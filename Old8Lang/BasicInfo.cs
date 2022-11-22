@@ -2,7 +2,15 @@
 
 public class BasicInfo
 {
+    /// <summary>
+    /// 帮助文档
+    /// </summary>
+    /// <returns></returns>
     public string HELP() => "笑死，根本就没有帮助这一说[doge]";
+    /// <summary>
+    /// 语言信息
+    /// </summary>
+    /// <returns></returns>
     public string INFO() => "Old8Lang是一个脚本语言，主要就是为了好玩而写的[doge]";
     /// <summary>
     /// 还没想好
