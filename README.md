@@ -28,10 +28,43 @@
 old a <- 1 //将1赋值给a
 a -> old b //将a赋值给b
 //在Old8Lang，变量更像是C中的指针，为了好看，这里使用 -> 或 <-
+
+if(a == 1) {
+    b <- 2 
+} 
+
+for(old c <- 1;c<=2:c++){ 
+    Console.WriteLine(b)
+} 
+
+while(a<=2){
+    Console.WriteLine(b)
+} 
+
+eight Old8LangClass{ 
+    old _a , _b
+    Old8LangClass(old a , old b){ 
+        a -> XATAT._a 
+        b -> XATAT._b 
+    } 
+    ADD(){
+        old c <- _a + _b
+        return c
+    }
+    ADD_1() => _a + _b
+}  
+
+//类的实例：
+a <- new Old8LangClass(1,2)                       
+a.ADD() == a.ADD_1() // ture
+a <- a.ADD
+a.ADD() // 3 
 ```
 
 
 ## Old8Lang关键字：
 - old => 声明变量
-- eight => 
+- eight => 类声明
 - XAUAT => 类里的this
+- null  => C# : null
+- if for while => C# : if for while
