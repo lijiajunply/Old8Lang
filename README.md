@@ -23,3 +23,15 @@
   
 现在的想法就是可以专门用来写文章，语法可能要改一下，毕竟我想让markdown不那么难用，或者说想让markdown小白一点
 
+## Old8Lang示例：
+```cs
+old a <- 1 //将1赋值给a
+a -> old b //将a赋值给b
+//在Old8Lang，变量更像是C中的指针，为了好看，这里使用 -> 或 <-
+```
+
+
+## Old8Lang关键字：
+- old => 声明变量
+- eight => 
+- XAUAT => 类里的this
