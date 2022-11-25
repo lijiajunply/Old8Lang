@@ -17,8 +17,8 @@ while(a<=2){
 eight Old8LangClass{ 
     old _a , _b
     Old8LangClass(old a , old b){ 
-        a -> XATAT._a 
-        b -> XATAT._b 
+        a -> XAUAT._a 
+        b -> XAUAT._b 
     } 
     ADD(){
         old c <- _a + _b
@@ -32,3 +32,46 @@ a <- new Old8LangClass(1,2)
 a.ADD() == a.ADD_1() // ture
 a <- a.ADD
 a.ADD() // 3 
+
+//彩蛋函数：
+a.XAUAT.ToString()
+//输出：西建大还我血汗钱我要回家
+a.XAUAT.HomeImg()
+//输出：西建大还我血汗钱我要回家 的 那张图
+
+//数组：
+a <- new String[]
+a[0] //为a数组的第一个
+a[-1] //为最后一个
+a[0:1] //取 a[n](0<=n<1)
+
+//lambda:
+a <- (c,d) => c+b
+Console.WriteLine(a())
+
+//type:
+typeof(a) // a : lambda
+a <- 5
+typeof(a) // a : int
+
+//泛型:
+eight TOld8Lang<T>{
+    private T[] array;
+    public TOld8Lang(int size){
+        array = new T[size + 1];
+    }
+    public T getItem(int index){
+        return array[index];
+    }
+    public void setItem(int index, T value){
+        array[index] = value;
+    }
+}
+a <- new TOld8Lang<Int>(6)
+a.setItem(0,2)
+a.getItem(0) // 2
+
+//基础类：
+XAUAT(object) Int(int) String Char ......
+
+//
