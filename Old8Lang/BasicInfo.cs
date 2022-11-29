@@ -29,4 +29,14 @@ public class BasicInfo
         "if for while",  // => C# : if for while
         ""
     };
+    /// <summary>
+    /// 文档，使用Old8Down书写(之后，现在先不这样写)
+    /// </summary>
+    /// <returns></returns>
+    public string Docs() => "学习资料：\n" +
+                            "1:《两周自制脚本语言》\n" +
+                            "2: https://www.bilibili.com/video/BV15v41147Zg （国内）/ " +
+                            "https://www.youtube.com/watch?v=wgHIkdUQbp0&list=PLRAdsfhKI4OWNOSfS7EUu5GRAVmze1t2y (国外) \n" +
+                            "3: https://www.zhihu.com/column/c_1383722427357159424  https://www.zhihu.com/column/c_1538128122850877440 \n" +
+                            "";
 }
