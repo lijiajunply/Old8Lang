@@ -22,9 +22,9 @@ public class BasicInfo
     /// </summary>
     public string[] KeyWords { get; set; } =
     {
-        "old",      // => C# : var
-        "eight",    // => C# : class
-        "XAUAT",    // => C# : this
+        "var",      // => C# : var
+        "class",    // => C# : class
+        "this",    // => C# : this
         "null",     // => C# : null
         "if for while",  // => C# : if for while
         ""

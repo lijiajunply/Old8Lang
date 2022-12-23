@@ -5,15 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/global.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangSample.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangSample.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///home/luckyfish/RiderProjects/Old8Lang/Old8Lang/BasicInfo.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -49,6 +49,8 @@
       <updated>1669093959861</updated>
       <workItem from="1669093964454" duration="2772000" />
       <workItem from="1669129552239" duration="727000" />
+      <workItem from="1670209988282" duration="126000" />
+      <workItem from="1670498793008" duration="273000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>

@@ -1,12 +1,12 @@
-﻿old a <- 1 //将1赋值给a
-a -> old b //将a赋值给b
+﻿var a <- 1 //将1赋值给a
+a -> var b //将a赋值给b
 //在Old8Lang，变量更像是C中的指针，为了好看，这里使用 -> 或 <-
 
 if(a == 1) {
     b <- 2 
 } 
 
-for(old c <- 1;c<=2:c++){ 
+for(var c <- 1;c<=2:c++){ 
     Console.WriteLine(b)
 } 
 
@@ -14,14 +14,14 @@ while(a<=2){
     Console.WriteLine(b)
 } 
 
-eight Old8LangClass{ 
-    old _a , _b
+class Old8LangClass{ 
+    var _a , _b
     Old8LangClass(old a , old b){ 
         a -> XAUAT._a 
         b -> XAUAT._b 
     } 
     ADD(){
-        old c <- _a + _b
+        var c <- _a + _b
         return c
     }
     ADD_1() => _a + _b
@@ -55,19 +55,19 @@ a <- 5
 typeof(a) // a : int
 
 //泛型:
-eight TOld8Lang<T>{
-    private T[] array;
-    public TOld8Lang(int size){
-        array = new T[size + 1];
+class TOld8Lang<T>{
+    T[] array;
+    TOld8Lang(int size){
+        array <- new T[size + 1];
     }
-    public T getItem(int index){
+    T getItem(int index){
         return array[index];
     }
-    public void setItem(int index, T value){
+    setItem(int index, T value){
         array[index] = value;
     }
 }
-a <- new TOld8Lang<Int>(6)
+a <- new TOld8Lang<int>(6)
 a.setItem(0,2)
 a.getItem(0) // 2
 
