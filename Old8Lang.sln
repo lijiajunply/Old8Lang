@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang", "Old8Lang\Old8Lang.csproj", "{8D3A97E2-5363-4B88-A6A0-C025E55DB084}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.App", "Old8Lang.App\Old8Lang.App.csproj", "{C82F35F3-5DD8-4E0E-AAB2-C9E2A480A025}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{8D3A97E2-5363-4B88-A6A0-C025E55DB084}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D3A97E2-5363-4B88-A6A0-C025E55DB084}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D3A97E2-5363-4B88-A6A0-C025E55DB084}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C82F35F3-5DD8-4E0E-AAB2-C9E2A480A025}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C82F35F3-5DD8-4E0E-AAB2-C9E2A480A025}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C82F35F3-5DD8-4E0E-AAB2-C9E2A480A025}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C82F35F3-5DD8-4E0E-AAB2-C9E2A480A025}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
