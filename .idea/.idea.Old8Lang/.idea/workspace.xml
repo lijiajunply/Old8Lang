@@ -7,9 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="add Old8Lang.App">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="asdf" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -27,6 +25,9 @@
         <option name="url" value="https://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@github.com/lijiajunply/Old8Lang.git" />
       </UrlAndAccount>
     </option>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///home/luckyfish/RiderProjects/Old8Lang/Old8Lang/Lexer/Old8LangException.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -56,6 +57,7 @@
   },
   "keyToStringList": {
     "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "Markdown",
       "PLAIN_TEXT"
     ],
     "rider.external.source.directories": [
@@ -97,7 +99,7 @@
       <workItem from="1669129552239" duration="727000" />
       <workItem from="1670209988282" duration="126000" />
       <workItem from="1670498793008" duration="273000" />
-      <workItem from="1671865363539" duration="7641000" />
+      <workItem from="1671865363539" duration="7988000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -127,7 +129,14 @@
       <option name="project" value="LOCAL" />
       <updated>1671872928326</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="asdf">
+      <created>1671873189492</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1671873189492</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -153,6 +162,7 @@
     <MESSAGE value="markdown 2022.11.22.11:17" />
     <MESSAGE value="add Lexer" />
     <MESSAGE value="add Old8Lang.App" />
-    <option name="LAST_COMMIT_MESSAGE" value="add Old8Lang.App" />
+    <MESSAGE value="asdf" />
+    <option name="LAST_COMMIT_MESSAGE" value="asdf" />
   </component>
 </project>
