@@ -17,6 +17,6 @@ public class Token
     public bool isIdentifier() => false;
     public bool isNum() => false;
     public bool isString() => false;
-    public int GetNumber() => throw new Old8LangException("not number token");
+    public int GetNumber() => throw new Old8LangException("not number _token");
     public string GetString() => "";
 }

@@ -94,7 +94,7 @@ public class Lexer
             }
             else
             {
-                throw new Old8LangException(" " + lineNo+$"bad token at position{lineNo}:{match.Index}");
+                throw new Old8LangException(" " + lineNo+$"bad _token at position{lineNo}:{match.Index}");
             }
         }
         Queue.Add(new IdToken(lineNo, Token.EOL));
