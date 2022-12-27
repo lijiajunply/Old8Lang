@@ -1,5 +1,4 @@
 namespace Old8Lang;
-
 public class APIs
 {
     public static StreamReader Reader { get; set; }
@@ -7,10 +6,15 @@ public class APIs
     {
         Reader = new StreamReader(Context);
     }
-
-    public void LexerUsing()
+    public String LexerUsing()
     {
         var _lexer = new Lexer.Lexer(Reader);
         //_lexer.Peek(line:1);
+        return _lexer.UseLexer();
+    }
+
+    public String CslyUsing()
+    {
+        return "";
     }
 }

@@ -24,7 +24,35 @@ public class Lexer
         HaveMore = true;
         Reader = r;
     }
-    /// <summary>
+
+    public string UseLexer()
+    {
+        int i = 1;
+        Token aas = new Token(i);
+        while (aas != Token.EOF)
+        {
+            aas = TokenRead();
+            if (aas == Token.EOF)
+            {
+                var oueueReaing = QueueReaing();
+                return oueueReaing;
+            }
+            aas = Peek(i);
+        }
+        return this.QueueReaing();
+    }
+
+    public string QueueReaing()
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+        foreach (var VARIABLE in Queue)
+        {
+            stringBuilder.Append($"{VARIABLE.ToString()} ");
+        }
+
+        return stringBuilder.ToString();
+    }
+        /// <summary>
     /// 将第一个读取,并删除
     /// </summary>
     /// <returns></returns>
