@@ -11,7 +11,8 @@ public class BasicInfo
     /// 语言信息
     /// </summary>
     /// <returns></returns>
-    public string INFO() => "Old8Lang是一个脚本语言，主要就是为了好玩而写的[doge]";
+    public string INFO() => "Old8Lang是一个脚本语言，主要就是为了好玩而写的[doge]\n" +
+                            "使用两种方式书写：自己手撸和使用csly(https://github.com/b3b00/csly)编写";
     /// <summary>
     /// 还没想好
     /// </summary>
@@ -22,12 +23,11 @@ public class BasicInfo
     /// </summary>
     public string[] KeyWords { get; set; } =
     {
-        "var",      // => C# : var
         "class",    // => C# : class
         "this",    // => C# : this
         "null",     // => C# : null
-        "if for while",  // => C# : if for while
-        ""
+        "if for while",  // => C# : if , for , while
+        "elif else", // => C# : else if , else
     };
     /// <summary>
     /// 文档，使用Old8Down书写(之后，现在先不这样写)

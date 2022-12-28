@@ -8,12 +8,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldTokenGeneric.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldBlock.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldBool.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldChar.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldCompare.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldCompound.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldDouble.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldFor.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldID.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldIf.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldIf_Elif_Else.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldInt.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldLangTree.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldSet.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldString.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldValue.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Old8Lang.App.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Old8Lang.App.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/APIs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/APIs.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Lexer/Lexer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Lexer/Lexer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldLangAST.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldTokenGeneric.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldTokenGeneric.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/OldTrees/BinaryExpr.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/OldTrees/BinaryExpr.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,7 +126,9 @@
       <workItem from="1671953213441" duration="4001000" />
       <workItem from="1671957408087" duration="94000" />
       <workItem from="1672130040700" duration="21000" />
-      <workItem from="1672131190875" duration="1813000" />
+      <workItem from="1672131190875" duration="2110000" />
+      <workItem from="1672136614891" duration="4720000" />
+      <workItem from="1672192619744" duration="4669000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -154,7 +172,14 @@
       <option name="project" value="LOCAL" />
       <updated>1671957194553</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="add APIs and csly">
+      <created>1672133289108</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1672133289108</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -182,6 +207,7 @@
     <MESSAGE value="add Old8Lang.App" />
     <MESSAGE value="asdf" />
     <MESSAGE value="add OldTrees and APIs" />
-    <option name="LAST_COMMIT_MESSAGE" value="add OldTrees and APIs" />
+    <MESSAGE value="add APIs and csly" />
+    <option name="LAST_COMMIT_MESSAGE" value="add APIs and csly" />
   </component>
 </project>
