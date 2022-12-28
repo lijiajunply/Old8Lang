@@ -1,5 +1,7 @@
 namespace Old8Lang.CslyMake.OldExpression;
-
+/// <summary>
+/// while语句
+/// </summary>
 public class OldWhile : OldCompound
 {
     public OldExpr Expr { get; set; }

@@ -1,6 +1,8 @@
 namespace Old8Lang.CslyMake.OldExpression;
-
-public class OldCompound : OldLangTree
+/// <summary>
+/// 表示语句
+/// </summary>
+public class OldCompound : OldStatement
 {
     public string Location { get; set; }
 }

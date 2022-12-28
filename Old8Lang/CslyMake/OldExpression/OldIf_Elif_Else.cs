@@ -1,5 +1,7 @@
 namespace Old8Lang.CslyMake.OldExpression;
-
+/// <summary>
+/// if语句
+/// </summary>
 public class OldIf_Elif_Else : OldCompound
 {
     public OldIf IfBlock { get; set; }

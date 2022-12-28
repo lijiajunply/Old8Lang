@@ -1,7 +1,9 @@
 using Old8Lang.CslyMake.OldLandParser;
 
 namespace Old8Lang.CslyMake.OldExpression;
-
+/// <summary>
+/// 比较符号
+/// </summary>
 public class OldCompare : OldLangTree
 {
     public string Location { get; set; }
