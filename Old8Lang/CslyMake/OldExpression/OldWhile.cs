@@ -1,3 +1,5 @@
+using Old8Lang.CslyMake.OldLandParser;
+
 namespace Old8Lang.CslyMake.OldExpression;
 /// <summary>
 /// while语句
@@ -11,5 +13,20 @@ public class OldWhile : OldCompound
     {
         Expr = expr;
         Block = block;
+    }
+
+    public override void Run(ref VariateManager Manager)
+    {
+        while (true)
+        {
+            if (Expr.CompareRun(ref Manager))
+            {
+                Block.Run(ref Manager);
+            }
+            else
+            {
+                return;
+            }
+        }
     }
 }

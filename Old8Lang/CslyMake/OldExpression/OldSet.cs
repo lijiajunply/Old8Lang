@@ -1,3 +1,5 @@
+using Old8Lang.CslyMake.OldLandParser;
+
 namespace Old8Lang.CslyMake.OldExpression;
 
 public class OldSet : OldStatement
@@ -9,5 +11,10 @@ public class OldSet : OldStatement
     {
         Id = id;
         Value = value;
+    }
+
+    public override void Run(ref VariateManager Manager)
+    {
+        Manager.Set(Id, Value);
     }
 }

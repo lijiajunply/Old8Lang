@@ -9,7 +9,7 @@ namespace Old8Lang.CslyMake.OldLandParser;
 public class OldParser
 {
     [Production("root: statement*")]
-    public OldLangTree Root(List<OldLangTree> statement) => new OldBlock(statement);
+    public OldLangTree Root(List<OldStatement> statement) => new OldBlock(statement);
 
     [Production("statement: [set|compound]")]
     public OldLangTree Statament(OldLangTree stat) => stat as OldStatement;
@@ -64,7 +64,7 @@ public class OldParser
     }
 
     [Production("block: INDENT[d] statement* UINDENT[d]")]
-    public OldLangTree Block(List<OldLangTree> statements) => new OldBlock(statements);
+    public OldLangTree Block(List<OldStatement> statements) => new OldBlock(statements);
 
     [Production("for: FOR[d] set , expr , statement : block")]
     public OldLangTree FOR(OldSet set, OldExpr expr, OldStatement statement, OldBlock block) =>

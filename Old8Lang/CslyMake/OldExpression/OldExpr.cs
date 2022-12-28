@@ -14,13 +14,25 @@ public class OldExpr : OldLangTree
 
     public OldExpr(OldID? id, OldCompare? compare, OldValue value)
     {
+        BoolValue = false;
         ID = id;
         Compare = compare;
         Value = value;
         if (id == null && compare == null && value != null)
         {
             var oldboolvalue = value as OldBool;
-            BoolValue = oldboolvalue.BoolValue;
+            BoolValue = (bool)oldboolvalue.Value;
         }
+    }
+
+    public bool CompareRun(ref VariateManager Manager)
+    {
+        if (BoolValue != null)
+        {
+            return BoolValue;
+        }
+        var a = Manager.GetValue(ID);
+        BoolValue = a.Compare(Value,Compare.Compare);
+        return BoolValue;
     }
 }

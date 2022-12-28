@@ -1,3 +1,5 @@
+using Old8Lang.CslyMake.OldLandParser;
+
 namespace Old8Lang.CslyMake.OldExpression;
 
 public class OldFor : OldCompound
@@ -13,5 +15,19 @@ public class OldFor : OldCompound
         Expr = expr;
         Statement = statement;
         ForBlock = block;
+    }
+
+    public override void Run(ref VariateManager Manager)
+    {
+        while (true)
+        {
+            Set.Run(ref Manager);
+            bool expr = Expr.CompareRun(ref Manager);
+            if (expr)
+            {
+                ForBlock.Run(ref Manager);
+            }
+            Statement.Run(ref Manager);
+        }
     }
 }

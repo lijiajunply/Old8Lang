@@ -57,7 +57,7 @@ public enum OldTokenGeneric
         
         [Sugar("->")] SAT1 = 40,
 
-        [Sugar("<-")] SAT2 = 41,
+        [Sugar("<-")] DIS_SAT = 41,
         
         [Sugar( ">")] GREATER = 30,
 
