@@ -25,7 +25,6 @@ public class VariateManager
             var a = value as OldID;
             return Direct(id, a);
         }
-
         return (id, value);
     }
 

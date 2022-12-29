@@ -2,10 +2,10 @@ namespace Old8Lang.CslyMake.OldExpression;
 
 public class OldAny : OldValue
 {
-    public List<OldExpr> Variates { get; set; }
+    public Dictionary<OldID,OldExpr> Variates { get; set; }
     public OldID Id { get; set; }
 
-    public OldAny(OldID id, List<OldExpr> variates)
+    public OldAny(OldID id, Dictionary<OldID,OldExpr> variates)
     {
         Variates = variates;
         Id = id;

@@ -17,6 +17,67 @@ public class BinaryOperation : OldExpr
     public bool BoolSet() => true;
     public override OldExpr Run(ref VariateManager Manager)
     {
+        // not id
+        if (Left is null && Right is not null && Oper == OldTokenGeneric.NOT)
+        {
+            var a = new OldValue();
+            if (Right is OldID)
+            {
+                a = Manager.GetValue(Right as OldID);
+            }else if (Right is OldValue)
+            {
+                a = Right as OldValue;
+            }
+            return new OldBool(!(bool)a.Value);
+        }
+        // id.id => output : id.id 's value
+        if (Left is OldID && Right is OldID && Oper == OldTokenGeneric.CONCAT)
+        {
+            var a = Manager.GetValue(Left as OldID);
+            if (a is OldAny)
+            {
+                var b = a as OldAny;
+                return b.Variates[Right as OldID];
+            }
+        }
+        // id1/value (and or xor) id2/value
+        if (Left is OldID && Right is OldID && Oper != null)
+        {
+            var a = new OldValue();
+            var b = new OldValue();
+            if (Left is OldID)
+            {
+                a = Manager.GetValue(Left as OldID);   
+            }
+
+            if (Right is OldID)
+            {
+                b = Manager.GetValue(Right as OldID);
+            }
+
+            if (Left is OldValue && Right is OldValue)
+            {
+                a = Left as OldValue;
+                b = Right as OldValue;
+            }
+            if (a is OldBool && b is OldBool)
+            {
+                switch (Oper)
+                {
+                    case OldTokenGeneric.AND:
+                        return new OldBool((bool)a.Value && (bool)b.Value);
+                    case OldTokenGeneric.OR:
+                        return new OldBool((bool)a.Value || (bool)b.Value);
+                    case OldTokenGeneric.XOR:
+                        if (a.Value == b.Value)
+                            return new OldBool(false);
+                        else
+                            return new OldBool(true);
+                    default:
+                        return new OldExpr();
+                }
+            }
+        }
         // var => output : var.id
         if (Left is OldID && Right == null && Oper == null)
             return Left as OldID;

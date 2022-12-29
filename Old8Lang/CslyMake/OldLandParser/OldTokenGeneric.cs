@@ -39,7 +39,9 @@ public enum OldTokenGeneric
         
         [Lexeme(GenericToken.KeyWord,"XOR")][Lexeme(GenericToken.KeyWord,"xor")]
         XOR = 11,
-
+        
+        [Lexeme(GenericToken.KeyWord,"//")]
+        ANNOTATION = 12,
         //[Lexeme(GenericToken.KeyWord, "CLASS")] [Lexeme(GenericToken.KeyWord, "print")]
         //PRINT = 12,
 
