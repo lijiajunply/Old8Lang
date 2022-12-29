@@ -1,6 +1,6 @@
 namespace Old8Lang.CslyMake.OldExpression;
 
-public class OldID : OldLangTree
+public class OldID : OldExpr
 {
     public string Location { get; set; }
     public string IdName { get; set; }

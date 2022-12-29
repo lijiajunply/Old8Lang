@@ -10,13 +10,23 @@ public class VariateManager
     public List<OldID> Variates { get; set; } = new List<OldID>();
     public Dictionary<int, OldValue> Values { get; set; } = new Dictionary<int, OldValue>();
 
-    public ValueTuple<OldID, OldValue> Set(OldID id, OldValue value)
+    public ValueTuple<OldID, OldExpr> Set(OldID id, OldExpr value)
     {
-        Variates.Add(id);
-        Values.Add(Count,value);
-        VariateDirectValue.Add(Count);
-        Count++;
-        return (id,value);
+        if (value is OldValue)
+        {
+            var a =  value as OldValue;
+            Variates.Add(id);
+            Values.Add(Count,a);
+            VariateDirectValue.Add(Count);
+            Count++;
+            return (id,a);
+        }else if (value is OldID)
+        {
+            var a = value as OldID;
+            return Direct(id, a);
+        }
+
+        return (id, value);
     }
 
     public ValueTuple<OldID, OldValue> Direct(OldID id, OldID directID)

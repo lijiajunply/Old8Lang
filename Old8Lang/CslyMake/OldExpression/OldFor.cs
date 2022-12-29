@@ -2,14 +2,14 @@ using Old8Lang.CslyMake.OldLandParser;
 
 namespace Old8Lang.CslyMake.OldExpression;
 
-public class OldFor : OldCompound
+public class OldFor : OldStatement
 {
     public OldSet Set { get; set;}
-    public OldExpr Expr { get; set; }
+    public BinaryOperation Expr { get; set; }
     public OldStatement Statement { get; set; }
     public OldBlock ForBlock { get; set; }
 
-    public OldFor(OldSet set, OldExpr expr, OldStatement statement, OldBlock block)
+    public OldFor(OldSet set, BinaryOperation expr, OldStatement statement, OldBlock block)
     {
         Set = set;
         Expr = expr;
@@ -19,10 +19,15 @@ public class OldFor : OldCompound
 
     public override void Run(ref VariateManager Manager)
     {
+        bool expr = false;
         while (true)
         {
             Set.Run(ref Manager);
-            bool expr = Expr.CompareRun(ref Manager);
+            var varexpr = Expr.Run(ref Manager);
+            if (varexpr is OldBool)
+            {
+                expr = (bool)(varexpr as OldBool).Value;
+            }
             if (expr)
             {
                 ForBlock.Run(ref Manager);

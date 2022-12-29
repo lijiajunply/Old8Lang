@@ -55,7 +55,7 @@ public enum OldTokenGeneric
 
         #region operators 30 -> 49
         
-        [Sugar("->")] SAT1 = 40,
+        [Sugar("->")] SAT = 40,
 
         [Sugar("<-")] DIS_SAT = 41,
         
@@ -69,7 +69,9 @@ public enum OldTokenGeneric
 
         [Sugar( ".")] CONCAT = 34,
 
-        [Sugar( ":=")] ASSIGN = 35,
+        [Sugar( "-*")] DIRECT = 35,
+        
+        [Sugar("*-")] DIS_DIRECT = 43,
 
         [Sugar( "+")] PLUS = 36,
 

@@ -1,6 +1,8 @@
+using sly.lexer;
+
 namespace Old8Lang.CslyMake.OldExpression;
 
 public interface OldLangTree
 {
-    public string Location { get; set; }
+    public LexerPosition Location { get; set; }
 }

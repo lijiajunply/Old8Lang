@@ -1,75 +1,121 @@
 using Old8Lang.CslyMake.OldExpression;
-using Old8Lang.CslyMake.OldLandParser;
 using sly.lexer;
 using sly.parser.generator;
 using sly.parser.parser;
 
 namespace Old8Lang.CslyMake.OldLandParser;
 
+[ParserRoot("root")]
 public class OldParser
 {
     [Production("root: statement*")]
     public OldLangTree Root(List<OldStatement> statement) => new OldBlock(statement);
 
-    [Production("statement: [set|compound]")]
-    public OldLangTree Statament(OldLangTree stat) => stat as OldStatement;
+    [Production("statement: LPAREN statement RPAREN")]
+    public OldLangTree BOLCK1(Token<OldTokenGeneric> l, OldLangTree statement, Token<OldTokenGeneric> r) =>
+        statement as OldStatement;
 
-    [Production("expr: [expr1|expr2]")]
-    public OldLangTree Expr(OldLangTree expr) => expr;
+    [Production("statement: IDENTIFIER SET[d] OldLangParser_expressions")]
+    public OldLangTree Set(OldID id, OldExpr value) => new OldSet(id, value);
     
-    [Production("expr1: id compare value")]
-    public OldLangTree Expr1(OldID id, OldCompare compare, OldValue value) => new OldExpr(id,compare,value);
+    [Operation((int) OldTokenGeneric.LESSER, Affix.InFix, Associativity.Right, 50)]
+    [Operation((int) OldTokenGeneric.GREATER, Affix.InFix, Associativity.Right, 50)]
+    [Operation((int) OldTokenGeneric.EQUALS, Affix.InFix, Associativity.Right, 50)]
+    [Operation((int) OldTokenGeneric.DIFFERENT, Affix.InFix, Associativity.Right, 50)]
+    public OldLangTree binaryComparisonExpression(OldLangTree left, Token<OldTokenGeneric> operatorToken,
+        OldLangTree right) => new BinaryOperation(left as OldExpr, operatorToken.TokenID, right as OldExpr);
 
-    [Production("expr2: [TRUE[d]|FALSE[d]]")]
-    public OldLangTree Expr2(Token<OldTokenGeneric> boolvalue) =>
-        new OldExpr(null, null, new OldBool(bool.Parse(boolvalue.Value))); 
+    [Operation((int)OldTokenGeneric.CONCAT, Affix.InFix, Associativity.Right, 100)]
+    public OldLangTree DotExpr(OldLangTree left, Token<OldTokenGeneric> oper, OldLangTree right) =>
+        new BinaryOperation(left as OldExpr, oper.TokenID, right as OldExpr);
 
-    [Production("set: id SET[d] value")]
-    public OldLangTree Set(OldID id, OldValue value) => new OldSet(id, value);
+    [Operation((int)OldTokenGeneric.PLUS, Affix.InFix, Associativity.Right, 20)]
+    [Operation((int)OldTokenGeneric.MINUS, Affix.InFix, Associativity.Right, 20)]
+    public OldLangTree BE1(OldLangTree left, Token<OldTokenGeneric> oper, OldLangTree right) =>
+        new BinaryOperation(left as OldExpr, oper.TokenID, right as OldExpr);
+    
+    [Operation((int)OldTokenGeneric.TIMES, Affix.InFix, Associativity.Right, 70)]
+    [Operation((int)OldTokenGeneric.DIVIDE, Affix.InFix, Associativity.Right, 70)]
+    public OldLangTree BE2(OldLangTree left, Token<OldTokenGeneric> oper, OldLangTree right) =>
+        new BinaryOperation(left as OldExpr, oper.TokenID, right as OldExpr);
 
-    [Production("value: [string|int|char|double|bool]")]
-    public OldLangTree Value(OldLangTree value) => value as OldValue;
+    [Operation((int)OldTokenGeneric.AND, Affix.InFix, Associativity.Right, 50)]
+    [Operation((int)OldTokenGeneric.OR, Affix.InFix, Associativity.Right, 50)]
+    [Operation((int)OldTokenGeneric.XOR, Affix.InFix, Associativity.Right, 50)]
+    public OldLangTree Bool1(OldExpr left, Token<OldTokenGeneric> oper, OldExpr right) =>
+        new BinaryOperation(left, oper.TokenID, right);
 
-    [Production("string: STRING")]
+    [Operation((int)OldTokenGeneric.NOT, Affix.PreFix, Associativity.Right, 100)]
+    public OldLangTree Bool2(Token<OldTokenGeneric> oper, OldExpr expr) =>
+        new BinaryOperation(null, oper.TokenID, expr);
+
+    [Operation((int)OldTokenGeneric.MINUS, Affix.PreFix, Associativity.Right, 100)]
+    public OldLangTree MINUS(Token<OldTokenGeneric> oper, OldExpr expr) =>
+        new BinaryOperation(null, oper.TokenID, expr);
+
+    [Operand]
+    [Production("operand: primary")]
+    public OldLangTree Operand(OldLangTree prim) => prim;
+
+    [Production("primary: LPAREN primary RPAREN")]
+    public OldLangTree LR(Token<OldTokenGeneric> l, OldLangTree prim, Token<OldTokenGeneric> r) =>
+        prim as OldExpr;
+
+    [Production("primary: STRING")]
     public OldLangTree STRING(Token<OldTokenGeneric> token) => new OldString(token.Value);
 
-    [Production("int: INT")]
+    [Production("primary: INT")]
     public OldLangTree INT(Token<OldTokenGeneric> token) => new OldInt(token.IntValue);
 
-    [Production("char: CHAR")]
+    [Production("primary: CHAR")]
     public OldLangTree CHAR(Token<OldTokenGeneric> token) => new OldChar(token.Value[0]);
 
-    [Production("double: DOUBLE")]
+    [Production("primary: DOUBLE")]
     public OldLangTree DOUBLE(Token<OldTokenGeneric> token) => new OldDouble(double.Parse(token.Value));
 
-    [Production("bool: expr")]
+    [Production("primary: OldLangParser_expressions")]
     public OldLangTree Bool(OldLangTree expr)
     {
-        var ex = expr as OldExpr;
-        bool boolvalue = ex.BoolValue;
-        return new OldBool(boolvalue);
+        var ex = expr as BinaryOperation;
+        return new OldBool(ex);
     }
 
-    [Production("compound: [ifelifelse|while|for]")]
-    public OldLangTree Compound(OldLangTree comp) => comp as OldCompare;
+    [Production("primary: IDENTIFIER")]
+    public OldLangTree IDENTIFIER(Token<OldTokenGeneric> id) => new OldID(id.Value);
 
-    [Production("ifelifelse : IF[d] expr : block (ELIF[d] expr : block)* [ELSE[d] : block]")]
-    public OldLangTree IF(OldExpr ifexpr , OldBlock ifBlock , OldExpr? elifExpr , OldBlock? elifBlock , ValueOption<Group<OldTokenGeneric,OldLangTree>> elseBlock)
+    [Production("primary: TRUE")]
+    public OldLangTree BoolTrue(Token<OldTokenGeneric> token) => new OldBool(true);
+
+    [Production("primary: FALSE")]
+    public OldLangTree BoolFalse(Token<OldTokenGeneric> token) => new OldBool(false);
+
+    [Production("statement : IF OldLangParser_expressions block (ELIF OldLangParser_expressions  block)* [ELSE  block]?")]
+    public OldLangTree IF(BinaryOperation ifexpr , OldBlock ifBlock ,List<ValueTuple<BinaryOperation,OldBlock>> elif, ValueOption<Group<OldTokenGeneric,OldLangTree>> elseBlock)
     {
-        var eGrp = elseBlock.Match(
-            x => x,() => null
-        );
-        var elseblock = eGrp?.Value(0) as OldBlock;
-        return new OldIf_Elif_Else(new OldIf(ifexpr,ifBlock),new OldIf(elifExpr,elifBlock),elseblock);
+        OldStatement elseblock = new OldStatement();
+        if (elseBlock is not null)
+        {
+            var eGrp = elseBlock.Match(
+                x => x,() => null
+            );
+            elseblock = eGrp?.Value(0) as OldBlock;
+        }
+
+        var a = from var in elif
+            select new OldIf(var.Item1, var.Item2);
+        return new OldIf_Elif_Else(new OldIf(ifexpr,ifBlock),a.ToList(),elseblock as OldBlock);
     }
 
     [Production("block: INDENT[d] statement* UINDENT[d]")]
     public OldLangTree Block(List<OldStatement> statements) => new OldBlock(statements);
 
-    [Production("for: FOR[d] set , expr , statement : block")]
-    public OldLangTree FOR(OldSet set, OldExpr expr, OldStatement statement, OldBlock block) =>
+    [Production("statement: FOR set , OldLangParser_expressions , statement  block")]
+    public OldLangTree FOR(OldSet set, BinaryOperation expr, OldStatement statement, OldBlock block) =>
         new OldFor(set, expr, statement, block);
 
-    [Production("while: WHILE[d] expr : block")]
-    public OldLangTree WHILE(OldExpr expr, OldBlock block) => new OldWhile(expr, block);
+    [Production("statement: WHILE expr : block")]
+    public OldLangTree WHILE(BinaryOperation expr, OldBlock block) => new OldWhile(expr, block);
+
+    [Production("statement: IDENTIFIER DIRECT IDENTIFIER")]
+    public OldLangTree DIRECT(OldID id1, OldID id2) => new OldDirect(id1, id2);
 }
