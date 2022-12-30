@@ -18,6 +18,7 @@ public class OldWhile : OldStatement
     public override void Run(ref VariateManager Manager)
     {
         bool expr = false;
+        Manager.AddChildren();
         while (true)
         {
             var varbool = Expr.Run(ref Manager);
@@ -31,8 +32,10 @@ public class OldWhile : OldStatement
             }
             else
             {
+                Manager.RemoveChildren();
                 return;
             }
         }
+        
     }
 }

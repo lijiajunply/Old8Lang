@@ -20,6 +20,7 @@ public class OldFor : OldStatement
     public override void Run(ref VariateManager Manager)
     {
         bool expr = false;
+        Manager.AddChildren();
         while (true)
         {
             Set.Run(ref Manager);
@@ -31,8 +32,13 @@ public class OldFor : OldStatement
             if (expr)
             {
                 ForBlock.Run(ref Manager);
+                Statement.Run(ref Manager);
             }
-            Statement.Run(ref Manager);
+            else
+            {
+                Manager.RemoveChildren();
+                return;
+            }
         }
     }
 }

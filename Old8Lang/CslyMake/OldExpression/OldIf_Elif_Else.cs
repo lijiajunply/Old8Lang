@@ -20,6 +20,7 @@ public class OldIf_Elif_Else : OldStatement
     public override void Run(ref VariateManager Manager)
     {
         bool r = true;
+        Manager.AddChildren();
         IfBlock.Run(ref Manager,ref r);
         if (ElifBlock is not null)
         {
@@ -29,5 +30,6 @@ public class OldIf_Elif_Else : OldStatement
             }
         }
         ElseBlock.Run(ref Manager);
+        Manager.RemoveChildren();
     }
 }

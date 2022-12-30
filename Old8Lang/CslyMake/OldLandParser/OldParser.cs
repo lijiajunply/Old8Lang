@@ -107,13 +107,21 @@ public class OldParser
 
     #region yuju
 
-    [Production("statement : IF OldLangParser_expressions block (ELIF OldLangParser_expressions  block)* [ELSE  block]?")]
-    public OldLangTree IF(Token<OldTokenGeneric> v, BinaryOperation ifexpr , OldBlock ifBlock, List<ValueTuple<Token<OldTokenGeneric>,BinaryOperation,OldBlock>> elif,Token<OldTokenGeneric> b, OldBlock elseBlock)
+    [Production("statement : IF ifblock (ELIF ifblock)* (ELSE  block)?")]
+    public OldLangTree IF(Token<OldTokenGeneric> v, OldIf ifBlock, List<Group<OldTokenGeneric,OldIf>> elif,ValueOption<Group<OldTokenGeneric,OldBlock>> Else)
     {
-        var a = from var in elif
-            select new OldIf(var.Item2, var.Item3);
-        return new OldIf_Elif_Else(new OldIf(ifexpr,ifBlock),a.ToList(),elseBlock);
+        var eGrp = Else.Match(x => x, () => null);
+        var elseBlock = eGrp?.Value(0);
+        List<OldIf> a = new List<OldIf>();
+        foreach (var VARIABLE in elif)
+        {
+            a.Add(VARIABLE.Value(0));
+        }
+        return new OldIf_Elif_Else(ifBlock, a, elseBlock);
     }
+
+    [Production("ifblock: OldLangParser_expressions block")]
+    public OldLangTree IFBLOCK(BinaryOperation binaryOperation, OldBlock block) => new OldIf(binaryOperation, block);
 
     [Production("block: INDENT[d] statement* UINDENT[d]")]
     public OldLangTree Block(List<OldStatement> statements) => new OldBlock(statements);

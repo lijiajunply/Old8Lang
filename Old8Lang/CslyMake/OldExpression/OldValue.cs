@@ -10,24 +10,12 @@ public class OldValue : OldExpr
     public string Location { get; set; }
     public object Value { get; set; }
 
-    public bool Compare(OldValue otherValue,OldTokenGeneric tokenGeneric)
-    {
-        if (this.GetType() == otherValue.GetType())
-        {
-            switch (tokenGeneric)
-            {
-                case OldTokenGeneric.EQUALS:
-                    return (this.Value == otherValue.Value);
-                case OldTokenGeneric.LESSER:
-                    return ((double)this.Value < (double)otherValue.Value);
-                case OldTokenGeneric.GREATER:
-                    return ((double)this.Value > (double)otherValue.Value);
-                case OldTokenGeneric.DIFFERENT:
-                    return (this.Value != otherValue.Value);
-                default:
-                    return false;
-            }
-        }
-        return false;
-    }
+    public virtual OldValue PLUS(OldValue otherValue) => new OldValue();
+
+    public virtual OldValue MINUS(OldValue otherValue) => new OldValue();
+
+    public virtual OldValue TIMES(OldValue otherValue) => new OldValue();
+
+    public virtual OldValue DIVIDE(OldValue otherValue) => new OldValue();
+
 }

@@ -9,6 +9,16 @@
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/BinaryOperation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/BinaryOperation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldChar.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldChar.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldFor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldFor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldIf_Elif_Else.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldIf_Elif_Else.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldInt.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldInt.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldWhile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldWhile.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldLangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldLangInterpreter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldParserBuilding.cs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,6 +124,8 @@
       <workItem from="1672278907488" duration="2352000" />
       <workItem from="1672287789793" duration="7793000" />
       <workItem from="1672295849332" duration="1370000" />
+      <workItem from="1672314176634" duration="5475000" />
+      <workItem from="1672366431827" duration="5738000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -192,7 +204,14 @@
       <option name="project" value="LOCAL" />
       <updated>1672297199128</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="add OldFunc.cs and OldAny.cs">
+      <created>1672319641805</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1672319641805</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -225,6 +244,7 @@
     <MESSAGE value="add OldLangInterpreter.cs and OldParserBuilding.cs" />
     <MESSAGE value="add Run func" />
     <MESSAGE value="add BOOL INT STRING" />
-    <option name="LAST_COMMIT_MESSAGE" value="add BOOL INT STRING" />
+    <MESSAGE value="add OldFunc.cs and OldAny.cs" />
+    <option name="LAST_COMMIT_MESSAGE" value="add OldFunc.cs and OldAny.cs" />
   </component>
 </project>
