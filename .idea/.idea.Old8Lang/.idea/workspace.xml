@@ -8,14 +8,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="解释器 完成">
-      <change afterPath="$PROJECT_DIR$/OldLang.App/OldLang.App.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldLang.App/Program.cs" afterDir="false" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/APIs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/APIs.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldLangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldLangInterpreter.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,6 +32,7 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3525d14275487fbeeab6166392023d993a1523b35bcd1caab2fff5ad2e5c0/GenericLexer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///home/luckyfish/RiderProjects/Old8Lang/Old8Lang/APIs.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -142,7 +137,7 @@
       <workItem from="1672295849332" duration="1370000" />
       <workItem from="1672314176634" duration="5475000" />
       <workItem from="1672366431827" duration="5738000" />
-      <workItem from="1672372744513" duration="1798000" />
+      <workItem from="1672372744513" duration="2591000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -235,7 +230,14 @@
       <option name="project" value="LOCAL" />
       <updated>1672372786975</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="add Old8Lang.App">
+      <created>1672375524760</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1672375524761</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -260,7 +262,6 @@
     <MESSAGE value="rename" />
     <MESSAGE value="markdown 2022.11.22.11:17" />
     <MESSAGE value="add Lexer" />
-    <MESSAGE value="add Old8Lang.App" />
     <MESSAGE value="asdf" />
     <MESSAGE value="add OldTrees and APIs" />
     <MESSAGE value="add APIs and csly" />
@@ -270,6 +271,7 @@
     <MESSAGE value="add BOOL INT STRING" />
     <MESSAGE value="add OldFunc.cs and OldAny.cs" />
     <MESSAGE value="解释器 完成" />
-    <option name="LAST_COMMIT_MESSAGE" value="解释器 完成" />
+    <MESSAGE value="add Old8Lang.App" />
+    <option name="LAST_COMMIT_MESSAGE" value="add Old8Lang.App" />
   </component>
 </project>
