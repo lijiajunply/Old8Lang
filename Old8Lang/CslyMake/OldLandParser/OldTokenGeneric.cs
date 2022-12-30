@@ -44,11 +44,20 @@ public enum OldTokenGeneric
         ANNOTATION = 12,
         //[Lexeme(GenericToken.KeyWord, "CLASS")] [Lexeme(GenericToken.KeyWord, "print")]
         //PRINT = 12,
+        
+        [Lexeme(GenericToken.KeyWord,"\n")]
+        HUANHANG = 13,
+        
+        [Lexeme(GenericToken.KeyWord,"CLASS")][Lexeme(GenericToken.KeyWord,"class")]
+        CLASS = 14,
+        
+        [Lexeme(GenericToken.KeyWord,"FUNC")][Lexeme(GenericToken.KeyWord,"func")]
+        FUNC = 15,
 
         #endregion
 
         #region literals 20 -> 29
-        [Lexeme(GenericToken.Identifier)] IDENTIFIER = 20,
+        [Lexeme(GenericToken.Identifier)] IDENTFIER = 20,
         [Lexeme(GenericToken.String)] STRING = 21,
         [Lexeme(GenericToken.Int)] INT = 22,
         [Lexeme(GenericToken.Double)] DOUBLE = 23,
@@ -57,9 +66,9 @@ public enum OldTokenGeneric
 
         #region operators 30 -> 49
         
-        [Sugar("->")] SAT = 40,
+        [Sugar("<-")] SET = 40,
 
-        [Sugar("<-")] DIS_SAT = 41,
+        [Sugar("->")] DIS_SET = 41,
         
         [Sugar( ">")] GREATER = 30,
 

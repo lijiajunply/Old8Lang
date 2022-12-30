@@ -11,26 +11,18 @@ public class OldLangInterpreter
     public List<string> Error => new List<string>();
     public OldLangInterpreter(string code)
     {
-        Parser<OldTokenGeneric, OldLangTree> parser = null;
+        ParserBuilder<OldTokenGeneric, OldLangTree> Parser = new ParserBuilder<OldTokenGeneric, OldLangTree>();
         OldParser oldParser = new OldParser();
-        BuildResult<Parser<OldTokenGeneric, OldLangTree>> buildResult =
-            new ParserBuilder<OldTokenGeneric, OldLangTree>().BuildParser(oldParser, ParserType.EBNF_LL_RECURSIVE_DESCENT,
-                "root");
-        if (buildResult.IsOk)
-            parser = buildResult.Result;
-        else
-        {
-            foreach (var error in buildResult.Errors)
-                Error.Add($"{error.Code} : {error.Message}");
-            return;
-        }
-            
-        ParseResult<OldTokenGeneric,OldLangTree> r = parser.Parse(code, null); 
+        var buildResult = Parser.BuildParser(oldParser,
+            ParserType.EBNF_LL_RECURSIVE_DESCENT).Result;
+
+        var r = buildResult.Parse(code);
+        string aaa = code; //
         var RUN = r.Result;
-        if (RUN is OldBlock)
+        if (r.Errors !=null && r.Errors.Any())
         {
-            var run = RUN as OldBlock;
-            run.Run(ref Manager);
+            // display errors
+            r.Errors.ForEach(error => Error.Add(error.ErrorMessage + "\n"));
         }
     }
 

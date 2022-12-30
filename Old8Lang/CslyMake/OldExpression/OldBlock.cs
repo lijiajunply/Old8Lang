@@ -7,13 +7,14 @@ namespace Old8Lang.CslyMake.OldExpression;
 public class OldBlock : OldStatement
 {
     public string Location { get; set; }
-    public List<OldStatement> Statements { get; set; }
-    public OldBlock(List<OldStatement> statements) => Statements = statements;
+    public List<OldLangTree> Statements { get; set; }
+    public OldBlock(List<OldLangTree> statements) => Statements = statements;
     public override void Run(ref VariateManager Manager)
     {
         foreach (var VARIABLE in Statements)
         {
-            VARIABLE.Run(ref Manager);
+            var a = VARIABLE as OldStatement;
+            a.Run(ref Manager);
         }
     }
 }

@@ -11,17 +11,11 @@ public class OldParser
     #region root and statement 
 
     [Production("root: statement*")]
-    public OldLangTree Root(List<OldStatement> statement) => new OldBlock(statement);
-
-    [Production("statement: statement ANNOTATION")]
-    public OldLangTree Annotation(OldStatement statement, Token<OldTokenGeneric> a) => statement;
-
+    public OldLangTree Root(List<OldLangTree> statement) => new OldBlock(statement);
+    
     [Production("statement: LPAREN statement RPAREN")]
     public OldLangTree BOLCK1(Token<OldTokenGeneric> l, OldLangTree statement, Token<OldTokenGeneric> r) =>
         statement as OldStatement;
-
-    [Production("statement: IDENTIFIER SET OldLangParser_expressions")]
-    public OldLangTree Set(Token<OldTokenGeneric> a , OldID id,Token<OldTokenGeneric> b, OldExpr value) => new OldSet(id, value);
 
     #endregion
 
@@ -87,14 +81,14 @@ public class OldParser
     [Production("primary: DOUBLE")]
     public OldLangTree DOUBLE(Token<OldTokenGeneric> token) => new OldDouble(double.Parse(token.Value));
 
-    [Production("primary: OldLangParser_expressions")]
+    [Production("primary: OldParser_expressions")]
     public OldLangTree Bool(OldLangTree expr)
     {
         var ex = expr as BinaryOperation;
         return new OldBool(ex);
     }
 
-    [Production("primary: IDENTIFIER")]
+    [Production("primary: IDENTFIER")]
     public OldLangTree IDENTIFIER(Token<OldTokenGeneric> id) => new OldID(id.Value);
 
     [Production("primary: TRUE")]
@@ -106,53 +100,60 @@ public class OldParser
     #endregion
 
     #region yuju
-
-    [Production("statement : IF ifblock (ELIF ifblock)* (ELSE  block)?")]
-    public OldLangTree IF(Token<OldTokenGeneric> v, OldIf ifBlock, List<Group<OldTokenGeneric,OldIf>> elif,ValueOption<Group<OldTokenGeneric,OldBlock>> Else)
+    
+    [Production("set: IDENTFIER SET[d] OldParser_expressions")]
+    public OldLangTree Set( Token<OldTokenGeneric> id, OldExpr value) => new OldSet(new OldID(id.Value), value);
+    
+    [Production("statement: set")]
+    public OldLangTree SET(OldSet a) => a;
+    
+    [Production("statement : IF[d] ifblock (ELIF ifblock)* (ELSE  block)?")]
+    public OldLangTree IF( OldIf ifBlock, List<Group<OldTokenGeneric,OldLangTree>> elif,ValueOption<Group<OldTokenGeneric,OldLangTree>> Else)
     {
         var eGrp = Else.Match(x => x, () => null);
-        var elseBlock = eGrp?.Value(0);
+        var elseBlock = eGrp?.Value(0) as OldBlock;
         List<OldIf> a = new List<OldIf>();
         foreach (var VARIABLE in elif)
         {
-            a.Add(VARIABLE.Value(0));
+            a.Add(VARIABLE.Value(0) as OldIf);
         }
         return new OldIf_Elif_Else(ifBlock, a, elseBlock);
     }
 
-    [Production("ifblock: OldLangParser_expressions block")]
+    [Production("ifblock: OldParser_expressions block")]
     public OldLangTree IFBLOCK(BinaryOperation binaryOperation, OldBlock block) => new OldIf(binaryOperation, block);
 
     [Production("block: INDENT[d] statement* UINDENT[d]")]
-    public OldLangTree Block(List<OldStatement> statements) => new OldBlock(statements);
+    public OldLangTree Block(List<OldLangTree> statements) => new OldBlock(statements);
 
-    [Production("statement: FOR set , OldLangParser_expressions , statement  block")]
+    [Production("statement: FOR set OldParser_expressions  statement  block")]
     public OldLangTree FOR(Token<OldTokenGeneric> a, OldSet set, BinaryOperation expr, OldStatement statement, OldBlock block) =>
         new OldFor(set, expr, statement, block);
 
-    [Production("statement: WHILE expr : block")]
+    [Production("statement: WHILE OldParser_expressions block")]
     public OldLangTree WHILE(Token<OldTokenGeneric> a, BinaryOperation expr, OldBlock block) => new OldWhile(expr, block);
 
-    [Production("statement: IDENTIFIER DIRECT IDENTIFIER")]
-    public OldLangTree DIRECT(OldID id1,Token<OldTokenGeneric> a, OldID id2) => new OldDirect(id1, id2);
+    [Production("statement: IDENTFIER DIRECT[d] IDENTFIER")]
+    public OldLangTree DIRECT(Token<OldTokenGeneric> id1, Token<OldTokenGeneric> id2) => new OldDirect(new OldID(id1.Value), new OldID(id2.Value));
 
-    [Production("statement: FUNC IDENTFIER LPAREN RPAREN block")]
-    public OldLangTree STAT_FUNC(Token<OldTokenGeneric> a, OldID id, Token<OldTokenGeneric> l, OldBlock block) => new OldFunc(id,block);
+    [Production("statement: FUNC[d] IDENTFIER LPAREN[d] RPAREN[d] block")]
+    public OldLangTree STAT_FUNC( Token<OldTokenGeneric> id, OldBlock block) => new OldFunc(new OldID(id.Value),block);
 
-    [Production("statement: CLASS IDENTFIER set*")]
-    public OldLangTree CLASS(Token<OldTokenGeneric> a , OldID id, List<OldSet> sets)
+    [Production("statement: CLASS[d] IDENTFIER set*")]
+    public OldLangTree CLASS( Token<OldTokenGeneric> id, List<OldLangTree> sets)
     {
         Dictionary<OldID, OldExpr> c = new Dictionary<OldID, OldExpr>();
         foreach (var VARIABLE in sets)
         {
-            c.Add(VARIABLE.Id,VARIABLE.Value);
+            var a = VARIABLE as OldSet;
+            c.Add(a.Id,a.Value);
         }
-        return new OldAny(id, c);
+        return new OldAny(new OldID(id.Value), c);
     }
 
-    [Production("statement: IDENTFIER SET IDENTFIER LPAREN RPAREN")]
-    public OldLangTree INSTANTIATE(OldID id, Token<OldTokenGeneric> a, OldID otherid, Token<OldTokenGeneric> b,
-        Token<OldTokenGeneric> c) => new OldSet(id, otherid);
+    [Production("statement: IDENTFIER SET[d] IDENTFIER LPAREN RPAREN")]
+    public OldLangTree INSTANTIATE(Token<OldTokenGeneric> id, Token<OldTokenGeneric> a, Token<OldTokenGeneric> otherid, Token<OldTokenGeneric> b,
+        Token<OldTokenGeneric> c) => new OldSet(new OldID(id.Value), new OldID(otherid.Value));
 
     #endregion
 }
