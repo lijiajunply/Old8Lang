@@ -1,20 +1,11 @@
+using Old8Lang.CslyMake.OldLandParser;
+
 namespace Old8Lang;
 public class APIs
 {
-    public static StreamReader Reader { get; set; }
-    public APIs(string Context)
+    public static (VariateManager,List<string>) CslyUsing(string code)
     {
-        Reader = new StreamReader(Context);
-    }
-    public String LexerUsing()
-    {
-        var _lexer = new Lexer.Lexer(Reader);
-        //_lexer.Peek(line:1);
-        return _lexer.UseLexer();
-    }
-
-    public String CslyUsing()
-    {
-        return "";
+        var a = new OldLangInterpreter(code);
+        return (a.GetVariateManager(), a.GetError());
     }
 }

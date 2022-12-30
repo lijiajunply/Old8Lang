@@ -8,6 +8,7 @@ namespace Old8Lang.CslyMake.OldLandParser;
 public class OldLangInterpreter
 {
     public VariateManager Manager = new VariateManager();
+    public List<string> Error => new List<string>();
     public OldLangInterpreter(string code)
     {
         Parser<OldTokenGeneric, OldLangTree> parser = null;
@@ -20,11 +21,10 @@ public class OldLangInterpreter
         else
         {
             foreach (var error in buildResult.Errors)
-            {
-                Console.WriteLine($"{error.Code} : {error.Message}");
-            }
+                Error.Add($"{error.Code} : {error.Message}");
+            return;
         }
-
+            
         ParseResult<OldTokenGeneric,OldLangTree> r = parser.Parse(code, null); 
         var RUN = r.Result;
         if (RUN is OldBlock)
@@ -34,5 +34,6 @@ public class OldLangInterpreter
         }
     }
 
+    public List<String> GetError() => Error;
     public VariateManager GetVariateManager() => Manager;
 }
