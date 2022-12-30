@@ -13,9 +13,8 @@ public class OldParser
     [Production("root: statement*")]
     public OldLangTree Root(List<OldLangTree> statement) => new OldBlock(statement);
     
-    [Production("statement: LPAREN statement RPAREN")]
-    public OldLangTree BOLCK1(Token<OldTokenGeneric> l, OldLangTree statement, Token<OldTokenGeneric> r) =>
-        statement as OldStatement;
+    [Production("statement: LPAREN[d] statement RPAREN[d]")]
+    public OldLangTree BOLCK1(OldLangTree statement) => statement as OldStatement;
 
     #endregion
 
@@ -115,12 +114,12 @@ public class OldParser
     [Production("block: INDENT[d] statement* UINDENT[d]")]
     public OldLangTree Block(List<OldLangTree> statements) => new OldBlock(statements);
 
-    [Production("statement: FOR set OldParser_expressions  statement  block")]
-    public OldLangTree FOR(Token<OldTokenGeneric> a, OldSet set, BinaryOperation expr, OldStatement statement, OldBlock block) =>
+    [Production("statement: FOR[d] set OldParser_expressions  statement  block")]
+    public OldLangTree FOR(OldSet set, BinaryOperation expr, OldStatement statement, OldBlock block) =>
         new OldFor(set, expr, statement, block);
 
-    [Production("statement: WHILE OldParser_expressions block")]
-    public OldLangTree WHILE(Token<OldTokenGeneric> a, BinaryOperation expr, OldBlock block) => new OldWhile(expr, block);
+    [Production("statement: WHILE[d] OldParser_expressions block")]
+    public OldLangTree WHILE(BinaryOperation expr, OldBlock block) => new OldWhile(expr, block);
 
     [Production("statement: IDENTFIER DIRECT[d] IDENTFIER")]
     public OldLangTree DIRECT(Token<OldTokenGeneric> id1, Token<OldTokenGeneric> id2) => new OldDirect(new OldID(id1.Value), new OldID(id2.Value));
@@ -140,9 +139,9 @@ public class OldParser
         return new OldAny(new OldID(id.Value), c);
     }
 
-    [Production("statement: IDENTFIER SET[d] IDENTFIER LPAREN RPAREN")]
-    public OldLangTree INSTANTIATE(Token<OldTokenGeneric> id, Token<OldTokenGeneric> a, Token<OldTokenGeneric> otherid, Token<OldTokenGeneric> b,
-        Token<OldTokenGeneric> c) => new OldSet(new OldID(id.Value), new OldID(otherid.Value));
+    [Production("statement: IDENTFIER SET[d] IDENTFIER LPAREN[d] RPAREN[d]")]
+    public OldLangTree INSTANTIATE(Token<OldTokenGeneric> id, Token<OldTokenGeneric> otherid) => 
+        new OldSet(new OldID(id.Value), new OldID(otherid.Value));
 
     #endregion
 }

@@ -68,7 +68,7 @@ public class VariateManager
 
     public OldValue GetValue(OldID id)
     {
-        var a = Variates.FindLastIndex(x => x == id);
+        var a = Variates.FindLastIndex(x => x.IdName == id.IdName);
         int b = VariateDirectValue[a];
         return Values[b];
     }

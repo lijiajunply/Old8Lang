@@ -19,7 +19,7 @@ public class OldSet : OldStatement
         {
             var a = Value.Run(ref Manager);
             var b = a as OldValue;
-            Manager.Set(Id, Value);
+            Manager.Set(Id, b);
         }else if(Value is OldID)
         {
             var a = Manager.GetValue(Value as OldID);

@@ -14,7 +14,11 @@ public class OldInt : OldValue
         if (otherValue is OldDouble)
             return otherValue.PLUS(this);
         if (otherValue is OldInt)
-            return new OldInt((int)this.Value + (int)otherValue.Value);
+        {
+            var other = otherValue as OldInt;
+            return new OldInt((Value + other.Value));
+        }
+            
         return new OldValue();
     }
 
