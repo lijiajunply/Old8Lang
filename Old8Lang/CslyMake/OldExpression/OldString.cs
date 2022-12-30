@@ -4,4 +4,5 @@ public class OldString : OldValue
 {
     new string Value { get; set; }
     public OldString(string stringvalue) => Value = stringvalue;
+    public override string ToString() => Value;
 }

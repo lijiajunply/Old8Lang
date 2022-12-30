@@ -20,6 +20,15 @@ public class BinaryOperation : OldExpr
         var l = Left;
         var r = Right;
 
+        // value => value
+        if (l is not null && r == null && Oper == null)
+        {
+            return l;
+        }
+        if (r is not null && l == null && Oper == null)
+        {
+            return r;
+        }
         // var/binary -> value
         if (Left is OldID)
             l = Manager.GetValue(Left as OldID);
@@ -91,17 +100,6 @@ public class BinaryOperation : OldExpr
                 case OldTokenGeneric.DIVIDE:
                     return l1.DIVIDE(r1);
             }
-        }
-        
-        
-        // value => value
-        if (l is not null && r == null && Oper == null)
-        {
-            return l;
-        }
-        if (r is not null && l == null && Oper == null)
-        {
-            return r;
         }
 
         return new OldExpr();

@@ -23,4 +23,5 @@ public class OldBool : OldValue
             return new OldExpr();
         }
     }
+    public override string ToString() => Value.ToString();
 }

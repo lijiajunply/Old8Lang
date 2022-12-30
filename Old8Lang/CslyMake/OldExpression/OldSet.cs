@@ -4,7 +4,7 @@ namespace Old8Lang.CslyMake.OldExpression;
 
 public class OldSet : OldStatement
 {
-    public OldID Id { get; set; }
+    public OldID Id { get; set; } 
     public OldExpr Value { get; set; }
 
     public OldSet(OldID id, OldExpr value)

@@ -10,10 +10,15 @@
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldBlock.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldBlock.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/BinaryOperation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/BinaryOperation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldBool.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldBool.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldChar.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldChar.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldID.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldID.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldInt.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldInt.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldSet.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldSet.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldString.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldString.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldLangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldLangInterpreter.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldTokenGeneric.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldTokenGeneric.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/OldLang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OldLang.App/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -53,31 +58,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "settings.editor.selected.configurable": "project.propDebugger",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propDebugger&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "Markdown",
-      "PLAIN_TEXT"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;Markdown&quot;,
+      &quot;PLAIN_TEXT&quot;
     ],
-    "rider.external.source.directories": [
-      "/home/luckyfish/.config/JetBrains/Rider2022.3/resharper-host/DecompilerCache",
-      "/home/luckyfish/.config/JetBrains/Rider2022.3/resharper-host/SourcesCache",
-      "/home/luckyfish/.local/share/Symbols/src"
+    &quot;rider.external.source.directories&quot;: [
+      &quot;/home/luckyfish/.config/JetBrains/Rider2022.3/resharper-host/DecompilerCache&quot;,
+      &quot;/home/luckyfish/.config/JetBrains/Rider2022.3/resharper-host/SourcesCache&quot;,
+      &quot;/home/luckyfish/.local/share/Symbols/src&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Project.OldLang.App">
     <configuration name="Old8Lang.App" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
@@ -144,7 +149,8 @@
       <workItem from="1672314176634" duration="5475000" />
       <workItem from="1672366431827" duration="5738000" />
       <workItem from="1672372744513" duration="2591000" />
-      <workItem from="1672385942747" duration="8436000" />
+      <workItem from="1672385942747" duration="12374000" />
+      <workItem from="1672406813651" duration="2953000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -244,7 +250,14 @@
       <option name="project" value="LOCAL" />
       <updated>1672375524761</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="bug">
+      <created>1672394803386</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1672394803386</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -279,38 +292,7 @@
     <MESSAGE value="add OldFunc.cs and OldAny.cs" />
     <MESSAGE value="解释器 完成" />
     <MESSAGE value="add Old8Lang.App" />
-    <option name="LAST_COMMIT_MESSAGE" value="add Old8Lang.App" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/OldLang.App/Program.cs</url>
-          <line>21</line>
-          <properties documentPath="$PROJECT_DIR$/OldLang.App/Program.cs" initialLine="21" containingFunctionPresentation="">
-            <startOffsets>
-              <option value="503" />
-            </startOffsets>
-            <endOffsets>
-              <option value="504" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="28" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldLangInterpreter.cs</url>
-          <line>18</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldLangInterpreter.cs" initialLine="19" containingFunctionPresentation="constructor 'OldLangInterpreter'">
-            <startOffsets>
-              <option value="629" />
-            </startOffsets>
-            <endOffsets>
-              <option value="661" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="38" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="bug" />
   </component>
 </project>

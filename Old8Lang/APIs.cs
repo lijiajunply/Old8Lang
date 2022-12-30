@@ -6,6 +6,7 @@ public class APIs
     public static (VariateManager,List<string>) CslyUsing(string code)
     {
         var a = new OldLangInterpreter(code);
+        a.Use();
         return (a.GetVariateManager(), a.GetError());
     }
 }

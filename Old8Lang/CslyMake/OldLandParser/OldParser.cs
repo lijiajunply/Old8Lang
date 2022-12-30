@@ -81,13 +81,6 @@ public class OldParser
     [Production("primary: DOUBLE")]
     public OldLangTree DOUBLE(Token<OldTokenGeneric> token) => new OldDouble(double.Parse(token.Value));
 
-    [Production("primary: OldParser_expressions")]
-    public OldLangTree Bool(OldLangTree expr)
-    {
-        var ex = expr as BinaryOperation;
-        return new OldBool(ex);
-    }
-
     [Production("primary: IDENTFIER")]
     public OldLangTree IDENTIFIER(Token<OldTokenGeneric> id) => new OldID(id.Value);
 
@@ -101,22 +94,18 @@ public class OldParser
 
     #region yuju
     
-    [Production("set: IDENTFIER SET[d] OldParser_expressions")]
-    public OldLangTree Set( Token<OldTokenGeneric> id, OldExpr value) => new OldSet(new OldID(id.Value), value);
-    
     [Production("statement: set")]
     public OldLangTree SET(OldSet a) => a;
     
+    [Production("set: IDENTFIER SET[d] OldParser_expressions")]
+    public OldLangTree Set( Token<OldTokenGeneric> id, OldExpr value) => new OldSet(new OldID(id.Value), value);
+
     [Production("statement : IF[d] ifblock (ELIF ifblock)* (ELSE  block)?")]
     public OldLangTree IF( OldIf ifBlock, List<Group<OldTokenGeneric,OldLangTree>> elif,ValueOption<Group<OldTokenGeneric,OldLangTree>> Else)
     {
         var eGrp = Else.Match(x => x, () => null);
         var elseBlock = eGrp?.Value(0) as OldBlock;
-        List<OldIf> a = new List<OldIf>();
-        foreach (var VARIABLE in elif)
-        {
-            a.Add(VARIABLE.Value(0) as OldIf);
-        }
+        var a = elif.Select(x => x.Value(0) as OldIf).ToList();
         return new OldIf_Elif_Else(ifBlock, a, elseBlock);
     }
 

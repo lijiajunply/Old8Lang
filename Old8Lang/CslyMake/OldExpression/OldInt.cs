@@ -4,6 +4,7 @@ public class OldInt : OldValue
 {
     new int Value { get; set; }
     public OldInt(int intValue) => Value = intValue;
+    public override string ToString() => Value.ToString();
     public override OldValue PLUS(OldValue otherValue)
     {
         if (otherValue is OldString)

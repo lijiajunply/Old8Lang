@@ -20,4 +20,6 @@ public class OldChar : OldValue
         }
         return new OldValue();
     }
+
+    public override string ToString() => Value.ToString();
 }
