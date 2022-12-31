@@ -8,17 +8,7 @@ public class OldChar : OldValue
 
     public override OldValue TIMES(OldValue otherValue)
     {
-        if (otherValue is OldInt)
-        {
-            int a = (int)otherValue.Value;
-            string b = "";
-            for (int i = 0; i < a; i++)
-            {
-                b += Value;
-            }
-            return new OldString(b);
-        }
-        return new OldValue();
+        return new OldString(Value + otherValue.ToString());
     }
 
     public override string ToString() => Value.ToString();

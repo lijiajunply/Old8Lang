@@ -1,12 +1,23 @@
+using System.Diagnostics;
 using Old8Lang.CslyMake.OldLandParser;
 
 namespace Old8Lang;
 public class APIs
 {
-    public static (VariateManager,List<string>) CslyUsing(string code)
+    public static (VariateManager Manager ,List<string> Error, string Time) CslyUsing(string code)
     {
         var a = new OldLangInterpreter(code);
+        
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
+
         a.Use();
-        return (a.GetVariateManager(), a.GetError());
+
+        sw.Stop();
+        TimeSpan ts = sw.Elapsed;
+        Console.WriteLine("DateTime costed for Shuffle function is: {0}ms", ts.TotalMilliseconds);
+        
+        
+        return (a.GetVariateManager(), a.GetError(),$"DateTime costed for Shuffle function is: {ts.TotalMilliseconds}ms");
     }
 }
