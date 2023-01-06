@@ -7,7 +7,6 @@ namespace Old8Lang.CslyMake.OldExpression;
 /// </summary>
 public class OldExpr : OldLangTree
 {
-    public LexerPosition Location { get; set; }
     public OldTokenGeneric Compare { get; set; }
 
     public virtual OldExpr Run(ref VariateManager Manager)

@@ -9,15 +9,17 @@ public class OldFunc : OldValue
     
     public OldExpr Return { get; set; }
 
-    public OldFunc(OldID id, OldBlock block)
+    public OldFunc(OldID id, OldBlock block,OldExpr _return)
     {
         ID = id;
         Block = block;
+        Return = _return;
     }
 
     public override OldExpr Run(ref VariateManager Manager)
     {
         Block.Run(ref Manager);
-        return new OldValue();
+        var a = Return as BinaryOperation;
+        return a.Run(ref Manager);
     }
 }

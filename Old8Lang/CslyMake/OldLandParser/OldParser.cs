@@ -100,6 +100,9 @@ public class OldParser
     [Production("set: IDENTFIER SET[d] OldParser_expressions")]
     public OldLangTree Set( Token<OldTokenGeneric> id, OldExpr value) => new OldSet(new OldID(id.Value), value);
 
+    [Production("set: OldParser_expressions DIS_SET[d] IDENTFIER")]
+    public OldLangTree DIS_SET(OldExpr value, Token<OldTokenGeneric> id) => new OldSet(new OldID(id.Value), value);
+
     [Production("statement : IF[d] ifblock (ELIF ifblock)* (ELSE  block)?")]
     public OldLangTree IF( OldIf ifBlock, List<Group<OldTokenGeneric,OldLangTree>> elif,ValueOption<Group<OldTokenGeneric,OldLangTree>> Else)
     {
@@ -125,24 +128,61 @@ public class OldParser
     [Production("statement: IDENTFIER DIRECT[d] IDENTFIER")]
     public OldLangTree DIRECT(Token<OldTokenGeneric> id1, Token<OldTokenGeneric> id2) => new OldDirect(new OldID(id1.Value), new OldID(id2.Value));
 
-    [Production("statement: FUNC[d] IDENTFIER LPAREN[d] RPAREN[d] block")]
-    public OldLangTree STAT_FUNC( Token<OldTokenGeneric> id, OldBlock block) => new OldFunc(new OldID(id.Value),block);
+    [Production("statement: FUNC[d] IDENTFIER LPAREN[d] RPAREN[d] block (RETURN[d] OldParser_expressions)?")]
+    public OldLangTree STAT_FUNC( Token<OldTokenGeneric> id, OldBlock block,ValueOption<Group<OldTokenGeneric,OldLangTree>> returnExpr) => 
+        new OldFuncInit( new OldFunc(new OldID(id.Value),block,returnExpr.Match(x => x,() => null)?.Value(0) as OldExpr));
 
-    [Production("statement: CLASS[d] IDENTFIER set*")]
+    /// <summary>
+    /// Class
+    /// </summary>
+    /// <param name="id">Class Name</param>
+    /// <param name="sets">类的属性和方法</param>
+    /// <returns></returns>
+    [Production("statement: CLASS[d] IDENTFIER classinfo*")]
     public OldLangTree CLASS( Token<OldTokenGeneric> id, List<OldLangTree> sets)
     {
         Dictionary<OldID, OldExpr> c = new Dictionary<OldID, OldExpr>();
         foreach (var VARIABLE in sets)
         {
-            var a = VARIABLE as OldSet;
-            c.Add(a.Id,a.Value);
+            if (VARIABLE is OldFunc)
+            {
+                var a = VARIABLE as OldFunc;
+                c.Add(a.ID,a);
+            }
+
+            if (VARIABLE is OldSet)
+            {
+                var a = VARIABLE as OldSet;
+                c.Add(a.Id,a.Value);
+            }
         }
-        return new OldAny(new OldID(id.Value), c);
+        return new OldClassInit(new OldAny(new OldID(id.Value), c));
     }
 
-    [Production("statement: IDENTFIER SET[d] IDENTFIER LPAREN[d] RPAREN[d]")]
-    public OldLangTree INSTANTIATE(Token<OldTokenGeneric> id, Token<OldTokenGeneric> otherid) => 
-        new OldSet(new OldID(id.Value), new OldID(otherid.Value));
+    [Production("classinfo: set")]
+    public OldLangTree ClassInfo_Set(OldSet a) => a;
+    
+    [Production("classinfo: FUNC[d] IDENTFIER LPAREN[d] RPAREN[d] block (RETURN[d] OldParser_expressions)?")]
+    public OldLangTree ClassInfo_Func(Token<OldTokenGeneric> id, OldBlock block,ValueOption<Group<OldTokenGeneric,OldLangTree>> returnExpr) 
+        => new OldFuncInit( new OldFunc(new OldID(id.Value),block,returnExpr.Match(x => x,() => null)?.Value(0) as OldExpr));
+
+    /// <summary>
+    /// a = A(); 类,函数的初始化
+    /// </summary>
+    /// <param name="id">a</param>
+    /// <param name="otherid">A</param>
+    /// <returns></returns>
+    [Production("statement: IDENTFIER SET[d] IDENTFIER LPAREN[d] IDENTFIER* RPAREN[d]")]
+    public OldLangTree INSTANTIATE(Token<OldTokenGeneric> id, Token<OldTokenGeneric> otherid,
+        List<Token<OldTokenGeneric>> valve)
+    {
+        List<OldID> a = new List<OldID>();
+        foreach (var VARIABLE in valve)
+        {
+            a.Add(new OldID(VARIABLE.Value));
+        }
+        return new OldSet(new OldID(id.Value), new OldID(otherid.Value),a);
+    }
 
     #endregion
 }

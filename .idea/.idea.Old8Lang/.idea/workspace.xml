@@ -8,7 +8,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldClassInit.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldDir.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldFuncInit.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldList.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/BinaryOperation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/BinaryOperation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldAny.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldAny.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldFunc.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldFunc.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldID.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldID.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldLangTree.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldLangTree.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldSet.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldSet.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldTokenGeneric.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldTokenGeneric.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/VariateManager.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -32,9 +49,6 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8ddc693f0d924df185ef87b81b654b0294de00/aa/e40a4310/List`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3525d14275487fbeeab6166392023d993a1523b35bcd1caab2fff5ad2e5c0/GenericLexer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/69b13731f8acbba44a7d7f7b22925950371fdb21804fa6eeec99de1fe7a37fd/EBNFRecursiveDescentSyntaxParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///home/luckyfish/RiderProjects/Old8Lang/Old8Lang/APIs.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///home/luckyfish/RiderProjects/Old8Lang/Old8Lang/APIs.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -145,6 +159,9 @@
       <workItem from="1672410363635" duration="2156000" />
       <workItem from="1672451147315" duration="1709000" />
       <workItem from="1672463809923" duration="1863000" />
+      <workItem from="1672467381474" duration="91000" />
+      <workItem from="1672467747768" duration="181000" />
+      <workItem from="1673003372371" duration="4405000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>

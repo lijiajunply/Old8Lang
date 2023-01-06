@@ -7,7 +7,6 @@ namespace Old8Lang.CslyMake.OldExpression;
 /// </summary>
 public class OldValue : OldExpr
 {
-    public string Location { get; set; }
     public object Value { get; set; }
 
     public virtual OldValue PLUS(OldValue otherValue) => new OldValue();

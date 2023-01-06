@@ -6,11 +6,19 @@ public class OldSet : OldStatement
 {
     public OldID Id { get; set; } 
     public OldExpr Value { get; set; }
+    public List<OldID> Init_ID { get; set; }
 
     public OldSet(OldID id, OldExpr value)
     {
         Id = id;
         Value = value;
+    }
+
+    public OldSet(OldID id, OldExpr value, List<OldID> a)
+    {
+        Id = id;
+        Value = value;
+        Init_ID = a;
     }
 
     public override void Run(ref VariateManager Manager)

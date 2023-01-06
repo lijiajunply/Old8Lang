@@ -45,11 +45,12 @@ public class BinaryOperation : OldExpr
         {
             var l1 = l as OldAny;
             bool v = false;
+            var r1 = r as OldID;
             foreach (var VARIABLE in l1.Variates.Keys)
-                if (VARIABLE == r)
+                if (VARIABLE == r1.IdName)
                     v = true;
             if (v)
-                return l1.Variates[r as OldID];
+                return l1.Variates[r1.IdName];
             else
                 return new OldExpr();
         }

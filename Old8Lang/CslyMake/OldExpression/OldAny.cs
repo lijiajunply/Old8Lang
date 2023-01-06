@@ -2,12 +2,16 @@ namespace Old8Lang.CslyMake.OldExpression;
 
 public class OldAny : OldValue
 {
-    public Dictionary<OldID,OldExpr> Variates { get; set; }
+    public Dictionary<string,OldExpr> Variates { get; set; }
     public OldID Id { get; set; }
 
     public OldAny(OldID id, Dictionary<OldID,OldExpr> variates)
     {
-        Variates = variates;
+        foreach (var VARIABLE in variates)
+        {
+            Variates.Add(VARIABLE.Key.IdName,VARIABLE.Value);
+        }
         Id = id;
+        
     }
 }

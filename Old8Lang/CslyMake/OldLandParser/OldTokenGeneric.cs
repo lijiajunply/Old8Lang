@@ -40,19 +40,17 @@ public enum OldTokenGeneric
         [Lexeme(GenericToken.KeyWord,"XOR")][Lexeme(GenericToken.KeyWord,"xor")]
         XOR = 11,
         
-        [Lexeme(GenericToken.KeyWord,"//")]
-        ANNOTATION = 12,
-        //[Lexeme(GenericToken.KeyWord, "CLASS")] [Lexeme(GenericToken.KeyWord, "print")]
-        //PRINT = 12,
-        
-        [Lexeme(GenericToken.KeyWord,"\n")]
-        HUANHANG = 13,
-        
         [Lexeme(GenericToken.KeyWord,"CLASS")][Lexeme(GenericToken.KeyWord,"class")]
         CLASS = 14,
         
         [Lexeme(GenericToken.KeyWord,"FUNC")][Lexeme(GenericToken.KeyWord,"func")]
         FUNC = 15,
+        
+        [Lexeme(GenericToken.KeyWord,"RETURN")][Lexeme(GenericToken.KeyWord,"return")]
+        RETURN = 16,
+        
+        [Lexeme(GenericToken.KeyWord,"IMPORT")][Lexeme(GenericToken.KeyWord,"import")]
+        IMPORT = 17,
 
         #endregion
 
@@ -99,6 +97,8 @@ public enum OldTokenGeneric
         [Sugar( "(")] LPAREN = 50,
 
         [Sugar( ")")] RPAREN = 51,
+        [Sugar("[")] L_BRACKET = 52,
+        [Sugar("]")] R_BRACKET = 53,
 
         EOF = 0
 

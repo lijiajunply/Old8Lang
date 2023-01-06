@@ -10,6 +10,8 @@ public class VariateManager
     public List<OldID> Variates { get; set; } = new List<OldID>();
     public Dictionary<int, OldValue> Values { get; set; } = new Dictionary<int, OldValue>();
 
+    public Dictionary<string, OldValue> ClassAndFuncInfo { get; set; } = new Dictionary<string, OldValue>();
+
     public ValueTuple<OldID, OldExpr> Set(OldID id, OldExpr value)
     {
         if (value is OldValue)
@@ -30,7 +32,7 @@ public class VariateManager
 
     public ValueTuple<OldID, OldValue> Direct(OldID id, OldID directID)
     {
-        var a = Variates.FindIndex(x => x == directID);
+        var a = Variates.FindIndex(x => x.IdName == directID.IdName);
         Variates.Add(id);
         VariateDirectValue.Add(VariateDirectValue[a]);
         Count++;
@@ -71,5 +73,18 @@ public class VariateManager
         var a = Variates.FindLastIndex(x => x.IdName == id.IdName);
         int b = VariateDirectValue[a];
         return Values[b];
+    }
+
+    public void Init()
+    {
+        Values = new Dictionary<int, OldValue>();
+        Variates = new List<OldID>();
+        VariateDirectValue = new List<int>();
+    }
+
+    public ValueTuple<OldID, OldValue> AddClassAndFunc(OldID id, OldValue value)
+    {
+        ClassAndFuncInfo.Add(id.IdName,value);
+        return (id, value);
     }
 }
