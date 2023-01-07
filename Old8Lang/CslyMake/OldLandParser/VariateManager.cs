@@ -14,28 +14,52 @@ public class VariateManager
 
     public ValueTuple<OldID, OldExpr> Set(OldID id, OldExpr value)
     {
-        if (value is OldValue)
+        var a1 = GetValue(id);
+        if (a1 is null)
         {
-            var a =  value as OldValue;
-            Variates.Add(id);
-            Values.Add(Count,a);
-            VariateDirectValue.Add(Count);
-            Count++;
-            return (id,a);
-        }else if (value is OldID)
+            //init
+            if (value is OldValue)
+            {
+                var a =  value as OldValue;
+                Variates.Add(id);
+                Values.Add(Count,a);
+                VariateDirectValue.Add(Count);
+                Count++;
+                return (id,a);
+            }else if (value is OldID)
+            {
+                var a = value as OldID;
+                return Direct(id, a);
+            }
+        }
+        else
         {
-            var a = value as OldID;
-            return Direct(id, a);
+            //reset
+            var a = Variates.FindLastIndex(x => x.IdName == id.IdName);
+            Values[VariateDirectValue[a]] = value as OldValue;
         }
         return (id, value);
     }
 
     public ValueTuple<OldID, OldValue> Direct(OldID id, OldID directID)
     {
-        var a = Variates.FindIndex(x => x.IdName == directID.IdName);
-        Variates.Add(id);
-        VariateDirectValue.Add(VariateDirectValue[a]);
-        Count++;
+
+        var a1 = GetValue(id);
+        if (a1 is null)
+        {
+            //init
+            var a = Variates.FindIndex(x => x.IdName == directID.IdName);
+            Variates.Add(id);
+            VariateDirectValue.Add(VariateDirectValue[a]);
+            Count++;
+        }
+        else
+        {
+            //re_direct
+            var a = Variates.FindLastIndex(x => x.IdName == id.IdName);
+            var b = Variates.FindLastIndex(x => x.IdName == directID.IdName);
+            VariateDirectValue[a] = VariateDirectValue[b];
+        }
         return (id, Values[VariateDirectValue.Last()]);
     }
 
@@ -70,9 +94,16 @@ public class VariateManager
 
     public OldValue GetValue(OldID id)
     {
-        var a = Variates.FindLastIndex(x => x.IdName == id.IdName);
-        int b = VariateDirectValue[a];
-        return Values[b];
+        try
+        {
+            var a = Variates.FindLastIndex(x => x.IdName == id.IdName);
+            int b = VariateDirectValue[a];
+            return Values[b];
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
     public void Init()

@@ -128,9 +128,17 @@ public class OldParser
     [Production("statement: IDENTFIER DIRECT[d] IDENTFIER")]
     public OldLangTree DIRECT(Token<OldTokenGeneric> id1, Token<OldTokenGeneric> id2) => new OldDirect(new OldID(id1.Value), new OldID(id2.Value));
 
-    [Production("statement: FUNC[d] IDENTFIER LPAREN[d] RPAREN[d] block (RETURN[d] OldParser_expressions)?")]
-    public OldLangTree STAT_FUNC( Token<OldTokenGeneric> id, OldBlock block,ValueOption<Group<OldTokenGeneric,OldLangTree>> returnExpr) => 
-        new OldFuncInit( new OldFunc(new OldID(id.Value),block,returnExpr.Match(x => x,() => null)?.Value(0) as OldExpr));
+    [Production("statement: FUNC[d] IDENTFIER LPAREN[d] IDENTFIER* RPAREN[d] block (RETURN[d] OldParser_expressions)?")]
+    public OldLangTree STAT_FUNC(Token<OldTokenGeneric> id, List<Token<OldTokenGeneric>> a,OldBlock block,
+        ValueOption<Group<OldTokenGeneric, OldLangTree>> returnExpr)
+    {
+        var b = new List<OldID>();
+        foreach (var VARIABLE in a)
+        {
+            b.Add(new OldID(VARIABLE.Value));
+        }
+        return new OldFuncInit( new OldFunc(new OldID(id.Value),b,block,returnExpr.Match(x => x,() => null)?.Value(0) as OldExpr));
+    }
 
     /// <summary>
     /// Class
@@ -161,10 +169,18 @@ public class OldParser
 
     [Production("classinfo: set")]
     public OldLangTree ClassInfo_Set(OldSet a) => a;
-    
-    [Production("classinfo: FUNC[d] IDENTFIER LPAREN[d] RPAREN[d] block (RETURN[d] OldParser_expressions)?")]
-    public OldLangTree ClassInfo_Func(Token<OldTokenGeneric> id, OldBlock block,ValueOption<Group<OldTokenGeneric,OldLangTree>> returnExpr) 
-        => new OldFuncInit( new OldFunc(new OldID(id.Value),block,returnExpr.Match(x => x,() => null)?.Value(0) as OldExpr));
+
+    [Production("classinfo: FUNC[d] IDENTFIER LPAREN[d] IDENTFIER* RPAREN[d] block (RETURN[d] OldParser_expressions)?")]
+    public OldLangTree ClassInfo_Func(Token<OldTokenGeneric> id, List<Token<OldTokenGeneric>> a, OldBlock block,
+        ValueOption<Group<OldTokenGeneric, OldLangTree>> returnExpr)
+    {
+        var b = new List<OldID>();
+        foreach (var VARIABLE in a)
+        {
+            b.Add(new OldID(VARIABLE.Value));
+        }
+        return  new OldFuncInit( new OldFunc(new OldID(id.Value),b,block,returnExpr.Match(x => x,() => null)?.Value(0) as OldExpr));
+    }
 
     /// <summary>
     /// a = A(); 类,函数的初始化

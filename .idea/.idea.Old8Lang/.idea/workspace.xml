@@ -9,21 +9,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldClassInit.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldDir.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldFuncInit.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldList.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/BinaryOperation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/BinaryOperation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldAny.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldAny.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/APIs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/APIs.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldFunc.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldFunc.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldID.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldID.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldLangTree.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldLangTree.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldSet.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldSet.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldTokenGeneric.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldTokenGeneric.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/VariateManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -45,10 +34,12 @@
     </option>
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8ddc693f0d924df185ef87b81b654b0294de00/5a/f213f7f1/ThrowHelper.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8ddc693f0d924df185ef87b81b654b0294de00/7f/e7c33f86/CastHelpers.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8ddc693f0d924df185ef87b81b654b0294de00/aa/e40a4310/List`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3525d14275487fbeeab6166392023d993a1523b35bcd1caab2fff5ad2e5c0/GenericLexer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/69b13731f8acbba44a7d7f7b22925950371fdb21804fa6eeec99de1fe7a37fd/EBNFRecursiveDescentSyntaxParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///home/luckyfish/RiderProjects/Old8Lang/Old8Lang/CslyMake/OldExpression/BinaryOperation.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -161,7 +152,7 @@
       <workItem from="1672463809923" duration="1863000" />
       <workItem from="1672467381474" duration="91000" />
       <workItem from="1672467747768" duration="181000" />
-      <workItem from="1673003372371" duration="4405000" />
+      <workItem from="1673003372371" duration="6623000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -289,7 +280,14 @@
       <option name="project" value="LOCAL" />
       <updated>1672465663659</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="list &amp;&amp; dir &amp;&amp; init() in VariateManager.cs &#10;but ==,&lt;,&gt; not implement&#10;and class func">
+      <created>1673007946314</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1673007946314</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -328,7 +326,8 @@
     <MESSAGE value="fix the bug" />
     <MESSAGE value="debug" />
     <MESSAGE value="file and Directory" />
-    <option name="LAST_COMMIT_MESSAGE" value="file and Directory" />
+    <MESSAGE value="list &amp;&amp; dir &amp;&amp; init() in VariateManager.cs &#10;but ==,&lt;,&gt; not implement&#10;and class func" />
+    <option name="LAST_COMMIT_MESSAGE" value="list &amp;&amp; dir &amp;&amp; init() in VariateManager.cs &#10;but ==,&lt;,&gt; not implement&#10;and class func" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

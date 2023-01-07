@@ -6,20 +6,24 @@ public class OldFunc : OldValue
 {
     public OldID ID { get; set; }
     public OldBlock Block { get; set; }
-    
+    public List<OldID> IDs { get; set; }
     public OldExpr Return { get; set; }
 
-    public OldFunc(OldID id, OldBlock block,OldExpr _return)
+    public OldFunc(OldID id,List<OldID>ids,OldBlock block,OldExpr _return)
     {
         ID = id;
+        IDs = ids;
         Block = block;
         Return = _return;
     }
 
     public override OldExpr Run(ref VariateManager Manager)
     {
+        Manager.AddChildren();
         Block.Run(ref Manager);
         var a = Return as BinaryOperation;
-        return a.Run(ref Manager);
+        var b = a.Run(ref Manager);
+        Manager.RemoveChildren();
+        return b as OldValue;
     }
 }

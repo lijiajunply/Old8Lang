@@ -15,8 +15,6 @@ public class APIs
 
         sw.Stop();
         TimeSpan ts = sw.Elapsed;
-        Console.WriteLine("DateTime costed for Shuffle function is: {0}ms", ts.TotalMilliseconds);
-        
         
         return (a.GetVariateManager(), a.GetError(),$"DateTime costed for Shuffle function is: {ts.TotalMilliseconds}ms");
     }
