@@ -2,36 +2,36 @@ using Old8Lang.CslyMake.OldLandParser;
 
 namespace Old8Lang.CslyMake.OldExpression;
 
-public class OldFor : OldStatement
+public class ForStatement : OldStatement
 {
-    public OldSet Set { get; set;}
+    public SetStatement SetStatement { get; set;}
     public BinaryOperation Expr { get; set; }
     public OldStatement Statement { get; set; }
-    public OldBlock ForBlock { get; set; }
+    public BlockStatement ForBlockStatement { get; set; }
 
-    public OldFor(OldSet set, BinaryOperation expr, OldStatement statement, OldBlock block)
+    public ForStatement(SetStatement setStatement, BinaryOperation expr, OldStatement statement, BlockStatement blockStatement)
     {
-        Set = set;
+        SetStatement = setStatement;
         Expr = expr;
         Statement = statement;
-        ForBlock = block;
+        ForBlockStatement = blockStatement;
     }
 
     public override void Run(ref VariateManager Manager)
     {
         bool expr = false;
         Manager.AddChildren();
+        SetStatement.Run(ref Manager);
         while (true)
         {
-            Set.Run(ref Manager);
             var varexpr = Expr.Run(ref Manager);
             if (varexpr is OldBool)
             {
-                expr = (bool)(varexpr as OldBool).Value;
+                expr = (varexpr as OldBool).Value;
             }
             if (expr)
             {
-                ForBlock.Run(ref Manager);
+                ForBlockStatement.Run(ref Manager);
                 Statement.Run(ref Manager);
             }
             else

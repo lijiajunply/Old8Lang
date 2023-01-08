@@ -5,7 +5,7 @@ namespace Old8Lang.CslyMake.OldExpression;
 public class OldBool : OldValue
 {
     public BinaryOperation Operation { get; set; }
-    new bool Value { get; set; }
+    public new bool Value { get; set; }
     public OldBool(BinaryOperation binaryOperation) => Operation = binaryOperation;
     public OldBool(bool value) => Value = value;
     public override OldExpr Run(ref VariateManager Manager)

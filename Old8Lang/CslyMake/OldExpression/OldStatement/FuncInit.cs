@@ -2,11 +2,11 @@ using Old8Lang.CslyMake.OldLandParser;
 
 namespace Old8Lang.CslyMake.OldExpression;
 
-public class OldFuncInit : OldStatement
+public class FuncInit : OldStatement
 {
     public OldFunc Func { get; set; }
 
-    public OldFuncInit(OldFunc a)
+    public FuncInit(OldFunc a)
     {
         Func = a;
     }

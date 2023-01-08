@@ -2,7 +2,7 @@ namespace Old8Lang.CslyMake.OldExpression;
 
 public class OldInt : OldValue
 {
-    new int Value { get; set; }
+    public new int Value { get; set; }
     public OldInt(int intValue) => Value = intValue;
     public override string ToString() => Value.ToString();
     public override OldValue PLUS(OldValue otherValue)
@@ -27,7 +27,7 @@ public class OldInt : OldValue
         if (otherValue is OldDouble)
             return otherValue.MINUS(this);
         if (otherValue is OldInt)
-            return new OldInt((int)this.Value - (int)otherValue.Value);
+            return new OldInt(Value - (int)otherValue.Value);
         return new OldValue();
     }
 
@@ -40,7 +40,7 @@ public class OldInt : OldValue
         if (otherValue is OldDouble)
             return otherValue.TIMES(this);
         if (otherValue is OldInt)
-            return new OldInt((int)this.Value * (int)otherValue.Value);
+            return new OldInt(Value * (int)otherValue.Value);
         return new OldValue();
     }
 
@@ -49,7 +49,10 @@ public class OldInt : OldValue
         if (otherValue is OldDouble)
             return otherValue.DIVIDE(this);
         if (otherValue is OldInt)
-            return new OldInt((int)this.Value / (int)otherValue.Value);
+            return new OldInt(Value / (int)otherValue.Value);
         return new OldValue();
     }
+
+    public override bool LESS(OldValue otherValue) => Value < Int32.Parse(otherValue.ToString());
+    public override bool GREATER(OldValue otherValue) => Value > Int32.Parse(otherValue.ToString());
 }

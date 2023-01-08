@@ -9,11 +9,33 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldFuncInit.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/ImportStatement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/InstanceStatement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/NativeStatement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/APIs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/APIs.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldFunc.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldFunc.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/BinaryOperation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/BinaryOperation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldAny.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldAny.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldBool.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldBool.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldDouble.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldDouble.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldFunc.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldFunc.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldInt.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldInt.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldList.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/OldBlock.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/BlockStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/OldClassInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/ClassInit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/OldDirect.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/DirectStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/OldFor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/ForStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/OldFuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/FuncInit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/OldIf.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/OldIf.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/OldIf_Elif_Else.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/If_Elif_ElseStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/OldSet.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/SetStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/OldWhile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/WhileStatement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldTokenGeneric.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldTokenGeneric.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/VariateManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldLang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OldLang.App/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,7 +61,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8ddc693f0d924df185ef87b81b654b0294de00/aa/e40a4310/List`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3525d14275487fbeeab6166392023d993a1523b35bcd1caab2fff5ad2e5c0/GenericLexer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/69b13731f8acbba44a7d7f7b22925950371fdb21804fa6eeec99de1fe7a37fd/EBNFRecursiveDescentSyntaxParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///home/luckyfish/RiderProjects/Old8Lang/Old8Lang/CslyMake/OldExpression/BinaryOperation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldFuncInit.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -153,6 +175,9 @@
       <workItem from="1672467381474" duration="91000" />
       <workItem from="1672467747768" duration="181000" />
       <workItem from="1673003372371" duration="6623000" />
+      <workItem from="1673077077323" duration="11874000" />
+      <workItem from="1673140675426" duration="3315000" />
+      <workItem from="1673144041533" duration="859000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -333,17 +358,17 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/OldLang.App/Program.cs</url>
-          <line>65</line>
-          <properties documentPath="$PROJECT_DIR$/OldLang.App/Program.cs" initialLine="65" containingFunctionPresentation="">
+          <url>file://$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldInt.cs</url>
+          <line>55</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldInt.cs" initialLine="55" containingFunctionPresentation="method 'LESS'">
             <startOffsets>
-              <option value="1442" />
+              <option value="1771" />
             </startOffsets>
             <endOffsets>
-              <option value="1475" />
+              <option value="1785" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="3" />
+          <option name="timeStamp" value="24" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

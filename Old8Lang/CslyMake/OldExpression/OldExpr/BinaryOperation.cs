@@ -19,42 +19,25 @@ public class BinaryOperation : OldExpr
     {
         var l = Left;
         var r = Right;
-
-        // value => value
-        if (l is not null && r == null && Oper == null)
-        {
-            return l;
-        }
-        if (r is not null && l == null && Oper == null)
-        {
-            return r;
-        }
-        // var/binary -> value
+        
+        // var/binary -> value (left)
         if (Left is OldID)
             l = Manager.GetValue(Left as OldID);
         if (Left is BinaryOperation)
             l = Left.Run(ref Manager);
         
+        // id.id => dot_value
+        if (l is OldValue && r is OldID && Oper == OldTokenGeneric.CONCAT)
+            return (l as OldValue).Dot(r as OldID);
+
+        // (right)
         if (Right is OldID && l is not OldAny)
             r = Manager.GetValue(Right as OldID);
         if (Right is BinaryOperation)
             r = Right.Run(ref Manager);
         
         // oldany.id
-        if (l is OldAny && r is OldID)
-        {
-            var l1 = l as OldAny;
-            bool v = false;
-            var r1 = r as OldID;
-            foreach (var VARIABLE in l1.Variates.Keys)
-                if (VARIABLE == r1.IdName)
-                    v = true;
-            if (v)
-                return l1.Variates[r1.IdName];
-            else
-                return new OldExpr();
-        }
-        
+
         // not right 
         if (r is OldBool && l == null && Oper == OldTokenGeneric.NOT)
             return new OldBool(!(bool)(r as OldBool).Value);
@@ -85,6 +68,14 @@ public class BinaryOperation : OldExpr
             return r1;
         }
         
+        // == , < , > 
+        if (l is not null && r is not null && Oper == OldTokenGeneric.EQUALS)
+            return new OldBool((l as OldValue).EQUAL(r as OldValue));
+        if (l is not null && r is not null && Oper == OldTokenGeneric.LESSER)
+            return new OldBool((l as OldValue).LESS(r as OldValue));
+        if (l is not null && r is not null && Oper == OldTokenGeneric.GREATER)
+            return new OldBool((l as OldValue).GREATER(r as OldValue));
+        
         // r (+-*/) l
         if (l is not null && r is not null && Oper != null)
         {
@@ -102,7 +93,7 @@ public class BinaryOperation : OldExpr
                     return l1.DIVIDE(r1);
             }
         }
-
-        return new OldExpr();
+        
+        return null;
     }
 }

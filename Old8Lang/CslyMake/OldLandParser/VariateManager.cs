@@ -36,7 +36,15 @@ public class VariateManager
         {
             //reset
             var a = Variates.FindLastIndex(x => x.IdName == id.IdName);
-            Values[VariateDirectValue[a]] = value as OldValue;
+            if (value is OldID)
+            {
+                var b = Variates.FindLastIndex(x => x.IdName == (value as OldID).IdName);
+                Values[VariateDirectValue[a]] = Values[VariateDirectValue[b]];
+            }
+            else
+            {
+                Values[VariateDirectValue[a]] = value as OldValue;
+            }
         }
         return (id, value);
     }
@@ -77,7 +85,7 @@ public class VariateManager
 
     public void AddChildren()
     {
-        ChildrenNum.Add(Count);
+        ChildrenNum.Add(Count+1);
     }
 
     public void RemoveChildren()
@@ -89,7 +97,7 @@ public class VariateManager
         }
         var a = ChildrenNum.Last();
         ChildrenNum.Remove(a);
-        GC();
+        //GC();
     }
 
     public OldValue GetValue(OldID id)
@@ -111,6 +119,17 @@ public class VariateManager
         Values = new Dictionary<int, OldValue>();
         Variates = new List<OldID>();
         VariateDirectValue = new List<int>();
+    }
+
+    public void Init(Dictionary<OldID, OldValue> values)
+    {
+        int i = 0;
+        foreach (var VARIABLE in values)
+        {
+            Variates.Add(VARIABLE.Key);
+            VariateDirectValue.Add(i);
+            Values.Add(i,VARIABLE.Value);
+        }
     }
 
     public ValueTuple<OldID, OldValue> AddClassAndFunc(OldID id, OldValue value)

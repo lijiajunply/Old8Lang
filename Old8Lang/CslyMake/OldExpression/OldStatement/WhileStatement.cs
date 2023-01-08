@@ -4,15 +4,15 @@ namespace Old8Lang.CslyMake.OldExpression;
 /// <summary>
 /// while语句
 /// </summary>
-public class OldWhile : OldStatement
+public class WhileStatement : OldStatement
 {
     public BinaryOperation Expr { get; set; }
-    public OldBlock Block { get; set; }
+    public BlockStatement BlockStatement { get; set; }
 
-    public OldWhile(BinaryOperation expr, OldBlock block)
+    public WhileStatement(BinaryOperation expr, BlockStatement blockStatement)
     {
         Expr = expr;
-        Block = block;
+        BlockStatement = blockStatement;
     }
 
     public override void Run(ref VariateManager Manager)
@@ -28,7 +28,7 @@ public class OldWhile : OldStatement
             }
             if (expr)
             {
-                Block.Run(ref Manager);
+                BlockStatement.Run(ref Manager);
             }
             else
             {

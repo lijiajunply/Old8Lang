@@ -12,6 +12,18 @@ public class OldAny : OldValue
             Variates.Add(VARIABLE.Key.IdName,VARIABLE.Value);
         }
         Id = id;
-        
+    }
+
+    public override OldValue Dot(OldID DotID)
+    {
+        OldExpr a = new OldExpr();
+        foreach (var VARIABLE in Variates)
+        {
+            if (DotID.IdName == VARIABLE.Key)
+            {
+                a = VARIABLE.Value;
+            }
+        }
+        return (OldValue)a;
     }
 }
