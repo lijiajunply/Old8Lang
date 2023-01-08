@@ -52,6 +52,9 @@ public enum OldTokenGeneric
         [Lexeme(GenericToken.KeyWord,"IMPORT")][Lexeme(GenericToken.KeyWord,"import")]
         IMPORT = 17,
 
+        [Comment("//","|*","*|")]
+        COMMENT = 18,
+
         #endregion
 
         #region literals 20 -> 29

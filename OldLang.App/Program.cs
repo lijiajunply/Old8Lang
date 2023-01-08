@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text;
-using Old8Lang;
-
+﻿using Old8Lang;
 
 string code = APIs.FromFile("/home/luckyfish/文本文件.txt");
 //code = "a <- 1+1 \nb <- true \nc <- 2 \nd <- a+c";
@@ -14,23 +11,25 @@ foreach (var VARIABLE in codeinfo.Error)
 {
     Console.WriteLine(VARIABLE);
 }
-Console.WriteLine();
 // variable and value
-Console.Write("|");
+Console.Write("variable and value: \n|");
 foreach (var VARIABLE in codeinfo.Manager.Variates)
 {
     Console.Write(VARIABLE + "|");
 }
-Console.WriteLine();
-Console.Write("|");
+Console.Write("\n|");
 foreach (var VARIABLE in codeinfo.Manager.VariateDirectValue)
 {
     Console.Write(VARIABLE + "|");
 }
-Console.WriteLine();
-Console.Write("|");
+Console.Write("\n|");
 foreach (var VARIABLE in codeinfo.Manager.Values)
 {
     Console.Write(VARIABLE.Value + "|");
+}
+Console.Write("\nclass&func:\n");
+foreach (var VARIABLE in codeinfo.Manager.ClassAndFuncInfo)
+{
+    Console.Write(VARIABLE.Key);
 }
 Console.WriteLine("\n"+codeinfo.Time);
