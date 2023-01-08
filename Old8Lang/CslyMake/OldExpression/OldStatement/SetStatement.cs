@@ -51,6 +51,4 @@ public class SetStatement : OldStatement
     }
 
     public override string ToString() => $"setStatement : id = {Id} , expr = {Value} \n at the location : {Location}";
-
-
 }
