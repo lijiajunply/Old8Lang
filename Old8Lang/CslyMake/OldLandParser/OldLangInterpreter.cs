@@ -20,7 +20,7 @@ public class OldLangInterpreter
         ParserBuilder<OldTokenGeneric, OldLangTree> Parser = new ParserBuilder<OldTokenGeneric, OldLangTree>();
         OldParser oldParser = new OldParser();
         var buildResult = Parser.BuildParser(oldParser,
-            ParserType.EBNF_LL_RECURSIVE_DESCENT).Result;
+            ParserType.EBNF_LL_RECURSIVE_DESCENT,"root").Result;
 
         var r = buildResult.Parse(Code);
         var RUN = r.Result;

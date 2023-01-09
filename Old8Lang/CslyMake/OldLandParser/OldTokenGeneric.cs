@@ -93,7 +93,7 @@ public enum OldTokenGeneric
 
         [Sugar( "/")] DIVIDE = 39,
         
-        [Sugar(",")]DOUHAO = 42,
+        [Sugar( ",")] DOUHAO = 42,
 
         #endregion
 

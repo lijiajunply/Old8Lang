@@ -27,21 +27,22 @@ public class OldValue : OldExpr
     {
         if (DotID.IdName == "toint")
         {
-            return new OldInt((int)Value);
+            return new OldInt(Int32.Parse(ToString()));
         }
         if (DotID.IdName == "tostring")
         {
-            return new OldString((string)Value);
+            return new OldString(ToString());
         }
 
         if (DotID.IdName == "tochar")
         {
-            return new OldChar(((string)Value)[0]);
+            return new OldChar(ToString()[0]);
         }
         return null;
     }
     public virtual bool EQUAL(OldValue otherValue) => Value == otherValue.Value;
     public virtual bool LESS(OldValue otherValue) => false;
     public virtual bool GREATER(OldValue otherValue) => false;
-
+    public override OldValue Run(ref VariateManager Manager) => this;
+    
 }

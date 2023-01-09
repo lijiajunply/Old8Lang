@@ -4,13 +4,13 @@ namespace Old8Lang.CslyMake.OldExpression;
 /// <summary>
 /// if语句
 /// </summary>
-public class If_Elif_ElseStatement : OldStatement
+public class IfStatement : OldStatement
 {
     public OldIf IfBlock { get; set; }
     public List<OldIf> ElifBlock { get; set; }
     public BlockStatement ElseBlockStatement { get; set; }
 
-    public If_Elif_ElseStatement(OldIf ifBlock, List<OldIf>? elifBlock, BlockStatement elseBlockStatement)
+    public IfStatement(OldIf ifBlock, List<OldIf>? elifBlock, BlockStatement elseBlockStatement)
     {
         IfBlock = ifBlock;
         ElifBlock = elifBlock;

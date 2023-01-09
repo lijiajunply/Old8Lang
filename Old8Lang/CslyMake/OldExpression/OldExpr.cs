@@ -9,7 +9,7 @@ public class OldExpr : OldLangTree
 {
     public OldTokenGeneric Compare { get; set; }
 
-    public virtual OldExpr Run(ref VariateManager Manager)
+    public virtual OldValue Run(ref VariateManager Manager)
     {
         return null;
     }

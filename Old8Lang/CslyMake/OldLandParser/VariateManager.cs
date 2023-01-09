@@ -9,6 +9,8 @@ public class VariateManager
     public List<int> ChildrenNum { get; set; } = new List<int>();
     public List<OldID> Variates { get; set; } = new List<OldID>();
     public Dictionary<int, OldValue> Values { get; set; } = new Dictionary<int, OldValue>();
+    public bool IsReturn { get; set; } = false;
+    public OldValue Result { get; set; }
 
     public Dictionary<string, OldValue> ClassAndFuncInfo { get; set; } = new Dictionary<string, OldValue>();
 

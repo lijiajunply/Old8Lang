@@ -6,7 +6,6 @@ namespace Old8Lang.CslyMake.OldExpression;
 /// </summary>
 public class BlockStatement : OldStatement
 {
-    public string Location { get; set; }
     public List<OldLangTree> Statements { get; set; }
     public BlockStatement(List<OldLangTree> statements) => Statements = statements;
     public override void Run(ref VariateManager Manager)
@@ -15,6 +14,10 @@ public class BlockStatement : OldStatement
         {
             var a = VARIABLE as OldStatement;
             a.Run(ref Manager);
+            if (Manager.IsReturn)
+            {
+                return;
+            }
         }
     }
 }

@@ -8,7 +8,7 @@ public class OldBool : OldValue
     public new bool Value { get; set; }
     public OldBool(BinaryOperation binaryOperation) => Operation = binaryOperation;
     public OldBool(bool value) => Value = value;
-    public override OldExpr Run(ref VariateManager Manager)
+    public override OldValue Run(ref VariateManager Manager)
     {
         var a = Operation.Run(ref Manager);
         if (a is OldBool)
@@ -20,7 +20,7 @@ public class OldBool : OldValue
         else
         {
             Value = false;
-            return new OldExpr();
+            return null;
         }
     }
     public override string ToString() => Value.ToString();

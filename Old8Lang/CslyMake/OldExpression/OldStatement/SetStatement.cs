@@ -23,31 +23,8 @@ public class SetStatement : OldStatement
 
     public override void Run(ref VariateManager Manager)
     {
-        if (Value is BinaryOperation)
-        {
-            var a = Value.Run(ref Manager);
-            var b = a as OldValue;
-            Manager.Set(Id, b);
-        }else if(Value is OldID)
-        {
-            var a = Manager.GetValue(Value as OldID);
-            if (a is OldFunc)
-            {
-                if ((a as OldFunc).Return is not null)
-                {
-                    Value = Manager.GetValue(Value as OldID).Run(ref Manager);
-                }
-                else
-                {
-                    return;
-                }
-            }
-            Manager.Set(Id, Value);
-        }
-        else
-        {
-            Manager.Set(Id, Value);
-        }
+        var result = Value.Run(ref Manager);
+        Manager.Set(Id, result);
     }
 
     public override string ToString() => $"setStatement : id = {Id} , expr = {Value} \n at the location : {Location}";
