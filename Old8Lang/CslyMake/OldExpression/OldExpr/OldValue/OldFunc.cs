@@ -23,7 +23,9 @@ public class OldFunc : OldValue
         isNative = true;
         Method = methodInfo;
     }
-    
+
+    public override OldValue Run(ref VariateManager Manager) => this;
+
 
     public OldValue Run(ref VariateManager Manager,List<OldID>? ids, Dictionary<OldID, OldValue>? dictionary)
     {
@@ -39,5 +41,13 @@ public class OldFunc : OldValue
         }
         BlockStatement.Run(ref manager);
         return manager.Result;
+    }
+
+    public override string ToString()
+    {
+        if (isNative)
+            return $"{Method}";
+        else
+            return $"func {ID} {IDs} : {BlockStatement}";
     }
 }

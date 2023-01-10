@@ -31,4 +31,6 @@ public class NativeStatement : OldStatement
         var Func = new OldFunc(NATIVE_NAME, methodInfo);
         Manager.AddClassAndFunc(new OldID(NATIVE_NAME), Func);
     }
+
+    public override string ToString() => $"[import {DLL_NAME} {CLASS_NAME} {METHOD_NAME} {NATIVE_NAME}]";
 }

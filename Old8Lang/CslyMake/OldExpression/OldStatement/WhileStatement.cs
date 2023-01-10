@@ -6,10 +6,10 @@ namespace Old8Lang.CslyMake.OldExpression;
 /// </summary>
 public class WhileStatement : OldStatement
 {
-    public BinaryOperation Expr { get; set; }
+    public OldExpr Expr { get; set; }
     public BlockStatement BlockStatement { get; set; }
 
-    public WhileStatement(BinaryOperation expr, BlockStatement blockStatement)
+    public WhileStatement(OldExpr expr, BlockStatement blockStatement)
     {
         Expr = expr;
         BlockStatement = blockStatement;
@@ -26,6 +26,10 @@ public class WhileStatement : OldStatement
             {
                 expr = (bool)(Expr.Run(ref Manager) as OldBool).Value;
             }
+            else
+            {
+                return;
+            }
             if (expr)
             {
                 BlockStatement.Run(ref Manager);
@@ -36,6 +40,6 @@ public class WhileStatement : OldStatement
                 return;
             }
         }
-        
     }
+    public override string ToString() => $"{Expr} : {BlockStatement}";
 }

@@ -13,7 +13,7 @@ public class OldItem : OldValue
         Key = key;
     }
 
-    public OldValue Run(ref VariateManager Manager)
+    public override OldValue Run(ref VariateManager Manager)
     {
         var a = Manager.GetValue(ListID);
         var result = new OldExpr();
@@ -36,4 +36,6 @@ public class OldItem : OldValue
         }
         return null;
     }
+
+    public override string ToString() => $"the key: {Key} in {ListID}";
 }

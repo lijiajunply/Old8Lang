@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Old8Lang.CslyMake.OldExpression;
 
 public class OldDir : OldValue
@@ -19,5 +21,16 @@ public class OldDir : OldValue
     public OldValue GetValue(OldValue value)
     {
         return Value[value];
+    }
+
+    public override string ToString()
+    {
+        StringBuilder sb = new StringBuilder();
+        foreach (var VARIABLE in Value)
+        {
+            sb.Append($"key:{VARIABLE.Key},value:{VARIABLE.Value}");
+        }
+
+        return $"dir {Id} : {sb}";
     }
 }

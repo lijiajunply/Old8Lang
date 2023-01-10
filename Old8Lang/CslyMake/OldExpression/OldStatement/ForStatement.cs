@@ -1,3 +1,4 @@
+using System.Text;
 using Old8Lang.CslyMake.OldLandParser;
 
 namespace Old8Lang.CslyMake.OldExpression;
@@ -26,9 +27,10 @@ public class ForStatement : OldStatement
         {
             var varexpr = Expr.Run(ref Manager);
             if (varexpr is OldBool)
-            {
                 expr = (varexpr as OldBool).Value;
-            }
+            else
+                return;
+            
             if (expr)
             {
                 ForBlockStatement.Run(ref Manager);
@@ -40,5 +42,14 @@ public class ForStatement : OldStatement
                 return;
             }
         }
+    }
+
+    public override string ToString()
+    {
+        StringBuilder sb = new StringBuilder($"for(var {SetStatement} ; {Expr} ; {Statement})");
+        sb.Append("{");
+        sb.Append(ForBlockStatement);
+        sb.Append("}");
+        return sb.ToString();
     }
 }

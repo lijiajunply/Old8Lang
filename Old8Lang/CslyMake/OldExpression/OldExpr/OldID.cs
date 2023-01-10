@@ -13,8 +13,5 @@ public class OldID : OldExpr
         return a.IdName == IdName;
     }
 
-    public override OldValue Run(ref VariateManager Manager)
-    {
-        return Manager.GetValue(this);
-    }
+    public override OldValue Run(ref VariateManager Manager) => Manager.GetValue(this);
 }

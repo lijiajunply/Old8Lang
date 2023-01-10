@@ -15,4 +15,6 @@ public class FuncInit : OldStatement
     {
         Manager.AddClassAndFunc(Func.ID, Func);
     }
+
+    public override string ToString() => Func.ToString();
 }

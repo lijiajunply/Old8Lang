@@ -13,4 +13,6 @@ public class OldClassInit : OldStatement
     {
         Manager.AddClassAndFunc(_Class.Id, _Class);
     }
+
+    public override string ToString() => _Class.ToString();
 }

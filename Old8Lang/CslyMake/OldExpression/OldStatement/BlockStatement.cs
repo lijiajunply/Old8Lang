@@ -1,3 +1,4 @@
+using System.Text;
 using Old8Lang.CslyMake.OldLandParser;
 
 namespace Old8Lang.CslyMake.OldExpression;
@@ -19,5 +20,16 @@ public class BlockStatement : OldStatement
                 return;
             }
         }
+    }
+
+    public override string ToString()
+    {
+        StringBuilder sb = new StringBuilder();
+        foreach (var VARIABLE in Statements)
+        {
+            sb.Append(VARIABLE);
+        }
+
+        return sb.ToString();
     }
 }

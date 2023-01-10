@@ -26,4 +26,6 @@ public class OldAny : OldValue
         }
         return (OldValue)a;
     }
+
+    public override string ToString() => $"class {Id} : {Variates}";
 }

@@ -107,8 +107,18 @@ public class VariateManager
         try
         {
             var a = Variates.FindLastIndex(x => x.IdName == id.IdName);
-            int b = VariateDirectValue[a];
-            return Values[b];
+            if (a == -1)
+            {
+                var func = ClassAndFuncInfo[id.IdName];
+                if (func is null)
+                    return null;
+                return func;
+            }
+            else
+            {
+                int b = VariateDirectValue[a];
+                return Values[b];
+            }
         }
         catch (Exception e)
         {

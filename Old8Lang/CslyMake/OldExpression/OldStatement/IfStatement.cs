@@ -1,3 +1,4 @@
+using System.Text;
 using Old8Lang.CslyMake.OldLandParser;
 
 namespace Old8Lang.CslyMake.OldExpression;
@@ -37,6 +38,7 @@ public class IfStatement : OldStatement
         {
             ElseBlockStatement.Run(ref Manager);
         }
-        
     }
+
+    public override string ToString() => $"{IfBlock} {ElifBlock} {ElseBlockStatement}";
 }

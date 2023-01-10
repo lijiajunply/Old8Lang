@@ -13,6 +13,9 @@ public class BinaryOperation : OldExpr
         Oper = oper;
         Right = right;
     }
+
+    public override string ToString() => $"{Left} {Oper} {Right}";
+
     public override OldValue Run(ref VariateManager Manager)
     {
         

@@ -4,10 +4,10 @@ namespace Old8Lang.CslyMake.OldExpression;
 
 public class OldIf : OldStatement
 {
-    public BinaryOperation Expr { get; set; }
+    public OldExpr Expr { get; set; }
     public BlockStatement BlockStatement { get; set; }
 
-    public OldIf(BinaryOperation expr, BlockStatement blockStatement)
+    public OldIf(OldExpr expr, BlockStatement blockStatement)
     {
         Expr = expr;
         BlockStatement = blockStatement;
@@ -28,4 +28,6 @@ public class OldIf : OldStatement
         }
         else return;
     }
+
+    public override string ToString() => $"{Expr} : {BlockStatement}";
 }

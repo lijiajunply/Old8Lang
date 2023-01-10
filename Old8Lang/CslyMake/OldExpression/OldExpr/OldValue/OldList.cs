@@ -11,6 +11,12 @@ public class OldList : OldValue
         ID = id;
     }
 
+    public OldList(OldID id, List<OldValue> values)
+    {
+        ID = id;
+        Value = values;
+    }
+    
     public OldValue Add(OldValue value)
     {
         Value.Add(value);
@@ -31,8 +37,7 @@ public class OldList : OldValue
         {
             sb.Append(VARIABLE + " ");
         }
-
-        return $"list {ID} : {sb}";
+        return $"list {ID} : {sb} ";
     }
 
     public override OldValue Dot(OldID DotID)

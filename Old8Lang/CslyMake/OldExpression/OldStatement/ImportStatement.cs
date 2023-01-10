@@ -21,4 +21,6 @@ public class ImportStatement : OldStatement
         Manager = a.Manager;
         Manager.Init();
     }
+
+    public override string ToString() => $"import {ImportString}";
 }

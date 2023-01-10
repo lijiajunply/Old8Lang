@@ -16,4 +16,6 @@ public class DirectStatement : OldStatement
     {
         Manager.Direct(ID1, ID2);
     }
+
+    public override string ToString() => $"{ID1} direct {ID2}";
 }
