@@ -1,24 +1,30 @@
-﻿using Old8Lang;
+﻿using System.Text;
+using Old8Lang;
 
-try
+Lang();
+
+void Lang()
 {
-    if (args[0] != null)
+    try
     {
-        if(args[0] == "-f")
-            Run(false,args[1]);
-        if(args[0] == "-d")
-            Run(true,args[1]);
+        if (args[0] != null)
+        {
+            if(args[0] == "-f")
+                Run(false,args[1]);
+            if(args[0] == "-d")
+                Run(true,args[1]);
+            else
+                Run(false,args[0]);
+        }
         else
-            Run(false,args[0]);
+        {
+            Run(false,"/home/luckyfish/文本文件.txt");
+        }
     }
-    else
+    catch (Exception e)
     {
         Run(false,"/home/luckyfish/文本文件.txt");
     }
-}
-catch (Exception e)
-{
-    Run(false,"/home/luckyfish/文本文件.txt");
 }
 
 void Run(bool isdir,string path)
