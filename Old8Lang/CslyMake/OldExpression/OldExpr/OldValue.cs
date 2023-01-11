@@ -40,7 +40,7 @@ public class OldValue : OldExpr
         }
         return null;
     }
-    public virtual bool EQUAL(OldValue otherValue) => Value == otherValue.Value;
+    public virtual bool EQUAL(OldValue otherValue) => (this.Value == otherValue.Value);
     public virtual bool LESS(OldValue otherValue) => false;
     public virtual bool GREATER(OldValue otherValue) => false;
     public override OldValue Run(ref VariateManager Manager) => this;

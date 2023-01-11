@@ -65,8 +65,8 @@ public class OldParser
     [Production("operand: primary")]
     public OldLangTree Operand(OldLangTree prim) => prim;
 
-    [Production("primary: LPAREN[d] primary RPAREN[d]")]
-    public OldLangTree LR(OldLangTree prim) => prim as OldExpr;
+    [Production("primary: LPAREN[d] OldParser_expressions RPAREN[d]")]
+    public OldLangTree LR(OldExpr prim) => prim ;
 
     [Production("primary: STRING")]
     public OldLangTree STRING(Token<OldTokenGeneric> token) => new OldString(token.Value);
@@ -93,17 +93,20 @@ public class OldParser
     public OldLangTree LIST(Token<OldTokenGeneric> id, OldExpr a) =>
         new OldItem(new OldID(id.Value), a);
 
-    [Production("primary: IDENTFIER LPAREN[d] IDENTFIER* RPAREN[d]")]
-    public OldLangTree INSTANTIATE(Token<OldTokenGeneric> id, List<Token<OldTokenGeneric>> ids)
+    [Production("primary: IDENTFIER LPAREN[d] OldParser_expressions* RPAREN[d]")]
+    public OldLangTree INSTANTIATE(Token<OldTokenGeneric> id, List<OldLangTree> ids)
     {
-        List<OldID> IDs = new List<OldID>();
+        List<OldExpr> IDs = new List<OldExpr>();
         foreach (var VARIABLE in ids)
         {
-            IDs.Add(new OldID(VARIABLE.Value));
+            if (VARIABLE is OldExpr)
+            {
+                IDs.Add(VARIABLE as OldExpr);
+            }
         }
-
-        return new OldInstance(new OldID(id.Value), IDs);
-    }
+        return new OldInstance(new OldID(id.Value),IDs);
+    } 
+    
 
     [Production("primary: DOUHAO")]
     public OldLangTree DOUHAO(Token<OldTokenGeneric> a) => new OldInt(0);
@@ -131,10 +134,16 @@ public class OldParser
     [Production("set: OldParser_expressions DIS_SET[d] IDENTFIER")]
     public OldLangTree DIS_SET(OldExpr value, Token<OldTokenGeneric> id) => new SetStatement(new OldID(id.Value), value);
 
-    [Production("statement : IF[d] ifblock (ELIF ifblock)* (ELSE  block)?")]
+    [Production("statement : IF[d] ifblock (ELIF[d] ifblock)* (ELSE[d] block)?")]
     public OldLangTree IF( OldIf ifBlock, List<Group<OldTokenGeneric,OldLangTree>> elif,ValueOption<Group<OldTokenGeneric,OldLangTree>> Else)
     {
-        var eGrp = Else.Match(x => x, () => null);
+        var eGrp = Else.Match(
+            x => {
+                return x;
+            }, () =>
+            {
+                return null;
+            });
         var elseBlock = eGrp?.Value(0) as BlockStatement;
         var a = elif.Select(x => x.Value(0) as OldIf).ToList();
         return new IfStatement(ifBlock, a, elseBlock);
@@ -172,15 +181,16 @@ public class OldParser
     }
     
     [Production("statement: CLASS[d] IDENTFIER class")]
-    public OldLangTree Class( Token<OldTokenGeneric> id, ClassInfoStatement statement)
+    public OldLangTree Class(Token<OldTokenGeneric> id, ClassInfoStatement statement)
     {
         Dictionary<OldID, OldExpr> c = new Dictionary<OldID, OldExpr>();
-        foreach (var VARIABLE in statement.Values)
+        var values = statement;
+        foreach (var VARIABLE in values.Values)
         {
-            if (VARIABLE is OldFunc)
+            if (VARIABLE is FuncInit)
             {
-                var a = VARIABLE as OldFunc;
-                c.Add(a.ID,a);
+                var a = VARIABLE as FuncInit;
+                c.Add(a.Func.ID,a.Func);
             }
 
             if (VARIABLE is SetStatement)
@@ -192,23 +202,14 @@ public class OldParser
         return new OldClassInit(new OldAny(new OldID(id.Value), c));
     }
 
-    [Production("class: INDENT[d] classinfo* UINDENT[d]")]
-    public OldLangTree ClassInfo(List<OldLangTree> a) => new ClassInfoStatement(a);
-
     [Production("classinfo: set")]
     public OldLangTree ClassInfo_Set(SetStatement a) => a;
 
-    [Production("classinfo: FUNC[d] IDENTFIER LPAREN[d] IDENTFIER* RPAREN[d] block ")]
-    public OldLangTree ClassInfo_Func(Token<OldTokenGeneric> id, List<Token<OldTokenGeneric>> a, BlockStatement blockStatement)
-    {
-        var b = new List<OldID>();
-        foreach (var VARIABLE in a)
-        {
-            b.Add(new OldID(VARIABLE.Value));
-        }
-        return new FuncInit( new OldFunc(new OldID(id.Value),b,blockStatement));
-    }
+    [Production("classinfo: func")]
+    public OldLangTree ClassInfo_Func(FuncInit a) => a;
     
+    [Production("class: INDENT[d] classinfo* UINDENT[d]")]
+    public OldLangTree ClassInfo(List<OldLangTree> a) => new ClassInfoStatement(a);
 
     [Production("statement: IMPORT[d] IDENTFIER")]
     public OldLangTree IMPORT(Token<OldTokenGeneric> import) => new ImportStatement(import.Value);

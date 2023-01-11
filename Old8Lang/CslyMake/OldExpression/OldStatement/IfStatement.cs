@@ -34,11 +34,11 @@ public class IfStatement : OldStatement
             }
         }
 
-        if (ElseBlockStatement is not null)
+        if (ElseBlockStatement is not null && r)
         {
             ElseBlockStatement.Run(ref Manager);
         }
     }
 
-    public override string ToString() => $"{IfBlock} {ElifBlock} {ElseBlockStatement}";
+    public override string ToString() => $"if: {IfBlock}elif: {ElifBlock} \nelse: {ElseBlockStatement}";
 }

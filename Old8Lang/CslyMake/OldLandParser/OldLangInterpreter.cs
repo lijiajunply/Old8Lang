@@ -19,8 +19,9 @@ public class OldLangInterpreter
     {
         ParserBuilder<OldTokenGeneric, OldLangTree> Parser = new ParserBuilder<OldTokenGeneric, OldLangTree>();
         OldParser oldParser = new OldParser();
-        var buildResult = Parser.BuildParser(oldParser,
-            ParserType.EBNF_LL_RECURSIVE_DESCENT,"root").Result;
+        var parserBuilder = Parser.BuildParser(oldParser,
+            ParserType.EBNF_LL_RECURSIVE_DESCENT, "root");
+        var buildResult = parserBuilder.Result;
 
         var r = buildResult.Parse(Code);
         var RUN = r.Result;
@@ -32,6 +33,7 @@ public class OldLangInterpreter
         else
         {
             var run = RUN as OldStatement;
+            Console.WriteLine(run);
             run.Run(ref Manager);
         }
     }

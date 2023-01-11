@@ -11,7 +11,7 @@ public class OldString : OldValue
     {
         return new OldString(Value + otherValue.ToString());
     }
-
+    public override bool EQUAL(OldValue otherValue) => Value == otherValue.ToString();
     public override OldValue TIMES(OldValue otherValue)
     {
         if (otherValue is OldInt)

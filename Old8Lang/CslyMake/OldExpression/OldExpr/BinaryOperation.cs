@@ -18,6 +18,9 @@ public class BinaryOperation : OldExpr
 
     public override OldValue Run(ref VariateManager Manager)
     {
+        // not right
+        if (Left == null && Oper == OldTokenGeneric.NOT)
+            return new OldBool(!(Right.Run(ref Manager) as OldBool).Value);
         
         var l = Left.Run(ref Manager);
         var r = Right;
@@ -32,9 +35,6 @@ public class BinaryOperation : OldExpr
         if (Right is BinaryOperation)
             r = Right.Run(ref Manager);
 
-        // not right 
-        if (r is OldBool && l == null && Oper == OldTokenGeneric.NOT)
-            return new OldBool(!(r as OldBool).Value);
         
         // left and right
         if (l is OldBool && r is OldBool && Oper == OldTokenGeneric.AND)
@@ -46,7 +46,7 @@ public class BinaryOperation : OldExpr
         
         // left xor right
         if (l is OldBool && r is OldBool && Oper == OldTokenGeneric.XOR)
-            return new OldBool(!((l as OldBool).Value == (l as OldBool).Value));
+            return new OldBool(!l.EQUAL(r as OldValue));
         
         // - right
         if (l is null && r is OldInt && Oper == OldTokenGeneric.MINUS)

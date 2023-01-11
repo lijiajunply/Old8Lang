@@ -4,15 +4,15 @@ namespace Old8Lang.CslyMake.OldExpression;
 
 public class OldClassInit : OldStatement
 {
-    public OldAny _Class { get; set; }
+    public OldAny Any { get; set; }
     public OldClassInit(OldAny any)
     {
-        _Class = any;
+        Any = any;
     }
     public override void Run(ref VariateManager Manager)
     {
-        Manager.AddClassAndFunc(_Class.Id, _Class);
+        Manager.AddClassAndFunc(Any.Id, Any);
     }
 
-    public override string ToString() => _Class.ToString();
+    public override string ToString() => Any.ToString();
 }

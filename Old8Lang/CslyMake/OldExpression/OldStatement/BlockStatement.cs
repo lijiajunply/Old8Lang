@@ -27,7 +27,7 @@ public class BlockStatement : OldStatement
         StringBuilder sb = new StringBuilder();
         foreach (var VARIABLE in Statements)
         {
-            sb.Append(VARIABLE);
+            sb.Append(VARIABLE + "\n");
         }
 
         return sb.ToString();

@@ -14,4 +14,5 @@ public class OldChar : OldValue
     }
 
     public override string ToString() => Value.ToString();
+    public override bool EQUAL(OldValue otherValue) => Value.ToString() == otherValue.ToString();
 }

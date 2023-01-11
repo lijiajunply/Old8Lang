@@ -4,10 +4,10 @@ namespace Old8Lang.CslyMake.OldExpression;
 
 public class OldInstance : OldValue
 {
-   public List<OldID> Ids { get; set; }
+   public List<OldExpr> Ids { get; set; }
    public OldID Id { get; set; }
 
-   public OldInstance(OldID id, List<OldID> ids)
+   public OldInstance(OldID id, List<OldExpr> ids)
    {
       Id = id;
       Ids = ids;
@@ -24,4 +24,6 @@ public class OldInstance : OldValue
 
       return result;
    }
+
+   public override string ToString() => Id.ToString() + Ids.ToString();
 }

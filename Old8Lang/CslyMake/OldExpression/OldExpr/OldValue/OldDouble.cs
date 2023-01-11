@@ -39,4 +39,5 @@ public class OldDouble : OldValue
     public override bool LESS(OldValue otherValue) => Value < (double)otherValue.Value;
     public override bool GREATER(OldValue otherValue) => Value > (double)otherValue.Value;
     public override string ToString() => Value.ToString();
+    public override bool EQUAL(OldValue otherValue) => double.Parse(Value.ToString())  == double.Parse(otherValue.ToString()) ;
 }

@@ -27,7 +27,7 @@ public class OldInt : OldValue
         if (otherValue is OldDouble)
             return otherValue.MINUS(this);
         if (otherValue is OldInt)
-            return new OldInt(Value - (int)otherValue.Value);
+            return new OldInt(Value - Int32.Parse(otherValue.ToString()));
         return new OldValue();
     }
 
@@ -55,4 +55,5 @@ public class OldInt : OldValue
 
     public override bool LESS(OldValue otherValue) => Value < Int32.Parse(otherValue.ToString());
     public override bool GREATER(OldValue otherValue) => Value > Int32.Parse(otherValue.ToString());
+    public override bool EQUAL(OldValue otherValue) => Value == Int32.Parse(otherValue.ToString());
 }
