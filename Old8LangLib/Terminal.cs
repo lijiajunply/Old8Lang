@@ -7,7 +7,7 @@ public class Terminal
     public static void PrintLine(string context) => Console.WriteLine(context);
     public static int ReadAsllc() => Console.Read();
     public static string ReadLine() => Console.ReadLine();
-    public static string ReadKey() => Console.ReadKey().ToString();
+    public static string ReadKey() => Console.ReadKey().Key.ToString();
     public static void Beep() => Console.Beep();
     public static void Clear() => Console.Clear();
 }

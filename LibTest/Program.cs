@@ -1,5 +1,4 @@
-﻿
-using Old8LangLib;
+﻿using Old8LangLib;
 
 
 #region os class test
@@ -12,11 +11,21 @@ Console.WriteLine(OS.Process("neofetch"));
 #region terminal class test
 
 Terminal.Title("a");
+Terminal.Print("hello,world\n");
+Terminal.PrintLine("asdf");
+var a =Terminal.ReadKey();
+Terminal.PrintLine(a);
+int asllc = Terminal.ReadAsllc();
+Terminal.PrintLine(asllc.ToString());
+Terminal.Clear();
+//Terminal.Beep();
 
 #endregion
 
+#region file class test
 
-//解压文件
 
-//读取zip压缩文件里的文件
-var filelist= ZipFile.OpenRead(zipPath).Entries.Select(s => s.Name).ToList();
+
+#endregion
+
+ColorfulTerminal.PrintAscii("hello,world");
