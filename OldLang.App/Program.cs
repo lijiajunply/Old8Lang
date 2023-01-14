@@ -3,7 +3,7 @@ using Old8Lang;
 
 Lang();
 
-void Lang()
+void Lang(string path)
 {
     try
     {

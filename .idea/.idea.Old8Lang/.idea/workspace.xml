@@ -9,12 +9,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8LangLib/ColorfulTerminal.cs" afterDir="false" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="asdf">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LibTest/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LibTest/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/Terminal.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Terminal.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,7 +76,7 @@
     ]
   }
 }</component>
-  <component name="RunManager" selected=".NET Project.LibTest">
+  <component name="RunManager" selected=".NET Project.OldLang.App">
     <configuration name="LibTest" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="$PROJECT_DIR$/LibTest/bin/Debug/net6.0/LibTest" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -193,7 +189,7 @@
       <workItem from="1673407486269" duration="15550000" />
       <workItem from="1673427241617" duration="196000" />
       <workItem from="1673490039648" duration="7000" />
-      <workItem from="1673582149911" duration="2010000" />
+      <workItem from="1673582149911" duration="2944000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -363,7 +359,14 @@
       <option name="project" value="LOCAL" />
       <updated>1673423641192</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="asdf">
+      <created>1673584961970</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1673584961970</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -388,7 +391,6 @@
     <MESSAGE value="rename" />
     <MESSAGE value="markdown 2022.11.22.11:17" />
     <MESSAGE value="add Lexer" />
-    <MESSAGE value="asdf" />
     <MESSAGE value="add OldTrees and APIs" />
     <MESSAGE value="add APIs and csly" />
     <MESSAGE value="add OldLangTree and the chilren class &#10;add OldParser with bnf" />
@@ -407,7 +409,8 @@
     <MESSAGE value="add class and list" />
     <MESSAGE value="func bug" />
     <MESSAGE value="add lib" />
-    <option name="LAST_COMMIT_MESSAGE" value="add lib" />
+    <MESSAGE value="asdf" />
+    <option name="LAST_COMMIT_MESSAGE" value="asdf" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
