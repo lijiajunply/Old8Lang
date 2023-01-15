@@ -5,18 +5,20 @@ namespace Old8Lang.CslyMake.OldExpression;
 public class OldList : OldValue
 {
     public new List<OldValue> Value { get; set; }
+
     public OldID ID { get; set; }
+
     public OldList(OldID id)
     {
         ID = id;
     }
 
-    public OldList(OldID id, List<OldValue> values)
+    public OldList(OldID id,List<OldValue> values)
     {
-        ID = id;
+        ID    = id;
         Value = values;
     }
-    
+
     public OldValue Add(OldValue value)
     {
         Value.Add(value);
@@ -35,16 +37,12 @@ public class OldList : OldValue
         StringBuilder sb = new StringBuilder();
         foreach (var VARIABLE in Value)
         {
-            sb.Append(VARIABLE + " ");
+            sb.Append(VARIABLE+" ");
         }
-        return $"list {ID} : {sb} ";
+        return $"list {ID} : {sb}";
     }
 
-    public override OldValue Dot(OldID DotID)
-    {
-        return new OldValue();
-    }
+    public override OldValue Dot(OldID DotID) => new OldValue();
 
     public override bool EQUAL(OldValue otherValue) => false;
-    
 }

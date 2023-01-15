@@ -49,6 +49,6 @@ public class OldFunc : OldValue
         if (isNative)
             return $"{Method}";
         else
-            return $"func {ID} {IDs} : {BlockStatement}";
+            return $"func {ID} {OldLangTree.ListToString(IDs)} : {BlockStatement}";
     }
 }

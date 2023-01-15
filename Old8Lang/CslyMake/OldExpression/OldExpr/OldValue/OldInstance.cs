@@ -1,3 +1,4 @@
+using System.Text;
 using Old8Lang.CslyMake.OldLandParser;
 
 namespace Old8Lang.CslyMake.OldExpression;
@@ -24,6 +25,14 @@ public class OldInstance : OldValue
 
       return result;
    }
-
-   public override string ToString() => Id.ToString() + Ids.ToString();
+   public virtual string ListToString(List<OldExpr> a)
+   {
+      StringBuilder builder = new StringBuilder();
+      foreach (var expr in a)
+      {
+         builder.Append(expr);
+      }
+      return builder.ToString();
+   }
+   public override string ToString() => Id + " "+ListToString(Ids);
 }

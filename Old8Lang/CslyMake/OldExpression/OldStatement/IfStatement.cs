@@ -39,6 +39,5 @@ public class IfStatement : OldStatement
             ElseBlockStatement.Run(ref Manager);
         }
     }
-
-    public override string ToString() => $"if: {IfBlock}elif: {ElifBlock} \nelse: {ElseBlockStatement}";
+    public override string ToString() => $"if: {IfBlock}elif: {OldLangTree.ListToString(ElifBlock)} \nelse: {ElseBlockStatement}";
 }

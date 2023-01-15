@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Old8Lang;
 
-Lang();
+Lang("/home/luckyfish/RiderProjects/Old8Lang/Old8Lang/Exceple/文本文件.txt");
 
 void Lang(string path)
 {
@@ -18,12 +18,12 @@ void Lang(string path)
         }
         else
         {
-            Run(false,"/home/luckyfish/文本文件.txt");
+            Run(false,path);
         }
     }
     catch (Exception e)
     {
-        Run(false,"/home/luckyfish/文本文件.txt");
+        Run(false,path);
     }
 }
 

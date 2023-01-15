@@ -5,11 +5,12 @@ namespace Old8Lang.CslyMake.OldExpression;
 public class ListInitStatement : OldStatement
 {
     public OldID Id { get; set; }
+
     public List<OldLangTree> Values { get; set; }
 
-    public ListInitStatement(OldID id, List<OldLangTree> values)
+    public ListInitStatement(OldID id,List<OldLangTree> values)
     {
-        Id = id;
+        Id     = id;
         Values = values;
     }
 
@@ -22,6 +23,7 @@ public class ListInitStatement : OldStatement
             value.Add(va.Run(ref Manager));
         }
         var result = new OldList(Id,value);
-        Manager.Set(Id, result);
+        Manager.Set(Id,result);
     }
+    public override string ToString() => Id+" : {"+OldLangTree.ListToString(Values)+"}";
 }

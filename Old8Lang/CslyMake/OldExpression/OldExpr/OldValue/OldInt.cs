@@ -40,7 +40,7 @@ public class OldInt : OldValue
         if (otherValue is OldDouble)
             return otherValue.TIMES(this);
         if (otherValue is OldInt)
-            return new OldInt(Value * (int)otherValue.Value);
+            return new OldInt(Value * Int32.Parse(otherValue.ToString()));
         return new OldValue();
     }
 
@@ -49,7 +49,7 @@ public class OldInt : OldValue
         if (otherValue is OldDouble)
             return otherValue.DIVIDE(this);
         if (otherValue is OldInt)
-            return new OldInt(Value / (int)otherValue.Value);
+            return new OldInt(Value / Int32.Parse(otherValue.ToString()));
         return new OldValue();
     }
 
