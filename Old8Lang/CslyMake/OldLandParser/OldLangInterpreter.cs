@@ -7,16 +7,19 @@ namespace Old8Lang.CslyMake.OldLandParser;
 
 public class OldLangInterpreter
 {
-    public VariateManager Manager = new VariateManager();
-    public List<string> Error => new List<string>();
-    public string Code { get; set; }
+    public VariateManager Manager;
+    public List<string>   Error;
+    public string         Code { get; set; }
     public OldLangInterpreter(string code)
     {
-        Code = code;
+        Code    = code;
+        Error   = new List<string>();
+        Manager = new VariateManager();
     }
 
     public void Use()
     {
+        
         ParserBuilder<OldTokenGeneric, OldLangTree> Parser = new ParserBuilder<OldTokenGeneric, OldLangTree>();
         OldParser oldParser = new OldParser();
         var parserBuilder = Parser.BuildParser(oldParser,
@@ -26,10 +29,7 @@ public class OldLangInterpreter
         var r = buildResult.Parse(Code);
         var RUN = r.Result;
         if (r.Errors !=null && r.Errors.Any())
-        {
-            // display errors
-            r.Errors.ForEach(error => Error.Add(error.ErrorMessage)); ;
-        }
+            r.Errors.ForEach(x => Error.Add(x.ToString()));
         else
         {
             var run = RUN as OldStatement;

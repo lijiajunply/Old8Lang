@@ -11,16 +11,9 @@
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldFunc.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldFunc.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldInstance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldInt.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldInt.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldList.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldLangTree.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldLangTree.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/IfStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/IfStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/ListInitStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/ListInitStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/ReturnStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/ReturnStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldAny.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldAny.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldLangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldLangInterpreter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Exceple/文本文件.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Exceple/文本文件.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/OldLang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OldLang.App/Program.cs" afterDir="false" />
     </list>
@@ -49,7 +42,6 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8ddc693f0d924df185ef87b81b654b0294de00/aa/e40a4310/List`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3525d14275487fbeeab6166392023d993a1523b35bcd1caab2fff5ad2e5c0/GenericLexer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/69b13731f8acbba44a7d7f7b22925950371fdb21804fa6eeec99de1fe7a37fd/EBNFRecursiveDescentSyntaxParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///home/luckyfish/RiderProjects/Old8Lang/OldLang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -204,6 +196,9 @@
       <workItem from="1673490039648" duration="7000" />
       <workItem from="1673582149911" duration="2944000" />
       <workItem from="1673708941924" duration="1956000" />
+      <workItem from="1673762147180" duration="293000" />
+      <workItem from="1673766614650" duration="857000" />
+      <workItem from="1673791857624" duration="7076000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -387,7 +382,14 @@
       <option name="project" value="LOCAL" />
       <updated>1673708994678</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="add ex">
+      <created>1673762161416</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1673762161416</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -432,7 +434,8 @@
     <MESSAGE value="add lib" />
     <MESSAGE value="asdf" />
     <MESSAGE value="add asdf" />
-    <option name="LAST_COMMIT_MESSAGE" value="add asdf" />
+    <MESSAGE value="add ex" />
+    <option name="LAST_COMMIT_MESSAGE" value="add ex" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -462,19 +465,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="37" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldInt.cs</url>
-          <line>39</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldInt.cs" initialLine="39" containingFunctionPresentation="method 'TIMES'">
-            <startOffsets>
-              <option value="1246" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1274" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="49" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue.cs</url>
@@ -516,17 +506,58 @@
           <option name="timeStamp" value="72" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldLangInterpreter.cs</url>
-          <line>25</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldLangInterpreter.cs" initialLine="25" containingFunctionPresentation="method 'Use'">
+          <url>file://$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/ClassInit.cs</url>
+          <line>13</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/ClassInit.cs" initialLine="13" containingFunctionPresentation="method 'Run'">
             <startOffsets>
-              <option value="773" />
+              <option value="301" />
             </startOffsets>
             <endOffsets>
-              <option value="805" />
+              <option value="338" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="73" />
+          <option name="timeStamp" value="78" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/OldLang.App/Program.cs</url>
+          <line>40</line>
+          <properties documentPath="$PROJECT_DIR$/OldLang.App/Program.cs" initialLine="40" containingFunctionPresentation="local function 'Run'">
+            <startOffsets>
+              <option value="765" />
+              <option value="793" />
+            </startOffsets>
+            <endOffsets>
+              <option value="815" />
+              <option value="813" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="89" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldLangInterpreter.cs</url>
+          <line>40</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldLangInterpreter.cs" initialLine="38" containingFunctionPresentation="method 'GetError'">
+            <startOffsets>
+              <option value="1187" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1192" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="91" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldAny.cs</url>
+          <line>22</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldAny.cs" initialLine="26" containingFunctionPresentation="method 'ToString'">
+            <startOffsets>
+              <option value="597" />
+            </startOffsets>
+            <endOffsets>
+              <option value="623" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="97" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -38,11 +38,8 @@ void Run(bool isdir,string path)
 
     Console.WriteLine(code);
     // error
-    foreach (var VARIABLE in codeinfo.Error)
-    {
-        Console.WriteLine(VARIABLE);
-    }
-    
+    codeinfo.Error.ForEach(x => Console.WriteLine(x));
+
     // variable and value
     Console.Write("variable and value: \n|");
     foreach (var VARIABLE in codeinfo.Manager.Variates)
