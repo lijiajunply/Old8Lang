@@ -171,12 +171,10 @@ public class OldParser
     }
 
     [Production("statement: CLASS[d] IDENTFIER block")]
-    public OldLangTree Class(Token<OldTokenGeneric> id,BlockStatement blockStatement)
+    public OldLangTree Class(Token<OldTokenGeneric> id,BlockStatement statements)
     {
-        Dictionary<OldID,OldExpr> c = new Dictionary<OldID,OldExpr>();
-
-        var statements = blockStatement.Statements;
-        statements.ForEach(x => c.Add(GetTuple(x).id,GetTuple(x).Expr));
+        var c = new Dictionary<OldID,OldExpr>();
+        statements.Statements.ForEach(x => c.Add(GetTuple(x).id,GetTuple(x).Expr));
         return new OldClassInit(new OldAny(new OldID(id.Value),c));
     }
 

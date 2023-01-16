@@ -27,21 +27,37 @@ public class OldFunc : OldValue
     public override OldValue Run(ref VariateManager Manager) => this;
 
 
-    public OldValue Run(ref VariateManager Manager,List<OldExpr>? ids, Dictionary<OldID, OldValue>? dictionary)
+    public OldValue Run(ref VariateManager Manager,List<OldExpr>? ids)
     {
-        VariateManager manager = new VariateManager();
-        manager.Init(dictionary);
-        manager.ClassAndFuncInfo = Manager.ClassAndFuncInfo;
-        if (ids is not null && IDs is not null)
+        if (Manager.isClass)
         {
-            List<OldValue> oldValues = new List<OldValue>();
-            for (int i = 0; i < ids.Count; i++)
+            if (ids is not null && IDs is not null)
             {
-                manager.Set(IDs[i],ids[i].Run(ref Manager));
+                List<OldValue> oldValues = new List<OldValue>();
+                for (int i = 0; i < ids.Count; i++)
+                {
+                    Manager.Set(IDs[i],ids[i].Run(ref Manager));
+                }
             }
+            BlockStatement.Run(ref Manager);
+            return Manager.Result;
         }
-        BlockStatement.Run(ref manager);
-        return manager.Result;
+        else
+        {
+            VariateManager manager = new VariateManager();
+            manager.ClassAndFuncInfo = Manager.ClassAndFuncInfo;
+            if (ids is not null && IDs is not null)
+            {
+                List<OldValue> oldValues = new List<OldValue>();
+                for (int i = 0; i < ids.Count; i++)
+                {
+                    Manager.Set(IDs[i],ids[i].Run(ref Manager));
+                }
+            }
+            BlockStatement.Run(ref manager);
+            return manager.Result;
+        }
+        
     }
 
     public override string ToString()

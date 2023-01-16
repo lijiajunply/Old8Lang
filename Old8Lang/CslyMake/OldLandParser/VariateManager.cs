@@ -12,6 +12,8 @@ public class VariateManager
     public bool IsReturn { get; set; } = false;
     public OldValue Result { get; set; }
 
+    public bool isClass { get; set; } = false;
+
     public Dictionary<string, OldValue> ClassAndFuncInfo { get; set; } = new Dictionary<string, OldValue>();
 
     public ValueTuple<OldID, OldExpr> Set(OldID id, OldExpr value)
@@ -141,7 +143,9 @@ public class VariateManager
             Variates.Add(VARIABLE.Key);
             VariateDirectValue.Add(i);
             Values.Add(i,VARIABLE.Value);
+            i++;
         }
+        isClass = true;
     }
 
     public ValueTuple<OldID, OldValue> AddClassAndFunc(OldID id, OldValue value)

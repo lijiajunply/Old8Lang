@@ -20,7 +20,14 @@ public class OldInstance : OldValue
       if (result is OldFunc)
       {
          var a = result as OldFunc;
-         result = a.Run(ref Manager, Ids, new Dictionary<OldID, OldValue>());
+         if (Manager.isClass)
+         {
+            result = a.Run(ref Manager,Ids);
+         }
+         else
+         {
+            result = a.Run(ref Manager,Ids);
+         }
       }
 
       return result;

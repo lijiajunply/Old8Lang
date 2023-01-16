@@ -23,20 +23,24 @@ public class OldValue : OldExpr
     public virtual OldValue DIVIDE(OldValue otherValue) => new OldValue();
     public override string ToString() => Value.ToString();
 
-    public virtual OldValue Dot(OldID DotID)
+    public virtual OldValue Dot(OldExpr Dot)
     {
-        if (DotID.IdName == "toint")
+        if (Dot is OldID)
         {
-            return new OldInt(Int32.Parse(ToString()));
-        }
-        if (DotID.IdName == "tostring")
-        {
-            return new OldString(ToString());
-        }
+            var a = Dot as OldID;
+            if (a.IdName == "toint")
+            {
+                return new OldInt(Int32.Parse(ToString()));
+            }
+            if (a.IdName == "tostring")
+            {
+                return new OldString(ToString());
+            }
 
-        if (DotID.IdName == "tochar")
-        {
-            return new OldChar(ToString()[0]);
+            if (a.IdName == "tochar")
+            {
+                return new OldChar(ToString()[0]);
+            }
         }
         return null;
     }
