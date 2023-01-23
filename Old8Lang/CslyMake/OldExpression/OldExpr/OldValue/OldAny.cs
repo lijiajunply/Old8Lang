@@ -6,55 +6,55 @@ namespace Old8Lang.CslyMake.OldExpression;
 public class OldAny : OldValue
 {
     public Dictionary<OldID,OldExpr>  Variates { get; set; }
-    public Dictionary<OldID,OldValue> Result   { get; set; }
+    public Dictionary<string,OldValue> Result   { get; set; }
     public OldID                      Id       { get; set; }
 
+    public VariateManager Manager;
     public OldAny(OldID id, Dictionary<OldID,OldExpr> variates)
     {
         Variates = variates; 
         Id       = id;
-        var man = new VariateManager();
-        Result = new Dictionary<OldID,OldValue>();
-        Run(ref man);
+        Result   = new Dictionary<string,OldValue>();
+        Manager  = new VariateManager();
+        Run(ref Manager);
+        Manager.Init(Result);
+        Manager.isClass = true;
     }
 
     public override OldValue Run(ref VariateManager Manager)
     {
         foreach (var VARIABLE in Variates.Keys)
-        {
-            var a = Variates[VARIABLE].Run(ref Manager);
-            Result.Add(VARIABLE,a);
-        }
+            Result.Add(VARIABLE.IdName,Variates[VARIABLE].Run(ref Manager));
         return this;
     }
 
-    public override OldValue Dot(OldExpr Dot)
+    public OldValue Dot(OldExpr dotExpr,List<OldExpr> c)
     {
-        var a = new OldExpr();
-        if (Dot is OldID)
+        if (dotExpr is OldID)
         {
-            var DotID = Dot as OldID;
+            var a = new OldExpr();
+            var DotID = dotExpr as OldID;
             foreach (var VARIABLE in Variates)
                 if (DotID.IdName == VARIABLE.Key.IdName)
                     a = VARIABLE.Value;
+            return a.Run(ref Manager);
         }
-        if (Dot is OldInstance)
+        if (dotExpr is OldFunc)
         {
-            a = Dot as OldInstance;
+            var a = dotExpr as OldFunc;
+            return a.Run(ref Manager,c);
         }
-        VariateManager manager = new VariateManager();
-        manager.Init(Result);
-        return a.Run(ref manager);
+        return dotExpr.Run(ref Manager);
+    }
+    public void Post(OldID id,OldValue value)
+    {
+        Manager.Set(id,value);
     }
 
-    public override string ToString() => $"class {Id} : {DicToString()}";
-    public string DicToString()
+    public override string ToString() => $"class {Id} : \n{Manager}";
+    public override void Init()
     {
-        StringBuilder builder = new StringBuilder();
-        foreach (var VARIABLE in Variates)
-        {
-            builder.Append(VARIABLE.Key+":"+VARIABLE.Value);
-        }
-        return builder.ToString();
+        Manager = new VariateManager();
+        Manager.Init(Result);
     }
 }

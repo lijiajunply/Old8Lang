@@ -43,7 +43,7 @@ public class OldList : OldValue
         return $"list {ID} : {sb}";
     }
 
-    public override OldValue Dot(OldExpr Dot) => new OldValue();
+    public override OldValue Dot(OldExpr dotExpr) => new OldValue();
 
     public override bool EQUAL(OldValue otherValue) => false;
 }

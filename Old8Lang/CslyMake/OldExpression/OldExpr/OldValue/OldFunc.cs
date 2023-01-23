@@ -31,29 +31,21 @@ public class OldFunc : OldValue
     {
         if (Manager.isClass)
         {
+            Manager.AddChildren();
             if (ids is not null && IDs is not null)
-            {
-                List<OldValue> oldValues = new List<OldValue>();
                 for (int i = 0; i < ids.Count; i++)
-                {
                     Manager.Set(IDs[i],ids[i].Run(ref Manager));
-                }
-            }
             BlockStatement.Run(ref Manager);
+            Manager.RemoveChildren();
             return Manager.Result;
         }
         else
         {
             VariateManager manager = new VariateManager();
-            manager.ClassAndFuncInfo = Manager.ClassAndFuncInfo;
+            manager.AnyInfo = Manager.AnyInfo;
             if (ids is not null && IDs is not null)
-            {
-                List<OldValue> oldValues = new List<OldValue>();
                 for (int i = 0; i < ids.Count; i++)
-                {
-                    Manager.Set(IDs[i],ids[i].Run(ref Manager));
-                }
-            }
+                    manager.Set(IDs[i],ids[i].Run(ref Manager));
             BlockStatement.Run(ref manager);
             return manager.Result;
         }
@@ -65,6 +57,6 @@ public class OldFunc : OldValue
         if (isNative)
             return $"{Method}";
         else
-            return $"func {ID} {OldLangTree.ListToString(IDs)} : {BlockStatement}";
+            return $"{ID}({OldLangTree.ListToString(IDs)}) => {BlockStatement}";
     }
 }

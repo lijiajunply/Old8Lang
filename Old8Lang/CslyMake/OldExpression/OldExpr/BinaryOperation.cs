@@ -26,9 +26,21 @@ public class BinaryOperation : OldExpr
         var r = Right;
         
         // id.id => dot_value
-        if (l is OldValue && r is not null && Oper == OldTokenGeneric.CONCAT)
+        if (l is not OldAny && r is not null && Oper == OldTokenGeneric.CONCAT)
             return l.Dot(r);
-        
+
+
+        if (l is OldAny && r is not null && Oper == OldTokenGeneric.CONCAT)
+        {
+            var l1 = l as OldAny;
+            if (r is OldInstance)
+            {
+                var r1 = r as OldInstance;
+                return l1.Dot(r,r1.Ids);
+            }
+            return l1.Dot(r,new List<OldExpr>());
+        }
+
         r = Right.Run(ref Manager);
         // (right)
         if (Right is OldID && l is not OldAny)

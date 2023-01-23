@@ -9,10 +9,7 @@ public class OldClassInit : OldStatement
     {
         Any = any;
     }
-    public override void Run(ref VariateManager Manager)
-    {
-        Manager.AddClassAndFunc(Any.Id, Any);
-    }
+    public override void Run(ref VariateManager Manager) => Manager.AddClassAndFunc(Any.Id,Any);
 
     public override string ToString() => Any.ToString();
 }

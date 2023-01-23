@@ -27,5 +27,5 @@ public class SetStatement : OldStatement
         Manager.Set(Id, result);
     }
 
-    public override string ToString() => $"set: id = {Id} , expr = {Value} ";
+    public override string ToString() => $"{Id} = {Value} ";
 }

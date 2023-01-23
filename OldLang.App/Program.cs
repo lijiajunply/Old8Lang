@@ -35,35 +35,13 @@ void Run(bool isdir,string path)
     else
         code = APIs.FromFile(path);
     var codeinfo = APIs.CslyUsing(code);
-
-    Console.WriteLine(code);
+    
     // error
     codeinfo.Error.ForEach(x => Console.WriteLine(x));
 
     // variable and value
-    Console.Write("variable and value: \n|");
-    foreach (var VARIABLE in codeinfo.Manager.Variates)
-    {
-        Console.Write(VARIABLE + "|");
-    }
-
-    Console.Write("\n|");
-    foreach (var VARIABLE in codeinfo.Manager.VariateDirectValue)
-    {
-        Console.Write(VARIABLE + "|");
-    }
-
-    Console.Write("\n|");
-    foreach (var VARIABLE in codeinfo.Manager.Values)
-    {
-        Console.Write(VARIABLE.Value + "|");
-    }
-
-    Console.Write("\nclass & func:\n");
-    foreach (var VARIABLE in codeinfo.Manager.ClassAndFuncInfo)
-    {
-        Console.Write(VARIABLE.Key + " : " + VARIABLE.Value + "\n");
-    }
+    Console.Write("\nvariable and value: \n|");
+    Console.WriteLine(codeinfo.Manager);
 
     Console.WriteLine("\n"+codeinfo.Time);
 }

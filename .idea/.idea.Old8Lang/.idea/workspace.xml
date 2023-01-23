@@ -10,16 +10,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/ClassVariateChanging.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/APIs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/APIs.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/BinaryOperation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/BinaryOperation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldID.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldID.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldAny.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldAny.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldFunc.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldFunc.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldInstance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldInt.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldInt.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldItem.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldList.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldLangTree.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldLangTree.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/BlockStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/ClassInfoStatement.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/ClassInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/ClassInit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/ReturnStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/ReturnStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/SetStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/WhileStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/WhileStatement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldTokenGeneric.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/OldTokenGeneric.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldLandParser/VariateManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Exceple/文本文件.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Exceple/文本文件.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldLang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OldLang.App/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +59,25 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8ddc693f0d924df185ef87b81b654b0294de00/67/67708e9d/RuntimeMethodInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8ddc693f0d924df185ef87b81b654b0294de00/7f/e7c33f86/CastHelpers.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8ddc693f0d924df185ef87b81b654b0294de00/aa/e40a4310/List`1.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/01/f8200c99/FastResourceComparer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/05/720b7b85/Stopwatch.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/09/30372e59/SR.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/0a/71e50a20/CultureInfo.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/11/4ef68be6/ValueTuple`2.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/13/ae3704bb/TlsOverPerCoreLockedStacksArrayPool`1.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/14/f40b5329/ResourceManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/2a/831ce8b4/DefaultInterpolatedStringHandler.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/3a/d9f669ab/Dictionary`2.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/41/8b5aa28d/List`1.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/52/8cb8cfe0/ValueStringBuilder.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/54/ae914792/HashHelpers.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/61/b73ef831/Buffer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/7e/3eef4e5b/RuntimeResourceSet.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/91/0d758bd6/NonRandomizedStringEqualityComparer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/94/ddebd456/StringBuilder.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/a2/95e3c974/String.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/f8/a0aa6a72/ThrowHelper.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9393dd8f52ce47e48eafb6bb046c08142bc00/93/f243917b/Console.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3525d14275487fbeeab6166392023d993a1523b35bcd1caab2fff5ad2e5c0/GenericLexer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/69b13731f8acbba44a7d7f7b22925950371fdb21804fa6eeec99de1fe7a37fd/EBNFRecursiveDescentSyntaxParser.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
@@ -71,7 +104,7 @@
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.github.tuchg.nonasciicodecompletionhelper.config.PluginSettingsController&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.ide.settings.new.ui&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -204,7 +237,25 @@
       <workItem from="1673762147180" duration="293000" />
       <workItem from="1673766614650" duration="857000" />
       <workItem from="1673791857624" duration="7432000" />
-      <workItem from="1673834502544" duration="3484000" />
+      <workItem from="1673834502544" duration="3822000" />
+      <workItem from="1673839991859" duration="649000" />
+      <workItem from="1673850648848" duration="3197000" />
+      <workItem from="1673854516942" duration="17331000" />
+      <workItem from="1673874682565" duration="674000" />
+      <workItem from="1673875376554" duration="485000" />
+      <workItem from="1673875891729" duration="310000" />
+      <workItem from="1673925752963" duration="22000" />
+      <workItem from="1673961233615" duration="3182000" />
+      <workItem from="1674102727806" duration="7000" />
+      <workItem from="1674105116018" duration="1271000" />
+      <workItem from="1674106558146" duration="2124000" />
+      <workItem from="1674185662380" duration="23000" />
+      <workItem from="1674186089012" duration="23000" />
+      <workItem from="1674186327736" duration="165000" />
+      <workItem from="1674220755706" duration="97000" />
+      <workItem from="1674221686192" duration="106000" />
+      <workItem from="1674273618233" duration="801000" />
+      <workItem from="1674465216253" duration="1705000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -402,7 +453,14 @@
       <option name="project" value="LOCAL" />
       <updated>1673799286019</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="add class">
+      <created>1673838135848</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1673838135848</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -455,27 +513,14 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldInt.cs</url>
-          <line>55</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldInt.cs" initialLine="55" containingFunctionPresentation="method 'LESS'">
-            <startOffsets>
-              <option value="1810" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1824" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="24" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldItem.cs</url>
           <line>36</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldItem.cs" initialLine="36" containingFunctionPresentation="method 'Run'">
             <startOffsets>
-              <option value="958" />
+              <option value="963" />
             </startOffsets>
             <endOffsets>
-              <option value="970" />
+              <option value="975" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="37" />
@@ -495,29 +540,16 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldAny.cs</url>
-          <line>44</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldAny.cs" initialLine="36" containingFunctionPresentation="method 'Dot'">
+          <line>39</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldExpr/OldValue/OldAny.cs" initialLine="43" containingFunctionPresentation="method 'Dot'">
             <startOffsets>
-              <option value="1226" />
+              <option value="1225" />
             </startOffsets>
             <endOffsets>
-              <option value="1272" />
+              <option value="1251" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="99" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/SetStatement.cs</url>
-          <line>26</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/CslyMake/OldExpression/OldStatement/SetStatement.cs" initialLine="26" containingFunctionPresentation="method 'Run'">
-            <startOffsets>
-              <option value="603" />
-            </startOffsets>
-            <endOffsets>
-              <option value="627" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="106" />
+          <option name="timeStamp" value="143" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

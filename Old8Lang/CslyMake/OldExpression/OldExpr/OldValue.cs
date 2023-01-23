@@ -23,11 +23,11 @@ public class OldValue : OldExpr
     public virtual OldValue DIVIDE(OldValue otherValue) => new OldValue();
     public override string ToString() => Value.ToString();
 
-    public virtual OldValue Dot(OldExpr Dot)
+    public virtual OldValue Dot(OldExpr dotExpr)
     {
-        if (Dot is OldID)
+        if (dotExpr is OldID)
         {
-            var a = Dot as OldID;
+            var a = dotExpr as OldID;
             if (a.IdName == "toint")
             {
                 return new OldInt(Int32.Parse(ToString()));
@@ -48,5 +48,15 @@ public class OldValue : OldExpr
     public virtual bool LESS(OldValue otherValue) => false;
     public virtual bool GREATER(OldValue otherValue) => false;
     public override OldValue Run(ref VariateManager Manager) => this;
-    
+
+    public virtual OldValue Clone()
+    {
+        var a = (OldValue)MemberwiseClone();
+        a.Init();
+        return a;
+    }
+    public virtual void Init()
+    {
+        Value = new object();
+    }
 }

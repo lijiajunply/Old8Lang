@@ -1,6 +1,15 @@
-class A
-   a <- 1
-   b <- 1+1
-   c() ->
-      return a+b
-a <- A.c()
+a <- 1+2 == 2+3
+b <- a or true
+class st
+   left <- 1
+   right <- 2
+a <- st()
+a.left <- 123
+fib(a) -> 
+   if a == 1
+      return 1
+   elif a == 2
+      return 1
+   else
+      return fib(a-1)+fib(a-2)
+b <- fib(3)

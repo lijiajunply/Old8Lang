@@ -55,9 +55,7 @@ public class APIs
 
     public static string ImportSearch(string ImportString)
     {
-        //
-        //
-        Path = System.Environment.CurrentDirectory;
+        Path = Environment.CurrentDirectory;
         return Path + ImportString;
     }
 }

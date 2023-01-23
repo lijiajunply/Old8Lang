@@ -15,21 +15,18 @@ public class BlockStatement : OldStatement
         {
             var a = VARIABLE as OldStatement;
             a.Run(ref Manager);
-            if (Manager.IsReturn)
-            {
-                return;
-            }
+            if (Manager.IsReturn) return;
         }
     }
 
     public override string ToString()
     {
         StringBuilder sb = new StringBuilder();
-        foreach (var VARIABLE in Statements)
+        for (int i = 0; i < Statements.Count; i++)
         {
-            sb.Append(VARIABLE + "\n");
+            string a = i == 0 || i == Statements.Count-1 ? "" : "\n";
+            sb.Append(Statements[i]+a);
         }
-
         return sb.ToString();
     }
 }

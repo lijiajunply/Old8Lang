@@ -25,7 +25,7 @@ public class OldItem : OldValue
         {
             var intResult = result as OldInt;
             var alist = a as OldList;
-            return alist.Value[intResult.Value];
+            return alist.Value[(int)intResult.Value];
         }
 
         if (a is OldDir && result is not null)

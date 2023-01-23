@@ -21,25 +21,18 @@ public class OldInstance : OldValue
       {
          var a = result as OldFunc;
          if (Manager.isClass)
-         {
             result = a.Run(ref Manager,Ids);
-         }
          else
-         {
             result = a.Run(ref Manager,Ids);
-         }
       }
-
+      if (result is OldAny)
+      {
+         var a = result as OldAny;
+         if (a.Result.TryGetValue("init",out result))
+            a.Dot(result,Ids);
+         return a;
+      }
       return result;
    }
-   public virtual string ListToString(List<OldExpr> a)
-   {
-      StringBuilder builder = new StringBuilder();
-      foreach (var expr in a)
-      {
-         builder.Append(expr);
-      }
-      return builder.ToString();
-   }
-   public override string ToString() => Id + " "+ListToString(Ids);
+   public override string ToString() => Id + "("+OldLangTree.ListToString(Ids)+")";
 }

@@ -11,5 +11,5 @@ public class ReturnStatement : OldStatement
         Manager.Result   = ReturnExpr.Run(ref Manager);
         Manager.IsReturn = true;
     }
-    public override string ToString() => $"RETURN: return {ReturnExpr}";
+    public override string ToString() => $"return {ReturnExpr}";
 }
