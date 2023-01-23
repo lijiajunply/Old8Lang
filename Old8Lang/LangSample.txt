@@ -1,73 +1,58 @@
-﻿var a <- 1 //将1赋值给a
-a -> var b //将a赋值给b
+﻿a <- 1 //将1赋值给a
+a -> b //将a赋值给b
 //在Old8Lang，变量更像是C中的指针，为了好看，这里使用 -> 或 <-
 
-if(a == 1) {
+if a == 1
     b <- 2 
-} 
 
-for(var c <- 1;c<=2:c++){ 
-    Console.WriteLine(b)
-} 
+for c <- 1,c<=2,c++
+    PrintLine(b)
 
 while(a<=2){
-    Console.WriteLine(b)
-} 
+    PrintLine(b)
+}
 
-class Old8LangClass{ 
-    var _a , _b
-    Old8LangClass(old a , old b){ 
-        a -> XAUAT._a 
-        b -> XAUAT._b 
-    } 
-    ADD(){
-        var c <- _a + _b
-        return c
-    }
+class Old8LangClass
+    _a <- 1
+    _b <- 2
+    init(old a , old b) ->
+        a -> _a 
+        b -> _b 
+    ADD() ->
+        return _a + _b
     ADD_1() => _a + _b
 }  
 
 //类的实例：
-a <- new Old8LangClass(1,2)                       
-a.ADD() == a.ADD_1() // ture
-a <- a.ADD
+a <- Old8LangClass(1,2)                       
+_ <- a.ADD() == a.ADD_1() // ture
 a.ADD() // 3 
 
 //彩蛋函数：
-a.XAUAT.ToString()
+a.XAUAT
 //输出：西建大还我血汗钱我要回家
-a.XAUAT.HomeImg()
-//输出：西建大还我血汗钱我要回家 的 那张图
 
 //数组：
-a <- new String[]
-a[0] //为a数组的第一个
-a[-1] //为最后一个
-a[0:1] //取 a[n](0<=n<1)
-
-//lambda:
-a <- (c,d) => c+b
-Console.WriteLine(a())
+a <- []
+a <- [1 2 1]
+PrintLine(a[0]) //为a数组的第一个
+PrintLine(a[-1]) //为最后一个
+b <- a[0:1] //取 a[n](0<=n<1)
 
 //type:
-typeof(a) // a : lambda
+typeof(a) // a : func
 a <- 5
 typeof(a) // a : int
 
 //泛型:
-class TOld8Lang<T>{
+class TOld8Lang<T>
     T[] array;
-    TOld8Lang(int size){
+    init(int size) ->
         array <- new T[size + 1];
-    }
-    T getItem(int index){
-        return array[index];
-    }
-    setItem(int index, T value){
-        array[index] = value;
-    }
-}
-a <- new TOld8Lang<int>(6)
+    getItem(int index) => array[index]
+    setItem(int index, T value) -> 
+        array[index] = value
+a <- TOld8Lang<int>(6)
 a.setItem(0,2)
 a.getItem(0) // 2
 
