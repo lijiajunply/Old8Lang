@@ -102,11 +102,12 @@ public class OldParser
                     });
         return new OldInstance(new OldID(id.Value),IDs);
     }
-    [Production("primary: func")]
-    public OldLangTree FuncValue(OldLangTree a)
+    [Production("primary: LPAREN[d] IDENTFIER* RPAREN[d] LAMBDA[d] OldParser_expressions")]
+    public OldLangTree Lambda(List<Token<OldTokenGeneric>> ids,OldExpr asdf)
     {
-        var b = a as FuncInit;
-        return b.Func;
+        List<OldLangTree> retrunState = new List<OldLangTree>() { new ReturnStatement(asdf) };
+        var               a           = ids.Select(x => new OldID(x.Value)).ToList();
+        return new OldFunc(null,a,new BlockStatement(retrunState));
     }
 
     [Production("primary: TYPE[d] LPAREN[d] IDENTFIER RPAREN[d]")]
@@ -123,18 +124,34 @@ public class OldParser
         return new OldList(a);
     }
 
-    [Production("primary: LPAREN[d] OldParser_expressions* RPAREN[d]")]
-    public OldLangTree Array(List<OldLangTree> list) => null;
+    [Production("primary: L_BRACKET[d] OldParser_expressions* R_BRACKET[d]")]
+    public OldLangTree Array(List<OldLangTree> list)
+    {
+        var a = list.OfType<OldExpr>().ToList();
+        return new OldArray(a);
+    }
+
+    [Production("primary: LPAREN[d] OldParser_expressions DOUHAO[d] OldParser_expressions RPAREN[d]")]
+    public OldLangTree Tuple(OldExpr v1,OldExpr v2) => new OldTuple(v1,v2);
+    
+
+    [Production("primary: L_BRACES[d] tuple+ R_BRACES[d]")]
+    public OldLangTree Dic(List<OldLangTree> a)
+    {
+        var b = a.OfType<OldTuple>().ToList();
+        return new OldDictionary(b);
+    }
+    
+    [Production("tuple: OldParser_expressions COLON[d] OldParser_expressions")]
+    public OldLangTree DicTuple(OldExpr v1,OldExpr v2) => new OldTuple(v1,v2);
 
     #endregion
 
     #region statement
 
-    [Production("setid: IDENTFIER")]
-    public OldLangTree SetId_ID(Token<OldTokenGeneric> a) => new OldID(a.Value);
-    
-    [Production("setid: IDENTFIER CONCAT[d] IDENTFIER")]
-    
+    [Production("statement: IDENTFIER L_BRACKET[d] OldParser_expressions R_BRACKET[d] SET[d] OldParser_expressions")]
+    public OldLangTree ArraySetTree(Token<OldTokenGeneric> classid,OldExpr aid,OldExpr expr) =>
+        new OtherVariateChanging(new OldID(classid.Value),aid,expr);
     [Production("statement: IDENTFIER CONCAT[d] IDENTFIER SET[d] OldParser_expressions")]
     public OldLangTree ClassSetTree(Token<OldTokenGeneric> classid,Token<OldTokenGeneric> aid,OldExpr expr) =>
         new OtherVariateChanging(new OldID(classid.Value),new OldID(aid.Value),expr);
@@ -218,6 +235,9 @@ public class OldParser
     public OldLangTree NativeTree(Token<OldTokenGeneric> DllName,   Token<OldTokenGeneric>  ClassName,
                               Token<OldTokenGeneric> MethodName,Token<OldTokenGeneric>? token) =>
         new NativeStatement(DllName.Value,ClassName.Value,MethodName.Value,token.Value);
+
+    [Production("statement: 'print'[d] LPAREN[d] OldParser_expressions RPAREN[d]")]
+    public OldLangTree Print(OldExpr a) => new PrintStatement(a);
 
     #endregion
 

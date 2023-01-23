@@ -9,12 +9,7 @@ namespace Old8Lang.AST.Expression;
 public class OldValue : OldExpr
 {
     public object Value { get; set; }
-
-    public override bool Equals(object? value)
-    {
-        var a = value as OldValue;
-        return Value.ToString() == a.Value.ToString();
-    }
+    
 
     #region intOper
 
@@ -77,7 +72,9 @@ public class OldValue : OldExpr
                    OldList       => "List",
                    OldString     => "String",
                    OldType       => "Type",
-                   _             => "value"
+                   OldTuple      => "Tuple",
+                   _             => "Value"
                };
     }
+    public override bool Equals(object? obj) => Equal(obj as OldValue);
 }

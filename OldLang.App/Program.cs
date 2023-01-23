@@ -27,10 +27,10 @@ void Lang(string path)
     }
 }
 
-void Run(bool isdir,string path)
+void Run(bool isdic,string path)
 {
     string code = "";
-    if (isdir)
+    if (isdic)
         code = APIs.FromDirectory(path);
     else
         code = APIs.FromFile(path);
@@ -40,7 +40,7 @@ void Run(bool isdir,string path)
     codeinfo.Error.ForEach(x => Console.WriteLine(x));
 
     // variable and value
-    Console.Write("\nvariable and value: \n|");
+    Console.Write("\nvariable and value: \n");
     Console.WriteLine(codeinfo.Manager);
 
     Console.WriteLine("\n"+codeinfo.Time);

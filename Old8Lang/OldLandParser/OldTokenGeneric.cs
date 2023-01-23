@@ -64,6 +64,7 @@ public enum OldTokenGeneric
         [Sugar("{")]  L_BRACES  = 304,
         [Sugar("}")]  R_BRACES  = 305,
         [Sugar("=>")] LAMBDA    = 306,
+        [Sugar(":")]  COLON     = 307,
 
         EOF = 0
 

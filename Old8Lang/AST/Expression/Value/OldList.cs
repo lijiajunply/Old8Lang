@@ -4,7 +4,7 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class OldList : OldValue
 {
-    public new List<OldExpr>  Value  { get; set; }
+    public new List<OldExpr> Value  { get; set; }
 
     public List<OldValue> Values { get; set; } = new List<OldValue>();
 
@@ -21,14 +21,14 @@ public class OldList : OldValue
 
     public OldValue Add(OldValue value)
     {
-        Value.Add(value);
+        Values.Add(value);
         return value;
     }
 
     public OldValue Remove(OldInt num)
     {
         var a = Values[num.Value];
-        Value.RemoveAt(num.Value);
+        Values.RemoveAt(num.Value);
         return a;
     }
 
@@ -37,12 +37,17 @@ public class OldList : OldValue
 
     public override OldValue Dot(OldExpr dotExpr)
     {
-        if (dotExpr is OldInstance)
+        if (dotExpr is OldInstance a)
         {
-            var a = dotExpr as OldInstance;
             if (a.Id.IdName == "Add")
             {
-                
+               var result = a.Ids[0] as OldValue;
+               return Add(result);
+            }
+            if (a.Id.IdName == "Remove")
+            {
+                var result = a.Ids[0] as OldInt;
+                return Remove(result);
             }
         }
         return null;

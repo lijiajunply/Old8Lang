@@ -18,4 +18,12 @@ public class OldArray : OldValue
             Values[i] = Va[i].Run(ref Manager);
         return this;
     }
+    public OldValue Post(OldInt i,OldValue value)
+    {
+        var a = Values[i.Value];
+        Values[i.Value] = value;
+        return a;
+    }
+    public OldValue Get(OldInt a) => Values[a.Value];
+    public override string ToString() => Values[0] == null?OldLangTree.ListToString(Va):OldLangTree.ArrayToString(Values);
 }

@@ -17,22 +17,15 @@ public class OldItem : OldValue
     {
         var a = Manager.GetValue(ListID);
         var result = new OldExpr();
-        if (Key is OldValue)
-            result = Key;
-        else
-            result = Key.Run(ref Manager);
-        if (a is OldList && result is OldInt)
-        {
-            var intResult = result as OldInt;
-            var alist = a as OldList;
-            return alist.Values[intResult.Value];
-        }
-
-        if (a is OldDictionary && result is not null)
+        result = Key.Run(ref Manager);
+        if (a is OldList list && result is OldInt intResult)
+            return list.Values[intResult.Value];
+        if (a is OldArray array && result is OldInt i)
+            return array.Get(i);
+        if (a is OldDictionary dir)
         {
             var keyResult = result as OldValue;
-            var aDir = a as OldDictionary;
-            return aDir.GetValue(keyResult);
+            return dir.Get(keyResult);
         }
         return null;
     }

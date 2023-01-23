@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.OldLandParser;
 
@@ -27,18 +28,25 @@ public class Operation : OldExpr
         var r = Right;
         
         // id.id => dot_value
-        if (l is not OldAny && r is not null && Oper == OldTokenGeneric.CONCAT)
-            return l.Dot(r);
-        if (l is OldAny && r is not null && Oper == OldTokenGeneric.CONCAT)
+        if (l is OldAny any  && Oper == OldTokenGeneric.CONCAT)
         {
-            var l1 = l as OldAny;
-            if (r is OldInstance)
-            {
-                var r1 = r as OldInstance;
-                return l1.Dot(r,r1.Ids);
-            }
-            return l1.Dot(r,new List<OldExpr>());
+            if (r is OldInstance r1)
+                return any.Dot(r1,r1.Ids);
+            return any.Dot(r,new List<OldExpr>());
         }
+        if (l is OldList && Oper == OldTokenGeneric.CONCAT)
+        {
+            if (r is OldInstance r1)
+            {
+                List<OldExpr> values = new List<OldExpr>();
+                foreach (var id in r1.Ids)
+                    values.Add(id.Run(ref Manager));
+                r1.Ids = values;
+            }
+            return l.Dot(r);
+        }
+        if (l is not OldAny && Oper == OldTokenGeneric.CONCAT)
+            return l.Dot(r);
         
         // r get value
         r = Right.Run(ref Manager);
@@ -50,23 +58,22 @@ public class Operation : OldExpr
 
         
         // left and right
-        if (l is OldBool && r is OldBool && Oper == OldTokenGeneric.AND)
-            return new OldBool((l as OldBool).Value && (r as OldBool).Value);
+        if (l is OldBool b && r is OldBool expr && Oper == OldTokenGeneric.AND)
+            return new OldBool(b.Value && expr.Value);
         
         // left or right
-        if (l is OldBool && r is OldBool && Oper == OldTokenGeneric.OR)
-            return new OldBool((l as OldBool).Value || (r as OldBool).Value);
+        if (l is OldBool b1 && r is OldBool oldBool && Oper == OldTokenGeneric.OR)
+            return new OldBool(b1.Value || oldBool.Value);
         
         // left xor right
-        if (l is OldBool && r is OldBool && Oper == OldTokenGeneric.XOR)
-            return new OldBool(!l.Equal(r as OldValue));
+        if (l is OldBool && r is OldBool value && Oper == OldTokenGeneric.XOR)
+            return new OldBool(!l.Equal(value));
         
         // - right
-        if (l is null && r is OldInt && Oper == OldTokenGeneric.MINUS)
+        if (l is null && r is OldInt i && Oper == OldTokenGeneric.MINUS)
         {
-            var r1 = r as OldInt;
-            r1.Value = -(int)r1.Value;
-            return r1;
+            i.Value = -i.Value;
+            return i;
         }
         if (r is OldDouble && l is null && Oper == OldTokenGeneric.MINUS)
         {

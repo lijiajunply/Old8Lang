@@ -6,24 +6,39 @@ namespace Old8Lang.AST.Statement;
 
 public class OtherVariateChanging : OldStatement
 {
-    private OldID   ClassID   { get; set; }
-    private OldID   VariateID { get; set; }
-    private OldExpr Expr      { get; set; }
+    private OldID ID { get; set; }
 
-    public OtherVariateChanging(OldID classId,OldID variateId,OldExpr expr)
+    private OldExpr Sum { get; set; }
+
+    private OldExpr Expr { get; set; }
+
+    public OtherVariateChanging(OldID id,OldExpr sumId,OldExpr expr)
     {
-        ClassID   = classId;
-        VariateID = variateId;
-        Expr      = expr;
+        ID    = id;
+        Sum = sumId;
+        Expr  = expr;
     }
     public override void Run(ref VariateManager Manager)
     {
-        var a = Manager.GetValue(ClassID);
+        var a = Manager.GetValue(ID);
         if (a is OldAny any)
         {
+            var SumID = Sum as OldID;
             var result = Expr.Run(ref Manager);
-            any.Set(VariateID,result);
+            any.Set(SumID,result);
+        }
+        if (a is OldArray array)
+        {
+            var s      = Sum.Run(ref Manager) as OldInt;
+            var result = Expr.Run(ref Manager);
+            array.Post(s,result);
+        }
+        if (a is OldDictionary dictionary)
+        {
+            var s      = Sum.Run(ref Manager);
+            var result = Expr.Run(ref Manager);
+            dictionary.Post(s,result);
         }
     }
-    public override string ToString() => $"{ClassID}.{VariateID} = {Expr}";
+    public override string ToString() => $"{ID}.{Sum} = {Expr}";
 }

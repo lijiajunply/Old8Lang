@@ -29,16 +29,20 @@ public class OldAny : OldValue
 
     public OldValue Dot(OldExpr dotExpr,List<OldExpr> c)
     {
-        if (dotExpr is OldID id)
+        switch (dotExpr)
         {
-            var a = new OldExpr();
-            foreach (var variable in Variates.Where(variable => id.IdName == variable.Key.IdName))
-                a = variable.Value;
-            return a.Run(ref manager);
+            case OldID id:
+            {
+                var a = new OldExpr();
+                foreach (var variable in Variates.Where(variable => id.IdName == variable.Key.IdName))
+                    a = variable.Value;
+                return a.Run(ref manager);
+            }
+            case OldFunc func:
+                return func.Run(ref manager,c);
+            default:
+                return dotExpr.Run(ref manager);
         }
-        if (dotExpr is OldFunc func)
-            return func.Run(ref manager,c);
-        return dotExpr.Run(ref manager);
     }
     public void Set(OldID id,OldValue value) => manager.Set(id,value);
 
