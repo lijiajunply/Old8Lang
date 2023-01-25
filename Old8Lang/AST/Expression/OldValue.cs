@@ -9,7 +9,7 @@ namespace Old8Lang.AST.Expression;
 public class OldValue : OldExpr
 {
     public object Value { get; set; }
-    
+
 
     #region intOper
 
@@ -19,7 +19,7 @@ public class OldValue : OldExpr
     public virtual OldValue Divide(OldValue otherValue) => new OldValue();
 
     #endregion
-    
+
 
     public virtual OldValue Dot(OldExpr dotExpr)
     {
@@ -32,7 +32,7 @@ public class OldValue : OldExpr
                 return new OldString(ToString());
             if (a.IdName == "tochar")
                 return new OldChar(ToString()[0]);
-            if (a.IdName == "XAUAT_Str")
+            if (a.IdName == "XAUAT")
                 return new OldString("西建大还我血汗钱我要回家");
         }
         return null;
@@ -40,13 +40,13 @@ public class OldValue : OldExpr
 
     #region boolOper
 
-    public virtual bool Equal(OldValue?   otherValue) => Value == otherValue.Value;
+    public virtual bool Equal(OldValue    otherValue) => false;
     public virtual bool Less(OldValue?    otherValue) => false;
     public virtual bool Greater(OldValue? otherValue) => false;
 
     #endregion
-    
-    public override OldValue Run(ref VariateManager Manager)    => this;
+
+    public override OldValue Run(ref VariateManager Manager) => this;
 
     public virtual OldValue Clone()
     {
@@ -59,22 +59,36 @@ public class OldValue : OldExpr
     {
         return this switch
                {
-                   OldAny a      => a.Id.IdName,
-                   OldArray      => "array",
-                   OldBool       => "bool",
-                   OldChar       => "char",
-                   OldDictionary => "Dictionary",
-                   OldDouble     => "Double",
-                   OldFunc       => "Function",
-                   OldInstance   => "Instance",
-                   OldInt        => "Int",
-                   OldItem       => "Item",
-                   OldList       => "List",
-                   OldString     => "String",
-                   OldType       => "Type",
-                   OldTuple      => "Tuple",
-                   _             => "Value"
+                   OldAny a             => a.Id.IdName,
+                   OldArray             => "array",
+                   OldBool              => "bool",
+                   OldChar              => "char",
+                   OldDictionary        => "Dictionary",
+                   OldDouble            => "Double",
+                   OldFunc func         => $"Function {func.Id} ({APIs.ListToString(func.Ids)})",
+                   OldInstance instance => $"Instance {instance}",
+                   OldInt               => "Int",
+                   OldItem item         => $"Item {item}",
+                   OldList              => "List",
+                   OldString            => "String",
+                   OldType              => "Type",
+                   OldTuple             => "Tuple",
+                   _                    => "Value"
                };
     }
-    public override bool Equals(object? obj) => Equal(obj as OldValue);
+    public override bool   Equals(object? obj) => Equal(obj as OldValue);
+    public virtual  object GetValue()          => Value;
+    public static OldValue ObjToValue(object value)
+    {
+        return value switch
+               {
+                   int a    => new OldInt(a),
+                   string a => new OldString(a),
+                   double a => new OldDouble(a),
+                   char a   => new OldChar(a),
+                   List<object> a => new OldList(a),
+                   object[] a => new OldArray(a.ToList()),
+                   _        => new OldValue()
+               };
+    }
 }

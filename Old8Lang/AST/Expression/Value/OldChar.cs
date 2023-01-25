@@ -12,5 +12,12 @@ public class OldChar : OldValue
     }
 
     public override string ToString() => Value.ToString();
-    public override bool   Equal(OldValue? otherValue) => Value.ToString() == otherValue.ToString();
+    
+    public override bool Equal(OldValue otherValue)
+    {
+        if (otherValue is OldChar b)
+            return Value == b.Value;
+        return false;
+    }
+    public override object GetValue() => Value;
 }

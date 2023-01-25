@@ -4,14 +4,13 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class OldList : OldValue
 {
-    public new List<OldExpr> Value  { get; set; }
+    private new List<OldExpr> Value  { get; set; }
 
-    public List<OldValue> Values { get; set; } = new List<OldValue>();
+    private List<OldValue> Values { get; set; } = new List<OldValue>();
 
-    public OldList(List<OldExpr> value)
-    {
-        Value = value;
-    }
+    public OldList(List<OldExpr> value) => Value = value;
+    public OldList(List<object>  value) => Values = value.Select(x => OldValue.ObjToValue(x)).ToList();
+    
     public override OldValue Run(ref VariateManager Manager)
     {
         foreach (var VARIABLE in Value)
@@ -19,13 +18,20 @@ public class OldList : OldValue
         return this;
     }
 
-    public OldValue Add(OldValue value)
+    public OldValue Get(OldInt i)
+    {
+        if (i.Value < 0)
+            i.Value = Values.Count+i.Value;
+        return Values[i.Value];
+    }
+
+    private OldValue Add(OldValue value)
     {
         Values.Add(value);
         return value;
     }
 
-    public OldValue Remove(OldInt num)
+    private OldValue Remove(OldInt num)
     {
         var a = Values[num.Value];
         Values.RemoveAt(num.Value);
@@ -33,7 +39,7 @@ public class OldList : OldValue
     }
 
     public override string ToString() =>
-        !Values.Any() ? "{"+OldLangTree.ListToString(Value)+"}" : "{"+OldLangTree.ListToString(Values)+"}";
+        !Values.Any() ? "{"+APIs.ListToString(Value)+"}" : "{"+APIs.ListToString(Values)+"}";
 
     public override OldValue Dot(OldExpr dotExpr)
     {
@@ -53,5 +59,5 @@ public class OldList : OldValue
         return null;
     }
 
-    public override bool Equal(OldValue? otherValue) => false;
+    public override object GetValue() => APIs.ListToObjects(Values);
 }

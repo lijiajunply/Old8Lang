@@ -23,6 +23,8 @@ public class Operation : OldExpr
         // not right
         if (Left == null && Oper == OldTokenGeneric.NOT)
             return new OldBool(!(Right.Run(ref Manager) as OldBool)!.Value);
+        if (Left == null && Oper == OldTokenGeneric.MINUS)
+            return new OldInt(-(Right.Run(ref Manager) as OldInt).Value);
         
         var l = Left.Run(ref Manager);
         var r = Right;
@@ -69,18 +71,6 @@ public class Operation : OldExpr
         if (l is OldBool && r is OldBool value && Oper == OldTokenGeneric.XOR)
             return new OldBool(!l.Equal(value));
         
-        // - right
-        if (l is null && r is OldInt i && Oper == OldTokenGeneric.MINUS)
-        {
-            i.Value = -i.Value;
-            return i;
-        }
-        if (r is OldDouble && l is null && Oper == OldTokenGeneric.MINUS)
-        {
-            var r1 = r as OldDouble;
-            r1.Value = -(int)r1.Value;
-            return r1;
-        }
         
         // == , < , > 
         if (l is not null && r is not null && Oper == OldTokenGeneric.EQUALS)

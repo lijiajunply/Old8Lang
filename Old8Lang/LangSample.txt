@@ -2,29 +2,29 @@
 a -> b //将a赋值给b
 //在Old8Lang，变量更像是C中的指针，为了好看，这里使用 -> 或 <-
 
+// if,for,while
 if a == 1
-    b <- 2 
-
+   b <- 2 
 for c <- 1,c<=2,c++
-    PrintLine(b)
+   PrintLine(b)
+while(a<=2)
+   PrintLine(b)
+//
 
-while(a<=2){
-    PrintLine(b)
-}
-
+//类
 class Old8LangClass
-    _a <- 1
-    _b <- 2
-    init(old a , old b) ->
-        a -> _a 
-        b -> _b 
-    ADD() ->
-        return _a + _b
-    ADD_1() => _a + _b
+   _a <- 1
+   _b <- 2
+   init(old a , old b) ->
+      a -> _a 
+      b -> _b 
+   ADD() ->
+      return _a + _b
+   ADD_1() => _a + _b
 }  
 
 //类的实例：
-a <- Old8LangClass(1,2)                       
+a <- Old8LangClass(1,2) // 运行init函数                
 _ <- a.ADD() == a.ADD_1() // ture
 a.ADD() // 3 
 
@@ -40,23 +40,15 @@ PrintLine(a[-1]) //为最后一个
 b <- a[0:1] //取 a[n](0<=n<1)
 
 //type:
-typeof(a) // a : func
+typeof(a) // a : Func
 a <- 5
 typeof(a) // a : int
 
-//泛型:
-class TOld8Lang<T>
-    T[] array;
-    init(int size) ->
-        array <- new T[size + 1];
-    getItem(int index) => array[index]
-    setItem(int index, T value) -> 
-        array[index] = value
-a <- TOld8Lang<int>(6)
-a.setItem(0,2)
-a.getItem(0) // 2
+//使用原生函数：
+[import "Old8LangLib" File FileRead]
 
-//基础类：
-XAUAT(object) Int(int) String Char ......
-
-//
+[import:"Old8LangLib" File FileRead]
+FileRead(file) ->
+   base <- base + "\n" // base 就是原函数结果
+   return base
+a <- FileRead

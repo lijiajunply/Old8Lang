@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Old8LangLib;
 
-public class File
+public static class File
 {
     public static string FileRead(string path) => System.IO.File.ReadAllText(path);
     public static List<string> FileReadLines(string path) => System.IO.File.ReadLines(path).ToList();

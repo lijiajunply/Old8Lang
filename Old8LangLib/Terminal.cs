@@ -1,6 +1,6 @@
 namespace Old8LangLib;
 
-public class Terminal
+public static class Terminal
 {
     public static void Title(string title) => Console.Title = title;
     public static void Print(string context) => Console.Write(context);

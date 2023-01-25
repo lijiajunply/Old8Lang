@@ -33,6 +33,7 @@ public enum OldTokenGeneric
         [Int]                        INT       = 102,
         [Double]                     DOUBLE    = 103,
         [Lexeme(GenericToken.Char)]  CHAR      = 104,
+        //[AlphaNumDashId]             PRIVATE   = 105,
         #endregion
 
         #region operators 200 -> 299

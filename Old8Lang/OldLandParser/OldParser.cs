@@ -45,19 +45,19 @@ public class OldParser
     public OldLangTree NumBerOper2(OldLangTree left,Token<OldTokenGeneric> oper,OldLangTree right) =>
         new Operation(left as OldExpr,oper.TokenID,right as OldExpr);
 
-    [Operation((int)OldTokenGeneric.AND,Affix.InFix,Associativity.Right,10)]
-    [Operation((int)OldTokenGeneric.OR, Affix.InFix,Associativity.Right,10)]
-    [Operation((int)OldTokenGeneric.XOR,Affix.InFix,Associativity.Right,10)]
+    [Operation((int)OldTokenGeneric.AND,Affix.InFix,Associativity.Right,1)]
+    [Operation((int)OldTokenGeneric.OR, Affix.InFix,Associativity.Right,1)]
+    [Operation((int)OldTokenGeneric.XOR,Affix.InFix,Associativity.Right,1)]
     public OldLangTree BoolOper(OldExpr left,Token<OldTokenGeneric> oper,OldExpr right) =>
         new Operation(left,oper.TokenID,right);
 
     [Operation((int)OldTokenGeneric.NOT,Affix.PreFix,Associativity.Right,100)]
     public OldLangTree NotBool(Token<OldTokenGeneric> oper,OldExpr expr) =>
-        new Operation(null,oper.TokenID,expr);
+        new Operation(null!,oper.TokenID,expr);
 
     [Operation((int)OldTokenGeneric.MINUS,Affix.PreFix,Associativity.Right,100)]
     public OldLangTree MINUS(Token<OldTokenGeneric> oper,OldExpr expr) =>
-        new Operation(null,oper.TokenID,expr);
+        new Operation(null!,oper.TokenID,expr);
 
     #endregion
 
@@ -149,6 +149,13 @@ public class OldParser
 
     #region statement
 
+    /// <summary>
+    /// va[expr] = expr
+    /// </summary>
+    /// <param name="classid"></param>
+    /// <param name="aid"></param>
+    /// <param name="expr"></param>
+    /// <returns></returns>
     [Production("statement: IDENTFIER L_BRACKET[d] OldParser_expressions R_BRACKET[d] SET[d] OldParser_expressions")]
     public OldLangTree ArraySetTree(Token<OldTokenGeneric> classid,OldExpr aid,OldExpr expr) =>
         new OtherVariateChanging(new OldID(classid.Value),aid,expr);
@@ -156,6 +163,11 @@ public class OldParser
     public OldLangTree ClassSetTree(Token<OldTokenGeneric> classid,Token<OldTokenGeneric> aid,OldExpr expr) =>
         new OtherVariateChanging(new OldID(classid.Value),new OldID(aid.Value),expr);
 
+    /// <summary>
+    /// return expr
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <returns></returns>
     [Production("statement: RETURN[d] OldParser_expressions")]
     public OldLangTree ReturnTree(OldExpr expr) => new ReturnStatement(expr);
 
@@ -228,19 +240,34 @@ public class OldParser
         return new OldClassInit(new OldAny(new OldID(id.Value),c));
     }
 
+    [Production("statement: IDENTFIER LPAREN[d] OldParser_expressions* RPAREN[d]")]
+    public OldLangTree FuncRun(Token<OldTokenGeneric> id,List<OldLangTree> langTrees) =>
+        new FuncRunStatement(new OldInstance(new OldID(id.Value),langTrees.OfType<OldExpr>().ToList()));
+    
     [Production("statement: IMPORT[d] IDENTFIER")]
     public OldLangTree ImportTree(Token<OldTokenGeneric> import) => new ImportStatement(import.Value);
 
+    
     [Production("statement: L_BRACKET[d] IMPORT[d] STRING IDENTFIER IDENTFIER IDENTFIER? R_BRACKET[d]")]
-    public OldLangTree NativeTree(Token<OldTokenGeneric> DllName,   Token<OldTokenGeneric>  ClassName,
-                              Token<OldTokenGeneric> MethodName,Token<OldTokenGeneric>? token) =>
-        new NativeStatement(DllName.Value,ClassName.Value,MethodName.Value,token.Value);
+    public OldLangTree NativeTree(Token<OldTokenGeneric> dllName,   Token<OldTokenGeneric>  className,
+                              Token<OldTokenGeneric> methodName,Token<OldTokenGeneric>? token) =>
+        new NativeStatement(dllName.Value,className.Value,methodName.Value,token!.Value);
 
-    [Production("statement: 'print'[d] LPAREN[d] OldParser_expressions RPAREN[d]")]
-    public OldLangTree Print(OldExpr a) => new PrintStatement(a);
-
+    [Production("statement:L_BRACKET[d] IMPORT[d] STRING IDENTFIER IDENTFIER IDENTFIER? R_BRACKET[d] '\n'[d] func")]
+    public OldLangTree Native(Token<OldTokenGeneric> dllName,   Token<OldTokenGeneric>  className,
+                                  Token<OldTokenGeneric> methodName,Token<OldTokenGeneric>? token,FuncInit a) =>
+        new NativeStatement(dllName.Value,className.Value,methodName.Value,token!.Value,a);
+    
     #endregion
 
+    #region sugar
+
+    [Production("statement:IDENTFIER PLUS[d] PLUS[d]")]
+    public OldLangTree PlusPlus(Token<OldTokenGeneric> id) =>
+        new SetStatement(new OldID(id.Value),new Operation(new OldID(id.Value),OldTokenGeneric.PLUS,new OldInt(1)));
+
+    #endregion
+    
     #region Func
 
     private (OldID id,OldExpr Expr) GetTuple(OldLangTree a)
@@ -253,9 +280,9 @@ public class OldParser
         if (a is FuncInit)
         {
             var b = a as FuncInit;
-            return (b.Func.ID,b.Func);
+            return (b.Func.Id,b.Func);
         }
-        return (null,null);
+        return (null!,null!);
     }
 
     #endregion

@@ -109,7 +109,7 @@ public class VariateManager
                                                            switch (x)
                                                            {
                                                                case OldFunc func:
-                                                                   return func.ID.IdName == id.IdName;
+                                                                   return func.Id.IdName == id.IdName;
                                                                case OldAny any:
                                                                    return any.Id.IdName == id.IdName;
                                                                default:

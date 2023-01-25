@@ -33,5 +33,5 @@ public class OldInstance : OldValue
       }
       return result;
    }
-   public override string ToString() => Id + "("+OldLangTree.ListToString(Ids)+")";
+   public override string ToString() => Id+ "("+APIs.ListToString(Ids)+")";
 }

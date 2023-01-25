@@ -4,10 +4,8 @@ using System.Text;
 
 namespace Old8LangLib;
 
-public class OS
+public static class OS
 {
-    public override string ToString() => "Old8LangLib.OS";
-
     public static string OsInfo()
     {
         StringBuilder sb = new StringBuilder();

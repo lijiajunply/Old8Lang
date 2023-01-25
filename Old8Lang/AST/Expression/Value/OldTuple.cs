@@ -21,4 +21,5 @@ public class OldTuple : OldValue
         return this;
     }
     public override string ToString() => Value is (null,null)?$"({V1},{V2})":$"({Value.Item1},{Value.Item2})";
+    public override object GetValue() => (Value.Item1.GetValue(),Value.Item2.GetValue());
 }

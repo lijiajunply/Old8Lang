@@ -33,7 +33,7 @@ public class OldDictionary : OldValue
 
     public OldValue Get(OldValue key)
     {
-        var a = Value.Where(x => key.Equal(x.Key)).ToList();
+        var a = Value.Where(x => x.Key.Equal(key)).ToList();
         return a[0].Value;
     }
     public OldValue Post(OldValue key,OldValue value)
@@ -54,6 +54,6 @@ public class OldDictionary : OldValue
 
             return "{"+sb+"}";
         }
-        return "{"+OldLangTree.ListToString(Tuples)+"}";
+        return "{"+APIs.ListToString(Tuples)+"}";
     }
 }

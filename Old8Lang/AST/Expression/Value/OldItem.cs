@@ -4,8 +4,9 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class OldItem : OldValue
 {
-    public OldID ListID { get; set; }
-    public OldExpr Key { get; set; }
+    private OldID   ListID { get; set; }
+
+    private OldExpr Key { get; set; }
 
     public OldItem(OldID listId , OldExpr key)
     {
@@ -19,7 +20,7 @@ public class OldItem : OldValue
         var result = new OldExpr();
         result = Key.Run(ref Manager);
         if (a is OldList list && result is OldInt intResult)
-            return list.Values[intResult.Value];
+            return list.Get(intResult);
         if (a is OldArray array && result is OldInt i)
             return array.Get(i);
         if (a is OldDictionary dir)

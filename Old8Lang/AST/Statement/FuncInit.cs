@@ -14,7 +14,7 @@ public class FuncInit : OldStatement
 
     public override void Run(ref VariateManager Manager)
     {
-        Manager.AddClassAndFunc(Func.ID, Func);
+        Manager.AddClassAndFunc(Func.Id, Func);
     }
 
     public override string ToString() => Func.ToString();

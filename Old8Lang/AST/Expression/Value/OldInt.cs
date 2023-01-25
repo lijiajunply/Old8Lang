@@ -1,3 +1,5 @@
+using Old8Lang.OldLandParser;
+
 namespace Old8Lang.AST.Expression.Value;
 
 public class OldInt : OldValue
@@ -52,5 +54,11 @@ public class OldInt : OldValue
 
     public override bool Less(OldValue?    otherValue) => Value < Int32.Parse((string)otherValue.ToString());
     public override bool Greater(OldValue? otherValue) => Value > Int32.Parse((string)otherValue.ToString());
-    public override bool Equal(OldValue?   otherValue) => Value == Int32.Parse((string)otherValue.ToString());
+    public override bool Equal(OldValue otherValue)
+    {
+        if (otherValue is OldInt b)
+            return Value == b.Value;
+        return false;
+    }
+    public override object GetValue() => Value;
 }
