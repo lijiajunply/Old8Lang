@@ -5,34 +5,18 @@ public class DoubleValue : ValueType
     public new double Value { get; set; }
     public DoubleValue(double doubleValue) => Value = doubleValue;
 
-    public override ValueType Plus(ValueType otherValueType)
-    {
-        if (otherValueType is IntValue || otherValueType is DoubleValue)
-            return new DoubleValue(Value + (double)otherValueType.Value);
-        return new ValueType();
-    }
+    public override ValueType Plus(ValueType otherValueType) => 
+        otherValueType is IntValue or DoubleValue ? new DoubleValue(Value+ (double)otherValueType.Value) : new ValueType();
 
-    public override ValueType Minus(ValueType otherValueType)
-    {
-        if (otherValueType is IntValue || otherValueType is DoubleValue)
-            return new DoubleValue(Value - (double)otherValueType.Value);
-        return new ValueType();
-    }
+    public override ValueType Minus(ValueType otherValueType) =>
+        otherValueType is IntValue or DoubleValue ? new DoubleValue(Value- (double)otherValueType.Value) : new ValueType();
 
-    public override ValueType Times(ValueType otherValueType)
-    {
-        if (otherValueType is IntValue || otherValueType is DoubleValue)
-            return new DoubleValue(Value * (double)otherValueType.Value);
-        return new ValueType();
-    }
+    public override ValueType Times(ValueType otherValueType) => 
+        otherValueType is IntValue or DoubleValue ? new DoubleValue(Value * (double)otherValueType.Value) : new ValueType();
 
-    public override ValueType Divide(ValueType otherValueType)
-    {
-        if (otherValueType is IntValue || otherValueType is DoubleValue)
-            return new DoubleValue(Value / (double)otherValueType.Value);
-        return new ValueType();
-    }
-    
+    public override ValueType Divide(ValueType otherValueType) =>
+        otherValueType is IntValue or DoubleValue ? new DoubleValue(Value / (double)otherValueType.Value) : new ValueType();
+
 
     public override bool Less(ValueType? otherValue) => Value < (double)otherValue.Value;
     public override bool Greater(ValueType? otherValue) => Value > (double)otherValue.Value;

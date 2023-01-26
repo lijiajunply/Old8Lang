@@ -166,7 +166,7 @@ public class VariateManager
             builder.Append((string?)(variable.Value+"|"));
         builder.Append(Values.Any()? "\n":"");
         foreach (var variable in AnyInfo)
-            builder.Append(variable.Value+"|");
+            builder.Append(variable+"|");
         return builder.ToString();
     }
 }

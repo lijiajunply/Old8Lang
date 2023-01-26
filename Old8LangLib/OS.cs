@@ -28,7 +28,7 @@ public  class OS
         {
             a.StartInfo.FileName = "/bin/bash";
         }
-        
+
         a.StartInfo.UseShellExecute = false;//是否使用操作系统shell启动
         a.StartInfo.RedirectStandardInput = true;//接受来自调用程序的输入信息
         a.StartInfo.RedirectStandardOutput = true;//由调用程序获取输出信息

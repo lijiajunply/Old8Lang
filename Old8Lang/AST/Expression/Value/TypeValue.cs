@@ -4,14 +4,14 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class TypeValue : ValueType
 {
-    private OldID Id { get; set; }
+    private OldExpr Expr { get; set; }
 
-    public TypeValue(OldID id) => Id = id;
+    public TypeValue(OldExpr expr) => Expr = expr;
 
     public override ValueType Run(ref VariateManager Manager)
     {
-        var result = Manager.GetValue(Id);
+        var result = Expr.Run(ref Manager);
         return new StringValue(result.TypeToString());
     }
-    public override string ToString() => $"typeof({Id})";
+    public override string ToString() => $"typeof({Expr})";
 }

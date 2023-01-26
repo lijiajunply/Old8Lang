@@ -28,7 +28,6 @@ public enum OldTokenGeneric
     COMMENT = 18,
 
     [Keyword("NEW")] [Keyword( "new")]  NEW  = 19,
-    [Keyword("TYPE")] [Keyword("type")] TYPE = 20,
 
     #endregion
 

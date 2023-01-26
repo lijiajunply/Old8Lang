@@ -15,21 +15,26 @@ public class Instance : ValueType
 
    public override ValueType Run(ref VariateManager Manager)
    {
-      var result = Id.Run(ref Manager);
-      if (result is FuncValue)
+      switch (Id.IdName)
       {
-         var a = result as FuncValue;
-         if (Manager.IsClass)
-            result = a.Run(ref Manager,Ids);
-         else
-            result = a.Run(ref Manager,Ids);
+         case "Position":
+         {
+            var a = Ids[0].Run(ref Manager).Position;
+            return new StringValue(a.ToString());
+         }
+         case "type":
+            return new TypeValue(Ids[0]).Run(ref Manager);
       }
-      if (result is AnyValue)
+      var result = Id.Run(ref Manager);
+      if (result is FuncValue funcValue)
       {
-         var a = result as AnyValue;
-         if (a.Result.TryGetValue("init",out result))
-            a.Dot(result,Ids);
-         return a;
+         return Manager.IsClass ? funcValue.Run(ref Manager,Ids) : funcValue.Run(ref Manager,Ids);
+      }
+      if (result is AnyValue anyValue)
+      {
+         if (anyValue.Result.TryGetValue("init",out result))
+            anyValue.Dot(result,Ids);
+         return anyValue;
       }
       return result;
    }

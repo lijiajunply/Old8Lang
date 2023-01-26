@@ -30,16 +30,14 @@ public class APIs
         }
         return builder.ToString();
     }
-    public static List<object> ListToObjects(List<ValueType> a) => a.Select(x => x.GetValue()).ToList();
+    public static List<object> ListToObjects(List<ValueType> a) =>
+        a.Count == 0 ? new List<object>() : a.Select(x => x.GetValue()).ToList();
 
     #endregion
 
-    public static string Path { get; set; }
-
     #region ReadFileOrDir
 
-    public static string FromFile(string filename) =>
-        File.Exists(filename) ? File.ReadAllText(filename,Encoding.UTF8) : "a <- 1";
+    public static string FromFile(string filename) => File.ReadAllText(filename,Encoding.UTF8);
 
     public static string FromDirectory(string DirectoryName)
     {
@@ -60,12 +58,10 @@ public class APIs
     }
 
     #endregion
-    
-    
-    
-    public static (VariateManager Manager,List<string> Error,string Time) CslyUsing(string code)
+
+    public static (VariateManager Manager,List<string> Error,string Time) CslyUsing(string code,bool isdir)
     {
-        var a = new OldLangInterpreter(code);
+        var a = new Interpreter(code,isdir);
 
         Stopwatch sw = new Stopwatch();
         sw.Start();

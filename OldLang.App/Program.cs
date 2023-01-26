@@ -1,7 +1,6 @@
-﻿using System.Text;
-using Old8Lang;
+﻿using Old8Lang;
 
-Lang("/home/luckyfish/RiderProjects/Old8Lang/Old8Lang/Exceple/init.ws");
+Lang("/home/luckyfish/RiderProjects/Old8Lang/Old8Lang/Ex/init.ws");
 
 void Lang(string path)
 {
@@ -29,19 +28,10 @@ void Lang(string path)
 
 void Run(bool isdic,string path)
 {
-    string code = "";
-    if (isdic)
-        code = APIs.FromDirectory(path);
-    else
-        code = APIs.FromFile(path);
-    var codeinfo = APIs.CslyUsing(code);
-    
-    // error
-    codeinfo.Error.ForEach(x => Console.WriteLine(x));
-
+    var    cslyUsing = APIs.CslyUsing(path,isdic);
+    cslyUsing.Error.ForEach(x => Console.WriteLine(x));
     // variable and value
-    Console.Write("\nvariable and value: \n");
-    Console.WriteLine(codeinfo.Manager);
-
-    Console.WriteLine("\n"+codeinfo.Time);
+    //Console.Write("\nvariable and value: \n");
+    //Console.WriteLine(cslyUsing.Manager);
+    Console.WriteLine("\n"+cslyUsing.Time);
 }

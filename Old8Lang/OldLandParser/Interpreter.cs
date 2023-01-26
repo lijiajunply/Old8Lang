@@ -1,22 +1,23 @@
 using Old8Lang.AST;
+using sly.lexer;
 using sly.parser.generator;
 using sly.parser.generator.visitor;
 
 namespace Old8Lang.OldLandParser;
 
-public class OldLangInterpreter
+public class Interpreter
 {
     private VariateManager Manager;
 
     private readonly List<string> Error;
 
-    private string Path { get; set; }
+    private string Code { get; set; }
 
-    public OldLangInterpreter(string path)
+    public Interpreter(string path,bool isDir)
     {
-        Path    = path;
         Error   = new List<string>();
         Manager = new VariateManager { Path = path };
+        Code    = isDir ? APIs.FromDirectory(path) : APIs.FromFile(path);
     }
 
     public void Use()
@@ -27,16 +28,16 @@ public class OldLangInterpreter
         var parserBuilder = Parser.BuildParser(oldParser,
                                                ParserType.EBNF_LL_RECURSIVE_DESCENT,"root");
         var buildResult = parserBuilder.Result;
-
-        var result = buildResult.Parse(APIs.FromFile(Path));
-        var RUN    = result.Result;
-        if (result.Errors != null && result.Errors.Any())
+        
+        var result = buildResult.Parse(Code);
+        var run    = result.Result as OldStatement;
+        if (result.Errors != null && result.Errors.Any()) 
             result.Errors.ForEach(x => Error.Add(x.ToString()));
         else
         {
-            var run = RUN as OldStatement;
-            Console.WriteLine(run);
+            //Console.WriteLine(run);
             run.Run(ref Manager);
+            // .dot
             var tree     = result.SyntaxTree;
             var graphviz = new GraphVizEBNFSyntaxTreeVisitor<OldTokenGeneric>();
             var _        = graphviz.VisitTree(tree);
