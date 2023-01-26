@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Old8Lang;
 
-Lang("/home/luckyfish/RiderProjects/Old8Lang/Old8Lang/Exceple/文本文件.txt");
+Lang("/home/luckyfish/RiderProjects/Old8Lang/Old8Lang/Exceple/init.ws");
 
 void Lang(string path)
 {

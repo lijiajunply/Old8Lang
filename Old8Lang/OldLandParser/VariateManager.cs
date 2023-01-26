@@ -9,7 +9,8 @@ namespace Old8Lang.OldLandParser;
 
 public class VariateManager
 {
-    private int Count { get; set; }
+    public  string Path  { get; set; } = String.Empty;
+    private int    Count { get; set; }
 
     private List<int> VariateDirectValue { get; set; } = new List<int>();
 

@@ -1,41 +1,50 @@
 using Old8Lang.AST;
 using sly.parser.generator;
+using sly.parser.generator.visitor;
 
 namespace Old8Lang.OldLandParser;
 
 public class OldLangInterpreter
 {
-    public VariateManager Manager;
-    public List<string>   Error;
-    public string         Code { get; set; }
-    public OldLangInterpreter(string code)
+    private VariateManager Manager;
+
+    private readonly List<string> Error;
+
+    private string Path { get; set; }
+
+    public OldLangInterpreter(string path)
     {
-        Code    = code;
+        Path    = path;
         Error   = new List<string>();
-        Manager = new VariateManager();
+        Manager = new VariateManager { Path = path };
     }
 
     public void Use()
     {
-        
-        ParserBuilder<OldTokenGeneric, OldLangTree> Parser = new ParserBuilder<OldTokenGeneric, OldLangTree>();
-        OldParser oldParser = new OldParser();
+
+        var Parser = new ParserBuilder<OldTokenGeneric,OldLangTree>();
+        var oldParser = new OldParser();
         var parserBuilder = Parser.BuildParser(oldParser,
-            ParserType.EBNF_LL_RECURSIVE_DESCENT, "root");
+                                               ParserType.EBNF_LL_RECURSIVE_DESCENT,"root");
         var buildResult = parserBuilder.Result;
 
-        var r = buildResult.Parse(Code);
-        var RUN = r.Result;
-        if (r.Errors !=null && r.Errors.Any())
-            r.Errors.ForEach(x => Error.Add(x.ToString()));
+        var result = buildResult.Parse(APIs.FromFile(Path));
+        var RUN    = result.Result;
+        if (result.Errors != null && result.Errors.Any())
+            result.Errors.ForEach(x => Error.Add(x.ToString()));
         else
         {
             var run = RUN as OldStatement;
             Console.WriteLine(run);
             run.Run(ref Manager);
+            var tree     = result.SyntaxTree;
+            var graphviz = new GraphVizEBNFSyntaxTreeVisitor<OldTokenGeneric>();
+            var _        = graphviz.VisitTree(tree);
+            var graph    = graphviz.Graph.Compile();
+            File.WriteAllLines("tree.dot",graph.Split("\n"));
         }
     }
 
-    public List<String> GetError() => Error;
+    public List<string>   GetError()          => Error;
     public VariateManager GetVariateManager() => Manager;
 }

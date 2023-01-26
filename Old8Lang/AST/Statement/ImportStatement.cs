@@ -14,10 +14,8 @@ public class ImportStatement : OldStatement
     public override void Run(ref VariateManager Manager)
     {
         //查找
-        var path = APIs.ImportSearch(ImportString);
-        var a    = APIs.CslyUsing(APIs.FromDirectory(path));
-        //
-        Manager = a.Manager;
+        var path = Manager.Path+ImportString;
+        Manager    = APIs.CslyUsing(APIs.FromDirectory(path)).Manager;
         Manager.Init();
     }
 

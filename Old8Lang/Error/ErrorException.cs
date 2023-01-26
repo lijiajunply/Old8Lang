@@ -4,10 +4,10 @@ using Old8Lang.AST.Expression;
 
 namespace Old8Lang.Error;
 
-public class OldError : Exception
+public class ErrorException : Exception
 {
-    public OldError(OldLangTree statement,OldLangTree value) :
+    public ErrorException(OldLangTree statement,OldLangTree value) :
         base($"{statement} is error message is{value} at {statement.Position}:{value.Position}"){}
-    protected OldError(OldLangTree statement,OldLangTree value,string errorMessage) :
+    protected ErrorException(OldLangTree statement,OldLangTree value,string errorMessage) :
         base($"{statement} is error at {value} \nat {statement.Position}:{value.Position} {errorMessage}") {}
 }

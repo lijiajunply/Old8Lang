@@ -36,16 +36,18 @@ public class APIs
 
     public static string Path { get; set; }
 
+    #region ReadFileOrDir
+
     public static string FromFile(string filename) =>
         File.Exists(filename) ? File.ReadAllText(filename,Encoding.UTF8) : "a <- 1";
 
     public static string FromDirectory(string DirectoryName)
     {
-        StringBuilder sb        = new StringBuilder();
-        DirectoryInfo info      = new DirectoryInfo(DirectoryName);
+        var sb        = new StringBuilder();
+        var info      = new DirectoryInfo(DirectoryName);
         var           fileInfos = info.GetFiles();
         var           a         = false;
-        sb.Append(FromFile(DirectoryName+"/"+info.Name));
+        sb.Append(FromFile(DirectoryName+"/"+"init.ws"));
         foreach (var VARIABLE in fileInfos)
             sb.Append(FromFile(VARIABLE.FullName));
 
@@ -56,6 +58,11 @@ public class APIs
 
         return sb.ToString();
     }
+
+    #endregion
+    
+    
+    
     public static (VariateManager Manager,List<string> Error,string Time) CslyUsing(string code)
     {
         var a = new OldLangInterpreter(code);
@@ -69,6 +76,4 @@ public class APIs
         return (a.GetVariateManager(),a.GetError(),
                 $"DateTime costed for Shuffle function is: {ts.TotalMilliseconds}ms");
     }
-
-    public static string ImportSearch(string ImportString) => Path+ImportString;
 }
