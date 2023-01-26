@@ -5,12 +5,12 @@ namespace Old8Lang.AST.Statement;
 
 public class OldClassInit : OldStatement
 {
-    public OldAny Any { get; set; }
-    public OldClassInit(OldAny any)
+    public AnyValue AnyValue { get; set; }
+    public OldClassInit(AnyValue anyValue)
     {
-        Any = any;
+        AnyValue = anyValue;
     }
-    public override void Run(ref VariateManager Manager) => Manager.AddClassAndFunc(Any.Id,Any);
+    public override void Run(ref VariateManager Manager) => Manager.AddClassAndFunc(AnyValue.Id,AnyValue);
 
-    public override string ToString() => Any.ToString();
+    public override string ToString() => AnyValue.ToString();
 }

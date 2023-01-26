@@ -18,27 +18,27 @@ public class Operation : OldExpr
 
     public override string ToString() => $"{Left} {Oper} {Right}";
 
-    public override OldValue Run(ref VariateManager Manager)
+    public override ValueType Run(ref VariateManager Manager)
     {
         // not right
         if (Left == null && Oper == OldTokenGeneric.NOT)
-            return new OldBool(!(Right.Run(ref Manager) as OldBool)!.Value);
+            return new BoolValue(!(Right.Run(ref Manager) as BoolValue)!.Value);
         if (Left == null && Oper == OldTokenGeneric.MINUS)
-            return new OldInt(-(Right.Run(ref Manager) as OldInt).Value);
+            return new IntValue(-(Right.Run(ref Manager) as IntValue).Value);
         
         var l = Left.Run(ref Manager);
         var r = Right;
         
         // id.id => dot_value
-        if (l is OldAny any  && Oper == OldTokenGeneric.CONCAT)
+        if (l is AnyValue any  && Oper == OldTokenGeneric.CONCAT)
         {
-            if (r is OldInstance r1)
+            if (r is Instance r1)
                 return any.Dot(r1,r1.Ids);
             return any.Dot(r,new List<OldExpr>());
         }
-        if (l is OldList && Oper == OldTokenGeneric.CONCAT)
+        if (l is ListValue && Oper == OldTokenGeneric.CONCAT)
         {
-            if (r is OldInstance r1)
+            if (r is Instance r1)
             {
                 List<OldExpr> values = new List<OldExpr>();
                 foreach (var id in r1.Ids)
@@ -47,43 +47,43 @@ public class Operation : OldExpr
             }
             return l.Dot(r);
         }
-        if (l is not OldAny && Oper == OldTokenGeneric.CONCAT)
+        if (l is not AnyValue && Oper == OldTokenGeneric.CONCAT)
             return l.Dot(r);
         
         // r get value
         r = Right.Run(ref Manager);
         // (right)
-        if (Right is OldID && l is not OldAny)
+        if (Right is OldID && l is not AnyValue)
             r = Manager.GetValue(Right as OldID);
         if (Right is Operation)
             r = Right.Run(ref Manager);
 
         
         // left and right
-        if (l is OldBool b && r is OldBool expr && Oper == OldTokenGeneric.AND)
-            return new OldBool(b.Value && expr.Value);
+        if (l is BoolValue b && r is BoolValue expr && Oper == OldTokenGeneric.AND)
+            return new BoolValue(b.Value && expr.Value);
         
         // left or right
-        if (l is OldBool b1 && r is OldBool oldBool && Oper == OldTokenGeneric.OR)
-            return new OldBool(b1.Value || oldBool.Value);
+        if (l is BoolValue b1 && r is BoolValue oldBool && Oper == OldTokenGeneric.OR)
+            return new BoolValue(b1.Value || oldBool.Value);
         
         // left xor right
-        if (l is OldBool && r is OldBool value && Oper == OldTokenGeneric.XOR)
-            return new OldBool(!l.Equal(value));
+        if (l is BoolValue && r is BoolValue value && Oper == OldTokenGeneric.XOR)
+            return new BoolValue(!l.Equal(value));
         
         
         // == , < , > 
         if (l is not null && r is not null && Oper == OldTokenGeneric.EQUALS)
-            return new OldBool(l.Equal(r as OldValue));
+            return new BoolValue(l.Equal(r as ValueType));
         if (l is not null && r is not null && Oper == OldTokenGeneric.LESSER)
-            return new OldBool(l.Less(r as OldValue));
+            return new BoolValue(l.Less(r as ValueType));
         if (l is not null && r is not null && Oper == OldTokenGeneric.GREATER)
-            return new OldBool(l.Greater(r as OldValue));
+            return new BoolValue(l.Greater(r as ValueType));
         
         // r (+-*/) l
         if (l is not null && r is not null && Oper != null)
         {
-            var r1 = r as OldValue;
+            var r1 = r as ValueType;
             var l1 = l ;
             switch (Oper)
             {

@@ -2,36 +2,36 @@ using Old8Lang.OldLandParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class OldList : OldValue
+public class ListValue : ValueType
 {
     private new List<OldExpr> Value  { get; set; }
 
-    private List<OldValue> Values { get; set; } = new List<OldValue>();
+    private List<ValueType> Values { get; set; } = new List<ValueType>();
 
-    public OldList(List<OldExpr> value) => Value = value;
-    public OldList(List<object>  value) => Values = value.Select(x => OldValue.ObjToValue(x)).ToList();
+    public ListValue(List<OldExpr> value) => Value = value;
+    public ListValue(List<object>  value) => Values = value.Select(x => ValueType.ObjToValue(x)).ToList();
     
-    public override OldValue Run(ref VariateManager Manager)
+    public override ValueType Run(ref VariateManager Manager)
     {
         foreach (var VARIABLE in Value)
             Values.Add(VARIABLE.Run(ref Manager));
         return this;
     }
 
-    public OldValue Get(OldInt i)
+    public ValueType Get(IntValue i)
     {
         if (i.Value < 0)
             i.Value = Values.Count+i.Value;
         return Values[i.Value];
     }
 
-    private OldValue Add(OldValue value)
+    private ValueType Add(ValueType valueType)
     {
-        Values.Add(value);
-        return value;
+        Values.Add(valueType);
+        return valueType;
     }
 
-    private OldValue Remove(OldInt num)
+    private ValueType Remove(IntValue num)
     {
         var a = Values[num.Value];
         Values.RemoveAt(num.Value);
@@ -41,18 +41,18 @@ public class OldList : OldValue
     public override string ToString() =>
         !Values.Any() ? "{"+APIs.ListToString(Value)+"}" : "{"+APIs.ListToString(Values)+"}";
 
-    public override OldValue Dot(OldExpr dotExpr)
+    public override ValueType Dot(OldExpr dotExpr)
     {
-        if (dotExpr is OldInstance a)
+        if (dotExpr is Instance a)
         {
             if (a.Id.IdName == "Add")
             {
-               var result = a.Ids[0] as OldValue;
+               var result = a.Ids[0] as ValueType;
                return Add(result);
             }
             if (a.Id.IdName == "Remove")
             {
-                var result = a.Ids[0] as OldInt;
+                var result = a.Ids[0] as IntValue;
                 return Remove(result);
             }
         }

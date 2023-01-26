@@ -2,16 +2,16 @@ using Old8Lang.OldLandParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class OldType : OldValue
+public class TypeValue : ValueType
 {
     private OldID Id { get; set; }
 
-    public OldType(OldID id) => Id = id;
+    public TypeValue(OldID id) => Id = id;
 
-    public override OldValue Run(ref VariateManager Manager)
+    public override ValueType Run(ref VariateManager Manager)
     {
         var result = Manager.GetValue(Id);
-        return new OldString(result.TypeToString());
+        return new StringValue(result.TypeToString());
     }
     public override string ToString() => $"typeof({Id})";
 }

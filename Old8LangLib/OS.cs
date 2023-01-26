@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Old8LangLib;
 
-public static class OS
+public  class OS
 {
     public static string OsInfo()
     {

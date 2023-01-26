@@ -6,9 +6,9 @@ namespace Old8Lang.AST.Statement;
 
 public class FuncRunStatement : OldStatement
 {
-    private OldInstance Instance { get; set; }
+    private Instance Instance { get; set; }
 
-    public FuncRunStatement(OldInstance instance) => Instance = instance;
+    public FuncRunStatement(Instance instance) => Instance = instance;
 
     public override void Run(ref VariateManager Manager) => Instance.Run(ref Manager);
 

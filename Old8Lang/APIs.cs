@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Text;
 using Old8Lang.AST.Expression;
 using Old8Lang.OldLandParser;
+using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang;
 
@@ -29,44 +30,30 @@ public class APIs
         }
         return builder.ToString();
     }
-    public static List<object> ListToObjects(List<OldValue> a) => a.Select(x => x.Value).ToList();
+    public static List<object> ListToObjects(List<ValueType> a) => a.Select(x => x.GetValue()).ToList();
 
     #endregion
-    
-    
 
     public static string Path { get; set; }
 
-    public static string FromFile(string filename)
-    {
-        if (File.Exists(filename))
-        {
-            string a = File.ReadAllText(filename,Encoding.UTF8);
-            return a;
-        }
-        else
-        {
-            return "a <- 1";
-        }
-    }
+    public static string FromFile(string filename) =>
+        File.Exists(filename) ? File.ReadAllText(filename,Encoding.UTF8) : "a <- 1";
 
     public static string FromDirectory(string DirectoryName)
     {
         StringBuilder sb        = new StringBuilder();
         DirectoryInfo info      = new DirectoryInfo(DirectoryName);
         var           fileInfos = info.GetFiles();
-        bool          a         = false;
+        var           a         = false;
         sb.Append(FromFile(DirectoryName+"/"+info.Name));
         foreach (var VARIABLE in fileInfos)
-        {
             sb.Append(FromFile(VARIABLE.FullName));
-        }
+
 
         var b = info.GetDirectories();
         foreach (var VARIABLE in b)
-        {
             sb.Append(FromDirectory(VARIABLE.FullName));
-        }
+
         return sb.ToString();
     }
     public static (VariateManager Manager,List<string> Error,string Time) CslyUsing(string code)
@@ -75,9 +62,7 @@ public class APIs
 
         Stopwatch sw = new Stopwatch();
         sw.Start();
-
         a.Use();
-
         sw.Stop();
         TimeSpan ts = sw.Elapsed;
 
@@ -85,9 +70,5 @@ public class APIs
                 $"DateTime costed for Shuffle function is: {ts.TotalMilliseconds}ms");
     }
 
-    public static string ImportSearch(string ImportString)
-    {
-        Path = Environment.CurrentDirectory;
-        return Path+ImportString;
-    }
+    public static string ImportSearch(string ImportString) => Path+ImportString;
 }

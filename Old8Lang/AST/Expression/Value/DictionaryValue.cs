@@ -3,19 +3,19 @@ using Old8Lang.OldLandParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class OldDictionary : OldValue
+public class DictionaryValue : ValueType
 {
-    public new List<(OldValue Key,OldValue Value)> Value  { get; set; }
-    public     List<OldTuple>                      Tuples { get; set; }
+    public new List<(ValueType Key,ValueType Value)> Value  { get; set; }
+    public     List<TupleValue>                      Tuples { get; set; }
 
     public OldID Id { get; set; }
 
-    public OldDictionary(List<OldTuple> tuples)
+    public DictionaryValue(List<TupleValue> tuples)
     {
-        Value  = new List<(OldValue Key,OldValue Value)>();
+        Value  = new List<(ValueType Key,ValueType Value)>();
         Tuples = tuples;
     }
-    public override OldValue Run(ref VariateManager Manager)
+    public override ValueType Run(ref VariateManager Manager)
     {
         foreach (var tuple in Tuples)
         {
@@ -25,22 +25,22 @@ public class OldDictionary : OldValue
         return this;
     }
 
-    public (OldValue,OldValue) Add(OldValue value1,OldValue value2)
+    public (ValueType,ValueType) Add(ValueType value1,ValueType value2)
     {
         Value.Add((value1,value2));
         return (value1,value2);
     }
 
-    public OldValue Get(OldValue key)
+    public ValueType Get(ValueType key)
     {
         var a = Value.Where(x => x.Key.Equal(key)).ToList();
         return a[0].Value;
     }
-    public OldValue Post(OldValue key,OldValue value)
+    public ValueType Post(ValueType key,ValueType valueType)
     {
         var a = Get(key);
         var b = Value.FindLastIndex(x => key.Equal(x.Key));
-        Value[b] = (key,value);
+        Value[b] = (key,valueType);
         return a;
     }
 

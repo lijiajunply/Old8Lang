@@ -15,8 +15,7 @@ public class ImportStatement : OldStatement
     {
         //查找
         var path = APIs.ImportSearch(ImportString);
-        //
-        var a = APIs.CslyUsing(APIs.FromDirectory(path));
+        var a    = APIs.CslyUsing(APIs.FromDirectory(path));
         //
         Manager = a.Manager;
         Manager.Init();

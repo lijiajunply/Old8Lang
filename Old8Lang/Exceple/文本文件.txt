@@ -1,4 +1,2 @@
-A <- 1
-b <- A.XAUAT
-c <- {1 123 13}
-d <- c[-2]
+a <- "hello,world!"
+[import "Old8LangLib.dll" OS OsInfo]

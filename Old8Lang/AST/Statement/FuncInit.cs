@@ -5,17 +5,17 @@ namespace Old8Lang.AST.Statement;
 
 public class FuncInit : OldStatement
 {
-    public OldFunc Func { get; set; }
+    public FuncValue FuncValue { get; set; }
 
-    public FuncInit(OldFunc a)
+    public FuncInit(FuncValue a)
     {
-        Func = a;
+        FuncValue = a;
     }
 
     public override void Run(ref VariateManager Manager)
     {
-        Manager.AddClassAndFunc(Func.Id, Func);
+        Manager.AddClassAndFunc(FuncValue.Id, FuncValue);
     }
 
-    public override string ToString() => Func.ToString();
+    public override string ToString() => FuncValue.ToString();
 }

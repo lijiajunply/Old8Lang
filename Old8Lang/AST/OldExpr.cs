@@ -1,5 +1,7 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.OldLandParser;
+using sly.lexer;
+using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.AST;
 /// <summary>
@@ -7,8 +9,6 @@ namespace Old8Lang.AST;
 /// </summary>
 public class OldExpr : OldLangTree
 {
-    public OldTokenGeneric Compare { get; set; }
-
-    public virtual OldValue Run(ref VariateManager Manager) => null;
-
+    public virtual ValueType Run(ref VariateManager Manager) => null;
+    public LexerPosition Position { get; set; }
 }

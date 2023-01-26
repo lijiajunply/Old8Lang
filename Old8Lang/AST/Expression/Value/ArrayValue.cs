@@ -2,32 +2,32 @@ using Old8Lang.OldLandParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class OldArray : OldValue
+public class ArrayValue : ValueType
 {
-    private OldValue[]    Values { get; set; }
+    private ValueType[]    Values { get; set; }
     private List<OldExpr> Va     { get; set; }
 
-    public OldArray(List<OldExpr> valuesList)
+    public ArrayValue(List<OldExpr> valuesList)
     {
-        Values = new OldValue[valuesList.Count];
+        Values = new ValueType[valuesList.Count];
         Va     = valuesList;
     }
-    public OldArray(List<object> a) =>Values = a.Select(x => OldValue.ObjToValue(x)).ToArray();
-    public override OldValue Run(ref VariateManager Manager)
+    public ArrayValue(List<object> a) =>Values = a.Select(x => ValueType.ObjToValue(x)).ToArray();
+    public override ValueType Run(ref VariateManager Manager)
     {
         for (int i = 0; i < Va.Count; i++)
             Values[i] = Va[i].Run(ref Manager);
         return this;
     }
-    public OldValue Post(OldInt i,OldValue value)
+    public ValueType Post(IntValue i,ValueType valueType)
     {
         if (i.Value < 0)
             i.Value = Values.Length+i.Value;
         var a = Values[i.Value];
-        Values[i.Value] = value;
+        Values[i.Value] = valueType;
         return a;
     }
-    public OldValue Get(OldInt a)
+    public ValueType Get(IntValue a)
     {
         if (a.Value < 0)
             a.Value = Values.Length+a.Value;

@@ -31,8 +31,8 @@ public class ForStatement : OldStatement
         while (true)
         {
             var varexpr = Expr.Run(ref Manager);
-            if (varexpr is OldBool)
-                expr = (varexpr as OldBool).Value;
+            if (varexpr is BoolValue)
+                expr = (varexpr as BoolValue).Value;
             else
                 return;
 

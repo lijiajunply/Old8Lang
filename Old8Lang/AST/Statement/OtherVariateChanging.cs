@@ -21,19 +21,19 @@ public class OtherVariateChanging : OldStatement
     public override void Run(ref VariateManager Manager)
     {
         var a = Manager.GetValue(ID);
-        if (a is OldAny any)
+        if (a is AnyValue any)
         {
             var SumID = Sum as OldID;
             var result = Expr.Run(ref Manager);
             any.Set(SumID,result);
         }
-        if (a is OldArray array)
+        if (a is ArrayValue array)
         {
-            var s      = Sum.Run(ref Manager) as OldInt;
+            var s      = Sum.Run(ref Manager) as IntValue;
             var result = Expr.Run(ref Manager);
             array.Post(s,result);
         }
-        if (a is OldDictionary dictionary)
+        if (a is DictionaryValue dictionary)
         {
             var s      = Sum.Run(ref Manager);
             var result = Expr.Run(ref Manager);

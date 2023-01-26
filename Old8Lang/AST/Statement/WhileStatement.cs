@@ -23,9 +23,9 @@ public class WhileStatement : OldStatement
         while (true)
         {
             var varbool = Expr.Run(ref Manager);
-            if (varbool is OldBool)
+            if (varbool is BoolValue)
             {
-                expr = (bool)(Expr.Run(ref Manager) as OldBool).Value;
+                expr = (bool)(Expr.Run(ref Manager) as BoolValue).Value;
             }
             else
             {

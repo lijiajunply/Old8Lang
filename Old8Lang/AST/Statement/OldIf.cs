@@ -18,9 +18,9 @@ public class OldIf : OldStatement
     {
         if (r == false) return;
         var exprvalue = Expr.Run(ref Manager);
-        if (exprvalue is OldBool)
+        if (exprvalue is BoolValue)
         {
-            var a = exprvalue as OldBool;
+            var a = exprvalue as BoolValue;
             if ((bool)a.Value)
             {
                 BlockStatement.Run(ref Manager);

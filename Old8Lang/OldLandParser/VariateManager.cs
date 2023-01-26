@@ -2,6 +2,8 @@ using System.Text;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
+using String = System.String;
+using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.OldLandParser;
 
@@ -15,23 +17,23 @@ public class VariateManager
 
     private List<OldID> Variates { get; set; } = new List<OldID>();
 
-    private Dictionary<int,OldValue> Values { get; set; } = new Dictionary<int,OldValue>();
+    private Dictionary<int,ValueType> Values { get; set; } = new Dictionary<int,ValueType>();
 
     public bool IsReturn { get; set; }
 
-    public OldValue Result { get; set; } = new OldInt(0);
+    public ValueType Result { get; set; } = new IntValue(0);
 
     public bool IsClass { get; set; }
 
-    public List<OldValue> AnyInfo { get; set; } = new List<OldValue>();
+    public List<ValueType> AnyInfo { get; set; } = new List<ValueType>();
 
-    public ValueTuple<OldID,OldExpr> Set(OldID id,OldValue value)
+    public ValueTuple<OldID,OldExpr> Set(OldID id,ValueType valueType)
     {
         var a1  = GetValue(id);
         if (a1 is null)
         {
             //init
-            var a = value;
+            var a = valueType;
             Variates.Add(id);
             Values.Add(Count,a);
             VariateDirectValue.Add(Count);
@@ -42,12 +44,12 @@ public class VariateManager
         {
             //reset
             var a = Variates.FindLastIndex(x => x.IdName == id.IdName);
-            Values[VariateDirectValue[a]] = value;
+            Values[VariateDirectValue[a]] = valueType;
         }
-        return (id,value);
+        return (id,valueType);
     }
 
-    public ValueTuple<OldID,OldValue> Direct(OldID id,OldID directId)
+    public ValueTuple<OldID,ValueType> Direct(OldID id,OldID directId)
     {
 
         var a1 = GetValue(id);
@@ -97,7 +99,7 @@ public class VariateManager
         GarbageCollection();
     }
 
-    public OldValue GetValue(OldID id)
+    public ValueType GetValue(OldID id)
     {
         try
         {
@@ -108,9 +110,9 @@ public class VariateManager
                                                        {
                                                            switch (x)
                                                            {
-                                                               case OldFunc func:
+                                                               case FuncValue func:
                                                                    return func.Id.IdName == id.IdName;
-                                                               case OldAny any:
+                                                               case AnyValue any:
                                                                    return any.Id.IdName == id.IdName;
                                                                default:
                                                                    return false;
@@ -130,12 +132,12 @@ public class VariateManager
 
     public void Init()
     {
-        Values             = new Dictionary<int,OldValue>();
+        Values             = new Dictionary<int,ValueType>();
         Variates           = new List<OldID>();
         VariateDirectValue = new List<int>();
     }
 
-    public void Init(Dictionary<string,OldValue> values)
+    public void Init(Dictionary<string,ValueType> values)
     {
         foreach (var variable in values)
         {
@@ -147,7 +149,7 @@ public class VariateManager
         IsClass = true;
     }
 
-    public void AddClassAndFunc(OldID id,OldValue value) => AnyInfo.Add(value);
+    public void AddClassAndFunc(OldID id,ValueType valueType) => AnyInfo.Add(valueType);
     
 
     public override string ToString()

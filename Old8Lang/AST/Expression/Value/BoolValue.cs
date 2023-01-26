@@ -2,15 +2,15 @@ using Old8Lang.OldLandParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class OldBool : OldValue
+public class BoolValue : ValueType
 {
     public new bool Value { get; set; }
-    public OldBool(bool value) => Value = value;
+    public BoolValue(bool value) => Value = value;
     public override string   ToString()                         => Value.ToString();
-    public override OldValue Run(ref VariateManager Manager)    => this;
-    public override bool Equal(OldValue otherValue)
+    public override ValueType Run(ref VariateManager Manager)    => this;
+    public override bool Equal(ValueType otherValueType)
     {
-        if (otherValue is OldBool b)
+        if (otherValueType is BoolValue b)
             return Value == b.Value;
         return false;
     }
