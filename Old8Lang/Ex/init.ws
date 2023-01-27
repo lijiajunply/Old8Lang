@@ -1,1 +1,3 @@
-a <- 1
+import OS
+import Terminal
+PrintLine(OSInfo())

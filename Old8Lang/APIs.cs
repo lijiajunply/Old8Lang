@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
-using Old8Lang.AST.Expression;
 using Old8Lang.OldLandParser;
 using ValueType = Old8Lang.AST.Expression.ValueType;
 
@@ -42,20 +41,9 @@ public class APIs
 
     public static string FromDirectory(string DirectoryName)
     {
-        var sb        = new StringBuilder();
-        var info      = new DirectoryInfo(DirectoryName);
-        var           fileInfos = info.GetFiles();
-        var           a         = false;
-        sb.Append(FromFile(DirectoryName+"/"+"init.ws"));
-        foreach (var VARIABLE in fileInfos)
-            sb.Append(FromFile(VARIABLE.FullName));
-
-
-        var b = info.GetDirectories();
-        foreach (var VARIABLE in b)
-            sb.Append(FromDirectory(VARIABLE.FullName));
-
-        return sb.ToString();
+        var builder   = new StringBuilder();
+        builder.Append(FromFile(DirectoryName+"/"+"init.ws"));
+        return builder.ToString();
     }
 
     #endregion
@@ -64,14 +52,11 @@ public class APIs
     {
         var a = new Interpreter(code,isdir);
 
-        Stopwatch sw = new Stopwatch();
-        sw.Start();
-        a.Use();
-        sw.Stop();
-        TimeSpan ts = sw.Elapsed;
+        
+        a.Run(!isdir);
+        
 
-        return (a.GetVariateManager(),a.GetError(),
-                $"DateTime costed for Shuffle function is: {ts.TotalMilliseconds}ms");
+        return (a.GetVariateManager(),a.GetError(),a.GetTime());
     }
 
     public static LangInfo JSON_Info(string langlib,string import,string ver,string uri = "https://downland.old8lang.com")
@@ -84,9 +69,8 @@ public class APIs
     }
     public static LangInfo Read_JSON()
     {
-        var jsonString = File.ReadAllText(BasicInfo.JSONPath);
-        LangInfo a          = JsonSerializer.Deserialize<LangInfo>(jsonString);
-        return a;
+        var jsonString = FromFile(BasicInfo.JSONPath);
+        return JsonSerializer.Deserialize<LangInfo>(jsonString);
     }
     public static bool ImportInstall(string context)
     {

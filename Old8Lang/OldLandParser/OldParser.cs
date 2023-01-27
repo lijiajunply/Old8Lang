@@ -230,7 +230,7 @@ public class OldParser
         new FuncRunStatement(new Instance(new OldID(id.Value){Position = id.Position},langTrees.OfType<OldExpr>().ToList())){Position = id.Position};
     
     [Production("statement: IMPORT[d] IDENTIFIER")]
-    public OldLangTree ImportTree(Token<OldTokenGeneric> import) => new ImportStatement(new []{import.Value}){Position = import.Position};
+    public OldLangTree ImportTree(Token<OldTokenGeneric> import) => new ImportStatement(import.Value){Position = import.Position};
 
     
     [Production("statement: L_BRACKET[d] IMPORT[d] STRING IDENTIFIER IDENTIFIER IDENTIFIER? R_BRACKET[d]")]
