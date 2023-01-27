@@ -10,22 +10,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Net/Controllers/WeatherForecastController.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Net/Old8Lang.Net.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Net/Program.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Net/Properties/launchSettings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Net/WeatherForecast.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Net/appsettings.Development.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Net/appsettings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Ex/other.ws" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Ex/treeByinit.ws.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/APIs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/APIs.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" afterDir="false" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Time">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Ex/tree_By_init.ws.dot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Net/Controllers/WeatherForecastController.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Net/Old8Lang.Net.csproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Net/Program.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Net/Properties/launchSettings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Net/WeatherForecast.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Net/appsettings.Development.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Net/appsettings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/treeByinit.ws.dot" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/tree_By_init.ws.dot" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/OldLandParser/Interpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/OldLandParser/Interpreter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/OldLandParser/OldParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/OldLandParser/OldParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,9 +74,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9393dd8f52ce47e48eafb6bb046c08142bc00/93/f243917b/Console.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3525d14275487fbeeab6166392023d993a1523b35bcd1caab2fff5ad2e5c0/GenericLexer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/69b13731f8acbba44a7d7f7b22925950371fdb21804fa6eeec99de1fe7a37fd/EBNFRecursiveDescentSyntaxParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Old8Lang.Net/Controllers/WeatherForecastController.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Old8Lang.Net/Program.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Old8Lang.Net/WeatherForecast.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///home/luckyfish/RiderProjects/Old8Lang/Old8Lang/APIs.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///home/luckyfish/RiderProjects/Old8Lang/Old8Lang/APIs.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -265,7 +258,7 @@
       <workItem from="1674783623514" duration="8179000" />
       <workItem from="1674797179574" duration="2499000" />
       <workItem from="1674799755747" duration="202000" />
-      <workItem from="1674799997137" duration="1892000" />
+      <workItem from="1674799997137" duration="2204000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -526,7 +519,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674791024103</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="Time">
+      <created>1674802110666</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1674802110666</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -551,7 +551,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="add BOOL INT STRING" />
     <MESSAGE value="add OldFunc.cs and OldAny.cs" />
     <MESSAGE value="解释器 完成" />
     <MESSAGE value="add Old8Lang.App" />
@@ -576,7 +575,8 @@
     <MESSAGE value="init" />
     <MESSAGE value="beep" />
     <MESSAGE value="0.3.0 finish" />
-    <option name="LAST_COMMIT_MESSAGE" value="0.3.0 finish" />
+    <MESSAGE value="Time" />
+    <option name="LAST_COMMIT_MESSAGE" value="Time" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
