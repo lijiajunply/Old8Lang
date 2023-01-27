@@ -13,21 +13,72 @@
 ## Old8Lang示例：
 
 ```
-a -> 1 // 赋值语句
-1 <- b // 与 b -> 1是一样的
-b -* a // b指向a , 即a,b共用一个a的Value
-a *- b // 相反也是一样的
-if a == b
-   a <- 2
-for a <- 1 , a < 3 ,a <- a + 1
-   b <- b + 1
-while not (a == 4)
-   a <- a + 1
-func c()
-   d <- 4
-class d
-   d1 <- a
+a <- 1 //将1赋值给a
+a -> b //将a赋值给b
+//在Old8Lang，变量更像是C中的指针，为了好看，这里使用 -> 或 <-
+
+// if,for,while
+if a == 1
+   b <- 2 
+for c <- 1,c<=2,c++
+   PrintLine(b)
+while(a<=2)
+   PrintLine(b)
+//
+
+//类
+class Old8LangClass
+   _a <- 1
+   _b <- 2
+   init(old a , old b) ->
+      a -> _a 
+      b -> _b 
+   ADD() ->
+      return _a + _b
+   ADD_1() => _a + _b
+}  
+
+//类的实例：
+a <- Old8LangClass(1,2) // 运行init函数          
+_ <- a.ADD() == a.ADD_1() // ture
+a.ADD() // 3 
+
+//彩蛋函数：
+a.XAUAT
+//输出：西建大还我血汗钱我要回家
+
+//数组：
+a <- []
+a <- [1 2 1]
+PrintLine(a[0]) //为a数组的第一个
+PrintLine(a[-1]) //为最后一个
+b <- a[0:1] //取 a[n](0<=n<1)
+
+//type:
+typeof(a) // a : Func
+a <- 5
+typeof(a) // a : int
+
+//使用原生函数：
+[import "Old8LangLib" File FileRead]
+
+[import:"Old8LangLib" File FileRead]
+FileRead(file) ->
+   base <- base + "\n" // base 就是原函数结果
+   return base
+a <- FileRead
   
+```
+
+## Old8Lang 0.2.0 0.3.0版本
+
+我们现在可以使用字典，列表，数组，元组（现在只支持而二元数组）。0.3.0版本则是对项目进行优化
+
+```
+a <- {1 2 3 4}//列表
+b <- [1 2 3 4]//数组
+c <- {(1:"1232") (2:"12345")}//字典
+d <- (1 "asdf")
 ```
 
 ## Old8Lang 0.1.0 版本
