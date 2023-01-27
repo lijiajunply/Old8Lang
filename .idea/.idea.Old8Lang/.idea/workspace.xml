@@ -9,31 +9,36 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="init">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" afterDir="false" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangInfo.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LibTest/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LibTest/Program.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/APIs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/APIs.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DoubleValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DoubleValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/IntValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/IntValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueType.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Exceple/init.ws" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/OldLandParser/OldLangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/OldLandParser/Interpreter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/OldLandParser/Interpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/OldLandParser/Interpreter.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/OldLandParser/OldParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/OldLandParser/OldParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/OldLandParser/OldTokenGeneric.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/OldLandParser/OldTokenGeneric.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/OldLandParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/OldLandParser/VariateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/OS.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OS.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/OS" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/OS" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Terminal" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Terminal" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/Terminal.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Terminal.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/File.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/File.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/OldLang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OldLang.App/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JSON File" />
+      </list>
+    </option>
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -75,7 +80,6 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9393dd8f52ce47e48eafb6bb046c08142bc00/93/f243917b/Console.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3525d14275487fbeeab6166392023d993a1523b35bcd1caab2fff5ad2e5c0/GenericLexer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/69b13731f8acbba44a7d7f7b22925950371fdb21804fa6eeec99de1fe7a37fd/EBNFRecursiveDescentSyntaxParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///home/luckyfish/RiderProjects/Old8Lang/Old8Lang/APIs.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -254,7 +258,8 @@
       <workItem from="1674465216253" duration="19665000" />
       <workItem from="1674623479168" duration="9082000" />
       <workItem from="1674719898790" duration="9540000" />
-      <workItem from="1674733211706" duration="10660000" />
+      <workItem from="1674733211706" duration="10948000" />
+      <workItem from="1674783623514" duration="7187000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -501,7 +506,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674734879457</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="beep">
+      <created>1674744117066</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1674744117066</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -523,7 +535,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="add OldLangInterpreter.cs and OldParserBuilding.cs" />
     <MESSAGE value="add Run func" />
     <MESSAGE value="add BOOL INT STRING" />
     <MESSAGE value="add OldFunc.cs and OldAny.cs" />
@@ -548,80 +559,8 @@
     <MESSAGE value="add more Native" />
     <MESSAGE value="add Error" />
     <MESSAGE value="init" />
-    <option name="LAST_COMMIT_MESSAGE" value="init" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/ValueType.cs</url>
-          <line>36</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueType.cs" initialLine="36" containingFunctionPresentation="method 'Dot'">
-            <startOffsets>
-              <option value="1116" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1155" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="185" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/ValueType.cs</url>
-          <line>26</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueType.cs" initialLine="26" containingFunctionPresentation="method 'Dot'">
-            <startOffsets>
-              <option value="711" />
-            </startOffsets>
-            <endOffsets>
-              <option value="732" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="186" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncValue.cs</url>
-          <line>45</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncValue.cs" initialLine="45" containingFunctionPresentation="method 'Run'">
-            <startOffsets>
-              <option value="1155" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1202" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="194" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/APIs.cs</url>
-          <line>33</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/APIs.cs" initialLine="33" containingFunctionPresentation="lambda expression inside method 'ListToObjects'">
-            <startOffsets>
-              <option value="995" />
-              <option value="945" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1007" />
-              <option value="1017" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="196" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncValue.cs</url>
-          <line>46</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncValue.cs" initialLine="46" containingFunctionPresentation="method 'Run'">
-            <startOffsets>
-              <option value="1215" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1247" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="199" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="beep" />
+    <option name="LAST_COMMIT_MESSAGE" value="beep" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

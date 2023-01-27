@@ -6,7 +6,7 @@ namespace Old8LangLib;
 public static class File
 {
     public static string FileRead(string path) => System.IO.File.ReadAllText(path);
-    public static List<string> FileReadLines(string path) => System.IO.File.ReadLines(path).ToList();
+    public static string[] FileReadLines(string path) => System.IO.File.ReadLines(path).ToArray();
     public static void UnpackZip(string zipPath, string newPath) => 
         ZipFile.ExtractToDirectory(newPath, zipPath, Encoding.UTF8, true);
     public static void CompressZip(string filePath,string zipPath) => ZipFile.CreateFromDirectory(filePath, zipPath);

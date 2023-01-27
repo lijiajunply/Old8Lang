@@ -1,4 +1,6 @@
-﻿namespace Old8Lang;
+﻿using System.Text;
+
+namespace Old8Lang;
 
 public class BasicInfo
 {
@@ -6,37 +8,55 @@ public class BasicInfo
     /// 帮助文档
     /// </summary>
     /// <returns></returns>
-    public string HELP() => "笑死，根本就没有帮助这一说[doge]";
+    public string HELP => "笑死，根本就没有帮助这一说[doge]";
+
     /// <summary>
     /// 语言信息
     /// </summary>
     /// <returns></returns>
-    public string INFO() => "Old8Lang是一个脚本语言，主要就是为了好玩而写的[doge]\n" +
-                            "使用两种方式书写：自己手撸和使用csly(https://github.com/b3b00/csly)编写";
+    public static string Info()
+    {
+        StringBuilder builder =
+            new StringBuilder("Old8Lang是一个脚本语言，主要就是为了好玩而写的[doge]\n使用csly(https://github.com/b3b00/csly)编写");
+        builder.Append("\nthe keyword:");
+        foreach (var variable in KeyWords)
+            builder.Append(variable+"\n");
+        builder.Append("LangSample:\n");
+        builder.Append(LangSample());
+        return builder.ToString();
+    }
+
     /// <summary>
     /// 还没想好
     /// </summary>
     /// <returns>这...实例</returns>
-    public string LangSample() => File.ReadAllText("LangSample.txt");
+    public static string LangSample() =>
+        File.ReadAllText("/home/luckyfish/RiderProjects/Old8Lang/Old8Lang/LangSample.txt");
+
     /// <summary>
     /// Old8Lang的关键字
     /// </summary>
-    public string[] KeyWords { get; set; } =
-    {
-        "class",    // => C# : class
-        "this",    // => C# : this
-        "null",     // => C# : null
-        "if for while",  // => C# : if , for , while
-        "elif else", // => C# : else if , else
-    };
-    /// <summary>
-    /// 文档，使用Old8Down书写(之后，现在先不这样写)
-    /// </summary>
-    /// <returns></returns>
-    public string Docs() => "学习资料：\n" +
-                            "1:《两周自制脚本语言》\n" +
-                            "2: https://www.bilibili.com/video/BV15v41147Zg （国内）/ " +
-                            "https://www.youtube.com/watch?v=wgHIkdUQbp0&list=PLRAdsfhKI4OWNOSfS7EUu5GRAVmze1t2y (国外) \n" +
-                            "3: https://www.zhihu.com/column/c_1383722427357159424  https://www.zhihu.com/column/c_1538128122850877440 \n" +
-                            "";
+    public static string[] KeyWords { get; set; } =
+        {
+            "class new",    // => C# : class new
+            "if for while", // => C# : if , for , while
+            "elif else",    // => C# : else if , else
+            "and or not",   // => C# : and or not
+            "return func",
+        };
+
+    public static string JSONPath { get; set; } = "/home/luckyfish/RiderProjects/Old8Lang/Old8Lang/LangInfo.json";
+
+    public static Dictionary<string,string> Order { get; set; } = new Dictionary<string,string>()
+                                                                  {
+                                                                      { "FromFile","-f" },
+                                                                      { "FromDir","-d" },
+                                                                      { "Import","import" },
+                                                                      { "LibPath","lib" },
+                                                                      { "ChangeLibPath","-clib" },
+                                                                      { "ChangeImport","-cimp" },
+                                                                      { "Var","-var" },
+                                                                      { "Info","info" },
+                                                                      { "Install","-i" }
+                                                                  };
 }

@@ -100,7 +100,7 @@ public class OldParser
                     {
                         if (x is OldExpr) IDs.Add(x as OldExpr);
                     });
-        return new Instance(new OldID(id.Value){Position = id.Position},IDs);
+        return new Instance(new OldID(id.Value){Position = id.Position},IDs){Position = id.Position};
     }
     [Production("primary: LPAREN[d] IDENTIFIER* RPAREN[d] LAMBDA[d] OldParser_expressions")]
     public OldLangTree Lambda(List<Token<OldTokenGeneric>> ids,OldExpr expr)
@@ -118,14 +118,14 @@ public class OldParser
     {
         List<OldExpr> a = new List<OldExpr>();
         list.ForEach(x => a.Add(x as OldExpr));
-        return new ListValue(a);
+        return new ListValue(a){Position = list.Count == 0?new LexerPosition(0,0,0):list[0].Position};
     }
 
-    [Production("primary: L_BRACKET[d] OldParser_expressions* R_BRACKET[d]")]
-    public OldLangTree Array(List<OldLangTree> list)
+    [Production("primary: L_BRACKET OldParser_expressions* R_BRACKET[d]")]
+    public OldLangTree Array(Token<OldTokenGeneric>_,List<OldLangTree> list)
     {
         var a = list.OfType<OldExpr>().ToList();
-        return new ArrayValue(a);
+        return new ArrayValue(a){Position = _.Position};
     }
 
     [Production("primary: LPAREN[d] OldParser_expressions DOUHAO[d] OldParser_expressions RPAREN[d]")]

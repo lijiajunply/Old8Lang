@@ -9,8 +9,9 @@ namespace Old8Lang.OldLandParser;
 
 public class VariateManager
 {
-    public  string Path  { get; set; } = String.Empty;
-    private int    Count { get; set; }
+    public  LangInfo LangInfo { get; set; }
+    public  string   Path     { get; set; } = String.Empty;
+    private int      Count    { get; set; }
 
     private List<int> VariateDirectValue { get; set; } = new List<int>();
 
@@ -151,8 +152,9 @@ public class VariateManager
     }
 
     public void AddClassAndFunc(OldID id,ValueType valueType) => AnyInfo.Add(valueType);
-    
 
+    public VariateManager Clone() => (VariateManager)MemberwiseClone();
+    
     public override string ToString()
     {
         StringBuilder builder = new StringBuilder();

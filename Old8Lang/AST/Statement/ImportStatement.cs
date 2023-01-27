@@ -17,12 +17,15 @@ public class ImportStatement : OldStatement
         //查找
         foreach (var i in ImportString)
         {
-            var path = "/home/luckyfish/RiderProjects/Old8Lang/Old8LangLib/OldLib/"+i;
-            var a    = new Interpreter(path,false);
-            a.Use();
-            var manager = a.GetVariateManager();
-            foreach (var valueType in manager.AnyInfo)
-                Manager.AddClassAndFunc((valueType as FuncValue).Id,valueType);
+            if (Manager.LangInfo.ImPortTable.Keys.Any(x => i == x) || APIs.ImportInstall(i))
+            {
+                var path = Manager.LangInfo.ImportPath+i;
+                var a    = new Interpreter(path,false,Manager.LangInfo);
+                a.Use();
+                var manager = a.GetVariateManager();
+                foreach (var valueType in manager.AnyInfo)
+                    Manager.AddClassAndFunc((valueType as FuncValue).Id,valueType);
+            }
         }
     }
 

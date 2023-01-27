@@ -19,9 +19,17 @@ public class Interpreter
         Manager = new VariateManager { Path = path };
         Code    = isDir ? APIs.FromDirectory(path) : APIs.FromFile(path);
     }
+    public Interpreter(string path,bool isDir,LangInfo info)
+    {
+        Error   = new List<string>();
+        Manager = new VariateManager { Path = path ,LangInfo = info};
+        Code    = isDir ? APIs.FromDirectory(path) : APIs.FromFile(path);
+    }
 
     public void Use()
     {
+        if (Manager.LangInfo is null)
+            Manager.LangInfo = APIs.Read_JSON();
 
         var Parser = new ParserBuilder<OldTokenGeneric,OldLangTree>();
         var oldParser = new OldParser();

@@ -16,7 +16,7 @@ public class IntValue : ValueType
         if (otherValueType is DoubleValue)
             return otherValueType.Plus(this);
         if (otherValueType is IntValue)
-            return new IntValue(Value + Int32.Parse((string)otherValueType.ToString()));
+            return new IntValue(Value + Int32.Parse(otherValueType.ToString()));
 
         return new ValueType();
     }
@@ -26,7 +26,7 @@ public class IntValue : ValueType
         if (otherValueType is DoubleValue)
             return otherValueType.Minus(this);
         if (otherValueType is IntValue)
-            return new IntValue(Value - Int32.Parse((string)otherValueType.ToString()));
+            return new IntValue(Value - Int32.Parse(otherValueType.ToString()));
         return new ValueType();
     }
 
@@ -39,7 +39,7 @@ public class IntValue : ValueType
         if (otherValueType is DoubleValue)
             return otherValueType.Times(this);
         if (otherValueType is IntValue)
-            return new IntValue(Value * Int32.Parse((string)otherValueType.ToString()));
+            return new IntValue(Value * Int32.Parse(otherValueType.ToString()));
         return new ValueType();
     }
 
@@ -48,12 +48,12 @@ public class IntValue : ValueType
         if (otherValueType is DoubleValue)
             return otherValueType.Divide(this);
         if (otherValueType is IntValue)
-            return new IntValue(Value / Int32.Parse((string)otherValueType.ToString()));
+            return new IntValue(Value / Int32.Parse(otherValueType.ToString()));
         return new ValueType();
     }
 
-    public override bool Less(ValueType?    otherValue) => Value < Int32.Parse((string)otherValue.ToString());
-    public override bool Greater(ValueType? otherValue) => Value > Int32.Parse((string)otherValue.ToString());
+    public override bool Less(ValueType?    otherValue) => Value < Int32.Parse(otherValue.ToString());
+    public override bool Greater(ValueType? otherValue) => Value > Int32.Parse(otherValue.ToString());
     public override bool Equal(ValueType otherValueType)
     {
         if (otherValueType is IntValue b)

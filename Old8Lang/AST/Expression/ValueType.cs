@@ -24,17 +24,24 @@ public class ValueType : OldExpr
 
     public virtual ValueType Dot(OldExpr dotExpr)
     {
-        if (dotExpr is OldID)
+        if (dotExpr is OldID id)
         {
-            var a = dotExpr as OldID;
-            if (a.IdName == "toint")
+            if (id.IdName == "toint")
                 return new IntValue(Int32.Parse(ToString()));
-            if (a.IdName == "tostring")
+            if (id.IdName == "tostr")
                 return new StringValue(ToString());
-            if (a.IdName == "tochar")
+            if (id.IdName == "tochar")
                 return new CharValue(ToString()[0]);
-            if (a.IdName == "XAUAT")
+            if (id.IdName == "XAUAT")
                 return new StringValue("西建大还我血汗钱我要回家");
+        }
+        if (dotExpr is Instance instance)
+        {
+            if (instance.Id.IdName == "GetType")
+            {
+                VariateManager manager = new VariateManager();
+                return new TypeValue(this).Run(ref manager);
+            }
         }
         return null;
     }

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json;
 using Old8Lang.AST.Expression;
 using Old8Lang.OldLandParser;
 using ValueType = Old8Lang.AST.Expression.ValueType;
@@ -71,5 +72,25 @@ public class APIs
 
         return (a.GetVariateManager(),a.GetError(),
                 $"DateTime costed for Shuffle function is: {ts.TotalMilliseconds}ms");
+    }
+
+    public static LangInfo JSON_Info(string langlib,string import,string ver,string uri = "https://downland.old8lang.com")
+    {
+        var      dictionary = new Dictionary<string,bool>() { { "OS",false }, {"Terminal",false },{"File",false} };
+        LangInfo langInfo   = new LangInfo() { ImPortTable = dictionary,LangLibDllPath = langlib,ImportPath = import,Ver = ver,Url = uri};
+        string   jsonString = JsonSerializer.Serialize(langInfo);
+        File.WriteAllText(BasicInfo.JSONPath,jsonString);
+        return langInfo;
+    }
+    public static LangInfo Read_JSON()
+    {
+        var jsonString = File.ReadAllText(BasicInfo.JSONPath);
+        LangInfo a          = JsonSerializer.Deserialize<LangInfo>(jsonString);
+        return a;
+    }
+    public static bool ImportInstall(string context)
+    {
+        //以后再说
+        return false;
     }
 }

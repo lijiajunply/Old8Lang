@@ -36,7 +36,7 @@ public class NativeStatement : OldStatement
     public override void Run(ref VariateManager Manager)
     {
         var path       = $"{Manager.Path}/dll/{DLL_NAME}"; // filepath/dll/dllname
-        var assembly   = Assembly.LoadFile("/home/luckyfish/RiderProjects/Old8Lang/Old8LangLib/bin/Debug/net6.0/Old8LangLib.dll");
+        var assembly   = Assembly.LoadFile(Manager.LangInfo.LangLibDllPath);
         var type       = assembly.GetType($"Old8LangLib.{CLASS_NAME}");
         var methodInfo = type.GetMethod(METHOD_NAME);
         if (NATIVE_NAME is "")

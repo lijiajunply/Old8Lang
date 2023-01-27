@@ -19,14 +19,13 @@ public enum OldTokenGeneric
     [Keyword("OR")] [Keyword(    "or")]    OR    = 10,
     [Keyword("XOR")] [Keyword(   "xor")]   XOR   = 11,
     [Keyword("CLASS")] [Keyword( "class")] CLASS = 14,
-    [Keyword("FUNC")] [Keyword(  "funcValue")]  FUNC  = 15,
+    [Keyword("FUNC")] [Keyword(  "func")]  FUNC  = 15,
     [Keyword("RETURN")] [Keyword("return")]
     RETURN = 16,
     [Keyword("IMPORT")] [Keyword("import")]
     IMPORT = 17,
     [Comment("//","|*","*|")]
     COMMENT = 18,
-
     [Keyword("NEW")] [Keyword( "new")]  NEW  = 19,
 
     #endregion

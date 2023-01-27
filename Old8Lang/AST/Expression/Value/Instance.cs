@@ -19,8 +19,8 @@ public class Instance : ValueType
       {
          case "Position":
          {
-            var a = Ids[0].Run(ref Manager).Position;
-            return new StringValue(a.ToString());
+            var a = Ids[0].Position.ToString();
+            return new StringValue(a);
          }
          case "type":
             return new TypeValue(Ids[0]).Run(ref Manager);
@@ -28,13 +28,13 @@ public class Instance : ValueType
       var result = Id.Run(ref Manager);
       if (result is FuncValue funcValue)
       {
-         return Manager.IsClass ? funcValue.Run(ref Manager,Ids) : funcValue.Run(ref Manager,Ids);
+         result = Manager.IsClass ? funcValue.Run(ref Manager,Ids) : funcValue.Run(ref Manager,Ids);
       }
       if (result is AnyValue anyValue)
       {
          if (anyValue.Result.TryGetValue("init",out result))
             anyValue.Dot(result,Ids);
-         return anyValue;
+         result = anyValue;
       }
       return result;
    }
