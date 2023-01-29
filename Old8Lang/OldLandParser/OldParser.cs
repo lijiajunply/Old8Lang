@@ -242,7 +242,10 @@ public class OldParser
     public OldLangTree Native(Token<OldTokenGeneric> dllName,   Token<OldTokenGeneric>  className,
                                   Token<OldTokenGeneric> methodName,Token<OldTokenGeneric>? token,FuncInit a) =>
         new NativeStatement(dllName.Value,className.Value,methodName.Value,token!.Value,a){Position = dllName.Position};
-    
+
+    [Production("statement:L_BRACKET[d] IMPORT[d] STRING IDENTIFIER R_BRACKET[d]")]
+    public OldLangTree NativeClass(Token<OldTokenGeneric> dllname,Token<OldTokenGeneric> classname) =>
+        new NativeStatement(dllname.Value,classname.Value);
     #endregion
 
     #region sugar

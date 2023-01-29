@@ -10,7 +10,7 @@ public class OldClassInit : OldStatement
     {
         AnyValue = anyValue;
     }
-    public override void Run(ref VariateManager Manager) => Manager.AddClassAndFunc(AnyValue.Id,AnyValue);
+    public override void Run(ref VariateManager Manager) => Manager.AddClassAndFunc(AnyValue);
 
     public override string ToString() => AnyValue.ToString();
 }

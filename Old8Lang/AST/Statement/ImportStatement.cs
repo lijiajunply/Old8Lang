@@ -22,7 +22,7 @@ public class ImportStatement : OldStatement
             a.Run();
             var manager = a.GetVariateManager();
             foreach (var valueType in manager.AnyInfo)
-                Manager.AddClassAndFunc((valueType as FuncValue).Id,valueType);
+                Manager.AddClassAndFunc(valueType);
             return;
         }
         if (APIs.ImportInstall(ImportString))
@@ -33,7 +33,7 @@ public class ImportStatement : OldStatement
             a.Run();
             var manager = a.GetVariateManager();
             foreach (var valueType in manager.AnyInfo)
-                Manager.AddClassAndFunc((valueType as FuncValue).Id,valueType);
+                Manager.AddClassAndFunc(valueType);
             return;
         }
         string dic = Path.GetDirectoryName(Manager.Path);
@@ -44,14 +44,14 @@ public class ImportStatement : OldStatement
             var manager = a.GetVariateManager();
             foreach (var valueType in manager.AnyInfo)
             {
-                if (valueType is FuncValue func)
+                if (valueType is FuncValue)
                 {
-                    Manager.AddClassAndFunc(func.Id,valueType);
+                    Manager.AddClassAndFunc(valueType);
                     continue;
                 }
-                if (valueType is AnyValue any)
+                if (valueType is AnyValue)
                 {
-                    Manager.AddClassAndFunc(any.Id,valueType);
+                    Manager.AddClassAndFunc(valueType);
                 }
             }
         }

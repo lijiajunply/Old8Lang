@@ -116,6 +116,8 @@ public class VariateManager
                                                                    return func.Id.IdName == id.IdName;
                                                                case AnyValue any:
                                                                    return any.Id.IdName == id.IdName;
+                                                               case NativeAnyValue na:
+                                                                   return na.ClassName == id.IdName;
                                                                default:
                                                                    return false;
                                                            }
@@ -123,8 +125,7 @@ public class VariateManager
                 var aa = AnyInfo[b];
                 return aa.Clone();
             }
-            else
-                return Values[VariateDirectValue[a]];
+            return Values[VariateDirectValue[a]];
         }
         catch (Exception _)
         {
@@ -151,7 +152,7 @@ public class VariateManager
         IsClass = true;
     }
 
-    public void AddClassAndFunc(OldID id,ValueType valueType) => AnyInfo.Add(valueType);
+    public void AddClassAndFunc(ValueType valueType) => AnyInfo.Add(valueType);
 
     public VariateManager Clone() => (VariateManager)MemberwiseClone();
     

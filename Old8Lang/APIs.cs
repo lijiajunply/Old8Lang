@@ -30,8 +30,16 @@ public class APIs
         }
         return builder.ToString();
     }
-    public static List<object> ListToObjects(List<ValueType> a) =>
-        a.Count == 0 ? new List<object>() : a.Select(x => x.GetValue()).ToList();
+    public static List<object> ListToObjects(List<ValueType> a)
+    {
+        if (a == null)
+            return new List<object>();
+        if (a.Count == 0)
+            return new List<object>();
+        if (a[0] == null)
+            return new List<object>();
+        return a.Select(x => x.GetValue()).ToList();
+    }
 
     #endregion
 

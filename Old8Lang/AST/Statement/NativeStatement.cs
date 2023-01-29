@@ -17,20 +17,25 @@ public class NativeStatement : OldStatement
 
     private FuncValue FuncValue { get; set; }
 
-    public NativeStatement(string dllName,string className,string methodName,string NativeName)
+    public NativeStatement(string dllName,string className,string methodName,string? nativeName)
     {
         DLL_NAME    = dllName;
         CLASS_NAME  = className;
         METHOD_NAME = methodName;
-        NATIVE_NAME = NativeName;
+        NATIVE_NAME = nativeName;
     }
-    public NativeStatement(string dllName,string className,string methodName,string NativeName,FuncInit a)
+    public NativeStatement(string dllName,string className,string methodName,string? nativeName,FuncInit a)
     {
         DLL_NAME    = dllName;
         CLASS_NAME  = className;
         METHOD_NAME = methodName;
-        NATIVE_NAME = NativeName;
+        NATIVE_NAME = nativeName;
         FuncValue        = a.FuncValue;
+    }
+    public NativeStatement(string dllName,string className)
+    {
+        DLL_NAME   = dllName;
+        CLASS_NAME = className;
     }
 
     public override void Run(ref VariateManager Manager)
@@ -38,12 +43,17 @@ public class NativeStatement : OldStatement
         DLL_NAME = DLL_NAME.Split(@"""")[1];
         var path       = $"{Path.GetDirectoryName(Manager.Path)}/dll/{DLL_NAME}.dll"; // filepath/dll/dllname
         var assembly   = Assembly.LoadFile(path);
-        var type       = assembly.GetType($"Old8LangLib.{CLASS_NAME}");
-        var methodInfo = type.GetMethod(METHOD_NAME);
-        if (NATIVE_NAME is "")
-            NATIVE_NAME = METHOD_NAME;
-        var func = new FuncValue(NATIVE_NAME,methodInfo,FuncValue);
-        Manager.AddClassAndFunc(new OldID(NATIVE_NAME),func);
+        var type       = assembly.GetType($"{DLL_NAME}.{CLASS_NAME}");
+        if (METHOD_NAME != null)
+        {
+            var methodInfo = type.GetMethod(METHOD_NAME);
+            if (NATIVE_NAME is "")
+                NATIVE_NAME = METHOD_NAME;
+            var func = new FuncValue(NATIVE_NAME,methodInfo,FuncValue);
+            Manager.AddClassAndFunc(func);
+            return;
+        }
+        Manager.AddClassAndFunc(new NativeAnyValue(DLL_NAME,CLASS_NAME,path).Run(ref Manager));
     }
 
     public override string ToString() => $"[import {DLL_NAME} {CLASS_NAME} {METHOD_NAME} {NATIVE_NAME}]\n{FuncValue}";

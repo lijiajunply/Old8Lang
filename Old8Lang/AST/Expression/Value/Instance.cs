@@ -28,13 +28,21 @@ public class Instance : ValueType
       var result = Id.Run(ref Manager);
       if (result is FuncValue funcValue)
       {
-         result = Manager.IsClass ? funcValue.Run(ref Manager,Ids) : funcValue.Run(ref Manager,Ids);
+         result = funcValue.Run(ref Manager,Ids);
       }
       if (result is AnyValue anyValue)
       {
          if (anyValue.Result.TryGetValue("init",out result))
             anyValue.Dot(result,Ids);
          result = anyValue;
+      }
+      if (result is NativeAnyValue nativeAnyValue)
+      {
+         List<ValueType> a = new List<ValueType>();
+         foreach (var id in Ids)
+            a.Add(id.Run(ref Manager));
+         nativeAnyValue.New(APIs.ListToObjects(a).ToArray());
+         result = nativeAnyValue;
       }
       return result;
    }
