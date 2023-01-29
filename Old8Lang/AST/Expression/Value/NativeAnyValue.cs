@@ -3,6 +3,9 @@ using Old8Lang.OldLandParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
+/// <summary>
+/// 适用于有构造函数的类
+/// </summary>
 public class NativeAnyValue : ValueType
 {
     private Type            ClassType      { get; set; }

@@ -1,2 +1,2 @@
-[import "Old8LangLib" Net]
-a <- 1
+[import "Old8LangLib" Net.Net]
+import Http

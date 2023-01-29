@@ -1,1 +1,1 @@
-a <- 1
+[import "Old8LangLib" Net.Http]
