@@ -2,60 +2,15 @@ digraph syntaxtree {
 0 [  label="IMPORT
 \"import\"" shape=doublecircle height=0.50]
 1 [  label="IDENTIFIER
-\"OS\"" shape=doublecircle height=0.50]
+\"Net\"" shape=doublecircle height=0.50]
 2 [  label="statement" shape=ellipse fontcolor=black height=0.50]
 2 [  label="statement" shape=ellipse fontcolor=black height=0.50]
-3 [  label="IMPORT
-\"import\"" shape=doublecircle height=0.50]
-4 [  label="IDENTIFIER
-\"Terminal\"" shape=doublecircle height=0.50]
-5 [  label="statement" shape=ellipse fontcolor=black height=0.50]
-5 [  label="statement" shape=ellipse fontcolor=black height=0.50]
-6 [  label="IDENTIFIER
-\"PrintLine\"" shape=doublecircle height=0.50]
-7 [  label="LPAREN
-\"(\"" shape=doublecircle height=0.50]
-8 [  label="IDENTIFIER
-\"OSInfo\"" shape=doublecircle height=0.50]
-9 [  label="LPAREN
-\"(\"" shape=doublecircle height=0.50]
-10 [  label="" shape=ellipse fontcolor=black height=0.50]
-10 [  label="" shape=ellipse fontcolor=black height=0.50]
-11 [  label="RPAREN
-\")\"" shape=doublecircle height=0.50]
-12 [  label="primary" shape=ellipse fontcolor=black height=0.50]
-12 [  label="primary" shape=ellipse fontcolor=black height=0.50]
-13 [  label="operand" shape=ellipse fontcolor=black height=0.50]
-13 [  label="operand" shape=ellipse fontcolor=black height=0.50]
-14 [  label="OldParser_expressions" shape=ellipse fontcolor=black height=0.50]
-14 [  label="OldParser_expressions" shape=ellipse fontcolor=black height=0.50]
-15 [  label="" shape=ellipse fontcolor=black height=0.50]
-15 [  label="" shape=ellipse fontcolor=black height=0.50]
-16 [  label="RPAREN
-\")\"" shape=doublecircle height=0.50]
-17 [  label="statement" shape=ellipse fontcolor=black height=0.50]
-17 [  label="statement" shape=ellipse fontcolor=black height=0.50]
-18 [  label="" shape=ellipse fontcolor=black height=0.50]
-18 [  label="" shape=ellipse fontcolor=black height=0.50]
-19 [  label="root" shape=ellipse fontcolor=black height=0.50]
-19 [  label="root" shape=ellipse fontcolor=black height=0.50]
+3 [  label="" shape=ellipse fontcolor=black height=0.50]
+3 [  label="" shape=ellipse fontcolor=black height=0.50]
+4 [  label="root" shape=ellipse fontcolor=black height=0.50]
+4 [  label="root" shape=ellipse fontcolor=black height=0.50]
 2->0 [  arrowshape=none];
 2->1 [  arrowshape=none];
-5->3 [  arrowshape=none];
-5->4 [  arrowshape=none];
-12->8 [  arrowshape=none];
-12->9 [  arrowshape=none];
-12->10 [  arrowshape=none];
-12->11 [  arrowshape=none];
-13->12 [  arrowshape=none];
-14->13 [  arrowshape=none];
-15->14 [  arrowshape=none];
-17->6 [  arrowshape=none];
-17->7 [  arrowshape=none];
-17->15 [  arrowshape=none];
-17->16 [  arrowshape=none];
-18->2 [  arrowshape=none];
-18->5 [  arrowshape=none];
-18->17 [  arrowshape=none];
-19->18 [  arrowshape=none];
+3->2 [  arrowshape=none];
+4->3 [  arrowshape=none];
 }

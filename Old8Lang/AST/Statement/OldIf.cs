@@ -14,20 +14,18 @@ public class OldIf : OldStatement
         BlockStatement = blockStatement;
     }
 
-    public new void Run(ref VariateManager Manager,ref bool r)
+    public void Run(ref VariateManager Manager,ref bool r)
     {
         if (r == false) return;
         var exprvalue = Expr.Run(ref Manager);
-        if (exprvalue is BoolValue)
+        if (exprvalue is BoolValue value)
         {
-            var a = exprvalue as BoolValue;
-            if ((bool)a.Value)
+            if (value.Value)
             {
                 BlockStatement.Run(ref Manager);
                 r = false;
-            }else return;
+            }
         }
-        else return;
     }
 
     public override string ToString() => $"{Expr} : {BlockStatement}";

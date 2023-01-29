@@ -59,10 +59,10 @@ public class APIs
         return (a.GetVariateManager(),a.GetError(),a.GetTime());
     }
 
-    public static LangInfo JSON_Info(string langlib,string import,string ver,string uri = "https://downland.old8lang.com")
+    public static LangInfo ChangeBasicInfo(string import,string ver,string uri = "https://downland.old8lang.com")
     {
         var      dictionary = new Dictionary<string,bool>() { { "OS",false }, {"Terminal",false },{"File",false} };
-        LangInfo langInfo   = new LangInfo() { ImPortTable = dictionary,LangLibDllPath = langlib,ImportPath = import,Ver = ver,Url = uri};
+        LangInfo langInfo   = new LangInfo() {LibInfos = Read_JSON().LibInfos,ImportPath = import,Ver = ver,Url = uri};
         string   jsonString = JsonSerializer.Serialize(langInfo);
         File.WriteAllText(BasicInfo.JSONPath,jsonString);
         return langInfo;

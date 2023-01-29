@@ -1,3 +1,1 @@
-import OS
-import Terminal
-PrintLine(OSInfo())
+import Net

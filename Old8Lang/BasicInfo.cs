@@ -1,14 +1,15 @@
 ﻿using System.Text;
+using Old8Lang.Lib;
 
 namespace Old8Lang;
 
-public class BasicInfo
+public static class BasicInfo
 {
     /// <summary>
     /// 帮助文档
     /// </summary>
     /// <returns></returns>
-    public string HELP => "笑死，根本就没有帮助这一说[doge]";
+    public static string HELP=> "笑死，根本就没有帮助这一说[doge]";
 
     /// <summary>
     /// 语言信息
@@ -53,10 +54,19 @@ public class BasicInfo
                                                                       { "FromDir","-d" },
                                                                       { "Import","import" },
                                                                       { "LibPath","lib" },
-                                                                      { "ChangeLibPath","-clib" },
                                                                       { "ChangeImport","-cimp" },
                                                                       { "Var","-var" },
                                                                       { "Info","info" },
-                                                                      { "Install","-i" }
+                                                                      { "Install","-i" },
+                                                                      { "Help","-h" },
+                                                                      { "Remove","-r" }
                                                                   };
+
+    public static List<LibInfo> OldLangLib { get; set; } = new List<LibInfo>()
+                                                           {
+                                                                new LibInfo(){IsDir = false,Var = 0.3,LibName = "OS"},
+                                                                new LibInfo(){IsDir = false,Var = 0.3,LibName = "File"},
+                                                                new LibInfo(){IsDir = false,Var = 0.3,LibName = "Terminal"},
+                                                                new LibInfo(){IsDir = true,Var = 0.3,LibName = "Net"}
+                                                           };
 }

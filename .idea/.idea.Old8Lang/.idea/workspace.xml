@@ -11,7 +11,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Lib/LibInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Net/Http.ws" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Net/init.ws" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/dll/Old8LangLib.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/APIs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/APIs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/OldIf.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/OldIf.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/tree_By_init.dot" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/tree_By_init.dot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangInfo.json" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangInfo.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/OldLandParser/Interpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/OldLandParser/Interpreter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/ColorfulTerminal.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/ColorfulTerminal.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/File" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/File.ws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/OS" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/OS.ws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Terminal" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Terminal.ws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldLang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OldLang.App/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,8 +85,6 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9393dd8f52ce47e48eafb6bb046c08142bc00/93/f243917b/Console.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3525d14275487fbeeab6166392023d993a1523b35bcd1caab2fff5ad2e5c0/GenericLexer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/69b13731f8acbba44a7d7f7b22925950371fdb21804fa6eeec99de1fe7a37fd/EBNFRecursiveDescentSyntaxParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///home/luckyfish/RiderProjects/Old8Lang/Old8Lang/APIs.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///home/luckyfish/RiderProjects/Old8Lang/Old8Lang/APIs.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -250,6 +268,7 @@
       <workItem from="1674797179574" duration="2499000" />
       <workItem from="1674799755747" duration="202000" />
       <workItem from="1674799997137" duration="2849000" />
+      <workItem from="1674967335800" duration="3447000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>

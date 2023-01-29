@@ -65,7 +65,6 @@ public class Interpreter
             {
                 string dic      = Path.GetDirectoryName(Manager.Path);
                 var    path     = dic+$"/tree_By_{Path.GetFileNameWithoutExtension(Manager.Path)}.dot";
-                Console.WriteLine(path);
                 var    tree     = result.SyntaxTree;
                 var    graphviz = new GraphVizEBNFSyntaxTreeVisitor<OldTokenGeneric>();
                 var    _        = graphviz.VisitTree(tree);

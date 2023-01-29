@@ -1,43 +1,52 @@
 ﻿using Old8Lang;
 
-//APIs.JSON_Info("/home/luckyfish/RiderProjects/Old8Lang/Old8LangLib/bin/Debug/net6.0/Old8LangLib.dll",
-//              "/home/luckyfish/RiderProjects/Old8Lang/Old8LangLib/OldLib/","0.3.0");
+//APIs.ChangeBasicInfo("/home/luckyfish/RiderProjects/Old8Lang/Old8LangLib/OldLib/","0.3.0");
 string[] sadf = { "-f" ,"/home/luckyfish/RiderProjects/Old8Lang/Old8Lang/Ex/init.ws"};
-args = sadf;
-Lang();
+//args = new[] { "import" };
+args = args.Length == 0?sadf:args;
+if (args.Length == 0)
+{
+    var o = Console.ReadLine();
+    args = o.Split(" ");
+}
+Lang(args);
 //Run(false,args[1]);
 
-void Lang()
+void Lang(string[] oder)
 {
-    if (args != null && args[0] != null)
+    var a = APIs.Read_JSON();
+    if (oder[0] == BasicInfo.Order["FromFile"])
     {
-        var a = APIs.Read_JSON();
-        if(args[0] == BasicInfo.Order["FromFile"])
-            Run(false,args[1]);
-        if(args[0] == BasicInfo.Order["FromDir"])
-            Run(true,args[1]);
-        if (args[0] == BasicInfo.Order["Import"])
-        {
-            foreach (var VARIABLE in a.ImPortTable)
-                Console.WriteLine(VARIABLE.Key + VARIABLE.Value);
-            Console.WriteLine("in:"+a.ImportPath);
-        }
-        if(args[0] == BasicInfo.Order["LibPath"])
-            Console.WriteLine(a.LangLibDllPath);
-        if (args[0] == BasicInfo.Order["ChangeLibPath"])
-        {
-            var b = APIs.JSON_Info(args[1],a.ImportPath,a.Ver);
-            Console.WriteLine("now:"+b.LangLibDllPath);
-        }
-        if (args[0] == BasicInfo.Order["ChangeImport"])
-        {
-            var b = APIs.JSON_Info(a.LangLibDllPath,args[1],a.Ver);
-            Console.WriteLine("now:"+b.LangLibDllPath);
-        }
-        if (args[0] == BasicInfo.Order["Var"])
-            Console.WriteLine(a.Ver);
-        if (args[0] == BasicInfo.Order["Info"])
-            Console.WriteLine(BasicInfo.Info());
+        Run(false,oder[1]);
+        return;
+    }
+    if (oder[0] == BasicInfo.Order["FromDir"])
+    {
+        Run(true,oder[1]);
+        return;
+    }
+    if (oder[0] == BasicInfo.Order["Import"])
+    {
+        foreach (var VARIABLE in a.LibInfos)
+            Console.WriteLine($"LibName:{VARIABLE.LibName} Var:{VARIABLE.Var} IsDir:{VARIABLE.IsDir}");
+        Console.WriteLine("in:"+a.ImportPath);
+        return;
+    }
+    if (oder[0] == BasicInfo.Order["ChangeImport"])
+    {
+        var b = APIs.ChangeBasicInfo(oder[1],a.Ver);
+        Console.WriteLine("now:"+b.ImportPath);
+        return;
+    }
+    if (oder[0] == BasicInfo.Order["Var"])
+    {
+        Console.WriteLine(a.Ver);
+        return;
+    }
+    if (oder[0] == BasicInfo.Order["Info"])
+    {
+        Console.WriteLine(BasicInfo.Info());
+        return;
     }
 }
 

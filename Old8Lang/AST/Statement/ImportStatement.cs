@@ -14,10 +14,22 @@ public class ImportStatement : OldStatement
 
     public override void Run(ref VariateManager Manager)
     {
-        if (Manager.LangInfo.ImPortTable.Keys.Any(x => ImportString == x) || APIs.ImportInstall(ImportString))
+        if (Manager.LangInfo.LibInfos.Any(x => ImportString == x.LibName))
         {
-            var path = Manager.LangInfo.ImportPath+ImportString;
-            var a    = new Interpreter(path,false,Manager.LangInfo);
+            var b = Manager.LangInfo.LibInfos.Where(x => x.LibName == ImportString).Select(x => x.IsDir).ToArray()[0];
+            var path = Manager.LangInfo.ImportPath+ImportString+(b?"":".ws");
+            var a    = new Interpreter(path,b,Manager.LangInfo);
+            a.Run();
+            var manager = a.GetVariateManager();
+            foreach (var valueType in manager.AnyInfo)
+                Manager.AddClassAndFunc((valueType as FuncValue).Id,valueType);
+            return;
+        }
+        if (APIs.ImportInstall(ImportString))
+        {
+            var b = Manager.LangInfo.LibInfos.Where(x => x.LibName == ImportString).Select(x => x.IsDir).ToArray()[0];
+            var path = Manager.LangInfo.ImportPath+ImportString+".ws";
+            var a    = new Interpreter(path,b,Manager.LangInfo);
             a.Run();
             var manager = a.GetVariateManager();
             foreach (var valueType in manager.AnyInfo)
@@ -27,7 +39,7 @@ public class ImportStatement : OldStatement
         string dic = Path.GetDirectoryName(Manager.Path);
         if (File.Exists(dic+"/"+ImportString+".ws"))
         {
-            var a = new Interpreter(dic+"/"+ImportString+".ws",false);
+            var a = new Interpreter(dic+"/"+ImportString+".ws",false,Manager.LangInfo);
             a.Run();
             var manager = a.GetVariateManager();
             foreach (var valueType in manager.AnyInfo)
