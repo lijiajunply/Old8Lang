@@ -1,0 +1,5 @@
+[import "Old8LangLib" Time GetTimeNow]
+[import "Old8LangLib" Time TimeFormat]
+[import "Old8LangLib" Time TimeStart]
+[import "Old8LangLib" Time TimeStop]
+[import "Old8LangLib" Time TimeStamp]

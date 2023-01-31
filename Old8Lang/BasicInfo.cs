@@ -67,6 +67,7 @@ public static class BasicInfo
                                                                 new LibInfo(){IsDir = false,Var = 0.3,LibName = "OS"},
                                                                 new LibInfo(){IsDir = false,Var = 0.3,LibName = "File"},
                                                                 new LibInfo(){IsDir = false,Var = 0.3,LibName = "Terminal"},
-                                                                new LibInfo(){IsDir = true,Var = 0.3,LibName = "Net"}
+                                                                new LibInfo(){IsDir = true,Var = 0.3,LibName = "Net"},
+                                                                new LibInfo(){IsDir = false,Var = 0.3,LibName = "Time"}
                                                            };
 }

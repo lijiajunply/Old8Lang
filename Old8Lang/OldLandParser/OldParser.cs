@@ -228,7 +228,14 @@ public class OldParser
     [Production("statement: IDENTIFIER LPAREN[d] OldParser_expressions* RPAREN[d]")]
     public OldLangTree FuncRun(Token<OldTokenGeneric> id,List<OldLangTree> langTrees) =>
         new FuncRunStatement(new Instance(new OldID(id.Value){Position = id.Position},langTrees.OfType<OldExpr>().ToList())){Position = id.Position};
-    
+
+    [Production("statement: IDENTIFIER CONCAT[d] IDENTIFIER LPAREN[d] OldParser_expressions* RPAREN[d]")]
+    public OldLangTree ClassFuncRun(Token<OldTokenGeneric> classid,Token<OldTokenGeneric> funcname,
+                                    List<OldLangTree>      exprs) =>
+        new FuncRunStatement(new Operation(new OldID(classid.Value){Position = classid.Position},OldTokenGeneric.CONCAT,
+                                           new Instance(new OldID(classid.Value) { Position = classid.Position },
+                                                        exprs.OfType<OldExpr>().ToList()){Position = classid.Position} ));
+
     [Production("statement: IMPORT[d] IDENTIFIER")]
     public OldLangTree ImportTree(Token<OldTokenGeneric> import) => new ImportStatement(import.Value){Position = import.Position};
 
