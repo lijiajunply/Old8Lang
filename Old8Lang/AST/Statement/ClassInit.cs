@@ -5,7 +5,7 @@ namespace Old8Lang.AST.Statement;
 
 public class OldClassInit : OldStatement
 {
-    public AnyValue AnyValue { get; set; }
+    private AnyValue AnyValue { get; set; }
     public OldClassInit(AnyValue anyValue)
     {
         AnyValue = anyValue;

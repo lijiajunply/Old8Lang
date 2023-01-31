@@ -22,6 +22,7 @@ public class AnyValue : ValueType
 
     public override ValueType Run(ref VariateManager Manager)
     {
+        manager.AnyInfo = Manager.AnyInfo.Where(x => x is not FuncValue).ToList();
         foreach (var variable in Variates.Keys)
             Result.Add(variable.IdName,Variates[variable].Run(ref Manager));
         return this;

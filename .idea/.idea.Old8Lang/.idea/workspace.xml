@@ -10,16 +10,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Time.ws" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8LangLib/Time.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangInfo.json" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangInfo.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/OldLandParser/OldParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/OldLandParser/OldParser.cs" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -257,7 +248,7 @@
       <workItem from="1674799755747" duration="202000" />
       <workItem from="1674799997137" duration="2849000" />
       <workItem from="1674967335800" duration="11578000" />
-      <workItem from="1675145141392" duration="1748000" />
+      <workItem from="1675145141392" duration="1782000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -553,7 +544,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674978907720</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="add Time">
+      <created>1675146906365</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1675146906365</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -578,7 +576,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="debug" />
     <MESSAGE value="file and Directory" />
     <MESSAGE value="list &amp;&amp; dir &amp;&amp; init() in VariateManager.cs &#10;but ==,&lt;,&gt; not implement&#10;and class func" />
     <MESSAGE value="add NativeStatement.cs and ImportStatement.cs" />
@@ -603,7 +600,8 @@
     <MESSAGE value="add asdfasdf" />
     <MESSAGE value="add NativeAnyValue.cs" />
     <MESSAGE value="add net" />
-    <option name="LAST_COMMIT_MESSAGE" value="add net" />
+    <MESSAGE value="add Time" />
+    <option name="LAST_COMMIT_MESSAGE" value="add Time" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
