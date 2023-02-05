@@ -7,3 +7,7 @@
 [import "Old8LangLib" Terminal Beep]
 [import "Old8LangLib" Terminal Clear]
 [import "Old8LangLib" Terminal BeepWindow]
+[import "Old8LangLib" ColorfulTerminal PrintColorful]
+[import "Old8LangLib" ColorfulTerminal PrintLineColorful]
+[import "Old8LangLib" ColorfulTerminal PrintAscii]
+[import "Old8LangLib" ColorfulTerminal PrintAsciiColorful]

@@ -26,22 +26,17 @@ public class ValueType : OldExpr
     {
         if (dotExpr is OldID id)
         {
-            if (id.IdName == "toint")
-                return new IntValue(Int32.Parse(ToString()));
-            if (id.IdName == "tostr")
-                return new StringValue(ToString());
-            if (id.IdName == "tochar")
-                return new CharValue(ToString()[0]);
             if (id.IdName == "XAUAT")
                 return new StringValue("西建大还我血汗钱我要回家");
         }
         if (dotExpr is Instance instance)
         {
             if (instance.Id.IdName == "GetType")
-            {
-                VariateManager manager = new VariateManager();
-                return new TypeValue(this).Run(ref manager);
-            }
+                return new TypeValue(TypeToString());
+            if (instance.Id.IdName == "ToInt")
+                return new IntValue(Int32.Parse(ToString()));
+            if (instance.Id.IdName == "ToString")
+                return new StringValue(ToString());
         }
         return null;
     }

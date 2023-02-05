@@ -5,8 +5,9 @@ namespace Old8Lang.AST.Statement;
 
 public class OldIf : OldStatement
 {
-    public OldExpr Expr { get; set; }
-    public BlockStatement BlockStatement { get; set; }
+    private OldExpr        Expr           { get; set; }
+
+    private BlockStatement BlockStatement { get; set; }
 
     public OldIf(OldExpr expr, BlockStatement blockStatement)
     {

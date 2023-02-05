@@ -11,5 +11,4 @@ public static class ColorfulTerminal
     public static void PrintAscii(string context) => Console.WriteAscii(context);
     public static void PrintAsciiColorful(string context,string color) =>
         Console.WriteAscii(context,Color.FromName(color));
-
 }

@@ -1,4 +1,5 @@
-﻿a <- 1 //将1赋值给a
+﻿import Terminal
+a <- 1 //将1赋值给a
 a -> b //将a赋值给b
 //在Old8Lang，变量更像是C中的指针，为了好看，这里使用 -> 或 <-
 
@@ -13,19 +14,18 @@ while(a<=2)
 
 //类
 class Old8LangClass
-   _a <- 1
-   _b <- 2
-   init(old a , old b) ->
-      a -> _a 
-      b -> _b 
+   a <- 1
+   b <- 2
+   init(a1 b1) ->
+      a1 -> a 
+      b1 -> b 
    ADD() ->
-      return _a + _b
-   ADD_1() => _a + _b
+      return a + b
+   ToString() => a.ToString+b.ToString;
 }  
 
 //类的实例：
-a <- Old8LangClass(1,2) // 运行init函数                
-_ <- a.ADD() == a.ADD_1() // ture
+a <- Old8LangClass(1,2) // 运行init函数
 a.ADD() // 3 
 
 //彩蛋函数：

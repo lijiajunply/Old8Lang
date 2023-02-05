@@ -6,7 +6,13 @@ public class StringValue : ValueType
 {
     public new string Value { get; set; }
 
-    public StringValue(string context) => Value = context;
+    public StringValue(string context)
+    {
+        string[] a = context.Split("\\n");
+        for (int i = 0; i < a.Length; i++)
+            Value += a[i] + (i == a.Length-1?"":"\n");
+        
+    }
     public override string   ToString()                => Value;
     public override ValueType Plus(ValueType otherValueType) => new StringValue(Value+otherValueType);
     public override bool Equal(ValueType otherValueType)

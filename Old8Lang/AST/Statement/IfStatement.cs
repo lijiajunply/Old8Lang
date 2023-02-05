@@ -6,9 +6,11 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public class IfStatement : OldStatement
 {
-    public OldIf IfBlock { get; set; }
-    public List<OldIf> ElifBlock { get; set; }
-    public BlockStatement ElseBlockStatement { get; set; }
+    private OldIf IfBlock { get; set; }
+
+    private List<OldIf> ElifBlock { get; set; }
+
+    private BlockStatement ElseBlockStatement { get; set; }
 
     public IfStatement(OldIf ifBlock, List<OldIf>? elifBlock, BlockStatement elseBlockStatement)
     {

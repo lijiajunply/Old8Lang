@@ -5,12 +5,11 @@ string[] sadf = { "-f" ,"/home/luckyfish/RiderProjects/Old8Lang/Old8Lang/Ex/init
 //args = new[] { "import" };
 args = args.Length == 0?sadf:args;
 if (args.Length == 0)
-{
-    var o = Console.ReadLine();
-    args = o.Split(" ");
-}
+    args = Console.ReadLine().Split(" ");
+
 Lang(args);
-//Run(false,args[1]);
+
+#region LangRun
 
 void Lang(string[] oder)
 {
@@ -52,7 +51,10 @@ void Lang(string[] oder)
 
 void Run(bool isdic,string path)
 {
-    var    info = APIs.CslyUsing(path,isdic);
+    var info = APIs.CslyUsing(path,isdic);
     info.Error.ForEach(x => Console.WriteLine(x));
     Console.WriteLine("\n"+info.Time);
 }
+
+
+#endregion

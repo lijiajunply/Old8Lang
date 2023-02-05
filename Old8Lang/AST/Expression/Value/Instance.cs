@@ -1,3 +1,4 @@
+using Old8Lang.AST.Statement;
 using Old8Lang.OldLandParser;
 
 namespace Old8Lang.AST.Expression.Value;
@@ -24,6 +25,18 @@ public class Instance : ValueType
          }
          case "type":
             return new TypeValue(Ids[0]).Run(ref Manager);
+         case "exec":
+         {
+            if (Ids[0] is StringValue stringValue)
+            {
+               Interpreter i = new Interpreter(stringValue.Value,Manager.Clone());
+               i.Run();
+               VariateManager manager = i.GetVariateManager();
+               foreach (var type in manager.Output())
+                  Manager.Set(new OldID(type.Key),type.Value);
+            }
+            return new IntValue(0);
+         }
       }
       var result = Id.Run(ref Manager);
       if (result is FuncValue funcValue)

@@ -6,21 +6,21 @@ public class DoubleValue : ValueType
     public DoubleValue(double doubleValue) => Value = doubleValue;
 
     public override ValueType Plus(ValueType otherValueType) => 
-        otherValueType is IntValue or DoubleValue ? new DoubleValue(Value+ (double)otherValueType.Value) : new ValueType();
+        otherValueType is IntValue or DoubleValue ? new DoubleValue(Value+ Double.Parse(otherValueType.ToString())) : new ValueType();
 
     public override ValueType Minus(ValueType otherValueType) =>
-        otherValueType is IntValue or DoubleValue ? new DoubleValue(Value- (double)otherValueType.Value) : new ValueType();
+        otherValueType is IntValue or DoubleValue ? new DoubleValue(Value- Double.Parse(otherValueType.ToString())) : new ValueType();
 
     public override ValueType Times(ValueType otherValueType) => 
-        otherValueType is IntValue or DoubleValue ? new DoubleValue(Value * (double)otherValueType.Value) : new ValueType();
+        otherValueType is IntValue or DoubleValue ? new DoubleValue(Value * Double.Parse(otherValueType.ToString())) : new ValueType();
 
     public override ValueType Divide(ValueType otherValueType) =>
-        otherValueType is IntValue or DoubleValue ? new DoubleValue(Value / (double)otherValueType.Value) : new ValueType();
+        otherValueType is IntValue or DoubleValue ? new DoubleValue(Value / Double.Parse(otherValueType.ToString())) : new ValueType();
 
 
-    public override bool Less(ValueType? otherValue) => Value < (double)otherValue.Value;
-    public override bool Greater(ValueType? otherValue) => Value > (double)otherValue.Value;
-    public override string ToString() => Value.ToString();
+    public override bool   Less(ValueType?    otherValue) => Value < Double.Parse(otherValue.ToString());
+    public override bool   Greater(ValueType? otherValue) => Value > Double.Parse(otherValue.ToString());
+    public override string ToString()                     => Value.ToString();
     
     public override bool Equal(ValueType otherValueType)
     {

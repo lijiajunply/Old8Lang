@@ -5,7 +5,7 @@ namespace Old8Lang.AST.Statement;
 
 public class ImportStatement : OldStatement
 {
-    public string ImportString { get; set; }
+    private string ImportString { get; set; }
 
     public ImportStatement(string importString)
     {

@@ -17,7 +17,7 @@ public class OldParser
     public OldLangTree Root(List<OldLangTree> statement) => new BlockStatement(statement);
 
     [Production("statement: LPAREN[d] statement RPAREN[d]")]
-    public OldLangTree LrBlock(OldLangTree statement) => statement;
+    public OldLangTree LrBlock(OldStatement statement) => statement;
 
     #endregion
 
@@ -68,7 +68,7 @@ public class OldParser
     public OldLangTree Operand(OldLangTree prim) => prim;
 
     [Production("primary: STRING")]
-    public OldLangTree STRING(Token<OldTokenGeneric> token) => new StringValue(token.Value.Split(@"""")[1]){Position = token.Position};
+    public OldLangTree STRING(Token<OldTokenGeneric> token) => new StringValue(token.Value[1..^1]){Position = token.Position};
 
     [Production("primary: INT")]
     public OldLangTree INT(Token<OldTokenGeneric> token) => new IntValue(token.IntValue){Position = token.Position};
@@ -156,10 +156,7 @@ public class OldParser
     [Production("statement: RETURN[d] OldParser_expressions")]
     public OldLangTree ReturnTree(OldExpr expr) => new ReturnStatement(expr){Position = expr.Position};
 
-    [Production("statement: IDENTIFIER DIRECT[d] IDENTIFIER")]
-    public OldLangTree DirectTree(Token<OldTokenGeneric> id1,Token<OldTokenGeneric> id2) =>
-        new DirectStatement(new OldID(id1.Value),new OldID(id2.Value)){Position = id1.Position};
-
+    
     [Production("statement: set")]
     public OldLangTree SetTree(SetStatement a) => a;
 
@@ -243,16 +240,16 @@ public class OldParser
     [Production("statement: L_BRACKET[d] IMPORT[d] STRING IDENTIFIER IDENTIFIER IDENTIFIER? R_BRACKET[d]")]
     public OldLangTree NativeTree(Token<OldTokenGeneric> dllName,   Token<OldTokenGeneric>  className,
                               Token<OldTokenGeneric> methodName,Token<OldTokenGeneric>? token) =>
-        new NativeStatement(dllName.Value,className.Value,methodName.Value,token!.Value){Position = dllName.Position};
+        new NativeStatement(dllName.Value[1..^1],className.Value,methodName.Value,token!.Value){Position = dllName.Position};
 
     [Production("statement:L_BRACKET[d] IMPORT[d] STRING IDENTIFIER IDENTIFIER IDENTIFIER? R_BRACKET[d] func")]
     public OldLangTree Native(Token<OldTokenGeneric> dllName,   Token<OldTokenGeneric>  className,
                                   Token<OldTokenGeneric> methodName,Token<OldTokenGeneric>? token,FuncInit a) =>
-        new NativeStatement(dllName.Value,className.Value,methodName.Value,token!.Value,a){Position = dllName.Position};
+        new NativeStatement(dllName.Value[1..^1],className.Value,methodName.Value,token!.Value,a){Position = dllName.Position};
 
     [Production("statement:L_BRACKET[d] IMPORT[d] STRING IDENTIFIER R_BRACKET[d]")]
     public OldLangTree NativeClass(Token<OldTokenGeneric> dllname,Token<OldTokenGeneric> classname) =>
-        new NativeStatement(dllname.Value,classname.Value);
+        new NativeStatement(dllname.Value[1..^1],classname.Value);
     #endregion
 
     #region sugar

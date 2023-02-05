@@ -53,7 +53,7 @@ public class ForStatement : OldStatement
     public override string ToString()
     {
         StringBuilder sb = new StringBuilder($"for({SetStatement} ; {Expr} ; {Statement})");
-        sb.Append("\n{\n    "+ForBlockStatement+"}");
+        sb.Append("\n{"+ForBlockStatement+"\n}");
         return sb.ToString();
     }
 }

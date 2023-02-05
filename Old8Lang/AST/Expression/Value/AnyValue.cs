@@ -40,17 +40,22 @@ public class AnyValue : ValueType
                 return a.Run(ref manager);
             }
             case FuncValue func:
-                return func.Run(ref manager,c);
+            {
+                if (func.Id.IdName == "GetType")
+                    return new TypeValue(TypeToString());
+                return func.Run(ref manager);
+            }
             default:
                 return dotExpr.Run(ref manager);
         }
     }
     public void Set(OldID id,ValueType valueType) => manager.Set(id,valueType);
 
-    public override string ToString() => $"class {Id} : \n{manager}";
+    public override string ToString() => $"class {Id} "+"{"+"\n{manager}"+"\n}";
     public override void Init()
     {
         manager = new VariateManager();
         manager.Init(Result);
+        manager.IsClass = true;
     }
 }
