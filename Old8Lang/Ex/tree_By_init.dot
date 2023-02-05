@@ -5,87 +5,69 @@ digraph syntaxtree {
 \"Terminal\"" shape=doublecircle height=0.50]
 2 [  label="statement" shape=ellipse fontcolor=black height=0.50]
 2 [  label="statement" shape=ellipse fontcolor=black height=0.50]
-3 [  label="IDENTIFIER
-\"a\"" shape=doublecircle height=0.50]
-4 [  label="SET
-\"<-\"" shape=doublecircle height=0.50]
-5 [  label="STRING
-\"\"asdf\"\"" shape=doublecircle height=0.50]
-6 [  label="primary" shape=ellipse fontcolor=black height=0.50]
-6 [  label="primary" shape=ellipse fontcolor=black height=0.50]
-7 [  label="operand" shape=ellipse fontcolor=black height=0.50]
-7 [  label="operand" shape=ellipse fontcolor=black height=0.50]
-8 [  label="OldParser_expressions" shape=ellipse fontcolor=black height=0.50]
-8 [  label="OldParser_expressions" shape=ellipse fontcolor=black height=0.50]
-9 [  label="set" shape=ellipse fontcolor=black height=0.50]
-9 [  label="set" shape=ellipse fontcolor=black height=0.50]
-10 [  label="statement" shape=ellipse fontcolor=black height=0.50]
-10 [  label="statement" shape=ellipse fontcolor=black height=0.50]
-11 [  label="IDENTIFIER
-\"PrintAscii\"" shape=doublecircle height=0.50]
-12 [  label="LPAREN
+3 [  label="IMPORT
+\"import\"" shape=doublecircle height=0.50]
+4 [  label="IDENTIFIER
+\"OS\"" shape=doublecircle height=0.50]
+5 [  label="statement" shape=ellipse fontcolor=black height=0.50]
+5 [  label="statement" shape=ellipse fontcolor=black height=0.50]
+6 [  label="IDENTIFIER
+\"PrintLine\"" shape=doublecircle height=0.50]
+7 [  label="LPAREN
 \"(\"" shape=doublecircle height=0.50]
-13 [  label="IDENTIFIER
-\"a\"" shape=doublecircle height=0.50]
-14 [  label="primary" shape=ellipse fontcolor=black height=0.50]
-14 [  label="primary" shape=ellipse fontcolor=black height=0.50]
-15 [  label="operand" shape=ellipse fontcolor=black height=0.50]
-15 [  label="operand" shape=ellipse fontcolor=black height=0.50]
-16 [  label="CONCAT
-\".\"" shape=doublecircle height=0.50]
-17 [  label="IDENTIFIER
-\"GetType\"" shape=doublecircle height=0.50]
-18 [  label="LPAREN
+8 [  label="IDENTIFIER
+\"Process\"" shape=doublecircle height=0.50]
+9 [  label="LPAREN
 \"(\"" shape=doublecircle height=0.50]
+10 [  label="STRING
+\"\"neofetch\"\"" shape=doublecircle height=0.50]
+11 [  label="primary" shape=ellipse fontcolor=black height=0.50]
+11 [  label="primary" shape=ellipse fontcolor=black height=0.50]
+12 [  label="operand" shape=ellipse fontcolor=black height=0.50]
+12 [  label="operand" shape=ellipse fontcolor=black height=0.50]
+13 [  label="OldParser_expressions" shape=ellipse fontcolor=black height=0.50]
+13 [  label="OldParser_expressions" shape=ellipse fontcolor=black height=0.50]
+14 [  label="" shape=ellipse fontcolor=black height=0.50]
+14 [  label="" shape=ellipse fontcolor=black height=0.50]
+15 [  label="RPAREN
+\")\"" shape=doublecircle height=0.50]
+16 [  label="primary" shape=ellipse fontcolor=black height=0.50]
+16 [  label="primary" shape=ellipse fontcolor=black height=0.50]
+17 [  label="operand" shape=ellipse fontcolor=black height=0.50]
+17 [  label="operand" shape=ellipse fontcolor=black height=0.50]
+18 [  label="OldParser_expressions" shape=ellipse fontcolor=black height=0.50]
+18 [  label="OldParser_expressions" shape=ellipse fontcolor=black height=0.50]
 19 [  label="" shape=ellipse fontcolor=black height=0.50]
 19 [  label="" shape=ellipse fontcolor=black height=0.50]
 20 [  label="RPAREN
 \")\"" shape=doublecircle height=0.50]
-21 [  label="primary" shape=ellipse fontcolor=black height=0.50]
-21 [  label="primary" shape=ellipse fontcolor=black height=0.50]
-22 [  label="operand" shape=ellipse fontcolor=black height=0.50]
-22 [  label="operand" shape=ellipse fontcolor=black height=0.50]
-23 [  label="expr_100_CONCAT_NOT_MINUS" shape=ellipse fontcolor=black height=0.50]
-23 [  label="expr_100_CONCAT_NOT_MINUS" shape=ellipse fontcolor=black height=0.50]
-24 [  label="OldParser_expressions" shape=ellipse fontcolor=black height=0.50]
-24 [  label="OldParser_expressions" shape=ellipse fontcolor=black height=0.50]
-25 [  label="" shape=ellipse fontcolor=black height=0.50]
-25 [  label="" shape=ellipse fontcolor=black height=0.50]
-26 [  label="RPAREN
-\")\"" shape=doublecircle height=0.50]
-27 [  label="statement" shape=ellipse fontcolor=black height=0.50]
-27 [  label="statement" shape=ellipse fontcolor=black height=0.50]
-28 [  label="" shape=ellipse fontcolor=black height=0.50]
-28 [  label="" shape=ellipse fontcolor=black height=0.50]
-29 [  label="root" shape=ellipse fontcolor=black height=0.50]
-29 [  label="root" shape=ellipse fontcolor=black height=0.50]
+21 [  label="statement" shape=ellipse fontcolor=black height=0.50]
+21 [  label="statement" shape=ellipse fontcolor=black height=0.50]
+22 [  label="" shape=ellipse fontcolor=black height=0.50]
+22 [  label="" shape=ellipse fontcolor=black height=0.50]
+23 [  label="root" shape=ellipse fontcolor=black height=0.50]
+23 [  label="root" shape=ellipse fontcolor=black height=0.50]
 2->0 [  arrowshape=none];
 2->1 [  arrowshape=none];
-6->5 [  arrowshape=none];
-7->6 [  arrowshape=none];
-8->7 [  arrowshape=none];
-9->3 [  arrowshape=none];
-9->4 [  arrowshape=none];
-9->8 [  arrowshape=none];
-10->9 [  arrowshape=none];
+5->3 [  arrowshape=none];
+5->4 [  arrowshape=none];
+11->10 [  arrowshape=none];
+12->11 [  arrowshape=none];
+13->12 [  arrowshape=none];
 14->13 [  arrowshape=none];
-15->14 [  arrowshape=none];
-21->17 [  arrowshape=none];
-21->18 [  arrowshape=none];
+16->8 [  arrowshape=none];
+16->9 [  arrowshape=none];
+16->14 [  arrowshape=none];
+16->15 [  arrowshape=none];
+17->16 [  arrowshape=none];
+18->17 [  arrowshape=none];
+19->18 [  arrowshape=none];
+21->6 [  arrowshape=none];
+21->7 [  arrowshape=none];
 21->19 [  arrowshape=none];
 21->20 [  arrowshape=none];
+22->2 [  arrowshape=none];
+22->5 [  arrowshape=none];
 22->21 [  arrowshape=none];
-23->15 [  arrowshape=none];
-23->16 [  arrowshape=none];
 23->22 [  arrowshape=none];
-24->23 [  arrowshape=none];
-25->24 [  arrowshape=none];
-27->11 [  arrowshape=none];
-27->12 [  arrowshape=none];
-27->25 [  arrowshape=none];
-27->26 [  arrowshape=none];
-28->2 [  arrowshape=none];
-28->10 [  arrowshape=none];
-28->27 [  arrowshape=none];
-29->28 [  arrowshape=none];
 }

@@ -10,32 +10,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="ColorfulTerminal.cs">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DoubleValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DoubleValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/StringValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/StringValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/DirectStatement.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/IfStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/IfStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/OldIf.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/OldIf.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/tree_By_init.dot" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/tree_By_init.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangSample.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangSample.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/OldLandParser/Interpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/OldLandParser/Interpreter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/OldLandParser/OldParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/OldLandParser/OldParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/OldLandParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/OldLandParser/VariateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/ColorfulTerminal.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/ColorfulTerminal.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Terminal.ws" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Terminal.ws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldLang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OldLang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Net/dll/Old8LangLib.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Net/dll/Old8LangLib.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/dll/Old8LangLib.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/dll/Old8LangLib.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldLang.App/OldLang.App.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/OldLang.App/OldLang.App.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,6 +72,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d3ec023e0c3d4c2a933de30eac3c98336e200/6b/867c741e/ThrowHelper.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3525d14275487fbeeab6166392023d993a1523b35bcd1caab2fff5ad2e5c0/GenericLexer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/69b13731f8acbba44a7d7f7b22925950371fdb21804fa6eeec99de1fe7a37fd/EBNFRecursiveDescentSyntaxParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///home/luckyfish/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///home/luckyfish/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/OldLandParser/Interpreter.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -183,6 +165,7 @@
       <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
       <option name="PROJECT_KIND" value="DotNetCore" />
       <option name="PROJECT_TFM" value="net6.0" />
+      <browser name="eb3c1d69-4466-41eb-ab60-db86c10f4b8c" />
       <method v="2">
         <option name="Build" />
       </method>
@@ -286,7 +269,7 @@
       <workItem from="1675338246954" duration="785000" />
       <workItem from="1675393662120" duration="180000" />
       <workItem from="1675559332953" duration="6647000" />
-      <workItem from="1675578662327" duration="1542000" />
+      <workItem from="1675578662327" duration="3682000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -596,7 +579,14 @@
       <option name="project" value="LOCAL" />
       <updated>1675148065425</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="ColorfulTerminal.cs">
+      <created>1675580388649</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1675580388650</updated>
+    </task>
+    <option name="localTasksCounter" value="46" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -621,7 +611,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="list &amp;&amp; dir &amp;&amp; init() in VariateManager.cs &#10;but ==,&lt;,&gt; not implement&#10;and class func" />
     <MESSAGE value="add NativeStatement.cs and ImportStatement.cs" />
     <MESSAGE value="bug" />
     <MESSAGE value="add class and list" />
@@ -646,7 +635,8 @@
     <MESSAGE value="add net" />
     <MESSAGE value="add Time" />
     <MESSAGE value="now class can use itself" />
-    <option name="LAST_COMMIT_MESSAGE" value="now class can use itself" />
+    <MESSAGE value="ColorfulTerminal.cs" />
+    <option name="LAST_COMMIT_MESSAGE" value="ColorfulTerminal.cs" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

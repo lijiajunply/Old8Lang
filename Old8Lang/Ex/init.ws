@@ -1,3 +1,3 @@
 import Terminal
-a <- "asdf"
-PrintAscii(a.GetType())
+import OS
+PrintLine(Process("neofetch"))
