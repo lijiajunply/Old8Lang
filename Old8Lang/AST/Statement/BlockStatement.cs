@@ -23,10 +23,8 @@ public class BlockStatement : OldStatement
     {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < Statements.Count; i++)
-        {
-            string a = i == 0 || i == Statements.Count-1 ? "" : "\n";
-            sb.Append(Statements[i]+a);
-        }
+            sb.Append(Statements[i]+(i == Statements.Count -1?"":"\n"));
+        
         return sb.ToString();
     }
 }

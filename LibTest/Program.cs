@@ -1,7 +1,7 @@
 ﻿using Old8LangLib;
 using File = Old8LangLib.File;
 
-
+Console.WriteLine(typeof(Math));
 Console.WriteLine(OS.OsInfo());
 Console.WriteLine(OS.Process("neofetch"));
 

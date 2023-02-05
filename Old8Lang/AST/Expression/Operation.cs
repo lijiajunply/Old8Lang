@@ -6,9 +6,11 @@ namespace Old8Lang.AST.Expression;
 
 public class Operation : OldExpr
 {
-    public OldExpr Left { get; set; }
-    public OldExpr Right { get; set; }
-    public OldTokenGeneric Oper { get; set; }
+    private OldExpr         Left  { get; set; }
+
+    private OldExpr         Right { get; set; }
+
+    private OldTokenGeneric Oper { get; set; }
     public Operation(OldExpr left, OldTokenGeneric oper, OldExpr right)
     {
         Left = left;
@@ -33,10 +35,21 @@ public class Operation : OldExpr
         if (l is AnyValue any  && Oper == OldTokenGeneric.CONCAT)
         {
             if (r is Instance r1)
-                return any.Dot(r1,r1.Ids);
-            return any.Dot(r,new List<OldExpr>());
+                return any.Dot(r1);
+            return any.Dot(r);
         }
         if (l is ListValue && Oper == OldTokenGeneric.CONCAT)
+        {
+            if (r is Instance r1)
+            {
+                List<OldExpr> values = new List<OldExpr>();
+                foreach (var id in r1.Ids)
+                    values.Add(id.Run(ref Manager));
+                r1.Ids = values;
+            }
+            return l.Dot(r);
+        }
+        if (l is NativeStaticAny && Oper == OldTokenGeneric.CONCAT)
         {
             if (r is Instance r1)
             {

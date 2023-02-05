@@ -1,3 +1,6 @@
-import Terminal
+import Math
 import OS
-PrintLine(Process("neofetch"))
+import Terminal
+a <- Math.Pow(2 2)
+PrintLine(a)
+PrintLine(OSInfo())

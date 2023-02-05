@@ -15,8 +15,7 @@ public class APIs
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < a.Count; i++)
         {
-            var b = i == 0 && a.Count == 1 || i == a.Count-1 ? "" : ",";
-            builder.Append(a[i]+b);
+            builder.Append(a[i]+(i == a.Count-1?"":" "));
         }
         return builder.ToString();
     }

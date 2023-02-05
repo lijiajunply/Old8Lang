@@ -28,7 +28,7 @@ public class AnyValue : ValueType
         return this;
     }
 
-    public ValueType Dot(OldExpr dotExpr,List<OldExpr> c)
+    public ValueType Dot(OldExpr dotExpr)
     {
         switch (dotExpr)
         {

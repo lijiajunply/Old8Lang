@@ -25,6 +25,11 @@
       "LibName" : "Time",
       "Var": 0.3,
       "IsDic": false
+    },
+    {
+      "LibName" : "Math",
+      "Var" : 0.3,
+      "IsDic": false
     }
   ],
   "Ver": "0.3.0",

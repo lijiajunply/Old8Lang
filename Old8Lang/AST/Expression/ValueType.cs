@@ -83,6 +83,10 @@ public class ValueType : OldExpr
     public virtual  object GetValue()          => Value;
     public static ValueType ObjToValue(object value)
     {
+        if (value is null)
+        {
+            return null;
+        }
         return value switch
                {
                    int a          => new IntValue(a),

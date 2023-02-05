@@ -1,6 +1,7 @@
 using System.Reflection;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Error;
 using Old8Lang.OldLandParser;
 
 namespace Old8Lang.AST.Statement;
@@ -14,7 +15,8 @@ public class NativeStatement : OldStatement
     private string METHOD_NAME { get; set; }
 
     private string NATIVE_NAME { get; set; }
-
+    
+    private string    Name      { get; set; }
     private FuncValue FuncValue { get; set; }
 
     public NativeStatement(string dllName,string className,string methodName,string? nativeName)
@@ -32,10 +34,11 @@ public class NativeStatement : OldStatement
         NATIVE_NAME = nativeName;
         FuncValue        = a.FuncValue;
     }
-    public NativeStatement(string dllName,string className)
+    public NativeStatement(string dllName,string className,string name = null)
     {
         DLL_NAME   = dllName;
         CLASS_NAME = className;
+        Name       = name;
     }
 
     public override void Run(ref VariateManager Manager)
@@ -43,6 +46,18 @@ public class NativeStatement : OldStatement
         var path       = $"{Path.GetDirectoryName(Manager.Path)}/dll/{DLL_NAME}.dll"; // filepath/dll/dllname
         var assembly   = Assembly.LoadFile(path);
         var type       = assembly.GetType($"{DLL_NAME}.{CLASS_NAME}");
+        if (Name != null)
+        {
+            type = assembly.GetType($"{Name}.{CLASS_NAME}");
+            if (type is null)
+            {
+                type = Type.GetType($"{Name}.{CLASS_NAME}");
+                if (type is null)
+                    throw new TypeError(this,this);
+            }
+            Manager.AddClassAndFunc(new NativeStaticAny(CLASS_NAME,type));
+            return;
+        }
         if (METHOD_NAME != null)
         {
             var methodInfo = type.GetMethod(METHOD_NAME);

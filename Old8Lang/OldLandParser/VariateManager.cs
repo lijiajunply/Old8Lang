@@ -92,6 +92,8 @@ public class VariateManager
                                          return any.Id.IdName == id.IdName;
                                      case NativeAnyValue na:
                                          return na.ClassName == id.IdName;
+                                     case NativeStaticAny staticAny:
+                                         return staticAny.ClassName == id.IdName;
                                      default:
                                          return false;
                                  }

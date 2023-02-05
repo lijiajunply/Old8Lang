@@ -46,7 +46,7 @@ public class Instance : ValueType
       if (result is AnyValue anyValue)
       {
          if (anyValue.Result.TryGetValue("init",out result))
-            anyValue.Dot(result,Ids);
+            anyValue.Dot(result);
          result = anyValue;
       }
       if (result is NativeAnyValue nativeAnyValue)

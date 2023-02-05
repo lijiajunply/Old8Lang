@@ -25,26 +25,38 @@ public class NativeAnyValue : ValueType
     }
     public override ValueType Dot(OldExpr dotExpr)
     {
-        ValueType result = new ValueType();
+        if (dotExpr is OldID id)
+        {
+            var prop = ClassType.GetProperty(id.IdName);
+            if (prop is null)
+            {
+                var fie = ClassType.GetField(id.IdName);
+                if (fie is null)
+                    return null;
+                return ObjToValue(fie.GetValue(null));
+            }
+            return ObjToValue(prop.GetValue(null));
+        }
         if (dotExpr is Instance instance)
         {
             var method = ClassType.GetMethod(instance.Id.IdName);
             var func   = new FuncValue(instance.Id.IdName,method);
-            result = func.Run(ref manager,instance.Ids,InstanceObj);
+            return func.Run(ref manager,instance.Ids,InstanceObj);
         }
-        return result;
+        return null;
     }
     public override ValueType Run(ref VariateManager Manager)
     {
         var assembly = Assembly.LoadFile(Path);
         ClassType   = assembly.GetType($"{DllName}.{ClassName}");
-        Constructor = ClassType.GetConstructors()[0];
+        if (ClassType.GetConstructors() is not null)
+            Constructor = ClassType.GetConstructors()[0];
         manager     = Manager.Clone();
         return this;
     }
     public void New(object[] pa)
     {
-        InstanceObj = Constructor.Invoke(pa);
+        InstanceObj = Constructor is not null ? Constructor.Invoke(pa) : Activator.CreateInstance(ClassType)!;
     }
     
 }
