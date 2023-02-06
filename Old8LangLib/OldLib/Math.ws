@@ -1,1 +1,1 @@
-[import "Old8LangLib" Math] => System
+[import "Old8LangLib" Math] => "System"

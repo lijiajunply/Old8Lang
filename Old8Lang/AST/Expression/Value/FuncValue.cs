@@ -35,7 +35,6 @@ public class FuncValue : ValueType
 
     public override ValueType Run(ref VariateManager Manager) => this;
 
-
     public ValueType Run(ref VariateManager Manager,List<OldExpr>? ids,object obj = null)
     {
         if (IsNative)

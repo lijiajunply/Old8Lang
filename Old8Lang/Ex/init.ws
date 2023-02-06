@@ -1,6 +1,7 @@
-import Math
-import OS
 import Terminal
-a <- Math.Pow(2 2)
+import Time
+import File
+import Math
+import other
+a <- fib(10)
 PrintLine(a)
-PrintLine(OSInfo())

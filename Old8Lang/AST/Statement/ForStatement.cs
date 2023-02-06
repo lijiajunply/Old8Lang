@@ -35,19 +35,15 @@ public class ForStatement : OldStatement
                 expr = (varexpr as BoolValue).Value;
             else
                 return;
-
-
             if (expr)
             {
                 ForBlockStatement.Run(ref Manager);
                 Statement.Run(ref Manager);
             }
             else
-            {
-                Manager.RemoveChildren();
                 return;
-            }
         }
+        Manager.RemoveChildren();
     }
 
     public override string ToString()

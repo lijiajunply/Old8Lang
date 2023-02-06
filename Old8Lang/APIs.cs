@@ -15,7 +15,7 @@ public class APIs
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < a.Count; i++)
         {
-            builder.Append(a[i]+(i == a.Count-1?"":" "));
+            builder.Append(a[i]+(i == a.Count-1 ? "" : " "));
         }
         return builder.ToString();
     }
@@ -37,6 +37,8 @@ public class APIs
             return new List<object>();
         if (a[0] == null)
             return new List<object>();
+
+
         return a.Select(x => x.GetValue()).ToList();
     }
 
@@ -48,7 +50,7 @@ public class APIs
 
     public static string FromDirectory(string DirectoryName)
     {
-        var builder   = new StringBuilder();
+        var builder = new StringBuilder();
         builder.Append(FromFile(DirectoryName+"/"+"init.ws"));
         return builder.ToString();
     }
@@ -58,18 +60,13 @@ public class APIs
     public static (VariateManager Manager,List<string> Error,string Time) CslyUsing(string code,bool isdir)
     {
         var a = new Interpreter(code,isdir);
-
-        
         a.Run(!isdir);
-        
-
         return (a.GetVariateManager(),a.GetError(),a.GetTime());
     }
 
     public static LangInfo ChangeBasicInfo(string import,string ver,string uri = "https://downland.old8lang.com")
     {
-        var      dictionary = new Dictionary<string,bool>() { { "OS",false }, {"Terminal",false },{"File",false} };
-        LangInfo langInfo   = new LangInfo() {LibInfos = Read_JSON().LibInfos,ImportPath = import,Ver = ver,Url = uri};
+        LangInfo langInfo = new LangInfo() { LibInfos = Read_JSON().LibInfos,ImportPath = import,Ver = ver,Url = uri };
         string   jsonString = JsonSerializer.Serialize(langInfo);
         File.WriteAllText(BasicInfo.JSONPath,jsonString);
         return langInfo;

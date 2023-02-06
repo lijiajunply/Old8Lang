@@ -11,25 +11,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/NativeStaticAny.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/TypeError.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8LangLib/MoreMath.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Math.ws" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LibTest/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LibTest/Program.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/APIs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/APIs.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/NativeAnyValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/NativeAnyValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/NativeStaticAny.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/NativeStaticAny.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/other.ws" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/other.ws" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/tree_By_init.dot" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/tree_By_init.dot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangInfo.json" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangInfo.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangSample.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangSample.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/OldLandParser/OldParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/OldLandParser/OldParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/OldLandParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/OldLandParser/VariateManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/File.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/FileLib.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/File.ws" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/File.ws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Math.ws" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Math.ws" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Net/dll/Old8LangLib.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Net/dll/Old8LangLib.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/dll/Old8LangLib.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/dll/Old8LangLib.dll" afterDir="false" />
     </list>
@@ -59,6 +55,7 @@
     </option>
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8ddc693f0d924df185ef87b81b654b0294de00/5a/f213f7f1/ThrowHelper.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8ddc693f0d924df185ef87b81b654b0294de00/67/67708e9d/RuntimeMethodInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8ddc693f0d924df185ef87b81b654b0294de00/7f/e7c33f86/CastHelpers.cs" root0="SKIP_HIGHLIGHTING" />
@@ -78,6 +75,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/52/8cb8cfe0/ValueStringBuilder.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/54/ae914792/HashHelpers.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/61/b73ef831/Buffer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/6a/53d12a8c/RuntimeType.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/7e/3eef4e5b/RuntimeResourceSet.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/91/0d758bd6/NonRandomizedStringEqualityComparer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/92e77bfce94d4da49dcf31dd8a1fe5a494de00/94/ddebd456/StringBuilder.cs" root0="SKIP_HIGHLIGHTING" />
@@ -284,7 +282,8 @@
       <workItem from="1675393662120" duration="180000" />
       <workItem from="1675559332953" duration="6647000" />
       <workItem from="1675578662327" duration="4173000" />
-      <workItem from="1675586136104" duration="5799000" />
+      <workItem from="1675586136104" duration="8403000" />
+      <workItem from="1675664917408" duration="2625000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -608,7 +607,14 @@
       <option name="project" value="LOCAL" />
       <updated>1675582814609</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="add NativeStaticAny.cs">
+      <created>1675592350285</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1675592350285</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -633,7 +639,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="bug" />
     <MESSAGE value="add class and list" />
     <MESSAGE value="func bug" />
     <MESSAGE value="add lib" />
@@ -658,7 +663,8 @@
     <MESSAGE value="now class can use itself" />
     <MESSAGE value="ColorfulTerminal.cs" />
     <MESSAGE value="vs debug" />
-    <option name="LAST_COMMIT_MESSAGE" value="vs debug" />
+    <MESSAGE value="add NativeStaticAny.cs" />
+    <option name="LAST_COMMIT_MESSAGE" value="add NativeStaticAny.cs" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -690,46 +696,26 @@
           <option name="timeStamp" value="24" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncValue.cs</url>
-          <line>43</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncValue.cs" initialLine="43" containingFunctionPresentation="method 'Run'">
-            <startOffsets>
-              <option value="1091" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1116" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="35" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncValue.cs</url>
-          <line>44</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncValue.cs" initialLine="44" containingFunctionPresentation="method 'Run'">
-            <startOffsets>
-              <option value="1133" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1167" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="36" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs</url>
-          <line>31</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" initialLine="31" containingFunctionPresentation="method 'Run'">
+          <line>63</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" initialLine="63" containingFunctionPresentation="method 'Run'">
             <startOffsets>
-              <option value="958" />
+              <option value="2006" />
             </startOffsets>
             <endOffsets>
-              <option value="972" />
+              <option value="2022" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="37" />
+          <option name="timeStamp" value="31" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="Type#Old8Lang.AST.Expression.OldID" memberName="IdName" />
+        <PinnedItemInfo parentTag="Type#Old8Lang.AST.Expression.Value.IntValue" memberName="Value" />
+      </pinned-members>
+    </pin-to-top-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

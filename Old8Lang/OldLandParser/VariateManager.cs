@@ -65,14 +65,20 @@ public class VariateManager
 
     public void AddChildren()
     {
-        ChildrenNum.Add(Count+1);
+        ChildrenNum.Add(Int32.Parse(Count.ToString()));
     }
 
     public void RemoveChildren()
     {
-        for (; Count >= ChildrenNum.Last(); Count--)
-            Variates.Remove(Variates.Keys.ToList()[Count]);
-        ChildrenNum.RemoveAt(ChildrenNum.Count-1);
+        var num = ChildrenNum[^1];
+        
+        while (Count > num)
+        {
+            var a = Variates.Keys.ToList();
+            Count--;
+            Variates.Remove(a[Count]);
+        }
+        ChildrenNum.Remove(ChildrenNum[^1]);
         GarbageCollection();
     }
 

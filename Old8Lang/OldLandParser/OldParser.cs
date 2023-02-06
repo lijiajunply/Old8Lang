@@ -242,9 +242,9 @@ public class OldParser
                               Token<OldTokenGeneric> methodName,Token<OldTokenGeneric>? token) =>
         new NativeStatement(dllName.Value[1..^1],className.Value,methodName.Value,token!.Value){Position = dllName.Position};
 
-    [Production("statement:L_BRACKET[d] IMPORT[d] STRING IDENTIFIER R_BRACKET[d] LAMBDA[d] IDENTIFIER")]
+    [Production("statement:L_BRACKET[d] IMPORT[d] STRING IDENTIFIER R_BRACKET[d] LAMBDA[d] STRING")]
     public OldLangTree NativeStatic(Token<OldTokenGeneric> dll,Token<OldTokenGeneric> classname,Token<OldTokenGeneric> _namespace) => 
-        new NativeStatement(dll.Value[1..^1],classname.Value,_namespace.Value);
+        new NativeStatement(dll.Value[1..^1],classname.Value,_namespace.Value[1..^1]);
 
     [Production("statement:L_BRACKET[d] IMPORT[d] STRING IDENTIFIER R_BRACKET[d]")]
     public OldLangTree NativeClass(Token<OldTokenGeneric> dllname,Token<OldTokenGeneric> classname) =>
