@@ -19,7 +19,7 @@ public class ImportStatement : OldStatement
             var b = Manager.LangInfo.LibInfos.Where(x => x.LibName == ImportString).Select(x => x.IsDir).ToArray()[0];
             var path = Manager.LangInfo.ImportPath+ImportString+(b?"":".ws");
             var a    = new Interpreter(path,b,Manager.LangInfo);
-            a.Run();
+            a.ParserRun();
             var manager = a.GetVariateManager();
             foreach (var valueType in manager.AnyInfo)
                 Manager.AddClassAndFunc(valueType);
@@ -30,7 +30,7 @@ public class ImportStatement : OldStatement
             var b = Manager.LangInfo.LibInfos.Where(x => x.LibName == ImportString).Select(x => x.IsDir).ToArray()[0];
             var path = Manager.LangInfo.ImportPath+ImportString+".ws";
             var a    = new Interpreter(path,b,Manager.LangInfo);
-            a.Run();
+            a.ParserRun();
             var manager = a.GetVariateManager();
             foreach (var valueType in manager.AnyInfo)
                 Manager.AddClassAndFunc(valueType);
@@ -40,7 +40,7 @@ public class ImportStatement : OldStatement
         if (File.Exists(dic+"/"+ImportString+".ws"))
         {
             var a = new Interpreter(dic+"/"+ImportString+".ws",false,Manager.LangInfo);
-            a.Run();
+            a.ParserRun();
             var manager = a.GetVariateManager();
             foreach (var valueType in manager.AnyInfo)
             {
@@ -58,5 +58,5 @@ public class ImportStatement : OldStatement
         
     }
 
-    public override string ToString() => $"import {ImportString}";
+    public override string ToString() => $"using {ImportString}";
 }

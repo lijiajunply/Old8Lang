@@ -219,7 +219,7 @@ public class OldParser
     {
         var c = new Dictionary<OldID,OldExpr>();
         statements.Statements.ForEach(x => c.Add(GetTuple(x).id,GetTuple(x).Expr));
-        return new OldClassInit(new AnyValue(new OldID(id.Value),c)){Position = id.Position};
+        return new ClassInit(new AnyValue(new OldID(id.Value),c)){Position = id.Position};
     }
 
     [Production("statement: IDENTIFIER LPAREN[d] OldParser_expressions* RPAREN[d]")]

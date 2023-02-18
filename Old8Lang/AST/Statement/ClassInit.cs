@@ -3,10 +3,10 @@ using Old8Lang.OldLandParser;
 
 namespace Old8Lang.AST.Statement;
 
-public class OldClassInit : OldStatement
+public class ClassInit : OldStatement
 {
     private AnyValue AnyValue { get; set; }
-    public OldClassInit(AnyValue anyValue)
+    public ClassInit(AnyValue anyValue)
     {
         AnyValue = anyValue;
     }

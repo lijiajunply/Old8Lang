@@ -40,5 +40,5 @@ public class IfStatement : OldStatement
             ElseBlockStatement.Run(ref Manager);
         }
     }
-    public override string ToString() => $"if: {IfBlock}elif: {APIs.ListToString(ElifBlock)} \nelse: {ElseBlockStatement}";
+    public override string ToString() => $"if({IfBlock} else if{APIs.ListToString(ElifBlock)} \nelse: {ElseBlockStatement}";
 }

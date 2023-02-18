@@ -42,5 +42,5 @@ public class WhileStatement : OldStatement
             }
         }
     }
-    public override string ToString() => $"while({Expr})"+"{"+$"{BlockStatement}"+"}";
+    public override string ToString() => $"while({Expr}){BlockStatement}";
 }

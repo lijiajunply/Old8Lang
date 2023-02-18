@@ -3,6 +3,11 @@ using System.Text;
 using System.Text.Json;
 using Old8Lang.OldLandParser;
 using ValueType = Old8Lang.AST.Expression.ValueType;
+using System.CodeDom.Compiler;
+using Microsoft.CSharp;
+using System.Reflection;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Old8Lang;
 
@@ -57,11 +62,44 @@ public class APIs
 
     #endregion
 
-    public static (VariateManager Manager,List<string> Error,string Time) CslyUsing(string code,bool isdir)
+    public static (VariateManager Manager,List<string> Error,string Time) CslyUsing(string path,bool isdir)
+    {
+        var a = new Interpreter(path,isdir);
+        a.ParserRun(!isdir);
+        return (a.GetVariateManager(),a.GetError(),a.GetTime());
+    }
+    
+    public static void CslyRun(string code,bool isdir)
     {
         var a = new Interpreter(code,isdir);
-        a.Run(!isdir);
-        return (a.GetVariateManager(),a.GetError(),a.GetTime());
+        var b = a.Build();
+        var s = b.ToCode();
+        var assembly = Compile(s, Assembly.Load(new AssemblyName("System.Runtime")), typeof(object).Assembly);
+        var personType = assembly.GetType("Project");
+        if (personType != null)
+        {
+            var method = personType.GetMethod("Main");
+            var result = method.Invoke(null,null); // fan
+        }
+    }
+    
+    public static Assembly Compile(string text,params Assembly[] referencedAssemblies)
+    {
+        var       references        = referencedAssemblies.Select(it => MetadataReference.CreateFromFile(it.Location));
+        var       options           = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
+        var       assemblyName      = "_"+ Guid.NewGuid().ToString("D");
+        var       syntaxTrees       = new SyntaxTree[] { CSharpSyntaxTree.ParseText(text) };
+        var       compilation       = CSharpCompilation.Create(assemblyName,syntaxTrees,references,options);
+        using var stream            = new MemoryStream();
+        var       compilationResult = compilation.Emit(stream);
+        if (compilationResult.Success)
+        {
+            stream.Seek(0,SeekOrigin.Begin);
+            return Assembly.Load(stream.ToArray());
+        }
+        throw new InvalidOperationException("Compilation error");
+
+
     }
 
     public static LangInfo ChangeBasicInfo(string import,string ver,string uri = "https://downland.old8lang.com")

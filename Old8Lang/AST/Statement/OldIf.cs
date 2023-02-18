@@ -29,5 +29,5 @@ public class OldIf : OldStatement
         }
     }
 
-    public override string ToString() => $"{Expr} : {BlockStatement}";
+    public override string ToString() => $"({Expr})\n{BlockStatement}";
 }

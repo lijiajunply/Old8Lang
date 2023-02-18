@@ -30,7 +30,7 @@ public class Instance : ValueType
             if (Ids[0] is StringValue stringValue)
             {
                Interpreter i = new Interpreter(stringValue.Value,Manager.Clone());
-               i.Run();
+               i.ParserRun();
                VariateManager manager = i.GetVariateManager();
                foreach (var type in manager.Output())
                   Manager.Set(new OldID(type.Key),type.Value);
