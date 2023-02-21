@@ -1,43 +1,46 @@
 digraph syntaxtree {
-0 [  label="IMPORT
-\"import\"" shape=doublecircle height=0.50]
-1 [  label="IDENTIFIER
-\"Terminal\"" shape=doublecircle height=0.50]
-2 [  label="statement" shape=ellipse fontcolor=black height=0.50]
-2 [  label="statement" shape=ellipse fontcolor=black height=0.50]
-3 [  label="IDENTIFIER
-\"PrintLine\"" shape=doublecircle height=0.50]
-4 [  label="LPAREN
-\"(\"" shape=doublecircle height=0.50]
-5 [  label="STRING
-\"\"asdf\"\"" shape=doublecircle height=0.50]
-6 [  label="primary" shape=ellipse fontcolor=black height=0.50]
-6 [  label="primary" shape=ellipse fontcolor=black height=0.50]
-7 [  label="operand" shape=ellipse fontcolor=black height=0.50]
-7 [  label="operand" shape=ellipse fontcolor=black height=0.50]
-8 [  label="OldParser_expressions" shape=ellipse fontcolor=black height=0.50]
-8 [  label="OldParser_expressions" shape=ellipse fontcolor=black height=0.50]
-9 [  label="" shape=ellipse fontcolor=black height=0.50]
-9 [  label="" shape=ellipse fontcolor=black height=0.50]
-10 [  label="RPAREN
-\")\"" shape=doublecircle height=0.50]
-11 [  label="statement" shape=ellipse fontcolor=black height=0.50]
-11 [  label="statement" shape=ellipse fontcolor=black height=0.50]
-12 [  label="" shape=ellipse fontcolor=black height=0.50]
-12 [  label="" shape=ellipse fontcolor=black height=0.50]
-13 [  label="root" shape=ellipse fontcolor=black height=0.50]
-13 [  label="root" shape=ellipse fontcolor=black height=0.50]
-2->0 [  arrowshape=none];
-2->1 [  arrowshape=none];
-6->5 [  arrowshape=none];
+0 [  label="IDENTIFIER
+\"a\"" shape=doublecircle height=0.50]
+1 [  label="SET
+\"<-\"" shape=doublecircle height=0.50]
+2 [  label="INT
+\"1\"" shape=doublecircle height=0.50]
+3 [  label="primary" shape=ellipse fontcolor=black height=0.50]
+3 [  label="primary" shape=ellipse fontcolor=black height=0.50]
+4 [  label="operand" shape=ellipse fontcolor=black height=0.50]
+4 [  label="operand" shape=ellipse fontcolor=black height=0.50]
+5 [  label="PLUS
+\"+\"" shape=doublecircle height=0.50]
+6 [  label="INT
+\"1\"" shape=doublecircle height=0.50]
+7 [  label="primary" shape=ellipse fontcolor=black height=0.50]
+7 [  label="primary" shape=ellipse fontcolor=black height=0.50]
+8 [  label="operand" shape=ellipse fontcolor=black height=0.50]
+8 [  label="operand" shape=ellipse fontcolor=black height=0.50]
+9 [  label="expr_20_PLUS_MINUS" shape=ellipse fontcolor=black height=0.50]
+9 [  label="expr_20_PLUS_MINUS" shape=ellipse fontcolor=black height=0.50]
+10 [  label="OldParser_expressions" shape=ellipse fontcolor=black height=0.50]
+10 [  label="OldParser_expressions" shape=ellipse fontcolor=black height=0.50]
+11 [  label="set" shape=ellipse fontcolor=black height=0.50]
+11 [  label="set" shape=ellipse fontcolor=black height=0.50]
+12 [  label="statement" shape=ellipse fontcolor=black height=0.50]
+12 [  label="statement" shape=ellipse fontcolor=black height=0.50]
+13 [  label="" shape=ellipse fontcolor=black height=0.50]
+13 [  label="" shape=ellipse fontcolor=black height=0.50]
+14 [  label="root" shape=ellipse fontcolor=black height=0.50]
+14 [  label="root" shape=ellipse fontcolor=black height=0.50]
+3->2 [  arrowshape=none];
+4->3 [  arrowshape=none];
 7->6 [  arrowshape=none];
 8->7 [  arrowshape=none];
+9->4 [  arrowshape=none];
+9->5 [  arrowshape=none];
 9->8 [  arrowshape=none];
-11->3 [  arrowshape=none];
-11->4 [  arrowshape=none];
-11->9 [  arrowshape=none];
+10->9 [  arrowshape=none];
+11->0 [  arrowshape=none];
+11->1 [  arrowshape=none];
 11->10 [  arrowshape=none];
-12->2 [  arrowshape=none];
 12->11 [  arrowshape=none];
 13->12 [  arrowshape=none];
+14->13 [  arrowshape=none];
 }

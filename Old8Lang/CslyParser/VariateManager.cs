@@ -5,7 +5,7 @@ using Old8Lang.AST.Expression.Value;
 using String = System.String;
 using ValueType = Old8Lang.AST.Expression.ValueType;
 
-namespace Old8Lang.OldLandParser;
+namespace Old8Lang.CslyParser;
 
 public class VariateManager
 {

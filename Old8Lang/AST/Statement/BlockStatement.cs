@@ -1,5 +1,5 @@
 using System.Text;
-using Old8Lang.OldLandParser;
+using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Statement;
 /// <summary>
@@ -51,21 +51,13 @@ public class BlockStatement : OldStatement
         var           import = ImportStatements.OfType<ImportStatement>().ToList();
         var           func   = ImportStatements.Where(x => x is ClassInit or FuncInit).ToList();
         foreach (var importStatement in import)
-        {
-            sb.Append(importStatement+"\n");
-        }
-        sb.Append("namespace Code\n{\n");
+            sb.Append(importStatement);
         foreach (var statement in func)
-        {
-            sb.Append(statement+"\n");
-        }
-        sb.Append($"class Project{{\n{{\npublic void Main()\n{{\n");
+            sb.Append(statement);
+        sb.Append($"class Project{{public void Main(){{");
         foreach (var statement in OtherStatements)
-        {
-            sb.Append(statement+"\n");
-        }
-        sb.Append("}");
-        sb.Append("\n}");
+            sb.Append(statement);
+        sb.Append("}}");
         return sb.ToString();
     }
 }

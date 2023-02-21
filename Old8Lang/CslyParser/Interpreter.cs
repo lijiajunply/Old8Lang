@@ -1,12 +1,11 @@
 using System.Diagnostics;
 using Old8Lang.AST;
 using Old8Lang.AST.Statement;
-using sly.lexer;
 using sly.parser;
 using sly.parser.generator;
 using sly.parser.generator.visitor;
 
-namespace Old8Lang.OldLandParser;
+namespace Old8Lang.CslyParser;
 
 public class Interpreter
 {

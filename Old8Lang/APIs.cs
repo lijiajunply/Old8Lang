@@ -1,13 +1,16 @@
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
-using Old8Lang.OldLandParser;
 using ValueType = Old8Lang.AST.Expression.ValueType;
 using System.CodeDom.Compiler;
 using Microsoft.CSharp;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.Extensions.DependencyModel;
+using Old8Lang.AST.Statement;
+using Old8Lang.CslyParser;
 
 namespace Old8Lang;
 
@@ -65,41 +68,20 @@ public class APIs
     public static (VariateManager Manager,List<string> Error,string Time) CslyUsing(string path,bool isdir)
     {
         var a = new Interpreter(path,isdir);
-        a.ParserRun(!isdir);
+        a.ParserRun(true);
         return (a.GetVariateManager(),a.GetError(),a.GetTime());
     }
-    
-    public static void CslyRun(string code,bool isdir)
-    {
-        var a = new Interpreter(code,isdir);
-        var b = a.Build();
-        var s = b.ToCode();
-        var assembly = Compile(s, Assembly.Load(new AssemblyName("System.Runtime")), typeof(object).Assembly);
-        var personType = assembly.GetType("Project");
-        if (personType != null)
-        {
-            var method = personType.GetMethod("Main");
-            var result = method.Invoke(null,null); // fan
-        }
-    }
-    
-    public static Assembly Compile(string text,params Assembly[] referencedAssemblies)
-    {
-        var       references        = referencedAssemblies.Select(it => MetadataReference.CreateFromFile(it.Location));
-        var       options           = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
-        var       assemblyName      = "_"+ Guid.NewGuid().ToString("D");
-        var       syntaxTrees       = new SyntaxTree[] { CSharpSyntaxTree.ParseText(text) };
-        var       compilation       = CSharpCompilation.Create(assemblyName,syntaxTrees,references,options);
-        using var stream            = new MemoryStream();
-        var       compilationResult = compilation.Emit(stream);
-        if (compilationResult.Success)
-        {
-            stream.Seek(0,SeekOrigin.Begin);
-            return Assembly.Load(stream.ToArray());
-        }
-        throw new InvalidOperationException("Compilation error");
 
-
+    public static void RunTask(BlockStatement statement)
+    {
+        string             code           = statement.ToCode();
+        CSharpCodeProvider codeProvider   = new CSharpCodeProvider();
+        CompilerParameters compParameters = new CompilerParameters();
+        // Compile the code
+        CompilerResults res = codeProvider.CompileAssemblyFromSource(compParameters,code);
+        // Create a new instance of the class 'MyClass'　　　　// 有命名空间的，需要命名空间.类名
+        object myClass = res.CompiledAssembly.CreateInstance("Project");
+        myClass.GetType().GetMethod("Main").Invoke(myClass,null);
     }
 
     public static LangInfo ChangeBasicInfo(string import,string ver,string uri = "https://downland.old8lang.com")

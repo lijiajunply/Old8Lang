@@ -6,7 +6,7 @@ using sly.lexer;
 using sly.parser.generator;
 using sly.parser.parser;
 
-namespace Old8Lang.OldLandParser;
+namespace Old8Lang.CslyParser;
 
 [ParserRoot("root")]
 public class OldParser

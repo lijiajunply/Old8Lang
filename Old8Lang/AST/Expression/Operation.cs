@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.OldLandParser;
+using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression;
 
@@ -18,7 +18,16 @@ public class Operation : OldExpr
         Right = right;
     }
 
-    public override string ToString() => $"{Left} {Oper} {Right}";
+    public string OperToString()
+    {
+        if (Oper == OldTokenGeneric.PLUS)
+        {
+            return "+";
+        }
+        return "";
+    }
+
+    public override string ToString() => $"{Left} {OperToString()} {Right}";
 
     public override ValueType Run(ref VariateManager Manager)
     {

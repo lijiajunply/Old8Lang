@@ -1,6 +1,6 @@
 using sly.lexer;
 
-namespace Old8Lang.OldLandParser;
+namespace Old8Lang.CslyParser;
 
 [Lexer(IndentationAWare = true)]
 public enum OldTokenGeneric
