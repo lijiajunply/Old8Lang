@@ -3,6 +3,8 @@
         xmlns:vm="using:OldStudio.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:avaloniaGraphControl="clr-namespace:AvaloniaGraphControl;assembly=AvaloniaGraphControl"
+        xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldStudio.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -13,6 +15,15 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-
+    <Grid RowDefinitions="Auto,*">
+        <avaloniaGraphControl:GraphPanel Grid.Row="0" 
+            Graph="{Binding MyGraph}"
+            Zoom="1.2" 
+            LayoutMethod="SugiyamaScheme" />
+        
+        <avaloniaEdit:TextEditor Grid.Row="1"
+                                 ShowLineNumbers="True"
+                                 FontFamily="Cascadia Code,Consolas,Menlo,Monospace"/>
+    </Grid>
+   
 </Window>

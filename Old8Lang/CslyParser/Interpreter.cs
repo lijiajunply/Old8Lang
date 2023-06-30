@@ -4,6 +4,7 @@ using Old8Lang.AST.Statement;
 using sly.parser;
 using sly.parser.generator;
 using sly.parser.generator.visitor;
+using sly.parser.generator.visitor.dotgraph;
 
 namespace Old8Lang.CslyParser;
 
@@ -22,7 +23,8 @@ public class Interpreter
 
     private string Time { get; set; }
     private double DoubleTime { get; set; }
-
+    
+    public DotGraph Graph { get; set; }
     #endregion
     
     
@@ -52,12 +54,12 @@ public class Interpreter
         Code = isDir ? Apis.FromDirectory(path) : Apis.FromFile(path);
     }
 
-    public void ParserRun(bool Dot = false)
+    public void ParserRun(bool dot = false)
     {
         Stopwatch sw = new Stopwatch();
         sw.Start();
         Manager.LangInfo ??= Apis.ReadJson();
-        Block = Build(Dot);
+        Block = Build(dot);
         sw.Stop();
         TimeSpan ts = sw.Elapsed;
         Time += $"Parser Build Time : {ts.TotalMilliseconds}ms\n";
@@ -92,13 +94,10 @@ public class Interpreter
 
     public void Dot(ParseResult<OldTokenGeneric, OldLangTree> result)
     {
-        string dic = Path.GetDirectoryName(Manager.Path)!;
-        var path = dic + $"/tree_By_{Path.GetFileNameWithoutExtension(Manager.Path)}.dot";
         var tree = result.SyntaxTree;
         var graphviz = new GraphVizEBNFSyntaxTreeVisitor<OldTokenGeneric>();
         graphviz.VisitTree(tree);
-        var graph = graphviz.Graph.Compile();
-        File.WriteAllText(path, graph);
+        Graph = graphviz.Graph;
     }
 
     public string GetTime() => Time;
