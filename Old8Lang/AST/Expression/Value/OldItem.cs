@@ -4,11 +4,11 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class OldItem : ValueType
 {
-    private OldID   ListID { get; set; }
+    private OldID ListID { get; set; }
 
     private OldExpr Key { get; set; }
 
-    public OldItem(OldID listId , OldExpr key)
+    public OldItem(OldID listId, OldExpr key)
     {
         ListID = listId;
         Key = key;
@@ -28,6 +28,7 @@ public class OldItem : ValueType
             var keyResult = result as ValueType;
             return dir.Get(keyResult);
         }
+
         return null;
     }
 

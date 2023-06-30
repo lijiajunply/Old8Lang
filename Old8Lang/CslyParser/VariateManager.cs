@@ -9,114 +9,126 @@ namespace Old8Lang.CslyParser;
 
 public class VariateManager
 {
-    public LangInfo LangInfo { get; set; }
+    #region Lang
 
+    public LangInfo LangInfo { get; set; }
     public string Path { get; set; } = String.Empty;
+
+    #endregion
+
+    #region Variate
+
+    private Dictionary<string, ValueType> Variates { get; set; }
+
+    public List<ValueType> AnyInfo { get; set; }
+
+    #endregion
+
+    #region Return
+
+    public bool IsReturn { get; set; }
+    public ValueType Result { get; set; }
+
+    #endregion
+
+    #region Block
 
     private int Count { get; set; }
 
-
     private List<int> ChildrenNum { get; set; }
-
-    private Dictionary<string,ValueType> Variates { get; set; }
-
-    public bool IsReturn { get; set; }
-
-    public ValueType Result { get; set; }
 
     public bool IsClass { get; set; }
 
-    public List<ValueType> AnyInfo { get; set; }
+    #endregion
+
 
     public VariateManager()
     {
         ChildrenNum = new List<int>();
-        Variates    = new Dictionary<string,ValueType>();
-        IsReturn    = false;
-        Result      = new IntValue(0);
-        IsClass     = false;
-        AnyInfo     = new List<ValueType>();
+        Variates = new Dictionary<string, ValueType>();
+        IsReturn = false;
+        Result = new IntValue(0);
+        IsClass = false;
+        AnyInfo = new List<ValueType>();
     }
 
-    public ValueTuple<OldID,OldExpr> Set(OldID id,ValueType valueType)
+    public ValueTuple<OldID, OldExpr> Set(OldID id, ValueType valueType)
     {
         var a1 = GetValue(id);
-        if (a1 is null)
+        if (a1 == null)
         {
             //init
             var a = valueType;
-            Variates.Add(id.IdName,valueType);
+            Variates.Add(id.IdName, valueType);
             Count++;
-            return (id,a);
+            return (id, a);
         }
-        else
-        {
-            //reset
-            Variates[id.IdName] = valueType;
-        }
-        return (id,valueType);
+        
+        //reset
+        Variates[id.IdName] = valueType;
+
+        return (id, valueType);
     }
 
 
     private void GarbageCollection()
     {
-
     }
 
     public void AddChildren()
     {
-        ChildrenNum.Add(Int32.Parse(Count.ToString()));
+        ChildrenNum.Add(int.Parse(Count.ToString()));
     }
 
     public void RemoveChildren()
     {
         var num = ChildrenNum[^1];
-        
+
         while (Count > num)
         {
             var a = Variates.Keys.ToList();
             Count--;
             Variates.Remove(a[Count]);
         }
+
         ChildrenNum.Remove(ChildrenNum[^1]);
         GarbageCollection();
     }
 
     public ValueType GetValue(OldID id)
     {
-        foreach (var key in Variates.Keys)
-            if (key == id.IdName)
-                return Variates[id.IdName];
+        if (Variates.Keys.Any(key => key == id.IdName))
+            return Variates[id.IdName];
 
         var b = AnyInfo.Find(x =>
-                             {
-                                 switch (x)
-                                 {
-                                     case FuncValue func:
-                                         return func.Id.IdName == id.IdName;
-                                     case AnyValue any:
-                                         return any.Id.IdName == id.IdName;
-                                     case NativeAnyValue na:
-                                         return na.ClassName == id.IdName;
-                                     case NativeStaticAny staticAny:
-                                         return staticAny.ClassName == id.IdName;
-                                     default:
-                                         return false;
-                                 }
-                             });
-        return b;
+        {
+            return x switch
+            {
+                FuncValue func => func.Id.IdName == id.IdName,
+                AnyValue any => any.Id.IdName == id.IdName,
+                NativeAnyValue na => na.ClassName == id.IdName,
+                NativeStaticAny staticAny => staticAny.ClassName == id.IdName,
+                _ => false
+            };
+        });
+        return b!;
     }
+
+    #region Init
 
     public void Init()
     {
-        Variates = new Dictionary<string,ValueType>();
+        Variates = new Dictionary<string, ValueType>();
     }
 
-    public void Init(Dictionary<string,ValueType> values)
+    public void Init(Dictionary<string, ValueType> values)
     {
         Variates = values;
-        Count    = values.Count;
+        Count = values.Count;
     }
+
+    #endregion
+
 
     public void AddClassAndFunc(ValueType valueType) => AnyInfo.Add(valueType);
 
@@ -126,12 +138,12 @@ public class VariateManager
     {
         StringBuilder builder = new StringBuilder();
         foreach (var variate in Variates)
-            builder.Append(" "+variate.Key+"=>"+variate.Value+" ");
-        builder.Append("\n");
+            builder.Append(" " + variate.Key + "=>" + variate.Value + " ");
+        builder.Append('\n');
         foreach (var variable in AnyInfo)
-            builder.Append(variable+"\n");
+            builder.Append(variable + "\n");
         return builder.ToString();
     }
 
-    public Dictionary<string,ValueType> Output() => Variates;
+    public Dictionary<string, ValueType> Output() => Variates;
 }

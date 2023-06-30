@@ -1,5 +1,5 @@
 {
-  "ImportPath": "/home/luckyfish/RiderProjects/Old8Lang/Old8LangLib/OldLib/",
+  "ImportPath": "",
   "LibInfos": [
     {
       "LibName": "OS",
@@ -22,13 +22,13 @@
       "IsDir": true
     },
     {
-      "LibName" : "Time",
+      "LibName": "Time",
       "Var": 0.3,
       "IsDic": false
     },
     {
-      "LibName" : "Math",
-      "Var" : 0.3,
+      "LibName": "Math",
+      "Var": 0.3,
       "IsDic": false
     }
   ],

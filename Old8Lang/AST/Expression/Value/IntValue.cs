@@ -5,6 +5,7 @@ public class IntValue : ValueType
     public new int Value { get; set; }
     public IntValue(int intValue) => Value = intValue;
     public override string ToString() => Value.ToString();
+
     public override ValueType Plus(ValueType otherValueType)
     {
         if (otherValueType is StringValue)
@@ -50,13 +51,15 @@ public class IntValue : ValueType
         return new ValueType();
     }
 
-    public override bool Less(ValueType?    otherValue) => Value < Int32.Parse(otherValue.ToString());
+    public override bool Less(ValueType? otherValue) => Value < Int32.Parse(otherValue.ToString());
     public override bool Greater(ValueType? otherValue) => Value > Int32.Parse(otherValue.ToString());
+
     public override bool Equal(ValueType otherValueType)
     {
         if (otherValueType is IntValue b)
             return Value == b.Value;
         return false;
     }
+
     public override object GetValue() => Value;
 }

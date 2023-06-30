@@ -5,7 +5,7 @@ namespace Old8Lang.AST.Statement;
 
 public class OldIf : OldStatement
 {
-    private OldExpr        Expr           { get; set; }
+    private OldExpr Expr { get; set; }
 
     private BlockStatement BlockStatement { get; set; }
 
@@ -15,11 +15,11 @@ public class OldIf : OldStatement
         BlockStatement = blockStatement;
     }
 
-    public void Run(ref VariateManager Manager,ref bool r)
+    public void Run(ref VariateManager Manager, ref bool r)
     {
         if (r == false) return;
-        var exprvalue = Expr.Run(ref Manager);
-        if (exprvalue is BoolValue value)
+        var exprValue = Expr.Run(ref Manager);
+        if (exprValue is BoolValue value)
         {
             if (value.Value)
             {

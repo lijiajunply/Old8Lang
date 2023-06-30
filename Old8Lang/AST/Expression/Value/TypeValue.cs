@@ -4,11 +4,11 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class TypeValue : ValueType
 {
-    private     OldExpr Expr  { get; set; }
-    private new string  Value { get; set; }
+    private OldExpr Expr { get; set; }
+    private new string Value { get; set; }
 
     public TypeValue(OldExpr expr) => Expr = expr;
-    public TypeValue(string  value) => Value = value;
+    public TypeValue(string value) => Value = value;
 
     public override ValueType Run(ref VariateManager Manager)
     {
@@ -16,6 +16,7 @@ public class TypeValue : ValueType
         Value = result.TypeToString();
         return this;
     }
+
     public override string ToString() => Value;
     public override object GetValue() => Value;
 }

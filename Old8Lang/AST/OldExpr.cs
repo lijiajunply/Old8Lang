@@ -4,6 +4,7 @@ using sly.lexer;
 using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.AST;
+
 /// <summary>
 /// expr ::= id compare value 
 /// </summary>

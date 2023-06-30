@@ -2,6 +2,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Statement;
+
 /// <summary>
 /// while语句
 /// </summary>
@@ -31,6 +32,7 @@ public class WhileStatement : OldStatement
             {
                 return;
             }
+
             if (expr)
             {
                 BlockStatement.Run(ref Manager);
@@ -42,5 +44,6 @@ public class WhileStatement : OldStatement
             }
         }
     }
+
     public override string ToString() => $"while({Expr}){BlockStatement}";
 }

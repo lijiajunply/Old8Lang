@@ -4,17 +4,18 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class AnyValue : ValueType
 {
-    public Dictionary<OldID,OldExpr>  Variates { get; set; }
-    public Dictionary<string,ValueType> Result   { get; set; }
-    public OldID                      Id       { get; set; }
+    public Dictionary<OldID, OldExpr> Variates { get; set; }
+    public Dictionary<string, ValueType> Result { get; set; }
+    public OldID Id { get; set; }
 
     public VariateManager manager;
-    public AnyValue(OldID id, Dictionary<OldID,OldExpr> variates)
+
+    public AnyValue(OldID id, Dictionary<OldID, OldExpr> variates)
     {
-        Variates = variates; 
-        Id       = id;
-        Result   = new Dictionary<string,ValueType>();
-        manager  = new VariateManager();
+        Variates = variates;
+        Id = id;
+        Result = new Dictionary<string, ValueType>();
+        manager = new VariateManager();
         Run(ref manager);
         manager.Init(Result);
         manager.IsClass = true;
@@ -24,7 +25,7 @@ public class AnyValue : ValueType
     {
         manager.AnyInfo = Manager.AnyInfo.Where(x => x is not FuncValue).ToList();
         foreach (var variable in Variates.Keys)
-            Result.Add(variable.IdName,Variates[variable].Run(ref Manager));
+            Result.Add(variable.IdName, Variates[variable].Run(ref Manager));
         return this;
     }
 
@@ -49,9 +50,11 @@ public class AnyValue : ValueType
                 return dotExpr.Run(ref manager);
         }
     }
-    public void Set(OldID id,ValueType valueType) => manager.Set(id,valueType);
 
-    public override string ToString() => $"class {Id} "+"{"+"\n{manager}"+"\n}";
+    public void Set(OldID id, ValueType valueType) => manager.Set(id, valueType);
+
+    public override string ToString() => $"class {Id} " + "{" + "\n{manager}" + "\n}";
+
     public override void Init()
     {
         manager = new VariateManager();

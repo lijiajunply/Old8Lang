@@ -1,6 +1,7 @@
 using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Statement;
+
 /// <summary>
 /// if语句
 /// </summary>
@@ -23,14 +24,14 @@ public class IfStatement : OldStatement
     {
         bool r = true;
         Manager.AddChildren();
-        IfBlock.Run(ref Manager,ref r);
+        IfBlock.Run(ref Manager, ref r);
         Manager.RemoveChildren();
         if (ElifBlock is not null)
         {
             foreach (var VARIABLE in ElifBlock)
             {
                 Manager.AddChildren();
-                VARIABLE.Run(ref Manager,ref r);
+                VARIABLE.Run(ref Manager, ref r);
                 Manager.RemoveChildren();
             }
         }
@@ -40,5 +41,7 @@ public class IfStatement : OldStatement
             ElseBlockStatement.Run(ref Manager);
         }
     }
-    public override string ToString() => $"if({IfBlock} else if{APIs.ListToString(ElifBlock)} \nelse: {ElseBlockStatement}";
+
+    public override string ToString() =>
+        $"if({IfBlock} else if{Apis.ListToString(ElifBlock)} \nelse: {ElseBlockStatement}";
 }

@@ -6,11 +6,12 @@ public class NativeStaticAny : ValueType
 
     private readonly Type ClassType;
 
-    public NativeStaticAny(string classname,Type classType)
+    public NativeStaticAny(string classname, Type classType)
     {
         ClassName = classname;
         ClassType = classType;
     }
+
     public override ValueType Dot(OldExpr dotExpr)
     {
         if (dotExpr is OldID id)
@@ -23,15 +24,18 @@ public class NativeStaticAny : ValueType
                     return null;
                 return ObjToValue(fie.GetValue(null));
             }
+
             return ObjToValue(prop.GetValue(null));
         }
+
         if (dotExpr is Instance instance)
         {
             var Method = ClassType.GetMethod(instance.Id.IdName);
-            var a      = APIs.ListToObjects(instance.Ids.OfType<ValueType>().ToList()).ToArray();
-            var invoke = Method.Invoke(null,a);
+            var a = Apis.ListToObjects(instance.Ids.OfType<ValueType>().ToList()).ToArray();
+            var invoke = Method.Invoke(null, a);
             return ObjToValue(invoke);
         }
+
         return null;
     }
 }

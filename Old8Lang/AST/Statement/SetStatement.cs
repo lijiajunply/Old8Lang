@@ -5,7 +5,7 @@ namespace Old8Lang.AST.Statement;
 
 public class SetStatement : OldStatement
 {
-    public OldID Id { get; set; } 
+    public OldID Id { get; set; }
     public OldExpr Value { get; set; }
 
     public SetStatement(OldID id, OldExpr value)

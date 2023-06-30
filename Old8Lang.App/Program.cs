@@ -1,11 +1,12 @@
 ﻿using Old8Lang;
 
 //APIs.ChangeBasicInfo("/home/luckyfish/RiderProjects/Old8Lang/Old8LangLib/OldLib/","0.3.0");
-string[] sadf = { "-f" ,"/home/luckyfish/RiderProjects/Old8Lang/Old8Lang/Ex/init.ws"};
-//args = new[] { "import" };
-args = args.Length == 0?sadf:args;
+string[] strings = { "-f" ,Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,"Old8Lang","Ex", "init.ws")};
+//
+
+args = args.Length == 0?strings:args;
 if (args.Length == 0)
-    args = Console.ReadLine().Split(" ");
+    args = Console.ReadLine()!.Split(" ");
 
 Lang(args);
 
@@ -13,7 +14,7 @@ Lang(args);
 
 void Lang(string[] oder)
 {
-    var a = APIs.Read_JSON();
+    var a = Apis.ReadJson();
     if (oder[0] == BasicInfo.Order["FromFile"])
     {
         Run(false,oder[1]);
@@ -33,7 +34,7 @@ void Lang(string[] oder)
     }
     if (oder[0] == BasicInfo.Order["ChangeImport"])
     {
-        var b = APIs.ChangeBasicInfo(oder[1],a.Ver);
+        var b = Apis.ChangeBasicInfo(oder[1],a.Ver);
         Console.WriteLine("now:"+b.ImportPath);
         return;
     }
@@ -45,14 +46,13 @@ void Lang(string[] oder)
     if (oder[0] == BasicInfo.Order["Info"])
     {
         Console.WriteLine(BasicInfo.Info());
-        return;
     }
 }
 
 void Run(bool isdic,string path)
 {
-    var info = APIs.CslyUsing(path,isdic);
-    info.Error.ForEach(x => Console.WriteLine(x));
+    var info = Apis.CslyUsing(path,isdic);
+    info.Error.ForEach(Console.WriteLine);
     Console.WriteLine("\n"+info.Time);
 }
 
