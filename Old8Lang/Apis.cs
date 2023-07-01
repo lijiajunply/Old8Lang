@@ -52,7 +52,9 @@ public static class Apis
 
     #region ReadFileOrDir
 
-    public static string FromFile(string filename) => File.ReadAllText(filename, Encoding.UTF8);
+    public static string FromFile(string filename)
+        => File.Exists(filename) ? File.ReadAllText(filename, Encoding.UTF8) : filename;
+    
 
     public static string FromDirectory(string DirectoryName)
     {

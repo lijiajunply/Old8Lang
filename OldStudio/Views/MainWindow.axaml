@@ -12,18 +12,29 @@
         Title="OldStudio">
 
     <Design.DataContext>
-        <vm:MainWindowViewModel/>
+        <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,*">
-        <avaloniaGraphControl:GraphPanel Grid.Row="0" 
-            Graph="{Binding MyGraph}"
-            Zoom="1.2" 
-            LayoutMethod="SugiyamaScheme" />
-        
+    <Grid RowDefinitions="Auto,*,Auto">
+        <WrapPanel Grid.Row="0" HorizontalAlignment="Right">
+            <Button Content="Run" Click="RunClick" />
+        </WrapPanel>
+
         <avaloniaEdit:TextEditor Grid.Row="1"
                                  ShowLineNumbers="True"
-                                 FontFamily="Cascadia Code,Consolas,Menlo,Monospace"/>
+                                 Name="Editor"
+                                 FontFamily="Cascadia Code,Consolas,Menlo,Monospace" />
+        <ScrollViewer Grid.Row="2">
+            <Grid ColumnDefinitions="*,*">
+                <avaloniaGraphControl:GraphPanel
+                    Grid.Column="0"
+                    Name="GraphPanel"
+                    Zoom="1.2"
+                    LayoutMethod="SugiyamaScheme" />
+                <TextBlock Grid.Column="1" Name="InfoBlock" />
+            </Grid>
+        </ScrollViewer>
+
     </Grid>
-   
+
 </Window>

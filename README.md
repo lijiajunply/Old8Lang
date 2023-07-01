@@ -36,7 +36,7 @@ class Old8LangClass
    ADD() ->
       return _a + _b
    ADD_1() => _a + _b
-}  
+
 
 //类的实例：
 a <- Old8LangClass(1,2) // 运行init函数          
@@ -103,11 +103,18 @@ import `<context>`
 
 [import `<dllname> <classname> <methodname> <nativemethodname>`]
 
-## 2022.11.22 建库
 
-我一直想写一门编程语言，然后最近看到了一个C#写编译器的教程：https://www.bilibili.com/video/BV15v41147Zg （国内）/ https://www.youtube.com/watch?v=wgHIkdUQbp0&list=PLRAdsfhKI4OWNOSfS7EUu5GRAVmze1t2y (国外)
 
-然后我就想自己也写一个。
+## 2022.12.30 12h
+
+现在已经基本上写完了，但是只是一小部分，因为个人能力有限，现在先写成这个样子
+
+已实现的：赋值语句，指向语句，if语句，for语句，while语句，func语句（还没有实现传参和返回功能），类实现（目前类里面方法功能还不太行）
+
+未实现的：方法传参返回，继承，泛型，原生函数（也就是说只能通过变量储存器去观看变量）
+
+未来还要写虚拟机但我已经忙好几天了，好累，等明年再说吧，现在连测试都还没开始，但应该可以使用。
+
 
 ## 2022.11.22 晚
 
@@ -121,17 +128,14 @@ import `<context>`
 
 现在的想法就是可以专门用来写文章，语法可能要改一下，毕竟我想让markdown不那么难用，或者说想让markdown小白一点
 
+## 2022.11.22 建库
+
+我一直想写一门编程语言，然后最近看到了一个C#写编译器的教程：https://www.bilibili.com/video/BV15v41147Zg （国内）/ https://www.youtube.com/watch?v=wgHIkdUQbp0&list=PLRAdsfhKI4OWNOSfS7EUu5GRAVmze1t2y (国外)
+
+然后我就想自己也写一个。
+
+
 ## Old8Lang关键字：
 
 - if elif else => C# : if else if else
 - for while => C# : for while
-
-## 2022.12.30 12h
-
-现在已经基本上写完了，但是只是一小部分，因为个人能力有限，现在先写成这个样子
-
-已实现的：赋值语句，指向语句，if语句，for语句，while语句，func语句（还没有实现传参和返回功能），类实现（目前类里面方法功能还不太行）
-
-未实现的：方法传参返回，继承，泛型，原生函数（也就是说只能通过变量储存器去观看变量）
-
-未来还要写虚拟机但我已经忙好几天了，好累，等明年再说吧，现在连测试都还没开始，但应该可以使用。

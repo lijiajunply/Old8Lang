@@ -11,14 +11,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="update">
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/App.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/OldStudio/App.axaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LibTest/LibTest.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/LibTest/LibTest.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Old8Lang.App.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Old8Lang.App.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/OldStudio/OldStudio.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/OldStudio/OldStudio.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/ViewModels/MainWindowViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OldStudio/ViewModels/MainWindowViewModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/ViewModels/ViewModelBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OldStudio/ViewModels/ViewModelBase.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/OldStudio/Views/MainWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/OldStudio/Views/MainWindow.axaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Views/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OldStudio/Views/MainWindow.axaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,9 +52,8 @@
     </option>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock://C:/Projects/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Projects/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e6641ef64e23bc021c22f7a836547714731db956d18c439bc734695b9e72/SafeFileHandle.Windows.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -66,33 +68,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "master",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "ReSpellerSettingsId",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;ReSpellerSettingsId&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "PLAIN_TEXT",
-      "Markdown"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;PLAIN_TEXT&quot;,
+      &quot;Markdown&quot;
     ],
-    "rider.external.source.directories": [
-      "C:\\Users\\李嘉俊\\AppData\\Roaming\\JetBrains\\Rider2023.1\\resharper-host\\DecompilerCache",
-      "C:\\Users\\李嘉俊\\AppData\\Roaming\\JetBrains\\Rider2023.1\\resharper-host\\SourcesCache",
-      "C:\\Users\\李嘉俊\\AppData\\Local\\Symbols\\src"
+    &quot;rider.external.source.directories&quot;: [
+      &quot;C:\\Users\\李嘉俊\\AppData\\Roaming\\JetBrains\\Rider2023.1\\resharper-host\\DecompilerCache&quot;,
+      &quot;C:\\Users\\李嘉俊\\AppData\\Roaming\\JetBrains\\Rider2023.1\\resharper-host\\SourcesCache&quot;,
+      &quot;C:\\Users\\李嘉俊\\AppData\\Local\\Symbols\\src&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET 项目.OldStudio">
     <configuration name="LibTest" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="$PROJECT_DIR$/LibTest/bin/Debug/net6.0/LibTest" />
@@ -254,7 +256,8 @@
       <workItem from="1676696024202" duration="6404000" />
       <workItem from="1676787857161" duration="55000" />
       <workItem from="1676964452621" duration="2016000" />
-      <workItem from="1688122318364" duration="3676000" />
+      <workItem from="1688122318364" duration="3850000" />
+      <workItem from="1688186573358" duration="3891000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -599,7 +602,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -625,7 +628,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="add lib" />
     <MESSAGE value="asdf" />
     <MESSAGE value="add asdf" />
     <MESSAGE value="add ex" />
@@ -650,7 +652,8 @@
     <MESSAGE value="add NativeStaticAny.cs" />
     <MESSAGE value="run" />
     <MESSAGE value="update" />
-    <option name="LAST_COMMIT_MESSAGE" value="update" />
+    <MESSAGE value="add OldStudio" />
+    <option name="LAST_COMMIT_MESSAGE" value="add OldStudio" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
