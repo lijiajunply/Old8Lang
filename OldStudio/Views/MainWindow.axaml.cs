@@ -5,18 +5,21 @@ using AvaloniaEdit;
 using AvaloniaEdit.TextMate;
 using AvaloniaEdit.TextMate.Grammars;
 using AvaloniaGraphControl;
+using OldStudio.Models;
 using sly.parser.generator.visitor.dotgraph;
 
 namespace OldStudio.Views;
 
 public partial class MainWindow : Window
 {
+    private Graph? Graph { get; set; }
+
     public MainWindow()
     {
         InitializeComponent();
+        View = this.FindControl<VariateManagerView>("View");
         InfoBlock = this.FindControl<TextBlock>("InfoBlock");
         Editor = this.FindControl<TextEditor>("Editor");
-        GraphPanel = this.FindControl<GraphPanel>("GraphPanel");
         var _registryOptions = new RegistryOptions(ThemeName.DarkPlus);
 
         var _textMateInstallation = Editor.InstallTextMate(_registryOptions);
@@ -30,9 +33,15 @@ public partial class MainWindow : Window
         if (string.IsNullOrEmpty(Editor.Text)) return;
         var i = new Old8Lang.CslyParser.Interpreter(Editor.Text, false);
         i.ParserRun(true);
-        GraphPanel.Graph = ToGraph(i.Graph);
+        i.GetVariateManager();
+        Graph = ToGraph(i.Graph);
+        View.DataContext = i.GetVariateManager();
+        InfoBlock.Text = "";
         InfoBlock.Text += "error:\n";
-        i.GetError().ForEach(x => InfoBlock.Text += x);
+        if (i.GetError().Count == 0)
+            InfoBlock.Text += "null\n";
+        else
+            i.GetError().ForEach(x => InfoBlock.Text += x+"\n");
         InfoBlock.Text += "info:\n";
         InfoBlock.Text += i.GetTime();
     }
@@ -43,46 +52,32 @@ public partial class MainWindow : Window
         dotGraph.Dump();
         var b = dotGraph.FindRoots();
         var node = b.First();
-        GetEdge(ref a,ref dotGraph,node);
+        GetEdge(ref a, ref dotGraph, node);
         return a;
     }
 
-    private void GetEdge(ref Graph graph,ref DotGraph dotGraph, DotNode node)
+    private void GetEdge(ref Graph graph, ref DotGraph dotGraph, DotNode node)
     {
         foreach (var arrow in dotGraph.FindEgdes(node))
         {
             graph.Edges.Add(new Edge(
-                    new MyNode(arrow.Destination),
-                    new MyNode(arrow.Source)
+                    new NodeModel(arrow.Destination),
+                    new NodeModel(arrow.Source)
                 )
             );
             if (arrow.Destination == null)
                 return;
-            GetEdge(ref graph,ref dotGraph,arrow.Destination);
+            GetEdge(ref graph, ref dotGraph, arrow.Destination);
         }
     }
-    
-    private class MyNode
+
+
+    private void ShowClick(object? sender, RoutedEventArgs e)
     {
-        private DotNode DotNode { get; set; }
-
-        public MyNode(DotNode dotNode)
+        if (Graph != null)
         {
-            DotNode = dotNode;
+            var window = new GraphView(Graph);
+            window.Show(this);
         }
-
-        public override bool Equals(object? obj)
-        {
-            if (obj is not MyNode node) return false;
-            return node.DotNode == DotNode;
-        }
-
-        protected bool Equals(MyNode other)
-        {
-            return DotNode.Equals(other.DotNode);
-        }
-
-        public override string ToString() => DotNode.Label;
     }
-    
 }

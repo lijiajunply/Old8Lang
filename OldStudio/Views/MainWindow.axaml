@@ -3,8 +3,8 @@
         xmlns:vm="using:OldStudio.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:avaloniaGraphControl="clr-namespace:AvaloniaGraphControl;assembly=AvaloniaGraphControl"
         xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+        xmlns:views="clr-namespace:OldStudio.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldStudio.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -18,6 +18,7 @@
     <Grid RowDefinitions="Auto,*,Auto">
         <WrapPanel Grid.Row="0" HorizontalAlignment="Right">
             <Button Content="Run" Click="RunClick" />
+            <Button Content="Show Gragh" Click="ShowClick"/>
         </WrapPanel>
 
         <avaloniaEdit:TextEditor Grid.Row="1"
@@ -26,11 +27,7 @@
                                  FontFamily="Cascadia Code,Consolas,Menlo,Monospace" />
         <ScrollViewer Grid.Row="2">
             <Grid ColumnDefinitions="*,*">
-                <avaloniaGraphControl:GraphPanel
-                    Grid.Column="0"
-                    Name="GraphPanel"
-                    Zoom="1.2"
-                    LayoutMethod="SugiyamaScheme" />
+                <views:VariateManagerView Grid.Column="0" Name="View"/>
                 <TextBlock Grid.Column="1" Name="InfoBlock" />
             </Grid>
         </ScrollViewer>

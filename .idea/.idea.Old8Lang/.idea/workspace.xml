@@ -11,7 +11,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/OldStudio/Models/NodeModel.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/OldStudio/Views/GraphView.axaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/OldStudio/Views/GraphView.axaml.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/OldStudio/Views/VariateManagerView.axaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/OldStudio/Views/VariateManagerView.axaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/avalonia.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/avalonia.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyParser/VariateManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/OldStudio.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/OldStudio/OldStudio.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/ViewModels/MainWindowViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OldStudio/ViewModels/MainWindowViewModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Views/MainWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/OldStudio/Views/MainWindow.axaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Views/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OldStudio/Views/MainWindow.axaml.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -248,6 +263,8 @@
       <workItem from="1676964452621" duration="2016000" />
       <workItem from="1688122318364" duration="3850000" />
       <workItem from="1688186573358" duration="4214000" />
+      <workItem from="1688195493064" duration="273000" />
+      <workItem from="1688280551861" duration="2843000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -592,7 +609,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -618,7 +635,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="add asdf" />
     <MESSAGE value="add ex" />
     <MESSAGE value="add class" />
     <MESSAGE value="add 0.2.0 all context" />
@@ -643,7 +659,8 @@
     <MESSAGE value="update" />
     <MESSAGE value="add OldStudio" />
     <MESSAGE value="OldStudio done 0.1" />
-    <option name="LAST_COMMIT_MESSAGE" value="OldStudio done 0.1" />
+    <MESSAGE value="OldStudio update to 0.10.21" />
+    <option name="LAST_COMMIT_MESSAGE" value="OldStudio update to 0.10.21" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

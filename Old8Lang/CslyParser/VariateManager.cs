@@ -41,7 +41,6 @@ public class VariateManager
 
     #endregion
 
-
     public VariateManager()
     {
         ChildrenNum = new List<int>();
@@ -50,6 +49,17 @@ public class VariateManager
         Result = new IntValue(0);
         IsClass = false;
         AnyInfo = new List<ValueType>();
+    }
+
+    public VariateManager(LangInfo info)
+    {
+        ChildrenNum = new List<int>();
+        Variates = new Dictionary<string, ValueType>();
+        IsReturn = false;
+        Result = new IntValue(0);
+        IsClass = false;
+        AnyInfo = new List<ValueType>();
+        LangInfo = info;
     }
 
     public ValueTuple<OldID, OldExpr> Set(OldID id, ValueType valueType)
@@ -71,6 +81,9 @@ public class VariateManager
     }
 
 
+    /// <summary>
+    /// GC
+    /// </summary>
     private void GarbageCollection()
     {
     }

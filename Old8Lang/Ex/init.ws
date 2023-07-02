@@ -1,2 +1,3 @@
-a <- 1+1
-a <- a+1
+import Terminal
+a <- 1
+Print(a)

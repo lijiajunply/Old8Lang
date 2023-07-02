@@ -4,7 +4,9 @@
     <option name="projectPerEditor">
       <map>
         <entry key="OldStudio/App.axaml" value="OldStudio/OldStudio.csproj" />
+        <entry key="OldStudio/Views/GraphView.axaml" value="OldStudio/OldStudio.csproj" />
         <entry key="OldStudio/Views/MainWindow.axaml" value="OldStudio/OldStudio.csproj" />
+        <entry key="OldStudio/Views/VariateManagerView.axaml" value="OldStudio/OldStudio.csproj" />
       </map>
     </option>
   </component>

@@ -49,7 +49,7 @@ public class Interpreter
     public Interpreter(string path, bool isDir, LangInfo info)
     {
         Error = new List<string>();
-        Manager = new VariateManager { Path = path, LangInfo = info };
+        Manager = new VariateManager(info) { Path = path};
         Manager.Init();
         Code = isDir ? Apis.FromDirectory(path) : Apis.FromFile(path);
     }

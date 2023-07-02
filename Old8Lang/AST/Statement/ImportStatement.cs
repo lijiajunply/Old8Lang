@@ -17,7 +17,7 @@ public class ImportStatement : OldStatement
         if (Manager.LangInfo.LibInfos.Any(x => ImportString == x.LibName))
         {
             var b = Manager.LangInfo.LibInfos.Where(x => x.LibName == ImportString).Select(x => x.IsDir).ToArray()[0];
-            var path = Manager.LangInfo.ImportPath + ImportString + (b ? "" : ".ws");
+            var path = Path.Combine(Manager.LangInfo.ImportPath , ImportString + (b ? "" : ".ws"));
             var a = new Interpreter(path, b, Manager.LangInfo);
             a.ParserRun();
             var manager = a.GetVariateManager();
