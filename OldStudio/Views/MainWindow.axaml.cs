@@ -12,39 +12,16 @@ namespace OldStudio.Views;
 
 public partial class MainWindow : Window
 {
+    #region Pror
+
     private Graph? Graph { get; set; }
+    private string? FilePath { get; set; }
 
-    public MainWindow()
-    {
-        InitializeComponent();
-        View = this.FindControl<VariateManagerView>("View");
-        InfoBlock = this.FindControl<TextBlock>("InfoBlock");
-        Editor = this.FindControl<TextEditor>("Editor");
-        var _registryOptions = new RegistryOptions(ThemeName.DarkPlus);
+    #endregion
 
-        var _textMateInstallation = Editor.InstallTextMate(_registryOptions);
+    #region Function
 
-        _textMateInstallation.SetGrammar(
-            _registryOptions.GetScopeByLanguageId(_registryOptions.GetLanguageByExtension(".cs").Id));
-    }
-
-    private void RunClick(object? sender, RoutedEventArgs e)
-    {
-        if (string.IsNullOrEmpty(Editor.Text)) return;
-        var i = new Old8Lang.CslyParser.Interpreter(Editor.Text, false);
-        i.ParserRun(true);
-        i.GetVariateManager();
-        Graph = ToGraph(i.Graph);
-        View.DataContext = i.GetVariateManager();
-        InfoBlock.Text = "";
-        InfoBlock.Text += "error:\n";
-        if (i.GetError().Count == 0)
-            InfoBlock.Text += "null\n";
-        else
-            i.GetError().ForEach(x => InfoBlock.Text += x+"\n");
-        InfoBlock.Text += "info:\n";
-        InfoBlock.Text += i.GetTime();
-    }
+    #region Graph
 
     private Graph ToGraph(DotGraph dotGraph)
     {
@@ -69,6 +46,46 @@ public partial class MainWindow : Window
                 return;
             GetEdge(ref graph, ref dotGraph, arrow.Destination);
         }
+    }
+
+    #endregion
+
+    #endregion
+
+    public MainWindow()
+    {
+        InitializeComponent();
+        View = this.FindControl<VariateManagerView>("View");
+        InfoBlock = this.FindControl<TextBlock>("InfoBlock");
+        Editor = this.FindControl<TextEditor>("Editor");
+        var _registryOptions = new RegistryOptions(ThemeName.DarkPlus);
+
+        var _textMateInstallation = Editor.InstallTextMate(_registryOptions);
+
+        _textMateInstallation.SetGrammar(
+            _registryOptions.GetScopeByLanguageId(_registryOptions.GetLanguageByExtension(".py").Id));
+
+        // var lang = new LangRegistry();
+        // var a = Editor.InstallTextMate(lang);
+        // a.SetGrammar(lang.GetGrammar("").GetName());
+    }
+
+    private void RunClick(object? sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(Editor.Text)) return;
+        var i = new Old8Lang.CslyParser.Interpreter(Editor.Text, false);
+        i.ParserRun(true);
+        i.GetVariateManager();
+        Graph = ToGraph(i.Graph);
+        View.DataContext = i.GetVariateManager();
+        InfoBlock.Text = "";
+        InfoBlock.Text += "error:\n";
+        if (i.GetError().Count == 0)
+            InfoBlock.Text += "null\n";
+        else
+            i.GetError().ForEach(x => InfoBlock.Text += x + "\n");
+        InfoBlock.Text += "info:\n";
+        InfoBlock.Text += i.GetTime();
     }
 
 
