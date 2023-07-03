@@ -11,34 +11,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/AssetsLoader.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/python/cgmanifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/python/language-configuration.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/python/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/python/package.nls.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/python/syntaxes/MagicPython.tmLanguage.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/python/syntaxes/MagicRegExp.tmLanguage.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/Theme/Red-color-theme.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/Theme/abyss-color-theme.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/Theme/dark_plus.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/Theme/dark_vs.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/Theme/dimmed-monokai-color-theme.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/Theme/hc_black.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/Theme/hc_light.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/Theme/kimbie-dark-color-theme.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/Theme/light_plus.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/Theme/light_vs.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/Theme/monokai-color-theme.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/Theme/quietlight-color-theme.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/Theme/solarized-dark-color-theme.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/Theme/solarized-light-color-theme.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Assets/Theme/tomorrow-night-blue-color-theme.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/OldStudio/Models/OldLangRegistry.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/OldStudio.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/OldStudio/OldStudio.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Views/MainWindow.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OldStudio/Views/MainWindow.axaml.cs" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -278,7 +251,7 @@
       <workItem from="1688195493064" duration="273000" />
       <workItem from="1688280551861" duration="3103000" />
       <workItem from="1688359966934" duration="1778000" />
-      <workItem from="1688377269474" duration="1365000" />
+      <workItem from="1688377269474" duration="1739000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -623,7 +596,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="55" />
+    <option name="localTasksCounter" value="56" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -649,7 +622,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="add class" />
     <MESSAGE value="add 0.2.0 all context" />
     <MESSAGE value="change" />
     <MESSAGE value="0.2.0" />
@@ -674,7 +646,8 @@
     <MESSAGE value="OldStudio done 0.1" />
     <MESSAGE value="OldStudio update to 0.10.21" />
     <MESSAGE value="OldStudio 0.2" />
-    <option name="LAST_COMMIT_MESSAGE" value="OldStudio 0.2" />
+    <MESSAGE value="add TextMeta" />
+    <option name="LAST_COMMIT_MESSAGE" value="add TextMeta" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
