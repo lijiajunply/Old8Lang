@@ -252,6 +252,7 @@
       <workItem from="1688280551861" duration="3103000" />
       <workItem from="1688359966934" duration="1778000" />
       <workItem from="1688377269474" duration="1739000" />
+      <workItem from="1688381418528" duration="48000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -596,7 +597,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="56" />
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -622,7 +623,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="add 0.2.0 all context" />
     <MESSAGE value="change" />
     <MESSAGE value="0.2.0" />
     <MESSAGE value="add more Native" />
@@ -647,7 +647,8 @@
     <MESSAGE value="OldStudio update to 0.10.21" />
     <MESSAGE value="OldStudio 0.2" />
     <MESSAGE value="add TextMeta" />
-    <option name="LAST_COMMIT_MESSAGE" value="add TextMeta" />
+    <MESSAGE value="asdf" />
+    <option name="LAST_COMMIT_MESSAGE" value="asdf" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
