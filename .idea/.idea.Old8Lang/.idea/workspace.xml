@@ -11,7 +11,53 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LibTest/LibTest.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/LibTest/LibTest.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Old8Lang.App.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Old8Lang.App.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/App.axaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/App.axaml.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/AssetsLoader.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/cgmanifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/language-configuration.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/package.nls.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/syntaxes/MagicPython.tmLanguage.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/syntaxes/MagicRegExp.tmLanguage.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/Red-color-theme.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/abyss-color-theme.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/dark_plus.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/dark_vs.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/dimmed-monokai-color-theme.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/hc_black.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/hc_light.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/kimbie-dark-color-theme.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/light_plus.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/light_vs.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/monokai-color-theme.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/quietlight-color-theme.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/solarized-dark-color-theme.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/solarized-light-color-theme.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/tomorrow-night-blue-color-theme.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/avalonia-logo.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Models/NodeModel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Models/OldLangRegistry.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/OldStudio.csproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Program.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/ViewLocator.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/ViewModels/MainWindowViewModel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/ViewModels/ViewModelBase.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Views/GraphView.axaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Views/GraphView.axaml.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Views/MainWindow.axaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Views/MainWindow.axaml.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Views/VariateManagerView.axaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/Views/VariateManagerView.axaml.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OldStudio/app.manifest" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -49,6 +95,9 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 6
+}]]></component>
   <component name="ProjectId" id="2HtAMVf8NHuev0xx6eaGfIJoJjl" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="false" id="Update" />
@@ -58,34 +107,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;ReSpellerSettingsId&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET 项目.Old8Lang.App.executor": "Run",
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "master",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "ReSpellerSettingsId",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;PLAIN_TEXT&quot;,
-      &quot;Markdown&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "PLAIN_TEXT",
+      "Markdown"
     ],
-    &quot;rider.external.source.directories&quot;: [
-      &quot;C:\\Users\\李嘉俊\\AppData\\Roaming\\JetBrains\\Rider2023.1\\resharper-host\\DecompilerCache&quot;,
-      &quot;C:\\Users\\李嘉俊\\AppData\\Roaming\\JetBrains\\Rider2023.1\\resharper-host\\SourcesCache&quot;,
-      &quot;C:\\Users\\李嘉俊\\AppData\\Local\\Symbols\\src&quot;
+    "rider.external.source.directories": [
+      "C:\\Users\\李嘉俊\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\DecompilerCache",
+      "C:\\Users\\李嘉俊\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\SourcesCache",
+      "C:\\Users\\李嘉俊\\AppData\\Local\\Symbols\\src"
     ]
   }
-}</component>
-  <component name="RunManager" selected=".NET 项目.OldStudio">
+}]]></component>
+  <component name="RunManager" selected=".NET 项目.Old8Lang.App">
     <configuration name="LibTest" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="$PROJECT_DIR$/LibTest/bin/Debug/net6.0/LibTest" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -253,6 +303,7 @@
       <workItem from="1688359966934" duration="1778000" />
       <workItem from="1688377269474" duration="1739000" />
       <workItem from="1688381418528" duration="48000" />
+      <workItem from="1703485350420" duration="308000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
