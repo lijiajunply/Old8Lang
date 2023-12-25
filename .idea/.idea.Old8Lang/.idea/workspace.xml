@@ -13,50 +13,9 @@
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LibTest/LibTest.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/LibTest/LibTest.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Old8Lang.App.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Old8Lang.App.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/App.axaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/App.axaml.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/AssetsLoader.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/cgmanifest.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/language-configuration.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/package.nls.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/syntaxes/MagicPython.tmLanguage.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/LangSetting/syntaxes/MagicRegExp.tmLanguage.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/Red-color-theme.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/abyss-color-theme.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/dark_plus.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/dark_vs.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/dimmed-monokai-color-theme.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/hc_black.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/hc_light.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/kimbie-dark-color-theme.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/light_plus.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/light_vs.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/monokai-color-theme.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/quietlight-color-theme.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/solarized-dark-color-theme.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/solarized-light-color-theme.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/Theme/tomorrow-night-blue-color-theme.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Assets/avalonia-logo.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Models/NodeModel.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Models/OldLangRegistry.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/OldStudio.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Program.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/ViewLocator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/ViewModels/MainWindowViewModel.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/ViewModels/ViewModelBase.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Views/GraphView.axaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Views/GraphView.axaml.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Views/MainWindow.axaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Views/MainWindow.axaml.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Views/VariateManagerView.axaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/Views/VariateManagerView.axaml.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/OldStudio/app.manifest" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyParser/VariateManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,9 +46,9 @@
     </option>
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock://C:/Projects/RiderProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Projects/RiderProjects/Old8Lang/Old8Lang/Apis.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/e6641ef64e23bc021c22f7a836547714731db956d18c439bc734695b9e72/SafeFileHandle.Windows.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -648,7 +607,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="58" />
+    <option name="localTasksCounter" value="59" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -674,7 +633,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="change" />
     <MESSAGE value="0.2.0" />
     <MESSAGE value="add more Native" />
     <MESSAGE value="add Error" />
@@ -699,7 +657,8 @@
     <MESSAGE value="OldStudio 0.2" />
     <MESSAGE value="add TextMeta" />
     <MESSAGE value="asdf" />
-    <option name="LAST_COMMIT_MESSAGE" value="asdf" />
+    <MESSAGE value="先这样吧，真觉得我写的这个好烂" />
+    <option name="LAST_COMMIT_MESSAGE" value="先这样吧，真觉得我写的这个好烂" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -729,6 +688,32 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="31" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs</url>
+          <line>62</line>
+          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\CslyParser\Interpreter.cs" initialLine="62" containingFunctionPresentation="方法 'ParserRun'">
+            <startOffsets>
+              <option value="1475" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1485" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="34" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs</url>
+          <line>69</line>
+          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\CslyParser\Interpreter.cs" initialLine="69" containingFunctionPresentation="方法 'ParserRun'">
+            <startOffsets>
+              <option value="1685" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1708" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="35" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

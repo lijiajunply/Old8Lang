@@ -12,8 +12,8 @@ public class Interpreter
 {
     #region Code
 
-    private BlockStatement Block { get; set; }
-    
+    private BlockStatement Block { get; set; } = new([]);
+
     private VariateManager Manager;
     private string Code { get; set; }
 
@@ -21,13 +21,13 @@ public class Interpreter
 
     #region RunTime
 
-    private string Time { get; set; }
+    private string Time { get; set; } = "";
     private double DoubleTime { get; set; }
-    
-    public DotGraph Graph { get; set; }
+
+    public DotGraph? Graph { get; set; }
+
     #endregion
-    
-    
+
 
     private readonly List<string> Error;
 
@@ -49,19 +49,19 @@ public class Interpreter
     public Interpreter(string path, bool isDir, LangInfo info)
     {
         Error = new List<string>();
-        Manager = new VariateManager(info) { Path = path};
+        Manager = new VariateManager(info) { Path = path };
         Manager.Init();
         Code = isDir ? Apis.FromDirectory(path) : Apis.FromFile(path);
     }
 
     public void ParserRun(bool dot = false)
     {
-        Stopwatch sw = new Stopwatch();
+        var sw = new Stopwatch();
         sw.Start();
         Manager.LangInfo ??= Apis.ReadJson();
         Block = Build(dot);
         sw.Stop();
-        TimeSpan ts = sw.Elapsed;
+        var ts = sw.Elapsed;
         Time += $"Parser Build Time : {ts.TotalMilliseconds}ms\n";
         DoubleTime += ts.TotalMilliseconds;
 
@@ -84,12 +84,11 @@ public class Interpreter
         var buildResult = parserBuilder.Result;
 
         var result = buildResult.Parse(Code);
-        Block = result.Result as BlockStatement;
         if (isDot)
             Dot(result);
-        if (result.Errors != null && result.Errors.Any())
-            result.Errors.ForEach(x => Error.Add(x.ToString()));
-        return Block;
+        if (result.Errors != null && result.Errors.Count != 0)
+            result.Errors.ForEach(x => Error.Add($"{x.ErrorType} : {x.ErrorMessage} in {x.Line} {x.Column}"));
+        return result.Result as BlockStatement ?? new BlockStatement([]);
     }
 
     public void Dot(ParseResult<OldTokenGeneric, OldLangTree> result)

@@ -11,7 +11,7 @@ public class VariateManager
 {
     #region Lang
 
-    public LangInfo LangInfo { get; set; }
+    public LangInfo? LangInfo { get; set; }
     public string Path { get; set; } = String.Empty;
 
     #endregion
@@ -65,7 +65,7 @@ public class VariateManager
     public ValueTuple<OldID, OldExpr> Set(OldID id, ValueType valueType)
     {
         var a1 = GetValue(id);
-        if (a1 == null)
+        if (a1 == null!)
         {
             //init
             var a = valueType;
@@ -117,7 +117,7 @@ public class VariateManager
         {
             return x switch
             {
-                FuncValue func => func.Id.IdName == id.IdName,
+                FuncValue func => func.Id!.IdName == id.IdName,
                 AnyValue any => any.Id.IdName == id.IdName,
                 NativeAnyValue na => na.ClassName == id.IdName,
                 NativeStaticAny staticAny => staticAny.ClassName == id.IdName,
