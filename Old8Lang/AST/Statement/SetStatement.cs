@@ -3,16 +3,10 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Statement;
 
-public class SetStatement : OldStatement
+public class SetStatement(OldID id, OldExpr value) : OldStatement
 {
-    public OldID Id { get; set; }
-    public OldExpr Value { get; set; }
-
-    public SetStatement(OldID id, OldExpr value)
-    {
-        Id = id;
-        Value = value;
-    }
+    public OldID Id { get; set; } = id;
+    public OldExpr Value { get; set; } = value;
 
     public override void Run(ref VariateManager Manager)
     {

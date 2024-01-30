@@ -74,7 +74,6 @@ public abstract class ValueType : OldExpr
         };
     }
 
-    public override bool Equals(object? obj) => Equal(obj as ValueType);
     public virtual object GetValue() => new();
 
     protected static ValueType ObjToValue(object value)

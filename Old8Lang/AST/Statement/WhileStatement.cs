@@ -6,31 +6,25 @@ namespace Old8Lang.AST.Statement;
 /// <summary>
 /// while语句
 /// </summary>
-public class WhileStatement : OldStatement
+public class WhileStatement(OldExpr expr, BlockStatement blockStatement) : OldStatement
 {
-    public OldExpr Expr { get; set; }
-    public BlockStatement BlockStatement { get; set; }
-
-    public WhileStatement(OldExpr expr, BlockStatement blockStatement)
-    {
-        Expr = expr;
-        BlockStatement = blockStatement;
-    }
+    private OldExpr Expr { get; set; } = expr;
+    private BlockStatement BlockStatement { get; set; } = blockStatement;
 
     public override void Run(ref VariateManager Manager)
     {
-        bool expr = false;
         Manager.AddChildren();
         while (true)
         {
-            var varbool = Expr.Run(ref Manager);
-            if (varbool is BoolValue)
+            var value = Expr.Run(ref Manager);
+            bool expr;
+            if (value is BoolValue varBool)
             {
-                expr = (bool)(Expr.Run(ref Manager) as BoolValue).Value;
+                expr = varBool.Value;
             }
             else
             {
-                return;
+                throw new Exception($"Type Error: {value} is not Bool");
             }
 
             if (expr)

@@ -11,5 +11,5 @@ namespace Old8Lang.AST;
 public class OldExpr : OldLangTree
 {
     public virtual ValueType Run(ref VariateManager Manager) => new VoidValue();
-    public LexerPosition Position { get; set; }
+    public LexerPosition Position { get; set; } = new();
 }

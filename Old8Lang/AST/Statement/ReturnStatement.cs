@@ -2,10 +2,9 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Statement;
 
-public class ReturnStatement : OldStatement
+public class ReturnStatement(OldExpr returnExpr) : OldStatement
 {
-    public OldExpr ReturnExpr { get; set; }
-    public ReturnStatement(OldExpr returnExpr) => ReturnExpr = returnExpr;
+    private OldExpr ReturnExpr { get; set; } = returnExpr;
 
     public override void Run(ref VariateManager Manager)
     {

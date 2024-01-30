@@ -1,5 +1,4 @@
 using System.Reflection;
-using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.CslyParser;
 using Old8Lang.Error;
@@ -12,12 +11,12 @@ public class NativeStatement : OldStatement
 
     private string ClassName { get; set; }
 
-    private string MethodName { get; set; }
+    private string? MethodName { get; set; }
 
-    private string NativeName { get; set; }
+    private string? NativeName { get; set; }
 
-    private string Name { get; set; }
-    private FuncValue FuncValue { get; set; }
+    private string? Name { get; set; }
+    private FuncValue? FuncValue { get; set; }
 
     public NativeStatement(string dllName, string className, string methodName, string nativeName)
     {
@@ -36,7 +35,7 @@ public class NativeStatement : OldStatement
         FuncValue = a.FuncValue;
     }
 
-    public NativeStatement(string dllName, string className, string name = null)
+    public NativeStatement(string dllName, string className, string name = "")
     {
         DllName = dllName;
         ClassName = className;
@@ -48,7 +47,7 @@ public class NativeStatement : OldStatement
         var path = $"{Path.GetDirectoryName(Manager.Path)}/dll/{DllName}.dll"; // filepath/dll/dllname
         var assembly = Assembly.LoadFile(path);
         var type = assembly.GetType($"{DllName}.{ClassName}");
-        if (Name != null)
+        if (!string.IsNullOrEmpty(Name))
         {
             type = assembly.GetType($"{Name}.{ClassName}");
             if (type is null)
@@ -62,10 +61,11 @@ public class NativeStatement : OldStatement
             return;
         }
 
-        if (MethodName != null)
+        if (!string.IsNullOrEmpty(MethodName))
         {
-            var methodInfo = type.GetMethod(MethodName);
-            if (NativeName is "")
+            var methodInfo = type?.GetMethod(MethodName);
+            if (methodInfo == null) throw new Exception($"Not Have Method in {ToString()}");
+            if (string.IsNullOrEmpty(NativeName))
                 NativeName = MethodName;
             var func = new FuncValue(NativeName, methodInfo, FuncValue);
             Manager.AddClassAndFunc(func);

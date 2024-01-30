@@ -3,17 +3,11 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Statement;
 
-public class OldIf : OldStatement
+public class OldIf(OldExpr expr, BlockStatement blockStatement) : OldStatement
 {
-    private OldExpr Expr { get; set; }
+    private OldExpr Expr { get; set; } = expr;
 
-    private BlockStatement BlockStatement { get; set; }
-
-    public OldIf(OldExpr expr, BlockStatement blockStatement)
-    {
-        Expr = expr;
-        BlockStatement = blockStatement;
-    }
+    private BlockStatement BlockStatement { get; set; } = blockStatement;
 
     public void Run(ref VariateManager Manager, ref bool r)
     {
