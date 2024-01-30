@@ -1,4 +1,3 @@
-import Net
 class a
    l <- 1
    r <- 2

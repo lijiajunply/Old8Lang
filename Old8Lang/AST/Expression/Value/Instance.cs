@@ -12,7 +12,7 @@ public class Instance(OldID id, List<OldExpr> ids) : ValueType
     {
         switch (Id.IdName)
         {
-            case "Position":
+            case "position":
             {
                 var a = Ids[0].Position.ToString();
                 return new StringValue(a);
