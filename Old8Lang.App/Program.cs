@@ -54,9 +54,9 @@ void Lang(string[] oder)
     }
 }
 
-void Run(bool isdic, string path)
+void Run(bool isDic, string path)
 {
-    var info = Apis.CslyUsing(path, isdic);
+    var info = Apis.CslyUsing(path, isDic);
     info.Error.ForEach(Console.WriteLine);
     Console.WriteLine("\n" + info.Time);
 }

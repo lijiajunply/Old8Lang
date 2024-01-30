@@ -38,13 +38,13 @@ public static class BasicInfo
     /// Old8Lang的关键字
     /// </summary>
     public static string[] KeyWords { get; set; } =
-    {
+    [
         "class new", // => C# : class new
         "if for while", // => C# : if , for , while
         "elif else", // => C# : else if , else
         "and or not", // => C# : and or not
-        "return func",
-    };
+        "return func"
+    ];
 
     public static string JsonPath 
         => Path.Combine(Path.GetDirectoryName(CodePath)!,"Old8Lang", "LangInfo.json");
@@ -63,14 +63,14 @@ public static class BasicInfo
         { "Remove", "-r" }
     };
 
-    public static List<LibInfo> OldLangLib { get; set; } = new()
-    {
+    public static List<LibInfo> OldLangLib { get; set; } =
+    [
         new LibInfo() { IsDir = false, Var = 0.3, LibName = "OS" },
         new LibInfo() { IsDir = false, Var = 0.3, LibName = "File" },
         new LibInfo() { IsDir = false, Var = 0.3, LibName = "Terminal" },
         new LibInfo() { IsDir = true, Var = 0.3, LibName = "Net" },
         new LibInfo() { IsDir = false, Var = 0.3, LibName = "Time" }
-    };
+    ];
     public static string CodePath
     {
         get

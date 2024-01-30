@@ -3,16 +3,10 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class Instance : ValueType
+public class Instance(OldID id, List<OldExpr> ids) : ValueType
 {
-    public List<OldExpr> Ids { get; set; }
-    public OldID Id { get; set; }
-
-    public Instance(OldID id, List<OldExpr> ids)
-    {
-        Id = id;
-        Ids = ids;
-    }
+    public List<OldExpr> Ids { get; set; } = ids;
+    public OldID Id { get; set; } = id;
 
     public override ValueType Run(ref VariateManager Manager)
     {
@@ -29,9 +23,9 @@ public class Instance : ValueType
             {
                 if (Ids[0] is StringValue stringValue)
                 {
-                    Interpreter i = new Interpreter(stringValue.Value, Manager.Clone());
+                    var i = new Interpreter(stringValue.Value, Manager.Clone());
                     i.ParserRun();
-                    VariateManager manager = i.GetVariateManager();
+                    var manager = i.GetVariateManager();
                     foreach (var type in manager.Output())
                         Manager.Set(new OldID(type.Key), type.Value);
                 }

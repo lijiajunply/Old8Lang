@@ -24,13 +24,11 @@ public class Interpreter
     private string Time { get; set; } = "";
     private double DoubleTime { get; set; }
 
-    public DotGraph? Graph { get; set; }
+    private DotGraph? Graph { get; set; }
 
     #endregion
-
-
+    
     private readonly List<string> Error;
-
 
     public Interpreter(string path, bool isDir)
     {
@@ -102,4 +100,5 @@ public class Interpreter
     public string GetTime() => Time;
     public List<string> GetError() => Error;
     public VariateManager GetVariateManager() => Manager;
+    public DotGraph? GetGraph() => Graph;
 }

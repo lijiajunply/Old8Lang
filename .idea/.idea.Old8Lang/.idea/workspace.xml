@@ -14,8 +14,10 @@
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyParser/VariateManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyParser/OldParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyParser/OldParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -263,6 +265,7 @@
       <workItem from="1688377269474" duration="1739000" />
       <workItem from="1688381418528" duration="48000" />
       <workItem from="1703485350420" duration="308000" />
+      <workItem from="1706598043467" duration="495000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -691,26 +694,26 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs</url>
-          <line>62</line>
+          <line>60</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\CslyParser\Interpreter.cs" initialLine="62" containingFunctionPresentation="方法 'ParserRun'">
             <startOffsets>
-              <option value="1475" />
+              <option value="1478" />
             </startOffsets>
             <endOffsets>
-              <option value="1485" />
+              <option value="1488" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="34" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs</url>
-          <line>69</line>
+          <line>67</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\CslyParser\Interpreter.cs" initialLine="69" containingFunctionPresentation="方法 'ParserRun'">
             <startOffsets>
-              <option value="1685" />
+              <option value="1688" />
             </startOffsets>
             <endOffsets>
-              <option value="1708" />
+              <option value="1711" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="35" />
