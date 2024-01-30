@@ -4,7 +4,7 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class TupleValue(OldExpr v1, OldExpr v2) : ValueType
 {
-    public new ValueTuple<ValueType, ValueType> Value { get; set; }
+    public ValueTuple<ValueType, ValueType> Value { get; private set; }
 
     private OldExpr V1 { get; set; } = v1;
 

@@ -44,7 +44,7 @@ public abstract class ValueType : OldExpr
 
     #region boolOper
 
-    public virtual bool Equal(ValueType otherValueType) => false;
+    public virtual bool Equal(ValueType? otherValueType) => false;
     public virtual bool Less(ValueType? otherValue) => false;
     public virtual bool Greater(ValueType? otherValue) => false;
 

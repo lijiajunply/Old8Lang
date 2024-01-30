@@ -17,7 +17,7 @@ public class StringValue : ValueType
     public override string ToString() => Value;
     public override ValueType Plus(ValueType otherValueType) => new StringValue(Value + otherValueType);
 
-    public override bool Equal(ValueType otherValueType)
+    public override bool Equal(ValueType? otherValueType)
     {
         if (otherValueType is StringValue b)
             return Value == b.Value;

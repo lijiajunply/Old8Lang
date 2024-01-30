@@ -4,11 +4,11 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class AnyValue : ValueType
 {
-    public Dictionary<OldID, OldExpr> Variates { get; set; }
+    private Dictionary<OldID, OldExpr> Variates { get; set; }
     public Dictionary<string, ValueType> Result { get; set; }
     public OldID Id { get; set; }
 
-    public VariateManager manager;
+    private VariateManager manager;
 
     public AnyValue(OldID id, Dictionary<OldID, OldExpr> variates)
     {
@@ -29,7 +29,7 @@ public class AnyValue : ValueType
         return this;
     }
 
-    public ValueType Dot(OldExpr dotExpr)
+    public override ValueType Dot(OldExpr dotExpr)
     {
         switch (dotExpr)
         {
@@ -42,7 +42,7 @@ public class AnyValue : ValueType
             }
             case FuncValue func:
             {
-                if (func.Id.IdName == "GetType")
+                if (func.Id?.IdName == "GetType")
                     return new TypeValue(TypeToString());
                 return func.Run(ref manager);
             }
@@ -55,7 +55,7 @@ public class AnyValue : ValueType
 
     public override string ToString() => $"class {Id} " + "{" + "\n{manager}" + "\n}";
 
-    public virtual void Init()
+    public void Init()
     {
         manager = new VariateManager();
         manager.Init(Result);

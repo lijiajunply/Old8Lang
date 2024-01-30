@@ -8,11 +8,11 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public class NativeAnyValue : ValueType
 {
-    private Type ClassType { get; set; }
+    private Type? ClassType { get; set; }
     private string DllName { get; set; }
     public string ClassName { get; set; }
     private string Path { get; set; }
-    private ConstructorInfo Constructor { get; set; }
+    private ConstructorInfo? Constructor { get; set; }
     private object InstanceObj { get; set; }
 
     private VariateManager manager;
@@ -28,21 +28,22 @@ public class NativeAnyValue : ValueType
     {
         if (dotExpr is OldID id)
         {
-            var prop = ClassType.GetProperty(id.IdName);
+            var prop = ClassType?.GetProperty(id.IdName);
             if (prop is null)
             {
-                var fie = ClassType.GetField(id.IdName);
+                var fie = ClassType?.GetField(id.IdName);
                 if (fie is null)
                     return new VoidValue();
-                return ObjToValue(fie.GetValue(null));
+                return ObjToValue(fie.GetValue(null)!);
             }
 
-            return ObjToValue(prop.GetValue(null));
+            return ObjToValue(prop.GetValue(null)!);
         }
 
         if (dotExpr is Instance instance)
         {
-            var method = ClassType.GetMethod(instance.Id.IdName);
+            var method = ClassType?.GetMethod(instance.Id.IdName);
+            if (method == null) return new VoidValue();
             var func = new FuncValue(instance.Id.IdName, method);
             return func.Run(ref manager, instance.Ids, InstanceObj);
         }
@@ -62,6 +63,6 @@ public class NativeAnyValue : ValueType
 
     public void New(object[] pa)
     {
-        InstanceObj = Constructor is not null ? Constructor.Invoke(pa) : Activator.CreateInstance(ClassType)!;
+        InstanceObj = Constructor != null ? Constructor.Invoke(pa) : Activator.CreateInstance(ClassType!)!;
     }
 }

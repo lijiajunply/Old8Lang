@@ -8,7 +8,7 @@ public class BoolValue(bool value) : ValueType
     public override string ToString() => Value.ToString();
     public override ValueType Run(ref VariateManager Manager) => this;
 
-    public override bool Equal(ValueType otherValueType)
+    public override bool Equal(ValueType? otherValueType)
     {
         if (otherValueType is BoolValue b)
             return Value == b.Value;

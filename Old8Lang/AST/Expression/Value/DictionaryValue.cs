@@ -3,18 +3,10 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class DictionaryValue : ValueType
+public class DictionaryValue(List<TupleValue> tuples) : ValueType
 {
-    public new List<(ValueType Key, ValueType Value)> Value { get; set; }
-    public List<TupleValue> Tuples { get; set; }
-
-    public OldID Id { get; set; }
-
-    public DictionaryValue(List<TupleValue> tuples)
-    {
-        Value = new List<(ValueType Key, ValueType Value)>();
-        Tuples = tuples;
-    }
+    private List<(ValueType Key, ValueType Value)> Value { get; set; } = [];
+    private List<TupleValue> Tuples { get; set; } = tuples;
 
     public override ValueType Run(ref VariateManager Manager)
     {

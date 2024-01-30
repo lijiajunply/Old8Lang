@@ -14,10 +14,10 @@ public class NativeStaticAny(string className, Type ClassType) : ValueType
                 var fie = ClassType.GetField(id.IdName);
                 if (fie is null)
                     return new VoidValue();
-                return ObjToValue(fie.GetValue(null));
+                return ObjToValue(fie.GetValue(null)!);
             }
 
-            return ObjToValue(prop.GetValue(null));
+            return ObjToValue(prop.GetValue(null)!);
         }
 
         if (dotExpr is Instance instance)

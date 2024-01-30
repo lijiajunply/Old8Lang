@@ -2,20 +2,20 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression;
 
-public class OldID : OldExpr
+public class OldID(string name) : OldExpr
 {
-    public string IdName { get; set; }
-    public OldID(string name) => IdName = name;
+    public string IdName => name;
     public override string ToString() => IdName;
 
     public override bool Equals(object? obj)
     {
         var a = obj as OldID;
-        return a.IdName == IdName;
+        return a?.IdName == IdName;
     }
-    protected bool Equals(OldID other)
+
+    public override int GetHashCode()
     {
-        return IdName == other.IdName;
+        return IdName.GetHashCode();
     }
 
     public override ValueType Run(ref VariateManager Manager) => Manager.GetValue(this);

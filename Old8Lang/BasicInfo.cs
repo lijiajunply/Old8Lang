@@ -17,7 +17,7 @@ public static class BasicInfo
     /// <returns></returns>
     public static string Info()
     {
-        StringBuilder builder =
+        var builder =
             new StringBuilder("Old8Lang是一个脚本语言，主要就是为了好玩而写的[doge]\n使用csly(https://github.com/b3b00/csly)编写");
         builder.Append("\nthe keyword:");
         foreach (var variable in KeyWords)

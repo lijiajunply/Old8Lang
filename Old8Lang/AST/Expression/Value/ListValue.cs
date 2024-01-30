@@ -4,7 +4,7 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class ListValue : ValueType
 {
-    private new List<OldExpr> Value { get; set; } = [];
+    private List<OldExpr> Value { get; set; } = [];
 
     private List<ValueType> Values { get; set; } = [];
 

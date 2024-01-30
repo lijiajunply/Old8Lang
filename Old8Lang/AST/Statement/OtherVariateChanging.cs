@@ -33,7 +33,7 @@ public class OtherVariateChanging : OldStatement
         {
             var s = Sum.Run(ref Manager) as IntValue;
             var result = Expr.Run(ref Manager);
-            array.Post(s, result);
+            array.Add(s, result);
         }
 
         if (a is DictionaryValue dictionary)

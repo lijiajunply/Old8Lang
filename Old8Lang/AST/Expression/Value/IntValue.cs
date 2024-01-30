@@ -2,7 +2,7 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class IntValue(int intValue) : ValueType
 {
-    public new int Value { get; set; } = intValue;
+    public int Value { get; set; } = intValue;
     public override string ToString() => Value.ToString();
 
     public override ValueType Plus(ValueType otherValueType)
@@ -53,7 +53,7 @@ public class IntValue(int intValue) : ValueType
     public override bool Less(ValueType? otherValue) => Value < int.Parse(otherValue!.ToString());
     public override bool Greater(ValueType? otherValue) => Value > int.Parse(otherValue!.ToString());
 
-    public override bool Equal(ValueType otherValueType)
+    public override bool Equal(ValueType? otherValueType)
     {
         if (otherValueType is IntValue b)
             return Value == b.Value;

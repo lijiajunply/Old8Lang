@@ -57,7 +57,7 @@ public class Operation(OldExpr left, OldTokenGeneric opera, OldExpr right) : Old
         {
             if (r is Instance r1)
             {
-                List<OldExpr> values = new List<OldExpr>();
+                List<OldExpr> values = [];
                 foreach (var id in r1.Ids)
                     values.Add(id.Run(ref Manager));
                 r1.Ids = values;

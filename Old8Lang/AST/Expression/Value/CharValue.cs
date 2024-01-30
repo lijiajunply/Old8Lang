@@ -12,7 +12,7 @@ public class CharValue(char value) : ValueType
 
     public override string ToString() => Value.ToString();
 
-    public override bool Equal(ValueType otherValueType)
+    public override bool Equal(ValueType? otherValueType)
     {
         if (otherValueType is CharValue b)
             return Value == b.Value;
