@@ -100,7 +100,7 @@ public static class Apis
         var a = JsonSerializer.Deserialize<LangInfo>(jsonString)!;
         if (!File.Exists(a.ImportPath))
         {
-            a.ImportPath = Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath),"Old8LangLib","OldLib");
+            a.ImportPath = Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,"Old8LangLib","OldLib");
         }
         return a;
     }
