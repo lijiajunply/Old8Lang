@@ -8,6 +8,7 @@ public class StringValue : ValueType
 
     public StringValue(string context)
     {
+        Value = "";
         string[] a = context.Split("\\n");
         for (int i = 0; i < a.Length; i++)
             Value += a[i] + (i == a.Length - 1 ? "" : "\n");

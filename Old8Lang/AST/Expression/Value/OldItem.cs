@@ -2,34 +2,26 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class OldItem : ValueType
+public class OldItem(OldID listId, OldExpr key) : ValueType
 {
-    private OldID ListID { get; set; }
+    private OldID ListID { get; set; } = listId;
 
-    private OldExpr Key { get; set; }
-
-    public OldItem(OldID listId, OldExpr key)
-    {
-        ListID = listId;
-        Key = key;
-    }
+    private OldExpr Key { get; set; } = key;
 
     public override ValueType Run(ref VariateManager Manager)
     {
         var a = Manager.GetValue(ListID);
-        var result = new OldExpr();
-        result = Key.Run(ref Manager);
+        OldExpr result = Key.Run(ref Manager);
         if (a is ListValue list && result is IntValue intResult)
             return list.Get(intResult);
         if (a is ArrayValue array && result is IntValue i)
             return array.Get(i);
         if (a is DictionaryValue dir)
         {
-            var keyResult = result as ValueType;
-            return dir.Get(keyResult);
+            if (result is ValueType keyResult) return dir.Get(keyResult);
         }
 
-        return null;
+        return new VoidValue();
     }
 
     public override string ToString() => $"the key: {Key} in {ListID}";

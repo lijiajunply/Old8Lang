@@ -3,14 +3,9 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Statement;
 
-public class FuncInit : OldStatement
+public class FuncInit(FuncValue a) : OldStatement
 {
-    public FuncValue FuncValue { get; set; }
-
-    public FuncInit(FuncValue a)
-    {
-        FuncValue = a;
-    }
+    public FuncValue FuncValue { get; set; } = a;
 
     public override void Run(ref VariateManager Manager)
     {

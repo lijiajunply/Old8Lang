@@ -4,17 +4,17 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class ListValue : ValueType
 {
-    private new List<OldExpr> Value { get; set; }
+    private new List<OldExpr> Value { get; set; } = [];
 
-    private List<ValueType> Values { get; set; } = new List<ValueType>();
+    private List<ValueType> Values { get; set; } = [];
 
     public ListValue(List<OldExpr> value) => Value = value;
-    public ListValue(List<object> value) => Values = value.Select(x => ValueType.ObjToValue(x)).ToList();
+    public ListValue(List<object> value) => Values = value.Select(ObjToValue).ToList();
 
     public override ValueType Run(ref VariateManager Manager)
     {
-        foreach (var VARIABLE in Value)
-            Values.Add(VARIABLE.Run(ref Manager));
+        foreach (var expr in Value)
+            Values.Add(expr.Run(ref Manager));
         return this;
     }
 
@@ -39,7 +39,7 @@ public class ListValue : ValueType
     }
 
     public override string ToString() =>
-        !Values.Any() ? "{" + Apis.ListToString(Value) + "}" : "{" + Apis.ListToString(Values) + "}";
+        Values.Count == 0 ? "{" + Apis.ListToString(Value) + "}" : "{" + Apis.ListToString(Values) + "}";
 
     public override ValueType Dot(OldExpr dotExpr)
     {
@@ -48,17 +48,17 @@ public class ListValue : ValueType
             if (a.Id.IdName == "Add")
             {
                 var result = a.Ids[0] as ValueType;
-                return Add(result);
+                return Add(result!);
             }
 
             if (a.Id.IdName == "Remove")
             {
                 var result = a.Ids[0] as IntValue;
-                return Remove(result);
+                return Remove(result!);
             }
         }
 
-        return null;
+        return new VoidValue();
     }
 
     public override object GetValue() => Apis.ListToObjects(Values);

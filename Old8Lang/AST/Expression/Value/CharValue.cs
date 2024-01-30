@@ -1,9 +1,8 @@
 namespace Old8Lang.AST.Expression.Value;
 
-public class CharValue : ValueType
+public class CharValue(char value) : ValueType
 {
-    new char Value { get; set; }
-    public CharValue(char value) => Value = value;
+    new char Value { get; set; } = value;
     public override ValueType Plus(ValueType otherValueType) => new StringValue(Value + (string)otherValueType.Value);
 
     public override ValueType Times(ValueType otherValueType)

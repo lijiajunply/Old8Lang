@@ -181,7 +181,7 @@ public class OldParser
             x => x, () => null!);
         var elseBlock = eGrp?.Value(0) as BlockStatement;
         var a = elif.Select(x => x.Value(0) as OldIf).ToList();
-        return new IfStatement(ifBlock, a!, elseBlock!) { Position = ifBlock.Position };
+        return new IfStatement(ifBlock, a, elseBlock) { Position = ifBlock.Position };
     }
 
     [Production("ifblock: OldParser_expressions block")]
@@ -228,7 +228,7 @@ public class OldParser
     public OldLangTree Class(Token<OldTokenGeneric> id, BlockStatement statements)
     {
         var c = new Dictionary<OldID, OldExpr>();
-        statements.Statements.ForEach(x => c.Add(GetTuple(x).id, GetTuple(x).Expr));
+        statements.OtherStatements.ForEach(x => c.Add(GetTuple(x).id, GetTuple(x).Expr));
         return new ClassInit(new AnyValue(new OldID(id.Value), c)) { Position = id.Position };
     }
 

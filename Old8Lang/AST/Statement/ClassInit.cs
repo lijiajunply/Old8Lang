@@ -3,14 +3,9 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Statement;
 
-public class ClassInit : OldStatement
+public class ClassInit(AnyValue anyValue) : OldStatement
 {
-    private AnyValue AnyValue { get; set; }
-
-    public ClassInit(AnyValue anyValue)
-    {
-        AnyValue = anyValue;
-    }
+    private AnyValue AnyValue { get; set; } = anyValue;
 
     public override void Run(ref VariateManager Manager) => Manager.AddClassAndFunc(AnyValue);
 

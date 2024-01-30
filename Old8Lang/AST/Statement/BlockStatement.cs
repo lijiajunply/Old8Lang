@@ -8,16 +8,15 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public class BlockStatement : OldStatement
 {
-    public List<OldStatement> Statements { get; set; }
     private List<OldStatement> ImportStatements { get; set; }
-    private List<OldStatement> OtherStatements { get; set; }
+    public List<OldStatement> OtherStatements { get; set; }
 
     public BlockStatement(List<OldLangTree> statements)
     {
         ImportStatements = new List<OldStatement>();
         OtherStatements = new List<OldStatement>();
-        Statements = statements.OfType<OldStatement>().ToList();
-        foreach (var statement in Statements)
+        
+        foreach (var statement in statements.OfType<OldStatement>())
         {
             if (statement is ImportStatement or NativeStatement or FuncInit or ClassInit)
                 ImportStatements.Add(statement);
@@ -43,22 +42,25 @@ public class BlockStatement : OldStatement
 
     public override string ToString()
     {
-        StringBuilder sb = new StringBuilder();
-        foreach (var t in Statements)
-            sb.Append(t + "\n");
+        var sb = new StringBuilder();
+        foreach (var statement in ImportStatements)
+            sb.Append(statement + Environment.NewLine);
+        foreach (var statement in OtherStatements)
+            sb.Append(statement + Environment.NewLine);
+        
         return sb.ToString();
     }
 
     public string ToCode()
     {
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
         var import = ImportStatements.OfType<ImportStatement>().ToList();
         var func = ImportStatements.Where(x => x is ClassInit or FuncInit).ToList();
         foreach (var importStatement in import)
             sb.Append(importStatement);
         foreach (var statement in func)
             sb.Append(statement);
-        sb.Append($"class Project{{public void Main(){{");
+        sb.Append("class Project{public void Main(){");
         foreach (var statement in OtherStatements)
             sb.Append(statement);
         sb.Append("}}");

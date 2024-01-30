@@ -5,24 +5,20 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Statement;
 
-public class ForStatement : OldStatement
+public class ForStatement(
+    SetStatement setStatement,
+    Operation expr,
+    OldStatement statement,
+    BlockStatement blockStatement)
+    : OldStatement
 {
-    public SetStatement SetStatement { get; set; }
+    private SetStatement SetStatement { get; set; } = setStatement;
 
-    public Operation Expr { get; set; }
+    private Operation Expr { get; set; } = expr;
 
-    public OldStatement Statement { get; set; }
+    private OldStatement Statement { get; set; } = statement;
 
-    public BlockStatement ForBlockStatement { get; set; }
-
-    public ForStatement(SetStatement setStatement, Operation expr, OldStatement statement,
-        BlockStatement blockStatement)
-    {
-        SetStatement = setStatement;
-        Expr = expr;
-        Statement = statement;
-        ForBlockStatement = blockStatement;
-    }
+    private BlockStatement ForBlockStatement { get; set; } = blockStatement;
 
     public override void Run(ref VariateManager Manager)
     {
@@ -32,17 +28,17 @@ public class ForStatement : OldStatement
         {
             var varExpr = Expr.Run(ref Manager);
             bool expr;
-            if (varExpr is BoolValue)
-                expr = (varExpr as BoolValue).Value;
+            if (varExpr is BoolValue value)
+                expr = value.Value;
             else
-                return;
+                break;
             if (expr)
             {
                 ForBlockStatement.Run(ref Manager);
                 Statement.Run(ref Manager);
             }
             else
-                return;
+                break;
         }
 
         Manager.RemoveChildren();
@@ -50,7 +46,7 @@ public class ForStatement : OldStatement
 
     public override string ToString()
     {
-        StringBuilder sb = new StringBuilder($"for({SetStatement} ; {Expr} ; {Statement})");
+        var sb = new StringBuilder($"for({SetStatement} ; {Expr} ; {Statement})");
         sb.Append("\n{" + ForBlockStatement + "\n}");
         return sb.ToString();
     }

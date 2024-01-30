@@ -33,7 +33,7 @@ public class NativeAnyValue : ValueType
             {
                 var fie = ClassType.GetField(id.IdName);
                 if (fie is null)
-                    return null;
+                    return new VoidValue();
                 return ObjToValue(fie.GetValue(null));
             }
 
@@ -47,14 +47,14 @@ public class NativeAnyValue : ValueType
             return func.Run(ref manager, instance.Ids, InstanceObj);
         }
 
-        return null;
+        return new VoidValue();
     }
 
     public override ValueType Run(ref VariateManager Manager)
     {
         var assembly = Assembly.LoadFile(Path);
-        ClassType = assembly.GetType($"{DllName}.{ClassName}");
-        if (ClassType.GetConstructors() is not null)
+        ClassType = assembly.GetType($"{DllName}.{ClassName}")!;
+        if (ClassType?.GetConstructors() is not null)
             Constructor = ClassType.GetConstructors()[0];
         manager = Manager.Clone();
         return this;

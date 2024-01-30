@@ -1,16 +1,8 @@
 namespace Old8Lang.AST.Expression.Value;
 
-public class NativeStaticAny : ValueType
+public class NativeStaticAny(string className, Type ClassType) : ValueType
 {
-    public readonly string ClassName;
-
-    private readonly Type ClassType;
-
-    public NativeStaticAny(string classname, Type classType)
-    {
-        ClassName = classname;
-        ClassType = classType;
-    }
+    public readonly string ClassName = className;
 
     public override ValueType Dot(OldExpr dotExpr)
     {
@@ -21,7 +13,7 @@ public class NativeStaticAny : ValueType
             {
                 var fie = ClassType.GetField(id.IdName);
                 if (fie is null)
-                    return null;
+                    return new VoidValue();
                 return ObjToValue(fie.GetValue(null));
             }
 
@@ -32,10 +24,10 @@ public class NativeStaticAny : ValueType
         {
             var Method = ClassType.GetMethod(instance.Id.IdName);
             var a = Apis.ListToObjects(instance.Ids.OfType<ValueType>().ToList()).ToArray();
-            var invoke = Method.Invoke(null, a);
-            return ObjToValue(invoke);
+            var invoke = Method?.Invoke(null, a);
+            return ObjToValue(invoke!);
         }
 
-        return null;
+        return new VoidValue();
     }
 }

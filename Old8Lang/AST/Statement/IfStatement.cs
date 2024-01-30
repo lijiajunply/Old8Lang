@@ -5,41 +5,32 @@ namespace Old8Lang.AST.Statement;
 /// <summary>
 /// if语句
 /// </summary>
-public class IfStatement : OldStatement
+public class IfStatement(OldIf ifBlock, List<OldIf?> elifBlock, BlockStatement? elseBlockStatement)
+    : OldStatement
 {
-    private OldIf IfBlock { get; set; }
+    private OldIf IfBlock { get; set; } = ifBlock;
 
-    private List<OldIf> ElifBlock { get; set; }
+    private List<OldIf?> ElifBlock { get; set; } = elifBlock;
 
-    private BlockStatement ElseBlockStatement { get; set; }
-
-    public IfStatement(OldIf ifBlock, List<OldIf>? elifBlock, BlockStatement elseBlockStatement)
-    {
-        IfBlock = ifBlock;
-        ElifBlock = elifBlock;
-        ElseBlockStatement = elseBlockStatement;
-    }
+    private BlockStatement? ElseBlockStatement { get; set; } = elseBlockStatement;
 
     public override void Run(ref VariateManager Manager)
     {
-        bool r = true;
+        var r = true;
         Manager.AddChildren();
         IfBlock.Run(ref Manager, ref r);
         Manager.RemoveChildren();
-        if (ElifBlock is not null)
+        foreach (var variable in ElifBlock)
         {
-            foreach (var VARIABLE in ElifBlock)
-            {
-                Manager.AddChildren();
-                VARIABLE.Run(ref Manager, ref r);
-                Manager.RemoveChildren();
-            }
+            if(variable is null)continue;
+            Manager.AddChildren();
+            variable.Run(ref Manager, ref r);
+            Manager.RemoveChildren();
         }
 
-        if (ElseBlockStatement is not null && r)
-        {
-            ElseBlockStatement.Run(ref Manager);
-        }
+        if (r)
+            ElseBlockStatement?.Run(ref Manager);
+        
     }
 
     public override string ToString() =>

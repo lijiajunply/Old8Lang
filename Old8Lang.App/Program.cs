@@ -1,7 +1,7 @@
 ﻿using Old8Lang;
 
 //APIs.ChangeBasicInfo("/home/luckyfish/RiderProjects/Old8Lang/Old8LangLib/OldLib/","0.3.0");
-string[] strings = ["-f", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!, "Old8Lang", "Ex", "other.ws")];
+string[] strings = ["-f", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!, "Old8Lang", "Ex", "init.ws")];
 //
 
 args = args.Length == 0 ? strings : args;

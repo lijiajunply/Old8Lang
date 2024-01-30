@@ -30,7 +30,7 @@ public class Instance(OldID id, List<OldExpr> ids) : ValueType
                         Manager.Set(new OldID(type.Key), type.Value);
                 }
 
-                return new IntValue(0);
+                return new VoidValue();
             }
         }
 
@@ -49,7 +49,7 @@ public class Instance(OldID id, List<OldExpr> ids) : ValueType
 
         if (result is NativeAnyValue nativeAnyValue)
         {
-            List<ValueType> a = new List<ValueType>();
+            List<ValueType> a = [];
             foreach (var id in Ids)
                 a.Add(id.Run(ref Manager));
             nativeAnyValue.New(Apis.ListToObjects(a).ToArray());

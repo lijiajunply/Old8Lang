@@ -2,12 +2,9 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class ErrorValue : ValueType
+public class ErrorValue(OldLangTree statement, OldLangTree value) : ValueType
 {
-    private ErrorException ErrorException { get; set; }
-
-    public ErrorValue(OldLangTree statement, OldLangTree value) =>
-        ErrorException = new ErrorException(statement, value);
+    private ErrorException ErrorException { get; set; } = new(statement, value);
 
     public override string ToString() => ErrorException.Message;
 }

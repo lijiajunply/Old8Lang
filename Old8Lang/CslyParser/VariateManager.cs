@@ -1,8 +1,6 @@
 using System.Text;
-using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
-using String = System.String;
 using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.CslyParser;
@@ -12,7 +10,7 @@ public class VariateManager
     #region Lang
 
     public LangInfo? LangInfo { get; set; }
-    public string Path { get; set; } = String.Empty;
+    public string Path { get; init; } = "";
 
     #endregion
 
@@ -62,22 +60,19 @@ public class VariateManager
         LangInfo = info;
     }
 
-    public ValueTuple<OldID, OldExpr> Set(OldID id, ValueType valueType)
+    public void Set(OldID id, ValueType valueType)
     {
         var a1 = GetValue(id);
         if (a1 == null!)
         {
             //init
-            var a = valueType;
             Variates.Add(id.IdName, valueType);
             Count++;
-            return (id, a);
+            return;
         }
         
         //reset
         Variates[id.IdName] = valueType;
-
-        return (id, valueType);
     }
 
 
@@ -149,7 +144,7 @@ public class VariateManager
 
     public override string ToString()
     {
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
         foreach (var variate in Variates)
             builder.Append(" " + variate.Key + "=>" + variate.Value + " ");
         builder.Append('\n');

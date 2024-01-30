@@ -8,15 +8,15 @@ public class FuncValue : ValueType
 {
     public OldID? Id { get; set; }
 
-    private BlockStatement BlockStatement { get; set; }
+    private BlockStatement BlockStatement { get; set; } = new([]);
 
     public List<OldID>? Ids { get; set; }
 
     private bool IsNative { get; set; }
 
-    private MethodInfo Method { get; set; }
+    private MethodInfo? Method { get; set; }
 
-    private FuncValue Func { get; set; }
+    private FuncValue? Func { get; set; }
 
     public FuncValue(OldID? id, List<OldID> ids, BlockStatement blockStatement)
     {
@@ -25,7 +25,7 @@ public class FuncValue : ValueType
         BlockStatement = blockStatement;
     }
 
-    public FuncValue(string idName, MethodInfo methodInfo, FuncValue func = null)
+    public FuncValue(string idName, MethodInfo methodInfo, FuncValue? func = null)
     {
         Id = new OldID(idName);
         IsNative = true;
@@ -35,21 +35,25 @@ public class FuncValue : ValueType
 
     public override ValueType Run(ref VariateManager Manager) => this;
 
-    public ValueType Run(ref VariateManager Manager, List<OldExpr>? ids, object obj = null)
+    public ValueType Run(ref VariateManager Manager, List<OldExpr>? ids, object? obj = null)
     {
         if (IsNative)
         {
             var values = new List<ValueType>();
-            foreach (var expr in ids)
-                values.Add(expr.Run(ref Manager));
+            if (ids != null)
+                foreach (var expr in ids)
+                    values.Add(expr.Run(ref Manager));
             var a = Apis.ListToObjects(values).ToArray();
-            var invoke = Method.Invoke(obj, a);
-
+            var invoke = Method?.Invoke(obj, a);
+            
+            if(invoke is null)
+                return new VoidValue();
+            
             var manager = new VariateManager();
             manager.Init(new Dictionary<string, ValueType> { { "base", ObjToValue(invoke) } });
             manager.IsClass = false;
             manager.Result = ObjToValue(invoke);
-            if (Func is not null) Func.Run(ref manager, ids);
+            Func?.Run(ref manager, ids);
             return manager.Result;
         }
 
@@ -72,7 +76,7 @@ public class FuncValue : ValueType
         return variateManager.Result;
     }
 
-    public override string ToString() => IsNative ? $"{Method}" : $"{Id}({Apis.ListToString(Ids)}) => {BlockStatement}";
+    public override string ToString() => IsNative ? $"{Method}" : $"{Id}({Apis.ListToString(Ids!)}) => {BlockStatement}";
 
     public override object GetValue() => Value;
 }

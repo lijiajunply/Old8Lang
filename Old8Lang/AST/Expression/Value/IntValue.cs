@@ -1,9 +1,8 @@
 namespace Old8Lang.AST.Expression.Value;
 
-public class IntValue : ValueType
+public class IntValue(int intValue) : ValueType
 {
-    public new int Value { get; set; }
-    public IntValue(int intValue) => Value = intValue;
+    public new int Value { get; set; } = intValue;
     public override string ToString() => Value.ToString();
 
     public override ValueType Plus(ValueType otherValueType)
@@ -15,7 +14,7 @@ public class IntValue : ValueType
         if (otherValueType is DoubleValue)
             return otherValueType.Plus(this);
         if (otherValueType is IntValue)
-            return new IntValue(Value + Int32.Parse(otherValueType.ToString()));
+            return new IntValue(Value + int.Parse(otherValueType.ToString()));
 
         return new ValueType();
     }
@@ -25,7 +24,7 @@ public class IntValue : ValueType
         if (otherValueType is DoubleValue)
             return otherValueType.Minus(this);
         if (otherValueType is IntValue)
-            return new IntValue(Value - Int32.Parse(otherValueType.ToString()));
+            return new IntValue(Value - int.Parse(otherValueType.ToString()));
         return new ValueType();
     }
 
@@ -38,8 +37,8 @@ public class IntValue : ValueType
         if (otherValueType is DoubleValue)
             return otherValueType.Times(this);
         if (otherValueType is IntValue)
-            return new IntValue(Value * Int32.Parse(otherValueType.ToString()));
-        return new ValueType();
+            return new IntValue(Value * int.Parse(otherValueType.ToString()));
+        return new VoidValue();
     }
 
     public override ValueType Divide(ValueType otherValueType)
@@ -47,12 +46,12 @@ public class IntValue : ValueType
         if (otherValueType is DoubleValue)
             return otherValueType.Divide(this);
         if (otherValueType is IntValue)
-            return new IntValue(Value / Int32.Parse(otherValueType.ToString()));
-        return new ValueType();
+            return new IntValue(Value / int.Parse(otherValueType.ToString()));
+        return new VoidValue();
     }
 
-    public override bool Less(ValueType? otherValue) => Value < Int32.Parse(otherValue.ToString());
-    public override bool Greater(ValueType? otherValue) => Value > Int32.Parse(otherValue.ToString());
+    public override bool Less(ValueType? otherValue) => Value < int.Parse(otherValue!.ToString());
+    public override bool Greater(ValueType? otherValue) => Value > int.Parse(otherValue!.ToString());
 
     public override bool Equal(ValueType otherValueType)
     {
