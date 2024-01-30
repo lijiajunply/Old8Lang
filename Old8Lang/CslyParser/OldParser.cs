@@ -114,7 +114,7 @@ public class OldParser
         return new FuncValue(null, a, new BlockStatement(returnState)) { Position = expr.Position };
     }
 
-    [Production("primary: DOUHAO")]
+    [Production("primary: COMMA")]
     public OldLangTree DouHaoTree(Token<OldTokenGeneric> _) => new IntValue(0) { Position = _.Position };
 
     [Production("primary: L_BRACES[d] OldParser_expressions* R_BRACES[d]")]
@@ -132,7 +132,7 @@ public class OldParser
         return new ArrayValue(a) { Position = _.Position };
     }
 
-    [Production("primary: LPAREN[d] OldParser_expressions DOUHAO[d] OldParser_expressions RPAREN[d]")]
+    [Production("primary: LPAREN[d] OldParser_expressions COMMA[d] OldParser_expressions RPAREN[d]")]
     public OldLangTree Tuple(OldExpr v1, OldExpr v2) => new TupleValue(v1, v2) { Position = v1.Position };
 
 
@@ -151,12 +151,12 @@ public class OldParser
     #region statement
 
     [Production("statement: IDENTIFIER L_BRACKET[d] OldParser_expressions R_BRACKET[d] SET[d] OldParser_expressions")]
-    public OldLangTree ArraySetTree(Token<OldTokenGeneric> classid, OldExpr aid, OldExpr expr) =>
-        new OtherVariateChanging(new OldID(classid.Value), aid, expr) { Position = classid.Position };
+    public OldLangTree ArraySetTree(Token<OldTokenGeneric> classId, OldExpr aid, OldExpr expr) =>
+        new OtherVariateChanging(new OldID(classId.Value), aid, expr) { Position = classId.Position };
 
     [Production("statement: IDENTIFIER CONCAT[d] IDENTIFIER SET[d] OldParser_expressions")]
-    public OldLangTree ClassSetTree(Token<OldTokenGeneric> classid, Token<OldTokenGeneric> aid, OldExpr expr) =>
-        new OtherVariateChanging(new OldID(classid.Value), new OldID(aid.Value), expr) { Position = classid.Position };
+    public OldLangTree ClassSetTree(Token<OldTokenGeneric> classId, Token<OldTokenGeneric> aid, OldExpr expr) =>
+        new OtherVariateChanging(new OldID(classId.Value), new OldID(aid.Value), expr) { Position = classId.Position };
 
     [Production("statement: RETURN[d] OldParser_expressions")]
     public OldLangTree ReturnTree(OldExpr expr) => new ReturnStatement(expr) { Position = expr.Position };
@@ -173,7 +173,7 @@ public class OldParser
     public OldLangTree DIS_SET(OldExpr value, Token<OldTokenGeneric> id) =>
         new SetStatement(new OldID(id.Value), value);
 
-    [Production("statement : IF[d] ifblock (ELIF[d] ifblock)* (ELSE[d] block)?")]
+    [Production("statement : IF[d] if_block (ELIF[d] if_block)* (ELSE[d] block)?")]
     public OldLangTree IfTree(OldIf ifBlock, List<Group<OldTokenGeneric, OldLangTree>> elif,
         ValueOption<Group<OldTokenGeneric, OldLangTree>> Else)
     {
@@ -184,7 +184,7 @@ public class OldParser
         return new IfStatement(ifBlock, a, elseBlock) { Position = ifBlock.Position };
     }
 
-    [Production("ifblock: OldParser_expressions block")]
+    [Production("if_block: OldParser_expressions block")]
     public OldLangTree IfBlock(OldExpr expr, BlockStatement blockStatement) =>
         new OldIf(expr, blockStatement) { Position = expr.Position };
 
@@ -192,7 +192,7 @@ public class OldParser
     public OldLangTree Block(List<OldLangTree> statements) => new BlockStatement(statements);
 
 
-    [Production("statement: FOR[d] set DOUHAO[d] OldParser_expressions DOUHAO[d] statement  block")]
+    [Production("statement: FOR[d] set COMMA[d] OldParser_expressions COMMA[d] statement  block")]
     public OldLangTree For(SetStatement setStatement, Operation expr, OldStatement statement,
         BlockStatement blockStatement) =>
         new ForStatement(setStatement, expr, statement, blockStatement) { Position = setStatement.Position };

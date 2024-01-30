@@ -101,7 +101,7 @@ public class Interpreter
         return result.Result as BlockStatement ?? new BlockStatement([]);
     }
 
-    public void Dot(ParseResult<OldTokenGeneric, OldLangTree> result)
+    private void Dot(ParseResult<OldTokenGeneric, OldLangTree> result)
     {
         var tree = result.SyntaxTree;
         var graphviz = new GraphVizEBNFSyntaxTreeVisitor<OldTokenGeneric>();

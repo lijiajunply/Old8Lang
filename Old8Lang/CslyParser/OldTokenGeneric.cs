@@ -58,7 +58,7 @@ public enum OldTokenGeneric
     [Sugar("/")] DIVIDE = 210,
     [Sugar("<-")] SET = 211,
     [Sugar("->")] DIS_SET = 212,
-    [Sugar(",")] DOUHAO = 213,
+    [Sugar(",")] COMMA = 213,
 
     #endregion
 
