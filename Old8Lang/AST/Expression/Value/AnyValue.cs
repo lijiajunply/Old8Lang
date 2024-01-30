@@ -55,7 +55,7 @@ public class AnyValue : ValueType
 
     public override string ToString() => $"class {Id} " + "{" + "\n{manager}" + "\n}";
 
-    public override void Init()
+    public virtual void Init()
     {
         manager = new VariateManager();
         manager.Init(Result);

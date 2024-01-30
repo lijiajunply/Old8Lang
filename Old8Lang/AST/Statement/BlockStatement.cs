@@ -40,6 +40,15 @@ public class BlockStatement : OldStatement
         }
     }
 
+    public void ImportRun(ref VariateManager Manager)
+    {
+        foreach (var statement in ImportStatements)
+        {
+            statement.Run(ref Manager);
+            if (Manager.IsReturn) return;
+        }
+    }
+
     public override string ToString()
     {
         var sb = new StringBuilder();

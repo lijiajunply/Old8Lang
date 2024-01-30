@@ -6,18 +6,17 @@ namespace Old8Lang.AST.Expression;
 /// <summary>
 /// 表示值
 /// </summary>
-public class ValueType : OldExpr
+public abstract class ValueType : OldExpr
 {
-    public object Value { get; set; }
 
-    public override string ToString() => GetValue().ToString();
+    public override string ToString() => GetValue().ToString()!;
 
     #region intOper
 
-    public virtual ValueType Plus(ValueType otherValueType) => new();
-    public virtual ValueType Minus(ValueType otherValueType) => new();
-    public virtual ValueType Times(ValueType otherValueType) => new();
-    public virtual ValueType Divide(ValueType otherValueType) => new();
+    public virtual ValueType Plus(ValueType otherValueType) => new VoidValue();
+    public virtual ValueType Minus(ValueType otherValueType) => new VoidValue();
+    public virtual ValueType Times(ValueType otherValueType) => new VoidValue();
+    public virtual ValueType Divide(ValueType otherValueType) => new VoidValue();
 
     #endregion
 
@@ -35,12 +34,12 @@ public class ValueType : OldExpr
             if (instance.Id.IdName == "GetType")
                 return new TypeValue(TypeToString());
             if (instance.Id.IdName == "ToInt")
-                return new IntValue(Int32.Parse(ToString()));
+                return new IntValue(int.Parse(ToString()));
             if (instance.Id.IdName == "ToString")
                 return new StringValue(ToString());
         }
 
-        return null;
+        return new VoidValue();
     }
 
     #region boolOper
@@ -53,15 +52,6 @@ public class ValueType : OldExpr
 
     public override ValueType Run(ref VariateManager Manager) => this;
 
-    public virtual ValueType Clone()
-    {
-        var a = (ValueType)MemberwiseClone();
-        a.Init();
-        return a;
-    }
-
-    public virtual void Init() => Value = new object();
-
     public string TypeToString()
     {
         return this switch
@@ -72,7 +62,7 @@ public class ValueType : OldExpr
             CharValue => "Char",
             DictionaryValue => "Dictionary",
             DoubleValue => "Double",
-            FuncValue func => $"Function {func.Id} ({Apis.ListToString(func.Ids)})",
+            FuncValue func => $"Function {func.Id} ({Apis.ListToString(func.Ids!)})",
             Instance instance => $"Instance {instance}",
             IntValue => "Int",
             OldItem item => $"Item {item}",
@@ -85,13 +75,13 @@ public class ValueType : OldExpr
     }
 
     public override bool Equals(object? obj) => Equal(obj as ValueType);
-    public virtual object GetValue() => Value;
+    public virtual object GetValue() => new();
 
-    public static ValueType ObjToValue(object value)
+    protected static ValueType ObjToValue(object value)
     {
-        if (value is null)
+        if (value == null!)
         {
-            return null;
+            return new VoidValue();
         }
 
         return value switch
@@ -102,7 +92,7 @@ public class ValueType : OldExpr
             char a => new CharValue(a),
             List<object> a => new ListValue(a),
             object[] a => new ArrayValue(a.ToList()),
-            _ => new ValueType()
+            _ => new VoidValue()
         };
     }
 }

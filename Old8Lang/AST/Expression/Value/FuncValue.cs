@@ -1,6 +1,7 @@
 using System.Reflection;
 using Old8Lang.AST.Statement;
 using Old8Lang.CslyParser;
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -44,11 +45,19 @@ public class FuncValue : ValueType
                 foreach (var expr in ids)
                     values.Add(expr.Run(ref Manager));
             var a = Apis.ListToObjects(values).ToArray();
-            var invoke = Method?.Invoke(obj, a);
-            
-            if(invoke is null)
+            object? invoke;
+            try
+            {
+                invoke = Method?.Invoke(obj, a);
+            }
+            catch
+            {
+                throw new ErrorException(this,this);
+            }
+
+            if (invoke is null)
                 return new VoidValue();
-            
+
             var manager = new VariateManager();
             manager.Init(new Dictionary<string, ValueType> { { "base", ObjToValue(invoke) } });
             manager.IsClass = false;
@@ -76,7 +85,6 @@ public class FuncValue : ValueType
         return variateManager.Result;
     }
 
-    public override string ToString() => IsNative ? $"{Method}" : $"{Id}({Apis.ListToString(Ids!)}) => {BlockStatement}";
-
-    public override object GetValue() => Value;
+    public override string ToString() =>
+        IsNative ? $"{Method}" : $"{Id}({Apis.ListToString(Ids!)}) => {BlockStatement}";
 }

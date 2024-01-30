@@ -4,13 +4,13 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class StringValue : ValueType
 {
-    public new string Value { get; set; }
+    public string Value { get; set; }
 
     public StringValue(string context)
     {
         Value = "";
-        string[] a = context.Split("\\n");
-        for (int i = 0; i < a.Length; i++)
+        var a = context.Split("\\n");
+        for (var i = 0; i < a.Length; i++)
             Value += a[i] + (i == a.Length - 1 ? "" : "\n");
     }
 
@@ -34,7 +34,7 @@ public class StringValue : ValueType
             return new StringValue(sb.ToString());
         }
 
-        return new ValueType();
+        return new VoidValue();
     }
 
     public override object GetValue() => Value;

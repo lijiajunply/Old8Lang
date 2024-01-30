@@ -12,10 +12,10 @@ public class Interpreter
 {
     #region Code
 
-    private BlockStatement Block { get; set; } = new([]);
-
     private VariateManager Manager;
     private string Code { get; set; }
+
+    private Parser<OldTokenGeneric, OldLangTree>? parser;
 
     #endregion
 
@@ -30,18 +30,31 @@ public class Interpreter
     
     private readonly List<string> Error;
 
+    private void Init()
+    {
+        var Parser = new ParserBuilder<OldTokenGeneric, OldLangTree>();
+        var oldParser = new OldParser();
+        var parserBuilder = Parser.BuildParser(oldParser,
+            ParserType.EBNF_LL_RECURSIVE_DESCENT, "root");
+        parser = parserBuilder.Result;
+    }
+    
     public Interpreter(string path, bool isDir)
     {
         Error = new List<string>();
         Manager = new VariateManager { Path = path };
         Code = isDir ? Apis.FromDirectory(path) : Apis.FromFile(path);
+        Init();
+        Manager.Interpreter = this;
     }
-
+    
     public Interpreter(string code, VariateManager manager)
     {
         Error = new List<string>();
         Manager = manager;
         Code = code;
+        Init();
+        Manager.Interpreter = this;
     }
 
     public Interpreter(string path, bool isDir, LangInfo info)
@@ -50,6 +63,8 @@ public class Interpreter
         Manager = new VariateManager(info) { Path = path };
         Manager.Init();
         Code = isDir ? Apis.FromDirectory(path) : Apis.FromFile(path);
+        Init();
+        Manager.Interpreter = this;
     }
 
     public void ParserRun(bool dot = false)
@@ -57,7 +72,7 @@ public class Interpreter
         var sw = new Stopwatch();
         sw.Start();
         Manager.LangInfo ??= Apis.ReadJson();
-        Block = Build(dot);
+        var Block = Build(dot);
         sw.Stop();
         var ts = sw.Elapsed;
         Time += $"Parser Build Time : {ts.TotalMilliseconds}ms\n";
@@ -73,15 +88,12 @@ public class Interpreter
         Time += $"Total : {DoubleTime}ms";
     }
 
-    public BlockStatement Build(bool isDot = false)
+    public BlockStatement Build(bool isDot = false,string code = "")
     {
-        var Parser = new ParserBuilder<OldTokenGeneric, OldLangTree>();
-        var oldParser = new OldParser();
-        var parserBuilder = Parser.BuildParser(oldParser,
-            ParserType.EBNF_LL_RECURSIVE_DESCENT, "root");
-        var buildResult = parserBuilder.Result;
+        var result = parser?.Parse(string.IsNullOrEmpty(code) ? Code : code);
 
-        var result = buildResult.Parse(Code);
+        if (result is null) return new BlockStatement([]);
+        
         if (isDot)
             Dot(result);
         if (result.Errors != null && result.Errors.Count != 0)

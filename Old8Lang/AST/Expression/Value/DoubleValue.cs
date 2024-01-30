@@ -4,27 +4,27 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class DoubleValue(double doubleValue) : ValueType
 {
-    public new double Value { get; set; } = doubleValue;
+    private double Value { get; set; } = doubleValue;
 
     public override ValueType Plus(ValueType otherValueType) =>
         otherValueType is IntValue or DoubleValue
             ? new DoubleValue(Value + double.Parse(otherValueType.ToString()))
-            : new ValueType();
+            : new VoidValue();
 
     public override ValueType Minus(ValueType otherValueType) =>
         otherValueType is IntValue or DoubleValue
             ? new DoubleValue(Value - double.Parse(otherValueType.ToString()))
-            : new ValueType();
+            : new VoidValue();
 
     public override ValueType Times(ValueType otherValueType) =>
         otherValueType is IntValue or DoubleValue
             ? new DoubleValue(Value * double.Parse(otherValueType.ToString()))
-            : new ValueType();
+            : new VoidValue();
 
     public override ValueType Divide(ValueType otherValueType) =>
         otherValueType is IntValue or DoubleValue
             ? new DoubleValue(Value / double.Parse(otherValueType.ToString()))
-            : new ValueType();
+            : new VoidValue();
 
 
     public override bool Less(ValueType? otherValue) => Value < double.Parse(otherValue.ToString());

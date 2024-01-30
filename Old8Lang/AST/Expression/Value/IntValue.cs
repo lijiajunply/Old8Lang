@@ -16,7 +16,7 @@ public class IntValue(int intValue) : ValueType
         if (otherValueType is IntValue)
             return new IntValue(Value + int.Parse(otherValueType.ToString()));
 
-        return new ValueType();
+        return new VoidValue();
     }
 
     public override ValueType Minus(ValueType otherValueType)
@@ -25,7 +25,7 @@ public class IntValue(int intValue) : ValueType
             return otherValueType.Minus(this);
         if (otherValueType is IntValue)
             return new IntValue(Value - int.Parse(otherValueType.ToString()));
-        return new ValueType();
+        return new VoidValue();
     }
 
     public override ValueType Times(ValueType otherValueType)

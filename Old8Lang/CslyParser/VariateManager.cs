@@ -10,7 +10,9 @@ public class VariateManager
     #region Lang
 
     public LangInfo? LangInfo { get; set; }
-    public string Path { get; init; } = "";
+    public string Path { get; set; } = "";
+    
+    public Interpreter? Interpreter { get; set; }
 
     #endregion
 
