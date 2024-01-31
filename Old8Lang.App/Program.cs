@@ -96,6 +96,7 @@ void Run(bool isDic, string path)
     var info = Apis.CslyUsing(path, isDic);
     info.Error.ForEach(Console.WriteLine);
     Console.WriteLine("------------------\n" + info.Time);
+    Console.WriteLine(info.Manager);
 }
 
 #endregion

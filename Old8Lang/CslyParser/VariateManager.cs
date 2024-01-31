@@ -11,7 +11,7 @@ public class VariateManager
 
     public LangInfo? LangInfo { get; set; }
     public string Path { get; set; } = "";
-    
+
     public Interpreter? Interpreter { get; set; }
 
     #endregion
@@ -44,18 +44,17 @@ public class VariateManager
     public void Set(OldID id, ValueType valueType)
     {
         var a1 = GetValue(id);
-        if (a1 == null!)
+        if (a1 == null)
         {
             //init
             Variates.Add(id.IdName, valueType);
             Count++;
             return;
         }
-        
+
         //reset
         Variates[id.IdName] = valueType;
     }
-
 
     /// <summary>
     /// GC
@@ -84,7 +83,7 @@ public class VariateManager
         GarbageCollection();
     }
 
-    public ValueType GetValue(OldID id)
+    public ValueType? GetValue(OldID id)
     {
         if (Variates.Keys.Any(key => key == id.IdName))
             return Variates[id.IdName];
@@ -100,7 +99,8 @@ public class VariateManager
                 _ => false
             };
         });
-        return b!;
+
+        return b;
     }
 
     #region Init
@@ -114,7 +114,7 @@ public class VariateManager
     #endregion
 
     public VariateManager NewManger()
-        => new() { AnyInfo = AnyInfo, LangInfo = LangInfo, Interpreter = Interpreter,Path = Path};
+        => new() { AnyInfo = AnyInfo, LangInfo = LangInfo, Interpreter = Interpreter, Path = Path };
 
     public void AddClassAndFunc(ValueType valueType) => AnyInfo.Add(valueType);
 
@@ -122,12 +122,23 @@ public class VariateManager
 
     public override string ToString()
     {
-        var builder = new StringBuilder();
+        var builder = new StringBuilder($"---------Variates---------{Environment.NewLine}|Name\t|Value\t|");
+        // foreach (var variate in Variates)
+        //     builder.Append(" " + variate.Key + "=>" + variate.Value + " ");
+        // builder.Append('\n');
+        // foreach (var variable in AnyInfo)
+        //     builder.Append(variable + "\n");
         foreach (var variate in Variates)
-            builder.Append(" " + variate.Key + "=>" + variate.Value + " ");
-        builder.Append('\n');
-        foreach (var variable in AnyInfo)
-            builder.Append(variable + "\n");
+            builder.Append($"{Environment.NewLine}|{variate.Key}\t|{variate.Value}\t|");
+        builder.Append($"{Environment.NewLine}---------Class&Func-------{Environment.NewLine}|");
+        foreach (var type in AnyInfo)
+        {
+            if (type is AnyValue any)
+                builder.Append($"{any.Id}|");
+            if (type is FuncValue func)
+                builder.Append($"{func.Id}|");
+        }
+        builder.Append($"{Environment.NewLine}------------------");
         return builder.ToString();
     }
 }

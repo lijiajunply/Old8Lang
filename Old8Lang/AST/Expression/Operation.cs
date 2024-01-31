@@ -21,6 +21,16 @@ public class Operation(OldExpr left, OldTokenGeneric opera, OldExpr right) : Old
             return "*";
         if (Opera == OldTokenGeneric.DIVIDE)
             return "/";
+        if (Opera == OldTokenGeneric.GREATER)
+            return ">";
+        if (Opera == OldTokenGeneric.LESSER)
+            return "<";
+        if (Opera == OldTokenGeneric.EQUALS)
+            return "==";
+        if (Opera == OldTokenGeneric.DIFFERENT)
+            return "!=";
+        if (Opera == OldTokenGeneric.CONCAT)
+            return ".";
         return "";
     }
 

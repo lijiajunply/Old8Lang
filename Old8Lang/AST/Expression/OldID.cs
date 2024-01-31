@@ -1,3 +1,4 @@
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression;
@@ -18,5 +19,5 @@ public class OldID(string name) : OldExpr
         return IdName.GetHashCode();
     }
 
-    public override ValueType Run(ref VariateManager Manager) => Manager.GetValue(this);
+    public override ValueType Run(ref VariateManager Manager) => Manager.GetValue(this) ?? new VoidValue();
 }
