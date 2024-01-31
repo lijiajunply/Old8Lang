@@ -13,8 +13,6 @@ public class FuncValue : ValueType
 
     public List<OldID>? Ids { get; set; }
 
-    private bool IsNative { get; set; }
-
     private MethodInfo? Method { get; set; }
 
     private FuncValue? Func { get; set; }
@@ -29,21 +27,19 @@ public class FuncValue : ValueType
     public FuncValue(string idName, MethodInfo methodInfo, FuncValue? func = null)
     {
         Id = new OldID(idName);
-        IsNative = true;
         Method = methodInfo;
         Func = func;
     }
 
     public override ValueType Run(ref VariateManager Manager) => this;
 
-    public ValueType Run(ref VariateManager Manager, List<OldExpr>? ids, object? obj = null)
+    public ValueType Run(ref VariateManager Manager, List<OldExpr> ids, object? obj = null)
     {
-        if (IsNative)
+        if (Method != null)
         {
             var values = new List<ValueType>();
-            if (ids != null)
-                foreach (var expr in ids)
-                    values.Add(expr.Run(ref Manager));
+            foreach (var expr in ids)
+                values.Add(expr.Run(ref Manager));
             var a = Apis.ListToObjects(values).ToArray();
             object? invoke;
             try
@@ -69,7 +65,7 @@ public class FuncValue : ValueType
         if (Manager.IsClass)
         {
             Manager.AddChildren();
-            if (Ids != null && ids is not null && Ids.Count != 0)
+            if (Ids != null && Ids.Count != 0)
                 for (var i = 0; i < ids.Count; i++)
                     Manager.Set(Ids[i], ids[i].Run(ref Manager));
             BlockStatement.Run(ref Manager);
@@ -77,8 +73,8 @@ public class FuncValue : ValueType
             return Manager.Result;
         }
 
-        var variateManager = new VariateManager { AnyInfo = Manager.AnyInfo };
-        if (Ids != null && ids is not null && Ids.Count != 0)
+        var variateManager = Manager.NewManger();
+        if (Ids != null && Ids.Count != 0)
             for (var i = 0; i < ids.Count; i++)
                 variateManager.Set(Ids[i], ids[i].Run(ref Manager));
         BlockStatement.Run(ref variateManager);
@@ -86,5 +82,5 @@ public class FuncValue : ValueType
     }
 
     public override string ToString() =>
-        IsNative ? $"{Method}" : $"{Id}({Apis.ListToString(Ids!)}) => {BlockStatement}";
+        Method != null ? $"{Method}" : $"{Id}({Apis.ListToString(Ids!)}) => {BlockStatement}";
 }

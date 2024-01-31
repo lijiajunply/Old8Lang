@@ -1,9 +1,7 @@
 ﻿using Old8Lang;
 using Old8Lang.CslyParser;
 
-//APIs.ChangeBasicInfo("/home/lucky fish/RiderProjects/Old8Lang/Old8LangLib/OldLib/","0.3.0");
 string[] strings = ["-f", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!, "Old8Lang", "Ex", "init.ws")];
-//
 
 args = args.Length == 0 ? strings : args;
 if (args.Length == 0)
@@ -25,13 +23,17 @@ void Lang(IReadOnlyList<string> order)
         while (true)
         {
             var code = Console.ReadLine();
-            if(string.IsNullOrEmpty(code))continue;
-            if(code == "exit")return;
+            if (string.IsNullOrEmpty(code)) continue;
+            if (code == "exit") return;
             var b = i.Build(code: code);
-            b.Run(ref i.Manager);
+            var error = i.GetError();
+            if (error.Count == 0)
+                b.Run(ref i.Manager);
+            else
+                error.ForEach(Console.WriteLine);
         }
     }
-    
+
     if (order[0] == BasicInfo.Order["FromFile"])
     {
         Run(false, order[1]);
@@ -93,7 +95,7 @@ void Run(bool isDic, string path)
 {
     var info = Apis.CslyUsing(path, isDic);
     info.Error.ForEach(Console.WriteLine);
-    Console.WriteLine("\n" + info.Time);
+    Console.WriteLine("------------------\n" + info.Time);
 }
 
 #endregion

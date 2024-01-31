@@ -27,7 +27,7 @@ public class VariateManager
     #region Return
 
     public bool IsReturn { get; set; }
-    public ValueType Result { get; set; } = new IntValue(0);
+    public ValueType Result { get; set; } = new VoidValue();
 
     #endregion
 
@@ -113,6 +113,8 @@ public class VariateManager
 
     #endregion
 
+    public VariateManager NewManger()
+        => new() { AnyInfo = AnyInfo, LangInfo = LangInfo, Interpreter = Interpreter,Path = Path};
 
     public void AddClassAndFunc(ValueType valueType) => AnyInfo.Add(valueType);
 

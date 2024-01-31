@@ -57,15 +57,14 @@ public class Interpreter
     {
         var sw = new Stopwatch();
         sw.Start();
-        var Block = Build(dot);
+        var block = Build(dot);
         sw.Stop();
         var ts = sw.Elapsed;
         Time += $"Parser Build Time : {ts.TotalMilliseconds}ms\n";
         DoubleTime += ts.TotalMilliseconds;
 
-        sw = new Stopwatch();
-        sw.Start();
-        Block.Run(ref Manager);
+        sw.Restart();
+        block.Run(ref Manager);
         sw.Stop();
         ts = sw.Elapsed;
         Time += $"Process Run Time : {ts.TotalMilliseconds}ms\n";
@@ -81,6 +80,7 @@ public class Interpreter
         
         if (isDot)
             Dot(result);
+        if(Error.Count != 0)Error.Clear();
         if (result.Errors != null && result.Errors.Count != 0)
             result.Errors.ForEach(x => Error.Add($"{x.ErrorType} : {x.ErrorMessage} in {x.Line} {x.Column}"));
         return result.Result as BlockStatement ?? new BlockStatement([]);
