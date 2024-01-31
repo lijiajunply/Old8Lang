@@ -62,7 +62,7 @@ public abstract class ValueType : OldExpr
             CharValue => "Char",
             DictionaryValue => "Dictionary",
             DoubleValue => "Double",
-            FuncValue func => $"Function {func.Id} ({Apis.ListToString(func.Ids!)})",
+            FuncValue func => $"Function {func.Id}({Apis.ListToString(func.Ids)})",
             Instance instance => $"Instance {instance}",
             IntValue => "Int",
             OldItem item => $"Item {item}",

@@ -12,13 +12,13 @@ public static class Apis
 {
     #region OtherFunc
 
-    public static string ListToString<T>(List<T> a)
+    public static string ListToString<T>(List<T>? a)
     {
+        if (a == null)
+            return "";
         var builder = new StringBuilder();
         for (var i = 0; i < a.Count; i++)
-        {
             builder.Append(a[i] + (i == a.Count - 1 ? "" : " "));
-        }
 
         return builder.ToString();
     }

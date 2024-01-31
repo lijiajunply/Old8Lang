@@ -6,5 +6,5 @@ fib(a) ->
       return 1
    else
       return fib(a-1)+fib(a-2)
-a <- fib(1)
+a <- fib(20)
 PrintLine(a)

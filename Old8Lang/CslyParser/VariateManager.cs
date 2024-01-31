@@ -65,7 +65,7 @@ public class VariateManager
 
     public void AddChildren()
     {
-        ChildrenNum.Add(int.Parse(Count.ToString()));
+        ChildrenNum.Add(Count);
     }
 
     public void RemoveChildren()
@@ -123,21 +123,11 @@ public class VariateManager
     public override string ToString()
     {
         var builder = new StringBuilder($"---------Variates---------{Environment.NewLine}|Name\t|Value\t|");
-        // foreach (var variate in Variates)
-        //     builder.Append(" " + variate.Key + "=>" + variate.Value + " ");
-        // builder.Append('\n');
-        // foreach (var variable in AnyInfo)
-        //     builder.Append(variable + "\n");
         foreach (var variate in Variates)
             builder.Append($"{Environment.NewLine}|{variate.Key}\t|{variate.Value}\t|");
         builder.Append($"{Environment.NewLine}---------Class&Func-------{Environment.NewLine}|");
         foreach (var type in AnyInfo)
-        {
-            if (type is AnyValue any)
-                builder.Append($"{any.Id}|");
-            if (type is FuncValue func)
-                builder.Append($"{func.Id}|");
-        }
+            builder.Append($"{type.TypeToString()}|");
         builder.Append($"{Environment.NewLine}------------------");
         return builder.ToString();
     }
