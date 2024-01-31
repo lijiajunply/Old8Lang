@@ -31,12 +31,11 @@ public class DictionaryValue(List<TupleValue> tuples) : ValueType
         return a[0].Value;
     }
 
-    public ValueType Post(ValueType key, ValueType valueType)
+    public void Update(ValueType key, ValueType valueType)
     {
-        var a = Get(key);
+        Get(key);
         var b = Value.FindLastIndex(x => key.Equal(x.Key));
         Value[b] = (key, valueType);
-        return a;
     }
 
     public override string ToString()

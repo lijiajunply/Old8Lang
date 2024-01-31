@@ -35,7 +35,7 @@ public class OtherVariateChanging(OldID id, OldExpr sumId, OldExpr expr) : OldSt
         {
             var s = Sum.Run(ref Manager);
             var result = Expr.Run(ref Manager);
-            dictionary.Post(s, result);
+            dictionary.Update(s, result);
         }
     }
 

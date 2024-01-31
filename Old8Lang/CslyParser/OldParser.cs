@@ -6,6 +6,8 @@ using sly.lexer;
 using sly.parser.generator;
 using sly.parser.parser;
 
+// ReSharper disable UnusedMember.Global
+
 namespace Old8Lang.CslyParser;
 
 [ParserRoot("root")]
@@ -238,7 +240,7 @@ public class OldParser
             langTrees.OfType<OldExpr>().ToList())) { Position = id.Position };
 
     [Production("statement: IDENTIFIER CONCAT[d] IDENTIFIER LPAREN[d] OldParser_expressions* RPAREN[d]")]
-    public OldLangTree ClassFuncRun(Token<OldTokenGeneric> classId, Token<OldTokenGeneric> funcName,
+    public OldLangTree ClassFuncRun(Token<OldTokenGeneric> classId, Token<OldTokenGeneric> _,
         List<OldLangTree> expressions) =>
         new FuncRunStatement(new Operation(new OldID(classId.Value) { Position = classId.Position },
             OldTokenGeneric.CONCAT,

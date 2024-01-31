@@ -14,8 +14,8 @@ public static class Apis
 
     public static string ListToString<T>(List<T> a)
     {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < a.Count; i++)
+        var builder = new StringBuilder();
+        for (var i = 0; i < a.Count; i++)
         {
             builder.Append(a[i] + (i == a.Count - 1 ? "" : " "));
         }
@@ -25,8 +25,8 @@ public static class Apis
 
     public static string ArrayToString<T>(T[] a)
     {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < a.Length; i++)
+        var builder = new StringBuilder();
+        for (var i = 0; i < a.Length; i++)
         {
             var b = i == 0 && a.Length == 1 || i == a.Length - 1 ? "" : ",";
             builder.Append(a[i] + b);
@@ -38,13 +38,12 @@ public static class Apis
     public static List<object> ListToObjects(List<ValueType>? a)
     {
         if (a == null)
-            return new List<object>();
+            return [];
         if (a.Count == 0)
-            return new List<object>();
+            return [];
         if (a[0] == null!)
-            return new List<object>();
-
-
+            return [];
+        
         return a.Select(x => x.GetValue()).ToList();
     }
 
@@ -86,8 +85,7 @@ public static class Apis
 
     public static LangInfo ChangeBasicInfo(string import, string ver, string uri = "https://downland.old8lang.com")
     {
-        var langInfo = new LangInfo()
-            { LibInfos = ReadJson().LibInfos, ImportPath = import, Ver = ver, Url = uri };
+        var langInfo = new LangInfo { LibInfos = ReadJson().LibInfos, ImportPath = import, Ver = ver, Url = uri };
         var jsonString = JsonSerializer.Serialize(langInfo);
         File.WriteAllText(BasicInfo.JsonPath, jsonString);
         return langInfo;
@@ -107,6 +105,9 @@ public static class Apis
     public static bool ImportInstall(string context)
     {
         //以后再说
+        if (string.IsNullOrEmpty(context)) return false;
+        //var _ = new HttpClient();
+        
         return false;
     }
 }
