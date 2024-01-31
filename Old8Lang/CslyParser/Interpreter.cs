@@ -12,8 +12,8 @@ public class Interpreter
 {
     #region Code
 
-    private VariateManager Manager;
-    private string Code { get; set; }
+    public VariateManager Manager = new();
+    private string Code { get; } = "";
 
     private Parser<OldTokenGeneric, OldLangTree>? parser;
 
@@ -27,8 +27,8 @@ public class Interpreter
     private DotGraph? Graph { get; set; }
 
     #endregion
-    
-    private readonly List<string> Error;
+
+    private readonly List<string> Error = [];
 
     private void Init()
     {
@@ -37,41 +37,26 @@ public class Interpreter
         var parserBuilder = Parser.BuildParser(oldParser,
             ParserType.EBNF_LL_RECURSIVE_DESCENT, "root");
         parser = parserBuilder.Result;
+        Manager.Interpreter = this;
+        Manager.LangInfo ??= Apis.ReadJson();
     }
     
     public Interpreter(string path, bool isDir)
     {
-        Error = new List<string>();
-        Manager = new VariateManager { Path = path };
+        Manager.Path = path;
         Code = isDir ? Apis.FromDirectory(path) : Apis.FromFile(path);
         Init();
-        Manager.Interpreter = this;
+    }
+
+    public Interpreter()
+    {
+        Init();
     }
     
-    public Interpreter(string code, VariateManager manager)
-    {
-        Error = new List<string>();
-        Manager = manager;
-        Code = code;
-        Init();
-        Manager.Interpreter = this;
-    }
-
-    public Interpreter(string path, bool isDir, LangInfo info)
-    {
-        Error = new List<string>();
-        Manager = new VariateManager(info) { Path = path };
-        Manager.Init();
-        Code = isDir ? Apis.FromDirectory(path) : Apis.FromFile(path);
-        Init();
-        Manager.Interpreter = this;
-    }
-
     public void ParserRun(bool dot = false)
     {
         var sw = new Stopwatch();
         sw.Start();
-        Manager.LangInfo ??= Apis.ReadJson();
         var Block = Build(dot);
         sw.Stop();
         var ts = sw.Elapsed;
@@ -111,6 +96,5 @@ public class Interpreter
 
     public string GetTime() => Time;
     public List<string> GetError() => Error;
-    public VariateManager GetVariateManager() => Manager;
     public DotGraph? GetGraph() => Graph;
 }

@@ -31,13 +31,13 @@ public static class BasicInfo
     /// 还没想好
     /// </summary>
     /// <returns>这...实例</returns>
-    public static string LangSample() =>
-        File.ReadAllText(Path.Combine(Path.GetDirectoryName(CodePath)!,"Old8Lang", "LangSample.txt"));
+    private static string LangSample() =>
+        File.ReadAllText(Path.Combine(Path.GetDirectoryName(CodePath)!, "Old8Lang", "LangSample.txt"));
 
     /// <summary>
     /// Old8Lang的关键字
     /// </summary>
-    public static string[] KeyWords { get; set; } =
+    private static string[] KeyWords =>
     [
         "class new", // => C# : class new
         "if for while", // => C# : if , for , while
@@ -46,16 +46,16 @@ public static class BasicInfo
         "return func"
     ];
 
-    public static string JsonPath 
-        => Path.Combine(Path.GetDirectoryName(CodePath)!,"Old8Lang", "LangInfo.json");
+    public static string JsonPath
+        => Path.Combine(Path.GetDirectoryName(CodePath)!, "Old8Lang", "LangInfo.json");
 
-    public static Dictionary<string, string> Order { get; set; } = new()
+    public static Dictionary<string, string> Order => new()
     {
         { "FromFile", "-f" },
         { "FromDir", "-d" },
         { "Import", "import" },
         { "LibPath", "lib" },
-        { "ChangeImport", "-cimp" },
+        { "ChangeImport", "-change" },
         { "Var", "-var" },
         { "Info", "info" },
         { "Install", "-i" },
@@ -63,14 +63,15 @@ public static class BasicInfo
         { "Remove", "-r" }
     };
 
-    public static List<LibInfo> OldLangLib { get; set; } =
+    public static List<LibInfo> OldLangLib =>
     [
-        new LibInfo() { IsDir = false, Var = 0.3, LibName = "OS" },
-        new LibInfo() { IsDir = false, Var = 0.3, LibName = "File" },
-        new LibInfo() { IsDir = false, Var = 0.3, LibName = "Terminal" },
-        new LibInfo() { IsDir = true, Var = 0.3, LibName = "Net" },
-        new LibInfo() { IsDir = false, Var = 0.3, LibName = "Time" }
+        new LibInfo { IsDir = false, Var = 0.3, LibName = "OS" },
+        new LibInfo { IsDir = false, Var = 0.3, LibName = "File" },
+        new LibInfo { IsDir = false, Var = 0.3, LibName = "Terminal" },
+        new LibInfo { IsDir = true, Var = 0.3, LibName = "Net" },
+        new LibInfo { IsDir = false, Var = 0.3, LibName = "Time" }
     ];
+
     public static string CodePath
     {
         get

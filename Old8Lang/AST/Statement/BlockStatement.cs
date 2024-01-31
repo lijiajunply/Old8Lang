@@ -8,8 +8,8 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public class BlockStatement : OldStatement
 {
-    private List<OldStatement> ImportStatements { get; set; }
-    public List<OldStatement> OtherStatements { get; set; }
+    private List<OldStatement> ImportStatements { get; }
+    public List<OldStatement> OtherStatements { get; }
 
     public BlockStatement(List<OldLangTree> statements)
     {

@@ -1,6 +1,7 @@
 ﻿using Old8Lang;
+using Old8Lang.CslyParser;
 
-//APIs.ChangeBasicInfo("/home/luckyfish/RiderProjects/Old8Lang/Old8LangLib/OldLib/","0.3.0");
+//APIs.ChangeBasicInfo("/home/lucky fish/RiderProjects/Old8Lang/Old8LangLib/OldLib/","0.3.0");
 string[] strings = ["-f", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!, "Old8Lang", "Ex", "init.ws")];
 //
 
@@ -8,26 +9,42 @@ args = args.Length == 0 ? strings : args;
 if (args.Length == 0)
     args = Console.ReadLine()!.Split(" ");
 
+//args = Array.Empty<string>();
 Lang(args);
 
 #region LangRun
 
-void Lang(string[] oder)
+void Lang(IReadOnlyList<string> order)
 {
     var a = Apis.ReadJson();
-    if (oder[0] == BasicInfo.Order["FromFile"])
+
+    if (order.Count == 0)
     {
-        Run(false, oder[1]);
+        var i = new Interpreter();
+
+        while (true)
+        {
+            var code = Console.ReadLine();
+            if(string.IsNullOrEmpty(code))continue;
+            if(code == "exit")return;
+            var b = i.Build(code: code);
+            b.Run(ref i.Manager);
+        }
+    }
+    
+    if (order[0] == BasicInfo.Order["FromFile"])
+    {
+        Run(false, order[1]);
         return;
     }
 
-    if (oder[0] == BasicInfo.Order["FromDir"])
+    if (order[0] == BasicInfo.Order["FromDir"])
     {
-        Run(true, oder[1]);
+        Run(true, order[1]);
         return;
     }
 
-    if (oder[0] == BasicInfo.Order["Import"])
+    if (order[0] == BasicInfo.Order["Import"])
     {
         foreach (var VARIABLE in a.LibInfos)
             Console.WriteLine($"LibName:{VARIABLE.LibName} Var:{VARIABLE.Var} IsDir:{VARIABLE.IsDir}");
@@ -35,22 +52,40 @@ void Lang(string[] oder)
         return;
     }
 
-    if (oder[0] == BasicInfo.Order["ChangeImport"])
+    if (order[0] == BasicInfo.Order["ChangeImport"])
     {
-        var b = Apis.ChangeBasicInfo(oder[1], a.Ver);
+        var b = Apis.ChangeBasicInfo(order[1], a.Ver);
         Console.WriteLine("now:" + b.ImportPath);
         return;
     }
 
-    if (oder[0] == BasicInfo.Order["Var"])
+    if (order[0] == BasicInfo.Order["Var"])
     {
         Console.WriteLine(a.Ver);
         return;
     }
 
-    if (oder[0] == BasicInfo.Order["Info"])
+    if (order[0] == BasicInfo.Order["Info"])
     {
         Console.WriteLine(BasicInfo.Info());
+        return;
+    }
+
+    if (order[0] == BasicInfo.Order["Install"])
+    {
+        Console.WriteLine(order[^1]);
+        return;
+    }
+
+    if (order[0] == BasicInfo.Order["Help"])
+    {
+        Console.WriteLine(BasicInfo.Help);
+        return;
+    }
+
+    if (order[0] == BasicInfo.Order["Remove"])
+    {
+        Console.WriteLine(order[^1]);
     }
 }
 

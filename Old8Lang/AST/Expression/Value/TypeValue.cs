@@ -18,6 +18,6 @@ public class TypeValue : ValueType
         return this;
     }
 
-    public override string ToString() => Value;
-    public override object GetValue() => Value;
+    public override string ToString() => Value ?? "";
+    public override object GetValue() => Value ?? "";
 }

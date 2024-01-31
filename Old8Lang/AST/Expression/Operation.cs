@@ -15,7 +15,12 @@ public class Operation(OldExpr left, OldTokenGeneric opera, OldExpr right) : Old
     {
         if (Opera == OldTokenGeneric.PLUS)
             return "+";
-
+        if (Opera == OldTokenGeneric.MINUS)
+            return "-";
+        if (Opera == OldTokenGeneric.TIMES)
+            return "*";
+        if (Opera == OldTokenGeneric.DIVIDE)
+            return "/";
         return "";
     }
 

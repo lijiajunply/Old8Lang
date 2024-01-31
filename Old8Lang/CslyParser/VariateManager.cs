@@ -18,16 +18,16 @@ public class VariateManager
 
     #region Variate
 
-    private Dictionary<string, ValueType> Variates { get; set; }
+    private Dictionary<string, ValueType> Variates { get; set; } = new();
 
-    public List<ValueType> AnyInfo { get; set; }
+    public List<ValueType> AnyInfo { get; set; } = [];
 
     #endregion
 
     #region Return
 
     public bool IsReturn { get; set; }
-    public ValueType Result { get; set; }
+    public ValueType Result { get; set; } = new IntValue(0);
 
     #endregion
 
@@ -35,32 +35,11 @@ public class VariateManager
 
     private int Count { get; set; }
 
-    private List<int> ChildrenNum { get; set; }
+    private List<int> ChildrenNum { get; set; } = [];
 
     public bool IsClass { get; set; }
 
     #endregion
-
-    public VariateManager()
-    {
-        ChildrenNum = new List<int>();
-        Variates = new Dictionary<string, ValueType>();
-        IsReturn = false;
-        Result = new IntValue(0);
-        IsClass = false;
-        AnyInfo = new List<ValueType>();
-    }
-
-    public VariateManager(LangInfo info)
-    {
-        ChildrenNum = new List<int>();
-        Variates = new Dictionary<string, ValueType>();
-        IsReturn = false;
-        Result = new IntValue(0);
-        IsClass = false;
-        AnyInfo = new List<ValueType>();
-        LangInfo = info;
-    }
 
     public void Set(OldID id, ValueType valueType)
     {
@@ -126,11 +105,6 @@ public class VariateManager
 
     #region Init
 
-    public void Init()
-    {
-        Variates = new Dictionary<string, ValueType>();
-    }
-
     public void Init(Dictionary<string, ValueType> values)
     {
         Variates = values;
@@ -154,6 +128,4 @@ public class VariateManager
             builder.Append(variable + "\n");
         return builder.ToString();
     }
-
-    public Dictionary<string, ValueType> Output() => Variates;
 }

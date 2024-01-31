@@ -4,6 +4,6 @@ public class MoreMath
 {
     public void a()
     {
-        Math.Pow(1,2);
+        _ = Math.Pow(1, 2);
     }
 }

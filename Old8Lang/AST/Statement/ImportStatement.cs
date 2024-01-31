@@ -25,11 +25,12 @@ public class ImportStatement(string importString) : OldStatement
         {
             var b = Manager.LangInfo.LibInfos.Where(x => x.LibName == ImportString).Select(x => x.IsDir).ToArray()[0];
             var path = Manager.LangInfo.ImportPath + ImportString + ".ws";
-            var a = new Interpreter(path, b, Manager.LangInfo);
-            a.ParserRun();
-            var manager = a.GetVariateManager();
-            foreach (var valueType in manager.AnyInfo)
-                Manager.AddClassAndFunc(valueType);
+            var previousPath = Manager.Path;
+            Manager.Path = path;
+            var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
+            var a = Manager.Interpreter?.Build(code: code);
+            a?.ImportRun(ref Manager);
+            Manager.Path = previousPath;
             return;
         }
 

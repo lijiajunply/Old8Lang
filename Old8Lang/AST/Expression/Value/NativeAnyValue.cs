@@ -15,7 +15,7 @@ public class NativeAnyValue : ValueType
     private ConstructorInfo? Constructor { get; set; }
     private object InstanceObj { get; set; }
 
-    private VariateManager manager;
+    private VariateManager manager = new();
 
     public NativeAnyValue(string dllName, string className, string path)
     {
@@ -32,9 +32,7 @@ public class NativeAnyValue : ValueType
             if (prop is null)
             {
                 var fie = ClassType?.GetField(id.IdName);
-                if (fie is null)
-                    return new VoidValue();
-                return ObjToValue(fie.GetValue(null)!);
+                return fie is null ? new VoidValue() : ObjToValue(fie.GetValue(null)!);
             }
 
             return ObjToValue(prop.GetValue(null)!);

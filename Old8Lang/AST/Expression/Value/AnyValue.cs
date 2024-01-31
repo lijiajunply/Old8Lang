@@ -21,7 +21,7 @@ public class AnyValue : ValueType
         manager.IsClass = true;
     }
 
-    public override ValueType Run(ref VariateManager Manager)
+    public sealed override ValueType Run(ref VariateManager Manager)
     {
         manager.AnyInfo = Manager.AnyInfo.Where(x => x is not FuncValue).ToList();
         foreach (var variable in Variates.Keys)

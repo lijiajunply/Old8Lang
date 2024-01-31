@@ -52,7 +52,7 @@ public class FuncValue : ValueType
             }
             catch
             {
-                throw new ErrorException(this,this);
+                throw new ErrorException(this, this);
             }
 
             if (invoke is null)

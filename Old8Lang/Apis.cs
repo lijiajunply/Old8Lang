@@ -69,27 +69,26 @@ public static class Apis
     {
         var a = new Interpreter(path, isDir);
         a.ParserRun(true);
-        return (a.GetVariateManager(), a.GetError(), a.GetTime());
+        return (a.Manager, a.GetError(), a.GetTime());
     }
 
     public static void CompilerRun(BlockStatement statement)
     {
-        string code = statement.ToCode();
-        CSharpCodeProvider codeProvider = new CSharpCodeProvider();
-        CompilerParameters compParameters = new CompilerParameters();
+        var code = statement.ToCode();
+        var codeProvider = new CSharpCodeProvider();
+        var compParameters = new CompilerParameters();
         // Compile the code
-        CompilerResults res = codeProvider.CompileAssemblyFromSource(compParameters, code);
+        var res = codeProvider.CompileAssemblyFromSource(compParameters, code);
         // Create a new instance of the class 'MyClass'　　　　// 有命名空间的，需要命名空间.类名
-        object? myClass = res.CompiledAssembly.CreateInstance("Project");
-        if(myClass == null)return;
-        myClass.GetType().GetMethod("Main")?.Invoke(myClass, null);
+        var myClass = res.CompiledAssembly.CreateInstance("Project");
+        myClass?.GetType().GetMethod("Main")?.Invoke(myClass, null);
     }
 
     public static LangInfo ChangeBasicInfo(string import, string ver, string uri = "https://downland.old8lang.com")
     {
-        LangInfo langInfo = new LangInfo()
+        var langInfo = new LangInfo()
             { LibInfos = ReadJson().LibInfos, ImportPath = import, Ver = ver, Url = uri };
-        string jsonString = JsonSerializer.Serialize(langInfo);
+        var jsonString = JsonSerializer.Serialize(langInfo);
         File.WriteAllText(BasicInfo.JsonPath, jsonString);
         return langInfo;
     }
