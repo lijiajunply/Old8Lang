@@ -4,7 +4,6 @@ using Old8Lang.AST.Statement;
 using sly.parser;
 using sly.parser.generator;
 using sly.parser.generator.visitor;
-using sly.parser.generator.visitor.dotgraph;
 
 namespace Old8Lang.CslyParser;
 
@@ -16,15 +15,6 @@ public class Interpreter
     private string Code { get; } = "";
 
     private Parser<OldTokenGeneric, OldLangTree>? parser;
-
-    #endregion
-
-    #region RunTime
-
-    private string Time { get; set; } = "";
-    private double DoubleTime { get; set; }
-
-    private DotGraph? Graph { get; set; }
 
     #endregion
 
@@ -59,42 +49,43 @@ public class Interpreter
         sw.Start();
         var block = Build(dot);
         sw.Stop();
-        var ts = sw.Elapsed;
-        Time += $"Parser Build Time : {ts.TotalMilliseconds}ms\n";
-        DoubleTime += ts.TotalMilliseconds;
+        var ts = sw.Elapsed.TotalMilliseconds;
+        var time = $"Parser Build Time : {ts}ms\n";
+        var milliseconds = ts;
 
         sw.Restart();
         block.Run(ref Manager);
         sw.Stop();
-        ts = sw.Elapsed;
-        Time += $"Process Run Time : {ts.TotalMilliseconds}ms\n";
-        DoubleTime += ts.TotalMilliseconds;
-        Time += $"Total : {DoubleTime}ms";
+        ts = sw.Elapsed.TotalMilliseconds;
+        time += $"Process Run Time : {ts}ms\n";
+        milliseconds += ts;
+        time += $"Total : {milliseconds}ms";
+        Console.WriteLine(time);
     }
 
     public BlockStatement Build(bool isDot = false,string code = "")
     {
-        var result = parser?.Parse(string.IsNullOrEmpty(code) ? Code : code);
+        code = string.IsNullOrEmpty(code) ? Code : code;
+        code += Environment.NewLine + "pass";
+        var result = parser?.Parse(code);
 
         if (result is null) return new BlockStatement([]);
         
-        if (isDot)
-            Dot(result);
+        if (isDot) Dot(result);
+        
         if(Error.Count != 0)Error.Clear();
         if (result.Errors != null && result.Errors.Count != 0)
-            result.Errors.ForEach(x => Error.Add($"{x.ErrorType} : {x.ErrorMessage} in {x.Line} {x.Column}"));
+            result.Errors.ForEach(x => Error.Add($"{x.ErrorType} : {x.ErrorMessage}"));
         return result.Result as BlockStatement ?? new BlockStatement([]);
     }
-
+    
     private void Dot(ParseResult<OldTokenGeneric, OldLangTree> result)
     {
         var tree = result.SyntaxTree;
         var graphviz = new GraphVizEBNFSyntaxTreeVisitor<OldTokenGeneric>();
         graphviz.VisitTree(tree);
-        Graph = graphviz.Graph;
+        File.WriteAllText(Manager.Path.Replace("ws","dot"),graphviz.Graph.Compile());
     }
-
-    public string GetTime() => Time;
+    
     public List<string> GetError() => Error;
-    public DotGraph? GetGraph() => Graph;
 }

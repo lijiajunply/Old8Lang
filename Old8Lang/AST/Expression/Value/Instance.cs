@@ -11,11 +11,6 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
     {
         switch (Id.IdName)
         {
-            case "position":
-            {
-                var a = Ids[0].Position.ToString();
-                return new StringValue(a);
-            }
             case "type":
                 return new TypeValue(Ids[0]).Run(ref Manager);
             case "exec":

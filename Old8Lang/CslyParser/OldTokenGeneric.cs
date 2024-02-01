@@ -28,6 +28,7 @@ public enum OldTokenGeneric
     IMPORT = 17,
     [Comment("//", "|*", "*|")] COMMENT = 18,
     [Keyword("NEW")] [Keyword("new")] NEW = 19,
+    [Keyword("PASS")] [Keyword("pass")] PASS = 20,
 
     #endregion
 

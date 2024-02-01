@@ -5,7 +5,7 @@ using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.CslyParser;
 
-public class VariateManager
+public class VariateManager : IDisposable
 {
     #region Lang
 
@@ -130,5 +130,12 @@ public class VariateManager
             builder.Append($"{type.TypeToString()}|");
         builder.Append($"{Environment.NewLine}------------------");
         return builder.ToString();
+    }
+
+    public void Dispose()
+    {
+        // AnyInfo.Clear();
+        // LangInfo = null;
+        // Interpreter = null;
     }
 }

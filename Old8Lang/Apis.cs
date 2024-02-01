@@ -64,13 +64,13 @@ public static class Apis
 
     #endregion
     
-    public static (VariateManager Manager, List<string> Error, string Time) CslyUsing(string path, bool isDir)
+    public static void CslyUsing(string path, bool isDir)
     {
         var a = new Interpreter(path, isDir);
-        a.ParserRun(true);
-        return (a.Manager, a.GetError(), a.GetTime());
+        a.ParserRun();
     }
 
+    // ReSharper disable once UnusedMember.Global
     public static void CompilerRun(BlockStatement statement)
     {
         var code = statement.ToCode();

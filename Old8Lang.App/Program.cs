@@ -18,10 +18,12 @@ void Lang(IReadOnlyList<string> order)
 
     if (order.Count == 0)
     {
+        Console.WriteLine("Command Line Mode");
         var i = new Interpreter();
 
         while (true)
         {
+            Console.Write(">");
             var code = Console.ReadLine();
             if (string.IsNullOrEmpty(code)) continue;
             if (code == "exit") return;
@@ -93,9 +95,7 @@ void Lang(IReadOnlyList<string> order)
 
 void Run(bool isDic, string path)
 {
-    var info = Apis.CslyUsing(path, isDic);
-    info.Error.ForEach(Console.WriteLine);
-    Console.WriteLine("------------------\n" + info.Time);
+    Apis.CslyUsing(path, isDic);
 }
 
 #endregion
