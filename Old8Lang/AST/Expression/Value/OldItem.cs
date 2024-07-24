@@ -4,9 +4,9 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class OldItem(OldID listId, OldExpr key) : ValueType
 {
-    private OldID ListID { get; set; } = listId;
+    private OldID ListID { get; } = listId;
 
-    private OldExpr Key { get; set; } = key;
+    private OldExpr Key { get; } = key;
 
     public override ValueType Run(ref VariateManager Manager)
     {

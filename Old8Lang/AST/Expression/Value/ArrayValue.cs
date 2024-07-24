@@ -4,8 +4,8 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class ArrayValue : ValueType
 {
-    private ValueType[] Values { get; set; }
-    private List<OldExpr> Va { get; set; } = [];
+    private ValueType[] Values { get; }
+    private List<OldExpr> Va { get; } = [];
 
     public ArrayValue(List<OldExpr> valuesList)
     {

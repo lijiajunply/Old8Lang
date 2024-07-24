@@ -1,10 +1,18 @@
 import Terminal
-fib(a) ->
-   if a == 1
-      return 1
-   elif a == 2
-      return 1
-   else
-      return fib(a-1)+fib(a-2)
+import other
 a <- fib(20)
 PrintLine(a)
+b <- {12 123 1231 123 1}
+b.Add(1)
+PrintLine(b.ToStr())
+class Test
+   a <- 1
+   b <- 2
+   func init(c d)
+      a <- c
+      b <- d
+   func Add()
+      return a+b
+pass
+test <- Test(2 3)
+PrintLine(test.Add())

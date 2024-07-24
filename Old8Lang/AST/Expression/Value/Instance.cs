@@ -11,9 +11,9 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
     {
         switch (Id.IdName)
         {
-            case "type":
+            case "Type":
                 return new TypeValue(Ids[0]).Run(ref Manager);
-            case "exec":
+            case "Exec":
             {
                 if (Ids[0] is not StringValue stringValue) return new VoidValue();
                 var a = Manager.Interpreter?.Build(code: stringValue.Value);
@@ -45,6 +45,29 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
         }
 
         return result;
+    }
+    
+    public ValueType FromClassToResult(ValueType baseValue,string typeName)
+    {
+        var type = Type.GetType($"{typeName}FuncStatic");
+        var m = type?.GetMethod(Id.IdName);
+        if (m == null)
+        {
+            if (baseValue is AnyValue anyValue)
+            {
+                
+            }
+            else
+            {
+                type = Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic");
+                m = type?.GetMethod(Id.IdName);   
+            }
+        }
+        var os = new List<object>(){baseValue};
+        os.AddRange(Ids);
+        var r = m?.Invoke(baseValue,os.ToArray());
+        if (r is ValueType v) return v;
+        return ObjToValue(r!);
     }
 
     public override string ToString() => Id + "(" + Apis.ListToString(Ids) + ")";

@@ -5,11 +5,11 @@ namespace Old8Lang.AST.Expression;
 
 public class Operation(OldExpr left, OldTokenGeneric opera, OldExpr right) : OldExpr
 {
-    private OldExpr? Left { get; set; } = left;
+    private OldExpr? Left { get; } = left;
 
-    private OldExpr Right { get; set; } = right;
+    private OldExpr Right { get; } = right;
 
-    private OldTokenGeneric Opera { get; set; } = opera;
+    private OldTokenGeneric Opera { get; } = opera;
 
     private string OperaToString()
     {

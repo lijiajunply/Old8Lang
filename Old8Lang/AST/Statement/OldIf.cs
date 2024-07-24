@@ -5,9 +5,9 @@ namespace Old8Lang.AST.Statement;
 
 public class OldIf(OldExpr expr, BlockStatement blockStatement) : OldStatement
 {
-    private OldExpr Expr { get; set; } = expr;
+    private OldExpr Expr { get; } = expr;
 
-    private BlockStatement BlockStatement { get; set; } = blockStatement;
+    private BlockStatement BlockStatement { get; } = blockStatement;
 
     public void Run(ref VariateManager Manager, ref bool r)
     {

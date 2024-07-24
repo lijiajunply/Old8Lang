@@ -1,4 +1,5 @@
 using System.Text;
+using Old8Lang.AST.Expression;
 using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Statement;
@@ -18,10 +19,17 @@ public class BlockStatement : OldStatement
         
         foreach (var statement in statements.OfType<OldStatement>())
         {
-            if (statement is ImportStatement or NativeStatement or FuncInit or ClassInit)
-                ImportStatements.Add(statement);
-            else
-                OtherStatements.Add(statement);
+            switch (statement)
+            {
+                case PassStatement:
+                    continue;
+                case ImportStatement or NativeStatement or FuncInit or ClassInit:
+                    ImportStatements.Add(statement);
+                    break;
+                default:
+                    OtherStatements.Add(statement);
+                    break;
+            }
         }
     }
 
@@ -74,5 +82,31 @@ public class BlockStatement : OldStatement
             sb.Append(statement);
         sb.Append("}}");
         return sb.ToString();
+    }
+
+    public Dictionary<OldID, OldExpr> ToAnyData()
+    {
+        var c = new Dictionary<OldID, OldExpr>();
+        OtherStatements.ForEach(x =>
+        {
+            var result = GetTuple(x);
+            c.Add(result.id, result.Expr);
+        });
+        ImportStatements.ForEach(x =>
+        {
+            var result = GetTuple(x);
+            c.Add(result.id, result.Expr);
+        });
+        return c;
+    }
+
+    private static (OldID id, OldExpr Expr) GetTuple(OldLangTree a)
+    {
+        return a switch
+        {
+            SetStatement statement => (id: statement.Id, Expr: statement.Value),
+            FuncInit init => (init.FuncValue.Id!, init.FuncValue),
+            _ => (null!, null!)
+        };
     }
 }

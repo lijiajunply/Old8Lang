@@ -5,7 +5,7 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class DoubleValue(double doubleValue) : ValueType
 {
-    private double Value { get; set; } = doubleValue;
+    public double Value { get; } = doubleValue;
 
     public override ValueType Plus(ValueType otherValueType) =>
         otherValueType is IntValue or DoubleValue

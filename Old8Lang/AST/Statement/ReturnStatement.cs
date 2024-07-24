@@ -4,7 +4,7 @@ namespace Old8Lang.AST.Statement;
 
 public class ReturnStatement(OldExpr returnExpr) : OldStatement
 {
-    private OldExpr ReturnExpr { get; set; } = returnExpr;
+    private OldExpr ReturnExpr { get; } = returnExpr;
 
     public override void Run(ref VariateManager Manager)
     {

@@ -7,11 +7,11 @@ namespace Old8Lang.AST.Statement;
 
 public class OtherVariateChanging(OldID id, OldExpr sumId, OldExpr expr) : OldStatement
 {
-    private OldID ID { get; set; } = id;
+    private OldID ID { get; } = id;
 
-    private OldExpr Sum { get; set; } = sumId;
+    private OldExpr Sum { get; } = sumId;
 
-    private OldExpr Expr { get; set; } = expr;
+    private OldExpr Expr { get; } = expr;
 
     public override void Run(ref VariateManager Manager)
     {

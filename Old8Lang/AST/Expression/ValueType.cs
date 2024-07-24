@@ -20,7 +20,6 @@ public abstract class ValueType : OldExpr
 
     #endregion
 
-
     public virtual ValueType Dot(OldExpr dotExpr)
     {
         if (dotExpr is OldID id)
@@ -31,12 +30,7 @@ public abstract class ValueType : OldExpr
 
         if (dotExpr is Instance instance)
         {
-            if (instance.Id.IdName == "GetType")
-                return new TypeValue(TypeToString());
-            if (instance.Id.IdName == "ToInt")
-                return new IntValue(int.Parse(ToString()));
-            if (instance.Id.IdName == "ToString")
-                return new StringValue(ToString());
+            return instance.FromClassToResult(this,"Old8Lang.AST.Expression.ValueType");
         }
 
         return new VoidValue();
@@ -76,9 +70,9 @@ public abstract class ValueType : OldExpr
 
     public virtual object GetValue() => new();
 
-    protected static ValueType ObjToValue(object value)
+    protected static ValueType ObjToValue(object? value)
     {
-        if (value == null!)
+        if (value == null)
         {
             return new VoidValue();
         }
@@ -93,5 +87,38 @@ public abstract class ValueType : OldExpr
             object[] a => new ArrayValue(a.ToList()),
             _ => new VoidValue()
         };
+    }
+}
+
+public static class ValueTypeFuncStatic
+{
+    public static IntValue ToInt(this ValueType type)
+    {
+        if (type is IntValue intValue)
+        {
+            return intValue;
+        }
+
+        if (type is DoubleValue doubleValue)
+        {
+            return new IntValue(Convert.ToInt32(doubleValue.Value));
+        }
+
+        if (type is CharValue charValue)
+        {
+            return new IntValue(Convert.ToInt32(charValue.Value));
+        }
+        
+        return new IntValue(int.Parse(type.ToString()));
+    }
+
+    public static TypeValue GetType(this ValueType type)
+    {
+        return new TypeValue(type.TypeToString());
+    }
+
+    public static StringValue ToStr(this ValueType type)
+    {
+        return new StringValue(type.ToString());
     }
 }

@@ -11,10 +11,10 @@ public class NativeStaticAny(string className, Type ClassType) : ValueType
             var prop = ClassType.GetProperty(id.IdName);
             if (prop is null)
             {
-                var fie = ClassType.GetField(id.IdName);
-                if (fie is null)
+                var field = ClassType.GetField(id.IdName);
+                if (field is null)
                     return new VoidValue();
-                return ObjToValue(fie.GetValue(null)!);
+                return ObjToValue(field.GetValue(null)!);
             }
 
             return ObjToValue(prop.GetValue(null)!);

@@ -4,7 +4,7 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class StringValue : ValueType
 {
-    public string Value { get; set; }
+    public string Value { get; }
 
     public StringValue(string context)
     {

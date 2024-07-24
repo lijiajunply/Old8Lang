@@ -9,11 +9,11 @@ namespace Old8Lang.AST.Expression.Value;
 public class NativeAnyValue : ValueType
 {
     private Type? ClassType { get; set; }
-    private string DllName { get; set; }
-    public string ClassName { get; set; }
-    private string Path { get; set; }
+    private string DllName { get; }
+    public string ClassName { get; }
+    private string Path { get; }
     private ConstructorInfo? Constructor { get; set; }
-    private object InstanceObj { get; set; }
+    private object InstanceObj { get; set; }  
 
     private VariateManager manager = new();
 

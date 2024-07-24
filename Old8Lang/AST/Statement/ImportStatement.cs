@@ -4,7 +4,7 @@ namespace Old8Lang.AST.Statement;
 
 public class ImportStatement(string importString) : OldStatement
 {
-    private string ImportString { get; set; } = importString;
+    private string ImportString { get; } = importString;
 
     public override void Run(ref VariateManager Manager)
     {

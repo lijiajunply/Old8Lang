@@ -8,11 +8,11 @@ namespace Old8Lang.AST.Statement;
 public class IfStatement(OldIf ifBlock, List<OldIf?> elifBlock, BlockStatement? elseBlockStatement)
     : OldStatement
 {
-    private OldIf IfBlock { get; set; } = ifBlock;
+    private OldIf IfBlock { get; } = ifBlock;
 
-    private List<OldIf?> ElifBlock { get; set; } = elifBlock;
+    private List<OldIf?> ElifBlock { get; } = elifBlock;
 
-    private BlockStatement? ElseBlockStatement { get; set; } = elseBlockStatement;
+    private BlockStatement? ElseBlockStatement { get; } = elseBlockStatement;
 
     public override void Run(ref VariateManager Manager)
     {

@@ -5,7 +5,7 @@ namespace Old8Lang.AST.Statement;
 
 public class FuncInit(FuncValue a) : OldStatement
 {
-    public FuncValue FuncValue { get; set; } = a;
+    public FuncValue FuncValue { get; } = a;
 
     public override void Run(ref VariateManager Manager)
     {

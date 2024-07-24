@@ -226,9 +226,7 @@ public class OldParser
     [Production("statement: CLASS[d] IDENTIFIER block")]
     public OldLangTree Class(Token<OldTokenGeneric> id, BlockStatement statements)
     {
-        var c = new Dictionary<OldID, OldExpr>();
-        statements.OtherStatements.ForEach(x => c.Add(GetTuple(x).id, GetTuple(x).Expr));
-        return new ClassInit(new AnyValue(new OldID(id.Value), c));
+        return new ClassInit(new AnyValue(new OldID(id.Value), statements.ToAnyData()));
     }
 
     [Production("statement: IDENTIFIER LPAREN[d] OldParser_expressions* RPAREN[d]")]
@@ -237,11 +235,11 @@ public class OldParser
             langTrees.OfType<OldExpr>().ToList()));
 
     [Production("statement: IDENTIFIER CONCAT[d] IDENTIFIER LPAREN[d] OldParser_expressions* RPAREN[d]")]
-    public OldLangTree ClassFuncRun(Token<OldTokenGeneric> classId, Token<OldTokenGeneric> _,
+    public OldLangTree ClassFuncRun(Token<OldTokenGeneric> classId, Token<OldTokenGeneric> funcName,
         List<OldLangTree> expressions) =>
         new FuncRunStatement(new Operation(new OldID(classId.Value),
             OldTokenGeneric.CONCAT,
-            new Instance(new OldID(classId.Value),
+            new Instance(new OldID(funcName.Value),
                 expressions.OfType<OldExpr>().ToList())));
 
     [Production("statement: IMPORT[d] IDENTIFIER")]
@@ -276,20 +274,6 @@ public class OldParser
     public OldLangTree MinusMinus(Token<OldTokenGeneric> id) =>
         new SetStatement(new OldID(id.Value),
             new Operation(new OldID(id.Value), OldTokenGeneric.MINUS, new IntValue(1)));
-
-    #endregion
-
-    #region FuncValue
-
-    private (OldID id, OldExpr Expr) GetTuple(OldLangTree a)
-    {
-        return a switch
-        {
-            SetStatement statement => (id: statement.Id, Expr: statement.Value),
-            FuncInit init => (init.FuncValue.Id!, init.FuncValue),
-            _ => (null!, null!)
-        };
-    }
 
     #endregion
 }

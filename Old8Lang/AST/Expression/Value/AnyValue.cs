@@ -4,9 +4,9 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class AnyValue : ValueType
 {
-    private Dictionary<OldID, OldExpr> Variates { get; set; }
-    public Dictionary<string, ValueType> Result { get; set; }
-    public OldID Id { get; set; }
+    private Dictionary<OldID, OldExpr> Variates { get; }
+    public Dictionary<string, ValueType> Result { get; }
+    public OldID Id { get; }
 
     private VariateManager manager;
 
@@ -23,7 +23,7 @@ public class AnyValue : ValueType
 
     public sealed override ValueType Run(ref VariateManager Manager)
     {
-        manager.AnyInfo = Manager.AnyInfo.Where(x => x is not FuncValue).ToList();
+        manager.AnyInfo.AddRange(Manager.AnyInfo.Where(x => x is not FuncValue).ToList());
         foreach (var variable in Variates.Keys)
             Result.Add(variable.IdName, Variates[variable].Run(ref Manager));
         return this;
@@ -54,11 +54,4 @@ public class AnyValue : ValueType
     public void Set(OldID id, ValueType valueType) => manager.Set(id, valueType);
 
     public override string ToString() => $"class {Id} " + "{" + "\n{manager}" + "\n}";
-
-    public void Init()
-    {
-        manager = new VariateManager();
-        manager.Init(Result);
-        manager.IsClass = true;
-    }
 }

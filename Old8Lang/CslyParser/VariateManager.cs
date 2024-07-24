@@ -1,11 +1,10 @@
-using System.Text;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.CslyParser;
 
-public class VariateManager : IDisposable
+public class VariateManager
 {
     #region Lang
 
@@ -18,7 +17,9 @@ public class VariateManager : IDisposable
 
     #region Variate
 
-    private Dictionary<string, ValueType> Variates { get; set; } = new();
+    //private Dictionary<string, ValueType> Variates { get; set; } = new();
+    private List<string> VariateName { get; } = [];
+    private List<ValueType> Values { get; } = [];
 
     public List<ValueType> AnyInfo { get; set; } = [];
 
@@ -34,8 +35,9 @@ public class VariateManager : IDisposable
     #region Block
 
     private int Count { get; set; }
+    public bool IsFunc { get; set; }
 
-    private List<int> ChildrenNum { get; set; } = [];
+    private List<int> ChildrenNum { get; } = [];
 
     public bool IsClass { get; set; }
 
@@ -44,23 +46,18 @@ public class VariateManager : IDisposable
     public void Set(OldID id, ValueType valueType)
     {
         var a1 = GetValue(id);
-        if (a1 == null)
+        if (a1 is null or AnyValue)
         {
             //init
-            Variates.Add(id.IdName, valueType);
+            VariateName.Add(id.IdName);
+            Values.Add(valueType);
             Count++;
             return;
         }
 
         //reset
-        Variates[id.IdName] = valueType;
-    }
-
-    /// <summary>
-    /// GC
-    /// </summary>
-    private void GarbageCollection()
-    {
+        var count = VariateName.IndexOf(id.IdName);
+        Values[count] = valueType;
     }
 
     public void AddChildren()
@@ -74,21 +71,20 @@ public class VariateManager : IDisposable
 
         while (Count > num)
         {
-            var a = Variates.Keys.ToList();
+            Values.RemoveAt(Count - 1);
+            VariateName.RemoveAt(Count - 1);
             Count--;
-            Variates.Remove(a[Count]);
         }
 
         ChildrenNum.Remove(ChildrenNum[^1]);
-        GarbageCollection();
     }
 
     public ValueType? GetValue(OldID id)
     {
-        if (Variates.Keys.Any(key => key == id.IdName))
-            return Variates[id.IdName];
+        var count = VariateName.IndexOf(id.IdName);
+        if (count != -1) return Values[count];
 
-        var b = AnyInfo.Find(x =>
+        var b = AnyInfo.FirstOrDefault(x =>
         {
             return x switch
             {
@@ -107,7 +103,8 @@ public class VariateManager : IDisposable
 
     public void Init(Dictionary<string, ValueType> values)
     {
-        Variates = values;
+        VariateName.AddRange(values.Keys);
+        Values.AddRange(values.Values);
         Count = values.Count;
     }
 
@@ -119,23 +116,4 @@ public class VariateManager : IDisposable
     public void AddClassAndFunc(ValueType valueType) => AnyInfo.Add(valueType);
 
     public VariateManager Clone() => (VariateManager)MemberwiseClone();
-
-    public override string ToString()
-    {
-        var builder = new StringBuilder($"---------Variates---------{Environment.NewLine}|Name\t|Value\t|");
-        foreach (var variate in Variates)
-            builder.Append($"{Environment.NewLine}|{variate.Key}\t|{variate.Value}\t|");
-        builder.Append($"{Environment.NewLine}---------Class&Func-------{Environment.NewLine}|");
-        foreach (var type in AnyInfo)
-            builder.Append($"{type.TypeToString()}|");
-        builder.Append($"{Environment.NewLine}------------------");
-        return builder.ToString();
-    }
-
-    public void Dispose()
-    {
-        // AnyInfo.Clear();
-        // LangInfo = null;
-        // Interpreter = null;
-    }
 }

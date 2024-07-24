@@ -5,8 +5,8 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class DictionaryValue(List<TupleValue> tuples) : ValueType
 {
-    private List<(ValueType Key, ValueType Value)> Value { get; set; } = [];
-    private List<TupleValue> Tuples { get; set; } = tuples;
+    public List<(ValueType Key, ValueType Value)> Value { get; } = [];
+    private List<TupleValue> Tuples { get; } = tuples;
 
     public override ValueType Run(ref VariateManager Manager)
     {
@@ -19,10 +19,9 @@ public class DictionaryValue(List<TupleValue> tuples) : ValueType
         return this;
     }
 
-    public (ValueType, ValueType) Add(ValueType value1, ValueType value2)
+    public override ValueType Dot(OldExpr dotExpr)
     {
-        Value.Add((value1, value2));
-        return (value1, value2);
+        return dotExpr is not Instance a ? new VoidValue() : a.FromClassToResult(this,GetType().ToString());
     }
 
     public ValueType Get(ValueType key)
@@ -40,15 +39,20 @@ public class DictionaryValue(List<TupleValue> tuples) : ValueType
 
     public override string ToString()
     {
-        if (Value.Count != 0)
-        {
-            var sb = new StringBuilder();
-            foreach (var valueTuple in Value)
-                sb.Append($"key:{valueTuple.Key},value:{valueTuple.Value}");
+        if (Value.Count == 0) return "{" + Apis.ListToString(Tuples) + "}";
+        var sb = new StringBuilder();
+        foreach (var valueTuple in Value)
+            sb.Append($"key:{valueTuple.Key},value:{valueTuple.Value}");
 
-            return "{" + sb + "}";
-        }
+        return "{" + sb + "}";
+    }
+}
 
-        return "{" + Apis.ListToString(Tuples) + "}";
+public static class DictionaryValueFuncStatic
+{
+    public static TupleValue Add(this DictionaryValue value,ValueType value1, ValueType value2)
+    {
+        value.Value.Add((value1, value2));
+        return new TupleValue(value1, value2);
     }
 }

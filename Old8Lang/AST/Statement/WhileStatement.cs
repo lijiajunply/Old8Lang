@@ -8,8 +8,8 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public class WhileStatement(OldExpr expr, BlockStatement blockStatement) : OldStatement
 {
-    private OldExpr Expr { get; set; } = expr;
-    private BlockStatement BlockStatement { get; set; } = blockStatement;
+    private OldExpr Expr { get; } = expr;
+    private BlockStatement BlockStatement { get; } = blockStatement;
 
     public override void Run(ref VariateManager Manager)
     {

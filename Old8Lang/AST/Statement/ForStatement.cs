@@ -12,13 +12,13 @@ public class ForStatement(
     BlockStatement blockStatement)
     : OldStatement
 {
-    private SetStatement SetStatement { get; set; } = setStatement;
+    private SetStatement SetStatement { get; } = setStatement;
 
-    private Operation Expr { get; set; } = expr;
+    private Operation Expr { get; } = expr;
 
-    private OldStatement Statement { get; set; } = statement;
+    private OldStatement Statement { get; } = statement;
 
-    private BlockStatement ForBlockStatement { get; set; } = blockStatement;
+    private BlockStatement ForBlockStatement { get; } = blockStatement;
 
     public override void Run(ref VariateManager Manager)
     {

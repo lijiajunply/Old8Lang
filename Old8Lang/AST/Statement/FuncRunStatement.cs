@@ -6,8 +6,8 @@ namespace Old8Lang.AST.Statement;
 
 public class FuncRunStatement : OldStatement
 {
-    private Instance? Instance { get; set; }
-    private Operation? Operation { get; set; }
+    private Instance? Instance { get; }
+    private Operation? Operation { get; }
 
     public FuncRunStatement(Instance instance) => Instance = instance;
     public FuncRunStatement(Operation operation) => Operation = operation;
