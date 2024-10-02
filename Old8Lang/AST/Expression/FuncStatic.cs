@@ -67,3 +67,12 @@ public static class ValueTypeFuncStatic
         return new StringValue(type.ToString());
     }
 }
+
+public static class DictionaryValueFuncStatic
+{
+    public static TupleValue Add(this DictionaryValue value, ValueType value1, ValueType value2)
+    {
+        value.Value.Add((value1, value2));
+        return new TupleValue(value1, value2);
+    }
+}

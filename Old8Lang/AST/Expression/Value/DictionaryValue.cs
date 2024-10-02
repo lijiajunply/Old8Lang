@@ -66,13 +66,8 @@ public class DictionaryValue(List<TupleValue> tuples) : ValueType, IOldList
         => Value.Select(x => new TupleValue(x.Key, x.Value));
 
     public int GetLength() => Value.Count;
-}
-
-public static class DictionaryValueFuncStatic
-{
-    public static TupleValue Add(this DictionaryValue value, ValueType value1, ValueType value2)
+    public ValueType Slice(int start, int end)
     {
-        value.Value.Add((value1, value2));
-        return new TupleValue(value1, value2);
+        throw new Exception("dictionary is not support Slice");
     }
 }
