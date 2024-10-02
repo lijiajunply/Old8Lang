@@ -2,7 +2,7 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class ListValue : ValueType , IOldList
+public class ListValue : ValueType, IOldList
 {
     private List<OldExpr> Value { get; } = [];
 
@@ -37,17 +37,26 @@ public class ListValue : ValueType , IOldList
     public IEnumerable<ValueType> GetItems() => Values;
 
     public int GetLength() => Values.Count;
+
+    public ValueType Slice(int start, int end)
+    {
+        if (start < 0) start += Values.Count;
+        if (end < 0) end += Values.Count + 1;
+        return new ListValue(Values[start..end]
+            .OfType<OldExpr>()
+            .ToList());
+    }
 }
 
 public static class ListValueFuncStatic
 {
-    public static ValueType Add(this ListValue value,ValueType valueType)
+    public static ValueType Add(this ListValue value, ValueType valueType)
     {
         value.Values.Add(valueType);
         return valueType;
     }
 
-    private static ValueType Remove(this ListValue value,IntValue num)
+    private static ValueType Remove(this ListValue value, IntValue num)
     {
         var a = value.Values[num.Value];
         value.Values.RemoveAt(num.Value);

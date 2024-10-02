@@ -2,7 +2,7 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class ArrayValue : ValueType , IOldList
+public class ArrayValue : ValueType, IOldList
 {
     public ValueType[] Values { get; }
     private List<OldExpr> Va { get; } = [];
@@ -41,4 +41,11 @@ public class ArrayValue : ValueType , IOldList
     public override object GetValue() => Apis.ListToObjects(Values.ToList());
     public IEnumerable<ValueType> GetItems() => Values;
     public int GetLength() => Values.Length;
+
+    public ValueType Slice(int start, int end)
+    {
+        if (start < 0) start += Values.Length;
+        if (end < 0) end += Values.Length + 1;
+        return new ArrayValue(Values[start..end]);
+    }
 }

@@ -57,4 +57,10 @@ public class StringValue : ValueType, IOldList
     public IEnumerable<ValueType> GetItems() => Value.Select(item => ObjToValue(item));
 
     public int GetLength() => Value.Length;
+    public ValueType Slice(int start, int end)
+    {
+        if (start < 0) start += Value.Length;
+        if (end < 0) end += Value.Length + 1;
+        return new StringValue(Value[start..end]);
+    }
 }

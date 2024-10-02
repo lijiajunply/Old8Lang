@@ -1,4 +1,3 @@
-using System.Collections;
 using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
@@ -15,21 +14,12 @@ public class SliceValue(OldID id, OldExpr? start = null, OldExpr? end = null) : 
         var start = Start?.Run(ref Manager);
         var end = End?.Run(ref Manager);
 
-        var length = value.GetValue<IList>().Count;
+        if (value is not IOldList list) return new VoidValue();
+
+        var length = list.GetLength();
         var startValue = start?.GetValue<int>() ?? 0;
         var endValue = end?.GetValue<int>() ?? length;
 
-        if (startValue < 0) startValue += length;
-        if (endValue < 0) endValue += length + 1;
-
-        return value switch
-        {
-            StringValue str => new StringValue(str.Value[startValue..endValue]),
-            ArrayValue arr => new ArrayValue(arr.Values[startValue..endValue]),
-            ListValue list => new ListValue(list.Values[startValue..endValue]
-                .OfType<OldExpr>()
-                .ToList()),
-            _ => new VoidValue()
-        };
+        return list.Slice(startValue, endValue);
     }
 }

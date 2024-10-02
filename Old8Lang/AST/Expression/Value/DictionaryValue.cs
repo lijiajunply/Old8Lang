@@ -66,6 +66,10 @@ public class DictionaryValue(List<TupleValue> tuples) : ValueType, IOldList
         => Value.Select(x => new TupleValue(x.Key, x.Value));
 
     public int GetLength() => Value.Count;
+    public ValueType Slice(int start, int end)
+    {
+        throw new Exception("dictionary is not support Slice");
+    }
 }
 
 public static class DictionaryValueFuncStatic
