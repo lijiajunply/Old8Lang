@@ -1,6 +1,4 @@
 [import "Old8LangLib" Terminal Title]
-[import "Old8LangLib" Terminal Print]
-[import "Old8LangLib" Terminal PrintLine]
 [import "Old8LangLib" Terminal ReadAscii]
 [import "Old8LangLib" Terminal ReadLine]
 [import "Old8LangLib" Terminal ReadKey]

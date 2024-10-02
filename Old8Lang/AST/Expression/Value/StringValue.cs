@@ -3,7 +3,7 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class StringValue : ValueType
+public class StringValue : ValueType, IOldList
 {
     public string Value { get; }
 
@@ -37,7 +37,7 @@ public class StringValue : ValueType
 
         return new VoidValue();
     }
-    
+
     public override ValueType Converse(ValueType otherValueType, ref VariateManager _)
     {
         if (otherValueType is not TypeValue value) throw new Exception("the value is not a type");
@@ -54,4 +54,7 @@ public class StringValue : ValueType
     }
 
     public override object GetValue() => Value;
+    public IEnumerable<ValueType> GetItems() => Value.Select(item => ObjToValue(item));
+
+    public int GetLength() => Value.Length;
 }

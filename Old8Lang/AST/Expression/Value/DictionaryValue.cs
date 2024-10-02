@@ -3,7 +3,7 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class DictionaryValue(List<TupleValue> tuples) : ValueType
+public class DictionaryValue(List<TupleValue> tuples) : ValueType, IOldList
 {
     public List<(ValueType Key, ValueType Value)> Value { get; } = [];
     private List<TupleValue> Tuples { get; } = tuples;
@@ -46,11 +46,11 @@ public class DictionaryValue(List<TupleValue> tuples) : ValueType
 
         return "{" + sb + "}";
     }
-    
-    public override ValueType Converse(ValueType otherValueType,ref VariateManager Manager)
+
+    public override ValueType Converse(ValueType otherValueType, ref VariateManager Manager)
     {
         if (otherValueType is not AnyValue typeAny) return new VoidValue();
-        
+
         foreach (var a in Value)
         {
             var aKey = a.Key.Run(ref Manager);
@@ -61,11 +61,16 @@ public class DictionaryValue(List<TupleValue> tuples) : ValueType
 
         return typeAny;
     }
+
+    public IEnumerable<ValueType> GetItems()
+        => Value.Select(x => new TupleValue(x.Key, x.Value));
+
+    public int GetLength() => Value.Count;
 }
 
 public static class DictionaryValueFuncStatic
 {
-    public static TupleValue Add(this DictionaryValue value,ValueType value1, ValueType value2)
+    public static TupleValue Add(this DictionaryValue value, ValueType value1, ValueType value2)
     {
         value.Value.Add((value1, value2));
         return new TupleValue(value1, value2);

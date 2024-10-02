@@ -34,6 +34,16 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
             case "ToObj":
                 return (Ids[0].Run(ref Manager) as StringValue)?.ToObj()
                     as ValueType ?? new VoidValue();
+            case "PrintLine":
+            {
+                Console.WriteLine(Ids[0].Run(ref Manager));
+                return new VoidValue();
+            }
+            case "Print":
+            {
+                Console.WriteLine(Ids[0].Run(ref Manager));
+                return new VoidValue();
+            }
         }
 
         var result = Id.Run(ref Manager);

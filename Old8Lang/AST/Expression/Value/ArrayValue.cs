@@ -2,15 +2,16 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class ArrayValue : ValueType
+public class ArrayValue : ValueType , IOldList
 {
-    private ValueType[] Values { get; }
+    public ValueType[] Values { get; }
     private List<OldExpr> Va { get; } = [];
 
-    public ArrayValue(List<OldExpr> valuesList)
+    public ArrayValue(IEnumerable<OldExpr> valuesList)
     {
-        Values = new ValueType[valuesList.Count];
-        Va = valuesList;
+        var oldExpr = valuesList as OldExpr[] ?? valuesList.ToArray();
+        Values = new ValueType[oldExpr.Length];
+        Va = oldExpr.ToList();
     }
 
     public ArrayValue(List<object> a) => Values = a.Select(ObjToValue).ToArray();
@@ -38,4 +39,6 @@ public class ArrayValue : ValueType
 
     public override string ToString() => Values[0] == null! ? Apis.ListToString(Va) : Apis.ArrayToString(Values);
     public override object GetValue() => Apis.ListToObjects(Values.ToList());
+    public IEnumerable<ValueType> GetItems() => Values;
+    public int GetLength() => Values.Length;
 }

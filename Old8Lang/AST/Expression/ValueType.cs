@@ -8,7 +8,6 @@ namespace Old8Lang.AST.Expression;
 /// </summary>
 public abstract class ValueType : OldExpr
 {
-
     public override string ToString() => GetValue().ToString()!;
 
     #region intOper
@@ -43,8 +42,8 @@ public abstract class ValueType : OldExpr
     public virtual bool Greater(ValueType? otherValue) => false;
 
     #endregion
-    
-    public virtual ValueType Converse(ValueType otherValueType,ref VariateManager Manager) => new VoidValue();
+
+    public virtual ValueType Converse(ValueType otherValueType, ref VariateManager Manager) => new VoidValue();
 
     public override ValueType Run(ref VariateManager Manager) => this;
 
@@ -71,6 +70,11 @@ public abstract class ValueType : OldExpr
     }
 
     public virtual object GetValue() => new();
+
+    public T GetValue<T>()
+    {
+        return (T)GetValue();
+    }
 
     public static ValueType ObjToValue(object? value)
     {

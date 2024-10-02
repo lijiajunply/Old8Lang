@@ -9,20 +9,15 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public class BlockStatement : OldStatement
 {
-    private List<OldStatement> ImportStatements { get; }
-    private List<OldStatement> OtherStatements { get; }
+    private List<OldStatement> ImportStatements { get; } = [];
+    private List<OldStatement> OtherStatements { get; } = [];
 
     public BlockStatement(List<OldLangTree> statements)
     {
-        ImportStatements = [];
-        OtherStatements = [];
-        
         foreach (var statement in statements.OfType<OldStatement>())
         {
             switch (statement)
             {
-                case PassStatement:
-                    continue;
                 case ImportStatement or NativeStatement or FuncInit or ClassInit:
                     ImportStatements.Add(statement);
                     break;

@@ -1,3 +1,4 @@
+// 函数：斐波那契
 fib(a) ->
 {
    if a == 1
@@ -7,6 +8,8 @@ fib(a) ->
    else
       return fib(a-1)+fib(a-2)
 }
+
+// 测试类
 class Test{
    a <- 1
    b <- 2

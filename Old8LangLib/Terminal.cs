@@ -5,8 +5,6 @@ namespace Old8LangLib;
 public static class Terminal
 {
     public static void Title(string title) => Console.Title = title;
-    public static void Print(object context) => Console.Write(context);
-    public static void PrintLine(object context) => Console.WriteLine(context);
     public static int ReadAscii() => Console.Read();
     public static string ReadLine() => Console.ReadLine() ?? "";
     public static string ReadKey() => Console.ReadKey().Key.ToString();
