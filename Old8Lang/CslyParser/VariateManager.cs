@@ -83,9 +83,7 @@ public class VariateManager
     public ValueType? GetValue(OldID id)
     {
         var count = VariateName.IndexOf(id.IdName);
-        if (count != -1) return Values[count];
-
-        return GetAny(id);
+        return count != -1 ? Values[count] : GetAny(id);
     }
 
     public ValueType? GetAny(OldID id)

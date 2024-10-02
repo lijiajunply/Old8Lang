@@ -4,10 +4,11 @@ import other
 
 //测试函数
 PrintLine("测试函数")
-a <- fib(20)
+//a <- fib(20)
+a <- fibIter(20)
 PrintLine(a)
 b <- {12,123,1231,123,1}
-b.Add(1)
+b.Add(2)
 PrintLine(b.ToStr())
 
 // 测试Json
@@ -47,6 +48,8 @@ switch "2" {
 }
 
 // 测试For in
+/*
 for i in [1,2,3] {
     PrintLine(i)
 }
+*/

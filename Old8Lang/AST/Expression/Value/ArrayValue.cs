@@ -48,4 +48,9 @@ public class ArrayValue : ValueType, IOldList
         if (end < 0) end += Values.Length + 1;
         return new ArrayValue(Values[start..end]);
     }
+
+    public void Add(ValueType valueType)
+    {
+        throw new Exception("Array is not use add");
+    }
 }

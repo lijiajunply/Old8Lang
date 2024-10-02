@@ -57,15 +57,21 @@ public class Operation(OldExpr left, OldTokenGeneric opera, OldExpr right) : Old
 
         if (l is ListValue && Opera == OldTokenGeneric.CONCAT)
         {
-            if (r is Instance r1)
+            if (r is not Instance r1) return l.Dot(r);
+            List<OldExpr> values = [];
+            foreach (var id in r1.Ids)
             {
-                List<OldExpr> values = [];
-                foreach (var id in r1.Ids)
-                    values.Add(id.Run(ref Manager));
-                r1.Ids = values;
+                if (id is ValueType)
+                {
+                    values.Add(id);
+                    continue;
+                }
+
+                values.Add(id.Run(ref Manager));
             }
 
-            return l.Dot(r);
+            var newInstance = new Instance(r1.Id, values);
+            return l.Dot(newInstance);
         }
 
         if (l is NativeStaticAny && Opera == OldTokenGeneric.CONCAT)

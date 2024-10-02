@@ -76,3 +76,31 @@ public static class DictionaryValueFuncStatic
         return new TupleValue(value1, value2);
     }
 }
+
+public static class ListValueFuncStatic
+{
+    public static ValueType Add(this ListValue value, ValueType valueType)
+    {
+        value.Values.Add(valueType);
+        return valueType;
+    }
+
+    private static ValueType Remove(this ListValue value, IntValue num)
+    {
+        var a = value.Values[num.Value];
+        value.Values.RemoveAt(num.Value);
+        return a;
+    }
+
+    private static VoidValue AddList(this ListValue value, ListValue otherValue)
+    {
+        value.Values.AddRange(otherValue.Values);
+        return new VoidValue();
+    }
+
+    private static ListValue Sort(this ListValue value)
+    {
+        value.Values.Sort();
+        return value;
+    }
+}

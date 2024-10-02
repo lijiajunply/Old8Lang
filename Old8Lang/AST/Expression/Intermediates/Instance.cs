@@ -77,6 +77,17 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
         var m = type.GetMethod(Id.IdName);
         if (m == null)
         {
+            type = baseValue switch
+            {
+                DictionaryValue => Type.GetType("Old8Lang.AST.Expression.DictionaryValueFuncStatic"),
+                ListValue => Type.GetType("Old8Lang.AST.Expression.ListValueFuncStatic"),
+                _ => Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic")
+            };
+            m = type?.GetMethod(Id.IdName);
+        }
+
+        if (m == null && baseValue is not DictionaryValue or ListValue)
+        {
             type = Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic");
             m = type?.GetMethod(Id.IdName);
         }
