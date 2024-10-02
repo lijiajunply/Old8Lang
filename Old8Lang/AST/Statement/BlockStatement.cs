@@ -10,12 +10,12 @@ namespace Old8Lang.AST.Statement;
 public class BlockStatement : OldStatement
 {
     private List<OldStatement> ImportStatements { get; }
-    public List<OldStatement> OtherStatements { get; }
+    private List<OldStatement> OtherStatements { get; }
 
     public BlockStatement(List<OldLangTree> statements)
     {
-        ImportStatements = new List<OldStatement>();
-        OtherStatements = new List<OldStatement>();
+        ImportStatements = [];
+        OtherStatements = [];
         
         foreach (var statement in statements.OfType<OldStatement>())
         {

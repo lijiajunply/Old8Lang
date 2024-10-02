@@ -1,5 +1,6 @@
 using Old8Lang.CslyParser;
 
+// ReSharper disable once CheckNamespace
 namespace Old8Lang.AST.Expression.Value;
 
 public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
@@ -20,6 +21,19 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
                 a?.ImportRun(ref Manager);
                 return new VoidValue();
             }
+            case "ShowValues":
+            {
+                Console.WriteLine(Manager);
+                return new VoidValue();
+            }
+            case "Json":
+            {
+                return (Ids[0].Run(ref Manager) as AnyValue)?.ToJson()
+                    as ValueType ?? new VoidValue();
+            }
+            case "ToObj":
+                return (Ids[0].Run(ref Manager) as StringValue)?.ToObj()
+                    as ValueType ?? new VoidValue();
         }
 
         var result = Id.Run(ref Manager);
@@ -46,26 +60,20 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
 
         return result;
     }
-    
-    public ValueType FromClassToResult(ValueType baseValue,string typeName)
+
+    public ValueType FromClassToResult(ValueType baseValue)
     {
-        var type = Type.GetType($"{typeName}FuncStatic");
-        var m = type?.GetMethod(Id.IdName);
+        var type = baseValue.GetType();
+        var m = type.GetMethod(Id.IdName);
         if (m == null)
         {
-            if (baseValue is AnyValue anyValue)
-            {
-                
-            }
-            else
-            {
-                type = Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic");
-                m = type?.GetMethod(Id.IdName);   
-            }
+            type = Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic");
+            m = type?.GetMethod(Id.IdName);
         }
-        var os = new List<object>(){baseValue};
+
+        var os = new List<object>() { baseValue };
         os.AddRange(Ids);
-        var r = m?.Invoke(baseValue,os.ToArray());
+        var r = m?.Invoke(baseValue, os.ToArray());
         if (r is ValueType v) return v;
         return ObjToValue(r!);
     }

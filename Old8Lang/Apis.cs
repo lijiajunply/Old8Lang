@@ -1,9 +1,6 @@
 using System.Text;
 using System.Text.Json;
 using ValueType = Old8Lang.AST.Expression.ValueType;
-using System.CodeDom.Compiler;
-using Microsoft.CSharp;
-using Old8Lang.AST.Statement;
 using Old8Lang.CslyParser;
 
 namespace Old8Lang;
@@ -65,19 +62,6 @@ public static class Apis
     {
         var a = new Interpreter(path, isDir);
         a.ParserRun();
-    }
-
-    // ReSharper disable once UnusedMember.Global
-    public static void CompilerRun(BlockStatement statement)
-    {
-        var code = statement.ToCode();
-        var codeProvider = new CSharpCodeProvider();
-        var compParameters = new CompilerParameters();
-        // Compile the code
-        var res = codeProvider.CompileAssemblyFromSource(compParameters, code);
-        // Create a new instance of the class 'MyClass'　　　　// 有命名空间的，需要命名空间.类名
-        var myClass = res.CompiledAssembly.CreateInstance("Project");
-        myClass?.GetType().GetMethod("Main")?.Invoke(myClass, null);
     }
 
     public static LangInfo ChangeBasicInfo(string import, string ver, string uri = "https://downland.old8lang.com")

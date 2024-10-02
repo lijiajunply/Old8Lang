@@ -30,7 +30,7 @@ public class ListValue : ValueType
 
     public override ValueType Dot(OldExpr dotExpr)
     {
-        return dotExpr is not Instance a ? new VoidValue() : a.FromClassToResult(this,GetType().ToString());
+        return dotExpr is not Instance a ? new VoidValue() : a.FromClassToResult(this);
     }
 
     public override object GetValue() => Apis.ListToObjects(Values);

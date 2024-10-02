@@ -1,7 +1,9 @@
 ﻿import Terminal
 a <- 1 //将1赋值给a
 a -> b //将a赋值给b
+
 //在Old8Lang，变量更像是C中的指针，为了好看，这里使用 -> 或 <-
+
 // if,for,while
 if a == 1
    b <- 2 
@@ -9,28 +11,35 @@ for c <- 1,c<=2,c++
    PrintLine(b)
 while(a<=2)
    PrintLine(b)
+
 //类
 class Old8LangClass
+{  
    a <- 1
    b <- 2
-   init(a1 b1) ->
+   init(a1,b1) ->
+   {
       a1 -> a 
-      b1 -> b 
-   ADD() ->
-      return a + b
-   ToString() => a.ToString+b.ToString;
+      b1 -> b
+   } 
+   ADD() -> return a + b
+}
+
 //类的实例：
 a <- Old8LangClass(1,2) // 运行init函数
 a.ADD() // 3 
+
 //彩蛋函数：
 a.XAUAT
 //输出：西建大还我血汗钱我要回家
+
 //数组：
 a <- []
-a <- [1 2 1]
+a <- [1,2,1]
 PrintLine(a[0]) //为a数组的第一个
 PrintLine(a[-1]) //为最后一个
 b <- a[0:1] //取 a[n](0<=n<1)
+
 //type:
 typeof(a) // a : Func
 a <- 5

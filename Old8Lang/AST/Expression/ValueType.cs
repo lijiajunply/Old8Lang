@@ -30,7 +30,7 @@ public abstract class ValueType : OldExpr
 
         if (dotExpr is Instance instance)
         {
-            return instance.FromClassToResult(this,"Old8Lang.AST.Expression.ValueType");
+            return instance.FromClassToResult(this);
         }
 
         return new VoidValue();
@@ -43,6 +43,8 @@ public abstract class ValueType : OldExpr
     public virtual bool Greater(ValueType? otherValue) => false;
 
     #endregion
+    
+    public virtual ValueType Converse(ValueType otherValueType,ref VariateManager Manager) => new VoidValue();
 
     public override ValueType Run(ref VariateManager Manager) => this;
 
@@ -70,7 +72,7 @@ public abstract class ValueType : OldExpr
 
     public virtual object GetValue() => new();
 
-    protected static ValueType ObjToValue(object? value)
+    public static ValueType ObjToValue(object? value)
     {
         if (value == null)
         {
@@ -85,40 +87,8 @@ public abstract class ValueType : OldExpr
             char a => new CharValue(a),
             List<object> a => new ListValue(a),
             object[] a => new ArrayValue(a.ToList()),
+            long a => new IntValue((int)a),
             _ => new VoidValue()
         };
-    }
-}
-
-public static class ValueTypeFuncStatic
-{
-    public static IntValue ToInt(this ValueType type)
-    {
-        if (type is IntValue intValue)
-        {
-            return intValue;
-        }
-
-        if (type is DoubleValue doubleValue)
-        {
-            return new IntValue(Convert.ToInt32(doubleValue.Value));
-        }
-
-        if (type is CharValue charValue)
-        {
-            return new IntValue(Convert.ToInt32(charValue.Value));
-        }
-        
-        return new IntValue(int.Parse(type.ToString()));
-    }
-
-    public static TypeValue GetType(this ValueType type)
-    {
-        return new TypeValue(type.TypeToString());
-    }
-
-    public static StringValue ToStr(this ValueType type)
-    {
-        return new StringValue(type.ToString());
     }
 }

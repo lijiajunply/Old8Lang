@@ -1,10 +1,11 @@
+using System.Text;
 using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
 public class AnyValue : ValueType
 {
-    private Dictionary<OldID, OldExpr> Variates { get; }
+    public Dictionary<OldID, OldExpr> Variates { get; }
     public Dictionary<string, ValueType> Result { get; }
     public OldID Id { get; }
 
@@ -21,6 +22,16 @@ public class AnyValue : ValueType
         manager.IsClass = true;
     }
 
+    public AnyValue(Dictionary<OldID, OldExpr> variates)
+    {
+        Variates = variates;
+        Id = new OldID("JsonNative");
+        Result = new Dictionary<string, ValueType>();
+        manager = new VariateManager();
+        manager.Init(Result);
+        manager.IsClass = true;
+    }
+    
     public sealed override ValueType Run(ref VariateManager Manager)
     {
         manager.AnyInfo.AddRange(Manager.AnyInfo.Where(x => x is not FuncValue).ToList());
@@ -36,7 +47,7 @@ public class AnyValue : ValueType
             case OldID id:
             {
                 var a = new OldExpr();
-                foreach (var variable in Variates.Where(variable => id.IdName == variable.Key.IdName))
+                foreach (var variable in Result.Where(variable => id.IdName == variable.Key))
                     a = variable.Value;
                 return a.Run(ref manager);
             }
@@ -53,5 +64,28 @@ public class AnyValue : ValueType
 
     public void Set(OldID id, ValueType valueType) => manager.Set(id, valueType);
 
-    public override string ToString() => $"class {Id} " + "{" + "\n{manager}" + "\n}";
+    public override ValueType Converse(ValueType otherValueType,ref VariateManager Manager)
+    {
+        if (otherValueType is not AnyValue typeAny) return new VoidValue();
+        
+        foreach (var a in Result)
+        {
+            typeAny.Set(new OldID(a.Key), a.Value);
+        }
+
+        return typeAny;
+    }
+
+    public override string ToString()
+    {
+        var builder = new StringBuilder();
+        builder.Append('{');
+        for (var i = 0; i < Variates.Count; i++)
+        {
+            var variable = Variates.ElementAt(i);
+            builder.Append($"{(i == 0 ? "" : ",")}\"{variable.Key}\":{variable.Value}");
+        }
+        builder.Append('}');
+        return builder.ToString();
+    }
 }

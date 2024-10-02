@@ -1,3 +1,4 @@
+using System.Text;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using ValueType = Old8Lang.AST.Expression.ValueType;
@@ -21,7 +22,7 @@ public class VariateManager
     private List<string> VariateName { get; } = [];
     private List<ValueType> Values { get; } = [];
 
-    public List<ValueType> AnyInfo { get; set; } = [];
+    public List<ValueType> AnyInfo { get; private init; } = [];
 
     #endregion
 
@@ -46,7 +47,7 @@ public class VariateManager
     public void Set(OldID id, ValueType valueType)
     {
         var a1 = GetValue(id);
-        if (a1 is null or AnyValue)
+        if (a1 is null)
         {
             //init
             VariateName.Add(id.IdName);
@@ -84,7 +85,12 @@ public class VariateManager
         var count = VariateName.IndexOf(id.IdName);
         if (count != -1) return Values[count];
 
-        var b = AnyInfo.FirstOrDefault(x =>
+        return GetAny(id);
+    }
+
+    public ValueType? GetAny(OldID id)
+    {
+        return AnyInfo.FirstOrDefault(x =>
         {
             return x switch
             {
@@ -95,8 +101,6 @@ public class VariateManager
                 _ => false
             };
         });
-
-        return b;
     }
 
     #region Init
@@ -116,4 +120,15 @@ public class VariateManager
     public void AddClassAndFunc(ValueType valueType) => AnyInfo.Add(valueType);
 
     public VariateManager Clone() => (VariateManager)MemberwiseClone();
+
+    public override string ToString()
+    {
+        var builder = new StringBuilder();
+        for (var i = 0; i < Values.Count; i++)
+        {
+            builder.AppendLine($"{VariateName[i]}:{Values[i]}");
+        }
+
+        return builder.ToString();
+    }
 }

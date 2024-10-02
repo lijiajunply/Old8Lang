@@ -1,3 +1,5 @@
+using Old8Lang.CslyParser;
+
 namespace Old8Lang.AST.Expression.Value;
 
 public class IntValue(int intValue) : ValueType
@@ -60,5 +62,20 @@ public class IntValue(int intValue) : ValueType
         return false;
     }
 
+    public override ValueType Converse(ValueType otherValueType, ref VariateManager _)
+    {
+        if (otherValueType is not TypeValue value) throw new Exception("the value is not a type");
+
+        return value.Value switch
+        {
+            "Int" or "int" => this,
+            "Bool" or "bool" => new BoolValue(Value > 0),
+            "String" or "string" => new StringValue(Value.ToString()),
+            "char" or "Char" => new CharValue(Convert.ToChar(Value)),
+            "Double" or "double" => new DoubleValue(Value),
+            _ => throw new Exception("not fount the type: " + value.Value)
+        };
+    }
+    
     public override object GetValue() => Value;
 }

@@ -1,4 +1,5 @@
 using System.Text;
+using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -35,6 +36,21 @@ public class StringValue : ValueType
         }
 
         return new VoidValue();
+    }
+    
+    public override ValueType Converse(ValueType otherValueType, ref VariateManager _)
+    {
+        if (otherValueType is not TypeValue value) throw new Exception("the value is not a type");
+
+        return value.Value switch
+        {
+            "Int" or "int" => new IntValue(Value.Length),
+            "Bool" or "bool" => throw new Exception("can not convert string to bool"),
+            "String" or "string" => this,
+            "char" or "Char" => Value.Length == 0 ? new CharValue('\0') : new CharValue(Value[0]),
+            "Double" or "double" => throw new Exception("can not convert string to double"),
+            _ => throw new Exception("not fount the type: " + value.Value)
+        };
     }
 
     public override object GetValue() => Value;

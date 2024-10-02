@@ -2,7 +2,6 @@ using sly.lexer;
 
 namespace Old8Lang.CslyParser;
 
-[Lexer(IndentationAWare = true)]
 public enum OldTokenGeneric
 {
     #region keywords 0 -> 99
@@ -26,9 +25,10 @@ public enum OldTokenGeneric
 
     [Keyword("IMPORT")] [Keyword("import")]
     IMPORT = 17,
-    [Comment("//", "|*", "*|")] COMMENT = 18,
+    [Comment("//", "/*", "*/")] COMMENT = 18,
     [Keyword("NEW")] [Keyword("new")] NEW = 19,
     [Keyword("PASS")] [Keyword("pass")] PASS = 20,
+    [Keyword("AS")] [Keyword("as")] AS = 21,
 
     #endregion
 

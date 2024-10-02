@@ -66,7 +66,6 @@ public class Interpreter
     public BlockStatement Build(bool isDot = false,string code = "")
     {
         code = string.IsNullOrEmpty(code) ? Code : code;
-        code += Environment.NewLine + "pass";
         var result = parser?.Parse(code);
 
         if (result == null) throw new Exception("语法出错");

@@ -21,7 +21,7 @@ public class DictionaryValue(List<TupleValue> tuples) : ValueType
 
     public override ValueType Dot(OldExpr dotExpr)
     {
-        return dotExpr is not Instance a ? new VoidValue() : a.FromClassToResult(this,GetType().ToString());
+        return dotExpr is not Instance a ? new VoidValue() : a.FromClassToResult(this);
     }
 
     public ValueType Get(ValueType key)
@@ -45,6 +45,21 @@ public class DictionaryValue(List<TupleValue> tuples) : ValueType
             sb.Append($"key:{valueTuple.Key},value:{valueTuple.Value}");
 
         return "{" + sb + "}";
+    }
+    
+    public override ValueType Converse(ValueType otherValueType,ref VariateManager Manager)
+    {
+        if (otherValueType is not AnyValue typeAny) return new VoidValue();
+        
+        foreach (var a in Value)
+        {
+            var aKey = a.Key.Run(ref Manager);
+            var aValue = a.Value.Run(ref Manager);
+            if (aKey is not StringValue s) continue;
+            typeAny.Set(new OldID(s.Value), aValue);
+        }
+
+        return typeAny;
     }
 }
 

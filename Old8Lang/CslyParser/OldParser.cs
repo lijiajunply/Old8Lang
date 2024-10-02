@@ -21,8 +21,6 @@ public class OldParser
     [Production("statement: LPAREN[d] statement RPAREN[d]")]
     public OldLangTree LrBlock(OldStatement statement) => statement;
 
-    [Production("statement: PASS[d]")]
-    public OldLangTree Pass() => new PassStatement();
     #endregion
 
     #region expr
@@ -71,6 +69,8 @@ public class OldParser
     [Production("operand: primary")]
     public OldLangTree Operand(OldLangTree prim) => prim;
 
+    #region BaseType
+
     [Production("primary: STRING")]
     public OldLangTree STRING(Token<OldTokenGeneric> token) =>
         new StringValue(token.Value[1..^1]);
@@ -88,57 +88,122 @@ public class OldParser
     [Production("primary: IDENTIFIER")]
     public OldLangTree IDENTIFIER(Token<OldTokenGeneric> id) => new OldID(id.Value);
 
-    [Production("primary: TRUE")]
-    public OldLangTree BoolTrue(Token<OldTokenGeneric> token) => new BoolValue(true);
+    [Production("primary: TRUE[d]")]
+    public OldLangTree BoolTrue() => new BoolValue(true);
 
-    [Production("primary: FALSE")]
-    public OldLangTree BoolFalse(Token<OldTokenGeneric> token) => new BoolValue(false);
+    [Production("primary: FALSE[d]")]
+    public OldLangTree BoolFalse() => new BoolValue(false);
 
+    #endregion
+
+    #region Arg and Id Array
+
+    [Production("idList: IDENTIFIER (COMMA[d] IDENTIFIER)*")]
+    public OldLangTree IdList(Token<OldTokenGeneric> first, List<Group<OldTokenGeneric, OldLangTree>> list)
+    {
+        var a = new List<OldID>();
+
+        if (first.IsEmpty) return new IdList(a);
+
+        a.Add(new OldID(first.Value));
+        list.ForEach(x => a.Add(new OldID(x.Token(0).Value)));
+        return new IdList(a);
+    }
+
+    [Production("argList: OldParser_expressions (COMMA[d] OldParser_expressions)*")]
+    public OldLangTree ArgList(OldLangTree first,
+        List<Group<OldTokenGeneric, OldLangTree>> list)
+    {
+        var a = new List<OldExpr>();
+
+        if (first is not OldExpr firstValue) return new ArgList(a);
+
+        a.Add(firstValue);
+        list.ForEach(x => a.Add(x.Value(0) as OldExpr ?? new StringValue("")));
+        return new ArgList(a);
+    }
+
+    #endregion
+
+    /// <summary>
+    /// 索引
+    /// </summary>
+    /// <param name="id">变量名</param>
+    /// <param name="a">索引</param>
+    /// <returns>eg : list[1]</returns>
     [Production("primary: IDENTIFIER L_BRACKET[d] OldParser_expressions R_BRACKET[d]")]
     public OldLangTree ListInit(Token<OldTokenGeneric> id, OldExpr a) =>
         new OldItem(new OldID(id.Value), a);
 
-    [Production("primary: IDENTIFIER LPAREN[d] OldParser_expressions* RPAREN[d]")]
-    public OldLangTree Instantiate(Token<OldTokenGeneric> id, List<OldLangTree> ids)
+    /// <summary>
+    /// 实例化 / 函数
+    /// </summary>
+    /// <param name="id">变量名</param>
+    /// <param name="ids">参数</param>
+    /// <returns>eg: a(1,2,3)</returns>
+    [Production("primary: IDENTIFIER LPAREN[d] argList? RPAREN[d]")]
+    public OldLangTree Instantiate(Token<OldTokenGeneric> id, ValueOption<OldLangTree> ids)
     {
         List<OldExpr> IDs = [];
-        ids.ForEach(x =>
-        {
-            if (x is OldExpr expr) IDs.Add(expr);
-        });
+
+        var value = ids.Match(x => x, () => null!);
+        if (value is ArgList argList) IDs.AddRange(argList.Args);
         return new Instance(new OldID(id.Value), IDs);
     }
 
-    [Production("primary: LPAREN[d] IDENTIFIER* RPAREN[d] LAMBDA[d] OldParser_expressions")]
-    public OldLangTree Lambda(List<Token<OldTokenGeneric>> ids, OldExpr expr)
+    /// <summary>
+    /// lambda表达式
+    /// </summary>
+    /// <param name="ids">参数</param>
+    /// <param name="expr">表达式</param>
+    /// <returns>(a,v) => a+v</returns>
+    [Production("primary: LPAREN[d] idList? RPAREN[d] LAMBDA[d] OldParser_expressions")]
+    public OldLangTree Lambda(ValueOption<OldLangTree> ids, OldExpr expr)
     {
-        List<OldLangTree> returnState = [new ReturnStatement(expr)];
-        var a = ids.Select(x => new OldID(x.Value)).ToList();
-        return new FuncValue(null, a, new BlockStatement(returnState));
+        var value = ids.Match(x => x, () => null!);
+        return new FuncValue(null, value is not IdList argList ? [] : argList.Args, new BlockStatement([new ReturnStatement(expr)]));
     }
 
-    [Production("primary: COMMA")]
-    public OldLangTree CommaTree(Token<OldTokenGeneric> _) => new VoidValue();
 
-    [Production("primary: L_BRACES[d] OldParser_expressions* R_BRACES[d]")]
-    public OldLangTree List(List<OldLangTree> list)
+    /// <summary>
+    /// 列表
+    /// </summary>
+    /// <param name="ids">元素</param>
+    /// <returns>eg : [1,2,3,4]</returns>
+    [Production("primary: L_BRACES[d] argList? R_BRACES[d]")]
+    public OldLangTree List(ValueOption<OldLangTree> ids)
     {
-        var a = new List<OldExpr>();
-        list.ForEach(x => a.Add(x as OldExpr ?? new StringValue("")));
-        return new ListValue(a);
+        var value = ids.Match(x => x, () => null!);
+        return new ListValue(value is not ArgList argList ? [] : argList.Args);
     }
 
-    [Production("primary: L_BRACKET OldParser_expressions* R_BRACKET[d]")]
-    public OldLangTree Array(Token<OldTokenGeneric> _, List<OldLangTree> list)
+    /// <summary>
+    /// 数组
+    /// </summary>
+    /// <param name="ids">元素</param>
+    /// <returns>eg : {1,2,3,4}</returns>
+    [Production("primary: L_BRACKET[d] argList? R_BRACKET[d]")]
+    public OldLangTree Array(ValueOption<OldLangTree> ids)
     {
-        var a = list.OfType<OldExpr>().ToList();
-        return new ArrayValue(a);
+        var value = ids.Match(x => x, () => null!);
+        return new ArrayValue(value is not ArgList argList ? [] : argList.Args);
     }
 
+    /// <summary>
+    /// 元组
+    /// </summary>
+    /// <param name="v1">value 1</param>
+    /// <param name="v2">value 2</param>
+    /// <returns>eg : ('a',1)</returns>
     [Production("primary: LPAREN[d] OldParser_expressions COMMA[d] OldParser_expressions RPAREN[d]")]
     public OldLangTree Tuple(OldExpr v1, OldExpr v2) => new TupleValue(v1, v2);
 
 
+    /// <summary>
+    /// 字典
+    /// </summary>
+    /// <param name="a">元素</param>
+    /// <returns>eg : {'1' : 1 'c' : 2}</returns>
     [Production("primary: L_BRACES[d] tuple+ R_BRACES[d]")]
     public OldLangTree Dic(List<OldLangTree> a)
     {
@@ -146,12 +211,33 @@ public class OldParser
         return new DictionaryValue(b);
     }
 
+    /// <summary>
+    /// 字典元素
+    /// </summary>
+    /// <param name="v1">Key</param>
+    /// <param name="v2">Value</param>
+    /// <returns>eg : 'a':1</returns>
     [Production("tuple: OldParser_expressions COLON[d] OldParser_expressions")]
     public OldLangTree DicTuple(OldExpr v1, OldExpr v2) => new TupleValue(v1, v2);
+
+    
+    /// <summary>
+    /// as 语句
+    /// </summary>
+    /// <param name="id">变量</param>
+    /// <param name="asId">需要转化的类型</param>
+    /// <returns></returns>
+    [Production("primary: IDENTIFIER AS[d] IDENTIFIER")]
+    public OldLangTree As(Token<OldTokenGeneric> id, Token<OldTokenGeneric> asId)
+    {
+        return new AsValue(new OldID(id.Value), new OldID(asId.Value));
+    }
 
     #endregion
 
     #region statement
+
+    #region Set
 
     [Production("statement: IDENTIFIER L_BRACKET[d] OldParser_expressions R_BRACKET[d] SET[d] OldParser_expressions")]
     public OldLangTree ArraySetTree(Token<OldTokenGeneric> classId, OldExpr aid, OldExpr expr) =>
@@ -176,6 +262,10 @@ public class OldParser
     public OldLangTree DIS_SET(OldExpr value, Token<OldTokenGeneric> id) =>
         new SetStatement(new OldID(id.Value), value);
 
+    #endregion
+
+    #region If Tree
+
     [Production("statement : IF[d] if_block (ELIF[d] if_block)* (ELSE[d] block)?")]
     public OldLangTree IfTree(OldIf ifBlock, List<Group<OldTokenGeneric, OldLangTree>> elif,
         ValueOption<Group<OldTokenGeneric, OldLangTree>> Else)
@@ -191,9 +281,19 @@ public class OldParser
     public OldLangTree IfBlock(OldExpr expr, BlockStatement blockStatement) =>
         new OldIf(expr, blockStatement);
 
-    [Production("block: INDENT[d] statement* UINDENT[d]")]
+    #endregion
+
+    #region Block Tree
+
+    [Production("block: L_BRACES[d] statement* R_BRACES[d]")]
     public OldLangTree Block(List<OldLangTree> statements) => new BlockStatement(statements);
 
+    [Production("block : statement")]
+    public OldLangTree BlockLine(OldLangTree statement) => new BlockStatement([statement]);
+
+    #endregion
+
+    #region For While
 
     [Production("statement: FOR[d] set COMMA[d] OldParser_expressions COMMA[d] statement  block")]
     public OldLangTree For(SetStatement setStatement, Operation expr, OldStatement statement,
@@ -203,25 +303,34 @@ public class OldParser
     [Production("statement: WHILE[d] OldParser_expressions block")]
     public OldLangTree While(OldExpr expr, BlockStatement blockStatement) => new WhileStatement(expr, blockStatement);
 
+    #endregion
+
+    #region Func and Lambda
 
     [Production("statement: func")]
     public OldLangTree FuncTree(OldLangTree a) => a;
 
-    [Production("func: IDENTIFIER LPAREN[d] IDENTIFIER* RPAREN[d] DIS_SET[d] block")]
-    [Production("func: FUNC[d] IDENTIFIER LPAREN[d] IDENTIFIER* RPAREN[d] block")]
-    public OldLangTree Func(Token<OldTokenGeneric> id, List<Token<OldTokenGeneric>> a, BlockStatement blockStatement)
+    [Production("func: IDENTIFIER LPAREN[d] idList? RPAREN[d] DIS_SET[d] block")]
+    [Production("func: FUNC[d] IDENTIFIER LPAREN[d] idList? RPAREN[d] block")]
+    public OldLangTree Func(Token<OldTokenGeneric> id, ValueOption<OldLangTree> ids, BlockStatement blockStatement)
     {
-        var b = new List<OldID>();
-        a.ForEach(x => b.Add(new OldID(x.Value)));
-        return new FuncInit(new FuncValue(new OldID(id.Value), b, blockStatement));
+        var value = ids.Match(x => x, () => null!);
+        return new FuncInit(new FuncValue(new OldID(id.Value),
+            value is not IdList idList ? [] : idList.Args,
+            blockStatement));
     }
 
-    [Production("func: IDENTIFIER LPAREN[d] IDENTIFIER* RPAREN[d] LAMBDA[d] OldParser_expressions")]
-    public OldLangTree LambdaFunc(Token<OldTokenGeneric> id, List<Token<OldTokenGeneric>> ids, OldExpr expr)
+    [Production("func: IDENTIFIER LPAREN[d] idList? RPAREN[d] LAMBDA[d] OldParser_expressions")]
+    public OldLangTree LambdaFunc(Token<OldTokenGeneric> id, ValueOption<OldLangTree> ids, OldExpr expr)
     {
-        return new FuncInit(new FuncValue(new OldID(id.Value), ids.Select(x => new OldID(x.Value)).ToList(),
+        var value = ids.Match(x => x, () => null!);
+        return new FuncInit(new FuncValue(new OldID(id.Value), 
+            value is not IdList idList ? [] : idList.Args,
             new BlockStatement([new ReturnStatement(expr)])));
     }
+
+    #endregion
+
 
     [Production("statement: CLASS[d] IDENTIFIER block")]
     public OldLangTree Class(Token<OldTokenGeneric> id, BlockStatement statements)
@@ -229,18 +338,29 @@ public class OldParser
         return new ClassInit(new AnyValue(new OldID(id.Value), statements.ToAnyData()));
     }
 
-    [Production("statement: IDENTIFIER LPAREN[d] OldParser_expressions* RPAREN[d]")]
-    public OldLangTree FuncRun(Token<OldTokenGeneric> id, List<OldLangTree> langTrees) =>
-        new FuncRunStatement(new Instance(new OldID(id.Value),
-            langTrees.OfType<OldExpr>().ToList()));
+    #region Run
 
-    [Production("statement: IDENTIFIER CONCAT[d] IDENTIFIER LPAREN[d] OldParser_expressions* RPAREN[d]")]
+    [Production("statement: IDENTIFIER LPAREN[d] argList? RPAREN[d]")]
+    public OldLangTree FuncRun(Token<OldTokenGeneric> id, ValueOption<OldLangTree> langTrees)
+    {
+        var value = langTrees.Match(x => x, () => null!);
+        return new FuncRunStatement(new Instance(new OldID(id.Value), value is not ArgList argList ? [] : argList.Args));
+    }
+
+    [Production("statement: IDENTIFIER CONCAT[d] IDENTIFIER LPAREN[d] argList? RPAREN[d]")]
     public OldLangTree ClassFuncRun(Token<OldTokenGeneric> classId, Token<OldTokenGeneric> funcName,
-        List<OldLangTree> expressions) =>
-        new FuncRunStatement(new Operation(new OldID(classId.Value),
+        ValueOption<OldLangTree> langTrees)
+    {
+        var value = langTrees.Match(x => x, () => null!);
+        return new FuncRunStatement(new Operation(new OldID(classId.Value),
             OldTokenGeneric.CONCAT,
             new Instance(new OldID(funcName.Value),
-                expressions.OfType<OldExpr>().ToList())));
+                value is not ArgList argList ? [] : argList.Args)));
+    }
+
+    #endregion
+
+    #region Import
 
     [Production("statement: IMPORT[d] IDENTIFIER")]
     public OldLangTree ImportTree(Token<OldTokenGeneric> import) =>
@@ -260,6 +380,8 @@ public class OldParser
     [Production("statement:L_BRACKET[d] IMPORT[d] STRING IDENTIFIER R_BRACKET[d]")]
     public OldLangTree NativeClass(Token<OldTokenGeneric> dllName, Token<OldTokenGeneric> classname) =>
         new NativeStatement(dllName.Value[1..^1], classname.Value);
+
+    #endregion
 
     #endregion
 
