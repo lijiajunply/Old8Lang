@@ -61,12 +61,6 @@ public class Operation(OldExpr left, OldTokenGeneric opera, OldExpr right) : Old
             List<OldExpr> values = [];
             foreach (var id in r1.Ids)
             {
-                if (id is ValueType)
-                {
-                    values.Add(id);
-                    continue;
-                }
-
                 values.Add(id.Run(ref Manager));
             }
 
@@ -76,15 +70,15 @@ public class Operation(OldExpr left, OldTokenGeneric opera, OldExpr right) : Old
 
         if (l is NativeStaticAny && Opera == OldTokenGeneric.CONCAT)
         {
-            if (r is Instance r1)
+            if (r is not Instance r1) return l.Dot(r);
+            List<OldExpr> values = [];
+            foreach (var id in r1.Ids)
             {
-                List<OldExpr> values = [];
-                foreach (var id in r1.Ids)
-                    values.Add(id.Run(ref Manager));
-                r1.Ids = values;
+                values.Add(id.Run(ref Manager));
             }
 
-            return l.Dot(r);
+            var newInstance = new Instance(r1.Id, values);
+            return l.Dot(newInstance);
         }
 
         if (l is not AnyValue && Opera == OldTokenGeneric.CONCAT)
@@ -119,6 +113,12 @@ public class Operation(OldExpr left, OldTokenGeneric opera, OldExpr right) : Old
             return new BoolValue(l.Less(r as ValueType));
         if (l is not null && r is not null && Opera == OldTokenGeneric.GREATER)
             return new BoolValue(l.Greater(r as ValueType));
+        if (l is not null && r is not null && Opera == OldTokenGeneric.DIFFERENT)
+            return new BoolValue(!l.Equal(r as ValueType));
+        if (l is not null && r is not null && Opera == OldTokenGeneric.LESS_EQUAL)
+            return new BoolValue(l.LessEqual(r as ValueType));
+        if (l is not null && r is not null && Opera == OldTokenGeneric.GREATER_EQUAL)
+            return new BoolValue(l.GreaterEqual(r as ValueType));
 
         // r (+-*/) l
         if (l is not null && r is not null)

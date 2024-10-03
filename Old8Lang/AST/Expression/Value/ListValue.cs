@@ -9,6 +9,7 @@ public class ListValue : ValueType, IOldList
     public List<ValueType> Values { get; } = [];
 
     public ListValue(List<OldExpr> value) => Value = value;
+
     public ListValue(List<object> value) => Values = value.Select(ObjToValue).ToList();
 
     public override ValueType Run(ref VariateManager Manager)

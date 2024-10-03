@@ -6,16 +6,15 @@ namespace Old8Lang.AST.Expression.Value;
 public class AnyValue : ValueType
 {
     public Dictionary<OldID, OldExpr> Variates { get; }
-    public Dictionary<string, ValueType> Result { get; }
+    public Dictionary<string, ValueType> Result { get; } = new();
     public OldID Id { get; }
 
-    private VariateManager manager;
+    public VariateManager manager;
 
     public AnyValue(OldID id, Dictionary<OldID, OldExpr> variates)
     {
         Variates = variates;
         Id = id;
-        Result = new Dictionary<string, ValueType>();
         manager = new VariateManager();
         Run(ref manager);
         manager.Init(Result);
@@ -26,12 +25,15 @@ public class AnyValue : ValueType
     {
         Variates = variates;
         Id = new OldID("JsonNative");
-        Result = new Dictionary<string, ValueType>();
         manager = new VariateManager();
+        foreach (var variate in variates)
+        {
+            if (variate.Value is ValueType valueType) Result.Add(variate.Key.IdName, valueType);
+        }
         manager.Init(Result);
         manager.IsClass = true;
     }
-    
+
     public sealed override ValueType Run(ref VariateManager Manager)
     {
         manager.AnyInfo.AddRange(Manager.AnyInfo.Where(x => x is not FuncValue).ToList());
@@ -64,10 +66,10 @@ public class AnyValue : ValueType
 
     public void Set(OldID id, ValueType valueType) => manager.Set(id, valueType);
 
-    public override ValueType Converse(ValueType otherValueType,ref VariateManager Manager)
+    public override ValueType Converse(ValueType otherValueType, ref VariateManager Manager)
     {
         if (otherValueType is not AnyValue typeAny) return new VoidValue();
-        
+
         foreach (var a in Result)
         {
             typeAny.Set(new OldID(a.Key), a.Value);
@@ -85,6 +87,7 @@ public class AnyValue : ValueType
             var variable = Variates.ElementAt(i);
             builder.Append($"{(i == 0 ? "" : ",")}\"{variable.Key}\":{variable.Value}");
         }
+
         builder.Append('}');
         return builder.ToString();
     }

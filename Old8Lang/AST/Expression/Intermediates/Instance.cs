@@ -5,20 +5,27 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
 {
-    public List<OldExpr> Ids { get; set; } = ids;
+    public List<OldExpr> Ids { get; } = ids;
     public OldID Id => oldId;
 
     public override ValueType Run(ref VariateManager Manager)
     {
+        var results = new List<ValueType>();
+
+        foreach (var t in Ids)
+        {
+            results.Add(t.Run(ref Manager));
+        }
+
         switch (Id.IdName)
         {
             case "Type":
-                return new TypeValue(Ids[0]).Run(ref Manager);
+                return new TypeValue(results[0]).Run(ref Manager);
             case "Exec":
             {
-                if (Ids[0] is not StringValue stringValue) return new VoidValue();
+                if (results[0] is not StringValue stringValue) return new VoidValue();
                 var a = Manager.Interpreter?.Build(code: stringValue.Value);
-                a?.ImportRun(ref Manager);
+                a?.Run(ref Manager);
                 return new VoidValue();
             }
             case "ShowValues":
@@ -28,20 +35,37 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
             }
             case "Json":
             {
-                return (Ids[0].Run(ref Manager) as AnyValue)?.ToJson()
+                return (results[0] as AnyValue)?.ToJson()
                     as ValueType ?? new VoidValue();
             }
             case "ToObj":
-                return (Ids[0].Run(ref Manager) as StringValue)?.ToObj()
+                return (results[0] as StringValue)?.ToObj()
                     as ValueType ?? new VoidValue();
             case "PrintLine":
             {
-                Console.WriteLine(Ids[0].Run(ref Manager));
+                if (results.Count == 0)
+                {
+                    Console.WriteLine();
+                    return new VoidValue();
+                }
+
+                var value = results[0];
+                for (var i = 1; i < results.Count; i++)
+                {
+                    value = value.Plus(results[i]);
+                }
+
+                Console.WriteLine(value);
                 return new VoidValue();
             }
             case "Print":
             {
-                Console.WriteLine(Ids[0].Run(ref Manager));
+                if (results.Count == 0) return new VoidValue();
+
+                var value = results[0];
+                for (var i = 1; i < results.Count; i++) value = value.Plus(results[i]);
+
+                Console.Write(value);
                 return new VoidValue();
             }
         }
@@ -52,10 +76,19 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
             result = funcValue.Run(ref Manager, Ids);
         }
 
+        // 初始化 调用init方法
         if (result is AnyValue anyValue)
         {
             if (anyValue.Result.TryGetValue("init", out result))
-                anyValue.Dot(result);
+            {
+                if (result is not FuncValue value) throw new Exception("init is not function");
+                value.Run(ref anyValue.manager, results.OfType<OldExpr>().ToList());
+            }
+            else if (results.Count != 0)
+            {
+                throw new Exception("No corresponding init function found");
+            }
+
             result = anyValue;
         }
 

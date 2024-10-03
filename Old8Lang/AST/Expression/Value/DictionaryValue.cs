@@ -42,7 +42,7 @@ public class DictionaryValue(List<TupleValue> tuples) : ValueType, IOldList
         if (Value.Count == 0) return "{" + Apis.ListToString(Tuples) + "}";
         var sb = new StringBuilder();
         foreach (var valueTuple in Value)
-            sb.Append($"key:{valueTuple.Key},value:{valueTuple.Value}");
+            sb.Append($"{valueTuple.Key},{valueTuple.Value};");
 
         return "{" + sb + "}";
     }

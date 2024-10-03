@@ -30,7 +30,7 @@ public class Interpreter
         Manager.Interpreter = this;
         Manager.LangInfo ??= Apis.ReadJson();
     }
-    
+
     public Interpreter(string path, bool isDir)
     {
         Manager.Path = path;
@@ -42,7 +42,7 @@ public class Interpreter
     {
         Init();
     }
-    
+
     public void ParserRun(bool dot = false)
     {
         var sw = new Stopwatch();
@@ -63,30 +63,31 @@ public class Interpreter
         Console.WriteLine(time);
     }
 
-    public BlockStatement Build(bool isDot = false,string code = "")
+    public BlockStatement Build(bool isDot = false, string code = "")
     {
         code = string.IsNullOrEmpty(code) ? Code : code;
         var result = parser?.Parse(code);
 
         if (result == null) throw new Exception("语法出错");
-        
-        if(Error.Count != 0)Error.Clear();
+
+        if (Error.Count != 0) Error.Clear();
         if (result.Errors != null && result.Errors.Count != 0)
         {
             result.Errors.ForEach(x => Error.Add($"{x.ErrorType} : {x.ErrorMessage}"));
             throw new Exception(string.Join("\n", Error));
         }
+
         if (isDot) Dot(result);
         return result.Result as BlockStatement ?? new BlockStatement([]);
     }
-    
+
     private void Dot(ParseResult<OldTokenGeneric, OldLangTree> result)
     {
         var tree = result.SyntaxTree;
         var graphviz = new GraphVizEBNFSyntaxTreeVisitor<OldTokenGeneric>();
         graphviz.VisitTree(tree);
-        File.WriteAllText(Manager.Path.Replace("ws","dot"),graphviz.Graph.Compile());
+        File.WriteAllText(Manager.Path.Replace("ws", "dot"), graphviz.Graph.Compile());
     }
-    
+
     public List<string> GetError() => Error;
 }

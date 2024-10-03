@@ -19,6 +19,18 @@ fibIter(a) -> {
     return list
 }
 
+fib2(a) -> {
+    Last <- 1
+    Second <- 1
+    Now <- 1
+    for i <- 2 , i < a , i++{
+        Now <- Last + Second
+        Second <- Last
+        Last <- Now
+    }
+    return Now
+}
+
 // 测试类
 class Test{
    a <- 1

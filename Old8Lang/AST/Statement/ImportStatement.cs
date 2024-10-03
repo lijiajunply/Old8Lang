@@ -35,16 +35,14 @@ public class ImportStatement(string importString) : OldStatement
         }
 
         var dic = Path.GetDirectoryName(Manager.Path)!;
-        if (File.Exists(dic + "/" + ImportString + ".ws"))
-        {
-            var path = dic + "/" + ImportString + ".ws";
-            var previousPath = Manager.Path;
-            Manager.Path = path;
-            var code = Apis.FromFile(path);
-            var a = Manager.Interpreter?.Build(code: code);
-            a?.ImportRun(ref Manager);
-            Manager.Path = previousPath;
-        }
+        if (!File.Exists(dic + "/" + ImportString + ".ws")) return;
+
+        var filePath = dic + "/" + ImportString + ".ws";
+        var PreviousPath = Manager.Path;
+        Manager.Path = filePath;
+        var result = Manager.Interpreter?.Build(code: Apis.FromFile(filePath));
+        result?.ImportRun(ref Manager);
+        Manager.Path = PreviousPath;
     }
 
     public override string ToString() => $"using {ImportString}";

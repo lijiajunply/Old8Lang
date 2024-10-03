@@ -9,10 +9,10 @@ public class IntValue(int intValue) : ValueType
 
     public override ValueType Plus(ValueType otherValueType)
     {
-        if (otherValueType is StringValue)
-            return otherValueType.Plus(this);
-        if (otherValueType is CharValue)
-            return otherValueType.Plus(this);
+        if (otherValueType is StringValue s)
+            return new StringValue(Value + s.Value);
+        if (otherValueType is CharValue c)
+            return new CharValue(Convert.ToChar(Value + c.Value));
         if (otherValueType is DoubleValue)
             return otherValueType.Plus(this);
         if (otherValueType is IntValue)
@@ -52,8 +52,41 @@ public class IntValue(int intValue) : ValueType
         return new VoidValue();
     }
 
-    public override bool Less(ValueType? otherValue) => Value < int.Parse(otherValue!.ToString());
-    public override bool Greater(ValueType? otherValue) => Value > int.Parse(otherValue!.ToString());
+    public override bool Less(ValueType? otherValue)
+    {
+        if (otherValue is DoubleValue d)
+            return Value < d.Value;
+        if (otherValue is IntValue i)
+            return Value < i.Value;
+        throw new Exception("not fount the type: " + otherValue!.TypeToString());
+    }
+
+    public override bool Greater(ValueType? otherValue)
+    {
+        if (otherValue is DoubleValue d)
+            return Value > d.Value;
+        if (otherValue is IntValue i)
+            return Value > i.Value;
+        throw new Exception("not fount the type: " + otherValue!.TypeToString());
+    }
+    
+    public override bool LessEqual(ValueType? otherValue)
+    {
+        if (otherValue is DoubleValue d)
+            return Value <= d.Value;
+        if (otherValue is IntValue i)
+            return Value <= i.Value;
+        throw new Exception("not fount the type: " + otherValue!.TypeToString());
+    }
+    
+    public override bool GreaterEqual(ValueType? otherValue)
+    {
+        if (otherValue is DoubleValue d)
+            return Value >= d.Value;
+        if (otherValue is IntValue i)
+            return Value >= i.Value;
+        throw new Exception("not fount the type: " + otherValue!.TypeToString());
+    }
 
     public override bool Equal(ValueType? otherValueType)
     {
@@ -76,6 +109,6 @@ public class IntValue(int intValue) : ValueType
             _ => throw new Exception("not fount the type: " + value.Value)
         };
     }
-    
+
     public override object GetValue() => Value;
 }

@@ -24,39 +24,88 @@ public class OldParser
     #endregion
 
     #region expr
-
+    
+    /// <summary>
+    /// 二元布尔计算
+    /// </summary>
+    /// <param name="left">左值</param>
+    /// <param name="operatorToken">运算符</param>
+    /// <param name="right">右值</param>
+    /// <returns></returns>
     [Operation((int)OldTokenGeneric.LESSER, Affix.InFix, Associativity.Right, 10)]
     [Operation((int)OldTokenGeneric.GREATER, Affix.InFix, Associativity.Right, 10)]
     [Operation((int)OldTokenGeneric.EQUALS, Affix.InFix, Associativity.Right, 10)]
     [Operation((int)OldTokenGeneric.DIFFERENT, Affix.InFix, Associativity.Right, 10)]
+    [Operation((int)OldTokenGeneric.LESS_EQUAL, Affix.InFix, Associativity.Right, 10)]
+    [Operation((int)OldTokenGeneric.GREATER_EQUAL, Affix.InFix, Associativity.Right, 10)]
     public OldLangTree BinaryExpression(OldLangTree left, Token<OldTokenGeneric> operatorToken,
         OldLangTree right) =>
         new Operation((left as OldExpr)!, operatorToken.TokenID, (right as OldExpr)!);
 
+    /// <summary>
+    /// 点运算
+    /// </summary>
+    /// <param name="left">左值</param>
+    /// <param name="opera">运算符</param>
+    /// <param name="right">右值</param>
+    /// <returns></returns>
     [Operation((int)OldTokenGeneric.CONCAT, Affix.InFix, Associativity.Right, 100)]
     public OldLangTree DotExpr(OldLangTree left, Token<OldTokenGeneric> opera, OldLangTree right) =>
         new Operation((left as OldExpr)!, opera.TokenID, (right as OldExpr)!);
 
+    /// <summary>
+    /// 加减
+    /// </summary>
+    /// <param name="left">左值</param>
+    /// <param name="opera">运算符</param>
+    /// <param name="right">右值</param>
+    /// <returns></returns>
     [Operation((int)OldTokenGeneric.PLUS, Affix.InFix, Associativity.Right, 20)]
     [Operation((int)OldTokenGeneric.MINUS, Affix.InFix, Associativity.Right, 20)]
     public OldLangTree NumberOpera1(OldLangTree left, Token<OldTokenGeneric> opera, OldLangTree right) =>
         new Operation((left as OldExpr)!, opera.TokenID, (right as OldExpr)!);
 
+    /// <summary>
+    /// 乘除
+    /// </summary>
+    /// <param name="left">左值</param>
+    /// <param name="opera">运算符</param>
+    /// <param name="right">右值</param>
+    /// <returns></returns>
     [Operation((int)OldTokenGeneric.TIMES, Affix.InFix, Associativity.Right, 70)]
     [Operation((int)OldTokenGeneric.DIVIDE, Affix.InFix, Associativity.Right, 70)]
     public OldLangTree NumBerOpera2(OldLangTree left, Token<OldTokenGeneric> opera, OldLangTree right) =>
         new Operation((left as OldExpr)!, opera.TokenID, (right as OldExpr)!);
 
+    /// <summary>
+    /// 布尔运算
+    /// </summary>
+    /// <param name="left">左值</param>
+    /// <param name="opera">运算符</param>
+    /// <param name="right">右值</param>
+    /// <returns></returns>
     [Operation((int)OldTokenGeneric.AND, Affix.InFix, Associativity.Right, 1)]
     [Operation((int)OldTokenGeneric.OR, Affix.InFix, Associativity.Right, 1)]
     [Operation((int)OldTokenGeneric.XOR, Affix.InFix, Associativity.Right, 1)]
     public OldLangTree BoolOpera(OldExpr left, Token<OldTokenGeneric> opera, OldExpr right) =>
         new Operation(left, opera.TokenID, right);
 
+    /// <summary>
+    /// 取反
+    /// </summary>
+    /// <param name="opera">运算符</param>
+    /// <param name="expr">右值</param>
+    /// <returns></returns>
     [Operation((int)OldTokenGeneric.NOT, Affix.PreFix, Associativity.Right, 100)]
     public OldLangTree NotBool(Token<OldTokenGeneric> opera, OldExpr expr) =>
         new Operation(null!, opera.TokenID, expr);
 
+    /// <summary>
+    /// 取负
+    /// </summary>
+    /// <param name="opera">运算符</param>
+    /// <param name="expr">右值</param>
+    /// <returns></returns>
     [Operation((int)OldTokenGeneric.MINUS, Affix.PreFix, Associativity.Right, 100)]
     public OldLangTree MINUS(Token<OldTokenGeneric> opera, OldExpr expr) =>
         new Operation(null!, opera.TokenID, expr);

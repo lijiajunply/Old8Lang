@@ -38,8 +38,10 @@ public abstract class ValueType : OldExpr
     #region boolOper
 
     public virtual bool Equal(ValueType? otherValueType) => false;
-    public virtual bool Less(ValueType? otherValue) => false;
-    public virtual bool Greater(ValueType? otherValue) => false;
+    public virtual bool Less(ValueType? otherValue) => throw new Exception("not available");
+    public virtual bool Greater(ValueType? otherValue) => throw new Exception("not available");
+    public virtual bool LessEqual(ValueType? otherValue) => throw new Exception("not available");
+    public virtual bool GreaterEqual(ValueType? otherValue) => throw new Exception("not available");
 
     #endregion
 

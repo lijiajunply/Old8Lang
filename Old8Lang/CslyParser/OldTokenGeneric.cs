@@ -29,16 +29,20 @@ public enum OldTokenGeneric
     [Keyword("NEW")] [Keyword("new")] NEW = 19,
     [Keyword("PASS")] [Keyword("pass")] PASS = 20,
     [Keyword("AS")] [Keyword("as")] AS = 21,
-    [Keyword("SWITCH")][Keyword("switch")] SWITCH = 22,
-    [Keyword("CASE")][Keyword("case")] CASE = 23,
-    [Keyword("default")][Keyword("DEFAULT")] DEFAULT = 24,
-    [Keyword("IN")][Keyword("in")] IN = 25,
+
+    [Keyword("SWITCH")] [Keyword("switch")]
+    SWITCH = 22,
+    [Keyword("CASE")] [Keyword("case")] CASE = 23,
+
+    [Keyword("default")] [Keyword("DEFAULT")]
+    DEFAULT = 24,
+    [Keyword("IN")] [Keyword("in")] IN = 25,
 
     #endregion
 
     #region literals 100 -> 199
 
-    [AlphaId] IDENTIFIER = 100,
+    [AlphaNumId] IDENTIFIER = 100,
     [Lexeme(GenericToken.String)] STRING = 101,
     [Int] INT = 102,
     [Double] DOUBLE = 103,
@@ -64,7 +68,9 @@ public enum OldTokenGeneric
     [Sugar("<-")] SET = 211,
     [Sugar("->")] DIS_SET = 212,
     [Sugar(",")] COMMA = 213,
-
+    [Sugar("<=")] LESS_EQUAL = 214,
+    [Sugar(">=")] GREATER_EQUAL = 215,
+    
     #endregion
 
     #region sugar 300 -> 399
