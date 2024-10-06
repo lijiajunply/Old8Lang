@@ -24,7 +24,7 @@ public class OldParser
     #endregion
 
     #region expr
-    
+
     /// <summary>
     /// 二元布尔计算
     /// </summary>
@@ -225,7 +225,7 @@ public class OldParser
     /// 列表
     /// </summary>
     /// <param name="ids">元素</param>
-    /// <returns>eg : [1,2,3,4]</returns>
+    /// <returns>eg : {1,2,3,4}</returns>
     [Production("primary: L_BRACES[d] argList? R_BRACES[d]")]
     public OldLangTree List(ValueOption<OldLangTree> ids)
     {
@@ -233,11 +233,17 @@ public class OldParser
         return new ListValue(value is not ArgList argList ? [] : argList.Args);
     }
 
+    [Production("primary: L_BRACKET[d] OldParser_expressions WAVY[d] OldParser_expressions R_BRACKET[d]")]
+    public OldLangTree Range(OldLangTree start, OldLangTree end)
+    {
+        return new RangeValue(start as OldExpr, end as OldExpr);
+    }
+
     /// <summary>
     /// 数组
     /// </summary>
     /// <param name="ids">元素</param>
-    /// <returns>eg : {1,2,3,4}</returns>
+    /// <returns>eg : [1,2,3,4]</returns>
     [Production("primary: L_BRACKET[d] argList? R_BRACKET[d]")]
     public OldLangTree Array(ValueOption<OldLangTree> ids)
     {
@@ -309,6 +315,13 @@ public class OldParser
 
     #region Set
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="classId"></param>
+    /// <param name="aid"></param>
+    /// <param name="expr"></param>
+    /// <returns></returns>
     [Production("statement: IDENTIFIER L_BRACKET[d] OldParser_expressions R_BRACKET[d] SET[d] OldParser_expressions")]
     public OldLangTree ArraySetTree(Token<OldTokenGeneric> classId, OldExpr aid, OldExpr expr) =>
         new OtherVariateChanging(new OldID(classId.Value), aid, expr);
@@ -331,6 +344,20 @@ public class OldParser
     [Production("set: OldParser_expressions DIS_SET[d] IDENTIFIER")]
     public OldLangTree DIS_SET(OldExpr value, Token<OldTokenGeneric> id) =>
         new SetStatement(new OldID(id.Value), value);
+
+    [Production("statement: idList SET[d] argList")]
+    public OldLangTree SetList(OldLangTree ids, OldLangTree values)
+    {
+        if (values is not ArgList argList || ids is not IdList idList) throw new Exception("both count is not ");
+        return new SetListStatement(idList.Args, argList.Args);
+    }
+
+    [Production("statement: argList DIS_SET[d] idList")]
+    public OldLangTree Dis_SetList(OldLangTree values, OldLangTree ids)
+    {
+        if (values is not ArgList argList || ids is not IdList idList) throw new Exception("both count is not ");
+        return new SetListStatement(idList.Args, argList.Args);
+    }
 
     #endregion
 

@@ -9,9 +9,15 @@ a <- [1,2,3,4] // 这个是Array
 a <- (1,2) // 这个是Tuple
 a <- {1,2,32,3} // 这个是List
 a <- {1:2,3:4} // 这个是字典
+a <- [1~10] // 从1到10列举
+
+PrintLine(a)
+12 -> a // 还可以倒着来
+a,b <- 1,2 // 多个变量同时赋值
+a,b <- b,a // 交换变量值
 
 // 打印变量
-PrintLine(a) // 打印a
+PrintLine(a,b) // 打印a
 PrintLine("Hello ","World") // Hello World
 Print(a) //不换行
 PrintLine() //换行
@@ -39,21 +45,17 @@ if 1 == 1 {
 }
 
 switch 1 {
-    case 1:
+    case 1
         PrintLine("1")
-    case 2:
+    case 2
         PrintLine("2")
-    default:
+    default
         PrintLine("default")
 }
 
 // 循环
 
-for i in [1,2,3,4,5] {
-    Print(i+" ")
-}
-
-for i <- 1, i <= 5, i++{
+for i in [1~5] {
     Print(i+" ")
 }
 
@@ -61,4 +63,5 @@ i <- 1
 
 while i < 5 {
     PrintLine("while")
+    i++
 }

@@ -28,7 +28,7 @@ public class OtherVariateChanging(OldID id, OldExpr sumId, OldExpr expr) : OldSt
             var s = Sum.Run(ref Manager);
             if (s is not IntValue sum) throw new TypeError(this,this);
             var result = Expr.Run(ref Manager);
-            array.Add(sum, result);
+            array.Set(sum, result);
         }
 
         if (a is DictionaryValue dictionary)

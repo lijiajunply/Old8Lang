@@ -83,6 +83,7 @@ public enum OldTokenGeneric
     [Sugar("}")] R_BRACES = 305,
     [Sugar("=>")] LAMBDA = 306,
     [Sugar(":")] COLON = 307,
+    [Sugar("~")] WAVY = 308, 
 
     EOF = 0
 

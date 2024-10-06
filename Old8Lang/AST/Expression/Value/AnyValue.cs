@@ -30,6 +30,7 @@ public class AnyValue : ValueType
         {
             if (variate.Value is ValueType valueType) Result.Add(variate.Key.IdName, valueType);
         }
+
         manager.Init(Result);
         manager.IsClass = true;
     }
@@ -48,9 +49,8 @@ public class AnyValue : ValueType
         {
             case OldID id:
             {
-                var a = new OldExpr();
-                foreach (var variable in Result.Where(variable => id.IdName == variable.Key))
-                    a = variable.Value;
+                var a = manager.GetValue(id);
+                if (a == null) throw new Exception("not found");
                 return a.Run(ref manager);
             }
             case FuncValue func:

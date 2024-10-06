@@ -12,7 +12,7 @@ public class BlockStatement : OldStatement
     private List<OldStatement> ImportStatements { get; } = [];
     private List<OldStatement> OtherStatements { get; } = [];
 
-    public BlockStatement(List<OldLangTree> statements)
+    public BlockStatement(IEnumerable<OldLangTree> statements)
     {
         foreach (var statement in statements.OfType<OldStatement>())
         {
@@ -21,6 +21,9 @@ public class BlockStatement : OldStatement
                 case ImportStatement or NativeStatement or FuncInit or ClassInit:
                     ImportStatements.Add(statement);
                     break;
+                case ReturnStatement:
+                    OtherStatements.Add(statement);
+                    return;
                 default:
                     OtherStatements.Add(statement);
                     break;

@@ -49,11 +49,8 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
                     return new VoidValue();
                 }
 
-                var value = results[0];
-                for (var i = 1; i < results.Count; i++)
-                {
-                    value = value.Plus(results[i]);
-                }
+                var value = results[0].ToString();
+                for (var i = 1; i < results.Count; i++) value += results[i].ToString();
 
                 Console.WriteLine(value);
                 return new VoidValue();
@@ -62,8 +59,8 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
             {
                 if (results.Count == 0) return new VoidValue();
 
-                var value = results[0];
-                for (var i = 1; i < results.Count; i++) value = value.Plus(results[i]);
+                var value = results[0].ToString();
+                for (var i = 1; i < results.Count; i++) value += results[i].ToString();
 
                 Console.Write(value);
                 return new VoidValue();

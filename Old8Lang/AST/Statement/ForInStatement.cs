@@ -1,7 +1,6 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.CslyParser;
-using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.AST.Statement;
 
@@ -16,7 +15,8 @@ public class ForInStatement(OldID id, OldExpr expr, OldStatement body) : OldStat
         Manager.AddChildren();
 
         var value = Expr.Run(ref Manager);
-        if (value is not IOldList oldList) throw new Exception("ForInStatement: Expr is not IOldList");
+        if (value is not IOldList oldList)
+            throw new Exception("ForInStatement: Expr is not IOldList");
 
         foreach (var idValue in oldList.GetItems())
         {

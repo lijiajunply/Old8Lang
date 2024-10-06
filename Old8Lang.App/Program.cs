@@ -2,7 +2,7 @@
 using Old8Lang.CslyParser;
 
 string[] strings = ["-f", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,
-    "Old8Lang", "Docs", "third.ws")];
+    "Old8Lang", "Docs", "first.ws")];
 
 args = args.Length == 0 ? strings : args;
 if (args.Length == 0)

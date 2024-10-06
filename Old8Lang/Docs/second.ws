@@ -58,7 +58,11 @@ class Person{
 
 p <- Person("Jack")
 p.setAge(18)
-p.print() // Name is Jack and age is 18
+p[name] <- "Jack1"
+p.print()
+PrintLine(p.name)
+p.name <- "Jack2"
+p.print() // Name is Jack2 and age is 18
 
 // lambda变量
 
