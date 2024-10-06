@@ -1,14 +1,17 @@
 ﻿using Old8Lang;
 using Old8Lang.CslyParser;
 
+
+#if DEBUG
 string[] strings = ["-f", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,
-    "Old8Lang", "Docs", "first.ws")];
+    "Old8Lang", "Ex", "init.ws")];
 
 args = args.Length == 0 ? strings : args;
+#endif
+
 if (args.Length == 0)
     args = Console.ReadLine()!.Split(" ");
 
-//args = Array.Empty<string>();
 Lang(args);
 
 #region LangRun
@@ -51,8 +54,8 @@ void Lang(IReadOnlyList<string> order)
 
     if (order[0] == BasicInfo.Order["Import"])
     {
-        foreach (var VARIABLE in a.LibInfos)
-            Console.WriteLine($"LibName:{VARIABLE.LibName} Var:{VARIABLE.Var} IsDir:{VARIABLE.IsDir}");
+        foreach (var libInfo in a.LibInfos)
+            Console.WriteLine($"LibName:{libInfo.LibName} Var:{libInfo.Var} IsDir:{libInfo.IsDir}");
         Console.WriteLine("in:" + a.ImportPath);
         return;
     }

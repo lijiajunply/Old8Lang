@@ -1,5 +1,5 @@
-﻿using System.Text;
-using Old8Lang.Lib;
+﻿using System.Reflection;
+using System.Text;
 
 namespace Old8Lang;
 
@@ -47,7 +47,16 @@ public static class BasicInfo
     ];
 
     public static string JsonPath
-        => Path.Combine(Path.GetDirectoryName(CodePath)!, "Old8Lang", "LangInfo.json");
+    {
+        get
+        {
+#if DEBUG
+            return Path.Combine(Path.GetDirectoryName(CodePath)!, "Old8Lang", "LangInfo.json");
+#endif
+            return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                "LangInfo.json");;
+        }
+    }
 
     public static Dictionary<string, string> Order => new()
     {
@@ -63,22 +72,16 @@ public static class BasicInfo
         { "Remove", "-r" }
     };
 
-    public static List<LibInfo> OldLangLib =>
-    [
-        new LibInfo { IsDir = false, Var = 0.3, LibName = "OS" },
-        new LibInfo { IsDir = false, Var = 0.3, LibName = "File" },
-        new LibInfo { IsDir = false, Var = 0.3, LibName = "Terminal" },
-        new LibInfo { IsDir = true, Var = 0.3, LibName = "Net" },
-        new LibInfo { IsDir = false, Var = 0.3, LibName = "Time" }
-    ];
-
     public static string CodePath
     {
         get
         {
+#if DEBUG
             var directory = AppContext.BaseDirectory.Split(Path.DirectorySeparatorChar);
             var slice = new ArraySegment<string>(directory, 0, directory.Length - 4);
             return Path.Combine(slice.ToArray());
+#endif
+            return "";
         }
     }
 }

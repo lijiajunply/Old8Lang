@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using ValueType = Old8Lang.AST.Expression.ValueType;
@@ -47,7 +48,7 @@ public static class Apis
 
     public static string FromFile(string filename)
         => File.Exists(filename) ? File.ReadAllText(filename, Encoding.UTF8) : filename;
-    
+
 
     public static string FromDirectory(string DirectoryName)
     {
@@ -57,7 +58,7 @@ public static class Apis
     }
 
     #endregion
-    
+
     public static void CslyUsing(string path, bool isDir)
     {
         var a = new Interpreter(path, isDir);
@@ -76,10 +77,13 @@ public static class Apis
     {
         var jsonString = FromFile(BasicInfo.JsonPath);
         var a = JsonSerializer.Deserialize<LangInfo>(jsonString)!;
-        if (!File.Exists(a.ImportPath))
-        {
-            a.ImportPath = Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,"Old8LangLib","OldLib");
-        }
+        if (Directory.Exists(a.ImportPath)) return a;
+        var s = Path.GetDirectoryName(BasicInfo.CodePath);
+#if RELEASE
+        s = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+#endif
+        a.ImportPath = Path.Combine(s ?? "", "Old8LangLib", "OldLib");
+
         return a;
     }
 
@@ -88,7 +92,7 @@ public static class Apis
         //以后再说
         if (string.IsNullOrEmpty(context)) return false;
         //var _ = new HttpClient();
-        
+
         return false;
     }
 }
