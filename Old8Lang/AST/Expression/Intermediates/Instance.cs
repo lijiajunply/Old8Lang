@@ -30,7 +30,7 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
             }
             case "ShowValues":
             {
-                Console.WriteLine(Manager);
+                Manager.Interpreter?.UseClass.WriteLine(Manager.ToString());
                 return new VoidValue();
             }
             case "Json":
@@ -45,14 +45,14 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
             {
                 if (results.Count == 0)
                 {
-                    Console.WriteLine();
+                    Manager.Interpreter?.UseClass.WriteLine("");
                     return new VoidValue();
                 }
 
                 var value = results[0].ToString();
                 for (var i = 1; i < results.Count; i++) value += results[i].ToString();
 
-                Console.WriteLine(value);
+                Manager.Interpreter?.UseClass.WriteLine(value);
                 return new VoidValue();
             }
             case "Print":
@@ -62,7 +62,7 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
                 var value = results[0].ToString();
                 for (var i = 1; i < results.Count; i++) value += results[i].ToString();
 
-                Console.Write(value);
+                Manager.Interpreter?.UseClass.Write(value);
                 return new VoidValue();
             }
         }

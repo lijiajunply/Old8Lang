@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
@@ -204,6 +205,12 @@ public class OldParser
 
     #endregion
 
+    [Production("primary: DOLLAR[d] (L_BRACES[d] OldParser_expressions R_BRACES[d])*")]
+    public OldLangTree StringTree(List<Group<OldTokenGeneric, OldLangTree>> list)
+    {
+        var a = list.Select(x => x.Value(0)).ToList();
+        return new StringTreeList(a.OfType<OldExpr>().ToList());
+    }
 
     /// <summary>
     /// lambda表达式

@@ -47,8 +47,8 @@ public enum OldTokenGeneric
     [Int] INT = 102,
     [Double] DOUBLE = 103,
     [Lexeme(GenericToken.Char)] CHAR = 104,
-    //[AlphaNumDashId]            PRIVATE    = 105,
     //[Lexeme(GenericToken.Identifier,IdentifierType.Custom,"_","A-Z")] PRIVATE = 105,
+    //[Lexeme(GenericToken.String, "")] WORD = 106,
 
     #endregion
 
@@ -70,7 +70,7 @@ public enum OldTokenGeneric
     [Sugar(",")] COMMA = 213,
     [Sugar("<=")] LESS_EQUAL = 214,
     [Sugar(">=")] GREATER_EQUAL = 215,
-    
+
     #endregion
 
     #region sugar 300 -> 399
@@ -83,7 +83,9 @@ public enum OldTokenGeneric
     [Sugar("}")] R_BRACES = 305,
     [Sugar("=>")] LAMBDA = 306,
     [Sugar(":")] COLON = 307,
-    [Sugar("~")] WAVY = 308, 
+    [Sugar("~")] WAVY = 308,
+    [Sugar("\"")] QUOTES = 309,
+    [Sugar("$")] DOLLAR = 310,
 
     EOF = 0
 

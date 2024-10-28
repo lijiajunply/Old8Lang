@@ -3,17 +3,9 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class StringValue : ValueType, IOldList
+public class StringValue(string context) : ValueType, IOldList
 {
-    public string Value { get; }
-
-    public StringValue(string context)
-    {
-        Value = "";
-        var a = context.Split("\\n");
-        for (var i = 0; i < a.Length; i++)
-            Value += a[i] + (i == a.Length - 1 ? "" : "\n");
-    }
+    public string Value { get; } = context.Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\r","\r").Replace(@"\\","\\");
 
     public override string ToString() => Value;
     public override ValueType Plus(ValueType otherValueType) => new StringValue(Value + otherValueType);

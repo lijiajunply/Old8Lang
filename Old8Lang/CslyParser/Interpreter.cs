@@ -15,6 +15,7 @@ public class Interpreter
     private string Code { get; } = "";
 
     private Parser<OldTokenGeneric, OldLangTree>? parser;
+    public AbsUseClass UseClass { get; set; } = new ConsoleUse();
 
     #endregion
 
@@ -73,7 +74,16 @@ public class Interpreter
         if (Error.Count != 0) Error.Clear();
         if (result.Errors != null && result.Errors.Count != 0)
         {
-            result.Errors.ForEach(x => Error.Add($"{x.ErrorType} : {x.ErrorMessage}"));
+            result.Errors.ForEach(x =>
+            {
+                try
+                {
+                    Error.Add($"{x.ErrorType} : {x.ErrorMessage ?? ""}");
+                }catch (Exception)
+                {
+                    Error.Add(x.ErrorType.ToString());
+                }
+            });
             throw new Exception(string.Join("\n", Error));
         }
 

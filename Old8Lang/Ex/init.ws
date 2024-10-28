@@ -1,4 +1,4 @@
-//PrintLine("引用模块/n")
+PrintLine("引用模块\n")
 import Terminal
 import other
 
@@ -9,6 +9,9 @@ PrintLine(Json(test))
 a <- ToObj("{\"a\" : 1,\"b\" : {\"c\" : 3}}")
 PrintLine(a.a)
 
+err <- ${a.a}{1}{2}
+PrintLine(err)
+
 //测试函数 测试For in
 PrintLine("测试函数")
 a <- fib2(20)
@@ -18,7 +21,7 @@ for i in a {
 }
 b <- {12,123,1231,123,1}
 b.Add(2)
-PrintLine(b.ToStr())
+PrintLine("\n"+b.ToStr())
 
 // 测试类型转换
 PrintLine("测试类型转换")
