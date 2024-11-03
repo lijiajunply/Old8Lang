@@ -1,85 +1,165 @@
 ﻿@namespace Lang.Demo
 @inherits LayoutComponentBase
+@inject NavigationManager Nav
 
-<AntDesign.ProLayout.BasicLayout
-    Logo="@("https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg")"
-    MenuData="_menuData"
-    MenuAccordion
-    @bind-Collapsed="collapsed">
-    <HeaderContentRender>
-        <Space Size="@("24")">
-            <SpaceItem>
-                <Icon Class="action" Type="@(collapsed ? "menu-unfold" : "menu-fold")" OnClick="Toggle"/>
-            </SpaceItem>
-            <SpaceItem>
-                <Icon Class="action" Type="reload" Theme="outline" OnClick="Reload"/>
-            </SpaceItem>
-        </Space>
-    </HeaderContentRender>
-    <RightContentRender>
-    </RightContentRender>
-    <ChildContent>
-        <ReuseTabs></ReuseTabs>
-    </ChildContent>
-    <FooterRender>
-        <FooterView Copyright="2021 Ant Design Blazor" Links="Links"></FooterView>
-    </FooterRender>
-</AntDesign.ProLayout.BasicLayout>
-<SettingDrawer/>
+<Layout Class="layout">
+    <Header Style="background: #fff">
+        <Flex Align="center" Justify="space-between">
+            <a href="/">
+                <Flex Gap="large">
+                    <Image Src="iOS_Club_LOGO.png" Preview="false" Style="width:40px; height:40px"/>
+                    <div class="desktop-phone-flex Layout-Header">Old8Lang</div>
+                </Flex>
+            </a>
+            <Space Size="@("large")" Class="desktop-phone-flex">
+                <Dropdown >
+                    <Overlay>
+                        <Flex Vertical Class="menu-flex">
+                            <a href="/Grammar/First" class="menu-a">简单语法</a>
+                            <a href="/Grammar/Second" class="menu-a">函数和类</a>
+                            <a href="/Grammar/Third" class="menu-a">更多操作</a>
+                        </Flex>
+                    </Overlay>
+                    <ChildContent>
+                        <Button Type="@ButtonType.Text" OnClick="@(() => Nav.NavigateTo("/About"))" Class="menu-button">
+                            语法
+                        </Button>
+                    </ChildContent>
+                </Dropdown>
+                <Dropdown >
+                    <Overlay>
+                        <Flex Vertical Class="menu-flex">
+                            <a href="/Tutorial" class="menu-a">总览</a>
+                            <a href="/HowToRead" class="menu-a">阅读代码</a>
+                            <a href="/Lexer" class="menu-a">词法分析</a>
+                            <a href="/OldExpr" class="menu-a">表达式和值</a>
+                            <a href="/OldStatement" class="menu-a">语句语法</a>
+                            <a href="/Parser" class="menu-a">语法器</a>
+                            <a href="/VariateManager" class="menu-a">变量管理器</a>
+                            <a href="/Interpreter" class="menu-a">解释器构建</a>
+                        </Flex>
+                    </Overlay>
+                    <ChildContent>
+                        <Button Type="@ButtonType.Text" OnClick="@(() => Nav.NavigateTo("/Event"))" Class="menu-button">
+                            技术实现
+                        </Button>
+                    </ChildContent>
+                </Dropdown>
+                <Button Type="@ButtonType.Primary" Class="menu-button"
+                        OnClick="@(() => Nav.NavigateTo("/TryCode"))">
+                    去体验
+                </Button>
+            </Space>
+            <Button Size="@AntSizeLDSType.Large" Type="@ButtonType.Text" Class="phone-desktop-flex"
+                    OnClick="@(() => _drawerVisible = !_drawerVisible)">
+                <Icon Type="menu" Theme="outline" Style="font-size: 30px;"/>
+            </Button>
+        </Flex>
+    </Header>
+    <Content>
+        @if (_drawerVisible)
+        {
+            <Menu Style="padding-top: 10px;animation: fade-in ease-in 0.3s;" OnMenuItemClicked="Close"
+                  Accordion Mode="@MenuMode.Inline">
+                <MenuItem RouterLink="/" RouterMatch="NavLinkMatch.All" Title="首页" />
+                <SubMenu Title="语法">
+                    <MenuItem RouterLink="/Grammar/First" RouterMatch="NavLinkMatch.All" Title="简单语法" />
+                    <MenuItem RouterLink="/Grammar/Second" RouterMatch="NavLinkMatch.All" Title="函数和类" />
+                    <MenuItem RouterLink="/Grammar/Third" RouterMatch="NavLinkMatch.All" Title="更多操作" />
+                </SubMenu>
+                <SubMenu Title="技术实现">
+                    <MenuItem RouterLink="/Tutorial" RouterMatch="NavLinkMatch.All" Title="总览"/>
+                    <MenuItem RouterLink="/HowToRead" RouterMatch="NavLinkMatch.All" Title="阅读代码"/>
+                    <MenuItem RouterLink="/Lexer" RouterMatch="NavLinkMatch.All" Title="词法分析"/>
+                    <MenuItem RouterLink="/OldExpr" RouterMatch="NavLinkMatch.All" Title="表达式和值"/>
+                    <MenuItem RouterLink="/OldStatement" RouterMatch="NavLinkMatch.All" Title="语句语法"/>
+                    <MenuItem RouterLink="/Parser" RouterMatch="NavLinkMatch.All" Title="语法器"/>
+                    <MenuItem RouterLink="/VariateManager" RouterMatch="NavLinkMatch.All" Title="变量管理器"/>
+                    <MenuItem RouterLink="/Interpreter" RouterMatch="NavLinkMatch.All" Title="解释器构建"/>
+                </SubMenu>
+                <MenuItem RouterLink="/TryCode" RouterMatch="NavLinkMatch.All" Title="去体验"/>
+            </Menu>
+        }
+        else
+        {
+            @Body
+        }
+    </Content>
+    <Footer Class="footer">
+        <p>
+            Copyright
+            <Icon Type="copyright" Theme="outline"/>
+            2024 XAUAT iOS Club
+        </p>
+        <div>
+            <Space>
+                <Split>
+                    <Divider Type="DirectionVHType.Vertical"/>
+                </Split>
+                <ChildContent>
+                    <SpaceItem Class="desktop-phone-flex">
+                        <a href="https://cn.xauat.edu.cn/" target="_blank">西安建筑科技大学</a>
+                    </SpaceItem>
+                    <SpaceItem>
+                        <a href="https://beian.miit.gov.cn/" target="_blank">备案号 陕ICP备2024031872号</a>
+                    </SpaceItem>
+                    <SpaceItem Class="desktop-phone-flex">
+                        <a href="https://gitee.com/XAUATiOSClub" target="_blank">我们的Gitee组织</a>
+                    </SpaceItem>
+                </ChildContent>
+            </Space>
+        </div>
+    </Footer>
+</Layout>
 
 @code
 {
-    bool collapsed;
-    private MenuDataItem[] _menuData = { };
-
-    [Inject] private ReuseTabsService TabService { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        _menuData = new[]
-        {
-            new MenuDataItem
-            {
-                Path = "/",
-                Name = "welcome",
-                Key = "welcome",
-                Icon = "smile",
-            }
-        };
-    }
-
-    public LinkItem[] Links { get; set; } =
-    {
-        new LinkItem
-        {
-            Key = "Ant Design Blazor",
-            Title = "Ant Design Blazor",
-            Href = "https://antblazor.com",
-            BlankTarget = true,
-        },
-        new LinkItem
-        {
-            Key = "github",
-            Title = (RenderFragment)(@<Icon Type="github"/>),
-            Href = "https://github.com/ant-design-blazor/ant-design-pro-blazor",
-            BlankTarget = true,
-        },
-        new LinkItem
-        {
-            Key = "Blazor",
-            Title = "Blazor",
-            Href = "https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor?WT.mc_id=DT-MVP-5003987",
-            BlankTarget = true,
-        }
-    };
-
-    void Toggle()
-    {
-        collapsed = !collapsed;
-    }
-
-    void Reload()
-    {
-        TabService.ReloadPage();
-    }
+    private bool _drawerVisible;
+    private void Close() => _drawerVisible = false;
 }
+
+<style>
+    .layout {
+        min-height: 100vh;
+    }
+
+    .footer {
+        text-align: center;
+    }
+
+    .menu-button {
+        border-radius: 10px;
+        margin-left: 20px;
+    }
+
+    .ant-drawer-content {
+        border-radius: 0 0 20px 20px;
+    }
+    
+    .menu-a{
+        color: #3c3c43;
+        margin: 5px;
+        text-align: center;
+        width: 100px;
+        font-size: 15px;
+    }
+    
+    .menu-flex{
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px #C0C0C0;
+        padding: 20px;
+    }
+
+
+
+    .ant-layout-content{
+        background: #ffffff;
+    }
+    
+    .Layout-Header{
+        font-size: 24px;
+        font-weight: bold;
+        color: #1c1f23;
+    }
+</style>

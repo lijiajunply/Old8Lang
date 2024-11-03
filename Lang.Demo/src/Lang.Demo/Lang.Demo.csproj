@@ -11,4 +11,10 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.5"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="wwwroot\Code\first.ws" />
+      <None Include="wwwroot\Code\second.ws" />
+      <None Include="wwwroot\Code\third.ws" />
+    </ItemGroup>
+
 </Project>

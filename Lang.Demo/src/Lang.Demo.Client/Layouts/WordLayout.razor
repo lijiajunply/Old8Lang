@@ -1,0 +1,137 @@
+@layout Demo.BasicLayout
+@inherits LayoutComponentBase
+
+<GridRow>
+    <GridCol Md="6" Lg="6" Xl="4" Xxl="4"
+             class="desktop-phone">
+        <Affix>
+            <div Style="overflow: auto;max-height: 100vh">
+                @Menu
+            </div>
+        </Affix>
+    </GridCol>
+    <GridCol Xs="24" Sm="24" Md="18" Lg="18" Xl="20" Xxl="20"
+             Style="padding: 20px;min-height: 100vh;">
+        <Button Type="@ButtonType.Text" Class="phone-desktop" OnClick="() => _drawerVisible = !_drawerVisible">
+            <Icon Type="menu" Theme="outline"/>
+            <span style="margin-left: 10px">导航</span>
+        </Button>
+        @if (_drawerVisible)
+        {
+        @Menu
+        }
+        else
+        {
+        @Body
+        }
+        <BackTop Style="margin-bottom:60px">
+            <div class="ant-back-top-inner">
+                <Icon Type="arrow-up" Theme="outline"/>
+            </div>
+        </BackTop>
+    </GridCol>
+</GridRow>
+
+@code {
+    private bool _drawerVisible;
+
+    private RenderFragment Menu =>
+        @<Template>
+            <Menu Theme="MenuTheme.Light"
+                  OnMenuItemClicked="() => _drawerVisible = false"
+                  Style="padding-top: 10px;animation: fade-in ease-in 0.3s;"
+                  Mode="MenuMode.Inline" Class="menu-block">
+                <MenuItemGroup Class="group-block">
+                    <TitleTemplate>
+                        <div class="group-title">
+                            语言简介
+                        </div>
+                    </TitleTemplate>
+                    <ChildContent>
+                        <MenuItem RouterLink="/About" RouterMatch="NavLinkMatch.All" Title="关于" />
+                        <MenuItem RouterLink="/TryCode" RouterMatch="NavLinkMatch.All" Title="在浏览器尝试" />
+                    </ChildContent>
+                </MenuItemGroup>
+                <MenuItemGroup Class="group-block">
+                    <TitleTemplate>
+                        <div class="group-title">
+                            语法
+                        </div>
+                    </TitleTemplate>
+                    <ChildContent>
+                        <MenuItem RouterLink="/Grammar/First" RouterMatch="NavLinkMatch.All" Title="简单语法"/>
+                        <MenuItem RouterLink="/Grammar/Second" RouterMatch="NavLinkMatch.All" Title="函数和类"/>
+                        <MenuItem RouterLink="/Grammar/Third" RouterMatch="NavLinkMatch.All" Title="更多操作"/>
+                    </ChildContent>
+                </MenuItemGroup>
+                <MenuItemGroup Class="group-block">
+                    <TitleTemplate>
+                        <div class="group-title">
+                            技术实现
+                        </div>
+                    </TitleTemplate>
+                    <ChildContent>
+                        <MenuItem RouterLink="/Tutorial" RouterMatch="NavLinkMatch.All" Title="总览"/>
+                        <MenuItem RouterLink="/HowToRead" RouterMatch="NavLinkMatch.All" Title="阅读代码"/>
+                        <MenuItem RouterLink="/Lexer" RouterMatch="NavLinkMatch.All" Title="词法分析"/>
+                        <MenuItem RouterLink="/OldExpr" RouterMatch="NavLinkMatch.All" Title="表达式和值"/>
+                        <MenuItem RouterLink="/OldStatement" RouterMatch="NavLinkMatch.All" Title="语句语法"/>
+                        <MenuItem RouterLink="/Parser" RouterMatch="NavLinkMatch.All" Title="语法器"/>
+                        <MenuItem RouterLink="/VariateManager" RouterMatch="NavLinkMatch.All" Title="变量管理器"/>
+                        <MenuItem RouterLink="/Interpreter" RouterMatch="NavLinkMatch.All" Title="解释器构建"/>
+                    </ChildContent>
+                </MenuItemGroup>
+            </Menu>
+        </Template>;
+}
+
+<style>
+    
+    .group-block{
+        padding: 10px;
+    }
+    
+    .menu-block{
+        padding-top: 20px;
+        padding-left: 10px;
+        padding-bottom: 20px;
+    }
+
+    .group-title {
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ededed;
+    }
+    
+    .ant-back-top-inner {
+        height: 40px;
+        width: 40px;
+        line-height: 40px;
+        border-radius: 20px;
+        background-color: #1088e9;
+        color: #fff;
+        text-align: center;
+        font-size: 20px;
+    }
+
+    .footer{
+        display: none;
+    }
+
+    @@media screen and (max-width: 768px) {
+        .footer {
+            display: block !important;
+        }
+    }
+
+    .blockquote{
+        border-left: 5px solid #e8e8e8;
+        padding-left: 10px;
+    }
+
+    .blockquote p{
+        font-size: 14px;
+    }
+</style>
+
+<link href="Prism/prism.css" rel="stylesheet">
+<script src="Prism/prism.js"></script>

@@ -1,0 +1,61 @@
+@using Markdig
+@using Markdig.Syntax
+@using Markdig.Syntax.Inlines
+
+<GridRow>
+    <GridCol Xs="24" Sm="24" Md="20" Lg="20" Xl="20" Xxl="20">
+        <MarkdownRenderer html="@Content" />
+    </GridCol>
+    <GridCol Md="4" Lg="4" Xl="4" Xxl="4" Class="desktop-phone">
+        <Affix>
+            <Anchor>
+                @foreach (var s in Anchors)
+                {
+                    <AnchorLink Href="@s.Link" Title="@s.Name"/>
+                }
+            </Anchor>
+        </Affix>
+    </GridCol>
+</GridRow>
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Url { get; set; } = "";
+    private string Content { get; set; } = "";
+    private List<MarkAnchorModel> Anchors { get; } = [];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var info = new FileInfo($"wwwroot/Docs/{Title}.md");
+        if (!info.Exists) return;
+        var pipeline = new MarkdownPipelineBuilder()
+            .UseAdvancedExtensions()
+            .UseBootstrap()
+            .UseGridTables()
+            .UseEmojiAndSmiley()
+            .Build();
+        var content = await File.ReadAllTextAsync(info.FullName);
+        var document = Markdown.Parse(content, pipeline);
+        Content = document.ToHtml();
+        Anchors.Clear();
+        foreach (var node in document.AsEnumerable())
+        {
+            if (node is HeadingBlock { Inline: not null } headingBlock)
+            {
+                Anchors.Add(new MarkAnchorModel()
+                {
+                    Name = headingBlock.Inline.FirstChild!.ToString()!,
+                    Link = $"/{Url}#{headingBlock.Inline.FirstChild!.ToString()!.ToLower()}"
+                });
+            }
+
+            if (node is not ParagraphBlock { Inline: not null } paragraphBlock) continue;
+            foreach (var inline in paragraphBlock.Inline)
+            {
+                if (inline is not LinkInline { IsImage: true } linkInline) continue;
+                if(!linkInline.Url!.StartsWith("http"))
+                    linkInline.Url = $"wwwroot/ArticleFile/{linkInline.Url}";
+            }
+        }
+    }
+}

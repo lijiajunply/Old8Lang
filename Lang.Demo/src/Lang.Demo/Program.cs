@@ -1,4 +1,3 @@
-using Lang.Demo.Client.Pages;
 using Lang.Demo.Components;
 using AntDesign.ProLayout;
 
@@ -26,8 +25,6 @@ builder.Services.AddScoped(sp =>
 
     return new HttpClient();
 });
-
-Lang.Demo.Program.AddClientServices(builder.Services);
 
 builder.Services.Configure<ProSettings>(builder.Configuration.GetSection("ProSettings"));
 

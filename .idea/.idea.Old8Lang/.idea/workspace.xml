@@ -17,51 +17,47 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/Directory.Build.props" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/Lang.Demo.sln" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Lang.Demo.Client.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Layouts/BasicLayout.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Welcome.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Welcome.razor.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Program.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Properties/launchSettings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Resources/Resources.Designer.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Resources/Resources.resx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Resources/Resources.zh-CN.resx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Routes.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/_Imports.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/wwwroot/appsettings.Development.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/wwwroot/appsettings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/wwwroot/assets/403.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/wwwroot/assets/logo.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/wwwroot/css/site.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/wwwroot/favicon.ico" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/wwwroot/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/wwwroot/pro_icon.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/Components/App.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/Components/Pages/Error.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/Components/_Imports.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/Lang.Demo.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/Program.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/Properties/launchSettings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/appsettings.Development.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/appsettings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/wwwroot/app.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyParser/AbsUseClass.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/CslyParser/ConsoleUse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/projectSettingsUpdater.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/projectSettingsUpdater.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/AppControls/MarkAnchorModel.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/AppControls/MarkdownRenderer.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/AppControls/PageShow.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Layouts/WordLayout.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Grammar/About.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Grammar/GrammarFirst.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Grammar/GrammarSecond.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Grammar/GrammarThird.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Grammar/_Imports.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Implementation/HowToRead.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Implementation/Interpreter.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Implementation/Lexer.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Implementation/OldExpr.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Implementation/OldStatement.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Implementation/Parser.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Implementation/Tutorial.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Implementation/VariateManager.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Implementation/_Imports.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/TryCode.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/wwwroot/Docs/Interpreter.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/wwwroot/Docs/Lexer.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/wwwroot/Docs/OldExpr.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/wwwroot/Docs/OldStatement.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/wwwroot/Docs/Parser.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/wwwroot/Docs/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/wwwroot/Docs/Tutorial.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/wwwroot/Docs/VariateManager.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/wwwroot/Docs/如何去看我的源代码.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/wwwroot/Prism/prism.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/wwwroot/Prism/prism.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/wwwroot/iOS_Club_LOGO.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Lang.Demo.Client.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Lang.Demo.Client.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Layouts/BasicLayout.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Layouts/BasicLayout.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Welcome.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Welcome.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Pages/Welcome.razor.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/Components/App.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/Components/App.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/wwwroot/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/wwwroot/app.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/StringValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/StringValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyParser/OldParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyParser/OldParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/CslyParser/OldTokenGeneric.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/CslyParser/OldTokenGeneric.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,6 +99,8 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24372012c6c94138bf3f496e104366ffc8f918/ad/a6cef6f7/MethodBaseInvoker.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24372012c6c94138bf3f496e104366ffc8f918/bc/f0bb272f/RuntimeType.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5148e388a7db4994ad2ab3750386454116e910/d2/5bf0502e/ThrowHelper.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/751c8e23b0474418801e8c816e0946811be00/2e/1ab7325e/ProSettings.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/751c8e23b0474418801e8c816e0946811be00/b9/0303e409/SettingDrawer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/915b4a23253f4570818a19dc2cad19c9add10/27/85a79b66/JsonSerializerInternalReader.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a510c0564bb54fcdbee3ef811867128c38000/c1/4ef6b3d5/UnexpectedTokenSyntaxError`1.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/123a4860ba4f7deaf37e78fb6ededfbebc7762f23f3ff2fd8a4d1c9b2f5e5b14/UnexpectedTokenSyntaxError.cs" root0="FORCE_HIGHLIGHTING" />
@@ -130,7 +128,8 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
+    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
+    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Debug",
     ".NET 项目.Old8Lang.App.executor": "Run",
     "ASKED_ADD_EXTERNAL_FILES": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
@@ -413,7 +412,14 @@
       <workItem from="1728484300244" duration="1422000" />
       <workItem from="1728569589261" duration="1294000" />
       <workItem from="1730014438210" duration="3540000" />
-      <workItem from="1730105290996" duration="2424000" />
+      <workItem from="1730105290996" duration="3236000" />
+      <workItem from="1730200970940" duration="2699000" />
+      <workItem from="1730258822848" duration="2490000" />
+      <workItem from="1730282112672" duration="6168000" />
+      <workItem from="1730369849567" duration="2025000" />
+      <workItem from="1730439545869" duration="1201000" />
+      <workItem from="1730567972307" duration="1292000" />
+      <workItem from="1730606349837" duration="2826000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -758,7 +764,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="83" />
+    <option name="localTasksCounter" value="84" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -785,7 +791,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="add TextMeta" />
     <MESSAGE value="asdf" />
     <MESSAGE value="先这样吧，真觉得我写的这个好烂" />
     <MESSAGE value="第一步修改" />
@@ -810,7 +815,8 @@
     <MESSAGE value="0.8.0完成" />
     <MESSAGE value="加入Range和SetList" />
     <MESSAGE value="修复 只能在Debug中使用" />
-    <option name="LAST_COMMIT_MESSAGE" value="修复 只能在Debug中使用" />
+    <MESSAGE value="加入演示网站" />
+    <option name="LAST_COMMIT_MESSAGE" value="加入演示网站" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
