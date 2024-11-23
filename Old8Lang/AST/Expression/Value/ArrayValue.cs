@@ -5,8 +5,8 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class ArrayValue : ValueType, IOldList
 {
-    private ValueType[] RunResult { get; }
-    private List<OldExpr> Values { get; } = [];
+    private readonly ValueType[] RunResult;
+    private readonly List<OldExpr> Values = [];
 
     public ArrayValue(IEnumerable<OldExpr> valuesList)
     {

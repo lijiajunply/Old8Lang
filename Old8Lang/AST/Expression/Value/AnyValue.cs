@@ -5,9 +5,9 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class AnyValue : ValueType
 {
-    public Dictionary<OldID, OldExpr> Variates { get; }
-    public Dictionary<string, ValueType> Result { get; } = new();
-    public OldID Id { get; }
+    public readonly Dictionary<OldID, OldExpr> Variates;
+    public readonly Dictionary<string, ValueType> Result = new();
+    public readonly OldID Id;
 
     public VariateManager manager;
 

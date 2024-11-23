@@ -4,7 +4,7 @@ using Old8Lang.CslyParser;
 
 #if DEBUG
 string[] strings = ["-f", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,
-    "Old8Lang", "Ex", "init.ws")];
+    "Old8Lang", "Ex", "fib.ws")];
 
 args = args.Length == 0 ? strings : args;
 #endif

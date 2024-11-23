@@ -4,9 +4,9 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class ListValue : ValueType, IOldList
 {
-    private List<OldExpr> Value { get; } = [];
+    private readonly List<OldExpr> Value = [];
 
-    public List<ValueType> Values { get; } = [];
+    public readonly List<ValueType> Values = [];
 
     public ListValue(List<OldExpr> value) => Value = value;
 

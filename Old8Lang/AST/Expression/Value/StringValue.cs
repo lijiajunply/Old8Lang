@@ -5,7 +5,8 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class StringValue(string context) : ValueType, IOldList
 {
-    public string Value { get; } = context.Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\r","\r").Replace(@"\\","\\");
+    public readonly string Value = context.Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\r", "\r")
+        .Replace(@"\\", "\\");
 
     public override string ToString() => Value;
     public override ValueType Plus(ValueType otherValueType) => new StringValue(Value + otherValueType);
@@ -49,6 +50,7 @@ public class StringValue(string context) : ValueType, IOldList
     public IEnumerable<ValueType> GetItems() => Value.Select(item => ObjToValue(item));
 
     public int GetLength() => Value.Length;
+
     public ValueType Slice(int start, int end)
     {
         if (start < 0) start += Value.Length;

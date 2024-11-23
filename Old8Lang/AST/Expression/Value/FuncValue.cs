@@ -7,15 +7,14 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class FuncValue : ValueType
 {
-    public OldID? Id { get; }
+    public readonly OldID? Id;
+    private readonly BlockStatement BlockStatement = new([]);
 
-    private BlockStatement BlockStatement { get; } = new([]);
+    public readonly List<OldID>? Ids;
 
-    public List<OldID>? Ids { get; }
+    private readonly MethodInfo? Method;
 
-    private MethodInfo? Method { get; }
-
-    private FuncValue? Func { get; }
+    private readonly FuncValue? Func;
 
     public FuncValue(OldID? id, List<OldID> ids, BlockStatement blockStatement)
     {

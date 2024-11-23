@@ -4,7 +4,7 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class CharValue(char value) : ValueType
 {
-    public char Value { get; } = value;
+    public readonly char Value = value;
 
     public override ValueType Plus(ValueType otherValueType) =>
         new StringValue(Value + (string)otherValueType.GetValue());

@@ -5,8 +5,8 @@ namespace Old8Lang.AST.Statement;
 
 public class SetStatement(OldID id, OldExpr value) : OldStatement
 {
-    public OldID Id { get; } = id;
-    public OldExpr Value { get; } = value;
+    public readonly OldID Id = id;
+    public readonly OldExpr Value = value;
 
     public override void Run(ref VariateManager Manager)
     {

@@ -3,59 +3,53 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression;
 
-public class Operation(OldExpr left, OldTokenGeneric opera, OldExpr right) : OldExpr
+public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : OldExpr
 {
-    private OldExpr? Left { get; } = left;
-
-    private OldExpr Right { get; } = right;
-
-    private OldTokenGeneric Opera { get; } = opera;
-
     private string OperaToString()
     {
-        if (Opera == OldTokenGeneric.PLUS)
+        if (opera == OldTokenGeneric.PLUS)
             return "+";
-        if (Opera == OldTokenGeneric.MINUS)
+        if (opera == OldTokenGeneric.MINUS)
             return "-";
-        if (Opera == OldTokenGeneric.TIMES)
+        if (opera == OldTokenGeneric.TIMES)
             return "*";
-        if (Opera == OldTokenGeneric.DIVIDE)
+        if (opera == OldTokenGeneric.DIVIDE)
             return "/";
-        if (Opera == OldTokenGeneric.GREATER)
+        if (opera == OldTokenGeneric.GREATER)
             return ">";
-        if (Opera == OldTokenGeneric.LESSER)
+        if (opera == OldTokenGeneric.LESSER)
             return "<";
-        if (Opera == OldTokenGeneric.EQUALS)
+        if (opera == OldTokenGeneric.EQUALS)
             return "==";
-        if (Opera == OldTokenGeneric.DIFFERENT)
+        if (opera == OldTokenGeneric.DIFFERENT)
             return "!=";
-        if (Opera == OldTokenGeneric.CONCAT)
+        if (opera == OldTokenGeneric.CONCAT)
             return ".";
         return "";
     }
 
-    public override string ToString() => $"{Left} {OperaToString()} {Right}";
+    public override string ToString() => $"{left} {OperaToString()} {right}";
 
     public override ValueType Run(ref VariateManager Manager)
     {
         // not right
-        if (Left == null && Opera == OldTokenGeneric.NOT)
-            return new BoolValue(!(Right.Run(ref Manager) as BoolValue)!.Value);
-        if (Left == null && Opera == OldTokenGeneric.MINUS)
-            return new IntValue(-(Right.Run(ref Manager) as IntValue)!.Value);
+        if (left == null && opera == OldTokenGeneric.NOT)
+            return new BoolValue(!(right.Run(ref Manager) as BoolValue)!.Value);
+        if (left == null && opera == OldTokenGeneric.MINUS)
+            return new IntValue(-(right.Run(ref Manager) as IntValue)!.Value);
 
-        var l = Left?.Run(ref Manager);
-        var r = Right;
+        var l = left?.Run(ref Manager);
+        var r = right;
 
         // id.id => dot_value
-        if (l is AnyValue any && Opera == OldTokenGeneric.CONCAT)
+        if (l is AnyValue any && opera == OldTokenGeneric.CONCAT)
         {
             if (r is Instance r1)
                 return any.Dot(r1);
             return any.Dot(r);
         }
 
-        if (l is ListValue && Opera == OldTokenGeneric.CONCAT)
+        if (l is ListValue && opera == OldTokenGeneric.CONCAT)
         {
             if (r is not Instance r1) return l.Dot(r);
             List<OldExpr> values = [];
@@ -68,7 +62,7 @@ public class Operation(OldExpr left, OldTokenGeneric opera, OldExpr right) : Old
             return l.Dot(newInstance);
         }
 
-        if (l is NativeStaticAny && Opera == OldTokenGeneric.CONCAT)
+        if (l is NativeStaticAny && opera == OldTokenGeneric.CONCAT)
         {
             if (r is not Instance r1) return l.Dot(r);
             List<OldExpr> values = [];
@@ -81,50 +75,50 @@ public class Operation(OldExpr left, OldTokenGeneric opera, OldExpr right) : Old
             return l.Dot(newInstance);
         }
 
-        if (l is not AnyValue && Opera == OldTokenGeneric.CONCAT)
+        if (l is not AnyValue && opera == OldTokenGeneric.CONCAT)
             return l?.Dot(r)!;
 
         // r get value
-        r = Right.Run(ref Manager);
+        r = right.Run(ref Manager);
         // (right)
-        if (Right is OldID oldId && l is not AnyValue)
+        if (right is OldID oldId && l is not AnyValue)
             r = Manager.GetValue(oldId);
-        if (Right is Operation)
-            r = Right.Run(ref Manager);
+        if (right is Operation)
+            r = right.Run(ref Manager);
 
 
         // left and right
-        if (l is BoolValue b && r is BoolValue expr && Opera == OldTokenGeneric.AND)
+        if (l is BoolValue b && r is BoolValue expr && opera == OldTokenGeneric.AND)
             return new BoolValue(b.Value && expr.Value);
 
         // left or right
-        if (l is BoolValue b1 && r is BoolValue oldBool && Opera == OldTokenGeneric.OR)
+        if (l is BoolValue b1 && r is BoolValue oldBool && opera == OldTokenGeneric.OR)
             return new BoolValue(b1.Value || oldBool.Value);
 
         // left xor right
-        if (l is BoolValue && r is BoolValue value && Opera == OldTokenGeneric.XOR)
+        if (l is BoolValue && r is BoolValue value && opera == OldTokenGeneric.XOR)
             return new BoolValue(!l.Equal(value));
 
 
         // == , < , > 
-        if (l is not null && r != null! && Opera == OldTokenGeneric.EQUALS)
+        if (l is not null && r != null! && opera == OldTokenGeneric.EQUALS)
             return new BoolValue(l.Equal(r as ValueType ?? new VoidValue()));
-        if (l is not null && r is not null && Opera == OldTokenGeneric.LESSER)
+        if (l is not null && r is not null && opera == OldTokenGeneric.LESSER)
             return new BoolValue(l.Less(r as ValueType));
-        if (l is not null && r is not null && Opera == OldTokenGeneric.GREATER)
+        if (l is not null && r is not null && opera == OldTokenGeneric.GREATER)
             return new BoolValue(l.Greater(r as ValueType));
-        if (l is not null && r is not null && Opera == OldTokenGeneric.DIFFERENT)
+        if (l is not null && r is not null && opera == OldTokenGeneric.DIFFERENT)
             return new BoolValue(!l.Equal(r as ValueType));
-        if (l is not null && r is not null && Opera == OldTokenGeneric.LESS_EQUAL)
+        if (l is not null && r is not null && opera == OldTokenGeneric.LESS_EQUAL)
             return new BoolValue(l.LessEqual(r as ValueType));
-        if (l is not null && r is not null && Opera == OldTokenGeneric.GREATER_EQUAL)
+        if (l is not null && r is not null && opera == OldTokenGeneric.GREATER_EQUAL)
             return new BoolValue(l.GreaterEqual(r as ValueType));
 
         // r (+-*/) l
         if (l is not null && r is not null)
         {
             if (r is not ValueType r1) return new VoidValue();
-            switch (Opera)
+            switch (opera)
             {
                 case OldTokenGeneric.PLUS:
                     return l.Plus(r1);

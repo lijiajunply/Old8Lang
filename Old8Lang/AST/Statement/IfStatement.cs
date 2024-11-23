@@ -8,19 +8,13 @@ namespace Old8Lang.AST.Statement;
 public class IfStatement(OldIf ifBlock, List<OldIf?> elifBlock, BlockStatement? elseBlockStatement)
     : OldStatement
 {
-    private OldIf IfBlock { get; } = ifBlock;
-
-    private List<OldIf?> ElifBlock { get; } = elifBlock;
-
-    private BlockStatement? ElseBlockStatement { get; } = elseBlockStatement;
-
     public override void Run(ref VariateManager Manager)
     {
         var r = true;
         Manager.AddChildren();
-        IfBlock.Run(ref Manager, ref r);
+        ifBlock.Run(ref Manager, ref r);
         Manager.RemoveChildren();
-        foreach (var variable in ElifBlock)
+        foreach (var variable in elifBlock)
         {
             if(variable is null)continue;
             Manager.AddChildren();
@@ -29,10 +23,10 @@ public class IfStatement(OldIf ifBlock, List<OldIf?> elifBlock, BlockStatement? 
         }
 
         if (r)
-            ElseBlockStatement?.Run(ref Manager);
+            elseBlockStatement?.Run(ref Manager);
         
     }
 
     public override string ToString() =>
-        $"if({IfBlock} else if{Apis.ListToString(ElifBlock)} \nelse: {ElseBlockStatement}";
+        $"if({ifBlock} else if{Apis.ListToString(elifBlock)} \nelse: {elseBlockStatement}";
 }

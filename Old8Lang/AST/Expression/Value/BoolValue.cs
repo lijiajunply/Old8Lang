@@ -4,7 +4,7 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class BoolValue(bool value) : ValueType
 {
-    public bool Value { get; } = value;
+    public readonly bool Value = value;
     public override string ToString() => Value.ToString();
     public override ValueType Run(ref VariateManager Manager) => this;
 

@@ -4,14 +4,12 @@ namespace Old8Lang.AST.Statement;
 
 public class ImportStatement(string importString) : OldStatement
 {
-    private string ImportString { get; } = importString;
-
     public override void Run(ref VariateManager Manager)
     {
-        if (Manager.LangInfo!.LibInfos.Any(x => ImportString == x.LibName))
+        if (Manager.LangInfo!.LibInfos.Any(x => importString == x.LibName))
         {
-            var b = Manager.LangInfo.LibInfos.Where(x => x.LibName == ImportString).Select(x => x.IsDir).ToArray()[0];
-            var path = Path.Combine(Manager.LangInfo.ImportPath, ImportString + (b ? "" : ".ws"));
+            var b = Manager.LangInfo.LibInfos.Where(x => x.LibName == importString).Select(x => x.IsDir).ToArray()[0];
+            var path = Path.Combine(Manager.LangInfo.ImportPath, importString + (b ? "" : ".ws"));
             var previousPath = Manager.Path;
             Manager.Path = path;
             var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
@@ -21,10 +19,10 @@ public class ImportStatement(string importString) : OldStatement
             return;
         }
 
-        if (Apis.ImportInstall(ImportString))
+        if (Apis.ImportInstall(importString))
         {
-            var b = Manager.LangInfo.LibInfos.Where(x => x.LibName == ImportString).Select(x => x.IsDir).ToArray()[0];
-            var path = Manager.LangInfo.ImportPath + ImportString + ".ws";
+            var b = Manager.LangInfo.LibInfos.Where(x => x.LibName == importString).Select(x => x.IsDir).ToArray()[0];
+            var path = Manager.LangInfo.ImportPath + importString + ".ws";
             var previousPath = Manager.Path;
             Manager.Path = path;
             var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
@@ -35,9 +33,9 @@ public class ImportStatement(string importString) : OldStatement
         }
 
         var dic = Path.GetDirectoryName(Manager.Path)!;
-        if (!File.Exists(dic + "/" + ImportString + ".ws")) return;
+        if (!File.Exists(dic + "/" + importString + ".ws")) return;
 
-        var filePath = dic + "/" + ImportString + ".ws";
+        var filePath = dic + "/" + importString + ".ws";
         var PreviousPath = Manager.Path;
         Manager.Path = filePath;
         var result = Manager.Interpreter?.Build(code: Apis.FromFile(filePath));
@@ -45,5 +43,5 @@ public class ImportStatement(string importString) : OldStatement
         Manager.Path = PreviousPath;
     }
 
-    public override string ToString() => $"using {ImportString}";
+    public override string ToString() => $"using {importString}";
 }

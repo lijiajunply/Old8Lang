@@ -5,8 +5,8 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
 {
-    public List<OldExpr> Ids { get; } = ids;
-    public OldID Id => oldId;
+    public readonly List<OldExpr> Ids = ids;
+    public readonly OldID Id = oldId;
 
     public override ValueType Run(ref VariateManager Manager)
     {

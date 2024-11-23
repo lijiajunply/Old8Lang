@@ -8,28 +8,25 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public class WhileStatement(OldExpr expr, BlockStatement blockStatement) : OldStatement
 {
-    private OldExpr Expr { get; } = expr;
-    private BlockStatement BlockStatement { get; } = blockStatement;
-
     public override void Run(ref VariateManager Manager)
     {
         Manager.AddChildren();
         while (true)
         {
-            var value = Expr.Run(ref Manager);
-            bool expr;
+            var value = expr.Run(ref Manager);
+            bool expr1;
             if (value is BoolValue varBool)
             {
-                expr = varBool.Value;
+                expr1 = varBool.Value;
             }
             else
             {
                 throw new Exception($"Type Error: {value} is not Bool");
             }
 
-            if (expr)
+            if (expr1)
             {
-                BlockStatement.Run(ref Manager);
+                blockStatement.Run(ref Manager);
             }
             else
             {
@@ -39,5 +36,5 @@ public class WhileStatement(OldExpr expr, BlockStatement blockStatement) : OldSt
         }
     }
 
-    public override string ToString() => $"while({Expr}){BlockStatement}";
+    public override string ToString() => $"while({expr}){blockStatement}";
 }

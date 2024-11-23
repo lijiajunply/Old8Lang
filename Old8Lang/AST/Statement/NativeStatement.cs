@@ -7,16 +7,16 @@ namespace Old8Lang.AST.Statement;
 
 public class NativeStatement : OldStatement
 {
-    private string DllName { get; }
+    private readonly string DllName;
 
-    private string ClassName { get; }
+    private readonly string ClassName;
 
-    private string? MethodName { get; }
+    private readonly string? MethodName;
 
     private string? NativeName { get; set; }
 
-    private string? Name { get; }
-    private FuncValue? FuncValue { get; }
+    private readonly string? Name;
+    private readonly FuncValue? FuncValue;
 
     public NativeStatement(string dllName, string className, string methodName, string nativeName)
     {

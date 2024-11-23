@@ -4,14 +4,10 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class OldItem(OldID listId, OldExpr key) : ValueType
 {
-    private OldID ListID { get; } = listId;
-
-    private OldExpr Key { get; } = key;
-
     public override ValueType Run(ref VariateManager Manager)
     {
-        var a = Manager.GetValue(ListID);
-        OldExpr result = Key.Run(ref Manager);
+        var a = Manager.GetValue(listId);
+        OldExpr result = key.Run(ref Manager);
         if (a is ListValue list && result is IntValue intResult)
             return list.Get(intResult);
         if (a is ArrayValue array && result is IntValue i)
@@ -24,5 +20,5 @@ public class OldItem(OldID listId, OldExpr key) : ValueType
         return new VoidValue();
     }
 
-    public override string ToString() => $"the key: {Key} in {ListID}";
+    public override string ToString() => $"the key: {key} in {listId}";
 }

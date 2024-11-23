@@ -4,8 +4,8 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class TypeValue : ValueType
 {
-    private OldExpr? Expr { get; }
-    public string? Value { get; set; }
+    private readonly OldExpr? Expr;
+    public string? Value { get; private set; }
 
     public TypeValue(OldExpr expr) => Expr = expr;
     public TypeValue(string value) => Value = value;

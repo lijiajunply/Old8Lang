@@ -9,8 +9,8 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public class BlockStatement : OldStatement
 {
-    private List<OldStatement> ImportStatements { get; } = [];
-    private List<OldStatement> OtherStatements { get; } = [];
+    private readonly List<OldStatement> ImportStatements  = [];
+    private readonly List<OldStatement> OtherStatements = [];
 
     public BlockStatement(IEnumerable<OldLangTree> statements)
     {

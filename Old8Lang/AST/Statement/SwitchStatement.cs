@@ -8,16 +8,12 @@ public class SwitchStatement(
     BlockStatement? defaultBlockStatement = null)
     : OldStatement
 {
-    private OldExpr SwitchExpr { get; } = switchExpr;
-    private List<OldCase> SwitchCaseList { get; } = switchCaseList;
-    private BlockStatement? DefaultBlockStatement { get; } = defaultBlockStatement;
-
     public override void Run(ref VariateManager Manager)
     {
         Manager.AddChildren();
-        var switchValue = SwitchExpr.Run(ref Manager);
+        var switchValue = switchExpr.Run(ref Manager);
 
-        foreach (var oldCase in SwitchCaseList)
+        foreach (var oldCase in switchCaseList)
         {
             var caseValue = oldCase.Expr.Run(ref Manager);
             if (!switchValue.Equal(caseValue)) continue;
@@ -26,7 +22,7 @@ public class SwitchStatement(
             return;
         }
 
-        DefaultBlockStatement?.Run(ref Manager);
+        defaultBlockStatement?.Run(ref Manager);
         Manager.RemoveChildren();
     }
 }

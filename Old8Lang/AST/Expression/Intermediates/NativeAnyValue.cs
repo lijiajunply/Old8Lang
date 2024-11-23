@@ -6,23 +6,14 @@ namespace Old8Lang.AST.Expression.Value;
 /// <summary>
 /// 适用于有构造函数的类
 /// </summary>
-public class NativeAnyValue : ValueType
+public class NativeAnyValue(string dllName, string className, string path) : ValueType
 {
     private Type? ClassType { get; set; }
-    private string DllName { get; }
-    public string ClassName { get; }
-    private string Path { get; }
+    public readonly string ClassName = className;
     private ConstructorInfo? Constructor { get; set; }
-    private object InstanceObj { get; set; }  
+    private object? InstanceObj { get; set; }
 
     private VariateManager manager = new();
-
-    public NativeAnyValue(string dllName, string className, string path)
-    {
-        DllName = dllName;
-        ClassName = className;
-        Path = path;
-    }
 
     public override ValueType Dot(OldExpr dotExpr)
     {
@@ -51,8 +42,8 @@ public class NativeAnyValue : ValueType
 
     public override ValueType Run(ref VariateManager Manager)
     {
-        var assembly = Assembly.LoadFile(Path);
-        ClassType = assembly.GetType($"{DllName}.{ClassName}")!;
+        var assembly = Assembly.LoadFile(path);
+        ClassType = assembly.GetType($"{dllName}.{ClassName}")!;
         if (ClassType?.GetConstructors() is not null)
             Constructor = ClassType.GetConstructors()[0];
         manager = Manager.Clone();

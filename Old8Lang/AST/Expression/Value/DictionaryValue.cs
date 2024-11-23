@@ -5,12 +5,11 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class DictionaryValue(List<TupleValue> tuples) : ValueType, IOldList
 {
-    public List<(ValueType Key, ValueType Value)> Value { get; } = [];
-    private List<TupleValue> Tuples { get; } = tuples;
+    public readonly List<(ValueType Key, ValueType Value)> Value = [];
 
     public override ValueType Run(ref VariateManager Manager)
     {
-        foreach (var tuple in Tuples)
+        foreach (var tuple in tuples)
         {
             tuple.Run(ref Manager);
             Value.Add(tuple.Value);
@@ -39,7 +38,7 @@ public class DictionaryValue(List<TupleValue> tuples) : ValueType, IOldList
 
     public override string ToString()
     {
-        if (Value.Count == 0) return "{" + Apis.ListToString(Tuples) + "}";
+        if (Value.Count == 0) return "{" + Apis.ListToString(tuples) + "}";
         var sb = new StringBuilder();
         foreach (var valueTuple in Value)
             sb.Append($"{valueTuple.Key},{valueTuple.Value};");

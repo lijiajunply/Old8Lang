@@ -12,30 +12,22 @@ public class ForStatement(
     BlockStatement blockStatement)
     : OldStatement
 {
-    private SetStatement SetStatement { get; } = setStatement;
-
-    private Operation Expr { get; } = expr;
-
-    private OldStatement Statement { get; } = statement;
-
-    private BlockStatement ForBlockStatement { get; } = blockStatement;
-
     public override void Run(ref VariateManager Manager)
     {
         Manager.AddChildren();
-        SetStatement.Run(ref Manager);
+        setStatement.Run(ref Manager);
         while (true)
         {
-            var varExpr = Expr.Run(ref Manager);
-            bool expr;
+            var varExpr = expr.Run(ref Manager);
+            bool expr1;
             if (varExpr is BoolValue value)
-                expr = value.Value;
+                expr1 = value.Value;
             else
                 break;
-            if (expr)
+            if (expr1)
             {
-                ForBlockStatement.Run(ref Manager);
-                Statement.Run(ref Manager);
+                blockStatement.Run(ref Manager);
+                statement.Run(ref Manager);
             }
             else
                 break;
@@ -46,8 +38,8 @@ public class ForStatement(
 
     public override string ToString()
     {
-        var sb = new StringBuilder($"for({SetStatement} ; {Expr} ; {Statement})");
-        sb.Append("\n{" + ForBlockStatement + "\n}");
+        var sb = new StringBuilder($"for({setStatement} ; {expr} ; {statement})");
+        sb.Append("\n{" + blockStatement + "\n}");
         return sb.ToString();
     }
 }

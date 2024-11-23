@@ -5,9 +5,7 @@ namespace Old8Lang.AST.Statement;
 
 public class ClassInit(AnyValue anyValue) : OldStatement
 {
-    private AnyValue AnyValue { get; } = anyValue;
+    public override void Run(ref VariateManager Manager) => Manager.AddClassAndFunc(anyValue);
 
-    public override void Run(ref VariateManager Manager) => Manager.AddClassAndFunc(AnyValue);
-
-    public override string ToString() => AnyValue.ToString();
+    public override string ToString() => anyValue.ToString();
 }
