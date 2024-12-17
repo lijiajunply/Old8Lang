@@ -31,12 +31,11 @@ public class BoolValue(bool value) : ValueType
             _ => throw new Exception("not fount the type: " + value.Value)
         };
     }
-
-    public override void SetValueToIL(ILGenerator ilGenerator, LocalManager local, string idName)
+    
+    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
     {
-        var valueLocal = ilGenerator.DeclareLocal(typeof(bool));
         ilGenerator.Emit(Value ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
-        ilGenerator.Emit(OpCodes.Stloc, valueLocal);
-        local.AddLocalVar(idName, valueLocal);
     }
+
+    public override Type OutputType(LocalManager local) => Value.GetType();
 }

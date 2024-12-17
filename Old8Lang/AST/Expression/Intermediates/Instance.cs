@@ -141,18 +141,18 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
         };
     }
 
-    public override void GenerateILValue(ILGenerator ilGenerator, LocalManager local)
+    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
     {
         switch (Id.IdName)
         {
             case "PrintLine":
                 var iPrintLine = Ids[0];
-                iPrintLine.GenerateILValue(ilGenerator, local);
+                iPrintLine.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", [iPrintLine.OutputType(local)!])!);
                 return;
             case "Print":
                 var iPrint = Ids[0];
-                iPrint.GenerateILValue(ilGenerator, local);
+                iPrint.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("Write", [iPrint.OutputType(local)!])!);
                 return;
         }

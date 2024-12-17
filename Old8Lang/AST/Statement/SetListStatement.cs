@@ -2,7 +2,6 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
-using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.AST.Statement;
 
@@ -20,6 +19,11 @@ public class SetListStatement(List<OldID> ids, List<OldExpr> expr) : OldStatemen
 
     public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
     {
-        throw new NotImplementedException();
+        for (var i = 0; i < ids.Count; i++)
+        {
+            var Value = expr[i];
+            var Id = ids[i];
+            Value.SetValueToIL(ilGenerator, local, Id.IdName);
+        }
     }
 }

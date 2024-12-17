@@ -42,16 +42,10 @@ public class CharValue(char value) : ValueType
         };
     }
     
-    public override void SetValueToIL(ILGenerator ilGenerator, LocalManager local,string idName)
+    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
     {
         ilGenerator.Emit(OpCodes.Ldc_I4, Convert.ToInt32(Value));
-        var valueLocal = ilGenerator.DeclareLocal(typeof(char));
-        ilGenerator.Emit(OpCodes.Stloc, valueLocal);
-        local.AddLocalVar(idName, valueLocal);
     }
-    
-    public override void GenerateILValue(ILGenerator ilGenerator, LocalManager local)
-    {
-        
-    }
+
+    public override Type OutputType(LocalManager local) => Value.GetType();
 }

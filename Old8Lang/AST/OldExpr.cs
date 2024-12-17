@@ -10,16 +10,36 @@ public class OldExpr : OldLangTree
 {
     public virtual ValueType Run(VariateManager Manager) => new VoidValue();
 
-    public virtual void GenerateILValue(ILGenerator ilGenerator, LocalManager local)
+    public virtual void LoadILValue(ILGenerator ilGenerator, LocalManager local)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void SetValueToIL(ILGenerator ilGenerator, LocalManager local,string idName)
+    public virtual void SetValueToIL(ILGenerator ilGenerator, LocalManager local, string idName)
     {
-        throw new NotImplementedException();
+        LoadILValue(ilGenerator, local);
+        var type = OutputType(local);
+        if (type == null) return;
+        var b = local.GetLocalVar(idName);
+        var valueLocal = ilGenerator.DeclareLocal(type);
+        if (b != null)
+        {
+            if (b.LocalType != type)
+            {
+                local.RemoveLocalVar(idName);
+                local.AddLocalVar(idName, valueLocal);
+                ilGenerator.Emit(OpCodes.Stloc, valueLocal.LocalIndex);
+            }
+            else
+            {
+                ilGenerator.Emit(OpCodes.Stloc, b.LocalIndex);
+            }
+            return;
+        }
+        ilGenerator.Emit(OpCodes.Stloc, valueLocal.LocalIndex);
+        local.AddLocalVar(idName, valueLocal);
     }
-    
+
     public virtual Type? OutputType(LocalManager local)
     {
         return null;

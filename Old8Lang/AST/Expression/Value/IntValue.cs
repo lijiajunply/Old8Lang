@@ -115,20 +115,9 @@ public class IntValue(int intValue) : ValueType
 
     public override object GetValue() => Value;
 
-    public override void SetValueToIL(ILGenerator ilGenerator, LocalManager local, string idName)
-    {
-        var valueLocal = ilGenerator.DeclareLocal(typeof(int));
-        ilGenerator.Emit(OpCodes.Ldc_I4, Value);
-        ilGenerator.Emit(OpCodes.Stloc, valueLocal);
-        local.AddLocalVar(idName, valueLocal);
-    }
+    public override Type OutputType(LocalManager local) => Value.GetType();
 
-    public override Type OutputType(LocalManager local)
-    {
-        return typeof(int);
-    }
-
-    public override void GenerateILValue(ILGenerator ilGenerator, LocalManager local)
+    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
     {
         ilGenerator.Emit(OpCodes.Ldc_I4, Value);
     }

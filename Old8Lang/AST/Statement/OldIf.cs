@@ -20,6 +20,11 @@ public class OldIf(OldExpr expr, BlockStatement blockStatement) : OldStatement
 
     public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
     {
-        throw new NotImplementedException();
+        blockStatement.GenerateIL(ilGenerator, local);
+    }
+
+    public void GenerateConditionIL(ILGenerator ilGenerator, LocalManager local)
+    {
+        expr.LoadILValue(ilGenerator, local);
     }
 }

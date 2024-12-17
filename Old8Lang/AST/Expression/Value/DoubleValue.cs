@@ -92,11 +92,10 @@ public class DoubleValue(double doubleValue) : ValueType
         };
     }
     
-    public override void SetValueToIL(ILGenerator ilGenerator, LocalManager local,string idName)
+    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
     {
-        var valueLocal = ilGenerator.DeclareLocal(typeof(double));
         ilGenerator.Emit(OpCodes.Ldc_R8, Value);
-        ilGenerator.Emit(OpCodes.Stloc, valueLocal);
-        local.AddLocalVar(idName, valueLocal);
     }
+
+    public override Type OutputType(LocalManager local) => Value.GetType();
 }

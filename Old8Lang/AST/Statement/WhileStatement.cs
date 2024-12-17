@@ -40,7 +40,24 @@ public class WhileStatement(OldExpr expr, BlockStatement blockStatement) : OldSt
 
     public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
     {
-        throw new NotImplementedException();
+        // 创建循环开始标签
+        var loopStart = ilGenerator.DefineLabel();
+        var loopEnd = ilGenerator.DefineLabel();
+
+        // 跳转到循环开始
+        ilGenerator.MarkLabel(loopStart);
+
+        // 检查循环条件
+        expr.LoadILValue(ilGenerator, local);
+        ilGenerator.Emit(OpCodes.Brfalse, loopEnd); // 如果 loopCounter >= 10，跳转到 loopEnd
+        
+        blockStatement.GenerateIL(ilGenerator, local);
+
+        // 跳转回循环开始
+        ilGenerator.Emit(OpCodes.Br, loopStart); // 跳转到 loopStart
+
+        // 循环结束标签
+        ilGenerator.MarkLabel(loopEnd);
     }
 
     public override string ToString() => $"while({expr}){blockStatement}";

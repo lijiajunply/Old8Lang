@@ -29,11 +29,11 @@ public class FuncRunStatement : OldStatement
     {
         if (Operation == null)
         {
-            Instance?.GenerateILValue(ilGenerator, local);
+            Instance?.LoadILValue(ilGenerator, local);
             return;
         }
 
-        Operation.GenerateILValue(ilGenerator, local);
+        Operation.LoadILValue(ilGenerator, local);
     }
 
     public override string ToString() => Instance?.ToString()!;

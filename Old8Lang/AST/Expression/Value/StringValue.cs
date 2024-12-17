@@ -60,11 +60,10 @@ public class StringValue(string context) : ValueType, IOldList
         return new StringValue(Value[start..end]);
     }
     
-    public override void SetValueToIL(ILGenerator ilGenerator, LocalManager local,string idName)
+    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
     {
-        var valueLocal = ilGenerator.DeclareLocal(typeof(string));
         ilGenerator.Emit(OpCodes.Ldstr, Value);
-        ilGenerator.Emit(OpCodes.Stloc, valueLocal);
-        local.AddLocalVar(idName, valueLocal);
     }
+
+    public override Type OutputType(LocalManager local) => Value.GetType();
 }

@@ -130,63 +130,36 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
         return new VoidValue();
     }
 
+
     public override void SetValueToIL(ILGenerator ilGenerator, LocalManager local, string idName)
     {
-        GenerateILValue(ilGenerator, local);
-        var valueLocal = ilGenerator.DeclareLocal(typeof(int));
+        var type = OutputType(ilGenerator, local);
+        var valueLocal = ilGenerator.DeclareLocal(type);
+        var b = local.GetLocalVar(idName);
+        if (b != null)
+        {
+            if (b.LocalType != type)
+            {
+                local.RemoveLocalVar(idName);
+                local.AddLocalVar(idName, valueLocal);
+                ilGenerator.Emit(OpCodes.Stloc, valueLocal.LocalIndex);
+            }
+            else
+            {
+                ilGenerator.Emit(OpCodes.Stloc, b.LocalIndex);
+            }
+            return;
+        }
         ilGenerator.Emit(OpCodes.Stloc, valueLocal.LocalIndex);
         local.AddLocalVar(idName, valueLocal);
     }
 
-    private void GenerateBinaryOp(ILGenerator ilGenerator, LocalManager local, Type valueType, string methodName)
+    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
     {
-        left!.GenerateILValue(ilGenerator, local);
-        right.GenerateILValue(ilGenerator, local);
-
-        switch (methodName)
-        {
-            case "Plus":
-                ilGenerator.Emit(OpCodes.Add);
-                return;
-            case "Minus":
-                ilGenerator.Emit(OpCodes.Sub);
-                return;
-            case "Times":
-                ilGenerator.Emit(OpCodes.Mul);
-                return;
-            case "Divide":
-                ilGenerator.Emit(OpCodes.Div);
-                return;
-        }
+        OutputType(ilGenerator, local);
     }
 
-    private void GenerateComparisonOp(ILGenerator ilGenerator, LocalManager local, string methodName)
-    {
-        left!.GenerateILValue(ilGenerator, local);
-        right.GenerateILValue(ilGenerator, local);
-
-        ilGenerator.Emit(OpCodes.Callvirt, typeof(ValueType).GetMethod(methodName)!);
-        ilGenerator.Emit(OpCodes.Newobj, typeof(BoolValue).GetConstructor([typeof(bool)])!);
-    }
-
-    private void GenerateConcatOp(ILGenerator ilGenerator, LocalManager local)
-    {
-        left!.GenerateILValue(ilGenerator, local);
-        right.GenerateILValue(ilGenerator, local);
-
-        ilGenerator.Emit(OpCodes.Callvirt, typeof(ValueType).GetMethod("DotToIL", [typeof(ValueType)])!);
-    }
-
-    private void GenerateLogicalOp(ILGenerator ilGenerator, LocalManager local, string methodName)
-    {
-        left!.GenerateILValue(ilGenerator, local);
-        right.GenerateILValue(ilGenerator, local);
-
-        ilGenerator.Emit(OpCodes.Callvirt, typeof(BoolValue).GetMethod(methodName)!);
-        ilGenerator.Emit(OpCodes.Newobj, typeof(BoolValue).GetConstructor([typeof(bool)])!);
-    }
-
-    public override void GenerateILValue(ILGenerator ilGenerator, LocalManager local)
+    private Type OutputType(ILGenerator ilGenerator, LocalManager local)
     {
         if (left == null)
         {
@@ -194,72 +167,116 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
             switch (opera)
             {
                 case OldTokenGeneric.NOT:
-                    right.GenerateILValue(ilGenerator, local);
-                    ilGenerator.Emit(OpCodes.Callvirt, typeof(BoolValue).GetProperty("Value")!.GetGetMethod()!);
-                    ilGenerator.Emit(OpCodes.Ldc_I4_0);
-                    ilGenerator.Emit(OpCodes.Ceq);
-                    ilGenerator.Emit(OpCodes.Newobj, typeof(BoolValue).GetConstructor([typeof(bool)])!);
-                    break;
+                    right.LoadILValue(ilGenerator, local);
+                    ilGenerator.Emit(OpCodes.Ldc_I4_1); // 加载常量 1
+                    ilGenerator.Emit(OpCodes.Xor); // 进行异或运算
+                    return typeof(bool);
                 case OldTokenGeneric.MINUS:
-                    right.GenerateILValue(ilGenerator, local);
-                    ilGenerator.Emit(OpCodes.Call, typeof(IntValue).GetProperty("Value")!.GetGetMethod()!);
+                    right.LoadILValue(ilGenerator, local);
                     ilGenerator.Emit(OpCodes.Neg);
-                    ilGenerator.Emit(OpCodes.Newobj, typeof(IntValue).GetConstructor([typeof(int)])!);
-                    break;
+                    return typeof(bool);
                 default:
                     throw new NotSupportedException($"Unsupported unary operator: {opera}");
             }
         }
-        else
+
+        var leftType = left?.OutputType(local);
+        var rightType = right.OutputType(local);
+
+        switch (opera)
         {
-            // 处理双目运算符
-            switch (opera)
-            {
-                case OldTokenGeneric.PLUS:
-                    GenerateBinaryOp(ilGenerator, local, typeof(IntValue), "Plus");
-                    break;
-                case OldTokenGeneric.MINUS:
-                    GenerateBinaryOp(ilGenerator, local, typeof(IntValue), "Minus");
-                    break;
-                case OldTokenGeneric.TIMES:
-                    GenerateBinaryOp(ilGenerator, local, typeof(IntValue), "Times");
-                    break;
-                case OldTokenGeneric.DIVIDE:
-                    GenerateBinaryOp(ilGenerator, local, typeof(IntValue), "Divide");
-                    break;
-                case OldTokenGeneric.GREATER:
-                    GenerateComparisonOp(ilGenerator, local, "Greater");
-                    break;
-                case OldTokenGeneric.LESSER:
-                    GenerateComparisonOp(ilGenerator, local, "Less");
-                    break;
-                case OldTokenGeneric.EQUALS:
-                    GenerateComparisonOp(ilGenerator, local, "Equal");
-                    break;
-                case OldTokenGeneric.DIFFERENT:
-                    GenerateComparisonOp(ilGenerator, local, "Different");
-                    break;
-                case OldTokenGeneric.CONCAT:
-                    GenerateConcatOp(ilGenerator, local);
-                    break;
-                case OldTokenGeneric.AND:
-                    GenerateLogicalOp(ilGenerator, local, "And");
-                    break;
-                case OldTokenGeneric.OR:
-                    GenerateLogicalOp(ilGenerator, local, "Or");
-                    break;
-                case OldTokenGeneric.XOR:
-                    GenerateLogicalOp(ilGenerator, local, "Xor");
-                    break;
-                case OldTokenGeneric.LESS_EQUAL:
-                    GenerateComparisonOp(ilGenerator, local, "LessEqual");
-                    break;
-                case OldTokenGeneric.GREATER_EQUAL:
-                    GenerateComparisonOp(ilGenerator, local, "GreaterEqual");
-                    break;
-                default:
-                    throw new NotSupportedException($"Unsupported binary operator: {opera}");
-            }
+            case OldTokenGeneric.PLUS:
+                left!.LoadILValue(ilGenerator, local);
+                right.LoadILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Add);
+                if (leftType == typeof(string) || rightType == typeof(string))
+                    return typeof(string);
+
+                if (leftType == typeof(double) || rightType == typeof(double))
+                    return typeof(double);
+
+                return typeof(int);
+            case OldTokenGeneric.MINUS:
+                left!.LoadILValue(ilGenerator, local);
+                right.LoadILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Sub);
+                if (leftType == typeof(double) || rightType == typeof(double))
+                    return typeof(double);
+                return typeof(int);
+            case OldTokenGeneric.TIMES:
+                left!.LoadILValue(ilGenerator, local);
+                right.LoadILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Mul);
+                if (leftType == typeof(double) || rightType == typeof(double))
+                    return typeof(double);
+                if (leftType == typeof(double) || rightType == typeof(double))
+                    return typeof(double);
+                return typeof(int);
+            case OldTokenGeneric.DIVIDE:
+                left!.LoadILValue(ilGenerator, local);
+                right.LoadILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Div);
+                if (leftType == typeof(double) || rightType == typeof(double))
+                    return typeof(double);
+                return typeof(int);
+            case OldTokenGeneric.GREATER:
+                left!.LoadILValue(ilGenerator, local);
+                right.LoadILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Cgt);
+                return typeof(bool);
+            case OldTokenGeneric.LESSER:
+                left!.LoadILValue(ilGenerator, local);
+                right.LoadILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Clt);
+                return typeof(bool);
+            case OldTokenGeneric.EQUALS:
+                left!.LoadILValue(ilGenerator, local);
+                right.LoadILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Ceq);
+                return typeof(bool);
+            case OldTokenGeneric.DIFFERENT:
+                left!.LoadILValue(ilGenerator, local);
+                right.LoadILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Ceq);
+                ilGenerator.Emit(OpCodes.Ldc_I4_1);
+                ilGenerator.Emit(OpCodes.Xor);
+                return typeof(bool);
+            case OldTokenGeneric.AND:
+                left!.LoadILValue(ilGenerator, local);
+                right.LoadILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.And);
+                return typeof(bool);
+            case OldTokenGeneric.OR:
+                left!.LoadILValue(ilGenerator, local);
+                right.LoadILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Or);
+                return typeof(bool);
+            case OldTokenGeneric.XOR:
+                left!.LoadILValue(ilGenerator, local);
+                right.LoadILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Xor);
+                return typeof(bool);
+            case OldTokenGeneric.LESS_EQUAL:
+                left!.LoadILValue(ilGenerator, local);
+                right.LoadILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Cgt);
+                ilGenerator.Emit(OpCodes.Ldc_I4_1);
+                ilGenerator.Emit(OpCodes.Xor);
+                return typeof(bool);
+            case OldTokenGeneric.GREATER_EQUAL:
+                left!.LoadILValue(ilGenerator, local);
+                right.LoadILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Clt);
+                ilGenerator.Emit(OpCodes.Ldc_I4_1);
+                ilGenerator.Emit(OpCodes.Xor);
+                return typeof(bool);
+            case OldTokenGeneric.CONCAT:
+                left!.LoadILValue(ilGenerator, local);
+                right.LoadILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Callvirt, typeof(ValueType).GetMethod("DotToIL", [typeof(ValueType)])!);
+                return typeof(string);
+            default:
+                throw new NotSupportedException($"Unsupported binary operator: {opera}");
         }
     }
 }
