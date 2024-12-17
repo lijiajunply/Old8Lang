@@ -9,7 +9,7 @@ namespace Old8Lang.AST.Expression.Value;
 public class FuncValue : ValueType
 {
     public readonly OldID? Id;
-    private readonly BlockStatement BlockStatement = new([]);
+    public readonly BlockStatement BlockStatement = new([]);
 
     public readonly List<OldID>? Ids;
 

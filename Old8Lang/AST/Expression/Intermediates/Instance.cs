@@ -156,5 +156,12 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
                 ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("Write", [iPrint.OutputType(local)!])!);
                 return;
         }
+
+        var result = local.DelegateVar[Id.IdName];
+        foreach (var id in Ids)
+        {
+            id.LoadILValue(ilGenerator, local);
+        }
+        ilGenerator.Emit(OpCodes.Call,result);
     }
 }

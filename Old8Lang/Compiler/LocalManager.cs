@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Reflection.Emit;
 
 namespace Old8Lang.Compiler;
@@ -5,7 +6,8 @@ namespace Old8Lang.Compiler;
 public class LocalManager
 {
     private readonly Dictionary<string, LocalBuilder> LocalVar = [];
-
+    public readonly Dictionary<string, MethodInfo> DelegateVar = [];
+    
     public LocalBuilder? GetLocalVar(string name)
     {
         return LocalVar.GetValueOrDefault(name);

@@ -38,3 +38,9 @@ switch a {
 for i in [1~3] {
     PrintLine(i)
 }
+
+func main() {
+    PrintLine("HelloWorld")
+}
+
+main()

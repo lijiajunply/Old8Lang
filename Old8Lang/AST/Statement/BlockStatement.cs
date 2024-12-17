@@ -50,6 +50,11 @@ public class BlockStatement : OldStatement
 
     public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
     {
+        foreach (var statement in ImportStatements)
+        {
+            statement.GenerateIL(ilGenerator, local);
+        }
+        
         foreach (var statement in OtherStatements)
         {
             statement.GenerateIL(ilGenerator, local);
