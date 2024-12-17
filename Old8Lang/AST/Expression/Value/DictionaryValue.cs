@@ -7,11 +7,11 @@ public class DictionaryValue(List<TupleValue> tuples) : ValueType, IOldList
 {
     public readonly List<(ValueType Key, ValueType Value)> Value = [];
 
-    public override ValueType Run(ref VariateManager Manager)
+    public override ValueType Run(VariateManager Manager)
     {
         foreach (var tuple in tuples)
         {
-            tuple.Run(ref Manager);
+            tuple.Run(Manager);
             Value.Add(tuple.Value);
         }
 
@@ -46,14 +46,14 @@ public class DictionaryValue(List<TupleValue> tuples) : ValueType, IOldList
         return "{" + sb + "}";
     }
 
-    public override ValueType Converse(ValueType otherValueType, ref VariateManager Manager)
+    public override ValueType Converse(ValueType otherValueType, VariateManager Manager)
     {
         if (otherValueType is not AnyValue typeAny) return new VoidValue();
 
         foreach (var a in Value)
         {
-            var aKey = a.Key.Run(ref Manager);
-            var aValue = a.Value.Run(ref Manager);
+            var aKey = a.Key.Run(Manager);
+            var aValue = a.Value.Run(Manager);
             if (aKey is not StringValue s) continue;
             typeAny.Set(new OldID(s.Value), aValue);
         }

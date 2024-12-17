@@ -51,11 +51,11 @@ public class Interpreter
         var block = Build(dot);
         sw.Stop();
         var ts = sw.Elapsed.TotalMilliseconds;
-        var time = $"Parser Build Time : {ts}ms\n";
+        var time = $"------------------\nParser Build Time : {ts}ms\n";
         var milliseconds = ts;
 
         sw.Restart();
-        block.Run(ref Manager);
+        block.Run( Manager);
         sw.Stop();
         ts = sw.Elapsed.TotalMilliseconds;
         time += $"Process Run Time : {ts}ms\n";

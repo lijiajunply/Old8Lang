@@ -4,10 +4,10 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class OldItem(OldID listId, OldExpr key) : ValueType
 {
-    public override ValueType Run(ref VariateManager Manager)
+    public override ValueType Run(VariateManager Manager)
     {
         var a = Manager.GetValue(listId);
-        OldExpr result = key.Run(ref Manager);
+        OldExpr result = key.Run(Manager);
         if (a is ListValue list && result is IntValue intResult)
             return list.Get(intResult);
         if (a is ArrayValue array && result is IntValue i)

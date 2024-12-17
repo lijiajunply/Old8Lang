@@ -1,3 +1,5 @@
+using System.Reflection.Emit;
+using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Statement;
@@ -8,25 +10,28 @@ namespace Old8Lang.AST.Statement;
 public class IfStatement(OldIf ifBlock, List<OldIf?> elifBlock, BlockStatement? elseBlockStatement)
     : OldStatement
 {
-    public override void Run(ref VariateManager Manager)
+    public override void Run(VariateManager Manager)
     {
         var r = true;
         Manager.AddChildren();
-        ifBlock.Run(ref Manager, ref r);
+        ifBlock.Run(Manager, ref r);
         Manager.RemoveChildren();
-        foreach (var variable in elifBlock)
+        foreach (var variable in elifBlock.OfType<OldIf>())
         {
-            if(variable is null)continue;
             Manager.AddChildren();
-            variable.Run(ref Manager, ref r);
+            variable.Run(Manager, ref r);
             Manager.RemoveChildren();
         }
 
         if (r)
-            elseBlockStatement?.Run(ref Manager);
-        
+            elseBlockStatement?.Run(Manager);
+    }
+
+    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    {
+        throw new NotImplementedException();
     }
 
     public override string ToString() =>
-        $"if({ifBlock} else if{Apis.ListToString(elifBlock)} \nelse: {elseBlockStatement}";
+        $"if {ifBlock} else if{Apis.ListToString(elifBlock)} \nelse {{ {elseBlockStatement} }}";
 }

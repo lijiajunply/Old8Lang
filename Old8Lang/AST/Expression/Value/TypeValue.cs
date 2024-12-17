@@ -10,9 +10,9 @@ public class TypeValue : ValueType
     public TypeValue(OldExpr expr) => Expr = expr;
     public TypeValue(string value) => Value = value;
 
-    public override ValueType Run(ref VariateManager Manager)
+    public override ValueType Run(VariateManager Manager)
     {
-        var result = Expr?.Run(ref Manager);
+        var result = Expr?.Run(Manager);
         if (result == null) return new VoidValue();
         Value = result.TypeToString();
         return this;

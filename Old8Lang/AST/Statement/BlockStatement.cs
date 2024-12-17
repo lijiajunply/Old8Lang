@@ -1,5 +1,7 @@
+using System.Reflection.Emit;
 using System.Text;
 using Old8Lang.AST.Expression;
+using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Statement;
@@ -9,7 +11,7 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public class BlockStatement : OldStatement
 {
-    private readonly List<OldStatement> ImportStatements  = [];
+    private readonly List<OldStatement> ImportStatements = [];
     private readonly List<OldStatement> OtherStatements = [];
 
     public BlockStatement(IEnumerable<OldLangTree> statements)
@@ -31,26 +33,34 @@ public class BlockStatement : OldStatement
         }
     }
 
-    public override void Run(ref VariateManager Manager)
+    public override void Run(VariateManager Manager)
     {
         foreach (var statement in ImportStatements)
         {
-            statement.Run(ref Manager);
+            statement.Run(Manager);
             if (Manager.IsReturn) return;
         }
 
         foreach (var statement in OtherStatements)
         {
-            statement.Run(ref Manager);
+            statement.Run(Manager);
             if (Manager.IsReturn) return;
         }
     }
 
-    public void ImportRun(ref VariateManager Manager)
+    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    {
+        foreach (var statement in OtherStatements)
+        {
+            statement.GenerateIL(ilGenerator, local);
+        }
+    }
+
+    public void ImportRun(VariateManager Manager)
     {
         foreach (var statement in ImportStatements)
         {
-            statement.Run(ref Manager);
+            statement.Run(Manager);
             if (Manager.IsReturn) return;
         }
     }
@@ -62,7 +72,7 @@ public class BlockStatement : OldStatement
             sb.Append(statement + Environment.NewLine);
         foreach (var statement in OtherStatements)
             sb.Append(statement + Environment.NewLine);
-        
+
         return sb.ToString();
     }
 
@@ -71,14 +81,19 @@ public class BlockStatement : OldStatement
         var sb = new StringBuilder();
         var import = ImportStatements.OfType<ImportStatement>().ToList();
         var func = ImportStatements.Where(x => x is ClassInit or FuncInit).ToList();
+        sb.AppendLine("using System;");
         foreach (var importStatement in import)
-            sb.Append(importStatement);
+            sb.AppendLine(importStatement.ToString());
+        sb.AppendLine("static class Program");
+        sb.AppendLine("{");
         foreach (var statement in func)
-            sb.Append(statement);
-        sb.Append("class Project{public void Main(){");
+            sb.AppendLine(statement.ToString());
+        sb.AppendLine("public static void Main(string[] args)");
+        sb.AppendLine("{");
         foreach (var statement in OtherStatements)
-            sb.Append(statement);
-        sb.Append("}}");
+            sb.AppendLine(statement.ToString());
+        sb.AppendLine("}");
+        sb.AppendLine("}");
         return sb.ToString();
     }
 

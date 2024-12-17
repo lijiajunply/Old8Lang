@@ -9,3 +9,4 @@ fib(a) ->
 }
 
 a <- fib(25)
+PrintLine(a)

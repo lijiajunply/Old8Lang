@@ -1,3 +1,5 @@
+using System.Reflection.Emit;
+using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
 
 // ReSharper disable once CheckNamespace
@@ -8,24 +10,24 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
     public readonly List<OldExpr> Ids = ids;
     public readonly OldID Id = oldId;
 
-    public override ValueType Run(ref VariateManager Manager)
+    public override ValueType Run(VariateManager Manager)
     {
         var results = new List<ValueType>();
 
         foreach (var t in Ids)
         {
-            results.Add(t.Run(ref Manager));
+            results.Add(t.Run(Manager));
         }
 
         switch (Id.IdName)
         {
             case "Type":
-                return new TypeValue(results[0]).Run(ref Manager);
+                return new TypeValue(results[0]).Run(Manager);
             case "Exec":
             {
                 if (results[0] is not StringValue stringValue) return new VoidValue();
                 var a = Manager.Interpreter?.Build(code: stringValue.Value);
-                a?.Run(ref Manager);
+                a?.Run(Manager);
                 return new VoidValue();
             }
             case "ShowValues":
@@ -67,10 +69,10 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
             }
         }
 
-        var result = Id.Run(ref Manager);
+        var result = Id.Run(Manager);
         if (result is FuncValue funcValue)
         {
-            result = funcValue.Run(ref Manager, Ids);
+            result = funcValue.Run(Manager, Ids);
         }
 
         // 初始化 调用init方法
@@ -79,7 +81,7 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
             if (anyValue.Result.TryGetValue("init", out result))
             {
                 if (result is not FuncValue value) throw new Exception("init is not function");
-                value.Run(ref anyValue.manager, results.OfType<OldExpr>().ToList());
+                value.Run(anyValue.manager, results.OfType<OldExpr>().ToList());
             }
             else if (results.Count != 0)
             {
@@ -93,7 +95,7 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
         {
             List<ValueType> a = [];
             foreach (var id in Ids)
-                a.Add(id.Run(ref Manager));
+                a.Add(id.Run(Manager));
             nativeAnyValue.New(Apis.ListToObjects(a).ToArray());
             result = nativeAnyValue;
         }
@@ -129,5 +131,30 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
         return ObjToValue(r!);
     }
 
-    public override string ToString() => Id + "(" + Apis.ListToString(Ids) + ")";
+    public override string ToString()
+    {
+        return Id.IdName switch
+        {
+            "PrintLine" => $"Console.WriteLine({Apis.ListToString(Ids)});",
+            "Print" => $"Console.Write({Apis.ListToString(Ids)});",
+            _ => Id + "(" + Apis.ListToString(Ids) + ")"
+        };
+    }
+
+    public override void GenerateILValue(ILGenerator ilGenerator, LocalManager local)
+    {
+        switch (Id.IdName)
+        {
+            case "PrintLine":
+                var iPrintLine = Ids[0];
+                iPrintLine.GenerateILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", [iPrintLine.OutputType(local)!])!);
+                return;
+            case "Print":
+                var iPrint = Ids[0];
+                iPrint.GenerateILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("Write", [iPrint.OutputType(local)!])!);
+                return;
+        }
+    }
 }

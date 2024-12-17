@@ -5,14 +5,11 @@ namespace Old8Lang.AST.Expression;
 
 public class StringTreeList(List<OldExpr> list) : ValueType
 {
-    public override ValueType Run(ref VariateManager Manager)
+    public override ValueType Run(VariateManager Manager)
     {
-        var result = "";
-        foreach (var item in list)
-        {
-            var value = item.Run(ref Manager);
-            result += value.ToString();
-        }
+        var result = list.Select(item => item.Run(Manager))
+            .Aggregate("", (current, value) => current + value);
+
         return new StringValue(result);
     }
 }

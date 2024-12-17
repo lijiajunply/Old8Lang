@@ -6,9 +6,9 @@ public class TupleValue(OldExpr v1, OldExpr v2) : ValueType
 {
     public ValueTuple<ValueType, ValueType> Value { get; private set; }
 
-    public override ValueType Run(ref VariateManager Manager)
+    public override ValueType Run(VariateManager Manager)
     {
-        Value = (v1.Run(ref Manager), v2.Run(ref Manager));
+        Value = (v1.Run(Manager), v2.Run(Manager));
         return this;
     }
 

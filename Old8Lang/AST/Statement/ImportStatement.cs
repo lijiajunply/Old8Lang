@@ -1,10 +1,12 @@
+using System.Reflection.Emit;
+using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Statement;
 
 public class ImportStatement(string importString) : OldStatement
 {
-    public override void Run(ref VariateManager Manager)
+    public override void Run(VariateManager Manager)
     {
         if (Manager.LangInfo!.LibInfos.Any(x => importString == x.LibName))
         {
@@ -14,7 +16,7 @@ public class ImportStatement(string importString) : OldStatement
             Manager.Path = path;
             var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
             var a = Manager.Interpreter?.Build(code: code);
-            a?.ImportRun(ref Manager);
+            a?.ImportRun(Manager);
             Manager.Path = previousPath;
             return;
         }
@@ -27,7 +29,7 @@ public class ImportStatement(string importString) : OldStatement
             Manager.Path = path;
             var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
             var a = Manager.Interpreter?.Build(code: code);
-            a?.ImportRun(ref Manager);
+            a?.ImportRun(Manager);
             Manager.Path = previousPath;
             return;
         }
@@ -39,8 +41,13 @@ public class ImportStatement(string importString) : OldStatement
         var PreviousPath = Manager.Path;
         Manager.Path = filePath;
         var result = Manager.Interpreter?.Build(code: Apis.FromFile(filePath));
-        result?.ImportRun(ref Manager);
+        result?.ImportRun(Manager);
         Manager.Path = PreviousPath;
+    }
+
+    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    {
+        throw new NotImplementedException();
     }
 
     public override string ToString() => $"using {importString}";

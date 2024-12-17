@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using ValueType = Old8Lang.AST.Expression.ValueType;
@@ -16,7 +15,7 @@ public static class Apis
             return "";
         var builder = new StringBuilder();
         for (var i = 0; i < a.Count; i++)
-            builder.Append(a[i] + (i == a.Count - 1 ? "" : " "));
+            builder.Append(a[i] + (i == a.Count - 1 ? "" : ","));
 
         return builder.ToString();
     }

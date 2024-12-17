@@ -9,14 +9,14 @@ public class AnyValue : ValueType
     public readonly Dictionary<string, ValueType> Result = new();
     public readonly OldID Id;
 
-    public VariateManager manager;
+    public readonly VariateManager manager;
 
     public AnyValue(OldID id, Dictionary<OldID, OldExpr> variates)
     {
         Variates = variates;
         Id = id;
         manager = new VariateManager();
-        Run(ref manager);
+        Run(manager);
         manager.Init(Result);
         manager.IsClass = true;
     }
@@ -35,11 +35,11 @@ public class AnyValue : ValueType
         manager.IsClass = true;
     }
 
-    public sealed override ValueType Run(ref VariateManager Manager)
+    public sealed override ValueType Run(VariateManager Manager)
     {
         manager.AnyInfo.AddRange(Manager.AnyInfo.Where(x => x is not FuncValue).ToList());
         foreach (var variable in Variates.Keys)
-            Result.Add(variable.IdName, Variates[variable].Run(ref Manager));
+            Result.Add(variable.IdName, Variates[variable].Run(Manager));
         return this;
     }
 
@@ -51,22 +51,22 @@ public class AnyValue : ValueType
             {
                 var a = manager.GetValue(id);
                 if (a == null) throw new Exception("not found");
-                return a.Run(ref manager);
+                return a.Run(manager);
             }
             case FuncValue func:
             {
                 if (func.Id?.IdName == "GetType")
                     return new TypeValue(TypeToString());
-                return func.Run(ref manager);
+                return func.Run(manager);
             }
             default:
-                return dotExpr.Run(ref manager);
+                return dotExpr.Run(manager);
         }
     }
 
     public void Set(OldID id, ValueType valueType) => manager.Set(id, valueType);
 
-    public override ValueType Converse(ValueType otherValueType, ref VariateManager Manager)
+    public override ValueType Converse(ValueType otherValueType, VariateManager Manager)
     {
         if (otherValueType is not AnyValue typeAny) return new VoidValue();
 

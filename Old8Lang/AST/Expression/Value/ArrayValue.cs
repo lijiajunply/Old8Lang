@@ -22,10 +22,10 @@ public class ArrayValue : ValueType, IOldList
 
     public ArrayValue(List<object> a) => RunResult = a.Select(ObjToValue).ToArray();
 
-    public override ValueType Run(ref VariateManager Manager)
+    public override ValueType Run(VariateManager Manager)
     {
         for (var i = 0; i < Values.Count; i++)
-            RunResult[i] = Values[i].Run(ref Manager);
+            RunResult[i] = Values[i].Run(Manager);
         return this;
     }
 

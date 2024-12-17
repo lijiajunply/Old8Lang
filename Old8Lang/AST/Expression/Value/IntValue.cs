@@ -1,3 +1,6 @@
+using System.Reflection.Emit;
+using System.Text;
+using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
@@ -69,7 +72,7 @@ public class IntValue(int intValue) : ValueType
             return Value > i.Value;
         throw new Exception("not fount the type: " + otherValue!.TypeToString());
     }
-    
+
     public override bool LessEqual(ValueType? otherValue)
     {
         if (otherValue is DoubleValue d)
@@ -78,7 +81,7 @@ public class IntValue(int intValue) : ValueType
             return Value <= i.Value;
         throw new Exception("not fount the type: " + otherValue!.TypeToString());
     }
-    
+
     public override bool GreaterEqual(ValueType? otherValue)
     {
         if (otherValue is DoubleValue d)
@@ -95,7 +98,7 @@ public class IntValue(int intValue) : ValueType
         return false;
     }
 
-    public override ValueType Converse(ValueType otherValueType, ref VariateManager _)
+    public override ValueType Converse(ValueType otherValueType, VariateManager _)
     {
         if (otherValueType is not TypeValue value) throw new Exception("the value is not a type");
 
@@ -111,4 +114,57 @@ public class IntValue(int intValue) : ValueType
     }
 
     public override object GetValue() => Value;
+
+    public override void SetValueToIL(ILGenerator ilGenerator, LocalManager local, string idName)
+    {
+        var valueLocal = ilGenerator.DeclareLocal(typeof(int));
+        ilGenerator.Emit(OpCodes.Ldc_I4, Value);
+        ilGenerator.Emit(OpCodes.Stloc, valueLocal);
+        local.AddLocalVar(idName, valueLocal);
+    }
+
+    public override Type OutputType(LocalManager local)
+    {
+        return typeof(int);
+    }
+
+    public override void GenerateILValue(ILGenerator ilGenerator, LocalManager local)
+    {
+        ilGenerator.Emit(OpCodes.Ldc_I4, Value);
+    }
+}
+
+public static class IntOperatorStatic
+{
+    public static int Plus(int i, int j) => i + j;
+    public static double Plus(int i, double j) => i + j;
+    public static string Plus(int i, string j) => i + j;
+    public static int Minus(int i, int j) => i - j;
+    public static double Minus(int i, double j) => i - j;
+    public static int Times(int i, int j) => i * j;
+    public static double Times(int i, double j) => i * j;
+
+    public static string Times(int i, string j)
+    {
+        var sb = new StringBuilder();
+        for (var k = 0; k < j.Length; k++)
+            sb.Append(i);
+        return sb.ToString();
+    }
+
+    public static int Divide(int i, int j) => i / j;
+    public static double Divide(int i, double j) => i / j;
+    public static bool Greater(int i, int j) => i > j;
+    public static bool Greater(int i, double j) => i > j;
+    public static bool Less(int i, int j) => i < j;
+    public static bool Less(int i, double j) => i < j;
+    public static bool Equal(int i, int j) => i == j;
+    public static bool Different(int i, int j) => i != j;
+    public static bool LessEqual(int i, int j) => i <= j;
+    public static bool LessEqual(int i, double j) => i <= j;
+    public static bool GreaterEqual(int i, int j) => i >= j;
+    public static bool GreaterEqual(int i, double j) => i >= j;
+    public static bool And(bool i, bool j) => i && j;
+    public static bool Or(bool i, bool j) => i || j;
+    public static bool Xor(bool i, bool j) => i ^ j;
 }

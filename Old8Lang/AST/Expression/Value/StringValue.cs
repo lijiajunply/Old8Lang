@@ -1,4 +1,6 @@
+using System.Reflection.Emit;
 using System.Text;
+using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
@@ -8,7 +10,7 @@ public class StringValue(string context) : ValueType, IOldList
     public readonly string Value = context.Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\r", "\r")
         .Replace(@"\\", "\\");
 
-    public override string ToString() => Value;
+    public override string ToString() => $"\"{Value}\"";
     public override ValueType Plus(ValueType otherValueType) => new StringValue(Value + otherValueType);
 
     public override bool Equal(ValueType? otherValueType)
@@ -31,7 +33,7 @@ public class StringValue(string context) : ValueType, IOldList
         return new VoidValue();
     }
 
-    public override ValueType Converse(ValueType otherValueType, ref VariateManager _)
+    public override ValueType Converse(ValueType otherValueType, VariateManager _)
     {
         if (otherValueType is not TypeValue value) throw new Exception("the value is not a type");
 
@@ -56,5 +58,13 @@ public class StringValue(string context) : ValueType, IOldList
         if (start < 0) start += Value.Length;
         if (end < 0) end += Value.Length + 1;
         return new StringValue(Value[start..end]);
+    }
+    
+    public override void SetValueToIL(ILGenerator ilGenerator, LocalManager local,string idName)
+    {
+        var valueLocal = ilGenerator.DeclareLocal(typeof(string));
+        ilGenerator.Emit(OpCodes.Ldstr, Value);
+        ilGenerator.Emit(OpCodes.Stloc, valueLocal);
+        local.AddLocalVar(idName, valueLocal);
     }
 }

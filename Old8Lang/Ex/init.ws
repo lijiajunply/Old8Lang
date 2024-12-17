@@ -1,6 +1,6 @@
 PrintLine("引用模块\n")
-import Terminal
-import other
+//import Terminal
+//import other
 
 // 测试Json
 PrintLine("测试Json")

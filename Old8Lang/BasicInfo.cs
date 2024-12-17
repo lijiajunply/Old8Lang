@@ -54,7 +54,7 @@ public static class BasicInfo
             return Path.Combine(Path.GetDirectoryName(CodePath)!, "Old8Lang", "LangInfo.json");
 #endif
             return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                "LangInfo.json");;
+                "LangInfo.json");
         }
     }
 
@@ -69,7 +69,8 @@ public static class BasicInfo
         { "Info", "info" },
         { "Install", "-i" },
         { "Help", "-h" },
-        { "Remove", "-r" }
+        { "Remove", "-r" },
+        { "Compiler", "-c" }
     };
 
     public static string CodePath

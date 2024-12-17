@@ -34,13 +34,13 @@ public class NativeAnyValue(string dllName, string className, string path) : Val
             var method = ClassType?.GetMethod(instance.Id.IdName);
             if (method == null) return new VoidValue();
             var func = new FuncValue(instance.Id.IdName, method);
-            return func.Run(ref manager, instance.Ids, InstanceObj);
+            return func.Run(manager, instance.Ids, InstanceObj);
         }
 
         return new VoidValue();
     }
 
-    public override ValueType Run(ref VariateManager Manager)
+    public override ValueType Run(VariateManager Manager)
     {
         var assembly = Assembly.LoadFile(path);
         ClassType = assembly.GetType($"{dllName}.{ClassName}")!;

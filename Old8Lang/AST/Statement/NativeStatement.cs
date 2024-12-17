@@ -1,5 +1,7 @@
 using System.Reflection;
+using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
 using Old8Lang.Error;
 
@@ -42,7 +44,7 @@ public class NativeStatement : OldStatement
         Name = name;
     }
 
-    public override void Run(ref VariateManager Manager)
+    public override void Run(VariateManager Manager)
     {
         var path = $"{Path.GetDirectoryName(Manager.Path)}/dll/{DllName}.dll"; // filepath/dll/dllname
         var assembly = Assembly.LoadFile(path);
@@ -72,7 +74,12 @@ public class NativeStatement : OldStatement
             return;
         }
 
-        Manager.AddClassAndFunc(new NativeAnyValue(DllName, ClassName, path).Run(ref Manager));
+        Manager.AddClassAndFunc(new NativeAnyValue(DllName, ClassName, path).Run(Manager));
+    }
+
+    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    {
+        throw new NotImplementedException();
     }
 
     public override string ToString() => $"[import {DllName} {ClassName} {MethodName} {NativeName}]\n{FuncValue}";

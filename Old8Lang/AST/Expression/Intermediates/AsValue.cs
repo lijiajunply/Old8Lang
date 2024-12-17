@@ -7,12 +7,12 @@ namespace Old8Lang.AST.Statement;
 
 public class AsValue(OldExpr id, OldID asId) : ValueType
 {
-    public override ValueType Run(ref VariateManager Manager)
+    public override ValueType Run(VariateManager Manager)
     {
-        var value = id.Run(ref Manager);
+        var value = id.Run(Manager);
         var type = Manager.GetAny(asId);
-        
+
         type ??= new TypeValue(asId.IdName);
-        return value.Converse(type, ref Manager);
+        return value.Converse(type, Manager);
     }
 }

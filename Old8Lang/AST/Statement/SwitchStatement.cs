@@ -1,3 +1,5 @@
+using System.Reflection.Emit;
+using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Statement;
@@ -8,22 +10,27 @@ public class SwitchStatement(
     BlockStatement? defaultBlockStatement = null)
     : OldStatement
 {
-    public override void Run(ref VariateManager Manager)
+    public override void Run(VariateManager Manager)
     {
         Manager.AddChildren();
-        var switchValue = switchExpr.Run(ref Manager);
+        var switchValue = switchExpr.Run(Manager);
 
         foreach (var oldCase in switchCaseList)
         {
-            var caseValue = oldCase.Expr.Run(ref Manager);
+            var caseValue = oldCase.Expr.Run(Manager);
             if (!switchValue.Equal(caseValue)) continue;
-            oldCase.BlockStatement.Run(ref Manager);
+            oldCase.BlockStatement.Run(Manager);
             Manager.RemoveChildren();
             return;
         }
 
-        defaultBlockStatement?.Run(ref Manager);
+        defaultBlockStatement?.Run(Manager);
         Manager.RemoveChildren();
+    }
+
+    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    {
+        throw new NotImplementedException();
     }
 }
 
@@ -32,8 +39,13 @@ public class OldCase(OldExpr expr, BlockStatement blockStatement) : OldStatement
     public OldExpr Expr { get; } = expr;
     public BlockStatement BlockStatement { get; } = blockStatement;
 
-    public override void Run(ref VariateManager Manager)
+    public override void Run(VariateManager Manager)
     {
-        BlockStatement.Run(ref Manager);
+        BlockStatement.Run(Manager);
+    }
+
+    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    {
+        throw new NotImplementedException();
     }
 }

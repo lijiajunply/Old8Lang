@@ -12,10 +12,10 @@ public class ListValue : ValueType, IOldList
 
     public ListValue(List<object> value) => Values = value.Select(ObjToValue).ToList();
 
-    public override ValueType Run(ref VariateManager Manager)
+    public override ValueType Run(VariateManager Manager)
     {
         foreach (var expr in Value)
-            Values.Add(expr.Run(ref Manager));
+            Values.Add(expr.Run(Manager));
         return this;
     }
 

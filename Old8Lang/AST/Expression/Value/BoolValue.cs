@@ -1,3 +1,5 @@
+using System.Reflection.Emit;
+using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
@@ -6,7 +8,7 @@ public class BoolValue(bool value) : ValueType
 {
     public readonly bool Value = value;
     public override string ToString() => Value.ToString();
-    public override ValueType Run(ref VariateManager Manager) => this;
+    public override ValueType Run(VariateManager Manager) => this;
 
     public override bool Equal(ValueType? otherValueType)
     {
@@ -15,7 +17,7 @@ public class BoolValue(bool value) : ValueType
         return false;
     }
 
-    public override ValueType Converse(ValueType otherValueType, ref VariateManager _)
+    public override ValueType Converse(ValueType otherValueType, VariateManager _)
     {
         if (otherValueType is not TypeValue value) throw new Exception("the value is not a type");
 
@@ -28,5 +30,13 @@ public class BoolValue(bool value) : ValueType
             "Double" or "double" => new DoubleValue(Value ? 1.0 : 0.0),
             _ => throw new Exception("not fount the type: " + value.Value)
         };
+    }
+
+    public override void SetValueToIL(ILGenerator ilGenerator, LocalManager local, string idName)
+    {
+        var valueLocal = ilGenerator.DeclareLocal(typeof(bool));
+        ilGenerator.Emit(Value ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
+        ilGenerator.Emit(OpCodes.Stloc, valueLocal);
+        local.AddLocalVar(idName, valueLocal);
     }
 }

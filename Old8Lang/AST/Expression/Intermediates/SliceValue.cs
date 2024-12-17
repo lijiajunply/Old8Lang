@@ -4,11 +4,11 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class SliceValue(OldID id, OldExpr? start = null, OldExpr? end = null) : ValueType
 {
-    public override ValueType Run(ref VariateManager Manager)
+    public override ValueType Run(VariateManager Manager)
     {
-        var value = id.Run(ref Manager);
-        var start1 = start?.Run(ref Manager);
-        var end1 = end?.Run(ref Manager);
+        var value = id.Run(Manager);
+        var start1 = start?.Run(Manager);
+        var end1 = end?.Run(Manager);
 
         if (value is not IOldList list) return new VoidValue();
 

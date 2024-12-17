@@ -45,9 +45,9 @@ public abstract class ValueType : OldExpr
 
     #endregion
 
-    public virtual ValueType Converse(ValueType otherValueType, ref VariateManager Manager) => new VoidValue();
+    public virtual ValueType Converse(ValueType otherValueType, VariateManager Manager) => new VoidValue();
 
-    public override ValueType Run(ref VariateManager Manager) => this;
+    public override ValueType Run(VariateManager Manager) => this;
 
     public string TypeToString()
     {
