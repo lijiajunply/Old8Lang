@@ -27,52 +27,52 @@ public class ForInStatement(OldID id, OldExpr expr, OldStatement body) : OldStat
 
     public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
     {
-        // var variableName = id.IdName;
-        // LocalBuilder arrayLocal = ilGenerator.DeclareLocal(typeof(int[])); 
-        // LocalBuilder indexLocal = ilGenerator.DeclareLocal(typeof(int));   
-        // LocalBuilder elementLocal = ilGenerator.DeclareLocal(typeof(int), variableName); // 使用指定变量名
-        //
-        // // 存储输入数组
-        // ilGenerator.Emit(OpCodes.Ldarg_0);
-        // ilGenerator.Emit(OpCodes.Stloc, arrayLocal.LocalIndex);
-        //
-        // // 初始化索引
-        // ilGenerator.Emit(OpCodes.Ldc_I4_0);
-        // ilGenerator.Emit(OpCodes.Stloc, indexLocal.LocalIndex);
-        //
-        // // 循环开始标签
-        // Label loopStart = ilGenerator.DefineLabel();
-        // Label loopEnd = ilGenerator.DefineLabel();
-        //
-        // ilGenerator.MarkLabel(loopStart);
-        //
-        // // 检查索引是否小于数组长度
-        // ilGenerator.Emit(OpCodes.Ldloc, indexLocal.LocalIndex);
-        // ilGenerator.Emit(OpCodes.Ldloc, arrayLocal.LocalIndex);
-        // ilGenerator.Emit(OpCodes.Ldlen);
-        // ilGenerator.Emit(OpCodes.Conv_I4);
-        // ilGenerator.Emit(OpCodes.Bge, loopEnd);
-        //
-        // // 获取当前元素
-        // ilGenerator.Emit(OpCodes.Ldloc, arrayLocal.LocalIndex);
-        // ilGenerator.Emit(OpCodes.Ldloc, indexLocal.LocalIndex);
-        // ilGenerator.Emit(OpCodes.Ldelem_I4);
-        // ilGenerator.Emit(OpCodes.Stloc, elementLocal.LocalIndex);
-        //
-        // // 处理元素（支持自定义处理逻辑）
-        // body.GenerateIL(ilGenerator, local);
-        //
-        // // 增加索引
-        // ilGenerator.Emit(OpCodes.Ldloc, indexLocal.LocalIndex);
-        // ilGenerator.Emit(OpCodes.Ldc_I4_1);
-        // ilGenerator.Emit(OpCodes.Add);
-        // ilGenerator.Emit(OpCodes.Stloc, indexLocal.LocalIndex);
-        //
-        // // 跳回循环开始
-        // ilGenerator.Emit(OpCodes.Br, loopStart);
-        //
-        // // 循环结束
-        // ilGenerator.MarkLabel(loopEnd);
-        // ilGenerator.Emit(OpCodes.Ret);
+        expr.LoadILValue(ilGenerator, local);
+        ilGenerator.Emit(OpCodes.Ldlen); // 获取数组长度
+        ilGenerator.Emit(OpCodes.Conv_I4); // 转换为 int
+        var len = ilGenerator.DeclareLocal(typeof(int));
+        ilGenerator.Emit(OpCodes.Stloc, len.LocalIndex); // 存储到 length
+        local.AddLocalVar("len", len);
+
+        // 初始化 index
+        ilGenerator.Emit(OpCodes.Ldc_I4_0); // 加载 0
+        var index = ilGenerator.DeclareLocal(typeof(int));
+        ilGenerator.Emit(OpCodes.Stloc, index.LocalIndex); // 存储到 length
+        local.AddLocalVar("index", index);
+
+        // 创建循环开始标签
+        Label loopStart = ilGenerator.DefineLabel();
+        Label loopEnd = ilGenerator.DefineLabel();
+
+        // 循环开始
+        ilGenerator.MarkLabel(loopStart);
+
+        // 检查 index 是否小于 length
+        ilGenerator.Emit(OpCodes.Ldloc, index); // 加载 index
+        ilGenerator.Emit(OpCodes.Ldloc, len); // 加载 length
+        ilGenerator.Emit(OpCodes.Bge, loopEnd); // 如果 index >= length，跳转到 loopEnd
+
+        // 获取当前元素
+        expr.LoadILValue(ilGenerator, local); // 加载 enumerator
+        ilGenerator.Emit(OpCodes.Ldloc,index); // 加载 index
+        ilGenerator.Emit(OpCodes.Ldelem_I4); // 获取元素
+        var item = ilGenerator.DeclareLocal(typeof(int));
+        ilGenerator.Emit(OpCodes.Stloc, item.LocalIndex); // 存储到 length
+        local.AddLocalVar(id.IdName, item);
+
+        // 打印当前元素
+        body.GenerateIL(ilGenerator, local);
+
+        // index +1
+        ilGenerator.Emit(OpCodes.Ldloc, index); // 加载 index
+        ilGenerator.Emit(OpCodes.Ldc_I4_1); // 加载 1
+        ilGenerator.Emit(OpCodes.Add); // index++
+        ilGenerator.Emit(OpCodes.Stloc, index); // 存储回 index
+
+        // 跳回循环开始
+        ilGenerator.Emit(OpCodes.Br, loopStart);
+
+        // 循环结束标签
+        ilGenerator.MarkLabel(loopEnd);
     }
 }

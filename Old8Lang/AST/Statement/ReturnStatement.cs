@@ -14,7 +14,7 @@ public class ReturnStatement(OldExpr returnExpr) : OldStatement
 
     public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
     {
-        throw new NotImplementedException();
+        ilGenerator.Emit(OpCodes.Ret);
     }
 
     public override string ToString() => $"return {returnExpr};";

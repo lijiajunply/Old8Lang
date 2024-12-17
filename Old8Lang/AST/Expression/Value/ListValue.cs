@@ -1,3 +1,5 @@
+using System.Reflection.Emit;
+using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
@@ -46,5 +48,19 @@ public class ListValue : ValueType, IOldList
         return new ListValue(Values[start..end]
             .OfType<OldExpr>()
             .ToList());
+    }
+
+    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
+    {
+        var listConstructor = typeof(List<int>).GetConstructor(Type.EmptyTypes)!;
+        ilGenerator.Emit(OpCodes.Newobj, listConstructor); // 创建 List<int> 实例
+
+        // 向 List<int> 中添加元素
+        var addMethod = typeof(List<int>).GetMethod("Add")!;
+        for (var i = 0; i < 5; i++)
+        {
+            ilGenerator.Emit(OpCodes.Ldc_I4, i); // 加载要添加的整数
+            ilGenerator.Emit(OpCodes.Callvirt, addMethod); // 调用 Add 方法
+        }
     }
 }

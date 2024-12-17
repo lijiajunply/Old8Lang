@@ -1,3 +1,5 @@
+using System.Reflection.Emit;
+using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
 using Old8Lang.Error;
 
@@ -57,4 +59,30 @@ public class ArrayValue : ValueType, IOldList
         if (end < 0) end += RunResult.Length + 1;
         return new ArrayValue(RunResult[start..end]);
     }
+
+    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
+    {
+        // 创建一个长度为 5 的整数数组
+        var len = RunResult.Length;
+        ilGenerator.Emit(OpCodes.Ldc_I4, len); // 加载数组长度
+        ilGenerator.Emit(OpCodes.Newarr, typeof(object)); // 创建新数组
+
+        for (var i = 0; i < len; i++)
+        {
+            ilGenerator.Emit(OpCodes.Dup); // 复制数组引用
+            ilGenerator.Emit(OpCodes.Ldc_I4, i); // 加载索引 0
+            if (len == Values.Count)
+            {
+                Values[i].LoadILValue(ilGenerator, local);
+            }
+            else
+            {
+                RunResult[i].LoadILValue(ilGenerator, local);
+            }
+
+            ilGenerator.Emit(OpCodes.Stelem_I4); // 将值存入数组
+        }
+    }
+
+    public override Type OutputType(LocalManager local) => typeof(object[]);
 }
