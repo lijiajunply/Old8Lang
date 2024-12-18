@@ -153,10 +153,27 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
         }
 
         var result = local.DelegateVar[Id.IdName];
-        
-        foreach (var id in Ids)
+
+        if (result is MethodBuilder)
         {
-            id.LoadILValue(ilGenerator, local);
+            foreach (var id in Ids)
+            {
+                id.LoadILValue(ilGenerator, local);
+            }
+        }
+        else
+        {
+            var a = result.GetParameters();
+            for (int i = 0; i < Ids.Count; i++)
+            {
+                var id = Ids[i];
+                id.LoadILValue(ilGenerator, local);
+                var idType = id.OutputType(local);
+                if (a[i].ParameterType == typeof(object) && idType!.IsValueType)
+                {
+                    ilGenerator.Emit(OpCodes.Box, idType);
+                }
+            }
         }
 
         ilGenerator.Emit(OpCodes.Call, result);

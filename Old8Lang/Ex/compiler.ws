@@ -38,12 +38,8 @@ for i in [1~3] {
     PrintLine(i)
 }
 
-Last <- 1
-Second <- 1
-Now <- 1
-for i <- 2 , i < 35 , i++{
-    Now <- Last + Second
-    Second <- Last
-    Last <- Now
+func main(a) {
+    PrintLine(a)
 }
-PrintLine(Now)
+
+main("asdf")

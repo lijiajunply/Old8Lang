@@ -134,18 +134,20 @@ public class OldParser
     [Production("primary: DOUBLE")]
     public OldLangTree DOUBLE(Token<OldTokenGeneric> token) => new DoubleValue(double.Parse(token.Value));
 
-    [Production("primary: IDENTIFIER")]
-    public OldLangTree IDENTIFIER(Token<OldTokenGeneric> id) => new OldID(id.Value);
+    // [Production("primary: IDENTIFIER")]
+    // public OldLangTree IDENTIFIER(Token<OldTokenGeneric> id) => new OldID(id.Value);
 
     [Production("primary: ident")]
     public OldLangTree Id(OldLangTree id) => id;
 
-    [Production("ident: IDENTIFIER")]
-    public OldLangTree Id_1(Token<OldTokenGeneric> id) => new OldID(id.Value);
-
-    [Production("ident: IDENTIFIER COLON[d] IDENTIFIER")]
-    public OldLangTree Id_2(Token<OldTokenGeneric> id, Token<OldTokenGeneric> assumptionType) =>
-        new OldID(id.Value, assumptionType.Value);
+    [Production("ident: IDENTIFIER (COLON[d] IDENTIFIER)?")]
+    public OldLangTree Id_1(Token<OldTokenGeneric> id,ValueOption<Group<OldTokenGeneric, OldLangTree>> assumptionType)
+    {
+        var eGrp = assumptionType.Match(
+            x => x, () => null!);
+        var assumption = eGrp?.Token(0).Value;
+        return new OldID(id.Value,assumption ?? "");
+    }
 
     [Production("primary: TRUE[d]")]
     public OldLangTree BoolTrue() => new BoolValue(true);

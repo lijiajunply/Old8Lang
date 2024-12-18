@@ -79,9 +79,13 @@ public class Interpreter
                 try
                 {
                     Error.Add($"{x.ErrorType} : {x.ErrorMessage ?? ""}");
+                    var lines = code.Split("\n");
+                    Error.Add($"{lines[x.Line]}");
                 }catch (Exception)
                 {
-                    Error.Add(x.ErrorType.ToString());
+                    Error.Add($"{x.ErrorType} in line {x.Line+1} , col {x.Column}");
+                    var lines = code.Split("\n");
+                    Error.Add($"{lines[x.Line]}");
                 }
             });
             throw new Exception(string.Join("\n", Error));

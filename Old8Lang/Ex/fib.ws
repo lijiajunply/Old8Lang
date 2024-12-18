@@ -9,4 +9,9 @@ fib:int (a:int) ->
 }
 
 a <- fib(30)
-PrintLine(a)
+
+func main (a) {
+    PrintLine(a)
+}
+
+main(a)

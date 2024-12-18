@@ -3,6 +3,8 @@ using Old8Lang;
 using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
 
+// fib , compiler
+
 #if DEBUG
 string[] strings =
 [
