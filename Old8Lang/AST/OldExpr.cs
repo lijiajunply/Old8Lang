@@ -42,6 +42,6 @@ public class OldExpr : OldLangTree
 
     public virtual Type? OutputType(LocalManager local)
     {
-        return null;
+        throw new NotImplementedException();
     }
 }

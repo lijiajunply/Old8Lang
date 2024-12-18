@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
@@ -138,6 +137,16 @@ public class OldParser
     [Production("primary: IDENTIFIER")]
     public OldLangTree IDENTIFIER(Token<OldTokenGeneric> id) => new OldID(id.Value);
 
+    [Production("primary: ident")]
+    public OldLangTree Id(OldLangTree id) => id;
+
+    [Production("ident: IDENTIFIER")]
+    public OldLangTree Id_1(Token<OldTokenGeneric> id) => new OldID(id.Value);
+
+    [Production("ident: IDENTIFIER COLON[d] IDENTIFIER")]
+    public OldLangTree Id_2(Token<OldTokenGeneric> id, Token<OldTokenGeneric> assumptionType) =>
+        new OldID(id.Value, assumptionType.Value);
+
     [Production("primary: TRUE[d]")]
     public OldLangTree BoolTrue() => new BoolValue(true);
 
@@ -148,15 +157,15 @@ public class OldParser
 
     #region Arg and Id Array
 
-    [Production("idList: IDENTIFIER (COMMA[d] IDENTIFIER)*")]
-    public OldLangTree IdList(Token<OldTokenGeneric> first, List<Group<OldTokenGeneric, OldLangTree>> list)
+    [Production("idList: ident (COMMA[d] ident)*")]
+    public OldLangTree IdList(OldLangTree first, List<Group<OldTokenGeneric, OldLangTree>> list)
     {
         var a = new List<OldID>();
 
-        if (first.IsEmpty) return new IdList(a);
+        if (first is not OldID firstId) return new IdList(a);
 
-        a.Add(new OldID(first.Value));
-        list.ForEach(x => a.Add(new OldID(x.Token(0).Value)));
+        a.Add(firstId);
+        list.ForEach(x => a.Add(x.Value(0) as OldID ?? new OldID("")));
         return new IdList(a);
     }
 
@@ -436,12 +445,13 @@ public class OldParser
     [Production("statement: func")]
     public OldLangTree FuncTree(OldLangTree a) => a;
 
-    [Production("func: IDENTIFIER LPAREN[d] idList? RPAREN[d] DIS_SET[d] block")]
-    [Production("func: FUNC[d] IDENTIFIER LPAREN[d] idList? RPAREN[d] block")]
-    public OldLangTree Func(Token<OldTokenGeneric> id, ValueOption<OldLangTree> ids, BlockStatement blockStatement)
+    [Production("func: ident LPAREN[d] idList? RPAREN[d] DIS_SET[d] block")]
+    [Production("func: FUNC[d] ident LPAREN[d] idList? RPAREN[d] block")]
+    public OldLangTree Func(OldLangTree id, ValueOption<OldLangTree> ids, BlockStatement blockStatement)
     {
+        if (id is not OldID oldId) return id;
         var value = ids.Match(x => x, () => null!);
-        return new FuncInit(new FuncValue(new OldID(id.Value),
+        return new FuncInit(new FuncValue(oldId,
             value is not IdList idList ? [] : idList.Args,
             blockStatement));
     }

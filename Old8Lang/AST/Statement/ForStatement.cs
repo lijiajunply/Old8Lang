@@ -64,6 +64,10 @@ public class ForStatement(
         ilGenerator.MarkLabel(loopEnd);
     }
 
+    public override OldStatement this[int index] => blockStatement[index];
+
+    public override int Count => blockStatement.Count;
+
     public override string ToString()
     {
         var sb = new StringBuilder($"for({setStatement} ; {expr} ; {statement})");

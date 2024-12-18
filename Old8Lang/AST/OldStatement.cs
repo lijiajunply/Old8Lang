@@ -6,6 +6,10 @@ namespace Old8Lang.AST;
 
 public abstract class OldStatement : OldLangTree
 {
-    public virtual void Run(VariateManager Manager){}
-    public abstract void GenerateIL(ILGenerator ilGenerator,LocalManager local);
+    public abstract void Run(VariateManager Manager);
+
+    public abstract void GenerateIL(ILGenerator ilGenerator, LocalManager local);
+
+    public abstract OldStatement? this[int index] { get; }
+    public abstract int Count { get; }
 }

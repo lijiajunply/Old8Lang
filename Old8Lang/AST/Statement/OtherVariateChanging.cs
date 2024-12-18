@@ -40,5 +40,9 @@ public class OtherVariateChanging(OldID id, OldExpr sumId, OldExpr expr) : OldSt
         throw new NotImplementedException();
     }
 
+    public override OldStatement? this[int index] => null;
+
+    public override int Count => 0;
+
     public override string ToString() => $"{id}.{sumId} = {expr}";
 }

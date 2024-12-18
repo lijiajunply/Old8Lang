@@ -22,5 +22,9 @@ public class SetStatement(OldID id, OldExpr value) : OldStatement
         Value.SetValueToIL(ilGenerator, local,Id.IdName);
     }
 
+    public override OldStatement this[int index] => this;
+
+    public override int Count => 0;
+
     public override string ToString() => $"var {Id} = {Value};";
 }

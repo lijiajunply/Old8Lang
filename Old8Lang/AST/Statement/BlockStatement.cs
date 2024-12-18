@@ -13,6 +13,7 @@ public class BlockStatement : OldStatement
 {
     private readonly List<OldStatement> ImportStatements = [];
     private readonly List<OldStatement> OtherStatements = [];
+    public override int Count => OtherStatements.Count;
 
     public BlockStatement(IEnumerable<OldLangTree> statements)
     {
@@ -54,7 +55,7 @@ public class BlockStatement : OldStatement
         {
             statement.GenerateIL(ilGenerator, local);
         }
-        
+
         foreach (var statement in OtherStatements)
         {
             statement.GenerateIL(ilGenerator, local);
@@ -127,4 +128,6 @@ public class BlockStatement : OldStatement
             _ => (null!, null!)
         };
     }
+
+    public override OldStatement this[int index] => OtherStatements[index];
 }

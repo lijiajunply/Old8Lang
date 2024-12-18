@@ -5,10 +5,11 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression;
 
-public class OldID(string name) : OldExpr
+public class OldID(string name,string assumptionType = "") : OldExpr
 {
     public readonly string IdName = name;
     public override string ToString() => IdName;
+    private string AssumptionType { get; } = assumptionType;
 
     public override bool Equals(object? obj)
     {
@@ -30,9 +31,22 @@ public class OldID(string name) : OldExpr
         ilGenerator.Emit(OpCodes.Ldloc, value.LocalIndex);
     }
 
-    public override Type? OutputType(LocalManager local)
+    public override Type OutputType(LocalManager local)
     {
+        if (!string.IsNullOrEmpty(AssumptionType))
+        {
+            return AssumptionType switch
+            {
+                "int" => typeof(int),
+                "double" => typeof(double),
+                "string" => typeof(string),
+                "bool" => typeof(bool),
+                "char" => typeof(char),
+                "void" => typeof(void),
+                _ => typeof(object)
+            };
+        }
         var value = local.GetLocalVar(IdName);
-        return value?.LocalType;
+        return value?.LocalType ?? typeof(object);
     }
 }

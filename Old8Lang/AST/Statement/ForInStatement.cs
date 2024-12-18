@@ -75,4 +75,8 @@ public class ForInStatement(OldID id, OldExpr expr, OldStatement body) : OldStat
         // 循环结束标签
         ilGenerator.MarkLabel(loopEnd);
     }
+
+    public override OldStatement this[int index] => body[index];
+
+    public override int Count => body.Count;
 }

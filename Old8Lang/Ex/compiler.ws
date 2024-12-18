@@ -1,4 +1,5 @@
 // 基本计算和赋值
+
 a <- 123
 a <- 1233
 b <- a >= 1233 
@@ -16,7 +17,7 @@ else
 
 // for语句
 
-/*
+
 for a <- 1,a <= 5,a++{
     PrintLine(a)
 }
@@ -33,14 +34,16 @@ switch a {
         PrintLine("default")
 }
 
-*/
-
 for i in [1~3] {
     PrintLine(i)
 }
 
-func main() {
-    PrintLine("HelloWorld")
+Last <- 1
+Second <- 1
+Now <- 1
+for i <- 2 , i < 35 , i++{
+    Now <- Last + Second
+    Second <- Last
+    Last <- Now
 }
-
-main()
+PrintLine(Now)

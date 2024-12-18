@@ -12,12 +12,7 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
 
     public override ValueType Run(VariateManager Manager)
     {
-        var results = new List<ValueType>();
-
-        foreach (var t in Ids)
-        {
-            results.Add(t.Run(Manager));
-        }
+        var results = Ids.Select(t => t.Run(Manager)).ToList();
 
         switch (Id.IdName)
         {
@@ -94,8 +89,7 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
         if (result is NativeAnyValue nativeAnyValue)
         {
             List<ValueType> a = [];
-            foreach (var id in Ids)
-                a.Add(id.Run(Manager));
+            a.AddRange(Ids.Select(id => id.Run(Manager)));
             nativeAnyValue.New(Apis.ListToObjects(a).ToArray());
             result = nativeAnyValue;
         }
@@ -148,7 +142,8 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
             case "PrintLine":
                 var iPrintLine = Ids[0];
                 iPrintLine.LoadILValue(ilGenerator, local);
-                ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", [iPrintLine.OutputType(local)!])!);
+                ilGenerator.Emit(OpCodes.Call,
+                    typeof(Console).GetMethod("WriteLine", [iPrintLine.OutputType(local)!])!);
                 return;
             case "Print":
                 var iPrint = Ids[0];
@@ -158,10 +153,26 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
         }
 
         var result = local.DelegateVar[Id.IdName];
+        
         foreach (var id in Ids)
         {
             id.LoadILValue(ilGenerator, local);
         }
-        ilGenerator.Emit(OpCodes.Call,result);
+
+        ilGenerator.Emit(OpCodes.Call, result);
+    }
+
+    public override Type OutputType(LocalManager local)
+    {
+        switch (Id.IdName)
+        {
+            case "PrintLine":
+            case "Print":
+                return typeof(void);
+        }
+
+        var result = local.DelegateVar[Id.IdName];
+
+        return result.ReturnType;
     }
 }

@@ -50,5 +50,9 @@ public class ImportStatement(string importString) : OldStatement
         throw new NotImplementedException();
     }
 
+    public override OldStatement this[int index] => this;
+
+    public override int Count => 0;
+
     public override string ToString() => $"using {importString}";
 }

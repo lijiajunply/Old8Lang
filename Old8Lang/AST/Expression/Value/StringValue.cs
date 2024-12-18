@@ -10,7 +10,7 @@ public class StringValue(string context) : ValueType, IOldList
     public readonly string Value = context.Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\r", "\r")
         .Replace(@"\\", "\\");
 
-    public override string ToString() => $"\"{Value}\"";
+    public override string ToString() => Value;
     public override ValueType Plus(ValueType otherValueType) => new StringValue(Value + otherValueType);
 
     public override bool Equal(ValueType? otherValueType)

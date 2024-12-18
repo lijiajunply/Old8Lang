@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text;
 using Old8Lang.AST.Statement;
+using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
 using Old8Lang.Error;
 
@@ -37,9 +38,7 @@ public class FuncValue : ValueType
     {
         if (Method != null)
         {
-            var values = new List<ValueType>();
-            foreach (var expr in ids)
-                values.Add(expr.Run(Manager));
+            var values = ids.Select(expr => expr.Run(Manager)).ToList();
             var a = Apis.ListToObjects(values).ToArray();
             object? invoke;
             try
@@ -81,6 +80,36 @@ public class FuncValue : ValueType
         return variateManager.Result;
     }
 
+    public override Type OutputType(LocalManager local)
+    {
+        var idType = Id?.OutputType(local);
+        if (idType != null && idType != typeof(object)) return idType;
+        var a = GetItemType(BlockStatement, local);
+        return a;
+    }
+
+    private static Type GetItemType(OldStatement statement, LocalManager local)
+    {
+        for (var i = 0; i < statement.Count; i++)
+        {
+            var item = statement[i];
+
+            if (item is ReturnStatement returnStatement)
+            {
+                return returnStatement.OutputType(local);
+            }
+
+            if (item == null || item.Count == 0)
+            {
+                continue;
+            }
+
+            return GetItemType(item, local);
+        }
+
+        return typeof(void);
+    }
+
     public override string ToString()
     {
         if (Method != null)
@@ -90,7 +119,7 @@ public class FuncValue : ValueType
 
         var builder = new StringBuilder();
         for (var i = 0; i < Ids!.Count; i++)
-            builder.Append("dynamic "+Ids[i] + (i == Ids.Count - 1 ? "" : ","));
+            builder.Append("dynamic " + Ids[i] + (i == Ids.Count - 1 ? "" : ","));
         return $"public static dynamic {Id} ({builder}) \n {{ {BlockStatement} }}";
     }
 }

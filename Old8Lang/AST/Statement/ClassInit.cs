@@ -14,5 +14,9 @@ public class ClassInit(AnyValue anyValue) : OldStatement
         throw new NotImplementedException();
     }
 
+    public override OldStatement this[int index] => this;
+
+    public override int Count => 0;
+
     public override string ToString() => anyValue.ToString();
 }

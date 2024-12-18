@@ -60,5 +60,9 @@ public class WhileStatement(OldExpr expr, BlockStatement blockStatement) : OldSt
         ilGenerator.MarkLabel(loopEnd);
     }
 
+    public override OldStatement this[int index] => blockStatement[index];
+
+    public override int Count => blockStatement.Count;
+
     public override string ToString() => $"while({expr}){blockStatement}";
 }

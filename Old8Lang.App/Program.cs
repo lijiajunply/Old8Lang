@@ -1,4 +1,5 @@
-﻿using Old8Lang;
+﻿using System.Diagnostics;
+using Old8Lang;
 using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
 
@@ -6,7 +7,7 @@ using Old8Lang.CslyParser;
 string[] strings =
 [
     "-c", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,
-        "Old8Lang", "Ex", "compiler.ws")
+        "Old8Lang", "Ex", "fib.ws")
 ];
 
 args = args.Length == 0 ? strings : args;
@@ -96,6 +97,22 @@ if (args[0] == BasicInfo.Order["Remove"])
 if (args[0] == BasicInfo.Order["Compiler"])
 {
     var interpreter = new Interpreter(args[1], false);
+    var sw = new Stopwatch();
+    sw.Start();
     var build = interpreter.Build();
-    Compiler.Compile(build);
+    sw.Stop();
+    var ts = sw.Elapsed.TotalMilliseconds;
+    var time = $"------------------\nParser Build Time : {ts}ms\n";
+    var milliseconds = ts;
+    
+    var aDelegate = Compiler.Compile(build);
+    
+    sw.Restart();
+    aDelegate();
+    sw.Stop();
+    ts = sw.Elapsed.TotalMilliseconds;
+    time += $"Process Run Time : {ts}ms\n";
+    milliseconds += ts;
+    time += $"Total : {milliseconds}ms";
+    Console.WriteLine(time);
 }

@@ -18,6 +18,11 @@ public class OldIf(OldExpr expr, BlockStatement blockStatement) : OldStatement
 
     public override string ToString() => $"({expr})\n {{ {blockStatement} }}";
 
+    public override void Run(VariateManager Manager)
+    {
+        blockStatement.Run(Manager);
+    }
+
     public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
     {
         blockStatement.GenerateIL(ilGenerator, local);
@@ -27,4 +32,8 @@ public class OldIf(OldExpr expr, BlockStatement blockStatement) : OldStatement
     {
         expr.LoadILValue(ilGenerator, local);
     }
+
+    public override OldStatement this[int index] => blockStatement[index];
+
+    public override int Count => blockStatement.Count;
 }

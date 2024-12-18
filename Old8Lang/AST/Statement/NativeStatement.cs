@@ -82,5 +82,9 @@ public class NativeStatement : OldStatement
         throw new NotImplementedException();
     }
 
+    public override OldStatement this[int index] => this;
+
+    public override int Count => 0;
+
     public override string ToString() => $"[import {DllName} {ClassName} {MethodName} {NativeName}]\n{FuncValue}";
 }

@@ -29,12 +29,19 @@ public class FuncRunStatement : OldStatement
     {
         if (Operation == null)
         {
-            Instance?.LoadILValue(ilGenerator, local);
+            if (Instance == null) return;
+            Instance.LoadILValue(ilGenerator, local);
+            // 销毁栈上的值
+            if (Instance.OutputType(local) != typeof(void)) ilGenerator.Emit(OpCodes.Pop);
             return;
         }
 
         Operation.LoadILValue(ilGenerator, local);
     }
+
+    public override OldStatement this[int index] => this;
+
+    public override int Count => 0;
 
     public override string ToString() => Instance?.ToString()!;
 }

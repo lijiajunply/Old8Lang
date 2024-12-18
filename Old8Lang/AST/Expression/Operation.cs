@@ -148,8 +148,10 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
             {
                 ilGenerator.Emit(OpCodes.Stloc, b.LocalIndex);
             }
+
             return;
         }
+
         ilGenerator.Emit(OpCodes.Stloc, valueLocal.LocalIndex);
         local.AddLocalVar(idName, valueLocal);
     }
@@ -159,8 +161,25 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
         OutputType(ilGenerator, local);
     }
 
+    public override Type? OutputType(LocalManager local)
+    {
+        var leftType = left?.OutputType(local);
+        var rightType = right.OutputType(local);
+        // if (leftType == typeof(object) && rightType == typeof(object))
+        //     return typeof(object);
+        return leftType == typeof(object) ? rightType : leftType;
+    }
+
     private Type OutputType(ILGenerator ilGenerator, LocalManager local)
     {
+        var leftType = left?.OutputType(local);
+        var rightType = right.OutputType(local);
+
+        if (leftType == typeof(object) || rightType == typeof(object))
+        {
+            return typeof(object);
+        }
+
         if (left == null)
         {
             // 处理单目运算符
@@ -179,9 +198,6 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
                     throw new NotSupportedException($"Unsupported unary operator: {opera}");
             }
         }
-
-        var leftType = left?.OutputType(local);
-        var rightType = right.OutputType(local);
 
         switch (opera)
         {

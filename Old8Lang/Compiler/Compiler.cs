@@ -8,7 +8,7 @@ namespace Old8Lang.Compiler;
 
 public static class Compiler
 {
-    public static void Compile(BlockStatement statement)
+    public static Action Compile(BlockStatement statement)
     {
         var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
         var ilGenerator = dynamicMethod.GetILGenerator();
@@ -16,7 +16,7 @@ public static class Compiler
         statement.GenerateIL(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Ret);
         var oldLangRun = (Action)dynamicMethod.CreateDelegate(typeof(Action));
-        oldLangRun();
+        return oldLangRun;
     }
 
     public static void CompileByCode(BlockStatement statement)

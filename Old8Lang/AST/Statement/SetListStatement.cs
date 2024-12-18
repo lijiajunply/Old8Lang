@@ -26,4 +26,7 @@ public class SetListStatement(List<OldID> ids, List<OldExpr> expr) : OldStatemen
             Value.SetValueToIL(ilGenerator, local, Id.IdName);
         }
     }
+
+    public override OldStatement this[int index] => this;
+    public override int Count => 0;
 }

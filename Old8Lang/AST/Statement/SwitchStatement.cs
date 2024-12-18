@@ -46,6 +46,10 @@ public class SwitchStatement(
         }
         ilGenerator.MarkLabel(labelEnd);
     }
+
+    public override OldStatement this[int index] => switchCaseList[index];
+
+    public override int Count => switchCaseList.Count;
 }
 
 public class OldCase(OldExpr expr, BlockStatement blockStatement) : OldStatement
@@ -67,4 +71,8 @@ public class OldCase(OldExpr expr, BlockStatement blockStatement) : OldStatement
         ilGenerator.MarkLabel(labelCase);
         BlockStatement.GenerateIL(ilGenerator, local);
     }
+
+    public override OldStatement this[int index] => BlockStatement[index];
+
+    public override int Count => BlockStatement.Count;
 }

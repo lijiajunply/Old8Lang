@@ -1,4 +1,4 @@
-fib(a) ->
+fib:int (a:int) ->
 {
    if a == 1
       return 1
@@ -8,5 +8,5 @@ fib(a) ->
       return fib(a-1)+fib(a-2)
 }
 
-a <- fib(25)
+a <- fib(30)
 PrintLine(a)

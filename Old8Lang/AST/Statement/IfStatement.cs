@@ -62,6 +62,26 @@ public class IfStatement(OldIf ifBlock, List<OldIf?> elifBlock, BlockStatement? 
         ilGenerator.MarkLabel(labelEnd);
     }
 
+    public override OldStatement? this[int index]
+    {
+        get
+        {
+            if (index == 0)
+            {
+                return ifBlock;
+            }
+
+            if (index == elifBlock.Count)
+            {
+                return elseBlockStatement;
+            }
+
+            return elifBlock[index];
+        }
+    }
+
+    public override int Count => 1 + elifBlock.Count + (elseBlockStatement == null ? 0 : 1);
+
     public override string ToString() =>
         $"if {ifBlock} else if{Apis.ListToString(elifBlock)} \nelse {{ {elseBlockStatement} }}";
 }
