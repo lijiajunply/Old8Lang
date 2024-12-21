@@ -62,6 +62,22 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
                 Manager.Interpreter?.UseClass.Write(value);
                 return new VoidValue();
             }
+            case "Compiler":
+            {
+                if (results.Count == 0) return new VoidValue();
+                var value = results[0].ToString();
+                var statement = Manager.Interpreter?.Build(code: value);
+                var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
+                var ilGenerator = dynamicMethod.GetILGenerator();
+                var local = new LocalManager();
+                statement?.GenerateIL(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Ret);
+                foreach (var info in local.DelegateVar)
+                {
+                    Manager.AddClassAndFunc(new FuncValue(info.Key,info.Value));
+                }
+                return new VoidValue();
+            }
         }
 
         var result = Id.Run(Manager);
@@ -140,19 +156,64 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
         switch (Id.IdName)
         {
             case "PrintLine":
-                var iPrintLine = Ids[0];
-                iPrintLine.LoadILValue(ilGenerator, local);
+                var id = Ids[0];
+                id.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Call,
-                    typeof(Console).GetMethod("WriteLine", [iPrintLine.OutputType(local)!])!);
+                    typeof(Console).GetMethod("WriteLine", [id.OutputType(local)!])!);
                 return;
             case "Print":
-                var iPrint = Ids[0];
-                iPrint.LoadILValue(ilGenerator, local);
-                ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("Write", [iPrint.OutputType(local)!])!);
+                id = Ids[0];
+                id.LoadILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Call,
+                    typeof(Console).GetMethod("Write", [id.OutputType(local)!])!);
+                return;
+            case "Json":
+                return;
+            case "ToObj":
+                return;
+            case "Type":
+                id = Ids[0];
+                id.LoadILValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Call, typeof(object).GetMethod("GetType")!);
                 return;
         }
 
-        var result = local.DelegateVar[Id.IdName];
+        var result = local.DelegateVar.GetValueOrDefault(Id.IdName);
+
+        if (result == null)
+        {
+            var classType = local.ClassVar.GetValueOrDefault(Id.IdName);
+            if (classType == null) return;
+            // 获取默认构造函数
+            var constructorInfo = classType.GetConstructor(Type.EmptyTypes);
+            if (constructorInfo != null)
+            {
+                ilGenerator.Emit(OpCodes.Newobj, constructorInfo);
+            }
+
+            var local_a = ilGenerator.DeclareLocal(classType);
+            ilGenerator.Emit(OpCodes.Stloc, local_a.LocalIndex);
+            ilGenerator.Emit(OpCodes.Ldloc, local_a.LocalIndex);
+
+            var initFunc = classType.GetMethod("init");
+            if (initFunc == null) return;
+            var a = initFunc.GetParameters();
+            for (var i = 0; i < Ids.Count; i++)
+            {
+                var id = Ids[i];
+                id.LoadILValue(ilGenerator, local);
+                var idType = id.OutputType(local);
+                if (a[i].ParameterType == typeof(object) && idType!.IsValueType)
+                {
+                    ilGenerator.Emit(OpCodes.Box, idType);
+                }
+            }
+
+            ilGenerator.Emit(OpCodes.Call, initFunc);
+            ilGenerator.Emit(OpCodes.Ldloc, local_a.LocalIndex);
+
+            return;
+        }
 
         if (result is MethodBuilder)
         {
@@ -164,7 +225,7 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
         else
         {
             var a = result.GetParameters();
-            for (int i = 0; i < Ids.Count; i++)
+            for (var i = 0; i < Ids.Count; i++)
             {
                 var id = Ids[i];
                 id.LoadILValue(ilGenerator, local);

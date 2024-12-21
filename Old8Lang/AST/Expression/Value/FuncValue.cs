@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
@@ -14,7 +15,7 @@ public class FuncValue : ValueType
 
     public readonly List<OldID>? Ids;
 
-    private readonly MethodInfo? Method;
+    public readonly MethodInfo? Method;
 
     private readonly FuncValue? Func;
 
@@ -40,15 +41,7 @@ public class FuncValue : ValueType
         {
             var values = ids.Select(expr => expr.Run(Manager)).ToList();
             var a = Apis.ListToObjects(values).ToArray();
-            object? invoke;
-            try
-            {
-                invoke = Method?.Invoke(obj, a);
-            }
-            catch
-            {
-                throw new ErrorException(this, this);
-            }
+            var invoke = Method?.Invoke(obj, a);
 
             if (invoke is null)
                 return new VoidValue();
@@ -121,5 +114,32 @@ public class FuncValue : ValueType
         for (var i = 0; i < Ids!.Count; i++)
             builder.Append("dynamic " + Ids[i] + (i == Ids.Count - 1 ? "" : ","));
         return $"public static dynamic {Id} ({builder}) \n {{ {BlockStatement} }}";
+    }
+
+    public void LoadIL(MethodBuilder methodBuilder,LocalManager local)
+    {
+        //var funcLocal = new LocalManager();
+        var parameterTypes = Ids!.Select(item => item.OutputType(local)).ToArray();
+
+        // 创建方法的 IL 发射器
+        var methodIL = methodBuilder.GetILGenerator();
+
+        for (var i = 0; i < Ids!.Count; i++)
+        {
+            var id = Ids[i];
+            var localVar = methodIL.DeclareLocal(parameterTypes[i]);
+            local.AddLocalVar(id.IdName, localVar);
+            methodIL.Emit(OpCodes.Ldarg, i);
+
+            methodIL.Emit(OpCodes.Stloc, localVar);
+        }
+
+        local.DelegateVar.Add(Id!.IdName, methodBuilder);
+
+        // 生成方法体的 IL 代码
+        BlockStatement.GenerateIL(methodIL, local);
+
+        // 返回
+        methodIL.Emit(OpCodes.Ret);
     }
 }

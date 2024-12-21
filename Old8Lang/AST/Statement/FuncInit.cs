@@ -19,7 +19,12 @@ public class FuncInit(FuncValue a) : OldStatement
     {
         // 获取方法的名称和参数类型
         var methodName = FuncValue.Id!.IdName;
-        var parameterTypes = FuncValue.Ids!.Select(item => item.OutputType(local)!).ToArray();
+        if (FuncValue.Method != null)
+        {
+            local.DelegateVar.Add(methodName, FuncValue.Method);
+            return;
+        }
+        var parameterTypes = FuncValue.Ids!.Select(item => item.OutputType(local)).ToArray();
 
         // 假设 LocalManager 包含一个 AssemblyBuilder 和 ModuleBuilder 实例
         var assemblyName = new AssemblyName("DynamicAssembly");

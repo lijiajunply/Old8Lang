@@ -11,7 +11,7 @@ public class ClassInit(AnyValue anyValue) : OldStatement
 
     public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
     {
-        throw new NotImplementedException();
+        anyValue.LoadILValue(ilGenerator, local);
     }
 
     public override OldStatement this[int index] => this;

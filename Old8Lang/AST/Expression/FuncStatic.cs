@@ -55,6 +55,24 @@ public static class AnyValueFuncStatic
                 return ValueType.ObjToValue(variable.Value);
             }));
     }
+
+    public static void ToObjIL(string context)
+    {
+        var jsonObject = JsonSerializer.Deserialize<Dictionary<string, object>>(context) ??
+                         new Dictionary<string, object>();
+        var json = new AnyValue(jsonObject.ToDictionary<KeyValuePair<string, object>, OldID, OldExpr>
+        (
+            variable => new OldID(variable.Key),
+            variable =>
+            {
+                if (variable.Value is JsonElement element)
+                {
+                    return GetJsonElement(element);
+                }
+
+                return ValueType.ObjToValue(variable.Value);
+            }));
+    }
 }
 
 public static class ValueTypeFuncStatic

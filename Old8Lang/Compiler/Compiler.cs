@@ -66,4 +66,16 @@ public static class Compiler
             mainMethod?.Invoke(null, [Array.Empty<string>()]);
         }
     }
+
+    public static void CompileTest(BlockStatement statement)
+    {
+        var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
+        var ilGenerator = dynamicMethod.GetILGenerator();
+        var local = new LocalManager();
+        statement.GenerateIL(ilGenerator, local);
+        ilGenerator.Emit(OpCodes.Ret);
+        var fib = local.DelegateVar["fib"];
+        var result = fib.Invoke(null, [25]);
+        Console.WriteLine(result);
+    }
 }

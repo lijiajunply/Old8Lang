@@ -8,8 +8,8 @@ using Old8Lang.CslyParser;
 #if DEBUG
 string[] strings =
 [
-    "-c", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,
-        "Old8Lang", "Ex", "fib.ws")
+    "-f", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,
+        "Old8Lang", "Ex", "class.ws")
 ];
 
 args = args.Length == 0 ? strings : args;
@@ -117,4 +117,11 @@ if (args[0] == BasicInfo.Order["Compiler"])
     milliseconds += ts;
     time += $"Total : {milliseconds}ms";
     Console.WriteLine(time);
+}
+
+if (args[0] == "-ct")
+{
+    var interpreter = new Interpreter(args[1], false);
+    var build = interpreter.Build();
+    Compiler.CompileTest(build);
 }
