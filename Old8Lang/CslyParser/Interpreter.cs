@@ -11,11 +11,12 @@ public class Interpreter
 {
     #region Code
 
-    public VariateManager Manager = new();
+    public readonly VariateManager Manager = new();
     private string Code { get; } = "";
 
     private Parser<OldTokenGeneric, OldLangTree>? parser;
     public AbsUseClass UseClass { get; set; } = new ConsoleUse();
+    public bool IsCompileOptimization { get; set; }
 
     #endregion
 

@@ -1,6 +1,7 @@
 using System.Reflection.Emit;
 using System.Text;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
 
@@ -11,7 +12,7 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public class BlockStatement : OldStatement
 {
-    public readonly List<OldStatement> ImportStatements = [];
+    private readonly List<OldStatement> ImportStatements = [];
     private readonly List<OldStatement> OtherStatements = [];
     public override int Count => OtherStatements.Count;
 
@@ -36,11 +37,7 @@ public class BlockStatement : OldStatement
 
     public override void Run(VariateManager Manager)
     {
-        foreach (var statement in ImportStatements)
-        {
-            statement.Run(Manager);
-            if (Manager.IsReturn) return;
-        }
+        ImportRun(Manager);
 
         foreach (var statement in OtherStatements)
         {
@@ -64,6 +61,22 @@ public class BlockStatement : OldStatement
 
     public void ImportRun(VariateManager Manager)
     {
+        if (Manager.Interpreter is { IsCompileOptimization: true })
+        {
+            var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
+            var ilGenerator = dynamicMethod.GetILGenerator();
+            var local = new LocalManager();
+            var block = new BlockStatement(ImportStatements);
+            block.GenerateIL(ilGenerator, local);
+            ilGenerator.Emit(OpCodes.Ret);
+            foreach (var info in local.DelegateVar)
+            {
+                Manager.AddClassAndFunc(new FuncValue(info.Key, info.Value));
+            }
+
+            return;
+        }
+
         foreach (var statement in ImportStatements)
         {
             statement.Run(Manager);

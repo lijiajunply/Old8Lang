@@ -1,6 +1,6 @@
 PrintLine("引用模块\n")
 //import Terminal
-//import other
+import other
 
 // 测试Json
 PrintLine("测试Json")
@@ -14,7 +14,7 @@ PrintLine(err)
 
 //测试函数 测试For in
 PrintLine("测试函数")
-a <- fib2(20)
+a <- fib2(25)
 a <- fibIter(35)
 for i in a {
     Print(i+" ")

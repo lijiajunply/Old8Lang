@@ -21,13 +21,13 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
             case "Exec":
             {
                 if (results[0] is not StringValue stringValue) return new VoidValue();
-                var a = Manager.Interpreter?.Build(code: stringValue.Value);
-                a?.Run(Manager);
+                var a = Manager.Interpreter.Build(code: stringValue.Value);
+                a.Run(Manager);
                 return new VoidValue();
             }
             case "ShowValues":
             {
-                Manager.Interpreter?.UseClass.WriteLine(Manager.ToString());
+                Manager.Interpreter.UseClass.WriteLine(Manager.ToString());
                 return new VoidValue();
             }
             case "Json":
@@ -42,14 +42,14 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
             {
                 if (results.Count == 0)
                 {
-                    Manager.Interpreter?.UseClass.WriteLine("");
+                    Manager.Interpreter.UseClass.WriteLine("");
                     return new VoidValue();
                 }
 
                 var value = results[0].ToString();
                 for (var i = 1; i < results.Count; i++) value += results[i].ToString();
 
-                Manager.Interpreter?.UseClass.WriteLine(value);
+                Manager.Interpreter.UseClass.WriteLine(value);
                 return new VoidValue();
             }
             case "Print":
@@ -59,18 +59,18 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
                 var value = results[0].ToString();
                 for (var i = 1; i < results.Count; i++) value += results[i].ToString();
 
-                Manager.Interpreter?.UseClass.Write(value);
+                Manager.Interpreter.UseClass.Write(value);
                 return new VoidValue();
             }
             case "Compiler":
             {
                 if (results.Count == 0) return new VoidValue();
                 var value = results[0].ToString();
-                var statement = Manager.Interpreter?.Build(code: value);
+                var statement = Manager.Interpreter.Build(code: value);
                 var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
                 var ilGenerator = dynamicMethod.GetILGenerator();
                 var local = new LocalManager();
-                statement?.GenerateIL(ilGenerator, local);
+                statement.GenerateIL(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Ret);
                 foreach (var info in local.DelegateVar)
                 {

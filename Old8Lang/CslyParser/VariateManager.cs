@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
@@ -12,7 +13,7 @@ public class VariateManager
     public LangInfo? LangInfo { get; set; }
     public string Path { get; set; } = "";
 
-    public Interpreter? Interpreter { get; set; }
+    [NotNull] public Interpreter? Interpreter { get; set; }
 
     #endregion
 

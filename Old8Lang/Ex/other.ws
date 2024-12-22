@@ -1,13 +1,13 @@
 // 函数：斐波那契
-fib(a) ->
-{
-   if a == 1
-      return 1
-   elif a == 2
-      return 1
-   else
-      return fib(a-1)+fib(a-2)
-}
+Compiler("fib:int (a:int) ->
+          {
+             if a == 1
+                return 1
+             elif a == 2
+                return 1
+             else
+                return fib(a-1)+fib(a-2)
+          }")
 
 fibIter(a) -> {
     list <- {1,1}

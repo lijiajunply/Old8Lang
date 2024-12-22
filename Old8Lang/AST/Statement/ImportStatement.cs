@@ -15,8 +15,8 @@ public class ImportStatement(string importString) : OldStatement
             var previousPath = Manager.Path;
             Manager.Path = path;
             var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
-            var a = Manager.Interpreter?.Build(code: code);
-            a?.ImportRun(Manager);
+            var a = Manager.Interpreter.Build(code: code);
+            a.ImportRun(Manager);
             Manager.Path = previousPath;
             return;
         }
@@ -28,8 +28,8 @@ public class ImportStatement(string importString) : OldStatement
             var previousPath = Manager.Path;
             Manager.Path = path;
             var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
-            var a = Manager.Interpreter?.Build(code: code);
-            a?.ImportRun(Manager);
+            var a = Manager.Interpreter.Build(code: code);
+            a.ImportRun(Manager);
             Manager.Path = previousPath;
             return;
         }
@@ -40,8 +40,8 @@ public class ImportStatement(string importString) : OldStatement
         var filePath = dic + "/" + importString + ".ws";
         var PreviousPath = Manager.Path;
         Manager.Path = filePath;
-        var result = Manager.Interpreter?.Build(code: Apis.FromFile(filePath));
-        result?.ImportRun(Manager);
+        var result = Manager.Interpreter.Build(code: Apis.FromFile(filePath));
+        result.ImportRun(Manager);
         Manager.Path = PreviousPath;
     }
 
