@@ -40,10 +40,21 @@ public class ClassInit(AnyValue anyValue) : OldStatement
             fieldValues.Add(value);
         }
 
-
+        var assemblyNameClone = new AssemblyName("DynamicAssembly");
+        var assemblyClone =
+            AssemblyBuilder.DefineDynamicAssembly(assemblyNameClone, AssemblyBuilderAccess.Run);
+        var moduleClone = assemblyClone.DefineDynamicModule("DynamicModule");
+        var typeClone = moduleClone.DefineType(anyValue.Id.IdName, TypeAttributes.Public);
+        foreach (var variate in anyValue.Variates.Where(variate => variate.Value is not FuncValue))
+        {
+            typeClone.DefineField(variate.Key.IdName,
+                variate.Value.OutputType(local)!,
+                FieldAttributes.Public);
+        }
+        
         foreach (var value in func)
         {
-            var funcLocal = new LocalManager();
+            var funcLocal = new LocalManager(){InClassEnv = typeClone.CreateType()};
             var parameterTypes = value.Ids!.Select(item => item.OutputType(funcLocal)).ToArray();
             var method = typeBuilder.DefineMethod(value.Id!.IdName, MethodAttributes.Public);
             method.SetReturnType(value.OutputType(funcLocal));

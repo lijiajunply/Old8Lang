@@ -63,6 +63,8 @@ class Test
     public int Add(int c, int d)
     {
         Console.WriteLine(a);
+        Test t = this;
+        t.a = 1;
         return c + d;
     }
 }

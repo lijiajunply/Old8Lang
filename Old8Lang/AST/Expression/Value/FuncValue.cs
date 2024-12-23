@@ -122,11 +122,7 @@ public class FuncValue : ValueType
 
         // 创建方法的 IL 发射器
         var methodIL = methodBuilder.GetILGenerator();
-
-        methodIL.Emit(OpCodes.Ldarg_0);
-        var thisType = methodIL.DeclareLocal(typeof(object));
-        methodIL.Emit(OpCodes.Stloc, thisType);
-        local.AddLocalVar("this", thisType);
+        
         for (var i = 1; i <= Ids!.Count; i++)
         {
             var id = Ids[i-1];

@@ -8,7 +8,7 @@ public class LocalManager
     private readonly Dictionary<string, LocalBuilder> LocalVar = [];
     public readonly Dictionary<string, MethodInfo> DelegateVar = [];
     public readonly Dictionary<string, Type> ClassVar = [];
-    public LocalBuilder? InClass { get; set; }
+    public Type? InClassEnv { get; set; }
     
     public LocalBuilder? GetLocalVar(string name)
     {

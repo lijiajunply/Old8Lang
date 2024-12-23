@@ -46,6 +46,11 @@ public class OldID(string name,string assumptionType = "") : OldExpr
                 _ => typeof(object)
             };
         }
+
+        if (local.InClassEnv != null && IdName == "this")
+        {
+            return local.InClassEnv;
+        }
         var value = local.GetLocalVar(IdName);
         return value?.LocalType ?? typeof(object);
     }

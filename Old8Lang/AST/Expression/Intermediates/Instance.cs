@@ -79,6 +79,12 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
 
                 return new VoidValue();
             }
+            case "Len":
+            {
+                var value = results[0].Run(Manager);
+                if (value is IOldList list) return new IntValue(list.GetLength());
+                throw new Exception($"{results[0]} Not a list");
+            }
         }
 
         var result = Id.Run(Manager);
@@ -173,10 +179,31 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
                 return;
             case "ToObj":
                 return;
+            case "Len":
+                id = Ids[0];
+                id.LoadILValue(ilGenerator, local);
+                type = id.OutputType(local)!;
+                if (type.IsAssignableTo(typeof(object[])))
+                {
+                    var lengthProp = typeof(object[]).GetProperty("Length");
+                    ilGenerator.Emit(OpCodes.Call, lengthProp!.GetGetMethod()!);
+                    return;
+                }
+
+                var countProp = typeof(List<object>).GetProperty("Count");
+                ilGenerator.Emit(OpCodes.Call, countProp!.GetGetMethod()!);
+                return;
             case "Type":
                 id = Ids[0];
                 id.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Call, typeof(object).GetMethod("GetType")!);
+                return;
+            case "Compiler":
+                ilGenerator.Emit(OpCodes.Ldstr, "编译环境不需要使用Compiler方法");
+                ilGenerator.Emit(OpCodes.Call,
+                    typeof(Console).GetMethod("WriteLine", [typeof(string)])!);
+                return;
+            case "Exec":
                 return;
         }
 
@@ -248,7 +275,12 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
         {
             case "PrintLine":
             case "Print":
+            case "Compiler":
                 return typeof(void);
+            case "Len":
+                return typeof(int);
+            case "Json":
+                return typeof(string);
         }
 
         var result = local.DelegateVar.GetValueOrDefault(Id.IdName);

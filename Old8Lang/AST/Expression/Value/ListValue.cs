@@ -6,16 +6,21 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class ListValue : ValueType, IOldList
 {
-    private readonly List<OldExpr> Value = [];
+    private readonly List<OldExpr> Value;
 
     public readonly List<ValueType> Values = [];
 
     public ListValue(List<OldExpr> value) => Value = value;
 
-    public ListValue(List<object> value) => Values = value.Select(ObjToValue).ToList();
+    public ListValue(List<object> value)
+    {
+        Values = value.Select(ObjToValue).ToList();
+        Value = Values.OfType<OldExpr>().ToList();
+    }
 
     public override ValueType Run(VariateManager Manager)
     {
+        if(Values.Count > 0)return this;
         foreach (var expr in Value)
             Values.Add(expr.Run(Manager));
         return this;
@@ -52,15 +57,28 @@ public class ListValue : ValueType, IOldList
 
     public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
     {
-        var listConstructor = typeof(List<int>).GetConstructor(Type.EmptyTypes)!;
+        var listConstructor = typeof(List<object>).GetConstructor(Type.EmptyTypes)!;
         ilGenerator.Emit(OpCodes.Newobj, listConstructor); // 创建 List<int> 实例
+        if (Value.Count == 0) return;
+        
+        var l = ilGenerator.DeclareLocal(typeof(List<object>));
+        ilGenerator.Emit(OpCodes.Stloc, l.LocalIndex);
 
         // 向 List<int> 中添加元素
-        var addMethod = typeof(List<int>).GetMethod("Add")!;
-        for (var i = 0; i < 5; i++)
+        var addMethod = typeof(List<object>).GetMethod("Add")!;
+        foreach (var expr in Value)
         {
-            ilGenerator.Emit(OpCodes.Ldc_I4, i); // 加载要添加的整数
+            ilGenerator.Emit(OpCodes.Ldloc, l.LocalIndex);
+            expr.LoadILValue(ilGenerator, local);
+            var t = expr.OutputType(local);
+            ilGenerator.Emit(OpCodes.Box, t!);
             ilGenerator.Emit(OpCodes.Callvirt, addMethod); // 调用 Add 方法
         }
+        ilGenerator.Emit(OpCodes.Ldloc, l.LocalIndex);
+    }
+
+    public override Type OutputType(LocalManager local)
+    {
+        return typeof(List<object>);
     }
 }

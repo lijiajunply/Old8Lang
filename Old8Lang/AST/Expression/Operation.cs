@@ -287,6 +287,22 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
                 ilGenerator.Emit(OpCodes.Xor);
                 return typeof(bool);
             case OldTokenGeneric.CONCAT:
+                if (local.InClassEnv != null && left is OldID { IdName: "this" })
+                {
+                    ilGenerator.Emit(OpCodes.Ldarg_0);
+                    if (right is not OldID rightId) return local.InClassEnv;
+                    var field = local.InClassEnv.GetField(rightId.IdName);
+                    if (field == null)
+                    {
+                        var p = local.InClassEnv.GetProperty(rightId.IdName);
+                        ilGenerator.Emit(OpCodes.Call, p!.GetGetMethod()!);
+                        return p.PropertyType;
+                    }
+
+                    ilGenerator.Emit(OpCodes.Ldfld, field);
+                    return field.FieldType;
+
+                }
                 if (right is Instance instance)
                 {
                     left!.LoadILValue(ilGenerator, local);
@@ -306,8 +322,15 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
                 {
                     left!.LoadILValue(ilGenerator, local);
                     var field = leftType!.GetField(id.IdName);
-                    ilGenerator.Emit(OpCodes.Ldfld,field!);
-                    return field!.FieldType;
+                    if (field == null)
+                    {
+                        var p = leftType.GetProperty(id.IdName);
+                        ilGenerator.Emit(OpCodes.Call, p!.GetGetMethod()!);
+                        return p.PropertyType;
+                    }
+
+                    ilGenerator.Emit(OpCodes.Ldfld, field);
+                    return field.FieldType;
                 }
 
                 return typeof(void);

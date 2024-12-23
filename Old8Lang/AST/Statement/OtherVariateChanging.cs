@@ -38,6 +38,25 @@ public class OtherVariateChanging(OldID id, OldExpr sumId, OldExpr expr) : OldSt
 
     public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
     {
+        if (local.InClassEnv != null && id.IdName == "this")
+        {
+            ilGenerator.Emit(OpCodes.Ldarg_0);
+            if (sumId is OldID sum1)
+            {
+                expr.LoadILValue(ilGenerator, local);
+                var field = local.InClassEnv.GetField(sum1.IdName);
+                ilGenerator.Emit(OpCodes.Stfld, field!);
+                return;
+            }
+
+            if (sumId is StringValue stringValue1)
+            {
+                expr.LoadILValue(ilGenerator, local);
+                var field = local.InClassEnv.GetField(stringValue1.Value);
+                ilGenerator.Emit(OpCodes.Stfld, field!);
+            }
+            return;
+        }
         id.LoadILValue(ilGenerator, local);
         var leftType = id.OutputType(local);
         
