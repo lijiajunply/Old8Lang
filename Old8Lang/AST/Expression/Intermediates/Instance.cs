@@ -74,8 +74,9 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
                 ilGenerator.Emit(OpCodes.Ret);
                 foreach (var info in local.DelegateVar)
                 {
-                    Manager.AddClassAndFunc(new FuncValue(info.Key,info.Value));
+                    Manager.AddClassAndFunc(new FuncValue(info.Key, info.Value));
                 }
+
                 return new VoidValue();
             }
         }
@@ -158,8 +159,9 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
             case "PrintLine":
                 var id = Ids[0];
                 id.LoadILValue(ilGenerator, local);
+                var type = id.OutputType(local)!;
                 ilGenerator.Emit(OpCodes.Call,
-                    typeof(Console).GetMethod("WriteLine", [id.OutputType(local)!])!);
+                    typeof(Console).GetMethod("WriteLine", [type])!);
                 return;
             case "Print":
                 id = Ids[0];
@@ -249,8 +251,9 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
                 return typeof(void);
         }
 
-        var result = local.DelegateVar[Id.IdName];
-
-        return result.ReturnType;
+        var result = local.DelegateVar.GetValueOrDefault(Id.IdName);
+        if (result != null) return result.ReturnType;
+        var classType = local.ClassVar.GetValueOrDefault(Id.IdName);
+        return classType ?? typeof(object);
     }
 }

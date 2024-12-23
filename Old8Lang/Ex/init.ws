@@ -50,3 +50,18 @@ switch "2" {
     default
         PrintLine("default")
 }
+
+// 测试编译加速
+PrintLine("测试编译加速")
+
+Compiler("fib:int (a:int) ->
+               {
+                  if a == 1
+                     return 1
+                  elif a == 2
+                     return 1
+                  else
+                     return fib(a-1)+fib(a-2)
+               }")
+               
+PrintLine(fib(30))

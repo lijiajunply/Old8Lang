@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
@@ -37,7 +38,31 @@ public class OtherVariateChanging(OldID id, OldExpr sumId, OldExpr expr) : OldSt
 
     public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
     {
-        throw new NotImplementedException();
+        id.LoadILValue(ilGenerator, local);
+        var leftType = id.OutputType(local);
+        
+        if (leftType.IsAssignableTo(typeof(IEnumerable)))
+        {
+            sumId.LoadILValue(ilGenerator, local);
+            expr.LoadILValue(ilGenerator, local);
+            ilGenerator.Emit(OpCodes.Stelem_I4);
+            return;
+        }
+
+        if (sumId is OldID sum)
+        {
+            expr.LoadILValue(ilGenerator, local);
+            var field = leftType.GetField(sum.IdName);
+            ilGenerator.Emit(OpCodes.Stfld, field!);
+            return;
+        }
+
+        if (sumId is StringValue stringValue)
+        {
+            expr.LoadILValue(ilGenerator, local);
+            var field = leftType.GetField(stringValue.Value);
+            ilGenerator.Emit(OpCodes.Stfld, field!);
+        }
     }
 
     public override OldStatement? this[int index] => null;

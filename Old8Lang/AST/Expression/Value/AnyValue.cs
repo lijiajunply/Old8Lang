@@ -97,33 +97,10 @@ public class AnyValue : ValueType
 
     public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
     {
-        var assemblyName = new AssemblyName("DynamicAssembly");
-        var assemblyBuilder =
-            AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-        var moduleBuilder = assemblyBuilder.DefineDynamicModule("DynamicModule");
+    }
 
-        // 定义一个新的类型
-        var typeBuilder = moduleBuilder.DefineType(Id.IdName, TypeAttributes.Public);
-
-        foreach (var variate in Variates)
-        {
-            if (variate.Value is FuncValue funcValue)
-            {
-                var parameterTypes = funcValue.Ids!.Select(item => item.OutputType(new LocalManager())).ToArray();
-                var method = typeBuilder.DefineMethod(funcValue.Id!.IdName, MethodAttributes.Public);
-                method.SetParameters(parameterTypes);
-                funcValue.LoadIL(method,new LocalManager());
-                continue;
-            }
-
-            if (variate.Value is not ValueType value) continue;
-
-            var fieldBuilder = typeBuilder.DefineField(variate.Key.IdName, variate.Value.OutputType(local)!,
-                FieldAttributes.Public);
-            fieldBuilder.SetConstant(value.GetValue());
-        }
-
-        var a = typeBuilder.CreateType();
-        local.ClassVar.Add(Id.IdName, a);
+    public override Type? OutputType(LocalManager local)
+    {
+        return local.ClassVar.GetValueOrDefault(Id.IdName);
     }
 }

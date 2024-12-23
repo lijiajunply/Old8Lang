@@ -41,8 +41,8 @@ public class ForInStatement(OldID id, OldExpr expr, OldStatement body) : OldStat
         local.AddLocalVar("index", index);
 
         // 创建循环开始标签
-        Label loopStart = ilGenerator.DefineLabel();
-        Label loopEnd = ilGenerator.DefineLabel();
+        var loopStart = ilGenerator.DefineLabel();
+        var loopEnd = ilGenerator.DefineLabel();
 
         // 循环开始
         ilGenerator.MarkLabel(loopStart);

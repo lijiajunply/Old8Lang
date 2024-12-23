@@ -4,7 +4,6 @@ using System.Text;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
-using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -124,10 +123,14 @@ public class FuncValue : ValueType
         // 创建方法的 IL 发射器
         var methodIL = methodBuilder.GetILGenerator();
 
-        for (var i = 0; i < Ids!.Count; i++)
+        methodIL.Emit(OpCodes.Ldarg_0);
+        var thisType = methodIL.DeclareLocal(typeof(object));
+        methodIL.Emit(OpCodes.Stloc, thisType);
+        local.AddLocalVar("this", thisType);
+        for (var i = 1; i <= Ids!.Count; i++)
         {
-            var id = Ids[i];
-            var localVar = methodIL.DeclareLocal(parameterTypes[i]);
+            var id = Ids[i-1];
+            var localVar = methodIL.DeclareLocal(parameterTypes[i-1]);
             local.AddLocalVar(id.IdName, localVar);
             methodIL.Emit(OpCodes.Ldarg, i);
 

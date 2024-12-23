@@ -31,6 +31,7 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
     }
 
     public override string ToString() => $"{left} {OperaToString()} {right}";
+    public Type? Type { get; set; }
 
     public override ValueType Run(VariateManager Manager)
     {
@@ -133,12 +134,12 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
 
     public override void SetValueToIL(ILGenerator ilGenerator, LocalManager local, string idName)
     {
-        var type = OutputType(ilGenerator, local);
-        var valueLocal = ilGenerator.DeclareLocal(type);
+        Type = OutputType(ilGenerator, local);
+        var valueLocal = ilGenerator.DeclareLocal(Type);
         var b = local.GetLocalVar(idName);
         if (b != null)
         {
-            if (b.LocalType != type)
+            if (b.LocalType != Type)
             {
                 local.RemoveLocalVar(idName);
                 local.AddLocalVar(idName, valueLocal);
@@ -158,15 +159,14 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
 
     public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
     {
-        OutputType(ilGenerator, local);
+        Type = OutputType(ilGenerator, local);
     }
 
     public override Type? OutputType(LocalManager local)
     {
+        if (Type != null) return Type;
         var leftType = left?.OutputType(local);
         var rightType = right.OutputType(local);
-        // if (leftType == typeof(object) && rightType == typeof(object))
-        //     return typeof(object);
         return leftType == typeof(object) ? rightType : leftType;
     }
 
@@ -175,7 +175,7 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
         var leftType = left?.OutputType(local);
         var rightType = right.OutputType(local);
 
-        if (leftType == typeof(object) || rightType == typeof(object))
+        if (leftType == typeof(object))
         {
             return typeof(object);
         }
@@ -287,10 +287,30 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
                 ilGenerator.Emit(OpCodes.Xor);
                 return typeof(bool);
             case OldTokenGeneric.CONCAT:
-                left!.LoadILValue(ilGenerator, local);
-                right.LoadILValue(ilGenerator, local);
-                ilGenerator.Emit(OpCodes.Callvirt, typeof(ValueType).GetMethod("DotToIL", [typeof(ValueType)])!);
-                return typeof(string);
+                if (right is Instance instance)
+                {
+                    left!.LoadILValue(ilGenerator, local);
+                    var types = new List<Type>();
+                    foreach (var instanceId in instance.Ids)
+                    {
+                        instanceId.LoadILValue(ilGenerator, local);
+                        types.Add(instanceId.OutputType(local)!);
+                    }
+
+                    var m = leftType!.GetMethod(instance.Id.IdName, types.ToArray())!;
+                    ilGenerator.Emit(OpCodes.Call, m);
+                    return m.ReturnType;
+                }
+
+                if (right is OldID id)
+                {
+                    left!.LoadILValue(ilGenerator, local);
+                    var field = leftType!.GetField(id.IdName);
+                    ilGenerator.Emit(OpCodes.Ldfld,field!);
+                    return field!.FieldType;
+                }
+
+                return typeof(void);
             default:
                 throw new NotSupportedException($"Unsupported binary operator: {opera}");
         }

@@ -8,7 +8,7 @@ using Old8Lang.CslyParser;
 #if DEBUG
 string[] strings =
 [
-    "-f", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,
+    "-c", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,
         "Old8Lang", "Ex", "class.ws")
 ];
 

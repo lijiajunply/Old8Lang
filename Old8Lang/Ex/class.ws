@@ -1,24 +1,21 @@
 // 测试类
-/*
 class Test{
-   a <- 1
+   a <- 2
    b <- 2
-   func init(c:int){
-       PrintLine(c)
+   func Add:int (c:int,d:int){
+      a <- c+d
+      return a
+   }
+   func init(a){
+       PrintLine(a)
    }
 }
 
-a <- Test(1)
-*/
+arr <- [1,2,3,4]
+arr[0] <- 21
+PrintLine(arr[0])
 
-Compiler("fib:int (a:int) ->
-               {
-                  if a == 1
-                     return 1
-                  elif a == 2
-                     return 1
-                  else
-                     return fib(a-1)+fib(a-2)
-               }")
-
-PrintLine(fib(30))
+a <- Test("asdf")
+PrintLine(a.Add(1,2))
+a.a <- 23
+PrintLine(a.a)
