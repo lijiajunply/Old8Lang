@@ -79,7 +79,32 @@ public class NativeStatement : OldStatement
 
     public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
     {
-        throw new NotImplementedException();
+        var path = $"{Path.GetDirectoryName(local.FilePath)}/dll/{DllName}.dll"; // filepath/dll/dllname
+        var assembly = Assembly.LoadFile(path);
+        var type = assembly.GetType($"{DllName}.{ClassName}");
+        if (!string.IsNullOrEmpty(Name))
+        {
+            type = assembly.GetType($"{Name}.{ClassName}");
+            if (type is null)
+            {
+                type = Type.GetType($"{Name}.{ClassName}");
+                if (type is null)
+                    throw new TypeError(this, this);
+            }
+
+            local.ClassVar.Add(ClassName, type);
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(MethodName))
+        {
+            var methodInfo = type?.GetMethod(MethodName);
+            if (methodInfo == null) throw new Exception($"Not Have Method in {ToString()}");
+            if (string.IsNullOrEmpty(NativeName))
+                NativeName = MethodName;
+            local.DelegateVar.Add(NativeName, methodInfo);
+            return;
+        }
     }
 
     public override OldStatement this[int index] => this;

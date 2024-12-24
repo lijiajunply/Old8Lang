@@ -47,7 +47,28 @@ public class ImportStatement(string importString) : OldStatement
 
     public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
     {
-        throw new NotImplementedException();
+        var langInfo = Apis.ReadJson();
+        if (langInfo.LibInfos.Any(x => importString == x.LibName))
+        {
+            var b = langInfo.LibInfos.Where(x => x.LibName == importString).Select(x => x.IsDir).ToArray()[0];
+            var path = Path.Combine(langInfo.ImportPath, importString + (b ? "" : ".ws"));
+            var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
+            //var a = Interpreter.Build(code: code);
+
+            var pPath = local.FilePath;
+            local.FilePath = path;
+            var block = local.Interpreter.Build(code: code);
+            block.GenerateImportIL(ilGenerator, local);
+            local.FilePath = pPath;
+            return;
+        }
+        
+        var dic = Path.GetDirectoryName(local.FilePath)!;
+        if (!File.Exists(dic + "/" + importString + ".ws")) return;
+
+        var filePath = dic + "/" + importString + ".ws";
+        var result = local.Interpreter.Build(code: Apis.FromFile(filePath));
+        result.GenerateImportIL(ilGenerator, local);
     }
 
     public override OldStatement this[int index] => this;

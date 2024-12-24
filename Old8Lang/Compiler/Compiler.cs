@@ -8,11 +8,23 @@ namespace Old8Lang.Compiler;
 
 public static class Compiler
 {
-    public static Action Compile(BlockStatement statement)
+    public static Action Compile(BlockStatement statement, string path, MiniInterpreter i)
     {
         var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
         var ilGenerator = dynamicMethod.GetILGenerator();
-        var local = new LocalManager();
+        var local = new LocalManager() { FilePath = path ,Interpreter = i};
+        statement.GenerateIL(ilGenerator, local);
+        ilGenerator.Emit(OpCodes.Ret);
+        var oldLangRun = (Action)dynamicMethod.CreateDelegate(typeof(Action));
+        return oldLangRun;
+    }
+
+    public static Action Compile(string path, MiniInterpreter i)
+    {
+        var statement = i.Build(Apis.FromFile(path));
+        var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
+        var ilGenerator = dynamicMethod.GetILGenerator();
+        var local = new LocalManager() { FilePath = path ,Interpreter = i};
         statement.GenerateIL(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Ret);
         var oldLangRun = (Action)dynamicMethod.CreateDelegate(typeof(Action));
@@ -65,17 +77,5 @@ public static class Compiler
             // 调用 Main 方法
             mainMethod?.Invoke(null, [Array.Empty<string>()]);
         }
-    }
-
-    public static void CompileTest(BlockStatement statement)
-    {
-        var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
-        var ilGenerator = dynamicMethod.GetILGenerator();
-        var local = new LocalManager();
-        statement.GenerateIL(ilGenerator, local);
-        ilGenerator.Emit(OpCodes.Ret);
-        var fib = local.DelegateVar["fib"];
-        var result = fib.Invoke(null, [25]);
-        Console.WriteLine(result);
     }
 }

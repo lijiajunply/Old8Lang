@@ -98,17 +98,17 @@ if (args[0] == BasicInfo.Order["Remove"])
 
 if (args[0] == BasicInfo.Order["Compiler"])
 {
-    var interpreter = new Interpreter(args[1], false);
+    var interpreter = new MiniInterpreter();
     var sw = new Stopwatch();
     sw.Start();
-    var build = interpreter.Build();
+    var build = interpreter.Build(Apis.FromFile(args[1]));
     sw.Stop();
     var ts = sw.Elapsed.TotalMilliseconds;
     var time = $"------------------\nParser Build Time : {ts}ms\n";
     var milliseconds = ts;
-    
-    var aDelegate = Compiler.Compile(build);
-    
+
+    var aDelegate = Compiler.Compile(build, args[1], interpreter);
+
     sw.Restart();
     aDelegate();
     sw.Stop();
@@ -117,11 +117,4 @@ if (args[0] == BasicInfo.Order["Compiler"])
     milliseconds += ts;
     time += $"Total : {milliseconds}ms";
     Console.WriteLine(time);
-}
-
-if (args[0] == "-ct")
-{
-    var interpreter = new Interpreter(args[1], false);
-    var build = interpreter.Build();
-    Compiler.CompileTest(build);
 }

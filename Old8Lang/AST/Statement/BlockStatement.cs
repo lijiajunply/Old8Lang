@@ -58,6 +58,14 @@ public class BlockStatement : OldStatement
             statement.GenerateIL(ilGenerator, local);
         }
     }
+    
+    public void GenerateImportIL(ILGenerator ilGenerator, LocalManager local)
+    {
+        foreach (var statement in ImportStatements)
+        {
+            statement.GenerateIL(ilGenerator, local);
+        }
+    }
 
     public void ImportRun(VariateManager Manager)
     {
