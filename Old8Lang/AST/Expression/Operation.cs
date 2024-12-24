@@ -303,6 +303,7 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
                     return field.FieldType;
 
                 }
+                
                 if (right is Instance instance)
                 {
                     left!.LoadILValue(ilGenerator, local);
@@ -310,6 +311,11 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
                     foreach (var instanceId in instance.Ids)
                     {
                         instanceId.LoadILValue(ilGenerator, local);
+                        var idType = instanceId.OutputType(local);
+                        if (idType!.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Box, idType);
+                        }
                         types.Add(instanceId.OutputType(local)!);
                     }
 

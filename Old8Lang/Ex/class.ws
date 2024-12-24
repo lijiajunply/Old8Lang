@@ -11,21 +11,23 @@ class Test{
    }
 }
 
-/*
-arr <- {12,31,2}
+arr <- [12,31,2]
+//arr.Add("asdf")
 PrintLine(Len(arr))
-//arr.Add(1)
-*/
+
+for a in arr{
+    PrintLine(a)
+}
 
 /*
+
 arr[0] <- 21
 PrintLine(arr[0])
 */
 
+
+/*
 a <- Test("asdf")
 PrintLine(a.Add(1,2))
 PrintLine(a.a)
-
-/*
-
 */

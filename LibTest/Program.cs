@@ -1,7 +1,5 @@
 ﻿using System.Collections;
-using System.Reflection;
 using System.Reflection.Emit;
-using Old8LangLib;
 
 // Console.WriteLine(typeof(Math));
 // Console.WriteLine(OS.OsInfo());
@@ -53,7 +51,65 @@ using Old8LangLib;
 // ilGenerator.Emit(OpCodes.Ret);
 // dynamicMethod.Invoke(null, null);
 
-Console.WriteLine(typeof(IDictionary).IsAssignableTo(typeof(IEnumerable)));
+//Console.WriteLine(typeof(IDictionary).IsAssignableTo(typeof(IEnumerable)));
+// var test = new object[]{1,2,3};
+// var te = test.GetEnumerator();
+// while (te.MoveNext())
+// {
+//     var a = te.Current;
+//     Console.WriteLine(a);
+// }
+
+// 创建一个动态方法
+var method = new DynamicMethod("EmitForEach", null, [typeof(object[])]);
+var ilGenerator = method.GetILGenerator();
+
+// Define local variables
+var enumerator = ilGenerator.DeclareLocal(typeof(IEnumerator));
+var current = ilGenerator.DeclareLocal(typeof(object));
+
+// Get the GetEnumerator method
+var getEnumeratorMethod = typeof(IEnumerable).GetMethod("GetEnumerator")!;
+var moveNextMethod = typeof(IEnumerator).GetMethod("MoveNext")!;
+var getCurrentMethod = typeof(IEnumerator).GetProperty("Current")!.GetGetMethod()!;
+
+// Get enumerator
+ilGenerator.Emit(OpCodes.Ldarg_0);
+ilGenerator.Emit(OpCodes.Callvirt, getEnumeratorMethod);
+ilGenerator.Emit(OpCodes.Stloc, enumerator);
+
+// Define labels for loop
+var loopStart = ilGenerator.DefineLabel();
+var loopEnd = ilGenerator.DefineLabel();
+
+// Start of loop
+ilGenerator.MarkLabel(loopStart);
+ilGenerator.Emit(OpCodes.Ldloc, enumerator);
+ilGenerator.Emit(OpCodes.Callvirt, moveNextMethod);
+ilGenerator.Emit(OpCodes.Brfalse, loopEnd);
+
+// Get current element
+ilGenerator.Emit(OpCodes.Ldloc, enumerator);
+ilGenerator.Emit(OpCodes.Callvirt, getCurrentMethod);
+//il.Emit(OpCodes.Box, typeof(int));
+ilGenerator.Emit(OpCodes.Stloc, current);
+
+// Print current element
+ilGenerator.Emit(OpCodes.Ldloc, current);
+ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", [typeof(object)])!);
+
+// Loop back
+ilGenerator.Emit(OpCodes.Br, loopStart);
+
+// End of loop
+ilGenerator.MarkLabel(loopEnd);
+
+// Complete the method
+ilGenerator.Emit(OpCodes.Ret);
+
+// Create a delegate and invoke the method
+var action = (Action<object[]>)method.CreateDelegate(typeof(Action<object[]>));
+action([1, 2, 3, 4, 5,":asdf"]);
 
 class Test
 {

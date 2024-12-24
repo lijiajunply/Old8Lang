@@ -71,16 +71,21 @@ public class ArrayValue : ValueType, IOldList
         {
             ilGenerator.Emit(OpCodes.Dup); // 复制数组引用
             ilGenerator.Emit(OpCodes.Ldc_I4, i); // 加载索引 0
+            Type t;
             if (len == Values.Count)
             {
                 Values[i].LoadILValue(ilGenerator, local);
+                t = Values[i].OutputType(local)!;
             }
             else
             {
                 RunResult[i].LoadILValue(ilGenerator, local);
+                t = RunResult[i].OutputType(local)!;
             }
+            
+            ilGenerator.Emit(OpCodes.Box, t); // 将 int 转换为 object
 
-            ilGenerator.Emit(OpCodes.Stelem_I4); // 将值存入数组
+            ilGenerator.Emit(OpCodes.Stelem_Ref); // 将值存入数组
         }
     }
 

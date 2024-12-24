@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
@@ -27,56 +28,44 @@ public class ForInStatement(OldID id, OldExpr expr, OldStatement body) : OldStat
 
     public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
     {
+        var enumerator = ilGenerator.DeclareLocal(typeof(IEnumerator));
+        var current = ilGenerator.DeclareLocal(typeof(object));
+
+        // Get the GetEnumerator method
+        var getEnumeratorMethod = typeof(IEnumerable).GetMethod("GetEnumerator")!;
+        var moveNextMethod = typeof(IEnumerator).GetMethod("MoveNext")!;
+        var getCurrentMethod = typeof(IEnumerator).GetProperty("Current")!.GetGetMethod()!;
         expr.LoadILValue(ilGenerator, local);
-        ilGenerator.Emit(OpCodes.Ldlen); // 获取数组长度
-        ilGenerator.Emit(OpCodes.Conv_I4); // 转换为 int
-        var len = ilGenerator.DeclareLocal(typeof(int));
-        ilGenerator.Emit(OpCodes.Stloc, len.LocalIndex); // 存储到 length
-        local.AddLocalVar("len", len);
+        ilGenerator.Emit(OpCodes.Callvirt, getEnumeratorMethod);
+        ilGenerator.Emit(OpCodes.Stloc, enumerator);
 
-        // 初始化 index
-        ilGenerator.Emit(OpCodes.Ldc_I4_0); // 加载 0
-        var index = ilGenerator.DeclareLocal(typeof(int));
-        ilGenerator.Emit(OpCodes.Stloc, index.LocalIndex); // 存储到 length
-        local.AddLocalVar("index", index);
+        // Define labels for loop
+        var loopListStart = ilGenerator.DefineLabel();
+        var loopListEnd = ilGenerator.DefineLabel();
 
-        // 创建循环开始标签
-        var loopStart = ilGenerator.DefineLabel();
-        var loopEnd = ilGenerator.DefineLabel();
+        // Start of loop
+        ilGenerator.MarkLabel(loopListStart);
+        ilGenerator.Emit(OpCodes.Ldloc, enumerator);
+        ilGenerator.Emit(OpCodes.Callvirt, moveNextMethod);
+        ilGenerator.Emit(OpCodes.Brfalse, loopListEnd);
 
-        // 循环开始
-        ilGenerator.MarkLabel(loopStart);
+        // Get current element
+        ilGenerator.Emit(OpCodes.Ldloc, enumerator);
+        ilGenerator.Emit(OpCodes.Callvirt, getCurrentMethod);
+        //ilGenerator.Emit(OpCodes.Box, typeof(int));
+        ilGenerator.Emit(OpCodes.Stloc, current);
+        local.AddLocalVar(id.IdName, current);
 
-        // 检查 index 是否小于 length
-        ilGenerator.Emit(OpCodes.Ldloc, index); // 加载 index
-        ilGenerator.Emit(OpCodes.Ldloc, len); // 加载 length
-        ilGenerator.Emit(OpCodes.Bge, loopEnd); // 如果 index >= length，跳转到 loopEnd
-
-        // 获取当前元素
-        expr.LoadILValue(ilGenerator, local); // 加载 enumerator
-        ilGenerator.Emit(OpCodes.Ldloc,index); // 加载 index
-        ilGenerator.Emit(OpCodes.Ldelem_I4); // 获取元素
-        var item = ilGenerator.DeclareLocal(typeof(int));
-        ilGenerator.Emit(OpCodes.Stloc, item.LocalIndex); // 存储到 length
-        local.AddLocalVar(id.IdName, item);
-
-        // 打印当前元素
         body.GenerateIL(ilGenerator, local);
 
-        // index +1
-        ilGenerator.Emit(OpCodes.Ldloc, index); // 加载 index
-        ilGenerator.Emit(OpCodes.Ldc_I4_1); // 加载 1
-        ilGenerator.Emit(OpCodes.Add); // index++
-        ilGenerator.Emit(OpCodes.Stloc, index); // 存储回 index
+        // Loop back
+        ilGenerator.Emit(OpCodes.Br, loopListStart);
 
-        // 跳回循环开始
-        ilGenerator.Emit(OpCodes.Br, loopStart);
-
-        // 循环结束标签
-        ilGenerator.MarkLabel(loopEnd);
+        // End of loop
+        ilGenerator.MarkLabel(loopListEnd);
     }
 
-    public override OldStatement this[int index] => body[index];
+    public override OldStatement this[int index] => body[index]!;
 
     public override int Count => body.Count;
 }

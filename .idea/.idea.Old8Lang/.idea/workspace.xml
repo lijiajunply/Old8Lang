@@ -16,17 +16,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="加入类型字段赋值">
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LibTest/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/LibTest/Program.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/Instance.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/OtherVariateChanging.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/OtherVariateChanging.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ArrayValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ArrayValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/class.ws" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/class.ws" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -59,7 +55,14 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock://C:/Projects/RiderProjects/Old8Lang/LibTest/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Projects/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Projects/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Projects/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Projects/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Projects/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Projects/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/CslyParser/Interpreter.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/3b8b000a0e115700b18265d8ec8c6307056dc94d/src/libraries/System.Private.CoreLib/src/System/Reflection/MethodBaseInvoker.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/3b8b000a0e115700b18265d8ec8c6307056dc94d/src/libraries/System.Private.CoreLib/src/System/ThrowHelper.cs" root0="SKIP_HIGHLIGHTING" />
@@ -77,6 +80,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/123a4860ba4f7deaf37e78fb6ededfbebc7762f23f3ff2fd8a4d1c9b2f5e5b14/UnexpectedTokenSyntaxError.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2c8e7ca976f350cba9836d5565dac56b11e0b56656fa786460eb1395857a6fa/ThrowHelper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/572df450b036f3bd6d61e41fc8ebf1215076a8abadabf7f7b4da87937e29/RuntimeMethodBuilder.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/59109b68aa8966a8b4c17bb8642684239e9598dc1f117d294c355534a932786/CastHelpers.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/61ad9558461773384084905aad81506625818228f9cd81a7cb8f20a89cae1771/RuntimeTypeBuilder.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/7fcc41fe48c43f71d1476329de953fce8565fcc5dbf3c8c6fdb81c216b19c4/ArgumentNullException.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/955ec549fe664629353c3b5424b6ad6c7dfcec4ab59bae709ab962c228cf45/RuntimeType.CoreCLR.cs" root0="FORCE_HIGHLIGHTING" />
@@ -402,7 +406,8 @@
       <workItem from="1734766800349" duration="111000" />
       <workItem from="1734841243760" duration="3040000" />
       <workItem from="1734860384623" duration="11053000" />
-      <workItem from="1734932454371" duration="18116000" />
+      <workItem from="1734932454371" duration="21542000" />
+      <workItem from="1735012179735" duration="10498000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -747,7 +752,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="94" />
+    <option name="localTasksCounter" value="95" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -774,7 +779,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="修改Bug" />
     <MESSAGE value="再次更改一下" />
     <MESSAGE value="即将把ref换成in" />
     <MESSAGE value="改正变量管理器" />
@@ -799,7 +803,8 @@
     <MESSAGE value="加入编译函数，支持类的初始化" />
     <MESSAGE value="加入编译加速" />
     <MESSAGE value="加入类型字段赋值" />
-    <option name="LAST_COMMIT_MESSAGE" value="加入类型字段赋值" />
+    <MESSAGE value="加入类中的this，但是不能使用函数" />
+    <option name="LAST_COMMIT_MESSAGE" value="加入类中的this，但是不能使用函数" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -819,52 +824,52 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>14</line>
+          <line>15</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="373" />
+              <option value="399" />
             </startOffsets>
             <endOffsets>
-              <option value="403" />
+              <option value="429" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="236" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>15</line>
+          <line>16</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="412" />
+              <option value="438" />
             </startOffsets>
             <endOffsets>
-              <option value="446" />
+              <option value="472" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="237" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>18</line>
+          <line>19</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="529" />
+              <option value="555" />
             </startOffsets>
             <endOffsets>
-              <option value="572" />
+              <option value="598" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="238" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>21</line>
+          <line>22</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="633" />
+              <option value="659" />
             </startOffsets>
             <endOffsets>
-              <option value="651" />
+              <option value="677" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="239" />
@@ -922,56 +927,30 @@
           <option name="timeStamp" value="334" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs</url>
-          <line>317</line>
-          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Expression\Operation.cs" containingFunctionPresentation="方法 'OutputType'">
+          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
+          <line>41</line>
+          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'GenerateIL'">
             <startOffsets>
-              <option value="12321" />
+              <option value="1387" />
             </startOffsets>
             <endOffsets>
-              <option value="12341" />
+              <option value="1424" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="344" />
+          <option name="timeStamp" value="380" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs</url>
-          <line>316</line>
-          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Expression\Operation.cs" containingFunctionPresentation="方法 'OutputType'">
+          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
+          <line>38</line>
+          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'GenerateIL'">
             <startOffsets>
-              <option value="12266" />
+              <option value="1290" />
             </startOffsets>
             <endOffsets>
-              <option value="12300" />
+              <option value="1334" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="345" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/Instance.cs</url>
-          <line>193</line>
-          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Expression\Intermediates\Instance.cs" containingFunctionPresentation="方法 'LoadILValue'">
-            <startOffsets>
-              <option value="6817" />
-            </startOffsets>
-            <endOffsets>
-              <option value="6876" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="366" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs</url>
-          <line>16</line>
-          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ReturnStatement.cs" containingFunctionPresentation="方法 'GenerateIL'">
-            <startOffsets>
-              <option value="428" />
-            </startOffsets>
-            <endOffsets>
-              <option value="471" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="372" />
+          <option name="timeStamp" value="383" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
