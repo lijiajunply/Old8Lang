@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Compiler;
 using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.CslyParser;
@@ -13,7 +14,7 @@ public class VariateManager
     public LangInfo? LangInfo { get; set; }
     public string Path { get; set; } = "";
 
-    [NotNull] public Interpreter? Interpreter { get; set; }
+    [NotNull] public IMiniInterpreter? Interpreter { get; set; }
 
     #endregion
 

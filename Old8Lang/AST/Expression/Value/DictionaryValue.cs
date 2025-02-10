@@ -1,4 +1,6 @@
+using System.Reflection.Emit;
 using System.Text;
+using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
@@ -69,5 +71,34 @@ public class DictionaryValue(List<TupleValue> tuples) : ValueType, IOldList
     public ValueType Slice(int start, int end)
     {
         throw new Exception("dictionary is not support Slice");
+    }
+
+    public Type GetChildType() => typeof(KeyValuePair<object, object>);
+
+    public override Type OutputType(LocalManager local) => typeof(Dictionary<object, object>);
+
+    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
+    {
+        var listConstructor = typeof(Dictionary<object, object>).GetConstructor(Type.EmptyTypes)!;
+        ilGenerator.Emit(OpCodes.Newobj, listConstructor); // 创建 List<int> 实例
+
+        var l = ilGenerator.DeclareLocal(typeof(Dictionary<object, object>));
+        ilGenerator.Emit(OpCodes.Stloc, l.LocalIndex);
+
+        // 向 List<int> 中添加元素
+        var addMethod = typeof(Dictionary<object, object>).GetMethod("Add")!;
+        foreach (var expr in tuples)
+        {
+            ilGenerator.Emit(OpCodes.Ldloc, l.LocalIndex);
+            expr.Item1.LoadILValue(ilGenerator, local);
+            var t = expr.Item1.OutputType(local);
+            ilGenerator.Emit(OpCodes.Box, t!);
+            expr.Item2.LoadILValue(ilGenerator, local);
+            t = expr.Item2.OutputType(local);
+            ilGenerator.Emit(OpCodes.Box, t!);
+            ilGenerator.Emit(OpCodes.Callvirt, addMethod); // 调用 Add 方法
+        }
+
+        ilGenerator.Emit(OpCodes.Ldloc, l.LocalIndex);
     }
 }

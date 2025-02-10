@@ -1,13 +1,14 @@
 using System.Diagnostics;
 using Old8Lang.AST;
 using Old8Lang.AST.Statement;
+using Old8Lang.Compiler;
 using sly.parser;
 using sly.parser.generator;
 using sly.parser.generator.visitor;
 
 namespace Old8Lang.CslyParser;
 
-public class Interpreter
+public class Interpreter : IMiniInterpreter
 {
     #region Code
 
@@ -45,18 +46,18 @@ public class Interpreter
         Init();
     }
 
-    public void ParserRun(bool dot = false)
+    public void ParserRun()
     {
         var sw = new Stopwatch();
         sw.Start();
-        var block = Build(dot);
+        var block = Build();
         sw.Stop();
         var ts = sw.Elapsed.TotalMilliseconds;
         var time = $"------------------\nParser Build Time : {ts}ms\n";
         var milliseconds = ts;
 
         sw.Restart();
-        block.Run( Manager);
+        block.Run(Manager);
         sw.Stop();
         ts = sw.Elapsed.TotalMilliseconds;
         time += $"Process Run Time : {ts}ms\n";
@@ -65,7 +66,7 @@ public class Interpreter
         Console.WriteLine(time);
     }
 
-    public BlockStatement Build(bool isDot = false, string code = "")
+    public BlockStatement Build(string code = "")
     {
         code = string.IsNullOrEmpty(code) ? Code : code;
         var result = parser?.Parse(code);
@@ -82,9 +83,10 @@ public class Interpreter
                     Error.Add($"{x.ErrorType} : {x.ErrorMessage ?? ""}");
                     var lines = code.Split("\n");
                     Error.Add($"{lines[x.Line]}");
-                }catch (Exception)
+                }
+                catch (Exception)
                 {
-                    Error.Add($"{x.ErrorType} in line {x.Line+1} , col {x.Column}");
+                    Error.Add($"{x.ErrorType} in line {x.Line + 1} , col {x.Column}");
                     var lines = code.Split("\n");
                     Error.Add($"{lines[x.Line]}");
                 }
@@ -92,7 +94,6 @@ public class Interpreter
             throw new Exception(string.Join("\n", Error));
         }
 
-        if (isDot) Dot(result);
         return result.Result as BlockStatement ?? new BlockStatement([]);
     }
 

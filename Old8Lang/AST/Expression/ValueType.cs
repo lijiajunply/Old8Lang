@@ -35,19 +35,6 @@ public abstract class ValueType : OldExpr
         return new VoidValue();
     }
 
-    public object DotToIL(object left,object right)
-    {
-        return left switch
-        {
-            string leftStr => right switch
-            {
-                string rightStr => leftStr + rightStr,
-                _ => leftStr + right
-            },
-            _ => left + right.ToString()
-        };
-    }
-
     #region boolOper
 
     public virtual bool Equal(ValueType? otherValueType) => false;

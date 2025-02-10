@@ -15,7 +15,7 @@ public class LocalManager
     public readonly Dictionary<string, Type> ClassVar = [];
     public Type? InClassEnv { get; init; }
     public string FilePath { get; set; } = "";
-    public MiniInterpreter Interpreter { get; init; } = new();
+    public IMiniInterpreter? Interpreter { get; init; }
 
     public LocalManager New()
     {
@@ -42,7 +42,7 @@ public class LocalManager
     public int GetCount() => LocalVar.Count;
 }
 
-public class MiniInterpreter
+public class MiniInterpreter : IMiniInterpreter
 {
     private readonly Parser<OldTokenGeneric, OldLangTree>? parser;
 
@@ -62,26 +62,33 @@ public class MiniInterpreter
         if (result == null) throw new Exception("语法出错");
         List<string> Error = [];
         if (Error.Count != 0) Error.Clear();
-        if (result.Errors != null && result.Errors.Count != 0)
+        if (result.Errors == null || result.Errors.Count == 0)
+            return result.Result as BlockStatement ?? new BlockStatement([]);
+        result.Errors.ForEach(x =>
         {
-            result.Errors.ForEach(x =>
+            try
             {
-                try
-                {
-                    Error.Add($"{x.ErrorType} : {x.ErrorMessage ?? ""}");
-                    var lines = code.Split("\n");
-                    Error.Add($"{lines[x.Line]}");
-                }
-                catch (Exception)
-                {
-                    Error.Add($"{x.ErrorType} in line {x.Line + 1} , col {x.Column}");
-                    var lines = code.Split("\n");
-                    Error.Add($"{lines[x.Line]}");
-                }
-            });
-            throw new Exception(string.Join("\n", Error));
-        }
-
-        return result.Result as BlockStatement ?? new BlockStatement([]);
+                Error.Add($"{x.ErrorType} : {x.ErrorMessage ?? ""}");
+                var lines = code.Split("\n");
+                Error.Add($"{lines[x.Line]}");
+            }
+            catch (Exception)
+            {
+                Error.Add($"{x.ErrorType} in line {x.Line + 1} , col {x.Column}");
+                var lines = code.Split("\n");
+                Error.Add($"{lines[x.Line]}");
+            }
+        });
+        throw new Exception(string.Join("\n", Error));
     }
+
+    public AbsUseClass UseClass { get; set; } = new ConsoleUse();
+    public bool IsCompileOptimization { get; set; }
+}
+
+public interface IMiniInterpreter
+{
+    public BlockStatement Build(string code);
+    public AbsUseClass UseClass { get; set; }
+    public bool IsCompileOptimization { get; set; }
 }

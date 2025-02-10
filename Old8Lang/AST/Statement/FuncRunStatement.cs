@@ -43,5 +43,6 @@ public class FuncRunStatement : OldStatement
 
     public override int Count => 0;
 
-    public override string ToString() => Instance?.ToString()!;
+    public override string ToString() =>
+        Instance == null ? Operation == null ? "" : Operation.ToString() : Instance.ToString();
 }

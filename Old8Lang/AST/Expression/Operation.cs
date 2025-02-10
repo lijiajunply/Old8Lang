@@ -175,10 +175,10 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
         var leftType = left?.OutputType(local);
         var rightType = right.OutputType(local);
 
-        if (leftType == typeof(object))
-        {
-            return typeof(object);
-        }
+        // if (leftType == typeof(object))
+        // {
+        //     return typeof(object);
+        // }
 
         if (left == null)
         {

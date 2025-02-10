@@ -60,6 +60,8 @@ public class ArrayValue : ValueType, IOldList
         return new ArrayValue(RunResult[start..end]);
     }
 
+    public Type GetChildType() => typeof(object);
+
     public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 创建一个长度为 5 的整数数组

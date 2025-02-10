@@ -55,6 +55,8 @@ public class ListValue : ValueType, IOldList
             .ToList());
     }
 
+    public Type GetChildType() => typeof(object);
+
     public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
     {
         var listConstructor = typeof(List<object>).GetConstructor(Type.EmptyTypes)!;

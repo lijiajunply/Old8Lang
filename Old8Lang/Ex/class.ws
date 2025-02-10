@@ -1,3 +1,4 @@
+/*
 import File
 
 // 测试类
@@ -13,11 +14,15 @@ class Test{
    }
 }
 
-arr <- [12,31,2]
+//arr <- [12,31,2]
 //arr.Add("asdf")
-PrintLine(Len(arr))
+//PrintLine(Len(arr))
 
+*/
+c <- {"a":1,"b":2}
+//PrintLine(Len(c))
 
+PrintLine(c)
 
 /*
 for a in arr{
@@ -25,12 +30,10 @@ for a in arr{
 }
 arr[0] <- 21
 PrintLine(arr[0])
-*/
-
-
 a <- Test("asdf")
 //a.a <- fib(30)
 PrintLine(a.a)
 //a.Add(1,2)
 a <- FileRead("C:\Projects\RiderProjects\Old8Lang\Old8Lang\Ex\class.ws")
-PrintLine(a)
+ PrintLine(a)
+*/

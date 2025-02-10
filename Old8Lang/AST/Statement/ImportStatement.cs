@@ -57,8 +57,8 @@ public class ImportStatement(string importString) : OldStatement
 
             var pPath = local.FilePath;
             local.FilePath = path;
-            var block = local.Interpreter.Build(code: code);
-            block.GenerateImportIL(ilGenerator, local);
+            var block = local.Interpreter?.Build(code: code);
+            block?.GenerateImportIL(ilGenerator, local);
             local.FilePath = pPath;
             return;
         }
@@ -67,8 +67,8 @@ public class ImportStatement(string importString) : OldStatement
         if (!File.Exists(dic + "/" + importString + ".ws")) return;
 
         var filePath = dic + "/" + importString + ".ws";
-        var result = local.Interpreter.Build(code: Apis.FromFile(filePath));
-        result.GenerateImportIL(ilGenerator, local);
+        var result = local.Interpreter?.Build(code: Apis.FromFile(filePath));
+        result?.GenerateImportIL(ilGenerator, local);
     }
 
     public override OldStatement this[int index] => this;

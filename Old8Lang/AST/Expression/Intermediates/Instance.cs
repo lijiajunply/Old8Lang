@@ -166,8 +166,7 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
                 var id = Ids[0];
                 id.LoadILValue(ilGenerator, local);
                 var type = id.OutputType(local)!;
-                ilGenerator.Emit(OpCodes.Call,
-                    typeof(Console).GetMethod("WriteLine", [type])!);
+                ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", [type])!);
                 return;
             case "Print":
                 id = Ids[0];
@@ -183,15 +182,8 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
                 id = Ids[0];
                 id.LoadILValue(ilGenerator, local);
                 type = id.OutputType(local)!;
-                if (type.IsAssignableTo(typeof(object[])))
-                {
-                    var lengthProp = typeof(object[]).GetProperty("Length");
-                    ilGenerator.Emit(OpCodes.Call, lengthProp!.GetGetMethod()!);
-                    return;
-                }
-
-                var countProp = typeof(List<object>).GetProperty("Count");
-                ilGenerator.Emit(OpCodes.Call, countProp!.GetGetMethod()!);
+                var lengthProp = type.GetProperty(type.IsAssignableTo(typeof(object[])) ? "Length" : "Count");
+                ilGenerator.Emit(OpCodes.Call, lengthProp!.GetGetMethod()!);
                 return;
             case "Type":
                 id = Ids[0];

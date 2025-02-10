@@ -9,7 +9,7 @@ namespace Old8Lang.AST.Statement;
 
 public class ForStatement(
     SetStatement setStatement,
-    Operation expr,
+    OldExpr expr,
     OldStatement statement,
     BlockStatement blockStatement)
     : OldStatement

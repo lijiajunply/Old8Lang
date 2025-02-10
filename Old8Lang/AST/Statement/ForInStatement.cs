@@ -28,8 +28,11 @@ public class ForInStatement(OldID id, OldExpr expr, OldStatement body) : OldStat
 
     public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
     {
+        var ty = expr.OutputType(local);
         var enumerator = ilGenerator.DeclareLocal(typeof(IEnumerator));
-        var current = ilGenerator.DeclareLocal(typeof(object));
+        var current = ilGenerator.DeclareLocal(ty == typeof(Dictionary<object, object>)
+            ? typeof(KeyValuePair<object, object>)
+            : typeof(object));
 
         // Get the GetEnumerator method
         var getEnumeratorMethod = typeof(IEnumerable).GetMethod("GetEnumerator")!;

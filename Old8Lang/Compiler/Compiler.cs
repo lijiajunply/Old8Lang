@@ -8,7 +8,7 @@ namespace Old8Lang.Compiler;
 
 public static class Compiler
 {
-    public static Action Compile(BlockStatement statement, string path, MiniInterpreter i)
+    public static Action Compile(BlockStatement statement, string path, IMiniInterpreter i)
     {
         var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
         var ilGenerator = dynamicMethod.GetILGenerator();
@@ -19,7 +19,7 @@ public static class Compiler
         return oldLangRun;
     }
 
-    public static Action Compile(string path, MiniInterpreter i)
+    public static Action Compile(string path, IMiniInterpreter i)
     {
         var statement = i.Build(Apis.FromFile(path));
         var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);

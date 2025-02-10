@@ -2,6 +2,16 @@
 using Old8Lang;
 using Old8Lang.Compiler;
 using Old8Lang.CslyParser;
+using Old8Lang.NewParser;
+
+const string newTokenCode = """
+                   func main (a) {
+                       return PrintLine(a)
+                   }
+                   """;
+
+NewInterpreter.Tokenize(newTokenCode).ForEach(x => Console.WriteLine(x));
+Console.WriteLine(new NewInterpreter().Build(newTokenCode));
 
 // fib , compiler
 

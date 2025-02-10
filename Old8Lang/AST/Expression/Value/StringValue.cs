@@ -59,7 +59,9 @@ public class StringValue(string context) : ValueType, IOldList
         if (end < 0) end += Value.Length + 1;
         return new StringValue(Value[start..end]);
     }
-    
+
+    public Type GetChildType() => typeof(char);
+
     public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
     {
         ilGenerator.Emit(OpCodes.Ldstr, Value);
