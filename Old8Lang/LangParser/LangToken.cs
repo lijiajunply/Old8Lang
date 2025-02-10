@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Text;
 
 namespace Old8Lang.LangParser;
@@ -21,11 +22,12 @@ public static class LangTokenizer
     {
         var tokens = new List<LangToken>();
 
+        code = new FilteringCommentsTokenizer(code).FilteringComments();
+
         // 行 : line
         // 列 : 字符总数 - 累积到上一行的字符数 - \r次数 + 1
         var line = 1;
-        var column = 0; // 累积到上一行的字符数 + \r次数
-        var lineBreaksCount = 0; // \r次数
+        var column = 0; // 累积到上一行的字符数
 
         for (var i = 0; i < code.Length; i++)
         {
@@ -35,7 +37,7 @@ public static class LangTokenizer
                 for (var j = 0; j < len; j++)
                 {
                     if (j == len - 1 && i + j <= code.Length && a[j] == code[i + j] && i + j + 1 < code.Length &&
-                        code[i + j + 1] == ' ')
+                        !char.IsLetter(code[i + j + 1]))
                     {
                         tokens.Add(new LangToken(a, Enum.Parse<LangTokenType>(char.ToUpper(a[0]) + a[1..]), line,
                             i - column));
@@ -54,14 +56,13 @@ public static class LangTokenizer
 
             if (code[i] == '\r')
             {
-                lineBreaksCount++;
-                continue;
+                i++;
             }
 
             if (code[i] == '\n')
             {
                 line++;
-                column = i + lineBreaksCount;
+                column = i;
                 continue;
             }
 
@@ -208,14 +209,13 @@ public static class LangTokenizer
 
             if (code[i] == '.')
             {
-                if (i + 1 < code.Length && code[i + 1] == '.')
-                {
-                    tokens.Add(new LangToken("..", LangTokenType.DotDot, line, i - column));
-                    i++;
-                    continue;
-                }
-
                 tokens.Add(new LangToken(".", LangTokenType.Dot, line, i - column));
+                continue;
+            }
+
+            if (code[i] == '~')
+            {
+                tokens.Add(new LangToken("~", LangTokenType.Wavy, line, i - column));
                 continue;
             }
 
@@ -315,9 +315,8 @@ public static class LangTokenizer
 
             #region 关键词
 
-            var enumList = Enum.GetNames<KeywordType>().Select(x => x.ToLower());
-            var enumerable = enumList as string[] ?? enumList.ToArray();
-            if (enumerable.Any(x => x[0] == code[i]) && enumerable.Any(Func)) continue;
+            var enumList = Enum.GetNames<KeywordType>().Select(x => x.ToLower()).ToFrozenSet();
+            if (enumList.Where(x => x[0] == code[i]).Any(Func)) continue;
 
             #endregion
 
@@ -354,5 +353,76 @@ public static class LangTokenizer
         }
 
         return tokens;
+    }
+}
+
+public struct FilteringCommentsTokenizer(string input)
+{
+    private int _currentIndex;
+
+    public string FilteringComments()
+    {
+        var tokens = new StringBuilder();
+
+        while (_currentIndex < input.Length)
+        {
+            var currentChar = input[_currentIndex];
+
+            if (currentChar == '/' && Peek() == '/')
+            {
+                SkipSingleLineComment();
+                continue;
+            }
+
+            if (currentChar == '/' && Peek() == '*')
+            {
+                SkipMultiLineComment();
+                continue;
+            }
+
+            tokens.Append(input[_currentIndex]);
+            Advance();
+        }
+
+        return tokens.ToString();
+    }
+
+    private void Advance()
+    {
+        _currentIndex++;
+    }
+
+    private char Peek()
+    {
+        return _currentIndex + 1 >= input.Length ? '\0' : input[_currentIndex + 1];
+    }
+
+    private void SkipSingleLineComment()
+    {
+        Advance(); // Skip '/'
+        Advance(); // Skip '/'
+
+        while (_currentIndex < input.Length && input[_currentIndex] != '\n')
+        {
+            Advance();
+        }
+    }
+
+    private void SkipMultiLineComment()
+    {
+        Advance(); // Skip '/'
+        Advance(); // Skip '*'
+
+        while (_currentIndex < input.Length)
+        {
+            if (input[_currentIndex] == '*' && Peek() == '/')
+            {
+                Advance(); // Skip '*'
+                Advance(); // Skip '/'
+                break;
+            }
+
+            Advance();
+        }
     }
 }

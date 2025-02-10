@@ -5,20 +5,62 @@ using Old8Lang.CslyParser;
 using Old8Lang.LangParser;
 
 const string newTokenCode = """
-                            func main (a) {
-                                return PrintLine(a)
+                            // 基本计算和赋值
+
+                            a <- 123+1
+                            a <- 1233
+                            b <- a >= 1233 
+                            PrintLine(b)
+
+                            // if语句
+                            if a == 123
+                              PrintLine("123")
+                            elif a == 1234
+                              PrintLine("1234")
+                            elif a == 1233
+                              PrintLine("1233")
+                            else
+                              PrintLine("false")
+
+                            // for语句
+
+
+                            for a <- 1,a <= 5,a++{
+                                PrintLine(a)
                             }
+
+
+                            // switch语句
+
+                            switch a {
+                                case 123
+                                    PrintLine("1")
+                                case 1233
+                                    PrintLine("2")
+                                default
+                                    PrintLine("default")
+                            }
+
+                            for i in [1~3] {
+                                PrintLine(i)
+                            }
+
+                            func main(a) {
+                                PrintLine(a)
+                            }
+
+                            main("asdf")
                             """;
 
-LangInterpreter.Tokenize(newTokenCode).ForEach(x => Console.WriteLine(x));
-Console.WriteLine(new LangInterpreter().Build(newTokenCode));
+var block = new LangInterpreter().Build(newTokenCode);
+Console.WriteLine(block.ToCode());
 
 // fib , compiler
 
 #if DEBUG
 string[] strings =
 [
-    "-c", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,
+    "-f", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,
         "Old8Lang", "Ex", "class.ws")
 ];
 
@@ -33,7 +75,7 @@ var a = Apis.ReadJson();
 if (args.Length == 0)
 {
     Console.WriteLine("Command Line Mode");
-    var i = new Interpreter();
+    var i = new LangInterpreter();
 
     while (true)
     {
@@ -41,18 +83,26 @@ if (args.Length == 0)
         var code = Console.ReadLine();
         if (string.IsNullOrEmpty(code)) continue;
         if (code == "exit") return;
-        var b = i.Build(code: code);
-        var error = i.GetError();
-        if (error.Count == 0)
+        try
+        {
+            var b = i.Build(code: code);
             b.Run(i.Manager);
-        else
-            error.ForEach(Console.WriteLine);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
     }
 }
 
 if (args[0] == BasicInfo.Order["FromFile"])
 {
-    Apis.CslyUsing(args[1], false);
+    var aLangInterpreter = new LangInterpreter
+    {
+        Manager = { Path = args[1] }
+    };
+    aLangInterpreter.Build(Apis.FromFile(args[1]));
+    //Apis.CslyUsing(args[1], false);
     return;
 }
 

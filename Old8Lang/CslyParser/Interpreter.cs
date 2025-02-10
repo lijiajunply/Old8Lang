@@ -97,13 +97,5 @@ public class Interpreter : IMiniInterpreter
         return result.Result as BlockStatement ?? new BlockStatement([]);
     }
 
-    private void Dot(ParseResult<OldTokenGeneric, OldLangTree> result)
-    {
-        var tree = result.SyntaxTree;
-        var graphviz = new GraphVizEBNFSyntaxTreeVisitor<OldTokenGeneric>();
-        graphviz.VisitTree(tree);
-        File.WriteAllText(Manager.Path.Replace("ws", "dot"), graphviz.Graph.Compile());
-    }
-
     public List<string> GetError() => Error;
 }

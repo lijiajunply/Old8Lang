@@ -164,9 +164,9 @@ public enum LangTokenType
     Dollar,
 
     /// <summary>
-    /// ..
+    /// ~
     /// </summary>
-    DotDot,
+    Wavy,
 
     /// <summary>
     /// not

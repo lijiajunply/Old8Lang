@@ -82,12 +82,13 @@ public class LangParser(List<LangToken> tokens)
         {
             LangTokenType.LeftParen => ParseLrBlock(),
             LangTokenType.If => ParseIfStatement(),
+            LangTokenType.For when Peek().Type == LangTokenType.Identifier &&
+                                   Peek(2).Type == LangTokenType.In => ParseForInStatement(),
             LangTokenType.For when Peek().Type == LangTokenType.Identifier => ParseForStatement(),
-            LangTokenType.For when Peek().Type == LangTokenType.In => ParseForInStatement(),
             LangTokenType.While => ParseWhileStatement(),
             LangTokenType.Switch => ParseSwitchStatement(),
-            LangTokenType.Func when Peek().Type == LangTokenType.Identifier && Peek(2).Type == LangTokenType.LeftParen =>
-                ParseFuncDeclaration(),
+            LangTokenType.Func when Peek().Type == LangTokenType.Identifier &&
+                                    Peek(2).Type == LangTokenType.LeftParen => ParseFuncDeclaration(),
             LangTokenType.Return => ParseReturnStatement(),
             // Lambda
             LangTokenType.Identifier when Peek().Type == LangTokenType.Arrow => ParseFuncDeclaration(),
@@ -96,20 +97,22 @@ public class LangParser(List<LangToken> tokens)
             // 类型实例调用属性/方法
             LangTokenType.Identifier when Peek().Type == LangTokenType.Dot => ParseClassFuncRunStatement(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseFuncRunStatement(),
+            LangTokenType.Identifier when Peek().Type == LangTokenType.PlusPlus => ParsePlusPlus(),
+            LangTokenType.Identifier when Peek().Type == LangTokenType.MinusMinus => ParseMinusMinus(),
             LangTokenType.Identifier => ParseSet(),
             LangTokenType.Class => ParseClassDeclaration(),
             LangTokenType.Import => ParseImportStatement(),
             LangTokenType.LeftBracket when Peek().Type == LangTokenType.Import => ParseNativeStatement(),
-            LangTokenType.PlusPlus => ParsePlusPlus(),
-            LangTokenType.MinusMinus => ParseMinusMinus(),
-            LangTokenType.LeftBracket when Peek().Type == LangTokenType.Import && Peek(2).Type == LangTokenType.String &&
-                                          Peek(3).Type == LangTokenType.Identifier &&
-                                          Peek(4).Type == LangTokenType.RightBracket &&
-                                          Peek(5).Type == LangTokenType.Arrow && Peek(6).Type == LangTokenType.String
+            LangTokenType.LeftBracket when Peek().Type == LangTokenType.Import &&
+                                           Peek(2).Type == LangTokenType.String &&
+                                           Peek(3).Type == LangTokenType.Identifier &&
+                                           Peek(4).Type == LangTokenType.RightBracket &&
+                                           Peek(5).Type == LangTokenType.Arrow && Peek(6).Type == LangTokenType.String
                 => ParseNativeStatic(),
-            LangTokenType.LeftBracket when Peek().Type == LangTokenType.Import && Peek(2).Type == LangTokenType.String &&
-                                          Peek(3).Type == LangTokenType.Identifier &&
-                                          Peek(4).Type == LangTokenType.RightBracket => ParseNativeClass(),
+            LangTokenType.LeftBracket when Peek().Type == LangTokenType.Import &&
+                                           Peek(2).Type == LangTokenType.String &&
+                                           Peek(3).Type == LangTokenType.Identifier &&
+                                           Peek(4).Type == LangTokenType.RightBracket => ParseNativeClass(),
             _ => throw new Exception($"语法有误。在解析到ParseStatement时出现问题。在{CurrentToken.Line}:{CurrentToken.Column}")
         };
     }
@@ -459,58 +462,55 @@ public class LangParser(List<LangToken> tokens)
     //            | notBool
     //            | minusPrefix
     //            | primary ;
-
     private OldExpr ParseExpression()
     {
-        if (CurrentToken.Type == LangTokenType.LeftParen)
-        {
-            return ParseBinaryExpression();
-        }
-
-        var a = CurrentToken.Type switch
-        {
-            LangTokenType.Not => ParseNotBool(),
-            LangTokenType.Minus when Peek().Type != LangTokenType.Assignment => ParseMinusPrefix(),
-            _ => null
-        };
-
-        if (a != null) return a;
-
-        var next = Peek();
-        return next.Type switch
-        {
-            LangTokenType.LessThanEquals or LangTokenType.GreaterThanEquals or LangTokenType.Equals
-                or LangTokenType.NotEquals or LangTokenType.LessThan
-                or LangTokenType.GreaterThan => ParseBinaryExpression(),
-            LangTokenType.Dot => ParseDotExpr(),
-            LangTokenType.Plus or LangTokenType.Minus when Peek().Type != LangTokenType.Assignment => ParseNumberOpera1(),
-            LangTokenType.Star or LangTokenType.Slash => ParseNumberOpera2(),
-            LangTokenType.And or LangTokenType.Or or LangTokenType.Xor => ParseBoolOpera(),
-            _ => ParsePrimary()
-        };
-    }
-
-    // numberOpera1 = expression ( ( "+" | "-" ) expression )* ;
-    private OldExpr ParseNumberOpera1()
-    {
-        var left = ParseTerm();
-        while (CurrentToken.Type == LangTokenType.Plus || CurrentToken.Type == LangTokenType.Minus)
-        {
-            var operatorToken = CurrentToken.Type;
-            Expect(CurrentToken.Type);
-            var right = ParseTerm();
-            left = new Operation(left, operatorToken.GetGeneric(), right);
-        }
-
-        return left;
-    }
-
-    // term = factor { ("*" | "/") factor } ;
-    private OldExpr ParseTerm()
-    {
         var left = ParsePrimary();
-        while (CurrentToken.Type == LangTokenType.Star || CurrentToken.Type == LangTokenType.Slash ||
-               CurrentToken.Type == LangTokenType.Dot)
+
+        while (true)
+        {
+            switch (CurrentToken.Type)
+            {
+                case LangTokenType.LessThanEquals:
+                case LangTokenType.GreaterThanEquals:
+                case LangTokenType.Equals:
+                case LangTokenType.NotEquals:
+                case LangTokenType.LessThan:
+                case LangTokenType.GreaterThan:
+                    left = ParseBinaryExpression(left);
+                    break;
+
+                case LangTokenType.Dot:
+                    left = ParseDotExpr(left);
+                    break;
+
+                case LangTokenType.Plus:
+                case LangTokenType.Minus when Peek().Type != LangTokenType.Assignment:
+                    left = ParseNumberOpera1(left);
+                    break;
+
+                case LangTokenType.Star:
+                case LangTokenType.Slash:
+                    left = ParseNumberOpera2(left);
+                    break;
+
+                case LangTokenType.And:
+                case LangTokenType.Or:
+                case LangTokenType.Xor:
+                    left = ParseBoolOpera(left);
+                    break;
+
+                default:
+                    return left;
+            }
+        }
+    }
+
+// binaryExpression = expression ( ( "<" | ">" | "==" | "!=" | "<=" | ">=" ) expression )* ;
+    private OldExpr ParseBinaryExpression(OldExpr left)
+    {
+        while (CurrentToken.Type is LangTokenType.LessThanEquals or LangTokenType.GreaterThanEquals
+               or LangTokenType.Equals
+               or LangTokenType.NotEquals or LangTokenType.LessThan or LangTokenType.GreaterThan)
         {
             var operatorToken = CurrentToken.Type;
             Expect(CurrentToken.Type);
@@ -521,27 +521,9 @@ public class LangParser(List<LangToken> tokens)
         return left;
     }
 
-
-    // binaryExpression = expression ( ( "<" | ">" | "==" | "!=" | "<=" | ">=" ) expression )* ;
-    private OldExpr ParseBinaryExpression()
+// dotExpr = expression ( "." expression )* ;
+    private OldExpr ParseDotExpr(OldExpr left)
     {
-        var left = ParseTerm();
-        while (CurrentToken.Type is LangTokenType.LessThanEquals or LangTokenType.GreaterThanEquals or LangTokenType.Equals
-               or LangTokenType.NotEquals or LangTokenType.LessThan or LangTokenType.GreaterThan)
-        {
-            var operatorToken = CurrentToken.Type;
-            Expect(CurrentToken.Type);
-            var right = ParseTerm();
-            left = new Operation(left, operatorToken.GetGeneric(), right);
-        }
-
-        return left;
-    }
-
-    // dotExpr = expression ( "." expression )* ;
-    private OldExpr ParseDotExpr()
-    {
-        var left = ParsePrimary();
         while (CurrentToken.Type == LangTokenType.Dot)
         {
             Expect(LangTokenType.Dot);
@@ -552,10 +534,23 @@ public class LangParser(List<LangToken> tokens)
         return left;
     }
 
-    // numberOpera2 = expression ( ( "*" | "/" ) expression )* ;
-    private OldExpr ParseNumberOpera2()
+// numberOpera1 = expression ( ( "+" | "-" ) expression )* ;
+    private OldExpr ParseNumberOpera1(OldExpr left)
     {
-        var left = ParsePrimary();
+        while (CurrentToken.Type == LangTokenType.Plus || CurrentToken.Type == LangTokenType.Minus)
+        {
+            var operatorToken = CurrentToken.Type;
+            Expect(CurrentToken.Type);
+            var right = ParsePrimary();
+            left = new Operation(left, operatorToken.GetGeneric(), right);
+        }
+
+        return left;
+    }
+
+// numberOpera2 = expression ( ( "*" | "/" ) expression )* ;
+    private OldExpr ParseNumberOpera2(OldExpr left)
+    {
         while (CurrentToken.Type == LangTokenType.Star || CurrentToken.Type == LangTokenType.Slash)
         {
             var operatorToken = CurrentToken.Type;
@@ -567,36 +562,19 @@ public class LangParser(List<LangToken> tokens)
         return left;
     }
 
-    // boolOpera = expression ( ( "and" | "or" | "xor" ) expression )* ;
-    private OldExpr ParseBoolOpera()
+// boolOpera = expression ( ( "and" | "or" | "xor" ) expression )* ;
+    private OldExpr ParseBoolOpera(OldExpr left)
     {
-        var left = ParseExpression();
         while (CurrentToken.Type == LangTokenType.And || CurrentToken.Type == LangTokenType.Or ||
                CurrentToken.Type == LangTokenType.Xor)
         {
             var operatorToken = CurrentToken.Type;
             Expect(CurrentToken.Type);
-            var right = ParseExpression();
+            var right = ParsePrimary();
             left = new Operation(left, operatorToken.GetGeneric(), right);
         }
 
         return left;
-    }
-
-    // notBool = "not" expression ;
-    private Operation ParseNotBool()
-    {
-        Expect(LangTokenType.Not);
-        var expression = ParseExpression();
-        return new Operation(null, OldTokenGeneric.NOT, expression);
-    }
-
-    // minusPrefix = "-" expression ;
-    private Operation ParseMinusPrefix()
-    {
-        Expect(LangTokenType.Minus);
-        var expression = ParseExpression();
-        return new Operation(null, OldTokenGeneric.MINUS, expression);
     }
 
     #endregion
@@ -620,7 +598,7 @@ public class LangParser(List<LangToken> tokens)
     //         | tuple
     //         | dictionary
     //         | slice
-    //         | asStatement ;
+    //         | asStatement
     private OldExpr ParsePrimary()
     {
         return CurrentToken.Type switch
@@ -719,9 +697,9 @@ public class LangParser(List<LangToken> tokens)
         }
 
         list.Add(ParseExpression());
-        if (CurrentToken.Type == LangTokenType.DotDot)
+        if (CurrentToken.Type == LangTokenType.Wavy)
         {
-            Expect(LangTokenType.DotDot);
+            Expect(LangTokenType.Wavy);
             list.Add(ParseExpression());
             Expect(LangTokenType.RightBracket);
             return new RangeValue(list[0], list[1]);
