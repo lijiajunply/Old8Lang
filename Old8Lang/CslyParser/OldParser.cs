@@ -141,12 +141,12 @@ public class OldParser
     public OldLangTree Id(OldLangTree id) => id;
 
     [Production("ident: IDENTIFIER (COLON[d] IDENTIFIER)?")]
-    public OldLangTree Id_1(Token<OldTokenGeneric> id,ValueOption<Group<OldTokenGeneric, OldLangTree>> assumptionType)
+    public OldLangTree Id_1(Token<OldTokenGeneric> id, ValueOption<Group<OldTokenGeneric, OldLangTree>> assumptionType)
     {
         var eGrp = assumptionType.Match(
             x => x, () => null!);
         var assumption = eGrp?.Token(0).Value;
-        return new OldID(id.Value,assumption ?? "");
+        return new OldID(id.Value, assumption ?? "");
     }
 
     [Production("primary: TRUE[d]")]
@@ -289,7 +289,7 @@ public class OldParser
     public OldLangTree Dic(OldLangTree first, List<Group<OldTokenGeneric, OldLangTree>> list)
     {
         var b = new List<TupleValue>();
-        if (first is not TupleValue firstValue) return new DictionaryValue([]);
+        if (first is not TupleValue firstValue) return new DictionaryValue();
 
         b.Add(firstValue);
         list.ForEach(x => b.Add(x.Value(0) as TupleValue ?? new TupleValue(new VoidValue(), new VoidValue())));

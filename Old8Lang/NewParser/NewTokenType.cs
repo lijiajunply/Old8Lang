@@ -45,9 +45,14 @@ public enum NewTokenType
     Pipe,
 
     /// <summary>
-    /// "
+    /// "~"
     /// </summary>
     String,
+
+    /// <summary>
+    /// '~'
+    /// </summary>
+    Char,
 
     /// <summary>
     /// 0-9
@@ -146,17 +151,29 @@ public enum NewTokenType
     /// ||
     /// </summary>
     Or,
+    Xor,
 
     /// <summary>
-    /// null
+    /// ->
     /// </summary>
+    Arrow,
+
+    /// <summary>
+    /// $
+    /// </summary>
+    Dollar,
+
+    /// <summary>
+    /// ..
+    /// </summary>
+    DotDot,
+
+    /// <summary>
+    /// not
+    /// </summary>
+    Not,
     Null,
-
-    /// <summary>
-    /// true
-    /// </summary>
     True,
-
     False,
     If,
     For,
@@ -173,14 +190,13 @@ public enum NewTokenType
     Else,
     Case,
     Default,
-    Arrow,
-    Not,
-    Xor,
-    Return
+    Return,
+    As
 }
 
 public enum KeywordType
 {
+    Not,
     Null,
     True,
     False,
@@ -196,7 +212,8 @@ public enum KeywordType
     Else,
     Case,
     Default,
-    Return
+    Return,
+    As
 }
 
 public static class TokenOpera

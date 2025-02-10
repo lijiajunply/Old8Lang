@@ -208,6 +208,13 @@ public static class NewTokenizer
 
             if (code[i] == '.')
             {
+                if (i + 1 < code.Length && code[i + 1] == '.')
+                {
+                    tokens.Add(new NewToken("..", NewTokenType.DotDot, line, i - column));
+                    i++;
+                    continue;
+                }
+
                 tokens.Add(new NewToken(".", NewTokenType.Dot, line, i - column));
                 continue;
             }
@@ -295,6 +302,12 @@ public static class NewTokenizer
                 }
 
                 tokens.Add(new NewToken("|", NewTokenType.Pipe, line, i - column));
+                continue;
+            }
+
+            if (code[i] == '$')
+            {
+                tokens.Add(new NewToken("$", NewTokenType.Dollar, line, i - column));
                 continue;
             }
 

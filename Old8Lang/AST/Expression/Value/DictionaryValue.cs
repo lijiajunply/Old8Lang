@@ -5,9 +5,25 @@ using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class DictionaryValue(List<TupleValue> tuples) : ValueType, IOldList
+public class DictionaryValue : ValueType, IOldList
 {
+    private readonly List<TupleValue> tuples;
     public readonly List<(ValueType Key, ValueType Value)> Value = [];
+
+    public DictionaryValue(List<TupleValue> tuples)
+    {
+        this.tuples = tuples;
+    }
+
+    public DictionaryValue()
+    {
+        tuples = [];
+    }
+
+    public DictionaryValue(List<KeyValuePair<OldExpr, OldExpr>> list)
+    {
+        tuples = list.Select(x => new TupleValue(x.Key, x.Value)).ToList();
+    }
 
     public override ValueType Run(VariateManager Manager)
     {

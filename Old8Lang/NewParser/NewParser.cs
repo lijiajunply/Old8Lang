@@ -3,11 +3,14 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.CslyParser;
+using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.NewParser;
 
 public class NewParser(List<NewToken> tokens)
 {
+    #region 基础操作
+
     private int _currentIndex;
 
     private NewToken CurrentToken => _currentIndex >= tokens.Count
@@ -34,6 +37,9 @@ public class NewParser(List<NewToken> tokens)
         return tokens[_currentIndex + offset];
     }
 
+    #endregion
+
+    #region Root
 
     // root = statement* ;
     public BlockStatement ParseProgram()
@@ -46,6 +52,10 @@ public class NewParser(List<NewToken> tokens)
 
         return new BlockStatement(statements);
     }
+
+    #endregion
+
+    #region Statement
 
     // statement = lrBlock
     //           | declaration
@@ -104,7 +114,7 @@ public class NewParser(List<NewToken> tokens)
         };
     }
 
-    private OldStatement ParseReturnStatement()
+    private ReturnStatement ParseReturnStatement()
     {
         Expect(NewTokenType.Return);
         var expression = ParseExpression();
@@ -221,11 +231,10 @@ public class NewParser(List<NewToken> tokens)
         return new OldCase(expression, block);
     }
 
-    // funcDeclaration = ( identifier | "func" identifier ) "(" idList? ")" ( "->" block | block ) ;
     /// <summary>
-    /// 声明函数
+    /// funcDeclaration = ( identifier | "func" identifier ) "(" idList? ")"  "->" block  ;
     /// </summary>
-    /// <returns></returns>
+    /// <returns>声明函数</returns>
     private FuncInit ParseFuncDeclaration()
     {
         if (CurrentToken.Type == NewTokenType.Func)
@@ -248,7 +257,10 @@ public class NewParser(List<NewToken> tokens)
         return new FuncInit(new FuncValue(funcName, parameters, block));
     }
 
-    // classDeclaration = "class" identifier classBlock ;
+    /// <summary>
+    /// classDeclaration = "class" identifier classBlock ;
+    /// </summary>
+    /// <returns>声明类</returns>
     private ClassInit ParseClassDeclaration()
     {
         Expect(NewTokenType.Class);
@@ -258,7 +270,11 @@ public class NewParser(List<NewToken> tokens)
         return new ClassInit(new AnyValue(new OldID(className), classBlock.ToAnyData()));
     }
 
-    // classBlock = "{" [set | funcDeclaration]* "}" ;
+    /// <summary>
+    /// classBlock = "{" [set | funcDeclaration]* "}" ;
+    /// </summary>
+    /// <returns>类块</returns>
+    /// <exception cref="Exception">期望声明或函数声明</exception>
     private BlockStatement ParseClassBlock()
     {
         Expect(NewTokenType.LeftBrace);
@@ -278,7 +294,10 @@ public class NewParser(List<NewToken> tokens)
         return new BlockStatement(statements);
     }
 
-    // funcRunStatement = identifier "(" argList? ")" ;
+    /// <summary>
+    /// funcRunStatement = identifier "(" argList? ")" ;
+    /// </summary>
+    /// <returns>函数调用</returns>
     private FuncRunStatement ParseFuncRunStatement()
     {
         var funcName = CurrentToken.Value;
@@ -289,8 +308,11 @@ public class NewParser(List<NewToken> tokens)
         return new FuncRunStatement(new Instance(new OldID(funcName), arguments));
     }
 
-    // classFuncRunStatement = identifier "." identifier "(" argList? ")" ;
-    private OldStatement ParseClassFuncRunStatement()
+    /// <summary>
+    /// classFuncRunStatement = identifier "." identifier "(" argList? ")" ;
+    /// </summary>
+    /// <returns>类方法调用</returns>
+    private FuncRunStatement ParseClassFuncRunStatement()
     {
         var className = CurrentToken.Value;
         Expect(NewTokenType.Identifier);
@@ -304,7 +326,10 @@ public class NewParser(List<NewToken> tokens)
             new Instance(new OldID(funcName), arguments)));
     }
 
-    // importStatement = "import" identifier ;
+    /// <summary>
+    /// importStatement = "import" identifier ;
+    /// </summary>
+    /// <returns>引入模块</returns>
     private ImportStatement ParseImportStatement()
     {
         Expect(NewTokenType.Import);
@@ -313,7 +338,10 @@ public class NewParser(List<NewToken> tokens)
         return new ImportStatement(moduleName);
     }
 
-    // nativeStatement = "[" "import" STRING identifier identifier identifier? "]" ;
+    /// <summary>
+    /// nativeStatement = "[" "import" STRING identifier identifier identifier? "]" ;
+    /// </summary>
+    /// <returns>引入原生方法</returns>
     private NativeStatement ParseNativeStatement()
     {
         Expect(NewTokenType.LeftBracket);
@@ -338,7 +366,7 @@ public class NewParser(List<NewToken> tokens)
     /// <summary>
     /// nativeStatic = "[" "import" STRING identifier "]" "->" STRING ;
     /// </summary>
-    /// <returns></returns>
+    /// <returns>引入原生静态类</returns>
     private NativeStatement ParseNativeStatic()
     {
         Expect(NewTokenType.LeftBracket);
@@ -354,7 +382,10 @@ public class NewParser(List<NewToken> tokens)
         return new NativeStatement(dllName, className, methodName);
     }
 
-    // nativeClass = "[" "import" STRING identifier "]" ;
+    /// <summary>
+    ///  nativeClass = "[" "import" STRING identifier "]" ;
+    /// </summary>
+    /// <returns>引入原生类</returns>
     private NativeStatement ParseNativeClass()
     {
         Expect(NewTokenType.LeftBracket);
@@ -367,7 +398,10 @@ public class NewParser(List<NewToken> tokens)
         return new NativeStatement(dllName, className);
     }
 
-    // plusPlus = identifier "++" ;
+    /// <summary>
+    /// plusPlus = identifier "++"
+    /// </summary>
+    /// <returns>i++运算</returns>
     private SetStatement ParsePlusPlus()
     {
         var identifier = CurrentToken.Value;
@@ -377,7 +411,10 @@ public class NewParser(List<NewToken> tokens)
             new Operation(new OldID(identifier), OldTokenGeneric.PLUS, new IntValue(1)));
     }
 
-    // minusMinus = identifier "--" ;
+    /// <summary>
+    /// minusMinus = identifier "--"
+    /// </summary>
+    /// <returns>i--运算</returns>
     private SetStatement ParseMinusMinus()
     {
         var identifier = CurrentToken.Value;
@@ -387,7 +424,11 @@ public class NewParser(List<NewToken> tokens)
             new Operation(new OldID(identifier), OldTokenGeneric.MINUS, new IntValue(1)));
     }
 
-    // block = "{" statement* "}" ;
+    /// <summary>
+    /// block = "{" statement* "}"
+    ///       | statement
+    /// </summary>
+    /// <returns>块语句</returns>
     private BlockStatement ParseBlock()
     {
         if (CurrentToken.Type != NewTokenType.LeftBrace)
@@ -405,6 +446,10 @@ public class NewParser(List<NewToken> tokens)
         Expect(NewTokenType.RightBrace);
         return new BlockStatement(statements);
     }
+
+    #endregion
+
+    #region Expression
 
     // expression = binaryExpression
     //            | dotExpr
@@ -445,7 +490,7 @@ public class NewParser(List<NewToken> tokens)
         };
     }
 
-// numberOpera1 = expression ( ( "+" | "-" ) expression )* ;
+    // numberOpera1 = expression ( ( "+" | "-" ) expression )* ;
     private OldExpr ParseNumberOpera1()
     {
         var left = ParseTerm();
@@ -460,7 +505,7 @@ public class NewParser(List<NewToken> tokens)
         return left;
     }
 
-// term = factor { ("*" | "/") factor } ;
+    // term = factor { ("*" | "/") factor } ;
     private OldExpr ParseTerm()
     {
         var left = ParsePrimary();
@@ -474,35 +519,6 @@ public class NewParser(List<NewToken> tokens)
         }
 
         return left;
-    }
-
-// primary = stringLiteral
-//         | intLiteral
-//         | charLiteral
-//         | doubleLiteral
-//         | identifier
-//         | trueLiteral
-//         | falseLiteral
-//         | listInit
-//         | instantiate
-//         | stringTree
-//         | lambda
-//         | list
-//         | range
-//         | array
-//         | tuple
-//         | dictionary
-//         | slice
-//         | asStatement ;
-    private OldExpr ParsePrimary()
-    {
-        return CurrentToken.Type switch
-        {
-            NewTokenType.String => ParseStringLiteral(),
-            NewTokenType.Number => ParseDoubleLiteral(),
-            NewTokenType.Identifier => ParseIdentifier(),
-            _ => throw new Exception($"语法错误：无法识别的主表达式，但得到了 {CurrentToken.Type}")
-        };
     }
 
 
@@ -568,7 +584,7 @@ public class NewParser(List<NewToken> tokens)
     }
 
     // notBool = "not" expression ;
-    private OldExpr ParseNotBool()
+    private Operation ParseNotBool()
     {
         Expect(NewTokenType.Not);
         var expression = ParseExpression();
@@ -576,12 +592,16 @@ public class NewParser(List<NewToken> tokens)
     }
 
     // minusPrefix = "-" expression ;
-    private OldExpr ParseMinusPrefix()
+    private Operation ParseMinusPrefix()
     {
         Expect(NewTokenType.Minus);
         var expression = ParseExpression();
         return new Operation(null, OldTokenGeneric.MINUS, expression);
     }
+
+    #endregion
+
+    #region Primary
 
     // primary = stringLiteral
     //         | intLiteral
@@ -601,10 +621,249 @@ public class NewParser(List<NewToken> tokens)
     //         | dictionary
     //         | slice
     //         | asStatement ;
+    private OldExpr ParsePrimary()
+    {
+        return CurrentToken.Type switch
+        {
+            NewTokenType.String => ParseStringLiteral(),
+            NewTokenType.Number => ParseDoubleLiteral(),
+            NewTokenType.LeftBracket => ParseArrayOrRange(),
+            NewTokenType.LeftParen => ParseLambdaOrTuple(),
+            NewTokenType.LeftBrace => ParseDictionaryOrList(),
+            NewTokenType.Dollar when Peek().Type == NewTokenType.LeftBrace => ParseStringTree(),
+            NewTokenType.Identifier when Peek().Type == NewTokenType.As => ParseAs(),
+            NewTokenType.Identifier when Peek().Type == NewTokenType.LeftBracket => ParseListInitOrSlice(),
+            NewTokenType.Identifier when Peek().Type == NewTokenType.LeftParen => ParseInstantiate(),
+            NewTokenType.Identifier => ParseIdentifier(),
+            NewTokenType.True or NewTokenType.False => ParseBoolLiteral(),
+            _ => throw new Exception($"语法错误：无法识别的主表达式，但得到了 {CurrentToken.Type}")
+        };
+    }
 
+    /// <summary>
+    /// asStatement = identifier "as" identifier ;
+    /// </summary>
+    /// <returns></returns>
+    private AsValue ParseAs()
+    {
+        var id = ParseIdentifier();
+        Expect(NewTokenType.As);
+        var asId = ParseIdentifier();
+        return new AsValue(id, asId);
+    }
+
+
+    /// <summary>
+    /// dictionary = "{" dicTuple ( "," dicTuple )* "}" ;
+    /// dicTuple = expression ":" expression ;
+    /// list = "{" expression ( "," expression )* "}" ;
+    /// </summary>
+    /// <returns>返回列表或者字典</returns>
+    private ValueType ParseDictionaryOrList()
+    {
+        Expect(NewTokenType.LeftBracket);
+
+        var elements = new List<OldExpr>();
+
+        if (CurrentToken.Type == NewTokenType.RightBracket)
+        {
+            Expect(NewTokenType.RightBracket);
+            return new ListValue(elements);
+        }
+
+        var key = ParseExpression();
+        if (CurrentToken.Type != NewTokenType.Colon || CurrentToken.Type == NewTokenType.RightBracket)
+        {
+            while (CurrentToken.Type == NewTokenType.Comma)
+            {
+                Expect(NewTokenType.Comma);
+                elements.Add(ParseExpression());
+            }
+
+            Expect(NewTokenType.RightBracket);
+            return new ListValue(elements);
+        }
+
+        Expect(NewTokenType.Colon);
+        var value = ParseExpression();
+        elements.Add(new TupleValue(key, value));
+
+        while (CurrentToken.Type == NewTokenType.Comma)
+        {
+            Expect(NewTokenType.Comma);
+            key = ParseExpression();
+            Expect(NewTokenType.Colon);
+            value = ParseExpression();
+            elements.Add(new TupleValue(key, value));
+        }
+
+        Expect(NewTokenType.RightBracket);
+
+        return new DictionaryValue(elements.OfType<TupleValue>().ToList());
+    }
+
+    /// <summary>
+    /// array = "[" expression ( "," expression )* "]" ;
+    /// range = "[" expression ".." expression "]" ;
+    /// </summary>
+    /// <returns>数列初始化或者Range</returns>
+    private ValueType ParseArrayOrRange()
+    {
+        Expect(NewTokenType.LeftBracket);
+        var list = new List<OldExpr>();
+
+        if (CurrentToken.Type == NewTokenType.RightBracket)
+        {
+            Expect(NewTokenType.RightBracket);
+            return new ArrayValue(list);
+        }
+
+        list.Add(ParseExpression());
+        if (CurrentToken.Type == NewTokenType.DotDot)
+        {
+            Expect(NewTokenType.DotDot);
+            list.Add(ParseExpression());
+            Expect(NewTokenType.RightBracket);
+            return new RangeValue(list[0], list[1]);
+        }
+
+        while (CurrentToken.Type == NewTokenType.Comma)
+        {
+            Expect(NewTokenType.Comma);
+            list.Add(ParseExpression());
+        }
+
+        return new ArrayValue(list);
+    }
+
+    /// <summary>
+    /// lambda = "(" idList? ")" "->" expression ;
+    /// tuple  = "(" expression "," expression ")" ;
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="Exception">存在空元组或元组元素过多</exception>
+    private OldExpr ParseLambdaOrTuple()
+    {
+        Expect(NewTokenType.LeftParen);
+
+        // Check if it's an empty tuple
+        if (CurrentToken.Type == NewTokenType.RightParen)
+        {
+            Expect(NewTokenType.RightParen);
+            throw new Exception("语法错误：空元组");
+        }
+
+        var expressions = new List<OldExpr> { ParseExpression() };
+
+        // Parse additional expressions for tuple
+        while (CurrentToken.Type == NewTokenType.Comma)
+        {
+            Expect(NewTokenType.Comma);
+            expressions.Add(ParseExpression());
+        }
+
+        // Check if it's a lambda
+        if (CurrentToken.Type == NewTokenType.Arrow)
+        {
+            Expect(NewTokenType.Arrow);
+            var block = ParseBlock();
+            var idList = expressions.OfType<OldID>().ToList();
+            return new FuncValue(null, idList, block);
+        }
+
+        Expect(NewTokenType.RightParen);
+
+        return expressions.Count switch
+        {
+            // If only one expression, it's a single value in parentheses, not a tuple
+            1 => expressions[0],
+            2 => new TupleValue(expressions[0], expressions[1]),
+            _ => throw new Exception("语法错误：元组")
+        };
+    }
+
+    /// <summary>
+    /// stringTree = "$" "{" expression ( "," expression )* "}" ;
+    /// </summary>
+    /// <returns>字符串粘合</returns>
+    private StringTreeList ParseStringTree()
+    {
+        Expect(NewTokenType.Dollar);
+        Expect(NewTokenType.LeftBrace);
+        var list = new List<OldExpr>();
+        while (CurrentToken.Type != NewTokenType.RightBrace)
+        {
+            list.Add(ParseExpression());
+            if (CurrentToken.Type == NewTokenType.Comma)
+            {
+                Expect(NewTokenType.Comma);
+            }
+        }
+
+        Expect(NewTokenType.RightBrace);
+        return new StringTreeList(list);
+    }
+
+    /// <summary>
+    /// instantiate = identifier "(" argList ")" ;
+    /// </summary>
+    /// <returns>实例</returns>
+    private Instance ParseInstantiate()
+    {
+        Expect(NewTokenType.Identifier);
+        var name = CurrentToken.Value;
+        Expect(NewTokenType.LeftParen);
+        var args = ParseArgList();
+        Expect(NewTokenType.RightParen);
+        return new Instance(new OldID(name), args);
+    }
+
+    /// <summary>
+    /// listInit = identifier "[" expression "]" ;
+    /// slice = identifier "[" expression "," expression "]" ;
+    /// </summary>
+    /// <returns>切片</returns>
+    private ValueType ParseListInitOrSlice()
+    {
+        var name = CurrentToken.Value;
+        Expect(NewTokenType.Identifier);
+        Expect(NewTokenType.LeftBracket);
+        if (CurrentToken.Type == NewTokenType.Comma)
+        {
+            Expect(NewTokenType.Comma);
+            if (CurrentToken.Type == NewTokenType.RightBracket)
+            {
+                Expect(NewTokenType.RightBracket);
+                return new RangeValue(null, null);
+            }
+
+            var first = ParseExpression();
+            Expect(NewTokenType.RightBracket);
+            return new RangeValue(null, first);
+        }
+
+        var args = ParseExpression();
+
+        if (CurrentToken.Type == NewTokenType.Comma)
+        {
+            Expect(NewTokenType.Comma);
+            if (CurrentToken.Type == NewTokenType.RightBracket)
+            {
+                Expect(NewTokenType.RightBracket);
+                return new RangeValue(args, null);
+            }
+
+            var second = ParseExpression();
+            Expect(NewTokenType.RightBracket);
+            return new RangeValue(args, second);
+        }
+
+        Expect(NewTokenType.RightBracket);
+        return new OldItem(new OldID(name), args);
+    }
 
     // stringLiteral = STRING ;
-    private OldExpr ParseStringLiteral()
+    private StringValue ParseStringLiteral()
     {
         var str = CurrentToken.Value;
         Expect(NewTokenType.String);
@@ -612,7 +871,7 @@ public class NewParser(List<NewToken> tokens)
     }
 
     // doubleLiteral = DOUBLE ;
-    private OldExpr ParseDoubleLiteral()
+    private DoubleValue ParseDoubleLiteral()
     {
         var number = double.Parse(CurrentToken.Value);
         Expect(NewTokenType.Number);
@@ -624,29 +883,33 @@ public class NewParser(List<NewToken> tokens)
     {
         var identifier = CurrentToken.Value;
         Expect(NewTokenType.Identifier);
-        var type = "";
-        if (CurrentToken.Type == NewTokenType.Colon)
-        {
-            Expect(NewTokenType.Colon);
-            type = CurrentToken.Value;
-            Expect(NewTokenType.Identifier);
-        }
+        if (CurrentToken.Type != NewTokenType.Colon)
+            return new OldID(identifier);
+
+        Expect(NewTokenType.Colon);
+        var type = CurrentToken.Value;
+        Expect(NewTokenType.Identifier);
 
         return new OldID(identifier, type);
     }
 
-    // argList = expression ( "," expression )* ;
+    private BoolValue ParseBoolLiteral()
+    {
+        var value = CurrentToken.Value;
+        Expect(value == "true" ? NewTokenType.True : NewTokenType.False);
+        return new BoolValue(value == "true");
+    }
+
+    // argList =  (expression "," expression )* ;
     private List<OldExpr> ParseArgList()
     {
         var arguments = new List<OldExpr>();
-        if (CurrentToken.Type != NewTokenType.RightParen)
+        if (CurrentToken.Type == NewTokenType.RightParen) return arguments;
+        arguments.Add(ParseExpression());
+        while (CurrentToken.Type == NewTokenType.Comma)
         {
+            Expect(NewTokenType.Comma);
             arguments.Add(ParseExpression());
-            while (CurrentToken.Type == NewTokenType.Comma)
-            {
-                Expect(NewTokenType.Comma);
-                arguments.Add(ParseExpression());
-            }
         }
 
         return arguments;
@@ -655,16 +918,16 @@ public class NewParser(List<NewToken> tokens)
     private List<OldID> ParseIdList()
     {
         var arguments = new List<OldID>();
-        if (CurrentToken.Type != NewTokenType.RightParen)
+        if (CurrentToken.Type == NewTokenType.RightParen) return arguments;
+        arguments.Add(ParseIdentifier());
+        while (CurrentToken.Type == NewTokenType.Comma)
         {
+            Expect(NewTokenType.Comma);
             arguments.Add(ParseIdentifier());
-            while (CurrentToken.Type == NewTokenType.Comma)
-            {
-                Expect(NewTokenType.Comma);
-                arguments.Add(ParseIdentifier());
-            }
         }
 
         return arguments;
     }
+
+    #endregion
 }
