@@ -8,10 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8LangLib", "Old8LangLib\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibTest", "LibTest\LibTest.csproj", "{A6F2D98F-7258-4FB7-AFD7-CDDDD1E117E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lang.Demo", "Lang.Demo\src\Lang.Demo\Lang.Demo.csproj", "{5CD8B93C-D01A-460B-8F03-B04A778C4645}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lang.Demo.Client", "Lang.Demo\src\Lang.Demo.Client\Lang.Demo.Client.csproj", "{67D84D77-24D5-497B-8B9F-264B58BF1C91}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,13 +30,5 @@ Global
 		{A6F2D98F-7258-4FB7-AFD7-CDDDD1E117E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6F2D98F-7258-4FB7-AFD7-CDDDD1E117E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6F2D98F-7258-4FB7-AFD7-CDDDD1E117E7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5CD8B93C-D01A-460B-8F03-B04A778C4645}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5CD8B93C-D01A-460B-8F03-B04A778C4645}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5CD8B93C-D01A-460B-8F03-B04A778C4645}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5CD8B93C-D01A-460B-8F03-B04A778C4645}.Release|Any CPU.Build.0 = Release|Any CPU
-		{67D84D77-24D5-497B-8B9F-264B58BF1C91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{67D84D77-24D5-497B-8B9F-264B58BF1C91}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{67D84D77-24D5-497B-8B9F-264B58BF1C91}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{67D84D77-24D5-497B-8B9F-264B58BF1C91}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
