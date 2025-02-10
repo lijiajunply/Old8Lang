@@ -5,19 +5,19 @@ using Old8Lang.AST.Statement;
 using Old8Lang.CslyParser;
 using ValueType = Old8Lang.AST.Expression.ValueType;
 
-namespace Old8Lang.NewParser;
+namespace Old8Lang.LangParser;
 
-public class NewParser(List<NewToken> tokens)
+public class LangParser(List<LangToken> tokens)
 {
     #region 基础操作
 
     private int _currentIndex;
 
-    private NewToken CurrentToken => _currentIndex >= tokens.Count
-        ? new NewToken("", NewTokenType.EndOfFile, _currentIndex)
+    private LangToken CurrentToken => _currentIndex >= tokens.Count
+        ? new LangToken("", LangTokenType.EndOfFile, _currentIndex)
         : tokens[_currentIndex];
 
-    private void Expect(NewTokenType type)
+    private void Expect(LangTokenType type)
     {
         if (CurrentToken.Type == type)
         {
@@ -27,11 +27,11 @@ public class NewParser(List<NewToken> tokens)
             throw new Exception($"语法错误：期望 {type}，但得到了 {CurrentToken.Type}。在 {CurrentToken.Line}:{CurrentToken.Column}");
     }
 
-    private NewToken Peek(int offset = 1)
+    private LangToken Peek(int offset = 1)
     {
         if (_currentIndex + offset >= tokens.Count)
         {
-            return new NewToken("", NewTokenType.EndOfFile, _currentIndex + offset);
+            return new LangToken("", LangTokenType.EndOfFile, _currentIndex + offset);
         }
 
         return tokens[_currentIndex + offset];
@@ -80,43 +80,43 @@ public class NewParser(List<NewToken> tokens)
     {
         return CurrentToken.Type switch
         {
-            NewTokenType.LeftParen => ParseLrBlock(),
-            NewTokenType.If => ParseIfStatement(),
-            NewTokenType.For when Peek().Type == NewTokenType.Identifier => ParseForStatement(),
-            NewTokenType.For when Peek().Type == NewTokenType.In => ParseForInStatement(),
-            NewTokenType.While => ParseWhileStatement(),
-            NewTokenType.Switch => ParseSwitchStatement(),
-            NewTokenType.Func when Peek().Type == NewTokenType.Identifier && Peek(2).Type == NewTokenType.LeftParen =>
+            LangTokenType.LeftParen => ParseLrBlock(),
+            LangTokenType.If => ParseIfStatement(),
+            LangTokenType.For when Peek().Type == LangTokenType.Identifier => ParseForStatement(),
+            LangTokenType.For when Peek().Type == LangTokenType.In => ParseForInStatement(),
+            LangTokenType.While => ParseWhileStatement(),
+            LangTokenType.Switch => ParseSwitchStatement(),
+            LangTokenType.Func when Peek().Type == LangTokenType.Identifier && Peek(2).Type == LangTokenType.LeftParen =>
                 ParseFuncDeclaration(),
-            NewTokenType.Return => ParseReturnStatement(),
+            LangTokenType.Return => ParseReturnStatement(),
             // Lambda
-            NewTokenType.Identifier when Peek().Type == NewTokenType.Arrow => ParseFuncDeclaration(),
-            NewTokenType.Identifier when Peek().Type == NewTokenType.Colon && Peek(2).Type == NewTokenType.Identifier
+            LangTokenType.Identifier when Peek().Type == LangTokenType.Arrow => ParseFuncDeclaration(),
+            LangTokenType.Identifier when Peek().Type == LangTokenType.Colon && Peek(2).Type == LangTokenType.Identifier
                 => ParseFuncDeclaration(),
             // 类型实例调用属性/方法
-            NewTokenType.Identifier when Peek().Type == NewTokenType.Dot => ParseClassFuncRunStatement(),
-            NewTokenType.Identifier when Peek().Type == NewTokenType.LeftParen => ParseFuncRunStatement(),
-            NewTokenType.Identifier => ParseSet(),
-            NewTokenType.Class => ParseClassDeclaration(),
-            NewTokenType.Import => ParseImportStatement(),
-            NewTokenType.LeftBracket when Peek().Type == NewTokenType.Import => ParseNativeStatement(),
-            NewTokenType.PlusPlus => ParsePlusPlus(),
-            NewTokenType.MinusMinus => ParseMinusMinus(),
-            NewTokenType.LeftBracket when Peek().Type == NewTokenType.Import && Peek(2).Type == NewTokenType.String &&
-                                          Peek(3).Type == NewTokenType.Identifier &&
-                                          Peek(4).Type == NewTokenType.RightBracket &&
-                                          Peek(5).Type == NewTokenType.Arrow && Peek(6).Type == NewTokenType.String
+            LangTokenType.Identifier when Peek().Type == LangTokenType.Dot => ParseClassFuncRunStatement(),
+            LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseFuncRunStatement(),
+            LangTokenType.Identifier => ParseSet(),
+            LangTokenType.Class => ParseClassDeclaration(),
+            LangTokenType.Import => ParseImportStatement(),
+            LangTokenType.LeftBracket when Peek().Type == LangTokenType.Import => ParseNativeStatement(),
+            LangTokenType.PlusPlus => ParsePlusPlus(),
+            LangTokenType.MinusMinus => ParseMinusMinus(),
+            LangTokenType.LeftBracket when Peek().Type == LangTokenType.Import && Peek(2).Type == LangTokenType.String &&
+                                          Peek(3).Type == LangTokenType.Identifier &&
+                                          Peek(4).Type == LangTokenType.RightBracket &&
+                                          Peek(5).Type == LangTokenType.Arrow && Peek(6).Type == LangTokenType.String
                 => ParseNativeStatic(),
-            NewTokenType.LeftBracket when Peek().Type == NewTokenType.Import && Peek(2).Type == NewTokenType.String &&
-                                          Peek(3).Type == NewTokenType.Identifier &&
-                                          Peek(4).Type == NewTokenType.RightBracket => ParseNativeClass(),
+            LangTokenType.LeftBracket when Peek().Type == LangTokenType.Import && Peek(2).Type == LangTokenType.String &&
+                                          Peek(3).Type == LangTokenType.Identifier &&
+                                          Peek(4).Type == LangTokenType.RightBracket => ParseNativeClass(),
             _ => throw new Exception($"语法有误。在解析到ParseStatement时出现问题。在{CurrentToken.Line}:{CurrentToken.Column}")
         };
     }
 
     private ReturnStatement ParseReturnStatement()
     {
-        Expect(NewTokenType.Return);
+        Expect(LangTokenType.Return);
         var expression = ParseExpression();
         return new ReturnStatement(expression);
     }
@@ -124,9 +124,9 @@ public class NewParser(List<NewToken> tokens)
     // lrBlock = "(" statement ")" ;
     private OldStatement ParseLrBlock()
     {
-        Expect(NewTokenType.LeftParen);
+        Expect(LangTokenType.LeftParen);
         var statement = ParseStatement();
-        Expect(NewTokenType.RightParen);
+        Expect(LangTokenType.RightParen);
         return statement;
     }
 
@@ -134,8 +134,8 @@ public class NewParser(List<NewToken> tokens)
     private SetStatement ParseSet()
     {
         var identifier = CurrentToken.Value;
-        Expect(NewTokenType.Identifier);
-        Expect(NewTokenType.Assignment);
+        Expect(LangTokenType.Identifier);
+        Expect(LangTokenType.Assignment);
         var expression = ParseExpression();
         return new SetStatement(new OldID(identifier), expression);
     }
@@ -143,22 +143,22 @@ public class NewParser(List<NewToken> tokens)
     // ifStatement = "if" expression block ( "elif" expression block )* ( "else" block )? ;
     private IfStatement ParseIfStatement()
     {
-        Expect(NewTokenType.If);
+        Expect(LangTokenType.If);
         var condition = ParseExpression();
         var ifBlock = ParseBlock();
         var oldIfs = new List<OldIf?>();
-        while (CurrentToken.Type == NewTokenType.Elif)
+        while (CurrentToken.Type == LangTokenType.Elif)
         {
-            Expect(NewTokenType.Elif);
+            Expect(LangTokenType.Elif);
             var elifCondition = ParseExpression();
             var elifBlock = ParseBlock();
             oldIfs.Add(new OldIf(elifCondition, elifBlock));
         }
 
         BlockStatement? elseBlock = null;
-        if (CurrentToken.Type == NewTokenType.Else)
+        if (CurrentToken.Type == LangTokenType.Else)
         {
-            Expect(NewTokenType.Else);
+            Expect(LangTokenType.Else);
             elseBlock = ParseBlock();
         }
 
@@ -168,11 +168,11 @@ public class NewParser(List<NewToken> tokens)
     // forStatement = "for" set "," expression "," statement block ;
     private ForStatement ParseForStatement()
     {
-        Expect(NewTokenType.For);
+        Expect(LangTokenType.For);
         var set = ParseSet();
-        Expect(NewTokenType.Comma);
+        Expect(LangTokenType.Comma);
         var condition = ParseExpression();
-        Expect(NewTokenType.Comma);
+        Expect(LangTokenType.Comma);
         var statement = ParseStatement();
         var block = ParseBlock();
         return new ForStatement(set, condition, statement, block);
@@ -181,10 +181,10 @@ public class NewParser(List<NewToken> tokens)
     // forInStatement = "for" identifier "in" expression block ;
     private ForInStatement ParseForInStatement()
     {
-        Expect(NewTokenType.For);
+        Expect(LangTokenType.For);
         var identifier = CurrentToken.Value;
-        Expect(NewTokenType.Identifier);
-        Expect(NewTokenType.In);
+        Expect(LangTokenType.Identifier);
+        Expect(LangTokenType.In);
         var expression = ParseExpression();
         var block = ParseBlock();
         return new ForInStatement(new OldID(identifier), expression, block);
@@ -193,7 +193,7 @@ public class NewParser(List<NewToken> tokens)
     // whileStatement = "while" expression block ;
     private WhileStatement ParseWhileStatement()
     {
-        Expect(NewTokenType.While);
+        Expect(LangTokenType.While);
         var condition = ParseExpression();
         var block = ParseBlock();
         return new WhileStatement(condition, block);
@@ -202,30 +202,30 @@ public class NewParser(List<NewToken> tokens)
     // switchStatement = "switch" expression "{" caseBlock* ( "default" block )? "}" ;
     private SwitchStatement ParseSwitchStatement()
     {
-        Expect(NewTokenType.Switch);
+        Expect(LangTokenType.Switch);
         var expression = ParseExpression();
-        Expect(NewTokenType.LeftBrace);
+        Expect(LangTokenType.LeftBrace);
         var cases = new List<OldCase>();
-        while (CurrentToken.Type == NewTokenType.Case)
+        while (CurrentToken.Type == LangTokenType.Case)
         {
             cases.Add(ParseCaseBlock());
         }
 
         BlockStatement? defaultBlock = null;
-        if (CurrentToken.Type == NewTokenType.Default)
+        if (CurrentToken.Type == LangTokenType.Default)
         {
-            Expect(NewTokenType.Default);
+            Expect(LangTokenType.Default);
             defaultBlock = ParseBlock();
         }
 
-        Expect(NewTokenType.RightBrace);
+        Expect(LangTokenType.RightBrace);
         return new SwitchStatement(expression, cases, defaultBlock);
     }
 
     // caseBlock = "case" expression block ;
     private OldCase ParseCaseBlock()
     {
-        Expect(NewTokenType.Case);
+        Expect(LangTokenType.Case);
         var expression = ParseExpression();
         var block = ParseBlock();
         return new OldCase(expression, block);
@@ -237,19 +237,19 @@ public class NewParser(List<NewToken> tokens)
     /// <returns>声明函数</returns>
     private FuncInit ParseFuncDeclaration()
     {
-        if (CurrentToken.Type == NewTokenType.Func)
+        if (CurrentToken.Type == LangTokenType.Func)
         {
-            Expect(NewTokenType.Func);
+            Expect(LangTokenType.Func);
         }
 
         var funcName = ParseIdentifier();
 
-        Expect(NewTokenType.LeftParen);
+        Expect(LangTokenType.LeftParen);
         var parameters = ParseIdList();
-        Expect(NewTokenType.RightParen);
-        if (CurrentToken.Type == NewTokenType.Arrow)
+        Expect(LangTokenType.RightParen);
+        if (CurrentToken.Type == LangTokenType.Arrow)
         {
-            Expect(NewTokenType.Arrow);
+            Expect(LangTokenType.Arrow);
         }
 
         var block = ParseBlock();
@@ -263,9 +263,9 @@ public class NewParser(List<NewToken> tokens)
     /// <returns>声明类</returns>
     private ClassInit ParseClassDeclaration()
     {
-        Expect(NewTokenType.Class);
+        Expect(LangTokenType.Class);
         var className = CurrentToken.Value;
-        Expect(NewTokenType.Identifier);
+        Expect(LangTokenType.Identifier);
         var classBlock = ParseClassBlock();
         return new ClassInit(new AnyValue(new OldID(className), classBlock.ToAnyData()));
     }
@@ -277,20 +277,20 @@ public class NewParser(List<NewToken> tokens)
     /// <exception cref="Exception">期望声明或函数声明</exception>
     private BlockStatement ParseClassBlock()
     {
-        Expect(NewTokenType.LeftBrace);
+        Expect(LangTokenType.LeftBrace);
         var statements = new List<OldLangTree>();
-        while (CurrentToken.Type != NewTokenType.RightBrace)
+        while (CurrentToken.Type != LangTokenType.RightBrace)
         {
             statements.Add(CurrentToken.Type switch
             {
-                NewTokenType.Assignment => ParseSet(),
-                NewTokenType.Func or NewTokenType.Identifier when Peek().Type == NewTokenType.LeftParen =>
+                LangTokenType.Assignment => ParseSet(),
+                LangTokenType.Func or LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen =>
                     ParseFuncDeclaration(),
                 _ => throw new Exception($"语法错误：期望声明或函数声明，但得到了 {CurrentToken.Type}")
             });
         }
 
-        Expect(NewTokenType.RightBrace);
+        Expect(LangTokenType.RightBrace);
         return new BlockStatement(statements);
     }
 
@@ -301,10 +301,10 @@ public class NewParser(List<NewToken> tokens)
     private FuncRunStatement ParseFuncRunStatement()
     {
         var funcName = CurrentToken.Value;
-        Expect(NewTokenType.Identifier);
-        Expect(NewTokenType.LeftParen);
+        Expect(LangTokenType.Identifier);
+        Expect(LangTokenType.LeftParen);
         var arguments = ParseArgList();
-        Expect(NewTokenType.RightParen);
+        Expect(LangTokenType.RightParen);
         return new FuncRunStatement(new Instance(new OldID(funcName), arguments));
     }
 
@@ -315,13 +315,13 @@ public class NewParser(List<NewToken> tokens)
     private FuncRunStatement ParseClassFuncRunStatement()
     {
         var className = CurrentToken.Value;
-        Expect(NewTokenType.Identifier);
-        Expect(NewTokenType.Dot);
+        Expect(LangTokenType.Identifier);
+        Expect(LangTokenType.Dot);
         var funcName = CurrentToken.Value;
-        Expect(NewTokenType.Identifier);
-        Expect(NewTokenType.LeftParen);
+        Expect(LangTokenType.Identifier);
+        Expect(LangTokenType.LeftParen);
         var arguments = ParseArgList();
-        Expect(NewTokenType.RightParen);
+        Expect(LangTokenType.RightParen);
         return new FuncRunStatement(new Operation(new OldID(className), OldTokenGeneric.CONCAT,
             new Instance(new OldID(funcName), arguments)));
     }
@@ -332,9 +332,9 @@ public class NewParser(List<NewToken> tokens)
     /// <returns>引入模块</returns>
     private ImportStatement ParseImportStatement()
     {
-        Expect(NewTokenType.Import);
+        Expect(LangTokenType.Import);
         var moduleName = CurrentToken.Value;
-        Expect(NewTokenType.Identifier);
+        Expect(LangTokenType.Identifier);
         return new ImportStatement(moduleName);
     }
 
@@ -344,22 +344,22 @@ public class NewParser(List<NewToken> tokens)
     /// <returns>引入原生方法</returns>
     private NativeStatement ParseNativeStatement()
     {
-        Expect(NewTokenType.LeftBracket);
-        Expect(NewTokenType.Import);
+        Expect(LangTokenType.LeftBracket);
+        Expect(LangTokenType.Import);
         var dllName = CurrentToken.Value;
-        Expect(NewTokenType.String);
+        Expect(LangTokenType.String);
         var className = CurrentToken.Value;
-        Expect(NewTokenType.Identifier);
+        Expect(LangTokenType.Identifier);
         var methodName = CurrentToken.Value;
-        Expect(NewTokenType.Identifier);
+        Expect(LangTokenType.Identifier);
         var alias = "";
-        if (CurrentToken.Type == NewTokenType.Identifier)
+        if (CurrentToken.Type == LangTokenType.Identifier)
         {
             alias = CurrentToken.Value;
-            Expect(NewTokenType.Identifier);
+            Expect(LangTokenType.Identifier);
         }
 
-        Expect(NewTokenType.RightBracket);
+        Expect(LangTokenType.RightBracket);
         return new NativeStatement(dllName, className, methodName, alias);
     }
 
@@ -369,16 +369,16 @@ public class NewParser(List<NewToken> tokens)
     /// <returns>引入原生静态类</returns>
     private NativeStatement ParseNativeStatic()
     {
-        Expect(NewTokenType.LeftBracket);
-        Expect(NewTokenType.Import);
+        Expect(LangTokenType.LeftBracket);
+        Expect(LangTokenType.Import);
         var dllName = CurrentToken.Value;
-        Expect(NewTokenType.String);
+        Expect(LangTokenType.String);
         var className = CurrentToken.Value;
-        Expect(NewTokenType.Identifier);
-        Expect(NewTokenType.RightBracket);
-        Expect(NewTokenType.Arrow);
+        Expect(LangTokenType.Identifier);
+        Expect(LangTokenType.RightBracket);
+        Expect(LangTokenType.Arrow);
         var methodName = CurrentToken.Value;
-        Expect(NewTokenType.String);
+        Expect(LangTokenType.String);
         return new NativeStatement(dllName, className, methodName);
     }
 
@@ -388,13 +388,13 @@ public class NewParser(List<NewToken> tokens)
     /// <returns>引入原生类</returns>
     private NativeStatement ParseNativeClass()
     {
-        Expect(NewTokenType.LeftBracket);
-        Expect(NewTokenType.Import);
+        Expect(LangTokenType.LeftBracket);
+        Expect(LangTokenType.Import);
         var dllName = CurrentToken.Value;
-        Expect(NewTokenType.String);
+        Expect(LangTokenType.String);
         var className = CurrentToken.Value;
-        Expect(NewTokenType.Identifier);
-        Expect(NewTokenType.RightBracket);
+        Expect(LangTokenType.Identifier);
+        Expect(LangTokenType.RightBracket);
         return new NativeStatement(dllName, className);
     }
 
@@ -405,8 +405,8 @@ public class NewParser(List<NewToken> tokens)
     private SetStatement ParsePlusPlus()
     {
         var identifier = CurrentToken.Value;
-        Expect(NewTokenType.Identifier);
-        Expect(NewTokenType.PlusPlus);
+        Expect(LangTokenType.Identifier);
+        Expect(LangTokenType.PlusPlus);
         return new SetStatement(new OldID(identifier),
             new Operation(new OldID(identifier), OldTokenGeneric.PLUS, new IntValue(1)));
     }
@@ -418,8 +418,8 @@ public class NewParser(List<NewToken> tokens)
     private SetStatement ParseMinusMinus()
     {
         var identifier = CurrentToken.Value;
-        Expect(NewTokenType.Identifier);
-        Expect(NewTokenType.MinusMinus);
+        Expect(LangTokenType.Identifier);
+        Expect(LangTokenType.MinusMinus);
         return new SetStatement(new OldID(identifier),
             new Operation(new OldID(identifier), OldTokenGeneric.MINUS, new IntValue(1)));
     }
@@ -431,19 +431,19 @@ public class NewParser(List<NewToken> tokens)
     /// <returns>块语句</returns>
     private BlockStatement ParseBlock()
     {
-        if (CurrentToken.Type != NewTokenType.LeftBrace)
+        if (CurrentToken.Type != LangTokenType.LeftBrace)
         {
             return new BlockStatement([ParseStatement()]);
         }
 
-        Expect(NewTokenType.LeftBrace);
+        Expect(LangTokenType.LeftBrace);
         var statements = new List<OldLangTree>();
-        while (CurrentToken.Type != NewTokenType.RightBrace)
+        while (CurrentToken.Type != LangTokenType.RightBrace)
         {
             statements.Add(ParseStatement());
         }
 
-        Expect(NewTokenType.RightBrace);
+        Expect(LangTokenType.RightBrace);
         return new BlockStatement(statements);
     }
 
@@ -462,15 +462,15 @@ public class NewParser(List<NewToken> tokens)
 
     private OldExpr ParseExpression()
     {
-        if (CurrentToken.Type == NewTokenType.LeftParen)
+        if (CurrentToken.Type == LangTokenType.LeftParen)
         {
             return ParseBinaryExpression();
         }
 
         var a = CurrentToken.Type switch
         {
-            NewTokenType.Not => ParseNotBool(),
-            NewTokenType.Minus when Peek().Type != NewTokenType.Assignment => ParseMinusPrefix(),
+            LangTokenType.Not => ParseNotBool(),
+            LangTokenType.Minus when Peek().Type != LangTokenType.Assignment => ParseMinusPrefix(),
             _ => null
         };
 
@@ -479,13 +479,13 @@ public class NewParser(List<NewToken> tokens)
         var next = Peek();
         return next.Type switch
         {
-            NewTokenType.LessThanEquals or NewTokenType.GreaterThanEquals or NewTokenType.Equals
-                or NewTokenType.NotEquals or NewTokenType.LessThan
-                or NewTokenType.GreaterThan => ParseBinaryExpression(),
-            NewTokenType.Dot => ParseDotExpr(),
-            NewTokenType.Plus or NewTokenType.Minus when Peek().Type != NewTokenType.Assignment => ParseNumberOpera1(),
-            NewTokenType.Star or NewTokenType.Slash => ParseNumberOpera2(),
-            NewTokenType.And or NewTokenType.Or or NewTokenType.Xor => ParseBoolOpera(),
+            LangTokenType.LessThanEquals or LangTokenType.GreaterThanEquals or LangTokenType.Equals
+                or LangTokenType.NotEquals or LangTokenType.LessThan
+                or LangTokenType.GreaterThan => ParseBinaryExpression(),
+            LangTokenType.Dot => ParseDotExpr(),
+            LangTokenType.Plus or LangTokenType.Minus when Peek().Type != LangTokenType.Assignment => ParseNumberOpera1(),
+            LangTokenType.Star or LangTokenType.Slash => ParseNumberOpera2(),
+            LangTokenType.And or LangTokenType.Or or LangTokenType.Xor => ParseBoolOpera(),
             _ => ParsePrimary()
         };
     }
@@ -494,7 +494,7 @@ public class NewParser(List<NewToken> tokens)
     private OldExpr ParseNumberOpera1()
     {
         var left = ParseTerm();
-        while (CurrentToken.Type == NewTokenType.Plus || CurrentToken.Type == NewTokenType.Minus)
+        while (CurrentToken.Type == LangTokenType.Plus || CurrentToken.Type == LangTokenType.Minus)
         {
             var operatorToken = CurrentToken.Type;
             Expect(CurrentToken.Type);
@@ -509,8 +509,8 @@ public class NewParser(List<NewToken> tokens)
     private OldExpr ParseTerm()
     {
         var left = ParsePrimary();
-        while (CurrentToken.Type == NewTokenType.Star || CurrentToken.Type == NewTokenType.Slash ||
-               CurrentToken.Type == NewTokenType.Dot)
+        while (CurrentToken.Type == LangTokenType.Star || CurrentToken.Type == LangTokenType.Slash ||
+               CurrentToken.Type == LangTokenType.Dot)
         {
             var operatorToken = CurrentToken.Type;
             Expect(CurrentToken.Type);
@@ -526,8 +526,8 @@ public class NewParser(List<NewToken> tokens)
     private OldExpr ParseBinaryExpression()
     {
         var left = ParseTerm();
-        while (CurrentToken.Type is NewTokenType.LessThanEquals or NewTokenType.GreaterThanEquals or NewTokenType.Equals
-               or NewTokenType.NotEquals or NewTokenType.LessThan or NewTokenType.GreaterThan)
+        while (CurrentToken.Type is LangTokenType.LessThanEquals or LangTokenType.GreaterThanEquals or LangTokenType.Equals
+               or LangTokenType.NotEquals or LangTokenType.LessThan or LangTokenType.GreaterThan)
         {
             var operatorToken = CurrentToken.Type;
             Expect(CurrentToken.Type);
@@ -542,9 +542,9 @@ public class NewParser(List<NewToken> tokens)
     private OldExpr ParseDotExpr()
     {
         var left = ParsePrimary();
-        while (CurrentToken.Type == NewTokenType.Dot)
+        while (CurrentToken.Type == LangTokenType.Dot)
         {
-            Expect(NewTokenType.Dot);
+            Expect(LangTokenType.Dot);
             var right = ParsePrimary();
             left = new Operation(left, OldTokenGeneric.CONCAT, right);
         }
@@ -556,7 +556,7 @@ public class NewParser(List<NewToken> tokens)
     private OldExpr ParseNumberOpera2()
     {
         var left = ParsePrimary();
-        while (CurrentToken.Type == NewTokenType.Star || CurrentToken.Type == NewTokenType.Slash)
+        while (CurrentToken.Type == LangTokenType.Star || CurrentToken.Type == LangTokenType.Slash)
         {
             var operatorToken = CurrentToken.Type;
             Expect(CurrentToken.Type);
@@ -571,8 +571,8 @@ public class NewParser(List<NewToken> tokens)
     private OldExpr ParseBoolOpera()
     {
         var left = ParseExpression();
-        while (CurrentToken.Type == NewTokenType.And || CurrentToken.Type == NewTokenType.Or ||
-               CurrentToken.Type == NewTokenType.Xor)
+        while (CurrentToken.Type == LangTokenType.And || CurrentToken.Type == LangTokenType.Or ||
+               CurrentToken.Type == LangTokenType.Xor)
         {
             var operatorToken = CurrentToken.Type;
             Expect(CurrentToken.Type);
@@ -586,7 +586,7 @@ public class NewParser(List<NewToken> tokens)
     // notBool = "not" expression ;
     private Operation ParseNotBool()
     {
-        Expect(NewTokenType.Not);
+        Expect(LangTokenType.Not);
         var expression = ParseExpression();
         return new Operation(null, OldTokenGeneric.NOT, expression);
     }
@@ -594,7 +594,7 @@ public class NewParser(List<NewToken> tokens)
     // minusPrefix = "-" expression ;
     private Operation ParseMinusPrefix()
     {
-        Expect(NewTokenType.Minus);
+        Expect(LangTokenType.Minus);
         var expression = ParseExpression();
         return new Operation(null, OldTokenGeneric.MINUS, expression);
     }
@@ -625,17 +625,17 @@ public class NewParser(List<NewToken> tokens)
     {
         return CurrentToken.Type switch
         {
-            NewTokenType.String => ParseStringLiteral(),
-            NewTokenType.Number => ParseDoubleLiteral(),
-            NewTokenType.LeftBracket => ParseArrayOrRange(),
-            NewTokenType.LeftParen => ParseLambdaOrTuple(),
-            NewTokenType.LeftBrace => ParseDictionaryOrList(),
-            NewTokenType.Dollar when Peek().Type == NewTokenType.LeftBrace => ParseStringTree(),
-            NewTokenType.Identifier when Peek().Type == NewTokenType.As => ParseAs(),
-            NewTokenType.Identifier when Peek().Type == NewTokenType.LeftBracket => ParseListInitOrSlice(),
-            NewTokenType.Identifier when Peek().Type == NewTokenType.LeftParen => ParseInstantiate(),
-            NewTokenType.Identifier => ParseIdentifier(),
-            NewTokenType.True or NewTokenType.False => ParseBoolLiteral(),
+            LangTokenType.String => ParseStringLiteral(),
+            LangTokenType.Number => ParseDoubleLiteral(),
+            LangTokenType.LeftBracket => ParseArrayOrRange(),
+            LangTokenType.LeftParen => ParseLambdaOrTuple(),
+            LangTokenType.LeftBrace => ParseDictionaryOrList(),
+            LangTokenType.Dollar when Peek().Type == LangTokenType.LeftBrace => ParseStringTree(),
+            LangTokenType.Identifier when Peek().Type == LangTokenType.As => ParseAs(),
+            LangTokenType.Identifier when Peek().Type == LangTokenType.LeftBracket => ParseListInitOrSlice(),
+            LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseInstantiate(),
+            LangTokenType.Identifier => ParseIdentifier(),
+            LangTokenType.True or LangTokenType.False => ParseBoolLiteral(),
             _ => throw new Exception($"语法错误：无法识别的主表达式，但得到了 {CurrentToken.Type}")
         };
     }
@@ -647,7 +647,7 @@ public class NewParser(List<NewToken> tokens)
     private AsValue ParseAs()
     {
         var id = ParseIdentifier();
-        Expect(NewTokenType.As);
+        Expect(LangTokenType.As);
         var asId = ParseIdentifier();
         return new AsValue(id, asId);
     }
@@ -661,43 +661,43 @@ public class NewParser(List<NewToken> tokens)
     /// <returns>返回列表或者字典</returns>
     private ValueType ParseDictionaryOrList()
     {
-        Expect(NewTokenType.LeftBracket);
+        Expect(LangTokenType.LeftBracket);
 
         var elements = new List<OldExpr>();
 
-        if (CurrentToken.Type == NewTokenType.RightBracket)
+        if (CurrentToken.Type == LangTokenType.RightBracket)
         {
-            Expect(NewTokenType.RightBracket);
+            Expect(LangTokenType.RightBracket);
             return new ListValue(elements);
         }
 
         var key = ParseExpression();
-        if (CurrentToken.Type != NewTokenType.Colon || CurrentToken.Type == NewTokenType.RightBracket)
+        if (CurrentToken.Type != LangTokenType.Colon || CurrentToken.Type == LangTokenType.RightBracket)
         {
-            while (CurrentToken.Type == NewTokenType.Comma)
+            while (CurrentToken.Type == LangTokenType.Comma)
             {
-                Expect(NewTokenType.Comma);
+                Expect(LangTokenType.Comma);
                 elements.Add(ParseExpression());
             }
 
-            Expect(NewTokenType.RightBracket);
+            Expect(LangTokenType.RightBracket);
             return new ListValue(elements);
         }
 
-        Expect(NewTokenType.Colon);
+        Expect(LangTokenType.Colon);
         var value = ParseExpression();
         elements.Add(new TupleValue(key, value));
 
-        while (CurrentToken.Type == NewTokenType.Comma)
+        while (CurrentToken.Type == LangTokenType.Comma)
         {
-            Expect(NewTokenType.Comma);
+            Expect(LangTokenType.Comma);
             key = ParseExpression();
-            Expect(NewTokenType.Colon);
+            Expect(LangTokenType.Colon);
             value = ParseExpression();
             elements.Add(new TupleValue(key, value));
         }
 
-        Expect(NewTokenType.RightBracket);
+        Expect(LangTokenType.RightBracket);
 
         return new DictionaryValue(elements.OfType<TupleValue>().ToList());
     }
@@ -709,27 +709,27 @@ public class NewParser(List<NewToken> tokens)
     /// <returns>数列初始化或者Range</returns>
     private ValueType ParseArrayOrRange()
     {
-        Expect(NewTokenType.LeftBracket);
+        Expect(LangTokenType.LeftBracket);
         var list = new List<OldExpr>();
 
-        if (CurrentToken.Type == NewTokenType.RightBracket)
+        if (CurrentToken.Type == LangTokenType.RightBracket)
         {
-            Expect(NewTokenType.RightBracket);
+            Expect(LangTokenType.RightBracket);
             return new ArrayValue(list);
         }
 
         list.Add(ParseExpression());
-        if (CurrentToken.Type == NewTokenType.DotDot)
+        if (CurrentToken.Type == LangTokenType.DotDot)
         {
-            Expect(NewTokenType.DotDot);
+            Expect(LangTokenType.DotDot);
             list.Add(ParseExpression());
-            Expect(NewTokenType.RightBracket);
+            Expect(LangTokenType.RightBracket);
             return new RangeValue(list[0], list[1]);
         }
 
-        while (CurrentToken.Type == NewTokenType.Comma)
+        while (CurrentToken.Type == LangTokenType.Comma)
         {
-            Expect(NewTokenType.Comma);
+            Expect(LangTokenType.Comma);
             list.Add(ParseExpression());
         }
 
@@ -744,34 +744,34 @@ public class NewParser(List<NewToken> tokens)
     /// <exception cref="Exception">存在空元组或元组元素过多</exception>
     private OldExpr ParseLambdaOrTuple()
     {
-        Expect(NewTokenType.LeftParen);
+        Expect(LangTokenType.LeftParen);
 
         // Check if it's an empty tuple
-        if (CurrentToken.Type == NewTokenType.RightParen)
+        if (CurrentToken.Type == LangTokenType.RightParen)
         {
-            Expect(NewTokenType.RightParen);
+            Expect(LangTokenType.RightParen);
             throw new Exception("语法错误：空元组");
         }
 
         var expressions = new List<OldExpr> { ParseExpression() };
 
         // Parse additional expressions for tuple
-        while (CurrentToken.Type == NewTokenType.Comma)
+        while (CurrentToken.Type == LangTokenType.Comma)
         {
-            Expect(NewTokenType.Comma);
+            Expect(LangTokenType.Comma);
             expressions.Add(ParseExpression());
         }
 
         // Check if it's a lambda
-        if (CurrentToken.Type == NewTokenType.Arrow)
+        if (CurrentToken.Type == LangTokenType.Arrow)
         {
-            Expect(NewTokenType.Arrow);
+            Expect(LangTokenType.Arrow);
             var block = ParseBlock();
             var idList = expressions.OfType<OldID>().ToList();
             return new FuncValue(null, idList, block);
         }
 
-        Expect(NewTokenType.RightParen);
+        Expect(LangTokenType.RightParen);
 
         return expressions.Count switch
         {
@@ -788,19 +788,19 @@ public class NewParser(List<NewToken> tokens)
     /// <returns>字符串粘合</returns>
     private StringTreeList ParseStringTree()
     {
-        Expect(NewTokenType.Dollar);
-        Expect(NewTokenType.LeftBrace);
+        Expect(LangTokenType.Dollar);
+        Expect(LangTokenType.LeftBrace);
         var list = new List<OldExpr>();
-        while (CurrentToken.Type != NewTokenType.RightBrace)
+        while (CurrentToken.Type != LangTokenType.RightBrace)
         {
             list.Add(ParseExpression());
-            if (CurrentToken.Type == NewTokenType.Comma)
+            if (CurrentToken.Type == LangTokenType.Comma)
             {
-                Expect(NewTokenType.Comma);
+                Expect(LangTokenType.Comma);
             }
         }
 
-        Expect(NewTokenType.RightBrace);
+        Expect(LangTokenType.RightBrace);
         return new StringTreeList(list);
     }
 
@@ -810,11 +810,11 @@ public class NewParser(List<NewToken> tokens)
     /// <returns>实例</returns>
     private Instance ParseInstantiate()
     {
-        Expect(NewTokenType.Identifier);
+        Expect(LangTokenType.Identifier);
         var name = CurrentToken.Value;
-        Expect(NewTokenType.LeftParen);
+        Expect(LangTokenType.LeftParen);
         var args = ParseArgList();
-        Expect(NewTokenType.RightParen);
+        Expect(LangTokenType.RightParen);
         return new Instance(new OldID(name), args);
     }
 
@@ -826,39 +826,39 @@ public class NewParser(List<NewToken> tokens)
     private ValueType ParseListInitOrSlice()
     {
         var name = CurrentToken.Value;
-        Expect(NewTokenType.Identifier);
-        Expect(NewTokenType.LeftBracket);
-        if (CurrentToken.Type == NewTokenType.Comma)
+        Expect(LangTokenType.Identifier);
+        Expect(LangTokenType.LeftBracket);
+        if (CurrentToken.Type == LangTokenType.Comma)
         {
-            Expect(NewTokenType.Comma);
-            if (CurrentToken.Type == NewTokenType.RightBracket)
+            Expect(LangTokenType.Comma);
+            if (CurrentToken.Type == LangTokenType.RightBracket)
             {
-                Expect(NewTokenType.RightBracket);
+                Expect(LangTokenType.RightBracket);
                 return new RangeValue(null, null);
             }
 
             var first = ParseExpression();
-            Expect(NewTokenType.RightBracket);
+            Expect(LangTokenType.RightBracket);
             return new RangeValue(null, first);
         }
 
         var args = ParseExpression();
 
-        if (CurrentToken.Type == NewTokenType.Comma)
+        if (CurrentToken.Type == LangTokenType.Comma)
         {
-            Expect(NewTokenType.Comma);
-            if (CurrentToken.Type == NewTokenType.RightBracket)
+            Expect(LangTokenType.Comma);
+            if (CurrentToken.Type == LangTokenType.RightBracket)
             {
-                Expect(NewTokenType.RightBracket);
+                Expect(LangTokenType.RightBracket);
                 return new RangeValue(args, null);
             }
 
             var second = ParseExpression();
-            Expect(NewTokenType.RightBracket);
+            Expect(LangTokenType.RightBracket);
             return new RangeValue(args, second);
         }
 
-        Expect(NewTokenType.RightBracket);
+        Expect(LangTokenType.RightBracket);
         return new OldItem(new OldID(name), args);
     }
 
@@ -866,7 +866,7 @@ public class NewParser(List<NewToken> tokens)
     private StringValue ParseStringLiteral()
     {
         var str = CurrentToken.Value;
-        Expect(NewTokenType.String);
+        Expect(LangTokenType.String);
         return new StringValue(str);
     }
 
@@ -874,7 +874,7 @@ public class NewParser(List<NewToken> tokens)
     private DoubleValue ParseDoubleLiteral()
     {
         var number = double.Parse(CurrentToken.Value);
-        Expect(NewTokenType.Number);
+        Expect(LangTokenType.Number);
         return new DoubleValue(number);
     }
 
@@ -882,13 +882,13 @@ public class NewParser(List<NewToken> tokens)
     private OldID ParseIdentifier()
     {
         var identifier = CurrentToken.Value;
-        Expect(NewTokenType.Identifier);
-        if (CurrentToken.Type != NewTokenType.Colon)
+        Expect(LangTokenType.Identifier);
+        if (CurrentToken.Type != LangTokenType.Colon)
             return new OldID(identifier);
 
-        Expect(NewTokenType.Colon);
+        Expect(LangTokenType.Colon);
         var type = CurrentToken.Value;
-        Expect(NewTokenType.Identifier);
+        Expect(LangTokenType.Identifier);
 
         return new OldID(identifier, type);
     }
@@ -896,7 +896,7 @@ public class NewParser(List<NewToken> tokens)
     private BoolValue ParseBoolLiteral()
     {
         var value = CurrentToken.Value;
-        Expect(value == "true" ? NewTokenType.True : NewTokenType.False);
+        Expect(value == "true" ? LangTokenType.True : LangTokenType.False);
         return new BoolValue(value == "true");
     }
 
@@ -904,11 +904,11 @@ public class NewParser(List<NewToken> tokens)
     private List<OldExpr> ParseArgList()
     {
         var arguments = new List<OldExpr>();
-        if (CurrentToken.Type == NewTokenType.RightParen) return arguments;
+        if (CurrentToken.Type == LangTokenType.RightParen) return arguments;
         arguments.Add(ParseExpression());
-        while (CurrentToken.Type == NewTokenType.Comma)
+        while (CurrentToken.Type == LangTokenType.Comma)
         {
-            Expect(NewTokenType.Comma);
+            Expect(LangTokenType.Comma);
             arguments.Add(ParseExpression());
         }
 
@@ -918,11 +918,11 @@ public class NewParser(List<NewToken> tokens)
     private List<OldID> ParseIdList()
     {
         var arguments = new List<OldID>();
-        if (CurrentToken.Type == NewTokenType.RightParen) return arguments;
+        if (CurrentToken.Type == LangTokenType.RightParen) return arguments;
         arguments.Add(ParseIdentifier());
-        while (CurrentToken.Type == NewTokenType.Comma)
+        while (CurrentToken.Type == LangTokenType.Comma)
         {
-            Expect(NewTokenType.Comma);
+            Expect(LangTokenType.Comma);
             arguments.Add(ParseIdentifier());
         }
 

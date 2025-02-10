@@ -1,8 +1,8 @@
 using Old8Lang.CslyParser;
 
-namespace Old8Lang.NewParser;
+namespace Old8Lang.LangParser;
 
-public enum NewTokenType
+public enum LangTokenType
 {
     /// <summary>
     /// +
@@ -218,45 +218,45 @@ public enum KeywordType
 
 public static class TokenOpera
 {
-    public static OldTokenGeneric GetGeneric(this NewTokenType type)
+    public static OldTokenGeneric GetGeneric(this LangTokenType type)
     {
         return type switch
         {
-            NewTokenType.Plus => OldTokenGeneric.PLUS,
-            NewTokenType.Minus => OldTokenGeneric.MINUS,
-            NewTokenType.Star => OldTokenGeneric.TIMES,
-            NewTokenType.Slash => OldTokenGeneric.DIVIDE,
-            NewTokenType.Ampersand => OldTokenGeneric.AND,
-            NewTokenType.Pipe => OldTokenGeneric.OR,
-            NewTokenType.String => OldTokenGeneric.STRING,
-            NewTokenType.Number => OldTokenGeneric.INT,
-            NewTokenType.Identifier => OldTokenGeneric.IDENTIFIER,
-            NewTokenType.LeftParen => OldTokenGeneric.LPAREN,
-            NewTokenType.RightParen => OldTokenGeneric.RPAREN,
-            NewTokenType.LeftBrace => OldTokenGeneric.L_BRACES,
-            NewTokenType.RightBrace => OldTokenGeneric.R_BRACES,
-            NewTokenType.LeftBracket => OldTokenGeneric.L_BRACKET,
-            NewTokenType.RightBracket => OldTokenGeneric.R_BRACKET,
-            NewTokenType.Comma => OldTokenGeneric.COMMA,
-            NewTokenType.Colon => OldTokenGeneric.COLON,
-            NewTokenType.Dot => OldTokenGeneric.CONCAT,
-            NewTokenType.Exclamation => OldTokenGeneric.NOT,
-            NewTokenType.Assignment => OldTokenGeneric.SET,
-            NewTokenType.Equals => OldTokenGeneric.EQUALS,
-            NewTokenType.Percent => OldTokenGeneric.EOF,
-            NewTokenType.Caret => OldTokenGeneric.EOF,
-            NewTokenType.Question => OldTokenGeneric.EOF,
-            NewTokenType.LessThan => OldTokenGeneric.LESSER,
-            NewTokenType.GreaterThan => OldTokenGeneric.GREATER,
-            NewTokenType.LessThanEquals => OldTokenGeneric.LESS_EQUAL,
-            NewTokenType.GreaterThanEquals => OldTokenGeneric.GREATER_EQUAL,
-            NewTokenType.NotEquals => OldTokenGeneric.DIFFERENT,
-            NewTokenType.And => OldTokenGeneric.AND,
-            NewTokenType.Or => OldTokenGeneric.OR,
-            NewTokenType.Null => OldTokenGeneric.EOF,
-            NewTokenType.True => OldTokenGeneric.TRUE,
-            NewTokenType.False => OldTokenGeneric.FALSE,
-            NewTokenType.Return => OldTokenGeneric.RETURN,
+            LangTokenType.Plus => OldTokenGeneric.PLUS,
+            LangTokenType.Minus => OldTokenGeneric.MINUS,
+            LangTokenType.Star => OldTokenGeneric.TIMES,
+            LangTokenType.Slash => OldTokenGeneric.DIVIDE,
+            LangTokenType.Ampersand => OldTokenGeneric.AND,
+            LangTokenType.Pipe => OldTokenGeneric.OR,
+            LangTokenType.String => OldTokenGeneric.STRING,
+            LangTokenType.Number => OldTokenGeneric.INT,
+            LangTokenType.Identifier => OldTokenGeneric.IDENTIFIER,
+            LangTokenType.LeftParen => OldTokenGeneric.LPAREN,
+            LangTokenType.RightParen => OldTokenGeneric.RPAREN,
+            LangTokenType.LeftBrace => OldTokenGeneric.L_BRACES,
+            LangTokenType.RightBrace => OldTokenGeneric.R_BRACES,
+            LangTokenType.LeftBracket => OldTokenGeneric.L_BRACKET,
+            LangTokenType.RightBracket => OldTokenGeneric.R_BRACKET,
+            LangTokenType.Comma => OldTokenGeneric.COMMA,
+            LangTokenType.Colon => OldTokenGeneric.COLON,
+            LangTokenType.Dot => OldTokenGeneric.CONCAT,
+            LangTokenType.Exclamation => OldTokenGeneric.NOT,
+            LangTokenType.Assignment => OldTokenGeneric.SET,
+            LangTokenType.Equals => OldTokenGeneric.EQUALS,
+            LangTokenType.Percent => OldTokenGeneric.EOF,
+            LangTokenType.Caret => OldTokenGeneric.EOF,
+            LangTokenType.Question => OldTokenGeneric.EOF,
+            LangTokenType.LessThan => OldTokenGeneric.LESSER,
+            LangTokenType.GreaterThan => OldTokenGeneric.GREATER,
+            LangTokenType.LessThanEquals => OldTokenGeneric.LESS_EQUAL,
+            LangTokenType.GreaterThanEquals => OldTokenGeneric.GREATER_EQUAL,
+            LangTokenType.NotEquals => OldTokenGeneric.DIFFERENT,
+            LangTokenType.And => OldTokenGeneric.AND,
+            LangTokenType.Or => OldTokenGeneric.OR,
+            LangTokenType.Null => OldTokenGeneric.EOF,
+            LangTokenType.True => OldTokenGeneric.TRUE,
+            LangTokenType.False => OldTokenGeneric.FALSE,
+            LangTokenType.Return => OldTokenGeneric.RETURN,
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
     }

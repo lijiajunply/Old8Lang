@@ -1,11 +1,11 @@
 using System.Text;
 
-namespace Old8Lang.NewParser;
+namespace Old8Lang.LangParser;
 
-public readonly struct NewToken(string value, NewTokenType type, int line = 0, int column = 0)
+public readonly struct LangToken(string value, LangTokenType type, int line = 0, int column = 0)
 {
     public readonly string Value = value;
-    public readonly NewTokenType Type = type;
+    public readonly LangTokenType Type = type;
     public readonly int Line = line;
     public readonly int Column = column + 1;
 
@@ -15,11 +15,11 @@ public readonly struct NewToken(string value, NewTokenType type, int line = 0, i
     }
 }
 
-public static class NewTokenizer
+public static class LangTokenizer
 {
-    public static List<NewToken> Tokenize(string code)
+    public static List<LangToken> Tokenize(string code)
     {
-        var tokens = new List<NewToken>();
+        var tokens = new List<LangToken>();
 
         // 行 : line
         // 列 : 字符总数 - 累积到上一行的字符数 - \r次数 + 1
@@ -37,7 +37,7 @@ public static class NewTokenizer
                     if (j == len - 1 && i + j <= code.Length && a[j] == code[i + j] && i + j + 1 < code.Length &&
                         code[i + j + 1] == ' ')
                     {
-                        tokens.Add(new NewToken(a, Enum.Parse<NewTokenType>(char.ToUpper(a[0]) + a[1..]), line,
+                        tokens.Add(new LangToken(a, Enum.Parse<LangTokenType>(char.ToUpper(a[0]) + a[1..]), line,
                             i - column));
                         i += len - 1;
                         return true;
@@ -78,12 +78,12 @@ public static class NewTokenizer
             {
                 if (i + 1 <= code.Length && code[i + 1] == '+')
                 {
-                    tokens.Add(new NewToken("++", NewTokenType.PlusPlus, line, i - column));
+                    tokens.Add(new LangToken("++", LangTokenType.PlusPlus, line, i - column));
                     i++;
                     continue;
                 }
 
-                tokens.Add(new NewToken("+", NewTokenType.Plus, line, i - column));
+                tokens.Add(new LangToken("+", LangTokenType.Plus, line, i - column));
                 continue;
             }
 
@@ -91,43 +91,43 @@ public static class NewTokenizer
             {
                 if (i + 1 <= code.Length && code[i + 1] == '-')
                 {
-                    tokens.Add(new NewToken("--", NewTokenType.MinusMinus, line, i - column));
+                    tokens.Add(new LangToken("--", LangTokenType.MinusMinus, line, i - column));
                     i++;
                     continue;
                 }
 
                 if (i + 1 <= code.Length && code[i + 1] == '>')
                 {
-                    tokens.Add(new NewToken("->", NewTokenType.Arrow, line, i - column));
+                    tokens.Add(new LangToken("->", LangTokenType.Arrow, line, i - column));
                     i++;
                     continue;
                 }
 
-                tokens.Add(new NewToken("-", NewTokenType.Minus, line, i - column));
+                tokens.Add(new LangToken("-", LangTokenType.Minus, line, i - column));
                 continue;
             }
 
             if (code[i] == '*')
             {
-                tokens.Add(new NewToken("*", NewTokenType.Star, line, i - column));
+                tokens.Add(new LangToken("*", LangTokenType.Star, line, i - column));
                 continue;
             }
 
             if (code[i] == '/')
             {
-                tokens.Add(new NewToken("/", NewTokenType.Slash, line, i - column));
+                tokens.Add(new LangToken("/", LangTokenType.Slash, line, i - column));
                 continue;
             }
 
             if (code[i] == '%')
             {
-                tokens.Add(new NewToken("%", NewTokenType.Percent, line, i - column));
+                tokens.Add(new LangToken("%", LangTokenType.Percent, line, i - column));
                 continue;
             }
 
             if (code[i] == '^')
             {
-                tokens.Add(new NewToken("^", NewTokenType.Caret, line, i - column));
+                tokens.Add(new LangToken("^", LangTokenType.Caret, line, i - column));
                 continue;
             }
 
@@ -135,12 +135,12 @@ public static class NewTokenizer
             {
                 if (i + 1 <= code.Length && code[i + 1] == '|')
                 {
-                    tokens.Add(new NewToken("||", NewTokenType.Or, line, i - column));
+                    tokens.Add(new LangToken("||", LangTokenType.Or, line, i - column));
                     i++;
                     continue;
                 }
 
-                tokens.Add(new NewToken("|", NewTokenType.Pipe, line, i - column));
+                tokens.Add(new LangToken("|", LangTokenType.Pipe, line, i - column));
                 continue;
             }
 
@@ -154,55 +154,55 @@ public static class NewTokenizer
                     i++;
                 }
 
-                tokens.Add(new NewToken(sb.ToString(), NewTokenType.String, line, i - column));
+                tokens.Add(new LangToken(sb.ToString(), LangTokenType.String, line, i - column));
                 continue;
             }
 
             if (code[i] == '(')
             {
-                tokens.Add(new NewToken("(", NewTokenType.LeftParen, line, i - column));
+                tokens.Add(new LangToken("(", LangTokenType.LeftParen, line, i - column));
                 continue;
             }
 
             if (code[i] == ')')
             {
-                tokens.Add(new NewToken(")", NewTokenType.RightParen, line, i - column));
+                tokens.Add(new LangToken(")", LangTokenType.RightParen, line, i - column));
                 continue;
             }
 
             if (code[i] == '{')
             {
-                tokens.Add(new NewToken("{", NewTokenType.LeftBrace, line, i - column));
+                tokens.Add(new LangToken("{", LangTokenType.LeftBrace, line, i - column));
                 continue;
             }
 
             if (code[i] == '}')
             {
-                tokens.Add(new NewToken("}", NewTokenType.RightBrace, line, i - column));
+                tokens.Add(new LangToken("}", LangTokenType.RightBrace, line, i - column));
                 continue;
             }
 
             if (code[i] == '[')
             {
-                tokens.Add(new NewToken("[", NewTokenType.LeftBracket, line, i - column));
+                tokens.Add(new LangToken("[", LangTokenType.LeftBracket, line, i - column));
                 continue;
             }
 
             if (code[i] == ']')
             {
-                tokens.Add(new NewToken("]", NewTokenType.RightBracket, line, i - column));
+                tokens.Add(new LangToken("]", LangTokenType.RightBracket, line, i - column));
                 continue;
             }
 
             if (code[i] == ',')
             {
-                tokens.Add(new NewToken(",", NewTokenType.Comma, line, i - column));
+                tokens.Add(new LangToken(",", LangTokenType.Comma, line, i - column));
                 continue;
             }
 
             if (code[i] == ':')
             {
-                tokens.Add(new NewToken(":", NewTokenType.Colon, line, i - column));
+                tokens.Add(new LangToken(":", LangTokenType.Colon, line, i - column));
                 continue;
             }
 
@@ -210,25 +210,25 @@ public static class NewTokenizer
             {
                 if (i + 1 < code.Length && code[i + 1] == '.')
                 {
-                    tokens.Add(new NewToken("..", NewTokenType.DotDot, line, i - column));
+                    tokens.Add(new LangToken("..", LangTokenType.DotDot, line, i - column));
                     i++;
                     continue;
                 }
 
-                tokens.Add(new NewToken(".", NewTokenType.Dot, line, i - column));
+                tokens.Add(new LangToken(".", LangTokenType.Dot, line, i - column));
                 continue;
             }
 
             if (code[i] == '?')
             {
-                tokens.Add(new NewToken("?", NewTokenType.Question, line, i - column));
+                tokens.Add(new LangToken("?", LangTokenType.Question, line, i - column));
                 continue;
             }
 
             if (code[i] == '=')
             {
                 if (i + 1 >= code.Length || code[i + 1] != '=') continue;
-                tokens.Add(new NewToken("==", NewTokenType.Equals, line, i - column));
+                tokens.Add(new LangToken("==", LangTokenType.Equals, line, i - column));
                 i++;
                 continue;
             }
@@ -237,19 +237,19 @@ public static class NewTokenizer
             {
                 if (i + 1 < code.Length && code[i + 1] == '=')
                 {
-                    tokens.Add(new NewToken("<=", NewTokenType.LessThanEquals, line, i - column));
+                    tokens.Add(new LangToken("<=", LangTokenType.LessThanEquals, line, i - column));
                     i++;
                     continue;
                 }
 
                 if (i + 1 < code.Length && code[i + 1] == '-')
                 {
-                    tokens.Add(new NewToken("<-", NewTokenType.Assignment, line, i - column));
+                    tokens.Add(new LangToken("<-", LangTokenType.Assignment, line, i - column));
                     i++;
                     continue;
                 }
 
-                tokens.Add(new NewToken("<", NewTokenType.LessThan, line, i - column));
+                tokens.Add(new LangToken("<", LangTokenType.LessThan, line, i - column));
                 continue;
             }
 
@@ -257,12 +257,12 @@ public static class NewTokenizer
             {
                 if (i + 1 < code.Length && code[i + 1] == '=')
                 {
-                    tokens.Add(new NewToken(">=", NewTokenType.GreaterThanEquals, line, i - column));
+                    tokens.Add(new LangToken(">=", LangTokenType.GreaterThanEquals, line, i - column));
                     i++;
                     continue;
                 }
 
-                tokens.Add(new NewToken(">", NewTokenType.GreaterThan, line, i - column));
+                tokens.Add(new LangToken(">", LangTokenType.GreaterThan, line, i - column));
                 continue;
             }
 
@@ -270,12 +270,12 @@ public static class NewTokenizer
             {
                 if (i + 1 < code.Length && code[i + 1] == '=')
                 {
-                    tokens.Add(new NewToken("!=", NewTokenType.NotEquals, line, i - column));
+                    tokens.Add(new LangToken("!=", LangTokenType.NotEquals, line, i - column));
                     i++;
                     continue;
                 }
 
-                tokens.Add(new NewToken("!", NewTokenType.Exclamation, line, i - column));
+                tokens.Add(new LangToken("!", LangTokenType.Exclamation, line, i - column));
                 continue;
             }
 
@@ -283,12 +283,12 @@ public static class NewTokenizer
             {
                 if (i + 1 < code.Length && code[i + 1] == '&')
                 {
-                    tokens.Add(new NewToken("&&", NewTokenType.And, line, i - column));
+                    tokens.Add(new LangToken("&&", LangTokenType.And, line, i - column));
                     i++;
                     continue;
                 }
 
-                tokens.Add(new NewToken("&", NewTokenType.Ampersand, line, i - column));
+                tokens.Add(new LangToken("&", LangTokenType.Ampersand, line, i - column));
                 continue;
             }
 
@@ -296,18 +296,18 @@ public static class NewTokenizer
             {
                 if (i + 1 < code.Length && code[i + 1] == '|')
                 {
-                    tokens.Add(new NewToken("||", NewTokenType.Or, line, i - column));
+                    tokens.Add(new LangToken("||", LangTokenType.Or, line, i - column));
                     i++;
                     continue;
                 }
 
-                tokens.Add(new NewToken("|", NewTokenType.Pipe, line, i - column));
+                tokens.Add(new LangToken("|", LangTokenType.Pipe, line, i - column));
                 continue;
             }
 
             if (code[i] == '$')
             {
-                tokens.Add(new NewToken("$", NewTokenType.Dollar, line, i - column));
+                tokens.Add(new LangToken("$", LangTokenType.Dollar, line, i - column));
                 continue;
             }
 
@@ -332,7 +332,7 @@ public static class NewTokenizer
                     i++;
                 }
 
-                tokens.Add(new NewToken(sb.ToString(), NewTokenType.Number, line, i - column));
+                tokens.Add(new LangToken(sb.ToString(), LangTokenType.Number, line, i - column));
                 continue;
             }
 
@@ -346,7 +346,7 @@ public static class NewTokenizer
                     i++;
                 }
 
-                tokens.Add(new NewToken(sb.ToString(), NewTokenType.Identifier, line, i - column));
+                tokens.Add(new LangToken(sb.ToString(), LangTokenType.Identifier, line, i - column));
                 continue;
             }
 
