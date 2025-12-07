@@ -22,19 +22,19 @@ public class SetStatement(OldId id, OldExpr value, SourcePosition position = def
             var actualType = result.TypeToString().ToLower();
             
             // 建立类型匹配映射
-            var typeMap = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<string>>
+            var typeMap = new Dictionary<string, List<string>>
             {
-                { "int", new System.Collections.Generic.List<string>{ "int" } },
-                { "double", new System.Collections.Generic.List<string>{ "double" } },
-                { "string", new System.Collections.Generic.List<string>{ "string" } },
-                { "bool", new System.Collections.Generic.List<string>{ "bool" } },
-                { "char", new System.Collections.Generic.List<string>{ "char" } },
-                { "array", new System.Collections.Generic.List<string>{ "array" } },
-                { "dictionary", new System.Collections.Generic.List<string>{ "dictionary" } },
-                { "list", new System.Collections.Generic.List<string>{ "list" } },
-                { "tuple", new System.Collections.Generic.List<string>{ "tuple" } },
-                { "type", new System.Collections.Generic.List<string>{ "type" } },
-                { "function", new System.Collections.Generic.List<string>{ "function" } }
+                { "int", ["int"] },
+                { "double", ["double"] },
+                { "string", ["string"] },
+                { "bool", ["bool"] },
+                { "char", ["char"] },
+                { "array", ["array"] },
+                { "dictionary", ["dictionary"] },
+                { "list", ["list"] },
+                { "tuple", ["tuple"] },
+                { "type", ["type"] },
+                { "function", ["function"] }
             };
             
             // 检查类型是否匹配
