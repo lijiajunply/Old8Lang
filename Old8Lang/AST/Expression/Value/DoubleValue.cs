@@ -26,10 +26,26 @@ public class DoubleValue(double doubleValue, SourcePosition position = default) 
             ? new DoubleValue(Value * double.Parse(otherValueType.ToString()))
             : new VoidValue();
 
-    public override ValueType Divide(ValueType otherValueType) =>
-        otherValueType is IntValue or DoubleValue
-            ? new DoubleValue(Value / double.Parse(otherValueType.ToString()))
-            : new VoidValue();
+    public override ValueType Divide(ValueType otherValueType) 
+    {
+        if (otherValueType is IntValue intValue)
+        {
+            if (intValue.Value == 0)
+            {
+                throw new ZeroDivisionError(this);
+            }
+            return new DoubleValue(Value / intValue.Value);
+        }
+        if (otherValueType is DoubleValue doubleValue)
+        {
+            if (Math.Abs(doubleValue.Value) < 0.000001)
+            {
+                throw new ZeroDivisionError(this);
+            }
+            return new DoubleValue(Value / doubleValue.Value);
+        }
+        return new VoidValue();
+    }
 
 
     public override bool Less(ValueType? otherValue)

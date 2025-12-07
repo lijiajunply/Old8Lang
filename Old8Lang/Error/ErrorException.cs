@@ -1,4 +1,5 @@
 using Old8Lang.AST;
+using Old8Lang.LangParser;
 
 namespace Old8Lang.Error;
 
@@ -7,6 +8,11 @@ namespace Old8Lang.Error;
 /// </summary>
 public class Old8Exception : Exception
 {
+    /// <summary>
+    /// 当前解释器实例，用于获取源代码上下文
+    /// </summary>
+    public static LangInterpreter? CurrentInterpreter { get; set; }
+    
     /// <summary>
     /// 错误代码
     /// </summary>
@@ -48,13 +54,13 @@ public class Old8Exception : Exception
         IOldLangTree? node = null,
         string? suggestion = null,
         string[]? sourceContext = null)
-        : base(FormatErrorMessage(errorCode, message, position, suggestion, sourceContext))
+        : base(FormatErrorMessage(errorCode, message, position, suggestion, GetSourceContextFromInterpreter(position, sourceContext)))
     {
         ErrorCode = errorCode;
         Position = position;
         Node = node;
         Suggestion = suggestion;
-        SourceContext = sourceContext;
+        SourceContext = GetSourceContextFromInterpreter(position, sourceContext);
     }
 
     /// <summary>
@@ -71,8 +77,32 @@ public class Old8Exception : Exception
         IOldLangTree node,
         string? suggestion = null,
         string[]? sourceContext = null)
-        : this(errorCode, message, node.Position, node, suggestion, sourceContext)
+        : this(errorCode, message, node.Position, node, suggestion, GetSourceContextFromInterpreter(node.Position, sourceContext))
     {
+    }
+    
+    /// <summary>
+    /// 从当前解释器获取源代码上下文
+    /// </summary>
+    /// <param name="position">位置信息</param>
+    /// <param name="providedContext">提供的上下文信息</param>
+    /// <returns>源代码上下文</returns>
+    private static string[] GetSourceContextFromInterpreter(SourcePosition position, string[]? providedContext)
+    {
+        // 如果提供了上下文，直接使用
+        if (providedContext is not null && providedContext.Length > 0)
+        {
+            return providedContext;
+        }
+        
+        // 否则从当前解释器获取
+        if (CurrentInterpreter is not null)
+        {
+            return CurrentInterpreter.GetSourceContext(position);
+        }
+        
+        // 如果没有解释器，返回空数组
+        return Array.Empty<string>();
     }
 
     /// <summary>

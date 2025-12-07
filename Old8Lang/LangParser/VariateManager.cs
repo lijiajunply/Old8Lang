@@ -13,6 +13,7 @@ public class VariateManager
 
     public LangInfo? LangInfo { get; set; }
     public string Path { get; set; } = "";
+    public string? FileName { get; set; }
 
     [NotNull] public IMiniInterpreter? Interpreter { get; set; }
 
@@ -149,6 +150,7 @@ public class VariateManager
         {
             LangInfo = LangInfo,
             Path = Path,
+            FileName = FileName,
             Interpreter = Interpreter
         };
         return newManager;
@@ -161,6 +163,7 @@ public class VariateManager
         {
             LangInfo = LangInfo,
             Path = Path,
+            FileName = FileName,
             Interpreter = Interpreter
         };
     }

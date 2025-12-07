@@ -1,11 +1,22 @@
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
+using Old8Lang.Error;
 
 namespace Old8Lang.LangParser;
 
 public class LangInterpreter : IMiniInterpreter
 {
     public readonly VariateManager Manager = new();
+    
+    /// <summary>
+    /// 源代码
+    /// </summary>
+    public string? SourceCode { get; private set; }
+    
+    /// <summary>
+    /// 文件名
+    /// </summary>
+    public string? FileName { get; private set; }
     
     public LangInterpreter()
     {
@@ -19,18 +30,57 @@ public class LangInterpreter : IMiniInterpreter
         return Build(code, null);
     }
     
-    // 主要的构建方法，支持传递文件名
-    public BlockStatement Build(string code, string? fileName)
+    // 重载方法，支持传递文件名
+    public BlockStatement Build(string code, string? fileName = null)
     {
+        SourceCode = code;
+        FileName = fileName;
+        Manager.FileName = fileName;
+        
+        // 设置当前解释器，以便在错误处理中使用
+        Old8Exception.CurrentInterpreter = this;
+        
         var parser = LangTokenizer.Tokenize(code);
         if (parser == null) throw new Exception("语法出错");
         //parser.ForEach(x => Console.WriteLine(x));
-        return new LangParser(parser, code, fileName).ParseProgram();
+        var result = new LangParser(parser, code, fileName).ParseProgram();
+        
+        // 清除当前解释器
+        // Old8Exception.CurrentInterpreter = null;
+        
+        return result;
     }
 
     public static List<LangToken> Tokenize(string code)
     {
         return LangTokenizer.Tokenize(code);
+    }
+    
+    /// <summary>
+    /// 获取错误位置附近的源代码上下文
+    /// </summary>
+    /// <param name="position">位置信息</param>
+    /// <returns>错误位置附近的源代码上下文</returns>
+    public string[] GetSourceContext(SourcePosition position)
+    {
+        if (string.IsNullOrEmpty(SourceCode))
+        {
+            return Array.Empty<string>();
+        }
+        
+        var lines = SourceCode.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        var contextLines = new List<string>();
+        
+        // 获取错误行前后的上下文，最多显示3行上下文
+        int startLine = Math.Max(0, position.Line - 2);
+        int endLine = Math.Min(lines.Length - 1, position.Line + 1);
+        
+        for (int i = startLine; i <= endLine; i++)
+        {
+            contextLines.Add(lines[i]);
+        }
+        
+        return contextLines.ToArray();
     }
 
     public AbsUseClass UseClass { get; set; } = new ConsoleUse();

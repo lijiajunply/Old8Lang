@@ -51,6 +51,20 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     /// </summary>
     /// <param name="message">错误信息</param>
     /// <returns>带有上下文信息的语法错误</returns>
+    /// <summary>
+    /// 创建完整的位置信息
+    /// </summary>
+    /// <param name="token">令牌</param>
+    /// <returns>完整的位置信息</returns>
+    private SourcePosition CreateSourcePosition(LangToken token)
+    {
+        return new SourcePosition(
+            token.Line,
+            token.Column,
+            fileName,
+            token.Value);
+    }
+    
     private SyntaxError CreateSyntaxError(string message)
     {
         var context = GetSourceContext(CurrentToken.Line, CurrentToken.Column);

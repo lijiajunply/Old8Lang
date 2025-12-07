@@ -52,8 +52,15 @@ public class IntValue(int intValue, SourcePosition position = default) : ValueTy
     {
         if (otherValueType is DoubleValue)
             return otherValueType.Divide(this);
-        if (otherValueType is IntValue)
-            return new IntValue(Value / int.Parse(otherValueType.ToString()));
+        if (otherValueType is IntValue otherInt)
+        {
+            if (otherInt.Value == 0)
+            {
+                // 抛出自定义的ZeroDivisionError
+                throw new ZeroDivisionError(this);
+            }
+            return new IntValue(Value / otherInt.Value);
+        }
         return new VoidValue();
     }
 

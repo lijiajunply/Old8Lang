@@ -17,16 +17,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Changes">
-      <change afterPath="$PROJECT_DIR$/test_printline.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/SyntaxError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/SyntaxError.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/init.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/init.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/other.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/other.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/ConsoleUse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/ConsoleUse.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/增强运行时报错显示上下文和文件信息.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
