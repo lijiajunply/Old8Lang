@@ -1,0 +1,19 @@
+PrintLine("测试1: 合法赋值 - int类型")
+a:int <- 123
+PrintLine(a)
+
+PrintLine("\n测试2: 合法赋值 - string类型")
+b:string <- "hello"
+PrintLine(b)
+
+PrintLine("\n测试3: 合法赋值 - bool类型")
+c:bool <- true
+PrintLine(c)
+
+PrintLine("\n测试4: 非法赋值 - int类型赋值字符串")
+d:int <- "world"
+PrintLine(d)
+
+PrintLine("\n测试5: 非法赋值 - string类型赋值整数")
+e:string <- 456
+PrintLine(e)
