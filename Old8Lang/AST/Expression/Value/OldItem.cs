@@ -3,6 +3,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 
+
 namespace Old8Lang.AST.Expression.Value;
 
 public class OldItem(OldId listId, OldExpr key, SourcePosition position = default) : ValueType(position)
@@ -16,11 +17,13 @@ public class OldItem(OldId listId, OldExpr key, SourcePosition position = defaul
             if (result is not IntValue intResult) throw new TypeError(this, "IntValue", result.GetType().Name);
             return list.Get(intResult);
         }
+
         if (a is ArrayValue array)
         {
             if (result is not IntValue i) throw new TypeError(this, "IntValue", result.GetType().Name);
             return array.Get(i);
         }
+
         if (a is DictionaryValue dir)
         {
             if (result is not ValueType keyResult) throw new TypeError(this, "ValueType", result.GetType().Name);
