@@ -685,7 +685,8 @@ public class LangParser(List<LangToken> tokens)
         return CurrentToken.Type switch
         {
             LangTokenType.String => ParseStringLiteral(),
-            LangTokenType.Number => ParseDoubleLiteral(),
+            LangTokenType.Char => ParseCharLiteral(),
+            LangTokenType.Number => CurrentToken.Value.Contains('.') ? ParseDoubleLiteral() : ParseIntLiteral(),
             LangTokenType.LeftBracket => ParseArrayOrRange(),
             LangTokenType.LeftParen => ParseLambdaOrTuple(),
             LangTokenType.LeftBrace => ParseDictionary(),
@@ -1031,6 +1032,16 @@ public class LangParser(List<LangToken> tokens)
         return new StringValue(str, position);
     }
 
+    // intLiteral = INT ;
+    private IntValue ParseIntLiteral()
+    {
+        var numberToken = CurrentToken;
+        var position = new SourcePosition(numberToken.Line, numberToken.Column, tokenValue: numberToken.Value);
+        var number = int.Parse(numberToken.Value);
+        Expect(LangTokenType.Number);
+        return new IntValue(number, position);
+    }
+
     // doubleLiteral = DOUBLE ;
     private DoubleValue ParseDoubleLiteral()
     {
@@ -1039,6 +1050,16 @@ public class LangParser(List<LangToken> tokens)
         var number = double.Parse(numberToken.Value);
         Expect(LangTokenType.Number);
         return new DoubleValue(number, position);
+    }
+
+    // charLiteral = CHAR ;
+    private CharValue ParseCharLiteral()
+    {
+        var charToken = CurrentToken;
+        var position = new SourcePosition(charToken.Line, charToken.Column, tokenValue: charToken.Value);
+        var charValue = charToken.Value.Length > 0 ? charToken.Value[0] : '\0';
+        Expect(LangTokenType.Char);
+        return new CharValue(charValue, position);
     }
 
     // identifier = IDENTIFIER ;

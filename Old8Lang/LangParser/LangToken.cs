@@ -155,6 +155,37 @@ public static class LangTokenizer
                 continue;
             }
 
+            // 处理字符字面量 'c'
+            if (code[i] == '\'')
+            {
+                var sb = new StringBuilder();
+                i++;
+                while (i < code.Length)
+                {
+                    if (code[i] == '\\') // 处理转义字符
+                    {
+                        if (i + 1 < code.Length)
+                        {
+                            i++;
+                            sb.Append(code[i]);
+                        }
+                    }
+                    else if (code[i] == '\'') // 遇到未转义的单引号，结束字符
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        sb.Append(code[i]);
+                    }
+
+                    i++;
+                }
+
+                tokens.Add(new LangToken(sb.ToString(), LangTokenType.Char, line, i - column));
+                continue;
+            }
+
             if (code[i] == '(')
             {
                 tokens.Add(new LangToken("(", LangTokenType.LeftParen, line, i - column));
