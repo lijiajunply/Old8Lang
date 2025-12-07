@@ -1,0 +1,35 @@
+# 测试复杂数据类型
+
+# 数组类型
+array <- [1, 2, 3, 4, 5]
+print(array)  # 应该输出 [1, 2, 3, 4, 5]
+
+# 访问数组元素
+array_elem <- array[0]
+print(array_elem)  # 应该输出 1
+
+# 字典类型
+dict <- {"name": "Old8Lang", "version": 1.0}
+print(dict)  # 应该输出 {"name": "Old8Lang", "version": 1.0}
+
+# 访问字典元素
+dict_elem <- dict["name"]
+print(dict_elem)  # 应该输出 "Old8Lang"
+
+# 列表类型
+list <- [1, 2, 3, 4, 5]
+print(list)  # 应该输出 [1, 2, 3, 4, 5]
+
+# 访问列表元素
+list_elem <- list[1]
+print(list_elem)  # 应该输出 2
+
+# 元组类型
+tuple <- (10, "string")
+print(tuple)  # 应该输出 (10, "string")
+
+# 访问元组元素
+tuple_elem1 <- tuple[0]
+tuple_elem2 <- tuple[1]
+print(tuple_elem1)  # 应该输出 10
+print(tuple_elem2)  # 应该输出 "string"

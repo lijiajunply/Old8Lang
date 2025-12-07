@@ -1,0 +1,23 @@
+# 测试函数和AnyValue类型
+
+# 定义一个简单函数
+func add(a, b) {
+    return a + b
+}
+
+# 调用函数
+result <- add(10, 20)
+print(result)  # 应该输出 30
+
+# 定义一个带有多个返回语句的函数
+func max(a, b) {
+    if a > b {
+        return a
+    } else {
+        return b
+    }
+}
+
+# 调用函数
+max_result <- max(30, 20)
+print(max_result) 
