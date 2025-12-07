@@ -100,7 +100,7 @@ public class Instance(OldId oldId, List<OldExpr> ids, SourcePosition position = 
             if (anyValue.Result.TryGetValue("init", out result))
             {
                 if (result is not FuncValue value) throw new TypeError(this, "FuncValue", "init 不是函数类型");
-                value.Run(anyValue.Manager, [.. results.OfType<OldExpr>()]);
+                value.Run(anyValue.Manager, Ids);
             }
             else if (results.Count != 0)
             {

@@ -387,7 +387,15 @@ public static class LangTokenizer
                 }
 
                 tokens.Add(new LangToken(sb.ToString(), LangTokenType.Identifier, line, i - column));
+                continue;
             }
+
+            // 处理无法识别的字符
+            throw new Old8Lang.Error.SyntaxError(
+                code[i].ToString(), 
+                line, 
+                i - column, 
+                $"语法错误：无法识别的字符 '{code[i]}'");
 
             #endregion
         }

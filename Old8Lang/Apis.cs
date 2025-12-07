@@ -80,7 +80,7 @@ public static class Apis
     public static string FromDirectory(string directoryName)
     {
         var builder = new StringBuilder();
-        builder.Append(FromFile(directoryName + "/" + "init.ws"));
+        builder.Append(FromFile(directoryName + "/" + "init.old8"));
         return builder.ToString();
     }
 

@@ -3,6 +3,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
+using Old8Lang.Error;
 using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.LangParser;
@@ -24,7 +25,7 @@ public class LangParser(List<LangToken> tokens)
             CurrentIndex++;
         }
         else
-            throw new Old8Lang.Error.SyntaxError(
+            throw new Error.SyntaxError(
                 CurrentToken.Value,
                 CurrentToken.Line,
                 CurrentToken.Column,
@@ -120,7 +121,7 @@ public class LangParser(List<LangToken> tokens)
                                            Peek(3).Type == LangTokenType.Identifier &&
                                            Peek(4).Type == LangTokenType.RightBracket => ParseNativeClass(),
             LangTokenType.LeftBracket when Peek().Type == LangTokenType.Import => ParseNativeStatement(),
-            _ => throw new Exception($"语法有误。在解析到ParseStatement时出现问题。在{CurrentToken.Line}:{CurrentToken.Column}")
+            _ => throw new SyntaxError(CurrentToken.Value, CurrentToken.Line, CurrentToken.Column, $"语法有误。在解析到ParseStatement时出现问题")
         };
     }
 
@@ -189,7 +190,7 @@ public class LangParser(List<LangToken> tokens)
             Expect(LangTokenType.Elif);
             var elifCondition = ParseExpression();
             var elifBlock = ParseBlock();
-            var elifPosition = new Old8Lang.SourcePosition(elifToken.Line, elifToken.Column);
+            var elifPosition = new SourcePosition(elifToken.Line, elifToken.Column);
             oldIfs.Add(new OldIf(elifCondition, elifBlock, elifPosition));
         }
 
@@ -200,7 +201,7 @@ public class LangParser(List<LangToken> tokens)
             elseBlock = ParseBlock();
         }
 
-        var ifPosition = new Old8Lang.SourcePosition(ifToken.Line, ifToken.Column);
+        var ifPosition = new SourcePosition(ifToken.Line, ifToken.Column);
         return new IfStatement(new OldIf(condition, ifBlock, ifPosition), oldIfs, elseBlock, ifPosition);
     }
 
@@ -215,7 +216,7 @@ public class LangParser(List<LangToken> tokens)
         Expect(LangTokenType.Comma);
         var statement = ParseStatement();
         var block = ParseBlock();
-        var position = new Old8Lang.SourcePosition(forToken.Line, forToken.Column);
+        var position = new SourcePosition(forToken.Line, forToken.Column);
         return new ForStatement(set, condition, statement, block, position);
     }
 
@@ -230,7 +231,7 @@ public class LangParser(List<LangToken> tokens)
         var expression = ParseExpression();
         var block = ParseBlock();
         
-        var position = new Old8Lang.SourcePosition(forToken.Line, forToken.Column);
+        var position = new SourcePosition(forToken.Line, forToken.Column);
         return new ForInStatement(new OldId(identifier), expression, block, position);
     }
 
@@ -241,7 +242,7 @@ public class LangParser(List<LangToken> tokens)
         Expect(LangTokenType.While);
         var condition = ParseExpression();
         var block = ParseBlock();
-        var position = new Old8Lang.SourcePosition(whileToken.Line, whileToken.Column);
+        var position = new SourcePosition(whileToken.Line, whileToken.Column);
         return new WhileStatement(condition, block, position);
     }
 
@@ -336,7 +337,7 @@ public class LangParser(List<LangToken> tokens)
                 LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseFuncDeclaration(),
                 // 支持类内部的声明语句：identifier "<-" expression
                 LangTokenType.Identifier => ParseSet(),
-                _ => throw new Exception($"语法错误：期望声明或函数声明，但得到了 {CurrentToken.Type}")
+                _ => throw new SyntaxError(CurrentToken.Value, CurrentToken.Line, CurrentToken.Column, $"语法错误：期望声明或函数声明，但得到了 {CurrentToken.Type}")
             });
         }
 
@@ -377,15 +378,17 @@ public class LangParser(List<LangToken> tokens)
     }
 
     /// <summary>
-    /// importStatement = "import" identifier ;
+    /// importStatement = "import" STRING ;
     /// </summary>
     /// <returns>引入模块</returns>
     private ImportStatement ParseImportStatement()
     {
+        var importToken = CurrentToken;
+        var position = new SourcePosition(importToken.Line, importToken.Column, tokenValue: importToken.Value);
         Expect(LangTokenType.Import);
         var moduleName = CurrentToken.Value;
-        Expect(LangTokenType.Identifier);
-        return new ImportStatement(moduleName);
+        Expect(LangTokenType.String);
+        return new ImportStatement(moduleName, position);
     }
 
     /// <summary>
@@ -696,7 +699,7 @@ public class LangParser(List<LangToken> tokens)
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseInstantiate(),
             LangTokenType.Identifier => ParseIdentifier(),
             LangTokenType.True or LangTokenType.False => ParseBoolLiteral(),
-            _ => throw new Exception($"语法错误：无法识别的主表达式，但得到了 {CurrentToken.Type}")
+            _ => throw new SyntaxError(CurrentToken.Value, CurrentToken.Line, CurrentToken.Column, $"语法错误：无法识别的主表达式，但得到了 {CurrentToken.Type}")
         };
     }
 
@@ -848,7 +851,7 @@ public class LangParser(List<LangToken> tokens)
         if (CurrentToken.Type == LangTokenType.RightParen)
         {
             Expect(LangTokenType.RightParen);
-            throw new Exception("语法错误：空元组");
+            throw new SyntaxError(CurrentToken.Value, CurrentToken.Line, CurrentToken.Column, "语法错误：空元组");
         }
 
         // 解析参数列表
@@ -872,7 +875,7 @@ public class LangParser(List<LangToken> tokens)
                 else
                 {
                     // 不是标识符，不是 lambda 参数，回滚，尝试解析为元组
-                    throw new Exception("语法错误：lambda 参数必须是标识符");
+                    throw new SyntaxError(CurrentToken.Value, CurrentToken.Line, CurrentToken.Column, "语法错误：lambda 参数必须是标识符");
                 }
             }
 
@@ -902,23 +905,23 @@ public class LangParser(List<LangToken> tokens)
         }
 
         // 不是 lambda，解析为元组
-        var tupleExprs = new List<OldExpr> { firstExpr };
+        var tupleExpress = new List<OldExpr> { firstExpr };
 
         // 解析更多元组元素
         while (CurrentToken.Type == LangTokenType.Comma)
         {
             Expect(LangTokenType.Comma);
-            tupleExprs.Add(ParseExpression());
+            tupleExpress.Add(ParseExpression());
         }
 
         Expect(LangTokenType.RightParen);
 
-        return tupleExprs.Count switch
+        return tupleExpress.Count switch
         {
             // If only one expression, it's a single value in parentheses, not a tuple
-            1 => tupleExprs[0],
-            2 => new TupleValue(tupleExprs[0], tupleExprs[1], position),
-            _ => throw new Exception("语法错误：元组")
+            1 => tupleExpress[0],
+            2 => new TupleValue(tupleExpress[0], tupleExpress[1], position),
+            _ => throw new SyntaxError(CurrentToken.Value, CurrentToken.Line, CurrentToken.Column, "语法错误：元组")
         };
     }
 
