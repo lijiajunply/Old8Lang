@@ -331,11 +331,20 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     left!.LoadIlValue(ilGenerator, local);
                     var field = leftType!.GetField(id.IdName);
                     if (field == null)
+                {
+                    var p = leftType.GetProperty(id.IdName);
+                    if (p == null)
                     {
-                        var p = leftType.GetProperty(id.IdName);
-                        ilGenerator.Emit(OpCodes.Call, p!.GetGetMethod()!);
-                        return p.PropertyType;
+                        throw new InvalidOperationError(this, $"类型 {leftType.Name} 没有属性 {id.IdName}");
                     }
+                    var getMethod = p.GetGetMethod();
+                    if (getMethod == null)
+                    {
+                        throw new InvalidOperationError(this, $"属性 {id.IdName} 没有公开的 getter 方法");
+                    }
+                    ilGenerator.Emit(OpCodes.Call, getMethod);
+                    return p.PropertyType;
+                }
 
                     ilGenerator.Emit(OpCodes.Ldfld, field);
                     return field.FieldType;

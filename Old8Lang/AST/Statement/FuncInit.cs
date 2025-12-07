@@ -88,7 +88,11 @@ public class FuncInit(FuncValue a, SourcePosition position = default) : OldState
         // 获取方法信息
         var addMethod = dynamicType.GetMethod(methodName)!;
 
-        local.DelegateVar.Add(methodName, addMethod);
+        // 检查键是否已经存在，如果不存在则添加
+        if (!local.DelegateVar.ContainsKey(methodName))
+        {
+            local.DelegateVar.Add(methodName, addMethod);
+        }
     }
 
     public override OldStatement this[int index] => this;
