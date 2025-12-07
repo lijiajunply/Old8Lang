@@ -17,7 +17,8 @@ statement = lrBlock
           | nativeClass
           | plusPlus
           | minusMinus
-          | returnStatement ;
+          | returnStatement
+          | tryStatement ;
 
 lrBlock = "(" statement ")" ;
 
@@ -58,6 +59,10 @@ plusPlus = identifier "++" ;
 minusMinus = identifier "--" ;
 
 returnStatement = "return" expression ;
+
+tryStatement = "try" block catchBlock* ( "finally" block )? ;
+
+catchBlock = "catch" ( "(" ( identifier ( identifier )? )? ")" )? block ;
 
 block = "{" statement* "}"
       | statement ;
