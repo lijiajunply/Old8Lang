@@ -102,7 +102,7 @@ if (args[0] == BasicInfo.Order["FromFile"])
         Manager = { Path = args[1] }
     };
     var b = aLangInterpreter.Build(Apis.FromFile(args[1]));
-    // b.Run(aLangInterpreter.Manager);
+    b.Run(aLangInterpreter.Manager);
     // Apis.CslyUsing(args[1], false);
     return;
 }

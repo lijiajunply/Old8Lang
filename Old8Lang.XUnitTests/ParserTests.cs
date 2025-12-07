@@ -1,5 +1,6 @@
 using Old8Lang.LangParser;
-using Old8Lang;
+
+namespace Old8Lang.XUnitTests;
 
 public class ParserTests
 {
@@ -30,9 +31,9 @@ public class ParserTests
     public void TestParser_Clean()
     {
         // 测试简单的赋值语句
-        string code = "a <- 10";
-        List<LangToken> tokens = LangTokenizer.Tokenize(code);
-        var parser = new LangParser(tokens);
+        var code = "a <- 10";
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens);
         var result = parser.ParseProgram();
         
         Assert.NotNull(result);
@@ -43,12 +44,12 @@ public class ParserTests
     public void TestParser_Simple()
     {
         // 测试简单的测试文件
-        string fullPath = Path.Combine(GetProjectRoot(), "test_simple.old8");
+        var fullPath = Path.Combine(GetProjectRoot(), "test_simple.old8");
         Assert.True(File.Exists(fullPath), $"文件不存在: {fullPath}");
         
-        string code = File.ReadAllText(fullPath);
-        List<LangToken> tokens = LangTokenizer.Tokenize(code);
-        var parser = new LangParser(tokens);
+        var code = File.ReadAllText(fullPath);
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens);
         var result = parser.ParseProgram();
         
         Assert.NotNull(result);
@@ -59,12 +60,12 @@ public class ParserTests
     public void TestParser_Syntax()
     {
         // 测试全面的语法测试文件
-        string fullPath = Path.Combine(GetProjectRoot(), "test_syntax.old8");
+        var fullPath = Path.Combine(GetProjectRoot(), "test_syntax.old8");
         Assert.True(File.Exists(fullPath), $"文件不存在: {fullPath}");
         
-        string code = File.ReadAllText(fullPath);
-        List<LangToken> tokens = LangTokenizer.Tokenize(code);
-        var parser = new LangParser(tokens);
+        var code = File.ReadAllText(fullPath);
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens);
         var result = parser.ParseProgram();
         
         Assert.NotNull(result);
@@ -75,12 +76,12 @@ public class ParserTests
     public void TestParser_Datatypes()
     {
         // 测试数据类型测试文件
-        string fullPath = Path.Combine(GetProjectRoot(), "test_datatypes.old8");
+        var fullPath = Path.Combine(GetProjectRoot(), "test_datatypes.old8");
         Assert.True(File.Exists(fullPath), $"文件不存在: {fullPath}");
         
-        string code = File.ReadAllText(fullPath);
-        List<LangToken> tokens = LangTokenizer.Tokenize(code);
-        var parser = new LangParser(tokens);
+        var code = File.ReadAllText(fullPath);
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens);
         var result = parser.ParseProgram();
         
         Assert.NotNull(result);
@@ -91,12 +92,12 @@ public class ParserTests
     public void TestParser_ListArray()
     {
         // 测试列表和数组测试文件
-        string fullPath = Path.Combine(GetProjectRoot(), "test_list_array.old8");
+        var fullPath = Path.Combine(GetProjectRoot(), "test_list_array.old8");
         Assert.True(File.Exists(fullPath), $"文件不存在: {fullPath}");
         
-        string code = File.ReadAllText(fullPath);
-        List<LangToken> tokens = LangTokenizer.Tokenize(code);
-        var parser = new LangParser(tokens);
+        var code = File.ReadAllText(fullPath);
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens);
         var result = parser.ParseProgram();
         
         Assert.NotNull(result);
@@ -112,12 +113,12 @@ public class ParserTests
     public void TestParser_AllFiles(string testFile)
     {
         // 测试所有测试文件
-        string fullPath = Path.Combine(GetProjectRoot(), testFile);
+        var fullPath = Path.Combine(GetProjectRoot(), testFile);
         Assert.True(File.Exists(fullPath), $"文件不存在: {fullPath}");
         
-        string code = File.ReadAllText(fullPath);
-        List<LangToken> tokens = LangTokenizer.Tokenize(code);
-        var parser = new LangParser(tokens);
+        var code = File.ReadAllText(fullPath);
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens);
         var result = parser.ParseProgram();
         
         Assert.NotNull(result);
@@ -128,8 +129,8 @@ public class ParserTests
     public void TestTokenizer()
     {
         // 测试令牌化功能
-        string code = "a <- 10 + 5 * 2";
-        List<LangToken> tokens = LangTokenizer.Tokenize(code);
+        var code = "a <- 10 + 5 * 2";
+        var tokens = LangTokenizer.Tokenize(code);
         
         Assert.NotNull(tokens);
         Assert.NotEmpty(tokens);
@@ -140,17 +141,17 @@ public class ParserTests
     public void TestApisFromFile()
     {
         // 测试 Apis.FromFile 方法
-        string filename = "test_clean.old8";
-        string fullPath = Path.Combine(GetProjectRoot(), filename);
+        var filename = "test_clean.old8";
+        var fullPath = Path.Combine(GetProjectRoot(), filename);
         
         // 确保文件存在
         Assert.True(File.Exists(fullPath), $"文件不存在: {fullPath}");
         
         // 读取文件内容
-        string expectedContent = File.ReadAllText(fullPath);
+        var expectedContent = File.ReadAllText(fullPath);
         
         // 使用 Apis.FromFile 读取文件
-        string actualContent = Apis.FromFile(fullPath);
+        var actualContent = Apis.FromFile(fullPath);
         
         // 验证内容一致
         Assert.Equal(expectedContent, actualContent);
@@ -160,14 +161,14 @@ public class ParserTests
     public void TestFileReading()
     {
         // 测试文件读取功能
-        string filename = "test_clean.old8";
-        string fullPath = Path.Combine(GetProjectRoot(), filename);
+        var filename = "test_clean.old8";
+        var fullPath = Path.Combine(GetProjectRoot(), filename);
         
         // 确保文件存在
         Assert.True(File.Exists(fullPath), $"文件不存在: {fullPath}");
         
         // 读取文件内容
-        string content = File.ReadAllText(fullPath);
+        var content = File.ReadAllText(fullPath);
         
         // 验证内容不为空
         Assert.NotNull(content);

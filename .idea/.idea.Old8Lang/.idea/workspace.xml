@@ -16,8 +16,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Changes">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.XUnitTests/ParserTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.XUnitTests/ParserTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.XUnitTests/UnitTest1.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/VoidValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/VoidValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_file.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_parser.cs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,11 +110,11 @@
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
-  <component name="RunManager" selected=".NET 项目.Old8Lang.App">
+  <component name="RunManager" selected="f11637e3-7dee-43fe-99f4-0b03c6317be4">
     <configuration name="LibTest" type="DotNetProject" factoryName=".NET Project">
-      <option name="EXE_PATH" value="$PROJECT_DIR$/LibTest/bin/Debug/net6.0/LibTest" />
+      <option name="EXE_PATH" value="$PROJECT_DIR$/LibTest/bin/Debug/net10.0/LibTest" />
       <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/LibTest/bin/Debug/net6.0" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/LibTest/bin/Debug/net10.0" />
       <option name="PASS_PARENT_ENVS" value="1" />
       <option name="ENV_FILE_PATHS" value="" />
       <option name="REDIRECT_INPUT_PATH" value="" />
@@ -120,15 +127,15 @@
       <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
       <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
       <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="net6.0" />
+      <option name="PROJECT_TFM" value="net10.0" />
       <method v="2">
         <option name="Build" />
       </method>
     </configuration>
     <configuration name="Old8Lang.App" type="DotNetProject" factoryName=".NET Project">
-      <option name="EXE_PATH" value="$PROJECT_DIR$/Old8Lang.App/bin/Debug/net6.0/Old8Lang.App.exe" />
+      <option name="EXE_PATH" value="$PROJECT_DIR$/Old8Lang.App/bin/Debug/net10.0/Old8Lang.App" />
       <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Old8Lang.App/bin/Debug/net6.0" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Old8Lang.App/bin/Debug/net10.0" />
       <option name="PASS_PARENT_ENVS" value="1" />
       <option name="ENV_FILE_PATHS" value="" />
       <option name="REDIRECT_INPUT_PATH" value="" />
@@ -141,97 +148,12 @@
       <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
       <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
       <option name="PROJECT_KIND" value="DotNetCore" />
-      <option name="PROJECT_TFM" value="net6.0" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
-    <configuration name="Lang.Demo: IIS Express" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
-      <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/Lang.Demo.csproj" />
-      <option name="LAUNCH_PROFILE_TFM" value="net8.0" />
-      <option name="LAUNCH_PROFILE_NAME" value="IIS Express" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
-      <option name="SHOW_IIS_EXPRESS_OUTPUT" value="0" />
-      <option name="SEND_DEBUG_REQUEST" value="1" />
-      <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
-      <option name="AUTO_ATTACH_CHILDREN" value="0" />
-      <option name="MIXED_MODE_DEBUG" value="0" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
-    <configuration name="Lang.Demo: http" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
-      <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/Lang.Demo.csproj" />
-      <option name="LAUNCH_PROFILE_TFM" value="net8.0" />
-      <option name="LAUNCH_PROFILE_NAME" value="http" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
-      <option name="SHOW_IIS_EXPRESS_OUTPUT" value="0" />
-      <option name="SEND_DEBUG_REQUEST" value="1" />
-      <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
-      <option name="AUTO_ATTACH_CHILDREN" value="0" />
-      <option name="MIXED_MODE_DEBUG" value="0" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
-    <configuration name="Lang.Demo: https" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
-      <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo/Lang.Demo.csproj" />
-      <option name="LAUNCH_PROFILE_TFM" value="net8.0" />
-      <option name="LAUNCH_PROFILE_NAME" value="https" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
-      <option name="SHOW_IIS_EXPRESS_OUTPUT" value="0" />
-      <option name="SEND_DEBUG_REQUEST" value="1" />
-      <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
-      <option name="AUTO_ATTACH_CHILDREN" value="0" />
-      <option name="MIXED_MODE_DEBUG" value="0" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
-    <configuration name="Lang.Demo.Client: IIS Express" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
-      <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Lang.Demo.Client.csproj" />
-      <option name="LAUNCH_PROFILE_TFM" value="net8.0" />
-      <option name="LAUNCH_PROFILE_NAME" value="IIS Express" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
-      <option name="SHOW_IIS_EXPRESS_OUTPUT" value="0" />
-      <option name="SEND_DEBUG_REQUEST" value="1" />
-      <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
-      <option name="AUTO_ATTACH_CHILDREN" value="0" />
-      <option name="MIXED_MODE_DEBUG" value="0" />
-      <method v="2">
-        <option name="Build" />
-      </method>
-    </configuration>
-    <configuration name="Lang.Demo.Client: Lang.Demo" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
-      <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/Lang.Demo/src/Lang.Demo.Client/Lang.Demo.Client.csproj" />
-      <option name="LAUNCH_PROFILE_TFM" value="net8.0" />
-      <option name="LAUNCH_PROFILE_NAME" value="Lang.Demo" />
-      <option name="USE_MONO" value="0" />
-      <option name="RUNTIME_ARGUMENTS" value="" />
-      <option name="GENERATE_APPLICATIONHOST_CONFIG" value="1" />
-      <option name="SHOW_IIS_EXPRESS_OUTPUT" value="0" />
-      <option name="SEND_DEBUG_REQUEST" value="1" />
-      <option name="ADDITIONAL_IIS_EXPRESS_ARGUMENTS" value="" />
-      <option name="AUTO_ATTACH_CHILDREN" value="0" />
-      <option name="MIXED_MODE_DEBUG" value="0" />
+      <option name="PROJECT_TFM" value="net10.0" />
       <method v="2">
         <option name="Build" />
       </method>
     </configuration>
     <list>
-      <item itemvalue=".NET 启动设置配置文件.Lang.Demo.Client: IIS Express" />
-      <item itemvalue=".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo" />
-      <item itemvalue=".NET 启动设置配置文件.Lang.Demo: IIS Express" />
-      <item itemvalue=".NET 启动设置配置文件.Lang.Demo: http" />
-      <item itemvalue=".NET 启动设置配置文件.Lang.Demo: https" />
       <item itemvalue=".NET 项目.LibTest" />
       <item itemvalue=".NET 项目.Old8Lang.App" />
     </list>
@@ -394,7 +316,7 @@
       <workItem from="1739066646620" duration="9252000" />
       <workItem from="1739186827152" duration="12590000" />
       <workItem from="1765095462905" duration="3326000" />
-      <workItem from="1765099889326" duration="5916000" />
+      <workItem from="1765099889326" duration="6689000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
