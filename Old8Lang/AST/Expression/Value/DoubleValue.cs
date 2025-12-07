@@ -11,20 +11,44 @@ public class DoubleValue(double doubleValue, SourcePosition position = default) 
 {
     public readonly double Value = doubleValue;
 
-    public override ValueType Plus(ValueType otherValueType) =>
-        otherValueType is IntValue or DoubleValue
-            ? new DoubleValue(Value + double.Parse(otherValueType.ToString()))
-            : new VoidValue();
+    public override ValueType Plus(ValueType otherValueType)
+    {
+        if (otherValueType is not IntValue and not DoubleValue)
+            return new VoidValue();
+        
+        var result = Value + double.Parse(otherValueType.ToString());
+        if (double.IsNaN(result) || double.IsInfinity(result))
+        {
+            throw new OverflowError(this, "浮点数加法");
+        }
+        return new DoubleValue(result);
+    }
 
-    public override ValueType Minus(ValueType otherValueType) =>
-        otherValueType is IntValue or DoubleValue
-            ? new DoubleValue(Value - double.Parse(otherValueType.ToString()))
-            : new VoidValue();
+    public override ValueType Minus(ValueType otherValueType)
+    {
+        if (otherValueType is not IntValue and not DoubleValue)
+            return new VoidValue();
+        
+        var result = Value - double.Parse(otherValueType.ToString());
+        if (double.IsNaN(result) || double.IsInfinity(result))
+        {
+            throw new OverflowError(this, "浮点数减法");
+        }
+        return new DoubleValue(result);
+    }
 
-    public override ValueType Times(ValueType otherValueType) =>
-        otherValueType is IntValue or DoubleValue
-            ? new DoubleValue(Value * double.Parse(otherValueType.ToString()))
-            : new VoidValue();
+    public override ValueType Times(ValueType otherValueType)
+    {
+        if (otherValueType is not IntValue and not DoubleValue)
+            return new VoidValue();
+        
+        var result = Value * double.Parse(otherValueType.ToString());
+        if (double.IsNaN(result) || double.IsInfinity(result))
+        {
+            throw new OverflowError(this, "浮点数乘法");
+        }
+        return new DoubleValue(result);
+    }
 
     public override ValueType Divide(ValueType otherValueType) 
     {

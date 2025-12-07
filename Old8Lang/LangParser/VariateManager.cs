@@ -3,6 +3,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
+using Old8Lang.Error;
 using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.LangParser;
@@ -121,6 +122,12 @@ public class VariateManager
 
     public void AddVariate(string name, ValueType valueType)
     {
+        if (VariateName.Contains(name))
+        {
+            // 创建一个默认的SourcePosition，因为AddVariate方法没有位置信息
+            // 在实际使用中，应该从调用处传递位置信息
+            throw new DuplicateNameError(new SourcePosition(), name, "变量");
+        }
         VariateName.Add(name);
         Values.Add(valueType);
         Count++;

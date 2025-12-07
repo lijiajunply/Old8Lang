@@ -20,8 +20,20 @@ public class IntValue(int intValue, SourcePosition position = default) : ValueTy
             return new CharValue(Convert.ToChar(Value + c.Value));
         if (otherValueType is DoubleValue)
             return otherValueType.Plus(this);
-        if (otherValueType is IntValue)
-            return new IntValue(Value + int.Parse(otherValueType.ToString()));
+        if (otherValueType is IntValue otherInt)
+        {
+            try
+            {
+                checked
+                {
+                    return new IntValue(Value + otherInt.Value);
+                }
+            }
+            catch (OverflowException)
+            {
+                throw new OverflowError(this, "整数加法");
+            }
+        }
 
         return new VoidValue();
     }
@@ -30,8 +42,20 @@ public class IntValue(int intValue, SourcePosition position = default) : ValueTy
     {
         if (otherValueType is DoubleValue)
             return otherValueType.Minus(this);
-        if (otherValueType is IntValue)
-            return new IntValue(Value - int.Parse(otherValueType.ToString()));
+        if (otherValueType is IntValue otherInt)
+        {
+            try
+            {
+                checked
+                {
+                    return new IntValue(Value - otherInt.Value);
+                }
+            }
+            catch (OverflowException)
+            {
+                throw new OverflowError(this, "整数减法");
+            }
+        }
         return new VoidValue();
     }
 
@@ -43,8 +67,20 @@ public class IntValue(int intValue, SourcePosition position = default) : ValueTy
             return otherValueType.Times(this);
         if (otherValueType is DoubleValue)
             return otherValueType.Times(this);
-        if (otherValueType is IntValue)
-            return new IntValue(Value * int.Parse(otherValueType.ToString()));
+        if (otherValueType is IntValue otherInt)
+        {
+            try
+            {
+                checked
+                {
+                    return new IntValue(Value * otherInt.Value);
+                }
+            }
+            catch (OverflowException)
+            {
+                throw new OverflowError(this, "整数乘法");
+            }
+        }
         return new VoidValue();
     }
 

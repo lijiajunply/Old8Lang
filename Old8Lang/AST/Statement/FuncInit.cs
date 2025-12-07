@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
 
@@ -12,6 +13,18 @@ public class FuncInit(FuncValue a, SourcePosition position = default) : OldState
 
     public override void Run(VariateManager manager)
     {
+        // 检查函数是否已存在
+        if (FuncValue.Id != null)
+        {
+            var existingFunc = manager.AnyInfo.FirstOrDefault(info => 
+                info is FuncValue func && func.Id?.IdName == FuncValue.Id.IdName);
+            
+            if (existingFunc != null)
+            {
+                throw new DuplicateNameError(this, FuncValue.Id.IdName, "函数");
+            }
+        }
+        
         manager.AddClassAndFunc(FuncValue);
     }
 

@@ -5,6 +5,7 @@ using System.Text;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
+using Old8Lang.Error;
 
 
 namespace Old8Lang.AST.Expression.Value;
@@ -40,6 +41,16 @@ public class FuncValue : ValueType
     {
         if (Method != null)
         {
+            // 检查参数数量是否匹配（Method的参数数量减去this参数）
+            var expectedParams = Method.GetParameters().Length;
+            if (obj != null) expectedParams--; // 如果有this参数，减去1
+            var actualParams = ids.Count;
+            if (expectedParams != actualParams)
+            {
+                throw new ArgumentError(Position, 
+                    $"方法 '{Method.Name}' 期望 {expectedParams} 个参数，但实际提供了 {actualParams} 个参数");
+            }
+            
             var values = ids.Select(expr => expr.Run(variateManagerFunc)).ToList();
             var a = Apis.ListToObjects(values).ToArray();
             var invoke = Method?.Invoke(obj, a);
@@ -53,6 +64,18 @@ public class FuncValue : ValueType
             manager.Result = ObjToValue(invoke);
             Func?.Run(manager, ids);
             return manager.Result;
+        }
+
+        // 检查参数数量是否匹配
+        if (Ids != null)
+        {
+            var expectedParams = Ids.Count;
+            var actualParams = ids.Count;
+            if (expectedParams != actualParams)
+            {
+                throw new ArgumentError(Position, 
+                    $"函数 '{Id?.IdName}' 期望 {expectedParams} 个参数，但实际提供了 {actualParams} 个参数");
+            }
         }
 
         if (variateManagerFunc.IsClass)

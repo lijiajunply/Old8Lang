@@ -3,12 +3,25 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
 
 public class ClassInit(AnyValue anyValue, SourcePosition position = default) : OldStatement(position)
 {
-    public override void Run(VariateManager manager) => manager.AddClassAndFunc(anyValue);
+    public override void Run(VariateManager manager)
+    {
+        // 检查类是否已存在
+        var existingClass = manager.AnyInfo.FirstOrDefault(info => 
+            info is AnyValue any && any.Id.IdName == anyValue.Id.IdName);
+        
+        if (existingClass != null)
+        {
+            throw new DuplicateNameError(this, anyValue.Id.IdName, "类");
+        }
+        
+        manager.AddClassAndFunc(anyValue);
+    }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {

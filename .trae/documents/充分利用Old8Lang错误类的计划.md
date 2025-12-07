@@ -91,4 +91,23 @@
 ## 4. 预期效果
 
 - 更精确的错误类型：每个错误都有特定的类型，便于调试和定位问题
-- 更有用的错误信息：
+- 更有用的错误信息：每个错误都有针对性的错误消息和修复建议
+- 更一致的错误处理：所有错误都使用统一的错误处理机制
+- 更好的用户体验：开发者能够获得更准确的错误反馈，提高开发效率
+
+## 5. 代码修改范围
+
+- `AST/Expression/Value/FuncValue.cs`
+- `AST/Statement/ImportStatement.cs`
+- `AST/Expression/Intermediates/Instance.cs`
+- `LangParser/VariateManager.cs`
+- `LangParser/LangInterpreter.cs`
+- `AST/Expression/Value/ArrayValue.cs`
+- `AST/Expression/Value/IntValue.cs`
+- `AST/Expression/Value/DoubleValue.cs`
+- `AST/Statement/FuncInit.cs`
+- `AST/Statement/ClassInit.cs`
+- `AST/Statement/FuncRunStatement.cs`
+- `AST/Expression/OldID.cs`
+
+通过这个计划，我们将充分利用所有已定义的错误类，提高Old8Lang语言的错误处理能力和用户体验。

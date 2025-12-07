@@ -39,15 +39,28 @@ public class StringValue(string context, SourcePosition position = default) : Va
     {
         if (otherValueType is not TypeValue value) throw new TypeError(this, "TypeValue", otherValueType.GetType().Name);
 
-        return value.Value switch
+        switch (value.Value)
         {
-            "Int" or "int" => new IntValue(Value.Length),
-            "Bool" or "bool" => throw new TypeError(this, "bool", "无法将字符串转换为布尔值"),
-            "String" or "string" => this,
-            "char" or "Char" => Value.Length == 0 ? new CharValue('\0') : new CharValue(Value[0]),
-            "Double" or "double" => throw new TypeError(this, "double", "无法将字符串转换为浮点数"),
-            _ => throw new TypeError(this, $"不支持的类型转换: {GetType().Name} 到 {value.Value}")
-        };
+            case "Int" or "int":
+                return new IntValue(Value.Length);
+            case "Bool" or "bool":
+                throw new FormatError(this, "无法将字符串转换为布尔值，字符串不是有效的布尔格式（true/false）");
+            case "String" or "string":
+                return this;
+            case "char" or "Char":
+                return Value.Length == 0 ? new CharValue('\0') : new CharValue(Value[0]);
+            case "Double" or "double":
+                try
+                {
+                    return new DoubleValue(double.Parse(Value));
+                }
+                catch (FormatException)
+                {
+                    throw new FormatError(this, $"无法将字符串 '{Value}' 转换为浮点数，字符串不是有效的数字格式");
+                }
+            default:
+                throw new TypeError(this, $"不支持的类型转换: {GetType().Name} 到 {value.Value}");
+        }
     }
 
     public override object GetValue() => Value;
