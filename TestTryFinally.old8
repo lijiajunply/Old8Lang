@@ -6,5 +6,5 @@ try {
 } catch {
     result <- 1
 } finally {
-    finally_executed <- 1
+    final <- 1
 }

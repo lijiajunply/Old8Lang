@@ -347,7 +347,7 @@ public static class LangTokenizer
             var matchedKeyword = enumList.FirstOrDefault(x => x[0] == code[i] && 
                 i + x.Length <= code.Length && 
                 code.Substring(i, x.Length) == x &&
-                (i + x.Length == code.Length || !char.IsLetter(code[i + x.Length])));
+                (i + x.Length == code.Length || !char.IsLetterOrDigit(code[i + x.Length]) && code[i + x.Length] != '_'));
             
             if (!string.IsNullOrEmpty(matchedKeyword))
             {

@@ -9,4 +9,16 @@ try {
     print("无论是否发生错误，finally块都会执行")
 }
 
-print("程序
+print("程序继续执行")
+
+try {
+    print(undefined_var)
+} catch (ZeroDivisionError) {
+    print("捕获到除以零错误，这行不应该执行")
+} catch (NameError e) {
+    print("捕获到名称错误：", e)
+} catch {
+    print("捕获到其他错误")
+}
+
+print("程序结束")

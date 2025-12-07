@@ -138,6 +138,72 @@ public class ParserTests
     }
     
     [Fact]
+    public void TestTokenizer_KeywordInVariableName()
+    {
+        // 测试包含关键字的变量名的令牌化
+        var code = "finally_executed <- 1";
+        var tokens = LangTokenizer.Tokenize(code);
+        
+        Assert.NotNull(tokens);
+        Assert.NotEmpty(tokens);
+        Assert.Equal(3, tokens.Count); // 应该有3个令牌：finally_executed, <-, 1
+        Assert.Equal("finally_executed", tokens[0].Value);
+        Assert.Equal(LangTokenType.Identifier, tokens[0].Type);
+    }
+    
+    [Fact]
+    public void TestParser_TryCatch()
+    {
+        // 测试try-catch语句
+        var code = "try { a <- 10 / 0 } catch { result <- 1 }";
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens);
+        var result = parser.ParseProgram();
+        
+        Assert.NotNull(result);
+        Assert.True(result.Count > 0);
+    }
+    
+    [Fact]
+    public void TestParser_TryCatchFinally()
+    {
+        // 测试try-catch-finally语句
+        var code = "try { a <- 10 / 0 } catch { result <- 1 } finally { final <- 1 }";
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens);
+        var result = parser.ParseProgram();
+        
+        Assert.NotNull(result);
+        Assert.True(result.Count > 0);
+    }
+    
+    [Fact]
+    public void TestParser_MultipleCatchBlocks()
+    {
+        // 测试多个catch块
+        var code = "try { a <- 10 / 0 } catch (ZeroDivisionError) { result <- 1 } catch { result <- 2 }";
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens);
+        var result = parser.ParseProgram();
+        
+        Assert.NotNull(result);
+        Assert.True(result.Count > 0);
+    }
+    
+    [Fact]
+    public void TestParser_CatchWithVariable()
+    {
+        // 测试带异常变量的catch块
+        var code = "try { a <- 10 / 0 } catch (ZeroDivisionError e) { result <- 1 }";
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens);
+        var result = parser.ParseProgram();
+        
+        Assert.NotNull(result);
+        Assert.True(result.Count > 0);
+    }
+    
+    [Fact]
     public void TestApisFromFile()
     {
         // 测试 Apis.FromFile 方法

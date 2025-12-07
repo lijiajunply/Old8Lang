@@ -235,6 +235,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         {
             LangTokenType.LeftParen => ParseLrBlock(),
             LangTokenType.If => ParseIfStatement(),
+            LangTokenType.Try => ParseTryStatement(),
             LangTokenType.For when Peek().Type == LangTokenType.Identifier &&
                                    Peek(2).Type == LangTokenType.In => ParseForInStatement(),
             LangTokenType.For when Peek().Type == LangTokenType.Identifier => ParseForStatement(),
@@ -659,6 +660,82 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
 
         Expect(LangTokenType.RightBrace);
         return new BlockStatement(statements);
+    }
+    
+    /// <summary>
+    /// 解析try语句
+    /// </summary>
+    /// <returns>TryStatement对象</returns>
+    private OldStatement ParseTryStatement()
+    {
+        Expect(LangTokenType.Try);
+        
+        // 解析try块
+        var tryBlock = ParseBlock();
+        
+        // 解析catch块列表
+        var catchBlocks = new List<(string? exceptionType, OldId? exceptionVar, BlockStatement catchBlock)>();
+        
+        // 循环解析catch块
+        while (CurrentToken.Type == LangTokenType.Catch)
+        {
+            Expect(LangTokenType.Catch);
+            
+            string? exceptionType = null;
+            OldId? exceptionVar = null;
+            
+            // 检查是否有异常类型和变量
+            if (CurrentToken.Type == LangTokenType.LeftParen)
+            {
+                Expect(LangTokenType.LeftParen);
+                
+                // 解析异常类型（如果有）
+                if (CurrentToken.Type == LangTokenType.Identifier)
+                {
+                    exceptionType = CurrentToken.Value;
+                    CurrentIndex++;
+                    
+                    // 解析异常变量（如果有）
+                    if (CurrentToken.Type == LangTokenType.Identifier)
+                    {
+                        exceptionVar = new OldId(CurrentToken.Value, position: CreateSourcePosition(CurrentToken));
+                        CurrentIndex++;
+                    }
+                }
+                
+                Expect(LangTokenType.RightParen);
+            }
+            
+            // 解析catch块
+            var catchBlock = ParseBlock();
+            catchBlocks.Add((exceptionType, exceptionVar, catchBlock));
+        }
+        
+        // 解析finally块（可选）
+        BlockStatement? finallyBlock = null;
+        if (CurrentToken.Type == LangTokenType.Finally)
+        {
+            Expect(LangTokenType.Finally);
+            // 直接解析finally块，不使用ParseBlock，避免finally被视为单独的语句
+            var statements = new List<IOldLangTree>();
+            if (CurrentToken.Type == LangTokenType.LeftBrace)
+            {
+                CurrentIndex++;
+                while (CurrentToken.Type != LangTokenType.RightBrace)
+                {
+                    statements.Add(ParseStatement());
+                }
+                CurrentIndex++;
+            }
+            else
+            {
+                statements.Add(ParseStatement());
+            }
+            finallyBlock = new BlockStatement(statements);
+        }
+        
+        // 创建TryStatement对象
+        return new TryStatement(tryBlock, catchBlocks, finallyBlock, CreateSourcePosition(CurrentToken));
     }
 
     #endregion
