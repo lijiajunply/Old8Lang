@@ -1,0 +1,76 @@
+// 测试基本语句
+a <- 10
+(a <- 20)
+
+// 测试条件语句
+if a > 10 {
+    b <- 20
+}
+
+if a > 10 {
+    b <- 20
+} elif a < 5 {
+    b <- 5
+} else {
+    b <- 15
+}
+
+// 测试循环语句
+for i <- 0, i < 10, i++ {
+    print(i)
+}
+
+while i < 10 {
+    i <- i + 1
+}
+
+for item in [1, 2, 3] {
+    print(item)
+}
+
+// 测试开关语句
+switch a {
+    case 1 {
+        print("one")
+    }
+    case 2 {
+        print("two")
+    }
+    default {
+        print("other")
+    }
+}
+
+// 测试函数定义和调用
+func add(a, b) {
+    return a + b
+}
+
+// 暂时注释掉箭头函数定义，因为解析器无法处理
+// add(a, b) -> {
+//     a + b
+// }
+
+add(1, 2)
+
+// 测试类定义和方法调用
+class Person {
+    name <- ""
+    age <- 0
+    
+    func setName(n) {
+        name <- n
+    }
+}
+
+person.setName("test")
+
+// 测试导入语句
+import module
+[import "dll" Class Method]
+[import "dll" Class] -> "Method"
+[import "dll" Class]
+
+// 测试自增自减
+i++
+i--

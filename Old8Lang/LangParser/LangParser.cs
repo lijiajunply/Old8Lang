@@ -96,13 +96,15 @@ public class LangParser(List<LangToken> tokens)
                 => ParseFuncDeclaration(),
             // 类型实例调用属性/方法
             LangTokenType.Identifier when Peek().Type == LangTokenType.Dot => ParseClassFuncRunStatement(),
-            LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseFuncRunStatement(),
+            // 先尝试解析为函数定义，再解析为函数调用
+            LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseIdentifierLeftParen(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.PlusPlus => ParsePlusPlus(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.MinusMinus => ParseMinusMinus(),
-            LangTokenType.Identifier => ParseSet(),
+            // 只有当标识符后面跟着 Assignment 标记时，才是声明语句
+            LangTokenType.Identifier when Peek().Type == LangTokenType.Assignment => ParseSet(),
             LangTokenType.Class => ParseClassDeclaration(),
             LangTokenType.Import => ParseImportStatement(),
-            LangTokenType.LeftBracket when Peek().Type == LangTokenType.Import => ParseNativeStatement(),
+            // 先处理更具体的 nativeStatic 和 nativeClass，再处理更通用的 nativeStatement
             LangTokenType.LeftBracket when Peek().Type == LangTokenType.Import &&
                                            Peek(2).Type == LangTokenType.String &&
                                            Peek(3).Type == LangTokenType.Identifier &&
@@ -113,8 +115,30 @@ public class LangParser(List<LangToken> tokens)
                                            Peek(2).Type == LangTokenType.String &&
                                            Peek(3).Type == LangTokenType.Identifier &&
                                            Peek(4).Type == LangTokenType.RightBracket => ParseNativeClass(),
+            LangTokenType.LeftBracket when Peek().Type == LangTokenType.Import => ParseNativeStatement(),
             _ => throw new Exception($"语法有误。在解析到ParseStatement时出现问题。在{CurrentToken.Line}:{CurrentToken.Column}")
         };
+    }
+    
+    /// <summary>
+    /// 处理标识符后面跟着左括号的情况，可能是函数定义或函数调用
+    /// </summary>
+    private OldStatement ParseIdentifierLeftParen()
+    {
+        // 先保存当前位置
+        var savedIndex = _currentIndex;
+        
+        try
+        {
+            // 尝试解析为函数定义
+            return ParseFuncDeclaration();
+        }
+        catch
+        {
+            // 解析失败，回滚，尝试解析为函数调用
+            _currentIndex = savedIndex;
+            return ParseFuncRunStatement();
+        }
     }
 
     private ReturnStatement ParseReturnStatement()
@@ -287,8 +311,10 @@ public class LangParser(List<LangToken> tokens)
             statements.Add(CurrentToken.Type switch
             {
                 LangTokenType.Assignment => ParseSet(),
-                LangTokenType.Func or LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen =>
-                    ParseFuncDeclaration(),
+                LangTokenType.Func => ParseFuncDeclaration(),
+                LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseFuncDeclaration(),
+                // 支持类内部的声明语句：identifier "<-" expression
+                LangTokenType.Identifier => ParseSet(),
                 _ => throw new Exception($"语法错误：期望声明或函数声明，但得到了 {CurrentToken.Type}")
             });
         }
@@ -601,6 +627,22 @@ public class LangParser(List<LangToken> tokens)
     //         | asStatement
     private OldExpr ParsePrimary()
     {
+        // 处理 not 表达式
+        if (CurrentToken.Type == LangTokenType.Not)
+        {
+            Expect(LangTokenType.Not);
+            var expr = ParsePrimary();
+            return new Operation(expr, OldTokenGeneric.NOT, null);
+        }
+        
+        // 处理前缀 minus 表达式
+        if (CurrentToken.Type == LangTokenType.Minus)
+        {
+            Expect(LangTokenType.Minus);
+            var expr = ParsePrimary();
+            return new Operation(new IntValue(0), OldTokenGeneric.MINUS, expr);
+        }
+        
         return CurrentToken.Type switch
         {
             LangTokenType.String => ParseStringLiteral(),
@@ -744,31 +786,70 @@ public class LangParser(List<LangToken> tokens)
             throw new Exception("语法错误：空元组");
         }
 
-        var expressions = new List<OldExpr> { ParseExpression() };
-
-        // Parse additional expressions for tuple
+        // 解析参数列表
+        var parameters = new List<OldID>();
+        var firstExpr = ParseExpression();
+        
+        // 如果第一个表达式是标识符，可能是 lambda 参数
+        if (firstExpr is OldID id)
+        {
+            parameters.Add(id);
+            
+            // 解析更多参数
+            while (CurrentToken.Type == LangTokenType.Comma)
+            {
+                Expect(LangTokenType.Comma);
+                var param = ParseExpression();
+                if (param is OldID paramId)
+                {
+                    parameters.Add(paramId);
+                }
+                else
+                {
+                    // 不是标识符，不是 lambda 参数，回滚，尝试解析为元组
+                    throw new Exception("语法错误：lambda 参数必须是标识符");
+                }
+            }
+            
+            // 检查是否是 lambda
+            if (CurrentToken.Type == LangTokenType.Arrow)
+            {
+                Expect(LangTokenType.Arrow);
+                
+                // 解析 lambda 体，支持 block 或 expression
+                if (CurrentToken.Type == LangTokenType.LeftBrace)
+                {
+                    var block = ParseBlock();
+                    return new FuncValue(null, parameters, block);
+                }
+                else
+                {
+                    // 简单表达式作为 lambda 体
+                    var expr = ParseExpression();
+                    // 创建一个只包含 return 语句的 block
+                    var block = new BlockStatement([new ReturnStatement(expr)]);
+                    return new FuncValue(null, parameters, block);
+                }
+            }
+        }
+        
+        // 不是 lambda，解析为元组
+        var tupleExprs = new List<OldExpr> { firstExpr };
+        
+        // 解析更多元组元素
         while (CurrentToken.Type == LangTokenType.Comma)
         {
             Expect(LangTokenType.Comma);
-            expressions.Add(ParseExpression());
+            tupleExprs.Add(ParseExpression());
         }
-
-        // Check if it's a lambda
-        if (CurrentToken.Type == LangTokenType.Arrow)
-        {
-            Expect(LangTokenType.Arrow);
-            var block = ParseBlock();
-            var idList = expressions.OfType<OldID>().ToList();
-            return new FuncValue(null, idList, block);
-        }
-
+        
         Expect(LangTokenType.RightParen);
 
-        return expressions.Count switch
+        return tupleExprs.Count switch
         {
             // If only one expression, it's a single value in parentheses, not a tuple
-            1 => expressions[0],
-            2 => new TupleValue(expressions[0], expressions[1]),
+            1 => tupleExprs[0],
+            2 => new TupleValue(tupleExprs[0], tupleExprs[1]),
             _ => throw new Exception("语法错误：元组")
         };
     }

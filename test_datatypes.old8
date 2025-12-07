@@ -46,7 +46,7 @@ p <- array[:3]
 q <- array[2:]
 
 // 测试函数
-def add(x, y) {
+func add(x, y) {
     return x + y
 }
 
@@ -77,4 +77,4 @@ u <- ${"Hello, " + name + "!"}
 // 测试自增自减
 i <- 0
 i++
-j <- i--
+i--

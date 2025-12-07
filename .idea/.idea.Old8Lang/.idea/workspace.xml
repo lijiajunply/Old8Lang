@@ -17,11 +17,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/测试 Old8Lang 解析器是否完全支持 EBNF 语法.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExprStatement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestParser.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -116,7 +116,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "ReSpellerSettingsId",
+    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -419,7 +419,7 @@
       <workItem from="1739004196265" duration="7463000" />
       <workItem from="1739066646620" duration="9252000" />
       <workItem from="1739186827152" duration="12590000" />
-      <workItem from="1765095462905" duration="2545000" />
+      <workItem from="1765095462905" duration="3326000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -764,7 +764,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="103" />
+    <option name="localTasksCounter" value="104" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -791,7 +791,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="Merge remote-tracking branch 'origin/master'&#10;&#10;# Conflicts:&#10;#&#9;.idea/.idea.Old8Lang/.idea/workspace.xml&#10;#&#9;Old8Lang/AST/Expression/Value/DictionaryValue.cs" />
     <MESSAGE value="更改Bug : Instance在Operation会进行更新问题" />
     <MESSAGE value="0.8.0完成" />
     <MESSAGE value="加入Range和SetList" />
@@ -816,7 +815,8 @@
     <MESSAGE value="删除Lang.Demo" />
     <MESSAGE value="chore(deps): 升级项目目标框架到 .NET 10&#10;&#10;- 将 LibTest 项目的目标框架从 net9.0 更新为 net10.0&#10;- 将 Old8Lang.App 项目的目标框架从 net9.0 更新为 net10.0&#10;- 将 Old8Lang 项目的目标框架从 net9.0 更新为 net10.0&#10;- 将 Old8LangLib 项目的目标框架从 net9.0 更新为 net10.0&#10;- 移除了 Lang.Demo 解决方案文件和相关配置&#10;- 更新 Rider IDE 的调试配置选项，增加环境变量路径和混合模式调试设置&#10;- 添加了对未处理异常忽略列表的配置支持" />
     <MESSAGE value="refactor(parser): 重构解析器相关代码以提升可读性&#10;&#10;- 统一变量命名风格，使用小驼峰命名法&#10;- 移除未使用的命名空间引用&#10;- 重命名方法参数以避免与局部变量冲突&#10;- 优化错误处理逻辑中的变量作用域&#10;- 更新依赖包版本至最新稳定版&#10;- 调整条件判断逻辑提高代码健壮性" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(parser): 重构解析器相关代码以提升可读性&#10;&#10;- 统一变量命名风格，使用小驼峰命名法&#10;- 移除未使用的命名空间引用&#10;- 重命名方法参数以避免与局部变量冲突&#10;- 优化错误处理逻辑中的变量作用域&#10;- 更新依赖包版本至最新稳定版&#10;- 调整条件判断逻辑提高代码健壮性" />
+    <MESSAGE value="refactor(parser): 优化解析器实现并增强文件读取逻辑&#10;&#10;- 改进FromFile方法以更好地处理macOS上的绝对路径和相对路径查找&#10;- 重构字典和列表解析逻辑，支持{}和[]语法&#10;- 完善字符串树解析以支持连续的插值块&#10;- 修复切片表达式中的冒号识别问题&#10;- 增强词法分析器的注释过滤和转义字符处理&#10;- 更新程序入口点的测试代码引用和示例文件路径&#10;- 调整IDE工作区配置和断点设置以匹配代码变更" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(parser): 优化解析器实现并增强文件读取逻辑&#10;&#10;- 改进FromFile方法以更好地处理macOS上的绝对路径和相对路径查找&#10;- 重构字典和列表解析逻辑，支持{}和[]语法&#10;- 完善字符串树解析以支持连续的插值块&#10;- 修复切片表达式中的冒号识别问题&#10;- 增强词法分析器的注释过滤和转义字符处理&#10;- 更新程序入口点的测试代码引用和示例文件路径&#10;- 调整IDE工作区配置和断点设置以匹配代码变更" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1044,90 +1044,90 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>613</line>
+          <line>691</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParsePrimary'" />
           <option name="timeStamp" value="475" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>808</line>
+          <line>925</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseInstantiate'">
             <startOffsets>
-              <option value="27202" />
+              <option value="31478" />
             </startOffsets>
             <endOffsets>
-              <option value="27235" />
+              <option value="31511" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="476" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>811</line>
+          <line>928</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseInstantiate'">
             <startOffsets>
-              <option value="27324" />
+              <option value="31600" />
             </startOffsets>
             <endOffsets>
-              <option value="27350" />
+              <option value="31626" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="477" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>903</line>
+          <line>1020</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseArgList'">
             <startOffsets>
-              <option value="30079" />
+              <option value="34355" />
             </startOffsets>
             <endOffsets>
-              <option value="30115" />
+              <option value="34391" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="478" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>904</line>
+          <line>1021</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseArgList'" />
           <option name="timeStamp" value="479" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>905</line>
+          <line>1022</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseArgList'">
             <startOffsets>
-              <option value="30201" />
+              <option value="34477" />
             </startOffsets>
             <endOffsets>
-              <option value="30234" />
+              <option value="34510" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="480" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>912</line>
+          <line>1029</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseArgList'">
             <startOffsets>
-              <option value="30408" />
+              <option value="34684" />
             </startOffsets>
             <endOffsets>
-              <option value="30425" />
+              <option value="34701" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="481" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>178</line>
+          <line>238</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseForStatement'">
             <startOffsets>
-              <option value="6818" />
+              <option value="9187" />
             </startOffsets>
             <endOffsets>
-              <option value="6851" />
+              <option value="9220" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="484" />
