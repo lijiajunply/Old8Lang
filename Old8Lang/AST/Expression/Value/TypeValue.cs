@@ -1,4 +1,6 @@
 using Old8Lang.Error;
+using System.Reflection.Emit;
+using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -20,4 +22,16 @@ public class TypeValue : ValueType
 
     public override string ToString() => Value ?? "";
     public override object GetValue() => Value ?? "";
+
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
+    {
+        // 加载类型字符串值
+        ilGenerator.Emit(OpCodes.Ldstr, Value ?? "");
+    }
+
+    public override Type OutputType(LocalManager local)
+    {
+        // TypeValue 表示类型信息，输出为字符串类型
+        return typeof(string);
+    }
 }

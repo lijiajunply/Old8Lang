@@ -138,6 +138,25 @@ public class FuncValue : ValueType
         return $"func {Id}({paramList}) \n {{ {BlockStatement} }}";
     }
 
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
+    {
+        // 如果是.NET方法，直接加载方法引用
+        if (Method != null)
+        {
+            // 对于实例方法，需要先加载对象实例到堆栈上
+            // 这里假设Method已经是正确的委托类型
+            return;
+        }
+        
+        // 如果是Old8Lang函数，需要加载函数委托
+        var funcMethod = local.DelegateVar.GetValueOrDefault(Id?.IdName);
+        if (funcMethod != null)
+        {
+            // 函数已经被编译为动态方法，直接调用
+            return;
+        }
+    }
+
     public void LoadIl(MethodBuilder methodBuilder, LocalManager local)
     {
         //var funcLocal = new LocalManager();

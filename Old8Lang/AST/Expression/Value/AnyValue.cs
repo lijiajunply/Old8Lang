@@ -97,6 +97,36 @@ public class AnyValue : ValueType
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
+        // 创建一个字典来存储AnyValue的属性
+        var dictType = typeof(Dictionary<string, object>);
+        var constructor = dictType.GetConstructor(Type.EmptyTypes)!;
+        
+        // 实例化字典
+        ilGenerator.Emit(OpCodes.Newobj, constructor);
+        
+        // 遍历所有属性，将它们添加到字典中
+        foreach (var variate in Variates)
+        {
+            // 复制字典引用到堆栈上
+            ilGenerator.Emit(OpCodes.Dup);
+            
+            // 加载属性名
+            ilGenerator.Emit(OpCodes.Ldstr, variate.Key.IdName);
+            
+            // 加载属性值
+            variate.Value.LoadIlValue(ilGenerator, local);
+            
+            // 确保值是对象类型，如果是值类型则装箱
+            var valueType = variate.Value.OutputType(local);
+            if (valueType != null && valueType.IsValueType)
+            {
+                ilGenerator.Emit(OpCodes.Box, valueType);
+            }
+            
+            // 调用字典的Add方法
+            var addMethod = dictType.GetMethod("Add", [typeof(string), typeof(object)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, addMethod);
+        }
     }
 
     public override Type? OutputType(LocalManager local)

@@ -166,6 +166,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
     public override Type? OutputType(LocalManager local)
     {
         if (Type != null) return Type;
+        // 直接返回类型信息，不创建临时方法
         var leftType = left?.OutputType(local);
         var rightType = right?.OutputType(local);
         return leftType == typeof(object) ? rightType : leftType;

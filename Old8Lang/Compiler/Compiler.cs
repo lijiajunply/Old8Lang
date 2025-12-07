@@ -27,6 +27,4 @@ public static class Compiler
         var oldLangRun = (Action)dynamicMethod.CreateDelegate(typeof(Action));
         return oldLangRun;
     }
-
-
 }

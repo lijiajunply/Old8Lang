@@ -20,4 +20,21 @@ func max(a, b) {
 
 # 调用函数
 max_result <- max(30, 20)
-print(max_result) 
+print(max_result)  # 应该输出 30
+
+# AnyValue类型测试
+person <- {
+    "name": "张三",
+    "age": 30,
+    "city": "北京"
+}
+
+print(person)  # 应该输出 {"name": "张三", "age": 30, "city": "北京"}
+
+# 访问AnyValue属性
+person_name <- person.name
+print(person_name)  # 应该输出 "张三"
+
+# TypeValue类型测试
+type <- Type(person)
+print(type)  # 应该输出 "Any"
