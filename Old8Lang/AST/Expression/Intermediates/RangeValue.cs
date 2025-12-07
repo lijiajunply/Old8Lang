@@ -36,4 +36,6 @@ public class RangeValue(OldExpr? start, OldExpr? end, SourcePosition position = 
     }
 
     public override Type OutputType(LocalManager local) => typeof(IEnumerable<int>);
+
+    public override string ToString() => $"{start}..{end}"; // Old8Lang 风格的范围表达式
 }

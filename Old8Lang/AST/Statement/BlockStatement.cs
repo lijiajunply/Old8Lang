@@ -106,21 +106,12 @@ public class BlockStatement : OldStatement
     public string ToCode()
     {
         var sb = new StringBuilder();
-        var import = ImportStatements.OfType<ImportStatement>().ToList();
-        var func = ImportStatements.Where(x => x is ClassInit or FuncInit).ToList();
-        sb.AppendLine("using System;");
-        foreach (var importStatement in import)
-            sb.AppendLine(importStatement.ToString());
-        sb.AppendLine("static class Program");
-        sb.AppendLine("{");
-        foreach (var statement in func)
+        // 输出所有导入和初始化语句
+        foreach (var statement in ImportStatements)
             sb.AppendLine(statement.ToString());
-        sb.AppendLine("public static void Main(string[] args)");
-        sb.AppendLine("{");
+        // 输出其他语句
         foreach (var statement in OtherStatements)
             sb.AppendLine(statement.ToString());
-        sb.AppendLine("}");
-        sb.AppendLine("}");
         return sb.ToString();
     }
 

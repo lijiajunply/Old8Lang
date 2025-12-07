@@ -89,5 +89,5 @@ public class OtherVariateChanging(OldId id, OldExpr sumId, OldExpr expr, SourceP
 
     public override int Count => 0;
 
-    public override string ToString() => $"{id}.{sumId} = {expr}";
+    public override string ToString() => $"{id}.{sumId} <- {expr}";
 }

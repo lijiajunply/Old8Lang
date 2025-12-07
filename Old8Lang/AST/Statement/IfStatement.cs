@@ -1,5 +1,6 @@
 using Old8Lang.LangParser;
 using System.Reflection.Emit;
+using System.Text;
 using Old8Lang.Compiler;
 
 
@@ -8,7 +9,11 @@ namespace Old8Lang.AST.Statement;
 /// <summary>
 /// if语句
 /// </summary>
-public class IfStatement(OldIf ifBlock, List<OldIf?> elifBlock, BlockStatement? elseBlockStatement, SourcePosition position = default)
+public class IfStatement(
+    OldIf ifBlock,
+    List<OldIf?> elifBlock,
+    BlockStatement? elseBlockStatement,
+    SourcePosition position = default)
     : OldStatement(position)
 {
     public override void Run(VariateManager manager)
@@ -83,6 +88,20 @@ public class IfStatement(OldIf ifBlock, List<OldIf?> elifBlock, BlockStatement? 
 
     public override int Count => 1 + elifBlock.Count + (elseBlockStatement == null ? 0 : 1);
 
-    public override string ToString() =>
-        $"if {ifBlock} else if{Apis.ListToString(elifBlock)} \nelse {{ {elseBlockStatement} }}";
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine($"if {ifBlock}");
+        foreach (var elif in elifBlock.OfType<OldIf>())
+        {
+            sb.AppendLine($"elif {elif}");
+        }
+
+        if (elseBlockStatement != null)
+        {
+            sb.AppendLine($"else {elseBlockStatement}");
+        }
+
+        return sb.ToString();
+    }
 }

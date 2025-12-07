@@ -58,12 +58,23 @@ public class DictionaryValue : ValueType, IOldList
 
     public override string ToString()
     {
-        if (Value.Count == 0) return "{" + Apis.ListToString(Tuples) + "}";
+        if (Value.Count == 0)
+        {
+            return "{" + string.Join(", ", Tuples) + "}";
+        }
+        
         var sb = new StringBuilder();
-        foreach (var valueTuple in Value)
-            sb.Append($"{valueTuple.Key},{valueTuple.Value};");
+        for (var i = 0; i < Value.Count; i++)
+        {
+            var valueTuple = Value[i];
+            sb.Append($"{valueTuple.Key}: {valueTuple.Value}");
+            if (i < Value.Count - 1)
+            {
+                sb.Append(", ");
+            }
+        }
 
-        return "{" + sb + "}";
+        return "{" + sb + "}"; // Old8Lang 风格的字典，使用 { } 包裹，键值对用 : 分隔
     }
 
     public override ValueType Converse(ValueType otherValueType, VariateManager manager)

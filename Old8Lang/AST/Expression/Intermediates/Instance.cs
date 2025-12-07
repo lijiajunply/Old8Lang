@@ -153,9 +153,9 @@ public class Instance(OldId oldId, List<OldExpr> ids, SourcePosition position = 
     {
         return Id.IdName switch
         {
-            "PrintLine" => $"Console.WriteLine({Apis.ListToString(Ids)});",
-            "Print" => $"Console.Write({Apis.ListToString(Ids)});",
-            _ => Id + "(" + Apis.ListToString(Ids) + ")"
+            "PrintLine" => $"print({string.Join(", ", Ids)})",
+            "Print" => $"print({string.Join(", ", Ids)})",
+            _ => $"{Id}({string.Join(", ", Ids)})"
         };
     }
 

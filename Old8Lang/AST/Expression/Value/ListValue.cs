@@ -36,7 +36,7 @@ public class ListValue : ValueType, IOldList
     }
 
     public override string ToString() =>
-        "{" + Apis.ListToString(Values) + "}";
+        "[" + string.Join(", ", Values) + "]"; // Old8Lang 风格的列表，使用 [ ] 包裹
 
     public override ValueType Dot(OldExpr dotExpr)
     {

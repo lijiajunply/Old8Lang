@@ -52,7 +52,7 @@ public class ArrayValue : ValueType, IOldList
     }
 
     public override string ToString() =>
-        RunResult[0] == null! ? Apis.ListToString(Values) : Apis.ArrayToString(RunResult);
+        RunResult[0] == null! ? $"[{string.Join(", ", Values)}]" : $"[{string.Join(", ", RunResult)}]"; // Old8Lang 风格的数组，使用 [ ] 包裹
 
     public override object GetValue() => Apis.ListToObjects(RunResult.ToList());
     public IEnumerable<ValueType> GetItems() => RunResult;

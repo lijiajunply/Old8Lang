@@ -24,5 +24,5 @@ public class ReturnStatement(OldExpr returnExpr, SourcePosition position = defau
 
     public Type OutputType(LocalManager local) => returnExpr.OutputType(local)!;
 
-    public override string ToString() => $"return {returnExpr};";
+    public override string ToString() => $"return {returnExpr}";
 }

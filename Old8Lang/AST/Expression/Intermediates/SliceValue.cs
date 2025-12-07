@@ -18,4 +18,15 @@ public class SliceValue(OldId id, OldExpr? start = null, OldExpr? end = null) : 
 
         return list.Slice(startValue, endValue);
     }
+
+    public override string ToString()
+    {
+        if (start != null && end != null)
+            return $"{id}[{start}:{end}]";
+        if (start != null)
+            return $"{id}[{start}:]";
+        if (end != null)
+            return $"{id}[:{end}]";
+        return $"{id}[:]"; // Old8Lang 风格的切片表达式
+    }
 }

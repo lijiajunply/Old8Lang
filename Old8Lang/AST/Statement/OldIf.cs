@@ -15,7 +15,7 @@ public class OldIf(OldExpr expr, BlockStatement blockStatement, SourcePosition p
         r = false;
     }
 
-    public override string ToString() => $"({expr})\n {{ {blockStatement} }}";
+    public override string ToString() => $"{expr}\n {{ {blockStatement} }}";
 
     public override void Run(LangParser.VariateManager manager)
     {

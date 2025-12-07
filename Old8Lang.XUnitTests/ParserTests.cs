@@ -15,18 +15,6 @@ public class ParserTests
         return Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()!)!.Parent!.FullName)!.FullName)!.FullName;
     }
     
-    private List<string> GetTestFiles()
-    {
-        return new List<string>
-        {
-            "test_clean.old8",
-            "test_simple.old8",
-            "test_syntax.old8",
-            "test_datatypes.old8",
-            "test_list_array.old8"
-        };
-    }
-    
     [Fact]
     public void TestParser_Clean()
     {
@@ -44,7 +32,7 @@ public class ParserTests
     public void TestParser_Simple()
     {
         // 测试简单的测试文件
-        var fullPath = Path.Combine(GetProjectRoot(), "test_simple.old8");
+        var fullPath = Path.Combine(GetProjectRoot(), "Test/test_simple.old8");
         Assert.True(File.Exists(fullPath), $"文件不存在: {fullPath}");
         
         var code = File.ReadAllText(fullPath);
@@ -60,7 +48,7 @@ public class ParserTests
     public void TestParser_Syntax()
     {
         // 测试全面的语法测试文件
-        var fullPath = Path.Combine(GetProjectRoot(), "test_syntax.old8");
+        var fullPath = Path.Combine(GetProjectRoot(), "Test/test_syntax.old8");
         Assert.True(File.Exists(fullPath), $"文件不存在: {fullPath}");
         
         var code = File.ReadAllText(fullPath);
@@ -76,7 +64,7 @@ public class ParserTests
     public void TestParser_Datatypes()
     {
         // 测试数据类型测试文件
-        var fullPath = Path.Combine(GetProjectRoot(), "test_datatypes.old8");
+        var fullPath = Path.Combine(GetProjectRoot(), "Test/test_datatypes.old8");
         Assert.True(File.Exists(fullPath), $"文件不存在: {fullPath}");
         
         var code = File.ReadAllText(fullPath);
@@ -92,7 +80,7 @@ public class ParserTests
     public void TestParser_ListArray()
     {
         // 测试列表和数组测试文件
-        var fullPath = Path.Combine(GetProjectRoot(), "test_list_array.old8");
+        var fullPath = Path.Combine(GetProjectRoot(), "Test/test_list_array.old8");
         Assert.True(File.Exists(fullPath), $"文件不存在: {fullPath}");
         
         var code = File.ReadAllText(fullPath);
@@ -105,11 +93,11 @@ public class ParserTests
     }
     
     [Theory]
-    [InlineData("test_clean.old8")]
-    [InlineData("test_simple.old8")]
-    [InlineData("test_syntax.old8")]
-    [InlineData("test_datatypes.old8")]
-    [InlineData("test_list_array.old8")]
+    [InlineData("Test/test_clean.old8")]
+    [InlineData("Test/test_simple.old8")]
+    [InlineData("Test/test_syntax.old8")]
+    [InlineData("Test/test_datatypes.old8")]
+    [InlineData("Test/test_list_array.old8")]
     public void TestParser_AllFiles(string testFile)
     {
         // 测试所有测试文件
@@ -207,7 +195,7 @@ public class ParserTests
     public void TestApisFromFile()
     {
         // 测试 Apis.FromFile 方法
-        var filename = "test_clean.old8";
+        var filename = "Test/test_clean.old8";
         var fullPath = Path.Combine(GetProjectRoot(), filename);
         
         // 确保文件存在
@@ -227,7 +215,7 @@ public class ParserTests
     public void TestFileReading()
     {
         // 测试文件读取功能
-        var filename = "test_clean.old8";
+        var filename = "Test/test_clean.old8";
         var fullPath = Path.Combine(GetProjectRoot(), filename);
         
         // 确保文件存在

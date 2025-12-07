@@ -131,5 +131,5 @@ public class ImportStatement(string importString, SourcePosition position = defa
 
     public override int Count => 0;
 
-    public override string ToString() => $"using {importString}";
+    public override string ToString() => $"import {importString}";
 }

@@ -65,5 +65,5 @@ public class WhileStatement(OldExpr expr, BlockStatement blockStatement, SourceP
 
     public override int Count => blockStatement.Count;
 
-    public override string ToString() => $"while({expr}){blockStatement}";
+    public override string ToString() => $"while {expr}\n{blockStatement}";
 }

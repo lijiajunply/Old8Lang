@@ -1,6 +1,8 @@
 using Old8Lang.LangParser;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
+using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
@@ -94,5 +96,12 @@ public class FuncInit(FuncValue a, SourcePosition position = default) : OldState
     public override int Count => 0;
 
 
-    public override string ToString() => FuncValue.ToString();
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+        var paramList = FuncValue.Ids != null ? string.Join(", ", FuncValue.Ids) : string.Empty;
+        sb.AppendLine($"func {FuncValue.Id}({paramList})");
+        sb.AppendLine($"{{ {FuncValue.BlockStatement} }}");
+        return sb.ToString();
+    }
 }

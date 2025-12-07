@@ -1,6 +1,8 @@
 using Old8Lang.LangParser;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
+using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
@@ -95,5 +97,27 @@ public class ClassInit(AnyValue anyValue, SourcePosition position = default) : O
 
     public override int Count => 0;
 
-    public override string ToString() => anyValue.ToString();
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine($"class {anyValue.Id.IdName} {{");
+        foreach (var variate in anyValue.Variates)
+        {
+            if (variate.Value is FuncValue funcValue)
+            {
+                // 方法定义
+                var paramList = funcValue.Ids != null ? string.Join(", ", funcValue.Ids) : string.Empty;
+                sb.AppendLine($"    func {funcValue.Id}({paramList}) {{");
+                sb.AppendLine($"        {funcValue.BlockStatement}");
+                sb.AppendLine("    }");
+            }
+            else
+            {
+                // 字段定义
+                sb.AppendLine($"    {variate.Key} <- {variate.Value}");
+            }
+        }
+        sb.AppendLine("}");
+        return sb.ToString();
+    }
 }

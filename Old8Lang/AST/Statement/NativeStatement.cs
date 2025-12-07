@@ -112,5 +112,17 @@ public class NativeStatement : OldStatement
 
     public override int Count => 0;
 
-    public override string ToString() => $"[import {DllName} {ClassName} {MethodName} {NativeName}]\n{FuncValue}";
+    public override string ToString()
+    {
+        if (!string.IsNullOrEmpty(Name))
+        {
+            return $"import native {DllName}.{ClassName} as {Name}";
+        }
+        if (!string.IsNullOrEmpty(MethodName))
+        {
+            var funcName = string.IsNullOrEmpty(NativeName) ? MethodName : NativeName;
+            return $"import native {DllName}.{ClassName}.{MethodName} as {funcName}\n{FuncValue}";
+        }
+        return $"import native {DllName}.{ClassName}";
+    }
 }

@@ -71,8 +71,9 @@ public class ForStatement(
 
     public override string ToString()
     {
-        var sb = new StringBuilder($"for({setStatement} ; {expr} ; {statement})");
-        sb.Append("\n{" + blockStatement + "\n}");
+        var sb = new StringBuilder($"for {setStatement}, {expr}, {statement}");
+        sb.AppendLine();
+        sb.Append($"{{{blockStatement}\n}}");
         return sb.ToString();
     }
 }

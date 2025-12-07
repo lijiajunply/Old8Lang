@@ -25,5 +25,5 @@ public class SetStatement(OldId id, OldExpr value, SourcePosition position = def
 
     public override int Count => 0;
 
-    public override string ToString() => $"var {Id} = {Value};";
+    public override string ToString() => $"{Id} <- {Value}";
 }

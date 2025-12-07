@@ -134,10 +134,8 @@ public class FuncValue : ValueType
             return $"{Method}";
         }
 
-        var builder = new StringBuilder();
-        for (var i = 0; i < Ids!.Count; i++)
-            builder.Append("dynamic " + Ids[i] + (i == Ids.Count - 1 ? "" : ","));
-        return $"public static dynamic {Id} ({builder}) \n {{ {BlockStatement} }}";
+        var paramList = Ids != null ? string.Join(", ", Ids) : string.Empty;
+        return $"func {Id}({paramList}) \n {{ {BlockStatement} }}";
     }
 
     public void LoadIl(MethodBuilder methodBuilder, LocalManager local)
