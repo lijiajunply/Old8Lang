@@ -89,6 +89,8 @@ public class LangParser(List<LangToken> tokens)
             LangTokenType.Func when Peek().Type == LangTokenType.Identifier &&
                                     Peek(2).Type == LangTokenType.LeftParen => ParseFuncDeclaration(),
             LangTokenType.Return => ParseReturnStatement(),
+            // 只有当标识符后面跟着 Assignment 标记时，才是声明语句
+            LangTokenType.Identifier when Peek().Type == LangTokenType.Assignment => ParseSet(),
             // Lambda
             LangTokenType.Identifier when Peek().Type == LangTokenType.Arrow => ParseFuncDeclaration(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.Colon && Peek(2).Type == LangTokenType.Identifier
@@ -99,8 +101,6 @@ public class LangParser(List<LangToken> tokens)
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseIdentifierLeftParen(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.PlusPlus => ParsePlusPlus(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.MinusMinus => ParseMinusMinus(),
-            // 只有当标识符后面跟着 Assignment 标记时，才是声明语句
-            LangTokenType.Identifier when Peek().Type == LangTokenType.Assignment => ParseSet(),
             LangTokenType.Class => ParseClassDeclaration(),
             LangTokenType.Import => ParseImportStatement(),
             // 先处理更具体的 nativeStatic 和 nativeClass，再处理更通用的 nativeStatement

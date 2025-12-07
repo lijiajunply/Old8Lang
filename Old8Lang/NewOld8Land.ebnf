@@ -1,0 +1,142 @@
+root = statement* ;
+
+statement = lrBlock
+          | set
+          | ifStatement
+          | forStatement
+          | whileStatement
+          | forInStatement
+          | switchStatement
+          | funcDeclaration
+          | classDeclaration
+          | funcRunStatement
+          | classFuncRunStatement
+          | importStatement
+          | nativeStatement
+          | nativeStatic
+          | nativeClass
+          | plusPlus
+          | minusMinus
+          | returnStatement ;
+
+lrBlock = "(" statement ")" ;
+
+set = identifier "<-" expression ;
+
+ifStatement = "if" expression block ( "elif" expression block )* ( "else" block )? ;
+
+forStatement = "for" set "," expression "," statement block ;
+
+whileStatement = "while" expression block ;
+
+forInStatement = "for" identifier "in" expression block ;
+
+switchStatement = "switch" expression "{" caseBlock* ( "default" block )? "}" ;
+
+caseBlock = "case" expression block ;
+
+funcDeclaration = ( identifier | "func" identifier ) "(" idList? ")" "->" block ;
+
+classDeclaration = "class" identifier classBlock ;
+
+classBlock = "{" [set | funcDeclaration]* "}" ;
+
+funcRunStatement = identifier "(" argList? ")" ;
+
+classFuncRunStatement = identifier "." identifier "(" argList? ")" ;
+
+importStatement = "import" identifier ;
+
+nativeStatement = "[" "import" STRING identifier identifier identifier? "]" ;
+
+nativeStatic = "[" "import" STRING identifier "]" "->" STRING ;
+
+nativeClass = "[" "import" STRING identifier "]" ;
+
+plusPlus = identifier "++" ;
+
+minusMinus = identifier "--" ;
+
+returnStatement = "return" expression ;
+
+block = "{" statement* "}"
+      | statement ;
+
+expression = binaryExpression
+           | dotExpr
+           | numberOpera1
+           | numberOpera2
+           | boolOpera
+           | primary ;
+
+binaryExpression = expression ( ( "<" | ">" | "==" | "!=" | "<=" | ">=" ) expression )* ;
+
+dotExpr = expression ( "." expression )* ;
+
+numberOpera1 = expression ( ( "+" | "-" ) expression )* ;
+
+numberOpera2 = expression ( ( "*" | "/" ) expression )* ;
+
+boolOpera = expression ( ( "and" | "or" | "xor" ) expression )* ;
+
+primary = stringLiteral
+        | doubleLiteral
+        | identifier
+        | trueLiteral
+        | falseLiteral
+        | listInit
+        | instantiate
+        | stringTree
+        | lambda
+        | list
+        | range
+        | array
+        | tuple
+        | dictionary
+        | slice
+        | asStatement
+        | notPrefix
+        | minusPrefix ;
+
+notPrefix = "not" primary ;
+
+minusPrefix = "-" primary ;
+
+stringLiteral = STRING ;
+
+doubleLiteral = DOUBLE ;
+
+identifier = IDENTIFIER ;
+
+trueLiteral = "true" ;
+
+falseLiteral = "false" ;
+
+listInit = identifier "[" expression "]" ;
+
+instantiate = identifier "(" argList ")" ;
+
+stringTree = "$" "{" expression ("," expression )* "}" ("{" expression ("," expression )* "}")* ;
+
+lambda = "(" idList? ")" "->" expression
+       | "(" idList? ")" "->" block ;
+
+list = "list" "[" expression ("," expression )* "]" ;
+
+range = "[" expression "~" expression "]" ;
+
+array = "[" expression ("," expression )* "]" ;
+
+tuple = "(" expression "," expression ")" ;
+
+dictionary = "{" dicTuple ("," dicTuple )* "}" ;
+
+dicTuple = expression ":" expression ;
+
+slice = identifier "[" expression ":" expression "]" ;
+
+asStatement = identifier "as" identifier ;
+
+argList =  (expression "," expression )* ;
+
+idList = identifier ("," identifier )* ;

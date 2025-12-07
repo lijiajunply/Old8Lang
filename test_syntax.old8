@@ -1,0 +1,181 @@
+// 基本赋值和表达式
+a <- 10
+b <- a + 5
+c <- b * 2
+d <- c / 3
+e <- a == b
+f <- not e
+g <- -10
+
+doubleVar <- 3.14
+stringVar <- "hello world"
+boolVar <- true
+
+// 条件语句
+if a > 5 {
+    PrintLine("a is greater than 5")
+} elif a == 5 {
+    PrintLine("a is equal to 5")
+} else {
+    PrintLine("a is less than 5")
+}
+
+// 循环语句
+for i <- 1, i <= 5, i++ {
+    PrintLine(i)
+}
+
+j <- 1
+while j <= 3 {
+    PrintLine(j)
+    j <- j + 1
+}
+
+for item in [1~3] {
+    PrintLine(item)
+}
+
+// 开关语句
+switch a {
+    case 10
+        PrintLine("a is 10")
+    case 20
+        PrintLine("a is 20")
+    default
+        PrintLine("default case")
+}
+
+// 函数定义和调用
+func add(x, y) -> {
+    return x + y
+}
+
+result <- add(3, 4)
+PrintLine(result)
+
+// 函数调用
+func main() -> {
+    PrintLine("main function")
+}
+
+main()
+
+// 类定义和方法调用
+class Person {
+    name <- ""
+    age <- 0
+    
+    func setName(newName) -> {
+        name <- newName
+    }
+    
+    func getName() -> {
+        return name
+    }
+}
+
+p <- Person()
+p.setName("test")
+printName <- p.getName()
+PrintLine(printName)
+
+// 各种数据类型
+// 列表
+listVar <- list[1, 2, 3, 4, 5]
+
+// 数组
+arrayVar <- [1, 2, 3, 4, 5]
+
+// 范围
+rangeVar <- [1~5]
+
+// 字典
+dictVar <- {"name": "test", "age": 20}
+
+// 元组
+tupleVar <- (1, 2)
+
+// 字符串模板
+name <- "world"
+greeting <- ${"hello ", name}
+PrintLine(greeting)
+
+// Lambda表达式
+addLambda <- (x, y) -> x + y
+lambdaResult <- addLambda(5, 6)
+PrintLine(lambdaResult)
+
+// 复杂Lambda（带块）
+complexLambda <- (x, y) -> {
+    temp <- x * y
+    return temp + x
+}
+complexResult <- complexLambda(3, 4)
+PrintLine(complexResult)
+
+// 各种操作符
+// 算术操作符
+arithResult <- 10 + 5 * 2 - 3 / 1
+PrintLine(arithResult)
+
+// 比较操作符
+compResult1 <- 10 > 5
+compResult2 <- 10 < 5
+compResult3 <- 10 == 10
+compResult4 <- 10 != 5
+compResult5 <- 10 <= 10
+compResult6 <- 10 >= 5
+
+// 逻辑操作符
+logicResult1 <- true and false
+logicResult2 <- true or false
+logicResult3 <- true xor false
+
+// 前缀操作符
+notResult <- not true
+minusResult <- -123.45
+
+// 自增自减
+i <- 0
+i++
+PrintLine(i)
+i--
+PrintLine(i)
+
+// 列表访问
+listItem <- listVar[0]
+PrintLine(listItem)
+
+// 切片
+sliceVar <- arrayVar[1:3]
+
+// as语句
+asVar <- a as int
+
+// 嵌套结构
+nestedArray <- [[1, 2], [3, 4]]
+nestedDict <- {"data": {"key": "value"}}
+
+// 复合表达式
+complexExpr <- (a + b) * (c - d) / 2
+
+// LR块
+(a <- 20)
+PrintLine(a)
+
+// 类方法调用
+class Math {
+    func add(x, y) -> {
+        return x + y
+    }
+}
+
+math <- Math()
+mathResult <- math.add(10, 20)
+PrintLine(mathResult)
+
+// 导入语句
+// import testModule
+
+// 原生语句（简化版，实际需要dll文件）
+// [import "test.dll" TestClass testMethod alias]
