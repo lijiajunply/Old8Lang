@@ -2,10 +2,11 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
+using Old8Lang;
 
 namespace Old8Lang.AST.Expression;
 
-public class Operation(OldExpr? left, OperationType opera, OldExpr? right) : OldExpr
+public class Operation(OldExpr? left, OperationType opera, OldExpr? right, SourcePosition position = default) : OldExpr(position)
 {
     private string OperaToString()
     {

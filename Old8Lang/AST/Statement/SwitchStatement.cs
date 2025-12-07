@@ -1,15 +1,16 @@
 using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
-
+using Old8Lang;
 
 namespace Old8Lang.AST.Statement;
 
 public class SwitchStatement(
     OldExpr switchExpr,
     List<OldCase> switchCaseList,
-    BlockStatement? defaultBlockStatement = null)
-    : OldStatement
+    BlockStatement? defaultBlockStatement = null,
+    SourcePosition position = default)
+    : OldStatement(position)
 {
     public override void Run(VariateManager manager)
     {
@@ -53,7 +54,7 @@ public class SwitchStatement(
     public override int Count => switchCaseList.Count;
 }
 
-public class OldCase(OldExpr expr, BlockStatement blockStatement) : OldStatement
+public class OldCase(OldExpr expr, BlockStatement blockStatement, SourcePosition position = default) : OldStatement(position)
 {
     public OldExpr Expr { get; } = expr;
     public BlockStatement BlockStatement { get; } = blockStatement;

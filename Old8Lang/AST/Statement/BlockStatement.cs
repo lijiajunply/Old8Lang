@@ -4,7 +4,7 @@ using System.Text;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
-
+using Old8Lang;
 
 namespace Old8Lang.AST.Statement;
 
@@ -17,7 +17,7 @@ public class BlockStatement : OldStatement
     private readonly List<OldStatement> OtherStatements = [];
     public override int Count => OtherStatements.Count;
 
-    public BlockStatement(IEnumerable<IOldLangTree> statements)
+    public BlockStatement(IEnumerable<IOldLangTree> statements, SourcePosition position = default) : base(position)
     {
         foreach (var statement in statements.OfType<OldStatement>())
         {
@@ -75,7 +75,7 @@ public class BlockStatement : OldStatement
             var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
             var ilGenerator = dynamicMethod.GetILGenerator();
             var local = new LocalManager();
-            var block = new BlockStatement(ImportStatements);
+            var block = new BlockStatement(ImportStatements, Position);
             block.GenerateIl(ilGenerator, local);
             ilGenerator.Emit(OpCodes.Ret);
             foreach (var info in local.DelegateVar)

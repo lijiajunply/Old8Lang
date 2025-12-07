@@ -2,10 +2,11 @@ using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.Compiler;
+using Old8Lang;
 
 namespace Old8Lang.AST.Statement;
 
-public class SetStatement(OldId id, OldExpr value) : OldStatement
+public class SetStatement(OldId id, OldExpr value, SourcePosition position = default) : OldStatement(position)
 {
     public readonly OldId Id = id;
     public readonly OldExpr Value = value;

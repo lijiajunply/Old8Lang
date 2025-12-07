@@ -3,11 +3,11 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
-
+using Old8Lang;
 
 namespace Old8Lang.AST.Statement;
 
-public class FuncInit(FuncValue a) : OldStatement
+public class FuncInit(FuncValue a, SourcePosition position = default) : OldStatement(position)
 {
     public readonly FuncValue FuncValue = a;
 

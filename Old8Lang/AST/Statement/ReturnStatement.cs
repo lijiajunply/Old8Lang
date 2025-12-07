@@ -1,11 +1,11 @@
 using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
-
+using Old8Lang;
 
 namespace Old8Lang.AST.Statement;
 
-public class ReturnStatement(OldExpr returnExpr) : OldStatement
+public class ReturnStatement(OldExpr returnExpr, SourcePosition position = default) : OldStatement(position)
 {
     public override void Run(VariateManager manager)
     {

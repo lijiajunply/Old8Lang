@@ -1,10 +1,11 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
+using Old8Lang;
 
 namespace Old8Lang.AST.Expression;
 
-public class OldId(string name,string assumptionType = "") : OldExpr
+public class OldId(string name,string assumptionType = "", SourcePosition position = default) : OldExpr(position)
 {
     public readonly string IdName = name;
     public override string ToString() => IdName;

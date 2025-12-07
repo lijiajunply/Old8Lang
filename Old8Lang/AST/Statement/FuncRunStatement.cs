@@ -3,7 +3,7 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
-
+using Old8Lang;
 
 namespace Old8Lang.AST.Statement;
 
@@ -12,8 +12,8 @@ public class FuncRunStatement : OldStatement
     private readonly Instance? Instance;
     private readonly Operation? Operation;
 
-    public FuncRunStatement(Instance instance) => Instance = instance;
-    public FuncRunStatement(Operation operation) => Operation = operation;
+    public FuncRunStatement(Instance instance, SourcePosition position = default) : base(position) => Instance = instance;
+    public FuncRunStatement(Operation operation, SourcePosition position = default) : base(position) => Operation = operation;
 
     public override void Run(VariateManager manager)
     {

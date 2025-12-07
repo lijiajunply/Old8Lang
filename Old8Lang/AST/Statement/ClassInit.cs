@@ -3,11 +3,11 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
-
+using Old8Lang;
 
 namespace Old8Lang.AST.Statement;
 
-public class ClassInit(AnyValue anyValue) : OldStatement
+public class ClassInit(AnyValue anyValue, SourcePosition position = default) : OldStatement(position)
 {
     public override void Run(VariateManager manager) => manager.AddClassAndFunc(anyValue);
 
