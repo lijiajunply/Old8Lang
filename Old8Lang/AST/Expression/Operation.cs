@@ -54,7 +54,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right) : Old
 
         if (l is ListValue && opera == OperationType.CONCAT)
         {
-            if (r is not Instance r1) return l.Dot(r);
+            if (r is not Instance r1) return l.Dot(r ?? new VoidValue());
             List<OldExpr> values = [];
             values.AddRange(r1.Ids.Select(id => id.Run(manager)));
 
@@ -64,7 +64,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right) : Old
 
         if (l is NativeStaticAny && opera == OperationType.CONCAT)
         {
-            if (r is not Instance r1) return l.Dot(r);
+            if (r is not Instance r1) return l.Dot(r ?? new VoidValue());
             List<OldExpr> values = [];
             values.AddRange(r1.Ids.Select(id => id.Run(manager)));
 
@@ -73,10 +73,10 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right) : Old
         }
 
         if (l is not AnyValue && opera == OperationType.CONCAT)
-            return l?.Dot(r)!;
+            return l?.Dot(r ?? new VoidValue())!;
 
         // r get value
-        r = right.Run(manager);
+        r = right?.Run(manager) ?? new VoidValue();
         // (right)
         if (right is OldId oldId && l is not AnyValue)
             r = manager.GetValue(oldId);
@@ -166,14 +166,14 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right) : Old
     {
         if (Type != null) return Type;
         var leftType = left?.OutputType(local);
-        var rightType = right.OutputType(local);
+        var rightType = right?.OutputType(local);
         return leftType == typeof(object) ? rightType : leftType;
     }
 
     private Type OutputType(ILGenerator ilGenerator, LocalManager local)
     {
         var leftType = left?.OutputType(local);
-        var rightType = right.OutputType(local);
+        var rightType = right?.OutputType(local);
 
         // if (leftType == typeof(object))
         // {
@@ -186,12 +186,12 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right) : Old
             switch (opera)
             {
                 case OperationType.NOT:
-                    right.LoadIlValue(ilGenerator, local);
+                    right?.LoadIlValue(ilGenerator, local);
                     ilGenerator.Emit(OpCodes.Ldc_I4_1); // 加载常量 1
                     ilGenerator.Emit(OpCodes.Xor); // 进行异或运算
                     return typeof(bool);
                 case OperationType.MINUS:
-                    right.LoadIlValue(ilGenerator, local);
+                    right?.LoadIlValue(ilGenerator, local);
                     ilGenerator.Emit(OpCodes.Neg);
                     return typeof(bool);
                 default:
@@ -202,8 +202,8 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right) : Old
         switch (opera)
         {
             case OperationType.PLUS:
-                left!.LoadIlValue(ilGenerator, local);
-                right.LoadIlValue(ilGenerator, local);
+                left?.LoadIlValue(ilGenerator, local);
+                right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Add);
                 if (leftType == typeof(string) || rightType == typeof(string))
                     return typeof(string);
@@ -213,15 +213,15 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right) : Old
 
                 return typeof(int);
             case OperationType.MINUS:
-                left!.LoadIlValue(ilGenerator, local);
-                right.LoadIlValue(ilGenerator, local);
+                left?.LoadIlValue(ilGenerator, local);
+                right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Sub);
                 if (leftType == typeof(double) || rightType == typeof(double))
                     return typeof(double);
                 return typeof(int);
             case OperationType.TIMES:
-                left!.LoadIlValue(ilGenerator, local);
-                right.LoadIlValue(ilGenerator, local);
+                left?.LoadIlValue(ilGenerator, local);
+                right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Mul);
                 if (leftType == typeof(double) || rightType == typeof(double))
                     return typeof(double);
@@ -229,59 +229,59 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right) : Old
                     return typeof(double);
                 return typeof(int);
             case OperationType.DIVIDE:
-                left!.LoadIlValue(ilGenerator, local);
-                right.LoadIlValue(ilGenerator, local);
+                left?.LoadIlValue(ilGenerator, local);
+                right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Div);
                 if (leftType == typeof(double) || rightType == typeof(double))
                     return typeof(double);
                 return typeof(int);
             case OperationType.GREATER:
-                left!.LoadIlValue(ilGenerator, local);
-                right.LoadIlValue(ilGenerator, local);
+                left?.LoadIlValue(ilGenerator, local);
+                right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Cgt);
                 return typeof(bool);
             case OperationType.LESSER:
-                left!.LoadIlValue(ilGenerator, local);
-                right.LoadIlValue(ilGenerator, local);
+                left?.LoadIlValue(ilGenerator, local);
+                right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Clt);
                 return typeof(bool);
             case OperationType.EQUALS:
-                left!.LoadIlValue(ilGenerator, local);
-                right.LoadIlValue(ilGenerator, local);
+                left?.LoadIlValue(ilGenerator, local);
+                right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Ceq);
                 return typeof(bool);
             case OperationType.DIFFERENT:
-                left!.LoadIlValue(ilGenerator, local);
-                right.LoadIlValue(ilGenerator, local);
+                left?.LoadIlValue(ilGenerator, local);
+                right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Ceq);
                 ilGenerator.Emit(OpCodes.Ldc_I4_1);
                 ilGenerator.Emit(OpCodes.Xor);
                 return typeof(bool);
             case OperationType.AND:
-                left!.LoadIlValue(ilGenerator, local);
-                right.LoadIlValue(ilGenerator, local);
+                left?.LoadIlValue(ilGenerator, local);
+                right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.And);
                 return typeof(bool);
             case OperationType.OR:
-                left!.LoadIlValue(ilGenerator, local);
-                right.LoadIlValue(ilGenerator, local);
+                left?.LoadIlValue(ilGenerator, local);
+                right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Or);
                 return typeof(bool);
             case OperationType.XOR:
-                left!.LoadIlValue(ilGenerator, local);
-                right.LoadIlValue(ilGenerator, local);
+                left?.LoadIlValue(ilGenerator, local);
+                right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Xor);
                 return typeof(bool);
             case OperationType.LESS_EQUAL:
-                left!.LoadIlValue(ilGenerator, local);
-                right.LoadIlValue(ilGenerator, local);
+                left?.LoadIlValue(ilGenerator, local);
+                right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Cgt);
                 ilGenerator.Emit(OpCodes.Ldc_I4_1);
                 ilGenerator.Emit(OpCodes.Xor);
                 return typeof(bool);
             case OperationType.GREATER_EQUAL:
-                left!.LoadIlValue(ilGenerator, local);
-                right.LoadIlValue(ilGenerator, local);
+                left?.LoadIlValue(ilGenerator, local);
+                right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Clt);
                 ilGenerator.Emit(OpCodes.Ldc_I4_1);
                 ilGenerator.Emit(OpCodes.Xor);
@@ -319,7 +319,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right) : Old
                         types.Add(instanceId.OutputType(local)!);
                     }
 
-                    var m = leftType!.GetMethod(instance.Id.IdName, types.ToArray())!;
+                    var m = leftType!.GetMethod(instance.Id.IdName, [.. types])!;
                     ilGenerator.Emit(OpCodes.Call, m);
                     return m.ReturnType;
                 }
