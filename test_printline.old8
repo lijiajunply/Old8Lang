@@ -1,0 +1,4 @@
+PrintLine("测试字符串")
+a <- 10
+a <- ${"hello ", a}
+PrintLine(a)

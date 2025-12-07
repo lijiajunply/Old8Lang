@@ -13,12 +13,19 @@ public class LangInterpreter : IMiniInterpreter
         Manager.LangInfo ??= Apis.ReadJson();
     }
 
+    // 实现接口方法
     public BlockStatement Build(string code)
+    {
+        return Build(code, null);
+    }
+    
+    // 主要的构建方法，支持传递文件名
+    public BlockStatement Build(string code, string? fileName)
     {
         var parser = LangTokenizer.Tokenize(code);
         if (parser == null) throw new Exception("语法出错");
         //parser.ForEach(x => Console.WriteLine(x));
-        return new LangParser(parser, code).ParseProgram();
+        return new LangParser(parser, code, fileName).ParseProgram();
     }
 
     public static List<LangToken> Tokenize(string code)

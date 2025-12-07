@@ -86,13 +86,6 @@ public static class Apis
 
     #endregion
 
-    public static void CslyUsing(string path, bool isDir)
-    {
-        // CslyParser 已被删除，使用 LangParser 替代
-        var interpreter = new LangParser.LangInterpreter();
-        // 这里可以根据需要添加新的实现
-    }
-
     public static LangInfo ChangeBasicInfo(string import, string ver, string uri = "https://downland.old8lang.com")
     {
         var langInfo = new LangInfo { LibInfos = ReadJson().LibInfos, ImportPath = import, Ver = ver, Url = uri };

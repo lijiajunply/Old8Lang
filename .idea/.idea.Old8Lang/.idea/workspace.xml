@@ -17,8 +17,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Changes">
+      <change afterPath="$PROJECT_DIR$/test_printline.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/SyntaxError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/SyntaxError.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/init.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/init.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/other.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/other.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/ConsoleUse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/ConsoleUse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,10 +59,12 @@
 }</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangInterpreter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -864,10 +874,10 @@
           <line>1119</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseInstantiate'">
             <startOffsets>
-              <option value="40527" />
+              <option value="40464" />
             </startOffsets>
             <endOffsets>
-              <option value="40560" />
+              <option value="40497" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="476" />
@@ -877,10 +887,10 @@
           <line>1122</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseInstantiate'">
             <startOffsets>
-              <option value="40652" />
+              <option value="40589" />
             </startOffsets>
             <endOffsets>
-              <option value="40678" />
+              <option value="40615" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="477" />
@@ -890,52 +900,52 @@
           <line>350</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseForStatement'">
             <startOffsets>
-              <option value="13947" />
+              <option value="13884" />
             </startOffsets>
             <endOffsets>
-              <option value="13980" />
+              <option value="13917" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="484" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs</url>
-          <line>70</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" containingFunctionPresentation="方法 'Run'">
+          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs</url>
+          <line>8</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="2658" />
+              <option value="278" />
             </startOffsets>
             <endOffsets>
-              <option value="2689" />
+              <option value="394" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="492" />
+          <option name="timeStamp" value="502" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs</url>
-          <line>68</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" containingFunctionPresentation="方法 'Run'">
+          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs</url>
+          <line>11</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="2613" />
+              <option value="404" />
             </startOffsets>
             <endOffsets>
-              <option value="2640" />
+              <option value="435" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="499" />
+          <option name="timeStamp" value="503" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs</url>
-          <line>74</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" containingFunctionPresentation="方法 'Run'">
+          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs</url>
+          <line>41</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="2845" />
+              <option value="1224" />
             </startOffsets>
             <endOffsets>
-              <option value="2872" />
+              <option value="1266" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="501" />
+          <option name="timeStamp" value="504" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />

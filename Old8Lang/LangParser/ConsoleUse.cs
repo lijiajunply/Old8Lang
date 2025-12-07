@@ -2,7 +2,7 @@ namespace Old8Lang.LangParser;
 
 public class ConsoleUse : AbsUseClass
 {
-    public override void WriteLine(string text)
+    public override void WriteLine(string? text)
     {
         Console.WriteLine(text);
     }

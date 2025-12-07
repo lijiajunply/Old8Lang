@@ -64,7 +64,7 @@ public class SyntaxError : Old8Exception
     /// <param name="column">列号</param>
     /// <param name="fileName">文件名</param>
     /// <param name="message">错误信息</param>
-    public SyntaxError(string? tokenValue, int line, int column, string fileName, string message) 
+    public SyntaxError(string? tokenValue, int line, int column, string? fileName, string message) 
         : this(new SourcePosition(line, column, fileName: fileName, tokenValue: tokenValue), message)
     {}
     
@@ -77,7 +77,7 @@ public class SyntaxError : Old8Exception
     /// <param name="fileName">文件名</param>
     /// <param name="message">错误信息</param>
     /// <param name="sourceContext">源代码上下文</param>
-    public SyntaxError(string? tokenValue, int line, int column, string fileName, string message, string[] sourceContext) 
+    public SyntaxError(string? tokenValue, int line, int column, string? fileName, string message, string[] sourceContext) 
         : this(new SourcePosition(line, column, fileName: fileName, tokenValue: tokenValue), message, sourceContext)
     {}
 }

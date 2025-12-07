@@ -13,7 +13,6 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     #region 基础操作
 
     private int CurrentIndex;
-    private readonly string? FileName = fileName;
 
     private LangToken CurrentToken => CurrentIndex >= tokens.Count
         ? new LangToken("", LangTokenType.EndOfFile, CurrentIndex)
@@ -59,6 +58,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             CurrentToken.Value,
             CurrentToken.Line,
             CurrentToken.Column,
+            fileName,
             message,
             context);
     }
@@ -71,11 +71,10 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         }
         else
         {
-            var expectedType = type;
             var actualType = CurrentToken.Type;
             var actualValue = CurrentToken.Value;
 
-            string detailedMessage = expectedType switch
+            var detailedMessage = type switch
             {
                 LangTokenType.RightParen => $"语法错误：缺少右括号 ')'。在 '{actualValue}' 处期望右括号。",
                 LangTokenType.RightBracket => $"语法错误：缺少右方括号 ']'。在 '{actualValue}' 处期望右方括号。",
@@ -98,10 +97,10 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 LangTokenType.Class => $"语法错误：缺少 'class' 关键字。在 '{actualValue}' 处期望 'class'。",
                 LangTokenType.Import => $"语法错误：缺少 'import' 关键字。在 '{actualValue}' 处期望 'import'。",
                 LangTokenType.Return => $"语法错误：缺少 'return' 关键字。在 '{actualValue}' 处期望 'return'。",
-                _ => $"语法错误：期望 {expectedType}，但得到了 {actualType} '{actualValue}'。",
+                _ => $"语法错误：期望 {type}，但得到了 {actualType} '{actualValue}'。",
             };
 
-            string suggestion = expectedType switch
+            var suggestion = type switch
             {
                 LangTokenType.RightParen => "建议：检查是否缺少右括号或括号不匹配。",
                 LangTokenType.RightBracket => "建议：检查是否缺少右方括号或方括号不匹配。",
@@ -124,6 +123,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 CurrentToken.Value,
                 CurrentToken.Line,
                 CurrentToken.Column,
+                fileName,
                 detailedMessage + " " + suggestion,
                 GetSourceContext(CurrentToken.Line, CurrentToken.Column));
         }
@@ -156,7 +156,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
 
             return new BlockStatement(statements);
         }
-        catch (SyntaxError ex)
+        catch (SyntaxError)
         {
             // 直接返回原始异常，不再重新包装
             throw;
@@ -268,7 +268,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
 
         try
         {
-            // 尝试解析为函数定义
+            // 尝试解析为函数定义，包括箭头函数定义
             return ParseFuncDeclaration();
         }
         catch
