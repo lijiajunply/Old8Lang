@@ -35,8 +35,10 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         var contextLines = new List<string>();
 
         // 获取错误行前后的上下文，最多显示3行上下文
-        var startLine = Math.Max(0, line - 2);
-        var endLine = Math.Min(lines.Length - 1, line + 1);
+        // 确保line至少为0，避免负数行号导致的问题
+        var safeLine = Math.Max(0, line);
+        var startLine = Math.Max(0, safeLine - 2);
+        var endLine = Math.Min(lines.Length - 1, safeLine + 1);
 
         for (var i = startLine; i <= endLine; i++)
         {

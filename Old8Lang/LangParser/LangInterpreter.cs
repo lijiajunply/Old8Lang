@@ -72,8 +72,10 @@ public class LangInterpreter : IMiniInterpreter
         var contextLines = new List<string>();
         
         // 获取错误行前后的上下文，最多显示3行上下文
-        int startLine = Math.Max(0, position.Line - 2);
-        int endLine = Math.Min(lines.Length - 1, position.Line + 1);
+        // 确保行号至少为0，避免负数行号导致的问题
+        var safeLine = Math.Max(0, position.Line);
+        int startLine = Math.Max(0, safeLine - 2);
+        int endLine = Math.Min(lines.Length - 1, safeLine + 1);
         
         for (int i = startLine; i <= endLine; i++)
         {

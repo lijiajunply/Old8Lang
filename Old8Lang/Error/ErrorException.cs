@@ -152,7 +152,9 @@ public class Old8Exception : Exception
                 if (isErrorLine)
                 {
                     sb.Append($"{blue}      {reset} | ");
-                    sb.Append(new string(' ', position.Column - 1));
+                    // 确保列号大于0，避免ArgumentOutOfRangeException
+                    var spaceCount = Math.Max(0, position.Column - 1);
+                    sb.Append(new string(' ', spaceCount));
                     sb.AppendLine($"{red}^ 错误发生在这里{reset}");
                 }
             }
