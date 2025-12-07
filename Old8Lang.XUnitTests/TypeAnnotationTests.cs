@@ -123,7 +123,8 @@ public class TypeAnnotationTests
             "b:string <- \"hello\"",
             "c:bool <- true",
             "d:char <- 'a'",
-            "e:double <- 3.14"
+            "e:double <- 3.14",
+            "f:array <- [1, 2, 3]"
         };
         
         foreach (var code in testCases)
@@ -135,6 +136,39 @@ public class TypeAnnotationTests
             Assert.NotNull(result);
             Assert.True(result.Count > 0);
         }
+    }
+    
+    [Fact]
+    public void TestAllTypeAnnotations()
+    {
+        // 测试所有类型注解的运行时类型检查
+        var code = "a:int <- 123\nb:double <- 3.14\nc:string <- \"hello\"\nd:bool <- true\ne:char <- 'a'\nf:array <- [1, 2, 3]";
+        var tokens = LangTokenizer.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens);
+        var program = parser.ParseProgram();
+        var manager = new VariateManager();
+        
+        // 所有赋值都应该成功执行，不抛出异常
+        for (int i = 0; i < program.Count; i++)
+        {
+            var statement = (SetStatement)program[i];
+            statement.Run(manager);
+        }
+        
+        // 验证变量已正确设置
+        var a = manager.GetValue(new OldId("a"));
+        var b = manager.GetValue(new OldId("b"));
+        var c = manager.GetValue(new OldId("c"));
+        var d = manager.GetValue(new OldId("d"));
+        var e = manager.GetValue(new OldId("e"));
+        var f = manager.GetValue(new OldId("f"));
+        
+        Assert.NotNull(a);
+        Assert.NotNull(b);
+        Assert.NotNull(c);
+        Assert.NotNull(d);
+        Assert.NotNull(e);
+        Assert.NotNull(f);
     }
     
     [Fact]

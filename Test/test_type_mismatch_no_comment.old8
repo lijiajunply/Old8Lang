@@ -1,0 +1,4 @@
+a:int <- 123
+b:string <- "hello"
+c:bool <- true
+d:int <- "world"

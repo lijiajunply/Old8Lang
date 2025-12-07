@@ -1,0 +1,11 @@
+a:int <- 123
+b:double <- 3.14
+c:string <- "hello"
+d:bool <- true
+e:char <- 'a'
+f:array <- [1, 2, 3]
+g:list <- [4, 5, 6]
+h:tuple <- (1, "two")
+i:dictionary <- { "key": "value", "number": 123 }
+j:function <- func (x) -> { return x + 1 }
+k:type <- int
