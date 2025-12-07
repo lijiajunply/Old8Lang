@@ -1,10 +1,10 @@
 fibIter(a) -> {
-    list <- list[1,1]
+    fib_list <- list[1,1]
     for i <- 2 , i < a , i++{
-        b <- list[i-1]+list[i-2]
-        list.Add(b)
+        b <- fib_list[i-1]+fib_list[i-2]
+        fib_list.Add(b)
     }
-    return list
+    return fib_list
 }
 
 fib2(a) -> {

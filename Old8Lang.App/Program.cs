@@ -9,7 +9,7 @@ using Old8Lang.LangParser;
 string[] strings =
 [
     "-f", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,
-        "Old8Lang", "Ex", "fib.old8")
+        "Old8Lang", "Ex", "init.old8")
 ];
 
 args = args.Length == 0 ? strings : args;

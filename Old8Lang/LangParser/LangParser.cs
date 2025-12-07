@@ -920,10 +920,9 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         }
 
         // 处理 list[...] 语法
-        if (CurrentToken is { Type: LangTokenType.Identifier, Value: "list" } &&
-            Peek().Type == LangTokenType.LeftBracket)
+        if (CurrentToken.Type == LangTokenType.List && Peek().Type == LangTokenType.LeftBracket)
         {
-            Expect(LangTokenType.Identifier); // 跳过 list 关键字
+            Expect(LangTokenType.List); // 跳过 list 关键字
             return ParseList();
         }
 

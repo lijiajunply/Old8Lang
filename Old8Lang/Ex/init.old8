@@ -32,7 +32,7 @@ PrintLine(a.Add())
 
 // 测试匿名函数
 PrintLine("测试lambda")
-a <- (c,b) => c + b
+a <- (c,b) -> c + b
 PrintLine(a(5,2))
 
 // 测试数组
