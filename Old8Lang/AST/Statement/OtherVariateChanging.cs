@@ -9,7 +9,7 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
 
-public class OtherVariateChanging(OldId id, OldExpr sumId, OldExpr expr) : OldStatement
+public class OtherVariateChanging(OldId id, OldExpr sumId, OldExpr expr, SourcePosition position = default) : OldStatement(position)
 {
     public override void Run(VariateManager manager)
     {

@@ -1,11 +1,11 @@
 using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
-
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class CharValue(char value) : ValueType
+public class CharValue(char value, SourcePosition position = default) : ValueType(position)
 {
     public readonly char Value = value;
 
@@ -30,16 +30,16 @@ public class CharValue(char value) : ValueType
 
     public override ValueType Converse(ValueType otherValueType, VariateManager manager)
     {
-        if (otherValueType is not TypeValue value) throw new Exception("the value is not a type");
+        if (otherValueType is not TypeValue value) throw new TypeError(this, "TypeValue", otherValueType.GetType().Name);
 
         return value.Value switch
         {
             "Int" or "int" => new IntValue(Convert.ToInt32(Value)),
-            "Bool" or "bool" => throw new Exception("can not convert char to bool"),
+            "Bool" or "bool" => throw new TypeError(this, "bool", "无法将字符转换为布尔值"),
             "String" or "string" => new StringValue(Value.ToString()),
             "char" or "Char" => this,
             "Double" or "double" => new DoubleValue(Convert.ToDouble(Value)),
-            _ => throw new Exception("not fount the type: " + value.Value)
+            _ => throw new TypeError(this, $"不支持的类型转换: {GetType().Name} 到 {value.Value}")
         };
     }
     

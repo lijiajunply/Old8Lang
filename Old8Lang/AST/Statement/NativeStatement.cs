@@ -68,7 +68,7 @@ public class NativeStatement : OldStatement
         if (!string.IsNullOrEmpty(MethodName))
         {
             var methodInfo = type?.GetMethod(MethodName);
-            if (methodInfo == null) throw new Exception($"Not Have Method in {ToString()}");
+            if (methodInfo == null) throw new InvalidOperationError(this, $"找不到方法 {MethodName} 在 {ClassName} 类中");
             if (string.IsNullOrEmpty(NativeName))
                 NativeName = MethodName;
             var func = new FuncValue(NativeName, methodInfo, FuncValue);
@@ -101,7 +101,7 @@ public class NativeStatement : OldStatement
         if (!string.IsNullOrEmpty(MethodName))
         {
             var methodInfo = type?.GetMethod(MethodName);
-            if (methodInfo == null) throw new Exception($"Not Have Method in {ToString()}");
+            if (methodInfo == null) throw new InvalidOperationError(this, $"找不到方法 {MethodName} 在 {ClassName} 类中");
             if (string.IsNullOrEmpty(NativeName))
                 NativeName = MethodName;
             local.DelegateVar.Add(NativeName, methodInfo);

@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
-
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -38,7 +38,7 @@ public class DoubleValue(double doubleValue, SourcePosition position = default) 
             return Value < d.Value;
         if (otherValue is IntValue i)
             return Value < i.Value;
-        throw new Exception("not fount the type: " + otherValue!.TypeToString());
+        throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
     public override bool Greater(ValueType? otherValue)
@@ -47,7 +47,7 @@ public class DoubleValue(double doubleValue, SourcePosition position = default) 
             return Value > d.Value;
         if (otherValue is IntValue i)
             return Value > i.Value;
-        throw new Exception("not fount the type: " + otherValue!.TypeToString());
+        throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
     public override bool LessEqual(ValueType? otherValue)
@@ -56,7 +56,7 @@ public class DoubleValue(double doubleValue, SourcePosition position = default) 
             return Value <= d.Value;
         if (otherValue is IntValue i)
             return Value <= i.Value;
-        throw new Exception("not fount the type: " + otherValue!.TypeToString());
+        throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
     public override bool GreaterEqual(ValueType? otherValue)
@@ -65,7 +65,7 @@ public class DoubleValue(double doubleValue, SourcePosition position = default) 
             return Value >= d.Value;
         if (otherValue is IntValue i)
             return Value >= i.Value;
-        throw new Exception("not fount the type: " + otherValue!.TypeToString());
+        throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
     public override string ToString() => Value.ToString(CultureInfo.InvariantCulture);
@@ -81,16 +81,16 @@ public class DoubleValue(double doubleValue, SourcePosition position = default) 
 
     public override ValueType Converse(ValueType otherValueType, VariateManager manager)
     {
-        if (otherValueType is not TypeValue value) throw new Exception("the value is not a type");
+        if (otherValueType is not TypeValue value) throw new TypeError(this, "TypeValue", otherValueType.GetType().Name);
 
         return value.Value switch
         {
             "Int" or "int" => new IntValue((int)Value),
             "Bool" or "bool" => new BoolValue(Value > 0),
             "String" or "string" => new StringValue(Value.ToString(CultureInfo.InvariantCulture)),
-            "char" or "Char" => throw new Exception("can not convert double to char"),
+            "char" or "Char" => throw new TypeError(this, "char", $"无法将 double 转换为 char"),
             "Double" or "double" => this,
-            _ => throw new Exception("not fount the type: " + value.Value)
+            _ => throw new TypeError(this, $"不支持的类型转换: {GetType().Name} 到 {value.Value}")
         };
     }
     

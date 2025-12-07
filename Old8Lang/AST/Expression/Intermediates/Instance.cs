@@ -1,12 +1,12 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
-
+using Old8Lang.Error;
 
 // ReSharper disable once CheckNamespace
 namespace Old8Lang.AST.Expression.Value;
 
-public class Instance(OldId oldId, List<OldExpr> ids) : ValueType
+public class Instance(OldId oldId, List<OldExpr> ids, SourcePosition position = default) : ValueType(position)
 {
     public readonly List<OldExpr> Ids = ids;
     public readonly OldId Id = oldId;
@@ -84,7 +84,7 @@ public class Instance(OldId oldId, List<OldExpr> ids) : ValueType
             {
                 var value = results[0].Run(manager);
                 if (value is IOldList list) return new IntValue(list.GetLength());
-                throw new Exception($"{results[0]} Not a list");
+                throw new InvalidOperationError(this, $"{results[0]} 不是列表类型");
             }
         }
 
@@ -99,12 +99,12 @@ public class Instance(OldId oldId, List<OldExpr> ids) : ValueType
         {
             if (anyValue.Result.TryGetValue("init", out result))
             {
-                if (result is not FuncValue value) throw new Exception("init is not function");
-                value.Run(anyValue.Manager, results.OfType<OldExpr>().ToList());
+                if (result is not FuncValue value) throw new TypeError(this, "FuncValue", "init 不是函数类型");
+                value.Run(anyValue.Manager, [.. results.OfType<OldExpr>()]);
             }
             else if (results.Count != 0)
             {
-                throw new Exception("No corresponding init function found");
+                throw new InvalidOperationError(this, "找不到对应的init函数");
             }
 
             result = anyValue;
@@ -114,7 +114,7 @@ public class Instance(OldId oldId, List<OldExpr> ids) : ValueType
         {
             List<ValueType> a = [];
             a.AddRange(Ids.Select(id => id.Run(manager)));
-            nativeAnyValue.New(Apis.ListToObjects(a).ToArray());
+            nativeAnyValue.New([.. Apis.ListToObjects(a)]);
             result = nativeAnyValue;
         }
 
@@ -144,7 +144,7 @@ public class Instance(OldId oldId, List<OldExpr> ids) : ValueType
 
         var os = new List<object>() { baseValue };
         os.AddRange(Ids);
-        var r = m?.Invoke(baseValue, os.ToArray());
+        var r = m?.Invoke(baseValue, [.. os]);
         if (r is ValueType v) return v;
         return ObjToValue(r!);
     }

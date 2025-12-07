@@ -2,13 +2,14 @@ using System.Text;
 using System.Text.Json;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Error;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Old8Lang.AST.Expression;
 
 public static class AnyValueFuncStatic
 {
-    private static ValueType GetJsonElement(JsonElement element)
+    private static ValueType GetJsonElement(JsonElement element, IOldLangTree node)
     {
         return element.ValueKind switch
         {
@@ -17,10 +18,11 @@ public static class AnyValueFuncStatic
             JsonValueKind.True => new BoolValue(true),
             JsonValueKind.False => new BoolValue(false),
             JsonValueKind.Null => new VoidValue(),
-            JsonValueKind.Array => new ArrayValue(element.EnumerateArray().Select(GetJsonElement).ToList()),
+            JsonValueKind.Array => new ArrayValue(
+                element.EnumerateArray().Select(x => GetJsonElement(x, node)).ToList()),
             JsonValueKind.Undefined => new VoidValue(),
             JsonValueKind.Object => ToObj(new StringValue(element.ToString())),
-            _ => throw new Exception()
+            _ => throw new InvalidOperationError(node, "不支持的JSON值类型")
         };
     }
 
@@ -50,7 +52,7 @@ public static class AnyValueFuncStatic
             {
                 if (variable.Value is JsonElement element)
                 {
-                    return GetJsonElement(element);
+                    return GetJsonElement(element, json);
                 }
 
                 return ValueType.ObjToValue(variable.Value);
@@ -68,7 +70,7 @@ public static class AnyValueFuncStatic
             {
                 if (variable.Value is JsonElement element)
                 {
-                    return GetJsonElement(element);
+                    return GetJsonElement(element, null!);
                 }
 
                 return ValueType.ObjToValue(variable.Value);
@@ -135,7 +137,7 @@ public static class DictionaryValueFuncStatic
             return a;
         }
 
-        throw new Exception("not found");
+        throw new KeyError(value, "键不存在");
     }
 }
 
@@ -157,7 +159,7 @@ public static class ListValueFuncStatic
             return a;
         }
 
-        throw new Exception("not found");
+        throw new InvalidOperationError(value, "找不到要移除的元素");
     }
 
     public static ValueType RemoveAt(this ListValue value, IntValue num)

@@ -3,19 +3,19 @@ using System.Reflection.Emit;
 using System.Text;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
-
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
 public class AnyValue : ValueType
 {
     public readonly Dictionary<OldId, OldExpr> Variates;
-    public readonly Dictionary<string, ValueType> Result = new();
+    public readonly Dictionary<string, ValueType> Result = [];
     public readonly OldId Id;
 
     public readonly VariateManager Manager;
 
-    public AnyValue(OldId id, Dictionary<OldId, OldExpr> variates)
+    public AnyValue(OldId id, Dictionary<OldId, OldExpr> variates, SourcePosition position = default) : base(position)
     {
         Variates = variates;
         Id = id;
@@ -25,7 +25,7 @@ public class AnyValue : ValueType
         Manager.IsClass = true;
     }
 
-    public AnyValue(Dictionary<OldId, OldExpr> variates)
+    public AnyValue(Dictionary<OldId, OldExpr> variates, SourcePosition position = default) : base(position)
     {
         Variates = variates;
         Id = new OldId("JsonNative");
@@ -54,7 +54,7 @@ public class AnyValue : ValueType
             case OldId id:
             {
                 var a = Manager.GetValue(id);
-                if (a == null) throw new Exception("not found");
+                if (a == null) throw new AttributeError(this, id.IdName, Id.IdName);
                 return a.Run(Manager);
             }
             case FuncValue func:

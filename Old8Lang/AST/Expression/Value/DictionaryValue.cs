@@ -3,7 +3,7 @@ using System.Reflection.Emit;
 using System.Text;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
-
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -88,7 +88,7 @@ public class DictionaryValue : ValueType, IOldList
 
     public ValueType Slice(int start, int end)
     {
-        throw new Exception("dictionary is not support Slice");
+        throw new InvalidOperationError(this, "字典类型不支持切片操作");
     }
 
     public Type GetChildType() => typeof(KeyValuePair<object, object>);

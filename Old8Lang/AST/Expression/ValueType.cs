@@ -1,6 +1,7 @@
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.LangParser;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression;
 
@@ -43,10 +44,10 @@ public abstract class ValueType(SourcePosition position = default) : OldExpr(pos
     #region boolOper
 
     public virtual bool Equal(ValueType? otherValueType) => false;
-    public virtual bool Less(ValueType? otherValue) => throw new Exception("not available");
-    public virtual bool Greater(ValueType? otherValue) => throw new Exception("not available");
-    public virtual bool LessEqual(ValueType? otherValue) => throw new Exception("not available");
-    public virtual bool GreaterEqual(ValueType? otherValue) => throw new Exception("not available");
+    public virtual bool Less(ValueType? otherValue) => throw new InvalidOperationError(this, "不支持Less操作");
+    public virtual bool Greater(ValueType? otherValue) => throw new InvalidOperationError(this, "不支持Greater操作");
+    public virtual bool LessEqual(ValueType? otherValue) => throw new InvalidOperationError(this, "不支持LessEqual操作");
+    public virtual bool GreaterEqual(ValueType? otherValue) => throw new InvalidOperationError(this, "不支持GreaterEqual操作");
 
     #endregion
 

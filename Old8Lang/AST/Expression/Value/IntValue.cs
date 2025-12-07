@@ -3,11 +3,11 @@ using System.Reflection.Emit;
 using System.Text;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
-
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class IntValue(int intValue) : ValueType
+public class IntValue(int intValue, SourcePosition position = default) : ValueType(position)
 {
     public int Value { get; set; } = intValue;
     public override string ToString() => Value.ToString();
@@ -63,7 +63,7 @@ public class IntValue(int intValue) : ValueType
             return Value < d.Value;
         if (otherValue is IntValue i)
             return Value < i.Value;
-        throw new Exception("not fount the type: " + otherValue!.TypeToString());
+        throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
     public override bool Greater(ValueType? otherValue)
@@ -72,7 +72,7 @@ public class IntValue(int intValue) : ValueType
             return Value > d.Value;
         if (otherValue is IntValue i)
             return Value > i.Value;
-        throw new Exception("not fount the type: " + otherValue!.TypeToString());
+        throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
     public override bool LessEqual(ValueType? otherValue)
@@ -81,7 +81,7 @@ public class IntValue(int intValue) : ValueType
             return Value <= d.Value;
         if (otherValue is IntValue i)
             return Value <= i.Value;
-        throw new Exception("not fount the type: " + otherValue!.TypeToString());
+        throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
     public override bool GreaterEqual(ValueType? otherValue)
@@ -90,7 +90,7 @@ public class IntValue(int intValue) : ValueType
             return Value >= d.Value;
         if (otherValue is IntValue i)
             return Value >= i.Value;
-        throw new Exception("not fount the type: " + otherValue!.TypeToString());
+        throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
     public override bool Equal(ValueType? otherValueType)
@@ -102,7 +102,7 @@ public class IntValue(int intValue) : ValueType
 
     public override ValueType Converse(ValueType otherValueType, VariateManager manager)
     {
-        if (otherValueType is not TypeValue value) throw new Exception("the value is not a type");
+        if (otherValueType is not TypeValue value) throw new TypeError(this, "TypeValue", otherValueType.GetType().Name);
 
         return value.Value switch
         {
@@ -111,7 +111,7 @@ public class IntValue(int intValue) : ValueType
             "String" or "string" => new StringValue(Value.ToString()),
             "char" or "Char" => new CharValue(Convert.ToChar(Value)),
             "Double" or "double" => new DoubleValue(Value),
-            _ => throw new Exception("not fount the type: " + value.Value)
+            _ => throw new TypeError(this, $"不支持的类型转换: {GetType().Name} 到 {value.Value}")
         };
     }
 

@@ -2,6 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression;
 
@@ -195,7 +196,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     ilGenerator.Emit(OpCodes.Neg);
                     return typeof(bool);
                 default:
-                    throw new NotSupportedException($"Unsupported unary operator: {opera}");
+                    throw new InvalidOperationError(this, $"不支持的一元运算符: {opera}");
             }
         }
 
@@ -341,7 +342,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
                 return typeof(void);
             default:
-                throw new NotSupportedException($"Unsupported binary operator: {opera}");
+                throw new InvalidOperationError(this, $"不支持的二元运算符: {opera}");
         }
     }
 }

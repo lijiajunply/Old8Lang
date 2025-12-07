@@ -13,17 +13,17 @@ public class ArrayValue : ValueType, IOldList
 
     public ArrayValue(IEnumerable<OldExpr> valuesList, SourcePosition position = default) : base(position)
     {
-        var oldExpr = valuesList as OldExpr[] ?? valuesList.ToArray();
+        var oldExpr = valuesList as OldExpr[] ?? [.. valuesList];
         RunResult = new ValueType[oldExpr.Length];
-        Values = oldExpr.ToList();
+        Values = [.. oldExpr];
     }
 
     public ArrayValue(List<ValueType> re, SourcePosition position = default) : base(position)
     {
-        RunResult = re.ToArray();
+        RunResult = [.. re];
     }
 
-    public ArrayValue(List<object> a, SourcePosition position = default) : base(position) => RunResult = a.Select(ObjToValue).ToArray();
+    public ArrayValue(List<object> a, SourcePosition position = default) : base(position) => RunResult = [.. a.Select(ObjToValue)];
 
     public override ValueType Run(LangParser.VariateManager manager)
     {

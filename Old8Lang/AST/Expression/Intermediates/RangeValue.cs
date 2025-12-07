@@ -1,6 +1,7 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
@@ -14,7 +15,7 @@ public class RangeValue(OldExpr? start, OldExpr? end, SourcePosition position = 
         var endValue = end?.Run(manager);
 
         if (startValue is not IntValue startIntValue || endValue is not IntValue endIntValue)
-            throw new Exception("RangeValue: start or end is not IntValue");
+            throw new TypeError(this, "IntValue", $"RangeValue: start 或 end 不是 IntValue，实际得到了 {startValue?.GetType().Name} 和 {endValue?.GetType().Name}");
 
         for (var i = startIntValue.Value; i <= endIntValue.Value; i++)
             results.Add(new IntValue(i));

@@ -1,7 +1,7 @@
 using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
-
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -20,7 +20,7 @@ public class BoolValue(bool value, SourcePosition position = default) : ValueTyp
 
     public override ValueType Converse(ValueType otherValueType, VariateManager manager)
     {
-        if (otherValueType is not TypeValue value) throw new Exception("the value is not a type");
+        if (otherValueType is not TypeValue value) throw new TypeError(this, "TypeValue", otherValueType.GetType().Name);
 
         return value.Value switch
         {
@@ -29,7 +29,7 @@ public class BoolValue(bool value, SourcePosition position = default) : ValueTyp
             "String" or "string" => new StringValue(Value.ToString()),
             "char" or "Char" => new CharValue(Value ? '1' : '0'),
             "Double" or "double" => new DoubleValue(Value ? 1.0 : 0.0),
-            _ => throw new Exception("not fount the type: " + value.Value)
+            _ => throw new TypeError(this, $"不支持的类型转换: {GetType().Name} 到 {value.Value}")
         };
     }
     

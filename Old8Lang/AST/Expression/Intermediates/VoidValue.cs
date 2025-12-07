@@ -2,15 +2,12 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
-public class VoidValue : ValueType
+/// <summary>
+/// 构造函数
+/// </summary>
+/// <param name="position">位置信息</param>
+public class VoidValue(SourcePosition position = default) : ValueType(position)
 {
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="position">位置信息</param>
-    public VoidValue(SourcePosition position = default) : base(position)
-    {}
-    
     public override object GetValue() => throw new InvalidOperationError(this, "尝试访问无效值（VoidValue）");
     
     public override ValueType Run(LangParser.VariateManager manager) => 
