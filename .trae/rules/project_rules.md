@@ -1,6 +1,6 @@
 ## 测试用 Old8Lang 代码文件 规范
 生成 测试用 Old8Lang 代码文件 时，请使用 .old8 作为文件扩展名。
-生成的 测试用代码文件 必须要符合 Old8Lang 语法规范。详情请看 Old8Lang.ebnf
+生成的 测试用代码文件 必须要符合 Old8Lang 语法规范。详情请看 /Old8Lang/Old8Lang.ebnf
 
 编译模式测试时，请放在 CompilerTests 目录下。
 解释模式测试时，请放在 Tests 目录下。

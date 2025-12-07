@@ -1,0 +1,15 @@
+// 逻辑和比较表达式测试
+
+// 1. 逻辑表达式
+
+j:bool <- true and false   // 逻辑与
+k:bool <- true or false    // 逻辑或
+l:bool <- not true         // 逻辑非
+m:bool <- true xor false   // 逻辑异或
+
+// 2. 比较表达式
+
+n:bool <- 10 == 5          // 等于
+p:bool <- 10 != 5          // 不等于
+q:bool <- 10 < 5           // 小于
+r:bool <- 10 > 5           // 大于

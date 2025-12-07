@@ -1,0 +1,144 @@
+// 类字段测试
+
+// 1. 基本类型字段测试
+
+class BasicFields {
+    // 整数类型
+    int_field:int <- 100
+    
+    // 浮点数类型
+    double_field:double <- 3.14159
+    
+    // 字符串类型
+    string_field:string <- "Hello, Class Fields"
+    
+    // 布尔类型
+    bool_field:bool <- true
+    
+    // 字符类型
+    char_field:char <- 'X'
+}
+
+// 测试基本类型字段访问
+obj1:BasicFields <- BasicFields()
+int_val:int <- obj1.int_field
+double_val:double <- obj1.double_field
+string_val:string <- obj1.string_field
+bool_val:bool <- obj1.bool_field
+char_val:char <- obj1.char_field
+
+// 修改基本类型字段
+obj1.int_field <- 200
+obj1.double_field <- 2.71828
+obj1.string_field <- "Modified String"
+obj1.bool_field <- false
+obj1.char_field <- 'Y'
+
+// 2. 复杂类型字段测试
+
+class ComplexFields {
+    // 数组类型字段
+    array_field:array <- [1, 2, 3, 4, 5]
+    
+    // 字典类型字段
+    dict_field:dictionary <- {"name": "Complex", "value": 1000}
+    
+    // 嵌套数组
+    nested_array:array <- [[1, 2], [3, 4], [5, 6]]
+    
+    // 包含不同类型的数组
+    mixed_array:array <- [1, "string", 3.14, true]
+}
+
+// 测试复杂类型字段访问
+obj2:ComplexFields <- ComplexFields()
+array_val:int <- obj2.array_field[0]
+dict_val:string <- obj2.dict_field["name"]
+nested_val:int <- obj2.nested_array[0][1]
+mixed_val:string <- obj2.mixed_array[1]
+
+// 修改复杂类型字段
+obj2.array_field[0] <- 100
+obj2.dict_field["value"] <- 2000
+obj2.nested_array[1][0] <- 300
+
+// 3. 对象引用字段测试
+
+class Address {
+    street:string <- ""
+    city:string <- ""
+    zip_code:string <- ""
+}
+
+class PersonWithAddress {
+    name:string <- ""
+    age:int <- 0
+    address:Address <- Address()
+}
+
+// 测试对象引用字段
+person:PersonWithAddress <- PersonWithAddress()
+person.name <- "Alice"
+person.age <- 30
+person.address.street <- "123 Main St"
+person.address.city <- "New York"
+person.address.zip_code <- "10001"
+
+// 4. 多个对象引用
+
+class Team {
+    name:string <- ""
+    members:array <- [PersonWithAddress(), PersonWithAddress()]
+}
+
+// 测试多个对象引用
+team:Team <- Team()
+team.name <- "Development Team"
+team.members[0].name <- "Bob"
+team.members[0].age <- 25
+team.members[1].name <- "Charlie"
+team.members[1].age <- 35
+
+// 5. 字段初始化表达式
+
+class InitializedFields {
+    // 使用表达式初始化字段
+    computed_int:int <- 10 + 20 * 3
+    
+    // 使用字符串拼接初始化
+    computed_string:string <- "Hello " + "World"
+    
+    // 使用布尔表达式初始化
+    computed_bool:bool <- (10 > 5) and (3 < 6)
+    
+    // 使用数组表达式初始化
+    computed_array:array <- [1, 2, 3] + [4, 5, 6]  // 假设支持数组拼接
+}
+
+// 测试初始化表达式
+obj3:InitializedFields <- InitializedFields()
+computed_int_val:int <- obj3.computed_int
+computed_string_val:string <- obj3.computed_string
+computed_bool_val:bool <- obj3.computed_bool
+
+// 6. 空值初始化（如果支持）
+// 假设Old8Lang支持空值
+// class NullableFields {
+//     null_int:int <- null
+//     null_string:string <- null
+//     null_array:array <- null
+// }
+
+// 7. 静态字段（如果支持）
+// 假设Old8Lang支持静态字段
+// class StaticFields {
+//     static static_count:int <- 0
+//     
+//     func increment() -> {
+//         static_count <- static_count + 1
+//     }
+//     
+//     func get_count() -> {
+//         return static_count
+//     }
+// }

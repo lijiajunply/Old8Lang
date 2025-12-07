@@ -1,0 +1,241 @@
+// 类方法测试
+
+// 1. 基本方法定义和调用
+
+class BasicMethods {
+    // 无参数无返回值方法
+    func say_hello() -> {
+        // print("Hello from BasicMethods")
+    }
+    
+    // 调用其他方法
+    func call_other_method() -> {
+        this.say_hello()
+    }
+}
+
+// 测试基本方法调用
+obj1:BasicMethods <- BasicMethods()
+obj1.say_hello()
+obj1.call_other_method()
+
+// 2. 带参数的方法
+
+class MethodsWithParams {
+    // 单个参数
+    func greet(name) -> {
+        // print("Hello, " + name)
+    }
+    
+    // 多个参数
+    func add_and_print(a, b) -> {
+        // result <- a + b
+        // print("Sum: " + result)
+    }
+    
+    // 不同类型参数
+    func mixed_params(name, age, active) -> {
+        // print("Name: " + name + ", Age: " + age + ", Active: " + active)
+    }
+}
+
+// 测试带参数的方法调用
+obj2:MethodsWithParams <- MethodsWithParams()
+obj2.greet("Alice")
+obj2.add_and_print(10, 20)
+obj2.mixed_params("Bob", 30, true)
+
+// 3. 带返回值的方法
+
+class MethodsWithReturn {
+    // 返回整数
+    func get_int_value() -> {
+        return 42
+    }
+    
+    // 返回浮点数
+    func get_double_value() -> {
+        return 3.14159
+    }
+    
+    // 返回字符串
+    func get_greeting(name) -> {
+        return "Hello, " + name
+    }
+    
+    // 返回布尔值
+    func is_positive(n) -> {
+        return n > 0
+    }
+}
+
+// 测试带返回值的方法
+obj3:MethodsWithReturn <- MethodsWithReturn()
+int_result:int <- obj3.get_int_value()
+double_result:double <- obj3.get_double_value()
+string_result:string <- obj3.get_greeting("Charlie")
+bool_result:bool <- obj3.is_positive(10)
+
+// 4. 方法中访问实例字段
+
+class MethodsAccessingFields {
+    count:int <- 0
+    name:string <- ""
+    
+    // 设置字段值
+    func set_name(new_name) -> {
+        this.name <- new_name
+    }
+    
+    // 获取字段值
+    func get_name() -> {
+        return this.name
+    }
+    
+    // 修改字段值
+    func increment_count() -> {
+        this.count <- this.count + 1
+    }
+    
+    // 复杂字段操作
+    func reset_and_get_count() -> {
+        current:int <- this.count
+        this.count <- 0
+        return current
+    }
+}
+
+// 测试方法访问实例字段
+obj4:MethodsAccessingFields <- MethodsAccessingFields()
+obj4.set_name("David")
+name_val:string <- obj4.get_name()
+obj4.increment_count()
+obj4.increment_count()
+count_val:int <- obj4.reset_and_get_count()
+
+// 5. 方法中调用其他方法
+
+class MethodsCallingOtherMethods {
+    value:int <- 0
+    
+    func set_initial_value(initial) -> {
+        this.value <- initial
+    }
+    
+    func multiply_by(factor) -> {
+        this.value <- this.value * factor
+    }
+    
+    func add_to(value_to_add) -> {
+        this.value <- this.value + value_to_add
+    }
+    
+    // 链式调用多个方法
+    func complex_operation(a, b, c) -> {
+        this.set_initial_value(a)
+        this.multiply_by(b)
+        this.add_to(c)
+        return this.value
+    }
+}
+
+// 测试方法调用其他方法
+obj5:MethodsCallingOtherMethods <- MethodsCallingOtherMethods()
+result1:int <- obj5.complex_operation(2, 3, 4)  // 预期结果: 2*3+4=10
+
+// 6. 递归方法
+
+class RecursiveMethods {
+    // 阶乘计算
+    func factorial(n) -> {
+        if n == 0 {
+            return 1
+        }
+        return n * this.factorial(n - 1)
+    }
+    
+    // 斐波那契数列
+    func fibonacci(n) -> {
+        if n <= 1 {
+            return n
+        }
+        return this.fibonacci(n - 1) + this.fibonacci(n - 2)
+    }
+    
+    // 求和递归
+    func sum_range(start, end) -> {
+        if start > end {
+            return 0
+        }
+        return start + this.sum_range(start + 1, end)
+    }
+}
+
+// 测试递归方法
+obj6:RecursiveMethods <- RecursiveMethods()
+fact_result:int <- obj6.factorial(5)  // 预期结果: 120
+fib_result:int <- obj6.fibonacci(10)   // 预期结果: 55
+sum_result:int <- obj6.sum_range(1, 10) // 预期结果: 55
+
+// 7. 方法中的控制流
+
+class MethodsWithControlFlow {
+    // 方法中的if-elif-else
+    func get_grade(score) -> {
+        if score >= 90 {
+            return "A"
+        } elif score >= 80 {
+            return "B"
+        } elif score >= 70 {
+            return "C"
+        } elif score >= 60 {
+            return "D"
+        } else {
+            return "F"
+        }
+    }
+    
+    // 方法中的while循环
+    func count_down(n) -> {
+        // while n > 0 {
+        //     print(n)
+        //     n <- n - 1
+        // }
+        // print("Blast off!")
+    }
+    
+    // 方法中的for循环
+    func sum_array(arr) -> {
+        result <- 0
+        for item in arr {
+            result <- result + item
+        }
+        return result
+    }
+}
+
+// 测试方法中的控制流
+obj7:MethodsWithControlFlow <- MethodsWithControlFlow()
+grade:string <- obj7.get_grade(85)  // 预期结果: "B"
+obj7.count_down(5)
+
+// 8. 方法重载（如果支持）
+// 假设Old8Lang支持方法重载
+// class OverloadedMethods {
+//     // 重载add方法
+//     func add(a, b) -> {
+//         return a + b
+//     }
+// }
+
+// 9. 静态方法（如果支持）
+// 假设Old8Lang支持静态方法
+// class StaticMethodsExample {
+//     static func static_method() -> {
+//         // print("This is a static method")
+//     }
+//     
+//     static func static_with_param(value) -> {
+//         return value * 2
+//     }
+// }

@@ -16,8 +16,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Changes">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.trae/documents/Old8Lang编译器编译模式系统性测试计划.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/basic_types.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/class_basic.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/class_fields.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/class_methods.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/complex_class.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/control_flow.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/expressions.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/functions.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/simple_class.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/simple_class_no_methods.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.trae/documents/修复编译模式问题.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.trae/documents/实现类型假注的运行时类型检查.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.trae/rules/project_rules.md" beforeDir="false" afterPath="$PROJECT_DIR$/.trae/rules/project_rules.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -682,7 +697,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="104" />
+    <option name="localTasksCounter" value="105" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -709,7 +724,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="更改Bug : Instance在Operation会进行更新问题" />
     <MESSAGE value="0.8.0完成" />
     <MESSAGE value="加入Range和SetList" />
     <MESSAGE value="修复 只能在Debug中使用" />
@@ -734,7 +748,8 @@
     <MESSAGE value="chore(deps): 升级项目目标框架到 .NET 10&#10;&#10;- 将 LibTest 项目的目标框架从 net9.0 更新为 net10.0&#10;- 将 Old8Lang.App 项目的目标框架从 net9.0 更新为 net10.0&#10;- 将 Old8Lang 项目的目标框架从 net9.0 更新为 net10.0&#10;- 将 Old8LangLib 项目的目标框架从 net9.0 更新为 net10.0&#10;- 移除了 Lang.Demo 解决方案文件和相关配置&#10;- 更新 Rider IDE 的调试配置选项，增加环境变量路径和混合模式调试设置&#10;- 添加了对未处理异常忽略列表的配置支持" />
     <MESSAGE value="refactor(parser): 重构解析器相关代码以提升可读性&#10;&#10;- 统一变量命名风格，使用小驼峰命名法&#10;- 移除未使用的命名空间引用&#10;- 重命名方法参数以避免与局部变量冲突&#10;- 优化错误处理逻辑中的变量作用域&#10;- 更新依赖包版本至最新稳定版&#10;- 调整条件判断逻辑提高代码健壮性" />
     <MESSAGE value="refactor(parser): 优化解析器实现并增强文件读取逻辑&#10;&#10;- 改进FromFile方法以更好地处理macOS上的绝对路径和相对路径查找&#10;- 重构字典和列表解析逻辑，支持{}和[]语法&#10;- 完善字符串树解析以支持连续的插值块&#10;- 修复切片表达式中的冒号识别问题&#10;- 增强词法分析器的注释过滤和转义字符处理&#10;- 更新程序入口点的测试代码引用和示例文件路径&#10;- 调整IDE工作区配置和断点设置以匹配代码变更" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(parser): 优化解析器实现并增强文件读取逻辑&#10;&#10;- 改进FromFile方法以更好地处理macOS上的绝对路径和相对路径查找&#10;- 重构字典和列表解析逻辑，支持{}和[]语法&#10;- 完善字符串树解析以支持连续的插值块&#10;- 修复切片表达式中的冒号识别问题&#10;- 增强词法分析器的注释过滤和转义字符处理&#10;- 更新程序入口点的测试代码引用和示例文件路径&#10;- 调整IDE工作区配置和断点设置以匹配代码变更" />
+    <MESSAGE value="refactor(ast): 简化类型映射声明语法&#10;&#10;- 使用简化集合初始化语法替换显式泛型声明&#10;- 移除冗余的 System.Collections.Generic 命名空间前缀&#10;- 更新 IDE 工作区配置文件中的字符串转义格式" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 简化类型映射声明语法&#10;&#10;- 使用简化集合初始化语法替换显式泛型声明&#10;- 移除冗余的 System.Collections.Generic 命名空间前缀&#10;- 更新 IDE 工作区配置文件中的字符串转义格式" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -832,39 +847,39 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>1223</line>
+          <line>1252</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseInstantiate'">
             <startOffsets>
-              <option value="44007" />
+              <option value="45250" />
             </startOffsets>
             <endOffsets>
-              <option value="44040" />
+              <option value="45283" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="476" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>1226</line>
+          <line>1255</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseInstantiate'">
             <startOffsets>
-              <option value="44132" />
+              <option value="45375" />
             </startOffsets>
             <endOffsets>
-              <option value="44158" />
+              <option value="45401" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="477" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>379</line>
+          <line>408</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseForStatement'">
             <startOffsets>
-              <option value="14935" />
+              <option value="16178" />
             </startOffsets>
             <endOffsets>
-              <option value="14968" />
+              <option value="16211" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="484" />

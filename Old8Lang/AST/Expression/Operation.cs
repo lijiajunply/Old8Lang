@@ -195,7 +195,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 case OperationType.MINUS:
                     right?.LoadIlValue(ilGenerator, local);
                     ilGenerator.Emit(OpCodes.Neg);
-                    return typeof(bool);
+                    return rightType;
                 default:
                     throw new InvalidOperationError(this, $"不支持的一元运算符: {opera}");
             }
@@ -234,6 +234,13 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 left?.LoadIlValue(ilGenerator, local);
                 right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Div);
+                if (leftType == typeof(double) || rightType == typeof(double))
+                    return typeof(double);
+                return typeof(int);
+            case OperationType.MODULO:
+                left?.LoadIlValue(ilGenerator, local);
+                right?.LoadIlValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Rem);
                 if (leftType == typeof(double) || rightType == typeof(double))
                     return typeof(double);
                 return typeof(int);

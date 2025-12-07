@@ -253,7 +253,8 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             // Lambda
             LangTokenType.Identifier when Peek().Type == LangTokenType.Arrow => ParseFuncDeclaration(),
             // 类型实例调用属性/方法
-            LangTokenType.Identifier when Peek().Type == LangTokenType.Dot => ParseClassFuncRunStatement(),
+            LangTokenType.Identifier when Peek().Type == LangTokenType.Dot && Peek(3).Type == LangTokenType.Assignment => ParseSet(), // 处理字段赋值：identifier.Dot.identifier.Assignment
+            LangTokenType.Identifier when Peek().Type == LangTokenType.Dot => ParseClassFuncRunStatement(), // 处理方法调用：identifier.Dot.identifier.LeftParen
             // 先尝试解析为函数定义，再解析为函数调用
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseIdentifierLeftParen(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.PlusPlus => ParsePlusPlus(),
@@ -316,7 +317,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         return statement;
     }
 
-    // declaration = identifier ":" type "<-" expression | identifier "<-" expression ;
+    // declaration = identifier ":" type "<-" expression | identifier "<-" expression | memberAccess ":" type "<-" expression | memberAccess "<-" expression ;
     private SetStatement ParseSet()
     {
         var identifierToken = CurrentToken;
@@ -324,6 +325,17 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             tokenValue: identifierToken.Value);
         var identifier = identifierToken.Value;
         Expect(LangTokenType.Identifier);
+        
+        // 处理成员访问：identifier "." identifier* ( ":" type )? "<-" expression
+        var isMemberAccess = false;
+        var memberPath = identifier;
+        while (CurrentToken.Type == LangTokenType.Dot)
+        {
+            isMemberAccess = true;
+            Expect(LangTokenType.Dot);
+            memberPath += "." + CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+        }
         
         // 检查是否有类型注解
         var assumptionType = "";
@@ -336,6 +348,23 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         
         Expect(LangTokenType.Assignment);
         var expression = ParseExpression();
+        
+        if (isMemberAccess)
+        {
+            // 处理成员访问赋值：p.name <- value
+            var parts = memberPath.Split('.');
+            var firstId = new OldId(parts[0], assumptionType, position);
+            var memberAccess = firstId;
+            
+            for (int i = 1; i < parts.Length; i++)
+            {
+                memberAccess = new OldId(parts[i], "", position);
+            }
+            
+            return new SetStatement(memberAccess, expression, position);
+        }
+        
+        // 处理简单变量赋值：a <- value
         return new SetStatement(new OldId(identifier, assumptionType, position), expression, position);
     }
 
@@ -790,6 +819,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
 
                 case LangTokenType.Star:
                 case LangTokenType.Slash:
+                case LangTokenType.Percent:
                     left = ParseNumberOpera2(left);
                     break;
 
@@ -854,14 +884,13 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         return left;
     }
 
-// numberOpera2 = expression ( ( "*" | "/" ) expression )* ;
+// numberOpera2 = expression ( ( "*" | "/" | "%" ) expression )* ;
     private OldExpr ParseNumberOpera2(OldExpr left)
     {
-        while (CurrentToken.Type == LangTokenType.Star || CurrentToken.Type == LangTokenType.Slash)
+        while (CurrentToken.Type == LangTokenType.Star || CurrentToken.Type == LangTokenType.Slash || CurrentToken.Type == LangTokenType.Percent)
         {
             var operatorToken = CurrentToken;
-            var position =
-                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position = new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
             Expect(operatorToken.Type);
             var right = ParsePrimary();
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
@@ -918,7 +947,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var position = new SourcePosition(notToken.Line, notToken.Column, tokenValue: notToken.Value);
             Expect(LangTokenType.Not);
             var expr = ParsePrimary();
-            return new Operation(expr, OperationType.NOT, null, position);
+            return new Operation(null, OperationType.NOT, expr, position);
         }
 
         // 处理前缀 minus 表达式
@@ -928,7 +957,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var position = new SourcePosition(minusToken.Line, minusToken.Column, tokenValue: minusToken.Value);
             Expect(LangTokenType.Minus);
             var expr = ParsePrimary();
-            return new Operation(new IntValue(0), OperationType.MINUS, expr, position);
+            return new Operation(null, OperationType.MINUS, expr, position);
         }
 
         // 处理 list[...] 语法

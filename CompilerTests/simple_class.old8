@@ -1,0 +1,20 @@
+class Person{
+    name <- ""
+    age <- 0
+}
+
+p <- Person()
+p.name <- "Alice"
+p.age <- 30
+
+class Calculator{
+    func add(a, b)
+    {
+        return a + b
+    }
+    func multiply(a, b) return a * b
+}
+
+calc <- Calculator()
+sum_result <- calc.add(10, 20)
+product_result <- calc.multiply(10, 20)
