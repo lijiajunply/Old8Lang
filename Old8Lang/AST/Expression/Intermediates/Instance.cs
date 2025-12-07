@@ -21,8 +21,8 @@ public class Instance(OldId oldId, List<OldExpr> ids, SourcePosition position = 
                 return new TypeValue(results[0]).Run(manager);
             case "Exec":
             {
-                if (results[0] is not StringValue stringValue) return new VoidValue();
-                var a = manager.Interpreter.Build(code: stringValue.Value);
+                if (results[0] is not StringValue execStringValue) throw new TypeError(this, "StringValue", results[0].GetType().Name);
+                var a = manager.Interpreter.Build(code: execStringValue.Value);
                 a.Run(manager);
                 return new VoidValue();
             }
@@ -33,12 +33,12 @@ public class Instance(OldId oldId, List<OldExpr> ids, SourcePosition position = 
             }
             case "Json":
             {
-                return (results[0] as AnyValue)?.ToJson()
-                    as ValueType ?? new VoidValue();
+                if (results[0] is not AnyValue jsonAnyValue) throw new TypeError(this, "AnyValue", results[0].GetType().Name);
+                return jsonAnyValue.ToJson();
             }
             case "ToObj":
-                return (results[0] as StringValue)?.ToObj()
-                    as ValueType ?? new VoidValue();
+                if (results[0] is not StringValue stringValue) throw new TypeError(this, "StringValue", results[0].GetType().Name);
+                return stringValue.ToObj();
             case "PrintLine":
             {
                 if (results.Count == 0)

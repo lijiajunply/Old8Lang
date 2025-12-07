@@ -72,7 +72,7 @@ public class AnyValue : ValueType
 
     public override ValueType Converse(ValueType otherValueType, VariateManager manager)
     {
-        if (otherValueType is not AnyValue typeAny) return new VoidValue();
+        if (otherValueType is not AnyValue typeAny) throw new TypeError(this, "AnyValue", otherValueType.GetType().Name);
 
         foreach (var a in Result)
         {

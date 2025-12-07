@@ -1,4 +1,5 @@
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -13,7 +14,7 @@ public class TypeValue : ValueType
     public override ValueType Run(LangParser.VariateManager manager)
     {
         var result = Expr?.Run(manager);
-        if (result == null) return new VoidValue();
+        if (result == null) throw new InvalidOperationError(this, "类型表达式求值失败");
         Value = result.TypeToString();
         return this;
     }

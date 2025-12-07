@@ -1,7 +1,7 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
-
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -39,7 +39,7 @@ public class ListValue : ValueType, IOldList
 
     public override ValueType Dot(OldExpr dotExpr)
     {
-        return dotExpr is not Instance a ? new VoidValue() : a.FromClassToResult(this);
+        return dotExpr is not Instance a ? throw new InvalidOperationError(this, "列表类型只支持实例调用操作") : a.FromClassToResult(this);
     }
 
     public override object GetValue() => Apis.ListToObjects(Values);

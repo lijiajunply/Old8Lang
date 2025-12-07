@@ -18,10 +18,10 @@ public abstract class ValueType(SourcePosition position = default) : OldExpr(pos
 
     #region intOper
 
-    public virtual ValueType Plus(ValueType otherValueType) => new VoidValue(Position);
-    public virtual ValueType Minus(ValueType otherValueType) => new VoidValue(Position);
-    public virtual ValueType Times(ValueType otherValueType) => new VoidValue(Position);
-    public virtual ValueType Divide(ValueType otherValueType) => new VoidValue(Position);
+    public virtual ValueType Plus(ValueType otherValueType) => throw new InvalidOperationError(this, $"不支持类型 '{GetType().Name}' 和 '{otherValueType.GetType().Name}' 的加法操作");
+    public virtual ValueType Minus(ValueType otherValueType) => throw new InvalidOperationError(this, $"不支持类型 '{GetType().Name}' 和 '{otherValueType.GetType().Name}' 的减法操作");
+    public virtual ValueType Times(ValueType otherValueType) => throw new InvalidOperationError(this, $"不支持类型 '{GetType().Name}' 和 '{otherValueType.GetType().Name}' 的乘法操作");
+    public virtual ValueType Divide(ValueType otherValueType) => throw new InvalidOperationError(this, $"不支持类型 '{GetType().Name}' 和 '{otherValueType.GetType().Name}' 的除法操作");
 
     #endregion
 
@@ -31,6 +31,7 @@ public abstract class ValueType(SourcePosition position = default) : OldExpr(pos
         {
             if (id.IdName == "XAUAT")
                 return new StringValue("西建大还我血汗钱我要回家");
+            throw new AttributeError(this, id.IdName, GetType().Name);
         }
 
         if (dotExpr is Instance instance)
@@ -38,7 +39,7 @@ public abstract class ValueType(SourcePosition position = default) : OldExpr(pos
             return instance.FromClassToResult(this);
         }
 
-        return new VoidValue(Position);
+        throw new InvalidOperationError(this, $"不支持类型 '{GetType().Name}' 的点操作");
     }
 
     #region boolOper
@@ -51,7 +52,7 @@ public abstract class ValueType(SourcePosition position = default) : OldExpr(pos
 
     #endregion
 
-    public virtual ValueType Converse(ValueType otherValueType, VariateManager manager) => new VoidValue(Position);
+    public virtual ValueType Converse(ValueType otherValueType, VariateManager manager) => throw new InvalidOperationError(this, $"不支持类型 '{GetType().Name}' 转换为 '{otherValueType.GetType().Name}'");
 
     public override ValueType Run(VariateManager manager) => this;
 
@@ -100,7 +101,7 @@ public abstract class ValueType(SourcePosition position = default) : OldExpr(pos
             List<object> a => new ListValue(a),
             object[] a => new ArrayValue(a.ToList()),
             long a => new IntValue((int)a),
-            _ => new VoidValue()
+            _ => throw new InvalidOperationError(new SourcePosition(), $"不支持将类型 '{value.GetType().Name}' 转换为Old8Lang值")
         };
     }
 }

@@ -40,7 +40,7 @@ public class DictionaryValue : ValueType, IOldList
 
     public override ValueType Dot(OldExpr dotExpr)
     {
-        return dotExpr is not Instance a ? new VoidValue() : a.FromClassToResult(this);
+        return dotExpr is not Instance a ? throw new InvalidOperationError(this, "字典类型只支持实例调用操作") : a.FromClassToResult(this);
     }
 
     public ValueType Get(ValueType key)
@@ -68,7 +68,7 @@ public class DictionaryValue : ValueType, IOldList
 
     public override ValueType Converse(ValueType otherValueType, VariateManager manager)
     {
-        if (otherValueType is not AnyValue typeAny) return new VoidValue();
+        if (otherValueType is not AnyValue typeAny) throw new TypeError(this, "AnyValue", otherValueType.GetType().Name);
 
         foreach (var a in Value)
         {

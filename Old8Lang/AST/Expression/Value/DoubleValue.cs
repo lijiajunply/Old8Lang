@@ -1,7 +1,6 @@
 using Old8Lang.LangParser;
 using System.Globalization;
 using System.Reflection.Emit;
-using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 
@@ -14,7 +13,7 @@ public class DoubleValue(double doubleValue, SourcePosition position = default) 
     public override ValueType Plus(ValueType otherValueType)
     {
         if (otherValueType is not IntValue and not DoubleValue)
-            return new VoidValue();
+            throw new InvalidOperationError(this, $"不支持浮点数与类型 '{otherValueType.GetType().Name}' 的加法操作");
         
         var result = Value + double.Parse(otherValueType.ToString());
         if (double.IsNaN(result) || double.IsInfinity(result))
@@ -27,7 +26,7 @@ public class DoubleValue(double doubleValue, SourcePosition position = default) 
     public override ValueType Minus(ValueType otherValueType)
     {
         if (otherValueType is not IntValue and not DoubleValue)
-            return new VoidValue();
+            throw new InvalidOperationError(this, $"不支持浮点数与类型 '{otherValueType.GetType().Name}' 的减法操作");
         
         var result = Value - double.Parse(otherValueType.ToString());
         if (double.IsNaN(result) || double.IsInfinity(result))
@@ -40,7 +39,7 @@ public class DoubleValue(double doubleValue, SourcePosition position = default) 
     public override ValueType Times(ValueType otherValueType)
     {
         if (otherValueType is not IntValue and not DoubleValue)
-            return new VoidValue();
+            throw new InvalidOperationError(this, $"不支持浮点数与类型 '{otherValueType.GetType().Name}' 的乘法操作");
         
         var result = Value * double.Parse(otherValueType.ToString());
         if (double.IsNaN(result) || double.IsInfinity(result))
@@ -68,7 +67,7 @@ public class DoubleValue(double doubleValue, SourcePosition position = default) 
             }
             return new DoubleValue(Value / doubleValue.Value);
         }
-        return new VoidValue();
+        throw new InvalidOperationError(this, $"不支持浮点数与类型 '{otherValueType.GetType().Name}' 的除法操作");
     }
 
 

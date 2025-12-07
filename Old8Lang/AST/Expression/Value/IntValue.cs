@@ -1,7 +1,6 @@
 using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using System.Text;
-using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 
@@ -35,7 +34,7 @@ public class IntValue(int intValue, SourcePosition position = default) : ValueTy
             }
         }
 
-        return new VoidValue();
+        throw new InvalidOperationError(this, $"不支持整数与类型 '{otherValueType.GetType().Name}' 的加法操作");
     }
 
     public override ValueType Minus(ValueType otherValueType)
@@ -56,7 +55,7 @@ public class IntValue(int intValue, SourcePosition position = default) : ValueTy
                 throw new OverflowError(this, "整数减法");
             }
         }
-        return new VoidValue();
+        throw new InvalidOperationError(this, $"不支持整数与类型 '{otherValueType.GetType().Name}' 的减法操作");
     }
 
     public override ValueType Times(ValueType otherValueType)
@@ -81,7 +80,7 @@ public class IntValue(int intValue, SourcePosition position = default) : ValueTy
                 throw new OverflowError(this, "整数乘法");
             }
         }
-        return new VoidValue();
+        throw new InvalidOperationError(this, $"不支持整数与类型 '{otherValueType.GetType().Name}' 的乘法操作");
     }
 
     public override ValueType Divide(ValueType otherValueType)
@@ -97,7 +96,7 @@ public class IntValue(int intValue, SourcePosition position = default) : ValueTy
             }
             return new IntValue(Value / otherInt.Value);
         }
-        return new VoidValue();
+        throw new InvalidOperationError(this, $"不支持整数与类型 '{otherValueType.GetType().Name}' 的除法操作");
     }
 
     public override bool Less(ValueType? otherValue)

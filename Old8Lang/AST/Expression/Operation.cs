@@ -55,7 +55,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
         if (l is ListValue && opera == OperationType.CONCAT)
         {
-            if (r is not Instance r1) return l.Dot(r ?? new VoidValue());
+            if (r is not Instance r1) throw new InvalidOperationError(this, "列表操作需要实例");
             List<OldExpr> values = [];
             values.AddRange(r1.Ids.Select(id => id.Run(manager)));
 
@@ -65,7 +65,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
         if (l is NativeStaticAny && opera == OperationType.CONCAT)
         {
-            if (r is not Instance r1) return l.Dot(r ?? new VoidValue());
+            if (r is not Instance r1) throw new InvalidOperationError(this, "原生静态类型操作需要实例");
             List<OldExpr> values = [];
             values.AddRange(r1.Ids.Select(id => id.Run(manager)));
 
@@ -74,10 +74,10 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         }
 
         if (l is not AnyValue && opera == OperationType.CONCAT)
-            return l?.Dot(r ?? new VoidValue())!;
+            return l?.Dot(r)!;
 
         // r get value
-        r = right?.Run(manager) ?? new VoidValue();
+        r = right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
         // (right)
         if (right is OldId oldId && l is not AnyValue)
             r = manager.GetValue(oldId);
@@ -100,7 +100,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
         // == , < , > 
         if (l is not null && r != null! && opera == OperationType.EQUALS)
-            return new BoolValue(l.Equal(r as ValueType ?? new VoidValue()));
+            return new BoolValue(l.Equal(r as ValueType ?? throw new InvalidOperationError(this, "无效的右操作数类型")));
         if (l is not null && r is not null && opera == OperationType.LESSER)
             return new BoolValue(l.Less(r as ValueType));
         if (l is not null && r is not null && opera == OperationType.GREATER)
@@ -115,7 +115,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         // r (+-*/) l
         if (l is not null && r is not null)
         {
-            if (r is not ValueType r1) return new VoidValue();
+            if (r is not ValueType r1) throw new InvalidOperationError(this, "右操作数必须是ValueType类型");
             switch (opera)
             {
                 case OperationType.PLUS:
@@ -129,7 +129,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
             }
         }
 
-        return new VoidValue();
+        throw new InvalidOperationError(this, $"不支持的操作类型: {OperaToString()}");
     }
 
 

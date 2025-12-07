@@ -32,7 +32,7 @@ public class StringValue(string context, SourcePosition position = default) : Va
             return new StringValue(sb.ToString());
         }
 
-        return new VoidValue();
+        throw new InvalidOperationError(this, $"不支持字符串与类型 '{otherValueType.GetType().Name}' 的乘法操作");
     }
 
     public override ValueType Converse(ValueType otherValueType, VariateManager manager)

@@ -1,5 +1,6 @@
 using System.Reflection;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Error;
 using Old8Lang.LangParser;
 
 namespace Old8Lang.AST.Expression.Intermediates;
@@ -24,7 +25,9 @@ public class NativeAnyValue(string dllName, string className, string path) : Val
             if (prop is null)
             {
                 var fie = ClassType?.GetField(id.IdName);
-                return fie is null ? new VoidValue() : ObjToValue(fie.GetValue(null)!);
+                if (fie is null)
+                    throw new AttributeError(this, id.IdName, ClassName);
+                return ObjToValue(fie.GetValue(null)!);
             }
 
             return ObjToValue(prop.GetValue(null)!);
@@ -33,12 +36,13 @@ public class NativeAnyValue(string dllName, string className, string path) : Val
         if (dotExpr is Instance instance)
         {
             var method = ClassType?.GetMethod(instance.Id.IdName);
-            if (method == null) return new VoidValue();
+            if (method == null)
+                throw new AttributeError(this, instance.Id.IdName, ClassName);
             var func = new FuncValue(instance.Id.IdName, method);
             return func.Run(Manager, instance.Ids, InstanceObj);
         }
 
-        return new VoidValue();
+        throw new InvalidOperationError(this, "不支持的点操作表达式类型");
     }
 
     public override ValueType Run(VariateManager manager)

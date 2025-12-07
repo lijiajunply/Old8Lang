@@ -1,6 +1,7 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
+using Old8Lang.Error;
 using Old8Lang.LangParser;
 using ValueType = Old8Lang.AST.Expression.ValueType;
 
@@ -20,7 +21,7 @@ public class OldExpr : IOldLangTree
         Position = position;
     }
     
-    public virtual ValueType Run(VariateManager manager) => new VoidValue();
+    public virtual ValueType Run(VariateManager manager) => throw new InvalidOperationError(this, "表达式未实现Run方法");
 
     public virtual void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
