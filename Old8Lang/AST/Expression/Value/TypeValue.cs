@@ -1,4 +1,5 @@
-using Old8Lang.CslyParser;
+using Old8Lang.LangParser;
+
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -10,7 +11,7 @@ public class TypeValue : ValueType
     public TypeValue(OldExpr expr) => Expr = expr;
     public TypeValue(string value) => Value = value;
 
-    public override ValueType Run(VariateManager Manager)
+    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
     {
         var result = Expr?.Run(Manager);
         if (result == null) return new VoidValue();

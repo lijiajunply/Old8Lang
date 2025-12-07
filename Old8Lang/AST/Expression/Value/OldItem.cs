@@ -1,12 +1,13 @@
+using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
-using Old8Lang.CslyParser;
+
 
 namespace Old8Lang.AST.Expression.Value;
 
 public class OldItem(OldID listId, OldExpr key) : ValueType
 {
-    public override ValueType Run(VariateManager Manager)
+    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
     {
         var a = Manager.GetValue(listId);
         OldExpr result = key.Run(Manager);

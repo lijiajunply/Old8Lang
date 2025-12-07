@@ -1,13 +1,14 @@
+using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
-using Old8Lang.CslyParser;
+
 
 namespace Old8Lang.AST.Statement;
 
 public class OldIf(OldExpr expr, BlockStatement blockStatement) : OldStatement
 {
-    public void Run(VariateManager Manager, ref bool r)
+    public void Run(Old8Lang.LangParser.VariateManager Manager, ref bool r)
     {
         if (r == false) return;
         var exprValue = expr.Run(Manager);
@@ -18,7 +19,7 @@ public class OldIf(OldExpr expr, BlockStatement blockStatement) : OldStatement
 
     public override string ToString() => $"({expr})\n {{ {blockStatement} }}";
 
-    public override void Run(VariateManager Manager)
+    public override void Run(Old8Lang.LangParser.VariateManager Manager)
     {
         blockStatement.Run(Manager);
     }

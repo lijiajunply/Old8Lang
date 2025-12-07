@@ -1,6 +1,7 @@
+using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
-using Old8Lang.CslyParser;
+
 using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
@@ -24,7 +25,7 @@ public class ArrayValue : ValueType, IOldList
 
     public ArrayValue(List<object> a) => RunResult = a.Select(ObjToValue).ToArray();
 
-    public override ValueType Run(VariateManager Manager)
+    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
     {
         for (var i = 0; i < Values.Count; i++)
             RunResult[i] = Values[i].Run(Manager);

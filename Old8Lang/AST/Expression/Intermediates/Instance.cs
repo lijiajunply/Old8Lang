@@ -1,6 +1,7 @@
+using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
-using Old8Lang.CslyParser;
+
 
 // ReSharper disable once CheckNamespace
 namespace Old8Lang.AST.Expression.Value;
@@ -10,7 +11,7 @@ public class Instance(OldID oldId, List<OldExpr> ids) : ValueType
     public readonly List<OldExpr> Ids = ids;
     public readonly OldID Id = oldId;
 
-    public override ValueType Run(VariateManager Manager)
+    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
     {
         var results = Ids.Select(t => t.Run(Manager)).ToList();
 

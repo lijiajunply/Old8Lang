@@ -158,7 +158,7 @@ if (args[0] == BasicInfo.Order["Remove"])
 
 if (args[0] == BasicInfo.Order["Compiler"])
 {
-    var interpreter = new MiniInterpreter();
+    var interpreter = new LangInterpreter();
     var sw = new Stopwatch();
     sw.Start();
     var build = interpreter.Build(Apis.FromFile(args[1]));

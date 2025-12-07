@@ -1,6 +1,7 @@
+using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
-using Old8Lang.CslyParser;
+
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -18,7 +19,7 @@ public class ListValue : ValueType, IOldList
         Value = Values.OfType<OldExpr>().ToList();
     }
 
-    public override ValueType Run(VariateManager Manager)
+    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
     {
         if(Values.Count > 0)return this;
         foreach (var expr in Value)

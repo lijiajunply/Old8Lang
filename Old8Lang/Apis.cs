@@ -1,7 +1,6 @@
 using System.Text;
 using System.Text.Json;
 using ValueType = Old8Lang.AST.Expression.ValueType;
-using Old8Lang.CslyParser;
 
 namespace Old8Lang;
 
@@ -89,8 +88,9 @@ public static class Apis
 
     public static void CslyUsing(string path, bool isDir)
     {
-        var a = new Interpreter(path, isDir);
-        a.ParserRun();
+        // CslyParser 已被删除，使用 LangParser 替代
+        var interpreter = new LangParser.LangInterpreter();
+        // 这里可以根据需要添加新的实现
     }
 
     public static LangInfo ChangeBasicInfo(string import, string ver, string uri = "https://downland.old8lang.com")

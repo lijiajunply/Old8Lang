@@ -1,0 +1,167 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
+using Old8Lang.Compiler;
+using ValueType = Old8Lang.AST.Expression.ValueType;
+
+namespace Old8Lang.LangParser;
+
+public class VariateManager
+{
+    #region Lang
+
+    public LangInfo? LangInfo { get; set; }
+    public string Path { get; set; } = "";
+
+    [NotNull] public IMiniInterpreter? Interpreter { get; set; }
+
+    #endregion
+
+    #region Variate
+
+    //private Dictionary<string, ValueType> Variates { get; set; } = new();
+    private List<string> VariateName { get; } = [];
+    private List<ValueType> Values { get; } = [];
+
+    public List<ValueType> AnyInfo { get; private init; } = [];
+
+    #endregion
+
+    #region Return
+
+    public bool IsReturn { get; set; }
+    public ValueType Result { get; set; } = new VoidValue();
+
+    #endregion
+
+    #region Block
+
+    private int Count { get; set; }
+    public bool IsFunc { get; set; }
+
+    private List<int> ChildrenNum { get; } = [];
+
+    public bool IsClass { get; set; }
+
+    #endregion
+
+    public void Set(OldID id, ValueType valueType)
+    {
+        var a1 = GetValue(id);
+        if (a1 is null)
+        {
+            //init
+            VariateName.Add(id.IdName);
+            Values.Add(valueType);
+            Count++;
+            return;
+        }
+
+        //reset
+        var count = VariateName.IndexOf(id.IdName);
+        Values[count] = valueType;
+    }
+
+    public void AddChildren()
+    {
+        ChildrenNum.Add(Count);
+    }
+
+    public void RemoveChildren()
+    {
+        var num = ChildrenNum[^1];
+
+        while (Count > num)
+        {
+            Values.RemoveAt(Count - 1);
+            VariateName.RemoveAt(Count - 1);
+            Count--;
+        }
+
+        ChildrenNum.Remove(ChildrenNum[^1]);
+    }
+
+    public ValueType? GetValue(OldID id)
+    {
+        var count = VariateName.IndexOf(id.IdName);
+        return count != -1 ? Values[count] : GetAny(id);
+    }
+
+    public ValueType? GetAny(OldID id)
+    {
+        return AnyInfo.FirstOrDefault(x =>
+        {
+            return x switch
+            {
+                FuncValue func => func.Id!.IdName == id.IdName,
+                AnyValue any => any.Id.IdName == id.IdName,
+                NativeAnyValue na => na.ClassName == id.IdName,
+                NativeStaticAny staticAny => staticAny.ClassName == id.IdName,
+                _ => false
+            };
+        });
+    }
+
+    public void AddClassAndFunc(ValueType value)
+    {
+        AnyInfo.Add(value);
+    }
+
+    public void AddFunc(ValueType value)
+    {
+        AnyInfo.Add(value);
+    }
+
+    public void AddClass(ValueType value)
+    {
+        AnyInfo.Add(value);
+    }
+
+    public void AddVariate(string name, ValueType valueType)
+    {
+        VariateName.Add(name);
+        Values.Add(valueType);
+        Count++;
+    }
+
+    public void ClearReturn()
+    {
+        IsReturn = false;
+        Result = new VoidValue();
+    }
+    
+    public void Init(Dictionary<string, ValueType> result)
+    {
+        // 初始化方法实现
+        // 将结果添加到管理器中
+        foreach (var item in result)
+        {
+            // 使用 AddVariate 方法添加变量
+            AddVariate(item.Key, item.Value);
+        }
+    }
+    
+    public VariateManager Clone()
+    {
+        // 克隆方法实现
+        var newManager = new VariateManager
+        {
+            LangInfo = LangInfo,
+            Path = Path,
+            Interpreter = Interpreter
+        };
+        return newManager;
+    }
+    
+    public VariateManager NewManger()
+    {
+        // 创建新管理器方法实现
+        return new VariateManager
+        {
+            LangInfo = LangInfo,
+            Path = Path,
+            Interpreter = Interpreter
+        };
+    }
+}

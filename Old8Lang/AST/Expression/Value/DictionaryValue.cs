@@ -1,7 +1,8 @@
+using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using System.Text;
 using Old8Lang.Compiler;
-using Old8Lang.CslyParser;
+
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -25,7 +26,7 @@ public class DictionaryValue : ValueType, IOldList
         tuples = list.Select(x => new TupleValue(x.Key, x.Value)).ToList();
     }
 
-    public override ValueType Run(VariateManager Manager)
+    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
     {
         foreach (var tuple in tuples)
         {

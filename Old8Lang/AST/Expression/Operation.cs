@@ -1,31 +1,31 @@
+using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
-using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression;
 
-public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : OldExpr
+public class Operation(OldExpr? left, OperationType opera, OldExpr right) : OldExpr
 {
     private string OperaToString()
     {
-        if (opera == OldTokenGeneric.PLUS)
+        if (opera == OperationType.PLUS)
             return "+";
-        if (opera == OldTokenGeneric.MINUS)
+        if (opera == OperationType.MINUS)
             return "-";
-        if (opera == OldTokenGeneric.TIMES)
+        if (opera == OperationType.TIMES)
             return "*";
-        if (opera == OldTokenGeneric.DIVIDE)
+        if (opera == OperationType.DIVIDE)
             return "/";
-        if (opera == OldTokenGeneric.GREATER)
+        if (opera == OperationType.GREATER)
             return ">";
-        if (opera == OldTokenGeneric.LESSER)
+        if (opera == OperationType.LESSER)
             return "<";
-        if (opera == OldTokenGeneric.EQUALS)
+        if (opera == OperationType.EQUALS)
             return "==";
-        if (opera == OldTokenGeneric.DIFFERENT)
+        if (opera == OperationType.DIFFERENT)
             return "!=";
-        if (opera == OldTokenGeneric.CONCAT)
+        if (opera == OperationType.CONCAT)
             return ".";
         return "";
     }
@@ -33,26 +33,26 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
     public override string ToString() => $"{left} {OperaToString()} {right}";
     public Type? Type { get; set; }
 
-    public override ValueType Run(VariateManager Manager)
+    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
     {
         // not right
-        if (left == null && opera == OldTokenGeneric.NOT)
+        if (left == null && opera == OperationType.NOT)
             return new BoolValue(!(right.Run(Manager) as BoolValue)!.Value);
-        if (left == null && opera == OldTokenGeneric.MINUS)
+        if (left == null && opera == OperationType.MINUS)
             return new IntValue(-(right.Run(Manager) as IntValue)!.Value);
 
         var l = left?.Run(Manager);
         var r = right;
 
         // id.id => dot_value
-        if (l is AnyValue any && opera == OldTokenGeneric.CONCAT)
+        if (l is AnyValue any && opera == OperationType.CONCAT)
         {
             if (r is Instance r1)
                 return any.Dot(r1);
             return any.Dot(r);
         }
 
-        if (l is ListValue && opera == OldTokenGeneric.CONCAT)
+        if (l is ListValue && opera == OperationType.CONCAT)
         {
             if (r is not Instance r1) return l.Dot(r);
             List<OldExpr> values = [];
@@ -62,7 +62,7 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
             return l.Dot(newInstance);
         }
 
-        if (l is NativeStaticAny && opera == OldTokenGeneric.CONCAT)
+        if (l is NativeStaticAny && opera == OperationType.CONCAT)
         {
             if (r is not Instance r1) return l.Dot(r);
             List<OldExpr> values = [];
@@ -72,7 +72,7 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
             return l.Dot(newInstance);
         }
 
-        if (l is not AnyValue && opera == OldTokenGeneric.CONCAT)
+        if (l is not AnyValue && opera == OperationType.CONCAT)
             return l?.Dot(r)!;
 
         // r get value
@@ -85,30 +85,30 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
 
 
         // left and right
-        if (l is BoolValue b && r is BoolValue expr && opera == OldTokenGeneric.AND)
+        if (l is BoolValue b && r is BoolValue expr && opera == OperationType.AND)
             return new BoolValue(b.Value && expr.Value);
 
         // left or right
-        if (l is BoolValue b1 && r is BoolValue oldBool && opera == OldTokenGeneric.OR)
+        if (l is BoolValue b1 && r is BoolValue oldBool && opera == OperationType.OR)
             return new BoolValue(b1.Value || oldBool.Value);
 
         // left xor right
-        if (l is BoolValue && r is BoolValue value && opera == OldTokenGeneric.XOR)
+        if (l is BoolValue && r is BoolValue value && opera == OperationType.XOR)
             return new BoolValue(!l.Equal(value));
 
 
         // == , < , > 
-        if (l is not null && r != null! && opera == OldTokenGeneric.EQUALS)
+        if (l is not null && r != null! && opera == OperationType.EQUALS)
             return new BoolValue(l.Equal(r as ValueType ?? new VoidValue()));
-        if (l is not null && r is not null && opera == OldTokenGeneric.LESSER)
+        if (l is not null && r is not null && opera == OperationType.LESSER)
             return new BoolValue(l.Less(r as ValueType));
-        if (l is not null && r is not null && opera == OldTokenGeneric.GREATER)
+        if (l is not null && r is not null && opera == OperationType.GREATER)
             return new BoolValue(l.Greater(r as ValueType));
-        if (l is not null && r is not null && opera == OldTokenGeneric.DIFFERENT)
+        if (l is not null && r is not null && opera == OperationType.DIFFERENT)
             return new BoolValue(!l.Equal(r as ValueType));
-        if (l is not null && r is not null && opera == OldTokenGeneric.LESS_EQUAL)
+        if (l is not null && r is not null && opera == OperationType.LESS_EQUAL)
             return new BoolValue(l.LessEqual(r as ValueType));
-        if (l is not null && r is not null && opera == OldTokenGeneric.GREATER_EQUAL)
+        if (l is not null && r is not null && opera == OperationType.GREATER_EQUAL)
             return new BoolValue(l.GreaterEqual(r as ValueType));
 
         // r (+-*/) l
@@ -117,13 +117,13 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
             if (r is not ValueType r1) return new VoidValue();
             switch (opera)
             {
-                case OldTokenGeneric.PLUS:
+                case OperationType.PLUS:
                     return l.Plus(r1);
-                case OldTokenGeneric.MINUS:
+                case OperationType.MINUS:
                     return l.Minus(r1);
-                case OldTokenGeneric.TIMES:
+                case OperationType.TIMES:
                     return l.Times(r1);
-                case OldTokenGeneric.DIVIDE:
+                case OperationType.DIVIDE:
                     return l.Divide(r1);
             }
         }
@@ -185,12 +185,12 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
             // 处理单目运算符
             switch (opera)
             {
-                case OldTokenGeneric.NOT:
+                case OperationType.NOT:
                     right.LoadILValue(ilGenerator, local);
                     ilGenerator.Emit(OpCodes.Ldc_I4_1); // 加载常量 1
                     ilGenerator.Emit(OpCodes.Xor); // 进行异或运算
                     return typeof(bool);
-                case OldTokenGeneric.MINUS:
+                case OperationType.MINUS:
                     right.LoadILValue(ilGenerator, local);
                     ilGenerator.Emit(OpCodes.Neg);
                     return typeof(bool);
@@ -201,7 +201,7 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
 
         switch (opera)
         {
-            case OldTokenGeneric.PLUS:
+            case OperationType.PLUS:
                 left!.LoadILValue(ilGenerator, local);
                 right.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Add);
@@ -212,14 +212,14 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
                     return typeof(double);
 
                 return typeof(int);
-            case OldTokenGeneric.MINUS:
+            case OperationType.MINUS:
                 left!.LoadILValue(ilGenerator, local);
                 right.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Sub);
                 if (leftType == typeof(double) || rightType == typeof(double))
                     return typeof(double);
                 return typeof(int);
-            case OldTokenGeneric.TIMES:
+            case OperationType.TIMES:
                 left!.LoadILValue(ilGenerator, local);
                 right.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Mul);
@@ -228,65 +228,65 @@ public class Operation(OldExpr? left, OldTokenGeneric opera, OldExpr right) : Ol
                 if (leftType == typeof(double) || rightType == typeof(double))
                     return typeof(double);
                 return typeof(int);
-            case OldTokenGeneric.DIVIDE:
+            case OperationType.DIVIDE:
                 left!.LoadILValue(ilGenerator, local);
                 right.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Div);
                 if (leftType == typeof(double) || rightType == typeof(double))
                     return typeof(double);
                 return typeof(int);
-            case OldTokenGeneric.GREATER:
+            case OperationType.GREATER:
                 left!.LoadILValue(ilGenerator, local);
                 right.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Cgt);
                 return typeof(bool);
-            case OldTokenGeneric.LESSER:
+            case OperationType.LESSER:
                 left!.LoadILValue(ilGenerator, local);
                 right.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Clt);
                 return typeof(bool);
-            case OldTokenGeneric.EQUALS:
+            case OperationType.EQUALS:
                 left!.LoadILValue(ilGenerator, local);
                 right.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Ceq);
                 return typeof(bool);
-            case OldTokenGeneric.DIFFERENT:
+            case OperationType.DIFFERENT:
                 left!.LoadILValue(ilGenerator, local);
                 right.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Ceq);
                 ilGenerator.Emit(OpCodes.Ldc_I4_1);
                 ilGenerator.Emit(OpCodes.Xor);
                 return typeof(bool);
-            case OldTokenGeneric.AND:
+            case OperationType.AND:
                 left!.LoadILValue(ilGenerator, local);
                 right.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.And);
                 return typeof(bool);
-            case OldTokenGeneric.OR:
+            case OperationType.OR:
                 left!.LoadILValue(ilGenerator, local);
                 right.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Or);
                 return typeof(bool);
-            case OldTokenGeneric.XOR:
+            case OperationType.XOR:
                 left!.LoadILValue(ilGenerator, local);
                 right.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Xor);
                 return typeof(bool);
-            case OldTokenGeneric.LESS_EQUAL:
+            case OperationType.LESS_EQUAL:
                 left!.LoadILValue(ilGenerator, local);
                 right.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Cgt);
                 ilGenerator.Emit(OpCodes.Ldc_I4_1);
                 ilGenerator.Emit(OpCodes.Xor);
                 return typeof(bool);
-            case OldTokenGeneric.GREATER_EQUAL:
+            case OperationType.GREATER_EQUAL:
                 left!.LoadILValue(ilGenerator, local);
                 right.LoadILValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Clt);
                 ilGenerator.Emit(OpCodes.Ldc_I4_1);
                 ilGenerator.Emit(OpCodes.Xor);
                 return typeof(bool);
-            case OldTokenGeneric.CONCAT:
+            case OperationType.CONCAT:
                 if (local.InClassEnv != null && left is OldID { IdName: "this" })
                 {
                     ilGenerator.Emit(OpCodes.Ldarg_0);

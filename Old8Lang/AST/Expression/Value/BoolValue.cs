@@ -1,6 +1,7 @@
+using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
-using Old8Lang.CslyParser;
+
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -8,7 +9,7 @@ public class BoolValue(bool value) : ValueType
 {
     public readonly bool Value = value;
     public override string ToString() => Value.ToString();
-    public override ValueType Run(VariateManager Manager) => this;
+    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager) => this;
 
     public override bool Equal(ValueType? otherValueType)
     {

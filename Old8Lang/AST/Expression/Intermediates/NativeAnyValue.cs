@@ -1,5 +1,6 @@
+using Old8Lang.LangParser;
 using System.Reflection;
-using Old8Lang.CslyParser;
+
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -40,7 +41,7 @@ public class NativeAnyValue(string dllName, string className, string path) : Val
         return new VoidValue();
     }
 
-    public override ValueType Run(VariateManager Manager)
+    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
     {
         var assembly = Assembly.LoadFile(path);
         ClassType = assembly.GetType($"{dllName}.{ClassName}")!;

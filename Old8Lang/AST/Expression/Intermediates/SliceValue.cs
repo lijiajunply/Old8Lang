@@ -1,10 +1,11 @@
-using Old8Lang.CslyParser;
+using Old8Lang.LangParser;
+
 
 namespace Old8Lang.AST.Expression.Value;
 
 public class SliceValue(OldID id, OldExpr? start = null, OldExpr? end = null) : ValueType
 {
-    public override ValueType Run(VariateManager Manager)
+    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
     {
         var value = id.Run(Manager);
         var start1 = start?.Run(Manager);

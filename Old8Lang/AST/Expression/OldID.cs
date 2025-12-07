@@ -1,7 +1,7 @@
+using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
-using Old8Lang.CslyParser;
 
 namespace Old8Lang.AST.Expression;
 
@@ -22,7 +22,7 @@ public class OldID(string name,string assumptionType = "") : OldExpr
         return IdName.GetHashCode();
     }
 
-    public override ValueType Run(VariateManager Manager) => Manager.GetValue(this) ?? new VoidValue();
+    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager) => Manager.GetValue(this) ?? new VoidValue();
 
     public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
     {

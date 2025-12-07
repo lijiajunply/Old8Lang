@@ -2,7 +2,6 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
-using Old8Lang.CslyParser;
 using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.LangParser;
@@ -351,7 +350,7 @@ public class LangParser(List<LangToken> tokens)
         Expect(LangTokenType.LeftParen);
         var arguments = ParseArgList();
         Expect(LangTokenType.RightParen);
-        return new FuncRunStatement(new Operation(new OldID(className), OldTokenGeneric.CONCAT,
+        return new FuncRunStatement(new Operation(new OldID(className), OperationType.CONCAT,
             new Instance(new OldID(funcName), arguments)));
     }
 
@@ -437,7 +436,7 @@ public class LangParser(List<LangToken> tokens)
         Expect(LangTokenType.Identifier);
         Expect(LangTokenType.PlusPlus);
         return new SetStatement(new OldID(identifier),
-            new Operation(new OldID(identifier), OldTokenGeneric.PLUS, new IntValue(1)));
+            new Operation(new OldID(identifier), OperationType.PLUS, new IntValue(1)));
     }
 
     /// <summary>
@@ -450,7 +449,7 @@ public class LangParser(List<LangToken> tokens)
         Expect(LangTokenType.Identifier);
         Expect(LangTokenType.MinusMinus);
         return new SetStatement(new OldID(identifier),
-            new Operation(new OldID(identifier), OldTokenGeneric.MINUS, new IntValue(1)));
+            new Operation(new OldID(identifier), OperationType.MINUS, new IntValue(1)));
     }
 
     /// <summary>
@@ -554,7 +553,7 @@ public class LangParser(List<LangToken> tokens)
         {
             Expect(LangTokenType.Dot);
             var right = ParsePrimary();
-            left = new Operation(left, OldTokenGeneric.CONCAT, right);
+            left = new Operation(left, OperationType.CONCAT, right);
         }
 
         return left;
@@ -632,7 +631,7 @@ public class LangParser(List<LangToken> tokens)
         {
             Expect(LangTokenType.Not);
             var expr = ParsePrimary();
-            return new Operation(expr, OldTokenGeneric.NOT, null);
+            return new Operation(expr, OperationType.NOT, null);
         }
         
         // 处理前缀 minus 表达式
@@ -640,7 +639,7 @@ public class LangParser(List<LangToken> tokens)
         {
             Expect(LangTokenType.Minus);
             var expr = ParsePrimary();
-            return new Operation(new IntValue(0), OldTokenGeneric.MINUS, expr);
+            return new Operation(new IntValue(0), OperationType.MINUS, expr);
         }
         
         // 处理 list[...] 语法

@@ -1,9 +1,10 @@
+using Old8Lang.LangParser;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
-using Old8Lang.CslyParser;
+
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -32,7 +33,7 @@ public class FuncValue : ValueType
         Func = func;
     }
 
-    public override ValueType Run(VariateManager Manager) => this;
+    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager) => this;
 
     public ValueType Run(VariateManager Manager, List<OldExpr> ids, object? obj = null)
     {

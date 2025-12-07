@@ -1,14 +1,14 @@
+using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
-using Old8Lang.CslyParser;
 using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.AST;
 
 public class OldExpr : OldLangTree
 {
-    public virtual ValueType Run(VariateManager Manager) => new VoidValue();
+    public virtual ValueType Run(Old8Lang.LangParser.VariateManager Manager) => new VoidValue();
 
     public virtual void LoadILValue(ILGenerator ilGenerator, LocalManager local)
     {

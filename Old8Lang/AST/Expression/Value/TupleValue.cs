@@ -1,4 +1,5 @@
-using Old8Lang.CslyParser;
+using Old8Lang.LangParser;
+
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -8,7 +9,7 @@ public class TupleValue(OldExpr v1, OldExpr v2) : ValueType
     public readonly OldExpr Item2 = v2;
     public ValueTuple<ValueType, ValueType> Value { get; private set; }
 
-    public override ValueType Run(VariateManager Manager)
+    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
     {
         Value = (Item1.Run(Manager), Item2.Run(Manager));
         return this;

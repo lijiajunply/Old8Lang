@@ -1,13 +1,14 @@
+using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
-using Old8Lang.CslyParser;
+
 
 namespace Old8Lang.AST.Expression;
 
 public class RangeValue(OldExpr? start, OldExpr? end) : ValueType
 {
-    public override ValueType Run(VariateManager Manager)
+    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
     {
         var results = new List<ValueType>();
 
