@@ -59,25 +59,26 @@ public static class AnyValueFuncStatic
             }));
     }
 
-    public static void ToObjIl(string context)
-    {
-        var jsonObject = JsonSerializer.Deserialize<Dictionary<string, object>>(context) ??
-                         new Dictionary<string, object>();
-        var json = new AnyValue(jsonObject.ToDictionary<KeyValuePair<string, object>, OldId, OldExpr>
-        (
-            variable => new OldId(variable.Key),
-            variable =>
-            {
-                if (variable.Value is JsonElement element)
-                {
-                    return GetJsonElement(element, null!);
-                }
-
-                return ValueType.ObjToValue(variable.Value);
-            }));
-    }
+    // public static void ToObjIl(string context)
+    // {
+    //     var jsonObject = JsonSerializer.Deserialize<Dictionary<string, object>>(context) ??
+    //                      new Dictionary<string, object>();
+    //     var json = new AnyValue(jsonObject.ToDictionary<KeyValuePair<string, object>, OldId, OldExpr>
+    //     (
+    //         variable => new OldId(variable.Key),
+    //         variable =>
+    //         {
+    //             if (variable.Value is JsonElement element)
+    //             {
+    //                 return GetJsonElement(element, null!);
+    //             }
+    //
+    //             return ValueType.ObjToValue(variable.Value);
+    //         }));
+    // }
 }
 
+[Serializable]
 public static class ValueTypeFuncStatic
 {
     extension(ValueType type)
@@ -109,76 +110,83 @@ public static class ValueTypeFuncStatic
 
         public StringValue ToStr()
         {
-            return new StringValue(type.ToString());
+            return new StringValue(type.ToDisplayString());
         }
     }
 }
 
+[Serializable]
 public static class DictionaryValueFuncStatic
 {
-    public static TupleValue Add(this DictionaryValue value, ValueType value1, ValueType value2)
+    extension(DictionaryValue value)
     {
-        value.Value.Add((value1, value2));
-        return new TupleValue(value1, value2);
-    }
-
-    public static ValueType GetValue(this DictionaryValue value, ValueType key)
-    {
-        return value.Value.First(x => x.Key.Equal(key)).Value;
-    }
-
-    public static ValueType Remove(this DictionaryValue value, ValueType key)
-    {
-        for (var i = 0; i < value.Value.Count; i++)
+        public TupleValue Add(ValueType value1, ValueType value2)
         {
-            if (!value.Value[i].Key.Equal(key)) continue;
-            var a = value.Value[i].Value;
-            value.Value.RemoveAt(i);
-            return a;
+            value.Value.Add((value1, value2));
+            return new TupleValue(value1, value2);
         }
 
-        throw new KeyError(value, "键不存在");
+        public ValueType GetValue(ValueType key)
+        {
+            return value.Value.First(x => x.Key.Equal(key)).Value;
+        }
+
+        public ValueType Remove(ValueType key)
+        {
+            for (var i = 0; i < value.Value.Count; i++)
+            {
+                if (!value.Value[i].Key.Equal(key)) continue;
+                var a = value.Value[i].Value;
+                value.Value.RemoveAt(i);
+                return a;
+            }
+
+            throw new KeyError(value, "键不存在");
+        }
     }
 }
 
 public static class ListValueFuncStatic
 {
-    public static ValueType Add(this ListValue value, ValueType valueType)
+    extension(ListValue value)
     {
-        value.Values.Add(valueType);
-        return valueType;
-    }
-
-    public static ValueType Remove(this ListValue value, ValueType num)
-    {
-        for (var i = 0; i < value.Values.Count; i++)
+        public ValueType Add(ValueType valueType)
         {
-            if (!value.Values[i].Equal(num)) continue;
-            var a = value.Values[i];
-            value.Values.RemoveAt(i);
+            value.Values.Add(valueType);
+            return valueType;
+        }
+
+        public ValueType Remove(ValueType num)
+        {
+            for (var i = 0; i < value.Values.Count; i++)
+            {
+                if (!value.Values[i].Equal(num)) continue;
+                var a = value.Values[i];
+                value.Values.RemoveAt(i);
+                return a;
+            }
+
+            throw new InvalidOperationError(value, "找不到要移除的元素");
+        }
+
+        public ValueType RemoveAt(IntValue num)
+        {
+            var a = value.Values[num.Value];
+            value.Values.RemoveAt(num.Value);
             return a;
         }
 
-        throw new InvalidOperationError(value, "找不到要移除的元素");
-    }
+        public VoidValue AddList(ListValue otherValue)
+        {
+            value.Values.AddRange(otherValue.Values);
+            return new VoidValue();
+        }
 
-    public static ValueType RemoveAt(this ListValue value, IntValue num)
-    {
-        var a = value.Values[num.Value];
-        value.Values.RemoveAt(num.Value);
-        return a;
-    }
-
-    public static VoidValue AddList(this ListValue value, ListValue otherValue)
-    {
-        value.Values.AddRange(otherValue.Values);
-        return new VoidValue();
-    }
-
-    public static ListValue Sort(this ListValue value)
-    {
-        QuickSort(value.Values, 0, value.Values.Count - 1);
-        return value;
+        public ListValue Sort()
+        {
+            QuickSort(value.Values, 0, value.Values.Count - 1);
+            return value;
+        }
     }
 
     private static void QuickSort(List<ValueType> nums, int left, int right)

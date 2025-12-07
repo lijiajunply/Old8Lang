@@ -84,6 +84,8 @@ public abstract class ValueType(SourcePosition position = default) : OldExpr(pos
     {
         return (T)GetValue();
     }
+    
+    public virtual string ToDisplayString() => ToString(); // 默认使用ToString()，子类可以重写
 
     public static ValueType ObjToValue(object? value)
     {

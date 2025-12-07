@@ -13,7 +13,8 @@ public class StringValue(string context, SourcePosition position = default) : Va
         .Replace(@"\\", "\\");
 
     public override string ToString() => $"\"{Value}\""; // 带引号的字符串，符合 Old8Lang 语法
-    public override ValueType Plus(ValueType otherValueType) => new StringValue(Value + otherValueType);
+    public override string ToDisplayString() => Value; // 不带引号的字符串，用于显示和打印
+    public override ValueType Plus(ValueType otherValueType) => new StringValue(Value + otherValueType.ToDisplayString());
 
     public override bool Equal(ValueType? otherValueType)
     {

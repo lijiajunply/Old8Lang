@@ -47,8 +47,8 @@ public class Instance(OldId oldId, List<OldExpr> ids, SourcePosition position = 
                     return new VoidValue();
                 }
 
-                var value = results[0].ToString();
-                for (var i = 1; i < results.Count; i++) value += results[i].ToString();
+                var value = results[0].ToDisplayString();
+                for (var i = 1; i < results.Count; i++) value += results[i].ToDisplayString();
 
                 manager.Interpreter.UseClass.WriteLine(value);
                 return new VoidValue();
@@ -57,8 +57,8 @@ public class Instance(OldId oldId, List<OldExpr> ids, SourcePosition position = 
             {
                 if (results.Count == 0) return new VoidValue();
 
-                var value = results[0].ToString();
-                for (var i = 1; i < results.Count; i++) value += results[i].ToString();
+                var value = results[0].ToDisplayString();
+                for (var i = 1; i < results.Count; i++) value += results[i].ToDisplayString();
 
                 manager.Interpreter.UseClass.Write(value);
                 return new VoidValue();
@@ -66,7 +66,15 @@ public class Instance(OldId oldId, List<OldExpr> ids, SourcePosition position = 
             case "Compiler":
             {
                 if (results.Count == 0) return new VoidValue();
-                var value = results[0].ToString();
+                string value;
+                if (results[0] is StringValue sv) // 使用不同的变量名，避免冲突
+                {
+                    value = sv.Value; // 直接访问Value属性，避免带引号
+                }
+                else
+                {
+                    value = results[0].ToString();
+                }
                 var statement = manager.Interpreter.Build(code: value);
                 var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
                 var ilGenerator = dynamicMethod.GetILGenerator();

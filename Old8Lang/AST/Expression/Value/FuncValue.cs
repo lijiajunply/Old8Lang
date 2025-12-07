@@ -1,12 +1,10 @@
 using Old8Lang.LangParser;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Text;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
-
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -21,14 +19,16 @@ public class FuncValue : ValueType
 
     private readonly FuncValue? Func;
 
-    public FuncValue(OldId? id, List<OldId> ids, BlockStatement blockStatement, SourcePosition position = default) : base(position)
+    public FuncValue(OldId? id, List<OldId> ids, BlockStatement blockStatement, SourcePosition position = default) :
+        base(position)
     {
         Id = id;
         Ids = ids;
         BlockStatement = blockStatement;
     }
 
-    public FuncValue(string idName, MethodInfo methodInfo, FuncValue? func = null, SourcePosition position = default) : base(position)
+    public FuncValue(string idName, MethodInfo methodInfo, FuncValue? func = null,
+        SourcePosition position = default) : base(position)
     {
         Id = new OldId(idName);
         Method = methodInfo;
@@ -47,10 +47,10 @@ public class FuncValue : ValueType
             var actualParams = ids.Count;
             if (expectedParams != actualParams)
             {
-                throw new ArgumentError(Position, 
+                throw new ArgumentError(Position,
                     $"方法 '{Method.Name}' 期望 {expectedParams} 个参数，但实际提供了 {actualParams} 个参数");
             }
-            
+
             var values = ids.Select(expr => expr.Run(variateManagerFunc)).ToList();
             var a = Apis.ListToObjects(values).ToArray();
             var invoke = Method?.Invoke(obj, a);
@@ -73,7 +73,7 @@ public class FuncValue : ValueType
             var actualParams = ids.Count;
             if (expectedParams != actualParams)
             {
-                throw new ArgumentError(Position, 
+                throw new ArgumentError(Position,
                     $"函数 '{Id?.IdName}' 期望 {expectedParams} 个参数，但实际提供了 {actualParams} 个参数");
             }
         }
@@ -147,13 +147,13 @@ public class FuncValue : ValueType
             // 这里假设Method已经是正确的委托类型
             return;
         }
-        
+
         // 如果是Old8Lang函数，需要加载函数委托
-        var funcMethod = local.DelegateVar.GetValueOrDefault(Id?.IdName);
+        var funcMethod = local.DelegateVar!.GetValueOrDefault(Id?.IdName);
         if (funcMethod != null)
         {
             // 函数已经被编译为动态方法，直接调用
-            return;
+            ilGenerator.Emit(OpCodes.Ldsfld, funcMethod);
         }
     }
 

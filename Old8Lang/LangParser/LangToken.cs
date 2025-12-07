@@ -136,7 +136,28 @@ public static class LangTokenizer
                         if (i + 1 < code.Length)
                         {
                             i++;
-                            sb.Append(code[i]);
+                            // 处理常见转义序列
+                            switch (code[i])
+                            {
+                                case 'n':
+                                    sb.Append('\n');
+                                    break;
+                                case 't':
+                                    sb.Append('\t');
+                                    break;
+                                case 'r':
+                                    sb.Append('\r');
+                                    break;
+                                case '\\':
+                                    sb.Append('\\');
+                                    break;
+                                case '"':
+                                    sb.Append('"');
+                                    break;
+                                default:
+                                    sb.Append(code[i]);
+                                    break;
+                            }
                         }
                     }
                     else if (code[i] == '"') // 遇到未转义的双引号，结束字符串
