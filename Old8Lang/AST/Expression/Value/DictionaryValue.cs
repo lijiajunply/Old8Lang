@@ -1,6 +1,7 @@
 using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using System.Text;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 
 
@@ -8,29 +9,29 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class DictionaryValue : ValueType, IOldList
 {
-    private readonly List<TupleValue> tuples;
+    private readonly List<TupleValue> Tuples;
     public readonly List<(ValueType Key, ValueType Value)> Value = [];
 
     public DictionaryValue(List<TupleValue> tuples)
     {
-        this.tuples = tuples;
+        this.Tuples = tuples;
     }
 
     public DictionaryValue()
     {
-        tuples = [];
+        Tuples = [];
     }
 
     public DictionaryValue(List<KeyValuePair<OldExpr, OldExpr>> list)
     {
-        tuples = list.Select(x => new TupleValue(x.Key, x.Value)).ToList();
+        Tuples = list.Select(x => new TupleValue(x.Key, x.Value)).ToList();
     }
 
-    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
+    public override ValueType Run(VariateManager manager)
     {
-        foreach (var tuple in tuples)
+        foreach (var tuple in Tuples)
         {
-            tuple.Run(Manager);
+            tuple.Run(manager);
             Value.Add(tuple.Value);
         }
 
@@ -57,7 +58,7 @@ public class DictionaryValue : ValueType, IOldList
 
     public override string ToString()
     {
-        if (Value.Count == 0) return "{" + Apis.ListToString(tuples) + "}";
+        if (Value.Count == 0) return "{" + Apis.ListToString(Tuples) + "}";
         var sb = new StringBuilder();
         foreach (var valueTuple in Value)
             sb.Append($"{valueTuple.Key},{valueTuple.Value};");
@@ -65,16 +66,16 @@ public class DictionaryValue : ValueType, IOldList
         return "{" + sb + "}";
     }
 
-    public override ValueType Converse(ValueType otherValueType, VariateManager Manager)
+    public override ValueType Converse(ValueType otherValueType, VariateManager manager)
     {
         if (otherValueType is not AnyValue typeAny) return new VoidValue();
 
         foreach (var a in Value)
         {
-            var aKey = a.Key.Run(Manager);
-            var aValue = a.Value.Run(Manager);
+            var aKey = a.Key.Run(manager);
+            var aValue = a.Value.Run(manager);
             if (aKey is not StringValue s) continue;
-            typeAny.Set(new OldID(s.Value), aValue);
+            typeAny.Set(new OldId(s.Value), aValue);
         }
 
         return typeAny;
@@ -94,7 +95,7 @@ public class DictionaryValue : ValueType, IOldList
 
     public override Type OutputType(LocalManager local) => typeof(Dictionary<object, object>);
 
-    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         var listConstructor = typeof(Dictionary<object, object>).GetConstructor(Type.EmptyTypes)!;
         ilGenerator.Emit(OpCodes.Newobj, listConstructor); // 创建 List<int> 实例
@@ -104,13 +105,13 @@ public class DictionaryValue : ValueType, IOldList
 
         // 向 List<int> 中添加元素
         var addMethod = typeof(Dictionary<object, object>).GetMethod("Add")!;
-        foreach (var expr in tuples)
+        foreach (var expr in Tuples)
         {
             ilGenerator.Emit(OpCodes.Ldloc, l.LocalIndex);
-            expr.Item1.LoadILValue(ilGenerator, local);
+            expr.Item1.LoadIlValue(ilGenerator, local);
             var t = expr.Item1.OutputType(local);
             ilGenerator.Emit(OpCodes.Box, t!);
-            expr.Item2.LoadILValue(ilGenerator, local);
+            expr.Item2.LoadIlValue(ilGenerator, local);
             t = expr.Item2.OutputType(local);
             ilGenerator.Emit(OpCodes.Box, t!);
             ilGenerator.Emit(OpCodes.Callvirt, addMethod); // 调用 Add 方法

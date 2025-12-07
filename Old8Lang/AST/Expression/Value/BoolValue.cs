@@ -9,7 +9,7 @@ public class BoolValue(bool value) : ValueType
 {
     public readonly bool Value = value;
     public override string ToString() => Value.ToString();
-    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager) => this;
+    public override ValueType Run(VariateManager manager) => this;
 
     public override bool Equal(ValueType? otherValueType)
     {
@@ -18,7 +18,7 @@ public class BoolValue(bool value) : ValueType
         return false;
     }
 
-    public override ValueType Converse(ValueType otherValueType, VariateManager _)
+    public override ValueType Converse(ValueType otherValueType, VariateManager manager)
     {
         if (otherValueType is not TypeValue value) throw new Exception("the value is not a type");
 
@@ -33,7 +33,7 @@ public class BoolValue(bool value) : ValueType
         };
     }
     
-    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         ilGenerator.Emit(Value ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
     }

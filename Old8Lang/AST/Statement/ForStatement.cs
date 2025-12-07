@@ -1,7 +1,6 @@
 using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using System.Text;
-using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 
@@ -15,13 +14,13 @@ public class ForStatement(
     BlockStatement blockStatement)
     : OldStatement
 {
-    public override void Run(VariateManager Manager)
+    public override void Run(VariateManager manager)
     {
-        Manager.AddChildren();
-        setStatement.Run(Manager);
+        manager.AddChildren();
+        setStatement.Run(manager);
         while (true)
         {
-            var varExpr = expr.Run(Manager);
+            var varExpr = expr.Run(manager);
             bool expr1;
             if (varExpr is BoolValue value)
                 expr1 = value.Value;
@@ -29,19 +28,19 @@ public class ForStatement(
                 break;
             if (expr1)
             {
-                blockStatement.Run(Manager);
-                statement.Run(Manager);
+                blockStatement.Run(manager);
+                statement.Run(manager);
             }
             else
                 break;
         }
 
-        Manager.RemoveChildren();
+        manager.RemoveChildren();
     }
 
-    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        setStatement.GenerateIL(ilGenerator, local);
+        setStatement.GenerateIl(ilGenerator, local);
 
         // 创建循环开始标签
         var loopStart = ilGenerator.DefineLabel();
@@ -51,12 +50,12 @@ public class ForStatement(
         ilGenerator.MarkLabel(loopStart);
 
         // 检查循环条件
-        expr.LoadILValue(ilGenerator, local);
+        expr.LoadIlValue(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Brfalse, loopEnd); // 如果 loopCounter >= 10，跳转到 loopEnd
         
-        blockStatement.GenerateIL(ilGenerator, local);
+        blockStatement.GenerateIl(ilGenerator, local);
 
-        statement.GenerateIL(ilGenerator, local);
+        statement.GenerateIl(ilGenerator, local);
 
         // 跳转回循环开始
         ilGenerator.Emit(OpCodes.Br, loopStart); // 跳转到 loopStart

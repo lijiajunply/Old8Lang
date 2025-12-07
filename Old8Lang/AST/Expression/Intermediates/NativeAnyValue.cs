@@ -1,8 +1,8 @@
-using Old8Lang.LangParser;
 using System.Reflection;
+using Old8Lang.AST.Expression.Value;
+using Old8Lang.LangParser;
 
-
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.Intermediates;
 
 /// <summary>
 /// 适用于有构造函数的类
@@ -14,11 +14,11 @@ public class NativeAnyValue(string dllName, string className, string path) : Val
     private ConstructorInfo? Constructor { get; set; }
     private object? InstanceObj { get; set; }
 
-    private VariateManager manager = new();
+    private VariateManager Manager = new();
 
     public override ValueType Dot(OldExpr dotExpr)
     {
-        if (dotExpr is OldID id)
+        if (dotExpr is OldId id)
         {
             var prop = ClassType?.GetProperty(id.IdName);
             if (prop is null)
@@ -35,19 +35,19 @@ public class NativeAnyValue(string dllName, string className, string path) : Val
             var method = ClassType?.GetMethod(instance.Id.IdName);
             if (method == null) return new VoidValue();
             var func = new FuncValue(instance.Id.IdName, method);
-            return func.Run(manager, instance.Ids, InstanceObj);
+            return func.Run(Manager, instance.Ids, InstanceObj);
         }
 
         return new VoidValue();
     }
 
-    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
+    public override ValueType Run(VariateManager manager)
     {
         var assembly = Assembly.LoadFile(path);
         ClassType = assembly.GetType($"{dllName}.{ClassName}")!;
         if (ClassType?.GetConstructors() is not null)
             Constructor = ClassType.GetConstructors()[0];
-        manager = Manager.Clone();
+        Manager = manager.Clone();
         return this;
     }
 

@@ -11,12 +11,12 @@ public class FuncInit(FuncValue a) : OldStatement
 {
     public readonly FuncValue FuncValue = a;
 
-    public override void Run(VariateManager Manager)
+    public override void Run(VariateManager manager)
     {
-        Manager.AddClassAndFunc(FuncValue);
+        manager.AddClassAndFunc(FuncValue);
     }
 
-    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 获取方法的名称和参数类型
         var methodName = FuncValue.Id!.IdName;
@@ -49,25 +49,25 @@ public class FuncInit(FuncValue a) : OldStatement
         var funcLocal = new LocalManager();
 
         // 创建方法的 IL 发射器
-        var methodIL = methodBuilder.GetILGenerator();
+        var methodIl = methodBuilder.GetILGenerator();
 
         for (var i = 0; i < FuncValue.Ids!.Count; i++)
         {
             var id = FuncValue.Ids[i];
-            var localVar = methodIL.DeclareLocal(parameterTypes[i]);
+            var localVar = methodIl.DeclareLocal(parameterTypes[i]);
             funcLocal.AddLocalVar(id.IdName, localVar);
-            methodIL.Emit(OpCodes.Ldarg, i);
+            methodIl.Emit(OpCodes.Ldarg, i);
 
-            methodIL.Emit(OpCodes.Stloc, localVar);
+            methodIl.Emit(OpCodes.Stloc, localVar);
         }
 
         funcLocal.DelegateVar.Add(methodName, methodBuilder);
         
         // 生成方法体的 IL 代码
-        FuncValue.BlockStatement.GenerateIL(methodIL, funcLocal);
+        FuncValue.BlockStatement.GenerateIl(methodIl, funcLocal);
 
         // 返回
-        methodIL.Emit(OpCodes.Ret);
+        methodIl.Emit(OpCodes.Ret);
 
         var dynamicType = typeBuilder.CreateType();
 

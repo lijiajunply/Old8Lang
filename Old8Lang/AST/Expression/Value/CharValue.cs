@@ -28,7 +28,7 @@ public class CharValue(char value) : ValueType
 
     public override object GetValue() => Value;
 
-    public override ValueType Converse(ValueType otherValueType, VariateManager _)
+    public override ValueType Converse(ValueType otherValueType, VariateManager manager)
     {
         if (otherValueType is not TypeValue value) throw new Exception("the value is not a type");
 
@@ -43,7 +43,7 @@ public class CharValue(char value) : ValueType
         };
     }
     
-    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         ilGenerator.Emit(OpCodes.Ldc_I4, Convert.ToInt32(Value));
     }

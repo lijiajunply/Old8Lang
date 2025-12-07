@@ -1,9 +1,8 @@
-using Old8Lang.LangParser;
 using Old8Lang.Error;
 
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.Intermediates;
 
-public class ErrorValue(OldLangTree statement, OldLangTree value) : ValueType
+public class ErrorValue(IOldLangTree statement, IOldLangTree value) : ValueType
 {
     private readonly ErrorException ErrorException = new(statement, value);
 

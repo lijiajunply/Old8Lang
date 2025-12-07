@@ -2,6 +2,7 @@ using Old8Lang.LangParser;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
 
@@ -10,16 +11,16 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class FuncValue : ValueType
 {
-    public readonly OldID? Id;
+    public readonly OldId? Id;
     public readonly BlockStatement BlockStatement = new([]);
 
-    public readonly List<OldID>? Ids;
+    public readonly List<OldId>? Ids;
 
     public readonly MethodInfo? Method;
 
     private readonly FuncValue? Func;
 
-    public FuncValue(OldID? id, List<OldID> ids, BlockStatement blockStatement)
+    public FuncValue(OldId? id, List<OldId> ids, BlockStatement blockStatement)
     {
         Id = id;
         Ids = ids;
@@ -28,18 +29,18 @@ public class FuncValue : ValueType
 
     public FuncValue(string idName, MethodInfo methodInfo, FuncValue? func = null)
     {
-        Id = new OldID(idName);
+        Id = new OldId(idName);
         Method = methodInfo;
         Func = func;
     }
 
-    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager) => this;
+    public override ValueType Run(VariateManager manager) => this;
 
-    public ValueType Run(VariateManager Manager, List<OldExpr> ids, object? obj = null)
+    public ValueType Run(VariateManager variateManagerFunc, List<OldExpr> ids, object? obj = null)
     {
         if (Method != null)
         {
-            var values = ids.Select(expr => expr.Run(Manager)).ToList();
+            var values = ids.Select(expr => expr.Run(variateManagerFunc)).ToList();
             var a = Apis.ListToObjects(values).ToArray();
             var invoke = Method?.Invoke(obj, a);
 
@@ -54,21 +55,21 @@ public class FuncValue : ValueType
             return manager.Result;
         }
 
-        if (Manager.IsClass)
+        if (variateManagerFunc.IsClass)
         {
-            Manager.AddChildren();
+            variateManagerFunc.AddChildren();
             if (Ids != null && Ids.Count != 0)
                 for (var i = 0; i < ids.Count; i++)
-                    Manager.Set(Ids[i], ids[i].Run(Manager));
-            BlockStatement.Run(Manager);
-            Manager.RemoveChildren();
-            return Manager.Result;
+                    variateManagerFunc.Set(Ids[i], ids[i].Run(variateManagerFunc));
+            BlockStatement.Run(variateManagerFunc);
+            variateManagerFunc.RemoveChildren();
+            return variateManagerFunc.Result;
         }
 
-        var variateManager = Manager.NewManger();
+        var variateManager = variateManagerFunc.NewManger();
         if (Ids != null && Ids.Count != 0)
             for (var i = 0; i < ids.Count; i++)
-                variateManager.Set(Ids[i], ids[i].Run(Manager));
+                variateManager.Set(Ids[i], ids[i].Run(variateManagerFunc));
         BlockStatement.Run(variateManager);
         return variateManager.Result;
     }
@@ -116,30 +117,30 @@ public class FuncValue : ValueType
         return $"public static dynamic {Id} ({builder}) \n {{ {BlockStatement} }}";
     }
 
-    public void LoadIL(MethodBuilder methodBuilder,LocalManager local)
+    public void LoadIl(MethodBuilder methodBuilder, LocalManager local)
     {
         //var funcLocal = new LocalManager();
         var parameterTypes = Ids!.Select(item => item.OutputType(local)).ToArray();
 
         // 创建方法的 IL 发射器
-        var methodIL = methodBuilder.GetILGenerator();
-        
+        var methodIl = methodBuilder.GetILGenerator();
+
         for (var i = 1; i <= Ids!.Count; i++)
         {
-            var id = Ids[i-1];
-            var localVar = methodIL.DeclareLocal(parameterTypes[i-1]);
+            var id = Ids[i - 1];
+            var localVar = methodIl.DeclareLocal(parameterTypes[i - 1]);
             local.AddLocalVar(id.IdName, localVar);
-            methodIL.Emit(OpCodes.Ldarg, i);
+            methodIl.Emit(OpCodes.Ldarg, i);
 
-            methodIL.Emit(OpCodes.Stloc, localVar);
+            methodIl.Emit(OpCodes.Stloc, localVar);
         }
 
         local.DelegateVar.Add(Id!.IdName, methodBuilder);
 
         // 生成方法体的 IL 代码
-        BlockStatement.GenerateIL(methodIL, local);
+        BlockStatement.GenerateIl(methodIl, local);
 
         // 返回
-        methodIL.Emit(OpCodes.Ret);
+        methodIl.Emit(OpCodes.Ret);
     }
 }

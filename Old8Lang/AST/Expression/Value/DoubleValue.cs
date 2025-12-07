@@ -1,6 +1,7 @@
 using Old8Lang.LangParser;
 using System.Globalization;
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 
 
@@ -78,7 +79,7 @@ public class DoubleValue(double doubleValue) : ValueType
 
     public override object GetValue() => Value;
 
-    public override ValueType Converse(ValueType otherValueType, VariateManager _)
+    public override ValueType Converse(ValueType otherValueType, VariateManager manager)
     {
         if (otherValueType is not TypeValue value) throw new Exception("the value is not a type");
 
@@ -93,7 +94,7 @@ public class DoubleValue(double doubleValue) : ValueType
         };
     }
     
-    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         ilGenerator.Emit(OpCodes.Ldc_R8, Value);
     }

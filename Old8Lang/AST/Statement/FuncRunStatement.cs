@@ -15,29 +15,29 @@ public class FuncRunStatement : OldStatement
     public FuncRunStatement(Instance instance) => Instance = instance;
     public FuncRunStatement(Operation operation) => Operation = operation;
 
-    public override void Run(VariateManager Manager)
+    public override void Run(VariateManager manager)
     {
         if (Operation == null)
         {
-            Instance?.Run(Manager);
+            Instance?.Run(manager);
             return;
         }
 
-        Operation.Run(Manager);
+        Operation.Run(manager);
     }
 
-    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         if (Operation == null)
         {
             if (Instance == null) return;
-            Instance.LoadILValue(ilGenerator, local);
+            Instance.LoadIlValue(ilGenerator, local);
             // 销毁栈上的值
             if (Instance.OutputType(local) != typeof(void)) ilGenerator.Emit(OpCodes.Pop);
             return;
         }
 
-        Operation.LoadILValue(ilGenerator, local);
+        Operation.LoadIlValue(ilGenerator, local);
     }
 
     public override OldStatement this[int index] => this;

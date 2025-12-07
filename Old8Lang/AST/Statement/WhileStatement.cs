@@ -11,12 +11,12 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public class WhileStatement(OldExpr expr, BlockStatement blockStatement) : OldStatement
 {
-    public override void Run(VariateManager Manager)
+    public override void Run(VariateManager manager)
     {
-        Manager.AddChildren();
+        manager.AddChildren();
         while (true)
         {
-            var value = expr.Run(Manager);
+            var value = expr.Run(manager);
             bool expr1;
             if (value is BoolValue varBool)
             {
@@ -29,17 +29,17 @@ public class WhileStatement(OldExpr expr, BlockStatement blockStatement) : OldSt
 
             if (expr1)
             {
-                blockStatement.Run(Manager);
+                blockStatement.Run(manager);
             }
             else
             {
-                Manager.RemoveChildren();
+                manager.RemoveChildren();
                 return;
             }
         }
     }
 
-    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 创建循环开始标签
         var loopStart = ilGenerator.DefineLabel();
@@ -49,10 +49,10 @@ public class WhileStatement(OldExpr expr, BlockStatement blockStatement) : OldSt
         ilGenerator.MarkLabel(loopStart);
 
         // 检查循环条件
-        expr.LoadILValue(ilGenerator, local);
+        expr.LoadIlValue(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Brfalse, loopEnd); // 如果 loopCounter >= 10，跳转到 loopEnd
         
-        blockStatement.GenerateIL(ilGenerator, local);
+        blockStatement.GenerateIl(ilGenerator, local);
 
         // 跳转回循环开始
         ilGenerator.Emit(OpCodes.Br, loopStart); // 跳转到 loopStart

@@ -1,7 +1,7 @@
 using Old8Lang.LangParser;
-using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 
 
@@ -9,41 +9,41 @@ namespace Old8Lang.AST.Expression.Value;
 
 public class AnyValue : ValueType
 {
-    public readonly Dictionary<OldID, OldExpr> Variates;
+    public readonly Dictionary<OldId, OldExpr> Variates;
     public readonly Dictionary<string, ValueType> Result = new();
-    public readonly OldID Id;
+    public readonly OldId Id;
 
-    public readonly VariateManager manager;
+    public readonly VariateManager Manager;
 
-    public AnyValue(OldID id, Dictionary<OldID, OldExpr> variates)
+    public AnyValue(OldId id, Dictionary<OldId, OldExpr> variates)
     {
         Variates = variates;
         Id = id;
-        manager = new VariateManager();
-        Run(manager);
-        manager.Init(Result);
-        manager.IsClass = true;
+        Manager = new VariateManager();
+        Run(Manager);
+        Manager.Init(Result);
+        Manager.IsClass = true;
     }
 
-    public AnyValue(Dictionary<OldID, OldExpr> variates)
+    public AnyValue(Dictionary<OldId, OldExpr> variates)
     {
         Variates = variates;
-        Id = new OldID("JsonNative");
-        manager = new VariateManager();
+        Id = new OldId("JsonNative");
+        Manager = new VariateManager();
         foreach (var variate in variates)
         {
             if (variate.Value is ValueType valueType) Result.Add(variate.Key.IdName, valueType);
         }
 
-        manager.Init(Result);
-        manager.IsClass = true;
+        Manager.Init(Result);
+        Manager.IsClass = true;
     }
 
-    public sealed override ValueType Run(VariateManager Manager)
+    public sealed override ValueType Run(VariateManager manager)
     {
-        manager.AnyInfo.AddRange(Manager.AnyInfo.Where(x => x is not FuncValue).ToList());
+        Manager.AnyInfo.AddRange(manager.AnyInfo.Where(x => x is not FuncValue).ToList());
         foreach (var variable in Variates.Keys)
-            Result.Add(variable.IdName, Variates[variable].Run(Manager));
+            Result.Add(variable.IdName, Variates[variable].Run(manager));
         return this;
     }
 
@@ -51,32 +51,32 @@ public class AnyValue : ValueType
     {
         switch (dotExpr)
         {
-            case OldID id:
+            case OldId id:
             {
-                var a = manager.GetValue(id);
+                var a = Manager.GetValue(id);
                 if (a == null) throw new Exception("not found");
-                return a.Run(manager);
+                return a.Run(Manager);
             }
             case FuncValue func:
             {
                 if (func.Id?.IdName == "GetType")
                     return new TypeValue(TypeToString());
-                return func.Run(manager);
+                return func.Run(Manager);
             }
             default:
-                return dotExpr.Run(manager);
+                return dotExpr.Run(Manager);
         }
     }
 
-    public void Set(OldID id, ValueType valueType) => manager.Set(id, valueType);
+    public void Set(OldId id, ValueType valueType) => Manager.Set(id, valueType);
 
-    public override ValueType Converse(ValueType otherValueType, VariateManager Manager)
+    public override ValueType Converse(ValueType otherValueType, VariateManager manager)
     {
         if (otherValueType is not AnyValue typeAny) return new VoidValue();
 
         foreach (var a in Result)
         {
-            typeAny.Set(new OldID(a.Key), a.Value);
+            typeAny.Set(new OldId(a.Key), a.Value);
         }
 
         return typeAny;
@@ -96,7 +96,7 @@ public class AnyValue : ValueType
         return builder.ToString();
     }
 
-    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
     }
 

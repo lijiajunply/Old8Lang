@@ -9,42 +9,42 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
 
-public class OtherVariateChanging(OldID id, OldExpr sumId, OldExpr expr) : OldStatement
+public class OtherVariateChanging(OldId id, OldExpr sumId, OldExpr expr) : OldStatement
 {
-    public override void Run(VariateManager Manager)
+    public override void Run(VariateManager manager)
     {
-        var a = Manager.GetValue(id);
+        var a = manager.GetValue(id);
         if (a is AnyValue any)
         {
-            if (sumId is not OldID sum) throw new TypeError(this, this);
-            var result = expr.Run(Manager);
+            if (sumId is not OldId sum) throw new TypeError(this, this);
+            var result = expr.Run(manager);
             any.Set(sum, result);
         }
 
         if (a is ArrayValue array)
         {
-            var s = sumId.Run(Manager);
+            var s = sumId.Run(manager);
             if (s is not IntValue sum) throw new TypeError(this, this);
-            var result = expr.Run(Manager);
+            var result = expr.Run(manager);
             array.Set(sum, result);
         }
 
         if (a is DictionaryValue dictionary)
         {
-            var s = sumId.Run(Manager);
-            var result = expr.Run(Manager);
+            var s = sumId.Run(manager);
+            var result = expr.Run(manager);
             dictionary.Update(s, result);
         }
     }
 
-    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         if (local.InClassEnv != null && id.IdName == "this")
         {
             ilGenerator.Emit(OpCodes.Ldarg_0);
-            if (sumId is OldID sum1)
+            if (sumId is OldId sum1)
             {
-                expr.LoadILValue(ilGenerator, local);
+                expr.LoadIlValue(ilGenerator, local);
                 var field = local.InClassEnv.GetField(sum1.IdName);
                 ilGenerator.Emit(OpCodes.Stfld, field!);
                 return;
@@ -52,26 +52,26 @@ public class OtherVariateChanging(OldID id, OldExpr sumId, OldExpr expr) : OldSt
 
             if (sumId is StringValue stringValue1)
             {
-                expr.LoadILValue(ilGenerator, local);
+                expr.LoadIlValue(ilGenerator, local);
                 var field = local.InClassEnv.GetField(stringValue1.Value);
                 ilGenerator.Emit(OpCodes.Stfld, field!);
             }
             return;
         }
-        id.LoadILValue(ilGenerator, local);
+        id.LoadIlValue(ilGenerator, local);
         var leftType = id.OutputType(local);
         
         if (leftType.IsAssignableTo(typeof(IEnumerable)))
         {
-            sumId.LoadILValue(ilGenerator, local);
-            expr.LoadILValue(ilGenerator, local);
+            sumId.LoadIlValue(ilGenerator, local);
+            expr.LoadIlValue(ilGenerator, local);
             ilGenerator.Emit(OpCodes.Stelem_I4);
             return;
         }
 
-        if (sumId is OldID sum)
+        if (sumId is OldId sum)
         {
-            expr.LoadILValue(ilGenerator, local);
+            expr.LoadIlValue(ilGenerator, local);
             var field = leftType.GetField(sum.IdName);
             ilGenerator.Emit(OpCodes.Stfld, field!);
             return;
@@ -79,7 +79,7 @@ public class OtherVariateChanging(OldID id, OldExpr sumId, OldExpr expr) : OldSt
 
         if (sumId is StringValue stringValue)
         {
-            expr.LoadILValue(ilGenerator, local);
+            expr.LoadIlValue(ilGenerator, local);
             var field = leftType.GetField(stringValue.Value);
             ilGenerator.Emit(OpCodes.Stfld, field!);
         }

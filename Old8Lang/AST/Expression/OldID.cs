@@ -1,11 +1,10 @@
-using Old8Lang.LangParser;
 using System.Reflection.Emit;
-using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Expression;
 
-public class OldID(string name,string assumptionType = "") : OldExpr
+public class OldId(string name,string assumptionType = "") : OldExpr
 {
     public readonly string IdName = name;
     public override string ToString() => IdName;
@@ -13,7 +12,7 @@ public class OldID(string name,string assumptionType = "") : OldExpr
 
     public override bool Equals(object? obj)
     {
-        var a = obj as OldID;
+        var a = obj as OldId;
         return a?.IdName == IdName;
     }
 
@@ -22,9 +21,9 @@ public class OldID(string name,string assumptionType = "") : OldExpr
         return IdName.GetHashCode();
     }
 
-    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager) => Manager.GetValue(this) ?? new VoidValue();
+    public override ValueType Run(LangParser.VariateManager manager) => manager.GetValue(this) ?? new VoidValue();
 
-    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         var value = local.GetLocalVar(IdName);
         if (value is null) return;

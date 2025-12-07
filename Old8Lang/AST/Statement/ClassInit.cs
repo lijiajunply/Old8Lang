@@ -9,9 +9,9 @@ namespace Old8Lang.AST.Statement;
 
 public class ClassInit(AnyValue anyValue) : OldStatement
 {
-    public override void Run(VariateManager Manager) => Manager.AddClassAndFunc(anyValue);
+    public override void Run(VariateManager manager) => manager.AddClassAndFunc(anyValue);
 
-    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         var assemblyName = new AssemblyName("DynamicAssembly");
         var assemblyBuilder =
@@ -60,7 +60,7 @@ public class ClassInit(AnyValue anyValue) : OldStatement
             var method = typeBuilder.DefineMethod(value.Id!.IdName, MethodAttributes.Public);
             method.SetReturnType(value.OutputType(funcLocal));
             method.SetParameters(parameterTypes);
-            value.LoadIL(method, funcLocal);
+            value.LoadIl(method, funcLocal);
         }
 
         var constructorBuilder =
@@ -70,7 +70,7 @@ public class ClassInit(AnyValue anyValue) : OldStatement
         for (var i = 0; i < fieldValues.Count; i++)
         {
             generator.Emit(OpCodes.Ldarg_0); // 加载当前实例（this）
-            fieldValues[i].LoadILValue(generator, local);
+            fieldValues[i].LoadIlValue(generator, local);
             generator.Emit(OpCodes.Stfld, fields[i]); // 将 1 存储到字段 a
         }
 

@@ -1,5 +1,4 @@
-using Old8Lang.LangParser;
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.Intermediates;
 
 public interface IOldList
 {

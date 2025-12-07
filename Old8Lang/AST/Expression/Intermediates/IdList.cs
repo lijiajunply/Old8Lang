@@ -1,7 +1,6 @@
-using Old8Lang.LangParser;
-namespace Old8Lang.AST.Expression;
+namespace Old8Lang.AST.Expression.Intermediates;
 
-public class IdList(List<OldID> args) : OldExpr
+public class IdList(List<OldId> args) : OldExpr
 {
-    public readonly List<OldID> Args = args;
+    public readonly List<OldId> Args = args;
 }

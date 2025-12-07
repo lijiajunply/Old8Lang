@@ -6,25 +6,25 @@ using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Statement;
 
-public class SetListStatement(List<OldID> ids, List<OldExpr> expr) : OldStatement
+public class SetListStatement(List<OldId> ids, List<OldExpr> expr) : OldStatement
 {
-    public override void Run(VariateManager Manager)
+    public override void Run(VariateManager manager)
     {
-        var results = expr.Select(item => item.Run(Manager)).ToList();
+        var results = expr.Select(item => item.Run(manager)).ToList();
 
         for (var i = 0; i < results.Count; i++)
         {
-            Manager.Set(ids[i], results[i]);
+            manager.Set(ids[i], results[i]);
         }
     }
 
-    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         for (var i = 0; i < ids.Count; i++)
         {
-            var Value = expr[i];
-            var Id = ids[i];
-            Value.SetValueToIL(ilGenerator, local, Id.IdName);
+            var value = expr[i];
+            var id = ids[i];
+            value.SetValueToIl(ilGenerator, local, id.IdName);
         }
     }
 

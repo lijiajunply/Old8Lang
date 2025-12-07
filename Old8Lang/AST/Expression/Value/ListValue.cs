@@ -1,5 +1,5 @@
-using Old8Lang.LangParser;
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 
 
@@ -19,11 +19,11 @@ public class ListValue : ValueType, IOldList
         Value = Values.OfType<OldExpr>().ToList();
     }
 
-    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
+    public override ValueType Run(LangParser.VariateManager manager)
     {
         if(Values.Count > 0)return this;
         foreach (var expr in Value)
-            Values.Add(expr.Run(Manager));
+            Values.Add(expr.Run(manager));
         return this;
     }
 
@@ -58,7 +58,7 @@ public class ListValue : ValueType, IOldList
 
     public Type GetChildType() => typeof(object);
 
-    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         var listConstructor = typeof(List<object>).GetConstructor(Type.EmptyTypes)!;
         ilGenerator.Emit(OpCodes.Newobj, listConstructor); // 创建 List<int> 实例
@@ -72,7 +72,7 @@ public class ListValue : ValueType, IOldList
         foreach (var expr in Value)
         {
             ilGenerator.Emit(OpCodes.Ldloc, l.LocalIndex);
-            expr.LoadILValue(ilGenerator, local);
+            expr.LoadIlValue(ilGenerator, local);
             var t = expr.OutputType(local);
             ilGenerator.Emit(OpCodes.Box, t!);
             ilGenerator.Emit(OpCodes.Callvirt, addMethod); // 调用 Add 方法

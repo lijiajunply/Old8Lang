@@ -10,7 +10,7 @@ Compiler("fib:int (a:int) ->
           }")
 
 fibIter(a) -> {
-    list <- {1,1}
+    list <- list[1,1]
     for i <- 2 , i < a , i++
     {
         b <- list[i-1]+list[i-2]

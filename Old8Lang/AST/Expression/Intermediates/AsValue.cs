@@ -1,19 +1,15 @@
-using Old8Lang.LangParser;
-using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 
-using ValueType = Old8Lang.AST.Expression.ValueType;
+namespace Old8Lang.AST.Expression.Intermediates;
 
-namespace Old8Lang.AST.Statement;
-
-public class AsValue(OldExpr id, OldID asId) : ValueType
+public class AsValue(OldExpr id, OldId asId) : ValueType
 {
-    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
+    public override ValueType Run(LangParser.VariateManager manager)
     {
-        var value = id.Run(Manager);
-        var type = Manager.GetAny(asId);
+        var value = id.Run(manager);
+        var type = manager.GetAny(asId);
 
         type ??= new TypeValue(asId.IdName);
-        return value.Converse(type, Manager);
+        return value.Converse(type, manager);
     }
 }

@@ -1,23 +1,23 @@
-using Old8Lang.LangParser;
 using System.Reflection.Emit;
-using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
+using Old8Lang.LangParser;
 using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.AST;
 
-public class OldExpr : OldLangTree
+public class OldExpr : IOldLangTree
 {
-    public virtual ValueType Run(Old8Lang.LangParser.VariateManager Manager) => new VoidValue();
+    public virtual ValueType Run(VariateManager manager) => new VoidValue();
 
-    public virtual void LoadILValue(ILGenerator ilGenerator, LocalManager local)
+    public virtual void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void SetValueToIL(ILGenerator ilGenerator, LocalManager local, string idName)
+    public virtual void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
     {
-        LoadILValue(ilGenerator, local);
+        LoadIlValue(ilGenerator, local);
         var type = OutputType(local);
         if (type == null) return;
         var b = local.GetLocalVar(idName);

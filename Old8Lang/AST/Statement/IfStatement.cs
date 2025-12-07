@@ -11,34 +11,34 @@ namespace Old8Lang.AST.Statement;
 public class IfStatement(OldIf ifBlock, List<OldIf?> elifBlock, BlockStatement? elseBlockStatement)
     : OldStatement
 {
-    public override void Run(VariateManager Manager)
+    public override void Run(VariateManager manager)
     {
         var r = true;
-        Manager.AddChildren();
-        ifBlock.Run(Manager, ref r);
-        Manager.RemoveChildren();
+        manager.AddChildren();
+        ifBlock.Run(manager, ref r);
+        manager.RemoveChildren();
         foreach (var variable in elifBlock.OfType<OldIf>())
         {
-            Manager.AddChildren();
-            variable.Run(Manager, ref r);
-            Manager.RemoveChildren();
+            manager.AddChildren();
+            variable.Run(manager, ref r);
+            manager.RemoveChildren();
         }
 
         if (r)
-            elseBlockStatement?.Run(Manager);
+            elseBlockStatement?.Run(manager);
     }
 
-    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         var labelElse = ilGenerator.DefineLabel();
         var labelEnd = ilGenerator.DefineLabel();
 
         // 处理 if 块
-        ifBlock.GenerateConditionIL(ilGenerator, local);
+        ifBlock.GenerateConditionIl(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Brfalse, labelElse);
 
         // if 部分
-        ifBlock.GenerateIL(ilGenerator, local);
+        ifBlock.GenerateIl(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Br, labelEnd);
 
         // 处理 elif 块
@@ -46,18 +46,18 @@ public class IfStatement(OldIf ifBlock, List<OldIf?> elifBlock, BlockStatement? 
         foreach (var elif in elifBlock.OfType<OldIf>())
         {
             var nextElif = ilGenerator.DefineLabel();
-            elif.GenerateConditionIL(ilGenerator, local);
+            elif.GenerateConditionIl(ilGenerator, local);
             ilGenerator.Emit(OpCodes.Brfalse, nextElif);
 
             // elif 部分
-            elif.GenerateIL(ilGenerator, local);
+            elif.GenerateIl(ilGenerator, local);
             ilGenerator.Emit(OpCodes.Br, labelEnd);
 
             ilGenerator.MarkLabel(nextElif);
         }
 
         // 处理 else 块
-        elseBlockStatement?.GenerateIL(ilGenerator, local);
+        elseBlockStatement?.GenerateIl(ilGenerator, local);
 
         // 结束标签
         ilGenerator.MarkLabel(labelEnd);

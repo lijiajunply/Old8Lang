@@ -19,7 +19,7 @@ a <- fibIter(35)
 for i in a {
     Print(i+" ")
 }
-b <- {12,123,1231,123,1}
+b <- list[12,123,1231,123,1]
 b.Add(2)
 PrintLine("\n"+b.ToStr())
 

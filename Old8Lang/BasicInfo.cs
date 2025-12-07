@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Text;
+﻿using System.Text;
 
 namespace Old8Lang;
 
@@ -52,11 +51,12 @@ public static class BasicInfo
         {
 #if DEBUG
             return Path.Combine(Path.GetDirectoryName(CodePath)!, "Old8Lang", "LangInfo.json");
+#else
+        return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "LangInfo.json");
 #endif
-            return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                "LangInfo.json");
         }
     }
+
 
     public static Dictionary<string, string> Order => new()
     {
@@ -81,8 +81,10 @@ public static class BasicInfo
             var directory = AppContext.BaseDirectory.Split(Path.DirectorySeparatorChar);
             var slice = new ArraySegment<string>(directory, 0, directory.Length - 4);
             return Path.Combine(slice.ToArray());
+#else
+        // 返回程序运行时目录或其他合理默认路径
+        return AppContext.BaseDirectory;
 #endif
-            return "";
         }
     }
 }

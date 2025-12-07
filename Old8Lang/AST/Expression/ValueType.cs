@@ -1,3 +1,4 @@
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.LangParser;
 using Old8Lang.AST.Expression.Value;
 
@@ -21,7 +22,7 @@ public abstract class ValueType : OldExpr
 
     public virtual ValueType Dot(OldExpr dotExpr)
     {
-        if (dotExpr is OldID id)
+        if (dotExpr is OldId id)
         {
             if (id.IdName == "XAUAT")
                 return new StringValue("西建大还我血汗钱我要回家");
@@ -45,9 +46,9 @@ public abstract class ValueType : OldExpr
 
     #endregion
 
-    public virtual ValueType Converse(ValueType otherValueType, VariateManager Manager) => new VoidValue();
+    public virtual ValueType Converse(ValueType otherValueType, VariateManager manager) => new VoidValue();
 
-    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager) => this;
+    public override ValueType Run(VariateManager manager) => this;
 
     public string TypeToString()
     {

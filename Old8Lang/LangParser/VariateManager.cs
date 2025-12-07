@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using ValueType = Old8Lang.AST.Expression.ValueType;
@@ -46,7 +46,7 @@ public class VariateManager
 
     #endregion
 
-    public void Set(OldID id, ValueType valueType)
+    public void Set(OldId id, ValueType valueType)
     {
         var a1 = GetValue(id);
         if (a1 is null)
@@ -82,13 +82,13 @@ public class VariateManager
         ChildrenNum.Remove(ChildrenNum[^1]);
     }
 
-    public ValueType? GetValue(OldID id)
+    public ValueType? GetValue(OldId id)
     {
         var count = VariateName.IndexOf(id.IdName);
         return count != -1 ? Values[count] : GetAny(id);
     }
 
-    public ValueType? GetAny(OldID id)
+    public ValueType? GetAny(OldId id)
     {
         return AnyInfo.FirstOrDefault(x =>
         {

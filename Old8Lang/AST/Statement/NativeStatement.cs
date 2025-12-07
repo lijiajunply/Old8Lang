@@ -1,6 +1,7 @@
 using Old8Lang.LangParser;
 using System.Reflection;
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 
@@ -45,9 +46,9 @@ public class NativeStatement : OldStatement
         Name = name;
     }
 
-    public override void Run(VariateManager Manager)
+    public override void Run(VariateManager manager)
     {
-        var path = $"{Path.GetDirectoryName(Manager.Path)}/dll/{DllName}.dll"; // filepath/dll/dllname
+        var path = $"{Path.GetDirectoryName(manager.Path)}/dll/{DllName}.dll"; // filepath/dll/dllname
         var assembly = Assembly.LoadFile(path);
         var type = assembly.GetType($"{DllName}.{ClassName}");
         if (!string.IsNullOrEmpty(Name))
@@ -60,7 +61,7 @@ public class NativeStatement : OldStatement
                     throw new TypeError(this, this);
             }
 
-            Manager.AddClassAndFunc(new NativeStaticAny(ClassName, type));
+            manager.AddClassAndFunc(new NativeStaticAny(ClassName, type));
             return;
         }
 
@@ -71,14 +72,14 @@ public class NativeStatement : OldStatement
             if (string.IsNullOrEmpty(NativeName))
                 NativeName = MethodName;
             var func = new FuncValue(NativeName, methodInfo, FuncValue);
-            Manager.AddClassAndFunc(func);
+            manager.AddClassAndFunc(func);
             return;
         }
 
-        Manager.AddClassAndFunc(new NativeAnyValue(DllName, ClassName, path).Run(Manager));
+        manager.AddClassAndFunc(new NativeAnyValue(DllName, ClassName, path).Run(manager));
     }
 
-    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         var path = $"{Path.GetDirectoryName(local.FilePath)}/dll/{DllName}.dll"; // filepath/dll/dllname
         var assembly = Assembly.LoadFile(path);
@@ -104,7 +105,6 @@ public class NativeStatement : OldStatement
             if (string.IsNullOrEmpty(NativeName))
                 NativeName = MethodName;
             local.DelegateVar.Add(NativeName, methodInfo);
-            return;
         }
     }
 

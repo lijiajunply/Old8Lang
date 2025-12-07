@@ -1,5 +1,4 @@
-using Old8Lang.LangParser;
-namespace Old8Lang.AST.Expression;
+namespace Old8Lang.AST.Expression.Intermediates;
 
 public class ArgList(List<OldExpr> args) : OldExpr
 {

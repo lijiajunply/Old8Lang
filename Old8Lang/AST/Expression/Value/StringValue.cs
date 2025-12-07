@@ -1,6 +1,7 @@
 using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using System.Text;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 
 
@@ -34,7 +35,7 @@ public class StringValue(string context) : ValueType, IOldList
         return new VoidValue();
     }
 
-    public override ValueType Converse(ValueType otherValueType, VariateManager _)
+    public override ValueType Converse(ValueType otherValueType, VariateManager manager)
     {
         if (otherValueType is not TypeValue value) throw new Exception("the value is not a type");
 
@@ -63,7 +64,7 @@ public class StringValue(string context) : ValueType, IOldList
 
     public Type GetChildType() => typeof(char);
 
-    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         ilGenerator.Emit(OpCodes.Ldstr, Value);
     }

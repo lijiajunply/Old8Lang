@@ -1,16 +1,16 @@
-using Old8Lang.LangParser;
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class OldItem(OldID listId, OldExpr key) : ValueType
+public class OldItem(OldId listId, OldExpr key) : ValueType
 {
-    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
+    public override ValueType Run(LangParser.VariateManager manager)
     {
-        var a = Manager.GetValue(listId);
-        OldExpr result = key.Run(Manager);
+        var a = manager.GetValue(listId);
+        OldExpr result = key.Run(manager);
         if (a is ListValue list && result is IntValue intResult)
             return list.Get(intResult);
         if (a is ArrayValue array && result is IntValue i)
@@ -25,10 +25,10 @@ public class OldItem(OldID listId, OldExpr key) : ValueType
 
     public override string ToString() => $"the key: {key} in {listId}";
 
-    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        listId.LoadILValue(ilGenerator, local); // 加载 enumerator
-        key.LoadILValue(ilGenerator, local); // 加载 index
+        listId.LoadIlValue(ilGenerator, local); // 加载 enumerator
+        key.LoadIlValue(ilGenerator, local); // 加载 index
         ilGenerator.Emit(OpCodes.Ldelem_I4); // 获取元素
     }
 

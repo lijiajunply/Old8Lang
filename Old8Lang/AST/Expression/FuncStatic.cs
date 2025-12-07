@@ -1,6 +1,6 @@
-using Old8Lang.LangParser;
 using System.Text;
 using System.Text.Json;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
@@ -43,9 +43,9 @@ public static class AnyValueFuncStatic
     {
         var jsonObject = JsonSerializer.Deserialize<Dictionary<string, object>>(json.Value) ??
                          new Dictionary<string, object>();
-        return new AnyValue(jsonObject.ToDictionary<KeyValuePair<string, object>, OldID, OldExpr>
+        return new AnyValue(jsonObject.ToDictionary<KeyValuePair<string, object>, OldId, OldExpr>
         (
-            variable => new OldID(variable.Key),
+            variable => new OldId(variable.Key),
             variable =>
             {
                 if (variable.Value is JsonElement element)
@@ -57,13 +57,13 @@ public static class AnyValueFuncStatic
             }));
     }
 
-    public static void ToObjIL(string context)
+    public static void ToObjIl(string context)
     {
         var jsonObject = JsonSerializer.Deserialize<Dictionary<string, object>>(context) ??
                          new Dictionary<string, object>();
-        var json = new AnyValue(jsonObject.ToDictionary<KeyValuePair<string, object>, OldID, OldExpr>
+        var json = new AnyValue(jsonObject.ToDictionary<KeyValuePair<string, object>, OldId, OldExpr>
         (
-            variable => new OldID(variable.Key),
+            variable => new OldId(variable.Key),
             variable =>
             {
                 if (variable.Value is JsonElement element)

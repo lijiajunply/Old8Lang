@@ -2,32 +2,32 @@ using Old8Lang.LangParser;
 using System.Collections;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 
 
 namespace Old8Lang.AST.Statement;
 
-public class ForInStatement(OldID id, OldExpr expr, OldStatement body) : OldStatement
+public class ForInStatement(OldId id, OldExpr expr, OldStatement body) : OldStatement
 {
-    public override void Run(VariateManager Manager)
+    public override void Run(VariateManager manager)
     {
-        Manager.AddChildren();
+        manager.AddChildren();
 
-        var value = expr.Run(Manager);
+        var value = expr.Run(manager);
         if (value is not IOldList oldList)
             throw new Exception("ForInStatement: Expr is not IOldList");
 
         foreach (var idValue in oldList.GetItems())
         {
-            Manager.Set(id, idValue);
-            body.Run(Manager);
+            manager.Set(id, idValue);
+            body.Run(manager);
         }
 
-        Manager.RemoveChildren();
+        manager.RemoveChildren();
     }
 
-    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         var ty = expr.OutputType(local);
         var enumerator = ilGenerator.DeclareLocal(typeof(IEnumerator));
@@ -39,7 +39,7 @@ public class ForInStatement(OldID id, OldExpr expr, OldStatement body) : OldStat
         var getEnumeratorMethod = typeof(IEnumerable).GetMethod("GetEnumerator")!;
         var moveNextMethod = typeof(IEnumerator).GetMethod("MoveNext")!;
         var getCurrentMethod = typeof(IEnumerator).GetProperty("Current")!.GetGetMethod()!;
-        expr.LoadILValue(ilGenerator, local);
+        expr.LoadIlValue(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Callvirt, getEnumeratorMethod);
         ilGenerator.Emit(OpCodes.Stloc, enumerator);
 
@@ -60,7 +60,7 @@ public class ForInStatement(OldID id, OldExpr expr, OldStatement body) : OldStat
         ilGenerator.Emit(OpCodes.Stloc, current);
         local.AddLocalVar(id.IdName, current);
 
-        body.GenerateIL(ilGenerator, local);
+        body.GenerateIl(ilGenerator, local);
 
         // Loop back
         ilGenerator.Emit(OpCodes.Br, loopListStart);

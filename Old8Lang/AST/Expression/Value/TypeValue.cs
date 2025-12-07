@@ -1,5 +1,4 @@
-using Old8Lang.LangParser;
-
+using Old8Lang.AST.Expression.Intermediates;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -11,9 +10,9 @@ public class TypeValue : ValueType
     public TypeValue(OldExpr expr) => Expr = expr;
     public TypeValue(string value) => Value = value;
 
-    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
+    public override ValueType Run(LangParser.VariateManager manager)
     {
-        var result = Expr?.Run(Manager);
+        var result = Expr?.Run(manager);
         if (result == null) return new VoidValue();
         Value = result.TypeToString();
         return this;

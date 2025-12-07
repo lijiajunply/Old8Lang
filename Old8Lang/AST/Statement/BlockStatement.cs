@@ -17,7 +17,7 @@ public class BlockStatement : OldStatement
     private readonly List<OldStatement> OtherStatements = [];
     public override int Count => OtherStatements.Count;
 
-    public BlockStatement(IEnumerable<OldLangTree> statements)
+    public BlockStatement(IEnumerable<IOldLangTree> statements)
     {
         foreach (var statement in statements.OfType<OldStatement>())
         {
@@ -36,51 +36,51 @@ public class BlockStatement : OldStatement
         }
     }
 
-    public override void Run(VariateManager Manager)
+    public override void Run(VariateManager manager)
     {
-        ImportRun(Manager);
+        ImportRun(manager);
 
         foreach (var statement in OtherStatements)
         {
-            statement.Run(Manager);
-            if (Manager.IsReturn) return;
+            statement.Run(manager);
+            if (manager.IsReturn) return;
         }
     }
 
-    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         foreach (var statement in ImportStatements)
         {
-            statement.GenerateIL(ilGenerator, local);
+            statement.GenerateIl(ilGenerator, local);
         }
 
         foreach (var statement in OtherStatements)
         {
-            statement.GenerateIL(ilGenerator, local);
+            statement.GenerateIl(ilGenerator, local);
         }
     }
     
-    public void GenerateImportIL(ILGenerator ilGenerator, LocalManager local)
+    public void GenerateImportIl(ILGenerator ilGenerator, LocalManager local)
     {
         foreach (var statement in ImportStatements)
         {
-            statement.GenerateIL(ilGenerator, local);
+            statement.GenerateIl(ilGenerator, local);
         }
     }
 
-    public void ImportRun(VariateManager Manager)
+    public void ImportRun(VariateManager manager)
     {
-        if (Manager.Interpreter is { IsCompileOptimization: true })
+        if (manager.Interpreter is { IsCompileOptimization: true })
         {
             var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
             var ilGenerator = dynamicMethod.GetILGenerator();
             var local = new LocalManager();
             var block = new BlockStatement(ImportStatements);
-            block.GenerateIL(ilGenerator, local);
+            block.GenerateIl(ilGenerator, local);
             ilGenerator.Emit(OpCodes.Ret);
             foreach (var info in local.DelegateVar)
             {
-                Manager.AddClassAndFunc(new FuncValue(info.Key, info.Value));
+                manager.AddClassAndFunc(new FuncValue(info.Key, info.Value));
             }
 
             return;
@@ -88,8 +88,8 @@ public class BlockStatement : OldStatement
 
         foreach (var statement in ImportStatements)
         {
-            statement.Run(Manager);
-            if (Manager.IsReturn) return;
+            statement.Run(manager);
+            if (manager.IsReturn) return;
         }
     }
 
@@ -125,9 +125,9 @@ public class BlockStatement : OldStatement
         return sb.ToString();
     }
 
-    public Dictionary<OldID, OldExpr> ToAnyData()
+    public Dictionary<OldId, OldExpr> ToAnyData()
     {
-        var c = new Dictionary<OldID, OldExpr>();
+        var c = new Dictionary<OldId, OldExpr>();
         OtherStatements.ForEach(x =>
         {
             var result = GetTuple(x);
@@ -141,7 +141,7 @@ public class BlockStatement : OldStatement
         return c;
     }
 
-    private static (OldID id, OldExpr Expr) GetTuple(OldLangTree a)
+    private static (OldId id, OldExpr Expr) GetTuple(IOldLangTree a)
     {
         return a switch
         {

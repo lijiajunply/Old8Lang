@@ -1,5 +1,5 @@
-using Old8Lang.LangParser;
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 
 using Old8Lang.Error;
@@ -25,10 +25,10 @@ public class ArrayValue : ValueType, IOldList
 
     public ArrayValue(List<object> a) => RunResult = a.Select(ObjToValue).ToArray();
 
-    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
+    public override ValueType Run(LangParser.VariateManager manager)
     {
         for (var i = 0; i < Values.Count; i++)
-            RunResult[i] = Values[i].Run(Manager);
+            RunResult[i] = Values[i].Run(manager);
         return this;
     }
 
@@ -63,7 +63,7 @@ public class ArrayValue : ValueType, IOldList
 
     public Type GetChildType() => typeof(object);
 
-    public override void LoadILValue(ILGenerator ilGenerator, LocalManager local)
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 创建一个长度为 5 的整数数组
         var len = RunResult.Length;
@@ -77,12 +77,12 @@ public class ArrayValue : ValueType, IOldList
             Type t;
             if (len == Values.Count)
             {
-                Values[i].LoadILValue(ilGenerator, local);
+                Values[i].LoadIlValue(ilGenerator, local);
                 t = Values[i].OutputType(local)!;
             }
             else
             {
-                RunResult[i].LoadILValue(ilGenerator, local);
+                RunResult[i].LoadIlValue(ilGenerator, local);
                 t = RunResult[i].OutputType(local)!;
             }
             

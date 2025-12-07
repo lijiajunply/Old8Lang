@@ -13,7 +13,7 @@ public static class Compiler
         var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
         var ilGenerator = dynamicMethod.GetILGenerator();
         var local = new LocalManager() { FilePath = path ,Interpreter = i};
-        statement.GenerateIL(ilGenerator, local);
+        statement.GenerateIl(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Ret);
         var oldLangRun = (Action)dynamicMethod.CreateDelegate(typeof(Action));
         return oldLangRun;
@@ -25,7 +25,7 @@ public static class Compiler
         var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
         var ilGenerator = dynamicMethod.GetILGenerator();
         var local = new LocalManager() { FilePath = path ,Interpreter = i};
-        statement.GenerateIL(ilGenerator, local);
+        statement.GenerateIl(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Ret);
         var oldLangRun = (Action)dynamicMethod.CreateDelegate(typeof(Action));
         return oldLangRun;

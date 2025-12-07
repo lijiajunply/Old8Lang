@@ -31,26 +31,6 @@ public static class LangTokenizer
 
         for (var i = 0; i < code.Length; i++)
         {
-            bool Func(string a)
-            {
-                var len = a.Length;
-                for (var j = 0; j < len; j++)
-                {
-                    if (j == len - 1 && i + j <= code.Length && a[j] == code[i + j] && i + j + 1 < code.Length &&
-                        !char.IsLetter(code[i + j + 1]))
-                    {
-                        tokens.Add(new LangToken(a, Enum.Parse<LangTokenType>(char.ToUpper(a[0]) + a[1..]), line,
-                            i - column));
-                        i += len - 1;
-                        return true;
-                    }
-
-                    if (i + j < code.Length && a[j] == code[i + j]) continue;
-                    return false;
-                }
-
-                return false;
-            }
 
             #region 特殊字符
 
@@ -167,6 +147,7 @@ public static class LangTokenizer
                     {
                         sb.Append(code[i]);
                     }
+
                     i++;
                 }
 
@@ -331,7 +312,21 @@ public static class LangTokenizer
             #region 关键词
 
             var enumList = Enum.GetNames<KeywordType>().Select(x => x.ToLower()).ToFrozenSet();
-            if (enumList.Where(x => x[0] == code[i]).Any(Func)) continue;
+            // 找到匹配的关键字
+            var matchedKeyword = enumList.FirstOrDefault(x => x[0] == code[i] && 
+                i + x.Length <= code.Length && 
+                code.Substring(i, x.Length) == x &&
+                (i + x.Length == code.Length || !char.IsLetter(code[i + x.Length])));
+            
+            if (!string.IsNullOrEmpty(matchedKeyword))
+            {
+                // 添加关键字标记
+                tokens.Add(new LangToken(matchedKeyword, 
+                    Enum.Parse<LangTokenType>(char.ToUpper(matchedKeyword[0]) + matchedKeyword[1..]), 
+                    line, i - column));
+                i += matchedKeyword.Length - 1;
+                continue;
+            }
 
             #endregion
 
@@ -361,7 +356,6 @@ public static class LangTokenizer
                 }
 
                 tokens.Add(new LangToken(sb.ToString(), LangTokenType.Identifier, line, i - column));
-                continue;
             }
 
             #endregion
@@ -371,32 +365,25 @@ public static class LangTokenizer
     }
 }
 
-public struct FilteringCommentsTokenizer
+public struct FilteringCommentsTokenizer(string input)
 {
-    private readonly string _input;
-    private int _currentIndex;
-
-    public FilteringCommentsTokenizer(string input)
-    {
-        _input = input;
-        _currentIndex = 0;
-    }
+    private int CurrentIndex = 0;
 
     public string FilteringComments()
     {
         var result = new StringBuilder();
 
-        while (_currentIndex < _input.Length)
+        while (CurrentIndex < input.Length)
         {
-            var currentChar = _input[_currentIndex];
+            var currentChar = input[CurrentIndex];
 
-            if (currentChar == '/' && _currentIndex + 1 < _input.Length && _input[_currentIndex + 1] == '/')
+            if (currentChar == '/' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '/')
             {
                 SkipSingleLineComment();
                 continue;
             }
 
-            if (currentChar == '/' && _currentIndex + 1 < _input.Length && _input[_currentIndex + 1] == '*')
+            if (currentChar == '/' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '*')
             {
                 SkipMultiLineComment();
                 continue;
@@ -411,12 +398,12 @@ public struct FilteringCommentsTokenizer
 
     private void Advance()
     {
-        _currentIndex++;
+        CurrentIndex++;
     }
 
     private char Peek()
     {
-        return _currentIndex + 1 >= _input.Length ? '\0' : _input[_currentIndex + 1];
+        return CurrentIndex + 1 >= input.Length ? '\0' : input[CurrentIndex + 1];
     }
 
     private void SkipSingleLineComment()
@@ -424,7 +411,7 @@ public struct FilteringCommentsTokenizer
         Advance(); // Skip '/'  
         Advance(); // Skip '/'  
 
-        while (_currentIndex < _input.Length && _input[_currentIndex] != '\n')
+        while (CurrentIndex < input.Length && input[CurrentIndex] != '\n')
         {
             Advance();
         }
@@ -435,9 +422,9 @@ public struct FilteringCommentsTokenizer
         Advance(); // Skip '/'  
         Advance(); // Skip '*'  
 
-        while (_currentIndex < _input.Length)
+        while (CurrentIndex < input.Length)
         {
-            if (_input[_currentIndex] == '*' && _currentIndex + 1 < _input.Length && _input[_currentIndex + 1] == '/')
+            if (input[CurrentIndex] == '*' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '/')
             {
                 Advance(); // Skip '*'  
                 Advance(); // Skip '/'  

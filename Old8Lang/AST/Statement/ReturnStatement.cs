@@ -7,15 +7,15 @@ namespace Old8Lang.AST.Statement;
 
 public class ReturnStatement(OldExpr returnExpr) : OldStatement
 {
-    public override void Run(VariateManager Manager)
+    public override void Run(VariateManager manager)
     {
-        Manager.IsReturn = true;
-        Manager.Result = returnExpr.Run(Manager);
+        manager.IsReturn = true;
+        manager.Result = returnExpr.Run(manager);
     }
 
-    public override void GenerateIL(ILGenerator ilGenerator, LocalManager local)
+    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        returnExpr.LoadILValue(ilGenerator, local);
+        returnExpr.LoadIlValue(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Ret);
     }
 

@@ -1,15 +1,12 @@
-using Old8Lang.LangParser;
+namespace Old8Lang.AST.Expression.Intermediates;
 
-
-namespace Old8Lang.AST.Expression.Value;
-
-public class SliceValue(OldID id, OldExpr? start = null, OldExpr? end = null) : ValueType
+public class SliceValue(OldId id, OldExpr? start = null, OldExpr? end = null) : ValueType
 {
-    public override ValueType Run(Old8Lang.LangParser.VariateManager Manager)
+    public override ValueType Run(LangParser.VariateManager manager)
     {
-        var value = id.Run(Manager);
-        var start1 = start?.Run(Manager);
-        var end1 = end?.Run(Manager);
+        var value = id.Run(manager);
+        var start1 = start?.Run(manager);
+        var end1 = end?.Run(manager);
 
         if (value is not IOldList list) return new VoidValue();
 

@@ -101,16 +101,17 @@ if (args[0] == BasicInfo.Order["FromFile"])
     {
         Manager = { Path = args[1] }
     };
-    aLangInterpreter.Build(Apis.FromFile(args[1]));
-    //Apis.CslyUsing(args[1], false);
+    var b = aLangInterpreter.Build(Apis.FromFile(args[1]));
+    // b.Run(aLangInterpreter.Manager);
+    // Apis.CslyUsing(args[1], false);
     return;
 }
 
-if (args[0] == BasicInfo.Order["FromDir"])
-{
-    Apis.CslyUsing(args[1], true);
-    return;
-}
+// if (args[0] == BasicInfo.Order["FromDir"])
+// {
+//     Apis.CslyUsing(args[1], true);
+//     return;
+// }
 
 if (args[0] == BasicInfo.Order["Import"])
 {
