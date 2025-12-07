@@ -9,7 +9,7 @@ PrintLine(Json(test))
 a <- ToObj("{\"a\" : 1,\"b\" : {\"c\" : 3}}")
 PrintLine(a.a)
 
-err <- ${a.a}{1}{2}
+err <- ${"hello ", a.a}
 PrintLine(err)
 
 //测试函数 测试For in
