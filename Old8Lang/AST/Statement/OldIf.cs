@@ -1,11 +1,12 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
-
+using Old8Lang.Error;
+using Old8Lang;
 
 namespace Old8Lang.AST.Statement;
 
-public class OldIf(OldExpr expr, BlockStatement blockStatement) : OldStatement
+public class OldIf(OldExpr expr, BlockStatement blockStatement, SourcePosition position = default) : OldStatement(position)
 {
     public void Run(LangParser.VariateManager manager, ref bool r)
     {

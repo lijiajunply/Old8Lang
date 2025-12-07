@@ -58,7 +58,7 @@ public class NativeStatement : OldStatement
             {
                 type = Type.GetType($"{Name}.{ClassName}");
                 if (type is null)
-                    throw new TypeError(this, this);
+                    throw new TypeError(this, $"找不到类型 {Name}.{ClassName}");
             }
 
             manager.AddClassAndFunc(new NativeStaticAny(ClassName, type));
@@ -91,7 +91,7 @@ public class NativeStatement : OldStatement
             {
                 type = Type.GetType($"{Name}.{ClassName}");
                 if (type is null)
-                    throw new TypeError(this, this);
+                    throw new TypeError(this, $"找不到类型 {Name}.{ClassName}");
             }
 
             local.ClassVar.Add(ClassName, type);

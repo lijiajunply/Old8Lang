@@ -8,8 +8,8 @@ namespace Old8Lang.AST.Statement;
 /// <summary>
 /// if语句
 /// </summary>
-public class IfStatement(OldIf ifBlock, List<OldIf?> elifBlock, BlockStatement? elseBlockStatement)
-    : OldStatement
+public class IfStatement(OldIf ifBlock, List<OldIf?> elifBlock, BlockStatement? elseBlockStatement, SourcePosition position = default)
+    : OldStatement(position)
 {
     public override void Run(VariateManager manager)
     {

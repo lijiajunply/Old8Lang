@@ -34,7 +34,8 @@ public class ArrayValue : ValueType, IOldList
 
     public void Set(IntValue i, ValueType valueType)
     {
-        if (i.Value >= RunResult.Length) throw new ErrorException(this, i);
+        if (i.Value >= RunResult.Length || i.Value < -RunResult.Length)
+            throw new IndexError(this, i.Value, RunResult.Length);
         if (i.Value < 0)
             i.Value = RunResult.Length + i.Value;
         RunResult[i.Value] = valueType;
@@ -42,9 +43,12 @@ public class ArrayValue : ValueType, IOldList
 
     public ValueType Get(IntValue a)
     {
-        if (a.Value < 0)
-            a.Value = RunResult.Length + a.Value;
-        return RunResult[a.Value];
+        var index = a.Value;
+        if (index < 0)
+            index = RunResult.Length + index;
+        if (index < 0 || index >= RunResult.Length)
+            throw new IndexError(this, index, RunResult.Length);
+        return RunResult[index];
     }
 
     public override string ToString() =>

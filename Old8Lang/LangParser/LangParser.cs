@@ -24,7 +24,11 @@ public class LangParser(List<LangToken> tokens)
             CurrentIndex++;
         }
         else
-            throw new Exception($"语法错误：期望 {type}，但得到了 {CurrentToken.Type}。在 {CurrentToken.Line}:{CurrentToken.Column}");
+            throw new Old8Lang.Error.SyntaxError(
+                CurrentToken.Value,
+                CurrentToken.Line,
+                CurrentToken.Column,
+                $"语法错误：期望 {type}，但得到了 {CurrentToken.Type}");
     }
 
     private LangToken Peek(int offset = 1)
@@ -170,16 +174,19 @@ public class LangParser(List<LangToken> tokens)
     // ifStatement = "if" expression block ( "elif" expression block )* ( "else" block )? ;
     private IfStatement ParseIfStatement()
     {
+        var ifToken = CurrentToken;
         Expect(LangTokenType.If);
         var condition = ParseExpression();
         var ifBlock = ParseBlock();
         var oldIfs = new List<OldIf?>();
         while (CurrentToken.Type == LangTokenType.Elif)
         {
+            var elifToken = CurrentToken;
             Expect(LangTokenType.Elif);
             var elifCondition = ParseExpression();
             var elifBlock = ParseBlock();
-            oldIfs.Add(new OldIf(elifCondition, elifBlock));
+            var elifPosition = new Old8Lang.SourcePosition(elifToken.Line, elifToken.Column);
+            oldIfs.Add(new OldIf(elifCondition, elifBlock, elifPosition));
         }
 
         BlockStatement? elseBlock = null;
@@ -189,12 +196,14 @@ public class LangParser(List<LangToken> tokens)
             elseBlock = ParseBlock();
         }
 
-        return new IfStatement(new OldIf(condition, ifBlock), oldIfs, elseBlock);
+        var ifPosition = new Old8Lang.SourcePosition(ifToken.Line, ifToken.Column);
+        return new IfStatement(new OldIf(condition, ifBlock, ifPosition), oldIfs, elseBlock, ifPosition);
     }
 
     // forStatement = "for" set "," expression "," statement block ;
     private ForStatement ParseForStatement()
     {
+        var forToken = CurrentToken;
         Expect(LangTokenType.For);
         var set = ParseSet();
         Expect(LangTokenType.Comma);
@@ -202,28 +211,34 @@ public class LangParser(List<LangToken> tokens)
         Expect(LangTokenType.Comma);
         var statement = ParseStatement();
         var block = ParseBlock();
-        return new ForStatement(set, condition, statement, block);
+        var position = new Old8Lang.SourcePosition(forToken.Line, forToken.Column);
+        return new ForStatement(set, condition, statement, block, position);
     }
 
     // forInStatement = "for" identifier "in" expression block ;
     private ForInStatement ParseForInStatement()
     {
+        var forToken = CurrentToken;
         Expect(LangTokenType.For);
         var identifier = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
         Expect(LangTokenType.In);
         var expression = ParseExpression();
         var block = ParseBlock();
-        return new ForInStatement(new OldId(identifier), expression, block);
+        
+        var position = new Old8Lang.SourcePosition(forToken.Line, forToken.Column);
+        return new ForInStatement(new OldId(identifier), expression, block, position);
     }
 
     // whileStatement = "while" expression block ;
     private WhileStatement ParseWhileStatement()
     {
+        var whileToken = CurrentToken;
         Expect(LangTokenType.While);
         var condition = ParseExpression();
         var block = ParseBlock();
-        return new WhileStatement(condition, block);
+        var position = new Old8Lang.SourcePosition(whileToken.Line, whileToken.Column);
+        return new WhileStatement(condition, block, position);
     }
 
     // switchStatement = "switch" expression "{" caseBlock* ( "default" block )? "}" ;

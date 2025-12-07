@@ -4,11 +4,12 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
-
+using Old8Lang.Error;
+using Old8Lang;
 
 namespace Old8Lang.AST.Statement;
 
-public class ForInStatement(OldId id, OldExpr expr, OldStatement body) : OldStatement
+public class ForInStatement(OldId id, OldExpr expr, OldStatement body, SourcePosition position = default) : OldStatement(position)
 {
     public override void Run(VariateManager manager)
     {
@@ -16,7 +17,7 @@ public class ForInStatement(OldId id, OldExpr expr, OldStatement body) : OldStat
 
         var value = expr.Run(manager);
         if (value is not IOldList oldList)
-            throw new Exception("ForInStatement: Expr is not IOldList");
+            throw new TypeError(this, "IOldList", value.GetType().Name);
 
         foreach (var idValue in oldList.GetItems())
         {

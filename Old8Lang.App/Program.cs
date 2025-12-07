@@ -101,8 +101,15 @@ if (args[0] == BasicInfo.Order["FromFile"])
     {
         Manager = { Path = args[1] }
     };
-    var b = aLangInterpreter.Build(Apis.FromFile(args[1]));
-    b.Run(aLangInterpreter.Manager);
+    try
+    {
+        var b = aLangInterpreter.Build(Apis.FromFile(args[1]));
+        b.Run(aLangInterpreter.Manager);
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine(e);
+    }
     // Apis.CslyUsing(args[1], false);
     return;
 }

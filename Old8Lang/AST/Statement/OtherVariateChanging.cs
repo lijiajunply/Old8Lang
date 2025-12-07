@@ -16,7 +16,7 @@ public class OtherVariateChanging(OldId id, OldExpr sumId, OldExpr expr) : OldSt
         var a = manager.GetValue(id);
         if (a is AnyValue any)
         {
-            if (sumId is not OldId sum) throw new TypeError(this, this);
+            if (sumId is not OldId sum) throw new TypeError(this, "OldId", sumId.GetType().Name);
             var result = expr.Run(manager);
             any.Set(sum, result);
         }
@@ -24,7 +24,7 @@ public class OtherVariateChanging(OldId id, OldExpr sumId, OldExpr expr) : OldSt
         if (a is ArrayValue array)
         {
             var s = sumId.Run(manager);
-            if (s is not IntValue sum) throw new TypeError(this, this);
+            if (s is not IntValue sum) throw new TypeError(this, "IntValue", s.GetType().Name);
             var result = expr.Run(manager);
             array.Set(sum, result);
         }

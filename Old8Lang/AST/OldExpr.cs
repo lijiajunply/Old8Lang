@@ -8,6 +8,18 @@ namespace Old8Lang.AST;
 
 public class OldExpr : IOldLangTree
 {
+    /// <inheritdoc />
+    public SourcePosition Position { get; }
+    
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="position">源代码位置信息</param>
+    public OldExpr(SourcePosition position = default)
+    {
+        Position = position;
+    }
+    
     public virtual ValueType Run(VariateManager manager) => new VoidValue();
 
     public virtual void LoadIlValue(ILGenerator ilGenerator, LocalManager local)

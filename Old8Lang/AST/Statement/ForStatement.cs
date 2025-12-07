@@ -3,7 +3,8 @@ using System.Reflection.Emit;
 using System.Text;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
-
+using Old8Lang.Error;
+using Old8Lang;
 
 namespace Old8Lang.AST.Statement;
 
@@ -11,8 +12,9 @@ public class ForStatement(
     SetStatement setStatement,
     OldExpr expr,
     OldStatement statement,
-    BlockStatement blockStatement)
-    : OldStatement
+    BlockStatement blockStatement,
+    SourcePosition position = default)
+    : OldStatement(position)
 {
     public override void Run(VariateManager manager)
     {
@@ -25,7 +27,7 @@ public class ForStatement(
             if (varExpr is BoolValue value)
                 expr1 = value.Value;
             else
-                break;
+                throw new TypeError(this, "期望布尔类型", $"实际得到了 {varExpr.GetType().Name}");
             if (expr1)
             {
                 blockStatement.Run(manager);
