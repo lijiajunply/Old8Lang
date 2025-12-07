@@ -246,10 +246,12 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             LangTokenType.Return => ParseReturnStatement(),
             // 只有当标识符后面跟着 Assignment 标记时，才是声明语句
             LangTokenType.Identifier when Peek().Type == LangTokenType.Assignment => ParseSet(),
+            // 带有类型注解的变量声明：identifier:type <- expression
+            LangTokenType.Identifier when Peek().Type == LangTokenType.Colon && Peek(3).Type == LangTokenType.Assignment => ParseSet(),
+            // 带有类型注解的函数定义：identifier:type (params) -> block
+            LangTokenType.Identifier when Peek().Type == LangTokenType.Colon && Peek(3).Type == LangTokenType.LeftParen => ParseFuncDeclaration(),
             // Lambda
             LangTokenType.Identifier when Peek().Type == LangTokenType.Arrow => ParseFuncDeclaration(),
-            LangTokenType.Identifier when Peek().Type == LangTokenType.Colon && Peek(2).Type == LangTokenType.Identifier
-                => ParseFuncDeclaration(),
             // 类型实例调用属性/方法
             LangTokenType.Identifier when Peek().Type == LangTokenType.Dot => ParseClassFuncRunStatement(),
             // 先尝试解析为函数定义，再解析为函数调用
@@ -314,7 +316,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         return statement;
     }
 
-    // declaration = identifier "<-" expression ;
+    // declaration = identifier ":" type "<-" expression | identifier "<-" expression ;
     private SetStatement ParseSet()
     {
         var identifierToken = CurrentToken;
@@ -322,9 +324,19 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             tokenValue: identifierToken.Value);
         var identifier = identifierToken.Value;
         Expect(LangTokenType.Identifier);
+        
+        // 检查是否有类型注解
+        var assumptionType = "";
+        if (CurrentToken.Type == LangTokenType.Colon)
+        {
+            Expect(LangTokenType.Colon);
+            assumptionType = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+        }
+        
         Expect(LangTokenType.Assignment);
         var expression = ParseExpression();
-        return new SetStatement(new OldId(identifier, "", position), expression, position);
+        return new SetStatement(new OldId(identifier, assumptionType, position), expression, position);
     }
 
     // ifStatement = "if" expression block ( "elif" expression block )* ( "else" block )? ;

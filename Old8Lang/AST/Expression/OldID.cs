@@ -8,7 +8,7 @@ public class OldId(string name,string assumptionType = "", SourcePosition positi
 {
     public readonly string IdName = name;
     public override string ToString() => IdName;
-    private string AssumptionType { get; } = assumptionType;
+    public string AssumptionType { get; } = assumptionType;
 
     public override bool Equals(object? obj)
     {
