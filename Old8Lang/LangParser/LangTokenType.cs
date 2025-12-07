@@ -213,7 +213,10 @@ public enum KeywordType
     Case,
     Default,
     Return,
-    As
+    As,
+    And,
+    Or,
+    Xor
 }
 
 public static class TokenOpera
@@ -253,6 +256,7 @@ public static class TokenOpera
             LangTokenType.NotEquals => OperationType.DIFFERENT,
             LangTokenType.And => OperationType.AND,
             LangTokenType.Or => OperationType.OR,
+            LangTokenType.Xor => OperationType.OR,
             LangTokenType.Null => OperationType.EOF,
             LangTokenType.True => OperationType.TRUE,
             LangTokenType.False => OperationType.FALSE,

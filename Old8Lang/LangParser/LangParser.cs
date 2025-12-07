@@ -826,10 +826,11 @@ public class LangParser(List<LangToken> tokens)
                 }
             }
             
-            // 检查是否是 lambda
-            if (CurrentToken.Type == LangTokenType.Arrow)
+            // 检查是否是 lambda: (params) -> ...
+            if (CurrentToken.Type == LangTokenType.RightParen && Peek().Type == LangTokenType.Arrow)
             {
-                Expect(LangTokenType.Arrow);
+                Expect(LangTokenType.RightParen); // 匹配右括号
+                Expect(LangTokenType.Arrow); // 匹配箭头
                 
                 // 解析 lambda 体，支持 block 或 expression
                 if (CurrentToken.Type == LangTokenType.LeftBrace)
