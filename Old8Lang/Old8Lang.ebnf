@@ -45,7 +45,7 @@ funcRunStatement = identifier "(" argList? ")" ;
 
 classFuncRunStatement = identifier "." identifier "(" argList? ")" ;
 
-importStatement = "import" identifier ;
+importStatement = "import" ( identifier | STRING ) ;
 
 nativeStatement = "[" "import" STRING identifier identifier identifier? "]" ;
 
