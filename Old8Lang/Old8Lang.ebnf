@@ -81,6 +81,8 @@ boolOpera = expression ( ( "and" | "or" | "xor" ) expression )* ;
 
 primary = stringLiteral
         | doubleLiteral
+        | intLiteral
+        | charLiteral
         | identifier
         | trueLiteral
         | falseLiteral
@@ -105,6 +107,10 @@ minusPrefix = "-" primary ;
 stringLiteral = STRING ;
 
 doubleLiteral = DOUBLE ;
+
+intLiteral = INT ;
+
+charLiteral = CHAR ;
 
 identifier = IDENTIFIER ;
 
