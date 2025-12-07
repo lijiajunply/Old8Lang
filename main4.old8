@@ -1,0 +1,5 @@
+// 主文件
+import "mylib2.ol"
+
+result <- multiply(10, 20)
+PrintLine(result)
