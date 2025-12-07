@@ -1,0 +1,29 @@
+# 测试try语句
+
+try {
+    # 尝试除以零，应该抛出ZeroDivisionError
+    a <- 10
+    b <- 0
+    c <- a / b
+    print("这行不应该执行")
+} catch (ZeroDivisionError e) {
+    print("捕获到除以零错误：", e)
+} finally {
+    print("无论是否发生错误，finally块都会执行")
+}
+
+print("程序继续执行")
+
+# 测试多个catch块
+try {
+    # 尝试访问未定义的变量，应该抛出NameError
+    print(undefined_var)
+} catch (ZeroDivisionError) {
+    print("捕获到除以零错误，这行不应该执行")
+} catch (NameError e) {
+    print("捕获到名称错误：", e)
+} catch {
+    print("捕获到其他错误")
+}
+
+print("程序结束")

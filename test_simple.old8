@@ -1,0 +1,15 @@
+# 简单测试文件
+
+a <- 10
+b <- 20
+c <- a + b
+
+if a > b {
+    result <- "a > b"
+} else {
+    result <- "a <= b"
+}
+
+for i <- 0, i < 5, i <- i + 1 {
+    print(i)
+}

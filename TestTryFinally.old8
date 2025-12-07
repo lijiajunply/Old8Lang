@@ -1,0 +1,10 @@
+try {
+    a <- 10
+    b <- 0
+    c <- a / b
+    result <- 0
+} catch {
+    result <- 1
+} finally {
+    finally_executed <- 1
+}

@@ -1,0 +1,12 @@
+try {
+    a <- 10
+    b <- 0
+    c <- a / b
+    print("这行不应该执行")
+} catch (ZeroDivisionError e) {
+    print("捕获到除以零错误：", e)
+} finally {
+    print("无论是否发生错误，finally块都会执行")
+}
+
+print("程序

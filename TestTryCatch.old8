@@ -1,0 +1,17 @@
+try {
+    a <- 10
+    b <- 0
+    c <- a / b
+    result <- 0
+} catch {
+    result <- 1
+}
+
+try {
+    undefined_var
+    result2 <- 0
+} catch (NameError) {
+    result2 <- 1
+} catch {
+    result2 <- 2
+}
