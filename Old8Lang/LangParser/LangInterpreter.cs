@@ -18,7 +18,7 @@ public class LangInterpreter : IMiniInterpreter
         var parser = LangTokenizer.Tokenize(code);
         if (parser == null) throw new Exception("语法出错");
         //parser.ForEach(x => Console.WriteLine(x));
-        return new LangParser(parser).ParseProgram();
+        return new LangParser(parser, code).ParseProgram();
     }
 
     public static List<LangToken> Tokenize(string code)

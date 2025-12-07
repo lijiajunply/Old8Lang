@@ -61,6 +61,11 @@ public class ImportStatement(string importString, SourcePosition position = defa
 
         // 修复：正确处理绝对路径和相对路径
         var filePath = Path.IsPathRooted(fileNameLocal) ? fileNameLocal : Path.Combine(dic, fileNameLocal);
+        if (filePath.StartsWith("Users/") || filePath.StartsWith("Volumes/"))
+        {
+            filePath = "/" + filePath;
+        }
+
         if (!File.Exists(filePath)) return;
 
         var managerPath = manager.Path;
@@ -107,6 +112,11 @@ public class ImportStatement(string importString, SourcePosition position = defa
 
         // 修复：正确处理绝对路径和相对路径
         var filePath = Path.IsPathRooted(fileNameLocal) ? fileNameLocal : Path.Combine(dic, fileNameLocal);
+        if (filePath.StartsWith("Users/") || filePath.StartsWith("Volumes/"))
+        {
+            filePath = "/" + filePath;
+        }
+
         if (!File.Exists(filePath)) return;
 
         var result = local.Interpreter?.Build(code: Apis.FromFile(filePath));

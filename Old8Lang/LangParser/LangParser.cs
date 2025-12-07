@@ -8,16 +8,62 @@ using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.LangParser;
 
-public class LangParser(List<LangToken> tokens)
+public class LangParser(List<LangToken> tokens, string? sourceCode = null, string? fileName = null)
 {
     #region 基础操作
 
     private int CurrentIndex;
+    private readonly string? _sourceCode = sourceCode;
+    private readonly string? _fileName = fileName;
 
     private LangToken CurrentToken => CurrentIndex >= tokens.Count
         ? new LangToken("", LangTokenType.EndOfFile, CurrentIndex)
         : tokens[CurrentIndex];
+    
+    /// <summary>
+    /// 获取错误位置附近的源代码上下文
+    /// </summary>
+    /// <param name="line">错误行号</param>
+    /// <param name="column">错误列号</param>
+    /// <returns>错误位置附近的源代码上下文</returns>
+    private string[] GetSourceContext(int line, int column)
+    {
+        if (string.IsNullOrEmpty(_sourceCode))
+        {
+            return Array.Empty<string>();
+        }
+        
+        var lines = _sourceCode.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        var contextLines = new List<string>();
+        
+        // 获取错误行前后的上下文，最多显示3行上下文
+        int startLine = Math.Max(0, line - 2);
+        int endLine = Math.Min(lines.Length - 1, line + 1);
+        
+        for (int i = startLine; i <= endLine; i++)
+        {
+            contextLines.Add(lines[i]);
+        }
+        
+        return contextLines.ToArray();
+    }
 
+    /// <summary>
+    /// 创建语法错误并添加上下文信息
+    /// </summary>
+    /// <param name="message">错误信息</param>
+    /// <returns>带有上下文信息的语法错误</returns>
+    private SyntaxError CreateSyntaxError(string message)
+    {
+        var context = GetSourceContext(CurrentToken.Line, CurrentToken.Column);
+        return new SyntaxError(
+            CurrentToken.Value,
+            CurrentToken.Line,
+            CurrentToken.Column,
+            message,
+            context);
+    }
+    
     private void Expect(LangTokenType type)
     {
         if (CurrentToken.Type == type)
@@ -25,11 +71,63 @@ public class LangParser(List<LangToken> tokens)
             CurrentIndex++;
         }
         else
+        {
+            var expectedType = type;
+            var actualType = CurrentToken.Type;
+            var actualValue = CurrentToken.Value;
+            
+            string detailedMessage = expectedType switch
+            {
+                LangTokenType.RightParen => $"语法错误：缺少右括号 ')'。在 '{actualValue}' 处期望右括号。",
+                LangTokenType.RightBracket => $"语法错误：缺少右方括号 ']'。在 '{actualValue}' 处期望右方括号。",
+                LangTokenType.RightBrace => $"语法错误：缺少右大括号 '}}'。在 '{actualValue}' 处期望右大括号。",
+                LangTokenType.LeftParen => $"语法错误：缺少左括号 '('。在 '{actualValue}' 处期望左括号。",
+                LangTokenType.LeftBracket => $"语法错误：缺少左方括号 '['。在 '{actualValue}' 处期望左方括号。",
+                LangTokenType.LeftBrace => $"语法错误：缺少左大括号 '{{'。在 '{actualValue}' 处期望左大括号。",
+                LangTokenType.Comma => $"语法错误：缺少逗号 ','。在 '{actualValue}' 处期望逗号。",
+                LangTokenType.Arrow => $"语法错误：缺少箭头 '->'。在 '{actualValue}' 处期望箭头。",
+                LangTokenType.Colon => $"语法错误：缺少冒号 ':'。在 '{actualValue}' 处期望冒号。",
+                LangTokenType.Assignment => $"语法错误：缺少赋值符号 '<-'。在 '{actualValue}' 处期望赋值符号。",
+                LangTokenType.Identifier => $"语法错误：缺少标识符。在 '{actualValue}' 处期望标识符。",
+                LangTokenType.String => $"语法错误：缺少字符串字面量。在 '{actualValue}' 处期望字符串。",
+                LangTokenType.Number => $"语法错误：缺少数字字面量。在 '{actualValue}' 处期望数字。",
+                LangTokenType.If => $"语法错误：缺少 'if' 关键字。在 '{actualValue}' 处期望 'if'。",
+                LangTokenType.Else => $"语法错误：缺少 'else' 关键字。在 '{actualValue}' 处期望 'else'。",
+                LangTokenType.While => $"语法错误：缺少 'while' 关键字。在 '{actualValue}' 处期望 'while'。",
+                LangTokenType.For => $"语法错误：缺少 'for' 关键字。在 '{actualValue}' 处期望 'for'。",
+                LangTokenType.Func => $"语法错误：缺少 'func' 关键字。在 '{actualValue}' 处期望 'func'。",
+                LangTokenType.Class => $"语法错误：缺少 'class' 关键字。在 '{actualValue}' 处期望 'class'。",
+                LangTokenType.Import => $"语法错误：缺少 'import' 关键字。在 '{actualValue}' 处期望 'import'。",
+                LangTokenType.Return => $"语法错误：缺少 'return' 关键字。在 '{actualValue}' 处期望 'return'。",
+                _ => $"语法错误：期望 {expectedType}，但得到了 {actualType} '{actualValue}'。",
+            };
+            
+            string suggestion = expectedType switch
+            {
+                LangTokenType.RightParen => "建议：检查是否缺少右括号或括号不匹配。",
+                LangTokenType.RightBracket => "建议：检查是否缺少右方括号或方括号不匹配。",
+                LangTokenType.RightBrace => "建议：检查是否缺少右大括号或大括号不匹配。",
+                LangTokenType.LeftParen => "建议：检查是否缺少左括号或括号不匹配。",
+                LangTokenType.LeftBracket => "建议：检查是否缺少左方括号或方括号不匹配。",
+                LangTokenType.LeftBrace => "建议：检查是否缺少左大括号或大括号不匹配。",
+                LangTokenType.Comma => "建议：检查是否缺少逗号分隔符。",
+                LangTokenType.Arrow => "建议：检查 lambda 表达式是否缺少箭头符号。",
+                LangTokenType.Colon => "建议：检查字典定义或类型注解是否缺少冒号。",
+                LangTokenType.Assignment => "建议：检查变量赋值是否使用了正确的赋值符号 '<-'。",
+                LangTokenType.Identifier => "建议：检查是否需要添加标识符名称。",
+                LangTokenType.String => "建议：检查字符串是否正确闭合。",
+                LangTokenType.Number => "建议：检查是否需要添加数字值。",
+                _ => "建议：检查语法结构是否正确。",
+            };
+            
+            // 抛出带有上下文的错误
             throw new Error.SyntaxError(
                 CurrentToken.Value,
                 CurrentToken.Line,
                 CurrentToken.Column,
-                $"语法错误：期望 {type}，但得到了 {CurrentToken.Type}");
+                detailedMessage + " " + suggestion,
+                GetSourceContext(CurrentToken.Line, CurrentToken.Column));
+        }
     }
 
     private LangToken Peek(int offset = 1)
@@ -50,12 +148,47 @@ public class LangParser(List<LangToken> tokens)
     public BlockStatement ParseProgram()
     {
         var statements = new List<IOldLangTree>();
-        while (CurrentIndex < tokens.Count)
+        try
         {
-            statements.Add(ParseStatement());
-        }
+            while (CurrentIndex < tokens.Count)
+            {
+                statements.Add(ParseStatement());
+            }
 
-        return new BlockStatement(statements);
+            return new BlockStatement(statements);
+        }
+        catch (SyntaxError ex)
+        {
+            // 直接返回原始异常，不再重新包装
+            throw;
+        }
+        catch (Exception ex)
+        {
+            // 处理其他类型的异常，添加上下文信息
+            var currentToken = CurrentToken;
+            var context = GetSourceContext(currentToken.Line, currentToken.Column);
+            
+            if (ex is Old8Exception old8Ex)
+            {
+                // 如果已经是 Old8Exception，添加上下文信息
+                throw new SyntaxError(
+                    currentToken.Value,
+                    currentToken.Line,
+                    currentToken.Column,
+                    $"解析错误：{old8Ex.Message}",
+                    context);
+            }
+            else
+            {
+                // 其他类型的异常，转换为 SyntaxError
+                throw new SyntaxError(
+                    currentToken.Value,
+                    currentToken.Line,
+                    currentToken.Column,
+                    $"解析错误：{ex.Message}",
+                    context);
+            }
+        }
     }
 
     #endregion
@@ -121,7 +254,7 @@ public class LangParser(List<LangToken> tokens)
                                            Peek(3).Type == LangTokenType.Identifier &&
                                            Peek(4).Type == LangTokenType.RightBracket => ParseNativeClass(),
             LangTokenType.LeftBracket when Peek().Type == LangTokenType.Import => ParseNativeStatement(),
-            _ => throw new SyntaxError(CurrentToken.Value, CurrentToken.Line, CurrentToken.Column, $"语法有误。在解析到ParseStatement时出现问题")
+            _ => throw CreateSyntaxError($"语法错误：无法识别的语句类型 '{CurrentToken.Type}'，值为 '{CurrentToken.Value}'。建议检查语句结构是否正确。")
         };
     }
 
@@ -337,7 +470,7 @@ public class LangParser(List<LangToken> tokens)
                 LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseFuncDeclaration(),
                 // 支持类内部的声明语句：identifier "<-" expression
                 LangTokenType.Identifier => ParseSet(),
-                _ => throw new SyntaxError(CurrentToken.Value, CurrentToken.Line, CurrentToken.Column, $"语法错误：期望声明或函数声明，但得到了 {CurrentToken.Type}")
+                _ => throw CreateSyntaxError($"语法错误：期望声明或函数声明，但得到了 {CurrentToken.Type}")
             });
         }
 
@@ -699,7 +832,7 @@ public class LangParser(List<LangToken> tokens)
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseInstantiate(),
             LangTokenType.Identifier => ParseIdentifier(),
             LangTokenType.True or LangTokenType.False => ParseBoolLiteral(),
-            _ => throw new SyntaxError(CurrentToken.Value, CurrentToken.Line, CurrentToken.Column, $"语法错误：无法识别的主表达式，但得到了 {CurrentToken.Type}")
+            _ => throw CreateSyntaxError($"语法错误：无法识别的主表达式类型 '{CurrentToken.Type}'，值为 '{CurrentToken.Value}'。建议检查表达式结构是否正确。")
         };
     }
 
@@ -851,7 +984,7 @@ public class LangParser(List<LangToken> tokens)
         if (CurrentToken.Type == LangTokenType.RightParen)
         {
             Expect(LangTokenType.RightParen);
-            throw new SyntaxError(CurrentToken.Value, CurrentToken.Line, CurrentToken.Column, "语法错误：空元组");
+            throw CreateSyntaxError("语法错误：空元组");
         }
 
         // 解析参数列表
@@ -875,7 +1008,7 @@ public class LangParser(List<LangToken> tokens)
                 else
                 {
                     // 不是标识符，不是 lambda 参数，回滚，尝试解析为元组
-                    throw new SyntaxError(CurrentToken.Value, CurrentToken.Line, CurrentToken.Column, "语法错误：lambda 参数必须是标识符");
+                    throw CreateSyntaxError("语法错误：lambda 参数必须是标识符");
                 }
             }
 
@@ -921,7 +1054,7 @@ public class LangParser(List<LangToken> tokens)
             // If only one expression, it's a single value in parentheses, not a tuple
             1 => tupleExpress[0],
             2 => new TupleValue(tupleExpress[0], tupleExpress[1], position),
-            _ => throw new SyntaxError(CurrentToken.Value, CurrentToken.Line, CurrentToken.Column, "语法错误：元组")
+            _ => throw CreateSyntaxError("语法错误：元组")
         };
     }
 

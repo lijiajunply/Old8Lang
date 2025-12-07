@@ -1,0 +1,58 @@
+// 测试错误处理系统
+
+// 测试1: 缺少右括号
+func test1() -> {
+    print("Hello, World!"  // 缺少右括号
+}
+
+// 测试2: 未定义的变量
+func test2() -> {
+    print(undefinedVariable)  // 未定义的变量
+}
+
+// 测试3: 类型错误
+func test3() -> {
+    let a = 10
+    let b = "string"
+    let c = a + b  // 类型错误
+}
+
+// 测试4: 语法错误 - 意外的token
+func test4() -> {
+    let a = 10
+    ,  // 意外的逗号
+    let b = 20
+}
+
+// 测试5: 缺少赋值符号
+func test5() -> {
+    let a 10  // 缺少赋值符号 '<-'
+}
+
+// 测试6: 无效的表达式
+func test6() -> {
+    let a = 10 +  // 缺少右操作数
+}
+
+// 测试7: 无效的函数调用
+func test7() -> {
+    funcCall(1, 2, 3,  // 缺少右括号
+}
+
+// 测试8: 无效的字典定义
+func test8() -> {
+    let dict = { key1: value1, key2: value2  // 缺少右大括号
+}
+
+// 测试9: 无效的数组定义
+func test9() -> {
+    let arr = [1, 2, 3,  // 缺少右方括号
+}
+
+// 测试10: 无效的条件语句
+func test10() -> {
+    if true
+        print("Hello")
+    else  // 缺少条件
+        print("World")
+}

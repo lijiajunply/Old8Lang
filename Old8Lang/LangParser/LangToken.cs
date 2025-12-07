@@ -395,7 +395,7 @@ public static class LangTokenizer
                 code[i].ToString(), 
                 line, 
                 i - column, 
-                $"语法错误：无法识别的字符 '{code[i]}'");
+                $"语法错误：无法识别的字符 '{code[i]}'。建议检查是否输入了无效字符或特殊字符。");
 
             #endregion
         }
