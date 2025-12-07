@@ -17,20 +17,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Changes">
-      <change afterPath="$PROJECT_DIR$/main.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main2.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main3.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main4.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mylib.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mylib2.ol" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mylib2.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test.ol" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Ex/main.ol" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/init.ws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/test.old8" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,7 +78,7 @@
     ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
     ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
     ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Debug",
+    ".NET 项目.Old8Lang.App.executor": "Run",
     "ASKED_ADD_EXTERNAL_FILES": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -323,7 +312,7 @@
       <workItem from="1739186827152" duration="12590000" />
       <workItem from="1765095462905" duration="3326000" />
       <workItem from="1765099889326" duration="6689000" />
-      <workItem from="1765111093830" duration="1887000" />
+      <workItem from="1765111093830" duration="2850000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -922,26 +911,26 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.App/Program.cs</url>
-          <line>114</line>
+          <line>62</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" containingFunctionPresentation="">
             <startOffsets>
-              <option value="3061" />
+              <option value="1333" />
             </startOffsets>
             <endOffsets>
-              <option value="3093" />
+              <option value="1365" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="490" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs</url>
-          <line>61</line>
+          <line>64</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="2478" />
+              <option value="2441" />
             </startOffsets>
             <endOffsets>
-              <option value="2509" />
+              <option value="2472" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="492" />

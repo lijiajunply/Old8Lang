@@ -18,7 +18,8 @@ public class ImportStatement(string importString, SourcePosition position = defa
             {
                 fileName += ".old8"; // 默认使用.old8扩展名
             }
-            var path = Path.Combine(manager.LangInfo.ImportPath, fileName + (b ? "" : ""));
+
+            var path = Path.Combine(manager.LangInfo.ImportPath, fileName);
             var previousPath = manager.Path;
             manager.Path = path;
             var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
@@ -38,7 +39,8 @@ public class ImportStatement(string importString, SourcePosition position = defa
             {
                 fileName += ".old8"; // 默认使用.old8扩展名
             }
-            var path = Path.Combine(manager.LangInfo.ImportPath, fileName + (b ? "" : ""));
+
+            var path = Path.Combine(manager.LangInfo.ImportPath, fileName);
             var previousPath = manager.Path;
             manager.Path = path;
             var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
@@ -56,9 +58,10 @@ public class ImportStatement(string importString, SourcePosition position = defa
         {
             fileNameLocal += ".old8"; // 默认使用.old8扩展名
         }
+
         var filePath = Path.Combine(dic, fileNameLocal);
         if (!File.Exists(filePath)) return;
-        
+
         var managerPath = manager.Path;
         manager.Path = filePath;
         var result = manager.Interpreter.Build(code: Apis.FromFile(filePath));
@@ -79,7 +82,8 @@ public class ImportStatement(string importString, SourcePosition position = defa
             {
                 fileName += ".old8"; // 默认使用.old8扩展名
             }
-            var path = Path.Combine(langInfo.ImportPath, fileName + (b ? "" : ""));
+
+            var path = Path.Combine(langInfo.ImportPath, fileName);
             var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
             //var a = Interpreter.Build(code: code);
 
@@ -90,7 +94,7 @@ public class ImportStatement(string importString, SourcePosition position = defa
             local.FilePath = pPath;
             return;
         }
-        
+
         var dic = Path.GetDirectoryName(local.FilePath)!;
         // 检查文件扩展名，只支持.old8和.ol
         var fileNameLocal = importString;
@@ -99,6 +103,7 @@ public class ImportStatement(string importString, SourcePosition position = defa
         {
             fileNameLocal += ".old8"; // 默认使用.old8扩展名
         }
+
         var filePath = Path.Combine(dic, fileNameLocal);
         if (!File.Exists(filePath)) return;
 
