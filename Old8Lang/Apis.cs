@@ -46,7 +46,36 @@ public static class Apis
     #region ReadFileOrDir
 
     public static string FromFile(string filename)
-        => File.Exists(filename) ? File.ReadAllText(filename, Encoding.UTF8) : filename;
+    {
+        // 处理macOS上缺少开头斜杠的绝对路径
+        if (filename.StartsWith("Users/") || filename.StartsWith("Volumes/"))
+        {
+            filename = "/" + filename;
+        }
+        
+        // 如果是绝对路径，直接使用
+        if (Path.IsPathFullyQualified(filename))
+        {
+            return File.Exists(filename) ? File.ReadAllText(filename, Encoding.UTF8) : filename;
+        }
+        
+        // 如果是相对路径，尝试从当前目录或应用程序目录查找
+        var fullPath = Path.GetFullPath(filename);
+        if (File.Exists(fullPath))
+        {
+            return File.ReadAllText(fullPath, Encoding.UTF8);
+        }
+        
+        // 尝试从应用程序基目录查找
+        var appPath = Path.Combine(AppContext.BaseDirectory, filename);
+        if (File.Exists(appPath))
+        {
+            return File.ReadAllText(appPath, Encoding.UTF8);
+        }
+        
+        // 所有尝试都失败，返回原始文件名
+        return filename;
+    }
 
 
     public static string FromDirectory(string directoryName)

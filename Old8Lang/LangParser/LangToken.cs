@@ -149,9 +149,24 @@ public static class LangTokenizer
             {
                 var sb = new StringBuilder();
                 i++;
-                while (i < code.Length && code[i] != '"')
+                while (i < code.Length)
                 {
-                    sb.Append(code[i]);
+                    if (code[i] == '\\') // 处理转义字符
+                    {
+                        if (i + 1 < code.Length)
+                        {
+                            i++;
+                            sb.Append(code[i]);
+                        }
+                    }
+                    else if (code[i] == '"') // 遇到未转义的双引号，结束字符串
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        sb.Append(code[i]);
+                    }
                     i++;
                 }
 
@@ -356,35 +371,42 @@ public static class LangTokenizer
     }
 }
 
-public struct FilteringCommentsTokenizer(string input)
+public struct FilteringCommentsTokenizer
 {
+    private readonly string _input;
     private int _currentIndex;
+
+    public FilteringCommentsTokenizer(string input)
+    {
+        _input = input;
+        _currentIndex = 0;
+    }
 
     public string FilteringComments()
     {
-        var tokens = new StringBuilder();
+        var result = new StringBuilder();
 
-        while (_currentIndex < input.Length)
+        while (_currentIndex < _input.Length)
         {
-            var currentChar = input[_currentIndex];
+            var currentChar = _input[_currentIndex];
 
-            if (currentChar == '/' && Peek() == '/')
+            if (currentChar == '/' && _currentIndex + 1 < _input.Length && _input[_currentIndex + 1] == '/')
             {
                 SkipSingleLineComment();
                 continue;
             }
 
-            if (currentChar == '/' && Peek() == '*')
+            if (currentChar == '/' && _currentIndex + 1 < _input.Length && _input[_currentIndex + 1] == '*')
             {
                 SkipMultiLineComment();
                 continue;
             }
 
-            tokens.Append(input[_currentIndex]);
+            result.Append(currentChar);
             Advance();
         }
 
-        return tokens.ToString();
+        return result.ToString();
     }
 
     private void Advance()
@@ -394,15 +416,15 @@ public struct FilteringCommentsTokenizer(string input)
 
     private char Peek()
     {
-        return _currentIndex + 1 >= input.Length ? '\0' : input[_currentIndex + 1];
+        return _currentIndex + 1 >= _input.Length ? '\0' : _input[_currentIndex + 1];
     }
 
     private void SkipSingleLineComment()
     {
-        Advance(); // Skip '/'
-        Advance(); // Skip '/'
+        Advance(); // Skip '/'  
+        Advance(); // Skip '/'  
 
-        while (_currentIndex < input.Length && input[_currentIndex] != '\n')
+        while (_currentIndex < _input.Length && _input[_currentIndex] != '\n')
         {
             Advance();
         }
@@ -410,15 +432,15 @@ public struct FilteringCommentsTokenizer(string input)
 
     private void SkipMultiLineComment()
     {
-        Advance(); // Skip '/'
-        Advance(); // Skip '*'
+        Advance(); // Skip '/'  
+        Advance(); // Skip '*'  
 
-        while (_currentIndex < input.Length)
+        while (_currentIndex < _input.Length)
         {
-            if (input[_currentIndex] == '*' && Peek() == '/')
+            if (_input[_currentIndex] == '*' && _currentIndex + 1 < _input.Length && _input[_currentIndex + 1] == '/')
             {
-                Advance(); // Skip '*'
-                Advance(); // Skip '/'
+                Advance(); // Skip '*'  
+                Advance(); // Skip '/'  
                 break;
             }
 
