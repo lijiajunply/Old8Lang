@@ -11,7 +11,14 @@ public class ImportStatement(string importString, SourcePosition position = defa
         if (manager.LangInfo!.LibInfos.Any(x => importString == x.LibName))
         {
             var b = manager.LangInfo.LibInfos.Where(x => x.LibName == importString).Select(x => x.IsDir).ToArray()[0];
-            var path = Path.Combine(manager.LangInfo.ImportPath, importString + (b ? "" : ".ws"));
+            // 检查文件扩展名，只支持.old8和.ol
+            var fileName = importString;
+            var ext = Path.GetExtension(fileName).ToLower();
+            if (!b && ext != ".old8" && ext != ".ol")
+            {
+                fileName += ".old8"; // 默认使用.old8扩展名
+            }
+            var path = Path.Combine(manager.LangInfo.ImportPath, fileName + (b ? "" : ""));
             var previousPath = manager.Path;
             manager.Path = path;
             var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
@@ -24,7 +31,14 @@ public class ImportStatement(string importString, SourcePosition position = defa
         if (Apis.ImportInstall(importString))
         {
             var b = manager.LangInfo.LibInfos.Where(x => x.LibName == importString).Select(x => x.IsDir).ToArray()[0];
-            var path = manager.LangInfo.ImportPath + importString + ".ws";
+            // 检查文件扩展名，只支持.old8和.ol
+            var fileName = importString;
+            var ext = Path.GetExtension(fileName).ToLower();
+            if (!b && ext != ".old8" && ext != ".ol")
+            {
+                fileName += ".old8"; // 默认使用.old8扩展名
+            }
+            var path = Path.Combine(manager.LangInfo.ImportPath, fileName + (b ? "" : ""));
             var previousPath = manager.Path;
             manager.Path = path;
             var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
@@ -35,9 +49,16 @@ public class ImportStatement(string importString, SourcePosition position = defa
         }
 
         var dic = Path.GetDirectoryName(manager.Path)!;
-        if (!File.Exists(dic + "/" + importString + ".ws")) return;
-
-        var filePath = dic + "/" + importString + ".ws";
+        // 检查文件扩展名，只支持.old8和.ol
+        var fileNameLocal = importString;
+        var extLocal = Path.GetExtension(fileNameLocal).ToLower();
+        if (extLocal != ".old8" && extLocal != ".ol")
+        {
+            fileNameLocal += ".old8"; // 默认使用.old8扩展名
+        }
+        var filePath = Path.Combine(dic, fileNameLocal);
+        if (!File.Exists(filePath)) return;
+        
         var managerPath = manager.Path;
         manager.Path = filePath;
         var result = manager.Interpreter.Build(code: Apis.FromFile(filePath));
@@ -51,7 +72,14 @@ public class ImportStatement(string importString, SourcePosition position = defa
         if (langInfo.LibInfos.Any(x => importString == x.LibName))
         {
             var b = langInfo.LibInfos.Where(x => x.LibName == importString).Select(x => x.IsDir).ToArray()[0];
-            var path = Path.Combine(langInfo.ImportPath, importString + (b ? "" : ".ws"));
+            // 检查文件扩展名，只支持.old8和.ol
+            var fileName = importString;
+            var ext = Path.GetExtension(fileName).ToLower();
+            if (!b && ext != ".old8" && ext != ".ol")
+            {
+                fileName += ".old8"; // 默认使用.old8扩展名
+            }
+            var path = Path.Combine(langInfo.ImportPath, fileName + (b ? "" : ""));
             var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
             //var a = Interpreter.Build(code: code);
 
@@ -64,9 +92,16 @@ public class ImportStatement(string importString, SourcePosition position = defa
         }
         
         var dic = Path.GetDirectoryName(local.FilePath)!;
-        if (!File.Exists(dic + "/" + importString + ".ws")) return;
+        // 检查文件扩展名，只支持.old8和.ol
+        var fileNameLocal = importString;
+        var extLocal = Path.GetExtension(fileNameLocal).ToLower();
+        if (extLocal != ".old8" && extLocal != ".ol")
+        {
+            fileNameLocal += ".old8"; // 默认使用.old8扩展名
+        }
+        var filePath = Path.Combine(dic, fileNameLocal);
+        if (!File.Exists(filePath)) return;
 
-        var filePath = dic + "/" + importString + ".ws";
         var result = local.Interpreter?.Build(code: Apis.FromFile(filePath));
         result?.GenerateImportIl(ilGenerator, local);
     }

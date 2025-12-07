@@ -1,5 +1,0 @@
-// 主文件
-import mylib
-
-var result = add(10, 20)
-PrintLine(result)

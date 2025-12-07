@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Old8Lang;
 using Old8Lang.Compiler;
 //using Old8Lang.CslyParser;
@@ -61,7 +61,7 @@ using Old8Lang.LangParser;
 string[] strings =
 [
     "-f", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,
-        "Old8Lang", "Ex", "init.ws")
+        "Old8Lang", "Ex", "init.old8")
 ];
 
 args = args.Length == 0 ? strings : args;
@@ -97,6 +97,14 @@ if (args.Length == 0)
 
 if (args[0] == BasicInfo.Order["FromFile"])
 {
+    // 验证文件扩展名
+    var ext = Path.GetExtension(args[1]).ToLower();
+    if (ext != ".old8" && ext != ".ol")
+    {
+        Console.WriteLine($"不支持的文件扩展名: {ext}，仅支持 .old8 和 .ol 文件");
+        return;
+    }
+    
     var aLangInterpreter = new LangInterpreter
     {
         Manager = { Path = args[1] }
@@ -166,6 +174,14 @@ if (args[0] == BasicInfo.Order["Remove"])
 
 if (args[0] == BasicInfo.Order["Compiler"])
 {
+    // 验证文件扩展名
+    var ext = Path.GetExtension(args[1]).ToLower();
+    if (ext != ".old8" && ext != ".ol")
+    {
+        Console.WriteLine($"不支持的文件扩展名: {ext}，仅支持 .old8 和 .ol 文件");
+        return;
+    }
+    
     var interpreter = new LangInterpreter();
     var sw = new Stopwatch();
     sw.Start();

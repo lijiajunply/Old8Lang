@@ -1,4 +1,0 @@
-// 库文件
-func multiply(x, y) -> {
-    return x * y
-}
