@@ -643,13 +643,20 @@ public class LangParser(List<LangToken> tokens)
             return new Operation(new IntValue(0), OldTokenGeneric.MINUS, expr);
         }
         
+        // 处理 list[...] 语法
+        if (CurrentToken.Type == LangTokenType.Identifier && CurrentToken.Value == "list" && Peek().Type == LangTokenType.LeftBracket)
+        {
+            Expect(LangTokenType.Identifier); // 跳过 list 关键字
+            return ParseList();
+        }
+        
         return CurrentToken.Type switch
         {
             LangTokenType.String => ParseStringLiteral(),
             LangTokenType.Number => ParseDoubleLiteral(),
             LangTokenType.LeftBracket => ParseArrayOrRange(),
             LangTokenType.LeftParen => ParseLambdaOrTuple(),
-            LangTokenType.LeftBrace => ParseDictionaryOrList(),
+            LangTokenType.LeftBrace => ParseDictionary(),
             LangTokenType.Dollar when Peek().Type == LangTokenType.LeftBrace => ParseStringTree(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.As => ParseAs(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftBracket => ParseListInitOrSlice(),
@@ -658,6 +665,34 @@ public class LangParser(List<LangToken> tokens)
             LangTokenType.True or LangTokenType.False => ParseBoolLiteral(),
             _ => throw new Exception($"语法错误：无法识别的主表达式，但得到了 {CurrentToken.Type}")
         };
+    }
+    
+    /// <summary>
+    /// list = "list" "[" expression ( "," expression )* "]" ;
+    /// </summary>
+    /// <returns>列表初始化</returns>
+    private ValueType ParseList()
+    {
+        Expect(LangTokenType.LeftBracket);
+        var elements = new List<OldExpr>();
+
+        if (CurrentToken.Type == LangTokenType.RightBracket)
+        {
+            Expect(LangTokenType.RightBracket);
+            // 空列表，返回ListValue
+            return new ListValue(elements);
+        }
+
+        elements.Add(ParseExpression());
+        while (CurrentToken.Type == LangTokenType.Comma)
+        {
+            Expect(LangTokenType.Comma);
+            elements.Add(ParseExpression());
+        }
+
+        Expect(LangTokenType.RightBracket);
+        // 返回ListValue表示列表
+        return new ListValue(elements);
     }
 
     /// <summary>
@@ -676,97 +711,78 @@ public class LangParser(List<LangToken> tokens)
     /// <summary>
     /// dictionary = "{" dicTuple ( "," dicTuple )* "}" ;
     /// dicTuple = expression ":" expression ;
-    /// list = "{" expression ( "," expression )* "}" ;
     /// </summary>
-    /// <returns>返回列表或者字典</returns>
-    private ValueType ParseDictionaryOrList()
+    /// <returns>返回字典</returns>
+    private ValueType ParseDictionary()
     {
-        // 处理左括号，支持 {} 和 []
-        var leftType = CurrentToken.Type;
-        if (leftType == LangTokenType.LeftBrace || leftType == LangTokenType.LeftBracket)
-        {
-            Expect(leftType);
-        }
-        else
-        {
-            throw new Exception($"语法错误：期望 LeftBrace 或 LeftBracket，但得到了 {CurrentToken.Type}");
-        }
+        // 处理左括号，只支持 {}
+        Expect(LangTokenType.LeftBrace);
 
-        // 确定对应的右括号类型
-        var rightType = leftType == LangTokenType.LeftBrace ? LangTokenType.RightBrace : LangTokenType.RightBracket;
+        var rightType = LangTokenType.RightBrace;
 
-        var elements = new List<OldExpr>();
+        var elements = new List<TupleValue>();
 
         if (CurrentToken.Type == rightType)
         {
             Expect(rightType);
-            return new ListValue(elements);
+            return new DictionaryValue(elements);
         }
 
-        var key = ParseExpression();
-        if (CurrentToken.Type != LangTokenType.Colon || CurrentToken.Type == rightType)
+        // 解析字典元素
+        while (true)
         {
-            while (CurrentToken.Type == LangTokenType.Comma)
-            {
-                Expect(LangTokenType.Comma);
-                elements.Add(ParseExpression());
-            }
-
-            Expect(rightType);
-            return new ListValue(elements);
-        }
-
-        Expect(LangTokenType.Colon);
-        var value = ParseExpression();
-        elements.Add(new TupleValue(key, value));
-
-        while (CurrentToken.Type == LangTokenType.Comma)
-        {
-            Expect(LangTokenType.Comma);
-            key = ParseExpression();
+            var key = ParseExpression();
             Expect(LangTokenType.Colon);
-            value = ParseExpression();
+            var value = ParseExpression();
             elements.Add(new TupleValue(key, value));
+
+            if (CurrentToken.Type != LangTokenType.Comma)
+            {
+                break;
+            }
+            Expect(LangTokenType.Comma);
         }
 
         Expect(rightType);
 
-        return new DictionaryValue(elements.OfType<TupleValue>().ToList());
+        return new DictionaryValue(elements);
     }
 
     /// <summary>
     /// array = "[" expression ( "," expression )* "]" ;
-    /// range = "[" expression ".." expression "]" ;
+    /// range = "[" expression "~" expression "]" ;
     /// </summary>
-    /// <returns>数列初始化或者Range</returns>
+    /// <returns>数组初始化或者Range</returns>
     private ValueType ParseArrayOrRange()
     {
         Expect(LangTokenType.LeftBracket);
-        var list = new List<OldExpr>();
+        var elements = new List<OldExpr>();
 
         if (CurrentToken.Type == LangTokenType.RightBracket)
         {
             Expect(LangTokenType.RightBracket);
-            return new ArrayValue(list);
+            // 空数组，返回ArrayValue
+            return new ArrayValue(elements);
         }
 
-        list.Add(ParseExpression());
+        elements.Add(ParseExpression());
         if (CurrentToken.Type == LangTokenType.Wavy)
         {
             Expect(LangTokenType.Wavy);
-            list.Add(ParseExpression());
+            elements.Add(ParseExpression());
             Expect(LangTokenType.RightBracket);
-            return new RangeValue(list[0], list[1]);
+            return new RangeValue(elements[0], elements[1]);
         }
 
         while (CurrentToken.Type == LangTokenType.Comma)
         {
             Expect(LangTokenType.Comma);
-            list.Add(ParseExpression());
+            elements.Add(ParseExpression());
         }
 
         Expect(LangTokenType.RightBracket);
-        return new ArrayValue(list);
+        // 返回ArrayValue表示数组
+        return new ArrayValue(elements);
     }
 
     /// <summary>
