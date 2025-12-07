@@ -107,7 +107,7 @@ public class OldParser
     /// <param name="expr">右值</param>
     /// <returns></returns>
     [Operation((int)OldTokenGeneric.MINUS, Affix.PreFix, Associativity.Right, 100)]
-    public OldLangTree MINUS(Token<OldTokenGeneric> opera, OldExpr expr) =>
+    public OldLangTree Minus(Token<OldTokenGeneric> opera, OldExpr expr) =>
         new Operation(null!, opera.TokenID, expr);
 
     #endregion
@@ -121,18 +121,18 @@ public class OldParser
     #region BaseType
 
     [Production("primary: STRING")]
-    public OldLangTree STRING(Token<OldTokenGeneric> token) =>
+    public OldLangTree String(Token<OldTokenGeneric> token) =>
         new StringValue(token.Value[1..^1]);
 
     [Production("primary: INT")]
-    public OldLangTree INT(Token<OldTokenGeneric> token) => new IntValue(token.IntValue);
+    public OldLangTree Int(Token<OldTokenGeneric> token) => new IntValue(token.IntValue);
 
     [Production("primary: CHAR")]
-    public OldLangTree CHAR(Token<OldTokenGeneric> token) =>
+    public OldLangTree Char(Token<OldTokenGeneric> token) =>
         new CharValue(token.CharValue);
 
     [Production("primary: DOUBLE")]
-    public OldLangTree DOUBLE(Token<OldTokenGeneric> token) => new DoubleValue(double.Parse(token.Value));
+    public OldLangTree Double(Token<OldTokenGeneric> token) => new DoubleValue(double.Parse(token.Value));
 
     // [Production("primary: IDENTIFIER")]
     // public OldLangTree IDENTIFIER(Token<OldTokenGeneric> id) => new OldID(id.Value);
@@ -207,11 +207,11 @@ public class OldParser
     [Production("primary: IDENTIFIER LPAREN[d] argList? RPAREN[d]")]
     public OldLangTree Instantiate(Token<OldTokenGeneric> id, ValueOption<OldLangTree> ids)
     {
-        List<OldExpr> IDs = [];
+        List<OldExpr> ds = [];
 
         var value = ids.Match(x => x, () => null!);
-        if (value is ArgList argList) IDs.AddRange(argList.Args);
-        return new Instance(new OldID(id.Value), IDs);
+        if (value is ArgList argList) ds.AddRange(argList.Args);
+        return new Instance(new OldID(id.Value), ds);
     }
 
     #endregion
@@ -383,9 +383,9 @@ public class OldParser
 
     [Production("statement : IF[d] if_block (ELIF[d] if_block)* (ELSE[d] block)?")]
     public OldLangTree IfTree(OldIf ifBlock, List<Group<OldTokenGeneric, OldLangTree>> elif,
-        ValueOption<Group<OldTokenGeneric, OldLangTree>> Else)
+        ValueOption<Group<OldTokenGeneric, OldLangTree>> @else)
     {
-        var eGrp = Else.Match(
+        var eGrp = @else.Match(
             x => x, () => null!);
         var elseBlock = eGrp?.Value(0) as BlockStatement;
         var a = elif.Select(x => x.Value(0) as OldIf).ToList();
@@ -522,8 +522,8 @@ public class OldParser
 
     [Production("statement:L_BRACKET[d] IMPORT[d] STRING IDENTIFIER R_BRACKET[d] LAMBDA[d] STRING")]
     public OldLangTree NativeStatic(Token<OldTokenGeneric> dll, Token<OldTokenGeneric> classname,
-        Token<OldTokenGeneric> _namespace) =>
-        new NativeStatement(dll.Value[1..^1], classname.Value, _namespace.Value[1..^1]);
+        Token<OldTokenGeneric> @namespace) =>
+        new NativeStatement(dll.Value[1..^1], classname.Value, @namespace.Value[1..^1]);
 
     [Production("statement:L_BRACKET[d] IMPORT[d] STRING IDENTIFIER R_BRACKET[d]")]
     public OldLangTree NativeClass(Token<OldTokenGeneric> dllName, Token<OldTokenGeneric> classname) =>

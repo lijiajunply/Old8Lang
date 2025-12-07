@@ -4,7 +4,6 @@ using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
 using sly.parser;
 using sly.parser.generator;
-using sly.parser.generator.visitor;
 
 namespace Old8Lang.CslyParser;
 
@@ -15,7 +14,7 @@ public class Interpreter : IMiniInterpreter
     public readonly VariateManager Manager = new();
     private string Code { get; } = "";
 
-    private Parser<OldTokenGeneric, OldLangTree>? parser;
+    private Parser<OldTokenGeneric, OldLangTree>? Parser;
     public AbsUseClass UseClass { get; set; } = new ConsoleUse();
     public bool IsCompileOptimization { get; set; }
 
@@ -25,11 +24,11 @@ public class Interpreter : IMiniInterpreter
 
     private void Init()
     {
-        var Parser = new ParserBuilder<OldTokenGeneric, OldLangTree>();
+        var builder = new ParserBuilder<OldTokenGeneric, OldLangTree>();
         var oldParser = new OldParser();
-        var parserBuilder = Parser.BuildParser(oldParser,
+        var parserBuilder = builder.BuildParser(oldParser,
             ParserType.EBNF_LL_RECURSIVE_DESCENT, "root");
-        parser = parserBuilder.Result;
+        Parser = parserBuilder.Result;
         Manager.Interpreter = this;
         Manager.LangInfo ??= Apis.ReadJson();
     }
@@ -69,7 +68,7 @@ public class Interpreter : IMiniInterpreter
     public BlockStatement Build(string code = "")
     {
         code = string.IsNullOrEmpty(code) ? Code : code;
-        var result = parser?.Parse(code);
+        var result = Parser?.Parse(code);
 
         if (result == null) throw new Exception("语法出错");
 

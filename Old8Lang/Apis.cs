@@ -49,10 +49,10 @@ public static class Apis
         => File.Exists(filename) ? File.ReadAllText(filename, Encoding.UTF8) : filename;
 
 
-    public static string FromDirectory(string DirectoryName)
+    public static string FromDirectory(string directoryName)
     {
         var builder = new StringBuilder();
-        builder.Append(FromFile(DirectoryName + "/" + "init.ws"));
+        builder.Append(FromFile(directoryName + "/" + "init.ws"));
         return builder.ToString();
     }
 
@@ -74,16 +74,26 @@ public static class Apis
 
     public static LangInfo ReadJson()
     {
-        var jsonString = FromFile(BasicInfo.JsonPath);
-        var a = JsonSerializer.Deserialize<LangInfo>(jsonString)!;
-        if (Directory.Exists(a.ImportPath)) return a;
+        LangInfo langInfo;
+        if (File.Exists(BasicInfo.JsonPath))
+        {
+            var jsonString = File.ReadAllText(BasicInfo.JsonPath, Encoding.UTF8);
+            langInfo = JsonSerializer.Deserialize<LangInfo>(jsonString)!;
+        }
+        else
+        {
+            // 如果文件不存在，创建一个默认的 LangInfo 对象
+            langInfo = new LangInfo { LibInfos = [], Ver = "1.0.0", Url = "https://downland.old8lang.com" };
+        }
+        
+        if (Directory.Exists(langInfo.ImportPath)) return langInfo;
         var s = Path.GetDirectoryName(BasicInfo.CodePath);
 #if RELEASE
         s = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 #endif
-        a.ImportPath = Path.Combine(s ?? "", "Old8LangLib", "OldLib");
+        langInfo.ImportPath = Path.Combine(s ?? "", "Old8LangLib", "OldLib");
 
-        return a;
+        return langInfo;
     }
 
     public static bool ImportInstall(string context)

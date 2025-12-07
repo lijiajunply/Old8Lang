@@ -44,42 +44,42 @@ public class LocalManager
 
 public class MiniInterpreter : IMiniInterpreter
 {
-    private readonly Parser<OldTokenGeneric, OldLangTree>? parser;
+    private readonly Parser<OldTokenGeneric, OldLangTree>? Parser;
 
     public MiniInterpreter()
     {
-        var Parser = new ParserBuilder<OldTokenGeneric, OldLangTree>();
+        var parser = new ParserBuilder<OldTokenGeneric, OldLangTree>();
         var oldParser = new OldParser();
-        var parserBuilder = Parser.BuildParser(oldParser,
+        var parserBuilder = parser.BuildParser(oldParser,
             ParserType.EBNF_LL_RECURSIVE_DESCENT, "root");
-        parser = parserBuilder.Result;
+        Parser = parserBuilder.Result;
     }
 
     public BlockStatement Build(string code)
     {
-        var result = parser?.Parse(code);
+        var result = Parser?.Parse(code);
 
         if (result == null) throw new Exception("语法出错");
-        List<string> Error = [];
-        if (Error.Count != 0) Error.Clear();
+        List<string> error = [];
+        if (error.Count != 0) error.Clear();
         if (result.Errors == null || result.Errors.Count == 0)
             return result.Result as BlockStatement ?? new BlockStatement([]);
         result.Errors.ForEach(x =>
         {
             try
             {
-                Error.Add($"{x.ErrorType} : {x.ErrorMessage ?? ""}");
+                error.Add($"{x.ErrorType} : {x.ErrorMessage ?? ""}");
                 var lines = code.Split("\n");
-                Error.Add($"{lines[x.Line]}");
+                error.Add($"{lines[x.Line]}");
             }
             catch (Exception)
             {
-                Error.Add($"{x.ErrorType} in line {x.Line + 1} , col {x.Column}");
+                error.Add($"{x.ErrorType} in line {x.Line + 1} , col {x.Column}");
                 var lines = code.Split("\n");
-                Error.Add($"{lines[x.Line]}");
+                error.Add($"{lines[x.Line]}");
             }
         });
-        throw new Exception(string.Join("\n", Error));
+        throw new Exception(string.Join("\n", error));
     }
 
     public AbsUseClass UseClass { get; set; } = new ConsoleUse();
