@@ -2,7 +2,7 @@ using Old8Lang.AST.Expression.Value;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
-public class AsValue(OldExpr id, OldId asId) : ValueType
+public class AsValue(OldExpr id, OldId asId, SourcePosition position = default) : ValueType(position)
 {
     public override ValueType Run(LangParser.VariateManager manager)
     {

@@ -11,9 +11,9 @@ public class ListValue : ValueType, IOldList
 
     public readonly List<ValueType> Values = [];
 
-    public ListValue(List<OldExpr> value) => Value = value;
+    public ListValue(List<OldExpr> value, SourcePosition position = default) : base(position) => Value = value;
 
-    public ListValue(List<object> value)
+    public ListValue(List<object> value, SourcePosition position = default) : base(position)
     {
         Values = value.Select(ObjToValue).ToList();
         Value = Values.OfType<OldExpr>().ToList();

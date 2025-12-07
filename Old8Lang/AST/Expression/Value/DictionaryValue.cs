@@ -12,17 +12,17 @@ public class DictionaryValue : ValueType, IOldList
     private readonly List<TupleValue> Tuples;
     public readonly List<(ValueType Key, ValueType Value)> Value = [];
 
-    public DictionaryValue(List<TupleValue> tuples)
+    public DictionaryValue(List<TupleValue> tuples, SourcePosition position = default) : base(position)
     {
         this.Tuples = tuples;
     }
 
-    public DictionaryValue()
+    public DictionaryValue(SourcePosition position = default) : base(position)
     {
         Tuples = [];
     }
 
-    public DictionaryValue(List<KeyValuePair<OldExpr, OldExpr>> list)
+    public DictionaryValue(List<KeyValuePair<OldExpr, OldExpr>> list, SourcePosition position = default) : base(position)
     {
         Tuples = list.Select(x => new TupleValue(x.Key, x.Value)).ToList();
     }

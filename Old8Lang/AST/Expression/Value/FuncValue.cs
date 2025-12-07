@@ -20,14 +20,14 @@ public class FuncValue : ValueType
 
     private readonly FuncValue? Func;
 
-    public FuncValue(OldId? id, List<OldId> ids, BlockStatement blockStatement)
+    public FuncValue(OldId? id, List<OldId> ids, BlockStatement blockStatement, SourcePosition position = default) : base(position)
     {
         Id = id;
         Ids = ids;
         BlockStatement = blockStatement;
     }
 
-    public FuncValue(string idName, MethodInfo methodInfo, FuncValue? func = null)
+    public FuncValue(string idName, MethodInfo methodInfo, FuncValue? func = null, SourcePosition position = default) : base(position)
     {
         Id = new OldId(idName);
         Method = methodInfo;

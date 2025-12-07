@@ -11,19 +11,19 @@ public class ArrayValue : ValueType, IOldList
     private readonly ValueType[] RunResult;
     private readonly List<OldExpr> Values = [];
 
-    public ArrayValue(IEnumerable<OldExpr> valuesList)
+    public ArrayValue(IEnumerable<OldExpr> valuesList, SourcePosition position = default) : base(position)
     {
         var oldExpr = valuesList as OldExpr[] ?? valuesList.ToArray();
         RunResult = new ValueType[oldExpr.Length];
         Values = oldExpr.ToList();
     }
 
-    public ArrayValue(List<ValueType> re)
+    public ArrayValue(List<ValueType> re, SourcePosition position = default) : base(position)
     {
         RunResult = re.ToArray();
     }
 
-    public ArrayValue(List<object> a) => RunResult = a.Select(ObjToValue).ToArray();
+    public ArrayValue(List<object> a, SourcePosition position = default) : base(position) => RunResult = a.Select(ObjToValue).ToArray();
 
     public override ValueType Run(LangParser.VariateManager manager)
     {

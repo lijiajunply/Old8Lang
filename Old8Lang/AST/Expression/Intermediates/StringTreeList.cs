@@ -2,7 +2,7 @@ using Old8Lang.AST.Expression.Value;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
-public class StringTreeList(List<OldExpr> list) : ValueType
+public class StringTreeList(List<OldExpr> list, SourcePosition position = default) : ValueType(position)
 {
     public override ValueType Run(LangParser.VariateManager manager)
     {

@@ -5,7 +5,7 @@ using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class BoolValue(bool value) : ValueType
+public class BoolValue(bool value, SourcePosition position = default) : ValueType(position)
 {
     public readonly bool Value = value;
     public override string ToString() => Value.ToString();

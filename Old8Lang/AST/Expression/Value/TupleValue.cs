@@ -1,6 +1,6 @@
 namespace Old8Lang.AST.Expression.Value;
 
-public class TupleValue(OldExpr v1, OldExpr v2) : ValueType
+public class TupleValue(OldExpr v1, OldExpr v2, SourcePosition position = default) : ValueType(position)
 {
     public readonly OldExpr Item1 = v1;
     public readonly OldExpr Item2 = v2;

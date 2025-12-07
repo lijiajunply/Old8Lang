@@ -78,34 +78,37 @@ public static class AnyValueFuncStatic
 
 public static class ValueTypeFuncStatic
 {
-    public static IntValue ToInt(this ValueType type)
+    extension(ValueType type)
     {
-        if (type is IntValue intValue)
+        public IntValue ToInt()
         {
-            return intValue;
+            if (type is IntValue intValue)
+            {
+                return intValue;
+            }
+
+            if (type is DoubleValue doubleValue)
+            {
+                return new IntValue(Convert.ToInt32(doubleValue.Value));
+            }
+
+            if (type is CharValue charValue)
+            {
+                return new IntValue(Convert.ToInt32(charValue.Value));
+            }
+
+            return new IntValue(int.Parse(type.ToString()));
         }
 
-        if (type is DoubleValue doubleValue)
+        public TypeValue ToType()
         {
-            return new IntValue(Convert.ToInt32(doubleValue.Value));
+            return new TypeValue(type.TypeToString());
         }
 
-        if (type is CharValue charValue)
+        public StringValue ToStr()
         {
-            return new IntValue(Convert.ToInt32(charValue.Value));
+            return new StringValue(type.ToString());
         }
-
-        return new IntValue(int.Parse(type.ToString()));
-    }
-
-    public static TypeValue ToType(this ValueType type)
-    {
-        return new TypeValue(type.TypeToString());
-    }
-
-    public static StringValue ToStr(this ValueType type)
-    {
-        return new StringValue(type.ToString());
     }
 }
 

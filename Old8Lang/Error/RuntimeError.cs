@@ -63,28 +63,16 @@ public class KeyError : RuntimeError
 /// <summary>
 /// 除零错误
 /// </summary>
-public class ZeroDivisionError : RuntimeError
-{
-    public ZeroDivisionError(IOldLangTree node) 
-        : base(
-            node, 
-            "除零错误",
-            "请确保除数不为零")
-    {}
-}
+public class ZeroDivisionError(IOldLangTree node) : RuntimeError(node,
+    "除零错误",
+    "请确保除数不为零");
 
 /// <summary>
 /// 无效操作错误
 /// </summary>
-public class InvalidOperationError : RuntimeError
-{
-    public InvalidOperationError(IOldLangTree node, string operation) 
-        : base(
-            node, 
-            $"无效操作: {operation}",
-            "请检查操作是否合法")
-    {}
-}
+public class InvalidOperationError(IOldLangTree node, string operation) : RuntimeError(node,
+    $"无效操作: {operation}",
+    "请检查操作是否合法");
 
 /// <summary>
 /// 内存溢出错误

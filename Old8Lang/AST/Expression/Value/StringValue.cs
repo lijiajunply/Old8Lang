@@ -7,7 +7,7 @@ using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class StringValue(string context) : ValueType, IOldList
+public class StringValue(string context, SourcePosition position = default) : ValueType(position), IOldList
 {
     public readonly string Value = context.Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\r", "\r")
         .Replace(@"\\", "\\");

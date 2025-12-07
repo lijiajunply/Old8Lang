@@ -7,7 +7,7 @@ using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class DoubleValue(double doubleValue) : ValueType
+public class DoubleValue(double doubleValue, SourcePosition position = default) : ValueType(position)
 {
     public readonly double Value = doubleValue;
 

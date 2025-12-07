@@ -5,7 +5,7 @@ using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class OldItem(OldId listId, OldExpr key) : ValueType
+public class OldItem(OldId listId, OldExpr key, SourcePosition position = default) : ValueType(position)
 {
     public override ValueType Run(LangParser.VariateManager manager)
     {

@@ -7,16 +7,20 @@ namespace Old8Lang.AST.Expression;
 /// <summary>
 /// 表示值
 /// </summary>
-public abstract class ValueType : OldExpr
+/// <remarks>
+/// 构造函数
+/// </remarks>
+/// <param name="position">位置信息</param>
+public abstract class ValueType(SourcePosition position = default) : OldExpr(position)
 {
     public override string ToString() => GetValue().ToString()!;
 
     #region intOper
 
-    public virtual ValueType Plus(ValueType otherValueType) => new VoidValue();
-    public virtual ValueType Minus(ValueType otherValueType) => new VoidValue();
-    public virtual ValueType Times(ValueType otherValueType) => new VoidValue();
-    public virtual ValueType Divide(ValueType otherValueType) => new VoidValue();
+    public virtual ValueType Plus(ValueType otherValueType) => new VoidValue(Position);
+    public virtual ValueType Minus(ValueType otherValueType) => new VoidValue(Position);
+    public virtual ValueType Times(ValueType otherValueType) => new VoidValue(Position);
+    public virtual ValueType Divide(ValueType otherValueType) => new VoidValue(Position);
 
     #endregion
 
@@ -33,7 +37,7 @@ public abstract class ValueType : OldExpr
             return instance.FromClassToResult(this);
         }
 
-        return new VoidValue();
+        return new VoidValue(Position);
     }
 
     #region boolOper
@@ -46,7 +50,7 @@ public abstract class ValueType : OldExpr
 
     #endregion
 
-    public virtual ValueType Converse(ValueType otherValueType, VariateManager manager) => new VoidValue();
+    public virtual ValueType Converse(ValueType otherValueType, VariateManager manager) => new VoidValue(Position);
 
     public override ValueType Run(VariateManager manager) => this;
 

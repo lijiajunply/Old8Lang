@@ -4,7 +4,7 @@ using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
-public class RangeValue(OldExpr? start, OldExpr? end) : ValueType
+public class RangeValue(OldExpr? start, OldExpr? end, SourcePosition position = default) : ValueType(position)
 {
     public override ValueType Run(LangParser.VariateManager manager)
     {

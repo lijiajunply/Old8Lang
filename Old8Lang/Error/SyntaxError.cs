@@ -1,6 +1,3 @@
-using Old8Lang.AST;
-using Old8Lang;
-
 namespace Old8Lang.Error;
 
 /// <summary>

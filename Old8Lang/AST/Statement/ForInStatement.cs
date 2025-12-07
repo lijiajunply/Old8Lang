@@ -5,7 +5,6 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
-using Old8Lang;
 
 namespace Old8Lang.AST.Statement;
 
