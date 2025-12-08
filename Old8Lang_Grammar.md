@@ -2,7 +2,7 @@
 
 ## 1. 概述
 
-Old8Lang 是一种静态类型的编程语言，具有类似 C#/Java 的语法结构，同时支持解释执行和编译执行。本文档详细介绍了 Old8Lang 的语法规则，包括词法、语法和语义。
+Old8Lang 是一种动态类型的编程语言，具有类似 C#/Java 的语法结构，同时支持解释执行和编译执行。本文档详细介绍了 Old8Lang 的语法规则，包括词法、语法和语义。
 
 ## 2. 词法规则
 
@@ -219,9 +219,9 @@ func(a, b)
 变量声明使用 `:` 语法指定类型（类型假注），赋值使用 `<-` 运算符：
 
 ```
-a:int <- 123
-b:double <- 3.14
-c:string <- "hello"
+a <- 123
+b <- 3.14
+c:string <- "hello" // 类型假注
 ```
 
 ### 5.3 控制流语句
@@ -313,6 +313,11 @@ class Person {
     name:string <- ""
     age:int <- 0
     
+    func init(name:string, age:int) {
+        this.name <- name
+        this.age <- age
+    }
+    
     func sayHello() {
         PrintLine("Hello, my name is " + name)
     }
@@ -322,18 +327,10 @@ class Person {
 #### 5.5.2 类实例化
 
 ```
-p <- Person()
-p.name <- "Alice"
-p.age <- 30
+p <- Person("Alice", 30)
 p.sayHello()
 
-class Test {
-    func init(a:int, b:int) {
-        PrintLine("init: " + a + ", " + b)
-    }
-}
-
-t <- Test(1, 2)
+t <- Test(1, 2)  // 调用带有参数的构造函数
 ```
 
 ### 5.6 异常处理
@@ -342,7 +339,7 @@ t <- Test(1, 2)
 try {
     // 可能抛出异常的代码
 } catch (e) {
-    // 捕获异常并处理
+    // 捕获所有类型的异常
 } finally {
     // 无论是否异常都执行
 }
@@ -357,7 +354,34 @@ import module
 
 ## 6. 类型系统
 
-### 6.1 类型转换
+### 6.1 动态类型
+
+Old8Lang 为动态类型语言，变量的类型可以在运行时改变：
+
+```
+a <- 123  // a 为 int 类型
+a <- "hello"  // a 变为 string 类型
+```
+
+### 6.2 类型假注
+
+可以使用 `:` 语法为变量添加类型假注，指定变量的预期类型：
+
+```
+a:int <- 123  // a 被标记为 int 类型
+```
+
+### 6.3 类型检查
+
+如果进行了类型假注，就需要保持类型不变，否则会产生报错：
+
+```
+a:int <- 123  // 正确，a 为 int 类型
+a <- 456  // 正确，仍然是 int 类型
+a <- "hello"  // 错误，不能将 string 类型赋值给标记为 int 类型的变量
+```
+
+### 6.4 类型转换
 
 使用 `as` 关键字进行类型转换：
 
@@ -366,30 +390,7 @@ a:int <- 123
 b:double <- a as double
 ```
 
-### 6.2 类型推断
-
-Old8Lang 支持类型推断，例如在变量声明时：
-
-```
-a <- 123  // 推断为 int 类型
-b <- 3.14  // 推断为 double 类型
-```
-
-> ![TIP]
->
-> Old8Lang 为动态类型语言，变量的类型可以在运行时改变。但如果进行了类型假注（例如 a:int 为 int 类型），就需要保持类型不变。
-
-### 6.3 类型检查
-
-Old8Lang 支持类型检查，例如在赋值时：
-
-```
-a:int <- 123
-b:double <- a  // 正确，a 可以隐式转换为 double
-c:string <- a  // 错误，不能将 int 隐式转换为 string
-```
-
-### 6.4 类型转换规则
+### 6.5 类型转换规则
 
 Old8Lang 支持以下类型转换规则：
 
@@ -400,9 +401,60 @@ Old8Lang 支持以下类型转换规则：
 | string | int/double | 解析数值 |
 | int/double | string | 转换为字符串 |
 
-## 7. 示例代码
+## 7. 特殊语法
 
-### 7.1 基本类型和表达式
+### 7.1 字符串模板
+
+使用 `$()` 语法来创建字符串模板，在字符串内部支持 `${}` 占位符和 `{{}}` 转义：
+
+```
+name <- "Alice"
+age <- 30
+message <- $("My name is {name}, I'm {age} years old.")
+PrintLine(message)
+```
+
+新语法支持：
+1. `$(".")` - 基本字符串模板
+2. `${}` - 在模板中嵌入表达式
+3. `{{` - 转义 `{` 字符
+4. `}}` - 转义 `}` 字符
+
+例如：
+```
+// 基本使用
+name <- "Alice"
+result <- $("Hello, {name}")
+
+// 转义大括号
+escaped <- $("This is {{escaped}} bracket")
+
+// 混合使用
+mixed <- $("Name: {name}, Escaped: {{escaped}}")
+```
+
+### 7.2 列表推导式
+
+```
+numbers <- [1, 2, 3, 4, 5]
+squares <- [x * x for x in numbers]
+```
+
+### 7.3 范围表达式
+
+```
+// 创建一个从 1 到 10 的范围
+range <- [1~10]
+
+// 使用范围进行循环
+for i in range {
+    PrintLine(i)
+}
+```
+
+## 8. 示例代码
+
+### 8.1 基本类型和表达式
 
 ```old8
 // 整数类型
@@ -435,7 +487,7 @@ l <- d and e
 m <- a > b
 ```
 
-### 7.2 控制流
+### 8.2 控制流
 
 ```old8
 // if-elif-else
@@ -465,7 +517,7 @@ for item in g {
 }
 ```
 
-### 7.3 函数和类
+### 8.3 函数和类
 
 ```old8
 // 函数声明
@@ -501,7 +553,7 @@ quotient <- calc.divide(10.0, 2.0)
 PrintLine("10.0 / 2.0 = " + quotient)
 ```
 
-### 7.4 异常处理
+### 8.4 异常处理
 
 ```old8
 try {
@@ -514,86 +566,16 @@ try {
 }
 ```
 
-## 8. 特殊语法
-
-### 8.1 字符串模板
-
-使用 `$()` 语法来创建字符串模板，在字符串内部支持 `${}` 占位符和 `{{}}` 转义：
-
-```
-name <- "Alice"
-age <- 30
-message <- $("My name is {name}, I'm {age} years old.")
-PrintLine(message)
-```
-
-新语法支持：
-1. `$(".")` - 基本字符串模板
-2. `${}` - 在模板中嵌入表达式
-3. `{{` - 转义 `{` 字符
-4. `}}` - 转义 `}` 字符
-
-例如：
-```
-// 基本使用
-name <- "Alice"
-result <- $("Hello, {name}")
-
-// 转义大括号
-escaped <- $("This is {{escaped}} bracket")
-
-// 混合使用
-mixed <- $("Name: {name}, Escaped: {{escaped}}")
-```
-
-### 8.2 列表推导式
-
-```
-numbers <- [1, 2, 3, 4, 5]
-squares <- [x * x for x in numbers]
-```
-
-### 8.3 范围表达式
-
-```
-// 创建一个从 1 到 10 的范围
-range <- [1~10]
-
-// 使用范围进行循环
-for i in range {
-    PrintLine(i)
-}
-```
-
 ## 9. 编译与执行
 
-### 9.1 解释执行
+### 9.1 解释模式
 
-使用解释器执行 Old8Lang 代码：
+解释模式下，Old8Lang 代码会逐条解释执行，无需编译。
 
-```bash
-dotnet run --project Old8Lang.App -- -f file.old8
-```
+### 9.2 编译模式
 
-### 9.2 编译执行
-
-使用编译器将 Old8Lang 代码编译为可执行文件：
-
-```bash
-dotnet run --project Old8Lang.App -- -c file.old8
-```
-
-> ![TIP]
->
-> 编译执行时，建议使用类型假注。函数书写时必须使用类型假注
+编译模式下，Old8Lang 代码会先被编译成中间代码，然后再执行。
 
 ## 10. 总结
 
-Old8Lang 是一种功能丰富的编程语言，具有清晰的语法结构和强大的表达能力。本文档详细介绍了 Old8Lang 的语法规则，包括词法、语法和语义。通过学习本文档，您应该能够理解和编写 Old8Lang 代码。
-
-如需了解更多关于 Old8Lang 的信息，请参考项目中的其他文档：
-
-- [Interpreter.md](Docs/Interpreter.md) - 解释器实现
-- [Lexer.md](Docs/Lexer.md) - 词法分析器实现
-- [Parser.md](Docs/Parser.md) - 语法分析器实现
-- [Tutorial.md](Docs/Tutorial.md) - 入门教程
+Old8Lang 是一种功能丰富的动态类型编程语言，具有清晰的语法结构和强大的表达能力。本文档详细介绍了 Old8Lang 的语法规则，包括词法、语法和语义。通过学习本文档，您应该能够理解和编写 Old8Lang 代码。
