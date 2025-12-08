@@ -1,6 +1,0 @@
-a:int <- 123
-b:string <- "hello"
-c:bool <- true
-
-# 测试类型不匹配，应该抛出TypeError
-d:int <- "world"

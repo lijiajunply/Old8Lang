@@ -1,4 +1,0 @@
-// 测试ForInStatement的类型错误
-for i in 123 {
-    PrintLine(i)
-}

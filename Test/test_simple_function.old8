@@ -1,8 +1,0 @@
-// 简单的函数定义，带有类型注解
-add:int (a:int, b:int) -> 
-{
-   return a + b
-}
-
-// 无类型注解的变量赋值
-result <- add(1, 2)
