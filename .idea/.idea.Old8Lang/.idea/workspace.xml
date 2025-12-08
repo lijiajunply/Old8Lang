@@ -17,52 +17,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/plan_20251208_082926.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/NullLangValue.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_very_simple.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/FuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/FuncStatic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/AsValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/AsLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ErrorValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ErrorLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/IOldList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/IOldList.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeStaticAny.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeStaticAny.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/RangeValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/RangeLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/SliceValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/SliceLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/VoidValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/VoidLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/OldID.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/OldID.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ArrayValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/BoolValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/BoolLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/CharValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/CharLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DoubleValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DoubleLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/IntValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/IntLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/OldItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/OldItem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/StringValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/StringLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/OldExpr.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/OldExpr.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/OldIf.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/OldIf.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/OtherVariateChanging.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/OtherVariateChanging.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/TryStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/TryStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Todos/2025-12-08-语法修复待办.md" beforeDir="false" afterPath="$PROJECT_DIR$/Todos/2025-12-08-语法修复待办.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_simple.old8" beforeDir="false" afterPath="$PROJECT_DIR$/test_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TokenAnalyzer/Program.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TokenAnalyzer/TokenAnalyzer.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SYNTAX_TEST_REPORT.md" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -357,7 +315,7 @@
       <workItem from="1765095462905" duration="3326000" />
       <workItem from="1765099889326" duration="6689000" />
       <workItem from="1765111093830" duration="7390000" />
-      <workItem from="1765181076923" duration="1497000" />
+      <workItem from="1765181076923" duration="2319000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -764,10 +722,10 @@
           <line>16</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="474" />
+              <option value="475" />
             </startOffsets>
             <endOffsets>
-              <option value="504" />
+              <option value="505" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="236" />
@@ -777,10 +735,10 @@
           <line>17</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="513" />
+              <option value="514" />
             </startOffsets>
             <endOffsets>
-              <option value="547" />
+              <option value="549" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="237" />
@@ -790,10 +748,10 @@
           <line>20</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="630" />
+              <option value="632" />
             </startOffsets>
             <endOffsets>
-              <option value="673" />
+              <option value="675" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="238" />
@@ -803,10 +761,10 @@
           <line>23</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="734" />
+              <option value="736" />
             </startOffsets>
             <endOffsets>
-              <option value="752" />
+              <option value="754" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="239" />
@@ -816,10 +774,10 @@
           <line>38</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'GenerateIl'">
             <startOffsets>
-              <option value="1224" />
+              <option value="1226" />
             </startOffsets>
             <endOffsets>
-              <option value="1298" />
+              <option value="1300" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="401" />
@@ -829,10 +787,10 @@
           <line>59</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'GenerateIl'">
             <startOffsets>
-              <option value="2221" />
+              <option value="2223" />
             </startOffsets>
             <endOffsets>
-              <option value="2262" />
+              <option value="2264" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="402" />
@@ -855,10 +813,10 @@
           <line>11</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/OldItem.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="319" />
+              <option value="320" />
             </startOffsets>
             <endOffsets>
-              <option value="352" />
+              <option value="353" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="506" />

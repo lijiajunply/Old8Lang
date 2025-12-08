@@ -35,7 +35,7 @@ public class ClassInit(AnyLangValue anyLangValue, SourcePosition position = defa
         var typeBuilder = moduleBuilder.DefineType(anyLangValue.Id.IdName, TypeAttributes.Public);
 
         var fields = new List<FieldBuilder>();
-        var fieldValues = new List<Old8Lang.AST.Expression.LangValueType>();
+        var fieldValues = new List<Expression.LangValueType>();
         var func = new List<FuncLangValue>();
         foreach (var variate in anyLangValue.Variates)
         {
@@ -45,7 +45,7 @@ public class ClassInit(AnyLangValue anyLangValue, SourcePosition position = defa
                 continue;
             }
 
-            if (variate.Value is not Old8Lang.AST.Expression.LangValueType value) continue;
+            if (variate.Value is not Expression.LangValueType value) continue;
 
             var fieldBuilder = typeBuilder.DefineField(variate.Key.IdName,
                 variate.Value.OutputType(local)!,

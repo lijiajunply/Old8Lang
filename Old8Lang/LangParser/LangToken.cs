@@ -412,7 +412,7 @@ public static class LangTokenizer
             }
 
             // 处理无法识别的字符
-            throw new Old8Lang.Error.SyntaxError(
+            throw new Error.SyntaxError(
                 code[i].ToString(), 
                 line, 
                 i - column, 

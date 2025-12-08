@@ -14,7 +14,7 @@ public class DictionaryLangValue : LangValueType, ILangList
 
     public DictionaryLangValue(List<TupleLangValue> tuples, SourcePosition position = default) : base(position)
     {
-        this.Tuples = tuples;
+        Tuples = tuples;
     }
 
     public DictionaryLangValue(SourcePosition position = default) : base(position)
