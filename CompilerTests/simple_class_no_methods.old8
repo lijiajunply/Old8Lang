@@ -1,8 +1,0 @@
-class Person{
-    name <- ""
-    age <- 0
-}
-
-p <- Person()
-p.name <- "Alice"
-p.age <- 30

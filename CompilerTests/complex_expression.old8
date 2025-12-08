@@ -1,9 +1,0 @@
-// 复杂表达式测试
-
-// 1. 先测试逻辑与和逻辑或
-a:bool <- true and false   // 逻辑与
-b:bool <- true or false    // 逻辑或
-
-// 2. 添加逻辑非和逻辑异或
-c:bool <- not true         // 逻辑非
-d:bool <- true xor false   // 逻辑异或

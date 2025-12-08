@@ -1,3 +1,0 @@
-// 只有逻辑异或测试
-
-d:bool <- true xor false   // 逻辑异或
