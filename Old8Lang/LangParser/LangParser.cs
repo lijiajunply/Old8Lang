@@ -468,14 +468,16 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     }
 
     /// <summary>
-    /// funcDeclaration = ( identifier | "func" identifier ) "(" idList? ")"  "->" block  ;
+    /// funcDeclaration = ( "func" identifier | identifier ) "(" idList? ")" ( "->" )? block  ;
     /// </summary>
     /// <returns>声明函数</returns>
     private FuncInit ParseFuncDeclaration()
     {
+        var isUseFunc = false;
         if (CurrentToken.Type == LangTokenType.Func)
         {
             Expect(LangTokenType.Func);
+            isUseFunc = true;
         }
 
         var funcName = ParseIdentifier();
@@ -483,7 +485,9 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         Expect(LangTokenType.LeftParen);
         var parameters = ParseIdList();
         Expect(LangTokenType.RightParen);
-        if (CurrentToken.Type == LangTokenType.Arrow)
+        
+        // 支持箭头语法: add(a, b) -> { ... }，但不支持 func(a, b) -> a + b
+        if (CurrentToken.Type == LangTokenType.Arrow && !isUseFunc)
         {
             Expect(LangTokenType.Arrow);
         }
@@ -1510,14 +1514,35 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     {
         var arguments = new List<OldId>();
         if (CurrentToken.Type == LangTokenType.RightParen) return arguments;
-        arguments.Add(ParseIdentifier());
+        arguments.Add(ParseTypedIdentifier());
         while (CurrentToken.Type == LangTokenType.Comma)
         {
             Expect(LangTokenType.Comma);
-            arguments.Add(ParseIdentifier());
+            arguments.Add(ParseTypedIdentifier());
         }
 
         return arguments;
+    }
+
+    /// <summary>
+    /// 解析带有类型注解的标识符，如 a:int
+    /// </summary>
+    private OldId ParseTypedIdentifier()
+    {
+        var identifierToken = CurrentToken;
+        var position = new SourcePosition(identifierToken.Line, identifierToken.Column, tokenValue: identifierToken.Value);
+        var identifier = CurrentToken.Value;
+        Expect(LangTokenType.Identifier);
+        
+        var type = "";
+        if (CurrentToken.Type == LangTokenType.Colon)
+        {
+            Expect(LangTokenType.Colon);
+            type = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+        }
+        
+        return new OldId(identifier, type, position);
     }
 
     #endregion

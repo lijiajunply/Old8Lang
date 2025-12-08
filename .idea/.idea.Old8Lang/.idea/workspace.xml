@@ -17,28 +17,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/Old8Lang解释模式系统性测试计划.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/basic_types_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/class_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/complex_expression_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/control_flow_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/exception_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/expressions_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/functions_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/lambda_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/list_comprehension_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/mixed_syntax_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/range_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/simple_arith_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/simple_expr_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/simple_template_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/simple_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/string_template_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFuncDeclaration.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.trae/rules/project_rules.md" beforeDir="false" afterPath="$PROJECT_DIR$/.trae/rules/project_rules.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang_Grammar.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -853,26 +834,26 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>1362</line>
+          <line>1366</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseInstantiate'">
             <startOffsets>
-              <option value="49009" />
+              <option value="49162" />
             </startOffsets>
             <endOffsets>
-              <option value="49042" />
+              <option value="49195" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="476" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>1365</line>
+          <line>1369</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseInstantiate'">
             <startOffsets>
-              <option value="49134" />
+              <option value="49287" />
             </startOffsets>
             <endOffsets>
-              <option value="49160" />
+              <option value="49313" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="477" />

@@ -36,7 +36,7 @@ switchStatement = "switch" expression "{" caseBlock* ( "default" block )? "}" ;
 
 caseBlock = "case" expression block ;
 
-funcDeclaration = ( identifier | "func" identifier ) "(" idList? ")" "->" block ;
+funcDeclaration = ( "func" identifier | identifier ) "(" idList? ")" ( "->" )? block ;
 
 classDeclaration = "class" identifier classBlock ;
 
@@ -119,6 +119,8 @@ charLiteral = CHAR ;
 
 identifier = IDENTIFIER ;
 
+typedIdentifier = identifier (":" identifier )? ;
+
 trueLiteral = "true" ;
 
 falseLiteral = "false" ;
@@ -150,4 +152,4 @@ asStatement = identifier "as" identifier ;
 
 argList =  (expression "," expression )* ;
 
-idList = identifier ("," identifier )* ;
+idList = typedIdentifier ("," typedIdentifier )* ;

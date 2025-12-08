@@ -81,7 +81,9 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         }
 
         if (l is not AnyValue && opera == OperationType.CONCAT)
-            return l?.Dot(r)!;
+            if (l is null || r is null)
+                throw new InvalidOperationError(this, "连接运算符左右操作数均不能为空");
+            return l!.Dot(r!);
 
         // r get value
         r = right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
