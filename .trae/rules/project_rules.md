@@ -32,7 +32,6 @@ dotnet run --project Old8Lang.App -- -c <path-to-test-file.old8>
 dotnet run --project Old8Lang.App -- -s <path-to-test-file.old8>
 ```
 
-生成完测试用代码文件后，请也在 Old8Lang.XUnitTests 目录下添加对应的测试类。
 如果发现有没有使用的测试用 Old8Lang 代码文件，请及时删除。
 
 ## 新语法添加 规范

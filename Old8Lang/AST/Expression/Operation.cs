@@ -71,6 +71,46 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
             throw new NameError(Left, "this");
         }
 
+        // 处理逻辑AND操作 - 短路求值
+        if (Opera == OperationType.AND)
+        {
+            var leftValue = Left?.Run(manager);
+            if (leftValue is BoolLangValue boolLeft)
+            {
+                if (!boolLeft.Value)
+                {
+                    // 短路求值：左操作数为false，直接返回false，不执行右操作数
+                    return new BoolLangValue(false);
+                }
+                // 左操作数为true，继续执行右操作数
+                var rightValue = Right?.Run(manager);
+                if (rightValue is BoolLangValue boolRight)
+                {
+                    return new BoolLangValue(boolLeft.Value && boolRight.Value);
+                }
+            }
+        }
+
+        // 处理逻辑OR操作 - 短路求值
+        if (Opera == OperationType.OR)
+        {
+            var leftValue = Left?.Run(manager);
+            if (leftValue is BoolLangValue boolLeft)
+            {
+                if (boolLeft.Value)
+                {
+                    // 短路求值：左操作数为true，直接返回true，不执行右操作数
+                    return new BoolLangValue(true);
+                }
+                // 左操作数为false，继续执行右操作数
+                var rightValue = Right?.Run(manager);
+                if (rightValue is BoolLangValue boolRight)
+                {
+                    return new BoolLangValue(boolLeft.Value || boolRight.Value);
+                }
+            }
+        }
+
         // 处理其他情况
         var l = Left?.Run(manager);
         var r = Right;
@@ -183,15 +223,6 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
             r = manager.GetValue(oldId);
         if (Right is Operation)
             r = Right.Run(manager);
-
-
-        // left and right
-        if (l is BoolLangValue b && r is BoolLangValue expr && Opera == OperationType.AND)
-            return new BoolLangValue(b.Value && expr.Value);
-
-        // left or right
-        if (l is BoolLangValue b1 && r is BoolLangValue oldBool && Opera == OperationType.OR)
-            return new BoolLangValue(b1.Value || oldBool.Value);
 
         // left xor right
         if (l is BoolLangValue && r is BoolLangValue value && Opera == OperationType.XOR)
