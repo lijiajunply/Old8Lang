@@ -16,7 +16,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -60,6 +62,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ClassInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangToken.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
@@ -69,7 +72,7 @@
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
+    <option name="selectedTabId" value="QODANA_PROBLEMS_VIEW_TAB" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -102,7 +105,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
+    "settings.editor.selected.configurable": "settings.qodana",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -323,7 +326,7 @@
       <workItem from="1765095462905" duration="3326000" />
       <workItem from="1765099889326" duration="6689000" />
       <workItem from="1765111093830" duration="7390000" />
-      <workItem from="1765181076923" duration="26434000" />
+      <workItem from="1765181076923" duration="27106000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -668,7 +671,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="106" />
+    <option name="localTasksCounter" value="107" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -695,7 +698,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="加入Range和SetList" />
     <MESSAGE value="修复 只能在Debug中使用" />
     <MESSAGE value="加入演示网站" />
     <MESSAGE value="基本OK，还剩语法和尝试" />
@@ -720,7 +722,8 @@
     <MESSAGE value="refactor(parser): 优化解析器实现并增强文件读取逻辑&#10;&#10;- 改进FromFile方法以更好地处理macOS上的绝对路径和相对路径查找&#10;- 重构字典和列表解析逻辑，支持{}和[]语法&#10;- 完善字符串树解析以支持连续的插值块&#10;- 修复切片表达式中的冒号识别问题&#10;- 增强词法分析器的注释过滤和转义字符处理&#10;- 更新程序入口点的测试代码引用和示例文件路径&#10;- 调整IDE工作区配置和断点设置以匹配代码变更" />
     <MESSAGE value="refactor(ast): 简化类型映射声明语法&#10;&#10;- 使用简化集合初始化语法替换显式泛型声明&#10;- 移除冗余的 System.Collections.Generic 命名空间前缀&#10;- 更新 IDE 工作区配置文件中的字符串转义格式" />
     <MESSAGE value="refactor(ast): 优化类型引用和字段初始化&#10;&#10;- 简化 ClassInit.cs 中的命名空间引用，去除冗余前缀&#10;- 统一 DictionaryLangValue 构造函数中的字段赋值方式&#10;- 修复 LangToken 中的异常类型引用，移除不必要的命名空间&#10;- 删除 SYNTAX_TEST_REPORT.md 文件&#10;- 新增 TokenAnalyzer 项目文件和程序入口&#10;- 更新 IDE 工作区配置和代码位置偏移量" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 优化类型引用和字段初始化&#10;&#10;- 简化 ClassInit.cs 中的命名空间引用，去除冗余前缀&#10;- 统一 DictionaryLangValue 构造函数中的字段赋值方式&#10;- 修复 LangToken 中的异常类型引用，移除不必要的命名空间&#10;- 删除 SYNTAX_TEST_REPORT.md 文件&#10;- 新增 TokenAnalyzer 项目文件和程序入口&#10;- 更新 IDE 工作区配置和代码位置偏移量" />
+    <MESSAGE value="refactor(parser): 优化表达式解析逻辑并清理无用代码&#10;&#10;- 简化Peek方法的条件判断逻辑&#10;- 移除重复且冗余的表达式解析辅助方法&#10;- 统一SourcePosition对象创建格式&#10;- 清理无用的空行和注释&#10;- 调整SetStatement构造函数参数格式以提高可读性&#10;- 合并相关联的代码块以增强结构清晰度" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(parser): 优化表达式解析逻辑并清理无用代码&#10;&#10;- 简化Peek方法的条件判断逻辑&#10;- 移除重复且冗余的表达式解析辅助方法&#10;- 统一SourcePosition对象创建格式&#10;- 清理无用的空行和注释&#10;- 调整SetStatement构造函数参数格式以提高可读性&#10;- 合并相关联的代码块以增强结构清晰度" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

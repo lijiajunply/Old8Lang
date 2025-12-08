@@ -23,12 +23,12 @@ PrintLine("1到10的和：" + sum)
 PrintLine("\n=== 不同步长的for循环 ===")
 
 PrintLine("步长为2：")
-for i <- 0, i < 10, i += 2 {
+for i <- 0, i < 10, i <- i + 2 {
     PrintLine("i = " + i)
 }
 
 PrintLine("\n步长为3：")
-for i <- 1, i <= 10, i += 3 {
+for i <- 1, i <= 10, i <- i + 3 {
     PrintLine("i = " + i)
 }
 
@@ -41,7 +41,7 @@ for i <- 10, i >= 1, i-- {
 }
 
 PrintLine("\n从10到2，步长为-2：")
-for i <- 10, i >= 2, i -= 2 {
+for i <- 10, i >= 2, i <- i - 2 {
     PrintLine("i = " + i)
 }
 

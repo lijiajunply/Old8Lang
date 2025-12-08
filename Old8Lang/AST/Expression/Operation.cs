@@ -31,6 +31,16 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
             return ".";
         if (Opera == OperationType.MODULO)
             return "%";
+        if (Opera == OperationType.LESS_EQUAL)
+            return "<=";
+        if (Opera == OperationType.GREATER_EQUAL)
+            return ">=";
+        if (Opera == OperationType.XOR)
+            return "^";
+        if (Opera == OperationType.AND)
+            return "&&";
+        if (Opera == OperationType.OR)
+            return "||";
         return "";
     }
 
