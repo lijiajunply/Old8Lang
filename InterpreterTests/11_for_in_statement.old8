@@ -1,0 +1,124 @@
+// 测试for-in循环语句
+
+PrintLine("=== for-in循环语句测试 ===")
+
+// 遍历数组
+PrintLine("\n=== 遍历数组 ===")
+
+array <- [10, 20, 30, 40, 50]
+PrintLine("数组元素：")
+for item in array {
+    PrintLine("item = " + item)
+}
+
+// 遍历列表
+PrintLine("\n=== 遍历列表 ===")
+
+list <- list[1, 2, 3, 4, 5]
+PrintLine("列表元素：")
+for item in list {
+    PrintLine("item = " + item)
+}
+
+// 遍历范围
+PrintLine("\n=== 遍历范围 ===")
+
+range <- [1~5]
+PrintLine("范围 [1~5] 元素：")
+for num in range {
+    PrintLine("num = " + num)
+}
+
+range2 <- [0~4]
+PrintLine("\n范围 [0~4] 元素：")
+for num in range2 {
+    PrintLine("num = " + num)
+}
+
+// 遍历字符串
+PrintLine("\n=== 遍历字符串 ===")
+
+string <- "hello"
+PrintLine("字符串 'hello' 字符：")
+for char in string {
+    PrintLine("char = " + char)
+}
+
+// 遍历字典
+PrintLine("\n=== 遍历字典 ===")
+
+dict <- {"name": "Alice", "age": 30, "city": "New York"}
+PrintLine("字典键值对：")
+for key, value in dict {
+    PrintLine(key + " = " + value)
+}
+
+// 遍历字典的键
+PrintLine("\n=== 遍历字典的键 ===")
+
+for key in dict {
+    PrintLine("key = " + key)
+}
+
+// for-in循环求和
+PrintLine("\n=== for-in循环求和 ===")
+
+ sum <- 0
+for num in [1~10] {
+    sum <- sum + num
+}
+PrintLine("1到10的和：" + sum)
+
+// 遍历元组
+PrintLine("\n=== 遍历元组 ===")
+
+tuple <- ("apple", "banana", "cherry")
+PrintLine("元组元素：")
+for item in tuple {
+    PrintLine("item = " + item)
+}
+
+// 嵌套for-in循环
+PrintLine("\n=== 嵌套for-in循环 ===")
+
+matrix <- [[1, 2], [3, 4], [5, 6]]
+PrintLine("二维数组元素：")
+for row in matrix {
+    for item in row {
+        PrintLine("item = " + item)
+    }
+}
+
+// for-in循环修改集合元素
+PrintLine("\n=== for-in循环修改集合元素 ===")
+
+mutableList <- list[10, 20, 30, 40, 50]
+PrintLine("修改前的列表：" + mutableList)
+
+// 注意：这里可能需要根据语言特性来修改元素
+index <- 0
+for item in mutableList {
+    mutableList[index] <- item * 2
+    index <- index + 1
+}
+PrintLine("修改后的列表：" + mutableList)
+
+// for-in循环中的条件判断
+PrintLine("\n=== for-in循环中的条件判断 ===")
+
+numbers <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+PrintLine("偶数：")
+for num in numbers {
+    if num % 2 == 0 {
+        PrintLine(num + " 是偶数")
+    }
+}
+
+PrintLine("\n奇数：")
+for num in numbers {
+    if num % 2 != 0 {
+        PrintLine(num + " 是奇数")
+    }
+}
+
+PrintLine("\n✅ 所有for-in循环语句测试完成")

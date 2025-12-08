@@ -14,14 +14,16 @@ public class ClassInit(AnyLangValue anyLangValue, SourcePosition position = defa
     {
         // 检查类是否已存在
         var existingClass = manager.AnyInfo.FirstOrDefault(info => 
-            info is AnyLangValue any && any.Id.IdName == anyLangValue.Id.IdName);
+            info is TypeTemplate template && template.ClassName == anyLangValue.Id.IdName);
         
         if (existingClass != null)
         {
             throw new DuplicateNameError(this, anyLangValue.Id.IdName, "类");
         }
         
-        manager.AddClassAndFunc(anyLangValue);
+        // 创建类型模板并存储，而不是直接存储AnyLangValue
+        var typeTemplate = new TypeTemplate(anyLangValue.Id.IdName, anyLangValue.Variates, Position);
+        manager.AddClassAndFunc(typeTemplate);
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)

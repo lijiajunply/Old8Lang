@@ -1,22 +1,38 @@
 using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
 
-public class SetStatement(LangId id, OldExpr value, SourcePosition position = default) : OldStatement(position)
+public class SetStatement : OldStatement
 {
-    public readonly LangId Id = id;
-    public readonly OldExpr Value = value;
+    public readonly LangId? Id;
+    public readonly OldExpr? LeftExpr;
+    public readonly OldExpr Value;
+
+    public SetStatement(LangId id, OldExpr value, SourcePosition position = default) : base(position)
+    {
+        Id = id;
+        LeftExpr = null;
+        Value = value;
+    }
+
+    public SetStatement(OldExpr leftExpr, OldExpr value, SourcePosition position = default) : base(position)
+    {
+        Id = null;
+        LeftExpr = leftExpr;
+        Value = value;
+    }
 
     public override void Run(VariateManager manager)
     {
         var result = Value.Run(manager);
         
         // 如果有类型注解，进行类型检查
-        if (!string.IsNullOrEmpty(Id.AssumptionType))
+        if (Id != null && !string.IsNullOrEmpty(Id.AssumptionType))
         {
             var expectedType = Id.AssumptionType.ToLower();
             var actualType = result.TypeToString().ToLower();
@@ -47,8 +63,56 @@ public class SetStatement(LangId id, OldExpr value, SourcePosition position = de
             }
         }
         
-        // 只有当Id名称不为空时，才设置变量
-        if (!string.IsNullOrEmpty(Id.IdName))
+        // 处理成员访问赋值：this.name <- value
+        if (LeftExpr is Operation operation)
+        {
+            // 检查是否是 CONCAT 操作（成员访问）
+            if (operation.Opera == OperationType.CONCAT)
+            {
+                // 解析成员访问表达式：this.name
+                if (operation is { Left: LangId { IdName: "this" }, Right: LangId memberName })
+                {
+                    // 是 this.member <- value 形式的赋值
+                    // 查找当前实例
+                    AnyLangValue? anyValue = null;
+                    
+                    // 首先检查manager.AnyInfo中是否有AnyLangValue实例
+                    anyValue = manager.AnyInfo.FirstOrDefault(x => x is AnyLangValue) as AnyLangValue;
+                    
+                    // 如果找到了实例，执行赋值
+                    if (anyValue != null)
+                    {
+                        // 将结果添加到实例的Result字典中，覆盖原来的值
+                        anyValue.Result[memberName.IdName] = result;
+                        // 同时更新VariateManager中的值，确保后续访问能获取到最新值
+                        anyValue.Manager.Set(new LangId(memberName.IdName), result);
+                        // 同时更新当前manager中的值，确保在同一个方法中后续访问能获取到最新值
+                        manager.Set(new LangId(memberName.IdName), result);
+                        return;
+                    }
+                    
+                    // 如果没有找到，可能是在init方法中，此时需要检查manager.IsFunc标志
+                    if (manager.IsFunc)
+                    {
+                        // 在init方法中，当前实例应该是manager.AnyInfo中的第一个AnyLangValue
+                        anyValue = manager.AnyInfo.FirstOrDefault(x => x is AnyLangValue) as AnyLangValue;
+                        if (anyValue != null)
+                        {
+                            // 将结果添加到实例的Result字典中，覆盖原来的值
+                            anyValue.Result[memberName.IdName] = result;
+                            // 同时更新VariateManager中的值，确保后续访问能获取到最新值
+                            anyValue.Manager.Set(new LangId(memberName.IdName), result);
+                            // 同时更新当前manager中的值，确保在同一个方法中后续访问能获取到最新值
+                            manager.Set(new LangId(memberName.IdName), result);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // 处理普通变量赋值：name <- value
+        if (Id != null && !string.IsNullOrEmpty(Id.IdName))
         {
             manager.Set(Id, result);
         }
@@ -56,7 +120,7 @@ public class SetStatement(LangId id, OldExpr value, SourcePosition position = de
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        if (!string.IsNullOrEmpty(Id.IdName))
+        if (Id != null && !string.IsNullOrEmpty(Id.IdName))
         {
             Value.SetValueToIl(ilGenerator, local, Id.IdName);
         }
@@ -66,5 +130,5 @@ public class SetStatement(LangId id, OldExpr value, SourcePosition position = de
 
     public override int Count => 0;
 
-    public override string ToString() => $"{Id} <- {Value}";
+    public override string ToString() => LeftExpr != null ? $"{LeftExpr} <- {Value}" : $"{Id} <- {Value}";
 }

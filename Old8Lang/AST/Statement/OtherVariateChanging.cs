@@ -16,7 +16,7 @@ public class OtherVariateChanging(LangId id, OldExpr sumId, OldExpr expr, Source
         var a = manager.GetValue(id);
         if (a is AnyLangValue any)
         {
-            if (sumId is not LangId sum) throw new TypeError(this, "OldId", sumId.GetType().Name);
+            if (sumId is not LangId sum) throw new TypeError(this, "LangId", sumId.GetType().Name);
             var result = expr.Run(manager);
             any.Set(sum, result);
         }

@@ -27,7 +27,8 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                 return new TypeLangValue(results[0]).Run(manager);
             case "Exec":
             {
-                if (results[0] is not StringLangValue execStringValue) throw new TypeError(this, "StringValue", results[0].GetType().Name);
+                if (results[0] is not StringLangValue execStringValue)
+                    throw new TypeError(this, "StringValue", results[0].GetType().Name);
                 var a = manager.Interpreter.Build(code: execStringValue.Value);
                 a.Run(manager);
                 return new VoidLangValue();
@@ -39,11 +40,13 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
             }
             case "Json":
             {
-                if (results[0] is not AnyLangValue jsonAnyValue) throw new TypeError(this, "AnyValue", results[0].GetType().Name);
+                if (results[0] is not AnyLangValue jsonAnyValue)
+                    throw new TypeError(this, "AnyValue", results[0].GetType().Name);
                 return jsonAnyValue.ToJson();
             }
             case "ToObj":
-                if (results[0] is not StringLangValue stringValue) throw new TypeError(this, "StringValue", results[0].GetType().Name);
+                if (results[0] is not StringLangValue stringValue)
+                    throw new TypeError(this, "StringValue", results[0].GetType().Name);
                 return stringValue.ToObj();
             case "PrintLine":
             {
@@ -69,6 +72,30 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                 manager.Interpreter.UseClass.Write(value);
                 return new VoidLangValue();
             }
+            case "Error":
+            {
+                if (results.Count == 0)
+                {
+                    manager.Interpreter.UseClass.WriteLine("");
+                    return new VoidLangValue();
+                }
+
+                var value = results[0].ToDisplayString();
+                for (var i = 1; i < results.Count; i++) value += results[i].ToDisplayString();
+
+                manager.Interpreter.UseClass.Error(value);
+                return new VoidLangValue();
+            }
+            case "ReadLine":
+            {
+                var res = manager.Interpreter.UseClass.ReadLine();
+                return new StringLangValue(res);
+            }
+            case "Clear":
+            {
+                manager.Interpreter.UseClass.Clear();
+                return new VoidLangValue();
+            }
             case "Compiler":
             {
                 if (results.Count == 0) return new VoidLangValue();
@@ -81,6 +108,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                 {
                     value = results[0].ToString();
                 }
+
                 var statement = manager.Interpreter.Build(code: value);
                 var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
                 var ilGenerator = dynamicMethod.GetILGenerator();
@@ -103,25 +131,67 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
         }
 
         var result = Id.Run(manager);
-        if (result is FuncLangValue funcValue)
+        
+        // 如果result是TypeTemplate，则创建其实例
+        if (result is TypeTemplate typeTemplate)
+        {
+            // 创建类的实例
+            var instance = typeTemplate.CreateInstance();
+            
+            // 初始化实例，设置Interpreter
+            instance.Init(manager.Interpreter);
+            
+            // 保存init方法的引用
+            if (instance.Result.TryGetValue("init", out var initResult))
+            {
+                if (initResult is not FuncLangValue initFunc) throw new TypeError(this, "FuncValue", "init 不是函数类型");
+                
+                // 在调用init方法前，将当前实例添加到AnyInfo中，以便this关键字访问
+                instance.Manager.AnyInfo.Add(instance); // 添加到实例自身的AnyInfo中
+                instance.Manager.IsFunc = true; // 设置为函数上下文
+                
+                // 调用init方法，并将参数传递给它
+                initFunc.Run(instance.Manager, Ids);
+                
+                // 恢复非函数上下文标志
+                instance.Manager.IsFunc = false;
+                instance.Manager.AnyInfo.Remove(instance); // 从实例自身的AnyInfo中移除
+            }
+            else if (Ids.Count != 0)
+            {
+                throw new InvalidOperationError(this, "找不到对应的init函数");
+            }
+            
+            result = instance;
+        }
+        // 如果result是FuncLangValue，则调用它
+        else if (result is FuncLangValue funcValue)
         {
             result = funcValue.Run(manager, Ids);
         }
-
-        // 初始化 调用init方法
-        if (result is AnyLangValue anyValue)
+        // 原来的AnyLangValue处理逻辑，用于兼容旧代码
+        else if (result is AnyLangValue anyValue)
         {
-            if (anyValue.Result.TryGetValue("init", out result))
+            // 保存init方法的引用，避免覆盖result变量
+            if (anyValue.Result.TryGetValue("init", out var initResult))
             {
-                if (result is not FuncLangValue value) throw new TypeError(this, "FuncValue", "init 不是函数类型");
-                value.Run(anyValue.Manager, Ids);
+                if (initResult is not FuncLangValue initFunc) throw new TypeError(this, "FuncValue", "init 不是函数类型");
+                
+                // 在调用init方法前，将当前实例添加到AnyInfo中，以便this关键字访问
+                anyValue.Manager.AnyInfo.Add(anyValue); // 添加到实例自身的AnyInfo中
+                anyValue.Manager.IsFunc = true; // 设置为函数上下文
+                
+                // 调用init方法，并将参数传递给它
+                initFunc.Run(anyValue.Manager, Ids);
+                
+                // 恢复非函数上下文标志
+                anyValue.Manager.IsFunc = false;
+                anyValue.Manager.AnyInfo.Remove(anyValue); // 从实例自身的AnyInfo中移除
             }
             else if (results.Count != 0)
             {
                 throw new InvalidOperationError(this, "找不到对应的init函数");
             }
-
-            result = anyValue;
         }
 
         if (result is NativeAnyLangValue nativeAnyValue)
@@ -158,7 +228,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
 
         var os = new List<object>() { baseLangValue };
         os.AddRange(Ids);
-        
+
         // 对于静态方法，第一个参数应该是 null，因为静态方法没有实例
         object? invokeInstance = null;
         // 检查是否是扩展方法（静态方法）
@@ -167,7 +237,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
             // 非静态方法，使用 baseLangValue 作为实例
             invokeInstance = baseLangValue;
         }
-        
+
         var r = m?.Invoke(invokeInstance, [.. os]);
         if (r is LangValueType v) return v;
         return ObjToValue(r!);

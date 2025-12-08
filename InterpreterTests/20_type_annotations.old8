@@ -1,0 +1,169 @@
+// 测试类型假注
+
+PrintLine("=== 类型假注测试 ===")
+
+// 基本类型的变量类型假注
+PrintLine("\n=== 基本类型的变量类型假注 ===")
+
+// 整数类型假注
+intVar:int <- 123
+PrintLine("整数类型假注: intVar = " + intVar)
+
+// 浮点数类型假注
+doubleVar:double <- 3.14
+PrintLine("浮点数类型假注: doubleVar = " + doubleVar)
+
+// 字符串类型假注
+stringVar:string <- "hello"
+PrintLine("字符串类型假注: stringVar = " + stringVar)
+
+// 布尔类型假注
+boolVar:bool <- true
+PrintLine("布尔类型假注: boolVar = " + boolVar)
+
+// 字符类型假注
+charVar:char <- 'a'
+PrintLine("字符类型假注: charVar = " + charVar)
+
+// 复合类型的变量类型假注
+PrintLine("\n=== 复合类型的变量类型假注 ===")
+
+// 数组类型假注
+arrayVar:array <- [1, 2, 3]
+PrintLine("数组类型假注: arrayVar = " + arrayVar)
+
+// 列表类型假注
+listVar:list <- list[1, 2, 3]
+PrintLine("列表类型假注: listVar = " + listVar)
+
+// 字典类型假注
+dictVar:dict <- {"name": "Alice", "age": 30}
+PrintLine("字典类型假注: dictVar = " + dictVar)
+
+// 元组类型假注
+tupleVar:tuple <- (1, "a", true)
+PrintLine("元组类型假注: tupleVar = " + tupleVar)
+
+// 函数参数类型假注
+PrintLine("\n=== 函数参数类型假注 ===")
+
+func add(a:int, b:int) {
+    return a + b
+}
+
+addResult <- add(1, 2)
+PrintLine("add(1, 2) = " + addResult)
+
+// 函数返回值类型假注
+PrintLine("\n=== 函数返回值类型假注 ===")
+
+func multiply(a:int, b:int) -> int {
+    return a * b
+}
+
+multiplyResult <- multiply(3, 4)
+PrintLine("multiply(3, 4) = " + multiplyResult)
+
+// 混合类型假注的函数
+PrintLine("\n=== 混合类型假注的函数 ===")
+
+func divide(a:double, b:double) -> double {
+    if b == 0 {
+        return 0.0
+    }
+    return a / b
+}
+
+divideResult <- divide(10.0, 2.0)
+PrintLine("divide(10.0, 2.0) = " + divideResult)
+
+// 函数中局部变量的类型假注
+PrintLine("\n=== 函数中局部变量的类型假注 ===")
+
+func testLocalTypeAnnotations() {
+    localVar:string <- "局部变量"
+    PrintLine("局部变量类型假注: " + localVar)
+}
+
+testLocalTypeAnnotations()
+
+// 类成员的类型假注
+PrintLine("\n=== 类成员的类型假注 ===")
+
+class Person {
+    name:string <- ""
+    age:int <- 0
+    height:double <- 0.0
+    
+    func init(name:string, age:int, height:double) {
+        this.name <- name
+        this.age <- age
+        this.height <- height
+    }
+    
+    func getInfo() -> string {
+        return "Name: " + this.name + ", Age: " + this.age + ", Height: " + this.height
+    }
+}
+
+person <- Person("Alice", 30, 165.5)
+info <- person.getInfo()
+PrintLine("类成员类型假注: " + info)
+
+// 类型假注的类型检查
+PrintLine("\n=== 类型假注的类型检查 ===")
+
+// 尝试将正确类型赋值给带有类型假注的变量
+correctAssignment:int <- 456
+PrintLine("正确类型赋值: correctAssignment = " + correctAssignment)
+
+// 尝试将错误类型赋值给带有类型假注的变量
+// 注意：这里应该会报错
+// wrongAssignment:int <- "hello"  // 这行应该会报错，因为尝试将string赋值给int类型
+// PrintLine("错误类型赋值: wrongAssignment = " + wrongAssignment)
+
+// 类型假注的动态特性
+PrintLine("\n=== 类型假注的动态特性 ===")
+
+// 注意：在动态类型语言中，类型假注通常不会阻止类型转换
+// 但如果进行了类型假注，就需要保持类型不变
+
+// 尝试修改带有类型假注的变量类型
+// 注意：这里应该会报错
+// dynamicVar:int <- 100
+// dynamicVar <- "hello"  // 这行应该会报错，因为尝试将string赋值给int类型
+// PrintLine("动态修改类型: dynamicVar = " + dynamicVar)
+
+// 类型假注的默认值
+PrintLine("\n=== 类型假注的默认值 ===")
+
+// 带有类型假注和默认值的变量
+defaultInt:int <- 0
+PrintLine("带有默认值的int类型假注: defaultInt = " + defaultInt)
+
+defaultString:string <- ""
+PrintLine("带有默认值的string类型假注: defaultString = " + defaultString)
+
+// 类型假注的函数重载
+PrintLine("\n=== 类型假注的函数重载 ===")
+
+// 注意：这里可能不支持函数重载
+// func testOverload(a:int) {
+//     PrintLine("int版本: " + a)
+// }
+// 
+// func testOverload(a:string) {
+//     PrintLine("string版本: " + a)
+// }
+// 
+// testOverload(123)
+// testOverload("hello")
+
+// 类型假注的泛型支持
+PrintLine("\n=== 类型假注的泛型支持 ===")
+
+// 注意：这里可能不支持泛型
+// listGeneric:list<int> <- list[1, 2, 3]
+// PrintLine("泛型列表类型假注: listGeneric = " + listGeneric)
+
+PrintLine("\n✅ 所有类型假注测试完成")

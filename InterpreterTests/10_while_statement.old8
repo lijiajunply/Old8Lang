@@ -1,0 +1,117 @@
+// 测试while循环语句
+
+PrintLine("=== while循环语句测试 ===")
+
+// 基本的while循环
+PrintLine("\n=== 基本的while循环 ===")
+
+count <- 0
+while count < 5 {
+    PrintLine("count = " + count)
+    count <- count + 1
+}
+
+// while循环求和
+PrintLine("\n=== while循环求和 ===")
+
+ sum <- 0
+number <- 1
+while number <= 10 {
+    sum <- sum + number
+    number <- number + 1
+}
+PrintLine("1到10的和：" + sum)
+
+// 条件为false的while循环
+PrintLine("\n=== 条件为false的while循环 ===")
+
+falseCondition <- false
+while falseCondition {
+    PrintLine("这个应该不会被执行")
+}
+PrintLine("条件为false的while循环测试完成")
+
+// 动态条件的while循环
+PrintLine("\n=== 动态条件的while循环 ===")
+
+x <- 1
+max <- 5
+while x < max {
+    PrintLine("x = " + x + ", max = " + max)
+    x <- x + 1
+    // 动态修改max值
+    if x == 3 {
+        max <- 7
+    }
+}
+
+// 嵌套while循环
+PrintLine("\n=== 嵌套while循环 ===")
+
+row <- 1
+while row <= 3 {
+    col <- 1
+    line <- ""
+    while col <= 3 {
+        line <- line + (row * col) + " "
+        col <- col + 1
+    }
+    PrintLine(line)
+    row <- row + 1
+}
+
+// while循环计算阶乘
+PrintLine("\n=== while循环计算阶乘 ===")
+
+n <- 5
+factorial <- 1
+while n > 0 {
+    factorial <- factorial * n
+    n <- n - 1
+}
+PrintLine("5的阶乘：" + factorial)
+
+// while循环遍历数组
+PrintLine("\n=== while循环遍历数组 ===")
+
+array <- [10, 20, 30, 40, 50]
+i <- 0
+while i < 5 {
+    PrintLine("array[" + i + "] = " + array[i])
+    i <- i + 1
+}
+
+// 空的while循环体
+PrintLine("\n=== 空的while循环体 ===")
+
+emptyCounter <- 0
+while emptyCounter < 3 {
+    // 空循环体
+    emptyCounter <- emptyCounter + 1
+}
+PrintLine("空的while循环执行了 " + emptyCounter + " 次")
+
+// 使用break和continue（如果支持）
+PrintLine("\n=== 使用break和continue（如果支持） ===")
+
+breakTest <- 0
+while breakTest < 10 {
+    PrintLine("breakTest = " + breakTest)
+    breakTest <- breakTest + 1
+    if breakTest == 5 {
+        PrintLine("执行break")
+        break
+    }
+}
+
+continueTest <- 0
+while continueTest < 5 {
+    continueTest <- continueTest + 1
+    if continueTest == 3 {
+        PrintLine("执行continue，跳过本次循环")
+        continue
+    }
+    PrintLine("continueTest = " + continueTest)
+}
+
+PrintLine("\n✅ 所有while循环语句测试完成")

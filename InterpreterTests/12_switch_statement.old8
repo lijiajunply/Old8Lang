@@ -1,0 +1,188 @@
+// 测试switch语句
+
+PrintLine("=== switch语句测试 ===")
+
+// 基本的switch语句
+PrintLine("\n=== 基本的switch语句 ===")
+
+number <- 2
+switch number {
+    case 1 {
+        PrintLine("数字是1")
+    }
+    case 2 {
+        PrintLine("数字是2")
+    }
+    case 3 {
+        PrintLine("数字是3")
+    }
+    default {
+        PrintLine("数字不是1、2或3")
+    }
+}
+
+// 使用default分支
+PrintLine("\n=== 使用default分支 ===")
+
+number2 <- 5
+switch number2 {
+    case 1 {
+        PrintLine("数字是1")
+    }
+    case 2 {
+        PrintLine("数字是2")
+    }
+    default {
+        PrintLine("数字不是1或2")
+    }
+}
+
+// 字符串类型的switch
+PrintLine("\n=== 字符串类型的switch ===")
+
+fruit <- "banana"
+switch fruit {
+    case "apple" {
+        PrintLine("水果是苹果")
+    }
+    case "banana" {
+        PrintLine("水果是香蕉")
+    }
+    case "cherry" {
+        PrintLine("水果是樱桃")
+    }
+    default {
+        PrintLine("未知水果")
+    }
+}
+
+// 布尔类型的switch
+PrintLine("\n=== 布尔类型的switch ===")
+
+isValid <- true
+switch isValid {
+    case true {
+        PrintLine("值为真")
+    }
+    case false {
+        PrintLine("值为假")
+    }
+}
+
+// 复杂表达式作为switch表达式
+PrintLine("\n=== 复杂表达式作为switch表达式 ===")
+
+a <- 10
+b <- 5
+result <- a > b
+switch result {
+    case true {
+        PrintLine("a大于b")
+    }
+    case false {
+        PrintLine("a不大于b")
+    }
+}
+
+// switch语句中的多个语句
+PrintLine("\n=== switch语句中的多个语句 ===")
+
+month <- 3
+switch month {
+    case 1 {
+        PrintLine("一月")
+        PrintLine("冬季")
+    }
+    case 2 {
+        PrintLine("二月")
+        PrintLine("冬季")
+    }
+    case 3 {
+        PrintLine("三月")
+        PrintLine("春季")
+    }
+    default {
+        PrintLine("其他月份")
+    }
+}
+
+// 测试不同类型的值
+PrintLine("\n=== 测试不同类型的值 ===")
+
+mixedValue <- 123
+switch mixedValue {
+    case "123" {
+        PrintLine("值是字符串'123'")
+    }
+    case 123 {
+        PrintLine("值是整数123")
+    }
+    default {
+        PrintLine("值是其他类型")
+    }
+}
+
+// 测试范围值
+PrintLine("\n=== 测试范围值 ===")
+
+score <- 85
+switch score {
+    case [90~100] {
+        PrintLine("优秀")
+    }
+    case [80~89] {
+        PrintLine("良好")
+    }
+    case [70~79] {
+        PrintLine("中等")
+    }
+    case [60~69] {
+        PrintLine("及格")
+    }
+    case [0~59] {
+        PrintLine("不及格")
+    }
+    default {
+        PrintLine("无效分数")
+    }
+}
+
+// switch语句在函数中的应用
+PrintLine("\n=== switch语句在函数中的应用 ===")
+
+func getDayName(day:int) {
+    switch day {
+        case 1 {
+            return "星期一"
+        }
+        case 2 {
+            return "星期二"
+        }
+        case 3 {
+            return "星期三"
+        }
+        case 4 {
+            return "星期四"
+        }
+        case 5 {
+            return "星期五"
+        }
+        case 6 {
+            return "星期六"
+        }
+        case 7 {
+            return "星期日"
+        }
+        default {
+            return "无效的星期数"
+        }
+    }
+}
+
+dayName <- getDayName(5)
+PrintLine("星期5的名称：" + dayName)
+
+dayName2 <- getDayName(8)
+PrintLine("星期8的名称：" + dayName2)
+
+PrintLine("\n✅ 所有switch语句测试完成")

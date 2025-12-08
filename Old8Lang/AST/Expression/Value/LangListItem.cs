@@ -36,6 +36,12 @@ public class LangListItem(LangId listId, OldExpr key, SourcePosition position = 
             return dir.Get(keyResult);
         }
 
+        if (a is StringLangValue str)
+        {
+            if (result is not IntLangValue intResult) throw new TypeError(this, "IntValue", result.GetType().Name);
+            return str.Get(intResult);
+        }
+
         throw new InvalidOperationError(this, $"不支持的集合类型: {a?.GetType().Name ?? "null"}");
     }
 
@@ -43,13 +49,36 @@ public class LangListItem(LangId listId, OldExpr key, SourcePosition position = 
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        listId.LoadIlValue(ilGenerator, local); // 加载 enumerator
-        key.LoadIlValue(ilGenerator, local); // 加载 index
-        ilGenerator.Emit(OpCodes.Ldelem_I4); // 获取元素
+        var listType = listId.OutputType(local);
+        
+        if (listType == typeof(string))
+        {
+            listId.LoadIlValue(ilGenerator, local); // 加载字符串
+            key.LoadIlValue(ilGenerator, local); // 加载索引
+            // 使用字符串的索引器属性获取字符
+            var getStringItemMethod = typeof(string).GetMethod("get_Chars", [typeof(int)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, getStringItemMethod);
+            // 直接返回 char 值，CharLangValue.LoadIlValue 会处理它
+        }
+        else
+        {
+            listId.LoadIlValue(ilGenerator, local); // 加载集合
+            key.LoadIlValue(ilGenerator, local); // 加载索引
+            ilGenerator.Emit(OpCodes.Ldelem_Ref); // 获取引用类型的元素
+        }
     }
 
     public override Type OutputType(LocalManager local)
     {
-        return typeof(int);
+        var listType = listId.OutputType(local);
+        
+        if (listType == typeof(string))
+        {
+            return typeof(char); // 字符串索引访问返回 char 类型
+        }
+        else
+        {
+            return typeof(object);
+        }
     }
 }

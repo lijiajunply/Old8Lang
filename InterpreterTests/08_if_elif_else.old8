@@ -1,0 +1,123 @@
+// 测试条件控制语句
+
+PrintLine("=== 条件控制语句测试 ===")
+
+// 基本 if 语句
+PrintLine("\n=== 基本 if 语句 ===")
+
+x <- 10
+
+if x > 5 {
+    PrintLine("x 大于 5")
+}
+
+// if-else 语句
+PrintLine("\n=== if-else 语句 ===")
+
+if x > 15 {
+    PrintLine("x 大于 15")
+} else {
+    PrintLine("x 小于等于 15")
+}
+
+// if-elif-else 语句
+PrintLine("\n=== if-elif-else 语句 ===")
+
+score <- 85
+
+if score >= 90 {
+    PrintLine("优秀")
+} elif score >= 80 {
+    PrintLine("良好")
+} elif score >= 70 {
+    PrintLine("中等")
+} elif score >= 60 {
+    PrintLine("及格")
+} else {
+    PrintLine("不及格")
+}
+
+// 嵌套 if 语句
+PrintLine("\n=== 嵌套 if 语句 ===")
+
+a <- 5
+b <- 10
+
+if a > 0 {
+    if b > 0 {
+        PrintLine("a 和 b 都大于 0")
+    } else {
+        PrintLine("a 大于 0，但 b 小于等于 0")
+    }
+} else {
+    PrintLine("a 小于等于 0")
+}
+
+// 布尔条件
+PrintLine("\n=== 布尔条件 ===")
+
+isTrue <- true
+
+if isTrue {
+    PrintLine("条件为真")
+} else {
+    PrintLine("条件为假")
+}
+
+// 逻辑表达式条件
+PrintLine("\n=== 逻辑表达式条件 ===")
+
+x <- 5
+y <- 10
+z <- 15
+
+if (x < y) and (y < z) {
+    PrintLine("x < y < z")
+}
+
+if (x > y) or (y < z) {
+    PrintLine("x > y 或 y < z")
+}
+
+// 比较表达式条件
+PrintLine("\n=== 比较表达式条件 ===")
+
+num1 <- 100
+num2 <- 200
+
+if num1 == num2 {
+    PrintLine("num1 等于 num2")
+} elif num1 < num2 {
+    PrintLine("num1 小于 num2")
+} else {
+    PrintLine("num1 大于 num2")
+}
+
+// 多条件测试
+PrintLine("\n=== 多条件测试 ===")
+
+// 测试所有条件分支
+for testScore in list[95, 85, 75, 65, 55] {
+    if testScore >= 90 {
+        PrintLine(testScore + " => 优秀")
+    } elif testScore >= 80 {
+        PrintLine(testScore + " => 良好")
+    } elif testScore >= 70 {
+        PrintLine(testScore + " => 中等")
+    } elif testScore >= 60 {
+        PrintLine(testScore + " => 及格")
+    } else {
+        PrintLine(testScore + " => 不及格")
+    }
+}
+
+// 空的条件块
+PrintLine("\n=== 空的条件块 ===")
+
+if x > 0 {
+    // 空的条件块
+}
+
+PrintLine("空的条件块测试完成")
+
+PrintLine("\n✅ 所有条件控制语句测试完成")

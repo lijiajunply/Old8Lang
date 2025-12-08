@@ -1,0 +1,56 @@
+// 测试数据类型
+
+// 数组测试
+PrintLine("=== 数组测试 ===")
+array1 <- [1, 2, 3, 4, 5]
+PrintLine("整数数组: " + array1)
+
+array2 <- ["a", "b", "c"]
+PrintLine("字符串数组: " + array2)
+
+array3 <- [1, "a", true]
+PrintLine("混合类型数组: " + array3)
+
+// 列表测试
+PrintLine("\n=== 列表测试 ===")
+list1 <- list[1, 2, 3]
+PrintLine("整数列表: " + list1)
+
+list2 <- list["a", "b", "c"]
+PrintLine("字符串列表: " + list2)
+
+list3 <- list[1, "a", true]
+PrintLine("混合类型列表: " + list3)
+
+// 字典测试
+PrintLine("\n=== 字典测试 ===")
+dict1 <- {"name": "Alice", "age": 30}
+PrintLine("字符串键字典: " + dict1)
+
+PrintLine("字典值访问: name = " + dict1["name"] + ", age = " + dict1["age"])
+
+dict2 <- {1: "one", 2: "two"}
+PrintLine("整数键字典: " + dict2)
+
+PrintLine("字典值访问: 1 = " + dict2[1] + ", 2 = " + dict2[2])
+
+// 元组测试
+PrintLine("\n=== 元组测试 ===")
+tuple1 <- (1, "a", true)
+PrintLine("元组: " + tuple1)
+
+tuple2 <- ("hello", 3.14)
+PrintLine("二元组: " + tuple2)
+
+// 范围测试
+PrintLine("\n=== 范围测试 ===")
+range1 <- [1~10]
+PrintLine("范围 [1~10]: " + range1)
+
+range2 <- [0~5]
+PrintLine("范围 [0~5]: " + range2)
+
+range3 <- [5~1]
+PrintLine("反向范围 [5~1]: " + range3)
+
+PrintLine("\n✅ 所有数据类型测试完成")

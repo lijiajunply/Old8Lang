@@ -1,0 +1,39 @@
+// 测试字符串索引访问功能
+PrintLine("=== 字符串索引访问测试 ===")
+
+// 定义一个字符串
+string <- "Hello, Old8Lang!"
+PrintLine("原始字符串: " + string)
+
+// 测试正向索引访问
+PrintLine("\n正向索引访问:")
+char0 <- string[0]
+PrintLine("string[0] = " + char0)
+
+char1 <- string[1]
+PrintLine("string[1] = " + char1)
+
+char5 <- string[5]
+PrintLine("string[5] = " + char5)
+
+// 测试负向索引访问
+PrintLine("\n负向索引访问:")
+charLast <- string[-1]
+PrintLine("string[-1] = " + charLast)
+
+charSecondLast <- string[-2]
+PrintLine("string[-2] = " + charSecondLast)
+
+// 测试边界情况
+PrintLine("\n边界情况测试:")
+charFirst <- string[0]
+PrintLine("第一个字符: " + charFirst)
+
+charBoundary <- string[14]
+PrintLine("第14个字符: " + charBoundary)
+
+// 测试字符串长度
+length <- string.length
+PrintLine("\n字符串长度: " + length)
+
+PrintLine("\n✅ 字符串索引访问测试完成")

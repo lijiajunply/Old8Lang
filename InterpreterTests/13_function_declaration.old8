@@ -1,0 +1,160 @@
+// 测试函数声明和调用
+
+PrintLine("=== 函数声明和调用测试 ===")
+
+// 基本函数声明和调用
+PrintLine("\n=== 基本函数声明和调用 ===")
+
+func sayHello() {
+    PrintLine("Hello, World!")
+}
+
+sayHello()
+
+// 带参数的函数
+PrintLine("\n=== 带参数的函数 ===")
+
+func greet(name) {
+    PrintLine("Hello, " + name + "!")
+}
+
+greet("Alice")
+greet("Bob")
+
+// 带返回值的函数
+PrintLine("\n=== 带返回值的函数 ===")
+
+func add(a, b) {
+    return a + b
+}
+
+result <- add(1, 2)
+PrintLine("1 + 2 = " + result)
+
+// 使用 -> 语法的函数声明
+PrintLine("\n=== 使用 -> 语法的函数声明 ===")
+
+multiply(a, b) -> {
+    return a * b
+}
+
+product <- multiply(3, 4)
+PrintLine("3 * 4 = " + product)
+
+// 带类型假注的函数
+PrintLine("\n=== 带类型假注的函数 ===")
+
+func subtract(a:int, b:int) -> {
+    return a - b
+}
+
+difference <- subtract(10, 5)
+PrintLine("10 - 5 = " + difference)
+
+// 无返回值的函数
+PrintLine("\n=== 无返回值的函数 ===")
+
+func printSum(a, b) {
+    sum <- a + b
+    PrintLine(a + " + " + b + " = " + sum)
+}
+
+printSum(5, 3)
+
+// 函数中的局部变量
+PrintLine("\n=== 函数中的局部变量 ===")
+
+func testLocalVariables() {
+    localVar <- "我是局部变量"
+    PrintLine(localVar)
+}
+
+testLocalVariables()
+
+// 尝试访问局部变量（应该会报错）
+// PrintLine(localVar)  // 这行应该会报错，因为 localVar 是函数内的局部变量
+
+// 函数嵌套调用
+PrintLine("\n=== 函数嵌套调用 ===")
+
+func square(x) {
+    return x * x
+}
+
+func cube(x) {
+    return square(x) * x
+}
+
+cubeResult <- cube(3)
+PrintLine("3的立方 = " + cubeResult)
+
+// 递归函数
+PrintLine("\n=== 递归函数 ===")
+
+func factorial(n) {
+    if n == 0 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+factResult <- factorial(5)
+PrintLine("5的阶乘 = " + factResult)
+
+// 斐波那契数列
+func fibonacci(n) {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+fibResult <- fibonacci(6)
+PrintLine("斐波那契数列第6项 = " + fibResult)
+
+// 函数作为参数
+PrintLine("\n=== 函数作为参数 ===")
+
+func applyOperation(a, b, operation) {
+    return operation(a, b)
+}
+
+addResult <- applyOperation(5, 3, add)
+PrintLine("5 + 3 = " + addResult)
+
+multiplyResult <- applyOperation(5, 3, multiply)
+PrintLine("5 * 3 = " + multiplyResult)
+
+// 函数作为返回值
+PrintLine("\n=== 函数作为返回值 ===")
+
+func createMultiplier(factor) {
+    func multiplier(x) {
+        return x * factor
+    }
+    return multiplier
+}
+
+doubleFunc <- createMultiplier(2)
+doubleResult <- doubleFunc(5)
+PrintLine("5的2倍 = " + doubleResult)
+
+tripleFunc <- createMultiplier(3)
+tripleResult <- tripleFunc(5)
+PrintLine("5的3倍 = " + tripleResult)
+
+// 函数重载（如果支持）
+PrintLine("\n=== 函数重载（如果支持） ===")
+
+func testOverload(a) {
+    PrintLine("单参数函数: " + a)
+}
+
+func testOverload(a, b) {
+    PrintLine("双参数函数: " + a + ", " + b)
+}
+
+testOverload(1)
+testOverload(1, 2)
+
+PrintLine("\n✅ 所有函数声明和调用测试完成")

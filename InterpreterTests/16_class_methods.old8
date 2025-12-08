@@ -1,0 +1,296 @@
+// 测试类方法
+
+PrintLine("=== 类方法测试 ===")
+
+// 基本的类方法
+PrintLine("\n=== 基本的类方法 ===")
+
+class BasicClass {
+    func sayHello() {
+        PrintLine("Hello from BasicClass")
+    }
+    
+    func add(a, b) {
+        return a + b
+    }
+}
+
+basic <- BasicClass()
+basic.sayHello()
+result <- basic.add(1, 2)
+PrintLine("1 + 2 = " + result)
+
+// 方法中的条件判断
+PrintLine("\n=== 方法中的条件判断 ===")
+
+class ConditionClass {
+    func checkEven(number) {
+        if number % 2 == 0 {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func getGrade(score) {
+        if score >= 90 {
+            return "优秀"
+        } elif score >= 80 {
+            return "良好"
+        } elif score >= 70 {
+            return "中等"
+        } elif score >= 60 {
+            return "及格"
+        } else {
+            return "不及格"
+        }
+    }
+}
+
+condition <- ConditionClass()
+isEven <- condition.checkEven(4)
+PrintLine("4是偶数: " + isEven)
+
+isOdd <- condition.checkEven(5)
+PrintLine("5是偶数: " + isOdd)
+
+grade <- condition.getGrade(85)
+PrintLine("85分的等级: " + grade)
+
+// 方法中的循环
+PrintLine("\n=== 方法中的循环 ===")
+
+class LoopClass {
+    func printNumbers(n) {
+        for i <- 0, i < n, i++ {
+            PrintLine("i = " + i)
+        }
+    }
+    
+    func calculateSum(n) {
+        sum <- 0
+        for i <- 1, i <= n, i++ {
+            sum <- sum + i
+        }
+        return sum
+    }
+}
+
+loop <- LoopClass()
+PrintLine("打印0到4的数字:")
+loop.printNumbers(5)
+
+sum <- loop.calculateSum(10)
+PrintLine("1到10的和: " + sum)
+
+// 方法中的this关键字
+PrintLine("\n=== 方法中的this关键字 ===")
+
+class ThisClass {
+    name <- ""
+    age <- 0
+    
+    func init(name, age) {
+        this.name <- name
+        this.age <- age
+    }
+    
+    func updateName(newName) {
+        this.name <- newName
+    }
+    
+    func updateAge(newAge) {
+        this.age <- newAge
+    }
+    
+    func getInfo() {
+        return "Name: " + this.name + ", Age: " + this.age
+    }
+}
+
+thisObj <- ThisClass("Alice", 30)
+PrintLine(thisObj.getInfo())
+
+thisObj.updateName("Bob")
+thisObj.updateAge(35)
+PrintLine(thisObj.getInfo())
+
+// 方法中的参数传递
+PrintLine("\n=== 方法中的参数传递 ===")
+
+class ParameterClass {
+    // 传递基本类型
+    func passByValue(value) {
+        value <- value + 1
+        return value
+    }
+    
+    // 传递数组/列表
+    func modifyArray(arr) {
+        arr[0] <- 100
+    }
+}
+
+param <- ParameterClass()
+
+// 测试基本类型传递
+original <- 5
+modified <- param.passByValue(original)
+PrintLine("原始值: " + original + ", 修改后: " + modified)
+
+// 测试数组传递
+array <- [1, 2, 3]
+PrintLine("修改前数组: " + array)
+param.modifyArray(array)
+PrintLine("修改后数组: " + array)
+
+// 方法返回值
+PrintLine("\n=== 方法返回值 ===")
+
+class ReturnClass {
+    func returnString() {
+        return "Hello, Return!"
+    }
+    
+    func returnArray() {
+        return [1, 2, 3, 4, 5]
+    }
+    
+    func returnObject() {
+        return {"name": "Test", "value": 42}
+    }
+}
+
+returnObj <- ReturnClass()
+
+stringResult <- returnObj.returnString()
+PrintLine("返回字符串: " + stringResult)
+
+arrayResult <- returnObj.returnArray()
+PrintLine("返回数组: " + arrayResult)
+
+objectResult <- returnObj.returnObject()
+PrintLine("返回对象: " + objectResult)
+
+// 方法中的方法调用
+PrintLine("\n=== 方法中的方法调用 ===")
+
+class MethodCallClass {
+    func square(x) {
+        return x * x
+    }
+    
+    func cube(x) {
+        return this.square(x) * x
+    }
+    
+    func power(x, n) {
+        result <- 1
+        for i <- 0, i < n, i++ {
+            result <- result * x
+        }
+        return result
+    }
+}
+
+methodCall <- MethodCallClass()
+squareResult <- methodCall.square(5)
+PrintLine("5的平方: " + squareResult)
+
+cubeResult <- methodCall.cube(5)
+PrintLine("5的立方: " + cubeResult)
+
+powerResult <- methodCall.power(2, 3)
+PrintLine("2的3次方: " + powerResult)
+
+// 方法中的局部变量
+PrintLine("\n=== 方法中的局部变量 ===")
+
+class LocalVarClass {
+    func testLocalVars() {
+        localVar <- "我是局部变量"
+        PrintLine(localVar)
+        
+        // 局部变量不会影响外部
+        externalVar <- "我是方法内的变量，不会影响外部"
+        PrintLine(externalVar)
+    }
+}
+
+externalVar <- "我是外部变量"
+localVarObj <- LocalVarClass()
+localVarObj.testLocalVars()
+PrintLine("外部变量值: " + externalVar)
+
+// 多参数方法
+PrintLine("\n=== 多参数方法 ===")
+
+class MultiParamClass {
+    func printInfo(name, age, city) {
+        PrintLine("Name: " + name + ", Age: " + age + ", City: " + city)
+    }
+    
+    func calculateDistance(x1, y1, x2, y2) {
+        return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
+    }
+}
+
+multiParam <- MultiParamClass()
+multiParam.printInfo("Alice", 30, "New York")
+distance <- multiParam.calculateDistance(0, 0, 3, 4)
+PrintLine("(0,0)到(3,4)的距离平方: " + distance)
+
+// 带默认参数的方法
+PrintLine("\n=== 带默认参数的方法 ===")
+
+class DefaultParamClass {
+    func greet(name, greeting = "Hello") {
+        return greeting + ", " + name + "!"
+    }
+}
+
+defaultParam <- DefaultParamClass()
+
+message1 <- defaultParam.greet("Alice")
+PrintLine(message1)
+
+message2 <- defaultParam.greet("Bob", "Hi")
+PrintLine(message2)
+
+// 无返回值的方法
+PrintLine("\n=== 无返回值的方法 ===")
+
+class VoidMethodClass {
+    func printMessage(message) {
+        PrintLine("Message: " + message)
+    }
+    
+    func doNothing() {
+        // 什么也不做
+    }
+}
+
+voidMethod <- VoidMethodClass()
+voidMethod.printMessage("这是一个无返回值的方法")
+
+// 方法中的异常处理（如果支持）
+PrintLine("\n=== 方法中的异常处理（如果支持） ===")
+
+class ExceptionClass {
+    func divide(a, b) {
+        if b == 0 {
+            PrintLine("除数不能为零")
+            return 0
+        }
+        return a / b
+    }
+}
+
+exceptionObj <- ExceptionClass()
+result1 <- exceptionObj.divide(10, 2)
+PrintLine("10 / 2 = " + result1)
+
+result2 <- exceptionObj.divide(10, 0)
+PrintLine("10 / 0 = " + result2)
+
+PrintLine("\n✅ 所有类方法测试完成")

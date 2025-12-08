@@ -81,23 +81,31 @@ public class FuncLangValue : LangValueType
             }
         }
 
-        if (variateManagerFunc.IsClass)
-        {
-            variateManagerFunc.AddChildren();
-            if (Ids != null && Ids.Count != 0)
-                for (var i = 0; i < ids.Count; i++)
-                    variateManagerFunc.Set(Ids[i], ids[i].Run(variateManagerFunc));
-            BlockStatement.Run(variateManagerFunc);
-            variateManagerFunc.RemoveChildren();
-            return variateManagerFunc.Result;
-        }
-
-        var variateManager = variateManagerFunc.NewManger();
+        // 调用方法体
+        variateManagerFunc.AddChildren();
+        variateManagerFunc.IsFunc = true; // 设置为函数上下文
         if (Ids != null && Ids.Count != 0)
-            for (var i = 0; i < ids.Count; i++)
-                variateManager.Set(Ids[i], ids[i].Run(variateManagerFunc));
-        BlockStatement.Run(variateManager);
-        return variateManager.Result;
+            for (var i = 0; i < Ids.Count; i++)
+            {
+                if (i < ids.Count)
+                {
+                    // 将实例化时的参数表达式结果赋值给方法参数
+                    var paramValue = ids[i].Run(variateManagerFunc);
+                    variateManagerFunc.Set(Ids[i], paramValue);
+                }
+            }
+        
+        // 运行方法体
+        BlockStatement.Run(variateManagerFunc);
+        
+        // 恢复非函数上下文标志
+        variateManagerFunc.IsFunc = false;
+        
+        // 移除子作用域，但是要注意，在init方法中使用this关键字设置的值已经被保存到实例中了
+        // 所以这里移除子作用域不会影响实例的状态
+        variateManagerFunc.RemoveChildren();
+        
+        return variateManagerFunc.Result;
     }
 
     public override Type OutputType(LocalManager local)

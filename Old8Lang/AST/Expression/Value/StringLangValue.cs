@@ -19,7 +19,9 @@ public class StringLangValue(string context, SourcePosition position = default) 
 
     public override string ToString() => $"\"{Value}\""; // 带引号的字符串，符合 Old8Lang 语法
     public override string ToDisplayString() => Value; // 不带引号的字符串，用于显示和打印
-    public override LangValueType Plus(LangValueType otherLangValueType) => new StringLangValue(Value + otherLangValueType.ToDisplayString());
+
+    public override LangValueType Plus(LangValueType otherLangValueType) =>
+        new StringLangValue(Value + otherLangValueType.ToDisplayString());
 
     public override bool Equal(LangValueType? otherValueType)
     {
@@ -41,9 +43,50 @@ public class StringLangValue(string context, SourcePosition position = default) 
         throw new InvalidOperationError(this, $"不支持字符串与类型 '{otherLangValueType.GetType().Name}' 的乘法操作");
     }
 
+    public override bool Less(LangValueType? otherValue)
+    {
+        if (otherValue is StringLangValue b)
+            return Value.Length < b.Value.Length;
+
+        throw new InvalidOperationError(this, $"不支持字符串与类型 '{otherValue?.GetType().Name}' 的比较操作");
+    }
+
+    public override bool LessEqual(LangValueType? otherValue)
+    {
+        if (otherValue is StringLangValue b)
+            return Value.Length <= b.Value.Length;
+
+        throw new InvalidOperationError(this, $"不支持字符串与类型 '{otherValue?.GetType().Name}' 的比较操作");
+    }
+
+    public override bool Greater(LangValueType? otherValue)
+    {
+        if (otherValue is StringLangValue b)
+            return Value.Length > b.Value.Length;
+
+        throw new InvalidOperationError(this, $"不支持字符串与类型 '{otherValue?.GetType().Name}' 的比较操作");
+    }
+
+    public override bool GreaterEqual(LangValueType? otherValue)
+    {
+        if (otherValue is StringLangValue b)
+            return Value.Length >= b.Value.Length;
+
+        throw new InvalidOperationError(this, $"不支持字符串与类型 '{otherValue?.GetType().Name}' 的比较操作");
+    }
+
+    public override LangValueType Minus(LangValueType otherLangValueType)
+    {
+        if (otherLangValueType is StringLangValue b)
+            return new StringLangValue(Value.Replace(b.Value, ""));
+
+        throw new InvalidOperationError(this, $"不支持字符串与类型 '{otherLangValueType.GetType().Name}' 的减法操作");
+    }
+
     public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)
     {
-        if (otherLangValueType is not TypeLangValue value) throw new TypeError(this, "TypeValue", otherLangValueType.GetType().Name);
+        if (otherLangValueType is not TypeLangValue value)
+            throw new TypeError(this, "TypeValue", otherLangValueType.GetType().Name);
 
         switch (value.Value)
         {
@@ -73,6 +116,16 @@ public class StringLangValue(string context, SourcePosition position = default) 
     public IEnumerable<LangValueType> GetItems() => Value.Select(item => ObjToValue(item));
 
     public int GetLength() => Value.Length;
+
+    public LangValueType Get(IntLangValue index)
+    {
+        var i = index.Value;
+        if (i < 0)
+            i = Value.Length + i;
+        if (i < 0 || i >= Value.Length)
+            throw new IndexError(this, i, Value.Length);
+        return new CharLangValue(Value[i]);
+    }
 
     public LangValueType Slice(int start, int end)
     {

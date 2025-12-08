@@ -206,7 +206,8 @@ public enum LangTokenType
     Default,
     Return,
     As,
-    List
+    List,
+    This
 }
 
 public enum KeywordType
@@ -235,7 +236,8 @@ public enum KeywordType
     And,
     Or,
     Xor,
-    List
+    List,
+    This
 }
 
 public static class TokenOpera

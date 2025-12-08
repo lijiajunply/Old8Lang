@@ -1,0 +1,19 @@
+// 测试令牌流
+
+class Person {
+    name <- ""
+    age <- 0
+    
+    func init(name, age) {
+        this.name <- name
+        this.age <- age
+    }
+    
+    func updateAge(newAge) {
+        this.age <- newAge
+    }
+}
+
+person <- Person("Bob", 25)
+person.updateAge(30)
+PrintLine(person.age)

@@ -1,0 +1,17 @@
+// 测试this关键字的简单使用
+class Person {
+    name <- ""
+    age <- 0
+    
+    func init(name, age) {
+        this.name <- name
+        this.age <- age
+    }
+}
+
+// 创建对象
+p <- Person("Bob", 25)
+
+// 直接访问属性
+PrintLine(p.name)
+PrintLine(p.age)

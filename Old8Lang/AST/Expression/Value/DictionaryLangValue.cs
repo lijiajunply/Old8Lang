@@ -62,6 +62,11 @@ public class DictionaryLangValue : LangValueType, ILangList
     public LangValueType Get(LangValueType key)
     {
         var a = Value.Where(x => x.Key.Equal(key)).ToList();
+        if (a.Count == 0)
+        {
+            return new NullLangValue();
+        }
+
         return a[0].Value;
     }
 

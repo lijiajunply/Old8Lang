@@ -311,8 +311,9 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             return ParseImportStatement();
         }
 
-        // 处理赋值语句：identifier <- expression
-        if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.LeftBrace or LangTokenType.LeftBracket)
+        // 处理赋值语句：identifier <- expression 或 this <- expression
+        if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.This or LangTokenType.LeftBrace
+            or LangTokenType.LeftBracket)
         {
             var nextToken = Peek();
             if (nextToken.Type == LangTokenType.Assignment)
@@ -539,9 +540,11 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         var position = new SourcePosition(identifierToken.Line, identifierToken.Column,
             tokenValue: identifierToken.Value);
         var identifier = identifierToken.Value;
-        Expect(LangTokenType.Identifier);
 
-        // 处理成员访问：identifier "." identifier* ( ":" type )? "<-" expression
+        // 检查当前令牌是否是 this 关键字
+        Expect(CurrentToken.Type == LangTokenType.This ? LangTokenType.This : LangTokenType.Identifier);
+
+        // 处理成员访问：identifier "." identifier* (":" type )? "<-" expression
         var isMemberAccess = false;
         var memberPath = identifier;
         while (CurrentToken.Type == LangTokenType.Dot)
@@ -566,16 +569,20 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
 
         if (isMemberAccess)
         {
-            // 处理成员访问赋值：p.name <- value
+            // 处理成员访问赋值：p.name <- value 或 this.name <- value
             var parts = memberPath.Split('.');
+
+            // 创建成员访问表达式：this.value
             var firstId = new LangId(parts[0], assumptionType, position);
-            var memberAccess = firstId;
+            OldExpr memberAccess = firstId;
 
             for (int i = 1; i < parts.Length; i++)
             {
-                memberAccess = new LangId(parts[i], "", position);
+                memberAccess = new Operation(memberAccess, OperationType.CONCAT, new LangId(parts[i], "", position),
+                    position);
             }
 
+            // 对于成员访问赋值，返回 SetStatement，其中 LeftExpr 是成员访问表达式
             return new SetStatement(memberAccess, expression, position);
         }
 
@@ -1153,7 +1160,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var position =
                 new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
             Expect(operatorToken.Type);
-            var right = ParsePrimary();
+            var right = ParseNumberOpera2(); // 解析乘除级别的表达式，保证优先级正确
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
         }
 
@@ -1170,11 +1177,18 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var position =
                 new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
             Expect(operatorToken.Type);
-            var right = ParsePrimary();
+            var right = ParsePrimary(); // 乘除的右操作数是primary
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
         }
 
         return left;
+    }
+
+    // 辅助方法：从primary开始解析完整的表达式，包括乘除和加减
+    private OldExpr ParseNumberOpera2()
+    {
+        var expr = ParsePrimary();
+        return ParseNumberOpera2(expr);
     }
 
 // boolOpera = expression ( ( "and" | "or" | "xor" ) expression )* ;
@@ -1292,6 +1306,15 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
 
             // 否则作为普通标识符处理
             return ParseIdentifier();
+        }
+
+        if (CurrentToken.Type == LangTokenType.This)
+        {
+            // 直接创建一个 LangId 对象来处理 this 关键字
+            var thisToken = CurrentToken;
+            var position = new SourcePosition(thisToken.Line, thisToken.Column, tokenValue: thisToken.Value);
+            Expect(LangTokenType.This);
+            return new LangId(thisToken.Value, "", position);
         }
 
         return CurrentToken.Type switch
@@ -1603,6 +1626,9 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         // 解析第一个元素
         elements.Add(ParseExpression());
 
+        // 检查是否有逗号
+        bool hasComma = CurrentToken.Type == LangTokenType.Comma;
+
         // 解析更多元素
         while (CurrentToken.Type == LangTokenType.Comma)
         {
@@ -1619,7 +1645,16 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         // 构建元组，支持任意数量元素
         if (elements.Count == 1)
         {
-            // 单元素元组：(expr) 或 (expr,)
+            // 检查是否是单元素元组还是括号表达式
+            // 如果没有逗号，那么是括号表达式：(expr)
+            // 如果有逗号，那么是单元素元组：(expr,)
+            if (!hasComma)
+            {
+                // 单个表达式，返回表达式本身，不是元组
+                return elements[0];
+            }
+
+            // 单元素元组：(expr,)
             return new TupleLangValue(elements[0], new LangId("", "", position), position);
         }
         else if (elements.Count == 2)
@@ -1657,16 +1692,16 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         {
             var dollarToken = CurrentToken;
             var position = new SourcePosition(dollarToken.Line, dollarToken.Column, tokenValue: dollarToken.Value);
-            
+
             // 跳过$符号
             Expect(LangTokenType.Dollar);
-            
+
             // 处理$"string" 格式（字符串插值）
             if (CurrentToken.Type == LangTokenType.String)
             {
                 var stringValue = CurrentToken.Value;
                 Expect(LangTokenType.String);
-                
+
                 // 完整的字符串模板解析
                 var parts = new List<OldExpr>();
                 var i = 0;
@@ -1725,10 +1760,10 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                                 {
                                     // 将表达式字符串转换为Token流
                                     var exprTokens = LangTokenizer.Tokenize(exprStr);
-                                    
+
                                     // 创建一个新的LangParser实例来解析这个表达式
                                     var exprParser = new LangParser(exprTokens, exprStr, fileName);
-                                    
+
                                     // 解析完整表达式
                                     var expr = exprParser.ParseExpression();
                                     parts.Add(expr);

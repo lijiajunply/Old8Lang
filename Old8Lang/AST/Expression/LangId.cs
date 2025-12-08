@@ -1,10 +1,11 @@
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression;
 
-public class LangId(string name,string assumptionType = "", SourcePosition position = default) : OldExpr(position)
+public class LangId(string name, string assumptionType = "", SourcePosition position = default) : OldExpr(position)
 {
     public readonly string IdName = name;
     public override string ToString() => IdName;
@@ -21,7 +22,23 @@ public class LangId(string name,string assumptionType = "", SourcePosition posit
         return IdName.GetHashCode();
     }
 
-    public override LangValueType Run(LangParser.VariateManager manager) => manager.GetValue(this) ?? throw new NameError(this, IdName);
+    public override LangValueType Run(LangParser.VariateManager manager)
+    {
+        if (IdName == "this")
+        {
+            // 在任何环境中，只要是this关键字，就尝试查找当前类实例
+            // 首先检查manager.AnyInfo中是否有AnyLangValue
+            if (manager.AnyInfo.FirstOrDefault(x => x is AnyLangValue) is AnyLangValue anyValue)
+            {
+                return anyValue;
+            }
+
+            // 如果没有找到，抛出NameError异常，因为this关键字只能在类的方法中使用
+            throw new NameError(this, "this");
+        }
+
+        return manager.GetValue(this) ?? throw new NameError(this, IdName);
+    }
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
@@ -50,6 +67,7 @@ public class LangId(string name,string assumptionType = "", SourcePosition posit
         {
             return local.InClassEnv;
         }
+
         var value = local.GetLocalVar(IdName);
         return value?.LocalType ?? typeof(object);
     }

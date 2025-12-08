@@ -1,0 +1,55 @@
+// 测试基本字面量
+
+// 整数字面量测试
+PrintLine("=== 整数字面量测试 ===")
+intLiteral1 <- 123
+PrintLine("整数 123: " + intLiteral1)
+
+intLiteral2 <- -456
+PrintLine("整数 -456: " + intLiteral2)
+
+intLiteral3 <- 0
+PrintLine("整数 0: " + intLiteral3)
+
+// 浮点数字面量测试
+PrintLine("\n=== 浮点数字面量测试 ===")
+doubleLiteral1 <- 3.14
+PrintLine("浮点数 3.14: " + doubleLiteral1)
+
+doubleLiteral2 <- -0.5
+PrintLine("浮点数 -0.5: " + doubleLiteral2)
+
+doubleLiteral3 <- 1.0
+PrintLine("浮点数 1.0: " + doubleLiteral3)
+
+// 字符串字面量测试
+PrintLine("\n=== 字符串字面量测试 ===")
+stringLiteral1 <- "hello world"
+PrintLine("字符串 'hello world': " + stringLiteral1)
+
+stringLiteral2 <- ""
+PrintLine("空字符串: '" + stringLiteral2 + "'")
+
+stringLiteral3 <- "a"
+PrintLine("单字符字符串 'a': " + stringLiteral3)
+
+// 字符字面量测试
+PrintLine("\n=== 字符字面量测试 ===")
+charLiteral1 <- 'a'
+PrintLine("字符 'a': " + charLiteral1)
+
+charLiteral2 <- '1'
+PrintLine("字符 '1': " + charLiteral2)
+
+charLiteral3 <- '\n'
+PrintLine("转义字符 '\\n': 换行符")
+
+// 布尔字面量测试
+PrintLine("\n=== 布尔字面量测试 ===")
+boolLiteral1 <- true
+PrintLine("布尔 true: " + boolLiteral1)
+
+boolLiteral2 <- false
+PrintLine("布尔 false: " + boolLiteral2)
+
+PrintLine("\n✅ 所有基本字面量测试完成")

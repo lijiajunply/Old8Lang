@@ -1,0 +1,93 @@
+// 测试比较表达式
+
+PrintLine("=== 比较表达式测试 ===")
+
+// 整数比较
+PrintLine("\n=== 整数比较 ===")
+
+// 等于
+equalResult <- 10 == 10
+PrintLine("10 == 10 = " + equalResult)
+
+// 不等于
+notEqualResult <- 10 != 5
+PrintLine("10 != 5 = " + notEqualResult)
+
+// 小于
+lessResult <- 5 < 10
+PrintLine("5 < 10 = " + lessResult)
+
+// 大于
+greaterResult <- 10 > 5
+PrintLine("10 > 5 = " + greaterResult)
+
+// 小于等于
+lessEqualResult <- 10 <= 10
+PrintLine("10 <= 10 = " + lessEqualResult)
+
+// 大于等于
+greaterEqualResult <- 10 >= 5
+PrintLine("10 >= 5 = " + greaterEqualResult)
+
+// 浮点数比较
+PrintLine("\n=== 浮点数比较 ===")
+
+// 等于
+doubleEqualResult <- 10.5 == 10.5
+PrintLine("10.5 == 10.5 = " + doubleEqualResult)
+
+// 不等于
+doubleNotEqualResult <- 10.5 != 5.5
+PrintLine("10.5 != 5.5 = " + doubleNotEqualResult)
+
+// 小于
+doubleLessResult <- 5.5 < 10.5
+PrintLine("5.5 < 10.5 = " + doubleLessResult)
+
+// 大于
+doubleGreaterResult <- 10.5 > 5.5
+PrintLine("10.5 > 5.5 = " + doubleGreaterResult)
+
+// 字符串比较
+PrintLine("\n=== 字符串比较 ===")
+
+// 等于
+stringEqualResult <- "hello" == "hello"
+PrintLine("\"hello\" == \"hello\" = " + stringEqualResult)
+
+// 不等于
+stringNotEqualResult <- "hello" != "world"
+PrintLine("\"hello\" != \"world\" = " + stringNotEqualResult)
+
+// 小于
+stringLessResult <- "apple" < "banana"
+PrintLine("\"apple\" < \"banana\" = " + stringLessResult)
+
+// 大于
+stringGreaterResult <- "banana" > "apple"
+PrintLine("\"banana\" > \"apple\" = " + stringGreaterResult)
+
+// 布尔比较
+PrintLine("\n=== 布尔比较 ===")
+
+// 等于
+boolEqualResult <- true == true
+PrintLine("true == true = " + boolEqualResult)
+
+// 不等于
+boolNotEqualResult <- true != false
+PrintLine("true != false = " + boolNotEqualResult)
+
+// 混合类型比较
+PrintLine("\n=== 混合类型比较 ===")
+
+// 整数和浮点数比较
+mixedEqualResult <- 10 == 10.0
+PrintLine("10 == 10.0 = " + mixedEqualResult)
+
+// 复杂表达式
+PrintLine("\n=== 复杂表达式 ===")
+complexResult <- (10 > 5) == ("apple" < "banana")
+PrintLine("(10 > 5) == (\"apple\" < \"banana\") = " + complexResult)
+
+PrintLine("\n✅ 所有比较表达式测试完成")
