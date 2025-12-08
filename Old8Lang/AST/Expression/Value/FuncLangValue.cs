@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// <summary>
 /// 函数 ，作为一种变量存在
 /// </summary>
-public class FuncLangValue : LangValueType
+public class FuncLangValue : ImportInfo
 {
     public readonly LangId? Id;
     public readonly BlockStatement BlockStatement = new([]);

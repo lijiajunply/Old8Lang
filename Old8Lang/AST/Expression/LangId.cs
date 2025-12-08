@@ -22,21 +22,20 @@ public class LangId(string name, string assumptionType = "", SourcePosition posi
         return IdName.GetHashCode();
     }
 
-    public override LangValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(LangParser.VariateManager manager) 
     {
         if (IdName == "this")
         {
-            // 在任何环境中，只要是this关键字，就尝试查找当前类实例
-            // 首先检查manager.AnyInfo中是否有AnyLangValue
-            if (manager.AnyInfo.FirstOrDefault(x => x is AnyLangValue) is AnyLangValue anyValue)
+            // 直接从变量储存器中获取名为"this"的变量
+            var thisValue = manager.GetValue(new LangId("this"));
+            if (thisValue != null)
             {
-                return anyValue;
+                return thisValue;
             }
-
+            
             // 如果没有找到，抛出NameError异常，因为this关键字只能在类的方法中使用
             throw new NameError(this, "this");
         }
-
         return manager.GetValue(this) ?? throw new NameError(this, IdName);
     }
 

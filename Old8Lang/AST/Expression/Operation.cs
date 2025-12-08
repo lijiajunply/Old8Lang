@@ -59,9 +59,9 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         if (Opera == OperationType.CONCAT && Left is LangId { IdName: "this" } && Right != null)
         {
             // 处理this关键字，获取当前类实例
-            // 首先检查manager.AnyInfo中是否有AnyLangValue
-            var anyValue = manager.AnyInfo.FirstOrDefault(x => x is AnyLangValue) as AnyLangValue;
-            if (anyValue != null)
+            // 运行Left表达式，获取this关键字的值
+            var thisValue = Left.Run(manager);
+            if (thisValue is AnyLangValue anyValue)
             {
                 // 直接调用当前实例的Dot方法，处理成员访问
                 return anyValue.Dot(Right);

@@ -17,18 +17,21 @@ public class AnyLangValue : LangValueType
 
     public readonly VariateManager Manager;
 
-    public AnyLangValue(LangId id, Dictionary<LangId, OldExpr> variates, SourcePosition position = default) : base(position)
+    public AnyLangValue(LangId id, Dictionary<LangId, OldExpr> variates, SourcePosition position = default) :
+        base(position)
     {
         Variates = variates;
         Id = id;
-        Manager = new VariateManager();
-        Manager.IsClass = true;
-        
+        Manager = new VariateManager
+        {
+            IsClass = true
+        };
+
         // 初始化Result字典，运行变量表达式
         // 注意：不要在这里运行表达式，因为此时Interpreter还没有被设置
         // 而是在Instance.Run方法中，当调用init方法前设置Interpreter
     }
-    
+
     /// <summary>
     /// 初始化实例，设置Interpreter
     /// </summary>
@@ -36,15 +39,15 @@ public class AnyLangValue : LangValueType
     public void Init(IMiniInterpreter interpreter)
     {
         Manager.Interpreter = interpreter;
-        
+
         // 现在可以运行变量表达式了
-        foreach (var variable in Variates.Keys)
+        foreach (var variable in Variates)
         {
-            // 运行变量表达式，并将结果添加到Result字典中
-            var value = Variates[variable].Run(Manager);
-            Result[variable.IdName] = value;
+            // 运行变量表达式，获取结果
+            var value = variable.Value.Run(Manager);
+            Result[variable.Key.IdName] = value;
         }
-        
+
         // 不要调用Manager.Init(Result)，否则会导致变量重复定义
         // 而是直接将Result字典中的值存储到实例中
     }
@@ -65,15 +68,15 @@ public class AnyLangValue : LangValueType
 
     public sealed override LangValueType Run(VariateManager manager)
     {
-        Manager.AnyInfo.AddRange(manager.AnyInfo.Where(x => x is not FuncLangValue).ToList());
-        
+        Manager.ImportInfos.AddRange(manager.ImportInfos.Where(x => x is not FuncLangValue).ToList());
+
         foreach (var variable in Variates.Keys)
         {
             // 运行变量表达式，并将结果添加到Result字典中
             var value = Variates[variable].Run(manager);
             Result.Add(variable.IdName, value);
         }
-        
+
         return this;
     }
 
@@ -89,23 +92,24 @@ public class AnyLangValue : LangValueType
                     // 检查value是否是函数类型
                     if (value is FuncLangValue funcValue)
                     {
-                        // 在调用类方法时，将当前实例添加到AnyInfo中，以便this关键字访问
-                        Manager.AnyInfo.Add(this);
+                        // 在调用类方法时，将当前实例作为"this"变量添加到变量储存器中
+                        Manager.Set(new LangId("this"), this);
                         var funcResult = funcValue.Run(Manager);
-                        Manager.AnyInfo.Remove(this);
+                        // 方法执行完毕后，移除"this"变量
+                        // 注意：这里不需要手动移除，因为FuncLangValue.Run方法会调用RemoveChildren()
                         return funcResult;
                     }
                     
                     return value;
                 }
-                
+
                 // 检查Variates字典中是否有该属性（成员变量）
                 if (Variates.TryGetValue(id, out var variate))
                 {
                     // 如果有，运行它并返回结果
                     return variate.Run(Manager);
                 }
-                
+
                 // 如果没有找到，抛出AttributeError异常
                 throw new AttributeError(this, id.IdName, Id.IdName);
             }
@@ -114,9 +118,8 @@ public class AnyLangValue : LangValueType
                 if (func.Id?.IdName == "GetType")
                     return new TypeLangValue(TypeToString());
                 // 在调用类方法时，将当前实例添加到AnyInfo中，以便this关键字访问
-                Manager.AnyInfo.Add(this);
+                Manager.Set(new LangId("this"), this);
                 var funcResult = func.Run(Manager);
-                Manager.AnyInfo.Remove(this);
                 return funcResult;
             }
             case Instance instance:
@@ -124,26 +127,25 @@ public class AnyLangValue : LangValueType
                 // 处理方法调用，如: alice.getName()
                 // 首先获取方法名
                 var methodName = instance.Id.IdName;
-                
+
                 // 检查Result字典中是否有该方法
                 if (Result.TryGetValue(methodName, out var value))
                 {
                     if (value is FuncLangValue funcValue)
                     {
                         // 在调用类方法时，将当前实例添加到AnyInfo中，以便this关键字访问
-                        Manager.AnyInfo.Add(this);
-                        
+                        Manager.Set(new LangId("this"), this);
+
                         // 处理方法参数
                         List<OldExpr> methodArgs = [];
                         methodArgs.AddRange(instance.Ids);
-                        
+
                         // 调用方法
                         var funcResult = funcValue.Run(Manager, methodArgs);
-                        Manager.AnyInfo.Remove(this);
                         return funcResult;
                     }
                 }
-                
+
                 // 检查Variates字典中是否有该方法
                 if (Variates.TryGetValue(new LangId(methodName), out var variate))
                 {
@@ -151,28 +153,26 @@ public class AnyLangValue : LangValueType
                     if (methodValue is FuncLangValue funcValue)
                     {
                         // 在调用类方法时，将当前实例添加到AnyInfo中，以便this关键字访问
-                        Manager.AnyInfo.Add(this);
-                        
+                        Manager.Set(new LangId("this"), this);
+
                         // 处理方法参数
                         List<OldExpr> methodArgs = [];
                         methodArgs.AddRange(instance.Ids);
-                        
+
                         // 调用方法
                         var funcResult = funcValue.Run(Manager, methodArgs);
-                        Manager.AnyInfo.Remove(this);
                         return funcResult;
                     }
                 }
-                
+
                 // 如果没有找到，抛出AttributeError异常
                 throw new AttributeError(this, methodName, Id.IdName);
             }
             default:
                 // 其他情况，直接运行表达式
                 // 在调用类方法时，将当前实例添加到AnyInfo中，以便this关键字访问
-                Manager.AnyInfo.Add(this);
+                Manager.Set(new LangId("this"), this);
                 var defaultResult = dotExpr.Run(Manager);
-                Manager.AnyInfo.Remove(this);
                 return defaultResult;
         }
     }
@@ -181,7 +181,8 @@ public class AnyLangValue : LangValueType
 
     public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)
     {
-        if (otherLangValueType is not AnyLangValue typeAny) throw new TypeError(this, "AnyValue", otherLangValueType.GetType().Name);
+        if (otherLangValueType is not AnyLangValue typeAny)
+            throw new TypeError(this, "AnyValue", otherLangValueType.GetType().Name);
 
         foreach (var a in Result)
         {
@@ -215,29 +216,29 @@ public class AnyLangValue : LangValueType
         // 创建一个字典来存储AnyValue的属性
         var dictType = typeof(Dictionary<string, object>);
         var constructor = dictType.GetConstructor(Type.EmptyTypes)!;
-        
+
         // 实例化字典
         ilGenerator.Emit(OpCodes.Newobj, constructor);
-        
+
         // 遍历所有属性，将它们添加到字典中
         foreach (var variate in Variates)
         {
             // 复制字典引用到堆栈上
             ilGenerator.Emit(OpCodes.Dup);
-            
+
             // 加载属性名
             ilGenerator.Emit(OpCodes.Ldstr, variate.Key.IdName);
-            
+
             // 加载属性值
             variate.Value.LoadIlValue(ilGenerator, local);
-            
+
             // 确保值是对象类型，如果是值类型则装箱
             var valueType = variate.Value.OutputType(local);
             if (valueType is { IsValueType: true })
             {
                 ilGenerator.Emit(OpCodes.Box, valueType);
             }
-            
+
             // 调用字典的Add方法
             var addMethod = dictType.GetMethod("Add", [typeof(string), typeof(object)])!;
             ilGenerator.Emit(OpCodes.Callvirt, addMethod);

@@ -9,8 +9,7 @@ using Old8Lang.LangParser;
 #if DEBUG
 string[] strings =
 [
-    "-f", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,
-        "Old8Lang", "Ex", "init.old8")
+    "-s", "/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/InterpreterTests/test_this_simple.old8"
 ];
 
 args = args.Length == 0 ? strings : args;

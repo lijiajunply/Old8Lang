@@ -8,7 +8,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// </summary>
 /// <param name="className"></param>
 /// <param name="classType"></param>
-public class NativeStaticAny(string className, Type classType) : LangValueType
+public class NativeStaticAny(string className, Type classType) : ImportInfo
 {
     public readonly string ClassName = className;
 

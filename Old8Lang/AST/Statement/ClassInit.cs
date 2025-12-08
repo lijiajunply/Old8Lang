@@ -2,28 +2,26 @@ using Old8Lang.LangParser;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
 
-public class ClassInit(AnyLangValue anyLangValue, SourcePosition position = default) : OldStatement(position)
+public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = default) : OldStatement(position)
 {
     public override void Run(VariateManager manager)
     {
         // 检查类是否已存在
-        var existingClass = manager.AnyInfo.FirstOrDefault(info => 
-            info is TypeTemplate template && template.ClassName == anyLangValue.Id.IdName);
+        var existingClass = manager.GetAny(new LangId(anyLangValue.ClassName));
         
         if (existingClass != null)
         {
-            throw new DuplicateNameError(this, anyLangValue.Id.IdName, "类");
+            throw new DuplicateNameError(this, anyLangValue.ClassName, "类");
         }
         
-        // 创建类型模板并存储，而不是直接存储AnyLangValue
-        var typeTemplate = new TypeTemplate(anyLangValue.Id.IdName, anyLangValue.Variates, Position);
-        manager.AddClassAndFunc(typeTemplate);
+        manager.AddClassAndFunc(anyLangValue);
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
@@ -34,10 +32,10 @@ public class ClassInit(AnyLangValue anyLangValue, SourcePosition position = defa
         var moduleBuilder = assemblyBuilder.DefineDynamicModule("DynamicModule");
 
         // 定义一个新的类型
-        var typeBuilder = moduleBuilder.DefineType(anyLangValue.Id.IdName, TypeAttributes.Public);
+        var typeBuilder = moduleBuilder.DefineType(anyLangValue.ClassName, TypeAttributes.Public);
 
         var fields = new List<FieldBuilder>();
-        var fieldValues = new List<Expression.LangValueType>();
+        var fieldValues = new List<LangValueType>();
         var func = new List<FuncLangValue>();
         foreach (var variate in anyLangValue.Variates)
         {
@@ -47,7 +45,7 @@ public class ClassInit(AnyLangValue anyLangValue, SourcePosition position = defa
                 continue;
             }
 
-            if (variate.Value is not Expression.LangValueType value) continue;
+            if (variate.Value is not LangValueType value) continue;
 
             var fieldBuilder = typeBuilder.DefineField(variate.Key.IdName,
                 variate.Value.OutputType(local)!,
@@ -60,7 +58,7 @@ public class ClassInit(AnyLangValue anyLangValue, SourcePosition position = defa
         var assemblyClone =
             AssemblyBuilder.DefineDynamicAssembly(assemblyNameClone, AssemblyBuilderAccess.Run);
         var moduleClone = assemblyClone.DefineDynamicModule("DynamicModule");
-        var typeClone = moduleClone.DefineType(anyLangValue.Id.IdName, TypeAttributes.Public);
+        var typeClone = moduleClone.DefineType(anyLangValue.ClassName, TypeAttributes.Public);
         foreach (var variate in anyLangValue.Variates.Where(variate => variate.Value is not FuncLangValue))
         {
             typeClone.DefineField(variate.Key.IdName,
@@ -91,7 +89,7 @@ public class ClassInit(AnyLangValue anyLangValue, SourcePosition position = defa
 
         generator.Emit(OpCodes.Ret);
 
-        local.ClassVar.Add(anyLangValue.Id.IdName, typeBuilder.CreateType());
+        local.ClassVar.Add(anyLangValue.ClassName, typeBuilder.CreateType());
     }
 
     public override OldStatement this[int index] => this;
@@ -101,7 +99,7 @@ public class ClassInit(AnyLangValue anyLangValue, SourcePosition position = defa
     public override string ToString()
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"class {anyLangValue.Id.IdName} {{");
+        sb.AppendLine($"class {anyLangValue.ClassName} {{");
         foreach (var variate in anyLangValue.Variates)
         {
             if (variate.Value is FuncLangValue funcValue)

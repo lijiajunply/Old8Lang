@@ -25,7 +25,7 @@ public class VariateManager
     private List<string> VariateName { get; } = [];
     private List<LangValueType> Values { get; } = [];
 
-    public List<LangValueType> AnyInfo { get; private init; } = [];
+    public List<ImportInfo> ImportInfos { get; } = [];
 
     #endregion
 
@@ -89,14 +89,13 @@ public class VariateManager
         return count != -1 ? Values[count] : GetAny(id);
     }
 
-    public LangValueType? GetAny(LangId id)
+    public ImportInfo? GetAny(LangId id)
     {
-        return AnyInfo.FirstOrDefault(x =>
+        return ImportInfos.FirstOrDefault(x =>
         {
             return x switch
             {
                 FuncLangValue func => func.Id!.IdName == id.IdName,
-                AnyLangValue any => any.Id.IdName == id.IdName,
                 TypeTemplate template => template.ClassName == id.IdName,
                 NativeAnyLangValue na => na.ClassName == id.IdName,
                 NativeStaticAny staticAny => staticAny.ClassName == id.IdName,
@@ -105,19 +104,9 @@ public class VariateManager
         });
     }
 
-    public void AddClassAndFunc(LangValueType langValue)
+    public void AddClassAndFunc(ImportInfo langValue)
     {
-        AnyInfo.Add(langValue);
-    }
-
-    public void AddFunc(LangValueType langValue)
-    {
-        AnyInfo.Add(langValue);
-    }
-
-    public void AddClass(LangValueType langValue)
-    {
-        AnyInfo.Add(langValue);
+        ImportInfos.Add(langValue);
     }
 
     public void AddVariate(string name, LangValueType langValueType)
@@ -128,6 +117,7 @@ public class VariateManager
             // 在实际使用中，应该从调用处传递位置信息
             throw new DuplicateNameError(new SourcePosition(), name, "变量");
         }
+
         VariateName.Add(name);
         Values.Add(langValueType);
         Count++;
@@ -138,7 +128,7 @@ public class VariateManager
         IsReturn = false;
         Result = new VoidLangValue();
     }
-    
+
     public void Init(Dictionary<string, LangValueType> result)
     {
         // 初始化方法实现
@@ -149,7 +139,7 @@ public class VariateManager
             AddVariate(item.Key, item.Value);
         }
     }
-    
+
     public VariateManager Clone()
     {
         // 克隆方法实现
@@ -162,7 +152,7 @@ public class VariateManager
         };
         return newManager;
     }
-    
+
     public VariateManager NewManger()
     {
         // 创建新管理器方法实现

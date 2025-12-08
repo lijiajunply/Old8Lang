@@ -8,7 +8,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <summary>
 /// 原生映射 适用于有构造函数的类
 /// </summary>
-public class NativeAnyLangValue(string dllName, string className, string path) : LangValueType
+public class NativeAnyLangValue(string dllName, string className, string path) : ImportInfo
 {
     private Type? ClassType { get; set; }
     public readonly string ClassName = className;

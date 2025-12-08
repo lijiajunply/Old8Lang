@@ -131,37 +131,36 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
         }
 
         var result = Id.Run(manager);
-        
+
         // 如果result是TypeTemplate，则创建其实例
         if (result is TypeTemplate typeTemplate)
         {
             // 创建类的实例
             var instance = typeTemplate.CreateInstance();
-            
+
             // 初始化实例，设置Interpreter
             instance.Init(manager.Interpreter);
-            
+
             // 保存init方法的引用
             if (instance.Result.TryGetValue("init", out var initResult))
             {
                 if (initResult is not FuncLangValue initFunc) throw new TypeError(this, "FuncValue", "init 不是函数类型");
-                
+
                 // 在调用init方法前，将当前实例添加到AnyInfo中，以便this关键字访问
-                instance.Manager.AnyInfo.Add(instance); // 添加到实例自身的AnyInfo中
+                instance.Manager.Set(new LangId("this"), instance);
                 instance.Manager.IsFunc = true; // 设置为函数上下文
-                
+
                 // 调用init方法，并将参数传递给它
                 initFunc.Run(instance.Manager, Ids);
-                
+
                 // 恢复非函数上下文标志
                 instance.Manager.IsFunc = false;
-                instance.Manager.AnyInfo.Remove(instance); // 从实例自身的AnyInfo中移除
             }
             else if (Ids.Count != 0)
             {
                 throw new InvalidOperationError(this, "找不到对应的init函数");
             }
-            
+
             result = instance;
         }
         // 如果result是FuncLangValue，则调用它
@@ -176,17 +175,16 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
             if (anyValue.Result.TryGetValue("init", out var initResult))
             {
                 if (initResult is not FuncLangValue initFunc) throw new TypeError(this, "FuncValue", "init 不是函数类型");
-                
+
                 // 在调用init方法前，将当前实例添加到AnyInfo中，以便this关键字访问
-                anyValue.Manager.AnyInfo.Add(anyValue); // 添加到实例自身的AnyInfo中
+                anyValue.Manager.Set(new LangId("this"), anyValue);
                 anyValue.Manager.IsFunc = true; // 设置为函数上下文
-                
+
                 // 调用init方法，并将参数传递给它
                 initFunc.Run(anyValue.Manager, Ids);
-                
+
                 // 恢复非函数上下文标志
                 anyValue.Manager.IsFunc = false;
-                anyValue.Manager.AnyInfo.Remove(anyValue); // 从实例自身的AnyInfo中移除
             }
             else if (results.Count != 0)
             {

@@ -748,7 +748,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         }
 
         var classBlock = ParseClassBlock();
-        return new ClassInit(new AnyLangValue(new LangId(className), classBlock.ToAnyData()));
+        return new ClassInit(new TypeTemplate(className, classBlock.ToAnyData()));
     }
 
     /// <summary>

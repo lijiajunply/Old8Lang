@@ -4,7 +4,6 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
-
 using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
@@ -76,7 +75,7 @@ public class NativeStatement : OldStatement
             return;
         }
 
-        manager.AddClassAndFunc(new NativeAnyLangValue(DllName, ClassName, path).Run(manager));
+        manager.AddClassAndFunc((ImportInfo)new NativeAnyLangValue(DllName, ClassName, path).Run(manager));
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
@@ -118,11 +117,13 @@ public class NativeStatement : OldStatement
         {
             return $"import native {DllName}.{ClassName} as {Name}";
         }
+
         if (!string.IsNullOrEmpty(MethodName))
         {
             var funcName = string.IsNullOrEmpty(NativeName) ? MethodName : NativeName;
             return $"import native {DllName}.{ClassName}.{MethodName} as {funcName}\n{FuncValue}";
         }
+
         return $"import native {DllName}.{ClassName}";
     }
 }

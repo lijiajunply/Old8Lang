@@ -13,7 +13,7 @@ public class AsLangValue(OldExpr id, LangId asId, SourcePosition position = defa
     public override LangValueType Run(LangParser.VariateManager manager)
     {
         var value = id.Run(manager);
-        var type = manager.GetAny(asId);
+        LangValueType? type = manager.GetAny(asId);
 
         type ??= new TypeLangValue(asId.IdName);
         return value.Converse(type, manager);

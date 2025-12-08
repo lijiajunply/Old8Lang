@@ -30,13 +30,13 @@ public class SetStatement : OldStatement
     public override void Run(VariateManager manager)
     {
         var result = Value.Run(manager);
-        
+
         // 如果有类型注解，进行类型检查
         if (Id != null && !string.IsNullOrEmpty(Id.AssumptionType))
         {
             var expectedType = Id.AssumptionType.ToLower();
             var actualType = result.TypeToString().ToLower();
-            
+
             // 建立类型匹配映射
             var typeMap = new Dictionary<string, List<string>>
             {
@@ -52,7 +52,7 @@ public class SetStatement : OldStatement
                 { "type", ["type"] },
                 { "function", ["function"] }
             };
-            
+
             // 检查类型是否匹配
             if (typeMap.TryGetValue(expectedType, out var allowedTypes))
             {
@@ -62,8 +62,10 @@ public class SetStatement : OldStatement
                 }
             }
         }
-        
+
         // 处理成员访问赋值：this.name <- value
+        // 处理 list 赋值：list[index] <- value
+        // 处理person.name <- value
         if (LeftExpr is Operation operation)
         {
             // 检查是否是 CONCAT 操作（成员访问）
@@ -74,13 +76,9 @@ public class SetStatement : OldStatement
                 {
                     // 是 this.member <- value 形式的赋值
                     // 查找当前实例
-                    AnyLangValue? anyValue = null;
-                    
-                    // 首先检查manager.AnyInfo中是否有AnyLangValue实例
-                    anyValue = manager.AnyInfo.FirstOrDefault(x => x is AnyLangValue) as AnyLangValue;
-                    
+
                     // 如果找到了实例，执行赋值
-                    if (anyValue != null)
+                    if (manager.GetValue(new LangId("this")) is AnyLangValue anyValue)
                     {
                         // 将结果添加到实例的Result字典中，覆盖原来的值
                         anyValue.Result[memberName.IdName] = result;
@@ -90,27 +88,25 @@ public class SetStatement : OldStatement
                         manager.Set(new LangId(memberName.IdName), result);
                         return;
                     }
-                    
+
                     // 如果没有找到，可能是在init方法中，此时需要检查manager.IsFunc标志
                     if (manager.IsFunc)
                     {
                         // 在init方法中，当前实例应该是manager.AnyInfo中的第一个AnyLangValue
-                        anyValue = manager.AnyInfo.FirstOrDefault(x => x is AnyLangValue) as AnyLangValue;
-                        if (anyValue != null)
-                        {
-                            // 将结果添加到实例的Result字典中，覆盖原来的值
-                            anyValue.Result[memberName.IdName] = result;
-                            // 同时更新VariateManager中的值，确保后续访问能获取到最新值
-                            anyValue.Manager.Set(new LangId(memberName.IdName), result);
-                            // 同时更新当前manager中的值，确保在同一个方法中后续访问能获取到最新值
-                            manager.Set(new LangId(memberName.IdName), result);
-                            return;
-                        }
+                        anyValue = manager.GetValue(new LangId("this")) as AnyLangValue ??
+                                   throw new NameError(this, "this");
+                        // 将结果添加到实例的Result字典中，覆盖原来的值
+                        anyValue.Result[memberName.IdName] = result;
+                        // 同时更新VariateManager中的值，确保后续访问能获取到最新值
+                        anyValue.Manager.Set(new LangId(memberName.IdName), result);
+                        // 同时更新当前manager中的值，确保在同一个方法中后续访问能获取到最新值
+                        manager.Set(new LangId(memberName.IdName), result);
+                        return;
                     }
                 }
             }
         }
-        
+
         // 处理普通变量赋值：name <- value
         if (Id != null && !string.IsNullOrEmpty(Id.IdName))
         {

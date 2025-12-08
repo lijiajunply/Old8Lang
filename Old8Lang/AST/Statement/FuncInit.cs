@@ -17,7 +17,7 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
         // 检查函数是否已存在
         if (FuncLangValue.Id != null)
         {
-            var existingFunc = manager.AnyInfo.FirstOrDefault(info => 
+            var existingFunc = manager.ImportInfos.FirstOrDefault(info => 
                 info is FuncLangValue func && func.Id?.IdName == FuncLangValue.Id.IdName);
             
             if (existingFunc != null)
