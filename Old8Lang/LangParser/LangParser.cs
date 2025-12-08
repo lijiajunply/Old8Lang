@@ -1720,30 +1720,18 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                                 // 提取表达式字符串
                                 var exprStr = stringValue.Substring(exprStart, i - exprStart).Trim();
 
-                                // 简化的表达式解析：支持常量值和变量名
+                                // 完整的表达式解析：支持所有表达式类型，包括点操作符
                                 if (!string.IsNullOrWhiteSpace(exprStr))
                                 {
-                                    // 尝试将表达式作为常量值处理
-                                    if (int.TryParse(exprStr, out var intValue))
-                                    {
-                                        // 如果是整数，直接添加 IntLangValue
-                                        parts.Add(new IntLangValue(intValue, position));
-                                    }
-                                    else if (double.TryParse(exprStr, out var doubleValue))
-                                    {
-                                        // 如果是浮点数，直接添加 DoubleLangValue
-                                        parts.Add(new DoubleLangValue(doubleValue, position));
-                                    }
-                                    else if (bool.TryParse(exprStr, out var boolValue))
-                                    {
-                                        // 如果是布尔值，直接添加 BoolLangValue
-                                        parts.Add(new BoolLangValue(boolValue, position));
-                                    }
-                                    else
-                                    {
-                                        // 否则作为变量名处理
-                                        parts.Add(new LangId(exprStr, "", position));
-                                    }
+                                    // 将表达式字符串转换为Token流
+                                    var exprTokens = LangTokenizer.Tokenize(exprStr);
+                                    
+                                    // 创建一个新的LangParser实例来解析这个表达式
+                                    var exprParser = new LangParser(exprTokens, exprStr, fileName);
+                                    
+                                    // 解析完整表达式
+                                    var expr = exprParser.ParseExpression();
+                                    parts.Add(expr);
                                 }
 
                                 i++;

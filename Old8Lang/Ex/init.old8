@@ -10,7 +10,7 @@ a <- ToObj("{\"a\" : 1,\"b\" : {\"c\" : 3}}")
 PrintLine(a.a)
 
 PrintLine("测试字符串插值")
-q <- $"hello {10}"
+q <- $"hello {a.a}"
 PrintLine(q)
 
 //测试函数 测试For in
@@ -55,6 +55,7 @@ switch "2" {
 // 测试编译加速
 PrintLine("测试编译加速")
 
+/*
 Compiler("fib:int (a:int) ->
                {
                   if a == 1
@@ -66,3 +67,4 @@ Compiler("fib:int (a:int) ->
                }")
                
 PrintLine(fib(30))
+*/

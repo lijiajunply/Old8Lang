@@ -43,7 +43,20 @@ public class DictionaryLangValue : LangValueType, ILangList
 
     public override LangValueType Dot(OldExpr dotExpr)
     {
-        return dotExpr is not Instance a ? throw new InvalidOperationError(this, "字典类型只支持实例调用操作") : a.FromClassToResult(this);
+        if (dotExpr is Instance a)
+        {
+            return a.FromClassToResult(this);
+        }
+        
+        // 处理属性访问：obj.property
+        if (dotExpr is LangId langId)
+        {
+            // 将属性名作为字符串键来访问字典值
+            var key = new StringLangValue(langId.IdName);
+            return Get(key);
+        }
+        
+        throw new InvalidOperationError(this, "字典类型只支持实例调用操作或属性访问");
     }
 
     public LangValueType Get(LangValueType key)
