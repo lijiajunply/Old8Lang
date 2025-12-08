@@ -4,15 +4,15 @@ using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class TypeValue : ValueType
+public class TypeLangValue : LangValueType
 {
     private readonly OldExpr? Expr;
     public string? Value { get; private set; }
 
-    public TypeValue(OldExpr expr) => Expr = expr;
-    public TypeValue(string value) => Value = value;
+    public TypeLangValue(OldExpr expr) => Expr = expr;
+    public TypeLangValue(string value) => Value = value;
 
-    public override ValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(LangParser.VariateManager manager)
     {
         var result = Expr?.Run(manager);
         if (result == null) throw new InvalidOperationError(this, "类型表达式求值失败");

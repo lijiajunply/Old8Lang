@@ -18,7 +18,7 @@ public class WhileStatement(OldExpr expr, BlockStatement blockStatement, SourceP
         {
             var value = expr.Run(manager);
             bool expr1;
-            if (value is BoolValue varBool)
+            if (value is BoolLangValue varBool)
             {
                 expr1 = varBool.Value;
             }

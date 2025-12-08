@@ -6,9 +6,9 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
 
-public class SetStatement(OldId id, OldExpr value, SourcePosition position = default) : OldStatement(position)
+public class SetStatement(LangId id, OldExpr value, SourcePosition position = default) : OldStatement(position)
 {
-    public readonly OldId Id = id;
+    public readonly LangId Id = id;
     public readonly OldExpr Value = value;
 
     public override void Run(VariateManager manager)

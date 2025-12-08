@@ -439,18 +439,51 @@ public struct FilteringCommentsTokenizer(string input)
 
             if (currentChar == '/' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '/')
             {
-                SkipSingleLineComment();
-                continue;
-            }
+                // 跳过单行注释，但保留换行符
+                Advance(); // Skip '/'  
+                Advance(); // Skip '/'  
 
-            if (currentChar == '/' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '*')
+                while (CurrentIndex < input.Length && input[CurrentIndex] != '\n')
+                {
+                    Advance();
+                }
+                
+                // 保留换行符
+                if (CurrentIndex < input.Length && input[CurrentIndex] == '\n')
+                {
+                    result.Append('\n');
+                    Advance();
+                }
+            }
+            else if (currentChar == '/' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '*')
             {
-                SkipMultiLineComment();
-                continue;
-            }
+                // 跳过多行注释，但保留其中的换行符
+                Advance(); // Skip '/'  
+                Advance(); // Skip '*'  
 
-            result.Append(currentChar);
-            Advance();
+                while (CurrentIndex < input.Length)
+                {
+                    if (input[CurrentIndex] == '*' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '/')
+                    {
+                        Advance(); // Skip '*'  
+                        Advance(); // Skip '/'  
+                        break;
+                    }
+                    
+                    // 保留多行注释中的换行符
+                    if (input[CurrentIndex] == '\n')
+                    {
+                        result.Append('\n');
+                    }
+
+                    Advance();
+                }
+            }
+            else
+            {
+                result.Append(currentChar);
+                Advance();
+            }
         }
 
         return result.ToString();
@@ -464,34 +497,5 @@ public struct FilteringCommentsTokenizer(string input)
     private char Peek()
     {
         return CurrentIndex + 1 >= input.Length ? '\0' : input[CurrentIndex + 1];
-    }
-
-    private void SkipSingleLineComment()
-    {
-        Advance(); // Skip '/'  
-        Advance(); // Skip '/'  
-
-        while (CurrentIndex < input.Length && input[CurrentIndex] != '\n')
-        {
-            Advance();
-        }
-    }
-
-    private void SkipMultiLineComment()
-    {
-        Advance(); // Skip '/'  
-        Advance(); // Skip '*'  
-
-        while (CurrentIndex < input.Length)
-        {
-            if (input[CurrentIndex] == '*' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '/')
-            {
-                Advance(); // Skip '*'  
-                Advance(); // Skip '/'  
-                break;
-            }
-
-            Advance();
-        }
     }
 }

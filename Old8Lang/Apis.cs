@@ -1,6 +1,6 @@
 using System.Text;
 using System.Text.Json;
-using ValueType = Old8Lang.AST.Expression.ValueType;
+using Old8Lang.AST.Expression;
 
 namespace Old8Lang;
 
@@ -31,7 +31,7 @@ public static class Apis
         return builder.ToString();
     }
 
-    public static List<object> ListToObjects(List<ValueType>? a)
+    public static List<object> ListToObjects(List<LangValueType>? a)
     {
         if (a == null)
             return [];

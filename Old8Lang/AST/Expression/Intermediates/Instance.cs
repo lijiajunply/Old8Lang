@@ -6,68 +6,68 @@ using Old8Lang.Error;
 // ReSharper disable once CheckNamespace
 namespace Old8Lang.AST.Expression.Value;
 
-public class Instance(OldId oldId, List<OldExpr> ids, SourcePosition position = default) : ValueType(position)
+public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position = default) : LangValueType(position)
 {
     public readonly List<OldExpr> Ids = ids;
-    public readonly OldId Id = oldId;
+    public readonly LangId Id = langId;
 
-    public override ValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(LangParser.VariateManager manager)
     {
         var results = Ids.Select(t => t.Run(manager)).ToList();
 
         switch (Id.IdName)
         {
             case "Type":
-                return new TypeValue(results[0]).Run(manager);
+                return new TypeLangValue(results[0]).Run(manager);
             case "Exec":
             {
-                if (results[0] is not StringValue execStringValue) throw new TypeError(this, "StringValue", results[0].GetType().Name);
+                if (results[0] is not StringLangValue execStringValue) throw new TypeError(this, "StringValue", results[0].GetType().Name);
                 var a = manager.Interpreter.Build(code: execStringValue.Value);
                 a.Run(manager);
-                return new VoidValue();
+                return new VoidLangValue();
             }
             case "ShowValues":
             {
                 manager.Interpreter.UseClass.WriteLine(manager.ToString());
-                return new VoidValue();
+                return new VoidLangValue();
             }
             case "Json":
             {
-                if (results[0] is not AnyValue jsonAnyValue) throw new TypeError(this, "AnyValue", results[0].GetType().Name);
+                if (results[0] is not AnyLangValue jsonAnyValue) throw new TypeError(this, "AnyValue", results[0].GetType().Name);
                 return jsonAnyValue.ToJson();
             }
             case "ToObj":
-                if (results[0] is not StringValue stringValue) throw new TypeError(this, "StringValue", results[0].GetType().Name);
+                if (results[0] is not StringLangValue stringValue) throw new TypeError(this, "StringValue", results[0].GetType().Name);
                 return stringValue.ToObj();
             case "PrintLine":
             {
                 if (results.Count == 0)
                 {
                     manager.Interpreter.UseClass.WriteLine("");
-                    return new VoidValue();
+                    return new VoidLangValue();
                 }
 
                 var value = results[0].ToDisplayString();
                 for (var i = 1; i < results.Count; i++) value += results[i].ToDisplayString();
 
                 manager.Interpreter.UseClass.WriteLine(value);
-                return new VoidValue();
+                return new VoidLangValue();
             }
             case "Print":
             {
-                if (results.Count == 0) return new VoidValue();
+                if (results.Count == 0) return new VoidLangValue();
 
                 var value = results[0].ToDisplayString();
                 for (var i = 1; i < results.Count; i++) value += results[i].ToDisplayString();
 
                 manager.Interpreter.UseClass.Write(value);
-                return new VoidValue();
+                return new VoidLangValue();
             }
             case "Compiler":
             {
-                if (results.Count == 0) return new VoidValue();
+                if (results.Count == 0) return new VoidLangValue();
                 string value;
-                if (results[0] is StringValue sv) // 使用不同的变量名，避免冲突
+                if (results[0] is StringLangValue sv) // 使用不同的变量名，避免冲突
                 {
                     value = sv.Value; // 直接访问Value属性，避免带引号
                 }
@@ -83,31 +83,31 @@ public class Instance(OldId oldId, List<OldExpr> ids, SourcePosition position = 
                 ilGenerator.Emit(OpCodes.Ret);
                 foreach (var info in local.DelegateVar)
                 {
-                    manager.AddClassAndFunc(new FuncValue(info.Key, info.Value));
+                    manager.AddClassAndFunc(new FuncLangValue(info.Key, info.Value));
                 }
 
-                return new VoidValue();
+                return new VoidLangValue();
             }
             case "Len":
             {
                 var value = results[0].Run(manager);
-                if (value is IOldList list) return new IntValue(list.GetLength());
+                if (value is ILangList list) return new IntLangValue(list.GetLength());
                 throw new InvalidOperationError(this, $"{results[0]} 不是列表类型");
             }
         }
 
         var result = Id.Run(manager);
-        if (result is FuncValue funcValue)
+        if (result is FuncLangValue funcValue)
         {
             result = funcValue.Run(manager, Ids);
         }
 
         // 初始化 调用init方法
-        if (result is AnyValue anyValue)
+        if (result is AnyLangValue anyValue)
         {
             if (anyValue.Result.TryGetValue("init", out result))
             {
-                if (result is not FuncValue value) throw new TypeError(this, "FuncValue", "init 不是函数类型");
+                if (result is not FuncLangValue value) throw new TypeError(this, "FuncValue", "init 不是函数类型");
                 value.Run(anyValue.Manager, Ids);
             }
             else if (results.Count != 0)
@@ -118,9 +118,9 @@ public class Instance(OldId oldId, List<OldExpr> ids, SourcePosition position = 
             result = anyValue;
         }
 
-        if (result is NativeAnyValue nativeAnyValue)
+        if (result is NativeAnyLangValue nativeAnyValue)
         {
-            List<ValueType> a = [];
+            List<LangValueType> a = [];
             a.AddRange(Ids.Select(id => id.Run(manager)));
             nativeAnyValue.New([.. Apis.ListToObjects(a)]);
             result = nativeAnyValue;
@@ -129,31 +129,31 @@ public class Instance(OldId oldId, List<OldExpr> ids, SourcePosition position = 
         return result;
     }
 
-    public ValueType FromClassToResult(ValueType baseValue)
+    public LangValueType FromClassToResult(LangValueType baseLangValue)
     {
-        var type = baseValue.GetType();
+        var type = baseLangValue.GetType();
         var m = type.GetMethod(Id.IdName);
         if (m == null)
         {
-            type = baseValue switch
+            type = baseLangValue switch
             {
-                DictionaryValue => Type.GetType("Old8Lang.AST.Expression.DictionaryValueFuncStatic"),
-                ListValue => Type.GetType("Old8Lang.AST.Expression.ListValueFuncStatic"),
+                DictionaryLangValue => Type.GetType("Old8Lang.AST.Expression.DictionaryValueFuncStatic"),
+                ListLangValue => Type.GetType("Old8Lang.AST.Expression.ListValueFuncStatic"),
                 _ => Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic")
             };
             m = type?.GetMethod(Id.IdName);
         }
 
-        if (m == null && baseValue is not DictionaryValue or ListValue)
+        if (m == null && baseLangValue is not DictionaryLangValue or ListLangValue)
         {
             type = Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic");
             m = type?.GetMethod(Id.IdName);
         }
 
-        var os = new List<object>() { baseValue };
+        var os = new List<object>() { baseLangValue };
         os.AddRange(Ids);
-        var r = m?.Invoke(baseValue, [.. os]);
-        if (r is ValueType v) return v;
+        var r = m?.Invoke(baseLangValue, [.. os]);
+        if (r is LangValueType v) return v;
         return ObjToValue(r!);
     }
 

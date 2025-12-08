@@ -1,17 +1,16 @@
-// 简单语法测试文件
-PrintLine("Hello, World!")
+// 简单赋值测试
+x <- 10
+y <- 20
+z <- x + y
 
-// 变量声明和赋值
-x:int <- 10
-y:string <- "test"
+// 简单字典赋值
+dict <- {"key": "value"}
 
-// if语句
-if x > 5 {
-    PrintLine("x 大于 5")
-} else {
-    PrintLine("x 小于等于 5")
-}
+// 简单数组赋值
+array <- [1, 2, 3]
 
-// 简单函数调用
-a <- 1 + 2
-PrintLine("a = " + a)
+// 简单列表赋值
+list <- list[1, 2, 3]
+
+// 简单字符串赋值
+str <- "hello"

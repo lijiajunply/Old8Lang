@@ -6,11 +6,11 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// 构造函数
 /// </summary>
 /// <param name="position">位置信息</param>
-public class VoidValue(SourcePosition position = default) : ValueType(position)
+public class VoidLangValue(SourcePosition position = default) : LangValueType(position)
 {
     public override object GetValue() => throw new InvalidOperationError(this, "尝试访问无效值（VoidValue）");
     
-    public override ValueType Run(LangParser.VariateManager manager) => 
+    public override LangValueType Run(LangParser.VariateManager manager) => 
         throw new InvalidOperationError(this, "尝试运行无效值（VoidValue）");
     
     public override string ToString() => 

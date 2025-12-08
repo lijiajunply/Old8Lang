@@ -6,26 +6,26 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class IntValue(int intValue, SourcePosition position = default) : ValueType(position)
+public class IntLangValue(int intValue, SourcePosition position = default) : LangValueType(position)
 {
     public int Value { get; set; } = intValue;
     public override string ToString() => Value.ToString();
 
-    public override ValueType Plus(ValueType otherValueType)
+    public override LangValueType Plus(LangValueType otherLangValueType)
     {
-        if (otherValueType is StringValue s)
-            return new StringValue(Value + s.Value);
-        if (otherValueType is CharValue c)
-            return new CharValue(Convert.ToChar(Value + c.Value));
-        if (otherValueType is DoubleValue)
-            return otherValueType.Plus(this);
-        if (otherValueType is IntValue otherInt)
+        if (otherLangValueType is StringLangValue s)
+            return new StringLangValue(Value + s.Value);
+        if (otherLangValueType is CharLangValue c)
+            return new CharLangValue(Convert.ToChar(Value + c.Value));
+        if (otherLangValueType is DoubleLangValue)
+            return otherLangValueType.Plus(this);
+        if (otherLangValueType is IntLangValue otherInt)
         {
             try
             {
                 checked
                 {
-                    return new IntValue(Value + otherInt.Value);
+                    return new IntLangValue(Value + otherInt.Value);
                 }
             }
             catch (OverflowException)
@@ -34,20 +34,20 @@ public class IntValue(int intValue, SourcePosition position = default) : ValueTy
             }
         }
 
-        throw new InvalidOperationError(this, $"不支持整数与类型 '{otherValueType.GetType().Name}' 的加法操作");
+        throw new InvalidOperationError(this, $"不支持整数与类型 '{otherLangValueType.GetType().Name}' 的加法操作");
     }
 
-    public override ValueType Minus(ValueType otherValueType)
+    public override LangValueType Minus(LangValueType otherLangValueType)
     {
-        if (otherValueType is DoubleValue)
-            return otherValueType.Minus(this);
-        if (otherValueType is IntValue otherInt)
+        if (otherLangValueType is DoubleLangValue)
+            return otherLangValueType.Minus(this);
+        if (otherLangValueType is IntLangValue otherInt)
         {
             try
             {
                 checked
                 {
-                    return new IntValue(Value - otherInt.Value);
+                    return new IntLangValue(Value - otherInt.Value);
                 }
             }
             catch (OverflowException)
@@ -55,24 +55,24 @@ public class IntValue(int intValue, SourcePosition position = default) : ValueTy
                 throw new OverflowError(this, "整数减法");
             }
         }
-        throw new InvalidOperationError(this, $"不支持整数与类型 '{otherValueType.GetType().Name}' 的减法操作");
+        throw new InvalidOperationError(this, $"不支持整数与类型 '{otherLangValueType.GetType().Name}' 的减法操作");
     }
 
-    public override ValueType Times(ValueType otherValueType)
+    public override LangValueType Times(LangValueType otherLangValueType)
     {
-        if (otherValueType is StringValue)
-            return otherValueType.Times(this);
-        if (otherValueType is CharValue)
-            return otherValueType.Times(this);
-        if (otherValueType is DoubleValue)
-            return otherValueType.Times(this);
-        if (otherValueType is IntValue otherInt)
+        if (otherLangValueType is StringLangValue)
+            return otherLangValueType.Times(this);
+        if (otherLangValueType is CharLangValue)
+            return otherLangValueType.Times(this);
+        if (otherLangValueType is DoubleLangValue)
+            return otherLangValueType.Times(this);
+        if (otherLangValueType is IntLangValue otherInt)
         {
             try
             {
                 checked
                 {
-                    return new IntValue(Value * otherInt.Value);
+                    return new IntLangValue(Value * otherInt.Value);
                 }
             }
             catch (OverflowException)
@@ -80,95 +80,95 @@ public class IntValue(int intValue, SourcePosition position = default) : ValueTy
                 throw new OverflowError(this, "整数乘法");
             }
         }
-        throw new InvalidOperationError(this, $"不支持整数与类型 '{otherValueType.GetType().Name}' 的乘法操作");
+        throw new InvalidOperationError(this, $"不支持整数与类型 '{otherLangValueType.GetType().Name}' 的乘法操作");
     }
 
-    public override ValueType Divide(ValueType otherValueType)
+    public override LangValueType Divide(LangValueType otherLangValueType)
     {
-        if (otherValueType is DoubleValue)
-            return otherValueType.Divide(this);
-        if (otherValueType is IntValue otherInt)
+        if (otherLangValueType is DoubleLangValue)
+            return otherLangValueType.Divide(this);
+        if (otherLangValueType is IntLangValue otherInt)
         {
             if (otherInt.Value == 0)
             {
                 // 抛出自定义的ZeroDivisionError
                 throw new ZeroDivisionError(this);
             }
-            return new IntValue(Value / otherInt.Value);
+            return new IntLangValue(Value / otherInt.Value);
         }
-        throw new InvalidOperationError(this, $"不支持整数与类型 '{otherValueType.GetType().Name}' 的除法操作");
+        throw new InvalidOperationError(this, $"不支持整数与类型 '{otherLangValueType.GetType().Name}' 的除法操作");
     }
 
-    public override ValueType Mod(ValueType otherValueType)
+    public override LangValueType Mod(LangValueType otherLangValueType)
     {
-        if (otherValueType is DoubleValue)
-            return otherValueType.Mod(this);
-        if (otherValueType is IntValue otherInt)
+        if (otherLangValueType is DoubleLangValue)
+            return otherLangValueType.Mod(this);
+        if (otherLangValueType is IntLangValue otherInt)
         {
             if (otherInt.Value == 0)
             {
                 // 抛出自定义的ZeroDivisionError
                 throw new ZeroDivisionError(this);
             }
-            return new IntValue(Value % otherInt.Value);
+            return new IntLangValue(Value % otherInt.Value);
         }
-        throw new InvalidOperationError(this, $"不支持整数与类型 '{otherValueType.GetType().Name}' 的取模操作");
+        throw new InvalidOperationError(this, $"不支持整数与类型 '{otherLangValueType.GetType().Name}' 的取模操作");
     }
 
-    public override bool Less(ValueType? otherValue)
+    public override bool Less(LangValueType? otherValue)
     {
-        if (otherValue is DoubleValue d)
+        if (otherValue is DoubleLangValue d)
             return Value < d.Value;
-        if (otherValue is IntValue i)
+        if (otherValue is IntLangValue i)
             return Value < i.Value;
         throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
-    public override bool Greater(ValueType? otherValue)
+    public override bool Greater(LangValueType? otherValue)
     {
-        if (otherValue is DoubleValue d)
+        if (otherValue is DoubleLangValue d)
             return Value > d.Value;
-        if (otherValue is IntValue i)
+        if (otherValue is IntLangValue i)
             return Value > i.Value;
         throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
-    public override bool LessEqual(ValueType? otherValue)
+    public override bool LessEqual(LangValueType? otherValue)
     {
-        if (otherValue is DoubleValue d)
+        if (otherValue is DoubleLangValue d)
             return Value <= d.Value;
-        if (otherValue is IntValue i)
+        if (otherValue is IntLangValue i)
             return Value <= i.Value;
         throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
-    public override bool GreaterEqual(ValueType? otherValue)
+    public override bool GreaterEqual(LangValueType? otherValue)
     {
-        if (otherValue is DoubleValue d)
+        if (otherValue is DoubleLangValue d)
             return Value >= d.Value;
-        if (otherValue is IntValue i)
+        if (otherValue is IntLangValue i)
             return Value >= i.Value;
         throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
-    public override bool Equal(ValueType? otherValueType)
+    public override bool Equal(LangValueType? otherValueType)
     {
-        if (otherValueType is IntValue b)
+        if (otherValueType is IntLangValue b)
             return Value == b.Value;
         return false;
     }
 
-    public override ValueType Converse(ValueType otherValueType, VariateManager manager)
+    public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)
     {
-        if (otherValueType is not TypeValue value) throw new TypeError(this, "TypeValue", otherValueType.GetType().Name);
+        if (otherLangValueType is not TypeLangValue value) throw new TypeError(this, "TypeValue", otherLangValueType.GetType().Name);
 
         return value.Value switch
         {
             "Int" or "int" => this,
-            "Bool" or "bool" => new BoolValue(Value > 0),
-            "String" or "string" => new StringValue(Value.ToString()),
-            "char" or "Char" => new CharValue(Convert.ToChar(Value)),
-            "Double" or "double" => new DoubleValue(Value),
+            "Bool" or "bool" => new BoolLangValue(Value > 0),
+            "String" or "string" => new StringLangValue(Value.ToString()),
+            "char" or "Char" => new CharLangValue(Convert.ToChar(Value)),
+            "Double" or "double" => new DoubleLangValue(Value),
             _ => throw new TypeError(this, $"不支持的类型转换: {GetType().Name} 到 {value.Value}")
         };
     }

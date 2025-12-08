@@ -3,13 +3,13 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
-public class NativeStaticAny(string className, Type classType) : ValueType
+public class NativeStaticAny(string className, Type classType) : LangValueType
 {
     public readonly string ClassName = className;
 
-    public override ValueType Dot(OldExpr dotExpr)
+    public override LangValueType Dot(OldExpr dotExpr)
     {
-        if (dotExpr is OldId id)
+        if (dotExpr is LangId id)
         {
             var prop = classType.GetProperty(id.IdName);
             if (prop is null)
@@ -28,7 +28,7 @@ public class NativeStaticAny(string className, Type classType) : ValueType
             var method = classType.GetMethod(instance.Id.IdName);
             if (method is null)
                 throw new AttributeError(this, instance.Id.IdName, ClassName);
-            var a = Apis.ListToObjects(instance.Ids.OfType<ValueType>().ToList()).ToArray();
+            var a = Apis.ListToObjects(instance.Ids.OfType<LangValueType>().ToList()).ToArray();
             var invoke = method.Invoke(null, a);
             return ObjToValue(invoke!);
         }

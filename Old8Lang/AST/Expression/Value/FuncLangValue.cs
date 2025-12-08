@@ -8,18 +8,18 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class FuncValue : ValueType
+public class FuncLangValue : LangValueType
 {
-    public readonly OldId? Id;
+    public readonly LangId? Id;
     public readonly BlockStatement BlockStatement = new([]);
 
-    public readonly List<OldId>? Ids;
+    public readonly List<LangId>? Ids;
 
     public readonly MethodInfo? Method;
 
-    private readonly FuncValue? Func;
+    private readonly FuncLangValue? Func;
 
-    public FuncValue(OldId? id, List<OldId> ids, BlockStatement blockStatement, SourcePosition position = default) :
+    public FuncLangValue(LangId? id, List<LangId> ids, BlockStatement blockStatement, SourcePosition position = default) :
         base(position)
     {
         Id = id;
@@ -27,17 +27,17 @@ public class FuncValue : ValueType
         BlockStatement = blockStatement;
     }
 
-    public FuncValue(string idName, MethodInfo methodInfo, FuncValue? func = null,
+    public FuncLangValue(string idName, MethodInfo methodInfo, FuncLangValue? func = null,
         SourcePosition position = default) : base(position)
     {
-        Id = new OldId(idName);
+        Id = new LangId(idName);
         Method = methodInfo;
         Func = func;
     }
 
-    public override ValueType Run(VariateManager manager) => this;
+    public override LangValueType Run(VariateManager manager) => this;
 
-    public ValueType Run(VariateManager variateManagerFunc, List<OldExpr> ids, object? obj = null)
+    public LangValueType Run(VariateManager variateManagerFunc, List<OldExpr> ids, object? obj = null)
     {
         if (Method != null)
         {
@@ -56,10 +56,10 @@ public class FuncValue : ValueType
             var invoke = Method?.Invoke(obj, a);
 
             if (invoke is null)
-                return new VoidValue();
+                return new VoidLangValue();
 
             var manager = new VariateManager();
-            manager.Init(new Dictionary<string, ValueType> { { "base", ObjToValue(invoke) } });
+            manager.Init(new Dictionary<string, LangValueType> { { "base", ObjToValue(invoke) } });
             manager.IsClass = false;
             manager.Result = ObjToValue(invoke);
             Func?.Run(manager, ids);

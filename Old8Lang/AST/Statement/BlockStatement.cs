@@ -79,7 +79,7 @@ public class BlockStatement : OldStatement
             ilGenerator.Emit(OpCodes.Ret);
             foreach (var info in local.DelegateVar)
             {
-                manager.AddClassAndFunc(new FuncValue(info.Key, info.Value));
+                manager.AddClassAndFunc(new FuncLangValue(info.Key, info.Value));
             }
 
             return;
@@ -115,9 +115,9 @@ public class BlockStatement : OldStatement
         return sb.ToString();
     }
 
-    public Dictionary<OldId, OldExpr> ToAnyData()
+    public Dictionary<LangId, OldExpr> ToAnyData()
     {
-        var c = new Dictionary<OldId, OldExpr>();
+        var c = new Dictionary<LangId, OldExpr>();
         OtherStatements.ForEach(x =>
         {
             var result = GetTuple(x);
@@ -131,12 +131,12 @@ public class BlockStatement : OldStatement
         return c;
     }
 
-    private static (OldId id, OldExpr Expr) GetTuple(IOldLangTree a)
+    private static (LangId id, OldExpr Expr) GetTuple(IOldLangTree a)
     {
         return a switch
         {
             SetStatement statement => (id: statement.Id, Expr: statement.Value),
-            FuncInit init => (init.FuncValue.Id!, init.FuncValue),
+            FuncInit init => (init.FuncLangValue.Id!, FuncValue: init.FuncLangValue),
             _ => (null!, null!)
         };
     }

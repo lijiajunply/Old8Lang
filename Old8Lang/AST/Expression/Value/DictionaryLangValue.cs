@@ -7,27 +7,27 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class DictionaryValue : ValueType, IOldList
+public class DictionaryLangValue : LangValueType, ILangList
 {
-    private readonly List<TupleValue> Tuples;
-    public readonly List<(ValueType Key, ValueType Value)> Value = [];
+    private readonly List<TupleLangValue> Tuples;
+    public readonly List<(LangValueType Key, LangValueType Value)> Value = [];
 
-    public DictionaryValue(List<TupleValue> tuples, SourcePosition position = default) : base(position)
+    public DictionaryLangValue(List<TupleLangValue> tuples, SourcePosition position = default) : base(position)
     {
         this.Tuples = tuples;
     }
 
-    public DictionaryValue(SourcePosition position = default) : base(position)
+    public DictionaryLangValue(SourcePosition position = default) : base(position)
     {
         Tuples = [];
     }
 
-    public DictionaryValue(List<KeyValuePair<OldExpr, OldExpr>> list, SourcePosition position = default) : base(position)
+    public DictionaryLangValue(List<KeyValuePair<OldExpr, OldExpr>> list, SourcePosition position = default) : base(position)
     {
-        Tuples = list.Select(x => new TupleValue(x.Key, x.Value)).ToList();
+        Tuples = list.Select(x => new TupleLangValue(x.Key, x.Value)).ToList();
     }
 
-    public override ValueType Run(VariateManager manager)
+    public override LangValueType Run(VariateManager manager)
     {
         foreach (var tuple in Tuples)
         {
@@ -38,22 +38,22 @@ public class DictionaryValue : ValueType, IOldList
         return this;
     }
 
-    public override ValueType Dot(OldExpr dotExpr)
+    public override LangValueType Dot(OldExpr dotExpr)
     {
         return dotExpr is not Instance a ? throw new InvalidOperationError(this, "字典类型只支持实例调用操作") : a.FromClassToResult(this);
     }
 
-    public ValueType Get(ValueType key)
+    public LangValueType Get(LangValueType key)
     {
         var a = Value.Where(x => x.Key.Equal(key)).ToList();
         return a[0].Value;
     }
 
-    public void Update(ValueType key, ValueType valueType)
+    public void Update(LangValueType key, LangValueType langValueType)
     {
         Get(key);
         var b = Value.FindLastIndex(x => key.Equal(x.Key));
-        Value[b] = (key, valueType);
+        Value[b] = (key, langValueType);
     }
 
     public override string ToString()
@@ -77,27 +77,27 @@ public class DictionaryValue : ValueType, IOldList
         return "{" + sb + "}"; // Old8Lang 风格的字典，使用 { } 包裹，键值对用 : 分隔
     }
 
-    public override ValueType Converse(ValueType otherValueType, VariateManager manager)
+    public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)
     {
-        if (otherValueType is not AnyValue typeAny) throw new TypeError(this, "AnyValue", otherValueType.GetType().Name);
+        if (otherLangValueType is not AnyLangValue typeAny) throw new TypeError(this, "AnyValue", otherLangValueType.GetType().Name);
 
         foreach (var a in Value)
         {
             var aKey = a.Key.Run(manager);
             var aValue = a.Value.Run(manager);
-            if (aKey is not StringValue s) continue;
-            typeAny.Set(new OldId(s.Value), aValue);
+            if (aKey is not StringLangValue s) continue;
+            typeAny.Set(new LangId(s.Value), aValue);
         }
 
         return typeAny;
     }
 
-    public IEnumerable<ValueType> GetItems()
-        => Value.Select(x => new TupleValue(x.Key, x.Value));
+    public IEnumerable<LangValueType> GetItems()
+        => Value.Select(x => new TupleLangValue(x.Key, x.Value));
 
     public int GetLength() => Value.Count;
 
-    public ValueType Slice(int start, int end)
+    public LangValueType Slice(int start, int end)
     {
         throw new InvalidOperationError(this, "字典类型不支持切片操作");
     }

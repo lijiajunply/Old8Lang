@@ -6,15 +6,15 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class AnyValue : ValueType
+public class AnyLangValue : LangValueType
 {
-    public readonly Dictionary<OldId, OldExpr> Variates;
-    public readonly Dictionary<string, ValueType> Result = [];
-    public readonly OldId Id;
+    public readonly Dictionary<LangId, OldExpr> Variates;
+    public readonly Dictionary<string, LangValueType> Result = [];
+    public readonly LangId Id;
 
     public readonly VariateManager Manager;
 
-    public AnyValue(OldId id, Dictionary<OldId, OldExpr> variates, SourcePosition position = default) : base(position)
+    public AnyLangValue(LangId id, Dictionary<LangId, OldExpr> variates, SourcePosition position = default) : base(position)
     {
         Variates = variates;
         Id = id;
@@ -24,42 +24,42 @@ public class AnyValue : ValueType
         Manager.IsClass = true;
     }
 
-    public AnyValue(Dictionary<OldId, OldExpr> variates, SourcePosition position = default) : base(position)
+    public AnyLangValue(Dictionary<LangId, OldExpr> variates, SourcePosition position = default) : base(position)
     {
         Variates = variates;
-        Id = new OldId("JsonNative");
+        Id = new LangId("JsonNative");
         Manager = new VariateManager();
         foreach (var variate in variates)
         {
-            if (variate.Value is ValueType valueType) Result.Add(variate.Key.IdName, valueType);
+            if (variate.Value is LangValueType valueType) Result.Add(variate.Key.IdName, valueType);
         }
 
         Manager.Init(Result);
         Manager.IsClass = true;
     }
 
-    public sealed override ValueType Run(VariateManager manager)
+    public sealed override LangValueType Run(VariateManager manager)
     {
-        Manager.AnyInfo.AddRange(manager.AnyInfo.Where(x => x is not FuncValue).ToList());
+        Manager.AnyInfo.AddRange(manager.AnyInfo.Where(x => x is not FuncLangValue).ToList());
         foreach (var variable in Variates.Keys)
             Result.Add(variable.IdName, Variates[variable].Run(manager));
         return this;
     }
 
-    public override ValueType Dot(OldExpr dotExpr)
+    public override LangValueType Dot(OldExpr dotExpr)
     {
         switch (dotExpr)
         {
-            case OldId id:
+            case LangId id:
             {
                 var a = Manager.GetValue(id);
                 if (a == null) throw new AttributeError(this, id.IdName, Id.IdName);
                 return a.Run(Manager);
             }
-            case FuncValue func:
+            case FuncLangValue func:
             {
                 if (func.Id?.IdName == "GetType")
-                    return new TypeValue(TypeToString());
+                    return new TypeLangValue(TypeToString());
                 return func.Run(Manager);
             }
             default:
@@ -67,15 +67,15 @@ public class AnyValue : ValueType
         }
     }
 
-    public void Set(OldId id, ValueType valueType) => Manager.Set(id, valueType);
+    public void Set(LangId id, LangValueType langValueType) => Manager.Set(id, langValueType);
 
-    public override ValueType Converse(ValueType otherValueType, VariateManager manager)
+    public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)
     {
-        if (otherValueType is not AnyValue typeAny) throw new TypeError(this, "AnyValue", otherValueType.GetType().Name);
+        if (otherLangValueType is not AnyLangValue typeAny) throw new TypeError(this, "AnyValue", otherLangValueType.GetType().Name);
 
         foreach (var a in Result)
         {
-            typeAny.Set(new OldId(a.Key), a.Value);
+            typeAny.Set(new LangId(a.Key), a.Value);
         }
 
         return typeAny;

@@ -9,27 +9,27 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
 
-public class OtherVariateChanging(OldId id, OldExpr sumId, OldExpr expr, SourcePosition position = default) : OldStatement(position)
+public class OtherVariateChanging(LangId id, OldExpr sumId, OldExpr expr, SourcePosition position = default) : OldStatement(position)
 {
     public override void Run(VariateManager manager)
     {
         var a = manager.GetValue(id);
-        if (a is AnyValue any)
+        if (a is AnyLangValue any)
         {
-            if (sumId is not OldId sum) throw new TypeError(this, "OldId", sumId.GetType().Name);
+            if (sumId is not LangId sum) throw new TypeError(this, "OldId", sumId.GetType().Name);
             var result = expr.Run(manager);
             any.Set(sum, result);
         }
 
-        if (a is ArrayValue array)
+        if (a is ArrayLangValue array)
         {
             var s = sumId.Run(manager);
-            if (s is not IntValue sum) throw new TypeError(this, "IntValue", s.GetType().Name);
+            if (s is not IntLangValue sum) throw new TypeError(this, "IntValue", s.GetType().Name);
             var result = expr.Run(manager);
             array.Set(sum, result);
         }
 
-        if (a is DictionaryValue dictionary)
+        if (a is DictionaryLangValue dictionary)
         {
             var s = sumId.Run(manager);
             var result = expr.Run(manager);
@@ -42,7 +42,7 @@ public class OtherVariateChanging(OldId id, OldExpr sumId, OldExpr expr, SourceP
         if (local.InClassEnv != null && id.IdName == "this")
         {
             ilGenerator.Emit(OpCodes.Ldarg_0);
-            if (sumId is OldId sum1)
+            if (sumId is LangId sum1)
             {
                 expr.LoadIlValue(ilGenerator, local);
                 var field = local.InClassEnv.GetField(sum1.IdName);
@@ -50,7 +50,7 @@ public class OtherVariateChanging(OldId id, OldExpr sumId, OldExpr expr, SourceP
                 return;
             }
 
-            if (sumId is StringValue stringValue1)
+            if (sumId is StringLangValue stringValue1)
             {
                 expr.LoadIlValue(ilGenerator, local);
                 var field = local.InClassEnv.GetField(stringValue1.Value);
@@ -69,7 +69,7 @@ public class OtherVariateChanging(OldId id, OldExpr sumId, OldExpr expr, SourceP
             return;
         }
 
-        if (sumId is OldId sum)
+        if (sumId is LangId sum)
         {
             expr.LoadIlValue(ilGenerator, local);
             var field = leftType.GetField(sum.IdName);
@@ -77,7 +77,7 @@ public class OtherVariateChanging(OldId id, OldExpr sumId, OldExpr expr, SourceP
             return;
         }
 
-        if (sumId is StringValue stringValue)
+        if (sumId is StringLangValue stringValue)
         {
             expr.LoadIlValue(ilGenerator, local);
             var field = leftType.GetField(stringValue.Value);

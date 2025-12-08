@@ -9,45 +9,45 @@ namespace Old8Lang.AST.Expression;
 
 public static class AnyValueFuncStatic
 {
-    private static ValueType GetJsonElement(JsonElement element, IOldLangTree node)
+    private static LangValueType GetJsonElement(JsonElement element, IOldLangTree node)
     {
         return element.ValueKind switch
         {
-            JsonValueKind.String => new StringValue(element.GetString() ?? ""),
-            JsonValueKind.Number => new IntValue(element.GetInt32()),
-            JsonValueKind.True => new BoolValue(true),
-            JsonValueKind.False => new BoolValue(false),
-            JsonValueKind.Null => new VoidValue(),
-            JsonValueKind.Array => new ArrayValue(
+            JsonValueKind.String => new StringLangValue(element.GetString() ?? ""),
+            JsonValueKind.Number => new IntLangValue(element.GetInt32()),
+            JsonValueKind.True => new BoolLangValue(true),
+            JsonValueKind.False => new BoolLangValue(false),
+            JsonValueKind.Null => new VoidLangValue(),
+            JsonValueKind.Array => new ArrayLangValue(
                 element.EnumerateArray().Select(x => GetJsonElement(x, node)).ToList()),
-            JsonValueKind.Undefined => new VoidValue(),
-            JsonValueKind.Object => ToObj(new StringValue(element.ToString())),
+            JsonValueKind.Undefined => new VoidLangValue(),
+            JsonValueKind.Object => ToObj(new StringLangValue(element.ToString())),
             _ => throw new InvalidOperationError(node, "不支持的JSON值类型")
         };
     }
 
-    public static StringValue ToJson(this AnyValue type)
+    public static StringLangValue ToJson(this AnyLangValue type)
     {
         var builder = new StringBuilder();
         builder.Append('{');
         for (var i = 0; i < type.Variates.Count; i++)
         {
             var variable = type.Variates.ElementAt(i);
-            if (variable.Value is FuncValue or Instance or NativeAnyValue or NativeStaticAny or VoidValue) continue;
+            if (variable.Value is FuncLangValue or Instance or NativeAnyLangValue or NativeStaticAny or VoidLangValue) continue;
             builder.Append($"{(i == 0 ? "" : ",")}\"{variable.Key}\":{variable.Value}");
         }
 
         builder.Append('}');
-        return new StringValue(builder.ToString());
+        return new StringLangValue(builder.ToString());
     }
 
-    public static AnyValue ToObj(this StringValue json)
+    public static AnyLangValue ToObj(this StringLangValue json)
     {
         var jsonObject = JsonSerializer.Deserialize<Dictionary<string, object>>(json.Value) ??
                          new Dictionary<string, object>();
-        return new AnyValue(jsonObject.ToDictionary<KeyValuePair<string, object>, OldId, OldExpr>
+        return new AnyLangValue(jsonObject.ToDictionary<KeyValuePair<string, object>, LangId, OldExpr>
         (
-            variable => new OldId(variable.Key),
+            variable => new LangId(variable.Key),
             variable =>
             {
                 if (variable.Value is JsonElement element)
@@ -55,7 +55,7 @@ public static class AnyValueFuncStatic
                     return GetJsonElement(element, json);
                 }
 
-                return ValueType.ObjToValue(variable.Value);
+                return LangValueType.ObjToValue(variable.Value);
             }));
     }
 
@@ -81,36 +81,36 @@ public static class AnyValueFuncStatic
 [Serializable]
 public static class ValueTypeFuncStatic
 {
-    extension(ValueType type)
+    extension(LangValueType type)
     {
-        public IntValue ToInt()
+        public IntLangValue ToInt()
         {
-            if (type is IntValue intValue)
+            if (type is IntLangValue intValue)
             {
                 return intValue;
             }
 
-            if (type is DoubleValue doubleValue)
+            if (type is DoubleLangValue doubleValue)
             {
-                return new IntValue(Convert.ToInt32(doubleValue.Value));
+                return new IntLangValue(Convert.ToInt32(doubleValue.Value));
             }
 
-            if (type is CharValue charValue)
+            if (type is CharLangValue charValue)
             {
-                return new IntValue(Convert.ToInt32(charValue.Value));
+                return new IntLangValue(Convert.ToInt32(charValue.Value));
             }
 
-            return new IntValue(int.Parse(type.ToString()));
+            return new IntLangValue(int.Parse(type.ToString()));
         }
 
-        public TypeValue ToType()
+        public TypeLangValue ToType()
         {
-            return new TypeValue(type.TypeToString());
+            return new TypeLangValue(type.TypeToString());
         }
 
-        public StringValue ToStr()
+        public StringLangValue ToStr()
         {
-            return new StringValue(type.ToDisplayString());
+            return new StringLangValue(type.ToDisplayString());
         }
     }
 }
@@ -118,78 +118,78 @@ public static class ValueTypeFuncStatic
 [Serializable]
 public static class DictionaryValueFuncStatic
 {
-    extension(DictionaryValue value)
+    extension(DictionaryLangValue langValue)
     {
-        public TupleValue Add(ValueType value1, ValueType value2)
+        public TupleLangValue Add(LangValueType value1, LangValueType value2)
         {
-            value.Value.Add((value1, value2));
-            return new TupleValue(value1, value2);
+            langValue.Value.Add((value1, value2));
+            return new TupleLangValue(value1, value2);
         }
 
-        public ValueType GetValue(ValueType key)
+        public LangValueType GetValue(LangValueType key)
         {
-            return value.Value.First(x => x.Key.Equal(key)).Value;
+            return langValue.Value.First(x => x.Key.Equal(key)).Value;
         }
 
-        public ValueType Remove(ValueType key)
+        public LangValueType Remove(LangValueType key)
         {
-            for (var i = 0; i < value.Value.Count; i++)
+            for (var i = 0; i < langValue.Value.Count; i++)
             {
-                if (!value.Value[i].Key.Equal(key)) continue;
-                var a = value.Value[i].Value;
-                value.Value.RemoveAt(i);
+                if (!langValue.Value[i].Key.Equal(key)) continue;
+                var a = langValue.Value[i].Value;
+                langValue.Value.RemoveAt(i);
                 return a;
             }
 
-            throw new KeyError(value, "键不存在");
+            throw new KeyError(langValue, "键不存在");
         }
     }
 }
 
 public static class ListValueFuncStatic
 {
-    extension(ListValue value)
+    extension(ListLangValue langValue)
     {
-        public ValueType Add(ValueType valueType)
+        public LangValueType Add(LangValueType langValueType)
         {
-            value.Values.Add(valueType);
-            return valueType;
+            langValue.Values.Add(langValueType);
+            return langValueType;
         }
 
-        public ValueType Remove(ValueType num)
+        public LangValueType Remove(LangValueType num)
         {
-            for (var i = 0; i < value.Values.Count; i++)
+            for (var i = 0; i < langValue.Values.Count; i++)
             {
-                if (!value.Values[i].Equal(num)) continue;
-                var a = value.Values[i];
-                value.Values.RemoveAt(i);
+                if (!langValue.Values[i].Equal(num)) continue;
+                var a = langValue.Values[i];
+                langValue.Values.RemoveAt(i);
                 return a;
             }
 
-            throw new InvalidOperationError(value, "找不到要移除的元素");
+            throw new InvalidOperationError(langValue, "找不到要移除的元素");
         }
 
-        public ValueType RemoveAt(IntValue num)
+        public LangValueType RemoveAt(IntLangValue num)
         {
-            var a = value.Values[num.Value];
-            value.Values.RemoveAt(num.Value);
+            var a = langValue.Values[num.Value];
+            langValue.Values.RemoveAt(num.Value);
             return a;
         }
 
-        public VoidValue AddList(ListValue otherValue)
+        public VoidLangValue AddList(ListLangValue otherLangValue)
         {
-            value.Values.AddRange(otherValue.Values);
-            return new VoidValue();
+            langValue.Values.AddRange(otherLangValue.Values);
+            return new VoidLangValue();
         }
 
-        public ListValue Sort()
+        public ListLangValue Sort()
         {
-            QuickSort(value.Values, 0, value.Values.Count - 1);
-            return value;
+            QuickSort(langValue.Values, 0, langValue.Values.Count - 1);
+            return langValue;
         }
     }
 
-    private static void QuickSort(List<ValueType> nums, int left, int right)
+    private static void QuickSort(List<LangValueType> nums, int left, int right)
     {
         while (true)
         {
@@ -205,7 +205,7 @@ public static class ListValueFuncStatic
         }
     }
 
-    private static int Partition(List<ValueType> nums, int left, int right)
+    private static int Partition(List<LangValueType> nums, int left, int right)
     {
         var pivot = nums[right];
         var i = left - 1;
@@ -221,7 +221,7 @@ public static class ListValueFuncStatic
         return i + 1;
     }
 
-    private static void Swap(List<ValueType> nums, int i, int j)
+    private static void Swap(List<LangValueType> nums, int i, int j)
     {
         (nums[i], nums[j]) = (nums[j], nums[i]);
     }

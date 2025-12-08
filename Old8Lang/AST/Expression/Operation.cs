@@ -35,18 +35,18 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
     public override string ToString() => $"{left}{OperaToString()}{right}";
     public Type? Type { get; set; }
 
-    public override ValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(LangParser.VariateManager manager)
     {
         // not right
         if (left == null && opera == OperationType.NOT)
-            return new BoolValue(!(right?.Run(manager) as BoolValue)!.Value);
+            return new BoolLangValue(!(right?.Run(manager) as BoolLangValue)!.Value);
         if (left == null && opera == OperationType.MINUS)
         {
             var rightValue = right?.Run(manager);
-            if (rightValue is IntValue intValue)
-                return new IntValue(-intValue.Value);
-            if (rightValue is DoubleValue doubleValue)
-                return new DoubleValue(-doubleValue.Value);
+            if (rightValue is IntLangValue intValue)
+                return new IntLangValue(-intValue.Value);
+            if (rightValue is DoubleLangValue doubleValue)
+                return new DoubleLangValue(-doubleValue.Value);
             throw new InvalidOperationError(this, "一元负号运算符只支持整数和浮点数");
         }
 
@@ -54,14 +54,14 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         var r = right;
 
         // id.id => dot_value
-        if (l is AnyValue any && opera == OperationType.CONCAT)
+        if (l is AnyLangValue any && opera == OperationType.CONCAT)
         {
             if (r is Instance r1)
                 return any.Dot(r1);
             if (r != null) return any.Dot(r);
         }
 
-        if (l is ListValue && opera == OperationType.CONCAT)
+        if (l is ListLangValue && opera == OperationType.CONCAT)
         {
             if (r is not Instance r1) throw new InvalidOperationError(this, "列表操作需要实例");
             List<OldExpr> values = [];
@@ -81,7 +81,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
             return l.Dot(newInstance);
         }
 
-        if (l is not AnyValue && opera == OperationType.CONCAT)
+        if (l is not AnyLangValue && opera == OperationType.CONCAT)
         {
             if (l is null || r is null)
                 throw new InvalidOperationError(this, "连接运算符左右操作数均不能为空");
@@ -91,43 +91,43 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         // r get value
         r = right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
         // (right)
-        if (right is OldId oldId && l is not AnyValue)
+        if (right is LangId oldId && l is not AnyLangValue)
             r = manager.GetValue(oldId);
         if (right is Operation)
             r = right.Run(manager);
 
 
         // left and right
-        if (l is BoolValue b && r is BoolValue expr && opera == OperationType.AND)
-            return new BoolValue(b.Value && expr.Value);
+        if (l is BoolLangValue b && r is BoolLangValue expr && opera == OperationType.AND)
+            return new BoolLangValue(b.Value && expr.Value);
 
         // left or right
-        if (l is BoolValue b1 && r is BoolValue oldBool && opera == OperationType.OR)
-            return new BoolValue(b1.Value || oldBool.Value);
+        if (l is BoolLangValue b1 && r is BoolLangValue oldBool && opera == OperationType.OR)
+            return new BoolLangValue(b1.Value || oldBool.Value);
 
         // left xor right
-        if (l is BoolValue && r is BoolValue value && opera == OperationType.XOR)
-            return new BoolValue(!l.Equal(value));
+        if (l is BoolLangValue && r is BoolLangValue value && opera == OperationType.XOR)
+            return new BoolLangValue(!l.Equal(value));
 
 
         // == , < , > 
         if (l is not null && r != null! && opera == OperationType.EQUALS)
-            return new BoolValue(l.Equal(r as ValueType ?? throw new InvalidOperationError(this, "无效的右操作数类型")));
+            return new BoolLangValue(l.Equal(r as LangValueType ?? throw new InvalidOperationError(this, "无效的右操作数类型")));
         if (l is not null && r is not null && opera == OperationType.LESSER)
-            return new BoolValue(l.Less(r as ValueType));
+            return new BoolLangValue(l.Less(r as LangValueType));
         if (l is not null && r is not null && opera == OperationType.GREATER)
-            return new BoolValue(l.Greater(r as ValueType));
+            return new BoolLangValue(l.Greater(r as LangValueType));
         if (l is not null && r is not null && opera == OperationType.DIFFERENT)
-            return new BoolValue(!l.Equal(r as ValueType));
+            return new BoolLangValue(!l.Equal(r as LangValueType));
         if (l is not null && r is not null && opera == OperationType.LESS_EQUAL)
-            return new BoolValue(l.LessEqual(r as ValueType));
+            return new BoolLangValue(l.LessEqual(r as LangValueType));
         if (l is not null && r is not null && opera == OperationType.GREATER_EQUAL)
-            return new BoolValue(l.GreaterEqual(r as ValueType));
+            return new BoolLangValue(l.GreaterEqual(r as LangValueType));
 
         // r (+-*/%) l
         if (l is not null && r is not null)
         {
-            if (r is not ValueType r1) throw new InvalidOperationError(this, "右操作数必须是ValueType类型");
+            if (r is not LangValueType r1) throw new InvalidOperationError(this, "右操作数必须是ValueType类型");
             switch (opera)
             {
                 case OperationType.PLUS:
@@ -310,10 +310,10 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 ilGenerator.Emit(OpCodes.Xor);
                 return typeof(bool);
             case OperationType.CONCAT:
-                if (local.InClassEnv != null && left is OldId { IdName: "this" })
+                if (local.InClassEnv != null && left is LangId { IdName: "this" })
                 {
                     ilGenerator.Emit(OpCodes.Ldarg_0);
-                    if (right is not OldId rightId) return local.InClassEnv;
+                    if (right is not LangId rightId) return local.InClassEnv;
                     var field = local.InClassEnv.GetField(rightId.IdName);
                     if (field == null)
                     {
@@ -347,7 +347,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     return m.ReturnType;
                 }
 
-                if (right is OldId id)
+                if (right is LangId id)
                 {
                     left!.LoadIlValue(ilGenerator, local);
                     var field = leftType!.GetField(id.IdName);

@@ -4,7 +4,7 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression;
 
-public class OldId(string name,string assumptionType = "", SourcePosition position = default) : OldExpr(position)
+public class LangId(string name,string assumptionType = "", SourcePosition position = default) : OldExpr(position)
 {
     public readonly string IdName = name;
     public override string ToString() => IdName;
@@ -12,7 +12,7 @@ public class OldId(string name,string assumptionType = "", SourcePosition positi
 
     public override bool Equals(object? obj)
     {
-        var a = obj as OldId;
+        var a = obj as LangId;
         return a?.IdName == IdName;
     }
 
@@ -21,7 +21,7 @@ public class OldId(string name,string assumptionType = "", SourcePosition positi
         return IdName.GetHashCode();
     }
 
-    public override ValueType Run(LangParser.VariateManager manager) => manager.GetValue(this) ?? throw new NameError(this, IdName);
+    public override LangValueType Run(LangParser.VariateManager manager) => manager.GetValue(this) ?? throw new NameError(this, IdName);
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {

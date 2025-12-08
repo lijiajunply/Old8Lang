@@ -5,7 +5,7 @@ using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Statement;
 
-public class SetListStatement(List<OldId> ids, List<OldExpr> expr, SourcePosition position = default) : OldStatement(position)
+public class SetListStatement(List<LangId> ids, List<OldExpr> expr, SourcePosition position = default) : OldStatement(position)
 {
     public override void Run(VariateManager manager)
     {

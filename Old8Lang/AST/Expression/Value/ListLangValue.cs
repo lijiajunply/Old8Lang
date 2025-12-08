@@ -6,21 +6,21 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class ListValue : ValueType, IOldList
+public class ListLangValue : LangValueType, ILangList
 {
     private readonly List<OldExpr> Value;
 
-    public readonly List<ValueType> Values = [];
+    public readonly List<LangValueType> Values = [];
 
-    public ListValue(List<OldExpr> value, SourcePosition position = default) : base(position) => Value = value;
+    public ListLangValue(List<OldExpr> value, SourcePosition position = default) : base(position) => Value = value;
 
-    public ListValue(List<object> value, SourcePosition position = default) : base(position)
+    public ListLangValue(List<object> value, SourcePosition position = default) : base(position)
     {
         Values = value.Select(ObjToValue).ToList();
         Value = Values.OfType<OldExpr>().ToList();
     }
 
-    public override ValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(LangParser.VariateManager manager)
     {
         if(Values.Count > 0)return this;
         foreach (var expr in Value)
@@ -28,7 +28,7 @@ public class ListValue : ValueType, IOldList
         return this;
     }
 
-    public ValueType Get(IntValue i)
+    public LangValueType Get(IntLangValue i)
     {
         if (i.Value < 0)
             i.Value = Values.Count + i.Value;
@@ -38,21 +38,21 @@ public class ListValue : ValueType, IOldList
     public override string ToString() =>
         "[" + string.Join(", ", Values) + "]"; // Old8Lang 风格的列表，使用 [ ] 包裹
 
-    public override ValueType Dot(OldExpr dotExpr)
+    public override LangValueType Dot(OldExpr dotExpr)
     {
         return dotExpr is not Instance a ? throw new InvalidOperationError(this, "列表类型只支持实例调用操作") : a.FromClassToResult(this);
     }
 
     public override object GetValue() => Apis.ListToObjects(Values);
-    public IEnumerable<ValueType> GetItems() => Values;
+    public IEnumerable<LangValueType> GetItems() => Values;
 
     public int GetLength() => Values.Count;
 
-    public ValueType Slice(int start, int end)
+    public LangValueType Slice(int start, int end)
     {
         if (start < 0) start += Values.Count;
         if (end < 0) end += Values.Count + 1;
-        return new ListValue(Values[start..end]
+        return new ListLangValue(Values[start..end]
             .OfType<OldExpr>()
             .ToList());
     }

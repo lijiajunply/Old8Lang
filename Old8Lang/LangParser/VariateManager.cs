@@ -4,7 +4,6 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
-using ValueType = Old8Lang.AST.Expression.ValueType;
 
 namespace Old8Lang.LangParser;
 
@@ -24,16 +23,16 @@ public class VariateManager
 
     //private Dictionary<string, ValueType> Variates { get; set; } = new();
     private List<string> VariateName { get; } = [];
-    private List<ValueType> Values { get; } = [];
+    private List<LangValueType> Values { get; } = [];
 
-    public List<ValueType> AnyInfo { get; private init; } = [];
+    public List<LangValueType> AnyInfo { get; private init; } = [];
 
     #endregion
 
     #region Return
 
     public bool IsReturn { get; set; }
-    public ValueType Result { get; set; } = new VoidValue();
+    public LangValueType Result { get; set; } = new VoidLangValue();
 
     #endregion
 
@@ -48,21 +47,21 @@ public class VariateManager
 
     #endregion
 
-    public void Set(OldId id, ValueType valueType)
+    public void Set(LangId id, LangValueType langValueType)
     {
         var a1 = GetValue(id);
         if (a1 is null)
         {
             //init
             VariateName.Add(id.IdName);
-            Values.Add(valueType);
+            Values.Add(langValueType);
             Count++;
             return;
         }
 
         //reset
         var count = VariateName.IndexOf(id.IdName);
-        Values[count] = valueType;
+        Values[count] = langValueType;
     }
 
     public void AddChildren()
@@ -84,43 +83,43 @@ public class VariateManager
         ChildrenNum.Remove(ChildrenNum[^1]);
     }
 
-    public ValueType? GetValue(OldId id)
+    public LangValueType? GetValue(LangId id)
     {
         var count = VariateName.IndexOf(id.IdName);
         return count != -1 ? Values[count] : GetAny(id);
     }
 
-    public ValueType? GetAny(OldId id)
+    public LangValueType? GetAny(LangId id)
     {
         return AnyInfo.FirstOrDefault(x =>
         {
             return x switch
             {
-                FuncValue func => func.Id!.IdName == id.IdName,
-                AnyValue any => any.Id.IdName == id.IdName,
-                NativeAnyValue na => na.ClassName == id.IdName,
+                FuncLangValue func => func.Id!.IdName == id.IdName,
+                AnyLangValue any => any.Id.IdName == id.IdName,
+                NativeAnyLangValue na => na.ClassName == id.IdName,
                 NativeStaticAny staticAny => staticAny.ClassName == id.IdName,
                 _ => false
             };
         });
     }
 
-    public void AddClassAndFunc(ValueType value)
+    public void AddClassAndFunc(LangValueType langValue)
     {
-        AnyInfo.Add(value);
+        AnyInfo.Add(langValue);
     }
 
-    public void AddFunc(ValueType value)
+    public void AddFunc(LangValueType langValue)
     {
-        AnyInfo.Add(value);
+        AnyInfo.Add(langValue);
     }
 
-    public void AddClass(ValueType value)
+    public void AddClass(LangValueType langValue)
     {
-        AnyInfo.Add(value);
+        AnyInfo.Add(langValue);
     }
 
-    public void AddVariate(string name, ValueType valueType)
+    public void AddVariate(string name, LangValueType langValueType)
     {
         if (VariateName.Contains(name))
         {
@@ -129,17 +128,17 @@ public class VariateManager
             throw new DuplicateNameError(new SourcePosition(), name, "变量");
         }
         VariateName.Add(name);
-        Values.Add(valueType);
+        Values.Add(langValueType);
         Count++;
     }
 
     public void ClearReturn()
     {
         IsReturn = false;
-        Result = new VoidValue();
+        Result = new VoidLangValue();
     }
     
-    public void Init(Dictionary<string, ValueType> result)
+    public void Init(Dictionary<string, LangValueType> result)
     {
         // 初始化方法实现
         // 将结果添加到管理器中

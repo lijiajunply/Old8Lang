@@ -8,7 +8,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <summary>
 /// 适用于有构造函数的类
 /// </summary>
-public class NativeAnyValue(string dllName, string className, string path) : ValueType
+public class NativeAnyLangValue(string dllName, string className, string path) : LangValueType
 {
     private Type? ClassType { get; set; }
     public readonly string ClassName = className;
@@ -17,9 +17,9 @@ public class NativeAnyValue(string dllName, string className, string path) : Val
 
     private VariateManager Manager = new();
 
-    public override ValueType Dot(OldExpr dotExpr)
+    public override LangValueType Dot(OldExpr dotExpr)
     {
-        if (dotExpr is OldId id)
+        if (dotExpr is LangId id)
         {
             var prop = ClassType?.GetProperty(id.IdName);
             if (prop is null)
@@ -38,14 +38,14 @@ public class NativeAnyValue(string dllName, string className, string path) : Val
             var method = ClassType?.GetMethod(instance.Id.IdName);
             if (method == null)
                 throw new AttributeError(this, instance.Id.IdName, ClassName);
-            var func = new FuncValue(instance.Id.IdName, method);
+            var func = new FuncLangValue(instance.Id.IdName, method);
             return func.Run(Manager, instance.Ids, InstanceObj);
         }
 
         throw new InvalidOperationError(this, "不支持的点操作表达式类型");
     }
 
-    public override ValueType Run(VariateManager manager)
+    public override LangValueType Run(VariateManager manager)
     {
         var assembly = Assembly.LoadFile(path);
         ClassType = assembly.GetType($"{dllName}.{ClassName}")!;

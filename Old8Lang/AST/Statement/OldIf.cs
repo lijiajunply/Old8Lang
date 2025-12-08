@@ -10,7 +10,7 @@ public class OldIf(OldExpr expr, BlockStatement blockStatement, SourcePosition p
     {
         if (r == false) return;
         var exprValue = expr.Run(manager);
-        if (exprValue is not BoolValue { Value: true }) return;
+        if (exprValue is not BoolLangValue { Value: true }) return;
         blockStatement.Run(manager);
         r = false;
     }

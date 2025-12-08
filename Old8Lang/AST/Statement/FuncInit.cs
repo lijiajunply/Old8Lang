@@ -8,37 +8,37 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
 
-public class FuncInit(FuncValue a, SourcePosition position = default) : OldStatement(position)
+public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldStatement(position)
 {
-    public readonly FuncValue FuncValue = a;
+    public readonly FuncLangValue FuncLangValue = a;
 
     public override void Run(VariateManager manager)
     {
         // 检查函数是否已存在
-        if (FuncValue.Id != null)
+        if (FuncLangValue.Id != null)
         {
             var existingFunc = manager.AnyInfo.FirstOrDefault(info => 
-                info is FuncValue func && func.Id?.IdName == FuncValue.Id.IdName);
+                info is FuncLangValue func && func.Id?.IdName == FuncLangValue.Id.IdName);
             
             if (existingFunc != null)
             {
-                throw new DuplicateNameError(this, FuncValue.Id.IdName, "函数");
+                throw new DuplicateNameError(this, FuncLangValue.Id.IdName, "函数");
             }
         }
         
-        manager.AddClassAndFunc(FuncValue);
+        manager.AddClassAndFunc(FuncLangValue);
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 获取方法的名称和参数类型
-        var methodName = FuncValue.Id!.IdName;
-        if (FuncValue.Method != null)
+        var methodName = FuncLangValue.Id!.IdName;
+        if (FuncLangValue.Method != null)
         {
-            local.DelegateVar.Add(methodName, FuncValue.Method);
+            local.DelegateVar.Add(methodName, FuncLangValue.Method);
             return;
         }
-        var parameterTypes = FuncValue.Ids!.Select(item => item.OutputType(local)).ToArray();
+        var parameterTypes = FuncLangValue.Ids!.Select(item => item.OutputType(local)).ToArray();
 
         // 假设 LocalManager 包含一个 AssemblyBuilder 和 ModuleBuilder 实例
         var assemblyName = new AssemblyName("DynamicAssembly");
@@ -49,7 +49,7 @@ public class FuncInit(FuncValue a, SourcePosition position = default) : OldState
         // 定义一个新的类型
         var typeBuilder = moduleBuilder.DefineType("DynamicType", TypeAttributes.Public);
 
-        var a = FuncValue.OutputType(local);
+        var a = FuncLangValue.OutputType(local);
         
         // 定义新的方法
         var methodBuilder = typeBuilder.DefineMethod(
@@ -64,9 +64,9 @@ public class FuncInit(FuncValue a, SourcePosition position = default) : OldState
         // 创建方法的 IL 发射器
         var methodIl = methodBuilder.GetILGenerator();
 
-        for (var i = 0; i < FuncValue.Ids!.Count; i++)
+        for (var i = 0; i < FuncLangValue.Ids!.Count; i++)
         {
-            var id = FuncValue.Ids[i];
+            var id = FuncLangValue.Ids[i];
             var localVar = methodIl.DeclareLocal(parameterTypes[i]);
             funcLocal.AddLocalVar(id.IdName, localVar);
             methodIl.Emit(OpCodes.Ldarg, i);
@@ -77,7 +77,7 @@ public class FuncInit(FuncValue a, SourcePosition position = default) : OldState
         funcLocal.DelegateVar.Add(methodName, methodBuilder);
         
         // 生成方法体的 IL 代码
-        FuncValue.BlockStatement.GenerateIl(methodIl, funcLocal);
+        FuncLangValue.BlockStatement.GenerateIl(methodIl, funcLocal);
 
         // 返回
         methodIl.Emit(OpCodes.Ret);
@@ -102,9 +102,9 @@ public class FuncInit(FuncValue a, SourcePosition position = default) : OldState
     public override string ToString()
     {
         var sb = new StringBuilder();
-        var paramList = FuncValue.Ids != null ? string.Join(", ", FuncValue.Ids) : string.Empty;
-        sb.AppendLine($"func {FuncValue.Id}({paramList})");
-        sb.AppendLine($"{{ {FuncValue.BlockStatement} }}");
+        var paramList = FuncLangValue.Ids != null ? string.Join(", ", FuncLangValue.Ids) : string.Empty;
+        sb.AppendLine($"func {FuncLangValue.Id}({paramList})");
+        sb.AppendLine($"{{ {FuncLangValue.BlockStatement} }}");
         return sb.ToString();
     }
 }

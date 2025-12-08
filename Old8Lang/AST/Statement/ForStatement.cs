@@ -23,7 +23,7 @@ public class ForStatement(
         {
             var varExpr = expr.Run(manager);
             bool expr1;
-            if (varExpr is BoolValue value)
+            if (varExpr is BoolLangValue value)
                 expr1 = value.Value;
             else
                 throw new TypeError(this, "期望布尔类型", $"实际得到了 {varExpr.GetType().Name}");

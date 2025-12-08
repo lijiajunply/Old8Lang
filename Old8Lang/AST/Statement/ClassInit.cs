@@ -8,20 +8,20 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
 
-public class ClassInit(AnyValue anyValue, SourcePosition position = default) : OldStatement(position)
+public class ClassInit(AnyLangValue anyLangValue, SourcePosition position = default) : OldStatement(position)
 {
     public override void Run(VariateManager manager)
     {
         // 检查类是否已存在
         var existingClass = manager.AnyInfo.FirstOrDefault(info => 
-            info is AnyValue any && any.Id.IdName == anyValue.Id.IdName);
+            info is AnyLangValue any && any.Id.IdName == anyLangValue.Id.IdName);
         
         if (existingClass != null)
         {
-            throw new DuplicateNameError(this, anyValue.Id.IdName, "类");
+            throw new DuplicateNameError(this, anyLangValue.Id.IdName, "类");
         }
         
-        manager.AddClassAndFunc(anyValue);
+        manager.AddClassAndFunc(anyLangValue);
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
@@ -32,20 +32,20 @@ public class ClassInit(AnyValue anyValue, SourcePosition position = default) : O
         var moduleBuilder = assemblyBuilder.DefineDynamicModule("DynamicModule");
 
         // 定义一个新的类型
-        var typeBuilder = moduleBuilder.DefineType(anyValue.Id.IdName, TypeAttributes.Public);
+        var typeBuilder = moduleBuilder.DefineType(anyLangValue.Id.IdName, TypeAttributes.Public);
 
         var fields = new List<FieldBuilder>();
-        var fieldValues = new List<Old8Lang.AST.Expression.ValueType>();
-        var func = new List<FuncValue>();
-        foreach (var variate in anyValue.Variates)
+        var fieldValues = new List<Old8Lang.AST.Expression.LangValueType>();
+        var func = new List<FuncLangValue>();
+        foreach (var variate in anyLangValue.Variates)
         {
-            if (variate.Value is FuncValue funcValue)
+            if (variate.Value is FuncLangValue funcValue)
             {
                 func.Add(funcValue);
                 continue;
             }
 
-            if (variate.Value is not Old8Lang.AST.Expression.ValueType value) continue;
+            if (variate.Value is not Old8Lang.AST.Expression.LangValueType value) continue;
 
             var fieldBuilder = typeBuilder.DefineField(variate.Key.IdName,
                 variate.Value.OutputType(local)!,
@@ -58,8 +58,8 @@ public class ClassInit(AnyValue anyValue, SourcePosition position = default) : O
         var assemblyClone =
             AssemblyBuilder.DefineDynamicAssembly(assemblyNameClone, AssemblyBuilderAccess.Run);
         var moduleClone = assemblyClone.DefineDynamicModule("DynamicModule");
-        var typeClone = moduleClone.DefineType(anyValue.Id.IdName, TypeAttributes.Public);
-        foreach (var variate in anyValue.Variates.Where(variate => variate.Value is not FuncValue))
+        var typeClone = moduleClone.DefineType(anyLangValue.Id.IdName, TypeAttributes.Public);
+        foreach (var variate in anyLangValue.Variates.Where(variate => variate.Value is not FuncLangValue))
         {
             typeClone.DefineField(variate.Key.IdName,
                 variate.Value.OutputType(local)!,
@@ -89,7 +89,7 @@ public class ClassInit(AnyValue anyValue, SourcePosition position = default) : O
 
         generator.Emit(OpCodes.Ret);
 
-        local.ClassVar.Add(anyValue.Id.IdName, typeBuilder.CreateType());
+        local.ClassVar.Add(anyLangValue.Id.IdName, typeBuilder.CreateType());
     }
 
     public override OldStatement this[int index] => this;
@@ -99,10 +99,10 @@ public class ClassInit(AnyValue anyValue, SourcePosition position = default) : O
     public override string ToString()
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"class {anyValue.Id.IdName} {{");
-        foreach (var variate in anyValue.Variates)
+        sb.AppendLine($"class {anyLangValue.Id.IdName} {{");
+        foreach (var variate in anyLangValue.Variates)
         {
-            if (variate.Value is FuncValue funcValue)
+            if (variate.Value is FuncLangValue funcValue)
             {
                 // 方法定义
                 var paramList = funcValue.Ids != null ? string.Join(", ", funcValue.Ids) : string.Empty;

@@ -20,7 +20,7 @@ public class NativeStatement : OldStatement
     private string? NativeName { get; set; }
 
     private readonly string? Name;
-    private readonly FuncValue? FuncValue;
+    private readonly FuncLangValue? FuncValue;
 
     public NativeStatement(string dllName, string className, string methodName, string nativeName)
     {
@@ -36,7 +36,7 @@ public class NativeStatement : OldStatement
         ClassName = className;
         MethodName = methodName;
         NativeName = nativeName;
-        FuncValue = a.FuncValue;
+        FuncValue = a.FuncLangValue;
     }
 
     public NativeStatement(string dllName, string className, string name = "")
@@ -71,12 +71,12 @@ public class NativeStatement : OldStatement
             if (methodInfo == null) throw new InvalidOperationError(this, $"找不到方法 {MethodName} 在 {ClassName} 类中");
             if (string.IsNullOrEmpty(NativeName))
                 NativeName = MethodName;
-            var func = new FuncValue(NativeName, methodInfo, FuncValue);
+            var func = new FuncLangValue(NativeName, methodInfo, FuncValue);
             manager.AddClassAndFunc(func);
             return;
         }
 
-        manager.AddClassAndFunc(new NativeAnyValue(DllName, ClassName, path).Run(manager));
+        manager.AddClassAndFunc(new NativeAnyLangValue(DllName, ClassName, path).Run(manager));
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)

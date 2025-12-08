@@ -5,22 +5,22 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
-public class RangeValue(OldExpr? start, OldExpr? end, SourcePosition position = default) : ValueType(position)
+public class RangeLangValue(OldExpr? start, OldExpr? end, SourcePosition position = default) : LangValueType(position)
 {
-    public override ValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(LangParser.VariateManager manager)
     {
-        var results = new List<ValueType>();
+        var results = new List<LangValueType>();
 
         var startValue = start?.Run(manager);
         var endValue = end?.Run(manager);
 
-        if (startValue is not IntValue startIntValue || endValue is not IntValue endIntValue)
+        if (startValue is not IntLangValue startIntValue || endValue is not IntLangValue endIntValue)
             throw new TypeError(this, "IntValue", $"RangeValue: start 或 end 不是 IntValue，实际得到了 {startValue?.GetType().Name} 和 {endValue?.GetType().Name}");
 
         for (var i = startIntValue.Value; i <= endIntValue.Value; i++)
-            results.Add(new IntValue(i));
+            results.Add(new IntLangValue(i));
 
-        return new ArrayValue(results);
+        return new ArrayLangValue(results);
     }
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)

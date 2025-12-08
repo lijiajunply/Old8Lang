@@ -16,7 +16,7 @@ namespace Old8Lang.AST.Statement;
 /// <param name="position">位置信息</param>
 public class TryStatement(
     BlockStatement tryBlock,
-    List<(string? exceptionType, OldId? exceptionVar, BlockStatement catchBlock)> catchBlocks,
+    List<(string? exceptionType, LangId? exceptionVar, BlockStatement catchBlock)> catchBlocks,
     BlockStatement? finallyBlock = null,
     SourcePosition position = default) : OldStatement(position)
 {
@@ -40,7 +40,7 @@ public class TryStatement(
                     if (exceptionVar != null)
                     {
                         // 创建一个包含异常信息的值类型
-                        manager.Set(exceptionVar, new ErrorValue(ex));
+                        manager.Set(exceptionVar, new ErrorLangValue(ex));
                     }
 
                     // 执行catch块

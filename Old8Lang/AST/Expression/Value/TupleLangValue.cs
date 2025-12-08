@@ -3,13 +3,13 @@ using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class TupleValue(OldExpr v1, OldExpr v2, SourcePosition position = default) : ValueType(position)
+public class TupleLangValue(OldExpr v1, OldExpr v2, SourcePosition position = default) : LangValueType(position)
 {
     public readonly OldExpr Item1 = v1;
     public readonly OldExpr Item2 = v2;
-    public ValueTuple<ValueType, ValueType> Value { get; private set; }
+    public ValueTuple<LangValueType, LangValueType> Value { get; private set; }
 
-    public override ValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(LangParser.VariateManager manager)
     {
         Value = (Item1.Run(manager), Item2.Run(manager));
         return this;

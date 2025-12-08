@@ -5,43 +5,43 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
-public class ArrayValue : ValueType, IOldList
+public class ArrayLangValue : LangValueType, ILangList
 {
-    private readonly ValueType[] RunResult;
+    private readonly LangValueType[] RunResult;
     private readonly List<OldExpr> Values = [];
 
-    public ArrayValue(IEnumerable<OldExpr> valuesList, SourcePosition position = default) : base(position)
+    public ArrayLangValue(IEnumerable<OldExpr> valuesList, SourcePosition position = default) : base(position)
     {
         var oldExpr = valuesList as OldExpr[] ?? [.. valuesList];
-        RunResult = new ValueType[oldExpr.Length];
+        RunResult = new LangValueType[oldExpr.Length];
         Values = [.. oldExpr];
     }
 
-    public ArrayValue(List<ValueType> re, SourcePosition position = default) : base(position)
+    public ArrayLangValue(List<LangValueType> re, SourcePosition position = default) : base(position)
     {
         RunResult = [.. re];
     }
 
-    public ArrayValue(List<object> a, SourcePosition position = default) : base(position) =>
+    public ArrayLangValue(List<object> a, SourcePosition position = default) : base(position) =>
         RunResult = [.. a.Select(ObjToValue)];
 
-    public override ValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(LangParser.VariateManager manager)
     {
         for (var i = 0; i < Values.Count; i++)
             RunResult[i] = Values[i].Run(manager);
         return this;
     }
 
-    public void Set(IntValue i, ValueType valueType)
+    public void Set(IntLangValue i, LangValueType langValueType)
     {
         if (i.Value >= RunResult.Length || i.Value < -RunResult.Length)
             throw new IndexError(this, i.Value, RunResult.Length);
         if (i.Value < 0)
             i.Value = RunResult.Length + i.Value;
-        RunResult[i.Value] = valueType;
+        RunResult[i.Value] = langValueType;
     }
 
-    public ValueType Get(IntValue a)
+    public LangValueType Get(IntLangValue a)
     {
         var index = a.Value;
         if (index < 0)
@@ -57,14 +57,14 @@ public class ArrayValue : ValueType, IOldList
         $"[{string.Join(", ", RunResult)}]"; // Old8Lang 风格的数组，使用 [ ] 包裹
 
     public override object GetValue() => Apis.ListToObjects(RunResult.ToList());
-    public IEnumerable<ValueType> GetItems() => RunResult;
+    public IEnumerable<LangValueType> GetItems() => RunResult;
     public int GetLength() => RunResult.Length;
 
-    public ValueType Slice(int start, int end)
+    public LangValueType Slice(int start, int end)
     {
         if (start < 0) start += RunResult.Length;
         if (end < 0) end += RunResult.Length + 1;
-        return new ArrayValue(RunResult[start..end]);
+        return new ArrayLangValue(RunResult[start..end]);
     }
 
     public Type GetChildType() => typeof(object);
