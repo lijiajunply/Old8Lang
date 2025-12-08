@@ -1,5 +1,7 @@
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
+using Old8Lang.LangParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -15,9 +17,25 @@ public class TupleLangValue(OldExpr v1, OldExpr v2, SourcePosition position = de
     public readonly OldExpr Item2 = v2;
     public ValueTuple<LangValueType, LangValueType> Value { get; private set; }
 
-    public override LangValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(VariateManager manager)
     {
-        Value = (Item1.Run(manager), Item2.Run(manager));
+        // 运行第一个元素
+        var item1Result = Item1.Run(manager);
+        
+        // 运行第二个元素，处理空名称的特殊情况
+        LangValueType item2Result;
+        if (Item2 is LangId item2Id && string.IsNullOrEmpty(item2Id.IdName))
+        {
+            // 如果第二个元素是空名称的LangId，直接使用NullLangValue，避免NameError
+            item2Result = new NullLangValue();
+        }
+        else
+        {
+            // 正常运行第二个元素
+            item2Result = Item2.Run(manager);
+        }
+        
+        Value = (item1Result, item2Result);
         return this;
     }
 
@@ -33,7 +51,7 @@ public class TupleLangValue(OldExpr v1, OldExpr v2, SourcePosition position = de
         // 元组将自动由堆栈上的两个值组成
     }
 
-    public override Type? OutputType(LocalManager local)
+    public override Type OutputType(LocalManager local)
     {
         // 获取两个元素的类型
         var type1 = Item1.OutputType(local);

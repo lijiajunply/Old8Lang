@@ -47,12 +47,19 @@ public class SetStatement(LangId id, OldExpr value, SourcePosition position = de
             }
         }
         
-        manager.Set(Id, result);
+        // 只有当Id名称不为空时，才设置变量
+        if (!string.IsNullOrEmpty(Id.IdName))
+        {
+            manager.Set(Id, result);
+        }
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        Value.SetValueToIl(ilGenerator, local,Id.IdName);
+        if (!string.IsNullOrEmpty(Id.IdName))
+        {
+            Value.SetValueToIl(ilGenerator, local, Id.IdName);
+        }
     }
 
     public override OldStatement this[int index] => this;

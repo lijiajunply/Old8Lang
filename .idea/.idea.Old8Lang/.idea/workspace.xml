@@ -17,29 +17,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/simple_string_template_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/string_interpolation_all_cases_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/string_interpolation_all_features_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/string_interpolation_basic_only_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/string_interpolation_basic_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/string_interpolation_escape_only_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/string_interpolation_escape_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/string_interpolation_final_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/string_interpolation_numeric_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/string_interpolation_simple_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/string_interpolation_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/very_simple_template_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/very_simple_template_test2.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs.new" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs.new" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Ex/simple_test.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/OldItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LangListItem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/init.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/init.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang_Grammar.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Todos/2025-12-08-语法修复待办.md" beforeDir="false" afterPath="$PROJECT_DIR$/Todos/2025-12-08-语法修复待办.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/other.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/other.old8" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -338,7 +319,7 @@
       <workItem from="1765095462905" duration="3326000" />
       <workItem from="1765099889326" duration="6689000" />
       <workItem from="1765111093830" duration="7390000" />
-      <workItem from="1765181076923" duration="11677000" />
+      <workItem from="1765181076923" duration="12710000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
