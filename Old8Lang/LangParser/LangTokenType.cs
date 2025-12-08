@@ -111,29 +111,39 @@ public enum LangTokenType
     /// ?
     /// </summary>
     Question,
-
+    
+    /// <summary>
     /// !
+    /// </summary>
     Exclamation,
 
-    // <-
+    /// <summary>
+    /// &lt;-
+    /// </summary>
     Assignment,
 
     /// <summary>
     /// ==
     /// </summary>
     Equals,
-
+    
+    /// <summary>
+    /// &lt;
+    /// </summary>
     LessThan,
 
     /// <summary>
-    /// >
+    /// &gt;
     /// </summary>
     GreaterThan,
-
+    
+    /// <summary>
+    /// &lt;=
+    /// </summary>
     LessThanEquals,
 
     /// <summary>
-    /// >=
+    /// &gt;=
     /// </summary>
     GreaterThanEquals,
 
@@ -151,6 +161,7 @@ public enum LangTokenType
     /// ||
     /// </summary>
     Or,
+    
     Xor,
 
     /// <summary>

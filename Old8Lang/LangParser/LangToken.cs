@@ -166,6 +166,11 @@ public static class LangTokenizer
                     }
                     else
                     {
+                        if (code[i] == '\n')
+                        {
+                            line++;
+                            column = i;
+                        }
                         sb.Append(code[i]);
                     }
 
@@ -197,6 +202,11 @@ public static class LangTokenizer
                     }
                     else
                     {
+                        if (code[i] == '\n')
+                        {
+                            line++;
+                            column = i;
+                        }
                         sb.Append(code[i]);
                     }
 

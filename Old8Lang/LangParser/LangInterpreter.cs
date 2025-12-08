@@ -7,17 +7,17 @@ namespace Old8Lang.LangParser;
 public class LangInterpreter : IMiniInterpreter
 {
     public readonly VariateManager Manager = new();
-    
+
     /// <summary>
     /// 源代码
     /// </summary>
     public string? SourceCode { get; private set; }
-    
+
     /// <summary>
     /// 文件名
     /// </summary>
     public string? FileName { get; private set; }
-    
+
     public LangInterpreter()
     {
         Manager.Interpreter = this;
@@ -29,25 +29,25 @@ public class LangInterpreter : IMiniInterpreter
     {
         return Build(code, null);
     }
-    
+
     // 重载方法，支持传递文件名
-    public BlockStatement Build(string code, string? fileName = null)
+    public BlockStatement Build(string code, string? fileName)
     {
         SourceCode = code;
         FileName = fileName;
         Manager.FileName = fileName;
-        
+
         // 设置当前解释器，以便在错误处理中使用
         Old8Exception.CurrentInterpreter = this;
-        
+
         var parser = LangTokenizer.Tokenize(code);
         if (parser == null) throw new Exception("语法出错");
         //parser.ForEach(x => Console.WriteLine(x));
         var result = new LangParser(parser, code, fileName).ParseProgram();
-        
+
         // 清除当前解释器
         // Old8Exception.CurrentInterpreter = null;
-        
+
         return result;
     }
 
@@ -55,7 +55,7 @@ public class LangInterpreter : IMiniInterpreter
     {
         return LangTokenizer.Tokenize(code);
     }
-    
+
     /// <summary>
     /// 获取错误位置附近的源代码上下文
     /// </summary>
@@ -67,21 +67,21 @@ public class LangInterpreter : IMiniInterpreter
         {
             return Array.Empty<string>();
         }
-        
+
         var lines = SourceCode.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
         var contextLines = new List<string>();
-        
+
         // 获取错误行前后的上下文，最多显示3行上下文
         // 确保行号至少为0，避免负数行号导致的问题
         var safeLine = Math.Max(0, position.Line);
         int startLine = Math.Max(0, safeLine - 2);
         int endLine = Math.Min(lines.Length - 1, safeLine + 1);
-        
+
         for (int i = startLine; i <= endLine; i++)
         {
             contextLines.Add(lines[i]);
         }
-        
+
         return contextLines.ToArray();
     }
 

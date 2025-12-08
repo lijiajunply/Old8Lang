@@ -237,11 +237,13 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             return ParseIfStatement();
         }
         
+        // 处理异常处理语句
         if (CurrentToken.Type == LangTokenType.Try)
         {
             return ParseTryStatement();
         }
         
+        // 处理循环语句 For 和 For in
         if (CurrentToken.Type == LangTokenType.For)
         {
             if (Peek().Type == LangTokenType.Identifier && Peek(2).Type == LangTokenType.In)
@@ -360,10 +362,10 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         {
             // 尝试解析为表达式
             var expr = ParseExpression();
-            // 如果解析成功，则这是一个表达式语句
-            // 由于我们的语法中没有专门的表达式语句节点，我们可以返回一个空语句或忽略它
-            // 这里我们返回一个空的SetStatement，因为语法测试主要关注解析是否成功，不关注执行结果
-            return new SetStatement(new LangId("", "", expr.Position), expr);
+            if (expr is Instance)
+            {
+                return new SetStatement(new LangId("", "", expr.Position), expr);
+            }
         }
         catch
         {

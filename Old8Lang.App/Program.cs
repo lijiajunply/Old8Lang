@@ -3,6 +3,7 @@ using Old8Lang;
 using Old8Lang.Compiler;
 //using Old8Lang.CslyParser;
 using Old8Lang.LangParser;
+
 // fib , compiler
 
 #if DEBUG
@@ -52,17 +53,17 @@ if (args[0] == BasicInfo.Order["FromFile"])
         Console.WriteLine($"不支持的文件扩展名: {ext}，仅支持 .old8 和 .ol 文件");
         return;
     }
-    
+
     var aLangInterpreter = new LangInterpreter
-        {
-            Manager = { Path = args[1] }
-        };
-        try
-        {
-            var code = Apis.FromFile(args[1]);
-            var b = aLangInterpreter.Build(code, args[1]);
-            b.Run(aLangInterpreter.Manager);
-        }
+    {
+        Manager = { Path = args[1] }
+    };
+    try
+    {
+        var code = Apis.FromFile(args[1]);
+        var b = aLangInterpreter.Build(code, args[1]);
+        b.Run(aLangInterpreter.Manager);
+    }
     catch (Exception e)
     {
 #if DEBUG
@@ -71,6 +72,7 @@ if (args[0] == BasicInfo.Order["FromFile"])
         Console.WriteLine(e.Message);
 #endif
     }
+
     // Apis.CslyUsing(args[1], false);
     return;
 }
@@ -134,7 +136,7 @@ if (args[0] == BasicInfo.Order["Compiler"])
         Console.WriteLine($"不支持的文件扩展名: {ext}，仅支持 .old8 和 .ol 文件");
         return;
     }
-    
+
     var interpreter = new LangInterpreter();
     var sw = new Stopwatch();
     sw.Start();
@@ -165,7 +167,7 @@ if (args[0] == BasicInfo.Order["SyntaxTest"])
         Console.WriteLine($"不支持的文件扩展名: {ext}，仅支持 .old8 和 .ol 文件");
         return;
     }
-    
+
     var interpreter = new LangInterpreter();
     var sw = new Stopwatch();
     sw.Start();
@@ -173,7 +175,7 @@ if (args[0] == BasicInfo.Order["SyntaxTest"])
     var build = interpreter.Build(code, args[1]);
     sw.Stop();
     var ts = sw.Elapsed.TotalMilliseconds;
-    
+
     Console.WriteLine($"------------------\nSyntax Test Result\nParser Build Time : {ts}ms\n------------------");
     Console.WriteLine(build.ToCode());
 }
