@@ -1,0 +1,21 @@
+// 简单Lambda表达式测试文件
+
+// 测试1: 基本Lambda表达式
+add <- (a, b) -> a + b
+result1 <- add(1, 2)
+
+// 测试2: 带类型注解的Lambda表达式
+subtract <- (a:int, b:int) -> a - b
+result2 <- subtract(5, 3)
+
+// 测试3: 无参数Lambda表达式
+sayHello <- () -> "Hello, World!"
+result3 <- sayHello()
+
+// 测试4: 单个参数Lambda表达式
+double <- (x) -> x * 2
+result4 <- double(5)
+
+// 测试5: 多个参数Lambda表达式
+multiply <- (a, b, c) -> a * b * c
+result5 <- multiply(2, 3, 4)

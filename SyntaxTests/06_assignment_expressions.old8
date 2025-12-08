@@ -1,0 +1,32 @@
+// 测试赋值表达式
+
+// 基本赋值
+a <- 10
+b <- 5
+
+// 赋值表达式作为值
+c <- (a <- 20)
+d <- (b <- a + 5)
+
+// 复合赋值（如果支持）
+e <- 10
+e <- e + 5
+
+// 赋值给数组元素
+arrayVar <- [1, 2, 3]
+arrayVar[0] <- 10
+
+// 赋值给字典值
+dictVar <- {"name": "Alice"}
+dictVar["name"] <- "Bob"
+dictVar["age"] <- 30
+
+// 赋值给对象属性
+class Person {
+    name <- ""
+    age <- 0
+}
+
+p <- Person()
+p.name <- "Charlie"
+p.age <- 25

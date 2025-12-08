@@ -1,0 +1,24 @@
+// 测试逻辑表达式
+
+// 准备测试数据
+e <- true
+f <- false
+
+// 测试基本逻辑运算
+result1 <- e and f
+result2 <- e or f
+result3 <- e xor f
+result4 <- not e
+result5 <- not f
+
+// 测试逻辑表达式与比较表达式结合
+result6 <- (a > b) and (c > d)
+result7 <- (a > b) or (c < d)
+result8 <- (a > b) xor (c < d)
+result9 <- not (a > b)
+
+// 测试连续逻辑运算
+result10 <- e and f or e
+result11 <- e or f and e
+result12 <- not e and f
+result13 <- not (e and f)

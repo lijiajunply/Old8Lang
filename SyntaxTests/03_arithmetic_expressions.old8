@@ -1,0 +1,29 @@
+// 测试算术表达式
+
+// 准备测试数据
+a <- 10
+b <- 5
+c <- 3
+d <- 2
+
+// 测试基本算术运算
+result1 <- a + b
+result2 <- a - b
+result3 <- a * b
+result4 <- a / b
+result5 <- a % b
+
+// 测试运算优先级
+result6 <- a + b * c
+result7 <- (a + b) * c
+result8 <- a / b + c
+result9 <- a / (b + c)
+
+// 测试一元运算
+result10 <- -a
+result11 <- -b
+
+// 测试连续运算
+result12 <- a + b - c
+result13 <- a * b / c
+result14 <- a + b * c / d

@@ -1,0 +1,31 @@
+// 测试基本数据类型和复合数据类型
+
+// 基本数据类型
+intVar:int <- 123
+doubleVar:double <- 3.14
+stringVar:string <- "hello"
+boolVar:bool <- true
+charVar:char <- 'a'
+
+// 复合数据类型
+
+// 数组
+arrayVar <- [1, 2, 3, 4, 5]
+arrayVar2 <- ["a", "b", "c"]
+arrayVar3 <- [true, false, true]
+
+// 列表
+listVar <- list[1, 2, 3]
+listVar2 <- list["a", "b", "c"]
+
+// 字典
+dictVar <- {"name": "Alice", "age": 30}
+dictVar2 <- {1: "one", 2: "two"}
+
+// 元组
+tupleVar <- (1, "a", true)
+tupleVar2 <- ("hello", 3.14)
+
+// 范围
+rangeVar <- [1~10]
+rangeVar2 <- [0~5]

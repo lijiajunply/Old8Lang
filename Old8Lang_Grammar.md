@@ -326,6 +326,14 @@ p <- Person()
 p.name <- "Alice"
 p.age <- 30
 p.sayHello()
+
+class Test {
+    func init(a:int, b:int) {
+        PrintLine("init: " + a + ", " + b)
+    }
+}
+
+t <- Test(1, 2)
 ```
 
 ### 5.6 异常处理
