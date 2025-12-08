@@ -1,0 +1,134 @@
+// 异常处理测试文件
+
+// 测试1: 基本的try-catch结构
+try {
+    // 可能抛出异常的代码
+    result1 <- 10 / 0
+} catch (e) {
+    // 捕获异常并处理
+    result1 <- "Error: " + e
+}
+
+// 测试2: try-catch-finally结构
+try {
+    result2 <- 10 / 2
+} catch (e) {
+    result2 <- "Error: " + e
+} finally {
+    // 无论是否异常都会执行
+    finallyExecuted1 <- true
+}
+
+// 测试3: 嵌套try-catch结构
+try {
+    try {
+        result3 <- 10 / 0
+    } catch (innerE) {
+        // 内部catch处理
+        result3 <- "Inner Error: " + innerE
+        // 重新抛出异常（如果支持）
+        // throw innerE
+    }
+} catch (outerE) {
+    // 外部catch处理
+    result3 <- "Outer Error: " + outerE
+}
+
+// 测试4: 多个catch块（如果支持）
+// 注意：根据语法文档，Old8Lang可能只支持单一catch块
+try {
+    result4 <- 10 / 0
+} catch (e) {
+    result4 <- "Generic Error: " + e
+}
+
+// 测试5: try-finally结构（无catch）
+try {
+    result5 <- 10 / 2
+} finally {
+    finallyExecuted2 <- true
+}
+
+// 测试6: 异常处理与函数结合
+func divide(a, b) {
+    try {
+        if b == 0 {
+            // 抛出异常（如果支持）
+            // throw "Division by zero"
+            return "Error: Division by zero"
+        }
+        return a / b
+    } catch (e) {
+        return "Error: " + e
+    } finally {
+        divideCalled <- true
+    }
+}
+
+result6 <- divide(10, 2)
+result7 <- divide(10, 0)
+
+// 测试7: 复杂try-catch结构
+try {
+    // 测试数组越界
+    arrayTest <- [1, 2, 3]
+    result8 <- arrayTest[5]  // 越界访问
+} catch (e) {
+    result8 <- "Array Error: " + e
+} finally {
+    finallyExecuted3 <- true
+}
+
+// 测试8: 异常处理与控制流结合
+result9 <- 0
+try {
+    for i <- 0, i < 10, i++ {
+        if i == 5 {
+            // 假设这里会抛出异常
+            // throw "Loop error at i=5"
+            break
+        }
+        result9 <- result9 + i
+    }
+} catch (e) {
+    result9 <- "Loop Error: " + e
+} finally {
+    finallyExecuted4 <- true
+}
+
+// 测试9: 异常处理与类方法结合
+class Calculator {
+    func safeDivide(a, b) {
+        try {
+            if b == 0 {
+                return "Error: Division by zero"
+            }
+            return a / b
+        } catch (e) {
+            return "Error: " + e
+        }
+    }
+}
+
+calc <- Calculator()
+result10 <- calc.safeDivide(20, 4)
+result11 <- calc.safeDivide(20, 0)
+
+// 测试10: 多个try-catch-finally块
+// 第一个try-catch-finally
+try {
+    result12 <- 1 + 2
+} catch (e) {
+    result12 <- "Error 1: " + e
+} finally {
+    finallyExecuted5 <- true
+}
+
+// 第二个try-catch-finally
+try {
+    result13 <- "string" / 2  // 类型错误
+} catch (e) {
+    result13 <- "Error 2: " + e
+} finally {
+    finallyExecuted6 <- true
+}

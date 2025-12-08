@@ -1,0 +1,83 @@
+// 字符串模板测试文件
+
+// 准备测试数据
+name <- "Alice"
+age <- 30
+city <- "New York"
+x <- 10
+y <- 20
+
+// 测试1: 基本字符串模板
+message1 <- $"My name is {name}."
+message2 <- $"I am {age} years old."
+message3 <- $"I live in {city}."
+
+// 测试2: 在模板中嵌入表达式
+sumMessage <- $"The sum of {x} and {y} is {x + y}."
+productMessage <- $"The product of {x} and {y} is {x * y}."
+comparisonMessage <- $"Is {x} greater than {y}? {(x > y)}."
+
+// 测试3: 转义 { 字符
+escapedBrace1 <- $"This is {{a brace}}."
+escapedBrace2 <- $"{{Hello}}, {name}!"
+
+// 测试4: 转义 } 字符
+escapedBrace3 <- $"This ends with a brace: }.
+escapedBrace4 <- $"{name} says: \"Hello}}\""
+
+// 测试5: 混合使用各种模板特性
+mixedTemplate <- $"Name: {name}, Age: {age}, City: {city}, Sum: {x + y}, Escaped: {{brace}}."
+
+// 测试6: 复杂模板结构
+// 包含函数调用
+func getFullName(firstName, lastName) {
+    return firstName + " " + lastName
+}
+
+fullName <- getFullName("Alice", "Smith")
+complexTemplate1 <- $"Full Name: {fullName}, Age: {age + 5}."
+
+// 包含条件表达式
+conditionalTemplate <- $"If {x} > {y}, then {x} is greater, else {y} is greater: {(x > y) ? x : y}."
+
+// 测试7: 嵌套模板（如果支持）
+nestedTemplate <- $"Outer: {{$"Inner: {name}"}}"
+
+// 测试8: 空模板
+emptyTemplate <- $""
+
+// 测试9: 只有转义字符的模板
+onlyEscapedTemplate <- $"{{{{}}}}"
+
+// 测试10: 复杂表达式模板
+complexExprTemplate <- $"The result of ({x} + {y}) * ({x} - {y}) is {((x + y) * (x - y))}."
+
+// 测试11: 模板中使用变量和表达式的混合
+mixedExprTemplate <- $"Name: {name}, Age next year: {age + 1}, City: {city}, Sum: {x + y}, Product: {x * y}, Division: {x / y}"
+
+// 测试12: 模板中使用列表和字典
+listTest <- [1, 2, 3, 4, 5]
+dictTest <- {"name": "Alice", "age": 30}
+
+collectionTemplate1 <- $"List: {listTest}, First element: {listTest[0]}"
+collectionTemplate2 <- $"Dict: {dictTest}, Name: {dictTest["name"]}, Age: {dictTest["age"]}"
+
+// 测试13: 模板中使用布尔值和字符
+boolValue <- true
+charValue <- 'a'
+
+boolCharTemplate <- $"Boolean: {boolValue}, Character: {charValue}"
+
+// 测试14: 模板中使用复杂条件
+complexCondTemplate <- $"{name} is {if age >= 18 then "an adult" else "a minor"}."
+
+// 测试15: 多行模板（如果支持）
+multiLineTemplate <- $"Line 1: {name}
+Line 2: {age}
+Line 3: {city}"
+
+// 打印结果（语法测试，实际运行时会输出）
+PrintLine(message1)
+PrintLine(sumMessage)
+PrintLine(escapedBrace1)
+PrintLine(mixedTemplate)

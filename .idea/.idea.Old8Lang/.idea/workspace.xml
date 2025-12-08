@@ -17,9 +17,29 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/TestFuncDeclaration.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/Old8Lang 语法系统性测试计划.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/实现语法测试函数.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/basic_syntax.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/classes.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/complex_syntax.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/control_flow.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/exception_handling.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/expressions.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/functions.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/import_statements.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/lambda.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/list_comprehensions.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/range_expressions.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/string_templates.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/run_syntax_tests.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_syntax.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.trae/rules/project_rules.md" beforeDir="false" afterPath="$PROJECT_DIR$/.trae/rules/project_rules.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/OldItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/OldItem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

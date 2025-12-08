@@ -6,7 +6,8 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression;
 
-public class Operation(OldExpr? left, OperationType opera, OldExpr? right, SourcePosition position = default) : OldExpr(position)
+public class Operation(OldExpr? left, OperationType opera, OldExpr? right, SourcePosition position = default)
+    : OldExpr(position)
 {
     private string OperaToString()
     {
@@ -31,7 +32,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         return "";
     }
 
-    public override string ToString() => $"{left} {OperaToString()} {right}";
+    public override string ToString() => $"{left}{OperaToString()}{right}";
     public Type? Type { get; set; }
 
     public override ValueType Run(LangParser.VariateManager manager)
@@ -81,9 +82,11 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         }
 
         if (l is not AnyValue && opera == OperationType.CONCAT)
+        {
             if (l is null || r is null)
                 throw new InvalidOperationError(this, "连接运算符左右操作数均不能为空");
-            return l!.Dot(r!);
+            return l.Dot(r);
+        }
 
         // r get value
         r = right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
@@ -349,20 +352,22 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     left!.LoadIlValue(ilGenerator, local);
                     var field = leftType!.GetField(id.IdName);
                     if (field == null)
-                {
-                    var p = leftType.GetProperty(id.IdName);
-                    if (p == null)
                     {
-                        throw new InvalidOperationError(this, $"类型 {leftType.Name} 没有属性 {id.IdName}");
+                        var p = leftType.GetProperty(id.IdName);
+                        if (p == null)
+                        {
+                            throw new InvalidOperationError(this, $"类型 {leftType.Name} 没有属性 {id.IdName}");
+                        }
+
+                        var getMethod = p.GetGetMethod();
+                        if (getMethod == null)
+                        {
+                            throw new InvalidOperationError(this, $"属性 {id.IdName} 没有公开的 getter 方法");
+                        }
+
+                        ilGenerator.Emit(OpCodes.Call, getMethod);
+                        return p.PropertyType;
                     }
-                    var getMethod = p.GetGetMethod();
-                    if (getMethod == null)
-                    {
-                        throw new InvalidOperationError(this, $"属性 {id.IdName} 没有公开的 getter 方法");
-                    }
-                    ilGenerator.Emit(OpCodes.Call, getMethod);
-                    return p.PropertyType;
-                }
 
                     ilGenerator.Emit(OpCodes.Ldfld, field);
                     return field.FieldType;

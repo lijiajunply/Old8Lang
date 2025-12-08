@@ -72,7 +72,8 @@ public static class BasicInfo
         { "Install", "-i" },
         { "Help", "-h" },
         { "Remove", "-r" },
-        { "Compiler", "-c" }
+        { "Compiler", "-c" },
+        { "SyntaxTest", "-s" }
     };
 
     public static string CodePath

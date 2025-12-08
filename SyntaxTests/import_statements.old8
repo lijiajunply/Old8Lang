@@ -1,0 +1,75 @@
+// 导入语句测试文件
+
+// 测试1: 基本导入语句（使用引号）
+import "module1"
+
+// 测试2: 另一种导入语句形式（不使用引号）
+import module2
+
+// 测试3: 导入多个模块
+import "module3"
+import "module4"
+import module5
+import module6
+
+// 测试4: 导入模块后使用（假设模块存在）
+// 这里我们只是测试语法，实际模块可能不存在
+// module1.someFunction()
+// module2.someVariable
+
+// 测试5: 导入语句与其他语句混合使用
+import "math"
+import "file"
+
+// 基本变量声明
+x <- 10
+y <- 20
+
+// 使用导入的模块（语法测试）
+// result1 <- math.add(x, y)
+// result2 <- file.read("test.txt")
+
+// 测试6: 导入语句在函数内部（如果支持）
+func testImport() {
+    // 函数内部导入
+    import "localModule"
+    // 使用导入的模块
+    // localModule.someFunction()
+}
+
+// 测试7: 导入语句在条件语句中（如果支持）
+if x > 5 {
+    import "conditionalModule"
+    // conditionalModule.someFunction()
+}
+
+// 测试8: 导入语句在类内部（如果支持）
+class TestClass {
+    // 类内部导入
+    import "classModule"
+    
+    func test() {
+        // 使用导入的模块
+        // classModule.someFunction()
+    }
+}
+
+// 测试9: 导入同一模块多次
+import "repeatedModule"
+import "repeatedModule"  // 重复导入
+import repeatedModule
+import repeatedModule  // 重复导入
+
+// 测试10: 复杂导入结构
+// 包含各种导入形式的组合
+import "complex1"
+import complex2
+import "complex3"
+import complex4
+
+// 其他代码
+func complexFunction() {
+    return 42
+}
+
+result <- complexFunction()

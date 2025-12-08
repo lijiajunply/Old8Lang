@@ -1,0 +1,95 @@
+// Lambda表达式测试文件
+
+// 测试1: 基本Lambda表达式
+add <- (a, b) -> a + b
+result1 <- add(1, 2)
+
+// 测试2: 带类型注解的Lambda表达式
+subtract <- (a:int, b:int) -> a - b
+result2 <- subtract(5, 3)
+
+// 测试3: 无参数Lambda表达式
+sayHello <- () -> "Hello, World!"
+result3 <- sayHello()
+
+// 测试4: 单个参数Lambda表达式
+double <- (x) -> x * 2
+result4 <- double(5)
+
+// 测试5: 多个参数Lambda表达式
+multiply <- (a, b, c) -> a * b * c
+result5 <- multiply(2, 3, 4)
+
+// 测试6: 带代码块的Lambda表达式
+power <- (base, exponent) -> {
+    result <- 1
+    for i <- 0, i < exponent, i++ {
+        result <- result * base
+    }
+    return result
+}
+
+result6 <- power(3, 2)
+result7 <- power(3, 4)
+
+// 测试7: Lambda表达式作为参数
+func applyOperation(a, b, operation) {
+    return operation(a, b)
+}
+
+result8 <- applyOperation(3, 4, (x, y) -> x + y)
+result9 <- applyOperation(3, 4, (x, y) -> x * y)
+
+// 测试8: Lambda表达式作为返回值
+func createMultiplier(factor) {
+    return (x) -> x * factor
+}
+
+multiplyBy3 <- createMultiplier(3)
+result10 <- multiplyBy3(5)
+
+multiplyBy5 <- createMultiplier(5)
+result11 <- multiplyBy5(5)
+
+// 测试9: 复杂Lambda表达式（嵌套条件）
+complexLambda <- (x, y, z) -> {
+    if x > y {
+        return x + z
+    } elif y > z {
+        return y + x
+    } else {
+        return z + y
+    }
+}
+
+result12 <- complexLambda(10, 5, 3)
+result13 <- complexLambda(3, 10, 5)
+result14 <- complexLambda(3, 5, 10)
+
+// 测试10: Lambda表达式与列表结合
+numbers <- [1, 2, 3, 4, 5]
+
+// 这里我们假设有一个map函数可以应用Lambda到列表
+// map函数的实现
+func map(list, func) {
+    result <- list[]
+    for item in list {
+        result.Add(func(item))
+    }
+    return result
+}
+
+// 使用Lambda表达式作为参数
+result15 <- map(numbers, (x) -> x * 2)
+result16 <- map(numbers, (x) -> x + 1)
+
+// 测试11: Lambda表达式捕获外部变量
+factor <- 10
+captureLambda <- (x) -> x * factor
+result17 <- captureLambda(5)
+
+factor <- 20
+result18 <- captureLambda(5)
+
+// 测试12: 自执行Lambda表达式
+result19 <- ((x, y) -> x + y)(10, 20)

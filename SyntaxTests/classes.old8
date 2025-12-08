@@ -1,0 +1,222 @@
+// 类测试文件
+
+// 测试1: 基本类声明
+class Person {
+    name <- ""
+    age <- 0
+    
+    func sayHello() {
+        return "Hello, my name is " + name
+    }
+}
+
+// 测试2: 类实例化
+p1 <- Person()
+p1.name <- "Alice"
+p1.age <- 30
+result1 <- p1.sayHello()
+
+// 测试3: 带类型注解的类字段
+class Student {
+    name:string <- ""
+    age:int <- 0
+    grade:int <- 0
+    
+    func getInfo() {
+        return "Name: " + name + ", Age: " + age + ", Grade: " + grade
+    }
+}
+
+// 测试4: 类的方法调用
+s1 <- Student()
+s1.name <- "Bob"
+s1.age <- 15
+s1.grade <- 9
+result2 <- s1.getInfo()
+
+// 测试5: 带参数的方法
+class Calculator {
+    func add(a:int, b:int) {
+        return a + b
+    }
+    
+    func multiply(a:int, b:int) {
+        return a * b
+    }
+    
+    func divide(a:double, b:double) {
+        if b == 0 {
+            return 0.0
+        }
+        return a / b
+    }
+}
+
+calc <- Calculator()
+result3 <- calc.add(10, 20)
+result4 <- calc.multiply(10, 20)
+result5 <- calc.divide(10.0, 2.0)
+
+// 测试6: 类的构造函数
+class Point {
+    x <- 0
+    y <- 0
+    
+    func init(newX, newY) {
+        x <- newX
+        y <- newY
+    }
+    
+    func getDistance() {
+        return (x * x + y * y) / 2
+    }
+}
+
+p2 <- Point()
+p2.init(3, 4)
+result6 <- p2.getDistance()
+
+// 测试7: 类的继承（如果支持）
+class Animal {
+    name <- ""
+    
+    func speak() {
+        return "Animal speaks"
+    }
+}
+
+class Dog extends Animal {
+    breed <- ""
+    
+    func speak() {
+        return "Woof!"
+    }
+    
+    func getBreed() {
+        return breed
+    }
+}
+
+class Cat extends Animal {
+    func speak() {
+        return "Meow!"
+    }
+}
+
+// 测试8: 继承类的实例化和方法调用
+dog <- Dog()
+dog.name <- "Rex"
+dog.breed <- "German Shepherd"
+result7 <- dog.speak()
+result8 <- dog.getBreed()
+
+cat <- Cat()
+cat.name <- "Whiskers"
+result9 <- cat.speak()
+
+// 测试9: 类的静态方法（如果支持）
+class MathUtils {
+    func add(a, b) {
+        return a + b
+    }
+    
+    func multiply(a, b) {
+        return a * b
+    }
+}
+
+result10 <- MathUtils.add(5, 3)
+result11 <- MathUtils.multiply(5, 3)
+
+// 测试10: 类的嵌套
+class OuterClass {
+    outerField <- 10
+    
+    func outerMethod() {
+        return outerField
+    }
+    
+    class InnerClass {
+        innerField <- 20
+        
+        func innerMethod() {
+            return innerField
+        }
+    }
+}
+
+outer <- OuterClass()
+result12 <- outer.outerMethod()
+
+// 测试11: 复杂类结构（包含多种成员）
+class ComplexClass {
+    // 基本类型字段
+    intField:int <- 0
+    doubleField:double <- 0.0
+    stringField:string <- ""
+    boolField:bool <- false
+    charField:char <- 'a'
+    
+    // 复合类型字段
+    arrayField <- [1, 2, 3]
+    listField <- list[4, 5, 6]
+    dictField <- {"key1": "value1", "key2": 123}
+    
+    // 方法
+    func setFields(intVal, doubleVal, stringVal, boolVal, charVal) {
+        intField <- intVal
+        doubleField <- doubleVal
+        stringField <- stringVal
+        boolField <- boolVal
+        charField <- charVal
+    }
+    
+    func getFields() {
+        return (intField, doubleField, stringField, boolField, charField)
+    }
+    
+    func modifyCollection() {
+        arrayField[0] <- 100
+        listField.Add(7)
+        dictField["key3"] <- true
+    }
+}
+
+complex <- ComplexClass()
+complex.setFields(10, 3.14, "test", true, 'b')
+result13 <- complex.getFields()
+complex.modifyCollection()
+result14 <- complex.arrayField[0]
+result15 <- complex.listField[3]
+result16 <- complex.dictField["key3"]
+
+// 测试12: 类的实例作为字段
+class Address {
+    street <- ""
+    city <- ""
+    country <- ""
+    
+    func getFullAddress() {
+        return street + ", " + city + ", " + country
+    }
+}
+
+class Employee {
+    name <- ""
+    address <- Address()
+    
+    func setAddress(street, city, country) {
+        address.street <- street
+        address.city <- city
+        address.country <- country
+    }
+    
+    func getEmployeeInfo() {
+        return "Name: " + name + ", Address: " + address.getFullAddress()
+    }
+}
+
+emp <- Employee()
+emp.name <- "Charlie"
+emp.setAddress("123 Main St", "New York", "USA")
+result17 <- emp.getEmployeeInfo()

@@ -155,3 +155,25 @@ if (args[0] == BasicInfo.Order["Compiler"])
     time += $"Total : {milliseconds}ms";
     Console.WriteLine(time);
 }
+
+if (args[0] == BasicInfo.Order["SyntaxTest"])
+{
+    // 验证文件扩展名
+    var ext = Path.GetExtension(args[1]).ToLower();
+    if (ext != ".old8" && ext != ".ol")
+    {
+        Console.WriteLine($"不支持的文件扩展名: {ext}，仅支持 .old8 和 .ol 文件");
+        return;
+    }
+    
+    var interpreter = new LangInterpreter();
+    var sw = new Stopwatch();
+    sw.Start();
+    var code = Apis.FromFile(args[1]);
+    var build = interpreter.Build(code, args[1]);
+    sw.Stop();
+    var ts = sw.Elapsed.TotalMilliseconds;
+    
+    Console.WriteLine($"------------------\nSyntax Test Result\nParser Build Time : {ts}ms\n------------------");
+    Console.WriteLine(build.ToCode());
+}

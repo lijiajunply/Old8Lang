@@ -29,6 +29,9 @@ dotnet run --project Old8Lang.App -- -f <path-to-test-file.old8>
 
 # 编译模式测试：
 dotnet run --project Old8Lang.App -- -c <path-to-test-file.old8>
+
+# 语法测试：
+dotnet run --project Old8Lang.App -- -s <path-to-test-file.old8>
 ```
 
 生成完测试用代码文件后，请也在 Old8Lang.XUnitTests 目录下添加对应的测试类。

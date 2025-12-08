@@ -1,0 +1,123 @@
+// 控制流语句测试文件
+
+// 准备测试数据
+x <- 10
+y <- 5
+z <- 15
+listTest <- [1, 2, 3, 4, 5]
+dictTest <- {"name": "Alice", "age": 30, "city": "New York"}
+
+// 测试if-elif-else语句
+if x > 10 {
+    result1 <- "x > 10"
+} elif x == 10 {
+    result1 <- "x == 10"
+} else {
+    result1 <- "x < 10"
+}
+
+// 测试嵌套if语句
+if x > 5 {
+    if y > 3 {
+        result2 <- "x > 5 and y > 3"
+    } else {
+        result2 <- "x > 5 and y <= 3"
+    }
+} else {
+    result2 <- "x <= 5"
+}
+
+// 测试for循环语句
+for i <- 0, i < 5, i++ {
+    result3 <- i
+}
+
+for i <- 5, i > 0, i-- {
+    result4 <- i
+}
+
+for i <- 0, i < 10, i += 2 {
+    result5 <- i
+}
+
+// 测试while循环语句
+count1 <- 0
+while count1 < 5 {
+    result6 <- count1
+    count1 <- count1 + 1
+}
+
+count2 <- 5
+while count2 > 0 {
+    result7 <- count2
+    count2 <- count2 - 1
+}
+
+// 测试switch-case-default语句
+switch x {
+    case 5 {
+        result8 <- "x is 5"
+    }
+    case 10 {
+        result8 <- "x is 10"
+    }
+    case 15 {
+        result8 <- "x is 15"
+    }
+    default {
+        result8 <- "x is other value"
+    }
+}
+
+// 测试嵌套switch语句
+switch x {
+    case 10 {
+        switch y {
+            case 5 {
+                result9 <- "x is 10 and y is 5"
+            }
+            default {
+                result9 <- "x is 10 and y is other value"
+            }
+        }
+    }
+    default {
+        result9 <- "x is other value"
+    }
+}
+
+// 测试for-in语句（遍历数组）
+for item in listTest {
+    result10 <- item
+}
+
+// 测试for-in语句（遍历字典）
+for key in dictTest {
+    value <- dictTest[key]
+    result11 <- key
+    result12 <- value
+}
+
+// 测试for-in语句（遍历范围）
+for i in [1~5] {
+    result13 <- i
+}
+
+// 测试复杂控制流组合
+result14 <- 0
+for i <- 0, i < 10, i++ {
+    if i % 2 == 0 {
+        result14 <- result14 + i
+    } else {
+        result14 <- result14 - i
+    }
+}
+
+// 测试while循环中的break和continue
+// 注意：根据语法文档，Old8Lang似乎没有break和continue关键字，这里仅测试语法结构
+count3 <- 0
+sum <- 0
+while count3 < 10 {
+    count3 <- count3 + 1
+    sum <- sum + count3
+}

@@ -32,7 +32,7 @@ public class OldItem(OldId listId, OldExpr key, SourcePosition position = defaul
         throw new InvalidOperationError(this, $"不支持的集合类型: {a?.GetType().Name ?? "null"}");
     }
 
-    public override string ToString() => $"the key: {key} in {listId}";
+    public override string ToString() => $"{listId}[{key}]";
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
