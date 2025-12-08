@@ -141,12 +141,9 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
 
     private LangToken Peek(int offset = 1)
     {
-        if (CurrentIndex + offset >= tokens.Count)
-        {
-            return new LangToken("", LangTokenType.EndOfFile, CurrentIndex + offset);
-        }
-
-        return tokens[CurrentIndex + offset];
+        return CurrentIndex + offset >= tokens.Count
+            ? new LangToken("", LangTokenType.EndOfFile, CurrentIndex + offset)
+            : tokens[CurrentIndex + offset];
     }
 
     #endregion
@@ -319,12 +316,12 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             // 检查是否是赋值语句，允许左值表达式包含成员访问或索引访问
             // 例如：identifier <- value, this.name <- value, a[b] <- value
             var savedIndex = CurrentIndex;
-            
+
             try
             {
                 // 尝试解析左值表达式
                 var leftExpr = ParseExpression();
-                
+
                 // 检查下一个token是否是赋值符号
                 if (CurrentToken.Type == LangTokenType.Assignment)
                 {
@@ -347,7 +344,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                         }
                     }
                 }
-                
+
                 // 如果不是赋值语句，回退到原始位置
                 CurrentIndex = savedIndex;
             }
@@ -577,7 +574,8 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         if (leftExpr is LangId langId)
         {
             // 普通标识符赋值：identifier <- value
-            return new SetStatement(new LangId(langId.IdName, assumptionType, leftExpr.Position), expression, leftExpr.Position);
+            return new SetStatement(new LangId(langId.IdName, assumptionType, leftExpr.Position), expression,
+                leftExpr.Position);
         }
         else
         {
@@ -1048,112 +1046,101 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         var expr = ParseBoolOpera();
         return expr;
     }
-    
+
     // 逻辑表达式（最低优先级）
     private OldExpr ParseBoolOpera()
     {
         var left = ParseBinaryExpression();
-        
+
         while (CurrentToken.Type == LangTokenType.And || CurrentToken.Type == LangTokenType.Or ||
                CurrentToken.Type == LangTokenType.Xor)
         {
             var operatorToken = CurrentToken;
-            var position = new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position =
+                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
             Expect(operatorToken.Type);
             var right = ParseBinaryExpression();
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
         }
-        
+
         return left;
     }
-    
+
     // 比较表达式
     private OldExpr ParseBinaryExpression()
     {
         var left = ParseNumberOpera1();
-        
+
         while (CurrentToken.Type is LangTokenType.LessThanEquals or LangTokenType.GreaterThanEquals
                or LangTokenType.Equals
                or LangTokenType.NotEquals or LangTokenType.LessThan or LangTokenType.GreaterThan)
         {
             var operatorToken = CurrentToken;
-            var position = new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position =
+                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
             Expect(operatorToken.Type);
             var right = ParseNumberOpera1();
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
         }
-        
+
         return left;
     }
-    
+
     // 加减表达式
     private OldExpr ParseNumberOpera1()
     {
         var left = ParseNumberOpera2();
-        
+
         while (CurrentToken.Type == LangTokenType.Plus || CurrentToken.Type == LangTokenType.Minus)
         {
             var operatorToken = CurrentToken;
-            var position = new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position =
+                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
             Expect(operatorToken.Type);
             var right = ParseNumberOpera2();
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
         }
-        
+
         return left;
     }
-    
+
     // 乘除表达式
     private OldExpr ParseNumberOpera2()
     {
         var left = ParsePrimary();
-        
+
         // 处理点运算符（最高优先级）
         left = ParseDotExpr(left);
-        
+
         while (CurrentToken.Type == LangTokenType.Star || CurrentToken.Type == LangTokenType.Slash ||
                CurrentToken.Type == LangTokenType.Percent)
         {
             var operatorToken = CurrentToken;
-            var position = new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position =
+                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
             Expect(operatorToken.Type);
             var right = ParsePrimary();
             // 处理右操作数的点运算符
             right = ParseDotExpr(right);
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
         }
-        
+
         // 处理后置自增自减
         if (CurrentToken.Type == LangTokenType.PlusPlus)
         {
             var operatorToken = CurrentToken;
-            var position = new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position =
+                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
             Expect(LangTokenType.PlusPlus);
             left = new Operation(left, OperationType.PLUS, new IntLangValue(1), position);
         }
         else if (CurrentToken.Type == LangTokenType.MinusMinus)
         {
             var operatorToken = CurrentToken;
-            var position = new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position =
+                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
             Expect(LangTokenType.MinusMinus);
             left = new Operation(left, OperationType.MINUS, new IntLangValue(1), position);
-        }
-        
-        return left;
-    }
-
-// binaryExpression = expression ( ( "<" | ">" | "==" | "!=" | "<=" | ">=" ) expression )* ;
-    private OldExpr ParseBinaryExpressionWithLeft(OldExpr left)
-    {
-        while (CurrentToken.Type is LangTokenType.LessThanEquals or LangTokenType.GreaterThanEquals
-               or LangTokenType.Equals
-               or LangTokenType.NotEquals or LangTokenType.LessThan or LangTokenType.GreaterThan)
-        {
-            var operatorToken = CurrentToken;
-            var position = new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
-            Expect(operatorToken.Type);
-            var right = ParsePrimary();
-            left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
         }
 
         return left;
@@ -1169,60 +1156,6 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             Expect(LangTokenType.Dot);
             var right = ParsePrimary();
             left = new Operation(left, OperationType.CONCAT, right, position);
-        }
-
-        return left;
-    }
-
-// numberOpera1 = expression ( ( "+" | "-" ) expression )* ;
-    private OldExpr ParseNumberOpera1(OldExpr left)
-    {
-        while (CurrentToken.Type == LangTokenType.Plus || CurrentToken.Type == LangTokenType.Minus)
-        {
-            var operatorToken = CurrentToken;
-            var position = new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
-            Expect(operatorToken.Type);
-            var right = ParseNumberOpera2(); // 解析乘除级别的表达式，保证优先级正确
-            left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
-        }
-
-        return left;
-    }
-
-// numberOpera2 = expression ( ( "*" | "/" | "%" ) expression )* ;
-    private OldExpr ParseNumberOpera2(OldExpr left)
-    {
-        while (CurrentToken.Type == LangTokenType.Star || CurrentToken.Type == LangTokenType.Slash ||
-               CurrentToken.Type == LangTokenType.Percent)
-        {
-            var operatorToken = CurrentToken;
-            var position = new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
-            Expect(operatorToken.Type);
-            var right = ParsePrimary(); // 乘除的右操作数是primary
-            left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
-        }
-
-        return left;
-    }
-
-    // 辅助方法：从primary开始解析完整的表达式，包括乘除和加减
-    private OldExpr ParseNumberOpera2Helper()
-    {
-        var expr = ParsePrimary();
-        return ParseNumberOpera2(expr);
-    }
-
-// boolOpera = expression ( ( "and" | "or" | "xor" ) expression )* ;
-    private OldExpr ParseBoolOperaWithLeft(OldExpr left)
-    {
-        while (CurrentToken.Type == LangTokenType.And || CurrentToken.Type == LangTokenType.Or ||
-               CurrentToken.Type == LangTokenType.Xor)
-        {
-            var operatorToken = CurrentToken;
-            var position = new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
-            Expect(operatorToken.Type);
-            var right = ParsePrimary();
-            left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
         }
 
         return left;
