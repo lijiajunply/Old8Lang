@@ -116,113 +116,104 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         var r = Right;
 
         // id.id => dot_value
-        if (l is AnyLangValue any && Opera == OperationType.CONCAT)
+        if (Opera == OperationType.CONCAT)
         {
-            if (Right is Instance r1)
+            if (l is AnyLangValue any)
             {
-                // 对于成员访问，先运行所有参数表达式，获取它们的值，使用外部管理器
-                var evaluatedArgs = new List<OldExpr>();
-                foreach (var arg in r1.Ids)
+                if (Right is Instance r1)
                 {
-                    // 运行参数表达式，使用外部管理器，这样可以访问外部变量
-                    var argValue = arg.Run(manager);
-                    // 将计算结果包装为LangValueType，以便后续使用
-                    evaluatedArgs.Add(argValue);
+                    // 对于成员访问，先运行所有参数表达式，获取它们的值，使用外部管理器
+                    var evaluatedArgs = new List<OldExpr>();
+                    foreach (var arg in r1.Ids)
+                    {
+                        // 运行参数表达式，使用外部管理器，这样可以访问外部变量
+                        var argValue = arg.Run(manager);
+                        // 将计算结果包装为LangValueType，以便后续使用
+                        evaluatedArgs.Add(argValue);
+                    }
+
+                    // 创建一个新的Instance，使用已经计算好的参数值
+                    var newInstance = new Instance(r1.Id, evaluatedArgs, r1.Position);
+
+                    // 调用Dot方法，传递已经计算好的参数
+                    return any.Dot(newInstance);
                 }
 
-                // 创建一个新的Instance，使用已经计算好的参数值
-                var newInstance = new Instance(r1.Id, evaluatedArgs, r1.Position);
-
-                // 调用Dot方法，传递已经计算好的参数
-                return any.Dot(newInstance);
-            }
-
-            if (Right != null)
-            {
-                return any.Dot(Right);
-            }
-        }
-
-        if (l is ListLangValue && Opera == OperationType.CONCAT)
-        {
-            // 先尝试将 r 作为 Instance 处理
-            Instance r1;
-
-            if (r is Instance instance)
-            {
-                r1 = instance;
-            }
-            else if (r != null)
-            {
-                // 如果 r 不是 Instance，先运行它，获取实际值
-                var rValue = r.Run(manager);
-                if (rValue is Instance rInstance)
+                if (Right != null)
                 {
-                    r1 = rInstance;
+                    return any.Dot(Right);
+                }
+            }
+            else if (l is ListLangValue list)
+            {
+                // 先尝试将 r 作为 Instance 处理
+                Instance r1;
+
+                if (r is Instance instance)
+                {
+                    r1 = instance;
+                }
+                else if (r != null)
+                {
+                    // 如果 r 不是 Instance，先运行它，获取实际值
+                    var rValue = r.Run(manager);
+                    if (rValue is Instance rInstance)
+                    {
+                        r1 = rInstance;
+                    }
+                    else
+                    {
+                        // 如果运行结果不是 Instance，直接使用 r 作为操作数
+                        return list.Dot(r);
+                    }
                 }
                 else
                 {
-                    // 如果运行结果不是 Instance，直接使用 r 作为操作数
-                    return l.Dot(r);
+                    throw new InvalidOperationError(this, "列表操作需要右侧操作数");
                 }
+
+                // 处理实例的参数，运行每个参数
+                List<OldExpr> values = [];
+                values.AddRange(r1.Ids.Select(id => id.Run(manager)));
+
+                var newInstance = new Instance(r1.Id, values);
+                return list.Dot(newInstance);
+            }
+            else if (l is NativeStaticAny native)
+            {
+                // 先运行 r，获取实际值
+                var rValue = r?.Run(manager);
+
+                if (rValue is not Instance r1) throw new InvalidOperationError(this, "原生静态类型操作需要实例");
+
+                // 处理实例的参数，运行每个参数
+                List<OldExpr> values = [];
+                values.AddRange(r1.Ids.Select(id => id.Run(manager)));
+
+                var newInstance = new Instance(r1.Id, values);
+                return native.Dot(newInstance);
+            }
+            else if (l != null && r != null)
+            {
+                // 只允许在支持Dot方法的类型上调用Dot方法
+                throw new InvalidOperationError(this, $"类型 '{l.GetType().Name}' 不支持点操作");
             }
             else
             {
-                throw new InvalidOperationError(this, "列表操作需要右侧操作数");
-            }
-
-            // 处理实例的参数，运行每个参数
-            List<OldExpr> values = [];
-            values.AddRange(r1.Ids.Select(id => id.Run(manager)));
-
-            var newInstance = new Instance(r1.Id, values);
-            return l.Dot(newInstance);
-        }
-
-        if (l is NativeStaticAny && Opera == OperationType.CONCAT)
-        {
-            // 先运行 r，获取实际值
-            var rValue = r?.Run(manager);
-
-            if (rValue is not Instance r1) throw new InvalidOperationError(this, "原生静态类型操作需要实例");
-
-            // 处理实例的参数，运行每个参数
-            List<OldExpr> values = [];
-            values.AddRange(r1.Ids.Select(id => id.Run(manager)));
-
-            var newInstance = new Instance(r1.Id, values);
-            return l.Dot(newInstance);
-        }
-
-        if (l is not AnyLangValue && Opera == OperationType.CONCAT)
-        {
-            if (l is null || r is null)
                 throw new InvalidOperationError(this, "连接运算符左右操作数均不能为空");
-
-            // 先运行 r，获取实际值
-            var rValue = r.Run(manager);
-
-            if (rValue is not Instance r1)
-            {
-                // 如果不是实例，直接使用 r
-                return l.Dot(r);
             }
-
-            // 处理实例的参数，运行每个参数
-            List<OldExpr> values = [];
-            values.AddRange(r1.Ids.Select(id => id.Run(manager)));
-
-            var newInstance = new Instance(r1.Id, values);
-            return l.Dot(newInstance);
         }
 
-        // r get value
-        r = Right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
-        // (right)
-        if (Right is LangId oldId && l is not AnyLangValue)
-            r = manager.GetValue(oldId);
-        if (Right is Operation)
-            r = Right.Run(manager);
+        // 只在非CONCAT操作时运行右操作数
+        if (Opera != OperationType.CONCAT)
+        {
+            r = Right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
+            // (right)
+            if (Right is LangId oldId && l is not AnyLangValue)
+                r = manager.GetValue(oldId);
+            if (Right is Operation)
+                r = Right.Run(manager);
+        }
 
         // left xor right
         if (l is BoolLangValue && r is BoolLangValue value && Opera == OperationType.XOR)

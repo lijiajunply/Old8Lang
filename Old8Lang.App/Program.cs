@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Old8Lang;
 using Old8Lang.Compiler;
-//using Old8Lang.CslyParser;
 using Old8Lang.LangParser;
 
 // fib , compiler
@@ -9,8 +8,7 @@ using Old8Lang.LangParser;
 #if DEBUG
 string[] strings =
 [
-    "-s", Path.Combine(Path.GetDirectoryName(BasicInfo.CodePath)!,
-        "Old8Lang", "Ex", "init.old8")
+    "-f", "/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/InterpreterTests/07_member_access.old8"
 ];
 
 args = args.Length == 0 ? strings : args;
