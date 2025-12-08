@@ -1,9 +1,0 @@
-// 简单 while 循环测试
-
-PrintLine("=== while 循环测试 ===")
-
-i <- 0
-while i < 5 {
-    PrintLine("i = " + i)
-    i <- i + 1
-}

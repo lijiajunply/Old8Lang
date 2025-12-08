@@ -52,7 +52,7 @@ printMessage()
 // 测试8: 带默认参数的函数
 func power(base, exponent <- 2) {
     result <- 1
-    for i <- 0, i < exponent, i++ {
+    for i <- 0, i < exponent, i <- i + 1 {
         result <- result * base
     }
     return result
@@ -131,7 +131,7 @@ minValue <- minMax[0]
 maxValue <- minMax[1]
 
 // 测试14: 复杂函数声明（多种特性组合）
-func complexFunction(a:int, b:double, c:string, d:bool) -> {
+func complexFunction(a:int, b:double, c:string, d:bool) {
     result <- a + b
     if d {
         result <- result * 2

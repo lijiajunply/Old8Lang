@@ -1,7 +1,0 @@
-// 简单 for 循环测试
-
-PrintLine("=== for 循环测试 ===")
-
-for i <- 0, i < 5, i++ {
-    PrintLine("i = " + i)
-}

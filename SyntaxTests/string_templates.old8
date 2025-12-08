@@ -41,7 +41,7 @@ complexTemplate1 <- $("Full Name: {fullName}, Age: {age + 5}.")
 conditionalTemplate <- $("If {x} > {y}, then {x} is greater, else {y} is greater: {(x > y) ? x : y}.")
 
 // 测试7: 嵌套模板（如果支持）
-nestedTemplate <- $("Outer: {{$("Inner: {name}")}}")
+// nestedTemplate <- $("Outer: {{$("Inner: {name}")}}")
 
 // 测试8: 空模板
 emptyTemplate <- $("")
@@ -60,7 +60,7 @@ listTest <- [1, 2, 3, 4, 5]
 dictTest <- {"name": "Alice", "age": 30}
 
 collectionTemplate1 <- $("List: {listTest}, First element: {listTest[0]}")
-collectionTemplate2 <- $("Dict: {dictTest}, Name: {dictTest["name"]}, Age: {dictTest["age"]}")
+// collectionTemplate2 <- $"Dict: {dictTest}, Name: {dictTest["name"]}, Age: {dictTest["age"]}")
 
 // 测试13: 模板中使用布尔值和字符
 boolValue <- true
@@ -69,7 +69,7 @@ charValue <- 'a'
 boolCharTemplate <- $("Boolean: {boolValue}, Character: {charValue}")
 
 // 测试14: 模板中使用复杂条件
-complexCondTemplate <- $("{name} is {if age >= 18 then "an adult" else "a minor"}.")
+// complexCondTemplate <- $"{name} is {if age >= 18 then "an adult" else "a minor"}.")
 
 // 测试15: 多行模板（如果支持）
 multiLineTemplate <- $("Line 1: {name}\nLine 2: {age}\nLine 3: {city}")

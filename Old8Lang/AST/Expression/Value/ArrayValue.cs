@@ -1,7 +1,6 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
-
 using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
@@ -23,7 +22,8 @@ public class ArrayValue : ValueType, IOldList
         RunResult = [.. re];
     }
 
-    public ArrayValue(List<object> a, SourcePosition position = default) : base(position) => RunResult = [.. a.Select(ObjToValue)];
+    public ArrayValue(List<object> a, SourcePosition position = default) : base(position) =>
+        RunResult = [.. a.Select(ObjToValue)];
 
     public override ValueType Run(LangParser.VariateManager manager)
     {
@@ -52,7 +52,9 @@ public class ArrayValue : ValueType, IOldList
     }
 
     public override string ToString() =>
-        RunResult[0] == null! ? $"[{string.Join(", ", Values)}]" : $"[{string.Join(", ", RunResult)}]"; // Old8Lang 风格的数组，使用 [ ] 包裹
+        RunResult.Length == 0 ? "[]" :
+        RunResult.Length > 0 && RunResult[0] == null! ? $"[{string.Join(", ", Values)}]" :
+        $"[{string.Join(", ", RunResult)}]"; // Old8Lang 风格的数组，使用 [ ] 包裹
 
     public override object GetValue() => Apis.ListToObjects(RunResult.ToList());
     public IEnumerable<ValueType> GetItems() => RunResult;
@@ -89,7 +91,7 @@ public class ArrayValue : ValueType, IOldList
                 RunResult[i].LoadIlValue(ilGenerator, local);
                 t = RunResult[i].OutputType(local)!;
             }
-            
+
             ilGenerator.Emit(OpCodes.Box, t); // 将 int 转换为 object
 
             ilGenerator.Emit(OpCodes.Stelem_Ref); // 将值存入数组
