@@ -5,6 +5,10 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
+/// <summary>
+/// Null值
+/// </summary>
+/// <param name="position">位置</param>
 public class NullLangValue(SourcePosition position = default) : LangValueType(position)
 {
     public override string ToString() => "null";

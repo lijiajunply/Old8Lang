@@ -4,6 +4,9 @@ using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Expression.Value;
 
+/// <summary>
+/// 类型值
+/// </summary>
 public class TypeLangValue : LangValueType
 {
     private readonly OldExpr? Expr;

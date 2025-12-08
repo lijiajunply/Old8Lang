@@ -1,0 +1,19 @@
+// 测试函数调用修复
+a <- 10
+PrintLine(a)
+
+// 测试函数定义
+func add(x, y) {
+    return x + y
+}
+
+result <- add(5, 3)
+PrintLine(result)
+
+// 测试箭头函数
+double <- (x) -> {
+    return x * 2
+}
+
+doubled <- double(10)
+PrintLine(doubled)

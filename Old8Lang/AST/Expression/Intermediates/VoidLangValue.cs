@@ -3,7 +3,7 @@ using Old8Lang.Error;
 namespace Old8Lang.AST.Expression.Intermediates;
 
 /// <summary>
-/// 构造函数
+/// 静态值，不可访问
 /// </summary>
 /// <param name="position">位置信息</param>
 public class VoidLangValue(SourcePosition position = default) : LangValueType(position)

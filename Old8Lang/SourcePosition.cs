@@ -9,22 +9,22 @@ public readonly struct SourcePosition
     /// 行号（从1开始）
     /// </summary>
     public readonly int Line;
-    
+
     /// <summary>
     /// 列号（从1开始）
     /// </summary>
     public readonly int Column;
-    
+
     /// <summary>
     /// 文件名（可选）
     /// </summary>
     public readonly string? FileName;
-    
+
     /// <summary>
     /// 原始令牌值（可选）
     /// </summary>
     public readonly string? TokenValue;
-    
+
     /// <summary>
     /// 构造函数
     /// </summary>
@@ -39,16 +39,14 @@ public readonly struct SourcePosition
         FileName = fileName;
         TokenValue = tokenValue;
     }
-    
+
     /// <summary>
     /// 表示无位置信息
     /// </summary>
-    public static readonly SourcePosition None = new SourcePosition(0, 0);
-    
+    public static readonly SourcePosition None = new(0, 0);
+
     public override string ToString()
     {
-        if (FileName is not null)
-            return $"{FileName}:{Line}:{Column}";
-        return $"{Line}:{Column}";
+        return FileName is not null ? $"{FileName}({Line}:{Column})" : $"{Line}:{Column}";
     }
 }

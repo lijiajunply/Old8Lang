@@ -6,6 +6,9 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
+/// <summary>
+/// 类
+/// </summary>
 public class AnyLangValue : LangValueType
 {
     public readonly Dictionary<LangId, OldExpr> Variates;

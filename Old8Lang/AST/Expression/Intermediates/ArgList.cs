@@ -1,5 +1,10 @@
 namespace Old8Lang.AST.Expression.Intermediates;
 
+/// <summary>
+/// 参数列表
+/// </summary>
+/// <param name="args"></param>
+/// <param name="position"></param>
 public class ArgList(List<OldExpr> args, SourcePosition position = default) : OldExpr(position)
 {
     public readonly List<OldExpr> Args = args;

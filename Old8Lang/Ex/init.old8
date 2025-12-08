@@ -10,7 +10,7 @@ a <- ToObj("{\"a\" : 1,\"b\" : {\"c\" : 3}}")
 PrintLine(a.a)
 
 PrintLine("测试字符串")
-q <- ${"hello ", 10}
+q <- $"hello {10}"
 PrintLine(q)
 
 //测试函数 测试For in
@@ -22,7 +22,7 @@ for i in a {
 }
 b <- list[12,123,1231,123,1]
 b.Add(2)
-PrintLine("\n"+b.ToStr())
+PrintLine("\n"+b)
 
 // 测试类型转换
 PrintLine("测试类型转换")
@@ -38,7 +38,7 @@ PrintLine(a(5,2))
 // 测试数组
 PrintLine("测试数组")
 a <- [1,2,3]
-PrintLine(a[0:2].ToStr())
+PrintLine(a[0:2])
 
 // 测试switch
 //a <- ReadLine()

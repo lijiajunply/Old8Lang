@@ -3,6 +3,11 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
+/// <summary>
+/// 原生静态类 映射
+/// </summary>
+/// <param name="className"></param>
+/// <param name="classType"></param>
 public class NativeStaticAny(string className, Type classType) : LangValueType
 {
     public readonly string ClassName = className;

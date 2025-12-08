@@ -7,6 +7,9 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
+/// <summary>
+/// 字典 键对值
+/// </summary>
 public class DictionaryLangValue : LangValueType, ILangList
 {
     private readonly List<TupleLangValue> Tuples;

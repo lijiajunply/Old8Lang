@@ -6,6 +6,12 @@ using Old8Lang.Error;
 // ReSharper disable once CheckNamespace
 namespace Old8Lang.AST.Expression.Value;
 
+/// <summary>
+/// 实例，a(b,c)
+/// </summary>
+/// <param name="langId"></param>
+/// <param name="ids"></param>
+/// <param name="position"></param>
 public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position = default) : LangValueType(position)
 {
     public readonly List<OldExpr> Ids = ids;
@@ -152,7 +158,17 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
 
         var os = new List<object>() { baseLangValue };
         os.AddRange(Ids);
-        var r = m?.Invoke(baseLangValue, [.. os]);
+        
+        // 对于静态方法，第一个参数应该是 null，因为静态方法没有实例
+        object? invokeInstance = null;
+        // 检查是否是扩展方法（静态方法）
+        if (m?.IsStatic == false)
+        {
+            // 非静态方法，使用 baseLangValue 作为实例
+            invokeInstance = baseLangValue;
+        }
+        
+        var r = m?.Invoke(invokeInstance, [.. os]);
         if (r is LangValueType v) return v;
         return ObjToValue(r!);
     }

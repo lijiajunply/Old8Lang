@@ -3,6 +3,12 @@ using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Expression.Value;
 
+/// <summary>
+/// 元组
+/// </summary>
+/// <param name="v1"></param>
+/// <param name="v2"></param>
+/// <param name="position"></param>
 public class TupleLangValue(OldExpr v1, OldExpr v2, SourcePosition position = default) : LangValueType(position)
 {
     public readonly OldExpr Item1 = v1;

@@ -1,0 +1,1095 @@
+Running syntax tests...
+Testing: ./SyntaxTests/list_comprehensions.old8
+------------------
+Syntax Test Result
+Parser Build Time : 32.3995ms
+------------------
+func is_even(n)
+{ return n2==0
+ }
+
+func square(n)
+{ return n*n
+ }
+
+numbers <- [1, 2, 3, 4, 5]
+squares <- [x*x]
+doubles <- [x*2]
+increments <- [x+1]
+evens <- [x]
+odds <- [x]
+greater_than_2 <- [x]
+range_squares <- [x*x]
+range_doubles <- [x*2]
+array_numbers <- [10, 20, 30, 40, 50]
+array_squares <- [x*x]
+array_halves <- [x/2]
+word <- "hello"
+characters <- [c]
+uppercase <- [c.upper()]
+complex_expr <- [x*x+y*y]
+mixed_expr <- [x+"_"+y]
+matrix <- [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+flattened <- [x]
+squared_matrix <- [[x*x]]
+transposed <- [[row.i]]
+person <- {("name","Alice"), ("age",30), ("city","New York")}
+keys <- [key]
+values <- [person.key]
+key_value_pairs <- [key+": "+person.key]
+a <- [1, 2, 3]
+b <- ["a", "b"]
+cartesian_product <- [(x,y)]
+mixed_conditions <- [x]
+function_comprehension1 <- [is_even(x)]
+function_comprehension2 <- [square(x)]
+empty1 <- [x]
+empty2 <- [x]
+lambda_comprehension <- [func (x) 
+ { return x*2
+ }]
+complex_condition <- [x]
+result <- 0
+Old8Lang.AST.Statement.ForInStatement
+print(squares)
+print(evens)
+print(flattened)
+
+✅ PASS
+Testing: ./SyntaxTests/basic_syntax.old8
+------------------
+Syntax Test Result
+Parser Build Time : 33.6338ms
+------------------
+validIdentifier1 <- 1
+valid_identifier2 <- 2
+_validIdentifier3 <- 3
+ValidIdentifier4 <- 4
+intLiteral1 <- 123
+intLiteral2 <- -456
+intLiteral3 <- 0
+doubleLiteral1 <- 3.14
+doubleLiteral2 <- -0.5
+doubleLiteral3 <- 1
+doubleLiteral4 <- 1
+ <- e3
+doubleLiteral5 <- 1
+ <- e-3
+stringLiteral1 <- "hello world"
+stringLiteral2 <- ""
+stringLiteral3 <- "a"
+stringLiteral4 <- "123"
+charLiteral1 <- a
+charLiteral2 <- 1
+charLiteral3 <- n
+charLiteral4 <- \
+boolLiteral1 <- True
+boolLiteral2 <- False
+intVar <- 123
+doubleVar <- 3.14
+stringVar <- "hello"
+boolVar <- True
+charVar <- a
+arrayVar <- [1, 2, 3, 4, 5]
+arrayVar2 <- ["a", "b", "c"]
+arrayVar3 <- [True, False, True]
+listVar <- []
+listVar2 <- []
+dictVar <- {("name","Alice"), ("age",30)}
+dictVar2 <- {(1,"one"), (2,"two")}
+tupleVar <- ((1,"a"),True)
+tupleVar2 <- ("hello",3.14)
+rangeVar <- 1..10
+rangeVar2 <- 0..5
+
+✅ PASS
+Testing: ./SyntaxTests/exception_handling.old8
+------------------
+Syntax Test Result
+Parser Build Time : 36.5975ms
+------------------
+func divide(a, b)
+{ Old8Lang.AST.Statement.TryStatement
+ }
+
+class Calculator {
+    func safeDivide(a, b) {
+        Old8Lang.AST.Statement.TryStatement
+
+    }
+}
+
+Old8Lang.AST.Statement.TryStatement
+Old8Lang.AST.Statement.TryStatement
+Old8Lang.AST.Statement.TryStatement
+Old8Lang.AST.Statement.TryStatement
+Old8Lang.AST.Statement.TryStatement
+result6 <- divide(10, 2)
+result7 <- divide(10, 0)
+Old8Lang.AST.Statement.TryStatement
+result9 <- 0
+Old8Lang.AST.Statement.TryStatement
+calc <- Calculator()
+result10 <- calc.safeDivide(20, 4)
+result11 <- calc.safeDivide(20, 0)
+Old8Lang.AST.Statement.TryStatement
+Old8Lang.AST.Statement.TryStatement
+
+✅ PASS
+Testing: ./SyntaxTests/control_flow.old8
+------------------
+Syntax Test Result
+Parser Build Time : 35.4572ms
+------------------
+x <- 10
+y <- 5
+z <- 15
+listTest <- [1, 2, 3, 4, 5]
+dictTest <- {("name","Alice"), ("age",30), ("city","New York")}
+if x>10
+ { result1 <- "x > 10"
+ }
+elif x==10
+ { result1 <- "x == 10"
+ }
+else result1 <- "x < 10"
+
+
+if x>5
+ { if y>3
+ { result2 <- "x > 5 and y > 3"
+ }
+else result2 <- "x > 5 and y <= 3"
+
+
+ }
+else result2 <- "x <= 5"
+
+
+for i <- 0, i<5, i <- i+1
+{result3 <- i
+
+}
+for i <- 5, i>0, i <- i-1
+{result4 <- i
+
+}
+for i <- 0, i<10,  <- i+2
+{result5 <- i
+
+}
+count1 <- 0
+while count1<5
+result6 <- count1
+count1 <- count1+1
+
+count2 <- 5
+while count2>0
+result7 <- count2
+count2 <- count2-1
+
+Old8Lang.AST.Statement.SwitchStatement
+Old8Lang.AST.Statement.SwitchStatement
+Old8Lang.AST.Statement.ForInStatement
+Old8Lang.AST.Statement.ForInStatement
+Old8Lang.AST.Statement.ForInStatement
+result14 <- 0
+for i <- 0, i<10, i <- i+1
+{if i2==0
+ { result14 <- result14+i
+ }
+else result14 <- result14-i
+
+
+
+}
+count3 <- 0
+sum <- 0
+while count3<10
+count3 <- count3+1
+sum <- sum+count3
+
+
+✅ PASS
+Testing: ./SyntaxTests/06_assignment_expressions.old8
+------------------
+Syntax Test Result
+Parser Build Time : 33.9916ms
+------------------
+class Person {
+    name <- ""
+    age <- 0
+}
+
+a <- 10
+b <- 5
+c <- (a,)
+d <- (b,)
+ <- a+5
+e <- 10
+e <- e+5
+arrayVar <- [1, 2, 3]
+ <- arrayVar.0
+dictVar <- {("name","Alice")}
+ <- dictVar."name"
+ <- dictVar."age"
+p <- Person()
+ <- p.name
+ <- p.age
+ <- 
+
+✅ PASS
+Testing: ./SyntaxTests/04_comparison_expressions.old8
+------------------
+Syntax Test Result
+Parser Build Time : 28.1923ms
+------------------
+a <- 10
+b <- 5
+c <- 10
+result1 <- a==b
+result2 <- a==c
+result3 <- a!=b
+result4 <- a<b
+result5 <- a>b
+result6 <- ab
+result7 <- ab
+result8 <- ac
+result9 <- ac
+result10 <- a+b>c
+result11 <- a-b<c
+result12 <- a*b==c*5
+result13 <- a
+
+✅ PASS
+Testing: ./SyntaxTests/03_arithmetic_expressions.old8
+------------------
+Syntax Test Result
+Parser Build Time : 28.6568ms
+------------------
+a <- 10
+b <- 5
+c <- 3
+d <- 2
+result1 <- a+b
+result2 <- a-b
+result3 <- a*b
+result4 <- a/b
+result5 <- ab
+result6 <- a+b*c
+result7 <- (a+b,)*c
+result8 <- a/b+c
+result9 <- a/(b+c,)
+result10 <- -a
+result11 <- -b
+result12 <- a+b-c
+result13 <- a*b/c
+result14 <- a+b*c/d
+
+✅ PASS
+Testing: ./SyntaxTests/range_simple.old8
+------------------
+Syntax Test Result
+Parser Build Time : 31.2275ms
+------------------
+func sum_range(range_expr)
+{ sum <- 0
+Old8Lang.AST.Statement.ForInStatement
+return sum
+ }
+
+range1 <- 1..10
+range2 <- 0..5
+count1 <- 0
+Old8Lang.AST.Statement.ForInStatement
+squares <- [x*x]
+doubles <- [x*2]
+result <- sum_range(1..5)
+
+✅ PASS
+Testing: ./SyntaxTests/complex_syntax.old8
+Old8Lang.Error.SyntaxError: [31m[SYNTAX_ERROR][0m [33m语法错误：字符串模板格式不正确。[0m
+[34m位置:[0m ./SyntaxTests/complex_syntax.old8:45:23
+[34m上下文:[0m
+[34m 43[0m |             return $($"Result for {input} is {result}")
+[34m 44[0m |         } catch (e) {
+[34m 45[0m |             return $($"Error: {e}")
+[34m      [0m |                       [31m^ 错误发生在这里[0m
+[34m 46[0m |         } finally {
+[32m建议:[0m 请检查语法是否正确
+
+   at Old8Lang.LangParser.LangParser.ParseStringTree(Boolean isNested) in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 1709
+   at Old8Lang.LangParser.LangParser.ParseStringTree(Boolean isNested) in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 1704
+   at Old8Lang.LangParser.LangParser.ParsePrimary() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 1293
+   at Old8Lang.LangParser.LangParser.ParseExpression() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 1056
+   at Old8Lang.LangParser.LangParser.ParseReturnStatement() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 518
+   at Old8Lang.LangParser.LangParser.ParseStatement() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 300
+   at Old8Lang.LangParser.LangParser.ParseBlock() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 945
+   at Old8Lang.LangParser.LangParser.ParseTryStatement() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 975
+   at Old8Lang.LangParser.LangParser.ParseStatement() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 265
+   at Old8Lang.LangParser.LangParser.ParseBlock() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 945
+   at Old8Lang.LangParser.LangParser.ParseFuncDeclaration() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 711
+   at Old8Lang.LangParser.LangParser.ParseStatement() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 294
+   at Old8Lang.LangParser.LangParser.ParseClassBlock() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 764
+   at Old8Lang.LangParser.LangParser.ParseClassDeclaration() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 739
+   at Old8Lang.LangParser.LangParser.ParseStatement() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 306
+   at Old8Lang.LangParser.LangParser.ParseProgram() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 164
+   at Old8Lang.LangParser.LangInterpreter.Build(String code, String fileName) in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangInterpreter.cs:line 46
+   at Program.<Main>$(String[] args) in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.App/Program.cs:line 178
+❌ FAIL
+Testing: ./SyntaxTests/functions.old8
+------------------
+Syntax Test Result
+Parser Build Time : 36.4221ms
+------------------
+func add(a, b)
+{ return a+b
+ }
+
+func subtract(a, b)
+{ return a-b
+ }
+
+func sumNumbers(a, b)
+{ return a+b
+ }
+
+func sayHello()
+{ return "Hello, World!"
+ }
+
+func greet(name)
+{ return "Hello, "+name
+ }
+
+func multiply(a, b, c)
+{ return a*b*c
+ }
+
+func printMessage()
+{ print("This is a message")
+ }
+
+func power(base, exponent)
+{ result <- 1
+for i <- 0, i<exponent, i <- i+1
+{result <- result*base
+
+}
+return result
+ }
+
+func factorial(n)
+{ if n1
+ { return 1
+ }
+
+return n*factorial(n-1)
+ }
+
+func outerFunction(x)
+{ func innerFunction(y)
+{ return y*2
+ }
+
+return innerFunction(x)+x
+ }
+
+func applyOperation(a, b, operation)
+{ return operation(a, b)
+ }
+
+func addOperation(x, y)
+{ return x+y
+ }
+
+func multiplyOperation(x, y)
+{ return x*y
+ }
+
+func createMultiplier(factor)
+{ func multiplier(x)
+{ return x*factor
+ }
+
+return multiplier
+ }
+
+func getMinMax(numbers)
+{ min <- numbers.0
+max <- numbers.0
+Old8Lang.AST.Statement.ForInStatement
+return (min,max)
+ }
+
+func complexFunction(a, b, c, d)
+{ result <- a+b
+if d
+ { result <- result*2
+ }
+
+return c+" "+result
+ }
+
+result1 <- add(1, 2)
+result2 <- subtract(5, 3)
+result3 <- sumNumbers(10, 20)
+result4 <- sayHello()
+result5 <- greet("Alice")
+result6 <- multiply(2, 3, 4)
+printMessage()
+result7 <- power(3)
+result8 <- power(3, 4)
+result9 <- factorial(5)
+result10 <- outerFunction(5)
+result11 <- applyOperation(3, 4, addOperation)
+result12 <- applyOperation(3, 4, multiplyOperation)
+multiplyBy3 <- createMultiplier(3)
+result13 <- multiplyBy3(5)
+multiplyBy5 <- createMultiplier(5)
+result14 <- multiplyBy5(5)
+minMax <- getMinMax([1, 3, 5, 2, 4])
+minValue <- minMax.0
+maxValue <- minMax.1
+result15 <- complexFunction(10, 3.14, "Result:", True)
+
+✅ PASS
+Testing: ./SyntaxTests/05_logical_expressions.old8
+------------------
+Syntax Test Result
+Parser Build Time : 29.7323ms
+------------------
+e <- True
+f <- False
+result1 <- ef
+result2 <- ef
+result3 <- ef
+result4 <- e
+result5 <- f
+result6 <- (a>b,)(c>d,)
+result7 <- (a>b,)(c<d,)
+result8 <- (a>b,)(c<d,)
+result9 <- (a>b,)
+result10 <- efe
+result11 <- efe
+result12 <- ef
+result13 <- (ef,)
+
+✅ PASS
+Testing: ./SyntaxTests/lambda.old8
+------------------
+Syntax Test Result
+Parser Build Time : 32.0811ms
+------------------
+func applyOperation(a, b, operation)
+{ return operation(a, b)
+ }
+
+func createMultiplier(factor)
+{ return func (x) 
+ { return x*factor
+ }
+ }
+
+func map(list, func)
+{ result <- []
+Old8Lang.AST.Statement.ForInStatement
+return result
+ }
+
+add <- func (a, b) 
+ { return a+b
+ }
+result1 <- add(1, 2)
+subtract <- func (a, b) 
+ { return a-b
+ }
+result2 <- subtract(5, 3)
+sayHello <- func () 
+ { return "Hello, World!"
+ }
+result3 <- sayHello()
+double <- func (x) 
+ { return x*2
+ }
+result4 <- double(5)
+multiply <- func (a, b, c) 
+ { return a*b*c
+ }
+result5 <- multiply(2, 3, 4)
+power <- func (base, exponent) 
+ { result <- 1
+for i <- 0, i<exponent, i <- i+1
+{result <- result*base
+
+}
+return result
+ }
+result6 <- power(3, 2)
+result7 <- power(3, 4)
+result8 <- applyOperation(3, 4, func (x, y) 
+ { return x+y
+ })
+result9 <- applyOperation(3, 4, func (x, y) 
+ { return x*y
+ })
+multiplyBy3 <- createMultiplier(3)
+result10 <- multiplyBy3(5)
+multiplyBy5 <- createMultiplier(5)
+result11 <- multiplyBy5(5)
+complexLambda <- func (x, y, z) 
+ { if x>y
+ { return x+z
+ }
+elif y>z
+ { return y+x
+ }
+else return z+y
+
+
+ }
+result12 <- complexLambda(10, 5, 3)
+result13 <- complexLambda(3, 10, 5)
+result14 <- complexLambda(3, 5, 10)
+numbers <- [1, 2, 3, 4, 5]
+result15 <- map(numbers, func (x) 
+ { return x*2
+ })
+result16 <- map(numbers, func (x) 
+ { return x+1
+ })
+factor <- 10
+captureLambda <- func (x) 
+ { return x*factor
+ }
+result17 <- captureLambda(5)
+factor <- 20
+result18 <- captureLambda(5)
+
+✅ PASS
+Testing: ./SyntaxTests/expressions.old8
+------------------
+Syntax Test Result
+Parser Build Time : 34.7775ms
+------------------
+class Person {
+    name <- ""
+    age <- 0
+    func sayHello() {
+        return "Hello, "+name
+
+    }
+}
+
+func add(x, y)
+{ return x+y
+ }
+
+func multiply(x, y)
+{ return x*y
+ }
+
+func greet(name)
+{ return "Hello, "+name
+ }
+
+func callWithArgs(a, b, c)
+{ return a+b+c
+ }
+
+a <- 10
+b <- 5
+c <- 3
+d <- 2
+e <- True
+f <- False
+str1 <- "hello"
+str2 <- " world"
+arithmetic1 <- a+b
+arithmetic2 <- a-b
+arithmetic3 <- a*b
+arithmetic4 <- a/b
+arithmetic5 <- ab
+arithmetic6 <- a+b*c
+arithmetic7 <- (a+b,)*c
+arithmetic8 <- -a
+arithmetic9 <- a+1
+arithmetic10 <- a-1
+comparison1 <- a==b
+comparison2 <- a!=b
+comparison3 <- a<b
+comparison4 <- a>b
+comparison5 <- ab
+comparison6 <- ab
+comparison7 <- a+b==c*d
+comparison8 <- a<b+c
+logic1 <- ef
+logic2 <- ef
+logic3 <- ef
+logic4 <- e
+logic5 <- f
+logic6 <- (a>b,)(c>d,)
+logic7 <- (a>b,)(c<d,)
+logic8 <- (a>b,)(c<d,)
+logic9 <- (a>b,)
+assign1 <- a
+assign2 <- a+b
+assign3 <- (a+b,)*c
+assign4 <- [1, 2, 3]
+assign5 <- {("name","Alice")}
+person <- Person()
+ <- person.name
+ <- person.age
+memberAccess1 <- person.name
+memberAccess2 <- person.age
+memberAccess3 <- person.sayHello()
+arrayTest <- [10, 20, 30, 40, 50]
+listTest <- []
+dictTest <- {("key1","value1"), ("key2",123), ("key3",True)}
+index1 <- arrayTest.0
+index2 <- arrayTest.1
+index3 <- listTest.0
+index4 <- listTest.1
+index5 <- dictTest."key1"
+index6 <- dictTest."key2"
+index7 <- dictTest."key3"
+funcCall1 <- add(1, 2)
+funcCall2 <- multiply(3, 4)
+funcCall3 <- greet("Alice")
+funcCall4 <- callWithArgs(1, 2, 3)
+funcCall5 <- add(a, b)
+funcCall6 <- multiply(add(1, 2), add(3, 4))
+complexExpr1 <- (a+b,)*c/d
+complexExpr2 <- (a>b,)(c<d,)(ef,)
+complexExpr3 <- arrayTest.add(1, 2)
+complexExpr4 <- dictTest.greet("key")
+complexExpr5 <- person.sayHello()+str1+str2
+
+✅ PASS
+Testing: ./SyntaxTests/string_templates.old8
+------------------
+Syntax Test Result
+Parser Build Time : 34.3654ms
+------------------
+func getFullName(firstName, lastName)
+{ return firstName+" "+lastName
+ }
+
+name <- "Alice"
+age <- 30
+city <- "New York"
+x <- 10
+y <- 20
+message1 <- System.Object
+message2 <- System.Object
+message3 <- System.Object
+sumMessage <- System.Object
+productMessage <- System.Object
+comparisonMessage <- System.Object
+escapedBrace1 <- System.Object
+escapedBrace2 <- System.Object
+escapedBrace3 <- System.Object
+escapedBrace4 <- System.Object
+mixedTemplate <- System.Object
+fullName <- getFullName("Alice", "Smith")
+complexTemplate1 <- System.Object
+conditionalTemplate <- System.Object
+emptyTemplate <- System.Object
+onlyEscapedTemplate <- System.Object
+complexExprTemplate <- System.Object
+mixedExprTemplate <- System.Object
+listTest <- [1, 2, 3, 4, 5]
+dictTest <- {("name","Alice"), ("age",30)}
+collectionTemplate1 <- System.Object
+boolValue <- True
+charValue <- a
+boolCharTemplate <- System.Object
+multiLineTemplate <- System.Object
+print(message1)
+print(sumMessage)
+print(escapedBrace1)
+print(mixedTemplate)
+
+✅ PASS
+Testing: ./SyntaxTests/lambda_simple.old8
+------------------
+Syntax Test Result
+Parser Build Time : 29.0672ms
+------------------
+add <- func (a, b) 
+ { return a+b
+ }
+result1 <- add(1, 2)
+subtract <- func (a, b) 
+ { return a-b
+ }
+result2 <- subtract(5, 3)
+sayHello <- func () 
+ { return "Hello, World!"
+ }
+result3 <- sayHello()
+double <- func (x) 
+ { return x*2
+ }
+result4 <- double(5)
+multiply <- func (a, b, c) 
+ { return a*b*c
+ }
+result5 <- multiply(2, 3, 4)
+
+✅ PASS
+Testing: ./SyntaxTests/range_expressions.old8
+Old8Lang.Error.SyntaxError: [31m[SYNTAX_ERROR][0m [33m语法错误：字符串模板格式不正确。[0m
+[34m位置:[0m ./SyntaxTests/range_expressions.old8:90:22
+[34m上下文:[0m
+[34m 88[0m |         for i in range_expr {
+[34m 89[0m |             sum <- sum + i
+[34m 90[0m |         }
+[34m      [0m |                      [31m^ 错误发生在这里[0m
+[34m 91[0m |         return sum
+[32m建议:[0m 请检查语法是否正确
+
+   at Old8Lang.LangParser.LangParser.ParseStringTree(Boolean isNested) in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 1709
+   at Old8Lang.LangParser.LangParser.ParseStringTree(Boolean isNested) in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 1704
+   at Old8Lang.LangParser.LangParser.ParsePrimary() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 1293
+   at Old8Lang.LangParser.LangParser.ParseExpression() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 1056
+   at Old8Lang.LangParser.LangParser.ParseSet() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 561
+   at Old8Lang.LangParser.LangParser.ParseStatement() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 321
+   at Old8Lang.LangParser.LangParser.ParseProgram() in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs:line 164
+   at Old8Lang.LangParser.LangInterpreter.Build(String code, String fileName) in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangInterpreter.cs:line 46
+   at Program.<Main>$(String[] args) in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.App/Program.cs:line 178
+❌ FAIL
+Testing: ./SyntaxTests/01_basic_literals.old8
+------------------
+Syntax Test Result
+Parser Build Time : 32.2715ms
+------------------
+intLiteral1 <- 123
+intLiteral2 <- -456
+intLiteral3 <- 0
+doubleLiteral1 <- 3.14
+doubleLiteral2 <- -0.5
+doubleLiteral3 <- 1
+stringLiteral1 <- "hello world"
+stringLiteral2 <- ""
+stringLiteral3 <- "a"
+charLiteral1 <- a
+charLiteral2 <- 1
+charLiteral3 <- n
+boolLiteral1 <- True
+boolLiteral2 <- False
+
+✅ PASS
+Testing: ./SyntaxTests/line_number_test2.old8
+------------------
+Syntax Test Result
+Parser Build Time : 28.1594ms
+------------------
+var1 <- "line1
+line2
+line3"
+var2 <- 123
+var3 <- "test"
+
+✅ PASS
+Testing: ./SyntaxTests/line_number_test3.old8
+------------------
+Syntax Test Result
+Parser Build Time : 28.0446ms
+------------------
+var1 <- "line1
+line2
+line3"
+var2 <- 123
+var3 <- "test"
+
+✅ PASS
+Testing: ./SyntaxTests/line_number_test.old8
+------------------
+Syntax Test Result
+Parser Build Time : 27.8887ms
+------------------
+test1 <- "hello
+world"
+print(test1)
+test2 <- "line1
+line2
+line3"
+print(test2)
+test3 <- a
+print(test3)
+
+✅ PASS
+Testing: ./SyntaxTests/02_basic_types.old8
+------------------
+Syntax Test Result
+Parser Build Time : 33.3761ms
+------------------
+intVar <- 123
+doubleVar <- 3.14
+stringVar <- "hello"
+boolVar <- True
+charVar <- a
+arrayVar <- [1, 2, 3, 4, 5]
+arrayVar2 <- ["a", "b", "c"]
+arrayVar3 <- [True, False, True]
+listVar <- []
+listVar2 <- []
+dictVar <- {("name","Alice"), ("age",30)}
+dictVar2 <- {(1,"one"), (2,"two")}
+tupleVar <- ((1,"a"),True)
+tupleVar2 <- ("hello",3.14)
+rangeVar <- 1..10
+rangeVar2 <- 0..5
+
+✅ PASS
+Testing: ./SyntaxTests/import_statements.old8
+------------------
+Syntax Test Result
+Parser Build Time : 32.5196ms
+------------------
+import module1
+import module2
+import module3
+import module4
+import module5
+import module6
+import math
+import file
+func testImport()
+{ import localModule
+ }
+
+class TestClass {
+    func test() {
+        
+    }
+}
+
+import repeatedModule
+import repeatedModule
+import repeatedModule
+import repeatedModule
+import complex1
+import complex2
+import complex3
+import complex4
+func complexFunction()
+{ return 42
+ }
+
+x <- 10
+y <- 20
+if x>5
+ { import conditionalModule
+ }
+
+result <- complexFunction()
+
+✅ PASS
+Testing: ./SyntaxTests/classes.old8
+------------------
+Syntax Test Result
+Parser Build Time : 38.9419ms
+------------------
+class Person {
+    name <- ""
+    age <- 0
+    func sayHello() {
+        return "Hello, my name is "+name
+
+    }
+}
+
+class Student {
+    name <- ""
+    age <- 0
+    grade <- 0
+    func getInfo() {
+        return "Name: "+name+", Age: "+age+", Grade: "+grade
+
+    }
+}
+
+class Calculator {
+    func add(a, b) {
+        return a+b
+
+    }
+    func multiply(a, b) {
+        return a*b
+
+    }
+    func divide(a, b) {
+        if b==0
+ { return 0
+ }
+
+return a/b
+
+    }
+}
+
+class Point {
+    x <- 0
+    y <- 0
+    func init(newX, newY) {
+        x <- newX
+y <- newY
+
+    }
+    func getDistance() {
+        return (x*x+y*y,)/2
+
+    }
+}
+
+class Animal {
+    name <- ""
+    func speak() {
+        return "Animal speaks"
+
+    }
+}
+
+class Dog {
+    breed <- ""
+    func speak() {
+        return "Woof!"
+
+    }
+    func getBreed() {
+        return breed
+
+    }
+}
+
+class Cat {
+    func speak() {
+        return "Meow!"
+
+    }
+}
+
+class MathUtils {
+    func add(a, b) {
+        return a+b
+
+    }
+    func multiply(a, b) {
+        return a*b
+
+    }
+}
+
+class OuterClass {
+    outerField <- 10
+    func outerMethod() {
+        return outerField
+
+    }
+}
+
+class ComplexClass {
+    intField <- 0
+    doubleField <- 0
+    stringField <- ""
+    boolField <- False
+    charField <- a
+    arrayField <- [1, 2, 3]
+    listField <- [4, 5, 6]
+    dictField <- {"key1": "value1", "key2": 123}
+    func setFields(intVal, doubleVal, stringVal, boolVal, charVal) {
+        intField <- intVal
+doubleField <- doubleVal
+stringField <- stringVal
+boolField <- boolVal
+charField <- charVal
+
+    }
+    func getFields() {
+        return ((((intField,doubleField),stringField),boolField),charField)
+
+    }
+    func modifyCollection() {
+         <- arrayField.0
+ <- listField.Add(7)
+ <- dictField."key3"
+
+    }
+}
+
+class Address {
+    street <- ""
+    city <- ""
+    country <- ""
+    func getFullAddress() {
+        return street+", "+city+", "+country
+
+    }
+}
+
+class Employee {
+    name <- ""
+    address <- null
+    func setAddress(street, city, country) {
+         <- address.street
+ <- street
+ <- address.city
+ <- city
+ <- address.country
+ <- country
+
+    }
+    func getEmployeeInfo() {
+        return "Name: "+name+", Address: "+address.getFullAddress()
+
+    }
+}
+
+p1 <- Person()
+ <- p1.name
+ <- p1.age
+result1 <- p1.sayHello()
+s1 <- Student()
+ <- s1.name
+ <- s1.age
+ <- s1.grade
+result2 <- s1.getInfo()
+calc <- Calculator()
+result3 <- calc.add(10, 20)
+result4 <- calc.multiply(10, 20)
+result5 <- calc.divide(10, 2)
+p2 <- Point()
+ <- p2.init(3, 4)
+result6 <- p2.getDistance()
+dog <- Dog()
+ <- dog.name
+ <- dog.breed
+result7 <- dog.speak()
+result8 <- dog.getBreed()
+cat <- Cat()
+ <- cat.name
+result9 <- cat.speak()
+result10 <- MathUtils.add(5, 3)
+result11 <- MathUtils.multiply(5, 3)
+outer <- OuterClass()
+result12 <- outer.outerMethod()
+complex <- ComplexClass()
+ <- complex.setFields(10, 3.14, "test", True, b)
+result13 <- complex.getFields()
+ <- complex.modifyCollection()
+result14 <- complex.arrayField.0
+result15 <- complex.listField.3
+result16 <- complex.dictField."key3"
+emp <- Employee()
+ <- emp.name
+ <- emp.setAddress("123 Main St", "New York", "USA")
+result17 <- emp.getEmployeeInfo()
+
+✅ PASS
+\n\n=== Syntax Test Results ===
+Total: 23
+Passed: 21
+Failed: 2
+\n❌ Some syntax tests failed!

@@ -7,6 +7,11 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
+/// <summary>
+/// 字符串
+/// </summary>
+/// <param name="context"></param>
+/// <param name="position"></param>
 public class StringLangValue(string context, SourcePosition position = default) : LangValueType(position), ILangList
 {
     public readonly string Value = context.Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\r", "\r")

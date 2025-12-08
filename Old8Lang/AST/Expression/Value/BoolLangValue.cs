@@ -5,6 +5,11 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
+/// <summary>
+/// bool
+/// </summary>
+/// <param name="value"></param>
+/// <param name="position"></param>
 public class BoolLangValue(bool value, SourcePosition position = default) : LangValueType(position)
 {
     public readonly bool Value = value;

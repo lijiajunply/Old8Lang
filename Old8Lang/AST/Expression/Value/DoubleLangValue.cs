@@ -6,6 +6,11 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
+/// <summary>
+/// 小数值
+/// </summary>
+/// <param name="doubleValue"></param>
+/// <param name="position"></param>
 public class DoubleLangValue(double doubleValue, SourcePosition position = default) : LangValueType(position)
 {
     public readonly double Value = doubleValue;

@@ -5,6 +5,9 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
+/// <summary>
+/// 数列
+/// </summary>
 public class ArrayLangValue : LangValueType, ILangList
 {
     private readonly LangValueType[] RunResult;

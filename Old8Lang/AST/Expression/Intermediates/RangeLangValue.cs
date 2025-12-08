@@ -5,6 +5,12 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
+/// <summary>
+/// 范围表达式，创建一个整数数组
+/// </summary>
+/// <param name="start"></param>
+/// <param name="end"></param>
+/// <param name="position"></param>
 public class RangeLangValue(OldExpr? start, OldExpr? end, SourcePosition position = default) : LangValueType(position)
 {
     public override LangValueType Run(LangParser.VariateManager manager)

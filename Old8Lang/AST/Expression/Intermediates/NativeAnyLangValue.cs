@@ -6,7 +6,7 @@ using Old8Lang.LangParser;
 namespace Old8Lang.AST.Expression.Intermediates;
 
 /// <summary>
-/// 适用于有构造函数的类
+/// 原生映射 适用于有构造函数的类
 /// </summary>
 public class NativeAnyLangValue(string dllName, string className, string path) : LangValueType
 {

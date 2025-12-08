@@ -58,7 +58,7 @@ public class BlockStatement : OldStatement
             statement.GenerateIl(ilGenerator, local);
         }
     }
-    
+
     public void GenerateImportIl(ILGenerator ilGenerator, LocalManager local)
     {
         foreach (var statement in ImportStatements)
@@ -120,24 +120,32 @@ public class BlockStatement : OldStatement
         var c = new Dictionary<LangId, OldExpr>();
         OtherStatements.ForEach(x =>
         {
-            var result = GetTuple(x);
-            c.Add(result.id, result.Expr);
+            var (id, expr) = GetTuple(x);
+            if (id != null! && expr != null!)
+            {
+                c.TryAdd(id, expr);
+            }
         });
         ImportStatements.ForEach(x =>
         {
-            var result = GetTuple(x);
-            c.Add(result.id, result.Expr);
+            var (id, expr) = GetTuple(x);
+            if (id != null! && expr != null!)
+            {
+                c.TryAdd(id, expr);
+            }
         });
         return c;
     }
 
-    private static (LangId id, OldExpr Expr) GetTuple(IOldLangTree a)
+    private static (LangId? id, OldExpr? Expr) GetTuple(IOldLangTree a)
     {
         return a switch
         {
             SetStatement statement => (id: statement.Id, Expr: statement.Value),
-            FuncInit init => (init.FuncLangValue.Id!, FuncValue: init.FuncLangValue),
-            _ => (null!, null!)
+            FuncInit init => (init.FuncLangValue.Id!, Expr: init.FuncLangValue),
+            // 对于 ClassInit，我们不需要将其转换为字典中的键值对
+            ClassInit => (null, null),
+            _ => (null, null)
         };
     }
 

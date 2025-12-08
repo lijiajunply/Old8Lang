@@ -5,6 +5,11 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
+/// <summary>
+/// 字符
+/// </summary>
+/// <param name="value"></param>
+/// <param name="position"></param>
 public class CharLangValue(char value, SourcePosition position = default) : LangValueType(position)
 {
     public readonly char Value = value;

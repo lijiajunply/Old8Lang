@@ -2,6 +2,12 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
+/// <summary>
+/// 切片表达式
+/// </summary>
+/// <param name="id"></param>
+/// <param name="start"></param>
+/// <param name="end"></param>
 public class SliceLangValue(LangId id, OldExpr? start = null, OldExpr? end = null) : LangValueType
 {
     public override LangValueType Run(LangParser.VariateManager manager)

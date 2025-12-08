@@ -63,7 +63,33 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
         if (l is ListLangValue && opera == OperationType.CONCAT)
         {
-            if (r is not Instance r1) throw new InvalidOperationError(this, "列表操作需要实例");
+            // 先尝试将 r 作为 Instance 处理
+            Instance r1;
+            
+            if (r is Instance instance)
+            {
+                r1 = instance;
+            }
+            else if (r != null)
+            {
+                // 如果 r 不是 Instance，先运行它，获取实际值
+                var rValue = r.Run(manager);
+                if (rValue is Instance rInstance)
+                {
+                    r1 = rInstance;
+                }
+                else
+                {
+                    // 如果运行结果不是 Instance，直接使用 r 作为操作数
+                    return l.Dot(r);
+                }
+            }
+            else
+            {
+                throw new InvalidOperationError(this, "列表操作需要右侧操作数");
+            }
+            
+            // 处理实例的参数，运行每个参数
             List<OldExpr> values = [];
             values.AddRange(r1.Ids.Select(id => id.Run(manager)));
 
@@ -73,7 +99,12 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
         if (l is NativeStaticAny && opera == OperationType.CONCAT)
         {
-            if (r is not Instance r1) throw new InvalidOperationError(this, "原生静态类型操作需要实例");
+            // 先运行 r，获取实际值
+            var rValue = r?.Run(manager);
+            
+            if (rValue is not Instance r1) throw new InvalidOperationError(this, "原生静态类型操作需要实例");
+            
+            // 处理实例的参数，运行每个参数
             List<OldExpr> values = [];
             values.AddRange(r1.Ids.Select(id => id.Run(manager)));
 
@@ -85,7 +116,22 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         {
             if (l is null || r is null)
                 throw new InvalidOperationError(this, "连接运算符左右操作数均不能为空");
-            return l.Dot(r);
+            
+            // 先运行 r，获取实际值
+            var rValue = r?.Run(manager);
+            
+            if (rValue is not Instance r1)
+            {
+                // 如果不是实例，直接使用 r
+                return l.Dot(r);
+            }
+            
+            // 处理实例的参数，运行每个参数
+            List<OldExpr> values = [];
+            values.AddRange(r1.Ids.Select(id => id.Run(manager)));
+
+            var newInstance = new Instance(r1.Id, values);
+            return l.Dot(newInstance);
         }
 
         // r get value

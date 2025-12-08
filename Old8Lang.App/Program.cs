@@ -68,6 +68,7 @@ if (args[0] == BasicInfo.Order["FromFile"])
     {
 #if DEBUG
         Console.WriteLine(e);
+        throw;
 #else
         Console.WriteLine(e.Message);
 #endif
@@ -168,14 +169,26 @@ if (args[0] == BasicInfo.Order["SyntaxTest"])
         return;
     }
 
-    var interpreter = new LangInterpreter();
-    var sw = new Stopwatch();
-    sw.Start();
-    var code = Apis.FromFile(args[1]);
-    var build = interpreter.Build(code, args[1]);
-    sw.Stop();
-    var ts = sw.Elapsed.TotalMilliseconds;
+    try
+    {
+        var interpreter = new LangInterpreter();
+        var sw = new Stopwatch();
+        sw.Start();
+        var code = Apis.FromFile(args[1]);
+        var build = interpreter.Build(code, args[1]);
+        sw.Stop();
+        var ts = sw.Elapsed.TotalMilliseconds;
 
-    Console.WriteLine($"------------------\nSyntax Test Result\nParser Build Time : {ts}ms\n------------------");
-    Console.WriteLine(build.ToCode());
+        Console.WriteLine($"------------------\nSyntax Test Result\nParser Build Time : {ts}ms\n------------------");
+        Console.WriteLine(build.ToCode());
+    }
+    catch (Exception e)
+    {
+#if DEBUG
+        Console.WriteLine(e);
+        throw;
+#else
+        Console.WriteLine(e.Message);
+#endif
+    }
 }

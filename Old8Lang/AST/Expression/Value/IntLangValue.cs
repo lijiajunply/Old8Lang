@@ -6,6 +6,11 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
+/// <summary>
+/// int 整数型
+/// </summary>
+/// <param name="intValue">int数据</param>
+/// <param name="position">位置</param>
 public class IntLangValue(int intValue, SourcePosition position = default) : LangValueType(position)
 {
     public int Value { get; set; } = intValue;

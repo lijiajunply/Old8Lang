@@ -203,7 +203,7 @@ class Address {
 
 class Employee {
     name <- ""
-    address <- Address()
+    address <- null
     
     func setAddress(street, city, country) {
         address.street <- street
