@@ -29,7 +29,20 @@ public class WhileStatement(OldExpr expr, BlockStatement blockStatement, SourceP
 
             if (expr1)
             {
-                blockStatement.Run(manager);
+                try
+                {
+                    blockStatement.Run(manager);
+                }
+                catch (BreakException)
+                {
+                    // 处理break
+                    break;
+                }
+                catch (ContinueException)
+                {
+                    // 处理continue，直接进入下一轮循环
+                    continue;
+                }
             }
             else
             {
@@ -37,28 +50,42 @@ public class WhileStatement(OldExpr expr, BlockStatement blockStatement, SourceP
                 return;
             }
         }
+        
+        manager.RemoveChildren();
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        // 创建循环开始标签
+        // 创建循环标签
         var loopStart = ilGenerator.DefineLabel();
         var loopEnd = ilGenerator.DefineLabel();
 
-        // 跳转到循环开始
+        // 保存当前的break和continue标签，以便嵌套循环使用
+        var oldBreakLabel = local.BreakLabel;
+        var oldContinueLabel = local.ContinueLabel;
+        
+        // 设置当前循环的break和continue标签
+        local.BreakLabel = loopEnd;
+        local.ContinueLabel = loopStart; // while循环中continue直接跳转到循环开始
+
+        // 循环开始标签
         ilGenerator.MarkLabel(loopStart);
 
         // 检查循环条件
         expr.LoadIlValue(ilGenerator, local);
-        ilGenerator.Emit(OpCodes.Brfalse, loopEnd); // 如果 loopCounter >= 10，跳转到 loopEnd
+        ilGenerator.Emit(OpCodes.Brfalse, loopEnd); // 如果条件为false，跳转到循环结束
         
         blockStatement.GenerateIl(ilGenerator, local);
 
         // 跳转回循环开始
-        ilGenerator.Emit(OpCodes.Br, loopStart); // 跳转到 loopStart
+        ilGenerator.Emit(OpCodes.Br, loopStart); // 跳转到循环开始
 
         // 循环结束标签
         ilGenerator.MarkLabel(loopEnd);
+        
+        // 恢复之前的break和continue标签
+        local.BreakLabel = oldBreakLabel;
+        local.ContinueLabel = oldContinueLabel;
     }
 
     public override OldStatement this[int index] => blockStatement[index];

@@ -18,6 +18,8 @@ statement = lrBlock
           | plusPlus
           | minusMinus
           | returnStatement
+          | breakStatement
+          | continueStatement
           | tryStatement ;
 
 lrBlock = "(" statement ")" ;
@@ -149,6 +151,10 @@ dicTuple = expression ":" expression ;
 slice = identifier "[" expression ":" expression "]" ;
 
 asStatement = identifier "as" identifier ;
+
+breakStatement = "break" ;
+
+continueStatement = "continue" ;
 
 argList =  (expression "," expression )* ;
 

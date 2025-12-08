@@ -206,6 +206,8 @@ public enum LangTokenType
     Default,
     Return,
     As,
+    Break,
+    Continue,
     List,
     This
 }
@@ -230,6 +232,8 @@ public enum KeywordType
     Default,
     Return,
     As,
+    Break,
+    Continue,
     Try,
     Catch,
     Finally,

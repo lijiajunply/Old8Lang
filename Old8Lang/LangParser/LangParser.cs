@@ -295,6 +295,18 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         {
             return ParseReturnStatement();
         }
+        
+        // 处理break语句：break
+        if (CurrentToken.Type == LangTokenType.Break)
+        {
+            return ParseBreakStatement();
+        }
+        
+        // 处理continue语句：continue
+        if (CurrentToken.Type == LangTokenType.Continue)
+        {
+            return ParseContinueStatement();
+        }
 
         // 处理class定义：class identifier block
         if (CurrentToken.Type == LangTokenType.Class)
@@ -541,6 +553,22 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         Expect(LangTokenType.Return);
         var expression = ParseExpression();
         return new ReturnStatement(expression, position);
+    }
+    
+    private BreakStatement ParseBreakStatement()
+    {
+        var breakToken = CurrentToken;
+        var position = new SourcePosition(breakToken.Line, breakToken.Column, tokenValue: breakToken.Value);
+        Expect(LangTokenType.Break);
+        return new BreakStatement(position);
+    }
+    
+    private ContinueStatement ParseContinueStatement()
+    {
+        var continueToken = CurrentToken;
+        var position = new SourcePosition(continueToken.Line, continueToken.Column, tokenValue: continueToken.Value);
+        Expect(LangTokenType.Continue);
+        return new ContinueStatement(position);
     }
 
     // lrBlock = "(" statement ")" ;

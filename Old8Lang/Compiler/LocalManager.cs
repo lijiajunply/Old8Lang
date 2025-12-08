@@ -13,6 +13,10 @@ public class LocalManager
     public Type? InClassEnv { get; init; }
     public string FilePath { get; set; } = "";
     public IMiniInterpreter? Interpreter { get; init; }
+    
+    // break和continue标签
+    public Label? BreakLabel { get; set; }
+    public Label? ContinueLabel { get; set; }
 
     public LocalManager New()
     {

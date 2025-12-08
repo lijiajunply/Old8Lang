@@ -29,7 +29,22 @@ public class ForStatement(
                 throw new TypeError(this, "期望布尔类型", $"实际得到了 {varExpr.GetType().Name}");
             if (expr1)
             {
-                blockStatement.Run(manager);
+                try
+                {
+                    blockStatement.Run(manager);
+                }
+                catch (BreakException)
+                {
+                    // 处理break
+                    break;
+                }
+                catch (ContinueException)
+                {
+                    // 处理continue，执行循环增量操作
+                    statement.Run(manager);
+                    continue;
+                }
+                // 正常执行，执行循环增量操作
                 statement.Run(manager);
             }
             else
@@ -43,26 +58,41 @@ public class ForStatement(
     {
         setStatement.GenerateIl(ilGenerator, local);
 
-        // 创建循环开始标签
+        // 创建循环标签
         var loopStart = ilGenerator.DefineLabel();
         var loopEnd = ilGenerator.DefineLabel();
+        var continueLabel = ilGenerator.DefineLabel();
+
+        // 保存当前的break和continue标签，以便嵌套循环使用
+        var oldBreakLabel = local.BreakLabel;
+        var oldContinueLabel = local.ContinueLabel;
+        
+        // 设置当前循环的break和continue标签
+        local.BreakLabel = loopEnd;
+        local.ContinueLabel = continueLabel;
 
         // 跳转到循环开始
         ilGenerator.MarkLabel(loopStart);
 
         // 检查循环条件
         expr.LoadIlValue(ilGenerator, local);
-        ilGenerator.Emit(OpCodes.Brfalse, loopEnd); // 如果 loopCounter >= 10，跳转到 loopEnd
+        ilGenerator.Emit(OpCodes.Brfalse, loopEnd); // 如果条件为false，跳转到循环结束
         
         blockStatement.GenerateIl(ilGenerator, local);
 
+        // continue标签：执行循环迭代语句
+        ilGenerator.MarkLabel(continueLabel);
         statement.GenerateIl(ilGenerator, local);
 
         // 跳转回循环开始
-        ilGenerator.Emit(OpCodes.Br, loopStart); // 跳转到 loopStart
+        ilGenerator.Emit(OpCodes.Br, loopStart); // 跳转到循环开始
 
         // 循环结束标签
         ilGenerator.MarkLabel(loopEnd);
+        
+        // 恢复之前的break和continue标签
+        local.BreakLabel = oldBreakLabel;
+        local.ContinueLabel = oldContinueLabel;
     }
 
     public override OldStatement this[int index] => blockStatement[index];

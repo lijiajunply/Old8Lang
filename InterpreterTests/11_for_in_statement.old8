@@ -14,9 +14,9 @@ for item in array {
 // 遍历列表
 PrintLine("\n=== 遍历列表 ===")
 
-list <- list[1, 2, 3, 4, 5]
+a_list <- list[1, 2, 3, 4, 5]
 PrintLine("列表元素：")
-for item in list {
+for item in a_list {
     PrintLine("item = " + item)
 }
 

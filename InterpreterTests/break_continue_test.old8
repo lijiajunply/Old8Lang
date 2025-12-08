@@ -1,0 +1,98 @@
+// 测试 break 和 continue 语句
+
+PrintLine("=== break 和 continue 语句测试 ===")
+
+// 定义list变量，使其在所有for-in循环中可用
+list <- [1, 2, 3, 4, 5]
+
+// 测试 break 在 for 循环中的功能
+PrintLine("\n=== for 循环中的 break 测试 ===")
+for i <- 0, i < 10, i++ {
+    PrintLine("i = " + i)
+    if i == 5 {
+        PrintLine("触发 break")
+        break
+    }
+}
+
+// 测试 continue 在 for 循环中的功能
+PrintLine("\n=== for 循环中的 continue 测试 ===")
+for i <- 0, i < 5, i++ {
+    if i == 2 {
+        PrintLine("触发 continue")
+        continue
+    }
+    PrintLine("i = " + i)
+}
+
+// 测试 break 在 while 循环中的功能
+PrintLine("\n=== while 循环中的 break 测试 ===")
+j <- 0
+while j < 10 {
+    PrintLine("j = " + j)
+    if j == 3 {
+        PrintLine("触发 break")
+        break
+    }
+    j++
+}
+
+// 测试 continue 在 while 循环中的功能
+PrintLine("\n=== while 循环中的 continue 测试 ===")
+k <- 0
+while k < 5 {
+    k++
+    if k == 3 {
+        PrintLine("触发 continue")
+        continue
+    }
+    PrintLine("k = " + k)
+}
+
+// 测试 break 在 for-in 循环中的功能
+PrintLine("\n=== for-in 循环中的 break 测试 ===")
+for item in list {
+    PrintLine("item = " + item)
+    if item == 3 {
+        PrintLine("触发 break")
+        break
+    }
+}
+
+// 测试 continue 在 for-in 循环中的功能
+PrintLine("\n=== for-in 循环中的 continue 测试 ===")
+for item in list {
+    if item == 3 {
+        PrintLine("触发 continue")
+        continue
+    }
+    PrintLine("item = " + item)
+}
+
+// 测试嵌套循环中的 break
+PrintLine("\n=== 嵌套 for 循环中的 break 测试 ===")
+for i <- 0, i < 3, i++ {
+    PrintLine("外层循环 i = " + i)
+    for j <- 0, j < 5, j++ {
+        PrintLine("内层循环 j = " + j)
+        if j == 2 {
+            PrintLine("触发 break，退出内层循环")
+            break
+        }
+    }
+}
+
+// 测试嵌套循环中的 continue
+PrintLine("\n=== 嵌套 for 循环中的 continue 测试 ===")
+for i <- 0, i < 3, i++ {
+    PrintLine("外层循环 i = " + i)
+    for j <- 0, j < 3, j++ {
+        if j == 1 {
+            PrintLine("触发 continue，跳过当前内层循环")
+            continue
+        }
+        PrintLine("内层循环 j = " + j)
+    }
+}
+
+PrintLine("\n=== 测试完成 ===")
