@@ -283,7 +283,11 @@ switch expression {
 #### 5.4.1 函数声明
 
 ```
-func add(a:int, b:int) -> {
+func add(a:int, b:int) {
+    return a + b
+}
+// 或者这样
+add(a:int, b:int) -> {
     return a + b
 }
 ```
@@ -309,7 +313,7 @@ class Person {
     name:string <- ""
     age:int <- 0
     
-    func sayHello() -> {
+    func sayHello() {
         PrintLine("Hello, my name is " + name)
     }
 }
@@ -356,12 +360,37 @@ b:double <- a as double
 
 ### 6.2 类型推断
 
-Old8Lang 支持有限的类型推断，例如在变量声明时：
+Old8Lang 支持类型推断，例如在变量声明时：
 
 ```
 a <- 123  // 推断为 int 类型
 b <- 3.14  // 推断为 double 类型
 ```
+
+> ![TIP]
+>
+> Old8Lang 为动态类型语言，变量的类型可以在运行时改变。但如果进行了类型假注（例如 a:int 为 int 类型），就需要保持类型不变。
+
+### 6.3 类型检查
+
+Old8Lang 支持类型检查，例如在赋值时：
+
+```
+a:int <- 123
+b:double <- a  // 正确，a 可以隐式转换为 double
+c:string <- a  // 错误，不能将 int 隐式转换为 string
+```
+
+### 6.4 类型转换规则
+
+Old8Lang 支持以下类型转换规则：
+
+| 源类型 | 目标类型 | 规则 |
+|--------|----------|------|
+| int    | double   | 直接转换 |
+| double | int      | 取整 |
+| string | int/double | 解析数值 |
+| int/double | string | 转换为字符串 |
 
 ## 7. 示例代码
 
@@ -481,13 +510,32 @@ try {
 
 ### 8.1 字符串模板
 
-使用 `$` 符号和花括号 `{}` 来创建字符串模板：
+使用 `$()` 语法来创建字符串模板，在字符串内部支持 `${}` 占位符和 `{{}}` 转义：
 
 ```
 name <- "Alice"
 age <- 30
 message <- $("My name is {name}, I'm {age} years old.")
 PrintLine(message)
+```
+
+新语法支持：
+1. `$(".")` - 基本字符串模板
+2. `${}` - 在模板中嵌入表达式
+3. `{{` - 转义 `{` 字符
+4. `}}` - 转义 `}` 字符
+
+例如：
+```
+// 基本使用
+name <- "Alice"
+result <- $("Hello, {name}")
+
+// 转义大括号
+escaped <- $("This is {{escaped}} bracket")
+
+// 混合使用
+mixed <- $("Name: {name}, Escaped: {{escaped}}")
 ```
 
 ### 8.2 列表推导式
@@ -516,7 +564,7 @@ for i in range {
 使用解释器执行 Old8Lang 代码：
 
 ```bash
-old8lang -f file.old8
+dotnet run --project Old8Lang.App -- -f file.old8
 ```
 
 ### 9.2 编译执行
@@ -524,8 +572,12 @@ old8lang -f file.old8
 使用编译器将 Old8Lang 代码编译为可执行文件：
 
 ```bash
-old8lang -c file.old8
+dotnet run --project Old8Lang.App -- -c file.old8
 ```
+
+> ![TIP]
+>
+> 编译执行时，建议使用类型假注。函数书写时必须使用类型假注
 
 ## 10. 总结
 

@@ -1,0 +1,26 @@
+// 简单 Lambda 表达式测试
+
+PrintLine("=== Lambda 表达式测试 ===")
+
+// 基本 Lambda 表达式
+add <- (a, b) -> a + b
+result <- add(1, 2)
+PrintLine("add(1, 2) = " + result)
+
+// 带有类型注解的 Lambda 表达式
+multiply <- (a:int, b:int) -> a * b
+result <- multiply(3, 4)
+PrintLine("multiply(3, 4) = " + result)
+
+// 单参数 Lambda 表达式
+square <- x -> x * x
+result <- square(5)
+PrintLine("square(5) = " + result)
+
+// Lambda 表达式作为参数
+func apply(operation, a, b) -> {
+    return operation(a, b)
+}
+
+result <- apply((x, y) -> x - y, 10, 5)
+PrintLine("apply((x, y) -> x - y, 10, 5) = " + result)

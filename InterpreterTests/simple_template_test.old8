@@ -1,0 +1,4 @@
+// 简单字符串模板测试
+name <- "Alice"
+result <- $("Hello, {name}")
+PrintLine(result)

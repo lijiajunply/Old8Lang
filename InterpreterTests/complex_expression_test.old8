@@ -1,0 +1,200 @@
+// 复杂表达式测试
+
+// 算术表达式的优先级
+PrintLine("=== 算术表达式的优先级测试 ===")
+
+result1 <- 1 + 2 * 3
+PrintLine("1 + 2 * 3 = " + result1)  // 应该等于 7
+
+result2 <- (1 + 2) * 3
+PrintLine("(1 + 2) * 3 = " + result2)  // 应该等于 9
+
+result3 <- 10 / 2 + 3
+PrintLine("10 / 2 + 3 = " + result3)  // 应该等于 8
+
+result4 <- 10 / (2 + 3)
+PrintLine("10 / (2 + 3) = " + result4)  // 应该等于 2
+
+result5 <- 2 * 3 + 4 * 5
+PrintLine("2 * 3 + 4 * 5 = " + result5)  // 应该等于 26
+
+result6 <- 2 * (3 + 4) * 5
+PrintLine("2 * (3 + 4) * 5 = " + result6)  // 应该等于 70
+
+// 算术表达式与比较表达式的组合
+PrintLine("\n=== 算术表达式与比较表达式的组合测试 ===")
+
+result7 <- 1 + 2 > 3
+PrintLine("1 + 2 > 3 = " + result7)  // 应该等于 false
+
+result8 <- 1 + 2 >= 3
+PrintLine("1 + 2 >= 3 = " + result8)  // 应该等于 true
+
+result9 <- (1 + 2) * 3 < 10
+PrintLine("(1 + 2) * 3 < 10 = " + result9)  // 应该等于 true
+
+// 逻辑表达式的组合
+PrintLine("\n=== 逻辑表达式的组合测试 ===")
+
+result10 <- true and false or true
+PrintLine("true and false or true = " + result10)  // 应该等于 true
+
+result11 <- true and (false or true)
+PrintLine("true and (false or true) = " + result11)  // 应该等于 true
+
+result12 <- (true and false) or true
+PrintLine("(true and false) or true = " + result12)  // 应该等于 true
+
+result13 <- not (true and false)
+PrintLine("not (true and false) = " + result13)  // 应该等于 true
+
+result14 <- true xor false xor true
+PrintLine("true xor false xor true = " + result14)  // 应该等于 false
+
+// 比较表达式与逻辑表达式的组合
+PrintLine("\n=== 比较表达式与逻辑表达式的组合测试 ===")
+
+x <- 5
+y <- 10
+z <- 15
+
+result15 <- x > 3 and y < 15
+PrintLine("x > 3 and y < 15 = " + result15)  // 应该等于 true
+
+result16 <- x > 10 or y < 15
+PrintLine("x > 10 or y < 15 = " + result16)  // 应该等于 true
+
+result17 <- not (x == y)
+PrintLine("not (x == y) = " + result17)  // 应该等于 true
+
+result18 <- (x < y) and (y < z)
+PrintLine("(x < y) and (y < z) = " + result18)  // 应该等于 true
+
+// 赋值表达式与其他表达式的组合
+PrintLine("\n=== 赋值表达式与其他表达式的组合测试 ===")
+
+// 赋值表达式的返回值
+a <- 0
+result19 <- (a <- 5) + 3
+PrintLine("(a <- 5) + 3 = " + result19)  // 应该等于 8
+PrintLine("a = " + a)  // 应该等于 5
+
+// 链式赋值
+b <- c <- 10
+PrintLine("b = " + b)  // 应该等于 10
+PrintLine("c = " + c)  // 应该等于 10
+
+// 复杂的条件表达式
+PrintLine("\n=== 复杂的条件表达式测试 ===")
+
+age <- 25
+result20 <- age >= 18 ? "成年人" : "未成年人"
+PrintLine("age >= 18 ? '成年人' : '未成年人' = " + result20)  // 应该等于 "成年人"
+
+// 嵌套条件表达式
+score <- 85
+result21 <- score >= 90 ? "优秀" : (score >= 80 ? "良好" : (score >= 60 ? "及格" : "不及格"))
+PrintLine("嵌套条件表达式: " + result21)  // 应该等于 "良好"
+
+// 成员访问与方法调用的组合
+PrintLine("\n=== 成员访问与方法调用的组合测试 ===")
+
+class Person {
+    name:string <- ""
+    age:int <- 0
+    
+    func Person(name:string, age:int) -> {
+        this.name <- name
+        this.age <- age
+    }
+    
+    func getInfo() -> {
+        return name + ", " + age
+    }
+    
+    func isAdult() -> {
+        return age >= 18
+    }
+}
+
+person <- Person("Alice", 30)
+result22 <- person.getInfo() + ", " + (person.isAdult() ? "成年人" : "未成年人")
+PrintLine("成员访问与方法调用的组合: " + result22)  // 应该等于 "Alice, 30, 成年人"
+
+// 索引访问与算术表达式的组合
+PrintLine("\n=== 索引访问与算术表达式的组合测试 ===")
+
+numbers <- [1, 2, 3, 4, 5]
+result23 <- numbers[1] + numbers[2] * numbers[3]
+PrintLine("numbers[1] + numbers[2] * numbers[3] = " + result23)  // 应该等于 2 + 3 * 4 = 14
+
+// 函数调用与表达式的组合
+PrintLine("\n=== 函数调用与表达式的组合测试 ===")
+
+func add(a, b) -> {
+    return a + b
+}
+
+func multiply(a, b) -> {
+    return a * b
+}
+
+result24 <- add(1, 2) * multiply(3, 4)
+PrintLine("add(1, 2) * multiply(3, 4) = " + result24)  // 应该等于 3 * 12 = 36
+
+result25 <- add(multiply(2, 3), multiply(4, 5))
+PrintLine("add(multiply(2, 3), multiply(4, 5)) = " + result25)  // 应该等于 6 + 20 = 26
+
+// 类型转换与其他表达式的组合
+PrintLine("\n=== 类型转换与其他表达式的组合测试 ===")
+
+int_value <- 123
+result26 <- (int_value as double) + 0.5
+PrintLine("(int_value as double) + 0.5 = " + result26)  // 应该等于 123.5
+
+string_value <- "456"
+result27 <- (string_value as int) + 100
+PrintLine("(string_value as int) + 100 = " + result27)  // 应该等于 556
+
+// 复杂的混合表达式
+PrintLine("\n=== 复杂的混合表达式测试 ===")
+
+result28 <- (add(1, 2) * multiply(3, 4) - 5) / 2 + (7 % 3)
+PrintLine("(add(1, 2) * multiply(3, 4) - 5) / 2 + (7 % 3) = " + result28)  // 应该等于 (3 * 12 - 5) / 2 + 1 = (36 - 5) / 2 + 1 = 31 / 2 + 1 = 15.5 + 1 = 16.5
+
+// 表达式中的副作用
+PrintLine("\n=== 表达式中的副作用测试 ===")
+
+counter <- 0
+
+func increment() -> {
+    counter <- counter + 1
+    return counter
+}
+
+result29 <- increment() + increment() * increment()
+PrintLine("increment() + increment() * increment() = " + result29)  // 应该等于 1 + 2 * 3 = 7
+PrintLine("counter = " + counter)  // 应该等于 3
+
+// 复杂的赋值表达式
+PrintLine("\n=== 复杂的赋值表达式测试 ===")
+
+x <- y <- z <- 5
+x <- x + 1
+y <- y + 2
+z <- z + 3
+PrintLine("x = " + x + ", y = " + y + ", z = " + z)  // 应该等于 x = 6, y = 7, z = 8
+
+// 复杂的布尔表达式
+PrintLine("\n=== 复杂的布尔表达式测试 ===")
+
+result30 <- (x > 5) and (y < 8) or not (z == 9)
+PrintLine("(x > 5) and (y < 8) or not (z == 9) = " + result30)  // 应该等于 true and true or not false = true and true or true = true
+
+// 复杂的字符串表达式
+PrintLine("\n=== 复杂的字符串表达式测试 ===")
+
+name <- "Alice"
+age <- 30
+result31 <- "Hello, " + name + ". You are " + age + " years old. " + (age >= 18 ? "You are an adult." : "You are a minor.")
+PrintLine(result31)  // 应该等于 "Hello, Alice. You are 30 years old. You are an adult."

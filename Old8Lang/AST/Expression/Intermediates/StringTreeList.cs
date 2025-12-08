@@ -7,7 +7,7 @@ public class StringTreeList(List<OldExpr> list, SourcePosition position = defaul
     public override ValueType Run(LangParser.VariateManager manager)
     {
         var result = list.Select(item => item.Run(manager))
-            .Aggregate("", (current, value) => current + value);
+            .Aggregate("", (current, value) => current + value.ToDisplayString());
 
         return new StringValue(result);
     }

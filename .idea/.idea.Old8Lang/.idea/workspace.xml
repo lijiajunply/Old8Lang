@@ -17,56 +17,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/Old8Lang解释器系统性测试计划.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_expression.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_primary_types.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_statement_class.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_statement_control_flow.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_statement_function.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_statement_loop.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_statement_set.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_statement_try_catch.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.XUnitTests/InterpreterTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/Old8Lang解释模式系统性测试计划.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/basic_types_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/class_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/complex_expression_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/control_flow_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/exception_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/expressions_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/functions_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/lambda_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/list_comprehension_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/mixed_syntax_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/range_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/simple_arith_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/simple_expr_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/simple_template_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/simple_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/string_template_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.trae/rules/project_rules.md" beforeDir="false" afterPath="$PROJECT_DIR$/.trae/rules/project_rules.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTest/test_basic_expressions.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTest/test_complex_data_types.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTest/test_functions_and_any.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTest/test_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.XUnitTests/CompilerTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.XUnitTests/ParserTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.XUnitTests/TypeAnnotationTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/TestErrorHandling.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/TestKeywordInVariableName.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/TestRuntimeError.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/TestRuntimeErrorDirect.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/TestTryCatch.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/TestTryFinally.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/TestTrySimple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/TestTrySimpleNoComment.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/TestTryStatement.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/TestTryStatementNoComment.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/TestTryZeroDivision.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_all_types.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_all_types_no_comment.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_basic_types.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_basic_types_no_keyword.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_clean.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_datatypes.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_error.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_errors_comprehensive.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_fib_function.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_list_array.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_simple_function.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_simple_function_no_comment.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_syntax.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_type_annotation.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_type_annotation_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_type_mismatch.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Test/test_type_mismatch_no_comment.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang_Grammar.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -881,39 +853,39 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>1252</line>
+          <line>1362</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseInstantiate'">
             <startOffsets>
-              <option value="45319" />
+              <option value="49009" />
             </startOffsets>
             <endOffsets>
-              <option value="45352" />
+              <option value="49042" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="476" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>1255</line>
+          <line>1365</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseInstantiate'">
             <startOffsets>
-              <option value="45444" />
+              <option value="49134" />
             </startOffsets>
             <endOffsets>
-              <option value="45470" />
+              <option value="49160" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="477" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>408</line>
+          <line>403</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\LangParser\LangParser.cs" containingFunctionPresentation="方法 'ParseForStatement'">
             <startOffsets>
-              <option value="16178" />
+              <option value="16035" />
             </startOffsets>
             <endOffsets>
-              <option value="16211" />
+              <option value="16068" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="484" />

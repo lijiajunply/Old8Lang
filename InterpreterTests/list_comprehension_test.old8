@@ -1,0 +1,153 @@
+// 列表推导式测试
+
+// 基本列表推导式
+PrintLine("=== 基本列表推导式测试 ===")
+
+numbers <- [1, 2, 3, 4, 5]
+squares <- [x * x for x in numbers]
+PrintLine("原始列表: " + numbers)
+PrintLine("平方列表: " + squares)
+
+// 带有条件的列表推导式
+PrintLine("\n=== 带有条件的列表推导式测试 ===")
+
+even_numbers <- [x for x in numbers if x % 2 == 0]
+PrintLine("偶数列表: " + even_numbers)
+
+odd_numbers <- [x for x in numbers if x % 2 != 0]
+PrintLine("奇数列表: " + odd_numbers)
+
+// 带有多个条件的列表推导式
+PrintLine("\n=== 带有多个条件的列表推导式测试 ===")
+
+range_numbers <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+filtered_numbers <- [x for x in range_numbers if x > 3 and x < 8]
+PrintLine("范围 [4-7] 列表: " + filtered_numbers)
+
+// 带有计算的列表推导式
+PrintLine("\n=== 带有计算的列表推导式测试 ===")
+
+cubes <- [x * x * x for x in numbers]
+PrintLine("立方列表: " + cubes)
+
+// 字符串列表推导式
+PrintLine("\n=== 字符串列表推导式测试 ===")
+
+words <- ["hello", "world", "old8lang", "test"]
+uppercase_words <- [word.upper() for word in words]
+PrintLine("原始字符串列表: " + words)
+PrintLine("大写字符串列表: " + uppercase_words)
+
+// 列表推导式中的函数调用
+PrintLine("\n=== 列表推导式中的函数调用测试 ===")
+
+func double(x:int) -> {
+    return x * 2
+}
+
+doubled_numbers <- [double(x) for x in numbers]
+PrintLine("原始列表: " + numbers)
+PrintLine("两倍列表: " + doubled_numbers)
+
+// 嵌套列表推导式
+PrintLine("\n=== 嵌套列表推导式测试 ===")
+
+nested_list <- [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+flattened_list <- [x for sublist in nested_list for x in sublist]
+PrintLine("嵌套列表: " + nested_list)
+PrintLine("扁平化列表: " + flattened_list)
+
+// 带有索引的列表推导式
+PrintLine("\n=== 带有索引的列表推导式测试 ===")
+
+indexed_list <- [(i, x) for i, x in enumerate(numbers)]
+PrintLine("带有索引的列表: " + indexed_list)
+
+// 字典推导式
+PrintLine("\n=== 字典推导式测试 ===")
+
+// 从列表创建字典
+dict_from_list <- {x: x * 2 for x in numbers}
+PrintLine("从列表创建的字典: " + dict_from_list)
+
+// 从另一个字典创建字典
+original_dict <- {"a": 1, "b": 2, "c": 3}
+doubled_dict <- {k: v * 2 for k, v in original_dict}
+PrintLine("原始字典: " + original_dict)
+PrintLine("值翻倍的字典: " + doubled_dict)
+
+// 带有条件的字典推导式
+filtered_dict <- {k: v for k, v in original_dict if v > 1}
+PrintLine("过滤后的字典: " + filtered_dict)
+
+// 集合推导式
+PrintLine("\n=== 集合推导式测试 ===")
+
+// 基本集合推导式
+set_from_list <- {x * 2 for x in numbers}
+PrintLine("原始列表: " + numbers)
+PrintLine("集合推导式结果: " + set_from_list)
+
+// 带有条件的集合推导式
+unique_even_numbers <- {x for x in [1, 2, 2, 3, 4, 4, 5] if x % 2 == 0}
+PrintLine("去重后的偶数集合: " + unique_even_numbers)
+
+// 字符串集合推导式
+unique_chars <- {c for c in "hello world"}
+PrintLine("字符串中的唯一字符: " + unique_chars)
+
+// 生成器推导式
+PrintLine("\n=== 生成器推导式测试 ===")
+
+// 基本生成器推导式
+generator <- (x * 2 for x in numbers)
+PrintLine("生成器推导式结果: ")
+for item in generator {
+    PrintLine(item)
+}
+
+// 复杂列表推导式
+PrintLine("\n=== 复杂列表推导式测试 ===")
+
+// 包含多个循环和条件的列表推导式
+matrix <- [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+complex_list <- [x for sublist in matrix for x in sublist if x % 2 == 0]
+PrintLine("矩阵: " + matrix)
+PrintLine("矩阵中的偶数: " + complex_list)
+
+// 列表推导式中的嵌套函数调用
+PrintLine("\n=== 列表推导式中的嵌套函数调用测试 ===")
+
+func square(x:int) -> {
+    return x * x
+}
+
+func cube(x:int) -> {
+    return x * x * x
+}
+
+complex_calc_list <- [cube(square(x)) for x in numbers if x % 2 == 1]
+PrintLine("原始列表: " + numbers)
+PrintLine("奇数的平方的立方: " + complex_calc_list)
+
+// 列表推导式中的类型转换
+PrintLine("\n=== 列表推导式中的类型转换测试 ===")
+
+string_list <- [str(x) for x in numbers]
+PrintLine("原始整数列表: " + numbers)
+PrintLine("转换为字符串列表: " + string_list)
+
+// 列表推导式中的布尔值
+PrintLine("\n=== 列表推导式中的布尔值测试 ===")
+
+bool_list <- [x > 3 for x in numbers]
+PrintLine("原始列表: " + numbers)
+PrintLine("大于3的布尔列表: " + bool_list)
+
+// 列表推导式中的空值处理
+PrintLine("\n=== 列表推导式中的空值处理测试 ===")
+
+mixed_list <- [1, null, 3, null, 5]
+non_null_list <- [x for x in mixed_list if x is not null]
+PrintLine("包含空值的列表: " + mixed_list)
+PrintLine("过滤空值后的列表: " + non_null_list)

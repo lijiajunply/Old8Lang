@@ -1,0 +1,292 @@
+// 类测试
+
+// 基本类声明和实例化
+PrintLine("=== 基本类声明和实例化测试 ===")
+
+class Person {
+    name:string <- ""
+    age:int <- 0
+    
+    func sayHello() -> {
+        return "Hello, my name is " + name + " and I'm " + age + " years old."
+    }
+}
+
+p <- Person()
+p.name <- "Alice"
+p.age <- 30
+PrintLine(p.sayHello())
+
+// 类的构造函数
+PrintLine("\n=== 类的构造函数测试 ===")
+
+class Student {
+    name:string <- ""
+    age:int <- 0
+    grade:string <- ""
+    
+    func Student(name:string, age:int, grade:string) -> {
+        this.name <- name
+        this.age <- age
+        this.grade <- grade
+    }
+    
+    func getInfo() -> {
+        return "Student: " + name + ", Age: " + age + ", Grade: " + grade
+    }
+}
+
+s <- Student("Bob", 15, "10th")
+PrintLine(s.getInfo())
+
+// 类的方法重载
+PrintLine("\n=== 类的方法重载测试 ===")
+
+class Calculator {
+    func add(a:int, b:int) -> {
+        return a + b
+    }
+    
+    func add(a:double, b:double) -> {
+        return a + b
+    }
+    
+    func add(a:string, b:string) -> {
+        return a + b
+    }
+}
+
+calc <- Calculator()
+PrintLine("整数相加: " + calc.add(1, 2))
+PrintLine("浮点数相加: " + calc.add(1.5, 2.5))
+PrintLine("字符串相加: " + calc.add("Hello, ", "World"))
+
+// 类的静态成员
+PrintLine("\n=== 类的静态成员测试 ===")
+
+class Counter {
+    static count:int <- 0
+    
+    func increment() -> {
+        count <- count + 1
+        return count
+    }
+    
+    func getCount() -> {
+        return count
+    }
+}
+
+c1 <- Counter()
+c2 <- Counter()
+
+PrintLine("c1.increment(): " + c1.increment())
+PrintLine("c2.increment(): " + c2.increment())
+PrintLine("c1.getCount(): " + c1.getCount())
+PrintLine("c2.getCount(): " + c2.getCount())
+
+// 类的继承
+PrintLine("\n=== 类的继承测试 ===")
+
+class Animal {
+    name:string <- ""
+    
+    func Animal(name:string) -> {
+        this.name <- name
+    }
+    
+    func makeSound() -> {
+        return "Some generic sound"
+    }
+}
+
+class Dog extends Animal {
+    breed:string <- ""
+    
+    func Dog(name:string, breed:string) -> {
+        super(name)
+        this.breed <- breed
+    }
+    
+    func makeSound() -> {
+        return "Woof!"
+    }
+    
+    func getBreed() -> {
+        return breed
+    }
+}
+
+class Cat extends Animal {
+    func Cat(name:string) -> {
+        super(name)
+    }
+    
+    func makeSound() -> {
+        return "Meow!"
+    }
+}
+
+animal <- Animal("Generic Animal")
+dog <- Dog("Buddy", "Golden Retriever")
+cat <- Cat("Whiskers")
+
+PrintLine(animal.name + " says: " + animal.makeSound())
+PrintLine(dog.name + " says: " + dog.makeSound())
+PrintLine(dog.name + " is a " + dog.getBreed())
+PrintLine(cat.name + " says: " + cat.makeSound())
+
+// 类的访问修饰符（如果支持的话）
+PrintLine("\n=== 类的访问修饰符测试 ===")
+
+class PersonWithPrivate {
+    private _name:string <- ""
+    age:int <- 0
+    
+    func setName(name:string) -> {
+        _name <- name
+    }
+    
+    func getName() -> {
+        return _name
+    }
+    
+    func getInfo() -> {
+        return "Name: " + _name + ", Age: " + age
+    }
+}
+
+pwp <- PersonWithPrivate()
+pwp.setName("Charlie")
+pwp.age <- 25
+PrintLine(pwp.getInfo())
+PrintLine(pwp.getName())
+
+// 类的属性（如果支持的话）
+PrintLine("\n=== 类的属性测试 ===")
+
+class PersonWithProperty {
+    private _name:string <- ""
+    
+    property Name {
+        get {
+            return _name
+        }
+        set {
+            _name <- value
+        }
+    }
+    
+    func getInfo() -> {
+        return "Name: " + _name
+    }
+}
+
+pwp2 <- PersonWithProperty()
+pwp2.Name <- "David"
+PrintLine(pwp2.Name)
+PrintLine(pwp2.getInfo())
+
+// 类的嵌套
+PrintLine("\n=== 类的嵌套测试 ===")
+
+class Outer {
+    class Inner {
+        func getMessage() -> {
+            return "Hello from Inner class"
+        }
+    }
+    
+    func createInner() -> {
+        return Inner()
+    }
+}
+
+outer <- Outer()
+inner <- outer.createInner()
+PrintLine(inner.getMessage())
+
+// 类的组合
+PrintLine("\n=== 类的组合测试 ===")
+
+class Address {
+    street:string <- ""
+    city:string <- ""
+    country:string <- ""
+    
+    func Address(street:string, city:string, country:string) -> {
+        this.street <- street
+        this.city <- city
+        this.country <- country
+    }
+    
+    func getFullAddress() -> {
+        return street + ", " + city + ", " + country
+    }
+}
+
+class Employee {
+    name:string <- ""
+    address:Address <- null
+    
+    func Employee(name:string, address:Address) -> {
+        this.name <- name
+        this.address <- address
+    }
+    
+    func getEmployeeInfo() -> {
+        return "Employee: " + name + ", Address: " + address.getFullAddress()
+    }
+}
+
+addr <- Address("123 Main St", "New York", "USA")
+emp <- Employee("Eve", addr)
+PrintLine(emp.getEmployeeInfo())
+
+// 类的抽象方法和接口（如果支持的话）
+PrintLine("\n=== 类的抽象方法和接口测试 ===")
+
+interface Shape {
+    func getArea() -> double
+    func getPerimeter() -> double
+}
+
+class Rectangle implements Shape {
+    width:double <- 0.0
+    height:double <- 0.0
+    
+    func Rectangle(width:double, height:double) -> {
+        this.width <- width
+        this.height <- height
+    }
+    
+    func getArea() -> double {
+        return width * height
+    }
+    
+    func getPerimeter() -> double {
+        return 2 * (width + height)
+    }
+}
+
+class Circle implements Shape {
+    radius:double <- 0.0
+    
+    func Circle(radius:double) -> {
+        this.radius <- radius
+    }
+    
+    func getArea() -> double {
+        return 3.14159 * radius * radius
+    }
+    
+    func getPerimeter() -> double {
+        return 2 * 3.14159 * radius
+    }
+}
+
+rect <- Rectangle(5.0, 3.0)
+PrintLine("Rectangle - Area: " + rect.getArea() + ", Perimeter: " + rect.getPerimeter())
+
+circle <- Circle(4.0)
+PrintLine("Circle - Area: " + circle.getArea() + ", Perimeter: " + circle.getPerimeter())

@@ -1,0 +1,115 @@
+// Lambda 表达式测试
+
+// 基本 Lambda 表达式
+PrintLine("=== 基本 Lambda 表达式测试 ===")
+
+add <- (a, b) -> a + b
+PrintLine("add(1, 2) = " + add(1, 2))
+
+// 带有类型注解的 Lambda 表达式
+PrintLine("\n=== 带有类型注解的 Lambda 表达式测试 ===")
+
+multiply <- (a:int, b:int) -> a * b
+PrintLine("multiply(3, 4) = " + multiply(3, 4))
+
+// 无参数的 Lambda 表达式
+PrintLine("\n=== 无参数的 Lambda 表达式测试 ===")
+
+greet <- () -> "Hello, Lambda!"
+PrintLine(greet())
+
+// 单参数的 Lambda 表达式
+PrintLine("\n=== 单参数的 Lambda 表达式测试 ===")
+
+square <- x -> x * x
+PrintLine("square(5) = " + square(5))
+
+// 带有复杂表达式的 Lambda 表达式
+PrintLine("\n=== 带有复杂表达式的 Lambda 表达式测试 ===")
+
+complex <- (a, b, c) -> {
+    temp <- a + b
+    return temp * c
+}
+PrintLine("complex(1, 2, 3) = " + complex(1, 2, 3))
+
+// Lambda 表达式作为参数
+PrintLine("\n=== Lambda 表达式作为参数测试 ===")
+
+func apply(operation, a, b) -> {
+    return operation(a, b)
+}
+
+result <- apply((x, y) -> x - y, 10, 5)
+PrintLine("10 - 5 = " + result)
+
+// Lambda 表达式在高阶函数中的使用
+PrintLine("\n=== Lambda 表达式在高阶函数中的使用测试 ===")
+
+func filter_list(list, predicate) -> {
+    result <- list[]
+    for item in list {
+        if predicate(item) {
+            result += item
+        }
+    }
+    return result
+}
+
+numbers <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+even_numbers <- filter_list(numbers, x -> x % 2 == 0)
+PrintLine("偶数列表: " + even_numbers)
+
+odd_numbers <- filter_list(numbers, x -> x % 2 != 0)
+PrintLine("奇数列表: " + odd_numbers)
+
+// Lambda 表达式作为返回值
+PrintLine("\n=== Lambda 表达式作为返回值测试 ===")
+
+func create_adder(x) -> {
+    return (y) -> x + y
+}
+
+add5 <- create_adder(5)
+PrintLine("add5(3) = " + add5(3))
+
+add10 <- create_adder(10)
+PrintLine("add10(3) = " + add10(3))
+
+// Lambda 表达式在列表推导式中的使用
+PrintLine("\n=== Lambda 表达式在列表推导式中的使用测试 ===")
+
+doubles <- [x * 2 for x in numbers]
+PrintLine("列表推导式生成的两倍值: " + doubles)
+
+// Lambda 表达式与内置函数结合使用
+PrintLine("\n=== Lambda 表达式与内置函数结合使用测试 ===")
+
+// 假设有一个 sort 函数
+sorted_numbers <- sorted(numbers, (a, b) -> b - a)
+PrintLine("降序排列: " + sorted_numbers)
+
+// Lambda 表达式捕获外部变量
+PrintLine("\n=== Lambda 表达式捕获外部变量测试 ===")
+
+factor <- 3
+triple <- x -> x * factor
+PrintLine("triple(5) = " + triple(5))
+
+// 修改外部变量后，Lambda 表达式的行为
+factor <- 5
+PrintLine("修改 factor 后，triple(5) = " + triple(5))
+
+// 带有逻辑表达式的 Lambda 表达式
+PrintLine("\n=== 带有逻辑表达式的 Lambda 表达式测试 ===")
+
+is_adult <- age -> age >= 18
+PrintLine("is_adult(20) = " + is_adult(20))
+PrintLine("is_adult(17) = " + is_adult(17))
+
+// 带有比较表达式的 Lambda 表达式
+PrintLine("\n=== 带有比较表达式的 Lambda 表达式测试 ===")
+
+is_greater_than_5 <- x -> x > 5
+PrintLine("is_greater_than_5(6) = " + is_greater_than_5(6))
+PrintLine("is_greater_than_5(4) = " + is_greater_than_5(4))

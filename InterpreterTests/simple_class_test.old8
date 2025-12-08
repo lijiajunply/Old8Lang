@@ -1,0 +1,24 @@
+// 简单类测试
+
+PrintLine("=== 类测试 ===")
+
+// 定义一个简单的类
+class Person {
+    name <- ""
+    age <- 0
+    
+    func sayHello() -> {
+        return "Hello, my name is " + name + " and I'm " + age + " years old."
+    }
+}
+
+// 实例化类
+p <- Person()
+
+// 设置属性
+p.name <- "Alice"
+p.age <- 30
+
+// 调用方法
+result <- p.sayHello()
+PrintLine(result)

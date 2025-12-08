@@ -1,0 +1,82 @@
+// 基本数据类型测试
+
+// 整数类型
+PrintLine("=== 整数类型测试 ===")
+a:int <- 123
+PrintLine(a)
+b:int <- -456
+PrintLine(b)
+c:int <- 0
+PrintLine(c)
+
+// 浮点数类型
+PrintLine("\n=== 浮点数类型测试 ===")
+d:double <- 3.14
+PrintLine(d)
+e:double <- -0.5
+PrintLine(e)
+f:double <- 1.0
+PrintLine(f)
+
+// 字符串类型
+PrintLine("\n=== 字符串类型测试 ===")
+g:string <- "hello world"
+PrintLine(g)
+h:string <- ""
+PrintLine(h)
+
+// 布尔类型
+PrintLine("\n=== 布尔类型测试 ===")
+i:bool <- true
+PrintLine(i)
+j:bool <- false
+PrintLine(j)
+
+// 字符类型
+PrintLine("\n=== 字符类型测试 ===")
+k:char <- 'a'
+PrintLine(k)
+l:char <- '1'
+PrintLine(l)
+m:char <- '\n'
+PrintLine(m)
+PrintLine("After newline")
+
+// 数组类型
+PrintLine("\n=== 数组类型测试 ===")
+n:array <- [1, 2, 3, 4, 5]
+PrintLine(n[0])
+PrintLine(n[1])
+PrintLine(n[2])
+
+// 列表类型
+// PrintLine("\n=== 列表类型测试 ===")
+// o:list <- list[1, 2, 3]
+// PrintLine(o[0])
+// o[0] <- 10
+// PrintLine(o[0])
+
+// 字典类型
+// PrintLine("\n=== 字典类型测试 ===")
+// p:dictionary <- {"name": "Alice", "age": 30}
+// name_val <- p["name"]
+// PrintLine(name_val)
+// age_val <- p["age"]
+// PrintLine(age_val)
+// p["age"] <- 31
+// new_age_val <- p["age"]
+// PrintLine(new_age_val)
+
+// 元组类型
+// PrintLine("\n=== 元组类型测试 ===")
+// q:tuple <- (1, "a", true)
+// PrintLine(q[0])
+// PrintLine(q[1])
+// PrintLine(q[2])
+
+// 范围类型
+// PrintLine("\n=== 范围类型测试 ===")
+// r:range <- [1~5]
+// for i in r {
+//     PrintLine(i)
+// }

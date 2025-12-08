@@ -49,11 +49,6 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     }
 
     /// <summary>
-    /// 创建语法错误并添加上下文信息
-    /// </summary>
-    /// <param name="message">错误信息</param>
-    /// <returns>带有上下文信息的语法错误</returns>
-    /// <summary>
     /// 创建完整的位置信息
     /// </summary>
     /// <param name="token">令牌</param>
@@ -975,7 +970,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             LangTokenType.LeftBracket => ParseArrayOrRange(),
             LangTokenType.LeftParen => ParseLambdaOrTuple(),
             LangTokenType.LeftBrace => ParseDictionary(),
-            LangTokenType.Dollar when Peek().Type == LangTokenType.LeftBrace => ParseStringTree(),
+            LangTokenType.Dollar when Peek().Type == LangTokenType.LeftBrace || Peek().Type == LangTokenType.LeftParen => ParseStringTree(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.As => ParseAs(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftBracket => ParseListInitOrSlice(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseInstantiate(),
@@ -1212,7 +1207,8 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     }
 
     /// <summary>
-    /// stringTree = "$" "{" expression ("," expression )* "}" ("{" expression ("," expression )* "}")* ;
+    /// stringTree = "$" "(" string ")" ;
+    /// 在字符串内部，支持 ${} 占位符和 {{}} 转义
     /// </summary>
     /// <returns>字符串粘合</returns>
     private StringTreeList ParseStringTree()
@@ -1222,23 +1218,137 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         Expect(LangTokenType.Dollar);
         var list = new List<OldExpr>();
 
-        // 处理连续的 {...} 块
-        do
+        // 检查是旧语法 ${} 还是新语法 $()
+        if (CurrentToken.Type == LangTokenType.LeftParen)
         {
-            Expect(LangTokenType.LeftBrace);
-            while (CurrentToken.Type != LangTokenType.RightBrace)
+            // 新语法：$("string with ${placeholders}")
+            Expect(LangTokenType.LeftParen);
+            
+            // 解析字符串字面量
+            var stringToken = CurrentToken;
+            if (stringToken.Type != LangTokenType.String)
             {
-                list.Add(ParseExpression());
-                if (CurrentToken.Type == LangTokenType.Comma)
-                {
-                    Expect(LangTokenType.Comma);
-                }
+                throw CreateSyntaxError("字符串模板中必须包含字符串字面量");
             }
+            
+            var templateString = stringToken.Value;
+            Expect(LangTokenType.String);
+            
+            Expect(LangTokenType.RightParen);
+            
+            // 解析字符串模板内容
+            ParseTemplateString(templateString, list, position);
+        }
+        else
+        {
+            // 旧语法兼容：${expr1, expr2}
+            do
+            {
+                Expect(LangTokenType.LeftBrace);
+                while (CurrentToken.Type != LangTokenType.RightBrace)
+                {
+                    list.Add(ParseExpression());
+                    if (CurrentToken.Type == LangTokenType.Comma)
+                    {
+                        Expect(LangTokenType.Comma);
+                    }
+                }
 
-            Expect(LangTokenType.RightBrace);
-        } while (CurrentToken.Type == LangTokenType.LeftBrace); // 如果下一个token是{，继续处理
+                Expect(LangTokenType.RightBrace);
+            } while (CurrentToken.Type == LangTokenType.LeftBrace);
+        }
 
         return new StringTreeList(list, position);
+    }
+    
+    /// <summary>
+    /// 解析模板字符串，提取字面量和表达式
+    /// </summary>
+    private void ParseTemplateString(string template, List<OldExpr> list, SourcePosition position)
+    {
+        var i = 0;
+        var length = template.Length;
+        
+        while (i < length)
+        {
+            // 查找 ${ 或 {{ 或 }}
+            var dollarIndex = template.IndexOf('{', i);
+            var doubleLeftIndex = template.IndexOf("{{", i, StringComparison.Ordinal);
+            var doubleRightIndex = template.IndexOf("}}", i, StringComparison.Ordinal);
+            
+            // 找出最近的特殊字符位置
+            var nextSpecialIndex = -1;
+            var specialType = "";
+            
+            if (doubleLeftIndex != -1)
+            {
+                nextSpecialIndex = doubleLeftIndex;
+                specialType = "{{";
+            }
+            
+            if (doubleRightIndex != -1 && (nextSpecialIndex == -1 || doubleRightIndex < nextSpecialIndex))
+            {
+                nextSpecialIndex = doubleRightIndex;
+                specialType = "}}";
+            }
+            
+            if (dollarIndex != -1 && (nextSpecialIndex == -1 || dollarIndex < nextSpecialIndex))
+            {
+                nextSpecialIndex = dollarIndex;
+                specialType = "{";
+            }
+            
+            if (nextSpecialIndex == -1)
+            {
+                // 没有更多特殊字符，添加剩余字符串
+                if (i < length)
+                {
+                    list.Add(new StringValue(template[i..], position));
+                }
+                break;
+            }
+            
+            // 添加特殊字符前的普通字符串
+            if (nextSpecialIndex > i)
+            {
+                list.Add(new StringValue(template.Substring(i, nextSpecialIndex - i), position));
+            }
+            
+            // 处理特殊字符
+            switch (specialType)
+            {
+                case "{":
+                    // 处理 {expr}
+                    i = nextSpecialIndex + 1;
+                    
+                    // 查找匹配的 }
+                    int exprEndIndex = template.IndexOf("}", i, StringComparison.Ordinal);
+                    if (exprEndIndex == -1)
+                    {
+                        throw CreateSyntaxError("字符串模板中缺少匹配的 '}'");
+                    }
+                    
+                    // 提取标识符或表达式
+                    string exprStr = template.Substring(i, exprEndIndex - i).Trim();
+                    i = exprEndIndex + 1;
+                    
+                    // 添加标识符表达式
+                    list.Add(new OldId(exprStr, "", position));
+                    break;
+                    
+                case "{{":
+                    // 处理 {{ 转义为 {
+                    list.Add(new StringValue("{", position));
+                    i = nextSpecialIndex + 2;
+                    break;
+                    
+                case "}}":
+                    // 处理 }} 转义为 }
+                    list.Add(new StringValue("}", position));
+                    i = nextSpecialIndex + 2;
+                    break;
+            }
+        }
     }
 
     /// <summary>

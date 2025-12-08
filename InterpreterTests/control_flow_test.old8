@@ -1,0 +1,144 @@
+// 控制流语句测试
+
+// if-elif-else 测试
+PrintLine("=== if-elif-else 测试 ===")
+
+x <- 10
+
+if x > 10 {
+    PrintLine("x 大于 10")
+elif x < 10 {
+    PrintLine("x 小于 10")
+} else {
+    PrintLine("x 等于 10")
+}
+
+// for 循环测试
+PrintLine("\n=== for 循环测试 ===")
+
+for i <- 0, i < 5, i++ {
+    PrintLine("i = " + i)
+}
+
+// for 循环反向遍历
+PrintLine("\n=== for 循环反向遍历测试 ===")
+
+for j <- 5, j > 0, j-- {
+    PrintLine("j = " + j)
+}
+
+// while 循环测试
+PrintLine("\n=== while 循环测试 ===")
+
+k <- 0
+while k < 5 {
+    PrintLine("k = " + k)
+    k <- k + 1
+}
+
+// while 循环带条件退出
+PrintLine("\n=== while 循环带条件退出测试 ===")
+
+l <- 0
+while true {
+    PrintLine("l = " + l)
+    l <- l + 1
+    if l >= 3 {
+        break
+    }
+}
+
+// for-in 循环测试
+PrintLine("\n=== for-in 循环测试 ===")
+
+// 数组遍历
+array_test <- [1, 2, 3, 4, 5]
+for item in array_test {
+    PrintLine("数组元素: " + item)
+}
+
+// 列表遍历
+list_test <- list[6, 7, 8, 9, 10]
+for item in list_test {
+    PrintLine("列表元素: " + item)
+}
+
+// 字典遍历
+PrintLine("\n=== 字典遍历测试 ===")
+dict_test <- {"name": "Alice", "age": 30, "city": "New York"}
+for key, value in dict_test {
+    PrintLine("字典键: " + key + ", 值: " + value)
+}
+
+// 范围遍历
+PrintLine("\n=== 范围遍历测试 ===")
+range_test <- [1~5]
+for i in range_test {
+    PrintLine("范围元素: " + i)
+}
+
+// switch 语句测试
+PrintLine("\n=== switch 语句测试 ===")
+
+color <- "red"
+
+switch color {
+    case "red" {
+        PrintLine("颜色是红色")
+    }
+    case "blue" {
+        PrintLine("颜色是蓝色")
+    }
+    case "green" {
+        PrintLine("颜色是绿色")
+    }
+    default {
+        PrintLine("颜色未知")
+    }
+}
+
+// switch 语句使用数值
+PrintLine("\n=== switch 语句数值测试 ===")
+
+number <- 2
+
+switch number {
+    case 1 {
+        PrintLine("数字是 1")
+    }
+    case 2 {
+        PrintLine("数字是 2")
+    }
+    case 3 {
+        PrintLine("数字是 3")
+    }
+    default {
+        PrintLine("数字不在范围内")
+    }
+}
+
+// 嵌套控制流测试
+PrintLine("\n=== 嵌套控制流测试 ===")
+
+for i <- 0, i < 3, i++ {
+    PrintLine("外层循环 i = " + i)
+    for j <- 0, j < 2, j++ {
+        PrintLine("  内层循环 j = " + j)
+    }
+}
+
+// if 嵌套测试
+PrintLine("\n=== if 嵌套测试 ===")
+
+a <- 10
+b <- 20
+
+if a > 5 {
+    PrintLine("a > 5")
+    if b > 15 {
+        PrintLine("  b > 15")
+        if a + b > 25 {
+            PrintLine("    a + b > 25")
+        }
+    }
+}
