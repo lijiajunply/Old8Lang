@@ -1,0 +1,18 @@
+// 测试方法调用语法：c.a(b)
+class Calculator {
+    func add(a, b) {
+        return a + b
+    }
+}
+
+c <- Calculator()
+
+// 测试 c.a(b) 语法
+c.add(10, 20)
+result <- c.add(10, 20)
+PrintLine("Result: " + result)
+
+// 测试嵌套方法调用
+d <- Calculator()
+result2 <- d.add(30, c.add(5, 5))
+PrintLine("Nested result: " + result2)

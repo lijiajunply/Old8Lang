@@ -133,12 +133,12 @@ public class AnyLangValue : LangValueType
                 {
                     if (value is FuncLangValue funcValue)
                     {
-                        // 在调用类方法时，将当前实例添加到AnyInfo中，以便this关键字访问
-                        Manager.Set(new LangId("this"), this);
-
-                        // 处理方法参数
+                        // 处理方法参数，先运行参数表达式，这样可以访问外部变量
                         List<OldExpr> methodArgs = [];
                         methodArgs.AddRange(instance.Ids);
+
+                        // 在调用类方法时，将当前实例添加到变量储存器中，以便this关键字访问
+                        Manager.Set(new LangId("this"), this);
 
                         // 调用方法
                         var funcResult = funcValue.Run(Manager, methodArgs);
@@ -149,13 +149,13 @@ public class AnyLangValue : LangValueType
                 // 检查Variates字典中是否有该方法
                 if (Variates.TryGetValue(new LangId(methodName), out var variate))
                 {
+                    // 在调用类方法时，将当前实例添加到变量储存器中，以便this关键字访问
+                    Manager.Set(new LangId("this"), this);
+                    
                     var methodValue = variate.Run(Manager);
                     if (methodValue is FuncLangValue funcValue)
                     {
-                        // 在调用类方法时，将当前实例添加到AnyInfo中，以便this关键字访问
-                        Manager.Set(new LangId("this"), this);
-
-                        // 处理方法参数
+                        // 处理方法参数，先运行参数表达式，这样可以访问外部变量
                         List<OldExpr> methodArgs = [];
                         methodArgs.AddRange(instance.Ids);
 

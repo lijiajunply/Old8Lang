@@ -90,6 +90,7 @@ public class FuncLangValue : ImportInfo
                 if (i < ids.Count)
                 {
                     // 将实例化时的参数表达式结果赋值给方法参数
+                    // 运行参数表达式时使用外部管理器，这样可以访问外部变量
                     var paramValue = ids[i].Run(variateManagerFunc);
                     variateManagerFunc.Set(Ids[i], paramValue);
                 }

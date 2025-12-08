@@ -311,28 +311,50 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             return ParseImportStatement();
         }
 
-        // 处理赋值语句：identifier <- expression 或 this <- expression
+        // 处理赋值语句：identifier｜this <- expression 或 a.name <- value 或 this.name <- value 或 a[b] <- value
+        // 先尝试解析可能的左值表达式开头
         if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.This or LangTokenType.LeftBrace
             or LangTokenType.LeftBracket)
         {
-            var nextToken = Peek();
-            if (nextToken.Type == LangTokenType.Assignment)
+            // 检查是否是赋值语句，允许左值表达式包含成员访问或索引访问
+            // 例如：identifier <- value, this.name <- value, a[b] <- value
+            var savedIndex = CurrentIndex;
+            
+            try
             {
-                return ParseSet();
-            }
-
-            // 处理带有类型注解的变量声明：identifier:type <- expression
-            if (nextToken.Type == LangTokenType.Colon)
-            {
-                var thirdToken = Peek(2);
-                if (thirdToken.Type == LangTokenType.Identifier)
+                // 尝试解析左值表达式
+                var leftExpr = ParseExpression();
+                
+                // 检查下一个token是否是赋值符号
+                if (CurrentToken.Type == LangTokenType.Assignment)
                 {
-                    var fourthToken = Peek(3);
-                    if (fourthToken.Type == LangTokenType.Assignment)
+                    // 回退到原始位置，准备调用ParseSet()
+                    CurrentIndex = savedIndex;
+                    return ParseSet();
+                }
+                // 检查是否是带有类型注解的赋值语句：identifier:type <- value
+                else if (CurrentToken.Type == LangTokenType.Colon)
+                {
+                    var nextToken = Peek();
+                    if (nextToken.Type == LangTokenType.Identifier)
                     {
-                        return ParseSet();
+                        var thirdToken = Peek(2);
+                        if (thirdToken.Type == LangTokenType.Assignment)
+                        {
+                            // 回退到原始位置，准备调用ParseSet()
+                            CurrentIndex = savedIndex;
+                            return ParseSet();
+                        }
                     }
                 }
+                
+                // 如果不是赋值语句，回退到原始位置
+                CurrentIndex = savedIndex;
+            }
+            catch
+            {
+                // 如果解析左值表达式失败，回退到原始位置
+                CurrentIndex = savedIndex;
             }
         }
 
@@ -378,7 +400,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
 
         // 处理表达式语句：允许将函数运行表达式作为语句执行
         // 例如：funcCall(), (lambda)(args)
-        var savedIndex = CurrentIndex;
+        var i = CurrentIndex;
         try
         {
             // 尝试解析为表达式
@@ -392,7 +414,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         catch
         {
             // 解析失败，回滚，尝试解析为其他语句类型
-            CurrentIndex = savedIndex;
+            CurrentIndex = i;
         }
 
         // 处理右大括号的情况，这通常意味着当前块结束
@@ -536,24 +558,8 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     // declaration = identifier ":" type "<-" expression | identifier "<-" expression | memberAccess ":" type "<-" expression | memberAccess "<-" expression ;
     private SetStatement ParseSet()
     {
-        var identifierToken = CurrentToken;
-        var position = new SourcePosition(identifierToken.Line, identifierToken.Column,
-            tokenValue: identifierToken.Value);
-        var identifier = identifierToken.Value;
-
-        // 检查当前令牌是否是 this 关键字
-        Expect(CurrentToken.Type == LangTokenType.This ? LangTokenType.This : LangTokenType.Identifier);
-
-        // 处理成员访问：identifier "." identifier* (":" type )? "<-" expression
-        var isMemberAccess = false;
-        var memberPath = identifier;
-        while (CurrentToken.Type == LangTokenType.Dot)
-        {
-            isMemberAccess = true;
-            Expect(LangTokenType.Dot);
-            memberPath += "." + CurrentToken.Value;
-            Expect(LangTokenType.Identifier);
-        }
+        // 解析任意复杂的左值表达式，包括标识符、成员访问、索引访问等
+        var leftExpr = ParseExpression();
 
         // 检查是否有类型注解
         var assumptionType = "";
@@ -567,27 +573,17 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         Expect(LangTokenType.Assignment);
         var expression = ParseExpression();
 
-        if (isMemberAccess)
+        // 处理不同类型的左值表达式
+        if (leftExpr is LangId langId)
         {
-            // 处理成员访问赋值：p.name <- value 或 this.name <- value
-            var parts = memberPath.Split('.');
-
-            // 创建成员访问表达式：this.value
-            var firstId = new LangId(parts[0], assumptionType, position);
-            OldExpr memberAccess = firstId;
-
-            for (int i = 1; i < parts.Length; i++)
-            {
-                memberAccess = new Operation(memberAccess, OperationType.CONCAT, new LangId(parts[i], "", position),
-                    position);
-            }
-
-            // 对于成员访问赋值，返回 SetStatement，其中 LeftExpr 是成员访问表达式
-            return new SetStatement(memberAccess, expression, position);
+            // 普通标识符赋值：identifier <- value
+            return new SetStatement(new LangId(langId.IdName, assumptionType, leftExpr.Position), expression, leftExpr.Position);
         }
-
-        // 处理简单变量赋值：a <- value
-        return new SetStatement(new LangId(identifier, assumptionType, position), expression, position);
+        else
+        {
+            // 复杂左值表达式赋值：a[b] <- value 或 a.a <- value 或 this.a <- value
+            return new SetStatement(leftExpr, expression, leftExpr.Position);
+        }
     }
 
     // ifStatement = "if" expression block ( "elif" expression block )* ( "else" block )? ;
@@ -803,24 +799,6 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         var arguments = ParseArgList();
         Expect(LangTokenType.RightParen);
         return new FuncRunStatement(new Instance(new LangId(funcName), arguments.Args));
-    }
-
-    /// <summary>
-    /// classFuncRunStatement = identifier "." identifier "(" argList? ")" ;
-    /// </summary>
-    /// <returns>类方法调用</returns>
-    private FuncRunStatement ParseClassFuncRunStatement()
-    {
-        var className = CurrentToken.Value;
-        Expect(LangTokenType.Identifier);
-        Expect(LangTokenType.Dot);
-        var funcName = CurrentToken.Value;
-        Expect(LangTokenType.Identifier);
-        Expect(LangTokenType.LeftParen);
-        var arguments = ParseArgList();
-        Expect(LangTokenType.RightParen);
-        return new FuncRunStatement(new Operation(new LangId(className), OperationType.CONCAT,
-            new Instance(new LangId(funcName), arguments.Args)));
     }
 
     /// <summary>

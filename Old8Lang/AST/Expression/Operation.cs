@@ -63,7 +63,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
             var thisValue = Left.Run(manager);
             if (thisValue is AnyLangValue anyValue)
             {
-                // 直接调用当前实例的Dot方法，处理成员访问
+                // 直接调用当前实例的Dot方法，处理成员访问，传递外部管理器
                 return anyValue.Dot(Right);
             }
 
@@ -73,14 +73,34 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
         // 处理其他情况
         var l = Left?.Run(manager);
-        var r = Right as OldExpr;
+        var r = Right;
 
         // id.id => dot_value
         if (l is AnyLangValue any && Opera == OperationType.CONCAT)
         {
             if (Right is Instance r1)
-                return any.Dot(r1);
-            if (Right != null) return any.Dot(Right);
+            {
+                // 对于成员访问，先运行所有参数表达式，获取它们的值，使用外部管理器
+                var evaluatedArgs = new List<OldExpr>();
+                foreach (var arg in r1.Ids)
+                {
+                    // 运行参数表达式，使用外部管理器，这样可以访问外部变量
+                    var argValue = arg.Run(manager);
+                    // 将计算结果包装为LangValueType，以便后续使用
+                    evaluatedArgs.Add(argValue);
+                }
+
+                // 创建一个新的Instance，使用已经计算好的参数值
+                var newInstance = new Instance(r1.Id, evaluatedArgs, r1.Position);
+
+                // 调用Dot方法，传递已经计算好的参数
+                return any.Dot(newInstance);
+            }
+
+            if (Right != null)
+            {
+                return any.Dot(Right);
+            }
         }
 
         if (l is ListLangValue && Opera == OperationType.CONCAT)
