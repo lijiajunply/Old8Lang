@@ -9,8 +9,8 @@ PrintLine(Json(test))
 a <- ToObj("{\"a\" : 1,\"b\" : {\"c\" : 3}}")
 PrintLine(a.a)
 
-PrintLine("测试字符串")
-q <- $"hello {10}"
+PrintLine("测试字符串插值")
+q <- $("hello {10}")
 PrintLine(q)
 
 //测试函数 测试For in

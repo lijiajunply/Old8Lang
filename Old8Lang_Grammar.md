@@ -405,18 +405,17 @@ Old8Lang 支持以下类型转换规则：
 
 ### 7.1 字符串模板
 
-使用 `$()` 语法来创建字符串模板，在字符串内部支持 `${}` 占位符和 `{{}}` 转义：
+使用 `$""` 语法来创建字符串模板（C# 风格），在字符串内部支持 `{}` 占位符和 `{{}}` 转义：
 
 ```
 name <- "Alice"
 age <- 30
-message <- $("My name is {name}, I'm {age} years old.")
+message <- $"My name is {name}, I'm {age} years old."
 PrintLine(message)
 ```
 
-新语法支持：
 1. `$(".")` - 基本字符串模板
-2. `${}` - 在模板中嵌入表达式
+2. `$"This is {10}"` - 在模板中嵌入表达式
 3. `{{` - 转义 `{` 字符
 4. `}}` - 转义 `}` 字符
 
@@ -424,13 +423,13 @@ PrintLine(message)
 ```
 // 基本使用
 name <- "Alice"
-result <- $("Hello, {name}")
+result <- $"Hello, {name}"
 
 // 转义大括号
-escaped <- $("This is {{escaped}} bracket")
+escaped <- $"This is {{escaped}} bracket"
 
 // 混合使用
-mixed <- $("Name: {name}, Escaped: {{escaped}}")
+mixed <- $"Name: {name}, Escaped: {{escaped}}"
 ```
 
 ### 7.2 列表推导式

@@ -1,0 +1,64 @@
+    private OldExpr ParseStringTree(bool isNested = false)
+    {
+        SourcePosition position;
+
+        // 只有非嵌套调用时才期望 Dollar 令牌
+        if (!isNested)
+        {
+            // 检查当前token是否是Dollar
+            if (CurrentToken.Type != LangTokenType.Dollar)
+            {
+                // 不是模板字符串，返回普通表达式
+                return ParsePrimary();
+            }
+
+            var dollarToken = CurrentToken;
+            position = new SourcePosition(dollarToken.Line, dollarToken.Column, tokenValue: dollarToken.Value);
+            Expect(LangTokenType.Dollar);
+        }
+        else
+        {
+            // 嵌套调用时使用当前令牌的位置
+            position = new SourcePosition(CurrentToken.Line, CurrentToken.Column, tokenValue: CurrentToken.Value);
+        }
+
+        // 处理 $$"string" 格式（转义的$符号）
+        if (!isNested && CurrentToken.Type == LangTokenType.Dollar)
+        {
+            // 跳过第二个$符号
+            Expect(LangTokenType.Dollar);
+            // 处理 $"string" 格式
+            if (CurrentToken.Type == LangTokenType.String)
+            {
+                var stringValue = CurrentToken.Value;
+                Expect(LangTokenType.String);
+                return new StringTreeList([new StringLangValue(stringValue, position)], position);
+            }
+        }
+
+        // 处理 $"string" 格式
+        if (CurrentToken.Type == LangTokenType.String)
+        {
+            var stringValue = CurrentToken.Value;
+            Expect(LangTokenType.String);
+            return new StringTreeList([new StringLangValue(stringValue, position)], position);
+        }
+
+        // 处理 ${expression} 格式
+        if (CurrentToken.Type == LangTokenType.LeftBrace)
+        {
+            Expect(LangTokenType.LeftBrace);
+            var expression = ParseExpression();
+            Expect(LangTokenType.RightBrace);
+            return expression;
+        }
+
+        // 处理 $($"string") 或 $("string {placeholder}") 格式
+        if (CurrentToken.Type == LangTokenType.LeftParen)
+        {
+            Expect(LangTokenType.LeftParen);
+
+            // 检查括号内是否是字符串
+            if (CurrentToken.Type == LangTokenType.String)
+            {
+                // 处理 $(

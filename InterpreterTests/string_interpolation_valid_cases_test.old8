@@ -1,0 +1,24 @@
+// 只包含有效字符串插值情况的测试
+
+// 1. 基本字符串模板
+PrintLine($".")
+PrintLine($"Hello world")
+
+// 2. 模板中嵌入表达式
+PrintLine($"This is {10}")
+PrintLine($"Pi is approximately {3.14}")
+
+// 3. 转义 {{ 和 }} 组合
+PrintLine($"{{double braces}}")
+
+// 4. 变量插值
+name <- "Alice"
+age <- 30
+PrintLine($"My name is {name}, I'm {age} years old.")
+
+// 5. 混合使用
+PrintLine($"Hello {name}, this is a number: {123}, and escaped: {{escaped}}")
+
+// 6. 简单转义测试
+PrintLine($"Single {{ brace")
+PrintLine($"Single }} brace")

@@ -7,12 +7,12 @@ namespace Old8Lang.AST.Expression.Value;
 
 
 /// <summary>
-/// list[key]
+/// list[key] 字典/数组/列表 索引访问
 /// </summary>
 /// <param name="listId">列表 ID</param>
 /// <param name="key">关键词或索引</param>
 /// <param name="position">位置</param>
-public class OldItem(LangId listId, OldExpr key, SourcePosition position = default) : LangValueType(position)
+public class LangListItem(LangId listId, OldExpr key, SourcePosition position = default) : LangValueType(position)
 {
     public override LangValueType Run(LangParser.VariateManager manager)
     {
