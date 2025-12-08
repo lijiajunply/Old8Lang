@@ -40,7 +40,14 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         if (left == null && opera == OperationType.NOT)
             return new BoolValue(!(right?.Run(manager) as BoolValue)!.Value);
         if (left == null && opera == OperationType.MINUS)
-            return new IntValue(-(right?.Run(manager) as IntValue)!.Value);
+        {
+            var rightValue = right?.Run(manager);
+            if (rightValue is IntValue intValue)
+                return new IntValue(-intValue.Value);
+            if (rightValue is DoubleValue doubleValue)
+                return new DoubleValue(-doubleValue.Value);
+            throw new InvalidOperationError(this, "一元负号运算符只支持整数和浮点数");
+        }
 
         var l = left?.Run(manager);
         var r = right;
@@ -112,7 +119,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         if (l is not null && r is not null && opera == OperationType.GREATER_EQUAL)
             return new BoolValue(l.GreaterEqual(r as ValueType));
 
-        // r (+-*/) l
+        // r (+-*/%) l
         if (l is not null && r is not null)
         {
             if (r is not ValueType r1) throw new InvalidOperationError(this, "右操作数必须是ValueType类型");
@@ -126,6 +133,8 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     return l.Times(r1);
                 case OperationType.DIVIDE:
                     return l.Divide(r1);
+                case OperationType.MODULO:
+                    return l.Mod(r1);
             }
         }
 

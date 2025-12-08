@@ -99,6 +99,22 @@ public class IntValue(int intValue, SourcePosition position = default) : ValueTy
         throw new InvalidOperationError(this, $"不支持整数与类型 '{otherValueType.GetType().Name}' 的除法操作");
     }
 
+    public override ValueType Mod(ValueType otherValueType)
+    {
+        if (otherValueType is DoubleValue)
+            return otherValueType.Mod(this);
+        if (otherValueType is IntValue otherInt)
+        {
+            if (otherInt.Value == 0)
+            {
+                // 抛出自定义的ZeroDivisionError
+                throw new ZeroDivisionError(this);
+            }
+            return new IntValue(Value % otherInt.Value);
+        }
+        throw new InvalidOperationError(this, $"不支持整数与类型 '{otherValueType.GetType().Name}' 的取模操作");
+    }
+
     public override bool Less(ValueType? otherValue)
     {
         if (otherValue is DoubleValue d)

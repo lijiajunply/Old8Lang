@@ -70,6 +70,38 @@ public class DoubleValue(double doubleValue, SourcePosition position = default) 
         throw new InvalidOperationError(this, $"不支持浮点数与类型 '{otherValueType.GetType().Name}' 的除法操作");
     }
 
+    public override ValueType Mod(ValueType otherValueType)
+    {
+        double divisor;
+        if (otherValueType is IntValue intValue)
+        {
+            if (intValue.Value == 0)
+            {
+                throw new ZeroDivisionError(this);
+            }
+            divisor = intValue.Value;
+        }
+        else if (otherValueType is DoubleValue doubleValue)
+        {
+            if (Math.Abs(doubleValue.Value) < 0.000001)
+            {
+                throw new ZeroDivisionError(this);
+            }
+            divisor = doubleValue.Value;
+        }
+        else
+        {
+            throw new InvalidOperationError(this, $"不支持浮点数与类型 '{otherValueType.GetType().Name}' 的取模操作");
+        }
+        
+        var result = Value % divisor;
+        if (double.IsNaN(result) || double.IsInfinity(result))
+        {
+            throw new OverflowError(this, "浮点数取模");
+        }
+        return new DoubleValue(result);
+    }
+
 
     public override bool Less(ValueType? otherValue)
     {

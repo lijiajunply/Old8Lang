@@ -22,6 +22,7 @@ public abstract class ValueType(SourcePosition position = default) : OldExpr(pos
     public virtual ValueType Minus(ValueType otherValueType) => throw new InvalidOperationError(this, $"不支持类型 '{GetType().Name}' 和 '{otherValueType.GetType().Name}' 的减法操作");
     public virtual ValueType Times(ValueType otherValueType) => throw new InvalidOperationError(this, $"不支持类型 '{GetType().Name}' 和 '{otherValueType.GetType().Name}' 的乘法操作");
     public virtual ValueType Divide(ValueType otherValueType) => throw new InvalidOperationError(this, $"不支持类型 '{GetType().Name}' 和 '{otherValueType.GetType().Name}' 的除法操作");
+    public virtual ValueType Mod(ValueType otherValueType) => throw new InvalidOperationError(this, $"不支持类型 '{GetType().Name}' 和 '{otherValueType.GetType().Name}' 的取模操作");
 
     #endregion
 
