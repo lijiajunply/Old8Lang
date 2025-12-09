@@ -246,11 +246,13 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         if (CurrentToken.Type is LangTokenType.Public or LangTokenType.Private or LangTokenType.Static)
         {
             var parsedModifiers = ParseAccessModifiers();
-            
+
             // 合并修饰符
-            var combinedModifiers = modifiers != null ? new List<AccessModifierType>(modifiers) : new List<AccessModifierType>();
+            var combinedModifiers = modifiers != null
+                ? new List<AccessModifierType>(modifiers)
+                : new List<AccessModifierType>();
             combinedModifiers.AddRange(parsedModifiers);
-            
+
             // 解析后面的语句（set 或 funcDeclaration）
             return ParseStatement(combinedModifiers);
         }
@@ -290,7 +292,8 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                     foundIn = true;
                     break;
                 }
-                else if (token.Type != LangTokenType.Identifier && token.Type != LangTokenType.Comma)
+
+                if (token.Type != LangTokenType.Identifier && token.Type != LangTokenType.Comma)
                 {
                     break;
                 }
@@ -539,13 +542,13 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             }
 
             // 解析标识符和左括号
-            var funcName = ParseIdentifier();
+            ParseIdentifier();
             Expect(LangTokenType.LeftParen);
-            var parameters = ParseIdList();
+            ParseIdList();
             Expect(LangTokenType.RightParen);
 
             // 保存当前位置，用于回滚
-            var afterParamsIndex = CurrentIndex;
+            // var afterParamsIndex = CurrentIndex;
 
             // 检查是否是函数定义：
             // - 箭头函数：标识符( params ) -> block
@@ -637,7 +640,8 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         if (leftExpr is LangId langId)
         {
             // 普通标识符赋值：identifier <- value
-            return new SetStatement(new LangId(langId.IdName, assumptionType, leftExpr.Position), expression, leftExpr.Position);
+            return new SetStatement(new LangId(langId.IdName, assumptionType, leftExpr.Position), expression,
+                leftExpr.Position);
         }
         else
         {
@@ -834,8 +838,8 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         }
 
         var classBlock = ParseClassBlock();
-        return new ClassInit(new TypeTemplate(className, classBlock.ToAnyData(), classBlock.ToStaticData(), parentClassName));
-        
+        return new ClassInit(new TypeTemplate(className, classBlock.ToAnyData(), classBlock.ToStaticData(),
+            parentClassName));
     }
 
     /// <summary>
@@ -845,7 +849,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     private List<AccessModifierType> ParseAccessModifiers()
     {
         var modifiers = new List<AccessModifierType>();
-        
+
         while (true)
         {
             switch (CurrentToken.Type)
@@ -890,40 +894,44 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             try
             {
                 // 保存当前位置，用于回滚
-                var savedIndex = CurrentIndex;
-                
+                // var savedIndex = CurrentIndex;
+
                 // 尝试解析修饰符
                 List<AccessModifierType> modifiers = [];
                 if (CurrentToken.Type is LangTokenType.Public or LangTokenType.Private or LangTokenType.Static)
                 {
                     modifiers = ParseAccessModifiers();
                 }
-                
+
                 // 解析语句
                 var statement = ParseStatement();
-                
+
                 // 根据语句类型和修饰符生成相应的类成员节点
                 if (modifiers.Any())
                 {
                     OldStatement classMemberStatement;
-                    
+
                     switch (statement)
                     {
-                        case SetStatement setStmt when setStmt.Id != null:
+                        case SetStatement { Id: not null } setStmt:
                             // 带有修饰符的类字段声明
-                            var memberId = new ClassMemberId(setStmt.Id.IdName, setStmt.Id.AssumptionType, modifiers, setStmt.Position);
-                            classMemberStatement = new ClassFieldSetStatement(memberId, setStmt.Value, setStmt.Position);
+                            var memberId = new ClassMemberId(setStmt.Id.IdName, setStmt.Id.AssumptionType, modifiers,
+                                setStmt.Position);
+                            classMemberStatement =
+                                new ClassFieldSetStatement(memberId, setStmt.Value, setStmt.Position);
                             break;
-                        case FuncInit funcInit when funcInit.FuncLangValue.Id != null:
+                        case FuncInit { FuncLangValue.Id: not null } funcInit:
                             // 带有修饰符的类函数声明
-                            var memberId2 = new ClassMemberId(funcInit.FuncLangValue.Id.IdName, funcInit.FuncLangValue.Id.AssumptionType, modifiers, funcInit.Position);
-                            classMemberStatement = new ClassFuncInitStatement(memberId2, funcInit.FuncLangValue, funcInit.Position);
+                            var memberId2 = new ClassMemberId(funcInit.FuncLangValue.Id.IdName,
+                                funcInit.FuncLangValue.Id.AssumptionType, modifiers, funcInit.Position);
+                            classMemberStatement =
+                                new ClassFuncInitStatement(memberId2, funcInit.FuncLangValue, funcInit.Position);
                             break;
                         default:
                             classMemberStatement = statement;
                             break;
                     }
-                    
+
                     statements.Add(classMemberStatement);
                 }
                 else

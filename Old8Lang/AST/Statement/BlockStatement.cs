@@ -2,7 +2,6 @@ using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using System.Text;
 using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Statement;
@@ -110,7 +109,7 @@ public class BlockStatement : OldStatement
     public Dictionary<ClassMemberId, OldExpr> ToAnyData()
     {
         var c = new Dictionary<ClassMemberId, OldExpr>();
-        
+
         // 处理所有语句，筛选出非静态成员
         foreach (var x in OtherStatements.Concat(ImportStatements))
         {
@@ -124,10 +123,10 @@ public class BlockStatement : OldStatement
                 }
             }
         }
-        
+
         return c;
     }
-    
+
     /// <summary>
     /// 获取静态成员字典
     /// </summary>
@@ -135,7 +134,7 @@ public class BlockStatement : OldStatement
     public Dictionary<ClassMemberId, OldExpr> ToStaticData()
     {
         var c = new Dictionary<ClassMemberId, OldExpr>();
-        
+
         // 处理所有语句，筛选出静态成员
         foreach (var x in OtherStatements.Concat(ImportStatements))
         {
@@ -149,7 +148,7 @@ public class BlockStatement : OldStatement
                 }
             }
         }
-        
+
         return c;
     }
 
@@ -160,9 +159,7 @@ public class BlockStatement : OldStatement
             case SetStatement statement:
                 if (statement.Id == null) return (null, null);
                 // 如果是 ClassMemberId 直接使用，否则转换
-                var memberId1 = statement.Id is ClassMemberId classMemberId1 ? 
-                    classMemberId1 : 
-                    new ClassMemberId(statement.Id);
+                var memberId1 = statement.Id as ClassMemberId ?? new ClassMemberId(statement.Id);
                 return (id: memberId1, Expr: statement.Value);
             case ClassFieldSetStatement classFieldSet:
                 // 直接使用 ClassFieldSetStatement 中的 ClassMemberId
@@ -170,9 +167,7 @@ public class BlockStatement : OldStatement
             case FuncInit init:
                 if (init.FuncLangValue.Id == null) return (null, null);
                 // 如果是 ClassMemberId 直接使用，否则转换
-                var memberId2 = init.FuncLangValue.Id is ClassMemberId classMemberId2 ? 
-                    classMemberId2 : 
-                    new ClassMemberId(init.FuncLangValue.Id);
+                var memberId2 = init.FuncLangValue.Id as ClassMemberId ?? new ClassMemberId(init.FuncLangValue.Id);
                 return (memberId2, Expr: init.FuncLangValue);
             case ClassFuncInitStatement classFuncInit:
                 // 直接使用 ClassFuncInitStatement 中的 ClassMemberId

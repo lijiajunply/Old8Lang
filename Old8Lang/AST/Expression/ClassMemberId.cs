@@ -1,6 +1,3 @@
-using System; 
-using System.Collections.Generic;
-using System.Linq;
 using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression;
@@ -24,58 +21,64 @@ public class ClassMemberId : LangId
     /// <summary>
     /// 互斥的修饰符组
     /// </summary>
-    private static readonly List<HashSet<AccessModifierType>> MutuallyExclusiveModifiers = new()
-    {
-        new HashSet<AccessModifierType> { AccessModifierType.Public, AccessModifierType.Private, AccessModifierType.Protected }
-    };
-    
+    private static readonly List<HashSet<AccessModifierType>> MutuallyExclusiveModifiers =
+    [
+        [AccessModifierType.Public, AccessModifierType.Private, AccessModifierType.Protected]
+    ];
+
     /// <summary>
     /// 访问修饰符集合
     /// </summary>
     public readonly HashSet<AccessModifierType> Modifiers;
-    
+
     /// <summary>
     /// 原始LangId
     /// </summary>
-    public LangId OriginalId { get; } 
-    
+    public LangId OriginalId { get; }
+
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="id">原始LangId</param>
     /// <param name="modifiers">访问修饰符列表</param>
-    public ClassMemberId(LangId id, IEnumerable<AccessModifierType> modifiers = null) 
+    public ClassMemberId(LangId id, IEnumerable<AccessModifierType>? modifiers = null)
         : base(id.IdName, id.AssumptionType, id.Position)
     {
         OriginalId = id;
-        Modifiers = modifiers != null ? new HashSet<AccessModifierType>(modifiers) : new HashSet<AccessModifierType>();
+        Modifiers = modifiers != null ? [..modifiers] : [];
         ValidateModifiers();
     }
-    
+
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="name">成员名称</param>
     /// <param name="assumptionType">类型假设</param>
     /// <param name="modifiers">访问修饰符列表</param>
-    public ClassMemberId(string name, string assumptionType = "", IEnumerable<AccessModifierType> modifiers = null) 
+    public ClassMemberId(string name, string assumptionType = "", IEnumerable<AccessModifierType>? modifiers = null)
         : base(name, assumptionType)
     {
         OriginalId = new LangId(name, assumptionType);
-        Modifiers = modifiers != null ? new HashSet<AccessModifierType>(modifiers) : new HashSet<AccessModifierType>();
+        Modifiers = modifiers != null ? [..modifiers] : [];
         ValidateModifiers();
     }
-    
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="assumptionType"></param>
     /// <param name="modifiers">访问修饰符列表</param>
     /// <param name="position">位置信息</param>
-    public ClassMemberId(string name, string assumptionType, IEnumerable<AccessModifierType> modifiers, SourcePosition position) 
+    public ClassMemberId(string name, string assumptionType, IEnumerable<AccessModifierType>? modifiers,
+        SourcePosition position)
         : base(name, assumptionType, position)
     {
         OriginalId = new LangId(name, assumptionType, position);
-        Modifiers = modifiers != null ? new HashSet<AccessModifierType>(modifiers) : new HashSet<AccessModifierType>();
+        Modifiers = modifiers != null ? [..modifiers] : [];
         ValidateModifiers();
     }
-    
+
     /// <summary>
     /// 验证修饰符是否合法
     /// </summary>
@@ -83,17 +86,15 @@ public class ClassMemberId : LangId
     private void ValidateModifiers()
     {
         // 检查互斥修饰符
-        foreach (var exclusiveGroup in MutuallyExclusiveModifiers)
+        foreach (var conflictingModifiers in from exclusiveGroup in MutuallyExclusiveModifiers
+                 let count = Modifiers.Count(exclusiveGroup.Contains)
+                 where count > 1
+                 select string.Join(", ", Modifiers.Where(exclusiveGroup.Contains)))
         {
-            var count = Modifiers.Count(m => exclusiveGroup.Contains(m));
-            if (count > 1)
-            {
-                var conflictingModifiers = string.Join(", ", Modifiers.Where(m => exclusiveGroup.Contains(m)));
-                throw new SyntaxError(Position, $"修饰符 {conflictingModifiers} 互斥，不能同时使用");
-            }
+            throw new SyntaxError(Position, $"修饰符 {conflictingModifiers} 互斥，不能同时使用");
         }
     }
-    
+
     /// <summary>
     /// 检查是否有指定修饰符
     /// </summary>
@@ -103,7 +104,7 @@ public class ClassMemberId : LangId
     {
         return Modifiers.Contains(modifier);
     }
-    
+
     /// <summary>
     /// 添加修饰符
     /// </summary>
@@ -121,9 +122,10 @@ public class ClassMemberId : LangId
                 throw new SyntaxError(Position, $"修饰符 {modifier} 与已有的修饰符互斥");
             }
         }
+
         Modifiers.Add(modifier);
     }
-    
+
     /// <summary>
     /// 转换为字符串
     /// </summary>
@@ -135,7 +137,7 @@ public class ClassMemberId : LangId
         if (HasModifier(AccessModifierType.Public)) modifierList.Add("public");
         if (HasModifier(AccessModifierType.Private)) modifierList.Add("private");
         if (HasModifier(AccessModifierType.Protected)) modifierList.Add("protected");
-        
+
         var modifiers = modifierList.Any() ? string.Join(" ", modifierList) + " " : string.Empty;
         return $"{modifiers}{base.ToString()}";
     }
