@@ -378,8 +378,8 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 // 先解析主要表达式
                 var expr = ParsePrimary();
                 // 处理点访问和索引访问等复杂左值表达式
-                expr = ParseDotExpr(expr);
-                
+                ParseDotExpr(expr);
+
                 // 检查是否是类型注解
                 if (CurrentToken.Type == LangTokenType.Colon)
                 {
@@ -1276,7 +1276,8 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                CurrentToken.Type == LangTokenType.Xor)
         {
             var operatorToken = CurrentToken;
-            var position = new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position =
+                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
             Expect(operatorToken.Type);
             var right = ParseBinaryExpression();
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
@@ -1284,7 +1285,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
 
         return left;
     }
-    
+
     /// <summary>
     /// 解析三元表达式
     /// ternaryExpression = expression "?" expression ":" expression ;
@@ -1298,28 +1299,28 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         {
             var questionToken = CurrentToken;
             Expect(LangTokenType.Question);
-            
+
             // 解析问号后的表达式（true分支）
             var trueExpr = ParseExpression();
-            
+
             // 检查是否有 :，这是三元表达式的分支分隔符
             if (CurrentToken.Type == LangTokenType.Colon)
             {
                 Expect(LangTokenType.Colon);
-                
+
                 // 解析冒号后的表达式（false分支）
                 var falseExpr = ParseExpression();
-                
+
                 // 创建三元表达式节点
                 // 语法：condition ? trueExpr : falseExpr
                 return new TernaryExpression(
-                    condition, 
-                    trueExpr, 
-                    falseExpr, 
+                    condition,
+                    trueExpr,
+                    falseExpr,
                     new SourcePosition(questionToken.Line, questionToken.Column));
             }
         }
-        
+
         // 不是三元表达式，返回原始条件表达式
         return condition;
     }
@@ -1334,7 +1335,8 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                or LangTokenType.NotEquals or LangTokenType.LessThan or LangTokenType.GreaterThan)
         {
             var operatorToken = CurrentToken;
-            var position = new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position =
+                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
             Expect(operatorToken.Type);
             var right = ParseNumberOpera1();
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
@@ -1660,7 +1662,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
 
         // 保存当前位置，用于回退
         var exprStartIndex = CurrentIndex;
-        
+
         elements.Add(ParseExpression());
         if (CurrentToken.Type == LangTokenType.Wavy)
         {
@@ -1693,7 +1695,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             // 回退到表达式开始位置，准备解析列表推导式
             CurrentIndex = exprStartIndex;
             elements.Clear();
-            
+
             // 解析列表推导式
             return ParseListComprehension(position);
         }
@@ -1708,7 +1710,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         // 返回ArrayValue表示数组
         return new ArrayLangValue(elements, position);
     }
-    
+
     /// <summary>
     /// 解析列表推导式
     /// list_comprehension = "[" expression ( "if" expression "else" expression )? "for" identifier "in" expression ( "if" expression )* ( "for" identifier "in" expression ( "if" expression )* )* "]" ;
@@ -1718,33 +1720,33 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     {
         // 解析表达式部分
         var expression = ParseExpression();
-        
+
         // 三元表达式已经在 ParseExpression 中处理，这里不需要额外处理
-        
+
         // 解析 for 循环部分
         var loops = new List<ListComprehension>();
-        
+
         while (CurrentToken.Type == LangTokenType.For)
         {
             Expect(LangTokenType.For);
-            
+
             // 解析变量
             var variable = ParseIdentifier();
-            
+
             Expect(LangTokenType.In);
-            
+
             // 解析可迭代对象
             var iterable = ParseExpression();
-            
+
             // 解析条件筛选（可选）
             List<OldExpr> conditions = [];
-            
+
             while (CurrentToken.Type == LangTokenType.If)
             {
                 Expect(LangTokenType.If);
                 conditions.Add(ParseExpression());
             }
-            
+
             // 组合多个条件，使用 AND 操作符连接
             OldExpr? condition = null;
             if (conditions.Count > 0)
@@ -1759,42 +1761,42 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                         new SourcePosition(CurrentToken.Line, CurrentToken.Column));
                 }
             }
-            
+
             // 创建循环节点
             loops.Add(new ListComprehension(
-                expression, 
-                variable, 
-                iterable, 
-                condition, 
-                null, 
+                expression,
+                variable,
+                iterable,
+                condition,
+                null,
                 position));
         }
-        
+
         Expect(LangTokenType.RightBracket);
-        
+
         if (loops.Count == 0)
         {
             throw CreateSyntaxError("列表推导式必须包含至少一个 for 循环");
         }
-        
+
         // 处理嵌套循环
         for (int i = loops.Count - 2; i >= 0; i--)
         {
             var currentLoop = loops[i];
             var nextLoop = loops[i + 1];
-            
+
             // 将下一个循环作为当前循环的嵌套循环
             currentLoop = new ListComprehension(
-                currentLoop.Expression, 
-                currentLoop.Variable, 
-                currentLoop.Iterable, 
-                currentLoop.Condition, 
-                [nextLoop], 
+                currentLoop.Expression,
+                currentLoop.Variable,
+                currentLoop.Iterable,
+                currentLoop.Condition,
+                [nextLoop],
                 currentLoop.Position);
-            
+
             loops[i] = currentLoop;
         }
-        
+
         return loops[0];
     }
 
@@ -2107,7 +2109,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     }
 
 
-
+    /// <summary>
     /// 解析标识符，支持带类型注解的标识符：identifier:type
     /// 允许将关键字用作标识符
     /// </summary>
@@ -2135,7 +2137,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         // 默认不处理类型注解
         return new LangId(value, "", position);
     }
-    
+
     /// <summary>
     /// 解析带有类型注解的标识符，用于赋值语句、函数参数和lambda参数
     /// </summary>

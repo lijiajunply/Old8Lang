@@ -131,7 +131,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                 if (value is ILangList list) return new IntLangValue(list.GetLength());
                 throw new InvalidOperationError(this, $"{results[0]} 不是列表类型");
             }
-            case "Test" or "test":
+            case "Assert" or "assert":
             {
                 var value = results[0].Run(manager);
                 var value1 = results[1].Run(manager);
@@ -266,12 +266,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
 
     public override string ToString()
     {
-        return Id.IdName switch
-        {
-            "PrintLine" => $"print({string.Join(", ", Ids)})",
-            "Print" => $"print({string.Join(", ", Ids)})",
-            _ => $"{Id}({string.Join(", ", Ids)})"
-        };
+        return $"{Id}({string.Join(", ", Ids)})";
     }
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)

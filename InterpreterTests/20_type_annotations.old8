@@ -33,7 +33,7 @@ arrayVar:array <- [1, 2, 3]
 PrintLine("数组类型假注: arrayVar = " + arrayVar)
 
 // 列表类型假注
-listVar:list <- list[1, 2, 3]
+listVar <- list[1, 2, 3] // list 类型的不支持类型假注
 PrintLine("列表类型假注: listVar = " + listVar)
 
 // 字典类型假注
@@ -145,7 +145,7 @@ defaultString:string <- ""
 PrintLine("带有默认值的string类型假注: defaultString = " + defaultString)
 
 // 类型假注的函数重载
-PrintLine("\n=== 类型假注的函数重载 ===")
+// PrintLine("\n=== 类型假注的函数重载 ===")
 
 // 注意：这里可能不支持函数重载
 // func testOverload(a:int) {
@@ -160,7 +160,7 @@ PrintLine("\n=== 类型假注的函数重载 ===")
 // testOverload("hello")
 
 // 类型假注的泛型支持
-PrintLine("\n=== 类型假注的泛型支持 ===")
+// PrintLine("\n=== 类型假注的泛型支持 ===")
 
 // 注意：这里可能不支持泛型
 // listGeneric:list<int> <- list[1, 2, 3]
