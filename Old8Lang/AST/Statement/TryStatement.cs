@@ -33,11 +33,11 @@ public class TryStatement(
             {
                 // 如果异常类型为null，则匹配所有异常
                 if (exceptionType == null ||
-                    ex.GetType().Name == exceptionType ||
-                    ex.GetType().BaseType?.Name == exceptionType)
+                    IsMatch(ex, exceptionType))
                 {
                     // 如果有异常变量，则将异常赋值给该变量
-                    if (exceptionVar != null)
+                    manager.AddChildren();
+                    if (exceptionVar != null && !string.IsNullOrEmpty(exceptionVar.IdName))
                     {
                         // 创建一个包含异常信息的值类型
                         manager.Set(exceptionVar, new ErrorLangValue(ex));
@@ -45,6 +45,7 @@ public class TryStatement(
 
                     // 执行catch块
                     catchBlock.Run(manager);
+                    manager.RemoveChildren();
                     return; // 只执行第一个匹配的catch块
                 }
             }
@@ -62,6 +63,30 @@ public class TryStatement(
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         // IL生成暂不实现
+    }
+
+    private static bool IsMatch(Old8Exception exception, string exceptionType)
+    {
+        if (string.IsNullOrEmpty(exceptionType) || exceptionType == "Exception")
+        {
+            return true;
+        }
+
+        var type = exception.GetType().Name;
+        while (true)
+        {
+            if (string.IsNullOrEmpty(type))
+            {
+                return false;
+            }
+
+            if (type == exceptionType)
+            {
+                return true;
+            }
+
+            type = exception.GetType().BaseType?.Name;
+        }
     }
 
     public override OldStatement this[int index] => this;

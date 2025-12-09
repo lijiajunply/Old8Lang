@@ -1161,6 +1161,14 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                         exceptionVar = new LangId(CurrentToken.Value, position: CreateSourcePosition(CurrentToken));
                         CurrentIndex++;
                     }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(exceptionType) && !exceptionType.Contains("Exception"))
+                        {
+                            exceptionVar = new LangId(exceptionType, position: CreateSourcePosition(CurrentToken));
+                            exceptionType = null;
+                        }
+                    }
                 }
 
                 Expect(LangTokenType.RightParen);
