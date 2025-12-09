@@ -1,0 +1,55 @@
+// 测试函数重载功能
+PrintLine("=== 函数重载测试 ===")
+
+// 基本函数重载测试
+PrintLine("\n1. 基本函数重载测试")
+
+func testOverload() {
+    PrintLine("无参数函数")
+}
+
+func testOverload(a) {
+    PrintLine("单参数函数: " + a)
+}
+
+func testOverload(a, b) {
+    PrintLine("双参数函数: " + a + ", " + b)
+}
+
+func testOverload(a, b, c) {
+    PrintLine("三参数函数: " + a + ", " + b + ", " + c)
+}
+
+// 调用不同参数数量的重载函数
+testOverload()
+testOverload(1)
+testOverload(1, 2)
+testOverload(1, 2, 3)
+
+// 函数重载与参数数量变化测试
+PrintLine("\n2. 函数重载与参数数量变化测试")
+
+func calculate(a)
+{
+    return a * 2
+}
+
+func calculate(a, b)
+{
+    return a * b
+}
+
+func calculate(a, b, c)
+{
+    return a + b + c
+}
+
+calc1 <- calculate(5)
+calc2 <- calculate(5, 3)
+calc3 <- calculate(5, 3, 2)
+
+PrintLine("calculate(5) = " + calc1)
+PrintLine("calculate(5, 3) = " + calc2)
+PrintLine("calculate(5, 3, 2) = " + calc3)
+
+PrintLine("\n✅ 函数重载测试完成")

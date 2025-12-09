@@ -184,6 +184,20 @@ public class VariateManager
         return GetAny(id);
     }
 
+    /// <summary>
+    /// 根据函数名和参数数量查找函数
+    /// </summary>
+    /// <param name="id">函数名</param>
+    /// <param name="paramCount">参数数量</param>
+    /// <returns>找到的函数或null</returns>
+    public FuncLangValue? GetFunc(LangId id, int paramCount)
+    {
+        return ImportInfos.FirstOrDefault(x =>
+            x is FuncLangValue func && 
+            func.Id!.IdName == id.IdName &&
+            func.Ids?.Count == paramCount) as FuncLangValue;
+    }
+    
     public ImportInfo? GetAny(LangId id)
     {
         return ImportInfos.FirstOrDefault(x =>

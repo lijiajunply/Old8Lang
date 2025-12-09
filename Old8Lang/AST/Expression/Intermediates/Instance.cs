@@ -19,6 +19,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
 
     public override LangValueType Run(LangParser.VariateManager manager)
     {
+        LangValueType result = new VoidLangValue();
         var results = Ids.Select(t => t.Run(manager)).ToList();
 
         switch (Id.IdName)
@@ -130,47 +131,60 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
             }
         }
 
-        var result = Id.Run(manager);
-
-        // 如果result是TypeTemplate，则创建其实例
-        if (result is TypeTemplate typeTemplate)
+        // 先尝试根据函数名和参数数量查找重载函数
+        var func = manager.GetFunc(Id, Ids.Count);
+        if (func != null)
         {
-            // 创建类的实例
-            var instance = typeTemplate.CreateInstance();
-
-            // 初始化实例，设置Interpreter
-            instance.Init(manager.Interpreter);
-
-            // 保存init方法的引用
-            if (instance.Result.TryGetValue("init", out var initResult))
-            {
-                if (initResult is not FuncLangValue initFunc) throw new TypeError(this, "FuncValue", "init 不是函数类型");
-
-                // 在调用init方法前，将当前实例添加到AnyInfo中，以便this关键字访问
-                instance.Manager.Set(new LangId("this"), instance);
-                instance.Manager.IsFunc = true; // 设置为函数上下文
-
-                // 调用init方法，并将参数传递给它
-                initFunc.Run(instance.Manager, Ids);
-
-                // 恢复非函数上下文标志
-                instance.Manager.IsFunc = false;
-            }
-            else if (Ids.Count != 0)
-            {
-                throw new InvalidOperationError(this, "找不到对应的init函数");
-            }
-
-            result = instance;
+            // 找到匹配的重载函数，直接调用
+            result = func.Run(manager, Ids);
         }
-        // 如果result是FuncLangValue，则调用它
-        else if (result is FuncLangValue funcValue)
+        else
         {
-            // 直接调用函数，参数表达式会在函数体内执行
-            result = funcValue.Run(manager, Ids);
+            // 如果没有找到重载函数，使用原来的方式查找
+            var idResult = Id.Run(manager);
+            result = idResult;
+
+            // 如果idResult是TypeTemplate，则创建其实例
+            if (idResult is TypeTemplate typeTemplate)
+            {
+                // 创建类的实例
+                var instance = typeTemplate.CreateInstance();
+
+                // 初始化实例，设置Interpreter
+                instance.Init(manager.Interpreter);
+
+                // 保存init方法的引用
+                if (instance.Result.TryGetValue("init", out var initResult))
+                {
+                    if (initResult is not FuncLangValue initFunc) throw new TypeError(this, "FuncValue", "init 不是函数类型");
+
+                    // 在调用init方法前，将当前实例添加到AnyInfo中，以便this关键字访问
+                    instance.Manager.Set(new LangId("this"), instance);
+                    instance.Manager.IsFunc = true; // 设置为函数上下文
+
+                    // 调用init方法，并将参数传递给它
+                    initFunc.Run(instance.Manager, Ids);
+
+                    // 恢复非函数上下文标志
+                    instance.Manager.IsFunc = false;
+                }
+                else if (Ids.Count != 0)
+                {
+                    throw new InvalidOperationError(this, "找不到对应的init函数");
+                }
+
+                result = instance;
+            }
+            // 如果idResult是FuncLangValue，则调用它
+            else if (idResult is FuncLangValue funcValue)
+            {
+                // 直接调用函数，参数表达式会在函数体内执行
+                result = funcValue.Run(manager, Ids);
+            }
         }
+        
         // 原来的AnyLangValue处理逻辑，用于兼容旧代码
-        else if (result is AnyLangValue anyValue)
+        if (result is AnyLangValue anyValue)
         {
             // 保存init方法的引用，避免覆盖result变量
             if (anyValue.Result.TryGetValue("init", out var initResult))

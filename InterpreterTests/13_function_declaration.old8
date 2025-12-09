@@ -125,6 +125,8 @@ PrintLine("5 + 3 = " + addResult)
 multiplyResult <- applyOperation(5, 3, multiply)
 PrintLine("5 * 3 = " + multiplyResult)
 
+// 以上测试成功
+
 // 函数作为返回值
 PrintLine("\n=== 函数作为返回值 ===")
 

@@ -13,21 +13,23 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
     public readonly FuncLangValue FuncLangValue = a;
 
     public override void Run(VariateManager manager)
-    {
-        // 检查函数是否已存在
-        if (FuncLangValue.Id != null)
         {
-            var existingFunc = manager.ImportInfos.FirstOrDefault(info => 
-                info is FuncLangValue func && func.Id?.IdName == FuncLangValue.Id.IdName);
-            
-            if (existingFunc != null)
+            // 检查函数是否已存在（只有当函数名和参数数量都相同时才视为重复）
+            if (FuncLangValue.Id != null)
             {
-                throw new DuplicateNameError(this, FuncLangValue.Id.IdName, "函数");
+                var existingFunc = manager.ImportInfos.FirstOrDefault(info => 
+                    info is FuncLangValue func && 
+                    func.Id?.IdName == FuncLangValue.Id.IdName &&
+                    func.Ids?.Count == FuncLangValue.Ids?.Count);
+                
+                if (existingFunc != null)
+                {
+                    throw new DuplicateNameError(this, FuncLangValue.Id.IdName, "函数");
+                }
             }
+            
+            manager.AddClassAndFunc(FuncLangValue);
         }
-        
-        manager.AddClassAndFunc(FuncLangValue);
-    }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {

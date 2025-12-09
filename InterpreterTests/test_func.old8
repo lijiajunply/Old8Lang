@@ -1,9 +1,15 @@
-func fibonacci(n) {
-    if n <= 1 {
-        return 1
-    }
-    return fibonacci(n - 1) + fibonacci(n - 2)
+// 函数重载（如果支持）
+PrintLine("\n=== 函数重载（如果支持） ===")
+
+func testOverload(a) {
+    PrintLine("单参数函数: " + a)
 }
 
-fibResult <- fibonacci(6)
-PrintLine("斐波那契数列第6项 = " + fibResult)
+func testOverload(a, b) {
+    PrintLine("双参数函数: " + a + ", " + b)
+}
+
+testOverload(1)
+testOverload(1, 2)
+
+PrintLine("\n✅ 所有函数声明和调用测试完成")
