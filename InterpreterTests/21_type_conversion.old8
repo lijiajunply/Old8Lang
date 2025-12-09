@@ -121,10 +121,10 @@ PrintLine("配置值: '" + configValue + "', 转换为整数: " + configInt)
 // 格式化输出
 number <- 123
 PrintLine("使用字符串拼接: " + "数值是 " + number)
-PrintLine("使用字符串模板: $"数值是 {number}"")
+PrintLine("使用字符串模板:" + $"数值是 {number}")
 
 // 测试各种边界情况
-PrintLine("\n=== 测试各种边界情况 ===")
+PrintLine("=== 测试各种边界情况 ===")
 
 // 零值转换
 zeroInt <- 0

@@ -2044,7 +2044,9 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         var position = new SourcePosition(numberToken.Line, numberToken.Column, tokenValue: numberToken.Value);
         var value = numberToken.Value;
         Expect(LangTokenType.Number);
-        return new DoubleLangValue(double.Parse(value), position);
+        if (!value.Contains('E') && !value.Contains('e')) return new DoubleLangValue(double.Parse(value), position);
+        var decimalValue = decimal.Parse(value, System.Globalization.NumberStyles.Float);
+        return new DoubleLangValue((double)decimalValue, position);
     }
 
     /// <summary>

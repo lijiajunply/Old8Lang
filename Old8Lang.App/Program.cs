@@ -10,7 +10,7 @@ if (args.Length == 0)
 {
     args =
     [
-        "-f", "/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/InterpreterTests/test_as.old8"
+        "-s", "/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/SyntaxTests/22_scientific_notation.old8"
     ];
 }
 #endif

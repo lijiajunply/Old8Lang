@@ -31,7 +31,6 @@ public static class LangTokenizer
 
         for (var i = 0; i < code.Length; i++)
         {
-
             #region 特殊字符
 
             if (code[i] == '\r')
@@ -171,6 +170,7 @@ public static class LangTokenizer
                             line++;
                             column = i;
                         }
+
                         sb.Append(code[i]);
                     }
 
@@ -207,6 +207,7 @@ public static class LangTokenizer
                             line++;
                             column = i;
                         }
+
                         sb.Append(code[i]);
                     }
 
@@ -375,16 +376,18 @@ public static class LangTokenizer
 
             var enumList = Enum.GetNames<KeywordType>().Select(x => x.ToLower()).ToFrozenSet();
             // 找到匹配的关键字
-            var matchedKeyword = enumList.FirstOrDefault(x => x[0] == code[i] && 
-                i + x.Length <= code.Length && 
-                code.Substring(i, x.Length) == x &&
-                (i + x.Length == code.Length || !char.IsLetterOrDigit(code[i + x.Length]) && code[i + x.Length] != '_'));
-            
+            var matchedKeyword = enumList.FirstOrDefault(x => x[0] == code[i] &&
+                                                              i + x.Length <= code.Length &&
+                                                              code.Substring(i, x.Length) == x &&
+                                                              (i + x.Length == code.Length ||
+                                                               !char.IsLetterOrDigit(code[i + x.Length]) &&
+                                                               code[i + x.Length] != '_'));
+
             if (!string.IsNullOrEmpty(matchedKeyword))
             {
                 // 添加关键字标记
-                tokens.Add(new LangToken(matchedKeyword, 
-                    Enum.Parse<LangTokenType>(char.ToUpper(matchedKeyword[0]) + matchedKeyword[1..]), 
+                tokens.Add(new LangToken(matchedKeyword,
+                    Enum.Parse<LangTokenType>(char.ToUpper(matchedKeyword[0]) + matchedKeyword[1..]),
                     line, i - column));
                 i += matchedKeyword.Length - 1;
                 continue;
@@ -401,6 +404,32 @@ public static class LangTokenizer
                 {
                     sb.Append(code[i + 1]);
                     i++;
+                }
+
+                // 处理科学计数法 (e.g., 1.23e3, 1.23E-4)
+                if (i + 1 < code.Length && char.ToLower(code[i + 1]) == 'e')
+                {
+                    if (!sb.ToString().Contains('.'))
+                    {
+                        sb.Append(".0");
+                    }
+
+                    sb.Append(code[i + 1]);
+                    i++;
+
+                    // 处理指数符号 (+/-)
+                    if (i + 1 < code.Length && (code[i + 1] == '+' || code[i + 1] == '-'))
+                    {
+                        sb.Append(code[i + 1]);
+                        i++;
+                    }
+
+                    // 处理指数数字
+                    while (i + 1 < code.Length && char.IsDigit(code[i + 1]))
+                    {
+                        sb.Append(code[i + 1]);
+                        i++;
+                    }
                 }
 
                 tokens.Add(new LangToken(sb.ToString(), LangTokenType.Number, line, i - column));
@@ -423,9 +452,9 @@ public static class LangTokenizer
 
             // 处理无法识别的字符
             throw new Error.SyntaxError(
-                code[i].ToString(), 
-                line, 
-                i - column, 
+                code[i].ToString(),
+                line,
+                i - column,
                 $"语法错误：无法识别的字符 '{code[i]}'。建议检查是否输入了无效字符或特殊字符。");
 
             #endregion
@@ -457,7 +486,7 @@ public struct FilteringCommentsTokenizer(string input)
                 {
                     Advance();
                 }
-                
+
                 // 保留换行符
                 if (CurrentIndex < input.Length && input[CurrentIndex] == '\n')
                 {
@@ -479,7 +508,7 @@ public struct FilteringCommentsTokenizer(string input)
                         Advance(); // Skip '/'  
                         break;
                     }
-                    
+
                     // 保留多行注释中的换行符
                     if (input[CurrentIndex] == '\n')
                     {

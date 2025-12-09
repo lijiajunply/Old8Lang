@@ -17,16 +17,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_as.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_as_parse.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_as_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/22_scientific_notation.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/22_scientific_notation.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/21_type_conversion.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/21_type_conversion.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/22_scientific_notation.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/22_scientific_notation.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/break_continue_simple.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/break_continue_test.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/fibonacci_debug.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/fibonacci_standard.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/fibonacci_test.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_access_modifiers.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_as.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_as_parse.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_as_simple.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_class_modifiers.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_func.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_func_overload.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_simple_class_modifiers.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_static_members.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_static_modifiers.old8" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/AsLangValue.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,28 +72,10 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///Immediate 窗口" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Immediate 窗口" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/StringLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ClassInit.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/BasicInfo.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/BasicInfo.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangToken.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1f/4c54500e/List`1.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -105,7 +101,7 @@
     ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
     ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
     ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Debug",
+    ".NET 项目.Old8Lang.App.executor": "Run",
     "ASKED_ADD_EXTERNAL_FILES": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -362,7 +358,7 @@
       <workItem from="1765277636089" duration="6000" />
       <workItem from="1765277821785" duration="994000" />
       <workItem from="1765278822007" duration="179000" />
-      <workItem from="1765279105952" duration="5507000" />
+      <workItem from="1765279105952" duration="7673000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -869,43 +865,17 @@
           <option name="timeStamp" value="530" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang.App/Program.cs</url>
-          <line>198</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" containingFunctionPresentation="">
+          <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
+          <line>2046</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" containingFunctionPresentation="方法 'ParseDoubleLiteral'">
             <startOffsets>
-              <option value="4673" />
+              <option value="68444" />
             </startOffsets>
             <endOffsets>
-              <option value="4705" />
+              <option value="68493" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="533" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs</url>
-          <line>248</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" containingFunctionPresentation="方法 'Run'">
-            <startOffsets>
-              <option value="9316" />
-            </startOffsets>
-            <endOffsets>
-              <option value="9358" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="537" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs</url>
-          <line>226</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" containingFunctionPresentation="方法 'Run'">
-            <startOffsets>
-              <option value="8471" />
-            </startOffsets>
-            <endOffsets>
-              <option value="8487" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="538" />
+          <option name="timeStamp" value="541" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />

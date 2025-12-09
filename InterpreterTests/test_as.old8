@@ -1,5 +1,0 @@
-// 测试 as 关键字作为操作符
-PrintLine("123" as int)
-PrintLine(123 as string)
-PrintLine(123.45 as int)
-PrintLine(true as string)
