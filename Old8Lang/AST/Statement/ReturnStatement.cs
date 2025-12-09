@@ -8,8 +8,8 @@ public class ReturnStatement(OldExpr returnExpr, SourcePosition position = defau
 {
     public override void Run(VariateManager manager)
     {
-        manager.IsReturn = true;
         manager.Result = returnExpr.Run(manager);
+        manager.IsReturn = true;
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)

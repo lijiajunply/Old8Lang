@@ -3,35 +3,35 @@
   "LibInfos": [
     {
       "LibName": "OS",
-      "Var": 0.3,
+      "Var": 0.8,
       "IsDir": false
     },
     {
       "LibName": "File",
-      "Var": 0.3,
+      "Var": 0.8,
       "IsDir": false
     },
     {
       "LibName": "Terminal",
-      "Var": 0.3,
+      "Var": 0.8,
       "IsDir": false
     },
     {
       "LibName": "Net",
-      "Var": 0.3,
+      "Var": 0.8,
       "IsDir": true
     },
     {
       "LibName": "Time",
-      "Var": 0.3,
+      "Var": 0.8,
       "IsDic": false
     },
     {
       "LibName": "Math",
-      "Var": 0.3,
+      "Var": 0.8,
       "IsDic": false
     }
   ],
-  "Ver": "0.3.0",
+  "Ver": "0.8.0",
   "Url": "https://downland.old8lang.com"
 }
