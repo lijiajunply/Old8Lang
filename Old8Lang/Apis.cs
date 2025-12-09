@@ -147,7 +147,7 @@ public static class Apis
         get
         {
 #if DEBUG
-            return Path.Combine(Path.GetDirectoryName(Apis.CodePath)!, "Old8Lang", "LangInfo.json");
+            return Path.Combine(Path.GetDirectoryName(CodePath)!, "Old8Lang", "LangInfo.json");
 #else
         return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "LangInfo.json");
 #endif

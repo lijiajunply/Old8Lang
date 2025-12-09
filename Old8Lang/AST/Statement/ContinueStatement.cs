@@ -25,11 +25,11 @@ public class ContinueStatement(SourcePosition position = default) : OldStatement
         }
         else
         {
-            throw new System.Exception("Continue statement outside of loop");
+            throw new Exception("Continue statement outside of loop");
         }
     }
 
-    public override OldStatement this[int index] => throw new System.NotImplementedException();
+    public override OldStatement this[int index] => throw new NotImplementedException();
 
     public override int Count => 0;
 
@@ -39,7 +39,4 @@ public class ContinueStatement(SourcePosition position = default) : OldStatement
 /// <summary>
 /// continue异常，用于解释器中的跳转处理
 /// </summary>
-public class ContinueException : System.Exception
-{
-    public ContinueException() : base("Continue exception") { }
-}
+public class ContinueException() : Exception("Continue exception");

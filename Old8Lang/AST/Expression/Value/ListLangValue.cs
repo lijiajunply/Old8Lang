@@ -38,6 +38,22 @@ public class ListLangValue : LangValueType, ILangList
         return Values[i.Value];
     }
 
+    public void Set(LangValueType index, LangValueType value)
+    {
+        if (index is IntLangValue i)
+        {
+            if (i.Value < 0)
+                i.Value = Values.Count + i.Value;
+            if (i.Value < 0 || i.Value >= Values.Count)
+                throw new IndexError(this, i.Value, Values.Count);
+            Values[i.Value] = value;
+        }
+        else
+        {
+            throw new TypeError(this, "IntValue", index.GetType().Name);
+        }
+    }
+
     public override string ToString() =>
         "[" + string.Join(", ", Values) + "]"; // Old8Lang 风格的列表，使用 [ ] 包裹
 

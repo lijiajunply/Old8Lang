@@ -2,6 +2,7 @@ using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 
@@ -63,21 +64,16 @@ public class SetStatement : OldStatement
             }
         }
 
-        // 处理成员访问赋值：this.name <- value
-        // 处理 list 赋值：list[index] <- value
-        // 处理person.name <- value
+        // 处理成员访问赋值：this.name <- value, person.name <- value
         if (LeftExpr is Operation operation)
         {
             // 检查是否是 CONCAT 操作（成员访问）
             if (operation.Opera == OperationType.CONCAT)
             {
-                // 解析成员访问表达式：this.name
+                // 处理 this.member <- value 形式的赋值
                 if (operation is { Left: LangId { IdName: "this" }, Right: LangId memberName })
                 {
-                    // 是 this.member <- value 形式的赋值
                     // 查找当前实例
-
-                    // 如果找到了实例，执行赋值
                     if (manager.GetValue(new LangId("this")) is AnyLangValue anyValue)
                     {
                         // 将结果添加到实例的Result字典中，覆盖原来的值
@@ -104,6 +100,35 @@ public class SetStatement : OldStatement
                         return;
                     }
                 }
+                // 处理普通对象成员访问：person.name <- value
+                else if (operation is { Left: { } leftExpr, Right: LangId memberNameObj })
+                {
+                    // 获取左侧对象的值
+                    var leftValue = leftExpr.Run(manager);
+                    if (leftValue is AnyLangValue anyObj)
+                    {
+                        // 将结果添加到实例的Result字典中，覆盖原来的值
+                        anyObj.Result[memberNameObj.IdName] = result;
+                        // 同时更新对象的管理器中的值
+                        anyObj.Manager.Set(new LangId(memberNameObj.IdName), result);
+                        return;
+                    }
+                }
+            }
+        }
+        // 处理索引访问赋值：array[index] <- value, list[index] <- value, dict[key] <- value
+        else if (LeftExpr is LangListItem listItem)
+        {
+            // 获取集合对象
+            var collectionValue = manager.GetValue(listItem.ListId);
+            // 获取索引或键
+            var indexValue = listItem.Key.Run(manager);
+
+            // 检查集合是否是ILangList类型，如果是则调用其Set方法
+            if (collectionValue is ILangList listCollection)
+            {
+                listCollection.Set(indexValue, result);
+                return;
             }
         }
 

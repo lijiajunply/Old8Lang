@@ -57,9 +57,11 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         {
             if (Opera == OperationType.NOT)
             {
-                var rightValue = Right?.Run(manager) as BoolLangValue ?? throw new InvalidOperationError(this, "NOT运算符只支持布尔类型");
+                var rightValue = Right?.Run(manager) as BoolLangValue ??
+                                 throw new InvalidOperationError(this, "NOT运算符只支持布尔类型");
                 return new BoolLangValue(!rightValue.Value);
             }
+
             if (Opera == OperationType.MINUS)
             {
                 var rightValue = Right?.Run(manager);
@@ -69,6 +71,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     return new DoubleLangValue(-doubleValue.Value);
                 throw new InvalidOperationError(this, "一元负号运算符只支持整数和浮点数");
             }
+
             throw new InvalidOperationError(this, "不支持的一元运算符");
         }
 
@@ -80,18 +83,22 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
             {
                 return anyValue.Dot(Right);
             }
+
             throw new NameError(Left, "this");
         }
 
         // 处理逻辑AND操作 - 短路求值
         if (Opera == OperationType.AND)
         {
-            var leftValue = Left.Run(manager) as BoolLangValue ?? throw new InvalidOperationError(this, "AND运算符只支持布尔类型");
+            var leftValue = Left.Run(manager) as BoolLangValue ??
+                            throw new InvalidOperationError(this, "AND运算符只支持布尔类型");
             if (!leftValue.Value)
             {
                 return new BoolLangValue(false);
             }
-            var rightValue = Right?.Run(manager) as BoolLangValue ?? throw new InvalidOperationError(this, "AND运算符只支持布尔类型");
+
+            var rightValue = Right?.Run(manager) as BoolLangValue ??
+                             throw new InvalidOperationError(this, "AND运算符只支持布尔类型");
             return new BoolLangValue(leftValue.Value && rightValue.Value);
         }
 
@@ -103,7 +110,9 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
             {
                 return new BoolLangValue(true);
             }
-            var rightValue = Right?.Run(manager) as BoolLangValue ?? throw new InvalidOperationError(this, "OR运算符只支持布尔类型");
+
+            var rightValue = Right?.Run(manager) as BoolLangValue ??
+                             throw new InvalidOperationError(this, "OR运算符只支持布尔类型");
             return new BoolLangValue(leftValue.Value || rightValue.Value);
         }
 
@@ -118,6 +127,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     var newInstance = new Instance(r1.Id, r1.Ids, r1.Position);
                     return any.Dot(newInstance);
                 }
+
                 if (Right != null)
                 {
                     return any.Dot(Right);
@@ -130,6 +140,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     var newInstance = new Instance(instance.Id, instance.Ids);
                     return list.Dot(newInstance);
                 }
+
                 if (Right != null)
                 {
                     return list.Dot(Right);
@@ -150,7 +161,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 throw new InvalidOperationError(this, "连接运算符左右操作数均不能为空");
             }
         }
-        
+
         // 处理其他二元运算符，运行左右操作数
         // 注意：直接在当前作用域中运行两个操作数
         // Set方法已经被修复，只在当前作用域中设置变量，不会修改外部变量
@@ -158,11 +169,12 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         var rightResult = Right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
 
         // left xor right
-        if (leftResult is BoolLangValue boolLeft && rightResult is BoolLangValue boolRight && Opera == OperationType.XOR)
+        if (leftResult is BoolLangValue boolLeft && rightResult is BoolLangValue boolRight &&
+            Opera == OperationType.XOR)
             return new BoolLangValue(!boolLeft.Equal(boolRight));
 
         // == , < , > 
-        if (leftResult != null! && rightResult != null)
+        if (leftResult != null! && rightResult != null!)
         {
             switch (Opera)
             {

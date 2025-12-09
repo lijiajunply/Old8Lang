@@ -25,11 +25,11 @@ public class BreakStatement(SourcePosition position = default) : OldStatement(po
         }
         else
         {
-            throw new System.Exception("Break statement outside of loop");
+            throw new Exception("Break statement outside of loop");
         }
     }
 
-    public override OldStatement this[int index] => throw new System.NotImplementedException();
+    public override OldStatement this[int index] => throw new NotImplementedException();
 
     public override int Count => 0;
 
@@ -39,7 +39,7 @@ public class BreakStatement(SourcePosition position = default) : OldStatement(po
 /// <summary>
 /// break异常，用于解释器中的跳转处理
 /// </summary>
-public class BreakException : System.Exception
+public class BreakException : Exception
 {
     public BreakException() : base("Break exception") { }
 }

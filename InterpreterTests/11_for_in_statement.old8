@@ -91,20 +91,6 @@ for row in matrix {
     }
 }
 
-// for-in循环修改集合元素
-PrintLine("\n=== for-in循环修改集合元素 ===")
-
-mutableList <- list[10, 20, 30, 40, 50]
-PrintLine("修改前的列表：" + mutableList)
-
-// 注意：这里可能需要根据语言特性来修改元素
-index <- 0
-for item in mutableList {
-    mutableList[index] <- item * 2
-    index <- index + 1
-}
-PrintLine("修改后的列表：" + mutableList)
-
 // for-in循环中的条件判断
 PrintLine("\n=== for-in循环中的条件判断 ===")
 

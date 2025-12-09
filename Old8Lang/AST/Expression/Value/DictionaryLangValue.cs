@@ -70,11 +70,19 @@ public class DictionaryLangValue : LangValueType, ILangList
         return a[0].Value;
     }
 
-    public void Update(LangValueType key, LangValueType langValueType)
+    public void Set(LangValueType key, LangValueType value)
     {
-        Get(key);
         var b = Value.FindLastIndex(x => key.Equal(x.Key));
-        Value[b] = (key, langValueType);
+        if (b >= 0)
+        {
+            // 更新现有键值对
+            Value[b] = (key, value);
+        }
+        else
+        {
+            // 添加新键值对
+            Value.Add((key, value));
+        }
     }
 
     public override string ToString()

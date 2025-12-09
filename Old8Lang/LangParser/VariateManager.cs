@@ -49,46 +49,77 @@ public class VariateManager
 
     public void Set(LangId id, LangValueType langValueType)
     {
-        // 获取当前作用域的起始索引
-        // 如果没有子作用域，当前作用域起始索引为0
-        var currentScopeStart = ChildrenNum.Count > 0 ? ChildrenNum[^1] : 0;
-        
         // 检查是否是函数调用中的参数设置
         // 如果是，直接添加到变量列表末尾，创建新的局部变量
-        // 这样可以避免修改外部作用域中的同名变量
         if (IsFunc)
         {
-            // 直接添加到当前作用域，创建新的局部变量
             VariateName.Add(id.IdName);
             Values.Add(langValueType);
             Count++;
             return;
         }
         
-        // 只在当前作用域中查找变量，而不是在所有父作用域中查找
-        // 这样可以避免在子作用域中设置变量时修改父作用域中的同名变量
-        var index = -1;
-        // 从当前作用域的末尾向前查找，只查找当前作用域中的变量
+        // 1. 先查找变量，包括当前作用域和所有父作用域
+        var findResult = FindVariable(id.IdName);
+        
+        if (findResult.Found)
+        {
+            // 2. 找到了变量，修改它的值
+            Values[findResult.Index] = langValueType;
+            return;
+        }
+        
+        // 3. 没有找到变量，在当前作用域中创建新变量
+        VariateName.Add(id.IdName);
+        Values.Add(langValueType);
+        Count++;
+    }
+    
+    /// <summary>
+    /// 查找变量，包括当前作用域和所有父作用域
+    /// </summary>
+    /// <param name="name">变量名</param>
+    /// <returns>查找结果，包括是否找到和变量索引</returns>
+    private (bool Found, int Index) FindVariable(string name)
+    {
+        // 获取当前作用域的起始索引
+        var currentScopeStart = ChildrenNum.Count > 0 ? ChildrenNum[^1] : 0;
+        
+        // 1. 先在当前作用域中查找
         for (var i = Count - 1; i >= currentScopeStart; i--)
         {
-            if (VariateName[i] == id.IdName)
+            if (VariateName[i] == name)
             {
-                index = i;
-                break;
+                return (true, i);
             }
         }
         
-        if (index == -1)
+        // 2. 当前作用域中没有找到，递归查找父作用域
+        if (ChildrenNum.Count > 0)
         {
-            //init - 如果当前作用域中没有该变量，添加到当前作用域
-            VariateName.Add(id.IdName);
-            Values.Add(langValueType);
-            Count++;
-            return;
+            // 临时保存当前作用域状态
+            var tempCount = Count;
+            var tempChildrenNum = ChildrenNum[^1];
+            
+            // 移除当前子作用域，进入父作用域
+            ChildrenNum.RemoveAt(ChildrenNum.Count - 1);
+            Count = tempChildrenNum;
+            
+            try
+            {
+                // 递归查找父作用域
+                return FindVariable(name);
+            }
+            finally
+            {
+                // 恢复当前作用域状态
+                ChildrenNum.Add(tempChildrenNum);
+                Count = tempCount;
+            }
         }
-
-        //reset - 如果当前作用域中已经有该变量，修改它
-        Values[index] = langValueType;
+        
+        // 3. 所有作用域中都没有找到
+        return (false, -1);
     }
 
     public void AddChildren()

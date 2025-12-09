@@ -35,13 +35,20 @@ public class ArrayLangValue : LangValueType, ILangList
         return this;
     }
 
-    public void Set(IntLangValue i, LangValueType langValueType)
+    public void Set(LangValueType index, LangValueType value)
     {
-        if (i.Value >= RunResult.Length || i.Value < -RunResult.Length)
-            throw new IndexError(this, i.Value, RunResult.Length);
-        if (i.Value < 0)
-            i.Value = RunResult.Length + i.Value;
-        RunResult[i.Value] = langValueType;
+        if (index is IntLangValue i)
+        {
+            if (i.Value >= RunResult.Length || i.Value < -RunResult.Length)
+                throw new IndexError(this, i.Value, RunResult.Length);
+            if (i.Value < 0)
+                i.Value = RunResult.Length + i.Value;
+            RunResult[i.Value] = value;
+        }
+        else
+        {
+            throw new TypeError(this, "IntValue", index.GetType().Name);
+        }
     }
 
     public LangValueType Get(IntLangValue a)

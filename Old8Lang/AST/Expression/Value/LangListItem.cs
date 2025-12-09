@@ -5,7 +5,6 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
-
 /// <summary>
 /// list[key] 字典/数组/列表 索引访问
 /// </summary>
@@ -14,6 +13,9 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="position">位置</param>
 public class LangListItem(LangId listId, OldExpr key, SourcePosition position = default) : LangValueType(position)
 {
+    public LangId ListId => listId;
+    public OldExpr Key => key;
+
     public override LangValueType Run(LangParser.VariateManager manager)
     {
         var a = manager.GetValue(listId);
@@ -50,7 +52,7 @@ public class LangListItem(LangId listId, OldExpr key, SourcePosition position = 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         var listType = listId.OutputType(local);
-        
+
         if (listType == typeof(string))
         {
             listId.LoadIlValue(ilGenerator, local); // 加载字符串
@@ -71,7 +73,7 @@ public class LangListItem(LangId listId, OldExpr key, SourcePosition position = 
     public override Type OutputType(LocalManager local)
     {
         var listType = listId.OutputType(local);
-        
+
         if (listType == typeof(string))
         {
             return typeof(char); // 字符串索引访问返回 char 类型
