@@ -1,0 +1,6 @@
+numbers <- [1, 2, 3, 4, 5]
+squares <- [x * x for x in numbers  ]
+print("原始列表: ")
+print(numbers)
+print("平方列表: ")
+print(squares)

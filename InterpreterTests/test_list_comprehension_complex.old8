@@ -1,0 +1,21 @@
+numbers <- [1, 2, 3, 4, 5]
+
+// 测试基本列表推导式
+squares1 <- [x for x in numbers]
+print("基本列表推导式 [x for x in numbers]: ")
+print(squares1)
+
+// 测试带乘法的列表推导式
+squares2 <- [x * x for x in numbers]
+print("带乘法的列表推导式 [x * x for x in numbers]: ")
+print(squares2)
+
+// 测试带条件的列表推导式
+evens <- [x for x in numbers if x % 2 == 0]
+print("带条件的列表推导式 [x for x in numbers if x % 2 == 0]: ")
+print(evens)
+
+// 测试带条件和乘法的列表推导式
+even_squares <- [x * x for x in numbers if x % 2 == 0]
+print("带条件和乘法的列表推导式 [x * x for x in numbers if x % 2 == 0]: ")
+print(even_squares)

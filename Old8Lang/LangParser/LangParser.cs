@@ -1636,6 +1636,9 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             return new ArrayLangValue(elements, position);
         }
 
+        // 保存当前位置，用于回退
+        var exprStartIndex = CurrentIndex;
+        
         elements.Add(ParseExpression());
         if (CurrentToken.Type == LangTokenType.Wavy)
         {
@@ -1666,7 +1669,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         if (isListComprehension)
         {
             // 回退到表达式开始位置，准备解析列表推导式
-            CurrentIndex -= elements.Count;
+            CurrentIndex = exprStartIndex;
             elements.Clear();
             
             // 解析列表推导式

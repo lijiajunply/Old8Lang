@@ -275,4 +275,11 @@ public class ListComprehension : LangValueType
     {
         return typeof(List<object>);
     }
+
+    public override string ToString()
+    {
+        var s = NestedLoops?.Count > 0 ? " " + string.Join(" ", NestedLoops.Select(loop => loop.ToString())) : "";
+        return
+            $"[{Expression} for {Variable} in {Iterable} {(Condition != null ? "if " + Condition : "")} {s}]";
+    }
 }

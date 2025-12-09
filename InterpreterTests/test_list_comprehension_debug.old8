@@ -1,0 +1,15 @@
+numbers <- [1, 2, 3, 4, 5]
+
+// 测试基本列表推导式
+squares1 <- [x for x in numbers]
+print("基本列表推导式 [x for x in numbers]: ")
+print(squares1)
+print("列表推导式字符串表示: ")
+print(squares1.ToString())
+
+// 测试带乘法的列表推导式
+squares2 <- [x * x for x in numbers]
+print("\n带乘法的列表推导式 [x * x for x in numbers]: ")
+print(squares2)
+print("列表推导式字符串表示: ")
+print(squares2.ToString())

@@ -131,6 +131,12 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                 if (value is ILangList list) return new IntLangValue(list.GetLength());
                 throw new InvalidOperationError(this, $"{results[0]} 不是列表类型");
             }
+            case "Test" or "test":
+            {
+                var value = results[0].Run(manager);
+                var value1 = results[1].Run(manager);
+                return value.Equal(value1) ? new BoolLangValue(true) : throw new InvalidOperationError(this, "测试失败");
+            }
         }
 
         // 先尝试根据函数名和参数数量查找重载函数
