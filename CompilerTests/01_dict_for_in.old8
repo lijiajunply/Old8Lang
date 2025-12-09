@@ -1,0 +1,17 @@
+// 测试字典for-in遍历
+PrintLine("=== 字典for-in遍历测试 ===")
+
+// 测试键值对遍历
+dict <- {"name": "Alice", "age": 30}
+PrintLine("字典键值对：")
+for key, value in dict {
+    PrintLine(key + " = " + value)
+}
+
+// 测试键遍历
+PrintLine("\n字典键：")
+for key in dict {
+    PrintLine("key = " + key)
+}
+
+PrintLine("\n✅ 字典for-in遍历测试完成")

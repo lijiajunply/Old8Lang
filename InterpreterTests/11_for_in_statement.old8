@@ -70,6 +70,7 @@ for num in [1~10] {
 PrintLine("1到10的和：" + sum)
 
 // 遍历元组
+/*
 PrintLine("\n=== 遍历元组 ===")
 
 tuple <- ("apple", "banana", "cherry")
@@ -77,6 +78,7 @@ PrintLine("元组元素：")
 for item in tuple {
     PrintLine("item = " + item)
 }
+*/
 
 // 嵌套for-in循环
 PrintLine("\n=== 嵌套for-in循环 ===")

@@ -32,7 +32,7 @@ forStatement = "for" set "," expression "," statement block ;
 
 whileStatement = "while" expression block ;
 
-forInStatement = "for" identifier "in" expression block ;
+forInStatement = "for" identifier ( "," identifier )* "in" expression block ;
 
 switchStatement = "switch" expression "{" caseBlock* ( "default" block )? "}" ;
 

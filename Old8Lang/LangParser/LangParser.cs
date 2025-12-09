@@ -263,7 +263,28 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         // 处理循环语句 For 和 For in
         if (CurrentToken.Type == LangTokenType.For)
         {
-            if (Peek().Type == LangTokenType.Identifier && Peek(2).Type == LangTokenType.In)
+            // 检查是否是 for-in 语句，支持 key, value in dict 格式
+            // 需要查找 "in" 关键字的位置
+            var tempIndex = CurrentIndex + 1;
+            var foundIn = false;
+            
+            // 跳过所有标识符和逗号，查找 "in" 关键字
+            while (tempIndex < tokens.Count)
+            {
+                var token = tokens[tempIndex];
+                if (token.Type == LangTokenType.In)
+                {
+                    foundIn = true;
+                    break;
+                }
+                else if (token.Type != LangTokenType.Identifier && token.Type != LangTokenType.Comma)
+                {
+                    break;
+                }
+                tempIndex++;
+            }
+            
+            if (foundIn)
             {
                 return ParseForInStatement();
             }
@@ -656,19 +677,42 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         return new ForStatement(set, condition, statement, block, position);
     }
 
-    // forInStatement = "for" identifier "in" expression block ;
+    // forInStatement = "for" identifier ( "," identifier )* "in" expression block ;
     private ForInStatement ParseForInStatement()
     {
         var forToken = CurrentToken;
         Expect(LangTokenType.For);
-        var identifier = CurrentToken.Value;
-        Expect(LangTokenType.Identifier);
+        
+        // 解析多个标识符，支持 key, value 格式
+        var identifiers = new List<LangId>();
+        while (true)
+        {
+            var identifier = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+            identifiers.Add(new LangId(identifier));
+            
+            if (CurrentToken.Type != LangTokenType.Comma)
+                break;
+            
+            Expect(LangTokenType.Comma);
+        }
+        
         Expect(LangTokenType.In);
         var expression = ParseExpression();
         var block = ParseBlock();
 
         var position = new SourcePosition(forToken.Line, forToken.Column);
-        return new ForInStatement(new LangId(identifier), expression, block, position);
+        
+        // 如果只有一个标识符，直接使用；否则使用多个标识符
+        if (identifiers.Count == 1)
+        {
+            return new ForInStatement(identifiers[0], expression, block, position);
+        }
+        else
+        {
+            // 创建一个复合标识符，将所有标识符存储起来
+            return new ForInStatement(identifiers[0], expression, block, position, identifiers.Skip(1).ToList());
+        }
     }
 
     // whileStatement = "while" expression block ;
@@ -1636,7 +1680,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             }
 
             // 单元素元组：(expr,)
-            return new TupleLangValue(elements[0], new LangId("", "", position), position);
+            return new TupleLangValue(elements[0], new NullLangValue(), position);
         }
         else if (elements.Count == 2)
         {
