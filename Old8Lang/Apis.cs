@@ -90,16 +90,16 @@ public static class Apis
     {
         var langInfo = new LangInfo { LibInfos = ReadJson().LibInfos, ImportPath = import, Ver = ver, Url = uri };
         var jsonString = JsonSerializer.Serialize(langInfo);
-        File.WriteAllText(BasicInfo.JsonPath, jsonString);
+        File.WriteAllText(JsonPath, jsonString);
         return langInfo;
     }
 
     public static LangInfo ReadJson()
     {
         LangInfo langInfo;
-        if (File.Exists(BasicInfo.JsonPath))
+        if (File.Exists(JsonPath))
         {
-            var jsonString = File.ReadAllText(BasicInfo.JsonPath, Encoding.UTF8);
+            var jsonString = File.ReadAllText(JsonPath, Encoding.UTF8);
             langInfo = JsonSerializer.Deserialize<LangInfo>(jsonString)!;
         }
         else
@@ -109,7 +109,7 @@ public static class Apis
         }
         
         if (Directory.Exists(langInfo.ImportPath)) return langInfo;
-        var s = Path.GetDirectoryName(BasicInfo.CodePath);
+        var s = Path.GetDirectoryName(CodePath);
 #if RELEASE
         s = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 #endif
@@ -125,5 +125,32 @@ public static class Apis
         //var _ = new HttpClient();
 
         return false;
+    }
+    
+    public static string CodePath
+    {
+        get
+        {
+#if DEBUG
+            var directory = AppContext.BaseDirectory.Split(Path.DirectorySeparatorChar);
+            var slice = new ArraySegment<string>(directory, 0, directory.Length - 4);
+            return Path.Combine(slice.ToArray());
+#else
+        // 返回程序运行时目录或其他合理默认路径
+        return AppContext.BaseDirectory;
+#endif
+        }
+    }
+    
+    public static string JsonPath
+    {
+        get
+        {
+#if DEBUG
+            return Path.Combine(Path.GetDirectoryName(Apis.CodePath)!, "Old8Lang", "LangInfo.json");
+#else
+        return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "LangInfo.json");
+#endif
+        }
     }
 }

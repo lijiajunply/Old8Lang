@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Old8Lang;
+namespace Old8Lang.App;
 
 public static class BasicInfo
 {
@@ -69,7 +69,7 @@ public static class BasicInfo
     /// </summary>
     /// <returns>这...实例</returns>
     private static string LangSample() =>
-        File.ReadAllText(Path.Combine(Path.GetDirectoryName(CodePath)!, "Old8Lang", "LangSample.txt"));
+        File.ReadAllText(Path.Combine(Path.GetDirectoryName(Apis.CodePath)!, "Old8Lang", "LangSample.txt"));
 
     /// <summary>
     /// Old8Lang的关键字
@@ -82,18 +82,6 @@ public static class BasicInfo
         "and or not", // => C# : and or not
         "return func"
     ];
-
-    public static string JsonPath
-    {
-        get
-        {
-#if DEBUG
-            return Path.Combine(Path.GetDirectoryName(CodePath)!, "Old8Lang", "LangInfo.json");
-#else
-        return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "LangInfo.json");
-#endif
-        }
-    }
 
 
     public static Dictionary<string, string> Order => new()
@@ -111,19 +99,4 @@ public static class BasicInfo
         { "Compiler", "-c" },
         { "SyntaxTest", "-s" }
     };
-
-    public static string CodePath
-    {
-        get
-        {
-#if DEBUG
-            var directory = AppContext.BaseDirectory.Split(Path.DirectorySeparatorChar);
-            var slice = new ArraySegment<string>(directory, 0, directory.Length - 4);
-            return Path.Combine(slice.ToArray());
-#else
-        // 返回程序运行时目录或其他合理默认路径
-        return AppContext.BaseDirectory;
-#endif
-        }
-    }
 }

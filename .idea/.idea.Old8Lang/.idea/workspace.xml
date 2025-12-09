@@ -17,14 +17,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_func.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/test_func.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/BasicInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Lib/LibInfo.cs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,10 +55,12 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="mock:///Immediate 窗口" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Immediate 窗口" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
@@ -69,6 +68,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/StringLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ClassInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/BasicInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/BasicInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
@@ -335,7 +335,7 @@
       <workItem from="1765095462905" duration="3326000" />
       <workItem from="1765099889326" duration="6689000" />
       <workItem from="1765111093830" duration="7390000" />
-      <workItem from="1765181076923" duration="35165000" />
+      <workItem from="1765181076923" duration="35526000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -680,7 +680,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="107" />
+    <option name="localTasksCounter" value="108" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -707,7 +707,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="修复 只能在Debug中使用" />
     <MESSAGE value="加入演示网站" />
     <MESSAGE value="基本OK，还剩语法和尝试" />
     <MESSAGE value="将Get属性变为只读变量" />
@@ -732,7 +731,8 @@
     <MESSAGE value="refactor(ast): 简化类型映射声明语法&#10;&#10;- 使用简化集合初始化语法替换显式泛型声明&#10;- 移除冗余的 System.Collections.Generic 命名空间前缀&#10;- 更新 IDE 工作区配置文件中的字符串转义格式" />
     <MESSAGE value="refactor(ast): 优化类型引用和字段初始化&#10;&#10;- 简化 ClassInit.cs 中的命名空间引用，去除冗余前缀&#10;- 统一 DictionaryLangValue 构造函数中的字段赋值方式&#10;- 修复 LangToken 中的异常类型引用，移除不必要的命名空间&#10;- 删除 SYNTAX_TEST_REPORT.md 文件&#10;- 新增 TokenAnalyzer 项目文件和程序入口&#10;- 更新 IDE 工作区配置和代码位置偏移量" />
     <MESSAGE value="refactor(parser): 优化表达式解析逻辑并清理无用代码&#10;&#10;- 简化Peek方法的条件判断逻辑&#10;- 移除重复且冗余的表达式解析辅助方法&#10;- 统一SourcePosition对象创建格式&#10;- 清理无用的空行和注释&#10;- 调整SetStatement构造函数参数格式以提高可读性&#10;- 合并相关联的代码块以增强结构清晰度" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(parser): 优化表达式解析逻辑并清理无用代码&#10;&#10;- 简化Peek方法的条件判断逻辑&#10;- 移除重复且冗余的表达式解析辅助方法&#10;- 统一SourcePosition对象创建格式&#10;- 清理无用的空行和注释&#10;- 调整SetStatement构造函数参数格式以提高可读性&#10;- 合并相关联的代码块以增强结构清晰度" />
+    <MESSAGE value="feat(cli): 完善命令行功能与帮助文档&#10;&#10;- 重构命令行参数解析逻辑，支持交互式输入&#10;- 新增完整的帮助文档，包含命令格式和使用示例&#10;- 实现版本信息、语言信息、导入库信息显示功能&#10;- 添加导入路径修改功能&#10;- 完善文件执行模式，支持解释模式和编译模式&#10;- 增强错误处理和用户提示信息&#10;- 更新测试用例，验证新功能正确性" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(cli): 完善命令行功能与帮助文档&#10;&#10;- 重构命令行参数解析逻辑，支持交互式输入&#10;- 新增完整的帮助文档，包含命令格式和使用示例&#10;- 实现版本信息、语言信息、导入库信息显示功能&#10;- 添加导入路径修改功能&#10;- 完善文件执行模式，支持解释模式和编译模式&#10;- 增强错误处理和用户提示信息&#10;- 更新测试用例，验证新功能正确性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

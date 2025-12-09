@@ -1,5 +1,3 @@
-using Old8Lang.Lib;
-
 namespace Old8Lang;
 
 [Serializable]
@@ -12,4 +10,12 @@ public class LangInfo
     public string Ver { get; init; } = "";
 
     public string Url { get; init; } = "";
+}
+
+[Serializable]
+public class LibInfo
+{
+    public string LibName { get; set; } = "";
+    public double Var { get; set; }
+    public bool IsDir { get; set; }
 }

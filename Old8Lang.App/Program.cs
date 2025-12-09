@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Old8Lang;
+using Old8Lang.App;
 using Old8Lang.Compiler;
 using Old8Lang.LangParser;
 
