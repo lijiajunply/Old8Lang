@@ -5,6 +5,7 @@ echo "Running syntax tests..."
 
 success=0
 failed=0
+failed_files=()
 
 # 获取所有测试文件
 test_files=$(find ./SyntaxTests -name "*.old8")
@@ -20,6 +21,7 @@ for file in $test_files; do
     else
         echo "❌ FAIL"
         ((failed++))
+        failed_files+=("$file")
     fi
 done
 
@@ -28,6 +30,14 @@ echo "\n\n=== Syntax Test Results ==="
 echo "Total: $(($success + $failed))"
 echo "Passed: $success"
 echo "Failed: $failed"
+
+# 输出失败的文件
+if [ $failed -gt 0 ]; then
+    echo "\n❌ Failed files:"
+    for file in "${failed_files[@]}"; do
+        echo "  - $file"
+    done
+fi
 
 if [ $failed -eq 0 ]; then
     echo "\n🎉 All syntax tests passed!"
