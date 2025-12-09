@@ -8,7 +8,7 @@ using Old8Lang.LangParser;
 #if DEBUG
 string[] strings =
 [
-    "-f", "/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/InterpreterTests/09_for_statement.old8"
+    "-f", "/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/InterpreterTests/test_func.old8"
 ];
 
 args = args.Length == 0 ? strings : args;

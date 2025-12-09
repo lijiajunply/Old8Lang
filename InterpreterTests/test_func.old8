@@ -1,0 +1,14 @@
+func createMultiplier(factor) {
+    func multiplier(x) {
+        return x * factor
+    }
+    return multiplier
+}
+
+doubleFunc <- createMultiplier(2)
+doubleResult <- doubleFunc(5)
+PrintLine("5的2倍 = " + doubleResult)
+
+tripleFunc <- createMultiplier(3)
+tripleResult <- tripleFunc(5)
+PrintLine("5的3倍 = " + tripleResult)

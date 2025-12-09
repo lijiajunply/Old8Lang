@@ -3,6 +3,7 @@
 // 数组测试
 PrintLine("=== 数组测试 ===")
 array1 <- [1, 2, 3, 4, 5]
+array1[0] <- 2
 PrintLine("整数数组: " + array1)
 
 array2 <- ["a", "b", "c"]

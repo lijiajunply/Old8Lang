@@ -44,7 +44,7 @@ PrintLine("3 * 4 = " + product)
 // 带类型假注的函数
 PrintLine("\n=== 带类型假注的函数 ===")
 
-func subtract(a:int, b:int) -> {
+func subtract(a:int, b:int) {
     return a - b
 }
 

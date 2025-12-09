@@ -785,6 +785,10 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         {
             Expect(LangTokenType.Arrow);
         }
+        else if(isUseFunc && CurrentToken.Type == LangTokenType.Arrow)
+        {
+            throw CreateSyntaxError("箭头函数不能使用func关键字");
+        }
 
         var block = ParseBlock();
 
