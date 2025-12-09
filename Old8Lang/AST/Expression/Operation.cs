@@ -52,214 +52,143 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
     public override LangValueType Run(LangParser.VariateManager manager)
     {
-        // not right
-        if (Left == null && Opera == OperationType.NOT)
-            return new BoolLangValue(!(Right?.Run(manager) as BoolLangValue)!.Value);
-        if (Left == null && Opera == OperationType.MINUS)
+        // 处理一元运算符
+        if (Left == null)
         {
-            var rightValue = Right?.Run(manager);
-            if (rightValue is IntLangValue intValue)
-                return new IntLangValue(-intValue.Value);
-            if (rightValue is DoubleLangValue doubleValue)
-                return new DoubleLangValue(-doubleValue.Value);
-            throw new InvalidOperationError(this, "一元负号运算符只支持整数和浮点数");
+            if (Opera == OperationType.NOT)
+            {
+                var rightValue = Right?.Run(manager) as BoolLangValue ?? throw new InvalidOperationError(this, "NOT运算符只支持布尔类型");
+                return new BoolLangValue(!rightValue.Value);
+            }
+            if (Opera == OperationType.MINUS)
+            {
+                var rightValue = Right?.Run(manager);
+                if (rightValue is IntLangValue intValue)
+                    return new IntLangValue(-intValue.Value);
+                if (rightValue is DoubleLangValue doubleValue)
+                    return new DoubleLangValue(-doubleValue.Value);
+                throw new InvalidOperationError(this, "一元负号运算符只支持整数和浮点数");
+            }
+            throw new InvalidOperationError(this, "不支持的一元运算符");
         }
 
-        // this.id => dot_value
+        // 处理this.id => dot_value
         if (Opera == OperationType.CONCAT && Left is LangId { IdName: "this" } && Right != null)
         {
-            // 处理this关键字，获取当前类实例
-            // 运行Left表达式，获取this关键字的值
             var thisValue = Left.Run(manager);
             if (thisValue is AnyLangValue anyValue)
             {
-                // 直接调用当前实例的Dot方法，处理成员访问，传递外部管理器
                 return anyValue.Dot(Right);
             }
-
-            // 如果没有找到，抛出错误
             throw new NameError(Left, "this");
         }
 
         // 处理逻辑AND操作 - 短路求值
         if (Opera == OperationType.AND)
         {
-            var leftValue = Left?.Run(manager);
-            if (leftValue is BoolLangValue boolLeft)
+            var leftValue = Left.Run(manager) as BoolLangValue ?? throw new InvalidOperationError(this, "AND运算符只支持布尔类型");
+            if (!leftValue.Value)
             {
-                if (!boolLeft.Value)
-                {
-                    // 短路求值：左操作数为false，直接返回false，不执行右操作数
-                    return new BoolLangValue(false);
-                }
-                // 左操作数为true，继续执行右操作数
-                var rightValue = Right?.Run(manager);
-                if (rightValue is BoolLangValue boolRight)
-                {
-                    return new BoolLangValue(boolLeft.Value && boolRight.Value);
-                }
+                return new BoolLangValue(false);
             }
+            var rightValue = Right?.Run(manager) as BoolLangValue ?? throw new InvalidOperationError(this, "AND运算符只支持布尔类型");
+            return new BoolLangValue(leftValue.Value && rightValue.Value);
         }
 
         // 处理逻辑OR操作 - 短路求值
         if (Opera == OperationType.OR)
         {
-            var leftValue = Left?.Run(manager);
-            if (leftValue is BoolLangValue boolLeft)
+            var leftValue = Left.Run(manager) as BoolLangValue ?? throw new InvalidOperationError(this, "OR运算符只支持布尔类型");
+            if (leftValue.Value)
             {
-                if (boolLeft.Value)
-                {
-                    // 短路求值：左操作数为true，直接返回true，不执行右操作数
-                    return new BoolLangValue(true);
-                }
-                // 左操作数为false，继续执行右操作数
-                var rightValue = Right?.Run(manager);
-                if (rightValue is BoolLangValue boolRight)
-                {
-                    return new BoolLangValue(boolLeft.Value || boolRight.Value);
-                }
+                return new BoolLangValue(true);
             }
+            var rightValue = Right?.Run(manager) as BoolLangValue ?? throw new InvalidOperationError(this, "OR运算符只支持布尔类型");
+            return new BoolLangValue(leftValue.Value || rightValue.Value);
         }
 
-        // 处理其他情况
-        var l = Left?.Run(manager);
-        var r = Right;
-
-        // id.id => dot_value
+        // 处理点操作
         if (Opera == OperationType.CONCAT)
         {
-            if (l is AnyLangValue any)
+            var dotLeftResult = Left.Run(manager);
+            if (dotLeftResult is AnyLangValue any)
             {
                 if (Right is Instance r1)
                 {
-                    // 对于成员访问，先运行所有参数表达式，获取它们的值，使用外部管理器
-                    var evaluatedArgs = new List<OldExpr>();
-                    foreach (var arg in r1.Ids)
-                    {
-                        // 运行参数表达式，使用外部管理器，这样可以访问外部变量
-                        var argValue = arg.Run(manager);
-                        // 将计算结果包装为LangValueType，以便后续使用
-                        evaluatedArgs.Add(argValue);
-                    }
-
-                    // 创建一个新的Instance，使用已经计算好的参数值
-                    var newInstance = new Instance(r1.Id, evaluatedArgs, r1.Position);
-
-                    // 调用Dot方法，传递已经计算好的参数
+                    var newInstance = new Instance(r1.Id, r1.Ids, r1.Position);
                     return any.Dot(newInstance);
                 }
-
                 if (Right != null)
                 {
                     return any.Dot(Right);
                 }
             }
-            else if (l is ListLangValue list)
+            else if (dotLeftResult is ListLangValue list)
             {
-                // 先尝试将 r 作为 Instance 处理
-                Instance r1;
-
-                if (r is Instance instance)
+                if (Right is Instance instance)
                 {
-                    r1 = instance;
+                    var newInstance = new Instance(instance.Id, instance.Ids);
+                    return list.Dot(newInstance);
                 }
-                else if (r != null)
+                if (Right != null)
                 {
-                    // 如果 r 不是 Instance，先运行它，获取实际值
-                    var rValue = r.Run(manager);
-                    if (rValue is Instance rInstance)
-                    {
-                        r1 = rInstance;
-                    }
-                    else
-                    {
-                        // 如果运行结果不是 Instance，直接使用 r 作为操作数
-                        return list.Dot(r);
-                    }
+                    return list.Dot(Right);
                 }
-                else
-                {
-                    throw new InvalidOperationError(this, "列表操作需要右侧操作数");
-                }
-
-                // 处理实例的参数，运行每个参数
-                List<OldExpr> values = [];
-                values.AddRange(r1.Ids.Select(id => id.Run(manager)));
-
-                var newInstance = new Instance(r1.Id, values);
-                return list.Dot(newInstance);
             }
-            else if (l is NativeStaticAny native)
+            else if (dotLeftResult is NativeStaticAny native)
             {
-                // 先运行 r，获取实际值
-                var rValue = r?.Run(manager);
-
-                if (rValue is not Instance r1) throw new InvalidOperationError(this, "原生静态类型操作需要实例");
-
-                // 处理实例的参数，运行每个参数
-                List<OldExpr> values = [];
-                values.AddRange(r1.Ids.Select(id => id.Run(manager)));
-
-                var newInstance = new Instance(r1.Id, values);
+                if (Right is not Instance r1) throw new InvalidOperationError(this, "原生静态类型操作需要实例");
+                var newInstance = new Instance(r1.Id, r1.Ids);
                 return native.Dot(newInstance);
             }
-            else if (l != null && r != null)
+            else if (dotLeftResult != null! && Right != null)
             {
-                // 只允许在支持Dot方法的类型上调用Dot方法
-                throw new InvalidOperationError(this, $"类型 '{l.GetType().Name}' 不支持点操作");
+                throw new InvalidOperationError(this, $"类型 '{dotLeftResult.GetType().Name}' 不支持点操作");
             }
             else
             {
                 throw new InvalidOperationError(this, "连接运算符左右操作数均不能为空");
             }
         }
-
-        // 只在非CONCAT操作时运行右操作数
-        if (Opera != OperationType.CONCAT)
-        {
-            r = Right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
-            // (right)
-            if (Right is LangId oldId && l is not AnyLangValue)
-                r = manager.GetValue(oldId);
-            if (Right is Operation)
-                r = Right.Run(manager);
-        }
+        
+        // 处理其他二元运算符，运行左右操作数
+        // 注意：直接在当前作用域中运行两个操作数
+        // Set方法已经被修复，只在当前作用域中设置变量，不会修改外部变量
+        var leftResult = Left.Run(manager);
+        var rightResult = Right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
 
         // left xor right
-        if (l is BoolLangValue && r is BoolLangValue value && Opera == OperationType.XOR)
-            return new BoolLangValue(!l.Equal(value));
-
+        if (leftResult is BoolLangValue boolLeft && rightResult is BoolLangValue boolRight && Opera == OperationType.XOR)
+            return new BoolLangValue(!boolLeft.Equal(boolRight));
 
         // == , < , > 
-        if (l is not null && r != null! && Opera == OperationType.EQUALS)
-            return new BoolLangValue(l.Equal(r as LangValueType ?? throw new InvalidOperationError(this, "无效的右操作数类型")));
-        if (l is not null && r is not null && Opera == OperationType.LESSER)
-            return new BoolLangValue(l.Less(r as LangValueType));
-        if (l is not null && r is not null && Opera == OperationType.GREATER)
-            return new BoolLangValue(l.Greater(r as LangValueType));
-        if (l is not null && r is not null && Opera == OperationType.DIFFERENT)
-            return new BoolLangValue(!l.Equal(r as LangValueType));
-        if (l is not null && r is not null && Opera == OperationType.LESS_EQUAL)
-            return new BoolLangValue(l.LessEqual(r as LangValueType));
-        if (l is not null && r is not null && Opera == OperationType.GREATER_EQUAL)
-            return new BoolLangValue(l.GreaterEqual(r as LangValueType));
-
-        // r (+-*/%) l
-        if (l is not null && r is not null)
+        if (leftResult != null! && rightResult != null)
         {
-            if (r is not LangValueType r1) throw new InvalidOperationError(this, "右操作数必须是ValueType类型");
             switch (Opera)
             {
+                case OperationType.EQUALS:
+                    return new BoolLangValue(leftResult.Equal(rightResult));
+                case OperationType.LESSER:
+                    return new BoolLangValue(leftResult.Less(rightResult));
+                case OperationType.GREATER:
+                    return new BoolLangValue(leftResult.Greater(rightResult));
+                case OperationType.DIFFERENT:
+                    return new BoolLangValue(!leftResult.Equal(rightResult));
+                case OperationType.LESS_EQUAL:
+                    return new BoolLangValue(leftResult.LessEqual(rightResult));
+                case OperationType.GREATER_EQUAL:
+                    return new BoolLangValue(leftResult.GreaterEqual(rightResult));
+                // r (+-*/%) l
                 case OperationType.PLUS:
-                    return l.Plus(r1);
+                    return leftResult.Plus(rightResult);
                 case OperationType.MINUS:
-                    return l.Minus(r1);
+                    return leftResult.Minus(rightResult);
                 case OperationType.TIMES:
-                    return l.Times(r1);
+                    return leftResult.Times(rightResult);
                 case OperationType.DIVIDE:
-                    return l.Divide(r1);
+                    return leftResult.Divide(rightResult);
                 case OperationType.MODULO:
-                    return l.Mod(r1);
+                    return leftResult.Mod(rightResult);
             }
         }
 

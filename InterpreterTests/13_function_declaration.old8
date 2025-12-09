@@ -128,9 +128,9 @@ PrintLine("5 * 3 = " + multiplyResult)
 // 函数作为返回值
 PrintLine("\n=== 函数作为返回值 ===")
 
-func createMultiplier(factor) {
+func createMultiplier(m) {
     func multiplier(x) {
-        return x * factor
+        return x * m
     }
     return multiplier
 }

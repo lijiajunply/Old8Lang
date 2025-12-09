@@ -82,22 +82,30 @@ public class FuncLangValue : ImportInfo
         }
 
         // 调用方法体
-        variateManagerFunc.AddChildren();
-        variateManagerFunc.IsFunc = true; // 设置为函数上下文
-        if (Ids != null && Ids.Count != 0)
-            for (var i = 0; i < Ids.Count; i++)
+            variateManagerFunc.AddChildren();
+            variateManagerFunc.IsFunc = true; // 设置为函数上下文
+            if (Ids != null && Ids.Count != 0)
             {
-                if (i < ids.Count)
+                // 先计算所有参数的值，使用外部变量管理器
+                // 这样可以避免参数计算时修改函数变量管理器中的变量
+                var paramValues = new List<LangValueType>();
+                for (var i = 0; i < ids.Count; i++)
                 {
-                    // 将实例化时的参数表达式结果赋值给方法参数
-                    // 运行参数表达式时使用外部管理器，这样可以访问外部变量
-                    var paramValue = ids[i].Run(variateManagerFunc);
-                    variateManagerFunc.Set(Ids[i], paramValue);
+                    paramValues.Add(ids[i].Run(variateManagerFunc));
+                }
+                
+                // 然后将计算好的参数值设置到函数的变量管理器中
+                for (var i = 0; i < Ids.Count; i++)
+                {
+                    if (i < paramValues.Count)
+                    {
+                        variateManagerFunc.Set(Ids[i], paramValues[i]);
+                    }
                 }
             }
-        
-        // 运行方法体
-        BlockStatement.Run(variateManagerFunc);
+            
+            // 运行方法体
+            BlockStatement.Run(variateManagerFunc);
         
         // 保存返回值
         var result = variateManagerFunc.Result;

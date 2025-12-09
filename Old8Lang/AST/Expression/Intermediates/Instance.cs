@@ -166,6 +166,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
         // 如果result是FuncLangValue，则调用它
         else if (result is FuncLangValue funcValue)
         {
+            // 直接调用函数，参数表达式会在函数体内执行
             result = funcValue.Run(manager, Ids);
         }
         // 原来的AnyLangValue处理逻辑，用于兼容旧代码

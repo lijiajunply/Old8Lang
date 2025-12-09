@@ -17,11 +17,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/BasicInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/BasicInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Lib/LibInfo.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.trae/documents/修复斐波那契数列计算错误.md" beforeDir="false" afterPath="$PROJECT_DIR$/.trae/documents/修复斐波那契数列计算错误.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/13_function_declaration.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/13_function_declaration.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_func.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/test_func.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,35 +97,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
-    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
-    ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Run",
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "settings.qodana",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Run&quot;,
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.qodana&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "PLAIN_TEXT",
-      "Markdown"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;PLAIN_TEXT&quot;,
+      &quot;Markdown&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
@@ -335,7 +337,8 @@
       <workItem from="1765095462905" duration="3326000" />
       <workItem from="1765099889326" duration="6689000" />
       <workItem from="1765111093830" duration="7390000" />
-      <workItem from="1765181076923" duration="35526000" />
+      <workItem from="1765181076923" duration="37881000" />
+      <workItem from="1765266479869" duration="1578000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -680,7 +683,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="108" />
+    <option name="localTasksCounter" value="109" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -707,7 +710,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="加入演示网站" />
     <MESSAGE value="基本OK，还剩语法和尝试" />
     <MESSAGE value="将Get属性变为只读变量" />
     <MESSAGE value="完成基础语法" />
@@ -732,7 +734,8 @@
     <MESSAGE value="refactor(ast): 优化类型引用和字段初始化&#10;&#10;- 简化 ClassInit.cs 中的命名空间引用，去除冗余前缀&#10;- 统一 DictionaryLangValue 构造函数中的字段赋值方式&#10;- 修复 LangToken 中的异常类型引用，移除不必要的命名空间&#10;- 删除 SYNTAX_TEST_REPORT.md 文件&#10;- 新增 TokenAnalyzer 项目文件和程序入口&#10;- 更新 IDE 工作区配置和代码位置偏移量" />
     <MESSAGE value="refactor(parser): 优化表达式解析逻辑并清理无用代码&#10;&#10;- 简化Peek方法的条件判断逻辑&#10;- 移除重复且冗余的表达式解析辅助方法&#10;- 统一SourcePosition对象创建格式&#10;- 清理无用的空行和注释&#10;- 调整SetStatement构造函数参数格式以提高可读性&#10;- 合并相关联的代码块以增强结构清晰度" />
     <MESSAGE value="feat(cli): 完善命令行功能与帮助文档&#10;&#10;- 重构命令行参数解析逻辑，支持交互式输入&#10;- 新增完整的帮助文档，包含命令格式和使用示例&#10;- 实现版本信息、语言信息、导入库信息显示功能&#10;- 添加导入路径修改功能&#10;- 完善文件执行模式，支持解释模式和编译模式&#10;- 增强错误处理和用户提示信息&#10;- 更新测试用例，验证新功能正确性" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(cli): 完善命令行功能与帮助文档&#10;&#10;- 重构命令行参数解析逻辑，支持交互式输入&#10;- 新增完整的帮助文档，包含命令格式和使用示例&#10;- 实现版本信息、语言信息、导入库信息显示功能&#10;- 添加导入路径修改功能&#10;- 完善文件执行模式，支持解释模式和编译模式&#10;- 增强错误处理和用户提示信息&#10;- 更新测试用例，验证新功能正确性" />
+    <MESSAGE value="refactor(core): 重构代码路径和JSON配置管理&#10;&#10;- 将 BasicInfo 类移动到 Old8Lang.App 命名空间&#10;- 从 BasicInfo 中移除 CodePath 和 JsonPath 属性&#10;- 在 Apis 类中新增 CodePath 和 JsonPath 属性及相应逻辑&#10;- 移动 LibInfo 类定义从 Old8Lang.Lib 到 Old8Lang 命名空间&#10;- 更新 Program.cs 中的命名空间引用&#10;- 修复文件读取路径引用为 Apis.CodePath&#10;- 删除冗余的 using 语句和无用的工作区配置项" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(core): 重构代码路径和JSON配置管理&#10;&#10;- 将 BasicInfo 类移动到 Old8Lang.App 命名空间&#10;- 从 BasicInfo 中移除 CodePath 和 JsonPath 属性&#10;- 在 Apis 类中新增 CodePath 和 JsonPath 属性及相应逻辑&#10;- 移动 LibInfo 类定义从 Old8Lang.Lib 到 Old8Lang 命名空间&#10;- 更新 Program.cs 中的命名空间引用&#10;- 修复文件读取路径引用为 Apis.CodePath&#10;- 删除冗余的 using 语句和无用的工作区配置项" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -882,13 +885,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs</url>
-          <line>88</line>
+          <line>89</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" containingFunctionPresentation="方法 'GetValue'">
             <startOffsets>
-              <option value="1975" />
+              <option value="2070" />
             </startOffsets>
             <endOffsets>
-              <option value="2023" />
+              <option value="2118" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="531" />

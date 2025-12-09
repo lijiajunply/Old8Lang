@@ -49,19 +49,46 @@ public class VariateManager
 
     public void Set(LangId id, LangValueType langValueType)
     {
-        var a1 = GetValue(id);
-        if (a1 is null)
+        // 获取当前作用域的起始索引
+        // 如果没有子作用域，当前作用域起始索引为0
+        var currentScopeStart = ChildrenNum.Count > 0 ? ChildrenNum[^1] : 0;
+        
+        // 检查是否是函数调用中的参数设置
+        // 如果是，直接添加到变量列表末尾，创建新的局部变量
+        // 这样可以避免修改外部作用域中的同名变量
+        if (IsFunc)
         {
-            //init
+            // 直接添加到当前作用域，创建新的局部变量
+            VariateName.Add(id.IdName);
+            Values.Add(langValueType);
+            Count++;
+            return;
+        }
+        
+        // 只在当前作用域中查找变量，而不是在所有父作用域中查找
+        // 这样可以避免在子作用域中设置变量时修改父作用域中的同名变量
+        var index = -1;
+        // 从当前作用域的末尾向前查找，只查找当前作用域中的变量
+        for (var i = Count - 1; i >= currentScopeStart; i--)
+        {
+            if (VariateName[i] == id.IdName)
+            {
+                index = i;
+                break;
+            }
+        }
+        
+        if (index == -1)
+        {
+            //init - 如果当前作用域中没有该变量，添加到当前作用域
             VariateName.Add(id.IdName);
             Values.Add(langValueType);
             Count++;
             return;
         }
 
-        //reset
-        var count = VariateName.IndexOf(id.IdName);
-        Values[count] = langValueType;
+        //reset - 如果当前作用域中已经有该变量，修改它
+        Values[index] = langValueType;
     }
 
     public void AddChildren()
@@ -85,8 +112,45 @@ public class VariateManager
 
     public LangValueType? GetValue(LangId id)
     {
-        var count = VariateName.IndexOf(id.IdName);
-        return count != -1 ? Values[count] : GetAny(id);
+        // 获取当前作用域的起始索引
+        var currentScopeStart = ChildrenNum.Count > 0 ? ChildrenNum[^1] : 0;
+        
+        // 从当前作用域的末尾向前查找，只查找当前作用域中的变量
+        // 这样可以确保找到的是当前作用域中最新的变量，而不是父作用域中的变量
+        for (var i = Count - 1; i >= currentScopeStart; i--)
+        {
+            if (VariateName[i] == id.IdName)
+            {
+                return Values[i];
+            }
+        }
+        
+        // 如果当前作用域中没有找到，尝试在父作用域中查找
+        if (ChildrenNum.Count > 0)
+        {
+            // 临时移除当前作用域，递归查找父作用域
+            var currentScopeEnd = Count;
+            var currentScopeSize = currentScopeEnd - currentScopeStart;
+            
+            // 临时调整状态
+            ChildrenNum.RemoveAt(ChildrenNum.Count - 1);
+            Count = currentScopeStart;
+            
+            try
+            {
+                // 递归查找父作用域
+                return GetValue(id);
+            }
+            finally
+            {
+                // 恢复状态
+                Count = currentScopeEnd;
+                ChildrenNum.Add(currentScopeStart);
+            }
+        }
+        
+        // 如果还是没有找到，尝试查找导入的函数或类
+        return GetAny(id);
     }
 
     public ImportInfo? GetAny(LangId id)
