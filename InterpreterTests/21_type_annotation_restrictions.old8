@@ -1,0 +1,51 @@
+// 测试类型注解的使用限制
+// 验证类型注解只能在赋值语句、函数参数和lambda参数中使用
+
+PrintLine("=== 测试类型注解的使用限制 ===");
+
+// 1. 正确的使用场景 - 应该通过
+PrintLine("\n=== 1. 正确的使用场景 ===");
+
+// 1.1 赋值语句中的类型注解
+PrintLine("\n1.1 赋值语句中的类型注解：");
+a:int <- 123;
+PrintLine("a = " + a);
+
+// 1.2 函数参数中的类型注解
+PrintLine("\n1.2 函数参数中的类型注解：");
+func testFunc(b:int, c:string) {
+    PrintLine("b = " + b + ", c = " + c);
+    return b;
+}
+testFunc(456, "test");
+
+// 1.3 Lambda 参数中的类型注解
+PrintLine("\n1.3 Lambda 参数中的类型注解：");
+lambdaFunc <- (d:int, e:double) -> d + e;
+result <- lambdaFunc(10, 20.5);
+PrintLine("lambdaFunc(10, 20.5) = " + result);
+
+// 2. 错误的使用场景 - 应该失败
+PrintLine("\n=== 2. 错误的使用场景 ===");
+
+// 2.1 变量引用中的类型注解
+PrintLine("\n2.1 变量引用中的类型注解：");
+// 以下代码应该失败，因为类型注解只能在声明时使用
+// PrintLine(a:int);
+
+// 2.2 函数调用中的类型注解
+PrintLine("\n2.2 函数调用中的类型注解：");
+// 以下代码应该失败，因为函数调用中不能使用类型注解
+// testFunc(789:int, "test":string);
+
+// 2.3 成员访问中的类型注解
+PrintLine("\n2.3 成员访问中的类型注解：");
+// 以下代码应该失败，因为成员访问中不能使用类型注解
+// obj.prop:int <- 123;
+
+// 2.4 索引访问中的类型注解
+PrintLine("\n2.4 索引访问中的类型注解：");
+// 以下代码应该失败，因为索引访问中不能使用类型注解
+// arr[0]:int <- 456;
+
+PrintLine("\n=== 测试完成 ===");

@@ -3,9 +3,10 @@
 // 测试基本的三元表达式语法
 a <- 10
 b <- 20
+c <- 30
 
 // 简单的三元表达式
-result1 <- a ? b : c
+result1 <- a > b ? b : c
 PrintLine(result1)
 
 // 测试问号是否被正确识别

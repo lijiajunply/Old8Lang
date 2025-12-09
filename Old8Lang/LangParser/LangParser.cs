@@ -638,7 +638,17 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     // declaration = identifier ":" type "<-" expression | identifier "<-" expression | memberAccess ":" type "<-" expression | memberAccess "<-" expression ;
     private SetStatement ParseSet()
     {
-        // 解析任意复杂的左值表达式，包括标识符、成员访问、索引访问等
+        // 特殊处理带有类型注解的赋值语句：a:int <- value
+        if (CurrentToken.Type == LangTokenType.Identifier && Peek().Type == LangTokenType.Colon)
+        {
+            // 带有类型注解的赋值语句
+            var id = ParseTypedIdentifier(); // 使用 ParseTypedIdentifier 处理类型注解
+            Expect(LangTokenType.Assignment);
+            var expr = ParseExpression();
+            return new SetStatement(id, expr, id.Position);
+        }
+
+        // 解析左值表达式
         var leftExpr = ParseExpression();
 
         // 检查是否有类型注解
@@ -1838,10 +1848,10 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         // 检查第一个元素是否是标识符
         if (CurrentToken.Type == LangTokenType.Identifier)
         {
-            // 解析第一个参数
-            ids.Add(ParseIdentifier());
+            // 解析第一个参数，允许类型注解
+            ids.Add(ParseTypedIdentifier());
 
-            // 解析更多参数
+            // 解析更多参数，允许类型注解
             while (CurrentToken.Type == LangTokenType.Comma)
             {
                 Expect(LangTokenType.Comma);
@@ -1852,7 +1862,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                     break;
                 }
 
-                ids.Add(ParseIdentifier());
+                ids.Add(ParseTypedIdentifier());
             }
 
             // 检查是否有箭头符号
@@ -2096,12 +2106,41 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         return ParsePrimary();
     }
 
-    /// <summary>
+
+
     /// 解析标识符，支持带类型注解的标识符：identifier:type
     /// 允许将关键字用作标识符
     /// </summary>
     /// <returns>标识符</returns>
     private LangId ParseIdentifier()
+    {
+        var identifierToken = CurrentToken;
+        var position = new SourcePosition(identifierToken.Line, identifierToken.Column,
+            tokenValue: identifierToken.Value);
+        var value = identifierToken.Value;
+
+        // 检查当前token是否是标识符或关键字
+        if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.Func or LangTokenType.Class
+            or LangTokenType.If or LangTokenType.Else or LangTokenType.While or LangTokenType.For
+            or LangTokenType.Return or LangTokenType.Import or LangTokenType.True or LangTokenType.False
+            or LangTokenType.List)
+        {
+            CurrentIndex++;
+        }
+        else
+        {
+            Expect(LangTokenType.Identifier);
+        }
+
+        // 默认不处理类型注解
+        return new LangId(value, "", position);
+    }
+    
+    /// <summary>
+    /// 解析带有类型注解的标识符，用于赋值语句、函数参数和lambda参数
+    /// </summary>
+    /// <returns>带有类型注解的标识符</returns>
+    private LangId ParseTypedIdentifier()
     {
         var identifierToken = CurrentToken;
         var position = new SourcePosition(identifierToken.Line, identifierToken.Column,
@@ -2228,8 +2267,8 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             or LangTokenType.Return or LangTokenType.Import or LangTokenType.True or LangTokenType.False
             or LangTokenType.List)
         {
-            // 解析第一个参数
-            ids.Add(ParseIdentifier());
+            // 解析第一个参数，允许类型注解
+            ids.Add(ParseTypedIdentifier());
 
             // 跳过默认参数值（如果有）
             if (CurrentToken.Type == LangTokenType.Assignment)
@@ -2241,11 +2280,11 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 }
             }
 
-            // 解析更多参数
+            // 解析更多参数，允许类型注解
             while (CurrentToken.Type == LangTokenType.Comma)
             {
                 Expect(LangTokenType.Comma);
-                ids.Add(ParseIdentifier());
+                ids.Add(ParseTypedIdentifier());
 
                 // 跳过默认参数值（如果有）
                 if (CurrentToken.Type == LangTokenType.Assignment)

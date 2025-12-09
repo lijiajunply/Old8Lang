@@ -17,21 +17,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/ternary_debug.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/ternary_debug2.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/ternary_final.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/ternary_grammar.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/ternary_simple.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/ternary_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/ternary_token_debug.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/ternary_token_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/19_list_comprehensions.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/19_list_comprehensions.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/分离变量名解析和类型推断解析，限制类型注解使用场景.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_interpreter_tests.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run_interpreter_tests.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_syntax_tests.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run_syntax_tests.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,7 +85,7 @@
     ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
     ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
     ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Debug",
+    ".NET 项目.Old8Lang.App.executor": "Run",
     "ASKED_ADD_EXTERNAL_FILES": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -355,7 +342,7 @@
       <workItem from="1765277636089" duration="6000" />
       <workItem from="1765277821785" duration="994000" />
       <workItem from="1765278822007" duration="179000" />
-      <workItem from="1765279105952" duration="16166000" />
+      <workItem from="1765279105952" duration="16783000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -862,43 +849,30 @@
           <option name="timeStamp" value="530" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>2189</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" containingFunctionPresentation="方法 'ParseDoubleLiteral'">
+          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs</url>
+          <line>38</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="73110" />
+              <option value="926" />
             </startOffsets>
             <endOffsets>
-              <option value="73159" />
+              <option value="971" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="541" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs</url>
-          <line>1304</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" containingFunctionPresentation="方法 'ParseTernaryExpression'">
-            <startOffsets>
-              <option value="42910" />
-            </startOffsets>
-            <endOffsets>
-              <option value="43117" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="544" />
+          <option name="timeStamp" value="546" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs</url>
-          <line>37</line>
+          <line>40</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="878" />
+              <option value="994" />
             </startOffsets>
             <endOffsets>
-              <option value="917" />
+              <option value="1055" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="545" />
+          <option name="timeStamp" value="547" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
