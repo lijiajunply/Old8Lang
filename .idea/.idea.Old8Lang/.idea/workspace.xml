@@ -17,16 +17,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/修复 A.P() 被错误解析为 Set 语句的问题.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ComplexTest.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/ClassMethodCallTest.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LoopTest.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SimpleAssignmentTest.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SimpleClassTest.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SimpleTest.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/实现多语法错误报告功能.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/提升错误提示覆盖率计划.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ErrorLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ErrorLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/16_class_methods.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/16_class_methods.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListComprehension.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListComprehension.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/OldExpr.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/OldExpr.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BreakStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BreakStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ContinueStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ContinueStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ImportError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/ImportError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/IndexError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/IndexError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/NameError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/NameError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/RuntimeError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/RuntimeError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/TypeError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/TypeError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -350,7 +354,7 @@
       <workItem from="1765277636089" duration="6000" />
       <workItem from="1765277821785" duration="994000" />
       <workItem from="1765278822007" duration="179000" />
-      <workItem from="1765279105952" duration="19350000" />
+      <workItem from="1765279105952" duration="21265000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>

@@ -1,5 +1,6 @@
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
+using Old8Lang.Error;
 using Old8Lang.LangParser;
 
 namespace Old8Lang.AST.Statement;
@@ -25,11 +26,11 @@ public class ContinueStatement(SourcePosition position = default) : OldStatement
         }
         else
         {
-            throw new Exception("Continue statement outside of loop");
+            throw new InvalidOperationError(new SourcePosition(), "Continue statement outside of loop", "continue语句只能在循环内部使用");
         }
     }
 
-    public override OldStatement this[int index] => throw new NotImplementedException();
+    public override OldStatement this[int index] => throw new InvalidOperationError(new SourcePosition(), "Indexer not implemented for ContinueStatement", "ContinueStatement不支持索引访问");
 
     public override int Count => 0;
 

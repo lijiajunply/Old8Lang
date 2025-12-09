@@ -5,7 +5,7 @@ namespace Old8Lang.Error;
 /// <summary>
 /// 索引越界错误
 /// </summary>
-public class IndexError : Old8Exception
+public class IndexError : RuntimeError
 {
     /// <summary>
     /// 构造函数
@@ -15,9 +15,8 @@ public class IndexError : Old8Exception
     /// <param name="length">长度</param>
     public IndexError(IOldLangTree node, int index, int length) 
         : base(
-            "INDEX_ERROR", 
+            node, 
             $"索引越界: 索引 {index} 超出范围 [0, {length - 1}]",
-            node,
             "请检查索引值是否在有效范围内")
     {}
     
@@ -28,9 +27,8 @@ public class IndexError : Old8Exception
     /// <param name="message">错误信息</param>
     public IndexError(IOldLangTree node, string message) 
         : base(
-            "INDEX_ERROR", 
+            node, 
             message,
-            node,
             "请检查索引相关操作")
     {}
 }

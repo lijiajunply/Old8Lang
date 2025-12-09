@@ -5,7 +5,7 @@ namespace Old8Lang.Error;
 /// <summary>
 /// 类型不匹配错误
 /// </summary>
-public class TypeError : Old8Exception
+public class TypeError : RuntimeError
 {
     /// <summary>
     /// 构造函数
@@ -15,9 +15,8 @@ public class TypeError : Old8Exception
     /// <param name="actualType">实际类型</param>
     public TypeError(IOldLangTree node, string expectedType, string actualType) 
         : base(
-            "TYPE_ERROR", 
+            node, 
             $"类型不匹配: 期望 {expectedType}，但得到 {actualType}",
-            node,
             "请检查变量类型或转换操作")
     {}
     
@@ -28,9 +27,8 @@ public class TypeError : Old8Exception
     /// <param name="message">错误信息</param>
     public TypeError(IOldLangTree node, string message) 
         : base(
-            "TYPE_ERROR", 
+            node, 
             message,
-            node,
             "请检查类型相关操作")
     {}
 }

@@ -126,18 +126,32 @@ public class ZeroDivisionError : RuntimeError
 /// </summary>
 public class InvalidOperationError : RuntimeError
 {
-    public InvalidOperationError(IOldLangTree node, string operation) 
+    public InvalidOperationError(IOldLangTree node, string message) 
         : base(
             node, 
-            $"无效操作: {operation}",
+            message,
             "请检查操作是否合法")
     {}
     
-    public InvalidOperationError(SourcePosition position, string operation) 
+    public InvalidOperationError(IOldLangTree node, string message, string suggestion) 
+        : base(
+            node, 
+            message,
+            suggestion)
+    {}
+    
+    public InvalidOperationError(SourcePosition position, string message) 
         : base(
             position, 
-            $"无效操作: {operation}",
+            message,
             "请检查操作是否合法")
+    {}
+    
+    public InvalidOperationError(SourcePosition position, string message, string suggestion) 
+        : base(
+            position, 
+            message,
+            suggestion)
     {}
 }
 

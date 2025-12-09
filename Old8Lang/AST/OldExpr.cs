@@ -24,7 +24,7 @@ public class OldExpr : IOldLangTree
 
     public virtual void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationError(this, "表达式未实现LoadIlValue方法", "请在子类中实现LoadIlValue方法");
     }
 
     public virtual void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
@@ -54,6 +54,6 @@ public class OldExpr : IOldLangTree
 
     public virtual Type? OutputType(LocalManager local)
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationError(this, "表达式未实现LoadIlValue方法", "请在子类中实现LoadIlValue方法");
     }
 }

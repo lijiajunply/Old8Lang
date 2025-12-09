@@ -268,7 +268,7 @@ public class ListComprehension : LangValueType
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 列表推导式的IL生成需要更复杂的实现，暂时不支持
-        throw new NotImplementedException("列表推导式的IL生成暂时不支持");
+        throw new InvalidOperationError(this, "列表推导式的IL生成暂时不支持", "列表推导式目前只支持解释模式，不支持编译模式");
     }
 
     public override Type OutputType(LocalManager local)

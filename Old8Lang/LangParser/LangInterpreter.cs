@@ -41,7 +41,7 @@ public class LangInterpreter : IMiniInterpreter
         Old8Exception.CurrentInterpreter = this;
 
         var parser = LangTokenizer.Tokenize(code);
-        if (parser == null) throw new Exception("语法出错");
+        if (parser == null) throw new SyntaxError(new SourcePosition(1, 1), "语法出错");
         //parser.ForEach(x => Console.WriteLine(x));
         var result = new LangParser(parser, code, fileName).ParseProgram();
 
