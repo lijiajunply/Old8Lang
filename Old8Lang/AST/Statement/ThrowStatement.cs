@@ -1,0 +1,35 @@
+using Old8Lang.Error;
+using Old8Lang.LangParser;
+using System.Reflection.Emit;
+using Old8Lang.Compiler;
+
+namespace Old8Lang.AST.Statement;
+
+public class ThrowStatement(OldExpr throwExpr, SourcePosition position = default) : OldStatement(position)
+{
+    public override void Run(VariateManager manager)
+    {
+        var value = throwExpr.Run(manager);
+        // 使用CustomError抛出异常
+        throw new CustomError(
+            value.ToString(),
+            this,
+            "这是一个自定义抛出的异常");
+    }
+
+    public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
+    {
+        // 编译模式下的实现
+        throwExpr.LoadIlValue(ilGenerator, local);
+        ilGenerator.Emit(OpCodes.Newobj, typeof(Exception).GetConstructor([typeof(string)])!);
+        ilGenerator.Emit(OpCodes.Throw);
+    }
+
+    public override OldStatement? this[int index] => null;
+
+    public override int Count => 0;
+
+    public Type OutputType(LocalManager local) => typeof(void);
+
+    public override string ToString() => $"throw {throwExpr}";
+}

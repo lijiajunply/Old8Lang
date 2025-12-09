@@ -1,0 +1,67 @@
+// 测试throw语句的语法
+
+// 测试1: 基本的throw语句
+throw "error message"
+
+// 测试2: throw表达式
+throw 123
+throw 3.14
+throw true
+throw [1, 2, 3]
+throw {"key": "value"}
+
+// 测试3: throw变量
+errorMsg <- "Custom error"
+throw errorMsg
+
+// 测试4: throw函数调用结果
+func getError() {
+    return "Function error"
+}
+throw getError()
+
+// 测试5: 在try-catch块中使用throw
+try {
+    throw "Exception in try block"
+} catch (e) {
+    PrintLine("Caught exception: " + e)
+}
+
+// 测试6: 在if语句中使用throw
+if true {
+    throw "Throw in if"
+}
+
+// 测试7: 在while循环中使用throw
+count <- 0
+while count < 3 {
+    if count == 2 {
+        throw "Throw in while loop"
+    }
+    count <- count + 1
+}
+
+// 测试8: 在for循环中使用throw
+for i <- 0, i < 3, i <- i + 1 {
+    if i == 1 {
+        throw "Throw in for loop"
+    }
+}
+
+// 测试9: 在函数中使用throw
+func throwFromFunc() {
+    throw "Throw from function"
+}
+
+// 测试10: 在类方法中使用throw
+class TestClass {
+    func throwFromMethod() {
+        throw "Throw from class method"
+    }
+}
+
+// 测试11: throw复合表达式
+throw "Error code: " + "123" + " - " + "Message"
+
+// 测试12: throw空值
+throw null

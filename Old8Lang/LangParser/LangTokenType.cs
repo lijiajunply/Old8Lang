@@ -211,6 +211,7 @@ public enum LangTokenType
     List,
     This,
     Extends,
+    Throw,
     /// <summary>
     /// static
     /// </summary>
@@ -258,7 +259,8 @@ public enum KeywordType
     Extends,
     Static,
     Public,
-    Private
+    Private,
+    Throw
 }
 
 public static class TokenOpera

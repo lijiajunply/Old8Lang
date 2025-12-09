@@ -345,6 +345,12 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             return ParseContinueStatement();
         }
 
+        // 处理throw语句：throw expression
+        if (CurrentToken.Type == LangTokenType.Throw)
+        {
+            return ParseThrowStatement();
+        }
+
         // 处理class定义：class identifier block
         if (CurrentToken.Type == LangTokenType.Class)
         {
@@ -606,6 +612,15 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         var position = new SourcePosition(continueToken.Line, continueToken.Column, tokenValue: continueToken.Value);
         Expect(LangTokenType.Continue);
         return new ContinueStatement(position);
+    }
+
+    private ThrowStatement ParseThrowStatement()
+    {
+        var throwToken = CurrentToken;
+        var position = new SourcePosition(throwToken.Line, throwToken.Column, tokenValue: throwToken.Value);
+        Expect(LangTokenType.Throw);
+        var expression = ParseExpression();
+        return new ThrowStatement(expression, position);
     }
 
     // lrBlock = "(" statement ")" ;

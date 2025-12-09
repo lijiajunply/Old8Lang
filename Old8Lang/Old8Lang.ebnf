@@ -20,7 +20,10 @@ statement = lrBlock
           | returnStatement
           | breakStatement
           | continueStatement
-          | tryStatement ;
+          | tryStatement
+          | throwStatement ;
+
+throwStatement = "throw" expression ;
 
 lrBlock = "(" statement ")" ;
 

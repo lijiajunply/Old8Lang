@@ -18,7 +18,7 @@ Old8Lang 是一种动态类型的编程语言，具有类似 C#/Java 的语法�
 以下是 Old8Lang 的关键字：
 
 ```
-if elif else for while switch case default func class return try catch finally import and or xor not true false in as
+if elif else for while switch case default func class return try catch finally import and or xor not true false in as throw
 ```
 
 ### 2.3 字面量
@@ -335,6 +335,8 @@ t <- Test(1, 2)  // 调用带有参数的构造函数
 
 ### 5.6 异常处理
 
+#### 5.6.1 try-catch-finally 语句
+
 ```
 try {
     // 可能抛出异常的代码
@@ -342,6 +344,37 @@ try {
     // 捕获所有类型的异常
 } finally {
     // 无论是否异常都执行
+}
+```
+
+#### 5.6.2 throw 语句
+
+throw 语句用于显式抛出异常，可以抛出任意类型的表达式作为异常信息：
+
+```
+// 抛出字符串异常
+throw "错误信息"
+
+// 抛出数字异常
+throw 123
+
+// 抛出布尔值异常
+throw true
+
+// 抛出数组异常
+throw [1, 2, 3]
+
+// 抛出函数调用结果
+throw getError()
+```
+
+throw 语句可以在任何地方使用，包括函数、循环、条件语句等。当执行到 throw 语句时，程序会立即停止当前执行路径，并将异常传递给最近的 try-catch 块处理：
+
+```
+try {
+    throw "异常信息"
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
 }
 ```
 
