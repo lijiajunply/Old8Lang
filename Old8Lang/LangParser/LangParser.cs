@@ -21,9 +21,8 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     /// 获取错误位置附近的源代码上下文
     /// </summary>
     /// <param name="line">错误行号</param>
-    /// <param name="column">错误列号</param>
     /// <returns>错误位置附近的源代码上下文</returns>
-    private string[] GetSourceContext(int line, int column)
+    private string[] GetSourceContext(int line)
     {
         if (string.IsNullOrEmpty(sourceCode))
         {
@@ -63,7 +62,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
 
     private SyntaxError CreateSyntaxError(string message)
     {
-        var context = GetSourceContext(CurrentToken.Line, CurrentToken.Column);
+        var context = GetSourceContext(CurrentToken.Line);
         return new SyntaxError(
             CurrentToken.Value,
             CurrentToken.Line,
@@ -135,7 +134,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 CurrentToken.Column,
                 fileName,
                 detailedMessage + " " + suggestion,
-                GetSourceContext(CurrentToken.Line, CurrentToken.Column));
+                GetSourceContext(CurrentToken.Line));
         }
     }
 
@@ -181,7 +180,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             string[] context;
             try
             {
-                context = GetSourceContext(line, column);
+                context = GetSourceContext(line);
             }
             catch
             {
@@ -806,7 +805,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         }
 
         // 如果有返回类型注解，创建新的LangId并设置AssumptionType
-        LangId? updatedFuncName = funcName;
+        var updatedFuncName = funcName;
         if (!string.IsNullOrEmpty(returnType))
         {
             updatedFuncName = new LangId(funcName.IdName, returnType, position: funcName.Position);
@@ -1329,6 +1328,19 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             left = new Operation(left, OperationType.MINUS, new IntLangValue(1), position);
         }
 
+        // 处理 as 操作符
+        while (CurrentToken.Type == LangTokenType.As)
+        {
+            var operatorToken = CurrentToken;
+            var position =
+                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            Expect(LangTokenType.As);
+            var right = ParsePrimary();
+            // 处理右操作数的点运算符
+            right = ParseDotExpr(right);
+            left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
+        }
+
         return left;
     }
 
@@ -1465,7 +1477,6 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             LangTokenType.LeftParen => ParseLambdaOrTuple(),
             LangTokenType.LeftBrace => ParseDictionary(),
             LangTokenType.Dollar => ParseStringTree(), // 处理字符串模板：$"string", ${expression}, $($"string")
-            LangTokenType.Identifier when Peek().Type == LangTokenType.As => ParseAs(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftBracket => ParseListInitOrSlice(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseInstantiate(),
             LangTokenType.Identifier => ParseIdentifier(),
@@ -1505,20 +1516,6 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         Expect(LangTokenType.RightBracket);
         // 返回ListValue表示列表
         return new ListLangValue(elements, position);
-    }
-
-    /// <summary>
-    /// asStatement = identifier "as" identifier ;
-    /// </summary>
-    /// <returns></returns>
-    private AsLangValue ParseAs()
-    {
-        var id = ParseIdentifier();
-        var asToken = CurrentToken;
-        var position = new SourcePosition(asToken.Line, asToken.Column, tokenValue: asToken.Value);
-        Expect(LangTokenType.As);
-        var asId = ParseIdentifier();
-        return new AsLangValue(id, asId, position);
     }
 
 

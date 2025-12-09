@@ -1,0 +1,21 @@
+// 测试 as 关键字作为操作符
+PrintLine("=== 测试 as 关键字作为操作符 ===")
+
+// 测试基本类型转换
+intVal <- 42
+PrintLine("intVal as string: " + (intVal as string))
+PrintLine("intVal as double: " + (intVal as double))
+
+doubleVal <- 3.14
+PrintLine("doubleVal as int: " + (doubleVal as int))
+PrintLine("doubleVal as string: " + (doubleVal as string))
+
+boolVal <- true
+PrintLine("boolVal as string: " + (boolVal as string))
+
+// 测试字符串到数值的转换
+stringVal <- "123"
+PrintLine("stringVal as int: " + (stringVal as int))
+PrintLine("stringVal as double: " + (stringVal as double))
+
+PrintLine("\n✅ 所有 as 关键字测试完成")

@@ -1,0 +1,22 @@
+// 测试 as 关键字作为操作符的解析
+PrintLine("测试 as 关键字作为操作符")
+
+// 基本类型转换
+result1 <- 42 as string
+result2 <- 3.14 as int
+result3 <- true as string
+
+// 字符串到数值的转换
+result4 <- "123" as int
+result5 <- "3.14" as double
+
+// 类型转换在表达式中的应用
+result6 <- ("10" as int) + ("20" as int)
+
+// 类型转换的链式转换
+result7 <- ("123" as int) as double as string
+
+// 类型转换在函数参数中的应用
+PrintLine("测试函数参数中的类型转换: " + ("456" as int))
+
+PrintLine("✅ 所有 as 关键字解析测试完成")

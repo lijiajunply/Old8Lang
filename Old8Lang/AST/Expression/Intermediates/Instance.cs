@@ -24,9 +24,9 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
 
         switch (Id.IdName)
         {
-            case "Type":
+            case "Type" or "type":
                 return new TypeLangValue(results[0]).Run(manager);
-            case "Exec":
+            case "Exec" or "exec":
             {
                 if (results[0] is not StringLangValue execStringValue)
                     throw new TypeError(this, "StringValue", results[0].GetType().Name);
@@ -34,22 +34,24 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                 a.Run(manager);
                 return new VoidLangValue();
             }
-            case "ShowValues":
+            case "ShowValues" or "showValues":
             {
+#if DEBUG
                 manager.Interpreter.UseClass.WriteLine(manager.ToString());
                 return new VoidLangValue();
+#endif
             }
-            case "Json":
+            case "Json" or "json":
             {
                 if (results[0] is not AnyLangValue jsonAnyValue)
                     throw new TypeError(this, "AnyValue", results[0].GetType().Name);
                 return jsonAnyValue.ToJson();
             }
-            case "ToObj":
+            case "ToObj" or "toObj":
                 if (results[0] is not StringLangValue stringValue)
                     throw new TypeError(this, "StringValue", results[0].GetType().Name);
                 return stringValue.ToObj();
-            case "PrintLine":
+            case "PrintLine" or "printLine":
             {
                 if (results.Count == 0)
                 {
@@ -63,7 +65,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                 manager.Interpreter.UseClass.WriteLine(value);
                 return new VoidLangValue();
             }
-            case "Print":
+            case "Print" or "print":
             {
                 if (results.Count == 0) return new VoidLangValue();
 
@@ -73,7 +75,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                 manager.Interpreter.UseClass.Write(value);
                 return new VoidLangValue();
             }
-            case "Error":
+            case "Error" or "error":
             {
                 if (results.Count == 0)
                 {
@@ -87,17 +89,17 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                 manager.Interpreter.UseClass.Error(value);
                 return new VoidLangValue();
             }
-            case "ReadLine":
+            case "ReadLine" or "readLine":
             {
                 var res = manager.Interpreter.UseClass.ReadLine();
                 return new StringLangValue(res);
             }
-            case "Clear":
+            case "Clear" or "clear":
             {
                 manager.Interpreter.UseClass.Clear();
                 return new VoidLangValue();
             }
-            case "Compiler":
+            case "Compiler" or "compiler":
             {
                 if (results.Count == 0) return new VoidLangValue();
                 string value;
@@ -123,7 +125,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
 
                 return new VoidLangValue();
             }
-            case "Len":
+            case "Len" or "len":
             {
                 var value = results[0].Run(manager);
                 if (value is ILangList list) return new IntLangValue(list.GetLength());
@@ -182,7 +184,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                 result = funcValue.Run(manager, Ids);
             }
         }
-        
+
         // 原来的AnyLangValue处理逻辑，用于兼容旧代码
         if (result is AnyLangValue anyValue)
         {

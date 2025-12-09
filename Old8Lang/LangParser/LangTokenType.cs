@@ -303,6 +303,7 @@ public static class TokenOpera
             LangTokenType.True => OperationType.TRUE,
             LangTokenType.False => OperationType.FALSE,
             LangTokenType.Return => OperationType.RETURN,
+            LangTokenType.As => OperationType.AS,
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
     }

@@ -41,6 +41,8 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
             return "&&";
         if (Opera == OperationType.OR)
             return "||";
+        if (Opera == OperationType.AS)
+            return "as";
         return "";
     }
 
@@ -170,7 +172,8 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
             }
             else if (dotLeftResult != null! && Right != null)
             {
-                throw new InvalidOperationError(this, $"类型 '{dotLeftResult.GetType().Name}' 不支持点操作");
+                return dotLeftResult.Dot(Right);
+                // throw new InvalidOperationError(this, $"类型 '{dotLeftResult.GetType().Name}' 不支持点操作");
             }
             else
             {
@@ -182,12 +185,47 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         // 注意：直接在当前作用域中运行两个操作数
         // Set方法已经被修复，只在当前作用域中设置变量，不会修改外部变量
         var leftResult = Left.Run(manager);
+
+        if (Opera == OperationType.AS)
+        {
+            // 处理类型转换操作：left as right
+            // 右侧应该是一个类型标识符，如 int, double, string 等
+            // 直接从 Right 表达式获取类型名称，而不是从运行结果
+            string typeName;
+            if (Right is LangId rightLangId)
+            {
+                typeName = rightLangId.IdName;
+            }
+            else if (Right is TypeLangValue rightTypeLangValue)
+            {
+                typeName = rightTypeLangValue.ToString();
+            }
+            else
+            {
+                // 如果是其他表达式，尝试获取其值作为类型
+                var rightAsResult = Right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
+
+                if (rightAsResult is TypeLangValue typeLangValue)
+                {
+                    return leftResult.Converse(typeLangValue, manager);
+                }
+
+                typeName = rightAsResult.ToString();
+            }
+
+            // 创建或获取类型对象
+            var type = new TypeLangValue(typeName);
+            return leftResult.Converse(type, manager);
+        }
+
         var rightResult = Right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
 
         // left xor right
         if (leftResult is BoolLangValue boolLeft && rightResult is BoolLangValue boolRight &&
             Opera == OperationType.XOR)
+        {
             return new BoolLangValue(!boolLeft.Equal(boolRight));
+        }
 
         // == , < , > 
         if (leftResult != null! && rightResult != null!)
