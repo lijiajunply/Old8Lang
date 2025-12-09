@@ -1,0 +1,18 @@
+// 调试三元表达式的token解析
+a <- 10
+b <- 20
+
+// 尝试用不同方式编写三元表达式
+
+// 方式1: 直接使用比较表达式作为条件
+result1 <- a > b ? a : b
+PrintLine("方式1 - a > b ? a : b = " + result1)
+
+// 方式2: 使用括号包围比较表达式
+result2 <- (a > b) ? a : b
+PrintLine("方式2 - (a > b) ? a : b = " + result2)
+
+// 方式3: 先将比较结果赋值给变量，再使用变量作为条件
+condition <- a > b
+result3 <- condition ? a : b
+PrintLine("方式3 - condition ? a : b = " + result3)

@@ -1,0 +1,19 @@
+// 测试三元表达式的优先级和执行逻辑
+
+a <- 10
+b <- 20
+
+// 测试基本的三元表达式
+condition <- a > b
+PrintLine("条件结果: " + condition)
+
+// 直接执行条件和分支，不使用三元表达式
+if condition {
+    PrintLine("条件为真，执行真分支: " + a)
+} else {
+    PrintLine("条件为假，执行假分支: " + b)
+}
+
+// 使用三元表达式
+result <- a > b ? a : b
+PrintLine("三元表达式结果: " + result)

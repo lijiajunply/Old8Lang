@@ -1,0 +1,16 @@
+// 调试三元表达式的解析和执行
+
+// 测试基本的三元表达式
+a <- 10
+b <- 20
+
+// 直接输出条件表达式的结果
+PrintLine("a > b = " + (a > b))
+
+// 尝试用括号包围条件表达式
+result <- (a > b) ? a : b
+PrintLine("(a > b) ? a : b = " + result)
+
+// 测试赋值语句中的三元表达式
+max <- a > b ? a : b
+PrintLine("max = " + max)

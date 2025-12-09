@@ -40,7 +40,7 @@ PrintLine("1-10中大于5的偶数: " + multiConditions)
 // 列表推导式中的if-else条件
 PrintLine("\n=== 列表推导式中的if-else条件 ===")
 
-ifElseList <- [x if x % 2 == 0 else 0 for x in numbers]
+ifElseList <- [x % 2 == 0 ? x : 0 for x in numbers]
 PrintLine("原始列表: " + numbers)
 PrintLine("偶数保留，奇数为0: " + ifElseList)
 
@@ -120,7 +120,7 @@ zeroMatrix <- [[0 for j in [0~2]] for i in [0~2]]
 PrintLine("3x3零矩阵: " + zeroMatrix)
 
 // 生成3x3的单位矩阵
-identityMatrix <- [[1 if i == j else 0 for j in [0~2]] for i in [0~2]]
+identityMatrix <- [[i == j ? 1 : 0 for j in [0~2]] for i in [0~2]]
 PrintLine("3x3单位矩阵: " + identityMatrix)
 
 PrintLine("\n✅ 所有列表推导式测试完成")

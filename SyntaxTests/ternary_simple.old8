@@ -1,0 +1,15 @@
+// 简单测试三元表达式
+
+// 使用布尔字面量作为条件
+result1 <- true ? "真" : "假"
+PrintLine("true ? \"真\" : \"假\" = " + result1)
+
+result2 <- false ? "真" : "假"
+PrintLine("false ? \"真\" : \"假\" = " + result2)
+
+// 使用简单的比较表达式
+result3 <- 5 > 3 ? 5 : 3
+PrintLine("5 > 3 ? 5 : 3 = " + result3)
+
+result4 <- 5 < 3 ? 5 : 3
+PrintLine("5 < 3 ? 5 : 3 = " + result4)

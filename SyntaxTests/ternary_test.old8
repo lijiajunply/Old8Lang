@@ -1,0 +1,15 @@
+// 测试三元表达式语法
+a <- 10
+b <- 20
+max <- a > b ? a : b
+PrintLine(max)
+
+// 测试嵌套三元表达式
+c <- 30
+result <- a > b ? (a > c ? a : c) : (b > c ? b : c)
+PrintLine(result)
+
+// 测试不同类型的表达式
+isTrue <- true
+message <- isTrue ? "条件为真" : "条件为假"
+PrintLine(message)

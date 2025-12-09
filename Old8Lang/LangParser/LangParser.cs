@@ -374,18 +374,14 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
 
             try
             {
-                // 尝试解析左值表达式
-                ParseExpression();
-
-                // 检查下一个token是否是赋值符号
-                if (CurrentToken.Type == LangTokenType.Assignment)
-                {
-                    // 回退到原始位置，准备调用ParseSet()
-                    CurrentIndex = savedIndex;
-                    return ParseSet();
-                }
-                // 检查是否是带有类型注解的赋值语句：identifier:type <- value
-                else if (CurrentToken.Type == LangTokenType.Colon)
+                // 尝试解析左值表达式（不包括三元表达式）
+                // 先解析主要表达式
+                var expr = ParsePrimary();
+                // 处理点访问和索引访问等复杂左值表达式
+                expr = ParseDotExpr(expr);
+                
+                // 检查是否是类型注解
+                if (CurrentToken.Type == LangTokenType.Colon)
                 {
                     var nextToken = Peek();
                     if (nextToken.Type == LangTokenType.Identifier)
@@ -393,11 +389,18 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                         var thirdToken = Peek(2);
                         if (thirdToken.Type == LangTokenType.Assignment)
                         {
-                            // 回退到原始位置，准备调用ParseSet()
+                            // 这是带有类型注解的赋值语句
                             CurrentIndex = savedIndex;
                             return ParseSet();
                         }
                     }
+                }
+                // 检查下一个token是否是赋值符号
+                else if (CurrentToken.Type == LangTokenType.Assignment)
+                {
+                    // 这是普通赋值语句
+                    CurrentIndex = savedIndex;
+                    return ParseSet();
                 }
 
                 // 如果不是赋值语句，回退到原始位置
@@ -1236,22 +1239,25 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
 
     #region Expression
 
-    // expression = binaryExpression
+    // expression = boolOpera
+    //            | ternaryExpression
+    //            | binaryExpression
     //            | dotExpr
     //            | numberOpera1
     //            | numberOpera2
-    //            | boolOpera
     //            | notBool
     //            | minusPrefix
     //            | primary ;
     private OldExpr ParseExpression()
     {
-        // 1. 解析最低优先级的表达式（逻辑表达式）
+        // 1. 解析逻辑表达式
         var expr = ParseBoolOpera();
+        // 2. 解析三元表达式（最低优先级）
+        expr = ParseTernaryExpression(expr);
         return expr;
     }
 
-    // 逻辑表达式（最低优先级）
+    // 逻辑表达式
     private OldExpr ParseBoolOpera()
     {
         var left = ParseBinaryExpression();
@@ -1266,39 +1272,46 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
         }
 
-        // 解析三元表达式
-        return ParseTernaryExpression(left);
+        return left;
     }
     
     /// <summary>
     /// 解析三元表达式
-    /// ternaryExpression = expression "if" expression "else" expression ;
+    /// ternaryExpression = expression "?" expression ":" expression ;
+    /// 注意：需要与类型注解区分开，类型注解的形式是 "identifier : type"
     /// </summary>
     /// <returns>三元表达式节点</returns>
-    private OldExpr ParseTernaryExpression(OldExpr expression)
+    private OldExpr ParseTernaryExpression(OldExpr condition)
     {
-        // 检查是否有 if-else 条件
-        if (CurrentToken.Type == LangTokenType.If)
+        // 检查是否有 ?，这是三元表达式的标志
+        if (CurrentToken.Type == LangTokenType.Question)
         {
-            var ifToken = CurrentToken;
-            Expect(LangTokenType.If);
-            var condition = ParseExpression();
+            var questionToken = CurrentToken;
+            Expect(LangTokenType.Question);
             
-            if (CurrentToken.Type == LangTokenType.Else)
+            // 解析问号后的表达式（true分支）
+            var trueExpr = ParseExpression();
+            
+            // 检查是否有 :，这是三元表达式的分支分隔符
+            if (CurrentToken.Type == LangTokenType.Colon)
             {
-                Expect(LangTokenType.Else);
-                var elseExpr = ParseExpression();
+                Expect(LangTokenType.Colon);
                 
-                // 创建专门的三元表达式节点
+                // 解析冒号后的表达式（false分支）
+                var falseExpr = ParseExpression();
+                
+                // 创建三元表达式节点
+                // 语法：condition ? trueExpr : falseExpr
                 return new TernaryExpression(
                     condition, 
-                    expression, 
-                    elseExpr, 
-                    new SourcePosition(ifToken.Line, ifToken.Column));
+                    trueExpr, 
+                    falseExpr, 
+                    new SourcePosition(questionToken.Line, questionToken.Column));
             }
         }
         
-        return expression;
+        // 不是三元表达式，返回原始条件表达式
+        return condition;
     }
 
     // 比较表达式
@@ -1311,8 +1324,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                or LangTokenType.NotEquals or LangTokenType.LessThan or LangTokenType.GreaterThan)
         {
             var operatorToken = CurrentToken;
-            var position =
-                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position = new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
             Expect(operatorToken.Type);
             var right = ParseNumberOpera1();
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);

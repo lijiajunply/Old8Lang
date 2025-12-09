@@ -8,7 +8,7 @@ failed=0
 failed_files=()
 
 # 获取所有测试文件
-test_files=$(find ./InterpreterTests -name "*.old8")
+test_files=$(find ./SyntaxTests -name "*.old8")
 
 # 遍历所有测试文件
 for file in $test_files; do

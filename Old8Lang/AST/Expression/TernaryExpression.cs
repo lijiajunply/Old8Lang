@@ -35,13 +35,14 @@ public class TernaryExpression(
     public override LangValueType Run(VariateManager manager)
     {
         // 执行条件判断
-        var conditionValue = Condition.Run(manager) as BoolLangValue ??
-                             throw new InvalidOperationError(
-                                 this,
-                                 "三元条件表达式的条件必须是Bool类型");
+        var condition = Condition.Run(manager);
+        if (condition is not BoolLangValue boolValue)
+        {
+            throw new InvalidOperationError(this, "三元条件表达式的条件必须是Bool类型");
+        }
 
         // 根据条件结果返回相应的表达式值
-        return conditionValue.Value
+        return boolValue.Value
             ? TrueExpression.Run(manager)
             : FalseExpression.Run(manager);
     }
@@ -87,6 +88,6 @@ public class TernaryExpression(
 
     public override string ToString()
     {
-        return $"{TrueExpression} if {Condition} else {FalseExpression}";
+        return $"{Condition} ? {TrueExpression} : {FalseExpression}";
     }
 }

@@ -1,0 +1,17 @@
+// 测试三元表达式的token解析
+
+// 测试基本的三元表达式语法
+a <- 10
+b <- 20
+
+// 简单的三元表达式
+result1 <- a ? b : c
+PrintLine(result1)
+
+// 测试问号是否被正确识别
+result2 <- 10 > 1 ? 20 : 30
+PrintLine(result2)
+
+// 测试冒号是否被正确识别
+result3 <- true ? "yes" : "no"
+PrintLine(result3)

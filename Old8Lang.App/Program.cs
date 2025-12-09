@@ -10,7 +10,7 @@ if (args.Length == 0)
 {
     args =
     [
-        "-s", "/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/InterpreterTests/test_list.old8"
+        "-f", "/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/SyntaxTests/ternary_token_test.old8"
     ];
 }
 #endif
@@ -198,10 +198,10 @@ if (command == fromFileCmd)
         var b = aLangInterpreter.Build(code, args[1]);
         b.Run(aLangInterpreter.Manager);
     }
-    catch (Exception e)
+    catch
     {
 #if DEBUG
-        Console.WriteLine(e);
+        //Console.WriteLine(e);
         throw;
 #else
         Console.WriteLine(e.Message);
@@ -243,10 +243,9 @@ if (command == compilerCmd)
     {
         action();
     }
-    catch (Exception e)
+    catch
     {
 #if DEBUG
-        Console.WriteLine(e);
         throw;
 #else
         Console.WriteLine(e.Message);
