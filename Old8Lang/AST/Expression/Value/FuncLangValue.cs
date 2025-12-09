@@ -99,14 +99,20 @@ public class FuncLangValue : ImportInfo
         // 运行方法体
         BlockStatement.Run(variateManagerFunc);
         
+        // 保存返回值
+        var result = variateManagerFunc.Result;
+        
         // 恢复非函数上下文标志
         variateManagerFunc.IsFunc = false;
+        
+        // 重置return标志，确保函数调用不会影响外部上下文
+        variateManagerFunc.IsReturn = false;
         
         // 移除子作用域，但是要注意，在init方法中使用this关键字设置的值已经被保存到实例中了
         // 所以这里移除子作用域不会影响实例的状态
         variateManagerFunc.RemoveChildren();
         
-        return variateManagerFunc.Result;
+        return result;
     }
 
     public override Type OutputType(LocalManager local)

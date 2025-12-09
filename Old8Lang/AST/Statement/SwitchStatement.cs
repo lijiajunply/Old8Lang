@@ -14,13 +14,12 @@ public class SwitchStatement(
 {
     public override void Run(VariateManager manager)
     {
-        manager.AddChildren();
         var switchValue = switchExpr.Run(manager);
 
         foreach (var oldCase in switchCaseList)
         {
             var caseValue = oldCase.Expr.Run(manager);
-            bool isMatch = false;
+            bool isMatch;
             
             // 处理范围匹配：如果 caseValue 是数组，检查 switchValue 是否在数组中
             if (caseValue is ArrayLangValue arrayValue)
@@ -36,13 +35,12 @@ public class SwitchStatement(
             if (isMatch)
             {
                 oldCase.BlockStatement.Run(manager);
-                manager.RemoveChildren();
+                // 如果case块中执行了return语句，直接返回
                 return;
             }
         }
 
         defaultBlockStatement?.Run(manager);
-        manager.RemoveChildren();
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)

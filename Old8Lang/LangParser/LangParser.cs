@@ -267,7 +267,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             // 需要查找 "in" 关键字的位置
             var tempIndex = CurrentIndex + 1;
             var foundIn = false;
-            
+
             // 跳过所有标识符和逗号，查找 "in" 关键字
             while (tempIndex < tokens.Count)
             {
@@ -281,9 +281,10 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 {
                     break;
                 }
+
                 tempIndex++;
             }
-            
+
             if (foundIn)
             {
                 return ParseForInStatement();
@@ -316,13 +317,13 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         {
             return ParseReturnStatement();
         }
-        
+
         // 处理break语句：break
         if (CurrentToken.Type == LangTokenType.Break)
         {
             return ParseBreakStatement();
         }
-        
+
         // 处理continue语句：continue
         if (CurrentToken.Type == LangTokenType.Continue)
         {
@@ -575,7 +576,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         var expression = ParseExpression();
         return new ReturnStatement(expression, position);
     }
-    
+
     private BreakStatement ParseBreakStatement()
     {
         var breakToken = CurrentToken;
@@ -583,7 +584,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         Expect(LangTokenType.Break);
         return new BreakStatement(position);
     }
-    
+
     private ContinueStatement ParseContinueStatement()
     {
         var continueToken = CurrentToken;
@@ -682,7 +683,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     {
         var forToken = CurrentToken;
         Expect(LangTokenType.For);
-        
+
         // 解析多个标识符，支持 key, value 格式
         var identifiers = new List<LangId>();
         while (true)
@@ -690,19 +691,19 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var identifier = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
             identifiers.Add(new LangId(identifier));
-            
+
             if (CurrentToken.Type != LangTokenType.Comma)
                 break;
-            
+
             Expect(LangTokenType.Comma);
         }
-        
+
         Expect(LangTokenType.In);
         var expression = ParseExpression();
         var block = ParseBlock();
 
         var position = new SourcePosition(forToken.Line, forToken.Column);
-        
+
         // 如果只有一个标识符，直接使用；否则使用多个标识符
         if (identifiers.Count == 1)
         {
@@ -1682,22 +1683,21 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             // 单元素元组：(expr,)
             return new TupleLangValue(elements[0], new NullLangValue(), position);
         }
-        else if (elements.Count == 2)
+
+        if (elements.Count == 2)
         {
             // 双元素元组：(expr1, expr2)
             return new TupleLangValue(elements[0], elements[1], position);
         }
-        else
-        {
-            // 多元素元组：(expr1, expr2, expr3, ...) - 递归构建嵌套元组
-            var tuple = new TupleLangValue(elements[0], elements[1], position);
-            for (int i = 2; i < elements.Count; i++)
-            {
-                tuple = new TupleLangValue(tuple, elements[i], position);
-            }
 
-            return tuple;
+        // 多元素元组：(expr1, expr2, expr3, ...) - 递归构建嵌套元组
+        var tuple = new TupleLangValue(elements[0], elements[1], position);
+        for (int i = 2; i < elements.Count; i++)
+        {
+            tuple = new TupleLangValue(tuple, elements[i], position);
         }
+
+        return tuple;
     }
 
     /// <summary>
