@@ -1,0 +1,19 @@
+// 测试科学计数法
+
+PrintLine("=== 科学计数法测试 ===")
+
+// 基本的科学计数法测试
+PrintLine("\n=== 基本的科学计数法测试 ===")
+
+// 正数指数
+sci1 <- 1.23e3
+PrintLine("1.23e3 = " + sci1)
+
+sci2 <- 1e10
+PrintLine("1e10 = " + sci2)
+
+// 负数指数
+sci3 <- 1.23e-3
+PrintLine("1.23e-3 = " + sci3)
+
+s

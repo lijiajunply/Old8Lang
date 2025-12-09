@@ -192,25 +192,27 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
             // 右侧应该是一个类型标识符，如 int, double, string 等
             // 直接从 Right 表达式获取类型名称，而不是从运行结果
             string typeName;
-            if (Right is LangId rightLangId)
+            switch (Right)
             {
-                typeName = rightLangId.IdName;
-            }
-            else if (Right is TypeLangValue rightTypeLangValue)
-            {
-                typeName = rightTypeLangValue.ToString();
-            }
-            else
-            {
-                // 如果是其他表达式，尝试获取其值作为类型
-                var rightAsResult = Right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
-
-                if (rightAsResult is TypeLangValue typeLangValue)
+                case LangId rightLangId:
+                    typeName = rightLangId.IdName;
+                    break;
+                case TypeLangValue rightTypeLangValue:
+                    typeName = rightTypeLangValue.ToString();
+                    break;
+                default:
                 {
-                    return leftResult.Converse(typeLangValue, manager);
-                }
+                    // 如果是其他表达式，尝试获取其值作为类型
+                    var rightAsResult = Right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
 
-                typeName = rightAsResult.ToString();
+                    if (rightAsResult is TypeLangValue typeLangValue)
+                    {
+                        return leftResult.Converse(typeLangValue, manager);
+                    }
+
+                    typeName = rightAsResult.ToString();
+                    break;
+                }
             }
 
             // 创建或获取类型对象
