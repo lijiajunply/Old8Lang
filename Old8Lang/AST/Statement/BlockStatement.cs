@@ -114,13 +114,11 @@ public class BlockStatement : OldStatement
         foreach (var x in OtherStatements.Concat(ImportStatements))
         {
             var (id, expr) = GetTuple(x);
-            if (id != null! && expr != null!)
+            if (id == null! || expr == null!) continue;
+            // 只添加非静态成员
+            if (!id.HasModifier(AccessModifierType.Static))
             {
-                // 只添加非静态成员
-                if (!id.HasModifier(AccessModifierType.Static))
-                {
-                    c.TryAdd(id, expr);
-                }
+                c.TryAdd(id, expr);
             }
         }
 
@@ -139,13 +137,11 @@ public class BlockStatement : OldStatement
         foreach (var x in OtherStatements.Concat(ImportStatements))
         {
             var (id, expr) = GetTuple(x);
-            if (id != null! && expr != null!)
+            if (id == null! || expr == null!) continue;
+            // 只添加静态成员
+            if (id.HasModifier(AccessModifierType.Static))
             {
-                // 只添加静态成员
-                if (id.HasModifier(AccessModifierType.Static))
-                {
-                    c.TryAdd(id, expr);
-                }
+                c.TryAdd(id, expr);
             }
         }
 

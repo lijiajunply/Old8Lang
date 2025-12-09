@@ -106,13 +106,10 @@ public class ClassMemberId : LangId
     {
         var newModifiers = new HashSet<AccessModifierType>(Modifiers) { modifier };
         // 检查互斥修饰符
-        foreach (var exclusiveGroup in MutuallyExclusiveModifiers)
+        if (MutuallyExclusiveModifiers.Select(exclusiveGroup => newModifiers.Count(m => exclusiveGroup.Contains(m)))
+            .Any(count => count > 1))
         {
-            var count = newModifiers.Count(m => exclusiveGroup.Contains(m));
-            if (count > 1)
-            {
-                throw new SyntaxError(Position, $"修饰符 {modifier} 与已有的修饰符互斥");
-            }
+            throw new SyntaxError(Position, $"修饰符 {modifier} 与已有的修饰符互斥");
         }
 
         Modifiers.Add(modifier);
@@ -130,7 +127,7 @@ public class ClassMemberId : LangId
         if (HasModifier(AccessModifierType.Private)) modifierList.Add("private");
         if (HasModifier(AccessModifierType.Protected)) modifierList.Add("protected");
 
-        var modifiers = modifierList.Any() ? string.Join(" ", modifierList) + " " : string.Empty;
+        var modifiers = modifierList.Count != 0 ? string.Join(" ", modifierList) + " " : string.Empty;
         return $"{modifiers}{base.ToString()}";
     }
 }

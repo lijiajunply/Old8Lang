@@ -29,30 +29,27 @@ public class TypeTemplate(
     /// <param name="manager">变量管理器，用于获取父类信息</param>
     /// <param name="type">当前类型模板</param>
     /// <param name="allVariates">用于存储所有成员的字典</param>
-    private void GetAllParentMembers(LangParser.VariateManager manager, TypeTemplate type, Dictionary<ClassMemberId, OldExpr> allVariates)
+    private void GetAllParentMembers(LangParser.VariateManager manager, TypeTemplate type,
+        Dictionary<ClassMemberId, OldExpr> allVariates)
     {
         // 如果有父类，递归获取父类的所有成员
         if (type.ParentClassName != null)
         {
-            var parentType = manager.GetAny(new LangId(type.ParentClassName)) as TypeTemplate;
-            if (parentType != null)
+            if (manager.GetAny(new LangId(type.ParentClassName)) is TypeTemplate parentType)
             {
                 // 先递归获取祖父类的成员
                 GetAllParentMembers(manager, parentType, allVariates);
-                
+
                 // 然后添加直接父类的成员
-                foreach (var parentMember in parentType.Variates)
+                foreach (var parentMember in parentType.Variates.Where(parentMember =>
+                             !allVariates.ContainsKey(parentMember.Key)))
                 {
-                    // 只有当子字典中没有该成员时，才添加父类成员
-                    if (!allVariates.ContainsKey(parentMember.Key))
-                    {
-                        allVariates[parentMember.Key] = parentMember.Value;
-                    }
+                    allVariates[parentMember.Key] = parentMember.Value;
                 }
             }
         }
     }
-    
+
     /// <summary>
     /// 创建类的实例
     /// </summary>
@@ -62,16 +59,16 @@ public class TypeTemplate(
     {
         // 合并所有祖先类和子类的成员
         var allVariates = new Dictionary<ClassMemberId, OldExpr>();
-        
+
         // 递归获取所有父类的成员
         GetAllParentMembers(manager, this, allVariates);
-        
+
         // 然后添加子类的成员，子类成员会覆盖父类同名成员
         foreach (var member in Variates)
         {
             allVariates[member.Key] = member.Value;
         }
-        
+
         // 创建一个新的AnyLangValue实例，传递合并后的所有成员变量和方法
         var instance = new AnyLangValue(new LangId(ClassName), allVariates, Position);
 
@@ -82,7 +79,7 @@ public class TypeTemplate(
     {
         return this;
     }
-    
+
     /// <summary>
     /// 处理静态成员访问和静态方法调用
     /// </summary>
@@ -98,7 +95,7 @@ public class TypeTemplate(
             _ => throw new InvalidOperationException($"不支持的静态成员访问: {right.GetType().Name}")
         };
     }
-    
+
     /// <summary>
     /// 获取静态成员
     /// </summary>
@@ -109,32 +106,31 @@ public class TypeTemplate(
     {
         // 转换为 ClassMemberId 进行查找
         var classMemberId = new ClassMemberId(id);
-        
+
         // 先查找当前类的静态成员
         if (StaticVariates.TryGetValue(classMemberId, out var expr))
         {
             return expr.Run(manager);
         }
-        
+
         // 然后查找父类的静态成员
         if (ParentClassName != null)
         {
-            var parentType = manager.GetAny(new LangId(ParentClassName)) as TypeTemplate;
-            if (parentType != null)
+            if (manager.GetAny(new LangId(ParentClassName)) is TypeTemplate parentType)
             {
                 return parentType.GetStaticMember(id, manager);
             }
         }
-        
+
         // 如果是实例成员，也可以通过类名访问（如果存在的话）
         if (Variates.TryGetValue(classMemberId, out expr))
         {
             return expr.Run(manager);
         }
-        
+
         throw new NameError(this, id.IdName);
     }
-    
+
     /// <summary>
     /// 调用静态方法
     /// </summary>
@@ -151,17 +147,16 @@ public class TypeTemplate(
                 return func.Run(manager, instance.Ids);
             }
         }
-        
+
         // 查找父类的静态方法
         if (ParentClassName != null)
         {
-            var parentType = manager.GetAny(new LangId(ParentClassName)) as TypeTemplate;
-            if (parentType != null)
+            if (manager.GetAny(new LangId(ParentClassName)) is TypeTemplate parentType)
             {
                 return parentType.CallStaticMethod(instance, manager);
             }
         }
-        
+
         // 查找实例方法（如果存在的话）
         foreach (var (key, value) in Variates)
         {
@@ -171,7 +166,7 @@ public class TypeTemplate(
                 return func.Run(manager, instance.Ids);
             }
         }
-        
+
         throw new NameError(this, instance.Id.IdName);
     }
 }
