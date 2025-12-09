@@ -209,7 +209,20 @@ public enum LangTokenType
     Break,
     Continue,
     List,
-    This
+    This,
+    Extends,
+    /// <summary>
+    /// static
+    /// </summary>
+    Static,
+    /// <summary>
+    /// public
+    /// </summary>
+    Public,
+    /// <summary>
+    /// private
+    /// </summary>
+    Private
 }
 
 public enum KeywordType
@@ -241,7 +254,11 @@ public enum KeywordType
     Or,
     Xor,
     List,
-    This
+    This,
+    Extends,
+    Static,
+    Public,
+    Private
 }
 
 public static class TokenOpera

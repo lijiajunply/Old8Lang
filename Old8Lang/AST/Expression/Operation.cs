@@ -152,6 +152,22 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 var newInstance = new Instance(r1.Id, r1.Ids);
                 return native.Dot(newInstance);
             }
+            // 处理静态成员访问：ClassName.staticMember
+            else if (dotLeftResult is TypeTemplate typeTemplate)
+            {
+                if (Right is Instance r1)
+                {
+                    // 处理静态方法调用
+                    var newInstance = new Instance(r1.Id, r1.Ids, r1.Position);
+                    return typeTemplate.Dot(newInstance, manager);
+                }
+
+                if (Right != null)
+                {
+                    // 处理静态成员访问
+                    return typeTemplate.Dot(Right, manager);
+                }
+            }
             else if (dotLeftResult != null! && Right != null)
             {
                 throw new InvalidOperationError(this, $"类型 '{dotLeftResult.GetType().Name}' 不支持点操作");

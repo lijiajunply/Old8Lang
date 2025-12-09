@@ -19,7 +19,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
 
     public override LangValueType Run(LangParser.VariateManager manager)
     {
-        LangValueType result = new VoidLangValue();
+        LangValueType result;
         var results = Ids.Select(t => t.Run(manager)).ToList();
 
         switch (Id.IdName)
@@ -148,7 +148,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
             if (idResult is TypeTemplate typeTemplate)
             {
                 // 创建类的实例
-                var instance = typeTemplate.CreateInstance();
+                var instance = typeTemplate.CreateInstance(manager);
 
                 // 初始化实例，设置Interpreter
                 instance.Init(manager.Interpreter);

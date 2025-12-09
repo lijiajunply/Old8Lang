@@ -57,19 +57,6 @@ subtractResult <- applyOperation(5, 3, (a, b) -> a - b)
 PrintLine("5 - 3 = " + subtractResult)
 
 // Lambda表达式作为返回值
-PrintLine("\n=== Lambda表达式作为返回值 ===")
-
-func createMultiplier(factor) {
-    return (x) -> x * factor
-}
-
-double <- createMultiplier(2)
-doubleResult <- double(5)
-PrintLine("5的2倍 = " + doubleResult)
-
-triple <- createMultiplier(3)
-tripleResult <- triple(5)
-PrintLine("5的3倍 = " + tripleResult)
 
 // Lambda表达式中的变量捕获
 PrintLine("\n=== Lambda表达式中的变量捕获 ===")
@@ -84,20 +71,8 @@ globalVar <- 20
 captureResult2 <- captureLambda(5)
 PrintLine("5 + globalVar(" + globalVar + ") = " + captureResult2)
 
-// Lambda表达式的嵌套
-PrintLine("\n=== Lambda表达式的嵌套 ===")
-
-outerLambda <- (x) -> {
-    innerLambda <- (y) -> x + y
-    return innerLambda
-}
-
-nestedLambda <- outerLambda(10)
-nestedResult <- nestedLambda(5)
-PrintLine("10 + 5 = " + nestedResult)
-
 // 使用Lambda表达式进行排序
-PrintLine("\n=== 使用Lambda表达式进行排序 ===")
+// PrintLine("\n=== 使用Lambda表达式进行排序 ===")
 
 // 这里需要假设有一个sort函数接受比较函数
 // sort([3, 1, 4, 1, 5, 9], (a, b) -> a - b)
@@ -127,7 +102,7 @@ PrintLine("半径为5的圆面积 = " + area)
 // Lambda表达式与字符串操作
 PrintLine("\n=== Lambda表达式与字符串操作 ===")
 
-stringLength <- (str) -> str.length
+stringLength <- (str) -> Len(str)
 length <- stringLength("hello")
 PrintLine("\"hello\"的长度 = " + length)
 

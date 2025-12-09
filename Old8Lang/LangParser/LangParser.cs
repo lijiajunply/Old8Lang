@@ -233,13 +233,26 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     //           | nativeClass
     //           | plusPlus
     //           | minusMinus ;
-    private OldStatement ParseStatement()
+    private OldStatement ParseStatement(List<AccessModifierType>? modifiers = null)
     {
         // 跳过空行和结束符
         if (CurrentToken.Type == LangTokenType.EndOfFile)
         {
             CurrentIndex++;
-            return ParseStatement();
+            return ParseStatement(modifiers);
+        }
+
+        // 处理访问修饰符：public、private、static 或它们的组合
+        if (CurrentToken.Type is LangTokenType.Public or LangTokenType.Private or LangTokenType.Static)
+        {
+            var parsedModifiers = ParseAccessModifiers();
+            
+            // 合并修饰符
+            var combinedModifiers = modifiers != null ? new List<AccessModifierType>(modifiers) : new List<AccessModifierType>();
+            combinedModifiers.AddRange(parsedModifiers);
+            
+            // 解析后面的语句（set 或 funcDeclaration）
+            return ParseStatement(combinedModifiers);
         }
 
         // 处理括号块：(statement)
@@ -624,8 +637,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         if (leftExpr is LangId langId)
         {
             // 普通标识符赋值：identifier <- value
-            return new SetStatement(new LangId(langId.IdName, assumptionType, leftExpr.Position), expression,
-                leftExpr.Position);
+            return new SetStatement(new LangId(langId.IdName, assumptionType, leftExpr.Position), expression, leftExpr.Position);
         }
         else
         {
@@ -785,13 +797,14 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         {
             Expect(LangTokenType.Arrow);
         }
-        else if(isUseFunc && CurrentToken.Type == LangTokenType.Arrow)
+        else if (isUseFunc && CurrentToken.Type == LangTokenType.Arrow)
         {
             throw CreateSyntaxError("箭头函数不能使用func关键字");
         }
 
         var block = ParseBlock();
 
+        // 普通函数声明，生成 FuncInit
         return new FuncInit(new FuncLangValue(funcName, parameters.Args, block));
     }
 
@@ -805,21 +818,54 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         var className = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
 
+        string? parentClassName = null;
         // 处理继承语法：class Name extends ParentClass {
-        if (CurrentToken is { Type: LangTokenType.Identifier, Value: "extends" })
+        if (CurrentToken is { Type: LangTokenType.Extends })
         {
             // 跳过 extends 关键字
-            CurrentIndex++;
+            Expect(LangTokenType.Extends);
 
-            // 跳过父类名称
+            // 获取父类名称
             if (CurrentToken.Type == LangTokenType.Identifier)
             {
+                parentClassName = CurrentToken.Value;
                 CurrentIndex++;
             }
         }
 
         var classBlock = ParseClassBlock();
-        return new ClassInit(new TypeTemplate(className, classBlock.ToAnyData()));
+        return new ClassInit(new TypeTemplate(className, classBlock.ToAnyData(), classBlock.ToStaticData(), parentClassName));
+        
+    }
+
+    /// <summary>
+    /// 解析访问修饰符
+    /// </summary>
+    /// <returns>访问修饰符列表</returns>
+    private List<AccessModifierType> ParseAccessModifiers()
+    {
+        var modifiers = new List<AccessModifierType>();
+        
+        while (true)
+        {
+            switch (CurrentToken.Type)
+            {
+                case LangTokenType.Public:
+                    modifiers.Add(AccessModifierType.Public);
+                    Expect(LangTokenType.Public);
+                    break;
+                case LangTokenType.Private:
+                    modifiers.Add(AccessModifierType.Private);
+                    Expect(LangTokenType.Private);
+                    break;
+                case LangTokenType.Static:
+                    modifiers.Add(AccessModifierType.Static);
+                    Expect(LangTokenType.Static);
+                    break;
+                default:
+                    return modifiers;
+            }
+        }
     }
 
     /// <summary>
@@ -840,10 +886,51 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 continue;
             }
 
-            // 尝试直接调用 ParseStatement，让它处理各种情况
+            // 尝试解析类成员，先解析修饰符，再解析语句
             try
             {
-                statements.Add(ParseStatement());
+                // 保存当前位置，用于回滚
+                var savedIndex = CurrentIndex;
+                
+                // 尝试解析修饰符
+                List<AccessModifierType> modifiers = [];
+                if (CurrentToken.Type is LangTokenType.Public or LangTokenType.Private or LangTokenType.Static)
+                {
+                    modifiers = ParseAccessModifiers();
+                }
+                
+                // 解析语句
+                var statement = ParseStatement();
+                
+                // 根据语句类型和修饰符生成相应的类成员节点
+                if (modifiers.Any())
+                {
+                    OldStatement classMemberStatement;
+                    
+                    switch (statement)
+                    {
+                        case SetStatement setStmt when setStmt.Id != null:
+                            // 带有修饰符的类字段声明
+                            var memberId = new ClassMemberId(setStmt.Id.IdName, setStmt.Id.AssumptionType, modifiers, setStmt.Position);
+                            classMemberStatement = new ClassFieldSetStatement(memberId, setStmt.Value, setStmt.Position);
+                            break;
+                        case FuncInit funcInit when funcInit.FuncLangValue.Id != null:
+                            // 带有修饰符的类函数声明
+                            var memberId2 = new ClassMemberId(funcInit.FuncLangValue.Id.IdName, funcInit.FuncLangValue.Id.AssumptionType, modifiers, funcInit.Position);
+                            classMemberStatement = new ClassFuncInitStatement(memberId2, funcInit.FuncLangValue, funcInit.Position);
+                            break;
+                        default:
+                            classMemberStatement = statement;
+                            break;
+                    }
+                    
+                    statements.Add(classMemberStatement);
+                }
+                else
+                {
+                    // 没有修饰符，直接添加原始语句
+                    statements.Add(statement);
+                }
             }
             catch (Exception ex)
             {

@@ -11,13 +11,13 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public class AnyLangValue : LangValueType
 {
-    public readonly Dictionary<LangId, OldExpr> Variates;
+    public readonly Dictionary<ClassMemberId, OldExpr> Variates;
     public readonly Dictionary<string, LangValueType> Result = [];
     public readonly LangId Id;
 
     public readonly VariateManager Manager;
 
-    public AnyLangValue(LangId id, Dictionary<LangId, OldExpr> variates, SourcePosition position = default) :
+    public AnyLangValue(LangId id, Dictionary<ClassMemberId, OldExpr> variates, SourcePosition position = default) :
         base(position)
     {
         Variates = variates;
@@ -44,7 +44,8 @@ public class AnyLangValue : LangValueType
         foreach (var variable in Variates)
         {
             // 运行变量表达式，获取结果
-            var value = variable.Value.Run(Manager);
+            // 如果是函数，则直接存储函数本身，不执行
+            var value = variable.Value is FuncLangValue funcValue ? funcValue : variable.Value.Run(Manager);
             Result[variable.Key.IdName] = value;
         }
 
@@ -52,7 +53,7 @@ public class AnyLangValue : LangValueType
         // 而是直接将Result字典中的值存储到实例中
     }
 
-    public AnyLangValue(Dictionary<LangId, OldExpr> variates, SourcePosition position = default) : base(position)
+    public AnyLangValue(Dictionary<ClassMemberId, OldExpr> variates, SourcePosition position = default) : base(position)
     {
         Variates = variates;
         Id = new LangId("JsonNative");
@@ -104,7 +105,9 @@ public class AnyLangValue : LangValueType
                 }
 
                 // 检查Variates字典中是否有该属性（成员变量）
-                if (Variates.TryGetValue(id, out var variate))
+                // 使用类名创建ClassMemberId进行查找
+                var classMemberId = new ClassMemberId(id);
+                if (Variates.TryGetValue(classMemberId, out var variate))
                 {
                     // 如果有，运行它并返回结果
                     return variate.Run(Manager);
@@ -139,6 +142,12 @@ public class AnyLangValue : LangValueType
 
                         // 在调用类方法时，将当前实例添加到变量储存器中，以便this关键字访问
                         Manager.Set(new LangId("this"), this);
+                        
+                        // 将实例的所有成员变量添加到Manager中，以便方法内部直接访问
+                        foreach (var member in Result)
+                        {
+                            Manager.Set(new LangId(member.Key), member.Value);
+                        }
 
                         // 调用方法
                         var funcResult = funcValue.Run(Manager, methodArgs);
@@ -147,10 +156,16 @@ public class AnyLangValue : LangValueType
                 }
 
                 // 检查Variates字典中是否有该方法
-                if (Variates.TryGetValue(new LangId(methodName), out var variate))
+                if (Variates.TryGetValue(new ClassMemberId(instance.Id), out var variate))
                 {
                     // 在调用类方法时，将当前实例添加到变量储存器中，以便this关键字访问
                     Manager.Set(new LangId("this"), this);
+                    
+                    // 将实例的所有成员变量添加到Manager中，以便方法内部直接访问
+                    foreach (var member in Result)
+                    {
+                        Manager.Set(new LangId(member.Key), member.Value);
+                    }
                     
                     var methodValue = variate.Run(Manager);
                     if (methodValue is FuncLangValue funcValue)

@@ -84,6 +84,24 @@ public class FuncLangValue : ImportInfo
         // 调用方法体
             variateManagerFunc.AddChildren();
             variateManagerFunc.IsFunc = true; // 设置为函数上下文
+            
+            // 将静态成员添加到方法的变量管理器中
+            var thisValue = variateManagerFunc.GetValue(new LangId("this"));
+            if (thisValue is AnyLangValue anyValue)
+            {
+                // 将类的静态成员添加到方法的变量管理器中
+                foreach (var importInfo in variateManagerFunc.ImportInfos)
+                {
+                    if (importInfo is TypeTemplate typeTemplate)
+                    {
+                        foreach (var staticMember in typeTemplate.StaticVariates)
+                        {
+                            variateManagerFunc.Set(staticMember.Key, staticMember.Value.Run(variateManagerFunc));
+                        }
+                    }
+                }
+            }
+            
             if (Ids != null && Ids.Count != 0)
             {
                 // 先计算所有参数的值，使用外部变量管理器

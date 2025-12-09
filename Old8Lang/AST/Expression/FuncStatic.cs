@@ -45,9 +45,9 @@ public static class AnyValueFuncStatic
     {
         var jsonObject = JsonSerializer.Deserialize<Dictionary<string, object>>(json.Value) ??
                          new Dictionary<string, object>();
-        return new AnyLangValue(jsonObject.ToDictionary<KeyValuePair<string, object>, LangId, OldExpr>
+        return new AnyLangValue(jsonObject.ToDictionary<KeyValuePair<string, object>, ClassMemberId, OldExpr>
         (
-            variable => new LangId(variable.Key),
+            variable => new ClassMemberId(variable.Key),
             variable =>
             {
                 if (variable.Value is JsonElement element)
@@ -58,24 +58,6 @@ public static class AnyValueFuncStatic
                 return LangValueType.ObjToValue(variable.Value);
             }));
     }
-
-    // public static void ToObjIl(string context)
-    // {
-    //     var jsonObject = JsonSerializer.Deserialize<Dictionary<string, object>>(context) ??
-    //                      new Dictionary<string, object>();
-    //     var json = new AnyValue(jsonObject.ToDictionary<KeyValuePair<string, object>, OldId, OldExpr>
-    //     (
-    //         variable => new OldId(variable.Key),
-    //         variable =>
-    //         {
-    //             if (variable.Value is JsonElement element)
-    //             {
-    //                 return GetJsonElement(element, null!);
-    //             }
-    //
-    //             return ValueType.ObjToValue(variable.Value);
-    //         }));
-    // }
 }
 
 [Serializable]

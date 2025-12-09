@@ -29,6 +29,7 @@ public class BlockStatement : OldStatement
                     OtherStatements.Add(statement);
                     return;
                 default:
+                    // 所有成员都添加到其他语句列表中，通过修饰符区分静态和实例成员
                     OtherStatements.Add(statement);
                     break;
             }
@@ -37,6 +38,8 @@ public class BlockStatement : OldStatement
 
     public override void Run(VariateManager manager)
     {
+        // 先执行 ImportStatements 列表中的语句，包括 ClassInit 和 FuncInit 语句
+        // 这样，当执行 OtherStatements 列表中的语句时，类和函数已经被添加到 ImportInfos 中了
         ImportRun(manager);
 
         foreach (var statement in OtherStatements)
@@ -69,22 +72,7 @@ public class BlockStatement : OldStatement
 
     public void ImportRun(VariateManager manager)
     {
-        if (manager.Interpreter is { IsCompileOptimization: true })
-        {
-            var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
-            var ilGenerator = dynamicMethod.GetILGenerator();
-            var local = new LocalManager();
-            var block = new BlockStatement(ImportStatements, Position);
-            block.GenerateIl(ilGenerator, local);
-            ilGenerator.Emit(OpCodes.Ret);
-            foreach (var info in local.DelegateVar)
-            {
-                manager.AddClassAndFunc(new FuncLangValue(info.Key, info.Value));
-            }
-
-            return;
-        }
-
+        // 直接运行ImportStatements列表中的语句，不管IsCompileOptimization属性的值是什么
         foreach (var statement in ImportStatements)
         {
             statement.Run(manager);
@@ -115,38 +103,86 @@ public class BlockStatement : OldStatement
         return sb.ToString();
     }
 
-    public Dictionary<LangId, OldExpr> ToAnyData()
+    /// <summary>
+    /// 获取实例成员字典
+    /// </summary>
+    /// <returns>实例成员字典</returns>
+    public Dictionary<ClassMemberId, OldExpr> ToAnyData()
     {
-        var c = new Dictionary<LangId, OldExpr>();
-        OtherStatements.ForEach(x =>
+        var c = new Dictionary<ClassMemberId, OldExpr>();
+        
+        // 处理所有语句，筛选出非静态成员
+        foreach (var x in OtherStatements.Concat(ImportStatements))
         {
             var (id, expr) = GetTuple(x);
             if (id != null! && expr != null!)
             {
-                c.TryAdd(id, expr);
+                // 只添加非静态成员
+                if (!id.HasModifier(AccessModifierType.Static))
+                {
+                    c.TryAdd(id, expr);
+                }
             }
-        });
-        ImportStatements.ForEach(x =>
+        }
+        
+        return c;
+    }
+    
+    /// <summary>
+    /// 获取静态成员字典
+    /// </summary>
+    /// <returns>静态成员字典</returns>
+    public Dictionary<ClassMemberId, OldExpr> ToStaticData()
+    {
+        var c = new Dictionary<ClassMemberId, OldExpr>();
+        
+        // 处理所有语句，筛选出静态成员
+        foreach (var x in OtherStatements.Concat(ImportStatements))
         {
             var (id, expr) = GetTuple(x);
             if (id != null! && expr != null!)
             {
-                c.TryAdd(id, expr);
+                // 只添加静态成员
+                if (id.HasModifier(AccessModifierType.Static))
+                {
+                    c.TryAdd(id, expr);
+                }
             }
-        });
+        }
+        
         return c;
     }
 
-    private static (LangId? id, OldExpr? Expr) GetTuple(IOldLangTree a)
+    private static (ClassMemberId? id, OldExpr? Expr) GetTuple(IOldLangTree a)
     {
-        return a switch
+        switch (a)
         {
-            SetStatement statement => (id: statement.Id, Expr: statement.Value),
-            FuncInit init => (init.FuncLangValue.Id!, Expr: init.FuncLangValue),
-            // 对于 ClassInit，我们不需要将其转换为字典中的键值对
-            ClassInit => (null, null),
-            _ => (null, null)
-        };
+            case SetStatement statement:
+                if (statement.Id == null) return (null, null);
+                // 如果是 ClassMemberId 直接使用，否则转换
+                var memberId1 = statement.Id is ClassMemberId classMemberId1 ? 
+                    classMemberId1 : 
+                    new ClassMemberId(statement.Id);
+                return (id: memberId1, Expr: statement.Value);
+            case ClassFieldSetStatement classFieldSet:
+                // 直接使用 ClassFieldSetStatement 中的 ClassMemberId
+                return (id: classFieldSet.Id, Expr: classFieldSet.Value);
+            case FuncInit init:
+                if (init.FuncLangValue.Id == null) return (null, null);
+                // 如果是 ClassMemberId 直接使用，否则转换
+                var memberId2 = init.FuncLangValue.Id is ClassMemberId classMemberId2 ? 
+                    classMemberId2 : 
+                    new ClassMemberId(init.FuncLangValue.Id);
+                return (memberId2, Expr: init.FuncLangValue);
+            case ClassFuncInitStatement classFuncInit:
+                // 直接使用 ClassFuncInitStatement 中的 ClassMemberId
+                return (id: classFuncInit.Id, Expr: classFuncInit.FuncValue);
+            case ClassInit:
+                // 对于 ClassInit，我们不需要将其转换为字典中的键值对
+                return (null, null);
+            default:
+                return (null, null);
+        }
     }
 
     public override OldStatement this[int index] => OtherStatements[index];

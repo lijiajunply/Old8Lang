@@ -1,0 +1,34 @@
+// 简化的类修饰符测试
+class A {
+    // 静态公共字段
+    static public staticPublic <- 1
+    // 静态私有字段
+    static private staticPrivate <- 2
+    // 公共实例字段
+    public publicField <- 3
+    
+    // 静态公共方法
+    static public func staticPublicMethod() {
+        return A.staticPublic + A.staticPrivate
+    }
+    
+    // 公共实例方法
+    public func getPublicField() {
+        return this.publicField
+    }
+}
+
+// 测试静态公共字段访问
+PrintLine(A.staticPublic)
+
+// 测试静态公共方法调用
+PrintLine(A.staticPublicMethod())
+
+// 创建实例
+obj = A()
+
+// 测试公共字段访问
+PrintLine(obj.publicField)
+
+// 测试公共方法调用
+PrintLine(obj.getPublicField())

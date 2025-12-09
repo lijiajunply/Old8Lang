@@ -1,15 +1,14 @@
-// 函数重载（如果支持）
-PrintLine("\n=== 函数重载（如果支持） ===")
-
-func testOverload(a) {
-    PrintLine("单参数函数: " + a)
+func createMultiplier(m) {
+    func multiplier(x) {
+        return x * m
+    }
+    return multiplier
 }
 
-func testOverload(a, b) {
-    PrintLine("双参数函数: " + a + ", " + b)
-}
+doubleFunc <- createMultiplier(2)
+doubleResult <- doubleFunc(5)
+PrintLine("5的2倍 = " + doubleResult)
 
-testOverload(1)
-testOverload(1, 2)
-
-PrintLine("\n✅ 所有函数声明和调用测试完成")
+tripleFunc <- createMultiplier(3)
+tripleResult <- tripleFunc(5)
+PrintLine("5的3倍 = " + tripleResult)s

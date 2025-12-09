@@ -35,7 +35,23 @@ public class LangId(string name, string assumptionType = "", SourcePosition posi
             // 如果没有找到，抛出NameError异常，因为this关键字只能在类的方法中使用
             throw new NameError(this, "this");
         }
-        return manager.GetValue(this) ?? throw new NameError(this, IdName);
+        
+        // 先尝试获取普通变量
+        var value = manager.GetValue(this);
+        if (value != null)
+        {
+            return value;
+        }
+        
+        // 如果不是普通变量，尝试获取类或函数
+        var anyValue = manager.GetAny(this);
+        if (anyValue != null)
+        {
+            return anyValue as LangValueType ?? throw new NameError(this, IdName);
+        }
+        
+        // 如果都没有找到，抛出NameError异常
+        throw new NameError(this, IdName);
     }
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)

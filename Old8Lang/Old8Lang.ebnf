@@ -42,7 +42,9 @@ funcDeclaration = ( "func" identifier | identifier ) "(" idList? ")" ( "->" )? b
 
 classDeclaration = "class" identifier classBlock ;
 
-classBlock = "{" [set | funcDeclaration]* "}" ;
+classBlock = "{" [staticMember]* "}";
+
+staticMember = "static" (set | funcDeclaration);
 
 funcRunStatement = identifier "(" argList? ")" ;
 

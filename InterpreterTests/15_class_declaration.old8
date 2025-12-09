@@ -158,13 +158,13 @@ class Animal {
     }
 }
 
-class Dog inherits Animal {
+class Dog extends Animal {
     func makeSound() {
         return "Woof!"
     }
 }
 
-class Cat inherits Animal {
+class Cat extends Animal {
     func makeSound() {
         return "Meow!"
     }

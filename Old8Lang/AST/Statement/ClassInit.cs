@@ -21,6 +21,7 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
             throw new DuplicateNameError(this, anyLangValue.ClassName, "类");
         }
         
+        // 立即将类添加到ImportInfos中，以便在类定义内部访问
         manager.AddClassAndFunc(anyLangValue);
     }
 
@@ -31,8 +32,19 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
             AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
         var moduleBuilder = assemblyBuilder.DefineDynamicModule("DynamicModule");
 
-        // 定义一个新的类型
-        var typeBuilder = moduleBuilder.DefineType(anyLangValue.ClassName, TypeAttributes.Public);
+        // 定义类型时考虑继承关系
+        Type? baseType = null;
+        if (anyLangValue.ParentClassName != null)
+        {
+            // 尝试获取父类的Type
+            baseType = local.ClassVar.GetValueOrDefault(anyLangValue.ParentClassName);
+        }
+        
+        // 如果没有父类，使用object作为基类
+        baseType ??= typeof(object);
+
+        // 定义一个新的类型，指定父类
+        var typeBuilder = moduleBuilder.DefineType(anyLangValue.ClassName, TypeAttributes.Public, baseType);
 
         var fields = new List<FieldBuilder>();
         var fieldValues = new List<LangValueType>();
@@ -58,7 +70,7 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
         var assemblyClone =
             AssemblyBuilder.DefineDynamicAssembly(assemblyNameClone, AssemblyBuilderAccess.Run);
         var moduleClone = assemblyClone.DefineDynamicModule("DynamicModule");
-        var typeClone = moduleClone.DefineType(anyLangValue.ClassName, TypeAttributes.Public);
+        var typeClone = moduleClone.DefineType(anyLangValue.ClassName, TypeAttributes.Public, baseType);
         foreach (var variate in anyLangValue.Variates.Where(variate => variate.Value is not FuncLangValue))
         {
             typeClone.DefineField(variate.Key.IdName,
@@ -80,11 +92,17 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
             typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, []);
 
         var generator = constructorBuilder.GetILGenerator();
+        
+        // 调用父类的构造函数
+        generator.Emit(OpCodes.Ldarg_0);
+        generator.Emit(OpCodes.Call, baseType.GetConstructor(Type.EmptyTypes)!);
+        
+        // 初始化子类字段
         for (var i = 0; i < fieldValues.Count; i++)
         {
             generator.Emit(OpCodes.Ldarg_0); // 加载当前实例（this）
             fieldValues[i].LoadIlValue(generator, local);
-            generator.Emit(OpCodes.Stfld, fields[i]); // 将 1 存储到字段 a
+            generator.Emit(OpCodes.Stfld, fields[i]); // 将值存储到字段
         }
 
         generator.Emit(OpCodes.Ret);

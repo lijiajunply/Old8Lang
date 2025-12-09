@@ -125,26 +125,6 @@ PrintLine("5 + 3 = " + addResult)
 multiplyResult <- applyOperation(5, 3, multiply)
 PrintLine("5 * 3 = " + multiplyResult)
 
-// 以上测试成功
-
-// 函数作为返回值
-PrintLine("\n=== 函数作为返回值 ===")
-
-func createMultiplier(m) {
-    func multiplier(x) {
-        return x * m
-    }
-    return multiplier
-}
-
-doubleFunc <- createMultiplier(2)
-doubleResult <- doubleFunc(5)
-PrintLine("5的2倍 = " + doubleResult)
-
-tripleFunc <- createMultiplier(3)
-tripleResult <- tripleFunc(5)
-PrintLine("5的3倍 = " + tripleResult)
-
 // 函数重载（如果支持）
 PrintLine("\n=== 函数重载（如果支持） ===")
 
