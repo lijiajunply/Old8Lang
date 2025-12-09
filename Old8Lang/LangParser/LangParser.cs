@@ -795,21 +795,27 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         var parameters = ParseIdList();
         Expect(LangTokenType.RightParen);
 
-        // 使用func关键字的函数不支持箭头语法
-        // 只有不使用func关键字的箭头函数才支持箭头语法
-        if (!isUseFunc && CurrentToken.Type == LangTokenType.Arrow)
+        string returnType = string.Empty;
+        // 检查是否有箭头语法用于返回类型注解
+        if (CurrentToken.Type == LangTokenType.Arrow)
         {
             Expect(LangTokenType.Arrow);
+            // 解析返回类型标识符
+            returnType = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
         }
-        else if (isUseFunc && CurrentToken.Type == LangTokenType.Arrow)
+
+        // 如果有返回类型注解，创建新的LangId并设置AssumptionType
+        LangId? updatedFuncName = funcName;
+        if (!string.IsNullOrEmpty(returnType))
         {
-            throw CreateSyntaxError("箭头函数不能使用func关键字");
+            updatedFuncName = new LangId(funcName.IdName, returnType, position: funcName.Position);
         }
 
         var block = ParseBlock();
 
         // 普通函数声明，生成 FuncInit
-        return new FuncInit(new FuncLangValue(funcName, parameters.Args, block));
+        return new FuncInit(new FuncLangValue(updatedFuncName, parameters.Args, block));
     }
 
     /// <summary>
@@ -1981,7 +1987,12 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         {
             Expect(LangTokenType.Colon);
             typeAnnotation = CurrentToken.Value;
-            Expect(LangTokenType.Identifier);
+            if (typeAnnotation == "")
+            {
+                throw CreateSyntaxError("类型注解不能为空");
+            }
+
+            Expect(CurrentToken.Type == LangTokenType.List ? LangTokenType.List : LangTokenType.Identifier);
         }
 
         return new LangId(value, typeAnnotation, position);

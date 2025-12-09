@@ -38,7 +38,7 @@ switchStatement = "switch" expression "{" caseBlock* ( "default" block )? "}" ;
 
 caseBlock = "case" expression block ;
 
-funcDeclaration = ( "func" identifier | identifier ) "(" idList? ")" ( "->" )? block ;
+funcDeclaration = ( "func" identifier | identifier ) "(" idList? ")" ( "->" identifier )? block ;
 
 classDeclaration = "class" identifier classBlock ;
 
