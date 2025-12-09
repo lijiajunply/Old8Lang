@@ -657,11 +657,9 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             return new SetStatement(new LangId(langId.IdName, assumptionType, leftExpr.Position), expression,
                 leftExpr.Position);
         }
-        else
-        {
-            // 复杂左值表达式赋值：a[b] <- value 或 a.a <- value 或 this.a <- value
-            return new SetStatement(leftExpr, expression, leftExpr.Position);
-        }
+
+        // 复杂左值表达式赋值：a[b] <- value 或 a.a <- value 或 this.a <- value
+        return new SetStatement(leftExpr, expression, leftExpr.Position);
     }
 
     // ifStatement = "if" expression block ( "elif" expression block )* ( "else" block )? ;
@@ -739,11 +737,9 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         {
             return new ForInStatement(identifiers[0], expression, block, position);
         }
-        else
-        {
-            // 创建一个复合标识符，将所有标识符存储起来
-            return new ForInStatement(identifiers[0], expression, block, position, identifiers.Skip(1).ToList());
-        }
+
+        // 创建一个复合标识符，将所有标识符存储起来
+        return new ForInStatement(identifiers[0], expression, block, position, identifiers.Skip(1).ToList());
     }
 
     // whileStatement = "while" expression block ;
@@ -809,14 +805,22 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         var parameters = ParseIdList();
         Expect(LangTokenType.RightParen);
 
-        string returnType = string.Empty;
+        var returnType = string.Empty;
         // 检查是否有箭头语法用于返回类型注解
         if (CurrentToken.Type == LangTokenType.Arrow)
         {
             Expect(LangTokenType.Arrow);
             // 解析返回类型标识符
-            returnType = CurrentToken.Value;
-            Expect(LangTokenType.Identifier);
+            if (isUseFunc)
+            {
+                if (CurrentToken.Type != LangTokenType.Identifier)
+                {
+                    throw CreateSyntaxError("请返回类型标识符");
+                }
+
+                returnType = CurrentToken.Value;
+                Expect(LangTokenType.Identifier);
+            }
         }
 
         // 如果有返回类型注解，创建新的LangId并设置AssumptionType
@@ -927,7 +931,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 var statement = ParseStatement();
 
                 // 根据语句类型和修饰符生成相应的类成员节点
-                if (modifiers.Any())
+                if (modifiers.Count != 0)
                 {
                     OldStatement classMemberStatement;
 
@@ -1615,18 +1619,16 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         // 列表推导式的特征是: 包含 for 关键字
         // 例如: [expr for var in iterable]
         // 或: [expr if condition else expr for var in iterable]
-        bool isListComprehension = false;
+        var isListComprehension = false;
 
         // 扫描剩余的令牌，查找 for 关键字
         for (int i = CurrentIndex; i < tokens.Count; i++)
         {
             if (tokens[i].Type == LangTokenType.RightBracket)
                 break; // 到达右括号，不是列表推导式
-            if (tokens[i].Type == LangTokenType.For)
-            {
-                isListComprehension = true;
-                break;
-            }
+            if (tokens[i].Type != LangTokenType.For) continue;
+            isListComprehension = true;
+            break;
         }
 
         if (isListComprehension)
@@ -2095,18 +2097,10 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         var ids = new List<LangId>();
 
         // 检查当前token是否是标识符或关键字
-        if (CurrentToken.Type == LangTokenType.Identifier ||
-            CurrentToken.Type == LangTokenType.Func ||
-            CurrentToken.Type == LangTokenType.Class ||
-            CurrentToken.Type == LangTokenType.If ||
-            CurrentToken.Type == LangTokenType.Else ||
-            CurrentToken.Type == LangTokenType.While ||
-            CurrentToken.Type == LangTokenType.For ||
-            CurrentToken.Type == LangTokenType.Return ||
-            CurrentToken.Type == LangTokenType.Import ||
-            CurrentToken.Type == LangTokenType.True ||
-            CurrentToken.Type == LangTokenType.False ||
-            CurrentToken.Type == LangTokenType.List)
+        if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.Func or LangTokenType.Class
+            or LangTokenType.If or LangTokenType.Else or LangTokenType.While or LangTokenType.For
+            or LangTokenType.Return or LangTokenType.Import or LangTokenType.True or LangTokenType.False
+            or LangTokenType.List)
         {
             // 解析第一个参数
             ids.Add(ParseIdentifier());

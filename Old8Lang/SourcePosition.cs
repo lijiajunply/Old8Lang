@@ -40,11 +40,6 @@ public readonly struct SourcePosition
         TokenValue = tokenValue;
     }
 
-    /// <summary>
-    /// 表示无位置信息
-    /// </summary>
-    public static readonly SourcePosition None = new(0, 0);
-
     public override string ToString()
     {
         return FileName is not null ? $"{FileName}({Line}:{Column})" : $"{Line}:{Column}";
