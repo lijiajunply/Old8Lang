@@ -1,6 +1,4 @@
 using System.Text;
-using System.Reflection;
-using System.IO;
 
 namespace Old8Lang;
 
@@ -10,7 +8,45 @@ public static class BasicInfo
     /// 帮助文档
     /// </summary>
     /// <returns></returns>
-    public static string Help => "笑死，根本就没有帮助这一说[doge]";
+    public static string Help => @"Old8Lang 命令行帮助文档
+
+命令格式：
+  Old8Lang.App [选项] [参数]
+
+运行模式：
+  解释模式：直接解释执行 Old8Lang 代码
+  编译模式：将 Old8Lang 代码编译为中间代码后执行
+
+可用命令：
+  -f <文件路径>          解释执行指定的 .old8 或 .ol 文件
+  -c <文件路径>          编译并执行指定的 .old8 或 .ol 文件
+  -s <文件路径>          对指定的 .old8 或 .ol 文件进行语法测试
+  info                   显示 Old8Lang 语言信息
+  -var                   显示当前版本号
+  import                 显示导入库信息
+  -change <路径>         修改导入路径
+  -h                     显示此帮助信息
+
+使用示例：
+  解释执行文件：
+    Old8Lang.App -f example.old8
+  
+  编译执行文件：
+    Old8Lang.App -c example.old8
+  
+  语法测试：
+    Old8Lang.App -s example.old8
+  
+  查看语言信息：
+    Old8Lang.App info
+  
+  查看帮助：
+    Old8Lang.App -h
+
+注意事项：
+  - 仅支持 .old8 和 .ol 扩展名的文件
+  - 编译模式会显示执行时间统计
+  - 语法测试会显示解析时间和生成的代码结构";
 
     /// <summary>
     /// 语言信息
