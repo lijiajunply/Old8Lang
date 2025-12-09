@@ -107,6 +107,23 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         // 处理逻辑OR操作 - 短路求值
         if (Opera == OperationType.OR)
         {
+            // 检查是否是三元条件表达式：(condition AND trueExpr) OR falseExpr
+            if (Left is Operation leftOp && leftOp.Opera == OperationType.AND)
+            {
+                // 这是一个三元条件表达式：condition ? trueExpr : falseExpr
+                var condition = leftOp.Left;
+                var trueExpr = leftOp.Right;
+                var falseExpr = Right;
+                
+                // 执行条件判断
+                var conditionValue = condition.Run(manager) as BoolLangValue ?? 
+                    throw new InvalidOperationError(this, "三元条件表达式的条件必须是布尔类型");
+                
+                // 根据条件结果返回相应的表达式值
+                return conditionValue.Value ? trueExpr.Run(manager) : falseExpr.Run(manager);
+            }
+            
+            // 普通的OR操作
             var leftValue = Left.Run(manager) as BoolLangValue ?? throw new InvalidOperationError(this, "OR运算符只支持布尔类型");
             if (leftValue.Value)
             {

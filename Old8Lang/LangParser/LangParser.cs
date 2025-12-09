@@ -1587,8 +1587,9 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     /// <summary>
     /// array = "[" expression ( "," expression )* "]" ;
     /// range = "[" expression "~" expression "]" ;
+    /// list_comprehension = "[" expression ( "if" expression "else" expression )? "for" identifier "in" expression ( "if" expression )* ( "for" identifier "in" expression ( "if" expression )* )* "]" ;
     /// </summary>
-    /// <returns>数组初始化或者Range</returns>
+    /// <returns>数组初始化、Range或者列表推导式</returns>
     private LangValueType ParseArrayOrRange()
     {
         var leftBracketToken = CurrentToken;
@@ -1633,22 +1634,12 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
 
         if (isListComprehension)
         {
-            // 使用括号计数来正确处理嵌套的列表推导式
-            var bracketCount = 1; // 已经有一个左括号被解析
-
-            // 跳过列表推导式内容，直到找到匹配的右括号
-            while (CurrentIndex < tokens.Count && bracketCount > 0)
-            {
-                if (tokens[CurrentIndex].Type == LangTokenType.LeftBracket)
-                    bracketCount++;
-                else if (tokens[CurrentIndex].Type == LangTokenType.RightBracket)
-                    bracketCount--;
-
-                CurrentIndex++;
-            }
-
-            // 返回 ArrayValue，仅用于语法测试通过
-            return new ArrayLangValue(elements, position);
+            // 回退到表达式开始位置，准备解析列表推导式
+            CurrentIndex -= elements.Count;
+            elements.Clear();
+            
+            // 解析列表推导式
+            return ParseListComprehension(position);
         }
 
         while (CurrentToken.Type == LangTokenType.Comma)
@@ -1660,6 +1651,116 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         Expect(LangTokenType.RightBracket);
         // 返回ArrayValue表示数组
         return new ArrayLangValue(elements, position);
+    }
+    
+    /// <summary>
+    /// 解析列表推导式
+    /// list_comprehension = "[" expression ( "if" expression "else" expression )? "for" identifier "in" expression ( "if" expression )* ( "for" identifier "in" expression ( "if" expression )* )* "]" ;
+    /// </summary>
+    /// <returns>列表推导式节点</returns>
+    private ListComprehension ParseListComprehension(SourcePosition position)
+    {
+        // 解析表达式部分
+        var expression = ParseExpression();
+        
+        // 检查是否有 if-else 条件
+        if (CurrentToken.Type == LangTokenType.If)
+        {
+            // 保存当前位置，用于回滚
+            var savedIndex = CurrentIndex;
+            
+            try
+            {
+                Expect(LangTokenType.If);
+                var ifCondition = ParseExpression();
+                
+                if (CurrentToken.Type == LangTokenType.Else)
+                {
+                    Expect(LangTokenType.Else);
+                    var elseExpr = ParseExpression();
+                    
+                    // 创建一个条件表达式，直接在运行时处理
+                    // 我们将创建一个 Operation 对象，使用 AND 操作符作为占位符
+                    // 在运行时，我们会检查这个特殊的 Operation 对象，并执行条件判断
+                    var conditionExpr = new Operation(
+                        ifCondition, 
+                        OperationType.AND, 
+                        expression, 
+                        new SourcePosition(CurrentToken.Line, CurrentToken.Column));
+                    expression = new Operation(
+                        conditionExpr, 
+                        OperationType.OR, 
+                        elseExpr, 
+                        new SourcePosition(CurrentToken.Line, CurrentToken.Column));
+                }
+            }
+            catch
+            {
+                // 不是 if-else 条件，回滚
+                CurrentIndex = savedIndex;
+            }
+        }
+        
+        // 解析 for 循环部分
+        var loops = new List<ListComprehension>();
+        
+        while (CurrentToken.Type == LangTokenType.For)
+        {
+            Expect(LangTokenType.For);
+            
+            // 解析变量
+            var variable = ParseIdentifier();
+            
+            Expect(LangTokenType.In);
+            
+            // 解析可迭代对象
+            var iterable = ParseExpression();
+            
+            // 解析条件筛选（可选）
+            OldExpr? condition = null;
+            
+            while (CurrentToken.Type == LangTokenType.If)
+            {
+                Expect(LangTokenType.If);
+                condition = ParseExpression();
+            }
+            
+            // 创建循环节点
+            loops.Add(new ListComprehension(
+                expression, 
+                variable, 
+                iterable, 
+                condition, 
+                null, 
+                position));
+        }
+        
+        Expect(LangTokenType.RightBracket);
+        
+        if (loops.Count == 0)
+        {
+            throw CreateSyntaxError("列表推导式必须包含至少一个 for 循环");
+        }
+        
+        // 处理嵌套循环
+        for (int i = loops.Count - 2; i >= 0; i--)
+        {
+            var currentLoop = loops[i];
+            var nextLoop = loops[i + 1];
+            
+            // 将下一个循环作为当前循环的嵌套循环
+            currentLoop = new ListComprehension(
+                currentLoop.Expression, 
+                currentLoop.Variable, 
+                currentLoop.Iterable, 
+                currentLoop.Condition, 
+                [nextLoop], 
+                currentLoop.Position);
+            
+            loops[i] = currentLoop;
+        }
+        
+        return loops[0];
     }
 
     /// <summary>
