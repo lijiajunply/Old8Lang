@@ -58,23 +58,23 @@ public class VariateManager
             Count++;
             return;
         }
-        
+
         // 1. 先查找变量，包括当前作用域和所有父作用域
         var findResult = FindVariable(id.IdName);
-        
+
         if (findResult.Found)
         {
             // 2. 找到了变量，修改它的值
             Values[findResult.Index] = langValueType;
             return;
         }
-        
+
         // 3. 没有找到变量，在当前作用域中创建新变量
         VariateName.Add(id.IdName);
         Values.Add(langValueType);
         Count++;
     }
-    
+
     /// <summary>
     /// 查找变量，包括当前作用域和所有父作用域
     /// </summary>
@@ -84,7 +84,7 @@ public class VariateManager
     {
         // 获取当前作用域的起始索引
         var currentScopeStart = ChildrenNum.Count > 0 ? ChildrenNum[^1] : 0;
-        
+
         // 1. 先在当前作用域中查找
         for (var i = Count - 1; i >= currentScopeStart; i--)
         {
@@ -93,18 +93,18 @@ public class VariateManager
                 return (true, i);
             }
         }
-        
+
         // 2. 当前作用域中没有找到，递归查找父作用域
         if (ChildrenNum.Count > 0)
         {
             // 临时保存当前作用域状态
             var tempCount = Count;
             var tempChildrenNum = ChildrenNum[^1];
-            
+
             // 移除当前子作用域，进入父作用域
             ChildrenNum.RemoveAt(ChildrenNum.Count - 1);
             Count = tempChildrenNum;
-            
+
             try
             {
                 // 递归查找父作用域
@@ -117,7 +117,7 @@ public class VariateManager
                 Count = tempCount;
             }
         }
-        
+
         // 3. 所有作用域中都没有找到
         return (false, -1);
     }
@@ -145,7 +145,7 @@ public class VariateManager
     {
         // 获取当前作用域的起始索引
         var currentScopeStart = ChildrenNum.Count > 0 ? ChildrenNum[^1] : 0;
-        
+
         // 从当前作用域的末尾向前查找，只查找当前作用域中的变量
         // 这样可以确保找到的是当前作用域中最新的变量，而不是父作用域中的变量
         for (var i = Count - 1; i >= currentScopeStart; i--)
@@ -155,18 +155,18 @@ public class VariateManager
                 return Values[i];
             }
         }
-        
+
         // 如果当前作用域中没有找到，尝试在父作用域中查找
         if (ChildrenNum.Count > 0)
         {
             // 临时移除当前作用域，递归查找父作用域
             var currentScopeEnd = Count;
-            var currentScopeSize = currentScopeEnd - currentScopeStart;
-            
+            // var currentScopeSize = currentScopeEnd - currentScopeStart;
+
             // 临时调整状态
             ChildrenNum.RemoveAt(ChildrenNum.Count - 1);
             Count = currentScopeStart;
-            
+
             try
             {
                 // 递归查找父作用域
@@ -179,7 +179,7 @@ public class VariateManager
                 ChildrenNum.Add(currentScopeStart);
             }
         }
-        
+
         // 如果还是没有找到，尝试查找导入的函数或类
         return GetAny(id);
     }
@@ -193,11 +193,11 @@ public class VariateManager
     public FuncLangValue? GetFunc(LangId id, int paramCount)
     {
         return ImportInfos.FirstOrDefault(x =>
-            x is FuncLangValue func && 
+            x is FuncLangValue func &&
             func.Id!.IdName == id.IdName &&
             func.Ids?.Count == paramCount) as FuncLangValue;
     }
-    
+
     public ImportInfo? GetAny(LangId id)
     {
         return ImportInfos.FirstOrDefault(x =>
@@ -224,7 +224,7 @@ public class VariateManager
         {
             // 创建一个默认的SourcePosition，因为AddVariate方法没有位置信息
             // 在实际使用中，应该从调用处传递位置信息
-            throw new DuplicateNameError(new SourcePosition(), name, "变量");
+            throw new DuplicateNameError(langValueType.Position, name, "变量");
         }
 
         VariateName.Add(name);
@@ -264,7 +264,6 @@ public class VariateManager
 
     public VariateManager NewManger()
     {
-        // 创建新管理器方法实现
         return new VariateManager
         {
             LangInfo = LangInfo,

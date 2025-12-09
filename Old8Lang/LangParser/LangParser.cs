@@ -1260,14 +1260,45 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                CurrentToken.Type == LangTokenType.Xor)
         {
             var operatorToken = CurrentToken;
-            var position =
-                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position = new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
             Expect(operatorToken.Type);
             var right = ParseBinaryExpression();
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
         }
 
-        return left;
+        // 解析三元表达式
+        return ParseTernaryExpression(left);
+    }
+    
+    /// <summary>
+    /// 解析三元表达式
+    /// ternaryExpression = expression "if" expression "else" expression ;
+    /// </summary>
+    /// <returns>三元表达式节点</returns>
+    private OldExpr ParseTernaryExpression(OldExpr expression)
+    {
+        // 检查是否有 if-else 条件
+        if (CurrentToken.Type == LangTokenType.If)
+        {
+            var ifToken = CurrentToken;
+            Expect(LangTokenType.If);
+            var condition = ParseExpression();
+            
+            if (CurrentToken.Type == LangTokenType.Else)
+            {
+                Expect(LangTokenType.Else);
+                var elseExpr = ParseExpression();
+                
+                // 创建专门的三元表达式节点
+                return new TernaryExpression(
+                    condition, 
+                    expression, 
+                    elseExpr, 
+                    new SourcePosition(ifToken.Line, ifToken.Column));
+            }
+        }
+        
+        return expression;
     }
 
     // 比较表达式
@@ -1663,43 +1694,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         // 解析表达式部分
         var expression = ParseExpression();
         
-        // 检查是否有 if-else 条件
-        if (CurrentToken.Type == LangTokenType.If)
-        {
-            // 保存当前位置，用于回滚
-            var savedIndex = CurrentIndex;
-            
-            try
-            {
-                Expect(LangTokenType.If);
-                var ifCondition = ParseExpression();
-                
-                if (CurrentToken.Type == LangTokenType.Else)
-                {
-                    Expect(LangTokenType.Else);
-                    var elseExpr = ParseExpression();
-                    
-                    // 创建一个条件表达式，直接在运行时处理
-                    // 我们将创建一个 Operation 对象，使用 AND 操作符作为占位符
-                    // 在运行时，我们会检查这个特殊的 Operation 对象，并执行条件判断
-                    var conditionExpr = new Operation(
-                        ifCondition, 
-                        OperationType.AND, 
-                        expression, 
-                        new SourcePosition(CurrentToken.Line, CurrentToken.Column));
-                    expression = new Operation(
-                        conditionExpr, 
-                        OperationType.OR, 
-                        elseExpr, 
-                        new SourcePosition(CurrentToken.Line, CurrentToken.Column));
-                }
-            }
-            catch
-            {
-                // 不是 if-else 条件，回滚
-                CurrentIndex = savedIndex;
-            }
-        }
+        // 三元表达式已经在 ParseExpression 中处理，这里不需要额外处理
         
         // 解析 for 循环部分
         var loops = new List<ListComprehension>();
@@ -1717,12 +1712,27 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var iterable = ParseExpression();
             
             // 解析条件筛选（可选）
-            OldExpr? condition = null;
+            List<OldExpr> conditions = [];
             
             while (CurrentToken.Type == LangTokenType.If)
             {
                 Expect(LangTokenType.If);
-                condition = ParseExpression();
+                conditions.Add(ParseExpression());
+            }
+            
+            // 组合多个条件，使用 AND 操作符连接
+            OldExpr? condition = null;
+            if (conditions.Count > 0)
+            {
+                condition = conditions[0];
+                for (int i = 1; i < conditions.Count; i++)
+                {
+                    condition = new Operation(
+                        condition,
+                        OperationType.AND,
+                        conditions[i],
+                        new SourcePosition(CurrentToken.Line, CurrentToken.Column));
+                }
             }
             
             // 创建循环节点

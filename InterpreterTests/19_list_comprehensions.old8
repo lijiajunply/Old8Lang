@@ -94,7 +94,7 @@ PrintLine("1-20中的质数: " + primes)
 PrintLine("\n=== 列表推导式中的类型转换 ===")
 
 doublesList <- [1.1, 2.2, 3.3, 4.4]
-intsList <- [int(x) for x in doublesList]
+intsList <- [x as int for x in doublesList]
 PrintLine("原始浮点列表: " + doublesList)
 PrintLine("转换为整数列表: " + intsList)
 
