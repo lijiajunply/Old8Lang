@@ -370,7 +370,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             try
             {
                 // 尝试解析左值表达式
-                var leftExpr = ParseExpression();
+                ParseExpression();
 
                 // 检查下一个token是否是赋值符号
                 if (CurrentToken.Type == LangTokenType.Assignment)
@@ -1731,7 +1731,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         else
         {
             // 第一个元素不是标识符，不是Lambda表达式
-            isLambda = false;
+            // isLambda = false;
         }
 
         // 元组：(expr1, expr2, ...)

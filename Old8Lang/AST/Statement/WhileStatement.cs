@@ -41,7 +41,6 @@ public class WhileStatement(OldExpr expr, BlockStatement blockStatement, SourceP
                 catch (ContinueException)
                 {
                     // 处理continue，直接进入下一轮循环
-                    continue;
                 }
             }
             else

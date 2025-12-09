@@ -32,11 +32,6 @@ public class ClassMemberId : LangId
     public readonly HashSet<AccessModifierType> Modifiers;
 
     /// <summary>
-    /// 原始LangId
-    /// </summary>
-    public LangId OriginalId { get; }
-
-    /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="id">原始LangId</param>
@@ -44,7 +39,6 @@ public class ClassMemberId : LangId
     public ClassMemberId(LangId id, IEnumerable<AccessModifierType>? modifiers = null)
         : base(id.IdName, id.AssumptionType, id.Position)
     {
-        OriginalId = id;
         Modifiers = modifiers != null ? [..modifiers] : [];
         ValidateModifiers();
     }
@@ -58,7 +52,6 @@ public class ClassMemberId : LangId
     public ClassMemberId(string name, string assumptionType = "", IEnumerable<AccessModifierType>? modifiers = null)
         : base(name, assumptionType)
     {
-        OriginalId = new LangId(name, assumptionType);
         Modifiers = modifiers != null ? [..modifiers] : [];
         ValidateModifiers();
     }
@@ -74,7 +67,6 @@ public class ClassMemberId : LangId
         SourcePosition position)
         : base(name, assumptionType, position)
     {
-        OriginalId = new LangId(name, assumptionType, position);
         Modifiers = modifiers != null ? [..modifiers] : [];
         ValidateModifiers();
     }

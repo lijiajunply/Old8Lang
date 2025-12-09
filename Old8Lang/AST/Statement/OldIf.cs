@@ -4,11 +4,12 @@ using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Statement;
 
-public class OldIf(OldExpr expr, BlockStatement blockStatement, SourcePosition position = default) : OldStatement(position)
+public class OldIf(OldExpr expr, BlockStatement blockStatement, SourcePosition position = default)
+    : OldStatement(position)
 {
     public void Run(LangParser.VariateManager manager, ref bool r)
     {
-        if (r == false) return;
+        if (!r) return;
         var exprValue = expr.Run(manager);
         if (exprValue is not BoolLangValue { Value: true }) return;
         blockStatement.Run(manager);

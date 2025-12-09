@@ -87,7 +87,7 @@ public class FuncLangValue : ImportInfo
             
             // 将静态成员添加到方法的变量管理器中
             var thisValue = variateManagerFunc.GetValue(new LangId("this"));
-            if (thisValue is AnyLangValue anyValue)
+            if (thisValue is AnyLangValue)
             {
                 // 将类的静态成员添加到方法的变量管理器中
                 foreach (var importInfo in variateManagerFunc.ImportInfos)

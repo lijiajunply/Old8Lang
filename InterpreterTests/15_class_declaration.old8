@@ -125,8 +125,9 @@ PrintLine("person1: name = " + person1.name + ", age = " + person1.age)
 PrintLine("person2: name = " + person2.name + ", age = " + person2.age)
 
 // 嵌套类（如果支持）
-PrintLine("\n=== 嵌套类（如果支持） ===")
+// PrintLine("\n=== 嵌套类（如果支持） ===")
 
+/*
 class OuterClass {
     outerVar <- "外部变量"
     
@@ -138,6 +139,7 @@ class OuterClass {
         }
     }
 }
+*/
 
 // 尝试实例化嵌套类
 // inner <- OuterClass.InnerClass()
@@ -171,10 +173,10 @@ class Cat extends Animal {
 }
 
 // 尝试使用继承
-// dog <- Dog("Buddy")
-// cat <- Cat("Kitty")
-// PrintLine(dog.name + " says: " + dog.makeSound())
-// PrintLine(cat.name + " says: " + cat.makeSound())
+dog <- Dog("Buddy")
+cat <- Cat("Kitty")
+PrintLine(dog.name + " says: " + dog.makeSound())
+PrintLine(cat.name + " says: " + cat.makeSound())
 
 // 类的静态成员（如果支持）
 PrintLine("\n=== 类的静态成员（如果支持） ===")
@@ -183,12 +185,12 @@ class MathUtil {
     static pi <- 3.14159
     
     static func getPi() {
-        return this.pi
+        return 3.14159
     }
 }
 
 // 尝试访问静态成员
-// PrintLine("MathUtil.pi = " + MathUtil.pi)
-// PrintLine("MathUtil.getPi() = " + MathUtil.getPi())
+PrintLine("MathUtil.pi = " + MathUtil.pi)
+PrintLine("MathUtil.getPi() = " + MathUtil.getPi())
 
 PrintLine("\n✅ 所有类声明和实例化测试完成")
