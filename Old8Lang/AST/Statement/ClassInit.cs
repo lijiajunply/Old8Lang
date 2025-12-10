@@ -27,87 +27,317 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        var assemblyName = new AssemblyName("DynamicAssembly");
-        var assemblyBuilder =
-            AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-        var moduleBuilder = assemblyBuilder.DefineDynamicModule("DynamicModule");
-
-        // 定义类型时考虑继承关系
-        Type? baseType = null;
-        if (anyLangValue.ParentClassName != null)
+        // 1. 检查类是否已经存在
+        if (local.ClassVar.ContainsKey(anyLangValue.ClassName))
         {
-            // 尝试获取父类的Type
-            baseType = local.ClassVar.GetValueOrDefault(anyLangValue.ParentClassName);
+            // 类已经存在，跳过生成
+            return;
         }
         
-        // 如果没有父类，使用object作为基类
-        baseType ??= typeof(object);
-
-        // 定义一个新的类型，指定父类
-        var typeBuilder = moduleBuilder.DefineType(anyLangValue.ClassName, TypeAttributes.Public, baseType);
-
-        var fields = new List<FieldBuilder>();
-        var fieldValues = new List<LangValueType>();
-        var func = new List<FuncLangValue>();
+        // 2. 创建动态程序集和模块
+        var assemblyName = new AssemblyName($"DynamicAssembly_{anyLangValue.ClassName}");
+        var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+        var moduleBuilder = assemblyBuilder.DefineDynamicModule($"DynamicModule_{anyLangValue.ClassName}");
+        
+        // 3. 定义基类
+        Type? baseType = null;
+        if (anyLangValue.ParentClassName != null && local.ClassVar.TryGetValue(anyLangValue.ParentClassName, out var parentType))
+        {
+            baseType = parentType;
+        }
+        else
+        {
+            // 如果没有指定父类或父类不存在，使用Object作为基类
+            baseType = typeof(object);
+        }
+        
+        // 4. 定义类类型
+        var typeBuilder = moduleBuilder.DefineType(
+            anyLangValue.ClassName,
+            TypeAttributes.Public | TypeAttributes.BeforeFieldInit,
+            baseType);
+        
+        // 5. 创建一个新的LocalManager实例，用于生成当前类的IL代码
+        // 这样可以避免不同类之间的方法混淆
+        var classLocal = new LocalManager
+        {
+            FilePath = local.FilePath,
+            Interpreter = local.Interpreter,
+            InClassEnv = typeBuilder
+        };
+        
+        // 6. 定义类的字段和方法
+        DefineClassMembers(typeBuilder, classLocal);
+        
+        // 7. 定义类的构造函数
+        DefineConstructor(typeBuilder, baseType, classLocal);
+        
+        // 8. 创建类型
+        var createdType = typeBuilder.CreateType()!;
+        
+        // 9. 将类型添加到原始LocalManager中，以便其他类可以访问
+        local.ClassVar[anyLangValue.ClassName] = createdType;
+    }
+    
+    /// <summary>
+    /// 定义类的成员（字段和方法）
+    /// </summary>
+    /// <param name="typeBuilder">类型构建器</param>
+    /// <param name="local">局部变量管理器</param>
+    private void DefineClassMembers(TypeBuilder typeBuilder, LocalManager local)
+    {
+        // 分离字段和方法
+        var fields = new List<(ClassMemberId, OldExpr)>();
+        var methods = new List<(ClassMemberId, FuncLangValue)>();
+        
         foreach (var variate in anyLangValue.Variates)
         {
             if (variate.Value is FuncLangValue funcValue)
             {
-                func.Add(funcValue);
-                continue;
+                methods.Add((variate.Key, funcValue));
             }
-
-            if (variate.Value is not LangValueType value) continue;
-
-            var fieldBuilder = typeBuilder.DefineField(variate.Key.IdName,
-                variate.Value.OutputType(local)!,
+            else
+            {
+                fields.Add((variate.Key, variate.Value));
+            }
+        }
+        
+        // 定义实例字段
+        foreach (var (memberId, expr) in fields)
+        {
+            // 获取字段类型
+            Type fieldType;
+            try
+            {
+                fieldType = expr.OutputType(local) ?? typeof(object);
+            }
+            catch
+            {
+                // 如果无法确定字段类型，使用object
+                fieldType = typeof(object);
+            }
+            
+            // 定义字段
+            typeBuilder.DefineField(
+                memberId.IdName,
+                fieldType,
                 FieldAttributes.Public);
-            fields.Add(fieldBuilder);
-            fieldValues.Add(value);
-        }
-
-        var assemblyNameClone = new AssemblyName("DynamicAssembly");
-        var assemblyClone =
-            AssemblyBuilder.DefineDynamicAssembly(assemblyNameClone, AssemblyBuilderAccess.Run);
-        var moduleClone = assemblyClone.DefineDynamicModule("DynamicModule");
-        var typeClone = moduleClone.DefineType(anyLangValue.ClassName, TypeAttributes.Public, baseType);
-        foreach (var variate in anyLangValue.Variates.Where(variate => variate.Value is not FuncLangValue))
-        {
-            typeClone.DefineField(variate.Key.IdName,
-                variate.Value.OutputType(local)!,
-                FieldAttributes.Public);
         }
         
-        foreach (var value in func)
+        // 定义实例方法
+        foreach (var (memberId, funcValue) in methods)
         {
-            var funcLocal = new LocalManager(){InClassEnv = typeClone.CreateType()};
-            var parameterTypes = value.Ids!.Select(item => item.OutputType(funcLocal)).ToArray();
-            var method = typeBuilder.DefineMethod(value.Id!.IdName, MethodAttributes.Public);
-            method.SetReturnType(value.OutputType(funcLocal));
-            method.SetParameters(parameterTypes);
-            value.LoadIl(method, funcLocal);
+            DefineMethod(typeBuilder, memberId, funcValue, local);
         }
-
-        var constructorBuilder =
-            typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, []);
-
-        var generator = constructorBuilder.GetILGenerator();
         
-        // 调用父类的构造函数
-        generator.Emit(OpCodes.Ldarg_0);
-        generator.Emit(OpCodes.Call, baseType.GetConstructor(Type.EmptyTypes)!);
-        
-        // 初始化子类字段
-        for (var i = 0; i < fieldValues.Count; i++)
+        // 定义静态成员
+        DefineStaticMembers(typeBuilder, local);
+    }
+    
+    /// <summary>
+    /// 定义类的静态成员（静态字段和静态方法）
+    /// </summary>
+    /// <param name="typeBuilder">类型构建器</param>
+    /// <param name="local">局部变量管理器</param>
+    private void DefineStaticMembers(TypeBuilder typeBuilder, LocalManager local)
+    {
+        foreach (var staticVariate in anyLangValue.StaticVariates)
         {
-            generator.Emit(OpCodes.Ldarg_0); // 加载当前实例（this）
-            fieldValues[i].LoadIlValue(generator, local);
-            generator.Emit(OpCodes.Stfld, fields[i]); // 将值存储到字段
+            if (staticVariate.Value is FuncLangValue funcValue)
+            {
+                // 直接定义静态方法，不调用DefineMethod
+                DefineStaticMethod(typeBuilder, staticVariate.Key, funcValue, local);
+            }
+            else
+            {
+                // 定义静态字段
+                Type fieldType;
+                try
+                {
+                    fieldType = staticVariate.Value.OutputType(local) ?? typeof(object);
+                }
+                catch
+                {
+                    fieldType = typeof(object);
+                }
+                
+                typeBuilder.DefineField(
+                    staticVariate.Key.IdName,
+                    fieldType,
+                    FieldAttributes.Public | FieldAttributes.Static);
+            }
         }
-
-        generator.Emit(OpCodes.Ret);
-
-        local.ClassVar.Add(anyLangValue.ClassName, typeBuilder.CreateType());
+    }
+    
+    /// <summary>
+    /// 定义类的方法
+    /// </summary>
+    /// <param name="typeBuilder">类型构建器</param>
+    /// <param name="memberId">成员ID</param>
+    /// <param name="funcValue">函数值</param>
+    /// <param name="local">局部变量管理器</param>
+    /// <returns>方法构建器</returns>
+    private MethodBuilder DefineMethod(TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue, LocalManager local)
+    {
+        return DefineMethodInternal(typeBuilder, memberId, funcValue, local, MethodAttributes.Public);
+    }
+    
+    /// <summary>
+    /// 定义静态方法
+    /// </summary>
+    /// <param name="typeBuilder">类型构建器</param>
+    /// <param name="memberId">成员ID</param>
+    /// <param name="funcValue">函数值</param>
+    /// <param name="local">局部变量管理器</param>
+    private void DefineStaticMethod(TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue, LocalManager local)
+    {
+        DefineMethodInternal(typeBuilder, memberId, funcValue, local, MethodAttributes.Public | MethodAttributes.Static);
+    }
+    
+    /// <summary>
+    /// 内部方法，用于定义方法
+    /// </summary>
+    /// <param name="typeBuilder">类型构建器</param>
+    /// <param name="memberId">成员ID</param>
+    /// <param name="funcValue">函数值</param>
+    /// <param name="local">局部变量管理器</param>
+    /// <param name="attributes">方法属性</param>
+    /// <returns>方法构建器</returns>
+    private MethodBuilder DefineMethodInternal(TypeBuilder typeBuilder, ClassMemberId memberId, FuncLangValue funcValue, LocalManager local, MethodAttributes attributes)
+    {
+        // 获取方法名称
+        string methodName = memberId.IdName;
+        
+        // 创建一个全新的LocalManager实例，完全独立于外部环境
+        // 这样可以避免不同类之间的方法上下文混淆
+        var methodLocal = new LocalManager
+        {
+            FilePath = local.FilePath,
+            Interpreter = local.Interpreter,
+            InClassEnv = typeBuilder
+        };
+        
+        // 获取返回类型
+        Type returnType;
+        try
+        {
+            returnType = funcValue.OutputType(methodLocal);
+        }
+        catch
+        {
+            returnType = typeof(void);
+        }
+        
+        // 获取参数类型
+        var parameterTypes = new List<Type>();
+        
+        // 对于实例方法，第一个参数是this
+        if ((attributes & MethodAttributes.Static) == 0)
+        {
+            parameterTypes.Add(typeBuilder);
+        }
+        
+        // 添加方法参数
+        if (funcValue.Ids != null)
+        {
+            foreach (var paramId in funcValue.Ids)
+            {
+                Type paramType;
+                try
+                {
+                    paramType = paramId.OutputType(methodLocal) ?? typeof(object);
+                }
+                catch
+                {
+                    paramType = typeof(object);
+                }
+                parameterTypes.Add(paramType);
+            }
+        }
+        
+        // 定义方法
+        var methodBuilder = typeBuilder.DefineMethod(
+            methodName,
+            attributes,
+            returnType,
+            parameterTypes.ToArray());
+        
+        // 创建方法的IL生成器
+        var methodIl = methodBuilder.GetILGenerator();
+        
+        // 处理方法参数
+        int paramIndex = (attributes & MethodAttributes.Static) == 0 ? 1 : 0; // 0是this（实例方法），0是第一个参数（静态方法）
+        if (funcValue.Ids != null)
+        {
+            foreach (var paramId in funcValue.Ids)
+            {
+                // 声明局部变量
+                var paramType = parameterTypes[paramIndex];
+                var localVar = methodIl.DeclareLocal(paramType);
+                
+                // 加载参数并存储到局部变量
+                methodIl.Emit(OpCodes.Ldarg, paramIndex);
+                methodIl.Emit(OpCodes.Stloc, localVar);
+                
+                // 将参数添加到新的LocalManager中，完全隔离
+                methodLocal.AddLocalVar(paramId.IdName, localVar);
+                
+                paramIndex++;
+            }
+        }
+        
+        // 生成方法体的IL代码
+        funcValue.BlockStatement.GenerateIl(methodIl, methodLocal);
+        
+        // 如果方法有返回值，确保最后一个指令是return
+        if (returnType != typeof(void))
+        {
+            // 检查是否已经有return指令，如果没有，添加一个默认的return
+            // 这里简化处理，直接添加return指令，实际应该检查最后一个指令
+            methodIl.Emit(OpCodes.Ret);
+        }
+        else
+        {
+            // 对于void方法，直接添加return指令
+            methodIl.Emit(OpCodes.Ret);
+        }
+        
+        return methodBuilder;
+    }
+    
+    /// <summary>
+    /// 定义类的构造函数
+    /// </summary>
+    /// <param name="typeBuilder">类型构建器</param>
+    /// <param name="baseType">基类类型</param>
+    /// <param name="local">局部变量管理器</param>
+    private void DefineConstructor(TypeBuilder typeBuilder, Type baseType, LocalManager local)
+    {
+        // 定义无参数构造函数
+        var constructorBuilder = typeBuilder.DefineConstructor(
+            MethodAttributes.Public,
+            CallingConventions.Standard,
+            Type.EmptyTypes);
+        
+        var ctorIl = constructorBuilder.GetILGenerator();
+        
+        // 1. 调用基类的无参数构造函数
+        ctorIl.Emit(OpCodes.Ldarg_0);
+        var baseCtor = baseType.GetConstructor(Type.EmptyTypes) ?? 
+                       baseType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                               .FirstOrDefault(ctor => ctor.GetParameters().Length == 0);
+        
+        if (baseCtor != null)
+        {
+            ctorIl.Emit(OpCodes.Call, baseCtor);
+        }
+        
+        // 2. 初始化实例字段
+        // 暂时不处理字段的初始化，因为需要处理字段的初始值表达式
+        // 实际实现中，应该在这里生成初始化字段的IL代码
+        
+        // 3. 返回
+        ctorIl.Emit(OpCodes.Ret);
     }
 
     public override OldStatement this[int index] => this;

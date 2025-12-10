@@ -32,51 +32,53 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
         }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
-    {
-        // 获取方法的名称和参数类型
-        var methodName = FuncLangValue.Id!.IdName;
-        if (FuncLangValue.Method != null)
         {
-            local.DelegateVar.Add(methodName, FuncLangValue.Method);
-            return;
+            // 获取方法的名称和参数类型
+            var methodName = FuncLangValue.Id!.IdName;
+            if (FuncLangValue.Method != null)
+            {
+                local.DelegateVar.Add(methodName, FuncLangValue.Method);
+                return;
+            }
+            var parameterTypes = FuncLangValue.Ids!.Select(item => item.OutputType(local)).ToArray();
+
+            // 获取返回类型
+            var returnType = GetItemType(FuncLangValue.BlockStatement, local);
+
+            // 定义新的方法
+            var dynamicMethod = new DynamicMethod(
+                methodName,
+                returnType,
+                parameterTypes,
+                true
+            );
+
+            // 创建方法的 IL 发射器
+            var methodIl = dynamicMethod.GetILGenerator();
+
+            var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
+
+            // 处理参数
+            for (var i = 0; i < FuncLangValue.Ids!.Count; i++)
+            {
+                var id = FuncLangValue.Ids[i];
+                var localVar = methodIl.DeclareLocal(parameterTypes[i]);
+                funcLocal.AddLocalVar(id.IdName, localVar);
+                methodIl.Emit(OpCodes.Ldarg, i);
+                methodIl.Emit(OpCodes.Stloc, localVar.LocalIndex);
+            }
+
+            // 生成方法体的 IL 代码
+            FuncLangValue.BlockStatement.GenerateIl(methodIl, funcLocal);
+
+            // 返回
+            methodIl.Emit(OpCodes.Ret);
+
+            // 将方法添加到本地变量管理器
+            // 对于用户定义的函数，我们需要保留原始方法名以便调用
+            // 对于重载函数，我们需要将所有重载都添加到字典中，使用不同的键
+            local.DelegateVar.TryAdd(methodName, dynamicMethod);
         }
-        var parameterTypes = FuncLangValue.Ids!.Select(item => item.OutputType(local)).ToArray();
-
-        // 获取返回类型
-        var returnType = GetItemType(FuncLangValue.BlockStatement, local);
-
-        // 定义新的方法
-        var dynamicMethod = new DynamicMethod(
-            methodName,
-            returnType,
-            parameterTypes,
-            true
-        );
-
-        // 创建方法的 IL 发射器
-        var methodIl = dynamicMethod.GetILGenerator();
-
-        var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
-
-        // 处理参数
-        for (var i = 0; i < FuncLangValue.Ids!.Count; i++)
-        {
-            var id = FuncLangValue.Ids[i];
-            var localVar = methodIl.DeclareLocal(parameterTypes[i]);
-            funcLocal.AddLocalVar(id.IdName, localVar);
-            methodIl.Emit(OpCodes.Ldarg, i);
-            methodIl.Emit(OpCodes.Stloc, localVar.LocalIndex);
-        }
-
-        // 生成方法体的 IL 代码
-        FuncLangValue.BlockStatement.GenerateIl(methodIl, funcLocal);
-
-        // 返回
-        methodIl.Emit(OpCodes.Ret);
-
-        // 将方法添加到本地变量管理器
-        local.DelegateVar.Add(methodName, dynamicMethod);
-    }
 
     private static Type GetItemType(OldStatement statement, LocalManager local)
     {

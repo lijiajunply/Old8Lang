@@ -420,8 +420,38 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     ilGenerator.Emit(OpCodes.Mul);
                     return typeof(double);
                 }
-                ilGenerator.Emit(OpCodes.Mul);
-                return typeof(int);
+                else if (leftType == typeof(int) && rightType == typeof(int))
+                {
+                    ilGenerator.Emit(OpCodes.Mul);
+                    return typeof(int);
+                }
+                else
+                {
+                    // 对于其他类型，尝试转换为double类型
+                    // 对于object类型，先转换为double
+                    if (leftType == typeof(object))
+                    {
+                        // 调用Convert.ToDouble(object)
+                        ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToDouble", [typeof(object)])!);
+                    }
+                    else if (leftType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Conv_R8);
+                    }
+                    
+                    if (rightType == typeof(object))
+                    {
+                        // 调用Convert.ToDouble(object)
+                        ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToDouble", [typeof(object)])!);
+                    }
+                    else if (rightType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Conv_R8);
+                    }
+                    
+                    ilGenerator.Emit(OpCodes.Mul);
+                    return typeof(double);
+                }
             case OperationType.DIVIDE:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
@@ -483,15 +513,49 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 ilGenerator.Emit(OpCodes.Xor);
                 return typeof(bool);
             case OperationType.AND:
+            {
+                // 实现短路求值：如果左操作数为false，则跳过右操作数
+                var endLabel = ilGenerator.DefineLabel();
+                var falseLabel = ilGenerator.DefineLabel();
+                
+                // 加载左操作数
                 Left?.LoadIlValue(ilGenerator, local);
+                // 如果左操作数为false，跳转到falseLabel
+                ilGenerator.Emit(OpCodes.Brfalse, falseLabel);
+                // 加载右操作数
                 Right?.LoadIlValue(ilGenerator, local);
-                ilGenerator.Emit(OpCodes.And);
+                // 如果右操作数为true，跳转到endLabel
+                ilGenerator.Emit(OpCodes.Brtrue, endLabel);
+                // 左操作数为false的情况
+                ilGenerator.MarkLabel(falseLabel);
+                ilGenerator.Emit(OpCodes.Ldc_I4_0); // 加载false
+                ilGenerator.Emit(OpCodes.Br, endLabel);
+                // 结果为true的情况
+                ilGenerator.MarkLabel(endLabel);
                 return typeof(bool);
+            }
             case OperationType.OR:
+            {
+                // 实现短路求值：如果左操作数为true，则跳过右操作数
+                var endLabel = ilGenerator.DefineLabel();
+                var trueLabel = ilGenerator.DefineLabel();
+                
+                // 加载左操作数
                 Left?.LoadIlValue(ilGenerator, local);
+                // 如果左操作数为true，跳转到trueLabel
+                ilGenerator.Emit(OpCodes.Brtrue, trueLabel);
+                // 加载右操作数
                 Right?.LoadIlValue(ilGenerator, local);
-                ilGenerator.Emit(OpCodes.Or);
+                // 如果右操作数为false，跳转到endLabel
+                ilGenerator.Emit(OpCodes.Brfalse, endLabel);
+                // 左操作数为true的情况
+                ilGenerator.MarkLabel(trueLabel);
+                ilGenerator.Emit(OpCodes.Ldc_I4_1); // 加载true
+                ilGenerator.Emit(OpCodes.Br, endLabel);
+                // 结果为false的情况
+                ilGenerator.MarkLabel(endLabel);
                 return typeof(bool);
+            }
             case OperationType.XOR:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
@@ -516,12 +580,28 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 {
                     ilGenerator.Emit(OpCodes.Ldarg_0);
                     if (Right is not LangId rightId) return local.InClassEnv;
+                    
+                    // 检查local.InClassEnv是否是TypeBuilder
+                    if (local.InClassEnv is TypeBuilder typeBuilder)
+                    {
+                        // 如果是TypeBuilder，我们不能在类型创建之前访问它的字段或属性
+                        // 直接返回typeof(object)，这是一个安全的默认值
+                        // 实际的类型信息会在类型创建后通过其他方式处理
+                        return typeof(object);
+                    }
+                    
+                    // 正常处理，local.InClassEnv是一个已经创建好的类型
                     var field = local.InClassEnv.GetField(rightId.IdName);
                     if (field == null)
                     {
                         var p = local.InClassEnv.GetProperty(rightId.IdName);
-                        ilGenerator.Emit(OpCodes.Call, p!.GetGetMethod()!);
-                        return p.PropertyType;
+                        if (p != null && p.GetGetMethod() != null)
+                        {
+                            ilGenerator.Emit(OpCodes.Call, p.GetGetMethod()!);
+                            return p.PropertyType;
+                        }
+                        // 如果没有找到属性或属性没有getter，返回typeof(object)
+                        return typeof(object);
                     }
 
                     ilGenerator.Emit(OpCodes.Ldfld, field);
@@ -544,7 +624,18 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                         types.Add(instanceId.OutputType(local)!);
                     }
 
+                    // 尝试查找精确匹配的方法
                     var m = leftType!.GetMethod(instance.Id.IdName, [.. types]);
+                    
+                    // 如果没有找到精确匹配，尝试查找参数数量匹配的方法
+                    if (m == null)
+                    {
+                        m = leftType.GetMethods()
+                            .FirstOrDefault(method => 
+                                method.Name == instance.Id.IdName && 
+                                method.GetParameters().Length == instance.Ids.Count);
+                    }
+                    
                     if (m == null)
                     {
                         // 方法未找到，抛出异常

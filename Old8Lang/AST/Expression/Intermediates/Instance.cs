@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
@@ -310,12 +311,25 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                 return;
         }
 
-        var result = local.DelegateVar.GetValueOrDefault(Id.IdName);
-
-        if (result == null)
+        // 查找匹配的方法
+        MethodInfo? matchingMethod = null;
+        
+        // 首先尝试使用方法名查找
+        if (local.DelegateVar.TryGetValue(Id.IdName, out var result))
+        {
+            // 检查参数数量是否匹配
+            var parameters = result.GetParameters();
+            if (parameters.Length == Ids.Count)
+            {
+                matchingMethod = result;
+            }
+        }
+        
+        if (matchingMethod == null)
         {
             var classType = local.ClassVar.GetValueOrDefault(Id.IdName);
             if (classType == null) return;
+            
             // 获取默认构造函数
             var constructorInfo = classType.GetConstructor(Type.EmptyTypes);
             if (constructorInfo != null)
@@ -347,7 +361,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
             return;
         }
 
-        if (result is MethodBuilder)
+        if (matchingMethod is MethodBuilder)
         {
             foreach (var id in Ids)
             {
@@ -356,7 +370,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
         }
         else
         {
-            var a = result.GetParameters();
+            var a = matchingMethod.GetParameters();
             for (var i = 0; i < Ids.Count; i++)
             {
                 var id = Ids[i];
@@ -369,7 +383,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
             }
         }
 
-        ilGenerator.Emit(OpCodes.Call, result);
+        ilGenerator.Emit(OpCodes.Call, matchingMethod);
     }
 
     public override Type OutputType(LocalManager local)

@@ -1,0 +1,20 @@
+// 简单赋值测试
+PrintLine("=== 简单赋值测试 ===")
+
+// 基本赋值
+x <- 10
+PrintLine("x = " + x)
+
+// 算术赋值
+y <- x + 5
+PrintLine("y = " + y)
+
+// 字符串赋值
+s <- "hello"
+PrintLine("s = " + s)
+
+// 布尔赋值
+b <- true
+PrintLine("b = " + b)
+
+PrintLine("✅ 简单赋值测试完成")

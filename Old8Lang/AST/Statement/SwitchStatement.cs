@@ -74,8 +74,9 @@ public class SwitchStatement(
             oldCase.Expr.LoadIlValue(ilGenerator, local);
             
             // 比较操作
-            if (switchValueType == typeof(int))
+            if (switchValueType == typeof(int) || switchValueType == typeof(bool))
             {
+                // 整数和布尔值使用Ceq指令比较
                 ilGenerator.Emit(OpCodes.Ceq);
             }
             else if (switchValueType == typeof(string))
@@ -87,8 +88,24 @@ public class SwitchStatement(
             else
             {
                 // 其他类型比较，调用Equals方法
-                var equalsMethod = switchValueType.GetMethod("Equals", [switchValueType])!;
-                ilGenerator.Emit(OpCodes.Call, equalsMethod);
+                // 尝试获取精确匹配的Equals方法
+                var equalsMethod = switchValueType.GetMethod("Equals", [switchValueType]);
+                
+                // 如果没有找到精确匹配，尝试获取接受object参数的Equals方法
+                if (equalsMethod == null)
+                {
+                    equalsMethod = switchValueType.GetMethod("Equals", [typeof(object)]);
+                }
+                
+                if (equalsMethod != null)
+                {
+                    ilGenerator.Emit(OpCodes.Call, equalsMethod);
+                }
+                else
+                {
+                    // 如果都没有找到，使用引用比较
+                    ilGenerator.Emit(OpCodes.Ceq);
+                }
             }
             
             // 如果相等，跳转到对应的case标签

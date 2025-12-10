@@ -208,17 +208,8 @@ public class FuncLangValue : ImportInfo
             return;
         }
 
-        // 如果是Old8Lang函数，需要加载函数委托
-        var idName = Id?.IdName;
-        if (!string.IsNullOrEmpty(idName))
-        {
-            var funcMethod = local.DelegateVar!.GetValueOrDefault(idName);
-            if (funcMethod != null)
-            {
-                // 函数已经被编译为动态方法，直接调用
-                ilGenerator.Emit(OpCodes.Ldsfld, funcMethod);
-            }
-        }
+        // 如果是Old8Lang函数，直接返回，因为函数调用是通过Instance类处理的
+        // 不需要在这里加载函数委托
     }
 
     public void LoadIl(MethodBuilder methodBuilder, LocalManager local)
