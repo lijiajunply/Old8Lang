@@ -17,20 +17,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/CompilerTests/05_debug_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/06_simple_int_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/07_simple_if_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/08_simple_for_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/09_simple_while_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/10_simple_for_in_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/11_simple_switch_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/12_simple_nested_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/13_simple_dict_for_in_test.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LangListItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LangListItem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListComprehension.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListComprehension.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,22 +53,9 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/ListComprehension.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/ListComprehension.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/ListComprehension.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/OldExpr.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BreakStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ContinueStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Error/ImportError.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Error/IndexError.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Error/NameError.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Error/RuntimeError.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Error/TypeError.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangInterpreter.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1f/4c54500e/List`1.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -131,11 +107,6 @@
     ]
   }
 }</component>
-  <component name="QodanaReportsService">
-    <option name="descriptions">
-      <ReportDescription localRun="true" path="/private/var/folders/n9/mz697ncj6wg5msxjsv8n1szh0000gn/T/qodana_output/qodana.sarif.json" reportGuid="4a67add3-0701-48b0-b307-b2adc926f26c" reportId="Old8Lang/qodana/2025-12-09" />
-    </option>
-  </component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
@@ -353,6 +324,7 @@
       <workItem from="1765277821785" duration="994000" />
       <workItem from="1765278822007" duration="179000" />
       <workItem from="1765279105952" duration="28440000" />
+      <workItem from="1765360741424" duration="974000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -756,65 +728,65 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>29</line>
+          <line>28</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="721" />
+              <option value="696" />
             </startOffsets>
             <endOffsets>
-              <option value="751" />
+              <option value="726" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="236" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>30</line>
+          <line>29</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="760" />
+              <option value="735" />
             </startOffsets>
             <endOffsets>
-              <option value="795" />
+              <option value="770" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="237" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>33</line>
+          <line>32</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="878" />
+              <option value="853" />
             </startOffsets>
             <endOffsets>
-              <option value="921" />
+              <option value="896" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="238" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>94</line>
+          <line>87</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'GenerateIl'">
             <startOffsets>
-              <option value="2572" />
+              <option value="2395" />
             </startOffsets>
             <endOffsets>
-              <option value="2646" />
+              <option value="2396" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="401" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>150</line>
+          <line>129</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'GenerateIl'">
             <startOffsets>
-              <option value="4945" />
+              <option value="4007" />
             </startOffsets>
             <endOffsets>
-              <option value="5273" />
+              <option value="4048" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="402" />

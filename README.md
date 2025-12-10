@@ -14,7 +14,7 @@
 
 ## Old8Lang示例：
 
-```py
+```old8lang
 
 // 开始到分支
 
@@ -45,6 +45,9 @@ a <- 1 == 1 // true
 a <- 1 != 1 // false
 a <- 1 > 1 // false
 a <- 1 < 1 // false
+a <- 1 >= 1 // true
+a <- 1 <= 1 // true
+a <- 1 > 2 ? 1 : 2 // 2
 
 
 // 分支
