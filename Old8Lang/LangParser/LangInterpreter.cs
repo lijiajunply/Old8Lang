@@ -30,6 +30,7 @@ public class LangInterpreter : IMiniInterpreter
     {
         SourceCode = code;
         Manager.FileName = fileName;
+        Manager.Path = fileName ?? "";
 
         // 设置当前解释器，以便在错误处理中使用
         Old8Exception.CurrentInterpreter = this;

@@ -25,7 +25,8 @@ public class DictionaryLangValue : LangValueType, ILangList
         Tuples = [];
     }
 
-    public DictionaryLangValue(List<KeyValuePair<OldExpr, OldExpr>> list, SourcePosition position = default) : base(position)
+    public DictionaryLangValue(List<KeyValuePair<OldExpr, OldExpr>> list, SourcePosition position = default) :
+        base(position)
     {
         Tuples = list.Select(x => new TupleLangValue(x.Key, x.Value)).ToList();
     }
@@ -47,7 +48,7 @@ public class DictionaryLangValue : LangValueType, ILangList
         {
             return a.FromClassToResult(this);
         }
-        
+
         // 处理属性访问：obj.property
         if (dotExpr is LangId langId)
         {
@@ -55,7 +56,7 @@ public class DictionaryLangValue : LangValueType, ILangList
             var key = new StringLangValue(langId.IdName);
             return Get(key);
         }
-        
+
         throw new InvalidOperationError(this, "字典类型只支持实例调用操作或属性访问");
     }
 
@@ -91,7 +92,7 @@ public class DictionaryLangValue : LangValueType, ILangList
         {
             return "{" + string.Join(", ", Tuples) + "}";
         }
-        
+
         var sb = new StringBuilder();
         for (var i = 0; i < Value.Count; i++)
         {
@@ -108,14 +109,22 @@ public class DictionaryLangValue : LangValueType, ILangList
 
     public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)
     {
-        if (otherLangValueType is not AnyLangValue typeAny) throw new TypeError(this, "AnyValue", otherLangValueType.GetType().Name);
+        if (otherLangValueType is not TypeLangValue type)
+            throw new TypeError(this, "Type", otherLangValueType.GetType().Name);
+        var info = manager.GetAny(new LangId(type.Value ?? ""));
+        if (info is not TypeTemplate typeTemplate)
+        {
+            throw new TypeError(this, "Type", otherLangValueType.GetType().Name);
+        }
+
+        var typeAny = typeTemplate.CreateInstance(manager);
 
         foreach (var a in Value)
         {
-            var aKey = a.Key.Run(manager);
-            var aValue = a.Value.Run(manager);
-            if (aKey is not StringLangValue s) continue;
-            typeAny.Set(new LangId(s.Value), aValue);
+            var key = a.Key.Run(manager);
+            var value = a.Value.Run(manager);
+            if (key is not StringLangValue s) continue;
+            typeAny.Set(new LangId(s.Value), value);
         }
 
         return typeAny;

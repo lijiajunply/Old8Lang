@@ -128,7 +128,8 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
             {
                 if (Right is Instance r1)
                 {
-                    var newInstance = new Instance(r1.Id, r1.Ids, r1.Position);
+                    var ids = r1.Ids.Select(x => x.Run(manager)).OfType<OldExpr>().ToList();
+                    var newInstance = new Instance(r1.Id, ids, r1.Position);
                     // 设置外部管理器，确保能访问最新的外部变量
                     any.ExternalManager = manager;
                     return any.Dot(newInstance);
@@ -145,7 +146,8 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
             {
                 if (Right is Instance instance)
                 {
-                    var newInstance = new Instance(instance.Id, instance.Ids);
+                    var ids = instance.Ids.Select(x => x.Run(manager)).OfType<OldExpr>().ToList();
+                    var newInstance = new Instance(instance.Id, ids);
                     return list.Dot(newInstance);
                 }
 
@@ -318,20 +320,21 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         // 直接返回类型信息，不创建临时方法
         var leftType = Left?.OutputType(local);
         var rightType = Right?.OutputType(local);
-        
+
         // 如果leftType是TypeBuilder，返回typeof(object)，避免后续访问TypeBuilder的成员
         if (leftType is TypeBuilder)
         {
             return typeof(object);
         }
-        
+
         // 对于二元运算，根据操作类型返回合适的类型
-        if (Opera == OperationType.TIMES || Opera == OperationType.PLUS || Opera == OperationType.MINUS || Opera == OperationType.DIVIDE || Opera == OperationType.MODULO || Opera == OperationType.POWER)
+        if (Opera == OperationType.TIMES || Opera == OperationType.PLUS || Opera == OperationType.MINUS ||
+            Opera == OperationType.DIVIDE || Opera == OperationType.MODULO || Opera == OperationType.POWER)
         {
             // 对于数值运算，返回int类型
             return typeof(int);
         }
-        
+
         return leftType == typeof(object) ? rightType : leftType;
     }
 
@@ -339,13 +342,13 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
     {
         var leftType = Left?.OutputType(local);
         var rightType = Right?.OutputType(local);
-        
+
         // 如果leftType是TypeBuilder，返回typeof(object)，避免后续访问TypeBuilder的成员
         if (leftType is TypeBuilder)
         {
             leftType = typeof(object);
         }
-        
+
         // 如果rightType是TypeBuilder，返回typeof(object)，避免后续访问TypeBuilder的成员
         if (rightType is TypeBuilder)
         {
@@ -385,15 +388,18 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     {
                         ilGenerator.Emit(OpCodes.Box, leftType!);
                     }
+
                     if (rightType != typeof(string))
                     {
                         ilGenerator.Emit(OpCodes.Box, rightType!);
                     }
+
                     // 调用string.Concat(object, object)
                     var concatMethod = typeof(string).GetMethod("Concat", [typeof(object), typeof(object)])!;
                     ilGenerator.Emit(OpCodes.Call, concatMethod);
                     return typeof(string);
                 }
+
                 // 处理数值类型加法
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
@@ -404,13 +410,16 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     {
                         ilGenerator.Emit(OpCodes.Conv_R8);
                     }
+
                     if (rightType == typeof(int))
                     {
                         ilGenerator.Emit(OpCodes.Conv_R8);
                     }
+
                     ilGenerator.Emit(OpCodes.Add);
                     return typeof(double);
                 }
+
                 // 整数加法
                 ilGenerator.Emit(OpCodes.Add);
                 return typeof(int);
@@ -424,20 +433,23 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     {
                         ilGenerator.Emit(OpCodes.Conv_R8);
                     }
+
                     if (rightType == typeof(int))
                     {
                         ilGenerator.Emit(OpCodes.Conv_R8);
                     }
+
                     ilGenerator.Emit(OpCodes.Sub);
                     return typeof(double);
                 }
+
                 ilGenerator.Emit(OpCodes.Sub);
                 return typeof(int);
             case OperationType.TIMES:
                 // 简化处理，只处理基本的int和double类型
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
-                
+
                 // 处理不同类型的乘法
                 if (leftType == typeof(double) || rightType == typeof(double))
                 {
@@ -446,10 +458,12 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     {
                         ilGenerator.Emit(OpCodes.Conv_R8);
                     }
+
                     if (rightType == typeof(int))
                     {
                         ilGenerator.Emit(OpCodes.Conv_R8);
                     }
+
                     ilGenerator.Emit(OpCodes.Mul);
                     return typeof(double);
                 }
@@ -474,6 +488,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                             ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
                         }
                     }
+
                     if (rightType != typeof(int))
                     {
                         // 对于值类型，使用适当的转换指令
@@ -491,6 +506,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                             ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
                         }
                     }
+
                     ilGenerator.Emit(OpCodes.Mul);
                     return typeof(int);
                 }
@@ -504,13 +520,16 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     {
                         ilGenerator.Emit(OpCodes.Conv_R8);
                     }
+
                     if (rightType == typeof(int))
                     {
                         ilGenerator.Emit(OpCodes.Conv_R8);
                     }
+
                     ilGenerator.Emit(OpCodes.Div);
                     return typeof(double);
                 }
+
                 ilGenerator.Emit(OpCodes.Div);
                 return typeof(int);
             case OperationType.MODULO:
@@ -523,13 +542,16 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     {
                         ilGenerator.Emit(OpCodes.Conv_R8);
                     }
+
                     if (rightType == typeof(int))
                     {
                         ilGenerator.Emit(OpCodes.Conv_R8);
                     }
+
                     ilGenerator.Emit(OpCodes.Rem);
                     return typeof(double);
                 }
+
                 ilGenerator.Emit(OpCodes.Rem);
                 return typeof(int);
             case OperationType.POWER:
@@ -540,10 +562,12 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 {
                     ilGenerator.Emit(OpCodes.Conv_R8);
                 }
+
                 if (rightType == typeof(int))
                 {
                     ilGenerator.Emit(OpCodes.Conv_R8);
                 }
+
                 // 调用Math.Pow方法
                 var powMethod = typeof(Math).GetMethod("Pow", [typeof(double), typeof(double)])!;
                 ilGenerator.Emit(OpCodes.Call, powMethod);
@@ -553,6 +577,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     ilGenerator.Emit(OpCodes.Conv_I4);
                     return typeof(int);
                 }
+
                 // 否则返回double类型
                 return typeof(double);
             case OperationType.GREATER:
@@ -582,7 +607,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 // 实现短路求值：如果左操作数为false，则跳过右操作数
                 var endLabel = ilGenerator.DefineLabel();
                 var falseLabel = ilGenerator.DefineLabel();
-                
+
                 // 加载左操作数
                 Left?.LoadIlValue(ilGenerator, local);
                 // 如果左操作数为false，跳转到falseLabel
@@ -603,7 +628,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 // 实现短路求值：如果左操作数为true，则跳过右操作数
                 var endLabel = ilGenerator.DefineLabel();
                 var trueLabel = ilGenerator.DefineLabel();
-                
+
                 // 加载左操作数
                 Left?.LoadIlValue(ilGenerator, local);
                 // 如果左操作数为true，跳转到trueLabel
@@ -659,10 +684,10 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                         "dictionary" => typeof(Dictionary<object, object>),
                         _ => typeof(object)
                     };
-                    
+
                     // 确保leftType不为null
                     if (leftType == null) leftType = typeof(object);
-                    
+
                     // 处理基本类型到字符串的转换
                     if (targetType == typeof(string))
                     {
@@ -740,7 +765,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                         // 引用类型到值类型转换，拆箱
                         ilGenerator.Emit(OpCodes.Unbox_Any, targetType);
                     }
-                    
+
                     return targetType;
                 }
                 else
@@ -754,7 +779,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 {
                     ilGenerator.Emit(OpCodes.Ldarg_0);
                     if (Right is not LangId rightId) return local.InClassEnv;
-                    
+
                     // 检查local.InClassEnv是否是TypeBuilder
                     if (local.InClassEnv is TypeBuilder typeBuilder)
                     {
@@ -763,7 +788,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                         // 实际的类型信息会在类型创建后通过其他方式处理
                         return typeof(object);
                     }
-                    
+
                     // 正常处理，local.InClassEnv是一个已经创建好的类型
                     var field = local.InClassEnv.GetField(rightId.IdName);
                     if (field == null)
@@ -774,6 +799,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                             ilGenerator.Emit(OpCodes.Call, p.GetGetMethod()!);
                             return p.PropertyType;
                         }
+
                         // 如果没有找到属性或属性没有getter，返回typeof(object)
                         return typeof(object);
                     }
@@ -800,22 +826,23 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
                     // 尝试查找精确匹配的方法
                     var m = leftType!.GetMethod(instance.Id.IdName, [.. types]);
-                    
+
                     // 如果没有找到精确匹配，尝试查找参数数量匹配的方法
                     if (m == null)
                     {
                         m = leftType.GetMethods()
-                            .FirstOrDefault(method => 
-                                method.Name == instance.Id.IdName && 
+                            .FirstOrDefault(method =>
+                                method.Name == instance.Id.IdName &&
                                 method.GetParameters().Length == instance.Ids.Count);
                     }
-                    
+
                     if (m == null)
                     {
                         // 方法未找到，抛出异常
-                        throw new InvalidOperationError(this, $"方法 '{instance.Id.IdName}' 未找到", 
+                        throw new InvalidOperationError(this, $"方法 '{instance.Id.IdName}' 未找到",
                             $"无法在类型 '{leftType.Name}' 中找到方法 '{instance.Id.IdName}'，参数类型为: {string.Join(", ", types.Select(t => t.Name))}");
                     }
+
                     ilGenerator.Emit(OpCodes.Call, m);
                     return m.ReturnType;
                 }
@@ -845,13 +872,13 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     ilGenerator.Emit(OpCodes.Ldfld, field);
                     return field.FieldType;
                 }
-                
+
                 // 处理索引访问: left[right]，例如 array[0], list[1], dict["key"]
                 if (rightType != null)
                 {
                     Left!.LoadIlValue(ilGenerator, local);
                     Right!.LoadIlValue(ilGenerator, local);
-                    
+
                     // 处理不同类型的索引访问
                     if (leftType == typeof(object[]))
                     {
@@ -880,7 +907,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                         ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
                         return typeof(char);
                     }
-                    
+
                     // 默认情况，尝试装箱并调用索引器
                     ilGenerator.Emit(OpCodes.Box, rightType);
                     var defaultIndexer = leftType!.GetProperty("Item")!;

@@ -53,7 +53,7 @@ switch "2" {
 }
 
 // 测试编译加速
-PrintLine("测试编译加速")
+// PrintLine("测试编译加速")
 
 /*
 Compiler("fib:int (a:int) ->

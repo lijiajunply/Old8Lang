@@ -25,9 +25,9 @@ class Test{
    b <- 2
    func init(c,d)
    {
-      a <- c
-      b <- d
+      this.a <- c
+      this.b <- d
    }
    func Add()
-      return a+b
+      return this.a + this.b
 }

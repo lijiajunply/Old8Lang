@@ -45,7 +45,7 @@ public class AnyLangValue : LangValueType
         {
             // 运行变量表达式，获取结果
             // 如果是函数，则直接存储函数本身，不执行
-            var value = variable.Value is FuncLangValue funcValue ? funcValue : variable.Value.Run(Manager);
+            var value = variable.Value as FuncLangValue ?? variable.Value.Run(Manager);
             Result[variable.Key.IdName] = value;
         }
 
@@ -215,12 +215,22 @@ public class AnyLangValue : LangValueType
         }
     }
 
-    public void Set(LangId id, LangValueType langValueType) => Manager.Set(id, langValueType);
+    public void Set(LangId id, LangValueType langValueType)
+    {
+        Result.TryAdd(id.IdName, langValueType);
+    }
 
     public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)
     {
-        if (otherLangValueType is not AnyLangValue typeAny)
-            throw new TypeError(this, "AnyValue", otherLangValueType.GetType().Name);
+        if (otherLangValueType is not TypeLangValue type)
+            throw new TypeError(this, "Type", otherLangValueType.GetType().Name);
+        var info = manager.GetAny(new LangId(type.Value ?? ""));
+        if (info is not TypeTemplate typeTemplate)
+        {
+            throw new TypeError(this, "Type", otherLangValueType.GetType().Name);
+        }
+
+        var typeAny = typeTemplate.CreateInstance(manager);
 
         foreach (var a in Result)
         {
