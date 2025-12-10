@@ -1,0 +1,12 @@
+// 简单的try-catch测试
+PrintLine("=== 简单的try-catch测试 ===")
+
+try {
+    PrintLine("尝试执行可能抛出异常的代码")
+    result <- 10 / 0
+    PrintLine("这行不应该被执行")
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+PrintLine("✅ 测试完成")

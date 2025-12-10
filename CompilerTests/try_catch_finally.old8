@@ -1,0 +1,26 @@
+// try-catch-finally测试
+PrintLine("=== try-catch-finally测试 ===")
+
+try {
+    PrintLine("尝试执行可能抛出异常的代码")
+    result <- 10 / 0
+    PrintLine("这行不应该被执行")
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+} finally {
+    PrintLine("finally块被执行")
+}
+
+PrintLine("\n=== 没有异常的try-catch-finally测试 ===")
+
+try {
+    PrintLine("尝试执行正常的代码")
+    result <- 10 / 2
+    PrintLine("执行成功，结果: " + result)
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+} finally {
+    PrintLine("finally块被执行")
+}
+
+PrintLine("✅ 测试完成")

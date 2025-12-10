@@ -1,0 +1,48 @@
+// 全面的try-catch测试
+PrintLine("=== 全面的try-catch测试 ===")
+
+// 1. 基本的try-catch语句
+PrintLine("\n1. 基本的try-catch语句")
+try {
+    PrintLine("尝试执行可能抛出异常的代码")
+    result <- 10 / 0
+    PrintLine("这行不应该被执行")
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 2. try-catch-finally语句
+PrintLine("\n2. try-catch-finally语句")
+try {
+    PrintLine("尝试执行可能抛出异常的代码")
+    result <- 10 / 0
+    PrintLine("这行不应该被执行")
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+} finally {
+    PrintLine("finally块被执行")
+}
+
+// 3. 没有异常的try-catch-finally语句
+PrintLine("\n3. 没有异常的try-catch-finally语句")
+try {
+    PrintLine("尝试执行正常的代码")
+    result <- 10 / 2
+    PrintLine("执行成功，结果: " + result)
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+} finally {
+    PrintLine("finally块被执行")
+}
+
+// 4. 只有try-finally语句
+PrintLine("\n4. 只有try-finally语句")
+try {
+    PrintLine("尝试执行可能抛出异常的代码")
+    result <- 10 / 0
+    PrintLine("这行不应该被执行")
+} finally {
+    PrintLine("finally块被执行")
+}
+
+PrintLine("\n✅ 测试完成")

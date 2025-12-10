@@ -1,4 +1,5 @@
 using Old8Lang.LangParser;
+using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
@@ -62,7 +63,56 @@ public class TryStatement(
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        // IL生成暂不实现
+        // 开始异常处理块
+        ilGenerator.BeginExceptionBlock();
+        
+        // 生成try块的IL代码
+        tryBlock.GenerateIl(ilGenerator, local);
+        
+        // 生成catch块的IL代码
+        foreach (var (exceptionType, exceptionVar, catchBlock) in catchBlocks)
+        {
+            // 开始catch块，捕获所有类型的异常
+            ilGenerator.BeginCatchBlock(typeof(Exception));
+            
+            // 如果有异常变量，将其添加到局部变量管理器
+            if (exceptionVar != null && !string.IsNullOrEmpty(exceptionVar.IdName))
+            {
+                // 直接使用捕获到的异常对象
+                var exceptionLocal = ilGenerator.DeclareLocal(typeof(Exception));
+                ilGenerator.Emit(OpCodes.Stloc, exceptionLocal);
+                
+                // 将异常变量添加到局部变量管理器
+                local.AddLocalVar(exceptionVar.IdName, exceptionLocal);
+            }
+            else
+            {
+                // 如果没有异常变量，清空堆栈
+                ilGenerator.Emit(OpCodes.Pop);
+            }
+            
+            // 生成catch块的IL代码
+            catchBlock.GenerateIl(ilGenerator, local);
+            
+            // 如果添加了异常变量，移除它
+            if (exceptionVar != null && !string.IsNullOrEmpty(exceptionVar.IdName))
+            {
+                local.RemoveLocalVar(exceptionVar.IdName);
+            }
+        }
+        
+        // 如果有finally块，生成finally块的IL代码
+        if (finallyBlock != null)
+        {
+            // 开始finally块
+            ilGenerator.BeginFinallyBlock();
+            
+            // 生成finally块的IL代码
+            finallyBlock.GenerateIl(ilGenerator, local);
+        }
+        
+        // 结束异常处理块
+        ilGenerator.EndExceptionBlock();
     }
 
     private static bool IsMatch(Old8Exception exception, string exceptionType)
