@@ -1,0 +1,105 @@
+// 测试索引赋值操作的类型装箱支持
+PrintLine("=== 索引赋值操作的类型装箱支持测试 (解释模式) ===")
+
+// 测试1：列表索引赋值的类型装箱
+PrintLine("\n=== 测试1：列表索引赋值的类型装箱 ===")
+try {
+    // 创建整数列表
+    intList <- [1, 2, 3]
+    PrintLine("原始列表: " + intList)
+    PrintLine("列表元素类型: " + type(intList[0]))
+    
+    // 将字符串转换为整数赋值给列表
+    intList[0] <- "4" as int
+    PrintLine("字符串转整数赋值后: " + intList)
+    PrintLine("元素类型: " + type(intList[0]))
+    
+    // 将浮点数转换为整数赋值给列表
+    intList[1] <- 5.5 as int
+    PrintLine("浮点数转整数赋值后: " + intList)
+    PrintLine("元素类型: " + type(intList[1]))
+    
+    // 测试类型不匹配的情况（应该失败）
+    // intList[2] <- "字符串"  // 应该失败，无法将字符串直接转换为整数
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 测试2：数组索引赋值的类型装箱
+PrintLine("\n=== 测试2：数组索引赋值的类型装箱 ===")
+try {
+    // 创建浮点数数组
+    doubleArray <- [1.1, 2.2, 3.3]
+    PrintLine("原始数组: " + doubleArray)
+    PrintLine("数组元素类型: " + type(doubleArray[0]))
+    
+    // 将整数转换为浮点数赋值给数组
+    doubleArray[0] <- 4 as double
+    PrintLine("整数转浮点数赋值后: " + doubleArray)
+    PrintLine("元素类型: " + type(doubleArray[0]))
+    
+    // 将字符串转换为浮点数赋值给数组
+    doubleArray[1] <- "5.5" as double
+    PrintLine("字符串转浮点数赋值后: " + doubleArray)
+    PrintLine("元素类型: " + type(doubleArray[1]))
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 测试3：布尔类型的装箱
+PrintLine("\n=== 测试3：布尔类型的装箱 ===")
+try {
+    // 创建布尔列表
+    boolList <- [true, false, true]
+    PrintLine("原始列表: " + boolList)
+    PrintLine("列表元素类型: " + type(boolList[0]))
+    
+    // 将整数转换为布尔值赋值给列表
+    boolList[0] <- 1 as bool
+    PrintLine("整数转布尔值赋值后: " + boolList)
+    PrintLine("元素类型: " + type(boolList[0]))
+    
+    boolList[1] <- 0 as bool
+    PrintLine("整数0转布尔值赋值后: " + boolList)
+    PrintLine("元素类型: " + type(boolList[1]))
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 测试4：字符类型的装箱
+PrintLine("\n=== 测试4：字符类型的装箱 ===")
+try {
+    // 创建字符列表
+    charList <- ['a', 'b', 'c']
+    PrintLine("原始列表: " + charList)
+    PrintLine("列表元素类型: " + type(charList[0]))
+    
+    // 将字符串转换为字符赋值给列表
+    charList[0] <- "d" as char
+    PrintLine("字符串转字符赋值后: " + charList)
+    PrintLine("元素类型: " + type(charList[0]))
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 测试5：动态类型列表的装箱
+PrintLine("\n=== 测试5：动态类型列表的装箱 ===")
+try {
+    // 创建混合类型列表
+    dynamicList <- [1, "2", 3.3]
+    PrintLine("原始列表: " + dynamicList)
+    
+    // 动态列表应该允许不同类型的赋值
+    dynamicList[0] <- "4"
+    PrintLine("字符串赋值后: " + dynamicList)
+    
+    dynamicList[1] <- 5.5
+    PrintLine("浮点数赋值后: " + dynamicList)
+    
+    dynamicList[2] <- true
+    PrintLine("布尔值赋值后: " + dynamicList)
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+PrintLine("\n✅ 所有索引赋值操作的类型装箱支持测试完成 (解释模式)")

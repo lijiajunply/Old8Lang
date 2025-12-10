@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
@@ -275,31 +276,80 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
         switch (Id.IdName)
         {
             case "PrintLine":
-                var id = Ids[0];
-                id.LoadIlValue(ilGenerator, local);
-                var type = id.OutputType(local)!;
-                ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", [type])!);
+                // 处理多个参数，将它们转换为字符串并拼接
+                if (Ids.Count == 0)
+                {
+                    // 没有参数，调用 Console.WriteLine()
+                    ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", Type.EmptyTypes)!);
+                    return;
+                }
+                
+                // 简化实现：只处理第一个参数，将其转换为字符串
+                var printLineExpr = Ids[0];
+                printLineExpr.LoadIlValue(ilGenerator, local);
+                var printLineType = printLineExpr.OutputType(local);
+                
+                // 如果参数不是字符串类型，调用 ToString() 方法转换为字符串
+                if (printLineType != typeof(string))
+                {
+                    // 获取 ToString() 方法
+                    var toStringMethod = typeof(object).GetMethod("ToString", Type.EmptyTypes)!;
+                    // 如果是值类型，先装箱
+                    if (printLineType != null && printLineType.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Box, printLineType);
+                    }
+                    // 调用 ToString() 方法
+                    ilGenerator.Emit(OpCodes.Callvirt, toStringMethod);
+                }
+                
+                // 调用 Console.WriteLine(string)
+                ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", [typeof(string)])!);
                 return;
             case "Print":
-                id = Ids[0];
-                id.LoadIlValue(ilGenerator, local);
-                ilGenerator.Emit(OpCodes.Call,
-                    typeof(Console).GetMethod("Write", [id.OutputType(local)!])!);
+                // 处理多个参数，将它们转换为字符串并拼接
+                if (Ids.Count == 0)
+                {
+                    // 没有参数，直接返回
+                    return;
+                }
+                
+                // 简化实现：只处理第一个参数，将其转换为字符串
+                var printExpr = Ids[0];
+                printExpr.LoadIlValue(ilGenerator, local);
+                var printType = printExpr.OutputType(local);
+                
+                // 如果参数不是字符串类型，调用 ToString() 方法转换为字符串
+                if (printType != typeof(string))
+                {
+                    // 获取 ToString() 方法
+                    var toStringMethod = typeof(object).GetMethod("ToString", Type.EmptyTypes)!;
+                    // 如果是值类型，先装箱
+                    if (printType != null && printType.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Box, printType);
+                    }
+                    // 调用 ToString() 方法
+                    ilGenerator.Emit(OpCodes.Callvirt, toStringMethod);
+                }
+                
+                // 调用 Console.Write(string)
+                ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("Write", [typeof(string)])!);
                 return;
             case "Json":
                 return;
             case "ToObj":
                 return;
             case "Len":
-                id = Ids[0];
-                id.LoadIlValue(ilGenerator, local);
-                type = id.OutputType(local)!;
-                var lengthProp = type.GetProperty(type.IsAssignableTo(typeof(object[])) ? "Length" : "Count");
+                var lenId = Ids[0];
+                lenId.LoadIlValue(ilGenerator, local);
+                var lenType = lenId.OutputType(local)!;
+                var lengthProp = lenType.GetProperty(lenType.IsAssignableTo(typeof(object[])) ? "Length" : "Count");
                 ilGenerator.Emit(OpCodes.Call, lengthProp!.GetGetMethod()!);
                 return;
             case "Type":
-                id = Ids[0];
-                id.LoadIlValue(ilGenerator, local);
+                var typeId = Ids[0];
+                typeId.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Call, typeof(object).GetMethod("GetType")!);
                 return;
             case "Compiler":

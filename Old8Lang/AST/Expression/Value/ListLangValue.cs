@@ -53,7 +53,9 @@ public class ListLangValue : LangValueType, ILangList
             if (i.Value < 0 || i.Value >= Values.Count)
                 throw new IndexError(this, i.Value, Values.Count);
 
-            // 类型检查：确保添加的元素类型与列表中已有的元素类型一致
+            // 类型检查和转换：确保添加的元素类型与列表中已有的元素类型一致
+            // 如果类型不一致，尝试进行类型转换
+            LangValueType convertedValue = value;
             if (Values.Count > 0)
             {
                 var existingType = Values[0].TypeToString().ToLower();
@@ -61,11 +63,23 @@ public class ListLangValue : LangValueType, ILangList
 
                 if (existingType != newValueType)
                 {
-                    throw new TypeError(this, existingType, newValueType, "列表元素类型必须一致");
+                    // 尝试进行类型转换
+                    try
+                    {
+                        // 创建类型值用于转换
+                        var targetType = new TypeLangValue(existingType);
+                        // 调用 Converse 方法进行类型转换
+                        convertedValue = value.Converse(targetType, new LangParser.VariateManager());
+                    }
+                    catch (Exception e)
+                    {
+                        // 如果转换失败，抛出类型不匹配错误
+                        throw new TypeError(this, existingType, newValueType, $"列表元素类型必须一致，无法将 {newValueType} 转换为 {existingType}: {e.Message}");
+                    }
                 }
             }
 
-            Values[i.Value] = value;
+            Values[i.Value] = convertedValue;
         }
         else
         {

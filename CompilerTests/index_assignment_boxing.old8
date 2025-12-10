@@ -1,0 +1,99 @@
+// 测试索引赋值操作的类型装箱支持
+PrintLine("=== 索引赋值操作的类型装箱支持测试 (编译模式) ===")
+
+// 测试1：列表索引赋值的类型装箱
+PrintLine("\n=== 测试1：列表索引赋值的类型装箱 ===")
+try {
+    // 创建整数列表
+    intList <- [1, 2, 3]
+    PrintLine("原始列表: " + intList)
+    PrintLine("列表元素类型: " + type(intList[0]))
+    
+    // 将字符串转换为整数赋值给列表
+    intList[0] <- "4" as int
+    PrintLine("字符串转整数赋值后: " + intList)
+    PrintLine("列表元素类型: " + type(intList[0]))
+    
+    // 将浮点数转换为整数赋值给列表
+    intList[1] <- 5.5 as int
+    PrintLine("浮点数转整数赋值后: " + intList)
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 测试2：数组索引赋值的类型装箱
+PrintLine("\n=== 测试2：数组索引赋值的类型装箱 ===")
+try {
+    // 创建浮点数数组
+    doubleArray <- [1.1, 2.2, 3.3]
+    PrintLine("原始数组: " + doubleArray)
+    PrintLine("数组元素类型: " + type(doubleArray[0]))
+    
+    // 将整数转换为浮点数赋值给数组
+    doubleArray[1] <- 4
+    PrintLine("整数赋值后: " + doubleArray)
+    
+    // 将字符串转换为浮点数赋值给数组
+    doubleArray[1] <- "5.5"
+    PrintLine("字符串转浮点数赋值后: " + doubleArray)
+}
+catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 测试3：数组索引赋值的类型转换
+PrintLine("\n=== 测试3：数组索引赋值的类型转换 ===")
+try {
+    // 创建浮点数数组
+    doubleArray <- [1.1, 2.2, 3.3]
+    PrintLine("原始数组: " + doubleArray)
+    PrintLine("数组元素类型: " + type(doubleArray[0]))
+    
+    // 将字符串转换为浮点数赋值给数组
+    doubleArray[0] <- "4.4"
+    PrintLine("字符串转浮点数赋值后: " + doubleArray)
+    PrintLine("数组元素类型: " + type(doubleArray[0]))
+    
+    // 将整数转换为浮点数赋值给数组
+    doubleArray[1] <- 5
+    PrintLine("整数转浮点数赋值后: " + doubleArray)
+    PrintLine("数组元素类型: " + type(doubleArray[1]))
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 测试4：布尔类型数组的索引赋值
+PrintLine("\n=== 测试4：布尔类型数组的索引赋值 ===")
+try {
+    // 创建布尔数组
+    boolArray <- [true, false, true]
+    PrintLine("原始布尔数组: " + boolArray)
+    
+    // 将整数转换为布尔赋值给数组
+    boolArray[0] <- 0  // 0 转换为 false
+    PrintLine("整数0赋值后: " + boolArray)
+    PrintLine("数组元素类型: " + type(boolArray[0]))
+    
+    // 将字符串转换为布尔赋值给数组
+    boolArray[1] <- "true"
+    PrintLine("字符串'true'赋值后: " + boolArray)
+    PrintLine("数组元素类型: " + type(boolArray[1]))
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 测试5：类型不匹配的错误处理
+PrintLine("\n=== 测试5：类型不匹配的错误处理 ===")
+try {
+    // 创建字符串列表
+    strList <- ["a", "b", "c"]
+    PrintLine("原始字符串列表: " + strList)
+    
+    // 尝试将整数直接赋值给字符串列表（应该失败，无法将整数转换为字符串）
+    // strList[0] <- 123  // 应该失败，无法将整数直接转换为字符串
+    // PrintLine("整数赋值后: " + strList)
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+PrintLine("\n✅ 所有测试完成！")
