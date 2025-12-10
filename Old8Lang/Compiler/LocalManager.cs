@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Statement;
+using Old8Lang.Error;
 using Old8Lang.LangParser;
 
 namespace Old8Lang.Compiler;
@@ -17,6 +18,47 @@ public class LocalManager
     // break和continue标签
     public Label? BreakLabel { get; set; }
     public Label? ContinueLabel { get; set; }
+    
+    /// <summary>
+    /// 记录调试信息
+    /// </summary>
+    /// <param name="message">调试信息</param>
+    /// <param name="position">源代码位置</param>
+    public void LogDebug(string message, SourcePosition position)
+    {
+        Console.WriteLine($"[DEBUG] {FilePath}:{position.Line}:{position.Column} - {message}");
+    }
+    
+    /// <summary>
+    /// 报告编译错误
+    /// </summary>
+    /// <param name="message">错误信息</param>
+    /// <param name="position">源代码位置</param>
+    /// <exception cref="CompilerException">编译异常</exception>
+    public void ReportError(string message, SourcePosition position)
+    {
+        var errorMessage = $"{FilePath}:{position.Line}:{position.Column} - {message}";
+        throw new CompilerException(errorMessage, position);
+    }
+    
+    /// <summary>
+    /// 验证类型兼容性
+    /// </summary>
+    /// <param name="expected">预期类型</param>
+    /// <param name="actual">实际类型</param>
+    /// <param name="position">源代码位置</param>
+    /// <returns>是否兼容</returns>
+    public bool ValidateType(Type? expected, Type? actual, SourcePosition position)
+    {
+        if (expected == null || actual == null)
+            return false;
+        
+        if (expected == actual || expected.IsAssignableFrom(actual))
+            return true;
+        
+        ReportError($"类型不兼容: 预期 {expected.Name}, 实际 {actual.Name}", position);
+        return false;
+    }
 
     public LocalManager New()
     {

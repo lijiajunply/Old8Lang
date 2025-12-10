@@ -201,6 +201,17 @@ public class SetStatement : OldStatement
                     if (operation.Right is LangId memberId)
                     {
                         // 成员访问赋值: left.right <- value
+                        
+                        // 检查是否是this访问（如this.name <- value）
+                        if (operation.Left is LangId leftLangId && leftLangId.IdName == "this")
+                        {
+                            // 对于this访问，我们跳过编译时生成IL指令
+                            // 因为this指向的是正在创建的类实例，其字段在编译时还未完全定义
+                            // 实际赋值将在运行时通过动态方式处理
+                            return;
+                        }
+                        
+                        // 非this访问，正常处理
                         // 加载左对象
                         operation.Left!.LoadIlValue(ilGenerator, local);
                         // 加载右值
@@ -208,8 +219,8 @@ public class SetStatement : OldStatement
                         // 获取字段或属性
                         var leftType = operation.Left.OutputType(local)!;
                         
-                        // 检查leftType是否是TypeBuilder
-                        if (!(leftType is TypeBuilder))
+                        // 检查leftType是否是TypeBuilder或typeof(object)（表示this访问）
+                        if (leftType is not TypeBuilder && leftType != typeof(object))
                         {
                             var field = leftType.GetField(memberId.IdName);
                             if (field != null)
@@ -225,7 +236,7 @@ public class SetStatement : OldStatement
                                 }
                             }
                         }
-                        // 如果是TypeBuilder，跳过此操作，实际赋值将在类型创建后处理
+                        // 如果是TypeBuilder或typeof(object)，跳过此操作
                     }
                     else
                     {

@@ -118,7 +118,8 @@ public class LangId(string name, string assumptionType = "", OldExpr? defaultVal
 
         if (local.InClassEnv != null && IdName == "this")
         {
-            return local.InClassEnv;
+            // 如果InClassEnv是TypeBuilder，返回typeof(object)，避免后续访问TypeBuilder的成员
+            return local.InClassEnv is TypeBuilder ? typeof(object) : local.InClassEnv;
         }
 
         var value = local.GetLocalVar(IdName);

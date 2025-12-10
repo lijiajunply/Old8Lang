@@ -33,14 +33,14 @@ public class OldExpr : IOldLangTree
         var type = OutputType(local);
         if (type == null) return;
         var b = local.GetLocalVar(idName);
-        var valueLocal = ilGenerator.DeclareLocal(type);
         if (b != null)
         {
             if (b.LocalType != type)
             {
                 local.RemoveLocalVar(idName);
-                local.AddLocalVar(idName, valueLocal);
-                ilGenerator.Emit(OpCodes.Stloc, valueLocal.LocalIndex);
+                b = ilGenerator.DeclareLocal(type);
+                local.AddLocalVar(idName, b);
+                ilGenerator.Emit(OpCodes.Stloc, b.LocalIndex);
             }
             else
             {
@@ -48,12 +48,13 @@ public class OldExpr : IOldLangTree
             }
             return;
         }
-        ilGenerator.Emit(OpCodes.Stloc, valueLocal.LocalIndex);
-        local.AddLocalVar(idName, valueLocal);
+        b = ilGenerator.DeclareLocal(type);
+        local.AddLocalVar(idName, b);
+        ilGenerator.Emit(OpCodes.Stloc, b.LocalIndex);
     }
 
     public virtual Type? OutputType(LocalManager local)
     {
-        throw new InvalidOperationError(this, "表达式未实现LoadIlValue方法", "请在子类中实现LoadIlValue方法");
+        throw new InvalidOperationError(this, "表达式未实现OutputType方法", "请在子类中实现OutputType方法");
     }
 }

@@ -314,6 +314,13 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         // 直接返回类型信息，不创建临时方法
         var leftType = Left?.OutputType(local);
         var rightType = Right?.OutputType(local);
+        
+        // 如果leftType是TypeBuilder，返回typeof(object)，避免后续访问TypeBuilder的成员
+        if (leftType is TypeBuilder)
+        {
+            return typeof(object);
+        }
+        
         return leftType == typeof(object) ? rightType : leftType;
     }
 
@@ -321,6 +328,18 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
     {
         var leftType = Left?.OutputType(local);
         var rightType = Right?.OutputType(local);
+        
+        // 如果leftType是TypeBuilder，返回typeof(object)，避免后续访问TypeBuilder的成员
+        if (leftType is TypeBuilder)
+        {
+            leftType = typeof(object);
+        }
+        
+        // 如果rightType是TypeBuilder，返回typeof(object)，避免后续访问TypeBuilder的成员
+        if (rightType is TypeBuilder)
+        {
+            rightType = typeof(object);
+        }
 
         if (Left == null)
         {
