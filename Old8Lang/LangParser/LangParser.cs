@@ -413,7 +413,11 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 // 如果不是赋值语句，回退到原始位置
                 CurrentIndex = savedIndex;
             }
-            catch
+            catch (Old8Exception)
+            {
+                throw;
+            }
+            catch (Exception)
             {
                 // 如果解析左值表达式失败，回退到原始位置
                 CurrentIndex = savedIndex;

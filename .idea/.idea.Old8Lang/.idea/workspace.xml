@@ -16,15 +16,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Changes">
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/other.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Ex/other.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SyntaxTests/test_extreme_values.old8" beforeDir="false" afterPath="$PROJECT_DIR$/SyntaxTests/test_extreme_values.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,12 +50,17 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///Immediate 窗口" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/OldExpr.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/TryStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangInterpreter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1f/4c54500e/List`1.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/35/58ca714a/RuntimeType.cs" root0="FORCE_HIGHLIGHTING" />
@@ -86,35 +85,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
-    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
-    ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Debug",
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "editor.preferences.smartKeys_rider",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Run&quot;,
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.smartKeys_rider&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "PLAIN_TEXT",
-      "Markdown"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;PLAIN_TEXT&quot;,
+      &quot;Markdown&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
@@ -333,7 +332,7 @@
       <workItem from="1765278822007" duration="179000" />
       <workItem from="1765279105952" duration="28440000" />
       <workItem from="1765360741424" duration="2635000" />
-      <workItem from="1765385357424" duration="5930000" />
+      <workItem from="1765385357424" duration="7237000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -678,7 +677,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="110" />
+    <option name="localTasksCounter" value="112" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -705,8 +704,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="将Get属性变为只读变量" />
-    <MESSAGE value="完成基础语法" />
     <MESSAGE value="for in可以进行编译" />
     <MESSAGE value="加入函数，但是现在还不能使用递归" />
     <MESSAGE value="函数解决" />
@@ -730,7 +727,9 @@
     <MESSAGE value="feat(cli): 完善命令行功能与帮助文档&#10;&#10;- 重构命令行参数解析逻辑，支持交互式输入&#10;- 新增完整的帮助文档，包含命令格式和使用示例&#10;- 实现版本信息、语言信息、导入库信息显示功能&#10;- 添加导入路径修改功能&#10;- 完善文件执行模式，支持解释模式和编译模式&#10;- 增强错误处理和用户提示信息&#10;- 更新测试用例，验证新功能正确性" />
     <MESSAGE value="refactor(core): 重构代码路径和JSON配置管理&#10;&#10;- 将 BasicInfo 类移动到 Old8Lang.App 命名空间&#10;- 从 BasicInfo 中移除 CodePath 和 JsonPath 属性&#10;- 在 Apis 类中新增 CodePath 和 JsonPath 属性及相应逻辑&#10;- 移动 LibInfo 类定义从 Old8Lang.Lib 到 Old8Lang 命名空间&#10;- 更新 Program.cs 中的命名空间引用&#10;- 修复文件读取路径引用为 Apis.CodePath&#10;- 删除冗余的 using 语句和无用的工作区配置项" />
     <MESSAGE value="feat(parser): 支持科学计数法解析&#10;&#10;- 在词法分析器中添加对科学计数法的支持，包括正负指数处理&#10;- 修改数字字面量解析逻辑，使用decimal.Parse提高精度&#10;- 更新测试用例以验证科学计数法功能&#10;- 调整字符串模板格式化方式&#10;- 清理冗余的测试文件和代码&#10;- 更新开发环境配置和调试设置" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 支持科学计数法解析&#10;&#10;- 在词法分析器中添加对科学计数法的支持，包括正负指数处理&#10;- 修改数字字面量解析逻辑，使用decimal.Parse提高精度&#10;- 更新测试用例以验证科学计数法功能&#10;- 调整字符串模板格式化方式&#10;- 清理冗余的测试文件和代码&#10;- 更新开发环境配置和调试设置" />
+    <MESSAGE value="refactor(core): 优化表达式求值与类型转换逻辑&#10;&#10;- 使用空合并运算符简化变量赋值逻辑&#10;- 重构类型转换方法，增强类型检查与实例创建流程&#10;- 更新字典值处理逻辑，确保键值对正确运行与设置&#10;- 修正实例表达式的ID运行机制，确保参数正确求值&#10;- 优化IL生成代码，改进数值运算与类型转换处理&#10;- 更新示例文件中的this引用语法，提高代码准确性&#10;- 调整极端值测试用例，减少嵌套层级以提升可读性&#10;- 更新IDE配置与调试断点，适配最新代码结构" />
+    <MESSAGE value="fix(parser): 修复解析器中的语法错误处理和代码格式问题&#10;&#10;- 修复了块结束标志的处理逻辑&#10;- 优化了函数返回类型声明的错误提示&#10;- 改进了幂运算和点运算符的解析顺序&#10;- 统一了源码位置信息的构造方式&#10;- 修正了元组解析时的逗号处理逻辑&#10;- 完善了默认参数值的解析条件判断&#10;- 清理了不必要的空行和代码格式问题" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(parser): 修复解析器中的语法错误处理和代码格式问题&#10;&#10;- 修复了块结束标志的处理逻辑&#10;- 优化了函数返回类型声明的错误提示&#10;- 改进了幂运算和点运算符的解析顺序&#10;- 统一了源码位置信息的构造方式&#10;- 修正了元组解析时的逗号处理逻辑&#10;- 完善了默认参数值的解析条件判断&#10;- 清理了不必要的空行和代码格式问题" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
