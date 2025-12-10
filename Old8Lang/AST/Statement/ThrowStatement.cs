@@ -12,9 +12,8 @@ public class ThrowStatement(OldExpr throwExpr, SourcePosition position = default
         var value = throwExpr.Run(manager);
         // 使用CustomError抛出异常
         throw new CustomError(
-            value.ToString(),
             this,
-            "这是一个自定义抛出的异常");
+            value.ToDisplayString());
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)

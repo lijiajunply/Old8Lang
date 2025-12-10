@@ -198,10 +198,9 @@ if (command == fromFileCmd)
         var b = aLangInterpreter.Build(code, args[1]);
         b.Run(aLangInterpreter.Manager);
     }
-    catch
+    catch (Exception e)
     {
 #if DEBUG
-        //Console.WriteLine(e);
         throw;
 #else
         Console.WriteLine(e.Message);
@@ -230,7 +229,7 @@ if (command == compilerCmd)
     var interpreter = new LangInterpreter();
     var sw = new Stopwatch();
     sw.Start();
-    var build = interpreter.Build(Apis.FromFile(args[1]));
+    var build = interpreter.Build(Apis.FromFile(args[1]), args[1]);
     sw.Stop();
     var ts = sw.Elapsed.TotalMilliseconds;
     var time = $"------------------\nParser Build Time : {ts}ms\n";
@@ -243,7 +242,7 @@ if (command == compilerCmd)
     {
         action();
     }
-    catch
+    catch (Exception e)
     {
 #if DEBUG
         throw;
@@ -251,6 +250,7 @@ if (command == compilerCmd)
         Console.WriteLine(e.Message);
 #endif
     }
+
     sw.Stop();
     ts = sw.Elapsed.TotalMilliseconds;
     time += $"Process Run Time : {ts}ms\n";
@@ -292,7 +292,6 @@ if (command == syntaxTestCmd)
     catch (Exception e)
     {
 #if DEBUG
-        Console.WriteLine(e);
         throw;
 #else
         Console.WriteLine(e.Message);

@@ -1239,8 +1239,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                CurrentToken.Type == LangTokenType.Xor)
         {
             var operatorToken = CurrentToken;
-            var position =
-                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position = CreateSourcePosition(operatorToken);
             Expect(operatorToken.Type);
             var right = ParseBinaryExpression();
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
@@ -1298,8 +1297,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                or LangTokenType.NotEquals or LangTokenType.LessThan or LangTokenType.GreaterThan)
         {
             var operatorToken = CurrentToken;
-            var position =
-                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position = CreateSourcePosition(operatorToken);
             Expect(operatorToken.Type);
             var right = ParseNumberOpera1();
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
@@ -1316,8 +1314,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         while (CurrentToken.Type == LangTokenType.Plus || CurrentToken.Type == LangTokenType.Minus)
         {
             var operatorToken = CurrentToken;
-            var position =
-                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position = CreateSourcePosition(operatorToken);
             Expect(operatorToken.Type);
             var right = ParseNumberOpera2();
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
@@ -1338,8 +1335,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                CurrentToken.Type == LangTokenType.Percent)
         {
             var operatorToken = CurrentToken;
-            var position =
-                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position = CreateSourcePosition(operatorToken);
             Expect(operatorToken.Type);
             var right = ParsePrimary();
             // 处理右操作数的点运算符
@@ -1351,26 +1347,22 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         if (CurrentToken.Type == LangTokenType.PlusPlus)
         {
             var operatorToken = CurrentToken;
-            var position =
-                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position = CreateSourcePosition(operatorToken);
             Expect(LangTokenType.PlusPlus);
             left = new Operation(left, OperationType.PLUS, new IntLangValue(1), position);
         }
         else if (CurrentToken.Type == LangTokenType.MinusMinus)
         {
             var operatorToken = CurrentToken;
-            var position =
-                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position = CreateSourcePosition(operatorToken);
             Expect(LangTokenType.MinusMinus);
             left = new Operation(left, OperationType.MINUS, new IntLangValue(1), position);
         }
-
         // 处理 as 操作符
         while (CurrentToken.Type == LangTokenType.As)
         {
             var operatorToken = CurrentToken;
-            var position =
-                new SourcePosition(operatorToken.Line, operatorToken.Column, tokenValue: operatorToken.Value);
+            var position = CreateSourcePosition(operatorToken);
             Expect(LangTokenType.As);
             var right = ParsePrimary();
             // 处理右操作数的点运算符
@@ -2175,7 +2167,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     private IntLangValue ParseIntLiteral()
     {
         var numberToken = CurrentToken;
-        var position = new SourcePosition(numberToken.Line, numberToken.Column, tokenValue: numberToken.Value);
+        var position = CreateSourcePosition(numberToken);
         var value = numberToken.Value;
         Expect(LangTokenType.Number);
         return new IntLangValue(int.Parse(value), position);
@@ -2188,7 +2180,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     private DoubleLangValue ParseDoubleLiteral()
     {
         var numberToken = CurrentToken;
-        var position = new SourcePosition(numberToken.Line, numberToken.Column, tokenValue: numberToken.Value);
+        var position = CreateSourcePosition(numberToken);
         var value = numberToken.Value;
         Expect(LangTokenType.Number);
         if (!value.Contains('E') && !value.Contains('e')) return new DoubleLangValue(double.Parse(value), position);
@@ -2203,7 +2195,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     private BoolLangValue ParseBoolLiteral()
     {
         var boolToken = CurrentToken;
-        var position = new SourcePosition(boolToken.Line, boolToken.Column, tokenValue: boolToken.Value);
+        var position = CreateSourcePosition(boolToken);
         var value = boolToken.Type == LangTokenType.True;
         Expect(boolToken.Type);
         return new BoolLangValue(value, position);
@@ -2212,7 +2204,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     private NullLangValue ParseNullLiteral()
     {
         var nullToken = CurrentToken;
-        var position = new SourcePosition(nullToken.Line, nullToken.Column, tokenValue: nullToken.Value);
+        var position = CreateSourcePosition(nullToken);
         Expect(LangTokenType.Null);
         return new NullLangValue(position);
     }

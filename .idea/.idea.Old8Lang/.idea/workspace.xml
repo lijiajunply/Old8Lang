@@ -17,26 +17,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/使语法解析更加严格的实施计划.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.trae/documents/生成Old8Lang语法测试用例计划.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/2025-12-10-14-00-syntax.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_basic_statements.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_edge_cases.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_error_syntax.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_expressions.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_functions_classes.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_special_syntax.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/运行时错误上下文展示功能实现.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/22_uncaught_runtime_error.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ThrowStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ThrowStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang_Grammar.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SyntaxTests/ternary_debug.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SyntaxTests/ternary_debug2.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SyntaxTests/ternary_final.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SyntaxTests/ternary_grammar.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SyntaxTests/ternary_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SyntaxTests/ternary_test.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SyntaxTests/ternary_token_debug.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SyntaxTests/ternary_token_test.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_syntax_tests.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run_syntax_tests.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run_compiler_tests.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run_compiler_tests.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run_interpreter_tests.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run_interpreter_tests.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -370,7 +360,7 @@
       <workItem from="1765277636089" duration="6000" />
       <workItem from="1765277821785" duration="994000" />
       <workItem from="1765278822007" duration="179000" />
-      <workItem from="1765279105952" duration="21980000" />
+      <workItem from="1765279105952" duration="23398000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
