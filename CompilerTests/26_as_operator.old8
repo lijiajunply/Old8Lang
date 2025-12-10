@@ -1,0 +1,11 @@
+// 测试AS运算符的编译模式实现 - 简化测试
+PrintLine("基本类型转换测试")
+PrintLine("5 as int: " + (5 as int))
+PrintLine("5 as double: " + (5 as double))
+PrintLine("5.5 as int: " + (5.5 as int))
+PrintLine("5.5 as double: " + (5.5 as double))
+
+// 布尔值转换测试
+PrintLine("\n布尔值转换测试")
+PrintLine("1 as bool: " + (1 as bool))
+PrintLine("0 as bool: " + (0 as bool))

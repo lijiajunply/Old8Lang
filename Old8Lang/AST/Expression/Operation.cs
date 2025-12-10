@@ -614,87 +614,57 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                         _ => typeof(object)
                     };
                     
-                    // 生成类型转换指令
-                    if (leftType == typeof(string))
+                    // 确保leftType不为null
+                    if (leftType == null) leftType = typeof(object);
+                    
+                    // 只处理基本的数值类型转换，避免复杂的方法调用
+                    if (leftType == typeof(int))
                     {
-                        // 字符串到其他类型的转换
-                        if (targetType == typeof(int))
+                        if (targetType == typeof(double))
                         {
-                            // 字符串转整数
-                            ilGenerator.Emit(OpCodes.Call, typeof(int).GetMethod("Parse", [typeof(string)])!);
-                        }
-                        else if (targetType == typeof(double))
-                        {
-                            // 字符串转双精度浮点数
-                            ilGenerator.Emit(OpCodes.Call, typeof(double).GetMethod("Parse", [typeof(string)])!);
+                            // 整数转双精度浮点数
+                            ilGenerator.Emit(OpCodes.Conv_R8);
                         }
                         else if (targetType == typeof(bool))
                         {
-                            // 字符串转布尔值
-                            ilGenerator.Emit(OpCodes.Call, typeof(bool).GetMethod("Parse", [typeof(string)])!);
+                            // 整数转布尔值：非零即真
+                            ilGenerator.Emit(OpCodes.Ldc_I4_0);
+                            ilGenerator.Emit(OpCodes.Cgt);
                         }
-                        else
+                    }
+                    else if (leftType == typeof(double))
+                    {
+                        if (targetType == typeof(int))
                         {
-                            // 对于其他类型，直接返回字符串
-                            // 无需转换
+                            // 双精度浮点数转整数
+                            ilGenerator.Emit(OpCodes.Conv_I4);
                         }
                     }
-                    else if (targetType == typeof(string))
+                    else if (leftType == typeof(bool))
                     {
-                        // 其他类型到字符串的转换
-                        if (leftType != null)
+                        if (targetType == typeof(int))
                         {
-                            // 调用ToString方法
-                            ilGenerator.Emit(OpCodes.Call, leftType.GetMethod("ToString", Type.EmptyTypes)!);
+                            // 布尔值转整数：true->1, false->0
+                            // 布尔值在栈上是1(true)或0(false)，直接转换为int即可
                         }
                     }
-                    else if (leftType == typeof(int) && targetType == typeof(double))
+                    // 字符串转换暂时不实现，避免InvalidProgramException
+                    // 其他情况：如果类型不同但都是值类型，尝试使用Convert类转换
+                    else if (leftType.IsValueType && targetType.IsValueType && leftType != targetType)
                     {
-                        // 整数转双精度浮点数
-                        ilGenerator.Emit(OpCodes.Conv_R8);
-                    }
-                    else if (leftType == typeof(double) && targetType == typeof(int))
-                    {
-                        // 双精度浮点数转整数
-                        ilGenerator.Emit(OpCodes.Conv_I4);
-                    }
-                    else if (leftType == typeof(int) && targetType == typeof(bool))
-                    {
-                        // 整数转布尔值
-                        ilGenerator.Emit(OpCodes.Ldc_I4_0);
-                        ilGenerator.Emit(OpCodes.Cgt);
-                    }
-                    else if (leftType == typeof(bool) && targetType == typeof(int))
-                    {
-                        // 布尔值转整数
-                        ilGenerator.Emit(OpCodes.Ldc_I4_0);
-                        ilGenerator.Emit(OpCodes.Ceq);
-                    }
-                    else if (leftType != null && leftType.IsValueType && targetType.IsValueType)
-                    {
-                        // 其他值类型转换，使用Convert类
                         var convertMethod = typeof(Convert).GetMethod($"To{targetType.Name}", [leftType]);
                         if (convertMethod != null)
                         {
                             ilGenerator.Emit(OpCodes.Call, convertMethod);
                         }
-                        else
-                        {
-                            // 装箱后再转换
-                            ilGenerator.Emit(OpCodes.Box, leftType);
-                            var objectConvertMethod = typeof(Convert).GetMethod($"To{targetType.Name}", [typeof(object)]);
-                            if (objectConvertMethod != null)
-                            {
-                                ilGenerator.Emit(OpCodes.Call, objectConvertMethod);
-                            }
-                        }
                     }
-                    else if (leftType != null && leftType.IsValueType)
+                    // 其他情况：值类型装箱，引用类型拆箱
+                    else if (leftType.IsValueType && !targetType.IsValueType)
                     {
                         // 值类型到引用类型转换，装箱
                         ilGenerator.Emit(OpCodes.Box, leftType);
                     }
-                    else if (targetType.IsValueType)
+                    else if (!leftType.IsValueType && targetType.IsValueType)
                     {
                         // 引用类型到值类型转换，拆箱
                         ilGenerator.Emit(OpCodes.Unbox_Any, targetType);
@@ -702,7 +672,12 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     
                     return targetType;
                 }
-                return typeof(object);
+                else
+                {
+                    // 非LangId类型，返回object类型
+                    Left!.LoadIlValue(ilGenerator, local);
+                    return typeof(object);
+                }
             case OperationType.CONCAT:
                 if (local.InClassEnv != null && Left is LangId { IdName: "this" })
                 {
