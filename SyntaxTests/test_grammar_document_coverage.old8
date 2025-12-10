@@ -20,7 +20,7 @@ obj.method()
 
 // 索引表达式
 array[0] <- 1
-list[1] <- 2
+list1[1] <- 2 // list 是关键词，不可用于变量命名
 dict["key"] <- "value"
 
 // 三元表达式（语法文档提到）

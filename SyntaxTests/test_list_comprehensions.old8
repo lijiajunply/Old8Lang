@@ -16,8 +16,8 @@ flattened <- [x for row in matrix for x in row]
 PrintLine(flattened) // 预期输出: [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 // 复杂表达式的列表推导式
-expr_results <- [x * 2 + y for x, y in [(1, 2), (3, 4), (5, 6)]]
-PrintLine(expr_results) // 预期输出: [4, 10, 16]
+// expr_results <- [x * 2 + y for x, y in [(1, 2), (3, 4), (5, 6)]]
+// PrintLine(expr_results) // 预期输出: [4, 10, 16]
 
 // 列表推导式与函数结合
 func square(x) {

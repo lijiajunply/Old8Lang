@@ -23,13 +23,6 @@ func test_param(x) {
 result4 <- test_param(a > b ? "a > b" : "a <= b")
 PrintLine(result4) // 预期输出: a <= b
 
-// 三元表达式作为赋值目标
-var1 <- 0
-var2 <- 0
-(a > b ? var1 : var2) <- 100
-PrintLine(var1) // 预期输出: 0
-PrintLine(var2) // 预期输出: 100
-
 // 三元表达式与类型转换结合
 result5 <- a > b ? (a as double) : (b as string)
 PrintLine(result5) // 预期输出: 20

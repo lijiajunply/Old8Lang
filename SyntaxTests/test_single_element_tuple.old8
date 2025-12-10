@@ -1,0 +1,13 @@
+// 测试单元素元组的解析
+// 只有一个元素的元组（边界情况）
+a <- (1,)
+PrintLine(a)
+
+b <- ("hello",)
+PrintLine(b)
+
+c <- ((1+2),)
+PrintLine(c)
+
+d <- (("test", 123),)
+PrintLine(d)

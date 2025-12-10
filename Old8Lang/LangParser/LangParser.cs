@@ -1917,6 +1917,14 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         while (CurrentToken.Type == LangTokenType.Comma)
         {
             Expect(LangTokenType.Comma);
+            
+            // 检查是否还有元素，或者是单元素元组的结束
+            if (CurrentToken.Type == LangTokenType.RightParen)
+            {
+                // 单元素元组，没有更多元素
+                break;
+            }
+            
             elements.Add(ParseExpression());
         }
 

@@ -38,6 +38,9 @@ PrintLine(empty_dict) // 预期输出: {}
 single_tuple <- (1,)
 PrintLine(single_tuple) // 预期输出: (1,)
 
+double_tuple <- (1,1)
+PrintLine(double_tuple) // 预期输出: (1,1)
+
 // 空参数列表的函数
 func no_params() {
     return "no params"
