@@ -18,9 +18,35 @@ for file in $test_files; do
     # 检查文件末尾是否包含"error"标记
     has_error_marker=$(tail -n 1 "$file" | grep -i "error")
     
-    # 运行测试
-    dotnet run --project Old8Lang.App -- -c "$file"
-    test_exit_code=$?
+    # 运行测试，添加10秒超时限制
+    # 使用兼容bash 3.2的方式实现超时
+    dotnet run --project Old8Lang.App -- -c "$file" &
+    DOTNET_PID=$!
+    
+    # 设置超时时间（秒）
+    TIMEOUT=10
+    
+    # 等待进程结束或超时
+    for ((i=0; i<$TIMEOUT; i++)); do
+        if kill -0 $DOTNET_PID 2>/dev/null; then
+            sleep 1
+        else
+            break
+        fi
+    done
+    
+    # 检查进程是否还在运行
+    if kill -0 $DOTNET_PID 2>/dev/null; then
+        # 超时，杀死进程
+        echo "⏱️  Test timed out after $TIMEOUT seconds, killing process..."
+        kill -9 $DOTNET_PID 2>/dev/null
+        wait $DOTNET_PID 2>/dev/null
+        test_exit_code=124  # 使用timeout命令的标准退出码
+    else
+        # 进程正常结束，获取退出码
+        wait $DOTNET_PID 2>/dev/null
+        test_exit_code=$?
+    fi
     
     if [ -n "$has_error_marker" ]; then
         # 期望测试失败
