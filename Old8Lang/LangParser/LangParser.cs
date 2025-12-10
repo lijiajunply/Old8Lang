@@ -393,6 +393,13 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                             CurrentIndex = savedIndex;
                             return ParseSet();
                         }
+                        // 检查是否是函数声明：identifier:returnType (params) -> { ... }
+                        else if (thirdToken.Type == LangTokenType.LeftParen)
+                        {
+                            // 这是带有返回类型注解的函数声明
+                            CurrentIndex = savedIndex;
+                            return ParseFuncDeclaration();
+                        }
                     }
                 }
                 // 检查下一个token是否是赋值符号
@@ -776,24 +783,35 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         }
 
         var funcName = ParseIdentifier();
+        var returnType = string.Empty;
+
+        // 检查是否有类型注解语法：identifier:returnType
+        if (CurrentToken.Type == LangTokenType.Colon)
+        {
+            Expect(LangTokenType.Colon);
+            if (CurrentToken.Type != LangTokenType.Identifier)
+            {
+                throw CreateSyntaxError("请返回类型标识符");
+            }
+            returnType = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+        }
 
         Expect(LangTokenType.LeftParen);
         var parameters = ParseIdList();
         Expect(LangTokenType.RightParen);
 
-        var returnType = string.Empty;
-        // 检查是否有箭头语法用于返回类型注解
+        // 检查是否有箭头语法用于返回类型注解或函数体
         if (CurrentToken.Type == LangTokenType.Arrow)
         {
             Expect(LangTokenType.Arrow);
-            // 解析返回类型标识符
-            if (isUseFunc)
+            // 解析返回类型标识符（如果有）
+            if (isUseFunc && CurrentToken.Type == LangTokenType.Identifier)
             {
-                if (CurrentToken.Type != LangTokenType.Identifier)
+                if (!string.IsNullOrEmpty(returnType))
                 {
-                    throw CreateSyntaxError("请返回类型标识符");
+                    throw CreateSyntaxError("函数返回类型重复声明");
                 }
-
                 returnType = CurrentToken.Value;
                 Expect(LangTokenType.Identifier);
             }
