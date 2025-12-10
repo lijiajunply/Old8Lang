@@ -19,6 +19,8 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
             return "*";
         if (Opera == OperationType.DIVIDE)
             return "/";
+        if (Opera == OperationType.POWER)
+            return "^";
         if (Opera == OperationType.GREATER)
             return ">";
         if (Opera == OperationType.LESSER)
@@ -261,6 +263,8 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     return leftResult.Divide(rightResult);
                 case OperationType.MODULO:
                     return leftResult.Mod(rightResult);
+                case OperationType.POWER:
+                    return leftResult.Power(rightResult);
             }
         }
 
@@ -322,7 +326,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         }
         
         // 对于二元运算，根据操作类型返回合适的类型
-        if (Opera == OperationType.TIMES || Opera == OperationType.PLUS || Opera == OperationType.MINUS || Opera == OperationType.DIVIDE || Opera == OperationType.MODULO)
+        if (Opera == OperationType.TIMES || Opera == OperationType.PLUS || Opera == OperationType.MINUS || Opera == OperationType.DIVIDE || Opera == OperationType.MODULO || Opera == OperationType.POWER)
         {
             // 对于数值运算，返回int类型
             return typeof(int);
@@ -528,6 +532,29 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 }
                 ilGenerator.Emit(OpCodes.Rem);
                 return typeof(int);
+            case OperationType.POWER:
+                Left?.LoadIlValue(ilGenerator, local);
+                Right?.LoadIlValue(ilGenerator, local);
+                // 确保两个操作数都是double类型，因为Math.Pow需要double参数
+                if (leftType == typeof(int))
+                {
+                    ilGenerator.Emit(OpCodes.Conv_R8);
+                }
+                if (rightType == typeof(int))
+                {
+                    ilGenerator.Emit(OpCodes.Conv_R8);
+                }
+                // 调用Math.Pow方法
+                var powMethod = typeof(Math).GetMethod("Pow", [typeof(double), typeof(double)])!;
+                ilGenerator.Emit(OpCodes.Call, powMethod);
+                // 如果两个操作数都是int类型，返回int类型
+                if (leftType == typeof(int) && rightType == typeof(int))
+                {
+                    ilGenerator.Emit(OpCodes.Conv_I4);
+                    return typeof(int);
+                }
+                // 否则返回double类型
+                return typeof(double);
             case OperationType.GREATER:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);

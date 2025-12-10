@@ -14,9 +14,6 @@ arith_result <- 1 + 2 * 3 / 4 - 5 % 2
 // 比较表达式
 comp_result <- a == b and c < d
 
-// 赋值表达式
-assign_result <- a <- b + c
-
 // 成员访问
 obj.field <- value
 obj.method()

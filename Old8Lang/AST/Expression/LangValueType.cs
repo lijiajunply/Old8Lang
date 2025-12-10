@@ -32,6 +32,9 @@ public abstract class LangValueType(SourcePosition position = default) : OldExpr
     public virtual LangValueType Mod(LangValueType otherLangValueType) => throw new InvalidOperationError(this,
         $"不支持类型 '{GetType().Name}' 和 '{otherLangValueType.GetType().Name}' 的取模操作");
 
+    public virtual LangValueType Power(LangValueType otherLangValueType) => throw new InvalidOperationError(this,
+        $"不支持类型 '{GetType().Name}' 和 '{otherLangValueType.GetType().Name}' 的幂运算");
+
     #endregion
 
     public virtual LangValueType Dot(OldExpr dotExpr)

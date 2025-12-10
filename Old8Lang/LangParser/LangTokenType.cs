@@ -291,7 +291,7 @@ public static class TokenOpera
             LangTokenType.Assignment => OperationType.SET,
             LangTokenType.Equals => OperationType.EQUALS,
             LangTokenType.Percent => OperationType.MODULO,
-            LangTokenType.Caret => OperationType.EOF,
+            LangTokenType.Caret => OperationType.POWER,
             LangTokenType.Question => OperationType.EOF,
             LangTokenType.LessThan => OperationType.LESSER,
             LangTokenType.GreaterThan => OperationType.GREATER,

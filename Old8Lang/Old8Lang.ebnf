@@ -29,8 +29,7 @@ throwStatement = "throw" expression ;
 
 lrBlock = "(" statement ")" ;
 
-// declaration = identifier ":" type "<-" expression | identifier "<-" expression | memberAccess ":" type "<-" expression | memberAccess "<-" expression ;
-declaration = identifier ( ":" type )? "<-" expression ;
+declaration = identifier (":" type )? "<-" expression ;
 assignment = expression ":" type? "<-" expression ;
 set = declaration | assignment ;
 
@@ -52,7 +51,7 @@ classDeclaration = accessModifier* "class" identifier ( "extends" identifier )? 
 
 classBlock = "{" classMember* "}";
 
-classMember = accessModifier* (set | funcDeclaration | importStatement);
+classMember = accessModifier* (declaration | funcDeclaration | importStatement);
 
 accessModifier = "public" | "private" | "static" ;
 

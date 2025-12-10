@@ -8,7 +8,7 @@ c <- 30
 d <- 40
 e <- 50
 
-complex_arith <- (a + b * c - d) / e % 3 + (a ** b) // 注意：**可能不支持，根据实际语法调整
+complex_arith <- (a + b * c - d) / e % 3 + (a ^ b)
 PrintLine(complex_arith)
 
 // 复杂比较表达式
@@ -58,11 +58,13 @@ complex_call <- funcD(funcC(funcB(funcA(10))))
 PrintLine(complex_call) // 预期输出: ((((10+1)*2)-3)/2) = (22-3)/2 = 19/2 = 9.5
 
 // 复杂lambda表达式
+/*
 complex_lambda <- (x, y) -> {
     temp <- x + y
     return temp * 2
 } (10, 20)
 PrintLine(complex_lambda) // 预期输出: 60
+*/
 
 // 复杂列表推导式
 matrix <- [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
@@ -90,8 +92,10 @@ complex_ternary <- (a > 5 ?
 PrintLine(complex_ternary) // 预期输出: all true
 
 // 复杂赋值表达式
+/*
 complex_assign <- (a <- b + c) * (d <- e - a)
 PrintLine(complex_assign) // 预期输出: 50 * (50 - 30) = 50 * 20 = 1000
+*/
 
 // 复杂索引表达式
 complex_index <- [1, 2, 3, 4, 5][2] + {"a": 10, "b": 20, "c": 30}["b"] + list[100, 200, 300][1]

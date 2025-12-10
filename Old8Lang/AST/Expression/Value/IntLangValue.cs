@@ -120,6 +120,43 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
         throw new InvalidOperationError(this, $"不支持整数与类型 '{otherLangValueType.GetType().Name}' 的取模操作");
     }
 
+    public override LangValueType Power(LangValueType otherLangValueType)
+    {
+        if (otherLangValueType is DoubleLangValue doubleValue)
+        {
+            // 直接计算，不调用 doubleValue.Power(this)，避免顺序颠倒
+            var result = Math.Pow(Value, doubleValue.Value);
+            if (double.IsNaN(result) || double.IsInfinity(result))
+            {
+                throw new OverflowError(this, "整数幂运算");
+            }
+            return new DoubleLangValue(result);
+        }
+        if (otherLangValueType is IntLangValue otherInt)
+        {
+            try
+            {
+                // 使用 Math.Pow 计算，然后根据结果类型返回
+                var result = Math.Pow(Value, otherInt.Value);
+                if (double.IsNaN(result) || double.IsInfinity(result))
+                {
+                    throw new OverflowError(this, "整数幂运算");
+                }
+                // 如果结果是整数，返回 IntLangValue，否则返回 DoubleLangValue
+                if (result == Math.Floor(result))
+                {
+                    return new IntLangValue((int)result);
+                }
+                return new DoubleLangValue(result);
+            }
+            catch (OverflowException)
+            {
+                throw new OverflowError(this, "整数幂运算");
+            }
+        }
+        throw new InvalidOperationError(this, $"不支持整数与类型 '{otherLangValueType.GetType().Name}' 的幂运算");
+    }
+
     public override bool Less(LangValueType? otherValue)
     {
         if (otherValue is DoubleLangValue d)

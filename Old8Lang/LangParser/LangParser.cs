@@ -1326,20 +1326,17 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     // 乘除表达式
     private OldExpr ParseNumberOpera2()
     {
-        var left = ParsePrimary();
+        // 处理幂运算（右结合，最高优先级）
+        var left = ParsePower();
 
-        // 处理点运算符（最高优先级）
-        left = ParseDotExpr(left);
-
+        // 处理乘法、除法和取模运算（左结合）
         while (CurrentToken.Type == LangTokenType.Star || CurrentToken.Type == LangTokenType.Slash ||
                CurrentToken.Type == LangTokenType.Percent)
         {
             var operatorToken = CurrentToken;
             var position = CreateSourcePosition(operatorToken);
             Expect(operatorToken.Type);
-            var right = ParsePrimary();
-            // 处理右操作数的点运算符
-            right = ParseDotExpr(right);
+            var right = ParsePower(); // 右边也需要先处理幂运算
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
         }
 
@@ -1368,6 +1365,27 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var right = ParsePrimary();
             // 处理右操作数的点运算符
             right = ParseDotExpr(right);
+            left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
+        }
+
+        return left;
+    }
+
+    // 处理幂运算（右结合）
+    private OldExpr ParsePower()
+    {
+        var left = ParsePrimary();
+        
+        // 处理点运算符（最高优先级）
+        left = ParseDotExpr(left);
+        
+        // 处理右结合的幂运算
+        if (CurrentToken.Type == LangTokenType.Caret)
+        {
+            var operatorToken = CurrentToken;
+            var position = CreateSourcePosition(operatorToken);
+            Expect(operatorToken.Type);
+            var right = ParsePower(); // 递归调用，实现右结合
             left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
         }
 

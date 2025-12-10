@@ -107,6 +107,30 @@ public class DoubleLangValue(double doubleValue, SourcePosition position = defau
         return new DoubleLangValue(result);
     }
 
+    public override LangValueType Power(LangValueType otherLangValueType)
+    {
+        double exponent;
+        if (otherLangValueType is IntLangValue intValue)
+        {
+            exponent = intValue.Value;
+        }
+        else if (otherLangValueType is DoubleLangValue doubleValue)
+        {
+            exponent = doubleValue.Value;
+        }
+        else
+        {
+            throw new InvalidOperationError(this, $"不支持浮点数与类型 '{otherLangValueType.GetType().Name}' 的幂运算");
+        }
+        
+        var result = Math.Pow(Value, exponent);
+        if (double.IsNaN(result) || double.IsInfinity(result))
+        {
+            throw new OverflowError(this, "浮点数幂运算");
+        }
+        return new DoubleLangValue(result);
+    }
+
 
     public override bool Less(LangValueType? otherValue)
     {

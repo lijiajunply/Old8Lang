@@ -53,11 +53,12 @@ public enum OperationType
     TIMES = 209,
     DIVIDE = 210,
     MODULO = 211,
-    SET = 212,
-    DIS_SET = 213,
-    COMMA = 214,
-    LESS_EQUAL = 215,
-    GREATER_EQUAL = 216,
+    POWER = 212,
+    SET = 213,
+    DIS_SET = 214,
+    COMMA = 215,
+    LESS_EQUAL = 216,
+    GREATER_EQUAL = 217,
 
     #endregion
 
