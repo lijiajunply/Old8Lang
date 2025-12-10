@@ -1,0 +1,13 @@
+// 超级简单的函数测试 - 编译模式
+// 只测试最基本的函数调用
+
+PrintLine("=== 超级简单的函数测试 ===")
+
+// 定义一个简单的函数
+func add(x, y) {
+    return x + y
+}
+
+// 调用函数
+result <- add(1, 2)
+PrintLine("add(1, 2) = " + result)

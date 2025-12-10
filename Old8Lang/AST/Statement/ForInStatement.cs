@@ -81,91 +81,153 @@ public class ForInStatement(
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        var ty = expr.OutputType(local);
+        var ty = expr.OutputType(local) ?? typeof(object);
+        
+        // 对于字典类型，使用特殊处理
+        if (ty == typeof(Dictionary<object, object>))
+        {
+            GenerateDictionaryIl(ilGenerator, local);
+            return;
+        }
+        
+        // 非字典类型，使用普通的IEnumerator处理
         var enumerator = ilGenerator.DeclareLocal(typeof(IEnumerator));
-        var current = ilGenerator.DeclareLocal(ty == typeof(Dictionary<object, object>)
-            ? typeof(KeyValuePair<object, object>)
-            : typeof(object));
-
-        // Get the GetEnumerator method
+        var current = ilGenerator.DeclareLocal(typeof(object));
+        
+        // 获取枚举器
         var getEnumeratorMethod = typeof(IEnumerable).GetMethod("GetEnumerator")!;
-        var moveNextMethod = typeof(IEnumerator).GetMethod("MoveNext")!;
-        var getCurrentMethod = typeof(IEnumerator).GetProperty("Current")!.GetGetMethod()!;
         expr.LoadIlValue(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Callvirt, getEnumeratorMethod);
         ilGenerator.Emit(OpCodes.Stloc, enumerator);
-
-        // Define labels for loop
-        var loopListStart = ilGenerator.DefineLabel();
-        var loopListEnd = ilGenerator.DefineLabel();
+        
+        // 定义循环标签
+        var loopStart = ilGenerator.DefineLabel();
+        var loopEnd = ilGenerator.DefineLabel();
         var continueLabel = ilGenerator.DefineLabel();
-
-        // 保存当前的break和continue标签，以便嵌套循环使用
+        
+        // 保存当前的break和continue标签
         var oldBreakLabel = local.BreakLabel;
         var oldContinueLabel = local.ContinueLabel;
-
+        
         // 设置当前循环的break和continue标签
-        local.BreakLabel = loopListEnd;
+        local.BreakLabel = loopEnd;
         local.ContinueLabel = continueLabel;
-
-        // Start of loop
-        ilGenerator.MarkLabel(loopListStart);
+        
+        // 循环开始
+        ilGenerator.MarkLabel(loopStart);
+        
+        // 调用MoveNext
+        var moveNextMethod = typeof(IEnumerator).GetMethod("MoveNext")!;
         ilGenerator.Emit(OpCodes.Ldloc, enumerator);
         ilGenerator.Emit(OpCodes.Callvirt, moveNextMethod);
-        ilGenerator.Emit(OpCodes.Brfalse, loopListEnd);
-
-        // Get current element
+        ilGenerator.Emit(OpCodes.Brfalse, loopEnd);
+        
+        // 获取当前元素
+        var currentProperty = typeof(IEnumerator).GetProperty("Current")!;
+        var getCurrentMethod = currentProperty.GetGetMethod()!;
         ilGenerator.Emit(OpCodes.Ldloc, enumerator);
         ilGenerator.Emit(OpCodes.Callvirt, getCurrentMethod);
         ilGenerator.Emit(OpCodes.Stloc, current);
-
+        
+        // 处理标识符赋值
         if (AllIds.Count == 1)
         {
-            // 单个标识符的情况，保持原有行为
-            local.AddLocalVar(id.IdName, current);
-        }
-        else if (ty == typeof(Dictionary<object, object>))
-        {
-            // 多个标识符且是字典的情况，分解KeyValuePair
-            var keyValuePairType = typeof(KeyValuePair<object, object>);
-            var keyProperty = keyValuePairType.GetProperty("Key")!;
-            var valueProperty = keyValuePairType.GetProperty("Value")!;
-            var keyGetMethod = keyProperty.GetGetMethod()!;
-            var valueGetMethod = valueProperty.GetGetMethod()!;
-
-            // 处理第一个标识符（键）
-            ilGenerator.Emit(OpCodes.Ldloc, current);
-            ilGenerator.Emit(OpCodes.Call, keyGetMethod); // 使用Call而不是Callvirt，因为KeyValuePair是值类型
-            var keyLocal = ilGenerator.DeclareLocal(typeof(object));
-            ilGenerator.Emit(OpCodes.Stloc, keyLocal);
-            local.AddLocalVar(AllIds[0].IdName, keyLocal);
-
-            // 处理第二个标识符（值）
-            if (AllIds.Count > 1)
-            {
-                ilGenerator.Emit(OpCodes.Ldloc, current);
-                ilGenerator.Emit(OpCodes.Call, valueGetMethod); // 使用Call而不是Callvirt，因为KeyValuePair是值类型
-                var valueLocal = ilGenerator.DeclareLocal(typeof(object));
-                ilGenerator.Emit(OpCodes.Stloc, valueLocal);
-                local.AddLocalVar(AllIds[1].IdName, valueLocal);
-            }
+            // 单个标识符，直接赋值
+            local.AddLocalVar(AllIds[0].IdName, current);
         }
         else
         {
-            // 多个标识符但不是字典的情况，只赋值给第一个标识符
+            // 多个标识符，只赋值给第一个
             local.AddLocalVar(AllIds[0].IdName, current);
         }
-
+        
+        // 生成循环体
         body.GenerateIl(ilGenerator, local);
-
-        // Continue label
+        
+        // 继续标签
         ilGenerator.MarkLabel(continueLabel);
-        // Loop back
-        ilGenerator.Emit(OpCodes.Br, loopListStart);
-
-        // End of loop
-        ilGenerator.MarkLabel(loopListEnd);
-
+        
+        // 跳回循环开始
+        ilGenerator.Emit(OpCodes.Br, loopStart);
+        
+        // 循环结束
+        ilGenerator.MarkLabel(loopEnd);
+        
+        // 恢复之前的break和continue标签
+        local.BreakLabel = oldBreakLabel;
+        local.ContinueLabel = oldContinueLabel;
+    }
+    
+    /// <summary>
+    /// 生成字典类型的IL代码，使用更简单可靠的方式
+    /// </summary>
+    private void GenerateDictionaryIl(ILGenerator ilGenerator, LocalManager local)
+    {
+        // 保存字典到局部变量
+        expr.LoadIlValue(ilGenerator, local);
+        var dictLocal = ilGenerator.DeclareLocal(typeof(Dictionary<object, object>));
+        ilGenerator.Emit(OpCodes.Stloc, dictLocal);
+        
+        // 获取字典的Keys集合
+        var keysProperty = typeof(Dictionary<object, object>).GetProperty("Keys")!;
+        var keysGetMethod = keysProperty.GetGetMethod()!;
+        
+        // 获取Keys集合的IEnumerable接口
+        var enumerableType = typeof(IEnumerable);
+        ilGenerator.Emit(OpCodes.Ldloc, dictLocal);
+        ilGenerator.Emit(OpCodes.Callvirt, keysGetMethod);
+        
+        // 获取Keys集合的枚举器
+        var keysEnumerator = ilGenerator.DeclareLocal(typeof(IEnumerator));
+        var keysGetEnumeratorMethod = enumerableType.GetMethod("GetEnumerator")!;
+        ilGenerator.Emit(OpCodes.Callvirt, keysGetEnumeratorMethod);
+        ilGenerator.Emit(OpCodes.Stloc, keysEnumerator);
+        
+        // 定义循环标签
+        var loopStart = ilGenerator.DefineLabel();
+        var loopEnd = ilGenerator.DefineLabel();
+        var continueLabel = ilGenerator.DefineLabel();
+        
+        // 保存当前的break和continue标签
+        var oldBreakLabel = local.BreakLabel;
+        var oldContinueLabel = local.ContinueLabel;
+        
+        // 设置当前循环的break和continue标签
+        local.BreakLabel = loopEnd;
+        local.ContinueLabel = continueLabel;
+        
+        // 循环开始
+        ilGenerator.MarkLabel(loopStart);
+        
+        // 调用MoveNext
+        var moveNextMethod = typeof(IEnumerator).GetMethod("MoveNext")!;
+        ilGenerator.Emit(OpCodes.Ldloc, keysEnumerator);
+        ilGenerator.Emit(OpCodes.Callvirt, moveNextMethod);
+        ilGenerator.Emit(OpCodes.Brfalse, loopEnd);
+        
+        // 获取当前键
+        var currentProperty = typeof(IEnumerator).GetProperty("Current")!;
+        var getCurrentMethod = currentProperty.GetGetMethod()!;
+        ilGenerator.Emit(OpCodes.Ldloc, keysEnumerator);
+        ilGenerator.Emit(OpCodes.Callvirt, getCurrentMethod);
+        var keyLocal = ilGenerator.DeclareLocal(typeof(object));
+        ilGenerator.Emit(OpCodes.Stloc, keyLocal);
+        
+        // 将键添加到局部变量管理器
+        local.AddLocalVar(AllIds[0].IdName, keyLocal);
+        
+        // 生成循环体
+        body.GenerateIl(ilGenerator, local);
+        
+        // 继续标签
+        ilGenerator.MarkLabel(continueLabel);
+        
+        // 跳回循环开始
+        ilGenerator.Emit(OpCodes.Br, loopStart);
+        
+        // 循环结束
+        ilGenerator.MarkLabel(loopEnd);
+        
         // 恢复之前的break和continue标签
         local.BreakLabel = oldBreakLabel;
         local.ContinueLabel = oldContinueLabel;

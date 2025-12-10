@@ -270,31 +270,41 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
     public override void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
     {
-        Type = OutputType(ilGenerator, local);
-        var valueLocal = ilGenerator.DeclareLocal(Type);
-        var b = local.GetLocalVar(idName);
-        if (b != null)
+        // 首先生成计算值的IL指令，将结果压入栈中
+        LoadIlValue(ilGenerator, local);
+        // 然后获取结果类型
+        var type = OutputType(local);
+        if (type == null) return;
+        // 声明局部变量或使用已存在的
+        var existingLocal = local.GetLocalVar(idName);
+        if (existingLocal != null)
         {
-            if (b.LocalType != Type)
+            if (existingLocal.LocalType != type)
             {
+                // 类型不匹配，重新声明
                 local.RemoveLocalVar(idName);
-                local.AddLocalVar(idName, valueLocal);
-                ilGenerator.Emit(OpCodes.Stloc, valueLocal.LocalIndex);
+                var newLocal = ilGenerator.DeclareLocal(type);
+                local.AddLocalVar(idName, newLocal);
+                ilGenerator.Emit(OpCodes.Stloc, newLocal.LocalIndex);
             }
             else
             {
-                ilGenerator.Emit(OpCodes.Stloc, b.LocalIndex);
+                // 类型匹配，直接存储
+                ilGenerator.Emit(OpCodes.Stloc, existingLocal.LocalIndex);
             }
-
-            return;
         }
-
-        ilGenerator.Emit(OpCodes.Stloc, valueLocal.LocalIndex);
-        local.AddLocalVar(idName, valueLocal);
+        else
+        {
+            // 首次声明变量
+            var newLocal = ilGenerator.DeclareLocal(type);
+            local.AddLocalVar(idName, newLocal);
+            ilGenerator.Emit(OpCodes.Stloc, newLocal.LocalIndex);
+        }
     }
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
+        // 调用带有ILGenerator参数的OutputType方法，该方法会生成实际的IL指令
         Type = OutputType(ilGenerator, local);
     }
 
@@ -311,11 +321,6 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
     {
         var leftType = Left?.OutputType(local);
         var rightType = Right?.OutputType(local);
-
-        // if (leftType == typeof(object))
-        // {
-        //     return typeof(object);
-        // }
 
         if (Left == null)
         {
@@ -340,45 +345,120 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         switch (Opera)
         {
             case OperationType.PLUS:
+                if (leftType == typeof(string) || rightType == typeof(string))
+                {
+                    // 处理字符串连接 - 需要调用string.Concat方法
+                    Left?.LoadIlValue(ilGenerator, local);
+                    Right?.LoadIlValue(ilGenerator, local);
+                    // 确保两个操作数都是字符串类型，或者进行转换
+                    if (leftType != typeof(string))
+                    {
+                        ilGenerator.Emit(OpCodes.Box, leftType!);
+                    }
+                    if (rightType != typeof(string))
+                    {
+                        ilGenerator.Emit(OpCodes.Box, rightType!);
+                    }
+                    // 调用string.Concat(object, object)
+                    var concatMethod = typeof(string).GetMethod("Concat", [typeof(object), typeof(object)])!;
+                    ilGenerator.Emit(OpCodes.Call, concatMethod);
+                    return typeof(string);
+                }
+                // 处理数值类型加法
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
-                ilGenerator.Emit(OpCodes.Add);
-                if (leftType == typeof(string) || rightType == typeof(string))
-                    return typeof(string);
-
                 if (leftType == typeof(double) || rightType == typeof(double))
+                {
+                    // 确保两个操作数都是double类型
+                    if (leftType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Conv_R8);
+                    }
+                    if (rightType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Conv_R8);
+                    }
+                    ilGenerator.Emit(OpCodes.Add);
                     return typeof(double);
-
+                }
+                // 整数加法
+                ilGenerator.Emit(OpCodes.Add);
                 return typeof(int);
             case OperationType.MINUS:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
-                ilGenerator.Emit(OpCodes.Sub);
                 if (leftType == typeof(double) || rightType == typeof(double))
+                {
+                    // 确保两个操作数都是double类型
+                    if (leftType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Conv_R8);
+                    }
+                    if (rightType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Conv_R8);
+                    }
+                    ilGenerator.Emit(OpCodes.Sub);
                     return typeof(double);
+                }
+                ilGenerator.Emit(OpCodes.Sub);
                 return typeof(int);
             case OperationType.TIMES:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
+                if (leftType == typeof(double) || rightType == typeof(double))
+                {
+                    // 确保两个操作数都是double类型
+                    if (leftType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Conv_R8);
+                    }
+                    if (rightType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Conv_R8);
+                    }
+                    ilGenerator.Emit(OpCodes.Mul);
+                    return typeof(double);
+                }
                 ilGenerator.Emit(OpCodes.Mul);
-                if (leftType == typeof(double) || rightType == typeof(double))
-                    return typeof(double);
-                if (leftType == typeof(double) || rightType == typeof(double))
-                    return typeof(double);
                 return typeof(int);
             case OperationType.DIVIDE:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
-                ilGenerator.Emit(OpCodes.Div);
                 if (leftType == typeof(double) || rightType == typeof(double))
+                {
+                    // 确保两个操作数都是double类型
+                    if (leftType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Conv_R8);
+                    }
+                    if (rightType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Conv_R8);
+                    }
+                    ilGenerator.Emit(OpCodes.Div);
                     return typeof(double);
+                }
+                ilGenerator.Emit(OpCodes.Div);
                 return typeof(int);
             case OperationType.MODULO:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
-                ilGenerator.Emit(OpCodes.Rem);
                 if (leftType == typeof(double) || rightType == typeof(double))
+                {
+                    // 确保两个操作数都是double类型
+                    if (leftType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Conv_R8);
+                    }
+                    if (rightType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Conv_R8);
+                    }
+                    ilGenerator.Emit(OpCodes.Rem);
                     return typeof(double);
+                }
+                ilGenerator.Emit(OpCodes.Rem);
                 return typeof(int);
             case OperationType.GREATER:
                 Left?.LoadIlValue(ilGenerator, local);
@@ -464,7 +544,13 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                         types.Add(instanceId.OutputType(local)!);
                     }
 
-                    var m = leftType!.GetMethod(instance.Id.IdName, [.. types])!;
+                    var m = leftType!.GetMethod(instance.Id.IdName, [.. types]);
+                    if (m == null)
+                    {
+                        // 方法未找到，抛出异常
+                        throw new InvalidOperationError(this, $"方法 '{instance.Id.IdName}' 未找到", 
+                            $"无法在类型 '{leftType.Name}' 中找到方法 '{instance.Id.IdName}'，参数类型为: {string.Join(", ", types.Select(t => t.Name))}");
+                    }
                     ilGenerator.Emit(OpCodes.Call, m);
                     return m.ReturnType;
                 }

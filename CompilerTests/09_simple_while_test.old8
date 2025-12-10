@@ -1,0 +1,12 @@
+// 简单while测试 - 编译模式
+// 只测试while循环
+
+PrintLine("=== 简单while测试 ===")
+
+// 只测试基本while循环
+count:int <- 0
+while count < 5 {
+    PrintLine("计数: " + count)
+    count <- count + 1
+}
+PrintLine("循环结束，count = " + count)

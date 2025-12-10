@@ -42,58 +42,62 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
         }
         var parameterTypes = FuncLangValue.Ids!.Select(item => item.OutputType(local)).ToArray();
 
-        // 假设 LocalManager 包含一个 AssemblyBuilder 和 ModuleBuilder 实例
-        var assemblyName = new AssemblyName("DynamicAssembly");
-        var assemblyBuilder =
-            AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-        var moduleBuilder = assemblyBuilder.DefineDynamicModule("DynamicModule");
+        // 获取返回类型
+        var returnType = GetItemType(FuncLangValue.BlockStatement, local);
 
-        // 定义一个新的类型
-        var typeBuilder = moduleBuilder.DefineType("DynamicType", TypeAttributes.Public);
-
-        var a = FuncLangValue.OutputType(local);
-        
         // 定义新的方法
-        var methodBuilder = typeBuilder.DefineMethod(
+        var dynamicMethod = new DynamicMethod(
             methodName,
-            MethodAttributes.Public | MethodAttributes.Static,
-            a,
-            parameterTypes
+            returnType,
+            parameterTypes,
+            true
         );
 
-        var funcLocal = new LocalManager();
-
         // 创建方法的 IL 发射器
-        var methodIl = methodBuilder.GetILGenerator();
+        var methodIl = dynamicMethod.GetILGenerator();
 
+        var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
+
+        // 处理参数
         for (var i = 0; i < FuncLangValue.Ids!.Count; i++)
         {
             var id = FuncLangValue.Ids[i];
             var localVar = methodIl.DeclareLocal(parameterTypes[i]);
             funcLocal.AddLocalVar(id.IdName, localVar);
             methodIl.Emit(OpCodes.Ldarg, i);
-
-            methodIl.Emit(OpCodes.Stloc, localVar);
+            methodIl.Emit(OpCodes.Stloc, localVar.LocalIndex);
         }
 
-        funcLocal.DelegateVar.Add(methodName, methodBuilder);
-        
         // 生成方法体的 IL 代码
         FuncLangValue.BlockStatement.GenerateIl(methodIl, funcLocal);
 
         // 返回
         methodIl.Emit(OpCodes.Ret);
 
-        var dynamicType = typeBuilder.CreateType();
+        // 将方法添加到本地变量管理器
+        local.DelegateVar.Add(methodName, dynamicMethod);
+    }
 
-        // 获取方法信息
-        var addMethod = dynamicType.GetMethod(methodName)!;
-
-        // 检查键是否已经存在，如果不存在则添加
-        if (!local.DelegateVar.ContainsKey(methodName))
+    private static Type GetItemType(OldStatement statement, LocalManager local)
+    {
+        for (var i = 0; i < statement.Count; i++)
         {
-            local.DelegateVar.Add(methodName, addMethod);
+            var item = statement[i];
+
+            if (item is ReturnStatement returnStatement)
+            {
+                return returnStatement.OutputType(local);
+            }
+
+            if (item == null || item.Count == 0)
+            {
+                continue;
+            }
+
+            return GetItemType(item, local);
         }
+
+        return typeof(void);
     }
 
     public override OldStatement this[int index] => this;

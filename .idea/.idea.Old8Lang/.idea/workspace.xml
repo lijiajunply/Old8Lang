@@ -17,14 +17,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/plan_20251210_080813.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/00_simple_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/01_basic_types_expressions.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/02_control_flow.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/03_functions_classes.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/04_exception_special_syntax.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/2025-12-10-03-30-compiler-tests.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.ebnf" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.ebnf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/05_debug_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/06_simple_int_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/07_simple_if_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/08_simple_for_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/09_simple_while_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/10_simple_for_in_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/11_simple_switch_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/12_simple_nested_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/13_simple_dict_for_in_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LangListItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LangListItem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -346,7 +352,7 @@
       <workItem from="1765277636089" duration="6000" />
       <workItem from="1765277821785" duration="994000" />
       <workItem from="1765278822007" duration="179000" />
-      <workItem from="1765279105952" duration="27695000" />
+      <workItem from="1765279105952" duration="28440000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -750,46 +756,46 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>28</line>
+          <line>29</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="696" />
+              <option value="721" />
             </startOffsets>
             <endOffsets>
-              <option value="726" />
+              <option value="751" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="236" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>29</line>
+          <line>30</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="735" />
+              <option value="760" />
             </startOffsets>
             <endOffsets>
-              <option value="770" />
+              <option value="795" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="237" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>32</line>
+          <line>33</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="853" />
+              <option value="878" />
             </startOffsets>
             <endOffsets>
-              <option value="896" />
+              <option value="921" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="238" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>90</line>
+          <line>94</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'GenerateIl'">
             <startOffsets>
               <option value="2572" />
@@ -802,13 +808,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>119</line>
+          <line>150</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'GenerateIl'">
             <startOffsets>
-              <option value="3832" />
+              <option value="4945" />
             </startOffsets>
             <endOffsets>
-              <option value="3873" />
+              <option value="5273" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="402" />

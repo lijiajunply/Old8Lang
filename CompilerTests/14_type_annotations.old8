@@ -1,0 +1,140 @@
+// 类型假注测试 - 编译模式
+// 测试各种类型假注的使用
+
+PrintLine("=== 类型假注测试 ===")
+
+// 基本类型假注
+PrintLine("\n1. 基本类型假注测试:")
+
+// 整数类型假注
+a:int <- 123
+PrintLine("整数 a:int <- 123, 值: " + a)
+
+// 浮点数类型假注
+b:double <- 3.14
+PrintLine("浮点数 b:double <- 3.14, 值: " + b)
+
+// 字符串类型假注
+c:string <- "hello"
+PrintLine("字符串 c:string <- \"hello\", 值: " + c)
+
+// 布尔类型假注
+d:bool <- true
+PrintLine("布尔值 d:bool <- true, 值: " + d)
+
+e:bool <- false
+PrintLine("布尔值 e:bool <- false, 值: " + e)
+
+// 字符类型假注
+f:char <- 'a'
+PrintLine("字符 f:char <- 'a', 值: " + f)
+
+// 类型假注的算术运算
+PrintLine("\n2. 类型假注的算术运算测试:")
+
+// 整数运算
+g:int <- a + 100
+PrintLine("整数运算: a + 100 = " + g)
+
+h:int <- a * 2
+PrintLine("整数运算: a * 2 = " + h)
+
+// 浮点数运算
+i:double <- b + 0.86
+PrintLine("浮点数运算: b + 0.86 = " + i)
+
+j:double <- b * 2.0
+PrintLine("浮点数运算: b * 2.0 = " + j)
+
+// 混合类型运算（应该会自动转换）
+k:double <- a + b
+PrintLine("混合类型运算: a + b = " + k)
+
+// 类型假注的比较运算
+PrintLine("\n3. 类型假注的比较运算测试:")
+
+l:bool <- a == 123
+PrintLine("比较运算: a == 123 = " + l)
+
+m:bool <- b > 3.0
+PrintLine("比较运算: b > 3.0 = " + m)
+
+n:bool <- a < 100
+PrintLine("比较运算: a < 100 = " + n)
+
+// 类型假注的逻辑运算
+PrintLine("\n4. 类型假注的逻辑运算测试:")
+
+p:bool <- d and e
+PrintLine("逻辑运算: d and e = " + p)
+
+q:bool <- d or e
+PrintLine("逻辑运算: d or e = " + q)
+
+r:bool <- not d
+PrintLine("逻辑运算: not d = " + r)
+
+// 类型假注的赋值
+PrintLine("\n5. 类型假注的赋值测试:")
+
+// 正确的赋值
+s:int <- a
+PrintLine("正确赋值: s:int <- a, 值: " + s)
+
+t:double <- b
+PrintLine("正确赋值: t:double <- b, 值: " + t)
+
+// 类型假注的函数参数
+PrintLine("\n6. 类型假注的函数参数测试:")
+
+func add(x:int, y:int) {
+    return x + y
+}
+
+result1 <- add(1, 2)
+PrintLine("add(1, 2) = " + result1)
+
+func multiply(x:double, y:double) {
+    return x * y
+}
+
+result2 <- multiply(3.0, 4.0)
+PrintLine("multiply(3.0, 4.0) = " + result2)
+
+// 类型假注的变量声明和赋值
+PrintLine("\n7. 类型假注的变量声明和赋值测试:")
+
+// 声明时赋值
+u:int <- 10
+PrintLine("声明时赋值: u:int <- 10, 值: " + u)
+
+// 类型假注的数组
+PrintLine("\n8. 类型假注的数组测试:")
+
+array1:array <- [1, 2, 3, 4, 5]
+PrintLine("整数数组 array1:array <- [1, 2, 3, 4, 5]")
+PrintLine("array1[0] = " + array1[0])
+PrintLine("array1[2] = " + array1[2])
+
+array2:array <- ["a", "b", "c"]
+PrintLine("字符串数组 array2:array <- [\"a\", \"b\", \"c\"]")
+PrintLine("array2[1] = " + array2[1])
+
+// 类型假注的字典
+PrintLine("\n9. 类型假注的字典测试:")
+
+dict1:dictionary <- {"name": "Alice", "age": 30}
+PrintLine("字典 dict1:dictionary <- {\"name\": \"Alice\", \"age\": 30}")
+PrintLine("dict1['name'] = " + dict1['name'])
+PrintLine("dict1['age'] = " + dict1['age'])
+
+// 类型假注的lambda表达式
+PrintLine("\n10. 类型假注的lambda表达式测试:")
+
+addLambda <- (x:int, y:int) -> x + y
+lambdaResult <- addLambda(5, 6)
+PrintLine("addLambda(5, 6) = " + lambdaResult)
+
+multiplyLambda <- (x:double, y:double) -> x * y
+lambdaResult2 <- multiplyLambda(2.5, 4.0)
+PrintLine("multiplyLambda(2.5, 4.0) = " + lambdaResult2)

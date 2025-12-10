@@ -46,22 +46,82 @@ public class SwitchStatement(
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         var labelEnd = ilGenerator.DefineLabel();
-        var labelDefault = defaultBlockStatement != null ? ilGenerator.DefineLabel() : labelEnd;
+        var defaultLabel = defaultBlockStatement != null ? ilGenerator.DefineLabel() : labelEnd;
         
-        // 处理 default 块
-        if (defaultBlockStatement != null)
-        {
-            defaultBlockStatement.GenerateIl(ilGenerator, local);
-            ilGenerator.Emit(OpCodes.Br, labelEnd);
-        }
+        // 保存switch表达式的值到局部变量
+        switchExpr.LoadIlValue(ilGenerator, local);
+        var switchValueType = switchExpr.OutputType(local) ?? typeof(object);
+        var switchValueLocal = ilGenerator.DeclareLocal(switchValueType);
+        ilGenerator.Emit(OpCodes.Stloc, switchValueLocal.LocalIndex);
         
-        // 处理所有 case
+        // 为每个case创建标签
+        var caseLabels = new List<Label>();
         foreach (var oldCase in switchCaseList)
         {
+            caseLabels.Add(ilGenerator.DefineLabel());
+        }
+        
+        // 生成case匹配逻辑
+        for (int i = 0; i < switchCaseList.Count; i++)
+        {
+            var oldCase = switchCaseList[i];
+            var caseLabel = caseLabels[i];
+            
+            // 重新加载switch值
+            ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal.LocalIndex);
+            
+            // 加载case值并比较
+            oldCase.Expr.LoadIlValue(ilGenerator, local);
+            
+            // 比较操作
+            if (switchValueType == typeof(int))
+            {
+                ilGenerator.Emit(OpCodes.Ceq);
+            }
+            else if (switchValueType == typeof(string))
+            {
+                // 字符串比较需要调用string.Equals方法
+                var equalsMethod = typeof(string).GetMethod("Equals", [typeof(string), typeof(string)])!;
+                ilGenerator.Emit(OpCodes.Call, equalsMethod);
+            }
+            else
+            {
+                // 其他类型比较，调用Equals方法
+                var equalsMethod = switchValueType.GetMethod("Equals", [switchValueType])!;
+                ilGenerator.Emit(OpCodes.Call, equalsMethod);
+            }
+            
+            // 如果相等，跳转到对应的case标签
+            ilGenerator.Emit(OpCodes.Brtrue, caseLabel);
+        }
+        
+        // 所有case都不匹配，跳转到default或结束
+        ilGenerator.Emit(OpCodes.Br, defaultLabel);
+        
+        // 生成各个case块
+        for (int i = 0; i < switchCaseList.Count; i++)
+        {
+            var oldCase = switchCaseList[i];
+            var caseLabel = caseLabels[i];
+            
+            // 标记case标签
+            ilGenerator.MarkLabel(caseLabel);
+            
+            // 生成case块的IL代码
             oldCase.BlockStatement.GenerateIl(ilGenerator, local);
+            
+            // 跳转到结束标签
             ilGenerator.Emit(OpCodes.Br, labelEnd);
         }
         
+        // 生成default块
+        if (defaultBlockStatement != null)
+        {
+            ilGenerator.MarkLabel(defaultLabel);
+            defaultBlockStatement.GenerateIl(ilGenerator, local);
+        }
+        
+        // 结束标签
         ilGenerator.MarkLabel(labelEnd);
     }
 

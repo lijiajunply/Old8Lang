@@ -1,0 +1,15 @@
+// 简单if测试 - 编译模式
+// 只测试if语句
+
+PrintLine("=== 简单if测试 ===")
+
+// 只测试基本if-else语句
+x:int <- 10
+PrintLine("x = " + x)
+
+// 这里是之前失败的地方
+if x > 5 {
+    PrintLine("x > 5")
+} else {
+    PrintLine("x <= 5")
+}

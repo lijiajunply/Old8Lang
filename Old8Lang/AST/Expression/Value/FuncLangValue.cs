@@ -209,11 +209,15 @@ public class FuncLangValue : ImportInfo
         }
 
         // 如果是Old8Lang函数，需要加载函数委托
-        var funcMethod = local.DelegateVar!.GetValueOrDefault(Id?.IdName);
-        if (funcMethod != null)
+        var idName = Id?.IdName;
+        if (!string.IsNullOrEmpty(idName))
         {
-            // 函数已经被编译为动态方法，直接调用
-            ilGenerator.Emit(OpCodes.Ldsfld, funcMethod);
+            var funcMethod = local.DelegateVar!.GetValueOrDefault(idName);
+            if (funcMethod != null)
+            {
+                // 函数已经被编译为动态方法，直接调用
+                ilGenerator.Emit(OpCodes.Ldsfld, funcMethod);
+            }
         }
     }
 

@@ -55,18 +55,57 @@ public class LangListItem(LangId listId, OldExpr key, SourcePosition position = 
 
         if (listType == typeof(string))
         {
+            // 处理字符串索引访问
             listId.LoadIlValue(ilGenerator, local); // 加载字符串
             key.LoadIlValue(ilGenerator, local); // 加载索引
             // 使用字符串的索引器属性获取字符
             var getStringItemMethod = typeof(string).GetMethod("get_Chars", [typeof(int)])!;
             ilGenerator.Emit(OpCodes.Callvirt, getStringItemMethod);
-            // 直接返回 char 值，CharLangValue.LoadIlValue 会处理它
+        }
+        else if (listType == typeof(Dictionary<object, object>))
+        {
+            // 处理字典索引访问
+            listId.LoadIlValue(ilGenerator, local); // 加载字典
+            key.LoadIlValue(ilGenerator, local); // 加载键
+            // 确保键是对象类型
+            var keyType = key.OutputType(local);
+            if (keyType != typeof(object))
+            {
+                ilGenerator.Emit(OpCodes.Box, keyType!);
+            }
+            // 调用字典的索引器（get_Item方法）
+            var getDictionaryItemMethod = typeof(Dictionary<object, object>).GetMethod("get_Item", [typeof(object)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, getDictionaryItemMethod);
+        }
+        else if (listType.IsArray)
+        {
+            // 处理数组索引访问
+            listId.LoadIlValue(ilGenerator, local); // 加载数组
+            key.LoadIlValue(ilGenerator, local); // 加载索引
+            // 根据元素类型选择适当的 Ldelem 指令
+            if (listType.GetElementType()!.IsValueType)
+            {
+                // 对于值类型数组，使用 Ldelem 指令
+                ilGenerator.Emit(OpCodes.Ldelem, listType.GetElementType()!);
+            }
+            else
+            {
+                // 对于引用类型数组，使用 Ldelem_Ref 指令
+                ilGenerator.Emit(OpCodes.Ldelem_Ref);
+            }
+        }
+        else if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(List<>))
+        {
+            // 处理List<T>索引访问
+            listId.LoadIlValue(ilGenerator, local); // 加载List
+            key.LoadIlValue(ilGenerator, local); // 加载索引
+            // 调用List<T>的索引器
+            var listItemMethod = listType.GetMethod("get_Item", [typeof(int)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, listItemMethod);
         }
         else
         {
-            listId.LoadIlValue(ilGenerator, local); // 加载集合
-            key.LoadIlValue(ilGenerator, local); // 加载索引
-            ilGenerator.Emit(OpCodes.Ldelem_Ref); // 获取引用类型的元素
+            throw new InvalidOperationError(this, "不支持的集合类型: " + listType.Name);
         }
     }
 

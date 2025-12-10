@@ -1,0 +1,12 @@
+// 简单for测试 - 编译模式
+// 只测试for循环
+
+PrintLine("=== 简单for测试 ===")
+
+// 只测试基本for循环
+sum:int <- 0
+for i:int <- 0, i < 5, i++ {
+    PrintLine("i = " + i)
+    sum <- sum + i
+}
+PrintLine("0 到 4 的和: " + sum)

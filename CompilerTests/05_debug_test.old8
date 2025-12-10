@@ -1,0 +1,31 @@
+// 调试编译模式 - 简单测试
+// 只测试最基本的功能，逐步添加
+
+PrintLine("=== 调试编译模式测试 ===")
+
+// 1. 基本字符串打印
+a <- "Hello, World!"
+PrintLine(a)
+
+// 2. 添加类型假注测试
+b:string <- "Type annotated string"
+PrintLine(b)
+
+// 3. 整数类型测试
+c:int <- 123
+PrintLine("c = " + c)
+
+d:int <- -456
+PrintLine("d = " + d)
+
+// 4. 浮点数类型测试
+e:double <- 3.14
+PrintLine("e = " + e)
+
+// 5. 布尔类型测试
+f:bool <- true
+PrintLine("f = " + f)
+
+// 6. 简单算术表达式测试
+g:int <- c + d
+PrintLine("c + d = " + g)

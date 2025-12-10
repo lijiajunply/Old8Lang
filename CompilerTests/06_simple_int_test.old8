@@ -1,0 +1,15 @@
+// 简单整数测试 - 编译模式
+// 只测试整数类型和加法运算
+
+PrintLine("=== 简单整数测试 ===")
+
+// 只测试基本整数赋值和加法
+a:int <- 10
+PrintLine("a = " + a)
+
+b:int <- 20
+PrintLine("b = " + b)
+
+// 这里是之前失败的地方
+c:int <- a + b
+PrintLine("a + b = " + c)
