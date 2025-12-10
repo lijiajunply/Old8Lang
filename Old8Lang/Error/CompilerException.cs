@@ -1,5 +1,3 @@
-using System;
-
 namespace Old8Lang.Error;
 
 /// <summary>

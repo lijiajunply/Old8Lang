@@ -1,6 +1,5 @@
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Text;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
@@ -280,7 +279,11 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                 if (Ids.Count == 0)
                 {
                     // 没有参数，调用 Console.WriteLine()
-                    ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", Type.EmptyTypes)!);
+                    var writeLineNoArg = typeof(Console).GetMethod("WriteLine", Type.EmptyTypes);
+                    if (writeLineNoArg != null)
+                    {
+                        ilGenerator.Emit(OpCodes.Call, writeLineNoArg);
+                    }
                     return;
                 }
                 
@@ -289,22 +292,17 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                 printLineExpr.LoadIlValue(ilGenerator, local);
                 var printLineType = printLineExpr.OutputType(local);
                 
-                // 如果参数不是字符串类型，调用 ToString() 方法转换为字符串
-                if (printLineType != typeof(string))
+                // 直接调用Console.WriteLine(object)方法，让CLR处理类型转换
+                var writeLineObject = typeof(Console).GetMethod("WriteLine", new[] { typeof(object) });
+                if (writeLineObject != null)
                 {
-                    // 获取 ToString() 方法
-                    var toStringMethod = typeof(object).GetMethod("ToString", Type.EmptyTypes)!;
                     // 如果是值类型，先装箱
                     if (printLineType != null && printLineType.IsValueType)
                     {
                         ilGenerator.Emit(OpCodes.Box, printLineType);
                     }
-                    // 调用 ToString() 方法
-                    ilGenerator.Emit(OpCodes.Callvirt, toStringMethod);
+                    ilGenerator.Emit(OpCodes.Call, writeLineObject);
                 }
-                
-                // 调用 Console.WriteLine(string)
-                ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", [typeof(string)])!);
                 return;
             case "Print":
                 // 处理多个参数，将它们转换为字符串并拼接

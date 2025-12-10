@@ -51,27 +51,27 @@ public static class Apis
         {
             filename = "/" + filename;
         }
-        
+
         // 如果是绝对路径，直接使用
         if (Path.IsPathFullyQualified(filename))
         {
             return File.Exists(filename) ? File.ReadAllText(filename, Encoding.UTF8) : filename;
         }
-        
+
         // 如果是相对路径，尝试从当前目录或应用程序目录查找
         var fullPath = Path.GetFullPath(filename);
         if (File.Exists(fullPath))
         {
             return File.ReadAllText(fullPath, Encoding.UTF8);
         }
-        
+
         // 尝试从应用程序基目录查找
         var appPath = Path.Combine(AppContext.BaseDirectory, filename);
         if (File.Exists(appPath))
         {
             return File.ReadAllText(appPath, Encoding.UTF8);
         }
-        
+
         // 所有尝试都失败，返回原始文件名
         return filename;
     }
@@ -107,7 +107,7 @@ public static class Apis
             // 如果文件不存在，创建一个默认的 LangInfo 对象
             langInfo = new LangInfo { LibInfos = [], Ver = "1.0.0", Url = "https://downland.old8lang.com" };
         }
-        
+
         if (Directory.Exists(langInfo.ImportPath)) return langInfo;
         var s = Path.GetDirectoryName(CodePath);
 #if RELEASE
@@ -126,7 +126,7 @@ public static class Apis
 
         return false;
     }
-    
+
     public static string CodePath
     {
         get
@@ -141,8 +141,8 @@ public static class Apis
 #endif
         }
     }
-    
-    public static string JsonPath
+
+    private static string JsonPath
     {
         get
         {

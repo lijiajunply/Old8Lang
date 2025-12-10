@@ -11,12 +11,7 @@ public class LangInterpreter : IMiniInterpreter
     /// <summary>
     /// 源代码
     /// </summary>
-    public string? SourceCode { get; private set; }
-
-    /// <summary>
-    /// 文件名
-    /// </summary>
-    public string? FileName { get; private set; }
+    private string? SourceCode { get; set; }
 
     public LangInterpreter()
     {
@@ -34,7 +29,6 @@ public class LangInterpreter : IMiniInterpreter
     public BlockStatement Build(string code, string? fileName)
     {
         SourceCode = code;
-        FileName = fileName;
         Manager.FileName = fileName;
 
         // 设置当前解释器，以便在错误处理中使用
@@ -65,10 +59,10 @@ public class LangInterpreter : IMiniInterpreter
     {
         if (string.IsNullOrEmpty(SourceCode))
         {
-            return Array.Empty<string>();
+            return [];
         }
 
-        var lines = SourceCode.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        var lines = SourceCode.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries);
         var contextLines = new List<string>();
 
         // 获取错误行前后的上下文，最多显示3行上下文
@@ -76,10 +70,10 @@ public class LangInterpreter : IMiniInterpreter
         var safeLine = Math.Max(1, position.Line);
         // 转换为0-based索引
         var zeroBasedLine = safeLine - 1;
-        int startLine = Math.Max(0, zeroBasedLine - 2);
-        int endLine = Math.Min(lines.Length - 1, zeroBasedLine + 1);
+        var startLine = Math.Max(0, zeroBasedLine - 2);
+        var endLine = Math.Min(lines.Length - 1, zeroBasedLine + 1);
 
-        for (int i = startLine; i <= endLine; i++)
+        for (var i = startLine; i <= endLine; i++)
         {
             contextLines.Add(lines[i]);
         }

@@ -321,6 +321,13 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
             return typeof(object);
         }
         
+        // 对于二元运算，根据操作类型返回合适的类型
+        if (Opera == OperationType.TIMES || Opera == OperationType.PLUS || Opera == OperationType.MINUS || Opera == OperationType.DIVIDE || Opera == OperationType.MODULO)
+        {
+            // 对于数值运算，返回int类型
+            return typeof(int);
+        }
+        
         return leftType == typeof(object) ? rightType : leftType;
     }
 
@@ -443,22 +450,42 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     return typeof(double);
                 }
                 // 整数乘法
-                else if (leftType == typeof(int) && rightType == typeof(int))
-                {
-                    ilGenerator.Emit(OpCodes.Mul);
-                    return typeof(int);
-                }
-                // 其他类型，默认使用整数乘法
                 else
                 {
-                    // 尝试转换为int并执行乘法
+                    // 确保两个操作数都是int类型
                     if (leftType != typeof(int))
                     {
-                        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+                        // 对于值类型，使用适当的转换指令
+                        if (leftType == typeof(double))
+                        {
+                            ilGenerator.Emit(OpCodes.Conv_I4);
+                        }
+                        else if (leftType == typeof(bool))
+                        {
+                            // 布尔值转换为int，true->1, false->0
+                        }
+                        // 对于引用类型，拆箱为int
+                        else if (!leftType.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+                        }
                     }
                     if (rightType != typeof(int))
                     {
-                        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+                        // 对于值类型，使用适当的转换指令
+                        if (rightType == typeof(double))
+                        {
+                            ilGenerator.Emit(OpCodes.Conv_I4);
+                        }
+                        else if (rightType == typeof(bool))
+                        {
+                            // 布尔值转换为int，true->1, false->0
+                        }
+                        // 对于引用类型，拆箱为int
+                        else if (!rightType.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+                        }
                     }
                     ilGenerator.Emit(OpCodes.Mul);
                     return typeof(int);
