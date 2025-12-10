@@ -17,11 +17,6 @@ public class ConsoleUse : AbsUseClass
         Console.Error.WriteLine(text);
     }
 
-    public override void Error(Exception e)
-    {
-        Console.Error.WriteLine(e);
-    }
-
     public override string ReadLine()
     {
         return Console.ReadLine() ?? string.Empty;

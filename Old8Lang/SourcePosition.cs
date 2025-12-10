@@ -24,7 +24,7 @@ public readonly struct SourcePosition
     /// 原始令牌值（可选）
     /// </summary>
     public readonly string? TokenValue;
-
+    
     /// <summary>
     /// 构造函数
     /// </summary>
