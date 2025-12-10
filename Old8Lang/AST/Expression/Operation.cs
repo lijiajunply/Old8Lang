@@ -127,11 +127,15 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 if (Right is Instance r1)
                 {
                     var newInstance = new Instance(r1.Id, r1.Ids, r1.Position);
+                    // 设置外部管理器，确保能访问最新的外部变量
+                    any.ExternalManager = manager;
                     return any.Dot(newInstance);
                 }
 
                 if (Right != null)
                 {
+                    // 设置外部管理器，确保能访问最新的外部变量
+                    any.ExternalManager = manager;
                     return any.Dot(Right);
                 }
             }

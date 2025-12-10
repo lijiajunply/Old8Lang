@@ -12,7 +12,7 @@ public class Old8Exception : Exception
     /// 当前解释器实例，用于获取源代码上下文
     /// </summary>
     public static LangInterpreter? CurrentInterpreter { get; set; }
-    
+
     /// <summary>
     /// 错误代码
     /// </summary>
@@ -54,7 +54,8 @@ public class Old8Exception : Exception
         IOldLangTree? node = null,
         string? suggestion = null,
         string[]? sourceContext = null)
-        : base(FormatErrorMessage(errorCode, message, position, suggestion, GetSourceContextFromInterpreter(position, sourceContext)))
+        : base(FormatErrorMessage(errorCode, message, position, suggestion,
+            GetSourceContextFromInterpreter(position, sourceContext)))
     {
         ErrorCode = errorCode;
         Position = position;
@@ -77,10 +78,11 @@ public class Old8Exception : Exception
         IOldLangTree node,
         string? suggestion = null,
         string[]? sourceContext = null)
-        : this(errorCode, message, node.Position, node, suggestion, GetSourceContextFromInterpreter(node.Position, sourceContext))
+        : this(errorCode, message, node.Position, node, suggestion,
+            GetSourceContextFromInterpreter(node.Position, sourceContext))
     {
     }
-    
+
     /// <summary>
     /// 从当前解释器获取源代码上下文
     /// </summary>
@@ -94,15 +96,15 @@ public class Old8Exception : Exception
         {
             return providedContext;
         }
-        
+
         // 否则从当前解释器获取
         if (CurrentInterpreter is not null)
         {
             return CurrentInterpreter.GetSourceContext(position);
         }
-        
+
         // 如果没有解释器，返回空数组
-        return Array.Empty<string>();
+        return [];
     }
 
     /// <summary>

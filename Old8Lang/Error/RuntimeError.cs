@@ -12,53 +12,44 @@ public class RuntimeError : Old8Exception
     /// </summary>
     /// <param name="node">AST节点</param>
     /// <param name="message">错误信息</param>
-    public RuntimeError(IOldLangTree node, string message) 
+    protected RuntimeError(IOldLangTree node, string message)
         : base(
-            "RUNTIME_ERROR", 
+            "RUNTIME_ERROR",
             message,
             node)
-    {}
-    
+    {
+    }
+
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="node">AST节点</param>
     /// <param name="message">错误信息</param>
     /// <param name="suggestion">建议</param>
-    public RuntimeError(IOldLangTree node, string message, string suggestion) 
+    protected RuntimeError(IOldLangTree node, string message, string suggestion)
         : base(
-            "RUNTIME_ERROR", 
+            "RUNTIME_ERROR",
             message,
             node,
             suggestion)
-    {}
-    
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="position">位置信息</param>
-    /// <param name="message">错误信息</param>
-    public RuntimeError(SourcePosition position, string message) 
-        : base(
-            "RUNTIME_ERROR", 
-            message,
-            position)
-    {}
-    
+    {
+    }
+
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="position">位置信息</param>
     /// <param name="message">错误信息</param>
     /// <param name="suggestion">建议</param>
-    public RuntimeError(SourcePosition position, string message, string suggestion) 
+    protected RuntimeError(SourcePosition position, string message, string suggestion)
         : base(
-            "RUNTIME_ERROR", 
+            "RUNTIME_ERROR",
             message,
             position,
             null,
             suggestion)
-    {}
+    {
+    }
 }
 
 /// <summary>
@@ -66,19 +57,21 @@ public class RuntimeError : Old8Exception
 /// </summary>
 public class AttributeError : RuntimeError
 {
-    public AttributeError(IOldLangTree node, string attributeName, string typeName) 
+    public AttributeError(IOldLangTree node, string attributeName, string typeName)
         : base(
-            node, 
+            node,
             $"类型 '{typeName}' 没有属性 '{attributeName}'",
             "请检查属性名称是否正确")
-    {}
-    
-    public AttributeError(SourcePosition position, string attributeName, string typeName) 
+    {
+    }
+
+    public AttributeError(SourcePosition position, string attributeName, string typeName)
         : base(
-            position, 
+            position,
             $"类型 '{typeName}' 没有属性 '{attributeName}'",
             "请检查属性名称是否正确")
-    {}
+    {
+    }
 }
 
 /// <summary>
@@ -86,19 +79,21 @@ public class AttributeError : RuntimeError
 /// </summary>
 public class KeyError : RuntimeError
 {
-    public KeyError(IOldLangTree node, object key) 
+    public KeyError(IOldLangTree node, object key)
         : base(
-            node, 
+            node,
             $"键 '{key}' 不存在",
             "请检查键是否存在或使用安全访问")
-    {}
-    
-    public KeyError(SourcePosition position, object key) 
+    {
+    }
+
+    public KeyError(SourcePosition position, object key)
         : base(
-            position, 
+            position,
             $"键 '{key}' 不存在",
             "请检查键是否存在或使用安全访问")
-    {}
+    {
+    }
 }
 
 /// <summary>
@@ -106,19 +101,21 @@ public class KeyError : RuntimeError
 /// </summary>
 public class ZeroDivisionError : RuntimeError
 {
-    public ZeroDivisionError(IOldLangTree node) 
+    public ZeroDivisionError(IOldLangTree node)
         : base(
-            node, 
+            node,
             "除零错误",
             "请确保除数不为零")
-    {}
-    
-    public ZeroDivisionError(SourcePosition position) 
+    {
+    }
+
+    public ZeroDivisionError(SourcePosition position)
         : base(
-            position, 
+            position,
             "除零错误",
             "请确保除数不为零")
-    {}
+    {
+    }
 }
 
 /// <summary>
@@ -126,33 +123,37 @@ public class ZeroDivisionError : RuntimeError
 /// </summary>
 public class InvalidOperationError : RuntimeError
 {
-    public InvalidOperationError(IOldLangTree node, string message) 
+    public InvalidOperationError(IOldLangTree node, string message)
         : base(
-            node, 
+            node,
             message,
             "请检查操作是否合法")
-    {}
-    
-    public InvalidOperationError(IOldLangTree node, string message, string suggestion) 
+    {
+    }
+
+    public InvalidOperationError(IOldLangTree node, string message, string suggestion)
         : base(
-            node, 
+            node,
             message,
             suggestion)
-    {}
-    
-    public InvalidOperationError(SourcePosition position, string message) 
+    {
+    }
+
+    public InvalidOperationError(SourcePosition position, string message)
         : base(
-            position, 
+            position,
             message,
             "请检查操作是否合法")
-    {}
-    
-    public InvalidOperationError(SourcePosition position, string message, string suggestion) 
+    {
+    }
+
+    public InvalidOperationError(SourcePosition position, string message, string suggestion)
         : base(
-            position, 
+            position,
             message,
             suggestion)
-    {}
+    {
+    }
 }
 
 /// <summary>
@@ -160,33 +161,37 @@ public class InvalidOperationError : RuntimeError
 /// </summary>
 public class OutOfMemoryError : RuntimeError
 {
-    public OutOfMemoryError(IOldLangTree node) 
+    public OutOfMemoryError(IOldLangTree node)
         : base(
-            node, 
+            node,
             "内存溢出",
             "程序使用了过多内存，请检查是否存在内存泄漏或优化内存使用")
-    {}
-    
-    public OutOfMemoryError(IOldLangTree node, string message) 
+    {
+    }
+
+    public OutOfMemoryError(IOldLangTree node, string message)
         : base(
-            node, 
+            node,
             $"内存溢出: {message}",
             "程序使用了过多内存，请检查是否存在内存泄漏或优化内存使用")
-    {}
-    
-    public OutOfMemoryError(SourcePosition position) 
+    {
+    }
+
+    public OutOfMemoryError(SourcePosition position)
         : base(
-            position, 
+            position,
             "内存溢出",
             "程序使用了过多内存，请检查是否存在内存泄漏或优化内存使用")
-    {}
-    
-    public OutOfMemoryError(SourcePosition position, string message) 
+    {
+    }
+
+    public OutOfMemoryError(SourcePosition position, string message)
         : base(
-            position, 
+            position,
             $"内存溢出: {message}",
             "程序使用了过多内存，请检查是否存在内存泄漏或优化内存使用")
-    {}
+    {
+    }
 }
 
 /// <summary>
@@ -194,31 +199,35 @@ public class OutOfMemoryError : RuntimeError
 /// </summary>
 public class OverflowError : RuntimeError
 {
-    public OverflowError(IOldLangTree node, string operation) 
+    public OverflowError(IOldLangTree node, string operation)
         : base(
-            node, 
+            node,
             $"数值溢出: {operation}",
             "数值运算结果超过了数据类型的范围")
-    {}
-    
-    public OverflowError(IOldLangTree node, string operation, long value) 
+    {
+    }
+
+    public OverflowError(IOldLangTree node, string operation, long value)
         : base(
-            node, 
+            node,
             $"数值溢出: {operation} 结果 {value} 超过了数据类型的范围",
             "数值运算结果超过了数据类型的范围")
-    {}
-    
-    public OverflowError(SourcePosition position, string operation) 
+    {
+    }
+
+    public OverflowError(SourcePosition position, string operation)
         : base(
-            position, 
+            position,
             $"数值溢出: {operation}",
             "数值运算结果超过了数据类型的范围")
-    {}
-    
-    public OverflowError(SourcePosition position, string operation, long value) 
+    {
+    }
+
+    public OverflowError(SourcePosition position, string operation, long value)
         : base(
-            position, 
+            position,
             $"数值溢出: {operation} 结果 {value} 超过了数据类型的范围",
             "数值运算结果超过了数据类型的范围")
-    {}
+    {
+    }
 }

@@ -99,7 +99,7 @@ PrintLine("原始浮点列表: " + doublesList)
 PrintLine("转换为整数列表: " + intsList)
 
 // 列表推导式生成字典
-PrintLine("\n=== 列表推导式生成字典 ===")
+// PrintLine("\n=== 列表推导式生成字典 ===")
 
 // 注意：这里可能不支持直接生成字典
 // dictComprehension <- {x: x * x for x in numbers}
@@ -108,9 +108,8 @@ PrintLine("\n=== 列表推导式生成字典 ===")
 // 列表推导式生成元组
 PrintLine("\n=== 列表推导式生成元组 ===")
 
-// 注意：这里可能不支持直接生成元组
-// tupleComprehension <- [(x, x * x) for x in numbers]
-// PrintLine("元组推导式: " + tupleComprehension)
+tupleComprehension <- [(x, x * x) for x in numbers]
+PrintLine("元组推导式: " + tupleComprehension)
 
 // 使用列表推导式生成二维列表
 PrintLine("\n=== 使用列表推导式生成二维列表 ===")

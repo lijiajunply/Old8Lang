@@ -199,7 +199,7 @@ public class ListComprehension : LangValueType
         {
             // 处理字符串，生成字符列表
             items = str.Value
-                .Select(LangValueType (c) => new CharLangValue(c));
+                .Select(c => new CharLangValue(c) as LangValueType);
         }
         else
         {
@@ -225,10 +225,32 @@ public class ListComprehension : LangValueType
             }
             else
             {
-                // 没有更多嵌套循环，检查条件并计算表达式
-                if (currentLoop.CheckCondition(newManager))
+                // 检查所有条件，包括当前循环和所有外层循环的条件
+                var allConditionsMet = true;
+                
+                // 检查当前循环的条件
+                if (!currentLoop.CheckCondition(newManager))
                 {
-                    var exprValue = currentLoop.Expression.Run(newManager);
+                    allConditionsMet = false;
+                }
+                
+                // 检查所有外层循环的条件（如果有）
+                var outerLoop = this;
+                while (outerLoop != null)
+                {
+                    if (!outerLoop.CheckCondition(newManager))
+                    {
+                        allConditionsMet = false;
+                        break;
+                    }
+                    outerLoop = null; // 跳出循环，因为this是最外层
+                }
+                
+                // 所有条件都满足，计算表达式值并添加到结果列表
+                if (allConditionsMet)
+                {
+                    // 使用最外层的表达式，而不是当前循环的表达式
+                    var exprValue = this.Expression.Run(newManager);
                     resultList.Add(exprValue);
                 }
             }

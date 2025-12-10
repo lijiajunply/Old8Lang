@@ -116,6 +116,15 @@ public abstract class LangValueType(SourcePosition position = default) : OldExpr
             List<object> a => new ListLangValue(a),
             object[] a => new ArrayLangValue(a.ToList()),
             long a => new IntLangValue((int)a),
+            bool a => new BoolLangValue(a),
+            Dictionary<object, object> a => new DictionaryLangValue(a.Select(x =>
+            {
+                var key = ObjToValue(x.Key);
+                var val = ObjToValue(x.Value);
+                return new KeyValuePair<OldExpr, OldExpr>(key, val);
+            }).ToList()),
+            Tuple<object, object> a => new TupleLangValue(ObjToValue(a.Item1), ObjToValue(a.Item2)),
+            ValueTuple<object, object> a => new TupleLangValue(ObjToValue(a.Item1), ObjToValue(a.Item2)),
             _ => throw new InvalidOperationError(new SourcePosition(), $"不支持将类型 '{value.GetType().Name}' 转换为Old8Lang值")
         };
     }

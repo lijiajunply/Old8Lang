@@ -264,12 +264,31 @@ public class VariateManager
 
     public VariateManager NewManger()
     {
-        return new VariateManager
+        var newManager = new VariateManager
         {
             LangInfo = LangInfo,
             Path = Path,
             FileName = FileName,
-            Interpreter = Interpreter
+            Interpreter = Interpreter,
+            // 复制作用域信息
+            Count = Count,
+            // 复制返回和函数状态
+            IsReturn = IsReturn,
+            Result = Result,
+            IsFunc = IsFunc,
+            IsClass = IsClass
         };
+        
+        // 复制变量列表（使用 AddRange 因为属性是只读的）
+        newManager.VariateName.AddRange(VariateName);
+        newManager.Values.AddRange(Values);
+        
+        // 复制作用域信息
+        newManager.ChildrenNum.AddRange(ChildrenNum);
+        
+        // 复制导入信息
+        newManager.ImportInfos.AddRange(ImportInfos);
+        
+        return newManager;
     }
 }

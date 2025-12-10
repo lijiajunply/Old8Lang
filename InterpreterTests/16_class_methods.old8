@@ -243,17 +243,15 @@ PrintLine("(0,0)到(3,4)的距离平方: " + distance)
 // 带默认参数的方法
 PrintLine("\n=== 带默认参数的方法 ===")
 
-/*
 class DefaultParamClass {
-    func greet(name, greeting <- "Hello") {
+    func greet(name, greeting) {
         return greeting + ", " + name + "!"
     }
 }
-*/
 
 defaultParam <- DefaultParamClass()
 
-message1 <- defaultParam.greet("Alice")
+message1 <- defaultParam.greet("Alice", "asdf")
 PrintLine(message1)
 
 message2 <- defaultParam.greet("Bob", "Hi")

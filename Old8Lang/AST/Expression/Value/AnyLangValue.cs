@@ -67,8 +67,16 @@ public class AnyLangValue : LangValueType
         Manager.IsClass = true;
     }
 
+    /// <summary>
+    /// 外部管理器引用，用于在Dot方法中访问外部变量
+    /// </summary>
+    internal VariateManager? ExternalManager;
+
     public sealed override LangValueType Run(VariateManager manager)
     {
+        // 保存外部管理器的引用
+        ExternalManager = manager;
+
         Manager.ImportInfos.AddRange(manager.ImportInfos.Where(x => x is not FuncLangValue).ToList());
 
         foreach (var variable in Variates.Keys)
@@ -100,7 +108,7 @@ public class AnyLangValue : LangValueType
                         // 注意：这里不需要手动移除，因为FuncLangValue.Run方法会调用RemoveChildren()
                         return funcResult;
                     }
-                    
+
                     return value;
                 }
 
@@ -140,17 +148,20 @@ public class AnyLangValue : LangValueType
                         List<OldExpr> methodArgs = [];
                         methodArgs.AddRange(instance.Ids);
 
+                        // 使用外部管理器或内部管理器作为回退
+                        var currentManager = ExternalManager ?? Manager;
+
                         // 在调用类方法时，将当前实例添加到变量储存器中，以便this关键字访问
-                        Manager.Set(new LangId("this"), this);
-                        
+                        currentManager.Set(new LangId("this"), this);
+
                         // 将实例的所有成员变量添加到Manager中，以便方法内部直接访问
                         foreach (var member in Result)
                         {
-                            Manager.Set(new LangId(member.Key), member.Value);
+                            currentManager.Set(new LangId(member.Key), member.Value);
                         }
 
-                        // 调用方法
-                        var funcResult = funcValue.Run(Manager, methodArgs);
+                        // 调用方法时使用当前管理器，这样可以访问外部变量
+                        var funcResult = funcValue.Run(currentManager, methodArgs);
                         return funcResult;
                     }
                 }
@@ -160,22 +171,34 @@ public class AnyLangValue : LangValueType
                 {
                     // 在调用类方法时，将当前实例添加到变量储存器中，以便this关键字访问
                     Manager.Set(new LangId("this"), this);
-                    
+
                     // 将实例的所有成员变量添加到Manager中，以便方法内部直接访问
                     foreach (var member in Result)
                     {
                         Manager.Set(new LangId(member.Key), member.Value);
                     }
-                    
-                    var methodValue = variate.Run(Manager);
+
+                    // 使用外部管理器或内部管理器作为回退
+                    var currentManager = ExternalManager ?? Manager;
+
+                    var methodValue = variate.Run(currentManager);
                     if (methodValue is FuncLangValue funcValue)
                     {
                         // 处理方法参数，先运行参数表达式，这样可以访问外部变量
                         List<OldExpr> methodArgs = [];
                         methodArgs.AddRange(instance.Ids);
 
-                        // 调用方法
-                        var funcResult = funcValue.Run(Manager, methodArgs);
+                        // 在调用类方法时，将当前实例添加到变量储存器中，以便this关键字访问
+                        currentManager.Set(new LangId("this"), this);
+
+                        // 将实例的所有成员变量添加到Manager中，以便方法内部直接访问
+                        foreach (var member in Result)
+                        {
+                            currentManager.Set(new LangId(member.Key), member.Value);
+                        }
+
+                        // 调用方法时使用当前管理器，这样可以访问外部变量
+                        var funcResult = funcValue.Run(currentManager, methodArgs);
                         return funcResult;
                     }
                 }
