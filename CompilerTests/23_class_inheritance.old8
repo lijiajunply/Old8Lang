@@ -1,0 +1,139 @@
+// 测试类继承功能
+
+PrintLine("=== 类继承测试 ===")
+
+// 定义父类
+class Animal {
+    name <- ""
+    age <- 0
+    
+    func init(name, age) {
+        this.name <- name
+        this.age <- age
+    }
+    
+    func makeSound() {
+        return "Unknown sound"
+    }
+    
+    func getInfo() {
+        return "Name: " + name + ", Age: " + age
+    }
+}
+
+// 定义子类继承父类
+class Dog extends Animal {
+    breed <- ""
+    
+    func init(name, age, breed) {
+        this.name <- name
+        this.age <- age
+        this.breed <- breed
+    }
+    
+    // 覆盖父类方法
+    func makeSound() {
+        return "Woof! Woof!"
+    }
+    
+    // 子类自己的方法
+    func fetch() {
+        return name + " is fetching!"
+    }
+}
+
+// 定义孙子类继承子类
+class Puppy extends Dog {
+    trainingLevel <- 0
+    
+    func init(name, age, breed, trainingLevel) {
+        this.name <- name
+        this.age <- age
+        this.breed <- breed
+        this.trainingLevel <- trainingLevel
+    }
+    
+    // 覆盖父类方法
+    func makeSound() {
+        return "Yip! Yip!"
+    }
+    
+    // 孙子类自己的方法
+    func play() {
+        return name + " is playing! Training level: " + trainingLevel
+    }
+}
+
+// 测试1: 父类实例化
+PrintLine("\n=== 测试1: 父类实例化 ===")
+animal <- Animal("Generic Animal", 5)
+PrintLine(animal.getInfo())
+PrintLine(animal.makeSound())
+
+// 测试2: 子类实例化
+PrintLine("\n=== 测试2: 子类实例化 ===")
+dog <- Dog("Buddy", 3, "Golden Retriever")
+PrintLine(dog.getInfo())       // 继承父类方法
+PrintLine(dog.makeSound())     // 覆盖父类方法
+PrintLine(dog.fetch())         // 子类自己的方法
+PrintLine("Breed: " + dog.breed) // 子类自己的字段
+
+// 测试3: 孙子类实例化
+PrintLine("\n=== 测试3: 孙子类实例化 ===")
+puppy <- Puppy("Max", 1, "Labrador", 2)
+PrintLine(puppy.getInfo())       // 继承父类方法
+PrintLine(puppy.makeSound())     // 覆盖父类方法
+PrintLine(puppy.fetch())         // 继承子类方法
+PrintLine(puppy.play())          // 孙子类自己的方法
+PrintLine("Breed: " + puppy.breed) // 继承子类字段
+PrintLine("Training Level: " + puppy.trainingLevel) // 孙子类自己的字段
+
+// 测试4: 字段覆盖
+PrintLine("\n=== 测试4: 字段覆盖 ===")
+class Parent {
+    sharedField <- "parent value"
+    uniqueParentField <- "parent only"
+}
+
+class Child extends Parent {
+    sharedField <- "child value"
+    uniqueChildField <- "child only"
+}
+
+parent <- Parent()
+child <- Child()
+PrintLine("Parent sharedField: " + parent.sharedField)
+PrintLine("Child sharedField: " + child.sharedField) // 应该显示子类的值
+PrintLine("Parent unique field: " + parent.uniqueParentField)
+PrintLine("Child can access parent unique field: " + child.uniqueParentField)
+PrintLine("Child unique field: " + child.uniqueChildField)
+
+// 测试5: 方法覆盖链
+PrintLine("\n=== 测试5: 方法覆盖链 ===")
+class GrandParent {
+    func identify() {
+        return "I am a GrandParent"
+    }
+}
+
+class Parent2 extends GrandParent {
+    func identify() {
+        return "I am a Parent2"
+    }
+}
+
+class Child2 extends Parent2 {
+    func identify() {
+        return "I am a Child2"
+    }
+}
+
+grandParent <- GrandParent()
+parent2 <- Parent2()
+child2 <- Child2()
+
+PrintLine(grandParent.identify())
+PrintLine(parent2.identify())
+PrintLine(child2.identify())
+
+PrintLine("\n✅ 所有继承测试完成")

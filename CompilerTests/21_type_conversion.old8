@@ -1,0 +1,144 @@
+// 测试类型转换
+
+PrintLine("=== 类型转换测试 ===")
+
+// int 到 double 的转换
+PrintLine("\n=== int 到 double 的转换 ===")
+
+intValue <- 10
+doubleValue <- intValue as double
+PrintLine("intValue: " + intValue + ", 类型: " + type(intValue))
+PrintLine("doubleValue: " + doubleValue + ", 类型: " + type(doubleValue))
+
+// double 到 int 的转换
+PrintLine("\n=== double 到 int 的转换 ===")
+
+doubleVal <- 3.14
+intVal <- doubleVal as int
+PrintLine("doubleVal: " + doubleVal + ", 类型: " + type(doubleVal))
+PrintLine("intVal: " + intVal + ", 类型: " + type(intVal))
+
+// 负浮点数到 int 的转换
+doubleNeg <- -2.718
+intNeg <- doubleNeg as int
+PrintLine("doubleNeg: " + doubleNeg + ", 类型: " + type(doubleNeg))
+PrintLine("intNeg: " + intNeg + ", 类型: " + type(intNeg))
+
+// int 到 string 的转换
+PrintLine("\n=== int 到 string 的转换 ===")
+
+intToString <- 42 as string
+PrintLine("intToString: '" + intToString + "', 类型: " + type(intToString))
+
+// double 到 string 的转换
+PrintLine("\n=== double 到 string 的转换 ===")
+
+doubleToString <- 3.14159 as string
+PrintLine("doubleToString: '" + doubleToString + "', 类型: " + type(doubleToString))
+
+// string 到 int 的转换
+PrintLine("\n=== string 到 int 的转换 ===")
+
+stringToInt <- "123" as int
+PrintLine("stringToInt: " + stringToInt + ", 类型: " + type(stringToInt))
+
+// string 到 double 的转换
+PrintLine("\n=== string 到 double 的转换 ===")
+
+stringToDouble <- "3.14" as double
+PrintLine("stringToDouble: " + stringToDouble + ", 类型: " + type(stringToDouble))
+
+// 布尔值到 string 的转换
+PrintLine("\n=== 布尔值到 string 的转换 ===")
+
+trueToString <- true as string
+falseToString <- false as string
+PrintLine("trueToString: '" + trueToString + "', 类型: " + type(trueToString))
+PrintLine("falseToString: '" + falseToString + "', 类型: " + type(falseToString))
+
+// 字符到 string 的转换
+PrintLine("\n=== 字符到 string 的转换 ===")
+
+charToString <- 'a' as string
+PrintLine("charToString: '" + charToString + "', 类型: " + type(charToString))
+
+// 字符到 int 的转换
+PrintLine("\n=== 字符到 int 的转换 ===")
+
+charToInt <- 'A' as int
+PrintLine("charToInt: " + charToInt + ", 类型: " + type(charToInt))
+
+// 类型转换的隐式转换
+PrintLine("\n=== 类型转换的隐式转换 ===")
+
+// 注意：在动态类型语言中，可能会自动进行类型转换
+mixedSum <- 10 + 3.14
+PrintLine("10 + 3.14 = " + mixedSum + ", 类型: " + type(mixedSum))
+
+// 尝试转换无效的字符串到数值
+PrintLine("\n=== 尝试转换无效的字符串到数值 ===")
+
+try {
+    invalidConversion <- "abc" as int
+    PrintLine("这行不应该被执行")
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 类型转换在表达式中的应用
+PrintLine("\n=== 类型转换在表达式中的应用 ===")
+
+result <- ("10" as int) + ("20" as int)
+PrintLine("(\"10\" as int) + (\"20\" as int) = " + result)
+
+// 类型转换在函数参数中的应用
+PrintLine("\n=== 类型转换在函数参数中的应用 ===")
+
+func printInt(value:int) {
+    PrintLine("int 值: " + value)
+}
+
+// 直接传递字符串（应该会报错）
+// printInt("123")  // 这行应该会报错
+
+// 转换后传递
+printInt("123" as int)
+
+// 类型转换的链式转换
+PrintLine("\n=== 类型转换的链式转换 ===")
+
+chainResult <- ("123" as int) as double as string
+PrintLine("(\"123\" as int) as double as string = '" + chainResult + "'")
+
+// 类型转换的实际应用场景
+PrintLine("\n=== 类型转换的实际应用场景 ===")
+
+// 模拟从字符串解析配置
+configValue <- "456"  // 假设从配置文件读取的字符串
+configInt <- configValue as int
+PrintLine("配置值: '" + configValue + "', 转换为整数: " + configInt)
+
+// 格式化输出
+number <- 123
+PrintLine("使用字符串拼接: " + "数值是 " + number)
+PrintLine("使用字符串模板:" + $"数值是 {number}")
+
+// 测试各种边界情况
+PrintLine("=== 测试各种边界情况 ===")
+
+// 零值转换
+zeroInt <- 0
+testZero <- zeroInt as string
+PrintLine("0 转换为字符串: '" + testZero + "'")
+
+// 大整数转换
+largeInt <- 999999999
+testLarge <- largeInt as string
+PrintLine("大整数转换为字符串: '" + testLarge + "'")
+
+// 科学计数法转换
+scientific <- 1.23e3
+testScientific <- scientific as string
+PrintLine("科学计数法转换为字符串: '" + testScientific + "'")
+
+PrintLine("\n✅ 所有类型转换测试完成")

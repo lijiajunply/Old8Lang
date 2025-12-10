@@ -1,0 +1,91 @@
+// 测试逻辑表达式
+
+PrintLine("=== 逻辑表达式测试 ===")
+
+// 逻辑与 (and) 测试
+PrintLine("\n=== 逻辑与 (and) 测试 ===")
+
+andResult1 <- true and true
+PrintLine("true and true = " + andResult1)
+
+andResult2 <- true and false
+PrintLine("true and false = " + andResult2)
+
+andResult3 <- false and true
+PrintLine("false and true = " + andResult3)
+
+andResult4 <- false and false
+PrintLine("false and false = " + andResult4)
+
+// 逻辑或 (or) 测试
+PrintLine("\n=== 逻辑或 (or) 测试 ===")
+
+orResult1 <- true or true
+PrintLine("true or true = " + orResult1)
+
+orResult2 <- true or false
+PrintLine("true or false = " + orResult2)
+
+orResult3 <- false or true
+PrintLine("false or true = " + orResult3)
+
+orResult4 <- false or false
+PrintLine("false or false = " + orResult4)
+
+// 逻辑异或 (xor) 测试
+PrintLine("\n=== 逻辑异或 (xor) 测试 ===")
+
+xorResult1 <- true xor true
+PrintLine("true xor true = " + xorResult1)
+
+xorResult2 <- true xor false
+PrintLine("true xor false = " + xorResult2)
+
+xorResult3 <- false xor true
+PrintLine("false xor true = " + xorResult3)
+
+xorResult4 <- false xor false
+PrintLine("false xor false = " + xorResult4)
+
+// 逻辑非 (not) 测试
+PrintLine("\n=== 逻辑非 (not) 测试 ===")
+
+notResult1 <- not true
+PrintLine("not true = " + notResult1)
+
+notResult2 <- not false
+PrintLine("not false = " + notResult2)
+
+// 复杂逻辑表达式
+PrintLine("\n=== 复杂逻辑表达式 ===")
+
+complexResult1 <- (true and false) or (not false)
+PrintLine("(true and false) or (not false) = " + complexResult1)
+
+complexResult2 <- not (true and (false or true)) xor false
+PrintLine("not (true and (false or true)) xor false = " + complexResult2)
+
+// 与比较表达式结合
+PrintLine("\n=== 与比较表达式结合 ===")
+
+combinedResult1 <- (5 > 3) and (10 < 20)
+PrintLine("(5 > 3) and (10 < 20) = " + combinedResult1)
+
+combinedResult2 <- (5 > 3) or (10 > 20)
+PrintLine("(5 > 3) or (10 > 20) = " + combinedResult2)
+
+combinedResult3 <- not (5 == 3)
+PrintLine("not (5 == 3) = " + combinedResult3)
+
+// 短路求值测试
+PrintLine("\n=== 短路求值测试 ===")
+
+// 测试 and 短路
+shortCircuitAnd <- false and (1 / 0 > 0)  // 应该不会执行右边的除法
+PrintLine("false and (1 / 0 > 0) = " + shortCircuitAnd)
+
+// 测试 or 短路
+shortCircuitOr <- true or (1 / 0 > 0)  // 应该不会执行右边的除法
+PrintLine("true or (1 / 0 > 0) = " + shortCircuitOr)
+
+PrintLine("\n✅ 所有逻辑表达式测试完成")

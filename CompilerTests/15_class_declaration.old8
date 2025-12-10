@@ -1,0 +1,196 @@
+// 测试类声明和实例化
+
+PrintLine("=== 类声明和实例化测试 ===")
+
+// 基本的类声明
+PrintLine("\n=== 基本的类声明 ===")
+
+class Person {
+    name <- ""
+    age <- 0
+}
+
+// 类的实例化
+PrintLine("\n=== 类的实例化 ===")
+
+person <- Person()
+PrintLine("person 对象: " + person)
+
+// 访问和修改成员变量
+PrintLine("\n=== 访问和修改成员变量 ===")
+
+// 访问成员变量
+PrintLine("person.name = " + person.name)
+PrintLine("person.age = " + person.age)
+
+// 修改成员变量
+person.name <- "Alice"
+person.age <- 30
+PrintLine("修改后 person.name = " + person.name)
+PrintLine("修改后 person.age = " + person.age)
+
+// 带构造函数的类
+PrintLine("\n=== 带构造函数的类 ===")
+
+class Employee {
+    name <- ""
+    age <- 0
+    position <- ""
+    
+    func init(name, age, position) {
+        this.name <- name
+        this.age <- age
+        this.position <- position
+    }
+}
+
+// 使用构造函数实例化
+employee <- Employee("Bob", 25, "Developer")
+PrintLine("employee.name = " + employee.name)
+PrintLine("employee.age = " + employee.age)
+PrintLine("employee.position = " + employee.position)
+
+// 带类型假注的类成员
+PrintLine("\n=== 带类型假注的类成员 ===")
+
+class Student {
+    name:string <- ""
+    age:int <- 0
+    grade:double <- 0.0
+    
+    func init(name:string, age:int, grade:double) {
+        this.name <- name
+        this.age <- age
+        this.grade <- grade
+    }
+}
+
+student <- Student("Charlie", 18, 95.5)
+PrintLine("student.name = " + student.name)
+PrintLine("student.age = " + student.age)
+PrintLine("student.grade = " + student.grade)
+
+// 类中的方法
+PrintLine("\n=== 类中的方法 ===")
+
+class Calculator {
+    func add(a, b) {
+        return a + b
+    }
+    
+    func subtract(a, b) {
+        return a - b
+    }
+}
+
+calc <- Calculator()
+addResult <- calc.add(10, 5)
+subtractResult <- calc.subtract(10, 5)
+PrintLine("10 + 5 = " + addResult)
+PrintLine("10 - 5 = " + subtractResult)
+
+// 类中的this关键字
+PrintLine("\n=== 类中的this关键字 ===")
+
+class Rectangle {
+    width <- 0
+    height <- 0
+    
+    func init(width, height) {
+        this.width <- width
+        this.height <- height
+    }
+    
+    func getArea() {
+        return this.width * this.height
+    }
+}
+
+rect <- Rectangle(5, 3)
+area <- rect.getArea()
+PrintLine("矩形面积: " + area)
+
+// 类的多个实例
+PrintLine("\n=== 类的多个实例 ===")
+
+person1 <- Person()
+person1.name <- "David"
+person1.age <- 40
+
+person2 <- Person()
+person2.name <- "Eve"
+person2.age <- 35
+
+PrintLine("person1: name = " + person1.name + ", age = " + person1.age)
+PrintLine("person2: name = " + person2.name + ", age = " + person2.age)
+
+// 嵌套类（如果支持）
+// PrintLine("\n=== 嵌套类（如果支持） ===")
+
+/*
+class OuterClass {
+    outerVar <- "外部变量"
+    
+    class InnerClass {
+        innerVar <- "内部变量"
+        
+        func getInnerVar() {
+            return this.innerVar
+        }
+    }
+}
+*/
+
+// 尝试实例化嵌套类
+// inner <- OuterClass.InnerClass()
+// PrintLine("inner.innerVar = " + inner.getInnerVar())
+
+// 类的继承（如果支持）
+PrintLine("\n=== 类的继承（如果支持） ===")
+
+class Animal {
+    name <- ""
+    
+    func init(name) {
+        this.name <- name
+    }
+    
+    func makeSound() {
+        return "Some sound"
+    }
+}
+
+class Dog extends Animal {
+    func makeSound() {
+        return "Woof!"
+    }
+}
+
+class Cat extends Animal {
+    func makeSound() {
+        return "Meow!"
+    }
+}
+
+// 尝试使用继承
+dog <- Dog("Buddy")
+cat <- Cat("Kitty")
+PrintLine(dog.name + " says: " + dog.makeSound())
+PrintLine(cat.name + " says: " + cat.makeSound())
+
+// 类的静态成员（如果支持）
+PrintLine("\n=== 类的静态成员（如果支持） ===")
+
+class MathUtil {
+    static pi <- 3.14159
+    
+    static func getPi() {
+        return 3.14159
+    }
+}
+
+// 尝试访问静态成员
+PrintLine("MathUtil.pi = " + MathUtil.pi)
+PrintLine("MathUtil.getPi() = " + MathUtil.getPi())
+
+PrintLine("\n✅ 所有类声明和实例化测试完成")

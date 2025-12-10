@@ -1,0 +1,121 @@
+// 测试成员访问和索引表达式
+
+PrintLine("=== 成员访问和索引表达式测试 ===")
+
+// 数组索引访问
+PrintLine("\n=== 数组索引访问 ===")
+
+array <- [10, 20, 30, 40, 50]
+PrintLine("数组: " + array)
+
+// 访问单个元素
+arrayElement0 <- array[0]
+PrintLine("array[0] = " + arrayElement0)
+
+arrayElement2 <- array[2]
+PrintLine("array[2] = " + arrayElement2)
+
+// 访问最后一个元素
+arrayElementLast <- array[4]
+PrintLine("array[4] = " + arrayElementLast)
+
+// 修改数组元素
+array[1] <- 25
+PrintLine("修改后 array[1] = " + array[1])
+PrintLine("修改后数组: " + array)
+
+// 列表索引访问
+PrintLine("\n=== 列表索引访问 ===")
+
+arg_list <- list[1, 2, 3, 4, 5]
+PrintLine("列表: " + arg_list)
+
+// 访问单个元素
+listElement1 <- arg_list[1]
+PrintLine("list[1] = " + listElement1)
+
+// 修改列表元素
+arg_list[2] <- 30
+PrintLine("修改后 list[2] = " + arg_list[2])
+PrintLine("修改后列表: " + arg_list)
+
+// 字典索引访问
+PrintLine("\n=== 字典索引访问 ===")
+
+dict <- {"name": "Alice", "age": 30, "city": "New York"}
+PrintLine("字典: " + dict)
+
+// 访问字典值
+nameValue <- dict["name"]
+PrintLine("dict[\"name\"] = " + nameValue)
+
+ageValue <- dict["age"]
+PrintLine("dict[\"age\"] = " + ageValue)
+
+// 修改字典值
+dict["age"] <- 31
+PrintLine("修改后 dict[\"age\"] = " + dict["age"])
+PrintLine("修改后字典: " + dict)
+
+// 添加新的键值对
+dict["country"] <- "USA"
+PrintLine("添加后字典: " + dict)
+
+// 字符串索引访问
+PrintLine("\n=== 字符串索引访问 ===")
+
+string <- "hello"
+PrintLine("字符串: " + string)
+
+// 访问单个字符
+char0 <- string[0]
+PrintLine("string[0] = " + char0)
+
+char2 <- string[2]
+PrintLine("string[2] = " + char2)
+
+// 范围访问（如果支持）
+PrintLine("\n=== 范围访问 ===")
+
+// 定义一个范围
+range <- [1~5]
+PrintLine("范围: " + range)
+
+// 类成员访问
+PrintLine("\n=== 类成员访问 ===")
+
+// 定义一个简单的类
+class Person {
+    name <- ""
+    age <- 0
+    
+    func init(name, age) {
+        this.name <- name
+        this.age <- age
+    }
+    
+    func sayHello() {
+        PrintLine("Hello, my name is " + this.name)
+    }
+}
+
+// 实例化类
+person <- Person("Bob", 25)
+PrintLine("person 对象: " + person)
+
+// 访问成员变量
+personName <- person.name
+PrintLine("person.name = " + personName)
+
+personAge <- person.age
+PrintLine("person.age = " + personAge)
+
+// 修改成员变量
+person.name <- "Charlie"
+PrintLine("修改后 person.name = " + person.name)
+
+// 调用成员方法
+PrintLine("调用 person.sayHello():")
+person.sayHello()
+
+PrintLine("\n✅ 所有成员访问和索引表达式测试完成")

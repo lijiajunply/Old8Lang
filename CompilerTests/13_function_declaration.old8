@@ -1,0 +1,196 @@
+// 测试函数声明和调用
+
+PrintLine("=== 函数声明和调用测试 ===")
+
+// 基本函数声明和调用
+PrintLine("\n=== 基本函数声明和调用 ===")
+
+func sayHello() {
+    PrintLine("Hello, World!")
+}
+
+sayHello()
+
+// 带参数的函数
+PrintLine("\n=== 带参数的函数 ===")
+
+func greet(name) {
+    PrintLine("Hello, " + name + "!")
+}
+
+greet("Alice")
+greet("Bob")
+
+// 带返回值的函数
+PrintLine("\n=== 带返回值的函数 ===")
+
+func add(a, b) {
+    return a + b
+}
+
+result <- add(1, 2)
+PrintLine("1 + 2 = " + result)
+
+// 使用 -> 语法的函数声明
+PrintLine("\n=== 使用 -> 语法的函数声明 ===")
+
+multiply(a, b) -> {
+    return a * b
+}
+
+product <- multiply(3, 4)
+PrintLine("3 * 4 = " + product)
+
+// 带类型假注的函数
+PrintLine("\n=== 带类型假注的函数 ===")
+
+func subtract(a:int, b:int) {
+    return a - b
+}
+
+difference <- subtract(10, 5)
+PrintLine("10 - 5 = " + difference)
+
+// 无返回值的函数
+PrintLine("\n=== 无返回值的函数 ===")
+
+func printSum(a, b) {
+    sum <- a + b
+    PrintLine(a + " + " + b + " = " + sum)
+}
+
+printSum(5, 3)
+
+// 函数中的局部变量
+PrintLine("\n=== 函数中的局部变量 ===")
+
+func testLocalVariables() {
+    localVar <- "我是局部变量"
+    PrintLine(localVar)
+}
+
+testLocalVariables()
+
+// 尝试访问局部变量（应该会报错）
+// PrintLine(localVar)  // 这行应该会报错，因为 localVar 是函数内的局部变量
+
+// 函数嵌套调用
+PrintLine("\n=== 函数嵌套调用 ===")
+
+func square(x) {
+    return x * x
+}
+
+func cube(x) {
+    return square(x) * x
+}
+
+cubeResult <- cube(3)
+PrintLine("3的立方 = " + cubeResult)
+
+// 递归函数
+PrintLine("\n=== 递归函数 ===")
+
+func factorial(n) {
+    if n == 0 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+factResult <- factorial(5)
+PrintLine("5的阶乘 = " + factResult)
+
+// 斐波那契数列
+func fibonacci(n) {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+fibResult <- fibonacci(6)
+PrintLine("斐波那契数列第6项 = " + fibResult)
+
+// 函数作为参数
+PrintLine("\n=== 函数作为参数 ===")
+
+func applyOperation(a, b, operation) {
+    return operation(a, b)
+}
+
+addResult <- applyOperation(5, 3, add)
+PrintLine("5 + 3 = " + addResult)
+
+multiplyResult <- applyOperation(5, 3, multiply)
+PrintLine("5 * 3 = " + multiplyResult)
+
+// 函数重载（如果支持）
+PrintLine("\n=== 函数重载（如果支持） ===")
+
+func testOverload(a) {
+    PrintLine("单参数函数: " + a)
+}
+
+func testOverload(a, b) {
+    PrintLine("双参数函数: " + a + ", " + b)
+}
+
+testOverload(1)
+testOverload(1, 2)
+
+// 带默认参数的函数
+PrintLine("\n=== 带默认参数的函数 ===")
+
+// 基本默认参数函数
+func greetWithDefault(name, message: "Hello") {
+    PrintLine(message + ", " + name + "!")
+}
+
+greetWithDefault("Alice")  // 使用默认消息
+
+greetWithDefault("Bob", "Hi")  // 覆盖默认消息
+
+// 带类型注解和默认参数的函数
+func calculateTotal(price:int, taxRate: 0.1) {
+    total <- price * (1 + taxRate)
+    PrintLine("总价: " + total)
+    return total
+}
+
+calculateTotal(100)  // 使用默认税率
+calculateTotal(100, 0.15)  // 覆盖默认税率
+
+// 多个默认参数
+func createUser(name, age: 18, gender: "unknown") {
+    PrintLine("创建用户: " + name + ", 年龄: " + age + ", 性别: " + gender)
+}
+
+createUser("Charlie")  // 全部使用默认参数
+createUser("David", 25)  // 覆盖第一个默认参数
+createUser("Eve", 30, "female")  // 覆盖所有默认参数
+
+// 混合使用必填参数和默认参数
+func testMixedParams(a, b, c: 3, d: 4) {
+    result <- a + b + c + d
+    PrintLine("结果: " + result)
+    return result
+}
+
+testMixedParams(1, 2)  // 使用默认参数 c=3, d=4
+testMixedParams(1, 2, 5)  // 覆盖 c，使用默认 d=4
+testMixedParams(1, 2, 5, 6)  // 覆盖所有参数
+
+// 不同类型的默认参数
+func testDefaultTypes(strParam: "default", intParam: 42, boolParam: true, doubleParam: 3.14) {
+    PrintLine("字符串: " + strParam)
+    PrintLine("整数: " + intParam)
+    PrintLine("布尔值: " + boolParam)
+    PrintLine("浮点数: " + doubleParam)
+}
+
+testDefaultTypes()  // 使用所有默认参数
+
+testDefaultTypes("custom", 100)  // 覆盖部分参数
+
+PrintLine("\n✅ 所有函数声明和调用测试完成")

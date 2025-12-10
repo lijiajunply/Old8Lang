@@ -1,0 +1,167 @@
+// 测试异常处理
+
+PrintLine("=== 异常处理测试 ===")
+
+// 基本的try-catch语句
+PrintLine("\n=== 基本的try-catch语句 ===")
+
+try {
+    PrintLine("尝试执行可能抛出异常的代码")
+    result <- 10 / 0
+    PrintLine("这行不应该被执行")
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 带有finally块的try-catch-finally语句
+PrintLine("\n=== 带有finally块的try-catch-finally语句 ===")
+
+try {
+    PrintLine("尝试执行可能抛出异常的代码")
+    result <- 10 / 0
+    PrintLine("这行不应该被执行")
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+} finally {
+    PrintLine("finally块被执行")
+}
+
+// 没有异常时的执行流程
+PrintLine("\n=== 没有异常时的执行流程 ===")
+
+try {
+    PrintLine("尝试执行正常的代码")
+    result <- 10 / 2
+    PrintLine("执行成功，结果: " + result)
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+} finally {
+    PrintLine("finally块被执行")
+}
+
+// 访问不存在的数组元素
+PrintLine("\n=== 访问不存在的数组元素 ===")
+
+try {
+    array <- [1, 2, 3]
+    PrintLine("尝试访问array[5]")
+    value <- array[5]
+    PrintLine("这行不应该被执行")
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 访问不存在的字典键
+PrintLine("\n=== 访问不存在的字典键 ===")
+
+try {
+    dict <- {"name": "Alice"}
+    PrintLine("尝试访问dict['age']")
+    age <- dict["age"]
+    PrintLine("这行不应该被执行")
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 类型错误异常
+PrintLine("\n=== 类型错误异常 ===")
+
+try {
+    PrintLine("尝试将字符串和整数相加")
+    result <- "hello" + 123
+    PrintLine("这行不应该被执行")
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 名称错误异常
+PrintLine("\n=== 名称错误异常 ===")
+
+try {
+    PrintLine("尝试访问未定义的变量")
+    PrintLine("value: " + undefinedVar)
+    PrintLine("这行不应该被执行")
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 嵌套的try-catch语句
+PrintLine("\n=== 嵌套的try-catch语句 ===")
+
+try {
+    PrintLine("外层try块开始")
+    
+    try {
+        PrintLine("内层try块开始")
+        result <- 10 / 0
+        PrintLine("内层try块的这行不应该被执行")
+    } catch (innerE) {
+        PrintLine("内层catch块捕获到异常: " + innerE)
+        // 重新抛出异常
+        throw innerE
+    } finally {
+        PrintLine("内层finally块被执行")
+    }
+    
+    PrintLine("外层try块的这行不应该被执行")
+} catch (outerE) {
+    PrintLine("外层catch块捕获到异常: " + outerE)
+} finally {
+    PrintLine("外层finally块被执行")
+}
+
+// 使用自定义异常
+PrintLine("\n=== 使用自定义异常 ===")
+
+try {
+    PrintLine("尝试抛出自定义异常")
+    throw "自定义异常信息"
+    PrintLine("这行不应该被执行")
+} catch (e) {
+    PrintLine("捕获到自定义异常: " + e)
+}
+
+// 异常处理中的多个catch块（如果支持）
+PrintLine("\n=== 异常处理中的多个catch块 ===")
+
+try {
+    PrintLine("尝试执行可能抛出不同类型异常的代码")
+    result <- 10 / 0
+} catch (ZeroDivisionError e) {
+    PrintLine("捕获到除以零异常: " + e)
+} catch (TypeError e) {
+    PrintLine("捕获到类型错误异常: " + e)
+} catch (Exception e) {
+    PrintLine("捕获到其他异常: " + e)
+}
+
+// 在finally块中修改返回值（如果支持）
+PrintLine("\n=== 在finally块中修改返回值 ===")
+
+func testFinallyReturn() {
+    try {
+        return 10
+    } catch (e) {
+        return 20
+    } finally {
+        PrintLine("finally块被执行")
+        // 在finally块中修改返回值
+        return 30
+    }
+}
+
+returnValue <- testFinallyReturn()
+PrintLine("函数返回值: " + returnValue)
+
+// 异常信息的详细内容
+PrintLine("\n=== 异常信息的详细内容 ===")
+
+try {
+    result <- 10 / 0
+} catch (e) {
+    // PrintLine("异常类型: " + e.GetType())
+    PrintLine("异常信息: " + e)
+    //PrintLine("异常堆栈信息: " + e.stack)
+}
+
+PrintLine("\n✅ 所有异常处理测试完成")

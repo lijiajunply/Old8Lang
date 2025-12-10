@@ -1,0 +1,92 @@
+// 测试赋值表达式
+
+PrintLine("=== 赋值表达式测试 ===")
+
+// 基本赋值
+PrintLine("\n=== 基本赋值 ===")
+
+// 整数赋值
+intVar <- 10
+PrintLine("intVar = " + intVar)
+
+// 浮点数赋值
+doubleVar <- 3.14
+PrintLine("doubleVar = " + doubleVar)
+
+// 字符串赋值
+stringVar <- "hello"
+PrintLine("stringVar = " + stringVar)
+
+// 布尔赋值
+boolVar <- true
+PrintLine("boolVar = " + boolVar)
+
+// 数组赋值
+arrayVar <- [1, 2, 3]
+PrintLine("arrayVar = " + arrayVar)
+
+// 字典赋值
+dictVar <- {"key": "value"}
+PrintLine("dictVar = " + dictVar)
+
+// 赋值给同一变量
+PrintLine("\n=== 赋值给同一变量 ===")
+
+intVar <- 20
+PrintLine("intVar 更新后 = " + intVar)
+
+intVar <- intVar + 5
+PrintLine("intVar +=5 结果 = " + intVar)
+
+// 多变量赋值
+PrintLine("\n=== 多变量赋值 ===")
+
+a <- 1
+b <- 2
+c <- 3
+PrintLine("a = " + a + ", b = " + b + ", c = " + c)
+
+// 交换变量值
+PrintLine("\n=== 交换变量值 ===")
+
+x <- 10
+y <- 20
+PrintLine("交换前: x = " + x + ", y = " + y)
+
+// 使用临时变量交换
+temp <- x
+x <- y
+y <- temp
+PrintLine("交换后: x = " + x + ", y = " + y)
+
+// 复杂表达式赋值
+PrintLine("\n=== 复杂表达式赋值 ===")
+
+complexVar <- (10 + 5) * 2 / (3 - 1)
+PrintLine("complexVar = (10 + 5) * 2 / (3 - 1) = " + complexVar)
+
+// 与逻辑表达式结合
+PrintLine("\n=== 与逻辑表达式结合 ===")
+
+logicVar <- (5 > 3) and (10 < 20)
+PrintLine("logicVar = (5 > 3) and (10 < 20) = " + logicVar)
+
+// 空值赋值
+PrintLine("\n=== 空值赋值 ===")
+
+emptyString <- ""
+PrintLine("emptyString = '" + emptyString + "'")
+
+// 动态类型赋值（同一变量不同类型）
+PrintLine("\n=== 动态类型赋值 ===")
+
+dynamicVar <- 10 // int 类型
+PrintLine("dynamicVar (int) = " + dynamicVar)
+
+dynamicVar <- "hello" // string 类型
+PrintLine("dynamicVar (string) = " + dynamicVar)
+
+dynamicVar <- true // bool 类型
+PrintLine("dynamicVar (bool) = " + dynamicVar)
+
+PrintLine("\n✅ 所有赋值表达式测试完成")

@@ -1,0 +1,65 @@
+// 测试算术表达式
+
+PrintLine("=== 算术表达式测试 ===")
+
+// 整数算术运算
+PrintLine("=== 整数算术运算 ===")
+
+// 加法
+addResult <- 10 + 5
+PrintLine("10 + 5 = " + addResult)
+
+// 减法
+subResult <- 10 - 5
+PrintLine("10 - 5 = " + subResult)
+
+// 减法 字符串
+stringGreaterResult <- "banana-apple" - "apple"
+PrintLine("\"banana-apple\" - \"apple\" = " + stringGreaterResult)
+
+// 乘法
+mulResult <- 10 * 5
+PrintLine("10 * 5 = " + mulResult)
+
+// 除法
+divResult <- 10 / 5
+PrintLine("10 / 5 = " + divResult)
+
+// 取模
+modResult <- 10 % 3
+PrintLine("10 % 3 = " + modResult)
+
+// 负数运算
+negResult <- -10 + 5
+PrintLine("-10 + 5 = " + negResult)
+
+// 浮点数算术运算
+PrintLine("=== 浮点数算术运算 ===")
+
+// 加法
+doubleAddResult <- 10.5 + 5.2
+PrintLine("10.5 + 5.2 = " + doubleAddResult)
+
+// 减法
+doubleSubResult <- 10.5 - 5.2
+PrintLine("10.5 - 5.2 = " + doubleSubResult)
+
+// 乘法
+doubleMulResult <- 10.5 * 5.2
+PrintLine("10.5 * 5.2 = " + doubleMulResult)
+
+// 除法
+doubleDivResult <- 10.5 / 5.2
+PrintLine("10.5 / 5.2 = " + doubleDivResult)
+
+// 混合类型运算
+PrintLine("=== 混合类型运算 ===")
+mixedResult <- 10 + 5.5
+PrintLine("10 + 5.5 = " + mixedResult)
+
+// 复杂表达式
+PrintLine("=== 复杂表达式 ===")
+complexResult <- (10 + 5) * 2 - 8 / 4
+PrintLine("(10 + 5) * 2 - 8 / 4 = " + complexResult)
+
+PrintLine("✅ 所有算术表达式测试完成")

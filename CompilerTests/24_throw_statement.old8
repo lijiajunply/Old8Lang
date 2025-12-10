@@ -1,0 +1,159 @@
+// 测试throw语句的解释模式执行
+
+PrintLine("=== 开始测试throw语句 ===")
+
+// 测试1: 基本的throw语句，预期会终止程序
+// 这里我们将它放在try-catch块中，以便程序继续执行
+PrintLine("\n=== 测试1: 基本throw语句 ===")
+try {
+    throw "这是一个错误信息"
+    PrintLine("这条语句不应该被执行")
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 测试2: throw不同类型的表达式
+PrintLine("\n=== 测试2: throw不同类型的表达式 ===")
+
+// throw整数
+try {
+    throw 123
+} catch (e) {
+    PrintLine("捕获到整数异常: " + e)
+}
+
+// throw浮点数
+try {
+    throw 3.14
+} catch (e) {
+    PrintLine("捕获到浮点数异常: " + e)
+}
+
+// throw布尔值
+try {
+    throw true
+} catch (e) {
+    PrintLine("捕获到布尔值异常: " + e)
+}
+
+// throw数组
+try {
+    throw [1, 2, 3]
+} catch (e) {
+    PrintLine("捕获到数组异常: " + e)
+}
+
+// throw字典
+try {
+    throw {"key": "value"}
+} catch (e) {
+    PrintLine("捕获到字典异常: " + e)
+}
+
+// 测试3: throw变量
+try {
+    errorMsg <- "自定义错误信息"
+    throw errorMsg
+} catch (e) {
+    PrintLine("捕获到变量异常: " + e)
+}
+
+// 测试4: throw函数调用结果
+func getError() {
+    return "函数返回的错误"
+}
+
+try {
+    throw getError()
+} catch (e) {
+    PrintLine("捕获到函数错误: " + e)
+}
+
+// 测试5: 在函数中throw，在调用处捕获
+func throwFromFunc() {
+    PrintLine("函数执行中...")
+    throw "从函数中抛出异常"
+    PrintLine("函数中throw之后的语句")
+}
+
+try {
+    throwFromFunc()
+    PrintLine("调用函数后的语句")
+} catch (e) {
+    PrintLine("捕获到函数抛出的异常: " + e)
+}
+
+// 测试6: 在if语句中throw
+PrintLine("\n=== 测试6: 在if语句中throw ===")
+try {
+    condition <- true
+    if condition {
+        throw "if语句中抛出的异常"
+    }
+    PrintLine("if语句后的语句")
+} catch (e) {
+    PrintLine("捕获到if中的异常: " + e)
+}
+
+// 测试7: 在while循环中throw
+PrintLine("\n=== 测试7: 在while循环中throw ===")
+try {
+    count <- 0
+    while count < 5 {
+        PrintLine("循环执行，count = " + count)
+        if count == 2 {
+            throw "while循环中抛出异常"
+        }
+        count <- count + 1
+    }
+    PrintLine("循环结束")
+} catch (e) {
+    PrintLine("捕获到while循环中的异常: " + e)
+    PrintLine("当前count值: " + count)
+}
+
+// 测试8: 嵌套try-catch中的throw
+PrintLine("\n=== 测试8: 嵌套try-catch中的throw ===")
+try {
+    PrintLine("外层try开始")
+    try {
+        PrintLine("内层try开始")
+        throw "内层try中的异常"
+        PrintLine("内层try中的后续语句")
+    } catch (innerE) {
+        PrintLine("内层catch捕获: " + innerE)
+        // 在内层catch中重新抛出异常
+        throw "从内层catch重新抛出"
+    } finally {
+        PrintLine("内层finally执行")
+    }
+    PrintLine("外层try中的后续语句")
+} catch (outerE) {
+    PrintLine("外层catch捕获: " + outerE)
+} finally {
+    PrintLine("外层finally执行")
+}
+
+// 测试9: 没有catch块的情况
+// 这将导致程序终止，所以我们先保存当前状态
+PrintLine("\n=== 测试9: 没有catch块的情况 ===")
+try {
+    PrintLine("尝试throw，没有对应的catch块")
+    // 注释掉下面的代码，因为它会导致程序终止
+    // throw "没有catch块的异常"
+    PrintLine("上面的throw被注释掉，程序继续执行")
+} finally {
+    PrintLine("finally块仍然执行")
+}
+
+// 测试10: throw复杂表达式
+PrintLine("\n=== 测试10: throw复杂表达式 ===")
+try {
+    errorCode <- "ERR_001"
+    errorMsg <- "系统错误"
+    throw "错误代码: " + errorCode + " - " + errorMsg + " (发生在测试中)"
+} catch (e) {
+    PrintLine("捕获到复杂表达式异常: " + e)
+}
+
+PrintLine("\n=== throw语句测试完成 ===")

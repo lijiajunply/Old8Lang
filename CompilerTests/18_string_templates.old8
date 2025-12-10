@@ -1,0 +1,144 @@
+// 测试字符串模板
+
+PrintLine("=== 字符串模板测试 ===")
+
+// 基本的字符串模板
+PrintLine("\n=== 基本的字符串模板 ===")
+
+name <- "Alice"
+message <- $"Hello, {name}!"
+PrintLine(message)
+
+// 模板中嵌入表达式
+PrintLine("\n=== 模板中嵌入表达式 ===")
+
+a <- 10
+b <- 20
+result <- $"a + b = {a + b}"
+PrintLine(result)
+
+// 模板中嵌入算术表达式
+PrintLine("\n=== 模板中嵌入算术表达式 ===")
+
+x <- 5
+power <- $"{x}的平方是{x * x}, 立方是{x * x * x}"
+PrintLine(power)
+
+// 模板中嵌入逻辑表达式
+PrintLine("\n=== 模板中嵌入逻辑表达式 ===")
+
+temp <- 25
+hot <- temp > 20
+weather <- $"今天温度{temp}度, {'热' if hot else '不热'}"
+PrintLine(weather)
+
+// 模板中嵌入函数调用
+PrintLine("\n=== 模板中嵌入函数调用 ===")
+
+func square(n) {
+    return n * n
+}
+
+y <- 4
+squareResult <- $"{y}的平方是{square(y)}"
+PrintLine(squareResult)
+
+// 转义大括号
+PrintLine("\n=== 转义大括号 ===")
+
+// 转义单个大括号
+escape1 <- $"这是一个大括号: {{, 这是另一个: }}"
+PrintLine(escape1)
+
+// 混合使用转义和模板占位符
+escape2 <- $"变量{name}的值是{name}, 使用双大括号转义: {{name}}"
+PrintLine(escape2)
+
+// 多行字符串模板
+PrintLine("\n=== 多行字符串模板 ===")
+
+multiLine <- $"""
+这是一个多行字符串模板
+变量name的值是: {name}
+变量age的值是: {30}
+算术表达式: {1 + 2 * 3}
+"""
+PrintLine(multiLine)
+
+// 模板中的嵌套模板
+PrintLine("\n=== 模板中的嵌套模板 ===")
+
+// 注意：这里可能不支持嵌套模板
+// nested <- $"外层模板: { $"内层模板: {name}" }"
+// PrintLine(nested)
+
+// 模板中的条件表达式
+PrintLine("\n=== 模板中的条件表达式 ===")
+
+age <- 30
+description <- $"{name}是一个{age}岁的{'成年人' if age >= 18 else '未成年人'}"
+PrintLine(description)
+
+// 模板中的数组和列表
+PrintLine("\n=== 模板中的数组和列表 ===")
+
+array <- [1, 2, 3, 4, 5]
+arrayStr <- $"数组内容: {array}"
+PrintLine(arrayStr)
+
+// 模板中的字典
+PrintLine("\n=== 模板中的字典 ===")
+
+dict <- {"name": "Bob", "age": 25}
+dictStr <- $"字典内容: {dict}"
+PrintLine(dictStr)
+
+// 模板中的布尔值
+PrintLine("\n=== 模板中的布尔值 ===")
+
+boolVar <- true
+boolStr <- $"布尔值: {boolVar}"
+PrintLine(boolStr)
+
+// 模板中的空值
+PrintLine("\n=== 模板中的空值 ===")
+
+emptyStr <- ""
+emptyStrTemplate <- $"空字符串: '{emptyStr}'"
+PrintLine(emptyStrTemplate)
+
+// 复杂的字符串模板
+PrintLine("\n=== 复杂的字符串模板 ===")
+
+person <- {
+    "name": "Charlie",
+    "age": 35,
+    "city": "New York",
+    "hobbies": ["reading", "swimming", "coding"]
+}
+
+complexTemplate <- $"Name: {person['name']}, Age: {person['age']}, City: {person['city']}, Hobbies: {person['hobbies']}"
+PrintLine(complexTemplate)
+
+// 模板中嵌入类型转换
+PrintLine("\n=== 模板中嵌入类型转换 ===")
+
+number <- 42
+stringNumber <- $"数字{number}转换为字符串: '{number as string}'"
+PrintLine(stringNumber)
+
+// 使用字符串模板格式化
+PrintLine("\n=== 使用字符串模板格式化 ===")
+
+for i <- 0, i < 3, i++ {
+    formatted <- $"索引{i}: 值{i * 10}"
+    PrintLine(formatted)
+}
+
+// 模板中的特殊字符
+PrintLine("\n=== 模板中的特殊字符 ===")
+
+specialStr <- $"特殊字符: \n换行符, \t制表符, \\反斜杠"
+PrintLine(specialStr)
+
+PrintLine("\n✅ 所有字符串模板测试完成")

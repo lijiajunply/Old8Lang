@@ -1,0 +1,125 @@
+// 测试列表推导式
+
+PrintLine("=== 列表推导式测试 ===")
+
+// 基本的列表推导式
+PrintLine("\n=== 基本的列表推导式 ===")
+
+numbers <- [1, 2, 3, 4, 5]
+squares <- [x * x for x in numbers]
+PrintLine("原始列表: " + numbers)
+PrintLine("平方列表: " + squares)
+
+// 列表推导式中的算术运算
+PrintLine("\n=== 列表推导式中的算术运算 ===")
+
+doubles <- [x * 2 for x in numbers]
+PrintLine("原始列表: " + numbers)
+PrintLine("翻倍列表: " + doubles)
+
+// 列表推导式中的条件筛选
+PrintLine("\n=== 列表推导式中的条件筛选 ===")
+
+evens <- [x for x in numbers if x % 2 == 0]
+PrintLine("原始列表: " + numbers)
+PrintLine("偶数列表: " + evens)
+
+// 列表推导式中的条件筛选和运算
+PrintLine("\n=== 列表推导式中的条件筛选和运算 ===")
+
+evenSquares <- [x * x for x in numbers if x % 2 == 0]
+PrintLine("原始列表: " + numbers)
+PrintLine("偶数平方列表: " + evenSquares)
+
+// 列表推导式中的多个条件
+PrintLine("\n=== 列表推导式中的多个条件 ===")
+
+multiConditions <- [x for x in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] if x % 2 == 0 if x > 5]
+PrintLine("1-10中大于5的偶数: " + multiConditions)
+
+// 列表推导式中的if-else条件
+PrintLine("\n=== 列表推导式中的if-else条件 ===")
+
+ifElseList <- [x % 2 == 0 ? x : 0 for x in numbers]
+PrintLine("原始列表: " + numbers)
+PrintLine("偶数保留，奇数为0: " + ifElseList)
+
+// 列表推导式遍历字符串
+PrintLine("\n=== 列表推导式遍历字符串 ===")
+
+word <- "hello"
+characters <- [c for c in word]
+PrintLine("字符串: " + word)
+PrintLine("字符列表: " + characters)
+
+// 列表推导式遍历范围
+PrintLine("\n=== 列表推导式遍历范围 ===")
+
+rangeList <- [x * x for x in [1~5]]
+PrintLine("范围[1~5]的平方: " + rangeList)
+
+// 嵌套列表推导式
+PrintLine("\n=== 嵌套列表推导式 ===")
+
+matrix <- [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+flattened <- [x for row in matrix for x in row]
+PrintLine("原始矩阵: " + matrix)
+PrintLine("扁平化列表: " + flattened)
+
+// 复杂的嵌套列表推导式
+PrintLine("\n=== 复杂的嵌套列表推导式 ===")
+
+doubleNested <- [x + y for x in [1, 2, 3] for y in [4, 5]]
+PrintLine("[1,2,3]和[4,5]的元素和: " + doubleNested)
+
+// 列表推导式中的函数调用
+PrintLine("\n=== 列表推导式中的函数调用 ===")
+
+func isPrime(n) {
+    if n <= 1 {
+        return false
+    }
+    for i <- 2, i * i <= n, i++ {
+        if n % i == 0 {
+            return false
+        }
+    }
+    return true
+}
+
+primes <- [x for x in [1~20] if isPrime(x)]
+PrintLine("1-20中的质数: " + primes)
+
+// 列表推导式中的类型转换
+PrintLine("\n=== 列表推导式中的类型转换 ===")
+
+doublesList <- [1.1, 2.2, 3.3, 4.4]
+intsList <- [x as int for x in doublesList]
+PrintLine("原始浮点列表: " + doublesList)
+PrintLine("转换为整数列表: " + intsList)
+
+// 列表推导式生成字典
+// PrintLine("\n=== 列表推导式生成字典 ===")
+
+// 注意：这里可能不支持直接生成字典
+// dictComprehension <- {x: x * x for x in numbers}
+// PrintLine("字典推导式: " + dictComprehension)
+
+// 列表推导式生成元组
+PrintLine("\n=== 列表推导式生成元组 ===")
+
+tupleComprehension <- [(x, x * x) for x in numbers]
+PrintLine("元组推导式: " + tupleComprehension)
+
+// 使用列表推导式生成二维列表
+PrintLine("\n=== 使用列表推导式生成二维列表 ===")
+
+// 生成3x3的零矩阵
+zeroMatrix <- [[0 for j in [0~2]] for i in [0~2]]
+PrintLine("3x3零矩阵: " + zeroMatrix)
+
+// 生成3x3的单位矩阵
+identityMatrix <- [[i == j ? 1 : 0 for j in [0~2]] for i in [0~2]]
+PrintLine("3x3单位矩阵: " + identityMatrix)
+
+PrintLine("\n✅ 所有列表推导式测试完成")
