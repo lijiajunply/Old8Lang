@@ -220,13 +220,22 @@ public class FuncLangValue : ImportInfo
         // 创建方法的 IL 发射器
         var methodIl = methodBuilder.GetILGenerator();
 
-        for (var i = 1; i <= Ids!.Count; i++)
+        // 检查方法是否是实例方法（第一个参数是this）
+        // 对于实例方法，第一个参数是this，真正的参数从索引1开始
+        int startIndex = 0;
+        var methodParams = methodBuilder.GetParameters();
+        if (methodParams.Length > Ids!.Count)
         {
-            var id = Ids[i - 1];
-            var localVar = methodIl.DeclareLocal(parameterTypes[i - 1]);
-            local.AddLocalVar(id.IdName, localVar);
-            methodIl.Emit(OpCodes.Ldarg, i);
+            // 有额外的参数，说明是实例方法，第一个参数是this
+            startIndex = 1;
+        }
 
+        for (var i = 0; i < Ids!.Count; i++)
+        {
+            var id = Ids[i];
+            var localVar = methodIl.DeclareLocal(parameterTypes[i]);
+            local.AddLocalVar(id.IdName, localVar);
+            methodIl.Emit(OpCodes.Ldarg, startIndex + i);
             methodIl.Emit(OpCodes.Stloc, localVar);
         }
 

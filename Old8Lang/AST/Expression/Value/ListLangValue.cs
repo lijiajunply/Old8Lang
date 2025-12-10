@@ -74,7 +74,8 @@ public class ListLangValue : LangValueType, ILangList
                     catch (Exception e)
                     {
                         // 如果转换失败，抛出类型不匹配错误
-                        throw new TypeError(this, existingType, newValueType, $"列表元素类型必须一致，无法将 {newValueType} 转换为 {existingType}: {e.Message}");
+                        throw new TypeError(this, existingType, newValueType,
+                            $"列表元素类型必须一致，无法将 {newValueType} 转换为 {existingType}: {e.Message}");
                     }
                 }
             }
@@ -186,19 +187,19 @@ public class ListLangValue : LangValueType, ILangList
         // 创建泛型List实例
         var listConstructor = listType.GetConstructor(Type.EmptyTypes)!;
         ilGenerator.Emit(OpCodes.Newobj, listConstructor);
-        
+
         // 如果没有元素需要添加，直接返回List实例
         if (Value.Count == 0)
         {
             return;
         }
-        
+
         // 否则，将List实例存储到局部变量
         var l = ilGenerator.DeclareLocal(listType);
         ilGenerator.Emit(OpCodes.Stloc, l.LocalIndex);
 
         // 向List中添加元素
-        var addMethod = listType.GetMethod("Add", [itemType])!;
+        var addMethod = listType.GetMethod("Add", [itemType ?? typeof(object)])!;
         foreach (var expr in Value)
         {
             ilGenerator.Emit(OpCodes.Ldloc, l.LocalIndex);
@@ -208,9 +209,10 @@ public class ListLangValue : LangValueType, ILangList
             {
                 ilGenerator.Emit(OpCodes.Box, t!);
             }
+
             ilGenerator.Emit(OpCodes.Callvirt, addMethod); // 调用Add方法
         }
-        
+
         // 将填充好的List实例加载到堆栈
         ilGenerator.Emit(OpCodes.Ldloc, l.LocalIndex);
     }
@@ -237,14 +239,9 @@ public class ListLangValue : LangValueType, ILangList
         {
             itemType = Values[0].OutputType(local);
             // 检查所有元素是否为同一类型
-            foreach (var value in Values)
+            if (Values.Select(value => value.OutputType(local)).Any(valueType => valueType != itemType))
             {
-                var valueType = value.OutputType(local);
-                if (valueType != itemType)
-                {
-                    itemType = typeof(object);
-                    break;
-                }
+                itemType = typeof(object);
             }
         }
 

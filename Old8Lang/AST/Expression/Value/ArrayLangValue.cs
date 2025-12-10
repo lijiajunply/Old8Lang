@@ -23,7 +23,7 @@ public class ArrayLangValue : LangValueType, ILangList
     public ArrayLangValue(List<LangValueType> re, SourcePosition position = default) : base(position)
     {
         RunResult = [.. re];
-        Values = new List<OldExpr>(); // 初始化空列表，因为我们已经有了RunResult
+        Values = []; // 初始化空列表，因为我们已经有了RunResult
     }
 
     public ArrayLangValue(List<object> a, SourcePosition position = default) : base(position) =>
@@ -48,7 +48,7 @@ public class ArrayLangValue : LangValueType, ILangList
             // 类型检查和转换：确保添加的元素类型与数组中已有的元素类型一致
             // 如果类型不一致，尝试进行类型转换
             LangValueType convertedValue = value;
-            if (RunResult.Length > 0 && RunResult[i.Value] != null)
+            if (RunResult.Length > 0 && RunResult[i.Value] != null!)
             {
                 var existingType = RunResult[i.Value].TypeToString().ToLower();
                 var newValueType = value.TypeToString().ToLower();
@@ -66,38 +66,39 @@ public class ArrayLangValue : LangValueType, ILangList
                     catch (Exception e)
                     {
                         // 如果转换失败，抛出类型不匹配错误
-                        throw new TypeError(this, existingType, newValueType, $"数组元素类型必须一致，无法将 {newValueType} 转换为 {existingType}: {e.Message}");
+                        throw new TypeError(this, existingType, newValueType,
+                            $"数组元素类型必须一致，无法将 {newValueType} 转换为 {existingType}: {e.Message}");
                     }
                 }
             }
             else if (RunResult.Length > 0)
             {
                 // 如果数组元素为空，检查其他非空元素的类型
-                for (int j = 0; j < RunResult.Length; j++)
+                foreach (var t in RunResult)
                 {
-                    if (RunResult[j] != null)
-                    {
-                        var existingType = RunResult[j].TypeToString().ToLower();
-                        var newValueType = value.TypeToString().ToLower();
+                    if (t == null!) continue;
+                    var existingType = t.TypeToString().ToLower();
+                    var newValueType = value.TypeToString().ToLower();
 
-                        if (existingType != newValueType)
+                    if (existingType != newValueType)
+                    {
+                        // 尝试进行类型转换
+                        try
                         {
-                            // 尝试进行类型转换
-                                try
-                                {
-                                    // 创建类型值用于转换
-                                    var targetType = new TypeLangValue(existingType);
-                                    // 调用 Converse 方法进行类型转换
-                                    convertedValue = value.Converse(targetType, new LangParser.VariateManager());
-                                }
-                            catch (Exception e)
-                            {
-                                // 如果转换失败，抛出类型不匹配错误
-                                throw new TypeError(this, existingType, newValueType, $"数组元素类型必须一致，无法将 {newValueType} 转换为 {existingType}: {e.Message}");
-                            }
+                            // 创建类型值用于转换
+                            var targetType = new TypeLangValue(existingType);
+                            // 调用 Converse 方法进行类型转换
+                            convertedValue = value.Converse(targetType, new LangParser.VariateManager());
                         }
-                        break;
+                        catch (Exception e)
+                        {
+                            // 如果转换失败，抛出类型不匹配错误
+                            throw new TypeError(this, existingType, newValueType,
+                                $"数组元素类型必须一致，无法将 {newValueType} 转换为 {existingType}: {e.Message}");
+                        }
                     }
+
+                    break;
                 }
             }
 
@@ -148,7 +149,7 @@ public class ArrayLangValue : LangValueType, ILangList
         {
             ilGenerator.Emit(OpCodes.Dup); // 复制数组引用
             ilGenerator.Emit(OpCodes.Ldc_I4, i); // 加载索引
-            
+
             Type t;
             if (len == Values.Count)
             {
@@ -160,7 +161,7 @@ public class ArrayLangValue : LangValueType, ILangList
             {
                 // 否则，使用RunResult[i]，但要确保它不为null
                 var item = RunResult[i];
-                if (item == null)
+                if (item == null!)
                 {
                     // 如果item为null，加载一个null值
                     ilGenerator.Emit(OpCodes.Ldnull);
@@ -179,10 +180,10 @@ public class ArrayLangValue : LangValueType, ILangList
     }
 
     public override Type OutputType(LocalManager local) => typeof(object[]);
-    
+
     public override LangValueType Converse(LangValueType otherLangValueType, LangParser.VariateManager manager)
     {
-        if (otherLangValueType is not TypeLangValue value) 
+        if (otherLangValueType is not TypeLangValue value)
             throw new TypeError(this, "TypeValue", otherLangValueType.GetType().Name);
 
         switch (value.Value)

@@ -423,8 +423,11 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 ilGenerator.Emit(OpCodes.Sub);
                 return typeof(int);
             case OperationType.TIMES:
+                // 简化处理，只处理基本的int和double类型
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
+                
+                // 处理不同类型的乘法
                 if (leftType == typeof(double) || rightType == typeof(double))
                 {
                     // 确保两个操作数都是double类型
@@ -439,37 +442,26 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     ilGenerator.Emit(OpCodes.Mul);
                     return typeof(double);
                 }
+                // 整数乘法
                 else if (leftType == typeof(int) && rightType == typeof(int))
                 {
                     ilGenerator.Emit(OpCodes.Mul);
                     return typeof(int);
                 }
+                // 其他类型，默认使用整数乘法
                 else
                 {
-                    // 对于其他类型，尝试转换为double类型
-                    // 对于object类型，先转换为double
-                    if (leftType == typeof(object))
+                    // 尝试转换为int并执行乘法
+                    if (leftType != typeof(int))
                     {
-                        // 调用Convert.ToDouble(object)
-                        ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToDouble", [typeof(object)])!);
+                        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
                     }
-                    else if (leftType == typeof(int))
+                    if (rightType != typeof(int))
                     {
-                        ilGenerator.Emit(OpCodes.Conv_R8);
+                        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
                     }
-                    
-                    if (rightType == typeof(object))
-                    {
-                        // 调用Convert.ToDouble(object)
-                        ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToDouble", [typeof(object)])!);
-                    }
-                    else if (rightType == typeof(int))
-                    {
-                        ilGenerator.Emit(OpCodes.Conv_R8);
-                    }
-                    
                     ilGenerator.Emit(OpCodes.Mul);
-                    return typeof(double);
+                    return typeof(int);
                 }
             case OperationType.DIVIDE:
                 Left?.LoadIlValue(ilGenerator, local);
@@ -617,8 +609,34 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     // 确保leftType不为null
                     if (leftType == null) leftType = typeof(object);
                     
-                    // 只处理基本的数值类型转换，避免复杂的方法调用
-                    if (leftType == typeof(int))
+                    // 处理基本类型到字符串的转换
+                    if (targetType == typeof(string))
+                    {
+                        // 所有类型转换为字符串
+                        if (leftType == typeof(int))
+                        {
+                            // int转string
+                            ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToString", [typeof(int)])!);
+                        }
+                        else if (leftType == typeof(double))
+                        {
+                            // double转string
+                            ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToString", [typeof(double)])!);
+                        }
+                        else if (leftType == typeof(bool))
+                        {
+                            // bool转string
+                            ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToString", [typeof(bool)])!);
+                        }
+                        else if (leftType == typeof(object))
+                        {
+                            // object转string
+                            ilGenerator.Emit(OpCodes.Callvirt, typeof(object).GetMethod("ToString")!);
+                        }
+                        // 如果已经是string类型，不需要转换
+                    }
+                    // 处理数值类型之间的转换
+                    else if (leftType == typeof(int))
                     {
                         if (targetType == typeof(double))
                         {
@@ -648,7 +666,6 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                             // 布尔值在栈上是1(true)或0(false)，直接转换为int即可
                         }
                     }
-                    // 字符串转换暂时不实现，避免InvalidProgramException
                     // 其他情况：如果类型不同但都是值类型，尝试使用Convert类转换
                     else if (leftType.IsValueType && targetType.IsValueType && leftType != targetType)
                     {

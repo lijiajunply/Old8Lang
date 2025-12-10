@@ -1,0 +1,8 @@
+// 测试基本函数调用
+func square(n: int) {
+    return n * n
+}
+
+x <- 4
+result <- square(x)
+PrintLine(result)

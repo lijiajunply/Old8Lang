@@ -29,7 +29,7 @@ PrintLine("\n=== 模板中嵌入逻辑表达式 ===")
 
 temp <- 25
 hot <- temp > 20
-weather <- $"今天温度{temp}度, {'热' if hot else '不热'}"
+weather <- $"今天温度{temp}度, {hot ? '热' : '冷'}"
 PrintLine(weather)
 
 // 模板中嵌入函数调用

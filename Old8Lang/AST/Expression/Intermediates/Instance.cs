@@ -368,8 +368,8 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
         if (local.DelegateVar.TryGetValue(Id.IdName, out var result))
         {
             // 检查参数数量是否匹配
-            var parameters = result.GetParameters();
-            if (parameters.Length == Ids.Count)
+            var methodParams = result.GetParameters();
+            if (methodParams.Length == Ids.Count)
             {
                 matchingMethod = result;
             }
@@ -411,28 +411,57 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
             return;
         }
 
-        if (matchingMethod is MethodBuilder)
+        // 处理所有类型的方法调用，包括DynamicMethod和MethodBuilder
+        var matchingParams = matchingMethod.GetParameters();
+        for (var i = 0; i < Ids.Count; i++)
         {
-            foreach (var id in Ids)
+            var id = Ids[i];
+            id.LoadIlValue(ilGenerator, local);
+            
+            // 确保参数类型匹配
+            if (i < matchingParams.Length)
             {
-                id.LoadIlValue(ilGenerator, local);
-            }
-        }
-        else
-        {
-            var a = matchingMethod.GetParameters();
-            for (var i = 0; i < Ids.Count; i++)
-            {
-                var id = Ids[i];
-                id.LoadIlValue(ilGenerator, local);
+                var paramType = matchingParams[i].ParameterType;
                 var idType = id.OutputType(local);
-                if (a[i].ParameterType == typeof(object) && idType!.IsValueType)
+                
+                // 确保参数类型与方法期望的类型匹配
+                if (idType != null && paramType != idType)
                 {
-                    ilGenerator.Emit(OpCodes.Box, idType);
+                    if (paramType == typeof(int) && idType == typeof(int))
+                    {
+                        // 类型已经匹配，不需要转换
+                    }
+                    else if (paramType == typeof(int) && idType == typeof(object))
+                    {
+                        // 从object转换为int
+                        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+                    }
+                    else if (paramType == typeof(double) && idType == typeof(object))
+                    {
+                        // 从object转换为double
+                        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(double));
+                    }
+                    else if (paramType == typeof(object) && idType.IsValueType)
+                    {
+                        // 从值类型转换为object，需要装箱
+                        ilGenerator.Emit(OpCodes.Box, idType);
+                    }
+                    else if (paramType == typeof(int) && idType == typeof(double))
+                    {
+                        // 从double转换为int
+                        ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToInt32", [typeof(double)])!);
+                    }
+                    else if (paramType == typeof(double) && idType == typeof(int))
+                    {
+                        // 从int转换为double
+                        ilGenerator.Emit(OpCodes.Conv_R8);
+                    }
                 }
             }
         }
-
+        
+        // 调用方法
+        // 对于DynamicMethod，使用Call指令
         ilGenerator.Emit(OpCodes.Call, matchingMethod);
     }
 

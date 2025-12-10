@@ -1,6 +1,7 @@
 using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using System.Text;
+using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
@@ -32,14 +33,23 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
         {
-            // 获取方法的名称和参数类型
+            // 获取方法的名称
             var methodName = FuncLangValue.Id!.IdName;
             if (FuncLangValue.Method != null)
             {
                 local.DelegateVar.Add(methodName, FuncLangValue.Method);
                 return;
             }
-            var parameterTypes = FuncLangValue.Ids!.Select(item => item.OutputType(local)).ToArray();
+            
+            // 使用参数的类型注解来确定参数类型
+            var parameterTypes = FuncLangValue.Ids!.Select(item => {
+                if (item is LangId langId)
+                {
+                    // 使用LangId的OutputType方法，该方法会解析AssumptionType
+                    return langId.OutputType(local);
+                }
+                return typeof(object);
+            }).ToArray();
 
             // 获取返回类型
             var returnType = GetItemType(FuncLangValue.BlockStatement, local);
@@ -55,14 +65,19 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
             // 创建方法的 IL 发射器
             var methodIl = dynamicMethod.GetILGenerator();
 
+            // 创建一个新的LocalManager实例，专门用于函数体的IL生成
+            // 这样可以避免函数内部的局部变量与外部的局部变量冲突
             var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
 
             // 处理参数
             for (var i = 0; i < FuncLangValue.Ids!.Count; i++)
             {
                 var id = FuncLangValue.Ids[i];
-                var localVar = methodIl.DeclareLocal(parameterTypes[i]);
+                // 使用实际的参数类型声明局部变量
+                var paramType = parameterTypes[i];
+                var localVar = methodIl.DeclareLocal(paramType);
                 funcLocal.AddLocalVar(id.IdName, localVar);
+                // 加载参数并存储到局部变量
                 methodIl.Emit(OpCodes.Ldarg, i);
                 methodIl.Emit(OpCodes.Stloc, localVar.LocalIndex);
             }
@@ -87,7 +102,9 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
 
             if (item is ReturnStatement returnStatement)
             {
-                return returnStatement.OutputType(local);
+                // 确保返回类型不为null
+                var returnType = returnStatement.OutputType(local);
+                return returnType ?? typeof(int); // 默认返回int类型
             }
 
             if (item == null || item.Count == 0)
@@ -95,10 +112,14 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
                 continue;
             }
 
-            return GetItemType(item, local);
+            var innerType = GetItemType(item, local);
+            if (innerType != typeof(void))
+            {
+                return innerType;
+            }
         }
 
-        return typeof(void);
+        return typeof(int); // 默认返回int类型，而不是void
     }
 
     public override OldStatement this[int index] => this;

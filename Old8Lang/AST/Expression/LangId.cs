@@ -58,7 +58,12 @@ public class LangId(string name, string assumptionType = "", OldExpr? defaultVal
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         var value = local.GetLocalVar(IdName);
-        if (value is null) return;
+        if (value is null) 
+        {
+            // 如果变量不存在，加载默认值null
+            ilGenerator.Emit(OpCodes.Ldnull);
+            return;
+        }
         ilGenerator.Emit(OpCodes.Ldloc, value.LocalIndex);
     }
 

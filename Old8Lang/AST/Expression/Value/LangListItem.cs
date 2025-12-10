@@ -64,7 +64,7 @@ public class LangListItem(LangId listId, OldExpr key, SourcePosition position = 
         }
         else if (listType == typeof(Dictionary<object, object>))
         {
-            // 处理字典索引访问
+            // 处理Dictionary<object, object>类型的字典索引访问
             listId.LoadIlValue(ilGenerator, local); // 加载字典
             key.LoadIlValue(ilGenerator, local); // 加载键
             // 确保键是对象类型
@@ -75,6 +75,33 @@ public class LangListItem(LangId listId, OldExpr key, SourcePosition position = 
             }
             // 调用字典的索引器（get_Item方法）
             var getDictionaryItemMethod = typeof(Dictionary<object, object>).GetMethod("get_Item", [typeof(object)])!;
+            ilGenerator.Emit(OpCodes.Callvirt, getDictionaryItemMethod);
+        }
+        else if (listType == typeof(Dictionary<string, object>))
+        {
+            // 处理Dictionary<string, object>类型的字典索引访问
+            listId.LoadIlValue(ilGenerator, local); // 加载字典
+            
+            // 处理键
+            if (key is StringLangValue stringKey)
+            {
+                // 键是字符串字面量，直接加载字符串值
+                ilGenerator.Emit(OpCodes.Ldstr, stringKey.Value);
+            }
+            else
+            {
+                // 键不是字符串字面量，加载并转换为字符串
+                key.LoadIlValue(ilGenerator, local);
+                var keyType = key.OutputType(local);
+                if (keyType != typeof(string))
+                {
+                    // 如果键不是字符串类型，转换为字符串
+                    ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToString", [typeof(object)])!);
+                }
+            }
+            
+            // 调用字典的索引器（get_Item方法）
+            var getDictionaryItemMethod = typeof(Dictionary<string, object>).GetMethod("get_Item", [typeof(string)])!;
             ilGenerator.Emit(OpCodes.Callvirt, getDictionaryItemMethod);
         }
         else if (listType.IsArray)
