@@ -10,7 +10,7 @@ if (args.Length == 0)
 {
     args =
     [
-        "-f", "/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/SyntaxTests/ternary_token_test.old8"
+        "-f", "/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Ex/init.old8"
     ];
 }
 #endif
@@ -190,13 +190,13 @@ if (command == fromFileCmd)
         return;
     }
 
-    var aLangInterpreter = new LangInterpreter();
+    var langInterpreter = new LangInterpreter();
 
     try
     {
         var code = Apis.FromFile(args[1]);
-        var b = aLangInterpreter.Build(code, args[1]);
-        b.Run(aLangInterpreter.Manager);
+        var b = langInterpreter.Build(code, args[1]);
+        b.Run(langInterpreter.Manager);
     }
     catch (Exception e)
     {

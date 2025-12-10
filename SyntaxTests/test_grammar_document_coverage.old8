@@ -1,0 +1,117 @@
+// 测试语法文档中提到的所有语法
+// 覆盖Old8Lang_Grammar.md中所有语法点
+
+// 基本类型和表达式
+int_var:int <- 123
+double_var:double <- 3.14
+string_var:string <- "hello"
+bool_var:bool <- true
+char_var:char <- 'a'
+
+// 算术表达式（包含取模运算符）
+arith_result <- 1 + 2 * 3 / 4 - 5 % 2
+
+// 比较表达式
+comp_result <- a == b and c < d
+
+// 赋值表达式
+assign_result <- a <- b + c
+
+// 成员访问
+obj.field <- value
+obj.method()
+
+// 索引表达式
+array[0] <- 1
+list[1] <- 2
+dict["key"] <- "value"
+
+// 三元表达式（语法文档提到）
+ternary_result <- a > b ? a : b
+
+// 控制流语句
+if a > 5 {
+    PrintLine("a > 5")
+} elif a == 5 {
+    PrintLine("a == 5")
+} else {
+    PrintLine("a < 5")
+}
+
+for i <- 0, i < 10, i++ {
+    PrintLine(i)
+}
+
+while j < 5 {
+    j <- j + 1
+}
+
+for item in collection {
+    PrintLine(item)
+}
+
+switch value {
+    case 1 {
+        PrintLine("case 1")
+    }
+    case 2 {
+        PrintLine("case 2")
+    }
+    default {
+        PrintLine("default")
+    }
+}
+
+// 函数相关
+func add(a:int, b:int) -> int {
+    return a + b
+}
+
+add:int (a:int, b:int) -> {
+    return a + b
+}
+
+lambda_add <- (a:int, b:int) -> a + b
+
+// 类相关
+class Person {
+    public name:string <- ""
+    age:int <- 0
+    
+    func init(name:string, age:int) {
+        this.name <- name
+        this.age <- age
+    }
+    
+    public func sayHello() {
+        PrintLine("Hello, my name is " + name)
+    }
+}
+
+person <- Person("Alice", 30)
+person.sayHello()
+
+// 异常处理
+try {
+    throw "error"
+} catch (e) {
+    PrintLine(e)
+} finally {
+    PrintLine("finally")
+}
+
+// 类型转换
+convert_result <- int_var as double
+
+// 字符串模板
+template_result <- $"Name: {person.name}, Age: {person.age}"
+
+// 列表推导式（语法文档提到）
+numbers <- [1, 2, 3, 4, 5]
+squares <- [x * x for x in numbers]
+
+// 范围表达式
+range_expr <- [1~10]
+
+// 切片表达式
+slice_expr <- list[1:3]

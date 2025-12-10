@@ -1,0 +1,75 @@
+// 极值情况测试
+// 测试各种极值情况的语法
+
+// 极大整数
+max_int <- 9223372036854775807
+PrintLine(max_int) // 预期输出: 9223372036854775807
+
+// 极小整数
+min_int <- -9223372036854775808
+PrintLine(min_int) // 预期输出: -9223372036854775808
+
+// 极大浮点数
+max_double <- 1.7976931348623157e+308
+PrintLine(max_double) // 预期输出: 1.7976931348623157e+308
+
+// 极小浮点数
+min_double <- 2.2250738585072014e-308
+PrintLine(min_double) // 预期输出: 2.2250738585072014e-308
+
+// 超长字符串
+long_string <- ""
+for i <- 0, i < 1000, i++ {
+    long_string <- long_string + "a"
+}
+PrintLine(len(long_string)) // 预期输出: 1000
+
+// 超长标识符
+very_long_identifier_name_that_is_extremely_long_and_should_test_the_parser_s_capability_to_handle_long_identifiers <- 100
+PrintLine(very_long_identifier_name_that_is_extremely_long_and_should_test_the_parser_s_capability_to_handle_long_identifiers) // 预期输出: 100
+
+// 深度嵌套的表达式
+// 100层嵌套的括号
+nested_expr <- (((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((1 + 1))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+PrintLine(nested_expr) // 预期输出: 2
+
+// 大量并列语句
+count <- 0
+for i <- 0, i < 100, i++ {
+    count <- count + 1
+    count <- count + 1
+    count <- count + 1
+    count <- count + 1
+    count <- count + 1
+    count <- count + 1
+    count <- count + 1
+    count <- count + 1
+    count <- count + 1
+    count <- count + 1
+}
+PrintLine(count) // 预期输出: 1000
+
+// 复杂的条件表达式
+complex_cond <- (a > 1000000) and (b < -1000000) or (c == 1.7976931348623157e+308) and (d != "") and (e is not null)
+
+// 大量参数的函数调用
+func many_params(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20) {
+    return p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9 + p10 + p11 + p12 + p13 + p14 + p15 + p16 + p17 + p18 + p19 + p20
+}
+
+result <- many_params(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)
+PrintLine(result) // 预期输出: 210
+
+// 大量键值对的字典
+large_dict <- {}
+for i <- 0, i < 100, i++ {
+    large_dict["key" + i] <- i
+}
+PrintLine(len(large_dict)) // 预期输出: 100
+
+// 大量元素的列表
+large_list <- list[]
+for i <- 0, i < 1000, i++ {
+    large_list.append(i)
+}
+PrintLine(len(large_list)) // 预期输出: 1000

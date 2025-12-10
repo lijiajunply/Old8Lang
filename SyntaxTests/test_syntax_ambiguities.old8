@@ -1,0 +1,69 @@
+// 语法歧义测试
+// 测试可能产生语法歧义的情况
+
+// 测试if语句的歧义
+// 这个例子可能被解析为两种方式：
+// 1. if (a > b) { PrintLine("a > b"); } else { PrintLine("a <= b"); }
+// 2. if (a > b) { PrintLine("a > b"); } else PrintLine("a <= b");
+if a > b PrintLine("a > b") else PrintLine("a <= b")
+
+// 测试for循环的歧义
+// 这个例子测试分号和逗号的使用
+for i <- 0, i < 5, i++ PrintLine(i)
+
+// 测试函数调用与成员访问的歧义
+// 这个例子可能被解析为：
+// 1. (func())("param") // 函数返回函数，然后调用返回的函数
+// 2. func()("param") // 直接链式调用
+func test_ambiguity() {
+    func inner(x) {
+        return x
+    }
+    return inner
+}
+
+result1 <- test_ambiguity()("test")
+PrintLine(result1) // 预期输出: test
+
+// 测试表达式优先级歧义
+// 这个例子测试不同运算符的优先级
+result2 <- 1 + 2 * 3 / 4 - 5
+PrintLine(result2) // 预期输出: 1 + 6 / 4 - 5 = 1 + 1.5 - 5 = -2.5
+
+// 测试类型标注与赋值的歧义
+// 这个例子测试类型标注与赋值的结合
+var1:int <- 100
+var2 <- 200:int // 可能有歧义：是赋值还是类型标注？
+
+// 测试lambda表达式与箭头函数的歧义
+// 这个例子测试lambda表达式的不同形式
+lambda1 <- (x) -> x + 1
+lambda2 <- (x) -> { return x + 1 }
+
+result3 <- lambda1(10)
+result4 <- lambda2(20)
+PrintLine(result3) // 预期输出: 11
+PrintLine(result4) // 预期输出: 21
+
+// 测试三元表达式与其他表达式的歧义
+// 这个例子测试三元表达式与算术表达式的结合
+result5 <- 1 + 2 ? 3 : 4
+PrintLine(result5) // 预期输出: 3 (如果三元优先级高于加法) 或 4 (如果加法优先级高于三元)
+
+// 测试括号与表达式的歧义
+// 这个例子测试括号的不同解释
+result6 <- (1 + 2) * 3
+result7 <- 1 + (2 * 3)
+PrintLine(result6) // 预期输出: 9
+PrintLine(result7) // 预期输出: 7
+
+// 测试字符串模板与其他语法的歧义
+// 这个例子测试字符串模板与其他语法的结合
+template_test <- $"Value: {1 + 2 * 3}"
+PrintLine(template_test) // 预期输出: Value: 7
+
+// 测试列表推导式与其他语法的歧义
+// 这个例子测试列表推导式与条件表达式的结合
+data <- [1, 2, 3, 4, 5]
+result8 <- [x for x in data if x > 2]
+PrintLine(result8) // 预期输出: [3, 4, 5]

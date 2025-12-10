@@ -1,0 +1,125 @@
+// 空结构测试
+// 测试各种空结构的语法
+
+// 空块
+empty_block {}
+
+// 空函数体
+func empty_func() {
+}
+
+result1 <- empty_func()
+PrintLine(result1) // 预期输出: null 或 undefined
+
+// 空类体
+class EmptyClass {
+}
+
+instance1 <- EmptyClass()
+PrintLine(instance1) // 预期输出: EmptyClass 实例
+
+// 空列表
+empty_list <- list[]
+PrintLine(empty_list) // 预期输出: []
+
+// 空数组
+empty_array <- []
+PrintLine(empty_array) // 预期输出: []
+
+// 空字典
+empty_dict <- {}
+PrintLine(empty_dict) // 预期输出: {}
+
+// 空元组（注意：根据语法，元组需要至少两个元素）
+// 尝试创建空元组（预期会失败）
+// empty_tuple <- ()
+
+// 只有一个元素的元组（边界情况）
+single_tuple <- (1,)
+PrintLine(single_tuple) // 预期输出: (1,)
+
+// 空参数列表的函数
+func no_params() {
+    return "no params"
+}
+
+result2 <- no_params()
+PrintLine(result2) // 预期输出: no params
+
+// 空返回值的函数
+func no_return() {
+    // 没有return语句
+}
+
+result3 <- no_return()
+PrintLine(result3) // 预期输出: null 或 undefined
+
+// 空if条件体
+if true {
+}
+
+// 空elif条件体
+if false {
+    PrintLine("should not execute")
+} elif true {
+}
+
+// 空else体
+if false {
+    PrintLine("should not execute")
+} else {
+}
+
+// 空for循环体
+for i <- 0, i < 5, i++ {
+}
+
+// 空while循环体
+j <- 0
+while j < 5 {
+    j <- j + 1
+}
+
+// 空switch语句
+switch 1 {
+}
+
+// 空try块
+try {
+} catch (e) {
+    PrintLine(e)
+}
+
+// 空catch块
+try {
+    throw "error"
+} catch (e) {
+}
+
+// 空finally块
+try {
+    throw "error"
+} catch (e) {
+    PrintLine(e)
+} finally {
+}
+
+// 空导入语句（如果支持）
+// import ""
+
+// 空字符串模板
+empty_template <- $""
+PrintLine(empty_template) // 预期输出: ""
+
+// 空lambda表达式
+empty_lambda <- () -> {
+}
+
+result4 <- empty_lambda()
+PrintLine(result4) // 预期输出: null 或 undefined
+
+// 空range表达式（边界情况）
+// empty_range <- [~]
+
+// 空切片表达式（边界情况）
+// empty_slice <- list[:]

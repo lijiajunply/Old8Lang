@@ -1,0 +1,53 @@
+// 列表推导式测试
+// 测试语法文档中提到的列表推导式
+
+// 基本列表推导式
+numbers <- [1, 2, 3, 4, 5]
+squares <- [x * x for x in numbers]
+PrintLine(squares) // 预期输出: [1, 4, 9, 16, 25]
+
+// 带条件的列表推导式
+even_squares <- [x * x for x in numbers if x % 2 == 0]
+PrintLine(even_squares) // 预期输出: [4, 16]
+
+// 嵌套列表推导式
+matrix <- [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+flattened <- [x for row in matrix for x in row]
+PrintLine(flattened) // 预期输出: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+// 复杂表达式的列表推导式
+expr_results <- [x * 2 + y for x, y in [(1, 2), (3, 4), (5, 6)]]
+PrintLine(expr_results) // 预期输出: [4, 10, 16]
+
+// 列表推导式与函数结合
+func square(x) {
+    return x * x
+}
+
+func_squares <- [square(x) for x in numbers]
+PrintLine(func_squares) // 预期输出: [1, 4, 9, 16, 25]
+
+// 列表推导式与类型转换结合
+string_list <- ["1", "2", "3", "4", "5"]
+int_list <- [x as int for x in string_list]
+PrintLine(int_list) // 预期输出: [1, 2, 3, 4, 5]
+
+// 列表推导式与三元表达式结合
+conditional_list <- [x % 2 == 0 ? "even" : "odd" for x in numbers]
+PrintLine(conditional_list) // 预期输出: ["odd", "even", "odd", "even", "odd"]
+
+// 多个条件的列表推导式
+multi_conditional <- [x for x in numbers if x > 1 if x < 5 if x % 2 == 1]
+PrintLine(multi_conditional) // 预期输出: [3]
+
+// 使用range的列表推导式
+range_list <- [x for x in [1~10]]
+PrintLine(range_list) // 预期输出: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+// 列表推导式生成字符串
+string_chars <- [char for char in "hello"]
+PrintLine(string_chars) // 预期输出: ['h', 'e', 'l', 'l', 'o']
+
+// 复杂嵌套的列表推导式
+deep_nested <- [x * y for x in [1, 2] for y in [3, 4] for z in [5, 6] if x + y + z > 10]
+PrintLine(deep_nested) // 预期输出: [8, 10, 12]

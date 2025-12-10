@@ -1,0 +1,98 @@
+// 复杂表达式测试
+// 测试各种复杂的表达式组合
+
+// 复杂算术表达式
+a <- 10
+b <- 20
+c <- 30
+d <- 40
+e <- 50
+
+complex_arith <- (a + b * c - d) / e % 3 + (a ** b) // 注意：**可能不支持，根据实际语法调整
+PrintLine(complex_arith)
+
+// 复杂比较表达式
+complex_comp <- (a > b) and (b < c) or (c == d) xor (d != e) and not (a <= e)
+PrintLine(complex_comp)
+
+// 复杂成员访问表达式
+class ComplexClass {
+    field1 <- 10
+    
+    class InnerClass {
+        field2 <- 20
+        
+        func getValue() {
+            return this.field2
+        }
+    }
+    
+    inner <- InnerClass()
+    
+    func getInner() {
+        return this.inner
+    }
+}
+
+complex_access <- ComplexClass().getInner().getValue()
+PrintLine(complex_access) // 预期输出: 20
+
+// 复杂函数调用链
+func funcA(x) {
+    return x + 1
+}
+
+func funcB(x) {
+    return x * 2
+}
+
+func funcC(x) {
+    return x - 3
+}
+
+func funcD(x) {
+    return x / 2
+}
+
+complex_call <- funcD(funcC(funcB(funcA(10))))
+PrintLine(complex_call) // 预期输出: ((((10+1)*2)-3)/2) = (22-3)/2 = 19/2 = 9.5
+
+// 复杂lambda表达式
+complex_lambda <- (x, y) -> {
+    temp <- x + y
+    return temp * 2
+} (10, 20)
+PrintLine(complex_lambda) // 预期输出: 60
+
+// 复杂列表推导式
+matrix <- [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+complex_comp <- [x * 2 for row in matrix for x in row if x % 2 == 1]
+PrintLine(complex_comp) // 预期输出: [2, 6, 10, 14, 18]
+
+// 复杂字符串模板
+complex_template <- $"a: {a}, b: {b}, c: {c}, d: {d}, e: {e}, sum: {a + b + c + d + e}, product: {a * b * c * d * e}"
+PrintLine(complex_template)
+
+// 复杂类型转换
+complex_convert <- (a as double as string as int) as double
+PrintLine(complex_convert) // 预期输出: 10.0
+
+// 复杂三元表达式
+complex_ternary <- (a > 5 ? 
+    (b > 15 ? 
+        (c > 25 ? 
+            (d > 35 ? 
+                (e > 45 ? "all true" : "e too small") : 
+                "d too small") : 
+            "c too small") : 
+        "b too small") : 
+    "a too small")
+PrintLine(complex_ternary) // 预期输出: all true
+
+// 复杂赋值表达式
+complex_assign <- (a <- b + c) * (d <- e - a)
+PrintLine(complex_assign) // 预期输出: 50 * (50 - 30) = 50 * 20 = 1000
+
+// 复杂索引表达式
+complex_index <- [1, 2, 3, 4, 5][2] + {"a": 10, "b": 20, "c": 30}["b"] + list[100, 200, 300][1]
+PrintLine(complex_index) // 预期输出: 3 + 20 + 200 = 223

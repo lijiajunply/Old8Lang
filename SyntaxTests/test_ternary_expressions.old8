@@ -1,0 +1,51 @@
+// 三元表达式测试
+// 测试语法文档中提到的三元表达式
+
+// 基本三元表达式
+a <- 10
+b <- 20
+result1 <- a > b ? a : b
+PrintLine(result1) // 预期输出: 20
+
+// 嵌套三元表达式
+result2 <- a > b ? (a > 0 ? a : 0) : (b > 0 ? b : 0)
+PrintLine(result2) // 预期输出: 20
+
+// 三元表达式与其他表达式结合
+result3 <- (a + b) > 30 ? (a * b) : (a / b)
+PrintLine(result3) // 预期输出: 300
+
+// 三元表达式作为函数参数
+func test_param(x) {
+    return x
+}
+
+result4 <- test_param(a > b ? "a > b" : "a <= b")
+PrintLine(result4) // 预期输出: a <= b
+
+// 三元表达式作为赋值目标
+var1 <- 0
+var2 <- 0
+(a > b ? var1 : var2) <- 100
+PrintLine(var1) // 预期输出: 0
+PrintLine(var2) // 预期输出: 100
+
+// 三元表达式与类型转换结合
+result5 <- a > b ? (a as double) : (b as string)
+PrintLine(result5) // 预期输出: 20
+
+// 三元表达式与逻辑运算符结合
+result6 <- (a > 5 and b < 25) ? "both true" : "one false"
+PrintLine(result6) // 预期输出: both true
+
+// 复杂嵌套三元表达式
+result7 <- a > 5 ? 
+    (b > 15 ? 
+        (a + b > 30 ? "all true" : "sum too small") : 
+        "b too small") : 
+    "a too small"
+PrintLine(result7) // 预期输出: all true
+
+// 三元表达式返回不同类型
+result8 <- a > b ? 10 : "string"
+PrintLine(result8) // 预期输出: string

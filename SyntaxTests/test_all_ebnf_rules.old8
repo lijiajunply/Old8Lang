@@ -1,0 +1,97 @@
+// 测试所有EBNF规则
+// 覆盖Old8Lang.ebnf中定义的所有语法规则
+
+// 字面量测试
+string_literal <- "hello world"
+double_literal <- 3.14
+int_literal <- 123
+char_literal <- 'a'
+true_literal <- true
+false_literal <- false
+
+// 标识符和赋值
+a <- 10
+b:int <- 20
+c:double <- 3.14
+
+// 表达式测试
+d <- a + b * c
+e <- a > b and c < 4.0
+f <- not e
+
+// 语句测试
+if a > 5 {
+    PrintLine("a > 5")
+} elif a == 5 {
+    PrintLine("a == 5")
+} else {
+    PrintLine("a < 5")
+}
+
+for i <- 0, i < 5, i++ {
+    PrintLine(i)
+}
+
+while a < 20 {
+    a <- a + 1
+}
+
+// 函数测试
+func add(x, y) {
+    return x + y
+}
+
+result <- add(1, 2)
+
+// 类测试
+class TestClass {
+    field <- 0
+    
+    func init(value) {
+        this.field <- value
+    }
+    
+    func getField() {
+        return this.field
+    }
+}
+
+instance <- TestClass(10)
+PrintLine(instance.getField())
+
+// 异常处理
+try {
+    throw "error"
+} catch (e) {
+    PrintLine(e)
+} finally {
+    PrintLine("finally")
+}
+
+// 数据结构测试
+list_test <- list[1, 2, 3]
+array_test <- [1, 2, 3]
+tuple_test <- (1, "a")
+dict_test <- {"key": "value"}
+range_test <- [1~5]
+
+// 字符串模板
+template_test <- $"Value: {a}"
+
+// Lambda表达式
+lambda_test <- (x, y) -> x + y
+lambda_result <- lambda_test(1, 2)
+
+// 类型转换
+convert_test <- a as double
+
+// 导入语句
+// import "test"
+
+// 跳转语句
+for i <- 0, i < 10, i++ {
+    if i == 5 {
+        break
+    }
+    PrintLine(i)
+}
