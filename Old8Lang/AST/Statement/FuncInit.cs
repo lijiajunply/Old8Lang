@@ -85,7 +85,8 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
             // 生成方法体的 IL 代码
             FuncLangValue.BlockStatement.GenerateIl(methodIl, funcLocal);
 
-            // 返回
+            // 如果函数有返回值，确保最后一个指令是return
+            // 这里简化处理，直接添加return指令
             methodIl.Emit(OpCodes.Ret);
 
             // 将方法添加到本地变量管理器

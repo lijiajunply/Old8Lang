@@ -63,6 +63,26 @@ public class TryStatement(
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
+        // 检查如果有finally块，那么try块和catch块中不能包含return语句
+        // 这是因为在.NET IL中，try块或catch块中的return语句与finally块一起使用会导致无效的IL代码
+        if (finallyBlock != null)
+        {
+            // 检查try块中是否包含return语句
+            if (ContainsReturnStatement(tryBlock))
+            {
+                throw new Old8Lang.Error.CompilerException("当有finally块时，try块中不能包含return语句", Position);
+            }
+            
+            // 检查所有catch块中是否包含return语句
+            foreach (var (_, _, catchBlock) in catchBlocks)
+            {
+                if (ContainsReturnStatement(catchBlock))
+                {
+                    throw new Old8Lang.Error.CompilerException("当有finally块时，catch块中不能包含return语句", Position);
+                }
+            }
+        }
+        
         // 开始异常处理块
         ilGenerator.BeginExceptionBlock();
         
@@ -107,12 +127,42 @@ public class TryStatement(
             // 开始finally块
             ilGenerator.BeginFinallyBlock();
             
+            // 设置在finally块中的标志
+            local.IsInFinallyBlock = true;
+            
             // 生成finally块的IL代码
             finallyBlock.GenerateIl(ilGenerator, local);
+            
+            // 恢复标志
+            local.IsInFinallyBlock = false;
         }
         
         // 结束异常处理块
         ilGenerator.EndExceptionBlock();
+    }
+    
+    /// <summary>
+    /// 检查try块、catch块和finally块中是否包含return语句
+    /// </summary>
+    /// <param name="statement">要检查的语句</param>
+    /// <returns>如果包含return语句，返回true；否则返回false</returns>
+    private bool ContainsReturnStatement(OldStatement statement)
+    {
+        if (statement is ReturnStatement)
+        {
+            return true;
+        }
+        
+        for (int i = 0; i < statement.Count; i++)
+        {
+            var child = statement[i];
+            if (ContainsReturnStatement(child))
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     private static bool IsMatch(Old8Exception exception, string exceptionType)

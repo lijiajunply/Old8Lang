@@ -19,6 +19,9 @@ public class LocalManager
     public Label? BreakLabel { get; set; }
     public Label? ContinueLabel { get; set; }
     
+    // 标记是否在finally块中生成IL代码
+    public bool IsInFinallyBlock { get; set; }
+    
     /// <summary>
     /// 记录调试信息
     /// </summary>
