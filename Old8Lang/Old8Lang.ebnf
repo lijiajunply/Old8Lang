@@ -126,7 +126,7 @@ charLiteral = CHAR ;
 
 identifier = IDENTIFIER ;
 
-typedIdentifier = identifier (":" identifier )? ;
+typedIdentifier = identifier (":" identifier )? (":" expression )? ;
 
 trueLiteral = "true" ;
 

@@ -69,15 +69,17 @@ public class FuncLangValue : ImportInfo
             return manager.Result;
         }
 
-        // 检查参数数量是否匹配
+        // 检查参数数量是否匹配，但允许省略带默认参数的实参
         if (Ids != null)
         {
             var expectedParams = Ids.Count;
             var actualParams = ids.Count;
-            if (expectedParams != actualParams)
+            
+            // 只检查最大参数数量，允许实际参数少于期望参数（如果有默认参数）
+            if (actualParams > expectedParams)
             {
                 throw new ArgumentError(Position,
-                    $"函数 '{Id?.IdName}' 期望 {expectedParams} 个参数，但实际提供了 {actualParams} 个参数");
+                    $"函数 '{Id?.IdName}' 期望最多 {expectedParams} 个参数，但实际提供了 {actualParams} 个参数");
             }
         }
 
@@ -104,21 +106,35 @@ public class FuncLangValue : ImportInfo
             
             if (Ids != null && Ids.Count != 0)
             {
-                // 先计算所有参数的值，使用外部变量管理器
-                // 这样可以避免参数计算时修改函数变量管理器中的变量
+                // 先计算所有传入参数的值，使用外部变量管理器
                 var paramValues = new List<LangValueType>();
                 for (var i = 0; i < ids.Count; i++)
                 {
                     paramValues.Add(ids[i].Run(variateManagerFunc));
                 }
                 
-                // 然后将计算好的参数值设置到函数的变量管理器中
+                // 处理默认参数，补全缺失的参数值
+                for (var i = paramValues.Count; i < Ids.Count; i++)
+                {
+                    var id = Ids[i];
+                    if (id.DefaultValue != null)
+                    {
+                        // 计算默认参数值
+                        var defaultValue = id.DefaultValue.Run(variateManagerFunc);
+                        paramValues.Add(defaultValue);
+                    }
+                    else
+                    {
+                        // 没有默认参数且没有传入参数，抛出错误
+                        throw new ArgumentError(Position,
+                            $"函数 '{Id?.IdName}' 的参数 '{id.IdName}' 缺少实参且没有默认值");
+                    }
+                }
+                
+                // 然后将所有参数值（包括默认参数）设置到函数的变量管理器中
                 for (var i = 0; i < Ids.Count; i++)
                 {
-                    if (i < paramValues.Count)
-                    {
-                        variateManagerFunc.Set(Ids[i], paramValues[i]);
-                    }
+                    variateManagerFunc.Set(Ids[i], paramValues[i]);
                 }
             }
             

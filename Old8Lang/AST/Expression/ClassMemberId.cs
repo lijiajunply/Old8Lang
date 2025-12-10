@@ -37,7 +37,7 @@ public class ClassMemberId : LangId
     /// <param name="id">原始LangId</param>
     /// <param name="modifiers">访问修饰符列表</param>
     public ClassMemberId(LangId id, IEnumerable<AccessModifierType>? modifiers = null)
-        : base(id.IdName, id.AssumptionType, id.Position)
+        : base(id.IdName, id.AssumptionType, position: id.Position)
     {
         Modifiers = modifiers != null ? [..modifiers] : [];
         ValidateModifiers();
@@ -65,7 +65,7 @@ public class ClassMemberId : LangId
     /// <param name="position">位置信息</param>
     public ClassMemberId(string name, string assumptionType, IEnumerable<AccessModifierType>? modifiers,
         SourcePosition position)
-        : base(name, assumptionType, position)
+        : base(name, assumptionType, position: position)
     {
         Modifiers = modifiers != null ? [..modifiers] : [];
         ValidateModifiers();

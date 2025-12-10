@@ -463,7 +463,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             if (expr != null!)
             {
                 // 表达式语句，返回一个空的 SetStatement 包装，或者直接返回表达式
-                return new SetStatement(new LangId("", "", expr.Position), expr);
+                return new SetStatement(new LangId("", "", position: expr.Position), expr);
             }
         }
         catch
@@ -476,8 +476,8 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         if (CurrentToken.Type == LangTokenType.RightBrace)
         {
             // 不是错误，而是块结束的标志，直接返回空语句
-            return new SetStatement(new LangId("", "", new SourcePosition(0, 0)),
-                new LangId("", "", new SourcePosition(0, 0)));
+            return new SetStatement(new LangId("", "", position: new SourcePosition(0, 0)),
+                new LangId("", "",position:  new SourcePosition(0, 0)));
         }
 
         // 无法识别的语句类型，直接抛出语法错误
@@ -630,7 +630,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         if (leftExpr is LangId langId)
         {
             // 普通标识符赋值：identifier <- value
-            return new SetStatement(new LangId(langId.IdName, assumptionType, leftExpr.Position), expression,
+            return new SetStatement(new LangId(langId.IdName, assumptionType, position: leftExpr.Position), expression,
                 leftExpr.Position);
         }
 
@@ -1358,6 +1358,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             Expect(LangTokenType.MinusMinus);
             left = new Operation(left, OperationType.MINUS, new IntLangValue(1), position);
         }
+
         // 处理 as 操作符
         while (CurrentToken.Type == LangTokenType.As)
         {
@@ -1494,7 +1495,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var thisToken = CurrentToken;
             var position = new SourcePosition(thisToken.Line, thisToken.Column, tokenValue: thisToken.Value);
             Expect(LangTokenType.This);
-            return new LangId(thisToken.Value, "", position);
+            return new LangId(thisToken.Value, "", position: position);
         }
 
         return CurrentToken.Type switch
@@ -1866,7 +1867,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         {
             Expect(LangTokenType.RightParen);
             // 返回一个空的元组
-            return new TupleLangValue(new LangId("", "", position), new LangId("", "", position), position);
+            return new TupleLangValue(new LangId("", "", position: position), new LangId("", "", position: position), position);
         }
 
         // 解析第一个元素
@@ -2090,13 +2091,13 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         }
 
         // 默认不处理类型注解
-        return new LangId(value, "", position);
+        return new LangId(value, "", position: position);
     }
 
     /// <summary>
-    /// 解析带有类型注解的标识符，用于赋值语句、函数参数和lambda参数
+    /// 解析带有类型注解或默认参数的标识符，用于赋值语句、函数参数和lambda参数
     /// </summary>
-    /// <returns>带有类型注解的标识符</returns>
+    /// <returns>带有类型注解或默认参数的标识符</returns>
     private LangId ParseTypedIdentifier()
     {
         var identifierToken = CurrentToken;
@@ -2117,21 +2118,34 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             Expect(LangTokenType.Identifier);
         }
 
-        // 处理类型注解：identifier:type
+        // 处理类型注解或默认参数：identifier:type 或 identifier:default_value
         var typeAnnotation = "";
+        OldExpr? defaultValue = null;
+
         if (CurrentToken.Type == LangTokenType.Colon)
         {
             Expect(LangTokenType.Colon);
-            typeAnnotation = CurrentToken.Value;
-            if (typeAnnotation == "")
-            {
-                throw CreateSyntaxError("类型注解不能为空");
-            }
 
-            Expect(CurrentToken.Type == LangTokenType.List ? LangTokenType.List : LangTokenType.Identifier);
+            // 检查下一个token类型，判断是类型注解还是默认参数
+            if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.List)
+            {
+                // 类型注解：identifier:type
+                typeAnnotation = CurrentToken.Value;
+                if (typeAnnotation == "")
+                {
+                    throw CreateSyntaxError("类型注解不能为空");
+                }
+
+                Expect(CurrentToken.Type == LangTokenType.List ? LangTokenType.List : LangTokenType.Identifier);
+            }
+            else
+            {
+                // 默认参数：identifier:default_value
+                defaultValue = ParseExpression();
+            }
         }
 
-        return new LangId(value, typeAnnotation, position);
+        return new LangId(value, typeAnnotation, defaultValue, position);
     }
 
     /// <summary>
@@ -2298,7 +2312,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         {
             Expect(LangTokenType.RightBracket);
             // 空列表访问，返回一个空的操作
-            return new Operation(identifier, OperationType.CONCAT, new LangId("", "", position), position);
+            return new Operation(identifier, OperationType.CONCAT, new LangId("", "", position: position), position);
         }
 
         // 处理切片：list[start:end]

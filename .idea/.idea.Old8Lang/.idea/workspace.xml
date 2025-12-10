@@ -17,16 +17,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/plan_20251210_055702.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/plan_20251210_070006.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/19_list_comprehensions.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/19_list_comprehensions.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListComprehension.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListComprehension.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ErrorException.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/ErrorException.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/RuntimeError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/RuntimeError.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/13_function_declaration.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/13_function_declaration.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ClassMemberId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ClassMemberId.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.ebnf" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.ebnf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -360,7 +358,7 @@
       <workItem from="1765277636089" duration="6000" />
       <workItem from="1765277821785" duration="994000" />
       <workItem from="1765278822007" duration="179000" />
-      <workItem from="1765279105952" duration="24893000" />
+      <workItem from="1765279105952" duration="26516000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -842,13 +840,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs</url>
-          <line>37</line>
+          <line>38</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="1052" />
+              <option value="1140" />
             </startOffsets>
             <endOffsets>
-              <option value="1491" />
+              <option value="1579" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="517" />

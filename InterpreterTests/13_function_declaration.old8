@@ -139,4 +139,58 @@ func testOverload(a, b) {
 testOverload(1)
 testOverload(1, 2)
 
+// 带默认参数的函数
+PrintLine("\n=== 带默认参数的函数 ===")
+
+// 基本默认参数函数
+func greetWithDefault(name, message: "Hello") {
+    PrintLine(message + ", " + name + "!")
+}
+
+greetWithDefault("Alice")  // 使用默认消息
+
+greetWithDefault("Bob", "Hi")  // 覆盖默认消息
+
+// 带类型注解和默认参数的函数
+func calculateTotal(price:int, taxRate: 0.1) {
+    total <- price * (1 + taxRate)
+    PrintLine("总价: " + total)
+    return total
+}
+
+calculateTotal(100)  // 使用默认税率
+calculateTotal(100, 0.15)  // 覆盖默认税率
+
+// 多个默认参数
+func createUser(name, age: 18, gender: "unknown") {
+    PrintLine("创建用户: " + name + ", 年龄: " + age + ", 性别: " + gender)
+}
+
+createUser("Charlie")  // 全部使用默认参数
+createUser("David", 25)  // 覆盖第一个默认参数
+createUser("Eve", 30, "female")  // 覆盖所有默认参数
+
+// 混合使用必填参数和默认参数
+func testMixedParams(a, b, c: 3, d: 4) {
+    result <- a + b + c + d
+    PrintLine("结果: " + result)
+    return result
+}
+
+testMixedParams(1, 2)  // 使用默认参数 c=3, d=4
+testMixedParams(1, 2, 5)  // 覆盖 c，使用默认 d=4
+testMixedParams(1, 2, 5, 6)  // 覆盖所有参数
+
+// 不同类型的默认参数
+func testDefaultTypes(strParam: "default", intParam: 42, boolParam: true, doubleParam: 3.14) {
+    PrintLine("字符串: " + strParam)
+    PrintLine("整数: " + intParam)
+    PrintLine("布尔值: " + boolParam)
+    PrintLine("浮点数: " + doubleParam)
+}
+
+testDefaultTypes()  // 使用所有默认参数
+
+testDefaultTypes("custom", 100)  // 覆盖部分参数
+
 PrintLine("\n✅ 所有函数声明和调用测试完成")
