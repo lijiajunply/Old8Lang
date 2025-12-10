@@ -1,0 +1,40 @@
+// 测试表达式语法
+
+// 算术表达式
+result1 <- 1 + 2 * 3 - 4 / 2
+PrintLine("1 + 2 * 3 - 4 / 2 = " + result1)
+
+// 比较表达式
+result2 <- 5 > 3 && 2 < 4
+PrintLine("5 > 3 && 2 < 4 = " + result2)
+
+// 逻辑表达式
+result3 <- true or false and not false
+PrintLine("true or false and not false = " + result3)
+
+// 赋值表达式
+a <- 10
+b <- a + 5
+PrintLine(b)
+
+// 三元表达式
+result4 <- a > 5 ? "大于" : "小于等于"
+PrintLine(result4)
+
+// 复杂嵌套表达式
+result5 <- (a + b) / 2 > 10 ? "大" : "小"
+PrintLine(result5)
+
+// 成员访问表达式
+person <- {"name": "Alice", "age": 30}
+PrintLine(person)
+
+// 函数调用表达式
+func square(x) { return x * x }
+result6 <- square(5)
+PrintLine(result6)
+
+// 类型转换表达式
+d <- 123
+e <- d as string
+PrintLine(e)

@@ -1,0 +1,32 @@
+// 测试错误语法情况
+
+// 括号不匹配
+if a > 5 {
+    PrintLine("缺少右括号")
+
+// 缺少关键字
+if a > 5
+    PrintLine("缺少关键字")
+elif a == 5
+    PrintLine("缺少关键字")
+
+// 无效标识符
+123abc <- 10
+
+// 错误的赋值语法
+d = 20
+
+// 无效的函数声明
+func 123func() {
+    return 0
+}
+
+// 缺少冒号的字典
+invalid_dict <- {"name" "Alice", "age" 30}
+
+// 缺少分号的语句
+print "缺少分号"
+
+// 无效的范围表达式
+invalid_range <- [1~]
+error

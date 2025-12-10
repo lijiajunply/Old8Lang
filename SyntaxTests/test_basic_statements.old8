@@ -1,0 +1,40 @@
+// 测试基本语句语法
+
+// if-elif-else语句
+a <- 10
+if a > 5 {
+    PrintLine("a > 5")
+} elif a == 5 {
+    PrintLine("a == 5")
+} else {
+    PrintLine("a < 5")
+}
+
+// 单行if语句
+if a > 5 PrintLine("a > 5")
+
+// for循环
+for i <- 0, i < 5, i++ {
+    PrintLine(i)
+}
+
+// while循环
+j <- 0
+while j < 5 {
+    PrintLine(j)
+    j <- j + 1
+}
+
+// switch语句
+b <- 2
+switch b {
+    case 1 {
+        PrintLine("b == 1")
+    }
+    case 2 {
+        PrintLine("b == 2")
+    }
+    default {
+        PrintLine("其他值")
+    }
+}

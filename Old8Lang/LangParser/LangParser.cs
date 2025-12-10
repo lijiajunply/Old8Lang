@@ -480,46 +480,9 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 new LangId("", "", new SourcePosition(0, 0)));
         }
 
-        // 无法识别的语句类型，尝试跳过并继续解析
-        try
-        {
-            // 记录当前位置，用于调试
-            var currentPos = CurrentIndex;
-
-            // 尝试跳过当前语句，寻找下一个可能的语句开始
-            while (CurrentIndex < tokens.Count &&
-                   CurrentToken.Type != LangTokenType.If &&
-                   CurrentToken.Type != LangTokenType.For &&
-                   CurrentToken.Type != LangTokenType.While &&
-                   CurrentToken.Type != LangTokenType.Switch &&
-                   CurrentToken.Type != LangTokenType.Func &&
-                   CurrentToken.Type != LangTokenType.Class &&
-                   CurrentToken.Type != LangTokenType.Return &&
-                   CurrentToken.Type != LangTokenType.Import &&
-                   CurrentToken.Type != LangTokenType.Try &&
-                   CurrentToken.Type != LangTokenType.RightBrace &&
-                   CurrentToken.Type != LangTokenType.Identifier)
-            {
-                CurrentIndex++;
-            }
-
-            // 如果没有找到下一个语句开始，返回一个空语句
-            if (CurrentIndex >= tokens.Count || CurrentIndex == currentPos)
-            {
-                CurrentIndex++;
-                return new SetStatement(new LangId("", "", new SourcePosition(0, 0)),
-                    new LangId("", "", new SourcePosition(0, 0)));
-            }
-
-            // 递归解析下一个语句
-            return ParseStatement();
-        }
-        catch
-        {
-            // 作为最后的手段，抛出无法识别的语句类型异常
-            throw CreateSyntaxError(
-                $"语法错误：无法识别的语句类型 '{CurrentToken.Type}'，值为 '{CurrentToken.Value}'。建议检查语句结构是否正确。");
-        }
+        // 无法识别的语句类型，直接抛出语法错误
+        throw CreateSyntaxError(
+            $"语法错误：无法识别的语句类型 '{CurrentToken.Type}'，值为 '{CurrentToken.Value}'。建议检查语句结构是否正确。");
     }
 
     /// <summary>

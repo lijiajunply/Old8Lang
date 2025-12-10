@@ -1,0 +1,52 @@
+// 测试函数与类语法
+
+// 基本函数声明
+func add(a, b) {
+    return a + b
+}
+
+// 调用函数
+result <- add(1, 2)
+PrintLine(result)
+
+// 带类型注解的函数
+func multiply(x:int, y:int) -> int {
+    return x * y
+}
+
+// 箭头函数
+subtract <- (a, b) -> a - b
+PrintLine(subtract(5, 3))
+
+// 类声明
+class Person {
+    name:string <- ""
+    age:int <- 0
+    
+    func init(name, age) {
+        this.name <- name
+        this.age <- age
+    }
+    
+    func sayHello() {
+        PrintLine("Hello, my name is " + this.name)
+    }
+}
+
+// 类实例化
+p <- Person("Alice", 30)
+p.sayHello()
+
+// 类方法调用
+PrintLine(p.age)
+
+// 静态成员
+class Math {
+    static func PI() {
+        return 3.14159
+    }
+}
+
+// 调用静态方法
+pi <- Math.PI()
+PrintLine(pi)

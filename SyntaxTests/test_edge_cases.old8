@@ -1,0 +1,57 @@
+// 测试边缘情况语法
+
+// 空语句块
+{}
+
+// 单语句块（无大括号）
+if true PrintLine("单语句if")
+
+// 多层嵌套if
+x <- 10
+y <- 20
+if x > 5 {
+    if y > 15 {
+        if x + y > 25 {
+            PrintLine("多层嵌套if")
+        }
+    }
+}
+
+// 嵌套函数
+func outer() {
+    func inner() {
+        return 42
+    }
+    return inner()
+}
+
+result <- outer()
+PrintLine(result)
+
+// 复杂表达式
+complex_result <- (1 + 2 * 3 - 4 / 2) > 5 ? "大" : "小"
+PrintLine(complex_result)
+
+// 空数组
+empty_array <- []
+PrintLine(empty_array)
+
+// 空字典
+empty_dict <- {}
+PrintLine(empty_dict)
+
+// 单个元素的数组
+single_array <- [42]
+PrintLine(single_array)
+
+// 单个元素的字典
+single_dict <- {"key": "value"}
+PrintLine(single_dict)
+
+// 长标识符
+very_long_identifier_name_that_is_really_long <- 10
+PrintLine(very_long_identifier_name_that_is_really_long)
+
+// 特殊字符
+message <- "特殊字符：\\n \" \'"
+PrintLine(message)

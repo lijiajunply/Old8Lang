@@ -200,6 +200,25 @@ func()
 func(a, b)
 ```
 
+### 4.8 成员访问表达式
+
+使用点号 `.` 访问对象的成员：
+
+```
+obj.field
+obj.method()
+```
+
+### 4.9 三元表达式
+
+使用问号 `?` 和冒号 `:` 表示条件表达式：
+
+```
+a <- 10
+b <- 20
+c <- a > b ? a : b
+```
+
 ## 5. 语句
 
 ### 5.1 块语句
@@ -262,6 +281,8 @@ for item in collection {
 }
 ```
 
+在 for in 中，禁止更改循环变量的值。
+
 #### 5.3.5 switch 语句
 
 ```
@@ -290,6 +311,15 @@ func add(a:int, b:int) {
 add(a:int, b:int) -> {
     return a + b
 }
+
+// 也可以给 func 添加返回值类型假注
+func add(a:int, b:int) -> int {
+    return a + b
+}
+
+add:int (a:int, b:int) -> {
+    return a + b
+}
 ```
 
 #### 5.4.2 函数调用
@@ -310,7 +340,7 @@ add <- (a:int, b:int) -> a + b
 
 ```
 class Person {
-    name:string <- ""
+    public name:string <- ""
     age:int <- 0
     
     func init(name:string, age:int) {
@@ -318,11 +348,13 @@ class Person {
         this.age <- age
     }
     
-    func sayHello() {
+    public func sayHello() {
         PrintLine("Hello, my name is " + name)
     }
 }
 ```
+
+标识符分别为 public、private、protected、static
 
 #### 5.5.2 类实例化
 

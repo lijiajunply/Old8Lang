@@ -1,0 +1,53 @@
+// 测试特殊语法
+
+// 字符串模板
+name <- "Alice"
+age <- 30
+message <- $"My name is {name}, I'm {age} years old."
+PrintLine(message)
+
+// 转义大括号
+escaped <- $"This is {{escaped}} bracket"
+PrintLine(escaped)
+
+// 列表推导式
+numbers <- [1, 2, 3, 4, 5]
+squares <- [x * x for x in numbers]
+PrintLine(squares)
+
+// 带条件的列表推导式
+even_squares <- [x * x for x in numbers if x % 2 == 0]
+PrintLine(even_squares)
+
+// 范围表达式
+range1 <- [1~10]
+PrintLine(range1)
+
+// 使用范围进行循环
+for i in [1~5] {
+    PrintLine(i)
+}
+
+// 数组初始化
+array1 <- [1, 2, 3, 4, 5]
+array2 <- ["a", "b", "c"]
+PrintLine(array1)
+PrintLine(array2)
+
+// 字典初始化
+dict1 <- {"name": "Alice", "age": 30}
+dict2 <- {1: "one", 2: "two"}
+PrintLine(dict1)
+PrintLine(dict2)
+
+// 元组
+tuple1 <- (1, "a")
+tuple2 <- (true, 3.14)
+PrintLine(tuple1)
+PrintLine(tuple2)
+
+// 列表
+list1 <- list[1, 2, 3]
+list2 <- list["x", "y", "z"]
+PrintLine(list1)
+PrintLine(list2)

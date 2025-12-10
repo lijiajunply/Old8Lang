@@ -12,37 +12,59 @@ test_files=$(find ./SyntaxTests -name "*.old8")
 
 # 遍历所有测试文件
 for file in $test_files; do
+    echo ""
     echo "Testing: $file"
-    dotnet run --project Old8Lang.App -- -s "$file"
     
-    if [ $? -eq 0 ]; then
-        echo "✅ PASS"
-        ((success++))
+    # 检查文件末尾是否包含"error"标记
+    has_error_marker=$(tail -n 1 "$file" | grep -i "error")
+    
+    # 运行测试
+    dotnet run --project Old8Lang.App -- -s "$file"
+    test_exit_code=$?
+    
+    if [ -n "$has_error_marker" ]; then
+        # 期望测试失败
+        if [ $test_exit_code -ne 0 ]; then
+            echo "✅ PASS (expected failure)"
+            ((success++))
+        else
+            echo "❌ FAIL (expected failure but passed)"
+            ((failed++))
+            failed_files+=("$file")
+        fi
     else
-        echo "❌ FAIL"
-        ((failed++))
-        failed_files+=("$file")
+        # 期望测试成功
+        if [ $test_exit_code -eq 0 ]; then
+            echo "✅ PASS"
+            ((success++))
+        else
+            echo "❌ FAIL"
+            ((failed++))
+            failed_files+=($file)
+        fi
     fi
 done
 
 # 输出结果
-echo "\n\n=== Syntax Test Results ==="
+echo ""
+echo "------------------------------"
+echo "=== Syntax Test Results ==="
 echo "Total: $(($success + $failed))"
 echo "Passed: $success"
 echo "Failed: $failed"
 
 # 输出失败的文件
 if [ $failed -gt 0 ]; then
-    echo "\n❌ Failed files:"
+    echo "❌ Failed files:"
     for file in "${failed_files[@]}"; do
         echo "  - $file"
     done
 fi
 
 if [ $failed -eq 0 ]; then
-    echo "\n🎉 All syntax tests passed!"
+    echo "🎉 All syntax tests passed!"
     exit 0
 else
-    echo "\n❌ Some syntax tests failed!"
+    echo "❌ Some syntax tests failed!"
     exit 1
 fi
