@@ -1,0 +1,22 @@
+// 简单编译模式测试
+// 只测试最基本的变量声明和打印功能
+
+PrintLine("=== 简单编译模式测试 ===")
+
+// 基本变量声明和赋值
+PrintLine("\n1. 基本变量测试:")
+x:int <- 10
+y:int <- 20
+z:string <- "Hello"
+
+PrintLine("x = " + x)
+PrintLine("y = " + y)
+PrintLine("z = " + z)
+
+// 简单表达式
+PrintLine("\n2. 简单表达式测试:")
+sum:int <- x + y
+product:int <- x * y
+
+PrintLine("x + y = " + sum)
+PrintLine("x * y = " + product)

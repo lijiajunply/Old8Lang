@@ -1,7 +1,9 @@
 root = statement* ;
 
 statement = lrBlock
-          | set
+          | declaration
+          | assignment
+          | expressionStatement
           | ifStatement
           | forStatement
           | whileStatement
@@ -27,7 +29,10 @@ throwStatement = "throw" expression ;
 
 lrBlock = "(" statement ")" ;
 
-set = identifier "<-" expression ;
+// declaration = identifier ":" type "<-" expression | identifier "<-" expression | memberAccess ":" type "<-" expression | memberAccess "<-" expression ;
+declaration = identifier ( ":" type )? "<-" expression ;
+assignment = expression ":" type? "<-" expression ;
+set = declaration | assignment ;
 
 ifStatement = "if" expression block ( "elif" expression block )* ( "else" block )? ;
 
@@ -41,13 +46,15 @@ switchStatement = "switch" expression "{" caseBlock* ( "default" block )? "}" ;
 
 caseBlock = "case" expression block ;
 
-funcDeclaration = ( "func" identifier | identifier ) "(" idList? ")" ( "->" identifier )? block ;
+funcDeclaration = accessModifier* ( "func" identifier | identifier ) "(" idList? ")" ( "->" identifier )? block ;
 
-classDeclaration = "class" identifier classBlock ;
+classDeclaration = accessModifier* "class" identifier ( "extends" identifier )? classBlock ;
 
-classBlock = "{" [staticMember]* "}";
+classBlock = "{" classMember* "}";
 
-staticMember = "static" (set | funcDeclaration);
+classMember = accessModifier* (set | funcDeclaration | importStatement);
+
+accessModifier = "public" | "private" | "static" ;
 
 funcRunStatement = identifier "(" argList? ")" ;
 
@@ -65,11 +72,15 @@ plusPlus = identifier "++" ;
 
 minusMinus = identifier "--" ;
 
-returnStatement = "return" expression ;
+returnStatement = "return" expression? ;
 
 tryStatement = "try" block catchBlock* ( "finally" block )? ;
 
-catchBlock = "catch" ( "(" ( identifier ( identifier )? )? ")" )? block ;
+catchBlock = "catch" ( "(" ( identifier identifier? )? ")" )? block ;
+
+breakStatement = "break" ;
+
+continueStatement = "continue" ;
 
 block = "{" statement* "}"
       | statement ;
@@ -110,7 +121,10 @@ primary = stringLiteral
         | slice
         | asStatement
         | notPrefix
-        | minusPrefix ;
+        | minusPrefix
+        | thisExpression ;
+
+thisExpression = "this" ;
 
 notPrefix = "not" primary ;
 
@@ -126,7 +140,7 @@ charLiteral = CHAR ;
 
 identifier = IDENTIFIER ;
 
-typedIdentifier = identifier (":" identifier )? (":" expression )? ;
+typedIdentifier = identifier (":" identifier )? ;
 
 trueLiteral = "true" ;
 
@@ -134,7 +148,7 @@ falseLiteral = "false" ;
 
 listInit = identifier "[" expression "]" ;
 
-instantiate = identifier "(" argList ")" ;
+instantiate = identifier "(" argList " )" ;
 
 stringTree = "$" "{" expression ("," expression )* "}" ("{" expression ("," expression )* "}")* ;
 
@@ -156,10 +170,6 @@ dicTuple = expression ":" expression ;
 slice = identifier "[" expression ":" expression "]" ;
 
 asStatement = identifier "as" identifier ;
-
-breakStatement = "break" ;
-
-continueStatement = "continue" ;
 
 argList =  (expression "," expression )* ;
 

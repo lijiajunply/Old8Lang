@@ -17,7 +17,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/plan_20251210_080813.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/00_simple_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/01_basic_types_expressions.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/02_control_flow.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/03_functions_classes.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/04_exception_special_syntax.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/2025-12-10-03-30-compiler-tests.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.ebnf" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.ebnf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,7 +82,7 @@
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
+    <option name="selectedTabId" value="QODANA_PROBLEMS_VIEW_TAB" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -118,18 +125,6 @@
     ]
   }
 }]]></component>
-  <component name="QodanaHighlightedReportService">
-    <option name="localRunNotPublishedPersistedInfo">
-      <LocalReportPersistedInfo>
-        <option name="path" value="/private/var/folders/n9/mz697ncj6wg5msxjsv8n1szh0000gn/T/qodana_output/qodana.sarif.json" />
-        <option name="reportGuid" value="4a67add3-0701-48b0-b307-b2adc926f26c" />
-        <option name="reportName" value="Old8Lang/qodana/2025-12-09" />
-      </LocalReportPersistedInfo>
-    </option>
-  </component>
-  <component name="QodanaIsSelectedPersistenceService">
-    <option name="selectedOrLoading" value="true" />
-  </component>
   <component name="QodanaReportsService">
     <option name="descriptions">
       <ReportDescription localRun="true" path="/private/var/folders/n9/mz697ncj6wg5msxjsv8n1szh0000gn/T/qodana_output/qodana.sarif.json" reportGuid="4a67add3-0701-48b0-b307-b2adc926f26c" reportId="Old8Lang/qodana/2025-12-09" />
@@ -351,7 +346,7 @@
       <workItem from="1765277636089" duration="6000" />
       <workItem from="1765277821785" duration="994000" />
       <workItem from="1765278822007" duration="179000" />
-      <workItem from="1765279105952" duration="26847000" />
+      <workItem from="1765279105952" duration="27695000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>

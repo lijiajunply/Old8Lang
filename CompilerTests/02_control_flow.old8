@@ -1,0 +1,94 @@
+// 控制流语句测试 - 编译模式
+// 测试各种控制流语句，使用类型假注
+
+PrintLine("=== 控制流语句测试 ===")
+
+// if-elif-else 语句测试
+PrintLine("\n1. if-elif-else 测试:")
+x:int <- 10
+if x > 15 {
+    PrintLine("x > 15")
+} elif x > 5 {
+    PrintLine("15 >= x > 5")
+} else {
+    PrintLine("x <= 5")
+}
+
+// for 语句测试
+PrintLine("\n2. for 循环测试:")
+sum:int <- 0
+for i:int <- 0, i < 10, i++ {
+    sum <- sum + i
+}
+PrintLine("0 到 9 的和: " + sum)
+
+// while 语句测试
+PrintLine("\n3. while 循环测试:")
+count:int <- 0
+while count < 5 {
+    PrintLine("计数: " + count)
+    count <- count + 1
+}
+
+// for-in 语句测试
+PrintLine("\n4. for-in 循环测试:")
+array:array <- [1, 2, 3, 4, 5]
+for item in array {
+    PrintLine("数组元素: " + item)
+}
+
+// 测试字典的 for-in 循环
+PrintLine("\n5. for-in 字典测试:")
+dict:dictionary <- {"name": "Alice", "age": 30, "city": "New York"}
+for key in dict {
+    PrintLine("键: " + key + ", 值: " + dict[key])
+}
+
+// switch 语句测试
+PrintLine("\n6. switch 语句测试:")
+option:int <- 2
+switch option {
+    case 1 {
+        PrintLine("选项 1")
+    }
+    case 2 {
+        PrintLine("选项 2")
+    }
+    case 3 {
+        PrintLine("选项 3")
+    }
+    default {
+        PrintLine("默认选项")
+    }
+}
+
+// 嵌套控制流测试
+PrintLine("\n7. 嵌套控制流测试:")
+for i:int <- 0, i < 3, i++ {
+    if i == 0 {
+        PrintLine("外层循环第 " + i + " 次: 进入if")
+    } elif i == 1 {
+        PrintLine("外层循环第 " + i + " 次: 进入elif")
+        j:int <- 0
+        while j < 2 {
+            PrintLine("  内层while循环第 " + j + " 次")
+            j <- j + 1
+        }
+    } else {
+        PrintLine("外层循环第 " + i + " 次: 进入else")
+    }
+}
+
+// break 和 continue 测试
+PrintLine("\n8. break 和 continue 测试:")
+for i:int <- 0, i < 5, i++ {
+    if i == 2 {
+        PrintLine("跳过 i = " + i)
+        continue
+    }
+    if i == 4 {
+        PrintLine("提前退出循环，i = " + i)
+        break
+    }
+    PrintLine("i = " + i)
+}

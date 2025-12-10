@@ -1,0 +1,116 @@
+// 基本类型和表达式测试 - 编译模式
+// 测试各种基本数据类型和表达式运算，使用类型假注
+
+// 整数类型测试
+a:int <- 123
+b:int <- -456
+c:int <- 0
+PrintLine("整数测试:")
+PrintLine("a = " + a)
+PrintLine("b = " + b)
+PrintLine("c = " + c)
+
+// 浮点数类型测试
+d:double <- 3.14
+e:double <- -0.5
+f:double <- 1.0
+PrintLine("\n浮点数测试:")
+PrintLine("d = " + d)
+PrintLine("e = " + e)
+PrintLine("f = " + f)
+
+// 字符串类型测试
+g:string <- "hello"
+h:string <- "world"
+i:string <- ""
+PrintLine("\n字符串测试:")
+PrintLine("g = " + g)
+PrintLine("h = " + h)
+PrintLine("i = " + i)
+
+// 布尔类型测试
+j:bool <- true
+k:bool <- false
+PrintLine("\n布尔测试:")
+PrintLine("j = " + j)
+PrintLine("k = " + k)
+
+// 字符类型测试
+l:char <- 'a'
+m:char <- '1'
+n:char <- '\n'
+PrintLine("\n字符测试:")
+PrintLine("l = " + l)
+PrintLine("m = " + m)
+PrintLine("n = 换行符")
+
+// 数组类型测试
+array1:array <- [1, 2, 3, 4, 5]
+array2:array <- ["a", "b", "c"]
+PrintLine("\n数组测试:")
+PrintLine("array1[0] = " + array1[0])
+PrintLine("array1[2] = " + array1[2])
+PrintLine("array2[1] = " + array2[1])
+
+// 字典类型测试
+dict1:dictionary <- {"name": "Alice", "age": 30}
+dict2:dictionary <- {1: "one", 2: "two"}
+PrintLine("\n字典测试:")
+PrintLine("dict1['name'] = " + dict1["name"])
+PrintLine("dict1['age'] = " + dict1["age"])
+PrintLine("dict2[1] = " + dict2[1])
+
+// 算术表达式测试
+result1:int <- a + b
+result2:int <- a - b
+result3:int <- a * b
+result4:double <- d / e
+result5:int <- a % 7
+PrintLine("\n算术表达式测试:")
+PrintLine("a + b = " + result1)
+PrintLine("a - b = " + result2)
+PrintLine("a * b = " + result3)
+PrintLine("d / e = " + result4)
+PrintLine("a % 7 = " + result5)
+
+// 比较表达式测试
+cmp1:bool <- a == b
+cmp2:bool <- a > b
+cmp3:bool <- d < e
+cmp4:bool <- a <= 123
+cmp5:bool <- d >= 3.0
+PrintLine("\n比较表达式测试:")
+PrintLine("a == b = " + cmp1)
+PrintLine("a > b = " + cmp2)
+PrintLine("d < e = " + cmp3)
+PrintLine("a <= 123 = " + cmp4)
+PrintLine("d >= 3.0 = " + cmp5)
+
+// 逻辑表达式测试
+log1:bool <- j and k
+log2:bool <- j or k
+log3:bool <- not j
+log4:bool <- j xor k
+PrintLine("\n逻辑表达式测试:")
+PrintLine("j and k = " + log1)
+PrintLine("j or k = " + log2)
+PrintLine("not j = " + log3)
+PrintLine("j xor k = " + log4)
+
+// 注意：类型转换的as关键字在当前编译模式下暂不支持，暂不测试
+// int_to_double:double <- a as double
+// double_to_int:int <- d as int
+// string_value:string <- a as string
+// doubleToInt:int <- 3.14 as int
+// PrintLine("\n类型转换测试:")
+// PrintLine("a as double = " + int_to_double)
+// PrintLine("d as int = " + double_to_int)
+// PrintLine("a as string = " + string_value)
+// PrintLine("3.14 as int = " + doubleToInt)
+
+// 注意：三元表达式在当前EBNF语法中未定义，暂不测试
+// ternary1:int <- a > b ? a : b
+// ternary2:string <- j ? "true" : "false"
+// PrintLine("\n三元表达式测试:")
+// PrintLine("a > b ? a : b = " + ternary1)
+// PrintLine("j ? \"true\" : \"false\" = " + ternary2)
