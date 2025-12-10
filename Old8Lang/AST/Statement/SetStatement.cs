@@ -37,6 +37,23 @@ public class SetStatement : OldStatement
         {
             var expectedType = Id.AssumptionType.ToLower();
             var actualType = result.TypeToString().ToLower();
+            
+            // 解析泛型类型注解，如 "list<int>" 或 "array<string>"
+            var isGeneric = expectedType.Contains('<') && expectedType.EndsWith('>');
+            string baseExpectedType;
+            string genericArg = "";
+            
+            if (isGeneric)
+            {
+                // 提取泛型类型名称
+                var genericIndex = expectedType.IndexOf('<');
+                baseExpectedType = expectedType[..genericIndex].Trim();
+                genericArg = expectedType[(genericIndex + 1)..^1].Trim();
+            }
+            else
+            {
+                baseExpectedType = expectedType;
+            }
 
             // 建立类型匹配映射
             var typeMap = new Dictionary<string, List<string>>
@@ -54,12 +71,42 @@ public class SetStatement : OldStatement
                 { "function", ["function"] }
             };
 
-            // 检查类型是否匹配
-            if (typeMap.TryGetValue(expectedType, out var allowedTypes))
+            // 检查基础类型是否匹配
+            if (typeMap.TryGetValue(baseExpectedType, out var allowedTypes))
             {
                 if (!allowedTypes.Contains(actualType))
                 {
                     throw new TypeError(Id, expectedType, actualType);
+                }
+            }
+            
+            // 如果是泛型类型，检查元素类型是否匹配
+            if (isGeneric && (baseExpectedType == "list" || baseExpectedType == "array" || baseExpectedType == "dictionary"))
+            {
+                // 对于列表和数组，检查元素类型
+                if (result is ListLangValue listValue)
+                {
+                    // 检查列表中的所有元素类型是否匹配泛型参数
+                    foreach (var item in listValue.Values)
+                    {
+                        var itemType = item.TypeToString().ToLower();
+                        if (itemType != genericArg)
+                        {
+                            throw new TypeError(Id, expectedType, actualType, $"列表元素类型不匹配：期望 {genericArg}，实际 {itemType}");
+                        }
+                    }
+                }
+                else if (result is ArrayLangValue arrayValue)
+                {
+                    // 检查数组中的所有元素类型是否匹配泛型参数
+                    foreach (var item in arrayValue.GetItems())
+                    {
+                        var itemType = item.TypeToString().ToLower();
+                        if (itemType != genericArg)
+                        {
+                            throw new TypeError(Id, expectedType, actualType, $"数组元素类型不匹配：期望 {genericArg}，实际 {itemType}");
+                        }
+                    }
                 }
             }
         }

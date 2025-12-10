@@ -1,0 +1,65 @@
+// 测试增强的类型转换系统
+PrintLine("=== 测试增强的类型转换系统 ===")
+
+// 测试字符串到整数的转换
+PrintLine("\n=== 字符串到整数的转换 ===")
+stringToInt <- "123" as int
+PrintLine("stringToInt: " + stringToInt + ", 类型: " + type(stringToInt))
+
+// 测试字符串到布尔值的转换
+PrintLine("\n=== 字符串到布尔值的转换 ===")
+trueToString <- "true" as bool
+falseToString <- "false" as bool
+PrintLine("trueToString: " + trueToString + ", 类型: " + type(trueToString))
+PrintLine("falseToString: " + falseToString + ", 类型: " + type(falseToString))
+
+// 测试数组到列表的转换
+PrintLine("\n=== 数组到列表的转换 ===")
+array1 <- [1, 2, 3]
+listFromArray <- array1 as list
+PrintLine("array1: " + array1 + ", 类型: " + type(array1))
+PrintLine("listFromArray: " + listFromArray + ", 类型: " + type(listFromArray))
+
+// 测试列表到数组的转换
+PrintLine("\n=== 列表到数组的转换 ===")
+list1 <- list[4, 5, 6]
+arrayFromList <- list1 as array
+PrintLine("list1: " + list1 + ", 类型: " + type(list1))
+PrintLine("arrayFromList: " + arrayFromList + ", 类型: " + type(arrayFromList))
+
+// 测试数组到字符串的转换
+PrintLine("\n=== 数组到字符串的转换 ===")
+array2 <- [1, 2, 3]
+stringFromArray <- array2 as string
+PrintLine("array2: " + array2 + ", 类型: " + type(array2))
+PrintLine("stringFromArray: '" + stringFromArray + "', 类型: " + type(stringFromArray))
+
+// 测试列表到字符串的转换
+PrintLine("\n=== 列表到字符串的转换 ===")
+list2 <- list["a", "b", "c"]
+stringFromList <- list2 as string
+PrintLine("list2: " + list2 + ", 类型: " + type(list2))
+PrintLine("stringFromList: '" + stringFromList + "', 类型: " + type(stringFromList))
+
+// 测试泛型类型注解（注释掉，因为Old8Lang可能不支持此语法）
+// PrintLine("\n=== 测试泛型类型注解 ===")
+
+// 测试列表泛型类型注解（注释掉）
+// listGeneric:list<int> <- list[1, 2, 3]
+// PrintLine("listGeneric: " + listGeneric + ", 类型: " + type(listGeneric))
+
+// 测试数组泛型类型注解（注释掉）
+// arrayGeneric:array<string> <- ["a", "b", "c"]
+// PrintLine("arrayGeneric: " + arrayGeneric + ", 类型: " + type(arrayGeneric))
+
+// 测试类型安全：尝试向列表添加不同类型的元素
+PrintLine("\n=== 测试类型安全 ===")
+try {
+    list3 <- list[1, 2, 3]
+    list3[0] <- "string" // 应该报错，类型不匹配
+    PrintLine("这行不应该被执行")
+} catch (e) {
+    PrintLine("捕获到预期的错误: " + e)
+}
+
+PrintLine("\n✅ 所有类型转换测试完成")

@@ -117,6 +117,21 @@ public class LangListItem(LangId listId, OldExpr key, SourcePosition position = 
         {
             return typeof(char); // 字符串索引访问返回 char 类型
         }
+        else if (listType.IsArray)
+        {
+            // 数组索引访问返回数组元素类型
+            return listType.GetElementType() ?? typeof(object);
+        }
+        else if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(List<>))
+        {
+            // List<T>索引访问返回T类型
+            return listType.GetGenericArguments()[0] ?? typeof(object);
+        }
+        else if (listType == typeof(Dictionary<object, object>))
+        {
+            // 字典值可以是任意类型
+            return typeof(object);
+        }
         else
         {
             return typeof(object);

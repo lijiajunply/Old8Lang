@@ -66,7 +66,41 @@ public class LangId(string name, string assumptionType = "", OldExpr? defaultVal
     {
         if (!string.IsNullOrEmpty(AssumptionType))
         {
-            return AssumptionType switch
+            // 解析泛型类型注解，如 "list<int>" 或 "array<string>"
+            var typeName = AssumptionType.Trim().ToLower();
+            
+            // 检查是否为泛型类型
+            if (typeName.Contains('<') && typeName.EndsWith('>'))
+            {
+                // 提取泛型类型名称和参数
+                var genericIndex = typeName.IndexOf('<');
+                var baseTypeName = typeName[..genericIndex].Trim();
+                var genericArg = typeName[(genericIndex + 1)..^1].Trim();
+                
+                // 解析泛型参数类型
+                var argType = genericArg switch
+                {
+                    "int" => typeof(int),
+                    "double" => typeof(double),
+                    "string" => typeof(string),
+                    "bool" => typeof(bool),
+                    "char" => typeof(char),
+                    "object" => typeof(object),
+                    _ => typeof(object) // 默认为object
+                };
+                
+                // 返回泛型类型
+                return baseTypeName switch
+                {
+                    "list" => typeof(List<>).MakeGenericType(argType),
+                    "array" => argType.MakeArrayType(),
+                    "dictionary" => typeof(Dictionary<,>).MakeGenericType(typeof(object), argType),
+                    _ => typeof(object) // 未知泛型类型，默认为object
+                };
+            }
+            
+            // 非泛型类型
+            return typeName switch
             {
                 "int" => typeof(int),
                 "double" => typeof(double),
@@ -74,6 +108,10 @@ public class LangId(string name, string assumptionType = "", OldExpr? defaultVal
                 "bool" => typeof(bool),
                 "char" => typeof(char),
                 "void" => typeof(void),
+                "list" => typeof(List<object>),
+                "array" => typeof(object[]),
+                "dictionary" => typeof(Dictionary<object, object>),
+                "tuple" => typeof(ValueTuple<object, object>),
                 _ => typeof(object)
             };
         }

@@ -23,6 +23,7 @@ public class ArrayLangValue : LangValueType, ILangList
     public ArrayLangValue(List<LangValueType> re, SourcePosition position = default) : base(position)
     {
         RunResult = [.. re];
+        Values = new List<OldExpr>(); // 初始化空列表，因为我们已经有了RunResult
     }
 
     public ArrayLangValue(List<object> a, SourcePosition position = default) : base(position) =>
@@ -109,4 +110,25 @@ public class ArrayLangValue : LangValueType, ILangList
     }
 
     public override Type OutputType(LocalManager local) => typeof(object[]);
+    
+    public override LangValueType Converse(LangValueType otherLangValueType, LangParser.VariateManager manager)
+    {
+        if (otherLangValueType is not TypeLangValue value) 
+            throw new TypeError(this, "TypeValue", otherLangValueType.GetType().Name);
+
+        switch (value.Value)
+        {
+            case "List" or "list":
+                // 数组转换为列表
+                return new ListLangValue(RunResult.ToList(), Position);
+            case "Array" or "array":
+                // 已经是数组，直接返回
+                return this;
+            case "String" or "string":
+                // 数组转换为字符串，用逗号分隔
+                return new StringLangValue(string.Join(", ", RunResult.Select(v => v.ToDisplayString())));
+            default:
+                throw new TypeError(this, $"不支持的类型转换: {GetType().Name} 到 {value.Value}");
+        }
+    }
 }

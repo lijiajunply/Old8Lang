@@ -91,8 +91,19 @@ public class StringLangValue(string context, SourcePosition position = default) 
         switch (value.Value)
         {
             case "Int" or "int":
-                return new IntLangValue(Value.Length);
+                try
+                {
+                    return new IntLangValue(int.Parse(Value));
+                }
+                catch (FormatException)
+                {
+                    throw new FormatError(this, $"无法将字符串 '{Value}' 转换为整数，字符串不是有效的数字格式");
+                }
             case "Bool" or "bool":
+                if (Value.Equals("true", StringComparison.OrdinalIgnoreCase))
+                    return new BoolLangValue(true);
+                if (Value.Equals("false", StringComparison.OrdinalIgnoreCase))
+                    return new BoolLangValue(false);
                 throw new FormatError(this, "无法将字符串转换为布尔值，字符串不是有效的布尔格式（true/false）");
             case "String" or "string":
                 return this;

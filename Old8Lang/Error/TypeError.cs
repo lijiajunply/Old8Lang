@@ -24,6 +24,20 @@ public class TypeError : RuntimeError
     /// 构造函数
     /// </summary>
     /// <param name="node">AST节点</param>
+    /// <param name="expectedType">期望类型</param>
+    /// <param name="actualType">实际类型</param>
+    /// <param name="detail">详细错误信息</param>
+    public TypeError(IOldLangTree node, string expectedType, string actualType, string detail) 
+        : base(
+            node, 
+            $"类型不匹配: 期望 {expectedType}，但得到 {actualType}。{detail}",
+            "请检查变量类型或转换操作")
+    {}
+    
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="node">AST节点</param>
     /// <param name="message">错误信息</param>
     public TypeError(IOldLangTree node, string message) 
         : base(
