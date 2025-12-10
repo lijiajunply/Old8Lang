@@ -22,7 +22,7 @@ public class ListLangValue : LangValueType, ILangList
         Values = value.Select(ObjToValue).ToList();
         Value = Values.OfType<OldExpr>().ToList();
     }
-    
+
     public ListLangValue(List<LangValueType> value, SourcePosition position = default) : base(position)
     {
         Values = [.. value];
@@ -31,7 +31,7 @@ public class ListLangValue : LangValueType, ILangList
 
     public override LangValueType Run(LangParser.VariateManager manager)
     {
-        if(Values.Count > 0)return this;
+        if (Values.Count > 0) return this;
         foreach (var expr in Value)
             Values.Add(expr.Run(manager));
         return this;
@@ -52,19 +52,19 @@ public class ListLangValue : LangValueType, ILangList
                 i.Value = Values.Count + i.Value;
             if (i.Value < 0 || i.Value >= Values.Count)
                 throw new IndexError(this, i.Value, Values.Count);
-            
+
             // 类型检查：确保添加的元素类型与列表中已有的元素类型一致
             if (Values.Count > 0)
             {
                 var existingType = Values[0].TypeToString().ToLower();
                 var newValueType = value.TypeToString().ToLower();
-                
+
                 if (existingType != newValueType)
                 {
                     throw new TypeError(this, existingType, newValueType, "列表元素类型必须一致");
                 }
             }
-            
+
             Values[i.Value] = value;
         }
         else
@@ -78,7 +78,9 @@ public class ListLangValue : LangValueType, ILangList
 
     public override LangValueType Dot(OldExpr dotExpr)
     {
-        return dotExpr is not Instance a ? throw new InvalidOperationError(this, "列表类型只支持实例调用操作") : a.FromClassToResult(this);
+        return dotExpr is not Instance a
+            ? throw new InvalidOperationError(this, "列表类型只支持实例调用操作")
+            : a.FromClassToResult(this);
     }
 
     public override object GetValue() => Apis.ListToObjects(Values);
@@ -111,7 +113,8 @@ public class ListLangValue : LangValueType, ILangList
                     return typeof(object);
                 }
             }
-            return firstType;
+
+            return firstType ?? typeof(object);
         }
         else if (Values.Count > 0)
         {
@@ -125,8 +128,10 @@ public class ListLangValue : LangValueType, ILangList
                     return typeof(object);
                 }
             }
+
             return firstType;
         }
+
         return typeof(object);
     }
 
@@ -162,12 +167,19 @@ public class ListLangValue : LangValueType, ILangList
                 }
             }
         }
-        
-        var listType = typeof(List<>).MakeGenericType(itemType);
+
+        var listType = typeof(List<>).MakeGenericType(itemType ?? typeof(object));
+        // 创建泛型List实例
         var listConstructor = listType.GetConstructor(Type.EmptyTypes)!;
-        ilGenerator.Emit(OpCodes.Newobj, listConstructor); // 创建泛型List实例
-        if (Value.Count == 0) return;
+        ilGenerator.Emit(OpCodes.Newobj, listConstructor);
         
+        // 如果没有元素需要添加，直接返回List实例
+        if (Value.Count == 0)
+        {
+            return;
+        }
+        
+        // 否则，将List实例存储到局部变量
         var l = ilGenerator.DeclareLocal(listType);
         ilGenerator.Emit(OpCodes.Stloc, l.LocalIndex);
 
@@ -184,6 +196,8 @@ public class ListLangValue : LangValueType, ILangList
             }
             ilGenerator.Emit(OpCodes.Callvirt, addMethod); // 调用Add方法
         }
+        
+        // 将填充好的List实例加载到堆栈
         ilGenerator.Emit(OpCodes.Ldloc, l.LocalIndex);
     }
 
@@ -219,14 +233,14 @@ public class ListLangValue : LangValueType, ILangList
                 }
             }
         }
-        
+
         // 返回泛型List类型
-        return typeof(List<>).MakeGenericType(itemType);
+        return typeof(List<>).MakeGenericType(itemType ?? typeof(object));
     }
-    
+
     public override LangValueType Converse(LangValueType otherLangValueType, LangParser.VariateManager manager)
     {
-        if (otherLangValueType is not TypeLangValue value) 
+        if (otherLangValueType is not TypeLangValue value)
             throw new TypeError(this, "TypeValue", otherLangValueType.GetType().Name);
 
         switch (value.Value)

@@ -31,14 +31,27 @@ public class RangeLangValue(OldExpr? start, OldExpr? end, SourcePosition positio
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
+        // 加载起始值
         start?.LoadIlValue(ilGenerator, local);
+        
+        // 加载结束值
         end?.LoadIlValue(ilGenerator, local);
-        // 创建一个长度为 5 的整数数组
-        var rangeMethod = typeof(Enumerable).GetMethod("Range", [typeof(int), typeof(int)]);
+        
+        // 获取 Enumerable.Range 方法
+        var rangeMethod = typeof(Enumerable).GetMethod("Range", [typeof(int), typeof(int)])!;
+        
         // 调用 Enumerable.Range 方法
-        ilGenerator.Emit(OpCodes.Call, rangeMethod!);
-        var a = typeof(Enumerable).GetMethod("ToArray")!;
-        ilGenerator.Emit(OpCodes.Call, a.MakeGenericMethod(typeof(int)));
+        ilGenerator.Emit(OpCodes.Call, rangeMethod);
+        
+        // 获取 Enumerable.ToArray<T> 泛型方法定义
+        var toArrayMethod = typeof(Enumerable).GetMethods()
+            .First(m => m.Name == "ToArray" && m.IsGenericMethod);
+        
+        // 为 int 类型创建泛型方法实例
+        var toArrayIntMethod = toArrayMethod.MakeGenericMethod(typeof(int));
+        
+        // 调用 ToArray<int> 方法
+        ilGenerator.Emit(OpCodes.Call, toArrayIntMethod);
     }
 
     public override Type OutputType(LocalManager local) => typeof(IEnumerable<int>);

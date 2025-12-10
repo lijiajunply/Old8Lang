@@ -1,7 +1,6 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
-using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
@@ -21,13 +20,8 @@ public class StringTreeList(List<OldExpr> list, SourcePosition position = defaul
         // 字符串模板中的占位符分解为了 LangId 对象。
         // 
         // 所以我们只需要直接执行每个表达式，然后将结果拼接起来即可。
-        var result = string.Empty;
-        
-        foreach (var item in list)
-        {
-            var exprResult = item.Run(manager);
-            result += exprResult.ToDisplayString();
-        }
+        var result = List.Select(item => item.Run(manager)).Aggregate(string.Empty,
+            (current, exprResult) => current + exprResult.ToDisplayString());
 
         return new StringLangValue(result);
     }
@@ -36,14 +30,14 @@ public class StringTreeList(List<OldExpr> list, SourcePosition position = defaul
     {
         // 初始化结果字符串为空字符串
         ilGenerator.Emit(OpCodes.Ldstr, "");
-        
+
         // 遍历所有字符串片段和表达式
         foreach (var item in List)
         {
             // 将当前结果字符串留在栈上
             // 加载当前项的值
             item.LoadIlValue(ilGenerator, local);
-            
+
             // 确保当前项的值是字符串类型
             var itemType = item.OutputType(local);
             if (itemType != typeof(string))
@@ -52,7 +46,7 @@ public class StringTreeList(List<OldExpr> list, SourcePosition position = defaul
                 var toStringMethod = typeof(object).GetMethod("ToString", Type.EmptyTypes)!;
                 ilGenerator.Emit(OpCodes.Call, toStringMethod);
             }
-            
+
             // 调用string.Concat(string, string)方法将当前项的值附加到结果字符串
             var concatMethod = typeof(string).GetMethod("Concat", [typeof(string), typeof(string)])!;
             ilGenerator.Emit(OpCodes.Call, concatMethod);

@@ -16,14 +16,13 @@ public class NullLangValue(SourcePosition position = default) : LangValueType(po
 
     public override bool Equal(LangValueType? otherValueType)
     {
-        if (otherValueType is NullLangValue)
-            return true;
-        return false;
+        return otherValueType is NullLangValue;
     }
 
     public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)
     {
-        if (otherLangValueType is not TypeLangValue value) throw new TypeError(this, "TypeValue", otherLangValueType.GetType().Name);
+        if (otherLangValueType is not TypeLangValue value)
+            throw new TypeError(this, "TypeValue", otherLangValueType.GetType().Name);
 
         return value.Value switch
         {
@@ -35,7 +34,7 @@ public class NullLangValue(SourcePosition position = default) : LangValueType(po
             _ => throw new TypeError(this, "不支持的类型转换")
         };
     }
-    
+
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         ilGenerator.Emit(OpCodes.Ldnull);

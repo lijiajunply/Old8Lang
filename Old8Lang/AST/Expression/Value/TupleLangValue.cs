@@ -43,11 +43,24 @@ public class TupleLangValue(OldExpr v1, OldExpr v2, SourcePosition position = de
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
+        // 获取两个元素的类型
+        var type1 = Item1.OutputType(local) ?? typeof(object);
+        var type2 = Item2.OutputType(local) ?? typeof(object);
+        
+        // 获取元组类型
+        var tupleType = typeof(ValueTuple<,>).MakeGenericType(type1, type2);
+        
+        // 获取元组构造函数
+        var constructor = tupleType.GetConstructor(new[] { type1, type2 })!;
+        
         // 加载第一个元素的值
         Item1.LoadIlValue(ilGenerator, local);
+        
         // 加载第二个元素的值
         Item2.LoadIlValue(ilGenerator, local);
-        // 元组将自动由堆栈上的两个值组成
+        
+        // 调用元组构造函数创建元组实例
+        ilGenerator.Emit(OpCodes.Newobj, constructor);
     }
 
     public override Type OutputType(LocalManager local)

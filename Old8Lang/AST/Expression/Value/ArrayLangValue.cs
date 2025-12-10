@@ -82,7 +82,7 @@ public class ArrayLangValue : LangValueType, ILangList
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        // 创建一个长度为 5 的整数数组
+        // 创建一个长度为 len 的对象数组
         var len = RunResult.Length;
         ilGenerator.Emit(OpCodes.Ldc_I4, len); // 加载数组长度
         ilGenerator.Emit(OpCodes.Newarr, typeof(object)); // 创建新数组
@@ -90,21 +90,33 @@ public class ArrayLangValue : LangValueType, ILangList
         for (var i = 0; i < len; i++)
         {
             ilGenerator.Emit(OpCodes.Dup); // 复制数组引用
-            ilGenerator.Emit(OpCodes.Ldc_I4, i); // 加载索引 0
+            ilGenerator.Emit(OpCodes.Ldc_I4, i); // 加载索引
+            
             Type t;
             if (len == Values.Count)
             {
+                // 如果Values列表有元素，使用Values[i]
                 Values[i].LoadIlValue(ilGenerator, local);
                 t = Values[i].OutputType(local)!;
             }
             else
             {
-                RunResult[i].LoadIlValue(ilGenerator, local);
-                t = RunResult[i].OutputType(local)!;
+                // 否则，使用RunResult[i]，但要确保它不为null
+                var item = RunResult[i];
+                if (item == null)
+                {
+                    // 如果item为null，加载一个null值
+                    ilGenerator.Emit(OpCodes.Ldnull);
+                    t = typeof(object);
+                }
+                else
+                {
+                    item.LoadIlValue(ilGenerator, local);
+                    t = item.OutputType(local)!;
+                }
             }
 
-            ilGenerator.Emit(OpCodes.Box, t); // 将 int 转换为 object
-
+            ilGenerator.Emit(OpCodes.Box, t); // 将值转换为object
             ilGenerator.Emit(OpCodes.Stelem_Ref); // 将值存入数组
         }
     }

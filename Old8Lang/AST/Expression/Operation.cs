@@ -524,13 +524,12 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 ilGenerator.Emit(OpCodes.Brfalse, falseLabel);
                 // 加载右操作数
                 Right?.LoadIlValue(ilGenerator, local);
-                // 如果右操作数为true，跳转到endLabel
-                ilGenerator.Emit(OpCodes.Brtrue, endLabel);
+                // 右操作数已经在栈上，直接跳转到endLabel
+                ilGenerator.Emit(OpCodes.Br, endLabel);
                 // 左操作数为false的情况
                 ilGenerator.MarkLabel(falseLabel);
                 ilGenerator.Emit(OpCodes.Ldc_I4_0); // 加载false
-                ilGenerator.Emit(OpCodes.Br, endLabel);
-                // 结果为true的情况
+                // 结果为true或false的情况
                 ilGenerator.MarkLabel(endLabel);
                 return typeof(bool);
             }
@@ -546,13 +545,12 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 ilGenerator.Emit(OpCodes.Brtrue, trueLabel);
                 // 加载右操作数
                 Right?.LoadIlValue(ilGenerator, local);
-                // 如果右操作数为false，跳转到endLabel
-                ilGenerator.Emit(OpCodes.Brfalse, endLabel);
+                // 右操作数已经在栈上，直接跳转到endLabel
+                ilGenerator.Emit(OpCodes.Br, endLabel);
                 // 左操作数为true的情况
                 ilGenerator.MarkLabel(trueLabel);
                 ilGenerator.Emit(OpCodes.Ldc_I4_1); // 加载true
-                ilGenerator.Emit(OpCodes.Br, endLabel);
-                // 结果为false的情况
+                // 结果为true或false的情况
                 ilGenerator.MarkLabel(endLabel);
                 return typeof(bool);
             }
@@ -781,6 +779,48 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
                     ilGenerator.Emit(OpCodes.Ldfld, field);
                     return field.FieldType;
+                }
+                
+                // 处理索引访问: left[right]，例如 array[0], list[1], dict["key"]
+                if (rightType != null)
+                {
+                    Left!.LoadIlValue(ilGenerator, local);
+                    Right!.LoadIlValue(ilGenerator, local);
+                    
+                    // 处理不同类型的索引访问
+                    if (leftType == typeof(object[]))
+                    {
+                        // 数组索引访问
+                        ilGenerator.Emit(OpCodes.Ldelem_Ref);
+                        return typeof(object);
+                    }
+                    else if (leftType == typeof(List<object>))
+                    {
+                        // List<T>索引访问，调用索引器的getter方法
+                        var indexer = typeof(List<object>).GetProperty("Item")!;
+                        ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
+                        return typeof(object);
+                    }
+                    else if (leftType == typeof(Dictionary<object, object>))
+                    {
+                        // Dictionary<TKey, TValue>索引访问，调用索引器的getter方法
+                        var indexer = typeof(Dictionary<object, object>).GetProperty("Item")!;
+                        ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
+                        return typeof(object);
+                    }
+                    else if (leftType == typeof(string))
+                    {
+                        // 字符串索引访问
+                        var indexer = typeof(string).GetProperty("Chars")!;
+                        ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
+                        return typeof(char);
+                    }
+                    
+                    // 默认情况，尝试装箱并调用索引器
+                    ilGenerator.Emit(OpCodes.Box, rightType);
+                    var defaultIndexer = leftType!.GetProperty("Item")!;
+                    ilGenerator.Emit(OpCodes.Callvirt, defaultIndexer.GetGetMethod()!);
+                    return typeof(object);
                 }
 
                 return typeof(void);

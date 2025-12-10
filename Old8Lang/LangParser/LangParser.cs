@@ -1377,13 +1377,32 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
 // dotExpr = expression ( "." expression )* ;
     private OldExpr ParseDotExpr(OldExpr left)
     {
-        while (CurrentToken.Type == LangTokenType.Dot)
+        while (true)
         {
-            var dotToken = CurrentToken;
-            var position = new SourcePosition(dotToken.Line, dotToken.Column, tokenValue: dotToken.Value);
-            Expect(LangTokenType.Dot);
-            var right = ParsePrimary();
-            left = new Operation(left, OperationType.CONCAT, right, position);
+            if (CurrentToken.Type == LangTokenType.Dot)
+            {
+                // 处理成员访问: left.right
+                var dotToken = CurrentToken;
+                var position = new SourcePosition(dotToken.Line, dotToken.Column, tokenValue: dotToken.Value);
+                Expect(LangTokenType.Dot);
+                var right = ParsePrimary();
+                left = new Operation(left, OperationType.CONCAT, right, position);
+            }
+            else if (CurrentToken.Type == LangTokenType.LeftBracket)
+            {
+                // 处理索引访问: left[right]
+                var leftBracketToken = CurrentToken;
+                var position = new SourcePosition(leftBracketToken.Line, leftBracketToken.Column, tokenValue: leftBracketToken.Value);
+                Expect(LangTokenType.LeftBracket);
+                var right = ParseExpression(); // 允许索引是复杂表达式
+                Expect(LangTokenType.RightBracket);
+                // 使用CONCAT操作符表示索引访问，后续在GenerateIl中处理
+                left = new Operation(left, OperationType.CONCAT, right, position);
+            }
+            else
+            {
+                break;
+            }
         }
 
         return left;
