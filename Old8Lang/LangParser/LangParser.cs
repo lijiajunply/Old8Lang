@@ -1151,10 +1151,22 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         }
         
         // 处理单个语句 - 没有大括号的情况
-        // 这里不能直接调用ParseStatement()，因为会导致无限递归
-        // 我们需要直接返回一个空的BlockStatement，让调用者处理
-        // 或者抛出语法错误
-        throw CreateSyntaxError("语法错误：期望块语句或大括号包围的块。");
+        // 保存当前索引，以便在解析失败时恢复
+        var savedIndex = CurrentIndex;
+        
+        try
+        {
+            // 解析单个语句
+            var statement = ParseStatement();
+            // 返回包含这个语句的BlockStatement
+            return new BlockStatement([statement]);
+        }
+        catch (SyntaxError)
+        {
+            // 如果解析失败，恢复索引并重新抛出错误
+            CurrentIndex = savedIndex;
+            throw;
+        }
     }
 
     /// <summary>
