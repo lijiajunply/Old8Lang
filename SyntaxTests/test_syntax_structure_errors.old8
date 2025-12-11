@@ -1,0 +1,129 @@
+// 测试语法结构错误情况
+
+// 括号不匹配 - 缺少右括号
+if (a > 5 {
+    PrintLine("缺少右括号")
+}
+
+while (b < 10 {
+    PrintLine("缺少右括号")
+}
+
+for (i <- 0, i < 10, i++ {
+    PrintLine("缺少右括号")
+}
+
+func test_func(a {
+    return a
+}
+
+// 括号不匹配 - 缺少左括号
+if a > 5) {
+    PrintLine("缺少左括号")
+}
+
+while b < 10) {
+    PrintLine("缺少左括号")
+}
+
+for i <- 0, i < 10, i++) {
+    PrintLine("缺少左括号")
+}
+
+func test_func a, b) {
+    return a + b
+}
+
+// 大括号不匹配 - 缺少右大括号
+if (a > 5) {
+    PrintLine("缺少右大括号")
+
+while (b < 10) {
+    PrintLine("缺少右大括号")
+
+for (i <- 0, i < 10, i++) {
+    PrintLine("缺少右大括号")
+
+func test_func(a, b) {
+    return a + b
+
+class TestClass {
+    var a <- 10
+
+// 大括号不匹配 - 缺少左大括号
+if (a > 5)
+    PrintLine("缺少左大括号")
+}
+
+while (b < 10)
+    PrintLine("缺少左大括号")
+}
+
+for (i <- 0, i < 10, i++)
+    PrintLine("缺少左大括号")
+}
+
+func test_func(a, b)
+    return a + b
+}
+
+class TestClass
+    var a <- 10
+}
+
+// 方括号不匹配 - 缺少右方括号
+array[0 <- 10
+list[1 <- 20
+dict["key" <- "value"
+range[1~10 <- 1
+
+// 方括号不匹配 - 缺少左方括号
+array]0] <- 10
+list]1] <- 20
+dict]"key"] <- "value"
+range]1~10] <- 1
+
+// 缺少关键字
+if a > 5 {
+    PrintLine("缺少左括号")
+}
+
+elif a == 5 {
+    PrintLine("缺少if关键字")
+}
+
+else {
+    PrintLine("缺少if关键字")
+}
+
+for i <- 0, i < 10, i++
+    PrintLine("缺少大括号")
+
+while b < 10
+    PrintLine("缺少大括号")
+
+// 无效语句序列
+PrintLine("语句1") PrintLine("语句2") // 缺少语句分隔
+
+PrintLine("语句1")
+
+PrintLine("语句2")
+
+PrintLine("语句3") // 多余的空行
+
+// 无效语句终止符
+a <- 10;
+PrintLine("使用分号");
+
+// 无效注释
+/* 未闭合的多行注释
+
+// 无效的嵌套注释
+/* 外层注释 /* 内层注释 */ 外层注释 */
+
+// 无效的注释位置
+var a <- 10 // 注释后的内容 10
+
+// 无效的标签语句
+label: PrintLine("不支持标签语句")
+goto label // 不支持goto语句

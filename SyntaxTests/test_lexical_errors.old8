@@ -1,0 +1,45 @@
+// 测试词法错误情况
+
+// 无效字符
+invalid_char1 <- @
+invalid_char2 <- #
+invalid_char3 <- $invalid
+invalid_char4 <- \invalid
+invalid_char5 <- |
+
+// 未闭合的字符串
+unclosed_string1 <- "hello world
+unclosed_string2 <- "hello world""extra quote
+unclosed_char1 <- 'a
+unclosed_char2 <- ''double quote
+
+// 无效标识符
+123invalid <- 10
+invalid-identifier <- 20
+invalid.identifier <- 30
+invalid identifier <- 40
+invalid@identifier <- 50
+invalid#identifier <- 60
+invalid$identifier <- 70
+invalid\identifier <- 80
+invalid|identifier <- 90
+
+// 无效数值字面量
+invalid_hex <- 0x123 // 不支持十六进制
+invalid_oct <- 0o123 // 不支持八进制
+invalid_bin <- 0b1010 // 不支持二进制
+invalid_float1 <- 1.2.3 // 多个小数点
+invalid_float2 <- .123 // 缺少前导数字
+invalid_float3 <- 123. // 缺少尾随数字
+invalid_float4 <- 123e+10 // 不支持科学计数法
+invalid_float5 <- 123E-10 // 不支持科学计数法
+
+// 无效布尔字面量
+invalid_bool1 <- True // 应该是小写 true
+invalid_bool2 <- False // 应该是小写 false
+invalid_bool3 <- TRUE // 应该是小写 true
+invalid_bool4 <- FALSE // 应该是小写 false
+
+// 无效空值
+invalid_null1 <- Null // 应该是小写 null
+invalid_null2 <- NULL // 应该是小写 null

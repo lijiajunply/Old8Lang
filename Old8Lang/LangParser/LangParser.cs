@@ -234,11 +234,11 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     //           | minusMinus ;
     private OldStatement ParseStatement(List<AccessModifierType>? modifiers = null)
     {
-        // 跳过空行和结束符
+        // 跳过结束符
         if (CurrentToken.Type == LangTokenType.EndOfFile)
         {
             CurrentIndex++;
-            return ParseStatement(modifiers);
+            throw CreateSyntaxError("语法错误：意外的文件结束符。建议检查是否缺少结束符号或语句。");
         }
 
         // 处理访问修饰符：public、private、static 或它们的组合
@@ -1113,37 +1113,48 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     /// <returns>块语句</returns>
     private BlockStatement ParseBlock()
     {
-        if (CurrentToken.Type != LangTokenType.LeftBrace)
+        // 处理大括号包围的块
+        if (CurrentToken.Type == LangTokenType.LeftBrace)
         {
-            return new BlockStatement([ParseStatement()]);
-        }
-
-        Expect(LangTokenType.LeftBrace);
-        var statements = new List<IOldLangTree>();
-        try
-        {
-            while (CurrentToken.Type != LangTokenType.RightBrace)
+            Expect(LangTokenType.LeftBrace);
+            var statements = new List<IOldLangTree>();
+            
+            try
             {
-                // 尝试解析语句
-                var statement = ParseStatement();
-
-                // 只有当语句不是空语句时才添加到列表中
-                if (!(statement is SetStatement { Id.IdName: "", Value: LangId { IdName: "" } }))
+                while (CurrentToken.Type != LangTokenType.RightBrace)
                 {
-                    statements.Add(statement);
+                    // 尝试解析语句
+                    var statement = ParseStatement();
+
+                    // 只有当语句不是空语句时才添加到列表中
+                    if (!(statement is SetStatement { Id.IdName: "", Value: LangId { IdName: "" } }))
+                    {
+                        statements.Add(statement);
+                    }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            if (ex.Message != "EndOfBlock")
+            catch (SyntaxError)
             {
+                // 直接抛出语法错误，不再包装
                 throw;
             }
-        }
+            catch (Exception ex)
+            {
+                if (ex.Message != "EndOfBlock")
+                {
+                    throw;
+                }
+            }
 
-        Expect(LangTokenType.RightBrace);
-        return new BlockStatement(statements);
+            Expect(LangTokenType.RightBrace);
+            return new BlockStatement(statements);
+        }
+        
+        // 处理单个语句 - 没有大括号的情况
+        // 这里不能直接调用ParseStatement()，因为会导致无限递归
+        // 我们需要直接返回一个空的BlockStatement，让调用者处理
+        // 或者抛出语法错误
+        throw CreateSyntaxError("语法错误：期望块语句或大括号包围的块。");
     }
 
     /// <summary>
@@ -1953,11 +1964,8 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             elements.Add(ParseExpression());
         }
 
-        // 检查是否是右括号，避免在错误位置调用Expect
-        if (CurrentToken.Type == LangTokenType.RightParen)
-        {
-            Expect(LangTokenType.RightParen);
-        }
+        // 必须是右括号，否则抛出语法错误
+        Expect(LangTokenType.RightParen);
 
         // 构建元组，支持任意数量元素
         if (elements.Count == 1)

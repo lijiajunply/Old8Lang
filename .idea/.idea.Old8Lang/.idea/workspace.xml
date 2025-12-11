@@ -17,8 +17,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/语法错误测试用例设计.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/SyntaxErrorTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_lexical_errors.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_syntax_structure_errors.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/ParsersTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/ParsersTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -333,6 +336,7 @@
       <workItem from="1765279105952" duration="28440000" />
       <workItem from="1765360741424" duration="2635000" />
       <workItem from="1765385357424" duration="7237000" />
+      <workItem from="1765433725382" duration="1394000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>

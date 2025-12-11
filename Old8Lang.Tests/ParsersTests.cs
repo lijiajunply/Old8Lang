@@ -8,7 +8,7 @@ public class ParsersTests
     public void ParseProgram_EmptyProgram_ReturnsEmptyBlock()
     {
         // Arrange
-        var tokens = new List<Old8Lang.LangParser.LangToken>();
+        var tokens = new List<LangToken>();
         var parser = new Old8Lang.LangParser.LangParser(tokens);
         
         // Act
@@ -23,11 +23,11 @@ public class ParsersTests
     public void ParseProgram_SimpleAssignment_ReturnsSetStatement()
     {
         // Arrange
-        var tokens = new List<Old8Lang.LangParser.LangToken>
+        var tokens = new List<LangToken>
         {
-            new("a", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new("<-", Old8Lang.LangParser.LangTokenType.Assignment, 1),
-            new("10", Old8Lang.LangParser.LangTokenType.Number, 1),
+            new("a", LangTokenType.Identifier, 1),
+            new("<-", LangTokenType.Assignment, 1),
+            new("10", LangTokenType.Number, 1),
         };
         var parser = new Old8Lang.LangParser.LangParser(tokens);
         
@@ -54,14 +54,14 @@ public class ParsersTests
     public void ParseProgram_IfStatement_ReturnsIfStatement()
     {
         // Arrange
-        var tokens = new List<Old8Lang.LangParser.LangToken>
+        var tokens = new List<LangToken>
         {
-            new("if", Old8Lang.LangParser.LangTokenType.If, 1),
-            new("a", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new(">", Old8Lang.LangParser.LangTokenType.GreaterThan, 1),
-            new("5", Old8Lang.LangParser.LangTokenType.Number, 1),
-            new("{", Old8Lang.LangParser.LangTokenType.LeftBrace, 1),
-            new("}", Old8Lang.LangParser.LangTokenType.RightBrace, 1),
+            new("if", LangTokenType.If, 1),
+            new("a", LangTokenType.Identifier, 1),
+            new(">", LangTokenType.GreaterThan, 1),
+            new("5", LangTokenType.Number, 1),
+            new("{", LangTokenType.LeftBrace, 1),
+            new("}", LangTokenType.RightBrace, 1),
         };
         var parser = new Old8Lang.LangParser.LangParser(tokens);
         
@@ -78,21 +78,21 @@ public class ParsersTests
     public void ParseProgram_ForStatement_ReturnsForStatement()
     {
         // Arrange
-        var tokens = new List<Old8Lang.LangParser.LangToken>
+        var tokens = new List<LangToken>
         {
-            new("for", Old8Lang.LangParser.LangTokenType.For, 1),
-            new("i", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new("<-", Old8Lang.LangParser.LangTokenType.Assignment, 1),
-            new("0", Old8Lang.LangParser.LangTokenType.Number, 1),
-            new(",", Old8Lang.LangParser.LangTokenType.Comma, 1),
-            new("i", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new("<", Old8Lang.LangParser.LangTokenType.LessThan, 1),
-            new("5", Old8Lang.LangParser.LangTokenType.Number, 1),
-            new(",", Old8Lang.LangParser.LangTokenType.Comma, 1),
-            new("i", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new("++", Old8Lang.LangParser.LangTokenType.PlusPlus, 1),
-            new("{", Old8Lang.LangParser.LangTokenType.LeftBrace, 1),
-            new("}", Old8Lang.LangParser.LangTokenType.RightBrace, 1),
+            new("for", LangTokenType.For, 1),
+            new("i", LangTokenType.Identifier, 1),
+            new("<-", LangTokenType.Assignment, 1),
+            new("0", LangTokenType.Number, 1),
+            new(",", LangTokenType.Comma, 1),
+            new("i", LangTokenType.Identifier, 1),
+            new("<", LangTokenType.LessThan, 1),
+            new("5", LangTokenType.Number, 1),
+            new(",", LangTokenType.Comma, 1),
+            new("i", LangTokenType.Identifier, 1),
+            new("++", LangTokenType.PlusPlus, 1),
+            new("{", LangTokenType.LeftBrace, 1),
+            new("}", LangTokenType.RightBrace, 1),
         };
         var parser = new Old8Lang.LangParser.LangParser(tokens);
         
@@ -109,14 +109,14 @@ public class ParsersTests
     public void ParseProgram_WhileStatement_ReturnsWhileStatement()
     {
         // Arrange
-        var tokens = new List<Old8Lang.LangParser.LangToken>
+        var tokens = new List<LangToken>
         {
-            new("while", Old8Lang.LangParser.LangTokenType.While, 1),
-            new("a", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new("<", Old8Lang.LangParser.LangTokenType.LessThan, 1),
-            new("10", Old8Lang.LangParser.LangTokenType.Number, 1),
-            new("{", Old8Lang.LangParser.LangTokenType.LeftBrace, 1),
-            new("}", Old8Lang.LangParser.LangTokenType.RightBrace, 1),
+            new("while", LangTokenType.While, 1),
+            new("a", LangTokenType.Identifier, 1),
+            new("<", LangTokenType.LessThan, 1),
+            new("10", LangTokenType.Number, 1),
+            new("{", LangTokenType.LeftBrace, 1),
+            new("}", LangTokenType.RightBrace, 1),
         };
         var parser = new Old8Lang.LangParser.LangParser(tokens);
         
@@ -134,21 +134,21 @@ public class ParsersTests
     {
         // Arrange
         var sourceCode = "func add(x, y) { return x + y }";
-        var tokens = new List<Old8Lang.LangParser.LangToken>
+        var tokens = new List<LangToken>
         {
-            new("func", Old8Lang.LangParser.LangTokenType.Func, 1),
-            new("add", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new("(", Old8Lang.LangParser.LangTokenType.LeftParen, 1),
-            new("x", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new(",", Old8Lang.LangParser.LangTokenType.Comma, 1),
-            new("y", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new(")", Old8Lang.LangParser.LangTokenType.RightParen, 1),
-            new("{", Old8Lang.LangParser.LangTokenType.LeftBrace, 1),
-            new("return", Old8Lang.LangParser.LangTokenType.Return, 1),
-            new("x", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new("+", Old8Lang.LangParser.LangTokenType.Plus, 1),
-            new("y", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new("}", Old8Lang.LangParser.LangTokenType.RightBrace, 1),
+            new("func", LangTokenType.Func, 1),
+            new("add", LangTokenType.Identifier, 1),
+            new("(", LangTokenType.LeftParen, 1),
+            new("x", LangTokenType.Identifier, 1),
+            new(",", LangTokenType.Comma, 1),
+            new("y", LangTokenType.Identifier, 1),
+            new(")", LangTokenType.RightParen, 1),
+            new("{", LangTokenType.LeftBrace, 1),
+            new("return", LangTokenType.Return, 1),
+            new("x", LangTokenType.Identifier, 1),
+            new("+", LangTokenType.Plus, 1),
+            new("y", LangTokenType.Identifier, 1),
+            new("}", LangTokenType.RightBrace, 1),
         };
         var parser = new Old8Lang.LangParser.LangParser(tokens);
         
@@ -166,15 +166,15 @@ public class ParsersTests
     public void ParseProgram_ClassDeclaration_ReturnsClassInit()
     {
         // Arrange
-        var tokens = new List<Old8Lang.LangParser.LangToken>
+        var tokens = new List<LangToken>
         {
-            new("class", Old8Lang.LangParser.LangTokenType.Class, 1),
-            new("TestClass", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new("{", Old8Lang.LangParser.LangTokenType.LeftBrace, 1),
-            new("field", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new("<-", Old8Lang.LangParser.LangTokenType.Assignment, 1),
-            new("0", Old8Lang.LangParser.LangTokenType.Number, 1),
-            new("}", Old8Lang.LangParser.LangTokenType.RightBrace, 1),
+            new("class", LangTokenType.Class, 1),
+            new("TestClass", LangTokenType.Identifier, 1),
+            new("{", LangTokenType.LeftBrace, 1),
+            new("field", LangTokenType.Identifier, 1),
+            new("<-", LangTokenType.Assignment, 1),
+            new("0", LangTokenType.Number, 1),
+            new("}", LangTokenType.RightBrace, 1),
         };
         var parser = new Old8Lang.LangParser.LangParser(tokens);
         
@@ -192,17 +192,17 @@ public class ParsersTests
     public void ParseProgram_TryCatchStatement_ReturnsTryStatement()
     {
         // Arrange
-        var tokens = new List<Old8Lang.LangParser.LangToken>
+        var tokens = new List<LangToken>
         {
-            new("try", Old8Lang.LangParser.LangTokenType.Try, 1),
-            new("{", Old8Lang.LangParser.LangTokenType.LeftBrace, 1),
-            new("}", Old8Lang.LangParser.LangTokenType.RightBrace, 1),
-            new("catch", Old8Lang.LangParser.LangTokenType.Catch, 1),
-            new("(", Old8Lang.LangParser.LangTokenType.LeftParen, 1),
-            new("e", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new(")", Old8Lang.LangParser.LangTokenType.RightParen, 1),
-            new("{", Old8Lang.LangParser.LangTokenType.LeftBrace, 1),
-            new("}", Old8Lang.LangParser.LangTokenType.RightBrace, 1),
+            new("try", LangTokenType.Try, 1),
+            new("{", LangTokenType.LeftBrace, 1),
+            new("}", LangTokenType.RightBrace, 1),
+            new("catch", LangTokenType.Catch, 1),
+            new("(", LangTokenType.LeftParen, 1),
+            new("e", LangTokenType.Identifier, 1),
+            new(")", LangTokenType.RightParen, 1),
+            new("{", LangTokenType.LeftBrace, 1),
+            new("}", LangTokenType.RightBrace, 1),
         };
         var parser = new Old8Lang.LangParser.LangParser(tokens);
         
@@ -219,15 +219,15 @@ public class ParsersTests
     public void ParseProgram_ArithmeticExpression_ReturnsOperation()
     {
         // Arrange
-        var tokens = new List<Old8Lang.LangParser.LangToken>
+        var tokens = new List<LangToken>
         {
-            new("result", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new("<-", Old8Lang.LangParser.LangTokenType.Assignment, 1),
-            new("1", Old8Lang.LangParser.LangTokenType.Number, 1),
-            new("+", Old8Lang.LangParser.LangTokenType.Plus, 1),
-            new("2", Old8Lang.LangParser.LangTokenType.Number, 1),
-            new("*", Old8Lang.LangParser.LangTokenType.Star, 1),
-            new("3", Old8Lang.LangParser.LangTokenType.Number, 1),
+            new("result", LangTokenType.Identifier, 1),
+            new("<-", LangTokenType.Assignment, 1),
+            new("1", LangTokenType.Number, 1),
+            new("+", LangTokenType.Plus, 1),
+            new("2", LangTokenType.Number, 1),
+            new("*", LangTokenType.Star, 1),
+            new("3", LangTokenType.Number, 1),
         };
         var parser = new Old8Lang.LangParser.LangParser(tokens);
         
@@ -247,17 +247,17 @@ public class ParsersTests
     public void ParseProgram_LogicalExpression_ReturnsOperation()
     {
         // Arrange
-        var tokens = new List<Old8Lang.LangParser.LangToken>
+        var tokens = new List<LangToken>
         {
-            new("result", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new("<-", Old8Lang.LangParser.LangTokenType.Assignment, 1),
-            new("a", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new(">", Old8Lang.LangParser.LangTokenType.GreaterThan, 1),
-            new("5", Old8Lang.LangParser.LangTokenType.Number, 1),
-            new("and", Old8Lang.LangParser.LangTokenType.And, 1),
-            new("b", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new("<", Old8Lang.LangParser.LangTokenType.LessThan, 1),
-            new("10", Old8Lang.LangParser.LangTokenType.Number, 1),
+            new("result", LangTokenType.Identifier, 1),
+            new("<-", LangTokenType.Assignment, 1),
+            new("a", LangTokenType.Identifier, 1),
+            new(">", LangTokenType.GreaterThan, 1),
+            new("5", LangTokenType.Number, 1),
+            new("and", LangTokenType.And, 1),
+            new("b", LangTokenType.Identifier, 1),
+            new("<", LangTokenType.LessThan, 1),
+            new("10", LangTokenType.Number, 1),
         };
         var parser = new Old8Lang.LangParser.LangParser(tokens);
         
@@ -277,13 +277,13 @@ public class ParsersTests
     public void ParseProgram_ComparisonExpression_ReturnsOperation()
     {
         // Arrange
-        var tokens = new List<Old8Lang.LangParser.LangToken>
+        var tokens = new List<LangToken>
         {
-            new("result", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new("<-", Old8Lang.LangParser.LangTokenType.Assignment, 1),
-            new("a", Old8Lang.LangParser.LangTokenType.Identifier, 1),
-            new("==", Old8Lang.LangParser.LangTokenType.Equals, 1),
-            new("b", Old8Lang.LangParser.LangTokenType.Identifier, 1),
+            new("result", LangTokenType.Identifier, 1),
+            new("<-", LangTokenType.Assignment, 1),
+            new("a", LangTokenType.Identifier, 1),
+            new("==", LangTokenType.Equals, 1),
+            new("b", LangTokenType.Identifier, 1),
         };
         var parser = new Old8Lang.LangParser.LangParser(tokens);
         
