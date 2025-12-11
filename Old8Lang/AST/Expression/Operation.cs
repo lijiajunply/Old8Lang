@@ -7,8 +7,8 @@ using Old8Lang.LangParser;
 
 namespace Old8Lang.AST.Expression;
 
-public class Operation(OldExpr? left, LangTokenType opera, OldExpr? right, SourcePosition position = default)
-    : OldExpr(position)
+public class Operation(LangExpression? left, LangTokenType opera, LangExpression? right, SourcePosition position = default)
+    : LangExpression(position)
 {
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
@@ -53,8 +53,8 @@ public class Operation(OldExpr? left, LangTokenType opera, OldExpr? right, Sourc
 
     public override string ToString() => $"{Left}{OperaToString()}{Right}";
     private Type? Type { get; set; }
-    public OldExpr? Left { get; set; } = left;
-    public OldExpr? Right { get; set; } = right;
+    public LangExpression? Left { get; set; } = left;
+    public LangExpression? Right { get; set; } = right;
     public LangTokenType Opera { get; set; } = opera;
 
     public override LangValueType Run(VariateManager manager)
@@ -131,7 +131,7 @@ public class Operation(OldExpr? left, LangTokenType opera, OldExpr? right, Sourc
             {
                 if (Right is Instance r1)
                 {
-                    var ids = r1.Ids.Select(x => x.Run(manager)).OfType<OldExpr>().ToList();
+                    var ids = r1.Ids.Select(x => x.Run(manager)).OfType<LangExpression>().ToList();
                     var newInstance = new Instance(r1.Id, ids, r1.Position);
                     // 设置外部管理器，确保能访问最新的外部变量
                     any.ExternalManager = manager;
@@ -149,7 +149,7 @@ public class Operation(OldExpr? left, LangTokenType opera, OldExpr? right, Sourc
             {
                 if (Right is Instance instance)
                 {
-                    var ids = instance.Ids.Select(x => x.Run(manager)).OfType<OldExpr>().ToList();
+                    var ids = instance.Ids.Select(x => x.Run(manager)).OfType<LangExpression>().ToList();
                     var newInstance = new Instance(instance.Id, ids);
                     return list.Dot(newInstance);
                 }

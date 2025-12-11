@@ -9,17 +9,17 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public class TypeLangValue : LangValueType
 {
-    private readonly OldExpr? Expr;
+    private readonly LangExpression? Expression;
     public string? Value { get; private set; }
     
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
-    public TypeLangValue(OldExpr expr) => Expr = expr;
+    public TypeLangValue(LangExpression expression) => Expression = expression;
     public TypeLangValue(string value) => Value = value;
 
     public override LangValueType Run(LangParser.VariateManager manager)
     {
-        var result = Expr?.Run(manager);
+        var result = Expression?.Run(manager);
         if (result == null) throw new InvalidOperationError(this, "类型表达式求值失败");
         Value = result.TypeToString();
         return this;

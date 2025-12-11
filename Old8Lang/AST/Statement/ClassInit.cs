@@ -90,7 +90,7 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
     private void DefineClassMembers(TypeBuilder typeBuilder, LocalManager local)
     {
         // 分离字段和方法
-        var fields = new List<(ClassMemberId, OldExpr)>();
+        var fields = new List<(ClassMemberId, LangExpression)>();
         var methods = new List<(ClassMemberId, FuncLangValue)>();
 
         foreach (var variate in anyLangValue.Variates)

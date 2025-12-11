@@ -10,10 +10,10 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="v1"></param>
 /// <param name="v2"></param>
 /// <param name="position"></param>
-public class TupleLangValue(OldExpr v1, OldExpr v2, SourcePosition position = default) : LangValueType(position)
+public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition position = default) : LangValueType(position)
 {
-    public OldExpr V1 = v1;
-    public OldExpr V2 = v2;
+    public LangExpression V1 = v1;
+    public LangExpression V2 = v2;
     
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     public ValueTuple<LangValueType, LangValueType> Value { get; private set; }

@@ -108,9 +108,9 @@ public class BlockStatement : OldStatement
     /// 获取实例成员字典
     /// </summary>
     /// <returns>实例成员字典</returns>
-    public Dictionary<ClassMemberId, OldExpr> ToAnyData()
+    public Dictionary<ClassMemberId, LangExpression> ToAnyData()
     {
-        var c = new Dictionary<ClassMemberId, OldExpr>();
+        var c = new Dictionary<ClassMemberId, LangExpression>();
 
         // 处理所有语句，筛选出非静态成员
         foreach (var x in OtherStatements.Concat(ImportStatements))
@@ -131,9 +131,9 @@ public class BlockStatement : OldStatement
     /// 获取静态成员字典
     /// </summary>
     /// <returns>静态成员字典</returns>
-    public Dictionary<ClassMemberId, OldExpr> ToStaticData()
+    public Dictionary<ClassMemberId, LangExpression> ToStaticData()
     {
-        var c = new Dictionary<ClassMemberId, OldExpr>();
+        var c = new Dictionary<ClassMemberId, LangExpression>();
 
         // 处理所有语句，筛选出静态成员
         foreach (var x in OtherStatements.Concat(ImportStatements))
@@ -150,7 +150,7 @@ public class BlockStatement : OldStatement
         return c;
     }
 
-    private static (ClassMemberId? id, OldExpr? Expr) GetTuple(IOldLangTree a)
+    private static (ClassMemberId? id, LangExpression? Expr) GetTuple(IOldLangTree a)
     {
         switch (a)
         {

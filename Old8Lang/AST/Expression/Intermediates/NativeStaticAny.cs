@@ -14,9 +14,9 @@ public class NativeStaticAny(string className, Type classType) : ImportInfo
     
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
-    public override LangValueType Dot(OldExpr dotExpr)
+    public override LangValueType Dot(LangExpression dotExpression)
     {
-        if (dotExpr is LangId id)
+        if (dotExpression is LangId id)
         {
             var prop = classType.GetProperty(id.IdName);
             if (prop is null)
@@ -30,7 +30,7 @@ public class NativeStaticAny(string className, Type classType) : ImportInfo
             return ObjToValue(prop.GetValue(null)!);
         }
 
-        if (dotExpr is Instance instance)
+        if (dotExpression is Instance instance)
         {
             var method = classType.GetMethod(instance.Id.IdName);
             if (method is null)

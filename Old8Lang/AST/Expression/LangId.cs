@@ -4,12 +4,12 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression;
 
-public class LangId(string name, string assumptionType = "", OldExpr? defaultValue = null, SourcePosition position = default) : OldExpr(position)
+public class LangId(string name, string assumptionType = "", LangExpression? defaultValue = null, SourcePosition position = default) : LangExpression(position)
 {
     public readonly string IdName = name;
     public override string ToString() => IdName;
     public string AssumptionType { get; } = assumptionType;
-    public OldExpr? DefaultValue { get; } = defaultValue;
+    public LangExpression? DefaultValue { get; } = defaultValue;
     
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 

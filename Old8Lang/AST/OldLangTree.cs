@@ -9,10 +9,8 @@ public interface IVisitor<out T>
     T Visit(Expression.TernaryExpression node);
 
     // 中间表达式节点
-    T Visit(Expression.Intermediates.ArgList node);
     T Visit(Expression.Intermediates.ErrorLangValue node);
     T Visit(Expression.Intermediates.ILangList node);
-    T Visit(Expression.Intermediates.IdList node);
     T Visit(Expression.Intermediates.ImportInfo node);
     T Visit(Expression.Value.Instance node);
     T Visit(Expression.Intermediates.NativeAnyLangValue node);

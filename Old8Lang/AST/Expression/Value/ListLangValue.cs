@@ -11,13 +11,13 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public class ListLangValue : LangValueType, ILangList
 {
-    private readonly List<OldExpr> Value;
+    private readonly List<LangExpression> Value;
 
     public readonly List<LangValueType> Values = [];
     
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
-    public ListLangValue(List<OldExpr> value, SourcePosition position = default) : base(position)
+    public ListLangValue(List<LangExpression> value, SourcePosition position = default) : base(position)
     {
         Value = value;
     }
@@ -98,9 +98,9 @@ public class ListLangValue : LangValueType, ILangList
     public override string ToString() =>
         "[" + string.Join(", ", Values) + "]"; // Old8Lang 风格的列表，使用 [ ] 包裹
 
-    public override LangValueType Dot(OldExpr dotExpr)
+    public override LangValueType Dot(LangExpression dotExpression)
     {
-        return dotExpr is not Instance a
+        return dotExpression is not Instance a
             ? throw new InvalidOperationError(this, "列表类型只支持实例调用操作")
             : a.FromClassToResult(this);
     }
@@ -115,7 +115,7 @@ public class ListLangValue : LangValueType, ILangList
         if (start < 0) start += Values.Count;
         if (end < 0) end += Values.Count + 1;
         return new ListLangValue(Values[start..end]
-            .OfType<OldExpr>()
+            .OfType<LangExpression>()
             .ToList());
     }
 

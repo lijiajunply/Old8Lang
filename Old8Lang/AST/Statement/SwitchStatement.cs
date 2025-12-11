@@ -6,7 +6,7 @@ using Old8Lang.AST.Expression.Value;
 namespace Old8Lang.AST.Statement;
 
 public class SwitchStatement(
-    OldExpr switchExpr,
+    LangExpression switchExpression,
     List<OldCase> switchCaseList,
     BlockStatement? defaultBlockStatement = null,
     SourcePosition position = default)
@@ -16,11 +16,11 @@ public class SwitchStatement(
     
     public override void Run(VariateManager manager)
     {
-        var switchValue = switchExpr.Run(manager);
+        var switchValue = switchExpression.Run(manager);
 
         foreach (var oldCase in switchCaseList)
         {
-            var caseValue = oldCase.Expr.Run(manager);
+            var caseValue = oldCase.expression.Run(manager);
             bool isMatch;
 
             // 处理范围匹配：如果 caseValue 是数组，检查 switchValue 是否在数组中
@@ -51,8 +51,8 @@ public class SwitchStatement(
         var defaultLabel = defaultBlockStatement != null ? ilGenerator.DefineLabel() : labelEnd;
 
         // 保存switch表达式的值到局部变量
-        switchExpr.LoadIlValue(ilGenerator, local);
-        var switchValueType = switchExpr.OutputType(local) ?? typeof(object);
+        switchExpression.LoadIlValue(ilGenerator, local);
+        var switchValueType = switchExpression.OutputType(local) ?? typeof(object);
         var switchValueLocal = ilGenerator.DeclareLocal(switchValueType);
         ilGenerator.Emit(OpCodes.Stloc, switchValueLocal.LocalIndex);
 
@@ -69,7 +69,7 @@ public class SwitchStatement(
             ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal.LocalIndex);
 
             // 加载case值并比较
-            oldCase.Expr.LoadIlValue(ilGenerator, local);
+            oldCase.expression.LoadIlValue(ilGenerator, local);
 
             // 比较操作
             if (switchValueType == typeof(int) || switchValueType == typeof(bool))
@@ -145,12 +145,12 @@ public class SwitchStatement(
     public override int Count => switchCaseList.Count;
 }
 
-public class OldCase(OldExpr expr, BlockStatement blockStatement, SourcePosition position = default)
+public class OldCase(LangExpression expression, BlockStatement blockStatement, SourcePosition position = default)
     : OldStatement(position)
 {
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
-    public OldExpr Expr { get; } = expr;
+    public LangExpression expression { get; } = expression;
     public BlockStatement BlockStatement { get; } = blockStatement;
 
     public override void Run(VariateManager manager)
@@ -161,7 +161,7 @@ public class OldCase(OldExpr expr, BlockStatement blockStatement, SourcePosition
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         var labelCase = ilGenerator.DefineLabel();
-        Expr.LoadIlValue(ilGenerator, local);
+        expression.LoadIlValue(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Br, labelCase);
 
         ilGenerator.MarkLabel(labelCase);

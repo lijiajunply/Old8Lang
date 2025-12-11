@@ -27,7 +27,7 @@ public class DictionaryLangValue : LangValueType, ILangList
         Tuples = [];
     }
 
-    public DictionaryLangValue(List<KeyValuePair<OldExpr, OldExpr>> list, SourcePosition position = default) :
+    public DictionaryLangValue(List<KeyValuePair<LangExpression, LangExpression>> list, SourcePosition position = default) :
         base(position)
     {
         Tuples = list.Select(x => new TupleLangValue(x.Key, x.Value)).ToList();
@@ -44,15 +44,15 @@ public class DictionaryLangValue : LangValueType, ILangList
         return this;
     }
 
-    public override LangValueType Dot(OldExpr dotExpr)
+    public override LangValueType Dot(LangExpression dotExpression)
     {
-        if (dotExpr is Instance a)
+        if (dotExpression is Instance a)
         {
             return a.FromClassToResult(this);
         }
 
         // 处理属性访问：obj.property
-        if (dotExpr is LangId langId)
+        if (dotExpression is LangId langId)
         {
             // 将属性名作为字符串键来访问字典值
             var key = new StringLangValue(langId.IdName);

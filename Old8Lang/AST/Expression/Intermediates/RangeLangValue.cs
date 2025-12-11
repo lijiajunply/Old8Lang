@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <param name="start"></param>
 /// <param name="end"></param>
 /// <param name="position"></param>
-public class RangeLangValue(OldExpr? start, OldExpr? end, SourcePosition position = default) : LangValueType(position)
+public class RangeLangValue(LangExpression? start, LangExpression? end, SourcePosition position = default) : LangValueType(position)
 {
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     

@@ -6,7 +6,7 @@ using Old8Lang.LangParser;
 
 namespace Old8Lang.AST;
 
-public abstract class OldExpr : IOldLangTree
+public abstract class LangExpression : IOldLangTree
 {
     /// <inheritdoc />
     public SourcePosition Position { get; }
@@ -15,7 +15,7 @@ public abstract class OldExpr : IOldLangTree
     /// 构造函数
     /// </summary>
     /// <param name="position">源代码位置信息</param>
-    protected OldExpr(SourcePosition position = default)
+    protected LangExpression(SourcePosition position = default)
     {
         Position = position;
     }

@@ -9,7 +9,7 @@ namespace Old8Lang.AST.Statement;
 /// <summary>
 /// while语句
 /// </summary>
-public class WhileStatement(OldExpr expr, OldStatement blockStatement, SourcePosition position = default) : OldStatement(position)
+public class WhileStatement(LangExpression expression, OldStatement blockStatement, SourcePosition position = default) : OldStatement(position)
 {
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
@@ -18,7 +18,7 @@ public class WhileStatement(OldExpr expr, OldStatement blockStatement, SourcePos
         manager.AddChildren();
         while (true)
         {
-            var value = expr.Run(manager);
+            var value = expression.Run(manager);
             bool expr1;
             if (value is BoolLangValue varBool)
             {
@@ -73,7 +73,7 @@ public class WhileStatement(OldExpr expr, OldStatement blockStatement, SourcePos
         ilGenerator.MarkLabel(loopStart);
 
         // 检查循环条件
-        expr.LoadIlValue(ilGenerator, local);
+        expression.LoadIlValue(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Brfalse, loopEnd); // 如果条件为false，跳转到循环结束
         
         blockStatement.GenerateIl(ilGenerator, local);
@@ -93,5 +93,5 @@ public class WhileStatement(OldExpr expr, OldStatement blockStatement, SourcePos
 
     public override int Count => blockStatement.Count;
 
-    public override string ToString() => $"while {expr}\n{blockStatement}";
+    public override string ToString() => $"while {expression}\n{blockStatement}";
 }

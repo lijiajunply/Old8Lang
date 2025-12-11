@@ -9,7 +9,7 @@ namespace Old8Lang.AST.Statement;
 
 public class ForStatement(
     SetStatement setStatement,
-    OldExpr expr,
+    LangExpression expression,
     OldStatement statement,
     BlockStatement blockStatement,
     SourcePosition position = default)
@@ -23,7 +23,7 @@ public class ForStatement(
         setStatement.Run(manager);
         while (true)
         {
-            var varExpr = expr.Run(manager);
+            var varExpr = expression.Run(manager);
             bool expr1;
             if (varExpr is BoolLangValue value)
                 expr1 = value.Value;
@@ -77,7 +77,7 @@ public class ForStatement(
         ilGenerator.MarkLabel(loopStart);
 
         // 检查循环条件
-        expr.LoadIlValue(ilGenerator, local);
+        expression.LoadIlValue(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Brfalse, loopEnd); // 如果条件为false，跳转到循环结束
         
         blockStatement.GenerateIl(ilGenerator, local);
@@ -103,7 +103,7 @@ public class ForStatement(
 
     public override string ToString()
     {
-        var sb = new StringBuilder($"for {setStatement}, {expr}, {statement}");
+        var sb = new StringBuilder($"for {setStatement}, {expression}, {statement}");
         sb.AppendLine();
         sb.Append($"{{{blockStatement}\n}}");
         return sb.ToString();

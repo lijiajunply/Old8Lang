@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public class AnyLangValue : LangValueType
 {
-    public readonly Dictionary<ClassMemberId, OldExpr> Variates;
+    public readonly Dictionary<ClassMemberId, LangExpression> Variates;
     public readonly Dictionary<string, LangValueType> Result = [];
     public readonly LangId Id;
     
@@ -19,7 +19,7 @@ public class AnyLangValue : LangValueType
 
     public readonly VariateManager Manager;
 
-    public AnyLangValue(LangId id, Dictionary<ClassMemberId, OldExpr> variates, SourcePosition position = default) :
+    public AnyLangValue(LangId id, Dictionary<ClassMemberId, LangExpression> variates, SourcePosition position = default) :
         base(position)
     {
         Variates = variates;
@@ -55,7 +55,7 @@ public class AnyLangValue : LangValueType
         // 而是直接将Result字典中的值存储到实例中
     }
 
-    public AnyLangValue(Dictionary<ClassMemberId, OldExpr> variates, SourcePosition position = default) : base(position)
+    public AnyLangValue(Dictionary<ClassMemberId, LangExpression> variates, SourcePosition position = default) : base(position)
     {
         Variates = variates;
         Id = new LangId("JsonNative");
@@ -91,9 +91,9 @@ public class AnyLangValue : LangValueType
         return this;
     }
 
-    public override LangValueType Dot(OldExpr dotExpr)
+    public override LangValueType Dot(LangExpression dotExpression)
     {
-        switch (dotExpr)
+        switch (dotExpression)
         {
             case LangId id:
             {
@@ -147,7 +147,7 @@ public class AnyLangValue : LangValueType
                     if (value is FuncLangValue funcValue)
                     {
                         // 处理方法参数，先运行参数表达式，这样可以访问外部变量
-                        List<OldExpr> methodArgs = [];
+                        List<LangExpression> methodArgs = [];
                         methodArgs.AddRange(instance.Ids);
 
                         // 使用外部管理器或内部管理器作为回退
@@ -187,7 +187,7 @@ public class AnyLangValue : LangValueType
                     if (methodValue is FuncLangValue funcValue)
                     {
                         // 处理方法参数，先运行参数表达式，这样可以访问外部变量
-                        List<OldExpr> methodArgs = [];
+                        List<LangExpression> methodArgs = [];
                         methodArgs.AddRange(instance.Ids);
 
                         // 在调用类方法时，将当前实例添加到变量储存器中，以便this关键字访问
@@ -212,7 +212,7 @@ public class AnyLangValue : LangValueType
                 // 其他情况，直接运行表达式
                 // 在调用类方法时，将当前实例添加到AnyInfo中，以便this关键字访问
                 Manager.Set(new LangId("this"), this);
-                var defaultResult = dotExpr.Run(Manager);
+                var defaultResult = dotExpression.Run(Manager);
                 return defaultResult;
         }
     }

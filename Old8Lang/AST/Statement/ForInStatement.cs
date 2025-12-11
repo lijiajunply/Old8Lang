@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Statement;
 
 public class ForInStatement(
     LangId id,
-    OldExpr expr,
+    LangExpression expression,
     OldStatement body,
     SourcePosition position = default,
     List<LangId>? additionalIds = null) : OldStatement(position)
@@ -28,7 +28,7 @@ public class ForInStatement(
     {
         manager.AddChildren();
 
-        var value = expr.Run(manager);
+        var value = expression.Run(manager);
         if (value is not ILangList oldList)
             throw new TypeError(this, "IOldList", value.GetType().Name);
 
@@ -83,7 +83,7 @@ public class ForInStatement(
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        var ty = expr.OutputType(local) ?? typeof(object);
+        var ty = expression.OutputType(local) ?? typeof(object);
         
         // 对于字典类型，使用特殊处理
         if (ty == typeof(Dictionary<object, object>))
@@ -98,7 +98,7 @@ public class ForInStatement(
         
         // 获取枚举器
         var getEnumeratorMethod = typeof(IEnumerable).GetMethod("GetEnumerator")!;
-        expr.LoadIlValue(ilGenerator, local);
+        expression.LoadIlValue(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Callvirt, getEnumeratorMethod);
         ilGenerator.Emit(OpCodes.Stloc, enumerator);
         
@@ -166,7 +166,7 @@ public class ForInStatement(
     private void GenerateDictionaryIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 保存字典到局部变量
-        expr.LoadIlValue(ilGenerator, local);
+        expression.LoadIlValue(ilGenerator, local);
         var dictLocal = ilGenerator.DeclareLocal(typeof(Dictionary<object, object>));
         ilGenerator.Emit(OpCodes.Stloc, dictLocal);
         

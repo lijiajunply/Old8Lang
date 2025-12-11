@@ -45,7 +45,7 @@ public static class AnyValueFuncStatic
     {
         var jsonObject = JsonSerializer.Deserialize<Dictionary<string, object>>(json.Value) ??
                          new Dictionary<string, object>();
-        return new AnyLangValue(jsonObject.ToDictionary<KeyValuePair<string, object>, ClassMemberId, OldExpr>
+        return new AnyLangValue(jsonObject.ToDictionary<KeyValuePair<string, object>, ClassMemberId, LangExpression>
         (
             variable => new ClassMemberId(variable.Key),
             variable =>

@@ -13,7 +13,7 @@ namespace Old8Lang.AST.Statement;
 public class ClassFieldSetStatement : OldStatement
 {
     public readonly ClassMemberId Id;
-    public readonly OldExpr Value;
+    public readonly LangExpression Value;
     
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
@@ -23,7 +23,7 @@ public class ClassFieldSetStatement : OldStatement
     /// <param name="id">类成员ID，包含修饰符信息</param>
     /// <param name="value">字段值</param>
     /// <param name="position">位置信息</param>
-    public ClassFieldSetStatement(ClassMemberId id, OldExpr value, SourcePosition position = default) : base(position)
+    public ClassFieldSetStatement(ClassMemberId id, LangExpression value, SourcePosition position = default) : base(position)
     {
         Id = id;
         Value = value;

@@ -4,13 +4,13 @@ using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Statement;
 
-public class ReturnStatement(OldExpr returnExpr, SourcePosition position = default) : OldStatement(position)
+public class ReturnStatement(LangExpression returnExpression, SourcePosition position = default) : OldStatement(position)
 {
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
     public override void Run(VariateManager manager)
     {
-        manager.Result = returnExpr.Run(manager);
+        manager.Result = returnExpression.Run(manager);
         manager.IsReturn = true;
     }
 
@@ -23,7 +23,7 @@ public class ReturnStatement(OldExpr returnExpr, SourcePosition position = defau
             }
             
             // 确保返回表达式有值
-            returnExpr.LoadIlValue(ilGenerator, local);
+            returnExpression.LoadIlValue(ilGenerator, local);
             
             ilGenerator.Emit(OpCodes.Ret);
         }
@@ -32,7 +32,7 @@ public class ReturnStatement(OldExpr returnExpr, SourcePosition position = defau
 
     public override int Count => 0;
 
-    public Type OutputType(LocalManager local) => returnExpr.OutputType(local)!;
+    public Type OutputType(LocalManager local) => returnExpression.OutputType(local)!;
 
-    public override string ToString() => $"return {returnExpr}";
+    public override string ToString() => $"return {returnExpression}";
 }

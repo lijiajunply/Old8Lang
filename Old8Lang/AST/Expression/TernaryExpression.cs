@@ -11,28 +11,28 @@ namespace Old8Lang.AST.Expression;
 /// 语法：expression if condition else expression
 /// </summary>
 public class TernaryExpression(
-    OldExpr condition,
-    OldExpr trueExpression,
-    OldExpr falseExpression,
+    LangExpression condition,
+    LangExpression trueExpression,
+    LangExpression falseExpression,
     SourcePosition position = default)
-    : OldExpr(position)
+    : LangExpression(position)
 {
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
     /// <summary>
     /// 条件表达式
     /// </summary>
-    public OldExpr Condition { get; } = condition;
+    public LangExpression Condition { get; } = condition;
 
     /// <summary>
     /// 条件为真时执行的表达式
     /// </summary>
-    public OldExpr TrueExpression { get; } = trueExpression;
+    public LangExpression TrueExpression { get; } = trueExpression;
 
     /// <summary>
     /// 条件为假时执行的表达式
     /// </summary>
-    public OldExpr FalseExpression { get; } = falseExpression;
+    public LangExpression FalseExpression { get; } = falseExpression;
 
     public override LangValueType Run(VariateManager manager)
     {

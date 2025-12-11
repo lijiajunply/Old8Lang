@@ -833,7 +833,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         var block = ParseBlock();
 
         // 普通函数声明，生成 FuncInit
-        return new FuncInit(new FuncLangValue(updatedFuncName, parameters.Args, block));
+        return new FuncInit(new FuncLangValue(updatedFuncName, parameters, block));
     }
 
     /// <summary>
@@ -992,7 +992,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         Expect(LangTokenType.LeftParen);
         var arguments = ParseArgList();
         Expect(LangTokenType.RightParen);
-        return new FuncRunStatement(new Instance(new LangId(funcName), arguments.Args));
+        return new FuncRunStatement(new Instance(new LangId(funcName), arguments));
     }
 
     /// <summary>
@@ -1268,7 +1268,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     //            | notBool
     //            | minusPrefix
     //            | primary ;
-    private OldExpr ParseExpression()
+    private LangExpression ParseExpression()
     {
         // 1. 解析逻辑表达式
         var expr = ParseBoolOpera();
@@ -1278,7 +1278,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     }
 
     // 逻辑表达式
-    private OldExpr ParseBoolOpera()
+    private LangExpression ParseBoolOpera()
     {
         var left = ParseBinaryExpression();
 
@@ -1301,7 +1301,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     /// 注意：需要与类型注解区分开，类型注解的形式是 "identifier : type"
     /// </summary>
     /// <returns>三元表达式节点</returns>
-    private OldExpr ParseTernaryExpression(OldExpr condition)
+    private LangExpression ParseTernaryExpression(LangExpression condition)
     {
         // 检查是否有 ?，这是三元表达式的标志
         if (CurrentToken.Type == LangTokenType.Question)
@@ -1335,7 +1335,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     }
 
     // 比较表达式
-    private OldExpr ParseBinaryExpression()
+    private LangExpression ParseBinaryExpression()
     {
         var left = ParseNumberOpera1();
 
@@ -1354,7 +1354,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     }
 
     // 加减表达式
-    private OldExpr ParseNumberOpera1()
+    private LangExpression ParseNumberOpera1()
     {
         var left = ParseNumberOpera2();
 
@@ -1371,7 +1371,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     }
 
     // 乘除表达式
-    private OldExpr ParseNumberOpera2()
+    private LangExpression ParseNumberOpera2()
     {
         // 处理幂运算（右结合，最高优先级）
         var left = ParsePower();
@@ -1419,7 +1419,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     }
 
     // 处理幂运算（右结合）
-    private OldExpr ParsePower()
+    private LangExpression ParsePower()
     {
         var left = ParsePrimary();
 
@@ -1440,7 +1440,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     }
 
 // dotExpr = expression ( "." expression )* ;
-    private OldExpr ParseDotExpr(OldExpr left)
+    private LangExpression ParseDotExpr(LangExpression left)
     {
         while (true)
         {
@@ -1496,7 +1496,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     //         | dictionary
     //         | slice
     //         | asStatement
-    private OldExpr ParsePrimary()
+    private LangExpression ParsePrimary()
     {
         // 处理 not 表达式
         if (CurrentToken.Type == LangTokenType.Not)
@@ -1612,7 +1612,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         var listToken = CurrentToken;
         var position = new SourcePosition(listToken.Line, listToken.Column, tokenValue: "list");
         Expect(LangTokenType.LeftBracket);
-        var elements = new List<OldExpr>();
+        var elements = new List<LangExpression>();
 
         if (CurrentToken.Type == LangTokenType.RightBracket)
         {
@@ -1692,7 +1692,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         var position = new SourcePosition(leftBracketToken.Line, leftBracketToken.Column,
             tokenValue: leftBracketToken.Value);
         Expect(LangTokenType.LeftBracket);
-        var elements = new List<OldExpr>();
+        var elements = new List<LangExpression>();
 
         if (CurrentToken.Type == LangTokenType.RightBracket)
         {
@@ -1780,7 +1780,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var iterable = ParseExpression();
 
             // 解析条件筛选（可选）
-            List<OldExpr> conditions = [];
+            List<LangExpression> conditions = [];
 
             while (CurrentToken.Type == LangTokenType.If)
             {
@@ -1789,7 +1789,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             }
 
             // 组合多个条件，使用 AND 操作符连接
-            OldExpr? condition = null;
+            LangExpression? condition = null;
             if (conditions.Count > 0)
             {
                 condition = conditions[0];
@@ -1846,7 +1846,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     /// tuple = "(" expression ( "," expression )* ")" ;
     /// </summary>
     /// <returns>返回Lambda或元组</returns>
-    private OldExpr ParseLambdaOrTuple()
+    private LangExpression ParseLambdaOrTuple()
     {
         var leftParenToken = CurrentToken;
         var position = new SourcePosition(leftParenToken.Line, leftParenToken.Column, tokenValue: leftParenToken.Value);
@@ -1945,7 +1945,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         // 回滚到左括号后，重新解析为表达式列表
         CurrentIndex = savedIndex;
 
-        var elements = new List<OldExpr>();
+        var elements = new List<LangExpression>();
 
         // 空括号情况：()
         if (CurrentToken.Type == LangTokenType.RightParen)
@@ -2021,7 +2021,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     /// - $"string ${expression} string" 混合模板
     /// </summary>
     /// <returns>字符串树</returns>
-    private OldExpr ParseStringTree()
+    private LangExpression ParseStringTree()
     {
         // 检查当前token是否是Dollar（用于字符串插值）
         if (CurrentToken.Type == LangTokenType.Dollar)
@@ -2039,7 +2039,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 Expect(LangTokenType.String);
 
                 // 完整的字符串模板解析
-                var parts = new List<OldExpr>();
+                var parts = new List<LangExpression>();
                 var i = 0;
                 var len = stringValue.Length;
 
@@ -2210,7 +2210,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
 
         // 处理类型注解或默认参数：identifier:type 或 identifier:default_value
         var typeAnnotation = "";
-        OldExpr? defaultValue = null;
+        LangExpression? defaultValue = null;
 
         if (CurrentToken.Type == LangTokenType.Colon)
         {
@@ -2318,7 +2318,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     /// 支持关键字作为标识符
     /// </summary>
     /// <returns>标识符列表</returns>
-    private IdList ParseIdList()
+    private List<LangId> ParseIdList()
     {
         var ids = new List<LangId>();
 
@@ -2359,20 +2359,20 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             }
         }
 
-        return new IdList(ids);
+        return (ids);
     }
 
     /// <summary>
     /// 解析参数列表
     /// </summary>
     /// <returns>参数列表</returns>
-    private ArgList ParseArgList()
+    private List<LangExpression> ParseArgList()
     {
-        var args = new List<OldExpr>();
+        var args = new List<LangExpression>();
 
         if (CurrentToken.Type == LangTokenType.RightParen)
         {
-            return new ArgList(args);
+            return args;
         }
 
         args.Add(ParseExpression());
@@ -2382,14 +2382,14 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             args.Add(ParseExpression());
         }
 
-        return new ArgList(args);
+        return args;
     }
 
     /// <summary>
     /// 解析列表初始化或切片
     /// </summary>
     /// <returns>列表初始化或切片</returns>
-    private OldExpr ParseListInitOrSlice()
+    private LangExpression ParseListInitOrSlice()
     {
         var identifier = ParseIdentifier();
         var leftBracketToken = CurrentToken;
@@ -2441,7 +2441,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         Expect(LangTokenType.LeftParen);
         var args = ParseArgList();
         Expect(LangTokenType.RightParen);
-        return new Instance(identifier, args.Args);
+        return new Instance(identifier, args);
     }
 
     #endregion

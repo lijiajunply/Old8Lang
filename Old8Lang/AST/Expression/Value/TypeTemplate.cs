@@ -8,15 +8,15 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary> 
 public class TypeTemplate(
     string className,
-    Dictionary<ClassMemberId, OldExpr> variates,
-    Dictionary<ClassMemberId, OldExpr> staticVariates,
+    Dictionary<ClassMemberId, LangExpression> variates,
+    Dictionary<ClassMemberId, LangExpression> staticVariates,
     string? parentClassName = null,
     SourcePosition position = default)
     : ImportInfo(position)
 {
     public readonly string ClassName = className;
-    public readonly Dictionary<ClassMemberId, OldExpr> Variates = variates;
-    public readonly Dictionary<ClassMemberId, OldExpr> StaticVariates = staticVariates;
+    public readonly Dictionary<ClassMemberId, LangExpression> Variates = variates;
+    public readonly Dictionary<ClassMemberId, LangExpression> StaticVariates = staticVariates;
     public readonly string? ParentClassName = parentClassName;
     
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
@@ -32,7 +32,7 @@ public class TypeTemplate(
     /// <param name="type">当前类型模板</param>
     /// <param name="allVariates">用于存储所有成员的字典</param>
     private void GetAllParentMembers(LangParser.VariateManager manager, TypeTemplate type,
-        Dictionary<ClassMemberId, OldExpr> allVariates)
+        Dictionary<ClassMemberId, LangExpression> allVariates)
     {
         // 如果有父类，递归获取父类的所有成员
         if (type.ParentClassName != null)
@@ -60,7 +60,7 @@ public class TypeTemplate(
     public AnyLangValue CreateInstance(LangParser.VariateManager manager)
     {
         // 合并所有祖先类和子类的成员
-        var allVariates = new Dictionary<ClassMemberId, OldExpr>();
+        var allVariates = new Dictionary<ClassMemberId, LangExpression>();
 
         // 递归获取所有父类的成员
         GetAllParentMembers(manager, this, allVariates);
@@ -88,7 +88,7 @@ public class TypeTemplate(
     /// <param name="right">要访问的成员或方法</param>
     /// <param name="manager">变量管理器</param>
     /// <returns>访问结果</returns>
-    public LangValueType Dot(OldExpr right, LangParser.VariateManager manager)
+    public LangValueType Dot(LangExpression right, LangParser.VariateManager manager)
     {
         return right switch
         {

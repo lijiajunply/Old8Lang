@@ -11,22 +11,22 @@ namespace Old8Lang.AST.Statement;
 public class SetStatement : OldStatement
 {
     public readonly LangId? Id;
-    public readonly OldExpr? LeftExpr;
-    public readonly OldExpr Value;
+    public readonly LangExpression? LeftExpression;
+    public readonly LangExpression Value;
     
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
-    public SetStatement(LangId id, OldExpr value, SourcePosition position = default) : base(position)
+    public SetStatement(LangId id, LangExpression value, SourcePosition position = default) : base(position)
     {
         Id = id;
-        LeftExpr = null;
+        LeftExpression = null;
         Value = value;
     }
 
-    public SetStatement(OldExpr leftExpr, OldExpr value, SourcePosition position = default) : base(position)
+    public SetStatement(LangExpression leftExpression, LangExpression value, SourcePosition position = default) : base(position)
     {
         Id = null;
-        LeftExpr = leftExpr;
+        LeftExpression = leftExpression;
         Value = value;
     }
 
@@ -114,7 +114,7 @@ public class SetStatement : OldStatement
         }
 
         // 处理成员访问赋值：this.name <- value, person.name <- value
-        if (LeftExpr is Operation operation)
+        if (LeftExpression is Operation operation)
         {
             // 检查是否是 DOT 操作（成员访问）
             if (operation.Opera == LangTokenType.Dot)
@@ -166,7 +166,7 @@ public class SetStatement : OldStatement
             }
         }
         // 处理索引访问赋值：array[index] <- value, list[index] <- value, dict[key] <- value
-        else if (LeftExpr is LangListItem listItem)
+        else if (LeftExpression is LangListItem listItem)
         {
             // 获取集合对象
             var collectionValue = manager.GetValue(listItem.ListId);
@@ -195,9 +195,9 @@ public class SetStatement : OldStatement
             // 普通变量赋值: name <- value
             Value.SetValueToIl(ilGenerator, local, Id.IdName);
         }
-        else if (LeftExpr != null)
+        else if (LeftExpression != null)
             {
-                if (LeftExpr is Operation operation && operation.Opera == LangTokenType.Dot)
+                if (LeftExpression is Operation operation && operation.Opera == LangTokenType.Dot)
                 {
                     // 处理成员访问或索引访问赋值: left.right <- value 或 left[right] <- value
                     if (operation.Right is LangId memberId)
@@ -318,7 +318,7 @@ public class SetStatement : OldStatement
                         }
                     }
                 }
-                else if (LeftExpr is LangListItem listItem)
+                else if (LeftExpression is LangListItem listItem)
                 {
                     // 处理LangListItem索引赋值: listId[key] <- value
                     // 加载集合对象
@@ -407,5 +407,5 @@ public class SetStatement : OldStatement
 
     public override int Count => 0;
 
-    public override string ToString() => LeftExpr != null ? $"{LeftExpr} <- {Value}" : $"{Id} <- {Value}";
+    public override string ToString() => LeftExpression != null ? $"{LeftExpression} <- {Value}" : $"{Id} <- {Value}";
 }

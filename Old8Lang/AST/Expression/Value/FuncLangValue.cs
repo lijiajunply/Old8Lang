@@ -43,7 +43,7 @@ public class FuncLangValue : ImportInfo
 
     public override LangValueType Run(VariateManager manager) => this;
 
-    public LangValueType Run(VariateManager variateManagerFunc, List<OldExpr> ids, object? obj = null)
+    public LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> ids, object? obj = null)
     {
         if (Method != null)
         {

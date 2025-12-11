@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression;
 /// 构造函数
 /// </remarks>
 /// <param name="position">位置信息</param>
-public abstract class LangValueType(SourcePosition position = default) : OldExpr(position)
+public abstract class LangValueType(SourcePosition position = default) : LangExpression(position)
 {
     public override string ToString() => GetValue().ToString()!;
     
@@ -39,16 +39,16 @@ public abstract class LangValueType(SourcePosition position = default) : OldExpr
 
     #endregion
 
-    public virtual LangValueType Dot(OldExpr dotExpr)
+    public virtual LangValueType Dot(LangExpression dotExpression)
     {
-        if (dotExpr is LangId id)
+        if (dotExpression is LangId id)
         {
             if (id.IdName == "XAUAT")
                 return new StringLangValue("西建大还我血汗钱我要回家");
             throw new AttributeError(this, id.IdName, GetType().Name);
         }
 
-        if (dotExpr is Instance instance)
+        if (dotExpression is Instance instance)
         {
             return instance.FromClassToResult(this);
         }
@@ -126,7 +126,7 @@ public abstract class LangValueType(SourcePosition position = default) : OldExpr
             {
                 var key = ObjToValue(x.Key);
                 var val = ObjToValue(x.Value);
-                return new KeyValuePair<OldExpr, OldExpr>(key, val);
+                return new KeyValuePair<LangExpression, LangExpression>(key, val);
             }).ToList()),
             Tuple<object, object> a => new TupleLangValue(ObjToValue(a.Item1), ObjToValue(a.Item2)),
             ValueTuple<object, object> a => new TupleLangValue(ObjToValue(a.Item1), ObjToValue(a.Item2)),

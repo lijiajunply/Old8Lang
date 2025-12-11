@@ -5,13 +5,13 @@ using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Statement;
 
-public class ThrowStatement(OldExpr expr, SourcePosition position = default) : OldStatement(position)
+public class ThrowStatement(LangExpression expression, SourcePosition position = default) : OldStatement(position)
 {
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
     public override void Run(VariateManager manager)
 {
-    var value = expr.Run(manager);
+    var value = expression.Run(manager);
     // 使用CustomError抛出异常
     throw new CustomError(
         this,
@@ -21,10 +21,10 @@ public class ThrowStatement(OldExpr expr, SourcePosition position = default) : O
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 编译模式下的实现
-        expr.LoadIlValue(ilGenerator, local);
+        expression.LoadIlValue(ilGenerator, local);
 
         // 获取表达式的类型
-        var exprType = expr.OutputType(local);
+        var exprType = expression.OutputType(local);
 
         // 如果是值类型，需要装箱后才能调用ToString()
         if (exprType is { IsValueType: true })
@@ -44,5 +44,5 @@ public class ThrowStatement(OldExpr expr, SourcePosition position = default) : O
 
     public Type OutputType(LocalManager local) => typeof(void);
 
-    public override string ToString() => $"throw {expr}";
+    public override string ToString() => $"throw {expression}";
 }

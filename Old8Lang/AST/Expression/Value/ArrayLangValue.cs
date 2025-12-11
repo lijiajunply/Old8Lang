@@ -11,13 +11,13 @@ namespace Old8Lang.AST.Expression.Value;
 public class ArrayLangValue : LangValueType, ILangList
 {
     private readonly LangValueType[] RunResult;
-    private readonly List<OldExpr> Values = [];
+    private readonly List<LangExpression> Values = [];
     
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
-    public ArrayLangValue(IEnumerable<OldExpr> valuesList, SourcePosition position = default) : base(position)
+    public ArrayLangValue(IEnumerable<LangExpression> valuesList, SourcePosition position = default) : base(position)
     {
-        var oldExpr = valuesList as OldExpr[] ?? [.. valuesList];
+        var oldExpr = valuesList as LangExpression[] ?? [.. valuesList];
         RunResult = new LangValueType[oldExpr.Length];
         Values.AddRange(oldExpr);
     }

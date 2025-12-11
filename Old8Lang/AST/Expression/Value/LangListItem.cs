@@ -11,17 +11,17 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="listId">列表 ID</param>
 /// <param name="key">关键词或索引</param>
 /// <param name="position">位置</param>
-public class LangListItem(LangId listId, OldExpr key, SourcePosition position = default) : LangValueType(position)
+public class LangListItem(LangId listId, LangExpression key, SourcePosition position = default) : LangValueType(position)
 {
     public readonly LangId ListId = listId;
-    public readonly OldExpr Key = key;
+    public readonly LangExpression Key = key;
     
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public override LangValueType Run(LangParser.VariateManager manager)
     {
         var a = manager.GetValue(listId);
-        OldExpr result = key.Run(manager);
+        LangExpression result = key.Run(manager);
         if (a is ListLangValue list)
         {
             if (result is not IntLangValue intResult) throw new TypeError(this, "IntValue", result.GetType().Name);

@@ -19,9 +19,9 @@ public class NativeAnyLangValue(string dllName, string className, string path) :
     
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
-    public override LangValueType Dot(OldExpr dotExpr)
+    public override LangValueType Dot(LangExpression dotExpression)
     {
-        if (dotExpr is LangId id)
+        if (dotExpression is LangId id)
         {
             var prop = ClassType?.GetProperty(id.IdName);
             if (prop is null)
@@ -35,7 +35,7 @@ public class NativeAnyLangValue(string dllName, string className, string path) :
             return ObjToValue(prop.GetValue(null)!);
         }
 
-        if (dotExpr is Instance instance)
+        if (dotExpression is Instance instance)
         {
             var method = ClassType?.GetMethod(instance.Id.IdName);
             if (method == null)

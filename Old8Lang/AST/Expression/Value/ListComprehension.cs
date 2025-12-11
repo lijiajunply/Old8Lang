@@ -16,7 +16,7 @@ public class ListComprehension : LangValueType
     /// <summary>
     /// 表达式部分，用于生成列表元素
     /// </summary>
-    public OldExpr Expression { get; }
+    public LangExpression Expression { get; }
 
     /// <summary>
     /// 遍历变量
@@ -26,12 +26,12 @@ public class ListComprehension : LangValueType
     /// <summary>
     /// 可迭代对象
     /// </summary>
-    public OldExpr Iterable { get; }
+    public LangExpression Iterable { get; }
 
     /// <summary>
     /// 条件筛选（可选）
     /// </summary>
-    public OldExpr? Condition { get; }
+    public LangExpression? Condition { get; }
 
     /// <summary>
     /// 嵌套的for循环（可选）
@@ -48,10 +48,10 @@ public class ListComprehension : LangValueType
     /// <param name="nestedLoops">嵌套的for循环（可选）</param>
     /// <param name="position">位置信息</param>
     public ListComprehension(
-        OldExpr expression,
+        LangExpression expression,
         LangId variable,
-        OldExpr iterable,
-        OldExpr? condition = null,
+        LangExpression iterable,
+        LangExpression? condition = null,
         List<ListComprehension>? nestedLoops = null,
         SourcePosition position = default)
         : base(position)

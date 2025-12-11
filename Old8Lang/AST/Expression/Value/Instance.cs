@@ -4,7 +4,6 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 
-// ReSharper disable once CheckNamespace
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
@@ -13,11 +12,11 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="langId"></param>
 /// <param name="ids"></param>
 /// <param name="position"></param>
-public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position = default) : LangValueType(position)
+public class Instance(LangId langId, List<LangExpression> ids, SourcePosition position = default) : LangValueType(position)
 {
-    public readonly List<OldExpr> Ids = ids;
+    public readonly List<LangExpression> Ids = ids;
     public readonly LangId Id = langId;
-    
+
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public override LangValueType Run(LangParser.VariateManager manager)
@@ -286,25 +285,28 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                     {
                         ilGenerator.Emit(OpCodes.Call, writeLineNoArg);
                     }
+
                     return;
                 }
-                
+
                 // 简化实现：只处理第一个参数，将其转换为字符串
                 var printLineExpr = Ids[0];
                 printLineExpr.LoadIlValue(ilGenerator, local);
                 var printLineType = printLineExpr.OutputType(local);
-                
+
                 // 直接调用Console.WriteLine(object)方法，让CLR处理类型转换
-                var writeLineObject = typeof(Console).GetMethod("WriteLine", new[] { typeof(object) });
+                var writeLineObject = typeof(Console).GetMethod("WriteLine", [typeof(object)]);
                 if (writeLineObject != null)
                 {
                     // 如果是值类型，先装箱
-                    if (printLineType != null && printLineType.IsValueType)
+                    if (printLineType is { IsValueType: true })
                     {
                         ilGenerator.Emit(OpCodes.Box, printLineType);
                     }
+
                     ilGenerator.Emit(OpCodes.Call, writeLineObject);
                 }
+
                 return;
             case "Print":
                 // 处理多个参数，将它们转换为字符串并拼接
@@ -313,26 +315,27 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                     // 没有参数，直接返回
                     return;
                 }
-                
+
                 // 简化实现：只处理第一个参数，将其转换为字符串
                 var printExpr = Ids[0];
                 printExpr.LoadIlValue(ilGenerator, local);
                 var printType = printExpr.OutputType(local);
-                
+
                 // 如果参数不是字符串类型，调用 ToString() 方法转换为字符串
                 if (printType != typeof(string))
                 {
                     // 获取 ToString() 方法
                     var toStringMethod = typeof(object).GetMethod("ToString", Type.EmptyTypes)!;
                     // 如果是值类型，先装箱
-                    if (printType != null && printType.IsValueType)
+                    if (printType is { IsValueType: true })
                     {
                         ilGenerator.Emit(OpCodes.Box, printType);
                     }
+
                     // 调用 ToString() 方法
                     ilGenerator.Emit(OpCodes.Callvirt, toStringMethod);
                 }
-                
+
                 // 调用 Console.Write(string)
                 ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("Write", [typeof(string)])!);
                 return;
@@ -363,7 +366,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
 
         // 查找匹配的方法
         MethodInfo? matchingMethod = null;
-        
+
         // 首先尝试使用方法名查找
         if (local.DelegateVar.TryGetValue(Id.IdName, out var result))
         {
@@ -374,12 +377,12 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                 matchingMethod = result;
             }
         }
-        
+
         if (matchingMethod == null)
         {
             var classType = local.ClassVar.GetValueOrDefault(Id.IdName);
             if (classType == null) return;
-            
+
             // 获取默认构造函数
             var constructorInfo = classType.GetConstructor(Type.EmptyTypes);
             if (constructorInfo != null)
@@ -417,13 +420,13 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
         {
             var id = Ids[i];
             id.LoadIlValue(ilGenerator, local);
-            
+
             // 确保参数类型匹配
             if (i < matchingParams.Length)
             {
                 var paramType = matchingParams[i].ParameterType;
                 var idType = id.OutputType(local);
-                
+
                 // 确保参数类型与方法期望的类型匹配
                 if (idType != null && paramType != idType)
                 {
@@ -459,7 +462,7 @@ public class Instance(LangId langId, List<OldExpr> ids, SourcePosition position 
                 }
             }
         }
-        
+
         // 调用方法
         // 对于DynamicMethod，使用Call指令
         ilGenerator.Emit(OpCodes.Call, matchingMethod);
