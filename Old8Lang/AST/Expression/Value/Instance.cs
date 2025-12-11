@@ -175,7 +175,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 if (!value.Equal(value1))
                 {
                     var message = $"断言失败: 期望 {value1}，但得到 {value}";
-                    throw new Error.AssertionError(this, message);
+                    throw new AssertionError(this, message);
                 }
                 return new BoolLangValue(true);
             }

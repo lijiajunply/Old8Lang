@@ -65,7 +65,7 @@ public class FuncLangValue : ImportInfo
             {
                 invoke = Method?.Invoke(obj, a);
             }
-            catch (System.Reflection.TargetInvocationException ex) when (ex.InnerException != null)
+            catch (TargetInvocationException ex) when (ex.InnerException != null)
             {
                 // 转换 .NET 异常为 Old8Lang 异常
                 var innerException = ex.InnerException;
@@ -73,47 +73,47 @@ public class FuncLangValue : ImportInfo
                 // FileNotFoundException 和 DirectoryNotFoundException -> FileNotFoundError
                 if (innerException is FileNotFoundException fileEx)
                 {
-                    throw new Error.FileNotFoundError(Position, fileEx.FileName ?? "未知文件");
+                    throw new FileNotFoundError(Position, fileEx.FileName ?? "未知文件");
                 }
                 if (innerException is DirectoryNotFoundException dirEx)
                 {
-                    throw new Error.FileNotFoundError(Position, dirEx.Message);
+                    throw new FileNotFoundError(Position, dirEx.Message);
                 }
 
                 // ArgumentException -> ValueError
                 if (innerException is ArgumentException argEx)
                 {
-                    throw new Error.ValueError(Position, argEx.Message);
+                    throw new ValueError(Position, argEx.Message);
                 }
 
                 // UnauthorizedAccessException -> PermissionError
                 if (innerException is UnauthorizedAccessException uaEx)
                 {
-                    throw new Error.PermissionError(Position, uaEx.Message);
+                    throw new PermissionError(Position, uaEx.Message);
                 }
 
                 // NotImplementedException -> NotImplementedError
                 if (innerException is NotImplementedException niEx)
                 {
-                    throw new Error.NotImplementedError(Position, niEx.Message);
+                    throw new NotImplementedError(Position, niEx.Message);
                 }
 
                 // TimeoutException -> TimeoutError
                 if (innerException is TimeoutException toEx)
                 {
-                    throw new Error.TimeoutError(Position, toEx.Message);
+                    throw new TimeoutError(Position, toEx.Message);
                 }
 
                 // InvalidCastException -> TypeError
                 if (innerException is InvalidCastException icEx)
                 {
-                    throw new Error.TypeError(this, icEx.Message);
+                    throw new TypeError(this, icEx.Message);
                 }
 
                 // OverflowException -> OverflowError
                 if (innerException is OverflowException ofEx)
                 {
-                    throw new Error.OverflowError(Position, ofEx.Message);
+                    throw new OverflowError(Position, ofEx.Message);
                 }
 
                 // 其他异常保持原样
