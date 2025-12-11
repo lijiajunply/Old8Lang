@@ -192,6 +192,42 @@ if (command == fromFileCmd)
 
     var langInterpreter = new LangInterpreter();
 
+    // 临时调试输出
+    Console.WriteLine("=== Debug LangInfo ===");
+    Console.WriteLine($"Interpreter Manager.Path: {langInterpreter.Manager.Path}");
+    Console.WriteLine($"Interpreter Manager.LangInfo.ImportPath: {langInterpreter.Manager.LangInfo.ImportPath}");
+    Console.WriteLine($"LibInfos count: {langInterpreter.Manager.LangInfo.LibInfos.Count}");
+    foreach (var lib in langInterpreter.Manager.LangInfo.LibInfos)
+    {
+        Console.WriteLine($"  - {lib.LibName}, IsDir: {lib.IsDir}");
+    }
+    
+    // 测试Time库路径
+    var timeFileName = "Time.old8";
+    var timePath = Path.Combine(langInterpreter.Manager.LangInfo.ImportPath, timeFileName);
+    Console.WriteLine($"\nTesting Time.old8 path:");
+    Console.WriteLine($"  Combined path: {timePath}");
+    Console.WriteLine($"  File exists? {File.Exists(timePath)}");
+    
+    // 测试直接路径
+    var directPath = Path.Combine(Directory.GetCurrentDirectory(), "Old8LangLib", "OldLib", timeFileName);
+    Console.WriteLine($"  Direct path: {directPath}");
+    Console.WriteLine($"  File exists? {File.Exists(directPath)}");
+    
+    // 测试Old8LangLib/OldLib目录是否存在
+    var oldLibPath = Path.Combine(Directory.GetCurrentDirectory(), "Old8LangLib", "OldLib");
+    Console.WriteLine($"\nOld8LangLib/OldLib directory exists? {Directory.Exists(oldLibPath)}");
+    if (Directory.Exists(oldLibPath))
+    {
+        Console.WriteLine("  Files in OldLib:");
+        foreach (var file in Directory.GetFiles(oldLibPath))
+        {
+            Console.WriteLine($"    - {Path.GetFileName(file)}");
+        }
+    }
+    
+    Console.WriteLine("\n=== Debug End ===");
+
     try
     {
         var code = Apis.FromFile(args[1]);

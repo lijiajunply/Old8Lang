@@ -1,0 +1,344 @@
+// 测试更多边缘情况语法
+
+// 极端长整数
+long_int <- 123456789012345678901234567890
+PrintLine(long_int)
+
+// 极端小的浮点数
+small_double <- 0.000000000000000000001
+PrintLine(small_double)
+
+// 科学计数法的各种形式
+sci_notation1 <- 1e10
+PrintLine(sci_notation1)
+
+sci_notation2 <- 1e-10
+PrintLine(sci_notation2)
+
+sci_notation3 <- 1.5e5
+PrintLine(sci_notation3)
+
+sci_notation4 <- 1.5e-5
+PrintLine(sci_notation4)
+
+// 嵌套三元表达式
+nested_ternary <- x > 10 ? "大于10" : x > 5 ? "大于5" : "小于等于5"
+PrintLine(nested_ternary)
+
+// 复杂的算术表达式
+complex_arith <- (1 + 2) * 3 / 4 - 5 % 2 + 1
+PrintLine(complex_arith)
+
+// 连续赋值
+a <- b <- c <- 10
+PrintLine(a, b, c)
+
+// 各种括号嵌套
+nested_parens <- (((1 + 2) * 3) / 4)
+PrintLine(nested_parens)
+
+// 数组嵌套
+nested_array <- [[1, 2], [3, 4], [5, 6]]
+PrintLine(nested_array)
+
+// 字典嵌套
+nested_dict <- {"outer": {"inner": "value"}}
+PrintLine(nested_dict)
+
+// 混合数据类型的数组
+mixed_array <- [1, "string", true, 3.14]
+PrintLine(mixed_array)
+
+// 字符串模板中的复杂表达式
+name <- "Old8Lang"
+version <- 1.0
+info <- $"名称: {name}, 版本: {version}, 状态: {version > 0 ? "活跃" : "未发布"}"
+PrintLine(info)
+
+// 列表推导式的复杂形式
+squares <- [x * x for x in [1, 2, 3, 4, 5]]
+PrintLine(squares)
+
+// 带条件的列表推导式
+even_squares <- [x * x for x in [1, 2, 3, 4, 5] if x % 2 == 0]
+PrintLine(even_squares)
+
+// 嵌套的列表推导式
+nested_comprehension <- [x + y for x in [1, 2] for y in [3, 4]]
+PrintLine(nested_comprehension)
+
+// 函数作为返回值
+func return_func() {
+    func inner() {
+        return "返回的函数"
+    }
+    return inner
+}
+
+returned_func <- return_func()
+result <- returned_func()
+PrintLine(result)
+
+// 递归函数
+func factorial(n) {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+fact_result <- factorial(5)
+PrintLine(fact_result)
+
+// 类的继承
+class Parent {
+    func init() {
+        this.value <- 10
+    }
+    
+    func getValue() {
+        return this.value
+    }
+}
+
+class Child extends Parent {
+    func init() {
+        super.init()
+        this.child_value <- 20
+    }
+    
+    func getChildValue() {
+        return this.child_value
+    }
+}
+
+child <- Child()
+PrintLine(child.getValue())
+PrintLine(child.getChildValue())
+
+// 多重继承
+class GrandParent {
+    func grandMethod() {
+        return "grand"
+    }
+}
+
+class Parent2 extends GrandParent {
+    func parentMethod() {
+        return "parent"
+    }
+}
+
+class Child2 extends Parent2 {
+    func childMethod() {
+        return "child"
+    }
+}
+
+child2 <- Child2()
+PrintLine(child2.grandMethod())
+PrintLine(child2.parentMethod())
+PrintLine(child2.childMethod())
+
+// 空的for循环
+for i <- 0, i < 0, i++ {
+    PrintLine("这行不应该执行")
+}
+
+// 空的while循环
+while false {
+    PrintLine("这行不应该执行")
+}
+
+// 复杂的条件表达式
+complex_cond <- (a > 5 and b < 10) or (c == 15 and d != 20) xor (e <= 25)
+PrintLine(complex_cond)
+
+// 多种操作符的组合
+type x <- 10
+result <- x++ + ++x
+PrintLine(result)
+
+// 类型转换
+int_to_double <- 10 as double
+PrintLine(int_to_double)
+
+string_to_int <- "42" as int
+PrintLine(string_to_int)
+
+// 异常处理的各种情况
+try {
+    throw "异常测试"
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+try {
+    throw 42
+} catch (e) {
+    PrintLine("捕获到数值异常: " + e)
+}
+
+try {
+    throw true
+} catch (e) {
+    PrintLine("捕获到布尔异常: " + e)
+}
+
+// 空的try块
+try {
+    // 空的try块
+} catch (e) {
+    PrintLine("这行不应该执行")
+} finally {
+    PrintLine("finally块被执行")
+}
+
+// 只有finally块的try-finally
+try {
+    PrintLine("try块")
+} finally {
+    PrintLine("finally块")
+}
+
+// 自定义异常类型
+try {
+    throw "CustomException"
+} catch (CustomException e) {
+    PrintLine("捕获到自定义异常: " + e)
+} catch (Exception e) {
+    PrintLine("捕获到通用异常: " + e)
+}
+
+// 多个catch块
+try {
+    result <- 10 / 0
+} catch (ZeroDivisionError e) {
+    PrintLine("捕获到除零错误: " + e)
+} catch (Exception e) {
+    PrintLine("捕获到其他异常: " + e)
+}
+
+// 使用类型注解的变量声明
+var_with_type <- 10:int
+PrintLine(var_with_type)
+
+var_with_double <- 3.14:double
+PrintLine(var_with_double)
+
+// 使用类型注解的函数声明
+func add_with_types(x:int, y:int):int {
+    return x + y
+}
+
+add_result <- add_with_types(5, 3)
+PrintLine(add_result)
+
+// 函数返回类型推断
+func infer_return() {
+    return "字符串返回值"
+}
+
+infer_result <- infer_return()
+PrintLine(infer_result)
+
+// 变量作用域测试
+global_var <- 10
+
+func test_scope() {
+    local_var <- 20
+    PrintLine(local_var)
+    PrintLine(global_var)
+    
+    // 修改全局变量
+    global_var <- 30
+}
+
+test_scope()
+PrintLine(global_var)
+
+// 嵌套作用域
+func outer_scope() {
+    outer_var <- 10
+    
+    func inner_scope() {
+        inner_var <- 20
+        PrintLine(outer_var)
+        PrintLine(inner_var)
+        
+        // 修改外部变量
+        outer_var <- 30
+    }
+    
+    inner_scope()
+    PrintLine(outer_var)
+}
+
+outer_scope()
+
+// 使用this关键字
+class TestThis {
+    value <- 10
+    
+    func update() {
+        this.value <- 20
+    }
+    
+    func getValue() {
+        return this.value
+    }
+}
+
+this_test <- TestThis()
+this_test.update()
+PrintLine(this_test.getValue())
+
+// 静态方法
+class StaticClass {
+    static static_value <- 10
+    
+    static func getStaticValue() {
+        return this.static_value
+    }
+    
+    static func setStaticValue(value) {
+        this.static_value <- value
+    }
+}
+
+PrintLine(StaticClass.getStaticValue())
+StaticClass.setStaticValue(20)
+PrintLine(StaticClass.getStaticValue())
+
+// 混合使用实例方法和静态方法
+class MixedClass {
+    instance_value <- 10
+    static static_value <- 20
+    
+    func getInstanceValue() {
+        return this.instance_value
+    }
+    
+    static func getStaticValue() {
+        return this.static_value
+    }
+}
+
+mixed <- MixedClass()
+PrintLine(mixed.getInstanceValue())
+PrintLine(MixedClass.getStaticValue())
+
+// 使用typeof操作符
+x <- 10
+x_type <- typeof(x)
+PrintLine(x_type)
+
+string_type <- typeof("string")
+PrintLine(string_type)
+
+// 类型检查
+is_int <- typeof(x) == "int"
+PrintLine(is_int)
+
+is_string <- typeof("string") == "string"
+PrintLine(is_string)

@@ -21,6 +21,29 @@ public class ImportStatement(string importString, SourcePosition position = defa
             }
 
             var path = Path.Combine(manager.LangInfo.ImportPath, fileName);
+            
+            // 检查文件或目录是否存在
+            if (!File.Exists(path) && !Directory.Exists(path))
+            {
+                // 尝试构建绝对路径
+                var absolutePath = Path.GetFullPath(path);
+                if (!File.Exists(absolutePath) && !Directory.Exists(absolutePath))
+                {
+                    // 尝试从应用程序基目录查找
+                    var appPath = Path.Combine(AppContext.BaseDirectory, path);
+                    if (!File.Exists(appPath) && !Directory.Exists(appPath))
+                    {
+                        // 所有尝试都失败，抛出导入错误
+                        throw new ImportError(Position, importString);
+                    }
+                    path = appPath;
+                }
+                else
+                {
+                    path = absolutePath;
+                }
+            }
+            
             var previousPath = manager.Path;
             manager.Path = path;
             var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);

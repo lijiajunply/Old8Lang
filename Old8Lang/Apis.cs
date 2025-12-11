@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using System.Reflection;
 using Old8Lang.AST.Expression;
 
 namespace Old8Lang;
@@ -37,7 +38,7 @@ public static class Apis
             return [];
         if (a.Count == 0)
             return [];
-        return a[0] == null! ? [] : a.Select(x => x.GetValue()).ToList();
+        return a[0] == null! ? [] : [.. a.Select(x => x.GetValue())];
     }
 
     #endregion
@@ -97,7 +98,15 @@ public static class Apis
     public static LangInfo ReadJson()
     {
         LangInfo langInfo;
-        if (File.Exists(JsonPath))
+        
+        // 直接测试Old8Lang目录下的LangInfo.json文件
+        var directJsonPath = Path.Combine(Directory.GetCurrentDirectory(), "Old8Lang", "LangInfo.json");
+        if (File.Exists(directJsonPath))
+        {
+            var jsonString = File.ReadAllText(directJsonPath, Encoding.UTF8);
+            langInfo = JsonSerializer.Deserialize<LangInfo>(jsonString)!;
+        }
+        else if (File.Exists(JsonPath))
         {
             var jsonString = File.ReadAllText(JsonPath, Encoding.UTF8);
             langInfo = JsonSerializer.Deserialize<LangInfo>(jsonString)!;
@@ -107,13 +116,37 @@ public static class Apis
             // 如果文件不存在，创建一个默认的 LangInfo 对象
             langInfo = new LangInfo { LibInfos = [], Ver = "1.0.0", Url = "https://downland.old8lang.com" };
         }
+        
+        // 如果LibInfos为空，尝试直接加载默认的库信息
+        if (langInfo.LibInfos.Count == 0)
+        {
+            // 手动添加默认库信息
+            langInfo.LibInfos.AddRange([
+                new() { LibName = "OS", Var = 0.8, IsDir = false },
+                new() { LibName = "File", Var = 0.8, IsDir = false },
+                new() { LibName = "Terminal", Var = 0.8, IsDir = false },
+                new() { LibName = "Net", Var = 0.8, IsDir = true },
+                new() { LibName = "Time", Var = 0.8, IsDir = false },
+                new() { LibName = "Math", Var = 0.8, IsDir = false }
+            ]);
+        }
 
         if (Directory.Exists(langInfo.ImportPath)) return langInfo;
         var s = Path.GetDirectoryName(CodePath);
 #if RELEASE
         s = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 #endif
-        langInfo.ImportPath = Path.Combine(s ?? "", "Old8LangLib", "OldLib");
+        
+        // 尝试使用绝对路径
+        var absoluteImportPath = Path.Combine(Directory.GetCurrentDirectory(), "Old8LangLib", "OldLib");
+        if (Directory.Exists(absoluteImportPath))
+        {
+            langInfo.ImportPath = absoluteImportPath;
+        }
+        else
+        {
+            langInfo.ImportPath = Path.Combine(s ?? "", "Old8LangLib", "OldLib");
+        }
 
         return langInfo;
     }
@@ -134,7 +167,7 @@ public static class Apis
 #if DEBUG
             var directory = AppContext.BaseDirectory.Split(Path.DirectorySeparatorChar);
             var slice = new ArraySegment<string>(directory, 0, directory.Length - 4);
-            return Path.Combine(slice.ToArray());
+            return Path.Combine([.. slice]);
 #else
         // 返回程序运行时目录或其他合理默认路径
         return AppContext.BaseDirectory;

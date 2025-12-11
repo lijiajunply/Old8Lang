@@ -333,6 +333,29 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             return ParseReturnStatement();
         }
 
+        // 处理native语句：[import "dll" class method]
+        if (CurrentToken.Type == LangTokenType.LeftBracket && Peek().Type == LangTokenType.Import)
+        {
+            // 先处理更具体的 nativeStatic 和 nativeClass，再处理更通用的 nativeStatement
+            if (Peek(2).Type == LangTokenType.String &&
+                Peek(3).Type == LangTokenType.Identifier &&
+                Peek(4).Type == LangTokenType.RightBracket &&
+                Peek(5).Type == LangTokenType.Arrow &&
+                Peek(6).Type == LangTokenType.String)
+            {
+                return ParseNativeStatic();
+            }
+
+            if (Peek(2).Type == LangTokenType.String &&
+                Peek(3).Type == LangTokenType.Identifier &&
+                Peek(4).Type == LangTokenType.RightBracket)
+            {
+                return ParseNativeClass();
+            }
+
+            return ParseNativeStatement();
+        }
+
         // 处理break语句：break
         if (CurrentToken.Type == LangTokenType.Break)
         {
@@ -439,29 +462,6 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         if (CurrentToken.Type == LangTokenType.Identifier && Peek().Type == LangTokenType.LeftParen)
         {
             return ParseIdentifierLeftParen();
-        }
-
-        // 处理native语句：[import "dll" class method]
-        if (CurrentToken.Type == LangTokenType.LeftBracket && Peek().Type == LangTokenType.Import)
-        {
-            // 先处理更具体的 nativeStatic 和 nativeClass，再处理更通用的 nativeStatement
-            if (Peek(2).Type == LangTokenType.String &&
-                Peek(3).Type == LangTokenType.Identifier &&
-                Peek(4).Type == LangTokenType.RightBracket &&
-                Peek(5).Type == LangTokenType.Arrow &&
-                Peek(6).Type == LangTokenType.String)
-            {
-                return ParseNativeStatic();
-            }
-
-            if (Peek(2).Type == LangTokenType.String &&
-                Peek(3).Type == LangTokenType.Identifier &&
-                Peek(4).Type == LangTokenType.RightBracket)
-            {
-                return ParseNativeClass();
-            }
-
-            return ParseNativeStatement();
         }
 
         // 处理表达式语句：允许将函数运行表达式作为语句执行

@@ -24,12 +24,12 @@
     {
       "LibName": "Time",
       "Var": 0.8,
-      "IsDic": false
+      "IsDir": false
     },
     {
       "LibName": "Math",
       "Var": 0.8,
-      "IsDic": false
+      "IsDir": false
     }
   ],
   "Ver": "0.8.0",

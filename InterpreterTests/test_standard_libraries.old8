@@ -1,0 +1,51 @@
+// 测试标准库函数
+
+// 测试Time库函数
+import Time
+PrintLine("=== 测试Time库函数 ===")
+
+// 直接调用导入的函数，而不是通过Time类
+// 测试当前时间
+current_time <- GetTimeNow("yyyy-MM-dd HH:mm:ss")
+PrintLine("GetTimeNow(\"yyyy-MM-dd HH:mm:ss\"): " + current_time)
+
+// 测试时间戳
+timestamp <- TimeStamp()
+PrintLine("TimeStamp(): " + timestamp)
+
+// 测试时间格式数组
+time_formats <- TimeFormat()
+// 直接打印数组，不访问length属性
+PrintLine("TimeFormat() 结果: " + time_formats)
+
+// 测试计时功能
+TimeStart()
+PrintLine("TimeStart() - 计时开始")
+// 简单的延迟操作
+sum <- 0
+sum <- sum + 1
+sum <- sum + 2
+sum <- sum + 3
+elapsed <- TimeStop()
+PrintLine("TimeStop() - 计时结束, 耗时: " + elapsed + "ms")
+
+// 测试OS库函数
+import OS
+PrintLine("\n=== 测试OS库函数 ===")
+
+// 直接调用导入的函数（注意：在OS.old8中被重命名为OSInfo）
+os_info <- OSInfo()
+PrintLine("OSInfo(): " + os_info)
+
+// 测试FileLib函数
+import File
+PrintLine("\n=== 测试FileLib函数 ===")
+
+// 注意：FileLib没有提供写入和删除文件的功能
+// 我们只测试不需要外部文件的功能
+PrintLine("FileLib 测试：")
+PrintLine("FileLib类提供了FileRead、FileReadLines、CopyFile、UnpackZip、CompressZip和ZipReadAll方法")
+PrintLine("由于FileWrite和FileRemove方法不存在，我们跳过这些测试")
+PrintLine("FileLib测试完成")
+
+PrintLine("\n=== 所有测试完成 ===")

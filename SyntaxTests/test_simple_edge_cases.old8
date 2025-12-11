@@ -1,0 +1,188 @@
+// 简单边缘情况测试
+
+// 空语句块
+{}
+
+// 单语句块（无大括号）
+if true PrintLine("单语句if")
+
+// 多层嵌套if
+x <- 10
+y <- 20
+if x > 5 {
+    if y > 15 {
+        if x + y > 25 {
+            PrintLine("多层嵌套if")
+        }
+    }
+}
+
+// 嵌套函数
+func outer() {
+    func inner() {
+        return 42
+    }
+    return inner()
+}
+
+result <- outer()
+PrintLine(result)
+
+// 复杂表达式
+complex_result <- (1 + 2 * 3 - 4 / 2) > 5 ? "大" : "小"
+PrintLine(complex_result)
+
+// 空数组
+empty_array <- []
+PrintLine(empty_array)
+
+// 空字典
+empty_dict <- {}
+PrintLine(empty_dict)
+
+// 单个元素的数组
+single_array <- [42]
+PrintLine(single_array)
+
+// 单个元素的字典
+single_dict <- {"key": "value"}
+PrintLine(single_dict)
+
+// 长标识符
+very_long_identifier_name <- 10
+PrintLine(very_long_identifier_name)
+
+// 特殊字符
+message <- "特殊字符：\n \" \'"
+PrintLine(message)
+
+// 连续赋值
+a <- b <- c <- 10
+PrintLine(a)
+PrintLine(b)
+PrintLine(c)
+
+// 各种括号嵌套
+nested_parens <- (((1 + 2) * 3) / 4)
+PrintLine(nested_parens)
+
+// 数组嵌套
+nested_array <- [[1, 2], [3, 4]]
+PrintLine(nested_array)
+
+// 字典嵌套
+nested_dict <- {"outer": {"inner": "value"}}
+PrintLine(nested_dict)
+
+// 混合数据类型的数组
+mixed_array <- [1, "string", true, 3.14]
+PrintLine(mixed_array)
+
+// 字符串模板
+name <- "Old8Lang"
+info <- $"名称: {name}"
+PrintLine(info)
+
+// 列表推导式
+squares <- [x * x for x in [1, 2, 3]]
+PrintLine(squares)
+
+// 带条件的列表推导式
+even_squares <- [x * x for x in [1, 2, 3] if x % 2 == 0]
+PrintLine(even_squares)
+
+// 递归函数
+func factorial(n) {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+fact_result <- factorial(3)
+PrintLine(fact_result)
+
+// 类的继承
+class Parent {
+    func init() {
+        this.value <- 10
+    }
+    
+    func getValue() {
+        return this.value
+    }
+}
+
+class Child extends Parent {
+    func init() {
+        super.init()
+        this.child_value <- 20
+    }
+}
+
+child <- Child()
+PrintLine(child.getValue())
+
+// 空的for循环
+for i <- 0, i < 0, i++ {
+    PrintLine("这行不应该执行")
+}
+
+// 空的while循环
+while false {
+    PrintLine("这行不应该执行")
+}
+
+// 异常处理
+try {
+    throw "异常测试"
+} catch (e) {
+    PrintLine("捕获到异常: " + e)
+}
+
+// 只有finally块的try-finally
+try {
+    PrintLine("try块")
+} finally {
+    PrintLine("finally块")
+}
+
+// 使用类型注解的变量声明
+var_with_type <- 10:int
+PrintLine(var_with_type)
+
+// 使用类型注解的函数声明
+func add_with_types(x:int, y:int) {
+    return x + y
+}
+
+add_result <- add_with_types(5, 3)
+PrintLine(add_result)
+
+// 变量作用域测试
+global_var <- 10
+
+func test_scope() {
+    local_var <- 20
+    PrintLine(local_var)
+}
+
+test_scope()
+PrintLine(global_var)
+
+// 使用this关键字
+class TestThis {
+    value <- 10
+    
+    func update() {
+        this.value <- 20
+    }
+    
+    func getValue() {
+        return this.value
+    }
+}
+
+this_test <- TestThis()
+this_test.update()
+PrintLine(this_test.getValue())

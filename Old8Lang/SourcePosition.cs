@@ -3,42 +3,34 @@ namespace Old8Lang;
 /// <summary>
 /// 表示源代码中的位置信息
 /// </summary>
-public readonly struct SourcePosition
+/// <remarks>
+/// 构造函数
+/// </remarks>
+/// <param name="line">行号</param>
+/// <param name="column">列号</param>
+/// <param name="fileName">文件名</param>
+/// <param name="tokenValue">令牌值</param>
+public readonly struct SourcePosition(int line, int column, string? fileName = null, string? tokenValue = null)
 {
     /// <summary>
     /// 行号（从1开始）
     /// </summary>
-    public readonly int Line;
+    public readonly int Line = line;
 
     /// <summary>
     /// 列号（从1开始）
     /// </summary>
-    public readonly int Column;
+    public readonly int Column = column;
 
     /// <summary>
     /// 文件名（可选）
     /// </summary>
-    public readonly string? FileName;
+    public readonly string? FileName = fileName;
 
     /// <summary>
     /// 原始令牌值（可选）
     /// </summary>
-    public readonly string? TokenValue;
-    
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    /// <param name="line">行号</param>
-    /// <param name="column">列号</param>
-    /// <param name="fileName">文件名</param>
-    /// <param name="tokenValue">令牌值</param>
-    public SourcePosition(int line, int column, string? fileName = null, string? tokenValue = null)
-    {
-        Line = line;
-        Column = column;
-        FileName = fileName;
-        TokenValue = tokenValue;
-    }
+    public readonly string? TokenValue = tokenValue;
 
     public override string ToString()
     {

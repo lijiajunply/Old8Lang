@@ -1,0 +1,13 @@
+// 测试基本赋值语句
+
+// 简单赋值
+a <- 10
+PrintLine(a)
+
+// 另一个赋值
+b <- 20
+PrintLine(b)
+
+// 简单表达式赋值
+sum <- a + b
+PrintLine(sum)

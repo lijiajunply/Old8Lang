@@ -47,9 +47,71 @@ public class NativeStatement : OldStatement
 
     public override void Run(VariateManager manager)
     {
-        var path = $"{Path.GetDirectoryName(manager.Path)}/dll/{DllName}.dll"; // filepath/dll/dllname
+        // 构建DLL路径，尝试多种可能的位置
+        var dllFileName = $"{DllName}.dll";
+        string path;
+        
+        // 1. 尝试从Old8LangLib/OldLib/dll目录查找
+        var oldLibDllPath = Path.Combine(manager.LangInfo.ImportPath, "dll", dllFileName);
+        if (File.Exists(oldLibDllPath))
+        {
+            path = oldLibDllPath;
+        }
+        // 2. 尝试从当前文件所在目录的dll子目录查找
+        else if (manager.Path != null)
+        {
+            path = Path.Combine(Path.GetDirectoryName(manager.Path) ?? "", "dll", dllFileName);
+        }
+        // 3. 尝试直接从应用程序基目录查找
+        else
+        {
+            path = Path.Combine(AppContext.BaseDirectory, dllFileName);
+        }
+        
+        // 确保文件存在
+        if (!File.Exists(path))
+        {
+            // 尝试使用当前目录的绝对路径
+            var absolutePath = Path.GetFullPath(dllFileName);
+            if (File.Exists(absolutePath))
+            {
+                path = absolutePath;
+            }
+            else
+            {
+                // 尝试使用Old8LangLib.dll的绝对路径（针对Old8LangLib特殊处理）
+                if (DllName == "Old8LangLib")
+                {
+                    var directDllPath = Path.Combine(Directory.GetCurrentDirectory(), "Old8LangLib", "OldLib", "dll", dllFileName);
+                    if (File.Exists(directDllPath))
+                    {
+                        path = directDllPath;
+                    }
+                    else
+                    {
+                        // 最后尝试从bin目录查找
+                        var binDllPath = Path.Combine(Directory.GetCurrentDirectory(), "Old8LangLib", "bin", "Debug", "net8.0", dllFileName);
+                        if (File.Exists(binDllPath))
+                        {
+                            path = binDllPath;
+                        }
+                        else
+                        {
+                            throw new FileNotFoundException($"无法找到DLL文件 {dllFileName}，尝试的路径：{oldLibDllPath}, {path}, {absolutePath}, {directDllPath}, {binDllPath}");
+                        }
+                    }
+                }
+                else
+                {
+                    throw new FileNotFoundException($"无法找到DLL文件 {dllFileName}，尝试的路径：{oldLibDllPath}, {path}, {absolutePath}");
+                }
+            }
+        }
+        
+        // 加载程序集并获取类型
         var assembly = Assembly.LoadFile(path);
         var type = assembly.GetType($"{DllName}.{ClassName}");
+        
         if (!string.IsNullOrEmpty(Name))
         {
             type = assembly.GetType($"{Name}.{ClassName}");
