@@ -144,6 +144,7 @@ Key syntax elements:
 - Control flow: `if/elif/else`, `for/while/for-in`, `switch/case/default`
 - String templates: `$"text {expr}"` (C# style)
 - Comments: `//` (NOT `#`)
+- ToString Method: `.ToStr()` (NOT `.ToString()`)
 
 ## Development Workflow
 

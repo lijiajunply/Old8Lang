@@ -33,7 +33,8 @@ public static class AnyValueFuncStatic
         for (var i = 0; i < type.Variates.Count; i++)
         {
             var variable = type.Variates.ElementAt(i);
-            if (variable.Value is FuncLangValue or Instance or NativeAnyLangValue or NativeStaticAny or VoidLangValue) continue;
+            if (variable.Value is FuncLangValue or Instance or NativeAnyLangValue or NativeStaticAny
+                or VoidLangValue) continue;
             builder.Append($"{(i == 0 ? "" : ",")}\"{variable.Key}\":{variable.Value}");
         }
 
