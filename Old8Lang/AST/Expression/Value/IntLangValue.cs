@@ -60,6 +60,7 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
                 throw new OverflowError(this, "整数减法");
             }
         }
+
         throw new InvalidOperationError(this, $"不支持整数与类型 '{otherLangValueType.GetType().Name}' 的减法操作");
     }
 
@@ -85,6 +86,7 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
                 throw new OverflowError(this, "整数乘法");
             }
         }
+
         throw new InvalidOperationError(this, $"不支持整数与类型 '{otherLangValueType.GetType().Name}' 的乘法操作");
     }
 
@@ -99,8 +101,10 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
                 // 抛出自定义的ZeroDivisionError
                 throw new ZeroDivisionError(this);
             }
+
             return new IntLangValue(Value / otherInt.Value);
         }
+
         throw new InvalidOperationError(this, $"不支持整数与类型 '{otherLangValueType.GetType().Name}' 的除法操作");
     }
 
@@ -115,8 +119,10 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
                 // 抛出自定义的ZeroDivisionError
                 throw new ZeroDivisionError(this);
             }
+
             return new IntLangValue(Value % otherInt.Value);
         }
+
         throw new InvalidOperationError(this, $"不支持整数与类型 '{otherLangValueType.GetType().Name}' 的取模操作");
     }
 
@@ -130,8 +136,10 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
             {
                 throw new OverflowError(this, "整数幂运算");
             }
+
             return new DoubleLangValue(result);
         }
+
         if (otherLangValueType is IntLangValue otherInt)
         {
             try
@@ -142,11 +150,13 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
                 {
                     throw new OverflowError(this, "整数幂运算");
                 }
+
                 // 如果结果是整数，返回 IntLangValue，否则返回 DoubleLangValue
-                if (result == Math.Floor(result))
+                if (Math.Abs(result - Math.Floor(result)) < 0.01)
                 {
                     return new IntLangValue((int)result);
                 }
+
                 return new DoubleLangValue(result);
             }
             catch (OverflowException)
@@ -154,6 +164,7 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
                 throw new OverflowError(this, "整数幂运算");
             }
         }
+
         throw new InvalidOperationError(this, $"不支持整数与类型 '{otherLangValueType.GetType().Name}' 的幂运算");
     }
 
@@ -202,7 +213,8 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
 
     public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)
     {
-        if (otherLangValueType is not TypeLangValue value) throw new TypeError(this, "TypeValue", otherLangValueType.GetType().Name);
+        if (otherLangValueType is not TypeLangValue value)
+            throw new TypeError(this, "TypeValue", otherLangValueType.GetType().Name);
 
         return value.Value switch
         {

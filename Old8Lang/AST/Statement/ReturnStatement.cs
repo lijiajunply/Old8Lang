@@ -1,7 +1,6 @@
 using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
-using Old8Lang.AST.Expression;
 
 namespace Old8Lang.AST.Statement;
 
@@ -18,7 +17,7 @@ public class ReturnStatement(OldExpr returnExpr, SourcePosition position = defau
             // 检查是否在finally块中使用了return语句，这在.NET IL中是不允许的
             if (local.IsInFinallyBlock)
             {
-                throw new Old8Lang.Error.CompilerException("在finally块中不允许使用return语句", Position);
+                throw new Error.CompilerException("在finally块中不允许使用return语句", Position);
             }
             
             // 确保返回表达式有值

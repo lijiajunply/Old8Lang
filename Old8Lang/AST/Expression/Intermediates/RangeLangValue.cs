@@ -21,7 +21,8 @@ public class RangeLangValue(OldExpr? start, OldExpr? end, SourcePosition positio
         var endValue = end?.Run(manager);
 
         if (startValue is not IntLangValue startIntValue || endValue is not IntLangValue endIntValue)
-            throw new TypeError(this, "IntValue", $"RangeValue: start 或 end 不是 IntValue，实际得到了 {startValue?.GetType().Name} 和 {endValue?.GetType().Name}");
+            throw new TypeError(this, "IntValue",
+                $"RangeValue: start 或 end 不是 IntValue，实际得到了 {startValue?.GetType().Name} 和 {endValue?.GetType().Name}");
 
         for (var i = startIntValue.Value; i <= endIntValue.Value; i++)
             results.Add(new IntLangValue(i));
@@ -33,23 +34,23 @@ public class RangeLangValue(OldExpr? start, OldExpr? end, SourcePosition positio
     {
         // 加载起始值
         start?.LoadIlValue(ilGenerator, local);
-        
+
         // 加载结束值
         end?.LoadIlValue(ilGenerator, local);
-        
+
         // 获取 Enumerable.Range 方法
         var rangeMethod = typeof(Enumerable).GetMethod("Range", [typeof(int), typeof(int)])!;
-        
+
         // 调用 Enumerable.Range 方法
         ilGenerator.Emit(OpCodes.Call, rangeMethod);
-        
+
         // 获取 Enumerable.ToArray<T> 泛型方法定义
         var toArrayMethod = typeof(Enumerable).GetMethods()
-            .First(m => m.Name == "ToArray" && m.IsGenericMethod);
-        
+            .First(m => m is { Name: "ToArray", IsGenericMethod: true });
+
         // 为 int 类型创建泛型方法实例
         var toArrayIntMethod = toArrayMethod.MakeGenericMethod(typeof(int));
-        
+
         // 调用 ToArray<int> 方法
         ilGenerator.Emit(OpCodes.Call, toArrayIntMethod);
     }

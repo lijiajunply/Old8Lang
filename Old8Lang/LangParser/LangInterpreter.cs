@@ -29,7 +29,6 @@ public class LangInterpreter : IMiniInterpreter
     public BlockStatement Build(string code, string? fileName)
     {
         SourceCode = code;
-        Manager.FileName = fileName;
         Manager.Path = fileName ?? "";
 
         // 设置当前解释器，以便在错误处理中使用

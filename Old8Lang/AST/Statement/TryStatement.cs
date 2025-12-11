@@ -69,38 +69,38 @@ public class TryStatement(
             // 检查try块中是否包含return语句
             if (ContainsReturnStatement(tryBlock))
             {
-                throw new Old8Lang.Error.CompilerException("当有finally块时，try块中不能包含return语句", Position);
+                throw new CompilerException("当有finally块时，try块中不能包含return语句", Position);
             }
-            
+
             // 检查所有catch块中是否包含return语句
             foreach (var (_, _, catchBlock) in catchBlocks)
             {
                 if (ContainsReturnStatement(catchBlock))
                 {
-                    throw new Old8Lang.Error.CompilerException("当有finally块时，catch块中不能包含return语句", Position);
+                    throw new CompilerException("当有finally块时，catch块中不能包含return语句", Position);
                 }
             }
         }
-        
+
         // 开始异常处理块
         ilGenerator.BeginExceptionBlock();
-        
+
         // 生成try块的IL代码
         tryBlock.GenerateIl(ilGenerator, local);
-        
+
         // 生成catch块的IL代码
         foreach (var (exceptionType, exceptionVar, catchBlock) in catchBlocks)
         {
             // 开始catch块，捕获所有类型的异常
             ilGenerator.BeginCatchBlock(typeof(Exception));
-            
+
             // 如果有异常变量，将其添加到局部变量管理器
             if (exceptionVar != null && !string.IsNullOrEmpty(exceptionVar.IdName))
             {
                 // 直接使用捕获到的异常对象
                 var exceptionLocal = ilGenerator.DeclareLocal(typeof(Exception));
                 ilGenerator.Emit(OpCodes.Stloc, exceptionLocal);
-                
+
                 // 将异常变量添加到局部变量管理器
                 local.AddLocalVar(exceptionVar.IdName, exceptionLocal);
             }
@@ -109,37 +109,37 @@ public class TryStatement(
                 // 如果没有异常变量，清空堆栈
                 ilGenerator.Emit(OpCodes.Pop);
             }
-            
+
             // 生成catch块的IL代码
             catchBlock.GenerateIl(ilGenerator, local);
-            
+
             // 如果添加了异常变量，移除它
             if (exceptionVar != null && !string.IsNullOrEmpty(exceptionVar.IdName))
             {
                 local.RemoveLocalVar(exceptionVar.IdName);
             }
         }
-        
+
         // 如果有finally块，生成finally块的IL代码
         if (finallyBlock != null)
         {
             // 开始finally块
             ilGenerator.BeginFinallyBlock();
-            
+
             // 设置在finally块中的标志
             local.IsInFinallyBlock = true;
-            
+
             // 生成finally块的IL代码
             finallyBlock.GenerateIl(ilGenerator, local);
-            
+
             // 恢复标志
             local.IsInFinallyBlock = false;
         }
-        
+
         // 结束异常处理块
         ilGenerator.EndExceptionBlock();
     }
-    
+
     /// <summary>
     /// 检查try块、catch块和finally块中是否包含return语句
     /// </summary>
@@ -151,16 +151,17 @@ public class TryStatement(
         {
             return true;
         }
-        
+
         for (int i = 0; i < statement.Count; i++)
         {
             var child = statement[i];
+            if (child == null) continue;
             if (ContainsReturnStatement(child))
             {
                 return true;
             }
         }
-        
+
         return false;
     }
 

@@ -26,11 +26,13 @@ public class BreakStatement(SourcePosition position = default) : OldStatement(po
         }
         else
         {
-            throw new InvalidOperationError(new SourcePosition(), "Break statement outside of loop", "break语句只能在循环内部使用");
+            throw new InvalidOperationError(new SourcePosition(), "Break statement outside of loop",
+                "break语句只能在循环内部使用");
         }
     }
 
-    public override OldStatement this[int index] => throw new InvalidOperationError(new SourcePosition(), "Indexer not implemented for BreakStatement", "BreakStatement不支持索引访问");
+    public override OldStatement this[int index] => throw new InvalidOperationError(new SourcePosition(),
+        "Indexer not implemented for BreakStatement", "BreakStatement不支持索引访问");
 
     public override int Count => 0;
 
@@ -40,7 +42,4 @@ public class BreakStatement(SourcePosition position = default) : OldStatement(po
 /// <summary>
 /// break异常，用于解释器中的跳转处理
 /// </summary>
-public class BreakException : Exception
-{
-    public BreakException() : base("Break exception") { }
-}
+public class BreakException() : Exception("Break exception");

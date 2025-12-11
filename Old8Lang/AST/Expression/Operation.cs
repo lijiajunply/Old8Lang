@@ -49,7 +49,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
     }
 
     public override string ToString() => $"{Left}{OperaToString()}{Right}";
-    public Type? Type { get; set; }
+    private Type? Type { get; set; }
     public OldExpr? Left { get; set; } = left;
     public OldExpr? Right { get; set; } = right;
     public OperationType Opera { get; set; } = opera;
@@ -483,7 +483,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                             // 布尔值转换为int，true->1, false->0
                         }
                         // 对于引用类型，拆箱为int
-                        else if (!leftType.IsValueType)
+                        else if (leftType is { IsValueType: false })
                         {
                             ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
                         }
@@ -501,7 +501,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                             // 布尔值转换为int，true->1, false->0
                         }
                         // 对于引用类型，拆箱为int
-                        else if (!rightType.IsValueType)
+                        else if (rightType is { IsValueType: false })
                         {
                             ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
                         }
@@ -686,7 +686,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     };
 
                     // 确保leftType不为null
-                    if (leftType == null) leftType = typeof(object);
+                    leftType ??= typeof(object);
 
                     // 处理基本类型到字符串的转换
                     if (targetType == typeof(string))
@@ -781,7 +781,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     if (Right is not LangId rightId) return local.InClassEnv;
 
                     // 检查local.InClassEnv是否是TypeBuilder
-                    if (local.InClassEnv is TypeBuilder typeBuilder)
+                    if (local.InClassEnv is TypeBuilder)
                     {
                         // 如果是TypeBuilder，我们不能在类型创建之前访问它的字段或属性
                         // 直接返回typeof(object)，这是一个安全的默认值

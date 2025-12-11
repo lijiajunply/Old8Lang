@@ -22,7 +22,8 @@ public class FuncLangValue : ImportInfo
 
     private readonly FuncLangValue? Func;
 
-    public FuncLangValue(LangId? id, List<LangId> ids, BlockStatement blockStatement, SourcePosition position = default) :
+    public FuncLangValue(LangId? id, List<LangId> ids, BlockStatement blockStatement,
+        SourcePosition position = default) :
         base(position)
     {
         Id = id;
@@ -74,7 +75,7 @@ public class FuncLangValue : ImportInfo
         {
             var expectedParams = Ids.Count;
             var actualParams = ids.Count;
-            
+
             // 只检查最大参数数量，允许实际参数少于期望参数（如果有默认参数）
             if (actualParams > expectedParams)
             {
@@ -84,76 +85,72 @@ public class FuncLangValue : ImportInfo
         }
 
         // 调用方法体
-            variateManagerFunc.AddChildren();
-            variateManagerFunc.IsFunc = true; // 设置为函数上下文
-            
-            // 将静态成员添加到方法的变量管理器中
-            var thisValue = variateManagerFunc.GetValue(new LangId("this"));
-            if (thisValue is AnyLangValue)
+        variateManagerFunc.AddChildren();
+        variateManagerFunc.IsFunc = true; // 设置为函数上下文
+
+        // 将静态成员添加到方法的变量管理器中
+        var thisValue = variateManagerFunc.GetValue(new LangId("this"));
+        if (thisValue is AnyLangValue)
+        {
+            // 将类的静态成员添加到方法的变量管理器中
+            foreach (var importInfo in variateManagerFunc.ImportInfos)
             {
-                // 将类的静态成员添加到方法的变量管理器中
-                foreach (var importInfo in variateManagerFunc.ImportInfos)
+                if (importInfo is TypeTemplate typeTemplate)
                 {
-                    if (importInfo is TypeTemplate typeTemplate)
+                    foreach (var staticMember in typeTemplate.StaticVariates)
                     {
-                        foreach (var staticMember in typeTemplate.StaticVariates)
-                        {
-                            variateManagerFunc.Set(staticMember.Key, staticMember.Value.Run(variateManagerFunc));
-                        }
+                        variateManagerFunc.Set(staticMember.Key, staticMember.Value.Run(variateManagerFunc));
                     }
                 }
             }
-            
-            if (Ids != null && Ids.Count != 0)
+        }
+
+        if (Ids != null && Ids.Count != 0)
+        {
+            // 先计算所有传入参数的值，使用外部变量管理器
+            var paramValues = ids.Select(t => t.Run(variateManagerFunc)).ToList();
+
+            // 处理默认参数，补全缺失的参数值
+            for (var i = paramValues.Count; i < Ids.Count; i++)
             {
-                // 先计算所有传入参数的值，使用外部变量管理器
-                var paramValues = new List<LangValueType>();
-                for (var i = 0; i < ids.Count; i++)
+                var id = Ids[i];
+                if (id.DefaultValue != null)
                 {
-                    paramValues.Add(ids[i].Run(variateManagerFunc));
+                    // 计算默认参数值
+                    var defaultValue = id.DefaultValue.Run(variateManagerFunc);
+                    paramValues.Add(defaultValue);
                 }
-                
-                // 处理默认参数，补全缺失的参数值
-                for (var i = paramValues.Count; i < Ids.Count; i++)
+                else
                 {
-                    var id = Ids[i];
-                    if (id.DefaultValue != null)
-                    {
-                        // 计算默认参数值
-                        var defaultValue = id.DefaultValue.Run(variateManagerFunc);
-                        paramValues.Add(defaultValue);
-                    }
-                    else
-                    {
-                        // 没有默认参数且没有传入参数，抛出错误
-                        throw new ArgumentError(Position,
-                            $"函数 '{Id?.IdName}' 的参数 '{id.IdName}' 缺少实参且没有默认值");
-                    }
-                }
-                
-                // 然后将所有参数值（包括默认参数）设置到函数的变量管理器中
-                for (var i = 0; i < Ids.Count; i++)
-                {
-                    variateManagerFunc.Set(Ids[i], paramValues[i]);
+                    // 没有默认参数且没有传入参数，抛出错误
+                    throw new ArgumentError(Position,
+                        $"函数 '{Id?.IdName}' 的参数 '{id.IdName}' 缺少实参且没有默认值");
                 }
             }
-            
-            // 运行方法体
-            BlockStatement.Run(variateManagerFunc);
-        
+
+            // 然后将所有参数值（包括默认参数）设置到函数的变量管理器中
+            for (var i = 0; i < Ids.Count; i++)
+            {
+                variateManagerFunc.Set(Ids[i], paramValues[i]);
+            }
+        }
+
+        // 运行方法体
+        BlockStatement.Run(variateManagerFunc);
+
         // 保存返回值
         var result = variateManagerFunc.Result;
-        
+
         // 恢复非函数上下文标志
         variateManagerFunc.IsFunc = false;
-        
+
         // 重置return标志，确保函数调用不会影响外部上下文
         variateManagerFunc.IsReturn = false;
-        
+
         // 移除子作用域，但是要注意，在init方法中使用this关键字设置的值已经被保存到实例中了
         // 所以这里移除子作用域不会影响实例的状态
         variateManagerFunc.RemoveChildren();
-        
+
         return result;
     }
 
@@ -205,7 +202,6 @@ public class FuncLangValue : ImportInfo
         {
             // 对于实例方法，需要先加载对象实例到堆栈上
             // 这里假设Method已经是正确的委托类型
-            return;
         }
 
         // 如果是Old8Lang函数，直接返回，因为函数调用是通过Instance类处理的

@@ -51,7 +51,7 @@ public class TupleLangValue(OldExpr v1, OldExpr v2, SourcePosition position = de
         var tupleType = typeof(ValueTuple<,>).MakeGenericType(type1, type2);
         
         // 获取元组构造函数
-        var constructor = tupleType.GetConstructor(new[] { type1, type2 })!;
+        var constructor = tupleType.GetConstructor([type1, type2])!;
         
         // 加载第一个元素的值
         Item1.LoadIlValue(ilGenerator, local);

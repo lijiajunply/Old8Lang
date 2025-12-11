@@ -55,7 +55,7 @@ public class ListLangValue : LangValueType, ILangList
 
             // 类型检查和转换：确保添加的元素类型与列表中已有的元素类型一致
             // 如果类型不一致，尝试进行类型转换
-            LangValueType convertedValue = value;
+            var convertedValue = value;
             if (Values.Count > 0)
             {
                 var existingType = Values[0].TypeToString().ToLower();

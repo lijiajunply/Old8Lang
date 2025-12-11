@@ -73,6 +73,7 @@ public class LangListItem(LangId listId, OldExpr key, SourcePosition position = 
             {
                 ilGenerator.Emit(OpCodes.Box, keyType!);
             }
+
             // 调用字典的索引器（get_Item方法）
             var getDictionaryItemMethod = typeof(Dictionary<object, object>).GetMethod("get_Item", [typeof(object)])!;
             ilGenerator.Emit(OpCodes.Callvirt, getDictionaryItemMethod);
@@ -81,7 +82,7 @@ public class LangListItem(LangId listId, OldExpr key, SourcePosition position = 
         {
             // 处理Dictionary<string, object>类型的字典索引访问
             listId.LoadIlValue(ilGenerator, local); // 加载字典
-            
+
             // 处理键
             if (key is StringLangValue stringKey)
             {
@@ -99,7 +100,7 @@ public class LangListItem(LangId listId, OldExpr key, SourcePosition position = 
                     ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToString", [typeof(object)])!);
                 }
             }
-            
+
             // 调用字典的索引器（get_Item方法）
             var getDictionaryItemMethod = typeof(Dictionary<string, object>).GetMethod("get_Item", [typeof(string)])!;
             ilGenerator.Emit(OpCodes.Callvirt, getDictionaryItemMethod);
@@ -144,24 +145,24 @@ public class LangListItem(LangId listId, OldExpr key, SourcePosition position = 
         {
             return typeof(char); // 字符串索引访问返回 char 类型
         }
-        else if (listType.IsArray)
+
+        if (listType.IsArray)
         {
             // 数组索引访问返回数组元素类型
             return listType.GetElementType() ?? typeof(object);
         }
-        else if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(List<>))
+
+        if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(List<>))
         {
             // List<T>索引访问返回T类型
-            return listType.GetGenericArguments()[0] ?? typeof(object);
+            return listType.GetGenericArguments()[0];
         }
-        else if (listType == typeof(Dictionary<object, object>))
+
+        if (listType == typeof(Dictionary<object, object>))
         {
             // 字典值可以是任意类型
-            return typeof(object);
         }
-        else
-        {
-            return typeof(object);
-        }
+
+        return typeof(object);
     }
 }

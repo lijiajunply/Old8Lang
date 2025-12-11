@@ -247,7 +247,7 @@ public class ListComprehension : LangValueType
                 if (allConditionsMet)
                 {
                     // 使用最外层的表达式，而不是当前循环的表达式
-                    var exprValue = this.Expression.Run(newManager);
+                    var exprValue = Expression.Run(newManager);
                     resultList.Add(exprValue);
                 }
             }
