@@ -20,13 +20,14 @@ public static class OS
     {
         Process a = new Process();
 
+        // 根据操作系统设置命令解释器
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             a.StartInfo.FileName = "cmd.exe";
         }
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        else
         {
+            // Linux 和 macOS 都使用 bash
             a.StartInfo.FileName = "/bin/bash";
         }
 

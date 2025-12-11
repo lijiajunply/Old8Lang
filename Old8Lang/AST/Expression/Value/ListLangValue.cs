@@ -156,9 +156,8 @@ public class ListLangValue : LangValueType, ILangList
     {
         if (start < 0) start += Values.Count;
         if (end < 0) end += Values.Count + 1;
-        return new ListLangValue(Values[start..end]
-            .OfType<LangExpression>()
-            .ToList());
+        // 使用接受 List<LangValueType> 的构造函数，因为 Values 已经包含了运行后的值
+        return new ListLangValue(Values[start..end], Position);
     }
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)

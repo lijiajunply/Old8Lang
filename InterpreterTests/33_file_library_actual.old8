@@ -1,0 +1,72 @@
+// File 库实际文件操作测试
+// 测试文件读取、行读取、ZIP 压缩等功能
+
+import File
+
+printLine("=== File 库实际文件操作测试 ===")
+
+// ===== 测试 1: FileRead 读取整个文件 =====
+printLine("\n--- 测试 1: FileRead 读取整个文件 ---")
+content <- FileRead("TestData/test_file.txt")
+printLine("文件内容:")
+printLine(content)
+printLine("文件读取成功 ✓")
+
+// ===== 测试 2: FileReadLines 按行读取文件 =====
+printLine("\n--- 测试 2: FileReadLines 按行读取文件 ---")
+lines <- FileReadLines("TestData/test_file.txt")
+printLine("文件总行数: " + Len(lines))
+printLine("逐行显示:")
+index <- 0
+for line in lines {
+    printLine("第 " + index + " 行: " + line)
+    index <- index + 1
+}
+printLine("按行读取成功 ✓")
+
+// ===== 测试 3: CompressZip 压缩文件夹 =====
+printLine("\n--- 测试 3: CompressZip 压缩文件夹 ---")
+printLine("正在压缩 TestData/test_folder 到 TestData/test_archive.zip...")
+CompressZip("TestData/test_folder", "TestData/test_archive.zip")
+printLine("压缩完成 ✓")
+
+// ===== 测试 4: ZipReadAll 读取 ZIP 文件内容列表 =====
+printLine("\n--- 测试 4: ZipReadAll 读取 ZIP 文件内容列表 ---")
+zipContents <- ZipReadAll("TestData/test_archive.zip")
+printLine("ZIP 文件中的文件数量: " + Len(zipContents))
+printLine("ZIP 文件内容:")
+for fileName in zipContents {
+    printLine("  - " + fileName)
+}
+printLine("ZIP 内容读取成功 ✓")
+
+// ===== 测试 5: 读取多个文件 =====
+printLine("\n--- 测试 5: 读取多个文件 ---")
+file1 <- FileRead("TestData/test_folder/file1.txt")
+file2 <- FileRead("TestData/test_folder/file2.txt")
+file3 <- FileRead("TestData/test_folder/file3.txt")
+printLine("file1.txt: " + file1)
+printLine("file2.txt: " + file2)
+printLine("file3.txt: " + file3)
+printLine("多文件读取成功 ✓")
+
+// ===== 测试 6: 读取当前测试文件本身 =====
+printLine("\n--- 测试 6: 读取当前测试文件 ---")
+selfLines <- FileReadLines("InterpreterTests/33_file_library_actual.old8")
+printLine("当前测试文件总行数: " + Len(selfLines))
+printLine("前 3 行内容:")
+printLine("  " + selfLines[0])
+printLine("  " + selfLines[1])
+printLine("  " + selfLines[2])
+printLine("自我读取成功 ✓")
+
+// ===== 综合测试总结 =====
+printLine("\n=== 综合测试总结 ===")
+printLine("✅ FileRead - 读取整个文件")
+printLine("✅ FileReadLines - 按行读取文件")
+printLine("✅ CompressZip - 压缩文件夹为 ZIP")
+printLine("✅ ZipReadAll - 读取 ZIP 文件内容列表")
+printLine("✅ 多文件读取")
+printLine("✅ 文件自我读取")
+
+printLine("\n🎉 所有 File 库实际操作测试通过！")

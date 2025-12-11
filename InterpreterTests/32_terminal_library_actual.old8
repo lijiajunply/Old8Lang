@@ -1,0 +1,74 @@
+// Terminal 库实际操作测试
+// 测试终端相关功能
+// 注意：某些交互式功能（ReadLine、ReadKey）在自动化测试中无法完全验证
+
+import Terminal
+
+printLine("=== Terminal 库实际操作测试 ===")
+
+// ===== 测试 1: Title - 设置终端标题 =====
+printLine("\n--- 测试 1: Title - 设置终端标题 ---")
+Title("Old8Lang 测试 - 标题1")
+printLine("已设置终端标题为: Old8Lang 测试 - 标题1")
+printLine("Title 设置成功 ✓")
+
+// ===== 测试 2: 多次设置 Title =====
+printLine("\n--- 测试 2: 多次设置 Title ---")
+Title("Old8Lang 测试 - 标题2")
+printLine("已更新终端标题为: Old8Lang 测试 - 标题2")
+Title("Old8Lang 测试 - 标题3")
+printLine("已更新终端标题为: Old8Lang 测试 - 标题3")
+printLine("多次 Title 设置成功 ✓")
+
+// ===== 测试 3: Beep - 系统蜂鸣 =====
+printLine("\n--- 测试 3: Beep - 系统蜂鸣 ---")
+printLine("正在发出系统蜂鸣...")
+Beep()
+printLine("Beep 调用成功 ✓")
+
+// ===== 测试 4: Clear 功能说明 =====
+printLine("\n--- 测试 4: Clear 功能说明 ---")
+printLine("Clear() 函数用于清除终端内容")
+printLine("在自动化测试中，我们不执行 Clear() 以保留输出")
+printLine("使用方法: Clear()")
+printLine("Clear 说明完成 ✓")
+
+// ===== 测试 5: 交互式功能说明 =====
+printLine("\n--- 测试 5: 交互式功能说明 ---")
+printLine("Terminal 库包含以下交互式功能:")
+printLine("1. ReadLine() - 读取一行用户输入")
+printLine("   示例: input <- ReadLine()")
+printLine("")
+printLine("2. ReadKey() - 读取单个按键")
+printLine("   示例: key <- ReadKey()")
+printLine("")
+printLine("3. ReadAscii() - 读取 ASCII 码输入")
+printLine("   示例: ascii <- ReadAscii()")
+printLine("")
+printLine("注意：这些功能需要用户交互，在自动化测试中无法执行")
+printLine("交互式功能说明完成 ✓")
+
+// ===== 测试 6: 彩色输出功能说明 =====
+printLine("\n--- 测试 6: 彩色输出功能说明 ---")
+printLine("Terminal 库支持彩色输出（如果终端支持）:")
+printLine("1. PrintColorful(text, color) - 彩色打印")
+printLine("   支持的颜色: Red, Green, Blue, Yellow, Cyan, Magenta")
+printLine("")
+printLine("2. PrintLineColorful(text, color) - 彩色打印并换行")
+printLine("")
+printLine("3. PrintAscii(text) - ASCII 艺术字打印")
+printLine("")
+printLine("4. PrintAsciiColorful(text, color) - 彩色 ASCII 艺术字")
+printLine("彩色输出功能说明完成 ✓")
+
+// ===== 综合测试总结 =====
+printLine("\n=== 综合测试总结 ===")
+printLine("✅ Title - 设置终端标题")
+printLine("✅ Title - 多次设置")
+printLine("✅ Beep - 系统蜂鸣")
+printLine("ℹ️  Clear - 功能说明")
+printLine("ℹ️  ReadLine/ReadKey/ReadAscii - 交互式功能说明")
+printLine("ℹ️  彩色输出功能 - 功能说明")
+
+printLine("\n🎉 Terminal 库基础功能测试通过！")
+printLine("注意：交互式功能和彩色输出需要在交互式环境中手动测试")

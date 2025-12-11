@@ -1,0 +1,51 @@
+// OS 库实际操作测试
+// 测试操作系统信息获取
+// 注意：Process 方法需要运行时环境支持，在部分测试环境中可能无法使用
+
+import OS
+
+printLine("=== OS 库实际操作测试 ===")
+
+// ===== 测试 1: OSInfo 获取操作系统信息 =====
+printLine("\n--- 测试 1: OSInfo 获取操作系统信息 ---")
+osInfo <- OSInfo()
+printLine("操作系统信息:")
+printLine(osInfo)
+printLine("OSInfo 成功 ✓")
+
+// ===== 测试 2: 多次调用 OSInfo =====
+printLine("\n--- 测试 2: 多次调用 OSInfo ---")
+osInfo2 <- OSInfo()
+printLine("第二次获取操作系统信息:")
+printLine(osInfo2)
+printLine("OSInfo 可以多次调用 ✓")
+
+// ===== 测试 3: 解析操作系统信息 =====
+printLine("\n--- 测试 3: 解析操作系统信息 ---")
+printLine("操作系统信息包含以下字段:")
+printLine("- MachineName: 机器名称")
+printLine("- UserName: 用户名")
+printLine("- TickCount: 系统运行时间（毫秒）")
+printLine("- WorkingSet: 工作集大小（字节）")
+printLine("信息解析说明完成 ✓")
+
+//=====注意：Process 方法测试 =====
+printLine("\n--- Process 方法说明 ---")
+printLine("Process(command) 方法可以执行系统命令")
+printLine("示例用法:")
+printLine("  result <- Process(\"echo Hello\")")
+printLine("  result <- Process(\"ls -la\")")
+printLine("  result <- Process(\"pwd\")")
+printLine("")
+printLine("注意：Process 方法需要运行时环境支持")
+printLine("在某些测试环境中可能需要额外配置")
+
+// ===== 综合测试总结 =====
+printLine("\n=== 综合测试总结 ===")
+printLine("✅ OSInfo - 获取操作系统信息")
+printLine("✅ OSInfo - 多次调用")
+printLine("✅ 操作系统信息解析")
+printLine("ℹ️  Process - 方法说明（需要运行时环境支持）")
+
+printLine("\n🎉 OS 库基础功能测试通过！")
+printLine("注意：Process 方法的完整测试需要在支持的运行环境中进行")

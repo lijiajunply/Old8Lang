@@ -179,7 +179,8 @@ public class ArrayLangValue : LangValueType, ILangList
     {
         if (start < 0) start += RunResult.Length;
         if (end < 0) end += RunResult.Length + 1;
-        return new ArrayLangValue(RunResult[start..end]);
+        // 使用接受 List<LangValueType> 的构造函数，因为 RunResult 已经包含了运行后的值
+        return new ArrayLangValue(RunResult[start..end].ToList(), Position);
     }
 
 

@@ -156,6 +156,13 @@ public class Operation(LangExpression? left, LangTokenType opera, LangExpression
 
                 if (Right != null)
                 {
+                    // 检查是否是索引访问
+                    var listIndexResult = Right.Run(manager);
+                    if (listIndexResult is IntLangValue intValue)
+                    {
+                        return list.Get(intValue);
+                    }
+                    // 如果不是整数索引，则作为方法调用处理
                     return list.Dot(Right);
                 }
             }
@@ -179,6 +186,19 @@ public class Operation(LangExpression? left, LangTokenType opera, LangExpression
                 {
                     // 处理静态成员访问
                     return typeTemplate.Dot(Right, manager);
+                }
+            }
+            else if (dotLeftResult is ArrayLangValue array)
+            {
+                // 处理数组索引访问，需要先运行Right表达式
+                if (Right != null)
+                {
+                    var arrayIndexResult = Right.Run(manager);
+                    if (arrayIndexResult is IntLangValue intValue)
+                    {
+                        return array.Get(intValue);
+                    }
+                    throw new InvalidOperationError(this, $"数组索引必须是整数类型，当前为 '{arrayIndexResult.GetType().Name}'");
                 }
             }
             else if (dotLeftResult != null! && Right != null)
