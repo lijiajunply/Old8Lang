@@ -17,17 +17,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/2025-12-11-16-00-comprehensive_syntax_test.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/2025-12-12-三个问题修复报告.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/2025-12-12-库函数实际测试报告.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/2025-12-12-新错误类型实际应用报告.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/2025-12-12-测试总结.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/2025-12-12-解释器测试报告.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/2025-12-12-错误处理系统增强报告.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/2025-12-12-错误处理系统扩展报告.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/2025-12-12-集合类型深度比较测试报告.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/MathLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/MathLib.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/MathLib.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/MathLib.old8" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,6 +53,7 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/SyntaxErrorTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/FuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/LangValueType.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
@@ -375,7 +368,7 @@
       <workItem from="1765446680033" duration="2287000" />
       <workItem from="1765449531774" duration="576000" />
       <workItem from="1765451683861" duration="981000" />
-      <workItem from="1765470025239" duration="13129000" />
+      <workItem from="1765470025239" duration="14033000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -720,7 +713,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="119" />
+    <option name="localTasksCounter" value="121" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -747,8 +740,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="加入类中的this，但是不能使用函数" />
-    <MESSAGE value="解决数组和for in语句的问题" />
     <MESSAGE value="将所有语句的编译都写好了，现在还剩字典，元组" />
     <MESSAGE value="加入自己写的Parser" />
     <MESSAGE value="基本完成，现在进入测试。测试成功1.0版本就OK了。" />
@@ -772,7 +763,9 @@
     <MESSAGE value="feat(tests): 添加 OS、Terminal、File 库实际操作测试&#10;&#10;- 新增 OS 库测试文件，验证 OSInfo 获取及多次调用功能&#10;- 新增 Terminal 库测试文件，覆盖 Title、Beep 等基础功能&#10;- 新增 File 库测试文件，测试文件读取、ZIP 压缩与解压功能&#10;- 创建测试数据文件用于 File 库测试&#10;- 修复 ObjToValue 对 List 类型的支持&#10;- 优化 OS.Process 方法支持 macOS 平台&#10;- 更新 ArrayLangValue 和 ListLangValue 构造逻辑&#10;- 改进 Operation 中数组和列表索引访问处理&#10;- 生成库函数实际测试报告并更新工作区配置" />
     <MESSAGE value="feat(lang): 实现集合类型深度比较功能&#10;&#10;- 为元组类型添加深度比较支持，递归比较两个元素&#10;- 修复字典类型重复添加键值对问题，清空旧值后重新加载&#10;- 优化字典深度比较逻辑，使用显式循环替代LINQ查找键&#10;- 添加完整测试用例覆盖数组、列表、字典、元组的深度比较&#10;- 支持嵌套结构比较和边界情况处理（空集合、单元素等）&#10;- 实现键顺序无关的字典比较机制&#10;- 生成详细测试报告验证功能正确性" />
     <MESSAGE value="feat(error): 实现错误处理系统增强与新异常类型应用&#10;&#10;- 添加异常转换层，将.NET异常转换为Old8Lang自定义异常&#10;- 实现MathLib模块注册，提供11个数学函数及参数验证&#10;- 添加递归深度限制机制，防止栈溢出&#10;- 应用AssertionError于Assert函数，提供清晰断言失败信息&#10;- 增强FileLib文件操作异常处理，主动检查文件存在性&#10;- 创建多个测试文件验证新错误类型实际应用&#10;- 修复MathLib模块导入问题，确保函数正确调用" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(error): 实现错误处理系统增强与新异常类型应用&#10;&#10;- 添加异常转换层，将.NET异常转换为Old8Lang自定义异常&#10;- 实现MathLib模块注册，提供11个数学函数及参数验证&#10;- 添加递归深度限制机制，防止栈溢出&#10;- 应用AssertionError于Assert函数，提供清晰断言失败信息&#10;- 增强FileLib文件操作异常处理，主动检查文件存在性&#10;- 创建多个测试文件验证新错误类型实际应用&#10;- 修复MathLib模块导入问题，确保函数正确调用" />
+    <MESSAGE value="feat(lang): 实现错误处理系统增强与语法解析优化&#10;&#10;- 新增 AssertionError、ValueError、FileNotFoundError 等错误类型的实际应用&#10;- 实现异常转换层，将 .NET 异常映射为 Old8Lang 自定义异常&#10;- 修复嵌套索引访问问题，支持 array[0][0] 等链式索引&#10;- 扩展 Json 函数支持字典、数组等多种数据结构序列化&#10;- 实现数组、列表、字典的深度内容比较，解决 Assert 函数比较问题&#10;- 新增数学函数库，包含 Sqrt、Log、Factorial 等函数及参数验证&#10;- 增强文件操作库的异常处理，主动检查文件存在性&#10;- 优化语法解析器对复杂表达式的处理能力&#10;- 提升编译器生成 IL 代码的准确性和稳定性&#10;- 完善单元测试覆盖，确保各项功能正常运行" />
+    <MESSAGE value="docs(lang): 更新语言特性文档并优化代码格式&#10;&#10;- 在CLAUDE.md中添加ToString方法说明&#10;- 优化FuncStatic.cs中的条件判断代码格式&#10;- 保持代码风格一致性" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(lang): 更新语言特性文档并优化代码格式&#10;&#10;- 在CLAUDE.md中添加ToString方法说明&#10;- 优化FuncStatic.cs中的条件判断代码格式&#10;- 保持代码风格一致性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
