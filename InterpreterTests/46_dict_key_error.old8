@@ -1,0 +1,20 @@
+// 测试字典键不存在错误
+// 测试访问字典中不存在的键
+
+printLine("=== 字典键错误测试 ===")
+
+// 测试: 访问不存在的键（虽然Old8Lang可能返回null，但我们测试一下）
+printLine("\n--- 测试: 访问字典不存在的键 ---")
+dict <- {"name": "Alice", "age": 25}
+printLine("字典: {name: Alice, age: 25}")
+printLine("尝试访问不存在的键 'email'...")
+
+// 先获取值
+email <- dict["email"]
+printLine("获取到的值: " + email)
+
+// 尝试对null值进行操作，应该会出错
+printLine("尝试对null值调用方法...")
+result <- email.length()
+
+// ERROR

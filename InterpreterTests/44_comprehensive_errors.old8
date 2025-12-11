@@ -1,0 +1,18 @@
+// 综合错误处理测试
+// 测试多种错误场景，确保错误信息清晰准确
+
+printLine("=== 综合错误处理测试 ===\n")
+
+// ===== 类型错误测试 =====
+printLine("--- 类型错误测试 ---")
+
+// 测试 1: 字符串与布尔值的比较运算
+printLine("测试 1: 字符串与布尔值的比较运算")
+str <- "hello"
+bool <- true
+try_result <- str > bool
+printLine("预期: 抛出类型错误")
+printLine("实际: " + try_result)
+printLine("✗ 测试失败：应该抛出错误但继续执行了")
+
+// ERROR

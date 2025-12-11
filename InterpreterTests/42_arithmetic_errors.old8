@@ -1,0 +1,14 @@
+// 测试运算错误处理
+// 本文件测试除零错误、数值溢出等运算相关错误
+
+printLine("=== 运算错误测试 ===")
+
+// 测试 1: 整数除零
+printLine("\n--- 测试 1: 整数除零错误 ---")
+a <- 10
+b <- 0
+printLine("计算: 10 / 0")
+// 这行应该抛出 ZeroDivisionError
+result <- a / b
+
+// ERROR

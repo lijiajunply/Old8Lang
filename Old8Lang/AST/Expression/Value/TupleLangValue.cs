@@ -43,6 +43,17 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
     public override string ToString() => $"({V1},{V2})";
     public override object GetValue() => (Value.Item1.GetValue(), Value.Item2.GetValue());
 
+    // 覆盖 Equal 方法以支持元组深度比较
+    public override bool Equal(LangValueType? otherValueType)
+    {
+        if (otherValueType is not TupleLangValue otherTuple)
+            return false;
+
+        // 比较两个元素是否都相等
+        return Value.Item1.Equal(otherTuple.Value.Item1) &&
+               Value.Item2.Equal(otherTuple.Value.Item2);
+    }
+
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 获取两个元素的类型

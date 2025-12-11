@@ -35,6 +35,9 @@ public class DictionaryLangValue : LangValueType, ILangList
 
     public override LangValueType Run(VariateManager manager)
     {
+        // 清空之前的值，避免重复添加
+        Value.Clear();
+
         foreach (var tuple in Tuples)
         {
             tuple.Run(manager);
@@ -92,10 +95,18 @@ public class DictionaryLangValue : LangValueType, ILangList
         foreach (var (key, value) in Value)
         {
             // 查找相同的键
-            var matchingPair = otherDict.Value.FirstOrDefault(p => p.Key.Equal(key));
+            var foundMatch = false;
+            foreach (var otherPair in otherDict.Value.Where(otherPair => otherPair.Key.Equal(key)))
+            {
+                // 找到相同的键，比较值是否相等
+                if (!value.Equal(otherPair.Value))
+                    return false;
+                foundMatch = true;
+                break;
+            }
 
-            // 如果找不到相同的键，或者值不相等，则返回 false
-            if (matchingPair.Key == null || !value.Equal(matchingPair.Value))
+            // 如果找不到相同的键，返回 false
+            if (!foundMatch)
                 return false;
         }
 

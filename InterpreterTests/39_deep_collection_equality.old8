@@ -1,0 +1,179 @@
+// 测试集合类型深度比较
+// 测试数组、列表、字典、元组的深度相等比较
+
+printLine("=== 集合类型深度比较测试 ===")
+
+// ===== 测试 1: 数组深度比较 =====
+printLine("\n--- 测试 1: 数组深度比��� ---")
+
+// 简单数组比较
+arr1 <- [1, 2, 3]
+arr2 <- [1, 2, 3]
+arr3 <- [1, 2, 4]
+Assert(arr1, arr2)
+printLine("简单数组相等比较: [1,2,3] == [1,2,3] ✓")
+
+// 嵌套数组比较
+nestedArr1 <- [[1, 2], [3, 4]]
+nestedArr2 <- [[1, 2], [3, 4]]
+nestedArr3 <- [[1, 2], [3, 5]]
+Assert(nestedArr1, nestedArr2)
+printLine("嵌套数组相等比较: [[1,2],[3,4]] == [[1,2],[3,4]] ✓")
+
+// 不同长度数组
+arr4 <- [1, 2]
+arr5 <- [1, 2, 3]
+different1 <- arr4 == arr5
+Assert(different1, false)
+printLine("不同长度数组比较: [1,2] != [1,2,3] ✓")
+
+// 不同元素数组
+different2 <- arr1 == arr3
+Assert(different2, false)
+printLine("不同元素数组比较: [1,2,3] != [1,2,4] ✓")
+
+printLine("数组深度比较测试通过 ✓")
+
+// ===== 测试 2: 列表深度比较 =====
+printLine("\n--- 测试 2: 列表深度比较 ---")
+
+// 简单列表比较
+list1 <- [10, 20, 30]
+list2 <- [10, 20, 30]
+list3 <- [10, 20, 40]
+Assert(list1, list2)
+printLine("简单列表相等比较: [10,20,30] == [10,20,30] ✓")
+
+// 嵌套列表比较
+nestedList1 <- [[1, 2], [3, 4], [5, 6]]
+nestedList2 <- [[1, 2], [3, 4], [5, 6]]
+Assert(nestedList1, nestedList2)
+printLine("嵌套列表相等比较通过 ✓")
+
+// 不同列表
+different3 <- list1 == list3
+Assert(different3, false)
+printLine("不同列表比较: [10,20,30] != [10,20,40] ✓")
+
+printLine("列表深度比较测试通过 ✓")
+
+// ===== 测试 3: 字典深度比较 =====
+printLine("\n--- 测试 3: 字典深度比较 ---")
+
+// 简单字典比较
+dict1 <- {"a": 1, "b": 2, "c": 3}
+dict2 <- {"a": 1, "b": 2, "c": 3}
+dict3 <- {"a": 1, "b": 2, "c": 4}
+Assert(dict1, dict2)
+printLine("简单字典相等比较: {a:1,b:2,c:3} == {a:1,b:2,c:3} ✓")
+
+// 键顺序不同的字典（应该相等）
+dict4 <- {"b": 2, "a": 1, "c": 3}
+Assert(dict1, dict4)
+printLine("键顺序不同的字典相等比较通过 ✓")
+
+// 嵌套字典比较
+nestedDict1 <- {"outer": {"inner": 123}}
+nestedDict2 <- {"outer": {"inner": 123}}
+Assert(nestedDict1, nestedDict2)
+printLine("嵌套字典相等比较通过 ✓")
+
+// 不同字典
+different4 <- dict1 == dict3
+Assert(different4, false)
+printLine("不同字典比较通过 ✓")
+
+printLine("字典深度比较测试通过 ✓")
+
+// ===== 测试 4: 元组深度比较 =====
+printLine("\n--- 测试 4: 元组深度比较 ---")
+
+// 简单元组比较
+tuple1 <- (1, 2)
+tuple2 <- (1, 2)
+tuple3 <- (1, 3)
+Assert(tuple1, tuple2)
+printLine("简单元组相等比较: (1,2) == (1,2) ✓")
+
+// 不同类型元素的元组
+tuple4 <- ("hello", 42)
+tuple5 <- ("hello", 42)
+tuple6 <- ("hello", 43)
+Assert(tuple4, tuple5)
+printLine("混合类型元组相等比较: (\"hello\",42) == (\"hello\",42) ✓")
+
+// 嵌套元组比较
+nestedTuple1 <- ((1, 2), (3, 4))
+nestedTuple2 <- ((1, 2), (3, 4))
+nestedTuple3 <- ((1, 2), (3, 5))
+Assert(nestedTuple1, nestedTuple2)
+printLine("嵌套元组相等比较: ((1,2),(3,4)) == ((1,2),(3,4)) ✓")
+
+// 不同元组
+different5 <- tuple1 == tuple3
+Assert(different5, false)
+printLine("不同元组比较: (1,2) != (1,3) ✓")
+
+different6 <- nestedTuple1 == nestedTuple3
+Assert(different6, false)
+printLine("不同嵌套元组比较通过 ✓")
+
+printLine("元组深度比较测试通过 ✓")
+
+// ===== 测试 5: 混合集合类型比较 =====
+printLine("\n--- 测试 5: 混合集合类型比较 ---")
+
+// 包含多种类型的复杂结构
+complex1 <- {
+    "array": [1, 2, 3],
+    "tuple": (10, 20),
+    "nested": {"a": 100}
+}
+complex2 <- {
+    "array": [1, 2, 3],
+    "tuple": (10, 20),
+    "nested": {"a": 100}
+}
+Assert(complex1, complex2)
+printLine("复杂嵌套结构相等比较通过 ✓")
+
+printLine("混合集合类型比较测试通过 ✓")
+
+// ===== 测试 6: 边界情况 =====
+printLine("\n--- 测试 6: 边界情况测试 ---")
+
+// 空集合比较
+emptyArr1 <- []
+emptyArr2 <- []
+Assert(emptyArr1, emptyArr2)
+printLine("空数组相等比较: [] == [] ✓")
+
+emptyDict1 <- {}
+emptyDict2 <- {}
+Assert(emptyDict1, emptyDict2)
+printLine("空字典相等比较: {} == {} ✓")
+
+// 单元素集合
+singleArr1 <- [42]
+singleArr2 <- [42]
+Assert(singleArr1, singleArr2)
+printLine("单元素数组相等比较: [42] == [42] ✓")
+
+// 深度嵌套
+deepNested1 <- [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
+deepNested2 <- [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
+Assert(deepNested1, deepNested2)
+printLine("深度嵌套数组相等比较通过 ✓")
+
+printLine("边界情况测试通过 ✓")
+
+// ===== 综合测试总结 =====
+printLine("\n=== 综合测试总结 ===")
+printLine("✅ 数组深度比较 - 简单数组、嵌套数组、不同长度")
+printLine("✅ 列表深度比较 - 简单列表、嵌套列表")
+printLine("✅ 字典深度比较 - 简单字典、键顺序、嵌套字典")
+printLine("✅ 元组深度比较 - 简单元组、混合类型、嵌套元组")
+printLine("✅ 混合集合类型 - 复杂嵌套结构")
+printLine("✅ 边界情况 - 空集合、单元素、深度嵌套")
+
+printLine("\n🎉 所有集合类型深度比较测试通过！")

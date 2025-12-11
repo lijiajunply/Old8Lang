@@ -1,0 +1,12 @@
+// 测试名称错误和属性错误处理
+// 本文件测试未定义的变量、函数、属性访问错误
+
+printLine("=== 名称和属性错误测试 ===")
+
+// 测试 1: 访问未定义的变量
+printLine("\n--- 测试 1: 未定义的变量 ---")
+printLine("尝试访问未定义的变量 'undefinedVar'...")
+// 这行应该抛出 NameError
+value <- undefinedVar
+
+// ERROR

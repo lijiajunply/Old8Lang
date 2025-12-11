@@ -1,0 +1,14 @@
+// 测试无效操作错误
+// 测试对不支持的类型执行不支持的操作
+
+printLine("=== 无效操作错误测试 ===")
+
+// 测试: 对字典进行切片操作
+printLine("\n--- 测试: 字典切片操作 ---")
+dict <- {"a": 1, "b": 2, "c": 3}
+printLine("字典: {a: 1, b: 2, c: 3}")
+printLine("尝试对字典进行切片操作 dict[0:2]...")
+// 这行应该抛出 InvalidOperationError
+sliced <- dict[0:2]
+
+// ERROR
