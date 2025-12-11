@@ -14,6 +14,8 @@ namespace Old8Lang.AST.Expression;
 public abstract class LangValueType(SourcePosition position = default) : OldExpr(position)
 {
     public override string ToString() => GetValue().ToString()!;
+    
+    public abstract override T Accept<T>(IVisitor<T> visitor);
 
     #region intOper
 

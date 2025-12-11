@@ -12,6 +12,8 @@ public class SwitchStatement(
     SourcePosition position = default)
     : OldStatement(position)
 {
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
+    
     public override void Run(VariateManager manager)
     {
         var switchValue = switchExpr.Run(manager);
@@ -146,6 +148,8 @@ public class SwitchStatement(
 public class OldCase(OldExpr expr, BlockStatement blockStatement, SourcePosition position = default)
     : OldStatement(position)
 {
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
+    
     public OldExpr Expr { get; } = expr;
     public BlockStatement BlockStatement { get; } = blockStatement;
 

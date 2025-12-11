@@ -11,6 +11,8 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <param name="position"></param>
 public class StringTreeList(List<OldExpr> list, SourcePosition position = default) : LangValueType(position)
 {
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
+    
     public override LangValueType Run(LangParser.VariateManager manager)
     {
         // 这个方法被调用时，list 中的元素已经是解析后的表达式，

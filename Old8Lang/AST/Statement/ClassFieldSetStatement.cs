@@ -14,6 +14,8 @@ public class ClassFieldSetStatement : OldStatement
 {
     public readonly ClassMemberId Id;
     public readonly OldExpr Value;
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     /// <summary>
     /// 构造函数

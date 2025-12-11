@@ -4,10 +4,10 @@ using Old8Lang.LangParser;
 namespace Old8Lang.Tests;
 
 /// <summary>
-    /// 语法错误测试，为每个语法错误问题单独编写测试用例
-    /// </summary>
-    [Collection("Sequential")]
-    public class SyntaxErrorTests
+/// 语法错误测试，为每个语法错误问题单独编写测试用例
+/// </summary>
+[Collection("Sequential")]
+public class SyntaxErrorTests
 {
     /// <summary>
     /// 测试括号不匹配 - 缺少右括号
@@ -19,11 +19,11 @@ namespace Old8Lang.Tests;
         var code = "if (a > 5 { PrintLine(\"Hello\") }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试括号不匹配 - 缺少左括号
     /// </summary>
@@ -34,11 +34,11 @@ namespace Old8Lang.Tests;
         var code = "if a > 5) { PrintLine(\"Hello\") }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试大括号不匹配 - 缺少右大括号
     /// </summary>
@@ -49,11 +49,11 @@ namespace Old8Lang.Tests;
         var code = "if (a > 5) { PrintLine(\"Hello\")";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试大括号不匹配 - 缺少左大括号
     /// </summary>
@@ -64,11 +64,11 @@ namespace Old8Lang.Tests;
         var code = "if (a > 5) PrintLine(\"Hello\") }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试方括号不匹配 - 缺少右方括号
     /// </summary>
@@ -79,11 +79,11 @@ namespace Old8Lang.Tests;
         var code = "array[0 <- 10";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试方括号不匹配 - 缺少左方括号
     /// </summary>
@@ -94,11 +94,11 @@ namespace Old8Lang.Tests;
         var code = "array]0] <- 10";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效标识符 - 以数字开头
     /// </summary>
@@ -109,11 +109,11 @@ namespace Old8Lang.Tests;
         var code = "123invalid <- 10";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效赋值运算符 - 使用等号
     /// </summary>
@@ -124,11 +124,11 @@ namespace Old8Lang.Tests;
         var code = "a = 10";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的函数声明 - 函数名以数字开头
     /// </summary>
@@ -139,11 +139,11 @@ namespace Old8Lang.Tests;
         var code = "func 123func() { return 0 }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的字典语法 - 缺少冒号
     /// </summary>
@@ -154,11 +154,11 @@ namespace Old8Lang.Tests;
         var code = "invalid_dict <- {\"name\" \"Alice\", \"age\" 30}";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的范围表达式 - 缺少结束值
     /// </summary>
@@ -169,11 +169,11 @@ namespace Old8Lang.Tests;
         var code = "invalid_range <- [1~]";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的范围表达式 - 缺少起始值
     /// </summary>
@@ -184,11 +184,11 @@ namespace Old8Lang.Tests;
         var code = "invalid_range <- [~10]";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的if语句 - 缺少条件表达式
     /// </summary>
@@ -199,11 +199,11 @@ namespace Old8Lang.Tests;
         var code = "if { PrintLine(\"Hello\") }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的elif语句 - 缺少条件表达式
     /// </summary>
@@ -214,11 +214,11 @@ namespace Old8Lang.Tests;
         var code = "if (a > 5) { PrintLine(\"Hello\") } elif { PrintLine(\"World\") }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的for循环 - 缺少表达式
     /// </summary>
@@ -229,11 +229,11 @@ namespace Old8Lang.Tests;
         var code = "for i <- 0, i < 10 { PrintLine(i) }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的while循环 - 缺少条件表达式
     /// </summary>
@@ -244,11 +244,11 @@ namespace Old8Lang.Tests;
         var code = "while { PrintLine(\"Hello\") }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的函数调用 - 多余的逗号
     /// </summary>
@@ -259,11 +259,11 @@ namespace Old8Lang.Tests;
         var code = "func_call(1, 2, )";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的类声明 - 类名以数字开头
     /// </summary>
@@ -274,11 +274,11 @@ namespace Old8Lang.Tests;
         var code = "class 123Class { var a <- 10 }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的数组初始化 - 多余的逗号
     /// </summary>
@@ -289,11 +289,11 @@ namespace Old8Lang.Tests;
         var code = "invalid_array <- [1, 2, ]";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的列表初始化 - 多余的逗号
     /// </summary>
@@ -304,11 +304,11 @@ namespace Old8Lang.Tests;
         var code = "invalid_list <- list[1, 2, ]";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的字典初始化 - 多余的逗号
     /// </summary>
@@ -319,11 +319,11 @@ namespace Old8Lang.Tests;
         var code = "invalid_dict <- {\"name\": \"Alice\", \"age\": 30, }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的类型注解 - 无效类型名
     /// </summary>
@@ -334,11 +334,11 @@ namespace Old8Lang.Tests;
         var code = "invalid_type <- 10 : invalid_type";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的lambda表达式 - 缺少表达式
     /// </summary>
@@ -349,11 +349,11 @@ namespace Old8Lang.Tests;
         var code = "invalid_lambda <- (a, b) ->";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的字符串模板 - 未闭合的占位符
     /// </summary>
@@ -364,11 +364,11 @@ namespace Old8Lang.Tests;
         var code = "invalid_template <- $\"Hello {name";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的导入语句 - 缺少模块名
     /// </summary>
@@ -379,11 +379,11 @@ namespace Old8Lang.Tests;
         var code = "import";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的native语句 - 缺少右括号
     /// </summary>
@@ -394,11 +394,11 @@ namespace Old8Lang.Tests;
         var code = "[import \"Old8LangLib\" Time GetTimeNow";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的算术表达式 - 缺少操作数
     /// </summary>
@@ -409,11 +409,11 @@ namespace Old8Lang.Tests;
         var code = "result <- 10 +";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的switch语句 - 缺少表达式
     /// </summary>
@@ -424,11 +424,11 @@ namespace Old8Lang.Tests;
         var code = "switch { case 1 { PrintLine(\"One\") } }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试无效的case语句 - 缺少表达式
     /// </summary>
@@ -439,11 +439,11 @@ namespace Old8Lang.Tests;
         var code = "switch (a) { case { PrintLine(\"One\") } }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试throw语句缺少表达式
     /// </summary>
@@ -454,11 +454,11 @@ namespace Old8Lang.Tests;
         var code = "throw";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试lrBlock缺少右括号
     /// </summary>
@@ -469,11 +469,11 @@ namespace Old8Lang.Tests;
         var code = "(a <- 10";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试lrBlock缺少左括号
     /// </summary>
@@ -484,11 +484,11 @@ namespace Old8Lang.Tests;
         var code = "a <- 10)";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试forInStatement缺少in关键字
     /// </summary>
@@ -499,13 +499,12 @@ namespace Old8Lang.Tests;
         var code = "for i [1, 2, 3] { PrintLine(i) }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
 
-    
+
     /// <summary>
     /// 测试accessModifier无效
     /// </summary>
@@ -516,11 +515,11 @@ namespace Old8Lang.Tests;
         var code = "protected func test() { return 0 }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试typedIdentifier无效的类型注解
     /// </summary>
@@ -531,11 +530,11 @@ namespace Old8Lang.Tests;
         var code = "func test(x: 123) { return x }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试asStatement缺少类型名
     /// </summary>
@@ -546,11 +545,11 @@ namespace Old8Lang.Tests;
         var code = "a as";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试slice缺少冒号
     /// </summary>
@@ -561,11 +560,11 @@ namespace Old8Lang.Tests;
         var code = "array[0 10]";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试slice缺少结束索引
     /// </summary>
@@ -576,11 +575,11 @@ namespace Old8Lang.Tests;
         var code = "array[0:]";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试tuple缺少逗号
     /// </summary>
@@ -591,26 +590,11 @@ namespace Old8Lang.Tests;
         var code = "(1 2)";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
-    /// <summary>
-    /// 测试tuple只有一个元素
-    /// </summary>
-    [Fact]
-    public void ParseProgram_InvalidTupleSingleElement_ThrowsSyntaxError()
-    {
-        // Arrange
-        var code = "(1)";
-        var tokens = LangInterpreter.Tokenize(code);
-        var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
-        // Act & Assert
-        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
-    }
-    
+
     /// <summary>
     /// 测试list缺少右括号
     /// </summary>
@@ -621,11 +605,11 @@ namespace Old8Lang.Tests;
         var code = "list[1, 2, 3";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试dictionary缺少右大括号
     /// </summary>
@@ -636,13 +620,12 @@ namespace Old8Lang.Tests;
         var code = "{\"name\": \"Alice\", \"age\": 30";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
 
-    
+
     /// <summary>
     /// 测试stringTree缺少右大括号
     /// </summary>
@@ -653,11 +636,11 @@ namespace Old8Lang.Tests;
         var code = "$\"Hello {name";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试instantiate缺少右括号
     /// </summary>
@@ -668,11 +651,11 @@ namespace Old8Lang.Tests;
         var code = "TestClass(1, 2";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试notPrefix缺少表达式
     /// </summary>
@@ -683,11 +666,11 @@ namespace Old8Lang.Tests;
         var code = "not";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试minusPrefix缺少表达式
     /// </summary>
@@ -698,11 +681,11 @@ namespace Old8Lang.Tests;
         var code = "-";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试二进制表达式缺少右操作数
     /// </summary>
@@ -713,11 +696,11 @@ namespace Old8Lang.Tests;
         var code = "a >";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试数字操作表达式缺少右操作数
     /// </summary>
@@ -728,11 +711,11 @@ namespace Old8Lang.Tests;
         var code = "a +";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试布尔操作表达式缺少右操作数
     /// </summary>
@@ -743,11 +726,11 @@ namespace Old8Lang.Tests;
         var code = "a and";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试函数声明缺少参数列表
     /// </summary>
@@ -758,11 +741,11 @@ namespace Old8Lang.Tests;
         var code = "func test { return 0 }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
-    
+
     /// <summary>
     /// 测试类声明缺少类块
     /// </summary>
@@ -773,7 +756,7 @@ namespace Old8Lang.Tests;
         var code = "class TestClass";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-        
+
         // Act & Assert
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }

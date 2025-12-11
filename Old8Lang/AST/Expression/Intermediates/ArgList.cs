@@ -10,4 +10,6 @@ public class ArgList(List<OldExpr> args, SourcePosition position = default) : Ol
     public readonly List<OldExpr> Args = args;
 
     public override string ToString() => string.Join(", ", Args); // Old8Lang 风格的参数列表
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 }

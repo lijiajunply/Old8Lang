@@ -220,10 +220,4 @@ public class ExceptionTests
         // Assert
         Assert.Contains(suggestion, exception.Message);
     }
-    
-    // 模拟IOldLangTree实现，用于测试
-    private class MockLangTree : IOldLangTree
-    {
-        public SourcePosition Position { get; set; } = new SourcePosition(1, 1);
-    }
 }

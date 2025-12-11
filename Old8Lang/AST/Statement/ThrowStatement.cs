@@ -5,24 +5,26 @@ using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Statement;
 
-public class ThrowStatement(OldExpr throwExpr, SourcePosition position = default) : OldStatement(position)
+public class ThrowStatement(OldExpr expr, SourcePosition position = default) : OldStatement(position)
 {
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
+    
     public override void Run(VariateManager manager)
-    {
-        var value = throwExpr.Run(manager);
-        // 使用CustomError抛出异常
-        throw new CustomError(
-            this,
-            value.ToDisplayString());
-    }
+{
+    var value = expr.Run(manager);
+    // 使用CustomError抛出异常
+    throw new CustomError(
+        this,
+        value.ToDisplayString());
+}
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 编译模式下的实现
-        throwExpr.LoadIlValue(ilGenerator, local);
+        expr.LoadIlValue(ilGenerator, local);
 
         // 获取表达式的类型
-        var exprType = throwExpr.OutputType(local);
+        var exprType = expr.OutputType(local);
 
         // 如果是值类型，需要装箱后才能调用ToString()
         if (exprType is { IsValueType: true })
@@ -42,5 +44,5 @@ public class ThrowStatement(OldExpr throwExpr, SourcePosition position = default
 
     public Type OutputType(LocalManager local) => typeof(void);
 
-    public override string ToString() => $"throw {throwExpr}";
+    public override string ToString() => $"throw {expr}";
 }

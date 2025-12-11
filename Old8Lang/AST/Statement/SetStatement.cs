@@ -13,6 +13,8 @@ public class SetStatement : OldStatement
     public readonly LangId? Id;
     public readonly OldExpr? LeftExpr;
     public readonly OldExpr Value;
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public SetStatement(LangId id, OldExpr value, SourcePosition position = default) : base(position)
     {

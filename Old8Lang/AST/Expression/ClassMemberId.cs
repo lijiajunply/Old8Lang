@@ -18,6 +18,8 @@ public enum AccessModifierType
 /// </summary>
 public class ClassMemberId : LangId
 {
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
+    
     /// <summary>
     /// 互斥的修饰符组
     /// </summary>

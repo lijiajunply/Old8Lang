@@ -9,8 +9,10 @@ namespace Old8Lang.AST.Statement;
 /// <summary>
 /// while语句
 /// </summary>
-public class WhileStatement(OldExpr expr, BlockStatement blockStatement, SourcePosition position = default) : OldStatement(position)
+public class WhileStatement(OldExpr expr, OldStatement blockStatement, SourcePosition position = default) : OldStatement(position)
 {
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
+    
     public override void Run(VariateManager manager)
     {
         manager.AddChildren();

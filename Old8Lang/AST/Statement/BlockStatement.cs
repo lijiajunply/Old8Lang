@@ -14,6 +14,8 @@ public class BlockStatement : OldStatement
     private readonly List<OldStatement> ImportStatements = [];
     private readonly List<OldStatement> OtherStatements = [];
     public override int Count => OtherStatements.Count;
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public BlockStatement(IEnumerable<IOldLangTree> statements, SourcePosition position = default) : base(position)
     {

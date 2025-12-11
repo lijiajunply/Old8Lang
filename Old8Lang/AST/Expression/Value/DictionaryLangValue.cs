@@ -14,6 +14,8 @@ public class DictionaryLangValue : LangValueType, ILangList
 {
     private readonly List<TupleLangValue> Tuples;
     public readonly List<(LangValueType Key, LangValueType Value)> Value = [];
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public DictionaryLangValue(List<TupleLangValue> tuples, SourcePosition position = default) : base(position)
     {
@@ -157,11 +159,11 @@ public class DictionaryLangValue : LangValueType, ILangList
         foreach (var expr in Tuples)
         {
             ilGenerator.Emit(OpCodes.Ldloc, l.LocalIndex);
-            expr.Item1.LoadIlValue(ilGenerator, local);
-            var t = expr.Item1.OutputType(local);
+            expr.V1.LoadIlValue(ilGenerator, local);
+            var t = expr.V1.OutputType(local);
             ilGenerator.Emit(OpCodes.Box, t!);
-            expr.Item2.LoadIlValue(ilGenerator, local);
-            t = expr.Item2.OutputType(local);
+            expr.V2.LoadIlValue(ilGenerator, local);
+            t = expr.V2.OutputType(local);
             ilGenerator.Emit(OpCodes.Box, t!);
             ilGenerator.Emit(OpCodes.Callvirt, addMethod); // 调用 Add 方法
         }

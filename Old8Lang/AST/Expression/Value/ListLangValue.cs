@@ -14,19 +14,24 @@ public class ListLangValue : LangValueType, ILangList
     private readonly List<OldExpr> Value;
 
     public readonly List<LangValueType> Values = [];
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
-    public ListLangValue(List<OldExpr> value, SourcePosition position = default) : base(position) => Value = value;
+    public ListLangValue(List<OldExpr> value, SourcePosition position = default) : base(position)
+    {
+        Value = value;
+    }
 
     public ListLangValue(List<object> value, SourcePosition position = default) : base(position)
     {
-        Values = value.Select(ObjToValue).ToList();
-        Value = Values.OfType<OldExpr>().ToList();
+        Values.AddRange(value.Select(ObjToValue));
+        Value = [];
     }
 
     public ListLangValue(List<LangValueType> value, SourcePosition position = default) : base(position)
     {
-        Values = [.. value];
-        Value = Values.OfType<OldExpr>().ToList();
+        Values.AddRange(value);
+        Value = [];
     }
 
     public override LangValueType Run(LangParser.VariateManager manager)
@@ -39,19 +44,21 @@ public class ListLangValue : LangValueType, ILangList
 
     public LangValueType Get(IntLangValue i)
     {
-        if (i.Value < 0)
-            i.Value = Values.Count + i.Value;
-        return Values[i.Value];
+        int idx = i.Value;
+        if (idx < 0)
+            idx = Values.Count + idx;
+        return Values[idx];
     }
 
     public void Set(LangValueType index, LangValueType value)
     {
         if (index is IntLangValue i)
         {
-            if (i.Value < 0)
-                i.Value = Values.Count + i.Value;
-            if (i.Value < 0 || i.Value >= Values.Count)
-                throw new IndexError(this, i.Value, Values.Count);
+            int idx = i.Value;
+            if (idx < 0)
+                idx = Values.Count + idx;
+            if (idx < 0 || idx >= Values.Count)
+                throw new IndexError(this, idx, Values.Count);
 
             // 类型检查和转换：确保添加的元素类型与列表中已有的元素类型一致
             // 如果类型不一致，尝试进行类型转换
@@ -80,7 +87,7 @@ public class ListLangValue : LangValueType, ILangList
                 }
             }
 
-            Values[i.Value] = convertedValue;
+            Values[idx] = convertedValue;
         }
         else
         {

@@ -10,6 +10,8 @@ public class FuncRunStatement : OldStatement
 {
     private readonly Instance? Instance;
     private readonly Operation? Operation;
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public FuncRunStatement(Instance instance, SourcePosition position = default) : base(position) => Instance = instance;
     public FuncRunStatement(Operation operation, SourcePosition position = default) : base(position) => Operation = operation;

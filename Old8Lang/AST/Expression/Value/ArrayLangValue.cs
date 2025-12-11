@@ -12,12 +12,14 @@ public class ArrayLangValue : LangValueType, ILangList
 {
     private readonly LangValueType[] RunResult;
     private readonly List<OldExpr> Values = [];
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public ArrayLangValue(IEnumerable<OldExpr> valuesList, SourcePosition position = default) : base(position)
     {
         var oldExpr = valuesList as OldExpr[] ?? [.. valuesList];
         RunResult = new LangValueType[oldExpr.Length];
-        Values = [.. oldExpr];
+        Values.AddRange(oldExpr);
     }
 
     public ArrayLangValue(List<LangValueType> re, SourcePosition position = default) : base(position)
@@ -40,17 +42,18 @@ public class ArrayLangValue : LangValueType, ILangList
     {
         if (index is IntLangValue i)
         {
-            if (i.Value >= RunResult.Length || i.Value < -RunResult.Length)
-                throw new IndexError(this, i.Value, RunResult.Length);
-            if (i.Value < 0)
-                i.Value = RunResult.Length + i.Value;
+            int idx = i.Value;
+            if (idx >= RunResult.Length || idx < -RunResult.Length)
+                throw new IndexError(this, idx, RunResult.Length);
+            if (idx < 0)
+                idx = RunResult.Length + idx;
 
             // 类型检查和转换：确保添加的元素类型与数组中已有的元素类型一致
             // 如果类型不一致，尝试进行类型转换
             LangValueType convertedValue = value;
-            if (RunResult.Length > 0 && RunResult[i.Value] != null!)
+            if (RunResult.Length > 0 && RunResult[idx] != null!)
             {
-                var existingType = RunResult[i.Value].TypeToString().ToLower();
+                var existingType = RunResult[idx].TypeToString().ToLower();
                 var newValueType = value.TypeToString().ToLower();
 
                 if (existingType != newValueType)
@@ -102,7 +105,7 @@ public class ArrayLangValue : LangValueType, ILangList
                 }
             }
 
-            RunResult[i.Value] = convertedValue;
+            RunResult[idx] = convertedValue;
         }
         else
         {

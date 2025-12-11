@@ -13,6 +13,8 @@ public class ClassFuncInitStatement : OldStatement
 {
     public readonly ClassMemberId Id;
     public readonly FuncLangValue FuncValue;
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     /// <summary>
     /// 构造函数

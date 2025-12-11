@@ -10,6 +10,8 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public class BreakStatement(SourcePosition position = default) : OldStatement(position)
 {
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
+    
     public override void Run(VariateManager manager)
     {
         // 使用异常来处理break跳转

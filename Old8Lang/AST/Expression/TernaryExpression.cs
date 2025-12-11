@@ -17,6 +17,8 @@ public class TernaryExpression(
     SourcePosition position = default)
     : OldExpr(position)
 {
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
+    
     /// <summary>
     /// 条件表达式
     /// </summary>

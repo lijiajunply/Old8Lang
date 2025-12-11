@@ -23,4 +23,7 @@ public abstract class OldStatement : IOldLangTree
 
     public abstract OldStatement? this[int index] { get; }
     public abstract int Count { get; }
+    
+    /// <inheritdoc />
+    public abstract T Accept<T>(IVisitor<T> visitor);
 }

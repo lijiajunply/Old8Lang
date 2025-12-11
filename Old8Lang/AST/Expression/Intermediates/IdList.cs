@@ -5,4 +5,6 @@ public class IdList(List<LangId> args, SourcePosition position = default) : OldE
     public readonly List<LangId> Args = args;
 
     public override string ToString() => string.Join(", ", Args); // Old8Lang 风格的 ID 列表
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 }

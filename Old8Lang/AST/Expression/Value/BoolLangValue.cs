@@ -13,6 +13,8 @@ namespace Old8Lang.AST.Expression.Value;
 public class BoolLangValue(bool value, SourcePosition position = default) : LangValueType(position)
 {
     public readonly bool Value = value;
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     public override string ToString() => Value.ToString();
     public override LangValueType Run(VariateManager manager) => this;
 

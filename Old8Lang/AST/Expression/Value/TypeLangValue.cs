@@ -11,6 +11,8 @@ public class TypeLangValue : LangValueType
 {
     private readonly OldExpr? Expr;
     public string? Value { get; private set; }
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public TypeLangValue(OldExpr expr) => Expr = expr;
     public TypeLangValue(string value) => Value = value;

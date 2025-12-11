@@ -14,6 +14,8 @@ namespace Old8Lang.AST.Expression.Value;
 public class DoubleLangValue(double doubleValue, SourcePosition position = default) : LangValueType(position)
 {
     public readonly double Value = doubleValue;
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public override LangValueType Plus(LangValueType otherLangValueType)
     {

@@ -11,7 +11,9 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="position">位置</param>
 public class NullLangValue(SourcePosition position = default) : LangValueType(position)
 {
-    public override string ToString() => "null";
+    public override string ToString() => "Null";
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     public override LangValueType Run(VariateManager manager) => this;
 
     public override bool Equal(LangValueType? otherValueType)

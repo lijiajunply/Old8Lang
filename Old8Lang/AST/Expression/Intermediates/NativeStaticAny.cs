@@ -11,7 +11,9 @@ namespace Old8Lang.AST.Expression.Intermediates;
 public class NativeStaticAny(string className, Type classType) : ImportInfo
 {
     public readonly string ClassName = className;
-
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
+    
     public override LangValueType Dot(OldExpr dotExpr)
     {
         if (dotExpr is LangId id)

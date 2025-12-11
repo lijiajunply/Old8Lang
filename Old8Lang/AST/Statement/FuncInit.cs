@@ -10,6 +10,8 @@ namespace Old8Lang.AST.Statement;
 public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldStatement(position)
 {
     public readonly FuncLangValue FuncLangValue = a;
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public override void Run(VariateManager manager)
     {

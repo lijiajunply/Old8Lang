@@ -11,6 +11,8 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public class ListComprehension : LangValueType
 {
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
+    
     /// <summary>
     /// 表达式部分，用于生成列表元素
     /// </summary>

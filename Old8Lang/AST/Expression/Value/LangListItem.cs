@@ -13,8 +13,10 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="position">位置</param>
 public class LangListItem(LangId listId, OldExpr key, SourcePosition position = default) : LangValueType(position)
 {
-    public LangId ListId => listId;
-    public OldExpr Key => key;
+    public readonly LangId ListId = listId;
+    public readonly OldExpr Key = key;
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public override LangValueType Run(LangParser.VariateManager manager)
     {

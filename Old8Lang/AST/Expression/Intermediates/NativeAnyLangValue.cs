@@ -16,6 +16,8 @@ public class NativeAnyLangValue(string dllName, string className, string path) :
     private object? InstanceObj { get; set; }
 
     private VariateManager Manager = new();
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public override LangValueType Dot(OldExpr dotExpr)
     {

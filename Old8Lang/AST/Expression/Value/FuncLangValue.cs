@@ -17,6 +17,8 @@ public class FuncLangValue : ImportInfo
     public readonly BlockStatement BlockStatement = new([]);
 
     public readonly List<LangId>? Ids;
+    
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public readonly MethodInfo? Method;
 

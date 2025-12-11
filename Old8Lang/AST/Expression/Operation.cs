@@ -10,6 +10,8 @@ namespace Old8Lang.AST.Expression;
 public class Operation(OldExpr? left, LangTokenType opera, OldExpr? right, SourcePosition position = default)
     : OldExpr(position)
 {
+    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
+    
     private string OperaToString()
     {
         if (Opera == LangTokenType.Plus)
