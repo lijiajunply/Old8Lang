@@ -1,6 +1,5 @@
 using Old8Lang.Error;
 using Old8Lang.LangParser;
-using Xunit;
 
 namespace Old8Lang.Tests;
 
@@ -18,7 +17,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "if (a > 5 { PrintLine(\"Hello\") }";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -33,7 +32,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "if a > 5) { PrintLine(\"Hello\") }";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -48,7 +47,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "if (a > 5) { PrintLine(\"Hello\")";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -63,7 +62,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "if (a > 5) PrintLine(\"Hello\") }";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -78,7 +77,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "array[0 <- 10";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -93,7 +92,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "array]0] <- 10";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -108,7 +107,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "123invalid <- 10";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -123,7 +122,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "a = 10";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -138,7 +137,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "func 123func() { return 0 }";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -153,7 +152,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "invalid_dict <- {\"name\" \"Alice\", \"age\" 30}";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -168,7 +167,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "invalid_range <- [1~]";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -183,7 +182,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "invalid_range <- [~10]";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -198,7 +197,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "if { PrintLine(\"Hello\") }";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -213,7 +212,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "if (a > 5) { PrintLine(\"Hello\") } elif { PrintLine(\"World\") }";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -228,7 +227,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "for i <- 0, i < 10 { PrintLine(i) }";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -243,7 +242,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "while { PrintLine(\"Hello\") }";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -258,7 +257,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "func_call(1, 2, )";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -273,7 +272,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "class 123Class { var a <- 10 }";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -288,7 +287,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "invalid_array <- [1, 2, ]";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -303,7 +302,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "invalid_list <- list[1, 2, ]";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -318,7 +317,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "invalid_dict <- {\"name\": \"Alice\", \"age\": 30, }";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -333,7 +332,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "invalid_type <- 10 : invalid_type";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -348,7 +347,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "invalid_lambda <- (a, b) ->";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -363,7 +362,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "invalid_template <- $\"Hello {name";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -378,7 +377,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "import";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -393,7 +392,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "[import \"Old8LangLib\" Time GetTimeNow";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -408,7 +407,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "result <- 10 +";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -423,7 +422,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "switch { case 1 { PrintLine(\"One\") } }";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -438,7 +437,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "switch (a) { case { PrintLine(\"One\") } }";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -453,7 +452,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "throw";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -468,7 +467,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "(a <- 10";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -483,7 +482,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "a <- 10)";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -498,7 +497,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "for i [1, 2, 3] { PrintLine(i) }";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -515,7 +514,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "protected func test() { return 0 }";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -530,7 +529,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "func test(x: 123) { return x }";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -545,7 +544,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "a as";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -560,7 +559,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "array[0 10]";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -575,7 +574,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "array[0:]";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -590,7 +589,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "(1 2)";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -605,7 +604,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "(1)";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -620,7 +619,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "list[1, 2, 3";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -635,7 +634,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "{\"name\": \"Alice\", \"age\": 30";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -652,7 +651,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "$\"Hello {name";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -667,7 +666,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "TestClass(1, 2";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -682,7 +681,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "not";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -697,7 +696,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "-";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -712,7 +711,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "a >";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -727,7 +726,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "a +";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -742,7 +741,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "a and";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -757,7 +756,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "func test { return 0 }";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert
@@ -772,7 +771,7 @@ namespace Old8Lang.Tests;
     {
         // Arrange
         var code = "class TestClass";
-        var tokens = Old8Lang.LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
         
         // Act & Assert

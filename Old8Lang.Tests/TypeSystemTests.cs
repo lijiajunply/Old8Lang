@@ -1,4 +1,4 @@
-using Old8Lang.AST.Expression;using Old8Lang.AST.Expression.Value;using Xunit;
+using Old8Lang.AST.Expression;using Old8Lang.AST.Expression.Value;
 
 namespace Old8Lang.Tests;
 

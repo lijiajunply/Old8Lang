@@ -1,7 +1,3 @@
-using System;
-using System.IO;
-using Old8Lang;
-
 namespace Old8Lang.App
 {
     class DebugImport

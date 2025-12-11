@@ -1,4 +1,4 @@
-using Old8Lang.AST;using Old8Lang.Error;using Old8Lang.LangParser;using Xunit;
+using Old8Lang.AST;using Old8Lang.Error;using Old8Lang.LangParser;
 
 namespace Old8Lang.Tests;
 
