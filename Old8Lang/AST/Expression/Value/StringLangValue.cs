@@ -14,9 +14,9 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="position"></param>
 public class StringLangValue(string context, SourcePosition position = default) : LangValueType(position), ILangList
 {
-    public string Value = context.Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\r", "\r")
+    public readonly string Value = context.Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\r", "\r")
         .Replace(@"\\", "\\");
-    
+
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public override string ToString() => $"\"{Value}\""; // 带引号的字符串，符合 Old8Lang 语法
@@ -146,8 +146,6 @@ public class StringLangValue(string context, SourcePosition position = default) 
         if (end < 0) end += Value.Length + 1;
         return new StringLangValue(Value[start..end]);
     }
-
-    public Type GetChildType() => typeof(char);
 
     public void Set(LangValueType index, LangValueType value)
     {

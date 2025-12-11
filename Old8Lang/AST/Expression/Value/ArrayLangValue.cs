@@ -139,7 +139,6 @@ public class ArrayLangValue : LangValueType, ILangList
         return new ArrayLangValue(RunResult[start..end]);
     }
 
-    public Type GetChildType() => typeof(object);
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {

@@ -16,46 +16,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Changes">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/AST节点层次结构优化与简化.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/FuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/FuncStatic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ArgList.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/IdList.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeStaticAny.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeStaticAny.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/RangeLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/RangeLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/SliceLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/SliceLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/StringTreeList.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" afterDir="false" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ILangList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ILangList.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LangListItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LangListItem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListComprehension.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListComprehension.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeTemplate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeTemplate.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/OldExpr.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/LangExpr.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/OldLangTree.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/OldLangTree.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassFieldSetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassFieldSetStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/OldIf.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/OldIf.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ThrowStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ThrowStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/StringLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/StringLangValue.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -713,7 +679,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="112" />
+    <option name="localTasksCounter" value="114" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -740,8 +706,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="for in可以进行编译" />
-    <MESSAGE value="加入函数，但是现在还不能使用递归" />
     <MESSAGE value="函数解决" />
     <MESSAGE value="修正编译器Bug: Box" />
     <MESSAGE value="加入编译函数，支持类的初始化" />
@@ -765,7 +729,9 @@
     <MESSAGE value="feat(parser): 支持科学计数法解析&#10;&#10;- 在词法分析器中添加对科学计数法的支持，包括正负指数处理&#10;- 修改数字字面量解析逻辑，使用decimal.Parse提高精度&#10;- 更新测试用例以验证科学计数法功能&#10;- 调整字符串模板格式化方式&#10;- 清理冗余的测试文件和代码&#10;- 更新开发环境配置和调试设置" />
     <MESSAGE value="refactor(core): 优化表达式求值与类型转换逻辑&#10;&#10;- 使用空合并运算符简化变量赋值逻辑&#10;- 重构类型转换方法，增强类型检查与实例创建流程&#10;- 更新字典值处理逻辑，确保键值对正确运行与设置&#10;- 修正实例表达式的ID运行机制，确保参数正确求值&#10;- 优化IL生成代码，改进数值运算与类型转换处理&#10;- 更新示例文件中的this引用语法，提高代码准确性&#10;- 调整极端值测试用例，减少嵌套层级以提升可读性&#10;- 更新IDE配置与调试断点，适配最新代码结构" />
     <MESSAGE value="fix(parser): 修复解析器中的语法错误处理和代码格式问题&#10;&#10;- 修复了块结束标志的处理逻辑&#10;- 优化了函数返回类型声明的错误提示&#10;- 改进了幂运算和点运算符的解析顺序&#10;- 统一了源码位置信息的构造方式&#10;- 修正了元组解析时的逗号处理逻辑&#10;- 完善了默认参数值的解析条件判断&#10;- 清理了不必要的空行和代码格式问题" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(parser): 修复解析器中的语法错误处理和代码格式问题&#10;&#10;- 修复了块结束标志的处理逻辑&#10;- 优化了函数返回类型声明的错误提示&#10;- 改进了幂运算和点运算符的解析顺序&#10;- 统一了源码位置信息的构造方式&#10;- 修正了元组解析时的逗号处理逻辑&#10;- 完善了默认参数值的解析条件判断&#10;- 清理了不必要的空行和代码格式问题" />
+    <MESSAGE value="refactor(ast): 重构AST表达式类型系统&#10;&#10;- 将OldExpr重命名为LangExpression，统一表达式类型命名&#10;- 更新AnyLangValue中的OldExpr引用为LangExpression&#10;- 修改ArrayLangValue使用LangExpression替代OldExpr&#10;- 更新BlockStatement中ToAnyData和ToStaticData返回类型&#10;- 将ClassFieldSetStatement中的OldExpr改为LangExpression&#10;- 更新DictionaryLangValue构造函数参数类型&#10;- 修改ForInStatement和ForStatement中的表达式类型&#10;- 更新FuncLangValue.Run方法参数类型&#10;- 移除ArgList和IdList中间节点类型&#10;- 将Instance类移动到Value目录并更新构造函数&#10;- 更新LangId和LangListItem中的表达式引用类型&#10;- 修改LangParser中所有Parse方法返回类型为LangExpression&#10;- 更新LangValueType.Dot方法参数类型&#10;- 修改ListComprehension和ListLangValue中的表达式类型&#10;- 更新NativeAnyLangValue和NativeStaticAny中的点操作参数类型&#10;- 修改OldIf条件表达式类型" />
+    <MESSAGE value="refactor(ast): 重命名OldIf类为IfChild并更新相关引用&#10;&#10;- 将OldIf类重命名为IfChild&#10;- 更新IfStatement中对OldIf的引用为IfChild&#10;- 修改LangParser中创建IfChild实例的代码&#10;- 更新SwitchStatement中的OldCase类为CaseStatement&#10;- 移除IVisitor接口" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 重命名OldIf类为IfChild并更新相关引用&#10;&#10;- 将OldIf类重命名为IfChild&#10;- 更新IfStatement中对OldIf的引用为IfChild&#10;- 修改LangParser中创建IfChild实例的代码&#10;- 更新SwitchStatement中的OldCase类为CaseStatement&#10;- 移除IVisitor接口" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -811,10 +777,10 @@
           <line>40</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="1225" />
+              <option value="1243" />
             </startOffsets>
             <endOffsets>
-              <option value="1664" />
+              <option value="1682" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="517" />
@@ -837,10 +803,10 @@
           <line>36</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="933" />
+              <option value="975" />
             </startOffsets>
             <endOffsets>
-              <option value="978" />
+              <option value="1020" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="546" />
@@ -850,10 +816,10 @@
           <line>39</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="1001" />
+              <option value="1043" />
             </startOffsets>
             <endOffsets>
-              <option value="1062" />
+              <option value="1104" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="547" />
@@ -863,10 +829,10 @@
           <line>129</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" containingFunctionPresentation="方法 'Converse'">
             <startOffsets>
-              <option value="3564" />
+              <option value="3600" />
             </startOffsets>
             <endOffsets>
-              <option value="3565" />
+              <option value="3601" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="555" />
@@ -876,10 +842,10 @@
           <line>126</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" containingFunctionPresentation="方法 'Converse'">
             <startOffsets>
-              <option value="3413" />
+              <option value="3449" />
             </startOffsets>
             <endOffsets>
-              <option value="3446" />
+              <option value="3482" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="556" />

@@ -14,7 +14,7 @@ public class ListLangValue : LangValueType, ILangList
     private readonly List<LangExpression> Value;
 
     public readonly List<LangValueType> Values = [];
-    
+
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public ListLangValue(List<LangExpression> value, SourcePosition position = default) : base(position)
@@ -119,44 +119,6 @@ public class ListLangValue : LangValueType, ILangList
             .ToList());
     }
 
-    public Type GetChildType()
-    {
-        // 确定列表元素的实际类型
-        if (Values.Count == 0 && Value.Count > 0)
-        {
-            // 如果Values为空但Value有元素，尝试从Value中推导类型
-            var firstType = Value[0].OutputType(null!);
-            // 检查所有元素是否为同一类型
-            foreach (var expr in Value)
-            {
-                var exprType = expr.OutputType(null!);
-                if (exprType != firstType)
-                {
-                    return typeof(object);
-                }
-            }
-
-            return firstType ?? typeof(object);
-        }
-        else if (Values.Count > 0)
-        {
-            // 如果Values不为空，从Values中推导类型
-            var firstType = Values[0].GetType();
-            // 检查所有元素是否为同一类型
-            foreach (var value in Values)
-            {
-                if (value.GetType() != firstType)
-                {
-                    return typeof(object);
-                }
-            }
-
-            return firstType;
-        }
-
-        return typeof(object);
-    }
-
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 确定列表元素的类型
@@ -165,28 +127,18 @@ public class ListLangValue : LangValueType, ILangList
         {
             itemType = Value[0].OutputType(local);
             // 检查所有元素是否为同一类型
-            foreach (var expr in Value)
+            if (Value.Select(expr => expr.OutputType(local)).Any(exprType => exprType != itemType))
             {
-                var exprType = expr.OutputType(local);
-                if (exprType != itemType)
-                {
-                    itemType = typeof(object);
-                    break;
-                }
+                itemType = typeof(object);
             }
         }
         else if (Values.Count > 0)
         {
             itemType = Values[0].OutputType(local);
             // 检查所有元素是否为同一类型
-            foreach (var value in Values)
+            if (Values.Select(value => value.OutputType(local)).Any(valueType => valueType != itemType))
             {
-                var valueType = value.OutputType(local);
-                if (valueType != itemType)
-                {
-                    itemType = typeof(object);
-                    break;
-                }
+                itemType = typeof(object);
             }
         }
 
@@ -232,14 +184,9 @@ public class ListLangValue : LangValueType, ILangList
         {
             itemType = Value[0].OutputType(local);
             // 检查所有元素是否为同一类型
-            foreach (var expr in Value)
+            if (Value.Select(expr => expr.OutputType(local)).Any(exprType => exprType != itemType))
             {
-                var exprType = expr.OutputType(local);
-                if (exprType != itemType)
-                {
-                    itemType = typeof(object);
-                    break;
-                }
+                itemType = typeof(object);
             }
         }
         else if (Values.Count > 0)
