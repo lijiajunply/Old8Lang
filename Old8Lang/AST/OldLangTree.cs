@@ -10,8 +10,6 @@ public interface IVisitor<out T>
 
     // 中间表达式节点
     T Visit(Expression.Intermediates.ErrorLangValue node);
-    T Visit(Expression.Intermediates.ILangList node);
-    T Visit(Expression.Intermediates.ImportInfo node);
     T Visit(Expression.Value.Instance node);
     T Visit(Expression.Intermediates.NativeAnyLangValue node);
     T Visit(Expression.Intermediates.NativeStaticAny node);
@@ -52,11 +50,11 @@ public interface IVisitor<out T>
     T Visit(Statement.IfStatement node);
     T Visit(Statement.ImportStatement node);
     T Visit(Statement.NativeStatement node);
-    T Visit(Statement.OldIf node);
+    T Visit(Statement.IfChild node);
     T Visit(Statement.ReturnStatement node);
     T Visit(Statement.SetStatement node);
     T Visit(Statement.SwitchStatement node);
-    T Visit(Statement.OldCase node);
+    T Visit(Statement.CaseStatement node);
     T Visit(Statement.ThrowStatement node);
     T Visit(Statement.TryStatement node);
     T Visit(Statement.WhileStatement node);
@@ -81,7 +79,7 @@ public interface IOldLangTree
 
 public class MockLangTree : IOldLangTree
 {
-    public SourcePosition Position { get; }
+    public SourcePosition Position { get; } = new();
 
     public T Accept<T>(IVisitor<T> visitor)
     {

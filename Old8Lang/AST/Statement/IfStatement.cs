@@ -10,8 +10,8 @@ namespace Old8Lang.AST.Statement;
 /// if语句
 /// </summary>
 public class IfStatement(
-    OldIf ifBlock,
-    List<OldIf?> elifBlock,
+    IfChild ifChildBlock,
+    List<IfChild?> elifBlock,
     BlockStatement? elseBlockStatement,
     SourcePosition position = default)
     : OldStatement(position)
@@ -22,9 +22,9 @@ public class IfStatement(
     {
         var r = true;
         manager.AddChildren();
-        ifBlock.Run(manager, ref r);
+        ifChildBlock.Run(manager, ref r);
         manager.RemoveChildren();
-        foreach (var variable in elifBlock.OfType<OldIf>())
+        foreach (var variable in elifBlock.OfType<IfChild>())
         {
             manager.AddChildren();
             variable.Run(manager, ref r);
@@ -41,16 +41,16 @@ public class IfStatement(
         var labelEnd = ilGenerator.DefineLabel();
 
         // 处理 if 块
-        ifBlock.GenerateConditionIl(ilGenerator, local);
+        ifChildBlock.GenerateConditionIl(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Brfalse, labelElse);
 
         // if 部分
-        ifBlock.GenerateIl(ilGenerator, local);
+        ifChildBlock.GenerateIl(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Br, labelEnd);
 
         // 处理 elif 块
         ilGenerator.MarkLabel(labelElse);
-        foreach (var elif in elifBlock.OfType<OldIf>())
+        foreach (var elif in elifBlock.OfType<IfChild>())
         {
             var nextElif = ilGenerator.DefineLabel();
             elif.GenerateConditionIl(ilGenerator, local);
@@ -76,7 +76,7 @@ public class IfStatement(
         {
             if (index == 0)
             {
-                return ifBlock;
+                return ifChildBlock;
             }
 
             if (index == elifBlock.Count)
@@ -93,8 +93,8 @@ public class IfStatement(
     public override string ToString()
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"if {ifBlock}");
-        foreach (var elif in elifBlock.OfType<OldIf>())
+        sb.AppendLine($"if {ifChildBlock}");
+        foreach (var elif in elifBlock.OfType<IfChild>())
         {
             sb.AppendLine($"elif {elif}");
         }

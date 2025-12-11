@@ -7,7 +7,7 @@ namespace Old8Lang.AST.Statement;
 
 public class SwitchStatement(
     LangExpression switchExpression,
-    List<OldCase> switchCaseList,
+    List<CaseStatement> switchCaseList,
     BlockStatement? defaultBlockStatement = null,
     SourcePosition position = default)
     : OldStatement(position)
@@ -145,7 +145,7 @@ public class SwitchStatement(
     public override int Count => switchCaseList.Count;
 }
 
-public class OldCase(LangExpression expression, BlockStatement blockStatement, SourcePosition position = default)
+public class CaseStatement(LangExpression expression, BlockStatement blockStatement, SourcePosition position = default)
     : OldStatement(position)
 {
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);

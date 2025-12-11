@@ -4,7 +4,7 @@ using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Statement;
 
-public class OldIf(LangExpression expression, BlockStatement blockStatement, SourcePosition position = default)
+public class IfChild(LangExpression expression, BlockStatement blockStatement, SourcePosition position = default)
     : OldStatement(position)
 {
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);

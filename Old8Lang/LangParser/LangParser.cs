@@ -656,7 +656,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         Expect(LangTokenType.If);
         var condition = ParseExpression();
         var ifBlock = ParseBlock();
-        var oldIfs = new List<OldIf?>();
+        var oldIfs = new List<IfChild?>();
         while (CurrentToken.Type == LangTokenType.Elif)
         {
             var elifToken = CurrentToken;
@@ -664,7 +664,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var elifCondition = ParseExpression();
             var elifBlock = ParseBlock();
             var elifPosition = new SourcePosition(elifToken.Line, elifToken.Column);
-            oldIfs.Add(new OldIf(elifCondition, elifBlock, elifPosition));
+            oldIfs.Add(new IfChild(elifCondition, elifBlock, elifPosition));
         }
 
         BlockStatement? elseBlock = null;
@@ -675,7 +675,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         }
 
         var ifPosition = new SourcePosition(ifToken.Line, ifToken.Column);
-        return new IfStatement(new OldIf(condition, ifBlock, ifPosition), oldIfs, elseBlock, ifPosition);
+        return new IfStatement(new IfChild(condition, ifBlock, ifPosition), oldIfs, elseBlock, ifPosition);
     }
 
     // forStatement = "for" set "," expression "," statement block ;
@@ -746,7 +746,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         Expect(LangTokenType.Switch);
         var expression = ParseExpression();
         Expect(LangTokenType.LeftBrace);
-        var cases = new List<OldCase>();
+        var cases = new List<CaseStatement>();
         while (CurrentToken.Type == LangTokenType.Case)
         {
             cases.Add(ParseCaseBlock());
@@ -764,14 +764,14 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     }
 
     // caseBlock = "case" expression block ;
-    private OldCase ParseCaseBlock()
+    private CaseStatement ParseCaseBlock()
     {
         var caseToken = CurrentToken;
         var position = new SourcePosition(caseToken.Line, caseToken.Column, tokenValue: caseToken.Value);
         Expect(LangTokenType.Case);
         var expression = ParseExpression();
         var block = ParseBlock();
-        return new OldCase(expression, block, position);
+        return new CaseStatement(expression, block, position);
     }
 
     /// <summary>
