@@ -1,0 +1,150 @@
+// 测试大规模循环 - 性能测试
+
+PrintLine("=== 大规模循环测试 ===")
+
+// 简单循环 - 大规模迭代
+PrintLine("\n--- 简单循环累加 ---")
+sum <- 0
+for i <- 0, i < 10000, i++ {
+    sum <- sum + 1
+}
+PrintLine("循环 10000 次累加结果: " + sum)
+
+// 嵌套循环 - 中等规模
+PrintLine("\n--- 嵌套循环 ---")
+nestedSum <- 0
+for i <- 0, i < 100, i++ {
+    for j <- 0, j < 100, j++ {
+        nestedSum <- nestedSum + 1
+    }
+}
+PrintLine("100x100 嵌套循环计数: " + nestedSum)
+
+// 三层嵌套循环
+PrintLine("\n--- 三层嵌套循环 ---")
+tripleSum <- 0
+for i <- 0, i < 50, i++ {
+    for j <- 0, j < 50, j++ {
+        for k <- 0, k < 50, k++ {
+            tripleSum <- tripleSum + 1
+        }
+    }
+}
+PrintLine("50x50x50 三层嵌套循环计数: " + tripleSum)
+
+// While 循环 - 大规模
+PrintLine("\n--- While 循环 ---")
+counter <- 0
+whileSum <- 0
+while counter < 5000 {
+    whileSum <- whileSum + counter
+    counter <- counter + 1
+}
+PrintLine("While 循环 5000 次累加: " + whileSum)
+
+// For-in 循环 - 大数组
+PrintLine("\n--- For-in 循环（大数组）---")
+largeArray <- []
+for i <- 0, i < 1000, i++ {
+    largeArray <- largeArray + [i]
+}
+
+forInSum <- 0
+for item in largeArray {
+    forInSum <- forInSum + item
+}
+PrintLine("For-in 遍历 1000 元素数组，和为: " + forInSum)
+
+// 循环中的数组操作
+PrintLine("\n--- 循环中的数组操作 ---")
+dynArray <- []
+for i <- 0, i < 500, i++ {
+    dynArray <- dynArray + [i * 2]
+}
+PrintLine("动态构建 500 元素数组，最后一个元素: " + dynArray[499])
+
+// 循环中的字符串拼接
+PrintLine("\n--- 循环中的字符串拼接 ---")
+str <- ""
+for i <- 0, i < 100, i++ {
+    str <- str + "a"
+}
+PrintLine("拼接 100 个 'a'，字符串长度: " + Len(str))
+
+// 循环中的条件判断
+PrintLine("\n--- 循环中的条件判断 ---")
+evenCount <- 0
+oddCount <- 0
+for i <- 0, i < 1000, i++ {
+    if i % 2 == 0 {
+        evenCount <- evenCount + 1
+    } else {
+        oddCount <- oddCount + 1
+    }
+}
+PrintLine("0-999 中偶数个数: " + evenCount)
+PrintLine("0-999 中奇数个数: " + oddCount)
+
+// 循环中的函数调用
+PrintLine("\n--- 循环中的函数调用 ---")
+func square(x) {
+    return x * x
+}
+
+squareSum <- 0
+for i <- 1, i <= 100, i++ {
+    squareSum <- squareSum + square(i)
+}
+PrintLine("1 到 100 的平方和: " + squareSum)
+
+// 循环中的复杂表达式
+PrintLine("\n--- 循环中的复杂表达式 ---")
+complexSum <- 0
+for i <- 1, i <= 100, i++ {
+    complexSum <- complexSum + (i * i + 2 * i + 1)
+}
+PrintLine("复杂表达式累加 (i²+2i+1): " + complexSum)
+
+// Break 和 Continue 测试
+PrintLine("\n--- Break 和 Continue ---")
+breakSum <- 0
+for i <- 0, i < 1000, i++ {
+    if i > 100 {
+        break
+    }
+    breakSum <- breakSum + i
+}
+PrintLine("Break 在 100 时的累加和: " + breakSum)
+
+continueSum <- 0
+for i <- 0, i < 100, i++ {
+    if i % 3 == 0 {
+        continue
+    }
+    continueSum <- continueSum + i
+}
+PrintLine("跳过 3 的倍数的累加和: " + continueSum)
+
+// 嵌套循环中的 Break
+PrintLine("\n--- 嵌套循环中的 Break ---")
+outerBreakCount <- 0
+for i <- 0, i < 50, i++ {
+    for j <- 0, j < 50, j++ {
+        if j > 10 {
+            break
+        }
+        outerBreakCount <- outerBreakCount + 1
+    }
+}
+PrintLine("嵌套循环中内层 break 计数: " + outerBreakCount)
+
+// 性能测试：算术运算密集循环
+PrintLine("\n--- 算术运算密集循环 ---")
+arithmeticSum <- 0
+for i <- 1, i <= 1000, i++ {
+    temp <- i * 2 + i / 2 - i % 3
+    arithmeticSum <- arithmeticSum + temp
+}
+PrintLine("算术密集运算结果: " + arithmeticSum)
+
+PrintLine("\n✅ 大规模循环测试完成")

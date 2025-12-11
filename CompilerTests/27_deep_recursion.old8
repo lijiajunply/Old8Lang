@@ -1,0 +1,132 @@
+// 测试深度递归 - 性能测试
+
+PrintLine("=== 深度递归测试 ===")
+
+// 斐波那契数列 - 递归实现
+PrintLine("\n--- 斐波那契数列（递归）---")
+func fibonacci(n) {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+// 测试不同深度
+for i <- 1, i <= 15, i++ {
+    result <- fibonacci(i)
+    PrintLine("fibonacci(" + i + ") = " + result)
+}
+
+// 阶乘 - 深度递归
+PrintLine("\n--- 阶乘（深度递归）---")
+func factorial(n) {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+PrintLine("factorial(10) = " + factorial(10))
+PrintLine("factorial(15) = " + factorial(15))
+PrintLine("factorial(20) = " + factorial(20))
+
+// 汉诺塔问题
+PrintLine("\n--- 汉诺塔问题 ---")
+moveCount <- 0
+
+func hanoi(n, from, to, aux) {
+    if n == 1 {
+        moveCount <- moveCount + 1
+    } else {
+        hanoi(n - 1, from, aux, to)
+        moveCount <- moveCount + 1
+        hanoi(n - 1, aux, to, from)
+    }
+}
+
+hanoi(5, "A", "C", "B")
+PrintLine("移动 5 个盘子需要 " + moveCount + " 步")
+
+moveCount <- 0
+hanoi(10, "A", "C", "B")
+PrintLine("移动 10 个盘子需要 " + moveCount + " 步")
+
+// 阿克曼函数 - 极高复杂度递归
+PrintLine("\n--- 阿克曼函数 ---")
+func ackermann(m, n) {
+    if m == 0 {
+        return n + 1
+    }
+    if n == 0 {
+        return ackermann(m - 1, 1)
+    }
+    return ackermann(m - 1, ackermann(m, n - 1))
+}
+
+PrintLine("ackermann(0, 0) = " + ackermann(0, 0))
+PrintLine("ackermann(1, 2) = " + ackermann(1, 2))
+PrintLine("ackermann(2, 3) = " + ackermann(2, 3))
+PrintLine("ackermann(3, 2) = " + ackermann(3, 2))
+
+// 二叉树遍历 - 递归
+PrintLine("\n--- 递归计算二叉树深度 ---")
+func treeDepth(depth) {
+    if depth <= 0 {
+        return 0
+    }
+    leftDepth <- treeDepth(depth - 1)
+    rightDepth <- treeDepth(depth - 1)
+    if leftDepth > rightDepth {
+        return leftDepth + 1
+    }
+    return rightDepth + 1
+}
+
+PrintLine("树深度 5 的计算: " + treeDepth(5))
+PrintLine("树深度 8 的计算: " + treeDepth(8))
+
+// 最大公约数 - 欧几里得算法
+PrintLine("\n--- 最大公约数（递归）---")
+func gcd(a, b) {
+    if b == 0 {
+        return a
+    }
+    return gcd(b, a % b)
+}
+
+PrintLine("gcd(48, 18) = " + gcd(48, 18))
+PrintLine("gcd(100, 35) = " + gcd(100, 35))
+PrintLine("gcd(1071, 462) = " + gcd(1071, 462))
+
+// 组合数计算 - 递归
+PrintLine("\n--- 组合数 C(n, k) ---")
+func combination(n, k) {
+    if k == 0 {
+        return 1
+    }
+    if k == n {
+        return 1
+    }
+    return combination(n - 1, k - 1) + combination(n - 1, k)
+}
+
+PrintLine("C(5, 2) = " + combination(5, 2))
+PrintLine("C(10, 3) = " + combination(10, 3))
+PrintLine("C(8, 4) = " + combination(8, 4))
+
+// 字符串反转 - 递归
+PrintLine("\n--- 字符串反转（递归）---")
+func reverseString(str) {
+    len <- Len(str)
+    if len <= 1 {
+        return str
+    }
+    firstChar <- str[0]
+    restReversed <- reverseString(str[1:len])
+    return restReversed + firstChar
+}
+
+PrintLine("reverse('hello') = " + reverseString("hello"))
+PrintLine("reverse('recursion') = " + reverseString("recursion"))
+
+PrintLine("\n✅ 深度递归测试完成")

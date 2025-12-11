@@ -1,0 +1,228 @@
+// 测试边界条件
+
+PrintLine("=== 边界条件测试 ===")
+
+// 空值测试
+PrintLine("\n--- 空值测试 ---")
+emptyString <- ""
+PrintLine("空字符串长度: " + Len(emptyString))
+PrintLine("空字符串: '" + emptyString + "'")
+
+emptyArray <- []
+PrintLine("空数组长度: " + Len(emptyArray))
+
+emptyList <- list[]
+PrintLine("空列表长度: " + Len(emptyList))
+
+emptyDict <- {}
+PrintLine("空字典键数量: " + Len(emptyDict))
+
+// 零值测试
+PrintLine("\n--- 零值测试 ---")
+zero <- 0
+PrintLine("整数零: " + zero)
+PrintLine("零加零: " + (zero + zero))
+PrintLine("零乘以任意数: " + (zero * 100))
+
+zeroFloat <- 0.0
+PrintLine("浮点零: " + zeroFloat)
+PrintLine("浮点零相等性: " + (zero == zeroFloat))
+
+// 单元素集合
+PrintLine("\n--- 单元素集合 ---")
+singleArray <- [42]
+PrintLine("单元素数组: " + singleArray[0])
+PrintLine("单元素数组长度: " + Len(singleArray))
+
+singleList <- list[99]
+PrintLine("单元素列表: " + singleList[0])
+
+singleDict <- {"key": "value"}
+PrintLine("单键值对字典: " + singleDict["key"])
+
+// 整数极值测试
+PrintLine("\n--- 整数边界值测试 ---")
+largeInt <- 2147483647
+PrintLine("大整数: " + largeInt)
+PrintLine("大整数加 1: " + (largeInt + 1))
+
+negativeInt <- -2147483648
+PrintLine("负整数: " + negativeInt)
+PrintLine("负整数减 1: " + (negativeInt - 1))
+
+// 浮点数特殊值测试
+PrintLine("\n--- 浮点数边界值 ---")
+verySmall <- 0.0000001
+PrintLine("非常小的浮点数: " + verySmall)
+
+veryLarge <- 999999999.999999
+PrintLine("非常大的浮点数: " + veryLarge)
+
+negativeFloat <- -999999999.999999
+PrintLine("负浮点数: " + negativeFloat)
+
+// 字符串边界
+PrintLine("\n--- 字符串边界 ---")
+singleChar <- "a"
+PrintLine("单字符字符串: " + singleChar)
+PrintLine("单字符字符串长度: " + Len(singleChar))
+
+longString <- ""
+for i <- 0, i < 100, i++ {
+    longString <- longString + "x"
+}
+PrintLine("长字符串长度: " + Len(longString))
+PrintLine("长字符串前 10 个字符: " + longString[0:10])
+
+// Unicode 和特殊字符
+PrintLine("\n--- 特殊字符测试 ---")
+chineseString <- "你好世界"
+PrintLine("中文字符串: " + chineseString)
+PrintLine("中文字符串长度: " + Len(chineseString))
+
+specialChars <- "!@#$%^&*()"
+PrintLine("特殊字符: " + specialChars)
+
+newlineString <- "第一行\n第二行"
+PrintLine("包含换行符的字符串:")
+PrintLine(newlineString)
+
+// 数组索引边界
+PrintLine("\n--- 数组索引边界 ---")
+testArray <- [10, 20, 30, 40, 50]
+PrintLine("数组: [10, 20, 30, 40, 50]")
+PrintLine("第一个元素 [0]: " + testArray[0])
+PrintLine("最后一个元素 [4]: " + testArray[4])
+
+// 负数索引（如果支持）
+PrintLine("\n--- 切片边界 ---")
+sliceTest <- [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+PrintLine("原数组: [0-9]")
+
+slice1 <- sliceTest[0:1]
+PrintLine("切片 [0:1]: " + slice1)
+
+slice2 <- sliceTest[0:0]
+PrintLine("切片 [0:0]: " + slice2)
+
+slice3 <- sliceTest[5:10]
+PrintLine("切片 [5:10]: " + slice3)
+
+// 布尔值边界
+PrintLine("\n--- 布尔值测试 ---")
+trueValue <- true
+falseValue <- false
+PrintLine("true: " + trueValue)
+PrintLine("false: " + falseValue)
+PrintLine("true and false: " + (trueValue and falseValue))
+PrintLine("true or false: " + (trueValue or falseValue))
+PrintLine("not true: " + (not trueValue))
+PrintLine("not false: " + (not falseValue))
+
+// 空集合操作
+PrintLine("\n--- 空集合操作 ---")
+emptyArr <- []
+emptyArr <- emptyArr + [1]
+PrintLine("空数组添加元素后: " + emptyArr)
+
+emptyDict2 <- {}
+emptyDict2["first"] <- "value"
+PrintLine("空字典添加键值对后: " + emptyDict2["first"])
+
+// 类型边界
+PrintLine("\n--- 类型边界测试 ---")
+intToStr <- 123
+PrintLine("整数: " + intToStr)
+
+floatToStr <- 3.14
+PrintLine("浮点数: " + floatToStr)
+
+boolToStr <- true
+PrintLine("布尔值: " + boolToStr)
+
+// 除法边界
+PrintLine("\n--- 除法边界 ---")
+div1 <- 10 / 3
+PrintLine("10 / 3 = " + div1)
+
+div2 <- 1 / 2
+PrintLine("1 / 2 = " + div2)
+
+div3 <- 7 / 7
+PrintLine("7 / 7 = " + div3)
+
+// 取模边界
+PrintLine("\n--- 取模边界 ---")
+mod1 <- 10 % 3
+PrintLine("10 % 3 = " + mod1)
+
+mod2 <- 5 % 5
+PrintLine("5 % 5 = " + mod2)
+
+mod3 <- 3 % 10
+PrintLine("3 % 10 = " + mod3)
+
+// 幂运算边界
+PrintLine("\n--- 幂运算边界 ---")
+pow1 <- 2 ^ 0
+PrintLine("2 ^ 0 = " + pow1)
+
+pow2 <- 0 ^ 5
+PrintLine("0 ^ 5 = " + pow2)
+
+pow3 <- 1 ^ 100
+PrintLine("1 ^ 100 = " + pow3)
+
+// 范围边界
+PrintLine("\n--- 范围边界 ---")
+range1 <- 0..5
+PrintLine("范围 0..5: " + range1)
+
+range2 <- 5..5
+PrintLine("范围 5..5: " + range2)
+
+// 嵌套结构边界
+PrintLine("\n--- 嵌套结构边界 ---")
+deepNested <- [[[[1]]]]
+PrintLine("深度嵌套数组: " + deepNested[0][0][0][0])
+
+nestedDict <- {"a": {"b": {"c": "value"}}}
+PrintLine("深度嵌套字典: " + nestedDict["a"]["b"]["c"])
+
+// 元组边界
+PrintLine("\n--- 元组边界 ---")
+singleTuple <- (42,)
+PrintLine("单元素元组: " + singleTuple)
+
+emptyTupleTest <- ()
+PrintLine("空元组: " + emptyTupleTest)
+
+largeTuple <- (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+PrintLine("大元组第一个元素: " + largeTuple[0])
+PrintLine("大元组最后一个元素: " + largeTuple[9])
+
+// 函数参数边界
+PrintLine("\n--- 函数参数边界 ---")
+func noParam() {
+    return "无参数函数"
+}
+PrintLine(noParam())
+
+func oneParam(a) {
+    return "单参数: " + a
+}
+PrintLine(oneParam(100))
+
+func manyParams(a, b, c, d, e) {
+    return a + b + c + d + e
+}
+PrintLine("多参数函数: " + manyParams(1, 2, 3, 4, 5))
+
+// 比较边界
+PrintLine("\n--- 比较边界 ---")
+PrintLine("0 == 0: " + (0 == 0))
+PrintLine("0.0 == 0: " + (0.0 == 0))
+PrintLine("true == true: " + (true == true))
+PrintLine("'' == '': " + ("" == ""))
+
+PrintLine("\n✅ 边界条件测试完成")

@@ -1,0 +1,191 @@
+// 测试大数据结构 - 性能测试
+
+PrintLine("=== 大数据结构测试 ===")
+
+// 大数组创建和访问
+PrintLine("\n--- 大数组创建和访问 ---")
+bigArray <- []
+for i <- 0, i < 1000, i++ {
+    bigArray <- bigArray + [i]
+}
+PrintLine("创建 1000 元素数组完成")
+PrintLine("数组长度: " + Len(bigArray))
+PrintLine("第 500 个元素: " + bigArray[500])
+PrintLine("最后一个元素: " + bigArray[999])
+
+// 大数组元素修改
+PrintLine("\n--- 大数组元素修改 ---")
+for i <- 0, i < 100, i++ {
+    bigArray[i] <- i * 10
+}
+PrintLine("修改前 100 个元素完成")
+PrintLine("bigArray[50] = " + bigArray[50])
+PrintLine("bigArray[99] = " + bigArray[99])
+
+// 大数组遍历求和
+PrintLine("\n--- 大数组遍历求和 ---")
+arraySum <- 0
+for item in bigArray {
+    arraySum <- arraySum + item
+}
+PrintLine("数组元素总和: " + arraySum)
+
+// 嵌套数组
+PrintLine("\n--- 嵌套数组 ---")
+nestedArray <- []
+for i <- 0, i < 50, i++ {
+    innerArray <- []
+    for j <- 0, j < 50, j++ {
+        innerArray <- innerArray + [i * 50 + j]
+    }
+    nestedArray <- nestedArray + [innerArray]
+}
+PrintLine("创建 50x50 嵌套数组完成")
+PrintLine("nestedArray[10][20] = " + nestedArray[10][20])
+PrintLine("nestedArray[25][25] = " + nestedArray[25][25])
+
+// 大列表操作
+PrintLine("\n--- 大列表操作 ---")
+bigList <- list[]
+for i <- 0, i < 500, i++ {
+    bigList <- bigList + [i * 2]
+}
+PrintLine("创建 500 元素列表完成")
+PrintLine("列表长度: " + Len(bigList))
+PrintLine("列表第 250 个元素: " + bigList[250])
+
+// 大字典创建和访问
+PrintLine("\n--- 大字典创建和访问 ---")
+bigDict <- {}
+for i <- 0, i < 200, i++ {
+    key <- "key" + i
+    bigDict[key] <- i * 3
+}
+PrintLine("创建 200 键值对字典完成")
+PrintLine("bigDict['key50'] = " + bigDict["key50"])
+PrintLine("bigDict['key150'] = " + bigDict["key150"])
+
+// 字典遍历
+PrintLine("\n--- 字典遍历 ---")
+dictSum <- 0
+count <- 0
+for key in bigDict {
+    dictSum <- dictSum + bigDict[key]
+    count <- count + 1
+}
+PrintLine("遍历字典，键值对数量: " + count)
+PrintLine("所有值的总和: " + dictSum)
+
+// 复杂嵌套结构
+PrintLine("\n--- 复杂嵌套结构 ---")
+complexData <- {
+    "users": [],
+    "scores": {},
+    "metadata": {
+        "count": 0,
+        "version": "1.0"
+    }
+}
+
+for i <- 0, i < 50, i++ {
+    user <- {
+        "id": i,
+        "name": "User" + i,
+        "age": 20 + i % 30
+    }
+    complexData["users"] <- complexData["users"] + [user]
+
+    scoreKey <- "user" + i
+    complexData["scores"][scoreKey] <- i * 10 + (i % 5)
+}
+
+complexData["metadata"]["count"] <- Len(complexData["users"])
+PrintLine("复杂数据结构创建完成")
+PrintLine("用户数量: " + complexData["metadata"]["count"])
+PrintLine("第 25 个用户: " + complexData["users"][25]["name"])
+PrintLine("user30 的分数: " + complexData["scores"]["user30"])
+
+// 字符串数组
+PrintLine("\n--- 字符串数组 ---")
+stringArray <- []
+for i <- 0, i < 100, i++ {
+    stringArray <- stringArray + ["String_" + i]
+}
+PrintLine("创建 100 个字符串数组完成")
+PrintLine("stringArray[50] = " + stringArray[50])
+
+// 混合类型数组
+PrintLine("\n--- 混合类型数组 ---")
+mixedArray <- [
+    1,
+    "string",
+    3.14,
+    true,
+    [1, 2, 3],
+    {"key": "value"}
+]
+for i <- 0, i < 50, i++ {
+    mixedArray <- mixedArray + [i]
+    mixedArray <- mixedArray + ["item" + i]
+}
+PrintLine("创建混合类型数组完成")
+PrintLine("数组长度: " + Len(mixedArray))
+
+// 元组数组
+PrintLine("\n--- 元组数组 ---")
+tupleArray <- []
+for i <- 0, i < 100, i++ {
+    tuple <- (i, i * 2, i * 3)
+    tupleArray <- tupleArray + [tuple]
+}
+PrintLine("创建 100 个元组数组完成")
+PrintLine("第 50 个元组的第一个元素: " + tupleArray[50][0])
+PrintLine("第 50 个元组的第二个元素: " + tupleArray[50][1])
+
+// 数组切片操作
+PrintLine("\n--- 数组切片操作 ---")
+sliceTest <- []
+for i <- 0, i < 100, i++ {
+    sliceTest <- sliceTest + [i]
+}
+slice1 <- sliceTest[0:10]
+slice2 <- sliceTest[50:60]
+slice3 <- sliceTest[90:100]
+PrintLine("切片 [0:10] 长度: " + Len(slice1))
+PrintLine("切片 [50:60] 第一个元素: " + slice2[0])
+PrintLine("切片 [90:100] 最后一个元素: " + slice3[9])
+
+// 多维数组求和
+PrintLine("\n--- 多维数组求和 ---")
+matrix <- []
+for i <- 0, i < 30, i++ {
+    row <- []
+    for j <- 0, j < 30, j++ {
+        row <- row + [i + j]
+    }
+    matrix <- matrix + [row]
+}
+
+matrixSum <- 0
+for row in matrix {
+    for val in row {
+        matrixSum <- matrixSum + val
+    }
+}
+PrintLine("30x30 矩阵求和: " + matrixSum)
+
+// 大字典键值对查找
+PrintLine("\n--- 字典键值对查找 ---")
+lookupDict <- {}
+for i <- 0, i < 300, i++ {
+    lookupDict["k" + i] <- i * i
+}
+
+lookupSum <- 0
+for i <- 0, i < 300, i <- i + 10 {
+    key <- "k" + i
+    lookupSum <- lookupSum + lookupDict[key]
+}
+PrintLine("每隔 10 个键查找并累加: " + lookupSum)
+
+PrintLine("\n✅ 大数据结构测试完成")

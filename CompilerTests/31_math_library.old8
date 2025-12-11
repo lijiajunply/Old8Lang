@@ -1,0 +1,197 @@
+// 测试 Math 库 - 编译器模式
+
+PrintLine("=== Math 库测试（编译器模式）===")
+
+// 基本算术运算
+PrintLine("\n--- 基本算术运算 ---")
+a <- 15
+b <- 7
+
+PrintLine(a + " + " + b + " = " + (a + b))
+PrintLine(a + " - " + b + " = " + (a - b))
+PrintLine(a + " * " + b + " = " + (a * b))
+PrintLine(a + " / " + b + " = " + (a / b))
+PrintLine(a + " % " + b + " = " + (a % b))
+
+// 幂运算
+PrintLine("\n--- 幂运算 ---")
+PrintLine("2 ^ 10 = " + (2 ^ 10))
+PrintLine("5 ^ 3 = " + (5 ^ 3))
+PrintLine("10 ^ 0 = " + (10 ^ 0))
+PrintLine("3 ^ 5 = " + (3 ^ 5))
+
+// 浮点数运算
+PrintLine("\n--- 浮点数运算 ---")
+x <- 3.14159
+y <- 2.71828
+
+PrintLine(x + " + " + y + " = " + (x + y))
+PrintLine(x + " - " + y + " = " + (x - y))
+PrintLine(x + " * " + y + " = " + (x * y))
+PrintLine(x + " / " + y + " = " + (x / y))
+
+// 混合运算
+PrintLine("\n--- 混合运算 ---")
+result1 <- 2 + 3 * 4 - 5
+PrintLine("2 + 3 * 4 - 5 = " + result1)
+
+result2 <- (2 + 3) * (4 - 5)
+PrintLine("(2 + 3) * (4 - 5) = " + result2)
+
+result3 <- 10 / 2 + 5 * 3
+PrintLine("10 / 2 + 5 * 3 = " + result3)
+
+result4 <- 2 ^ 3 + 4 ^ 2 - 1
+PrintLine("2 ^ 3 + 4 ^ 2 - 1 = " + result4)
+
+// 比较运算
+PrintLine("\n--- 比较运算 ---")
+n1 <- 10
+n2 <- 20
+n3 <- 10
+
+PrintLine(n1 + " == " + n3 + ": " + (n1 == n3))
+PrintLine(n1 + " != " + n2 + ": " + (n1 != n2))
+PrintLine(n1 + " < " + n2 + ": " + (n1 < n2))
+PrintLine(n2 + " > " + n1 + ": " + (n2 > n1))
+PrintLine(n1 + " <= " + n3 + ": " + (n1 <= n3))
+PrintLine(n2 + " >= " + n1 + ": " + (n2 >= n1))
+
+// 浮点数比较
+PrintLine("\n--- 浮点数比较 ---")
+f1 <- 3.14
+f2 <- 2.71
+f3 <- 3.14
+
+PrintLine(f1 + " == " + f3 + ": " + (f1 == f3))
+PrintLine(f1 + " > " + f2 + ": " + (f1 > f2))
+PrintLine(f2 + " < " + f1 + ": " + (f2 < f1))
+
+// 零值和一值测试
+PrintLine("\n--- 零值和一值测试 ---")
+zero <- 0
+one <- 1
+num <- 42
+
+PrintLine(num + " + 0 = " + (num + zero))
+PrintLine(num + " - 0 = " + (num - zero))
+PrintLine(num + " * 0 = " + (num * zero))
+PrintLine(num + " * 1 = " + (num * one))
+PrintLine(num + " / 1 = " + (num / one))
+PrintLine("0 + " + num + " = " + (zero + num))
+
+// 负数运算
+PrintLine("\n--- 负数运算 ---")
+neg1 <- -15
+neg2 <- -7
+
+PrintLine(neg1 + " + " + neg2 + " = " + (neg1 + neg2))
+PrintLine(neg1 + " - " + neg2 + " = " + (neg1 - neg2))
+PrintLine(neg1 + " * " + neg2 + " = " + (neg1 * neg2))
+PrintLine(neg1 + " / " + neg2 + " = " + (neg1 / neg2))
+
+// 数学函数测试（如果有内置函数）
+PrintLine("\n--- 数学表达式测试 ---")
+
+// 阶乘函数
+func factorial(n) {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+PrintLine("5! = " + factorial(5))
+PrintLine("10! = " + factorial(10))
+
+// 平方函数
+func square(x) {
+    return x * x
+}
+
+PrintLine("square(5) = " + square(5))
+PrintLine("square(12) = " + square(12))
+
+// 立方函数
+func cube(x) {
+    return x * x * x
+}
+
+PrintLine("cube(3) = " + cube(3))
+PrintLine("cube(5) = " + cube(5))
+
+// 平均值函数
+func average(a, b, c) {
+    return (a + b + c) / 3
+}
+
+PrintLine("average(10, 20, 30) = " + average(10, 20, 30))
+
+// 最大值函数
+func max(a, b) {
+    if a > b {
+        return a
+    }
+    return b
+}
+
+PrintLine("max(15, 27) = " + max(15, 27))
+PrintLine("max(100, 50) = " + max(100, 50))
+
+// 最小值函数
+func min(a, b) {
+    if a < b {
+        return a
+    }
+    return b
+}
+
+PrintLine("min(15, 27) = " + min(15, 27))
+PrintLine("min(100, 50) = " + min(100, 50))
+
+// 绝对值函数
+func abs(x) {
+    if x < 0 {
+        return -x
+    }
+    return x
+}
+
+PrintLine("abs(-15) = " + abs(-15))
+PrintLine("abs(25) = " + abs(25))
+PrintLine("abs(0) = " + abs(0))
+
+// 幂函数（递归实现）
+func power(base, exp) {
+    if exp == 0 {
+        return 1
+    }
+    if exp == 1 {
+        return base
+    }
+    return base * power(base, exp - 1)
+}
+
+PrintLine("power(2, 8) = " + power(2, 8))
+PrintLine("power(3, 4) = " + power(3, 4))
+
+// 最大公约数
+func gcd(a, b) {
+    if b == 0 {
+        return a
+    }
+    return gcd(b, a % b)
+}
+
+PrintLine("gcd(48, 18) = " + gcd(48, 18))
+PrintLine("gcd(100, 35) = " + gcd(100, 35))
+
+// 复杂数学运算
+PrintLine("\n--- 复杂数学运算 ---")
+complexResult <- (10 + 5) * (8 - 3) / 2 + 4 ^ 2
+PrintLine("(10+5)*(8-3)/2+4^2 = " + complexResult)
+
+nestedResult <- ((2 + 3) * 4 - 5) / ((6 - 2) * 2)
+PrintLine("((2+3)*4-5)/((6-2)*2) = " + nestedResult)
+
+PrintLine("\n✅ Math 库测试完成")

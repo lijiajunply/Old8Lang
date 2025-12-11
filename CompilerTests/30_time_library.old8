@@ -1,0 +1,121 @@
+// 测试 Time 库 - 编译器模式
+
+import Time
+
+PrintLine("=== Time 库测试（编译器模式）===")
+
+// GetTimeNow 测试
+PrintLine("\n--- GetTimeNow 函数测试 ---")
+currentTime1 <- GetTimeNow("yyyy-MM-dd HH:mm:ss")
+PrintLine("当前时间: " + currentTime1)
+
+currentTime2 <- GetTimeNow("yyyy/MM/dd")
+PrintLine("日期格式: " + currentTime2)
+
+currentTime3 <- GetTimeNow("HH:mm:ss")
+PrintLine("时间格式: " + currentTime3)
+
+// TimeStamp 测试
+PrintLine("\n--- TimeStamp 函数测试 ---")
+ts1 <- TimeStamp()
+PrintLine("时间戳 1: " + ts1)
+
+// 简单延时（通过循环）
+sum <- 0
+for i <- 0, i < 100, i++ {
+    sum <- sum + i
+}
+
+ts2 <- TimeStamp()
+PrintLine("时间戳 2: " + ts2)
+PrintLine("时间戳差异: " + (ts2 - ts1))
+
+// TimeFormat 测试
+PrintLine("\n--- TimeFormat 函数测试 ---")
+formats <- TimeFormat()
+PrintLine("可用的时间格式数量: " + Len(formats))
+
+// TimeStart 和 TimeStop 测试
+PrintLine("\n--- TimeStart 和 TimeStop 测试 ---")
+
+// 测试 1: 简单循环计时
+PrintLine("测试 1: 1000 次循环")
+TimeStart()
+loopSum <- 0
+for i <- 0, i < 1000, i++ {
+    loopSum <- loopSum + i
+}
+elapsed1 <- TimeStop()
+PrintLine("结果: " + loopSum)
+PrintLine("耗时: " + elapsed1 + " 毫秒")
+
+// 测试 2: 函数调用计时
+PrintLine("\n测试 2: 函数调用")
+func fibonacci(n) {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+TimeStart()
+fibResult <- fibonacci(15)
+elapsed2 <- TimeStop()
+PrintLine("fibonacci(15) = " + fibResult)
+PrintLine("耗时: " + elapsed2 + " 毫秒")
+
+// 测试 3: 数组操作计时
+PrintLine("\n测试 3: 数组操作")
+TimeStart()
+arr <- []
+for i <- 0, i < 500, i++ {
+    arr <- arr + [i * 2]
+}
+elapsed3 <- TimeStop()
+PrintLine("创建 500 元素数组")
+PrintLine("耗时: " + elapsed3 + " 毫秒")
+
+// 测试 4: 字符串拼接计时
+PrintLine("\n测试 4: 字符串拼接")
+TimeStart()
+str <- ""
+for i <- 0, i < 100, i++ {
+    str <- str + "a"
+}
+elapsed4 <- TimeStop()
+PrintLine("拼接 100 个字符")
+PrintLine("字符串长度: " + Len(str))
+PrintLine("耗时: " + elapsed4 + " 毫秒")
+
+// 测试 5: 字典操作计时
+PrintLine("\n测试 5: 字典操作")
+TimeStart()
+dict <- {}
+for i <- 0, i < 200, i++ {
+    key <- "key" + i
+    dict[key] <- i * 3
+}
+elapsed5 <- TimeStop()
+PrintLine("创建 200 键值对字典")
+PrintLine("耗时: " + elapsed5 + " 毫秒")
+
+// 综合测试
+PrintLine("\n--- 综合时间测试 ---")
+PrintLine("开始时间: " + GetTimeNow("yyyy-MM-dd HH:mm:ss"))
+PrintLine("开始时间戳: " + TimeStamp())
+
+TimeStart()
+// 执行一些复杂操作
+complexSum <- 0
+for i <- 0, i < 100, i++ {
+    for j <- 0, j < 100, j++ {
+        complexSum <- complexSum + (i * j)
+    }
+}
+complexElapsed <- TimeStop()
+
+PrintLine("复杂计算结果: " + complexSum)
+PrintLine("计算耗时: " + complexElapsed + " 毫秒")
+PrintLine("结束时间: " + GetTimeNow("yyyy-MM-dd HH:mm:ss"))
+
+PrintLine("\n✅ Time 库测试完成")

@@ -1,0 +1,334 @@
+// 测试高级控制流语句
+
+PrintLine("=== 高级控制流测试 ===")
+
+// 嵌套循环中的 Break
+PrintLine("\n--- 嵌套循环中的 Break ---")
+outerCount <- 0
+innerBreakCount <- 0
+
+for i <- 0, i < 5, i++ {
+    outerCount <- outerCount + 1
+    for j <- 0, j < 10, j++ {
+        if j == 3 {
+            break
+        }
+        innerBreakCount <- innerBreakCount + 1
+    }
+}
+
+PrintLine("外层循环次数: " + outerCount)
+PrintLine("内层循环实际执行次数: " + innerBreakCount)
+
+// 嵌套循环中的 Continue
+PrintLine("\n--- 嵌套循环中的 Continue ---")
+continueSum <- 0
+
+for i <- 0, i < 5, i++ {
+    for j <- 0, j < 5, j++ {
+        if j % 2 == 0 {
+            continue
+        }
+        continueSum <- continueSum + 1
+    }
+}
+
+PrintLine("跳过偶数后的计数: " + continueSum)
+
+// 多层嵌套循环 Break
+PrintLine("\n--- 多层嵌套循环 Break ---")
+found <- false
+targetI <- 0
+targetJ <- 0
+targetK <- 0
+
+for i <- 0, i < 10, i++ {
+    if found {
+        break
+    }
+    for j <- 0, j < 10, j++ {
+        if found {
+            break
+        }
+        for k <- 0, k < 10, k++ {
+            if i + j + k == 15 {
+                targetI <- i
+                targetJ <- j
+                targetK <- k
+                found <- true
+                break
+            }
+        }
+    }
+}
+
+PrintLine("找到目标: i=" + targetI + ", j=" + targetJ + ", k=" + targetK)
+
+// Switch 中的 Break
+PrintLine("\n--- Switch 中的 Break ---")
+for value <- 0, value < 5, value++ {
+    switch value {
+        case 0:
+            PrintLine("Case 0")
+            break
+        case 1:
+            PrintLine("Case 1")
+            break
+        case 2:
+            PrintLine("Case 2")
+            break
+        default:
+            PrintLine("Default case: " + value)
+    }
+}
+
+// 复杂 Switch-Case
+PrintLine("\n--- 复杂 Switch-Case ---")
+func evaluateGrade(score) {
+    switch true {
+        case score >= 90:
+            return "优秀"
+        case score >= 80:
+            return "良好"
+        case score >= 70:
+            return "中等"
+        case score >= 60:
+            return "及格"
+        default:
+            return "不及格"
+    }
+}
+
+scores <- [95, 85, 75, 65, 55]
+for score in scores {
+    grade <- evaluateGrade(score)
+    PrintLine("分数 " + score + ": " + grade)
+}
+
+// While 循环中的 Break 和 Continue
+PrintLine("\n--- While 循环中的 Break 和 Continue ---")
+counter <- 0
+whileSum <- 0
+
+while counter < 20 {
+    counter <- counter + 1
+
+    if counter == 10 {
+        continue
+    }
+
+    if counter > 15 {
+        break
+    }
+
+    whileSum <- whileSum + counter
+}
+
+PrintLine("While 循环累加结果: " + whileSum)
+PrintLine("Counter 值: " + counter)
+
+// For-in 循环中的 Break
+PrintLine("\n--- For-in 循环中的 Break ---")
+array <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+forInSum <- 0
+
+for item in array {
+    if item > 5 {
+        break
+    }
+    forInSum <- forInSum + item
+}
+
+PrintLine("For-in Break 后的和: " + forInSum)
+
+// For-in 循环中的 Continue
+PrintLine("\n--- For-in 循环中的 Continue ---")
+forInContinueSum <- 0
+
+for item in array {
+    if item % 2 == 0 {
+        continue
+    }
+    forInContinueSum <- forInContinueSum + item
+}
+
+PrintLine("For-in Continue 跳过偶数后的和: " + forInContinueSum)
+
+// 异常传播链
+PrintLine("\n--- 异常传播链 ---")
+func level4() {
+    throw "Level 4 异常"
+}
+
+func level3() {
+    PrintLine("Level 3 调用 Level 4")
+    level4()
+}
+
+func level2() {
+    PrintLine("Level 2 调用 Level 3")
+    level3()
+}
+
+func level1() {
+    PrintLine("Level 1 调用 Level 2")
+    level2()
+}
+
+try {
+    level1()
+} catch e {
+    PrintLine("在顶层捕获异常: " + e)
+}
+
+// 中间层捕获异常
+PrintLine("\n--- 中间层捕获异常 ---")
+func innerFunc() {
+    throw "内部异常"
+}
+
+func middleFunc() {
+    try {
+        innerFunc()
+    } catch e {
+        PrintLine("中间层捕获: " + e)
+        throw "重新抛出: " + e
+    }
+}
+
+func outerFunc() {
+    try {
+        middleFunc()
+    } catch e {
+        PrintLine("外层捕获: " + e)
+    }
+}
+
+outerFunc()
+
+// 条件异常抛出
+PrintLine("\n--- 条件异常抛出 ---")
+func checkValue(val) {
+    if val < 0 {
+        throw "值不能为负数: " + val
+    }
+    if val > 100 {
+        throw "值不能大于100: " + val
+    }
+    return "有效值: " + val
+}
+
+testValues <- [-5, 50, 150]
+for val in testValues {
+    try {
+        result <- checkValue(val)
+        PrintLine(result)
+    } catch e {
+        PrintLine("验证失败: " + e)
+    }
+}
+
+// Finally 中的清理操作
+PrintLine("\n--- Finally 清理操作 ---")
+func resourceOperation(shouldFail) {
+    try {
+        PrintLine("开始操作资源")
+        if shouldFail {
+            throw "操作失败"
+        }
+        PrintLine("操作成功")
+    } catch e {
+        PrintLine("捕获错误: " + e)
+    } finally {
+        PrintLine("清理资源（总是执行）")
+    }
+}
+
+resourceOperation(false)
+PrintLine("")
+resourceOperation(true)
+
+// 循环中的异常处理
+PrintLine("\n--- 循环中的异常处理 ---")
+func processItem(item) {
+    if item == 3 {
+        throw "Item 3 处理失败"
+    }
+    return item * 2
+}
+
+processedItems <- []
+for i <- 1, i <= 5, i++ {
+    try {
+        result <- processItem(i)
+        processedItems <- processedItems + [result]
+        PrintLine("处理 item " + i + ": " + result)
+    } catch e {
+        PrintLine("错误: " + e)
+    }
+}
+
+PrintLine("成功处理的项: " + processedItems)
+
+// 复杂控制流组合
+PrintLine("\n--- 复杂控制流组合 ---")
+for outer <- 1, outer <= 3, outer++ {
+    PrintLine("\n外层循环: " + outer)
+
+    switch outer {
+        case 1:
+            PrintLine("  执行 Case 1")
+            for inner <- 1, inner <= 3, inner++ {
+                if inner == 2 {
+                    continue
+                }
+                PrintLine("    内层: " + inner)
+            }
+        case 2:
+            PrintLine("  执行 Case 2")
+            try {
+                throw "测试异常"
+            } catch e {
+                PrintLine("    捕获: " + e)
+            }
+        case 3:
+            PrintLine("  执行 Case 3")
+            count <- 0
+            while count < 3 {
+                count <- count + 1
+                PrintLine("    While: " + count)
+            }
+    }
+}
+
+// Return 中断循环
+PrintLine("\n--- Return 中断循环 ---")
+func findFirst(array, target) {
+    for i <- 0, i < Len(array), i++ {
+        if array[i] == target {
+            return i
+        }
+    }
+    return -1
+}
+
+searchArray <- [10, 20, 30, 40, 50]
+PrintLine("查找 30 的位置: " + findFirst(searchArray, 30))
+PrintLine("查找 99 的位置: " + findFirst(searchArray, 99))
+
+// 多重条件 Break
+PrintLine("\n--- 多重条件 Break ---")
+sum <- 0
+for i <- 1, i <= 100, i++ {
+    if sum > 100 {
+        PrintLine("和超过 100，在 i=" + i + " 处停止")
+        break
+    }
+    if i % 7 == 0 {
+        continue
+    }
+    sum <- sum + i
+}
+PrintLine("最终和: " + sum)
+
+PrintLine("\n✅ 高级控制流测试完成")

@@ -1,0 +1,264 @@
+// 测试错误处理和异常情况
+
+PrintLine("=== 错误处理测试 ===")
+
+// 除零错误
+PrintLine("\n--- 除零错误测试 ---")
+try {
+    result <- 10 / 0
+    PrintLine("10 / 0 = " + result)
+} catch e {
+    PrintLine("捕获除零错误: " + e)
+}
+
+try {
+    result <- 5 % 0
+    PrintLine("5 % 0 = " + result)
+} catch e {
+    PrintLine("捕获取模零错误: " + e)
+}
+
+// 数组越界错误
+PrintLine("\n--- 数组越界测试 ---")
+testArray <- [1, 2, 3, 4, 5]
+
+try {
+    value <- testArray[10]
+    PrintLine("testArray[10] = " + value)
+} catch e {
+    PrintLine("捕获数组越界错误: " + e)
+}
+
+try {
+    value <- testArray[-1]
+    PrintLine("testArray[-1] = " + value)
+} catch e {
+    PrintLine("捕获负索引错误: " + e)
+}
+
+// 类型错误
+PrintLine("\n--- 类型错误测试 ---")
+try {
+    str <- "hello"
+    num <- 123
+    result <- str + num
+    PrintLine("字符串+数字 = " + result)
+} catch e {
+    PrintLine("捕获类型错误: " + e)
+}
+
+// 未定义变量
+PrintLine("\n--- 未定义变量测试 ---")
+try {
+    PrintLine("未定义的变量: " + undefinedVariable)
+} catch e {
+    PrintLine("捕获未定义变量错误: " + e)
+}
+
+// 函数调用错误
+PrintLine("\n--- 函数调用错误测试 ---")
+
+// 参数数量不匹配
+func requiresTwoParams(a, b) {
+    return a + b
+}
+
+try {
+    result <- requiresTwoParams(1)
+    PrintLine("缺少参数: " + result)
+} catch e {
+    PrintLine("捕获参数不匹配错误: " + e)
+}
+
+try {
+    result <- requiresTwoParams(1, 2, 3)
+    PrintLine("参数过多: " + result)
+} catch e {
+    PrintLine("捕获参数过多错误: " + e)
+}
+
+// 调用未定义函数
+try {
+    result <- undefinedFunction()
+    PrintLine("调用未定义函数: " + result)
+} catch e {
+    PrintLine("捕获未定义函数错误: " + e)
+}
+
+// 递归溢出错误
+PrintLine("\n--- 递归溢出测试 ---")
+func infiniteRecursion(n) {
+    return infiniteRecursion(n + 1)
+}
+
+try {
+    infiniteRecursion(0)
+} catch e {
+    PrintLine("捕获递归溢出错误: " + e)
+}
+
+// 字典键不存在
+PrintLine("\n--- 字典键不存在测试 ---")
+testDict <- {"key1": "value1", "key2": "value2"}
+
+try {
+    value <- testDict["nonexistent"]
+    PrintLine("不存在的键: " + value)
+} catch e {
+    PrintLine("捕获键不存在错误: " + e)
+}
+
+// 空数组访问
+PrintLine("\n--- 空数组访问测试 ---")
+emptyArray <- []
+
+try {
+    value <- emptyArray[0]
+    PrintLine("空数组第一个元素: " + value)
+} catch e {
+    PrintLine("捕获空数组访问错误: " + e)
+}
+
+// 异常传播测试
+PrintLine("\n--- 异常传播测试 ---")
+func level3() {
+    throw "Level 3 异常"
+}
+
+func level2() {
+    level3()
+}
+
+func level1() {
+    level2()
+}
+
+try {
+    level1()
+} catch e {
+    PrintLine("捕获传播的异常: " + e)
+}
+
+// 多层 try-catch
+PrintLine("\n--- 多层 try-catch 测试 ---")
+try {
+    PrintLine("外层 try")
+    try {
+        PrintLine("内层 try")
+        throw "内层异常"
+    } catch innerE {
+        PrintLine("内层 catch: " + innerE)
+        throw "重新抛出异常"
+    }
+} catch outerE {
+    PrintLine("外层 catch: " + outerE)
+}
+
+// finally 测试
+PrintLine("\n--- finally 测试 ---")
+try {
+    PrintLine("try 块")
+    throw "测试异常"
+} catch e {
+    PrintLine("catch 块: " + e)
+} finally {
+    PrintLine("finally 块总是执行")
+}
+
+// 成功情况的 finally
+try {
+    PrintLine("成功的 try 块")
+} catch e {
+    PrintLine("不会执行的 catch")
+} finally {
+    PrintLine("成功后的 finally")
+}
+
+// 类型转换错误
+PrintLine("\n--- 类型转换错误 ---")
+try {
+    invalidNumber <- "not a number"
+    result <- invalidNumber * 2
+    PrintLine("字符串乘以数字: " + result)
+} catch e {
+    PrintLine("捕获类型转换错误: " + e)
+}
+
+// 空引用错误
+PrintLine("\n--- 空引用测试 ---")
+nullValue <- null
+try {
+    PrintLine("空值: " + nullValue)
+} catch e {
+    PrintLine("捕获空引用错误: " + e)
+}
+
+// 自定义异常
+PrintLine("\n--- 自定义异常测试 ---")
+func validateAge(age) {
+    if age < 0 {
+        throw "年龄不能为负数: " + age
+    }
+    if age > 150 {
+        throw "年龄不合理: " + age
+    }
+    return "年龄有效: " + age
+}
+
+try {
+    PrintLine(validateAge(25))
+} catch e {
+    PrintLine("捕获年龄验证错误: " + e)
+}
+
+try {
+    PrintLine(validateAge(-5))
+} catch e {
+    PrintLine("捕获年龄验证错误: " + e)
+}
+
+try {
+    PrintLine(validateAge(200))
+} catch e {
+    PrintLine("捕获年龄验证错误: " + e)
+}
+
+// 异常类型测试
+PrintLine("\n--- 不同类型异常测试 ---")
+try {
+    throw 123
+} catch e {
+    PrintLine("捕获数字异常: " + e)
+}
+
+try {
+    throw true
+} catch e {
+    PrintLine("捕获布尔异常: " + e)
+}
+
+try {
+    throw ["array", "exception"]
+} catch e {
+    PrintLine("捕获数组异常: " + e)
+}
+
+// 类成员访问错误
+PrintLine("\n--- 类成员访问错误 ---")
+class TestClass {
+    public x
+
+    func init() {
+        x <- 10
+    }
+}
+
+try {
+    obj <- TestClass()
+    PrintLine("访问存在的成员: " + obj.x)
+    PrintLine("访问不存在的成员: " + obj.y)
+} catch e {
+    PrintLine("捕获成员访问错误: " + e)
+}
+
+PrintLine("\n✅ 错误处理测试完成")
