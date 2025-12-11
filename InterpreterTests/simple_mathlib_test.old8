@@ -1,0 +1,22 @@
+// 简单的 MathLib 测试 - 直接打印结果
+import MathLib
+
+printLine("=== 简单 MathLib 测试 ===\n")
+
+printLine("测试 Abs(42.0)...")
+result1 <- Abs(42.0)
+printLine(result1)
+
+printLine("\n测试 Factorial(5)...")
+result2 <- Factorial(5)
+printLine(result2)
+
+printLine("\n测试 Max(10.0, 20.0)...")
+result3 <- Max(10.0, 20.0)
+printLine(result3)
+
+printLine("\n测试 Pow(2.0, 3.0)...")
+result4 <- Pow(2.0, 3.0)
+printLine(result4)
+
+printLine("\n=== 测试完成 ===")

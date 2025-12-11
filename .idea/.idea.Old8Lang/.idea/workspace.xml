@@ -17,19 +17,39 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/39_deep_collection_equality.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/40_type_errors.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/41_index_key_errors.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/42_arithmetic_errors.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/43_name_attribute_errors.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/44_comprehensive_errors.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/45_negative_index_error.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/46_dict_key_error.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/47_invalid_operation_error.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/2025-12-12-集合类型深度比较测试报告.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/48_new_error_types_demo.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/49_assertion_error_applied.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/50_value_error_math_applied.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/51_file_not_found_applied.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/52_exception_conversion_file.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/53_exception_conversion_value.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/54_recursion_limit.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/55_mathlib_comprehensive.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/56_mathlib_extended.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/debug_mathlib_return.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/simple_mathlib_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Error/Class1.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Error/Old8Lang.Error.csproj" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/AdditionalErrors.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/MathLib.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/MathLib.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/2025-12-12-新错误类型实际应用报告.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/2025-12-12-测试总结.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/2025-12-12-错误处理系统增强报告.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/2025-12-12-错误处理系统扩展报告.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangInfo.json" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangInfo.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/FileLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/FileLib.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/MoreMath.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OS.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OS.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Math.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/dll/Old8LangLib.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/dll/Old8LangLib.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/Time.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Time.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,11 +93,14 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/ListLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/ListLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TupleLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TupleLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangInfo.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
@@ -85,10 +108,19 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangToken.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/FileLib.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/FileLib.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/FileLib.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/OS.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/Time.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1f/4c54500e/List`1.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/35/58ca714a/RuntimeType.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/d3/7ed6bf18/FileNotFoundException.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/ec/ce83ccf2/ArgumentNullException.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -363,7 +395,7 @@
       <workItem from="1765446680033" duration="2287000" />
       <workItem from="1765449531774" duration="576000" />
       <workItem from="1765451683861" duration="981000" />
-      <workItem from="1765470025239" duration="9583000" />
+      <workItem from="1765470025239" duration="12768000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -708,7 +740,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="117" />
+    <option name="localTasksCounter" value="118" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -735,7 +767,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="加入编译加速" />
     <MESSAGE value="加入类型字段赋值" />
     <MESSAGE value="加入类中的this，但是不能使用函数" />
     <MESSAGE value="解决数组和for in语句的问题" />
@@ -760,7 +791,8 @@
     <MESSAGE value="test(parser): 增加边界情况和表达式错误测试&#10;&#10;- 添加空值、极值、嵌套结构等边界情况测试&#10;- 增加算术、比较、逻辑表达式错误测试&#10;- 添加赋值、括号、数组、字典相关错误测试&#10;- 增加函数调用、成员访问、索引访问错误测试&#10;- 添加类型转换和三元表达式错误测试&#10;- 完善特殊字符和浮点数边界测试&#10;- 增加长度极限和混合边界测试用例" />
     <MESSAGE value="feat(interpreter): 添加数组、切片和字典操作的全面测试&#10;&#10;- 实现了数组字面量创建和索引访问测试&#10;- 添加了数组切片操作和范围(Range)功能测试&#10;- 完善了列表(List)创建、访问和修改测试&#10;- 实现了嵌套数组和字典键值访问测试&#10;- 添加了字典修改和新增键值对功能验证" />
     <MESSAGE value="feat(tests): 添加 OS、Terminal、File 库实际操作测试&#10;&#10;- 新增 OS 库测试文件，验证 OSInfo 获取及多次调用功能&#10;- 新增 Terminal 库测试文件，覆盖 Title、Beep 等基础功能&#10;- 新增 File 库测试文件，测试文件读取、ZIP 压缩与解压功能&#10;- 创建测试数据文件用于 File 库测试&#10;- 修复 ObjToValue 对 List 类型的支持&#10;- 优化 OS.Process 方法支持 macOS 平台&#10;- 更新 ArrayLangValue 和 ListLangValue 构造逻辑&#10;- 改进 Operation 中数组和列表索引访问处理&#10;- 生成库函数实际测试报告并更新工作区配置" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(tests): 添加 OS、Terminal、File 库实际操作测试&#10;&#10;- 新增 OS 库测试文件，验证 OSInfo 获取及多次调用功能&#10;- 新增 Terminal 库测试文件，覆盖 Title、Beep 等基础功能&#10;- 新增 File 库测试文件，测试文件读取、ZIP 压缩与解压功能&#10;- 创建测试数据文件用于 File 库测试&#10;- 修复 ObjToValue 对 List 类型的支持&#10;- 优化 OS.Process 方法支持 macOS 平台&#10;- 更新 ArrayLangValue 和 ListLangValue 构造逻辑&#10;- 改进 Operation 中数组和列表索引访问处理&#10;- 生成库函数实际测试报告并更新工作区配置" />
+    <MESSAGE value="feat(lang): 实现集合类型深度比较功能&#10;&#10;- 为元组类型添加深度比较支持，递归比较两个元素&#10;- 修复字典类型重复添加键值对问题，清空旧值后重新加载&#10;- 优化字典深度比较逻辑，使用显式循环替代LINQ查找键&#10;- 添加完整测试用例覆盖数组、列表、字典、元组的深度比较&#10;- 支持嵌套结构比较和边界情况处理（空集合、单元素等）&#10;- 实现键顺序无关的字典比较机制&#10;- 生成详细测试报告验证功能正确性" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 实现集合类型深度比较功能&#10;&#10;- 为元组类型添加深度比较支持，递归比较两个元素&#10;- 修复字典类型重复添加键值对问题，清空旧值后重新加载&#10;- 优化字典深度比较逻辑，使用显式循环替代LINQ查找键&#10;- 添加完整测试用例覆盖数组、列表、字典、元组的深度比较&#10;- 支持嵌套结构比较和边界情况处理（空集合、单元素等）&#10;- 实现键顺序无关的字典比较机制&#10;- 生成详细测试报告验证功能正确性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

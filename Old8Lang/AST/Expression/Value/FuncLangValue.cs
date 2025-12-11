@@ -59,15 +59,75 @@ public class FuncLangValue : ImportInfo
 
             var values = ids.Select(expr => expr.Run(variateManagerFunc)).ToList();
             var a = Apis.ListToObjects(values).ToArray();
-            var invoke = Method?.Invoke(obj, a);
+
+            object? invoke;
+            try
+            {
+                invoke = Method?.Invoke(obj, a);
+            }
+            catch (System.Reflection.TargetInvocationException ex) when (ex.InnerException != null)
+            {
+                // 转换 .NET 异常为 Old8Lang 异常
+                var innerException = ex.InnerException;
+
+                // FileNotFoundException 和 DirectoryNotFoundException -> FileNotFoundError
+                if (innerException is FileNotFoundException fileEx)
+                {
+                    throw new Error.FileNotFoundError(Position, fileEx.FileName ?? "未知文件");
+                }
+                if (innerException is DirectoryNotFoundException dirEx)
+                {
+                    throw new Error.FileNotFoundError(Position, dirEx.Message);
+                }
+
+                // ArgumentException -> ValueError
+                if (innerException is ArgumentException argEx)
+                {
+                    throw new Error.ValueError(Position, argEx.Message);
+                }
+
+                // UnauthorizedAccessException -> PermissionError
+                if (innerException is UnauthorizedAccessException uaEx)
+                {
+                    throw new Error.PermissionError(Position, uaEx.Message);
+                }
+
+                // NotImplementedException -> NotImplementedError
+                if (innerException is NotImplementedException niEx)
+                {
+                    throw new Error.NotImplementedError(Position, niEx.Message);
+                }
+
+                // TimeoutException -> TimeoutError
+                if (innerException is TimeoutException toEx)
+                {
+                    throw new Error.TimeoutError(Position, toEx.Message);
+                }
+
+                // InvalidCastException -> TypeError
+                if (innerException is InvalidCastException icEx)
+                {
+                    throw new Error.TypeError(this, icEx.Message);
+                }
+
+                // OverflowException -> OverflowError
+                if (innerException is OverflowException ofEx)
+                {
+                    throw new Error.OverflowError(Position, ofEx.Message);
+                }
+
+                // 其他异常保持原样
+                throw;
+            }
 
             if (invoke is null)
                 return new VoidLangValue();
 
             var manager = new VariateManager();
-            manager.Init(new Dictionary<string, LangValueType> { { "base", ObjToValue(invoke) } });
+            var convertedValue = ObjToValue(invoke);
+            manager.Init(new Dictionary<string, LangValueType> { { "base", convertedValue } });
             manager.IsClass = false;
-            manager.Result = ObjToValue(invoke);
+            manager.Result = convertedValue;
             Func?.Run(manager, ids);
             return manager.Result;
         }
@@ -87,8 +147,12 @@ public class FuncLangValue : ImportInfo
         }
 
         // 调用方法体
-        variateManagerFunc.AddChildren();
-        variateManagerFunc.IsFunc = true; // 设置为函数上下文
+        // 递归深度检查
+        variateManagerFunc.RecursionDepth++;
+        try
+        {
+            variateManagerFunc.AddChildren();
+            variateManagerFunc.IsFunc = true; // 设置为函数上下文
 
         // 将静态成员添加到方法的变量管理器中
         var thisValue = variateManagerFunc.GetValue(new LangId("this"));
@@ -154,6 +218,12 @@ public class FuncLangValue : ImportInfo
         variateManagerFunc.RemoveChildren();
 
         return result;
+        }
+        finally
+        {
+            // 确保递归深度总是被递减
+            variateManagerFunc.RecursionDepth--;
+        }
     }
 
     public override Type OutputType(LocalManager local)

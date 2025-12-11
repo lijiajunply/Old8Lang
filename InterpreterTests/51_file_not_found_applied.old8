@@ -1,0 +1,13 @@
+// 测试实际应用的 FileNotFoundError
+// 测试 FileLib 中的文件操作错误处理
+
+import File
+
+printLine("=== FileNotFoundError 实际应用测试 ===\n")
+
+printLine("--- 测试: 读取不存在的文件（会抛出 FileNotFoundException）---")
+printLine("尝试读取文件: /nonexistent/file/path.txt")
+// 这应该抛出 FileNotFoundException
+content <- FileRead("/nonexistent/file/path.txt")
+
+// ERROR

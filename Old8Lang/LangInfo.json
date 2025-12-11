@@ -27,7 +27,7 @@
       "IsDir": false
     },
     {
-      "LibName": "Math",
+      "LibName": "MathLib",
       "Var": 0.8,
       "IsDir": false
     }

@@ -1,0 +1,19 @@
+// 测试递归深度限制
+// 验证超过最大递归深度时抛出 RecursionError
+
+printLine("=== 递归深度限制测试 ===\n")
+
+// 定义一个无限递归函数
+infiniteRecursion(n) -> {
+    printLine("递归深度: " + n.toString())
+    infiniteRecursion(n + 1)
+}
+
+printLine("--- 测试: 无限递归 ---")
+printLine("开始无限递归...")
+printLine("（应该在达到最大深度 1000 时抛出 RecursionError）\n")
+
+// 这应该在递归深度达到 1000 时抛出 RecursionError
+infiniteRecursion(1)
+
+// ERROR

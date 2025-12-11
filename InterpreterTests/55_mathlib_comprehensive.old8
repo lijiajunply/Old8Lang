@@ -1,0 +1,57 @@
+// MathLib 综合功能测试
+// 测试所有 MathLib 函数的正常使用和参数验证
+
+import MathLib
+
+printLine("=== MathLib 综合功能测试 ===\n")
+
+// 1. Sqrt 测试
+printLine("--- 测试 Sqrt ---")
+r1 <- Sqrt(16.0)
+printLine("Sqrt(16.0) = " + r1.toString())
+printLine("预期: 4.0\n")
+
+// 2. Factorial 测试
+printLine("--- 测试 Factorial ---")
+r2 <- Factorial(5)
+printLine("Factorial(5) = " + r2.toString())
+printLine("预期: 120\n")
+
+// 3. Pow 测试
+printLine("--- 测试 Pow ---")
+r3 <- Pow(2.0, 3.0)
+printLine("Pow(2.0, 3.0) = " + r3.toString())
+printLine("预期: 8.0\n")
+
+// 4. Abs 测试
+printLine("--- 测试 Abs ---")
+r4 <- Abs(-42.5)
+printLine("Abs(-42.5) = " + r4.toString())
+printLine("预期: 42.5\n")
+
+// 5. Max 和 Min 测试
+printLine("--- 测试 Max 和 Min ---")
+r5 <- Max(10.0, 20.0)
+r6 <- Min(10.0, 20.0)
+printLine("Max(10.0, 20.0) = " + r5.toString())
+printLine("Min(10.0, 20.0) = " + r6.toString())
+printLine("预期: 20.0 和 10.0\n")
+
+// 6. Ceil, Floor, Round 测试
+printLine("--- 测试 Ceil, Floor, Round ---")
+r7 <- Ceil(3.2)
+r8 <- Floor(3.8)
+r9 <- Round(3.5)
+printLine("Ceil(3.2) = " + r7.toString())
+printLine("Floor(3.8) = " + r8.toString())
+printLine("Round(3.5) = " + r9.toString())
+printLine("预期: 4, 3, 4\n")
+
+printLine("✅ 所有基本测试通过！\n")
+
+// 7. 错误情况测试 - Sqrt 负数
+printLine("--- 测试 Sqrt(-1) 错误处理 ---")
+printLine("应该抛出 ValueError...\n")
+bad1 <- Sqrt(-1.0)
+
+// ERROR

@@ -1,0 +1,40 @@
+// 测试扩展的 MathLib 功能
+import MathLib
+
+printLine("=== 扩展 MathLib 功能测试 ===\n")
+
+// 测试三角函数
+printLine("--- 三角函数测试 ---")
+pi <- GetPi()
+printLine("Pi = " + pi)
+
+angle <- pi / 4.0  // 45 度
+printLine("角度 = π/4 (45度)")
+printLine("Sin(π/4) = " + Sin(angle))
+printLine("Cos(π/4) = " + Cos(angle))
+printLine("Tan(π/4) = " + Tan(angle))
+
+printLine("\n反三角函数:")
+printLine("Asin(0.5) = " + Asin(0.5))
+printLine("Acos(0.5) = " + Acos(0.5))
+printLine("Atan(1.0) = " + Atan(1.0))
+printLine("Atan2(1.0, 1.0) = " + Atan2(1.0, 1.0))
+
+// 测试指数和对数函数
+printLine("\n--- 指数和对数函数测试 ---")
+e <- GetE()
+printLine("E = " + e)
+printLine("Exp(1.0) = " + Exp(1.0))
+printLine("Exp(2.0) = " + Exp(2.0))
+printLine("Log10(100.0) = " + Log10(100.0))
+printLine("Log10(1000.0) = " + Log10(1000.0))
+
+// 测试其他实用函数
+printLine("\n--- 其他实用函数测试 ---")
+printLine("Sign(-5.5) = " + Sign(-5.5))
+printLine("Sign(0.0) = " + Sign(0.0))
+printLine("Sign(3.7) = " + Sign(3.7))
+printLine("Trunc(3.7) = " + Trunc(3.7))
+printLine("Trunc(-3.7) = " + Trunc(-3.7))
+
+printLine("\n✅ 所有扩展功能测试完成！")

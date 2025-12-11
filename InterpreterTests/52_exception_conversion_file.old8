@@ -1,0 +1,13 @@
+// 测试异常转换层 - FileNotFoundError
+// 验证 .NET FileNotFoundException 被转换为 Old8Lang FileNotFoundError
+
+import File
+
+printLine("=== 异常转换层测试: FileNotFoundError ===\n")
+
+printLine("--- 测试: 读取不存在的文件 ---")
+printLine("尝试读取: /nonexistent/file.txt")
+// 应该抛出 Old8Lang.Error.FileNotFoundError（而不是 System.IO.FileNotFoundException）
+content <- FileRead("/nonexistent/file.txt")
+
+// ERROR

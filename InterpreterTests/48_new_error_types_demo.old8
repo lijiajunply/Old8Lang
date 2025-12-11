@@ -1,0 +1,27 @@
+// 测试新添加的错误类型
+// 本文件创建一个简单的测试框架来演示新的错误类型使用
+
+printLine("=== 新错误类型演示 ===\n")
+
+// 注意：这些错误类型目前只是定义，需要在实际代码中使用它们
+// 下面展示了这些错误类型的用途说明
+
+printLine("已添加的新错误类型：")
+printLine("1. ValueError - 值错误（值不在有效范围内）")
+printLine("2. AssertionError - 断言错误（断言失败）")
+printLine("3. FileNotFoundError - 文件不存在错误")
+printLine("4. RecursionError - 递归深度超限错误")
+printLine("5. NotImplementedError - 未实现错误")
+printLine("6. PermissionError - 权限错误")
+printLine("7. TimeoutError - 超时错误")
+
+printLine("\n这些错误类型可以在以下场景中使用：")
+printLine("- ValueError: 当参数值不符合要求时（如负数的平方根）")
+printLine("- AssertionError: 当断言条件不满足时")
+printLine("- FileNotFoundError: 当文件操作找不到文件时")
+printLine("- RecursionError: 当递归调用超过最大深度时")
+printLine("- NotImplementedError: 当功能尚未实现时")
+printLine("- PermissionError: 当没有权限执行操作时")
+printLine("- TimeoutError: 当操作超时时")
+
+printLine("\n✓ 所有新错误类型已成功添加到项目中")

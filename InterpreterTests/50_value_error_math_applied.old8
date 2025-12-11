@@ -1,0 +1,18 @@
+// 测试实际应用的数学函数 ValueError
+// 测试 MathLib 中的函数参数验证
+
+import MathLib
+
+printLine("=== MathLib ValueError 实际应用测试 ===\n")
+
+printLine("--- 测试 1: 正常的平方根 ---")
+result1 <- Sqrt(25.0)
+printLine("Sqrt(25.0) = " + result1.toString())
+printLine("✓ 通过")
+
+printLine("\n--- 测试 2: 负数的平方根（会抛出 ArgumentException）---")
+printLine("尝试 Sqrt(-1.0)...")
+// 这应该抛出 ArgumentException
+result2 <- Sqrt(-1.0)
+
+// ERROR

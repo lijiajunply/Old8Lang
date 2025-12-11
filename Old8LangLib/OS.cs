@@ -18,18 +18,14 @@ public static class OS
 
     public static string Process(string code)
     {
-        Process a = new Process();
+        var a = new Process();
 
         // 根据操作系统设置命令解释器
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            a.StartInfo.FileName = "cmd.exe";
-        }
-        else
-        {
+        a.StartInfo.FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? "cmd.exe"
+            :
             // Linux 和 macOS 都使用 bash
-            a.StartInfo.FileName = "/bin/bash";
-        }
+            "/bin/bash";
 
         a.StartInfo.UseShellExecute = false; //是否使用操作系统shell启动
         a.StartInfo.RedirectStandardInput = true; //接受来自调用程序的输入信息

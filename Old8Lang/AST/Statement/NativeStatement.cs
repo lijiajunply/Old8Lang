@@ -92,17 +92,23 @@ public class NativeStatement : OldStatement
                     }
                     else
                     {
-                        // 最后尝试从bin目录查找
-                        var binDllPath = Path.Combine(Directory.GetCurrentDirectory(), "Old8LangLib", "bin", "Debug",
+                        // 最后尝试从bin目录查找 - 支持 net8.0 和 net10.0
+                        var binDllPath8 = Path.Combine(Directory.GetCurrentDirectory(), "Old8LangLib", "bin", "Debug",
                             "net8.0", dllFileName);
-                        if (File.Exists(binDllPath))
+                        var binDllPath10 = Path.Combine(Directory.GetCurrentDirectory(), "Old8LangLib", "bin", "Debug",
+                            "net10.0", dllFileName);
+                        if (File.Exists(binDllPath10))
                         {
-                            path = binDllPath;
+                            path = binDllPath10;
+                        }
+                        else if (File.Exists(binDllPath8))
+                        {
+                            path = binDllPath8;
                         }
                         else
                         {
                             throw new FileNotFoundException(
-                                $"无法找到DLL文件 {dllFileName}，尝试的路径：{oldLibDllPath}, {path}, {absolutePath}, {directDllPath}, {binDllPath}");
+                                $"无法找到DLL文件 {dllFileName}，尝试的路径：{oldLibDllPath}, {path}, {absolutePath}, {directDllPath}, {binDllPath8}, {binDllPath10}");
                         }
                     }
                 }

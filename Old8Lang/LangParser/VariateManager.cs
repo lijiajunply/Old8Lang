@@ -44,6 +44,26 @@ public class VariateManager
 
     public bool IsClass { get; set; }
 
+    // 递归深度限制
+    public const int MaxRecursionDepth = 1000;
+    private int _recursionDepth = 0;
+
+    public int RecursionDepth
+    {
+        get => _recursionDepth;
+        set
+        {
+            if (value > MaxRecursionDepth)
+            {
+                throw new RecursionError(
+                    new SourcePosition(0, 0),
+                    MaxRecursionDepth
+                );
+            }
+            _recursionDepth = value;
+        }
+    }
+
     #endregion
 
     public void Set(LangId id, LangValueType langValueType)

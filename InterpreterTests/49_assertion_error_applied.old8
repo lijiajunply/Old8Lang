@@ -1,0 +1,15 @@
+// 测试实际应用的 AssertionError
+// 测试 Assert 函数现在使用 AssertionError
+
+printLine("=== AssertionError 实际应用测试 ===\n")
+
+printLine("--- 测试 1: Assert 断言成功 ---")
+result1 <- Assert(10, 10)
+printLine("Assert(10, 10) 通过 ✓")
+
+printLine("\n--- 测试 2: Assert 断言失败（会抛出 AssertionError）---")
+printLine("尝试 Assert(5, 10)...")
+// 这应该抛出 AssertionError
+result2 <- Assert(5, 10)
+
+// ERROR

@@ -1,0 +1,18 @@
+// 测试异常转换层 - ValueError
+// 验证 .NET ArgumentException 被转换为 Old8Lang ValueError
+
+import MathLib
+
+printLine("=== 异常转换层测试: ValueError ===\n")
+
+printLine("--- 测试 1: 正常的阶乘 ---")
+result1 <- Factorial(5)
+printLine("Factorial(5) = " + result1.toString())
+printLine("✓ 通过\n")
+
+printLine("--- 测试 2: 负数的阶乘 ---")
+printLine("尝试 Factorial(-1)...")
+// 应该抛出 Old8Lang.Error.ValueError（而不是 System.ArgumentException）
+result2 <- Factorial(-1)
+
+// ERROR

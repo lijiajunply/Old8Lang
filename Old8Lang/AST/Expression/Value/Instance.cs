@@ -172,7 +172,12 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             {
                 var value = results[0].Run(manager);
                 var value1 = results[1].Run(manager);
-                return value.Equal(value1) ? new BoolLangValue(true) : throw new InvalidOperationError(this, "测试失败");
+                if (!value.Equal(value1))
+                {
+                    var message = $"断言失败: 期望 {value1}，但得到 {value}";
+                    throw new Error.AssertionError(this, message);
+                }
+                return new BoolLangValue(true);
             }
         }
 

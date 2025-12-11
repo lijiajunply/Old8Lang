@@ -1,0 +1,27 @@
+// 调试 MathLib 返回值
+import MathLib
+
+printLine("=== 调试 MathLib 返回值 ===\n")
+
+// 测试 Abs (返回 double)
+result1 <- Abs(42.0)
+printLine("Abs(42.0) 返回类型: " + result1.getType())
+printLine("Abs(42.0) 值: " + result1.toString())
+printLine("")
+
+// 测试 Max (返回 double)
+result2 <- Max(10.0, 20.0)
+printLine("Max(10.0, 20.0) 返回类型: " + result2.getType())
+printLine("Max(10.0, 20.0) 值: " + result2.toString())
+printLine("")
+
+// 测试 Factorial (返回 long)
+result3 <- Factorial(5)
+printLine("Factorial(5) 返回类型: " + result3.getType())
+printLine("Factorial(5) 值: " + result3.toString())
+printLine("")
+
+// 测试 Pow (返回 double)
+result4 <- Pow(2.0, 3.0)
+printLine("Pow(2.0, 3.0) 返回类型: " + result4.getType())
+printLine("Pow(2.0, 3.0) 值: " + result4.toString())
