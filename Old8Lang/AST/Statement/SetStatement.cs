@@ -114,8 +114,8 @@ public class SetStatement : OldStatement
         // 处理成员访问赋值：this.name <- value, person.name <- value
         if (LeftExpr is Operation operation)
         {
-            // 检查是否是 CONCAT 操作（成员访问）
-            if (operation.Opera == OperationType.CONCAT)
+            // 检查是否是 DOT 操作（成员访问）
+            if (operation.Opera == LangTokenType.Dot)
             {
                 // 处理 this.member <- value 形式的赋值
                 if (operation is { Left: LangId { IdName: "this" }, Right: LangId memberName })
@@ -195,7 +195,7 @@ public class SetStatement : OldStatement
         }
         else if (LeftExpr != null)
             {
-                if (LeftExpr is Operation operation && operation.Opera == OperationType.CONCAT)
+                if (LeftExpr is Operation operation && operation.Opera == LangTokenType.Dot)
                 {
                     // 处理成员访问或索引访问赋值: left.right <- value 或 left[right] <- value
                     if (operation.Right is LangId memberId)

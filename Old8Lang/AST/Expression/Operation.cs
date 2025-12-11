@@ -3,47 +3,48 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
+using Old8Lang.LangParser;
 
 namespace Old8Lang.AST.Expression;
 
-public class Operation(OldExpr? left, OperationType opera, OldExpr? right, SourcePosition position = default)
+public class Operation(OldExpr? left, LangTokenType opera, OldExpr? right, SourcePosition position = default)
     : OldExpr(position)
 {
     private string OperaToString()
     {
-        if (Opera == OperationType.PLUS)
+        if (Opera == LangTokenType.Plus)
             return "+";
-        if (Opera == OperationType.MINUS)
+        if (Opera == LangTokenType.Minus)
             return "-";
-        if (Opera == OperationType.TIMES)
+        if (Opera == LangTokenType.Star)
             return "*";
-        if (Opera == OperationType.DIVIDE)
+        if (Opera == LangTokenType.Slash)
             return "/";
-        if (Opera == OperationType.POWER)
+        if (Opera == LangTokenType.Caret)
             return "^";
-        if (Opera == OperationType.GREATER)
+        if (Opera == LangTokenType.GreaterThan)
             return ">";
-        if (Opera == OperationType.LESSER)
+        if (Opera == LangTokenType.LessThan)
             return "<";
-        if (Opera == OperationType.EQUALS)
+        if (Opera == LangTokenType.Equals)
             return "==";
-        if (Opera == OperationType.DIFFERENT)
+        if (Opera == LangTokenType.NotEquals)
             return "!=";
-        if (Opera == OperationType.CONCAT)
+        if (Opera == LangTokenType.Dot)
             return ".";
-        if (Opera == OperationType.MODULO)
+        if (Opera == LangTokenType.Percent)
             return "%";
-        if (Opera == OperationType.LESS_EQUAL)
+        if (Opera == LangTokenType.LessThanEquals)
             return "<=";
-        if (Opera == OperationType.GREATER_EQUAL)
+        if (Opera == LangTokenType.GreaterThanEquals)
             return ">=";
-        if (Opera == OperationType.XOR)
+        if (Opera == LangTokenType.Xor)
             return "^";
-        if (Opera == OperationType.AND)
+        if (Opera == LangTokenType.And)
             return "&&";
-        if (Opera == OperationType.OR)
+        if (Opera == LangTokenType.Or)
             return "||";
-        if (Opera == OperationType.AS)
+        if (Opera == LangTokenType.As)
             return "as";
         return "";
     }
@@ -52,21 +53,21 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
     private Type? Type { get; set; }
     public OldExpr? Left { get; set; } = left;
     public OldExpr? Right { get; set; } = right;
-    public OperationType Opera { get; set; } = opera;
+    public LangTokenType Opera { get; set; } = opera;
 
-    public override LangValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(VariateManager manager)
     {
         // 处理一元运算符
         if (Left == null)
         {
-            if (Opera == OperationType.NOT)
+            if (Opera == LangTokenType.Exclamation)
             {
                 var rightValue = Right?.Run(manager) as BoolLangValue ??
                                  throw new InvalidOperationError(this, "NOT运算符只支持布尔类型");
                 return new BoolLangValue(!rightValue.Value);
             }
 
-            if (Opera == OperationType.MINUS)
+            if (Opera == LangTokenType.Minus)
             {
                 var rightValue = Right?.Run(manager);
                 if (rightValue is IntLangValue intValue)
@@ -80,7 +81,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         }
 
         // 处理this.id => dot_value
-        if (Opera == OperationType.CONCAT && Left is LangId { IdName: "this" } && Right != null)
+        if (Opera == LangTokenType.Dot && Left is LangId { IdName: "this" } && Right != null)
         {
             var thisValue = Left.Run(manager);
             if (thisValue is AnyLangValue anyValue)
@@ -92,7 +93,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         }
 
         // 处理逻辑AND操作 - 短路求值
-        if (Opera == OperationType.AND)
+        if (Opera == LangTokenType.And)
         {
             var leftValue = Left.Run(manager) as BoolLangValue ??
                             throw new InvalidOperationError(this, "AND运算符只支持布尔类型");
@@ -107,7 +108,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         }
 
         // 处理逻辑OR操作 - 短路求值
-        if (Opera == OperationType.OR)
+        if (Opera == LangTokenType.Or)
         {
             var leftValue = Left.Run(manager) as BoolLangValue ?? throw new InvalidOperationError(this, "OR运算符只支持布尔类型");
             if (leftValue.Value)
@@ -121,7 +122,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         }
 
         // 处理点操作
-        if (Opera == OperationType.CONCAT)
+        if (Opera == LangTokenType.Dot)
         {
             var dotLeftResult = Left.Run(manager);
             if (dotLeftResult is AnyLangValue any)
@@ -194,7 +195,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         // Set方法已经被修复，只在当前作用域中设置变量，不会修改外部变量
         var leftResult = Left.Run(manager);
 
-        if (Opera == OperationType.AS)
+        if (Opera == LangTokenType.As)
         {
             // 处理类型转换操作：left as right
             // 右侧应该是一个类型标识符，如 int, double, string 等
@@ -232,7 +233,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
         // left xor right
         if (leftResult is BoolLangValue boolLeft && rightResult is BoolLangValue boolRight &&
-            Opera == OperationType.XOR)
+            Opera == LangTokenType.Xor)
         {
             return new BoolLangValue(!boolLeft.Equal(boolRight));
         }
@@ -242,30 +243,30 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         {
             switch (Opera)
             {
-                case OperationType.EQUALS:
+                case LangTokenType.Equals:
                     return new BoolLangValue(leftResult.Equal(rightResult));
-                case OperationType.LESSER:
+                case LangTokenType.LessThan:
                     return new BoolLangValue(leftResult.Less(rightResult));
-                case OperationType.GREATER:
+                case LangTokenType.GreaterThan:
                     return new BoolLangValue(leftResult.Greater(rightResult));
-                case OperationType.DIFFERENT:
+                case LangTokenType.NotEquals:
                     return new BoolLangValue(!leftResult.Equal(rightResult));
-                case OperationType.LESS_EQUAL:
+                case LangTokenType.LessThanEquals:
                     return new BoolLangValue(leftResult.LessEqual(rightResult));
-                case OperationType.GREATER_EQUAL:
+                case LangTokenType.GreaterThanEquals:
                     return new BoolLangValue(leftResult.GreaterEqual(rightResult));
                 // r (+-*/%) l
-                case OperationType.PLUS:
+                case LangTokenType.Plus:
                     return leftResult.Plus(rightResult);
-                case OperationType.MINUS:
+                case LangTokenType.Minus:
                     return leftResult.Minus(rightResult);
-                case OperationType.TIMES:
+                case LangTokenType.Star:
                     return leftResult.Times(rightResult);
-                case OperationType.DIVIDE:
+                case LangTokenType.Slash:
                     return leftResult.Divide(rightResult);
-                case OperationType.MODULO:
+                case LangTokenType.Percent:
                     return leftResult.Mod(rightResult);
-                case OperationType.POWER:
+                case LangTokenType.Caret:
                     return leftResult.Power(rightResult);
             }
         }
@@ -328,8 +329,8 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
         }
 
         // 对于二元运算，根据操作类型返回合适的类型
-        if (Opera == OperationType.TIMES || Opera == OperationType.PLUS || Opera == OperationType.MINUS ||
-            Opera == OperationType.DIVIDE || Opera == OperationType.MODULO || Opera == OperationType.POWER)
+        if (Opera == LangTokenType.Star || Opera == LangTokenType.Plus || Opera == LangTokenType.Minus ||
+            Opera == LangTokenType.Slash || Opera == LangTokenType.Percent || Opera == LangTokenType.Caret)
         {
             // 对于数值运算，返回int类型
             return typeof(int);
@@ -360,12 +361,12 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
             // 处理单目运算符
             switch (Opera)
             {
-                case OperationType.NOT:
+                case LangTokenType.Exclamation:
                     Right?.LoadIlValue(ilGenerator, local);
                     ilGenerator.Emit(OpCodes.Ldc_I4_1); // 加载常量 1
                     ilGenerator.Emit(OpCodes.Xor); // 进行异或运算
                     return typeof(bool);
-                case OperationType.MINUS:
+                case LangTokenType.Minus:
                     Right?.LoadIlValue(ilGenerator, local);
                     ilGenerator.Emit(OpCodes.Neg);
                     return rightType ?? throw new InvalidOperationError(this, "右操作数不能为空");
@@ -377,7 +378,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
         switch (Opera)
         {
-            case OperationType.PLUS:
+            case LangTokenType.Plus:
                 if (leftType == typeof(string) || rightType == typeof(string))
                 {
                     // 处理字符串连接 - 需要调用string.Concat方法
@@ -423,7 +424,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 // 整数加法
                 ilGenerator.Emit(OpCodes.Add);
                 return typeof(int);
-            case OperationType.MINUS:
+            case LangTokenType.Minus:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
                 if (leftType == typeof(double) || rightType == typeof(double))
@@ -445,7 +446,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
                 ilGenerator.Emit(OpCodes.Sub);
                 return typeof(int);
-            case OperationType.TIMES:
+            case LangTokenType.Star:
                 // 简化处理，只处理基本的int和double类型
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
@@ -510,7 +511,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     ilGenerator.Emit(OpCodes.Mul);
                     return typeof(int);
                 }
-            case OperationType.DIVIDE:
+            case LangTokenType.Slash:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
                 if (leftType == typeof(double) || rightType == typeof(double))
@@ -532,7 +533,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
                 ilGenerator.Emit(OpCodes.Div);
                 return typeof(int);
-            case OperationType.MODULO:
+            case LangTokenType.Percent:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
                 if (leftType == typeof(double) || rightType == typeof(double))
@@ -554,7 +555,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
                 ilGenerator.Emit(OpCodes.Rem);
                 return typeof(int);
-            case OperationType.POWER:
+            case LangTokenType.Caret:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
                 // 确保两个操作数都是double类型，因为Math.Pow需要double参数
@@ -580,29 +581,29 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
 
                 // 否则返回double类型
                 return typeof(double);
-            case OperationType.GREATER:
+            case LangTokenType.GreaterThan:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Cgt);
                 return typeof(bool);
-            case OperationType.LESSER:
+            case LangTokenType.LessThan:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Clt);
                 return typeof(bool);
-            case OperationType.EQUALS:
+            case LangTokenType.Equals:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Ceq);
                 return typeof(bool);
-            case OperationType.DIFFERENT:
+            case LangTokenType.NotEquals:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Ceq);
                 ilGenerator.Emit(OpCodes.Ldc_I4_1);
                 ilGenerator.Emit(OpCodes.Xor);
                 return typeof(bool);
-            case OperationType.AND:
+            case LangTokenType.And:
             {
                 // 实现短路求值：如果左操作数为false，则跳过右操作数
                 var endLabel = ilGenerator.DefineLabel();
@@ -623,7 +624,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 ilGenerator.MarkLabel(endLabel);
                 return typeof(bool);
             }
-            case OperationType.OR:
+            case LangTokenType.Or:
             {
                 // 实现短路求值：如果左操作数为true，则跳过右操作数
                 var endLabel = ilGenerator.DefineLabel();
@@ -644,26 +645,26 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                 ilGenerator.MarkLabel(endLabel);
                 return typeof(bool);
             }
-            case OperationType.XOR:
+            case LangTokenType.Xor:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Xor);
                 return typeof(bool);
-            case OperationType.LESS_EQUAL:
+            case LangTokenType.LessThanEquals:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Cgt);
                 ilGenerator.Emit(OpCodes.Ldc_I4_1);
                 ilGenerator.Emit(OpCodes.Xor);
                 return typeof(bool);
-            case OperationType.GREATER_EQUAL:
+            case LangTokenType.GreaterThanEquals:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
                 ilGenerator.Emit(OpCodes.Clt);
                 ilGenerator.Emit(OpCodes.Ldc_I4_1);
                 ilGenerator.Emit(OpCodes.Xor);
                 return typeof(bool);
-            case OperationType.AS:
+            case LangTokenType.As:
                 // 处理类型转换操作：left as right
                 // 右侧应该是一个类型标识符，如 int, double, string 等
                 if (Right is LangId rightLangId)
@@ -774,7 +775,7 @@ public class Operation(OldExpr? left, OperationType opera, OldExpr? right, Sourc
                     Left!.LoadIlValue(ilGenerator, local);
                     return typeof(object);
                 }
-            case OperationType.CONCAT:
+            case LangTokenType.Dot:
                 if (local.InClassEnv != null && Left is LangId { IdName: "this" })
                 {
                     ilGenerator.Emit(OpCodes.Ldarg_0);

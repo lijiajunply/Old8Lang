@@ -16,12 +16,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/语法错误测试用例设计.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/SyntaxErrorTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_lexical_errors.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_syntax_structure_errors.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/ParsersTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/ParsersTests.cs" afterDir="false" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Changes">
+      <change afterPath="$PROJECT_DIR$/.trae/documents/删除 OperationType 并全面使用 LangTokenType.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/OperationType.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -337,6 +338,7 @@
       <workItem from="1765360741424" duration="2635000" />
       <workItem from="1765385357424" duration="7237000" />
       <workItem from="1765433725382" duration="1394000" />
+      <workItem from="1765446680033" duration="2287000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -831,13 +833,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/IntLangValue.cs</url>
-          <line>73</line>
+          <line>74</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/IntLangValue.cs" containingFunctionPresentation="方法 'Times'">
             <startOffsets>
-              <option value="2447" />
+              <option value="2448" />
             </startOffsets>
             <endOffsets>
-              <option value="2495" />
+              <option value="2496" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="530" />

@@ -1090,7 +1090,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         Expect(LangTokenType.Identifier);
         Expect(LangTokenType.PlusPlus);
         return new SetStatement(new LangId(identifier),
-            new Operation(new LangId(identifier), OperationType.PLUS, new IntLangValue(1)));
+            new Operation(new LangId(identifier), LangTokenType.Plus, new IntLangValue(1)));
     }
 
     /// <summary>
@@ -1103,7 +1103,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         Expect(LangTokenType.Identifier);
         Expect(LangTokenType.MinusMinus);
         return new SetStatement(new LangId(identifier),
-            new Operation(new LangId(identifier), OperationType.MINUS, new IntLangValue(1)));
+            new Operation(new LangId(identifier), LangTokenType.Minus, new IntLangValue(1)));
     }
 
     /// <summary>
@@ -1289,7 +1289,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var position = CreateSourcePosition(operatorToken);
             Expect(operatorToken.Type);
             var right = ParseBinaryExpression();
-            left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
+            left = new Operation(left, operatorToken.Type, right, position);
         }
 
         return left;
@@ -1347,7 +1347,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var position = CreateSourcePosition(operatorToken);
             Expect(operatorToken.Type);
             var right = ParseNumberOpera1();
-            left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
+            left = new Operation(left, operatorToken.Type, right, position);
         }
 
         return left;
@@ -1364,7 +1364,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var position = CreateSourcePosition(operatorToken);
             Expect(operatorToken.Type);
             var right = ParseNumberOpera2();
-            left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
+            left = new Operation(left, operatorToken.Type, right, position);
         }
 
         return left;
@@ -1384,7 +1384,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var position = CreateSourcePosition(operatorToken);
             Expect(operatorToken.Type);
             var right = ParsePower(); // 右边也需要先处理幂运算
-            left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
+            left = new Operation(left, operatorToken.Type, right, position);
         }
 
         // 处理后置自增自减
@@ -1393,14 +1393,14 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var operatorToken = CurrentToken;
             var position = CreateSourcePosition(operatorToken);
             Expect(LangTokenType.PlusPlus);
-            left = new Operation(left, OperationType.PLUS, new IntLangValue(1), position);
+            left = new Operation(left, LangTokenType.Plus, new IntLangValue(1), position);
         }
         else if (CurrentToken.Type == LangTokenType.MinusMinus)
         {
             var operatorToken = CurrentToken;
             var position = CreateSourcePosition(operatorToken);
             Expect(LangTokenType.MinusMinus);
-            left = new Operation(left, OperationType.MINUS, new IntLangValue(1), position);
+            left = new Operation(left, LangTokenType.Minus, new IntLangValue(1), position);
         }
 
         // 处理 as 操作符
@@ -1412,7 +1412,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var right = ParsePrimary();
             // 处理右操作数的点运算符
             right = ParseDotExpr(right);
-            left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
+            left = new Operation(left, operatorToken.Type, right, position);
         }
 
         return left;
@@ -1433,7 +1433,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var position = CreateSourcePosition(operatorToken);
             Expect(operatorToken.Type);
             var right = ParsePower(); // 递归调用，实现右结合
-            left = new Operation(left, operatorToken.Type.GetGeneric(), right, position);
+            left = new Operation(left, operatorToken.Type, right, position);
         }
 
         return left;
@@ -1451,7 +1451,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 var position = new SourcePosition(dotToken.Line, dotToken.Column, tokenValue: dotToken.Value);
                 Expect(LangTokenType.Dot);
                 var right = ParsePrimary();
-                left = new Operation(left, OperationType.CONCAT, right, position);
+                left = new Operation(left, LangTokenType.Dot, right, position);
             }
             else if (CurrentToken.Type == LangTokenType.LeftBracket)
             {
@@ -1463,7 +1463,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 var right = ParseExpression(); // 允许索引是复杂表达式
                 Expect(LangTokenType.RightBracket);
                 // 使用CONCAT操作符表示索引访问，后续在GenerateIl中处理
-                left = new Operation(left, OperationType.CONCAT, right, position);
+                left = new Operation(left, LangTokenType.Dot, right, position);
             }
             else
             {
@@ -1505,7 +1505,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var position = new SourcePosition(notToken.Line, notToken.Column, tokenValue: notToken.Value);
             Expect(LangTokenType.Not);
             var expr = ParsePrimary();
-            return new Operation(null, OperationType.NOT, expr, position);
+            return new Operation(null, LangTokenType.Exclamation, expr, position);
         }
 
         // 处理前缀 minus 表达式
@@ -1515,7 +1515,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var position = new SourcePosition(minusToken.Line, minusToken.Column, tokenValue: minusToken.Value);
             Expect(LangTokenType.Minus);
             var expr = ParsePrimary();
-            return new Operation(null, OperationType.MINUS, expr, position);
+            return new Operation(null, LangTokenType.Minus, expr, position);
         }
 
         // 处理前缀自增 ++i
@@ -1526,7 +1526,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 new SourcePosition(plusPlusToken.Line, plusPlusToken.Column, tokenValue: plusPlusToken.Value);
             Expect(LangTokenType.PlusPlus);
             var expr = ParsePrimary();
-            return new Operation(expr, OperationType.PLUS, new IntLangValue(1), position);
+            return new Operation(expr, LangTokenType.Plus, new IntLangValue(1), position);
         }
 
         // 处理前缀自减 --i
@@ -1537,7 +1537,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 tokenValue: minusMinusToken.Value);
             Expect(LangTokenType.MinusMinus);
             var expr = ParsePrimary();
-            return new Operation(expr, OperationType.MINUS, new IntLangValue(1), position);
+            return new Operation(expr, LangTokenType.Minus, new IntLangValue(1), position);
         }
 
         // 处理 list[...] 语法
@@ -1797,7 +1797,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 {
                     condition = new Operation(
                         condition,
-                        OperationType.AND,
+                        LangTokenType.And,
                         conditions[i],
                         new SourcePosition(CurrentToken.Line, CurrentToken.Column));
                 }
@@ -2402,7 +2402,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         {
             Expect(LangTokenType.RightBracket);
             // 空列表访问，返回一个空的操作
-            return new Operation(identifier, OperationType.CONCAT, new LangId("", position: position), position);
+            return new Operation(identifier, LangTokenType.Dot, new LangId("", position: position), position);
         }
 
         // 处理切片：list[start:end]
