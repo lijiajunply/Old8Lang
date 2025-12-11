@@ -56,7 +56,7 @@ public static class LangTokenizer
 
             if (code[i] == '+')
             {
-                if (i + 1 <= code.Length && code[i + 1] == '+')
+                if (i + 1 < code.Length && code[i + 1] == '+')
                 {
                     tokens.Add(new LangToken("++", LangTokenType.PlusPlus, line, i - column));
                     i++;
@@ -69,17 +69,68 @@ public static class LangTokenizer
 
             if (code[i] == '-')
             {
-                if (i + 1 <= code.Length && code[i + 1] == '-')
+                if (i + 1 < code.Length && code[i + 1] == '-')
                 {
                     tokens.Add(new LangToken("--", LangTokenType.MinusMinus, line, i - column));
                     i++;
                     continue;
                 }
 
-                if (i + 1 <= code.Length && code[i + 1] == '>')
+                if (i + 1 < code.Length && code[i + 1] == '>')
                 {
                     tokens.Add(new LangToken("->", LangTokenType.Arrow, line, i - column));
                     i++;
+                    continue;
+                }
+
+                // 检查是否是负数字面量
+                // 如果前一个token是运算符、赋值、左括号、逗号等，并且后面跟着数字，则视为负数
+                if (i + 1 < code.Length && char.IsDigit(code[i + 1]) &&
+                    (tokens.Count == 0 ||
+                     tokens[^1].Type is LangTokenType.Assignment or LangTokenType.LeftParen or
+                                        LangTokenType.Comma or LangTokenType.LeftBracket or
+                                        LangTokenType.Plus or LangTokenType.Minus or
+                                        LangTokenType.Star or LangTokenType.Slash or
+                                        LangTokenType.Percent or LangTokenType.Caret or
+                                        LangTokenType.GreaterThan or LangTokenType.LessThan or
+                                        LangTokenType.Equals or LangTokenType.NotEquals or
+                                        LangTokenType.GreaterThanEquals or LangTokenType.LessThanEquals or
+                                        LangTokenType.And or LangTokenType.Or or LangTokenType.Xor or
+                                        LangTokenType.Return or LangTokenType.Colon))
+                {
+                    // 解析负数
+                    var sb = new StringBuilder("-");
+                    i++;
+
+                    while (i < code.Length && (char.IsDigit(code[i]) || code[i] == '.'))
+                    {
+                        sb.Append(code[i]);
+                        i++;
+                    }
+
+                    // 处理科学计数法
+                    if (i < code.Length && char.ToLower(code[i]) == 'e')
+                    {
+                        sb.Append(code[i]);
+                        i++;
+
+                        // 处理指数符号 (+/-)
+                        if (i < code.Length && (code[i] == '+' || code[i] == '-'))
+                        {
+                            sb.Append(code[i]);
+                            i++;
+                        }
+
+                        // 处理指数数字
+                        while (i < code.Length && char.IsDigit(code[i]))
+                        {
+                            sb.Append(code[i]);
+                            i++;
+                        }
+                    }
+
+                    tokens.Add(new LangToken(sb.ToString(), LangTokenType.Number, line, i - 1 - column));
+                    i--; // 回退一位，因为外层循环会 i++
                     continue;
                 }
 
@@ -113,7 +164,7 @@ public static class LangTokenizer
 
             if (code[i] == '|')
             {
-                if (i + 1 <= code.Length && code[i + 1] == '|')
+                if (i + 1 < code.Length && code[i + 1] == '|')
                 {
                     tokens.Add(new LangToken("||", LangTokenType.Or, line, i - column));
                     i++;
@@ -406,14 +457,9 @@ public static class LangTokenizer
                     i++;
                 }
 
-                // 处理科学计数法 (e.g., 1.23e3, 1.23E-4)
+                // 处理科学计数法 (e.g., 1.23e3, 1.23E-4, 1e10)
                 if (i + 1 < code.Length && char.ToLower(code[i + 1]) == 'e')
                 {
-                    if (!sb.ToString().Contains('.'))
-                    {
-                        sb.Append(".0");
-                    }
-
                     sb.Append(code[i + 1]);
                     i++;
 

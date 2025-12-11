@@ -153,11 +153,26 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
     public BlockStatement ParseProgram()
     {
         var statements = new List<IOldLangTree>();
+        var lastStatementLine = -1; // 跟踪上一个语句的行号
+
         try
         {
             while (CurrentIndex < tokens.Count)
             {
+                // 记录当前语句开始的行号
+                var currentStatementLine = CurrentToken.Line;
+
+                // 如果当前语句与上一个语句在同一行，抛出错误
+                if (lastStatementLine != -1 && currentStatementLine == lastStatementLine)
+                {
+                    throw CreateSyntaxError(
+                        "语法错误：同一行上不能有多个语句。建议：在语句之间添加换行符，或使用分号分隔（如果语言支持）。");
+                }
+
                 statements.Add(ParseStatement());
+
+                // 更新最后一个语句的行号
+                lastStatementLine = currentStatementLine;
             }
 
             return new BlockStatement(statements);
@@ -473,6 +488,17 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var expr = ParseExpression();
             if (expr != null!)
             {
+                // 检查表达式后面的token是否合法
+                // 合法的语句终止符：右大括号（块结束）、EOF（文件结束）
+                // 如果后面跟着其他token，说明语句结构不正确
+                if (CurrentToken.Type != LangTokenType.RightBrace &&
+                    CurrentToken.Type != LangTokenType.EndOfFile)
+                {
+                    throw CreateSyntaxError(
+                        $"语法错误：语句结构不正确。标识符 '{(expr as LangId)?.IdName ?? "expression"}' 后面跟着意外的 token '{CurrentToken.Value}'。" +
+                        "建议：检查是否缺少运算符（如 '<-' 用于赋值）或正确的语句分隔。");
+                }
+
                 // 表达式语句，返回一个空的 SetStatement 包装，或者直接返回表达式
                 return new SetStatement(new LangId("", position: expr.Position), expr);
             }
@@ -1328,6 +1354,11 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                     falseExpr,
                     new SourcePosition(questionToken.Line, questionToken.Column));
             }
+            else
+            {
+                // 三元表达式缺少冒号，抛出错误
+                throw CreateSyntaxError("语法错误：三元表达式不完整，缺少 ':' 和假值分支。建议：使用完整的三元表达式格式 'condition ? trueValue : falseValue'。");
+            }
         }
 
         // 不是三元表达式，返回原始条件表达式
@@ -1950,9 +1981,10 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         // 空括号情况：()
         if (CurrentToken.Type == LangTokenType.RightParen)
         {
-            Expect(LangTokenType.RightParen);
-            // 返回一个空的元组
-            return new TupleLangValue(new LangId("", position: position), new LangId("", position: position), position);
+            // 空括号没有箭头，语义不明确，抛出错误
+            // 注意：() -> expr 的Lambda形式在前面已经处理过了（第1890行）
+            throw CreateSyntaxError(
+                "语法错误：空括号 '()' 不能作为表达式。建议：如果要定义无参Lambda，请使用 '() -> expression' 或 '() -> { ... }' 格式。");
         }
 
         // 解析第一个元素
@@ -2091,19 +2123,22 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                                 // 提取表达式字符串
                                 var exprStr = stringValue.Substring(exprStart, i - exprStart).Trim();
 
-                                // 完整的表达式解析：支持所有表达式类型，包括点操作符
-                                if (!string.IsNullOrWhiteSpace(exprStr))
+                                // 检查表达式是否为空
+                                if (string.IsNullOrWhiteSpace(exprStr))
                                 {
-                                    // 将表达式字符串转换为Token流
-                                    var exprTokens = LangTokenizer.Tokenize(exprStr);
-
-                                    // 创建一个新的LangParser实例来解析这个表达式
-                                    var exprParser = new LangParser(exprTokens, exprStr, fileName);
-
-                                    // 解析完整表达式
-                                    var expr = exprParser.ParseExpression();
-                                    parts.Add(expr);
+                                    throw CreateSyntaxError("语法错误：字符串模板的花括号内不能为空。建议：在花括号内提供有效的表达式，如 ${variableName}。");
                                 }
+
+                                // 完整的表达式解析：支持所有表达式类型，包括点操作符
+                                // 将表达式字符串转换为Token流
+                                var exprTokens = LangTokenizer.Tokenize(exprStr);
+
+                                // 创建一个新的LangParser实例来解析这个表达式
+                                var exprParser = new LangParser(exprTokens, exprStr, fileName);
+
+                                // 解析完整表达式
+                                var expr = exprParser.ParseExpression();
+                                parts.Add(expr);
 
                                 i++;
                             }
@@ -2287,9 +2322,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         var position = CreateSourcePosition(numberToken);
         var value = numberToken.Value;
         Expect(LangTokenType.Number);
-        if (!value.Contains('E') && !value.Contains('e')) return new DoubleLangValue(double.Parse(value), position);
-        var decimalValue = decimal.Parse(value, System.Globalization.NumberStyles.Float);
-        return new DoubleLangValue((double)decimalValue, position);
+        return new DoubleLangValue(double.Parse(value, System.Globalization.NumberStyles.Float), position);
     }
 
     /// <summary>
@@ -2397,12 +2430,11 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             tokenValue: leftBracketToken.Value);
         Expect(LangTokenType.LeftBracket);
 
-        // 检查是否是空列表初始化或访问：list[]
+        // 检查是否是空索引访问：list[]
         if (CurrentToken.Type == LangTokenType.RightBracket)
         {
-            Expect(LangTokenType.RightBracket);
-            // 空列表访问，返回一个空的操作
-            return new Operation(identifier, LangTokenType.Dot, new LangId("", position: position), position);
+            // 空索引访问是无效的，抛出错误
+            throw CreateSyntaxError("语法错误：索引访问不能为空。建议：提供有效的索引表达式，如 array[0]。");
         }
 
         // 处理切片：list[start:end]

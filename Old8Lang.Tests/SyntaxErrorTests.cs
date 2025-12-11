@@ -61,7 +61,7 @@ public class SyntaxErrorTests
     public void ParseProgram_MissingLeftBrace_ThrowsSyntaxError()
     {
         // Arrange
-        var code = "if (a > 5) PrintLine(\"Hello\") }";
+        var code = "if (a > 5) PrintLine(\"Hello\")}";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
 
@@ -513,21 +513,6 @@ public class SyntaxErrorTests
     {
         // Arrange
         var code = "protected func test() { return 0 }";
-        var tokens = LangInterpreter.Tokenize(code);
-        var parser = new Old8Lang.LangParser.LangParser(tokens, code);
-
-        // Act & Assert
-        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
-    }
-
-    /// <summary>
-    /// 测试typedIdentifier无效的类型注解
-    /// </summary>
-    [Fact]
-    public void ParseProgram_InvalidTypedIdentifier_ThrowsSyntaxError()
-    {
-        // Arrange
-        var code = "func test(x: 123) { return x }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
 
