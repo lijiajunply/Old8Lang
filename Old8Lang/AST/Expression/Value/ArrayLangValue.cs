@@ -123,6 +123,49 @@ public class ArrayLangValue : LangValueType, ILangList
         return RunResult[index];
     }
 
+    // 覆盖 Dot 方法以支持嵌套索引访问，如 array[0][0]
+    public override LangValueType Dot(LangExpression dotExpression)
+    {
+        // 如果 dotExpression 是一个整数值或可以转换为整数的表达式，则视为索引访问
+        if (dotExpression is IntLangValue intValue)
+        {
+            return Get(intValue);
+        }
+
+        // 如果是其他类型的表达式，尝试将其作为索引（可能需要运行表达式）
+        // 这里需要一个 manager，但我们没有，所以使用一个临时的
+        var tempManager = new LangParser.VariateManager();
+        var result = dotExpression.Run(tempManager);
+
+        if (result is IntLangValue idx)
+        {
+            return Get(idx);
+        }
+
+        // 如果不是索引访问，调用父类的 Dot 方法（会报错）
+        return base.Dot(dotExpression);
+    }
+
+    // 覆盖 Equal 方法以支持数组深度比较
+    public override bool Equal(LangValueType? otherValueType)
+    {
+        if (otherValueType is not ArrayLangValue otherArray)
+            return false;
+
+        // 比较长度
+        if (RunResult.Length != otherArray.RunResult.Length)
+            return false;
+
+        // 逐个比较元素
+        for (int i = 0; i < RunResult.Length; i++)
+        {
+            if (!RunResult[i].Equal(otherArray.RunResult[i]))
+                return false;
+        }
+
+        return true;
+    }
+
     public override string ToString() =>
         RunResult.Length == 0 ? "[]" :
         RunResult.Length > 0 && RunResult[0] == null! ? $"[{string.Join(", ", Values)}]" :

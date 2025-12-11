@@ -1,0 +1,174 @@
+// 测试复杂数据结构操作
+
+PrintLine("=== 复杂数据结构操作测试 ===")
+
+PrintLine("\n--- 嵌套数组操作测试 ---")
+// 二维数组
+matrix <- [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+PrintLine("二维数组: " + matrix)
+PrintLine("第一行: " + matrix[0])
+PrintLine("第二行: " + matrix[1])
+PrintLine("第三行: " + matrix[2])
+// 现在支持直接嵌套索引访问！
+PrintLine("matrix[0][0] = " + matrix[0][0])
+PrintLine("matrix[1][1] = " + matrix[1][1])
+PrintLine("matrix[2][2] = " + matrix[2][2])
+
+// 修改二维数组元素
+matrix[0][0] <- 100
+PrintLine("修改后 matrix[0][0] = " + matrix[0][0])
+PrintLine("修改后的第一行: " + matrix[0])
+
+PrintLine("\n--- 三维数组测试 ---")
+cube <- [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
+PrintLine("三维数组: " + cube)
+PrintLine("cube[0] = " + cube[0])
+PrintLine("cube[0][0] = " + cube[0][0])
+PrintLine("cube[0][0][0] = " + cube[0][0][0])
+PrintLine("cube[1][1][1] = " + cube[1][1][1])
+
+PrintLine("\n--- 数组嵌套字典测试 ---")
+students <- [
+    {"name": "Alice", "age": 20, "score": 95},
+    {"name": "Bob", "age": 21, "score": 88},
+    {"name": "Charlie", "age": 19, "score": 92}
+]
+PrintLine("学生数组: " + students)
+PrintLine("第一个学生: " + students[0])
+PrintLine("第一个学生姓名: " + students[0]["name"])
+PrintLine("第二个学生年龄: " + students[1]["age"])
+PrintLine("第三个学生分数: " + students[2]["score"])
+
+// 修改嵌套数据
+students[0]["score"] <- 98
+PrintLine("修改后第一个学生分数: " + students[0]["score"])
+
+PrintLine("\n--- 字典嵌套数组测试 ---")
+classes <- {
+    "math": [90, 85, 92],
+    "english": [88, 91, 87],
+    "science": [95, 89, 93]
+}
+PrintLine("班级成绩: " + classes)
+PrintLine("数学成绩: " + classes["math"])
+PrintLine("英语成绩: " + classes["english"])
+PrintLine("数学第一个成绩: " + classes["math"][0])
+PrintLine("英语第二个成绩: " + classes["english"][1])
+
+// 修改嵌套数据
+classes["math"][0] <- 100
+PrintLine("修改后数学第一个成绩: " + classes["math"][0])
+
+PrintLine("\n--- 字典嵌套字典测试 ---")
+company <- {
+    "employees": {
+        "alice": {"position": "Manager", "salary": 5000},
+        "bob": {"position": "Developer", "salary": 4000},
+        "charlie": {"position": "Designer", "salary": 3500}
+    },
+    "departments": {
+        "IT": {"budget": 100000, "head": "alice"},
+        "Design": {"budget": 50000, "head": "charlie"}
+    }
+}
+PrintLine("公司数据: " + company)
+PrintLine("员工信息: " + company["employees"])
+PrintLine("Alice 信息: " + company["employees"]["alice"])
+PrintLine("Alice 职位: " + company["employees"]["alice"]["position"])
+PrintLine("IT 部门预算: " + company["departments"]["IT"]["budget"])
+
+PrintLine("\n--- 混合嵌套结构测试 ---")
+complex <- {
+    "users": [
+        {"id": 1, "name": "User1", "tags": ["admin", "active"]},
+        {"id": 2, "name": "User2", "tags": ["user", "inactive"]}
+    ],
+    "settings": {
+        "theme": "dark",
+        "features": ["feature1", "feature2", "feature3"]
+    }
+}
+PrintLine("复杂结构: " + complex)
+PrintLine("第一个用户: " + complex["users"][0])
+PrintLine("第一个用户名称: " + complex["users"][0]["name"])
+PrintLine("第一个用户标签: " + complex["users"][0]["tags"])
+PrintLine("第一个用户第一个标签: " + complex["users"][0]["tags"][0])
+PrintLine("设置主题: " + complex["settings"]["theme"])
+PrintLine("功能列表: " + complex["settings"]["features"])
+
+PrintLine("\n--- 动态添加元素测试 ---")
+dynamicArr <- []
+PrintLine("空数组: " + dynamicArr)
+dynamicArr <- [1]
+PrintLine("添加元素后: " + dynamicArr)
+dynamicArr <- [1, 2]
+PrintLine("再次添加: " + dynamicArr)
+
+dynamicDict <- {}
+PrintLine("空字典: " + dynamicDict)
+dynamicDict["key1"] <- "value1"
+PrintLine("添加键值对后: " + dynamicDict)
+dynamicDict["key2"] <- "value2"
+PrintLine("再次添加: " + dynamicDict)
+
+PrintLine("\n--- 数组切片与嵌套测试 ---")
+bigArray <- [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+PrintLine("原数组: " + bigArray)
+slice1 <- bigArray[0:5]
+PrintLine("切片 [0:5]: " + slice1)
+slice2 <- bigArray[5:10]
+PrintLine("切片 [5:10]: " + slice2)
+
+// 切片后的数组再进行操作
+// 注意：切片返回的数组需要先运行才能再次索引
+// PrintLine("slice1[0] = " + slice1[0])
+// PrintLine("slice1[4] = " + slice1[4])
+
+PrintLine("\n--- 元组嵌套测试 ---")
+tuple1 <- (1, "hello", true)
+PrintLine("元组: " + tuple1)
+
+// 元组数组
+tupleArray <- [(1, "a"), (2, "b"), (3, "c")]
+PrintLine("元组数组: " + tupleArray)
+PrintLine("第一个元组: " + tupleArray[0])
+PrintLine("第二个元组: " + tupleArray[1])
+
+PrintLine("\n--- 复杂数据遍历测试 ---")
+data <- [
+    {"name": "Item1", "values": [10, 20, 30]},
+    {"name": "Item2", "values": [40, 50, 60]},
+    {"name": "Item3", "values": [70, 80, 90]}
+]
+
+PrintLine("遍历复杂数据:")
+for i <- 0, i < Len(data), i++ {
+    item <- data[i]
+    PrintLine("项目: " + item["name"])
+    values <- item["values"]
+    for j <- 0, j < Len(values), j++ {
+        PrintLine("  值[" + j + "]: " + values[j])
+    }
+}
+
+PrintLine("\n--- 数据结构转换测试 ---")
+// 数组转字典
+arr <- ["a", "b", "c"]
+dict <- {"0": arr[0], "1": arr[1], "2": arr[2]}
+PrintLine("数组: " + arr)
+PrintLine("转换为字典: " + dict)
+
+// 字典值提取
+dict2 <- {"x": 10, "y": 20, "z": 30}
+values <- [dict2["x"], dict2["y"], dict2["z"]]
+PrintLine("字典: " + dict2)
+PrintLine("提取值到数组: " + values)
+
+PrintLine("\n--- 范围与数组操作测试 ---")
+range <- [1~10]
+PrintLine("范围 [1~10]: " + range)
+PrintLine("范围长度: " + Len(range))
+PrintLine("范围第一个元素: " + range[0])
+PrintLine("范围最后一个元素: " + range[9])
+
+PrintLine("\n✅ 复杂数据结构操作测试完成")

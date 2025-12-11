@@ -1,0 +1,109 @@
+// 测试数组和切片操作
+
+PrintLine("=== 数组字面量测试 ===")
+// 创建数组
+arr1 <- [1, 2, 3, 4, 5]
+PrintLine("数组 arr1: " + arr1)
+
+arr2 <- ["a", "b", "c"]
+PrintLine("字符串数组 arr2: " + arr2)
+
+arr3 <- [true, false, true]
+PrintLine("布尔数组 arr3: " + arr3)
+
+// 混合类型数组
+arr4 <- [1, "hello", 3.14, true]
+PrintLine("混合类型数组 arr4: " + arr4)
+
+PrintLine("\n=== 数组索引访问测试 ===")
+// 正索引访问
+PrintLine("arr1[0]: " + arr1[0])
+PrintLine("arr1[2]: " + arr1[2])
+PrintLine("arr1[4]: " + arr1[4])
+
+// 负索引访问（如果支持）
+PrintLine("arr2[0]: " + arr2[0])
+PrintLine("arr2[1]: " + arr2[1])
+PrintLine("arr2[2]: " + arr2[2])
+
+PrintLine("\n=== 数组索引赋值测试 ===")
+arr1[0] <- 100
+PrintLine("修改后的 arr1[0]: " + arr1[0])
+PrintLine("修改后的 arr1: " + arr1)
+
+arr2[1] <- "modified"
+PrintLine("修改后的 arr2[1]: " + arr2[1])
+PrintLine("修改后的 arr2: " + arr2)
+
+PrintLine("\n=== 数组切片测试 ===")
+numbers <- [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+PrintLine("原数组 numbers: " + numbers)
+
+// 切片操作 [start:end]
+slice1 <- numbers[0:5]
+PrintLine("numbers[0:5]: " + slice1)
+
+slice2 <- numbers[3:7]
+PrintLine("numbers[3:7]: " + slice2)
+
+slice3 <- numbers[5:10]
+PrintLine("numbers[5:10]: " + slice3)
+
+PrintLine("\n=== 范围（Range）测试 ===")
+// 创建范围
+range1 <- [1~10]
+PrintLine("范围 [1~10]: " + range1)
+
+range2 <- [0~5]
+PrintLine("范围 [0~5]: " + range2)
+
+range3 <- [10~20]
+PrintLine("范围 [10~20]: " + range3)
+
+PrintLine("\n=== 列表操作测试 ===")
+// 创建列表
+lst1 <- list[1, 2, 3]
+PrintLine("列表 lst1: " + lst1)
+
+lst2 <- list["x", "y", "z"]
+PrintLine("列表 lst2: " + lst2)
+
+// 空列表
+emptyList <- list[]
+PrintLine("空列表: " + emptyList)
+
+PrintLine("\n=== 列表索引访问测试 ===")
+PrintLine("lst1[0]: " + lst1[0])
+PrintLine("lst1[1]: " + lst1[1])
+PrintLine("lst1[2]: " + lst1[2])
+
+PrintLine("\n=== 列表索引赋值测试 ===")
+lst1[0] <- 100
+PrintLine("修改后的 lst1[0]: " + lst1[0])
+PrintLine("修改后的 lst1: " + lst1)
+
+PrintLine("\n=== 嵌套数组测试 ===")
+nested <- [[1, 2], [3, 4], [5, 6]]
+PrintLine("嵌套数组: " + nested)
+PrintLine("nested[0]: " + nested[0])
+PrintLine("nested[1]: " + nested[1])
+// 现在支持直接嵌套索引访问！
+PrintLine("nested[0][0]: " + nested[0][0])
+PrintLine("nested[1][1]: " + nested[1][1])
+
+PrintLine("\n=== 字典键值访问测试 ===")
+dict <- {"name": "Alice", "age": 30, "city": "Beijing"}
+PrintLine("字典 dict: " + dict)
+PrintLine("dict[\"name\"]: " + dict["name"])
+PrintLine("dict[\"age\"]: " + dict["age"])
+PrintLine("dict[\"city\"]: " + dict["city"])
+
+// 修改字典值
+dict["age"] <- 31
+PrintLine("修改后的 dict[\"age\"]: " + dict["age"])
+
+// 添加新键值对
+dict["country"] <- "China"
+PrintLine("添加后的 dict: " + dict)
+
+PrintLine("\n✅ 所有数组和切片操作测试完成")

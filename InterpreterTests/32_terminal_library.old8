@@ -1,0 +1,99 @@
+// 测试 Terminal 库函数
+// 注意：某些功能需要交互式输入，自动化测试可能无法完全覆盖
+
+import Terminal
+
+PrintLine("=== Terminal 库函数测试 ===")
+
+PrintLine("\n--- Title 函数测试 ---")
+// 设置终端标题
+Title("Old8Lang 解释器测试")
+PrintLine("已设置终端标题为: Old8Lang 解释器测试")
+
+Title("测试标题 2")
+PrintLine("已更新终端标题为: 测试标题 2")
+
+PrintLine("\n--- Beep 函数测试 ---")
+// 发出蜂鸣声
+PrintLine("即将发出系统蜂鸣声...")
+Beep()
+PrintLine("蜂鸣声已发出")
+
+PrintLine("\n--- Clear 函数测试 ---")
+// 注意：实际使用时会清除终端内容
+PrintLine("Clear() 函数用于清除终端内容")
+PrintLine("在自动化测试中，我们跳过实际清除操作")
+// Clear()  // 注释掉以保留测试输出
+
+PrintLine("\n--- BeepWindow 函数测试 ---")
+// 窗口蜂鸣
+PrintLine("即将发出窗口蜂鸣...")
+BeepWindow()
+PrintLine("窗口蜂鸣已发出")
+
+PrintLine("\n--- PrintColorful 和 PrintLineColorful 函数测试 ---")
+// 彩色打印（如果支持）
+PrintLine("测试彩色打印功能...")
+PrintColorful("红色文本", "Red")
+PrintLine()
+PrintColorful("绿色文本", "Green")
+PrintLine()
+PrintColorful("蓝色文本", "Blue")
+PrintLine()
+
+PrintLineColorful("黄色文本（换行）", "Yellow")
+PrintLineColorful("青色文本（换行）", "Cyan")
+PrintLineColorful("品红色文本（换行）", "Magenta")
+
+PrintLine("\n--- PrintAscii 函数测试 ---")
+// 打印 ASCII 艺术字
+PrintLine("测试 ASCII 打印...")
+PrintAscii("Hello")
+PrintLine()
+PrintAscii("Old8Lang")
+PrintLine()
+
+PrintLine("\n--- PrintAsciiColorful 函数测试 ---")
+// 彩色 ASCII 艺术字
+PrintLine("测试彩色 ASCII 打印...")
+PrintAsciiColorful("TEST", "Red")
+PrintLine()
+PrintAsciiColorful("CODE", "Green")
+PrintLine()
+
+PrintLine("\n--- ReadLine 函数测试（需要交互输入）---")
+// 注意：这个测试需要手动输入
+PrintLine("ReadLine() 函数用于读取用户输入")
+PrintLine("自动化测试中跳过此功能")
+// Print("请输入一些文本: ")
+// input <- ReadLine()
+// PrintLine("您输入的内容: " + input)
+
+PrintLine("\n--- ReadKey 函数测试（需要交互输入）---")
+PrintLine("ReadKey() 函数用于读取单个按键")
+PrintLine("自动化测试中跳过此功能")
+// PrintLine("请按任意键...")
+// key <- ReadKey()
+// PrintLine("您按下的键: " + key)
+
+PrintLine("\n--- ReadAscii 函数测试（需要交互输入）---")
+PrintLine("ReadAscii() 函数用于读取 ASCII 输入")
+PrintLine("自动化测试中跳过此功能")
+
+PrintLine("\n--- Terminal 库综合测试 ---")
+Title("综合测试")
+PrintLine("终端标题已更新")
+
+PrintColorful("彩色", "Red")
+Print(" ")
+PrintColorful("输出", "Green")
+Print(" ")
+PrintColorful("测试", "Blue")
+PrintLine()
+
+PrintLineColorful("第一行彩色文本", "Yellow")
+PrintLineColorful("第二行彩色文本", "Cyan")
+PrintLineColorful("第三行彩色文本", "Magenta")
+
+PrintLine("\n✅ Terminal 库函数测试完成")
+PrintLine("注意：ReadLine、ReadKey、ReadAscii 等交互功能需要手动测试")

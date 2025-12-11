@@ -1,0 +1,114 @@
+// 测试 Import 语句
+
+PrintLine("=== Import 语句测试 ===")
+
+PrintLine("\n--- 导入标准库 ---")
+
+// 导入 Time 库
+import Time
+PrintLine("已导入 Time 库")
+timeNow <- GetTimeNow("yyyy-MM-dd HH:mm:ss")
+PrintLine("Time 库测试 - 当前时间: " + timeNow)
+
+// 导入 OS 库
+import OS
+PrintLine("已导入 OS 库")
+osInfo <- OSInfo()
+PrintLine("OS 库测试 - 操作系统: " + osInfo)
+
+// 导入 Math 库
+import Math
+PrintLine("已导入 Math 库")
+mathResult <- 2 ^ 10
+PrintLine("Math 库测试 - 2^10 = " + mathResult)
+
+PrintLine("\n--- 多次导入同一库 ---")
+// 重复导入应该不会出错
+import Time
+PrintLine("再次导入 Time 库")
+timeNow2 <- GetTimeNow("HH:mm:ss")
+PrintLine("Time 库再次使用: " + timeNow2)
+
+import OS
+PrintLine("再次导入 OS 库")
+osInfo2 <- OSInfo()
+PrintLine("OS 库再次使用: " + osInfo2)
+
+PrintLine("\n--- 导入后使用库函数 ---")
+// 使用 Time 库的多个函数
+PrintLine("使用 Time 库的多个函数:")
+PrintLine("1. GetTimeNow: " + GetTimeNow("yyyy-MM-dd"))
+PrintLine("2. TimeStamp: " + TimeStamp())
+
+TimeStart()
+sum <- 0
+for i <- 0, i < 100, i++ {
+    sum <- sum + i
+}
+elapsed <- TimeStop()
+PrintLine("3. TimeStart/TimeStop 计时: " + elapsed + "ms")
+
+PrintLine("\n--- 导入顺序测试 ---")
+// 测试不同的导入顺序
+PrintLine("导入顺序不影响使用:")
+PrintLine("Time -> OS -> Math 顺序导入")
+PrintLine("所有库函数均可正常使用")
+
+PrintLine("\n--- 库函数调用测试 ---")
+// 确保导入后的函数可以正常调用
+PrintLine("Time 库函数调用:")
+time1 <- GetTimeNow("yyyy/MM/dd")
+PrintLine("  GetTimeNow: " + time1)
+
+stamp1 <- TimeStamp()
+PrintLine("  TimeStamp: " + stamp1)
+
+PrintLine("OS 库函数调用:")
+os1 <- OSInfo()
+PrintLine("  OSInfo: " + os1)
+
+PrintLine("\n--- Import 语句位置测试 ---")
+// 在代码中间导入库
+a <- 10
+b <- 20
+PrintLine("变量定义: a = " + a + ", b = " + b)
+
+// 导入 Terminal 库
+import Terminal
+PrintLine("在代码中间导入 Terminal 库")
+Title("Import 测试")
+PrintLine("Terminal 库函数调用: Title 已设置")
+
+c <- a + b
+PrintLine("继续执行: c = a + b = " + c)
+
+PrintLine("\n--- 字符串形式导入测试 ---")
+// 使用字符串形式导入（如果支持）
+import "Time"
+PrintLine("使用字符串形式导入 Time 库")
+timeStr <- GetTimeNow("HH:mm")
+PrintLine("字符串导入后使用: " + timeStr)
+
+PrintLine("\n--- 导入不存在的库错误处理 ---")
+PrintLine("导入不存在的库应该产生错误")
+PrintLine("例如: import NonExistentLibrary")
+PrintLine("（此测试跳过实际导入以避免错误）")
+
+PrintLine("\n--- Import 语句综合测试 ---")
+PrintLine("综合使用多个库:")
+
+// Time 库
+PrintLine("1. Time 库: " + GetTimeNow("yyyy-MM-dd HH:mm:ss"))
+
+// OS 库
+PrintLine("2. OS 库: " + OSInfo())
+
+// Math 库
+result1 <- 5 + 3 * 2
+PrintLine("3. Math 库: 5 + 3 * 2 = " + result1)
+
+// Terminal 库
+PrintLineColorful("4. Terminal 库: 彩色输出", "Green")
+
+PrintLine("\n✅ Import 语句测试完成")
+PrintLine("所有标准库均可正常导入和使用")

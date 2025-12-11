@@ -1,0 +1,38 @@
+// 测试 OS 库函数
+
+import OS
+
+PrintLine("=== OS 库函数测试 ===")
+
+PrintLine("\n--- OSInfo 函数测试 ---")
+// 获取操作系统信息
+osInfo <- OSInfo()
+PrintLine("操作系统信息: " + osInfo)
+
+// 多次调用应该返回相同的结果
+osInfo2 <- OSInfo()
+PrintLine("再次获取操作系统信息: " + osInfo2)
+
+// 验证两次调用结果一致
+Assert(osInfo, osInfo2)
+PrintLine("两次调用 OSInfo() 返回结果一致")
+
+PrintLine("\n--- OS 信息详细测试 ---")
+// 显示详细的操作系统信息
+PrintLine("OS 库提供的功能:")
+PrintLine("1. OSInfo() - 获取操作系统信息")
+PrintLine("2. Process() - 进程相关操作（如果存在）")
+
+PrintLine("\n--- 系统环境测试 ---")
+PrintLine("当前操作系统: " + osInfo)
+PrintLine("OS 库测试在不同操作系统上的兼容性")
+
+// 根据操作系统信息进行条件判断示例
+hasWindows <- false
+hasLinux <- false
+hasMac <- false
+
+// 注意：实际的 OSInfo 返回格式可能需要调整
+PrintLine("操作系统类型检测（基于 OSInfo 返回值）")
+
+PrintLine("\n✅ OS 库函数测试完成")

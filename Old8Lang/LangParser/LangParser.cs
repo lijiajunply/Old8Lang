@@ -2455,6 +2455,9 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
                 Expect(LangTokenType.RightBracket);
                 return new LangListItem(identifier, start, position);
             }
+
+            // 如果既不是冒号也不是右方括号，则为语法错误
+            throw CreateSyntaxError($"语法错误：索引或切片语法错误。在 '{CurrentToken.Value}' 处期望 ':' 或 ']'。建议：使用 array[index] 进行索引访问，或使用 array[start:end] 进行切片。");
         }
 
         // 处理列表访问：list[index] （默认情况）- 使用 OldItem

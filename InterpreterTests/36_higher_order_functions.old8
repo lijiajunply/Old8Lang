@@ -1,0 +1,201 @@
+// 测试高阶函数和闭包
+
+PrintLine("=== 高阶函数和闭包测试 ===")
+
+PrintLine("\n--- 函数作为参数测试 ---")
+// 定义接受函数作为参数的函数
+func applyOperation(a:int, b:int, operation) {
+    return operation(a, b)
+}
+
+// 定义操作函数
+func add(x:int, y:int) {
+    return x + y
+}
+
+func multiply(x:int, y:int) {
+    return x * y
+}
+
+func subtract(x:int, y:int) {
+    return x - y
+}
+
+// 测试函数作为参数
+result1 <- applyOperation(10, 5, add)
+PrintLine("applyOperation(10, 5, add) = " + result1)
+
+result2 <- applyOperation(10, 5, multiply)
+PrintLine("applyOperation(10, 5, multiply) = " + result2)
+
+result3 <- applyOperation(10, 5, subtract)
+PrintLine("applyOperation(10, 5, subtract) = " + result3)
+
+PrintLine("\n--- Lambda 表达式作为参数测试 ---")
+// 使用 lambda 表达式
+result4 <- applyOperation(20, 4, (a:int, b:int) -> a / b)
+PrintLine("applyOperation(20, 4, (a, b) -> a / b) = " + result4)
+
+result5 <- applyOperation(5, 3, (a:int, b:int) -> a ^ b)
+PrintLine("applyOperation(5, 3, (a, b) -> a ^ b) = " + result5)
+
+PrintLine("\n--- 返回函数的函数测试 ---")
+// 定义返回函数的函数
+func makeAdder(x:int) {
+    return (y:int) -> x + y
+}
+
+// 创建加法器
+add5 <- makeAdder(5)
+add10 <- makeAdder(10)
+
+PrintLine("add5(3) = " + add5(3))
+PrintLine("add5(7) = " + add5(7))
+PrintLine("add10(3) = " + add10(3))
+PrintLine("add10(7) = " + add10(7))
+
+PrintLine("\n--- 返回乘法器测试 ---")
+func makeMultiplier(factor:int) {
+    return (n:int) -> n * factor
+}
+
+double <- makeMultiplier(2)
+triple <- makeMultiplier(3)
+
+PrintLine("double(5) = " + double(5))
+PrintLine("double(10) = " + double(10))
+PrintLine("triple(5) = " + triple(5))
+PrintLine("triple(10) = " + triple(10))
+
+PrintLine("\n--- 闭包变量捕获测试 ---")
+func makeCounter() {
+    count <- 0
+    return () -> {
+        count <- count + 1
+        return count
+    }
+}
+
+// 创建计数器
+counter1 <- makeCounter()
+counter2 <- makeCounter()
+
+PrintLine("counter1()第1次调用: " + counter1())
+PrintLine("counter1()第2次调用: " + counter1())
+PrintLine("counter1()第3次调用: " + counter1())
+
+PrintLine("counter2()第1次调用: " + counter2())
+PrintLine("counter2()第2次调用: " + counter2())
+
+PrintLine("\n--- 函数组合测试 ---")
+func compose(f, g) {
+    return (x) -> f(g(x))
+}
+
+func addOne(x:int) {
+    return x + 1
+}
+
+func timesTwo(x:int) {
+    return x * 2
+}
+
+// 组合函数：先 *2 再 +1
+composed1 <- compose(addOne, timesTwo)
+PrintLine("compose(addOne, timesTwo)(5) = " + composed1(5))
+PrintLine("compose(addOne, timesTwo)(10) = " + composed1(10))
+
+// 组合函数：先 +1 再 *2
+composed2 <- compose(timesTwo, addOne)
+PrintLine("compose(timesTwo, addOne)(5) = " + composed2(5))
+PrintLine("compose(timesTwo, addOne)(10) = " + composed2(10))
+
+PrintLine("\n--- 高阶函数：map 模拟测试 ---")
+func mapArray(arr, fn) {
+    result <- []
+    for i <- 0, i < Len(arr), i++ {
+        result <- [fn(arr[i])]
+    }
+    return result
+}
+
+numbers <- [1, 2, 3, 4, 5]
+PrintLine("原数组: " + numbers)
+
+squared <- mapArray(numbers, (x:int) -> x * x)
+PrintLine("平方后: " + squared)
+
+doubled <- mapArray(numbers, (x:int) -> x * 2)
+PrintLine("翻倍后: " + doubled)
+
+PrintLine("\n--- 高阶函数：filter 模拟测试 ---")
+func filterArray(arr, predicate) {
+    result <- []
+    for i <- 0, i < Len(arr), i++ {
+        if predicate(arr[i]) {
+            result <- [arr[i]]
+        }
+    }
+    return result
+}
+
+numbers2 <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+PrintLine("原数组: " + numbers2)
+
+evens <- filterArray(numbers2, (x:int) -> x % 2 == 0)
+PrintLine("偶数: " + evens)
+
+greaterThan5 <- filterArray(numbers2, (x:int) -> x > 5)
+PrintLine("大于5: " + greaterThan5)
+
+PrintLine("\n--- 高阶函数：reduce 模拟测试 ---")
+func reduceArray(arr, fn, initial) {
+    result <- initial
+    for i <- 0, i < Len(arr), i++ {
+        result <- fn(result, arr[i])
+    }
+    return result
+}
+
+numbers3 <- [1, 2, 3, 4, 5]
+PrintLine("原数组: " + numbers3)
+
+sum <- reduceArray(numbers3, (acc:int, x:int) -> acc + x, 0)
+PrintLine("求和: " + sum)
+
+product <- reduceArray(numbers3, (acc:int, x:int) -> acc * x, 1)
+PrintLine("求积: " + product)
+
+PrintLine("\n--- 柯里化测试 ---")
+func curry(fn) {
+    return (a) -> (b) -> fn(a, b)
+}
+
+func addTwoNumbers(x:int, y:int) {
+    return x + y
+}
+
+curriedAdd <- curry(addTwoNumbers)
+add20 <- curriedAdd(20)
+
+PrintLine("curriedAdd(20)(5) = " + add20(5))
+PrintLine("curriedAdd(20)(10) = " + add20(10))
+
+PrintLine("\n--- 偏函数应用测试 ---")
+func partial(fn, x) {
+    return (y) -> fn(x, y)
+}
+
+func power(base:int, exp:int) {
+    return base ^ exp
+}
+
+square <- partial(power, 2)
+cube <- partial(power, 3)
+
+PrintLine("square(5) = " + square(5))
+PrintLine("square(10) = " + square(10))
+PrintLine("cube(3) = " + cube(3))
+PrintLine("cube(5) = " + cube(5))
+
+PrintLine("\n✅ 高阶函数和闭包测试完成")

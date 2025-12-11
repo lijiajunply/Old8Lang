@@ -17,17 +17,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/重构访问者模式实现.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCaseTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/ExpressionErrorTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Todo" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/26_array_and_slice_operations.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/27_ternary_expressions.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/28_builtin_functions.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/29_time_library.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/30_math_library.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/31_os_library.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/32_terminal_library.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/33_file_library.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/34_import_statements.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/35_recursive_functions.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/36_higher_order_functions.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/37_scope_and_variables.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/38_complex_data_structures.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/2025-12-12-解释器测试报告.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/InterpreterTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/InterpreterTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/SyntaxErrorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/SyntaxErrorTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TestParserError.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Todo" beforeDir="false" afterPath="$PROJECT_DIR$/Todos/Todo.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,6 +70,9 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/SyntaxErrorTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangToken.cs" root0="SKIP_HIGHLIGHTING" />
@@ -343,7 +353,7 @@
       <workItem from="1765446680033" duration="2287000" />
       <workItem from="1765449531774" duration="576000" />
       <workItem from="1765451683861" duration="981000" />
-      <workItem from="1765470025239" duration="3729000" />
+      <workItem from="1765470025239" duration="5620000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -688,7 +698,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="114" />
+    <option name="localTasksCounter" value="115" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -715,7 +725,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="函数解决" />
     <MESSAGE value="修正编译器Bug: Box" />
     <MESSAGE value="加入编译函数，支持类的初始化" />
     <MESSAGE value="加入编译加速" />
@@ -740,7 +749,8 @@
     <MESSAGE value="fix(parser): 修复解析器中的语法错误处理和代码格式问题&#10;&#10;- 修复了块结束标志的处理逻辑&#10;- 优化了函数返回类型声明的错误提示&#10;- 改进了幂运算和点运算符的解析顺序&#10;- 统一了源码位置信息的构造方式&#10;- 修正了元组解析时的逗号处理逻辑&#10;- 完善了默认参数值的解析条件判断&#10;- 清理了不必要的空行和代码格式问题" />
     <MESSAGE value="refactor(ast): 重构AST表达式类型系统&#10;&#10;- 将OldExpr重命名为LangExpression，统一表达式类型命名&#10;- 更新AnyLangValue中的OldExpr引用为LangExpression&#10;- 修改ArrayLangValue使用LangExpression替代OldExpr&#10;- 更新BlockStatement中ToAnyData和ToStaticData返回类型&#10;- 将ClassFieldSetStatement中的OldExpr改为LangExpression&#10;- 更新DictionaryLangValue构造函数参数类型&#10;- 修改ForInStatement和ForStatement中的表达式类型&#10;- 更新FuncLangValue.Run方法参数类型&#10;- 移除ArgList和IdList中间节点类型&#10;- 将Instance类移动到Value目录并更新构造函数&#10;- 更新LangId和LangListItem中的表达式引用类型&#10;- 修改LangParser中所有Parse方法返回类型为LangExpression&#10;- 更新LangValueType.Dot方法参数类型&#10;- 修改ListComprehension和ListLangValue中的表达式类型&#10;- 更新NativeAnyLangValue和NativeStaticAny中的点操作参数类型&#10;- 修改OldIf条件表达式类型" />
     <MESSAGE value="refactor(ast): 重命名OldIf类为IfChild并更新相关引用&#10;&#10;- 将OldIf类重命名为IfChild&#10;- 更新IfStatement中对OldIf的引用为IfChild&#10;- 修改LangParser中创建IfChild实例的代码&#10;- 更新SwitchStatement中的OldCase类为CaseStatement&#10;- 移除IVisitor接口" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 重命名OldIf类为IfChild并更新相关引用&#10;&#10;- 将OldIf类重命名为IfChild&#10;- 更新IfStatement中对OldIf的引用为IfChild&#10;- 修改LangParser中创建IfChild实例的代码&#10;- 更新SwitchStatement中的OldCase类为CaseStatement&#10;- 移除IVisitor接口" />
+    <MESSAGE value="test(parser): 增加边界情况和表达式错误测试&#10;&#10;- 添加空值、极值、嵌套结构等边界情况测试&#10;- 增加算术、比较、逻辑表达式错误测试&#10;- 添加赋值、括号、数组、字典相关错误测试&#10;- 增加函数调用、成员访问、索引访问错误测试&#10;- 添加类型转换和三元表达式错误测试&#10;- 完善特殊字符和浮点数边界测试&#10;- 增加长度极限和混合边界测试用例" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(parser): 增加边界情况和表达式错误测试&#10;&#10;- 添加空值、极值、嵌套结构等边界情况测试&#10;- 增加算术、比较、逻辑表达式错误测试&#10;- 添加赋值、括号、数组、字典相关错误测试&#10;- 增加函数调用、成员访问、索引访问错误测试&#10;- 添加类型转换和三元表达式错误测试&#10;- 完善特殊字符和浮点数边界测试&#10;- 增加长度极限和混合边界测试用例" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

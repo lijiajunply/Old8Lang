@@ -100,9 +100,51 @@ public class ListLangValue : LangValueType, ILangList
 
     public override LangValueType Dot(LangExpression dotExpression)
     {
-        return dotExpression is not Instance a
-            ? throw new InvalidOperationError(this, "列表类型只支持实例调用操作")
-            : a.FromClassToResult(this);
+        // 先检查是否是索引访问
+        if (dotExpression is IntLangValue intValue)
+        {
+            return Get(intValue);
+        }
+
+        // 如果是其他类型的表达式，尝试将其作为索引
+        if (dotExpression is not Instance)
+        {
+            var tempManager = new LangParser.VariateManager();
+            var result = dotExpression.Run(tempManager);
+
+            if (result is IntLangValue idx)
+            {
+                return Get(idx);
+            }
+        }
+
+        // 如果是 Instance，则作为方法调用
+        if (dotExpression is Instance a)
+        {
+            return a.FromClassToResult(this);
+        }
+
+        throw new InvalidOperationError(this, "列表类型只支持索引访问或实例方法调用");
+    }
+
+    // 覆盖 Equal 方法以支持列表深度比较
+    public override bool Equal(LangValueType? otherValueType)
+    {
+        if (otherValueType is not ListLangValue otherList)
+            return false;
+
+        // 比较长度
+        if (Values.Count != otherList.Values.Count)
+            return false;
+
+        // 逐个比较元素
+        for (int i = 0; i < Values.Count; i++)
+        {
+            if (!Values[i].Equal(otherList.Values[i]))
+                return false;
+        }
+
+        return true;
     }
 
     public override object GetValue() => Apis.ListToObjects(Values);

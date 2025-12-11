@@ -45,9 +45,44 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             }
             case "Json" or "json":
             {
-                if (results[0] is not AnyLangValue jsonAnyValue)
-                    throw new TypeError(this, "AnyValue", results[0].GetType().Name);
-                return jsonAnyValue.ToJson();
+                // 支持多种类型的 JSON 序列化
+                switch (results[0])
+                {
+                    case AnyLangValue jsonAnyValue:
+                        return jsonAnyValue.ToJson();
+
+                    case DictionaryLangValue dictValue:
+                    {
+                        // 将字典转换为 JSON 字符串
+                        var dict = new Dictionary<string, object>();
+                        foreach (var (key, value) in dictValue.Value)
+                        {
+                            var keyStr = key.ToDisplayString();
+                            dict[keyStr] = value.GetValue();
+                        }
+                        var jsonStr = System.Text.Json.JsonSerializer.Serialize(dict);
+                        return new StringLangValue(jsonStr);
+                    }
+
+                    case ArrayLangValue arrayValue:
+                    {
+                        // 将数组转换为 JSON 字符串
+                        var list = arrayValue.GetItems().Select(item => item.GetValue()).ToList();
+                        var jsonStr = System.Text.Json.JsonSerializer.Serialize(list);
+                        return new StringLangValue(jsonStr);
+                    }
+
+                    case ListLangValue listValue:
+                    {
+                        // 将列表转换为 JSON 字符串
+                        var list = listValue.GetItems().Select(item => item.GetValue()).ToList();
+                        var jsonStr = System.Text.Json.JsonSerializer.Serialize(list);
+                        return new StringLangValue(jsonStr);
+                    }
+
+                    default:
+                        throw new TypeError(this, "AnyValue/DictionaryValue/ArrayValue/ListValue", results[0].GetType().Name);
+                }
             }
             case "ToObj" or "toObj":
                 if (results[0] is not StringLangValue stringValue)

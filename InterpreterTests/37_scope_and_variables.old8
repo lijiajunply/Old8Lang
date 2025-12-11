@@ -1,0 +1,189 @@
+// 测试作用域和变量
+
+PrintLine("=== 作用域和变量测试 ===")
+
+PrintLine("\n--- 全局变量测试 ---")
+// 全局变量
+globalVar <- 100
+PrintLine("全局变量 globalVar = " + globalVar)
+
+func testGlobal() {
+    PrintLine("函数内访问全局变量: " + globalVar)
+    return globalVar + 10
+}
+
+result <- testGlobal()
+PrintLine("函数返回值: " + result)
+
+PrintLine("\n--- 局部变量测试 ---")
+func testLocal() {
+    localVar <- 50
+    PrintLine("局部变量 localVar = " + localVar)
+    return localVar * 2
+}
+
+result2 <- testLocal()
+PrintLine("函数返回值: " + result2)
+
+// 尝试访问局部变量会失败（此处注释掉以避免错误）
+// PrintLine("尝试访问局部变量: " + localVar)  // 会报错
+
+PrintLine("\n--- 变量遮蔽测试 ---")
+outerVar <- 10
+PrintLine("外部变量 outerVar = " + outerVar)
+
+func testShadowing() {
+    outerVar <- 20  // 创建新的局部变量
+    PrintLine("函数内的 outerVar = " + outerVar)
+    return outerVar + 5
+}
+
+result3 <- testShadowing()
+PrintLine("函数返回值: " + result3)
+PrintLine("外部的 outerVar 仍然是: " + outerVar)
+
+PrintLine("\n--- 块作用域测试 ---")
+x <- 1
+PrintLine("外层 x = " + x)
+
+{
+    x <- 2
+    PrintLine("块内 x = " + x)
+
+    {
+        x <- 3
+        PrintLine("嵌套块内 x = " + x)
+    }
+
+    PrintLine("返回外层块，x = " + x)
+}
+
+PrintLine("最外层 x = " + x)
+
+PrintLine("\n--- 函数参数作用域测试 ---")
+param <- 100
+PrintLine("全局 param = " + param)
+
+func testParam(param:int) {
+    PrintLine("函数参数 param = " + param)
+    param <- param + 10
+    PrintLine("修改后的参数 param = " + param)
+    return param
+}
+
+result4 <- testParam(50)
+PrintLine("函数返回值: " + result4)
+PrintLine("全局 param 不变: " + param)
+
+PrintLine("\n--- 循环变量作用域测试 ---")
+loopVar <- 999
+PrintLine("循环前 loopVar = " + loopVar)
+
+for i <- 0, i < 5, i++ {
+    loopVar <- i * 10
+    PrintLine("循环内 loopVar = " + loopVar)
+}
+
+PrintLine("循环后 loopVar = " + loopVar)
+
+PrintLine("\n--- For-in 循环变量作用域测试 ---")
+arr <- [10, 20, 30, 40, 50]
+PrintLine("数组: " + arr)
+
+for item in arr {
+    PrintLine("循环项: " + item)
+}
+
+// 循环变量在循环外不可访问（此处注释掉）
+// PrintLine("循环外访问 item: " + item)  // 会报错
+
+PrintLine("\n--- if 语句作用域测试 ---")
+ifVar <- 100
+PrintLine("if 语句前 ifVar = " + ifVar)
+
+if true {
+    ifVar <- 200
+    PrintLine("if 块内 ifVar = " + ifVar)
+}
+
+PrintLine("if 语句后 ifVar = " + ifVar)
+
+PrintLine("\n--- 嵌套函数作用域测试 ---")
+func outer() {
+    outerLocal <- "外层"
+    PrintLine("外层函数变量: " + outerLocal)
+
+    func inner() {
+        innerLocal <- "内层"
+        PrintLine("内层函数变量: " + innerLocal)
+        PrintLine("内层访问外层变量: " + outerLocal)
+        return innerLocal + " + " + outerLocal
+    }
+
+    return inner()
+}
+
+result5 <- outer()
+PrintLine("嵌套函数返回值: " + result5)
+
+PrintLine("\n--- 变量重新赋值测试 ---")
+reassignVar <- 10
+PrintLine("初始值: " + reassignVar)
+
+reassignVar <- 20
+PrintLine("第一次重新赋值: " + reassignVar)
+
+reassignVar <- 30
+PrintLine("第二次重新赋值: " + reassignVar)
+
+reassignVar <- "字符串"
+PrintLine("改变类型赋值: " + reassignVar)
+
+reassignVar <- true
+PrintLine("再次改变类型: " + reassignVar)
+
+PrintLine("\n--- 多个同名变量测试 ---")
+multiVar <- "全局"
+PrintLine("全局 multiVar = " + multiVar)
+
+func testMulti() {
+    multiVar <- "函数"
+    PrintLine("函数内 multiVar = " + multiVar)
+
+    {
+        multiVar <- "块"
+        PrintLine("块内 multiVar = " + multiVar)
+    }
+
+    PrintLine("返回函数层 multiVar = " + multiVar)
+}
+
+testMulti()
+PrintLine("全局 multiVar 不变: " + multiVar)
+
+PrintLine("\n--- 变量初始化测试 ---")
+// 声明即赋值
+initVar1 <- 42
+PrintLine("initVar1 = " + initVar1)
+
+// 多个变量初始化
+initVar2 <- 100
+initVar3 <- 200
+initVar4 <- 300
+PrintLine("initVar2 = " + initVar2)
+PrintLine("initVar3 = " + initVar3)
+PrintLine("initVar4 = " + initVar4)
+
+PrintLine("\n--- 类型注解作用域测试 ---")
+typedVar:int <- 123
+PrintLine("带类型注解的变量: " + typedVar)
+
+func testTypedParam(param:string) {
+    PrintLine("带类型注解的参数: " + param)
+    return param + " processed"
+}
+
+result6 <- testTypedParam("test")
+PrintLine("函数返回值: " + result6)
+
+PrintLine("\n✅ 作用域和变量测试完成")

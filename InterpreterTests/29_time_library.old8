@@ -1,0 +1,107 @@
+// 测试 Time 库函数
+
+import Time
+
+PrintLine("=== Time 库函数测试 ===")
+
+PrintLine("\n--- GetTimeNow 函数测试 ---")
+// 测试不同的时间格式
+time1 <- GetTimeNow("yyyy-MM-dd HH:mm:ss")
+PrintLine("GetTimeNow(\"yyyy-MM-dd HH:mm:ss\"): " + time1)
+
+time2 <- GetTimeNow("yyyy/MM/dd")
+PrintLine("GetTimeNow(\"yyyy/MM/dd\"): " + time2)
+
+time3 <- GetTimeNow("HH:mm:ss")
+PrintLine("GetTimeNow(\"HH:mm:ss\"): " + time3)
+
+time4 <- GetTimeNow("yyyy-MM-dd")
+PrintLine("GetTimeNow(\"yyyy-MM-dd\"): " + time4)
+
+time5 <- GetTimeNow("yyyy年MM月dd日")
+PrintLine("GetTimeNow(\"yyyy年MM月dd日\"): " + time5)
+
+PrintLine("\n--- TimeStamp 函数测试 ---")
+// 获取当前时间戳
+timestamp1 <- TimeStamp()
+PrintLine("TimeStamp(): " + timestamp1)
+
+// 多次获取时间戳应该不同
+timestamp2 <- TimeStamp()
+PrintLine("TimeStamp(): " + timestamp2)
+
+PrintLine("\n--- TimeFormat 函数测试 ---")
+// 获取时间格式数组
+formats <- TimeFormat()
+PrintLine("TimeFormat() 返回值: " + formats)
+PrintLine("TimeFormat() 数组长度: " + Len(formats))
+
+PrintLine("\n--- TimeStart 和 TimeStop 函数测试 ---")
+// 测试计时功能
+PrintLine("开始计时...")
+TimeStart()
+
+// 执行一些操作
+sum <- 0
+for i <- 0, i < 1000, i++ {
+    sum <- sum + i
+}
+PrintLine("计算 0 到 999 的和: " + sum)
+
+// 停止计时
+elapsed1 <- TimeStop()
+PrintLine("耗时: " + elapsed1 + " 毫秒")
+
+// 第二次计时测试
+PrintLine("\n开始第二次计时...")
+TimeStart()
+
+// 执行更多操作
+product <- 1
+for i <- 1, i <= 10, i++ {
+    product <- product * i
+}
+PrintLine("计算 10 的阶乘: " + product)
+
+elapsed2 <- TimeStop()
+PrintLine("耗时: " + elapsed2 + " 毫秒")
+
+// 第三次计时测试 - 嵌套循环
+PrintLine("\n开始第三次计时...")
+TimeStart()
+
+count <- 0
+for i <- 0, i < 100, i++ {
+    for j <- 0, j < 100, j++ {
+        count <- count + 1
+    }
+}
+PrintLine("嵌套循环计数: " + count)
+
+elapsed3 <- TimeStop()
+PrintLine("耗时: " + elapsed3 + " 毫秒")
+
+PrintLine("\n--- 时间函数综合测试 ---")
+PrintLine("当前时间: " + GetTimeNow("yyyy-MM-dd HH:mm:ss"))
+PrintLine("当前时间戳: " + TimeStamp())
+
+// 性能测试：数组操作
+TimeStart()
+arr <- []
+for i <- 0, i < 100, i++ {
+    arr <- [i]  // 注意：这里每次创建新数组，不是追加
+}
+arrTime <- TimeStop()
+PrintLine("创建 100 个单元素数组耗时: " + arrTime + " 毫秒")
+
+// 性能测试：字符串拼接
+TimeStart()
+str <- ""
+for i <- 0, i < 50, i++ {
+    str <- str + "a"
+}
+strTime <- TimeStop()
+PrintLine("字符串拼接 50 次耗时: " + strTime + " 毫秒")
+PrintLine("拼接结果长度: " + Len(str))
+
+PrintLine("\n✅ Time 库函数测试完成")

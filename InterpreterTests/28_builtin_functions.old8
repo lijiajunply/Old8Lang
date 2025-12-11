@@ -1,0 +1,154 @@
+// 测试内置函数
+
+PrintLine("=== PrintLine 函数测试 ===")
+// 基本用法
+PrintLine("Hello, World!")
+PrintLine("这是一个测试")
+PrintLine()  // 空行
+
+// 多参数测试
+PrintLine("拼接测试: ", "a", "b", "c")
+PrintLine("数字: ", 123, " 字符串: ", "test")
+
+PrintLine("\n=== Print 函数测试 ===")
+// 不换行打印
+Print("不换行 ")
+Print("打印 ")
+Print("测试")
+PrintLine()  // 换行
+
+// 打印多个参数
+Print("a", "b", "c")
+PrintLine()
+
+PrintLine("\n=== Len 函数测试 ===")
+// 数组长度
+arr <- [1, 2, 3, 4, 5]
+PrintLine("数组 [1, 2, 3, 4, 5] 的长度: " + Len(arr))
+
+// 空数组
+emptyArr <- []
+PrintLine("空数组的长度: " + Len(emptyArr))
+
+// 字符串数组
+strArr <- ["a", "b", "c"]
+PrintLine("字符串数组 [\"a\", \"b\", \"c\"] 的长度: " + Len(strArr))
+
+// 列表长度
+lst <- list[10, 20, 30]
+PrintLine("列表 list[10, 20, 30] 的长度: " + Len(lst))
+
+// 空列表
+emptyList <- list[]
+PrintLine("空列表的长度: " + Len(emptyList))
+
+PrintLine("\n=== Assert 函数测试 ===")
+// 断言相等
+PrintLine("测试 Assert(5, 5)")
+Assert(5, 5)
+PrintLine("Assert(5, 5) 通过")
+
+PrintLine("测试 Assert(\"hello\", \"hello\")")
+Assert("hello", "hello")
+PrintLine("Assert(\"hello\", \"hello\") 通过")
+
+PrintLine("测试 Assert(true, true)")
+Assert(true, true)
+PrintLine("Assert(true, true) 通过")
+
+// 数组断言 - 现在支持数组内容比较！
+PrintLine("测试 Assert([1, 2], [1, 2])")
+arr1 <- [1, 2]
+arr2 <- [1, 2]
+Assert(arr1, arr2)
+PrintLine("Assert([1, 2], [1, 2]) 通过")
+
+PrintLine("\n=== Json 和 ToObj 函数测试 ===")
+// 对象转JSON - 现在支持字典和数组！
+obj <- {"name": "Alice", "age": 30, "city": "Beijing"}
+PrintLine("原对象: " + obj)
+jsonStr <- Json(obj)
+PrintLine("Json 结果: " + jsonStr)
+
+// 数组转JSON
+arr <- [1, 2, 3, 4, 5]
+PrintLine("数组: " + arr)
+arrJson <- Json(arr)
+PrintLine("数组转JSON: " + arrJson)
+
+// JSON转对象
+jsonString <- "{\"name\":\"Bob\",\"age\":25}"
+PrintLine("JSON 字符串: " + jsonString)
+obj2 <- ToObj(jsonString)
+PrintLine("ToObj 结果: " + obj2)
+
+// JSON数组转对象
+jsonArr <- "[10, 20, 30]"
+PrintLine("JSON数组: " + jsonArr)
+arr3 <- ToObj(jsonArr)
+PrintLine("JSON数组转对象: " + arr3)
+
+PrintLine("\n=== 字符串操作测试 ===")
+// 字符串拼接
+str1 <- "Hello"
+str2 <- "World"
+result <- str1 + " " + str2
+PrintLine("\"" + str1 + "\" + \" \" + \"" + str2 + "\" = " + result)
+
+// 字符串与数字拼接
+str <- "数字: "
+num <- 42
+result <- str + num
+PrintLine("\"数字: \" + 42 = " + result)
+
+// 字符串与布尔值拼接
+str <- "布尔值: "
+bool <- true
+result <- str + bool
+PrintLine("\"布尔值: \" + true = " + result)
+
+PrintLine("\n=== 类型测试 ===")
+// 整数类型
+intVal <- 123
+PrintLine("整数值: " + intVal)
+
+// 浮点数类型
+doubleVal <- 3.14
+PrintLine("浮点数值: " + doubleVal)
+
+// 字符串类型
+strVal <- "test"
+PrintLine("字符串值: " + strVal)
+
+// 布尔类型
+boolVal <- true
+PrintLine("布尔值: " + boolVal)
+
+// 字符类型
+charVal <- 'A'
+PrintLine("字符值: " + charVal)
+
+// null 类型
+nullVal <- null
+PrintLine("null 值: " + nullVal)
+
+PrintLine("\n=== 数组和列表类型测试 ===")
+// 数组
+arr <- [1, 2, 3]
+PrintLine("数组: " + arr)
+PrintLine("数组长度: " + Len(arr))
+
+// 列表
+lst <- list[4, 5, 6]
+PrintLine("列表: " + lst)
+PrintLine("列表长度: " + Len(lst))
+
+// 字典
+dict <- {"key1": "value1", "key2": "value2"}
+PrintLine("字典: " + dict)
+
+// 元组
+tuple <- (1, "hello", true)
+PrintLine("元组: " + tuple)
+
+PrintLine("\n✅ 所有内置函数测试完成")

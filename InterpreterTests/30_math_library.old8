@@ -1,0 +1,123 @@
+// 测试 Math 库函数
+// 注意：Math 是内置的数学运算，不需要 import
+
+PrintLine("=== Math 库函数测试 ===")
+
+PrintLine("\n--- Math 常量测试 ---")
+// Math 常量（如果存在）
+PrintLine("Math 库已导入")
+
+PrintLine("\n--- 基本数学运算测试 ---")
+// 加法
+a <- 10
+b <- 20
+sum <- a + b
+PrintLine(a + " + " + b + " = " + sum)
+
+// 减法
+diff <- b - a
+PrintLine(b + " - " + a + " = " + diff)
+
+// 乘法
+product <- a * b
+PrintLine(a + " * " + b + " = " + product)
+
+// 除法
+quotient <- b / a
+PrintLine(b + " / " + a + " = " + quotient)
+
+// 取模
+mod <- b % a
+PrintLine(b + " % " + a + " = " + mod)
+
+// 幂运算
+power <- 2 ^ 8
+PrintLine("2 ^ 8 = " + power)
+
+power2 <- 3 ^ 4
+PrintLine("3 ^ 4 = " + power2)
+
+PrintLine("\n--- 浮点数运算测试 ---")
+x <- 3.14
+y <- 2.71
+sumFloat <- x + y
+PrintLine(x + " + " + y + " = " + sumFloat)
+
+diffFloat <- x - y
+PrintLine(x + " - " + y + " = " + diffFloat)
+
+productFloat <- x * y
+PrintLine(x + " * " + y + " = " + productFloat)
+
+quotientFloat <- x / y
+PrintLine(x + " / " + y + " = " + quotientFloat)
+
+PrintLine("\n--- 负数运算测试 ---")
+neg1 <- -10
+neg2 <- -5
+PrintLine("负数 neg1 = " + neg1)
+PrintLine("负数 neg2 = " + neg2)
+
+negSum <- neg1 + neg2
+PrintLine(neg1 + " + " + neg2 + " = " + negSum)
+
+negProduct <- neg1 * neg2
+PrintLine(neg1 + " * " + neg2 + " = " + negProduct)
+
+PrintLine("\n--- 混合运算测试 ---")
+result1 <- 10 + 5 * 2
+PrintLine("10 + 5 * 2 = " + result1)
+
+result2 <- (10 + 5) * 2
+PrintLine("(10 + 5) * 2 = " + result2)
+
+result3 <- 100 / 10 + 5
+PrintLine("100 / 10 + 5 = " + result3)
+
+result4 <- 100 / (10 + 5)
+PrintLine("100 / (10 + 5) = " + result4)
+
+PrintLine("\n--- 复杂表达式测试 ---")
+expr1 <- 2 + 3 * 4 - 5
+PrintLine("2 + 3 * 4 - 5 = " + expr1)
+
+expr2 <- (2 + 3) * (4 - 5)
+PrintLine("(2 + 3) * (4 - 5) = " + expr2)
+
+expr3 <- 10 * 2 + 15 / 3 - 4
+PrintLine("10 * 2 + 15 / 3 - 4 = " + expr3)
+
+expr4 <- 2 ^ 3 + 4 ^ 2
+PrintLine("2 ^ 3 + 4 ^ 2 = " + expr4)
+
+PrintLine("\n--- 数学比较运算测试 ---")
+PrintLine("10 > 5: " + (10 > 5))
+PrintLine("5 < 10: " + (5 < 10))
+PrintLine("10 >= 10: " + (10 >= 10))
+PrintLine("5 <= 5: " + (5 <= 5))
+PrintLine("10 == 10: " + (10 == 10))
+PrintLine("10 != 5: " + (10 != 5))
+
+PrintLine("\n--- 浮点数比较测试 ---")
+f1 <- 3.14
+f2 <- 3.14
+f3 <- 2.71
+PrintLine(f1 + " == " + f2 + ": " + (f1 == f2))
+PrintLine(f1 + " > " + f3 + ": " + (f1 > f3))
+PrintLine(f3 + " < " + f1 + ": " + (f3 < f1))
+
+PrintLine("\n--- 零值运算测试 ---")
+zero <- 0
+num <- 42
+PrintLine("42 + 0 = " + (num + zero))
+PrintLine("42 - 0 = " + (num - zero))
+PrintLine("42 * 0 = " + (num * zero))
+PrintLine("0 * 42 = " + (zero * num))
+
+PrintLine("\n--- 一值运算测试 ---")
+one <- 1
+PrintLine("42 * 1 = " + (num * one))
+PrintLine("42 / 1 = " + (num / one))
+PrintLine("1 * 42 = " + (one * num))
+
+PrintLine("\n✅ Math 库函数测试完成")

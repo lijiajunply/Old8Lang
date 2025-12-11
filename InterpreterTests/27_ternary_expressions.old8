@@ -1,0 +1,102 @@
+// 测试三元表达式（条件运算符）
+
+PrintLine("=== 基本三元表达式测试 ===")
+// 简单的三元表达式
+a <- 10
+b <- 20
+max <- a > b ? a : b
+PrintLine("a = " + a + ", b = " + b)
+PrintLine("max = a > b ? a : b = " + max)
+
+min <- a < b ? a : b
+PrintLine("min = a < b ? a : b = " + min)
+
+PrintLine("\n=== 三元表达式比较测试 ===")
+x <- 5
+y <- 5
+result1 <- x == y ? "相等" : "不相等"
+PrintLine("x = " + x + ", y = " + y)
+PrintLine("x == y ? \"相等\" : \"不相等\" = " + result1)
+
+x <- 10
+result2 <- x == y ? "相等" : "不相等"
+PrintLine("x = " + x + ", y = " + y)
+PrintLine("x == y ? \"相等\" : \"不相等\" = " + result2)
+
+PrintLine("\n=== 三元表达式返回不同类型测试 ===")
+flag <- true
+value1 <- flag ? 100 : "false"
+PrintLine("flag = true, flag ? 100 : \"false\" = " + value1)
+
+flag <- false
+value2 <- flag ? 100 : "false"
+PrintLine("flag = false, flag ? 100 : \"false\" = " + value2)
+
+PrintLine("\n=== 嵌套三元表达式测试 ===")
+score <- 85
+grade <- score >= 90 ? "A" : (score >= 80 ? "B" : (score >= 70 ? "C" : (score >= 60 ? "D" : "F")))
+PrintLine("score = " + score)
+PrintLine("grade = " + grade)
+
+score <- 92
+grade <- score >= 90 ? "A" : (score >= 80 ? "B" : (score >= 70 ? "C" : (score >= 60 ? "D" : "F")))
+PrintLine("score = " + score)
+PrintLine("grade = " + grade)
+
+score <- 65
+grade <- score >= 90 ? "A" : (score >= 80 ? "B" : (score >= 70 ? "C" : (score >= 60 ? "D" : "F")))
+PrintLine("score = " + score)
+PrintLine("grade = " + grade)
+
+score <- 55
+grade <- score >= 90 ? "A" : (score >= 80 ? "B" : (score >= 70 ? "C" : (score >= 60 ? "D" : "F")))
+PrintLine("score = " + score)
+PrintLine("grade = " + grade)
+
+PrintLine("\n=== 三元表达式在赋值中测试 ===")
+isPositive <- true
+number <- isPositive ? 42 : -42
+PrintLine("isPositive = true, number = " + number)
+
+isPositive <- false
+number <- isPositive ? 42 : -42
+PrintLine("isPositive = false, number = " + number)
+
+PrintLine("\n=== 三元表达式与运算符组合测试 ===")
+num1 <- 10
+num2 <- 20
+result <- (num1 > num2 ? num1 : num2) + 5
+PrintLine("num1 = " + num1 + ", num2 = " + num2)
+PrintLine("(num1 > num2 ? num1 : num2) + 5 = " + result)
+
+result <- (num1 < num2 ? num1 : num2) * 2
+PrintLine("(num1 < num2 ? num1 : num2) * 2 = " + result)
+
+PrintLine("\n=== 三元表达式与逻辑运算符组合测试 ===")
+age <- 25
+hasLicense <- true
+canDrive <- age >= 18 and hasLicense ? "可以开车" : "不能开车"
+PrintLine("age = " + age + ", hasLicense = " + hasLicense)
+PrintLine("canDrive = " + canDrive)
+
+age <- 16
+canDrive <- age >= 18 and hasLicense ? "可以开车" : "不能开车"
+PrintLine("age = " + age + ", hasLicense = " + hasLicense)
+PrintLine("canDrive = " + canDrive)
+
+hasLicense <- false
+age <- 25
+canDrive <- age >= 18 and hasLicense ? "可以开车" : "不能开车"
+PrintLine("age = " + age + ", hasLicense = " + hasLicense)
+PrintLine("canDrive = " + canDrive)
+
+PrintLine("\n=== 三元表达式返回表达式测试 ===")
+condition <- true
+val <- condition ? 10 + 20 : 30 + 40
+PrintLine("condition = true, val = condition ? 10 + 20 : 30 + 40 = " + val)
+
+condition <- false
+val <- condition ? 10 + 20 : 30 + 40
+PrintLine("condition = false, val = condition ? 10 + 20 : 30 + 40 = " + val)
+
+PrintLine("\n✅ 所有三元表达式测试完成")
