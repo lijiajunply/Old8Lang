@@ -15,7 +15,7 @@ public class ExceptionTests
         
         // Assert
         Assert.NotNull(exception);
-        Assert.Equal("RUNTIME_ERROR", exception.ErrorCode);
+        Assert.Contains("INVALID_OPERATION_ERROR", exception.Message);
         Assert.Equal(position, exception.Position);
         Assert.NotNull(exception.Message);
     }
@@ -30,7 +30,7 @@ public class ExceptionTests
         var exception = new InvalidOperationError(position, "无效操作错误信息");
         
         // Assert
-        Assert.Contains("RUNTIME_ERROR", exception.Message);
+        Assert.Contains("INVALID_OPERATION_ERROR", exception.Message);
         Assert.Contains("1", exception.Message);
         Assert.Contains("10", exception.Message);
         Assert.Contains("test.old8", exception.Message);
@@ -47,7 +47,7 @@ public class ExceptionTests
         var exception = new InvalidOperationError(position, "无效操作错误信息", suggestion);
         
         // Assert
-        Assert.Equal("RUNTIME_ERROR", exception.ErrorCode);
+        Assert.Contains("INVALID_OPERATION_ERROR", exception.Message);
         Assert.Equal(position, exception.Position);
         Assert.Equal(suggestion, exception.Suggestion);
         Assert.NotNull(exception.Message);
@@ -64,7 +64,7 @@ public class ExceptionTests
         
         // Assert
         Assert.NotNull(exception);
-        Assert.Equal("RUNTIME_ERROR", exception.ErrorCode);
+        Assert.Contains("ATTRIBUTE_ERROR", exception.Message);
         Assert.Equal(mockNode, exception.Node);
         Assert.Contains("nonExistentAttr", exception.Message);
         Assert.Contains("TestType", exception.Message);
@@ -82,7 +82,7 @@ public class ExceptionTests
         
         // Assert
         Assert.NotNull(exception);
-        Assert.Equal("RUNTIME_ERROR", exception.ErrorCode);
+        Assert.Contains("KEY_ERROR", exception.Message);
         Assert.Equal(position, exception.Position);
         Assert.Contains("nonExistentKey", exception.Message);
         Assert.NotNull(exception.Suggestion);
@@ -99,7 +99,7 @@ public class ExceptionTests
         
         // Assert
         Assert.NotNull(exception);
-        Assert.Equal("RUNTIME_ERROR", exception.ErrorCode);
+        Assert.Contains("ZERO_DIVISION_ERROR", exception.Message);
         Assert.Equal(mockNode, exception.Node);
         Assert.Contains("除零错误", exception.Message);
         Assert.NotNull(exception.Suggestion);
@@ -116,7 +116,7 @@ public class ExceptionTests
         
         // Assert
         Assert.NotNull(exception);
-        Assert.Equal("RUNTIME_ERROR", exception.ErrorCode);
+        Assert.Contains("OUT_OF_MEMORY_ERROR", exception.Message);
         Assert.Contains("内存溢出", exception.Message);
         Assert.Contains("内存不足错误信息", exception.Message);
         Assert.NotNull(exception.Suggestion);
@@ -133,7 +133,7 @@ public class ExceptionTests
         
         // Assert
         Assert.NotNull(exception);
-        Assert.Equal("RUNTIME_ERROR", exception.ErrorCode);
+        Assert.Contains("OVERFLOW_ERROR", exception.Message);
         Assert.Contains("数值溢出", exception.Message);
         Assert.Contains("addition", exception.Message);
         Assert.NotNull(exception.Suggestion);

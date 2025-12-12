@@ -6,10 +6,102 @@ namespace Old8Lang.Compiler;
 
 public static class Compiler
 {
+    /// <summary>
+    /// 调试输出开关，默认为关闭
+    /// </summary>
+    public static bool DebugOutputEnabled { get; set; } = false;
+    
+    /// <summary>
+    /// 日志级别枚举
+    /// </summary>
+    public enum LogLevel
+    {
+        /// <summary>
+        /// 仅输出错误信息
+        /// </summary>
+        Error,
+        /// <summary>
+        /// 输出错误和警告信息
+        /// </summary>
+        Warning,
+        /// <summary>
+        /// 输出错误、警告和信息
+        /// </summary>
+        Info,
+        /// <summary>
+        /// 输出所有信息，包括调试信息
+        /// </summary>
+        Debug
+    }
+    
+    /// <summary>
+    /// 当前日志级别，默认为 Info
+    /// </summary>
+    public static LogLevel CurrentLogLevel { get; set; } = LogLevel.Info;
+    
+    /// <summary>
+    /// 条件输出调试信息
+    /// </summary>
+    /// <param name="message">调试信息</param>
+    /// <param name="level">日志级别</param>
+    private static void Log(string message, LogLevel level = LogLevel.Info)
+    {
+        if (!DebugOutputEnabled && level > LogLevel.Info)
+            return;
+            
+        if (level > CurrentLogLevel)
+            return;
+            
+        string levelPrefix = level switch
+        {
+            LogLevel.Error => "[编译错误]",
+            LogLevel.Warning => "[编译警告]",
+            LogLevel.Info => "[编译信息]",
+            LogLevel.Debug => "[编译调试]",
+            _ => "[编译日志]"
+        };
+        
+        if (level == LogLevel.Error)
+            Console.Error.WriteLine($"{levelPrefix} {message}");
+        else
+            Console.WriteLine($"{levelPrefix} {message}");
+    }
+    
+    /// <summary>
+    /// 条件输出调试信息
+    /// </summary>
+    /// <param name="format">格式化字符串</param>
+    /// <param name="level">日志级别</param>
+    /// <param name="args">格式化参数</param>
+    private static void LogFormat(string format, LogLevel level = LogLevel.Info, params object[] args)
+    {
+        if (!DebugOutputEnabled && level > LogLevel.Info)
+            return;
+            
+        if (level > CurrentLogLevel)
+            return;
+            
+        string levelPrefix = level switch
+        {
+            LogLevel.Error => "[编译错误]",
+            LogLevel.Warning => "[编译警告]",
+            LogLevel.Info => "[编译信息]",
+            LogLevel.Debug => "[编译调试]",
+            _ => "[编译日志]"
+        };
+        
+        string message = string.Format(format, args);
+        
+        if (level == LogLevel.Error)
+            Console.Error.WriteLine($"{levelPrefix} {message}");
+        else
+            Console.WriteLine($"{levelPrefix} {message}");
+    }
+    
     public static Action Compile(BlockStatement statement, string path, IMiniInterpreter i)
     {
-        Console.WriteLine($"[编译调试] 开始编译: {path}");
-        Console.WriteLine($"[编译调试] 语句类型: {statement.GetType().Name}");
+        LogFormat("开始编译: {0}", LogLevel.Debug, path);
+        LogFormat("语句类型: {0}", LogLevel.Debug, statement.GetType().Name);
         
         var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
         var ilGenerator = dynamicMethod.GetILGenerator();
@@ -17,42 +109,45 @@ public static class Compiler
         
         try
         {
-            Console.WriteLine($"[编译调试] 开始生成IL代码");
+            Log("开始生成IL代码", LogLevel.Debug);
             statement.GenerateIl(ilGenerator, local);
-            Console.WriteLine($"[编译调试] IL代码生成完成");
+            Log("IL代码生成完成", LogLevel.Debug);
             
             ilGenerator.Emit(OpCodes.Ret);
             
-            Console.WriteLine($"[编译调试] 创建委托");
+            Log("创建委托", LogLevel.Debug);
             var oldLangRun = (Action)dynamicMethod.CreateDelegate(typeof(Action));
-            Console.WriteLine($"[编译调试] 编译成功");
+            Log("编译成功", LogLevel.Info);
             
             return oldLangRun;
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"\n[编译错误] {path}");
-            Console.Error.WriteLine($"[错误类型] {ex.GetType().Name}");
-            Console.Error.WriteLine($"[错误信息] {ex.Message}");
-            Console.Error.WriteLine($"[堆栈跟踪] {ex.StackTrace}");
+            LogFormat("\n{0}", LogLevel.Error, path);
+            LogFormat("错误类型: {0}", LogLevel.Error, ex.GetType().Name);
+            LogFormat("错误信息: {0}", LogLevel.Error, ex.Message);
+            
+            // 仅在调试模式下输出完整堆栈跟踪
+            if (CurrentLogLevel >= LogLevel.Debug)
+                LogFormat("堆栈跟踪: {0}", LogLevel.Error, ex.StackTrace);
             
             // 尝试获取更详细的位置信息
             if (ex is InvalidOperationError invalidOpError)
             {
-                Console.Error.WriteLine($"[位置信息] {invalidOpError.Position}");
+                LogFormat("位置信息: {0}", LogLevel.Error, invalidOpError.Position);
                 if (invalidOpError.SourceContext != null && invalidOpError.SourceContext.Length > 0)
                 {
-                    Console.Error.WriteLine($"[上下文]");
+                    Log("上下文", LogLevel.Error);
                     foreach (var line in invalidOpError.SourceContext)
                     {
-                        Console.Error.WriteLine($"  {line}");
+                        LogFormat("  {0}", LogLevel.Error, line);
                     }
                 }
-                Console.Error.WriteLine($"[建议] {invalidOpError.Suggestion}");
+                LogFormat("建议: {0}", LogLevel.Error, invalidOpError.Suggestion);
             }
             else if (ex is CompilerException compilerEx)
             {
-                Console.Error.WriteLine($"[位置信息] {compilerEx.Position}");
+                LogFormat("位置信息: {0}", LogLevel.Error, compilerEx.Position);
             }
             
             throw;
@@ -61,36 +156,39 @@ public static class Compiler
 
     public static Action Compile(string path, IMiniInterpreter i)
     {
-        Console.WriteLine($"[编译调试] 开始编译文件: {path}");
+        LogFormat("开始编译文件: {0}", LogLevel.Debug, path);
         
         try
         {
-            Console.WriteLine($"[编译调试] 解析代码");
+            Log("解析代码", LogLevel.Debug);
             var statement = i.Build(Apis.FromFile(path));
-            Console.WriteLine($"[编译调试] 解析完成");
+            Log("解析完成", LogLevel.Debug);
             
             return Compile(statement, path, i);
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"\n[编译错误] {path}");
-            Console.Error.WriteLine($"[错误类型] {ex.GetType().Name}");
-            Console.Error.WriteLine($"[错误信息] {ex.Message}");
-            Console.Error.WriteLine($"[堆栈跟踪] {ex.StackTrace}");
+            LogFormat("\n{0}", LogLevel.Error, path);
+            LogFormat("错误类型: {0}", LogLevel.Error, ex.GetType().Name);
+            LogFormat("错误信息: {0}", LogLevel.Error, ex.Message);
+            
+            // 仅在调试模式下输出完整堆栈跟踪
+            if (CurrentLogLevel >= LogLevel.Debug)
+                LogFormat("堆栈跟踪: {0}", LogLevel.Error, ex.StackTrace);
             
             // 尝试获取更详细的位置信息
             if (ex is SyntaxError syntaxError)
             {
-                Console.Error.WriteLine($"[位置信息] {syntaxError.Position}");
+                LogFormat("位置信息: {0}", LogLevel.Error, syntaxError.Position);
                 if (syntaxError.SourceContext != null && syntaxError.SourceContext.Length > 0)
                 {
-                    Console.Error.WriteLine($"[上下文]");
+                    Log("上下文", LogLevel.Error);
                     foreach (var line in syntaxError.SourceContext)
                     {
-                        Console.Error.WriteLine($"  {line}");
+                        LogFormat("  {0}", LogLevel.Error, line);
                     }
                 }
-                Console.Error.WriteLine($"[建议] {syntaxError.Suggestion}");
+                LogFormat("建议: {0}", LogLevel.Error, syntaxError.Suggestion);
             }
             
             throw;

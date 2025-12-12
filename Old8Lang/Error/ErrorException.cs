@@ -1,5 +1,6 @@
 using Old8Lang.AST;
 using Old8Lang.LangParser;
+using System;
 
 namespace Old8Lang.Error;
 
@@ -39,6 +40,16 @@ public class Old8Exception : Exception
     public string[]? SourceContext { get; }
 
     /// <summary>
+    /// 错误发生时间戳
+    /// </summary>
+    public DateTime Timestamp { get; }
+
+    /// <summary>
+    /// 请求ID，用于跟踪分布式系统中的请求
+    /// </summary>
+    public Guid RequestId { get; }
+
+    /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="errorCode">错误代码</param>
@@ -47,21 +58,25 @@ public class Old8Exception : Exception
     /// <param name="node">AST节点</param>
     /// <param name="suggestion">建议</param>
     /// <param name="sourceContext">源代码上下文</param>
+    /// <param name="requestId">请求ID，用于跟踪分布式系统中的请求</param>
     protected Old8Exception(
         string errorCode,
         string message,
         SourcePosition position,
         IOldLangTree? node = null,
         string? suggestion = null,
-        string[]? sourceContext = null)
+        string[]? sourceContext = null,
+        Guid? requestId = null)
         : base(FormatErrorMessage(errorCode, message, position, suggestion,
-            GetSourceContextFromInterpreter(position, sourceContext)))
+            GetSourceContextFromInterpreter(position, sourceContext), DateTime.Now, requestId ?? Guid.NewGuid()))
     {
         ErrorCode = errorCode;
         Position = position;
         Node = node;
         Suggestion = suggestion;
         SourceContext = GetSourceContextFromInterpreter(position, sourceContext);
+        Timestamp = DateTime.Now;
+        RequestId = requestId ?? Guid.NewGuid();
     }
 
     /// <summary>
@@ -72,14 +87,16 @@ public class Old8Exception : Exception
     /// <param name="node">AST节点</param>
     /// <param name="suggestion">建议</param>
     /// <param name="sourceContext">源代码上下文</param>
+    /// <param name="requestId">请求ID，用于跟踪分布式系统中的请求</param>
     protected Old8Exception(
         string errorCode,
         string message,
         IOldLangTree node,
         string? suggestion = null,
-        string[]? sourceContext = null)
+        string[]? sourceContext = null,
+        Guid? requestId = null)
         : this(errorCode, message, node.Position, node, suggestion,
-            GetSourceContextFromInterpreter(node.Position, sourceContext))
+            GetSourceContextFromInterpreter(node.Position, sourceContext), requestId)
     {
     }
 
@@ -115,9 +132,11 @@ public class Old8Exception : Exception
     /// <param name="position">位置信息</param>
     /// <param name="suggestion">建议</param>
     /// <param name="sourceContext">源代码上下文</param>
+    /// <param name="timestamp">错误发生时间</param>
+    /// <param name="requestId">请求ID</param>
     /// <returns>格式化后的错误信息</returns>
     private static string FormatErrorMessage(string errorCode, string message, SourcePosition position,
-        string? suggestion, string[]? sourceContext)
+        string? suggestion, string[]? sourceContext, DateTime timestamp, Guid requestId)
     {
         var sb = new System.Text.StringBuilder();
 
@@ -127,11 +146,14 @@ public class Old8Exception : Exception
         const string yellow = "\u001b[33m";
         const string blue = "\u001b[34m";
         const string green = "\u001b[32m";
+        const string gray = "\u001b[37m";
 
-        // 错误标题
+        // 错误标题 - 标准化格式
         sb.AppendLine($"{red}[{errorCode}]{reset} {yellow}{message}{reset}");
 
-        // 位置信息
+        // 基本信息
+        sb.AppendLine($"{blue}时间:{reset} {timestamp:yyyy-MM-dd HH:mm:ss.fff}");
+        sb.AppendLine($"{blue}请求ID:{reset} {requestId}");
         sb.AppendLine($"{blue}位置:{reset} {position}");
 
         // 源代码上下文
@@ -167,6 +189,10 @@ public class Old8Exception : Exception
         {
             sb.AppendLine($"{green}建议:{reset} {suggestion}");
         }
+
+        // 堆栈跟踪
+        sb.AppendLine($"{blue}堆栈跟踪:{reset}");
+        sb.AppendLine(new System.Diagnostics.StackTrace(2, true).ToString().Trim());
 
         return sb.ToString();
     }

@@ -579,8 +579,8 @@ public struct FilteringCommentsTokenizer(string input)
         CurrentIndex++;
     }
 
-    private char Peek()
-    {
-        return CurrentIndex + 1 >= input.Length ? '\0' : input[CurrentIndex + 1];
-    }
+    // private char Peek()
+    // {
+    //     return CurrentIndex + 1 >= input.Length ? '\0' : input[CurrentIndex + 1];
+    // }
 }

@@ -6,13 +6,18 @@ namespace Old8Lang.Error;
 public class SyntaxError : Old8Exception
 {
     /// <summary>
+    /// 语法错误代码
+    /// </summary>
+    public new const string ErrorCode = "SYNTAX_ERROR";
+
+    /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="position">位置信息</param>
     /// <param name="message">错误信息</param>
     public SyntaxError(SourcePosition position, string message) 
         : base(
-            "SYNTAX_ERROR", 
+            ErrorCode, 
             message,
             position,
             suggestion: "请检查语法是否正确")
@@ -26,12 +31,50 @@ public class SyntaxError : Old8Exception
     /// <param name="sourceContext">源代码上下文</param>
     public SyntaxError(SourcePosition position, string message, string[] sourceContext) 
         : base(
-            "SYNTAX_ERROR", 
+            ErrorCode, 
             message,
             position,
             suggestion: "请检查语法是否正确",
             sourceContext: sourceContext)
     {}
+    
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="position">位置信息</param>
+    /// <param name="message">错误信息</param>
+    /// <param name="suggestion">建议</param>
+    /// <param name="requestId">请求ID，用于跟踪分布式系统中的请求</param>
+    public SyntaxError(SourcePosition position, string message, string suggestion, System.Guid requestId)
+        : base(
+            ErrorCode,
+            message,
+            position,
+            null,
+            suggestion,
+            null,
+            requestId)
+    {
+    }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="position">位置信息</param>
+    /// <param name="message">错误信息</param>
+    /// <param name="sourceContext">源代码上下文</param>
+    /// <param name="requestId">请求ID，用于跟踪分布式系统中的请求</param>
+    public SyntaxError(SourcePosition position, string message, string[] sourceContext, System.Guid requestId)
+        : base(
+            ErrorCode,
+            message,
+            position,
+            null,
+            "请检查语法是否正确",
+            sourceContext,
+            requestId)
+    {
+    }
     
     /// <summary>
     /// 构造函数

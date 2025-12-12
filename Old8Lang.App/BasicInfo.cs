@@ -26,6 +26,8 @@ public static class BasicInfo
   import                 显示导入库信息
   -change <路径>         修改导入路径
   -h                     显示此帮助信息
+  -d, --debug            启用调试输出，显示详细的编译过程信息
+  -l, --log-level <级别> 设置日志输出级别 (error, warning, info, debug)
 
 使用示例：
   解释执行文件：

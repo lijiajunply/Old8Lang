@@ -26,6 +26,57 @@ if (args.Length == 0)
     }
 }
 
+// 解析调试参数
+var debugEnabled = false;
+var logLevel = Old8Lang.Compiler.Compiler.LogLevel.Info;
+
+// 检查是否有调试参数
+for (int i = 0; i < args.Length; i++)
+{
+    if (args[i] == "-d" || args[i] == "--debug")
+    {
+        debugEnabled = true;
+        logLevel = Old8Lang.Compiler.Compiler.LogLevel.Debug;
+        // 移除调试参数，避免影响后续命令解析
+        var newArgs = new List<string>(args);
+        newArgs.RemoveAt(i);
+        args = newArgs.ToArray();
+        i--;
+    }
+    else if (args[i] == "-l" || args[i] == "--log-level")
+    {
+        if (i + 1 < args.Length)
+        {
+            var levelStr = args[i + 1].ToLower();
+            switch (levelStr)
+            {
+                case "error":
+                    logLevel = Old8Lang.Compiler.Compiler.LogLevel.Error;
+                    break;
+                case "warning":
+                    logLevel = Old8Lang.Compiler.Compiler.LogLevel.Warning;
+                    break;
+                case "info":
+                    logLevel = Old8Lang.Compiler.Compiler.LogLevel.Info;
+                    break;
+                case "debug":
+                    logLevel = Old8Lang.Compiler.Compiler.LogLevel.Debug;
+                    debugEnabled = true;
+                    break;
+            }
+            // 移除日志级别参数
+            var newArgs = new List<string>(args);
+            newArgs.RemoveRange(i, 2);
+            args = newArgs.ToArray();
+            i--;
+        }
+    }
+}
+
+// 设置编译器的调试输出开关和日志级别
+Old8Lang.Compiler.Compiler.DebugOutputEnabled = debugEnabled;
+Old8Lang.Compiler.Compiler.CurrentLogLevel = logLevel;
+
 var langInfo = Apis.ReadJson();
 
 // 命令行模式

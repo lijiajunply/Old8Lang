@@ -17,29 +17,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/Old8Lang 项目优化计划.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/Old8Exception 类及其子类优化计划.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_class_inherit_field.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_class_inherit_init.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_class_inherit_init10.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_class_inherit_init2.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_class_inherit_init3.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_class_inherit_init4.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_class_inherit_init5.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_class_inherit_init6.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_class_inherit_init7.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_class_inherit_init8.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_class_inherit_init9.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_class_inherit_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_class_inherit_simple2.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_dict_modify_access.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_func_add.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_func_param.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_func_return.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_func_return2.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_func_return3.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_func_simple2.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/BasicInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/BasicInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/ExceptionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/ExceptionTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ErrorException.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/ErrorException.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/RuntimeError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/RuntimeError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/SemanticError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/SemanticError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/SyntaxError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/SyntaxError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -359,7 +348,7 @@
       <workItem from="1765451683861" duration="981000" />
       <workItem from="1765470025239" duration="15713000" />
       <workItem from="1765514280184" duration="23569000" />
-      <workItem from="1765551227084" duration="1430000" />
+      <workItem from="1765551227084" duration="2873000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
