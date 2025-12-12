@@ -137,6 +137,17 @@ public class LangId(string name, string assumptionType = "", LangExpression? def
         }
 
         var value = local.GetLocalVar(IdName);
-        return value?.LocalType ?? typeof(object);
+        if (value != null)
+        {
+            return value.LocalType;
+        }
+
+        // 如果LocalVar中没有，检查LocalVarTypes（用于函数参数类型推断）
+        if (local.LocalVarTypes.TryGetValue(IdName, out var varType))
+        {
+            return varType;
+        }
+
+        return typeof(object);
     }
 }

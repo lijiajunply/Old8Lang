@@ -1,0 +1,10 @@
+func add(a, b) {
+    PrintLine(a)
+    PrintLine(b)
+    c <- a + b
+    PrintLine(c)
+    return c
+}
+
+result <- add(1, 2)
+PrintLine(result)

@@ -1,0 +1,6 @@
+func test(a) {
+    return a
+}
+
+result <- test(123)
+PrintLine(result)

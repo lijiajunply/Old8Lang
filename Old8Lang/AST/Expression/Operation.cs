@@ -454,7 +454,21 @@ public class Operation(LangExpression? left, LangTokenType opera, LangExpression
 
                 // 处理数值类型加法
                 Left?.LoadIlValue(ilGenerator, local);
+                // 如果左操作数是object类型，拆箱为int
+                if (leftType == typeof(object))
+                {
+                    ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+                    leftType = typeof(int);
+                }
+
                 Right?.LoadIlValue(ilGenerator, local);
+                // 如果右操作数是object类型，拆箱为int
+                if (rightType == typeof(object))
+                {
+                    ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+                    rightType = typeof(int);
+                }
+
                 if (leftType == typeof(double) || rightType == typeof(double))
                 {
                     // 确保两个操作数都是double类型

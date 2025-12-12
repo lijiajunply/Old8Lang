@@ -8,10 +8,11 @@ namespace Old8Lang.Compiler;
 
 public class LocalManager
 {
-    private readonly Dictionary<string, LocalBuilder> LocalVar = [];
+    public readonly Dictionary<string, LocalBuilder> LocalVar = [];
     public readonly Dictionary<string, MethodInfo> DelegateVar = [];
     public readonly Dictionary<string, Type> ClassVar = [];
     public readonly Dictionary<string, FieldInfo> FieldVar = [];
+    public readonly Dictionary<string, Type> LocalVarTypes = [];
     public Type? InClassEnv { get; init; }
     public string FilePath { get; set; } = "";
     public IMiniInterpreter? Interpreter { get; init; }

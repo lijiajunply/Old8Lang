@@ -17,10 +17,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Reports/20251210-1000-compiler-tests.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_dict_modify_access.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_func_add.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_func_param.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_func_return.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_func_return2.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_func_simple2.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LangListItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LangListItem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -370,7 +374,7 @@
       <workItem from="1765449531774" duration="576000" />
       <workItem from="1765451683861" duration="981000" />
       <workItem from="1765470025239" duration="15713000" />
-      <workItem from="1765514280184" duration="20372000" />
+      <workItem from="1765514280184" duration="21233000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -715,7 +719,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="133" />
+    <option name="localTasksCounter" value="134" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -742,7 +746,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(core): 重构代码路径和JSON配置管理&#10;&#10;- 将 BasicInfo 类移动到 Old8Lang.App 命名空间&#10;- 从 BasicInfo 中移除 CodePath 和 JsonPath 属性&#10;- 在 Apis 类中新增 CodePath 和 JsonPath 属性及相应逻辑&#10;- 移动 LibInfo 类定义从 Old8Lang.Lib 到 Old8Lang 命名空间&#10;- 更新 Program.cs 中的命名空间引用&#10;- 修复文件读取路径引用为 Apis.CodePath&#10;- 删除冗余的 using 语句和无用的工作区配置项" />
     <MESSAGE value="feat(parser): 支持科学计数法解析&#10;&#10;- 在词法分析器中添加对科学计数法的支持，包括正负指数处理&#10;- 修改数字字面量解析逻辑，使用decimal.Parse提高精度&#10;- 更新测试用例以验证科学计数法功能&#10;- 调整字符串模板格式化方式&#10;- 清理冗余的测试文件和代码&#10;- 更新开发环境配置和调试设置" />
     <MESSAGE value="refactor(core): 优化表达式求值与类型转换逻辑&#10;&#10;- 使用空合并运算符简化变量赋值逻辑&#10;- 重构类型转换方法，增强类型检查与实例创建流程&#10;- 更新字典值处理逻辑，确保键值对正确运行与设置&#10;- 修正实例表达式的ID运行机制，确保参数正确求值&#10;- 优化IL生成代码，改进数值运算与类型转换处理&#10;- 更新示例文件中的this引用语法，提高代码准确性&#10;- 调整极端值测试用例，减少嵌套层级以提升可读性&#10;- 更新IDE配置与调试断点，适配最新代码结构" />
     <MESSAGE value="fix(parser): 修复解析器中的语法错误处理和代码格式问题&#10;&#10;- 修复了块结束标志的处理逻辑&#10;- 优化了函数返回类型声明的错误提示&#10;- 改进了幂运算和点运算符的解析顺序&#10;- 统一了源码位置信息的构造方式&#10;- 修正了元组解析时的逗号处理逻辑&#10;- 完善了默认参数值的解析条件判断&#10;- 清理了不必要的空行和代码格式问题" />
@@ -767,7 +770,8 @@
     <MESSAGE value="chore(tests): 移除重复的编译器测试报告文件&#10;&#10;- 删除了多次重复的测试结果条目&#10;- 清理了无效的失败测试记录&#10;- 统一了测试报告格式，去除冗余内容&#10;- 优化了测试结果展示逻辑&#10;- 修复了测试数据结构的显示问题&#10;- 简化了报告文件的内容组织方式" />
     <MESSAGE value="chore(tests): 添加基础函数与Lambda表达式测试用例&#10;&#10;- 新增普通函数定义与调用测试文件&#10;- 添加Lambda表达式语法测试用例&#10;- 验证函数参数" />
     <MESSAGE value="feat(compiler): 支持类字段访问与赋值操作&#10;&#10;- 在 ClassInit.cs 中保存字段信息到 LocalManager，以便在方法中访问&#10;- 在 LocalManager.cs 中添加 FieldVar 字典用于存储字段信息&#10;- 在 Operation.cs 中优先从 FieldVar 查找字段，支持 TypeBuilder 场景&#10;- 在 SetStatement.cs 中实现对 this 字段的赋值操作支持&#10;- 添加多个测试用例验证类成员访问、修改及初始化功能&#10;- 更新现有测试文件以适配新的类字段处理逻辑" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 支持类字段访问与赋值操作&#10;&#10;- 在 ClassInit.cs 中保存字段信息到 LocalManager，以便在方法中访问&#10;- 在 LocalManager.cs 中添加 FieldVar 字典用于存储字段信息&#10;- 在 Operation.cs 中优先从 FieldVar 查找字段，支持 TypeBuilder 场景&#10;- 在 SetStatement.cs 中实现对 this 字段的赋值操作支持&#10;- 添加多个测试用例验证类成员访问、修改及初始化功能&#10;- 更新现有测试文件以适配新的类字段处理逻辑" />
+    <MESSAGE value="feat(compiler): 支持泛型字典的索引访问与赋值操作&#10;&#10;- 优化 LangListItem 中字典索引访问的类型处理逻辑&#10;- 支持 Dictionary&lt;TKey, TValue&gt; 泛型类型的键值类型匹配&#10;- 在 SetStatement 中实现对泛型字典索引赋值的类型转换&#10;- 添加测试用例验证字典修改与访问功能&#10;- 更新编译器测试报告与相关配置文件" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 支持泛型字典的索引访问与赋值操作&#10;&#10;- 优化 LangListItem 中字典索引访问的类型处理逻辑&#10;- 支持 Dictionary&lt;TKey, TValue&gt; 泛型类型的键值类型匹配&#10;- 在 SetStatement 中实现对泛型字典索引赋值的类型转换&#10;- 添加测试用例验证字典修改与访问功能&#10;- 更新编译器测试报告与相关配置文件" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

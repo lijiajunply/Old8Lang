@@ -13,7 +13,7 @@ public class SetStatement : OldStatement
     public readonly LangId? Id;
     public readonly LangExpression? LeftExpression;
     public readonly LangExpression Value;
-    
+
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public SetStatement(LangId id, LangExpression value, SourcePosition position = default) : base(position)
@@ -23,7 +23,8 @@ public class SetStatement : OldStatement
         Value = value;
     }
 
-    public SetStatement(LangExpression leftExpression, LangExpression value, SourcePosition position = default) : base(position)
+    public SetStatement(LangExpression leftExpression, LangExpression value, SourcePosition position = default) :
+        base(position)
     {
         Id = null;
         LeftExpression = leftExpression;
@@ -39,12 +40,12 @@ public class SetStatement : OldStatement
         {
             var expectedType = Id.AssumptionType.ToLower();
             var actualType = result.TypeToString().ToLower();
-            
+
             // 解析泛型类型注解，如 "list<int>" 或 "array<string>"
             var isGeneric = expectedType.Contains('<') && expectedType.EndsWith('>');
             string baseExpectedType;
             string genericArg = "";
-            
+
             if (isGeneric)
             {
                 // 提取泛型类型名称
@@ -81,9 +82,10 @@ public class SetStatement : OldStatement
                     throw new TypeError(Id, expectedType, actualType);
                 }
             }
-            
+
             // 如果是泛型类型，检查元素类型是否匹配
-            if (isGeneric && (baseExpectedType == "list" || baseExpectedType == "array" || baseExpectedType == "dictionary"))
+            if (isGeneric && (baseExpectedType == "list" || baseExpectedType == "array" ||
+                              baseExpectedType == "dictionary"))
             {
                 // 对于列表和数组，检查元素类型
                 if (result is ListLangValue listValue)
@@ -94,7 +96,8 @@ public class SetStatement : OldStatement
                         var itemType = item.TypeToString().ToLower();
                         if (itemType != genericArg)
                         {
-                            throw new TypeError(Id, expectedType, actualType, $"列表元素类型不匹配：期望 {genericArg}，实际 {itemType}");
+                            throw new TypeError(Id, expectedType, actualType,
+                                $"列表元素类型不匹配：期望 {genericArg}，实际 {itemType}");
                         }
                     }
                 }
@@ -106,7 +109,8 @@ public class SetStatement : OldStatement
                         var itemType = item.TypeToString().ToLower();
                         if (itemType != genericArg)
                         {
-                            throw new TypeError(Id, expectedType, actualType, $"数组元素类型不匹配：期望 {genericArg}，实际 {itemType}");
+                            throw new TypeError(Id, expectedType, actualType,
+                                $"数组元素类型不匹配：期望 {genericArg}，实际 {itemType}");
                         }
                     }
                 }
@@ -196,214 +200,86 @@ public class SetStatement : OldStatement
             Value.SetValueToIl(ilGenerator, local, Id.IdName);
         }
         else if (LeftExpression != null)
+        {
+            if (LeftExpression is Operation { Opera: LangTokenType.Dot } operation)
             {
-                if (LeftExpression is Operation operation && operation.Opera == LangTokenType.Dot)
+                // 处理成员访问或索引访问赋值: left.right <- value 或 left[right] <- value
+                if (operation.Right is LangId memberId)
                 {
-                    // 处理成员访问或索引访问赋值: left.right <- value 或 left[right] <- value
-                    if (operation.Right is LangId memberId)
+                    // 成员访问赋值: left.right <- value
+
+                    // 检查是否是this访问（如this.name <- value）
+                    if (operation.Left is LangId { IdName: "this" } && local.InClassEnv != null)
                     {
-                        // 成员访问赋值: left.right <- value
+                        // 加载 this（参数0）
+                        ilGenerator.Emit(OpCodes.Ldarg_0);
+                        // 加载右值
+                        Value.LoadIlValue(ilGenerator, local);
 
-                        // 检查是否是this访问（如this.name <- value）
-                        if (operation.Left is LangId leftLangId && leftLangId.IdName == "this" && local.InClassEnv != null)
+                        // 从 FieldVar 中获取字段信息
+                        if (local.FieldVar.TryGetValue(memberId.IdName, out var fieldInfo))
                         {
-                            // 加载 this（参数0）
-                            ilGenerator.Emit(OpCodes.Ldarg_0);
-                            // 加载右值
-                            Value.LoadIlValue(ilGenerator, local);
-
-                            // 从 FieldVar 中获取字段信息
-                            if (local.FieldVar.TryGetValue(memberId.IdName, out var fieldInfo))
-                            {
-                                ilGenerator.Emit(OpCodes.Stfld, fieldInfo);
-                                return;
-                            }
-
-                            // 如果 FieldVar 中没有，尝试从类型中获取（仅适用于已创建的类型）
-                            if (local.InClassEnv is not TypeBuilder)
-                            {
-                                var field = local.InClassEnv.GetField(memberId.IdName);
-                                if (field != null)
-                                {
-                                    ilGenerator.Emit(OpCodes.Stfld, field);
-                                    return;
-                                }
-                            }
-
-                            // 如果没有找到字段，跳过
+                            ilGenerator.Emit(OpCodes.Stfld, fieldInfo);
                             return;
                         }
 
-                        // 非this访问，正常处理
-                        // 加载左对象
-                        operation.Left!.LoadIlValue(ilGenerator, local);
-                        // 加载右值
-                        Value.LoadIlValue(ilGenerator, local);
-                        // 获取字段或属性
-                        var leftType = operation.Left.OutputType(local)!;
-
-                        // 检查leftType是否是TypeBuilder或typeof(object)（表示this访问）
-                        if (leftType is not TypeBuilder && leftType != typeof(object))
+                        // 如果 FieldVar 中没有，尝试从类型中获取（仅适用于已创建的类型）
+                        if (local.InClassEnv is not TypeBuilder)
                         {
-                            var field = leftType.GetField(memberId.IdName);
+                            var field = local.InClassEnv.GetField(memberId.IdName);
                             if (field != null)
                             {
                                 ilGenerator.Emit(OpCodes.Stfld, field);
                             }
-                            else
-                            {
-                                var property = leftType.GetProperty(memberId.IdName);
-                                if (property != null && property.GetSetMethod() != null)
-                                {
-                                    ilGenerator.Emit(OpCodes.Callvirt, property.GetSetMethod()!);
-                                }
-                            }
-                        }
-                        // 如果是TypeBuilder或typeof(object)，跳过此操作
-                    }
-                    else
-                    {
-                        // 索引访问赋值: left[right] <- value
-                        // 加载左对象
-                        operation.Left!.LoadIlValue(ilGenerator, local);
-                        // 加载索引
-                        operation.Right!.LoadIlValue(ilGenerator, local);
-                        // 加载右值
-                        Value.LoadIlValue(ilGenerator, local);
-                        // 获取左对象类型
-                        var leftType = operation.Left.OutputType(local)!;
-                        
-                        if (leftType.IsArray)
-                        {
-                            // 数组索引赋值
-                            var elementType = leftType.GetElementType()!;
-                            // 获取值的类型
-                            var valueType = Value.OutputType(local)!;
-                            // 如果值类型与元素类型不匹配，添加类型转换或装箱指令
-                            if (valueType != elementType)
-                            {
-                                if (elementType.IsValueType && !valueType.IsValueType)
-                                {
-                                    // 值类型数组，引用类型值需要拆箱
-                                    ilGenerator.Emit(OpCodes.Unbox_Any, elementType);
-                                }
-                                else if (!elementType.IsValueType && valueType.IsValueType)
-                                {
-                                    // 引用类型数组，值类型值需要装箱
-                                    ilGenerator.Emit(OpCodes.Box, valueType);
-                                }
-                                // 对于其他类型不匹配情况，IL会在运行时处理
-                            }
-                            // 根据元素类型选择适当的 Stelem 指令
-                            if (elementType.IsValueType)
-                            {
-                                // 对于值类型数组，使用 Stelem 指令
-                                ilGenerator.Emit(OpCodes.Stelem, elementType);
-                            }
-                            else
-                            {
-                                // 对于引用类型数组，使用 Stelem_Ref 指令
-                                ilGenerator.Emit(OpCodes.Stelem_Ref);
-                            }
-                        }
-                        else if (leftType.IsGenericType && leftType.GetGenericTypeDefinition() == typeof(List<>))
-                        {
-                            // List<T>索引赋值，调用索引器的setter方法
-                            var genericArguments = leftType.GetGenericArguments();
-                            var itemType = genericArguments[0];
-                            // 获取值的类型
-                            var valueType = Value.OutputType(local)!;
-                            // 如果值类型与列表元素类型不匹配，添加类型转换或装箱指令
-                            if (valueType != itemType)
-                            {
-                                if (itemType.IsValueType && !valueType.IsValueType)
-                                {
-                                    // 值类型列表，引用类型值需要拆箱
-                                    ilGenerator.Emit(OpCodes.Unbox_Any, itemType);
-                                }
-                                else if (!itemType.IsValueType && valueType.IsValueType)
-                                {
-                                    // 引用类型列表，值类型值需要装箱
-                                    ilGenerator.Emit(OpCodes.Box, valueType);
-                                }
-                                // 对于其他类型不匹配情况，IL会在运行时处理
-                            }
-                            var indexer = leftType.GetProperty("Item")!;
-                            ilGenerator.Emit(OpCodes.Callvirt, indexer.GetSetMethod()!);
-                        }
-                        else if (leftType.IsGenericType && leftType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
-                        {
-                            // Dictionary<TKey, TValue>索引赋值，调用索引器的setter方法
-                            var indexer = leftType.GetProperty("Item")!;
-                            ilGenerator.Emit(OpCodes.Callvirt, indexer.GetSetMethod()!);
-                        }
-                    }
-                }
-                else if (LeftExpression is LangListItem listItem)
-                {
-                    // 处理LangListItem索引赋值: listId[key] <- value
-                    // 获取集合类型
-                    var listType = listItem.ListId.OutputType(local);
-
-                    // 加载集合对象
-                    listItem.ListId.LoadIlValue(ilGenerator, local);
-
-                    // 对于字典，需要在加载键和值时进行类型转换
-                    if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
-                    {
-                        var genericArgs = listType.GetGenericArguments();
-                        var dictKeyType = genericArgs[0];
-                        var dictValueType = genericArgs[1];
-
-                        // 加载键并进行类型转换
-                        listItem.Key.LoadIlValue(ilGenerator, local);
-                        var keyType = listItem.Key.OutputType(local);
-                        if (keyType != dictKeyType)
-                        {
-                            if (dictKeyType.IsValueType && !keyType!.IsValueType)
-                            {
-                                ilGenerator.Emit(OpCodes.Unbox_Any, dictKeyType);
-                            }
-                            else if (!dictKeyType.IsValueType && keyType!.IsValueType)
-                            {
-                                ilGenerator.Emit(OpCodes.Box, keyType);
-                            }
                         }
 
-                        // 加载值并进行类型转换
-                        Value.LoadIlValue(ilGenerator, local);
-                        var valueType = Value.OutputType(local);
-                        if (valueType != dictValueType)
-                        {
-                            if (dictValueType.IsValueType && !valueType!.IsValueType)
-                            {
-                                ilGenerator.Emit(OpCodes.Unbox_Any, dictValueType);
-                            }
-                            else if (!dictValueType.IsValueType && valueType!.IsValueType)
-                            {
-                                ilGenerator.Emit(OpCodes.Box, valueType);
-                            }
-                        }
-
-                        // 调用字典的set_Item方法
-                        var indexer = listType.GetProperty("Item")!;
-                        ilGenerator.Emit(OpCodes.Callvirt, indexer.GetSetMethod()!);
+                        // 如果没有找到字段，跳过
                         return;
                     }
 
-                    // 对于非字典类型，按原来的方式加载
-                    listItem.Key.LoadIlValue(ilGenerator, local);
+                    // 非this访问，正常处理
+                    // 加载左对象
+                    operation.Left!.LoadIlValue(ilGenerator, local);
+                    // 加载右值
                     Value.LoadIlValue(ilGenerator, local);
-                    
-                    if (listType == typeof(string))
+                    // 获取字段或属性
+                    var leftType = operation.Left.OutputType(local)!;
+
+                    // 检查leftType是否是TypeBuilder或typeof(object)（表示this访问）
+                    if (leftType is not TypeBuilder && leftType != typeof(object))
                     {
-                        // 字符串是不可变的，不支持赋值
-                        throw new InvalidOperationError(this, "字符串是不可变的，不支持索引赋值");
+                        var field = leftType.GetField(memberId.IdName);
+                        if (field != null)
+                        {
+                            ilGenerator.Emit(OpCodes.Stfld, field);
+                        }
+                        else
+                        {
+                            var property = leftType.GetProperty(memberId.IdName);
+                            if (property != null && property.GetSetMethod() != null)
+                            {
+                                ilGenerator.Emit(OpCodes.Callvirt, property.GetSetMethod()!);
+                            }
+                        }
                     }
-                    else if (listType.IsArray)
+                    // 如果是TypeBuilder或typeof(object)，跳过此操作
+                }
+                else
+                {
+                    // 索引访问赋值: left[right] <- value
+                    // 加载左对象
+                    operation.Left!.LoadIlValue(ilGenerator, local);
+                    // 加载索引
+                    operation.Right!.LoadIlValue(ilGenerator, local);
+                    // 加载右值
+                    Value.LoadIlValue(ilGenerator, local);
+                    // 获取左对象类型
+                    var leftType = operation.Left.OutputType(local)!;
+
+                    if (leftType.IsArray)
                     {
                         // 数组索引赋值
-                        var elementType = listType.GetElementType()!;
+                        var elementType = leftType.GetElementType()!;
                         // 获取值的类型
                         var valueType = Value.OutputType(local)!;
                         // 如果值类型与元素类型不匹配，添加类型转换或装箱指令
@@ -421,6 +297,7 @@ public class SetStatement : OldStatement
                             }
                             // 对于其他类型不匹配情况，IL会在运行时处理
                         }
+
                         // 根据元素类型选择适当的 Stelem 指令
                         if (elementType.IsValueType)
                         {
@@ -433,10 +310,10 @@ public class SetStatement : OldStatement
                             ilGenerator.Emit(OpCodes.Stelem_Ref);
                         }
                     }
-                    else if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(List<>))
+                    else if (leftType.IsGenericType && leftType.GetGenericTypeDefinition() == typeof(List<>))
                     {
-                        // List<T>索引赋值
-                        var genericArguments = listType.GetGenericArguments();
+                        // List<T>索引赋值，调用索引器的setter方法
+                        var genericArguments = leftType.GetGenericArguments();
                         var itemType = genericArguments[0];
                         // 获取值的类型
                         var valueType = Value.OutputType(local)!;
@@ -455,11 +332,141 @@ public class SetStatement : OldStatement
                             }
                             // 对于其他类型不匹配情况，IL会在运行时处理
                         }
-                        var indexer = listType.GetProperty("Item")!;
+
+                        var indexer = leftType.GetProperty("Item")!;
+                        ilGenerator.Emit(OpCodes.Callvirt, indexer.GetSetMethod()!);
+                    }
+                    else if (leftType.IsGenericType && leftType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                    {
+                        // Dictionary<TKey, TValue>索引赋值，调用索引器的setter方法
+                        var indexer = leftType.GetProperty("Item")!;
                         ilGenerator.Emit(OpCodes.Callvirt, indexer.GetSetMethod()!);
                     }
                 }
             }
+            else if (LeftExpression is LangListItem listItem)
+            {
+                // 处理LangListItem索引赋值: listId[key] <- value
+                // 获取集合类型
+                var listType = listItem.ListId.OutputType(local);
+
+                // 加载集合对象
+                listItem.ListId.LoadIlValue(ilGenerator, local);
+
+                // 对于字典，需要在加载键和值时进行类型转换
+                if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                {
+                    var genericArgs = listType.GetGenericArguments();
+                    var dictKeyType = genericArgs[0];
+                    var dictValueType = genericArgs[1];
+
+                    // 加载键并进行类型转换
+                    listItem.Key.LoadIlValue(ilGenerator, local);
+                    var keyType = listItem.Key.OutputType(local);
+                    if (keyType != dictKeyType)
+                    {
+                        if (dictKeyType.IsValueType && !keyType!.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Unbox_Any, dictKeyType);
+                        }
+                        else if (!dictKeyType.IsValueType && keyType!.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Box, keyType);
+                        }
+                    }
+
+                    // 加载值并进行类型转换
+                    Value.LoadIlValue(ilGenerator, local);
+                    var valueType = Value.OutputType(local);
+                    if (valueType != dictValueType)
+                    {
+                        if (dictValueType.IsValueType && !valueType!.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Unbox_Any, dictValueType);
+                        }
+                        else if (!dictValueType.IsValueType && valueType!.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Box, valueType);
+                        }
+                    }
+
+                    // 调用字典的set_Item方法
+                    var indexer = listType.GetProperty("Item")!;
+                    ilGenerator.Emit(OpCodes.Callvirt, indexer.GetSetMethod()!);
+                    return;
+                }
+
+                // 对于非字典类型，按原来的方式加载
+                listItem.Key.LoadIlValue(ilGenerator, local);
+                Value.LoadIlValue(ilGenerator, local);
+
+                if (listType == typeof(string))
+                {
+                    // 字符串是不可变的，不支持赋值
+                    throw new InvalidOperationError(this, "字符串是不可变的，不支持索引赋值");
+                }
+                else if (listType.IsArray)
+                {
+                    // 数组索引赋值
+                    var elementType = listType.GetElementType()!;
+                    // 获取值的类型
+                    var valueType = Value.OutputType(local)!;
+                    // 如果值类型与元素类型不匹配，添加类型转换或装箱指令
+                    if (valueType != elementType)
+                    {
+                        if (elementType.IsValueType && !valueType.IsValueType)
+                        {
+                            // 值类型数组，引用类型值需要拆箱
+                            ilGenerator.Emit(OpCodes.Unbox_Any, elementType);
+                        }
+                        else if (!elementType.IsValueType && valueType.IsValueType)
+                        {
+                            // 引用类型数组，值类型值需要装箱
+                            ilGenerator.Emit(OpCodes.Box, valueType);
+                        }
+                        // 对于其他类型不匹配情况，IL会在运行时处理
+                    }
+
+                    // 根据元素类型选择适当的 Stelem 指令
+                    if (elementType.IsValueType)
+                    {
+                        // 对于值类型数组，使用 Stelem 指令
+                        ilGenerator.Emit(OpCodes.Stelem, elementType);
+                    }
+                    else
+                    {
+                        // 对于引用类型数组，使用 Stelem_Ref 指令
+                        ilGenerator.Emit(OpCodes.Stelem_Ref);
+                    }
+                }
+                else if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    // List<T>索引赋值
+                    var genericArguments = listType.GetGenericArguments();
+                    var itemType = genericArguments[0];
+                    // 获取值的类型
+                    var valueType = Value.OutputType(local)!;
+                    // 如果值类型与列表元素类型不匹配，添加类型转换或装箱指令
+                    if (valueType != itemType)
+                    {
+                        if (itemType.IsValueType && !valueType.IsValueType)
+                        {
+                            // 值类型列表，引用类型值需要拆箱
+                            ilGenerator.Emit(OpCodes.Unbox_Any, itemType);
+                        }
+                        else if (!itemType.IsValueType && valueType.IsValueType)
+                        {
+                            // 引用类型列表，值类型值需要装箱
+                            ilGenerator.Emit(OpCodes.Box, valueType);
+                        }
+                        // 对于其他类型不匹配情况，IL会在运行时处理
+                    }
+
+                    var indexer = listType.GetProperty("Item")!;
+                    ilGenerator.Emit(OpCodes.Callvirt, indexer.GetSetMethod()!);
+                }
+            }
+        }
     }
 
     public override OldStatement this[int index] => this;

@@ -1,0 +1,5 @@
+func test(a) {
+    PrintLine(a)
+}
+
+test(123)
