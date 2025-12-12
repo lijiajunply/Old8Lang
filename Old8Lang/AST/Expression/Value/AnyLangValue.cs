@@ -36,7 +36,7 @@ public class AnyLangValue : LangValueType
     /// 初始化实例，设置Interpreter
     /// </summary>
     /// <param name="interpreter">解释器实例</param>
-    public void Init(IMiniInterpreter interpreter)
+    public void Init(LangInterpreter interpreter)
     {
         Manager.Interpreter = interpreter;
 

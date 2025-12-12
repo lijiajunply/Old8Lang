@@ -4,7 +4,7 @@ using Old8Lang.Error;
 
 namespace Old8Lang.LangParser;
 
-public class LangInterpreter : IMiniInterpreter
+public class LangInterpreter
 {
     public readonly VariateManager Manager = new();
 

@@ -15,7 +15,7 @@ public class LocalManager
     public readonly Dictionary<string, Type> LocalVarTypes = [];
     public Type? InClassEnv { get; init; }
     public string FilePath { get; set; } = "";
-    public IMiniInterpreter? Interpreter { get; init; }
+    public LangInterpreter? Interpreter { get; init; }
     
     // break和continue标签
     public Label? BreakLabel { get; set; }
@@ -178,11 +178,4 @@ public class LocalManager
     public bool IsHasVar(string name) => LocalVar.ContainsKey(name);
 
     public int GetCount() => LocalVar.Count;
-}
-
-public interface IMiniInterpreter
-{
-    public BlockStatement Build(string code);
-    public AbsUseClass UseClass { get; set; }
-    public bool IsCompileOptimization { get; set; }
 }

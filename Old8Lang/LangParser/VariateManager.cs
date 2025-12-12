@@ -14,7 +14,7 @@ public class VariateManager
     public LangInfo? LangInfo { get; set; }
     public string Path { get; set; } = "";
 
-    [NotNull] public IMiniInterpreter? Interpreter { get; set; }
+    [NotNull] public LangInterpreter? Interpreter { get; set; }
 
     #endregion
 

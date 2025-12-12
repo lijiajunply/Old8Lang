@@ -101,17 +101,4 @@ public class CompilerTests
         // Assert
         Assert.True(localManager.IsInFinallyBlock);
     }
-    
-    // 模拟IMiniInterpreter实现
-    private class MockInterpreter : IMiniInterpreter
-    {
-        public BlockStatement Build(string code)
-        {
-            return new BlockStatement([]);
-        }
-        
-        public AbsUseClass UseClass { get; set; } = new ConsoleUse();
-        
-        public bool IsCompileOptimization { get; set; } = false;
-    }
 }
