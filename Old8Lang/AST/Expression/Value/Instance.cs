@@ -452,7 +452,11 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             var localA = ilGenerator.DeclareLocal(classType);
             ilGenerator.Emit(OpCodes.Stloc, localA.LocalIndex);
 
-            var initFunc = classType.GetMethod("init");
+            // 使用BindingFlags.DeclaredOnly来只查找当前类声明的方法，避免与继承的方法冲突
+            var initFunc = classType.GetMethod("init",
+                System.Reflection.BindingFlags.Public |
+                System.Reflection.BindingFlags.Instance |
+                System.Reflection.BindingFlags.DeclaredOnly);
             if (initFunc != null)
             {
                 // 加载 this 指针

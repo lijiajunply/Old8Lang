@@ -95,6 +95,19 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
         var methods = new List<(ClassMemberId, FuncLangValue)>();
         var fieldBuilders = new List<(FieldBuilder, LangExpression)>();
 
+        // 首先，如果有父类，将父类的字段信息复制到当前类的FieldVar中
+        if (anyLangValue.ParentClassName != null &&
+            local.ClassVar.TryGetValue(anyLangValue.ParentClassName, out var parentType))
+        {
+            // 获取父类的所有公共字段
+            var parentFields = parentType.GetFields(BindingFlags.Public | BindingFlags.Instance);
+            foreach (var parentField in parentFields)
+            {
+                // 将父类字段添加到FieldVar中，这样子类方法就能访问父类字段
+                local.FieldVar[parentField.Name] = parentField;
+            }
+        }
+
         foreach (var variate in anyLangValue.Variates)
         {
             if (variate.Value is FuncLangValue funcValue)
@@ -129,6 +142,7 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
                 FieldAttributes.Public);
 
             // 保存字段信息到 LocalManager，以便在方法中访问
+            // 如果父类已经有同名字段，子类的字段会覆盖它
             local.FieldVar[memberId.IdName] = fieldBuilder;
 
             // 保存字段信息用于构造函数初始化
