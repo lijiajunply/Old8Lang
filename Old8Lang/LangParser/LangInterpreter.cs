@@ -1,5 +1,4 @@
 using Old8Lang.AST.Statement;
-using Old8Lang.Compiler;
 using Old8Lang.Error;
 
 namespace Old8Lang.LangParser;
@@ -81,6 +80,6 @@ public class LangInterpreter
         return contextLines.ToArray();
     }
 
-    public AbsUseClass UseClass { get; set; } = new ConsoleUse();
+    public AbsUseClass OutputProvider { get; set; } = new ConsoleUse();
     public bool IsCompileOptimization { get; set; }
 }

@@ -38,7 +38,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             case "ShowValues" or "showValues":
             {
 #if DEBUG
-                manager.Interpreter.UseClass.WriteLine(manager.ToString());
+                manager.Interpreter.OutputProvider.WriteLine(manager.ToString());
                 return new VoidLangValue();
 #endif
             }
@@ -93,14 +93,14 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             {
                 if (results.Count == 0)
                 {
-                    manager.Interpreter.UseClass.WriteLine("");
+                    manager.Interpreter.OutputProvider.WriteLine("");
                     return new VoidLangValue();
                 }
 
                 var value = results[0].ToDisplayString();
                 for (var i = 1; i < results.Count; i++) value += results[i].ToDisplayString();
 
-                manager.Interpreter.UseClass.WriteLine(value);
+                manager.Interpreter.OutputProvider.WriteLine(value);
                 return new VoidLangValue();
             }
             case "Print" or "print":
@@ -110,31 +110,31 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 var value = results[0].ToDisplayString();
                 for (var i = 1; i < results.Count; i++) value += results[i].ToDisplayString();
 
-                manager.Interpreter.UseClass.Write(value);
+                manager.Interpreter.OutputProvider.Write(value);
                 return new VoidLangValue();
             }
             case "Error" or "error":
             {
                 if (results.Count == 0)
                 {
-                    manager.Interpreter.UseClass.WriteLine("");
+                    manager.Interpreter.OutputProvider.WriteLine("");
                     return new VoidLangValue();
                 }
 
                 var value = results[0].ToDisplayString();
                 for (var i = 1; i < results.Count; i++) value += results[i].ToDisplayString();
 
-                manager.Interpreter.UseClass.Error(value);
+                manager.Interpreter.OutputProvider.Error(value);
                 return new VoidLangValue();
             }
             case "ReadLine" or "readLine":
             {
-                var res = manager.Interpreter.UseClass.ReadLine();
+                var res = manager.Interpreter.OutputProvider.ReadLine();
                 return new StringLangValue(res);
             }
             case "Clear" or "clear":
             {
-                manager.Interpreter.UseClass.Clear();
+                manager.Interpreter.OutputProvider.Clear();
                 return new VoidLangValue();
             }
             case "Compiler" or "compiler":

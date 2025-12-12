@@ -85,7 +85,7 @@ public class InterpreterTests
         var interpreter = new LangInterpreter();
         
         // Act
-        var result = interpreter.UseClass;
+        var result = interpreter.OutputProvider;
         
         // Assert
         Assert.NotNull(result);
