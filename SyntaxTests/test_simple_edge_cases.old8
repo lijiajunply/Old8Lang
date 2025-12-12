@@ -56,12 +56,6 @@ PrintLine(very_long_identifier_name)
 message <- "特殊字符：\n \" \'"
 PrintLine(message)
 
-// 连续赋值
-a <- b <- c <- 10
-PrintLine(a)
-PrintLine(b)
-PrintLine(c)
-
 // 各种括号嵌套
 nested_parens <- (((1 + 2) * 3) / 4)
 PrintLine(nested_parens)

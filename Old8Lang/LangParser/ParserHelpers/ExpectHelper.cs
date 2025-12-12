@@ -1,5 +1,3 @@
-using Old8Lang.Error;
-
 namespace Old8Lang.LangParser.ParserHelpers;
 
 /// <summary>

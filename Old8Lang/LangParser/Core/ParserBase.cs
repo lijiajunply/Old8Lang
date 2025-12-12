@@ -6,14 +6,9 @@ namespace Old8Lang.LangParser.Core;
 /// <summary>
 /// 基础解析器，提供所有解析器通用的基础操作
 /// </summary>
-public abstract class ParserBase
+public abstract class ParserBase(ParserContext context)
 {
-    protected readonly ParserContext Context;
-
-    protected ParserBase(ParserContext context)
-    {
-        Context = context;
-    }
+    protected readonly ParserContext Context = context;
 
     // 快捷访问属性
     protected LangToken CurrentToken => Context.CurrentToken;

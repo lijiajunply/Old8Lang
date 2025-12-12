@@ -2,7 +2,6 @@ using System.Diagnostics.CodeAnalysis;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.Compiler;
 using Old8Lang.Error;
 
 namespace Old8Lang.LangParser;

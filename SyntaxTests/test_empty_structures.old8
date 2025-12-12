@@ -2,7 +2,7 @@
 // 测试各种空结构的语法
 
 // 空块
-empty_block {}
+{}
 
 // 空函数体
 func empty_func() {

@@ -2,7 +2,6 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
-using Old8Lang.Error;
 using Old8Lang.LangParser.Core;
 
 namespace Old8Lang.LangParser.Parsers;
@@ -10,18 +9,11 @@ namespace Old8Lang.LangParser.Parsers;
 /// <summary>
 /// 类解析器，负责解析类声明、访问修饰符和类块
 /// </summary>
-public class ClassParser : ParserBase
+public class ClassParser(
+    ParserContext context,
+    Func<StatementParser> statementParserFactory)
+    : ParserBase(context)
 {
-    private readonly Func<StatementParser> _statementParserFactory;
-
-    public ClassParser(
-        ParserContext context,
-        Func<StatementParser> statementParserFactory)
-        : base(context)
-    {
-        _statementParserFactory = statementParserFactory;
-    }
-
     public ClassInit ParseClassDeclaration()
     {
         Expect(LangTokenType.Class);
@@ -110,7 +102,7 @@ public class ClassParser : ParserBase
                 }
 
                 // 解析语句
-                var statement = _statementParserFactory().ParseStatement();
+                var statement = statementParserFactory().ParseStatement();
 
                 // 根据语句类型和修饰符生成相应的类成员节点
                 if (modifiers.Count != 0)

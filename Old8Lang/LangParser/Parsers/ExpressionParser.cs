@@ -1,9 +1,6 @@
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.AST.Statement;
-using Old8Lang.Error;
 using Old8Lang.LangParser.Core;
 
 namespace Old8Lang.LangParser.Parsers;
@@ -12,16 +9,8 @@ namespace Old8Lang.LangParser.Parsers;
 /// 表达式解析器
 /// 负责解析各种表达式，包括算术、逻辑、比较、三元表达式等
 /// </summary>
-public class ExpressionParser : ParserBase
+public class ExpressionParser(ParserContext context, PrimaryParser primaryParser) : ParserBase(context)
 {
-    private readonly PrimaryParser _primaryParser;
-
-    public ExpressionParser(ParserContext context, PrimaryParser primaryParser)
-        : base(context)
-    {
-        _primaryParser = primaryParser;
-    }
-
     #region Expression
 
     // expression = boolOpera
@@ -93,11 +82,9 @@ public class ExpressionParser : ParserBase
                     falseExpr,
                     new SourcePosition(questionToken.Line, questionToken.Column));
             }
-            else
-            {
-                // 三元表达式缺少冒号，抛出错误
-                throw CreateSyntaxError("语法错误：三元表达式不完整，缺少 ':' 和假值分支。建议：使用完整的三元表达式格式 'condition ? trueValue : falseValue'。");
-            }
+
+            // 三元表达式缺少冒号，抛出错误
+            throw CreateSyntaxError("语法错误：三元表达式不完整，缺少 ':' 和假值分支。建议：使用完整的三元表达式格式 'condition ? trueValue : falseValue'。");
         }
 
         // 不是三元表达式，返回原始条件表达式
@@ -147,8 +134,7 @@ public class ExpressionParser : ParserBase
         var left = ParsePower();
 
         // 处理乘法、除法和取模运算（左结合）
-        while (CurrentToken.Type == LangTokenType.Star || CurrentToken.Type == LangTokenType.Slash ||
-               CurrentToken.Type == LangTokenType.Percent)
+        while (CurrentToken.Type is LangTokenType.Star or LangTokenType.Slash or LangTokenType.Percent)
         {
             var operatorToken = CurrentToken;
             var position = CreateSourcePosition(operatorToken);
@@ -179,7 +165,7 @@ public class ExpressionParser : ParserBase
             var operatorToken = CurrentToken;
             var position = CreateSourcePosition(operatorToken);
             Expect(LangTokenType.As);
-            var right = _primaryParser.ParsePrimary();
+            var right = primaryParser.ParsePrimary();
             // 处理右操作数的点运算符
             right = ParseDotExpr(right);
             left = new Operation(left, operatorToken.Type, right, position);
@@ -191,7 +177,7 @@ public class ExpressionParser : ParserBase
     // 处理幂运算（右结合）
     public LangExpression ParsePower()
     {
-        var left = _primaryParser.ParsePrimary();
+        var left = primaryParser.ParsePrimary();
 
         // 处理点运算符（最高优先级）
         left = ParseDotExpr(left);
@@ -220,7 +206,7 @@ public class ExpressionParser : ParserBase
                 var dotToken = CurrentToken;
                 var position = new SourcePosition(dotToken.Line, dotToken.Column, tokenValue: dotToken.Value);
                 Expect(LangTokenType.Dot);
-                var right = _primaryParser.ParsePrimary();
+                var right = primaryParser.ParsePrimary();
                 left = new Operation(left, LangTokenType.Dot, right, position);
             }
             else if (CurrentToken.Type == LangTokenType.LeftBracket)

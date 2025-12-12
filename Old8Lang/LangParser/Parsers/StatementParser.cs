@@ -11,27 +11,14 @@ namespace Old8Lang.LangParser.Parsers;
 /// <summary>
 /// 语句解析器，负责解析各种语句类型
 /// </summary>
-public class StatementParser : ParserBase
+public class StatementParser(
+    ParserContext context,
+    ExpressionParser expressionParser,
+    FunctionParser functionParser,
+    ClassParser classParser,
+    PrimaryParser primaryParser)
+    : ParserBase(context)
 {
-    private readonly ExpressionParser _expressionParser;
-    private readonly FunctionParser _functionParser;
-    private readonly ClassParser _classParser;
-    private readonly PrimaryParser _primaryParser;
-
-    public StatementParser(
-        ParserContext context,
-        ExpressionParser expressionParser,
-        FunctionParser functionParser,
-        ClassParser classParser,
-        PrimaryParser primaryParser)
-        : base(context)
-    {
-        _expressionParser = expressionParser;
-        _functionParser = functionParser;
-        _classParser = classParser;
-        _primaryParser = primaryParser;
-    }
-
     #region Statement
 
     // statement = lrBlock
@@ -65,7 +52,7 @@ public class StatementParser : ParserBase
         // 处理访问修饰符：public、private、static 或它们的组合
         if (CurrentToken.Type is LangTokenType.Public or LangTokenType.Private or LangTokenType.Static)
         {
-            var parsedModifiers = _classParser.ParseAccessModifiers();
+            var parsedModifiers = classParser.ParseAccessModifiers();
 
             // 合并修饰符
             var combinedModifiers = modifiers != null
@@ -101,11 +88,11 @@ public class StatementParser : ParserBase
             // 检查是否是 for-in 语句，支持 key, value in dict 格式
             // 需要查找 "in" 关键字的位置
             // 限制前瞻深度，避免扫描过多 token（for-in 语句中 'in' 通常在前20个token内）
-            const int MaxLookahead = 20;
+            const int maxLookahead = 20;
 
             var tempIndex = CurrentIndex + 1;
             var foundIn = false;
-            var scanLimit = Math.Min(tempIndex + MaxLookahead, Tokens.Count);
+            var scanLimit = Math.Min(tempIndex + maxLookahead, Tokens.Count);
 
             // 跳过所有标识符和逗号，查找 "in" 关键字
             while (tempIndex < scanLimit)
@@ -150,7 +137,7 @@ public class StatementParser : ParserBase
         // 处理函数定义
         if (CurrentToken.Type == LangTokenType.Func)
         {
-            return _functionParser.ParseFuncDeclaration();
+            return functionParser.ParseFuncDeclaration();
         }
 
         // 处理return语句：return expression
@@ -203,7 +190,7 @@ public class StatementParser : ParserBase
         // 处理class定义：class identifier block
         if (CurrentToken.Type == LangTokenType.Class)
         {
-            return _classParser.ParseClassDeclaration();
+            return classParser.ParseClassDeclaration();
         }
 
         // 处理import语句：import module
@@ -225,9 +212,9 @@ public class StatementParser : ParserBase
             {
                 // 尝试解析左值表达式（不包括三元表达式）
                 // 先解析主要表达式
-                var expr = _primaryParser.ParsePrimary();
+                var expr = primaryParser.ParsePrimary();
                 // 处理点访问和索引访问等复杂左值表达式
-                _expressionParser.ParseDotExpr(expr);
+                expressionParser.ParseDotExpr(expr);
 
                 // 检查是否是类型注解
                 if (CurrentToken.Type == LangTokenType.Colon)
@@ -247,7 +234,7 @@ public class StatementParser : ParserBase
                         {
                             // 这是带有返回类型注解的函数声明
                             CurrentIndex = savedIndex;
-                            return _functionParser.ParseFuncDeclaration();
+                            return functionParser.ParseFuncDeclaration();
                         }
                     }
                 }
@@ -296,7 +283,7 @@ public class StatementParser : ParserBase
         try
         {
             // 尝试解析为表达式
-            var expr = _expressionParser.ParseExpression();
+            var expr = expressionParser.ParseExpression();
             if (expr != null!)
             {
                 // 如果是函数调用表达式（Instance 或 Operation），返回 FuncRunStatement
@@ -304,6 +291,7 @@ public class StatementParser : ParserBase
                 {
                     return new FuncRunStatement(instance, expr.Position);
                 }
+
                 if (expr is Operation operation)
                 {
                     return new FuncRunStatement(operation, expr.Position);
@@ -360,9 +348,9 @@ public class StatementParser : ParserBase
             }
 
             // 解析标识符和左括号
-            _functionParser.ParseIdentifier();
+            functionParser.ParseIdentifier();
             Expect(LangTokenType.LeftParen);
-            _functionParser.ParseIdList();
+            functionParser.ParseIdList();
             Expect(LangTokenType.RightParen);
 
             // 保存当前位置，用于回滚
@@ -387,7 +375,7 @@ public class StatementParser : ParserBase
             {
                 // 回滚到函数开始位置，完整解析函数定义
                 CurrentIndex = savedIndex;
-                return _functionParser.ParseFuncDeclaration();
+                return functionParser.ParseFuncDeclaration();
             }
 
             // 否则是函数调用，回滚到开始位置，解析为函数调用
@@ -418,7 +406,7 @@ public class StatementParser : ParserBase
             return new ReturnStatement(new VoidLangValue(position), position);
         }
 
-        var expression = _expressionParser.ParseExpression();
+        var expression = expressionParser.ParseExpression();
         return new ReturnStatement(expression, position);
     }
 
@@ -443,7 +431,7 @@ public class StatementParser : ParserBase
         var throwToken = CurrentToken;
         var position = new SourcePosition(throwToken.Line, throwToken.Column, tokenValue: throwToken.Value);
         Expect(LangTokenType.Throw);
-        var expression = _expressionParser.ParseExpression();
+        var expression = expressionParser.ParseExpression();
         return new ThrowStatement(expression, position);
     }
 
@@ -463,14 +451,14 @@ public class StatementParser : ParserBase
         if (CurrentToken.Type == LangTokenType.Identifier && Peek().Type == LangTokenType.Colon)
         {
             // 带有类型注解的赋值语句
-            var id = _functionParser.ParseTypedIdentifier(false); // 使用 ParseTypedIdentifier 处理类型注解
+            var id = functionParser.ParseTypedIdentifier(false); // 使用 ParseTypedIdentifier 处理类型注解
             Expect(LangTokenType.Assignment);
-            var expr = _expressionParser.ParseExpression();
+            var expr = expressionParser.ParseExpression();
             return new SetStatement(id, expr, id.Position);
         }
 
         // 解析左值表达式
-        var leftExpr = _expressionParser.ParseExpression();
+        var leftExpr = expressionParser.ParseExpression();
 
         // 检查是否有类型注解
         var assumptionType = "";
@@ -482,7 +470,7 @@ public class StatementParser : ParserBase
         }
 
         Expect(LangTokenType.Assignment);
-        var expression = _expressionParser.ParseExpression();
+        var expression = expressionParser.ParseExpression();
 
         // 处理不同类型的左值表达式
         if (leftExpr is LangId langId)
@@ -501,14 +489,14 @@ public class StatementParser : ParserBase
     {
         var ifToken = CurrentToken;
         Expect(LangTokenType.If);
-        var condition = _expressionParser.ParseExpression();
+        var condition = expressionParser.ParseExpression();
         var ifBlock = ParseBlock();
         var oldIfs = new List<IfChild?>();
         while (CurrentToken.Type == LangTokenType.Elif)
         {
             var elifToken = CurrentToken;
             Expect(LangTokenType.Elif);
-            var elifCondition = _expressionParser.ParseExpression();
+            var elifCondition = expressionParser.ParseExpression();
             var elifBlock = ParseBlock();
             var elifPosition = new SourcePosition(elifToken.Line, elifToken.Column);
             oldIfs.Add(new IfChild(elifCondition, elifBlock, elifPosition));
@@ -532,7 +520,7 @@ public class StatementParser : ParserBase
         Expect(LangTokenType.For);
         var set = ParseSet();
         Expect(LangTokenType.Comma);
-        var condition = _expressionParser.ParseExpression();
+        var condition = expressionParser.ParseExpression();
         Expect(LangTokenType.Comma);
         var statement = ParseStatement();
         var block = ParseBlock();
@@ -561,7 +549,7 @@ public class StatementParser : ParserBase
         }
 
         Expect(LangTokenType.In);
-        var expression = _expressionParser.ParseExpression();
+        var expression = expressionParser.ParseExpression();
         var block = ParseBlock();
 
         var position = new SourcePosition(forToken.Line, forToken.Column);
@@ -581,7 +569,7 @@ public class StatementParser : ParserBase
     {
         var whileToken = CurrentToken;
         Expect(LangTokenType.While);
-        var condition = _expressionParser.ParseExpression();
+        var condition = expressionParser.ParseExpression();
         var block = ParseBlock();
         var position = new SourcePosition(whileToken.Line, whileToken.Column);
         return new WhileStatement(condition, block, position);
@@ -591,7 +579,7 @@ public class StatementParser : ParserBase
     public SwitchStatement ParseSwitchStatement()
     {
         Expect(LangTokenType.Switch);
-        var expression = _expressionParser.ParseExpression();
+        var expression = expressionParser.ParseExpression();
         Expect(LangTokenType.LeftBrace);
         var cases = new List<CaseStatement>();
         while (CurrentToken.Type == LangTokenType.Case)
@@ -616,7 +604,7 @@ public class StatementParser : ParserBase
         var caseToken = CurrentToken;
         var position = new SourcePosition(caseToken.Line, caseToken.Column, tokenValue: caseToken.Value);
         Expect(LangTokenType.Case);
-        var expression = _expressionParser.ParseExpression();
+        var expression = expressionParser.ParseExpression();
         var block = ParseBlock();
         return new CaseStatement(expression, block, position);
     }
@@ -630,7 +618,7 @@ public class StatementParser : ParserBase
         var funcName = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
         Expect(LangTokenType.LeftParen);
-        var arguments = _functionParser.ParseArgList();
+        var arguments = functionParser.ParseArgList();
         Expect(LangTokenType.RightParen);
         return new FuncRunStatement(new Instance(new LangId(funcName), arguments));
     }

@@ -25,6 +25,7 @@ public class ParserContext
 
     /// <summary>
     /// 获取缓存的源代码行（延迟初始化，避免在无错误时分割）
+    /// 注意：保留空行以确保行号正确匹配
     /// </summary>
     public string[] SourceLines
     {
@@ -32,8 +33,9 @@ public class ParserContext
         {
             if (_cachedSourceLines == null && !string.IsNullOrEmpty(SourceCode))
             {
-                _cachedSourceLines = SourceCode.Split(['\n', '\r'],
-                    StringSplitOptions.RemoveEmptyEntries);
+                // 使用 '\n' 分割并保留空行，确保行号正确对应
+                // 注意：Split by '\n' 会保留 '\r'，所以需要在使用时 Trim
+                _cachedSourceLines = SourceCode.Split('\n');
             }
             return _cachedSourceLines ?? Array.Empty<string>();
         }

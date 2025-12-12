@@ -2,7 +2,6 @@ using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
-using Old8Lang.Error;
 using Old8Lang.LangParser.Core;
 
 namespace Old8Lang.LangParser.Parsers;
@@ -10,21 +9,12 @@ namespace Old8Lang.LangParser.Parsers;
 /// <summary>
 /// 函数解析器，负责解析函数声明、参数列表、Lambda
 /// </summary>
-public class FunctionParser : ParserBase
+public class FunctionParser(
+    ParserContext context,
+    Func<StatementParser> statementParserFactory,
+    Func<ExpressionParser> expressionParserFactory)
+    : ParserBase(context)
 {
-    private readonly Func<StatementParser> _statementParserFactory;
-    private readonly Func<ExpressionParser> _expressionParserFactory;
-
-    public FunctionParser(
-        ParserContext context,
-        Func<StatementParser> statementParserFactory,
-        Func<ExpressionParser> expressionParserFactory)
-        : base(context)
-    {
-        _statementParserFactory = statementParserFactory;
-        _expressionParserFactory = expressionParserFactory;
-    }
-
     /// <summary>
     /// 解析函数声明
     /// funcDeclaration = ( "func" identifier | identifier ) "(" idList? ")" ( "->" )? block
@@ -81,7 +71,7 @@ public class FunctionParser : ParserBase
             updatedFuncName = new LangId(funcName.IdName, returnType, position: funcName.Position);
         }
 
-        var stmtParser = _statementParserFactory();
+        var stmtParser = statementParserFactory();
         var block = stmtParser.ParseBlock();
 
         // 普通函数声明，生成 FuncInit
@@ -147,7 +137,7 @@ public class FunctionParser : ParserBase
             return args;
         }
 
-        var exprParser = _expressionParserFactory();
+        var exprParser = expressionParserFactory();
         args.Add(exprParser.ParseExpression());
         while (CurrentToken.Type == LangTokenType.Comma)
         {
@@ -204,7 +194,7 @@ public class FunctionParser : ParserBase
             else if (isNeedDefaultValue)
             {
                 // 默认参数：identifier:default_value
-                var exprParser = _expressionParserFactory();
+                var exprParser = expressionParserFactory();
                 defaultValue = exprParser.ParseExpression();
             }
         }

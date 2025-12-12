@@ -3,7 +3,6 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
-using Old8Lang.Error;
 using Old8Lang.LangParser.Core;
 
 namespace Old8Lang.LangParser.Parsers;
@@ -12,24 +11,13 @@ namespace Old8Lang.LangParser.Parsers;
 /// Primary 表达式解析器
 /// 负责解析主表达式，包括字面量、列表、字典、数组、元组、Lambda、字符串模板等
 /// </summary>
-public class PrimaryParser : ParserBase
+public class PrimaryParser(
+    ParserContext context,
+    Func<StatementParser> statementParserFactory,
+    Func<ExpressionParser> expressionParserFactory,
+    FunctionParser functionParser)
+    : ParserBase(context)
 {
-    private readonly Func<StatementParser> _statementParserFactory;
-    private readonly Func<ExpressionParser> _expressionParserFactory;
-    private readonly FunctionParser _functionParser;
-
-    public PrimaryParser(
-        ParserContext context,
-        Func<StatementParser> statementParserFactory,
-        Func<ExpressionParser> expressionParserFactory,
-        FunctionParser functionParser)
-        : base(context)
-    {
-        _statementParserFactory = statementParserFactory;
-        _expressionParserFactory = expressionParserFactory;
-        _functionParser = functionParser;
-    }
-
     #region Primary
 
     // primary = stringLiteral
@@ -175,11 +163,11 @@ public class PrimaryParser : ParserBase
             return new ListLangValue(elements, position);
         }
 
-        elements.Add(_expressionParserFactory().ParseExpression());
+        elements.Add(expressionParserFactory().ParseExpression());
         while (CurrentToken.Type == LangTokenType.Comma)
         {
             Expect(LangTokenType.Comma);
-            elements.Add(_expressionParserFactory().ParseExpression());
+            elements.Add(expressionParserFactory().ParseExpression());
         }
 
         Expect(LangTokenType.RightBracket);
@@ -214,11 +202,11 @@ public class PrimaryParser : ParserBase
         // 解析字典元素
         while (true)
         {
-            var key = _expressionParserFactory().ParseExpression();
+            var key = expressionParserFactory().ParseExpression();
             var colonToken = CurrentToken;
             var tuplePosition = new SourcePosition(colonToken.Line, colonToken.Column, tokenValue: colonToken.Value);
             Expect(LangTokenType.Colon);
-            var value = _expressionParserFactory().ParseExpression();
+            var value = expressionParserFactory().ParseExpression();
             elements.Add(new TupleLangValue(key, value, tuplePosition));
 
             if (CurrentToken.Type != LangTokenType.Comma)
@@ -258,13 +246,13 @@ public class PrimaryParser : ParserBase
         // 保存当前位置，用于回退
         var exprStartIndex = CurrentIndex;
 
-        elements.Add(_expressionParserFactory().ParseExpression());
+        elements.Add(expressionParserFactory().ParseExpression());
         if (CurrentToken.Type == LangTokenType.Wavy)
         {
             var wavyToken = CurrentToken;
             var rangePosition = new SourcePosition(wavyToken.Line, wavyToken.Column, tokenValue: wavyToken.Value);
             Expect(LangTokenType.Wavy);
-            elements.Add(_expressionParserFactory().ParseExpression());
+            elements.Add(expressionParserFactory().ParseExpression());
             Expect(LangTokenType.RightBracket);
             return new RangeLangValue(elements[0], elements[1], rangePosition);
         }
@@ -308,7 +296,7 @@ public class PrimaryParser : ParserBase
         while (CurrentToken.Type == LangTokenType.Comma)
         {
             Expect(LangTokenType.Comma);
-            elements.Add(_expressionParserFactory().ParseExpression());
+            elements.Add(expressionParserFactory().ParseExpression());
         }
 
         Expect(LangTokenType.RightBracket);
@@ -324,7 +312,7 @@ public class PrimaryParser : ParserBase
     public ListComprehension ParseListComprehension(SourcePosition position)
     {
         // 解析表达式部分
-        var expression = _expressionParserFactory().ParseExpression();
+        var expression = expressionParserFactory().ParseExpression();
 
         // 三元表达式已经在 ParseExpression 中处理，这里不需要额外处理
 
@@ -341,7 +329,7 @@ public class PrimaryParser : ParserBase
             Expect(LangTokenType.In);
 
             // 解析可迭代对象
-            var iterable = _expressionParserFactory().ParseExpression();
+            var iterable = expressionParserFactory().ParseExpression();
 
             // 解析条件筛选（可选）
             List<LangExpression> conditions = [];
@@ -349,7 +337,7 @@ public class PrimaryParser : ParserBase
             while (CurrentToken.Type == LangTokenType.If)
             {
                 Expect(LangTokenType.If);
-                conditions.Add(_expressionParserFactory().ParseExpression());
+                conditions.Add(expressionParserFactory().ParseExpression());
             }
 
             // 组合多个条件，使用 AND 操作符连接
@@ -432,13 +420,13 @@ public class PrimaryParser : ParserBase
             if (CurrentToken.Type == LangTokenType.LeftBrace)
             {
                 // 块语句：() -> { ... }
-                block = _statementParserFactory().ParseBlock();
+                block = statementParserFactory().ParseBlock();
             }
             else
             {
                 // 表达式：() -> expression
                 // 我们需要将表达式转换为块语句，添加return
-                var expr = _expressionParserFactory().ParseExpression();
+                var expr = expressionParserFactory().ParseExpression();
                 var returnStmt = new ReturnStatement(expr, position);
                 block = new BlockStatement([returnStmt]);
             }
@@ -456,7 +444,7 @@ public class PrimaryParser : ParserBase
         if (CurrentToken.Type == LangTokenType.Identifier)
         {
             // 解析第一个参数，允许类型注解
-            ids.Add(_functionParser.ParseTypedIdentifier(true));
+            ids.Add(functionParser.ParseTypedIdentifier(true));
 
             // 解析更多参数，允许类型注解
             while (CurrentToken.Type == LangTokenType.Comma)
@@ -469,7 +457,7 @@ public class PrimaryParser : ParserBase
                     break;
                 }
 
-                ids.Add(_functionParser.ParseTypedIdentifier(true));
+                ids.Add(functionParser.ParseTypedIdentifier(true));
             }
 
             // 检查是否有箭头符号
@@ -485,13 +473,13 @@ public class PrimaryParser : ParserBase
                 if (CurrentToken.Type == LangTokenType.LeftBrace)
                 {
                     // 块语句：(params) -> { ... }
-                    block = _statementParserFactory().ParseBlock();
+                    block = statementParserFactory().ParseBlock();
                 }
                 else
                 {
                     // 表达式：(params) -> expression
                     // 我们需要将表达式转换为块语句，添加return
-                    var expr = _expressionParserFactory().ParseExpression();
+                    var expr = expressionParserFactory().ParseExpression();
                     var returnStmt = new ReturnStatement(expr, position);
                     block = new BlockStatement([returnStmt]);
                 }
@@ -521,7 +509,7 @@ public class PrimaryParser : ParserBase
         }
 
         // 解析第一个元素
-        elements.Add(_expressionParserFactory().ParseExpression());
+        elements.Add(expressionParserFactory().ParseExpression());
 
         // 检查是否有逗号
         bool hasComma = CurrentToken.Type == LangTokenType.Comma;
@@ -538,7 +526,7 @@ public class PrimaryParser : ParserBase
                 break;
             }
 
-            elements.Add(_expressionParserFactory().ParseExpression());
+            elements.Add(expressionParserFactory().ParseExpression());
         }
 
         // 必须是右括号，否则抛出语法错误
@@ -663,11 +651,15 @@ public class PrimaryParser : ParserBase
                                 }
 
                                 // 完整的表达式解析：支持所有表达式类型，包括点操作符
+                                // 将表达式包装成括号表达式，然后作为赋值语句的右值
+                                // 使用括号可以避免三元运算符中的 if 被误认为 if 语句
+                                var wrappedExpr = $"__temp <- ({exprStr})";
+
                                 // 将表达式字符串转换为Token流
-                                var exprTokens = LangTokenizer.Tokenize(exprStr);
+                                var exprTokens = LangTokenizer.Tokenize(wrappedExpr);
 
                                 // 创建一个新的LangParser实例来解析这个表达式
-                                var exprParser = new LangParser(exprTokens, exprStr, Context.FileName);
+                                var exprParser = new LangParser(exprTokens, wrappedExpr, $"{Context.FileName}:template");
 
                                 // 解析完整表达式
                                 var programBlock = exprParser.ParseProgram();
@@ -854,11 +846,11 @@ public class PrimaryParser : ParserBase
         // 处理切片：list[start:end]
         if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.Number or LangTokenType.LeftBracket)
         {
-            var start = _expressionParserFactory().ParseExpression();
+            var start = expressionParserFactory().ParseExpression();
             if (CurrentToken.Type == LangTokenType.Colon)
             {
                 Expect(LangTokenType.Colon);
-                var end = _expressionParserFactory().ParseExpression();
+                var end = expressionParserFactory().ParseExpression();
                 Expect(LangTokenType.RightBracket);
                 return new SliceLangValue(identifier, start, end);
             }
@@ -875,7 +867,7 @@ public class PrimaryParser : ParserBase
         }
 
         // 处理列表访问：list[index] （默认情况）- 使用 OldItem
-        var index = _expressionParserFactory().ParseExpression();
+        var index = expressionParserFactory().ParseExpression();
         Expect(LangTokenType.RightBracket);
         return new LangListItem(identifier, index, position);
     }
@@ -888,7 +880,7 @@ public class PrimaryParser : ParserBase
     {
         var identifier = ParseIdentifier();
         Expect(LangTokenType.LeftParen);
-        var args = _functionParser.ParseArgList();
+        var args = functionParser.ParseArgList();
         Expect(LangTokenType.RightParen);
         return new Instance(identifier, args);
     }
