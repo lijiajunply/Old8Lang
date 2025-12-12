@@ -1,7 +1,0 @@
-class Dog {
-    func init() {
-        PrintLine("Dog init")
-    }
-}
-
-dog <- Dog()

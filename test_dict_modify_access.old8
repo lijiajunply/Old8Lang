@@ -1,4 +1,0 @@
-dict <- {"age": 30}
-PrintLine(dict["age"])
-dict["age"] <- 31
-PrintLine(dict["age"])

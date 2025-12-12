@@ -1,5 +1,0 @@
-func sayHello() {
-    PrintLine("Hello")
-}
-
-sayHello()

@@ -45,12 +45,11 @@ public class VariateManager
     public bool IsClass { get; set; }
 
     // 递归深度限制
-    public const int MaxRecursionDepth = 1000;
-    private int _recursionDepth = 0;
+    private const int MaxRecursionDepth = 1000;
 
     public int RecursionDepth
     {
-        get => _recursionDepth;
+        get;
         set
         {
             if (value > MaxRecursionDepth)
@@ -60,7 +59,8 @@ public class VariateManager
                     MaxRecursionDepth
                 );
             }
-            _recursionDepth = value;
+
+            field = value;
         }
     }
 
@@ -237,7 +237,7 @@ public class VariateManager
         ImportInfos.Add(langValue);
     }
 
-    public void AddVariate(string name, LangValueType langValueType)
+    private void AddVariate(string name, LangValueType langValueType)
     {
         if (VariateName.Contains(name))
         {
@@ -295,17 +295,17 @@ public class VariateManager
             IsFunc = IsFunc,
             IsClass = IsClass
         };
-        
+
         // 复制变量列表（使用 AddRange 因为属性是只读的）
         newManager.VariateName.AddRange(VariateName);
         newManager.Values.AddRange(Values);
-        
+
         // 复制作用域信息
         newManager.ChildrenNum.AddRange(ChildrenNum);
-        
+
         // 复制导入信息
         newManager.ImportInfos.AddRange(ImportInfos);
-        
+
         return newManager;
     }
 }
