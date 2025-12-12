@@ -1,11 +1,7 @@
 // 最简单的类成员访问测试
-PrintLine("开始测试")
-
 class Person {
     name <- "Alice"
-    age <- 30
 }
 
 person <- Person()
-n <- person.name
-PrintLine(n)
+PrintLine("person.name = " + person.name)

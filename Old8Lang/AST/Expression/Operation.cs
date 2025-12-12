@@ -832,32 +832,33 @@ public class Operation(LangExpression? left, LangTokenType opera, LangExpression
                     ilGenerator.Emit(OpCodes.Ldarg_0);
                     if (Right is not LangId rightId) return local.InClassEnv;
 
-                    // 检查local.InClassEnv是否是TypeBuilder
-                    if (local.InClassEnv is TypeBuilder)
+                    // 优先从 FieldVar 中查找字段（支持 TypeBuilder）
+                    if (local.FieldVar.TryGetValue(rightId.IdName, out var fieldInfo))
                     {
-                        // 如果是TypeBuilder，我们不能在类型创建之前访问它的字段或属性
-                        // 直接返回typeof(object)，这是一个安全的默认值
-                        // 实际的类型信息会在类型创建后通过其他方式处理
-                        return typeof(object);
+                        ilGenerator.Emit(OpCodes.Ldfld, fieldInfo);
+                        return fieldInfo.FieldType;
                     }
 
-                    // 正常处理，local.InClassEnv是一个已经创建好的类型
-                    var field = local.InClassEnv.GetField(rightId.IdName);
-                    if (field == null)
+                    // 如果 FieldVar 中没有，尝试从类型中获取（仅适用于已创建的类型）
+                    if (local.InClassEnv is not TypeBuilder)
                     {
+                        var field = local.InClassEnv.GetField(rightId.IdName);
+                        if (field != null)
+                        {
+                            ilGenerator.Emit(OpCodes.Ldfld, field);
+                            return field.FieldType;
+                        }
+
                         var p = local.InClassEnv.GetProperty(rightId.IdName);
                         if (p != null && p.GetGetMethod() != null)
                         {
                             ilGenerator.Emit(OpCodes.Call, p.GetGetMethod()!);
                             return p.PropertyType;
                         }
-
-                        // 如果没有找到属性或属性没有getter，返回typeof(object)
-                        return typeof(object);
                     }
 
-                    ilGenerator.Emit(OpCodes.Ldfld, field);
-                    return field.FieldType;
+                    // 如果没有找到字段或属性，返回typeof(object)
+                    return typeof(object);
                 }
 
                 if (Right is Instance instance)

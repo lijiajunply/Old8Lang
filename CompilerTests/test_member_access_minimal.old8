@@ -1,0 +1,9 @@
+// 最小化成员访问测试
+PrintLine("=== 数组索引访问 ===")
+array <- [10, 20, 30]
+PrintLine("数组: " + array)
+element <- array[0]
+PrintLine("array[0] = " + element)
+array[1] <- 25
+PrintLine("修改后 array[1] = " + array[1])
+PrintLine("✅ 测试完成")

@@ -1,15 +1,11 @@
 // 测试类方法调用
 class Person {
-    name <- ""
-
-    func init(n) {
-        this.name <- n
-    }
-
+    name <- "Alice"
+    
     func sayHello() {
-        PrintLine("Hello from " + this.name)
+        PrintLine("Hello, my name is " + this.name)
     }
 }
 
-person <- Person("Bob")
+person <- Person()
 person.sayHello()

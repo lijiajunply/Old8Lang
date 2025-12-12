@@ -1,0 +1,4 @@
+// 测试字典修改
+dict <- {"name": "Alice"}
+dict["name"] <- "Bob"
+PrintLine("修改后: " + dict["name"])

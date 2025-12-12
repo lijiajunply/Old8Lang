@@ -203,16 +203,37 @@ public class SetStatement : OldStatement
                     if (operation.Right is LangId memberId)
                     {
                         // 成员访问赋值: left.right <- value
-                        
+
                         // 检查是否是this访问（如this.name <- value）
-                        if (operation.Left is LangId leftLangId && leftLangId.IdName == "this")
+                        if (operation.Left is LangId leftLangId && leftLangId.IdName == "this" && local.InClassEnv != null)
                         {
-                            // 对于this访问，我们跳过编译时生成IL指令
-                            // 因为this指向的是正在创建的类实例，其字段在编译时还未完全定义
-                            // 实际赋值将在运行时通过动态方式处理
+                            // 加载 this（参数0）
+                            ilGenerator.Emit(OpCodes.Ldarg_0);
+                            // 加载右值
+                            Value.LoadIlValue(ilGenerator, local);
+
+                            // 从 FieldVar 中获取字段信息
+                            if (local.FieldVar.TryGetValue(memberId.IdName, out var fieldInfo))
+                            {
+                                ilGenerator.Emit(OpCodes.Stfld, fieldInfo);
+                                return;
+                            }
+
+                            // 如果 FieldVar 中没有，尝试从类型中获取（仅适用于已创建的类型）
+                            if (local.InClassEnv is not TypeBuilder)
+                            {
+                                var field = local.InClassEnv.GetField(memberId.IdName);
+                                if (field != null)
+                                {
+                                    ilGenerator.Emit(OpCodes.Stfld, field);
+                                    return;
+                                }
+                            }
+
+                            // 如果没有找到字段，跳过
                             return;
                         }
-                        
+
                         // 非this访问，正常处理
                         // 加载左对象
                         operation.Left!.LoadIlValue(ilGenerator, local);
@@ -220,7 +241,7 @@ public class SetStatement : OldStatement
                         Value.LoadIlValue(ilGenerator, local);
                         // 获取字段或属性
                         var leftType = operation.Left.OutputType(local)!;
-                        
+
                         // 检查leftType是否是TypeBuilder或typeof(object)（表示this访问）
                         if (leftType is not TypeBuilder && leftType != typeof(object))
                         {

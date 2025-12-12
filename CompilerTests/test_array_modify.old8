@@ -1,0 +1,5 @@
+// 测试数组元素修改
+array <- [10, 20, 30]
+PrintLine("原始数组: " + array)
+array[1] <- 25
+PrintLine("修改后 array[1] = " + array[1])

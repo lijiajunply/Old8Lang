@@ -128,6 +128,9 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
                 fieldType,
                 FieldAttributes.Public);
 
+            // 保存字段信息到 LocalManager，以便在方法中访问
+            local.FieldVar[memberId.IdName] = fieldBuilder;
+
             // 保存字段信息用于构造函数初始化
             if (!memberId.HasModifier(AccessModifierType.Static))
             {
@@ -240,6 +243,12 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
         foreach (var kvp in local.ClassVar)
         {
             methodLocal.ClassVar[kvp.Key] = kvp.Value;
+        }
+
+        // 继承字段定义
+        foreach (var kvp in local.FieldVar)
+        {
+            methodLocal.FieldVar[kvp.Key] = kvp.Value;
         }
 
         // 获取返回类型

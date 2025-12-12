@@ -16,7 +16,30 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_array_access_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_array_modify.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_class_full.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_class_member_modify.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_class_with_init.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_dict_access.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_dict_modify.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_dict_read.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_dict_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_init_called.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_list_access.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_member_access_minimal.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_range.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_string_index.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_this_assignment.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_member_simple.old8" beforeDir="false" afterPath="$PROJECT_DIR$/CompilerTests/test_class_member_simple.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_call.old8" beforeDir="false" afterPath="$PROJECT_DIR$/CompilerTests/test_class_method_call.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -58,9 +81,13 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ClassInit.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ClassInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ClassInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ClassInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ClassInit.cs" root0="SKIP_HIGHLIGHTING" />
@@ -68,6 +95,8 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/FuncRunStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SwitchStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SwitchStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SwitchStatement.cs" root0="SKIP_HIGHLIGHTING" />
@@ -356,7 +385,7 @@
       <workItem from="1765449531774" duration="576000" />
       <workItem from="1765451683861" duration="981000" />
       <workItem from="1765470025239" duration="15713000" />
-      <workItem from="1765514280184" duration="16312000" />
+      <workItem from="1765514280184" duration="17964000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -701,7 +730,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="131" />
+    <option name="localTasksCounter" value="132" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -728,7 +757,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(parser): 优化表达式解析逻辑并清理无用代码&#10;&#10;- 简化Peek方法的条件判断逻辑&#10;- 移除重复且冗余的表达式解析辅助方法&#10;- 统一SourcePosition对象创建格式&#10;- 清理无用的空行和注释&#10;- 调整SetStatement构造函数参数格式以提高可读性&#10;- 合并相关联的代码块以增强结构清晰度" />
     <MESSAGE value="feat(cli): 完善命令行功能与帮助文档&#10;&#10;- 重构命令行参数解析逻辑，支持交互式输入&#10;- 新增完整的帮助文档，包含命令格式和使用示例&#10;- 实现版本信息、语言信息、导入库信息显示功能&#10;- 添加导入路径修改功能&#10;- 完善文件执行模式，支持解释模式和编译模式&#10;- 增强错误处理和用户提示信息&#10;- 更新测试用例，验证新功能正确性" />
     <MESSAGE value="refactor(core): 重构代码路径和JSON配置管理&#10;&#10;- 将 BasicInfo 类移动到 Old8Lang.App 命名空间&#10;- 从 BasicInfo 中移除 CodePath 和 JsonPath 属性&#10;- 在 Apis 类中新增 CodePath 和 JsonPath 属性及相应逻辑&#10;- 移动 LibInfo 类定义从 Old8Lang.Lib 到 Old8Lang 命名空间&#10;- 更新 Program.cs 中的命名空间引用&#10;- 修复文件读取路径引用为 Apis.CodePath&#10;- 删除冗余的 using 语句和无用的工作区配置项" />
     <MESSAGE value="feat(parser): 支持科学计数法解析&#10;&#10;- 在词法分析器中添加对科学计数法的支持，包括正负指数处理&#10;- 修改数字字面量解析逻辑，使用decimal.Parse提高精度&#10;- 更新测试用例以验证科学计数法功能&#10;- 调整字符串模板格式化方式&#10;- 清理冗余的测试文件和代码&#10;- 更新开发环境配置和调试设置" />
@@ -753,7 +781,8 @@
     <MESSAGE value="feat(compiler): 支持类方法调用和初始化&#10;&#10;- 修改 ClassInit.cs 以支持方法上下文继承外部函数和类定义&#10;- 调整 Instance.cs 中的实例化逻辑，确保正确调用 init 方法&#10;- 新增多个测试用例验证类方法的赋值、返回值和调用功能&#10;- 更新编译器测试报告，记录新增测试结果" />
     <MESSAGE value="feat(compiler): 支持类字段和方法的基本访问与调用&#10;&#10;- 实现类字段的初始化和访问功能&#10;- 支持类方法的定义与调用&#10;- 支持方法内部的 PrintLine 调用&#10;- 支持方法返回值处理&#10;- 支持 void 方法中的 return 语句&#10;- 添加多个测试用例验证类功能正确性" />
     <MESSAGE value="chore(tests): 移除重复的编译器测试报告文件&#10;&#10;- 删除了多次重复的测试结果条目&#10;- 清理了无效的失败测试记录&#10;- 统一了测试报告格式，去除冗余内容&#10;- 优化了测试结果展示逻辑&#10;- 修复了测试数据结构的显示问题&#10;- 简化了报告文件的内容组织方式" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore(tests): 移除重复的编译器测试报告文件&#10;&#10;- 删除了多次重复的测试结果条目&#10;- 清理了无效的失败测试记录&#10;- 统一了测试报告格式，去除冗余内容&#10;- 优化了测试结果展示逻辑&#10;- 修复了测试数据结构的显示问题&#10;- 简化了报告文件的内容组织方式" />
+    <MESSAGE value="chore(tests): 添加基础函数与Lambda表达式测试用例&#10;&#10;- 新增普通函数定义与调用测试文件&#10;- 添加Lambda表达式语法测试用例&#10;- 验证函数参数" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore(tests): 添加基础函数与Lambda表达式测试用例&#10;&#10;- 新增普通函数定义与调用测试文件&#10;- 添加Lambda表达式语法测试用例&#10;- 验证函数参数" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -11,6 +11,7 @@ public class LocalManager
     private readonly Dictionary<string, LocalBuilder> LocalVar = [];
     public readonly Dictionary<string, MethodInfo> DelegateVar = [];
     public readonly Dictionary<string, Type> ClassVar = [];
+    public readonly Dictionary<string, FieldInfo> FieldVar = [];
     public Type? InClassEnv { get; init; }
     public string FilePath { get; set; } = "";
     public IMiniInterpreter? Interpreter { get; init; }
@@ -100,7 +101,13 @@ public class LocalManager
         {
             cloned.ClassVar[name] = type;
         }
-        
+
+        // 克隆字段变量
+        foreach (var (name, field) in FieldVar)
+        {
+            cloned.FieldVar[name] = field;
+        }
+
         return cloned;
     }
     
@@ -130,13 +137,22 @@ public class LocalManager
         
         // 清空当前类变量
         ClassVar.Clear();
-        
+
         // 恢复类变量
         foreach (var (name, type) in cloned.ClassVar)
         {
             ClassVar[name] = type;
         }
-        
+
+        // 清空当前字段变量
+        FieldVar.Clear();
+
+        // 恢复字段变量
+        foreach (var (name, field) in cloned.FieldVar)
+        {
+            FieldVar[name] = field;
+        }
+
         // 恢复其他属性（注意：InClassEnv是init-only属性，不能修改）
         FilePath = cloned.FilePath;
         BreakLabel = cloned.BreakLabel;

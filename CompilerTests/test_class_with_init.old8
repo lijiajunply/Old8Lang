@@ -1,0 +1,17 @@
+// 测试带有init方法的类
+class Person {
+    name <- ""
+    age <- 0
+    
+    func init(name, age) {
+        this.name <- name
+        this.age <- age
+    }
+    
+    func sayHello() {
+        PrintLine("Hello, my name is " + this.name)
+    }
+}
+
+person <- Person("Bob", 25)
+person.sayHello()
