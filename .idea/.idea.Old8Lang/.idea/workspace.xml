@@ -17,17 +17,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Core/ParserContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Core/ParserContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ErrorException.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/ErrorException.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SyntaxTests/test_lexical_errors.old8" beforeDir="false" afterPath="$PROJECT_DIR$/SyntaxTests/test_lexical_error.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SyntaxTests/test_simple_edge_cases.old8" beforeDir="false" afterPath="$PROJECT_DIR$/SyntaxTests/test_simple_edge_cases.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SyntaxTests/test_syntax_structure_errors.old8" beforeDir="false" afterPath="$PROJECT_DIR$/SyntaxTests/test_syntax_structure_error.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestData/test_archive.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestData/test_file.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestData/test_folder/file1.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestData/test_folder/file2.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestData/test_folder/file3.txt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -713,7 +704,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="141" />
+    <option name="localTasksCounter" value="142" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -740,7 +731,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(tests): 添加 OS、Terminal、File 库实际操作测试&#10;&#10;- 新增 OS 库测试文件，验证 OSInfo 获取及多次调用功能&#10;- 新增 Terminal 库测试文件，覆盖 Title、Beep 等基础功能&#10;- 新增 File 库测试文件，测试文件读取、ZIP 压缩与解压功能&#10;- 创建测试数据文件用于 File 库测试&#10;- 修复 ObjToValue 对 List 类型的支持&#10;- 优化 OS.Process 方法支持 macOS 平台&#10;- 更新 ArrayLangValue 和 ListLangValue 构造逻辑&#10;- 改进 Operation 中数组和列表索引访问处理&#10;- 生成库函数实际测试报告并更新工作区配置" />
     <MESSAGE value="feat(lang): 实现集合类型深度比较功能&#10;&#10;- 为元组类型添加深度比较支持，递归比较两个元素&#10;- 修复字典类型重复添加键值对问题，清空旧值后重新加载&#10;- 优化字典深度比较逻辑，使用显式循环替代LINQ查找键&#10;- 添加完整测试用例覆盖数组、列表、字典、元组的深度比较&#10;- 支持嵌套结构比较和边界情况处理（空集合、单元素等）&#10;- 实现键顺序无关的字典比较机制&#10;- 生成详细测试报告验证功能正确性" />
     <MESSAGE value="feat(error): 实现错误处理系统增强与新异常类型应用&#10;&#10;- 添加异常转换层，将.NET异常转换为Old8Lang自定义异常&#10;- 实现MathLib模块注册，提供11个数学函数及参数验证&#10;- 添加递归深度限制机制，防止栈溢出&#10;- 应用AssertionError于Assert函数，提供清晰断言失败信息&#10;- 增强FileLib文件操作异常处理，主动检查文件存在性&#10;- 创建多个测试文件验证新错误类型实际应用&#10;- 修复MathLib模块导入问题，确保函数正确调用" />
     <MESSAGE value="feat(lang): 实现错误处理系统增强与语法解析优化&#10;&#10;- 新增 AssertionError、ValueError、FileNotFoundError 等错误类型的实际应用&#10;- 实现异常转换层，将 .NET 异常映射为 Old8Lang 自定义异常&#10;- 修复嵌套索引访问问题，支持 array[0][0] 等链式索引&#10;- 扩展 Json 函数支持字典、数组等多种数据结构序列化&#10;- 实现数组、列表、字典的深度内容比较，解决 Assert 函数比较问题&#10;- 新增数学函数库，包含 Sqrt、Log、Factorial 等函数及参数验证&#10;- 增强文件操作库的异常处理，主动检查文件存在性&#10;- 优化语法解析器对复杂表达式的处理能力&#10;- 提升编译器生成 IL 代码的准确性和稳定性&#10;- 完善单元测试覆盖，确保各项功能正常运行" />
@@ -765,7 +755,8 @@
     <MESSAGE value="refactor(compiler): 重构解释器接口和类型引用&#10;&#10;- 将 IMiniInterpreter 接口从 LocalManager.cs 分离到独立文件&#10;- 更新 LangInterpreter 类不再实现 IMiniInterpreter 接口&#10;- 修改 AnyLangValue.cs 和 Compiler.cs 中的接口引用为具体类型&#10;- 调整 LocalManager 和 VariateManager 中的解释器类型声明&#10;- 移除 CompilerTests.cs 中的模拟接口实现&#10;- 添加 IMiniInterpreter 接口设计优化计划文档&#10;- 统一编译器日志输出格式和调试信息处理逻辑&#10;- 优化异常处理中的堆栈跟踪和建议信息输出&#10;- 清理代码中的多余空行和格式问题" />
     <MESSAGE value="feat(interpreter): 重构 IMiniInterpreter 接口及其实现&#10;&#10;- 定义新的 IMiniInterpreter 接口，明确解释器核心功能&#10;- 优化 LangInterpreter 类以实现新接口&#10;- 统一输出提供者属性命名为 OutputProvider&#10;- 将 UseClass 属性重命名为 OutputProvider 以提高语义清晰度&#10;- 更新 Instance.cs 中的输出调用方式以使用新的 OutputProvider 属性&#10;- 修改测试用例以适应新的属性命名&#10;- 移除不再需要的 using 语句&#10;- 在文档中详细描述接口设计优化方案和实现步骤" />
     <MESSAGE value="feat(parser): 实现类、函数和表达式解析器&#10;&#10;- 添加 ClassParser 用于解析类声明、访问修饰符和类块&#10;- 实现 ExpressionParser 支持算术、逻辑、比较和三元表达式&#10;- 创建 FunctionParser 处理函数声明、参数列表和 Lambda 表达式&#10;- 新增 ParserBase 提供基础解析操作和错误处理&#10;- 引入 ParserContext 管理解析器共享状态&#10;- 添加 ExpectHelper 生成详细的语法错误消息&#10;- 实现 PrimaryParser 解析字面量、列表、字典等主表达式" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 实现类、函数和表达式解析器&#10;&#10;- 添加 ClassParser 用于解析类声明、访问修饰符和类块&#10;- 实现 ExpressionParser 支持算术、逻辑、比较和三元表达式&#10;- 创建 FunctionParser 处理函数声明、参数列表和 Lambda 表达式&#10;- 新增 ParserBase 提供基础解析操作和错误处理&#10;- 引入 ParserContext 管理解析器共享状态&#10;- 添加 ExpectHelper 生成详细的语法错误消息&#10;- 实现 PrimaryParser 解析字面量、列表、字典等主表达式" />
+    <MESSAGE value="refactor(parser): 重构解析器类以使用主构造函数&#10;&#10;- 将 ClassParser、ExpressionParser、FunctionParser、PrimaryParser 和 StatementParser&#10;  重构为使用主构造函数语法&#10;- 移除了不必要的 Error 命名空间引用&#10;- 更新了字段访问方式，使用构造函数参数直接调用&#10;- 简化了 ParserBase 的构造逻辑&#10;- 修改了表达式解析中的三元运算符错误处理逻辑&#10;- 优化了运算符匹配的模式匹配语法&#10;- 调整了源代码行分割逻辑以保留空行确保行号正确&#10;- 清理了测试文件中无用的命名空间引用&#10;- 删除了部分测试数据文件和语法测试文件中的冗余内容&#10;- 重命名了部分语法测试文件名称以保持一致性" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(parser): 重构解析器类以使用主构造函数&#10;&#10;- 将 ClassParser、ExpressionParser、FunctionParser、PrimaryParser 和 StatementParser&#10;  重构为使用主构造函数语法&#10;- 移除了不必要的 Error 命名空间引用&#10;- 更新了字段访问方式，使用构造函数参数直接调用&#10;- 简化了 ParserBase 的构造逻辑&#10;- 修改了表达式解析中的三元运算符错误处理逻辑&#10;- 优化了运算符匹配的模式匹配语法&#10;- 调整了源代码行分割逻辑以保留空行确保行号正确&#10;- 清理了测试文件中无用的命名空间引用&#10;- 删除了部分测试数据文件和语法测试文件中的冗余内容&#10;- 重命名了部分语法测试文件名称以保持一致性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

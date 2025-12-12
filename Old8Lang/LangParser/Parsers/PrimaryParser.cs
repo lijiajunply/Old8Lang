@@ -129,7 +129,10 @@ public class PrimaryParser(
         {
             LangTokenType.String => ParseStringLiteral(),
             LangTokenType.Char => ParseCharLiteral(),
-            LangTokenType.Number => CurrentToken.Value.Contains('.') || CurrentToken.Value.Contains('e') || CurrentToken.Value.Contains('E') ? ParseDoubleLiteral() : ParseIntLiteral(),
+            LangTokenType.Number => CurrentToken.Value.Contains('.') || CurrentToken.Value.Contains('e') ||
+                                    CurrentToken.Value.Contains('E')
+                ? ParseDoubleLiteral()
+                : ParseIntLiteral(),
             LangTokenType.LeftBracket => ParseArrayOrRange(),
             LangTokenType.LeftParen => ParseLambdaOrTuple(),
             LangTokenType.LeftBrace => ParseDictionary(),
@@ -659,7 +662,8 @@ public class PrimaryParser(
                                 var exprTokens = LangTokenizer.Tokenize(wrappedExpr);
 
                                 // 创建一个新的LangParser实例来解析这个表达式
-                                var exprParser = new LangParser(exprTokens, wrappedExpr, $"{Context.FileName}:template");
+                                var exprParser = new LangParser(exprTokens, wrappedExpr,
+                                    $"{Context.FileName}:template");
 
                                 // 解析完整表达式
                                 var programBlock = exprParser.ParseProgram();
@@ -787,7 +791,14 @@ public class PrimaryParser(
         var position = CreateSourcePosition(numberToken);
         var value = numberToken.Value;
         Expect(LangTokenType.Number);
-        return new IntLangValue(int.Parse(value), position);
+        try
+        {
+            return new IntLangValue(int.Parse(value), position);
+        }
+        catch
+        {
+            throw CreateSyntaxError("无法解析整数字面量");
+        }
     }
 
     /// <summary>
@@ -800,7 +811,14 @@ public class PrimaryParser(
         var position = CreateSourcePosition(numberToken);
         var value = numberToken.Value;
         Expect(LangTokenType.Number);
-        return new DoubleLangValue(double.Parse(value, System.Globalization.NumberStyles.Float), position);
+        try
+        {
+            return new DoubleLangValue(double.Parse(value), position);
+        }
+        catch
+        {
+            throw CreateSyntaxError("无法解析双精度字面量");
+        }
     }
 
     /// <summary>
@@ -863,7 +881,8 @@ public class PrimaryParser(
             }
 
             // 如果既不是冒号也不是右方括号，则为语法错误
-            throw CreateSyntaxError($"语法错误：索引或切片语法错误。在 '{CurrentToken.Value}' 处期望 ':' 或 ']'。建议：使用 array[index] 进行索引访问，或使用 array[start:end] 进行切片。");
+            throw CreateSyntaxError(
+                $"语法错误：索引或切片语法错误。在 '{CurrentToken.Value}' 处期望 ':' 或 ']'。建议：使用 array[index] 进行索引访问，或使用 array[start:end] 进行切片。");
         }
 
         // 处理列表访问：list[index] （默认情况）- 使用 OldItem

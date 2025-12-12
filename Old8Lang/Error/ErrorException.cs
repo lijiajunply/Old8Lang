@@ -145,7 +145,6 @@ public class Old8Exception : Exception
         const string yellow = "\u001b[33m";
         const string blue = "\u001b[34m";
         const string green = "\u001b[32m";
-        const string gray = "\u001b[37m";
 
         // 错误标题 - 标准化格式
         sb.AppendLine($"{red}[{errorCode}]{reset} {yellow}{message}{reset}");
