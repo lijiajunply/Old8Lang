@@ -1,0 +1,9 @@
+// 测试类方法中的 PrintLine
+class Test {
+    func hello() {
+        PrintLine("Hello")
+    }
+}
+
+t <- Test()
+t.hello()

@@ -63,12 +63,12 @@ PrintLine(escape2)
 // 多行字符串模板
 PrintLine("\n=== 多行字符串模板 ===")
 
-multiLine <- $"""
+multiLine <- $"
 这是一个多行字符串模板
 变量name的值是: {name}
 变量age的值是: {30}
 算术表达式: {1 + 2 * 3}
-"""
+" // Old8Lang 不需要 使用 """ 来表示多行
 PrintLine(multiLine)
 
 // 模板中的嵌套模板

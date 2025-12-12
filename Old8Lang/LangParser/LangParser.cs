@@ -1608,7 +1608,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         {
             LangTokenType.String => ParseStringLiteral(),
             LangTokenType.Char => ParseCharLiteral(),
-            LangTokenType.Number => CurrentToken.Value.Contains('.') ? ParseDoubleLiteral() : ParseIntLiteral(),
+            LangTokenType.Number => CurrentToken.Value.Contains('.') || CurrentToken.Value.Contains('e') || CurrentToken.Value.Contains('E') ? ParseDoubleLiteral() : ParseIntLiteral(),
             LangTokenType.LeftBracket => ParseArrayOrRange(),
             LangTokenType.LeftParen => ParseLambdaOrTuple(),
             LangTokenType.LeftBrace => ParseDictionary(),

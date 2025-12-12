@@ -895,7 +895,15 @@ public class Operation(LangExpression? left, LangTokenType opera, LangExpression
                             $"无法在类型 '{leftType.Name}' 中找到方法 '{instance.Id.IdName}'，参数类型为: {string.Join(", ", types.Select(t => t.Name))}");
                     }
 
-                    ilGenerator.Emit(OpCodes.Call, m);
+                    // 对于实例方法使用 Callvirt，对于静态方法使用 Call
+                    if (m.IsStatic)
+                    {
+                        ilGenerator.Emit(OpCodes.Call, m);
+                    }
+                    else
+                    {
+                        ilGenerator.Emit(OpCodes.Callvirt, m);
+                    }
                     return m.ReturnType;
                 }
 

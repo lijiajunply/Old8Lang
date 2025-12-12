@@ -15,6 +15,6 @@ printLine("获取到的值: " + email)
 
 // 尝试对null值进行操作，应该会出错
 printLine("尝试对null值调用方法...")
-result <- email.length()
+result <- len(email)
 
 // ERROR

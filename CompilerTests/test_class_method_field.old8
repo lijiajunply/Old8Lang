@@ -1,0 +1,11 @@
+// 测试类方法访问字段
+class Test {
+    name <- "Bob"
+
+    func hello() {
+        PrintLine("Hello from " + this.name)
+    }
+}
+
+t <- Test()
+t.hello()

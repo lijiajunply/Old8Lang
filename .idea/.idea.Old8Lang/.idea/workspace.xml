@@ -17,25 +17,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/CompilerTests/test_expression_statement.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/test_switch_in_function.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/test_switch_range.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/dll/Old8Lang.NetLib.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/失败测试分析.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/analyze_failures.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_class_init.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_class_method_call.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_class_method_debug.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_class_method_field.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_class_method_print.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_class_method_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251210-1000-compiler-tests.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/28_builtin_functions.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/28_builtin_functions.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/30_math_library.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/31_os_library.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/31_os_library.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/32_terminal_library.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/32_terminal_library.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/34_import_statements.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/34_import_statements.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_netlib.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_netlib_minimal.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_netlib_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Old8Lang.App.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Old8Lang.App.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/18_string_templates.old8" beforeDir="false" afterPath="$PROJECT_DIR$/CompilerTests/18_string_templates.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/18_string_templates.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/18_string_templates.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/37_scope_and_variables.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/46_dict_key_error.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/46_dict_key_error.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/DebugImport.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/dll/Old8LangLib.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/dll/Old8LangLib.dll" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,6 +65,7 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.NetLib/SocketClient.cs" root0="SKIP_HIGHLIGHTING" />
@@ -369,7 +368,7 @@
       <workItem from="1765449531774" duration="576000" />
       <workItem from="1765451683861" duration="981000" />
       <workItem from="1765470025239" duration="15713000" />
-      <workItem from="1765514280184" duration="10724000" />
+      <workItem from="1765514280184" duration="11906000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -714,7 +713,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="126" />
+    <option name="localTasksCounter" value="127" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -741,7 +740,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="chore(deps): 升级项目目标框架到 .NET 10&#10;&#10;- 将 LibTest 项目的目标框架从 net9.0 更新为 net10.0&#10;- 将 Old8Lang.App 项目的目标框架从 net9.0 更新为 net10.0&#10;- 将 Old8Lang 项目的目标框架从 net9.0 更新为 net10.0&#10;- 将 Old8LangLib 项目的目标框架从 net9.0 更新为 net10.0&#10;- 移除了 Lang.Demo 解决方案文件和相关配置&#10;- 更新 Rider IDE 的调试配置选项，增加环境变量路径和混合模式调试设置&#10;- 添加了对未处理异常忽略列表的配置支持" />
     <MESSAGE value="refactor(parser): 重构解析器相关代码以提升可读性&#10;&#10;- 统一变量命名风格，使用小驼峰命名法&#10;- 移除未使用的命名空间引用&#10;- 重命名方法参数以避免与局部变量冲突&#10;- 优化错误处理逻辑中的变量作用域&#10;- 更新依赖包版本至最新稳定版&#10;- 调整条件判断逻辑提高代码健壮性" />
     <MESSAGE value="refactor(parser): 优化解析器实现并增强文件读取逻辑&#10;&#10;- 改进FromFile方法以更好地处理macOS上的绝对路径和相对路径查找&#10;- 重构字典和列表解析逻辑，支持{}和[]语法&#10;- 完善字符串树解析以支持连续的插值块&#10;- 修复切片表达式中的冒号识别问题&#10;- 增强词法分析器的注释过滤和转义字符处理&#10;- 更新程序入口点的测试代码引用和示例文件路径&#10;- 调整IDE工作区配置和断点设置以匹配代码变更" />
     <MESSAGE value="refactor(ast): 简化类型映射声明语法&#10;&#10;- 使用简化集合初始化语法替换显式泛型声明&#10;- 移除冗余的 System.Collections.Generic 命名空间前缀&#10;- 更新 IDE 工作区配置文件中的字符串转义格式" />
@@ -766,7 +764,8 @@
     <MESSAGE value="feat(netlib): 添加网络库支持并重构项目结构&#10;&#10;- 新增 Old8Lang.NetLib 项目，包含 HTTP、Socket、WebSocket 和 MQTT 客户端实现&#10;- 在 Old8LangLib 中添加对新网络库的引用和导入定义&#10;- 更新解决方案文件，将 Old8Lang.NetLib 加入构建配置&#10;- 添加多个测试脚本用于验证网络库功能&#10;- 修改 IDE 编码配置路径以适配项目结构调整&#10;- 移除旧的 Net 类定义，使用新的模块化网络库替代&#10;- 提供完整的异步网络通信支持，包括连接、发送和接收数据&#10;- 支持常见的网络协议和操作，提升语言的网络编程能力" />
     <MESSAGE value="refactor(netlib): 重构SocketClient和WebApiClient字段命名及访问逻辑&#10;&#10;- 将私有字段重命名为PascalCase格式以符合C#命名约定&#10;- 使用可空引用类型优化NetworkStream声明&#10;- 将_isConnected标志替换为公共属性IsConnected并添加setter&#10;- 更新所有方法中的字段引用以匹配新命名&#10;- 简化HttpClient和TcpClient的初始化及资源释放逻辑&#10;- 优化BuildUrl方法中字典判断条件表达式&#10;- 改进PATCH请求发送方式，移除不必要的using块嵌套&#10;-" />
     <MESSAGE value="feat(compiler): 实现 for-in 循环对字典键值对的支持&#10;&#10;- 修复了字典键值对遍历时的 InvalidProgramException 错误&#10;- 更新 GenerateDictionaryIl 方法以支持多个标识符&#10;- 添加了对字典索引器的调用逻辑&#10;- 增加了值变量的局部存储和管理&#10;- 完成了对键值对遍历的完整 IL 代码生成&#10;- 通过单元测试验证了数组、字符串、字典的遍历功能&#10;- 确认了 for-in 语法在编译模式下的完全支持" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 实现 for-in 循环对字典键值对的支持&#10;&#10;- 修复了字典键值对遍历时的 InvalidProgramException 错误&#10;- 更新 GenerateDictionaryIl 方法以支持多个标识符&#10;- 添加了对字典索引器的调用逻辑&#10;- 增加了值变量的局部存储和管理&#10;- 完成了对键值对遍历的完整 IL 代码生成&#10;- 通过单元测试验证了数组、字符串、字典的遍历功能&#10;- 确认了 for-in 语法在编译模式下的完全支持" />
+    <MESSAGE value="feat(compiler): 支持 switch 语句范围匹配和函数内使用&#10;&#10;- 实现 switch 语句对范围数组的匹配支持&#10;- 允许 switch 语句在函数体内正常使用&#10;- 优化 switch 语句 IL 生成逻辑，支持 break 和 return 混合场景&#10;- 更新解析器逻辑，不再强制检查表达式后的特定终止符&#10;- 添加相关测试用例：test_switch_range.old8 和 test_switch_in_function.old8&#10;- 引入 Colorful.Console 包以增强终端输出能力&#10;- 移除部分冗余的终端库和 OS 库测试代码&#10;- 新增失败测试分析脚本 analyze_failures.sh 及报告文件" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 支持 switch 语句范围匹配和函数内使用&#10;&#10;- 实现 switch 语句对范围数组的匹配支持&#10;- 允许 switch 语句在函数体内正常使用&#10;- 优化 switch 语句 IL 生成逻辑，支持 break 和 return 混合场景&#10;- 更新解析器逻辑，不再强制检查表达式后的特定终止符&#10;- 添加相关测试用例：test_switch_range.old8 和 test_switch_in_function.old8&#10;- 引入 Colorful.Console 包以增强终端输出能力&#10;- 移除部分冗余的终端库和 OS 库测试代码&#10;- 新增失败测试分析脚本 analyze_failures.sh 及报告文件" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

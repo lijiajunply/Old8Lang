@@ -1,0 +1,8 @@
+// 测试最简单的类方法调用
+class Test {
+    func hello() {
+    }
+}
+
+t <- Test()
+t.hello()

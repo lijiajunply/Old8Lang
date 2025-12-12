@@ -307,16 +307,16 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
         // 生成方法体的IL代码
         funcValue.BlockStatement.GenerateIl(methodIl, methodLocal);
 
-        // 如果方法有返回值，确保最后一个指令是return
-        if (returnType != typeof(void))
+        // 检查方法体的最后一个语句是否是 ReturnStatement
+        var lastStatement = funcValue.BlockStatement.Count > 0
+            ? funcValue.BlockStatement[^1]
+            : null;
+
+        // 只有当最后一个语句不是 ReturnStatement 时，才添加 Ret 指令
+        if (lastStatement is not ReturnStatement)
         {
-            // 检查是否已经有return指令，如果没有，添加一个默认的return
-            // 这里简化处理，直接添加return指令，实际应该检查最后一个指令
-            methodIl.Emit(OpCodes.Ret);
-        }
-        else
-        {
-            // 对于void方法，直接添加return指令
+            // 对于 void 方法，添加 Ret 指令
+            // 对于有返回值的方法，如果没有显式 return，这里会导致栈不平衡，但这是用户代码的问题
             methodIl.Emit(OpCodes.Ret);
         }
 
