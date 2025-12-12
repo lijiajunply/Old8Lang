@@ -1,4 +1,5 @@
 using Old8Lang.LangParser;
+using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
@@ -214,8 +215,32 @@ public class SetStatement : OldStatement
                         // 加载 this（参数0）
                         ilGenerator.Emit(OpCodes.Ldarg_0);
 
+                        FieldInfo? fieldInfo = null;
+
                         // 从 FieldVar 中获取字段信息
-                        if (local.FieldVar.TryGetValue(memberId.IdName, out var fieldInfo))
+                        if (local.FieldVar.TryGetValue(memberId.IdName, out fieldInfo))
+                        {
+                            // 找到了字段
+                        }
+                        // 如果 FieldVar 中没有，尝试从当前类型或父类中获取
+                        else if (local.InClassEnv is TypeBuilder typeBuilder)
+                        {
+                            // 对于 TypeBuilder，尝试从基类中查找字段
+                            var baseType = typeBuilder.BaseType;
+                            while (baseType != null && baseType != typeof(object))
+                            {
+                                fieldInfo = baseType.GetField(memberId.IdName, BindingFlags.Public | BindingFlags.Instance);
+                                if (fieldInfo != null) break;
+                                baseType = baseType.BaseType;
+                            }
+                        }
+                        else
+                        {
+                            // 对于已创建的类型，直接获取字段
+                            fieldInfo = local.InClassEnv.GetField(memberId.IdName, BindingFlags.Public | BindingFlags.Instance);
+                        }
+
+                        if (fieldInfo != null)
                         {
                             // 加载右值
                             Value.LoadIlValue(ilGenerator, local);
@@ -238,20 +263,8 @@ public class SetStatement : OldStatement
                             }
 
                             ilGenerator.Emit(OpCodes.Stfld, fieldInfo);
-                            return;
                         }
 
-                        // 如果 FieldVar 中没有，尝试从类型中获取（仅适用于已创建的类型）
-                        if (local.InClassEnv is not TypeBuilder)
-                        {
-                            var field = local.InClassEnv.GetField(memberId.IdName);
-                            if (field != null)
-                            {
-                                ilGenerator.Emit(OpCodes.Stfld, field);
-                            }
-                        }
-
-                        // 如果没有找到字段，跳过
                         return;
                     }
 

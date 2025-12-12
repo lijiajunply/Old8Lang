@@ -17,7 +17,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Reports/20251210-1000-compiler-tests.md" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_class_inherit_init10.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_class_inherit_init6.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_class_inherit_init7.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_class_inherit_init8.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_class_inherit_init9.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,9 +70,12 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ClassInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ClassInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ClassInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ClassInit.cs" root0="SKIP_HIGHLIGHTING" />
@@ -75,6 +86,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/FuncRunStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
@@ -366,7 +378,7 @@
       <workItem from="1765449531774" duration="576000" />
       <workItem from="1765451683861" duration="981000" />
       <workItem from="1765470025239" duration="15713000" />
-      <workItem from="1765514280184" duration="21817000" />
+      <workItem from="1765514280184" duration="23569000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -711,7 +723,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="135" />
+    <option name="localTasksCounter" value="137" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -738,8 +750,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(core): 优化表达式求值与类型转换逻辑&#10;&#10;- 使用空合并运算符简化变量赋值逻辑&#10;- 重构类型转换方法，增强类型检查与实例创建流程&#10;- 更新字典值处理逻辑，确保键值对正确运行与设置&#10;- 修正实例表达式的ID运行机制，确保参数正确求值&#10;- 优化IL生成代码，改进数值运算与类型转换处理&#10;- 更新示例文件中的this引用语法，提高代码准确性&#10;- 调整极端值测试用例，减少嵌套层级以提升可读性&#10;- 更新IDE配置与调试断点，适配最新代码结构" />
-    <MESSAGE value="fix(parser): 修复解析器中的语法错误处理和代码格式问题&#10;&#10;- 修复了块结束标志的处理逻辑&#10;- 优化了函数返回类型声明的错误提示&#10;- 改进了幂运算和点运算符的解析顺序&#10;- 统一了源码位置信息的构造方式&#10;- 修正了元组解析时的逗号处理逻辑&#10;- 完善了默认参数值的解析条件判断&#10;- 清理了不必要的空行和代码格式问题" />
     <MESSAGE value="refactor(ast): 重构AST表达式类型系统&#10;&#10;- 将OldExpr重命名为LangExpression，统一表达式类型命名&#10;- 更新AnyLangValue中的OldExpr引用为LangExpression&#10;- 修改ArrayLangValue使用LangExpression替代OldExpr&#10;- 更新BlockStatement中ToAnyData和ToStaticData返回类型&#10;- 将ClassFieldSetStatement中的OldExpr改为LangExpression&#10;- 更新DictionaryLangValue构造函数参数类型&#10;- 修改ForInStatement和ForStatement中的表达式类型&#10;- 更新FuncLangValue.Run方法参数类型&#10;- 移除ArgList和IdList中间节点类型&#10;- 将Instance类移动到Value目录并更新构造函数&#10;- 更新LangId和LangListItem中的表达式引用类型&#10;- 修改LangParser中所有Parse方法返回类型为LangExpression&#10;- 更新LangValueType.Dot方法参数类型&#10;- 修改ListComprehension和ListLangValue中的表达式类型&#10;- 更新NativeAnyLangValue和NativeStaticAny中的点操作参数类型&#10;- 修改OldIf条件表达式类型" />
     <MESSAGE value="refactor(ast): 重命名OldIf类为IfChild并更新相关引用&#10;&#10;- 将OldIf类重命名为IfChild&#10;- 更新IfStatement中对OldIf的引用为IfChild&#10;- 修改LangParser中创建IfChild实例的代码&#10;- 更新SwitchStatement中的OldCase类为CaseStatement&#10;- 移除IVisitor接口" />
     <MESSAGE value="test(parser): 增加边界情况和表达式错误测试&#10;&#10;- 添加空值、极值、嵌套结构等边界情况测试&#10;- 增加算术、比较、逻辑表达式错误测试&#10;- 添加赋值、括号、数组、字典相关错误测试&#10;- 增加函数调用、成员访问、索引访问错误测试&#10;- 添加类型转换和三元表达式错误测试&#10;- 完善特殊字符和浮点数边界测试&#10;- 增加长度极限和混合边界测试用例" />
@@ -763,7 +773,9 @@
     <MESSAGE value="feat(compiler): 支持类字段访问与赋值操作&#10;&#10;- 在 ClassInit.cs 中保存字段信息到 LocalManager，以便在方法中访问&#10;- 在 LocalManager.cs 中添加 FieldVar 字典用于存储字段信息&#10;- 在 Operation.cs 中优先从 FieldVar 查找字段，支持 TypeBuilder 场景&#10;- 在 SetStatement.cs 中实现对 this 字段的赋值操作支持&#10;- 添加多个测试用例验证类成员访问、修改及初始化功能&#10;- 更新现有测试文件以适配新的类字段处理逻辑" />
     <MESSAGE value="feat(compiler): 支持泛型字典的索引访问与赋值操作&#10;&#10;- 优化 LangListItem 中字典索引访问的类型处理逻辑&#10;- 支持 Dictionary&lt;TKey, TValue&gt; 泛型类型的键值类型匹配&#10;- 在 SetStatement 中实现对泛型字典索引赋值的类型转换&#10;- 添加测试用例验证字典修改与访问功能&#10;- 更新编译器测试报告与相关配置文件" />
     <MESSAGE value="feat(compiler): 支持函数参数类型推断和返回值处理&#10;&#10;- 在FuncInit中创建独立的LocalManager用于函数体IL生成，避免局部变量冲突&#10;- 函数参数提前添加到funcLocal中，便于GetItemType正确推断返回类型&#10;- 优化返回语句处理逻辑，自动添加Ret指令（除非最后已是ReturnStatement）&#10;- 支持void类型作为默认函数返回类型&#10;- 在LocalManager中新增LocalVarTypes字典，用于记录局部变量类型&#10;- LangId支持从LocalVarTypes中查找变量类型（用于参数和局部变量）&#10;- Operation中增加object类型操作数的拆箱处理逻辑&#10;- SetStatement中记录局部变量类型到LocalVarTypes，辅助类型推断&#10;- 优化成员访问和索引赋值的IL生成逻辑，增强类型转换支持&#10;- 添加多个函数相关测试用例，验证参数传递和返回值处理功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 支持函数参数类型推断和返回值处理&#10;&#10;- 在FuncInit中创建独立的LocalManager用于函数体IL生成，避免局部变量冲突&#10;- 函数参数提前添加到funcLocal中，便于GetItemType正确推断返回类型&#10;- 优化返回语句处理逻辑，自动添加Ret指令（除非最后已是ReturnStatement）&#10;- 支持void类型作为默认函数返回类型&#10;- 在LocalManager中新增LocalVarTypes字典，用于记录局部变量类型&#10;- LangId支持从LocalVarTypes中查找变量类型（用于参数和局部变量）&#10;- Operation中增加object类型操作数的拆箱处理逻辑&#10;- SetStatement中记录局部变量类型到LocalVarTypes，辅助类型推断&#10;- 优化成员访问和索引赋值的IL生成逻辑，增强类型转换支持&#10;- 添加多个函数相关测试用例，验证参数传递和返回值处理功能" />
+    <MESSAGE value="feat(compiler): 支持类继承与字段访问&#10;&#10;- 在ClassInit中实现父类字段复制逻辑，支持子类访问父类字段&#10;- 优化字段存储机制，子类字段可覆盖父类同名字段&#10;- 改进init方法查找逻辑，使用DeclaredOnly避免继承冲突&#10;- 添加类继承测试用例，验证基本继承和字段访问功能&#10;- 增强类型推断与IL生成过程中的字段解析能力&#10;- 更新Instance类构造逻辑，确保正确调用当前类的init方法" />
+    <MESSAGE value="feat(lang): 支持类继承中的字段初始化和类型检查&#10;&#10;- 在 FuncLangValue 中增加对 SetStatement 的局部变量类型记录&#10;- 优化 GetItemType 方法以正确处理非 void 类型返回&#10;- 在 SetStatement 中实现字段赋值时的类型匹配与自动转换&#10;- 添加多个测试用例验证类继承场景下的字段初始化逻辑" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 支持类继承中的字段初始化和类型检查&#10;&#10;- 在 FuncLangValue 中增加对 SetStatement 的局部变量类型记录&#10;- 优化 GetItemType 方法以正确处理非 void 类型返回&#10;- 在 SetStatement 中实现字段赋值时的类型匹配与自动转换&#10;- 添加多个测试用例验证类继承场景下的字段初始化逻辑" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

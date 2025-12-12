@@ -1,0 +1,11 @@
+class Animal {
+    name <- "Default"
+}
+
+class Dog extends Animal {
+    func init() {
+        PrintLine(this.name)
+    }
+}
+
+dog <- Dog()

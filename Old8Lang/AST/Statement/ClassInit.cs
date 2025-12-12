@@ -265,21 +265,10 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
             methodLocal.FieldVar[kvp.Key] = kvp.Value;
         }
 
-        // 获取返回类型
-        Type returnType;
-        try
-        {
-            returnType = funcValue.OutputType(methodLocal);
-        }
-        catch
-        {
-            returnType = typeof(void);
-        }
-
         // 获取参数类型（不包含 this，this 是隐式的）
         var parameterTypes = new List<Type>();
 
-        // 添加方法参数
+        // 添加方法参数，并将它们添加到LocalVarTypes中，以便OutputType能正确推断类型
         if (funcValue.Ids != null)
         {
             foreach (var paramId in funcValue.Ids)
@@ -295,7 +284,20 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
                 }
 
                 parameterTypes.Add(paramType);
+                // 将参数类型添加到LocalVarTypes中，以便在获取返回类型时能正确推断
+                methodLocal.LocalVarTypes[paramId.IdName] = paramType;
             }
+        }
+
+        // 获取返回类型（现在methodLocal中已经有参数信息了）
+        Type returnType;
+        try
+        {
+            returnType = funcValue.OutputType(methodLocal);
+        }
+        catch
+        {
+            returnType = typeof(void);
         }
 
         // 定义方法
