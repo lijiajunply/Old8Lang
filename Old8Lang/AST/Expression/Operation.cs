@@ -350,6 +350,34 @@ public class Operation(LangExpression? left, LangTokenType opera, LangExpression
             return typeof(object);
         }
 
+        // 处理成员访问（Dot操作符）
+        if (Opera == LangTokenType.Dot && Right is LangId rightId)
+        {
+            if (leftType != null)
+            {
+                // 尝试获取字段类型
+                var field = leftType.GetField(rightId.IdName);
+                if (field != null)
+                {
+                    return field.FieldType;
+                }
+
+                // 尝试获取属性类型
+                var property = leftType.GetProperty(rightId.IdName);
+                if (property != null)
+                {
+                    return property.PropertyType;
+                }
+            }
+            return typeof(object);
+        }
+
+        // 对于加法运算，如果任一操作数是字符串，则返回字符串类型
+        if (Opera == LangTokenType.Plus && (leftType == typeof(string) || rightType == typeof(string)))
+        {
+            return typeof(string);
+        }
+
         // 对于二元运算，根据操作类型返回合适的类型
         if (Opera == LangTokenType.Star || Opera == LangTokenType.Plus || Opera == LangTokenType.Minus ||
             Opera == LangTokenType.Slash || Opera == LangTokenType.Percent || Opera == LangTokenType.Caret)
@@ -404,14 +432,15 @@ public class Operation(LangExpression? left, LangTokenType opera, LangExpression
                 if (leftType == typeof(string) || rightType == typeof(string))
                 {
                     // 处理字符串连接 - 需要调用string.Concat方法
+                    // 加载左操作数并立即装箱（如果需要）
                     Left?.LoadIlValue(ilGenerator, local);
-                    Right?.LoadIlValue(ilGenerator, local);
-                    // 确保两个操作数都是字符串类型，或者进行转换
                     if (leftType != typeof(string))
                     {
                         ilGenerator.Emit(OpCodes.Box, leftType!);
                     }
 
+                    // 加载右操作数并立即装箱（如果需要）
+                    Right?.LoadIlValue(ilGenerator, local);
                     if (rightType != typeof(string))
                     {
                         ilGenerator.Emit(OpCodes.Box, rightType!);

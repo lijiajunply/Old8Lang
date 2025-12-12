@@ -1,0 +1,9 @@
+// 测试类成员访问和字符串拼接
+PrintLine("开始测试")
+
+class Person {
+    name <- "Alice"
+}
+
+person <- Person()
+PrintLine("name: " + person.name)

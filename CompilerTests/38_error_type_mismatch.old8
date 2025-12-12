@@ -1,0 +1,11 @@
+// 错误测试：类型不匹配
+PrintLine("=== 类型不匹配错误测试 ===")
+
+a:int <- 10
+PrintLine("整数a: " + a.ToStr())
+
+// 尝试将字符串赋值给整数类型变量
+a <- "hello"
+
+PrintLine("不应该执行到这里")
+// error

@@ -1,0 +1,13 @@
+// 测试字符串拼接
+PrintLine("=== 字符串拼接测试 ===")
+
+a <- "Hello"
+b <- "World"
+c <- a + " " + b
+PrintLine(c)
+
+num <- 123
+str <- "Number: " + num
+PrintLine(str)
+
+PrintLine("完成")

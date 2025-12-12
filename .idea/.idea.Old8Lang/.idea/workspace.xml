@@ -17,30 +17,49 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/plan_20251212_051809.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_netlib.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_netlib_minimal.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_netlib_simple.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.NetLib/HttpClient.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.NetLib/Old8Lang.NetLib.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.NetLib/WebApiClient.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Net.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/36_error_division_by_zero.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/37_error_undefined_variable.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/38_error_type_mismatch.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/39_performance_fibonacci.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/40_performance_array_operations.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/41_data_string_operations.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/42_data_dictionary_operations.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/43_statement_nested_loops.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/44_statement_complex_conditions.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_class_instantiate.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_class_member.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_class_member_age.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_class_member_concat.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_class_member_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_class_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_for_in_dict.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_for_in_dict_kv.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_for_in_dict_kv2.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_for_in_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_for_in_string.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_len_func.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_string_concat.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_type_conv_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_type_func.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_type_func2.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_type_func3.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_type_func4.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_type_func5.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_type_with_concat.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251212-1354-编译模式测试.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251212-1359-编译模式综合测试报告.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251212-1443-for-in循环支持完成.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251212-1451-关键bug修复报告.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251212-1506-type函数修复成功.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251212-1509-类系统实现状态.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/compiler.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Ex/compiler.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/fib.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Ex/fib.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/init.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Ex/init.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/other.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Ex/other.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/Net/Net.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Net/Http.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Net/dll/Old8LangLib.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Net/init.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/35_advanced_control_flow.old8" beforeDir="false" afterPath="$PROJECT_DIR$/CompilerTests/35_advanced_control_flow.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,11 +92,20 @@
 }</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClient.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/NetLib.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.NetLib/SocketClient.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ClassInit.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
@@ -359,7 +387,7 @@
       <workItem from="1765449531774" duration="576000" />
       <workItem from="1765451683861" duration="981000" />
       <workItem from="1765470025239" duration="15713000" />
-      <workItem from="1765514280184" duration="2434000" />
+      <workItem from="1765514280184" duration="7587000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -704,7 +732,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="123" />
+    <option name="localTasksCounter" value="125" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -731,8 +759,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="基本完成，现在进入测试。测试成功1.0版本就OK了。" />
-    <MESSAGE value="改一下位置" />
     <MESSAGE value="删除Lang.Demo" />
     <MESSAGE value="chore(deps): 升级项目目标框架到 .NET 10&#10;&#10;- 将 LibTest 项目的目标框架从 net9.0 更新为 net10.0&#10;- 将 Old8Lang.App 项目的目标框架从 net9.0 更新为 net10.0&#10;- 将 Old8Lang 项目的目标框架从 net9.0 更新为 net10.0&#10;- 将 Old8LangLib 项目的目标框架从 net9.0 更新为 net10.0&#10;- 移除了 Lang.Demo 解决方案文件和相关配置&#10;- 更新 Rider IDE 的调试配置选项，增加环境变量路径和混合模式调试设置&#10;- 添加了对未处理异常忽略列表的配置支持" />
     <MESSAGE value="refactor(parser): 重构解析器相关代码以提升可读性&#10;&#10;- 统一变量命名风格，使用小驼峰命名法&#10;- 移除未使用的命名空间引用&#10;- 重命名方法参数以避免与局部变量冲突&#10;- 优化错误处理逻辑中的变量作用域&#10;- 更新依赖包版本至最新稳定版&#10;- 调整条件判断逻辑提高代码健壮性" />
@@ -756,7 +782,9 @@
     <MESSAGE value="docs(lang): 更新语言特性文档并优化代码格式&#10;&#10;- 在CLAUDE.md中添加ToString方法说明&#10;- 优化FuncStatic.cs中的条件判断代码格式&#10;- 保持代码风格一致性" />
     <MESSAGE value="feat(math): 扩展数学库功能并优化实现&#10;&#10;- 添加双曲三角函数：Sinh、Cosh、Tanh&#10;- 实现特殊函数：Gamma函数和Beta函数&#10;- 增加随机数生成函数：Random和RandomInt&#10;- 添加角度与弧度转换函数&#10;- 实现常用单位换算函数（温度、长度、重量）&#10;- 增加向量操作函数：模长、点积、加减、数乘、归一化等&#10;- 添加向量数学函数：VectorSin、VectorCos等&#10;- 优化对数函数底数判断逻辑，提高数值稳定性&#10;- 完善各函数的参数验证和异常处理&#10;- 更新库导入声明以支持新增函数" />
     <MESSAGE value="test(compiler): 添加深度递归性能测试用例&#10;&#10;- 新增斐波那契数列递归实现及测试&#10;- 实现阶乘深度递归计算函数&#10;- 添加汉诺塔问题递归解法&#10;- 实现阿克曼函数极高复杂度递归测试&#10;- 添加二叉树深度递归计算逻辑&#10;- 实现最大公约数欧几里得递归算法&#10;- 添加组合数递归计算功能&#10;- 实现字符串反转递归方法" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(compiler): 添加深度递归性能测试用例&#10;&#10;- 新增斐波那契数列递归实现及测试&#10;- 实现阶乘深度递归计算函数&#10;- 添加汉诺塔问题递归解法&#10;- 实现阿克曼函数极高复杂度递归测试&#10;- 添加二叉树深度递归计算逻辑&#10;- 实现最大公约数欧几里得递归算法&#10;- 添加组合数递归计算功能&#10;- 实现字符串反转递归方法" />
+    <MESSAGE value="feat(netlib): 添加网络库支持并重构项目结构&#10;&#10;- 新增 Old8Lang.NetLib 项目，包含 HTTP、Socket、WebSocket 和 MQTT 客户端实现&#10;- 在 Old8LangLib 中添加对新网络库的引用和导入定义&#10;- 更新解决方案文件，将 Old8Lang.NetLib 加入构建配置&#10;- 添加多个测试脚本用于验证网络库功能&#10;- 修改 IDE 编码配置路径以适配项目结构调整&#10;- 移除旧的 Net 类定义，使用新的模块化网络库替代&#10;- 提供完整的异步网络通信支持，包括连接、发送和接收数据&#10;- 支持常见的网络协议和操作，提升语言的网络编程能力" />
+    <MESSAGE value="refactor(netlib): 重构SocketClient和WebApiClient字段命名及访问逻辑&#10;&#10;- 将私有字段重命名为PascalCase格式以符合C#命名约定&#10;- 使用可空引用类型优化NetworkStream声明&#10;- 将_isConnected标志替换为公共属性IsConnected并添加setter&#10;- 更新所有方法中的字段引用以匹配新命名&#10;- 简化HttpClient和TcpClient的初始化及资源释放逻辑&#10;- 优化BuildUrl方法中字典判断条件表达式&#10;- 改进PATCH请求发送方式，移除不必要的using块嵌套&#10;-" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(netlib): 重构SocketClient和WebApiClient字段命名及访问逻辑&#10;&#10;- 将私有字段重命名为PascalCase格式以符合C#命名约定&#10;- 使用可空引用类型优化NetworkStream声明&#10;- 将_isConnected标志替换为公共属性IsConnected并添加setter&#10;- 更新所有方法中的字段引用以匹配新命名&#10;- 简化HttpClient和TcpClient的初始化及资源释放逻辑&#10;- 优化BuildUrl方法中字典判断条件表达式&#10;- 改进PATCH请求发送方式，移除不必要的using块嵌套&#10;-" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

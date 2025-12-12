@@ -1,0 +1,73 @@
+// 语句测试：复杂条件判断
+PrintLine("=== 复杂条件判断测试 ===")
+
+// 多重条件
+a <- 10
+b <- 20
+c <- 30
+
+if a < b && b < c {
+    PrintLine("✅ 多重与条件正确")
+}
+
+if a > 100 || b > 10 {
+    PrintLine("✅ 多重或条件正确")
+}
+
+// 复杂的逻辑表达式
+if (a < b && b < c) || (a > 0 && c < 100) {
+    PrintLine("✅ 复杂逻辑表达式正确")
+}
+
+// 嵌套if-else
+if a < b {
+    if b < c {
+        if c < 100 {
+            PrintLine("✅ 三层嵌套if正确")
+        }
+    }
+}
+
+// 多个elif
+score <- 85
+if score >= 90 {
+    PrintLine("等级: A")
+} elif score >= 80 {
+    PrintLine("等级: B")
+} elif score >= 70 {
+    PrintLine("等级: C")
+} elif score >= 60 {
+    PrintLine("等级: D")
+} else {
+    PrintLine("等级: F")
+}
+
+// 条件表达式中的计算
+x <- 5
+y <- 10
+if x + y > 10 && x * y < 100 {
+    PrintLine("✅ 条件表达式中的计算正确")
+}
+
+// 字符串比较
+str1 <- "abc"
+str2 <- "abc"
+str3 <- "def"
+
+if str1 == str2 {
+    PrintLine("✅ 字符串相等比较正确")
+}
+
+if str1 != str3 {
+    PrintLine("✅ 字符串不等比较正确")
+}
+
+// 布尔值条件
+flag1 <- true
+flag2 <- false
+
+if flag1 && flag2 == false {
+    PrintLine("✅ 布尔值条件正确")
+}
+
+PrintLine("✅ 复杂条件判断测试完成")

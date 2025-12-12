@@ -1,0 +1,11 @@
+// 测试类实例化
+PrintLine("开始测试")
+
+class Person {
+    name <- "Alice"
+    age <- 30
+}
+
+person <- Person()
+PrintLine("实例化完成")
+PrintLine(person)

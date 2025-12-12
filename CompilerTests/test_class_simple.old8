@@ -1,0 +1,9 @@
+// 最简单的类测试
+PrintLine("开始测试")
+
+class Person {
+    name <- "Alice"
+    age <- 30
+}
+
+PrintLine("类定义完成")

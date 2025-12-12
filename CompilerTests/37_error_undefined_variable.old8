@@ -1,0 +1,11 @@
+// 错误测试：未定义变量
+PrintLine("=== 未定义变量错误测试 ===")
+
+a <- 10
+PrintLine(a)
+
+// 使用未定义的变量
+PrintLine(undefinedVar)
+
+PrintLine("不应该执行到这里")
+// error

@@ -1,0 +1,9 @@
+// 简单的for-in测试
+PrintLine("开始测试")
+
+arr <- [1, 2, 3]
+for item in arr {
+    PrintLine(item)
+}
+
+PrintLine("测试完成")

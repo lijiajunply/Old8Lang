@@ -70,10 +70,10 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
         };
 
         // 6. 定义类的字段和方法
-        DefineClassMembers(typeBuilder, classLocal);
+        var fieldBuilders = DefineClassMembers(typeBuilder, classLocal);
 
         // 7. 定义类的构造函数
-        DefineConstructor(typeBuilder, baseType);
+        DefineConstructor(typeBuilder, baseType, fieldBuilders);
 
         // 8. 创建类型
         var createdType = typeBuilder.CreateType();
@@ -87,11 +87,13 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
     /// </summary>
     /// <param name="typeBuilder">类型构建器</param>
     /// <param name="local">局部变量管理器</param>
-    private void DefineClassMembers(TypeBuilder typeBuilder, LocalManager local)
+    /// <returns>字段列表，用于构造函数初始化</returns>
+    private List<(FieldBuilder, LangExpression)> DefineClassMembers(TypeBuilder typeBuilder, LocalManager local)
     {
         // 分离字段和方法
         var fields = new List<(ClassMemberId, LangExpression)>();
         var methods = new List<(ClassMemberId, FuncLangValue)>();
+        var fieldBuilders = new List<(FieldBuilder, LangExpression)>();
 
         foreach (var variate in anyLangValue.Variates)
         {
@@ -121,10 +123,16 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
             }
 
             // 定义字段
-            typeBuilder.DefineField(
+            var fieldBuilder = typeBuilder.DefineField(
                 memberId.IdName,
                 fieldType,
                 FieldAttributes.Public);
+
+            // 保存字段信息用于构造函数初始化
+            if (!memberId.HasModifier(AccessModifierType.Static))
+            {
+                fieldBuilders.Add((fieldBuilder, expr));
+            }
         }
 
         // 定义实例方法
@@ -132,6 +140,8 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
         {
             DefineMethod(typeBuilder, memberId, funcValue, local);
         }
+
+        return fieldBuilders;
 
         // 定义静态成员
         DefineStaticMembers(typeBuilder, local);
@@ -318,7 +328,8 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
     /// </summary>
     /// <param name="typeBuilder">类型构建器</param>
     /// <param name="baseType">基类类型</param>
-    private void DefineConstructor(TypeBuilder typeBuilder, Type baseType)
+    /// <param name="fieldBuilders">字段列表</param>
+    private void DefineConstructor(TypeBuilder typeBuilder, Type baseType, List<(FieldBuilder, LangExpression)> fieldBuilders)
     {
         // 定义无参数构造函数
         var constructorBuilder = typeBuilder.DefineConstructor(
@@ -340,8 +351,24 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
         }
 
         // 2. 初始化实例字段
-        // 暂时不处理字段的初始化，因为需要处理字段的初始值表达式
-        // 实际实现中，应该在这里生成初始化字段的IL代码
+        foreach (var (fieldBuilder, initExpr) in fieldBuilders)
+        {
+            // 加载 this
+            ctorIl.Emit(OpCodes.Ldarg_0);
+
+            // 创建临时 LocalManager 用于字段初始化
+            var tempLocal = new LocalManager
+            {
+                FilePath = "",
+                Interpreter = null
+            };
+
+            // 加载字段的初始值
+            initExpr.LoadIlValue(ctorIl, tempLocal);
+
+            // 存储到字段
+            ctorIl.Emit(OpCodes.Stfld, fieldBuilder);
+        }
 
         // 3. 返回
         ctorIl.Emit(OpCodes.Ret);

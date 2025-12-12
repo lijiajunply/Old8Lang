@@ -1,0 +1,38 @@
+// 数据测试：字典操作
+PrintLine("=== 字典操作测试 ===")
+
+// 创建字典
+dict <- {"name": "张三", "age": 25, "city": "北京"}
+PrintLine("字典创建完成")
+
+// 访问字典元素
+PrintLine("姓名: " + dict["name"])
+PrintLine("年龄: " + dict["age"].ToStr())
+PrintLine("城市: " + dict["city"])
+
+// 修改字典元素
+dict["age"] <- 26
+PrintLine("修改后的年龄: " + dict["age"].ToStr())
+
+// 添加新元素
+dict["email"] <- "zhangsan@example.com"
+PrintLine("邮箱: " + dict["email"])
+
+// 字典长度
+PrintLine("字典元素个数: " + dict.Count.ToStr())
+
+// 嵌套字典
+nestedDict <- {
+    "person": {
+        "name": "李四",
+        "age": 30
+    },
+    "address": {
+        "city": "上海",
+        "street": "南京路"
+    }
+}
+PrintLine("嵌套字典 - 姓名: " + nestedDict["person"]["name"])
+PrintLine("嵌套字典 - 城市: " + nestedDict["address"]["city"])
+
+PrintLine("✅ 字典操作测试完成")

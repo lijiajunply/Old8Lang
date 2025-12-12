@@ -1,0 +1,8 @@
+// 简单类型转换测试
+PrintLine("开始测试")
+
+a <- 10
+b <- a as double
+PrintLine(b)
+
+PrintLine("完成")

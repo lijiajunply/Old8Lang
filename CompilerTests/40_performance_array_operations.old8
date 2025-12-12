@@ -1,0 +1,30 @@
+// 性能测试：数组操作
+PrintLine("=== 数组操作性能测试 ===")
+
+// 创建大数组
+PrintLine("创建包含1000个元素的数组...")
+arr <- []
+for i <- 0; i < 1000; i <- i + 1 {
+    arr <- arr + [i]
+}
+PrintLine("数组创建完成，长度: " + arr.Length.ToStr())
+
+// 数组遍历
+PrintLine("遍历数组并计算总和...")
+sum <- 0
+for i <- 0; i < arr.Length; i <- i + 1 {
+    sum <- sum + arr[i]
+}
+PrintLine("数组总和: " + sum.ToStr())
+
+// 数组过滤
+PrintLine("过滤偶数...")
+evenCount <- 0
+for i <- 0; i < arr.Length; i <- i + 1 {
+    if arr[i] % 2 == 0 {
+        evenCount <- evenCount + 1
+    }
+}
+PrintLine("偶数个数: " + evenCount.ToStr())
+
+PrintLine("✅ 数组操作测试完成")

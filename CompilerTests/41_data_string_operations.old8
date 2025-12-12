@@ -1,0 +1,33 @@
+// 数据测试：字符串操作
+PrintLine("=== 字符串操作测试 ===")
+
+// 字符串拼接
+str1 <- "Hello"
+str2 <- "World"
+str3 <- str1 + " " + str2
+PrintLine("字符串拼接: " + str3)
+
+// 字符串比较
+if str1 == "Hello" {
+    PrintLine("✅ 字符串相等比较正确")
+}
+
+if str1 != str2 {
+    PrintLine("✅ 字符串不等比较正确")
+}
+
+// 空字符串
+emptyStr <- ""
+if emptyStr == "" {
+    PrintLine("✅ 空字符串测试正确")
+}
+
+// 包含特殊字符的字符串
+specialStr <- "Hello\nWorld\tTest"
+PrintLine("特殊字符字符串: " + specialStr)
+
+// 多次拼接
+result <- "A" + "B" + "C" + "D"
+PrintLine("多次拼接: " + result)
+
+PrintLine("✅ 字符串操作测试完成")

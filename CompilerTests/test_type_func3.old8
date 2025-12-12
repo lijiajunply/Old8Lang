@@ -1,0 +1,7 @@
+// 测试type函数 - 不赋值
+PrintLine("开始测试")
+
+a <- 10
+PrintLine(type(a))
+
+PrintLine("完成")

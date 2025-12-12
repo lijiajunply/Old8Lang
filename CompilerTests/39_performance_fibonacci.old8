@@ -1,0 +1,19 @@
+// 性能测试：斐波那契数列
+PrintLine("=== 斐波那契数列性能测试 ===")
+
+func fib(n) {
+    if n <= 1 {
+        return n
+    }
+    return fib(n - 1) + fib(n - 2)
+}
+
+PrintLine("计算斐波那契数列...")
+
+// 计算前20个斐波那契数
+for i <- 0; i < 20; i <- i + 1 {
+    result <- fib(i)
+    PrintLine("fib(" + i.ToStr() + ") = " + result.ToStr())
+}
+
+PrintLine("✅ 斐波那契数列计算完成")

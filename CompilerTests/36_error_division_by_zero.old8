@@ -1,0 +1,9 @@
+// 错误测试：除零错误
+PrintLine("=== 除零错误测试 ===")
+
+a <- 10
+b <- 0
+result <- a / b
+
+PrintLine("不应该执行到这里")
+// error

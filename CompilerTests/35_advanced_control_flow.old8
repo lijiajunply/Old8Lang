@@ -68,17 +68,18 @@ PrintLine("找到目标: i=" + targetI + ", j=" + targetJ + ", k=" + targetK)
 PrintLine("\n--- Switch 中的 Break ---")
 for value <- 0, value < 5, value++ {
     switch value {
-        case 0:
+        case 0 {
             PrintLine("Case 0")
-            break
-        case 1:
+        }
+        case 1 {
             PrintLine("Case 1")
-            break
-        case 2:
+        }
+        case 2 {
             PrintLine("Case 2")
-            break
-        default:
+        }
+        default {
             PrintLine("Default case: " + value)
+        }
     }
 }
 
@@ -86,13 +87,13 @@ for value <- 0, value < 5, value++ {
 PrintLine("\n--- 复杂 Switch-Case ---")
 func evaluateGrade(score) {
     switch true {
-        case score >= 90:
+        case score >= 90
             return "优秀"
-        case score >= 80:
+        case score >= 80
             return "良好"
-        case score >= 70:
+        case score >= 70
             return "中等"
-        case score >= 60:
+        case score >= 60
             return "及格"
         default:
             return "不及格"

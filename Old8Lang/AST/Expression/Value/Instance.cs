@@ -12,7 +12,8 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="langId"></param>
 /// <param name="ids"></param>
 /// <param name="position"></param>
-public class Instance(LangId langId, List<LangExpression> ids, SourcePosition position = default) : LangValueType(position)
+public class Instance(LangId langId, List<LangExpression> ids, SourcePosition position = default)
+    : LangValueType(position)
 {
     public readonly List<LangExpression> Ids = ids;
     public readonly LangId Id = langId;
@@ -60,6 +61,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                             var keyStr = key.ToDisplayString();
                             dict[keyStr] = value.GetValue();
                         }
+
                         var jsonStr = System.Text.Json.JsonSerializer.Serialize(dict);
                         return new StringLangValue(jsonStr);
                     }
@@ -81,7 +83,8 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                     }
 
                     default:
-                        throw new TypeError(this, "AnyValue/DictionaryValue/ArrayValue/ListValue", results[0].GetType().Name);
+                        throw new TypeError(this, "AnyValue/DictionaryValue/ArrayValue/ListValue",
+                            results[0].GetType().Name);
                 }
             }
             case "ToObj" or "toObj":
@@ -177,6 +180,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                     var message = $"断言失败: 期望 {value1}，但得到 {value}";
                     throw new AssertionError(this, message);
                 }
+
                 return new BoolLangValue(true);
             }
         }
@@ -315,7 +319,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
     {
         switch (Id.IdName)
         {
-            case "PrintLine":
+            case "PrintLine" or "printLine":
                 // 处理多个参数，将它们转换为字符串并拼接
                 if (Ids.Count == 0)
                 {
@@ -348,7 +352,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 }
 
                 return;
-            case "Print":
+            case "Print" or "print":
                 // 处理多个参数，将它们转换为字符串并拼接
                 if (Ids.Count == 0)
                 {
@@ -379,28 +383,43 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 // 调用 Console.Write(string)
                 ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("Write", [typeof(string)])!);
                 return;
-            case "Json":
+            case "Json" or "json":
                 return;
-            case "ToObj":
+            case "ToObj" or "toObj":
                 return;
-            case "Len":
+            case "Len" or "len":
                 var lenId = Ids[0];
                 lenId.LoadIlValue(ilGenerator, local);
                 var lenType = lenId.OutputType(local)!;
                 var lengthProp = lenType.GetProperty(lenType.IsAssignableTo(typeof(object[])) ? "Length" : "Count");
-                ilGenerator.Emit(OpCodes.Call, lengthProp!.GetGetMethod()!);
+                if (lengthProp == null)
+                {
+                    throw new InvalidOperationError(this, $"类型 {lenType.Name} 没有 Length 或 Count 属性");
+                }
+
+                ilGenerator.Emit(OpCodes.Call, lengthProp.GetGetMethod()!);
                 return;
-            case "Type":
+            case "Type" or "type":
+                // 编译模式下type()函数返回类型名称字符串
                 var typeId = Ids[0];
-                typeId.LoadIlValue(ilGenerator, local);
-                ilGenerator.Emit(OpCodes.Call, typeof(object).GetMethod("GetType")!);
+                var typeIdType = typeId.OutputType(local);
+                if (typeIdType != null)
+                {
+                    // 直接返回类型名称字符串，不调用GetType()
+                    ilGenerator.Emit(OpCodes.Ldstr, typeIdType.Name);
+                }
+                else
+                {
+                    ilGenerator.Emit(OpCodes.Ldstr, "object");
+                }
+
                 return;
-            case "Compiler":
+            case "Compiler" or "compiler":
                 ilGenerator.Emit(OpCodes.Ldstr, "编译环境不需要使用Compiler方法");
                 ilGenerator.Emit(OpCodes.Call,
                     typeof(Console).GetMethod("WriteLine", [typeof(string)])!);
                 return;
-            case "Exec":
+            case "Exec" or "exec":
                 return;
         }
 
@@ -519,6 +538,8 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             case "Len":
                 return typeof(int);
             case "Json":
+                return typeof(string);
+            case "Type":
                 return typeof(string);
         }
 
