@@ -17,15 +17,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/test_class_inherit_init10.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_class_inherit_init6.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_class_inherit_init7.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_class_inherit_init8.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_class_inherit_init9.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -379,6 +371,7 @@
       <workItem from="1765451683861" duration="981000" />
       <workItem from="1765470025239" duration="15713000" />
       <workItem from="1765514280184" duration="23569000" />
+      <workItem from="1765551227084" duration="315000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -723,7 +716,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="137" />
+    <option name="localTasksCounter" value="138" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -750,7 +743,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(ast): 重构AST表达式类型系统&#10;&#10;- 将OldExpr重命名为LangExpression，统一表达式类型命名&#10;- 更新AnyLangValue中的OldExpr引用为LangExpression&#10;- 修改ArrayLangValue使用LangExpression替代OldExpr&#10;- 更新BlockStatement中ToAnyData和ToStaticData返回类型&#10;- 将ClassFieldSetStatement中的OldExpr改为LangExpression&#10;- 更新DictionaryLangValue构造函数参数类型&#10;- 修改ForInStatement和ForStatement中的表达式类型&#10;- 更新FuncLangValue.Run方法参数类型&#10;- 移除ArgList和IdList中间节点类型&#10;- 将Instance类移动到Value目录并更新构造函数&#10;- 更新LangId和LangListItem中的表达式引用类型&#10;- 修改LangParser中所有Parse方法返回类型为LangExpression&#10;- 更新LangValueType.Dot方法参数类型&#10;- 修改ListComprehension和ListLangValue中的表达式类型&#10;- 更新NativeAnyLangValue和NativeStaticAny中的点操作参数类型&#10;- 修改OldIf条件表达式类型" />
     <MESSAGE value="refactor(ast): 重命名OldIf类为IfChild并更新相关引用&#10;&#10;- 将OldIf类重命名为IfChild&#10;- 更新IfStatement中对OldIf的引用为IfChild&#10;- 修改LangParser中创建IfChild实例的代码&#10;- 更新SwitchStatement中的OldCase类为CaseStatement&#10;- 移除IVisitor接口" />
     <MESSAGE value="test(parser): 增加边界情况和表达式错误测试&#10;&#10;- 添加空值、极值、嵌套结构等边界情况测试&#10;- 增加算术、比较、逻辑表达式错误测试&#10;- 添加赋值、括号、数组、字典相关错误测试&#10;- 增加函数调用、成员访问、索引访问错误测试&#10;- 添加类型转换和三元表达式错误测试&#10;- 完善特殊字符和浮点数边界测试&#10;- 增加长度极限和混合边界测试用例" />
     <MESSAGE value="feat(interpreter): 添加数组、切片和字典操作的全面测试&#10;&#10;- 实现了数组字面量创建和索引访问测试&#10;- 添加了数组切片操作和范围(Range)功能测试&#10;- 完善了列表(List)创建、访问和修改测试&#10;- 实现了嵌套数组和字典键值访问测试&#10;- 添加了字典修改和新增键值对功能验证" />
@@ -775,121 +767,122 @@
     <MESSAGE value="feat(compiler): 支持函数参数类型推断和返回值处理&#10;&#10;- 在FuncInit中创建独立的LocalManager用于函数体IL生成，避免局部变量冲突&#10;- 函数参数提前添加到funcLocal中，便于GetItemType正确推断返回类型&#10;- 优化返回语句处理逻辑，自动添加Ret指令（除非最后已是ReturnStatement）&#10;- 支持void类型作为默认函数返回类型&#10;- 在LocalManager中新增LocalVarTypes字典，用于记录局部变量类型&#10;- LangId支持从LocalVarTypes中查找变量类型（用于参数和局部变量）&#10;- Operation中增加object类型操作数的拆箱处理逻辑&#10;- SetStatement中记录局部变量类型到LocalVarTypes，辅助类型推断&#10;- 优化成员访问和索引赋值的IL生成逻辑，增强类型转换支持&#10;- 添加多个函数相关测试用例，验证参数传递和返回值处理功能" />
     <MESSAGE value="feat(compiler): 支持类继承与字段访问&#10;&#10;- 在ClassInit中实现父类字段复制逻辑，支持子类访问父类字段&#10;- 优化字段存储机制，子类字段可覆盖父类同名字段&#10;- 改进init方法查找逻辑，使用DeclaredOnly避免继承冲突&#10;- 添加类继承测试用例，验证基本继承和字段访问功能&#10;- 增强类型推断与IL生成过程中的字段解析能力&#10;- 更新Instance类构造逻辑，确保正确调用当前类的init方法" />
     <MESSAGE value="feat(lang): 支持类继承中的字段初始化和类型检查&#10;&#10;- 在 FuncLangValue 中增加对 SetStatement 的局部变量类型记录&#10;- 优化 GetItemType 方法以正确处理非 void 类型返回&#10;- 在 SetStatement 中实现字段赋值时的类型匹配与自动转换&#10;- 添加多个测试用例验证类继承场景下的字段初始化逻辑" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 支持类继承中的字段初始化和类型检查&#10;&#10;- 在 FuncLangValue 中增加对 SetStatement 的局部变量类型记录&#10;- 优化 GetItemType 方法以正确处理非 void 类型返回&#10;- 在 SetStatement 中实现字段赋值时的类型匹配与自动转换&#10;- 添加多个测试用例验证类继承场景下的字段初始化逻辑" />
+    <MESSAGE value="refactor(ast): 移除所有Accept方法并简化访问者模式实现&#10;&#10;- 删除所有具体节点中的Accept方法实现&#10;- 移除IVisitor接口及其所有访问方法&#10;- 简化IOldLangTree接口定义，移除Accept方法声明&#10;- 更新相关类继承结构以适应新的设计&#10;- 修改FuncInit类中的模式匹配逻辑以提高可读性&#10;- 将TupleLangValue的字段改为只读属性&#10;- 优化LangListItem中的字段引用一致性&#10;- 清理冗余的空行和注释以提升代码整洁度" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 移除所有Accept方法并简化访问者模式实现&#10;&#10;- 删除所有具体节点中的Accept方法实现&#10;- 移除IVisitor接口及其所有访问方法&#10;- 简化IOldLangTree接口定义，移除Accept方法声明&#10;- 更新相关类继承结构以适应新的设计&#10;- 修改FuncInit类中的模式匹配逻辑以提高可读性&#10;- 将TupleLangValue的字段改为只读属性&#10;- 优化LangListItem中的字段引用一致性&#10;- 清理冗余的空行和注释以提升代码整洁度" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>28</line>
+          <line>27</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'" />
           <option name="timeStamp" value="236" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>29</line>
+          <line>28</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'" />
           <option name="timeStamp" value="237" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>32</line>
+          <line>31</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'" />
           <option name="timeStamp" value="238" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>87</line>
+          <line>86</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'GenerateIl'" />
           <option name="timeStamp" value="401" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>129</line>
+          <line>128</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'GenerateIl'" />
           <option name="timeStamp" value="402" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs</url>
-          <line>47</line>
+          <line>45</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\FuncRunStatement.cs" containingFunctionPresentation="方法 'ToString'" />
           <option name="timeStamp" value="444" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs</url>
-          <line>40</line>
+          <line>38</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="1243" />
+              <option value="1161" />
             </startOffsets>
             <endOffsets>
-              <option value="1682" />
+              <option value="1600" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="517" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/IntLangValue.cs</url>
-          <line>74</line>
+          <line>73</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/IntLangValue.cs" containingFunctionPresentation="方法 'Times'">
             <startOffsets>
-              <option value="2410" />
+              <option value="2333" />
             </startOffsets>
             <endOffsets>
-              <option value="2452" />
+              <option value="2375" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="530" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs</url>
-          <line>36</line>
+          <line>35</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="975" />
+              <option value="898" />
             </startOffsets>
             <endOffsets>
-              <option value="1020" />
+              <option value="943" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="546" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs</url>
-          <line>39</line>
+          <line>38</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="1043" />
+              <option value="966" />
             </startOffsets>
             <endOffsets>
-              <option value="1104" />
+              <option value="1027" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="547" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs</url>
-          <line>180</line>
+          <line>178</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" containingFunctionPresentation="方法 'Converse'">
             <startOffsets>
-              <option value="4947" />
+              <option value="4865" />
             </startOffsets>
             <endOffsets>
-              <option value="4948" />
+              <option value="4866" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="555" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs</url>
-          <line>177</line>
+          <line>175</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" containingFunctionPresentation="方法 'Converse'">
             <startOffsets>
-              <option value="4796" />
+              <option value="4714" />
             </startOffsets>
             <endOffsets>
-              <option value="4829" />
+              <option value="4747" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="556" />

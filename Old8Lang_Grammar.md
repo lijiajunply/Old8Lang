@@ -430,6 +430,53 @@ import "module"
 import module
 ```
 
+### 5.8 原生库导入语句
+
+Old8Lang 支持导入原生 DLL 库中的类和方法，以便调用外部功能。原生库导入语句使用方括号 `[]` 包围，有三种形式：
+
+#### 5.8.1 nativeStatement
+
+**语法规则**：`[import "dllName" className methodName alias?]`
+
+**描述**：导入原生 DLL 中的特定方法，并可选地指定别名。
+
+**示例**：
+
+```
+[import "console.dll" console Write print]
+[import "console.dll" console WriteLine printline]
+```
+
+#### 5.8.2 nativeStatic
+
+**语法规则**：`[import "dllName" className] -> alias`
+
+**描述**：导入原生 DLL 中的静态类或静态方法集，并指定别名。
+
+**示例**：
+
+```
+[import "Math.dll" Math] -> Math
+```
+
+#### 5.8.3 nativeClass
+
+**语法规则**：`[import "dllName" className]`
+
+**描述**：导入原生 DLL 中的完整类，包括所有方法和属性。
+
+**示例**：
+
+```
+[import "Person.dll" Person]
+```
+
+**原生库导入的作用**：
+- 允许 Old8Lang 代码调用外部 C# DLL 中的功能
+- 支持调用静态方法和实例方法
+- 支持导入整个类或特定方法
+- 可用于扩展 Old8Lang 的功能，如访问系统 API、使用第三方库等
+
 ## 6. 类型系统
 
 ### 6.1 动态类型
