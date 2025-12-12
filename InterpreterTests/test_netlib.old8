@@ -1,0 +1,51 @@
+// 测试网络请求库
+// 注意：这个测试只验证库的基本功能，不实际连接到外部服务器
+
+// 导入网络库
+import Net
+
+// 测试Socket客户端
+PrintLine("===== 测试Socket客户端 =====")
+socket <- Net.CreateSocketClient("localhost", 8080)
+PrintLine("Socket客户端创建成功")
+PrintLine("Socket客户端连接状态: " + socket.IsConnected)
+
+// 测试HTTP客户端
+PrintLine("\n===== 测试HTTP客户端 =====")
+http <- Net.CreateHttpClient()
+PrintLine("HTTP客户端创建成功")
+
+// 添加默认请求头
+try {
+    http.AddDefaultHeader("User-Agent", "Old8Lang/1.0")
+    PrintLine("添加默认请求头成功")
+} catch (e) {
+    PrintLine("添加默认请求头失败: " + e)
+}
+
+// 测试WebAPI客户端
+PrintLine("\n===== 测试WebAPI客户端 =====")
+api <- Net.CreateWebApiClient("https://jsonplaceholder.typicode.com")
+PrintLine("WebAPI客户端创建成功")
+
+// 添加认证头
+try {
+    api.AddDefaultHeader("Authorization", "Bearer test-token")
+    PrintLine("添加认证头成功")
+} catch (e) {
+    PrintLine("添加认证头失败: " + e)
+}
+
+// 测试WebSocket客户端
+PrintLine("\n===== 测试WebSocket客户端 =====")
+ws <- Net.CreateWebSocketClient("ws://localhost:8081")
+PrintLine("WebSocket客户端创建成功")
+PrintLine("WebSocket客户端连接状态: " + ws.IsConnected)
+
+// 测试MQTT客户端
+PrintLine("\n===== 测试MQTT客户端 =====")
+mqtt <- Net.CreateMqttClient("localhost", 1883)
+PrintLine("MQTT客户端创建成功")
+PrintLine("MQTT客户端连接状态: " + mqtt.IsConnected)
+
+PrintLine("\n===== 网络库测试完成 =====")

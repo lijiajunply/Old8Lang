@@ -1,0 +1,32 @@
+// 简单测试网络请求库
+// 只测试基本功能，不实际连接到外部服务器
+
+// 导入网络库
+import Net
+
+// 测试Socket客户端创建
+PrintLine("Test Socket Client")
+socket <- Net.CreateSocketClient("localhost", 8080)
+PrintLine("Socket created")
+
+// 测试HTTP客户端创建
+PrintLine("Test HTTP Client")
+http <- Net.CreateHttpClient()
+PrintLine("HTTP client created")
+
+// 测试WebAPI客户端创建
+PrintLine("Test WebAPI Client")
+api <- Net.CreateWebApiClient("https://jsonplaceholder.typicode.com")
+PrintLine("WebAPI client created")
+
+// 测试WebSocket客户端创建
+PrintLine("Test WebSocket Client")
+ws <- Net.CreateWebSocketClient("ws://localhost:8081")
+PrintLine("WebSocket client created")
+
+// 测试MQTT客户端创建
+PrintLine("Test MQTT Client")
+mqtt <- Net.CreateMqttClient("localhost", 1883)
+PrintLine("MQTT client created")
+
+PrintLine("All clients created successfully")

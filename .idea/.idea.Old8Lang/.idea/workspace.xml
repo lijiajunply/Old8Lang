@@ -17,18 +17,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/CompilerTests/27_deep_recursion.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/28_large_loops.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/29_large_data_structures.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/30_time_library.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/31_math_library.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/32_boundary_conditions.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/33_error_handling.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/34_complex_data_structures.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/35_advanced_control_flow.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/20251212-0508-编译器全面测试.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/run_comprehensive_compiler_tests.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/plan_20251212_051809.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_netlib.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_netlib_minimal.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_netlib_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.NetLib/HttpClient.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.NetLib/Old8Lang.NetLib.csproj" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.NetLib/WebApiClient.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Net.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/compiler.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Ex/compiler.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/fib.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Ex/fib.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/init.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Ex/init.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Ex/other.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Ex/other.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/Net/Net.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Net/Http.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Net/dll/Old8LangLib.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Net/init.old8" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,43 +73,12 @@
 }</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/SyntaxErrorTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/FuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/NetLib.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/LangValueType.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/ListLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/ListLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TupleLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TupleLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangInfo.json" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangToken.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/FileLib.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/FileLib.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/FileLib.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/OS.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/Time.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1f/4c54500e/List`1.cs" root0="FORCE_HIGHLIGHTING" />
@@ -124,36 +105,36 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
-    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
-    ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Run",
-    "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Run&quot;,
+    &quot;07d79105-db56-470d-b872-543f396b1133.executor&quot;: &quot;Debug&quot;,
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "PLAIN_TEXT",
-      "Markdown"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;PLAIN_TEXT&quot;,
+      &quot;Markdown&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
@@ -377,7 +358,8 @@
       <workItem from="1765446680033" duration="2287000" />
       <workItem from="1765449531774" duration="576000" />
       <workItem from="1765451683861" duration="981000" />
-      <workItem from="1765470025239" duration="15469000" />
+      <workItem from="1765470025239" duration="15713000" />
+      <workItem from="1765514280184" duration="2434000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -722,7 +704,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="122" />
+    <option name="localTasksCounter" value="123" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -749,7 +731,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="加入自己写的Parser" />
     <MESSAGE value="基本完成，现在进入测试。测试成功1.0版本就OK了。" />
     <MESSAGE value="改一下位置" />
     <MESSAGE value="删除Lang.Demo" />
@@ -774,7 +755,8 @@
     <MESSAGE value="feat(lang): 实现错误处理系统增强与语法解析优化&#10;&#10;- 新增 AssertionError、ValueError、FileNotFoundError 等错误类型的实际应用&#10;- 实现异常转换层，将 .NET 异常映射为 Old8Lang 自定义异常&#10;- 修复嵌套索引访问问题，支持 array[0][0] 等链式索引&#10;- 扩展 Json 函数支持字典、数组等多种数据结构序列化&#10;- 实现数组、列表、字典的深度内容比较，解决 Assert 函数比较问题&#10;- 新增数学函数库，包含 Sqrt、Log、Factorial 等函数及参数验证&#10;- 增强文件操作库的异常处理，主动检查文件存在性&#10;- 优化语法解析器对复杂表达式的处理能力&#10;- 提升编译器生成 IL 代码的准确性和稳定性&#10;- 完善单元测试覆盖，确保各项功能正常运行" />
     <MESSAGE value="docs(lang): 更新语言特性文档并优化代码格式&#10;&#10;- 在CLAUDE.md中添加ToString方法说明&#10;- 优化FuncStatic.cs中的条件判断代码格式&#10;- 保持代码风格一致性" />
     <MESSAGE value="feat(math): 扩展数学库功能并优化实现&#10;&#10;- 添加双曲三角函数：Sinh、Cosh、Tanh&#10;- 实现特殊函数：Gamma函数和Beta函数&#10;- 增加随机数生成函数：Random和RandomInt&#10;- 添加角度与弧度转换函数&#10;- 实现常用单位换算函数（温度、长度、重量）&#10;- 增加向量操作函数：模长、点积、加减、数乘、归一化等&#10;- 添加向量数学函数：VectorSin、VectorCos等&#10;- 优化对数函数底数判断逻辑，提高数值稳定性&#10;- 完善各函数的参数验证和异常处理&#10;- 更新库导入声明以支持新增函数" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(math): 扩展数学库功能并优化实现&#10;&#10;- 添加双曲三角函数：Sinh、Cosh、Tanh&#10;- 实现特殊函数：Gamma函数和Beta函数&#10;- 增加随机数生成函数：Random和RandomInt&#10;- 添加角度与弧度转换函数&#10;- 实现常用单位换算函数（温度、长度、重量）&#10;- 增加向量操作函数：模长、点积、加减、数乘、归一化等&#10;- 添加向量数学函数：VectorSin、VectorCos等&#10;- 优化对数函数底数判断逻辑，提高数值稳定性&#10;- 完善各函数的参数验证和异常处理&#10;- 更新库导入声明以支持新增函数" />
+    <MESSAGE value="test(compiler): 添加深度递归性能测试用例&#10;&#10;- 新增斐波那契数列递归实现及测试&#10;- 实现阶乘深度递归计算函数&#10;- 添加汉诺塔问题递归解法&#10;- 实现阿克曼函数极高复杂度递归测试&#10;- 添加二叉树深度递归计算逻辑&#10;- 实现最大公约数欧几里得递归算法&#10;- 添加组合数递归计算功能&#10;- 实现字符串反转递归方法" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(compiler): 添加深度递归性能测试用例&#10;&#10;- 新增斐波那契数列递归实现及测试&#10;- 实现阶乘深度递归计算函数&#10;- 添加汉诺塔问题递归解法&#10;- 实现阿克曼函数极高复杂度递归测试&#10;- 添加二叉树深度递归计算逻辑&#10;- 实现最大公约数欧几里得递归算法&#10;- 添加组合数递归计算功能&#10;- 实现字符串反转递归方法" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
