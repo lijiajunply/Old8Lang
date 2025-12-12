@@ -1,0 +1,10 @@
+class Dog {
+    name <- ""
+
+    func init(n) {
+        this.name <- n
+    }
+}
+
+dog <- Dog("Buddy")
+PrintLine(dog.name)

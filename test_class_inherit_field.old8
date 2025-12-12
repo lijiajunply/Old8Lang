@@ -1,0 +1,11 @@
+class Animal {
+    name <- "default"
+}
+
+class Dog extends Animal {
+    breed <- "unknown"
+}
+
+dog <- Dog()
+PrintLine(dog.name)
+PrintLine(dog.breed)

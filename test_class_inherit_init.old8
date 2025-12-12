@@ -1,0 +1,27 @@
+class Animal {
+    name <- ""
+
+    func init(n) {
+        PrintLine("Animal init")
+        this.name <- n
+        PrintLine("Animal init done")
+    }
+}
+
+class Dog extends Animal {
+    breed <- ""
+
+    func init(n, b) {
+        PrintLine("Dog init start")
+        this.name <- n
+        PrintLine("Dog init middle")
+        this.breed <- b
+        PrintLine("Dog init done")
+    }
+}
+
+PrintLine("Creating dog")
+dog <- Dog("Buddy", "Golden")
+PrintLine("Dog created")
+PrintLine(dog.name)
+PrintLine(dog.breed)

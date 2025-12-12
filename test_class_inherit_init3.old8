@@ -1,0 +1,7 @@
+class Dog {
+    func init(name) {
+        PrintLine(name)
+    }
+}
+
+dog <- Dog("Buddy")

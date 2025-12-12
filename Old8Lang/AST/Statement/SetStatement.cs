@@ -213,12 +213,30 @@ public class SetStatement : OldStatement
                     {
                         // 加载 this（参数0）
                         ilGenerator.Emit(OpCodes.Ldarg_0);
-                        // 加载右值
-                        Value.LoadIlValue(ilGenerator, local);
 
                         // 从 FieldVar 中获取字段信息
                         if (local.FieldVar.TryGetValue(memberId.IdName, out var fieldInfo))
                         {
+                            // 加载右值
+                            Value.LoadIlValue(ilGenerator, local);
+
+                            // 检查值类型是否与字段类型匹配
+                            var valueType = Value.OutputType(local);
+                            if (valueType != null && fieldInfo.FieldType != valueType)
+                            {
+                                // 如果值类型与字段类型不匹配，进行类型转换
+                                if (fieldInfo.FieldType == typeof(object) && valueType.IsValueType)
+                                {
+                                    // 值类型到object，需要装箱
+                                    ilGenerator.Emit(OpCodes.Box, valueType);
+                                }
+                                else if (fieldInfo.FieldType.IsValueType && valueType == typeof(object))
+                                {
+                                    // object到值类型，需要拆箱
+                                    ilGenerator.Emit(OpCodes.Unbox_Any, fieldInfo.FieldType);
+                                }
+                            }
+
                             ilGenerator.Emit(OpCodes.Stfld, fieldInfo);
                             return;
                         }

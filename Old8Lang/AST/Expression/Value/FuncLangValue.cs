@@ -240,6 +240,16 @@ public class FuncLangValue : ImportInfo
         {
             var item = statement[i];
 
+            // 如果是SetStatement，记录局部变量的类型
+            if (item is SetStatement setStatement && setStatement.Id != null)
+            {
+                var varType = setStatement.Value.OutputType(local);
+                if (varType != null)
+                {
+                    local.LocalVarTypes[setStatement.Id.IdName] = varType;
+                }
+            }
+
             if (item is ReturnStatement returnStatement)
             {
                 return returnStatement.OutputType(local);
@@ -250,7 +260,11 @@ public class FuncLangValue : ImportInfo
                 continue;
             }
 
-            return GetItemType(item, local);
+            var innerType = GetItemType(item, local);
+            if (innerType != typeof(void))
+            {
+                return innerType;
+            }
         }
 
         return typeof(void);
