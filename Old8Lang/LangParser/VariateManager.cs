@@ -20,9 +20,9 @@ public class VariateManager
 
     #region Variate
 
-    //private Dictionary<string, ValueType> Variates { get; set; } = new();
-    private List<string> VariateName { get; } = [];
-    private List<LangValueType> Values { get; } = [];
+    // 作用域栈，每个作用域是一个 Dictionary
+    // Scopes[0] 是全局作用域，Scopes[^1] 是当前作用域
+    private List<Dictionary<string, LangValueType>> Scopes { get; } = [new()];
 
     public List<ImportInfo> ImportInfos { get; } = [];
 
@@ -37,11 +37,7 @@ public class VariateManager
 
     #region Block
 
-    private int Count { get; set; }
     public bool IsFunc { get; set; }
-
-    private List<int> ChildrenNum { get; } = [];
-
     public bool IsClass { get; set; }
 
     // 递归深度限制
@@ -69,133 +65,51 @@ public class VariateManager
     public void Set(LangId id, LangValueType langValueType)
     {
         // 检查是否是函数调用中的参数设置
-        // 如果是，直接添加到变量列表末尾，创建新的局部变量
+        // 如果是，直接添加到当前作用域，创建新的局部变量
         if (IsFunc)
         {
-            VariateName.Add(id.IdName);
-            Values.Add(langValueType);
-            Count++;
+            Scopes[^1][id.IdName] = langValueType;
             return;
         }
 
-        // 1. 先查找变量，包括当前作用域和所有父作用域
-        var findResult = FindVariable(id.IdName);
-
-        if (findResult.Found)
+        // 1. 先查找变量，从当前作用域向父作用域查找
+        for (var i = Scopes.Count - 1; i >= 0; i--)
         {
-            // 2. 找到了变量，修改它的值
-            Values[findResult.Index] = langValueType;
-            return;
+            if (Scopes[i].ContainsKey(id.IdName))
+            {
+                // 2. 找到了变量，修改它的值
+                Scopes[i][id.IdName] = langValueType;
+                return;
+            }
         }
 
         // 3. 没有找到变量，在当前作用域中创建新变量
-        VariateName.Add(id.IdName);
-        Values.Add(langValueType);
-        Count++;
-    }
-
-    /// <summary>
-    /// 查找变量，包括当前作用域和所有父作用域
-    /// </summary>
-    /// <param name="name">变量名</param>
-    /// <returns>查找结果，包括是否找到和变量索引</returns>
-    private (bool Found, int Index) FindVariable(string name)
-    {
-        // 获取当前作用域的起始索引
-        var currentScopeStart = ChildrenNum.Count > 0 ? ChildrenNum[^1] : 0;
-
-        // 1. 先在当前作用域中查找
-        for (var i = Count - 1; i >= currentScopeStart; i--)
-        {
-            if (VariateName[i] == name)
-            {
-                return (true, i);
-            }
-        }
-
-        // 2. 当前作用域中没有找到，递归查找父作用域
-        if (ChildrenNum.Count > 0)
-        {
-            // 临时保存当前作用域状态
-            var tempCount = Count;
-            var tempChildrenNum = ChildrenNum[^1];
-
-            // 移除当前子作用域，进入父作用域
-            ChildrenNum.RemoveAt(ChildrenNum.Count - 1);
-            Count = tempChildrenNum;
-
-            try
-            {
-                // 递归查找父作用域
-                return FindVariable(name);
-            }
-            finally
-            {
-                // 恢复当前作用域状态
-                ChildrenNum.Add(tempChildrenNum);
-                Count = tempCount;
-            }
-        }
-
-        // 3. 所有作用域中都没有找到
-        return (false, -1);
+        Scopes[^1][id.IdName] = langValueType;
     }
 
     public void AddChildren()
     {
-        ChildrenNum.Add(Count);
+        // 创建新的作用域
+        Scopes.Add(new Dictionary<string, LangValueType>());
     }
 
     public void RemoveChildren()
     {
-        var num = ChildrenNum[^1];
-
-        while (Count > num)
+        // 移除当前作用域
+        if (Scopes.Count > 1)
         {
-            Values.RemoveAt(Count - 1);
-            VariateName.RemoveAt(Count - 1);
-            Count--;
+            Scopes.RemoveAt(Scopes.Count - 1);
         }
-
-        ChildrenNum.Remove(ChildrenNum[^1]);
     }
 
     public LangValueType? GetValue(LangId id)
     {
-        // 获取当前作用域的起始索引
-        var currentScopeStart = ChildrenNum.Count > 0 ? ChildrenNum[^1] : 0;
-
-        // 从当前作用域的末尾向前查找，只查找当前作用域中的变量
-        // 这样可以确保找到的是当前作用域中最新的变量，而不是父作用域中的变量
-        for (var i = Count - 1; i >= currentScopeStart; i--)
+        // 从当前作用域（栈顶）向全局作用域（栈底）查找
+        for (var i = Scopes.Count - 1; i >= 0; i--)
         {
-            if (VariateName[i] == id.IdName)
+            if (Scopes[i].TryGetValue(id.IdName, out var value))
             {
-                return Values[i];
-            }
-        }
-
-        // 如果当前作用域中没有找到，尝试在父作用域中查找
-        if (ChildrenNum.Count > 0)
-        {
-            // 临时移除当前作用域，递归查找父作用域
-            var currentScopeEnd = Count;
-            // var currentScopeSize = currentScopeEnd - currentScopeStart;
-
-            // 临时调整状态
-            ChildrenNum.RemoveAt(ChildrenNum.Count - 1);
-            Count = currentScopeStart;
-
-            try
-            {
-                // 递归查找父作用域
-                return GetValue(id);
-            }
-            finally
-            {
-                // 恢复状态
-                Count = currentScopeEnd;
-                ChildrenNum.Add(currentScopeStart);
+                return value;
             }
         }
 
@@ -239,16 +153,15 @@ public class VariateManager
 
     private void AddVariate(string name, LangValueType langValueType)
     {
-        if (VariateName.Contains(name))
+        // 检查当前作用域中是否已存在同名变量
+        if (Scopes[^1].ContainsKey(name))
         {
             // 创建一个默认的SourcePosition，因为AddVariate方法没有位置信息
             // 在实际使用中，应该从调用处传递位置信息
             throw new DuplicateNameError(langValueType.Position, name, "变量");
         }
 
-        VariateName.Add(name);
-        Values.Add(langValueType);
-        Count++;
+        Scopes[^1][name] = langValueType;
     }
 
     public void ClearReturn()
@@ -275,8 +188,29 @@ public class VariateManager
         {
             LangInfo = LangInfo,
             Path = Path,
-            Interpreter = Interpreter
+            Interpreter = Interpreter,
+            IsFunc = IsFunc,
+            IsClass = IsClass,
+            IsReturn = IsReturn,
+            Result = Result
         };
+
+        // 深拷贝作用域栈
+        foreach (var scope in Scopes)
+        {
+            var newScope = new Dictionary<string, LangValueType>(scope);
+            newManager.Scopes.Add(newScope);
+        }
+
+        // 移除初始化时的空作用域（因为构造函数已经创建了一个）
+        if (newManager.Scopes.Count > 0 && Scopes.Count > 0)
+        {
+            newManager.Scopes.RemoveAt(0);
+        }
+
+        // 复制导入信息
+        newManager.ImportInfos.AddRange(ImportInfos);
+
         return newManager;
     }
 
@@ -287,8 +221,6 @@ public class VariateManager
             LangInfo = LangInfo,
             Path = Path,
             Interpreter = Interpreter,
-            // 复制作用域信息
-            Count = Count,
             // 复制返回和函数状态
             IsReturn = IsReturn,
             Result = Result,
@@ -296,12 +228,18 @@ public class VariateManager
             IsClass = IsClass
         };
 
-        // 复制变量列表（使用 AddRange 因为属性是只读的）
-        newManager.VariateName.AddRange(VariateName);
-        newManager.Values.AddRange(Values);
+        // 深拷贝作用域栈
+        foreach (var scope in Scopes)
+        {
+            var newScope = new Dictionary<string, LangValueType>(scope);
+            newManager.Scopes.Add(newScope);
+        }
 
-        // 复制作用域信息
-        newManager.ChildrenNum.AddRange(ChildrenNum);
+        // 移除初始化时的空作用域（因为构造函数已经创建了一个）
+        if (newManager.Scopes.Count > 0 && Scopes.Count > 0)
+        {
+            newManager.Scopes.RemoveAt(0);
+        }
 
         // 复制导入信息
         newManager.ImportInfos.AddRange(ImportInfos);

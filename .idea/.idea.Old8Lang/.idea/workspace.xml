@@ -17,13 +17,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/IMiniInterpreter 接口设计优化计划.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Core/ParserBase.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Core/ParserContext.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/ParserHelpers/ExpectHelper.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ExpressionParser.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/CompilerTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/CompilerTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -56,12 +59,17 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/.claude/settings.local.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/InterpreterTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
@@ -344,7 +352,7 @@
       <workItem from="1765451683861" duration="981000" />
       <workItem from="1765470025239" duration="15713000" />
       <workItem from="1765514280184" duration="23569000" />
-      <workItem from="1765551227084" duration="3659000" />
+      <workItem from="1765551227084" duration="8963000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -689,7 +697,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="138" />
+    <option name="localTasksCounter" value="140" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -716,8 +724,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(ast): 重命名OldIf类为IfChild并更新相关引用&#10;&#10;- 将OldIf类重命名为IfChild&#10;- 更新IfStatement中对OldIf的引用为IfChild&#10;- 修改LangParser中创建IfChild实例的代码&#10;- 更新SwitchStatement中的OldCase类为CaseStatement&#10;- 移除IVisitor接口" />
-    <MESSAGE value="test(parser): 增加边界情况和表达式错误测试&#10;&#10;- 添加空值、极值、嵌套结构等边界情况测试&#10;- 增加算术、比较、逻辑表达式错误测试&#10;- 添加赋值、括号、数组、字典相关错误测试&#10;- 增加函数调用、成员访问、索引访问错误测试&#10;- 添加类型转换和三元表达式错误测试&#10;- 完善特殊字符和浮点数边界测试&#10;- 增加长度极限和混合边界测试用例" />
     <MESSAGE value="feat(interpreter): 添加数组、切片和字典操作的全面测试&#10;&#10;- 实现了数组字面量创建和索引访问测试&#10;- 添加了数组切片操作和范围(Range)功能测试&#10;- 完善了列表(List)创建、访问和修改测试&#10;- 实现了嵌套数组和字典键值访问测试&#10;- 添加了字典修改和新增键值对功能验证" />
     <MESSAGE value="feat(tests): 添加 OS、Terminal、File 库实际操作测试&#10;&#10;- 新增 OS 库测试文件，验证 OSInfo 获取及多次调用功能&#10;- 新增 Terminal 库测试文件，覆盖 Title、Beep 等基础功能&#10;- 新增 File 库测试文件，测试文件读取、ZIP 压缩与解压功能&#10;- 创建测试数据文件用于 File 库测试&#10;- 修复 ObjToValue 对 List 类型的支持&#10;- 优化 OS.Process 方法支持 macOS 平台&#10;- 更新 ArrayLangValue 和 ListLangValue 构造逻辑&#10;- 改进 Operation 中数组和列表索引访问处理&#10;- 生成库函数实际测试报告并更新工作区配置" />
     <MESSAGE value="feat(lang): 实现集合类型深度比较功能&#10;&#10;- 为元组类型添加深度比较支持，递归比较两个元素&#10;- 修复字典类型重复添加键值对问题，清空旧值后重新加载&#10;- 优化字典深度比较逻辑，使用显式循环替代LINQ查找键&#10;- 添加完整测试用例覆盖数组、列表、字典、元组的深度比较&#10;- 支持嵌套结构比较和边界情况处理（空集合、单元素等）&#10;- 实现键顺序无关的字典比较机制&#10;- 生成详细测试报告验证功能正确性" />
@@ -741,7 +747,9 @@
     <MESSAGE value="feat(compiler): 支持类继承与字段访问&#10;&#10;- 在ClassInit中实现父类字段复制逻辑，支持子类访问父类字段&#10;- 优化字段存储机制，子类字段可覆盖父类同名字段&#10;- 改进init方法查找逻辑，使用DeclaredOnly避免继承冲突&#10;- 添加类继承测试用例，验证基本继承和字段访问功能&#10;- 增强类型推断与IL生成过程中的字段解析能力&#10;- 更新Instance类构造逻辑，确保正确调用当前类的init方法" />
     <MESSAGE value="feat(lang): 支持类继承中的字段初始化和类型检查&#10;&#10;- 在 FuncLangValue 中增加对 SetStatement 的局部变量类型记录&#10;- 优化 GetItemType 方法以正确处理非 void 类型返回&#10;- 在 SetStatement 中实现字段赋值时的类型匹配与自动转换&#10;- 添加多个测试用例验证类继承场景下的字段初始化逻辑" />
     <MESSAGE value="refactor(ast): 移除所有Accept方法并简化访问者模式实现&#10;&#10;- 删除所有具体节点中的Accept方法实现&#10;- 移除IVisitor接口及其所有访问方法&#10;- 简化IOldLangTree接口定义，移除Accept方法声明&#10;- 更新相关类继承结构以适应新的设计&#10;- 修改FuncInit类中的模式匹配逻辑以提高可读性&#10;- 将TupleLangValue的字段改为只读属性&#10;- 优化LangListItem中的字段引用一致性&#10;- 清理冗余的空行和注释以提升代码整洁度" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 移除所有Accept方法并简化访问者模式实现&#10;&#10;- 删除所有具体节点中的Accept方法实现&#10;- 移除IVisitor接口及其所有访问方法&#10;- 简化IOldLangTree接口定义，移除Accept方法声明&#10;- 更新相关类继承结构以适应新的设计&#10;- 修改FuncInit类中的模式匹配逻辑以提高可读性&#10;- 将TupleLangValue的字段改为只读属性&#10;- 优化LangListItem中的字段引用一致性&#10;- 清理冗余的空行和注释以提升代码整洁度" />
+    <MESSAGE value="refactor(compiler): 重构解释器接口和类型引用&#10;&#10;- 将 IMiniInterpreter 接口从 LocalManager.cs 分离到独立文件&#10;- 更新 LangInterpreter 类不再实现 IMiniInterpreter 接口&#10;- 修改 AnyLangValue.cs 和 Compiler.cs 中的接口引用为具体类型&#10;- 调整 LocalManager 和 VariateManager 中的解释器类型声明&#10;- 移除 CompilerTests.cs 中的模拟接口实现&#10;- 添加 IMiniInterpreter 接口设计优化计划文档&#10;- 统一编译器日志输出格式和调试信息处理逻辑&#10;- 优化异常处理中的堆栈跟踪和建议信息输出&#10;- 清理代码中的多余空行和格式问题" />
+    <MESSAGE value="feat(interpreter): 重构 IMiniInterpreter 接口及其实现&#10;&#10;- 定义新的 IMiniInterpreter 接口，明确解释器核心功能&#10;- 优化 LangInterpreter 类以实现新接口&#10;- 统一输出提供者属性命名为 OutputProvider&#10;- 将 UseClass 属性重命名为 OutputProvider 以提高语义清晰度&#10;- 更新 Instance.cs 中的输出调用方式以使用新的 OutputProvider 属性&#10;- 修改测试用例以适应新的属性命名&#10;- 移除不再需要的 using 语句&#10;- 在文档中详细描述接口设计优化方案和实现步骤" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(interpreter): 重构 IMiniInterpreter 接口及其实现&#10;&#10;- 定义新的 IMiniInterpreter 接口，明确解释器核心功能&#10;- 优化 LangInterpreter 类以实现新接口&#10;- 统一输出提供者属性命名为 OutputProvider&#10;- 将 UseClass 属性重命名为 OutputProvider 以提高语义清晰度&#10;- 更新 Instance.cs 中的输出调用方式以使用新的 OutputProvider 属性&#10;- 修改测试用例以适应新的属性命名&#10;- 移除不再需要的 using 语句&#10;- 在文档中详细描述接口设计优化方案和实现步骤" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
