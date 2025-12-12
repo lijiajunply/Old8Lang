@@ -1,0 +1,11 @@
+// 测试类方法中的 PrintLine
+class Test {
+    func sayHello() {
+        PrintLine("Hello from method")
+        return 1
+    }
+}
+
+t <- Test()
+result <- t.sayHello()
+PrintLine("Result: " + result)

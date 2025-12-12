@@ -142,9 +142,6 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
         }
 
         return fieldBuilders;
-
-        // 定义静态成员
-        DefineStaticMembers(typeBuilder, local);
     }
 
     /// <summary>

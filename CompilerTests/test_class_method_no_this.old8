@@ -1,0 +1,11 @@
+// 测试类方法不使用 this
+class Test {
+    name <- "Alice"
+
+    func sayHello() {
+        PrintLine("Hello without this")
+    }
+}
+
+t <- Test()
+t.sayHello()

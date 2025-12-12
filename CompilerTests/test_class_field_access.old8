@@ -1,0 +1,8 @@
+// 测试类字段访问
+class Test {
+    value <- 100
+}
+
+t <- Test()
+result <- t.value
+PrintLine(result)

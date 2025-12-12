@@ -1,0 +1,11 @@
+// 测试 void 方法带 return
+class Test {
+    func sayHello() {
+        PrintLine("Hello")
+        return
+    }
+}
+
+t <- Test()
+t.sayHello()
+PrintLine("Done")

@@ -1,0 +1,14 @@
+// 测试类方法中访问 this
+class Test {
+    name <- "Alice"
+
+    func sayHello() {
+        PrintLine("Before this.name")
+        value <- this.name
+        PrintLine("After this.name")
+        PrintLine("Hello from " + value)
+    }
+}
+
+t <- Test()
+t.sayHello()
