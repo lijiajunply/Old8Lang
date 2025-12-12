@@ -1,0 +1,10 @@
+// 测试类方法返回值
+class Test {
+    func getValue() {
+        return 42
+    }
+}
+
+t <- Test()
+result <- t.getValue()
+PrintLine(result)

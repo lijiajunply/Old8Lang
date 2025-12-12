@@ -225,14 +225,25 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
         // 获取方法名称
         string methodName = memberId.IdName;
 
-        // 创建一个全新的LocalManager实例，完全独立于外部环境
-        // 这样可以避免不同类之间的方法上下文混淆
+        // 创建一个新的LocalManager实例，继承外部的函数和类定义
         var methodLocal = new LocalManager
         {
             FilePath = local.FilePath,
             Interpreter = local.Interpreter,
             InClassEnv = typeBuilder
         };
+
+        // 继承外部的函数定义（包括内置函数如 PrintLine）
+        foreach (var kvp in local.DelegateVar)
+        {
+            methodLocal.DelegateVar[kvp.Key] = kvp.Value;
+        }
+
+        // 继承外部的类定义
+        foreach (var kvp in local.ClassVar)
+        {
+            methodLocal.ClassVar[kvp.Key] = kvp.Value;
+        }
 
         // 获取返回类型
         Type returnType;
@@ -245,14 +256,8 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
             returnType = typeof(void);
         }
 
-        // 获取参数类型
+        // 获取参数类型（不包含 this，this 是隐式的）
         var parameterTypes = new List<Type>();
-
-        // 对于实例方法，第一个参数是this
-        if ((attributes & MethodAttributes.Static) == 0)
-        {
-            parameterTypes.Add(typeBuilder);
-        }
 
         // 添加方法参数
         if (funcValue.Ids != null)
@@ -284,13 +289,16 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
         var methodIl = methodBuilder.GetILGenerator();
 
         // 处理方法参数
-        int paramIndex = (attributes & MethodAttributes.Static) == 0 ? 1 : 0; // 0是this（实例方法），0是第一个参数（静态方法）
+        // 对于实例方法，参数索引从 1 开始（0 是 this）
+        // 对于静态方法，参数索引从 0 开始
+        int paramIndex = (attributes & MethodAttributes.Static) == 0 ? 1 : 0;
         if (funcValue.Ids != null)
         {
+            int paramTypeIndex = 0;
             foreach (var paramId in funcValue.Ids)
             {
                 // 声明局部变量
-                var paramType = parameterTypes[paramIndex];
+                var paramType = parameterTypes[paramTypeIndex];
                 var localVar = methodIl.DeclareLocal(paramType);
 
                 // 加载参数并存储到局部变量
@@ -301,6 +309,7 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
                 methodLocal.AddLocalVar(paramId.IdName, localVar);
 
                 paramIndex++;
+                paramTypeIndex++;
             }
         }
 

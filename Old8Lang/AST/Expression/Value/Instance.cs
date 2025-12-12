@@ -451,23 +451,31 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
             var localA = ilGenerator.DeclareLocal(classType);
             ilGenerator.Emit(OpCodes.Stloc, localA.LocalIndex);
-            ilGenerator.Emit(OpCodes.Ldloc, localA.LocalIndex);
 
             var initFunc = classType.GetMethod("init");
-            if (initFunc == null) return;
-            var a = initFunc.GetParameters();
-            for (var i = 0; i < Ids.Count; i++)
+            if (initFunc != null)
             {
-                var id = Ids[i];
-                id.LoadIlValue(ilGenerator, local);
-                var idType = id.OutputType(local);
-                if (a[i].ParameterType == typeof(object) && idType!.IsValueType)
+                // 加载 this 指针
+                ilGenerator.Emit(OpCodes.Ldloc, localA.LocalIndex);
+
+                // 加载参数
+                var a = initFunc.GetParameters();
+                for (var i = 0; i < Ids.Count; i++)
                 {
-                    ilGenerator.Emit(OpCodes.Box, idType);
+                    var id = Ids[i];
+                    id.LoadIlValue(ilGenerator, local);
+                    var idType = id.OutputType(local);
+                    if (a[i].ParameterType == typeof(object) && idType!.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Box, idType);
+                    }
                 }
+
+                // 调用 init 方法（实例方法使用 Callvirt）
+                ilGenerator.Emit(OpCodes.Callvirt, initFunc);
             }
 
-            ilGenerator.Emit(OpCodes.Call, initFunc);
+            // 加载对象实例作为返回值
             ilGenerator.Emit(OpCodes.Ldloc, localA.LocalIndex);
 
             return;
