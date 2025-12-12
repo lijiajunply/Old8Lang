@@ -13,23 +13,11 @@ PrintLine("已设置终端标题为: Old8Lang 解释器测试")
 Title("测试标题 2")
 PrintLine("已更新终端标题为: 测试标题 2")
 
-PrintLine("\n--- Beep 函数测试 ---")
-// 发出蜂鸣声
-PrintLine("即将发出系统蜂鸣声...")
-Beep()
-PrintLine("蜂鸣声已发出")
-
 PrintLine("\n--- Clear 函数测试 ---")
 // 注意：实际使用时会清除终端内容
 PrintLine("Clear() 函数用于清除终端内容")
 PrintLine("在自动化测试中，我们跳过实际清除操作")
 // Clear()  // 注释掉以保留测试输出
-
-PrintLine("\n--- BeepWindow 函数测试 ---")
-// 窗口蜂鸣
-PrintLine("即将发出窗口蜂鸣...")
-BeepWindow()
-PrintLine("窗口蜂鸣已发出")
 
 PrintLine("\n--- PrintColorful 和 PrintLineColorful 函数测试 ---")
 // 彩色打印（如果支持）

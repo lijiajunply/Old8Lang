@@ -1,0 +1,18 @@
+// 测试switch范围匹配
+PrintLine("开始测试")
+
+score <- 85
+switch score {
+    case [90~100] {
+        PrintLine("优秀")
+    }
+    case [80~89] {
+        PrintLine("良好")
+    }
+    case [70~79] {
+        PrintLine("中等")
+    }
+    default {
+        PrintLine("其他")
+    }
+}

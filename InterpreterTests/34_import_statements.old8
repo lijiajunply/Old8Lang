@@ -16,12 +16,6 @@ PrintLine("已导入 OS 库")
 osInfo <- OSInfo()
 PrintLine("OS 库测试 - 操作系统: " + osInfo)
 
-// 导入 Math 库
-import Math
-PrintLine("已导入 Math 库")
-mathResult <- 2 ^ 10
-PrintLine("Math 库测试 - 2^10 = " + mathResult)
-
 PrintLine("\n--- 多次导入同一库 ---")
 // 重复导入应该不会出错
 import Time

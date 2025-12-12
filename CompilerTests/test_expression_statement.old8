@@ -1,0 +1,12 @@
+// 测试表达式语句
+PrintLine("开始测试")
+
+// 函数调用作为表达式语句
+PrintLine("测试1")
+PrintLine("测试2")
+
+// 变量赋值
+a <- 10
+PrintLine(a)
+
+PrintLine("完成")

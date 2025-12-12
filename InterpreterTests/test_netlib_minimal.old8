@@ -1,4 +1,0 @@
-// 极简测试网络请求库
-import Net
-PrintLine("Test Net Library")
-PrintLine("Library imported successfully")

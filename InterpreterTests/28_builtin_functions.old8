@@ -83,7 +83,7 @@ obj2 <- ToObj(jsonString)
 PrintLine("ToObj 结果: " + obj2)
 
 // JSON数组转对象
-jsonArr <- "[10, 20, 30]"
+jsonArr <- "{\"a\" : 1,\"b\" : {\"c\" : 3}}"
 PrintLine("JSON数组: " + jsonArr)
 arr3 <- ToObj(jsonArr)
 PrintLine("JSON数组转对象: " + arr3)

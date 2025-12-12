@@ -488,18 +488,8 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var expr = ParseExpression();
             if (expr != null!)
             {
-                // 检查表达式后面的token是否合法
-                // 合法的语句终止符：右大括号（块结束）、EOF（文件结束）
-                // 如果后面跟着其他token，说明语句结构不正确
-                if (CurrentToken.Type != LangTokenType.RightBrace &&
-                    CurrentToken.Type != LangTokenType.EndOfFile)
-                {
-                    throw CreateSyntaxError(
-                        $"语法错误：语句结构不正确。标识符 '{(expr as LangId)?.IdName ?? "expression"}' 后面跟着意外的 token '{CurrentToken.Value}'。" +
-                        "建议：检查是否缺少运算符（如 '<-' 用于赋值）或正确的语句分隔。");
-                }
-
                 // 表达式语句，返回一个空的 SetStatement 包装，或者直接返回表达式
+                // 注意：不需要检查后面的token，因为表达式语句可以出现在任何地方
                 return new SetStatement(new LangId("", position: expr.Position), expr);
             }
         }

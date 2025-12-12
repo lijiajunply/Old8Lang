@@ -2,6 +2,7 @@ using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Expression.Intermediates;
 
 namespace Old8Lang.AST.Statement;
 
@@ -13,7 +14,7 @@ public class SwitchStatement(
     : OldStatement(position)
 {
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
-    
+
     public override void Run(VariateManager manager)
     {
         var switchValue = switchExpression.Run(manager);
@@ -65,49 +66,81 @@ public class SwitchStatement(
             var oldCase = switchCaseList[i];
             var caseLabel = caseLabels[i];
 
-            // 重新加载switch值
-            ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal.LocalIndex);
-
-            // 加载case值并比较
-            oldCase.expression.LoadIlValue(ilGenerator, local);
-
-            // 比较操作
-            if (switchValueType == typeof(int) || switchValueType == typeof(bool))
+            // 检查是否是范围匹配
+            if (oldCase.expression is RangeLangValue)
             {
-                // 整数和布尔值使用Ceq指令比较
-                ilGenerator.Emit(OpCodes.Ceq);
-            }
-            else if (switchValueType == typeof(string))
-            {
-                // 字符串比较需要调用string.Equals方法
-                var equalsMethod = typeof(string).GetMethod("Equals", [typeof(string), typeof(string)])!;
-                ilGenerator.Emit(OpCodes.Call, equalsMethod);
+                // 范围匹配：检查 switchValue 是否在范围数组中
+                // 加载case值（数组）
+                oldCase.expression.LoadIlValue(ilGenerator, local);
+
+                // 加载switch值
+                ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal.LocalIndex);
+
+                // 装箱 switch 值（因为 Array.IndexOf 需要 object 参数）
+                if (switchValueType.IsValueType)
+                {
+                    ilGenerator.Emit(OpCodes.Box, switchValueType);
+                }
+
+                // 调用 Array.IndexOf 方法
+                var indexOfMethod = typeof(Array).GetMethod("IndexOf", [typeof(Array), typeof(object)])!;
+                ilGenerator.Emit(OpCodes.Call, indexOfMethod);
+
+                // 检查返回值是否 >= 0（表示找到了）
+                // IndexOf >= 0 等价于 IndexOf > -1
+                ilGenerator.Emit(OpCodes.Ldc_I4_M1);
+                ilGenerator.Emit(OpCodes.Cgt);
+
+                // 如果找到，跳转到对应的case标签
+                ilGenerator.Emit(OpCodes.Brtrue, caseLabel);
             }
             else
             {
-                // 其他类型比较，调用Equals方法
-                // 尝试获取精确匹配的Equals方法
-                var equalsMethod = switchValueType.GetMethod("Equals", [switchValueType]);
+                // 普通匹配
+                // 重新加载switch值
+                ilGenerator.Emit(OpCodes.Ldloc, switchValueLocal.LocalIndex);
 
-                // 如果没有找到精确匹配，尝试获取接受object参数的Equals方法
-                if (equalsMethod == null)
+                // 加载case值并比较
+                oldCase.expression.LoadIlValue(ilGenerator, local);
+
+                // 比较操作
+                if (switchValueType == typeof(int) || switchValueType == typeof(bool))
                 {
-                    equalsMethod = switchValueType.GetMethod("Equals", [typeof(object)]);
+                    // 整数和布尔值使用Ceq指令比较
+                    ilGenerator.Emit(OpCodes.Ceq);
                 }
-
-                if (equalsMethod != null)
+                else if (switchValueType == typeof(string))
                 {
+                    // 字符串比较需要调用string.Equals方法
+                    var equalsMethod = typeof(string).GetMethod("Equals", [typeof(string), typeof(string)])!;
                     ilGenerator.Emit(OpCodes.Call, equalsMethod);
                 }
                 else
                 {
-                    // 如果都没有找到，使用引用比较
-                    ilGenerator.Emit(OpCodes.Ceq);
-                }
-            }
+                    // 其他类型比较，调用Equals方法
+                    // 尝试获取精确匹配的Equals方法
+                    var equalsMethod = switchValueType.GetMethod("Equals", [switchValueType]);
 
-            // 如果相等，跳转到对应的case标签
-            ilGenerator.Emit(OpCodes.Brtrue, caseLabel);
+                    // 如果没有找到精确匹配，尝试获取接受object参数的Equals方法
+                    if (equalsMethod == null)
+                    {
+                        equalsMethod = switchValueType.GetMethod("Equals", [typeof(object)]);
+                    }
+
+                    if (equalsMethod != null)
+                    {
+                        ilGenerator.Emit(OpCodes.Call, equalsMethod);
+                    }
+                    else
+                    {
+                        // 如果都没有找到，使用引用比较
+                        ilGenerator.Emit(OpCodes.Ceq);
+                    }
+                }
+
+                // 如果相等，跳转到对应的case标签
+                ilGenerator.Emit(OpCodes.Brtrue, caseLabel);
+            }
         }
 
         // 所有case都不匹配，跳转到default或结束
@@ -125,8 +158,16 @@ public class SwitchStatement(
             // 生成case块的IL代码
             oldCase.BlockStatement.GenerateIl(ilGenerator, local);
 
-            // 跳转到结束标签
-            ilGenerator.Emit(OpCodes.Br, labelEnd);
+            // 检查case块是否以return语句结尾
+            var lastStatement = oldCase.BlockStatement.Count > 0
+                ? oldCase.BlockStatement[^1]
+                : null;
+
+            // 如果不是return语句，跳转到结束标签
+            if (lastStatement is not ReturnStatement)
+            {
+                ilGenerator.Emit(OpCodes.Br, labelEnd);
+            }
         }
 
         // 生成default块
@@ -149,7 +190,7 @@ public class CaseStatement(LangExpression expression, BlockStatement blockStatem
     : OldStatement(position)
 {
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
-    
+
     public LangExpression expression { get; } = expression;
     public BlockStatement BlockStatement { get; } = blockStatement;
 
