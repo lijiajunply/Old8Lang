@@ -331,7 +331,7 @@ public class SetStatement : OldStatement
                             var indexer = leftType.GetProperty("Item")!;
                             ilGenerator.Emit(OpCodes.Callvirt, indexer.GetSetMethod()!);
                         }
-                        else if (leftType == typeof(Dictionary<object, object>))
+                        else if (leftType.IsGenericType && leftType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                         {
                             // Dictionary<TKey, TValue>索引赋值，调用索引器的setter方法
                             var indexer = leftType.GetProperty("Item")!;
@@ -342,14 +342,58 @@ public class SetStatement : OldStatement
                 else if (LeftExpression is LangListItem listItem)
                 {
                     // 处理LangListItem索引赋值: listId[key] <- value
-                    // 加载集合对象
-                    listItem.ListId.LoadIlValue(ilGenerator, local);
-                    // 加载索引或键
-                    listItem.Key.LoadIlValue(ilGenerator, local);
-                    // 加载右值
-                    Value.LoadIlValue(ilGenerator, local);
                     // 获取集合类型
                     var listType = listItem.ListId.OutputType(local);
+
+                    // 加载集合对象
+                    listItem.ListId.LoadIlValue(ilGenerator, local);
+
+                    // 对于字典，需要在加载键和值时进行类型转换
+                    if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                    {
+                        var genericArgs = listType.GetGenericArguments();
+                        var dictKeyType = genericArgs[0];
+                        var dictValueType = genericArgs[1];
+
+                        // 加载键并进行类型转换
+                        listItem.Key.LoadIlValue(ilGenerator, local);
+                        var keyType = listItem.Key.OutputType(local);
+                        if (keyType != dictKeyType)
+                        {
+                            if (dictKeyType.IsValueType && !keyType!.IsValueType)
+                            {
+                                ilGenerator.Emit(OpCodes.Unbox_Any, dictKeyType);
+                            }
+                            else if (!dictKeyType.IsValueType && keyType!.IsValueType)
+                            {
+                                ilGenerator.Emit(OpCodes.Box, keyType);
+                            }
+                        }
+
+                        // 加载值并进行类型转换
+                        Value.LoadIlValue(ilGenerator, local);
+                        var valueType = Value.OutputType(local);
+                        if (valueType != dictValueType)
+                        {
+                            if (dictValueType.IsValueType && !valueType!.IsValueType)
+                            {
+                                ilGenerator.Emit(OpCodes.Unbox_Any, dictValueType);
+                            }
+                            else if (!dictValueType.IsValueType && valueType!.IsValueType)
+                            {
+                                ilGenerator.Emit(OpCodes.Box, valueType);
+                            }
+                        }
+
+                        // 调用字典的set_Item方法
+                        var indexer = listType.GetProperty("Item")!;
+                        ilGenerator.Emit(OpCodes.Callvirt, indexer.GetSetMethod()!);
+                        return;
+                    }
+
+                    // 对于非字典类型，按原来的方式加载
+                    listItem.Key.LoadIlValue(ilGenerator, local);
+                    Value.LoadIlValue(ilGenerator, local);
                     
                     if (listType == typeof(string))
                     {
@@ -411,12 +455,6 @@ public class SetStatement : OldStatement
                             }
                             // 对于其他类型不匹配情况，IL会在运行时处理
                         }
-                        var indexer = listType.GetProperty("Item")!;
-                        ilGenerator.Emit(OpCodes.Callvirt, indexer.GetSetMethod()!);
-                    }
-                    else if (listType == typeof(Dictionary<object, object>))
-                    {
-                        // Dictionary<TKey, TValue>索引赋值
                         var indexer = listType.GetProperty("Item")!;
                         ilGenerator.Emit(OpCodes.Callvirt, indexer.GetSetMethod()!);
                     }

@@ -64,20 +64,32 @@ public class LangListItem(LangId listId, LangExpression key, SourcePosition posi
             var getStringItemMethod = typeof(string).GetMethod("get_Chars", [typeof(int)])!;
             ilGenerator.Emit(OpCodes.Callvirt, getStringItemMethod);
         }
-        else if (listType == typeof(Dictionary<object, object>))
+        else if (listType.IsGenericType && listType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
         {
-            // 处理Dictionary<object, object>类型的字典索引访问
+            // 处理Dictionary<TKey, TValue>类型的字典索引访问
             listId.LoadIlValue(ilGenerator, local); // 加载字典
             key.LoadIlValue(ilGenerator, local); // 加载键
-            // 确保键是对象类型
+
+            // 获取字典的泛型参数
+            var genericArgs = listType.GetGenericArguments();
+            var dictKeyType = genericArgs[0];
+
+            // 确保键类型匹配
             var keyType = key.OutputType(local);
-            if (keyType != typeof(object))
+            if (keyType != dictKeyType)
             {
-                ilGenerator.Emit(OpCodes.Box, keyType!);
+                if (dictKeyType.IsValueType && !keyType!.IsValueType)
+                {
+                    ilGenerator.Emit(OpCodes.Unbox_Any, dictKeyType);
+                }
+                else if (!dictKeyType.IsValueType && keyType!.IsValueType)
+                {
+                    ilGenerator.Emit(OpCodes.Box, keyType);
+                }
             }
 
             // 调用字典的索引器（get_Item方法）
-            var getDictionaryItemMethod = typeof(Dictionary<object, object>).GetMethod("get_Item", [typeof(object)])!;
+            var getDictionaryItemMethod = listType.GetMethod("get_Item", [dictKeyType])!;
             ilGenerator.Emit(OpCodes.Callvirt, getDictionaryItemMethod);
         }
         else if (listType == typeof(Dictionary<string, object>))
