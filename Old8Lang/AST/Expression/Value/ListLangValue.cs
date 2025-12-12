@@ -15,7 +15,6 @@ public class ListLangValue : LangValueType, ILangList
 
     public readonly List<LangValueType> Values = [];
 
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public ListLangValue(List<LangExpression> value, SourcePosition position = default) : base(position)
     {

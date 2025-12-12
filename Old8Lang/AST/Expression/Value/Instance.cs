@@ -18,8 +18,6 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
     public readonly List<LangExpression> Ids = ids;
     public readonly LangId Id = langId;
 
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
-
     public override LangValueType Run(LangParser.VariateManager manager)
     {
         LangValueType result;

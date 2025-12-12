@@ -13,7 +13,6 @@ public class NullLangValue(SourcePosition position = default) : LangValueType(po
 {
     public override string ToString() => "Null";
     
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     public override LangValueType Run(VariateManager manager) => this;
 
     public override bool Equal(LangValueType? otherValueType)

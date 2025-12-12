@@ -13,7 +13,6 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <param name="position"></param>
 public class RangeLangValue(LangExpression? start, LangExpression? end, SourcePosition position = default) : LangValueType(position)
 {
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
     public override LangValueType Run(LangParser.VariateManager manager)
     {

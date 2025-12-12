@@ -15,7 +15,6 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
 {
     public int Value = intValue;
 
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     public override string ToString() => Value.ToString();
 
     public override LangValueType Plus(LangValueType otherLangValueType)

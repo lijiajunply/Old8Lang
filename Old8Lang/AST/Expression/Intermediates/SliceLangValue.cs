@@ -10,7 +10,6 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <param name="end"></param>
 public class SliceLangValue(LangId id, LangExpression? start = null, LangExpression? end = null) : LangValueType
 {
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
     public override LangValueType Run(LangParser.VariateManager manager)
     {

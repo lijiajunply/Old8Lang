@@ -15,7 +15,6 @@ public class ForStatement(
     SourcePosition position = default)
     : OldStatement(position)
 {
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
     public override void Run(VariateManager manager)
     {

@@ -17,7 +17,6 @@ public class TernaryExpression(
     SourcePosition position = default)
     : LangExpression(position)
 {
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
     /// <summary>
     /// 条件表达式

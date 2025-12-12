@@ -14,8 +14,6 @@ public class AnyLangValue : LangValueType
     public readonly Dictionary<ClassMemberId, LangExpression> Variates;
     public readonly Dictionary<string, LangValueType> Result = [];
     public readonly LangId Id;
-    
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public readonly VariateManager Manager;
 

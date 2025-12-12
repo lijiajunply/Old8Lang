@@ -10,7 +10,6 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <param name="position">位置信息</param>
 public class VoidLangValue(SourcePosition position = default) : LangValueType(position)
 {
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public override object GetValue() => throw new InvalidOperationError(this, "尝试访问无效值（VoidValue）");
 

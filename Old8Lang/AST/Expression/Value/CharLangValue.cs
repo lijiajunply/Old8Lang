@@ -13,8 +13,6 @@ namespace Old8Lang.AST.Expression.Value;
 public class CharLangValue(char value, SourcePosition position = default) : LangValueType(position)
 {
     public readonly char Value = value;
-    
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public override LangValueType Plus(LangValueType otherLangValueType) =>
         new StringLangValue(Value + (string)otherLangValueType.GetValue());

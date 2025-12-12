@@ -10,8 +10,6 @@ namespace Old8Lang.AST.Statement;
 public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldStatement(position)
 {
     public readonly FuncLangValue FuncLangValue = a;
-    
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public override void Run(VariateManager manager)
     {
@@ -119,7 +117,7 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
             var item = statement[i];
 
             // 如果是SetStatement，记录局部变量的类型
-            if (item is SetStatement setStatement && setStatement.Id != null)
+            if (item is SetStatement { Id: not null } setStatement)
             {
                 var varType = setStatement.Value.OutputType(local);
                 if (varType != null)

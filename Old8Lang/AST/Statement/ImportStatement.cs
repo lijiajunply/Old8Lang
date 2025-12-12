@@ -7,7 +7,6 @@ namespace Old8Lang.AST.Statement;
 
 public class ImportStatement(string importString, SourcePosition position = default) : OldStatement(position)
 {
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
     public override void Run(VariateManager manager)
     {

@@ -12,8 +12,6 @@ public class ArrayLangValue : LangValueType, ILangList
 {
     private readonly LangValueType[] RunResult;
     private readonly List<LangExpression> Values = [];
-    
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public ArrayLangValue(IEnumerable<LangExpression> valuesList, SourcePosition position = default) : base(position)
     {

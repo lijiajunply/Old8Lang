@@ -16,7 +16,6 @@ public class ForInStatement(
     SourcePosition position = default,
     List<LangId>? additionalIds = null) : OldStatement(position)
 {
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
     // 获取所有标识符，包括主标识符和附加标识符
     private List<LangId> AllIds

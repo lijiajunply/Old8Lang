@@ -11,7 +11,6 @@ namespace Old8Lang.AST.Expression;
 public class Operation(LangExpression? left, LangTokenType opera, LangExpression? right, SourcePosition position = default)
     : LangExpression(position)
 {
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
     private string OperaToString()
     {

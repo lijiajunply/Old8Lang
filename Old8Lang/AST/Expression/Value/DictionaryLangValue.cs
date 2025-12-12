@@ -14,8 +14,6 @@ public class DictionaryLangValue : LangValueType, ILangList
 {
     private readonly List<TupleLangValue> Tuples;
     public readonly List<(LangValueType Key, LangValueType Value)> Value = [];
-    
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public DictionaryLangValue(List<TupleLangValue> tuples, SourcePosition position = default) : base(position)
     {

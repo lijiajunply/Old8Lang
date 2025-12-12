@@ -10,7 +10,6 @@ namespace Old8Lang.AST.Statement;
 
 public class NativeStatement : OldStatement
 {
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
     private readonly string DllName;
 

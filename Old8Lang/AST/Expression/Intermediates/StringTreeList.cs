@@ -11,7 +11,6 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <param name="position"></param>
 public class StringTreeList(List<LangExpression> list, SourcePosition position = default) : LangValueType(position)
 {
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public override LangValueType Run(LangParser.VariateManager manager)
     {

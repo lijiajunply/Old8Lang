@@ -7,7 +7,6 @@ namespace Old8Lang.AST.Statement;
 public class IfChild(LangExpression expression, BlockStatement blockStatement, SourcePosition position = default)
     : OldStatement(position)
 {
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
     public void Run(LangParser.VariateManager manager, ref bool r)
     {

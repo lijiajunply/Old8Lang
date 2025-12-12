@@ -9,7 +9,6 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <param name="value"></param>
 public class ErrorLangValue(Old8Exception value) : LangValueType
 {
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
     public override string ToString()
     {

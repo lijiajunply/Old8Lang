@@ -10,7 +10,6 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public class ContinueStatement(SourcePosition position = default) : OldStatement(position)
 {
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
     
     public override void Run(VariateManager manager)
     {

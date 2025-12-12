@@ -15,8 +15,6 @@ public class SetStatement : OldStatement
     public readonly LangExpression? LeftExpression;
     public readonly LangExpression Value;
 
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
-
     public SetStatement(LangId id, LangExpression value, SourcePosition position = default) : base(position)
     {
         Id = id;

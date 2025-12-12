@@ -13,7 +13,6 @@ public class SwitchStatement(
     SourcePosition position = default)
     : OldStatement(position)
 {
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public override void Run(VariateManager manager)
     {
@@ -189,7 +188,6 @@ public class SwitchStatement(
 public class CaseStatement(LangExpression expression, BlockStatement blockStatement, SourcePosition position = default)
     : OldStatement(position)
 {
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public LangExpression expression { get; } = expression;
     public BlockStatement BlockStatement { get; } = blockStatement;

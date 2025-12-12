@@ -18,8 +18,6 @@ public class TypeTemplate(
     public readonly Dictionary<ClassMemberId, LangExpression> Variates = variates;
     public readonly Dictionary<ClassMemberId, LangExpression> StaticVariates = staticVariates;
     public readonly string? ParentClassName = parentClassName;
-    
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public override string ToString() => ParentClassName == null
         ? $"TypeTemplate({ClassName})"

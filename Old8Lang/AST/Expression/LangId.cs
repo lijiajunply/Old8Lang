@@ -10,8 +10,6 @@ public class LangId(string name, string assumptionType = "", LangExpression? def
     public override string ToString() => IdName;
     public string AssumptionType { get; } = assumptionType;
     public LangExpression? DefaultValue { get; } = defaultValue;
-    
-    public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
 
     public override bool Equals(object? obj)
     {

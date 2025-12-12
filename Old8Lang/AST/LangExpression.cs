@@ -61,7 +61,4 @@ public abstract class LangExpression : IOldLangTree
     {
         throw new InvalidOperationError(this, "表达式未实现OutputType方法", "请在子类中实现OutputType方法");
     }
-    
-    /// <inheritdoc />
-    public abstract T Accept<T>(IVisitor<T> visitor);
 }
