@@ -275,14 +275,24 @@ public class PrimaryParser : ParserBase
         // 或: [expr if condition else expr for var in iterable]
         var isListComprehension = false;
 
+        // 限制扫描范围到 30 个 token（列表推导式的 for 关键字通常在前30个token内）
+        const int MaxScanDepth = 30;
+        var scanLimit = Math.Min(CurrentIndex + MaxScanDepth, Tokens.Count);
+
         // 扫描剩余的令牌，查找 for 关键字
-        for (int i = CurrentIndex; i < Tokens.Count; i++)
+        for (int i = CurrentIndex; i < scanLimit; i++)
         {
-            if (Tokens[i].Type == LangTokenType.RightBracket)
-                break; // 到达右括号，不是列表推导式
-            if (Tokens[i].Type != LangTokenType.For) continue;
-            isListComprehension = true;
-            break;
+            var tokenType = Tokens[i].Type;
+
+            // 遇到右括号，不是列表推导式
+            if (tokenType == LangTokenType.RightBracket)
+                break;
+
+            if (tokenType == LangTokenType.For)
+            {
+                isListComprehension = true;
+                break;
+            }
         }
 
         if (isListComprehension)

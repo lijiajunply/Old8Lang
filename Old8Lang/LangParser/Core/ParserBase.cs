@@ -70,13 +70,15 @@ public abstract class ParserBase
     /// <returns>错误位置附近的源代码上下文（最多3行）</returns>
     protected string[] GetSourceContext(int line)
     {
-        if (string.IsNullOrEmpty(Context.SourceCode))
+        // 使用缓存的分割结果
+        var lines = Context.SourceLines;
+
+        if (lines.Length == 0)
         {
-            return [];
+            return Array.Empty<string>();
         }
 
-        var lines = Context.SourceCode.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries);
-        var contextLines = new List<string>();
+        var contextLines = new List<string>(4); // 预分配容量
 
         // 获取错误行前后的上下文，最多显示3行上下文
         // 确保line至少为0，避免负数行号导致的问题

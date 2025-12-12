@@ -100,11 +100,15 @@ public class StatementParser : ParserBase
         {
             // 检查是否是 for-in 语句，支持 key, value in dict 格式
             // 需要查找 "in" 关键字的位置
+            // 限制前瞻深度，避免扫描过多 token（for-in 语句中 'in' 通常在前20个token内）
+            const int MaxLookahead = 20;
+
             var tempIndex = CurrentIndex + 1;
             var foundIn = false;
+            var scanLimit = Math.Min(tempIndex + MaxLookahead, Tokens.Count);
 
             // 跳过所有标识符和逗号，查找 "in" 关键字
-            while (tempIndex < Tokens.Count)
+            while (tempIndex < scanLimit)
             {
                 var token = Tokens[tempIndex];
                 if (token.Type == LangTokenType.In)
@@ -113,6 +117,7 @@ public class StatementParser : ParserBase
                     break;
                 }
 
+                // 遇到非标识符/逗号，说明不是 for-in 语句
                 if (token.Type != LangTokenType.Identifier && token.Type != LangTokenType.Comma)
                 {
                     break;

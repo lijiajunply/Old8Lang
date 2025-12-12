@@ -18,6 +18,18 @@ public readonly struct LangToken(string value, LangTokenType type, int line = 0,
 
 public static class LangTokenizer
 {
+    // 静态缓存关键字集合，避免每次 Tokenize 时重新创建
+    private static readonly FrozenSet<string> KeywordSet =
+        Enum.GetNames<KeywordType>()
+            .Select(x => x.ToLower())
+            .ToFrozenSet();
+
+    // 创建首字母索引以加速查找，按长度降序排列以优先匹配最长关键字
+    private static readonly Dictionary<char, List<string>> KeywordsByFirstChar =
+        KeywordSet
+            .GroupBy(k => k[0])
+            .ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.Length).ToList());
+
     public static List<LangToken> Tokenize(string code)
     {
         var tokens = new List<LangToken>();
@@ -425,14 +437,28 @@ public static class LangTokenizer
 
             #region 关键词
 
-            var enumList = Enum.GetNames<KeywordType>().Select(x => x.ToLower()).ToFrozenSet();
-            // 找到匹配的关键字
-            var matchedKeyword = enumList.FirstOrDefault(x => x[0] == code[i] &&
-                                                              i + x.Length <= code.Length &&
-                                                              code.Substring(i, x.Length) == x &&
-                                                              (i + x.Length == code.Length ||
-                                                               !char.IsLetterOrDigit(code[i + x.Length]) &&
-                                                               code[i + x.Length] != '_'));
+            // 使用首字母索引和 AsSpan() 优化关键字识别，避免字符串分配
+            string? matchedKeyword = null;
+
+            // 只查找以当前字符开头的关键字
+            if (KeywordsByFirstChar.TryGetValue(code[i], out var candidates))
+            {
+                var codeSpan = code.AsSpan(i);
+
+                // 按长度降序排列，优先匹配最长的关键字
+                foreach (var keyword in candidates)
+                {
+                    if (keyword.Length <= codeSpan.Length &&
+                        codeSpan.Slice(0, keyword.Length).Equals(keyword.AsSpan(), StringComparison.Ordinal) &&
+                        (i + keyword.Length == code.Length ||
+                         !char.IsLetterOrDigit(code[i + keyword.Length]) &&
+                         code[i + keyword.Length] != '_'))
+                    {
+                        matchedKeyword = keyword;
+                        break;
+                    }
+                }
+            }
 
             if (!string.IsNullOrEmpty(matchedKeyword))
             {

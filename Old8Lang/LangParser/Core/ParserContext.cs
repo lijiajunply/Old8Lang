@@ -6,6 +6,7 @@ namespace Old8Lang.LangParser.Core;
 public class ParserContext
 {
     private readonly List<LangToken> _tokens;
+    private string[]? _cachedSourceLines; // 缓存分割后的源代码行
 
     /// <summary>
     /// 源代码（用于错误上下文）
@@ -21,6 +22,22 @@ public class ParserContext
     /// 当前令牌索引
     /// </summary>
     public int CurrentIndex { get; set; }
+
+    /// <summary>
+    /// 获取缓存的源代码行（延迟初始化，避免在无错误时分割）
+    /// </summary>
+    public string[] SourceLines
+    {
+        get
+        {
+            if (_cachedSourceLines == null && !string.IsNullOrEmpty(SourceCode))
+            {
+                _cachedSourceLines = SourceCode.Split(['\n', '\r'],
+                    StringSplitOptions.RemoveEmptyEntries);
+            }
+            return _cachedSourceLines ?? Array.Empty<string>();
+        }
+    }
 
     /// <summary>
     /// 获取令牌列表
