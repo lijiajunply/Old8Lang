@@ -1,0 +1,12 @@
+// 测试有返回值的方法中的 PrintLine
+class Test {
+    func test() {
+        PrintLine("Before return")
+        return 42
+    }
+}
+
+t <- Test()
+PrintLine("Before call")
+result <- t.test()
+PrintLine("After call, result: " + result)

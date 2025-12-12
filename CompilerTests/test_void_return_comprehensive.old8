@@ -1,0 +1,26 @@
+// 全面测试 void 方法的 return 语句
+class Test {
+    func earlyReturn(x) {
+        if (x > 0) {
+            PrintLine("Positive")
+            return
+        }
+        PrintLine("Non-positive")
+    }
+
+    func noReturn() {
+        PrintLine("No return statement")
+    }
+
+    func withReturn() {
+        PrintLine("With return statement")
+        return
+    }
+}
+
+t <- Test()
+t.earlyReturn(5)
+t.earlyReturn(-3)
+t.noReturn()
+t.withReturn()
+PrintLine("All tests passed")

@@ -1,4 +1,6 @@
 using Old8Lang.Error;
+using System.Reflection.Emit;
+using Old8Lang.Compiler;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
@@ -9,12 +11,22 @@ namespace Old8Lang.AST.Expression.Intermediates;
 public class VoidLangValue(SourcePosition position = default) : LangValueType(position)
 {
     public override T Accept<T>(IVisitor<T> visitor) => visitor.Visit(this);
-    
+
     public override object GetValue() => throw new InvalidOperationError(this, "尝试访问无效值（VoidValue）");
-    
-    public override LangValueType Run(LangParser.VariateManager manager) => 
-        throw new InvalidOperationError(this, "尝试运行无效值（VoidValue）");
-    
-    public override string ToString() => 
+
+    public override LangValueType Run(LangParser.VariateManager manager) => this;
+
+    public override string ToString() =>
         throw new InvalidOperationError(this, "尝试将无效值（VoidValue）转换为字符串");
+
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
+    {
+        // void 类型不需要加载任何值到栈上
+        // 什么都不做
+    }
+
+    public override Type OutputType(LocalManager local)
+    {
+        return typeof(void);
+    }
 }

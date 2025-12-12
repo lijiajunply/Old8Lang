@@ -480,7 +480,7 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         }
 
         // 处理表达式语句：允许将函数运行表达式作为语句执行
-        // 例如：funcCall(), (lambda)(args)
+        // 例如：funcCall(), (lambda)(args), t.test()
         var i = CurrentIndex;
         try
         {
@@ -488,8 +488,17 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
             var expr = ParseExpression();
             if (expr != null!)
             {
-                // 表达式语句，返回一个空的 SetStatement 包装，或者直接返回表达式
-                // 注意：不需要检查后面的token，因为表达式语句可以出现在任何地方
+                // 如果是函数调用表达式（Instance 或 Operation），返回 FuncRunStatement
+                if (expr is Instance instance)
+                {
+                    return new FuncRunStatement(instance, expr.Position);
+                }
+                if (expr is Operation operation)
+                {
+                    return new FuncRunStatement(operation, expr.Position);
+                }
+
+                // 其他表达式，返回 SetStatement 包装
                 return new SetStatement(new LangId("", position: expr.Position), expr);
             }
         }
@@ -587,6 +596,17 @@ public class LangParser(List<LangToken> tokens, string? sourceCode = null, strin
         var returnToken = CurrentToken;
         var position = new SourcePosition(returnToken.Line, returnToken.Column, tokenValue: returnToken.Value);
         Expect(LangTokenType.Return);
+
+        // 检查是否有返回值表达式
+        // 如果下一个 token 是语句结束符（右大括号、换行符等），则没有返回值
+        if (CurrentToken.Type == LangTokenType.RightBrace ||
+            CurrentToken.Type == LangTokenType.EndOfFile ||
+            CurrentIndex >= tokens.Count)
+        {
+            // void 返回，使用 VoidLangValue
+            return new ReturnStatement(new VoidLangValue(position), position);
+        }
+
         var expression = ParseExpression();
         return new ReturnStatement(expression, position);
     }

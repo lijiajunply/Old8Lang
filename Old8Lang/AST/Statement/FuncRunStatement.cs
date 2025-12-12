@@ -32,9 +32,10 @@ public class FuncRunStatement : OldStatement
         if (Operation == null)
         {
             if (Instance == null) return;
+            var outputType = Instance.OutputType(local);
             Instance.LoadIlValue(ilGenerator, local);
             // 销毁栈上的值
-            if (Instance.OutputType(local) != typeof(void)) ilGenerator.Emit(OpCodes.Pop);
+            if (outputType != typeof(void)) ilGenerator.Emit(OpCodes.Pop);
             return;
         }
 

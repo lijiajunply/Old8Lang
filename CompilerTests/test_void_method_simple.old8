@@ -1,0 +1,10 @@
+// 最简单的 void 方法测试
+class Test {
+    func test() {
+        a <- 1
+    }
+}
+
+t <- Test()
+t.test()
+PrintLine("Done")
