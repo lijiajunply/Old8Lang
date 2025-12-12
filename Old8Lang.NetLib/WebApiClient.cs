@@ -5,28 +5,28 @@ namespace Old8Lang.NetLib;
 /// </summary>
 public class WebApiClient : IDisposable
 {
-    private HttpClient _httpClient;
-    private readonly string _baseUrl;
-    private Dictionary<string, string> _defaultHeaders;
-    private bool _disposed = false;
+    private readonly HttpClient HttpClient;
+    private readonly string BaseUrl;
+    private readonly Dictionary<string, string> DefaultHeaders;
+    private bool Disposed;
 
     /// <summary>
     /// 构造函数
     /// </summary>
     public WebApiClient(string baseUrl)
     {
-        _baseUrl = EnsureTrailingSlash(baseUrl);
-        _httpClient = new HttpClient();
-        _defaultHeaders = new Dictionary<string, string>
+        BaseUrl = EnsureTrailingSlash(baseUrl);
+        HttpClient = new HttpClient();
+        DefaultHeaders = new Dictionary<string, string>
         {
             { "Accept", "application/json" },
             { "Content-Type", "application/json" }
         };
 
         // 添加默认请求头
-        foreach (var header in _defaultHeaders)
+        foreach (var header in DefaultHeaders)
         {
-            _httpClient.AddDefaultHeader(header.Key, header.Value);
+            HttpClient.AddDefaultHeader(header.Key, header.Value);
         }
     }
 
@@ -39,6 +39,7 @@ public class WebApiClient : IDisposable
         {
             return url + "/";
         }
+
         return url;
     }
 
@@ -47,8 +48,8 @@ public class WebApiClient : IDisposable
     /// </summary>
     public void AddDefaultHeader(string name, string value)
     {
-        _defaultHeaders[name] = value;
-        _httpClient.AddDefaultHeader(name, value);
+        DefaultHeaders[name] = value;
+        HttpClient.AddDefaultHeader(name, value);
     }
 
     /// <summary>
@@ -56,8 +57,8 @@ public class WebApiClient : IDisposable
     /// </summary>
     public void RemoveDefaultHeader(string name)
     {
-        _defaultHeaders.Remove(name);
-        _httpClient.RemoveDefaultHeader(name);
+        DefaultHeaders.Remove(name);
+        HttpClient.RemoveDefaultHeader(name);
     }
 
     /// <summary>
@@ -65,29 +66,29 @@ public class WebApiClient : IDisposable
     /// </summary>
     public void SetTimeout(int milliseconds)
     {
-        _httpClient.SetTimeout(milliseconds);
+        HttpClient.SetTimeout(milliseconds);
     }
 
     /// <summary>
     /// 构建完整的URL
     /// </summary>
-    private string BuildUrl(string endpoint, Dictionary<string, object>? pathParams = null, Dictionary<string, object>? queryParams = null)
+    private string BuildUrl(string endpoint, Dictionary<string, object>? pathParams = null,
+        Dictionary<string, object>? queryParams = null)
     {
-        string url = _baseUrl + endpoint;
+        string url = BaseUrl + endpoint;
 
         // 替换路径参数
-        if (pathParams != null && pathParams.Count > 0)
+        if (pathParams is { Count: > 0 })
         {
-            foreach (var param in pathParams)
-            {
-                url = url.Replace($"{{{param.Key}}}", param.Value.ToString()!);
-            }
+            url = pathParams.Aggregate(url,
+                (current, param) => current.Replace($"{{{param.Key}}}", param.Value.ToString()!));
         }
 
         // 添加查询参数
-        if (queryParams != null && queryParams.Count > 0)
+        if (queryParams is { Count: > 0 })
         {
-            var queryString = string.Join("&", queryParams.Select(p => $"{Uri.EscapeDataString(p.Key)}={Uri.EscapeDataString(p.Value.ToString()!)}"));
+            var queryString = string.Join("&",
+                queryParams.Select(p => $"{Uri.EscapeDataString(p.Key)}={Uri.EscapeDataString(p.Value.ToString()!)}"));
             url += "?" + queryString;
         }
 
@@ -97,74 +98,77 @@ public class WebApiClient : IDisposable
     /// <summary>
     /// 发送GET请求
     /// </summary>
-    public async Task<HttpResponse> GetAsync(string endpoint, Dictionary<string, object>? pathParams = null, Dictionary<string, object>? queryParams = null)
+    public async Task<HttpResponse> GetAsync(string endpoint, Dictionary<string, object>? pathParams = null,
+        Dictionary<string, object>? queryParams = null)
     {
         string url = BuildUrl(endpoint, pathParams, queryParams);
-        return await _httpClient.GetAsync(url);
+        return await HttpClient.GetAsync(url);
     }
 
     /// <summary>
     /// 发送POST请求
     /// </summary>
-    public async Task<HttpResponse> PostAsync(string endpoint, object? requestBody = null, Dictionary<string, object>? pathParams = null, Dictionary<string, object>? queryParams = null)
+    public async Task<HttpResponse> PostAsync(string endpoint, object? requestBody = null,
+        Dictionary<string, object>? pathParams = null, Dictionary<string, object>? queryParams = null)
     {
         string url = BuildUrl(endpoint, pathParams, queryParams);
         string content = requestBody != null ? System.Text.Json.JsonSerializer.Serialize(requestBody) : string.Empty;
-        return await _httpClient.PostAsync(url, content);
+        return await HttpClient.PostAsync(url, content);
     }
 
     /// <summary>
     /// 发送PUT请求
     /// </summary>
-    public async Task<HttpResponse> PutAsync(string endpoint, object? requestBody = null, Dictionary<string, object>? pathParams = null, Dictionary<string, object>? queryParams = null)
+    public async Task<HttpResponse> PutAsync(string endpoint, object? requestBody = null,
+        Dictionary<string, object>? pathParams = null, Dictionary<string, object>? queryParams = null)
     {
         string url = BuildUrl(endpoint, pathParams, queryParams);
         string content = requestBody != null ? System.Text.Json.JsonSerializer.Serialize(requestBody) : string.Empty;
-        return await _httpClient.PutAsync(url, content);
+        return await HttpClient.PutAsync(url, content);
     }
 
     /// <summary>
     /// 发送DELETE请求
     /// </summary>
-    public async Task<HttpResponse> DeleteAsync(string endpoint, Dictionary<string, object>? pathParams = null, Dictionary<string, object>? queryParams = null)
+    public async Task<HttpResponse> DeleteAsync(string endpoint, Dictionary<string, object>? pathParams = null,
+        Dictionary<string, object>? queryParams = null)
     {
         string url = BuildUrl(endpoint, pathParams, queryParams);
-        return await _httpClient.DeleteAsync(url);
+        return await HttpClient.DeleteAsync(url);
     }
 
     /// <summary>
     /// 发送PATCH请求
     /// </summary>
-    public async Task<HttpResponse> PatchAsync(string endpoint, object? requestBody = null, Dictionary<string, object>? pathParams = null, Dictionary<string, object>? queryParams = null)
+    public async Task<HttpResponse> PatchAsync(string endpoint, object? requestBody = null,
+        Dictionary<string, object>? pathParams = null, Dictionary<string, object>? queryParams = null)
     {
         string url = BuildUrl(endpoint, pathParams, queryParams);
         string content = requestBody != null ? System.Text.Json.JsonSerializer.Serialize(requestBody) : string.Empty;
-        
+
         // 使用HttpClient的底层方法发送PATCH请求
         var httpMethod = new HttpMethod("PATCH");
-        using (var httpRequest = new HttpRequestMessage(httpMethod, url))
+        using var httpRequest = new HttpRequestMessage(httpMethod, url);
+        if (!string.IsNullOrEmpty(content))
         {
-            if (!string.IsNullOrEmpty(content))
-            {
-                httpRequest.Content = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
-            }
-            
-            // 添加默认请求头
-            foreach (var header in _defaultHeaders)
-            {
-                httpRequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
-            }
-            
-            var response = await _httpClient.GetUnderlyingClient().SendAsync(httpRequest);
-            
-            return new HttpResponse
-            {
-                StatusCode = (int)response.StatusCode,
-                Content = await response.Content.ReadAsStringAsync(),
-                Headers = response.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value)),
-                IsSuccessStatusCode = response.IsSuccessStatusCode
-            };
+            httpRequest.Content = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
         }
+
+        // 添加默认请求头
+        foreach (var header in DefaultHeaders)
+        {
+            httpRequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
+        }
+
+        var response = await HttpClient.GetUnderlyingClient().SendAsync(httpRequest);
+
+        return new HttpResponse
+        {
+            StatusCode = (int)response.StatusCode,
+            Content = await response.Content.ReadAsStringAsync(),
+            Headers = response.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value)),
+            IsSuccessStatusCode = response.IsSuccessStatusCode
+        };
     }
 
     /// <summary>
@@ -173,7 +177,7 @@ public class WebApiClient : IDisposable
     public System.Net.Http.HttpClient GetUnderlyingClient()
     {
         // 这里需要修改HttpClient类，添加一个方法来获取底层的System.Net.Http.HttpClient实例
-        return _httpClient.GetUnderlyingClient();
+        return HttpClient.GetUnderlyingClient();
     }
 
     /// <summary>
@@ -181,13 +185,14 @@ public class WebApiClient : IDisposable
     /// </summary>
     protected virtual void Dispose(bool disposing)
     {
-        if (!_disposed)
+        if (!Disposed)
         {
             if (disposing)
             {
-                _httpClient.Dispose();
+                HttpClient.Dispose();
             }
-            _disposed = true;
+
+            Disposed = true;
         }
     }
 
