@@ -1,13 +1,6 @@
 // 网络库的导入定义
 // 这个文件定义了Old8Lang如何导入C#实现的网络库
 
-// 导入NetLib类的方法
-[import "Old8Lang.NetLib" Net CreateSocketClient]
-[import "Old8Lang.NetLib" Net CreateHttpClient]
-[import "Old8Lang.NetLib" Net CreateMqttClient]
-[import "Old8Lang.NetLib" Net CreateWebSocketClient]
-[import "Old8Lang.NetLib" Net CreateWebApiClient]
-
 // 导入SocketClient类的方法
 [import "Old8Lang.NetLib" SocketClient ConnectAsync]
 [import "Old8Lang.NetLib" SocketClient SendAsync]

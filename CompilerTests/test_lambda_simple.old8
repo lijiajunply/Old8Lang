@@ -1,0 +1,4 @@
+// 最简单的 Lambda 测试
+add <- (a, b) -> a + b
+result <- add(1, 2)
+PrintLine("Result: " + result)
