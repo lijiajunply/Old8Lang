@@ -1,4 +1,0 @@
-// 测试批量导入后直接使用函数
-[import "Old8LangLib" MathLib *]
-result <- Sqrt(16)
-PrintLine("Sqrt(16) = " + result)

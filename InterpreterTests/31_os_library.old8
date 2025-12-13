@@ -6,7 +6,7 @@ PrintLine("=== OS 库函数测试 ===")
 
 PrintLine("\n--- OSInfo 函数测试 ---")
 // 获取操作系统信息
-osInfo <- OSInfo()
+osInfo <- OsInfo()
 PrintLine("操作系统信息: " + osInfo)
 
 PrintLine("\n--- OS 信息详细测试 ---")

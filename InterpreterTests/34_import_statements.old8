@@ -13,7 +13,7 @@ PrintLine("Time 库测试 - 当前时间: " + timeNow)
 // 导入 OS 库
 import OS
 PrintLine("已导入 OS 库")
-osInfo <- OSInfo()
+osInfo <- OsInfo()
 PrintLine("OS 库测试 - 操作系统: " + osInfo)
 
 PrintLine("\n--- 多次导入同一库 ---")
@@ -25,7 +25,7 @@ PrintLine("Time 库再次使用: " + timeNow2)
 
 import OS
 PrintLine("再次导入 OS 库")
-osInfo2 <- OSInfo()
+osInfo2 <- OsInfo()
 PrintLine("OS 库再次使用: " + osInfo2)
 
 PrintLine("\n--- 导入后使用库函数 ---")
@@ -58,7 +58,7 @@ stamp1 <- TimeStamp()
 PrintLine("  TimeStamp: " + stamp1)
 
 PrintLine("OS 库函数调用:")
-os1 <- OSInfo()
+os1 <- OsInfo()
 PrintLine("  OSInfo: " + os1)
 
 PrintLine("\n--- Import 语句位置测试 ---")
@@ -95,7 +95,7 @@ PrintLine("综合使用多个库:")
 PrintLine("1. Time 库: " + GetTimeNow("yyyy-MM-dd HH:mm:ss"))
 
 // OS 库
-PrintLine("2. OS 库: " + OSInfo())
+PrintLine("2. OS 库: " + OsInfo())
 
 // Math 库
 result1 <- 5 + 3 * 2

@@ -8,14 +8,14 @@ printLine("=== OS 库实际操作测试 ===")
 
 // ===== 测试 1: OSInfo 获取操作系统信息 =====
 printLine("\n--- 测试 1: OSInfo 获取操作系统信息 ---")
-osInfo <- OSInfo()
+osInfo <- OsInfo()
 printLine("操作系统信息:")
 printLine(osInfo)
-printLine("OSInfo 成功 ✓")
+printLine("OsInfo 成功 ✓")
 
 // ===== 测试 2: 多次调用 OSInfo =====
 printLine("\n--- 测试 2: 多次调用 OSInfo ---")
-osInfo2 <- OSInfo()
+osInfo2 <- OsInfo()
 printLine("第二次获取操作系统信息:")
 printLine(osInfo2)
 printLine("OSInfo 可以多次调用 ✓")

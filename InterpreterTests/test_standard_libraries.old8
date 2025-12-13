@@ -34,8 +34,8 @@ import OS
 PrintLine("\n=== 测试OS库函数 ===")
 
 // 直接调用导入的函数（注意：在OS.old8中被重命名为OSInfo）
-os_info <- OSInfo()
-PrintLine("OSInfo(): " + os_info)
+os_info <- OsInfo()
+PrintLine("OsInfo(): " + os_info)
 
 // 测试FileLib函数
 import File

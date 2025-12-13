@@ -76,7 +76,7 @@ PrintLine("\n=== 模板中的嵌套模板 ===")
 PrintLine("\n=== 模板中的条件表达式 ===")
 
 age <- 30
-description <- $"{name}是一个{age}岁的{'成年人' if age >= 18 else '未成年人'}"
+description <- $"{name}是一个{age}岁的{age >= 18 ? '已' : '未'}成年人"
 PrintLine(description)
 
 // 模板中的数组和列表

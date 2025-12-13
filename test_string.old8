@@ -1,0 +1,4 @@
+// 简单测试
+age <- 30
+description <- $"{age >= 18 ? '' : '未'}成年人"
+PrintLine(description)
