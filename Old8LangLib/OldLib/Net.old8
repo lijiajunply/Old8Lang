@@ -1,73 +1,12 @@
 // 网络库的导入定义
 // 这个文件定义了Old8Lang如何导入C#实现的网络库
-
 // 导入SocketClient类的方法
-[import "Old8Lang.NetLib" SocketClient ConnectAsync]
-[import "Old8Lang.NetLib" SocketClient SendAsync]
-[import "Old8Lang.NetLib" SocketClient ReceiveAsync]
-[import "Old8Lang.NetLib" SocketClient Disconnect]
-[import "Old8Lang.NetLib" SocketClient Dispose]
-
-// 导入SocketClient类的属性
-[import "Old8Lang.NetLib" SocketClient IsConnected]
-
+[import "Old8Lang.NetLib" SocketClient]
 // 导入HttpClient类的方法
-[import "Old8Lang.NetLib" HttpClient AddDefaultHeader]
-[import "Old8Lang.NetLib" HttpClient RemoveDefaultHeader]
-[import "Old8Lang.NetLib" HttpClient SetTimeout]
-[import "Old8Lang.NetLib" HttpClient GetAsync]
-[import "Old8Lang.NetLib" HttpClient PostAsync]
-[import "Old8Lang.NetLib" HttpClient PutAsync]
-[import "Old8Lang.NetLib" HttpClient DeleteAsync]
-[import "Old8Lang.NetLib" HttpClient GetUnderlyingClient]
-[import "Old8Lang.NetLib" HttpClient Dispose]
-
-// 导入HttpResponse类的属性
-[import "Old8Lang.NetLib" HttpResponse StatusCode]
-[import "Old8Lang.NetLib" HttpResponse Content]
-[import "Old8Lang.NetLib" HttpResponse Headers]
-[import "Old8Lang.NetLib" HttpResponse IsSuccessStatusCode]
-
-// 导入HttpResponse类的方法
-[import "Old8Lang.NetLib" HttpResponse ToString]
-
+[import "Old8Lang.NetLib" HttpClient]
 // 导入MqttClient类的方法
-[import "Old8Lang.NetLib" MqttClient SetConnectionOptions]
-[import "Old8Lang.NetLib" MqttClient ConnectAsync]
-[import "Old8Lang.NetLib" MqttClient DisconnectAsync]
-[import "Old8Lang.NetLib" MqttClient SubscribeAsync]
-[import "Old8Lang.NetLib" MqttClient UnsubscribeAsync]
-[import "Old8Lang.NetLib" MqttClient PublishAsync]
-[import "Old8Lang.NetLib" MqttClient SetMessageReceivedHandler]
-[import "Old8Lang.NetLib" MqttClient SetConnectedHandler]
-[import "Old8Lang.NetLib" MqttClient SetDisconnectedHandler]
-[import "Old8Lang.NetLib" MqttClient SetSubscriptionHandler]
-[import "Old8Lang.NetLib" MqttClient Dispose]
-
-// 导入MqttClient类的属性
-[import "Old8Lang.NetLib" MqttClient IsConnected]
-
+[import "Old8Lang.NetLib" MqttClient]
 // 导入WebSocketClient类的方法
-[import "Old8Lang.NetLib" WebSocketClient ConnectAsync]
-[import "Old8Lang.NetLib" WebSocketClient SendAsync]
-[import "Old8Lang.NetLib" WebSocketClient DisconnectAsync]
-[import "Old8Lang.NetLib" WebSocketClient SetMessageReceivedHandler]
-[import "Old8Lang.NetLib" WebSocketClient SetConnectedHandler]
-[import "Old8Lang.NetLib" WebSocketClient SetDisconnectedHandler]
-[import "Old8Lang.NetLib" WebSocketClient SetErrorHandler]
-[import "Old8Lang.NetLib" WebSocketClient Dispose]
-
-// 导入WebSocketClient类的属性
-[import "Old8Lang.NetLib" WebSocketClient IsConnected]
-
+[import "Old8Lang.NetLib" WebSocketClient]
 // 导入WebApiClient类的方法
-[import "Old8Lang.NetLib" WebApiClient AddDefaultHeader]
-[import "Old8Lang.NetLib" WebApiClient RemoveDefaultHeader]
-[import "Old8Lang.NetLib" WebApiClient SetTimeout]
-[import "Old8Lang.NetLib" WebApiClient GetAsync]
-[import "Old8Lang.NetLib" WebApiClient PostAsync]
-[import "Old8Lang.NetLib" WebApiClient PutAsync]
-[import "Old8Lang.NetLib" WebApiClient DeleteAsync]
-[import "Old8Lang.NetLib" WebApiClient PatchAsync]
-[import "Old8Lang.NetLib" WebApiClient GetUnderlyingClient]
-[import "Old8Lang.NetLib" WebApiClient Dispose]
+[import "Old8Lang.NetLib" WebApiClient]

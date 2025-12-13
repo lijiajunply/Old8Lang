@@ -17,23 +17,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/37_batch_import.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/37_batch_import_simple.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/37_batch_import_test2.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/37_batch_import_test3.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/37_batch_import_test4.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_dll_not_found.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/DllPathResolver.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/File.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/File.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/MathLib.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/MathLib.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/OS.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/OS.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Terminal.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Terminal.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Time.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Time.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang_Grammar.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeStaticAny.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeStaticAny.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Net.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Net.old8" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,7 +60,10 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/InterpreterTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/NativeStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/NativeStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Apis.cs" root0="SKIP_HIGHLIGHTING" />
@@ -728,7 +717,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="151" />
+    <option name="localTasksCounter" value="152" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -755,7 +744,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(netlib): 重构SocketClient和WebApiClient字段命名及访问逻辑&#10;&#10;- 将私有字段重命名为PascalCase格式以符合C#命名约定&#10;- 使用可空引用类型优化NetworkStream声明&#10;- 将_isConnected标志替换为公共属性IsConnected并添加setter&#10;- 更新所有方法中的字段引用以匹配新命名&#10;- 简化HttpClient和TcpClient的初始化及资源释放逻辑&#10;- 优化BuildUrl方法中字典判断条件表达式&#10;- 改进PATCH请求发送方式，移除不必要的using块嵌套&#10;-" />
     <MESSAGE value="feat(compiler): 实现 for-in 循环对字典键值对的支持&#10;&#10;- 修复了字典键值对遍历时的 InvalidProgramException 错误&#10;- 更新 GenerateDictionaryIl 方法以支持多个标识符&#10;- 添加了对字典索引器的调用逻辑&#10;- 增加了值变量的局部存储和管理&#10;- 完成了对键值对遍历的完整 IL 代码生成&#10;- 通过单元测试验证了数组、字符串、字典的遍历功能&#10;- 确认了 for-in 语法在编译模式下的完全支持" />
     <MESSAGE value="feat(compiler): 支持 switch 语句范围匹配和函数内使用&#10;&#10;- 实现 switch 语句对范围数组的匹配支持&#10;- 允许 switch 语句在函数体内正常使用&#10;- 优化 switch 语句 IL 生成逻辑，支持 break 和 return 混合场景&#10;- 更新解析器逻辑，不再强制检查表达式后的特定终止符&#10;- 添加相关测试用例：test_switch_range.old8 和 test_switch_in_function.old8&#10;- 引入 Colorful.Console 包以增强终端输出能力&#10;- 移除部分冗余的终端库和 OS 库测试代码&#10;- 新增失败测试分析脚本 analyze_failures.sh 及报告文件" />
     <MESSAGE value="fix(parser): 修复科学计数法数字字面量解析问题&#10;&#10;- 更新数字字面量解析逻辑，支持科学计数法(e/E)格式&#10;- 修复包含科学计数法的数字被错误解析为整数的问题&#10;- 确保带小数点或科学计数法的数字正确解析为双精度浮点数&#10;&#10;refactor(class): 优化类初始化方法的IL生成&#10;&#10;- 改进返回语句处理逻辑，避免重复添加Ret指令&#10;- 检查方法体最后语句是否为ReturnStatement，避免不必要的return&#10;- 修复void方法可能重复添加return指令的问题&#10;&#10;fix(runtime): 修复实例方法调用的IL指令生成&#10;&#10;- 区分实例方法和静态方法的调用指令&#10;- 实例方法使用Callvirt指令确保虚方法正确调用&#10;- 静态方法继续使用Call指令保持原有行为&#10;&#10;test(string): 更新多行字符串模板测试用例&#10;&#10;- 移除多行字符串模板的三引号语法&#10;- 适配Old8Lang新语法规范，使用单引号定义多行模板&#10;- 确保模板内插值和表达式计算功能正常&#10;&#10;chore(tests): 添加新的类和方法调用测试用例&#10;&#10;- 新增类构造函数初始化测试&#10;- 添加类方法调用相关测试文件&#10;- 完善类字段访问和方法执行测试场景&#10;&#10;docs(report): 生成编译器测试报告&#10;&#10;- 添加完整编译器测试执行结果报告&#10;- 记录各测试用例执行状态和性能数据&#10;- 便于跟踪测试覆盖率和失败情况分析" />
@@ -780,7 +768,8 @@
     <MESSAGE value="test(parser): 添加表达式和主解析器的单元测试&#10;&#10;- 实现运算符优先级和结合性的测试用例&#10;- 添加三元表达式和布尔运算的测试覆盖&#10;- 完成比较运算符和一元运算符的测试验证&#10;- 增加复杂数字字面量和字符串解析测试&#10;- 补充集合字面量及实例化解析测试&#10;- 完善标识符和元组解析的测试场景" />
     <MESSAGE value="feat(lib): 添加集合和CSV处理库及文件下载功能&#10;&#10;- 新增 CollectionLib 类，提供列表、字典、集合等常用操作方法&#10;- 新增 CsvLib 类，支持 CSV 文件的读取、写入和解析功能&#10;- 在 HttpClient 中新增 DownloadFileAsync 方法，支持文件下载&#10;- 为集合处理库添加完整的单元测试覆盖&#10;- 为 CSV 处理库添加基础解析和格式化测试&#10;- 修复 UnpackZip 方法中的路径参数使用错误问题&#10;- 扩展 HTTP 客户端功能以支持文件上传操作" />
     <MESSAGE value="refactor(CollectionLib): 优化集合操作方法并增强类型安全&#10;&#10;- 移除不必要的空行以提升代码整洁度&#10;- 为DictMerge、DictFilter等字典操作方法添加notnull约束&#10;- 使用集合表达式语法初始化HashSet提升可读性&#10;- 统一代码风格，增强参数验证逻辑一致性" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(CollectionLib): 优化集合操作方法并增强类型安全&#10;&#10;- 移除不必要的空行以提升代码整洁度&#10;- 为DictMerge、DictFilter等字典操作方法添加notnull约束&#10;- 使用集合表达式语法初始化HashSet提升可读性&#10;- 统一代码风格，增强参数验证逻辑一致性" />
+    <MESSAGE value="feat(lang): 实现原生库批量导入功能&#10;&#10;- 新增 DLL 路径解析器 DllPathResolver，支持多策略查找原生库&#10;- 支持批量导入语法：[import &quot;DllName&quot; ClassName *]&#10;- 支持选择性导入语法：[import &quot;DllName&quot; ClassName { Method1, Method2 }]&#10;- 更新语法解析器以识别新的导入语句格式&#10;- 优化 NativeStatement 类以处理多种导入方式&#10;- 完善错误提示，提供详细的 DLL 查找失败信息&#10;- 更新标准库文件使用新的批量导入语法&#10;- 扩展语法文档，增加批量导入和选择性导入说明&#10;- 添加相关测试用例验证新功能正确性" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 实现原生库批量导入功能&#10;&#10;- 新增 DLL 路径解析器 DllPathResolver，支持多策略查找原生库&#10;- 支持批量导入语法：[import &quot;DllName&quot; ClassName *]&#10;- 支持选择性导入语法：[import &quot;DllName&quot; ClassName { Method1, Method2 }]&#10;- 更新语法解析器以识别新的导入语句格式&#10;- 优化 NativeStatement 类以处理多种导入方式&#10;- 完善错误提示，提供详细的 DLL 查找失败信息&#10;- 更新标准库文件使用新的批量导入语法&#10;- 扩展语法文档，增加批量导入和选择性导入说明&#10;- 添加相关测试用例验证新功能正确性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

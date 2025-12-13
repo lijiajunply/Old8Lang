@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 public class NativeStaticAny(string className, Type classType) : ImportInfo
 {
     public readonly string ClassName = className;
-    
+
     public override LangValueType Dot(LangExpression dotExpression)
     {
         if (dotExpression is LangId id)
@@ -20,9 +20,9 @@ public class NativeStaticAny(string className, Type classType) : ImportInfo
             if (prop is null)
             {
                 var field = classType.GetField(id.IdName);
-                if (field is null)
-                    throw new AttributeError(this, id.IdName, ClassName);
-                return ObjToValue(field.GetValue(null)!);
+                return field is null
+                    ? throw new AttributeError(this, id.IdName, ClassName)
+                    : ObjToValue(field.GetValue(null)!);
             }
 
             return ObjToValue(prop.GetValue(null)!);
