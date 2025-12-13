@@ -1,6 +1,4 @@
 using System.Reflection.Emit;
-using dnlib.DotNet;
-using dnlib.DotNet.Emit;
 
 namespace Old8Lang.Compiler;
 

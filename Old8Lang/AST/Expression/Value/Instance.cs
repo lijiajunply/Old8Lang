@@ -1,10 +1,9 @@
-using Old8Lang.LangParser;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
+
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
@@ -40,7 +39,6 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             {
 #if DEBUG
                 manager.Interpreter.OutputProvider.WriteLine(manager.ToString());
-                return new VoidLangValue();
 #endif
                 return new VoidLangValue();
             }
@@ -391,7 +389,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 var lenId = Ids[0];
                 lenId.LoadIlValue(ilGenerator, local);
                 var lenType = lenId.OutputType(local)!;
-                
+
                 // 尝试获取Length属性，适用于数组、字符串等
                 var lengthProp = lenType.GetProperty("Length");
                 if (lengthProp != null)
@@ -399,7 +397,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                     ilGenerator.Emit(OpCodes.Call, lengthProp.GetGetMethod()!);
                     return;
                 }
-                
+
                 // 尝试获取Count属性，适用于集合类
                 var countProp = lenType.GetProperty("Count");
                 if (countProp != null)
@@ -407,7 +405,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                     ilGenerator.Emit(OpCodes.Call, countProp.GetGetMethod()!);
                     return;
                 }
-                
+
                 // 尝试获取Length字段，适用于某些自定义类型
                 var lengthField = lenType.GetField("Length");
                 if (lengthField != null)
@@ -415,7 +413,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                     ilGenerator.Emit(OpCodes.Ldfld, lengthField);
                     return;
                 }
-                
+
                 // 尝试获取Count字段，适用于某些自定义类型
                 var countField = lenType.GetField("Count");
                 if (countField != null)
@@ -423,30 +421,22 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                     ilGenerator.Emit(OpCodes.Ldfld, countField);
                     return;
                 }
-                
+
                 // 如果是object类型，说明类型推断失败，使用默认值0
                 if (lenType == typeof(object))
                 {
                     ilGenerator.Emit(OpCodes.Ldc_I4_0);
                     return;
                 }
-                
+
                 // 所有尝试都失败，抛出错误
                 throw new InvalidOperationError(this, $"类型 {lenType.Name} 没有 Length 或 Count 属性");
-                return;
             case "Type" or "type":
                 // 编译模式下type()函数返回类型名称字符串
                 var typeId = Ids[0];
                 var typeIdType = typeId.OutputType(local);
-                if (typeIdType != null)
-                {
-                    // 直接返回类型名称字符串，不调用GetType()
-                    ilGenerator.Emit(OpCodes.Ldstr, typeIdType.Name);
-                }
-                else
-                {
-                    ilGenerator.Emit(OpCodes.Ldstr, "object");
-                }
+                // 直接返回类型名称字符串，不调用GetType()
+                ilGenerator.Emit(OpCodes.Ldstr, typeIdType != null ? typeIdType.Name : "object");
 
                 return;
             case "Compiler" or "compiler":
@@ -461,12 +451,12 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
         // 查找匹配的方法
         MethodInfo? matchingMethod = null;
         List<LangId>? funcParams = null;
-        
+
         // 首先，尝试通过实际参数类型构建键进行精确匹配
         var actualParamTypes = Ids.Select(id => id.OutputType(local)).ToArray();
         var actualParamTypeNames = string.Join("_", actualParamTypes.Select(t => t?.Name ?? "object"));
         var exactDelegateKey = $"{Id.IdName}${actualParamTypeNames}";
-        
+
         if (local.DelegateVar.TryGetValue(exactDelegateKey, out var exactResult))
         {
             matchingMethod = exactResult;
@@ -483,29 +473,22 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 {
                     if (!key.StartsWith($"{Id.IdName}$"))
                         continue;
-                    
+
                     // 获取方法参数信息
                     var methodParams = result.GetParameters();
-                    
+
                     // 检查参数数量是否匹配
                     if (methodParams.Length == paramCount)
                     {
                         // 获取函数的参数列表信息
                         local.FuncParameters.TryGetValue(key, out funcParams);
-                        
+
                         // 检查是否有默认参数可以补充
                         if (funcParams != null && Ids.Count <= methodParams.Length)
                         {
                             // 计算必需参数的数量（没有默认值的参数）
-                            int requiredParamsCount = 0;
-                            for (int i = 0; i < funcParams.Count; i++)
-                            {
-                                if (funcParams[i].DefaultValue == null)
-                                {
-                                    requiredParamsCount++;
-                                }
-                            }
-                            
+                            int requiredParamsCount = funcParams.Count(t => t.DefaultValue == null);
+
                             // 如果实际参数数量大于等于必需参数数量，则可以匹配
                             if (Ids.Count >= requiredParamsCount)
                             {
@@ -666,32 +649,32 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             // 1. 为DynamicMethod创建委托类型
             // 2. 创建委托实例
             // 3. 调用委托的Invoke方法
-            
+
             try
             {
                 // 获取委托类型
                 var delegateType = CreateDelegateType(matchingMethod);
-                
+
                 // 创建委托实例
-                var delegateObj = dynamicMethod.CreateDelegate(delegateType);
-                
+                dynamicMethod.CreateDelegate(delegateType);
+
                 // 注意：在IL生成阶段，我们无法直接创建委托实例
                 // 这里我们需要生成IL代码来创建委托实例并调用它
-                
+
                 // 步骤1：将DynamicMethod引用加载到栈上
                 // 注意：这在IL生成阶段是不可能的，因为DynamicMethod是运行时对象
                 // 因此，我们需要采用另一种方式：将DynamicMethod存储在LocalManager中，
                 // 然后在运行时通过反射调用
-                
+
                 // 步骤2：加载参数到栈上
                 for (var i = 0; i < Ids.Count; i++)
                 {
                     Ids[i].LoadIlValue(ilGenerator, local);
                 }
-                
+
                 // 步骤3：调用委托的Invoke方法
                 // 注意：这也无法直接在IL生成阶段完成
-                
+
                 // 因此，我们暂时采用一种简化的方式：
                 // 对于返回值类型，确保栈上有返回值，避免栈不平衡
                 if (matchingMethod.ReturnType != typeof(void))
@@ -731,14 +714,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 // 如果创建委托类型失败，确保栈平衡
                 if (matchingMethod.ReturnType != typeof(void))
                 {
-                    if (matchingMethod.ReturnType.IsValueType)
-                    {
-                        ilGenerator.Emit(OpCodes.Ldc_I4_0);
-                    }
-                    else
-                    {
-                        ilGenerator.Emit(OpCodes.Ldnull);
-                    }
+                    ilGenerator.Emit(matchingMethod.ReturnType.IsValueType ? OpCodes.Ldc_I4_0 : OpCodes.Ldnull);
                 }
             }
         }
@@ -758,7 +734,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
     {
         var parameters = method.GetParameters();
         var paramTypes = parameters.Select(p => p.ParameterType).ToArray();
-        
+
         // 使用Expression.GetDelegateType创建委托类型
         // 这个方法会根据参数类型和返回类型创建合适的委托类型
         return System.Linq.Expressions.Expression.GetDelegateType(
@@ -797,10 +773,10 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             {
                 if (!key.StartsWith($"{Id.IdName}$"))
                     continue;
-                
+
                 // 获取方法参数信息
                 var methodParams = method.GetParameters();
-                
+
                 // 检查参数数量是否匹配
                 if (methodParams.Length >= Ids.Count)
                 {
@@ -808,15 +784,8 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                     if (local.FuncParameters.TryGetValue(key, out var funcParams))
                     {
                         // 计算必需参数的数量（没有默认值的参数）
-                        int requiredParamsCount = 0;
-                        for (int i = 0; i < funcParams.Count; i++)
-                        {
-                            if (funcParams[i].DefaultValue == null)
-                            {
-                                requiredParamsCount++;
-                            }
-                        }
-                        
+                        int requiredParamsCount = funcParams.Count(t => t.DefaultValue == null);
+
                         // 如果实际参数数量大于等于必需参数数量，则可以匹配
                         if (Ids.Count >= requiredParamsCount)
                         {
