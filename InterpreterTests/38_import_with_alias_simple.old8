@@ -1,6 +1,0 @@
-// 简单的别名导入测试
-[import "Old8LangLib" Csv as CsvUtil]
-
-PrintLine("测试别名导入")
-test <- CsvUtil
-PrintLine("✅ 成功使用别名 CsvUtil")

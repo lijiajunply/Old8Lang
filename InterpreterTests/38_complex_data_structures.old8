@@ -104,7 +104,7 @@ PrintLine("添加元素后: " + dynamicArr)
 dynamicArr <- [1, 2]
 PrintLine("再次添加: " + dynamicArr)
 
-dynamicDict <- {}
+dynamicDict <- {"key": "name"}
 PrintLine("空字典: " + dynamicDict)
 dynamicDict["key1"] <- "value1"
 PrintLine("添加键值对后: " + dynamicDict)
