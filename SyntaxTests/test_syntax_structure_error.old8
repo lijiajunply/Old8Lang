@@ -73,13 +73,13 @@ class TestClass
 
 // 方括号不匹配 - 缺少右方括号
 array[0 <- 10
-list[1 <- 20
+{1 <- 20
 dict["key" <- "value"
 range[1~10 <- 1
 
 // 方括号不匹配 - 缺少左方括号
 array]0] <- 10
-list]1] <- 20
+list}1] <- 20
 dict]"key"] <- "value"
 range]1~10] <- 1
 

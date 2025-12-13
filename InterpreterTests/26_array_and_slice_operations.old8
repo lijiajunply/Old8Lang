@@ -62,14 +62,14 @@ PrintLine("范围 [10~20]: " + range3)
 
 PrintLine("\n=== 列表操作测试 ===")
 // 创建列表
-lst1 <- list[1, 2, 3]
+lst1 <- {1, 2, 3}
 PrintLine("列表 lst1: " + lst1)
 
-lst2 <- list["x", "y", "z"]
+lst2 <- {"x", "y", "z"}
 PrintLine("列表 lst2: " + lst2)
 
 // 空列表
-emptyList <- list[]
+emptyList <- {}
 PrintLine("空列表: " + emptyList)
 
 PrintLine("\n=== 列表索引访问测试 ===")

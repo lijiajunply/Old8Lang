@@ -17,13 +17,34 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/update_list_syntax.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.ebnf" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.ebnf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang_Grammar.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/02_data_types.old8" beforeDir="false" afterPath="$PROJECT_DIR$/CompilerTests/02_data_types.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/07_member_access.old8" beforeDir="false" afterPath="$PROJECT_DIR$/CompilerTests/07_member_access.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/08_if_elif_else.old8" beforeDir="false" afterPath="$PROJECT_DIR$/CompilerTests/08_if_elif_else.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/11_for_in_statement.old8" beforeDir="false" afterPath="$PROJECT_DIR$/CompilerTests/11_for_in_statement.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/12_in_expression.old8" beforeDir="false" afterPath="$PROJECT_DIR$/CompilerTests/12_in_expression.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/20_type_annotations.old8" beforeDir="false" afterPath="$PROJECT_DIR$/CompilerTests/20_type_annotations.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/29_large_data_structures.old8" beforeDir="false" afterPath="$PROJECT_DIR$/CompilerTests/29_large_data_structures.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/32_boundary_conditions.old8" beforeDir="false" afterPath="$PROJECT_DIR$/CompilerTests/32_boundary_conditions.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/34_complex_data_structures.old8" beforeDir="false" afterPath="$PROJECT_DIR$/CompilerTests/34_complex_data_structures.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/type_conversion_enhanced.old8" beforeDir="false" afterPath="$PROJECT_DIR$/CompilerTests/type_conversion_enhanced.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/02_data_types.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/02_data_types.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/07_member_access.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/07_member_access.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/08_if_elif_else.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/08_if_elif_else.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/11_for_in_statement.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/11_for_in_statement.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/12_in_expression.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/12_in_expression.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/20_type_annotations.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/20_type_annotations.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/26_array_and_slice_operations.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/26_array_and_slice_operations.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/28_builtin_functions.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/28_builtin_functions.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/type_conversion_enhanced.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/type_conversion_enhanced.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SyntaxTests/12_in_expression.old8" beforeDir="false" afterPath="$PROJECT_DIR$/SyntaxTests/12_in_expression.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SyntaxTests/test_all_ebnf_rules.old8" beforeDir="false" afterPath="$PROJECT_DIR$/SyntaxTests/test_all_ebnf_rules.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SyntaxTests/test_complex_expressions.old8" beforeDir="false" afterPath="$PROJECT_DIR$/SyntaxTests/test_complex_expressions.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SyntaxTests/test_empty_structures.old8" beforeDir="false" afterPath="$PROJECT_DIR$/SyntaxTests/test_empty_structures.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SyntaxTests/test_extreme_values.old8" beforeDir="false" afterPath="$PROJECT_DIR$/SyntaxTests/test_extreme_values.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SyntaxTests/test_special_syntax.old8" beforeDir="false" afterPath="$PROJECT_DIR$/SyntaxTests/test_special_syntax.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SyntaxTests/test_syntax_structure_error.old8" beforeDir="false" afterPath="$PROJECT_DIR$/SyntaxTests/test_syntax_structure_error.old8" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,6 +93,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/InterpreterTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Language/ExpressionStatementTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Language/ExpressionStatementTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Parser/Statement/DeclarationStatementTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
@@ -762,7 +784,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="169" />
+    <option name="localTasksCounter" value="170" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -789,7 +811,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(parser): 支持分号作为语句分隔符并优化解析逻辑&#10;&#10;- 重命名 AbsUseClass 为 AbsOutputProvider，ConsoleUse 为 ConsoleOutputProvider&#10;- 在词法分析器中添加对分号 (;) 的识别和支持&#10;- 修改语法解析器以跳过可选的分号分隔符，允许同一行内使用多个语句&#10;- 更新 ExpectHelper 中的错误处理逻辑，简化条件表达式&#10;- 优化 AST 节点中的类型检查和 IL 生成相关代码&#10;- 添加多个测试用例验证分号在不同场景下的行为&#10;- 调整 ParserBase 类中的方法可见性和辅助函数实现&#10;- 更新变量管理器中的作用域深拷贝逻辑&#10;- 更新相关单元测试以匹配新的类名和行为变化" />
     <MESSAGE value="feat(parser): 增强 Lambda 表达式解析和语句验证&#10;&#10;- 添加 Lambda 表达式缺少箭头符号的严格语法检查&#10;- 改进表达式作为独立语句时的错误提示和处理逻辑&#10;- 更新 SetStatement 的 ToString 方法以支持空标识符情况&#10;- 优化 SwitchStatement 和 WhileStatement 的 IL 生成逻辑&#10;- 添加多个语法测试用例覆盖 Lambda 和语句解析场景&#10;- 调整 PrimaryParser 和 StatementParser 的错误处理机制&#10;- 完善工作区文件变更记录和测试文件路径映射" />
     <MESSAGE value="test(parser): 添加语法错误测试用例&#10;&#10;- 新增算术表达式和括号错误测试&#10;- 新增赋值语句语法错误测试&#10;- 新增括号匹配错误测试&#10;- 新增集合、索引和成员访问表达式错误测试&#10;- 新增比较、逻辑和三元表达式错误测试&#10;- 新增编译器集成测试验证IL生成&#10;- 新增控制流语句语法错误测试&#10;- 重命名并重构声明语句测试类" />
     <MESSAGE value="test(parser): 添加高级运算符和列表推导式解析测试&#10;&#10;- 新增幂运算符(^)的解析测试，包括简单幂运算、链式幂运算、与括号结合、与其他运算符优先级等场景&#10;- 新增点运算符(.)的解析测试，涵盖成员访问、链式访问、方法调用、数组索引、字典键访问等用法&#10;- 新增列表推导式的完整测试套件，包括基本语法、条件过滤、嵌套循环、复杂表达式等场景&#10;- 添加点运算符和列表推导式的错误处理测试，验证语法错误能被正确捕获&#10;- 实现运算符优先级测试，确保点运算符与幂运算符、算术运算符的优先级关系正确&#10;- 补充特殊用法测试，如函数调用结果的成员访问和链式方法调用等边界情况" />
@@ -814,7 +835,8 @@
     <MESSAGE value="chore(tests): 清理和整理CompilerTests目录&#10;&#10;- 删除74+个冗余测试文件，减少58%文件数量&#10;- 移除重复的简单测试、调试文件和临时测试&#10;- 保留56个核心测试文件，确保功能覆盖完整&#10;- 规范测试文件命名：编号测试 + 专项测试&#10;- 更新类型注解测试集，保留6个关键测试文件&#10;- 删除无法在编译模式下运行的类型注解测试&#10;- 清理重复的类、函数、控制流测试文件&#10;- 建立未来测试文件命名和维护规范&#10;- 更新IDEA workspace.xml中的文件变更记录&#10;- 保持与现有功能的完整测试覆盖" />
     <MESSAGE value="fix(compiler): 修复IL验证开关命名一致性问题&#10;&#10;- 将 ILVerificationEnabled 属性重命名为 ilVerificationEnabled&#10;- 更新所有引用该属性的测试用例&#10;- 统一属性命名风格，保持代码一致性&#10;- 修复IL验证逻辑中的空值检查问题&#10;- 优化错误日志输出格式，提高可读性&#10;- 调整CompilerBenchmarkTests中的配置访问方式&#10;- 完善IL验证失败时的错误处理流程" />
     <MESSAGE value="fix(compiler): 修复 in 操作符类型检查与 IL 生成问题&#10;&#10;- 修复 in 操作符右侧非集合类型时的类型检查逻辑&#10;- 优化 IL 生成中装箱值类型的处理方式&#10;- 统一局部变量存储与加载顺序，确保栈平衡&#10;- 添加缺失的静态方法调用指令&#10;- 清理冗余代码并增强类型安全检查&#10;- 更新相关集成测试用例以覆盖边界情况" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(compiler): 修复 in 操作符类型检查与 IL 生成问题&#10;&#10;- 修复 in 操作符右侧非集合类型时的类型检查逻辑&#10;- 优化 IL 生成中装箱值类型的处理方式&#10;- 统一局部变量存储与加载顺序，确保栈平衡&#10;- 添加缺失的静态方法调用指令&#10;- 清理冗余代码并增强类型安全检查&#10;- 更新相关集成测试用例以覆盖边界情况" />
+    <MESSAGE value="feat(parser): 重构列表和字典语法解析逻辑&#10;&#10;- 移除 list 关键字，统一使用花括号 {} 表示列表和字典&#10;- 实现通过首个元素是否包含冒号来区分列表和字典&#10;- 支持列表和字典的尾随逗号语法&#10;- 更新语法文档和EBNF定义以反映新的语法规范&#10;- 修改测试用例以适配新的列表和字典解析逻辑&#10;- 废弃旧的 ParseList 和 ParseDictionary 方法&#10;- 优化函数参数解析逻辑，移除对 List 类型的特殊处理" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 重构列表和字典语法解析逻辑&#10;&#10;- 移除 list 关键字，统一使用花括号 {} 表示列表和字典&#10;- 实现通过首个元素是否包含冒号来区分列表和字典&#10;- 支持列表和字典的尾随逗号语法&#10;- 更新语法文档和EBNF定义以反映新的语法规范&#10;- 修改测试用例以适配新的列表和字典解析逻辑&#10;- 废弃旧的 ParseList 和 ParseDictionary 方法&#10;- 优化函数参数解析逻辑，移除对 List 类型的特殊处理" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

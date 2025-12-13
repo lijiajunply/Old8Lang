@@ -3,7 +3,7 @@
 // 这是in表达式
 result1 <- 1 in [1, 2, 3]
 result2 <- "test" in {"test": 123}
-result3 <- 5 in list[4, 5, 6]
+result3 <- 5 in {4, 5, 6}
 
 // 这是for-in循环
 for item in [1, 2, 3] {

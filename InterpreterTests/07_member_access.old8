@@ -27,7 +27,7 @@ PrintLine("修改后数组: " + array)
 // 列表索引访问
 PrintLine("\n=== 列表索引访问 ===")
 
-arg_list <- list[1, 2, 3, 4, 5]
+arg_list <- {1, 2, 3, 4, 5}
 PrintLine("列表: " + arg_list)
 
 // 访问单个元素

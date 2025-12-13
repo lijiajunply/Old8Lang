@@ -69,7 +69,7 @@ try {
 }
 
 // 数据结构测试
-list_test <- list[1, 2, 3]
+list_test <- {1, 2, 3}
 array_test <- [1, 2, 3]
 tuple_test <- (1, "a")
 dict_test <- {"key": "value"}

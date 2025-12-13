@@ -22,7 +22,7 @@ PrintLine("listFromArray: " + listFromArray + ", 类型: " + type(listFromArray)
 
 // 测试列表到数组的转换
 PrintLine("\n=== 列表到数组的转换 ===")
-list1 <- list[4, 5, 6]
+list1 <- {4, 5, 6}
 arrayFromList <- list1 as array
 PrintLine("list1: " + list1 + ", 类型: " + type(list1))
 PrintLine("arrayFromList: " + arrayFromList + ", 类型: " + type(arrayFromList))
@@ -36,7 +36,7 @@ PrintLine("stringFromArray: '" + stringFromArray + "', 类型: " + type(stringFr
 
 // 测试列表到字符串的转换
 PrintLine("\n=== 列表到字符串的转换 ===")
-list2 <- list["a", "b", "c"]
+list2 <- {"a", "b", "c"}
 stringFromList <- list2 as string
 PrintLine("list2: " + list2 + ", 类型: " + type(list2))
 PrintLine("stringFromList: '" + stringFromList + "', 类型: " + type(stringFromList))
@@ -45,7 +45,7 @@ PrintLine("stringFromList: '" + stringFromList + "', 类型: " + type(stringFrom
 // PrintLine("\n=== 测试泛型类型注解 ===")
 
 // 测试列表泛型类型注解（注释掉）
-// listGeneric:list<int> <- list[1, 2, 3]
+// listGeneric:list<int> <- {1, 2, 3}
 // PrintLine("listGeneric: " + listGeneric + ", 类型: " + type(listGeneric))
 
 // 测试数组泛型类型注解（注释掉）
@@ -55,7 +55,7 @@ PrintLine("stringFromList: '" + stringFromList + "', 类型: " + type(stringFrom
 // 测试类型安全：尝试向列表添加不同类型的元素
 PrintLine("\n=== 测试类型安全 ===")
 try {
-    list3 <- list[1, 2, 3]
+    list3 <- {1, 2, 3}
     list3[0] <- "string" // 应该报错，类型不匹配
     PrintLine("这行不应该被执行")
 } catch (e) {

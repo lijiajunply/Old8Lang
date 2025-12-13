@@ -68,7 +68,7 @@ for i <- 0, i < 100, i++ {
 PrintLine(len(large_dict)) // 预期输出: 100
 
 // 大量元素的列表
-large_list <- list[]
+large_list <- {}
 for i <- 0, i < 1000, i++ {
     large_list.append(i)
 }

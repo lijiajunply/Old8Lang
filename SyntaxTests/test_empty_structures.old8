@@ -19,7 +19,7 @@ instance1 <- EmptyClass()
 PrintLine(instance1) // 预期输出: EmptyClass 实例
 
 // 空列表
-empty_list <- list[]
+empty_list <- {}
 PrintLine(empty_list) // 预期输出: []
 
 // 空数组
@@ -125,4 +125,4 @@ PrintLine(result4) // 预期输出: null 或 undefined
 // empty_range <- [~]
 
 // 空切片表达式（边界情况）
-// empty_slice <- list[:]
+// empty_slice <- {:}

@@ -46,7 +46,7 @@ PrintLine("nestedArray[25][25] = " + nestedArray[25][25])
 
 // 大列表操作
 PrintLine("\n--- 大列表操作 ---")
-bigList <- list[]
+bigList <- {}
 for i <- 0, i < 500, i++ {
     bigList <- bigList + [i * 2]
 }

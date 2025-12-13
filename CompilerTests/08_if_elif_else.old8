@@ -97,7 +97,7 @@ if num1 == num2 {
 PrintLine("\n=== 多条件测试 ===")
 
 // 测试所有条件分支
-for testScore in list[95, 85, 75, 65, 55] {
+for testScore in {95, 85, 75, 65, 55} {
     if testScore >= 90 {
         PrintLine(testScore + " => 优秀")
     } elif testScore >= 80 {

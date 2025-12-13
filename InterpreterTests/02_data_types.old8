@@ -14,13 +14,13 @@ PrintLine("混合类型数组: " + array3)
 
 // 列表测试
 PrintLine("\n=== 列表测试 ===")
-list1 <- list[1, 2, 3]
+list1 <- {1, 2, 3}
 PrintLine("整数列表: " + list1)
 
-list2 <- list["a", "b", "c"]
+list2 <- {"a", "b", "c"}
 PrintLine("字符串列表: " + list2)
 
-list3 <- list[1, "a", true]
+list3 <- {1, "a", true}
 PrintLine("混合类型列表: " + list3)
 
 // 字典测试

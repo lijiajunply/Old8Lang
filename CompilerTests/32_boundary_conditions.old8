@@ -11,7 +11,7 @@ PrintLine("空字符串: '" + emptyString + "'")
 emptyArray <- []
 PrintLine("空数组长度: " + Len(emptyArray))
 
-emptyList <- list[]
+emptyList <- {}
 PrintLine("空列表长度: " + Len(emptyList))
 
 emptyDict <- {}
@@ -34,7 +34,7 @@ singleArray <- [42]
 PrintLine("单元素数组: " + singleArray[0])
 PrintLine("单元素数组长度: " + Len(singleArray))
 
-singleList <- list[99]
+singleList <- {99}
 PrintLine("单元素列表: " + singleList[0])
 
 singleDict <- {"key": "value"}

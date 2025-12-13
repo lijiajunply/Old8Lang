@@ -47,7 +47,7 @@ PrintLine(tuple1)
 PrintLine(tuple2)
 
 // 列表
-list1 <- list[1, 2, 3]
-list2 <- list["x", "y", "z"]
+list1 <- {1, 2, 3}
+list2 <- {"x", "y", "z"}
 PrintLine(list1)
 PrintLine(list2)

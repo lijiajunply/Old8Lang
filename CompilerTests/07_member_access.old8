@@ -27,16 +27,16 @@ PrintLine("修改后数组: " + array)
 // 列表索引访问
 PrintLine("\n=== 列表索引访问 ===")
 
-arg_list <- list[1, 2, 3, 4, 5]
+arg_list <- {1, 2, 3, 4, 5}
 PrintLine("列表: " + arg_list)
 
 // 访问单个元素
-listElement1 <- arg_list[1]
-PrintLine("list[1] = " + listElement1)
+listElement1 <- arg_list{1}
+PrintLine("[1] = " + listElement1)
 
 // 修改列表元素
 arg_list[2] <- 30
-PrintLine("修改后 list[2] = " + arg_list[2])
+PrintLine("修改后 [2] = " + arg_list[2])
 PrintLine("修改后列表: " + arg_list)
 
 // 字典索引访问

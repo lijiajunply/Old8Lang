@@ -35,11 +35,11 @@ strArr <- ["a", "b", "c"]
 PrintLine("字符串数组 [\"a\", \"b\", \"c\"] 的长度: " + Len(strArr))
 
 // 列表长度
-lst <- list[10, 20, 30]
-PrintLine("列表 list[10, 20, 30] 的长度: " + Len(lst))
+lst <- {10, 20, 30}
+PrintLine("列表 {10, 20, 30} 的长度: " + Len(lst))
 
 // 空列表
-emptyList <- list[]
+emptyList <- {}
 PrintLine("空列表的长度: " + Len(emptyList))
 
 PrintLine("\n=== Assert 函数测试 ===")
@@ -139,7 +139,7 @@ PrintLine("数组: " + arr)
 PrintLine("数组长度: " + Len(arr))
 
 // 列表
-lst <- list[4, 5, 6]
+lst <- {4, 5, 6}
 PrintLine("列表: " + lst)
 PrintLine("列表长度: " + Len(lst))
 

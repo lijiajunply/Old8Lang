@@ -33,7 +33,7 @@ arrayVar:array <- [1, 2, 3]
 PrintLine("数组类型假注: arrayVar = " + arrayVar)
 
 // 列表类型假注
-listVar <- list[1, 2, 3] // list 类型的不支持类型假注
+listVar <- {1, 2, 3} // list 类型的不支持类型假注
 PrintLine("列表类型假注: listVar = " + listVar)
 
 // 字典类型假注
@@ -163,7 +163,7 @@ PrintLine("带有默认值的string类型假注: defaultString = " + defaultStri
 // PrintLine("\n=== 类型假注的泛型支持 ===")
 
 // 注意：这里可能不支持泛型
-// listGeneric:list<int> <- list[1, 2, 3]
+// listGeneric:list<int> <- {1, 2, 3}
 // PrintLine("泛型列表类型假注: listGeneric = " + listGeneric)
 
 PrintLine("\n✅ 所有类型假注测试完成")

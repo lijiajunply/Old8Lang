@@ -10,8 +10,8 @@ PrintLine("3 in array: " + (3 in array))
 PrintLine("6 in array: " + (6 in array))
 
 // 测试列表中的in表达式
-my_list <- list[10, 20, 30]
-PrintLine("\n列表: list[10, 20, 30]")
+my_list <- {10, 20, 30}
+PrintLine("\n列表: {10, 20, 30}")
 PrintLine("10 in my_list: " + (10 in my_list))
 PrintLine("25 in my_list: " + (25 in my_list))
 
