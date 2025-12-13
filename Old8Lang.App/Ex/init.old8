@@ -20,7 +20,7 @@ a <- fibIter(35)
 for i in a {
     Print(i+" ")
 }
-b <- list[12,123,1231,123,1]
+b <- {12,123,1231,123,1}
 b.Add(2)
 PrintLine("\n"+b)
 
@@ -53,9 +53,8 @@ switch "2" {
 }
 
 // 测试编译加速
-// PrintLine("测试编译加速")
+PrintLine("测试编译加速")
 
-/*
 Compiler("fib:int (a:int) ->
                {
                   if a == 1
@@ -67,4 +66,3 @@ Compiler("fib:int (a:int) ->
                }")
                
 PrintLine(fib(30))
-*/

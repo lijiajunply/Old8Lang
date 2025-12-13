@@ -1,5 +1,5 @@
 fibIter(a) -> {
-    fib_list <- list[1,1]
+    fib_list <- {1,1}
     for i <- 2 , i < a , i++{
         b <- fib_list[i-1]+fib_list[i-2]
         fib_list.Add(b)
@@ -28,6 +28,7 @@ class Test{
       this.a <- c
       this.b <- d
    }
-   func Add()
-      return this.a + this.b
+   func Add(){
+       return this.a + this.b
+   }
 }

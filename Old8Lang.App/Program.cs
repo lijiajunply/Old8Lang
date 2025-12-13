@@ -10,7 +10,7 @@ if (args.Length == 0)
 {
     args =
     [
-        "-s", "/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/InterpreterTests/37_batch_import_test4.old8"
+        "-f", "/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.App/Ex/init.old8"
     ];
 }
 #endif
