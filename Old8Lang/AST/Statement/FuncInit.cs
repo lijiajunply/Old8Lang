@@ -85,7 +85,7 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
             funcLocal.AddLocalVar(id.IdName, localVar);
             // 加载参数并存储到局部变量
             methodIl.Emit(OpCodes.Ldarg, i);
-            methodIl.Emit(OpCodes.Stloc, localVar.LocalIndex);
+            methodIl.Emit(OpCodes.Stloc, localVar);
         }
 
         // 生成方法体的 IL 代码
@@ -99,19 +99,57 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
         // 只有当最后一个语句不是 ReturnStatement 时，才添加 Ret 指令
         if (lastStatement is not ReturnStatement)
         {
-            // 对于 void 方法，添加 Ret 指令
-            // 对于有返回值的方法，如果没有显式 return，这里会导致栈不平衡，但这是用户代码的问题
-            methodIl.Emit(OpCodes.Ret);
+            // 确保栈平衡
+            if (returnType == typeof(void))
+            {
+                // 对于 void 方法，直接添加 Ret 指令
+                methodIl.Emit(OpCodes.Ret);
+            }
+            else
+            {
+                // 对于有返回值的方法，如果没有显式 return，需要提供默认返回值
+                if (returnType.IsValueType)
+                {
+                    // 对于值类型，创建默认值
+                    var defaultValue = Activator.CreateInstance(returnType);
+                    if (returnType == typeof(int))
+                    {
+                        methodIl.Emit(OpCodes.Ldc_I4_0);
+                    }
+                    else if (returnType == typeof(double))
+                    {
+                        methodIl.Emit(OpCodes.Ldc_R8, 0.0);
+                    }
+                    else if (returnType == typeof(bool))
+                    {
+                        methodIl.Emit(OpCodes.Ldc_I4_0);
+                    }
+                    else
+                    {
+                        // 对于其他值类型，初始化并加载默认值
+                        var defaultLocal = methodIl.DeclareLocal(returnType);
+                        methodIl.Emit(OpCodes.Initobj, returnType);
+                        methodIl.Emit(OpCodes.Ldloc, defaultLocal);
+                    }
+                }
+                else
+                {
+                    // 对于引用类型，返回 null
+                    methodIl.Emit(OpCodes.Ldnull);
+                }
+                methodIl.Emit(OpCodes.Ret);
+            }
         }
 
         // 将方法添加到本地变量管理器
         // 对于用户定义的函数，我们需要保留原始方法名以便调用
-        // 对于重载函数，我们需要将所有重载都添加到字典中，使用"函数名$参数数量"作为键
+        // 对于重载函数，使用函数名+参数类型组合作为键，支持更准确的函数重载
         var delegateKey = methodName;
         if (FuncLangValue.Ids != null)
         {
-            // 使用函数名+参数数量作为键，支持函数重载
-            delegateKey = $"{methodName}${FuncLangValue.Ids.Count}";
+            // 使用函数名+参数类型作为键，支持更准确的函数重载
+            var paramTypeNames = string.Join("_", parameterTypes.Select(t => t.Name));
+            delegateKey = $"{methodName}${paramTypeNames}";
         }
         local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
 

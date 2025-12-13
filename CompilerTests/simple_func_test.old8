@@ -1,0 +1,17 @@
+// 简单函数测试
+PrintLine("=== 简单函数测试 ===")
+
+// 基本函数声明和调用
+func sayHello() {
+    PrintLine("Hello, World!")
+}
+
+sayHello()
+
+// 带返回值的简单函数
+func add(a, b) {
+    return a + b
+}
+
+result <- add(1, 2)
+PrintLine("1 + 2 = " + result)

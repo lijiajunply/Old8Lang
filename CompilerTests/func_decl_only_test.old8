@@ -1,0 +1,7 @@
+// 只包含函数声明的测试
+PrintLine("=== 只包含函数声明的测试 ===")
+
+// 无参数、无返回值的函数
+func hello() {
+    PrintLine("Hello")
+}

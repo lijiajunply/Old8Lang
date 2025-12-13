@@ -346,11 +346,11 @@ public class FuncLangValue : ImportInfo
             return;
         }
 
-        // 使用参数的类型注解来确定参数类型
-        var parameterTypes = Ids!.Select(item => item.OutputType(local)).ToArray();
-
         // 创建一个新的LocalManager实例，专门用于函数体的IL生成
         var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
+
+        // 使用参数的类型注解来确定参数类型
+        var parameterTypes = Ids!.Select(item => item.OutputType(funcLocal)).ToArray();
 
         // 先处理参数，将它们添加到funcLocal中，这样GetItemType才能正确推断返回类型
         for (var i = 0; i < Ids!.Count; i++)
@@ -374,10 +374,7 @@ public class FuncLangValue : ImportInfo
         // 创建方法的 IL 发射器
         var methodIl = dynamicMethod.GetILGenerator();
 
-        // 清空funcLocal，重新添加参数（这次使用真正的LocalBuilder）
-        funcLocal.LocalVar.Clear();
-
-        // 处理参数
+        // 处理参数 - 不需要清空LocalVar，直接添加参数
         for (var i = 0; i < Ids!.Count; i++)
         {
             var id = Ids[i];
@@ -386,7 +383,7 @@ public class FuncLangValue : ImportInfo
             funcLocal.AddLocalVar(id.IdName, localVar);
             // 加载参数并存储到局部变量
             methodIl.Emit(OpCodes.Ldarg, i);
-            methodIl.Emit(OpCodes.Stloc, localVar.LocalIndex);
+            methodIl.Emit(OpCodes.Stloc, localVar);
         }
 
         // 生成方法体的 IL 代码
@@ -401,24 +398,38 @@ public class FuncLangValue : ImportInfo
         if (lastStatement is not ReturnStatement)
         {
             // 对于 void 方法，添加 Ret 指令
-            // 对于有返回值的方法，如果没有显式 return，这里会导致栈不平衡
-            // 但对于Lambda表达式 (a, b) -> a + b 这种形式，整个块就是一个表达式
-            // 需要特殊处理
-            if (returnType != typeof(void))
+            // 对于有返回值的方法，如果没有显式 return，需要确保栈上有返回值
+            if (returnType == typeof(void))
+            {
+                methodIl.Emit(OpCodes.Ret);
+            }
+            else
             {
                 // 如果是单表达式Lambda (a, b) -> a + b
-                // BlockStatement应该只有一个表达式语句，其值已经在栈上
-                // 我们已经在BlockStatement.GenerateIl中处理过，不需要额外操作
+                // 确保栈上有返回值
+                // 对于没有显式return的函数，返回默认值
+                if (returnType.IsValueType)
+                {
+                    // 对于值类型，创建默认值
+                    var defaultValue = Activator.CreateInstance(returnType);
+                    methodIl.Emit(OpCodes.Ldc_I4_0);
+                }
+                else
+                {
+                    // 对于引用类型，返回null
+                    methodIl.Emit(OpCodes.Ldnull);
+                }
+                methodIl.Emit(OpCodes.Ret);
             }
-            methodIl.Emit(OpCodes.Ret);
         }
 
         // 将方法注册到本地变量管理器的DelegateVar中
-        // 使用函数名+参数数量作为键，支持函数重载
+        // 使用完整的参数类型信息作为函数重载的键，更准确
         var delegateKey = methodName;
         if (Ids != null)
         {
-            delegateKey = $"{methodName}${Ids.Count}";
+            var paramTypeNames = string.Join("_", parameterTypes.Select(t => t.Name));
+            delegateKey = $"{methodName}${paramTypeNames}";
         }
         local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
 
