@@ -1,0 +1,14 @@
+// Lambda表达式测试
+PrintLine("=== Lambda表达式测试 ===")
+
+// 基本Lambda表达式
+add <- (a, b) -> a + b
+result <- add(1, 2)
+PrintLine("1 + 2 = " + result)
+
+// 单参数Lambda表达式
+square <- (x) -> x * x
+squareResult <- square(5)
+PrintLine("5的平方 = " + squareResult)
+
+PrintLine("✅ Lambda表达式测试完成")

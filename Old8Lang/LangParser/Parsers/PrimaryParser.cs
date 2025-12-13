@@ -434,7 +434,8 @@ public class PrimaryParser(
                 block = new BlockStatement([returnStmt]);
             }
 
-            return new FuncLangValue(null, [], block, position);
+            // 创建Lambda表达式，设置IsLambda为true
+            return new FuncLangValue(null, [], block, position, true);
         }
 
         // 检查是否是有参数的Lambda表达式
@@ -487,7 +488,8 @@ public class PrimaryParser(
                     block = new BlockStatement([returnStmt]);
                 }
 
-                return new FuncLangValue(null, ids, block, position);
+                // 创建Lambda表达式，设置IsLambda为true
+                return new FuncLangValue(null, ids, block, position, true);
             }
 
             // 严格检查：如果看起来像 Lambda 参数列表但缺少 ->

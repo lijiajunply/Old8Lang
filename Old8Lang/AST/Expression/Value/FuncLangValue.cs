@@ -24,14 +24,19 @@ public class FuncLangValue : ImportInfo
 
     // 闭包环境：捕获的作用域，用于支持闭包变量访问
     private VariateManager? CapturedScope { get; init; }
+    
+    // 函数类型：区分普通方法和Lambda表达式
+    public bool IsLambda { get; init; }
 
     public FuncLangValue(LangId? id, List<LangId> ids, BlockStatement blockStatement,
-        SourcePosition position = default) :
+        SourcePosition position = default,
+        bool isLambda = false) :
         base(position)
     {
         Id = id;
         Ids = ids;
         BlockStatement = blockStatement;
+        IsLambda = isLambda;
     }
 
     public FuncLangValue(string idName, MethodInfo methodInfo, FuncLangValue? func = null,
@@ -40,23 +45,24 @@ public class FuncLangValue : ImportInfo
         Id = new LangId(idName);
         Method = methodInfo;
         Func = func;
+        IsLambda = false; // 原生方法不是Lambda表达式
     }
 
     public override LangValueType Run(VariateManager manager)
     {
         // 如果这个函数没有方法引用（即是 Old8Lang 函数而非原生方法）
-        // 创建一个新的 FuncLangValue 副本，并捕获当前作用域
-        // 这样每次返回函数时都会捕获各自的作用域，支持闭包
-        if (Method == null && Ids != null)
-        {
-            var closureFunc = new FuncLangValue(Id, Ids, BlockStatement, Position)
+            // 创建一个新的 FuncLangValue 副本，并捕获当前作用域
+            // 这样每次返回函数时都会捕获各自的作用域，支持闭包
+            if (Method == null && Ids != null)
             {
-                // 克隆当前作用域，保存闭包环境的快照
-                // 这样即使外部函数返回后，闭包仍然可以访问捕获的变量
-                CapturedScope = manager.Clone()
-            };
-            return closureFunc;
-        }
+                var closureFunc = new FuncLangValue(Id, Ids, BlockStatement, Position, IsLambda)
+                {
+                    // 克隆当前作用域，保存闭包环境的快照
+                    // 这样即使外部函数返回后，闭包仍然可以访问捕获的变量
+                    CapturedScope = manager.Clone()
+                };
+                return closureFunc;
+            }
 
         // 原生方法或其他情况直接返回自身
         return this;
@@ -333,9 +339,9 @@ public class FuncLangValue : ImportInfo
 
     public override void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
     {
-        // Lambda表达式需要特殊处理：编译成DynamicMethod
-        // 不是将函数对象存储为变量，而是将函数注册到DelegateVar中
-
+        // Lambda表达式需要特殊处理：编译成Delegate
+        // 普通方法：编译成DynamicMethod
+        
         // Lambda表达式没有函数名(Id == null)，使用变量名作为方法名
         var methodName = Id?.IdName ?? idName;
 
@@ -362,81 +368,177 @@ public class FuncLangValue : ImportInfo
 
         // 获取返回类型
         var returnType = GetItemType(BlockStatement, funcLocal);
-
-        // 定义新的方法
-        var dynamicMethod = new DynamicMethod(
-            methodName,
-            returnType,
-            parameterTypes,
-            true
-        );
-
-        // 创建方法的 IL 发射器
-        var methodIl = dynamicMethod.GetILGenerator();
-
-        // 处理参数 - 不需要清空LocalVar，直接添加参数
-        for (var i = 0; i < Ids!.Count; i++)
+        
+        // 根据函数类型选择不同的处理方式
+        if (IsLambda || Id == null)
         {
-            var id = Ids[i];
-            var paramType = parameterTypes[i];
-            var localVar = methodIl.DeclareLocal(paramType);
-            funcLocal.AddLocalVar(id.IdName, localVar);
-            // 加载参数并存储到局部变量
-            methodIl.Emit(OpCodes.Ldarg, i);
-            methodIl.Emit(OpCodes.Stloc, localVar);
-        }
+            // Lambda表达式处理：编译成Delegate
+            
+            // 定义新的方法
+            var dynamicMethod = new DynamicMethod(
+                methodName,
+                returnType,
+                parameterTypes,
+                true
+            );
 
-        // 生成方法体的 IL 代码
-        BlockStatement.GenerateIl(methodIl, funcLocal);
+            // 创建方法的 IL 发射器
+            var methodIl = dynamicMethod.GetILGenerator();
 
-        // 检查函数体的最后一个语句是否是 ReturnStatement
-        var lastStatement = BlockStatement.Count > 0
-            ? BlockStatement[^1]
-            : null;
-
-        // 只有当最后一个语句不是 ReturnStatement 时，才添加 Ret 指令
-        if (lastStatement is not ReturnStatement)
-        {
-            // 对于 void 方法，添加 Ret 指令
-            // 对于有返回值的方法，如果没有显式 return，需要确保栈上有返回值
-            if (returnType == typeof(void))
+            // 处理参数
+            for (var i = 0; i < Ids!.Count; i++)
             {
-                methodIl.Emit(OpCodes.Ret);
+                var id = Ids[i];
+                var paramType = parameterTypes[i];
+                var localVar = methodIl.DeclareLocal(paramType);
+                funcLocal.AddLocalVar(id.IdName, localVar);
+                // 加载参数并存储到局部变量
+                methodIl.Emit(OpCodes.Ldarg, i);
+                methodIl.Emit(OpCodes.Stloc, localVar);
             }
-            else
+
+            // 生成方法体的 IL 代码
+            BlockStatement.GenerateIl(methodIl, funcLocal);
+
+            // 检查函数体的最后一个语句是否是 ReturnStatement
+            var lastStatement = BlockStatement.Count > 0
+                ? BlockStatement[^1]
+                : null;
+
+            // 确保方法有正确的返回值
+            if (lastStatement is not ReturnStatement)
             {
-                // 如果是单表达式Lambda (a, b) -> a + b
-                // 确保栈上有返回值
-                // 对于没有显式return的函数，返回默认值
-                if (returnType.IsValueType)
+                if (returnType == typeof(void))
                 {
-                    // 对于值类型，创建默认值
-                    var defaultValue = Activator.CreateInstance(returnType);
-                    methodIl.Emit(OpCodes.Ldc_I4_0);
+                    methodIl.Emit(OpCodes.Ret);
                 }
                 else
                 {
-                    // 对于引用类型，返回null
-                    methodIl.Emit(OpCodes.Ldnull);
+                    // 对于有返回值的Lambda表达式，确保返回默认值
+                    if (returnType.IsValueType)
+                    {
+                        // 根据返回类型生成不同的默认值
+                        if (returnType == typeof(int))
+                        {
+                            methodIl.Emit(OpCodes.Ldc_I4_0);
+                        }
+                        else if (returnType == typeof(double))
+                        {
+                            methodIl.Emit(OpCodes.Ldc_R8, 0.0);
+                        }
+                        else if (returnType == typeof(bool))
+                        {
+                            methodIl.Emit(OpCodes.Ldc_I4_0);
+                        }
+                        else
+                        {
+                            // 对于其他值类型，初始化并加载默认值
+                            var defaultValueLocal = methodIl.DeclareLocal(returnType);
+                            methodIl.Emit(OpCodes.Initobj, returnType);
+                            methodIl.Emit(OpCodes.Ldloc, defaultValueLocal);
+                        }
+                    }
+                    else
+                    {
+                        // 引用类型返回null
+                        methodIl.Emit(OpCodes.Ldnull);
+                    }
+                    methodIl.Emit(OpCodes.Ret);
                 }
-                methodIl.Emit(OpCodes.Ret);
             }
-        }
-
-        // 将方法注册到本地变量管理器的DelegateVar中
-        // 使用完整的参数类型信息作为函数重载的键，更准确
-        var delegateKey = methodName;
-        if (Ids != null)
-        {
+            
+            // 注册Lambda表达式到DelegateVar
             var paramTypeNames = string.Join("_", parameterTypes.Select(t => t.Name));
-            delegateKey = $"{methodName}${paramTypeNames}";
+            var delegateKey = $"{methodName}${paramTypeNames}";
+            local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
         }
-        local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
-
-        // 同时存储函数的参数列表信息，用于支持默认参数
-        if (Ids != null)
+        else
         {
-            local.FuncParameters.TryAdd(delegateKey, Ids);
+            // 普通方法处理：编译成DynamicMethod
+            
+            // 定义新的方法
+            var dynamicMethod = new DynamicMethod(
+                methodName,
+                returnType,
+                parameterTypes,
+                true
+            );
+
+            // 创建方法的 IL 发射器
+            var methodIl = dynamicMethod.GetILGenerator();
+
+            // 处理参数
+            for (var i = 0; i < Ids!.Count; i++)
+            {
+                var id = Ids[i];
+                var paramType = parameterTypes[i];
+                var localVar = methodIl.DeclareLocal(paramType);
+                funcLocal.AddLocalVar(id.IdName, localVar);
+                // 加载参数并存储到局部变量
+                methodIl.Emit(OpCodes.Ldarg, i);
+                methodIl.Emit(OpCodes.Stloc, localVar);
+            }
+
+            // 生成方法体的 IL 代码
+            BlockStatement.GenerateIl(methodIl, funcLocal);
+
+            // 检查函数体的最后一个语句是否是 ReturnStatement
+            var lastStatement = BlockStatement.Count > 0
+                ? BlockStatement[^1]
+                : null;
+
+            // 确保方法有正确的返回值
+            if (lastStatement is not ReturnStatement)
+            {
+                if (returnType == typeof(void))
+                {
+                    methodIl.Emit(OpCodes.Ret);
+                }
+                else
+                {
+                    // 对于有返回值的方法，确保返回默认值
+                    if (returnType.IsValueType)
+                    {
+                        // 根据返回类型生成不同的默认值
+                        if (returnType == typeof(int))
+                        {
+                            methodIl.Emit(OpCodes.Ldc_I4_0);
+                        }
+                        else if (returnType == typeof(double))
+                        {
+                            methodIl.Emit(OpCodes.Ldc_R8, 0.0);
+                        }
+                        else if (returnType == typeof(bool))
+                        {
+                            methodIl.Emit(OpCodes.Ldc_I4_0);
+                        }
+                        else
+                        {
+                            // 对于其他值类型，初始化并加载默认值
+                            var defaultValueLocal = methodIl.DeclareLocal(returnType);
+                            methodIl.Emit(OpCodes.Initobj, returnType);
+                            methodIl.Emit(OpCodes.Ldloc, defaultValueLocal);
+                        }
+                    }
+                    else
+                    {
+                        // 引用类型返回null
+                        methodIl.Emit(OpCodes.Ldnull);
+                    }
+                    methodIl.Emit(OpCodes.Ret);
+                }
+            }
+            
+            // 将方法注册到本地变量管理器的DelegateVar中
+            var paramTypeNames = string.Join("_", parameterTypes.Select(t => t.Name));
+            var delegateKey = $"{methodName}${paramTypeNames}";
+            local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
+
+            // 同时存储函数的参数列表信息，用于支持默认参数
+            if (Ids != null)
+            {
+                local.FuncParameters.TryAdd(delegateKey, Ids);
+            }
         }
     }
 }

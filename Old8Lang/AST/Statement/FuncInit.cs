@@ -10,6 +10,9 @@ namespace Old8Lang.AST.Statement;
 public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldStatement(position)
 {
     public readonly FuncLangValue FuncLangValue = a;
+    
+    // 检查函数是否为Lambda表达式（通过检查Id是否为null）
+    public bool IsLambda => FuncLangValue.Id == null;
 
     public override void Run(VariateManager manager)
     {

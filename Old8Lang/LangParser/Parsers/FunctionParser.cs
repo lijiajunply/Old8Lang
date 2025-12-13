@@ -74,8 +74,8 @@ public class FunctionParser(
         var stmtParser = statementParserFactory();
         var block = stmtParser.ParseBlock();
 
-        // 普通函数声明，生成 FuncInit
-        return new FuncInit(new FuncLangValue(updatedFuncName, parameters, block));
+        // 普通函数声明，生成 FuncInit，设置 IsLambda 为 false
+        return new FuncInit(new FuncLangValue(updatedFuncName, parameters, block, isLambda: false));
     }
 
     /// <summary>
