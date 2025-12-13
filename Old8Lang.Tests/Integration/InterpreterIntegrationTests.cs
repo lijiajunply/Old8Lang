@@ -284,7 +284,7 @@ public class InterpreterIntegrationTests
     {
         // 测试列表操作
         var code = @"
-            mylist <- list[1, 2, 3, 4, 5]
+            mylist <- {1, 2, 3, 4, 5}
             first <- mylist[0]
             third <- mylist[2]
         ";

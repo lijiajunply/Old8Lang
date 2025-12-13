@@ -145,18 +145,20 @@ public class DeclarationStatementTests
     }
 
     /// <summary>
-    /// 测试无效的字典初始化 - 多余的逗号
+    /// 测试字典尾随逗号 - 现在支持尾随逗号
     /// </summary>
     [Fact]
     public void ParseProgram_InvalidDictionaryInitExtraComma_ThrowsSyntaxError()
     {
-        // Arrange
-        var code = "invalid_dict <- {\"name\": \"Alice\", \"age\": 30, }";
+        // Arrange - 尾随逗号现在是允许的
+        var code = "valid_dict <- {\"name\": \"Alice\", \"age\": 30, }";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
 
-        // Act & Assert
-        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
+        // Act & Assert - 应该成功解析，不再抛出错误
+        var result = parser.ParseProgram();
+        Assert.NotNull(result);
+        Assert.Equal(1, result.Count);
     }
 
     /// <summary>

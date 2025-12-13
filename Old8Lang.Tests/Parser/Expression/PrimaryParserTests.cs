@@ -381,7 +381,7 @@ public class PrimaryParserTests
     }
 
     /// <summary>
-    /// 测试空字典 - {}
+    /// 测试空列表 - {}
     /// </summary>
     [Fact]
     public void ParseDictionary_EmptyDictionary_ParsesSuccessfully()
@@ -398,7 +398,8 @@ public class PrimaryParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<DictionaryLangValue>(setStmt.Value);
+        // {} 现在解析为空列表而不是空字典
+        Assert.IsType<ListLangValue>(setStmt.Value);
     }
 
     /// <summary>

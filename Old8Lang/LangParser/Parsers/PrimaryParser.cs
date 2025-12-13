@@ -31,11 +31,10 @@ public class PrimaryParser(
     //         | instantiate
     //         | stringTree
     //         | lambda
-    //         | list
+    //         | listOrDictionary
     //         | range
     //         | array
     //         | tuple
-    //         | dictionary
     //         | slice
     //         | asStatement
     public LangExpression ParsePrimary()
@@ -82,13 +81,6 @@ public class PrimaryParser(
             return new Operation(expr, LangTokenType.Minus, new IntLangValue(1), position);
         }
 
-        // 处理 list[...] 语法
-        if (CurrentToken.Type == LangTokenType.List && Peek().Type == LangTokenType.LeftBracket)
-        {
-            Expect(LangTokenType.List); // 跳过 list 关键字
-            return ParseList();
-        }
-
         // 处理关键字作为标识符的情况
         if (CurrentToken.Type is LangTokenType.Func or
             LangTokenType.Class or
@@ -97,8 +89,7 @@ public class PrimaryParser(
             LangTokenType.While or
             LangTokenType.For or
             LangTokenType.Return or
-            LangTokenType.Import or
-            LangTokenType.List)
+            LangTokenType.Import)
         {
             // 检查是否是列表初始化：list[...]
             if (Peek().Type == LangTokenType.LeftBracket)
@@ -135,7 +126,7 @@ public class PrimaryParser(
                 : ParseIntLiteral(),
             LangTokenType.LeftBracket => ParseArrayOrRange(),
             LangTokenType.LeftParen => ParseLambdaOrTuple(),
-            LangTokenType.LeftBrace => ParseDictionary(),
+            LangTokenType.LeftBrace => ParseListOrDictionary(),
             LangTokenType.Dollar => ParseStringTree(), // 处理字符串模板：$"string", ${expression}, $($"string")
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftBracket => ParseListInitOrSlice(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseInstantiate(),
@@ -148,9 +139,97 @@ public class PrimaryParser(
     }
 
     /// <summary>
+    /// 解析列表或字典初始化
+    /// list = "{" expression ( "," expression )* "}" ;
+    /// dictionary = "{" dicTuple ( "," dicTuple )* "}" ;
+    /// dicTuple = expression ":" expression ;
+    ///
+    /// 区分规则：
+    /// - 如果第一个元素后面跟着冒号，则是字典
+    /// - 否则是列表
+    /// </summary>
+    /// <returns>列表或字典初始化</returns>
+    public LangValueType ParseListOrDictionary()
+    {
+        var leftBraceToken = CurrentToken;
+        var position = new SourcePosition(leftBraceToken.Line, leftBraceToken.Column, tokenValue: leftBraceToken.Value);
+        Expect(LangTokenType.LeftBrace);
+
+        // 空的 {} - 返回空列表
+        if (CurrentToken.Type == LangTokenType.RightBrace)
+        {
+            Expect(LangTokenType.RightBrace);
+            return new ListLangValue(new List<LangExpression>(), position);
+        }
+
+        // 保存当前位置，用于判断是列表还是字典
+        var savedIndex = CurrentIndex;
+
+        // 解析第一个表达式
+        var firstExpr = expressionParserFactory().ParseExpression();
+
+        // 检查是否是字典（有冒号）
+        if (CurrentToken.Type == LangTokenType.Colon)
+        {
+            // 是字典，解析为字典
+            var elements = new List<TupleLangValue>();
+
+            // 解析第一个键值对
+            Expect(LangTokenType.Colon);
+            var firstValue = expressionParserFactory().ParseExpression();
+            elements.Add(new TupleLangValue(firstExpr, firstValue, position));
+
+            // 解析剩余的键值对
+            while (CurrentToken.Type == LangTokenType.Comma)
+            {
+                Expect(LangTokenType.Comma);
+
+                // 检查是否是尾随逗号
+                if (CurrentToken.Type == LangTokenType.RightBrace)
+                {
+                    break;
+                }
+
+                var key = expressionParserFactory().ParseExpression();
+                Expect(LangTokenType.Colon);
+                var value = expressionParserFactory().ParseExpression();
+                elements.Add(new TupleLangValue(key, value, position));
+            }
+
+            Expect(LangTokenType.RightBrace);
+            return new DictionaryLangValue(elements, position);
+        }
+        else
+        {
+            // 是列表，解析为列表
+            var elements = new List<LangExpression> { firstExpr };
+
+            // 解析剩余的元素
+            while (CurrentToken.Type == LangTokenType.Comma)
+            {
+                Expect(LangTokenType.Comma);
+
+                // 检查是否是尾随逗号
+                if (CurrentToken.Type == LangTokenType.RightBrace)
+                {
+                    break;
+                }
+
+                elements.Add(expressionParserFactory().ParseExpression());
+            }
+
+            Expect(LangTokenType.RightBrace);
+            return new ListLangValue(elements, position);
+        }
+    }
+
+
+    /// <summary>
+    /// 已废弃：此方法不再使用，因为 list 关键词已被删除
     /// list = "list" "[" expression ( "," expression )* "]" ;
     /// </summary>
     /// <returns>列表初始化</returns>
+    [Obsolete("此方法已废弃，请使用 ParseListOrDictionary 方法")]
     public LangValueType ParseList()
     {
         // list关键字已经被跳过，所以使用当前token的位置（即左括号）
@@ -180,10 +259,12 @@ public class PrimaryParser(
 
 
     /// <summary>
+    /// 已废弃：此方法不再使用，已被 ParseListOrDictionary 方法替代
     /// dictionary = "{" dicTuple ( "," dicTuple )* "}" ;
     /// dicTuple = expression ":" expression ;
     /// </summary>
     /// <returns>返回字典</returns>
+    [Obsolete("此方法已废弃，请使用 ParseListOrDictionary 方法")]
     public LangValueType ParseDictionary()
     {
         // 处理左括号，只支持 {}
@@ -224,6 +305,7 @@ public class PrimaryParser(
 
         return new DictionaryLangValue(elements, dictPosition);
     }
+
 
     /// <summary>
     /// array = "[" expression ( "," expression )* "]" ;
@@ -763,8 +845,7 @@ public class PrimaryParser(
         // 检查当前token是否是标识符或关键字
         if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.Func or LangTokenType.Class
             or LangTokenType.If or LangTokenType.Else or LangTokenType.While or LangTokenType.For
-            or LangTokenType.Return or LangTokenType.Import or LangTokenType.True or LangTokenType.False
-            or LangTokenType.List)
+            or LangTokenType.Return or LangTokenType.Import or LangTokenType.True or LangTokenType.False)
         {
             CurrentIndex++;
         }

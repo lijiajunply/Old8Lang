@@ -160,6 +160,9 @@ Key syntax elements:
 - Functions: `func name(params) { }` or `name(params) -> { }`
 - Classes: `class Name { }` with `public`/`private`/`static` modifiers
 - Control flow: `if/elif/else`, `for/while/for-in`, `switch/case/default`
+- Lists: `{1, 2, 3}` (braces for list literals)
+- Dictionaries: `{"key": value}` (braces with colons for dictionary literals)
+- Arrays: `[1, 2, 3]` (square brackets for array literals)
 - String templates: `$"text {expr}"` (C# style)
 - Comments: `//` (NOT `#`)
 - ToString Method: `.ToStr()` (NOT `.ToString()`)

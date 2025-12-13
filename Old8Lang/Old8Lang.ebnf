@@ -154,7 +154,7 @@ stringTree = "$" "{" expression ("," expression )* "}" ("{" expression ("," expr
 lambda = "(" idList? ")" "->" expression
        | "(" idList? ")" "->" block ;
 
-list = "list" "[" expression ("," expression )* "]" ;
+list = "{" ( expression ("," expression )* )? "}" ;
 
 range = "[" expression "~" expression "]" ;
 
@@ -165,6 +165,13 @@ tuple = "(" expression "," expression ")" ;
 dictionary = "{" dicTuple ("," dicTuple )* "}" ;
 
 dicTuple = expression ":" expression ;
+
+(* Note: list and dictionary both use braces `{}`.
+   The parser distinguishes them by checking if the first element contains a colon.
+   - `{1, 2, 3}` is a list
+   - `{"key": "value"}` is a dictionary
+   - `{}` is an empty list
+*)
 
 slice = identifier "[" expression ":" expression "]" ;
 

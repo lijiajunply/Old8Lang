@@ -18,7 +18,12 @@
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InterpreterIntegrationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InterpreterIntegrationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.ebnf" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.ebnf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang_Grammar.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,8 +64,11 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/EndToEndCompileTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/EndToEndCompileTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/InterpreterIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/InterpreterIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/InterpreterTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Language/ExpressionStatementTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Language/ExpressionStatementTests.cs" root0="SKIP_HIGHLIGHTING" />
@@ -69,6 +77,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/NativeStaticAny.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
@@ -753,7 +762,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="168" />
+    <option name="localTasksCounter" value="169" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -780,7 +789,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(parser): 重构解析器类以使用主构造函数&#10;&#10;- 将 ClassParser、ExpressionParser、FunctionParser、PrimaryParser 和 StatementParser&#10;  重构为使用主构造函数语法&#10;- 移除了不必要的 Error 命名空间引用&#10;- 更新了字段访问方式，使用构造函数参数直接调用&#10;- 简化了 ParserBase 的构造逻辑&#10;- 修改了表达式解析中的三元运算符错误处理逻辑&#10;- 优化了运算符匹配的模式匹配语法&#10;- 调整了源代码行分割逻辑以保留空行确保行号正确&#10;- 清理了测试文件中无用的命名空间引用&#10;- 删除了部分测试数据文件和语法测试文件中的冗余内容&#10;- 重命名了部分语法测试文件名称以保持一致性" />
     <MESSAGE value="feat(parser): 支持分号作为语句分隔符并优化解析逻辑&#10;&#10;- 重命名 AbsUseClass 为 AbsOutputProvider，ConsoleUse 为 ConsoleOutputProvider&#10;- 在词法分析器中添加对分号 (;) 的识别和支持&#10;- 修改语法解析器以跳过可选的分号分隔符，允许同一行内使用多个语句&#10;- 更新 ExpectHelper 中的错误处理逻辑，简化条件表达式&#10;- 优化 AST 节点中的类型检查和 IL 生成相关代码&#10;- 添加多个测试用例验证分号在不同场景下的行为&#10;- 调整 ParserBase 类中的方法可见性和辅助函数实现&#10;- 更新变量管理器中的作用域深拷贝逻辑&#10;- 更新相关单元测试以匹配新的类名和行为变化" />
     <MESSAGE value="feat(parser): 增强 Lambda 表达式解析和语句验证&#10;&#10;- 添加 Lambda 表达式缺少箭头符号的严格语法检查&#10;- 改进表达式作为独立语句时的错误提示和处理逻辑&#10;- 更新 SetStatement 的 ToString 方法以支持空标识符情况&#10;- 优化 SwitchStatement 和 WhileStatement 的 IL 生成逻辑&#10;- 添加多个语法测试用例覆盖 Lambda 和语句解析场景&#10;- 调整 PrimaryParser 和 StatementParser 的错误处理机制&#10;- 完善工作区文件变更记录和测试文件路径映射" />
     <MESSAGE value="test(parser): 添加语法错误测试用例&#10;&#10;- 新增算术表达式和括号错误测试&#10;- 新增赋值语句语法错误测试&#10;- 新增括号匹配错误测试&#10;- 新增集合、索引和成员访问表达式错误测试&#10;- 新增比较、逻辑和三元表达式错误测试&#10;- 新增编译器集成测试验证IL生成&#10;- 新增控制流语句语法错误测试&#10;- 重命名并重构声明语句测试类" />
@@ -805,7 +813,8 @@
     <MESSAGE value="feat(compiler): 实现编译模式下函数参数默认值类型推断&#10;&#10;- 新增函数参数默认值自动推断类型功能&#10;- 更新类型验证逻辑，允许通过默认值推断参数类型&#10;- 改进错误信息，提供两种参数类型满足方式&#10;- 添加对整数、浮点数、字符串、布尔值等默认值的类型推断&#10;- 支持混合使用显式类型注解和默认值推断&#10;- 保持与解释器模式和现有代码的向后兼容性&#10;- 更新语法文档和开发指南说明新功能&#10;- 添加多个测试用例验证默认参数类型推断行为&#10;- 修复编译模式下参数类型检查的IL生成问题" />
     <MESSAGE value="chore(tests): 清理和整理CompilerTests目录&#10;&#10;- 删除74+个冗余测试文件，减少58%文件数量&#10;- 移除重复的简单测试、调试文件和临时测试&#10;- 保留56个核心测试文件，确保功能覆盖完整&#10;- 规范测试文件命名：编号测试 + 专项测试&#10;- 更新类型注解测试集，保留6个关键测试文件&#10;- 删除无法在编译模式下运行的类型注解测试&#10;- 清理重复的类、函数、控制流测试文件&#10;- 建立未来测试文件命名和维护规范&#10;- 更新IDEA workspace.xml中的文件变更记录&#10;- 保持与现有功能的完整测试覆盖" />
     <MESSAGE value="fix(compiler): 修复IL验证开关命名一致性问题&#10;&#10;- 将 ILVerificationEnabled 属性重命名为 ilVerificationEnabled&#10;- 更新所有引用该属性的测试用例&#10;- 统一属性命名风格，保持代码一致性&#10;- 修复IL验证逻辑中的空值检查问题&#10;- 优化错误日志输出格式，提高可读性&#10;- 调整CompilerBenchmarkTests中的配置访问方式&#10;- 完善IL验证失败时的错误处理流程" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(compiler): 修复IL验证开关命名一致性问题&#10;&#10;- 将 ILVerificationEnabled 属性重命名为 ilVerificationEnabled&#10;- 更新所有引用该属性的测试用例&#10;- 统一属性命名风格，保持代码一致性&#10;- 修复IL验证逻辑中的空值检查问题&#10;- 优化错误日志输出格式，提高可读性&#10;- 调整CompilerBenchmarkTests中的配置访问方式&#10;- 完善IL验证失败时的错误处理流程" />
+    <MESSAGE value="fix(compiler): 修复 in 操作符类型检查与 IL 生成问题&#10;&#10;- 修复 in 操作符右侧非集合类型时的类型检查逻辑&#10;- 优化 IL 生成中装箱值类型的处理方式&#10;- 统一局部变量存储与加载顺序，确保栈平衡&#10;- 添加缺失的静态方法调用指令&#10;- 清理冗余代码并增强类型安全检查&#10;- 更新相关集成测试用例以覆盖边界情况" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(compiler): 修复 in 操作符类型检查与 IL 生成问题&#10;&#10;- 修复 in 操作符右侧非集合类型时的类型检查逻辑&#10;- 优化 IL 生成中装箱值类型的处理方式&#10;- 统一局部变量存储与加载顺序，确保栈平衡&#10;- 添加缺失的静态方法调用指令&#10;- 清理冗余代码并增强类型安全检查&#10;- 更新相关集成测试用例以覆盖边界情况" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

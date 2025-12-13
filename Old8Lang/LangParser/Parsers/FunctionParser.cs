@@ -88,8 +88,7 @@ public class FunctionParser(
         // 检查当前token是否是标识符或关键字
         if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.Func or LangTokenType.Class
             or LangTokenType.If or LangTokenType.Else or LangTokenType.While or LangTokenType.For
-            or LangTokenType.Return or LangTokenType.Import or LangTokenType.True or LangTokenType.False
-            or LangTokenType.List)
+            or LangTokenType.Return or LangTokenType.Import or LangTokenType.True or LangTokenType.False)
         {
             // 解析第一个参数，允许类型注解
             ids.Add(ParseTypedIdentifier(true));
@@ -161,8 +160,7 @@ public class FunctionParser(
         // 检查当前token是否是标识符或关键字
         if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.Func or LangTokenType.Class
             or LangTokenType.If or LangTokenType.Else or LangTokenType.While or LangTokenType.For
-            or LangTokenType.Return or LangTokenType.Import or LangTokenType.True or LangTokenType.False
-            or LangTokenType.List)
+            or LangTokenType.Return or LangTokenType.Import or LangTokenType.True or LangTokenType.False)
         {
             CurrentIndex++;
         }
@@ -180,7 +178,7 @@ public class FunctionParser(
             Expect(LangTokenType.Colon);
 
             // 检查下一个token类型，判断是类型注解还是默认参数
-            if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.List)
+            if (CurrentToken.Type is LangTokenType.Identifier)
             {
                 // 类型注解：identifier:type
                 typeAnnotation = CurrentToken.Value;
@@ -189,7 +187,7 @@ public class FunctionParser(
                     throw CreateSyntaxError("类型注解不能为空");
                 }
 
-                Expect(CurrentToken.Type == LangTokenType.List ? LangTokenType.List : LangTokenType.Identifier);
+                Expect(LangTokenType.Identifier);
             }
             else if (isNeedDefaultValue)
             {
@@ -215,8 +213,7 @@ public class FunctionParser(
         // 检查当前token是否是标识符或关键字
         if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.Func or LangTokenType.Class
             or LangTokenType.If or LangTokenType.Else or LangTokenType.While or LangTokenType.For
-            or LangTokenType.Return or LangTokenType.Import or LangTokenType.True or LangTokenType.False
-            or LangTokenType.List)
+            or LangTokenType.Return or LangTokenType.Import or LangTokenType.True or LangTokenType.False)
         {
             CurrentIndex++;
         }
