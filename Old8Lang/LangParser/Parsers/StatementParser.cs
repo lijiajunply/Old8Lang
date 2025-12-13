@@ -756,6 +756,15 @@ public class StatementParser(
             {
                 while (CurrentToken.Type != LangTokenType.RightBrace)
                 {
+                    // 跳过开头的分号（空语句）
+                    SkipOptionalSemicolons();
+
+                    // 如果跳过分号后遇到右大括号，退出循环
+                    if (CurrentToken.Type == LangTokenType.RightBrace)
+                    {
+                        break;
+                    }
+
                     // 尝试解析语句
                     var statement = ParseStatement();
 

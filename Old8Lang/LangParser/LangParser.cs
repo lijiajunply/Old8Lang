@@ -74,6 +74,18 @@ public class LangParser
         {
             while (Context.CurrentIndex < Context.Tokens.Count)
             {
+                // 跳过开头的分号（空语句）
+                while (Context.CurrentToken.Type == LangTokenType.Semicolon)
+                {
+                    Context.CurrentIndex++;
+                }
+
+                // 如果跳过分号后到达文件末尾，退出循环
+                if (Context.CurrentIndex >= Context.Tokens.Count)
+                {
+                    break;
+                }
+
                 statements.Add(StatementParser.ParseStatement());
 
                 // 跳过可选的分号分隔符

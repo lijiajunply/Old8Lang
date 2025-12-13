@@ -17,19 +17,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/lambda_comprehensive.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/lambda_correct_syntax.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/lambda_missing_arrow_error.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/lambda_multiline.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/lambda_with_semicolon.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_expression_as_statement_error.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_single_identifier.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_valid_statements.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/ExpressionStatementTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LambdaStrictCheckTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/SemicolonTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -70,6 +61,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/InterpreterTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Core/ParserContext.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Core/ParserContext.cs" root0="SKIP_HIGHLIGHTING" />
@@ -718,7 +710,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="144" />
+    <option name="localTasksCounter" value="145" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -745,7 +737,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(error): 实现错误处理系统增强与新异常类型应用&#10;&#10;- 添加异常转换层，将.NET异常转换为Old8Lang自定义异常&#10;- 实现MathLib模块注册，提供11个数学函数及参数验证&#10;- 添加递归深度限制机制，防止栈溢出&#10;- 应用AssertionError于Assert函数，提供清晰断言失败信息&#10;- 增强FileLib文件操作异常处理，主动检查文件存在性&#10;- 创建多个测试文件验证新错误类型实际应用&#10;- 修复MathLib模块导入问题，确保函数正确调用" />
     <MESSAGE value="feat(lang): 实现错误处理系统增强与语法解析优化&#10;&#10;- 新增 AssertionError、ValueError、FileNotFoundError 等错误类型的实际应用&#10;- 实现异常转换层，将 .NET 异常映射为 Old8Lang 自定义异常&#10;- 修复嵌套索引访问问题，支持 array[0][0] 等链式索引&#10;- 扩展 Json 函数支持字典、数组等多种数据结构序列化&#10;- 实现数组、列表、字典的深度内容比较，解决 Assert 函数比较问题&#10;- 新增数学函数库，包含 Sqrt、Log、Factorial 等函数及参数验证&#10;- 增强文件操作库的异常处理，主动检查文件存在性&#10;- 优化语法解析器对复杂表达式的处理能力&#10;- 提升编译器生成 IL 代码的准确性和稳定性&#10;- 完善单元测试覆盖，确保各项功能正常运行" />
     <MESSAGE value="docs(lang): 更新语言特性文档并优化代码格式&#10;&#10;- 在CLAUDE.md中添加ToString方法说明&#10;- 优化FuncStatic.cs中的条件判断代码格式&#10;- 保持代码风格一致性" />
     <MESSAGE value="feat(math): 扩展数学库功能并优化实现&#10;&#10;- 添加双曲三角函数：Sinh、Cosh、Tanh&#10;- 实现特殊函数：Gamma函数和Beta函数&#10;- 增加随机数生成函数：Random和RandomInt&#10;- 添加角度与弧度转换函数&#10;- 实现常用单位换算函数（温度、长度、重量）&#10;- 增加向量操作函数：模长、点积、加减、数乘、归一化等&#10;- 添加向量数学函数：VectorSin、VectorCos等&#10;- 优化对数函数底数判断逻辑，提高数值稳定性&#10;- 完善各函数的参数验证和异常处理&#10;- 更新库导入声明以支持新增函数" />
@@ -770,7 +761,8 @@
     <MESSAGE value="feat(parser): 实现类、函数和表达式解析器&#10;&#10;- 添加 ClassParser 用于解析类声明、访问修饰符和类块&#10;- 实现 ExpressionParser 支持算术、逻辑、比较和三元表达式&#10;- 创建 FunctionParser 处理函数声明、参数列表和 Lambda 表达式&#10;- 新增 ParserBase 提供基础解析操作和错误处理&#10;- 引入 ParserContext 管理解析器共享状态&#10;- 添加 ExpectHelper 生成详细的语法错误消息&#10;- 实现 PrimaryParser 解析字面量、列表、字典等主表达式" />
     <MESSAGE value="refactor(parser): 重构解析器类以使用主构造函数&#10;&#10;- 将 ClassParser、ExpressionParser、FunctionParser、PrimaryParser 和 StatementParser&#10;  重构为使用主构造函数语法&#10;- 移除了不必要的 Error 命名空间引用&#10;- 更新了字段访问方式，使用构造函数参数直接调用&#10;- 简化了 ParserBase 的构造逻辑&#10;- 修改了表达式解析中的三元运算符错误处理逻辑&#10;- 优化了运算符匹配的模式匹配语法&#10;- 调整了源代码行分割逻辑以保留空行确保行号正确&#10;- 清理了测试文件中无用的命名空间引用&#10;- 删除了部分测试数据文件和语法测试文件中的冗余内容&#10;- 重命名了部分语法测试文件名称以保持一致性" />
     <MESSAGE value="feat(parser): 支持分号作为语句分隔符并优化解析逻辑&#10;&#10;- 重命名 AbsUseClass 为 AbsOutputProvider，ConsoleUse 为 ConsoleOutputProvider&#10;- 在词法分析器中添加对分号 (;) 的识别和支持&#10;- 修改语法解析器以跳过可选的分号分隔符，允许同一行内使用多个语句&#10;- 更新 ExpectHelper 中的错误处理逻辑，简化条件表达式&#10;- 优化 AST 节点中的类型检查和 IL 生成相关代码&#10;- 添加多个测试用例验证分号在不同场景下的行为&#10;- 调整 ParserBase 类中的方法可见性和辅助函数实现&#10;- 更新变量管理器中的作用域深拷贝逻辑&#10;- 更新相关单元测试以匹配新的类名和行为变化" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 支持分号作为语句分隔符并优化解析逻辑&#10;&#10;- 重命名 AbsUseClass 为 AbsOutputProvider，ConsoleUse 为 ConsoleOutputProvider&#10;- 在词法分析器中添加对分号 (;) 的识别和支持&#10;- 修改语法解析器以跳过可选的分号分隔符，允许同一行内使用多个语句&#10;- 更新 ExpectHelper 中的错误处理逻辑，简化条件表达式&#10;- 优化 AST 节点中的类型检查和 IL 生成相关代码&#10;- 添加多个测试用例验证分号在不同场景下的行为&#10;- 调整 ParserBase 类中的方法可见性和辅助函数实现&#10;- 更新变量管理器中的作用域深拷贝逻辑&#10;- 更新相关单元测试以匹配新的类名和行为变化" />
+    <MESSAGE value="feat(parser): 增强 Lambda 表达式解析和语句验证&#10;&#10;- 添加 Lambda 表达式缺少箭头符号的严格语法检查&#10;- 改进表达式作为独立语句时的错误提示和处理逻辑&#10;- 更新 SetStatement 的 ToString 方法以支持空标识符情况&#10;- 优化 SwitchStatement 和 WhileStatement 的 IL 生成逻辑&#10;- 添加多个语法测试用例覆盖 Lambda 和语句解析场景&#10;- 调整 PrimaryParser 和 StatementParser 的错误处理机制&#10;- 完善工作区文件变更记录和测试文件路径映射" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 增强 Lambda 表达式解析和语句验证&#10;&#10;- 添加 Lambda 表达式缺少箭头符号的严格语法检查&#10;- 改进表达式作为独立语句时的错误提示和处理逻辑&#10;- 更新 SetStatement 的 ToString 方法以支持空标识符情况&#10;- 优化 SwitchStatement 和 WhileStatement 的 IL 生成逻辑&#10;- 添加多个语法测试用例覆盖 Lambda 和语句解析场景&#10;- 调整 PrimaryParser 和 StatementParser 的错误处理机制&#10;- 完善工作区文件变更记录和测试文件路径映射" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
