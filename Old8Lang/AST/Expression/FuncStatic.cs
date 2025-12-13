@@ -3,6 +3,7 @@ using System.Text.Json;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
+using Old8Lang.LangParser;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Old8Lang.AST.Expression;
@@ -95,6 +96,66 @@ public static class ValueTypeFuncStatic
         {
             return new StringLangValue(type.ToDisplayString());
         }
+
+        public IntLangValue ToHash()
+        {
+            return new IntLangValue(type.GetHashCode());
+        }
+
+        public BoolLangValue Equal(LangValueType otherValue)
+        {
+            return new BoolLangValue(type.Equal(otherValue));
+        }
+    }
+}
+
+[Serializable]
+public static class StringValueFuncStatic
+{
+    extension(StringLangValue str)
+    {
+        public StringLangValue Substring(IntLangValue start, IntLangValue length)
+        {
+            return new StringLangValue(str.Value.Substring(start.Value, length.Value));
+        }
+
+        public IntLangValue IndexOf(StringLangValue value)
+        {
+            return new IntLangValue(str.Value.IndexOf(value.Value, StringComparison.Ordinal));
+        }
+
+        public StringLangValue Replace(StringLangValue oldValue, StringLangValue newValue)
+        {
+            return new StringLangValue(str.Value.Replace(oldValue.Value, newValue.Value));
+        }
+
+        public ListLangValue Split(StringLangValue separator)
+        {
+            var parts = str.Value.Split(separator.Value)
+                .Select(s => new StringLangValue(s) as LangValueType)
+                .ToList();
+            return new ListLangValue(parts);
+        }
+
+        public StringLangValue ToUpper()
+        {
+            return new StringLangValue(str.Value.ToUpper());
+        }
+
+        public StringLangValue ToLower()
+        {
+            return new StringLangValue(str.Value.ToLower());
+        }
+
+        public BoolLangValue Contains(StringLangValue value)
+        {
+            return new BoolLangValue(str.Value.Contains(value.Value));
+        }
+
+        public StringLangValue Trim()
+        {
+            return new StringLangValue(str.Value.Trim());
+        }
     }
 }
 
@@ -169,6 +230,86 @@ public static class ListValueFuncStatic
         {
             QuickSort(langValue.Values, 0, langValue.Values.Count - 1);
             return langValue;
+        }
+
+        public ListLangValue Filter(FuncLangValue predicate)
+        {
+            var filtered = new List<LangValueType>();
+            foreach (var item in langValue.Values)
+            {
+                // 创建临时变量管理器
+                var manager = new VariateManager();
+                manager.Set(new LangId("item"), item);
+
+                // 执行谓词函数
+                var result = predicate.Run(manager);
+
+                // 如果结果为真，则保留该元素
+                if (result is BoolLangValue { Value: true })
+                {
+                    filtered.Add(item);
+                }
+            }
+
+            return new ListLangValue(filtered);
+        }
+
+        public ListLangValue Map(FuncLangValue transform)
+        {
+            var mapped = new List<LangValueType>();
+            foreach (var item in langValue.Values)
+            {
+                // 创建临时变量管理器
+                var manager = new VariateManager();
+                manager.Set(new LangId("item"), item);
+
+                // 执行转换函数
+                var result = transform.Run(manager);
+                mapped.Add(result);
+            }
+
+            return new ListLangValue(mapped);
+        }
+
+        public LangValueType Reduce(FuncLangValue reducer, LangValueType initialValue)
+        {
+            var accumulator = initialValue;
+            foreach (var item in langValue.Values)
+            {
+                // 创建临时变量管理器
+                var manager = new VariateManager();
+                manager.Set(new LangId("accumulator"), accumulator);
+                manager.Set(new LangId("item"), item);
+
+                // 执行归约函数
+                accumulator = reducer.Run(manager);
+            }
+
+            return accumulator;
+        }
+
+        public ListLangValue Reverse()
+        {
+            langValue.Values.Reverse();
+            return langValue;
+        }
+
+        public BoolLangValue Contains(LangValueType element)
+        {
+            return new BoolLangValue(langValue.Values.Any(item => item.Equal(element)));
+        }
+
+        public IntLangValue IndexOf(LangValueType element)
+        {
+            for (var i = 0; i < langValue.Values.Count; i++)
+            {
+                if (langValue.Values[i].Equal(element))
+                {
+                    return new IntLangValue(i);
+                }
+            }
+
+            return new IntLangValue(-1); // 未找到返回-1
         }
     }
 
