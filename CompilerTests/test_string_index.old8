@@ -1,5 +1,0 @@
-// 测试字符串索引访问
-string <- "hello"
-PrintLine("字符串: " + string)
-char0 <- string[0]
-PrintLine("string[0] = " + char0)

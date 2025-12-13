@@ -1,3 +1,0 @@
-// 测试范围
-range <- [1~5]
-PrintLine("范围: " + range)

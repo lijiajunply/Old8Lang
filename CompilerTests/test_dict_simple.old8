@@ -1,3 +1,0 @@
-// 最简单的字典测试
-dict <- {"name": "Alice"}
-PrintLine("字典: " + dict)

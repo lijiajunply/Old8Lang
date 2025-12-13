@@ -1,9 +1,0 @@
-// 最基本的函数测试
-PrintLine("=== 最基本的函数测试 ===")
-
-// 无参数、无返回值的函数
-func hello() {
-    PrintLine("Hello")
-}
-
-hello()

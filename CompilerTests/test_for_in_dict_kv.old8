@@ -1,9 +1,0 @@
-// 测试字典键值对遍历
-PrintLine("测试字典键值对遍历")
-
-dict <- {"a": 1, "b": 2}
-for key, value in dict {
-    PrintLine(key + " = " + value)
-}
-
-PrintLine("完成")

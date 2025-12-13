@@ -17,12 +17,92 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/CompilerTests/type_annotation_default_inference.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/type_annotation_default_minimal.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/type_annotation_no_type_no_default.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang_Grammar.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/func_decl_only_test.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/lambda_basic_test.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/semicolon_compile.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/simple_func_test.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/simple_lambda_test.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/simple_print_test.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_array_access_simple.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_array_modify.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_basic_arith.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_field_access.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_full.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_init.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_instantiate.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_member.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_member_age.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_member_concat.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_member_modify.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_member_simple.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_assign.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_call.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_debug.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_debug2.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_field.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_no_this.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_print.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_println.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_return.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_simple.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_simple2.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_this.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_trace.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_void_return.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_simple.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_with_init.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_debug_info.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_default_params.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_dict_access.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_dict_modify.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_dict_read.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_dict_simple.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_expression_statement.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_for_in_dict.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_for_in_dict_kv.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_for_in_dict_kv2.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_for_in_simple.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_for_in_string.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_func_call.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_func_simple.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_il_verification.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_init_called.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_lambda_simple.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_len_func.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_list_access.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_member_access_minimal.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_minimal_void_method.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_overload.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_range.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_return_with_println.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_simple_assignment.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_simple_default.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_simple_func.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_simple_println.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_string_concat.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_string_index.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_switch_in_function.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_switch_range.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_this_assignment.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_type_conv_simple.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_type_func.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_type_func2.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_type_func3.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_type_func4.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_type_func5.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_type_with_concat.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_void_method_field.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_void_method_simple.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_void_method_success.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/test_void_return_comprehensive.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/type_annotation_advanced.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/type_annotation_basic_functions.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/type_annotation_class_methods.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/type_annotation_complete_test.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/type_annotation_default_inference.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/type_annotation_default_minimal.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/type_annotation_minimal.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTests/very_simple_func_test.old8" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -747,7 +827,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="165" />
+    <option name="localTasksCounter" value="166" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -774,7 +854,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(compiler): 重构解释器接口和类型引用&#10;&#10;- 将 IMiniInterpreter 接口从 LocalManager.cs 分离到独立文件&#10;- 更新 LangInterpreter 类不再实现 IMiniInterpreter 接口&#10;- 修改 AnyLangValue.cs 和 Compiler.cs 中的接口引用为具体类型&#10;- 调整 LocalManager 和 VariateManager 中的解释器类型声明&#10;- 移除 CompilerTests.cs 中的模拟接口实现&#10;- 添加 IMiniInterpreter 接口设计优化计划文档&#10;- 统一编译器日志输出格式和调试信息处理逻辑&#10;- 优化异常处理中的堆栈跟踪和建议信息输出&#10;- 清理代码中的多余空行和格式问题" />
     <MESSAGE value="feat(interpreter): 重构 IMiniInterpreter 接口及其实现&#10;&#10;- 定义新的 IMiniInterpreter 接口，明确解释器核心功能&#10;- 优化 LangInterpreter 类以实现新接口&#10;- 统一输出提供者属性命名为 OutputProvider&#10;- 将 UseClass 属性重命名为 OutputProvider 以提高语义清晰度&#10;- 更新 Instance.cs 中的输出调用方式以使用新的 OutputProvider 属性&#10;- 修改测试用例以适应新的属性命名&#10;- 移除不再需要的 using 语句&#10;- 在文档中详细描述接口设计优化方案和实现步骤" />
     <MESSAGE value="feat(parser): 实现类、函数和表达式解析器&#10;&#10;- 添加 ClassParser 用于解析类声明、访问修饰符和类块&#10;- 实现 ExpressionParser 支持算术、逻辑、比较和三元表达式&#10;- 创建 FunctionParser 处理函数声明、参数列表和 Lambda 表达式&#10;- 新增 ParserBase 提供基础解析操作和错误处理&#10;- 引入 ParserContext 管理解析器共享状态&#10;- 添加 ExpectHelper 生成详细的语法错误消息&#10;- 实现 PrimaryParser 解析字面量、列表、字典等主表达式" />
     <MESSAGE value="refactor(parser): 重构解析器类以使用主构造函数&#10;&#10;- 将 ClassParser、ExpressionParser、FunctionParser、PrimaryParser 和 StatementParser&#10;  重构为使用主构造函数语法&#10;- 移除了不必要的 Error 命名空间引用&#10;- 更新了字段访问方式，使用构造函数参数直接调用&#10;- 简化了 ParserBase 的构造逻辑&#10;- 修改了表达式解析中的三元运算符错误处理逻辑&#10;- 优化了运算符匹配的模式匹配语法&#10;- 调整了源代码行分割逻辑以保留空行确保行号正确&#10;- 清理了测试文件中无用的命名空间引用&#10;- 删除了部分测试数据文件和语法测试文件中的冗余内容&#10;- 重命名了部分语法测试文件名称以保持一致性" />
@@ -799,7 +878,8 @@
     <MESSAGE value="refactor(compiler): 优化IL生成逻辑和类型检查&#10;&#10;- 移除未使用的命名空间引用&#10;- 简化条件判断逻辑，减少冗余代码&#10;- 合并重复的IL指令生成代码&#10;- 优化参数数量检查逻辑&#10;- 移除调试模式下的无效返回语句&#10;- 统一空值处理逻辑&#10;- 清理无用的换行和空格&#10;- 优化委托类型创建流程&#10;- 改进错误提示信息的准确性&#10;- 移除测试文件中的不必要引用" />
     <MESSAGE value="feat(parser): 实现in表达式解析并优化for-in循环检测&#10;&#10;- 在ExpressionParser中添加对in操作符的支持，使其能正确解析为二元表达式&#10;- 更新StatementParser中的for-in循环检测逻辑，确保准确区分in表达式与for-in语句&#10;- 在Operation类中实现in操作符的解释执行逻辑，支持数组、列表、字典和字符串类型&#10;- 实现in操作符的编译模式支持，生成对应的IL代码以调用集合的Contains方法&#10;- 添加全面的单元测试和集成测试，验证in表达式与for-in循环的正确解析和执行&#10;- 新增语法、解释和编译测试文件，覆盖in表达式的各种使用场景" />
     <MESSAGE value="feat(compiler): 实现编译模式下类型注解强制要求&#10;&#10;- 在编译模式下强制要求函数参数和返回值必须有类型注解&#10;- 强制要求Lambda表达式参数必须有类型注解&#10;- 添加类型注解验证逻辑，在IL生成前进行检查&#10;- 提供清晰的中文错误信息和修复建议&#10;- 更新语法文档和开发指南，说明编译模式与解释器模式的区别&#10;- 添加多个测试文件验证类型注解功能&#10;- 修复现有测试文件中的类型注解问题&#10;- 保持与解释器模式的向后兼容性" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 实现编译模式下类型注解强制要求&#10;&#10;- 在编译模式下强制要求函数参数和返回值必须有类型注解&#10;- 强制要求Lambda表达式参数必须有类型注解&#10;- 添加类型注解验证逻辑，在IL生成前进行检查&#10;- 提供清晰的中文错误信息和修复建议&#10;- 更新语法文档和开发指南，说明编译模式与解释器模式的区别&#10;- 添加多个测试文件验证类型注解功能&#10;- 修复现有测试文件中的类型注解问题&#10;- 保持与解释器模式的向后兼容性" />
+    <MESSAGE value="feat(compiler): 实现编译模式下函数参数默认值类型推断&#10;&#10;- 新增函数参数默认值自动推断类型功能&#10;- 更新类型验证逻辑，允许通过默认值推断参数类型&#10;- 改进错误信息，提供两种参数类型满足方式&#10;- 添加对整数、浮点数、字符串、布尔值等默认值的类型推断&#10;- 支持混合使用显式类型注解和默认值推断&#10;- 保持与解释器模式和现有代码的向后兼容性&#10;- 更新语法文档和开发指南说明新功能&#10;- 添加多个测试用例验证默认参数类型推断行为&#10;- 修复编译模式下参数类型检查的IL生成问题" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 实现编译模式下函数参数默认值类型推断&#10;&#10;- 新增函数参数默认值自动推断类型功能&#10;- 更新类型验证逻辑，允许通过默认值推断参数类型&#10;- 改进错误信息，提供两种参数类型满足方式&#10;- 添加对整数、浮点数、字符串、布尔值等默认值的类型推断&#10;- 支持混合使用显式类型注解和默认值推断&#10;- 保持与解释器模式和现有代码的向后兼容性&#10;- 更新语法文档和开发指南说明新功能&#10;- 添加多个测试用例验证默认参数类型推断行为&#10;- 修复编译模式下参数类型检查的IL生成问题" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -1,5 +1,0 @@
-// 最简单的数组访问测试
-array <- [10, 20, 30]
-PrintLine("数组: " + array)
-element <- array[0]
-PrintLine("array[0] = " + element)

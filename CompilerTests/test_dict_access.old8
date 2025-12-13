@@ -1,9 +1,0 @@
-// 测试字典访问
-PrintLine("=== 字典索引访问 ===")
-dict <- {"name": "Alice", "age": 30}
-PrintLine("字典: " + dict)
-nameValue <- dict["name"]
-PrintLine("dict[\"name\"] = " + nameValue)
-dict["age"] <- 31
-PrintLine("修改后 dict[\"age\"] = " + dict["age"])
-PrintLine("✅ 测试完成")

@@ -1,8 +1,0 @@
-// 测试init方法是否被调用
-class Person {
-    func init(name) {
-        PrintLine("init called with name: " + name)
-    }
-}
-
-person <- Person("Bob")

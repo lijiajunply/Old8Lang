@@ -1,9 +1,0 @@
-// 测试字典遍历
-PrintLine("测试字典遍历")
-
-dict <- {"a": 1, "b": 2}
-for key in dict {
-    PrintLine(key)
-}
-
-PrintLine("完成")

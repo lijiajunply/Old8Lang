@@ -1,5 +1,0 @@
-// 测试基本算术运算
-x <- 4
-y <- 5
-result <- x * y
-PrintLine(result)

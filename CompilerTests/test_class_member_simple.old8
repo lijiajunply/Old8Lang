@@ -1,7 +1,0 @@
-// 最简单的类成员访问测试
-class Person {
-    name <- "Alice"
-}
-
-person <- Person()
-PrintLine("person.name = " + person.name)

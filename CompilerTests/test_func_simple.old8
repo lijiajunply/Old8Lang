@@ -1,7 +1,0 @@
-// 测试普通函数
-func add(a, b) {
-    return a + b
-}
-
-result <- add(1, 2)
-PrintLine("Result: " + result)

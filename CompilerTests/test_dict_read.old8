@@ -1,4 +1,0 @@
-// 测试字典读取
-dict <- {"name": "Alice"}
-value <- dict["name"]
-PrintLine("value = " + value)

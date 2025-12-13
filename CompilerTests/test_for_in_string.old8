@@ -1,9 +1,0 @@
-// 测试字符串遍历
-PrintLine("测试字符串遍历")
-
-str <- "hello"
-for char in str {
-    PrintLine(char)
-}
-
-PrintLine("完成")
