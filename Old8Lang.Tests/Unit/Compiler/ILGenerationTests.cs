@@ -6,7 +6,7 @@ namespace Old8Lang.Tests.Unit.Compiler;
 /// IL生成模块单元测试
 /// </summary>
 [Collection("Sequential")]
-public class ILGenerationTests
+public class IlGenerationTests
 {
     /// <summary>
     /// 测试BlockStatement的IL生成
@@ -173,7 +173,7 @@ public class ILGenerationTests
     {
         // Arrange
         var code = @"
-            func test_return() {
+            func test_return() -> int {
                 a <- 123
                 return a
             }
@@ -218,7 +218,7 @@ public class ILGenerationTests
     {
         // Arrange
         var code = """
-                               func add(a, b) {
+                               func add:int(a:int, b:int) {
                                    return a + b
                                }
                                result <- add(10, 20)
@@ -241,6 +241,7 @@ public class ILGenerationTests
     {
         // Arrange
         var code = @"
+            a <- 1
             try {
                 a <- 10 / 0
             } catch {
@@ -266,15 +267,15 @@ public class ILGenerationTests
         // Arrange
         var code = @"
             class TestClass {
-                func init() {
+                func init() -> void {
                     this.value <- 0
                 }
-                
-                func get_value() {
+
+                func get_value() -> int {
                     return this.value
                 }
             }
-            
+
             obj <- TestClass()
             result <- obj.get_value()
         ";
@@ -298,7 +299,7 @@ public class ILGenerationTests
         // 简化lambda表达式测试，使用基本函数替代lambda表达式
         // 因为lambda表达式的IL生成可能存在问题
         var code = @"
-            func add(a, b) {
+            func add:int(a:int, b:int) {
                 return a + b
             }
             result <- add(10, 20)

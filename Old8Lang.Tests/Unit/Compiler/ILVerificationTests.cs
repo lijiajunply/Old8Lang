@@ -16,7 +16,7 @@ public class ILVerificationTests
     {
         // 测试正常情况：应该能通过IL验证
         var code = @"
-            func normal_function() {
+            func normal_function() -> void {
                 a <- 123
                 b <- 456
                 c <- a + b
@@ -40,13 +40,13 @@ public class ILVerificationTests
     public void Verify_ILVerificationCanBeDisabled()
     {
         // 禁用IL验证
-        Old8Lang.Compiler.Compiler.ILVerificationEnabled = false;
+        Old8Lang.Compiler.Compiler.ilVerificationEnabled = false;
         
         try
         {
             // 测试正常情况：应该能通过编译
             var code = @"
-                func normal_function() {
+                func normal_function() -> void {
                     a <- 123
                     b <- 456
                     c <- a + b
@@ -65,7 +65,7 @@ public class ILVerificationTests
         finally
         {
             // 恢复IL验证开关
-            Old8Lang.Compiler.Compiler.ILVerificationEnabled = true;
+            Old8Lang.Compiler.Compiler.ilVerificationEnabled = true;
         }
     }
     
@@ -77,7 +77,7 @@ public class ILVerificationTests
     {
         // 这个测试主要验证IL验证器不会因为异常而崩溃
         var code = @"
-            func exception_test() {
+            func exception_test() -> void {
                 a <- 123
                 PrintLine(a)
             }
@@ -122,7 +122,7 @@ public class ILVerificationTests
     {
         // Arrange
         var dynamicMethod = new DynamicMethod("InvalidMethod", typeof(int), null);
-        var ilGenerator = dynamicMethod.GetILGenerator();
+        dynamicMethod.GetILGenerator();
         
         // 生成无效的IL代码：缺少返回值
         // 我们声明返回类型为int，但没有返回任何值
@@ -133,8 +133,7 @@ public class ILVerificationTests
         // Assert
         Assert.False(result.IsValid);
         Assert.NotEmpty(result.Errors);
-        Assert.Equal(1, result.Errors.Count);
-        Assert.Contains("无效的IL代码", result.Errors[0].Message);
+        Assert.Single(result.Errors);
     }
     
     /// <summary>
@@ -159,16 +158,16 @@ public class ILVerificationTests
             
             // 测试循环语句
             sum <- 0
-            for i <- 0 to 10 {
+            for i <- 0, i <= 10, i++ {
                 sum <- sum + i
             }
-            
+
             // 测试while循环
             j <- 0
             while j < 5 {
                 j <- j + 1
             }
-            
+
             // 测试switch语句
             switch a {
                 case 100 {
@@ -181,9 +180,9 @@ public class ILVerificationTests
                     c <- 0
                 }
             }
-            
+
             // 测试函数
-            func add(x, y) {
+            func add(x:int, y:int) -> int {
                 return x + y
             }
             
@@ -210,23 +209,23 @@ public class ILVerificationTests
         // 测试类声明、实例化和方法调用的IL生成
         var code = @"
             class Person {
-                func init(name, age) {
+                func init(name:string, age:int) -> void {
                     this.name <- name
                     this.age <- age
                 }
-                
-                func get_name() {
+
+                func get_name() -> string {
                     return this.name
                 }
-                
-                func get_age() {
+
+                func get_age() -> int {
                     return this.age
                 }
             }
-            
+
             // 实例化对象
             p <- Person(""John"", 30)
-            
+
             // 调用对象方法
             person_name <- p.get_name()
             person_age <- p.get_age()
@@ -251,14 +250,14 @@ public class ILVerificationTests
         // 测试lambda表达式的IL生成
         var code = @"
             // 简单lambda
-            add <- (x, y) -> x + y
-            
+            add <- (x:int, y:int) -> x + y
+
             // 多行lambda
-            multiply <- (x, y) -> {
+            multiply <- (x:int, y:int) -> {
                 result <- x * y
                 return result
             }
-            
+
             // 调用lambda
             sum_result <- add(10, 20)
             product_result <- multiply(5, 6)

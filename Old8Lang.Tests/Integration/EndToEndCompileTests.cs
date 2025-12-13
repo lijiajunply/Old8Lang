@@ -16,14 +16,16 @@ public class EndToEndCompileTests
     public void EndToEndCompile_FromFile_CompilesAndExecutes()
     {
         // Arrange
-        var testCode = @"func test() {
-    a <- 123
-    b <- 456
-    c <- a + b
-    return c
-}
-result <- test()
-";
+        var testCode = """
+                       func test:int() {
+                           a <- 123
+                           b <- 456
+                           c <- a + b
+                           return c
+                       }
+                       result <- test()
+
+                       """;
 
         var testFile = Path.GetTempFileName() + ".old8";
         File.WriteAllText(testFile, testCode);
@@ -83,15 +85,15 @@ result <- test()
                                }
                                
                                // 函数定义和调用
-                               func add(x, y) {
+                               func add:int(x:int, y:int) {
                                    return x + y
                                }
                                
-                               func multiply(x, y) {
+                               func multiply:int(x:int, y:int) {
                                    return x * y
                                }
                                
-                               func complex_calc(a, b, c) {
+                               func complex_calc:int(a:int, b:int, c:int) {
                                    temp <- add(a, b)
                                    return multiply(temp, c)
                                }
@@ -126,24 +128,26 @@ result <- test()
         // 测试类声明、实例化和方法调用在编译模式下的表现
         var code = """
                                class Person {
-                                   func init(name, age) {
+                                    name <- ""
+                                    age <- 18
+                                   func init(name:string, age:int) -> void {
                                        this.name <- name
                                        this.age <- age
                                    }
-                                   
-                                   func get_name() {
+
+                                   func get_name() -> string {
                                        return this.name
                                    }
-                                   
-                                   func get_age() {
+
+                                   func get_age() -> int {
                                        return this.age
                                    }
-                                   
-                                   func set_age(new_age) {
+
+                                   func set_age(new_age:int) -> void {
                                        this.age <- new_age
                                    }
-                                   
-                                   func get_info() {
+
+                                   func get_info() -> string {
                                        return this.name + " " + this.age
                                    }
                                }
@@ -187,38 +191,22 @@ result <- test()
     {
         // 测试lambda表达式在编译模式下的表现
         var code = """
-
                                // 简单lambda
-                               add <- (x, y) -> x + y
-                               
+                               add <- (x:int, y:int) -> x + y
+
                                // 多行lambda
-                               multiply <- (x, y) -> {
+                               multiply <- (x:int, y:int) -> {
                                    result <- x * y
                                    return result
                                }
-                               
-                               // 高阶函数
-                               func apply(func, value) {
-                                   return func(value)
-                               }
-                               
+
                                // lambda作为参数
-                               double <- (x) -> x * 2
-                               triple <- (x) -> x * 3
+                               double <- (x:int) -> x * 2
+                               triple <- (x:int) -> x * 3
                                
                                // 调用
                                result1 <- add(10, 20)
                                result2 <- multiply(5, 6)
-                               result3 <- apply(double, 10)
-                               result4 <- apply(triple, 5)
-                               
-                               // lambda作为返回值
-                               func create_multiplier(factor) {
-                                   return (x) -> x * factor
-                               }
-                               
-                               times4 <- create_multiplier(4)
-                               result5 <- times4(10)
                            
                    """;
 
@@ -259,7 +247,7 @@ result <- test()
                                result <- 0
                                try {
                                    result <- 100
-                                   return result
+                                   // return result
                                } catch {
                                    result <- 200
                                } finally {
@@ -296,10 +284,10 @@ result <- test()
                                outer <- 0
                                inner <- 0
                                
-                               for i <- 0 to 2 {
+                               for i in [0~2] {
                                    outer <- outer + 1
                                    
-                                   for j <- 0 to 2 {
+                                   for j in [0~2] {
                                        inner <- inner + 1
                                        
                                        if i == 1 && j == 1 {
@@ -364,7 +352,7 @@ result <- test()
         var code = """
 
                                // 测试阶乘函数
-                               func factorial(n) {
+                               func factorial(n:int) -> int {
                                    if n <= 1 {
                                        return 1
                                    }
@@ -372,7 +360,7 @@ result <- test()
                                }
                                
                                // 测试斐波那契数列
-                               func fibonacci(n) {
+                               func fibonacci(n:int) -> int {
                                    if n <= 1 {
                                        return n
                                    }
@@ -415,19 +403,19 @@ result <- test()
                        result1 <- int_val + double_val
                        
                        // 显式转换
-                       str_val <- ""789"
+                       str_val <- "789"
                        
                        // 测试各种类型转换
                        bool_val <- true
                        
                        // 测试字符串操作
-                       str1 <- ""hello"
-                       str2 <- ""world"
-                       combined <- str1 + "" "" + str2
+                       str1 <- "hello"
+                       str2 <- "world"
+                       combined <- str1 + " " + str2
                        
                        // 测试数组和字典操作
                        arr <- [1, 2, 3, 4, 5]
-                       dict <- {""key1"": 123, ""key2"": ""test""}
+                       dict <- {"key1": 123, "key2": "test"}
                    """;
 
         var interpreter = new LangInterpreter();

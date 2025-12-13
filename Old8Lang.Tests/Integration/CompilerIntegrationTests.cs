@@ -59,7 +59,7 @@ public class CompilerIntegrationTests
     {
         // 测试函数声明的 IL 生成
         var code = @"
-            func add(x, y) {
+            func add(x:int, y:int) -> int {
                 return x + y
             }
         ";
@@ -81,7 +81,7 @@ public class CompilerIntegrationTests
         // 测试函数调用的 IL 生成 - 简化版本
         // 注意:完整的函数调用测试在编译器模式下可能有 bug,这里仅测试编译不抛出异常
         var code = @"
-            func multiply(x, y) {
+            func multiply(x:int, y:int) -> int {
                 return x * y
             }
         ";
@@ -207,7 +207,7 @@ public class CompilerIntegrationTests
     {
         // 测试局部变量管理
         var code = @"
-            func testLocals() {
+            func testLocals() -> int {
                 local1 <- 100
                 local2 <- 200
                 local3 <- local1 + local2

@@ -139,7 +139,8 @@ public class DictionaryLangValue : LangValueType, ILangList
 
     public bool In(LangValueType value)
     {
-        return Value.Any(x => x.Value.Equal(value));
+        // 检查键是否存在（与编译模式的ContainsKey行为一致）
+        return Value.Any(x => x.Key.Equal(value));
     }
 
     public override string ToString()
