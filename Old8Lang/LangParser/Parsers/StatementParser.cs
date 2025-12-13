@@ -673,7 +673,7 @@ public class StatementParser(
 
     /// <summary>
     /// importStatement = "import" ( importSpecifier "from" )? ( identifier | STRING ) ;
-    /// importSpecifier = "{" importItem ( "," importItem )* "}" | identifier;
+    /// importSpecifier = "{" importItem ( "," importItem )* "}";
     /// importItem = identifier ( "as" identifier )?;
     /// </summary>
     /// <returns>引入模块</returns>
@@ -684,7 +684,6 @@ public class StatementParser(
         Expect(LangTokenType.Import);
         
         List<ImportItem>? importSpecifiers = null;
-        string? defaultImport = null;
         bool fromClause = false;
         string moduleName;
         
@@ -733,42 +732,9 @@ public class StatementParser(
         }
         else if (CurrentToken.Type == LangTokenType.Identifier)
         {
-            // 检查是否是默认导入：import module as alias
-            string firstIdentifier = CurrentToken.Value;
-            CurrentIndex++;
-            
-            if (CurrentToken.Type == LangTokenType.As)
-            {
-                // 解析默认导入：import module as alias
-                Expect(LangTokenType.As);
-                defaultImport = CurrentToken.Value;
-                Expect(LangTokenType.Identifier);
-                moduleName = firstIdentifier;
-            }
-            else if (CurrentToken.Type == LangTokenType.From)
-            {
-                // 解析默认导入：import module from "module"
-                defaultImport = firstIdentifier;
-                fromClause = true;
-                Expect(LangTokenType.From);
-                
-                // 解析模块名
-                if (CurrentToken.Type == LangTokenType.String)
-                {
-                    moduleName = CurrentToken.Value;
-                    Expect(LangTokenType.String);
-                }
-                else
-                {
-                    moduleName = CurrentToken.Value;
-                    Expect(LangTokenType.Identifier);
-                }
-            }
-            else
-            {
-                // 传统导入：import module
-                moduleName = firstIdentifier;
-            }
+            // 传统导入：import module
+            moduleName = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
         }
         else if (CurrentToken.Type == LangTokenType.String)
         {
@@ -781,7 +747,7 @@ public class StatementParser(
             throw CreateSyntaxError("Expected identifier, string, or left brace after import");
         }
         
-        return new ImportStatement(moduleName, position, importSpecifiers, defaultImport, fromClause);
+        return new ImportStatement(moduleName, position, importSpecifiers, fromClause);
     }
 
     /// <summary>

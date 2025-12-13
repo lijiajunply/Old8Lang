@@ -7,15 +7,14 @@ namespace Old8Lang.AST.Statement;
 
 public class ImportItem(string name, string? alias = null)
 {
-    public string Name = name;
-    public string Alias = alias ?? name;
+    public readonly string Name = name;
+    public readonly string Alias = alias ?? name;
 }
 
 public class ImportStatement(
     string importString,
     SourcePosition position = default,
     List<ImportItem>? importSpecifiers = null,
-    string? defaultImport = null,
     bool fromClause = false
 ) : OldStatement(position)
 {
@@ -23,20 +22,7 @@ public class ImportStatement(
 
     public override void Run(VariateManager manager)
     {
-        string moduleName;
-
-        if (fromClause)
-        {
-            moduleName = importString;
-        }
-        else if (!string.IsNullOrEmpty(defaultImport))
-        {
-            moduleName = importString;
-        }
-        else
-        {
-            moduleName = importString;
-        }
+        var moduleName = importString;
 
         if (manager.LangInfo!.LibInfos.Any(x => moduleName == x.LibName))
         {
@@ -79,9 +65,9 @@ public class ImportStatement(
             var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
             var a = manager.Interpreter.Build(code: code);
 
-            if (fromClause || !string.IsNullOrEmpty(defaultImport))
+            if (fromClause)
             {
-                // 对于命名导入和默认导入，我们需要先执行导入，然后根据需要获取指定的变量
+                // 对于命名导入，我们需要先执行导入，然后根据需要获取指定的变量
                 // 暂时先导入所有内容，后续可以优化为只导入指定的变量
                 a.ImportRun(manager);
             }
@@ -141,9 +127,9 @@ public class ImportStatement(
         manager.Path = filePath;
         var result = manager.Interpreter.Build(code: Apis.FromFile(filePath));
 
-        if (fromClause || defaultImport != null)
+        if (fromClause)
         {
-            // 对于命名导入和默认导入，我们需要先执行导入，然后根据需要获取指定的变量
+            // 对于命名导入，我们需要先执行导入，然后根据需要获取指定的变量
             // 暂时先导入所有内容，后续可以优化为只导入指定的变量
             result.ImportRun(manager);
         }
@@ -158,15 +144,7 @@ public class ImportStatement(
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        string moduleName;
-        if (fromClause || defaultImport != null)
-        {
-            moduleName = importString;
-        }
-        else
-        {
-            moduleName = importString;
-        }
+        string moduleName = importString;
 
         var langInfo = Apis.ReadJson();
         if (langInfo.LibInfos.Any(x => moduleName == x.LibName))
@@ -219,11 +197,6 @@ public class ImportStatement(
 
     public override string ToString()
     {
-        if (defaultImport != null)
-        {
-            return $"import {defaultImport} from {importString}";
-        }
-
         if (ImportSpecifiers.Count > 0)
         {
             var specifiers = string.Join(", ",
