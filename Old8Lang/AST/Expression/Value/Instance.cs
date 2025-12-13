@@ -41,6 +41,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 manager.Interpreter.OutputProvider.WriteLine(manager.ToString());
                 return new VoidLangValue();
 #endif
+                return new VoidLangValue();
             }
             case "Json" or "json":
             {

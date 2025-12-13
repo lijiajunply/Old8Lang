@@ -10,7 +10,8 @@ public class WebSocketClient : IDisposable
     private ClientWebSocket _client;
     private readonly string _url;
     private bool _isConnected;
-    private Action<string>? _messageReceivedHandler;
+    private Action<string>? _textMessageReceivedHandler;
+    private Action<byte[]>? _binaryMessageReceivedHandler;
     private Action<string>? _connectedHandler;
     private Action<string>? _disconnectedHandler;
     private Action<Exception>? _errorHandler;
@@ -68,6 +69,7 @@ public class WebSocketClient : IDisposable
     {
         var buffer = new byte[1024 * 4];
         var segment = new ArraySegment<byte>(buffer);
+        var messageBytes = new List<byte>();
 
         try
         {
@@ -85,8 +87,28 @@ public class WebSocketClient : IDisposable
 
                 if (result.Count > 0)
                 {
-                    var message = System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count);
-                    _messageReceivedHandler?.Invoke(message);
+                    // 收集消息数据
+                    messageBytes.AddRange(segment.Take(result.Count));
+                    
+                    // 如果是消息的最后一部分，处理消息
+                    if (result.EndOfMessage)
+                    {
+                        if (result.MessageType == WebSocketMessageType.Text)
+                        {
+                            // 处理文本消息
+                            var message = System.Text.Encoding.UTF8.GetString(messageBytes.ToArray());
+                            _textMessageReceivedHandler?.Invoke(message);
+                        }
+                        else if (result.MessageType == WebSocketMessageType.Binary)
+                        {
+                            // 处理二进制消息
+                            var binaryData = messageBytes.ToArray();
+                            _binaryMessageReceivedHandler?.Invoke(binaryData);
+                        }
+                        
+                        // 重置消息缓冲区
+                        messageBytes.Clear();
+                    }
                 }
             }
         }
@@ -118,6 +140,25 @@ public class WebSocketClient : IDisposable
     }
 
     /// <summary>
+    /// 发送二进制消息
+    /// </summary>
+    public async Task SendBinaryAsync(byte[] data)
+    {
+        if (!_isConnected || _client.State != WebSocketState.Open)
+        {
+            throw new InvalidOperationException("WebSocket client is not connected");
+        }
+        
+        if (data == null)
+        {
+            throw new ArgumentNullException(nameof(data), "二进制数据不能为空");
+        }
+
+        var segment = new ArraySegment<byte>(data);
+        await _client.SendAsync(segment, WebSocketMessageType.Binary, true, _cts!.Token);
+    }
+
+    /// <summary>
     /// 断开连接
     /// </summary>
     public async Task DisconnectAsync()
@@ -137,11 +178,27 @@ public class WebSocketClient : IDisposable
     }
 
     /// <summary>
-    /// 设置消息接收事件处理程序
+    /// 设置文本消息接收事件处理程序
+    /// </summary>
+    public void SetTextMessageReceivedHandler(Action<string> handler)
+    {
+        _textMessageReceivedHandler = handler;
+    }
+    
+    /// <summary>
+    /// 设置二进制消息接收事件处理程序
+    /// </summary>
+    public void SetBinaryMessageReceivedHandler(Action<byte[]> handler)
+    {
+        _binaryMessageReceivedHandler = handler;
+    }
+    
+    /// <summary>
+    /// 设置消息接收事件处理程序（兼容旧版本）
     /// </summary>
     public void SetMessageReceivedHandler(Action<string> handler)
     {
-        _messageReceivedHandler = handler;
+        _textMessageReceivedHandler = handler;
     }
 
     /// <summary>

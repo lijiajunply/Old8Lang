@@ -1,3 +1,6 @@
+using System.IO;
+using System.Net.Http.Headers;
+
 namespace Old8Lang.NetLib;
 
 /// <summary>
@@ -71,6 +74,174 @@ public class HttpClient : IDisposable
     public async Task<HttpResponse> DeleteAsync(string url)
     {
         return await SendAsync(HttpMethod.Delete, url, null, null);
+    }
+
+    /// <summary>
+    /// 下载文件到本地路径
+    /// </summary>
+    /// <param name="url">文件URL</param>
+    /// <param name="localPath">本地保存路径</param>
+    /// <returns>HTTP响应</returns>
+    public async Task<HttpResponse> DownloadFileAsync(string url, string localPath)
+    {
+        if (string.IsNullOrEmpty(localPath))
+        {
+            throw new ArgumentNullException(nameof(localPath), "本地路径不能为空");
+        }
+
+        using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url))
+        {
+            // 添加默认请求头
+            foreach (var header in _defaultHeaders)
+            {
+                request.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            }
+
+            // 发送请求
+            var response = await _client.SendAsync(request);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                // 确保目录存在
+                var directory = Path.GetDirectoryName(localPath);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+                
+                // 下载文件
+                using (var fileStream = new FileStream(localPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    await response.Content.CopyToAsync(fileStream);
+                }
+            }
+
+            // 构建响应对象
+            return new HttpResponse
+            {
+                StatusCode = (int)response.StatusCode,
+                Content = response.IsSuccessStatusCode ? "File downloaded successfully" : await response.Content.ReadAsStringAsync(),
+                Headers = response.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value)),
+                IsSuccessStatusCode = response.IsSuccessStatusCode
+            };
+        }
+    }
+
+    /// <summary>
+    /// 上传单个文件
+    /// </summary>
+    /// <param name="url">目标URL</param>
+    /// <param name="filePath">本地文件路径</param>
+    /// <param name="parameterName">表单参数名，默认为"file"</param>
+    /// <param name="fileName">上传后的文件名，默认为原文件名</param>
+    /// <param name="additionalFields">额外的表单字段</param>
+    /// <returns>HTTP响应</returns>
+    public async Task<HttpResponse> UploadFileAsync(string url, string filePath, string parameterName = "file", string? fileName = null, Dictionary<string, string>? additionalFields = null)
+    {
+        if (!File.Exists(filePath))
+        {
+            throw new FileNotFoundException($"文件不存在: '{filePath}'", filePath);
+        }
+
+        // 使用MultipartFormDataContent上传文件
+        using (var content = new MultipartFormDataContent())
+        {
+            // 添加额外的表单字段
+            if (additionalFields != null)
+            {
+                foreach (var field in additionalFields)
+                {
+                    content.Add(new StringContent(field.Value), field.Key);
+                }
+            }
+
+            // 添加文件内容
+            var fileContent = new StreamContent(File.OpenRead(filePath));
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            
+            var uploadFileName = string.IsNullOrEmpty(fileName) ? Path.GetFileName(filePath) : fileName;
+            content.Add(fileContent, parameterName, uploadFileName);
+
+            return await SendRequestWithContentAsync(HttpMethod.Post, url, content);
+        }
+    }
+
+    /// <summary>
+    /// 上传多个文件
+    /// </summary>
+    /// <param name="url">目标URL</param>
+    /// <param name="filePaths">本地文件路径列表</param>
+    /// <param name="parameterName">表单参数名，默认为"files"</param>
+    /// <param name="additionalFields">额外的表单字段</param>
+    /// <returns>HTTP响应</returns>
+    public async Task<HttpResponse> UploadFilesAsync(string url, IEnumerable<string> filePaths, string parameterName = "files", Dictionary<string, string>? additionalFields = null)
+    {
+        if (filePaths == null || !filePaths.Any())
+        {
+            throw new ArgumentException("文件路径列表不能为空", nameof(filePaths));
+        }
+
+        // 检查所有文件是否存在
+        foreach (var filePath in filePaths)
+        {
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"文件不存在: '{filePath}'", filePath);
+            }
+        }
+
+        // 使用MultipartFormDataContent上传文件
+        using (var content = new MultipartFormDataContent())
+        {
+            // 添加额外的表单字段
+            if (additionalFields != null)
+            {
+                foreach (var field in additionalFields)
+                {
+                    content.Add(new StringContent(field.Value), field.Key);
+                }
+            }
+
+            // 添加多个文件
+            foreach (var filePath in filePaths)
+            {
+                var fileContent = new StreamContent(File.OpenRead(filePath));
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                content.Add(fileContent, parameterName, Path.GetFileName(filePath));
+            }
+
+            return await SendRequestWithContentAsync(HttpMethod.Post, url, content);
+        }
+    }
+
+    /// <summary>
+    /// 发送带内容的请求
+    /// </summary>
+    private async Task<HttpResponse> SendRequestWithContentAsync(HttpMethod method, string url, HttpContent content)
+    {
+        using (HttpRequestMessage request = new HttpRequestMessage(method, url))
+        {
+            // 添加默认请求头
+            foreach (var header in _defaultHeaders)
+            {
+                request.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            }
+
+            // 设置请求内容
+            request.Content = content;
+
+            // 发送请求
+            var response = await _client.SendAsync(request);
+
+            // 构建响应对象
+            return new HttpResponse
+            {
+                StatusCode = (int)response.StatusCode,
+                Content = await response.Content.ReadAsStringAsync(),
+                Headers = response.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value)),
+                IsSuccessStatusCode = response.IsSuccessStatusCode
+            };
+        }
     }
 
     /// <summary>

@@ -34,11 +34,12 @@ public static class FileLib
 
     public static void UnpackZip(string zipPath, string newPath)
     {
-        if (!File.Exists(newPath))
+        if (!File.Exists(zipPath))
         {
-            throw new FileNotFoundException($"ZIP文件不存在: '{newPath}'", newPath);
+            throw new FileNotFoundException($"ZIP文件不存在: '{zipPath}'", zipPath);
         }
-        ZipFile.ExtractToDirectory(newPath, zipPath, Encoding.UTF8, true);
+        Directory.CreateDirectory(newPath);
+        ZipFile.ExtractToDirectory(zipPath, newPath, Encoding.UTF8, true);
     }
 
     public static void CompressZip(string filePath, string zipPath)
