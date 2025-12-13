@@ -1,6 +1,5 @@
 using Old8Lang.Error;
 using Old8Lang.LangParser;
-using Xunit;
 
 namespace Old8Lang.Tests.Unit;
 

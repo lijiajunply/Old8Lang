@@ -284,6 +284,13 @@ public class Operation(
                     return new BoolLangValue(leftResult.LessEqual(rightResult));
                 case LangTokenType.GreaterThanEquals:
                     return new BoolLangValue(leftResult.GreaterEqual(rightResult));
+                case LangTokenType.In:
+                    // 处理 in 操作符：检查左侧值是否存在于右侧集合中
+                    if (rightResult is ILangList list)
+                    {
+                        return new BoolLangValue(list.In(leftResult));
+                    }
+                    throw new InvalidOperationError(this, "in 操作符右侧必须是集合类型");
                 // r (+-*/%) l
                 case LangTokenType.Plus:
                     return leftResult.Plus(rightResult);
@@ -781,6 +788,73 @@ public class Operation(
                 ilGenerator.Emit(OpCodes.Ldc_I4_1);
                 ilGenerator.Emit(OpCodes.Xor);
                 return typeof(bool);
+            case LangTokenType.In:
+            {
+                // 处理 in 操作符：left in right
+                // 加载左侧值
+                Left!.LoadIlValue(ilGenerator, local);
+                // 加载右侧集合
+                Right!.LoadIlValue(ilGenerator, local);
+                
+                // 处理不同类型的集合
+                if (rightType!.IsGenericType && rightType.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    // 调用 List<T>.Contains(T) 方法
+                    var containsMethod = rightType.GetMethod("Contains", [rightType.GetGenericArguments()[0]])!;
+                    ilGenerator.Emit(OpCodes.Callvirt, containsMethod);
+                }
+                else if (rightType.IsArray)
+                {
+                    // 调用 Array.IndexOf(array, value) 方法，然后检查结果是否 >= 0
+                    var indexOfMethod = typeof(Array).GetMethod("IndexOf", [rightType, rightType.GetElementType()])!;
+                    ilGenerator.Emit(OpCodes.Call, indexOfMethod);
+                    ilGenerator.Emit(OpCodes.Ldc_I4_0);
+                    ilGenerator.Emit(OpCodes.Clt);
+                    ilGenerator.Emit(OpCodes.Ldc_I4_1);
+                    ilGenerator.Emit(OpCodes.Xor);
+                }
+                else if (rightType.IsGenericType && rightType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                {
+                    // 调用 Dictionary<TKey, TValue>.ContainsKey(TKey) 方法
+                    var containsMethod = rightType.GetMethod("ContainsKey", [rightType.GetGenericArguments()[0]])!;
+                    ilGenerator.Emit(OpCodes.Callvirt, containsMethod);
+                }
+                else
+                {
+                    // 默认情况，尝试调用 Contains 方法，参数类型为 object
+                    var containsMethod = rightType.GetMethod("Contains", [typeof(object)]);
+                    if (containsMethod != null)
+                    {
+                        ilGenerator.Emit(containsMethod.IsStatic ? OpCodes.Call : OpCodes.Callvirt, containsMethod);
+                    }
+                    else
+                    {
+                        // 尝试调用 Contains 方法，参数类型为左侧值的类型
+                        var leftOperandType = Left?.OutputType(local);
+                        containsMethod = rightType.GetMethod("Contains", [leftOperandType!]);
+                        if (containsMethod != null)
+                        {
+                            ilGenerator.Emit(containsMethod.IsStatic ? OpCodes.Call : OpCodes.Callvirt, containsMethod);
+                        }
+                        else
+                        {
+                            // 对于字符串类型，特殊处理
+                            if (rightType == typeof(string))
+                            {
+                                // 调用 string.Contains(string) 方法
+                                var stringContainsMethod = typeof(string).GetMethod("Contains", [typeof(string)])!;
+                                ilGenerator.Emit(OpCodes.Callvirt, stringContainsMethod);
+                            }
+                            else
+                            {
+                                // 如果没有 Contains 方法，抛出异常
+                                throw new InvalidOperationError(this, $"类型 {rightType.Name} 不支持 in 操作符");
+                            }
+                        }
+                    }
+                }
+                return typeof(bool);
+            }
             case LangTokenType.As:
             {
                 // 处理类型转换操作：left as right

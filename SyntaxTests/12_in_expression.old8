@@ -1,0 +1,32 @@
+// 测试in表达式和for-in循环的语法正确性
+
+// 这是in表达式
+result1 <- 1 in [1, 2, 3]
+result2 <- "test" in {"test": 123}
+result3 <- 5 in list[4, 5, 6]
+
+// 这是for-in循环
+for item in [1, 2, 3] {
+    // 循环体
+}
+
+for key, value in {"a": 1, "b": 2} {
+    // 循环体
+}
+
+// 复杂表达式中的in表达式
+if 1 in [1, 2, 3] and "name" in {"name": "test"} {
+    // 条件体
+}
+
+// in表达式作为三元表达式的条件
+result4 <- (2 in [1, 2, 3]) ? "存在" : "不存在"
+
+// 确保语法解析器不会将in表达式误识别为for-in循环
+// 以下代码应该被解析为：for循环，而不是for-in循环
+for i <- 0, i < 5, i++ {
+    // 循环体
+}
+
+// 以下代码应该被解析为：in表达式赋值，而不是for-in循环
+value <- 1 in [1, 2, 3]

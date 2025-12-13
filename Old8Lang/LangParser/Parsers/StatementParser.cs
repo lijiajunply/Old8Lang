@@ -85,14 +85,12 @@ public class StatementParser(
         // 处理循环语句 For 和 For in
         if (CurrentToken.Type == LangTokenType.For)
         {
-            // 检查是否是 for-in 语句，支持 key, value in dict 格式
-            // 需要查找 "in" 关键字的位置
-            // 限制前瞻深度，避免扫描过多 token（for-in 语句中 'in' 通常在前20个token内）
-            const int maxLookahead = 20;
-
+            // 检查是否是 for-in 语句，格式为：for 标识符 (, 标识符)* in 表达式
+            // 需要确保 "in" 关键字前面只有标识符和逗号
             var tempIndex = CurrentIndex + 1;
             var foundIn = false;
-            var scanLimit = Math.Min(tempIndex + maxLookahead, Tokens.Count);
+            var inPosition = 0;
+            var scanLimit = Math.Min(tempIndex + 20, Tokens.Count); // 限制前瞻深度
 
             // 跳过所有标识符和逗号，查找 "in" 关键字
             while (tempIndex < scanLimit)
@@ -101,6 +99,7 @@ public class StatementParser(
                 if (token.Type == LangTokenType.In)
                 {
                     foundIn = true;
+                    inPosition = tempIndex;
                     break;
                 }
 
@@ -113,15 +112,14 @@ public class StatementParser(
                 tempIndex++;
             }
 
+            // 只有当 "in" 关键字前面只有标识符和逗号时，才是 for-in 语句
             if (foundIn)
             {
                 return ParseForInStatement();
             }
 
-            if (Peek().Type == LangTokenType.Identifier || Peek().Type == LangTokenType.Assignment)
-            {
-                return ParseForStatement();
-            }
+            // 解析普通 for 循环
+            return ParseForStatement();
         }
 
         if (CurrentToken.Type == LangTokenType.While)

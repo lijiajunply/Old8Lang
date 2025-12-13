@@ -17,23 +17,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/编译器测试全面升级计划.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndCompileTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Performance/CompilerBenchmarkTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/TestResults/fc488cda-741f-4a29-b52c-e834dec2f294/coverage.cobertura.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILGenerationTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_comprehensive_syntax_coverage.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/plan_20251213_155800.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/12_in_expression.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/12_in_expression.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/InExpressionTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/12_in_expression.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Old8Lang.Tests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Old8Lang.Tests.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/LocalManagerTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/LocalManagerTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ILangList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ILangList.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/StringLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/StringLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ExpressionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ExpressionParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -941,29 +934,42 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs</url>
-          <line>171</line>
+          <line>169</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" containingFunctionPresentation="方法 'ParseStatement'">
             <startOffsets>
-              <option value="5270" />
+              <option value="5195" />
             </startOffsets>
             <endOffsets>
-              <option value="5430" />
+              <option value="5355" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="559" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs</url>
-          <line>149</line>
+          <line>147</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" containingFunctionPresentation="方法 'ParseStatement'">
             <startOffsets>
-              <option value="4336" />
+              <option value="4261" />
             </startOffsets>
             <endOffsets>
-              <option value="4426" />
+              <option value="4351" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="560" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILGenerationTests.cs</url>
+          <line>232</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILGenerationTests.cs" containingFunctionPresentation="方法 'FuncRunStatement_GenerateIl_ShouldGenerateCorrectIL'">
+            <startOffsets>
+              <option value="5802" />
+            </startOffsets>
+            <endOffsets>
+              <option value="5833" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="561" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />

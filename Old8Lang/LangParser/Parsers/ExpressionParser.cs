@@ -96,7 +96,7 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
     {
         var left = ParseNumberOpera1();
 
-        while (CurrentToken.Type is LangTokenType.LessThanEquals or LangTokenType.GreaterThanEquals
+        while (CurrentToken.Type is LangTokenType.In or LangTokenType.LessThanEquals or LangTokenType.GreaterThanEquals
                or LangTokenType.Equals
                or LangTokenType.NotEquals or LangTokenType.LessThan or LangTokenType.GreaterThan)
         {

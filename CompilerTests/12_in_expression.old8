@@ -1,0 +1,58 @@
+// 测试in表达式和for-in循环的区分（编译模式）
+
+PrintLine("=== in表达式测试 ===")
+
+// 测试数组中的in表达式
+array <- [1, 2, 3, 4, 5]
+PrintLine("数组: [1, 2, 3, 4, 5]")
+PrintLine("1 in array: " + (1 in array))
+PrintLine("3 in array: " + (3 in array))
+PrintLine("6 in array: " + (6 in array))
+
+// 测试列表中的in表达式
+my_list <- list[10, 20, 30]
+PrintLine("\n列表: list[10, 20, 30]")
+PrintLine("10 in my_list: " + (10 in my_list))
+PrintLine("25 in my_list: " + (25 in my_list))
+
+// 测试字典中的in表达式（检查键是否存在）
+dict <- {"name": "Alice", "age": 30}
+PrintLine("\n字典: {\"name\": \"Alice\", \"age\": 30}")
+PrintLine("\"name\" in dict: " + ("name" in dict))
+PrintLine("\"city\" in dict: " + ("city" in dict))
+
+// 测试字符串中的in表达式
+str <- "hello"
+PrintLine("\n字符串: \"hello\"")
+PrintLine("'h' in str: " + ('h' in str))
+PrintLine("'e' in str: " + ('e' in str))
+PrintLine("'x' in str: " + ('x' in str))
+
+// 测试in表达式与for-in循环的区分
+PrintLine("\n=== in表达式与for-in循环区分测试 ===")
+
+// 这是in表达式，不是for-in循环
+result <- 3 in [1, 2, 3, 4, 5]
+PrintLine("3 in [1, 2, 3, 4, 5]: " + result)
+
+// 这是for-in循环，不是in表达式
+PrintLine("\nfor-in循环示例:")
+for item in [1, 2, 3] {
+    PrintLine("item: " + item)
+}
+
+// 测试复杂表达式中的in表达式
+PrintLine("\n=== 复杂表达式中的in表达式 ===")
+
+// in表达式作为条件
+if 2 in [1, 2, 3] {
+    PrintLine("2 is in [1, 2, 3]")
+} else {
+    PrintLine("2 is not in [1, 2, 3]")
+}
+
+// in表达式与其他操作符结合
+PrintLine("\n(1 in [1, 2] and 3 in [3, 4]): " + ((1 in [1, 2]) and (3 in [3, 4])))
+PrintLine("(1 in [1, 2] or 3 in [1, 2]): " + ((1 in [1, 2]) or (3 in [1, 2])))
+
+PrintLine("\n✅ 所有in表达式测试完成")
