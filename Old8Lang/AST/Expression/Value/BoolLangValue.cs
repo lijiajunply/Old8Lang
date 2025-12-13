@@ -23,6 +23,8 @@ public class BoolLangValue(bool value, SourcePosition position = default) : Lang
         return false;
     }
 
+    public override object GetValue() => Value;
+
     public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)
     {
         if (otherLangValueType is not TypeLangValue value) throw new TypeError(this, "TypeValue", otherLangValueType.GetType().Name);

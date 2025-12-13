@@ -17,92 +17,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/CompilerTests/func_decl_only_test.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/lambda_basic_test.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/semicolon_compile.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/simple_func_test.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/simple_lambda_test.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/simple_print_test.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_array_access_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_array_modify.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_basic_arith.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_field_access.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_full.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_init.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_instantiate.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_member.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_member_age.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_member_concat.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_member_modify.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_member_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_assign.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_call.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_debug.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_debug2.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_field.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_no_this.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_print.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_println.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_return.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_simple2.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_this.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_trace.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_method_void_return.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_class_with_init.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_debug_info.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_default_params.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_dict_access.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_dict_modify.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_dict_read.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_dict_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_expression_statement.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_for_in_dict.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_for_in_dict_kv.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_for_in_dict_kv2.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_for_in_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_for_in_string.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_func_call.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_func_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_il_verification.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_init_called.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_lambda_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_len_func.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_list_access.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_member_access_minimal.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_minimal_void_method.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_overload.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_range.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_return_with_println.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_simple_assignment.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_simple_default.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_simple_func.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_simple_println.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_string_concat.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_string_index.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_switch_in_function.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_switch_range.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_this_assignment.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_type_conv_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_type_func.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_type_func2.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_type_func3.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_type_func4.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_type_func5.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_type_with_concat.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_void_method_field.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_void_method_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_void_method_success.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/test_void_return_comprehensive.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/type_annotation_advanced.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/type_annotation_basic_functions.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/type_annotation_class_methods.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/type_annotation_complete_test.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/type_annotation_default_inference.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/type_annotation_default_minimal.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/type_annotation_minimal.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTests/very_simple_func_test.old8" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251214-InExpression修复与测试优化报告.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251214-测试修复报告.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndCompileTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndCompileTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILGenerationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILGenerationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/ErrorHandlingTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/ErrorHandlingTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/BoolLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/BoolLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -141,6 +67,10 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/EndToEndCompileTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/InterpreterTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Language/ExpressionStatementTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Language/ExpressionStatementTests.cs" root0="SKIP_HIGHLIGHTING" />
@@ -152,6 +82,8 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/BoolLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
@@ -204,8 +136,10 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1f/4c54500e/List`1.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/35/58ca714a/RuntimeType.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/4f/81203e97/CastHelpers.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/d3/7ed6bf18/FileNotFoundException.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/ec/ce83ccf2/ArgumentNullException.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a840692e98b74557bc005b38213a22c72dad0/c8/58c2e0c9/Assert.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -231,7 +165,7 @@
     ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
     ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
     ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Run",
+    ".NET 项目.Old8Lang.App.executor": "Debug",
     "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
     "ASKED_ADD_EXTERNAL_FILES": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
@@ -827,7 +761,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="166" />
+    <option name="localTasksCounter" value="167" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -854,7 +788,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(interpreter): 重构 IMiniInterpreter 接口及其实现&#10;&#10;- 定义新的 IMiniInterpreter 接口，明确解释器核心功能&#10;- 优化 LangInterpreter 类以实现新接口&#10;- 统一输出提供者属性命名为 OutputProvider&#10;- 将 UseClass 属性重命名为 OutputProvider 以提高语义清晰度&#10;- 更新 Instance.cs 中的输出调用方式以使用新的 OutputProvider 属性&#10;- 修改测试用例以适应新的属性命名&#10;- 移除不再需要的 using 语句&#10;- 在文档中详细描述接口设计优化方案和实现步骤" />
     <MESSAGE value="feat(parser): 实现类、函数和表达式解析器&#10;&#10;- 添加 ClassParser 用于解析类声明、访问修饰符和类块&#10;- 实现 ExpressionParser 支持算术、逻辑、比较和三元表达式&#10;- 创建 FunctionParser 处理函数声明、参数列表和 Lambda 表达式&#10;- 新增 ParserBase 提供基础解析操作和错误处理&#10;- 引入 ParserContext 管理解析器共享状态&#10;- 添加 ExpectHelper 生成详细的语法错误消息&#10;- 实现 PrimaryParser 解析字面量、列表、字典等主表达式" />
     <MESSAGE value="refactor(parser): 重构解析器类以使用主构造函数&#10;&#10;- 将 ClassParser、ExpressionParser、FunctionParser、PrimaryParser 和 StatementParser&#10;  重构为使用主构造函数语法&#10;- 移除了不必要的 Error 命名空间引用&#10;- 更新了字段访问方式，使用构造函数参数直接调用&#10;- 简化了 ParserBase 的构造逻辑&#10;- 修改了表达式解析中的三元运算符错误处理逻辑&#10;- 优化了运算符匹配的模式匹配语法&#10;- 调整了源代码行分割逻辑以保留空行确保行号正确&#10;- 清理了测试文件中无用的命名空间引用&#10;- 删除了部分测试数据文件和语法测试文件中的冗余内容&#10;- 重命名了部分语法测试文件名称以保持一致性" />
     <MESSAGE value="feat(parser): 支持分号作为语句分隔符并优化解析逻辑&#10;&#10;- 重命名 AbsUseClass 为 AbsOutputProvider，ConsoleUse 为 ConsoleOutputProvider&#10;- 在词法分析器中添加对分号 (;) 的识别和支持&#10;- 修改语法解析器以跳过可选的分号分隔符，允许同一行内使用多个语句&#10;- 更新 ExpectHelper 中的错误处理逻辑，简化条件表达式&#10;- 优化 AST 节点中的类型检查和 IL 生成相关代码&#10;- 添加多个测试用例验证分号在不同场景下的行为&#10;- 调整 ParserBase 类中的方法可见性和辅助函数实现&#10;- 更新变量管理器中的作用域深拷贝逻辑&#10;- 更新相关单元测试以匹配新的类名和行为变化" />
@@ -879,7 +812,8 @@
     <MESSAGE value="feat(parser): 实现in表达式解析并优化for-in循环检测&#10;&#10;- 在ExpressionParser中添加对in操作符的支持，使其能正确解析为二元表达式&#10;- 更新StatementParser中的for-in循环检测逻辑，确保准确区分in表达式与for-in语句&#10;- 在Operation类中实现in操作符的解释执行逻辑，支持数组、列表、字典和字符串类型&#10;- 实现in操作符的编译模式支持，生成对应的IL代码以调用集合的Contains方法&#10;- 添加全面的单元测试和集成测试，验证in表达式与for-in循环的正确解析和执行&#10;- 新增语法、解释和编译测试文件，覆盖in表达式的各种使用场景" />
     <MESSAGE value="feat(compiler): 实现编译模式下类型注解强制要求&#10;&#10;- 在编译模式下强制要求函数参数和返回值必须有类型注解&#10;- 强制要求Lambda表达式参数必须有类型注解&#10;- 添加类型注解验证逻辑，在IL生成前进行检查&#10;- 提供清晰的中文错误信息和修复建议&#10;- 更新语法文档和开发指南，说明编译模式与解释器模式的区别&#10;- 添加多个测试文件验证类型注解功能&#10;- 修复现有测试文件中的类型注解问题&#10;- 保持与解释器模式的向后兼容性" />
     <MESSAGE value="feat(compiler): 实现编译模式下函数参数默认值类型推断&#10;&#10;- 新增函数参数默认值自动推断类型功能&#10;- 更新类型验证逻辑，允许通过默认值推断参数类型&#10;- 改进错误信息，提供两种参数类型满足方式&#10;- 添加对整数、浮点数、字符串、布尔值等默认值的类型推断&#10;- 支持混合使用显式类型注解和默认值推断&#10;- 保持与解释器模式和现有代码的向后兼容性&#10;- 更新语法文档和开发指南说明新功能&#10;- 添加多个测试用例验证默认参数类型推断行为&#10;- 修复编译模式下参数类型检查的IL生成问题" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 实现编译模式下函数参数默认值类型推断&#10;&#10;- 新增函数参数默认值自动推断类型功能&#10;- 更新类型验证逻辑，允许通过默认值推断参数类型&#10;- 改进错误信息，提供两种参数类型满足方式&#10;- 添加对整数、浮点数、字符串、布尔值等默认值的类型推断&#10;- 支持混合使用显式类型注解和默认值推断&#10;- 保持与解释器模式和现有代码的向后兼容性&#10;- 更新语法文档和开发指南说明新功能&#10;- 添加多个测试用例验证默认参数类型推断行为&#10;- 修复编译模式下参数类型检查的IL生成问题" />
+    <MESSAGE value="chore(tests): 清理和整理CompilerTests目录&#10;&#10;- 删除74+个冗余测试文件，减少58%文件数量&#10;- 移除重复的简单测试、调试文件和临时测试&#10;- 保留56个核心测试文件，确保功能覆盖完整&#10;- 规范测试文件命名：编号测试 + 专项测试&#10;- 更新类型注解测试集，保留6个关键测试文件&#10;- 删除无法在编译模式下运行的类型注解测试&#10;- 清理重复的类、函数、控制流测试文件&#10;- 建立未来测试文件命名和维护规范&#10;- 更新IDEA workspace.xml中的文件变更记录&#10;- 保持与现有功能的完整测试覆盖" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore(tests): 清理和整理CompilerTests目录&#10;&#10;- 删除74+个冗余测试文件，减少58%文件数量&#10;- 移除重复的简单测试、调试文件和临时测试&#10;- 保留56个核心测试文件，确保功能覆盖完整&#10;- 规范测试文件命名：编号测试 + 专项测试&#10;- 更新类型注解测试集，保留6个关键测试文件&#10;- 删除无法在编译模式下运行的类型注解测试&#10;- 清理重复的类、函数、控制流测试文件&#10;- 建立未来测试文件命名和维护规范&#10;- 更新IDEA workspace.xml中的文件变更记录&#10;- 保持与现有功能的完整测试覆盖" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -901,18 +835,6 @@
           <line>31</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'" />
           <option name="timeStamp" value="238" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>86</line>
-          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'GenerateIl'" />
-          <option name="timeStamp" value="401" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>128</line>
-          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'GenerateIl'" />
-          <option name="timeStamp" value="402" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs</url>
@@ -974,26 +896,26 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs</url>
-          <line>183</line>
+          <line>184</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" containingFunctionPresentation="方法 'Converse'">
             <startOffsets>
-              <option value="4971" />
+              <option value="5011" />
             </startOffsets>
             <endOffsets>
-              <option value="4972" />
+              <option value="5012" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="555" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs</url>
-          <line>180</line>
+          <line>181</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" containingFunctionPresentation="方法 'Converse'">
             <startOffsets>
-              <option value="4820" />
+              <option value="4860" />
             </startOffsets>
             <endOffsets>
-              <option value="4853" />
+              <option value="4893" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="556" />
@@ -1025,30 +947,82 @@
           <option name="timeStamp" value="559" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs</url>
-          <line>147</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" containingFunctionPresentation="方法 'ParseStatement'">
-            <startOffsets>
-              <option value="4261" />
-            </startOffsets>
-            <endOffsets>
-              <option value="4351" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="560" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILGenerationTests.cs</url>
           <line>232</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILGenerationTests.cs" containingFunctionPresentation="方法 'FuncRunStatement_GenerateIl_ShouldGenerateCorrectIL'">
             <startOffsets>
-              <option value="5802" />
+              <option value="5821" />
             </startOffsets>
             <endOffsets>
-              <option value="5833" />
+              <option value="5852" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="561" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs</url>
+          <line>74</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" containingFunctionPresentation="方法 'InExpression_Dictionary_ShouldReturnTrueWhenKeyExists'">
+            <startOffsets>
+              <option value="2100" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2133" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="562" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs</url>
+          <line>75</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" containingFunctionPresentation="方法 'InExpression_Dictionary_ShouldReturnTrueWhenKeyExists'">
+            <startOffsets>
+              <option value="2142" />
+            </startOffsets>
+            <endOffsets>
+              <option value="2176" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="563" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Unit/ErrorHandlingTests.cs</url>
+          <line>264</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/ErrorHandlingTests.cs" containingFunctionPresentation="方法 'ErrorPosition_Accurate'">
+            <startOffsets>
+              <option value="5770" />
+            </startOffsets>
+            <endOffsets>
+              <option value="5811" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="564" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs</url>
+          <line>32</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" containingFunctionPresentation="方法 'InExpression_Array_ShouldReturnTrueWhenExists'">
+            <startOffsets>
+              <option value="862" />
+            </startOffsets>
+            <endOffsets>
+              <option value="877" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="565" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs</url>
+          <line>164</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" containingFunctionPresentation="方法 'CompileMode_InExpression_ShouldWork'">
+            <startOffsets>
+              <option value="4473" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4545" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="570" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />

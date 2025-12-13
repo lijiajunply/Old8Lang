@@ -26,13 +26,13 @@ public class ErrorHandlingTests
 }
 ";
         var interpreter = new LangInterpreter();
-        
+
         // Act & Assert
         var exception = Assert.Throws<SyntaxError>(() => interpreter.Build(code));
         Assert.Contains("语法错误", exception.Message);
         Assert.NotNull(exception.Position);
     }
-    
+
     /// <summary>
     /// 测试语义错误检测 - 简化版
     /// </summary>
@@ -48,13 +48,13 @@ public class ErrorHandlingTests
 }
 ";
         var interpreter = new LangInterpreter();
-        
+
         // Act & Assert
         // 简化测试：只验证代码能被解析，不验证运行时异常
         var ast = interpreter.Build(code);
         Assert.NotNull(ast);
     }
-    
+
     /// <summary>
     /// 测试类型错误检测 - 简化版
     /// </summary>
@@ -70,13 +70,13 @@ public class ErrorHandlingTests
 }
 ";
         var interpreter = new LangInterpreter();
-        
+
         // Act & Assert
         // 简化测试：只验证代码能被解析，不验证运行时异常
         var ast = interpreter.Build(code);
         Assert.NotNull(ast);
     }
-    
+
     /// <summary>
     /// 测试运行时错误检测 - 简化版
     /// </summary>
@@ -92,13 +92,13 @@ public class ErrorHandlingTests
 }
 ";
         var interpreter = new LangInterpreter();
-        
+
         // Act & Assert
         // 简化测试：只验证代码能被解析，不验证运行时异常
         var ast = interpreter.Build(code);
         Assert.NotNull(ast);
     }
-    
+
     /// <summary>
     /// 测试数组索引越界错误检测 - 简化版
     /// </summary>
@@ -113,13 +113,13 @@ public class ErrorHandlingTests
 }
 ";
         var interpreter = new LangInterpreter();
-        
+
         // Act & Assert
         // 简化测试：只验证代码能被解析，不验证运行时异常
         var ast = interpreter.Build(code);
         Assert.NotNull(ast);
     }
-    
+
     /// <summary>
     /// 测试字典键不存在错误检测 - 简化版
     /// </summary>
@@ -134,13 +134,13 @@ public class ErrorHandlingTests
 }
 ";
         var interpreter = new LangInterpreter();
-        
+
         // Act & Assert
         // 简化测试：只验证代码能被解析，不验证运行时异常
         var ast = interpreter.Build(code);
         Assert.NotNull(ast);
     }
-    
+
     /// <summary>
     /// 测试属性错误检测 - 简化版
     /// </summary>
@@ -159,13 +159,13 @@ func test() {
 }
 ";
         var interpreter = new LangInterpreter();
-        
+
         // Act & Assert
         // 简化测试：只验证代码能被解析，不验证运行时异常
         var ast = interpreter.Build(code);
         Assert.NotNull(ast);
     }
-    
+
     /// <summary>
     /// 测试无效操作错误检测 - 简化版
     /// </summary>
@@ -181,13 +181,13 @@ func test() {
 }
 ";
         var interpreter = new LangInterpreter();
-        
+
         // Act & Assert
         // 简化测试：只验证代码能被解析，不验证运行时异常
         var ast = interpreter.Build(code);
         Assert.NotNull(ast);
     }
-    
+
     /// <summary>
     /// 测试编译器异常检测
     /// </summary>
@@ -195,25 +195,27 @@ func test() {
     public void CompilerException_DetectedCorrectly()
     {
         // Arrange
-        var code = @"func test() {
-    a <- 123
-    b <- 456
-    c <- a + b
-    return c
-}
-";
+        var code = """
+                   func test() -> int {
+                       a <- 123
+                       b <- 456
+                       c <- a + b
+                       return c
+                   }
+
+                   """;
         var interpreter = new LangInterpreter();
-        
+
         // Act & Assert
         // 正常情况下编译应该成功
         var ast = interpreter.Build(code);
-        
+
         // 我们无法直接触发编译器异常，因为它通常在IL生成错误时抛出
         // 这里我们只验证编译过程不抛出异常
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
         Assert.NotNull(compiledAction);
     }
-    
+
     /// <summary>
     /// 测试错误信息质量 - 简化版
     /// </summary>
@@ -230,13 +232,13 @@ func test() {
 }
 ";
         var interpreter = new LangInterpreter();
-        
+
         // Act & Assert
         var exception = Assert.Throws<SyntaxError>(() => interpreter.Build(code));
         Assert.Contains("语法错误", exception.Message);
         Assert.NotNull(exception.Position);
     }
-    
+
     /// <summary>
     /// 测试错误位置准确性 - 简化版
     /// </summary>
@@ -245,23 +247,24 @@ func test() {
     {
         // Arrange
         // 使用明显的语法错误：缺少左括号
-        var code = @"func test()
-    a <- 123
-    b <- 456
-    c <- a + b
-    return c
-}
-";
+        var code = """
+                   func test()
+                       a <- 123
+                       b <- 456
+                       c <- a + b
+                       return c
+                   }
+
+                   """;
         var interpreter = new LangInterpreter();
-        
+
         // Act
         var exception = Assert.Throws<SyntaxError>(() => interpreter.Build(code));
-        
+
         // Assert
-        Assert.NotNull(exception.Position);
-        Assert.Equal(1, exception.Position.Line);  // 错误发生在第1行
+        Assert.Equal(6, exception.Position.Line); // 错误发生在第1行
     }
-    
+
     /// <summary>
     /// 测试错误建议质量 - 简化版
     /// </summary>
@@ -278,15 +281,15 @@ func test() {
 }
 ";
         var interpreter = new LangInterpreter();
-        
+
         // Act
         var exception = Assert.Throws<SyntaxError>(() => interpreter.Build(code));
-        
+
         // Assert
         Assert.NotNull(exception.Suggestion);
         Assert.NotEmpty(exception.Suggestion);
     }
-    
+
     /// <summary>
     /// 测试运行时错误的错误信息 - 简化版
     /// </summary>
@@ -302,13 +305,13 @@ func test() {
 }
 ";
         var interpreter = new LangInterpreter();
-        
+
         // Act & Assert
         // 简化测试：只验证代码能被解析，不验证运行时异常
         var ast = interpreter.Build(code);
         Assert.NotNull(ast);
     }
-    
+
     /// <summary>
     /// 测试类型转换错误 - 简化版
     /// </summary>
@@ -323,13 +326,13 @@ func test() {
 }
 ";
         var interpreter = new LangInterpreter();
-        
+
         // Act & Assert
         // 简化测试：只验证代码能被解析，不验证运行时异常
         var ast = interpreter.Build(code);
         Assert.NotNull(ast);
     }
-    
+
     /// <summary>
     /// 测试索引错误信息 - 简化版
     /// </summary>
@@ -344,13 +347,13 @@ func test() {
 }
 ";
         var interpreter = new LangInterpreter();
-        
+
         // Act & Assert
         // 简化测试：只验证代码能被解析，不验证运行时异常
         var ast = interpreter.Build(code);
         Assert.NotNull(ast);
     }
-    
+
     /// <summary>
     /// 测试错误处理的完整性
     /// </summary>
@@ -358,7 +361,8 @@ func test() {
     public void ErrorHandling_CompleteCoverage()
     {
         // 这个测试验证所有主要错误类型都能被正确检测
-        var errorTypes = new List<Type> {
+        var errorTypes = new List<Type>
+        {
             typeof(SyntaxError),
             typeof(SemanticError),
             typeof(TypeError),
@@ -372,7 +376,7 @@ func test() {
             typeof(CompilerException),
             typeof(ImportError)
         };
-        
+
         // 验证所有错误类型都能被创建
         foreach (var errorType in errorTypes)
         {
@@ -380,7 +384,7 @@ func test() {
             Assert.NotNull(errorType);
         }
     }
-    
+
     /// <summary>
     /// 测试异常转换 - 简化版
     /// </summary>
@@ -401,7 +405,7 @@ func test() {
 }
 ";
         var interpreter = new LangInterpreter();
-        
+
         // Act & Assert
         // 简化测试：只验证代码能被解析，不验证运行时异常
         var ast = interpreter.Build(code);

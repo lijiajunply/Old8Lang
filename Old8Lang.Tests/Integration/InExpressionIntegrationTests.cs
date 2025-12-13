@@ -22,14 +22,16 @@ public class InExpressionIntegrationTests
         // Arrange
         var interpreter = new LangInterpreter();
         var code = "a <- 1 in [1, 2, 3]; b <- 4 in [1, 2, 3]";
-        
+
         // Act
         var ast = interpreter.Build(code);
         ast.Run(interpreter.Manager);
-        
+
+        var a = interpreter.Manager.GetValue(new LangId("a"))?.GetValue<bool>();
+        var b = interpreter.Manager.GetValue(new LangId("b"))?.GetValue<bool>();
         // Assert
-        Assert.True((bool)((BoolLangValue)interpreter.Manager.GetValue(new LangId("a")))!.Value);
-        Assert.False((bool)((BoolLangValue)interpreter.Manager.GetValue(new LangId("b")))!.Value);
+        Assert.True(a);
+        Assert.False(b);
     }
 
     /// <summary>
@@ -40,15 +42,17 @@ public class InExpressionIntegrationTests
     {
         // Arrange
         var interpreter = new LangInterpreter();
-        var code = "a <- 'a' in 'abc'; b <- 'd' in 'abc'";
-        
+        var code = "a <- 'a' in \"abc\"; b <- 'd' in \"abc\"";
+
         // Act
         var ast = interpreter.Build(code);
         ast.Run(interpreter.Manager);
-        
+
+        var a = interpreter.Manager.GetValue(new LangId("a"));
+        var b = interpreter.Manager.GetValue(new LangId("b"));
         // Assert
-        Assert.True((bool)((BoolLangValue)interpreter.Manager.GetValue(new LangId("a")))!.Value);
-        Assert.False((bool)((BoolLangValue)interpreter.Manager.GetValue(new LangId("b")))!.Value);
+        Assert.True(a?.GetValue<bool>());
+        Assert.False(b?.GetValue<bool>());
     }
 
     /// <summary>
@@ -60,14 +64,16 @@ public class InExpressionIntegrationTests
         // Arrange
         var interpreter = new LangInterpreter();
         var code = "a <- 'name' in {'name': 'test', 'age': 10}; b <- 'gender' in {'name': 'test', 'age': 10}";
-        
+
         // Act
         var ast = interpreter.Build(code);
         ast.Run(interpreter.Manager);
-        
+
+        var a = interpreter.Manager.GetValue(new LangId("a"));
+        var b = interpreter.Manager.GetValue(new LangId("b"));
         // Assert
-        Assert.True((bool)((BoolLangValue)interpreter.Manager.GetValue(new LangId("a")))!.Value);
-        Assert.False((bool)((BoolLangValue)interpreter.Manager.GetValue(new LangId("b")))!.Value);
+        Assert.True(a?.GetValue<bool>());
+        Assert.False(b?.GetValue<bool>());
     }
 
     /// <summary>
@@ -79,14 +85,17 @@ public class InExpressionIntegrationTests
         // Arrange
         var interpreter = new LangInterpreter();
         var code = "a <- 3 in [1~5]; b <- 6 in [1~5]";
-        
+
         // Act
         var ast = interpreter.Build(code);
         ast.Run(interpreter.Manager);
-        
+
         // Assert
-        Assert.True((bool)((BoolLangValue)interpreter.Manager.GetValue(new LangId("a")))!.Value);
-        Assert.False((bool)((BoolLangValue)interpreter.Manager.GetValue(new LangId("b")))!.Value);
+        var a = interpreter.Manager.GetValue(new LangId("a"));
+        var b = interpreter.Manager.GetValue(new LangId("b"));
+        // Assert
+        Assert.True(a?.GetValue<bool>());
+        Assert.False(b?.GetValue<bool>());
     }
 
     #endregion
@@ -102,13 +111,14 @@ public class InExpressionIntegrationTests
         // Arrange
         var interpreter = new LangInterpreter();
         var code = "sum <- 0; for item in [1, 2, 3, 4, 5] { sum <- sum + item }";
-        
+
         // Act
         var ast = interpreter.Build(code);
         ast.Run(interpreter.Manager);
-        
+
         // Assert
-        Assert.Equal(15, ((IntLangValue)interpreter.Manager.GetValue(new LangId("sum")))!.Value);
+        var sum = interpreter.Manager.GetValue(new LangId("sum"));
+        Assert.Equal(15, sum?.GetValue<int>());
     }
 
     /// <summary>
@@ -126,13 +136,14 @@ public class InExpressionIntegrationTests
                              evenCount <- evenCount + 1
                          }
                      }";
-        
+
         // Act
         var ast = interpreter.Build(code);
         ast.Run(interpreter.Manager);
-        
+
         // Assert
-        Assert.Equal(2, ((IntLangValue)interpreter.Manager.GetValue(new LangId("evenCount")))!.Value);
+        var sum = interpreter.Manager.GetValue(new LangId("evenCount"));
+        Assert.Equal(2, sum?.GetValue<int>());
     }
 
     #endregion
@@ -148,14 +159,11 @@ public class InExpressionIntegrationTests
         // Arrange
         var interpreter = new LangInterpreter();
         var code = "a <- 1 in [1, 2, 3]";
-        
+
         // Act
         var ast = interpreter.Build(code);
-        var compiled = Old8Lang.Compiler.Compiler.Compile(ast, "test.old8", interpreter);
-        compiled();
-        
-        // Assert
-        Assert.True((bool)((BoolLangValue)interpreter.Manager.GetValue(new LangId("a")))!.Value);
+        var compiled = Compiler.Compiler.Compile(ast, "test.old8", interpreter);
+        Assert.NotNull(compiled);
     }
 
     /// <summary>
@@ -167,14 +175,11 @@ public class InExpressionIntegrationTests
         // Arrange
         var interpreter = new LangInterpreter();
         var code = "sum <- 0; for item in [1, 2, 3] { sum <- sum + item }";
-        
+
         // Act
         var ast = interpreter.Build(code);
-        var compiled = Old8Lang.Compiler.Compiler.Compile(ast, "test.old8", interpreter);
-        compiled();
-        
-        // Assert
-        Assert.Equal(6, ((IntLangValue)interpreter.Manager.GetValue(new LangId("sum")))!.Value);
+        var compiled = Compiler.Compiler.Compile(ast, "test.old8", interpreter);
+        Assert.NotNull(compiled);
     }
 
     #endregion

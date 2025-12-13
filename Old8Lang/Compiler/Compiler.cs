@@ -15,7 +15,7 @@ public static class Compiler
     /// <summary>
     /// IL代码验证开关，默认为开启
     /// </summary>
-    public static bool ILVerificationEnabled { get; set; } = true;
+    public static bool ilVerificationEnabled { get; set; } = true;
 
     /// <summary>
     /// 日志级别枚举
@@ -125,30 +125,33 @@ public static class Compiler
             ilGenerator.Emit(OpCodes.Ret);
 
             // 执行IL代码验证（如果启用）
-            if (ILVerificationEnabled)
+            if (ilVerificationEnabled)
             {
                 Log("开始验证IL代码", LogLevel.Debug);
                 var verificationResult = ILVerifier.Verify(dynamicMethod, "OldLangRun");
-                
+
                 if (!verificationResult.IsValid)
                 {
                     // IL验证失败，输出详细错误信息
                     foreach (var error in verificationResult.Errors)
                     {
-                        LogFormat("IL验证错误 [{0}]: {1}", LogLevel.Error, error.Code, error.Message);
+                        if (error is { Code: not null, Message: not null })
+                            LogFormat("IL验证错误 [{0}]: {1}", LogLevel.Error, error.Code, error.Message);
                         if (!string.IsNullOrEmpty(error.Context))
                         {
                             LogFormat("上下文: {0}", LogLevel.Error, error.Context);
                         }
+
                         if (!string.IsNullOrEmpty(error.StackTrace))
                         {
                             LogFormat("堆栈跟踪: {0}", LogLevel.Debug, error.StackTrace);
                         }
                     }
-                    
-                    throw new CompilerException($"IL代码验证失败，共发现 {verificationResult.Errors.Count} 个错误", new SourcePosition(0, 0));
+
+                    throw new CompilerException($"IL代码验证失败，共发现 {verificationResult.Errors.Count} 个错误",
+                        new SourcePosition(0, 0));
                 }
-                
+
                 Log("IL代码验证通过", LogLevel.Debug);
             }
             else

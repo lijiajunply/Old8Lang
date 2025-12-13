@@ -222,7 +222,7 @@ result <- obj.calculate()
     public void ILVerificationOverhead()
     {
         // 启用IL验证
-        Old8Lang.Compiler.Compiler.ILVerificationEnabled = true;
+        Old8Lang.Compiler.Compiler.ilVerificationEnabled = true;
         
         var ast = _interpreter.Build(_mediumCode);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "il_verification_test", _interpreter);
@@ -236,13 +236,13 @@ result <- obj.calculate()
     public void NoILVerification()
     {
         // 禁用IL验证
-        Old8Lang.Compiler.Compiler.ILVerificationEnabled = false;
+        Old8Lang.Compiler.Compiler.ilVerificationEnabled = false;
         
         var ast = _interpreter.Build(_mediumCode);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "no_il_verification_test", _interpreter);
         compiledAction();
         
         // 恢复IL验证设置
-        Old8Lang.Compiler.Compiler.ILVerificationEnabled = true;
+        Old8Lang.Compiler.Compiler.ilVerificationEnabled = true;
     }
 }
