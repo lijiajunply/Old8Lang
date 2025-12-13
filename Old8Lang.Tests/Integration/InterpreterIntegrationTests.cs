@@ -306,9 +306,7 @@ public class InterpreterIntegrationTests
     public void FullPipeline_TupleOperations_WorksCorrectly()
     {
         // 测试元组操作（创建和验证）
-        var code = @"
-            tuple <- (100, ""test"")
-        ";
+        var code = """tuple <- (100, "test")""";
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);
@@ -322,12 +320,9 @@ public class InterpreterIntegrationTests
         Assert.NotNull(v1);
         Assert.Equal(100, v1.Value);
 
-        if (tuple.V2 != null)
-        {
-            var v2 = tuple.V2.Run(interpreter.Manager) as StringLangValue;
-            Assert.NotNull(v2);
-            Assert.Equal("test", v2.Value);
-        }
+        var v2 = tuple.V2.Run(interpreter.Manager) as StringLangValue;
+        Assert.NotNull(v2);
+        Assert.Equal("test", v2.Value);
     }
 
     #endregion
@@ -411,10 +406,7 @@ public class InterpreterIntegrationTests
         var interpreter = new LangInterpreter();
 
         // 语法错误应该在 Build 阶段抛出
-        Assert.ThrowsAny<Exception>(() =>
-        {
-            interpreter.Build(code);
-        });
+        Assert.ThrowsAny<Exception>(() => { interpreter.Build(code); });
     }
 
     [Fact]
@@ -431,10 +423,7 @@ public class InterpreterIntegrationTests
         var ast = interpreter.Build(code);
 
         // 运行时错误应该在 Run 阶段抛出
-        Assert.Throws<ZeroDivisionError>(() =>
-        {
-            ast.Run(interpreter.Manager);
-        });
+        Assert.Throws<ZeroDivisionError>(() => { ast.Run(interpreter.Manager); });
     }
 
     #endregion

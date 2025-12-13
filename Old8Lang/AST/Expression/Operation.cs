@@ -290,6 +290,7 @@ public class Operation(
                     {
                         return new BoolLangValue(list.In(leftResult));
                     }
+
                     throw new InvalidOperationError(this, "in 操作符右侧必须是集合类型");
                 // r (+-*/%) l
                 case LangTokenType.Plus:
@@ -793,11 +794,11 @@ public class Operation(
                 // 处理 in 操作符：left in right
                 // 加载左侧值
                 Left!.LoadIlValue(ilGenerator, local);
-                var leftValueType = Left.OutputType(local);
+                var leftInType = Left.OutputType(local);
                 // 确保左侧值是object类型（装箱值类型）
-                if (leftValueType != null && leftValueType.IsValueType)
+                if (leftInType is { IsValueType: true })
                 {
-                    ilGenerator.Emit(OpCodes.Box, leftValueType);
+                    ilGenerator.Emit(OpCodes.Box, leftInType);
                 }
 
                 // 加载右侧集合
@@ -814,8 +815,8 @@ public class Operation(
                     var valueLocal = ilGenerator.DeclareLocal(typeof(object));
 
                     // 保存list和value到局部变量
-                    ilGenerator.Emit(OpCodes.Stloc, listLocal);  // 保存list
-                    ilGenerator.Emit(OpCodes.Stloc, valueLocal);  // 保存value
+                    ilGenerator.Emit(OpCodes.Stloc, listLocal); // 保存list
+                    ilGenerator.Emit(OpCodes.Stloc, valueLocal); // 保存value
 
                     // 按正确顺序重新加载：list, value
                     ilGenerator.Emit(OpCodes.Ldloc, listLocal);
@@ -834,8 +835,8 @@ public class Operation(
                     var valueLocal = ilGenerator.DeclareLocal(typeof(object));
 
                     // 保存array和value到局部变量
-                    ilGenerator.Emit(OpCodes.Stloc, arrayLocal);  // 保存array
-                    ilGenerator.Emit(OpCodes.Stloc, valueLocal);  // 保存value
+                    ilGenerator.Emit(OpCodes.Stloc, arrayLocal); // 保存array
+                    ilGenerator.Emit(OpCodes.Stloc, valueLocal); // 保存value
 
                     // 按正确顺序重新加载：array, value
                     ilGenerator.Emit(OpCodes.Ldloc, arrayLocal);
@@ -858,8 +859,8 @@ public class Operation(
                     var valueLocal = ilGenerator.DeclareLocal(typeof(object));
 
                     // 保存dict和value到局部变量
-                    ilGenerator.Emit(OpCodes.Stloc, dictLocal);  // 保存dict
-                    ilGenerator.Emit(OpCodes.Stloc, valueLocal);  // 保存value
+                    ilGenerator.Emit(OpCodes.Stloc, dictLocal); // 保存dict
+                    ilGenerator.Emit(OpCodes.Stloc, valueLocal); // 保存value
 
                     // 按正确顺序重新加载：dict, value
                     ilGenerator.Emit(OpCodes.Ldloc, dictLocal);
@@ -884,6 +885,7 @@ public class Operation(
                             ilGenerator.Emit(OpCodes.Ldloc, objLocal);
                             ilGenerator.Emit(OpCodes.Ldloc, valueLocal);
                         }
+
                         ilGenerator.Emit(containsMethod.IsStatic ? OpCodes.Call : OpCodes.Callvirt, containsMethod);
                     }
                     else
@@ -903,6 +905,7 @@ public class Operation(
                                 ilGenerator.Emit(OpCodes.Ldloc, objLocal);
                                 ilGenerator.Emit(OpCodes.Ldloc, valueLocal);
                             }
+
                             ilGenerator.Emit(containsMethod.IsStatic ? OpCodes.Call : OpCodes.Callvirt, containsMethod);
                         }
                         else
@@ -930,6 +933,7 @@ public class Operation(
                         }
                     }
                 }
+
                 return typeof(bool);
             }
             case LangTokenType.As:
