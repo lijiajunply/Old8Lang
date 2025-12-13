@@ -241,4 +241,27 @@ public class VariateManager
 
         return newManager;
     }
+    
+    /// <summary>
+    /// 获取当前作用域和父作用域中的变量信息
+    /// </summary>
+    /// <param name="limit">限制返回的变量数量</param>
+    /// <returns>变量信息字典，键为变量名，值为变量值的字符串表示</returns>
+    public Dictionary<string, string> GetVariableStates(int limit = 20)
+    {
+        var variableStates = new Dictionary<string, string>();
+        
+        // 从当前作用域向上遍历，收集变量信息
+        for (int i = Scopes.Count - 1; i >= 0 && variableStates.Count < limit; i--)
+        {
+            var scope = Scopes[i];
+            foreach (var (varName, varValue) in scope)
+            {
+                if (variableStates.Count >= limit) break;
+                variableStates[varName] = varValue.ToString();
+            }
+        }
+        
+        return variableStates;
+    }
 }

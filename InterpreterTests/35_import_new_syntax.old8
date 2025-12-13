@@ -15,10 +15,10 @@ PrintLine("func2(): " + func2())
 PrintLine("var2: " + var2)
 
 // 测试 3: 默认导入
-PrintLine("\n3. 测试默认导入: import test_import_module as module")
-import test_import_module as module
-// 注意：这里的默认导入目前会导入所有内容，因为我们还没有实现模块对象包装
-PrintLine("module 导入测试: ")
+PrintLine("\n3. 测试默认导入: import test_import_module")
+import test_import_module
+// 传统导入会导入所有内容到当前作用域
+PrintLine("默认导入测试: ")
 PrintLine("   export_func1(): " + export_func1())
 PrintLine("   export_var1: " + export_var1)
 

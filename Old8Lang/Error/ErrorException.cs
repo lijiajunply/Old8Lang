@@ -4,6 +4,38 @@ using Old8Lang.LangParser;
 namespace Old8Lang.Error;
 
 /// <summary>
+/// 调用栈帧信息
+/// </summary>
+public class CallStackFrame
+{
+    /// <summary>
+    /// 函数名称
+    /// </summary>
+    public string FunctionName { get; set; }
+    
+    /// <summary>
+    /// 源代码位置
+    /// </summary>
+    public SourcePosition Position { get; set; }
+    
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="functionName">函数名称</param>
+    /// <param name="position">源代码位置</param>
+    public CallStackFrame(string functionName, SourcePosition position)
+    {
+        FunctionName = functionName;
+        Position = position;
+    }
+    
+    public override string ToString()
+    {
+        return $"{FunctionName} at {Position}";
+    }
+}
+
+/// <summary>
 /// Old8语言错误的基类
 /// </summary>
 public class Old8Exception : Exception
@@ -47,6 +79,50 @@ public class Old8Exception : Exception
     /// 请求ID，用于跟踪分布式系统中的请求
     /// </summary>
     public Guid RequestId { get; }
+    
+    /// <summary>
+    /// Old8Lang调用栈
+    /// </summary>
+    public List<CallStackFrame> CallStack { get; set; }
+    
+    /// <summary>
+    /// 变量状态信息
+    /// </summary>
+    public Dictionary<string, string> VariableStates { get; set; } = new();
+    
+    /// <summary>
+    /// 当前调用栈，用于在错误发生时收集
+    /// </summary>
+    public static List<CallStackFrame> CurrentCallStack { get; private set; } = new();
+    
+    /// <summary>
+    /// 入栈，记录函数调用
+    /// </summary>
+    /// <param name="functionName">函数名称</param>
+    /// <param name="position">源代码位置</param>
+    public static void PushCallStack(string functionName, SourcePosition position)
+    {
+        CurrentCallStack.Add(new CallStackFrame(functionName, position));
+    }
+    
+    /// <summary>
+    /// 出栈，函数调用结束
+    /// </summary>
+    public static void PopCallStack()
+    {
+        if (CurrentCallStack.Count > 0)
+        {
+            CurrentCallStack.RemoveAt(CurrentCallStack.Count - 1);
+        }
+    }
+    
+    /// <summary>
+    /// 清空调用栈
+    /// </summary>
+    public static void ClearCallStack()
+    {
+        CurrentCallStack.Clear();
+    }
 
     /// <summary>
     /// 构造函数
@@ -58,6 +134,7 @@ public class Old8Exception : Exception
     /// <param name="suggestion">建议</param>
     /// <param name="sourceContext">源代码上下文</param>
     /// <param name="requestId">请求ID，用于跟踪分布式系统中的请求</param>
+    /// <param name="innerException">内部异常</param>
     protected Old8Exception(
         string errorCode,
         string message,
@@ -65,9 +142,37 @@ public class Old8Exception : Exception
         IOldLangTree? node = null,
         string? suggestion = null,
         string[]? sourceContext = null,
-        Guid? requestId = null)
+        Guid? requestId = null,
+        Exception? innerException = null)
+        : this(errorCode, message, position, node, suggestion, sourceContext, requestId, innerException, new Dictionary<string, string>())
+    {
+    }
+    
+    /// <summary>
+    /// 构造函数，支持变量状态收集
+    /// </summary>
+    /// <param name="errorCode">错误代码</param>
+    /// <param name="message">错误信息</param>
+    /// <param name="position">位置信息</param>
+    /// <param name="node">AST节点</param>
+    /// <param name="suggestion">建议</param>
+    /// <param name="sourceContext">源代码上下文</param>
+    /// <param name="requestId">请求ID</param>
+    /// <param name="innerException">内部异常</param>
+    /// <param name="variableStates">变量状态信息</param>
+    protected Old8Exception(
+        string errorCode,
+        string message,
+        SourcePosition position,
+        IOldLangTree? node,
+        string? suggestion,
+        string[]? sourceContext,
+        Guid? requestId,
+        Exception? innerException,
+        Dictionary<string, string> variableStates)
         : base(FormatErrorMessage(errorCode, message, position, suggestion,
-            GetSourceContextFromInterpreter(position, sourceContext), DateTime.Now, requestId ?? Guid.NewGuid()))
+            GetSourceContextFromInterpreter(position, sourceContext), DateTime.Now, requestId ?? Guid.NewGuid(), 
+            CurrentCallStack, variableStates), innerException)
     {
         ErrorCode = errorCode;
         Position = position;
@@ -76,6 +181,10 @@ public class Old8Exception : Exception
         SourceContext = GetSourceContextFromInterpreter(position, sourceContext);
         Timestamp = DateTime.Now;
         RequestId = requestId ?? Guid.NewGuid();
+        // 复制当前调用栈
+        CallStack = new List<CallStackFrame>(CurrentCallStack);
+        // 初始化变量状态
+        VariableStates = variableStates;
     }
 
     /// <summary>
@@ -87,15 +196,42 @@ public class Old8Exception : Exception
     /// <param name="suggestion">建议</param>
     /// <param name="sourceContext">源代码上下文</param>
     /// <param name="requestId">请求ID，用于跟踪分布式系统中的请求</param>
+    /// <param name="innerException">内部异常</param>
     protected Old8Exception(
         string errorCode,
         string message,
         IOldLangTree node,
         string? suggestion = null,
         string[]? sourceContext = null,
-        Guid? requestId = null)
+        Guid? requestId = null,
+        Exception? innerException = null)
         : this(errorCode, message, node.Position, node, suggestion,
-            GetSourceContextFromInterpreter(node.Position, sourceContext), requestId)
+            GetSourceContextFromInterpreter(node.Position, sourceContext), requestId, innerException, new Dictionary<string, string>())
+    {
+    }
+    
+    /// <summary>
+    /// 从AST节点创建错误，支持变量状态收集
+    /// </summary>
+    /// <param name="errorCode">错误代码</param>
+    /// <param name="message">错误信息</param>
+    /// <param name="node">AST节点</param>
+    /// <param name="suggestion">建议</param>
+    /// <param name="sourceContext">源代码上下文</param>
+    /// <param name="requestId">请求ID</param>
+    /// <param name="innerException">内部异常</param>
+    /// <param name="variableStates">变量状态信息</param>
+    protected Old8Exception(
+        string errorCode,
+        string message,
+        IOldLangTree node,
+        string? suggestion,
+        string[]? sourceContext,
+        Guid? requestId,
+        Exception? innerException,
+        Dictionary<string, string> variableStates)
+        : this(errorCode, message, node.Position, node, suggestion,
+            GetSourceContextFromInterpreter(node.Position, sourceContext), requestId, innerException, variableStates)
     {
     }
 
@@ -133,9 +269,12 @@ public class Old8Exception : Exception
     /// <param name="sourceContext">源代码上下文</param>
     /// <param name="timestamp">错误发生时间</param>
     /// <param name="requestId">请求ID</param>
+    /// <param name="callStack">调用栈信息</param>
+    /// <param name="variableStates">变量状态信息</param>
     /// <returns>格式化后的错误信息</returns>
     private static string FormatErrorMessage(string errorCode, string message, SourcePosition position,
-        string? suggestion, string[]? sourceContext, DateTime timestamp, Guid requestId)
+        string? suggestion, string[]? sourceContext, DateTime timestamp, Guid requestId, 
+        List<CallStackFrame> callStack, Dictionary<string, string> variableStates)
     {
         var sb = new System.Text.StringBuilder();
 
@@ -145,6 +284,8 @@ public class Old8Exception : Exception
         const string yellow = "\u001b[33m";
         const string blue = "\u001b[34m";
         const string green = "\u001b[32m";
+        const string cyan = "\u001b[36m";
+        const string magenta = "\u001b[35m";
 
         // 错误标题 - 标准化格式
         sb.AppendLine($"{red}[{errorCode}]{reset} {yellow}{message}{reset}");
@@ -182,15 +323,33 @@ public class Old8Exception : Exception
             }
         }
 
+        // 变量状态
+        if (variableStates.Count > 0)
+        {
+            sb.AppendLine($"{magenta}相关变量状态:{reset}");
+            foreach (var (varName, varValue) in variableStates)
+            {
+                sb.AppendLine($"  {varName} = {varValue}");
+            }
+        }
+
         // 建议
         if (!string.IsNullOrEmpty(suggestion))
         {
             sb.AppendLine($"{green}建议:{reset} {suggestion}");
         }
 
-        // 堆栈跟踪
-        sb.AppendLine($"{blue}堆栈跟踪:{reset}");
-        sb.AppendLine(new System.Diagnostics.StackTrace(2, true).ToString().Trim());
+        // Old8Lang调用栈
+        if (callStack.Count > 0)
+        {
+            sb.AppendLine($"{cyan}Old8Lang调用栈:{reset}");
+            for (int i = 0; i < callStack.Count; i++)
+            {
+                var frame = callStack[i];
+                var indent = new string(' ', i * 2);
+                sb.AppendLine($"{indent}{frame.FunctionName} at {frame.Position}");
+            }
+        }
 
         return sb.ToString();
     }

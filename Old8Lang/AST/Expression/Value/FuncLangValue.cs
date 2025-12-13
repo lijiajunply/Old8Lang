@@ -88,6 +88,8 @@ public class FuncLangValue : ImportInfo
             object? invoke;
             try
             {
+                // 入栈：记录函数调用
+                Old8Exception.PushCallStack(Method?.Name ?? "Unknown", Position);
                 invoke = Method?.Invoke(obj, a);
             }
             catch (TargetInvocationException ex) when (ex.InnerException != null)
@@ -177,6 +179,9 @@ public class FuncLangValue : ImportInfo
         variateManagerFunc.RecursionDepth++;
         try
         {
+            // 入栈：记录函数调用
+            Old8Exception.PushCallStack(Id?.IdName ?? "anonymous", Position);
+            
             // 如果有捕获的作用域（闭包），使用捕获的作用域而不是调用时的作用域
             // 这样函数体就能访问定义时的外部变量
             VariateManager executionManager;
@@ -266,6 +271,8 @@ public class FuncLangValue : ImportInfo
         {
             // 确保递归深度总是被递减
             variateManagerFunc.RecursionDepth--;
+            // 出栈：函数调用结束
+            Old8Exception.PopCallStack();
         }
     }
 

@@ -17,12 +17,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/移除 import ... as ... 语法支持.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.ebnf" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.ebnf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang_Grammar.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SyntaxTests/test_import_syntax.old8" beforeDir="false" afterPath="$PROJECT_DIR$/SyntaxTests/test_import_syntax.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/Old8Lang错误信息优化计划.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/更新和完善Old8Lang项目文档.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/50_enhanced_error_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/35_import_new_syntax.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/35_import_new_syntax.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ErrorException.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/ErrorException.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -771,7 +773,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="176" />
+    <option name="localTasksCounter" value="177" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -798,7 +800,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lib): 添加集合和CSV处理库及文件下载功能&#10;&#10;- 新增 CollectionLib 类，提供列表、字典、集合等常用操作方法&#10;- 新增 CsvLib 类，支持 CSV 文件的读取、写入和解析功能&#10;- 在 HttpClient 中新增 DownloadFileAsync 方法，支持文件下载&#10;- 为集合处理库添加完整的单元测试覆盖&#10;- 为 CSV 处理库添加基础解析和格式化测试&#10;- 修复 UnpackZip 方法中的路径参数使用错误问题&#10;- 扩展 HTTP 客户端功能以支持文件上传操作" />
     <MESSAGE value="refactor(CollectionLib): 优化集合操作方法并增强类型安全&#10;&#10;- 移除不必要的空行以提升代码整洁度&#10;- 为DictMerge、DictFilter等字典操作方法添加notnull约束&#10;- 使用集合表达式语法初始化HashSet提升可读性&#10;- 统一代码风格，增强参数验证逻辑一致性" />
     <MESSAGE value="feat(lang): 实现原生库批量导入功能&#10;&#10;- 新增 DLL 路径解析器 DllPathResolver，支持多策略查找原生库&#10;- 支持批量导入语法：[import &quot;DllName&quot; ClassName *]&#10;- 支持选择性导入语法：[import &quot;DllName&quot; ClassName { Method1, Method2 }]&#10;- 更新语法解析器以识别新的导入语句格式&#10;- 优化 NativeStatement 类以处理多种导入方式&#10;- 完善错误提示，提供详细的 DLL 查找失败信息&#10;- 更新标准库文件使用新的批量导入语法&#10;- 扩展语法文档，增加批量导入和选择性导入说明&#10;- 添加相关测试用例验证新功能正确性" />
     <MESSAGE value="refactor(net): 简化网络库导入定义并优化字段访问逻辑&#10;&#10;- 简化 Net.old8 文件中的类导入定义，统一使用类名导入替代方法级别导入&#10;- 移除冗余的属性和方法导入声明，减少配置复杂度&#10;- 优化 NativeStaticAny 类中的字段访问逻辑，提高代码可读性&#10;- 调整条件表达式结构，使字段获取流程更加清晰&#10;- 更新工作区变更记录，反映最新的文件修改状态" />
@@ -823,7 +824,8 @@
     <MESSAGE value="feat(parser): 引入 native 关键字替代 import 方括号语法&#10;&#10;- 新增 Native 枚举值以支持 native 关键字识别&#10;- 更新 EBNF 语法规则，使用 native 替代 [import ...] 形式&#10;- 修改解析器逻辑，适配新的 native 语句结构&#10;- 支持批量导入(*)、选择性导入({})及别名(as)语法&#10;- 移除旧的方括号包围的 import 语句处理逻辑&#10;- 更新标准库文件使用新语法格式&#10;- 同步更新语法文档说明与示例代码" />
     <MESSAGE value="refactor(parser): 将 import 关键字替换为 native&#10;&#10;- 更新语法关键字从 import 到 native&#10;- 修改类导入语句格式为 native &quot;DllName&quot; ClassName&#10;- 支持带别名的类导入语法 native &quot;DllName&quot; ClassName as Alias&#10;- 更新批量导入语法为 native &quot;DllName&quot; ClassName *&#10;- 更新选择性导入语法为 native &quot;DllName&quot; ClassName { Method1, Method2 }&#10;- 调整测试文件中的导入语句格式&#10;- 更新代码注释中的语法示例说明" />
     <MESSAGE value="feat(parser): 实现新的 import 语法支持&#10;&#10;- 新增 ImportItem 类用于表示导入项及其别名&#10;- 修改 ImportStatement 类以支持命名导入、默认导入和 from 子句&#10;- 更新语法规则，添加 from 和 as 关键字支持&#10;- 实现解析器对新 import 语法的完整支持&#10;- 支持传统 import 语法以保持向后兼容&#10;- 添加测试用例验证各种 import 语法场景&#10;- 更新语法文档和 EBNF 定义&#10;- 优化模块导入逻辑，区分不同导入方式的处理流程" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 实现新的 import 语法支持&#10;&#10;- 新增 ImportItem 类用于表示导入项及其别名&#10;- 修改 ImportStatement 类以支持命名导入、默认导入和 from 子句&#10;- 更新语法规则，添加 from 和 as 关键字支持&#10;- 实现解析器对新 import 语法的完整支持&#10;- 支持传统 import 语法以保持向后兼容&#10;- 添加测试用例验证各种 import 语法场景&#10;- 更新语法文档和 EBNF 定义&#10;- 优化模块导入逻辑，区分不同导入方式的处理流程" />
+    <MESSAGE value="feat(parser): 移除 import ... as ... 语法支持&#10;&#10;- 移除 ImportStatement 类中的 defaultImport 参数和相关逻辑&#10;- 修改 StatementParser 中的 ParseImportStatement 方法，不再处理 import module as alias 语法&#10;- 更新 Old8Lang.ebnf 文件，调整 importSpecifier 语法规则&#10;- 删除或更新使用 import ... as ... 语法的测试用例&#10;- 更新 Old8Lang_Grammar.md 文档，移除相关语法说明&#10;- 确保保留命名导入和重命名导入的支持&#10;- 确保传统 import 语法仍可正常使用" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 移除 import ... as ... 语法支持&#10;&#10;- 移除 ImportStatement 类中的 defaultImport 参数和相关逻辑&#10;- 修改 StatementParser 中的 ParseImportStatement 方法，不再处理 import module as alias 语法&#10;- 更新 Old8Lang.ebnf 文件，调整 importSpecifier 语法规则&#10;- 删除或更新使用 import ... as ... 语法的测试用例&#10;- 更新 Old8Lang_Grammar.md 文档，移除相关语法说明&#10;- 确保保留命名导入和重命名导入的支持&#10;- 确保传统 import 语法仍可正常使用" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

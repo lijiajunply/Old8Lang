@@ -1,0 +1,127 @@
+// 测试增强后的错误信息
+// 这个文件将触发各种错误，验证增强后的错误信息是否正确显示
+
+PrintLine("=== 增强错误信息测试 ===")
+PrintLine()
+
+// 测试1: 除零错误
+PrintLine("--- 测试1: 除零错误 ---")
+try {
+    a <- 10
+    b <- 0
+    result <- a / b
+    PrintLine("结果: " + result)
+} catch (e) {
+    PrintLine("捕获除零错误:")
+    PrintLine(e)
+    PrintLine()
+}
+
+// 测试2: 数组越界错误
+PrintLine("--- 测试2: 数组越界错误 ---")
+try {
+    testArray <- [1, 2, 3, 4, 5]
+    index <- 10
+    value <- testArray[index]
+    PrintLine("结果: " + value)
+} catch (e) {
+    PrintLine("捕获数组越界错误:")
+    PrintLine(e)
+    PrintLine()
+}
+
+// 测试3: 类型错误
+PrintLine("--- 测试3: 类型错误 ---")
+try {
+    str <- "hello"
+    num <- 123
+    result <- str + num
+    PrintLine("结果: " + result)
+} catch (e) {
+    PrintLine("捕获类型错误:")
+    PrintLine(e)
+    PrintLine()
+}
+
+// 测试4: 未定义变量错误
+PrintLine("--- 测试4: 未定义变量错误 ---")
+try {
+    PrintLine("未定义变量: " + undefinedVariable)
+} catch (e) {
+    PrintLine("捕获未定义变量错误:")
+    PrintLine(e)
+    PrintLine()
+}
+
+// 测试5: 函数参数不匹配错误
+PrintLine("--- 测试5: 函数参数不匹配错误 ---")
+func requiresTwoParams(a, b) {
+    return a + b
+}
+
+try {
+    result <- requiresTwoParams(1)
+    PrintLine("结果: " + result)
+} catch (e) {
+    PrintLine("捕获参数不匹配错误:")
+    PrintLine(e)
+    PrintLine()
+}
+
+// 测试6: 属性错误
+PrintLine("--- 测试6: 属性错误 ---")
+class TestClass {
+    public x
+    
+    func init() {
+        this.x <- 10
+    }
+}
+
+try {
+    obj <- TestClass()
+    PrintLine("访问不存在的属性: " + obj.y)
+} catch e {
+    PrintLine("捕获属性错误:")
+    PrintLine(e)
+    PrintLine()
+}
+
+// 测试7: 键错误
+PrintLine("--- 测试7: 键错误 ---")
+try {
+    testDict <- {"key1": "value1", "key2": "value2"}
+    value <- testDict["nonexistent_key"]
+    PrintLine("结果: " + value)
+} catch (e) {
+    PrintLine("捕获键错误:")
+    PrintLine(e)
+    PrintLine()
+}
+
+// 测试8: 函数调用栈测试
+PrintLine("--- 测试8: 函数调用栈测试 ---")
+func func1() {
+    func2()
+}
+
+func func2() {
+    func3()
+}
+
+func func3() {
+    a <- 10
+    b <- 0
+    result <- a / b
+    PrintLine("结果: " + result)
+}
+
+try {
+    func1()
+} catch (e) {
+    PrintLine("捕获调用栈错误:")
+    PrintLine(e)
+    PrintLine()
+}
+
+PrintLine("✅ 增强错误信息测试完成")
