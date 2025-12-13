@@ -413,20 +413,6 @@ public class RegexException : Exception
     /// <summary>
     /// 构造函数
     /// </summary>
-    public RegexException() : base()
-    {
-    }
-
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    public RegexException(string message) : base(message)
-    {
-    }
-
-    /// <summary>
-    /// 构造函数
-    /// </summary>
     public RegexException(string message, Exception innerException) : base(message, innerException)
     {
     }
@@ -437,20 +423,6 @@ public class RegexException : Exception
 /// </summary>
 public class EncodingException : Exception
 {
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    public EncodingException() : base()
-    {
-    }
-
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    public EncodingException(string message) : base(message)
-    {
-    }
-
     /// <summary>
     /// 构造函数
     /// </summary>

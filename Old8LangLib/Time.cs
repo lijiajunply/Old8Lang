@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Old8LangLib;
 
@@ -8,7 +9,7 @@ namespace Old8LangLib;
 public static class Time
 {
     private static readonly Stopwatch Sw = Stopwatch.StartNew();
-    
+
     // ========== 时间获取 ==========
 
     /// <summary>
@@ -16,10 +17,10 @@ public static class Time
     /// </summary>
     /// <param name="format">时间格式字符串，默认为null</param>
     /// <returns>格式化后的时间字符串</returns>
-    public static string GetLocalTime(string format = null)
+    public static string GetLocalTime(string? format = null)
     {
         DateTime now = DateTime.Now;
-        return string.IsNullOrEmpty(format) ? now.ToString() : now.ToString(format);
+        return string.IsNullOrEmpty(format) ? now.ToString(CultureInfo.InvariantCulture) : now.ToString(format);
     }
 
     /// <summary>
@@ -27,19 +28,19 @@ public static class Time
     /// </summary>
     /// <param name="format">时间格式字符串，默认为null</param>
     /// <returns>格式化后的时间字符串</returns>
-    public static string GetUtcTime(string format = null)
+    public static string GetUtcTime(string? format = null)
     {
         DateTime now = DateTime.UtcNow;
-        return string.IsNullOrEmpty(format) ? now.ToString() : now.ToString(format);
+        return string.IsNullOrEmpty(format) ? now.ToString(CultureInfo.InvariantCulture) : now.ToString(format);
     }
 
     /// <summary>
     /// 获取指定时区的当前时间
     /// </summary>
-    /// <param name="timeZoneId">时区ID，例如："Asia/Shanghai", "America/New_York", "Europe/London"
+    /// <param name="timeZoneId">时区ID，例如："Asia/Shanghai", "America/New_York", "Europe/London"</param>
     /// <param name="format">时间格式字符串，默认为null</param>
     /// <returns>格式化后的时间字符串</returns>
-    public static string GetTimeInTimeZone(string timeZoneId, string format = null)
+    public static string GetTimeInTimeZone(string timeZoneId, string? format = null)
     {
         try
         {
@@ -66,10 +67,10 @@ public static class Time
     /// <param name="localTime">本地时间</param>
     /// <param name="format">时间格式字符串，默认为null</param>
     /// <returns>格式化后的UTC时间字符串</returns>
-    public static string LocalToUtc(DateTime localTime, string format = null)
+    public static string LocalToUtc(DateTime localTime, string? format = null)
     {
         DateTime utcTime = localTime.ToUniversalTime();
-        return string.IsNullOrEmpty(format) ? utcTime.ToString() : utcTime.ToString(format);
+        return string.IsNullOrEmpty(format) ? utcTime.ToString(CultureInfo.InvariantCulture) : utcTime.ToString(format);
     }
 
     /// <summary>
@@ -78,10 +79,12 @@ public static class Time
     /// <param name="utcTime">UTC时间</param>
     /// <param name="format">时间格式字符串，默认为null</param>
     /// <returns>格式化后的本地时间字符串</returns>
-    public static string UtcToLocal(DateTime utcTime, string format = null)
+    public static string UtcToLocal(DateTime utcTime, string? format = null)
     {
         DateTime localTime = utcTime.ToLocalTime();
-        return string.IsNullOrEmpty(format) ? localTime.ToString() : localTime.ToString(format);
+        return string.IsNullOrEmpty(format)
+            ? localTime.ToString(CultureInfo.InvariantCulture)
+            : localTime.ToString(format);
     }
 
     /// <summary>
@@ -92,16 +95,17 @@ public static class Time
     /// <param name="toTimeZoneId">目标时区ID</param>
     /// <param name="format">时间格式字符串，默认为null</param>
     /// <returns>格式化后的目标时区时间字符串</returns>
-    public static string ConvertTimeBetweenTimeZones(DateTime time, string fromTimeZoneId, string toTimeZoneId, string format = null)
+    public static string ConvertTimeBetweenTimeZones(DateTime time, string fromTimeZoneId, string toTimeZoneId,
+        string? format = null)
     {
         try
         {
-            TimeZoneInfo fromTimeZone = TimeZoneInfo.FindSystemTimeZoneById(fromTimeZoneId);
-            TimeZoneInfo toTimeZone = TimeZoneInfo.FindSystemTimeZoneById(toTimeZoneId);
-            
-            DateTimeOffset fromTime = new DateTimeOffset(time, fromTimeZone.GetUtcOffset(time));
-            DateTimeOffset toTime = TimeZoneInfo.ConvertTime(fromTime, toTimeZone);
-            
+            var fromTimeZone = TimeZoneInfo.FindSystemTimeZoneById(fromTimeZoneId);
+            var toTimeZone = TimeZoneInfo.FindSystemTimeZoneById(toTimeZoneId);
+
+            var fromTime = new DateTimeOffset(time, fromTimeZone.GetUtcOffset(time));
+            var toTime = TimeZoneInfo.ConvertTime(fromTime, toTimeZone);
+
             return string.IsNullOrEmpty(format) ? toTime.ToString() : toTime.ToString(format);
         }
         catch (TimeZoneNotFoundException ex)
@@ -140,9 +144,9 @@ public static class Time
     /// <param name="seconds">Unix时间戳（秒）</param>
     /// <param name="format">时间格式字符串，默认为null</param>
     /// <returns>格式化后的时间字符串</returns>
-    public static string FromUnixTimeSeconds(long seconds, string format = null)
+    public static string FromUnixTimeSeconds(long seconds, string? format = null)
     {
-        DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(seconds);
+        var dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(seconds);
         return string.IsNullOrEmpty(format) ? dateTimeOffset.ToString() : dateTimeOffset.ToString(format);
     }
 
@@ -152,9 +156,9 @@ public static class Time
     /// <param name="milliseconds">Unix时间戳（毫秒）</param>
     /// <param name="format">时间格式字符串，默认为null</param>
     /// <returns>格式化后的时间字符串</returns>
-    public static string FromUnixTimeMilliseconds(long milliseconds, string format = null)
+    public static string FromUnixTimeMilliseconds(long milliseconds, string? format = null)
     {
-        DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeMilliseconds(milliseconds);
+        var dateTimeOffset = DateTimeOffset.FromUnixTimeMilliseconds(milliseconds);
         return string.IsNullOrEmpty(format) ? dateTimeOffset.ToString() : dateTimeOffset.ToString(format);
     }
 
@@ -203,7 +207,8 @@ public static class Time
     /// <returns>常用时间格式数组</returns>
     public static string[] GetCommonFormats()
     {
-        return [
+        return
+        [
             "yyyy-MM-dd",
             "yyyy-MM-dd HH:mm:ss",
             "HH:mm:ss",
@@ -227,7 +232,7 @@ public static class Time
         {
             throw new ArgumentNullException(nameof(format), "时间格式不能为空");
         }
-        
+
         return dateTime.ToString(format);
     }
 
@@ -240,10 +245,10 @@ public static class Time
     /// <param name="days">天数</param>
     /// <param name="format">时间格式字符串，默认为null</param>
     /// <returns>格式化后的时间字符串</returns>
-    public static string AddDays(DateTime dateTime, int days, string format = null)
+    public static string AddDays(DateTime dateTime, int days, string? format = null)
     {
-        DateTime result = dateTime.AddDays(days);
-        return string.IsNullOrEmpty(format) ? result.ToString() : result.ToString(format);
+        var result = dateTime.AddDays(days);
+        return string.IsNullOrEmpty(format) ? result.ToString(CultureInfo.InvariantCulture) : result.ToString(format);
     }
 
     /// <summary>
@@ -253,10 +258,10 @@ public static class Time
     /// <param name="hours">小时数</param>
     /// <param name="format">时间格式字符串，默认为null</param>
     /// <returns>格式化后的时间字符串</returns>
-    public static string AddHours(DateTime dateTime, int hours, string format = null)
+    public static string AddHours(DateTime dateTime, int hours, string? format = null)
     {
-        DateTime result = dateTime.AddHours(hours);
-        return string.IsNullOrEmpty(format) ? result.ToString() : result.ToString(format);
+        var result = dateTime.AddHours(hours);
+        return string.IsNullOrEmpty(format) ? result.ToString(CultureInfo.InvariantCulture) : result.ToString(format);
     }
 
     /// <summary>
@@ -266,10 +271,10 @@ public static class Time
     /// <param name="minutes">分钟数</param>
     /// <param name="format">时间格式字符串，默认为null</param>
     /// <returns>格式化后的时间字符串</returns>
-    public static string AddMinutes(DateTime dateTime, int minutes, string format = null)
+    public static string AddMinutes(DateTime dateTime, int minutes, string? format = null)
     {
-        DateTime result = dateTime.AddMinutes(minutes);
-        return string.IsNullOrEmpty(format) ? result.ToString() : result.ToString(format);
+        var result = dateTime.AddMinutes(minutes);
+        return string.IsNullOrEmpty(format) ? result.ToString(CultureInfo.InvariantCulture) : result.ToString(format);
     }
 
     /// <summary>
@@ -279,10 +284,10 @@ public static class Time
     /// <param name="seconds">秒数</param>
     /// <param name="format">时间格式字符串，默认为null</param>
     /// <returns>格式化后的时间字符串</returns>
-    public static string AddSeconds(DateTime dateTime, int seconds, string format = null)
+    public static string AddSeconds(DateTime dateTime, int seconds, string? format = null)
     {
-        DateTime result = dateTime.AddSeconds(seconds);
-        return string.IsNullOrEmpty(format) ? result.ToString() : result.ToString(format);
+        var result = dateTime.AddSeconds(seconds);
+        return string.IsNullOrEmpty(format) ? result.ToString(CultureInfo.InvariantCulture) : result.ToString(format);
     }
 
     // ========== 兼容性方法 ==========
