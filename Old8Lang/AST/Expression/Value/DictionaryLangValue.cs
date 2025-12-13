@@ -137,6 +137,11 @@ public class DictionaryLangValue : LangValueType, ILangList
         }
     }
 
+    public bool In(LangValueType value)
+    {
+        return Value.Any(x => x.Value.Equal(value));
+    }
+
     public override string ToString()
     {
         if (Value.Count == 0)

@@ -94,6 +94,11 @@ public class ListLangValue : LangValueType, ILangList
         }
     }
 
+    public bool In(LangValueType value)
+    {
+        return Values.Any(v => v.Equal(value));
+    }
+
     public override string ToString() =>
         "[" + string.Join(", ", Values) + "]"; // Old8Lang 风格的列表，使用 [ ] 包裹
 

@@ -111,6 +111,11 @@ public class ArrayLangValue : LangValueType, ILangList
         }
     }
 
+    public bool In(LangValueType value)
+    {
+        return RunResult.Any(t => t.Equal(value));
+    }
+
     public LangValueType Get(IntLangValue a)
     {
         var index = a.Value;

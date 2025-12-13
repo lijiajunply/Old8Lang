@@ -151,6 +151,11 @@ public class StringLangValue(string context, SourcePosition position = default) 
         throw new InvalidOperationError(this, "字符串索引修改不可使用");
     }
 
+    public bool In(LangValueType value)
+    {
+        return Value.Contains(value.GetValue<char>());
+    }
+
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         ilGenerator.Emit(OpCodes.Ldstr, Value);

@@ -6,4 +6,5 @@ public interface ILangList
     public int GetLength();
     public LangValueType Slice(int start, int end);
     public void Set(LangValueType index, LangValueType value);
+    public bool In(LangValueType value);
 }
