@@ -22,7 +22,7 @@ public class CompilerIntegrationTests
         var ast = interpreter.Build(code);
 
         // 编译生成 IL - 主要验证不抛出异常
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
 
         // 验证 IL 已生成
         Assert.NotNull(compiledAction);
@@ -45,7 +45,7 @@ public class CompilerIntegrationTests
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
 
         Assert.NotNull(compiledAction);
 
@@ -66,7 +66,7 @@ public class CompilerIntegrationTests
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
 
         Assert.NotNull(compiledAction);
 
@@ -88,7 +88,7 @@ public class CompilerIntegrationTests
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
 
         // 验证 IL 已生成
         Assert.NotNull(compiledAction);
@@ -118,7 +118,7 @@ public class CompilerIntegrationTests
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
 
         Assert.NotNull(compiledAction);
 
@@ -140,7 +140,7 @@ public class CompilerIntegrationTests
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
 
         Assert.NotNull(compiledAction);
 
@@ -164,7 +164,7 @@ public class CompilerIntegrationTests
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
 
         Assert.NotNull(compiledAction);
 
@@ -189,7 +189,7 @@ public class CompilerIntegrationTests
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
 
         Assert.NotNull(compiledAction);
 
@@ -218,7 +218,7 @@ public class CompilerIntegrationTests
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
 
         Assert.NotNull(compiledAction);
 
@@ -240,7 +240,7 @@ public class CompilerIntegrationTests
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
 
         Assert.NotNull(compiledAction);
 

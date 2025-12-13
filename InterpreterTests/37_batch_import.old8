@@ -1,0 +1,18 @@
+// 所有导入必须在文件开头，避免解析问题
+[import "Old8LangLib" MathLib *]
+[import "Old8LangLib" Time { GetTimeNow, TimeStamp }]
+
+PrintLine("=== 批量导入功能测试 ===")
+PrintLine("测试1: 批量导入所有方法")
+
+result1 <- Sqrt(16)
+PrintLine("Sqrt(16) = " + result1.ToStr())
+
+result2 <- Pow(2, 3)
+PrintLine("Pow(2, 3) = " + result2.ToStr())
+
+PrintLine("测试2: 选择性导入")
+timeStr <- GetTimeNow("yyyy-MM-dd HH:mm:ss")
+PrintLine("GetTimeNow: " + timeStr)
+
+PrintLine("✅ 测试完成")

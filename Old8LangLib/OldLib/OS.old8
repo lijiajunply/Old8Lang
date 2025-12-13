@@ -1,2 +1,2 @@
-[import "Old8LangLib" OS OsInfo OSInfo]
-[import "Old8LangLib" OS Process]
+// Old8Lang 操作系统库 - 使用批量导入功能
+[import "Old8LangLib" OS *]

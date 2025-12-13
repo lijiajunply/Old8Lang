@@ -432,9 +432,9 @@ import module
 
 ### 5.8 原生库导入语句
 
-Old8Lang 支持导入原生 DLL 库中的类和方法，以便调用外部功能。原生库导入语句使用方括号 `[]` 包围，有三种形式：
+Old8Lang 支持导入原生 DLL 库中的类和方法，以便调用外部功能。原生库导入语句使用方括号 `[]` 包围，支持以下几种形式：
 
-#### 5.8.1 nativeStatement
+#### 5.8.1 单个方法导入 (nativeStatement)
 
 **语法规则**：`[import "dllName" className methodName alias?]`
 
@@ -447,7 +447,53 @@ Old8Lang 支持导入原生 DLL 库中的类和方法，以便调用外部功能
 [import "console.dll" console WriteLine printline]
 ```
 
-#### 5.8.2 nativeStatic
+#### 5.8.2 批量导入所有方法 (新增)
+
+**语法规则**：`[import "dllName" className *]`
+
+**描述**：导入原生 DLL 中某个类的所有公共静态方法。大大简化了标准库的引入。
+
+**示例**：
+
+```
+// 导入 MathLib 的所有方法（53个方法只需1行）
+[import "Old8LangLib" MathLib *]
+
+// 导入后可直接使用所有方法
+result <- Sqrt(16)     // 调用 Sqrt 方法
+pi <- GetPi()          // 调用 GetPi 方法
+sinVal <- Sin(1.57)    // 调用 Sin 方法
+```
+
+**优势**：
+- 从 53 行导入语句减少到 1 行
+- 自动导入类中的所有公共静态方法
+- 避免遗漏方法
+- 代码更简洁易读
+
+#### 5.8.3 选择性导入多个方法 (新增)
+
+**语法规则**：`[import "dllName" className { method1, method2, method3 }]`
+
+**描述**：按需导入原生 DLL 中某个类的特定方法，用逗号分隔多个方法名。
+
+**示例**：
+
+```
+// 只导入 Time 类的两个方法
+[import "Old8LangLib" Time { GetTimeNow, TimeStamp }]
+
+// 导入后可以使用这两个方法
+timeStr <- GetTimeNow("yyyy-MM-dd HH:mm:ss")
+stamp <- TimeStamp()
+```
+
+**优势**：
+- 按需导入，避免命名冲突
+- 代码更明确，容易理解使用了哪些方法
+- 减少不必要的方法导入
+
+#### 5.8.4 静态类导入 (nativeStatic)
 
 **语法规则**：`[import "dllName" className] -> alias`
 
@@ -459,7 +505,7 @@ Old8Lang 支持导入原生 DLL 库中的类和方法，以便调用外部功能
 [import "Math.dll" Math] -> Math
 ```
 
-#### 5.8.3 nativeClass
+#### 5.8.5 完整类导入 (nativeClass)
 
 **语法规则**：`[import "dllName" className]`
 
@@ -471,11 +517,20 @@ Old8Lang 支持导入原生 DLL 库中的类和方法，以便调用外部功能
 [import "Person.dll" Person]
 ```
 
-**原生库导入的作用**：
+#### 原生库导入的作用
+
 - 允许 Old8Lang 代码调用外部 C# DLL 中的功能
 - 支持调用静态方法和实例方法
 - 支持导入整个类或特定方法
+- 支持批量导入和选择性导入
 - 可用于扩展 Old8Lang 的功能，如访问系统 API、使用第三方库等
+
+#### 使用建议
+
+1. **批量导入** (`*`)：适用于需要使用类中大部分方法的场景，如标准库
+2. **选择性导入** (`{ }`)：适用于只需要使用少数几个方法的场景，避免命名冲突
+3. **单个方法导入**：适用于需要为方法指定别名的场景
+4. **导入位置**：建议将所有导入语句放在文件开头，避免解析歧义
 
 ## 6. 类型系统
 

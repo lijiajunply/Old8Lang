@@ -10,7 +10,7 @@ namespace Old8Lang.AST.Statement;
 
 public class NativeStatement : OldStatement
 {
-    
+
     private readonly string DllName;
 
     private readonly string ClassName;
@@ -22,12 +22,18 @@ public class NativeStatement : OldStatement
     private readonly string? Name;
     private readonly FuncLangValue? FuncValue;
 
+    // 批量导入相关字段
+    private readonly bool ImportAll;  // 是否导入所有方法 (*)
+    private readonly List<string>? MethodList;  // 选择性导入的方法列表
+
     public NativeStatement(string dllName, string className, string methodName, string nativeName)
     {
         DllName = dllName;
         ClassName = className;
         MethodName = methodName;
         NativeName = nativeName;
+        ImportAll = false;
+        MethodList = null;
     }
 
     public NativeStatement(string dllName, string className, string methodName, string nativeName, FuncInit a)
@@ -37,6 +43,8 @@ public class NativeStatement : OldStatement
         MethodName = methodName;
         NativeName = nativeName;
         FuncValue = a.FuncLangValue;
+        ImportAll = false;
+        MethodList = null;
     }
 
     public NativeStatement(string dllName, string className, string name = "")
@@ -44,83 +52,56 @@ public class NativeStatement : OldStatement
         DllName = dllName;
         ClassName = className;
         Name = name;
+        ImportAll = false;
+        MethodList = null;
+    }
+
+    // 新增：批量导入所有方法的构造函数
+    public NativeStatement(string dllName, string className, bool importAll)
+    {
+        DllName = dllName;
+        ClassName = className;
+        ImportAll = importAll;
+        MethodList = null;
+    }
+
+    // 新增：选择性导入多个方法的构造函数
+    public NativeStatement(string dllName, string className, List<string> methodList)
+    {
+        DllName = dllName;
+        ClassName = className;
+        MethodList = methodList;
+        ImportAll = false;
     }
 
     public override void Run(VariateManager manager)
     {
-        // 构建DLL路径，尝试多种可能的位置
-        var dllFileName = $"{DllName}.dll";
+        // 使用 DllPathResolver 查找 DLL 路径
         string path;
-
-        // 1. 尝试从Old8LangLib/OldLib/dll目录查找
-        var oldLibDllPath = Path.Combine(manager.LangInfo?.ImportPath ?? "", "dll", dllFileName);
-        if (File.Exists(oldLibDllPath))
+        try
         {
-            path = oldLibDllPath;
+            path = DllPathResolver.ResolveDllPath(
+                DllName,
+                manager.LangInfo?.ImportPath,
+                manager.Path);
         }
-        // 2. 尝试从当前文件所在目录的dll子目录查找
-        else if (string.IsNullOrEmpty(manager.Path))
+        catch (FileNotFoundException ex)
         {
-            path = Path.Combine(Path.GetDirectoryName(manager.Path) ?? "", "dll", dllFileName);
-        }
-        // 3. 尝试直接从应用程序基目录查找
-        else
-        {
-            path = Path.Combine(AppContext.BaseDirectory, dllFileName);
-        }
-
-        // 确保文件存在
-        if (!File.Exists(path))
-        {
-            // 尝试使用当前目录的绝对路径
-            var absolutePath = Path.GetFullPath(dllFileName);
-            if (File.Exists(absolutePath))
-            {
-                path = absolutePath;
-            }
-            else
-            {
-                // 尝试使用Old8LangLib.dll的绝对路径（针对Old8LangLib特殊处理）
-                if (DllName == "Old8LangLib")
-                {
-                    var directDllPath = Path.Combine(Directory.GetCurrentDirectory(), "Old8LangLib", "OldLib", "dll",
-                        dllFileName);
-                    if (File.Exists(directDllPath))
-                    {
-                        path = directDllPath;
-                    }
-                    else
-                    {
-                        // 最后尝试从bin目录查找 - 支持 net8.0 和 net10.0
-                        var binDllPath8 = Path.Combine(Directory.GetCurrentDirectory(), "Old8LangLib", "bin", "Debug",
-                            "net8.0", dllFileName);
-                        var binDllPath10 = Path.Combine(Directory.GetCurrentDirectory(), "Old8LangLib", "bin", "Debug",
-                            "net10.0", dllFileName);
-                        if (File.Exists(binDllPath10))
-                        {
-                            path = binDllPath10;
-                        }
-                        else if (File.Exists(binDllPath8))
-                        {
-                            path = binDllPath8;
-                        }
-                        else
-                        {
-                            throw new FileNotFoundException(
-                                $"无法找到DLL文件 {dllFileName}，尝试的路径：{oldLibDllPath}, {path}, {absolutePath}, {directDllPath}, {binDllPath8}, {binDllPath10}");
-                        }
-                    }
-                }
-                else
-                {
-                    throw new FileNotFoundException(
-                        $"无法找到DLL文件 {dllFileName}，尝试的路径：{oldLibDllPath}, {path}, {absolutePath}");
-                }
-            }
+            // 包装异常，添加源代码位置信息
+            throw new Error.ImportError(Position, $"导入原生库失败：\n{ex.Message}");
         }
 
         // 加载程序集并获取类型
-        var assembly = Assembly.LoadFile(path);
+        Assembly assembly;
+        try
+        {
+            assembly = Assembly.LoadFile(path);
+        }
+        catch (Exception ex)
+        {
+            throw new Error.ImportError(Position, $"加载 DLL 文件失败：{path}\n错误：{ex.Message}");
+        }
+
         var type = assembly.GetType($"{DllName}.{ClassName}");
 
         if (!string.IsNullOrEmpty(Name))
@@ -148,13 +129,76 @@ public class NativeStatement : OldStatement
             return;
         }
 
+        // 处理批量导入所有方法：[import "DllName" ClassName *]
+        if (ImportAll)
+        {
+            var methods = type?.GetMethods(BindingFlags.Public | BindingFlags.Static);
+            if (methods == null || methods.Length == 0)
+            {
+                throw new InvalidOperationError(this, $"类 {ClassName} 中没有找到公共静态方法");
+            }
+
+            foreach (var method in methods)
+            {
+                // 过滤掉 Object 基类的方法
+                if (method.DeclaringType == typeof(object))
+                    continue;
+
+                var func = new FuncLangValue(method.Name, method, null);
+                manager.AddClassAndFunc(func);
+            }
+            return;
+        }
+
+        // 处理选择性导入多个方法：[import "DllName" ClassName { Method1, Method2 }]
+        if (MethodList != null && MethodList.Count > 0)
+        {
+            foreach (var methodName in MethodList)
+            {
+                var methodInfo = type?.GetMethod(methodName);
+                if (methodInfo == null)
+                {
+                    throw new InvalidOperationError(this, $"找不到方法 {methodName} 在 {ClassName} 类中");
+                }
+
+                var func = new FuncLangValue(methodName, methodInfo, null);
+                manager.AddClassAndFunc(func);
+            }
+            return;
+        }
+
         manager.AddClassAndFunc((ImportInfo)new NativeAnyLangValue(DllName, ClassName, path).Run(manager));
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        var path = $"{Path.GetDirectoryName(local.FilePath)}/dll/{DllName}.dll"; // filepath/dll/dllname
-        var assembly = Assembly.LoadFile(path);
+        // 使用 DllPathResolver 查找 DLL 路径
+        string path;
+        try
+        {
+            // 对于编译模式，尝试从 Apis.ReadJson 获取导入路径
+            var langInfo = Apis.ReadJson();
+            path = DllPathResolver.ResolveDllPath(
+                DllName,
+                langInfo.ImportPath,
+                local.FilePath);
+        }
+        catch (FileNotFoundException ex)
+        {
+            throw new Error.ImportError(new SourcePosition(0, 0), $"编译模式：导入原生库失败：\n{ex.Message}");
+        }
+
+        // 加载程序集并获取类型
+        Assembly assembly;
+        try
+        {
+            assembly = Assembly.LoadFile(path);
+        }
+        catch (Exception ex)
+        {
+            throw new Error.ImportError(new SourcePosition(0, 0), $"编译模式：加载 DLL 文件失败：{path}\n错误：{ex.Message}");
+        }
+
         var type = assembly.GetType($"{DllName}.{ClassName}");
         if (!string.IsNullOrEmpty(Name))
         {
@@ -177,6 +221,42 @@ public class NativeStatement : OldStatement
             if (string.IsNullOrEmpty(NativeName))
                 NativeName = MethodName;
             local.DelegateVar.Add(NativeName, methodInfo);
+            return;
+        }
+
+        // 处理批量导入所有方法：[import "DllName" ClassName *]
+        if (ImportAll)
+        {
+            var methods = type?.GetMethods(BindingFlags.Public | BindingFlags.Static);
+            if (methods == null || methods.Length == 0)
+            {
+                throw new InvalidOperationError(this, $"类 {ClassName} 中没有找到公共静态方法");
+            }
+
+            foreach (var method in methods)
+            {
+                // 过滤掉 Object 基类的方法
+                if (method.DeclaringType == typeof(object))
+                    continue;
+
+                local.DelegateVar.Add(method.Name, method);
+            }
+            return;
+        }
+
+        // 处理选择性导入多个方法：[import "DllName" ClassName { Method1, Method2 }]
+        if (MethodList != null && MethodList.Count > 0)
+        {
+            foreach (var methodName in MethodList)
+            {
+                var methodInfo = type?.GetMethod(methodName);
+                if (methodInfo == null)
+                {
+                    throw new InvalidOperationError(this, $"找不到方法 {methodName} 在 {ClassName} 类中");
+                }
+
+                local.DelegateVar.Add(methodName, methodInfo);
+            }
         }
     }
 
@@ -195,6 +275,19 @@ public class NativeStatement : OldStatement
         {
             var funcName = string.IsNullOrEmpty(NativeName) ? MethodName : NativeName;
             return $"import native {DllName}.{ClassName}.{MethodName} as {funcName}\n{FuncValue}";
+        }
+
+        // 批量导入所有方法
+        if (ImportAll)
+        {
+            return $"[import \"{DllName}\" {ClassName} *]";
+        }
+
+        // 选择性导入多个方法
+        if (MethodList != null && MethodList.Count > 0)
+        {
+            var methods = string.Join(", ", MethodList);
+            return $"[import \"{DllName}\" {ClassName} {{ {methods} }}]";
         }
 
         return $"import native {DllName}.{ClassName}";

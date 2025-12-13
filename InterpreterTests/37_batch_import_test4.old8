@@ -1,0 +1,8 @@
+// 简化测试
+PrintLine("测试开始")
+PrintLine("测试2: 选择性导入多个方法")
+
+[import "Old8LangLib" Time { GetTimeNow, TimeStamp }]
+
+timeStr <- GetTimeNow("yyyy-MM-dd HH:mm:ss")
+PrintLine("GetTimeNow: " + timeStr)

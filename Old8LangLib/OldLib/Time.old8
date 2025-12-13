@@ -1,5 +1,2 @@
-[import "Old8LangLib" Time GetTimeNow]
-[import "Old8LangLib" Time TimeFormat]
-[import "Old8LangLib" Time TimeStart]
-[import "Old8LangLib" Time TimeStop]
-[import "Old8LangLib" Time TimeStamp]
+// Old8Lang 时间库 - 使用批量导入功能
+[import "Old8LangLib" Time *]

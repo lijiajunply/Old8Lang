@@ -1,0 +1,4 @@
+// 简单的批量导入测试
+[import "Old8LangLib" MathLib *]
+
+PrintLine("测试成功")

@@ -1,11 +1,4 @@
-[import "Old8LangLib" Terminal Title]
-[import "Old8LangLib" Terminal ReadAscii]
-[import "Old8LangLib" Terminal ReadLine]
-[import "Old8LangLib" Terminal ReadKey]
-[import "Old8LangLib" Terminal Beep]
-[import "Old8LangLib" Terminal Clear]
-[import "Old8LangLib" Terminal BeepWindow]
-[import "Old8LangLib" ColorfulTerminal PrintColorful]
-[import "Old8LangLib" ColorfulTerminal PrintLineColorful]
-[import "Old8LangLib" ColorfulTerminal PrintAscii]
-[import "Old8LangLib" ColorfulTerminal PrintAsciiColorful]
+// Old8Lang 终端库 - 使用批量导入功能
+// 导入 Terminal 和 ColorfulTerminal 的所有方法
+[import "Old8LangLib" Terminal *]
+[import "Old8LangLib" ColorfulTerminal *]

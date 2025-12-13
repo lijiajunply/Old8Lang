@@ -1,0 +1,12 @@
+// 测试批量导入功能
+
+PrintLine("测试1: 批量导入所有方法")
+[import "Old8LangLib" MathLib *]
+
+result1 <- Sqrt(16)
+PrintLine("Sqrt(16) = " + result1.ToStr())
+
+result2 <- Pow(2, 3)
+PrintLine("Pow(2, 3) = " + result2.ToStr())
+
+PrintLine("测试完成")

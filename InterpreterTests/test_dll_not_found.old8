@@ -1,0 +1,4 @@
+// 测试 DLL 路径查找错误提示
+[import "NonExistentDll" TestClass *]
+
+PrintLine("这行不会执行")

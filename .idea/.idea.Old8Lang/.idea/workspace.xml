@@ -17,21 +17,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.NetLib/HttpClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.NetLib/HttpClient.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/37_batch_import.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/37_batch_import_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/37_batch_import_test2.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/37_batch_import_test3.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/37_batch_import_test4.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_dll_not_found.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/DllPathResolver.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Language/SemicolonTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Language/SemicolonTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/CollectionLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/CollectionLibTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/CsvLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/CsvTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/JsonLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/JsonLibTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/SortLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/SortLibTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/StringLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/StringLibTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/PrimaryParserTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/PrimaryParserTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/CollectionLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/CollectionLib.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/CsvLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Csv.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/StringLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/StringLib.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/Time.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Time.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/NativeStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/File.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/File.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/MathLib.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/MathLib.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/OS.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/OS.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Terminal.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Terminal.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Time.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Time.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang_Grammar.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,9 +70,12 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/InterpreterTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/NativeStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Apis.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
@@ -91,10 +96,12 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/Time.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1f/4c54500e/List`1.cs" root0="FORCE_HIGHLIGHTING" />
@@ -721,7 +728,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="150" />
+    <option name="localTasksCounter" value="151" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -748,7 +755,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(netlib): 添加网络库支持并重构项目结构&#10;&#10;- 新增 Old8Lang.NetLib 项目，包含 HTTP、Socket、WebSocket 和 MQTT 客户端实现&#10;- 在 Old8LangLib 中添加对新网络库的引用和导入定义&#10;- 更新解决方案文件，将 Old8Lang.NetLib 加入构建配置&#10;- 添加多个测试脚本用于验证网络库功能&#10;- 修改 IDE 编码配置路径以适配项目结构调整&#10;- 移除旧的 Net 类定义，使用新的模块化网络库替代&#10;- 提供完整的异步网络通信支持，包括连接、发送和接收数据&#10;- 支持常见的网络协议和操作，提升语言的网络编程能力" />
     <MESSAGE value="refactor(netlib): 重构SocketClient和WebApiClient字段命名及访问逻辑&#10;&#10;- 将私有字段重命名为PascalCase格式以符合C#命名约定&#10;- 使用可空引用类型优化NetworkStream声明&#10;- 将_isConnected标志替换为公共属性IsConnected并添加setter&#10;- 更新所有方法中的字段引用以匹配新命名&#10;- 简化HttpClient和TcpClient的初始化及资源释放逻辑&#10;- 优化BuildUrl方法中字典判断条件表达式&#10;- 改进PATCH请求发送方式，移除不必要的using块嵌套&#10;-" />
     <MESSAGE value="feat(compiler): 实现 for-in 循环对字典键值对的支持&#10;&#10;- 修复了字典键值对遍历时的 InvalidProgramException 错误&#10;- 更新 GenerateDictionaryIl 方法以支持多个标识符&#10;- 添加了对字典索引器的调用逻辑&#10;- 增加了值变量的局部存储和管理&#10;- 完成了对键值对遍历的完整 IL 代码生成&#10;- 通过单元测试验证了数组、字符串、字典的遍历功能&#10;- 确认了 for-in 语法在编译模式下的完全支持" />
     <MESSAGE value="feat(compiler): 支持 switch 语句范围匹配和函数内使用&#10;&#10;- 实现 switch 语句对范围数组的匹配支持&#10;- 允许 switch 语句在函数体内正常使用&#10;- 优化 switch 语句 IL 生成逻辑，支持 break 和 return 混合场景&#10;- 更新解析器逻辑，不再强制检查表达式后的特定终止符&#10;- 添加相关测试用例：test_switch_range.old8 和 test_switch_in_function.old8&#10;- 引入 Colorful.Console 包以增强终端输出能力&#10;- 移除部分冗余的终端库和 OS 库测试代码&#10;- 新增失败测试分析脚本 analyze_failures.sh 及报告文件" />
@@ -773,7 +779,8 @@
     <MESSAGE value="test(parser): 添加高级运算符和列表推导式解析测试&#10;&#10;- 新增幂运算符(^)的解析测试，包括简单幂运算、链式幂运算、与括号结合、与其他运算符优先级等场景&#10;- 新增点运算符(.)的解析测试，涵盖成员访问、链式访问、方法调用、数组索引、字典键访问等用法&#10;- 新增列表推导式的完整测试套件，包括基本语法、条件过滤、嵌套循环、复杂表达式等场景&#10;- 添加点运算符和列表推导式的错误处理测试，验证语法错误能被正确捕获&#10;- 实现运算符优先级测试，确保点运算符与幂运算符、算术运算符的优先级关系正确&#10;- 补充特殊用法测试，如函数调用结果的成员访问和链式方法调用等边界情况" />
     <MESSAGE value="test(parser): 添加表达式和主解析器的单元测试&#10;&#10;- 实现运算符优先级和结合性的测试用例&#10;- 添加三元表达式和布尔运算的测试覆盖&#10;- 完成比较运算符和一元运算符的测试验证&#10;- 增加复杂数字字面量和字符串解析测试&#10;- 补充集合字面量及实例化解析测试&#10;- 完善标识符和元组解析的测试场景" />
     <MESSAGE value="feat(lib): 添加集合和CSV处理库及文件下载功能&#10;&#10;- 新增 CollectionLib 类，提供列表、字典、集合等常用操作方法&#10;- 新增 CsvLib 类，支持 CSV 文件的读取、写入和解析功能&#10;- 在 HttpClient 中新增 DownloadFileAsync 方法，支持文件下载&#10;- 为集合处理库添加完整的单元测试覆盖&#10;- 为 CSV 处理库添加基础解析和格式化测试&#10;- 修复 UnpackZip 方法中的路径参数使用错误问题&#10;- 扩展 HTTP 客户端功能以支持文件上传操作" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lib): 添加集合和CSV处理库及文件下载功能&#10;&#10;- 新增 CollectionLib 类，提供列表、字典、集合等常用操作方法&#10;- 新增 CsvLib 类，支持 CSV 文件的读取、写入和解析功能&#10;- 在 HttpClient 中新增 DownloadFileAsync 方法，支持文件下载&#10;- 为集合处理库添加完整的单元测试覆盖&#10;- 为 CSV 处理库添加基础解析和格式化测试&#10;- 修复 UnpackZip 方法中的路径参数使用错误问题&#10;- 扩展 HTTP 客户端功能以支持文件上传操作" />
+    <MESSAGE value="refactor(CollectionLib): 优化集合操作方法并增强类型安全&#10;&#10;- 移除不必要的空行以提升代码整洁度&#10;- 为DictMerge、DictFilter等字典操作方法添加notnull约束&#10;- 使用集合表达式语法初始化HashSet提升可读性&#10;- 统一代码风格，增强参数验证逻辑一致性" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(CollectionLib): 优化集合操作方法并增强类型安全&#10;&#10;- 移除不必要的空行以提升代码整洁度&#10;- 为DictMerge、DictFilter等字典操作方法添加notnull约束&#10;- 使用集合表达式语法初始化HashSet提升可读性&#10;- 统一代码风格，增强参数验证逻辑一致性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
