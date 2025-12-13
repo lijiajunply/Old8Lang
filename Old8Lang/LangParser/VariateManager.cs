@@ -74,12 +74,9 @@ public class VariateManager
         // 1. 先查找变量，从当前作用域向父作用域查找
         for (var i = Scopes.Count - 1; i >= 0; i--)
         {
-            if (Scopes[i].ContainsKey(id.IdName))
-            {
-                // 2. 找到了变量，修改它的值
-                Scopes[i][id.IdName] = langValueType;
-                return;
-            }
+            if (!Scopes[i].ContainsKey(id.IdName)) continue;
+            Scopes[i][id.IdName] = langValueType;
+            return;
         }
 
         // 3. 没有找到变量，在当前作用域中创建新变量
@@ -138,7 +135,7 @@ public class VariateManager
             {
                 FuncLangValue func => func.Id!.IdName == id.IdName,
                 TypeTemplate template => template.ClassName == id.IdName,
-                NativeAnyLangValue na => na.RegisterName == id.IdName,  // 使用 RegisterName 而不是 ClassName
+                NativeAnyLangValue na => na.RegisterName == id.IdName, // 使用 RegisterName 而不是 ClassName
                 NativeStaticAny staticAny => staticAny.ClassName == id.IdName,
                 _ => false
             };

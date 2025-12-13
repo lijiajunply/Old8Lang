@@ -12,20 +12,22 @@ public class LocalManager
     public readonly Dictionary<string, MethodInfo> DelegateVar = [];
     public readonly Dictionary<string, Type> ClassVar = [];
     public readonly Dictionary<string, FieldInfo> FieldVar = [];
+
     public readonly Dictionary<string, Type> LocalVarTypes = [];
+
     // 存储函数的参数列表信息（用于支持默认参数）
     public readonly Dictionary<string, List<LangId>> FuncParameters = [];
     public Type? InClassEnv { get; init; }
     public string FilePath { get; set; } = "";
     public LangInterpreter? Interpreter { get; init; }
-    
+
     // break和continue标签
     public Label? BreakLabel { get; set; }
     public Label? ContinueLabel { get; set; }
-    
+
     // 标记是否在finally块中生成IL代码
     public bool IsInFinallyBlock { get; set; }
-    
+
     /// <summary>
     /// 记录调试信息
     /// </summary>
@@ -35,7 +37,7 @@ public class LocalManager
     {
         Console.WriteLine($"[DEBUG] {FilePath}:{position.Line}:{position.Column} - {message}");
     }
-    
+
     /// <summary>
     /// 报告编译错误
     /// </summary>
@@ -47,7 +49,7 @@ public class LocalManager
         var errorMessage = $"{FilePath}:{position.Line}:{position.Column} - {message}";
         throw new CompilerException(errorMessage, position);
     }
-    
+
     /// <summary>
     /// 验证类型兼容性
     /// </summary>
@@ -59,10 +61,10 @@ public class LocalManager
     {
         if (expected == null || actual == null)
             return false;
-        
+
         if (expected == actual || expected.IsAssignableFrom(actual))
             return true;
-        
+
         ReportError($"类型不兼容: 预期 {expected.Name}, 实际 {actual.Name}", position);
         return false;
     }
@@ -86,19 +88,19 @@ public class LocalManager
             BreakLabel = BreakLabel,
             ContinueLabel = ContinueLabel
         };
-        
+
         // 克隆局部变量
         foreach (var (name, local) in LocalVar)
         {
             cloned.LocalVar[name] = local;
         }
-        
+
         // 克隆委托变量
         foreach (var (name, method) in DelegateVar)
         {
             cloned.DelegateVar[name] = method;
         }
-        
+
         // 克隆类变量
         foreach (var (name, type) in ClassVar)
         {
@@ -112,14 +114,14 @@ public class LocalManager
         }
 
         // 克隆函数参数信息
-        foreach (var (name, params_) in FuncParameters)
+        foreach (var (name, @params) in FuncParameters)
         {
-            cloned.FuncParameters[name] = params_;
+            cloned.FuncParameters[name] = @params;
         }
 
         return cloned;
     }
-    
+
     /// <summary>
     /// 从克隆实例中恢复当前LocalManager的状态
     /// </summary>
@@ -128,22 +130,22 @@ public class LocalManager
     {
         // 清空当前局部变量
         LocalVar.Clear();
-        
+
         // 恢复局部变量
         foreach (var (name, local) in cloned.LocalVar)
         {
             LocalVar[name] = local;
         }
-        
+
         // 清空当前委托变量
         DelegateVar.Clear();
-        
+
         // 恢复委托变量
         foreach (var (name, method) in cloned.DelegateVar)
         {
             DelegateVar[name] = method;
         }
-        
+
         // 清空当前类变量
         ClassVar.Clear();
 
