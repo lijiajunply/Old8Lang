@@ -793,20 +793,55 @@ public class Operation(
                 // 处理 in 操作符：left in right
                 // 加载左侧值
                 Left!.LoadIlValue(ilGenerator, local);
+                var leftValueType = Left.OutputType(local);
+                // 确保左侧值是object类型（装箱值类型）
+                if (leftValueType != null && leftValueType.IsValueType)
+                {
+                    ilGenerator.Emit(OpCodes.Box, leftValueType);
+                }
+
                 // 加载右侧集合
                 Right!.LoadIlValue(ilGenerator, local);
-                
+
                 // 处理不同类型的集合
                 if (rightType!.IsGenericType && rightType.GetGenericTypeDefinition() == typeof(List<>))
                 {
                     // 调用 List<T>.Contains(T) 方法
+                    // 注意：栈上当前顺序是 [value, list]，但实例方法期望 [list, value]
+                    // 需要使用局部变量交换栈顺序
+
+                    var listLocal = ilGenerator.DeclareLocal(rightType);
+                    var valueLocal = ilGenerator.DeclareLocal(typeof(object));
+
+                    // 保存list和value到局部变量
+                    ilGenerator.Emit(OpCodes.Stloc, listLocal);  // 保存list
+                    ilGenerator.Emit(OpCodes.Stloc, valueLocal);  // 保存value
+
+                    // 按正确顺序重新加载：list, value
+                    ilGenerator.Emit(OpCodes.Ldloc, listLocal);
+                    ilGenerator.Emit(OpCodes.Ldloc, valueLocal);
+
                     var containsMethod = rightType.GetMethod("Contains", [rightType.GetGenericArguments()[0]])!;
                     ilGenerator.Emit(OpCodes.Callvirt, containsMethod);
                 }
                 else if (rightType.IsArray)
                 {
                     // 调用 Array.IndexOf(array, value) 方法，然后检查结果是否 >= 0
-                    var indexOfMethod = typeof(Array).GetMethod("IndexOf", [rightType, rightType.GetElementType()])!;
+                    // 注意：栈上当前顺序是 [value, array]，但 Array.IndexOf 期望 [array, value]
+                    // 需要使用局部变量交换栈顺序
+
+                    var arrayLocal = ilGenerator.DeclareLocal(rightType);
+                    var valueLocal = ilGenerator.DeclareLocal(typeof(object));
+
+                    // 保存array和value到局部变量
+                    ilGenerator.Emit(OpCodes.Stloc, arrayLocal);  // 保存array
+                    ilGenerator.Emit(OpCodes.Stloc, valueLocal);  // 保存value
+
+                    // 按正确顺序重新加载：array, value
+                    ilGenerator.Emit(OpCodes.Ldloc, arrayLocal);
+                    ilGenerator.Emit(OpCodes.Ldloc, valueLocal);
+
+                    var indexOfMethod = typeof(Array).GetMethod("IndexOf", [typeof(Array), typeof(object)])!;
                     ilGenerator.Emit(OpCodes.Call, indexOfMethod);
                     ilGenerator.Emit(OpCodes.Ldc_I4_0);
                     ilGenerator.Emit(OpCodes.Clt);
@@ -816,6 +851,20 @@ public class Operation(
                 else if (rightType.IsGenericType && rightType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                 {
                     // 调用 Dictionary<TKey, TValue>.ContainsKey(TKey) 方法
+                    // 注意：栈上当前顺序是 [value, dict]，但实例方法期望 [dict, value]
+                    // 需要使用局部变量交换栈顺序
+
+                    var dictLocal = ilGenerator.DeclareLocal(rightType);
+                    var valueLocal = ilGenerator.DeclareLocal(typeof(object));
+
+                    // 保存dict和value到局部变量
+                    ilGenerator.Emit(OpCodes.Stloc, dictLocal);  // 保存dict
+                    ilGenerator.Emit(OpCodes.Stloc, valueLocal);  // 保存value
+
+                    // 按正确顺序重新加载：dict, value
+                    ilGenerator.Emit(OpCodes.Ldloc, dictLocal);
+                    ilGenerator.Emit(OpCodes.Ldloc, valueLocal);
+
                     var containsMethod = rightType.GetMethod("ContainsKey", [rightType.GetGenericArguments()[0]])!;
                     ilGenerator.Emit(OpCodes.Callvirt, containsMethod);
                 }
@@ -825,6 +874,16 @@ public class Operation(
                     var containsMethod = rightType.GetMethod("Contains", [typeof(object)]);
                     if (containsMethod != null)
                     {
+                        // 非静态方法需要交换栈顺序
+                        if (!containsMethod.IsStatic)
+                        {
+                            var objLocal = ilGenerator.DeclareLocal(rightType);
+                            var valueLocal = ilGenerator.DeclareLocal(typeof(object));
+                            ilGenerator.Emit(OpCodes.Stloc, objLocal);
+                            ilGenerator.Emit(OpCodes.Stloc, valueLocal);
+                            ilGenerator.Emit(OpCodes.Ldloc, objLocal);
+                            ilGenerator.Emit(OpCodes.Ldloc, valueLocal);
+                        }
                         ilGenerator.Emit(containsMethod.IsStatic ? OpCodes.Call : OpCodes.Callvirt, containsMethod);
                     }
                     else
@@ -834,6 +893,16 @@ public class Operation(
                         containsMethod = rightType.GetMethod("Contains", [leftOperandType!]);
                         if (containsMethod != null)
                         {
+                            // 非静态方法需要交换栈顺序
+                            if (!containsMethod.IsStatic)
+                            {
+                                var objLocal = ilGenerator.DeclareLocal(rightType);
+                                var valueLocal = ilGenerator.DeclareLocal(leftOperandType!);
+                                ilGenerator.Emit(OpCodes.Stloc, objLocal);
+                                ilGenerator.Emit(OpCodes.Stloc, valueLocal);
+                                ilGenerator.Emit(OpCodes.Ldloc, objLocal);
+                                ilGenerator.Emit(OpCodes.Ldloc, valueLocal);
+                            }
                             ilGenerator.Emit(containsMethod.IsStatic ? OpCodes.Call : OpCodes.Callvirt, containsMethod);
                         }
                         else
@@ -842,6 +911,14 @@ public class Operation(
                             if (rightType == typeof(string))
                             {
                                 // 调用 string.Contains(string) 方法
+                                // 注意：栈上当前顺序是 [value, string]，但实例方法期望 [string, value]
+                                var strLocal = ilGenerator.DeclareLocal(typeof(string));
+                                var valueLocal = ilGenerator.DeclareLocal(typeof(object));
+                                ilGenerator.Emit(OpCodes.Stloc, strLocal);
+                                ilGenerator.Emit(OpCodes.Stloc, valueLocal);
+                                ilGenerator.Emit(OpCodes.Ldloc, strLocal);
+                                ilGenerator.Emit(OpCodes.Ldloc, valueLocal);
+
                                 var stringContainsMethod = typeof(string).GetMethod("Contains", [typeof(string)])!;
                                 ilGenerator.Emit(OpCodes.Callvirt, stringContainsMethod);
                             }
