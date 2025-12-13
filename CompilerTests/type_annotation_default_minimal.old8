@@ -1,0 +1,12 @@
+// 最简单的默认参数类型推断测试
+
+PrintLine("=== 最简单的默认参数测试 ===")
+
+func add(a:int, b: 10) -> int {
+    return a + b
+}
+
+result <- add(5)
+PrintLine("5 + 10 = " + result.ToStr())
+
+PrintLine("✅ 测试完成")

@@ -181,35 +181,80 @@ When adding new language features:
 
 | Feature | Interpreter Mode | Compiler Mode |
 |---------|-----------------|---------------|
-| Function parameter type annotations | Optional | **Required** |
+| Function parameter type annotations | Optional | **Required** (or default value) |
+| Function default parameter inference | Supported | **Supported** |
 | Function return type annotations | Optional (inferred) | **Required** |
 | Lambda parameter type annotations | Optional | **Required** |
 | Lambda return type annotations | Optional (inferred) | Optional (inferred) |
 
+#### Function Parameter Type Requirements
+
+In compiler mode, function parameters must satisfy **one of the following**:
+1. **Explicit type annotation**: `param:int`
+2. **Default value for type inference**: `param: 123`
+
 Compiler mode examples:
 
 ```old8
-// Correct: complete type annotations
-func calculate(x:int, y:int) -> int {
-    return x + y
+// Method 1: Explicit type annotations
+func add(a:int, b:int) -> int {
+    return a + b
 }
 
+// Method 2: Default value inference
+func greet(name:string, message: "Hello") -> void {
+    PrintLine(message + ", " + name)
+}
+
+// Method 3: Mixed approach
+func calculate(x:int, y: 0, operation: "add") -> int {
+    if operation == "add" {
+        return x + y
+    } else {
+        return x * y
+    }
+}
+
+// Correct: Lambda with parameter types, return type can be inferred
+transform <- (n:int) -> n * 2
+```
+
+Error examples:
+
+```old8
 // Error: missing return type
 func calculate(x:int, y:int) {
     return x + y
 }
 
-// Error: missing parameter type
-func calculate(x, y:int) -> int {
+// Error: parameter has neither type annotation nor default value
+func calculate(x, y) -> int {
     return x + y
 }
-
-// Correct: Lambda with parameter types, return type can be inferred
-transform <- (n:int) -> n * 2
 
 // Error: Lambda missing parameter type
 transform <- (n) -> n * 2
 ```
+
+#### Default Parameter Type Inference
+
+When a parameter has a default value, the compiler infers its type:
+
+```old8
+func example(
+    intParam: 123,           // inferred as int
+    doubleParam: 3.14,       // inferred as double
+    stringParam: "text",     // inferred as string
+    boolParam: true          // inferred as bool
+) -> void {
+    // function body
+}
+```
+
+**Known Limitations**:
+- Default parameter inference works for **validation** (passes type checking)
+- Due to known IL generation issues, functions with default parameters may encounter runtime issues in compiler mode
+- Interpreter mode handles default parameters correctly
 
 **Note**: Interpreter mode remains flexible and allows type inference for all cases.
 

@@ -339,14 +339,17 @@ add:int (a:int, b:int) -> {
 
 在编译模式下（使用 `-c` 选项），函数声明有额外要求：
 
-1. **参数类型注解是强制的**：所有函数参数必须显式声明类型
+1. **参数类型要求**：所有函数参数必须满足以下之一
+   - 显式声明类型注解：`param:int`
+   - 提供默认值以推断类型：`param: 123`
 2. **返回类型注解是强制的**：函数返回类型必须显式声明，不能通过return推断
-3. **Lambda参数类型注解是强制的**：Lambda表达式的参数必须有类型注解
+3. **Lambda参数类型注解是强制的**：Lambda表达式的参数必须有类型注解（不支持默认参数）
 4. **Lambda返回类型可以推断**：Lambda的返回类型可以从表达式或return语句推断
 
 | 特性 | 解释器模式 | 编译模式 |
 |------|----------|---------|
-| 函数参数类型注解 | 可选 | **必须** |
+| 函数参数类型注解 | 可选 | **必须**（或有默认值） |
+| 函数参数默认值推断 | 支持 | **支持** |
 | 函数返回类型注解 | 可选（可推断） | **必须** |
 | Lambda参数类型注解 | 可选 | **必须** |
 | Lambda返回类型注解 | 可选（可推断） | 可选（可推断） |
@@ -354,9 +357,23 @@ add:int (a:int, b:int) -> {
 正确示例（编译模式）：
 
 ```old8
-// 完整类型注解的函数
+// 方式1：完整类型注解的函数
 func add(a:int, b:int) -> int {
     return a + b
+}
+
+// 方式2：使用默认值推断参数类型
+func greet(name:string, message: "Hello") -> void {
+    PrintLine(message + ", " + name)
+}
+
+// 方式3：混合使用类型注解和默认值
+func calculate(x:int, y: 0, operation: "add") -> int {
+    if operation == "add" {
+        return x + y
+    } else {
+        return x * y
+    }
 }
 
 // void返回类型
@@ -376,7 +393,7 @@ func calculate(x:int, y:int) {
     return x + y
 }
 
-// 错误：参数缺少类型
+// 错误：参数既没有类型也没有默认值
 func add(a, b) -> int {
     return a + b
 }
@@ -384,6 +401,26 @@ func add(a, b) -> int {
 // 错误：Lambda参数缺少类型
 transform <- (x) -> x * 2
 ```
+
+**默认参数类型推断说明**：
+
+当参数提供默认值时，编译器会从默认值自动推断参数类型：
+
+```old8
+func example(
+    intParam: 123,           // 推断为 int
+    doubleParam: 3.14,       // 推断为 double
+    stringParam: "text",     // 推断为 string
+    boolParam: true          // 推断为 bool
+) -> void {
+    // 函数体
+}
+```
+
+注意：
+- 默认参数推断在**验证阶段**生效，能通过编译模式的类型检查
+- 由于编译器IL生成的已知限制，带默认参数的函数在编译模式下可能遇到运行时问题
+- 解释器模式下默认参数完全正常工作
 
 #### 5.4.3 函数调用
 

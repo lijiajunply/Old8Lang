@@ -1,0 +1,51 @@
+// 测试默认参数的类型自动推断
+
+PrintLine("=== 默认参数类型推断测试 ===")
+
+// 测试1：整数默认值
+func add(a:int, b: 10) -> int {
+    return a + b
+}
+
+PrintLine("5 + 10 = " + add(5).ToStr())
+PrintLine("5 + 20 = " + add(5, 20).ToStr())
+
+// 测试2：字符串默认值
+func greet(name:string, message: "Hello") -> void {
+    PrintLine(message + ", " + name + "!")
+}
+
+greet("Alice")
+greet("Bob", "Hi")
+
+// 测试3：浮点数默认值
+func multiply(a:double, factor: 2.0) -> double {
+    return a * factor
+}
+
+PrintLine("3.5 * 2.0 = " + multiply(3.5).ToStr())
+PrintLine("3.5 * 1.5 = " + multiply(3.5, 1.5).ToStr())
+
+// 测试4：布尔默认值
+func printFlag(label:string, flag: true) -> void {
+    PrintLine(label + ": " + flag.ToStr())
+}
+
+printFlag("状态1")
+printFlag("状态2", false)
+
+// 测试5：混合使用类型注解和默认值
+func calculate(x:int, y:int, operation: "add") -> int {
+    if operation == "add" {
+        return x + y
+    } elif operation == "multiply" {
+        return x * y
+    } else {
+        return 0
+    }
+}
+
+PrintLine("5 + 3 = " + calculate(5, 3).ToStr())
+PrintLine("5 * 3 = " + calculate(5, 3, "multiply").ToStr())
+
+PrintLine("\n✅ 默认参数类型推断测试完成")

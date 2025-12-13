@@ -1,0 +1,11 @@
+// 应该报错：参数既没有类型注解也没有默认值
+
+PrintLine("=== 测试参数缺少类型和默认值 ===")
+
+func test(a, b) -> int {
+    return a + b
+}
+
+test(1, 2)
+
+// error

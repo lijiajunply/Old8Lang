@@ -66,7 +66,7 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
 
         // 【修改】优先使用显式声明的返回类型
         // 如果类型注解存在但OutputType返回null/object，则仍尝试推断（用于兼容性）
-        var returnType = FuncLangValue.Id!.OutputType(local);
+        var returnType = FuncLangValue.Id?.OutputType(local);
         if (returnType == null || returnType == typeof(object))
         {
             // 如果OutputType无法解析，尝试从函数体推断
@@ -183,12 +183,25 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
             for (int i = 0; i < FuncLangValue.Ids.Count; i++)
             {
                 var param = FuncLangValue.Ids[i];
+
+                // 如果参数没有类型注解，检查是否有默认值
                 if (string.IsNullOrEmpty(param.AssumptionType))
                 {
+                    // 如果有默认值，可以从默认值推断类型，不报错
+                    if (param.DefaultValue != null)
+                    {
+                        // 从默认值推断类型（在后续处理中会自动使用）
+                        continue;
+                    }
+
+                    // 既没有类型注解也没有默认值，报错
                     var errorMsg = $"[编译模式错误] 函数 '{FuncLangValue.Id?.IdName}' 的参数 '{param.IdName}' (第{i + 1}个参数) 缺少类型注解\n\n" +
-                                  $"编译模式下所有函数参数必须显式声明类型注解。\n\n" +
+                                  $"编译模式下所有函数参数必须满足以下之一：\n" +
+                                  $"  1. 显式声明类型注解：{param.IdName}:int\n" +
+                                  $"  2. 提供默认值以推断类型：{param.IdName}: 123\n\n" +
                                   $"修复示例：\n" +
-                                  $"  func {FuncLangValue.Id?.IdName}(..., {param.IdName}:int, ...) -> returnType {{ ... }}\n\n" +
+                                  $"  func {FuncLangValue.Id?.IdName}(..., {param.IdName}:int, ...) -> returnType {{ ... }}\n" +
+                                  $"  func {FuncLangValue.Id?.IdName}(..., {param.IdName}: 0, ...) -> returnType {{ ... }}\n\n" +
                                   $"支持的类型：int, double, string, bool, char, void, list<T>, array<T>, dictionary<K,V>";
                     local.ReportError(errorMsg, param.Position);
                 }
