@@ -9,9 +9,9 @@ namespace Old8Lang.AST.Statement;
 /// <summary>
 /// while语句
 /// </summary>
-public class WhileStatement(LangExpression expression, OldStatement blockStatement, SourcePosition position = default) : OldStatement(position)
+public class WhileStatement(LangExpression expression, OldStatement blockStatement, SourcePosition position = default)
+    : OldStatement(position)
 {
-    
     public override void Run(VariateManager manager)
     {
         manager.AddChildren();
@@ -50,7 +50,7 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
                 return;
             }
         }
-        
+
         manager.RemoveChildren();
     }
 
@@ -63,7 +63,7 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
         // 保存当前的break和continue标签，以便嵌套循环使用
         var oldBreakLabel = local.BreakLabel;
         var oldContinueLabel = local.ContinueLabel;
-        
+
         // 设置当前循环的break和continue标签
         local.BreakLabel = loopEnd;
         local.ContinueLabel = loopStart; // while循环中continue直接跳转到循环开始
@@ -74,7 +74,7 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
         // 检查循环条件
         expression.LoadIlValue(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Brfalse, loopEnd); // 如果条件为false，跳转到循环结束
-        
+
         blockStatement.GenerateIl(ilGenerator, local);
 
         // 跳转回循环开始
@@ -82,13 +82,13 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
 
         // 循环结束标签
         ilGenerator.MarkLabel(loopEnd);
-        
+
         // 恢复之前的break和continue标签
         local.BreakLabel = oldBreakLabel;
         local.ContinueLabel = oldContinueLabel;
     }
 
-    public override OldStatement this[int index] => blockStatement[index];
+    public override OldStatement this[int index] => blockStatement[index] ?? throw new IndexOutOfRangeException();
 
     public override int Count => blockStatement.Count;
 

@@ -13,7 +13,6 @@ public class SwitchStatement(
     SourcePosition position = default)
     : OldStatement(position)
 {
-
     public override void Run(VariateManager manager)
     {
         var switchValue = switchExpression.Run(manager);
@@ -91,7 +90,6 @@ public class SwitchStatement(
                 ilGenerator.Emit(OpCodes.Cgt);
 
                 // 如果找到，跳转到对应的case标签
-                ilGenerator.Emit(OpCodes.Brtrue, caseLabel);
             }
             else
             {
@@ -138,15 +136,16 @@ public class SwitchStatement(
                 }
 
                 // 如果相等，跳转到对应的case标签
-                ilGenerator.Emit(OpCodes.Brtrue, caseLabel);
             }
+
+            ilGenerator.Emit(OpCodes.Brtrue, caseLabel);
         }
 
         // 所有case都不匹配，跳转到default或结束
         ilGenerator.Emit(OpCodes.Br, defaultLabel);
 
         // 生成各个case块
-        for (int i = 0; i < switchCaseList.Count; i++)
+        for (var i = 0; i < switchCaseList.Count; i++)
         {
             var oldCase = switchCaseList[i];
             var caseLabel = caseLabels[i];
@@ -188,7 +187,6 @@ public class SwitchStatement(
 public class CaseStatement(LangExpression expression, BlockStatement blockStatement, SourcePosition position = default)
     : OldStatement(position)
 {
-
     public LangExpression expression { get; } = expression;
     public BlockStatement BlockStatement { get; } = blockStatement;
 

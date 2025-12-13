@@ -489,6 +489,28 @@ public class PrimaryParser(
 
                 return new FuncLangValue(null, ids, block, position);
             }
+
+            // 严格检查：如果看起来像 Lambda 参数列表但缺少 ->
+            if (isLambda && CurrentToken.Type == LangTokenType.RightParen)
+            {
+                var rightParenLine = CurrentToken.Line;
+                var nextToken = Peek();
+
+                // 检查右括号后是否还有内容，且在同一行，且不是分号
+                if (nextToken.Type != LangTokenType.Semicolon &&
+                    nextToken.Type != LangTokenType.EndOfFile &&
+                    nextToken.Line == rightParenLine)
+                {
+                    // 构建参数列表字符串用于错误消息
+                    var paramList = string.Join(", ", ids.Select(id => id.IdName));
+
+                    throw CreateSyntaxError(
+                        $"语法错误：Lambda 表达式缺少箭头 '->'。\n" +
+                        $"检测到参数列表 '({paramList})'，但缺少 '->' 符号。\n" +
+                        $"建议：使用 '({paramList}) -> expression' 或 '({paramList}) -> {{ ... }}' 格式定义 Lambda 表达式。\n" +
+                        $"如果这不是 Lambda 表达式，请在参数列表后添加分号 ';' 或换行符。");
+                }
+            }
         }
         else
         {

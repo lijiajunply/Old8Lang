@@ -286,22 +286,27 @@ public class StatementParser(
             var expr = expressionParser.ParseExpression();
             if (expr != null!)
             {
-                // 如果是函数调用表达式（Instance 或 Operation），返回 FuncRunStatement
+                // 如果是函数调用表达式（Instance），返回 FuncRunStatement
                 if (expr is Instance instance)
                 {
                     return new FuncRunStatement(instance, expr.Position);
                 }
 
-                if (expr is Operation operation)
-                {
-                    return new FuncRunStatement(operation, expr.Position);
-                }
-
-                // 其他表达式，返回 SetStatement 包装
-                return new SetStatement(new LangId("", position: expr.Position), expr);
+                // 其他表达式（Operation、LangId 等）不能作为语句
+                throw CreateSyntaxError(
+                    $"语法错误：表达式 '{expr}' 不能作为独立语句使用。\n" +
+                    $"建议：\n" +
+                    $"  1. 如果要赋值，请使用 'variable <- {expr}' 格式\n" +
+                    $"  2. 如果要调用函数，请添加函数调用 '{expr}(arguments)' 格式\n" +
+                    $"  3. 如果要返回值，请使用 'return {expr}' 格式");
             }
         }
-        catch
+        catch (Old8Exception)
+        {
+            // 重新抛出语法错误和其他 Old8 异常
+            throw;
+        }
+        catch (Exception)
         {
             // 解析失败，回滚，尝试解析为其他语句类型
             CurrentIndex = i;

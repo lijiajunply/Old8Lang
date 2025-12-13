@@ -1,0 +1,20 @@
+// 综合测试：各种 Lambda 和括号的场景
+
+// 正确的 Lambda 表达式（简洁形式）
+add <- (x, y) -> x + y
+square <- (n) -> n * n
+
+// 同一行多个语句，用分号分隔
+a <- (1, 2); b <- (3, 4)
+
+// 元组赋值后换行
+tuple1 <- (x, y)
+tuple2 <- (a, b)
+
+// 带分号的 Lambda
+double <- (n) -> n * 2;
+triple <- (n) -> n * 3;
+
+// 复杂的 Lambda 表达式（块形式必须用 return）
+max <- (x, y) -> { if x > y { return x } else { return y } }
+min <- (x, y) -> { if x < y { return x } else { return y } }

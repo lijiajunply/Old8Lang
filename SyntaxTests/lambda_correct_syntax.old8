@@ -1,0 +1,15 @@
+// 测试：正确的 Lambda 语法
+add <- (x, y) -> x + y
+multiply <- (a, b) -> a * b
+
+// 带分号的正确语法
+square <- (n) -> n * n;
+
+// 多行 Lambda（必须用 return）
+max <- (x, y) -> {
+    if x > y {
+        return x
+    } else {
+        return y
+    }
+}

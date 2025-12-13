@@ -502,5 +502,19 @@ public class SetStatement : OldStatement
 
     public override int Count => 0;
 
-    public override string ToString() => LeftExpression != null ? $"{LeftExpression} <- {Value}" : $"{Id} <- {Value}";
+    public override string ToString()
+    {
+        if (LeftExpression != null)
+        {
+            return $"{LeftExpression} <- {Value}";
+        }
+
+        // 如果 Id 为空或 IdName 为空，只显示右值（用于块表达式的返回值）
+        if (Id == null || string.IsNullOrEmpty(Id.IdName))
+        {
+            return $" <- {Value}";
+        }
+
+        return $"{Id} <- {Value}";
+    }
 }
