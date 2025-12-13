@@ -339,9 +339,15 @@ public class FuncLangValue : ImportInfo
 
     public override void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
     {
+        // 【新增】Lambda表达式类型注解验证
+        if (IsLambda || Id == null)
+        {
+            ValidateLambdaTypeAnnotations(local, idName);
+        }
+
         // Lambda表达式需要特殊处理：编译成Delegate
         // 普通方法：编译成DynamicMethod
-        
+
         // Lambda表达式没有函数名(Id == null)，使用变量名作为方法名
         var methodName = Id?.IdName ?? idName;
 
@@ -540,5 +546,32 @@ public class FuncLangValue : ImportInfo
                 local.FuncParameters.TryAdd(delegateKey, Ids);
             }
         }
+    }
+
+    /// <summary>
+    /// 验证Lambda表达式的类型注解完整性（编译模式要求）
+    /// </summary>
+    private void ValidateLambdaTypeAnnotations(LocalManager local, string variableName)
+    {
+        // 验证Lambda参数的类型注解
+        if (Ids != null)
+        {
+            for (int i = 0; i < Ids.Count; i++)
+            {
+                var param = Ids[i];
+                if (string.IsNullOrEmpty(param.AssumptionType))
+                {
+                    var errorMsg = $"[编译模式错误] Lambda表达式 '{variableName}' 的参数 '{param.IdName}' (第{i + 1}个参数) 缺少类型注解\n\n" +
+                                  $"编译模式下Lambda表达式的所有参数必须显式声明类型注解。\n\n" +
+                                  $"修复示例：\n" +
+                                  $"  {variableName} <- ({param.IdName}:int, ...) -> {{ ... }}\n" +
+                                  $"  {variableName} <- ({param.IdName}:int, ...) -> expression\n\n" +
+                                  $"支持的类型：int, double, string, bool, char, list<T>, array<T>";
+                    local.ReportError(errorMsg, param.Position);
+                }
+            }
+        }
+
+        // 注意：Lambda返回类型允许推断，不需要强制声明
     }
 }

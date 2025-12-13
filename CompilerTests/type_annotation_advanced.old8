@@ -1,0 +1,384 @@
+// 编译模式 - 复杂场景类型注解测试
+// 测试嵌套、递归、闭包等高级特性
+
+PrintLine("=== 复杂场景类型注解测试 ===\n")
+
+// ========== 递归算法测试 ==========
+PrintLine("【递归算法测试】")
+
+func factorial(n:int) -> int {
+    if n <= 0 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+func fibonacci(n:int) -> int {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+func gcd(a:int, b:int) -> int {
+    if b == 0 {
+        return a
+    }
+    return gcd(b, a % b)
+}
+
+func power(base:int, exp:int) -> int {
+    if exp == 0 {
+        return 1
+    }
+    if exp == 1 {
+        return base
+    }
+    return base * power(base, exp - 1)
+}
+
+PrintLine("5的阶乘: " + factorial(5).ToStr())
+PrintLine("斐波那契第8项: " + fibonacci(8).ToStr())
+PrintLine("GCD(48, 18): " + gcd(48, 18).ToStr())
+PrintLine("2的10次方: " + power(2, 10).ToStr())
+
+// ========== 数组处理测试 ==========
+PrintLine("\n【数组处理测试】")
+
+func sumArray(arr:array) -> int {
+    sum <- 0
+    for item in arr {
+        sum <- sum + item
+    }
+    return sum
+}
+
+func findMax(arr:array) -> int {
+    if Len(arr) == 0 {
+        return 0
+    }
+    max <- arr[0]
+    for item in arr {
+        if item > max {
+            max <- item
+        }
+    }
+    return max
+}
+
+func findMin(arr:array) -> int {
+    if Len(arr) == 0 {
+        return 0
+    }
+    min <- arr[0]
+    for item in arr {
+        if item < min {
+            min <- item
+        }
+    }
+    return min
+}
+
+func countPositive(arr:array) -> int {
+    count <- 0
+    for item in arr {
+        if item > 0 {
+            count <- count + 1
+        }
+    }
+    return count
+}
+
+testArray <- [3, 7, 2, 9, 1, 5, 8, 4, 6]
+PrintLine("数组: [3, 7, 2, 9, 1, 5, 8, 4, 6]")
+PrintLine("数组总和: " + sumArray(testArray).ToStr())
+PrintLine("最大值: " + findMax(testArray).ToStr())
+PrintLine("最小值: " + findMin(testArray).ToStr())
+PrintLine("正数个数: " + countPositive(testArray).ToStr())
+
+// ========== 字符串处理高级测试 ==========
+PrintLine("\n【字符串处理高级测试】")
+
+func countWords(text:string) -> int {
+    if Len(text) == 0 {
+        return 0
+    }
+    // 简化版本：假设单词由空格分隔
+    return Len(text)
+}
+
+func isPalindrome(s:string) -> bool {
+    length <- Len(s)
+    for i in Range(0, length / 2) {
+        if s[i] != s[length - 1 - i] {
+            return false
+        }
+    }
+    return true
+}
+
+func reverseString(s:string) -> string {
+    result <- ""
+    length <- Len(s)
+    for i in Range(0, length) {
+        result <- s[length - 1 - i].ToStr() + result
+    }
+    return result
+}
+
+func countChar(s:string, target:char) -> int {
+    count <- 0
+    for c in s {
+        if c == target {
+            count <- count + 1
+        }
+    }
+    return count
+}
+
+testStr <- "hello"
+PrintLine("字符串: " + testStr)
+PrintLine("是否回文: " + isPalindrome(testStr).ToStr())
+PrintLine("字符'l'出现次数: " + countChar(testStr, 'l').ToStr())
+
+// ========== Lambda闭包测试 ==========
+PrintLine("\n【Lambda闭包测试】")
+
+func createMultiplier(factor:int) -> void {
+    multiplier <- (x:int) -> x * factor
+    PrintLine("3 * " + factor.ToStr() + " = " + multiplier(3).ToStr())
+}
+
+func createCounter(start:int) -> void {
+    current <- start
+    increment <- () -> {
+        current <- current + 1
+        return current
+    }
+    PrintLine("计数器: " + increment().ToStr())
+    PrintLine("计数器: " + increment().ToStr())
+    PrintLine("计数器: " + increment().ToStr())
+}
+
+createMultiplier(5)
+createCounter(10)
+
+// ========== 多层嵌套函数测试 ==========
+PrintLine("\n【多层嵌套函数测试】")
+
+func outerFunction(x:int) -> int {
+    func innerFunction(y:int) -> int {
+        return x + y
+    }
+    return innerFunction(10) + innerFunction(20)
+}
+
+func complexCalculation(a:int, b:int, c:int) -> int {
+    func add(x:int, y:int) -> int {
+        return x + y
+    }
+    func multiply(x:int, y:int) -> int {
+        return x * y
+    }
+    return add(multiply(a, b), c)
+}
+
+PrintLine("外部函数(5): " + outerFunction(5).ToStr())
+PrintLine("复杂计算(3, 4, 5): " + complexCalculation(3, 4, 5).ToStr())
+
+// ========== 条件分支复杂测试 ==========
+PrintLine("\n【条件分支复杂测试】")
+
+func getGrade(score:int) -> string {
+    if score >= 90 {
+        return "A"
+    } elif score >= 80 {
+        return "B"
+    } elif score >= 70 {
+        return "C"
+    } elif score >= 60 {
+        return "D"
+    } else {
+        return "F"
+    }
+}
+
+func getDayType(day:int) -> string {
+    if day >= 1 and day <= 5 {
+        return "工作日"
+    } elif day == 6 or day == 7 {
+        return "周末"
+    } else {
+        return "无效"
+    }
+}
+
+func classify(n:int) -> string {
+    if n > 0 {
+        if n % 2 == 0 {
+            return "正偶数"
+        } else {
+            return "正奇数"
+        }
+    } elif n < 0 {
+        if n % 2 == 0 {
+            return "负偶数"
+        } else {
+            return "负奇数"
+        }
+    } else {
+        return "零"
+    }
+}
+
+PrintLine("分数85的等级: " + getGrade(85))
+PrintLine("星期6的类型: " + getDayType(6))
+PrintLine("数字-7的分类: " + classify(-7))
+
+// ========== Switch语句测试 ==========
+PrintLine("\n【Switch语句测试】")
+
+func getMonthName(month:int) -> string {
+    switch month {
+        case 1 {
+            return "一月"
+        }
+        case 2 {
+            return "二月"
+        }
+        case 3 {
+            return "三月"
+        }
+        case 4 {
+            return "四月"
+        }
+        case 5 {
+            return "五月"
+        }
+        case 6 {
+            return "六月"
+        }
+        default {
+            return "未知月份"
+        }
+    }
+}
+
+func getSeasonByMonth(month:int) -> string {
+    switch month {
+        case 3 {
+            return "春季"
+        }
+        case 4 {
+            return "春季"
+        }
+        case 5 {
+            return "春季"
+        }
+        case 6 {
+            return "夏季"
+        }
+        case 7 {
+            return "夏季"
+        }
+        case 8 {
+            return "夏季"
+        }
+        case 9 {
+            return "秋季"
+        }
+        case 10 {
+            return "秋季"
+        }
+        case 11 {
+            return "秋季"
+        }
+        case 12 {
+            return "冬季"
+        }
+        case 1 {
+            return "冬季"
+        }
+        case 2 {
+            return "冬季"
+        }
+        default {
+            return "未知"
+        }
+    }
+}
+
+PrintLine("月份3: " + getMonthName(3))
+PrintLine("月份7的季节: " + getSeasonByMonth(7))
+
+// ========== 循环组合测试 ==========
+PrintLine("\n【循环组合测试】")
+
+func multiplicationTable(n:int) -> void {
+    for i in Range(1, n + 1) {
+        line <- ""
+        for j in Range(1, n + 1) {
+            line <- line + (i * j).ToStr() + " "
+        }
+        PrintLine(line)
+    }
+}
+
+func sumOfSquares(n:int) -> int {
+    sum <- 0
+    for i in Range(1, n + 1) {
+        sum <- sum + (i * i)
+    }
+    return sum
+}
+
+func countDigits(n:int) -> int {
+    if n == 0 {
+        return 1
+    }
+    count <- 0
+    temp <- n
+    if temp < 0 {
+        temp <- -temp
+    }
+    while temp > 0 {
+        count <- count + 1
+        temp <- temp / 10
+    }
+    return count
+}
+
+PrintLine("3x3乘法表:")
+multiplicationTable(3)
+PrintLine("1到10平方和: " + sumOfSquares(10).ToStr())
+PrintLine("12345的位数: " + countDigits(12345).ToStr())
+
+// ========== 错误处理测试 ==========
+PrintLine("\n【错误处理测试】")
+
+func safeDivide(a:int, b:int) -> double {
+    if b == 0 {
+        PrintLine("错误：除数为0，返回0")
+        return 0.0
+    }
+    return a / b
+}
+
+func validateAge(age:int) -> bool {
+    if age < 0 {
+        PrintLine("错误：年龄不能为负数")
+        return false
+    }
+    if age > 150 {
+        PrintLine("错误：年龄超出合理范围")
+        return false
+    }
+    return true
+}
+
+PrintLine("安全除法(10, 2): " + safeDivide(10, 2).ToStr())
+PrintLine("安全除法(10, 0): " + safeDivide(10, 0).ToStr())
+PrintLine("验证年龄25: " + validateAge(25).ToStr())
+PrintLine("验证年龄-5: " + validateAge(-5).ToStr())
+
+PrintLine("\n✅ 所有复杂场景类型注解测试完成")

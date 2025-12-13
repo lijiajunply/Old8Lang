@@ -1,0 +1,6 @@
+// 编译模式类型注解测试 - Lambda参数类型缺失
+// 应该编译失败：Lambda参数缺少类型注解
+
+subtract <- (a, b) -> a - b
+
+// error

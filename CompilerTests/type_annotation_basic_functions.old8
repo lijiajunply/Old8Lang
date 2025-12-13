@@ -1,0 +1,172 @@
+// 编译模式 - 基础函数类型注解测试
+// 不包含Lambda和闭包，专注于函数类型注解验证
+
+PrintLine("=== 基础函数类型注解测试 ===\n")
+
+// ========== 基本类型测试 ==========
+PrintLine("【基本类型测试】")
+
+func addInt(a:int, b:int) -> int {
+    return a + b
+}
+
+func multiplyDouble(a:double, b:double) -> double {
+    return a * b
+}
+
+func concatenateString(s1:string, s2:string) -> string {
+    return s1 + s2
+}
+
+func negateBoolean(flag:bool) -> bool {
+    return not flag
+}
+
+func charToString(c:char) -> string {
+    return c.ToStr()
+}
+
+PrintLine("整数加法: " + addInt(10, 20).ToStr())
+PrintLine("浮点乘法: " + multiplyDouble(3.5, 2.0).ToStr())
+PrintLine("字符串拼接: " + concatenateString("Hello", " World"))
+PrintLine("布尔取反: " + negateBoolean(true).ToStr())
+PrintLine("字符转字符串: " + charToString('A'))
+
+// ========== Void返回类型测试 ==========
+PrintLine("\n【Void返回类型测试】")
+
+func printInfo(name:string, age:int) -> void {
+    PrintLine("姓名: " + name + ", 年龄: " + age.ToStr())
+}
+
+func logMessage(message:string) -> void {
+    PrintLine("[LOG] " + message)
+}
+
+printInfo("张三", 25)
+logMessage("系统启动成功")
+
+// ========== 条件逻辑测试 ==========
+PrintLine("\n【条件逻辑测试】")
+
+func max(a:int, b:int) -> int {
+    if a > b {
+        return a
+    } else {
+        return b
+    }
+}
+
+func min(a:int, b:int) -> int {
+    if a < b {
+        return a
+    }
+    return b
+}
+
+func isEven(n:int) -> bool {
+    return n % 2 == 0
+}
+
+func isPositive(n:int) -> bool {
+    return n > 0
+}
+
+PrintLine("最大值(10, 20): " + max(10, 20).ToStr())
+PrintLine("最小值(10, 20): " + min(10, 20).ToStr())
+PrintLine("8是偶数: " + isEven(8).ToStr())
+PrintLine("-5是正数: " + isPositive(-5).ToStr())
+
+// ========== 循环逻辑测试 ==========
+PrintLine("\n【循环逻辑测试】")
+
+func factorial(n:int) -> int {
+    if n <= 1 {
+        return 1
+    }
+    result <- 1
+    for i in Range(2, n + 1) {
+        result <- result * i
+    }
+    return result
+}
+
+func sumRange(start:int, end:int) -> int {
+    sum <- 0
+    for i in Range(start, end + 1) {
+        sum <- sum + i
+    }
+    return sum
+}
+
+PrintLine("5的阶乘: " + factorial(5).ToStr())
+PrintLine("1到10的和: " + sumRange(1, 10).ToStr())
+
+// ========== 嵌套函数调用测试 ==========
+PrintLine("\n【嵌套函数调用测试】")
+
+func triple(n:int) -> int {
+    return n * 3
+}
+
+func addThenTriple(a:int, b:int) -> int {
+    return triple(addInt(a, b))
+}
+
+PrintLine("嵌套调用 addThenTriple(5, 3): " + addThenTriple(5, 3).ToStr())
+
+// ========== 字符串处理测试 ==========
+PrintLine("\n【字符串处理测试】")
+
+func repeatString(s:string, times:int) -> string {
+    result <- ""
+    for i in Range(0, times) {
+        result <- result + s
+    }
+    return result
+}
+
+func stringLength(s:string) -> int {
+    return Len(s)
+}
+
+PrintLine("重复字符串: " + repeatString("Ha", 3))
+PrintLine("字符串长度: " + stringLength("Hello World").ToStr())
+
+// ========== 数学运算测试 ==========
+PrintLine("\n【数学运算测试】")
+
+func average(a:int, b:int) -> double {
+    return (a + b) / 2.0
+}
+
+func absolute(n:int) -> int {
+    if n < 0 {
+        return -n
+    }
+    return n
+}
+
+PrintLine("平均值(10, 20): " + average(10, 20).ToStr())
+PrintLine("绝对值(-42): " + absolute(-42).ToStr())
+
+// ========== 数组处理测试 ==========
+PrintLine("\n【数组处理测试】")
+
+func sumArray(arr:array) -> int {
+    sum <- 0
+    for item in arr {
+        sum <- sum + item
+    }
+    return sum
+}
+
+func getArrayLength(arr:array) -> int {
+    return Len(arr)
+}
+
+testArray <- [1, 2, 3, 4, 5]
+PrintLine("数组求和: " + sumArray(testArray).ToStr())
+PrintLine("数组长度: " + getArrayLength(testArray).ToStr())
+
+PrintLine("\n✅ 所有基础函数类型注解测试完成")

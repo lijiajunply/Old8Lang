@@ -1,0 +1,12 @@
+// 最简单的函数类型注解测试
+
+PrintLine("=== 最简单的函数类型注解测试 ===")
+
+func add(a:int, b:int) -> int {
+    return a + b
+}
+
+result <- add(10, 20)
+PrintLine("10 + 20 = " + result.ToStr())
+
+PrintLine("✅ 测试完成")

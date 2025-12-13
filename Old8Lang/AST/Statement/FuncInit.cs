@@ -35,6 +35,9 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
+        // 【新增】验证函数类型注解完整性（编译模式要求）
+        ValidateTypeAnnotations(local);
+
         // 获取方法的名称
         var methodName = FuncLangValue.Id!.IdName;
         if (FuncLangValue.Method != null)
@@ -61,8 +64,14 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
             funcLocal.LocalVarTypes[id.IdName] = paramType;
         }
 
-        // 获取返回类型（现在funcLocal中已经有参数信息了）
-        var returnType = GetItemType(FuncLangValue.BlockStatement, funcLocal);
+        // 【修改】优先使用显式声明的返回类型
+        // 如果类型注解存在但OutputType返回null/object，则仍尝试推断（用于兼容性）
+        var returnType = FuncLangValue.Id!.OutputType(local);
+        if (returnType == null || returnType == typeof(object))
+        {
+            // 如果OutputType无法解析，尝试从函数体推断
+            returnType = GetItemType(FuncLangValue.BlockStatement, funcLocal);
+        }
 
         // 定义新的方法
         var dynamicMethod = new DynamicMethod(
@@ -160,6 +169,42 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
         if (FuncLangValue.Ids != null)
         {
             local.FuncParameters.TryAdd(delegateKey, FuncLangValue.Ids);
+        }
+    }
+
+    /// <summary>
+    /// 验证函数的类型注解完整性（编译模式要求）
+    /// </summary>
+    private void ValidateTypeAnnotations(LocalManager local)
+    {
+        // 1. 验证所有参数的类型注解
+        if (FuncLangValue.Ids != null)
+        {
+            for (int i = 0; i < FuncLangValue.Ids.Count; i++)
+            {
+                var param = FuncLangValue.Ids[i];
+                if (string.IsNullOrEmpty(param.AssumptionType))
+                {
+                    var errorMsg = $"[编译模式错误] 函数 '{FuncLangValue.Id?.IdName}' 的参数 '{param.IdName}' (第{i + 1}个参数) 缺少类型注解\n\n" +
+                                  $"编译模式下所有函数参数必须显式声明类型注解。\n\n" +
+                                  $"修复示例：\n" +
+                                  $"  func {FuncLangValue.Id?.IdName}(..., {param.IdName}:int, ...) -> returnType {{ ... }}\n\n" +
+                                  $"支持的类型：int, double, string, bool, char, void, list<T>, array<T>, dictionary<K,V>";
+                    local.ReportError(errorMsg, param.Position);
+                }
+            }
+        }
+
+        // 2. 验证返回值类型注解
+        if (FuncLangValue.Id != null && string.IsNullOrEmpty(FuncLangValue.Id.AssumptionType))
+        {
+            var errorMsg = $"[编译模式错误] 函数 '{FuncLangValue.Id.IdName}' 缺少返回值类型注解\n\n" +
+                          $"编译模式下所有函数必须显式声明返回类型，不能通过return语句推断。\n\n" +
+                          $"修复示例：\n" +
+                          $"  方式1：func {FuncLangValue.Id.IdName}(...) -> int {{ return ... }}\n" +
+                          $"  方式2：func {FuncLangValue.Id.IdName}(...) -> void {{ ... }}\n" +
+                          $"  方式3：{FuncLangValue.Id.IdName}:int(...) -> {{ return ... }}";
+            local.ReportError(errorMsg, FuncLangValue.Id.Position);
         }
     }
 

@@ -12,14 +12,17 @@ Old8Lang is a dynamic programming language designed with C#/Java-like syntax, su
 
 ## Solution Structure
 
-The solution consists of 4 main projects:
+The solution consists of 5 main projects:
 
 - **Old8Lang**: Core language library containing AST, parser, interpreter, and compiler
 - **Old8Lang.App**: CLI application for running Old8Lang code
 - **Old8LangLib**: Native library providing OS, file, network, and terminal utilities
+- **Old8Lang.NetLib**: Network library providing MQTT and advanced networking features (requires MQTTnet)
 - **Old8Lang.Tests**: Unit tests using xUnit
 
 ## Building and Testing
+
+**Requirements**: .NET 10.0 SDK
 
 ### Build Commands
 
@@ -55,10 +58,11 @@ dotnet test Old8Lang.Tests/Old8Lang.Tests.csproj
 dotnet test --filter "FullyQualifiedName~Old8Lang.Tests.ParsersTests"
 
 # Run test scripts for Old8Lang test files
-./run_syntax_tests.sh         # Test syntax parsing only
-./run_interpreter_tests.sh    # Test interpreter mode execution
-./run_compiler_tests.sh       # Test compiler mode execution
-./run_all_compiler_tests.sh   # Run all compiler tests
+./run_syntax_tests.sh                  # Test syntax parsing only
+./run_interpreter_tests.sh             # Test interpreter mode execution
+./run_compiler_tests.sh                # Test compiler mode execution
+./run_comprehensive_compiler_tests.sh  # Run all compiler tests with detailed report
+./analyze_failures.sh                  # Analyze and report test failures
 ```
 
 ## Architecture
@@ -104,6 +108,20 @@ Located in `Old8Lang/Compiler/`:
 
 - `Compiler.cs`: Compiles AST to intermediate code (IL-like)
 - `LocalManager.cs`: Manages local variables during compilation
+
+### Compiler Configuration
+
+The compiler provides several configuration options in `Compiler.cs`:
+
+- `DebugOutputEnabled`: Enable/disable debug output (default: false)
+- `ILVerificationEnabled`: Enable/disable IL code verification (default: true)
+- `CurrentLogLevel`: Set logging level (Error, Warning, Info, Debug) (default: Info)
+
+Example usage in code:
+```csharp
+Compiler.DebugOutputEnabled = true;
+Compiler.CurrentLogLevel = Compiler.LogLevel.Debug;
+```
 
 ### Error Handling
 
@@ -157,12 +175,52 @@ When adding new language features:
 3. **Compiler testing**: Add test to `CompilerTests/`, verify compiler execution
 4. **Documentation**: Update `Old8Lang.ebnf` and `Old8Lang_Grammar.md`
 
+### Compiler Mode Type Annotation Rules
+
+**IMPORTANT**: Compiler mode (`-c`) and interpreter mode (`-f`) have different type annotation requirements:
+
+| Feature | Interpreter Mode | Compiler Mode |
+|---------|-----------------|---------------|
+| Function parameter type annotations | Optional | **Required** |
+| Function return type annotations | Optional (inferred) | **Required** |
+| Lambda parameter type annotations | Optional | **Required** |
+| Lambda return type annotations | Optional (inferred) | Optional (inferred) |
+
+Compiler mode examples:
+
+```old8
+// Correct: complete type annotations
+func calculate(x:int, y:int) -> int {
+    return x + y
+}
+
+// Error: missing return type
+func calculate(x:int, y:int) {
+    return x + y
+}
+
+// Error: missing parameter type
+func calculate(x, y:int) -> int {
+    return x + y
+}
+
+// Correct: Lambda with parameter types, return type can be inferred
+transform <- (n:int) -> n * 2
+
+// Error: Lambda missing parameter type
+transform <- (n) -> n * 2
+```
+
+**Note**: Interpreter mode remains flexible and allows type inference for all cases.
+
 ### Visitor Pattern Implementation
 
-The codebase recently transitioned to visitor pattern for AST traversal. When working with AST nodes:
-- Implement `Accept` methods for visitor pattern
-- Check `Old8Lang/AST/Visitor/` for visitor interfaces
-- See recent commits (3ced530, 39ae648) for visitor pattern refactoring examples
+**Note**: The codebase is in the process of transitioning to visitor pattern. Currently:
+- No `Visitor/` directory exists yet in `Old8Lang/AST/`
+- AST nodes are being refactored to support visitor pattern
+- See commits 3ced530, 39ae648 for visitor pattern refactoring progress
+
+When working with AST nodes, be aware that the visitor pattern implementation is ongoing.
 
 ### Recent Refactoring
 

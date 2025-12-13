@@ -1,0 +1,8 @@
+// 编译模式类型注解测试 - 混合错误
+// 应该编译失败：部分参数有类型注解，部分缺失
+
+func divide(a:int, b) -> double {
+    return a / b
+}
+
+// error

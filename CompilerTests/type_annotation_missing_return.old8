@@ -1,0 +1,8 @@
+// 编译模式类型注解测试 - 返回类型缺失
+// 应该编译失败：返回类型缺少注解
+
+func multiply(a:int, b:int) {
+    return a * b
+}
+
+// error
