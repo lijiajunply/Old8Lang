@@ -1,7 +1,7 @@
 using Old8Lang.Error;
 using Old8Lang.LangParser;
 
-namespace Old8Lang.Tests;
+namespace Old8Lang.Tests.Language;
 
 /// <summary>
 /// 分号语句分隔符测试

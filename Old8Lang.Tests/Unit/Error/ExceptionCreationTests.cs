@@ -1,8 +1,9 @@
 using Old8Lang.AST;using Old8Lang.Error;using Old8Lang.LangParser;
 
-namespace Old8Lang.Tests;
+namespace Old8Lang.Tests.Unit.Error;
 
-public class ExceptionTests
+[Collection("Sequential")]
+public class ExceptionCreationTests
 {
     [Fact]
     public void RuntimeError_WithPosition_CanBeCreated()

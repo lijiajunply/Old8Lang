@@ -1,8 +1,9 @@
 using Old8Lang.Compiler;
 
-namespace Old8Lang.Tests;
+namespace Old8Lang.Tests.Unit.Compiler;
 
-public class CompilerTests
+[Collection("Sequential")]
+public class LocalManagerTests
 {
     [Fact]
     public void LocalManager_New_CreatesNewInstance()

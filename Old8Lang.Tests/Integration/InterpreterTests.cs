@@ -1,6 +1,6 @@
 using Old8Lang.AST.Statement;using Old8Lang.LangParser;
 
-namespace Old8Lang.Tests;
+namespace Old8Lang.Tests.Integration;
 
 public class InterpreterTests
 {

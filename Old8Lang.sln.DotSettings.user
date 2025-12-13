@@ -31,18 +31,10 @@
   &lt;Assembly Path="/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/OldLib/dll/Old8LangLib.dll" /&gt;
   &lt;Assembly Path="/usr/local/share/dotnet/shared/Microsoft.NETCore.App/10.0.0/System.Runtime.dll" /&gt;
 &lt;/AssemblyExplorer&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=07d79105_002Ddb56_002D470d_002Db872_002D543f396b1133/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="SyntaxErrorTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;TestAncestor&gt;
-    &lt;TestId&gt;xUnit::1DEC2AB8-D29B-4551-81BC-142BBB09C294::net10.0::Old8Lang.Tests.SyntaxErrorTests&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::1DEC2AB8-D29B-4551-81BC-142BBB09C294::net10.0::Old8Lang.Tests.ExceptionTests&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::1DEC2AB8-D29B-4551-81BC-142BBB09C294::net10.0::Old8Lang.Tests.EdgeCaseTests&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::1DEC2AB8-D29B-4551-81BC-142BBB09C294::net10.0::Old8Lang.Tests.CompilerTests&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::1DEC2AB8-D29B-4551-81BC-142BBB09C294::net10.0::Old8Lang.Tests.InterpreterTests&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::1DEC2AB8-D29B-4551-81BC-142BBB09C294::net10.0::Old8Lang.Tests.ParsersTests&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::1DEC2AB8-D29B-4551-81BC-142BBB09C294::net10.0::Old8Lang.Tests.TypeSystemTests&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::1DEC2AB8-D29B-4551-81BC-142BBB09C294::net10.0::Old8Lang.Tests.UnitTest1&lt;/TestId&gt;
-  &lt;/TestAncestor&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=fcae5552_002D40ef_002D409a_002D8c5b_002Db548ebb4a1d6/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="&amp;lt;Old8Lang.Tests&amp;gt; 中的所有测试" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;Project Location="/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests" Presentation="&amp;lt;Old8Lang.Tests&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
+	
 	
 	
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Csly/@EntryIndexedValue">True</s:Boolean>

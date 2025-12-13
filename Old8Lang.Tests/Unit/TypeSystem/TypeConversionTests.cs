@@ -1,8 +1,9 @@
 using Old8Lang.AST.Expression;using Old8Lang.AST.Expression.Value;
 
-namespace Old8Lang.Tests;
+namespace Old8Lang.Tests.Unit.TypeSystem;
 
-public class TypeSystemTests
+[Collection("Sequential")]
+public class TypeConversionTests
 {
     [Fact]
     public void LangValueType_ObjToValue_Null_ReturnsNullLangValue()

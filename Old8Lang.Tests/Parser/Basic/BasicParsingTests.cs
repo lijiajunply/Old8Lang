@@ -1,8 +1,9 @@
 using Old8Lang.AST.Expression;using Old8Lang.AST.Expression.Value;using Old8Lang.AST.Statement;using Old8Lang.LangParser;
 
-namespace Old8Lang.Tests;
+namespace Old8Lang.Tests.Parser.Basic;
 
-public class ParsersTests
+[Collection("Sequential")]
+public class BasicParsingTests
 {
     [Fact]
     public void ParseProgram_EmptyProgram_ReturnsEmptyBlock()

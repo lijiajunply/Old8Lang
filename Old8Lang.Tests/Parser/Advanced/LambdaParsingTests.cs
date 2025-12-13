@@ -1,13 +1,13 @@
 using Old8Lang.Error;
 using Old8Lang.LangParser;
 
-namespace Old8Lang.Tests;
+namespace Old8Lang.Tests.Parser.Advanced;
 
 /// <summary>
 /// Lambda 表达式严格检查测试
 /// </summary>
 [Collection("Sequential")]
-public class LambdaStrictCheckTests
+public class LambdaParsingTests
 {
     /// <summary>
     /// 测试正确的 Lambda 语法 - 简写形式
@@ -216,4 +216,53 @@ b <- 10";
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
     }
+
+    #region Lambda表达式错误
+
+    /// <summary>
+    /// 测试Lambda缺少箭头
+    /// </summary>
+    [Fact]
+    public void ParseProgram_LambdaMissingArrow_ThrowsSyntaxError()
+    {
+        // Arrange
+        var code = "a <- (x, y) x + y";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new Old8Lang.LangParser.LangParser(tokens, code);
+
+        // Act & Assert
+        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
+    }
+
+    /// <summary>
+    /// 测试Lambda缺少参数括号
+    /// </summary>
+    [Fact]
+    public void ParseProgram_LambdaMissingParentheses_ThrowsSyntaxError()
+    {
+        // Arrange
+        var code = "a <- x, y -> x + y";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new Old8Lang.LangParser.LangParser(tokens, code);
+
+        // Act & Assert
+        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
+    }
+
+    /// <summary>
+    /// 测试Lambda缺少表达式体
+    /// </summary>
+    [Fact]
+    public void ParseProgram_LambdaMissingBody_ThrowsSyntaxError()
+    {
+        // Arrange
+        var code = "a <- (x, y) ->";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new Old8Lang.LangParser.LangParser(tokens, code);
+
+        // Act & Assert
+        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
+    }
+
+    #endregion
 }
