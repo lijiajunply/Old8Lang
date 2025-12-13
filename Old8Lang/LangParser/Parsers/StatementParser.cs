@@ -144,55 +144,64 @@ public class StatementParser(
             return ParseReturnStatement();
         }
 
-        // 处理native语句：[import "dll" class method]
-        if (CurrentToken.Type == LangTokenType.LeftBracket && Peek().Type == LangTokenType.Import)
+        // 处理native语句：native "dll" class method
+        if (CurrentToken.Type == LangTokenType.Native)
         {
+            var peek1 = Peek();
+            var peek2 = Peek(2);
+            var peek3 = Peek(3);
+            var peek4 = Peek(4);
+
             // 先处理更具体的语法模式，再处理更通用的
-            // 1. nativeStatic: [import "dll" class] -> "alias"
-            if (Peek(2).Type == LangTokenType.String &&
-                Peek(3).Type == LangTokenType.Identifier &&
-                Peek(4).Type == LangTokenType.RightBracket &&
-                Peek(5).Type == LangTokenType.Arrow &&
-                Peek(6).Type == LangTokenType.String)
+            // 1. nativeStatic: native "dll" class -> "alias"
+            if (peek1.Type == LangTokenType.String &&
+                peek2.Type == LangTokenType.Identifier &&
+                peek3.Type == LangTokenType.Arrow)
             {
                 return ParseNativeStatic();
             }
 
-            // 2. 批量导入所有方法: [import "dll" class *]
-            if (Peek(2).Type == LangTokenType.String &&
-                Peek(3).Type == LangTokenType.Identifier &&
-                Peek(4).Type == LangTokenType.Star)
+            // 2. 批量导入所有方法: native "dll" class *
+            if (peek1.Type == LangTokenType.String &&
+                peek2.Type == LangTokenType.Identifier &&
+                peek3.Type == LangTokenType.Star)
             {
                 return ParseNativeStatement();
             }
 
-            // 3. 选择性导入: [import "dll" class { method1, method2 }]
-            if (Peek(2).Type == LangTokenType.String &&
-                Peek(3).Type == LangTokenType.Identifier &&
-                Peek(4).Type == LangTokenType.LeftBrace)
+            // 3. 选择性导入: native "dll" class { method1, method2 }
+            if (peek1.Type == LangTokenType.String &&
+                peek2.Type == LangTokenType.Identifier &&
+                peek3.Type == LangTokenType.LeftBrace)
             {
                 return ParseNativeStatement();
             }
 
-            // 4. nativeClass with alias: [import "dll" class as alias]
-            if (Peek(2).Type == LangTokenType.String &&
-                Peek(3).Type == LangTokenType.Identifier &&
-                Peek(4).Type == LangTokenType.As &&
-                Peek(5).Type == LangTokenType.Identifier &&
-                Peek(6).Type == LangTokenType.RightBracket)
+            // 4. nativeClass with alias: native "dll" class as alias
+            if (peek1.Type == LangTokenType.String &&
+                peek2.Type == LangTokenType.Identifier &&
+                peek3.Type == LangTokenType.As)
             {
                 return ParseNativeClass();
             }
 
-            // 5. nativeClass: [import "dll" class]
-            if (Peek(2).Type == LangTokenType.String &&
-                Peek(3).Type == LangTokenType.Identifier &&
-                Peek(4).Type == LangTokenType.RightBracket)
+            // 5. 单个方法导入: native "dll" class method alias?
+            // 如果第三个 token 是 identifier，说明是方法导入
+            if (peek1.Type == LangTokenType.String &&
+                peek2.Type == LangTokenType.Identifier &&
+                peek3.Type == LangTokenType.Identifier)
+            {
+                return ParseNativeStatement();
+            }
+
+            // 6. nativeClass: native "dll" class（最后兜底，第三个 token 不是上述任何特殊类型）
+            if (peek1.Type == LangTokenType.String &&
+                peek2.Type == LangTokenType.Identifier)
             {
                 return ParseNativeClass();
             }
 
-            // 6. 单个方法导入: [import "dll" class method alias?]
+            // 其他情况，尝试解析为 native statement
             return ParseNativeStatement();
         }
 
@@ -228,72 +237,63 @@ public class StatementParser(
 
         // 处理赋值语句：identifier｜this <- expression 或 a.name <- value 或 this.name <- value 或 a[b] <- value
         // 先尝试解析可能的左值表达式开头
-        // 注意：需要排除 [import 语句的情况
         if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.This or LangTokenType.LeftBrace
             or LangTokenType.LeftBracket)
         {
-            // 排除 [import 语句（native statement）
-            if (CurrentToken.Type == LangTokenType.LeftBracket && Peek().Type == LangTokenType.Import)
-            {
-                // 这是 native import 语句，不是赋值语句，跳过此分支
-            }
-            else
-            {
-                // 检查是否是赋值语句，允许左值表达式包含成员访问或索引访问
-                // 例如：identifier <- value, this.name <- value, a[b] <- value
-                var savedIndex = CurrentIndex;
+            // 检查是否是赋值语句，允许左值表达式包含成员访问或索引访问
+            // 例如：identifier <- value, this.name <- value, a[b] <- value
+            var savedIndex = CurrentIndex;
 
-                try
+            try
+            {
+                // 尝试解析左值表达式（不包括三元表达式）
+                // 先解析主要表达式
+                var expr = primaryParser.ParsePrimary();
+                // 处理点访问和索引访问等复杂左值表达式
+                expressionParser.ParseDotExpr(expr);
+
+                // 检查是否是类型注解
+                if (CurrentToken.Type == LangTokenType.Colon)
                 {
-                    // 尝试解析左值表达式（不包括三元表达式）
-                    // 先解析主要表达式
-                    var expr = primaryParser.ParsePrimary();
-                    // 处理点访问和索引访问等复杂左值表达式
-                    expressionParser.ParseDotExpr(expr);
-
-                    // 检查是否是类型注解
-                    if (CurrentToken.Type == LangTokenType.Colon)
+                    var nextToken = Peek();
+                    if (nextToken.Type == LangTokenType.Identifier)
                     {
-                        var nextToken = Peek();
-                        if (nextToken.Type == LangTokenType.Identifier)
+                        var thirdToken = Peek(2);
+                        if (thirdToken.Type == LangTokenType.Assignment)
                         {
-                            var thirdToken = Peek(2);
-                            if (thirdToken.Type == LangTokenType.Assignment)
-                            {
-                                // 这是带有类型注解的赋值语句
-                                CurrentIndex = savedIndex;
-                                return ParseSet();
-                            }
-                            // 检查是否是函数声明：identifier:returnType (params) -> { ... }
-                            else if (thirdToken.Type == LangTokenType.LeftParen)
-                            {
-                                // 这是带有返回类型注解的函数声明
-                                CurrentIndex = savedIndex;
-                                return functionParser.ParseFuncDeclaration();
-                            }
+                            // 这是带有类型注解的赋值语句
+                            CurrentIndex = savedIndex;
+                            return ParseSet();
+                        }
+                        // 检查是否是函数声明：identifier:returnType (params) -> { ... }
+                        else if (thirdToken.Type == LangTokenType.LeftParen)
+                        {
+                            // 这是带有返回类型注解的函数声明
+                            CurrentIndex = savedIndex;
+                            return functionParser.ParseFuncDeclaration();
                         }
                     }
-                    // 检查下一个token是否是赋值符号
-                    else if (CurrentToken.Type == LangTokenType.Assignment)
-                    {
-                        // 这是普通赋值语句
-                        CurrentIndex = savedIndex;
-                        return ParseSet();
-                    }
+                }
+                // 检查下一个token是否是赋值符号
+                else if (CurrentToken.Type == LangTokenType.Assignment)
+                {
+                    // 这是普通赋值语句
+                    CurrentIndex = savedIndex;
+                    return ParseSet();
+                }
 
-                    // 如果不是赋值语句，回退到原始位置
-                    CurrentIndex = savedIndex;
-                }
-                catch (Old8Exception)
-                {
-                    throw;
-                }
-                catch (Exception)
-                {
-                    // 如果解析左值表达式失败，回退到原始位置
-                    CurrentIndex = savedIndex;
-                }
-            } // 结束 else 块
+                // 如果不是赋值语句，回退到原始位置
+                CurrentIndex = savedIndex;
+            }
+            catch (Old8Exception)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                // 如果解析左值表达式失败，回退到原始位置
+                CurrentIndex = savedIndex;
+            }
         }
 
         // 处理增量/减量语句：i++, i--
@@ -311,55 +311,6 @@ public class StatementParser(
         if (CurrentToken.Type == LangTokenType.Identifier && Peek().Type == LangTokenType.LeftParen)
         {
             return ParseIdentifierLeftParen();
-        }
-
-        // 处理表达式语句之前，再次检查是否是native import语句
-        // 防止 [import ... 被误认为是数组字面量表达式
-        if (CurrentToken.Type == LangTokenType.LeftBracket && Peek().Type == LangTokenType.Import)
-        {
-            // 这里应该走到 native statement 的处理逻辑
-            // 由于前面的流程可能跳过了第 150 行，所以在这里重新执行检查
-            // 检查具体是哪种 native 语句类型
-            if (Peek(2).Type == LangTokenType.String &&
-                Peek(3).Type == LangTokenType.Identifier &&
-                Peek(4).Type == LangTokenType.RightBracket &&
-                Peek(5).Type == LangTokenType.Arrow &&
-                Peek(6).Type == LangTokenType.String)
-            {
-                return ParseNativeStatic();
-            }
-
-            if (Peek(2).Type == LangTokenType.String &&
-                Peek(3).Type == LangTokenType.Identifier &&
-                Peek(4).Type == LangTokenType.Star)
-            {
-                return ParseNativeStatement();
-            }
-
-            if (Peek(2).Type == LangTokenType.String &&
-                Peek(3).Type == LangTokenType.Identifier &&
-                Peek(4).Type == LangTokenType.LeftBrace)
-            {
-                return ParseNativeStatement();
-            }
-
-            if (Peek(2).Type == LangTokenType.String &&
-                Peek(3).Type == LangTokenType.Identifier &&
-                Peek(4).Type == LangTokenType.As &&
-                Peek(5).Type == LangTokenType.Identifier &&
-                Peek(6).Type == LangTokenType.RightBracket)
-            {
-                return ParseNativeClass();
-            }
-
-            if (Peek(2).Type == LangTokenType.String &&
-                Peek(3).Type == LangTokenType.Identifier &&
-                Peek(4).Type == LangTokenType.RightBracket)
-            {
-                return ParseNativeClass();
-            }
-
-            return ParseNativeStatement();
         }
 
         // 处理表达式语句：允许将函数运行表达式作为语句执行
@@ -746,29 +697,27 @@ public class StatementParser(
     }
 
     /// <summary>
-    /// nativeStatement = "[" "import" STRING identifier identifier identifier? "]"
-    ///                 | "[" "import" STRING identifier "*" "]"
-    ///                 | "[" "import" STRING identifier "{" identifierList "}" "]" ;
+    /// nativeStatement = "native" STRING identifier identifier identifier?
+    ///                 | "native" STRING identifier "*"
+    ///                 | "native" STRING identifier "{" identifierList "}" ;
     /// </summary>
     /// <returns>引入原生方法</returns>
     public NativeStatement ParseNativeStatement()
     {
-        Expect(LangTokenType.LeftBracket);
-        Expect(LangTokenType.Import);
+        Expect(LangTokenType.Native);
         var dllName = CurrentToken.Value;
         Expect(LangTokenType.String);
         var className = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
 
-        // 检查是否是批量导入所有方法：[import "DllName" ClassName *]
+        // 检查是否是批量导入所有方法：native "DllName" ClassName *
         if (CurrentToken.Type == LangTokenType.Star)
         {
             Expect(LangTokenType.Star);
-            Expect(LangTokenType.RightBracket);
             return new NativeStatement(dllName, className, importAll: true);
         }
 
-        // 检查是否是选择性导入多个方法：[import "DllName" ClassName { Method1, Method2 }]
+        // 检查是否是选择性导入多个方法：native "DllName" ClassName { Method1, Method2 }
         if (CurrentToken.Type == LangTokenType.LeftBrace)
         {
             Expect(LangTokenType.LeftBrace);
@@ -795,7 +744,6 @@ public class StatementParser(
             }
 
             Expect(LangTokenType.RightBrace);
-            Expect(LangTokenType.RightBracket);
 
             if (methodList.Count == 0)
             {
@@ -805,7 +753,7 @@ public class StatementParser(
             return new NativeStatement(dllName, className, methodList);
         }
 
-        // 原有的单个方法导入：[import "DllName" ClassName MethodName Alias?]
+        // 原有的单个方法导入：native "DllName" ClassName MethodName Alias?
         var methodName = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
         var alias = "";
@@ -815,23 +763,20 @@ public class StatementParser(
             Expect(LangTokenType.Identifier);
         }
 
-        Expect(LangTokenType.RightBracket);
         return new NativeStatement(dllName, className, methodName, alias);
     }
 
     /// <summary>
-    /// nativeStatic = "[" "import" STRING identifier "]" "->" STRING ;
+    /// nativeStatic = "native" STRING identifier "->" STRING ;
     /// </summary>
     /// <returns>引入原生静态类</returns>
     public NativeStatement ParseNativeStatic()
     {
-        Expect(LangTokenType.LeftBracket);
-        Expect(LangTokenType.Import);
+        Expect(LangTokenType.Native);
         var dllName = CurrentToken.Value;
         Expect(LangTokenType.String);
         var className = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
-        Expect(LangTokenType.RightBracket);
         Expect(LangTokenType.Arrow);
         var methodName = CurrentToken.Value;
         Expect(LangTokenType.String);
@@ -839,29 +784,26 @@ public class StatementParser(
     }
 
     /// <summary>
-    ///  nativeClass = "[" "import" STRING identifier "]" ;
+    ///  nativeClass = "native" STRING identifier ("as" identifier)? ;
     /// </summary>
     /// <returns>引入原生类</returns>
     public NativeStatement ParseNativeClass()
     {
-        Expect(LangTokenType.LeftBracket);
-        Expect(LangTokenType.Import);
+        Expect(LangTokenType.Native);
         var dllName = CurrentToken.Value;
         Expect(LangTokenType.String);
         var className = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
 
-        // 检查是否有 as 别名：[import "DllName" ClassName as Alias]
+        // 检查是否有 as 别名：native "DllName" ClassName as Alias
         if (CurrentToken.Type == LangTokenType.As)
         {
             Expect(LangTokenType.As);
             var alias = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
-            Expect(LangTokenType.RightBracket);
             return new NativeStatement(dllName, className, alias, isAliasImport: true);
         }
 
-        Expect(LangTokenType.RightBracket);
         return new NativeStatement(dllName, className);
     }
 

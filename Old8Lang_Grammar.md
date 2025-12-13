@@ -520,24 +520,24 @@ import module
 
 ### 5.8 原生库导入语句
 
-Old8Lang 支持导入原生 DLL 库中的类和方法，以便调用外部功能。原生库导入语句使用方括号 `[]` 包围，支持以下几种形式：
+Old8Lang 支持导入原生 DLL 库中的类和方法，以便调用外部功能。原生库导入语句使用 `native` 关键字，支持以下几种形式：
 
 #### 5.8.1 单个方法导入 (nativeStatement)
 
-**语法规则**：`[import "dllName" className methodName alias?]`
+**语法规则**：`native "dllName" className methodName alias?`
 
 **描述**：导入原生 DLL 中的特定方法，并可选地指定别名。
 
 **示例**：
 
 ```
-[import "console.dll" console Write print]
-[import "console.dll" console WriteLine printline]
+native "console.dll" console Write print
+native "console.dll" console WriteLine printline
 ```
 
-#### 5.8.2 批量导入所有方法 (新增)
+#### 5.8.2 批量导入所有方法
 
-**语法规则**：`[import "dllName" className *]`
+**语法规则**：`native "dllName" className *`
 
 **描述**：导入原生 DLL 中某个类的所有公共静态方法。大大简化了标准库的引入。
 
@@ -545,7 +545,7 @@ Old8Lang 支持导入原生 DLL 库中的类和方法，以便调用外部功能
 
 ```
 // 导入 MathLib 的所有方法（53个方法只需1行）
-[import "Old8LangLib" MathLib *]
+native "Old8LangLib" MathLib *
 
 // 导入后可直接使用所有方法
 result <- Sqrt(16)     // 调用 Sqrt 方法
@@ -559,9 +559,9 @@ sinVal <- Sin(1.57)    // 调用 Sin 方法
 - 避免遗漏方法
 - 代码更简洁易读
 
-#### 5.8.3 选择性导入多个方法 (新增)
+#### 5.8.3 选择性导入多个方法
 
-**语法规则**：`[import "dllName" className { method1, method2, method3 }]`
+**语法规则**：`native "dllName" className { method1, method2, method3 }`
 
 **描述**：按需导入原生 DLL 中某个类的特定方法，用逗号分隔多个方法名。
 
@@ -569,7 +569,7 @@ sinVal <- Sin(1.57)    // 调用 Sin 方法
 
 ```
 // 只导入 Time 类的两个方法
-[import "Old8LangLib" Time { GetTimeNow, TimeStamp }]
+native "Old8LangLib" Time { GetTimeNow, TimeStamp }
 
 // 导入后可以使用这两个方法
 timeStr <- GetTimeNow("yyyy-MM-dd HH:mm:ss")
@@ -583,31 +583,31 @@ stamp <- TimeStamp()
 
 #### 5.8.4 静态类导入 (nativeStatic)
 
-**语法规则**：`[import "dllName" className] -> alias`
+**语法规则**：`native "dllName" className -> alias`
 
 **描述**：导入原生 DLL 中的静态类或静态方法集，并指定别名。
 
 **示例**：
 
 ```
-[import "Math.dll" Math] -> Math
+native "Math.dll" Math -> Math
 ```
 
 #### 5.8.5 完整类导入 (nativeClass)
 
-**语法规则**：`[import "dllName" className]`
+**语法规则**：`native "dllName" className`
 
 **描述**：导入原生 DLL 中的完整类，包括所有方法和属性。
 
 **示例**：
 
 ```
-[import "Person.dll" Person]
+native "Person.dll" Person
 ```
 
 #### 5.8.6 带别名的类导入 (nativeClass with alias)
 
-**语法规则**：`[import "dllName" className as alias]`
+**语法规则**：`native "dllName" className as alias`
 
 **描述**：导入原生 DLL 中的完整类，并使用指定的别名进行注册。这使得类导入更加明确，并且可以避免命名冲突。
 
@@ -615,7 +615,7 @@ stamp <- TimeStamp()
 
 ```
 // 导入 Old8LangLib.Csv 类，并命名为 CsvUtil
-[import "Old8LangLib" Csv as CsvUtil]
+native "Old8LangLib" Csv as CsvUtil
 
 // 使用别名创建实例或访问类
 csv <- CsvUtil

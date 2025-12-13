@@ -225,7 +225,11 @@ public enum LangTokenType
     /// <summary>
     /// private
     /// </summary>
-    Private
+    Private,
+    /// <summary>
+    /// native
+    /// </summary>
+    Native
 }
 
 public enum KeywordType
@@ -261,6 +265,7 @@ public enum KeywordType
     Static,
     Public,
     Private,
-    Throw
+    Throw,
+    Native
 }
 

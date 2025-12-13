@@ -1,2 +1,2 @@
 // Old8Lang 时间库 - 使用批量导入功能
-[import "Old8LangLib" Time *]
+native "Old8LangLib" Time *

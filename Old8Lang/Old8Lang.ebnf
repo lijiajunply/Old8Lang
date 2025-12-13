@@ -61,11 +61,13 @@ classFuncRunStatement = identifier "." identifier "(" argList? ")" ;
 
 importStatement = "import" ( identifier | STRING ) ;
 
-nativeStatement = "[" "import" STRING identifier identifier identifier? "]" ;
+nativeStatement = "native" STRING identifier identifier identifier?
+                | "native" STRING identifier "*"
+                | "native" STRING identifier "{" identifierList "}" ;
 
-nativeStatic = "[" "import" STRING identifier "]" "->" STRING ;
+nativeStatic = "native" STRING identifier "->" STRING ;
 
-nativeClass = "[" "import" STRING identifier "]" ;
+nativeClass = "native" STRING identifier ( "as" identifier )? ;
 
 plusPlus = identifier "++" ;
 
