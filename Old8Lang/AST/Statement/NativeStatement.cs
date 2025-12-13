@@ -26,7 +26,7 @@ public class NativeStatement : OldStatement
     private readonly bool ImportAll;  // 是否导入所有方法 (*)
     private readonly List<string>? MethodList;  // 选择性导入的方法列表
 
-    // 类导入别名（用于 [import "DllName" ClassName as Alias]）
+    // 类导入别名（用于 native "DllName" ClassName as Alias）
     private readonly string? ClassAlias;
 
     public NativeStatement(string dllName, string className, string methodName, string nativeName)
@@ -77,7 +77,7 @@ public class NativeStatement : OldStatement
         ImportAll = false;
     }
 
-    // 新增：带别名的类导入构造函数 ([import "DllName" ClassName as Alias])
+    // 新增：带别名的类导入构造函数 (native "DllName" ClassName as Alias)
     public NativeStatement(string dllName, string className, string classAlias, bool isAliasImport)
     {
         DllName = dllName;
@@ -142,7 +142,7 @@ public class NativeStatement : OldStatement
             return;
         }
 
-        // 处理批量导入所有方法：[import "DllName" ClassName *]
+        // 处理批量导入所有方法：native "DllName" ClassName *
         if (ImportAll)
         {
             var methods = type?.GetMethods(BindingFlags.Public | BindingFlags.Static);
@@ -163,7 +163,7 @@ public class NativeStatement : OldStatement
             return;
         }
 
-        // 处理选择性导入多个方法：[import "DllName" ClassName { Method1, Method2 }]
+        // 处理选择性导入多个方法：native "DllName" ClassName { Method1, Method2 }
         if (MethodList != null && MethodList.Count > 0)
         {
             foreach (var methodName in MethodList)
@@ -180,7 +180,7 @@ public class NativeStatement : OldStatement
             return;
         }
 
-        // 处理类导入（支持别名）：[import "DllName" ClassName] 或 [import "DllName" ClassName as Alias]
+        // 处理类导入（支持别名）：native "DllName" ClassName 或 native "DllName" ClassName as Alias
         var registerName = !string.IsNullOrEmpty(ClassAlias) ? ClassAlias : ClassName;
         var nativeClass = new NativeAnyLangValue(DllName, ClassName, path, registerName);
         var importInfo = (ImportInfo)nativeClass.Run(manager);
@@ -241,7 +241,7 @@ public class NativeStatement : OldStatement
             return;
         }
 
-        // 处理批量导入所有方法：[import "DllName" ClassName *]
+        // 处理批量导入所有方法：native "DllName" ClassName *
         if (ImportAll)
         {
             var methods = type?.GetMethods(BindingFlags.Public | BindingFlags.Static);
@@ -261,7 +261,7 @@ public class NativeStatement : OldStatement
             return;
         }
 
-        // 处理选择性导入多个方法：[import "DllName" ClassName { Method1, Method2 }]
+        // 处理选择性导入多个方法：native "DllName" ClassName { Method1, Method2 }
         if (MethodList != null && MethodList.Count > 0)
         {
             foreach (var methodName in MethodList)
@@ -297,20 +297,20 @@ public class NativeStatement : OldStatement
         // 批量导入所有方法
         if (ImportAll)
         {
-            return $"[import \"{DllName}\" {ClassName} *]";
+            return $"native \"{DllName}\" {ClassName} *";
         }
 
         // 选择性导入多个方法
         if (MethodList != null && MethodList.Count > 0)
         {
             var methods = string.Join(", ", MethodList);
-            return $"[import \"{DllName}\" {ClassName} {{ {methods} }}]";
+            return $"native \"{DllName}\" {ClassName} {{ {methods} }}";
         }
 
         // 类导入（可能带别名）
         if (!string.IsNullOrEmpty(ClassAlias))
         {
-            return $"[import \"{DllName}\" {ClassName} as {ClassAlias}]";
+            return $"native \"{DllName}\" {ClassName} as {ClassAlias}";
         }
 
         return $"import native {DllName}.{ClassName}";
