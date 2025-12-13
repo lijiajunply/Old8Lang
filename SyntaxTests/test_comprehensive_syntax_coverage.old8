@@ -1,0 +1,423 @@
+// 全面语法覆盖测试
+// 覆盖所有语法结构和边缘情况
+
+// 1. 基本类型和字面量
+int_literal <- 123
+neg_int_literal <- -456
+float_literal <- 3.14
+neg_float_literal <- -6.789
+string_literal <- "hello world"
+char_literal <- 'a'
+bool_true <- true
+bool_false <- false
+null_literal <- null
+
+// 2. 复杂表达式
+complex_expr <- (10 + 20) * 30 / 40 - 50 % 60
+nested_expr <- ((1 + 2) * (3 + 4)) / ((5 + 6) - (7 - 8))
+comparison_expr <- a > b && c < d || e == f
+membership_expr <- x in [1, 2, 3]
+identity_expr <- y is null
+
+// 3. 变量赋值和操作
+// 基本赋值
+var1 <- 123
+// 复合赋值
+var2 <- 10
+var2 += 5
+var2 -= 3
+var2 *= 2
+var2 /= 4
+var2 %= 2
+// 链式赋值
+var3 <- var4 <- var5 <- 100
+
+// 4. 数组和字典
+// 基本数组
+arr1 <- [1, 2, 3, 4, 5]
+// 空数组
+arr2 <- []
+// 嵌套数组
+arr3 <- [1, [2, 3], [4, [5, 6]]]
+// 基本字典
+dict1 <- {"name": "test", "value": 123}
+// 空字典
+dict2 <- {}
+// 嵌套字典
+dict3 <- {"level1": {"level2": {"level3": "deep"}}}
+// 混合类型字典
+dict4 <- {"int": 123, "string": "test", "bool": true, "array": [1, 2, 3]}
+
+// 5. 控制流语句
+// if-elif-else 各种组合
+if a > 10 {
+    result <- "greater"
+} elif a < 10 {
+    result <- "less"
+} else {
+    result <- "equal"
+}
+
+// 单行if
+if b {
+    c <- 1
+}
+
+// 没有else的if
+if d > 0 {
+    e <- d
+}
+
+// for循环各种形式
+// 传统for循环
+for i <- 0, i < 10, i++ {
+    PrintLine(i)
+}
+
+// for-in数组
+for item in [1, 2, 3] {
+    PrintLine(item)
+}
+
+// for-in字典
+for key, value in {"a": 1, "b": 2} {
+    PrintLine(key + ": " + value)
+}
+
+// while循环
+while counter < 10 {
+    counter <- counter + 1
+}
+
+// do-while循环（如果支持）
+// do {
+//     counter <- counter + 1
+// } while counter < 10
+
+// switch语句各种情况
+switch value {
+    case 1 {
+        result <- "one"
+    }
+    case 2 {
+        result <- "two"
+    }
+    case 3, 4, 5 {
+        result <- "three_to_five"
+    }
+    case 6..10 {
+        result <- "six_to_ten"
+    }
+    default {
+        result <- "other"
+    }
+}
+
+// 6. 函数定义和调用
+// 基本函数
+func add(a, b) {
+    return a + b
+}
+
+// 带类型注解的函数
+func multiply(a:int, b:int) -> int {
+    return a * b
+}
+
+// 无返回值函数
+func print_hello() {
+    PrintLine("Hello")
+}
+
+// 带默认参数的函数
+func greet(name, greeting <- "Hello") {
+    return greeting + ", " + name
+}
+
+// 可变参数函数
+func sum(...args) {
+    total <- 0
+    for arg in args {
+        total <- total + arg
+    }
+    return total
+}
+
+// 递归函数
+func factorial(n) {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+// 高阶函数
+func apply(func, value) {
+    return func(value)
+}
+
+// 函数调用各种形式
+result1 <- add(10, 20)
+result2 <- multiply(5, 6)
+result3 <- greet("world")
+result4 <- greet("world", "Hi")
+result5 <- sum(1, 2, 3, 4, 5)
+result6 <- apply(func(x) { return x * 2 }, 10)
+
+// 7. Lambda表达式
+// 基本lambda
+lambda1 <- (x, y) -> x + y
+// 单行lambda带括号
+lambda2 <- (x, y) -> (x + y)
+// 多行lambda
+lambda3 <- (x, y) -> {
+    temp <- x + y
+    return temp * 2
+}
+// 无参数lambda
+lambda4 <- () -> 42
+// 单个参数lambda
+lambda5 <- x -> x * x
+// lambda作为参数
+result7 <- [1, 2, 3].map(x -> x * 2)
+// lambda作为返回值
+func create_adder(n) {
+    return x -> x + n
+}
+adder <- create_adder(10)
+result8 <- adder(20)
+
+// 8. 类和对象
+// 基本类定义
+class BasicClass {
+    field1 <- 100
+    field2 <- "test"
+    
+    func init() {
+        this.field1 <- 200
+    }
+    
+    func get_field1() {
+        return this.field1
+    }
+    
+    func set_field1(value) {
+        this.field1 <- value
+    }
+}
+
+// 带继承的类
+class ParentClass {
+    parent_field <- "parent"
+    
+    func parent_method() {
+        return "parent method"
+    }
+}
+
+class ChildClass extends ParentClass {
+    child_field <- "child"
+    
+    func child_method() {
+        return "child method"
+    }
+    
+    // 重写父类方法
+    func parent_method() {
+        return "overridden parent method"
+    }
+}
+
+// 带访问修饰符的类
+class AccessClass {
+    public public_field <- "public"
+    private private_field <- "private"
+    protected protected_field <- "protected"
+}
+
+// 静态成员
+class StaticClass {
+    static static_field <- "static"
+    
+    static func static_method() {
+        return "static method"
+    }
+}
+
+// 类实例化和方法调用
+basic_obj <- BasicClass()
+basic_obj.set_field1(300)
+basic_field <- basic_obj.get_field1()
+
+child_obj <- ChildClass()
+parent_result <- child_obj.parent_method()
+child_result <- child_obj.child_method()
+
+static_result <- StaticClass.static_method()
+
+// 9. 异常处理
+// 基本try-catch
+try {
+    risky_operation()
+} catch {
+    error_occurred <- true
+}
+
+// try-catch-finally
+try {
+    risky_operation()
+} catch (e) {
+    error <- e
+} finally {
+    cleanup()
+}
+
+// 多个catch块
+try {
+    risky_operation()
+} catch (TypeError) {
+    type_error <- true
+} catch (ValueError) {
+    value_error <- true
+} catch {
+    general_error <- true
+}
+
+// 抛出异常
+func throw_error() {
+    throw "custom error"
+}
+
+// 10. 类型转换和检查
+// 基本类型转换
+int_to_float <- 123 as double
+float_to_int <- 3.14 as int
+string_to_int <- "456" as int
+
+// 类型检查
+is_string <- "hello" is string
+is_int <- 123 is int
+is_bool <- true is bool
+
+// 11. 列表和字典操作
+// 列表操作
+list <- [1, 2, 3, 4, 5]
+list.append(6)
+list.insert(0, 0)
+list.remove(3)
+list.pop()
+list.pop(0)
+
+// 字典操作
+dict <- {"name": "test", "value": 123}
+dict["new_key"] <- "new_value"
+dict.remove("name")
+dict_keys <- dict.keys()
+dict_values <- dict.values()
+dict_items <- dict.items()
+
+// 12. 字符串操作
+string <- "hello world"
+string_length <- len(string)
+string_upper <- string.upper()
+string_lower <- string.lower()
+string_split <- string.split(" ")
+string_join <- ", ".join(["a", "b", "c"])
+string_substring <- string[1:4]
+string_repeat <- "*" * 10
+
+// 13. 导入和模块
+// 基本导入
+import math
+// 导入特定函数
+from math import sqrt, pow
+// 导入所有
+from math import *
+// 带别名的导入
+import os as filesystem
+from sys import path as syspath
+
+// 14. 注释和空白
+// 单行注释
+var <- 123 // 这是单行注释
+
+/*
+这是多行注释
+跨越了多个行
+*/
+var2 <- 456
+
+// 15. 特殊语法和边缘情况
+// 空语句
+;
+;;
+
+// 单行多个语句
+a <- 1; b <- 2; c <- 3
+
+// 嵌套块
+if a > 0 {
+    if b > 0 {
+        if c > 0 {
+            nested <- true
+        }
+    }
+}
+
+// 深度嵌套函数
+func level1() {
+    func level2() {
+        func level3() {
+            func level4() {
+                func level5() {
+                    return 42
+                }
+                return level5()
+            }
+            return level4()
+        }
+        return level3()
+    }
+    return level2()
+}
+
+// 列表推导式
+numbers <- [1, 2, 3, 4, 5]
+squares <- [x * x for x in numbers]
+even_squares <- [x * x for x in numbers if x % 2 == 0]
+
+// 字典推导式
+dict_comp <- {x: x * 2 for x in [1, 2, 3]}
+
+// 生成器表达式
+gen_expr <- (x * 2 for x in [1, 2, 3])
+
+// 三元表达式
+ternary1 <- a > b ? a : b
+ternary2 <- a is null ? "null" : "not null"
+nested_ternary <- a > b ? (a > c ? "a最大" : "c次大") : (b > c ? "b最大" : "c最大")
+
+// 范围表达式
+range1 <- 1..10
+range2 <- 10..1
+range3 <- 1..10 step 2
+
+// 切片表达式
+array <- [1, 2, 3, 4, 5]
+slice1 <- array[1:3]
+slice2 <- array[:3]
+slice3 <- array[2:]
+slice4 <- array[::2]
+slice5 <- array[::-1]
+
+// 16. 错误处理测试用例
+// 这些应该在语法上是正确的，但在运行时可能会出错
+// 它们用于测试语法解析器能够正确处理这些结构
+
+division_by_zero <- 10 / 0
+index_out_of_range <- [1, 2, 3][10]
+key_error <- {"a": 1}["b"]
+name_error <- undefined_variable
+type_error <- "string" + 123
+value_error <- int("not a number")
+attribute_error <- "string".non_existent_method()
