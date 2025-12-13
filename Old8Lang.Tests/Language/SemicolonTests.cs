@@ -1,4 +1,3 @@
-using Old8Lang.Error;
 using Old8Lang.LangParser;
 
 namespace Old8Lang.Tests.Language;

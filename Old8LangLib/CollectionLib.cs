@@ -20,12 +20,12 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(list), "输入列表不能为空");
         }
-        
+
         if (predicate == null)
         {
             throw new ArgumentNullException(nameof(predicate), "过滤条件不能为空");
         }
-        
+
         return list.Where(predicate).ToList();
     }
 
@@ -43,12 +43,12 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(list), "输入列表不能为空");
         }
-        
+
         if (selector == null)
         {
             throw new ArgumentNullException(nameof(selector), "转换函数不能为空");
         }
-        
+
         return list.Select(selector).ToList();
     }
 
@@ -67,12 +67,12 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(list), "输入列表不能为空");
         }
-        
+
         if (func == null)
         {
             throw new ArgumentNullException(nameof(func), "折叠函数不能为空");
         }
-        
+
         return list.Aggregate(initialValue, func);
     }
 
@@ -89,12 +89,12 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(list), "输入列表不能为空");
         }
-        
+
         if (predicate == null)
         {
             throw new ArgumentNullException(nameof(predicate), "查找条件不能为空");
         }
-        
+
         return list.FirstOrDefault(predicate);
     }
 
@@ -111,9 +111,9 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(list), "输入列表不能为空");
         }
-        
+
         var result = new List<T>(list);
-        
+
         if (comparer == null)
         {
             result.Sort();
@@ -122,7 +122,7 @@ public static class CollectionLib
         {
             result.Sort(comparer);
         }
-        
+
         return result;
     }
 
@@ -141,14 +141,14 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(list), "输入列表不能为空");
         }
-        
+
         if (keySelector == null)
         {
             throw new ArgumentNullException(nameof(keySelector), "键选择器不能为空");
         }
-        
+
         var result = new List<T>(list);
-        
+
         if (ascending)
         {
             result.Sort((a, b) => Comparer<TKey>.Default.Compare(keySelector(a), keySelector(b)));
@@ -157,7 +157,7 @@ public static class CollectionLib
         {
             result.Sort((a, b) => Comparer<TKey>.Default.Compare(keySelector(b), keySelector(a)));
         }
-        
+
         return result;
     }
 
@@ -173,7 +173,7 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(list), "输入列表不能为空");
         }
-        
+
         var result = new List<T>(list);
         result.Reverse();
         return result;
@@ -191,7 +191,7 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(list), "输入列表不能为空");
         }
-        
+
         return list.Distinct().ToList();
     }
 
@@ -208,12 +208,12 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(list), "输入列表不能为空");
         }
-        
+
         if (count < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(count), count, "元素个数不能为负数");
         }
-        
+
         return list.Take(count).ToList();
     }
 
@@ -230,12 +230,12 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(list), "输入列表不能为空");
         }
-        
+
         if (count < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(count), count, "跳过的元素个数不能为负数");
         }
-        
+
         return list.Skip(count).ToList();
     }
 
@@ -249,23 +249,25 @@ public static class CollectionLib
     /// <typeparam name="TKey">键类型</typeparam>
     /// <typeparam name="TValue">值类型</typeparam>
     /// <returns>合并后的字典</returns>
-    public static Dictionary<TKey, TValue> DictMerge<TKey, TValue>(Dictionary<TKey, TValue> dict1, Dictionary<TKey, TValue> dict2)
+    public static Dictionary<TKey, TValue> DictMerge<TKey, TValue>(Dictionary<TKey, TValue> dict1,
+        Dictionary<TKey, TValue> dict2) where TKey : notnull
     {
         if (dict1 == null)
         {
             throw new ArgumentNullException(nameof(dict1), "第一个字典不能为空");
         }
-        
+
         if (dict2 == null)
         {
             throw new ArgumentNullException(nameof(dict2), "第二个字典不能为空");
         }
-        
+
         var result = new Dictionary<TKey, TValue>(dict1);
         foreach (var pair in dict2)
         {
             result[pair.Key] = pair.Value;
         }
+
         return result;
     }
 
@@ -277,18 +279,19 @@ public static class CollectionLib
     /// <typeparam name="TKey">键类型</typeparam>
     /// <typeparam name="TValue">值类型</typeparam>
     /// <returns>过滤后的字典</returns>
-    public static Dictionary<TKey, TValue> DictFilter<TKey, TValue>(Dictionary<TKey, TValue> dict, Func<KeyValuePair<TKey, TValue>, bool> predicate)
+    public static Dictionary<TKey, TValue> DictFilter<TKey, TValue>(Dictionary<TKey, TValue> dict,
+        Func<KeyValuePair<TKey, TValue>, bool> predicate) where TKey : notnull
     {
         if (dict == null)
         {
             throw new ArgumentNullException(nameof(dict), "输入字典不能为空");
         }
-        
+
         if (predicate == null)
         {
             throw new ArgumentNullException(nameof(predicate), "过滤条件不能为空");
         }
-        
+
         return dict.Where(predicate).ToDictionary(pair => pair.Key, pair => pair.Value);
     }
 
@@ -300,12 +303,13 @@ public static class CollectionLib
     /// <typeparam name="TValue">值类型</typeparam>
     /// <returns>转换后的列表</returns>
     public static List<KeyValuePair<TKey, TValue>> DictToList<TKey, TValue>(Dictionary<TKey, TValue> dict)
+        where TKey : notnull
     {
         if (dict == null)
         {
             throw new ArgumentNullException(nameof(dict), "输入字典不能为空");
         }
-        
+
         return dict.ToList();
     }
 
@@ -316,13 +320,13 @@ public static class CollectionLib
     /// <typeparam name="TKey">键类型</typeparam>
     /// <typeparam name="TValue">值类型</typeparam>
     /// <returns>键列表</returns>
-    public static List<TKey> DictKeys<TKey, TValue>(Dictionary<TKey, TValue> dict)
+    public static List<TKey> DictKeys<TKey, TValue>(Dictionary<TKey, TValue> dict) where TKey : notnull
     {
         if (dict == null)
         {
             throw new ArgumentNullException(nameof(dict), "输入字典不能为空");
         }
-        
+
         return dict.Keys.ToList();
     }
 
@@ -333,13 +337,13 @@ public static class CollectionLib
     /// <typeparam name="TKey">键类型</typeparam>
     /// <typeparam name="TValue">值类型</typeparam>
     /// <returns>值列表</returns>
-    public static List<TValue> DictValues<TKey, TValue>(Dictionary<TKey, TValue> dict)
+    public static List<TValue> DictValues<TKey, TValue>(Dictionary<TKey, TValue> dict) where TKey : notnull
     {
         if (dict == null)
         {
             throw new ArgumentNullException(nameof(dict), "输入字典不能为空");
         }
-        
+
         return dict.Values.ToList();
     }
 
@@ -358,12 +362,12 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(set1), "第一个集合不能为空");
         }
-        
+
         if (set2 == null)
         {
             throw new ArgumentNullException(nameof(set2), "第二个集合不能为空");
         }
-        
+
         var result = new HashSet<T>(set1);
         result.IntersectWith(set2);
         return result;
@@ -382,12 +386,12 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(set1), "第一个集合不能为空");
         }
-        
+
         if (set2 == null)
         {
             throw new ArgumentNullException(nameof(set2), "第二个集合不能为空");
         }
-        
+
         var result = new HashSet<T>(set1);
         result.UnionWith(set2);
         return result;
@@ -406,12 +410,12 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(set1), "第一个集合不能为空");
         }
-        
+
         if (set2 == null)
         {
             throw new ArgumentNullException(nameof(set2), "第二个集合不能为空");
         }
-        
+
         var result = new HashSet<T>(set1);
         result.ExceptWith(set2);
         return result;
@@ -430,12 +434,12 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(subset), "子集不能为空");
         }
-        
+
         if (superset == null)
         {
             throw new ArgumentNullException(nameof(superset), "超集不能为空");
         }
-        
+
         return subset.IsSubsetOf(superset);
     }
 
@@ -452,12 +456,12 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(superset), "超集不能为空");
         }
-        
+
         if (subset == null)
         {
             throw new ArgumentNullException(nameof(subset), "子集不能为空");
         }
-        
+
         return superset.IsSupersetOf(subset);
     }
 
@@ -475,7 +479,7 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(collection), "输入集合不能为空");
         }
-        
+
         return !collection.Any();
     }
 
@@ -491,7 +495,7 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(collection), "输入集合不能为空");
         }
-        
+
         return collection.Count();
     }
 
@@ -507,7 +511,7 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(collection), "输入集合不能为空");
         }
-        
+
         return collection.ToArray();
     }
 
@@ -523,7 +527,7 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(collection), "输入集合不能为空");
         }
-        
+
         return collection.ToList();
     }
 
@@ -539,7 +543,7 @@ public static class CollectionLib
         {
             throw new ArgumentNullException(nameof(collection), "输入集合不能为空");
         }
-        
-        return new HashSet<T>(collection);
+
+        return [..collection];
     }
 }

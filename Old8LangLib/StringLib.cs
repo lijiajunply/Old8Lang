@@ -20,12 +20,12 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
         }
-        
+
         if (string.IsNullOrEmpty(pattern))
         {
             throw new ArgumentNullException(nameof(pattern), "正则表达式模式不能为空");
         }
-        
+
         try
         {
             var options = ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
@@ -51,12 +51,12 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
         }
-        
+
         if (string.IsNullOrEmpty(pattern))
         {
             throw new ArgumentNullException(nameof(pattern), "正则表达式模式不能为空");
         }
-        
+
         try
         {
             var options = ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
@@ -81,12 +81,12 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
         }
-        
+
         if (string.IsNullOrEmpty(pattern))
         {
             throw new ArgumentNullException(nameof(pattern), "正则表达式模式不能为空");
         }
-        
+
         try
         {
             var options = ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
@@ -112,17 +112,17 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
         }
-        
+
         if (string.IsNullOrEmpty(pattern))
         {
             throw new ArgumentNullException(nameof(pattern), "正则表达式模式不能为空");
         }
-        
+
         try
         {
             var options = ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
             var matches = Regex.Matches(input, pattern, options);
-            return matches.Cast<Match>().Select(match => match.Value).ToArray();
+            return matches.Select(match => match.Value).ToArray();
         }
         catch (Exception ex)
         {
@@ -142,12 +142,12 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(format), "格式字符串不能为空");
         }
-        
+
         if (args == null)
         {
             throw new ArgumentNullException(nameof(args), "格式参数不能为空");
         }
-        
+
         try
         {
             return string.Format(format, args);
@@ -169,7 +169,7 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
         }
-        
+
         try
         {
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes(input);
@@ -192,7 +192,7 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
         }
-        
+
         try
         {
             byte[] bytes = Convert.FromBase64String(input);
@@ -215,7 +215,7 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
         }
-        
+
         return input.ToUpper();
     }
 
@@ -230,7 +230,7 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
         }
-        
+
         return input.ToLower();
     }
 
@@ -245,7 +245,7 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
         }
-        
+
         return input.Trim();
     }
 
@@ -260,7 +260,7 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
         }
-        
+
         return input.TrimStart();
     }
 
@@ -275,7 +275,7 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
         }
-        
+
         return input.TrimEnd();
     }
 
@@ -292,12 +292,12 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
         }
-        
+
         if (string.IsNullOrEmpty(prefix))
         {
             throw new ArgumentNullException(nameof(prefix), "前缀不能为空");
         }
-        
+
         return input.StartsWith(prefix, ignoreCase, null);
     }
 
@@ -314,12 +314,12 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
         }
-        
+
         if (string.IsNullOrEmpty(suffix))
         {
             throw new ArgumentNullException(nameof(suffix), "后缀不能为空");
         }
-        
+
         return input.EndsWith(suffix, ignoreCase, null);
     }
 
@@ -336,12 +336,12 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
         }
-        
+
         if (string.IsNullOrEmpty(substring))
         {
             throw new ArgumentNullException(nameof(substring), "子字符串不能为空");
         }
-        
+
         var comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
         return input.IndexOf(substring, comparison);
     }
@@ -358,13 +358,13 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
         }
-        
+
         if (string.IsNullOrEmpty(separator))
         {
             throw new ArgumentNullException(nameof(separator), "分隔符不能为空");
         }
-        
-        return input.Split(new[] { separator }, StringSplitOptions.None);
+
+        return input.Split([separator], StringSplitOptions.None);
     }
 
     /// <summary>
@@ -379,7 +379,7 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "字符串数组不能为空");
         }
-        
+
         return string.Join(separator, input);
     }
 
@@ -395,12 +395,12 @@ public static class StringLib
         {
             throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
         }
-        
+
         if (count < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(count), count, "重复次数不能为负数");
         }
-        
+
         return new string(input[0], count);
     }
 }
@@ -413,17 +413,23 @@ public class RegexException : Exception
     /// <summary>
     /// 构造函数
     /// </summary>
-    public RegexException() : base() { }
+    public RegexException() : base()
+    {
+    }
 
     /// <summary>
     /// 构造函数
     /// </summary>
-    public RegexException(string message) : base(message) { }
+    public RegexException(string message) : base(message)
+    {
+    }
 
     /// <summary>
     /// 构造函数
     /// </summary>
-    public RegexException(string message, Exception innerException) : base(message, innerException) { }
+    public RegexException(string message, Exception innerException) : base(message, innerException)
+    {
+    }
 }
 
 /// <summary>
@@ -434,15 +440,21 @@ public class EncodingException : Exception
     /// <summary>
     /// 构造函数
     /// </summary>
-    public EncodingException() : base() { }
+    public EncodingException() : base()
+    {
+    }
 
     /// <summary>
     /// 构造函数
     /// </summary>
-    public EncodingException(string message) : base(message) { }
+    public EncodingException(string message) : base(message)
+    {
+    }
 
     /// <summary>
     /// 构造函数
     /// </summary>
-    public EncodingException(string message, Exception innerException) : base(message, innerException) { }
+    public EncodingException(string message, Exception innerException) : base(message, innerException)
+    {
+    }
 }

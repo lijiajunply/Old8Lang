@@ -1,4 +1,3 @@
-using System.IO;
 using System.Net.Http.Headers;
 
 namespace Old8Lang.NetLib;

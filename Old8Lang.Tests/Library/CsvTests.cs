@@ -1,12 +1,11 @@
 using Old8LangLib;
-using Xunit;
 
 namespace Old8Lang.Tests.Library;
 
 /// <summary>
 /// CSV处理模块测试
 /// </summary>
-public class CsvLibTests
+public class CsvTests
 {
     [Fact]
     public void ParseCsvLine_SimpleLine_ReturnsArray()
@@ -15,7 +14,7 @@ public class CsvLibTests
         string csvLine = "Name,Age,City";
         
         // Act
-        var result = CsvLib.ParseCsvLine(csvLine);
+        var result = Csv.ParseCsvLine(csvLine);
         
         // Assert
         Assert.NotNull(result);
@@ -32,7 +31,7 @@ public class CsvLibTests
         string csvLine = "John,\"Doe, Jr.\",30";
         
         // Act
-        var result = CsvLib.ParseCsvLine(csvLine);
+        var result = Csv.ParseCsvLine(csvLine);
         
         // Assert
         Assert.NotNull(result);
@@ -49,7 +48,7 @@ public class CsvLibTests
         string[] values = { "Name", "Age", "City" };
         
         // Act
-        var result = CsvLib.FormatCsvLine(values);
+        var result = Csv.FormatCsvLine(values);
         
         // Assert
         Assert.NotNull(result);
@@ -63,7 +62,7 @@ public class CsvLibTests
         string[] values = { "John", "Doe, Jr.", "New York" };
         
         // Act
-        var result = CsvLib.FormatCsvLine(values);
+        var result = Csv.FormatCsvLine(values);
         
         // Assert
         Assert.NotNull(result);
@@ -77,7 +76,7 @@ public class CsvLibTests
         string csvContent = "Name,Age\nJohn,30\nJane,25";
         
         // Act
-        var result = CsvLib.ParseCsvContent(csvContent, true);
+        var result = Csv.ParseCsvContent(csvContent, true);
         
         // Assert
         Assert.NotNull(result);
@@ -96,7 +95,7 @@ public class CsvLibTests
         string csvContent = string.Empty;
         
         // Act
-        var result = CsvLib.ParseCsvContent(csvContent);
+        var result = Csv.ParseCsvContent(csvContent);
         
         // Assert
         Assert.NotNull(result);
@@ -110,7 +109,7 @@ public class CsvLibTests
         string csvLine = string.Empty;
         
         // Act
-        var result = CsvLib.ParseCsvLine(csvLine);
+        var result = Csv.ParseCsvLine(csvLine);
         
         // Assert
         Assert.NotNull(result);

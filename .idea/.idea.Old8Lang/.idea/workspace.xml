@@ -17,185 +17,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/标准库系统性扩展与优化计划.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang.NetLib_HttpClient.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang.NetLib_HttpResponse.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang.NetLib_MqttClientWrapper.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang.NetLib_SocketClient.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang.NetLib_WebApiClient.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang.NetLib_WebSocketClient.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8LangLib_CollectionLib.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8LangLib_ColorfulTerminal.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8LangLib_CsvException.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8LangLib_CsvLib.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8LangLib_EncodingException.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8LangLib_FileLib.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8LangLib_JsonLib.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8LangLib_MathLib.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8LangLib_OS.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8LangLib_RegexException.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8LangLib_SortLib.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8LangLib_StringLib.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8LangLib_Terminal.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8LangLib_Time.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_AnyLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_AnyValueFuncStatic.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_Apis.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ArgumentError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ArrayLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_AssertionError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_AttributeError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_BlockStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_BoolLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_BreakException.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_BreakStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_CaseStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_CharLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ClassFieldSetStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ClassFuncInitStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ClassInit.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ClassMemberId.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ClassParser.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_Compiler.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_CompilerException.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ConsoleOutputProvider.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ContinueException.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ContinueStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_CustomError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_DictionaryLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_DictionaryValueFuncStatic.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_DoubleLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_DuplicateNameError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ErrorLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ExpectHelper.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ExpressionParser.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_FileNotFoundError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_FilteringCommentsTokenizer.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ForInStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ForStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_FormatError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_FuncInit.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_FuncLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_FuncRunStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_FunctionParser.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_IfChild.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_IfStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ImportError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ImportInfo.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ImportStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_IndexError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_Instance.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_IntLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_IntOperatorStatic.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_InvalidOperationError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_KeyError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_LangExpression.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_LangId.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_LangInfo.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_LangInterpreter.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_LangListItem.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_LangParser.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_LangToken.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_LangTokenizer.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_LangValueType.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_LibInfo.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ListComprehension.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ListLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ListValueFuncStatic.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_LocalManager.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_MockLangTree.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_NameError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_NativeAnyLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_NativeStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_NativeStaticAny.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_NotImplementedError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_NullLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_Old8Exception.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_OldStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_Operation.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_OutOfMemoryError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_OverflowError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ParserBase.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ParserContext.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_PermissionError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_PrimaryParser.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_RangeLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_RecursionError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ReturnStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_RuntimeError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_SemanticError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_SetStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_SliceLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_SourcePosition.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_StatementParser.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_StringLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_StringTreeList.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_SwitchStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_SyntaxError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_TernaryExpression.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ThrowStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_TimeoutError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_TryStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_TupleLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_TypeError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_TypeLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_TypeTemplate.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ValueError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ValueTypeFuncStatic.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_VariateManager.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_VoidLangValue.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_WhileStatement.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/Old8Lang_ZeroDivisionError.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/class.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_cog.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_cog_dark.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_cube.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_cube_dark.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_fork.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_fork_dark.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_info-circled.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_info-circled_dark.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_minus.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_minus_dark.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_plus.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_plus_dark.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_search-minus.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_search-minus_dark.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_search-plus.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_search-plus_dark.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_sponsor.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_star.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_star_dark.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_up-dir.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_up-dir_active.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_up-down-dir.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_up-down-dir_dark.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_wrench.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/icon_wrench_dark.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/index.htm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/main.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CoverageReport/report.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/CollectionLibTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/CsvLibTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/JsonLibTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/SortLibTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/StringLibTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/TestResults/6761447b-21f0-4e3a-91fe-b6237ff7a4ee/coverage.cobertura.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/TestResults/6c257f88-561c-442d-bcc9-4deb57f9edb7/coverage.cobertura.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/TestResults/c7bc7479-b19c-40c2-94ef-b9190c79851b/coverage.cobertura.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8LangLib/CollectionLib.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8LangLib/CsvLib.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8LangLib/JsonLib.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8LangLib/SortLib.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8LangLib/StringLib.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.NetLib/HttpClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.NetLib/HttpClient.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.NetLib/Old8Lang.NetLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.NetLib/Old8Lang.NetLib.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Language/SemicolonTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Language/SemicolonTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/CollectionLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/CollectionLibTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/CsvLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/CsvTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/JsonLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/JsonLibTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/SortLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/SortLibTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/StringLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/StringLibTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/PrimaryParserTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/PrimaryParserTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/FileLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/FileLib.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/CollectionLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/CollectionLib.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/CsvLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Csv.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/StringLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/StringLib.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8LangLib/Time.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Time.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -237,6 +72,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Apis.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Core/ParserContext.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Core/ParserContext.cs" root0="SKIP_HIGHLIGHTING" />
@@ -885,7 +721,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="149" />
+    <option name="localTasksCounter" value="150" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -912,7 +748,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(compiler): 添加深度递归性能测试用例&#10;&#10;- 新增斐波那契数列递归实现及测试&#10;- 实现阶乘深度递归计算函数&#10;- 添加汉诺塔问题递归解法&#10;- 实现阿克曼函数极高复杂度递归测试&#10;- 添加二叉树深度递归计算逻辑&#10;- 实现最大公约数欧几里得递归算法&#10;- 添加组合数递归计算功能&#10;- 实现字符串反转递归方法" />
     <MESSAGE value="feat(netlib): 添加网络库支持并重构项目结构&#10;&#10;- 新增 Old8Lang.NetLib 项目，包含 HTTP、Socket、WebSocket 和 MQTT 客户端实现&#10;- 在 Old8LangLib 中添加对新网络库的引用和导入定义&#10;- 更新解决方案文件，将 Old8Lang.NetLib 加入构建配置&#10;- 添加多个测试脚本用于验证网络库功能&#10;- 修改 IDE 编码配置路径以适配项目结构调整&#10;- 移除旧的 Net 类定义，使用新的模块化网络库替代&#10;- 提供完整的异步网络通信支持，包括连接、发送和接收数据&#10;- 支持常见的网络协议和操作，提升语言的网络编程能力" />
     <MESSAGE value="refactor(netlib): 重构SocketClient和WebApiClient字段命名及访问逻辑&#10;&#10;- 将私有字段重命名为PascalCase格式以符合C#命名约定&#10;- 使用可空引用类型优化NetworkStream声明&#10;- 将_isConnected标志替换为公共属性IsConnected并添加setter&#10;- 更新所有方法中的字段引用以匹配新命名&#10;- 简化HttpClient和TcpClient的初始化及资源释放逻辑&#10;- 优化BuildUrl方法中字典判断条件表达式&#10;- 改进PATCH请求发送方式，移除不必要的using块嵌套&#10;-" />
     <MESSAGE value="feat(compiler): 实现 for-in 循环对字典键值对的支持&#10;&#10;- 修复了字典键值对遍历时的 InvalidProgramException 错误&#10;- 更新 GenerateDictionaryIl 方法以支持多个标识符&#10;- 添加了对字典索引器的调用逻辑&#10;- 增加了值变量的局部存储和管理&#10;- 完成了对键值对遍历的完整 IL 代码生成&#10;- 通过单元测试验证了数组、字符串、字典的遍历功能&#10;- 确认了 for-in 语法在编译模式下的完全支持" />
@@ -937,7 +772,8 @@
     <MESSAGE value="test(parser): 添加语法错误测试用例&#10;&#10;- 新增算术表达式和括号错误测试&#10;- 新增赋值语句语法错误测试&#10;- 新增括号匹配错误测试&#10;- 新增集合、索引和成员访问表达式错误测试&#10;- 新增比较、逻辑和三元表达式错误测试&#10;- 新增编译器集成测试验证IL生成&#10;- 新增控制流语句语法错误测试&#10;- 重命名并重构声明语句测试类" />
     <MESSAGE value="test(parser): 添加高级运算符和列表推导式解析测试&#10;&#10;- 新增幂运算符(^)的解析测试，包括简单幂运算、链式幂运算、与括号结合、与其他运算符优先级等场景&#10;- 新增点运算符(.)的解析测试，涵盖成员访问、链式访问、方法调用、数组索引、字典键访问等用法&#10;- 新增列表推导式的完整测试套件，包括基本语法、条件过滤、嵌套循环、复杂表达式等场景&#10;- 添加点运算符和列表推导式的错误处理测试，验证语法错误能被正确捕获&#10;- 实现运算符优先级测试，确保点运算符与幂运算符、算术运算符的优先级关系正确&#10;- 补充特殊用法测试，如函数调用结果的成员访问和链式方法调用等边界情况" />
     <MESSAGE value="test(parser): 添加表达式和主解析器的单元测试&#10;&#10;- 实现运算符优先级和结合性的测试用例&#10;- 添加三元表达式和布尔运算的测试覆盖&#10;- 完成比较运算符和一元运算符的测试验证&#10;- 增加复杂数字字面量和字符串解析测试&#10;- 补充集合字面量及实例化解析测试&#10;- 完善标识符和元组解析的测试场景" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(parser): 添加表达式和主解析器的单元测试&#10;&#10;- 实现运算符优先级和结合性的测试用例&#10;- 添加三元表达式和布尔运算的测试覆盖&#10;- 完成比较运算符和一元运算符的测试验证&#10;- 增加复杂数字字面量和字符串解析测试&#10;- 补充集合字面量及实例化解析测试&#10;- 完善标识符和元组解析的测试场景" />
+    <MESSAGE value="feat(lib): 添加集合和CSV处理库及文件下载功能&#10;&#10;- 新增 CollectionLib 类，提供列表、字典、集合等常用操作方法&#10;- 新增 CsvLib 类，支持 CSV 文件的读取、写入和解析功能&#10;- 在 HttpClient 中新增 DownloadFileAsync 方法，支持文件下载&#10;- 为集合处理库添加完整的单元测试覆盖&#10;- 为 CSV 处理库添加基础解析和格式化测试&#10;- 修复 UnpackZip 方法中的路径参数使用错误问题&#10;- 扩展 HTTP 客户端功能以支持文件上传操作" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lib): 添加集合和CSV处理库及文件下载功能&#10;&#10;- 新增 CollectionLib 类，提供列表、字典、集合等常用操作方法&#10;- 新增 CsvLib 类，支持 CSV 文件的读取、写入和解析功能&#10;- 在 HttpClient 中新增 DownloadFileAsync 方法，支持文件下载&#10;- 为集合处理库添加完整的单元测试覆盖&#10;- 为 CSV 处理库添加基础解析和格式化测试&#10;- 修复 UnpackZip 方法中的路径参数使用错误问题&#10;- 扩展 HTTP 客户端功能以支持文件上传操作" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

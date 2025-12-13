@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text;
 
 namespace Old8LangLib;
@@ -6,7 +5,7 @@ namespace Old8LangLib;
 /// <summary>
 /// CSV处理模块，用于CSV文件的读写和解析
 /// </summary>
-public static class CsvLib
+public static class Csv
 {
     /// <summary>
     /// 从CSV文件中读取数据，返回二维字符串数组
@@ -61,7 +60,8 @@ public static class CsvLib
     /// <param name="delimiter">分隔符，默认为逗号</param>
     /// <param name="quoteChar">引号字符，默认为双引号</param>
     /// <returns>字典列表</returns>
-    public static List<Dictionary<string, string>> ReadCsvAsDictionary(string filePath, char delimiter = ',', char quoteChar = '"')
+    public static List<Dictionary<string, string>> ReadCsvAsDictionary(string filePath, char delimiter = ',',
+        char quoteChar = '"')
     {
         if (!File.Exists(filePath))
         {
@@ -115,7 +115,8 @@ public static class CsvLib
     /// <param name="headers">表头数组，可选</param>
     /// <param name="delimiter">分隔符，默认为逗号</param>
     /// <param name="quoteChar">引号字符，默认为双引号</param>
-    public static void WriteCsv(string filePath, string[][] data, string[]? headers = null, char delimiter = ',', char quoteChar = '"')
+    public static void WriteCsv(string filePath, string[][] data, string[]? headers = null, char delimiter = ',',
+        char quoteChar = '"')
     {
         if (data == null)
         {
@@ -127,7 +128,7 @@ public static class CsvLib
             using var writer = new StreamWriter(filePath);
 
             // 写入表头
-            if (headers != null && headers.Length > 0)
+            if (headers is { Length: > 0 })
             {
                 writer.WriteLine(FormatCsvLine(headers, delimiter, quoteChar));
             }
@@ -151,7 +152,8 @@ public static class CsvLib
     /// <param name="data">字典列表</param>
     /// <param name="delimiter">分隔符，默认为逗号</param>
     /// <param name="quoteChar">引号字符，默认为双引号</param>
-    public static void WriteCsvFromDictionary(string filePath, List<Dictionary<string, string>> data, char delimiter = ',', char quoteChar = '"')
+    public static void WriteCsvFromDictionary(string filePath, List<Dictionary<string, string>> data,
+        char delimiter = ',', char quoteChar = '"')
     {
         if (data == null)
         {
@@ -188,6 +190,7 @@ public static class CsvLib
                 {
                     values[i] = row.TryGetValue(headerArray[i], out var value) ? value : string.Empty;
                 }
+
                 writer.WriteLine(FormatCsvLine(values, delimiter, quoteChar));
             }
         }
@@ -216,10 +219,8 @@ public static class CsvLib
         bool inQuotes = false;
         bool escapeNext = false;
 
-        for (int i = 0; i < line.Length; i++)
+        foreach (var c in line)
         {
-            char c = line[i];
-
             if (escapeNext)
             {
                 currentValue.Append(c);
@@ -255,7 +256,7 @@ public static class CsvLib
     /// <param name="delimiter">分隔符</param>
     /// <param name="quoteChar">引号字符</param>
     /// <returns>格式化后的CSV行字符串</returns>
-    public static string FormatCsvLine(string[] values, char delimiter = ',', char quoteChar = '"')
+    public static string FormatCsvLine(string[]? values, char delimiter = ',', char quoteChar = '"')
     {
         if (values == null)
         {
@@ -271,13 +272,14 @@ public static class CsvLib
                 result.Append(delimiter);
             }
 
-            string value = values[i] ?? string.Empty;
-            bool needsQuotes = value.Contains(delimiter) || value.Contains(quoteChar) || value.Contains('\n') || value.Contains('\r');
+            string value = values[i];
+            bool needsQuotes = value.Contains(delimiter) || value.Contains(quoteChar) || value.Contains('\n') ||
+                               value.Contains('\r');
 
             if (needsQuotes)
             {
                 result.Append(quoteChar);
-                result.Append(value.Replace(quoteChar.ToString(), quoteChar.ToString() + quoteChar.ToString()));
+                result.Append(value.Replace(quoteChar.ToString(), quoteChar + quoteChar.ToString()));
                 result.Append(quoteChar);
             }
             else
@@ -297,14 +299,15 @@ public static class CsvLib
     /// <param name="delimiter">分隔符</param>
     /// <param name="quoteChar">引号字符</param>
     /// <returns>二维字符串数组</returns>
-    public static string[][] ParseCsvContent(string csvContent, bool hasHeader = true, char delimiter = ',', char quoteChar = '"')
+    public static string[][] ParseCsvContent(string csvContent, bool hasHeader = true, char delimiter = ',',
+        char quoteChar = '"')
     {
         if (string.IsNullOrEmpty(csvContent))
         {
             return Array.Empty<string[]>();
         }
 
-        var lines = csvContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var lines = csvContent.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
         if (lines.Length == 0)
         {
             return Array.Empty<string[]>();
@@ -333,15 +336,7 @@ public class CsvException : Exception
     /// <summary>
     /// 构造函数
     /// </summary>
-    public CsvException() : base() { }
-
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    public CsvException(string message) : base(message) { }
-
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    public CsvException(string message, Exception innerException) : base(message, innerException) { }
+    public CsvException(string message, Exception innerException) : base(message, innerException)
+    {
+    }
 }
