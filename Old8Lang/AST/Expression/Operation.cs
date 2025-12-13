@@ -372,6 +372,28 @@ public class Operation(LangExpression? left, LangTokenType opera, LangExpression
             return typeof(object);
         }
 
+        // 处理方法调用（Dot操作符 + Instance）
+        if (Opera == LangTokenType.Dot && Right is Instance instance)
+        {
+            // 特殊处理ToStr()方法，返回string类型
+            if (instance.Id.IdName == "ToStr" && instance.Ids.Count == 0)
+            {
+                return typeof(string);
+            }
+
+            // 对于其他方法调用，尝试查找方法并返回其返回类型
+            if (leftType != null)
+            {
+                var paramTypes = instance.Ids.Select(id => id.OutputType(local) ?? typeof(object)).ToArray();
+                var method = leftType.GetMethod(instance.Id.IdName, paramTypes);
+                if (method != null)
+                {
+                    return method.ReturnType;
+                }
+            }
+            return typeof(object);
+        }
+
         // 对于加法运算，如果任一操作数是字符串，则返回字符串类型
         if (Opera == LangTokenType.Plus && (leftType == typeof(string) || rightType == typeof(string)))
         {
@@ -908,6 +930,23 @@ public class Operation(LangExpression? left, LangTokenType opera, LangExpression
                         types.Add(instanceId.OutputType(local)!);
                     }
 
+                    // 特殊处理Old8Lang的ToStr()方法
+                    // ToStr()是Old8Lang的扩展方法，在编译模式下将其映射到.NET的ToString()
+                    if (instance.Id.IdName == "ToStr" && instance.Ids.Count == 0)
+                    {
+                        // 调用ToString()方法
+                        var toStringMethod = typeof(object).GetMethod("ToString", Type.EmptyTypes)!;
+
+                        // 如果左侧是值类型，需要先装箱
+                        if (leftType!.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Box, leftType);
+                        }
+
+                        ilGenerator.Emit(OpCodes.Callvirt, toStringMethod);
+                        return typeof(string);
+                    }
+
                     // 尝试查找精确匹配的方法
                     var m = leftType!.GetMethod(instance.Id.IdName, [.. types]);
 
@@ -999,12 +1038,84 @@ public class Operation(LangExpression? left, LangTokenType opera, LangExpression
                         ilGenerator.Emit(OpCodes.Callvirt, indexer.GetGetMethod()!);
                         return typeof(char);
                     }
+                    else if (leftType == typeof(object))
+                    {
+                        // Object类型，可能是字典、列表或数组
+                        // 策略：先存储到局部变量，然后依次尝试类型转换
+
+                        // 栈上已经有: leftValue, rightValue
+                        // 先保存rightValue
+                        var rightLocal = ilGenerator.DeclareLocal(typeof(object));
+                        if (rightType.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Box, rightType);
+                        }
+                        ilGenerator.Emit(OpCodes.Stloc, rightLocal);
+
+                        // leftValue仍在栈上，保存它
+                        var leftLocal = ilGenerator.DeclareLocal(typeof(object));
+                        ilGenerator.Emit(OpCodes.Stloc, leftLocal);
+
+                        var endLabel = ilGenerator.DefineLabel();
+                        var notDictLabel = ilGenerator.DefineLabel();
+                        var notListLabel = ilGenerator.DefineLabel();
+
+                        // 尝试Dictionary<object, object>
+                        ilGenerator.Emit(OpCodes.Ldloc, leftLocal);
+                        ilGenerator.Emit(OpCodes.Isinst, typeof(Dictionary<object, object>));
+                        ilGenerator.Emit(OpCodes.Dup);
+                        ilGenerator.Emit(OpCodes.Brfalse, notDictLabel);
+
+                        // 是Dictionary
+                        ilGenerator.Emit(OpCodes.Ldloc, rightLocal);
+                        var dictIndexer = typeof(Dictionary<object, object>).GetProperty("Item")!;
+                        ilGenerator.Emit(OpCodes.Callvirt, dictIndexer.GetGetMethod()!);
+                        ilGenerator.Emit(OpCodes.Br, endLabel);
+
+                        // 不是Dictionary，尝试List<object>
+                        ilGenerator.MarkLabel(notDictLabel);
+                        ilGenerator.Emit(OpCodes.Pop); // 弹出null
+                        ilGenerator.Emit(OpCodes.Ldloc, leftLocal);
+                        ilGenerator.Emit(OpCodes.Isinst, typeof(List<object>));
+                        ilGenerator.Emit(OpCodes.Dup);
+                        ilGenerator.Emit(OpCodes.Brfalse, notListLabel);
+
+                        // 是List
+                        ilGenerator.Emit(OpCodes.Ldloc, rightLocal);
+                        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+                        var listIndexer = typeof(List<object>).GetProperty("Item")!;
+                        ilGenerator.Emit(OpCodes.Callvirt, listIndexer.GetGetMethod()!);
+                        ilGenerator.Emit(OpCodes.Br, endLabel);
+
+                        // 不是List，尝试object[]
+                        ilGenerator.MarkLabel(notListLabel);
+                        ilGenerator.Emit(OpCodes.Pop);
+                        ilGenerator.Emit(OpCodes.Ldloc, leftLocal);
+                        ilGenerator.Emit(OpCodes.Isinst, typeof(object[]));
+                        ilGenerator.Emit(OpCodes.Ldloc, rightLocal);
+                        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+                        ilGenerator.Emit(OpCodes.Ldelem_Ref);
+
+                        ilGenerator.MarkLabel(endLabel);
+                        return typeof(object);
+                    }
 
                     // 默认情况，尝试装箱并调用索引器
-                    ilGenerator.Emit(OpCodes.Box, rightType);
-                    var defaultIndexer = leftType!.GetProperty("Item")!;
-                    ilGenerator.Emit(OpCodes.Callvirt, defaultIndexer.GetGetMethod()!);
-                    return typeof(object);
+                    if (rightType.IsValueType)
+                    {
+                        ilGenerator.Emit(OpCodes.Box, rightType);
+                    }
+                    var defaultIndexer = leftType!.GetProperty("Item");
+                    if (defaultIndexer != null)
+                    {
+                        ilGenerator.Emit(OpCodes.Callvirt, defaultIndexer.GetGetMethod()!);
+                        return typeof(object);
+                    }
+                    else
+                    {
+                        // 类型不支持索引访问
+                        throw new InvalidOperationError(this, $"类型 '{leftType.Name}' 不支持索引访问");
+                    }
                 }
 
                 return typeof(void);
