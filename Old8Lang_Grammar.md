@@ -513,9 +513,48 @@ try {
 
 ### 5.7 导入语句
 
+Old8Lang 支持多种导入语法，包括传统导入、命名导入、重命名导入和默认导入：
+
+#### 5.7.1 传统导入
+
 ```
 import "module"
 import module
+```
+
+#### 5.7.2 命名导入
+
+从模块中导入指定的函数或变量：
+
+```
+import { func1, var1 } from "module"
+import { func2, var2 } from module
+```
+
+#### 5.7.3 重命名导入
+
+将导入的项重命名为指定名称：
+
+```
+import { A as B, C as D } from "module"
+import { oldName as newName } from module
+```
+
+#### 5.7.4 默认导入
+
+将整个模块导入为指定名称：
+
+```
+import module as mod
+import "module" as mod
+```
+
+#### 5.7.5 混合导入
+
+同时使用命名导入和重命名导入：
+
+```
+import { func3, var3 as v3 } from "module"
 ```
 
 ### 5.8 原生库导入语句

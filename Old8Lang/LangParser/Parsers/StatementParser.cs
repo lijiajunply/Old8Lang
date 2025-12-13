@@ -672,7 +672,9 @@ public class StatementParser(
     }
 
     /// <summary>
-    /// importStatement = "import" STRING | IDENTIFIER;
+    /// importStatement = "import" ( importSpecifier "from" )? ( identifier | STRING ) ;
+    /// importSpecifier = "{" importItem ( "," importItem )* "}" | identifier;
+    /// importItem = identifier ( "as" identifier )?;
     /// </summary>
     /// <returns>引入模块</returns>
     public ImportStatement ParseImportStatement()
@@ -680,20 +682,106 @@ public class StatementParser(
         var importToken = CurrentToken;
         var position = new SourcePosition(importToken.Line, importToken.Column, tokenValue: importToken.Value);
         Expect(LangTokenType.Import);
+        
+        List<ImportItem>? importSpecifiers = null;
+        string? defaultImport = null;
+        bool fromClause = false;
         string moduleName;
-
-        if (CurrentToken.Type == LangTokenType.String)
+        
+        // 检查是否有导入指定项
+        if (CurrentToken.Type == LangTokenType.LeftBrace)
         {
+            // 解析命名导入：{ item1, item2 as alias2, ... }
+            importSpecifiers = new List<ImportItem>();
+            Expect(LangTokenType.LeftBrace);
+            
+            do
+            {
+                // 解析导入项
+                string name = CurrentToken.Value;
+                Expect(LangTokenType.Identifier);
+                
+                string? alias = null;
+                if (CurrentToken.Type == LangTokenType.As)
+                {
+                    Expect(LangTokenType.As);
+                    alias = CurrentToken.Value;
+                    Expect(LangTokenType.Identifier);
+                }
+                
+                importSpecifiers.Add(new ImportItem(name, alias));
+                
+            } while (CurrentToken.Type == LangTokenType.Comma && (CurrentIndex++ > -1));
+            
+            Expect(LangTokenType.RightBrace);
+            
+            // 解析 from 子句
+            fromClause = true;
+            Expect(LangTokenType.From);
+            
+            // 解析模块名
+            if (CurrentToken.Type == LangTokenType.String)
+            {
+                moduleName = CurrentToken.Value;
+                Expect(LangTokenType.String);
+            }
+            else
+            {
+                moduleName = CurrentToken.Value;
+                Expect(LangTokenType.Identifier);
+            }
+        }
+        else if (CurrentToken.Type == LangTokenType.Identifier)
+        {
+            // 检查是否是默认导入：import module as alias
+            string firstIdentifier = CurrentToken.Value;
+            CurrentIndex++;
+            
+            if (CurrentToken.Type == LangTokenType.As)
+            {
+                // 解析默认导入：import module as alias
+                Expect(LangTokenType.As);
+                defaultImport = CurrentToken.Value;
+                Expect(LangTokenType.Identifier);
+                moduleName = firstIdentifier;
+            }
+            else if (CurrentToken.Type == LangTokenType.From)
+            {
+                // 解析默认导入：import module from "module"
+                defaultImport = firstIdentifier;
+                fromClause = true;
+                Expect(LangTokenType.From);
+                
+                // 解析模块名
+                if (CurrentToken.Type == LangTokenType.String)
+                {
+                    moduleName = CurrentToken.Value;
+                    Expect(LangTokenType.String);
+                }
+                else
+                {
+                    moduleName = CurrentToken.Value;
+                    Expect(LangTokenType.Identifier);
+                }
+            }
+            else
+            {
+                // 传统导入：import module
+                moduleName = firstIdentifier;
+            }
+        }
+        else if (CurrentToken.Type == LangTokenType.String)
+        {
+            // 传统导入：import "module"
             moduleName = CurrentToken.Value;
             Expect(LangTokenType.String);
         }
         else
         {
-            moduleName = CurrentToken.Value;
-            Expect(LangTokenType.Identifier);
+            throw CreateSyntaxError("Expected identifier, string, or left brace after import");
         }
-
-        return new ImportStatement(moduleName, position);
+        
+        return new ImportStatement(moduleName, position, importSpecifiers, defaultImport, fromClause);
     }
 
     /// <summary>

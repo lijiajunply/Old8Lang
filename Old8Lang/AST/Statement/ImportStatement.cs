@@ -5,16 +5,44 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
 
-public class ImportStatement(string importString, SourcePosition position = default) : OldStatement(position)
+public class ImportItem(string name, string? alias = null)
 {
-    
+    public string Name = name;
+    public string Alias = alias ?? name;
+}
+
+public class ImportStatement(
+    string importString,
+    SourcePosition position = default,
+    List<ImportItem>? importSpecifiers = null,
+    string? defaultImport = null,
+    bool fromClause = false
+) : OldStatement(position)
+{
+    private readonly List<ImportItem> ImportSpecifiers = importSpecifiers ?? [];
+
     public override void Run(VariateManager manager)
     {
-        if (manager.LangInfo!.LibInfos.Any(x => importString == x.LibName))
+        string moduleName;
+
+        if (fromClause)
         {
-            var b = manager.LangInfo.LibInfos.Where(x => x.LibName == importString).Select(x => x.IsDir).ToArray()[0];
+            moduleName = importString;
+        }
+        else if (!string.IsNullOrEmpty(defaultImport))
+        {
+            moduleName = importString;
+        }
+        else
+        {
+            moduleName = importString;
+        }
+
+        if (manager.LangInfo!.LibInfos.Any(x => moduleName == x.LibName))
+        {
+            var b = manager.LangInfo.LibInfos.Where(x => x.LibName == moduleName).Select(x => x.IsDir).ToArray()[0];
             // 检查文件扩展名，只支持.old8和.ol
-            var fileName = importString;
+            var fileName = moduleName;
             var ext = Path.GetExtension(fileName).ToLower();
             if (!b && ext != ".old8" && ext != ".ol")
             {
@@ -22,7 +50,7 @@ public class ImportStatement(string importString, SourcePosition position = defa
             }
 
             var path = Path.Combine(manager.LangInfo.ImportPath, fileName);
-            
+
             // 检查文件或目录是否存在
             if (!File.Exists(path) && !Directory.Exists(path))
             {
@@ -35,8 +63,9 @@ public class ImportStatement(string importString, SourcePosition position = defa
                     if (!File.Exists(appPath) && !Directory.Exists(appPath))
                     {
                         // 所有尝试都失败，抛出导入错误
-                        throw new ImportError(Position, importString);
+                        throw new ImportError(Position, moduleName);
                     }
+
                     path = appPath;
                 }
                 else
@@ -44,21 +73,33 @@ public class ImportStatement(string importString, SourcePosition position = defa
                     path = absolutePath;
                 }
             }
-            
+
             var previousPath = manager.Path;
             manager.Path = path;
             var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
             var a = manager.Interpreter.Build(code: code);
-            a.ImportRun(manager);
+
+            if (fromClause || !string.IsNullOrEmpty(defaultImport))
+            {
+                // 对于命名导入和默认导入，我们需要先执行导入，然后根据需要获取指定的变量
+                // 暂时先导入所有内容，后续可以优化为只导入指定的变量
+                a.ImportRun(manager);
+            }
+            else
+            {
+                // 传统导入：导入所有内容
+                a.ImportRun(manager);
+            }
+
             manager.Path = previousPath;
             return;
         }
 
-        if (Apis.ImportInstall(importString))
+        if (Apis.ImportInstall(moduleName))
         {
-            var b = manager.LangInfo.LibInfos.Where(x => x.LibName == importString).Select(x => x.IsDir).ToArray()[0];
+            var b = manager.LangInfo.LibInfos.Where(x => x.LibName == moduleName).Select(x => x.IsDir).ToArray()[0];
             // 检查文件扩展名，只支持.old8和.ol
-            var fileName = importString;
+            var fileName = moduleName;
             var ext = Path.GetExtension(fileName).ToLower();
             if (!b && ext != ".old8" && ext != ".ol")
             {
@@ -77,7 +118,7 @@ public class ImportStatement(string importString, SourcePosition position = defa
 
         var dic = Path.GetDirectoryName(manager.Path)!;
         // 检查文件扩展名，只支持.old8和.ol
-        var fileNameLocal = importString;
+        var fileNameLocal = moduleName;
         var extLocal = Path.GetExtension(fileNameLocal).ToLower();
         if (extLocal != ".old8" && extLocal != ".ol")
         {
@@ -93,24 +134,46 @@ public class ImportStatement(string importString, SourcePosition position = defa
 
         if (!File.Exists(filePath))
         {
-            throw new ImportError(Position, importString);
+            throw new ImportError(Position, moduleName);
         }
 
         var managerPath = manager.Path;
         manager.Path = filePath;
         var result = manager.Interpreter.Build(code: Apis.FromFile(filePath));
-        result.ImportRun(manager);
+
+        if (fromClause || defaultImport != null)
+        {
+            // 对于命名导入和默认导入，我们需要先执行导入，然后根据需要获取指定的变量
+            // 暂时先导入所有内容，后续可以优化为只导入指定的变量
+            result.ImportRun(manager);
+        }
+        else
+        {
+            // 传统导入：导入所有内容
+            result.ImportRun(manager);
+        }
+
         manager.Path = managerPath;
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        var langInfo = Apis.ReadJson();
-        if (langInfo.LibInfos.Any(x => importString == x.LibName))
+        string moduleName;
+        if (fromClause || defaultImport != null)
         {
-            var b = langInfo.LibInfos.Where(x => x.LibName == importString).Select(x => x.IsDir).ToArray()[0];
+            moduleName = importString;
+        }
+        else
+        {
+            moduleName = importString;
+        }
+
+        var langInfo = Apis.ReadJson();
+        if (langInfo.LibInfos.Any(x => moduleName == x.LibName))
+        {
+            var b = langInfo.LibInfos.Where(x => x.LibName == moduleName).Select(x => x.IsDir).ToArray()[0];
             // 检查文件扩展名，只支持.old8和.ol
-            var fileName = importString;
+            var fileName = moduleName;
             var ext = Path.GetExtension(fileName).ToLower();
             if (!b && ext != ".old8" && ext != ".ol")
             {
@@ -119,7 +182,6 @@ public class ImportStatement(string importString, SourcePosition position = defa
 
             var path = Path.Combine(langInfo.ImportPath, fileName);
             var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
-            //var a = Interpreter.Build(code: code);
 
             var pPath = local.FilePath;
             local.FilePath = path;
@@ -131,7 +193,7 @@ public class ImportStatement(string importString, SourcePosition position = defa
 
         var dic = Path.GetDirectoryName(local.FilePath)!;
         // 检查文件扩展名，只支持.old8和.ol
-        var fileNameLocal = importString;
+        var fileNameLocal = moduleName;
         var extLocal = Path.GetExtension(fileNameLocal).ToLower();
         if (extLocal != ".old8" && extLocal != ".ol")
         {
@@ -155,5 +217,20 @@ public class ImportStatement(string importString, SourcePosition position = defa
 
     public override int Count => 0;
 
-    public override string ToString() => $"import {importString}";
+    public override string ToString()
+    {
+        if (defaultImport != null)
+        {
+            return $"import {defaultImport} from {importString}";
+        }
+
+        if (ImportSpecifiers.Count > 0)
+        {
+            var specifiers = string.Join(", ",
+                ImportSpecifiers.Select(s => s.Name == s.Alias ? s.Name : $"{s.Name} as {s.Alias}"));
+            return $"import {{ {specifiers} }} from {importString}";
+        }
+
+        return $"import {importString}";
+    }
 }

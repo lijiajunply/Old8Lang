@@ -1,0 +1,13 @@
+// 测试模块，用于测试各种 import 语法
+
+// 导出的函数和变量
+func export_func1() {
+    return "Hello from export_func1"
+}
+
+func export_func2() {
+    return "Hello from export_func2"
+}
+
+export_var1 <- "This is export_var1"
+export_var2 <- 12345

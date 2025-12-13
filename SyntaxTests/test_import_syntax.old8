@@ -1,0 +1,22 @@
+// 语法测试：新的 import 语法
+
+// 测试 1: 命名导入
+import { func1, var1 } from "module1"
+
+// 测试 2: 重命名导入
+import { A as B, C as D } from "module2"
+
+// 测试 3: 默认导入
+import module3 as mod3
+
+// 测试 4: 混合导入
+import { func2, var2 as v2 } from "module4"
+
+// 测试 5: 传统导入（保持向后兼容）
+import "module5"
+
+// 测试 6: 使用标识符作为模块名
+import { func3 } from module6
+
+// 测试 7: 单个命名导入
+import { single } from "module8"
