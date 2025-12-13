@@ -270,7 +270,7 @@ public class ExpressionParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<Operation>(setStmt.Value);
+        Assert.IsType<TernaryExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -291,7 +291,7 @@ public class ExpressionParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<Operation>(setStmt.Value);
+        Assert.IsType<TernaryExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -312,7 +312,7 @@ public class ExpressionParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<Operation>(setStmt.Value);
+        Assert.IsType<TernaryExpression>(setStmt.Value);
     }
 
     /// <summary>
@@ -631,7 +631,7 @@ public class ExpressionParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Count);
         var setStmt = Assert.IsType<SetStatement>(result[0]);
-        Assert.IsType<Operation>(setStmt.Value);
+        Assert.IsType<TernaryExpression>(setStmt.Value);
     }
 
     /// <summary>

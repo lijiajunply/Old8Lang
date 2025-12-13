@@ -18,7 +18,7 @@
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/FuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/FuncStatic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/ExpressionParserTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/ExpressionParserTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,36 +120,37 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Run&quot;,
-    &quot;07d79105-db56-470d-b872-543f396b1133.executor&quot;: &quot;Debug&quot;,
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
+    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
+    ".NET 项目.LibTest.executor": "Run",
+    ".NET 项目.Old8Lang.App.executor": "Run",
+    "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;PLAIN_TEXT&quot;,
-      &quot;Markdown&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "PLAIN_TEXT",
+      "Markdown"
     ]
   }
-}</component>
+}]]></component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
@@ -720,7 +721,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="154" />
+    <option name="localTasksCounter" value="156" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -747,8 +748,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(parser): 修复科学计数法数字字面量解析问题&#10;&#10;- 更新数字字面量解析逻辑，支持科学计数法(e/E)格式&#10;- 修复包含科学计数法的数字被错误解析为整数的问题&#10;- 确保带小数点或科学计数法的数字正确解析为双精度浮点数&#10;&#10;refactor(class): 优化类初始化方法的IL生成&#10;&#10;- 改进返回语句处理逻辑，避免重复添加Ret指令&#10;- 检查方法体最后语句是否为ReturnStatement，避免不必要的return&#10;- 修复void方法可能重复添加return指令的问题&#10;&#10;fix(runtime): 修复实例方法调用的IL指令生成&#10;&#10;- 区分实例方法和静态方法的调用指令&#10;- 实例方法使用Callvirt指令确保虚方法正确调用&#10;- 静态方法继续使用Call指令保持原有行为&#10;&#10;test(string): 更新多行字符串模板测试用例&#10;&#10;- 移除多行字符串模板的三引号语法&#10;- 适配Old8Lang新语法规范，使用单引号定义多行模板&#10;- 确保模板内插值和表达式计算功能正常&#10;&#10;chore(tests): 添加新的类和方法调用测试用例&#10;&#10;- 新增类构造函数初始化测试&#10;- 添加类方法调用相关测试文件&#10;- 完善类字段访问和方法执行测试场景&#10;&#10;docs(report): 生成编译器测试报告&#10;&#10;- 添加完整编译器测试执行结果报告&#10;- 记录各测试用例执行状态和性能数据&#10;- 便于跟踪测试覆盖率和失败情况分析" />
-    <MESSAGE value="feat(compiler): 支持类方法调用和初始化&#10;&#10;- 修改 ClassInit.cs 以支持方法上下文继承外部函数和类定义&#10;- 调整 Instance.cs 中的实例化逻辑，确保正确调用 init 方法&#10;- 新增多个测试用例验证类方法的赋值、返回值和调用功能&#10;- 更新编译器测试报告，记录新增测试结果" />
     <MESSAGE value="feat(compiler): 支持类字段和方法的基本访问与调用&#10;&#10;- 实现类字段的初始化和访问功能&#10;- 支持类方法的定义与调用&#10;- 支持方法内部的 PrintLine 调用&#10;- 支持方法返回值处理&#10;- 支持 void 方法中的 return 语句&#10;- 添加多个测试用例验证类功能正确性" />
     <MESSAGE value="chore(tests): 移除重复的编译器测试报告文件&#10;&#10;- 删除了多次重复的测试结果条目&#10;- 清理了无效的失败测试记录&#10;- 统一了测试报告格式，去除冗余内容&#10;- 优化了测试结果展示逻辑&#10;- 修复了测试数据结构的显示问题&#10;- 简化了报告文件的内容组织方式" />
     <MESSAGE value="chore(tests): 添加基础函数与Lambda表达式测试用例&#10;&#10;- 新增普通函数定义与调用测试文件&#10;- 添加Lambda表达式语法测试用例&#10;- 验证函数参数" />
@@ -772,7 +771,9 @@
     <MESSAGE value="feat(lang): 实现原生库批量导入功能&#10;&#10;- 新增 DLL 路径解析器 DllPathResolver，支持多策略查找原生库&#10;- 支持批量导入语法：[import &quot;DllName&quot; ClassName *]&#10;- 支持选择性导入语法：[import &quot;DllName&quot; ClassName { Method1, Method2 }]&#10;- 更新语法解析器以识别新的导入语句格式&#10;- 优化 NativeStatement 类以处理多种导入方式&#10;- 完善错误提示，提供详细的 DLL 查找失败信息&#10;- 更新标准库文件使用新的批量导入语法&#10;- 扩展语法文档，增加批量导入和选择性导入说明&#10;- 添加相关测试用例验证新功能正确性" />
     <MESSAGE value="refactor(net): 简化网络库导入定义并优化字段访问逻辑&#10;&#10;- 简化 Net.old8 文件中的类导入定义，统一使用类名导入替代方法级别导入&#10;- 移除冗余的属性和方法导入声明，减少配置复杂度&#10;- 优化 NativeStaticAny 类中的字段访问逻辑，提高代码可读性&#10;- 调整条件表达式结构，使字段获取流程更加清晰&#10;- 更新工作区变更记录，反映最新的文件修改状态" />
     <MESSAGE value="feat(parser): 支持成员方法调用语句解析&#10;&#10;- 新增对 obj.method() 形式的方法调用语句支持&#10;- 更新 StatementParser 以识别成员方法调用并生成 FuncRunStatement&#10;- 添加 ExpressionStatementTests 测试用例验证成员方法调用解析&#10;- 调整 ParseSet 方法中的表达式解析逻辑，保持缩进一致性&#10;- 修复工作区变更记录，准确反映文件修改状态" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 支持成员方法调用语句解析&#10;&#10;- 新增对 obj.method() 形式的方法调用语句支持&#10;- 更新 StatementParser 以识别成员方法调用并生成 FuncRunStatement&#10;- 添加 ExpressionStatementTests 测试用例验证成员方法调用解析&#10;- 调整 ParseSet 方法中的表达式解析逻辑，保持缩进一致性&#10;- 修复工作区变更记录，准确反映文件修改状态" />
+    <MESSAGE value="feat(lang): 扩展字符串和列表类型的功能支持&#10;&#10;- 为字符串类型添加哈希码计算和相等比较方法&#10;- 实现字符串常用操作方法：子串截取、查找、替换、分割、大小写转换、包含判断和去空白&#10;- 为列表类型添加过滤、映射、归约、反转、包含判断和索引查找方法&#10;- 支持在列表操作中使用函数式编程范式处理元素&#10;- 增强类型系统对扩展方法的支持能力" />
+    <MESSAGE value="refactor(lib): 优化代码结构并提升可读性&#10;&#10;- 移除了冗余的异常构造函数定义&#10;- 使用元组交换语法简化 Swap 方法实现&#10;- 添加 CultureInfo.InvariantCulture 以确保时间格式一致性&#10;- 更新方法参数为可空引用类型以提高类型安全性&#10;- 优化变量声明方式，使用 var 关键字提高代码简洁性&#10;- 调整数组初始化语法，增强代码可读性&#10;- 统一代码缩进和空行规范，改善整体代码风格" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(lib): 优化代码结构并提升可读性&#10;&#10;- 移除了冗余的异常构造函数定义&#10;- 使用元组交换语法简化 Swap 方法实现&#10;- 添加 CultureInfo.InvariantCulture 以确保时间格式一致性&#10;- 更新方法参数为可空引用类型以提高类型安全性&#10;- 优化变量声明方式，使用 var 关键字提高代码简洁性&#10;- 调整数组初始化语法，增强代码可读性&#10;- 统一代码缩进和空行规范，改善整体代码风格" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -890,6 +891,19 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="556" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/ExpressionParserTests.cs</url>
+          <line>633</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/ExpressionParserTests.cs" containingFunctionPresentation="方法 'ParseExpression_VeryComplexExpression_ParsesSuccessfully'">
+            <startOffsets>
+              <option value="17906" />
+            </startOffsets>
+            <endOffsets>
+              <option value="17954" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="558" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
