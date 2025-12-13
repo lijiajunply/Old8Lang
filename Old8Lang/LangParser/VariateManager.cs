@@ -138,7 +138,7 @@ public class VariateManager
             {
                 FuncLangValue func => func.Id!.IdName == id.IdName,
                 TypeTemplate template => template.ClassName == id.IdName,
-                NativeAnyLangValue na => na.ClassName == id.IdName,
+                NativeAnyLangValue na => na.RegisterName == id.IdName,  // 使用 RegisterName 而不是 ClassName
                 NativeStaticAny staticAny => staticAny.ClassName == id.IdName,
                 _ => false
             };

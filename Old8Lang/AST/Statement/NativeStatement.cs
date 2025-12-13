@@ -26,6 +26,9 @@ public class NativeStatement : OldStatement
     private readonly bool ImportAll;  // 是否导入所有方法 (*)
     private readonly List<string>? MethodList;  // 选择性导入的方法列表
 
+    // 类导入别名（用于 [import "DllName" ClassName as Alias]）
+    private readonly string? ClassAlias;
+
     public NativeStatement(string dllName, string className, string methodName, string nativeName)
     {
         DllName = dllName;
@@ -72,6 +75,16 @@ public class NativeStatement : OldStatement
         ClassName = className;
         MethodList = methodList;
         ImportAll = false;
+    }
+
+    // 新增：带别名的类导入构造函数 ([import "DllName" ClassName as Alias])
+    public NativeStatement(string dllName, string className, string classAlias, bool isAliasImport)
+    {
+        DllName = dllName;
+        ClassName = className;
+        ClassAlias = classAlias;
+        ImportAll = false;
+        MethodList = null;
     }
 
     public override void Run(VariateManager manager)
@@ -167,7 +180,11 @@ public class NativeStatement : OldStatement
             return;
         }
 
-        manager.AddClassAndFunc((ImportInfo)new NativeAnyLangValue(DllName, ClassName, path).Run(manager));
+        // 处理类导入（支持别名）：[import "DllName" ClassName] 或 [import "DllName" ClassName as Alias]
+        var registerName = !string.IsNullOrEmpty(ClassAlias) ? ClassAlias : ClassName;
+        var nativeClass = new NativeAnyLangValue(DllName, ClassName, path, registerName);
+        var importInfo = (ImportInfo)nativeClass.Run(manager);
+        manager.AddClassAndFunc(importInfo);
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
@@ -288,6 +305,12 @@ public class NativeStatement : OldStatement
         {
             var methods = string.Join(", ", MethodList);
             return $"[import \"{DllName}\" {ClassName} {{ {methods} }}]";
+        }
+
+        // 类导入（可能带别名）
+        if (!string.IsNullOrEmpty(ClassAlias))
+        {
+            return $"[import \"{DllName}\" {ClassName} as {ClassAlias}]";
         }
 
         return $"import native {DllName}.{ClassName}";

@@ -1,0 +1,35 @@
+// 测试原生类导入的 as 别名语法
+// 验证可以使用 as 关键字为导入的类指定别名
+
+// 所有 import 语句必须在文件开头
+[import "Old8LangLib" Csv]
+[import "Old8LangLib" CollectionLib as Collection]
+
+PrintLine("=== 测试原生类别名导入功能 ===")
+
+PrintLine("测试1: 导入不使用别名的类")
+test1 <- Csv
+PrintLine("✅ 正常导入 Csv 类成功")
+
+PrintLine("")
+PrintLine("测试2: 使用 as 别名导入")
+
+// 测试：确保可以使用别名访问
+try {
+    test2 <- Collection
+    PrintLine("✅ 使用别名 'Collection' 成功导入了 CollectionLib 类")
+} catch (e) {
+    PrintLine("❌ 错误：无法使用别名 'Collection'")
+    PrintLine("   异常信息: " + e.ToStr())
+}
+
+// 测试：确保原始名称仍然可用（两个是不同的导入）
+try {
+    test3 <- CollectionLib
+    PrintLine("❌ 原始名称 'CollectionLib' 不应该可用（因为我们使用了别名）")
+} catch (e) {
+    PrintLine("✅ 正确：使用原始名称 'CollectionLib' 抛出异常")
+}
+
+PrintLine("")
+PrintLine("=== 测试完成 ===")

@@ -8,10 +8,14 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <summary>
 /// 原生映射 适用于有构造函数的类
 /// </summary>
-public class NativeAnyLangValue(string dllName, string className, string path) : ImportInfo
+public class NativeAnyLangValue(string dllName, string className, string path, string? registerName = null) : ImportInfo
 {
     private Type? ClassType { get; set; }
     public readonly string ClassName = className;
+
+    // 注册名称（用于别名功能，如果为null则使用ClassName）
+    public readonly string RegisterName = registerName ?? className;
+
     private ConstructorInfo? Constructor { get; set; }
     private object? InstanceObj { get; set; }
 
@@ -25,9 +29,9 @@ public class NativeAnyLangValue(string dllName, string className, string path) :
             if (prop is null)
             {
                 var fie = ClassType?.GetField(id.IdName);
-                if (fie is null)
-                    throw new AttributeError(this, id.IdName, ClassName);
-                return ObjToValue(fie.GetValue(null)!);
+                return fie is null
+                    ? throw new AttributeError(this, id.IdName, ClassName)
+                    : ObjToValue(fie.GetValue(null)!);
             }
 
             return ObjToValue(prop.GetValue(null)!);

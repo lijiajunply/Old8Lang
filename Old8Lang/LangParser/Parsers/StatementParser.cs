@@ -176,7 +176,17 @@ public class StatementParser(
                 return ParseNativeStatement();
             }
 
-            // 4. nativeClass: [import "dll" class]
+            // 4. nativeClass with alias: [import "dll" class as alias]
+            if (Peek(2).Type == LangTokenType.String &&
+                Peek(3).Type == LangTokenType.Identifier &&
+                Peek(4).Type == LangTokenType.As &&
+                Peek(5).Type == LangTokenType.Identifier &&
+                Peek(6).Type == LangTokenType.RightBracket)
+            {
+                return ParseNativeClass();
+            }
+
+            // 5. nativeClass: [import "dll" class]
             if (Peek(2).Type == LangTokenType.String &&
                 Peek(3).Type == LangTokenType.Identifier &&
                 Peek(4).Type == LangTokenType.RightBracket)
@@ -184,7 +194,7 @@ public class StatementParser(
                 return ParseNativeClass();
             }
 
-            // 5. 单个方法导入: [import "dll" class method alias?]
+            // 6. 单个方法导入: [import "dll" class method alias?]
             return ParseNativeStatement();
         }
 
@@ -333,6 +343,15 @@ public class StatementParser(
                 Peek(4).Type == LangTokenType.LeftBrace)
             {
                 return ParseNativeStatement();
+            }
+
+            if (Peek(2).Type == LangTokenType.String &&
+                Peek(3).Type == LangTokenType.Identifier &&
+                Peek(4).Type == LangTokenType.As &&
+                Peek(5).Type == LangTokenType.Identifier &&
+                Peek(6).Type == LangTokenType.RightBracket)
+            {
+                return ParseNativeClass();
             }
 
             if (Peek(2).Type == LangTokenType.String &&
@@ -826,6 +845,17 @@ public class StatementParser(
         Expect(LangTokenType.String);
         var className = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
+
+        // 检查是否有 as 别名：[import "DllName" ClassName as Alias]
+        if (CurrentToken.Type == LangTokenType.As)
+        {
+            Expect(LangTokenType.As);
+            var alias = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+            Expect(LangTokenType.RightBracket);
+            return new NativeStatement(dllName, className, alias, isAliasImport: true);
+        }
+
         Expect(LangTokenType.RightBracket);
         return new NativeStatement(dllName, className);
     }
