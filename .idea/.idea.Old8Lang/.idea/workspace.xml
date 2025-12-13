@@ -17,21 +17,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/test_string.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/18_string_templates.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/18_string_templates.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/31_os_library.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/31_os_library.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/31_os_library_actual.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/31_os_library_actual.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/33_file_library.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/33_file_library_actual.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/34_import_statements.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/34_import_statements.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/37_batch_import_simple.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/37_batch_import_test2.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/37_batch_import_test3.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/37_batch_import_test4.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_dll_not_found.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_standard_libraries.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/test_standard_libraries.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_string.old8" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,6 +66,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/NativeStaticAny.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/NativeStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/NativeStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
@@ -735,7 +724,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="157" />
+    <option name="localTasksCounter" value="158" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -762,7 +751,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="chore(tests): 移除重复的编译器测试报告文件&#10;&#10;- 删除了多次重复的测试结果条目&#10;- 清理了无效的失败测试记录&#10;- 统一了测试报告格式，去除冗余内容&#10;- 优化了测试结果展示逻辑&#10;- 修复了测试数据结构的显示问题&#10;- 简化了报告文件的内容组织方式" />
     <MESSAGE value="chore(tests): 添加基础函数与Lambda表达式测试用例&#10;&#10;- 新增普通函数定义与调用测试文件&#10;- 添加Lambda表达式语法测试用例&#10;- 验证函数参数" />
     <MESSAGE value="feat(compiler): 支持类字段访问与赋值操作&#10;&#10;- 在 ClassInit.cs 中保存字段信息到 LocalManager，以便在方法中访问&#10;- 在 LocalManager.cs 中添加 FieldVar 字典用于存储字段信息&#10;- 在 Operation.cs 中优先从 FieldVar 查找字段，支持 TypeBuilder 场景&#10;- 在 SetStatement.cs 中实现对 this 字段的赋值操作支持&#10;- 添加多个测试用例验证类成员访问、修改及初始化功能&#10;- 更新现有测试文件以适配新的类字段处理逻辑" />
     <MESSAGE value="feat(compiler): 支持泛型字典的索引访问与赋值操作&#10;&#10;- 优化 LangListItem 中字典索引访问的类型处理逻辑&#10;- 支持 Dictionary&lt;TKey, TValue&gt; 泛型类型的键值类型匹配&#10;- 在 SetStatement 中实现对泛型字典索引赋值的类型转换&#10;- 添加测试用例验证字典修改与访问功能&#10;- 更新编译器测试报告与相关配置文件" />
@@ -787,7 +775,8 @@
     <MESSAGE value="feat(lang): 扩展字符串和列表类型的功能支持&#10;&#10;- 为字符串类型添加哈希码计算和相等比较方法&#10;- 实现字符串常用操作方法：子串截取、查找、替换、分割、大小写转换、包含判断和去空白&#10;- 为列表类型添加过滤、映射、归约、反转、包含判断和索引查找方法&#10;- 支持在列表操作中使用函数式编程范式处理元素&#10;- 增强类型系统对扩展方法的支持能力" />
     <MESSAGE value="refactor(lib): 优化代码结构并提升可读性&#10;&#10;- 移除了冗余的异常构造函数定义&#10;- 使用元组交换语法简化 Swap 方法实现&#10;- 添加 CultureInfo.InvariantCulture 以确保时间格式一致性&#10;- 更新方法参数为可空引用类型以提高类型安全性&#10;- 优化变量声明方式，使用 var 关键字提高代码简洁性&#10;- 调整数组初始化语法，增强代码可读性&#10;- 统一代码缩进和空行规范，改善整体代码风格" />
     <MESSAGE value="test(parser): 更新表达式解析器测试用例&#10;&#10;- 将多个测试用例中的 Operation 断言更新为 TernaryExpression&#10;- 确保三元表达式在复杂表达式解析中的正确性&#10;- 修复测试用例与实际解析结果类型不匹配的问题" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(parser): 更新表达式解析器测试用例&#10;&#10;- 将多个测试用例中的 Operation 断言更新为 TernaryExpression&#10;- 确保三元表达式在复杂表达式解析中的正确性&#10;- 修复测试用例与实际解析结果类型不匹配的问题" />
+    <MESSAGE value="fix(parser): 更新OS库函数名和三元表达式语法&#10;&#10;- 将OSInfo()函数调用统一改为小写的OsInfo()&#10;- 修改字符串模板中的三元表达式语法格式&#10;- 更新相关测试文件以匹配新的函数命名规范&#10;- 调整程序入口测试路径指向正确的测试文件&#10;- 添加新的字符串测试用例验证三元表达式功能" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(parser): 更新OS库函数名和三元表达式语法&#10;&#10;- 将OSInfo()函数调用统一改为小写的OsInfo()&#10;- 修改字符串模板中的三元表达式语法格式&#10;- 更新相关测试文件以匹配新的函数命名规范&#10;- 调整程序入口测试路径指向正确的测试文件&#10;- 添加新的字符串测试用例验证三元表达式功能" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

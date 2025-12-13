@@ -22,6 +22,9 @@ public class FuncLangValue : ImportInfo
 
     private readonly FuncLangValue? Func;
 
+    // 闭包环境：捕获的作用域，用于支持闭包变量访问
+    private VariateManager? CapturedScope { get; init; }
+
     public FuncLangValue(LangId? id, List<LangId> ids, BlockStatement blockStatement,
         SourcePosition position = default) :
         base(position)
@@ -39,7 +42,25 @@ public class FuncLangValue : ImportInfo
         Func = func;
     }
 
-    public override LangValueType Run(VariateManager manager) => this;
+    public override LangValueType Run(VariateManager manager)
+    {
+        // 如果这个函数没有方法引用（即是 Old8Lang 函数而非原生方法）
+        // 创建一个新的 FuncLangValue 副本，并捕获当前作用域
+        // 这样每次返回函数时都会捕获各自的作用域，支持闭包
+        if (Method == null && Ids != null)
+        {
+            var closureFunc = new FuncLangValue(Id, Ids, BlockStatement, Position)
+            {
+                // 克隆当前作用域，保存闭包环境的快照
+                // 这样即使外部函数返回后，闭包仍然可以访问捕获的变量
+                CapturedScope = manager.Clone()
+            };
+            return closureFunc;
+        }
+
+        // 原生方法或其他情况直接返回自身
+        return this;
+    }
 
     public LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> ids, object? obj = null)
     {
@@ -73,6 +94,7 @@ public class FuncLangValue : ImportInfo
                 {
                     throw new FileNotFoundError(Position, fileEx.FileName ?? "未知文件");
                 }
+
                 if (innerException is DirectoryNotFoundException dirEx)
                 {
                     throw new FileNotFoundError(Position, dirEx.Message);
@@ -149,73 +171,90 @@ public class FuncLangValue : ImportInfo
         variateManagerFunc.RecursionDepth++;
         try
         {
-            variateManagerFunc.AddChildren();
-            variateManagerFunc.IsFunc = true; // 设置为函数上下文
-
-        // 将静态成员添加到方法的变量管理器中
-        var thisValue = variateManagerFunc.GetValue(new LangId("this"));
-        if (thisValue is AnyLangValue)
-        {
-            // 将类的静态成员添加到方法的变量管理器中
-            foreach (var importInfo in variateManagerFunc.ImportInfos)
+            // 如果有捕获的作用域（闭包），使用捕获的作用域而不是调用时的作用域
+            // 这样函数体就能访问定义时的外部变量
+            VariateManager executionManager;
+            if (CapturedScope != null)
             {
-                if (importInfo is TypeTemplate typeTemplate)
+                // 使用捕获的作用域作为基础
+                executionManager = CapturedScope;
+                // 增加递归深度
+                executionManager.RecursionDepth = variateManagerFunc.RecursionDepth;
+            }
+            else
+            {
+                // 没有捕获作用域，使用调用时的作用域
+                executionManager = variateManagerFunc;
+            }
+
+            executionManager.AddChildren();
+            executionManager.IsFunc = true; // 设置为函数上下文
+
+            // 将静态成员添加到方法的变量管理器中
+            var thisValue = executionManager.GetValue(new LangId("this"));
+            if (thisValue is AnyLangValue)
+            {
+                // 将类的静态成员添加到方法的变量管理器中
+                foreach (var importInfo in executionManager.ImportInfos)
                 {
-                    foreach (var staticMember in typeTemplate.StaticVariates)
+                    if (importInfo is TypeTemplate typeTemplate)
                     {
-                        variateManagerFunc.Set(staticMember.Key, staticMember.Value.Run(variateManagerFunc));
+                        foreach (var staticMember in typeTemplate.StaticVariates)
+                        {
+                            executionManager.Set(staticMember.Key, staticMember.Value.Run(executionManager));
+                        }
                     }
                 }
             }
-        }
 
-        if (Ids != null && Ids.Count != 0)
-        {
-            // 先计算所有传入参数的值，使用外部变量管理器
-            var paramValues = ids.Select(t => t.Run(variateManagerFunc)).ToList();
-
-            // 处理默认参数，补全缺失的参数值
-            for (var i = paramValues.Count; i < Ids.Count; i++)
+            if (Ids != null && Ids.Count != 0)
             {
-                var id = Ids[i];
-                if (id.DefaultValue != null)
+                // 先计算所有传入参数的值，使用外部变量管理器
+                var paramValues = ids.Select(t => t.Run(variateManagerFunc)).ToList();
+
+                // 处理默认参数，补全缺失的参数值
+                for (var i = paramValues.Count; i < Ids.Count; i++)
                 {
-                    // 计算默认参数值
-                    var defaultValue = id.DefaultValue.Run(variateManagerFunc);
-                    paramValues.Add(defaultValue);
+                    var id = Ids[i];
+                    if (id.DefaultValue != null)
+                    {
+                        // 计算默认参数值
+                        var defaultValue = id.DefaultValue.Run(executionManager);
+                        paramValues.Add(defaultValue);
+                    }
+                    else
+                    {
+                        // 没有默认参数且没有传入参数，抛出错误
+                        throw new ArgumentError(Position,
+                            $"函数 '{Id?.IdName}' 的参数 '{id.IdName}' 缺少实参且没有默认值");
+                    }
                 }
-                else
+
+                // 然后将所有参数值（包括默认参数）设置到函数的变量管理器中
+                for (var i = 0; i < Ids.Count; i++)
                 {
-                    // 没有默认参数且没有传入参数，抛出错误
-                    throw new ArgumentError(Position,
-                        $"函数 '{Id?.IdName}' 的参数 '{id.IdName}' 缺少实参且没有默认值");
+                    executionManager.Set(Ids[i], paramValues[i]);
                 }
             }
 
-            // 然后将所有参数值（包括默认参数）设置到函数的变量管理器中
-            for (var i = 0; i < Ids.Count; i++)
-            {
-                variateManagerFunc.Set(Ids[i], paramValues[i]);
-            }
-        }
+            // 参数设置完成后，恢复非函数上下文标志
+            // 这样函数体中的赋值语句可以正常查找和修改外部作用域的变量
+            executionManager.IsFunc = false;
 
-        // 运行方法体
-        BlockStatement.Run(variateManagerFunc);
+            // 运行方法体
+            BlockStatement.Run(executionManager);
 
-        // 保存返回值
-        var result = variateManagerFunc.Result;
+            // 保存返回值
+            var result = executionManager.Result;
 
-        // 恢复非函数上下文标志
-        variateManagerFunc.IsFunc = false;
+            // 重置return标志，确保函数调用不会影响外部上下文
+            executionManager.IsReturn = false;
 
-        // 重置return标志，确保函数调用不会影响外部上下文
-        variateManagerFunc.IsReturn = false;
+            // 移除子作用域，但是要注意，在init方法中使用this关键字设置的值已经被保存到实例中了
+            // 所以这里移除子作用域不会影响实例的状态
+            executionManager.RemoveChildren();
 
-        // 移除子作用域，但是要注意，在init方法中使用this关键字设置的值已经被保存到实例中了
-        // 所以这里移除子作用域不会影响实例的状态
-        variateManagerFunc.RemoveChildren();
-
-        return result;
+            return result;
         }
         finally
         {
@@ -239,7 +278,7 @@ public class FuncLangValue : ImportInfo
             var item = statement[i];
 
             // 如果是SetStatement，记录局部变量的类型
-            if (item is SetStatement setStatement && setStatement.Id != null)
+            if (item is SetStatement { Id: not null } setStatement)
             {
                 var varType = setStatement.Value.OutputType(local);
                 if (varType != null)
