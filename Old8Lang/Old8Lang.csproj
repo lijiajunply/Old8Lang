@@ -10,7 +10,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="5.0.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
-
+        <PackageReference Include="dnlib" Version="4.5.0" />
     </ItemGroup>
 
 </Project>

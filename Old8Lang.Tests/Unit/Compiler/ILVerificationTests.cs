@@ -29,7 +29,7 @@ public class ILVerificationTests
         var ast = interpreter.Build(code);
 
         // 编译生成IL - 应该能通过验证
-        var compiledAction = Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
         // 验证IL已生成且委托已创建
         Assert.NotNull(compiledAction);
@@ -42,7 +42,7 @@ public class ILVerificationTests
     public void Verify_ILVerificationCanBeDisabled()
     {
         // 禁用IL验证
-        Compiler.ILVerificationEnabled = false;
+        Old8Lang.Compiler.Compiler.ILVerificationEnabled = false;
         
         try
         {
@@ -59,7 +59,7 @@ public class ILVerificationTests
             var ast = interpreter.Build(code);
 
             // 编译生成IL - 应该能通过编译
-            var compiledAction = Compiler.Compile(ast, "test", interpreter);
+            var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
             // 验证IL已生成且委托已创建
             Assert.NotNull(compiledAction);
@@ -67,7 +67,7 @@ public class ILVerificationTests
         finally
         {
             // 恢复IL验证开关
-            Compiler.ILVerificationEnabled = true;
+            Old8Lang.Compiler.Compiler.ILVerificationEnabled = true;
         }
     }
     
@@ -89,7 +89,7 @@ public class ILVerificationTests
         var ast = interpreter.Build(code);
 
         // 编译生成IL - 应该能通过验证
-        var compiledAction = Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
         // 验证IL已生成且委托已创建
         Assert.NotNull(compiledAction);

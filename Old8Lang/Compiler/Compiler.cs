@@ -13,6 +13,11 @@ public static class Compiler
     public static bool DebugOutputEnabled { get; set; }
 
     /// <summary>
+    /// IL代码验证开关，默认为开启
+    /// </summary>
+    public static bool ILVerificationEnabled { get; set; } = true;
+
+    /// <summary>
     /// 日志级别枚举
     /// </summary>
     public enum LogLevel
@@ -119,6 +124,38 @@ public static class Compiler
 
             ilGenerator.Emit(OpCodes.Ret);
 
+            // 执行IL代码验证（如果启用）
+            if (ILVerificationEnabled)
+            {
+                Log("开始验证IL代码", LogLevel.Debug);
+                var verificationResult = ILVerifier.Verify(dynamicMethod, "OldLangRun");
+                
+                if (!verificationResult.IsValid)
+                {
+                    // IL验证失败，输出详细错误信息
+                    foreach (var error in verificationResult.Errors)
+                    {
+                        LogFormat("IL验证错误 [{0}]: {1}", LogLevel.Error, error.Code, error.Message);
+                        if (!string.IsNullOrEmpty(error.Context))
+                        {
+                            LogFormat("上下文: {0}", LogLevel.Error, error.Context);
+                        }
+                        if (!string.IsNullOrEmpty(error.StackTrace))
+                        {
+                            LogFormat("堆栈跟踪: {0}", LogLevel.Debug, error.StackTrace);
+                        }
+                    }
+                    
+                    throw new CompilerException($"IL代码验证失败，共发现 {verificationResult.Errors.Count} 个错误", new SourcePosition(0, 0));
+                }
+                
+                Log("IL代码验证通过", LogLevel.Debug);
+            }
+            else
+            {
+                Log("IL代码验证已禁用", LogLevel.Debug);
+            }
+
             Log("创建委托", LogLevel.Debug);
             Action oldLangRun;
             try
@@ -129,12 +166,7 @@ public static class Compiler
             catch (InvalidProgramException ex)
             {
                 LogFormat("创建委托失败: {0}", LogLevel.Error, ex.Message);
-                Log("尝试使用替代方法创建委托", LogLevel.Debug);
-                
-                // 替代方案：创建一个空操作委托，避免编译器崩溃
-                // 这只是一个临时解决方案，完整实现需要重新设计Lambda表达式处理
-                oldLangRun = () => { };
-                Log("使用空操作委托作为替代方案", LogLevel.Debug);
+                throw new CompilerException($"创建委托失败: {ex.Message}", new SourcePosition(0, 0), ex);
             }
 
             return oldLangRun;

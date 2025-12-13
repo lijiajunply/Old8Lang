@@ -1,7 +1,6 @@
 using System.Reflection.Emit;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
-using dnlib.IO;
 
 namespace Old8Lang.Compiler;
 
@@ -22,39 +21,39 @@ public static class ILVerifier
         
         try
         {
-            // 获取动态方法的IL字节
-            var ilBytes = dynamicMethod.GetMethodImplementationFlags() != MethodImplAttributes.IL
-                ? Array.Empty<byte>()
-                : GetILBytes(dynamicMethod);
-            
-            if (ilBytes.Length == 0)
+            // 对于DynamicMethod，我们通过尝试创建委托来验证IL
+            // 这是最直接的方式，因为CLR会在创建委托时验证IL
+            try
             {
+                // 尝试创建委托，这会触发CLR的IL验证
+                dynamicMethod.CreateDelegate(typeof(Action));
+                
+                // 如果没有抛出异常，则IL代码基本有效
+                result.IsValid = true;
+            }
+            catch (InvalidProgramException ex)
+            {
+                // IL代码无效，记录详细错误
                 result.Errors.Add(new VerificationError
                 {
                     Severity = Severity.Error,
                     Code = "IL001",
-                    Message = "方法没有IL实现",
-                    MethodName = methodName
+                    Message = $"无效的IL代码: {ex.Message}",
+                    MethodName = methodName,
+                    Context = "CLR在创建委托时检测到无效IL代码"
                 });
-                return result;
             }
-            
-            // 解析IL指令
-            var instructions = ParseILInstructions(ilBytes);
-            
-            // 执行基本验证
-            ValidateILInstructions(instructions, result, methodName);
-            
-            // 执行堆栈验证
-            ValidateStackOperations(instructions, result, methodName);
-            
-            // 执行类型验证
-            ValidateTypeSafety(instructions, result, methodName);
-            
-            // 如果没有错误，则验证通过
-            if (result.Errors.Count == 0)
+            catch (Exception ex)
             {
-                result.IsValid = true;
+                // 其他类型的异常
+                result.Errors.Add(new VerificationError
+                {
+                    Severity = Severity.Error,
+                    Code = "IL002",
+                    Message = $"验证过程中发生异常: {ex.Message}",
+                    MethodName = methodName,
+                    StackTrace = ex.StackTrace
+                });
             }
         }
         catch (Exception ex)
@@ -62,4 +61,96 @@ public static class ILVerifier
             result.Errors.Add(new VerificationError
             {
                 Severity = Severity.Error,
-                Code
+                Code = "IL000",
+                Message = $"验证器内部错误: {ex.Message}",
+                MethodName = methodName,
+                StackTrace = ex.StackTrace
+            });
+        }
+        
+        return result;
+    }
+}
+
+/// <summary>
+/// 验证结果
+/// </summary>
+public class VerificationResult
+{
+    /// <summary>
+    /// IL代码是否有效
+    /// </summary>
+    public bool IsValid { get; set; }
+    
+    /// <summary>
+    /// 验证过程中发现的错误
+    /// </summary>
+    public List<VerificationError> Errors { get; set; }
+    
+    public VerificationResult()
+    {
+        Errors = new List<VerificationError>();
+    }
+}
+
+/// <summary>
+/// 验证错误
+/// </summary>
+public class VerificationError
+{
+    /// <summary>
+    /// 错误严重性
+    /// </summary>
+    public Severity Severity { get; set; }
+    
+    /// <summary>
+    /// 错误代码
+    /// </summary>
+    public string? Code { get; set; }
+    
+    /// <summary>
+    /// 错误消息
+    /// </summary>
+    public string? Message { get; set; }
+    
+    /// <summary>
+    /// 方法名称
+    /// </summary>
+    public string? MethodName { get; set; }
+    
+    /// <summary>
+    /// 错误位置偏移量
+    /// </summary>
+    public int Offset { get; set; }
+    
+    /// <summary>
+    /// 堆栈跟踪信息
+    /// </summary>
+    public string? StackTrace { get; set; }
+    
+    /// <summary>
+    /// 错误上下文信息
+    /// </summary>
+    public string? Context { get; set; }
+}
+
+/// <summary>
+/// 错误严重性枚举
+/// </summary>
+public enum Severity
+{
+    /// <summary>
+    /// 信息
+    /// </summary>
+    Info,
+    
+    /// <summary>
+    /// 警告
+    /// </summary>
+    Warning,
+    
+    /// <summary>
+    /// 错误
+    /// </summary>
+    Error
+}
