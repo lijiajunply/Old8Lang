@@ -424,15 +424,48 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
         // 查找匹配的方法
         MethodInfo? matchingMethod = null;
+        List<LangId>? funcParams = null;
 
-        // 首先尝试使用方法名查找
-        if (local.DelegateVar.TryGetValue(Id.IdName, out var result))
+        // 首先尝试使用方法名+参数数量查找（支持重载）
+        // 对于带默认参数的情况，从实际参数数量开始，逐步增加参数数量尝试匹配
+        for (int paramCount = Ids.Count; matchingMethod == null && paramCount <= Ids.Count + 10; paramCount++)
         {
-            // 检查参数数量是否匹配
-            var methodParams = result.GetParameters();
-            if (methodParams.Length == Ids.Count)
+            var delegateKey = $"{Id.IdName}${paramCount}";
+
+            if (local.DelegateVar.TryGetValue(delegateKey, out var result))
             {
-                matchingMethod = result;
+                // 获取函数的参数列表信息
+                local.FuncParameters.TryGetValue(delegateKey, out funcParams);
+
+                var methodParams = result.GetParameters();
+
+                // 检查参数数量是否匹配
+                if (methodParams.Length == Ids.Count)
+                {
+                    // 完全匹配
+                    matchingMethod = result;
+                    break;
+                }
+                else if (funcParams != null && Ids.Count < methodParams.Length)
+                {
+                    // 参数数量少于方法参数，检查是否有默认参数可以补充
+                    // 计算必需参数的数量（没有默认值的参数）
+                    int requiredParamsCount = 0;
+                    for (int i = 0; i < funcParams.Count; i++)
+                    {
+                        if (funcParams[i].DefaultValue == null)
+                        {
+                            requiredParamsCount++;
+                        }
+                    }
+
+                    // 如果实际参数数量大于等于必需参数数量，则可以匹配
+                    if (Ids.Count >= requiredParamsCount)
+                    {
+                        matchingMethod = result;
+                        break;
+                    }
+                }
             }
         }
 
@@ -453,9 +486,9 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
             // 使用BindingFlags.DeclaredOnly来只查找当前类声明的方法，避免与继承的方法冲突
             var initFunc = classType.GetMethod("init",
-                System.Reflection.BindingFlags.Public |
-                System.Reflection.BindingFlags.Instance |
-                System.Reflection.BindingFlags.DeclaredOnly);
+                BindingFlags.Public |
+                BindingFlags.Instance |
+                BindingFlags.DeclaredOnly);
             if (initFunc != null)
             {
                 // 加载 this 指针
@@ -486,6 +519,8 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
         // 处理所有类型的方法调用，包括DynamicMethod和MethodBuilder
         var matchingParams = matchingMethod.GetParameters();
+
+        // 加载实际传递的参数
         for (var i = 0; i < Ids.Count; i++)
         {
             var id = Ids[i];
@@ -533,6 +568,41 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             }
         }
 
+        // 如果有默认参数需要补充
+        if (funcParams != null && Ids.Count < matchingParams.Length)
+        {
+            // 补充默认参数值
+            for (var i = Ids.Count; i < funcParams.Count; i++)
+            {
+                var param = funcParams[i];
+                if (param.DefaultValue != null)
+                {
+                    // 加载默认参数值
+                    param.DefaultValue.LoadIlValue(ilGenerator, local);
+
+                    // 确保类型匹配
+                    var paramType = matchingParams[i].ParameterType;
+                    var defaultType = param.DefaultValue.OutputType(local);
+
+                    if (defaultType != null && paramType != defaultType)
+                    {
+                        if (paramType == typeof(object) && defaultType.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Box, defaultType);
+                        }
+                        else if (paramType == typeof(int) && defaultType == typeof(double))
+                        {
+                            ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToInt32", [typeof(double)])!);
+                        }
+                        else if (paramType == typeof(double) && defaultType == typeof(int))
+                        {
+                            ilGenerator.Emit(OpCodes.Conv_R8);
+                        }
+                    }
+                }
+            }
+        }
+
         // 调用方法
         // 对于DynamicMethod，使用Call指令
         ilGenerator.Emit(OpCodes.Call, matchingMethod);
@@ -554,8 +624,45 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 return typeof(string);
         }
 
-        var result = local.DelegateVar.GetValueOrDefault(Id.IdName);
+        // 尝试使用函数名+参数数量查找（支持重载）
+        // 先尝试精确匹配参数数量
+        var delegateKey = $"{Id.IdName}${Ids.Count}";
+        var result = local.DelegateVar.GetValueOrDefault(delegateKey);
+
+        // 如果找不到，可能是带默认参数的函数，尝试更多参数数量
+        if (result == null)
+        {
+            for (int paramCount = Ids.Count + 1; paramCount <= Ids.Count + 10; paramCount++)
+            {
+                delegateKey = $"{Id.IdName}${paramCount}";
+                result = local.DelegateVar.GetValueOrDefault(delegateKey);
+
+                if (result != null)
+                {
+                    // 检查是否有默认参数支持这个调用
+                    if (local.FuncParameters.TryGetValue(delegateKey, out var funcParams))
+                    {
+                        int requiredParamsCount = 0;
+                        for (int i = 0; i < funcParams.Count; i++)
+                        {
+                            if (funcParams[i].DefaultValue == null)
+                            {
+                                requiredParamsCount++;
+                            }
+                        }
+
+                        if (Ids.Count >= requiredParamsCount)
+                        {
+                            break; // 找到匹配的函数
+                        }
+                    }
+                    result = null; // 参数不匹配，继续查找
+                }
+            }
+        }
+
         if (result != null) return result.ReturnType;
+
         var classType = local.ClassVar.GetValueOrDefault(Id.IdName);
         return classType ?? typeof(object);
     }

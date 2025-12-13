@@ -331,39 +331,101 @@ public class FuncLangValue : ImportInfo
         // 不需要在这里加载函数委托
     }
 
-    public void LoadIl(MethodBuilder methodBuilder, LocalManager local)
+    public override void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
     {
-        //var funcLocal = new LocalManager();
-        var parameterTypes = Ids!.Select(item => item.OutputType(local)).ToArray();
+        // Lambda表达式需要特殊处理：编译成DynamicMethod
+        // 不是将函数对象存储为变量，而是将函数注册到DelegateVar中
 
-        // 创建方法的 IL 发射器
-        var methodIl = methodBuilder.GetILGenerator();
+        // Lambda表达式没有函数名(Id == null)，使用变量名作为方法名
+        var methodName = Id?.IdName ?? idName;
 
-        // 检查方法是否是实例方法（第一个参数是this）
-        // 对于实例方法，第一个参数是this，真正的参数从索引1开始
-        int startIndex = 0;
-        var methodParams = methodBuilder.GetParameters();
-        if (methodParams.Length > Ids!.Count)
+        // 如果已经是编译好的方法，直接注册
+        if (Method != null)
         {
-            // 有额外的参数，说明是实例方法，第一个参数是this
-            startIndex = 1;
+            local.DelegateVar.Add(methodName, Method);
+            return;
         }
 
+        // 使用参数的类型注解来确定参数类型
+        var parameterTypes = Ids!.Select(item => item.OutputType(local)).ToArray();
+
+        // 创建一个新的LocalManager实例，专门用于函数体的IL生成
+        var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
+
+        // 先处理参数，将它们添加到funcLocal中，这样GetItemType才能正确推断返回类型
         for (var i = 0; i < Ids!.Count; i++)
         {
             var id = Ids[i];
-            var localVar = methodIl.DeclareLocal(parameterTypes[i]);
-            local.AddLocalVar(id.IdName, localVar);
-            methodIl.Emit(OpCodes.Ldarg, startIndex + i);
-            methodIl.Emit(OpCodes.Stloc, localVar);
+            var paramType = parameterTypes[i];
+            funcLocal.LocalVarTypes[id.IdName] = paramType;
         }
 
-        local.DelegateVar.Add(Id!.IdName, methodBuilder);
+        // 获取返回类型
+        var returnType = GetItemType(BlockStatement, funcLocal);
+
+        // 定义新的方法
+        var dynamicMethod = new DynamicMethod(
+            methodName,
+            returnType,
+            parameterTypes,
+            true
+        );
+
+        // 创建方法的 IL 发射器
+        var methodIl = dynamicMethod.GetILGenerator();
+
+        // 清空funcLocal，重新添加参数（这次使用真正的LocalBuilder）
+        funcLocal.LocalVar.Clear();
+
+        // 处理参数
+        for (var i = 0; i < Ids!.Count; i++)
+        {
+            var id = Ids[i];
+            var paramType = parameterTypes[i];
+            var localVar = methodIl.DeclareLocal(paramType);
+            funcLocal.AddLocalVar(id.IdName, localVar);
+            // 加载参数并存储到局部变量
+            methodIl.Emit(OpCodes.Ldarg, i);
+            methodIl.Emit(OpCodes.Stloc, localVar.LocalIndex);
+        }
 
         // 生成方法体的 IL 代码
-        BlockStatement.GenerateIl(methodIl, local);
+        BlockStatement.GenerateIl(methodIl, funcLocal);
 
-        // 返回
-        methodIl.Emit(OpCodes.Ret);
+        // 检查函数体的最后一个语句是否是 ReturnStatement
+        var lastStatement = BlockStatement.Count > 0
+            ? BlockStatement[^1]
+            : null;
+
+        // 只有当最后一个语句不是 ReturnStatement 时，才添加 Ret 指令
+        if (lastStatement is not ReturnStatement)
+        {
+            // 对于 void 方法，添加 Ret 指令
+            // 对于有返回值的方法，如果没有显式 return，这里会导致栈不平衡
+            // 但对于Lambda表达式 (a, b) -> a + b 这种形式，整个块就是一个表达式
+            // 需要特殊处理
+            if (returnType != typeof(void))
+            {
+                // 如果是单表达式Lambda (a, b) -> a + b
+                // BlockStatement应该只有一个表达式语句，其值已经在栈上
+                // 我们已经在BlockStatement.GenerateIl中处理过，不需要额外操作
+            }
+            methodIl.Emit(OpCodes.Ret);
+        }
+
+        // 将方法注册到本地变量管理器的DelegateVar中
+        // 使用函数名+参数数量作为键，支持函数重载
+        var delegateKey = methodName;
+        if (Ids != null)
+        {
+            delegateKey = $"{methodName}${Ids.Count}";
+        }
+        local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
+
+        // 同时存储函数的参数列表信息，用于支持默认参数
+        if (Ids != null)
+        {
+            local.FuncParameters.TryAdd(delegateKey, Ids);
+        }
     }
 }

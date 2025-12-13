@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression;
 using Old8Lang.Error;
 using Old8Lang.LangParser;
 
@@ -12,6 +13,8 @@ public class LocalManager
     public readonly Dictionary<string, Type> ClassVar = [];
     public readonly Dictionary<string, FieldInfo> FieldVar = [];
     public readonly Dictionary<string, Type> LocalVarTypes = [];
+    // 存储函数的参数列表信息（用于支持默认参数）
+    public readonly Dictionary<string, List<LangId>> FuncParameters = [];
     public Type? InClassEnv { get; init; }
     public string FilePath { get; set; } = "";
     public LangInterpreter? Interpreter { get; init; }
@@ -106,6 +109,12 @@ public class LocalManager
         foreach (var (name, field) in FieldVar)
         {
             cloned.FieldVar[name] = field;
+        }
+
+        // 克隆函数参数信息
+        foreach (var (name, params_) in FuncParameters)
+        {
+            cloned.FuncParameters[name] = params_;
         }
 
         return cloned;

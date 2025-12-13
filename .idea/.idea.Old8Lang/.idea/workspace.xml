@@ -17,9 +17,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_default_params.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_overload.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_simple_default.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_simple_func.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251213-1857-编译器全面测试.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251213-Lambda表达式修复报告.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251213-编译器错误分析与修复计划.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_string.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run_all_compiler_tests.sh" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,10 +77,16 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/NativeStaticAny.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/NativeStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/NativeStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Apis.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Compiler/LocalManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Core/ParserContext.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Core/ParserContext.cs" root0="SKIP_HIGHLIGHTING" />
@@ -724,7 +740,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="158" />
+    <option name="localTasksCounter" value="159" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -751,7 +767,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="chore(tests): 添加基础函数与Lambda表达式测试用例&#10;&#10;- 新增普通函数定义与调用测试文件&#10;- 添加Lambda表达式语法测试用例&#10;- 验证函数参数" />
     <MESSAGE value="feat(compiler): 支持类字段访问与赋值操作&#10;&#10;- 在 ClassInit.cs 中保存字段信息到 LocalManager，以便在方法中访问&#10;- 在 LocalManager.cs 中添加 FieldVar 字典用于存储字段信息&#10;- 在 Operation.cs 中优先从 FieldVar 查找字段，支持 TypeBuilder 场景&#10;- 在 SetStatement.cs 中实现对 this 字段的赋值操作支持&#10;- 添加多个测试用例验证类成员访问、修改及初始化功能&#10;- 更新现有测试文件以适配新的类字段处理逻辑" />
     <MESSAGE value="feat(compiler): 支持泛型字典的索引访问与赋值操作&#10;&#10;- 优化 LangListItem 中字典索引访问的类型处理逻辑&#10;- 支持 Dictionary&lt;TKey, TValue&gt; 泛型类型的键值类型匹配&#10;- 在 SetStatement 中实现对泛型字典索引赋值的类型转换&#10;- 添加测试用例验证字典修改与访问功能&#10;- 更新编译器测试报告与相关配置文件" />
     <MESSAGE value="feat(compiler): 支持函数参数类型推断和返回值处理&#10;&#10;- 在FuncInit中创建独立的LocalManager用于函数体IL生成，避免局部变量冲突&#10;- 函数参数提前添加到funcLocal中，便于GetItemType正确推断返回类型&#10;- 优化返回语句处理逻辑，自动添加Ret指令（除非最后已是ReturnStatement）&#10;- 支持void类型作为默认函数返回类型&#10;- 在LocalManager中新增LocalVarTypes字典，用于记录局部变量类型&#10;- LangId支持从LocalVarTypes中查找变量类型（用于参数和局部变量）&#10;- Operation中增加object类型操作数的拆箱处理逻辑&#10;- SetStatement中记录局部变量类型到LocalVarTypes，辅助类型推断&#10;- 优化成员访问和索引赋值的IL生成逻辑，增强类型转换支持&#10;- 添加多个函数相关测试用例，验证参数传递和返回值处理功能" />
@@ -776,7 +791,8 @@
     <MESSAGE value="refactor(lib): 优化代码结构并提升可读性&#10;&#10;- 移除了冗余的异常构造函数定义&#10;- 使用元组交换语法简化 Swap 方法实现&#10;- 添加 CultureInfo.InvariantCulture 以确保时间格式一致性&#10;- 更新方法参数为可空引用类型以提高类型安全性&#10;- 优化变量声明方式，使用 var 关键字提高代码简洁性&#10;- 调整数组初始化语法，增强代码可读性&#10;- 统一代码缩进和空行规范，改善整体代码风格" />
     <MESSAGE value="test(parser): 更新表达式解析器测试用例&#10;&#10;- 将多个测试用例中的 Operation 断言更新为 TernaryExpression&#10;- 确保三元表达式在复杂表达式解析中的正确性&#10;- 修复测试用例与实际解析结果类型不匹配的问题" />
     <MESSAGE value="fix(parser): 更新OS库函数名和三元表达式语法&#10;&#10;- 将OSInfo()函数调用统一改为小写的OsInfo()&#10;- 修改字符串模板中的三元表达式语法格式&#10;- 更新相关测试文件以匹配新的函数命名规范&#10;- 调整程序入口测试路径指向正确的测试文件&#10;- 添加新的字符串测试用例验证三元表达式功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(parser): 更新OS库函数名和三元表达式语法&#10;&#10;- 将OSInfo()函数调用统一改为小写的OsInfo()&#10;- 修改字符串模板中的三元表达式语法格式&#10;- 更新相关测试文件以匹配新的函数命名规范&#10;- 调整程序入口测试路径指向正确的测试文件&#10;- 添加新的字符串测试用例验证三元表达式功能" />
+    <MESSAGE value="feat(lang): 实现函数闭包支持并优化作用域管理&#10;&#10;- 为 FuncLangValue 添加闭包环境捕获机制&#10;- 在函数调用时克隆当前作用域以支持闭包变量访问&#10;- 修改 Run 方法逻辑，区分原生方法和 Old8Lang 函数的执行路径&#10;- 重构函数执行上下文管理，优先使用捕获的作用域&#10;- 优化参数处理逻辑，确保默认参数在正确的作用域中计算&#10;- 改进 SetStatement 类型检查模式匹配语法&#10;- 更新 IDE 配置文件以反映最新的代码变更和测试调整" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 实现函数闭包支持并优化作用域管理&#10;&#10;- 为 FuncLangValue 添加闭包环境捕获机制&#10;- 在函数调用时克隆当前作用域以支持闭包变量访问&#10;- 修改 Run 方法逻辑，区分原生方法和 Old8Lang 函数的执行路径&#10;- 重构函数执行上下文管理，优先使用捕获的作用域&#10;- 优化参数处理逻辑，确保默认参数在正确的作用域中计算&#10;- 改进 SetStatement 类型检查模式匹配语法&#10;- 更新 IDE 配置文件以反映最新的代码变更和测试调整" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

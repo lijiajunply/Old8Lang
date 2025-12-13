@@ -1,0 +1,25 @@
+// 测试函数默认参数
+PrintLine("=== 函数默认参数测试 ===")
+
+// 基本默认参数
+func greet(name, message: "Hello") {
+    PrintLine(message + ", " + name + "!")
+}
+
+greet("Alice")  // 使用默认消息
+greet("Bob", "Hi")  // 覆盖默认消息
+
+// 带类型注解和默认参数
+func calculateTotal(price:int, taxRate: 0.1) {
+    total <- price * (1 + taxRate)
+    PrintLine("总价: " + total)
+    return total
+}
+
+result1 <- calculateTotal(100)  // 使用默认税率
+result2 <- calculateTotal(100, 0.15)  // 覆盖默认税率
+
+PrintLine("结果1: " + result1)
+PrintLine("结果2: " + result2)
+
+PrintLine("\n✅ 默认参数测试完成")

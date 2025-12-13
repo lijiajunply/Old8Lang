@@ -1,0 +1,25 @@
+// 简单测试默认参数
+PrintLine("=== 简单默认参数测试 ===")
+
+// 字符串默认参数
+func greet(name, message: "Hello") {
+    PrintLine(message + ", " + name + "!")
+}
+
+greet("Alice")
+greet("Bob", "Hi")
+
+// 数字默认参数
+func add(a, b: 10) {
+    result <- a + b
+    PrintLine("结果: " + result)
+    return result
+}
+
+r1 <- add(5)
+r2 <- add(5, 20)
+
+PrintLine("r1 = " + r1)
+PrintLine("r2 = " + r2)
+
+PrintLine("\n✅ 默认参数测试完成")

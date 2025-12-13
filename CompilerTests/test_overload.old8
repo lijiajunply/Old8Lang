@@ -1,0 +1,17 @@
+// 测试函数重载
+PrintLine("=== 函数重载测试 ===")
+
+// 单参数版本
+func testOverload(a) {
+    PrintLine("单参数函数: " + a)
+}
+
+// 双参数版本
+func testOverload(a, b) {
+    PrintLine("双参数函数: " + a + ", " + b)
+}
+
+testOverload(1)
+testOverload(1, 2)
+
+PrintLine("\n✅ 函数重载测试完成")

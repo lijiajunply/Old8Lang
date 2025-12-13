@@ -106,8 +106,20 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
 
         // 将方法添加到本地变量管理器
         // 对于用户定义的函数，我们需要保留原始方法名以便调用
-        // 对于重载函数，我们需要将所有重载都添加到字典中，使用不同的键
-        local.DelegateVar.TryAdd(methodName, dynamicMethod);
+        // 对于重载函数，我们需要将所有重载都添加到字典中，使用"函数名$参数数量"作为键
+        var delegateKey = methodName;
+        if (FuncLangValue.Ids != null)
+        {
+            // 使用函数名+参数数量作为键，支持函数重载
+            delegateKey = $"{methodName}${FuncLangValue.Ids.Count}";
+        }
+        local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
+
+        // 同时存储函数的参数列表信息，用于支持默认参数
+        if (FuncLangValue.Ids != null)
+        {
+            local.FuncParameters.TryAdd(delegateKey, FuncLangValue.Ids);
+        }
     }
 
     private static Type GetItemType(OldStatement statement, LocalManager local)

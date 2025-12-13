@@ -1,0 +1,7 @@
+// 简单函数测试
+func add(a, b) {
+    return a + b
+}
+
+result <- add(1, 2)
+PrintLine("Result: " + result)
