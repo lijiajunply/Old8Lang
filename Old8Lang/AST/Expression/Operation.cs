@@ -558,6 +558,27 @@ public class Operation(LangExpression? left, LangTokenType opera, LangExpression
                 // 整数乘法
                 else
                 {
+                    // 特殊处理：如果两个操作数都是object类型，使用Convert.ToInt32进行安全转换
+                    if (leftType == typeof(object) && rightType == typeof(object))
+                    {
+                        // 在进入这个分支前，栈上有: [left_value, right_value]
+                        // 先保存right到临时变量
+                        var rightTemp = ilGenerator.DeclareLocal(typeof(object));
+                        ilGenerator.Emit(OpCodes.Stloc, rightTemp);
+
+                        // 现在栈上只有left_value，转换它为int
+                        var toInt32Method = typeof(Convert).GetMethod("ToInt32", [typeof(object)])!;
+                        ilGenerator.Emit(OpCodes.Call, toInt32Method);
+
+                        // 现在加载right并转换
+                        ilGenerator.Emit(OpCodes.Ldloc, rightTemp);
+                        ilGenerator.Emit(OpCodes.Call, toInt32Method);
+
+                        // 现在栈上是: [left_int, right_int]
+                        ilGenerator.Emit(OpCodes.Mul);
+                        return typeof(int);
+                    }
+
                     // 确保两个操作数都是int类型
                     if (leftType != typeof(int))
                     {
@@ -570,8 +591,8 @@ public class Operation(LangExpression? left, LangTokenType opera, LangExpression
                         {
                             // 布尔值转换为int，true->1, false->0
                         }
-                        // 对于引用类型，拆箱为int
-                        else if (leftType is { IsValueType: false })
+                        // 对于引用类型（非object），拆箱为int
+                        else if (leftType != typeof(object) && leftType is { IsValueType: false })
                         {
                             ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
                         }
@@ -588,8 +609,8 @@ public class Operation(LangExpression? left, LangTokenType opera, LangExpression
                         {
                             // 布尔值转换为int，true->1, false->0
                         }
-                        // 对于引用类型，拆箱为int
-                        else if (rightType is { IsValueType: false })
+                        // 对于引用类型（非object），拆箱为int
+                        else if (rightType != typeof(object) && rightType is { IsValueType: false })
                         {
                             ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
                         }
