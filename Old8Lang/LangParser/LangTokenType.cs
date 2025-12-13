@@ -96,6 +96,11 @@ public enum LangTokenType
     Comma,
 
     /// <summary>
+    /// ;
+    /// </summary>
+    Semicolon,
+
+    /// <summary>
     /// :
     /// </summary>
     Colon,

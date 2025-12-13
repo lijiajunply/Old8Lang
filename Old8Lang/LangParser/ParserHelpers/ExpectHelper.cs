@@ -58,13 +58,9 @@ public static class ExpectHelper
     /// </summary>
     public static string GetDetailedMessage(LangTokenType expectedType, LangTokenType actualType, string actualValue)
     {
-        if (ErrorTemplates.TryGetValue(expectedType, out var template))
-        {
-            return string.Format(template, actualValue);
-        }
-
-        // 回退到通用消息（仅在不常见情况下分配）
-        return $"语法错误：期望 {expectedType}，但得到了 {actualType} '{actualValue}'。";
+        return ErrorTemplates.TryGetValue(expectedType, out var template)
+            ? string.Format(template, actualValue)
+            : $"语法错误：期望 {expectedType}，但得到了 {actualType} '{actualValue}'。"; // 回退到通用消息（仅在不常见情况下分配）
     }
 
     /// <summary>
@@ -72,8 +68,6 @@ public static class ExpectHelper
     /// </summary>
     public static string GetSuggestion(LangTokenType expectedType)
     {
-        return Suggestions.TryGetValue(expectedType, out var suggestion)
-            ? suggestion
-            : DefaultSuggestion;
+        return Suggestions.GetValueOrDefault(expectedType, DefaultSuggestion);
     }
 }

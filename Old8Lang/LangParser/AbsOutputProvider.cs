@@ -1,6 +1,6 @@
 namespace Old8Lang.LangParser;
 
-public abstract class AbsUseClass
+public abstract class AbsOutputProvider
 {
     public abstract void WriteLine(string? text);
     public abstract void Write(string text);

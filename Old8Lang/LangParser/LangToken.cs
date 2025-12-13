@@ -323,6 +323,12 @@ public static class LangTokenizer
                 continue;
             }
 
+            if (code[i] == ';')
+            {
+                tokens.Add(new LangToken(";", LangTokenType.Semicolon, line, i - column));
+                continue;
+            }
+
             if (code[i] == ':')
             {
                 tokens.Add(new LangToken(":", LangTokenType.Colon, line, i - column));

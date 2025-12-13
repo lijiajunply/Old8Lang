@@ -30,9 +30,8 @@ public abstract class LangExpression : IOldLangTree
     public virtual void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
     {
         // 先获取值的类型
-        var type = OutputType(local);
-        if (type == null) type = typeof(int); // 默认类型为int
-        
+        var type = OutputType(local) ?? typeof(int); // 默认类型为int
+
         // 先声明变量，确保在使用前已经存在
         var b = local.GetLocalVar(idName);
         if (b != null)
@@ -49,10 +48,10 @@ public abstract class LangExpression : IOldLangTree
             b = ilGenerator.DeclareLocal(type);
             local.AddLocalVar(idName, b);
         }
-        
+
         // 然后加载值
         LoadIlValue(ilGenerator, local);
-        
+
         // 最后存储到变量
         ilGenerator.Emit(OpCodes.Stloc, b.LocalIndex);
     }

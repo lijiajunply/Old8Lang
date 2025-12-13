@@ -267,8 +267,8 @@ public class PrimaryParser(
         var isListComprehension = false;
 
         // 限制扫描范围到 30 个 token（列表推导式的 for 关键字通常在前30个token内）
-        const int MaxScanDepth = 30;
-        var scanLimit = Math.Min(CurrentIndex + MaxScanDepth, Tokens.Count);
+        const int maxScanDepth = 30;
+        var scanLimit = Math.Min(CurrentIndex + maxScanDepth, Tokens.Count);
 
         // 扫描剩余的令牌，查找 for 关键字
         for (int i = CurrentIndex; i < scanLimit; i++)
@@ -571,9 +571,7 @@ public class PrimaryParser(
     /// 解析字符串树，支持模板字符串
     /// 支持格式：
     /// - $"string" 简单模板字符串
-    /// - ${expression} 表达式模板
-    /// - $($"string") 嵌套模板
-    /// - $("string {placeholder}") 带占位符的模板
+    /// - $"string {placeholder}" 带占位符的模板
     /// - $"string ${expression} string" 混合模板
     /// </summary>
     /// <returns>字符串树</returns>

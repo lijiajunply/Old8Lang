@@ -1,6 +1,6 @@
 namespace Old8Lang.LangParser;
 
-public class ConsoleUse : AbsUseClass
+public class ConsoleOutputProvider : AbsOutputProvider
 {
     public override void WriteLine(string? text)
     {

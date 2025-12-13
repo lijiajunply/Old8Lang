@@ -89,7 +89,7 @@ public class InterpreterTests
         
         // Assert
         Assert.NotNull(result);
-        Assert.IsType<ConsoleUse>(result);
+        Assert.IsType<ConsoleOutputProvider>(result);
     }
     
     [Fact]

@@ -80,6 +80,6 @@ public class LangInterpreter
         return contextLines.ToArray();
     }
 
-    public AbsUseClass OutputProvider { get; set; } = new ConsoleUse();
+    public AbsOutputProvider OutputProvider { get; set; } = new ConsoleOutputProvider();
     public bool IsCompileOptimization { get; set; }
 }

@@ -228,9 +228,8 @@ public class VariateManager
         };
 
         // 深拷贝作用域栈
-        foreach (var scope in Scopes)
+        foreach (var newScope in Scopes.Select(scope => new Dictionary<string, LangValueType>(scope)))
         {
-            var newScope = new Dictionary<string, LangValueType>(scope);
             newManager.Scopes.Add(newScope);
         }
 

@@ -63,14 +63,14 @@ public abstract class ParserBase(ParserContext context)
     /// </summary>
     /// <param name="line">错误行号</param>
     /// <returns>错误位置附近的源代码上下文（最多3行）</returns>
-    protected string[] GetSourceContext(int line)
+    private string[] GetSourceContext(int line)
     {
         // 使用缓存的分割结果
         var lines = Context.SourceLines;
 
         if (lines.Length == 0)
         {
-            return Array.Empty<string>();
+            return [];
         }
 
         var contextLines = new List<string>(4); // 预分配容量
@@ -118,5 +118,16 @@ public abstract class ParserBase(ParserContext context)
             token.Column,
             Context.FileName,
             token.Value);
+    }
+
+    /// <summary>
+    /// 跳过可选的分号分隔符（支持连续多个分号）
+    /// </summary>
+    protected void SkipOptionalSemicolons()
+    {
+        while (CurrentToken.Type == LangTokenType.Semicolon)
+        {
+            CurrentIndex++;
+        }
     }
 }

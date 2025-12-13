@@ -759,6 +759,8 @@ public class StatementParser(
                     {
                         statements.Add(statement);
                     }
+
+                    SkipOptionalSemicolons(); // 跳过可选的分号分隔符
                 }
             }
             catch (SyntaxError)

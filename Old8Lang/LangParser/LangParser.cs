@@ -69,31 +69,18 @@ public class LangParser
     public BlockStatement ParseProgram()
     {
         var statements = new List<IOldLangTree>();
-        var lastStatementLine = -1; // 跟踪上一个语句的行号
 
         try
         {
             while (Context.CurrentIndex < Context.Tokens.Count)
             {
-                // 记录当前语句开始的行号
-                var currentStatementLine = Context.CurrentToken.Line;
-
-                // 如果当前语句与上一个语句在同一行，抛出错误
-                if (lastStatementLine != -1 && currentStatementLine == lastStatementLine)
-                {
-                    throw new SyntaxError(
-                        Context.CurrentToken.Value,
-                        Context.CurrentToken.Line,
-                        Context.CurrentToken.Column,
-                        Context.FileName,
-                        "语法错误：同一行上不能有多个语句。建议：在语句之间添加换行符，或使用分号分隔（如果语言支持）。",
-                        GetSourceContext(Context.CurrentToken.Line));
-                }
-
                 statements.Add(StatementParser.ParseStatement());
 
-                // 更新最后一个语句的行号
-                lastStatementLine = currentStatementLine;
+                // 跳过可选的分号分隔符
+                while (Context.CurrentToken.Type == LangTokenType.Semicolon)
+                {
+                    Context.CurrentIndex++;
+                }
             }
 
             return new BlockStatement(statements);
