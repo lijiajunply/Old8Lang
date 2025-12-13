@@ -273,8 +273,7 @@ public class ExpressionStatementTests
     }
 
     /// <summary>
-    /// 测试成员访问后的函数调用（不是方法链，Old8Lang 不支持 obj.method() 形式）
-    /// 测试简单的赋值
+    /// 测试成员访问赋值语句
     /// </summary>
     [Fact]
     public void ParseProgram_MemberAccessAssignment_ParsesSuccessfully()
@@ -308,5 +307,32 @@ public class ExpressionStatementTests
         Assert.Contains("建议", exception.Message);
         Assert.Contains("<-", exception.Message); // 应该建议使用赋值
         Assert.Contains("return", exception.Message); // 应该建议使用 return
+    }
+
+    /// <summary>
+    /// 测试成员方法调用是允许的 (obj.method() 形式)
+    /// </summary>
+    [Fact]
+    public void ParseProgram_MemberMethodCall_ParsesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+class Person {
+    public func sayHello() {
+        PrintLine(""Hello"")
+    }
+}
+person <- Person()
+person.sayHello()";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new Old8Lang.LangParser.LangParser(tokens, code);
+
+        // Act
+        var result = parser.ParseProgram();
+
+        // Assert
+        Assert.NotNull(result);
+        // 验证解析成功（没有抛出异常）
+        Assert.True(result.Count >= 0);
     }
 }

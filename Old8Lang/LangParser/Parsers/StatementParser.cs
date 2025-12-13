@@ -245,57 +245,57 @@ public class StatementParser(
                 // 例如：identifier <- value, this.name <- value, a[b] <- value
                 var savedIndex = CurrentIndex;
 
-            try
-            {
-                // 尝试解析左值表达式（不包括三元表达式）
-                // 先解析主要表达式
-                var expr = primaryParser.ParsePrimary();
-                // 处理点访问和索引访问等复杂左值表达式
-                expressionParser.ParseDotExpr(expr);
-
-                // 检查是否是类型注解
-                if (CurrentToken.Type == LangTokenType.Colon)
+                try
                 {
-                    var nextToken = Peek();
-                    if (nextToken.Type == LangTokenType.Identifier)
+                    // 尝试解析左值表达式（不包括三元表达式）
+                    // 先解析主要表达式
+                    var expr = primaryParser.ParsePrimary();
+                    // 处理点访问和索引访问等复杂左值表达式
+                    expressionParser.ParseDotExpr(expr);
+
+                    // 检查是否是类型注解
+                    if (CurrentToken.Type == LangTokenType.Colon)
                     {
-                        var thirdToken = Peek(2);
-                        if (thirdToken.Type == LangTokenType.Assignment)
+                        var nextToken = Peek();
+                        if (nextToken.Type == LangTokenType.Identifier)
                         {
-                            // 这是带有类型注解的赋值语句
-                            CurrentIndex = savedIndex;
-                            return ParseSet();
-                        }
-                        // 检查是否是函数声明：identifier:returnType (params) -> { ... }
-                        else if (thirdToken.Type == LangTokenType.LeftParen)
-                        {
-                            // 这是带有返回类型注解的函数声明
-                            CurrentIndex = savedIndex;
-                            return functionParser.ParseFuncDeclaration();
+                            var thirdToken = Peek(2);
+                            if (thirdToken.Type == LangTokenType.Assignment)
+                            {
+                                // 这是带有类型注解的赋值语句
+                                CurrentIndex = savedIndex;
+                                return ParseSet();
+                            }
+                            // 检查是否是函数声明：identifier:returnType (params) -> { ... }
+                            else if (thirdToken.Type == LangTokenType.LeftParen)
+                            {
+                                // 这是带有返回类型注解的函数声明
+                                CurrentIndex = savedIndex;
+                                return functionParser.ParseFuncDeclaration();
+                            }
                         }
                     }
-                }
-                // 检查下一个token是否是赋值符号
-                else if (CurrentToken.Type == LangTokenType.Assignment)
-                {
-                    // 这是普通赋值语句
-                    CurrentIndex = savedIndex;
-                    return ParseSet();
-                }
+                    // 检查下一个token是否是赋值符号
+                    else if (CurrentToken.Type == LangTokenType.Assignment)
+                    {
+                        // 这是普通赋值语句
+                        CurrentIndex = savedIndex;
+                        return ParseSet();
+                    }
 
-                // 如果不是赋值语句，回退到原始位置
-                CurrentIndex = savedIndex;
-            }
-            catch (Old8Exception)
-            {
-                throw;
-            }
-            catch (Exception)
-            {
-                // 如果解析左值表达式失败，回退到原始位置
-                CurrentIndex = savedIndex;
-            }
-            }  // 结束 else 块
+                    // 如果不是赋值语句，回退到原始位置
+                    CurrentIndex = savedIndex;
+                }
+                catch (Old8Exception)
+                {
+                    throw;
+                }
+                catch (Exception)
+                {
+                    // 如果解析左值表达式失败，回退到原始位置
+                    CurrentIndex = savedIndex;
+                }
+            } // 结束 else 块
         }
 
         // 处理增量/减量语句：i++, i--
@@ -377,6 +377,13 @@ public class StatementParser(
                 if (expr is Instance instance)
                 {
                     return new FuncRunStatement(instance, expr.Position);
+                }
+
+                // 如果是成员方法调用（Operation，且操作符为 Dot，右侧为 Instance），返回 FuncRunStatement
+                if (expr is Operation { Opera: LangTokenType.Dot, Right: Instance } operation)
+                    // 检查右侧是否是函数调用（Instance）
+                {
+                    return new FuncRunStatement(operation, expr.Position);
                 }
 
                 // 其他表达式（Operation、LangId 等）不能作为语句
