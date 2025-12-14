@@ -3,53 +3,114 @@ using System.Text;
 
 namespace Old8Lang.LangParser;
 
+/// <summary>
+/// 表示Old8Lang语言的词法标记
+/// </summary>
+/// <param name="value">标记的字符串值</param>
+/// <param name="type">标记的类型</param>
+/// <param name="line">标记在源代码中的行号</param>
+/// <param name="column">标记在源代码中的列号</param>
+/// <remarks>
+/// 该结构体用于存储词法分析过程中生成的标记信息，包括标记的值、类型、行号和列号。
+/// 这些信息对于后续的语法分析和错误报告非常重要。
+/// </remarks>
 public readonly struct LangToken(string value, LangTokenType type, int line = 0, int column = 0)
 {
+    /// <summary>
+    /// 标记的字符串值
+    /// </summary>
     public readonly string Value = value;
+    
+    /// <summary>
+    /// 标记的类型
+    /// </summary>
     public readonly LangTokenType Type = type;
+    
+    /// <summary>
+    /// 标记在源代码中的行号（从1开始）
+    /// </summary>
     public readonly int Line = line;
+    
+    /// <summary>
+    /// 标记在源代码中的列号（从1开始）
+    /// </summary>
     public readonly int Column = column + 1;
 
+    /// <summary>
+    /// 将标记转换为字符串表示
+    /// </summary>
+    /// <returns>包含标记值、类型、行号和列号的字符串</returns>
     public override string ToString()
     {
         return $"{Value} {Type} {Line} {Column}";
     }
 }
 
+/// <summary>
+/// Old8Lang语言的词法分析器，负责将源代码转换为标记流
+/// </summary>
+/// <remarks>
+/// 该类实现了完整的词法分析功能，包括：
+/// - 识别关键字、标识符、字面量（数字、字符串、字符）
+/// - 处理运算符和分隔符
+/// - 支持科学计数法
+/// - 处理注释过滤
+/// - 优化的关键字查找算法
+/// </remarks>
 public static class LangTokenizer
 {
-    // 静态缓存关键字集合，避免每次 Tokenize 时重新创建
-    private static readonly FrozenSet<string> KeywordSet =
+    /// <summary>
+    /// 静态缓存关键字集合，避免每次Tokenize时重新创建，提高性能
+    /// </summary>
+    private static readonly FrozenSet<string> KeywordSet = 
         Enum.GetNames<KeywordType>()
             .Select(x => x.ToLower())
             .ToFrozenSet();
 
-    // 创建首字母索引以加速查找，按长度降序排列以优先匹配最长关键字
-    private static readonly Dictionary<char, List<string>> KeywordsByFirstChar =
+    /// <summary>
+    /// 按首字母索引的关键字列表，按长度降序排列以优先匹配最长关键字
+    /// </summary>
+    private static readonly Dictionary<char, List<string>> KeywordsByFirstChar = 
         KeywordSet
             .GroupBy(k => k[0])
             .ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.Length).ToList());
 
+    /// <summary>
+    /// 将Old8Lang源代码转换为标记流
+    /// </summary>
+    /// <param name="code">要分析的Old8Lang源代码</param>
+    /// <returns>包含所有标记的列表</returns>
+    /// <exception cref="Error.SyntaxError">当遇到无法识别的字符时抛出</exception>
+    /// <remarks>
+    /// 该方法执行以下步骤：
+    /// 1. 过滤掉源代码中的注释
+    /// 2. 逐字符扫描源代码
+    /// 3. 识别并生成各种类型的标记
+    /// 4. 返回完整的标记列表
+    /// </remarks>
     public static List<LangToken> Tokenize(string code)
     {
         var tokens = new List<LangToken>();
 
+        // 先过滤掉源代码中的注释
         code = new FilteringCommentsTokenizer(code).FilteringComments();
 
-        // 行 : line
-        // 列 : 字符总数 - 累积到上一行的字符数 - \r次数 + 1
+        // 初始化行号和列号信息
         var line = 1;
         var column = 0; // 累积到上一行的字符数
 
+        // 逐字符扫描源代码
         for (var i = 0; i < code.Length; i++)
         {
-            #region 特殊字符
+            #region 特殊字符处理
 
+            // 处理回车符，跳过并继续
             if (code[i] == '\r')
             {
                 i++;
             }
 
+            // 处理换行符，更新行号和列累积值
             if (code[i] == '\n')
             {
                 line++;
@@ -57,6 +118,7 @@ public static class LangTokenizer
                 continue;
             }
 
+            // 跳过空格和制表符
             if (code[i] == ' ' || code[i] == '\t')
             {
                 continue;
@@ -542,24 +604,44 @@ public static class LangTokenizer
     }
 }
 
+/// <summary>
+/// 注释过滤词法分析器，负责从源代码中移除注释，但保留换行符
+/// </summary>
+/// <param name="input">原始源代码</param>
+/// <remarks>
+/// 该结构体用于在词法分析之前过滤掉源代码中的注释，支持：
+/// - 单行注释 (// ...)
+/// - 多行注释 (/* ... */)
+/// 过滤过程中会保留换行符，以确保后续词法分析时行号的准确性。
+/// </remarks>
 public struct FilteringCommentsTokenizer(string input)
 {
+    /// <summary>
+    /// 当前扫描索引
+    /// </summary>
     private int CurrentIndex = 0;
 
+    /// <summary>
+    /// 过滤源代码中的注释
+    /// </summary>
+    /// <returns>过滤掉注释后的源代码</returns>
     public string FilteringComments()
     {
         var result = new StringBuilder();
 
+        // 扫描整个输入字符串
         while (CurrentIndex < input.Length)
         {
             var currentChar = input[CurrentIndex];
 
+            // 处理单行注释
             if (currentChar == '/' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '/')
             {
                 // 跳过单行注释，但保留换行符
-                Advance(); // Skip '/'  
-                Advance(); // Skip '/'  
+                Advance(); // 跳过 '/'  
+                Advance(); // 跳过 '/'  
 
+                // 跳过注释内容直到换行符
                 while (CurrentIndex < input.Length && input[CurrentIndex] != '\n')
                 {
                     Advance();
@@ -572,18 +654,21 @@ public struct FilteringCommentsTokenizer(string input)
                     Advance();
                 }
             }
+            // 处理多行注释
             else if (currentChar == '/' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '*')
             {
                 // 跳过多行注释，但保留其中的换行符
-                Advance(); // Skip '/'  
-                Advance(); // Skip '*'  
+                Advance(); // 跳过 '/'  
+                Advance(); // 跳过 '*'  
 
+                // 跳过注释内容直到结束标记
                 while (CurrentIndex < input.Length)
                 {
+                    // 检查是否到达注释结束标记 */
                     if (input[CurrentIndex] == '*' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '/')
                     {
-                        Advance(); // Skip '*'  
-                        Advance(); // Skip '/'  
+                        Advance(); // 跳过 '*'  
+                        Advance(); // 跳过 '/'  
                         break;
                     }
 
@@ -596,6 +681,7 @@ public struct FilteringCommentsTokenizer(string input)
                     Advance();
                 }
             }
+            // 处理普通字符
             else
             {
                 result.Append(currentChar);
@@ -606,11 +692,15 @@ public struct FilteringCommentsTokenizer(string input)
         return result.ToString();
     }
 
+    /// <summary>
+    /// 前进到下一个字符
+    /// </summary>
     private void Advance()
     {
         CurrentIndex++;
     }
 
+    // 以下方法暂时注释掉，如需使用可取消注释
     // private char Peek()
     // {
     //     return CurrentIndex + 1 >= input.Length ? '\0' : input[CurrentIndex + 1];

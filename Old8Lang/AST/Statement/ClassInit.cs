@@ -9,9 +9,23 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
 
+/// <summary>
+/// 类定义语句，用于处理Old8Lang中的类声明
+/// </summary>
+/// <param name="anyLangValue">类模板信息，包含类名、父类、成员变量和方法等</param>
+/// <param name="position">源代码位置信息，用于错误报告</param>
 public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = default) : OldStatement(position)
 {
+    /// <summary>
+    /// 类模板信息，包含类的完整定义
+    /// </summary>
+    private readonly TypeTemplate anyLangValue = anyLangValue;
     
+    /// <summary>
+    /// 在解释模式下执行类定义
+    /// </summary>
+    /// <param name="manager">变量管理器，用于管理类的声明和访问</param>
+    /// <exception cref="DuplicateNameError">当类名已存在时抛出</exception>
     public override void Run(VariateManager manager)
     {
         // 检查类是否已存在
@@ -26,6 +40,11 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
         manager.AddClassAndFunc(anyLangValue);
     }
 
+    /// <summary>
+    /// 在编译模式下生成类的IL代码
+    /// </summary>
+    /// <param name="ilGenerator">IL指令生成器</param>
+    /// <param name="local">局部变量管理器，用于管理类的声明和访问</param>
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 1. 检查类是否已经存在
@@ -426,10 +445,23 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
         ctorIl.Emit(OpCodes.Ret);
     }
 
+    /// <summary>
+    /// 获取指定索引处的语句（实现OldStatement接口）
+    /// </summary>
+    /// <param name="index">语句索引</param>
+    /// <returns>返回当前语句本身，因为ClassInit是单个语句</returns>
     public override OldStatement this[int index] => this;
 
+    /// <summary>
+    /// 获取语句数量（实现OldStatement接口）
+    /// </summary>
+    /// <returns>返回0，因为ClassInit是单个语句</returns>
     public override int Count => 0;
 
+    /// <summary>
+    /// 将类定义转换为字符串表示
+    /// </summary>
+    /// <returns>类定义的字符串表示，包含类名、字段和方法</returns>
     public override string ToString()
     {
         var sb = new StringBuilder();

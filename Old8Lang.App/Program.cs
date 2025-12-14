@@ -4,7 +4,7 @@ using Old8Lang.App;
 using Old8Lang.Compiler;
 using Old8Lang.LangParser;
 
-// 调试模式下的默认参数
+// 调试模式下的默认参数设置
 #if DEBUG
 if (args.Length == 0)
 {
@@ -15,7 +15,7 @@ if (args.Length == 0)
 }
 #endif
 
-// 读取命令行参数
+// 如果没有提供命令行参数，从控制台读取输入
 if (args.Length == 0)
 {
     Console.Write("请输入命令 (输入 -h 获取帮助): ");
@@ -26,17 +26,17 @@ if (args.Length == 0)
     }
 }
 
-// 解析调试参数
+// 初始化调试和日志设置
 var debugEnabled = false;
-var logLevel = Old8Lang.Compiler.Compiler.LogLevel.Info;
+var logLevel = Compiler.LogLevel.Info;
 
-// 检查是否有调试参数
+// 解析调试和日志级别参数
 for (int i = 0; i < args.Length; i++)
 {
     if (args[i] == "-d" || args[i] == "--debug")
     {
         debugEnabled = true;
-        logLevel = Old8Lang.Compiler.Compiler.LogLevel.Debug;
+        logLevel = Compiler.LogLevel.Debug;
         // 移除调试参数，避免影响后续命令解析
         var newArgs = new List<string>(args);
         newArgs.RemoveAt(i);
@@ -51,19 +51,20 @@ for (int i = 0; i < args.Length; i++)
             switch (levelStr)
             {
                 case "error":
-                    logLevel = Old8Lang.Compiler.Compiler.LogLevel.Error;
+                    logLevel = Compiler.LogLevel.Error;
                     break;
                 case "warning":
-                    logLevel = Old8Lang.Compiler.Compiler.LogLevel.Warning;
+                    logLevel = Compiler.LogLevel.Warning;
                     break;
                 case "info":
-                    logLevel = Old8Lang.Compiler.Compiler.LogLevel.Info;
+                    logLevel = Compiler.LogLevel.Info;
                     break;
                 case "debug":
-                    logLevel = Old8Lang.Compiler.Compiler.LogLevel.Debug;
+                    logLevel = Compiler.LogLevel.Debug;
                     debugEnabled = true;
                     break;
             }
+
             // 移除日志级别参数
             var newArgs = new List<string>(args);
             newArgs.RemoveRange(i, 2);
@@ -74,12 +75,13 @@ for (int i = 0; i < args.Length; i++)
 }
 
 // 设置编译器的调试输出开关和日志级别
-Old8Lang.Compiler.Compiler.DebugOutputEnabled = debugEnabled;
-Old8Lang.Compiler.Compiler.CurrentLogLevel = logLevel;
+Compiler.DebugOutputEnabled = debugEnabled;
+Compiler.CurrentLogLevel = logLevel;
 
+// 读取语言配置信息
 var langInfo = Apis.ReadJson();
 
-// 命令行模式
+// 交互式命令行模式
 if (args.Length == 0)
 {
     Console.WriteLine("\n========================================");
@@ -138,34 +140,34 @@ if (args.Length < 1)
     return;
 }
 
-// 处理命令
+// 获取命令名称
 var command = args[0];
-var fromFileCmd = BasicInfo.Order["FromFile"];
-var compilerCmd = BasicInfo.Order["Compiler"];
-var syntaxTestCmd = BasicInfo.Order["SyntaxTest"];
-var helpCmd = BasicInfo.Order["Help"];
-var varCmd = BasicInfo.Order["Var"];
-var infoCmd = BasicInfo.Order["Info"];
-var importCmd = BasicInfo.Order["Import"];
-var changeImportCmd = BasicInfo.Order["ChangeImport"];
-var installCmd = BasicInfo.Order["Install"];
-var removeCmd = BasicInfo.Order["Remove"];
+var fromFileCmd = BasicInfo.Order["FromFile"]; // 解释执行文件命令
+var compilerCmd = BasicInfo.Order["Compiler"]; // 编译执行文件命令
+var syntaxTestCmd = BasicInfo.Order["SyntaxTest"]; // 语法测试命令
+var helpCmd = BasicInfo.Order["Help"]; // 帮助命令
+var varCmd = BasicInfo.Order["Var"]; // 版本信息命令
+var infoCmd = BasicInfo.Order["Info"]; // 语言信息命令
+var importCmd = BasicInfo.Order["Import"]; // 导入库信息命令
+var changeImportCmd = BasicInfo.Order["ChangeImport"]; // 修改导入路径命令
+var installCmd = BasicInfo.Order["Install"]; // 安装库命令
+var removeCmd = BasicInfo.Order["Remove"]; // 移除库命令
 
-// 帮助命令
+// 处理帮助命令
 if (command == helpCmd)
 {
     Console.WriteLine(BasicInfo.Help);
     return;
 }
 
-// 版本信息命令
+// 处理版本信息命令
 if (command == varCmd)
 {
     Console.WriteLine($"Old8Lang 版本: {langInfo.Ver}");
     return;
 }
 
-// 语言信息命令
+// 处理语言信息命令
 if (command == infoCmd)
 {
     Console.WriteLine("========================================");
@@ -174,7 +176,7 @@ if (command == infoCmd)
     return;
 }
 
-// 导入库信息命令
+// 处理导入库信息命令
 if (command == importCmd)
 {
     Console.WriteLine("========================================");
@@ -191,7 +193,7 @@ if (command == importCmd)
     return;
 }
 
-// 修改导入路径命令
+// 处理修改导入路径命令
 if (command == changeImportCmd)
 {
     if (args.Length < 2)
@@ -207,7 +209,7 @@ if (command == changeImportCmd)
     return;
 }
 
-// 安装命令（占位）
+// 处理安装命令（占位，尚未实现）
 if (command == installCmd)
 {
     if (args.Length < 2)
@@ -220,6 +222,7 @@ if (command == installCmd)
     Console.WriteLine($"安装命令已接收，包名: {args[1]}");
 }
 
+// 处理移除命令（占位，尚未实现）
 if (command == removeCmd)
 {
     if (args.Length < 2)
@@ -232,6 +235,7 @@ if (command == removeCmd)
     Console.WriteLine($"删除命令已接收，库名: {args[1]}");
 }
 
+// 处理解释执行文件命令
 if (command == fromFileCmd)
 {
     if (args.Length < 2)
@@ -246,21 +250,21 @@ if (command == fromFileCmd)
     try
     {
         var code = Apis.FromFile(args[1]);
-        var b = langInterpreter.Build(code, args[1]);
-        b.Run(langInterpreter.Manager);
+        var ast = langInterpreter.Build(code, args[1]);
+        ast.Run(langInterpreter.Manager);
     }
     catch (Exception e)
     {
 #if DEBUG
         throw;
-#else
-        Console.WriteLine(e.Message);
 #endif
+        Console.WriteLine(e.Message);
     }
 
     return;
 }
 
+// 处理编译执行文件命令
 if (command == compilerCmd)
 {
     if (args.Length < 2)
@@ -270,6 +274,7 @@ if (command == compilerCmd)
         return;
     }
 
+    // 验证文件扩展名
     var ext = Path.GetExtension(args[1]).ToLower();
     if (ext != ".old8" && ext != ".ol")
     {
@@ -278,38 +283,42 @@ if (command == compilerCmd)
     }
 
     var interpreter = new LangInterpreter();
-    var sw = new Stopwatch();
-    sw.Start();
-    var build = interpreter.Build(Apis.FromFile(args[1]), args[1]);
-    sw.Stop();
-    var ts = sw.Elapsed.TotalMilliseconds;
-    var time = $"------------------\nParser Build Time : {ts}ms\n";
-    var milliseconds = ts;
+    var stopwatch = new Stopwatch();
 
-    var action = Compiler.Compile(build, args[1], interpreter);
+    // 测量解析时间
+    stopwatch.Start();
+    var ast = interpreter.Build(Apis.FromFile(args[1]), args[1]);
+    stopwatch.Stop();
+    var parseTime = stopwatch.Elapsed.TotalMilliseconds;
+    var timeInfo = $"------------------\nParser Build Time : {parseTime}ms\n";
+    var totalTime = parseTime;
 
-    sw.Restart();
+    // 编译代码
+    var compiledAction = Compiler.Compile(ast, args[1], interpreter);
+
+    // 测量执行时间
+    stopwatch.Restart();
     try
     {
-        action();
+        compiledAction();
     }
     catch (Exception e)
     {
 #if DEBUG
         throw;
-#else
-        Console.WriteLine(e.Message);
 #endif
+        Console.WriteLine(e.Message);
     }
 
-    sw.Stop();
-    ts = sw.Elapsed.TotalMilliseconds;
-    time += $"Process Run Time : {ts}ms\n";
-    milliseconds += ts;
-    time += $"Total : {milliseconds}ms";
-    Console.WriteLine(time);
+    stopwatch.Stop();
+    var executionTime = stopwatch.Elapsed.TotalMilliseconds;
+    timeInfo += $"Process Run Time : {executionTime}ms\n";
+    totalTime += executionTime;
+    timeInfo += $"Total : {totalTime}ms";
+    Console.WriteLine(timeInfo);
 }
 
+// 处理语法测试命令
 if (command == syntaxTestCmd)
 {
     if (args.Length < 2)
@@ -330,22 +339,22 @@ if (command == syntaxTestCmd)
     try
     {
         var interpreter = new LangInterpreter();
-        var sw = new Stopwatch();
-        sw.Start();
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
         var code = Apis.FromFile(args[1]);
-        var build = interpreter.Build(code, args[1]);
-        sw.Stop();
-        var ts = sw.Elapsed.TotalMilliseconds;
+        var ast = interpreter.Build(code, args[1]);
+        stopwatch.Stop();
+        var parseTime = stopwatch.Elapsed.TotalMilliseconds;
 
-        Console.WriteLine($"------------------\nSyntax Test Result\nParser Build Time : {ts}ms\n------------------");
-        Console.WriteLine(build.ToCode());
+        Console.WriteLine(
+            $"------------------\nSyntax Test Result\nParser Build Time : {parseTime}ms\n------------------");
+        Console.WriteLine(ast.ToCode());
     }
     catch (Exception e)
     {
 #if DEBUG
         throw;
-#else
-        Console.WriteLine(e.Message);
 #endif
+        Console.WriteLine(e.Message);
     }
 }

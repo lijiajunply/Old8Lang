@@ -5,6 +5,17 @@ using Old8Lang.LangParser;
 
 namespace Old8Lang.Compiler;
 
+/// <summary>
+/// Old8Lang编译器，负责将抽象语法树(AST)转换为IL代码并执行
+/// </summary>
+/// <remarks>
+/// 该类是Old8Lang编译器的核心组件，主要负责：
+/// - 将AST编译为动态方法
+/// - 生成IL代码
+/// - 验证IL代码的正确性
+/// - 处理编译错误和日志输出
+/// - 支持不同级别的日志记录
+/// </remarks>
 public static class Compiler
 {
     /// <summary>
@@ -18,7 +29,7 @@ public static class Compiler
     public static bool ilVerificationEnabled { get; set; } = true;
 
     /// <summary>
-    /// 日志级别枚举
+    /// 日志级别枚举，用于控制编译过程中的日志输出
     /// </summary>
     public enum LogLevel
     {
@@ -77,7 +88,7 @@ public static class Compiler
     }
 
     /// <summary>
-    /// 条件输出调试信息
+    /// 条件输出格式化调试信息
     /// </summary>
     /// <param name="format">格式化字符串</param>
     /// <param name="level">日志级别</param>
@@ -107,11 +118,27 @@ public static class Compiler
             Console.WriteLine($"{levelPrefix} {message}");
     }
 
+    /// <summary>
+    /// 将抽象语法树编译为可执行的委托
+    /// </summary>
+    /// <param name="statement">表示整个程序的块语句</param>
+    /// <param name="path">源代码文件路径</param>
+    /// <param name="i">关联的解释器实例</param>
+    /// <returns>编译后的可执行委托</returns>
+    /// <exception cref="CompilerException">当编译或IL验证失败时抛出</exception>
+    /// <remarks>
+    /// 该方法执行以下步骤：
+    /// 1. 创建动态方法和IL生成器
+    /// 2. 生成IL代码
+    /// 3. 验证IL代码（如果启用）
+    /// 4. 创建并返回可执行委托
+    /// </remarks>
     public static Action Compile(BlockStatement statement, string path, LangInterpreter i)
     {
         LogFormat("开始编译: {0}", LogLevel.Debug, path);
         LogFormat("语句类型: {0}", LogLevel.Debug, statement.GetType().Name);
 
+        // 创建动态方法，用于生成和执行IL代码
         var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
         var ilGenerator = dynamicMethod.GetILGenerator();
         var local = new LocalManager() { FilePath = path, Interpreter = i };
@@ -119,9 +146,11 @@ public static class Compiler
         try
         {
             Log("开始生成IL代码", LogLevel.Debug);
+            // 调用块语句的GenerateIl方法生成IL代码
             statement.GenerateIl(ilGenerator, local);
             Log("IL代码生成完成", LogLevel.Debug);
 
+            // 生成返回指令
             ilGenerator.Emit(OpCodes.Ret);
 
             // 执行IL代码验证（如果启用）
@@ -163,6 +192,7 @@ public static class Compiler
             Action oldLangRun;
             try
             {
+                // 创建可执行委托
                 oldLangRun = (Action)dynamicMethod.CreateDelegate(typeof(Action));
                 Log("编译成功");
             }
@@ -176,6 +206,7 @@ public static class Compiler
         }
         catch (Exception ex)
         {
+            // 处理编译过程中的异常，输出详细错误信息
             LogFormat("\n{0}", LogLevel.Error, path);
             LogFormat("错误类型: {0}", LogLevel.Error, ex.GetType().Name);
             LogFormat("错误信息: {0}", LogLevel.Error, ex.Message);
@@ -216,6 +247,19 @@ public static class Compiler
         }
     }
 
+    /// <summary>
+    /// 从文件路径编译Old8Lang代码
+    /// </summary>
+    /// <param name="path">Old8Lang源代码文件路径</param>
+    /// <param name="i">关联的解释器实例</param>
+    /// <returns>编译后的可执行委托</returns>
+    /// <exception cref="CompilerException">当编译失败时抛出</exception>
+    /// <remarks>
+    /// 该方法执行以下步骤：
+    /// 1. 从文件读取源代码
+    /// 2. 解析源代码生成抽象语法树
+    /// 3. 调用另一个Compile重载方法编译AST
+    /// </remarks>
     public static Action Compile(string path, LangInterpreter i)
     {
         LogFormat("开始编译文件: {0}", LogLevel.Debug, path);
@@ -223,13 +267,16 @@ public static class Compiler
         try
         {
             Log("解析代码", LogLevel.Debug);
+            // 从文件读取代码并解析为AST
             var statement = i.Build(Apis.FromFile(path));
             Log("解析完成", LogLevel.Debug);
 
+            // 调用另一个Compile重载方法编译AST
             return Compile(statement, path, i);
         }
         catch (Exception ex)
         {
+            // 处理编译过程中的异常，输出详细错误信息
             LogFormat("\n{0}", LogLevel.Error, path);
             LogFormat("错误类型: {0}", LogLevel.Error, ex.GetType().Name);
             LogFormat("错误信息: {0}", LogLevel.Error, ex.Message);

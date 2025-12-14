@@ -2,12 +2,15 @@ using System.Text;
 
 namespace Old8Lang.App;
 
+/// <summary>
+/// 命令行应用的基本信息类，提供帮助文档、语言信息和命令映射
+/// </summary>
 public static class BasicInfo
 {
     /// <summary>
-    /// 帮助文档
+    /// 获取 Old8Lang 命令行帮助文档
     /// </summary>
-    /// <returns></returns>
+    /// <returns>格式化的帮助文档字符串</returns>
     public static string Help => @"Old8Lang 命令行帮助文档
 
 命令格式：
@@ -51,9 +54,9 @@ public static class BasicInfo
   - 语法测试会显示解析时间和生成的代码结构";
 
     /// <summary>
-    /// 语言信息
+    /// 获取 Old8Lang 语言的详细信息，包括关键字和示例代码
     /// </summary>
-    /// <returns></returns>
+    /// <returns>格式化的语言信息字符串</returns>
     public static string Info()
     {
         var builder =
@@ -67,14 +70,14 @@ public static class BasicInfo
     }
 
     /// <summary>
-    /// 还没想好
+    /// 从文件中读取 Old8Lang 示例代码
     /// </summary>
-    /// <returns>这...实例</returns>
+    /// <returns>示例代码字符串</returns>
     private static string LangSample() =>
-        File.ReadAllText(Path.Combine(Path.GetDirectoryName(Apis.CodePath)!, "Old8Lang", "LangSample.txt"));
+        File.ReadAllText(Path.Combine(Path.GetDirectoryName(Apis.CodePath)! , "Old8Lang", "LangSample.txt"));
 
     /// <summary>
-    /// Old8Lang的关键字
+    /// Old8Lang 语言的关键字列表
     /// </summary>
     private static string[] KeyWords =>
     [
@@ -85,20 +88,22 @@ public static class BasicInfo
         "return func"
     ];
 
-
+    /// <summary>
+    /// 命令名称与命令行参数的映射字典
+    /// </summary>
     public static Dictionary<string, string> Order => new()
     {
-        { "FromFile", "-f" },
-        { "FromDir", "-d" },
-        { "Import", "import" },
-        { "LibPath", "lib" },
-        { "ChangeImport", "-change" },
-        { "Var", "-var" },
-        { "Info", "info" },
-        { "Install", "-i" },
-        { "Help", "-h" },
-        { "Remove", "-r" },
-        { "Compiler", "-c" },
-        { "SyntaxTest", "-s" }
+        { "FromFile", "-f" },        // 解释执行文件
+        { "FromDir", "-d" },        // 从目录加载
+        { "Import", "import" },     // 显示导入库信息
+        { "LibPath", "lib" },       // 库路径
+        { "ChangeImport", "-change" }, // 修改导入路径
+        { "Var", "-var" },          // 显示版本号
+        { "Info", "info" },         // 显示语言信息
+        { "Install", "-i" },        // 安装库
+        { "Help", "-h" },           // 显示帮助
+        { "Remove", "-r" },         // 移除库
+        { "Compiler", "-c" },       // 编译执行
+        { "SyntaxTest", "-s" }       // 语法测试
     };
 }

@@ -8,27 +8,56 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
 
+/// <summary>
+/// 原生语句类，用于处理Old8Lang中的native导入语句
+/// 支持导入原生DLL、类和方法
+/// </summary>
 public class NativeStatement : OldStatement
 {
-
+    /// <summary>
+    /// DLL名称
+    /// </summary>
     private readonly string DllName;
-
+    /// <summary>
+    /// 类名称
+    /// </summary>
     private readonly string ClassName;
-
+    /// <summary>
+    /// 方法名称（可选）
+    /// </summary>
     private readonly string? MethodName;
-
+    /// <summary>
+    /// 原生方法名称别名（可选）
+    /// </summary>
     private string? NativeName { get; set; }
-
+    /// <summary>
+    /// 导入名称（可选）
+    /// </summary>
     private readonly string? Name;
+    /// <summary>
+    /// 函数值（可选）
+    /// </summary>
     private readonly FuncLangValue? FuncValue;
-
-    // 批量导入相关字段
-    private readonly bool ImportAll;  // 是否导入所有方法 (*)
-    private readonly List<string>? MethodList;  // 选择性导入的方法列表
-
-    // 类导入别名（用于 native "DllName" ClassName as Alias）
+    /// <summary>
+    /// 是否导入所有方法 (*)
+    /// </summary>
+    private readonly bool ImportAll;  
+    /// <summary>
+    /// 选择性导入的方法列表
+    /// </summary>
+    private readonly List<string>? MethodList;  
+    /// <summary>
+    /// 类导入别名
+    /// </summary>
     private readonly string? ClassAlias;
 
+    /// <summary>
+    /// 构造函数：导入单个方法
+    /// </summary>
+    /// <param name="dllName">DLL名称</param>
+    /// <param name="className">类名称</param>
+    /// <param name="methodName">方法名称</param>
+    /// <param name="nativeName">原生方法别名</param>
     public NativeStatement(string dllName, string className, string methodName, string nativeName)
     {
         DllName = dllName;
@@ -39,6 +68,14 @@ public class NativeStatement : OldStatement
         MethodList = null;
     }
 
+    /// <summary>
+    /// 构造函数：导入单个方法并指定函数值
+    /// </summary>
+    /// <param name="dllName">DLL名称</param>
+    /// <param name="className">类名称</param>
+    /// <param name="methodName">方法名称</param>
+    /// <param name="nativeName">原生方法别名</param>
+    /// <param name="a">函数初始化对象</param>
     public NativeStatement(string dllName, string className, string methodName, string nativeName, FuncInit a)
     {
         DllName = dllName;
@@ -50,6 +87,12 @@ public class NativeStatement : OldStatement
         MethodList = null;
     }
 
+    /// <summary>
+    /// 构造函数：导入类
+    /// </summary>
+    /// <param name="dllName">DLL名称</param>
+    /// <param name="className">类名称</param>
+    /// <param name="name">导入名称</param>
     public NativeStatement(string dllName, string className, string name = "")
     {
         DllName = dllName;
@@ -59,7 +102,12 @@ public class NativeStatement : OldStatement
         MethodList = null;
     }
 
-    // 新增：批量导入所有方法的构造函数
+    /// <summary>
+    /// 构造函数：批量导入所有方法
+    /// </summary>
+    /// <param name="dllName">DLL名称</param>
+    /// <param name="className">类名称</param>
+    /// <param name="importAll">是否导入所有方法</param>
     public NativeStatement(string dllName, string className, bool importAll)
     {
         DllName = dllName;
@@ -68,7 +116,12 @@ public class NativeStatement : OldStatement
         MethodList = null;
     }
 
-    // 新增：选择性导入多个方法的构造函数
+    /// <summary>
+    /// 构造函数：选择性导入多个方法
+    /// </summary>
+    /// <param name="dllName">DLL名称</param>
+    /// <param name="className">类名称</param>
+    /// <param name="methodList">要导入的方法列表</param>
     public NativeStatement(string dllName, string className, List<string> methodList)
     {
         DllName = dllName;
@@ -77,7 +130,13 @@ public class NativeStatement : OldStatement
         ImportAll = false;
     }
 
-    // 新增：带别名的类导入构造函数 (native "DllName" ClassName as Alias)
+    /// <summary>
+    /// 构造函数：带别名的类导入
+    /// </summary>
+    /// <param name="dllName">DLL名称</param>
+    /// <param name="className">类名称</param>
+    /// <param name="classAlias">类别名</param>
+    /// <param name="isAliasImport">是否为别名导入</param>
     public NativeStatement(string dllName, string className, string classAlias, bool isAliasImport)
     {
         DllName = dllName;
@@ -87,6 +146,13 @@ public class NativeStatement : OldStatement
         MethodList = null;
     }
 
+    /// <summary>
+    /// 在解释模式下执行原生导入
+    /// </summary>
+    /// <param name="manager">变量管理器，用于管理导入的原生元素</param>
+    /// <exception cref="Error.ImportError">当导入失败时抛出</exception>
+    /// <exception cref="TypeError">当找不到指定类型时抛出</exception>
+    /// <exception cref="InvalidOperationError">当找不到指定方法时抛出</exception>
     public override void Run(VariateManager manager)
     {
         // 使用 DllPathResolver 查找 DLL 路径
@@ -187,6 +253,14 @@ public class NativeStatement : OldStatement
         manager.AddClassAndFunc(importInfo);
     }
 
+    /// <summary>
+    /// 在编译模式下生成原生导入的IL代码
+    /// </summary>
+    /// <param name="ilGenerator">IL指令生成器</param>
+    /// <param name="local">局部变量管理器</param>
+    /// <exception cref="Error.ImportError">当导入失败时抛出</exception>
+    /// <exception cref="TypeError">当找不到指定类型时抛出</exception>
+    /// <exception cref="InvalidOperationError">当找不到指定方法时抛出</exception>
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 使用 DllPathResolver 查找 DLL 路径
@@ -277,10 +351,23 @@ public class NativeStatement : OldStatement
         }
     }
 
+    /// <summary>
+    /// 获取指定索引处的语句（实现OldStatement接口）
+    /// </summary>
+    /// <param name="index">语句索引</param>
+    /// <returns>返回当前语句本身，因为NativeStatement是单个语句</returns>
     public override OldStatement this[int index] => this;
 
+    /// <summary>
+    /// 获取语句数量（实现OldStatement接口）
+    /// </summary>
+    /// <returns>返回0，因为NativeStatement是单个语句</returns>
     public override int Count => 0;
 
+    /// <summary>
+    /// 将原生语句转换为字符串表示
+    /// </summary>
+    /// <returns>原生语句的字符串表示</returns>
     public override string ToString()
     {
         if (!string.IsNullOrEmpty(Name))

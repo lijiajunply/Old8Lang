@@ -4,24 +4,73 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression;
 
+/// <summary>
+/// 语言标识符类，用于表示变量名、函数名、类名等
+/// </summary>
+/// <param name="name">标识符名称</param>
+/// <param name="assumptionType">类型注解，用于类型检查和推断</param>
+/// <param name="defaultValue">默认值表达式</param>
+/// <param name="position">源代码位置信息，用于错误报告</param>
+/// <remarks>
+/// 该类是Old8Lang表达式系统的基础组件，用于表示各种标识符。
+/// 支持类型注解、默认值、"this"关键字处理等功能。
+/// </remarks>
 public class LangId(string name, string assumptionType = "", LangExpression? defaultValue = null, SourcePosition position = default) : LangExpression(position)
 {
+    /// <summary>
+    /// 标识符名称
+    /// </summary>
     public readonly string IdName = name;
-    public override string ToString() => IdName;
+    
+    /// <summary>
+    /// 类型注解，用于类型检查和推断
+    /// </summary>
     public string AssumptionType { get; } = assumptionType;
+    
+    /// <summary>
+    /// 默认值表达式
+    /// </summary>
     public LangExpression? DefaultValue { get; } = defaultValue;
 
+    /// <summary>
+    /// 将标识符转换为字符串表示
+    /// </summary>
+    /// <returns>标识符名称</returns>
+    public override string ToString() => IdName;
+
+    /// <summary>
+    /// 比较两个LangId是否相等
+    /// </summary>
+    /// <param name="obj">要比较的对象</param>
+    /// <returns>如果相等则返回true，否则返回false</returns>
     public override bool Equals(object? obj)
     {
         var a = obj as LangId;
         return a?.IdName == IdName;
     }
 
+    /// <summary>
+    /// 获取标识符的哈希码
+    /// </summary>
+    /// <returns>哈希码</returns>
     public override int GetHashCode()
     {
         return IdName.GetHashCode();
     }
 
+    /// <summary>
+    /// 执行标识符，获取其对应的值
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>标识符对应的值</returns>
+    /// <exception cref="NameError">当标识符未定义时抛出</exception>
+    /// <remarks>
+    /// 执行过程：
+    /// 1. 如果是"this"关键字，直接从变量管理器中获取
+    /// 2. 否则，尝试获取普通变量
+    /// 3. 如果不是普通变量，尝试获取类或函数
+    /// 4. 如果都没有找到，抛出NameError异常
+    /// </remarks>
     public override LangValueType Run(LangParser.VariateManager manager) 
     {
         if (IdName == "this")
@@ -55,6 +104,15 @@ public class LangId(string name, string assumptionType = "", LangExpression? def
         throw new NameError(this, IdName);
     }
 
+    /// <summary>
+    /// 生成加载标识符值的IL指令
+    /// </summary>
+    /// <param name="ilGenerator">IL生成器</param>
+    /// <param name="local">局部变量管理器</param>
+    /// <remarks>
+    /// 如果标识符是局部变量，使用Ldloc指令加载；
+    /// 否则，假设是函数参数，使用Ldarg_0指令加载（简化实现）。
+    /// </remarks>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         var value = local.GetLocalVar(IdName);
@@ -74,6 +132,19 @@ public class LangId(string name, string assumptionType = "", LangExpression? def
         }
     }
 
+    /// <summary>
+    /// 获取标识符的输出类型
+    /// </summary>
+    /// <param name="local">局部变量管理器</param>
+    /// <returns>标识符的输出类型</returns>
+    /// <remarks>
+    /// 输出类型的确定顺序：
+    /// 1. 如果有类型注解，解析类型注解
+    /// 2. 如果是"this"关键字，返回当前类类型
+    /// 3. 如果是局部变量，返回局部变量类型
+    /// 4. 如果在局部变量类型字典中存在，返回对应类型
+    /// 5. 默认返回object类型
+    /// </remarks>
     public override Type OutputType(LocalManager local)
     {
         if (!string.IsNullOrEmpty(AssumptionType))

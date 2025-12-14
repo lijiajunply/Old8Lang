@@ -5,12 +5,30 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
 
+/// <summary>
+/// 导入项类，用于表示导入语句中的单个导入项
+/// </summary>
+/// <param name="name">导入项的原始名称</param>
+/// <param name="alias">导入项的别名，默认与原始名称相同</param>
 public class ImportItem(string name, string? alias = null)
 {
+    /// <summary>
+    /// 导入项的原始名称
+    /// </summary>
     public readonly string Name = name;
+    /// <summary>
+    /// 导入项的别名，默认与原始名称相同
+    /// </summary>
     public readonly string Alias = alias ?? name;
 }
 
+/// <summary>
+/// 导入语句类，用于处理Old8Lang中的import语句
+/// </summary>
+/// <param name="importString">导入的模块名称或路径</param>
+/// <param name="position">源代码位置信息，用于错误报告</param>
+/// <param name="importSpecifiers">导入指定符列表，用于命名导入</param>
+/// <param name="fromClause">是否使用from子句，如import { ... } from "module"</param>
 public class ImportStatement(
     string importString,
     SourcePosition position = default,
@@ -18,8 +36,24 @@ public class ImportStatement(
     bool fromClause = false
 ) : OldStatement(position)
 {
+    /// <summary>
+    /// 导入的模块名称或路径
+    /// </summary>
+    private readonly string importString = importString;
+    /// <summary>
+    /// 是否使用from子句
+    /// </summary>
+    private readonly bool fromClause = fromClause;
+    /// <summary>
+    /// 导入指定符列表，用于命名导入
+    /// </summary>
     private readonly List<ImportItem> ImportSpecifiers = importSpecifiers ?? [];
 
+    /// <summary>
+    /// 在解释模式下执行导入语句
+    /// </summary>
+    /// <param name="manager">变量管理器，用于管理导入的模块和变量</param>
+    /// <exception cref="ImportError">当导入失败时抛出</exception>
     public override void Run(VariateManager manager)
     {
         var moduleName = importString;
@@ -142,6 +176,11 @@ public class ImportStatement(
         manager.Path = managerPath;
     }
 
+    /// <summary>
+    /// 在编译模式下生成导入语句的IL代码
+    /// </summary>
+    /// <param name="ilGenerator">IL指令生成器</param>
+    /// <param name="local">局部变量管理器，用于管理导入的模块和变量</param>
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         string moduleName = importString;
@@ -191,10 +230,23 @@ public class ImportStatement(
         result?.GenerateImportIl(ilGenerator, local);
     }
 
+    /// <summary>
+    /// 获取指定索引处的语句（实现OldStatement接口）
+    /// </summary>
+    /// <param name="index">语句索引</param>
+    /// <returns>返回当前语句本身，因为ImportStatement是单个语句</returns>
     public override OldStatement this[int index] => this;
 
+    /// <summary>
+    /// 获取语句数量（实现OldStatement接口）
+    /// </summary>
+    /// <returns>返回0，因为ImportStatement是单个语句</returns>
     public override int Count => 0;
 
+    /// <summary>
+    /// 将导入语句转换为字符串表示
+    /// </summary>
+    /// <returns>导入语句的字符串表示</returns>
     public override string ToString()
     {
         if (ImportSpecifiers.Count > 0)

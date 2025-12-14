@@ -27,8 +27,12 @@ public static class SortLib
     }
 
     /// <summary>
-    /// 快速排序实现
+    /// 快速排序的递归实现
     /// </summary>
+    /// <param name="array">待排序的数组</param>
+    /// <param name="low">排序区间的起始索引</param>
+    /// <param name="high">排序区间的结束索引</param>
+    /// <typeparam name="T">元素类型</typeparam>
     private static void QuickSortImpl<T>(T[] array, int low, int high) where T : IComparable<T>
     {
         if (low < high)
@@ -40,8 +44,13 @@ public static class SortLib
     }
 
     /// <summary>
-    /// 分区操作
+    /// 快速排序的分区操作
     /// </summary>
+    /// <param name="array">待分区的数组</param>
+    /// <param name="low">分区区间的起始索引</param>
+    /// <param name="high">分区区间的结束索引</param>
+    /// <typeparam name="T">元素类型</typeparam>
+    /// <returns>基准元素的最终位置索引</returns>
     private static int Partition<T>(T[] array, int low, int high) where T : IComparable<T>
     {
         T pivot = array[high];
@@ -87,8 +96,12 @@ public static class SortLib
     }
 
     /// <summary>
-    /// 归并排序实现
+    /// 归并排序的递归实现
     /// </summary>
+    /// <param name="array">待排序的数组</param>
+    /// <param name="left">排序区间的起始索引</param>
+    /// <param name="right">排序区间的结束索引</param>
+    /// <typeparam name="T">元素类型</typeparam>
     private static void MergeSortImpl<T>(T[] array, int left, int right) where T : IComparable<T>
     {
         if (left < right)
@@ -101,8 +114,13 @@ public static class SortLib
     }
 
     /// <summary>
-    /// 合并操作
+    /// 归并排序的合并操作
     /// </summary>
+    /// <param name="array">待合并的数组</param>
+    /// <param name="left">左子数组的起始索引</param>
+    /// <param name="mid">左子数组的结束索引，也是右子数组的前一个索引</param>
+    /// <param name="right">右子数组的结束索引</param>
+    /// <typeparam name="T">元素类型</typeparam>
     private static void Merge<T>(T[] array, int left, int mid, int right) where T : IComparable<T>
     {
         int n1 = mid - left + 1;
@@ -286,8 +304,12 @@ public static class SortLib
     }
 
     /// <summary>
-    /// 堆化操作
+    /// 堆排序的堆化操作
     /// </summary>
+    /// <param name="array">待堆化的数组</param>
+    /// <param name="n">数组的长度</param>
+    /// <param name="i">当前需要堆化的节点索引</param>
+    /// <typeparam name="T">元素类型</typeparam>
     private static void Heapify<T>(T[] array, int n, int i) where T : IComparable<T>
     {
         int largest = i;
@@ -316,6 +338,10 @@ public static class SortLib
     /// <summary>
     /// 交换数组中的两个元素
     /// </summary>
+    /// <param name="array">数组</param>
+    /// <param name="i">第一个元素的索引</param>
+    /// <param name="j">第二个元素的索引</param>
+    /// <typeparam name="T">元素类型</typeparam>
     private static void Swap<T>(T[] array, int i, int j)
     {
         (array[i], array[j]) = (array[j], array[i]);

@@ -401,7 +401,17 @@ public static class StringLib
             throw new ArgumentOutOfRangeException(nameof(count), count, "重复次数不能为负数");
         }
 
-        return new string(input[0], count);
+        if (count == 0)
+        {
+            return string.Empty;
+        }
+
+        var builder = new System.Text.StringBuilder(input.Length * count);
+        for (int i = 0; i < count; i++)
+        {
+            builder.Append(input);
+        }
+        return builder.ToString();
     }
 }
 
@@ -413,7 +423,17 @@ public class RegexException : Exception
     /// <summary>
     /// 构造函数
     /// </summary>
+    /// <param name="message">异常信息</param>
+    /// <param name="innerException">内部异常</param>
     public RegexException(string message, Exception innerException) : base(message, innerException)
+    {
+    }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="message">异常信息</param>
+    public RegexException(string message) : base(message)
     {
     }
 }
@@ -426,7 +446,17 @@ public class EncodingException : Exception
     /// <summary>
     /// 构造函数
     /// </summary>
+    /// <param name="message">异常信息</param>
+    /// <param name="innerException">内部异常</param>
     public EncodingException(string message, Exception innerException) : base(message, innerException)
+    {
+    }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="message">异常信息</param>
+    public EncodingException(string message) : base(message)
     {
     }
 }

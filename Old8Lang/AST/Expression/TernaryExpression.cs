@@ -33,6 +33,12 @@ public class TernaryExpression(
     /// </summary>
     public LangExpression FalseExpression { get; } = falseExpression;
 
+    /// <summary>
+    /// 执行三元表达式，根据条件结果返回相应的表达式值
+    /// </summary>
+    /// <param name="manager">变量管理器，用于管理执行环境中的变量</param>
+    /// <returns>条件为真时返回TrueExpression的结果，否则返回FalseExpression的结果</returns>
+    /// <exception cref="InvalidOperationError">当条件不是Bool类型时抛出</exception>
     public override LangValueType Run(VariateManager manager)
     {
         // 执行条件判断
@@ -48,6 +54,11 @@ public class TernaryExpression(
             : FalseExpression.Run(manager);
     }
 
+    /// <summary>
+    /// 生成将三元表达式结果加载到栈上的IL指令
+    /// </summary>
+    /// <param name="ilGenerator">IL指令生成器，用于生成IL代码</param>
+    /// <param name="local">局部变量管理器，用于管理局部变量</param>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 条件表达式
@@ -72,6 +83,11 @@ public class TernaryExpression(
         ilGenerator.MarkLabel(endLabel);
     }
 
+    /// <summary>
+    /// 获取三元表达式的输出类型
+    /// </summary>
+    /// <param name="local">局部变量管理器，用于管理局部变量</param>
+    /// <returns>如果两个分支类型相同则返回该类型，否则返回object类型</returns>
     public override Type? OutputType(LocalManager local)
     {
         // 三元表达式的输出类型是两个分支类型的公共父类型
@@ -87,6 +103,10 @@ public class TernaryExpression(
         return typeof(object);
     }
 
+    /// <summary>
+    /// 将三元表达式转换为字符串表示
+    /// </summary>
+    /// <returns>三元表达式的字符串表示，格式为"condition ? trueExpression : falseExpression"</returns>
     public override string ToString()
     {
         return $"{Condition} ? {TrueExpression} : {FalseExpression}";

@@ -1,21 +1,50 @@
 namespace Old8Lang;
 
+/// <summary>
+/// 表示 Old8Lang 语言的元信息，用于存储语言配置和库信息
+/// </summary>
 [Serializable]
 public class LangInfo
 {
+    /// <summary>
+    /// 获取或设置模块导入路径
+    /// </summary>
     public string ImportPath { get; set; } = "";
 
+    /// <summary>
+    /// 获取或设置库信息列表
+    /// </summary>
     public List<LibInfo> LibInfos { get; set; } = [];
 
+    /// <summary>
+    /// 获取或设置语言版本
+    /// </summary>
     public string Ver { get; set; } = "";
 
+    /// <summary>
+    /// 获取或设置语言官方网站URL
+    /// </summary>
     public string Url { get; set; } = "";
 }
 
+/// <summary>
+/// 表示 Old8Lang 库的元信息，用于描述单个库的属性
+/// </summary>
 [Serializable]
 public class LibInfo
 {
+    /// <summary>
+    /// 获取或设置库名称
+    /// </summary>
     public string LibName { get; set; } = "";
+
+    /// <summary>
+    /// 获取或设置库版本号
+    /// </summary>
     public double Var { get; set; }
+
+    /// <summary>
+    /// 获取或设置库是否为目录类型
+    /// </summary>
     public bool IsDir { get; set; }
 }

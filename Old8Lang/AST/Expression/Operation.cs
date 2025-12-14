@@ -8,6 +8,24 @@ using Old8Lang.LangParser;
 
 namespace Old8Lang.AST.Expression;
 
+/// <summary>
+/// 操作表达式类，用于表示各种运算符和操作
+/// </summary>
+/// <param name="left">左操作数</param>
+/// <param name="opera">运算符类型</param>
+/// <param name="right">右操作数</param>
+/// <param name="position">源代码位置信息，用于错误报告</param>
+/// <remarks>
+/// 该类是Old8Lang表达式系统的核心组件，用于表示各种运算符和操作，包括：
+/// - 算术运算符：+, -, *, /, %, ^
+/// - 比较运算符：>, <, ==, !=, <=, >=
+/// - 逻辑运算符：&&, ||, ^
+/// - 点运算符：.
+/// - 类型转换运算符：as
+/// - 成员访问和方法调用
+/// - 索引访问
+/// - 一元运算符：!, -
+/// </remarks>
 public class Operation(
     LangExpression? left,
     LangTokenType opera,
@@ -15,6 +33,10 @@ public class Operation(
     SourcePosition position = default)
     : LangExpression(position)
 {
+    /// <summary>
+    /// 将运算符类型转换为字符串表示
+    /// </summary>
+    /// <returns>运算符的字符串表示</returns>
     private string OperaToString()
     {
         if (Opera == LangTokenType.Plus)
@@ -56,10 +78,30 @@ public class Operation(
         return "";
     }
 
+    /// <summary>
+    /// 将操作转换为字符串表示
+    /// </summary>
+    /// <returns>操作的字符串表示</returns>
     public override string ToString() => $"{Left}{OperaToString()}{Right}";
+    
+    /// <summary>
+    /// 操作的输出类型缓存
+    /// </summary>
     private Type? Type { get; set; }
+    
+    /// <summary>
+    /// 左操作数
+    /// </summary>
     public LangExpression? Left { get; } = left;
+    
+    /// <summary>
+    /// 右操作数
+    /// </summary>
     public LangExpression? Right { get; } = right;
+    
+    /// <summary>
+    /// 运算符类型
+    /// </summary>
     public LangTokenType Opera { get; } = opera;
 
     public override LangValueType Run(VariateManager manager)
@@ -312,6 +354,21 @@ public class Operation(
     }
 
 
+    /// <summary>
+    /// 将操作结果保存到局部变量的IL生成方法
+    /// </summary>
+    /// <param name="ilGenerator">IL指令生成器，用于生成IL代码</param>
+    /// <param name="local">局部变量管理器，用于管理局部变量</param>
+    /// <param name="idName">要保存的局部变量名称</param>
+    /// <remarks>
+    /// 该方法执行以下步骤：
+    /// 1. 调用LoadIlValue生成计算操作结果的IL指令，将结果压入栈中
+    /// 2. 获取操作结果的类型
+    /// 3. 检查是否已存在同名局部变量
+    ///    - 如果存在且类型匹配：直接将结果存储到该变量
+    ///    - 如果存在但类型不匹配：删除旧变量，声明新变量并存储结果
+    ///    - 如果不存在：声明新变量并存储结果
+    /// </remarks>
     public override void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
     {
         // 首先生成计算值的IL指令，将结果压入栈中
@@ -346,12 +403,31 @@ public class Operation(
         }
     }
 
+    /// <summary>
+    /// 生成将操作结果加载到栈上的IL指令
+    /// </summary>
+    /// <param name="ilGenerator">IL指令生成器，用于生成IL代码</param>
+    /// <param name="local">局部变量管理器，用于管理局部变量</param>
+    /// <remarks>
+    /// 该方法通过调用带有ILGenerator参数的OutputType方法来生成实际的IL指令，
+    /// 并将结果类型存储在Type属性中以便后续使用。
+    /// </remarks>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 调用带有ILGenerator参数的OutputType方法，该方法会生成实际的IL指令
         Type = OutputType(ilGenerator, local);
     }
 
+    /// <summary>
+    /// 获取操作的输出类型，用于编译时类型检查和IL生成
+    /// </summary>
+    /// <param name="local">局部变量管理器，用于管理局部变量</param>
+    /// <returns>操作的输出类型，如果无法确定则返回null</returns>
+    /// <remarks>
+    /// 该方法主要用于编译时类型检查，不生成实际的IL指令。
+    /// 它会根据操作符类型、左操作数类型和右操作数类型来确定操作的输出类型。
+    /// 如果已经计算过类型，会直接返回缓存的Type属性值。
+    /// </remarks>
     public override Type? OutputType(LocalManager local)
     {
         if (Type != null) return Type;

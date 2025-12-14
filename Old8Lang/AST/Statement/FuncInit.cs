@@ -7,13 +7,28 @@ using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
 
+/// <summary>
+/// 函数初始化类，用于处理Old8Lang中的函数声明
+/// </summary>
+/// <param name="a">函数值对象</param>
+/// <param name="position">源代码位置信息，用于错误报告</param>
 public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldStatement(position)
 {
+    /// <summary>
+    /// 函数值对象，包含函数的完整定义
+    /// </summary>
     public readonly FuncLangValue FuncLangValue = a;
     
-    // 检查函数是否为Lambda表达式（通过检查Id是否为null）
+    /// <summary>
+    /// 检查函数是否为Lambda表达式（通过检查Id是否为null）
+    /// </summary>
     public bool IsLambda => FuncLangValue.Id == null;
 
+    /// <summary>
+    /// 在解释模式下执行函数初始化
+    /// </summary>
+    /// <param name="manager">变量管理器，用于管理函数的声明和访问</param>
+    /// <exception cref="DuplicateNameError">当函数已存在时抛出</exception>
     public override void Run(VariateManager manager)
     {
         // 检查函数是否已存在（只有当函数名和参数数量都相同时才视为重复）
@@ -33,9 +48,14 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
         manager.AddClassAndFunc(FuncLangValue);
     }
 
+    /// <summary>
+    /// 在编译模式下生成函数的IL代码
+    /// </summary>
+    /// <param name="ilGenerator">IL指令生成器</param>
+    /// <param name="local">局部变量管理器，用于管理函数的声明和访问</param>
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        // 【新增】验证函数类型注解完整性（编译模式要求）
+        // 验证函数类型注解完整性（编译模式要求）
         ValidateTypeAnnotations(local);
 
         // 获取方法的名称
@@ -64,7 +84,7 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
             funcLocal.LocalVarTypes[id.IdName] = paramType;
         }
 
-        // 【修改】优先使用显式声明的返回类型
+        // 优先使用显式声明的返回类型
         // 如果类型注解存在但OutputType返回null/object，则仍尝试推断（用于兼容性）
         var returnType = FuncLangValue.Id?.OutputType(local);
         if (returnType == null || returnType == typeof(object))
@@ -175,6 +195,7 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
     /// <summary>
     /// 验证函数的类型注解完整性（编译模式要求）
     /// </summary>
+    /// <param name="local">局部变量管理器，用于报告错误</param>
     private void ValidateTypeAnnotations(LocalManager local)
     {
         // 1. 验证所有参数的类型注解
@@ -221,6 +242,12 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
         }
     }
 
+    /// <summary>
+    /// 从语句块中推断返回类型
+    /// </summary>
+    /// <param name="statement">要分析的语句块</param>
+    /// <param name="local">局部变量管理器</param>
+    /// <returns>推断出的返回类型</returns>
     private static Type GetItemType(OldStatement statement, LocalManager local)
     {
         for (var i = 0; i < statement.Count; i++)
@@ -259,11 +286,23 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
         return typeof(void); // 默认返回void类型
     }
 
+    /// <summary>
+    /// 获取指定索引处的语句（实现OldStatement接口）
+    /// </summary>
+    /// <param name="index">语句索引</param>
+    /// <returns>返回当前语句本身，因为FuncInit是单个语句</returns>
     public override OldStatement this[int index] => this;
 
+    /// <summary>
+    /// 获取语句数量（实现OldStatement接口）
+    /// </summary>
+    /// <returns>返回0，因为FuncInit是单个语句</returns>
     public override int Count => 0;
 
-
+    /// <summary>
+    /// 将函数初始化转换为字符串表示
+    /// </summary>
+    /// <returns>函数初始化的字符串表示</returns>
     public override string ToString()
     {
         var sb = new StringBuilder();

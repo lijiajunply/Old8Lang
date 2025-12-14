@@ -6,42 +6,91 @@ using Old8Lang.Error;
 
 namespace Old8Lang.LangParser;
 
+/// <summary>
+/// Old8Lang变量管理器，负责管理变量作用域、返回值、导入信息等
+/// </summary>
+/// <remarks>
+/// 该类是Old8Lang解释器的核心组件之一，主要负责：
+/// - 管理变量作用域栈（全局作用域和局部作用域）
+/// - 处理函数返回值和返回状态
+/// - 管理导入的函数、类和原生类型
+/// - 跟踪递归深度，防止栈溢出
+/// - 提供变量状态查询功能
+/// </remarks>
 public class VariateManager
 {
     #region Lang
 
+    /// <summary>
+    /// 语言信息，包含库信息和导入路径等
+    /// </summary>
     public LangInfo? LangInfo { get; set; }
+    
+    /// <summary>
+    /// 当前源代码文件路径
+    /// </summary>
     public string Path { get; set; } = "";
 
+    /// <summary>
+    /// 关联的解释器实例
+    /// </summary>
     [NotNull] public LangInterpreter? Interpreter { get; set; }
 
     #endregion
 
     #region Variate
 
-    // 作用域栈，每个作用域是一个 Dictionary
-    // Scopes[0] 是全局作用域，Scopes[^1] 是当前作用域
+    /// <summary>
+    /// 作用域栈，每个作用域是一个字典
+    /// </summary>
+    /// <remarks>
+    /// Scopes[0] 是全局作用域，Scopes[^1] 是当前作用域
+    /// 作用域栈用于实现变量的作用域规则和变量查找
+    /// </remarks>
     private List<Dictionary<string, LangValueType>> Scopes { get; } = [new()];
 
+    /// <summary>
+    /// 导入信息列表，包含导入的函数、类和原生类型
+    /// </summary>
     public List<ImportInfo> ImportInfos { get; } = [];
 
     #endregion
 
     #region Return
 
+    /// <summary>
+    /// 是否处于返回状态
+    /// </summary>
     public bool IsReturn { get; set; }
+    
+    /// <summary>
+    /// 返回结果值
+    /// </summary>
     public LangValueType Result { get; set; } = new VoidLangValue();
 
     #endregion
 
     #region Block
 
+    /// <summary>
+    /// 当前是否处于函数内部
+    /// </summary>
     public bool IsFunc { get; set; }
+    
+    /// <summary>
+    /// 当前是否处于类内部
+    /// </summary>
     public bool IsClass { get; set; }
 
-    // 递归深度限制
+    /// <summary>
+    /// 最大递归深度限制，防止栈溢出
+    /// </summary>
     private const int MaxRecursionDepth = 1000;
 
+    /// <summary>
+    /// 当前递归深度
+    /// </summary>
+    /// <exception cref="RecursionError">当递归深度超过最大值时抛出</exception>
     public int RecursionDepth
     {
         get;
@@ -61,6 +110,17 @@ public class VariateManager
 
     #endregion
 
+    /// <summary>
+    /// 设置变量值
+    /// </summary>
+    /// <param name="id">变量标识符</param>
+    /// <param name="langValueType">变量值</param>
+    /// <remarks>
+    /// 变量查找规则：
+    /// 1. 如果在函数内部，直接在当前作用域创建新变量
+    /// 2. 否则，从当前作用域向上查找，找到则更新值
+    /// 3. 未找到则在当前作用域创建新变量
+    /// </remarks>
     public void Set(LangId id, LangValueType langValueType)
     {
         // 检查是否是函数调用中的参数设置
@@ -83,12 +143,21 @@ public class VariateManager
         Scopes[^1][id.IdName] = langValueType;
     }
 
+    /// <summary>
+    /// 添加新的子作用域（进入块语句）
+    /// </summary>
     public void AddChildren()
     {
         // 创建新的作用域
         Scopes.Add(new Dictionary<string, LangValueType>());
     }
 
+    /// <summary>
+    /// 移除当前作用域（退出块语句）
+    /// </summary>
+    /// <remarks>
+    /// 全局作用域（Scopes[0]）不能被移除
+    /// </remarks>
     public void RemoveChildren()
     {
         // 移除当前作用域
@@ -98,6 +167,16 @@ public class VariateManager
         }
     }
 
+    /// <summary>
+    /// 获取变量值
+    /// </summary>
+    /// <param name="id">变量标识符</param>
+    /// <returns>变量值，如果未找到则返回null</returns>
+    /// <remarks>
+    /// 变量查找规则：
+    /// 1. 从当前作用域（栈顶）向全局作用域（栈底）查找
+    /// 2. 如果未找到，尝试从导入信息中查找
+    /// </remarks>
     public LangValueType? GetValue(LangId id)
     {
         // 从当前作用域（栈顶）向全局作用域（栈底）查找
@@ -116,7 +195,7 @@ public class VariateManager
     /// <summary>
     /// 根据函数名和参数数量查找函数
     /// </summary>
-    /// <param name="id">函数名</param>
+    /// <param name="id">函数标识符</param>
     /// <param name="paramCount">参数数量</param>
     /// <returns>找到的函数或null</returns>
     public FuncLangValue? GetFunc(LangId id, int paramCount)
@@ -127,6 +206,11 @@ public class VariateManager
             func.Ids?.Count == paramCount) as FuncLangValue;
     }
 
+    /// <summary>
+    /// 从导入信息中查找任意类型的导入项
+    /// </summary>
+    /// <param name="id">要查找的标识符</param>
+    /// <returns>找到的导入项或null</returns>
     public ImportInfo? GetAny(LangId id)
     {
         return ImportInfos.FirstOrDefault(x =>
@@ -142,11 +226,21 @@ public class VariateManager
         });
     }
 
+    /// <summary>
+    /// 添加类或函数到导入信息列表
+    /// </summary>
+    /// <param name="langValue">要添加的导入信息</param>
     public void AddClassAndFunc(ImportInfo langValue)
     {
         ImportInfos.Add(langValue);
     }
 
+    /// <summary>
+    /// 在当前作用域添加变量
+    /// </summary>
+    /// <param name="name">变量名</param>
+    /// <param name="langValueType">变量值</param>
+    /// <exception cref="DuplicateNameError">当变量名已存在时抛出</exception>
     private void AddVariate(string name, LangValueType langValueType)
     {
         // 检查当前作用域中是否已存在同名变量
@@ -160,12 +254,19 @@ public class VariateManager
         Scopes[^1][name] = langValueType;
     }
 
+    /// <summary>
+    /// 清除返回状态和结果
+    /// </summary>
     public void ClearReturn()
     {
         IsReturn = false;
         Result = new VoidLangValue();
     }
 
+    /// <summary>
+    /// 初始化变量管理器，添加多个变量
+    /// </summary>
+    /// <param name="result">要添加的变量字典</param>
     public void Init(Dictionary<string, LangValueType> result)
     {
         // 初始化方法实现
@@ -177,6 +278,10 @@ public class VariateManager
         }
     }
 
+    /// <summary>
+    /// 克隆变量管理器实例
+    /// </summary>
+    /// <returns>克隆后的变量管理器实例</returns>
     public VariateManager Clone()
     {
         // 克隆方法实现
@@ -210,6 +315,10 @@ public class VariateManager
         return newManager;
     }
 
+    /// <summary>
+    /// 创建新的变量管理器实例（与Clone方法类似）
+    /// </summary>
+    /// <returns>新的变量管理器实例</returns>
     public VariateManager NewManger()
     {
         var newManager = new VariateManager
@@ -247,6 +356,9 @@ public class VariateManager
     /// </summary>
     /// <param name="limit">限制返回的变量数量</param>
     /// <returns>变量信息字典，键为变量名，值为变量值的字符串表示</returns>
+    /// <remarks>
+    /// 该方法用于调试和错误报告，从当前作用域向上遍历，收集变量信息
+    /// </remarks>
     public Dictionary<string, string> GetVariableStates(int limit = 20)
     {
         var variableStates = new Dictionary<string, string>();
