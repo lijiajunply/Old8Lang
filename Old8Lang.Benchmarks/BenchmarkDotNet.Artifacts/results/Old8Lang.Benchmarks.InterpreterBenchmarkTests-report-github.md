@@ -8,14 +8,14 @@ Apple M4, 1 CPU, 10 logical and 10 physical cores
 
 
 ```
-| Method                         | Mean         | Error     | StdDev    |
-|------------------------------- |-------------:|----------:|----------:|
-| &#39;Loop Intensive Code&#39;          |     58.73 μs |  0.266 μs |  0.222 μs |
-| &#39;Function Call Intensive Code&#39; |    738.42 μs |  2.570 μs |  2.146 μs |
-| &#39;Mixed Intensive Code&#39;         | 13,545.34 μs | 61.217 μs | 51.119 μs |
-| &#39;Multiple Executions&#39;          |    584.67 μs |  2.483 μs |  2.201 μs |
-| &#39;Deep Recursion&#39;               |           NA |        NA |        NA |
-| &#39;While Loop Performance&#39;       |  1,214.68 μs |  3.615 μs |  3.381 μs |
+| Method                         | Mean         | Error     | StdDev    | Median       |
+|------------------------------- |-------------:|----------:|----------:|-------------:|
+| &#39;Loop Intensive Code&#39;          |     59.42 μs |  1.103 μs |  0.861 μs |     59.15 μs |
+| &#39;Function Call Intensive Code&#39; |    783.25 μs | 16.560 μs | 45.888 μs |    768.12 μs |
+| &#39;Mixed Intensive Code&#39;         | 13,768.17 μs | 63.173 μs | 52.753 μs | 13,750.17 μs |
+| &#39;Multiple Executions&#39;          |    592.02 μs |  3.858 μs |  3.420 μs |    591.64 μs |
+| &#39;Deep Recursion&#39;               |           NA |        NA |        NA |           NA |
+| &#39;While Loop Performance&#39;       |  1,178.87 μs |  2.601 μs |  2.306 μs |  1,178.19 μs |
 
 Benchmarks with issues:
   InterpreterBenchmarkTests.'Deep Recursion': DefaultJob

@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.Tests", "Old8Lang.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.NetLib", "Old8Lang.NetLib\Old8Lang.NetLib.csproj", "{B5AFABDB-F2C5-4A10-9DAF-A108D4DD14CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.Benchmarks", "Old8Lang.Benchmarks\Old8Lang.Benchmarks.csproj", "{4777BA14-A8AA-42FD-81F0-59321B1EB580}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +82,18 @@ Global
 		{B5AFABDB-F2C5-4A10-9DAF-A108D4DD14CF}.Release|x64.Build.0 = Release|Any CPU
 		{B5AFABDB-F2C5-4A10-9DAF-A108D4DD14CF}.Release|x86.ActiveCfg = Release|Any CPU
 		{B5AFABDB-F2C5-4A10-9DAF-A108D4DD14CF}.Release|x86.Build.0 = Release|Any CPU
+		{4777BA14-A8AA-42FD-81F0-59321B1EB580}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4777BA14-A8AA-42FD-81F0-59321B1EB580}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4777BA14-A8AA-42FD-81F0-59321B1EB580}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4777BA14-A8AA-42FD-81F0-59321B1EB580}.Debug|x64.Build.0 = Debug|Any CPU
+		{4777BA14-A8AA-42FD-81F0-59321B1EB580}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4777BA14-A8AA-42FD-81F0-59321B1EB580}.Debug|x86.Build.0 = Debug|Any CPU
+		{4777BA14-A8AA-42FD-81F0-59321B1EB580}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4777BA14-A8AA-42FD-81F0-59321B1EB580}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4777BA14-A8AA-42FD-81F0-59321B1EB580}.Release|x64.ActiveCfg = Release|Any CPU
+		{4777BA14-A8AA-42FD-81F0-59321B1EB580}.Release|x64.Build.0 = Release|Any CPU
+		{4777BA14-A8AA-42FD-81F0-59321B1EB580}.Release|x86.ActiveCfg = Release|Any CPU
+		{4777BA14-A8AA-42FD-81F0-59321B1EB580}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

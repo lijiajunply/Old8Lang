@@ -8,6 +8,7 @@
     <projectFile profileName="https">Lang.Demo/src/Lang.Demo/Lang.Demo.csproj</projectFile>
     <projectFile>LibTest/LibTest.csproj</projectFile>
     <projectFile>Old8Lang.App/Old8Lang.App.csproj</projectFile>
+    <projectFile>Old8Lang.Benchmarks/Old8Lang.Benchmarks.csproj</projectFile>
     <projectFile profileName="Old8Lang.Net">Old8Lang.Net/Old8Lang.Net.csproj</projectFile>
     <projectFile>OldLang.App/OldLang.App.csproj</projectFile>
     <projectFile>OldStudio/OldStudio.csproj</projectFile>
@@ -17,34 +18,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/plan_20251214_092040.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.CompilerBenchmarkTests-20251214-173945.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.CompilerBenchmarkTests-20251214-174004.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.CompilerBenchmarkTests-20251214-174037.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.CompilerBenchmarkTests-20251214-174217.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.InterpreterBenchmarkTests-20251214-173946.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.InterpreterBenchmarkTests-20251214-174005.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.InterpreterBenchmarkTests-20251214-174048.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.InterpreterBenchmarkTests-20251214-174228.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.CompilerBenchmarkTests-report-github.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.CompilerBenchmarkTests-report.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.CompilerBenchmarkTests-report.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.InterpreterBenchmarkTests-report-github.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.InterpreterBenchmarkTests-report.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.InterpreterBenchmarkTests-report.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Old8Lang.Benchmarks.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Program.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/ControlFlowManager.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/20251214-控制流状态管理分析报告.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BreakStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BreakStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ContinueStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ContinueStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/VectorLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/VectorLib.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/VectorLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/VectorLibTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,6 +57,8 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/.claude/settings.local.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
@@ -94,6 +75,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/378b2b72dcfd47c7a335f353306873123e00/5d/0b33afd1/02000002pdb1.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1f/4c54500e/List`1.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/35/58ca714a/RuntimeType.cs" root0="FORCE_HIGHLIGHTING" />
@@ -121,41 +103,42 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Run&quot;,
-    &quot;07d79105-db56-470d-b872-543f396b1133.executor&quot;: &quot;Debug&quot;,
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;e9de5ea7-95aa-45c5-91d2-c46acccab710.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
+    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
+    ".NET 项目.LibTest.executor": "Run",
+    ".NET 项目.Old8Lang.App.executor": "Run",
+    ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
+    "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;PLAIN_TEXT&quot;,
-      &quot;Markdown&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "PLAIN_TEXT",
+      "Markdown"
     ]
   }
-}</component>
+}]]></component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
-  <component name="RunManager" selected=".NET 项目.Old8Lang.App">
+  <component name="RunManager" selected=".NET 项目.Old8Lang.Benchmarks">
     <configuration name="LibTest" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="$PROJECT_DIR$/LibTest/bin/Debug/net10.0/LibTest" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -198,7 +181,29 @@
         <option name="Build" />
       </method>
     </configuration>
+    <configuration name="Old8Lang.Benchmarks" type="DotNetProject" factoryName=".NET Project">
+      <option name="EXE_PATH" value="" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="ENV_FILE_PATHS" value="" />
+      <option name="REDIRECT_INPUT_PATH" value="" />
+      <option name="MIXED_MODE_DEBUG" value="0" />
+      <option name="USE_MONO" value="0" />
+      <option name="RUNTIME_ARGUMENTS" value="" />
+      <option name="AUTO_ATTACH_CHILDREN" value="0" />
+      <option name="PROJECT_PATH" value="$PROJECT_DIR$/Old8Lang.Benchmarks/Old8Lang.Benchmarks.csproj" />
+      <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
+      <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
+      <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
+      <option name="PROJECT_KIND" value="DotNetCore" />
+      <option name="PROJECT_TFM" value="" />
+      <method v="2">
+        <option name="Build" />
+      </method>
+    </configuration>
     <list>
+      <item itemvalue=".NET 项目.Old8Lang.Benchmarks" />
       <item itemvalue=".NET 项目.LibTest" />
       <item itemvalue=".NET 项目.Old8Lang.App" />
     </list>
@@ -379,7 +384,7 @@
       <workItem from="1765514280184" duration="23569000" />
       <workItem from="1765551227084" duration="9861000" />
       <workItem from="1765700935456" duration="239000" />
-      <workItem from="1765703120567" duration="2421000" />
+      <workItem from="1765703120567" duration="2914000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -724,7 +729,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="181" />
+    <option name="localTasksCounter" value="182" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -751,7 +756,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 扩展字符串和列表类型的功能支持&#10;&#10;- 为字符串类型添加哈希码计算和相等比较方法&#10;- 实现字符串常用操作方法：子串截取、查找、替换、分割、大小写转换、包含判断和去空白&#10;- 为列表类型添加过滤、映射、归约、反转、包含判断和索引查找方法&#10;- 支持在列表操作中使用函数式编程范式处理元素&#10;- 增强类型系统对扩展方法的支持能力" />
     <MESSAGE value="refactor(lib): 优化代码结构并提升可读性&#10;&#10;- 移除了冗余的异常构造函数定义&#10;- 使用元组交换语法简化 Swap 方法实现&#10;- 添加 CultureInfo.InvariantCulture 以确保时间格式一致性&#10;- 更新方法参数为可空引用类型以提高类型安全性&#10;- 优化变量声明方式，使用 var 关键字提高代码简洁性&#10;- 调整数组初始化语法，增强代码可读性&#10;- 统一代码缩进和空行规范，改善整体代码风格" />
     <MESSAGE value="test(parser): 更新表达式解析器测试用例&#10;&#10;- 将多个测试用例中的 Operation 断言更新为 TernaryExpression&#10;- 确保三元表达式在复杂表达式解析中的正确性&#10;- 修复测试用例与实际解析结果类型不匹配的问题" />
     <MESSAGE value="fix(parser): 更新OS库函数名和三元表达式语法&#10;&#10;- 将OSInfo()函数调用统一改为小写的OsInfo()&#10;- 修改字符串模板中的三元表达式语法格式&#10;- 更新相关测试文件以匹配新的函数命名规范&#10;- 调整程序入口测试路径指向正确的测试文件&#10;- 添加新的字符串测试用例验证三元表达式功能" />
@@ -776,7 +780,8 @@
     <MESSAGE value="docs(core): 完善核心模块的XML文档注释&#10;&#10;- 为 Apis.cs 中的公共 API 方法添加详细的 XML 注释&#10;- 补充 Old8Lang.App/BasicInfo.cs 中命令行帮助信息的说明&#10;- 增强 Old8Lang/AST/Statement/ClassInit.cs 类定义语句的文档&#10;- 完善 Old8LangLib/ColorfulTerminal.cs 彩色终端模块的注释&#10;- 加强 Old8Lang/Compiler/Compiler.cs 编译器核心类的文档说明&#10;- 丰富 Old8LangLib/FileLib.cs 文件操作库的函数注释&#10;- 补充 Old8Lang/AST/Statement/FuncInit.cs 函数初始化类的说明&#10;- 完善 Old8Lang/AST/Expression/FuncStatic.cs 扩展方法类的注释&#10;- 统一调整各模块中的参数、返回值和异常说明&#10;- 规范化所有新增注释的格式和内容描述" />
     <MESSAGE value="docs(ast): 为ILangList接口添加注释&#10;&#10;- 添加了接口的中文注释说明&#10;- 明确了接口的用途和功能&#10;- 提高了代码的可读性和维护性" />
     <MESSAGE value="perf(interpreter): 实现对象池化优化解释器性能&#10;&#10;- 为BoolLangValue、IntLangValue、DoubleLangValue、StringLangValue、CharLangValue等值类型实现对象池化&#10;- 添加ObjectPool和ObjectPoolManager管理对象池&#10;- 修改值对象构造函数支持默认参数和池化接口&#10;- 优化循环执行机制，使用标志位替代异常处理break和continue&#10;- 更新类型转换和运算方法使用对象池创建实例&#10;- 优化ForStatement中布尔表达式处理后归还临时对象&#10;- 移除BreakException和ContinueException异常类&#10;- 更新编译器测试中冗余的命名空间引用&#10;- 添加解释器性能基准测试用例&#10;- 编写性能优化计划文档说明优化目标和实施方案" />
-    <option name="LAST_COMMIT_MESSAGE" value="perf(interpreter): 实现对象池化优化解释器性能&#10;&#10;- 为BoolLangValue、IntLangValue、DoubleLangValue、StringLangValue、CharLangValue等值类型实现对象池化&#10;- 添加ObjectPool和ObjectPoolManager管理对象池&#10;- 修改值对象构造函数支持默认参数和池化接口&#10;- 优化循环执行机制，使用标志位替代异常处理break和continue&#10;- 更新类型转换和运算方法使用对象池创建实例&#10;- 优化ForStatement中布尔表达式处理后归还临时对象&#10;- 移除BreakException和ContinueException异常类&#10;- 更新编译器测试中冗余的命名空间引用&#10;- 添加解释器性能基准测试用例&#10;- 编写性能优化计划文档说明优化目标和实施方案" />
+    <MESSAGE value="refactor(control-flow): 重构控制流状态管理机制&#10;&#10;- 引入 ControlFlowManager 类统一管理 break 和 continue 状态&#10;- 所有循环语句在开始时压入状态，结束时弹出状态&#10;- 每次迭代前重置当前状态，确保控制流标志正确&#10;- 更新 BreakStatement 和 ContinueStatement 使用新的状态管理器&#10;- 删除旧的 VariateManager 中的 BreakFlag 和 ContinueFlag 属性&#10;- 添加详细测试验证控制流状态生命周期管理正确性&#10;- 编写分析报告确认循环结束时无需手动重置状态" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(control-flow): 重构控制流状态管理机制&#10;&#10;- 引入 ControlFlowManager 类统一管理 break 和 continue 状态&#10;- 所有循环语句在开始时压入状态，结束时弹出状态&#10;- 每次迭代前重置当前状态，确保控制流标志正确&#10;- 更新 BreakStatement 和 ContinueStatement 使用新的状态管理器&#10;- 删除旧的 VariateManager 中的 BreakFlag 和 ContinueFlag 属性&#10;- 添加详细测试验证控制流状态生命周期管理正确性&#10;- 编写分析报告确认循环结束时无需手动重置状态" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
