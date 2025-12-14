@@ -17,17 +17,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/CompilerTests/40_uninitialized_fields.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/40_simple_uninitialized.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/40_uninitialized_fields.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/41_uninitialized_fields_outside_class.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/42_private_static_fields.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/plan_20251214_053803.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/完善FileLib支持更多文件格式.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/53_filelib_enhanced.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/FileLibTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeTemplate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeTemplate.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/Csv.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Csv.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/FileLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/FileLib.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/JsonLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/JsonLib.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,6 +97,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TypeTemplate.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
@@ -146,6 +146,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/FileLib.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/Time.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
@@ -161,7 +162,7 @@
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
+    <option name="selectedTabId" value="Toolset" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -776,7 +777,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="177" />
+    <option name="localTasksCounter" value="178" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -803,7 +804,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(CollectionLib): 优化集合操作方法并增强类型安全&#10;&#10;- 移除不必要的空行以提升代码整洁度&#10;- 为DictMerge、DictFilter等字典操作方法添加notnull约束&#10;- 使用集合表达式语法初始化HashSet提升可读性&#10;- 统一代码风格，增强参数验证逻辑一致性" />
     <MESSAGE value="feat(lang): 实现原生库批量导入功能&#10;&#10;- 新增 DLL 路径解析器 DllPathResolver，支持多策略查找原生库&#10;- 支持批量导入语法：[import &quot;DllName&quot; ClassName *]&#10;- 支持选择性导入语法：[import &quot;DllName&quot; ClassName { Method1, Method2 }]&#10;- 更新语法解析器以识别新的导入语句格式&#10;- 优化 NativeStatement 类以处理多种导入方式&#10;- 完善错误提示，提供详细的 DLL 查找失败信息&#10;- 更新标准库文件使用新的批量导入语法&#10;- 扩展语法文档，增加批量导入和选择性导入说明&#10;- 添加相关测试用例验证新功能正确性" />
     <MESSAGE value="refactor(net): 简化网络库导入定义并优化字段访问逻辑&#10;&#10;- 简化 Net.old8 文件中的类导入定义，统一使用类名导入替代方法级别导入&#10;- 移除冗余的属性和方法导入声明，减少配置复杂度&#10;- 优化 NativeStaticAny 类中的字段访问逻辑，提高代码可读性&#10;- 调整条件表达式结构，使字段获取流程更加清晰&#10;- 更新工作区变更记录，反映最新的文件修改状态" />
     <MESSAGE value="feat(parser): 支持成员方法调用语句解析&#10;&#10;- 新增对 obj.method() 形式的方法调用语句支持&#10;- 更新 StatementParser 以识别成员方法调用并生成 FuncRunStatement&#10;- 添加 ExpressionStatementTests 测试用例验证成员方法调用解析&#10;- 调整 ParseSet 方法中的表达式解析逻辑，保持缩进一致性&#10;- 修复工作区变更记录，准确反映文件修改状态" />
@@ -828,7 +828,8 @@
     <MESSAGE value="refactor(parser): 将 import 关键字替换为 native&#10;&#10;- 更新语法关键字从 import 到 native&#10;- 修改类导入语句格式为 native &quot;DllName&quot; ClassName&#10;- 支持带别名的类导入语法 native &quot;DllName&quot; ClassName as Alias&#10;- 更新批量导入语法为 native &quot;DllName&quot; ClassName *&#10;- 更新选择性导入语法为 native &quot;DllName&quot; ClassName { Method1, Method2 }&#10;- 调整测试文件中的导入语句格式&#10;- 更新代码注释中的语法示例说明" />
     <MESSAGE value="feat(parser): 实现新的 import 语法支持&#10;&#10;- 新增 ImportItem 类用于表示导入项及其别名&#10;- 修改 ImportStatement 类以支持命名导入、默认导入和 from 子句&#10;- 更新语法规则，添加 from 和 as 关键字支持&#10;- 实现解析器对新 import 语法的完整支持&#10;- 支持传统 import 语法以保持向后兼容&#10;- 添加测试用例验证各种 import 语法场景&#10;- 更新语法文档和 EBNF 定义&#10;- 优化模块导入逻辑，区分不同导入方式的处理流程" />
     <MESSAGE value="feat(parser): 移除 import ... as ... 语法支持&#10;&#10;- 移除 ImportStatement 类中的 defaultImport 参数和相关逻辑&#10;- 修改 StatementParser 中的 ParseImportStatement 方法，不再处理 import module as alias 语法&#10;- 更新 Old8Lang.ebnf 文件，调整 importSpecifier 语法规则&#10;- 删除或更新使用 import ... as ... 语法的测试用例&#10;- 更新 Old8Lang_Grammar.md 文档，移除相关语法说明&#10;- 确保保留命名导入和重命名导入的支持&#10;- 确保传统 import 语法仍可正常使用" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 移除 import ... as ... 语法支持&#10;&#10;- 移除 ImportStatement 类中的 defaultImport 参数和相关逻辑&#10;- 修改 StatementParser 中的 ParseImportStatement 方法，不再处理 import module as alias 语法&#10;- 更新 Old8Lang.ebnf 文件，调整 importSpecifier 语法规则&#10;- 删除或更新使用 import ... as ... 语法的测试用例&#10;- 更新 Old8Lang_Grammar.md 文档，移除相关语法说明&#10;- 确保保留命名导入和重命名导入的支持&#10;- 确保传统 import 语法仍可正常使用" />
+    <MESSAGE value="feat(parser): 支持未初始化字段声明和访问修饰符&#10;&#10;- 实现未初始化字段语法解析，自动赋予null默认值&#10;- 添加private、static等访问修饰符的支持和检查&#10;- 完善字段访问权限控制，防止外部访问私有成员&#10;- 优化类成员查找逻辑，支持继承和静态成员访问&#10;- 增强错误处理，禁止类外部使用未初始化字段语法&#10;- 更新字段定义机制，正确设置字段的访问属性&#10;- 改进导入语句解析，提高代码格式一致性" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 支持未初始化字段声明和访问修饰符&#10;&#10;- 实现未初始化字段语法解析，自动赋予null默认值&#10;- 添加private、static等访问修饰符的支持和检查&#10;- 完善字段访问权限控制，防止外部访问私有成员&#10;- 优化类成员查找逻辑，支持继承和静态成员访问&#10;- 增强错误处理，禁止类外部使用未初始化字段语法&#10;- 更新字段定义机制，正确设置字段的访问属性&#10;- 改进导入语句解析，提高代码格式一致性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -963,26 +964,26 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs</url>
-          <line>74</line>
+          <line>73</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" containingFunctionPresentation="方法 'InExpression_Dictionary_ShouldReturnTrueWhenKeyExists'">
             <startOffsets>
-              <option value="2100" />
+              <option value="2063" />
             </startOffsets>
             <endOffsets>
-              <option value="2133" />
+              <option value="2096" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="562" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs</url>
-          <line>75</line>
+          <line>74</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" containingFunctionPresentation="方法 'InExpression_Dictionary_ShouldReturnTrueWhenKeyExists'">
             <startOffsets>
-              <option value="2142" />
+              <option value="2105" />
             </startOffsets>
             <endOffsets>
-              <option value="2176" />
+              <option value="2139" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="563" />
@@ -1002,26 +1003,26 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs</url>
-          <line>32</line>
+          <line>31</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" containingFunctionPresentation="方法 'InExpression_Array_ShouldReturnTrueWhenExists'">
             <startOffsets>
-              <option value="862" />
+              <option value="825" />
             </startOffsets>
             <endOffsets>
-              <option value="877" />
+              <option value="840" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="565" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs</url>
-          <line>164</line>
+          <line>163</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" containingFunctionPresentation="方法 'CompileMode_InExpression_ShouldWork'">
             <startOffsets>
-              <option value="4473" />
+              <option value="4436" />
             </startOffsets>
             <endOffsets>
-              <option value="4545" />
+              <option value="4508" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="570" />

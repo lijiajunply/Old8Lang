@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json;
 
 namespace Old8LangLib;
 
@@ -14,8 +15,10 @@ public static class Csv
     /// <param name="hasHeader">是否包含表头</param>
     /// <param name="delimiter">分隔符，默认为逗号</param>
     /// <param name="quoteChar">引号字符，默认为双引号</param>
+    /// <param name="encoding">文件编码，默认为UTF-8</param>
     /// <returns>二维字符串数组</returns>
-    public static string[][] ReadCsv(string filePath, bool hasHeader = true, char delimiter = ',', char quoteChar = '"')
+    public static string[][] ReadCsv(string filePath, bool hasHeader = true, char delimiter = ',', char quoteChar = '"',
+        Encoding? encoding = null)
     {
         if (!File.Exists(filePath))
         {
@@ -24,7 +27,7 @@ public static class Csv
 
         try
         {
-            var lines = File.ReadAllLines(filePath);
+            var lines = File.ReadAllLines(filePath, encoding ?? Encoding.UTF8);
             if (lines.Length == 0)
             {
                 return Array.Empty<string[]>();
@@ -59,9 +62,10 @@ public static class Csv
     /// <param name="filePath">CSV文件路径</param>
     /// <param name="delimiter">分隔符，默认为逗号</param>
     /// <param name="quoteChar">引号字符，默认为双引号</param>
+    /// <param name="encoding">文件编码，默认为UTF-8</param>
     /// <returns>字典列表</returns>
     public static List<Dictionary<string, string>> ReadCsvAsDictionary(string filePath, char delimiter = ',',
-        char quoteChar = '"')
+        char quoteChar = '"', Encoding? encoding = null)
     {
         if (!File.Exists(filePath))
         {
@@ -70,7 +74,7 @@ public static class Csv
 
         try
         {
-            var lines = File.ReadAllLines(filePath);
+            var lines = File.ReadAllLines(filePath, encoding ?? Encoding.UTF8);
             if (lines.Length < 2)
             {
                 return new List<Dictionary<string, string>>();
@@ -115,8 +119,9 @@ public static class Csv
     /// <param name="headers">表头数组，可选</param>
     /// <param name="delimiter">分隔符，默认为逗号</param>
     /// <param name="quoteChar">引号字符，默认为双引号</param>
+    /// <param name="encoding">文件编码，默认为UTF-8</param>
     public static void WriteCsv(string filePath, string[][] data, string[]? headers = null, char delimiter = ',',
-        char quoteChar = '"')
+        char quoteChar = '"', Encoding? encoding = null)
     {
         if (data == null)
         {
@@ -125,7 +130,7 @@ public static class Csv
 
         try
         {
-            using var writer = new StreamWriter(filePath);
+            using var writer = new StreamWriter(filePath, false, encoding ?? Encoding.UTF8);
 
             // 写入表头
             if (headers is { Length: > 0 })
@@ -152,8 +157,9 @@ public static class Csv
     /// <param name="data">字典列表</param>
     /// <param name="delimiter">分隔符，默认为逗号</param>
     /// <param name="quoteChar">引号字符，默认为双引号</param>
+    /// <param name="encoding">文件编码，默认为UTF-8</param>
     public static void WriteCsvFromDictionary(string filePath, List<Dictionary<string, string>> data,
-        char delimiter = ',', char quoteChar = '"')
+        char delimiter = ',', char quoteChar = '"', Encoding? encoding = null)
     {
         if (data == null)
         {
@@ -164,7 +170,7 @@ public static class Csv
         {
             if (data.Count == 0)
             {
-                File.WriteAllText(filePath, string.Empty);
+                File.WriteAllText(filePath, string.Empty, encoding ?? Encoding.UTF8);
                 return;
             }
 
@@ -180,7 +186,7 @@ public static class Csv
 
             var headerArray = headers.ToArray();
 
-            using var writer = new StreamWriter(filePath);
+            using var writer = new StreamWriter(filePath, false, encoding ?? Encoding.UTF8);
             writer.WriteLine(FormatCsvLine(headerArray, delimiter, quoteChar));
 
             foreach (var row in data)
@@ -326,6 +332,205 @@ public static class Csv
 
         return result.ToArray();
     }
+
+    /// <summary>
+    /// 将CSV转换为JSON
+    /// </summary>
+    /// <param name="csvContent">CSV字符串</param>
+    /// <param name="hasHeader">是否包含表头</param>
+    /// <param name="delimiter">分隔符</param>
+    /// <param name="quoteChar">引号字符</param>
+    /// <returns>JSON字符串</returns>
+    public static string ConvertCsvToJson(string csvContent, bool hasHeader = true, char delimiter = ',',
+        char quoteChar = '"')
+    {
+        if (string.IsNullOrEmpty(csvContent))
+        {
+            throw new ArgumentNullException(nameof(csvContent), "CSV内容不能为空");
+        }
+
+        try
+        {
+            var lines = csvContent.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+            if (lines.Length == 0)
+            {
+                return "[]";
+            }
+
+            var headers = hasHeader ? ParseCsvLine(lines[0], delimiter, quoteChar) : null;
+            var startIndex = hasHeader ? 1 : 0;
+            var result = new List<Dictionary<string, string>>();
+
+            for (int i = startIndex; i < lines.Length; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(lines[i]))
+                {
+                    var values = ParseCsvLine(lines[i], delimiter, quoteChar);
+                    var row = new Dictionary<string, string>();
+
+                    for (int j = 0; j < values.Length; j++)
+                    {
+                        var key = headers != null && j < headers.Length ? headers[j] : j.ToString();
+                        row[key] = values[j];
+                    }
+
+                    result.Add(row);
+                }
+            }
+
+            return JsonLib.Serialize(result);
+        }
+        catch (Exception ex)
+        {
+            throw new CsvException($"CSV转换为JSON失败: {ex.Message}", ex);
+        }
+    }
+
+    /// <summary>
+    /// 将JSON转换为CSV
+    /// </summary>
+    /// <param name="jsonContent">JSON字符串</param>
+    /// <param name="delimiter">分隔符</param>
+    /// <param name="quoteChar">引号字符</param>
+    /// <returns>CSV字符串</returns>
+    public static string ConvertJsonToCsv(string jsonContent, char delimiter = ',', char quoteChar = '"')
+    {
+        if (string.IsNullOrEmpty(jsonContent))
+        {
+            throw new ArgumentNullException(nameof(jsonContent), "JSON内容不能为空");
+        }
+
+        try
+        {
+            var jsonDoc = JsonDocument.Parse(jsonContent);
+            var root = jsonDoc.RootElement;
+
+            if (root.ValueKind != JsonValueKind.Array)
+            {
+                throw new CsvException("JSON必须是数组格式");
+            }
+
+            var rows = root.EnumerateArray().ToList();
+            if (rows.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            // 获取所有唯一的键作为表头
+            var headers = new HashSet<string>();
+            foreach (var row in rows)
+            {
+                if (row.ValueKind == JsonValueKind.Object)
+                {
+                    foreach (var property in row.EnumerateObject())
+                    {
+                        headers.Add(property.Name);
+                    }
+                }
+            }
+
+            var headerArray = headers.ToArray();
+            var csvLines = new List<string>();
+            csvLines.Add(FormatCsvLine(headerArray, delimiter, quoteChar));
+
+            // 生成数据行
+            foreach (var row in rows)
+            {
+                if (row.ValueKind == JsonValueKind.Object)
+                {
+                    var values = new string[headerArray.Length];
+                    for (int i = 0; i < headerArray.Length; i++)
+                    {
+                        if (row.TryGetProperty(headerArray[i], out var propertyValue))
+                        {
+                            values[i] = propertyValue.GetString() ?? propertyValue.ToString();
+                        }
+                        else
+                        {
+                            values[i] = string.Empty;
+                        }
+                    }
+
+                    csvLines.Add(FormatCsvLine(values, delimiter, quoteChar));
+                }
+            }
+
+            return string.Join(Environment.NewLine, csvLines);
+        }
+        catch (JsonException ex)
+        {
+            throw new CsvException($"JSON格式错误: {ex.Message}", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new CsvException($"JSON转换为CSV失败: {ex.Message}", ex);
+        }
+    }
+
+    /// <summary>
+    /// 将CSV文件转换为JSON文件
+    /// </summary>
+    /// <param name="csvFilePath">CSV文件路径</param>
+    /// <param name="jsonFilePath">JSON文件路径</param>
+    /// <param name="hasHeader">是否包含表头</param>
+    /// <param name="delimiter">分隔符</param>
+    /// <param name="quoteChar">引号字符</param>
+    /// <param name="encoding">文件编码，默认为UTF-8</param>
+    public static void ConvertCsvToJsonFile(string csvFilePath, string jsonFilePath, bool hasHeader = true,
+        char delimiter = ',', char quoteChar = '"', Encoding? encoding = null)
+    {
+        if (!File.Exists(csvFilePath))
+        {
+            throw new FileNotFoundException($"CSV文件不存在: '{csvFilePath}'", csvFilePath);
+        }
+
+        try
+        {
+            var csvContent = File.ReadAllText(csvFilePath, encoding ?? Encoding.UTF8);
+            var jsonContent = ConvertCsvToJson(csvContent, hasHeader, delimiter, quoteChar);
+            File.WriteAllText(jsonFilePath, jsonContent, encoding ?? Encoding.UTF8);
+        }
+        catch (FileNotFoundException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new CsvException($"CSV文件转换为JSON文件失败: {ex.Message}", ex);
+        }
+    }
+
+    /// <summary>
+    /// 将JSON文件转换为CSV文件
+    /// </summary>
+    /// <param name="jsonFilePath">JSON文件路径</param>
+    /// <param name="csvFilePath">CSV文件路径</param>
+    /// <param name="delimiter">分隔符</param>
+    /// <param name="quoteChar">引号字符</param>
+    /// <param name="encoding">文件编码，默认为UTF-8</param>
+    public static void ConvertJsonToCsvFile(string jsonFilePath, string csvFilePath, char delimiter = ',',
+        char quoteChar = '"', Encoding? encoding = null)
+    {
+        if (!File.Exists(jsonFilePath))
+        {
+            throw new FileNotFoundException($"JSON文件不存在: '{jsonFilePath}'", jsonFilePath);
+        }
+
+        try
+        {
+            var jsonContent = File.ReadAllText(jsonFilePath, encoding ?? Encoding.UTF8);
+            var csvContent = ConvertJsonToCsv(jsonContent, delimiter, quoteChar);
+            File.WriteAllText(csvFilePath, csvContent, encoding ?? Encoding.UTF8);
+        }
+        catch (FileNotFoundException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new CsvException($"JSON文件转换为CSV文件失败: {ex.Message}", ex);
+        }
+    }
 }
 
 /// <summary>
@@ -337,6 +542,13 @@ public class CsvException : Exception
     /// 构造函数
     /// </summary>
     public CsvException(string message, Exception innerException) : base(message, innerException)
+    {
+    }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    public CsvException(string message) : base(message)
     {
     }
 }

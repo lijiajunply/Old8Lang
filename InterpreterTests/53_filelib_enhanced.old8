@@ -1,0 +1,107 @@
+// 测试增强版FileLib功能
+// 测试基本文件操作、CSV、XML和YAML支持
+
+import File
+
+PrintLine("=== FileLib 增强功能测试 ===")
+
+// 测试基本文件操作
+PrintLine("\n--- 基本文件操作测试 ---")
+
+// 测试FileWrite和FileRead
+PrintLine("测试FileWrite和FileRead...")
+FileWrite("test_write.txt", "Hello, Old8Lang!")
+content <- FileRead("test_write.txt")
+PrintLine("写入内容: Hello, Old8Lang!")
+PrintLine("读取内容: " + content)
+
+// 测试FileWriteLines和FileReadLines
+PrintLine("\n测试FileWriteLines和FileReadLines...")
+lines <- ["Line 1", "Line 2", "Line 3"]
+FileWriteLines("test_lines.txt", lines)
+readLines <- FileReadLines("test_lines.txt")
+PrintLine("写入行数: " + lines.Length)
+PrintLine("读取行数: " + readLines.Length)
+
+// 测试FileAppend和FileAppendLines
+PrintLine("\n测试FileAppend和FileAppendLines...")
+FileAppend("test_append.txt", "First line\n")
+FileAppend("test_append.txt", "Second line\n")
+appendLines <- ["Third line", "Fourth line"]
+FileAppendLines("test_append.txt", appendLines)
+appendContent <- FileRead("test_append.txt")
+PrintLine("追加后内容:")
+PrintLine(appendContent)
+
+// 测试FileExists
+PrintLine("\n测试FileExists...")
+exists <- FileExists("test_write.txt")
+PrintLine("test_write.txt 存在: " + exists)
+notExists <- FileExists("non_existent.txt")
+PrintLine("non_existent.txt 存在: " + notExists)
+
+// 测试CopyFile和RenameFile
+PrintLine("\n测试CopyFile和RenameFile...")
+CopyFile("test_write.txt", "test_copy.txt")
+copyContent <- FileRead("test_copy.txt")
+PrintLine("复制文件内容: " + copyContent)
+
+RenameFile("test_copy.txt", "test_renamed.txt")
+renamedContent <- FileRead("test_renamed.txt")
+PrintLine("重命名后文件内容: " + renamedContent)
+
+// 测试GetFileInfo
+PrintLine("\n测试GetFileInfo...")
+info <- GetFileInfo("test_write.txt")
+PrintLine("文件信息:")
+PrintLine(info)
+
+// 测试CSV文件支持
+PrintLine("\n--- CSV文件支持测试 ---")
+
+// 测试WriteCsv和ReadCsv
+csvData <- [
+    ["Name", "Age", "City"],
+    ["Alice", "25", "New York"],
+    ["Bob", "30", "London"],
+    ["Charlie", "35", "Paris"]
+]
+WriteCsv("test.csv", csvData)
+PrintLine("已写入CSV文件")
+
+readCsvData <- ReadCsv("test.csv")
+PrintLine("读取CSV文件成功")
+
+// 测试XML文件支持
+PrintLine("\n--- XML文件支持测试 ---")
+
+xmlContent <- "<root><person><name>Alice</name><age>25</age></person></root>"
+WriteXml("test.xml", xmlContent)
+PrintLine("已写入XML文件")
+
+readXmlContent <- ReadXml("test.xml")
+PrintLine("读取XML文件成功")
+
+// 测试YAML文件支持
+PrintLine("\n--- YAML文件支持测试 ---")
+
+// YAML测试需要使用动态对象，这里使用简单的测试方式
+// 注意：YAML支持在Old8Lang解释器中可能需要特殊处理
+PrintLine("YAML支持测试：")
+PrintLine("由于YAML涉及动态类型，此处仅测试文件操作")
+PrintLine("实际YAML序列化/反序列化测试需要在.NET代码中进行")
+
+// 清理测试文件
+PrintLine("\n--- 清理测试文件 ---")
+
+// 删除文件
+DeleteFile("test_write.txt")
+DeleteFile("test_lines.txt")
+DeleteFile("test_append.txt")
+DeleteFile("test_renamed.txt")
+DeleteFile("test.csv")
+DeleteFile("test.xml")
+
+PrintLine("已删除所有测试文件")
+
+PrintLine("\n🎉 FileLib 增强功能测试完成！")
