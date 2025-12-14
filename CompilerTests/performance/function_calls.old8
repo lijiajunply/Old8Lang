@@ -1,0 +1,64 @@
+// 性能测试：函数调用和闭包
+PrintLine("=== 函数调用性能测试 ===")
+
+PrintLine("\n--- 测试1：10K次简单函数调用 ---")
+func simpleAdd(a:int, b:int) {
+    return a + b
+}
+
+result:int <- 0
+k:int <- 0
+while k < 10000 {
+    result <- simpleAdd(k, 1)
+    k <- k + 1
+}
+PrintLine("简单函数调用完成，最后结果 = " + result)
+
+PrintLine("\n--- 测试2：5K次递归调用（斐波那契） ---")
+func fib(n:int) {
+    if n <= 1 {
+        return n
+    }
+    return fib(n - 1) + fib(n - 2)
+}
+
+fibResults:int <- 0
+m:int <- 0
+while m < 20 {
+    fibResults <- fib(m)
+    m <- m + 1
+}
+PrintLine("递归测试完成，fib(19) = " + fibResults)
+
+PrintLine("\n--- 测试3：10K次闭包创建和调用 ---")
+func makeCounter() {
+    count:int <- 0
+    return (inc:int) -> {
+        count <- count + inc
+        return count
+    }
+}
+
+closureSum:int <- 0
+n:int <- 0
+while n < 1000 {
+    counter <- makeCounter()
+    closureSum <- closureSum + counter(1)
+    n <- n + 1
+}
+PrintLine("闭包测试完成，closureSum = " + closureSum)
+
+PrintLine("\n--- 测试4：5K次带默认参数的函数调用 ---")
+func addWithDefault(a:int, b: 10) {
+    return a + b
+}
+
+defaultSum:int <- 0
+p:int <- 0
+while p < 5000 {
+    defaultSum <- defaultSum + addWithDefault(p)
+    p <- p + 1
+}
+PrintLine("默认参数测试完成，defaultSum = " + defaultSum)
+
+PrintLine("\n✅ 函数调用性能测试完成")

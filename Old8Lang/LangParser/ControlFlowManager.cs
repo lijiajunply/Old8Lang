@@ -11,21 +11,23 @@ public class ControlFlowManager
     private readonly Stack<ControlFlowState> ControlFlowStack = [];
 
     /// <summary>
-    /// 压入新的控制流状态
+    /// 压入新的控制流状态（从对象池获取）
     /// </summary>
     public void PushState()
     {
-        ControlFlowStack.Push(new ControlFlowState());
+        var state = ObjectPoolManager.Instance.ControlFlowStatePool.Get();
+        ControlFlowStack.Push(state);
     }
 
     /// <summary>
-    /// 弹出当前控制流状态
+    /// 弹出当前控制流状态（归还到对象池）
     /// </summary>
     public void PopState()
     {
         if (ControlFlowStack.Count > 0)
         {
-            ControlFlowStack.Pop();
+            var state = ControlFlowStack.Pop();
+            ObjectPoolManager.Instance.ControlFlowStatePool.Return(state);
         }
     }
 
@@ -37,8 +39,10 @@ public class ControlFlowManager
     {
         if (ControlFlowStack.Count > 0)
         {
-            ControlFlowStack.Pop();
-            ControlFlowStack.Push(new ControlFlowState());
+            // 直接重置当前状态，不再Pop/Push，避免对象创建
+            var currentState = ControlFlowStack.Peek();
+            currentState.BreakFlag = false;
+            currentState.ContinueFlag = false;
         }
     }
 
@@ -73,9 +77,9 @@ public class ControlFlowManager
     }
 
     /// <summary>
-    /// 控制流状态类，用于存储break和continue标志
+    /// 控制流状态类，用于存储break和continue标志，支持对象池复用
     /// </summary>
-    private class ControlFlowState
+    public class ControlFlowState : IPoolable
     {
         /// <summary>
         /// Break标志
@@ -86,5 +90,14 @@ public class ControlFlowManager
         /// Continue标志
         /// </summary>
         public bool ContinueFlag { get; set; }
+
+        /// <summary>
+        /// 重置状态，供对象池复用
+        /// </summary>
+        public void Reset()
+        {
+            BreakFlag = false;
+            ContinueFlag = false;
+        }
     }
 }

@@ -24,9 +24,12 @@ public class FuncLangValue : ImportInfo
 
     // 闭包环境：捕获的作用域，用于支持闭包变量访问
     private VariateManager? CapturedScope { get; init; }
-    
+
     // 函数类型：区分普通方法和Lambda表达式
     public bool IsLambda { get; init; }
+
+    // 默认参数值缓存：缓存常量表达式的默认值，避免重复求值
+    private Dictionary<int, LangValueType>? CachedDefaultValues { get; set; }
 
     public FuncLangValue(LangId? id, List<LangId> ids, BlockStatement blockStatement,
         SourcePosition position = default,
@@ -57,9 +60,9 @@ public class FuncLangValue : ImportInfo
             {
                 var closureFunc = new FuncLangValue(Id, Ids, BlockStatement, Position, IsLambda)
                 {
-                    // 克隆当前作用域，保存闭包环境的快照
-                    // 这样即使外部函数返回后，闭包仍然可以访问捕获的变量
-                    CapturedScope = manager.Clone()
+                    // 使用浅拷贝快照捕获作用域
+                    // 复制作用域结构但共享值对象，性能优于深拷贝
+                    CapturedScope = manager.CaptureForClosure()
                 };
                 return closureFunc;
             }
@@ -220,6 +223,12 @@ public class FuncLangValue : ImportInfo
 
             if (Ids != null && Ids.Count != 0)
             {
+                // 首次调用时初始化默认参数值缓存
+                if (CachedDefaultValues == null && Ids.Any(id => id.DefaultValue != null))
+                {
+                    InitializeDefaultValueCache(executionManager);
+                }
+
                 // 先计算所有传入参数的值，使用外部变量管理器
                 var paramValues = ids.Select(t => t.Run(variateManagerFunc)).ToList();
 
@@ -229,9 +238,17 @@ public class FuncLangValue : ImportInfo
                     var id = Ids[i];
                     if (id.DefaultValue != null)
                     {
-                        // 计算默认参数值
-                        var defaultValue = id.DefaultValue.Run(executionManager);
-                        paramValues.Add(defaultValue);
+                        // 优先使用缓存的默认值
+                        if (CachedDefaultValues?.TryGetValue(i, out var cachedValue) == true)
+                        {
+                            paramValues.Add(cachedValue);
+                        }
+                        else
+                        {
+                            // 非常量表达式，需要每次计算
+                            var defaultValue = id.DefaultValue.Run(executionManager);
+                            paramValues.Add(defaultValue);
+                        }
                     }
                     else
                     {
@@ -551,6 +568,53 @@ public class FuncLangValue : ImportInfo
             if (Ids != null)
             {
                 local.FuncParameters.TryAdd(delegateKey, Ids);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 检查表达式是否为常量表达式（可以安全缓存）
+    /// </summary>
+    private static bool IsConstantExpression(LangExpression? expr)
+    {
+        if (expr == null) return false;
+
+        return expr switch
+        {
+            // 字面量都是常量
+            IntLangValue => true,
+            DoubleLangValue => true,
+            StringLangValue => true,
+            BoolLangValue => true,
+            CharLangValue => true,
+            NullLangValue => true,
+
+            // 算术运算：如果操作数都是常量，结果也是常量
+            Operation op => IsConstantExpression(op.Left) && IsConstantExpression(op.Right),
+
+            // 其他情况（变量、函数调用等）不是常量
+            _ => false
+        };
+    }
+
+    /// <summary>
+    /// 初始化默认参数值缓存
+    /// </summary>
+    private void InitializeDefaultValueCache(VariateManager manager)
+    {
+        if (Ids == null || Ids.Count == 0) return;
+
+        for (int i = 0; i < Ids.Count; i++)
+        {
+            var param = Ids[i];
+            if (param.DefaultValue != null && IsConstantExpression(param.DefaultValue))
+            {
+                // 延迟初始化缓存字典
+                CachedDefaultValues ??= new Dictionary<int, LangValueType>();
+
+                // 预先求值并缓存
+                var defaultValue = param.DefaultValue.Run(manager);
+                CachedDefaultValues[i] = defaultValue;
             }
         }
     }

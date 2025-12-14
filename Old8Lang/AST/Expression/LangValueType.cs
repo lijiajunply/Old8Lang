@@ -240,7 +240,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     {
         if (value == null)
         {
-            return new NullLangValue();
+            return NullLangValue.Instance;
         }
 
         return value switch

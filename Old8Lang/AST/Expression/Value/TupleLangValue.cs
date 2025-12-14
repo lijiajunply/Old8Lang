@@ -21,20 +21,20 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
     {
         // 运行第一个元素
         var item1Result = V1.Run(manager);
-        
+
         // 运行第二个元素，处理空名称的特殊情况
         LangValueType item2Result;
         if (V2 is LangId item2Id && string.IsNullOrEmpty(item2Id.IdName))
         {
             // 如果第二个元素是空名称的LangId，直接使用NullLangValue，避免NameError
-            item2Result = new NullLangValue();
+            item2Result = NullLangValue.Instance;
         }
         else
         {
             // 正常运行第二个元素
             item2Result = V2.Run(manager);
         }
-        
+
         Value = (item1Result, item2Result);
         return this;
     }

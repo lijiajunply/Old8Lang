@@ -11,8 +11,13 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="position">位置</param>
 public class NullLangValue(SourcePosition position = default) : LangValueType(position)
 {
+    /// <summary>
+    /// 单例实例，用于减少对象创建
+    /// </summary>
+    public static readonly NullLangValue Instance = new();
+
     public override string ToString() => "Null";
-    
+
     public override LangValueType Run(VariateManager manager) => this;
 
     public override bool Equal(LangValueType? otherValueType)
@@ -27,11 +32,11 @@ public class NullLangValue(SourcePosition position = default) : LangValueType(po
 
         return value.Value switch
         {
-            "Bool" or "bool" => new BoolLangValue(false),
-            "String" or "string" => new StringLangValue("null"),
-            "Int" or "int" => new IntLangValue(0),
-            "Double" or "double" => new DoubleLangValue(0.0),
-            "Char" or "char" => new CharLangValue('\0'),
+            "Bool" or "bool" => BoolLangValue.Create(false, Position),
+            "String" or "string" => StringLangValue.Create("null", Position),
+            "Int" or "int" => IntLangValue.Create(0, Position),
+            "Double" or "double" => DoubleLangValue.Create(0.0, Position),
+            "Char" or "char" => CharLangValue.Create('\0', Position),
             _ => throw new TypeError(this, "不支持的类型转换")
         };
     }

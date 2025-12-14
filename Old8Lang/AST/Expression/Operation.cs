@@ -113,7 +113,7 @@ public class Operation(
             {
                 var rightValue = Right?.Run(manager) as BoolLangValue ??
                                  throw new InvalidOperationError(this, "NOT运算符只支持布尔类型");
-                return new BoolLangValue(!rightValue.Value);
+                return BoolLangValue.Create(!rightValue.Value, Position);
             }
 
             if (Opera == LangTokenType.Minus)
@@ -150,12 +150,12 @@ public class Operation(
                             throw new InvalidOperationError(this, "AND运算符只支持布尔类型");
             if (!leftValue.Value)
             {
-                return new BoolLangValue(false);
+                return BoolLangValue.Create(false, Position);
             }
 
             var rightValue = Right?.Run(manager) as BoolLangValue ??
                              throw new InvalidOperationError(this, "AND运算符只支持布尔类型");
-            return new BoolLangValue(leftValue.Value && rightValue.Value);
+            return BoolLangValue.Create(leftValue.Value && rightValue.Value, Position);
         }
 
         // 处理逻辑OR操作 - 短路求值
@@ -164,12 +164,12 @@ public class Operation(
             var leftValue = Left.Run(manager) as BoolLangValue ?? throw new InvalidOperationError(this, "OR运算符只支持布尔类型");
             if (leftValue.Value)
             {
-                return new BoolLangValue(true);
+                return BoolLangValue.Create(true, Position);
             }
 
             var rightValue = Right?.Run(manager) as BoolLangValue ??
                              throw new InvalidOperationError(this, "OR运算符只支持布尔类型");
-            return new BoolLangValue(leftValue.Value || rightValue.Value);
+            return BoolLangValue.Create(leftValue.Value || rightValue.Value, Position);
         }
 
         // 处理点操作
@@ -308,31 +308,31 @@ public class Operation(
         if (leftResult is BoolLangValue boolLeft && rightResult is BoolLangValue boolRight &&
             Opera == LangTokenType.Xor)
         {
-            return new BoolLangValue(!boolLeft.Equal(boolRight));
+            return BoolLangValue.Create(!boolLeft.Equal(boolRight), Position);
         }
 
-        // == , < , > 
+        // == , < , >
         if (leftResult != null! && rightResult != null!)
         {
             switch (Opera)
             {
                 case LangTokenType.Equals:
-                    return new BoolLangValue(leftResult.Equal(rightResult));
+                    return BoolLangValue.Create(leftResult.Equal(rightResult), Position);
                 case LangTokenType.LessThan:
-                    return new BoolLangValue(leftResult.Less(rightResult));
+                    return BoolLangValue.Create(leftResult.Less(rightResult), Position);
                 case LangTokenType.GreaterThan:
-                    return new BoolLangValue(leftResult.Greater(rightResult));
+                    return BoolLangValue.Create(leftResult.Greater(rightResult), Position);
                 case LangTokenType.NotEquals:
-                    return new BoolLangValue(!leftResult.Equal(rightResult));
+                    return BoolLangValue.Create(!leftResult.Equal(rightResult), Position);
                 case LangTokenType.LessThanEquals:
-                    return new BoolLangValue(leftResult.LessEqual(rightResult));
+                    return BoolLangValue.Create(leftResult.LessEqual(rightResult), Position);
                 case LangTokenType.GreaterThanEquals:
-                    return new BoolLangValue(leftResult.GreaterEqual(rightResult));
+                    return BoolLangValue.Create(leftResult.GreaterEqual(rightResult), Position);
                 case LangTokenType.In:
                     // 处理 in 操作符：检查左侧值是否存在于右侧集合中
                     if (rightResult is ILangList list)
                     {
-                        return new BoolLangValue(list.In(leftResult));
+                        return BoolLangValue.Create(list.In(leftResult), Position);
                     }
 
                     throw new InvalidOperationError(this, "in 操作符右侧必须是集合类型");

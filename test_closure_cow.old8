@@ -1,0 +1,19 @@
+// 简单闭包测试
+PrintLine("=== COW闭包测试 ===")
+
+PrintLine("\n--- 测试1：简单闭包 ---")
+func makeAdder(x:int) {
+    return (y:int) -> x + y
+}
+
+add5 <- makeAdder(5)
+PrintLine("add5(10) = " + add5(10))
+PrintLine("add5(20) = " + add5(20))
+
+PrintLine("\n--- 测试2：多个闭包 ---")
+add3 <- makeAdder(3)
+add7 <- makeAdder(7)
+PrintLine("add3(5) = " + add3(5))
+PrintLine("add7(5) = " + add7(5))
+
+PrintLine("\n✅ COW闭包测试完成")

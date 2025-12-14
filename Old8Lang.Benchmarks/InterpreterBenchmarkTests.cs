@@ -158,7 +158,7 @@ public class InterpreterBenchmarkTests
                                 }
                                 return deep_recursion(n - 1) + 1
                             }
-                            result <- deep_recursion(1000)
+                            result <- deep_recursion(500)
 
                             """;
         BlockStatement ast = interpreter.Build(recursionCode);

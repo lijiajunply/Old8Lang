@@ -52,14 +52,37 @@ public class VariateManager
     private List<Dictionary<string, LangValueType>> Scopes { get; } = [new()];
 
     /// <summary>
-    /// 作用域缓存池，用于复用作用域字典，减少内存分配和垃圾回收开销
+    /// 作用域缓存池，使用ThreadLocal的Stack避免并发同步开销
     /// </summary>
-    private static readonly ConcurrentBag<Dictionary<string, LangValueType>> ScopeCache = new();
+    private static readonly ThreadLocal<Stack<Dictionary<string, LangValueType>>> ScopeCache =
+        new(() => new Stack<Dictionary<string, LangValueType>>());
+
+    /// <summary>
+    /// 临时VariateManager缓存池，用于点操作等临时场景
+    /// </summary>
+    private static readonly ThreadLocal<Stack<VariateManager>> TempManagerPool =
+        new(() => new Stack<VariateManager>());
 
     /// <summary>
     /// 缓存池最大大小
     /// </summary>
     private const int MaxScopeCacheSize = 100;
+
+    /// <summary>
+    /// 临时管理器池最大大小
+    /// </summary>
+    private const int MaxTempManagerPoolSize = 10;
+
+    /// <summary>
+    /// 变量查找缓存，使用ThreadStatic避免线程同步开销
+    /// </summary>
+    [ThreadStatic]
+    private static Dictionary<string, (int scopeIndex, LangValueType value)>? LookupCache;
+
+    /// <summary>
+    /// 缓存版本号，当作用域变化时递增，用于检测缓存失效
+    /// </summary>
+    private int CacheVersion;
 
     /// <summary>
     /// 导入信息列表，包含导入的函数、类和原生类型
@@ -131,7 +154,7 @@ public class VariateManager
     /// 设置变量值
     /// </summary>
     /// <param name="id">变量标识符</param>
-    /// <param name="langValueType">变量值</param>
+    /// <parameter name="langValueType">变量值</param>
     /// <remarks>
     /// 变量查找规则：
     /// 1. 如果在函数内部，直接在当前作用域创建新变量
@@ -156,7 +179,7 @@ public class VariateManager
             return;
         }
 
-        // 3. 没有找到变量，在当前作用域中创建新变量
+        // 2. 没有找到变量，在当前作用域创建新变量
         Scopes[^1][id.IdName] = langValueType;
     }
 
@@ -165,9 +188,12 @@ public class VariateManager
     /// </summary>
     public void AddChildren()
     {
+        var cache = ScopeCache.Value!;
+
         // 优化：从缓存池获取作用域字典，减少内存分配
-        if (ScopeCache.TryTake(out var cachedScope))
+        if (cache.Count > 0)
         {
+            var cachedScope = cache.Pop();
             // 确保缓存的作用域是空的
             cachedScope.Clear();
             Scopes.Add(cachedScope);
@@ -177,6 +203,10 @@ public class VariateManager
             // 缓存池为空时创建新的作用域
             Scopes.Add(new Dictionary<string, LangValueType>());
         }
+
+        // 作用域变化，清理查找缓存
+        CacheVersion++;
+        LookupCache?.Clear();
     }
 
     /// <summary>
@@ -195,10 +225,15 @@ public class VariateManager
 
             // 优化：清空作用域并将其归还到缓存池，以便复用
             scopeToRemove.Clear();
-            if (ScopeCache.Count < MaxScopeCacheSize)
+            var cache = ScopeCache.Value!;
+            if (cache.Count < MaxScopeCacheSize)
             {
-                ScopeCache.Add(scopeToRemove);
+                cache.Push(scopeToRemove);
             }
+
+            // 作用域变化，清理查找缓存
+            CacheVersion++;
+            LookupCache?.Clear();
         }
     }
 
@@ -209,16 +244,29 @@ public class VariateManager
     /// <returns>变量值，如果未找到则返回null</returns>
     /// <remarks>
     /// 变量查找规则：
-    /// 1. 从当前作用域（栈顶）向全局作用域（栈底）查找
-    /// 2. 如果未找到，尝试从导入信息中查找
+    /// 1. 优先检查缓存（快速路径）
+    /// 2. 从当前作用域（栈顶）向全局作用域（栈底）查找
+    /// 3. 如果未找到，尝试从导入信息中查找
+    /// 4. 找到后更新缓存
     /// </remarks>
     public LangValueType? GetValue(LangId id)
     {
-        // 从当前作用域（栈顶）向全局作用域（栈底）查找
+        // 快速路径：检查缓存
+        if (LookupCache?.TryGetValue(id.IdName, out var cached) == true
+            && cached.scopeIndex < Scopes.Count
+            && Scopes[cached.scopeIndex].TryGetValue(id.IdName, out var cachedValue))
+        {
+            return cachedValue;
+        }
+
+        // 慢速路径：完整查找
         for (var i = Scopes.Count - 1; i >= 0; i--)
         {
             if (Scopes[i].TryGetValue(id.IdName, out var value))
             {
+                // 更新缓存
+                LookupCache ??= new();
+                LookupCache[id.IdName] = (i, value);
                 return value;
             }
         }
@@ -410,5 +458,100 @@ public class VariateManager
         }
 
         return variableStates;
+    }
+
+    /// <summary>
+    /// 从池中获取临时VariateManager，用于点操作等临时场景
+    /// </summary>
+    public static VariateManager GetTemp()
+    {
+        var pool = TempManagerPool.Value!;
+        if (pool.Count > 0)
+        {
+            var manager = pool.Pop();
+            return manager;
+        }
+        return new VariateManager();
+    }
+
+    /// <summary>
+    /// 将临时VariateManager归还到池中
+    /// </summary>
+    public static void ReturnTemp(VariateManager manager)
+    {
+        // 清空管理器状态
+        manager.Clear();
+
+        var pool = TempManagerPool.Value!;
+        if (pool.Count < MaxTempManagerPoolSize)
+        {
+            pool.Push(manager);
+        }
+    }
+
+    /// <summary>
+    /// 清空VariateManager状态，准备复用
+    /// </summary>
+    private void Clear()
+    {
+        // 只保留全局作用域，移除所有局部作用域
+        while (Scopes.Count > 1)
+        {
+            RemoveChildren();
+        }
+
+        // 清空全局作用域中的变量
+        Scopes[0].Clear();
+
+        // 清空导入信息
+        ImportInfos.Clear();
+
+        // 重置标志位
+        IsReturn = false;
+        IsFunc = false;
+        IsClass = false;
+        Result = new VoidLangValue();
+        RecursionDepth = 0;
+
+        // 清理查找缓存
+        CacheVersion++;
+        LookupCache?.Clear();
+    }
+
+    /// <summary>
+    /// 为闭包创建作用域快照（浅拷贝优化）
+    /// </summary>
+    /// <returns>包含当前作用域快照的新VariateManager</returns>
+    /// <remarks>
+    /// 使用浅拷贝策略：复制Scopes列表和字典结构，但不复制LangValueType对象
+    /// 这样可以在保持正确性的同时大幅减少内存分配
+    /// </remarks>
+    public VariateManager CaptureForClosure()
+    {
+        var captured = new VariateManager
+        {
+            LangInfo = this.LangInfo,
+            Path = this.Path,
+            Interpreter = this.Interpreter
+        };
+
+        // 浅拷贝所有作用域：复制字典结构，但共享值对象
+        // 这是安全的，因为LangValueType是不可变的
+        foreach (var scope in Scopes)
+        {
+            var newScope = new Dictionary<string, LangValueType>(scope);
+            captured.Scopes.Add(newScope);
+        }
+
+        // 移除初始化时的空作用域（因为构造函数已经创建了一个）
+        if (captured.Scopes.Count > 0 && Scopes.Count > 0)
+        {
+            captured.Scopes.RemoveAt(0);
+        }
+
+        // 复制导入信息
+        captured.ImportInfos.AddRange(ImportInfos);
+
+        return captured;
     }
 }

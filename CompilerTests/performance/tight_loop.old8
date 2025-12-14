@@ -1,0 +1,36 @@
+// 性能测试：紧密循环
+PrintLine("=== 紧密循环性能测试 ===")
+
+PrintLine("\n--- 测试1：100K次简单循环 ---")
+counter:int <- 0
+i:int <- 0
+while i < 100000 {
+    counter <- counter + 1
+    i <- i + 1
+}
+PrintLine("循环完成，counter = " + counter)
+
+PrintLine("\n--- 测试2：嵌套循环 (1000x100) ---")
+total:int <- 0
+outer:int <- 0
+while outer < 1000 {
+    inner:int <- 0
+    while inner < 100 {
+        total <- total + 1
+        inner <- inner + 1
+    }
+    outer <- outer + 1
+}
+PrintLine("嵌套循环完成，total = " + total)
+
+PrintLine("\n--- 测试3：循环中的变量访问 ---")
+sum:int <- 0
+multiplier:int <- 2
+j:int <- 0
+while j < 10000 {
+    sum <- sum + multiplier
+    j <- j + 1
+}
+PrintLine("变量访问测试完成，sum = " + sum)
+
+PrintLine("\n✅ 紧密循环性能测试完成")
