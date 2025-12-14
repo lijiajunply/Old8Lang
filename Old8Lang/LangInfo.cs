@@ -19,7 +19,7 @@ public class LangInfo
     /// <summary>
     /// 获取或设置语言版本
     /// </summary>
-    public string Ver { get; set; } = "";
+    public string Var { get; set; } = "";
 
     /// <summary>
     /// 获取或设置语言官方网站URL

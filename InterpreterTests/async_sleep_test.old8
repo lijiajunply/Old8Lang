@@ -1,0 +1,16 @@
+// 测试异步函数返回值（带Sleep）
+import Async
+
+// 带Sleep的异步函数
+async func returnStringWithSleep() {
+    Sleep(100)
+    return "测试字符串"
+}
+
+PrintLine("开始测试")
+task <- returnStringWithSleep()
+PrintLine("任务已创建")
+
+result <- await task
+PrintLine("等待完成")
+PrintLine("结果: " + result)

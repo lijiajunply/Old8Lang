@@ -1,0 +1,23 @@
+// 测试异步函数执行流程
+import Async
+
+// 带调试输出的异步函数
+async func testFunc() {
+    PrintLine("[异步] 函数开始")
+    PrintLine("[异步] 调用Sleep前")
+    Sleep(100)
+    PrintLine("[异步] 调用Sleep后")
+    PrintLine("[异步] 准备返回")
+    return "成功返回"
+}
+
+PrintLine("[主线程] 开始测试")
+task <- testFunc()
+PrintLine("[主线程] 任务已创建")
+
+result <- await task
+PrintLine("[主线程] 等待完成")
+PrintLine("[主线程] 结果类型检查...")
+
+// 先单独打印result，不做字符串拼接
+PrintLine(result)

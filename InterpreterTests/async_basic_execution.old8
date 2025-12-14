@@ -1,0 +1,39 @@
+// 异步函数基本执行测试
+import Async
+
+// 测试1：简单异步函数调用
+async func hello() {
+    Sleep(100)
+    return "Hello"
+}
+
+task <- hello()
+PrintLine("任务已启动")
+result <- await task
+PrintLine("结果: " + result)
+Assert(result, "Hello")
+
+// 测试2：带参数的异步函数
+async func add(a:int, b:int) {
+    Sleep(50)
+    return a + b
+}
+
+task2 <- add(10, 20)
+sum <- await task2
+PrintLine("求和结果: " + sum.ToStr())
+Assert(sum, 30)
+
+// 测试3：异步函数内部使用 await
+async func fetchAndProcess(value:int) {
+    task <- add(value, 5)
+    result <- await task
+    return result * 2
+}
+
+task3 <- fetchAndProcess(10)
+finalResult <- await task3
+PrintLine("最终结果: " + finalResult.ToStr())
+Assert(finalResult, 30)  // (10 + 5) * 2 = 30
+
+PrintLine("异步函数基本执行测试通过")

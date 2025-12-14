@@ -134,6 +134,14 @@ public class StatementParser(
             return ParseSwitchStatement();
         }
 
+        // 处理异步函数定义：async func
+        if (CurrentToken.Type == LangTokenType.Async)
+        {
+            Expect(LangTokenType.Async);
+            Expect(LangTokenType.Func);
+            return functionParser.ParseAsyncFuncDeclaration();
+        }
+
         // 处理函数定义
         if (CurrentToken.Type == LangTokenType.Func)
         {

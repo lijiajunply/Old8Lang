@@ -15,4 +15,10 @@
       <ProjectReference Include="..\Old8Lang.NetLib\Old8Lang.NetLib.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="OldLib\*.old8">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

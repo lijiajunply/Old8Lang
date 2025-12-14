@@ -167,7 +167,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// 将值类型转换为字符串表示
     /// </summary>
     /// <returns>值类型的字符串表示</returns>
-    public string TypeToString()
+    public virtual string TypeToString()
     {
         return this switch
         {

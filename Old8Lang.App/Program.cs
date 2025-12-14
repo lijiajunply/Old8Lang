@@ -163,7 +163,7 @@ if (command == helpCmd)
 // 处理版本信息命令
 if (command == varCmd)
 {
-    Console.WriteLine($"Old8Lang 版本: {langInfo.Ver}");
+    Console.WriteLine($"Old8Lang 版本: {langInfo.Var}");
     return;
 }
 
@@ -204,7 +204,7 @@ if (command == changeImportCmd)
     }
 
     var newPath = args[1];
-    var updatedInfo = Apis.ChangeBasicInfo(newPath, langInfo.Ver);
+    var updatedInfo = Apis.ChangeBasicInfo(newPath, langInfo.Var);
     Console.WriteLine($"\n导入路径已更新为: {updatedInfo.ImportPath}");
     return;
 }

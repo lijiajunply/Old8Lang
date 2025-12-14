@@ -242,7 +242,15 @@ public enum LangTokenType
     /// <summary>
     /// protected
     /// </summary>
-    Protected
+    Protected,
+    /// <summary>
+    /// async
+    /// </summary>
+    Async,
+    /// <summary>
+    /// await
+    /// </summary>
+    Await
 }
 
 public enum KeywordType
@@ -283,6 +291,8 @@ public enum KeywordType
     Private,
     Throw,
     Native,
-    Protected
+    Protected,
+    Async,
+    Await
 }
 

@@ -1,0 +1,22 @@
+// 测试异步函数返回值
+import Async
+
+// 简单返回字符串
+async func returnString() {
+    return "测试字符串"
+}
+
+PrintLine("开始测试")
+task <- returnString()
+PrintLine("任务已创建")
+
+result <- await task
+PrintLine("等待完成")
+
+// 检查结果类型
+if result == null {
+    PrintLine("结果是null")
+} else {
+    PrintLine("结果不是null")
+    PrintLine(result)
+}

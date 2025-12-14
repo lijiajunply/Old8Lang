@@ -39,6 +39,16 @@ public class PrimaryParser(
     //         | asStatement
     public LangExpression ParsePrimary()
     {
+        // 处理 await 表达式
+        if (CurrentToken.Type == LangTokenType.Await)
+        {
+            var awaitToken = CurrentToken;
+            var position = new SourcePosition(awaitToken.Line, awaitToken.Column, tokenValue: awaitToken.Value);
+            Expect(LangTokenType.Await);
+            var expr = expressionParserFactory().ParseExpression();
+            return new AwaitExpression(expr, position);
+        }
+
         // 处理 not 表达式
         if (CurrentToken.Type == LangTokenType.Not)
         {

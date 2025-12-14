@@ -30,8 +30,13 @@
       "LibName": "MathLib",
       "Var": 0.8,
       "IsDir": false
+    },
+    {
+      "LibName": "Async",
+      "Var": 0.8,
+      "IsDir": false
     }
   ],
-  "Ver": "0.8.0",
+  "Var": "0.8.0",
   "Url": "https://downland.old8lang.com"
 }

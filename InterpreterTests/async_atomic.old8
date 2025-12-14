@@ -1,0 +1,67 @@
+// 异步原子操作测试
+import Async
+
+// 创建原子整数
+atomic <- AtomicIntCreate(0)
+PrintLine("原子整数已创建，初始值: " + AtomicIntGet(atomic).ToStr())
+
+// 异步递增函数（使用原子操作）
+async func atomicIncrement(id:int, times:int) {
+    i <- 0
+    while i < times {
+        newValue <- AtomicIntIncrement(atomic)
+        i <- i + 1
+    }
+    PrintLine("任务 " + id.ToStr() + " 完成，线程ID: " + GetCurrentThreadId().ToStr())
+}
+
+// 启动多个并发任务
+PrintLine("启动多个并发任务")
+t1 <- atomicIncrement(1, 1000)
+t2 <- atomicIncrement(2, 1000)
+t3 <- atomicIncrement(3, 1000)
+
+// 等待所有任务完成
+_ <- await t1
+_ <- await t2
+_ <- await t3
+
+PrintLine("所有任务已完成")
+finalValue <- AtomicIntGet(atomic)
+PrintLine("最终原子计数: " + finalValue.ToStr())
+
+// 原子操作保证线程安全，计数应该正好是 3000
+Assert(finalValue, 3000)
+
+// 测试其他原子操作
+atomic2 <- AtomicIntCreate(100)
+PrintLine("测试原子操作...")
+
+// 测试自减
+AtomicIntDecrement(atomic2)
+val1 <- AtomicIntGet(atomic2)
+Assert(val1, 99)
+
+// 测试加法
+AtomicIntAdd(atomic2, 10)
+val2 <- AtomicIntGet(atomic2)
+Assert(val2, 109)
+
+// 测试设置
+AtomicIntSet(atomic2, 50)
+val3 <- AtomicIntGet(atomic2)
+Assert(val3, 50)
+
+// 测试 CAS（Compare-And-Set）
+success <- AtomicIntCompareAndSet(atomic2, 50, 100)
+Assert(success, true)
+val4 <- AtomicIntGet(atomic2)
+Assert(val4, 100)
+
+// CAS 失败的情况
+success2 <- AtomicIntCompareAndSet(atomic2, 50, 200)
+Assert(success2, false)
+val5 <- AtomicIntGet(atomic2)
+Assert(val5, 100)  // 值应该没有变化
+
+PrintLine("原子操作测试通过")

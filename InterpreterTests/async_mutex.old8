@@ -1,0 +1,46 @@
+// 异步 Mutex 互斥锁测试
+import Async
+
+// 共享计数器
+counter <- 0
+
+// 创建互斥锁
+mutex <- MutexCreate()
+PrintLine("Mutex 已创建，ID: " + mutex.ToStr())
+
+// 异步递增函数（使用 Mutex 保护）
+async func increment(id:int, times:int) {
+    i <- 0
+    while i < times {
+        MutexLock(mutex)
+        try {
+            oldValue <- counter
+            Sleep(1)  // 模拟临界区操作
+            counter <- oldValue + 1
+        } finally {
+            MutexUnlock(mutex)
+        }
+        i <- i + 1
+    }
+    PrintLine("任务 " + id.ToStr() + " 完成，线程ID: " + GetCurrentThreadId().ToStr())
+}
+
+// 启动多个并发任务
+PrintLine("启动多个并发任务")
+t1 <- increment(1, 50)
+t2 <- increment(2, 50)
+t3 <- increment(3, 50)
+
+// 等待所有任务完成
+_ <- await t1
+_ <- await t2
+_ <- await t3
+
+PrintLine("所有任务已完成")
+PrintLine("最终计数: " + counter.ToStr())
+
+// 如果没有 Mutex 保护，计数会小于 150
+// 有 Mutex 保护，计数应该正好是 150
+Assert(counter, 150)
+
+PrintLine("Mutex 互斥锁测试通过")

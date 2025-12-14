@@ -86,8 +86,28 @@ public class VariateManager
 
     /// <summary>
     /// 导入信息列表，包含导入的函数、类和原生类型
+    /// 使用内部 List 和锁来保证线程安全
     /// </summary>
-    public List<ImportInfo> ImportInfos { get; } = [];
+    private readonly List<ImportInfo> _importInfos = [];
+
+    /// <summary>
+    /// 保护 ImportInfos 的锁对象
+    /// </summary>
+    private readonly object _importInfosLock = new();
+
+    /// <summary>
+    /// 公开的 ImportInfos 访问器（线程安全）
+    /// </summary>
+    public IEnumerable<ImportInfo> ImportInfos
+    {
+        get
+        {
+            lock (_importInfosLock)
+            {
+                return _importInfos.ToList(); // 返回副本以避免外部修改
+            }
+        }
+    }
 
     #endregion
 
@@ -276,17 +296,16 @@ public class VariateManager
     }
 
     /// <summary>
-    /// 根据函数名和参数数量查找函数
+    /// 根据函数名和参数数量查找函数（支持同步和异步函数）
     /// </summary>
     /// <param name="id">函数标识符</param>
     /// <param name="paramCount">参数数量</param>
-    /// <returns>找到的函数或null</returns>
-    public FuncLangValue? GetFunc(LangId id, int paramCount)
+    /// <returns>找到的函数（FuncLangValue或AsyncFuncLangValue）或null</returns>
+    public ImportInfo? GetFunc(LangId id, int paramCount)
     {
         return ImportInfos.FirstOrDefault(x =>
-            x is FuncLangValue func &&
-            func.Id!.IdName == id.IdName &&
-            func.Ids?.Count == paramCount) as FuncLangValue;
+            (x is FuncLangValue func && func.Id!.IdName == id.IdName && func.Ids?.Count == paramCount) ||
+            (x is AsyncFuncLangValue asyncFunc && asyncFunc.Id!.IdName == id.IdName && asyncFunc.Ids?.Count == paramCount));
     }
 
     /// <summary>
@@ -310,12 +329,27 @@ public class VariateManager
     }
 
     /// <summary>
-    /// 添加类或函数到导入信息列表
+    /// 添加类或函数到导入信息列表（线程安全）
     /// </summary>
     /// <param name="langValue">要添加的导入信息</param>
     public void AddClassAndFunc(ImportInfo langValue)
     {
-        ImportInfos.Add(langValue);
+        lock (_importInfosLock)
+        {
+            _importInfos.Add(langValue);
+        }
+    }
+
+    /// <summary>
+    /// 批量添加导入信息到列表（线程安全）
+    /// </summary>
+    /// <param name="items">要添加的导入信息集合</param>
+    public void AddImportInfoRange(IEnumerable<ImportInfo> items)
+    {
+        lock (_importInfosLock)
+        {
+            _importInfos.AddRange(items);
+        }
     }
 
     /// <summary>
@@ -392,8 +426,14 @@ public class VariateManager
             newManager.Scopes.RemoveAt(0);
         }
 
-        // 复制导入信息
-        newManager.ImportInfos.AddRange(ImportInfos);
+        // 复制导入信息（线程安全）
+        lock (_importInfosLock)
+        {
+            lock (newManager._importInfosLock)
+            {
+                newManager._importInfos.AddRange(_importInfos);
+            }
+        }
 
         return newManager;
     }
@@ -428,8 +468,14 @@ public class VariateManager
             newManager.Scopes.RemoveAt(0);
         }
 
-        // 复制导入信息
-        newManager.ImportInfos.AddRange(ImportInfos);
+        // 复制导入信息（线程安全）
+        lock (_importInfosLock)
+        {
+            lock (newManager._importInfosLock)
+            {
+                newManager._importInfos.AddRange(_importInfos);
+            }
+        }
 
         return newManager;
     }
@@ -503,8 +549,11 @@ public class VariateManager
         // 清空全局作用域中的变量
         Scopes[0].Clear();
 
-        // 清空导入信息
-        ImportInfos.Clear();
+        // 清空导入信息（线程安全）
+        lock (_importInfosLock)
+        {
+            _importInfos.Clear();
+        }
 
         // 重置标志位
         IsReturn = false;
@@ -549,8 +598,14 @@ public class VariateManager
             captured.Scopes.RemoveAt(0);
         }
 
-        // 复制导入信息
-        captured.ImportInfos.AddRange(ImportInfos);
+        // 复制导入信息（线程安全）
+        lock (_importInfosLock)
+        {
+            lock (captured._importInfosLock)
+            {
+                captured._importInfos.AddRange(_importInfos);
+            }
+        }
 
         return captured;
     }

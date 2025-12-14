@@ -91,10 +91,30 @@ public class Old8Exception : Exception
     public Dictionary<string, string> VariableStates { get; set; } = new();
     
     /// <summary>
-    /// 当前调用栈，用于在错误发生时收集
+    /// 使用 AsyncLocal 实现线程安全的调用栈，每个异步上下文有独立的调用栈
     /// </summary>
-    public static List<CallStackFrame> CurrentCallStack { get; private set; } = new();
-    
+    private static readonly AsyncLocal<List<CallStackFrame>> _asyncCallStack = new();
+
+    /// <summary>
+    /// 当前调用栈，用于在错误发生时收集
+    /// 使用 AsyncLocal 确保每个异步上下文（包括不同线程）都有自己的调用栈副本
+    /// </summary>
+    public static List<CallStackFrame> CurrentCallStack
+    {
+        get
+        {
+            if (_asyncCallStack.Value == null)
+            {
+                _asyncCallStack.Value = new List<CallStackFrame>();
+            }
+            return _asyncCallStack.Value;
+        }
+        set
+        {
+            _asyncCallStack.Value = value;
+        }
+    }
+
     /// <summary>
     /// 入栈，记录函数调用
     /// </summary>
@@ -104,7 +124,7 @@ public class Old8Exception : Exception
     {
         CurrentCallStack.Add(new CallStackFrame(functionName, position));
     }
-    
+
     /// <summary>
     /// 出栈，函数调用结束
     /// </summary>
@@ -115,7 +135,7 @@ public class Old8Exception : Exception
             CurrentCallStack.RemoveAt(CurrentCallStack.Count - 1);
         }
     }
-    
+
     /// <summary>
     /// 清空调用栈
     /// </summary>

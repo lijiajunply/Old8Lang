@@ -1,0 +1,45 @@
+// 异步并发执行测试
+import Async
+
+// 测试1：多个任务并发执行
+async func task1() {
+    PrintLine("任务1开始，线程ID: " + GetCurrentThreadId().ToStr())
+    Sleep(200)
+    PrintLine("任务1完成")
+    return 1
+}
+
+async func task2() {
+    PrintLine("任务2开始，线程ID: " + GetCurrentThreadId().ToStr())
+    Sleep(100)
+    PrintLine("任务2完成")
+    return 2
+}
+
+async func task3() {
+    PrintLine("任务3开始，线程ID: " + GetCurrentThreadId().ToStr())
+    Sleep(150)
+    PrintLine("任务3完成")
+    return 3
+}
+
+// 启动三个并发任务
+PrintLine("启动所有任务")
+t1 <- task1()
+t2 <- task2()
+t3 <- task3()
+
+// 等待所有任务完成
+PrintLine("等待所有任务完成")
+r1 <- await t1
+r2 <- await t2
+r3 <- await t3
+
+PrintLine("所有任务已完成")
+PrintLine("结果: " + r1.ToStr() + ", " + r2.ToStr() + ", " + r3.ToStr())
+
+Assert(r1, 1)
+Assert(r2, 2)
+Assert(r3, 3)
+
+PrintLine("异步并发执行测试通过")

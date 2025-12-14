@@ -74,8 +74,68 @@ public class FunctionParser(
         var stmtParser = statementParserFactory();
         var block = stmtParser.ParseBlock();
 
-        // 普通函数声明，生成 FuncInit，设置 IsLambda 为 false
+        // 普通函数声明,生成 FuncInit，设置 IsLambda 为 false
         return new FuncInit(new FuncLangValue(updatedFuncName, parameters, block, isLambda: false));
+    }
+
+    /// <summary>
+    /// 解析异步函数声明
+    /// asyncFuncDeclaration = "async" "func" identifier "(" idList? ")" ( "->" returnType )? block
+    /// </summary>
+    public AsyncFuncInit ParseAsyncFuncDeclaration()
+    {
+        // 这里假设 async 和 func 关键字已经被消费了
+        var funcName = ParseIdentifier();
+        var returnType = string.Empty;
+
+        // 检查是否有类型注解语法：identifier:returnType
+        if (CurrentToken.Type == LangTokenType.Colon)
+        {
+            Expect(LangTokenType.Colon);
+            if (CurrentToken.Type != LangTokenType.Identifier)
+            {
+                throw CreateSyntaxError("请返回类型标识符");
+            }
+
+            returnType = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+        }
+
+        Expect(LangTokenType.LeftParen);
+        var parameters = ParseIdList();
+        Expect(LangTokenType.RightParen);
+
+        // 检查是否有箭头语法用于返回类型注解或函数体
+        if (CurrentToken.Type == LangTokenType.Arrow)
+        {
+            Expect(LangTokenType.Arrow);
+            // 解析返回类型标识符（如果有）
+            if (CurrentToken.Type == LangTokenType.Identifier)
+            {
+                if (!string.IsNullOrEmpty(returnType))
+                {
+                    throw CreateSyntaxError("函数返回类型重复声明");
+                }
+
+                returnType = CurrentToken.Value;
+                Expect(LangTokenType.Identifier);
+            }
+        }
+
+        // 如果有返回类型注解，创建新的LangId并设置AssumptionType
+        var updatedFuncName = funcName;
+        if (!string.IsNullOrEmpty(returnType))
+        {
+            updatedFuncName = new LangId(funcName.IdName, returnType, position: funcName.Position);
+        }
+
+        var stmtParser = statementParserFactory();
+        var block = stmtParser.ParseBlock();
+
+        // 异步函数声明，生成 AsyncFuncInit
+        return new AsyncFuncInit(
+            new AsyncFuncLangValue(updatedFuncName, parameters, block, updatedFuncName.Position),
+            updatedFuncName.Position);
     }
 
     /// <summary>

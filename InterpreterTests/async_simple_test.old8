@@ -1,0 +1,16 @@
+// 简单的异步函数测试
+import Async
+
+// 最简单的异步函数
+async func test() {
+    PrintLine("异步函数执行中")
+}
+
+// 调用异步函数
+task <- test()
+PrintLine("任务已创建")
+
+// 等待完成
+_ <- await task
+
+PrintLine("测试完成")

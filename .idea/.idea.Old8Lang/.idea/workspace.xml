@@ -18,36 +18,41 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.CompilerBenchmarkTests-20251215-024459.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.InterpreterBenchmarkTests-20251215-024308.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.CompilerBenchmarkTests-report-github.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.CompilerBenchmarkTests-report.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.CompilerBenchmarkTests-report.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.InterpreterBenchmarkTests-report-github.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.InterpreterBenchmarkTests-report.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.InterpreterBenchmarkTests-report.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/performance/function_calls.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/performance/tight_loop.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/2025-12-15-BenchmarkDotNet性能测试报告.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/2025-12-15-COW代码清理报告.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/2025-12-15-性能优化完成报告.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/2025-12-15-项目最终总结.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/2025-12-15-项目最终更新-BenchmarkDotNet测试完成.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_closure_cow.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_default_params.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/async_atomic.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/async_basic_execution.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/async_concurrent.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/async_debug_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/async_mutex.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/async_return_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/async_simple_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/async_sleep_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AwaitExpression.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncFuncInit.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/AsyncLib.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Async.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/CollectionLib.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Csv.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Json.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Vector.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/async_basic_syntax.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/NullLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/NullLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/ControlFlowManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/ControlFlowManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/ObjectPoolManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/ObjectPoolManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ErrorException.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/ErrorException.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangInfo.json" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangInfo.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/dll/Old8LangLib.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/dll/Old8LangLib.dll" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,16 +93,25 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/LangValueType.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/LangValueType.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/NullLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TupleLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Error/ErrorException.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/ControlFlowManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/ControlFlowManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/378b2b72dcfd47c7a335f353306873123e00/5d/0b33afd1/02000002pdb1.il" root0="FORCE_HIGHLIGHTING" />
@@ -411,7 +425,7 @@
       <workItem from="1765700935456" duration="239000" />
       <workItem from="1765703120567" duration="3476000" />
       <workItem from="1765720320753" duration="2106000" />
-      <workItem from="1765734191994" duration="3399000" />
+      <workItem from="1765734191994" duration="8387000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -756,7 +770,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="183" />
+    <option name="localTasksCounter" value="184" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -783,7 +797,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(parser): 更新表达式解析器测试用例&#10;&#10;- 将多个测试用例中的 Operation 断言更新为 TernaryExpression&#10;- 确保三元表达式在复杂表达式解析中的正确性&#10;- 修复测试用例与实际解析结果类型不匹配的问题" />
     <MESSAGE value="fix(parser): 更新OS库函数名和三元表达式语法&#10;&#10;- 将OSInfo()函数调用统一改为小写的OsInfo()&#10;- 修改字符串模板中的三元表达式语法格式&#10;- 更新相关测试文件以匹配新的函数命名规范&#10;- 调整程序入口测试路径指向正确的测试文件&#10;- 添加新的字符串测试用例验证三元表达式功能" />
     <MESSAGE value="feat(lang): 实现函数闭包支持并优化作用域管理&#10;&#10;- 为 FuncLangValue 添加闭包环境捕获机制&#10;- 在函数调用时克隆当前作用域以支持闭包变量访问&#10;- 修改 Run 方法逻辑，区分原生方法和 Old8Lang 函数的执行路径&#10;- 重构函数执行上下文管理，优先使用捕获的作用域&#10;- 优化参数处理逻辑，确保默认参数在正确的作用域中计算&#10;- 改进 SetStatement 类型检查模式匹配语法&#10;- 更新 IDE 配置文件以反映最新的代码变更和测试调整" />
     <MESSAGE value="fix(compiler): 修复Lambda表达式和函数默认参数编译问题&#10;&#10;- 解决Lambda表达式IL生成时的InvalidProgramException错误&#10;- 实现函数默认参数的正确IL代码生成逻辑&#10;- 支持函数重载机制，避免方法覆盖问题&#10;- 修复函数调用时参数数量不匹配的处理&#10;- 完善类型推断逻辑，确保编译时与运行时一致性" />
@@ -808,7 +821,8 @@
     <MESSAGE value="perf(interpreter): 实现对象池化优化解释器性能&#10;&#10;- 为BoolLangValue、IntLangValue、DoubleLangValue、StringLangValue、CharLangValue等值类型实现对象池化&#10;- 添加ObjectPool和ObjectPoolManager管理对象池&#10;- 修改值对象构造函数支持默认参数和池化接口&#10;- 优化循环执行机制，使用标志位替代异常处理break和continue&#10;- 更新类型转换和运算方法使用对象池创建实例&#10;- 优化ForStatement中布尔表达式处理后归还临时对象&#10;- 移除BreakException和ContinueException异常类&#10;- 更新编译器测试中冗余的命名空间引用&#10;- 添加解释器性能基准测试用例&#10;- 编写性能优化计划文档说明优化目标和实施方案" />
     <MESSAGE value="refactor(control-flow): 重构控制流状态管理机制&#10;&#10;- 引入 ControlFlowManager 类统一管理 break 和 continue 状态&#10;- 所有循环语句在开始时压入状态，结束时弹出状态&#10;- 每次迭代前重置当前状态，确保控制流标志正确&#10;- 更新 BreakStatement 和 ContinueStatement 使用新的状态管理器&#10;- 删除旧的 VariateManager 中的 BreakFlag 和 ContinueFlag 属性&#10;- 添加详细测试验证控制流状态生命周期管理正确性&#10;- 编写分析报告确认循环结束时无需手动重置状态" />
     <MESSAGE value="fix(lang): 修复私有访问控制bug并完善类属性修饰符支持&#10;&#10;- 修复private/protected字段访问控制逻辑，确保只能在类内部访问&#10;- 完善this引用查找机制，使用GetValue替代GetAny确保正确识别内部访问&#10;- 添加ExternalManager传递机制，使方法调用时能正确判断访问上下文&#10;- 支持protected修饰符语法解析和语义检查&#10;- 实现字段类型假注功能，支持int、double、string、bool、char等类型&#10;- 支持多种修饰符组合，包括public、private、static及其组合使用&#10;- 添加对未初始化字段声明的支持&#10;- 完善字段声明列表解析，支持逗号分隔的多个字段声明&#10;- 更新语法测试和解释器测试用例，覆盖各类修饰符使用场景&#10;- 修复编译器相关配置项命名一致性问题&#10;- 移除不必要的System.Reflection引用&#10;- 更新项目文档，补充性能基准测试说明和架构信息" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(lang): 修复私有访问控制bug并完善类属性修饰符支持&#10;&#10;- 修复private/protected字段访问控制逻辑，确保只能在类内部访问&#10;- 完善this引用查找机制，使用GetValue替代GetAny确保正确识别内部访问&#10;- 添加ExternalManager传递机制，使方法调用时能正确判断访问上下文&#10;- 支持protected修饰符语法解析和语义检查&#10;- 实现字段类型假注功能，支持int、double、string、bool、char等类型&#10;- 支持多种修饰符组合，包括public、private、static及其组合使用&#10;- 添加对未初始化字段声明的支持&#10;- 完善字段声明列表解析，支持逗号分隔的多个字段声明&#10;- 更新语法测试和解释器测试用例，覆盖各类修饰符使用场景&#10;- 修复编译器相关配置项命名一致性问题&#10;- 移除不必要的System.Reflection引用&#10;- 更新项目文档，补充性能基准测试说明和架构信息" />
+    <MESSAGE value="docs(reports): 添加性能优化项目完整文档&#10;&#10;- 新增五份详细报告，涵盖BenchmarkDotNet测试、COW代码清理、性能优化完成情况及项目总结&#10;- 包括解释器性能测试结果、优化技术验证、代码清理记录和项目最终评估&#10;- 提供完整的性能数据、优化前后对比及技术突破说明&#10;- 记录测试验证结果、待办事项和后续优化建议&#10;- 展示项目成果、技术亮点和工程实践经验总结" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(reports): 添加性能优化项目完整文档&#10;&#10;- 新增五份详细报告，涵盖BenchmarkDotNet测试、COW代码清理、性能优化完成情况及项目总结&#10;- 包括解释器性能测试结果、优化技术验证、代码清理记录和项目最终评估&#10;- 提供完整的性能数据、优化前后对比及技术突破说明&#10;- 记录测试验证结果、待办事项和后续优化建议&#10;- 展示项目成果、技术亮点和工程实践经验总结" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

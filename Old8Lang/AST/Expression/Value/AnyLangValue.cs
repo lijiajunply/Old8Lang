@@ -79,7 +79,7 @@ public class AnyLangValue : LangValueType
         // 保存外部管理器的引用
         ExternalManager = manager;
 
-        Manager.ImportInfos.AddRange(manager.ImportInfos.Where(x => x is not FuncLangValue).ToList());
+        Manager.AddImportInfoRange(manager.ImportInfos.Where(x => x is not FuncLangValue).ToList());
 
         foreach (var variable in Variates.Keys)
         {

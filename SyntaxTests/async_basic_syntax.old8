@@ -1,0 +1,20 @@
+// 基本异步函数语法测试
+
+// 测试1：简单的异步函数声明
+async func simpleAsync() {
+    PrintLine("异步函数执行")
+}
+
+// 测试2：带参数的异步函数
+async func asyncWithParams(x:int, y:int) {
+    result <- x + y
+    return result
+}
+
+// 测试3：带返回类型注解的异步函数
+async func fetchData(url:string) {
+    data <- "数据: " + url
+    return data
+}
+
+PrintLine("异步函数语法测试通过")

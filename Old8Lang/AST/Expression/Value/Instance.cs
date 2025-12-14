@@ -187,8 +187,23 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
         var func = manager.GetFunc(Id, Ids.Count);
         if (func != null)
         {
-            // 找到匹配的重载函数，直接调用
-            result = func.Run(manager, Ids);
+            // 检查是否为异步函数
+            if (func is AsyncFuncLangValue asyncFunc)
+            {
+                // 先调用 Run() 捕获闭包，然后调用返回的副本的 RunAsync()
+                var closedFunc = (AsyncFuncLangValue)asyncFunc.Run(manager);
+                result = closedFunc.RunAsync(manager, Ids);
+            }
+            else if (func is FuncLangValue funcValue)
+            {
+                // 找到匹配的重载函数，直接调用
+                result = funcValue.Run(manager, Ids);
+            }
+            else
+            {
+                // 其他类型的 ImportInfo，使用单参数 Run
+                result = func.Run(manager);
+            }
         }
         else
         {
@@ -232,6 +247,13 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             {
                 // 直接调用函数，参数表达式会在函数体内执行
                 result = funcValue.Run(manager, Ids);
+            }
+            // 如果idResult是AsyncFuncLangValue，则调用它
+            else if (idResult is AsyncFuncLangValue asyncFuncValue)
+            {
+                // 先调用 Run() 捕获闭包，然后调用返回的副本的 RunAsync()
+                var closedAsyncFunc = (AsyncFuncLangValue)asyncFuncValue.Run(manager);
+                result = closedAsyncFunc.RunAsync(manager, Ids);
             }
         }
 

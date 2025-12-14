@@ -133,7 +133,7 @@ public static class Apis
     /// <returns>更新后的语言信息对象</returns>
     public static LangInfo ChangeBasicInfo(string import, string ver, string uri = "https://downland.old8lang.com")
     {
-        var langInfo = new LangInfo { LibInfos = ReadJson().LibInfos, ImportPath = import, Ver = ver, Url = uri };
+        var langInfo = new LangInfo { LibInfos = ReadJson().LibInfos, ImportPath = import, Var = ver, Url = uri };
         var jsonString = JsonSerializer.Serialize(langInfo);
         File.WriteAllText(JsonPath, jsonString);
         return langInfo;
@@ -170,7 +170,7 @@ public static class Apis
         else
         {
             // 如果文件不存在，创建一个默认的 LangInfo 对象
-            langInfo = new LangInfo { LibInfos = [], Ver = "1.0.0", Url = "https://downland.old8lang.com" };
+            langInfo = new LangInfo { LibInfos = [], Var = "1.0.0", Url = "https://downland.old8lang.com" };
         }
 
         // 如果LibInfos为空，尝试直接加载默认的库信息
