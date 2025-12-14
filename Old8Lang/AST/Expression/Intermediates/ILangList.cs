@@ -1,5 +1,8 @@
 namespace Old8Lang.AST.Expression.Intermediates;
 
+/// <summary>
+/// 列表接口
+/// </summary>
 public interface ILangList
 {
     public IEnumerable<LangValueType> GetItems();
