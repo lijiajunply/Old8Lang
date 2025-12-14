@@ -64,6 +64,8 @@ public class StatementParser(
             return ParseStatement(combinedModifiers);
         }
 
+
+
         // 处理括号块：(statement)
         if (CurrentToken.Type == LangTokenType.LeftParen)
         {
@@ -682,24 +684,24 @@ public class StatementParser(
         var importToken = CurrentToken;
         var position = new SourcePosition(importToken.Line, importToken.Column, tokenValue: importToken.Value);
         Expect(LangTokenType.Import);
-        
+
         List<ImportItem>? importSpecifiers = null;
         bool fromClause = false;
         string moduleName;
-        
+
         // 检查是否有导入指定项
         if (CurrentToken.Type == LangTokenType.LeftBrace)
         {
             // 解析命名导入：{ item1, item2 as alias2, ... }
             importSpecifiers = new List<ImportItem>();
             Expect(LangTokenType.LeftBrace);
-            
+
             do
             {
                 // 解析导入项
                 string name = CurrentToken.Value;
                 Expect(LangTokenType.Identifier);
-                
+
                 string? alias = null;
                 if (CurrentToken.Type == LangTokenType.As)
                 {
@@ -707,17 +709,16 @@ public class StatementParser(
                     alias = CurrentToken.Value;
                     Expect(LangTokenType.Identifier);
                 }
-                
+
                 importSpecifiers.Add(new ImportItem(name, alias));
-                
             } while (CurrentToken.Type == LangTokenType.Comma && (CurrentIndex++ > -1));
-            
+
             Expect(LangTokenType.RightBrace);
-            
+
             // 解析 from 子句
             fromClause = true;
             Expect(LangTokenType.From);
-            
+
             // 解析模块名
             if (CurrentToken.Type == LangTokenType.String)
             {
@@ -746,7 +747,7 @@ public class StatementParser(
         {
             throw CreateSyntaxError("Expected identifier, string, or left brace after import");
         }
-        
+
         return new ImportStatement(moduleName, position, importSpecifiers, fromClause);
     }
 

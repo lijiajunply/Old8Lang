@@ -104,17 +104,23 @@ public class TypeTemplate(
     /// <returns>成员值</returns>
     private LangValueType GetStaticMember(LangId id, LangParser.VariateManager manager)
     {
-        // 转换为 ClassMemberId 进行查找
-        var classMemberId = new ClassMemberId(id);
+        // 查找实际的 ClassMemberId（包含修饰符信息）
+        ClassMemberId? actualMemberId = null;
+        LangExpression? expr = null;
 
-        // 先查找当前类的静态成员
-        if (StaticVariates.TryGetValue(classMemberId, out var expr))
+        // 1. 先查找当前类的静态成员
+        foreach (var (memberId, memberExpr) in StaticVariates)
         {
-            return expr.Run(manager);
+            if (memberId.IdName == id.IdName)
+            {
+                actualMemberId = memberId;
+                expr = memberExpr;
+                break;
+            }
         }
 
-        // 然后查找父类的静态成员
-        if (ParentClassName != null)
+        // 2. 如果没找到，查找父类的静态成员
+        if (actualMemberId == null && ParentClassName != null)
         {
             if (manager.GetAny(new LangId(ParentClassName)) is TypeTemplate parentType)
             {
@@ -122,13 +128,43 @@ public class TypeTemplate(
             }
         }
 
-        // 如果是实例成员，也可以通过类名访问（如果存在的话）
-        if (Variates.TryGetValue(classMemberId, out expr))
+        // 3. 如果没找到，查找当前类的实例成员
+        if (actualMemberId == null)
         {
-            return expr.Run(manager);
+            foreach (var (memberId, memberExpr) in Variates)
+            {
+                if (memberId.IdName == id.IdName)
+                {
+                    actualMemberId = memberId;
+                    expr = memberExpr;
+                    break;
+                }
+            }
         }
 
-        throw new NameError(this, id.IdName);
+        // 4. 检查是否找到成员
+        if (actualMemberId == null || expr == null)
+        {
+            throw new NameError(this, id.IdName);
+        }
+
+        // 5. 检查访问权限
+        bool isPrivate = actualMemberId.HasModifier(AccessModifierType.Private);
+        
+        // 直接检查成员是否是私有的，如果是，外部无法访问
+        // 静态成员的私有访问控制：只有类内部可以访问
+        if (isPrivate)
+        {
+            // 检查是否在类内部访问（通过检查当前作用域是否有类上下文）
+            bool isInClassContext = manager.IsClass;
+            if (!isInClassContext)
+            {
+                throw new NameError(this, id.IdName);
+            }
+        }
+
+        // 6. 执行并返回结果
+        return expr.Run(manager);
     }
 
     /// <summary>

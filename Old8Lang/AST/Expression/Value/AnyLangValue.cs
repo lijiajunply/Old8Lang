@@ -17,7 +17,8 @@ public class AnyLangValue : LangValueType
 
     public readonly VariateManager Manager;
 
-    public AnyLangValue(LangId id, Dictionary<ClassMemberId, LangExpression> variates, SourcePosition position = default) :
+    public AnyLangValue(LangId id, Dictionary<ClassMemberId, LangExpression> variates,
+        SourcePosition position = default) :
         base(position)
     {
         Variates = variates;
@@ -53,7 +54,8 @@ public class AnyLangValue : LangValueType
         // 而是直接将Result字典中的值存储到实例中
     }
 
-    public AnyLangValue(Dictionary<ClassMemberId, LangExpression> variates, SourcePosition position = default) : base(position)
+    public AnyLangValue(Dictionary<ClassMemberId, LangExpression> variates, SourcePosition position = default) :
+        base(position)
     {
         Variates = variates;
         Id = new LangId("JsonNative");
@@ -95,6 +97,41 @@ public class AnyLangValue : LangValueType
         {
             case LangId id:
             {
+                // 查找字段的ClassMemberId，获取访问修饰符
+                ClassMemberId? memberId = null;
+                foreach (var (key, _) in Variates)
+                {
+                    if (key.IdName == id.IdName)
+                    {
+                        memberId = key;
+                        break;
+                    }
+                }
+
+                // 检查访问权限
+                bool isPrivate = memberId?.HasModifier(AccessModifierType.Private) ?? false;
+                bool isStatic = memberId?.HasModifier(AccessModifierType.Static) ?? false;
+
+                // 对于静态字段，检查调用上下文是否在类内部
+                bool isInternalAccess;
+                try
+                {
+                    Manager.GetAny(new LangId("this"));
+                    isInternalAccess = true;
+                }
+                catch
+                {
+                    // 尝试检查是否通过类名访问静态成员
+                    // 静态成员可以通过类名访问，但私有静态成员只能在类内部访问
+                    isInternalAccess = false;
+                }
+
+                // 外部无法访问私有字段，无论是实例字段还是静态字段
+                if (isPrivate && !isInternalAccess)
+                {
+                    throw new AttributeError(this, id.IdName, Id.IdName);
+                }
+
                 // 首先检查Result字典中是否有该属性
                 if (Result.TryGetValue(id.IdName, out var value))
                 {
@@ -104,8 +141,6 @@ public class AnyLangValue : LangValueType
                         // 在调用类方法时，将当前实例作为"this"变量添加到变量储存器中
                         Manager.Set(new LangId("this"), this);
                         var funcResult = funcValue.Run(Manager);
-                        // 方法执行完毕后，移除"this"变量
-                        // 注意：这里不需要手动移除，因为FuncLangValue.Run方法会调用RemoveChildren()
                         return funcResult;
                     }
 

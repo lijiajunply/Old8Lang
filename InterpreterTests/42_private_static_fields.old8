@@ -1,0 +1,47 @@
+// 测试 private static 修饰符组合
+PrintLine("=== private static 修饰符组合测试 ===")
+
+class TestClass {
+    private static staticPrivateField
+    public static staticPublicField <- 100
+    private instancePrivateField <- "private"
+    public instancePublicField <- "public"
+    
+    public func accessPrivateStatic() {
+        // 类内部可以访问私有静态字段
+        staticPrivateField <- "accessible"
+        PrintLine("类内部访问私有静态字段: " + staticPrivateField)
+    }
+    
+    public func accessPublicStatic() {
+        // 类内部可以访问公共静态字段
+        PrintLine("类内部访问公共静态字段: " + staticPublicField)
+    }
+    
+    public func getPrivateStatic() {
+        return staticPrivateField
+    }
+}
+
+// 测试实例化和访问
+test <- TestClass()
+
+test.accessPrivateStatic()
+test.accessPublicStatic()
+
+// 测试外部访问公共静态字段（应该可以）
+PrintLine("外部访问公共静态字段: " + TestClass.staticPublicField)
+
+// 测试外部访问私有静态字段（应该报错）
+try {
+    PrintLine("尝试外部访问私有静态字段: " + TestClass.staticPrivateField)
+    PrintLine("❌ 错误：外部应该无法访问私有静态字段")
+} catch (e) {
+    PrintLine("✅ 正确：外部无法访问私有静态字段")
+}
+
+// 测试通过方法访问私有静态字段（应该可以）
+value <- test.getPrivateStatic()
+PrintLine("通过方法访问私有静态字段: " + value)
+
+PrintLine("✅ private static 修饰符组合测试完成")

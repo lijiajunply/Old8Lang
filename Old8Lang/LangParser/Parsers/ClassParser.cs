@@ -101,8 +101,31 @@ public class ClassParser(
                     modifiers = ParseAccessModifiers();
                 }
 
-                // 解析语句
-                var statement = statementParserFactory().ParseStatement();
+                // 检查是否是未初始化的字段声明：[modifiers] identifier
+                if (CurrentToken.Type == LangTokenType.Identifier)
+                {
+                    var nextToken = Peek();
+                    // 未初始化字段：后面不是赋值符号
+                    if (nextToken.Type != LangTokenType.Assignment)
+                    {
+                        // 处理未初始化字段声明
+                        var fieldName = CurrentToken.Value;
+                        var position = CreateSourcePosition(CurrentToken);
+                        CurrentIndex++;
+
+                        // 创建类成员ID
+                        var memberId = new ClassMemberId(fieldName, "", modifiers, position);
+                        // 使用默认值 null 或适当的默认值
+                        var defaultExpr = new NullLangValue(position);
+                        // 创建 ClassFieldSetStatement
+                        var classMemberStatement = new ClassFieldSetStatement(memberId, defaultExpr, position);
+                        statements.Add(classMemberStatement);
+                        continue;
+                    }
+                }
+
+                // 解析语句，传递修饰符
+                var statement = statementParserFactory().ParseStatement(modifiers);
 
                 // 根据语句类型和修饰符生成相应的类成员节点
                 if (modifiers.Count != 0)
@@ -134,7 +157,7 @@ public class ClassParser(
                 }
                 else
                 {
-                    // 没有修饰符，直接添加原始语句
+                    // 直接添加原始语句
                     statements.Add(statement);
                 }
             }

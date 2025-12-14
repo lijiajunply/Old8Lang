@@ -1,0 +1,17 @@
+// 简单测试未初始化字段声明
+PrintLine("=== 简单未初始化字段测试 ===")
+
+// 定义一个带有未初始化字段的类
+class TestClass {
+    public x
+    public y <- 2
+}
+
+// 创建类实例
+obj <- TestClass()
+
+// 测试未初始化字段是否被赋值为 null
+PrintLine("x 的值: " + obj.x)
+PrintLine("y 的值: " + obj.y)
+
+PrintLine("\n✅ 简单未初始化字段测试完成")

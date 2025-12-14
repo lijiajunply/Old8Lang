@@ -1,0 +1,40 @@
+// 测试类内部未初始化字段
+PrintLine("=== 类内部未初始化字段测试 ===")
+
+// 测试基本的未初始化字段
+class TestClass {
+    public x
+    public y <- 2
+    private z
+    static s
+}
+
+// 测试实例化和访问未初始化字段
+test <- TestClass()
+PrintLine("访问未初始化的公共字段 x: " + test.x)
+PrintLine("访问已初始化的公共字段 y: " + test.y)
+
+// 测试修改未初始化字段
+test.x <- 10
+PrintLine("修改后访问公共字段 x: " + test.x)
+
+// 测试带有继承的未初始化字段
+class BaseClass {
+    public baseField
+}
+
+class SubClass extends BaseClass {
+    public subField
+}
+
+sub <- SubClass()
+PrintLine("访问继承的未初始化字段 baseField: " + sub.baseField)
+PrintLine("访问子类未初始化字段 subField: " + sub.subField)
+
+// 测试未初始化字段的类型推断
+sub.baseField <- "字符串值"
+sub.subField <- 3.14
+PrintLine("修改为字符串的 baseField: " + sub.baseField)
+PrintLine("修改为浮点数的 subField: " + sub.subField)
+
+PrintLine("✅ 类内部未初始化字段测试完成")

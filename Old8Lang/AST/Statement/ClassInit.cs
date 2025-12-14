@@ -134,11 +134,33 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
                 fieldType = typeof(object);
             }
 
+            // 根据修饰符设置字段属性
+            var fieldAttributes = FieldAttributes.Public; // 默认是公共字段
+            
+            if (memberId.HasModifier(AccessModifierType.Private))
+            {
+                fieldAttributes = FieldAttributes.Private;
+            }
+            else if (memberId.HasModifier(AccessModifierType.Protected))
+            {
+                fieldAttributes = FieldAttributes.Family;
+            }
+            else if (!memberId.HasModifier(AccessModifierType.Public))
+            {
+                // 如果没有明确指定访问修饰符，使用默认的公共访问
+                fieldAttributes = FieldAttributes.Public;
+            }
+            
+            if (memberId.HasModifier(AccessModifierType.Static))
+            {
+                fieldAttributes |= FieldAttributes.Static;
+            }
+            
             // 定义字段
             var fieldBuilder = typeBuilder.DefineField(
                 memberId.IdName,
                 fieldType,
-                FieldAttributes.Public);
+                fieldAttributes);
 
             // 保存字段信息到 LocalManager，以便在方法中访问
             // 如果父类已经有同名字段，子类的字段会覆盖它
