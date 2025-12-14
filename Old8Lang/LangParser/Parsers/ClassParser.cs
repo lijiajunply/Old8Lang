@@ -16,11 +16,28 @@ public class ClassParser(
 {
     public ClassInit ParseClassDeclaration()
     {
-        Expect(LangTokenType.Class);
+        bool isMixin = false;
+        // 检查是 class 还是 mixin
+        if (CurrentToken.Type == LangTokenType.Class)
+        {
+            Expect(LangTokenType.Class);
+        }
+        else if (CurrentToken.Type == LangTokenType.Mixin)
+        {
+            isMixin = true;
+            Expect(LangTokenType.Mixin);
+        }
+        else
+        {
+            throw new InvalidOperationException("Expected class or mixin keyword");
+        }
+        
         var className = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
 
         string? parentClassName = null;
+        List<string> mixinNames = new List<string>();
+        
         // 处理继承语法：class Name extends ParentClass {
         if (CurrentToken is { Type: LangTokenType.Extends })
         {
@@ -34,10 +51,36 @@ public class ClassParser(
                 CurrentIndex++;
             }
         }
+        
+        // 处理 with 子句：class Name extends ParentClass with Mixin1, Mixin2 {
+        if (CurrentToken is { Type: LangTokenType.With })
+        {
+            // 跳过 with 关键字
+            Expect(LangTokenType.With);
+            
+            // 解析多个 mixin 类，用逗号分隔
+            while (true)
+            {
+                if (CurrentToken.Type == LangTokenType.Identifier)
+                {
+                    mixinNames.Add(CurrentToken.Value);
+                    CurrentIndex++;
+                }
+                
+                // 检查是否还有更多 mixin
+                if (CurrentToken.Type == LangTokenType.Comma)
+                {
+                    CurrentIndex++;
+                    continue;
+                }
+                
+                break;
+            }
+        }
 
         var classBlock = ParseClassBlock();
         return new ClassInit(new TypeTemplate(className, classBlock.ToAnyData(), classBlock.ToStaticData(),
-            parentClassName));
+            parentClassName, isMixin, mixinNames));
     }
 
     /// <summary>

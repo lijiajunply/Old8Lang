@@ -216,6 +216,14 @@ public enum LangTokenType
     Extends,
     Throw,
     /// <summary>
+    /// mixin
+    /// </summary>
+    Mixin,
+    /// <summary>
+    /// with
+    /// </summary>
+    With,
+    /// <summary>
     /// static
     /// </summary>
     Static,
@@ -264,6 +272,8 @@ public enum KeywordType
     Xor,
     This,
     Extends,
+    Mixin,
+    With,
     Static,
     Public,
     Private,

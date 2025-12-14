@@ -1,0 +1,21 @@
+// 简单测试 mixin 功能
+
+// 定义一个简单的 mixin
+mixin Logger {
+    func log(message) {
+        PrintLine("[LOG] " + message)
+    }
+}
+
+// 应用 mixin
+class User with Logger {
+    name <- ""
+    
+    func init(name) {
+        this.name <- name
+    }
+}
+
+// 测试代码
+user <- User("Alice")
+user.log("Hello from user")

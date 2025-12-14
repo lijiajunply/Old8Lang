@@ -225,8 +225,8 @@ public class StatementParser(
             return ParseThrowStatement();
         }
 
-        // 处理class定义：class identifier block
-        if (CurrentToken.Type == LangTokenType.Class)
+        // 处理class或mixin定义：class identifier block 或 mixin identifier block
+        if (CurrentToken.Type == LangTokenType.Class || CurrentToken.Type == LangTokenType.Mixin)
         {
             return classParser.ParseClassDeclaration();
         }

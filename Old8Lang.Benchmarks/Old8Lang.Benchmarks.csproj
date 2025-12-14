@@ -7,13 +7,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Old8Lang\Old8Lang.csproj" />
-    <ProjectReference Include="..\Old8LangLib\Old8LangLib.csproj" />
-  </ItemGroup>
-
 </Project>

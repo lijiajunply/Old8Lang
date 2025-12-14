@@ -1,0 +1,30 @@
+// 测试多个 mixin 功能
+
+// 定义第一个 mixin
+mixin Logger {
+    func log(message) {
+        PrintLine("[LOG] " + message)
+    }
+}
+
+// 定义第二个 mixin
+mixin Serializable {
+    func serialize() {
+        return "Serialized object"
+    }
+}
+
+// 应用多个 mixin
+class User with Logger, Serializable {
+    name <- ""
+    
+    func init(name) {
+        this.name <- name
+    }
+}
+
+// 测试代码
+user <- User("Alice")
+user.log("Hello from user")
+serialized <- user.serialize()
+PrintLine("Serialized: " + serialized)

@@ -1,0 +1,29 @@
+// 测试继承和 mixin 结合使用
+
+// 定义一个 mixin
+mixin Logger {
+    func log(message) {
+        PrintLine("[LOG] " + message)
+    }
+}
+
+// 定义一个基类
+class BaseClass {
+    name <- ""
+    
+    func init(name) {
+        this.name <- name
+    }
+}
+
+// 继承基类并应用 mixin
+class User extends BaseClass with Logger {
+    func init(name) {
+        this.name <- name
+    }
+}
+
+// 测试代码
+user <- User("Alice")
+user.log("Hello from user")
+PrintLine("User name: " + user.name)

@@ -457,7 +457,50 @@ class Person {
 
 标识符分别为 public、private、protected、static
 
-#### 5.5.2 类实例化
+#### 5.5.2 Mixin 声明
+
+Mixin 是一种特殊的类，用于提供可重用的功能模块，可以被多个类使用。
+
+```
+mixin Logger {
+    public func log(message) {
+        PrintLine("[LOG] " + message)
+    }
+}
+
+mixin Serializable {
+    public func serialize() {
+        return "Serialized object"
+    }
+}
+```
+
+#### 5.5.3 使用 Mixin
+
+类可以通过 `with` 关键字应用一个或多个 mixin：
+
+```
+// 应用单个 mixin
+class User extends BaseClass with Logger {
+    func init(name) {
+        this.name <- name
+        log("User created: " + name)
+    }
+}
+
+// 应用多个 mixin
+class Product extends BaseClass with Logger, Serializable {
+    public price <- 0.0
+    
+    func init(name, price) {
+        this.name <- name
+        this.price <- price
+        log("Product created: " + name)
+    }
+}
+```
+
+#### 5.5.4 类实例化
 
 ```
 p <- Person("Alice", 30)

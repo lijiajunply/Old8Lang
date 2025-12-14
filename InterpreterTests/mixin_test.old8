@@ -1,0 +1,55 @@
+// 测试 mixin 功能
+
+// 定义一个简单的 mixin
+mixin Logger {
+    public func log(message) {
+        PrintLine("[LOG] " + message)
+    }
+}
+
+// 定义另一个 mixin
+mixin Serializable {
+    public func serialize() {
+        return "Serialized object"
+    }
+}
+
+// 定义一个基类
+class BaseClass {
+    public name <- ""
+    
+    func init(name) {
+        this.name <- name
+    }
+}
+
+// 应用单个 mixin
+class User extends BaseClass with Logger {
+    func init(name) {
+        this.name <- name
+        log("User created: " + name) // 使用 Logger mixin 的方法
+    }
+}
+
+// 应用多个 mixin
+class Product extends BaseClass with Logger, Serializable {
+    public price <- 0.0
+    
+    func init(name, price) {
+        this.name <- name
+        this.price <- price
+        log("Product created: " + name + ", price: " + price) // 使用 Logger mixin 的方法
+    }
+}
+
+// 测试代码
+user <- User("Alice")
+product <- Product("Laptop", 999.99)
+
+// 测试 mixin 方法调用
+user.log("Hello from user")
+product.log("Hello from product")
+
+// 测试多个 mixin
+serialized <- product.serialize()
+PrintLine("Serialized product: " + serialized)

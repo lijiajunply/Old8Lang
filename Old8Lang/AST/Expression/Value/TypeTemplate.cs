@@ -11,6 +11,8 @@ public class TypeTemplate(
     Dictionary<ClassMemberId, LangExpression> variates,
     Dictionary<ClassMemberId, LangExpression> staticVariates,
     string? parentClassName = null,
+    bool isMixin = false,
+    List<string>? mixinNames = null,
     SourcePosition position = default)
     : ImportInfo(position)
 {
@@ -18,15 +20,30 @@ public class TypeTemplate(
     public readonly Dictionary<ClassMemberId, LangExpression> Variates = variates;
     public readonly Dictionary<ClassMemberId, LangExpression> StaticVariates = staticVariates;
     public readonly string? ParentClassName = parentClassName;
+    public readonly bool IsMixin = isMixin;
+    public readonly List<string> MixinNames = mixinNames ?? [];
 
-    public override string ToString() => ParentClassName == null
-        ? $"TypeTemplate({ClassName})"
-        : $"TypeTemplate({ClassName} extends {ParentClassName})";
+    public override string ToString()
+    {
+        var baseStr = IsMixin ? $"MixinTemplate({ClassName})" : $"TypeTemplate({ClassName})";
+        
+        if (ParentClassName != null)
+        {
+            baseStr += $" extends {ParentClassName}";
+        }
+        
+        if (MixinNames.Count > 0)
+        {
+            baseStr += $" with {string.Join(", ", MixinNames)}";
+        }
+        
+        return baseStr;
+    }
 
     /// <summary>
-    /// 递归获取所有父类的成员变量和方法
+    /// 递归获取所有父类和mixin的成员变量和方法
     /// </summary>
-    /// <param name="manager">变量管理器，用于获取父类信息</param>
+    /// <param name="manager">变量管理器，用于获取父类和mixin信息</param>
     /// <param name="type">当前类型模板</param>
     /// <param name="allVariates">用于存储所有成员的字典</param>
     private void GetAllParentMembers(LangParser.VariateManager manager, TypeTemplate type,
@@ -45,6 +62,23 @@ public class TypeTemplate(
                              !allVariates.ContainsKey(parentMember.Key)))
                 {
                     allVariates[parentMember.Key] = parentMember.Value;
+                }
+            }
+        }
+        
+        // 处理所有mixin类
+        foreach (var mixinName in type.MixinNames)
+        {
+            if (manager.GetAny(new LangId(mixinName)) is TypeTemplate mixinType)
+            {
+                // 递归获取mixin的父类和mixin成员
+                GetAllParentMembers(manager, mixinType, allVariates);
+                
+                // 添加当前mixin的成员
+                foreach (var mixinMember in mixinType.Variates.Where(mixinMember =>
+                             !allVariates.ContainsKey(mixinMember.Key)))
+                {
+                    allVariates[mixinMember.Key] = mixinMember.Value;
                 }
             }
         }
