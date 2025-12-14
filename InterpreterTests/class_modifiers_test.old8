@@ -1,0 +1,154 @@
+// 测试类属性访问修饰符功能
+
+// 测试1：public 修饰符
+PrintLine("=== 测试 1: Public 修饰符 ===")
+class PublicTest {
+    public x:int <- 10
+    public y:string <- "public field"
+}
+
+p1 <- PublicTest()
+PrintLine("p1.x = " + p1.x.ToStr())
+PrintLine("p1.y = " + p1.y)
+PrintLine("✓ Public 字段可以正常访问")
+
+// 测试2：private 修饰符
+PrintLine("\n=== 测试 2: Private 修饰符 ===")
+class PrivateTest {
+    private secret:int <- 42
+    public value:int <- 100
+
+    func getSecret() {
+        return this.secret
+    }
+
+    func setSecret(newSecret) {
+        this.secret <- newSecret
+    }
+}
+
+p2 <- PrivateTest()
+PrintLine("p2.value (public) = " + p2.value.ToStr())
+PrintLine("通过方法访问 private 字段: p2.getSecret() = " + p2.getSecret().ToStr())
+p2.setSecret(999)
+PrintLine("修改后: p2.getSecret() = " + p2.getSecret().ToStr())
+PrintLine("✓ Private 字段可以通过类内方法访问和修改")
+
+// 测试3：static 修饰符（简单版本）
+PrintLine("\n=== 测试 3: Static 修饰符 ===")
+class StaticTest {
+    static counter:int <- 100
+    public id:int <- 1
+}
+
+PrintLine("访问静态字段: StaticTest.counter = " + StaticTest.counter.ToStr())
+s1 <- StaticTest()
+PrintLine("实例字段: s1.id = " + s1.id.ToStr())
+PrintLine("✓ Static 字段可以通过类名访问")
+
+// 测试4：public static 组合
+PrintLine("\n=== 测试 4: Public Static 组合 ===")
+class ConfigTest {
+    public static appName:string <- "Old8Lang"
+    public static version:string <- "1.0.0"
+    public static maxUsers:int <- 1000
+    public name:string <- "config instance"
+}
+
+PrintLine("ConfigTest.appName = " + ConfigTest.appName)
+PrintLine("ConfigTest.version = " + ConfigTest.version)
+PrintLine("ConfigTest.maxUsers = " + ConfigTest.maxUsers.ToStr())
+
+c1 <- ConfigTest()
+PrintLine("实例字段: c1.name = " + c1.name)
+PrintLine("✓ Public static 组合正常工作")
+
+// 测试5：混合使用各种修饰符
+PrintLine("\n=== 测试 5: 混合使用修饰符 ===")
+class MixedTest {
+    public publicField:int <- 1
+    private privateField:int <- 2
+    static staticField:int <- 3
+    public static publicStaticField:int <- 4
+    normalField <- 5
+
+    func showAll() {
+        PrintLine("  publicField = " + this.publicField.ToStr())
+        PrintLine("  privateField = " + this.privateField.ToStr())
+        PrintLine("  normalField = " + this.normalField.ToStr())
+    }
+
+    func getPrivateField() {
+        return this.privateField
+    }
+}
+
+m1 <- MixedTest()
+m1.showAll()
+PrintLine("从外部访问 public: m1.publicField = " + m1.publicField.ToStr())
+PrintLine("从外部访问 normal: m1.normalField = " + m1.normalField.ToStr())
+PrintLine("通过方法访问 private: m1.getPrivateField() = " + m1.getPrivateField().ToStr())
+PrintLine("访问 static: MixedTest.staticField = " + MixedTest.staticField.ToStr())
+PrintLine("访问 public static: MixedTest.publicStaticField = " + MixedTest.publicStaticField.ToStr())
+PrintLine("✓ 混合修饰符正常工作")
+
+// 测试6：修改字段值
+PrintLine("\n=== 测试 6: 修改字段值 ===")
+class ModifyTest {
+    public count:int <- 0
+    private data:string <- "original"
+
+    func updateData(newData) {
+        this.data <- newData
+    }
+
+    func getData() {
+        return this.data
+    }
+}
+
+mod <- ModifyTest()
+PrintLine("初始 count = " + mod.count.ToStr())
+mod.count <- 42
+PrintLine("修改后 count = " + mod.count.ToStr())
+
+PrintLine("初始 data = " + mod.getData())
+mod.updateData("modified")
+PrintLine("修改后 data = " + mod.getData())
+PrintLine("✓ 字段值修改正常")
+
+// 测试7：无修饰符字段（默认行为）
+PrintLine("\n=== 测试 7: 无修饰符字段 ===")
+class NoModifierTest {
+    defaultField <- "default"
+    anotherField:int <- 123
+}
+
+n1 <- NoModifierTest()
+PrintLine("n1.defaultField = " + n1.defaultField)
+PrintLine("n1.anotherField = " + n1.anotherField.ToStr())
+PrintLine("✓ 无修饰符字段正常工作")
+
+// 测试8：带类型假注的各种修饰符
+PrintLine("\n=== 测试 8: 带类型假注的修饰符 ===")
+class TypeAnnotationTest {
+    public intVal:int <- 10
+    private strVal:string <- "private"
+    static doubleVal:double <- 3.14
+    public static boolVal:bool <- true
+
+    func getStrVal() {
+        return this.strVal
+    }
+}
+
+t1 <- TypeAnnotationTest()
+PrintLine("public int: t1.intVal = " + t1.intVal.ToStr())
+PrintLine("private string (通过方法): " + t1.getStrVal())
+PrintLine("static double: TypeAnnotationTest.doubleVal = " + TypeAnnotationTest.doubleVal.ToStr())
+PrintLine("public static bool: TypeAnnotationTest.boolVal = " + TypeAnnotationTest.boolVal.ToStr())
+PrintLine("✓ 带类型假注的修饰符正常工作")
+
+PrintLine("\n" + "=".Repeat(50))
+PrintLine("所有测试完成！✓")
+PrintLine("=".Repeat(50))

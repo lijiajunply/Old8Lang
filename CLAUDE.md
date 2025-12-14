@@ -12,13 +12,14 @@ Old8Lang is a dynamic programming language designed with C#/Java-like syntax, su
 
 ## Solution Structure
 
-The solution consists of 5 main projects:
+The solution consists of 6 main projects:
 
 - **Old8Lang**: Core language library containing AST, parser, interpreter, and compiler
 - **Old8Lang.App**: CLI application for running Old8Lang code
 - **Old8LangLib**: Native library providing OS, file, network, and terminal utilities
 - **Old8Lang.NetLib**: Network library providing MQTT and advanced networking features (requires MQTTnet)
 - **Old8Lang.Tests**: Unit tests using xUnit
+- **Old8Lang.Benchmarks**: Performance benchmarks using BenchmarkDotNet
 
 ## Building and Testing
 
@@ -63,6 +64,9 @@ dotnet test --filter "FullyQualifiedName~Old8Lang.Tests.ParsersTests"
 ./run_compiler_tests.sh                # Test compiler mode execution
 ./run_comprehensive_compiler_tests.sh  # Run all compiler tests with detailed report
 ./analyze_failures.sh                  # Analyze and report test failures
+
+# Run performance benchmarks
+dotnet run --project Old8Lang.Benchmarks --configuration Release
 ```
 
 ## Architecture
@@ -114,7 +118,7 @@ Located in `Old8Lang/Compiler/`:
 The compiler provides several configuration options in `Compiler.cs`:
 
 - `DebugOutputEnabled`: Enable/disable debug output (default: false)
-- `ILVerificationEnabled`: Enable/disable IL code verification (default: true)
+- `ilVerificationEnabled`: Enable/disable IL code verification (default: true)
 - `CurrentLogLevel`: Set logging level (Error, Warning, Info, Debug) (default: Info)
 
 Example usage in code:
@@ -263,8 +267,7 @@ func example(
 
 ### Visitor Pattern Implementation
 
-**Note**: The codebase is in the process of transitioning to visitor pattern. Currently:
-- No `Visitor/` directory exists yet in `Old8Lang/AST/`
+**Note**: The codebase is in the process of transitioning to visitor pattern:
 - AST nodes are being refactored to support visitor pattern
 - See commits 3ced530, 39ae648 for visitor pattern refactoring progress
 

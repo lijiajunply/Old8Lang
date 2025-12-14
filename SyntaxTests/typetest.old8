@@ -1,0 +1,8 @@
+// 测试5：各种类型的类型假注
+class TypeTest {
+    public intVal:int <- 42
+    public doubleVal:double <- 3.14
+    public stringVal:string <- "hello"
+    public boolVal:bool <- true
+    public charVal:char <- 'A'
+}

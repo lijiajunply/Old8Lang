@@ -1,0 +1,16 @@
+// 简单测试 private 访问
+
+class TestPrivate {
+    private secret:int <- 42
+
+    func getSecret() {
+        PrintLine("在 getSecret 方法中...")
+        PrintLine("访问 this.secret")
+        return this.secret
+    }
+}
+
+obj <- TestPrivate()
+PrintLine("调用 obj.getSecret()")
+result <- obj.getSecret()
+PrintLine("结果: " + result.ToStr())

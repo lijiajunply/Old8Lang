@@ -110,24 +110,54 @@ public class AnyLangValue : LangValueType
 
                 // 检查访问权限
                 bool isPrivate = memberId?.HasModifier(AccessModifierType.Private) ?? false;
+                bool isProtected = memberId?.HasModifier(AccessModifierType.Protected) ?? false;
                 bool isStatic = memberId?.HasModifier(AccessModifierType.Static) ?? false;
 
-                // 对于静态字段，检查调用上下文是否在类内部
-                bool isInternalAccess;
+                // 检查调用上下文是否在类内部
+                // 关键：需要检查外部管理器（ExternalManager）中的 this，而不是当前实例的 Manager
+                bool isInternalAccess = false;
+
+                // 首先检查自己的 Manager 中是否有 this（在类方法内部访问时）
                 try
                 {
-                    Manager.GetAny(new LangId("this"));
-                    isInternalAccess = true;
+                    var thisInManager = Manager.GetValue(new LangId("this"));
+                    if (ReferenceEquals(thisInManager, this))
+                    {
+                        isInternalAccess = true;
+                    }
                 }
                 catch
                 {
-                    // 尝试检查是否通过类名访问静态成员
-                    // 静态成员可以通过类名访问，但私有静态成员只能在类内部访问
-                    isInternalAccess = false;
+                    // Manager 中没有 this
                 }
 
-                // 外部无法访问私有字段，无论是实例字段还是静态字段
+                // 如果还没有确认是内部访问，再检查 ExternalManager
+                if (!isInternalAccess && ExternalManager != null)
+                {
+                    try
+                    {
+                        var thisInfo = ExternalManager.GetValue(new LangId("this"));
+                        // GetValue 返回 LangValueType，AnyLangValue 继承自 LangValueType
+                        // 所以可以直接比较引用
+                        if (ReferenceEquals(thisInfo, this))
+                        {
+                            isInternalAccess = true;
+                        }
+                    }
+                    catch
+                    {
+                        // ExternalManager 中没有 this，说明不在类内部
+                    }
+                }
+
+                // 外部无法访问私有字段
                 if (isPrivate && !isInternalAccess)
+                {
+                    throw new AttributeError(this, id.IdName, Id.IdName);
+                }
+
+                // 外部无法访问保护字段（protected 的语义与 private 在 Old8Lang 中相同，因为没有继承）
+                if (isProtected && !isInternalAccess)
                 {
                     throw new AttributeError(this, id.IdName, Id.IdName);
                 }
@@ -195,9 +225,21 @@ public class AnyLangValue : LangValueType
                             currentManager.Set(new LangId(member.Key), member.Value);
                         }
 
-                        // 调用方法时使用当前管理器，这样可以访问外部变量
-                        var funcResult = funcValue.Run(currentManager, methodArgs);
-                        return funcResult;
+                        // 临时设置 ExternalManager，使得在方法内部访问字段时能正确判断是内部访问
+                        var originalExternalManager = ExternalManager;
+                        ExternalManager = currentManager;
+
+                        try
+                        {
+                            // 调用方法时使用当前管理器，这样可以访问外部变量
+                            var funcResult = funcValue.Run(currentManager, methodArgs);
+                            return funcResult;
+                        }
+                        finally
+                        {
+                            // 恢复原始的 ExternalManager
+                            ExternalManager = originalExternalManager;
+                        }
                     }
                 }
 

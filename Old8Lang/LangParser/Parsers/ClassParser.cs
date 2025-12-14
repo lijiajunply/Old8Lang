@@ -11,7 +11,8 @@ namespace Old8Lang.LangParser.Parsers;
 /// </summary>
 public class ClassParser(
     ParserContext context,
-    Func<StatementParser> statementParserFactory)
+    Func<StatementParser> statementParserFactory,
+    Func<ExpressionParser> expressionParserFactory)
     : ParserBase(context)
 {
     public ClassInit ParseClassDeclaration()
@@ -103,6 +104,10 @@ public class ClassParser(
                     modifiers.Add(AccessModifierType.Private);
                     Expect(LangTokenType.Private);
                     break;
+                case LangTokenType.Protected:
+                    modifiers.Add(AccessModifierType.Protected);
+                    Expect(LangTokenType.Protected);
+                    break;
                 case LangTokenType.Static:
                     modifiers.Add(AccessModifierType.Static);
                     Expect(LangTokenType.Static);
@@ -139,28 +144,41 @@ public class ClassParser(
 
                 // 尝试解析修饰符
                 List<AccessModifierType> modifiers = [];
-                if (CurrentToken.Type is LangTokenType.Public or LangTokenType.Private or LangTokenType.Static)
+                if (CurrentToken.Type is LangTokenType.Public or LangTokenType.Private or LangTokenType.Protected or LangTokenType.Static)
                 {
                     modifiers = ParseAccessModifiers();
                 }
 
-                // 检查是否是未初始化的字段声明：[modifiers] identifier
+                // 检查是否是字段声明（带类型假注或多字段）：[modifiers] identifier[:type] [, identifier[:type]]* [<- value]
                 if (CurrentToken.Type == LangTokenType.Identifier)
                 {
                     var nextToken = Peek();
-                    // 未初始化字段：后面不是赋值符号
-                    if (nextToken.Type != LangTokenType.Assignment)
+                    // 字段声明的特征：
+                    // 1. 后面是冒号（类型假注）：identifier:type
+                    // 2. 标识符后面有冒号然后是逗号：identifier:type, ...
+                    if (nextToken.Type == LangTokenType.Colon)
                     {
-                        // 处理未初始化字段声明
+                        // 检查是否是类型假注（identifier:type）而非函数调用（identifier:default_value）
+                        // 继续查看冒号后面的token
+                        var tokenAfterColon = Peek(2);
+                        if (tokenAfterColon.Type == LangTokenType.Identifier)
+                        {
+                            // 这是类型假注，解析字段声明列表
+                            var fieldDeclarations = ParseFieldDeclarationList(modifiers);
+                            statements.AddRange(fieldDeclarations);
+                            continue;
+                        }
+                    }
+                    // 3. 无修饰符且后面不是赋值或函数调用，很可能是未初始化字段（但这种情况较少见）
+                    else if (modifiers.Count == 0 && nextToken.Type != LangTokenType.Assignment && nextToken.Type != LangTokenType.LeftParen)
+                    {
+                        // 未初始化的字段（无修饰符、无类型假注）
                         var fieldName = CurrentToken.Value;
                         var position = CreateSourcePosition(CurrentToken);
                         CurrentIndex++;
 
-                        // 创建类成员ID
                         var memberId = new ClassMemberId(fieldName, "", modifiers, position);
-                        // 使用默认值 null 或适当的默认值
                         var defaultExpr = new NullLangValue(position);
-                        // 创建 ClassFieldSetStatement
                         var classMemberStatement = new ClassFieldSetStatement(memberId, defaultExpr, position);
                         statements.Add(classMemberStatement);
                         continue;
@@ -219,5 +237,88 @@ public class ClassParser(
 
         Expect(LangTokenType.RightBrace);
         return new BlockStatement(statements);
+    }
+
+    /// <summary>
+    /// 解析字段声明列表
+    /// 支持的语法：
+    /// - identifier:type <- value
+    /// - identifier:type
+    /// - identifier
+    /// - identifier:type, identifier:type, identifier:type <- value
+    /// </summary>
+    /// <param name="modifiers">访问修饰符列表</param>
+    /// <returns>字段语句列表</returns>
+    private List<IOldLangTree> ParseFieldDeclarationList(List<AccessModifierType> modifiers)
+    {
+        var fields = new List<IOldLangTree>();
+        var fieldInfos = new List<(string name, string type, SourcePosition position)>();
+
+        // 解析第一个字段及后续用逗号分隔的字段
+        while (true)
+        {
+            if (CurrentToken.Type != LangTokenType.Identifier)
+            {
+                throw CreateSyntaxError($"期望标识符，但得到 {CurrentToken.Type}");
+            }
+
+            var fieldName = CurrentToken.Value;
+            var position = CreateSourcePosition(CurrentToken);
+            CurrentIndex++;
+
+            string typeAnnotation = "";
+
+            // 检查类型假注
+            if (CurrentToken.Type == LangTokenType.Colon)
+            {
+                CurrentIndex++; // 跳过冒号
+
+                // 解析类型
+                if (CurrentToken.Type == LangTokenType.Identifier)
+                {
+                    typeAnnotation = CurrentToken.Value;
+                    CurrentIndex++;
+                }
+                else
+                {
+                    throw CreateSyntaxError($"期望类型标识符，但得到 {CurrentToken.Type}");
+                }
+            }
+
+            // 记录字段信息
+            fieldInfos.Add((fieldName, typeAnnotation, position));
+
+            // 检查是否有更多字段（逗号分隔）
+            if (CurrentToken.Type == LangTokenType.Comma)
+            {
+                CurrentIndex++; // 跳过逗号
+                continue;
+            }
+
+            // 没有更多字段，跳出循环
+            break;
+        }
+
+        // 检查是否有初始化值
+        LangExpression? initValue = null;
+        if (CurrentToken.Type == LangTokenType.Assignment)
+        {
+            CurrentIndex++; // 跳过 <-
+
+            // 解析初始化表达式
+            var exprParser = expressionParserFactory();
+            initValue = exprParser.ParseExpression();
+        }
+
+        // 为每个字段创建 ClassFieldSetStatement
+        foreach (var (name, type, position) in fieldInfos)
+        {
+            var memberId = new ClassMemberId(name, type, modifiers, position);
+            var fieldValue = initValue ?? new NullLangValue(position);
+            var fieldStatement = new ClassFieldSetStatement(memberId, fieldValue, position);
+            fields.Add(fieldStatement);
+        }
+
+        return fields;
     }
 }

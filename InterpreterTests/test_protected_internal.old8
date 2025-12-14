@@ -1,0 +1,15 @@
+// 测试 protected 字段在类内部的访问
+
+class TestProtectedInternal {
+    protected data:int <- 42
+    public value:int <- 100
+
+    func getProtectedData() {
+        return this.data
+    }
+}
+
+obj <- TestProtectedInternal()
+PrintLine("访问 public 字段: " + obj.value.ToStr())
+result <- obj.getProtectedData()
+PrintLine("通过方法访问 protected 字段: " + result.ToStr())

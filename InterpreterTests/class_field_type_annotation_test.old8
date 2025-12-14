@@ -1,0 +1,10 @@
+// 测试类字段类型假注 - 解释器模式测试
+
+class Person {
+    public name:string <- "Alice"
+    public age:int <- 25
+}
+
+p <- Person()
+PrintLine("Name: " + p.name)
+PrintLine("Age: " + p.age.ToStr())

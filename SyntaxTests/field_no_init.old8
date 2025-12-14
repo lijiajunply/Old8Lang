@@ -1,0 +1,5 @@
+// 测试无初始化值
+
+class Test2 {
+    public x:int
+}

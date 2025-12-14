@@ -1,0 +1,12 @@
+// 测试 protected 关键词支持
+
+class TestProtected {
+    protected data:int <- 42
+    public value:int <- 100
+}
+
+obj <- TestProtected()
+PrintLine("访问 public 字段: " + obj.value.ToStr())
+PrintLine("访问 protected 字段: " + obj.data.ToStr())
+
+// error

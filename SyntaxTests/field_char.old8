@@ -1,0 +1,5 @@
+// 测试 char 类型
+
+class Test3 {
+    public c:char <- 'A'
+}

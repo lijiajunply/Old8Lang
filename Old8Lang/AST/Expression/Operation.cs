@@ -135,6 +135,8 @@ public class Operation(
             var thisValue = Left.Run(manager);
             if (thisValue is AnyLangValue anyValue)
             {
+                // 设置外部管理器，确保访问控制能够正确识别这是内部访问
+                anyValue.ExternalManager = manager;
                 return anyValue.Dot(Right);
             }
 

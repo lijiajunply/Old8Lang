@@ -1,0 +1,5 @@
+// 测试静态字段带类型假注
+class Config {
+    public version:string <- "1.0.0"
+    static count:int <- 100
+}

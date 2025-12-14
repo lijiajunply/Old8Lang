@@ -1,0 +1,24 @@
+// 测试类字段类型假注功能
+
+// 测试1：基本类型假注
+class Person {
+    public name:string <- "Alice"
+    public age:int <- 25
+    private salary:double <- 50000.50
+    public active:bool <- true
+}
+
+// 测试2：无初始化值的类型假注
+class Student {
+    public id:int
+    public name:string
+    private grade:double
+}
+
+// 测试3：混合使用带类型假注和不带类型假注的字段
+class Mixed {
+    public name:string <- "Test"
+    age <- 18
+    public score:double
+    private count:int <- 0
+}

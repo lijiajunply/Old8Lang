@@ -18,7 +18,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Old8Lang.Benchmarks.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Old8Lang.Benchmarks.csproj" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/class_field_type_annotation_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/class_field_type_annotation_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/class_modifiers_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_private_access_control.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_private_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_protected.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_protected_internal.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251215-类属性修饰符测试报告.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/class_field_type_annotation.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/field_char.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/field_no_init.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/simple_field_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/static_field_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/typetest.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -381,6 +400,7 @@
       <workItem from="1765700935456" duration="239000" />
       <workItem from="1765703120567" duration="3476000" />
       <workItem from="1765720320753" duration="2106000" />
+      <workItem from="1765734191994" duration="372000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>

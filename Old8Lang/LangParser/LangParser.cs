@@ -87,10 +87,11 @@ public class LangParser
         // 创建ExpressionParser（仅依赖PrimaryParser）
         ExpressionParser = new ExpressionParser(Context, PrimaryParser);
 
-        // 创建ClassParser（需要延迟加载StatementParser）
+        // 创建ClassParser（需要延迟加载StatementParser和ExpressionParser）
         ClassParser = new ClassParser(
             Context,
-            () => StatementParser!);
+            () => StatementParser!,
+            () => ExpressionParser!);
 
         // 最后创建StatementParser（依赖所有其他解析器）
         StatementParser = new StatementParser(

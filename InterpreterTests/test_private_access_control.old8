@@ -1,0 +1,15 @@
+// 测试 private 访问控制
+// 预期：尝试从外部访问 private 字段应该失败
+
+class TestPrivateAccess {
+    private secret:int <- 42
+    public value:int <- 100
+}
+
+obj <- TestPrivateAccess()
+PrintLine("访问 public 字段: " + obj.value.ToStr())
+
+// 尝试访问 private 字段 - 应该报错
+PrintLine("尝试访问 private 字段: " + obj.secret.ToStr())
+
+// error

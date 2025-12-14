@@ -1,0 +1,5 @@
+// 简单测试类字段类型假注
+
+class Test1 {
+    public x:int <- 1
+}
