@@ -95,14 +95,9 @@ public class VariateManager
     public bool IsClass { get; set; }
 
     /// <summary>
-    /// Break标志位，用于替代异常处理break语句
+    /// 控制流管理器，用于管理break和continue等控制流语句的状态
     /// </summary>
-    public bool BreakFlag { get; set; }
-
-    /// <summary>
-    /// Continue标志位，用于替代异常处理continue语句
-    /// </summary>
-    public bool ContinueFlag { get; set; }
+    public ControlFlowManager ControlFlowManager { get; } = new();
 
     /// <summary>
     /// 最大递归深度限制，防止栈溢出

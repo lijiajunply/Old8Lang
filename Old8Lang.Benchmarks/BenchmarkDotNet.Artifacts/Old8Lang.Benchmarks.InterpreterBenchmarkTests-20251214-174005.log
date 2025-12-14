@@ -1,0 +1,65 @@
+// Validating benchmarks:
+// ***** BenchmarkRunner: Start   *****
+// ***** Found 6 benchmark(s) in total *****
+// ***** Building 1 exe(s) in Parallel: Start   *****
+// start dotnet  restore --nodeReuse:false /p:UseSharedCompilation=false /p:Deterministic=true /p:Optimize=true /p:ArtifactsPath="/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Benchmarks/bin/Release/net10.0/Old8Lang.Benchmarks-InvocationCount=16, IterationCount=10, WarmupCount=3-2/" /p:OutDir="/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Benchmarks/bin/Release/net10.0/Old8Lang.Benchmarks-InvocationCount=16, IterationCount=10, WarmupCount=3-2/bin/Release/net10.0/" /p:OutputPath="/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Benchmarks/bin/Release/net10.0/Old8Lang.Benchmarks-InvocationCount=16, IterationCount=10, WarmupCount=3-2/bin/Release/net10.0/" /p:PublishDir="/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Benchmarks/bin/Release/net10.0/Old8Lang.Benchmarks-InvocationCount=16, IterationCount=10, WarmupCount=3-2/publish/" in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Benchmarks/bin/Release/net10.0/Old8Lang.Benchmarks-InvocationCount=16, IterationCount=10, WarmupCount=3-2
+// command took 0.44 sec and exited with 1
+// ***** Done, took 00:00:00 (0.46 sec)   *****
+// Found 6 benchmarks:
+//   InterpreterBenchmarkTests.'Loop Intensive Code': InvocationCount=16, IterationCount=10, WarmupCount=3(InvocationCount=16, IterationCount=10, WarmupCount=3)
+//   InterpreterBenchmarkTests.'Function Call Intensive Code': InvocationCount=16, IterationCount=10, WarmupCount=3(InvocationCount=16, IterationCount=10, WarmupCount=3)
+//   InterpreterBenchmarkTests.'Mixed Intensive Code': InvocationCount=16, IterationCount=10, WarmupCount=3(InvocationCount=16, IterationCount=10, WarmupCount=3)
+//   InterpreterBenchmarkTests.'Multiple Executions': InvocationCount=16, IterationCount=10, WarmupCount=3(InvocationCount=16, IterationCount=10, WarmupCount=3)
+//   InterpreterBenchmarkTests.'Deep Recursion': InvocationCount=16, IterationCount=10, WarmupCount=3(InvocationCount=16, IterationCount=10, WarmupCount=3)
+//   InterpreterBenchmarkTests.'While Loop Performance': InvocationCount=16, IterationCount=10, WarmupCount=3(InvocationCount=16, IterationCount=10, WarmupCount=3)
+
+// Build Error: Standard output: 
+  
+ Standard error: 
+ MSBUILD : error MSB4177: 属性无效。名称“ IterationCount”包含无效字符“ ”。
+
+// BenchmarkDotNet has failed to build the auto-generated boilerplate code.
+// It can be found in /Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Benchmarks/bin/Release/net10.0/Old8Lang.Benchmarks-InvocationCount=16, IterationCount=10, WarmupCount=3-2
+// Please follow the troubleshooting guide: https://benchmarkdotnet.org/articles/guides/troubleshooting.html
+
+// ** Remained 0 (0.0%) benchmark(s) to run. Estimated finish 2025-12-14 17:40 (0h 0m from now) **
+// ***** BenchmarkRunner: Finish  *****
+
+// * Export *
+  BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.InterpreterBenchmarkTests-report.csv
+  BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.InterpreterBenchmarkTests-report-github.md
+  BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.InterpreterBenchmarkTests-report.html
+
+// * Detailed results *
+InterpreterBenchmarkTests.'Loop Intensive Code': InvocationCount=16, IterationCount=10, WarmupCount=3(InvocationCount=16, IterationCount=10, WarmupCount=3)
+Runtime = ; GC = 
+There are not any results runs
+
+// * Summary *
+
+BenchmarkDotNet v0.15.8, macOS Tahoe 26.1 (25B78) [Darwin 25.1.0]
+Apple M4, 1 CPU, 10 logical and 10 physical cores
+.NET SDK 10.0.100
+  [Host] : .NET 10.0.0 (10.0.0, 10.0.25.52411), Arm64 RyuJIT armv8.0-a
+
+Job=InvocationCount=16, IterationCount=10, WarmupCount=3  InvocationCount=16  IterationCount=10  
+WarmupCount=3  
+
+| Method                | Mean | Error |
+|---------------------- |-----:|------:|
+| 'Loop Intensive Code' |   NA |    NA |
+
+Benchmarks with issues:
+  InterpreterBenchmarkTests.'Loop Intensive Code': InvocationCount=16, IterationCount=10, WarmupCount=3(InvocationCount=16, IterationCount=10, WarmupCount=3)
+
+// * Legends *
+  Mean  : Arithmetic mean of all measurements
+  Error : Half of 99.9% confidence interval
+  1 ns  : 1 Nanosecond (0.000000001 sec)
+
+// ***** BenchmarkRunner: End *****
+Run time: 00:00:00 (0 sec), executed benchmarks: 0
+
+Global total time: 00:00:00 (0.46 sec), executed benchmarks: 0
+// * Artifacts cleanup *
+Artifacts cleanup is finished

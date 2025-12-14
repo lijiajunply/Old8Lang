@@ -12,8 +12,8 @@ public class ContinueStatement(SourcePosition position = default) : OldStatement
 {
     public override void Run(VariateManager manager)
     {
-        // 优化：使用标志位替代异常处理，减少性能开销
-        manager.ContinueFlag = true;
+        // 优化：使用ControlFlowManager管理控制流状态，符合单一职责原则
+        manager.ControlFlowManager.ContinueFlag = true;
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)

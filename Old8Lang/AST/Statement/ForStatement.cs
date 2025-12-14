@@ -19,49 +19,58 @@ public class ForStatement(
     public override void Run(VariateManager manager)
     {
         manager.AddChildren();
-        setStatement.Run(manager);
-        while (true)
+        // 压入新的控制流状态
+        manager.ControlFlowManager.PushState();
+        
+        try
         {
-            var varExpr = expression.Run(manager);
-            bool expr1;
-            if (varExpr is BoolLangValue value)
+            setStatement.Run(manager);
+            while (true)
             {
-                expr1 = value.Value;
-                // 优化：将临时布尔对象归还到对象池
-                value.ReturnToPool();
-            }
-            else
-                throw new TypeError(this, "期望布尔类型", $"实际得到了 {varExpr.GetType().Name}");
-            
-            if (expr1)
-            {
-                // 使用标志位替代异常处理，减少性能开销
-                manager.BreakFlag = false;
-                manager.ContinueFlag = false;
+                // 在每次循环迭代开始时重置控制流标志
+                manager.ControlFlowManager.ResetCurrentState();
                 
-                blockStatement.Run(manager);
-                
-                // 处理break
-                if (manager.BreakFlag)
+                var varExpr = expression.Run(manager);
+                bool expr1;
+                if (varExpr is BoolLangValue value)
                 {
-                    break;
+                    expr1 = value.Value;
+                    // 优化：将临时布尔对象归还到对象池
+                    value.ReturnToPool();
                 }
+                else
+                    throw new TypeError(this, "期望布尔类型", $"实际得到了 {varExpr.GetType().Name}");
                 
-                // 处理continue，执行循环增量操作
-                if (manager.ContinueFlag)
+                if (expr1)
                 {
+                    blockStatement.Run(manager);
+                    
+                    // 处理break
+                    if (manager.ControlFlowManager.BreakFlag)
+                    {
+                        break;
+                    }
+                    
+                    // 处理continue，执行循环增量操作
+                    if (manager.ControlFlowManager.ContinueFlag)
+                    {
+                        statement.Run(manager);
+                        continue;
+                    }
+                    
+                    // 正常执行，执行循环增量操作
                     statement.Run(manager);
-                    continue;
                 }
-                
-                // 正常执行，执行循环增量操作
-                statement.Run(manager);
+                else
+                    break;
             }
-            else
-                break;
         }
-
-        manager.RemoveChildren();
+        finally
+        {
+            // 弹出当前控制流状态
+            manager.ControlFlowManager.PopState();
+            manager.RemoveChildren();
+        }
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)

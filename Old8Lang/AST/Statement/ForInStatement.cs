@@ -26,45 +26,63 @@ public class ForInStatement(
     public override void Run(VariateManager manager)
     {
         manager.AddChildren();
-
-        var value = expression.Run(manager);
-        if (value is not ILangList oldList)
-            throw new TypeError(this, "IOldList", value.GetType().Name);
-
-        foreach (var idValue in oldList.GetItems())
+        // 压入新的控制流状态
+        manager.ControlFlowManager.PushState();
+        
+        try
         {
-            if (AllIds.Count == 1)
+            var value = expression.Run(manager);
+            if (value is not ILangList oldList)
+                throw new TypeError(this, "IOldList", value.GetType().Name);
+
+            foreach (var idValue in oldList.GetItems())
             {
-                // 单个标识符的情况，保持原有行为
-                manager.Set(id, idValue);
-            }
-            else
-            {
-                // 多个标识符的情况，处理键值对
-                if (idValue is TupleLangValue tupleValue)
+                // 在每次循环迭代开始时重置控制流标志
+                manager.ControlFlowManager.ResetCurrentState();
+                
+                if (AllIds.Count == 1)
                 {
-                    // 运行元组，获取实际值
-                    tupleValue.Run(manager);
-
-                    // 字典键值对，赋值给多个标识符
-                    var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
-
-                    for (int i = 0; i < AllIds.Count && i < values.Count; i++)
-                    {
-                        manager.Set(AllIds[i], values[i]);
-                    }
+                    // 单个标识符的情况，保持原有行为
+                    manager.Set(id, idValue);
                 }
                 else
                 {
-                    // 不是键值对，只赋值给第一个标识符
-                    manager.Set(id, idValue);
+                    // 多个标识符的情况，处理键值对
+                    if (idValue is TupleLangValue tupleValue)
+                    {
+                        // 运行元组，获取实际值
+                        tupleValue.Run(manager);
+
+                        // 字典键值对，赋值给多个标识符
+                        var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+
+                        for (int i = 0; i < AllIds.Count && i < values.Count; i++)
+                        {
+                            manager.Set(AllIds[i], values[i]);
+                        }
+                    }
+                    else
+                    {
+                        // 不是键值对，只赋值给第一个标识符
+                        manager.Set(id, idValue);
+                    }
+                }
+
+                body.Run(manager);
+                
+                // 处理break
+                if (manager.ControlFlowManager.BreakFlag)
+                {
+                    break;
                 }
             }
-
-            body.Run(manager);
         }
-
-        manager.RemoveChildren();
+        finally
+        {
+            // 弹出当前控制流状态
+            manager.ControlFlowManager.PopState();
+            manager.RemoveChildren();
+        }
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)

@@ -1,0 +1,19 @@
+// Validating benchmarks:
+// Benchmark InterpreterBenchmarkTests.'Loop Intensive Code': InvocationCount=1, IterationCount=10, WarmupCount=3(InvocationCount=1, IterationCount=10, WarmupCount=3)
+//    * Specified InvocationCount (1) must be a multiple of UnrollFactor (16)
+
+// Benchmark InterpreterBenchmarkTests.'Function Call Intensive Code': InvocationCount=1, IterationCount=10, WarmupCount=3(InvocationCount=1, IterationCount=10, WarmupCount=3)
+//    * Specified InvocationCount (1) must be a multiple of UnrollFactor (16)
+
+// Benchmark InterpreterBenchmarkTests.'Mixed Intensive Code': InvocationCount=1, IterationCount=10, WarmupCount=3(InvocationCount=1, IterationCount=10, WarmupCount=3)
+//    * Specified InvocationCount (1) must be a multiple of UnrollFactor (16)
+
+// Benchmark InterpreterBenchmarkTests.'Multiple Executions': InvocationCount=1, IterationCount=10, WarmupCount=3(InvocationCount=1, IterationCount=10, WarmupCount=3)
+//    * Specified InvocationCount (1) must be a multiple of UnrollFactor (16)
+
+// Benchmark InterpreterBenchmarkTests.'Deep Recursion': InvocationCount=1, IterationCount=10, WarmupCount=3(InvocationCount=1, IterationCount=10, WarmupCount=3)
+//    * Specified InvocationCount (1) must be a multiple of UnrollFactor (16)
+
+// Benchmark InterpreterBenchmarkTests.'While Loop Performance': InvocationCount=1, IterationCount=10, WarmupCount=3(InvocationCount=1, IterationCount=10, WarmupCount=3)
+//    * Specified InvocationCount (1) must be a multiple of UnrollFactor (16)
+

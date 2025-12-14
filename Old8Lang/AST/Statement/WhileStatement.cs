@@ -15,45 +15,53 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
     public override void Run(VariateManager manager)
     {
         manager.AddChildren();
-        while (true)
+        // 压入新的控制流状态
+        manager.ControlFlowManager.PushState();
+        
+        try
         {
-            // 优化：直接获取布尔值，避免临时对象创建
-            var value = expression.Run(manager);
-            bool expr1;
-            if (value is BoolLangValue varBool)
+            while (true)
             {
-                expr1 = varBool.Value;
-                // 优化：将临时布尔对象归还到对象池
-                varBool.ReturnToPool();
-            }
-            else
-            {
-                throw new TypeError(this, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
-            }
-
-            if (expr1)
-            {
-                // 使用标志位替代异常处理，减少性能开销
-                manager.BreakFlag = false;
-                manager.ContinueFlag = false;
+                // 在每次循环迭代开始时重置控制流标志
+                manager.ControlFlowManager.ResetCurrentState();
                 
-                blockStatement.Run(manager);
-                
-                // 处理break
-                if (manager.BreakFlag)
+                // 优化：直接获取布尔值，避免临时对象创建
+                var value = expression.Run(manager);
+                bool expr1;
+                if (value is BoolLangValue varBool)
                 {
-                    break;
+                    expr1 = varBool.Value;
+                    // 优化：将临时布尔对象归还到对象池
+                    varBool.ReturnToPool();
                 }
-                // continue由标志位控制，直接进入下一轮循环
-            }
-            else
-            {
-                manager.RemoveChildren();
-                return;
+                else
+                {
+                    throw new TypeError(this, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
+                }
+
+                if (expr1)
+                {
+                    blockStatement.Run(manager);
+                    
+                    // 处理break
+                    if (manager.ControlFlowManager.BreakFlag)
+                    {
+                        break;
+                    }
+                    // continue由标志位控制，直接进入下一轮循环
+                }
+                else
+                {
+                    return;
+                }
             }
         }
-
-        manager.RemoveChildren();
+        finally
+        {
+            // 弹出当前控制流状态
+            manager.ControlFlowManager.PopState();
+            manager.RemoveChildren();
+        }
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
