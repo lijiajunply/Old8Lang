@@ -19,7 +19,7 @@
     {
       "LibName": "Net",
       "Var": 0.8,
-      "IsDir": true
+      "IsDir": false
     },
     {
       "LibName": "Time",
@@ -33,6 +33,31 @@
     },
     {
       "LibName": "Async",
+      "Var": 0.8,
+      "IsDir": false
+    },
+    {
+      "LibName": "Crypto",
+      "Var": 0.8,
+      "IsDir": false
+    },
+    {
+      "LibName": "CollectionLib",
+      "Var": 0.8,
+      "IsDir": false
+    },
+    {
+      "LibName": "Json",
+      "Var": 0.8,
+      "IsDir": false
+    },
+    {
+      "LibName": "Csv",
+      "Var": 0.8,
+      "IsDir": false
+    },
+    {
+      "LibName": "Vector",
       "Var": 0.8,
       "IsDir": false
     }
