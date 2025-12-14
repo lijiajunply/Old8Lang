@@ -25,26 +25,35 @@ public class ForStatement(
             var varExpr = expression.Run(manager);
             bool expr1;
             if (varExpr is BoolLangValue value)
+            {
                 expr1 = value.Value;
+                // 优化：将临时布尔对象归还到对象池
+                value.ReturnToPool();
+            }
             else
                 throw new TypeError(this, "期望布尔类型", $"实际得到了 {varExpr.GetType().Name}");
+            
             if (expr1)
             {
-                try
+                // 使用标志位替代异常处理，减少性能开销
+                manager.BreakFlag = false;
+                manager.ContinueFlag = false;
+                
+                blockStatement.Run(manager);
+                
+                // 处理break
+                if (manager.BreakFlag)
                 {
-                    blockStatement.Run(manager);
-                }
-                catch (BreakException)
-                {
-                    // 处理break
                     break;
                 }
-                catch (ContinueException)
+                
+                // 处理continue，执行循环增量操作
+                if (manager.ContinueFlag)
                 {
-                    // 处理continue，执行循环增量操作
                     statement.Run(manager);
                     continue;
                 }
+                
                 // 正常执行，执行循环增量操作
                 statement.Run(manager);
             }

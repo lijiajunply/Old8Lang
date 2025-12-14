@@ -245,17 +245,17 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
 
         return value switch
         {
-            int a => new IntLangValue(a),
-            string a => new StringLangValue(a),
-            double a => new DoubleLangValue(a),
-            char a => new CharLangValue(a),
+            int a => IntLangValue.Create(a),
+            string a => StringLangValue.Create(a),
+            double a => DoubleLangValue.Create(a),
+            char a => CharLangValue.Create(a),
             List<object> a => new ListLangValue(a),
             List<string> a => new ListLangValue(a.Cast<object>().ToList()),
             List<int> a => new ListLangValue(a.Cast<object>().ToList()),
             List<double> a => new ListLangValue(a.Cast<object>().ToList()),
             object[] a => new ArrayLangValue(a.ToList()),
-            long a => new IntLangValue((int)a),
-            bool a => new BoolLangValue(a),
+            long a => IntLangValue.Create((int)a),
+            bool a => BoolLangValue.Create(a),
             Dictionary<object, object> a => new DictionaryLangValue(a.Select(x =>
             {
                 var key = ObjToValue(x.Key);

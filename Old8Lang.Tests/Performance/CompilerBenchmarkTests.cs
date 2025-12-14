@@ -108,7 +108,7 @@ result <- obj.calculate()
     public void CompileSimpleCode()
     {
         var ast = _interpreter.Build(_simpleCode);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "simple_test", _interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "simple_test", _interpreter);
         compiledAction();
     }
     
@@ -119,7 +119,7 @@ result <- obj.calculate()
     public void CompileMediumCode()
     {
         var ast = _interpreter.Build(_mediumCode);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "medium_test", _interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "medium_test", _interpreter);
         compiledAction();
     }
     
@@ -130,7 +130,7 @@ result <- obj.calculate()
     public void CompileComplexCode()
     {
         var ast = _interpreter.Build(_complexCode);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "complex_test", _interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "complex_test", _interpreter);
         compiledAction();
     }
     
@@ -144,7 +144,7 @@ result <- obj.calculate()
         var ast = _interpreter.Build(_simpleCode);
         
         // 测量IL生成时间
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "simple_il_test", _interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "simple_il_test", _interpreter);
     }
     
     /// <summary>
@@ -157,7 +157,7 @@ result <- obj.calculate()
         var ast = _interpreter.Build(_mediumCode);
         
         // 测量IL生成时间
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "medium_il_test", _interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "medium_il_test", _interpreter);
     }
     
     /// <summary>
@@ -170,7 +170,7 @@ result <- obj.calculate()
         var ast = _interpreter.Build(_complexCode);
         
         // 测量IL生成时间
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "complex_il_test", _interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "complex_il_test", _interpreter);
     }
     
     /// <summary>
@@ -181,7 +181,7 @@ result <- obj.calculate()
     {
         // 预编译代码
         var ast = _interpreter.Build(_simpleCode);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "simple_execute_test", _interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "simple_execute_test", _interpreter);
         
         // 只测量执行时间
         compiledAction();
@@ -195,7 +195,7 @@ result <- obj.calculate()
     {
         // 预编译代码
         var ast = _interpreter.Build(_complexCode);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "complex_execute_test", _interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "complex_execute_test", _interpreter);
         
         // 只测量执行时间
         compiledAction();
@@ -210,7 +210,7 @@ result <- obj.calculate()
         for (int i = 0; i < 10; i++)
         {
             var ast = _interpreter.Build(_simpleCode);
-            var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "multiple_test", _interpreter);
+            var compiledAction = Compiler.Compiler.Compile(ast, "multiple_test", _interpreter);
             compiledAction();
         }
     }
@@ -222,10 +222,10 @@ result <- obj.calculate()
     public void ILVerificationOverhead()
     {
         // 启用IL验证
-        Old8Lang.Compiler.Compiler.ilVerificationEnabled = true;
+        Compiler.Compiler.ilVerificationEnabled = true;
         
         var ast = _interpreter.Build(_mediumCode);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "il_verification_test", _interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "il_verification_test", _interpreter);
         compiledAction();
     }
     
@@ -236,13 +236,13 @@ result <- obj.calculate()
     public void NoILVerification()
     {
         // 禁用IL验证
-        Old8Lang.Compiler.Compiler.ilVerificationEnabled = false;
+        Compiler.Compiler.ilVerificationEnabled = false;
         
         var ast = _interpreter.Build(_mediumCode);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "no_il_verification_test", _interpreter);
+        var compiledAction = Compiler.Compiler.Compile(ast, "no_il_verification_test", _interpreter);
         compiledAction();
         
         // 恢复IL验证设置
-        Old8Lang.Compiler.Compiler.ilVerificationEnabled = true;
+        Compiler.Compiler.ilVerificationEnabled = true;
     }
 }

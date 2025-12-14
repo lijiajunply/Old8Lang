@@ -54,9 +54,9 @@ PrintLine("employee.position = " + employee.position)
 PrintLine("\n=== 带类型假注的类成员 ===")
 
 class Student {
-    name:string <- ""
-    age:int <- 0
-    grade:double <- 0.0
+    name <- ""
+    age <- 0
+    grade <- 0.0
     
     func init(name:string, age:int, grade:double) {
         this.name <- name

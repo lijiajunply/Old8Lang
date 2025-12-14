@@ -13,8 +13,8 @@ public class BreakStatement(SourcePosition position = default) : OldStatement(po
     
     public override void Run(VariateManager manager)
     {
-        // 使用异常来处理break跳转
-        throw new BreakException();
+        // 优化：使用标志位替代异常处理，减少性能开销
+        manager.BreakFlag = true;
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
@@ -39,8 +39,3 @@ public class BreakStatement(SourcePosition position = default) : OldStatement(po
 
     public override string ToString() => "break";
 }
-
-/// <summary>
-/// break异常，用于解释器中的跳转处理
-/// </summary>
-public class BreakException() : Exception("Break exception");

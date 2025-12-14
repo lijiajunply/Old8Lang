@@ -91,9 +91,9 @@ testLocalTypeAnnotations()
 PrintLine("\n=== 类成员的类型假注 ===")
 
 class Person {
-    name:string <- ""
-    age:int <- 0
-    height:double <- 0.0
+    name <- ""
+    age <- 0
+    height <- 0.0
     
     func init(name:string, age:int, height:double) {
         this.name <- name

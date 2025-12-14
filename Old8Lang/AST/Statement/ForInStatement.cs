@@ -61,20 +61,7 @@ public class ForInStatement(
                 }
             }
 
-            try
-            {
-                body.Run(manager);
-            }
-            catch (BreakException)
-            {
-                // 处理break
-                break;
-            }
-            catch (ContinueException)
-            {
-                // 处理continue，直接进入下一轮循环
-                // continue;
-            }
+            body.Run(manager);
         }
 
         manager.RemoveChildren();

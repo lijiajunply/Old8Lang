@@ -9,7 +9,7 @@ namespace Old8Lang.AST;
 public abstract class LangExpression : IOldLangTree
 {
     /// <inheritdoc />
-    public SourcePosition Position { get; }
+    public SourcePosition Position { get; set; }
 
     /// <summary>
     /// 构造函数

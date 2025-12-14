@@ -12,9 +12,10 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 /// <param name="context"></param>
 /// <param name="position"></param>
-public class StringLangValue(string context, SourcePosition position = default) : LangValueType(position), ILangList
+public class StringLangValue(string context = "", SourcePosition position = default)
+    : LangValueType(position), ILangList, IPoolable
 {
-    public readonly string Value = context.Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\r", "\r")
+    public string Value { get; private set; } = context.Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\r", "\r")
         .Replace(@"\\", "\\");
 
 
@@ -22,7 +23,7 @@ public class StringLangValue(string context, SourcePosition position = default) 
     public override string ToDisplayString() => Value; // 不带引号的字符串，用于显示和打印
 
     public override LangValueType Plus(LangValueType otherLangValueType) =>
-        new StringLangValue(Value + otherLangValueType.ToDisplayString());
+        Create(Value + otherLangValueType.ToDisplayString());
 
     public override bool Equal(LangValueType? otherValueType)
     {
@@ -38,7 +39,7 @@ public class StringLangValue(string context, SourcePosition position = default) 
             var sb = new StringBuilder();
             for (var i = 0; i < value.Value; i++)
                 sb.Append(Value);
-            return new StringLangValue(sb.ToString());
+            return Create(sb.ToString());
         }
 
         throw new InvalidOperationError(this, $"不支持字符串与类型 '{otherLangValueType.GetType().Name}' 的乘法操作");
@@ -79,7 +80,7 @@ public class StringLangValue(string context, SourcePosition position = default) 
     public override LangValueType Minus(LangValueType otherLangValueType)
     {
         if (otherLangValueType is StringLangValue b)
-            return new StringLangValue(Value.Replace(b.Value, ""));
+            return Create(Value.Replace(b.Value, ""));
 
         throw new InvalidOperationError(this, $"不支持字符串与类型 '{otherLangValueType.GetType().Name}' 的减法操作");
     }
@@ -94,7 +95,7 @@ public class StringLangValue(string context, SourcePosition position = default) 
             case "Int" or "int":
                 try
                 {
-                    return new IntLangValue(int.Parse(Value));
+                    return IntLangValue.Create(int.Parse(Value));
                 }
                 catch (FormatException)
                 {
@@ -102,18 +103,18 @@ public class StringLangValue(string context, SourcePosition position = default) 
                 }
             case "Bool" or "bool":
                 if (Value.Equals("true", StringComparison.OrdinalIgnoreCase))
-                    return new BoolLangValue(true);
+                    return BoolLangValue.Create(true);
                 if (Value.Equals("false", StringComparison.OrdinalIgnoreCase))
-                    return new BoolLangValue(false);
+                    return BoolLangValue.Create(false);
                 throw new FormatError(this, "无法将字符串转换为布尔值，字符串不是有效的布尔格式（true/false）");
             case "String" or "string":
                 return this;
             case "char" or "Char":
-                return Value.Length == 0 ? new CharLangValue('\0') : new CharLangValue(Value[0]);
+                return Value.Length == 0 ? CharLangValue.Create('\0') : CharLangValue.Create(Value[0]);
             case "Double" or "double":
                 try
                 {
-                    return new DoubleLangValue(double.Parse(Value));
+                    return DoubleLangValue.Create(double.Parse(Value));
                 }
                 catch (FormatException)
                 {
@@ -136,14 +137,14 @@ public class StringLangValue(string context, SourcePosition position = default) 
             i = Value.Length + i;
         if (i < 0 || i >= Value.Length)
             throw new IndexError(this, i, Value.Length);
-        return new CharLangValue(Value[i]);
+        return CharLangValue.Create(Value[i]);
     }
 
     public LangValueType Slice(int start, int end)
     {
         if (start < 0) start += Value.Length;
         if (end < 0) end += Value.Length + 1;
-        return new StringLangValue(Value[start..end]);
+        return Create(Value[start..end]);
     }
 
     public void Set(LangValueType index, LangValueType value)
@@ -162,4 +163,36 @@ public class StringLangValue(string context, SourcePosition position = default) 
     }
 
     public override Type OutputType(LocalManager local) => Value.GetType();
+
+    /// <summary>
+    /// 重置对象状态，使其可以被复用
+    /// </summary>
+    public void Reset()
+    {
+        Value = string.Empty;
+        // Position是只读属性，无法修改
+    }
+
+    /// <summary>
+    /// 从对象池获取StringLangValue实例
+    /// </summary>
+    /// <param name="value">字符串值</param>
+    /// <param name="position">源码位置</param>
+    /// <returns>StringLangValue实例</returns>
+    public static StringLangValue Create(string value, SourcePosition position = default)
+    {
+        var instance = ObjectPoolManager.Instance.StringPool.Get();
+        instance.Value = value.Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\r", "\r")
+            .Replace(@"\\", "\\");
+        instance.Position = position;
+        return instance;
+    }
+
+    /// <summary>
+    /// 将实例归还到对象池
+    /// </summary>
+    public void ReturnToPool()
+    {
+        ObjectPoolManager.Instance.StringPool.Return(this);
+    }
 }

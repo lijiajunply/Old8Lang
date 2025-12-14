@@ -10,11 +10,10 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public class ContinueStatement(SourcePosition position = default) : OldStatement(position)
 {
-    
     public override void Run(VariateManager manager)
     {
-        // 使用异常来处理continue跳转
-        throw new ContinueException();
+        // 优化：使用标志位替代异常处理，减少性能开销
+        manager.ContinueFlag = true;
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
@@ -27,18 +26,15 @@ public class ContinueStatement(SourcePosition position = default) : OldStatement
         }
         else
         {
-            throw new InvalidOperationError(new SourcePosition(), "Continue statement outside of loop", "continue语句只能在循环内部使用");
+            throw new InvalidOperationError(new SourcePosition(), "Continue statement outside of loop",
+                "continue语句只能在循环内部使用");
         }
     }
 
-    public override OldStatement this[int index] => throw new InvalidOperationError(new SourcePosition(), "Indexer not implemented for ContinueStatement", "ContinueStatement不支持索引访问");
+    public override OldStatement this[int index] => throw new InvalidOperationError(new SourcePosition(),
+        "Indexer not implemented for ContinueStatement", "ContinueStatement不支持索引访问");
 
     public override int Count => 0;
 
     public override string ToString() => "continue";
 }
-
-/// <summary>
-/// continue异常，用于解释器中的跳转处理
-/// </summary>
-public class ContinueException() : Exception("Continue exception");

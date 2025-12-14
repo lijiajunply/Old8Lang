@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 /// <param name="intValue">int数据</param>
 /// <param name="position">位置</param>
-public class IntLangValue(int intValue, SourcePosition position = default) : LangValueType(position)
+public class IntLangValue(int intValue = 0, SourcePosition position = default) : LangValueType(position), IPoolable
 {
     public int Value = intValue;
 
@@ -20,9 +20,9 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
     public override LangValueType Plus(LangValueType otherLangValueType)
     {
         if (otherLangValueType is StringLangValue s)
-            return new StringLangValue(Value + s.Value);
+            return StringLangValue.Create(Value + s.Value);
         if (otherLangValueType is CharLangValue c)
-            return new CharLangValue(Convert.ToChar(Value + c.Value));
+            return CharLangValue.Create(Convert.ToChar(Value + c.Value));
         if (otherLangValueType is DoubleLangValue)
             return otherLangValueType.Plus(this);
         if (otherLangValueType is IntLangValue otherInt)
@@ -31,7 +31,7 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
             {
                 checked
                 {
-                    return new IntLangValue(Value + otherInt.Value);
+                    return Create(Value + otherInt.Value);
                 }
             }
             catch (OverflowException)
@@ -53,7 +53,7 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
             {
                 checked
                 {
-                    return new IntLangValue(Value - otherInt.Value);
+                    return Create(Value - otherInt.Value);
                 }
             }
             catch (OverflowException)
@@ -79,7 +79,7 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
             {
                 checked
                 {
-                    return new IntLangValue(Value * otherInt.Value);
+                    return Create(Value * otherInt.Value);
                 }
             }
             catch (OverflowException)
@@ -103,7 +103,7 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
                 throw new ZeroDivisionError(this);
             }
 
-            return new IntLangValue(Value / otherInt.Value);
+            return Create(Value / otherInt.Value);
         }
 
         throw new InvalidOperationError(this, $"不支持整数与类型 '{otherLangValueType.GetType().Name}' 的除法操作");
@@ -121,7 +121,7 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
                 throw new ZeroDivisionError(this);
             }
 
-            return new IntLangValue(Value % otherInt.Value);
+            return Create(Value % otherInt.Value);
         }
 
         throw new InvalidOperationError(this, $"不支持整数与类型 '{otherLangValueType.GetType().Name}' 的取模操作");
@@ -138,7 +138,7 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
                 throw new OverflowError(this, "整数幂运算");
             }
 
-            return new DoubleLangValue(result);
+            return DoubleLangValue.Create(result);
         }
 
         if (otherLangValueType is IntLangValue otherInt)
@@ -155,10 +155,10 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
                 // 如果结果是整数，返回 IntLangValue，否则返回 DoubleLangValue
                 if (Math.Abs(result - Math.Floor(result)) < 0.01)
                 {
-                    return new IntLangValue((int)result);
+                    return Create((int)result);
                 }
 
-                return new DoubleLangValue(result);
+                return DoubleLangValue.Create(result);
             }
             catch (OverflowException)
             {
@@ -220,10 +220,10 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
         return value.Value switch
         {
             "Int" or "int" => this,
-            "Bool" or "bool" => new BoolLangValue(Value > 0),
-            "String" or "string" => new StringLangValue(Value.ToString()),
-            "char" or "Char" => new CharLangValue(Convert.ToChar(Value)),
-            "Double" or "double" => new DoubleLangValue(Value),
+            "Bool" or "bool" => BoolLangValue.Create(Value > 0),
+            "String" or "string" => StringLangValue.Create(Value.ToString()),
+            "char" or "Char" => CharLangValue.Create(Convert.ToChar(Value)),
+            "Double" or "double" => DoubleLangValue.Create(Value),
             _ => throw new TypeError(this, $"不支持的类型转换: {GetType().Name} 到 {value.Value}")
         };
     }
@@ -235,6 +235,37 @@ public class IntLangValue(int intValue, SourcePosition position = default) : Lan
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         ilGenerator.Emit(OpCodes.Ldc_I4, Value);
+    }
+    
+    /// <summary>
+    /// 重置对象状态，使其可以被复用
+    /// </summary>
+    public void Reset()
+    {
+        Value = 0;
+        // Position是只读属性，无法修改
+    }
+    
+    /// <summary>
+    /// 从对象池获取IntLangValue实例
+    /// </summary>
+    /// <param name="value">整数值</param>
+    /// <param name="position">源码位置</param>
+    /// <returns>IntLangValue实例</returns>
+    public static IntLangValue Create(int value, SourcePosition position = default)
+    {
+        var instance = ObjectPoolManager.Instance.IntPool.Get();
+        instance.Value = value;
+        instance.Position = position;
+        return instance;
+    }
+    
+    /// <summary>
+    /// 将实例归还到对象池
+    /// </summary>
+    public void ReturnToPool()
+    {
+        ObjectPoolManager.Instance.IntPool.Return(this);
     }
 }
 

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
@@ -25,7 +26,7 @@ public class VariateManager
     /// 语言信息，包含库信息和导入路径等
     /// </summary>
     public LangInfo? LangInfo { get; set; }
-    
+
     /// <summary>
     /// 当前源代码文件路径
     /// </summary>
@@ -34,7 +35,8 @@ public class VariateManager
     /// <summary>
     /// 关联的解释器实例
     /// </summary>
-    [NotNull] public LangInterpreter? Interpreter { get; set; }
+    [NotNull]
+    public LangInterpreter? Interpreter { get; set; }
 
     #endregion
 
@@ -50,6 +52,16 @@ public class VariateManager
     private List<Dictionary<string, LangValueType>> Scopes { get; } = [new()];
 
     /// <summary>
+    /// 作用域缓存池，用于复用作用域字典，减少内存分配和垃圾回收开销
+    /// </summary>
+    private static readonly ConcurrentBag<Dictionary<string, LangValueType>> ScopeCache = new();
+
+    /// <summary>
+    /// 缓存池最大大小
+    /// </summary>
+    private const int MaxScopeCacheSize = 100;
+
+    /// <summary>
     /// 导入信息列表，包含导入的函数、类和原生类型
     /// </summary>
     public List<ImportInfo> ImportInfos { get; } = [];
@@ -62,7 +74,7 @@ public class VariateManager
     /// 是否处于返回状态
     /// </summary>
     public bool IsReturn { get; set; }
-    
+
     /// <summary>
     /// 返回结果值
     /// </summary>
@@ -76,11 +88,21 @@ public class VariateManager
     /// 当前是否处于函数内部
     /// </summary>
     public bool IsFunc { get; set; }
-    
+
     /// <summary>
     /// 当前是否处于类内部
     /// </summary>
     public bool IsClass { get; set; }
+
+    /// <summary>
+    /// Break标志位，用于替代异常处理break语句
+    /// </summary>
+    public bool BreakFlag { get; set; }
+
+    /// <summary>
+    /// Continue标志位，用于替代异常处理continue语句
+    /// </summary>
+    public bool ContinueFlag { get; set; }
 
     /// <summary>
     /// 最大递归深度限制，防止栈溢出
@@ -148,8 +170,18 @@ public class VariateManager
     /// </summary>
     public void AddChildren()
     {
-        // 创建新的作用域
-        Scopes.Add(new Dictionary<string, LangValueType>());
+        // 优化：从缓存池获取作用域字典，减少内存分配
+        if (ScopeCache.TryTake(out var cachedScope))
+        {
+            // 确保缓存的作用域是空的
+            cachedScope.Clear();
+            Scopes.Add(cachedScope);
+        }
+        else
+        {
+            // 缓存池为空时创建新的作用域
+            Scopes.Add(new Dictionary<string, LangValueType>());
+        }
     }
 
     /// <summary>
@@ -163,7 +195,15 @@ public class VariateManager
         // 移除当前作用域
         if (Scopes.Count > 1)
         {
+            var scopeToRemove = Scopes[^1];
             Scopes.RemoveAt(Scopes.Count - 1);
+
+            // 优化：清空作用域并将其归还到缓存池，以便复用
+            scopeToRemove.Clear();
+            if (ScopeCache.Count < MaxScopeCacheSize)
+            {
+                ScopeCache.Add(scopeToRemove);
+            }
         }
     }
 
@@ -350,7 +390,7 @@ public class VariateManager
 
         return newManager;
     }
-    
+
     /// <summary>
     /// 获取当前作用域和父作用域中的变量信息
     /// </summary>
@@ -362,7 +402,7 @@ public class VariateManager
     public Dictionary<string, string> GetVariableStates(int limit = 20)
     {
         var variableStates = new Dictionary<string, string>();
-        
+
         // 从当前作用域向上遍历，收集变量信息
         for (int i = Scopes.Count - 1; i >= 0 && variableStates.Count < limit; i--)
         {
@@ -373,7 +413,7 @@ public class VariateManager
                 variableStates[varName] = varValue.ToString();
             }
         }
-        
+
         return variableStates;
     }
 }

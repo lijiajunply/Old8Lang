@@ -17,9 +17,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/Old8Lang项目完整注释计划.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/Old8Lang解释器性能优化计划.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Performance/InterpreterBenchmarkTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/ObjectPool.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/ObjectPoolManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/15_class_declaration.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/15_class_declaration.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/20_type_annotations.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/20_type_annotations.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Performance/CompilerBenchmarkTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Performance/CompilerBenchmarkTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/BoolLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/BoolLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/CharLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/CharLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DoubleLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DoubleLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/IntLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/IntLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/StringLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/StringLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/LangExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/LangExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BreakStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BreakStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ContinueStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ContinueStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,91 +74,13 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/EndToEndCompileTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/EndToEndCompileTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/InterpreterIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Integration/InterpreterIntegrationTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/InterpreterTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Language/ExpressionStatementTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Language/ExpressionStatementTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Parser/Statement/DeclarationStatementTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/NativeStaticAny.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/BoolLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/BoolLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TypeTemplate.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/NativeStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/NativeStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/NativeStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Apis.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Compiler/Compiler.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Compiler/ILVerifier.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Compiler/LocalManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/CharLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/IntLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BreakStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Core/ParserContext.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Core/ParserContext.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Core/ParserContext.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Core/ParserContext.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Core/ParserContext.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Core/ParserContext.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangToken.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/ParserHelpers/ExpectHelper.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/FunctionParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/FileLib.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/Time.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1f/4c54500e/List`1.cs" root0="FORCE_HIGHLIGHTING" />
@@ -426,6 +366,8 @@
       <workItem from="1765470025239" duration="15713000" />
       <workItem from="1765514280184" duration="23569000" />
       <workItem from="1765551227084" duration="9861000" />
+      <workItem from="1765700935456" duration="239000" />
+      <workItem from="1765703120567" duration="720000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -770,7 +712,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="178" />
+    <option name="localTasksCounter" value="180" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -797,8 +739,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 实现原生库批量导入功能&#10;&#10;- 新增 DLL 路径解析器 DllPathResolver，支持多策略查找原生库&#10;- 支持批量导入语法：[import &quot;DllName&quot; ClassName *]&#10;- 支持选择性导入语法：[import &quot;DllName&quot; ClassName { Method1, Method2 }]&#10;- 更新语法解析器以识别新的导入语句格式&#10;- 优化 NativeStatement 类以处理多种导入方式&#10;- 完善错误提示，提供详细的 DLL 查找失败信息&#10;- 更新标准库文件使用新的批量导入语法&#10;- 扩展语法文档，增加批量导入和选择性导入说明&#10;- 添加相关测试用例验证新功能正确性" />
-    <MESSAGE value="refactor(net): 简化网络库导入定义并优化字段访问逻辑&#10;&#10;- 简化 Net.old8 文件中的类导入定义，统一使用类名导入替代方法级别导入&#10;- 移除冗余的属性和方法导入声明，减少配置复杂度&#10;- 优化 NativeStaticAny 类中的字段访问逻辑，提高代码可读性&#10;- 调整条件表达式结构，使字段获取流程更加清晰&#10;- 更新工作区变更记录，反映最新的文件修改状态" />
     <MESSAGE value="feat(parser): 支持成员方法调用语句解析&#10;&#10;- 新增对 obj.method() 形式的方法调用语句支持&#10;- 更新 StatementParser 以识别成员方法调用并生成 FuncRunStatement&#10;- 添加 ExpressionStatementTests 测试用例验证成员方法调用解析&#10;- 调整 ParseSet 方法中的表达式解析逻辑，保持缩进一致性&#10;- 修复工作区变更记录，准确反映文件修改状态" />
     <MESSAGE value="feat(lang): 扩展字符串和列表类型的功能支持&#10;&#10;- 为字符串类型添加哈希码计算和相等比较方法&#10;- 实现字符串常用操作方法：子串截取、查找、替换、分割、大小写转换、包含判断和去空白&#10;- 为列表类型添加过滤、映射、归约、反转、包含判断和索引查找方法&#10;- 支持在列表操作中使用函数式编程范式处理元素&#10;- 增强类型系统对扩展方法的支持能力" />
     <MESSAGE value="refactor(lib): 优化代码结构并提升可读性&#10;&#10;- 移除了冗余的异常构造函数定义&#10;- 使用元组交换语法简化 Swap 方法实现&#10;- 添加 CultureInfo.InvariantCulture 以确保时间格式一致性&#10;- 更新方法参数为可空引用类型以提高类型安全性&#10;- 优化变量声明方式，使用 var 关键字提高代码简洁性&#10;- 调整数组初始化语法，增强代码可读性&#10;- 统一代码缩进和空行规范，改善整体代码风格" />
@@ -822,29 +762,13 @@
     <MESSAGE value="feat(parser): 实现新的 import 语法支持&#10;&#10;- 新增 ImportItem 类用于表示导入项及其别名&#10;- 修改 ImportStatement 类以支持命名导入、默认导入和 from 子句&#10;- 更新语法规则，添加 from 和 as 关键字支持&#10;- 实现解析器对新 import 语法的完整支持&#10;- 支持传统 import 语法以保持向后兼容&#10;- 添加测试用例验证各种 import 语法场景&#10;- 更新语法文档和 EBNF 定义&#10;- 优化模块导入逻辑，区分不同导入方式的处理流程" />
     <MESSAGE value="feat(parser): 移除 import ... as ... 语法支持&#10;&#10;- 移除 ImportStatement 类中的 defaultImport 参数和相关逻辑&#10;- 修改 StatementParser 中的 ParseImportStatement 方法，不再处理 import module as alias 语法&#10;- 更新 Old8Lang.ebnf 文件，调整 importSpecifier 语法规则&#10;- 删除或更新使用 import ... as ... 语法的测试用例&#10;- 更新 Old8Lang_Grammar.md 文档，移除相关语法说明&#10;- 确保保留命名导入和重命名导入的支持&#10;- 确保传统 import 语法仍可正常使用" />
     <MESSAGE value="feat(parser): 支持未初始化字段声明和访问修饰符&#10;&#10;- 实现未初始化字段语法解析，自动赋予null默认值&#10;- 添加private、static等访问修饰符的支持和检查&#10;- 完善字段访问权限控制，防止外部访问私有成员&#10;- 优化类成员查找逻辑，支持继承和静态成员访问&#10;- 增强错误处理，禁止类外部使用未初始化字段语法&#10;- 更新字段定义机制，正确设置字段的访问属性&#10;- 改进导入语句解析，提高代码格式一致性" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 支持未初始化字段声明和访问修饰符&#10;&#10;- 实现未初始化字段语法解析，自动赋予null默认值&#10;- 添加private、static等访问修饰符的支持和检查&#10;- 完善字段访问权限控制，防止外部访问私有成员&#10;- 优化类成员查找逻辑，支持继承和静态成员访问&#10;- 增强错误处理，禁止类外部使用未初始化字段语法&#10;- 更新字段定义机制，正确设置字段的访问属性&#10;- 改进导入语句解析，提高代码格式一致性" />
+    <MESSAGE value="docs(core): 完善核心模块的XML文档注释&#10;&#10;- 为 Apis.cs 中的公共 API 方法添加详细的 XML 注释&#10;- 补充 Old8Lang.App/BasicInfo.cs 中命令行帮助信息的说明&#10;- 增强 Old8Lang/AST/Statement/ClassInit.cs 类定义语句的文档&#10;- 完善 Old8LangLib/ColorfulTerminal.cs 彩色终端模块的注释&#10;- 加强 Old8Lang/Compiler/Compiler.cs 编译器核心类的文档说明&#10;- 丰富 Old8LangLib/FileLib.cs 文件操作库的函数注释&#10;- 补充 Old8Lang/AST/Statement/FuncInit.cs 函数初始化类的说明&#10;- 完善 Old8Lang/AST/Expression/FuncStatic.cs 扩展方法类的注释&#10;- 统一调整各模块中的参数、返回值和异常说明&#10;- 规范化所有新增注释的格式和内容描述" />
+    <MESSAGE value="docs(ast): 为ILangList接口添加注释&#10;&#10;- 添加了接口的中文注释说明&#10;- 明确了接口的用途和功能&#10;- 提高了代码的可读性和维护性" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(ast): 为ILangList接口添加注释&#10;&#10;- 添加了接口的中文注释说明&#10;- 明确了接口的用途和功能&#10;- 提高了代码的可读性和维护性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>27</line>
-          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'" />
-          <option name="timeStamp" value="236" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>28</line>
-          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'" />
-          <option name="timeStamp" value="237" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs</url>
-          <line>31</line>
-          <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\ForInStatement.cs" containingFunctionPresentation="方法 'Run'" />
-          <option name="timeStamp" value="238" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs</url>
           <line>45</line>
@@ -853,7 +777,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs</url>
-          <line>38</line>
+          <line>87</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
               <option value="1161" />
@@ -863,45 +787,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="517" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/IntLangValue.cs</url>
-          <line>73</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/IntLangValue.cs" containingFunctionPresentation="方法 'Times'">
-            <startOffsets>
-              <option value="2333" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2375" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="530" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs</url>
-          <line>35</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs" containingFunctionPresentation="方法 'Run'">
-            <startOffsets>
-              <option value="898" />
-            </startOffsets>
-            <endOffsets>
-              <option value="943" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="546" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs</url>
-          <line>38</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/TernaryExpression.cs" containingFunctionPresentation="方法 'Run'">
-            <startOffsets>
-              <option value="966" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1027" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="547" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs</url>

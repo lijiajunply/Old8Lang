@@ -17,11 +17,14 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
         manager.AddChildren();
         while (true)
         {
+            // 优化：直接获取布尔值，避免临时对象创建
             var value = expression.Run(manager);
             bool expr1;
             if (value is BoolLangValue varBool)
             {
                 expr1 = varBool.Value;
+                // 优化：将临时布尔对象归还到对象池
+                varBool.ReturnToPool();
             }
             else
             {
@@ -30,19 +33,18 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
 
             if (expr1)
             {
-                try
+                // 使用标志位替代异常处理，减少性能开销
+                manager.BreakFlag = false;
+                manager.ContinueFlag = false;
+                
+                blockStatement.Run(manager);
+                
+                // 处理break
+                if (manager.BreakFlag)
                 {
-                    blockStatement.Run(manager);
-                }
-                catch (BreakException)
-                {
-                    // 处理break
                     break;
                 }
-                catch (ContinueException)
-                {
-                    // 处理continue，直接进入下一轮循环
-                }
+                // continue由标志位控制，直接进入下一轮循环
             }
             else
             {
