@@ -27,18 +27,18 @@ class BaseClass {
 class User extends BaseClass with Logger {
     func init(name) {
         this.name <- name
-        log("User created: " + name) // 使用 Logger mixin 的方法
+        this.log("User created: " + name) // 使用 Logger mixin 的方法
     }
 }
 
 // 应用多个 mixin
 class Product extends BaseClass with Logger, Serializable {
     public price <- 0.0
-    
+
     func init(name, price) {
         this.name <- name
         this.price <- price
-        log("Product created: " + name + ", price: " + price) // 使用 Logger mixin 的方法
+        this.log("Product created: " + name + ", price: " + price.ToStr()) // 使用 Logger mixin 的方法
     }
 }
 

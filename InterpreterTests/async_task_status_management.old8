@@ -55,13 +55,13 @@ try {
         PrintLine("超时测试通过")
     }
 } catch (e) {
-    PrintLine("捕获到异常: " + e.Message)
+    PrintLine("捕获到异常: " + e)
 }
 
 // 测试3：任务异常测试
 async func exceptionTask() {
     Sleep(100)
-    throw new Error("TestException")
+    throw ("TestException")
 }
 
 PrintLine("\n=== 测试3：任务异常测试 ===")
