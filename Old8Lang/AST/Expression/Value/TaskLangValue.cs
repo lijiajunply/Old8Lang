@@ -8,6 +8,23 @@ using Old8Lang.Error;
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
+/// Task 状态枚举，表示异步操作的完整生命周期
+/// </summary>
+public enum TaskStatus
+{
+    /// <summary>任务已创建但尚未开始</summary>
+    Pending,
+    /// <summary>任务正在执行</summary>
+    Running,
+    /// <summary>任务已成功完成</summary>
+    Completed,
+    /// <summary>任务执行过程中发生异常</summary>
+    Failed,
+    /// <summary>任务被取消</summary>
+    Canceled
+}
+
+/// <summary>
 /// Task 值类型，表示异步操作
 /// 包装 .NET Task&lt;LangValueType&gt;，支持异步执行和 await 等待
 /// </summary>
@@ -15,9 +32,10 @@ public class TaskLangValue : LangValueType
 {
     private readonly Task<LangValueType> _task;
     private readonly CancellationToken _cancellationToken;
-    private bool _isCompleted = false;
+    private TaskStatus _status = TaskStatus.Pending;
     private LangValueType? _result = null;
     private Exception? _exception = null;
+    private readonly object _lock = new();
 
     /// <summary>
     /// 获取任务结果（如果已完成）
@@ -46,26 +64,51 @@ public class TaskLangValue : LangValueType
         _task = task;
         _cancellationToken = cancellationToken;
 
-        // 注册完成回调，缓存结果
+        // 注册任务状态变化的回调
         _task.ContinueWith(t =>
         {
-            _isCompleted = true;
-            if (t.IsFaulted)
+            lock (_lock)
             {
-                _exception = t.Exception?.InnerException;
-            }
-            else if (t.IsCompletedSuccessfully)
-            {
-                _result = t.Result;
+                if (t.IsCanceled)
+                {
+                    _status = TaskStatus.Canceled;
+                    _exception = new OperationCanceledException("任务被取消");
+                }
+                else if (t.IsFaulted)
+                {
+                    _status = TaskStatus.Failed;
+                    _exception = t.Exception?.InnerException ?? t.Exception;
+                }
+                else if (t.IsCompletedSuccessfully)
+                {
+                    _status = TaskStatus.Completed;
+                    _result = t.Result;
+                }
             }
         });
+
+        // 如果任务已经开始执行，更新状态为Running
+        if (_task.Status == System.Threading.Tasks.TaskStatus.Running)
+        {
+            lock (_lock)
+            {
+                _status = TaskStatus.Running;
+            }
+        }
 
         // 注册取消回调
         if (_cancellationToken.CanBeCanceled)
         {
             _cancellationToken.Register(() =>
             {
-                // 任务无法直接取消，但可以在等待时检查取消状态
+                lock (_lock)
+                {
+                    if (_status == TaskStatus.Pending || _status == TaskStatus.Running)
+                    {
+                        _status = TaskStatus.Canceled;
+                        _exception = new OperationCanceledException("任务被取消");
+                    }
+                }
             });
         }
     }
@@ -83,8 +126,12 @@ public class TaskLangValue : LangValueType
             var result = _task.Result;
             
             // 更新缓存状态
-            _isCompleted = true;
-            _result = result;
+            lock (_lock)
+            {
+                _status = TaskStatus.Completed;
+                _result = result;
+                _exception = null;
+            }
             
             return result;
         }
@@ -92,9 +139,23 @@ public class TaskLangValue : LangValueType
         {
             // 展开 AggregateException，抛出内部异常
             var innerException = aggEx.InnerException ?? aggEx;
-            _isCompleted = true;
-            _exception = innerException;
+            lock (_lock)
+            {
+                _status = innerException is OperationCanceledException ? TaskStatus.Canceled : TaskStatus.Failed;
+                _exception = innerException;
+                _result = null;
+            }
             throw innerException;
+        }
+        catch (Exception ex)
+        {
+            lock (_lock)
+            {
+                _status = ex is OperationCanceledException ? TaskStatus.Canceled : TaskStatus.Failed;
+                _exception = ex;
+                _result = null;
+            }
+            throw;
         }
     }
 
@@ -112,41 +173,75 @@ public class TaskLangValue : LangValueType
     /// <param name="timeoutMs">超时时间（毫秒），-1 表示无超时</param>
     /// <returns>任务结果</returns>
     /// <exception cref="TimeoutException">任务超时</exception>
+    /// <exception cref="OperationCanceledException">任务被取消</exception>
     public async Task<LangValueType> AwaitAsync(int timeoutMs)
     {
         try
         {
+            // 检查取消请求
+            _cancellationToken.ThrowIfCancellationRequested();
+
+            // 确保任务状态更新为 Running
+            lock (_lock)
+            {
+                if (_status == TaskStatus.Pending)
+                {
+                    _status = TaskStatus.Running;
+                }
+            }
+
             LangValueType result;
             if (timeoutMs <= 0)
             {
+                // 无超时，异步等待任务完成
                 result = await _task;
             }
             else
             {
-                var completedTask = await Task.WhenAny(_task, Task.Delay(timeoutMs));
-                if (completedTask != _task)
+                // 带超时，使用 Task.WhenAny 实现超时机制
+                var timeoutTask = Task.Delay(timeoutMs, _cancellationToken);
+                var completedTask = await Task.WhenAny(_task, timeoutTask);
+                
+                // 检查取消请求
+                _cancellationToken.ThrowIfCancellationRequested();
+                
+                if (completedTask == timeoutTask)
                 {
+                    // 超时
                     throw new TimeoutException($"Task 等待超时（{timeoutMs}ms）");
                 }
+                
+                // 任务已完成，获取结果
                 result = await _task;
             }
 
-            // 线程安全地更新状态
-            lock (this)
+            // 线程安全地更新完成状态
+            lock (_lock)
             {
-                _isCompleted = true;
+                _status = TaskStatus.Completed;
                 _result = result;
                 _exception = null;
             }
 
             return result;
         }
+        catch (OperationCanceledException ex)
+        {
+            // 任务被取消
+            lock (_lock)
+            {
+                _status = TaskStatus.Canceled;
+                _exception = ex;
+                _result = null;
+            }
+            throw;
+        }
         catch (Exception ex)
         {
-            // 线程安全地更新异常状态
-            lock (this)
+            // 其他异常
+            lock (_lock)
             {
-                _isCompleted = true;
+                _status = TaskStatus.Failed;
                 _exception = ex;
                 _result = null;
             }
@@ -167,6 +262,7 @@ public class TaskLangValue : LangValueType
         }
         catch (TimeoutException)
         {
+            // 超时情况下不更新任务状态，返回 null
             return null;
         }
     }
@@ -174,12 +270,30 @@ public class TaskLangValue : LangValueType
     /// <summary>
     /// 非阻塞检查任务是否完成
     /// </summary>
-    public bool IsCompleted => _isCompleted;
+    public bool IsCompleted
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _status == TaskStatus.Completed || _status == TaskStatus.Failed || _status == TaskStatus.Canceled;
+            }
+        }
+    }
 
     /// <summary>
     /// 获取任务的状态
     /// </summary>
-    public TaskStatus Status => _task.Status;
+    public TaskStatus Status
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _status;
+            }
+        }
+    }
 
     /// <summary>
     /// 获取底层 Task 对象
@@ -196,13 +310,18 @@ public class TaskLangValue : LangValueType
     /// </summary>
     public override string ToString()
     {
-        if (_isCompleted)
+        lock (_lock)
         {
-            if (_exception != null)
-                return $"Task(Failed: {_exception.Message})";
-            return $"Task(Completed: {_result?.ToString() ?? "void"})";
+            return _status switch
+            {
+                TaskStatus.Pending => "Task(Status: Pending)",
+                TaskStatus.Running => "Task(Status: Running)",
+                TaskStatus.Completed => $"Task(Completed: {_result?.ToString() ?? "void"})",
+                TaskStatus.Failed => $"Task(Failed: {_exception?.ToString() ?? "Unknown error"})",
+                TaskStatus.Canceled => "Task(Canceled)",
+                _ => "Task(Status: Unknown)"
+            };
         }
-        return $"Task(Status: {Status})";
     }
 
     /// <summary>

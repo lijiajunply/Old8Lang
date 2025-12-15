@@ -1,0 +1,172 @@
+// AwaitAsync 方法综合测试
+import Async
+
+// 测试1：基本AwaitAsync测试
+async func basicAwait() {
+    Sleep(100)
+    return "Success"
+}
+
+PrintLine("=== 测试1：基本AwaitAsync测试 ===")
+task1 <- basicAwait()
+result1 <- await task1
+PrintLine("结果: " + result1)
+Assert(result1, "Success")
+PrintLine("状态: " + task1)
+
+// 测试2：AwaitAsync超时测试
+async func slowTask() {
+    Sleep(500)
+    return "TooLate"
+}
+
+PrintLine("\n=== 测试2：AwaitAsync超时测试 ===")
+task2 <- slowTask()
+
+// 自定义超时测试（使用IsCompleted属性轮询）
+startTime <- GetCurrentTime()
+timeout <- 200
+isTimeout <- false
+
+// 使用while true循环代替!操作符
+while (true) {
+    if (task2.IsCompleted) {
+        isTimeout <- false
+        break
+    }
+    if (GetCurrentTime() - startTime > timeout) {
+        isTimeout <- true
+        break
+    }
+    Sleep(10)
+}
+
+if (isTimeout) {
+    PrintLine("任务超时，状态: " + task2)
+    PrintLine("超时测试通过")
+} else {
+    PrintLine("任务未超时，状态: " + task2)
+}
+
+// 测试3：AwaitAsync异常传播测试
+async func exceptionAwait() {
+    Sleep(50)
+    throw new Error("TestException")
+}
+
+PrintLine("\n=== 测试3：AwaitAsync异常传播测试 ===")
+task3 <- exceptionAwait()
+
+try {
+    result3 <- await task3
+    PrintLine("意外: 未捕获到异常")
+} catch (e) {
+    PrintLine("成功捕获异常: " + e)
+    PrintLine("异常后状态: " + task3)
+}
+
+// 测试4：并发AwaitAsync测试
+async func concurrentTask(id:int, delay:int) {
+    Sleep(delay)
+    return "Task" + id.ToStr() + "_Done"
+}
+
+PrintLine("\n=== 测试4：并发AwaitAsync测试 ===")
+
+// 启动多个并发任务
+start <- GetCurrentTime()
+taskA <- concurrentTask(1, 200)
+taskB <- concurrentTask(2, 100)
+taskC <- concurrentTask(3, 150)
+
+// 并发执行，使用await依次等待
+PrintLine("启动所有任务，开始等待...")
+resultA <- await taskA
+resultB <- await taskB
+resultC <- await taskC
+
+end <- GetCurrentTime()
+duration <- end - start
+
+PrintLine("所有任务完成，总耗时: " + duration + "ms")
+PrintLine("任务A结果: " + resultA)
+PrintLine("任务B结果: " + resultB)
+PrintLine("任务C结果: " + resultC)
+
+// 验证结果
+Assert(resultA, "Task1_Done")
+Assert(resultB, "Task2_Done")
+Assert(resultC, "Task3_Done")
+
+// 测试5：任务状态连续查询测试
+async func statusTest() {
+    for (i <- 0; i < 3; i++) {
+        Sleep(50)
+    }
+    return "Final"
+}
+
+PrintLine("\n=== 测试5：任务状态连续查询测试 ===")
+task5 <- statusTest()
+
+// 连续查询状态变化
+for (i <- 0; i < 5; i++) {
+    PrintLine("查询 #" + i + ": " + task5)
+    Sleep(40)
+}
+
+result5 <- await task5
+PrintLine("最终状态: " + task5)
+PrintLine("结果: " + result5)
+
+// 测试6：异步函数嵌套AwaitAsync测试
+async func nestedTask() {
+    async func innerTask() {
+        Sleep(80)
+        return "InnerResult"
+    }
+    
+    innerResult <- await innerTask()
+    return "Outer_" + innerResult
+}
+
+PrintLine("\n=== 测试6：异步函数嵌套AwaitAsync测试 ===")
+task6 <- nestedTask()
+result6 <- await task6
+PrintLine("嵌套结果: " + result6)
+Assert(result6, "Outer_InnerResult")
+
+// 测试7：快速完成的任务测试
+async func fastTask() {
+    return "QuickResult"
+}
+
+PrintLine("\n=== 测试7：快速完成的任务测试 ===")
+task7 <- fastTask()
+result7 <- await task7
+PrintLine("快速任务状态: " + task7)
+PrintLine("快速任务结果: " + result7)
+Assert(result7, "QuickResult")
+
+// 测试8：多个await同一个任务测试
+async func reusableTask() {
+    Sleep(100)
+    return "Reusable"
+}
+
+PrintLine("\n=== 测试8：多个await同一个任务测试 ===")
+task8 <- reusableTask()
+
+// 第一个await
+result8a <- await task8
+PrintLine("第一个await结果: " + result8a)
+
+// 第二个await同一个任务
+result8b <- await task8
+PrintLine("第二个await结果: " + result8b)
+
+// 验证两次结果相同
+Assert(result8a, result8b)
+PrintLine("同一个任务多次await测试通过")
+
+PrintLine("\n=== 所有AwaitAsync综合测试完成！ ===")

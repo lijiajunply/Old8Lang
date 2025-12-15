@@ -1,0 +1,159 @@
+// 异步任务状态管理测试
+import Async
+
+// 测试1：基本任务状态转换测试
+async func basicStatusTest() {
+    Sleep(100)
+    return "Complete"
+}
+
+PrintLine("=== 测试1：基本任务状态转换测试 ===")
+task1 <- basicStatusTest()
+PrintLine("初始状态: " + task1)
+// 应该显示 Task(Status: Pending)
+
+Sleep(50) // 让任务运行一段时间
+PrintLine("运行中状态: " + task1)
+// 应该显示 Task(Status: Running)
+
+result1 <- await task1
+PrintLine("完成后状态: " + task1)
+// 应该显示 Task(Completed: Complete)
+PrintLine("结果: " + result1)
+Assert(result1, "Complete")
+
+// 测试2：任务超时测试
+async func longRunningTask() {
+    Sleep(500)
+    return "Late"
+}
+
+PrintLine("\n=== 测试2：任务超时测试 ===")
+task2 <- longRunningTask()
+PrintLine("初始状态: " + task2)
+
+try {
+    // 使用自定义的超时机制测试
+    start <- GetCurrentTime()
+    timeout <- 200 // 200ms 超时
+    // 使用IsCompleted属性直接判断，Old8Lang不支持!操作符
+    while (true) {
+        if (task2.IsCompleted) {
+            break
+        }
+        if ((GetCurrentTime() - start) >= timeout) {
+            break
+        }
+        Sleep(10) // 避免忙等
+    }
+    
+    // 判断是否超时
+    if (task2.IsCompleted) {
+        PrintLine("任务未超时，状态: " + task2)
+    } else {
+        PrintLine("任务超时，状态: " + task2)
+        PrintLine("超时测试通过")
+    }
+} catch (e) {
+    PrintLine("捕获到异常: " + e.Message)
+}
+
+// 测试3：任务异常测试
+async func exceptionTask() {
+    Sleep(100)
+    throw new Error("TestException")
+}
+
+PrintLine("\n=== 测试3：任务异常测试 ===")
+task3 <- exceptionTask()
+PrintLine("初始状态: " + task3)
+
+try {
+    result3 <- await task3
+    PrintLine("意外: 任务未抛出异常")
+} catch (e) {
+    PrintLine("成功捕获异常: " + e)
+    PrintLine("异常后状态: " + task3)
+    // 应该显示 Task(Failed: TestException)
+}
+
+// 测试4：并发任务状态测试
+async func concurrentTask(id:int, delay:int) {
+    Sleep(delay)
+    return "Task" + id.ToStr()
+}
+
+PrintLine("\n=== 测试4：并发任务状态测试 ===")
+taskA <- concurrentTask(1, 200)
+taskB <- concurrentTask(2, 100)
+taskC <- concurrentTask(3, 150)
+
+PrintLine("任务A初始状态: " + taskA)
+PrintLine("任务B初始状态: " + taskB)
+PrintLine("任务C初始状态: " + taskC)
+
+// 等待任务B完成（最快）
+resultB <- await taskB
+PrintLine("任务B完成后状态: " + taskB)
+PrintLine("任务B结果: " + resultB)
+
+// 等待任务C完成
+resultC <- await taskC
+PrintLine("任务C完成后状态: " + taskC)
+PrintLine("任务C结果: " + resultC)
+
+// 等待任务A完成
+resultA <- await taskA
+PrintLine("任务A完成后状态: " + taskA)
+PrintLine("任务A结果: " + resultA)
+
+// 测试5：任务取消测试（注释掉，因为Old8Lang中无法直接创建取消令牌）
+/*
+async func cancelableTask() {
+    // 这个测试需要手动创建取消令牌，暂时无法在Old8Lang中直接测试
+    // 但我们可以测试异常状态转换
+    Sleep(200)
+    return "ShouldNotReach"
+}
+
+PrintLine("\n=== 测试5：任务取消模拟测试 ===")
+task5 <- cancelableTask()
+PrintLine("初始状态: " + task5)
+
+// 模拟取消状态转换（通过抛出Error）
+async func simulateCancel() {
+    throw new Error("OperationCanceled")
+}
+
+try {
+    cancelTask <- simulateCancel()
+    cancelResult <- await cancelTask
+    PrintLine("意外: 取消任务未抛出异常")
+} catch (e) {
+    PrintLine("捕获到取消异常: " + e)
+    // 注意：由于我们使用的是Error对象而不是真正的OperationCanceledException，状态会显示为Failed
+    // 在C#代码中，真正的OperationCanceledException会导致状态变为Canceled
+}
+*/
+
+// 测试6：任务状态查询测试
+async func quickTask() {
+    Sleep(50)
+    return 42
+}
+
+PrintLine("\n=== 测试6：任务状态查询测试 ===")
+task6 <- quickTask()
+
+// 非阻塞查询状态
+PrintLine("初始IsCompleted: " + task6.IsCompleted)
+
+// 等待任务完成
+result6 <- await task6
+
+// 再次查询状态
+PrintLine("完成后IsCompleted: " + task6.IsCompleted)
+PrintLine("结果: " + result6)
+Assert(result6, 42)
+
+PrintLine("\n=== 所有异步任务状态管理测试完成！ ===")

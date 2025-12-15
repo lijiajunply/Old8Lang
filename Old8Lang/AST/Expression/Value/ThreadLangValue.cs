@@ -66,7 +66,7 @@ public class ThreadLangValue : LangValueType
 
         if (_exception != null)
         {
-            throw new InvalidOperationError(this, "线程执行异常: " + _exception.Message);
+            throw new InvalidOperationError(this, "线程执行异常: " + _exception.ToString());
         }
 
         return ObjToValue(_result!);
