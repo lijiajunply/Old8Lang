@@ -176,7 +176,12 @@ public class AsyncFuncLangValue : ImportInfo
             }
         }, cancellationToken);
 
-        return new TaskLangValue(task, cancellationToken, Position);
+        // 创建 TaskLangValue 对象并设置 ExternalManager
+        var taskLangValue = new TaskLangValue(task, cancellationToken, Position)
+        {
+            ExternalManager = CapturedScope ?? variateManagerFunc
+        };
+        return taskLangValue;
     }
 
     /// <summary>

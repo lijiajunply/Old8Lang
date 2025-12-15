@@ -555,7 +555,7 @@ public static class TaskValueFuncStatic
 
             var manager = task.ExternalManager;
 
-            return task.Then(result =>
+            return task.ThenTask(result =>
             {
                 // 使用 ExternalManager（它有有效的 Interpreter）
                 var closedFunc = continuation.Run(manager);
@@ -592,7 +592,7 @@ public static class TaskValueFuncStatic
                 throw new InvalidOperationError(task.Position, "Then 方法需要有效的执行上下文（ExternalManager）");
             }
 
-            return task.Retry(retryCount.Value, delayMs?.Value ?? 0);
+            return task.RetryTask(retryCount.Value, delayMs?.Value ?? 0);
         }
     }
 }

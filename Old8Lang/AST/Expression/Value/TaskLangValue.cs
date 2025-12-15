@@ -442,7 +442,7 @@ public class TaskLangValue : LangValueType
     /// <summary>
     /// 任务完成后执行下一个任务
     /// </summary>
-    public TaskLangValue Then(Func<LangValueType, TaskLangValue> continuation, SourcePosition position = default)
+    public TaskLangValue ThenTask(Func<LangValueType, TaskLangValue> continuation, SourcePosition position = default)
     {
         var thenTask = Task.ContinueWith(t =>
         {
@@ -479,7 +479,7 @@ public class TaskLangValue : LangValueType
     /// <summary>
     /// 实现任务重试机制
     /// </summary>
-    public TaskLangValue Retry(int retryCount, int delayMs = 0, SourcePosition position = default)
+    public TaskLangValue RetryTask(int retryCount, int delayMs = 0, SourcePosition position = default)
     {
         var retryTask = System.Threading.Tasks.Task.Run(async () =>
         {
