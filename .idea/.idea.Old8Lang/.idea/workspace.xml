@@ -18,16 +18,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/plan_20251215_054532.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_thread_basic.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ThreadLangValue.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_thread_comprehensive.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_thread_simple.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/AsyncLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/AsyncLib.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ThreadLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ThreadLangValue.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,6 +65,8 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/VoidLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/VoidLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/VoidLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TaskLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TaskLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TaskLangValue.cs" root0="SKIP_HIGHLIGHTING" />
@@ -112,7 +109,7 @@
     ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
     ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
     ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Debug",
+    ".NET 项目.Old8Lang.App.executor": "Run",
     ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
     "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
     "ASKED_ADD_EXTERNAL_FILES": "true",
@@ -391,7 +388,7 @@
       <workItem from="1765703120567" duration="3476000" />
       <workItem from="1765720320753" duration="2106000" />
       <workItem from="1765734191994" duration="8791000" />
-      <workItem from="1765776532895" duration="2630000" />
+      <workItem from="1765776532895" duration="4305000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -736,7 +733,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="186" />
+    <option name="localTasksCounter" value="187" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -763,7 +760,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(compiler): 修复Lambda表达式和函数默认参数编译问题&#10;&#10;- 解决Lambda表达式IL生成时的InvalidProgramException错误&#10;- 实现函数默认参数的正确IL代码生成逻辑&#10;- 支持函数重载机制，避免方法覆盖问题&#10;- 修复函数调用时参数数量不匹配的处理&#10;- 完善类型推断逻辑，确保编译时与运行时一致性" />
     <MESSAGE value="fix(compiler): 优化对象类型乘法运算与拆箱逻辑&#10;&#10;- 为object类型操作数添加安全的ToInt32转换处理&#10;- 使用临时变量保存右操作数，确保正确的IL生成顺序&#10;- 调整引用类型的拆箱条件，排除object类型的误处理&#10;- 增强类型推断准确性，避免运行时类型转换异常" />
     <MESSAGE value="refactor(compiler): 优化局部变量管理器和变量解析逻辑&#10;&#10;- 调整 LocalManager 中字段布局，增强可读性&#10;- 统一克隆方法中的参数命名风格&#10;- 简化 VariateManager 中的作用域查找逻辑&#10;- 保留原生值类型比较逻辑的一致性注释" />
     <MESSAGE value="refactor(compiler): 优化IL生成逻辑和类型检查&#10;&#10;- 移除未使用的命名空间引用&#10;- 简化条件判断逻辑，减少冗余代码&#10;- 合并重复的IL指令生成代码&#10;- 优化参数数量检查逻辑&#10;- 移除调试模式下的无效返回语句&#10;- 统一空值处理逻辑&#10;- 清理无用的换行和空格&#10;- 优化委托类型创建流程&#10;- 改进错误提示信息的准确性&#10;- 移除测试文件中的不必要引用" />
@@ -788,7 +784,8 @@
     <MESSAGE value="docs(reports): 添加性能优化项目完整文档&#10;&#10;- 新增五份详细报告，涵盖BenchmarkDotNet测试、COW代码清理、性能优化完成情况及项目总结&#10;- 包括解释器性能测试结果、优化技术验证、代码清理记录和项目最终评估&#10;- 提供完整的性能数据、优化前后对比及技术突破说明&#10;- 记录测试验证结果、待办事项和后续优化建议&#10;- 展示项目成果、技术亮点和工程实践经验总结" />
     <MESSAGE value="feat(async): 实现异步函数和await表达式支持&#10;&#10;- 添加异步函数声明语法：async func&#10;- 实现AwaitExpression解析和执行&#10;- 创建TaskLangValue封装.NET Task&#10;- 支持异步函数调用和返回值处理&#10;- 添加AsyncFuncInit和AsyncFuncLangValue类&#10;- 实现闭包捕获和异步执行上下文&#10;- 更新错误处理以支持异步调用栈&#10;- 添加异步相关原语和原子操作库&#10;- 创建AsyncLib提供Mutex、Semaphore等同步原语&#10;- 增加多个异步测试用例验证功能正确性&#10;- 更新语言版本字段名从Ver到Var&#10;- 添加Async库到默认库信息配置" />
     <MESSAGE value="feat(crypto): 添加加密库支持&#10;&#10;- 新增 AES 加密解密功能&#10;- 实现 RSA 加密解密功能&#10;- 添加 SHA256 和 SHA512 哈希算法&#10;- 支持 HMAC-SHA256 和 HMAC-SHA512 算法&#10;- 提供 Base64 编码解码功能&#10;- 实现 XOR 加密解密方法&#10;- 注册 Crypto 库到语言信息配置&#10;- 更新项目配置以包含新库文件" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(crypto): 添加加密库支持&#10;&#10;- 新增 AES 加密解密功能&#10;- 实现 RSA 加密解密功能&#10;- 添加 SHA256 和 SHA512 哈希算法&#10;- 支持 HMAC-SHA256 和 HMAC-SHA512 算法&#10;- 提供 Base64 编码解码功能&#10;- 实现 XOR 加密解密方法&#10;- 注册 Crypto 库到语言信息配置&#10;- 更新项目配置以包含新库文件" />
+    <MESSAGE value="feat(runtime): 实现多线程支持和线程管理功能&#10;&#10;- 添加 ThreadLangValue 类封装线程操作和状态管理&#10;- 实现 spawn 函数支持创建新线程执行函数&#10;- 实现 Join 方法用于等待线程完成并获取返回值&#10;- 扩展 Instance 类支持 Spawn 方法调用&#10;- 更新变量管理器字段命名和线程安全处理&#10;- 添加基础线程测试用例验证功能正确性&#10;- 更新词法分析器标记定义和格式化&#10;- 优化异步库 ChannelTryReceive 方法可空返回类型&#10;- 调整 IL 生成代码使用 foreach 替代 for 循环&#10;- 更新项目配置和开发环境设置文件" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(runtime): 实现多线程支持和线程管理功能&#10;&#10;- 添加 ThreadLangValue 类封装线程操作和状态管理&#10;- 实现 spawn 函数支持创建新线程执行函数&#10;- 实现 Join 方法用于等待线程完成并获取返回值&#10;- 扩展 Instance 类支持 Spawn 方法调用&#10;- 更新变量管理器字段命名和线程安全处理&#10;- 添加基础线程测试用例验证功能正确性&#10;- 更新词法分析器标记定义和格式化&#10;- 优化异步库 ChannelTryReceive 方法可空返回类型&#10;- 调整 IL 生成代码使用 foreach 替代 for 循环&#10;- 更新项目配置和开发环境设置文件" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -941,19 +938,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="571" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>358</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
-            <startOffsets>
-              <option value="12943" />
-            </startOffsets>
-            <endOffsets>
-              <option value="12977" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="576" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />

@@ -16,22 +16,22 @@ public class ThreadLangValue : LangValueType
     /// 线程对象
     /// </summary>
     private readonly Thread _thread;
-    
+
     /// <summary>
     /// 线程执行结果
     /// </summary>
     private object? _result;
-    
+
     /// <summary>
     /// 线程执行是否完成
     /// </summary>
     private bool _isCompleted;
-    
+
     /// <summary>
     /// 线程执行过程中发生的异常
     /// </summary>
     private Exception? _exception;
-    
+
     /// <summary>
     /// 构造函数
     /// </summary>
@@ -42,19 +42,20 @@ public class ThreadLangValue : LangValueType
         _thread = new Thread(threadStart);
         _thread.Start();
     }
-    
+
     /// <summary>
     /// 构造函数，带参数
     /// </summary>
     /// <param name="parameterizedThreadStart">带参数的线程入口点</param>
     /// <param name="parameter">线程参数</param>
     /// <param name="position">源代码位置</param>
-    public ThreadLangValue(ParameterizedThreadStart parameterizedThreadStart, object? parameter, SourcePosition position = default) : base(position)
+    public ThreadLangValue(ParameterizedThreadStart parameterizedThreadStart, object? parameter,
+        SourcePosition position = default) : base(position)
     {
         _thread = new Thread(parameterizedThreadStart);
         _thread.Start(parameter);
     }
-    
+
     /// <summary>
     /// 等待线程完成
     /// </summary>
@@ -62,15 +63,15 @@ public class ThreadLangValue : LangValueType
     public LangValueType Join()
     {
         _thread.Join();
-        
+
         if (_exception != null)
         {
             throw new InvalidOperationError(this, "线程执行异常: " + _exception.Message);
         }
-        
+
         return ObjToValue(_result!);
     }
-    
+
     /// <summary>
     /// 设置线程执行结果
     /// </summary>
@@ -80,7 +81,7 @@ public class ThreadLangValue : LangValueType
         _result = result;
         _isCompleted = true;
     }
-    
+
     /// <summary>
     /// 设置线程执行异常
     /// </summary>
@@ -90,17 +91,17 @@ public class ThreadLangValue : LangValueType
         _exception = exception;
         _isCompleted = true;
     }
-    
+
     /// <summary>
     /// 获取线程状态
     /// </summary>
     public ThreadState State => _thread.ThreadState;
-    
+
     /// <summary>
     /// 检查线程是否已完成
     /// </summary>
     public bool IsCompleted => _isCompleted;
-    
+
     /// <summary>
     /// 将对象转换为语言值类型
     /// </summary>
@@ -116,10 +117,10 @@ public class ThreadLangValue : LangValueType
             bool b => new BoolLangValue(b),
             char c => new CharLangValue(c),
             null => new NullLangValue(),
-            _ => new VoidLangValue()  // 对于未知类型，返回 VoidLangValue
+            _ => new VoidLangValue() // 对于未知类型，返回 VoidLangValue
         };
     }
-    
+
     /// <summary>
     /// 运行方法，用于支持线程对象的方法调用
     /// </summary>
@@ -131,18 +132,18 @@ public class ThreadLangValue : LangValueType
         // 处理 Join 方法调用
         return Join();
     }
-    
+
     public override Type OutputType(LocalManager local)
     {
         return typeof(ThreadLangValue);
     }
-    
+
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 加载当前线程对象到 IL 栈
         ilGenerator.Emit(OpCodes.Ldarg_0);
     }
-    
+
     public override void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
     {
         // 声明局部变量
@@ -152,9 +153,27 @@ public class ThreadLangValue : LangValueType
         // 设置线程对象到 IL 变量
         ilGenerator.Emit(OpCodes.Stloc, localVar);
     }
-    
+
     public override object GetValue()
     {
         return this;
+    }
+
+    /// <summary>
+    /// 处理点操作，直接调用 Join 方法，避免反射调用
+    /// </summary>
+    /// <param name="dotExpression">点表达式</param>
+    /// <returns>方法调用结果</returns>
+    public override LangValueType Dot(LangExpression dotExpression)
+    {
+        // 处理 Join 方法调用
+        if (dotExpression is Instance { Id.IdName: "Join" })
+        {
+            // 直接调用 Join 方法，避免反射
+            return Join();
+        }
+
+        // 其他情况调用基类方法
+        return base.Dot(dotExpression);
     }
 }

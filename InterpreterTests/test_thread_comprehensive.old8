@@ -1,0 +1,136 @@
+// 全面的多线程测试用例
+
+PrintLine("=== 开始全面多线程测试 ===")
+
+// 全局计数器，用于测试多线程同步
+counter <- 0
+
+// 1. 基础线程创建和执行
+PrintLine("\n1. 基础线程创建和执行测试")
+func testBasic() {
+    PrintLine("基础线程执行中")
+    return "basic_done"
+}
+
+thread1 <- spawn(testBasic)
+result1 <- thread1.Join()
+PrintLine("基础线程返回值: " + result1.ToStr())
+
+// 2. 多个线程并发执行
+PrintLine("\n2. 多个线程并发执行测试")
+func testConcurrent(id) {
+    PrintLine("并发线程 " + id.ToStr() + " 开始执行")
+    // 模拟耗时操作
+    i <- 0
+    while i < 1000000 {
+        i <- i + 1
+    }
+    PrintLine("并发线程 " + id.ToStr() + " 执行完成")
+    return "concurrent_" + id.ToStr()
+}
+
+threads <- {}
+for i in [0~3] {
+    thread <- spawn(testConcurrent, i)
+    threads.Add(thread)
+}
+
+results <- {}
+for thread in threads {
+    result <- thread.Join()
+    results.Add(result)
+}
+
+PrintLine("并发线程返回结果: " + results.ToStr())
+
+// 3. 线程返回不同类型的值
+PrintLine("\n3. 线程返回不同类型的值测试")
+func testReturnInt() {
+    return 42
+}
+
+func testReturnDouble() {
+    return 3.14159
+}
+
+func testReturnBool() {
+    return true
+}
+
+thread_int <- spawn(testReturnInt)
+thread_double <- spawn(testReturnDouble)
+thread_bool <- spawn(testReturnBool)
+
+result_int <- thread_int.Join()
+result_double <- thread_double.Join()
+result_bool <- thread_bool.Join()
+
+PrintLine("返回整数: " + result_int.ToStr() + ", 类型: " + type(result_int).ToStr())
+PrintLine("返回浮点数: " + result_double.ToStr() + ", 类型: " + type(result_double).ToStr())
+PrintLine("返回布尔值: " + result_bool.ToStr() + ", 类型: " + type(result_bool).ToStr())
+
+// 4. 带参数的线程
+PrintLine("\n4. 带参数的线程测试")
+func testWithParams(a, b, c) {
+    return a + b + c
+}
+
+thread_params <- spawn(testWithParams, 10, 20, 30)
+result_params <- thread_params.Join()
+PrintLine("带参数线程结果: 10 + 20 + 30 = " + result_params.ToStr())
+
+// 5. 线程异常处理测试
+PrintLine("\n5. 线程异常处理测试")
+func testException() {
+    // 模拟除零异常
+    x <- 1 / 0
+    return x
+}
+
+try {
+    thread_exception <- spawn(testException)
+    result_exception <- thread_exception.Join()
+    PrintLine("异常测试失败: 应该抛出异常")
+} catch (e) {
+    PrintLine("异常测试成功: 捕获到预期异常")
+    PrintLine("异常信息: " + e)
+}
+
+// 6. 多线程共享数据测试
+PrintLine("\n6. 多线程共享数据测试")
+func testSharedData() {
+    i <- 0
+    while i < 10000 {
+        counter <- counter + 1
+        i <- i + 1
+    }
+    return counter
+}
+
+// 创建多个线程修改共享计数器
+shared_threads <- {}
+for i in [0~4] {
+    thread <- spawn(testSharedData)
+    shared_threads.Add(thread)
+}
+
+// 等待所有线程完成
+for thread in shared_threads {
+    thread.Join()
+}
+
+PrintLine("共享计数器最终值: " + counter.ToStr())
+PrintLine("预期值: 50000")
+PrintLine("注意: 由于没有锁机制，实际值可能小于预期值，这是正常的")
+
+// 7. 简单的返回字符串测试
+PrintLine("\n7. 简单的返回字符串测试")
+func testReturnString() {
+    return "hello_world"
+}
+
+thread_string <- spawn(testReturnString)
+result_string <- thread_string.Join()
+PrintLine("字符串返回结果: " + result_string.ToStr())
+
+PrintLine("\n=== 全面多线程测试完成 ===")

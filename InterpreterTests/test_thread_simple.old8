@@ -1,0 +1,46 @@
+// 简单的多线程测试用例
+
+PrintLine("=== 开始简单多线程测试 ===")
+
+// 1. 基础线程创建和执行
+PrintLine("\n1. 基础线程创建和执行")
+func testBasic() {
+    PrintLine("基础线程执行中")
+    return "basic_done"
+}
+
+thread1 <- spawn(testBasic)
+result1 <- thread1.Join()
+PrintLine("基础线程返回值: " + result1.ToStr())
+
+// 2. 线程返回整数
+PrintLine("\n2. 线程返回整数")
+func testReturnInt() {
+    return 42
+}
+
+thread2 <- spawn(testReturnInt)
+result2 <- thread2.Join()
+PrintLine("整数线程返回值: " + result2.ToStr())
+
+// 3. 线程返回浮点数
+PrintLine("\n3. 线程返回浮点数")
+func testReturnDouble() {
+    return 3.14159
+}
+
+thread3 <- spawn(testReturnDouble)
+result3 <- thread3.Join()
+PrintLine("浮点数线程返回值: " + result3.ToStr())
+
+// 4. 带参数的线程
+PrintLine("\n4. 带参数的线程")
+func testWithParam(x) {
+    return x * 2
+}
+
+thread4 <- spawn(testWithParam, 10)
+result4 <- thread4.Join()
+PrintLine("带参数线程返回值: " + result4.ToStr())
+
+PrintLine("\n=== 简单多线程测试完成 ===")

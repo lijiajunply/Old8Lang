@@ -354,42 +354,57 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
     }
 
     public LangValueType FromClassToResult(LangValueType baseLangValue)
-    {
-        var type = baseLangValue.GetType();
-        var m = type.GetMethod(Id.IdName);
-        if (m == null)
         {
-            type = baseLangValue switch
+            var type = baseLangValue.GetType();
+            var m = type.GetMethod(Id.IdName);
+            if (m == null)
             {
-                DictionaryLangValue => Type.GetType("Old8Lang.AST.Expression.DictionaryValueFuncStatic"),
-                ListLangValue => Type.GetType("Old8Lang.AST.Expression.ListValueFuncStatic"),
-                _ => Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic")
-            };
-            m = type?.GetMethod(Id.IdName);
+                type = baseLangValue switch
+                {
+                    DictionaryLangValue => Type.GetType("Old8Lang.AST.Expression.DictionaryValueFuncStatic"),
+                    ListLangValue => Type.GetType("Old8Lang.AST.Expression.ListValueFuncStatic"),
+                    _ => Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic")
+                };
+                m = type?.GetMethod(Id.IdName);
+            }
+
+            if (m == null && baseLangValue is not DictionaryLangValue or ListLangValue)
+            {
+                type = Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic");
+                m = type?.GetMethod(Id.IdName);
+            }
+
+            var os = new List<object>();
+            
+            // 检查方法是否需要参数
+            var parameters = m?.GetParameters() ?? Array.Empty<ParameterInfo>();
+            
+            // 对于静态方法（扩展方法），第一个参数是 baseLangValue
+            if (m?.IsStatic == true && parameters.Length > 0)
+            {
+                os.Add(baseLangValue);
+            }
+            
+            // 只添加与方法参数数量匹配的参数
+            for (int i = 0; i < Ids.Count && os.Count < parameters.Length; i++)
+            {
+                // 对于实例方法，第一个参数已经是实例本身，所以跳过
+                if (m?.IsStatic == false && i == 0 && parameters.Length > 0)
+                {
+                    continue;
+                }
+                
+                // 运行表达式获取参数值
+                os.Add(Ids[i].Run(null!));
+            }
+
+            // 对于静态方法，实例参数为 null；对于实例方法，实例参数为 baseLangValue
+            object? invokeInstance = m?.IsStatic == false ? baseLangValue : null;
+
+            var r = m?.Invoke(invokeInstance, [.. os]);
+            if (r is LangValueType v) return v;
+            return ObjToValue(r!);
         }
-
-        if (m == null && baseLangValue is not DictionaryLangValue or ListLangValue)
-        {
-            type = Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic");
-            m = type?.GetMethod(Id.IdName);
-        }
-
-        var os = new List<object>() { baseLangValue };
-        os.AddRange(Ids);
-
-        // 对于静态方法，第一个参数应该是 null，因为静态方法没有实例
-        object? invokeInstance = null;
-        // 检查是否是扩展方法（静态方法）
-        if (m?.IsStatic == false)
-        {
-            // 非静态方法，使用 baseLangValue 作为实例
-            invokeInstance = baseLangValue;
-        }
-
-        var r = m?.Invoke(invokeInstance, [.. os]);
-        if (r is LangValueType v) return v;
-        return ObjToValue(r!);
-    }
 
     public override string ToString()
     {
