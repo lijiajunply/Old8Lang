@@ -374,16 +374,18 @@ public class InterpreterIntegrationTests
     public void FullPipeline_RecursiveFunction_WorksCorrectly()
     {
         // 测试递归函数 - 计算阶乘
-        var code = @"
-            func factorial(n) {
-                if n <= 1 {
-                    return 1
-                } else {
-                    return n * factorial(n - 1)
-                }
-            }
-            result <- factorial(5)
-        ";
+        var code = """
+
+                               func factorial(n) {
+                                   if n <= 1 {
+                                       return 1
+                                   } else {
+                                       return n * factorial(n - 1)
+                                   }
+                               }
+                               result <- factorial(5)
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);

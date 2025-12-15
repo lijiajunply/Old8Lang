@@ -258,51 +258,53 @@ public class EndToEndTests
     public void EndToEnd_ComplexBusinessLogic_WorksCorrectly()
     {
         // 测试复杂业务逻辑 - 订单处理系统
-        var code = @"
-            // 定义价格计算函数
-            func calculateTotal(price, quantity, discount) {
-                subtotal <- price * quantity
-                discountAmount <- subtotal * discount / 100
-                return subtotal - discountAmount
-            }
+        var code = """
 
-            // 定义评级函数
-            func getGrade(score) {
-                if score >= 90 {
-                    return ""A""
-                } elif score >= 80 {
-                    return ""B""
-                } elif score >= 70 {
-                    return ""C""
-                } else {
-                    return ""D""
-                }
-            }
+                               // 定义价格计算函数
+                               func calculateTotal(price, quantity, discount) {
+                                   subtotal <- price * quantity
+                                   discountAmount <- subtotal * discount / 100
+                                   return subtotal - discountAmount
+                               }
 
-            // 订单 1: 价格 100, 数量 3, 折扣 10%
-            order1 <- calculateTotal(100, 3, 10)
+                               // 定义评级函数
+                               func getGrade(score) {
+                                   if score >= 90 {
+                                       return "A"
+                                   } elif score >= 80 {
+                                       return "B"
+                                   } elif score >= 70 {
+                                       return "C"
+                                   } else {
+                                       return "D"
+                                   }
+                               }
 
-            // 订单 2: 价格 50, 数量 5, 折扣 20%
-            order2 <- calculateTotal(50, 5, 20)
+                               // 订单 1: 价格 100, 数量 3, 折扣 10%
+                               order1 <- calculateTotal(100, 3, 10)
 
-            // 计算总收入
-            totalRevenue <- order1 + order2
+                               // 订单 2: 价格 50, 数量 5, 折扣 20%
+                               order2 <- calculateTotal(50, 5, 20)
 
-            // 评分系统
-            score1 <- 95
-            score2 <- 82
-            score3 <- 68
+                               // 计算总收入
+                               totalRevenue <- order1 + order2
 
-            grade1 <- getGrade(score1)
-            grade2 <- getGrade(score2)
-            grade3 <- getGrade(score3)
+                               // 评分系统
+                               score1 <- 95
+                               score2 <- 82
+                               score3 <- 68
 
-            // 统计及格数量（分数 >= 70）
-            passCount <- 0
-            if score1 >= 70 { passCount <- passCount + 1 }
-            if score2 >= 70 { passCount <- passCount + 1 }
-            if score3 >= 70 { passCount <- passCount + 1 }
-        ";
+                               grade1 <- getGrade(score1)
+                               grade2 <- getGrade(score2)
+                               grade3 <- getGrade(score3)
+
+                               // 统计及格数量（分数 >= 70）
+                               passCount <- 0
+                               if score1 >= 70 { passCount <- passCount + 1 }
+                               if score2 >= 70 { passCount <- passCount + 1 }
+                               if score3 >= 70 { passCount <- passCount + 1 }
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);
