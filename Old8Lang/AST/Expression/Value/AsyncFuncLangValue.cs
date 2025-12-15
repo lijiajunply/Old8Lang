@@ -57,14 +57,18 @@ public class AsyncFuncLangValue : ImportInfo
     /// </summary>
     /// <param name="variateManagerFunc">调用时的变量管理器</param>
     /// <param name="ids">参数表达式列表</param>
+    /// <param name="cancellationToken">取消令牌</param>
     /// <returns>包含异步操作的 TaskLangValue</returns>
-    public TaskLangValue RunAsync(VariateManager variateManagerFunc, List<LangExpression> ids)
+    public TaskLangValue RunAsync(VariateManager variateManagerFunc, List<LangExpression> ids, CancellationToken cancellationToken = default)
     {
         // 创建 .NET Task
         var task = Task.Run(() =>
         {
             try
             {
+                // 检查取消请求
+                cancellationToken.ThrowIfCancellationRequested();
+
                 // 参数数量检查
                 if (Ids != null && ids.Count > Ids.Count)
                 {
@@ -117,6 +121,9 @@ public class AsyncFuncLangValue : ImportInfo
                             // 补全默认参数
                             for (var i = paramValues.Count; i < Ids.Count; i++)
                             {
+                                // 检查取消请求
+                                cancellationToken.ThrowIfCancellationRequested();
+                                
                                 var id = Ids[i];
                                 if (id.DefaultValue != null)
                                 {
@@ -176,9 +183,9 @@ public class AsyncFuncLangValue : ImportInfo
                 // 异常会被 Task 捕获并在 await 时重新抛出
                 throw;
             }
-        });
+        }, cancellationToken);
 
-        return new TaskLangValue(task, Position);
+        return new TaskLangValue(task, cancellationToken, Position);
     }
 
     /// <summary>

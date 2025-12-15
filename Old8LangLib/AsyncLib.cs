@@ -342,6 +342,66 @@ public static class AsyncLib
 
     #endregion
 
+    #region 取消令牌
+
+    // 存储 CancellationTokenSource 对象
+    private static readonly ConcurrentDictionary<int, CancellationTokenSource> CancellationTokenSources = new();
+    private static int _cancellationTokenSourceIdCounter;
+
+    /// <summary>
+    /// 创建取消令牌源
+    /// </summary>
+    /// <returns>取消令牌源 ID</returns>
+    public static int CreateCancellationTokenSource()
+    {
+        var id = Interlocked.Increment(ref _cancellationTokenSourceIdCounter);
+        CancellationTokenSources[id] = new CancellationTokenSource();
+        return id;
+    }
+
+    /// <summary>
+    /// 取消任务
+    /// </summary>
+    /// <param name="ctsId">取消令牌源 ID</param>
+    public static void Cancel(int ctsId)
+    {
+        if (!CancellationTokenSources.TryGetValue(ctsId, out var cts))
+        {
+            throw new ArgumentException($"取消令牌源 ID {ctsId} 不存在");
+        }
+
+        cts.Cancel();
+    }
+
+    /// <summary>
+    /// 延迟取消任务
+    /// </summary>
+    /// <param name="ctsId">取消令牌源 ID</param>
+    /// <param name="delayMs">延迟毫秒数</param>
+    public static void CancelAfter(int ctsId, int delayMs)
+    {
+        if (!CancellationTokenSources.TryGetValue(ctsId, out var cts))
+        {
+            throw new ArgumentException($"取消令牌源 ID {ctsId} 不存在");
+        }
+
+        cts.CancelAfter(delayMs);
+    }
+
+    /// <summary>
+    /// 销毁取消令牌源
+    /// </summary>
+    /// <param name="ctsId">取消令牌源 ID</param>
+    public static void DisposeCancellationTokenSource(int ctsId)
+    {
+        if (CancellationTokenSources.TryRemove(ctsId, out var cts))
+        {
+            cts.Dispose();
+        }
+    }
+
+    #endregion
+
     #region Channel 通道
 
     /// <summary>

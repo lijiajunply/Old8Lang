@@ -345,6 +345,13 @@ public class StatementParser(
                     return new FuncRunStatement(operation, expr.Position);
                 }
 
+                // 如果是 await 表达式，允许作为独立语句
+                if (expr is Old8Lang.AST.Expression.AwaitExpression awaitExpr)
+                {
+                    // 创建一个 FuncRunStatement 来执行 await 表达式
+                    return new FuncRunStatement(awaitExpr, expr.Position);
+                }
+
                 // 其他表达式（Operation、LangId 等）不能作为语句
                 throw CreateSyntaxError(
                     $"语法错误：表达式 '{expr}' 不能作为独立语句使用。\n" +

@@ -3,6 +3,7 @@ using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -13,6 +14,7 @@ namespace Old8Lang.AST.Expression.Value;
 public class TaskLangValue : LangValueType
 {
     private readonly Task<LangValueType> _task;
+    private readonly CancellationToken _cancellationToken;
     private bool _isCompleted = false;
     private LangValueType? _result = null;
     private Exception? _exception = null;
@@ -28,14 +30,21 @@ public class TaskLangValue : LangValueType
     public Exception? Exception => _exception;
 
     /// <summary>
+    /// 获取取消令牌
+    /// </summary>
+    public CancellationToken CancellationToken => _cancellationToken;
+
+    /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="task">.NET Task对象</param>
+    /// <param name="cancellationToken">取消令牌</param>
     /// <param name="position">源代码位置</param>
-    public TaskLangValue(Task<LangValueType> task, SourcePosition position = default)
+    public TaskLangValue(Task<LangValueType> task, CancellationToken cancellationToken = default, SourcePosition position = default)
         : base(position)
     {
         _task = task;
+        _cancellationToken = cancellationToken;
 
         // 注册完成回调，缓存结果
         _task.ContinueWith(t =>
@@ -50,6 +59,15 @@ public class TaskLangValue : LangValueType
                 _result = t.Result;
             }
         });
+
+        // 注册取消回调
+        if (_cancellationToken.CanBeCanceled)
+        {
+            _cancellationToken.Register(() =>
+            {
+                // 任务无法直接取消，但可以在等待时检查取消状态
+            });
+        }
     }
 
     /// <summary>
@@ -197,7 +215,7 @@ public class TaskLangValue : LangValueType
     /// </summary>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        throw new Error.NotImplementedError(
+        throw new NotImplementedError(
             Position,
             "编译模式暂不支持 Task 类型"
         );
@@ -210,4 +228,117 @@ public class TaskLangValue : LangValueType
     {
         return typeof(Task<object>);
     }
+
+    #region 任务组合方法
+
+    /// <summary>
+    /// 并行执行多个任务，等待所有任务完成
+    /// </summary>
+    public static TaskLangValue WhenAll(IEnumerable<TaskLangValue> tasks, SourcePosition position = default)
+    {
+        var dotnetTasks = tasks.Select(t => t._task).ToList();
+        var whenAllTask = Task.WhenAll(dotnetTasks)
+            .ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    throw t.Exception?.InnerException ?? t.Exception;
+                }
+                return new ListLangValue(t.Result.ToList(), position) as LangValueType;
+            });
+        return new TaskLangValue(whenAllTask, CancellationToken.None, position);
+    }
+
+    /// <summary>
+    /// 等待第一个完成的任务
+    /// </summary>
+    public static TaskLangValue WhenAny(IEnumerable<TaskLangValue> tasks, SourcePosition position = default)
+    {
+        var dotnetTasks = tasks.Select(t => t._task).ToList();
+        var whenAnyTask = Task.WhenAny(dotnetTasks)
+            .ContinueWith(t => t.Result.Result);
+        return new TaskLangValue(whenAnyTask, CancellationToken.None, position);
+    }
+
+    /// <summary>
+    /// 创建延迟执行的任务
+    /// </summary>
+    public static TaskLangValue Delay(int delayMs, CancellationToken cancellationToken = default, SourcePosition position = default)
+    {
+        var delayTask = Task.Delay(delayMs, cancellationToken)
+            .ContinueWith(t => (LangValueType)new VoidLangValue(position));
+        return new TaskLangValue(delayTask, cancellationToken, position);
+    }
+
+    /// <summary>
+    /// 任务完成后执行下一个任务
+    /// </summary>
+    public TaskLangValue Then(Func<LangValueType, TaskLangValue> continuation, SourcePosition position = default)
+    {
+        var thenTask = _task.ContinueWith(t =>
+        {
+            if (t.IsFaulted)
+            {
+                throw t.Exception?.InnerException ?? t.Exception;
+            }
+            var result = continuation(t.Result);
+            return result.AwaitAsync().Result;
+        }, _cancellationToken);
+        return new TaskLangValue(thenTask, _cancellationToken, position);
+    }
+
+    /// <summary>
+    /// 为任务添加超时限制
+    /// </summary>
+    public TaskLangValue WithTimeout(int timeoutMs, SourcePosition position = default)
+    {
+        var timeoutTask = Task.WhenAny(_task, Task.Delay(timeoutMs, _cancellationToken))
+            .ContinueWith(t =>
+            {
+                if (t.Result != _task)
+                {
+                    throw new TimeoutException($"Task 等待超时（{timeoutMs}ms）");
+                }
+                return _task.Result;
+            }, _cancellationToken);
+        return new TaskLangValue(timeoutTask, _cancellationToken, position);
+    }
+
+    /// <summary>
+    /// 实现任务重试机制
+    /// </summary>
+    public TaskLangValue Retry(int retryCount, int delayMs = 0, SourcePosition position = default)
+    {
+        var retryTask = Task.Run(async () =>
+        {
+            Exception? lastException = null;
+            
+            for (int i = 0; i <= retryCount; i++)
+            {
+                _cancellationToken.ThrowIfCancellationRequested();
+                
+                try
+                {
+                    return await _task;
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+                    
+                    if (i < retryCount)
+                    {
+                        // 重试前延迟
+                        await Task.Delay(delayMs, _cancellationToken);
+                    }
+                }
+            }
+            
+            // 重试次数耗尽，抛出最后一次异常
+            throw lastException ?? new Exception("任务执行失败，重试次数耗尽");
+        }, _cancellationToken);
+        
+        return new TaskLangValue(retryTask, _cancellationToken, position);
+    }
+
+    #endregion
 }

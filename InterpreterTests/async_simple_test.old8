@@ -1,16 +1,33 @@
-// 简单的异步函数测试
-import Async
+// 简单的异步功能测试
 
-// 最简单的异步函数
-async func test() {
-    PrintLine("异步函数执行中")
+// 测试任务组合方法 - Then
+
+async func task1() {
+    return 1
 }
 
-// 调用异步函数
-task <- test()
-PrintLine("任务已创建")
+async func task2() {
+    return 2
+}
 
-// 等待完成
-_ <- await task
+// 测试 Then 方法
+var result = await task1().Then((res) => {
+    return task2()
+})
 
-PrintLine("测试完成")
+// 打印结果（使用 Old8Lang 的内置打印函数）
+PrintLine("Then 结果: " + result)
+
+// 测试 Retry 方法
+var retryCount = 0
+
+async func flakyTask() {
+    retryCount = retryCount + 1
+    if retryCount < 3 {
+        throw new Error("任务失败，需要重试")
+    }
+    return "重试成功"
+}
+
+var retryResult = await flakyTask().Retry(3, 100)
+PrintLine("Retry 结果: " + retryResult)
