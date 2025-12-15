@@ -5,31 +5,30 @@ namespace Old8Lang.NetLib;
 /// <summary>
 /// WebSocket客户端类，用于WebSocket通信
 /// </summary>
-public class WebSocketClient : IDisposable
+public class WebSocketClient : IAsyncDisposable
 {
-    private ClientWebSocket _client;
-    private readonly string _url;
-    private bool _isConnected;
-    private Action<string>? _textMessageReceivedHandler;
-    private Action<byte[]>? _binaryMessageReceivedHandler;
-    private Action<string>? _connectedHandler;
-    private Action<string>? _disconnectedHandler;
-    private Action<Exception>? _errorHandler;
-    private CancellationTokenSource? _cts;
-    private Task? _receiveTask;
+    private readonly ClientWebSocket Client;
+    private readonly string Url;
+    private Action<string>? TextMessageReceivedHandler;
+    private Action<byte[]>? BinaryMessageReceivedHandler;
+    private Action<string>? ConnectedHandler;
+    private Action<string>? DisconnectedHandler;
+    private Action<Exception>? ErrorHandler;
+    private CancellationTokenSource? Cts;
+    private Task? ReceiveTask;
 
     /// <summary>
     /// 获取客户端连接状态
     /// </summary>
-    public bool IsConnected => _isConnected;
+    public bool IsConnected { get; private set; }
 
     /// <summary>
     /// 构造函数
     /// </summary>
     public WebSocketClient(string url)
     {
-        _url = url;
-        _client = new ClientWebSocket();
+        Url = url;
+        Client = new ClientWebSocket();
     }
 
     /// <summary>
@@ -37,8 +36,8 @@ public class WebSocketClient : IDisposable
     /// </summary>
     public async Task ConnectAsync(Dictionary<string, string>? headers = null)
     {
-        _cts = new CancellationTokenSource();
-        
+        Cts = new CancellationTokenSource();
+
         // 添加自定义头
         if (headers != null)
         {
@@ -49,17 +48,17 @@ public class WebSocketClient : IDisposable
                     header.Key.StartsWith("Authorization", StringComparison.OrdinalIgnoreCase) ||
                     header.Key.Equals("Origin", StringComparison.OrdinalIgnoreCase))
                 {
-                    _client.Options.SetRequestHeader(header.Key, header.Value);
+                    Client.Options.SetRequestHeader(header.Key, header.Value);
                 }
             }
         }
 
-        await _client.ConnectAsync(new Uri(_url), _cts.Token);
-        _isConnected = true;
-        _connectedHandler?.Invoke("Connected to WebSocket server");
-        
+        await Client.ConnectAsync(new Uri(Url), Cts.Token);
+        IsConnected = true;
+        ConnectedHandler?.Invoke("Connected to WebSocket server");
+
         // 启动接收循环
-        _receiveTask = ReceiveLoopAsync();
+        ReceiveTask = ReceiveLoopAsync();
     }
 
     /// <summary>
@@ -73,15 +72,15 @@ public class WebSocketClient : IDisposable
 
         try
         {
-            while (_client.State == WebSocketState.Open && !_cts!.IsCancellationRequested)
+            while (Client.State == WebSocketState.Open && !Cts!.IsCancellationRequested)
             {
-                var result = await _client.ReceiveAsync(segment, _cts.Token);
-                
+                var result = await Client.ReceiveAsync(segment, Cts.Token);
+
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    await _client.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
-                    _isConnected = false;
-                    _disconnectedHandler?.Invoke("WebSocket connection closed");
+                    await Client.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+                    IsConnected = false;
+                    DisconnectedHandler?.Invoke("WebSocket connection closed");
                     break;
                 }
 
@@ -89,7 +88,7 @@ public class WebSocketClient : IDisposable
                 {
                     // 收集消息数据
                     messageBytes.AddRange(segment.Take(result.Count));
-                    
+
                     // 如果是消息的最后一部分，处理消息
                     if (result.EndOfMessage)
                     {
@@ -97,15 +96,15 @@ public class WebSocketClient : IDisposable
                         {
                             // 处理文本消息
                             var message = System.Text.Encoding.UTF8.GetString(messageBytes.ToArray());
-                            _textMessageReceivedHandler?.Invoke(message);
+                            TextMessageReceivedHandler?.Invoke(message);
                         }
                         else if (result.MessageType == WebSocketMessageType.Binary)
                         {
                             // 处理二进制消息
                             var binaryData = messageBytes.ToArray();
-                            _binaryMessageReceivedHandler?.Invoke(binaryData);
+                            BinaryMessageReceivedHandler?.Invoke(binaryData);
                         }
-                        
+
                         // 重置消息缓冲区
                         messageBytes.Clear();
                     }
@@ -118,9 +117,9 @@ public class WebSocketClient : IDisposable
         }
         catch (Exception ex)
         {
-            _errorHandler?.Invoke(ex);
-            _isConnected = false;
-            _disconnectedHandler?.Invoke($"WebSocket error: {ex.Message}");
+            ErrorHandler?.Invoke(ex);
+            IsConnected = false;
+            DisconnectedHandler?.Invoke($"WebSocket error: {ex.Message}");
         }
     }
 
@@ -129,14 +128,14 @@ public class WebSocketClient : IDisposable
     /// </summary>
     public async Task SendAsync(string message)
     {
-        if (!_isConnected || _client.State != WebSocketState.Open)
+        if (!IsConnected || Client.State != WebSocketState.Open)
         {
             throw new InvalidOperationException("WebSocket client is not connected");
         }
 
         byte[] buffer = System.Text.Encoding.UTF8.GetBytes(message);
         var segment = new ArraySegment<byte>(buffer);
-        await _client.SendAsync(segment, WebSocketMessageType.Text, true, _cts!.Token);
+        await Client.SendAsync(segment, WebSocketMessageType.Text, true, Cts!.Token);
     }
 
     /// <summary>
@@ -144,18 +143,18 @@ public class WebSocketClient : IDisposable
     /// </summary>
     public async Task SendBinaryAsync(byte[] data)
     {
-        if (!_isConnected || _client.State != WebSocketState.Open)
+        if (!IsConnected || Client.State != WebSocketState.Open)
         {
             throw new InvalidOperationException("WebSocket client is not connected");
         }
-        
+
         if (data == null)
         {
             throw new ArgumentNullException(nameof(data), "二进制数据不能为空");
         }
 
         var segment = new ArraySegment<byte>(data);
-        await _client.SendAsync(segment, WebSocketMessageType.Binary, true, _cts!.Token);
+        await Client.SendAsync(segment, WebSocketMessageType.Binary, true, Cts!.Token);
     }
 
     /// <summary>
@@ -163,17 +162,17 @@ public class WebSocketClient : IDisposable
     /// </summary>
     public async Task DisconnectAsync()
     {
-        if (_isConnected)
+        if (IsConnected)
         {
-            _cts?.Cancel();
-            
-            if (_client.State == WebSocketState.Open)
+            await Cts!.CancelAsync();
+
+            if (Client.State == WebSocketState.Open)
             {
-                await _client.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+                await Client.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
             }
-            
-            _isConnected = false;
-            _disconnectedHandler?.Invoke("Disconnected from WebSocket server");
+
+            IsConnected = false;
+            DisconnectedHandler?.Invoke("Disconnected from WebSocket server");
         }
     }
 
@@ -182,23 +181,23 @@ public class WebSocketClient : IDisposable
     /// </summary>
     public void SetTextMessageReceivedHandler(Action<string> handler)
     {
-        _textMessageReceivedHandler = handler;
+        TextMessageReceivedHandler = handler;
     }
-    
+
     /// <summary>
     /// 设置二进制消息接收事件处理程序
     /// </summary>
     public void SetBinaryMessageReceivedHandler(Action<byte[]> handler)
     {
-        _binaryMessageReceivedHandler = handler;
+        BinaryMessageReceivedHandler = handler;
     }
-    
+
     /// <summary>
     /// 设置消息接收事件处理程序（兼容旧版本）
     /// </summary>
     public void SetMessageReceivedHandler(Action<string> handler)
     {
-        _textMessageReceivedHandler = handler;
+        TextMessageReceivedHandler = handler;
     }
 
     /// <summary>
@@ -206,7 +205,7 @@ public class WebSocketClient : IDisposable
     /// </summary>
     public void SetConnectedHandler(Action<string> handler)
     {
-        _connectedHandler = handler;
+        ConnectedHandler = handler;
     }
 
     /// <summary>
@@ -214,7 +213,7 @@ public class WebSocketClient : IDisposable
     /// </summary>
     public void SetDisconnectedHandler(Action<string> handler)
     {
-        _disconnectedHandler = handler;
+        DisconnectedHandler = handler;
     }
 
     /// <summary>
@@ -222,16 +221,26 @@ public class WebSocketClient : IDisposable
     /// </summary>
     public void SetErrorHandler(Action<Exception> handler)
     {
-        _errorHandler = handler;
+        ErrorHandler = handler;
     }
 
     /// <summary>
     /// 释放资源
     /// </summary>
-    public async void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        await DisconnectAsync();
-        _cts?.Dispose();
-        _client?.Dispose();
+        await CastAndDispose(Client);
+        if (Cts != null) await CastAndDispose(Cts);
+        if (ReceiveTask != null) await CastAndDispose(ReceiveTask);
+
+        return;
+
+        static async ValueTask CastAndDispose(IDisposable resource)
+        {
+            if (resource is IAsyncDisposable resourceAsyncDisposable)
+                await resourceAsyncDisposable.DisposeAsync();
+            else
+                resource.Dispose();
+        }
     }
 }

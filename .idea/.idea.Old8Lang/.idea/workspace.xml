@@ -18,7 +18,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/IfStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/IfStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/41_uninitialized_fields_outside_class.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/50_enhanced_error_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/50_enhanced_error_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/async_awaitasync_comprehensive_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/async_awaitasync_comprehensive_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/async_simple_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/async_simple_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/test_channel.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/test_channel.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.NetLib/HttpClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.NetLib/HttpClient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/dll/Old8LangLib.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/dll/Old8LangLib.dll" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,10 +74,12 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/GeneratorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/IfStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/WhileStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/WhileStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/ClassParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
@@ -389,7 +400,7 @@
       <workItem from="1765734191994" duration="8791000" />
       <workItem from="1765776532895" duration="4492000" />
       <workItem from="1765791344254" duration="3118000" />
-      <workItem from="1765816155545" duration="8688000" />
+      <workItem from="1765816155545" duration="9663000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -734,7 +745,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="193" />
+    <option name="localTasksCounter" value="194" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -761,7 +772,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(compiler): 实现编译模式下函数参数默认值类型推断&#10;&#10;- 新增函数参数默认值自动推断类型功能&#10;- 更新类型验证逻辑，允许通过默认值推断参数类型&#10;- 改进错误信息，提供两种参数类型满足方式&#10;- 添加对整数、浮点数、字符串、布尔值等默认值的类型推断&#10;- 支持混合使用显式类型注解和默认值推断&#10;- 保持与解释器模式和现有代码的向后兼容性&#10;- 更新语法文档和开发指南说明新功能&#10;- 添加多个测试用例验证默认参数类型推断行为&#10;- 修复编译模式下参数类型检查的IL生成问题" />
     <MESSAGE value="chore(tests): 清理和整理CompilerTests目录&#10;&#10;- 删除74+个冗余测试文件，减少58%文件数量&#10;- 移除重复的简单测试、调试文件和临时测试&#10;- 保留56个核心测试文件，确保功能覆盖完整&#10;- 规范测试文件命名：编号测试 + 专项测试&#10;- 更新类型注解测试集，保留6个关键测试文件&#10;- 删除无法在编译模式下运行的类型注解测试&#10;- 清理重复的类、函数、控制流测试文件&#10;- 建立未来测试文件命名和维护规范&#10;- 更新IDEA workspace.xml中的文件变更记录&#10;- 保持与现有功能的完整测试覆盖" />
     <MESSAGE value="fix(compiler): 修复IL验证开关命名一致性问题&#10;&#10;- 将 ILVerificationEnabled 属性重命名为 ilVerificationEnabled&#10;- 更新所有引用该属性的测试用例&#10;- 统一属性命名风格，保持代码一致性&#10;- 修复IL验证逻辑中的空值检查问题&#10;- 优化错误日志输出格式，提高可读性&#10;- 调整CompilerBenchmarkTests中的配置访问方式&#10;- 完善IL验证失败时的错误处理流程" />
     <MESSAGE value="fix(compiler): 修复 in 操作符类型检查与 IL 生成问题&#10;&#10;- 修复 in 操作符右侧非集合类型时的类型检查逻辑&#10;- 优化 IL 生成中装箱值类型的处理方式&#10;- 统一局部变量存储与加载顺序，确保栈平衡&#10;- 添加缺失的静态方法调用指令&#10;- 清理冗余代码并增强类型安全检查&#10;- 更新相关集成测试用例以覆盖边界情况" />
@@ -786,7 +796,8 @@
     <MESSAGE value="fix(interpreter): 修复异步函数和while循环执行问题&#10;&#10;- 修复while循环只执行一次的问题，通过IsInGenerator标志区分执行上下文&#10;- 修复异步函数无法修改外部作用域变量的问题，移除作用域深拷贝逻辑&#10;- 异步任务中变量修改现在可正确反映到外部作用域&#10;- while循环在非生成器上下文中恢复正常多次迭代&#10;- 通过Mutex和原子操作测试验证修复效果，计数结果从错误值变为正确值&#10;- 修复影响async_mutex.old8和async_atomic.old8等关键测试用例" />
     <MESSAGE value="refactor(generator): 移除旧生成器架构并统一使用状态机模式&#10;&#10;- 删除 BlockStatement 中的生成器执行位置字段和重置方法&#10;- 移除 GeneratorLangValue 中的 LocalState 和 UseStateMachine 属性&#10;- 简化 FuncLangValue 中生成器环境的创建逻辑&#10;- 统一 WhileStatement 和 BlockStatement 的执行路径&#10;- 清理 YieldStatement 中的旧架构兼容代码&#10;- 更新相关类文件以适应新的生成器执行模型" />
     <MESSAGE value="refactor(ast): 优化AST节点引用和访问修饰符&#10;&#10;- 移除了多个文件中未使用的命名空间引用&#10;- 将FuncLangValue中的IsLambda属性从public改为private&#10;- 将FuncLangValue中的IsGenerator属性从public改为private&#10;- 更新了Ids非空判断的模式匹配语法&#10;- 清理了GeneratorExecutionContext和GeneratorStateMachine中不必要的using语句&#10;- 移除了YieldStatement中未使用的命名空间引用&#10;- 移除了ThreadLangValue中未使用的System.Threading引用" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 优化AST节点引用和访问修饰符&#10;&#10;- 移除了多个文件中未使用的命名空间引用&#10;- 将FuncLangValue中的IsLambda属性从public改为private&#10;- 将FuncLangValue中的IsGenerator属性从public改为private&#10;- 更新了Ids非空判断的模式匹配语法&#10;- 清理了GeneratorExecutionContext和GeneratorStateMachine中不必要的using语句&#10;- 移除了YieldStatement中未使用的命名空间引用&#10;- 移除了ThreadLangValue中未使用的System.Threading引用" />
+    <MESSAGE value="fix(ast): 修复 IfStatement 中的索引逻辑错误&#10;&#10;- 修正了 elifBlock 索引访问越界的问题&#10;- 调整 elseBlock 返回条件以匹配正确的索引位置&#10;- 更新索引计算方式确保与 elifBlock 的实际元素对应" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(ast): 修复 IfStatement 中的索引逻辑错误&#10;&#10;- 修正了 elifBlock 索引访问越界的问题&#10;- 调整 elseBlock 返回条件以匹配正确的索引位置&#10;- 更新索引计算方式确保与 elifBlock 的实际元素对应" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

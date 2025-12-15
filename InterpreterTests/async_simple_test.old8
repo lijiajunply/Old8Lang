@@ -11,7 +11,7 @@ async func task2() {
 }
 
 // 测试 Then 方法
-var result = await task1().Then((res) => {
+result <- await task1().Then((res) -> {
     return task2()
 })
 
@@ -19,15 +19,15 @@ var result = await task1().Then((res) => {
 PrintLine("Then 结果: " + result)
 
 // 测试 Retry 方法
-var retryCount = 0
+retryCount <- 0
 
 async func flakyTask() {
-    retryCount = retryCount + 1
+    retryCount++
     if retryCount < 3 {
         throw new Error("任务失败，需要重试")
     }
     return "重试成功"
 }
 
-var retryResult = await flakyTask().Retry(3, 100)
+retryResult <- await flakyTask().Retry(3, 100)
 PrintLine("Retry 结果: " + retryResult)

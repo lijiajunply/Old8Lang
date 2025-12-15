@@ -81,7 +81,7 @@ class TestClass {
 try {
     obj <- TestClass()
     PrintLine("访问不存在的属性: " + obj.y)
-} catch e {
+} catch (e) {
     PrintLine("捕获属性错误:")
     PrintLine(e)
     PrintLine()

@@ -7,16 +7,16 @@ namespace Old8Lang.NetLib;
 /// </summary>
 public class HttpClient : IDisposable
 {
-    private System.Net.Http.HttpClient _client;
-    private Dictionary<string, string> _defaultHeaders;
+    private readonly System.Net.Http.HttpClient Client;
+    private readonly Dictionary<string, string> DefaultHeaders;
 
     /// <summary>
     /// 构造函数
     /// </summary>
     public HttpClient()
     {
-        _client = new System.Net.Http.HttpClient();
-        _defaultHeaders = new Dictionary<string, string>();
+        Client = new System.Net.Http.HttpClient();
+        DefaultHeaders = new Dictionary<string, string>();
     }
 
     /// <summary>
@@ -24,7 +24,7 @@ public class HttpClient : IDisposable
     /// </summary>
     public void AddDefaultHeader(string name, string value)
     {
-        _defaultHeaders[name] = value;
+        DefaultHeaders[name] = value;
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public class HttpClient : IDisposable
     /// </summary>
     public void RemoveDefaultHeader(string name)
     {
-        _defaultHeaders.Remove(name);
+        DefaultHeaders.Remove(name);
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ public class HttpClient : IDisposable
     /// </summary>
     public void SetTimeout(int milliseconds)
     {
-        _client.Timeout = TimeSpan.FromMilliseconds(milliseconds);
+        Client.Timeout = TimeSpan.FromMilliseconds(milliseconds);
     }
 
     /// <summary>
@@ -88,42 +88,40 @@ public class HttpClient : IDisposable
             throw new ArgumentNullException(nameof(localPath), "本地路径不能为空");
         }
 
-        using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url))
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        // 添加默认请求头
+        foreach (var header in DefaultHeaders)
         {
-            // 添加默认请求头
-            foreach (var header in _defaultHeaders)
-            {
-                request.Headers.TryAddWithoutValidation(header.Key, header.Value);
-            }
-
-            // 发送请求
-            var response = await _client.SendAsync(request);
-            
-            if (response.IsSuccessStatusCode)
-            {
-                // 确保目录存在
-                var directory = Path.GetDirectoryName(localPath);
-                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                }
-                
-                // 下载文件
-                using (var fileStream = new FileStream(localPath, FileMode.Create, FileAccess.Write, FileShare.None))
-                {
-                    await response.Content.CopyToAsync(fileStream);
-                }
-            }
-
-            // 构建响应对象
-            return new HttpResponse
-            {
-                StatusCode = (int)response.StatusCode,
-                Content = response.IsSuccessStatusCode ? "File downloaded successfully" : await response.Content.ReadAsStringAsync(),
-                Headers = response.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value)),
-                IsSuccessStatusCode = response.IsSuccessStatusCode
-            };
+            request.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
+
+        // 发送请求
+        var response = await Client.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            // 确保目录存在
+            var directory = Path.GetDirectoryName(localPath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            // 下载文件
+            await using var fileStream = new FileStream(localPath, FileMode.Create, FileAccess.Write, FileShare.None);
+            await response.Content.CopyToAsync(fileStream);
+        }
+
+        // 构建响应对象
+        return new HttpResponse
+        {
+            StatusCode = (int)response.StatusCode,
+            Content = response.IsSuccessStatusCode
+                ? "File downloaded successfully"
+                : await response.Content.ReadAsStringAsync(),
+            Headers = response.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value)),
+            IsSuccessStatusCode = response.IsSuccessStatusCode
+        };
     }
 
     /// <summary>
@@ -135,7 +133,8 @@ public class HttpClient : IDisposable
     /// <param name="fileName">上传后的文件名，默认为原文件名</param>
     /// <param name="additionalFields">额外的表单字段</param>
     /// <returns>HTTP响应</returns>
-    public async Task<HttpResponse> UploadFileAsync(string url, string filePath, string parameterName = "file", string? fileName = null, Dictionary<string, string>? additionalFields = null)
+    public async Task<HttpResponse> UploadFileAsync(string url, string filePath, string parameterName = "file",
+        string? fileName = null, Dictionary<string, string>? additionalFields = null)
     {
         if (!File.Exists(filePath))
         {
@@ -143,26 +142,24 @@ public class HttpClient : IDisposable
         }
 
         // 使用MultipartFormDataContent上传文件
-        using (var content = new MultipartFormDataContent())
+        using var content = new MultipartFormDataContent();
+        // 添加额外的表单字段
+        if (additionalFields != null)
         {
-            // 添加额外的表单字段
-            if (additionalFields != null)
+            foreach (var field in additionalFields)
             {
-                foreach (var field in additionalFields)
-                {
-                    content.Add(new StringContent(field.Value), field.Key);
-                }
+                content.Add(new StringContent(field.Value), field.Key);
             }
-
-            // 添加文件内容
-            var fileContent = new StreamContent(File.OpenRead(filePath));
-            fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-            
-            var uploadFileName = string.IsNullOrEmpty(fileName) ? Path.GetFileName(filePath) : fileName;
-            content.Add(fileContent, parameterName, uploadFileName);
-
-            return await SendRequestWithContentAsync(HttpMethod.Post, url, content);
         }
+
+        // 添加文件内容
+        var fileContent = new StreamContent(File.OpenRead(filePath));
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+
+        var uploadFileName = string.IsNullOrEmpty(fileName) ? Path.GetFileName(filePath) : fileName;
+        content.Add(fileContent, parameterName, uploadFileName);
+
+        return await SendRequestWithContentAsync(HttpMethod.Post, url, content);
     }
 
     /// <summary>
@@ -173,15 +170,17 @@ public class HttpClient : IDisposable
     /// <param name="parameterName">表单参数名，默认为"files"</param>
     /// <param name="additionalFields">额外的表单字段</param>
     /// <returns>HTTP响应</returns>
-    public async Task<HttpResponse> UploadFilesAsync(string url, IEnumerable<string> filePaths, string parameterName = "files", Dictionary<string, string>? additionalFields = null)
+    public async Task<HttpResponse> UploadFilesAsync(string url, IEnumerable<string> filePaths,
+        string parameterName = "files", Dictionary<string, string>? additionalFields = null)
     {
-        if (filePaths == null || !filePaths.Any())
+        var enumerable = filePaths as string[] ?? filePaths.ToArray();
+        if (filePaths == null || enumerable.Length == 0)
         {
             throw new ArgumentException("文件路径列表不能为空", nameof(filePaths));
         }
 
         // 检查所有文件是否存在
-        foreach (var filePath in filePaths)
+        foreach (var filePath in enumerable)
         {
             if (!File.Exists(filePath))
             {
@@ -190,27 +189,25 @@ public class HttpClient : IDisposable
         }
 
         // 使用MultipartFormDataContent上传文件
-        using (var content = new MultipartFormDataContent())
+        using var content = new MultipartFormDataContent();
+        // 添加额外的表单字段
+        if (additionalFields != null)
         {
-            // 添加额外的表单字段
-            if (additionalFields != null)
+            foreach (var field in additionalFields)
             {
-                foreach (var field in additionalFields)
-                {
-                    content.Add(new StringContent(field.Value), field.Key);
-                }
+                content.Add(new StringContent(field.Value), field.Key);
             }
-
-            // 添加多个文件
-            foreach (var filePath in filePaths)
-            {
-                var fileContent = new StreamContent(File.OpenRead(filePath));
-                fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-                content.Add(fileContent, parameterName, Path.GetFileName(filePath));
-            }
-
-            return await SendRequestWithContentAsync(HttpMethod.Post, url, content);
         }
+
+        // 添加多个文件
+        foreach (var filePath in enumerable)
+        {
+            var fileContent = new StreamContent(File.OpenRead(filePath));
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            content.Add(fileContent, parameterName, Path.GetFileName(filePath));
+        }
+
+        return await SendRequestWithContentAsync(HttpMethod.Post, url, content);
     }
 
     /// <summary>
@@ -218,29 +215,27 @@ public class HttpClient : IDisposable
     /// </summary>
     private async Task<HttpResponse> SendRequestWithContentAsync(HttpMethod method, string url, HttpContent content)
     {
-        using (HttpRequestMessage request = new HttpRequestMessage(method, url))
+        using var request = new HttpRequestMessage(method, url);
+        // 添加默认请求头
+        foreach (var header in DefaultHeaders)
         {
-            // 添加默认请求头
-            foreach (var header in _defaultHeaders)
-            {
-                request.Headers.TryAddWithoutValidation(header.Key, header.Value);
-            }
-
-            // 设置请求内容
-            request.Content = content;
-
-            // 发送请求
-            var response = await _client.SendAsync(request);
-
-            // 构建响应对象
-            return new HttpResponse
-            {
-                StatusCode = (int)response.StatusCode,
-                Content = await response.Content.ReadAsStringAsync(),
-                Headers = response.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value)),
-                IsSuccessStatusCode = response.IsSuccessStatusCode
-            };
+            request.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
+
+        // 设置请求内容
+        request.Content = content;
+
+        // 发送请求
+        var response = await Client.SendAsync(request);
+
+        // 构建响应对象
+        return new HttpResponse
+        {
+            StatusCode = (int)response.StatusCode,
+            Content = await response.Content.ReadAsStringAsync(),
+            Headers = response.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value)),
+            IsSuccessStatusCode = response.IsSuccessStatusCode
+        };
     }
 
     /// <summary>
@@ -248,32 +243,30 @@ public class HttpClient : IDisposable
     /// </summary>
     private async Task<HttpResponse> SendAsync(HttpMethod method, string url, string? content, string? contentType)
     {
-        using (HttpRequestMessage request = new HttpRequestMessage(method, url))
+        using HttpRequestMessage request = new HttpRequestMessage(method, url);
+        // 添加默认请求头
+        foreach (var header in DefaultHeaders)
         {
-            // 添加默认请求头
-            foreach (var header in _defaultHeaders)
-            {
-                request.Headers.TryAddWithoutValidation(header.Key, header.Value);
-            }
-
-            // 添加请求内容
-            if (!string.IsNullOrEmpty(content))
-            {
-                request.Content = new StringContent(content, System.Text.Encoding.UTF8, contentType);
-            }
-
-            // 发送请求
-            var response = await _client.SendAsync(request);
-
-            // 构建响应对象
-            return new HttpResponse
-            {
-                StatusCode = (int)response.StatusCode,
-                Content = await response.Content.ReadAsStringAsync(),
-                Headers = response.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value)),
-                IsSuccessStatusCode = response.IsSuccessStatusCode
-            };
+            request.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
+
+        // 添加请求内容
+        if (!string.IsNullOrEmpty(content))
+        {
+            request.Content = new StringContent(content, System.Text.Encoding.UTF8, contentType);
+        }
+
+        // 发送请求
+        var response = await Client.SendAsync(request);
+
+        // 构建响应对象
+        return new HttpResponse
+        {
+            StatusCode = (int)response.StatusCode,
+            Content = await response.Content.ReadAsStringAsync(),
+            Headers = response.Headers.ToDictionary(h => h.Key, h => string.Join(", ", h.Value)),
+            IsSuccessStatusCode = response.IsSuccessStatusCode
+        };
     }
 
     /// <summary>
@@ -281,7 +274,7 @@ public class HttpClient : IDisposable
     /// </summary>
     public System.Net.Http.HttpClient GetUnderlyingClient()
     {
-        return _client;
+        return Client;
     }
 
     /// <summary>
@@ -289,7 +282,7 @@ public class HttpClient : IDisposable
     /// </summary>
     public void Dispose()
     {
-        _client.Dispose();
+        Client.Dispose();
     }
 }
 

@@ -1,5 +1,7 @@
 // 通道测试
 
+import Async
+
 // 创建无界通道
 ch <- ChannelCreate()
 

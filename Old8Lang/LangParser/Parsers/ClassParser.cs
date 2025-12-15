@@ -169,7 +169,26 @@ public class ClassParser(
                             continue;
                         }
                     }
-                    // 3. 无修饰符且后面不是赋值或函数调用，很可能是未初始化字段（但这种情况较少见）
+                    // 3. 带修饰符但后面既没有赋值也没有函数调用，说明是未初始化字段
+                    // 检查：有修饰符 && 后面不是赋值、冒号、左括号、逗号
+                    else if (modifiers.Count > 0 &&
+                             nextToken.Type != LangTokenType.Assignment &&
+                             nextToken.Type != LangTokenType.Colon &&
+                             nextToken.Type != LangTokenType.LeftParen &&
+                             nextToken.Type != LangTokenType.Comma)
+                    {
+                        // 带修饰符的未初始化字段
+                        var fieldName = CurrentToken.Value;
+                        var position = CreateSourcePosition(CurrentToken);
+                        CurrentIndex++;
+
+                        var memberId = new ClassMemberId(fieldName, "", modifiers, position);
+                        var defaultExpr = new NullLangValue(position);
+                        var classMemberStatement = new ClassFieldSetStatement(memberId, defaultExpr, position);
+                        statements.Add(classMemberStatement);
+                        continue;
+                    }
+                    // 4. 无修饰符且后面不是赋值或函数调用，很可能是未初始化字段（但这种情况较少见）
                     else if (modifiers.Count == 0 && nextToken.Type != LangTokenType.Assignment && nextToken.Type != LangTokenType.LeftParen)
                     {
                         // 未初始化的字段（无修饰符、无类型假注）
