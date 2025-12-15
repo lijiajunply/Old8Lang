@@ -40,8 +40,31 @@ public class AwaitExpression : LangExpression
             );
         }
 
-        // 同步等待 Task 完成
-        return taskValue.Await();
+        // 检查任务是否已完成，如果已完成直接返回结果，避免阻塞
+        lock (taskValue)
+        {
+            if (taskValue.IsCompleted)
+            {
+                if (taskValue.Exception != null)
+                {
+                    throw taskValue.Exception;
+                }
+                return taskValue.Result!;
+            }
+        }
+
+        // 对于未完成的任务，使用异步等待但在当前线程同步执行
+        // 这是一种妥协方案，确保在现有解释器架构下工作
+        // 后续可以优化为真正的非阻塞实现
+        try
+        {
+            // 使用 Task.Run 避免线程死锁
+            return Task.Run(async () => await taskValue.AwaitAsync()).GetAwaiter().GetResult();
+        }
+        catch (AggregateException aggEx)
+        {
+            throw aggEx.InnerException ?? aggEx;
+        }
     }
 
     /// <summary>

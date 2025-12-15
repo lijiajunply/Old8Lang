@@ -18,6 +18,16 @@ public class TaskLangValue : LangValueType
     private Exception? _exception = null;
 
     /// <summary>
+    /// 获取任务结果（如果已完成）
+    /// </summary>
+    public LangValueType? Result => _result;
+
+    /// <summary>
+    /// 获取任务异常（如果已失败）
+    /// </summary>
+    public Exception? Exception => _exception;
+
+    /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="task">.NET Task对象</param>
@@ -75,13 +85,71 @@ public class TaskLangValue : LangValueType
     /// </summary>
     public async Task<LangValueType> AwaitAsync()
     {
+        return await AwaitAsync(-1); // 默认无超时
+    }
+
+    /// <summary>
+    /// 异步等待 Task 完成并返回结果（非阻塞，带超时）
+    /// </summary>
+    /// <param name="timeoutMs">超时时间（毫秒），-1 表示无超时</param>
+    /// <returns>任务结果</returns>
+    /// <exception cref="TimeoutException">任务超时</exception>
+    public async Task<LangValueType> AwaitAsync(int timeoutMs)
+    {
         try
         {
-            return await _task;
+            LangValueType result;
+            if (timeoutMs <= 0)
+            {
+                result = await _task;
+            }
+            else
+            {
+                var completedTask = await Task.WhenAny(_task, Task.Delay(timeoutMs));
+                if (completedTask != _task)
+                {
+                    throw new TimeoutException($"Task 等待超时（{timeoutMs}ms）");
+                }
+                result = await _task;
+            }
+
+            // 线程安全地更新状态
+            lock (this)
+            {
+                _isCompleted = true;
+                _result = result;
+                _exception = null;
+            }
+
+            return result;
         }
         catch (Exception ex)
         {
+            // 线程安全地更新异常状态
+            lock (this)
+            {
+                _isCompleted = true;
+                _exception = ex;
+                _result = null;
+            }
             throw;
+        }
+    }
+
+    /// <summary>
+    /// 尝试异步等待 Task 完成并返回结果（非阻塞，带超时）
+    /// </summary>
+    /// <param name="timeoutMs">超时时间（毫秒）</param>
+    /// <returns>任务结果，如果超时则返回 null</returns>
+    public async Task<LangValueType?> TryAwaitAsync(int timeoutMs)
+    {
+        try
+        {
+            return await AwaitAsync(timeoutMs);
+        }
+        catch (TimeoutException)
+        {
+            return null;
         }
     }
 
