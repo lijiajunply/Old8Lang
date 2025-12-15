@@ -181,6 +181,67 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
                 return new BoolLangValue(true);
             }
+            case "Spawn" or "spawn":
+            {
+                // 确保参数数量至少为1
+                if (Ids.Count == 0)
+                {
+                    throw new ArgumentError(this, "spawn 函数需要至少一个参数");
+                }
+
+                // 获取第一个参数，应该是一个函数
+                var funcExpr = Ids[0];
+                var funcValue = funcExpr.Run(manager);
+
+                if (funcValue is not FuncLangValue spawnFunc)
+                {
+                    throw new TypeError(this, "FuncValue", funcValue.GetType().Name);
+                }
+
+                // 创建线程参数列表（跳过第一个函数参数）
+                var threadArgs = Ids.Skip(1).ToList();
+
+                // 创建新的变量管理器，复制当前管理器的状态
+                var threadManager = manager.Clone();
+
+                // 使用临时变量来存储线程对象，避免闭包引用问题
+                ThreadLangValue? tempThread = null;
+
+                // 调用函数
+                if (threadArgs.Count == 0)
+                {
+                    // 无参数情况
+                    tempThread = new ThreadLangValue(ThreadCallback, Position);
+                }
+                else
+                {
+                    // 带参数情况
+                    tempThread = new ThreadLangValue(_ => ThreadCallback(), null, Position);
+                }
+
+                // 赋值给最终的线程变量
+                var thread = tempThread;
+
+                result = thread;
+                return result;
+
+                void ThreadCallback()
+                {
+                    try
+                    {
+                        // 调用函数
+                        var funcResult = spawnFunc.Run(threadManager, threadArgs);
+
+                        // 设置线程结果
+                        tempThread!.SetResult(funcResult.GetValue());
+                    }
+                    catch (Exception ex)
+                    {
+                        // 设置线程异常
+                        tempThread?.SetException(ex);
+                    }
+                }
+            }
         }
 
         // 先尝试根据函数名和参数数量查找重载函数
@@ -689,9 +750,9 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 // 然后在运行时通过反射调用
 
                 // 步骤2：加载参数到栈上
-                for (var i = 0; i < Ids.Count; i++)
+                foreach (var t in Ids)
                 {
-                    Ids[i].LoadIlValue(ilGenerator, local);
+                    t.LoadIlValue(ilGenerator, local);
                 }
 
                 // 步骤3：调用委托的Invoke方法

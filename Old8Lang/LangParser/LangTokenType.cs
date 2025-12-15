@@ -114,7 +114,7 @@ public enum LangTokenType
     /// ?
     /// </summary>
     Question,
-    
+
     /// <summary>
     /// !
     /// </summary>
@@ -129,7 +129,7 @@ public enum LangTokenType
     /// ==
     /// </summary>
     Equals,
-    
+
     /// <summary>
     /// &lt;
     /// </summary>
@@ -139,7 +139,7 @@ public enum LangTokenType
     /// &gt;
     /// </summary>
     GreaterThan,
-    
+
     /// <summary>
     /// &lt;=
     /// </summary>
@@ -164,7 +164,7 @@ public enum LangTokenType
     /// ||
     /// </summary>
     Or,
-    
+
     Xor,
 
     /// <summary>
@@ -215,38 +215,47 @@ public enum LangTokenType
     This,
     Extends,
     Throw,
+
     /// <summary>
     /// mixin
     /// </summary>
     Mixin,
+
     /// <summary>
     /// with
     /// </summary>
     With,
+
     /// <summary>
     /// static
     /// </summary>
     Static,
+
     /// <summary>
     /// public
     /// </summary>
     Public,
+
     /// <summary>
     /// private
     /// </summary>
     Private,
+
     /// <summary>
     /// native
     /// </summary>
     Native,
+
     /// <summary>
     /// protected
     /// </summary>
     Protected,
+
     /// <summary>
     /// async
     /// </summary>
     Async,
+
     /// <summary>
     /// await
     /// </summary>
@@ -295,4 +304,3 @@ public enum KeywordType
     Async,
     Await
 }
-

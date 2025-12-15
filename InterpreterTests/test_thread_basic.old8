@@ -1,0 +1,17 @@
+// 基础线程测试用例
+
+PrintLine("开始测试基础线程功能")
+
+// 定义一个简单的函数，用于测试线程
+func testFunc() {
+    PrintLine("在新线程中执行")
+    return 42
+}
+
+// 1. 基础线程创建和使用
+PrintLine("测试1: 基础线程创建和执行")
+thread <- spawn(testFunc)
+result <- thread.Join()  // 等待线程完成，获取返回值
+PrintLine("线程返回值: " + result.ToStr())
+
+PrintLine("\n基础线程测试完成")

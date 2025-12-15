@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
@@ -76,24 +75,18 @@ public class VariateManager
     /// <summary>
     /// 变量查找缓存，使用ThreadStatic避免线程同步开销
     /// </summary>
-    [ThreadStatic]
-    private static Dictionary<string, (int scopeIndex, LangValueType value)>? LookupCache;
-
-    /// <summary>
-    /// 缓存版本号，当作用域变化时递增，用于检测缓存失效
-    /// </summary>
-    private int CacheVersion;
+    [ThreadStatic] private static Dictionary<string, (int scopeIndex, LangValueType value)>? _lookupCache;
 
     /// <summary>
     /// 导入信息列表，包含导入的函数、类和原生类型
     /// 使用内部 List 和锁来保证线程安全
     /// </summary>
-    private readonly List<ImportInfo> _importInfos = [];
+    private readonly List<ImportInfo> ImportInfosList = [];
 
     /// <summary>
     /// 保护 ImportInfos 的锁对象
     /// </summary>
-    private readonly object _importInfosLock = new();
+    private readonly object ImportInfosLock = new();
 
     /// <summary>
     /// 公开的 ImportInfos 访问器（线程安全）
@@ -102,9 +95,9 @@ public class VariateManager
     {
         get
         {
-            lock (_importInfosLock)
+            lock (ImportInfosLock)
             {
-                return _importInfos.ToList(); // 返回副本以避免外部修改
+                return ImportInfosList.ToList(); // 返回副本以避免外部修改
             }
         }
     }
@@ -174,7 +167,7 @@ public class VariateManager
     /// 设置变量值
     /// </summary>
     /// <param name="id">变量标识符</param>
-    /// <parameter name="langValueType">变量值</param>
+    /// <param name="langValueType">变量值</param>
     /// <remarks>
     /// 变量查找规则：
     /// 1. 如果在函数内部，直接在当前作用域创建新变量
@@ -225,8 +218,7 @@ public class VariateManager
         }
 
         // 作用域变化，清理查找缓存
-        CacheVersion++;
-        LookupCache?.Clear();
+        _lookupCache?.Clear();
     }
 
     /// <summary>
@@ -252,8 +244,7 @@ public class VariateManager
             }
 
             // 作用域变化，清理查找缓存
-            CacheVersion++;
-            LookupCache?.Clear();
+            _lookupCache?.Clear();
         }
     }
 
@@ -272,7 +263,7 @@ public class VariateManager
     public LangValueType? GetValue(LangId id)
     {
         // 快速路径：检查缓存
-        if (LookupCache?.TryGetValue(id.IdName, out var cached) == true
+        if (_lookupCache?.TryGetValue(id.IdName, out var cached) == true
             && cached.scopeIndex < Scopes.Count
             && Scopes[cached.scopeIndex].TryGetValue(id.IdName, out var cachedValue))
         {
@@ -285,8 +276,8 @@ public class VariateManager
             if (Scopes[i].TryGetValue(id.IdName, out var value))
             {
                 // 更新缓存
-                LookupCache ??= new();
-                LookupCache[id.IdName] = (i, value);
+                _lookupCache ??= new();
+                _lookupCache[id.IdName] = (i, value);
                 return value;
             }
         }
@@ -305,7 +296,8 @@ public class VariateManager
     {
         return ImportInfos.FirstOrDefault(x =>
             (x is FuncLangValue func && func.Id!.IdName == id.IdName && func.Ids?.Count == paramCount) ||
-            (x is AsyncFuncLangValue asyncFunc && asyncFunc.Id!.IdName == id.IdName && asyncFunc.Ids?.Count == paramCount));
+            (x is AsyncFuncLangValue asyncFunc && asyncFunc.Id!.IdName == id.IdName &&
+             asyncFunc.Ids?.Count == paramCount));
     }
 
     /// <summary>
@@ -334,9 +326,9 @@ public class VariateManager
     /// <param name="langValue">要添加的导入信息</param>
     public void AddClassAndFunc(ImportInfo langValue)
     {
-        lock (_importInfosLock)
+        lock (ImportInfosLock)
         {
-            _importInfos.Add(langValue);
+            ImportInfosList.Add(langValue);
         }
     }
 
@@ -346,9 +338,9 @@ public class VariateManager
     /// <param name="items">要添加的导入信息集合</param>
     public void AddImportInfoRange(IEnumerable<ImportInfo> items)
     {
-        lock (_importInfosLock)
+        lock (ImportInfosLock)
         {
-            _importInfos.AddRange(items);
+            ImportInfosList.AddRange(items);
         }
     }
 
@@ -427,11 +419,11 @@ public class VariateManager
         }
 
         // 复制导入信息（线程安全）
-        lock (_importInfosLock)
+        lock (ImportInfosLock)
         {
-            lock (newManager._importInfosLock)
+            lock (newManager.ImportInfosLock)
             {
-                newManager._importInfos.AddRange(_importInfos);
+                newManager.ImportInfosList.AddRange(ImportInfosList);
             }
         }
 
@@ -469,11 +461,11 @@ public class VariateManager
         }
 
         // 复制导入信息（线程安全）
-        lock (_importInfosLock)
+        lock (ImportInfosLock)
         {
-            lock (newManager._importInfosLock)
+            lock (newManager.ImportInfosLock)
             {
-                newManager._importInfos.AddRange(_importInfos);
+                newManager.ImportInfosList.AddRange(ImportInfosList);
             }
         }
 
@@ -517,6 +509,7 @@ public class VariateManager
             var manager = pool.Pop();
             return manager;
         }
+
         return new VariateManager();
     }
 
@@ -550,9 +543,9 @@ public class VariateManager
         Scopes[0].Clear();
 
         // 清空导入信息（线程安全）
-        lock (_importInfosLock)
+        lock (ImportInfosLock)
         {
-            _importInfos.Clear();
+            ImportInfosList.Clear();
         }
 
         // 重置标志位
@@ -563,8 +556,7 @@ public class VariateManager
         RecursionDepth = 0;
 
         // 清理查找缓存
-        CacheVersion++;
-        LookupCache?.Clear();
+        _lookupCache?.Clear();
     }
 
     /// <summary>
@@ -599,11 +591,11 @@ public class VariateManager
         }
 
         // 复制导入信息（线程安全）
-        lock (_importInfosLock)
+        lock (ImportInfosLock)
         {
-            lock (captured._importInfosLock)
+            lock (captured.ImportInfosLock)
             {
-                captured._importInfos.AddRange(_importInfos);
+                captured.ImportInfosList.AddRange(ImportInfosList);
             }
         }
 

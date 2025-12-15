@@ -426,7 +426,7 @@ public static class AsyncLib
     /// <param name="channelId">Channel ID</param>
     /// <param name="timeoutMs">超时时间（毫秒）</param>
     /// <returns>接收到的数据，如果超时则返回 null</returns>
-    public static object ChannelTryReceive(int channelId, int timeoutMs)
+    public static object? ChannelTryReceive(int channelId, int timeoutMs)
     {
         if (!Channels.TryGetValue(channelId, out var channel))
         {
@@ -438,6 +438,7 @@ public static class AsyncLib
         {
             return task.GetAwaiter().GetResult();
         }
+
 
         return null;
     }
