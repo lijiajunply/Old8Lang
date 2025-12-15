@@ -13,12 +13,16 @@ public enum TaskStatus
 {
     /// <summary>任务已创建但尚未开始</summary>
     Pending,
+
     /// <summary>任务正在执行</summary>
     Running,
+
     /// <summary>任务已成功完成</summary>
     Completed,
+
     /// <summary>任务执行过程中发生异常</summary>
     Failed,
+
     /// <summary>任务被取消</summary>
     Canceled
 }
@@ -29,12 +33,12 @@ public enum TaskStatus
 /// </summary>
 public class TaskLangValue : LangValueType
 {
-    private readonly Task<LangValueType> _task;
+    private readonly Task<LangValueType> Task;
     private readonly CancellationToken _cancellationToken;
     private TaskStatus _status = TaskStatus.Pending;
-    private LangValueType? _result = null;
-    private Exception? _exception = null;
-    private readonly object _lock = new();
+    private LangValueType? _result;
+    private Exception? _exception;
+    private readonly Lock Lock = new();
 
     /// <summary>
     /// 获取任务结果（如果已完成）
@@ -57,16 +61,17 @@ public class TaskLangValue : LangValueType
     /// <param name="task">.NET Task对象</param>
     /// <param name="cancellationToken">取消令牌</param>
     /// <param name="position">源代码位置</param>
-    public TaskLangValue(Task<LangValueType> task, CancellationToken cancellationToken = default, SourcePosition position = default)
+    public TaskLangValue(Task<LangValueType> task, CancellationToken cancellationToken = default,
+        SourcePosition position = default)
         : base(position)
     {
-        _task = task;
+        Task = task;
         _cancellationToken = cancellationToken;
 
         // 注册任务状态变化的回调
-        _task.ContinueWith(t =>
+        Task.ContinueWith(t =>
         {
-            lock (_lock)
+            lock (Lock)
             {
                 if (t.IsCanceled)
                 {
@@ -87,9 +92,9 @@ public class TaskLangValue : LangValueType
         });
 
         // 如果任务已经开始执行，更新状态为Running
-        if (_task.Status == System.Threading.Tasks.TaskStatus.Running)
+        if (Task.Status == System.Threading.Tasks.TaskStatus.Running)
         {
-            lock (_lock)
+            lock (Lock)
             {
                 _status = TaskStatus.Running;
             }
@@ -100,7 +105,7 @@ public class TaskLangValue : LangValueType
         {
             _cancellationToken.Register(() =>
             {
-                lock (_lock)
+                lock (Lock)
                 {
                     if (_status == TaskStatus.Pending || _status == TaskStatus.Running)
                     {
@@ -122,38 +127,40 @@ public class TaskLangValue : LangValueType
         try
         {
             // 同步等待任务完成并获取结果
-            var result = _task.Result;
-            
+            var result = Task.Result;
+
             // 更新缓存状态
-            lock (_lock)
+            lock (Lock)
             {
                 _status = TaskStatus.Completed;
                 _result = result;
                 _exception = null;
             }
-            
+
             return result;
         }
         catch (AggregateException aggEx)
         {
             // 展开 AggregateException，抛出内部异常
             var innerException = aggEx.InnerException ?? aggEx;
-            lock (_lock)
+            lock (Lock)
             {
                 _status = innerException is OperationCanceledException ? TaskStatus.Canceled : TaskStatus.Failed;
                 _exception = innerException;
                 _result = null;
             }
+
             throw innerException;
         }
         catch (Exception ex)
         {
-            lock (_lock)
+            lock (Lock)
             {
                 _status = ex is OperationCanceledException ? TaskStatus.Canceled : TaskStatus.Failed;
                 _exception = ex;
                 _result = null;
             }
+
             throw;
         }
     }
@@ -181,7 +188,7 @@ public class TaskLangValue : LangValueType
             _cancellationToken.ThrowIfCancellationRequested();
 
             // 确保任务状态更新为 Running
-            lock (_lock)
+            lock (Lock)
             {
                 if (_status == TaskStatus.Pending)
                 {
@@ -193,29 +200,29 @@ public class TaskLangValue : LangValueType
             if (timeoutMs <= 0)
             {
                 // 无超时，异步等待任务完成
-                result = await _task;
+                result = await Task;
             }
             else
             {
                 // 带超时，使用 Task.WhenAny 实现超时机制
-                var timeoutTask = Task.Delay(timeoutMs, _cancellationToken);
-                var completedTask = await Task.WhenAny(_task, timeoutTask);
-                
+                var timeoutTask = System.Threading.Tasks.Task.Delay(timeoutMs, _cancellationToken);
+                var completedTask = await System.Threading.Tasks.Task.WhenAny(Task, timeoutTask);
+
                 // 检查取消请求
                 _cancellationToken.ThrowIfCancellationRequested();
-                
+
                 if (completedTask == timeoutTask)
                 {
                     // 超时
                     throw new TimeoutException($"Task 等待超时（{timeoutMs}ms）");
                 }
-                
+
                 // 任务已完成，获取结果
-                result = await _task;
+                result = await Task;
             }
 
             // 线程安全地更新完成状态
-            lock (_lock)
+            lock (Lock)
             {
                 _status = TaskStatus.Completed;
                 _result = result;
@@ -227,23 +234,25 @@ public class TaskLangValue : LangValueType
         catch (OperationCanceledException ex)
         {
             // 任务被取消
-            lock (_lock)
+            lock (Lock)
             {
                 _status = TaskStatus.Canceled;
                 _exception = ex;
                 _result = null;
             }
+
             throw;
         }
         catch (Exception ex)
         {
             // 其他异常
-            lock (_lock)
+            lock (Lock)
             {
                 _status = TaskStatus.Failed;
                 _exception = ex;
                 _result = null;
             }
+
             throw;
         }
     }
@@ -273,9 +282,10 @@ public class TaskLangValue : LangValueType
     {
         get
         {
-            lock (_lock)
+            lock (Lock)
             {
-                return _status == TaskStatus.Completed || _status == TaskStatus.Failed || _status == TaskStatus.Canceled;
+                return _status == TaskStatus.Completed || _status == TaskStatus.Failed ||
+                       _status == TaskStatus.Canceled;
             }
         }
     }
@@ -287,7 +297,7 @@ public class TaskLangValue : LangValueType
     {
         get
         {
-            lock (_lock)
+            lock (Lock)
             {
                 return _status;
             }
@@ -297,7 +307,7 @@ public class TaskLangValue : LangValueType
     /// <summary>
     /// 获取底层 Task 对象
     /// </summary>
-    public override object GetValue() => _task;
+    public override object GetValue() => Task;
 
     /// <summary>
     /// 类型字符串表示
@@ -309,7 +319,7 @@ public class TaskLangValue : LangValueType
     /// </summary>
     public override string ToString()
     {
-        lock (_lock)
+        lock (Lock)
         {
             return _status switch
             {
@@ -329,6 +339,29 @@ public class TaskLangValue : LangValueType
     public override LangValueType Run(VariateManager manager) => this;
 
     /// <summary>
+    /// Dot 方法：支持属性访问
+    /// </summary>
+    public override LangValueType Dot(LangExpression dotExpression)
+    {
+        // 处理属性访问（ClassMemberId 继承自 LangId）
+        if (dotExpression is LangId id)
+        {
+            var propertyName = id.IdName;
+
+            return propertyName switch
+            {
+                "IsCompleted" => new BoolLangValue(IsCompleted, Position),
+                "Status" => new StringLangValue(Status.ToString(), Position),
+                "XAUAT" => new StringLangValue("西建大还我血汗钱我要回家", Position),
+                _ => throw new AttributeError(dotExpression.Position, propertyName, "Task")
+            };
+        }
+
+        // 其他情况使用基类实现
+        return base.Dot(dotExpression);
+    }
+
+    /// <summary>
     /// 生成 IL 代码（编译器模式暂不支持）
     /// </summary>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
@@ -342,7 +375,7 @@ public class TaskLangValue : LangValueType
     /// <summary>
     /// 获取 .NET 类型（编译器模式暂不支持）
     /// </summary>
-    public override Type? OutputType(LocalManager local)
+    public override Type OutputType(LocalManager local)
     {
         return typeof(Task<object>);
     }
@@ -354,14 +387,15 @@ public class TaskLangValue : LangValueType
     /// </summary>
     public static TaskLangValue WhenAll(IEnumerable<TaskLangValue> tasks, SourcePosition position = default)
     {
-        var dotnetTasks = tasks.Select(t => t._task).ToList();
-        var whenAllTask = Task.WhenAll(dotnetTasks)
+        var dotnetTasks = tasks.Select(t => t.Task).ToList();
+        var whenAllTask = System.Threading.Tasks.Task.WhenAll(dotnetTasks)
             .ContinueWith(t =>
             {
                 if (t.IsFaulted)
                 {
                     throw t.Exception?.InnerException ?? t.Exception;
                 }
+
                 return new ListLangValue(t.Result.ToList(), position) as LangValueType;
             });
         return new TaskLangValue(whenAllTask, CancellationToken.None, position);
@@ -372,8 +406,8 @@ public class TaskLangValue : LangValueType
     /// </summary>
     public static TaskLangValue WhenAny(IEnumerable<TaskLangValue> tasks, SourcePosition position = default)
     {
-        var dotnetTasks = tasks.Select(t => t._task).ToList();
-        var whenAnyTask = Task.WhenAny(dotnetTasks)
+        var dotnetTasks = tasks.Select(t => t.Task).ToList();
+        var whenAnyTask = System.Threading.Tasks.Task.WhenAny(dotnetTasks)
             .ContinueWith(t => t.Result.Result);
         return new TaskLangValue(whenAnyTask, CancellationToken.None, position);
     }
@@ -381,10 +415,11 @@ public class TaskLangValue : LangValueType
     /// <summary>
     /// 创建延迟执行的任务
     /// </summary>
-    public static TaskLangValue Delay(int delayMs, CancellationToken cancellationToken = default, SourcePosition position = default)
+    public static TaskLangValue Delay(int delayMs, CancellationToken cancellationToken = default,
+        SourcePosition position = default)
     {
-        var delayTask = Task.Delay(delayMs, cancellationToken)
-            .ContinueWith(t => (LangValueType)new VoidLangValue(position));
+        var delayTask = System.Threading.Tasks.Task.Delay(delayMs, cancellationToken)
+            .ContinueWith(LangValueType (_) => new VoidLangValue(position), cancellationToken);
         return new TaskLangValue(delayTask, cancellationToken, position);
     }
 
@@ -393,12 +428,13 @@ public class TaskLangValue : LangValueType
     /// </summary>
     public TaskLangValue Then(Func<LangValueType, TaskLangValue> continuation, SourcePosition position = default)
     {
-        var thenTask = _task.ContinueWith(t =>
+        var thenTask = Task.ContinueWith(t =>
         {
             if (t.IsFaulted)
             {
                 throw t.Exception?.InnerException ?? t.Exception;
             }
+
             var result = continuation(t.Result);
             return result.AwaitAsync().Result;
         }, _cancellationToken);
@@ -410,14 +446,16 @@ public class TaskLangValue : LangValueType
     /// </summary>
     public TaskLangValue WithTimeout(int timeoutMs, SourcePosition position = default)
     {
-        var timeoutTask = Task.WhenAny(_task, Task.Delay(timeoutMs, _cancellationToken))
+        var timeoutTask = System.Threading.Tasks.Task
+            .WhenAny(Task, System.Threading.Tasks.Task.Delay(timeoutMs, _cancellationToken))
             .ContinueWith(t =>
             {
-                if (t.Result != _task)
+                if (t.Result != Task)
                 {
                     throw new TimeoutException($"Task 等待超时（{timeoutMs}ms）");
                 }
-                return _task.Result;
+
+                return Task.Result;
             }, _cancellationToken);
         return new TaskLangValue(timeoutTask, _cancellationToken, position);
     }
@@ -427,34 +465,34 @@ public class TaskLangValue : LangValueType
     /// </summary>
     public TaskLangValue Retry(int retryCount, int delayMs = 0, SourcePosition position = default)
     {
-        var retryTask = Task.Run(async () =>
+        var retryTask = System.Threading.Tasks.Task.Run(async () =>
         {
             Exception? lastException = null;
-            
+
             for (int i = 0; i <= retryCount; i++)
             {
                 _cancellationToken.ThrowIfCancellationRequested();
-                
+
                 try
                 {
-                    return await _task;
+                    return await Task;
                 }
                 catch (Exception ex)
                 {
                     lastException = ex;
-                    
+
                     if (i < retryCount)
                     {
                         // 重试前延迟
-                        await Task.Delay(delayMs, _cancellationToken);
+                        await System.Threading.Tasks.Task.Delay(delayMs, _cancellationToken);
                     }
                 }
             }
-            
+
             // 重试次数耗尽，抛出最后一次异常
             throw lastException ?? new Exception("任务执行失败，重试次数耗尽");
         }, _cancellationToken);
-        
+
         return new TaskLangValue(retryTask, _cancellationToken, position);
     }
 

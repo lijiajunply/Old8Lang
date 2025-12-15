@@ -1,5 +1,6 @@
 // AwaitAsync 方法综合测试
 import Async
+import Time
 
 // 测试1：基本AwaitAsync测试
 async func basicAwait() {
@@ -24,7 +25,7 @@ PrintLine("\n=== 测试2：AwaitAsync超时测试 ===")
 task2 <- slowTask()
 
 // 自定义超时测试（使用IsCompleted属性轮询）
-startTime <- GetCurrentTime()
+startTime <- GetUnixTimeMilliseconds()
 timeout <- 200
 isTimeout <- false
 
@@ -34,7 +35,7 @@ while true {
         isTimeout <- false
         break
     }
-    if GetCurrentTime() - startTime > timeout {
+    if GetUnixTimeMilliseconds() - startTime > timeout {
         isTimeout <- true
         break
     }
@@ -51,7 +52,7 @@ if isTimeout {
 // 测试3：AwaitAsync异常传播测试
 async func exceptionAwait() {
     Sleep(50)
-    throw new Error("TestException")
+    throw "TestException"
 }
 
 PrintLine("\n=== 测试3：AwaitAsync异常传播测试 ===")
@@ -74,7 +75,7 @@ async func concurrentTask(id:int, delay:int) {
 PrintLine("\n=== 测试4：并发AwaitAsync测试 ===")
 
 // 启动多个并发任务
-start <- GetCurrentTime()
+start <- GetUnixTimeMilliseconds()
 taskA <- concurrentTask(1, 200)
 taskB <- concurrentTask(2, 100)
 taskC <- concurrentTask(3, 150)
@@ -85,7 +86,7 @@ resultA <- await taskA
 resultB <- await taskB
 resultC <- await taskC
 
-end <- GetCurrentTime()
+end <- GetUnixTimeMilliseconds()
 duration <- end - start
 
 PrintLine("所有任务完成，总耗时: " + duration + "ms")

@@ -1,5 +1,6 @@
 // 异步任务状态管理测试
 import Async
+import Time
 
 // 测试1：基本任务状态转换测试
 async func basicStatusTest() {
@@ -34,14 +35,14 @@ PrintLine("初始状态: " + task2)
 
 try {
     // 使用自定义的超时机制测试
-    start <- GetCurrentTime()
+    start <- GetUnixTimeMilliseconds()
     timeout <- 200 // 200ms 超时
     // 使用IsCompleted属性直接判断，Old8Lang不支持!操作符
     while (true) {
         if (task2.IsCompleted) {
             break
         }
-        if ((GetCurrentTime() - start) >= timeout) {
+        if ((GetUnixTimeMilliseconds() - start) >= timeout) {
             break
         }
         Sleep(10) // 避免忙等
@@ -122,7 +123,7 @@ PrintLine("初始状态: " + task5)
 
 // 模拟取消状态转换（通过抛出Error）
 async func simulateCancel() {
-    throw new Error("OperationCanceled")
+    throw ("OperationCanceled")
 }
 
 try {
