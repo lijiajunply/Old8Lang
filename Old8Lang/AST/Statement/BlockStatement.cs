@@ -17,8 +17,10 @@ public class BlockStatement : OldStatement
 
     public BlockStatement(IEnumerable<IOldLangTree> statements, SourcePosition position = default) : base(position)
     {
+        // 遍历所有语句
         foreach (var statement in statements.OfType<OldStatement>())
         {
+            // 根据语句类型添加到不同的列表中
             switch (statement)
             {
                 case ImportStatement or NativeStatement or FuncInit or ClassInit:
@@ -75,7 +77,8 @@ public class BlockStatement : OldStatement
         foreach (var statement in ImportStatements)
         {
             statement.Run(manager);
-            if (manager.IsReturn) return;
+            // 不要在ImportRun中检查IsReturn，因为这会导致主函数体无法执行
+            // if (manager.IsReturn) return;
         }
     }
 

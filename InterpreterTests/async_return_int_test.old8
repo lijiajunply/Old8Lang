@@ -1,0 +1,23 @@
+// 测试异步函数返回整数
+
+// 最简单的异步函数，返回整数
+async func simpleReturn() {
+    return 42
+}
+
+PrintLine("测试开始")
+task <- simpleReturn()
+PrintLine("任务已创建")
+
+result <- await task
+PrintLine("等待完成")
+
+// 检查结果
+PrintLine("结果类型: " + result.TypeToString())
+PrintLine("结果值: " + result.ToStr())
+
+if result == 42 {
+    PrintLine("测试通过！")
+} else {
+    PrintLine("测试失败：result = " + result.ToStr())
+}

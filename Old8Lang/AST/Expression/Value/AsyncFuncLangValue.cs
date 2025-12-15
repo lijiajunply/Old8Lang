@@ -74,8 +74,12 @@ public class AsyncFuncLangValue : ImportInfo
                     );
                 }
 
-                // 使用捕获的作用域或当前作用域
-                var executionManager = CapturedScope ?? variateManagerFunc;
+                // 为异步执行创建独立的 VariateManager 实例，确保状态隔离
+                var baseManager = CapturedScope ?? variateManagerFunc;
+                var executionManager = baseManager.NewManger();
+                
+                // 重置返回状态，确保异步函数体能够正常执行
+                executionManager.IsReturn = false;
 
                 // 为异步执行创建独立的调用栈上下文
                 var asyncCallStack = new List<CallStackFrame>(Old8Exception.CurrentCallStack);
@@ -96,63 +100,67 @@ public class AsyncFuncLangValue : ImportInfo
                     executionManager.AddChildren();
                     executionManager.IsFunc = true;
 
-                    // 处理参数
-                    if (Ids != null && Ids.Count != 0)
+                    try
                     {
-                        // 初始化默认参数值缓存（仅在首次调用时）
-                        if (CachedDefaultValues == null && Ids.Any(id => id.DefaultValue != null))
+                        // 处理参数
+                        if (Ids != null && Ids.Count != 0)
                         {
-                            InitializeDefaultValueCache(executionManager);
-                        }
-
-                        // 评估参数
-                        var paramValues = ids.Select(t => t.Run(variateManagerFunc)).ToList();
-
-                        // 补全默认参数
-                        for (var i = paramValues.Count; i < Ids.Count; i++)
-                        {
-                            var id = Ids[i];
-                            if (id.DefaultValue != null)
+                            // 初始化默认参数值缓存（仅在首次调用时）
+                            if (CachedDefaultValues == null && Ids.Any(id => id.DefaultValue != null))
                             {
-                                // 优先使用缓存值（常量表达式）
-                                if (CachedDefaultValues?.TryGetValue(i, out var cachedValue) == true)
+                                InitializeDefaultValueCache(executionManager);
+                            }
+
+                            // 评估参数
+                            var paramValues = ids.Select(t => t.Run(variateManagerFunc)).ToList();
+
+                            // 补全默认参数
+                            for (var i = paramValues.Count; i < Ids.Count; i++)
+                            {
+                                var id = Ids[i];
+                                if (id.DefaultValue != null)
                                 {
-                                    paramValues.Add(cachedValue);
+                                    // 优先使用缓存值（常量表达式）
+                                    if (CachedDefaultValues?.TryGetValue(i, out var cachedValue) == true)
+                                    {
+                                        paramValues.Add(cachedValue);
+                                    }
+                                    else
+                                    {
+                                        paramValues.Add(id.DefaultValue.Run(executionManager));
+                                    }
                                 }
                                 else
                                 {
-                                    paramValues.Add(id.DefaultValue.Run(executionManager));
+                                    throw new ArgumentError(
+                                        Position,
+                                        $"异步函数 '{Id?.IdName ?? "anonymous"}' 的参数 '{id.IdName}' 缺少实参且没有默认值"
+                                    );
                                 }
                             }
-                            else
-                            {
-                                throw new ArgumentError(
-                                    Position,
-                                    $"异步函数 '{Id?.IdName ?? "anonymous"}' 的参数 '{id.IdName}' 缺少实参且没有默认值"
-                                );
-                            }
-                        }
 
-                        // 设置参数到作用域
+                            // 设置参数到作用域
                         for (var i = 0; i < Ids.Count; i++)
                         {
                             executionManager.Set(Ids[i], paramValues[i]);
                         }
                     }
 
-                    executionManager.IsFunc = false;
+                            // 执行函数体，保持 IsFunc = true
+                        BlockStatement.Run(executionManager);
 
-                    // 执行函数体
-                    BlockStatement.Run(executionManager);
+                        // 保存返回值（在清理之前）
+                        var result = executionManager.Result;
 
-                    // 保存返回值
-                    var result = executionManager.Result;
-
-                    // 清理
-                    executionManager.IsReturn = false;
-                    executionManager.RemoveChildren();
-
-                    return result;
+                        return result;
+                    }
+                    finally
+                    {
+                        // 清理资源
+                        executionManager.IsReturn = false;
+                        executionManager.IsFunc = false;
+                        executionManager.RemoveChildren();
+                    }
                 }
                 finally
                 {

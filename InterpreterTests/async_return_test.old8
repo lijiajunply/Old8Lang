@@ -3,6 +3,7 @@ import Async
 
 // 简单返回字符串
 async func returnString() {
+    Sleep(1000)
     return "测试字符串"
 }
 

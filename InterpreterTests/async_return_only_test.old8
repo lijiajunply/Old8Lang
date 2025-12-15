@@ -1,0 +1,11 @@
+// 最简单的异步函数返回测试
+
+// 直接返回一个值
+async func returnValue() {
+    return 123
+}
+
+// 调用并打印结果
+task <- returnValue()
+result <- await task
+PrintLine("Result: " + result)

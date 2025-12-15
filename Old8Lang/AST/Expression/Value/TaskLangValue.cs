@@ -51,21 +51,22 @@ public class TaskLangValue : LangValueType
     {
         try
         {
-            // 同步等待任务完成
-            _task.Wait();
-
-            // 如果有异常，重新抛出
-            if (_exception != null)
-            {
-                throw _exception;
-            }
-
-            return _result ?? new VoidLangValue();
+            // 同步等待任务完成并获取结果
+            var result = _task.Result;
+            
+            // 更新缓存状态
+            _isCompleted = true;
+            _result = result;
+            
+            return result;
         }
         catch (AggregateException aggEx)
         {
             // 展开 AggregateException，抛出内部异常
-            throw aggEx.InnerException ?? aggEx;
+            var innerException = aggEx.InnerException ?? aggEx;
+            _isCompleted = true;
+            _exception = innerException;
+            throw innerException;
         }
     }
 

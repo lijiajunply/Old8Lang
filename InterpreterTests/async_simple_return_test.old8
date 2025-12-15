@@ -1,0 +1,23 @@
+// 简单的异步函数返回测试
+
+// 最简单的异步函数，返回字符串
+async func simpleReturn() {
+    return "Hello World"
+}
+
+// 调用异步函数
+PrintLine("开始测试")
+task <- simpleReturn()
+PrintLine("任务已创建")
+
+// 等待完成并打印结果
+result <- await task
+PrintLine("异步函数返回: ")
+PrintLine(result)
+
+// 比较返回值
+if result == "Hello World" {
+    PrintLine("测试通过！")
+} else {
+    PrintLine("测试失败！")
+}

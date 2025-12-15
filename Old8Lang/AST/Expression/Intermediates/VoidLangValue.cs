@@ -15,8 +15,7 @@ public class VoidLangValue(SourcePosition position = default) : LangValueType(po
 
     public override LangValueType Run(LangParser.VariateManager manager) => this;
 
-    public override string ToString() =>
-        throw new InvalidOperationError(this, "尝试将无效值（VoidValue）转换为字符串");
+    public override string ToString() => ""; // VoidValue 转换为字符串时返回空字符串，而不是抛出异常
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {

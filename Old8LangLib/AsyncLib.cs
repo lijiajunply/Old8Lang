@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Threading.Channels;
 
 namespace Old8LangLib;
 
@@ -19,6 +20,10 @@ public static class AsyncLib
     // 存储原子整数对象
     private static readonly ConcurrentDictionary<int, AtomicInt> AtomicInts = new();
     private static int _atomicIntIdCounter;
+
+    // 存储通道对象（使用 Channel<object> 实现，支持任意类型数据）
+    private static readonly ConcurrentDictionary<int, Channel<object>> Channels = new();
+    private static int _channelIdCounter;
 
     #region Mutex 互斥锁
 
@@ -333,6 +338,134 @@ public static class AsyncLib
     public static int GetProcessorCount()
     {
         return Environment.ProcessorCount;
+    }
+
+    #endregion
+
+    #region Channel 通道
+
+    /// <summary>
+    /// 创建一个无界通道
+    /// </summary>
+    /// <returns>Channel ID</returns>
+    public static int ChannelCreate()
+    {
+        var id = Interlocked.Increment(ref _channelIdCounter);
+        Channels[id] = Channel.CreateUnbounded<object>();
+        return id;
+    }
+
+    /// <summary>
+    /// 创建一个有界通道
+    /// </summary>
+    /// <param name="capacity">通道容量</param>
+    /// <returns>Channel ID</returns>
+    public static int ChannelCreateBounded(int capacity)
+    {
+        if (capacity < 1)
+        {
+            throw new ArgumentException("通道容量必须大于等于1");
+        }
+
+        var id = Interlocked.Increment(ref _channelIdCounter);
+        Channels[id] = Channel.CreateBounded<object>(capacity);
+        return id;
+    }
+
+    /// <summary>
+    /// 向通道发送数据（阻塞等待）
+    /// </summary>
+    /// <param name="channelId">Channel ID</param>
+    /// <param name="value">要发送的数据</param>
+    public static void ChannelSend(int channelId, object value)
+    {
+        if (!Channels.TryGetValue(channelId, out var channel))
+        {
+            throw new ArgumentException($"Channel ID {channelId} 不存在");
+        }
+
+        channel.Writer.WriteAsync(value).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// 向通道发送数据（带超时）
+    /// </summary>
+    /// <param name="channelId">Channel ID</param>
+    /// <param name="value">要发送的数据</param>
+    /// <param name="timeoutMs">超时时间（毫秒）</param>
+    /// <returns>是否成功发送</returns>
+    public static bool ChannelTrySend(int channelId, object value, int timeoutMs)
+    {
+        if (!Channels.TryGetValue(channelId, out var channel))
+        {
+            throw new ArgumentException($"Channel ID {channelId} 不存在");
+        }
+
+        var task = channel.Writer.WriteAsync(value).AsTask();
+        return task.Wait(timeoutMs);
+    }
+
+    /// <summary>
+    /// 从通道接收数据（阻塞等待）
+    /// </summary>
+    /// <param name="channelId">Channel ID</param>
+    /// <returns>接收到的数据</returns>
+    public static object ChannelReceive(int channelId)
+    {
+        if (!Channels.TryGetValue(channelId, out var channel))
+        {
+            throw new ArgumentException($"Channel ID {channelId} 不存在");
+        }
+
+        return channel.Reader.ReadAsync().GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// 从通道接收数据（带超时）
+    /// </summary>
+    /// <param name="channelId">Channel ID</param>
+    /// <param name="timeoutMs">超时时间（毫秒）</param>
+    /// <returns>接收到的数据，如果超时则返回 null</returns>
+    public static object ChannelTryReceive(int channelId, int timeoutMs)
+    {
+        if (!Channels.TryGetValue(channelId, out var channel))
+        {
+            throw new ArgumentException($"Channel ID {channelId} 不存在");
+        }
+
+        var task = channel.Reader.ReadAsync().AsTask();
+        if (task.Wait(timeoutMs))
+        {
+            return task.GetAwaiter().GetResult();
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 关闭通道写入端
+    /// </summary>
+    /// <param name="channelId">Channel ID</param>
+    public static void ChannelClose(int channelId)
+    {
+        if (!Channels.TryGetValue(channelId, out var channel))
+        {
+            throw new ArgumentException($"Channel ID {channelId} 不存在");
+        }
+
+        channel.Writer.Complete();
+    }
+
+    /// <summary>
+    /// 销毁通道
+    /// </summary>
+    /// <param name="channelId">Channel ID</param>
+    public static void ChannelDispose(int channelId)
+    {
+        if (Channels.TryRemove(channelId, out var channel))
+        {
+            // Channel 会自动释放资源，无需手动 Dispose
+        }
     }
 
     #endregion

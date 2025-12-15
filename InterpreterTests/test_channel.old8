@@ -1,0 +1,52 @@
+// 通道测试
+
+// 创建无界通道
+ch <- ChannelCreate()
+
+// 向通道发送数据
+ChannelSend(ch, "Hello")
+ChannelSend(ch, "World")
+ChannelSend(ch, 123)
+
+// 从通道接收数据并打印
+PrintLine(ChannelReceive(ch))
+PrintLine(ChannelReceive(ch))
+PrintLine(ChannelReceive(ch))
+
+// 创建有界通道
+boundedCh <- ChannelCreateBounded(2)
+
+// 向有界通道发送数据
+ChannelSend(boundedCh, "Bounded")
+ChannelSend(boundedCh, "Channel")
+
+// 接收并打印
+PrintLine(ChannelReceive(boundedCh))
+PrintLine(ChannelReceive(boundedCh))
+
+// 测试带超时的发送和接收
+timeoutCh <- ChannelCreateBounded(1)
+ChannelSend(timeoutCh, "Timeout")
+
+// 尝试发送（应该超时，因为通道已满）
+sendResult <- ChannelTrySend(timeoutCh, "ShouldTimeout", 1000)
+PrintLine("Send result: " + sendResult)
+
+// 接收数据
+PrintLine(ChannelReceive(timeoutCh))
+
+// 尝试接收（应该超时，因为通道为空）
+receiveResult <- ChannelTryReceive(timeoutCh, 1000)
+PrintLine("Receive result: " + (receiveResult == null ? "null" : receiveResult))
+
+// 关闭和销毁通道
+ChannelClose(ch)
+ChannelDispose(ch)
+
+ChannelClose(boundedCh)
+ChannelDispose(boundedCh)
+
+ChannelClose(timeoutCh)
+ChannelDispose(timeoutCh)
+
+PrintLine("通道测试完成")
