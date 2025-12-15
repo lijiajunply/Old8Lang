@@ -78,12 +78,12 @@ public class IfStatement(
                 return ifChildBlock;
             }
 
-            if (index == elifBlock.Count)
+            if (index == 1 + elifBlock.Count)
             {
                 return elseBlockStatement;
             }
 
-            return elifBlock[index];
+            return elifBlock[index - 1];
         }
     }
 
