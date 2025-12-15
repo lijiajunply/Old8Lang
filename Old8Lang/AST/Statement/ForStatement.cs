@@ -42,25 +42,31 @@ public class ForStatement(
                     throw new TypeError(this, "期望布尔类型", $"实际得到了 {varExpr.GetType().Name}");
                 
                 if (expr1)
+            {
+                blockStatement.Run(manager);
+                
+                // 处理yield：如果循环体中遇到yield，返回以暂停执行
+                if (manager.IsYield)
                 {
-                    blockStatement.Run(manager);
-                    
-                    // 处理break
-                    if (manager.ControlFlowManager.BreakFlag)
-                    {
-                        break;
-                    }
-                    
-                    // 处理continue，执行循环增量操作
-                    if (manager.ControlFlowManager.ContinueFlag)
-                    {
-                        statement.Run(manager);
-                        continue;
-                    }
-                    
-                    // 正常执行，执行循环增量操作
-                    statement.Run(manager);
+                    return;
                 }
+                
+                // 处理break
+                if (manager.ControlFlowManager.BreakFlag)
+                {
+                    break;
+                }
+                
+                // 处理continue，执行循环增量操作
+                if (manager.ControlFlowManager.ContinueFlag)
+                {
+                    statement.Run(manager);
+                    continue;
+                }
+                
+                // 正常执行，执行循环增量操作
+                statement.Run(manager);
+            }
                 else
                     break;
             }

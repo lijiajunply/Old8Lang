@@ -20,40 +20,55 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
         
         try
         {
-            while (true)
+            // 只执行一次循环迭代，然后检查yield标志
+            // 这样生成器可以在每次yield后暂停执行
+            
+            // 在每次循环迭代开始时重置控制流标志
+            manager.ControlFlowManager.ResetCurrentState();
+            
+            // 优化：直接获取布尔值，避免临时对象创建
+            var value = expression.Run(manager);
+            bool expr1;
+            if (value is BoolLangValue varBool)
             {
-                // 在每次循环迭代开始时重置控制流标志
-                manager.ControlFlowManager.ResetCurrentState();
-                
-                // 优化：直接获取布尔值，避免临时对象创建
-                var value = expression.Run(manager);
-                bool expr1;
-                if (value is BoolLangValue varBool)
-                {
-                    expr1 = varBool.Value;
-                    // 优化：将临时布尔对象归还到对象池
-                    varBool.ReturnToPool();
-                }
-                else
-                {
-                    throw new TypeError(this, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
-                }
+                expr1 = varBool.Value;
+                // 优化：将临时布尔对象归还到对象池
+                varBool.ReturnToPool();
+            }
+            else
+            {
+                throw new TypeError(this, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
+            }
 
-                if (expr1)
-                {
-                    blockStatement.Run(manager);
-                    
-                    // 处理break
-                    if (manager.ControlFlowManager.BreakFlag)
-                    {
-                        break;
-                    }
-                    // continue由标志位控制，直接进入下一轮循环
-                }
-                else
+            if (expr1)
+            {
+                blockStatement.Run(manager);
+                
+                // 处理break
+                if (manager.ControlFlowManager.BreakFlag)
                 {
                     return;
                 }
+                
+                // 处理yield：如果循环体中遇到yield，立即返回以暂停执行
+                // 不执行循环变量更新，让下一次调用处理
+                if (manager.IsYield)
+                {
+                    return;
+                }
+                
+                // continue由标志位控制，直接返回，让下一次调用处理
+                if (manager.ControlFlowManager.ContinueFlag)
+                {
+                    return;
+                }
+                
+                // 正常执行，返回，让下一次调用处理下一次迭代
+                return;
+            }
+            else
+            {
+                return;
             }
         }
         finally

@@ -7,69 +7,69 @@ using Old8Lang.AST.Expression.Intermediates;
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
-    /// 生成器对象，用于表示生成器函数的实例，实现ILangList接口以支持迭代
+/// 生成器对象，用于表示生成器函数的实例，实现ILangList接口以支持迭代
+/// </summary>
+public class GeneratorLangValue : LangValueType, ILangList
+{
+    /// <summary>
+    /// 生成器函数引用
     /// </summary>
-    public class GeneratorLangValue : LangValueType, ILangList
+    public FuncLangValue Func { get; init; }
+
+    /// <summary>
+    /// 生成器当前状态
+    /// </summary>
+    public GeneratorState State { get; set; } = GeneratorState.Suspended;
+
+    /// <summary>
+    /// 生成器的执行位置（用于恢复执行）
+    /// </summary>
+    public int ExecutionPosition { get; set; }
+
+    /// <summary>
+    /// 生成器的局部变量状态
+    /// </summary>
+    public VariateManager? LocalState { get; set; }
+
+    /// <summary>
+    /// 生成器迭代器的下一个值
+    /// </summary>
+    public LangValueType? NextValue { get; set; }
+
+    /// <summary>
+    /// 生成器函数的参数值
+    /// </summary>
+    private Dictionary<string, LangValueType> ParameterValues { get; } = new();
+
+    /// <summary>
+    /// 生成器状态枚举
+    /// </summary>
+    public enum GeneratorState
     {
-        /// <summary>
-        /// 生成器函数引用
-        /// </summary>
-        public FuncLangValue Func { get; init; }
+        Suspended,
+        Running,
+        Completed
+    }
 
-        /// <summary>
-        /// 生成器当前状态
-        /// </summary>
-        public GeneratorState State { get; set; } = GeneratorState.Suspended;
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="func">生成器函数引用</param>
+    /// <param name="position">源代码位置</param>
+    public GeneratorLangValue(FuncLangValue func, SourcePosition position = default) : base(position)
+    {
+        Func = func;
+    }
 
-        /// <summary>
-        /// 生成器的执行位置（用于恢复执行）
-        /// </summary>
-        public int ExecutionPosition { get; set; } = 0;
-
-        /// <summary>
-        /// 生成器的局部变量状态
-        /// </summary>
-        public VariateManager? LocalState { get; set; }
-
-        /// <summary>
-        /// 生成器迭代器的下一个值
-        /// </summary>
-        public LangValueType? NextValue { get; set; }
-        
-        /// <summary>
-        /// 生成器函数的参数值
-        /// </summary>
-        private Dictionary<string, LangValueType> ParameterValues { get; } = new();
-
-        /// <summary>
-        /// 生成器状态枚举
-        /// </summary>
-        public enum GeneratorState
-        {
-            Suspended,
-            Running,
-            Completed
-        }
-
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="func">生成器函数引用</param>
-        /// <param name="position">源代码位置</param>
-        public GeneratorLangValue(FuncLangValue func, SourcePosition position = default) : base(position)
-        {
-            Func = func;
-        }
-        
-        /// <summary>
-        /// 设置生成器函数的参数值
-        /// </summary>
-        /// <param name="paramName">参数名称</param>
-        /// <param name="value">参数值</param>
-        public void SetParameter(string paramName, LangValueType value)
-        {
-            ParameterValues[paramName] = value;
-        }
+    /// <summary>
+    /// 设置生成器函数的参数值
+    /// </summary>
+    /// <param name="paramName">参数名称</param>
+    /// <param name="value">参数值</param>
+    public void SetParameter(string paramName, LangValueType value)
+    {
+        ParameterValues[paramName] = value;
+    }
 
     /// <summary>
     /// 运行生成器，返回下一个值
@@ -81,9 +81,11 @@ namespace Old8Lang.AST.Expression.Value;
         // 注意：我们不需要创建新的LocalState，因为它已经在FuncLangValue.Run方法中被设置好了
         
         State = GeneratorState.Running;
+        
+        // 每次执行前清除yield标志，确保下一次迭代能正确执行
         LocalState!.IsYield = false;
 
-        // 执行当前语句
+        // 只执行当前语句，不循环执行所有语句
         if (ExecutionPosition < Func.BlockStatement.Count)
         {
             var statement = Func.BlockStatement[ExecutionPosition];
@@ -94,7 +96,9 @@ namespace Old8Lang.AST.Expression.Value;
                 // 遇到yield，保存状态并返回值
                 NextValue = LocalState.Result;
                 State = GeneratorState.Suspended;
-                // 增加ExecutionPosition，以便下一次调用时执行下一个语句
+                // 递增ExecutionPosition，因为yield语句已经执行完毕
+                // 下一次调用时会执行yield语句后面的语句
+                // 这样可以确保生成器继续生成后续的值
                 ExecutionPosition++;
                 return NextValue;
             }
@@ -108,6 +112,8 @@ namespace Old8Lang.AST.Expression.Value;
             
             // 没有遇到yield或return，继续执行下一个语句
             ExecutionPosition++;
+            // 递归调用自己，继续执行下一个语句
+            return Run(manager);
         }
 
         // 函数执行完毕，生成器完成
@@ -209,7 +215,7 @@ namespace Old8Lang.AST.Expression.Value;
             new BlockStatement(new List<OldStatement>()),
             Position
         );
-        
+
         return new GeneratorLangValue(slicedFunc, Position);
     }
 
@@ -240,6 +246,7 @@ namespace Old8Lang.AST.Expression.Value;
                 return true;
             }
         }
+
         return false;
     }
 }

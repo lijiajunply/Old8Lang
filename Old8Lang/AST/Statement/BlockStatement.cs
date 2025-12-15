@@ -47,6 +47,8 @@ public class BlockStatement : OldStatement
         {
             statement.Run(manager);
             if (manager.IsReturn) return;
+            // 不立即返回，继续执行yield语句后面的语句
+            // 这样yield语句后面的语句（如i <- i + 1）会被执行
         }
     }
 
