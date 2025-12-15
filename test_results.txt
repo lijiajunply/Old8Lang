@@ -1,0 +1,226 @@
+=== Old8Lang 解释器模式综合测试 ===
+开始时间: 2025-12-16 02:07:01
+
+找到 108 个测试文件
+
+[  1/108] 测试: 01_basic_literals.old8                             ❌ FAIL (exit: 127)
+[  2/108] 测试: 02_data_types.old8                                 ❌ FAIL (exit: 127)
+[  3/108] 测试: 03_arithmetic_expressions.old8                     ❌ FAIL (exit: 127)
+[  4/108] 测试: 04_comparison_expressions.old8                     ❌ FAIL (exit: 127)
+[  5/108] 测试: 05_logical_expressions.old8                        ❌ FAIL (exit: 127)
+[  6/108] 测试: 06_assignment_expressions.old8                     ❌ FAIL (exit: 127)
+[  7/108] 测试: 07_member_access.old8                              ❌ FAIL (exit: 127)
+[  8/108] 测试: 08_if_elif_else.old8                               ❌ FAIL (exit: 127)
+[  9/108] 测试: 09_for_statement.old8                              ❌ FAIL (exit: 127)
+[ 10/108] 测试: 10_while_statement.old8                            ❌ FAIL (exit: 127)
+[ 11/108] 测试: 11_for_in_statement.old8                           ❌ FAIL (exit: 127)
+[ 12/108] 测试: 12_in_expression.old8                              ❌ FAIL (exit: 127)
+[ 13/108] 测试: 12_switch_statement.old8                           ❌ FAIL (exit: 127)
+[ 14/108] 测试: 13_function_declaration.old8                       ❌ FAIL (exit: 127)
+[ 15/108] 测试: 14_lambda_expressions.old8                         ❌ FAIL (exit: 127)
+[ 16/108] 测试: 15_class_declaration.old8                          ❌ FAIL (exit: 127)
+[ 17/108] 测试: 16_class_methods.old8                              ❌ FAIL (exit: 127)
+[ 18/108] 测试: 17_exception_handling.old8                         ❌ FAIL (exit: 127)
+[ 19/108] 测试: 18_string_templates.old8                           ❌ FAIL (exit: 127)
+[ 20/108] 测试: 19_list_comprehensions.old8                        ❌ FAIL (exit: 127)
+[ 21/108] 测试: 20_type_annotations.old8                           ❌ FAIL (exit: 127)
+[ 22/108] 测试: 21_type_conversion.old8                            ❌ FAIL (exit: 127)
+[ 23/108] 测试: 22_scientific_notation.old8                        ❌ FAIL (exit: 127)
+[ 24/108] 测试: 23_class_inheritance.old8                          ❌ FAIL (exit: 127)
+[ 25/108] 测试: 24_throw_statement.old8                            ❌ FAIL (exit: 127)
+[ 26/108] 测试: 25_type_annotation_restrictions_test.old8          ❌ FAIL (exit: 127)
+[ 27/108] 测试: 26_array_and_slice_operations.old8                 ❌ FAIL (exit: 127)
+[ 28/108] 测试: 27_ternary_expressions.old8                        ❌ FAIL (exit: 127)
+[ 29/108] 测试: 28_builtin_functions.old8                          ❌ FAIL (exit: 127)
+[ 30/108] 测试: 28_generator.old8                                  ❌ FAIL (exit: 127)
+[ 31/108] 测试: 28_simple_generator.old8                           ❌ FAIL (exit: 127)
+[ 32/108] 测试: 29_time_library.old8                               ❌ FAIL (exit: 127)
+[ 33/108] 测试: 31_os_library_actual.old8                          ❌ FAIL (exit: 127)
+[ 34/108] 测试: 31_os_library.old8                                 ❌ FAIL (exit: 127)
+[ 35/108] 测试: 32_terminal_library_actual.old8                    ❌ FAIL (exit: 127)
+[ 36/108] 测试: 32_terminal_library.old8                           ❌ FAIL (exit: 127)
+[ 37/108] 测试: 34_import_statements.old8                          ❌ FAIL (exit: 127)
+[ 38/108] 测试: 35_import_new_syntax.old8                          ❌ FAIL (exit: 127)
+[ 39/108] 测试: 35_recursive_functions.old8                        ❌ FAIL (exit: 127)
+[ 40/108] 测试: 36_higher_order_functions.old8                     ❌ FAIL (exit: 127)
+[ 41/108] 测试: 37_batch_import.old8                               ❌ FAIL (exit: 127)
+[ 42/108] 测试: 38_complex_data_structures.old8                    ❌ FAIL (exit: 127)
+[ 43/108] 测试: 39_deep_collection_equality.old8                   ❌ FAIL (exit: 127)
+[ 44/108] 测试: 40_simple_uninitialized.old8                       ❌ FAIL (exit: 127)
+[ 45/108] 测试: 40_type_errors.old8                                ✅ PASS (expected error)
+[ 46/108] 测试: 40_uninitialized_fields.old8                       ❌ FAIL (exit: 127)
+[ 47/108] 测试: 41_index_key_errors.old8                           ✅ PASS (expected error)
+[ 48/108] 测试: 41_uninitialized_fields_outside_class.old8         ❌ FAIL (exit: 127)
+[ 49/108] 测试: 42_arithmetic_errors.old8                          ✅ PASS (expected error)
+[ 50/108] 测试: 42_private_static_fields.old8                      ❌ FAIL (exit: 127)
+[ 51/108] 测试: 43_name_attribute_errors.old8                      ✅ PASS (expected error)
+[ 52/108] 测试: 44_comprehensive_errors.old8                       ✅ PASS (expected error)
+[ 53/108] 测试: 45_negative_index_error.old8                       ✅ PASS (expected error)
+[ 54/108] 测试: 46_dict_key_error.old8                             ✅ PASS (expected error)
+[ 55/108] 测试: 47_invalid_operation_error.old8                    ✅ PASS (expected error)
+[ 56/108] 测试: 48_new_error_types_demo.old8                       ❌ FAIL (exit: 127)
+[ 57/108] 测试: 49_assertion_error_applied.old8                    ✅ PASS (expected error)
+[ 58/108] 测试: 50_enhanced_error_test.old8                        ❌ FAIL (exit: 127)
+[ 59/108] 测试: 50_value_error_math_applied.old8                   ✅ PASS (expected error)
+[ 60/108] 测试: 51_file_not_found_applied.old8                     ✅ PASS (expected error)
+[ 61/108] 测试: 52_exception_conversion_file.old8                  ✅ PASS (expected error)
+[ 62/108] 测试: 53_exception_conversion_value.old8                 ✅ PASS (expected error)
+[ 63/108] 测试: 53_filelib_enhanced.old8                           ❌ FAIL (exit: 127)
+[ 64/108] 测试: 54_recursion_limit.old8                            ✅ PASS (expected error)
+[ 65/108] 测试: 55_mathlib_comprehensive.old8                      ✅ PASS (expected error)
+[ 66/108] 测试: 56_mathlib_extended.old8                           ❌ FAIL (exit: 127)
+[ 67/108] 测试: async_advanced_features.old8                       ❌ FAIL (exit: 127)
+[ 68/108] 测试: async_advanced_test.old8                           ❌ FAIL (exit: 127)
+[ 69/108] 测试: async_atomic.old8                                  ❌ FAIL (exit: 127)
+[ 70/108] 测试: async_await_improvement.old8                       ❌ FAIL (exit: 127)
+[ 71/108] 测试: async_awaitasync_comprehensive_test.old8           ❌ FAIL (exit: 127)
+[ 72/108] 测试: async_basic_execution.old8                         ❌ FAIL (exit: 127)
+[ 73/108] 测试: async_concurrent.old8                              ❌ FAIL (exit: 127)
+[ 74/108] 测试: async_debug_return_test.old8                       ❌ FAIL (exit: 127)
+[ 75/108] 测试: async_debug_test.old8                              ❌ FAIL (exit: 127)
+[ 76/108] 测试: async_mutex.old8                                   ❌ FAIL (exit: 127)
+[ 77/108] 测试: async_only_return_test.old8                        ❌ FAIL (exit: 127)
+[ 78/108] 测试: async_pure_test.old8                               ❌ FAIL (exit: 127)
+[ 79/108] 测试: async_return_int_test.old8                         ❌ FAIL (exit: 127)
+[ 80/108] 测试: async_return_only_test.old8                        ❌ FAIL (exit: 127)
+[ 81/108] 测试: async_return_test.old8                             ❌ FAIL (exit: 127)
+[ 82/108] 测试: async_simple_return_test.old8                      ❌ FAIL (exit: 127)
+[ 83/108] 测试: async_simple_test.old8                             ❌ FAIL (exit: 127)
+[ 84/108] 测试: async_sleep_test.old8                              ❌ FAIL (exit: 127)
+[ 85/108] 测试: async_task_status_management.old8                  ❌ FAIL (exit: 127)
+[ 86/108] 测试: class_field_type_annotation_test.old8              ❌ FAIL (exit: 127)
+[ 87/108] 测试: class_modifiers_test.old8                          ❌ FAIL (exit: 127)
+[ 88/108] 测试: debug_mathlib_return.old8                          ❌ FAIL (exit: 127)
+[ 89/108] 测试: generator_test.old8                                ❌ FAIL (exit: 127)
+[ 90/108] 测试: inheritance_mixin_test.old8                        ❌ FAIL (exit: 127)
+[ 91/108] 测试: mixin_test.old8                                    ❌ FAIL (exit: 127)
+[ 92/108] 测试: multiple_mixin_test.old8                           ❌ FAIL (exit: 127)
+[ 93/108] 测试: parameterized_generator_test.old8                  ❌ FAIL (exit: 127)
+[ 94/108] 测试: semicolon_execution.old8                           ❌ FAIL (exit: 127)
+[ 95/108] 测试: simple_mathlib_test.old8                           ❌ FAIL (exit: 127)
+[ 96/108] 测试: simple_mixin_test.old8                             ❌ FAIL (exit: 127)
+[ 97/108] 测试: sync_return_test.old8                              ❌ FAIL (exit: 127)
+[ 98/108] 测试: test_channel.old8                                  ❌ FAIL (exit: 127)
+[ 99/108] 测试: test_import_module.old8                            ❌ FAIL (exit: 127)
+[100/108] 测试: test_private_access_control.old8                   ✅ PASS (expected error)
+[101/108] 测试: test_private_simple.old8                           ❌ FAIL (exit: 127)
+[102/108] 测试: test_protected_internal.old8                       ❌ FAIL (exit: 127)
+[103/108] 测试: test_protected.old8                                ✅ PASS (expected error)
+[104/108] 测试: test_standard_libraries.old8                       ❌ FAIL (exit: 127)
+[105/108] 测试: test_thread_basic.old8                             ❌ FAIL (exit: 127)
+[106/108] 测试: test_thread_comprehensive.old8                     ❌ FAIL (exit: 127)
+[107/108] 测试: test_thread_simple.old8                            ❌ FAIL (exit: 127)
+[108/108] 测试: type_conversion_enhanced.old8                      ❌ FAIL (exit: 127)
+
+================================
+=== 测试结果汇总 ===
+================================
+总计: 108
+通过: 17
+失败: 91
+超时: 0
+awk: syntax error at source line 1
+ context is
+	BEGIN >>>  printf <<<  "%.1f%%"
+awk: bailing out at source line 1
+awk: syntax error at source line 1
+ context is
+	BEGIN  >>>  ( <<< 
+awk: bailing out at source line 1
+成功率:  成功率: 
+
+❌ 失败的测试 (91):
+  - ./InterpreterTests/01_basic_literals.old8
+  - ./InterpreterTests/02_data_types.old8
+  - ./InterpreterTests/03_arithmetic_expressions.old8
+  - ./InterpreterTests/04_comparison_expressions.old8
+  - ./InterpreterTests/05_logical_expressions.old8
+  - ./InterpreterTests/06_assignment_expressions.old8
+  - ./InterpreterTests/07_member_access.old8
+  - ./InterpreterTests/08_if_elif_else.old8
+  - ./InterpreterTests/09_for_statement.old8
+  - ./InterpreterTests/10_while_statement.old8
+  - ./InterpreterTests/11_for_in_statement.old8
+  - ./InterpreterTests/12_in_expression.old8
+  - ./InterpreterTests/12_switch_statement.old8
+  - ./InterpreterTests/13_function_declaration.old8
+  - ./InterpreterTests/14_lambda_expressions.old8
+  - ./InterpreterTests/15_class_declaration.old8
+  - ./InterpreterTests/16_class_methods.old8
+  - ./InterpreterTests/17_exception_handling.old8
+  - ./InterpreterTests/18_string_templates.old8
+  - ./InterpreterTests/19_list_comprehensions.old8
+  - ./InterpreterTests/20_type_annotations.old8
+  - ./InterpreterTests/21_type_conversion.old8
+  - ./InterpreterTests/22_scientific_notation.old8
+  - ./InterpreterTests/23_class_inheritance.old8
+  - ./InterpreterTests/24_throw_statement.old8
+  - ./InterpreterTests/25_type_annotation_restrictions_test.old8
+  - ./InterpreterTests/26_array_and_slice_operations.old8
+  - ./InterpreterTests/27_ternary_expressions.old8
+  - ./InterpreterTests/28_builtin_functions.old8
+  - ./InterpreterTests/28_generator.old8
+  - ./InterpreterTests/28_simple_generator.old8
+  - ./InterpreterTests/29_time_library.old8
+  - ./InterpreterTests/31_os_library_actual.old8
+  - ./InterpreterTests/31_os_library.old8
+  - ./InterpreterTests/32_terminal_library_actual.old8
+  - ./InterpreterTests/32_terminal_library.old8
+  - ./InterpreterTests/34_import_statements.old8
+  - ./InterpreterTests/35_import_new_syntax.old8
+  - ./InterpreterTests/35_recursive_functions.old8
+  - ./InterpreterTests/36_higher_order_functions.old8
+  - ./InterpreterTests/37_batch_import.old8
+  - ./InterpreterTests/38_complex_data_structures.old8
+  - ./InterpreterTests/39_deep_collection_equality.old8
+  - ./InterpreterTests/40_simple_uninitialized.old8
+  - ./InterpreterTests/40_uninitialized_fields.old8
+  - ./InterpreterTests/41_uninitialized_fields_outside_class.old8
+  - ./InterpreterTests/42_private_static_fields.old8
+  - ./InterpreterTests/48_new_error_types_demo.old8
+  - ./InterpreterTests/50_enhanced_error_test.old8
+  - ./InterpreterTests/53_filelib_enhanced.old8
+  - ./InterpreterTests/56_mathlib_extended.old8
+  - ./InterpreterTests/async_advanced_features.old8
+  - ./InterpreterTests/async_advanced_test.old8
+  - ./InterpreterTests/async_atomic.old8
+  - ./InterpreterTests/async_await_improvement.old8
+  - ./InterpreterTests/async_awaitasync_comprehensive_test.old8
+  - ./InterpreterTests/async_basic_execution.old8
+  - ./InterpreterTests/async_concurrent.old8
+  - ./InterpreterTests/async_debug_return_test.old8
+  - ./InterpreterTests/async_debug_test.old8
+  - ./InterpreterTests/async_mutex.old8
+  - ./InterpreterTests/async_only_return_test.old8
+  - ./InterpreterTests/async_pure_test.old8
+  - ./InterpreterTests/async_return_int_test.old8
+  - ./InterpreterTests/async_return_only_test.old8
+  - ./InterpreterTests/async_return_test.old8
+  - ./InterpreterTests/async_simple_return_test.old8
+  - ./InterpreterTests/async_simple_test.old8
+  - ./InterpreterTests/async_sleep_test.old8
+  - ./InterpreterTests/async_task_status_management.old8
+  - ./InterpreterTests/class_field_type_annotation_test.old8
+  - ./InterpreterTests/class_modifiers_test.old8
+  - ./InterpreterTests/debug_mathlib_return.old8
+  - ./InterpreterTests/generator_test.old8
+  - ./InterpreterTests/inheritance_mixin_test.old8
+  - ./InterpreterTests/mixin_test.old8
+  - ./InterpreterTests/multiple_mixin_test.old8
+  - ./InterpreterTests/parameterized_generator_test.old8
+  - ./InterpreterTests/semicolon_execution.old8
+  - ./InterpreterTests/simple_mathlib_test.old8
+  - ./InterpreterTests/simple_mixin_test.old8
+  - ./InterpreterTests/sync_return_test.old8
+  - ./InterpreterTests/test_channel.old8
+  - ./InterpreterTests/test_import_module.old8
+  - ./InterpreterTests/test_private_simple.old8
+  - ./InterpreterTests/test_protected_internal.old8
+  - ./InterpreterTests/test_standard_libraries.old8
+  - ./InterpreterTests/test_thread_basic.old8
+  - ./InterpreterTests/test_thread_comprehensive.old8
+  - ./InterpreterTests/test_thread_simple.old8
+  - ./InterpreterTests/type_conversion_enhanced.old8
+
+结束时间: 2025-12-16 02:07:01
+❌ 部分测试失败或超时

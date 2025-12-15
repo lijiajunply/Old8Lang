@@ -17,6 +17,20 @@ public class GeneratorLangValue : LangValueType, ILangList
     public FuncLangValue Func { get; init; }
 
     /// <summary>
+    /// 生成器状态机（新架构）
+    /// </summary>
+    private GeneratorStateMachine? StateMachine { get; set; }
+
+    /// <summary>
+    /// 是否使用新的状态机架构
+    /// </summary>
+    /// <remarks>
+    /// 设置为true时使用新的GeneratorStateMachine，false时使用旧的LocalState方式
+    /// 在重构过程中，这个标志用于逐步迁移和测试
+    /// </remarks>
+    private bool UseStateMachine { get; set; } = true;  // 已启用新架构
+
+    /// <summary>
     /// 生成器当前状态
     /// </summary>
     public GeneratorState State { get; set; } = GeneratorState.Suspended;
@@ -77,6 +91,63 @@ public class GeneratorLangValue : LangValueType, ILangList
     /// <param name="manager">变量管理器</param>
     /// <returns>生成器的下一个值</returns>
     public override LangValueType Run(VariateManager manager)
+    {
+        // 根据标志选择使用新架构还是旧架构
+        if (UseStateMachine)
+        {
+            return RunWithStateMachine(manager);
+        }
+        else
+        {
+            return RunLegacy(manager);
+        }
+    }
+
+    /// <summary>
+    /// 使用新的状态机架构运行生成器
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>生成器的下一个值</returns>
+    private LangValueType RunWithStateMachine(VariateManager manager)
+    {
+        // 如果状态机还未初始化，则创建它
+        if (StateMachine == null)
+        {
+            // 为生成器创建独立的变量环境
+            var generatorManager = LocalState ?? manager.CloneForGenerator();
+
+            // 设置参数值到生成器环境中
+            foreach (var (paramName, paramValue) in ParameterValues)
+            {
+                generatorManager.Set(new LangId(paramName), paramValue);
+            }
+
+            // 创建状态机
+            StateMachine = new GeneratorStateMachine(Func, generatorManager);
+        }
+
+        // 调用状态机的MoveNext
+        if (StateMachine.MoveNext())
+        {
+            // 还有更多值
+            State = GeneratorState.Suspended;
+            NextValue = StateMachine.Current;
+            return NextValue ?? new VoidLangValue();
+        }
+        else
+        {
+            // 生成器完成
+            State = GeneratorState.Completed;
+            return new VoidLangValue();
+        }
+    }
+
+    /// <summary>
+    /// 使用旧架构运行生成器（向后兼容）
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>生成器的下一个值</returns>
+    private LangValueType RunLegacy(VariateManager manager)
     {
         // 注意：我们不需要创建新的LocalState，因为它已经在FuncLangValue.Run方法中被设置好了
 
@@ -148,8 +219,17 @@ public class GeneratorLangValue : LangValueType, ILangList
     {
         State = GeneratorState.Suspended;
         ExecutionPosition = 0;
-        LocalState = null;
         NextValue = null;
+
+        // 根据使用的架构重置对应的组件
+        if (UseStateMachine)
+        {
+            StateMachine?.Reset();
+        }
+        else
+        {
+            LocalState = null;
+        }
     }
 
     /// <summary>

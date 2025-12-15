@@ -19,7 +19,7 @@ result <- await task
 PrintLine("异步函数执行完成")
 
 PrintLine("异步函数返回值类型: ")
-PrintLine(typeof(result))
+PrintLine(Type(result))
 
 PrintLine("异步函数返回值: ")
 PrintLine(result)

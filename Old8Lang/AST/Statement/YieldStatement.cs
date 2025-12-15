@@ -1,6 +1,7 @@
 using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
+using Old8Lang.Error;
 
 namespace Old8Lang.AST.Statement;
 
@@ -21,9 +22,22 @@ public class YieldStatement(LangExpression yieldExpression, SourcePosition posit
     public override void Run(VariateManager manager)
     {
         // 计算yield表达式的值
-        manager.Result = YieldExpression.Run(manager);
-        // 设置yield标志，通知生成器暂停执行
-        manager.IsYield = true;
+        var yieldValue = YieldExpression.Run(manager);
+
+        // 检查是否有生成器上下文
+        var genContext = manager.GeneratorContext;
+        if (genContext != null)
+        {
+            // 新架构：通过生成器上下文设置yield值和标志
+            genContext.CurrentValue = yieldValue;
+            genContext.HasYielded = true;
+        }
+        else
+        {
+            // 旧架构（向后兼容）：使用全局标志
+            manager.Result = yieldValue;
+            manager.IsYield = true;
+        }
     }
 
     /// <summary>

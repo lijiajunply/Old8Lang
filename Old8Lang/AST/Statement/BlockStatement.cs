@@ -53,6 +53,77 @@ public class BlockStatement : OldStatement
 
     public override void Run(VariateManager manager)
     {
+        // 检查是否有生成器上下文，决定使用新架构还是旧架构
+        if (manager.GeneratorContext != null)
+        {
+            RunWithGeneratorContext(manager);
+        }
+        else
+        {
+            RunLegacy(manager);
+        }
+    }
+
+    /// <summary>
+    /// 使用新的生成器上下文运行（新架构）
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    private void RunWithGeneratorContext(VariateManager manager)
+    {
+        var context = manager.GeneratorContext!;
+
+        // 先执行导入语句
+        ImportRun(manager);
+
+        // 从保存的位置开始执行
+        for (int i = context.CurrentStatementIndex; i < OtherStatements.Count; i++)
+        {
+            var statement = OtherStatements[i];
+            statement.Run(manager);
+
+            // 检查是否遇到yield（通过生成器上下文而非全局标志）
+            if (context.HasYielded)
+            {
+                // 保存当前位置，以便下次恢复
+                if (statement is YieldStatement)
+                {
+                    // 对于直接yield语句，保存下一个语句的位置
+                    context.CurrentStatementIndex = i + 1;
+                }
+                else if (statement is WhileStatement || statement is ForStatement || statement is ForInStatement)
+                {
+                    // 对于循环语句中的yield，保持当前语句位置
+                    context.CurrentStatementIndex = i;
+                }
+                else
+                {
+                    // 对于其他语句中的yield，保存下一个语句的位置
+                    context.CurrentStatementIndex = i + 1;
+                }
+                return;
+            }
+
+            // 检查是否遇到return或其他控制流
+            if (manager.IsReturn || context.IsCompleted)
+            {
+                // 标记生成器完成
+                context.IsCompleted = true;
+                context.CurrentStatementIndex = 0;
+                return;
+            }
+        }
+
+        // 执行完毕，标记为完成
+        context.IsCompleted = true;
+        context.CurrentStatementIndex = 0;
+    }
+
+    /// <summary>
+    /// 使用旧架构运行（向后兼容）
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    private void RunLegacy(VariateManager manager)
+    {
         // 先执行 ImportStatements 列表中的语句，包括 ClassInit 和 FuncInit 语句
         // 这样，当执行 OtherStatements 列表中的语句时，类和函数已经被添加到 ImportInfos 中了
         ImportRun(manager);

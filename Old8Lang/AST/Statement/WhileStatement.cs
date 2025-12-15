@@ -14,6 +14,95 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
 {
     public override void Run(VariateManager manager)
     {
+        // 检查是否使用新的生成器架构
+        if (manager.GeneratorContext != null)
+        {
+            // 新架构：标准 while 循环，生成器断点由 BlockStatement 处理
+            RunWithGeneratorContext(manager);
+        }
+        else
+        {
+            // 旧架构：根据 IsInGenerator 标志决定执行模式
+            RunLegacy(manager);
+        }
+    }
+
+    /// <summary>
+    /// 使用新架构运行（标准 while 循环）
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    /// <remarks>
+    /// 新架构下，生成器的断点恢复完全由 BlockStatement 的 GeneratorContext 处理
+    /// WhileStatement 只需要实现标准的 while 循环逻辑即可
+    /// </remarks>
+    private void RunWithGeneratorContext(VariateManager manager)
+    {
+        // 压入新的控制流状态
+        manager.ControlFlowManager.PushState();
+
+        try
+        {
+            // 标准 while 循环
+            while (true)
+            {
+                // 在每次循环迭代开始时重置控制流标志
+                manager.ControlFlowManager.ResetCurrentState();
+
+                // 获取条件表达式的值
+                var value = expression.Run(manager);
+                if (value is not BoolLangValue varBool)
+                {
+                    throw new TypeError(this, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
+                }
+
+                bool conditionResult = varBool.Value;
+                varBool.ReturnToPool();
+
+                // 如果条件为 false，退出循环
+                if (!conditionResult)
+                {
+                    break;
+                }
+
+                // 执行循环体
+                blockStatement.Run(manager);
+
+                // 检查是否遇到 yield（通过 GeneratorContext）
+                if (manager.GeneratorContext!.HasYielded)
+                {
+                    // 遇到 yield，立即返回以暂停执行
+                    // BlockStatement 已经保存了执行位置
+                    return;
+                }
+
+                // 处理 break
+                if (manager.ControlFlowManager.BreakFlag)
+                {
+                    manager.ControlFlowManager.BreakFlag = false;
+                    break;
+                }
+
+                // 处理 continue
+                if (manager.ControlFlowManager.ContinueFlag)
+                {
+                    manager.ControlFlowManager.ContinueFlag = false;
+                    continue;
+                }
+            }
+        }
+        finally
+        {
+            // 弹出当前控制流状态
+            manager.ControlFlowManager.PopState();
+        }
+    }
+
+    /// <summary>
+    /// 使用旧架构运行（向后兼容）
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    private void RunLegacy(VariateManager manager)
+    {
         // 压入新的控制流状态
         manager.ControlFlowManager.PushState();
 

@@ -15,19 +15,19 @@ async func task2() {
     return 2
 }
 
-var result1 = await Task.WhenAll([task1(), task2()])
+result1 <- await Task.WhenAll([task1(), task2()])
 print("WhenAll 结果: " + result1)
 
 // 测试2: 任务组合方法 - WhenAny
 print("\n=== 测试2: 任务组合方法 - WhenAny ===")
 
-var result2 = await Task.WhenAny([task1(), task2()])
+result2 <- await Task.WhenAny([task1(), task2()])
 print("WhenAny 结果: " + result2)
 
 // 测试3: 任务组合方法 - Then
 print("\n=== 测试3: 任务组合方法 - Then ===")
 
-var result3 = await task1().Then((res) => {
+result3 <- await task1().Then((res) -> {
     print("前一个任务结果: " + res)
     return task2()
 })
@@ -37,7 +37,7 @@ print("Then 结果: " + result3)
 print("\n=== 测试4: 任务组合方法 - WithTimeout ===")
 
 try {
-    var result4 = await task1().WithTimeout(150)
+    result4 <- await task1().WithTimeout(150)
     print("WithTimeout 成功结果: " + result4)
 } catch (e) {
     print("WithTimeout 超时异常")
@@ -46,10 +46,10 @@ try {
 // 测试5: 任务组合方法 - Retry
 print("\n=== 测试5: 任务组合方法 - Retry ===")
 
-var retryCount = 0
+retryCount <- 0
 
 async func flakyTask() {
-    retryCount = retryCount + 1
+    retryCount <- retryCount + 1
     print("重试次数: " + retryCount)
     if retryCount < 3 {
         throw new Error("任务失败，需要重试")
@@ -57,22 +57,22 @@ async func flakyTask() {
     return "重试成功"
 }
 
-var result5 = await flakyTask().Retry(3, 200)
+result5 <- await flakyTask().Retry(3, 200)
 print("Retry 结果: " + result5)
 
 // 测试6: 任务取消机制
 print("\n=== 测试6: 任务取消机制 ===")
 
 // 测试创建取消令牌源
-var ctsId = Async.CreateCancellationTokenSource()
+ctsId <- CreateCancellationTokenSource()
 print("取消令牌源创建成功")
 
 // 测试延迟取消
-Async.Sleep(100)
-Async.CancelAfter(ctsId, 200)
+Sleep(100)
+CancelAfter(ctsId, 200)
 print("已设置延迟取消")
 
-Async.Sleep(300)
+Sleep(300)
 print("取消已执行")
 
 print("\n所有测试完成!")

@@ -158,6 +158,16 @@ public class VariateManager
     public bool IsInGenerator { get; set; } = false;
 
     /// <summary>
+    /// 生成器执行上下文（仅在生成器执行时存在）
+    /// 替代全局的IsYield标志，每个生成器实例都有独立的上下文
+    /// </summary>
+    /// <remarks>
+    /// 当此属性不为null时，表示当前正在执行生成器函数
+    /// 生成器的状态信息（如yield点、当前值等）都保存在此上下文中
+    /// </remarks>
+    public GeneratorExecutionContext? GeneratorContext { get; set; }
+
+    /// <summary>
     /// 最大递归深度限制，防止栈溢出
     /// </summary>
     private const int MaxRecursionDepth = 1000;
@@ -615,5 +625,47 @@ public class VariateManager
         }
 
         return captured;
+    }
+
+    /// <summary>
+    /// 为生成器创建独立的变量管理器（深拷贝）
+    /// </summary>
+    /// <returns>包含独立作用域副本和生成器上下文的新VariateManager</returns>
+    /// <remarks>
+    /// 与闭包的浅拷贝不同，生成器需要独立的变量副本以避免多个生成器实例互相干扰
+    /// 每个生成器实例都有自己的：
+    /// - 独立的作用域栈副本（深拷贝）
+    /// - 独立的GeneratorExecutionContext
+    /// - 共享的导入信息（函数、类定义等）
+    /// </remarks>
+    public VariateManager CloneForGenerator()
+    {
+        var generatorManager = new VariateManager
+        {
+            LangInfo = this.LangInfo,
+            Path = this.Path,
+            Interpreter = this.Interpreter,
+            // 创建生成器专用的执行上下文
+            GeneratorContext = new GeneratorExecutionContext()
+        };
+
+        // 深拷贝作用域栈（生成器需要独立副本）
+        generatorManager.Scopes.Clear(); // 清除构造函数创建的初始作用域
+        foreach (var scope in Scopes)
+        {
+            var newScope = new Dictionary<string, LangValueType>(scope);
+            generatorManager.Scopes.Add(newScope);
+        }
+
+        // 复制导入信息（线程安全）
+        lock (ImportInfosLock)
+        {
+            lock (generatorManager.ImportInfosLock)
+            {
+                generatorManager.ImportInfosList.AddRange(ImportInfosList);
+            }
+        }
+
+        return generatorManager;
     }
 }
