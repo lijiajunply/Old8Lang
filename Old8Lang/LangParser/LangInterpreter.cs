@@ -1,4 +1,6 @@
 using Old8Lang.AST.Statement;
+using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 
 namespace Old8Lang.LangParser;
@@ -39,6 +41,9 @@ public class LangInterpreter
     {
         Manager.Interpreter = this;
         Manager.LangInfo ??= Apis.ReadJson();
+
+        // 注册全局 Task 对象
+        Manager.Set(new LangId("Task"), TaskClassLangValue.GetInstance());
     }
 
     /// <summary>

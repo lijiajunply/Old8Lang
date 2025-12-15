@@ -252,6 +252,22 @@ public class Operation(
                     throw new InvalidOperationError(this, $"数组索引必须是整数类型，当前为 '{arrayIndexResult.GetType().Name}'");
                 }
             }
+            else if (dotLeftResult is TaskClassLangValue taskClassValue)
+            {
+                if (Right is Instance instance)
+                {
+                    // 设置外部管理器，确保能访问最新的外部变量
+                    taskClassValue.ExternalManager = manager;
+                    return taskClassValue.Dot(instance);
+                }
+
+                if (Right != null)
+                {
+                    // 设置外部管理器，确保能访问最新的外部变量
+                    taskClassValue.ExternalManager = manager;
+                    return taskClassValue.Dot(Right);
+                }
+            }
             else if (dotLeftResult != null! && Right != null)
             {
                 return dotLeftResult.Dot(Right);

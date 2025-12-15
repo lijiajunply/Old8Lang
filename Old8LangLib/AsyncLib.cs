@@ -523,7 +523,7 @@ public static class AsyncLib
     /// <param name="channelId">Channel ID</param>
     public static void ChannelDispose(int channelId)
     {
-        if (Channels.TryRemove(channelId, out var channel))
+        if (Channels.TryRemove(channelId, out _))
         {
             // Channel 会自动释放资源，无需手动 Dispose
         }

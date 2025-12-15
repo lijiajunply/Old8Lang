@@ -316,6 +316,13 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 var closedAsyncFunc = (AsyncFuncLangValue)asyncFuncValue.Run(manager);
                 result = closedAsyncFunc.RunAsync(manager, Ids);
             }
+            // 如果idResult是TaskStaticMethodWrapper，则调用它
+            else if (idResult is TaskStaticMethodWrapper taskMethodWrapper)
+            {
+                // 执行静态方法
+                var args = Ids.Select(id => id.Run(manager)).ToList();
+                result = taskMethodWrapper.Invoke(args, Position);
+            }
         }
 
         // 原来的AnyLangValue处理逻辑，用于兼容旧代码

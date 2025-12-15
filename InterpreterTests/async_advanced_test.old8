@@ -14,26 +14,17 @@ async func task2() {
     return 2
 }
 
-// 测试 WhenAll - 由于 Task 类未暴露到 Old8Lang,暂时注释
-// printTask <- Task.WhenAll([task1(), task2()])
-// result1 <- await printTask
-// PrintLine("WhenAll 结果: " + result1)
-
-// 替代方案:分别等待各个任务
-t1 <- task1()
-t2 <- task2()
-result1a <- await t1
-result1b <- await t2
-PrintLine("任务1结果: " + result1a.ToStr())
-PrintLine("任务2结果: " + result1b.ToStr())
+// 测试 WhenAll
+printTask <- Task.WhenAll([task1(), task2()])
+result1 <- await printTask
+PrintLine("WhenAll 结果: " + result1.ToStr())
 
 // 测试任务组合方法 - WhenAny
 PrintLine("\n=== 测试2: 任务组合方法 - WhenAny ===")
 
-// anyTask <- Task.WhenAny([task1(), task2()])
-// result2 <- await anyTask
-// PrintLine("WhenAny 结果: " + result2)
-PrintLine("WhenAny 方法暂不可用(Task类未暴露)")
+anyTask <- Task.WhenAny([task1(), task2()])
+result2 <- await anyTask
+PrintLine("WhenAny 结果: " + result2.ToStr())
 
 // 测试5: 任务组合方法 - Retry
 PrintLine("\n=== 测试3: 任务组合方法 - Retry ===")
@@ -49,8 +40,8 @@ async func flakyTask() {
     return "重试成功"
 }
 
-// Retry 方法也可能不可用,先测试是否能运行
-PrintLine("Retry 方法测试(可能失败)")
+// Retry 方法目前还不可用
+PrintLine("Retry 方法暂不可用")
 // retryTask <- flakyTask().Retry(3, 200)
 // result5 <- await retryTask
 // PrintLine("Retry 结果: " + result5)
