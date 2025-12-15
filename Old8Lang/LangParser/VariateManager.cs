@@ -107,9 +107,14 @@ public class VariateManager
     #region Return
 
     /// <summary>
-    /// 是否处于返回状态
+    /// 标记是否是return状态
     /// </summary>
     public bool IsReturn { get; set; }
+
+    /// <summary>
+    /// 标记是否是yield状态
+    /// </summary>
+    public bool IsYield { get; set; }
 
     /// <summary>
     /// 返回结果值
@@ -369,6 +374,7 @@ public class VariateManager
     public void ClearReturn()
     {
         IsReturn = false;
+        IsYield = false;
         Result = new VoidLangValue();
     }
 
@@ -402,6 +408,7 @@ public class VariateManager
             IsFunc = IsFunc,
             IsClass = IsClass,
             IsReturn = IsReturn,
+            IsYield = IsYield,
             Result = Result
         };
 

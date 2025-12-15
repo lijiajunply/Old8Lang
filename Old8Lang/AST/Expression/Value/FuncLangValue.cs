@@ -1,6 +1,7 @@
 using Old8Lang.LangParser;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Linq;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
@@ -51,25 +52,117 @@ public class FuncLangValue : ImportInfo
         IsLambda = false; // 原生方法不是Lambda表达式
     }
 
+    /// <summary>
+    /// 检查函数是否是生成器函数（包含yield语句）
+    /// </summary>
+    public bool IsGenerator => ContainsYieldStatement(BlockStatement);
+
+    /// <summary>
+    /// 递归检查语句是否包含yield语句
+    /// </summary>
+    private bool ContainsYieldStatement(OldStatement stmt)
+    {
+        if (stmt is YieldStatement)
+            return true;
+        
+        // 检查块语句中的子语句
+        for (int i = 0; i < stmt.Count; i++)
+        {
+            var child = stmt[i];
+            if (child != null && ContainsYieldStatement(child))
+                return true;
+        }
+        
+        return false;
+    }
+
     public override LangValueType Run(VariateManager manager)
     {
         // 如果这个函数没有方法引用（即是 Old8Lang 函数而非原生方法）
-            // 创建一个新的 FuncLangValue 副本，并捕获当前作用域
-            // 这样每次返回函数时都会捕获各自的作用域，支持闭包
-            if (Method == null && Ids != null)
+        if (Method == null && Ids != null)
+        {
+            // 对于生成器函数，我们需要特殊处理
+            if (ContainsYieldStatement(BlockStatement))
             {
-                var closureFunc = new FuncLangValue(Id, Ids, BlockStatement, Position, IsLambda)
+                // 检查是否有参数需要处理
+                if (Ids.Count > 0)
+                {
+                    // 对于生成器函数，我们需要创建一个闭包，捕获当前作用域
+                    var generatorClosure = new FuncLangValue(Id, Ids, BlockStatement, Position, IsLambda)
+                    {
+                        // 使用浅拷贝快照捕获作用域
+                        // 复制作用域结构但共享值对象，性能优于深拷贝
+                        CapturedScope = manager.CaptureForClosure()
+                    };
+                    
+                    return new GeneratorLangValue(generatorClosure, Position);
+                }
+                
+                // 没有参数的生成器函数
+                var noParamClosure = new FuncLangValue(Id, Ids, BlockStatement, Position, IsLambda)
                 {
                     // 使用浅拷贝快照捕获作用域
-                    // 复制作用域结构但共享值对象，性能优于深拷贝
                     CapturedScope = manager.CaptureForClosure()
                 };
-                return closureFunc;
+                
+                return new GeneratorLangValue(noParamClosure, Position);
             }
+            
+            var closureFunc = new FuncLangValue(Id, Ids, BlockStatement, Position, IsLambda)
+            {
+                // 使用浅拷贝快照捕获作用域
+                // 复制作用域结构但共享值对象，性能优于深拷贝
+                CapturedScope = manager.CaptureForClosure()
+            };
+            
+            return closureFunc;
+        }
 
         // 原生方法或其他情况直接返回自身
         return this;
     }
+    
+    /// <summary>
+    /// 执行生成器函数，返回下一个值
+    /// </summary>
+    /// <param name="variateManagerFunc">变量管理器</param>
+    /// <param name="ids">参数列表</param>
+    /// <param name="obj">对象实例</param>
+    /// <returns>生成器的下一个值</returns>
+    public LangValueType RunGenerator(VariateManager variateManagerFunc, List<LangExpression> ids, object? obj = null)
+    {
+        // 创建一个新的变量管理器来执行生成器
+        var generatorManager = new VariateManager
+        {
+            LangInfo = variateManagerFunc.LangInfo,
+            Path = variateManagerFunc.Path,
+            Interpreter = variateManagerFunc.Interpreter,
+            IsFunc = true
+        };
+        
+        // 处理参数
+        if (Ids != null && Ids.Count != 0)
+        {
+            // 计算所有传入参数的值
+            var paramValues = ids.Select(t => t.Run(variateManagerFunc)).ToList();
+            
+            // 设置参数值到生成器的变量管理器
+            for (var i = 0; i < Ids.Count; i++)
+            {
+                if (i < paramValues.Count)
+                {
+                    generatorManager.Set(Ids[i], paramValues[i]);
+                }
+            }
+        }
+        
+        // 运行函数体
+        BlockStatement.Run(generatorManager);
+        
+        return generatorManager.Result;
+    }
+    
+
 
     public LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> ids, object? obj = null)
     {
@@ -175,6 +268,69 @@ public class FuncLangValue : ImportInfo
                 throw new ArgumentError(Position,
                     $"函数 '{Id?.IdName}' 期望最多 {expectedParams} 个参数，但实际提供了 {actualParams} 个参数");
             }
+        }
+
+        // 检查是否是生成器函数
+        if (IsGenerator)
+        {
+            // 对于生成器函数，我们需要特殊处理
+            // 生成器函数在调用时，应该返回一个GeneratorLangValue对象
+            // 这个对象包含了生成器函数的引用和调用时的参数值
+            
+            // 计算所有传入参数的值，使用外部变量管理器
+            var paramValues = ids.Select(t => t.Run(variateManagerFunc)).ToList();
+            
+            // 创建一个新的VariateManager，用于生成器的执行
+            // 这个VariateManager将作为生成器函数的执行环境
+            var generatorEnv = new VariateManager
+            {
+                LangInfo = variateManagerFunc.LangInfo,
+                Path = variateManagerFunc.Path,
+                Interpreter = variateManagerFunc.Interpreter,
+                IsFunc = true
+            };
+            
+            // 将参数值设置到生成器环境中
+            if (Ids != null && Ids.Count > 0)
+            {
+                // 处理默认参数，补全缺失的参数值
+                for (var i = paramValues.Count; i < Ids.Count; i++)
+                {
+                    var id = Ids[i];
+                    if (id.DefaultValue != null)
+                    {
+                        // 计算默认值
+                        var defaultValue = id.DefaultValue.Run(variateManagerFunc);
+                        paramValues.Add(defaultValue);
+                    }
+                    else
+                    {
+                        // 没有默认参数且没有传入参数，抛出错误
+                        throw new ArgumentError(Position,
+                            $"函数 '{Id?.IdName}' 的参数 '{id.IdName}' 缺少实参且没有默认值");
+                    }
+                }
+                
+                // 将参数值设置到生成器环境中
+                for (var i = 0; i < Ids.Count; i++)
+                {
+                    var paramId = Ids[i];
+                    var paramValue = paramValues[i];
+                    generatorEnv.Set(paramId, paramValue);
+                }
+            }
+            
+            // 注意：我们不需要创建新的闭包函数，因为我们已经将参数值
+            // 设置到了生成器环境中，生成器函数可以直接使用这个环境
+            
+            // 对于生成器函数，返回GeneratorLangValue对象，而不是直接执行
+            var generator = new GeneratorLangValue(this, Position)
+            {
+                // 将生成器环境设置为LocalState，这样生成器函数就可以访问到参数值
+                LocalState = generatorEnv
+            };
+            
+            return generator;
         }
 
         // 调用方法体

@@ -1,0 +1,29 @@
+// 生成器函数测试
+func generator() {
+    yield 1
+    yield 2
+    yield 3
+}
+
+// 调用生成器函数，返回生成器对象
+gen <- generator()
+
+// 手动迭代生成器
+result1 <- gen()
+result2 <- gen()
+result3 <- gen()
+result4 <- gen()
+
+PrintLine("手动迭代结果：")
+PrintLine(result1)
+PrintLine(result2)
+PrintLine(result3)
+PrintLine(result4)
+
+// 重置生成器并使用for...in循环迭代
+gen2 <- generator()
+
+PrintLine("\nfor...in循环结果：")
+for item in gen2 {
+    PrintLine(item)
+}

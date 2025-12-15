@@ -23,9 +23,12 @@ statement = lrBlock
           | breakStatement
           | continueStatement
           | tryStatement
-          | throwStatement ;
+          | throwStatement
+          | yieldStatement ;
 
 throwStatement = "throw" expression ;
+
+yieldStatement = "yield" expression ;
 
 lrBlock = "(" statement ")" ;
 

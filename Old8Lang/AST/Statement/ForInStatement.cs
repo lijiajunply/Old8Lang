@@ -32,49 +32,94 @@ public class ForInStatement(
         try
         {
             var value = expression.Run(manager);
-            if (value is not ILangList oldList)
-                throw new TypeError(this, "IOldList", value.GetType().Name);
-
-            foreach (var idValue in oldList.GetItems())
+            
+            // 处理生成器对象
+            if (value is GeneratorLangValue generator)
             {
-                // 在每次循环迭代开始时重置控制流标志
-                manager.ControlFlowManager.ResetCurrentState();
-                
-                if (AllIds.Count == 1)
+                // 生成器迭代逻辑
+                while (true)
                 {
-                    // 单个标识符的情况，保持原有行为
-                    manager.Set(id, idValue);
-                }
-                else
-                {
-                    // 多个标识符的情况，处理键值对
-                    if (idValue is TupleLangValue tupleValue)
+                    // 在每次循环迭代开始时重置控制流标志
+                    manager.ControlFlowManager.ResetCurrentState();
+                    
+                    // 运行生成器，获取下一个值
+                    var nextValue = generator.Run(manager);
+                    
+                    // 检查生成器是否已完成
+                    if (generator.State == GeneratorLangValue.GeneratorState.Completed)
                     {
-                        // 运行元组，获取实际值
-                        tupleValue.Run(manager);
-
-                        // 字典键值对，赋值给多个标识符
-                        var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
-
-                        for (int i = 0; i < AllIds.Count && i < values.Count; i++)
-                        {
-                            manager.Set(AllIds[i], values[i]);
-                        }
+                        break;
+                    }
+                    
+                    // 赋值给标识符
+                    if (AllIds.Count == 1)
+                    {
+                        manager.Set(id, nextValue);
                     }
                     else
                     {
-                        // 不是键值对，只赋值给第一个标识符
-                        manager.Set(id, idValue);
+                        // 多个标识符的情况，只赋值给第一个
+                        manager.Set(id, nextValue);
+                    }
+                    
+                    // 执行循环体
+                    body.Run(manager);
+                    
+                    // 处理break
+                    if (manager.ControlFlowManager.BreakFlag)
+                    {
+                        break;
                     }
                 }
-
-                body.Run(manager);
-                
-                // 处理break
-                if (manager.ControlFlowManager.BreakFlag)
+            }
+            // 处理普通列表对象
+            else if (value is ILangList oldList)
+            {
+                foreach (var idValue in oldList.GetItems())
                 {
-                    break;
+                    // 在每次循环迭代开始时重置控制流标志
+                    manager.ControlFlowManager.ResetCurrentState();
+                    
+                    if (AllIds.Count == 1)
+                    {
+                        // 单个标识符的情况，保持原有行为
+                        manager.Set(id, idValue);
+                    }
+                    else
+                    {
+                        // 多个标识符的情况，处理键值对
+                        if (idValue is TupleLangValue tupleValue)
+                        {
+                            // 运行元组，获取实际值
+                            tupleValue.Run(manager);
+
+                            // 字典键值对，赋值给多个标识符
+                            var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+
+                            for (int i = 0; i < AllIds.Count && i < values.Count; i++)
+                            {
+                                manager.Set(AllIds[i], values[i]);
+                            }
+                        }
+                        else
+                        {
+                            // 不是键值对，只赋值给第一个标识符
+                            manager.Set(id, idValue);
+                        }
+                    }
+
+                    body.Run(manager);
+                    
+                    // 处理break
+                    if (manager.ControlFlowManager.BreakFlag)
+                    {
+                        break;
+                    }
                 }
+            }
+            else
+            {
+                throw new TypeError(this, "IOldList或GeneratorLangValue", value.GetType().Name);
             }
         }
         finally

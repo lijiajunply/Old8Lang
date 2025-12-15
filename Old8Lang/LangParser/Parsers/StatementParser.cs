@@ -154,6 +154,12 @@ public class StatementParser(
             return ParseReturnStatement();
         }
 
+        // 处理yield语句：yield expression
+        if (CurrentToken.Type == LangTokenType.Yield)
+        {
+            return ParseYieldStatement();
+        }
+
         // 处理native语句：native "dll" class method
         if (CurrentToken.Type == LangTokenType.Native)
         {
@@ -489,6 +495,20 @@ public class StatementParser(
         var position = new SourcePosition(continueToken.Line, continueToken.Column, tokenValue: continueToken.Value);
         Expect(LangTokenType.Continue);
         return new ContinueStatement(position);
+    }
+
+    /// <summary>
+    /// 解析yield语句：yield expression
+    /// </summary>
+    public YieldStatement ParseYieldStatement()
+    {
+        var yieldToken = CurrentToken;
+        var position = new SourcePosition(yieldToken.Line, yieldToken.Column, tokenValue: yieldToken.Value);
+        Expect(LangTokenType.Yield);
+
+        // 解析yield表达式
+        var expression = expressionParser.ParseExpression();
+        return new YieldStatement(expression, position);
     }
 
     public ThrowStatement ParseThrowStatement()

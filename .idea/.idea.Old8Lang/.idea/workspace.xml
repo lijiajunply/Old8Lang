@@ -17,7 +17,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.trae/documents/支持生成器语法.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/28_generator.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/generator_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/GeneratorLangValue.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/YieldStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.ebnf" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.ebnf" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -99,38 +111,38 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
-    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
-    ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Run",
-    ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
-    "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.Benchmarks.executor&quot;: &quot;Run&quot;,
+    &quot;07d79105-db56-470d-b872-543f396b1133.executor&quot;: &quot;Debug&quot;,
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;e9de5ea7-95aa-45c5-91d2-c46acccab710.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "PLAIN_TEXT",
-      "Markdown"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;PLAIN_TEXT&quot;,
+      &quot;Markdown&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
@@ -384,6 +396,7 @@
       <workItem from="1765720320753" duration="2106000" />
       <workItem from="1765734191994" duration="8791000" />
       <workItem from="1765776532895" duration="4492000" />
+      <workItem from="1765791344254" duration="676000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -787,7 +800,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs</url>
-          <line>45</line>
+          <line>62</line>
           <properties documentPath="C:\Projects\RiderProjects\Old8Lang\Old8Lang\AST\Statement\FuncRunStatement.cs" containingFunctionPresentation="方法 'ToString'" />
           <option name="timeStamp" value="444" />
         </line-breakpoint>

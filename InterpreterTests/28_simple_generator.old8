@@ -1,0 +1,14 @@
+// 简单生成器测试
+
+// 定义一个简单的生成器函数，生成1到3的整数
+func simple_range() {
+    yield 1
+    yield 2
+    yield 3
+}
+
+// 测试简单生成器
+PrintLine("简单生成器测试：")
+for num in simple_range() {
+    PrintLine(num)
+}
