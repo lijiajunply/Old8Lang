@@ -41,6 +41,12 @@ public class TaskLangValue : LangValueType
     private readonly Lock Lock = new();
 
     /// <summary>
+    /// 外部变量管理器，用于访问外部作用域和Interpreter
+    /// 类似于AnyLangValue的ExternalManager
+    /// </summary>
+    public VariateManager? ExternalManager { get; set; }
+
+    /// <summary>
     /// 获取任务结果（如果已完成）
     /// </summary>
     public LangValueType? Result => _result;
@@ -339,11 +345,11 @@ public class TaskLangValue : LangValueType
     public override LangValueType Run(VariateManager manager) => this;
 
     /// <summary>
-    /// Dot 方法：支持属性访问
+    /// Dot 方法：支持属性访问和方法调用
     /// </summary>
     /// <remarks>
-    /// 注意：Then 和 Retry 方法的调用已经在 Operation.cs 中直接处理，
-    /// 因为它们需要访问 manager（包含 Interpreter）来正确执行 Lambda 函数
+    /// Then 方法通过扩展方法实现（在 FuncStatic.cs 中），通过 ExternalManager 访问 Interpreter
+    /// Retry 方法在 Operation.cs 中特殊处理，因为需要重新执行原始函数调用
     /// </remarks>
     public override LangValueType Dot(LangExpression dotExpression)
     {
@@ -358,6 +364,13 @@ public class TaskLangValue : LangValueType
                 "Status" => new StringLangValue(Status.ToString(), Position),
                 _ => throw new AttributeError(dotExpression.Position, propertyName, "Task")
             };
+        }
+
+        // 处理方法调用（Instance）
+        if (dotExpression is Instance instance)
+        {
+            // 调用扩展方法（在 Instance.FromClassToResult 中处理）
+            return instance.FromClassToResult(this);
         }
 
         // 其他情况使用基类实现

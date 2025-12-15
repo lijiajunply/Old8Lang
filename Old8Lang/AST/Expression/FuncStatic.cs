@@ -548,18 +548,20 @@ public static class TaskValueFuncStatic
         /// <returns>新的 TaskLangValue</returns>
         public TaskLangValue Then(FuncLangValue continuation)
         {
+            if (task.ExternalManager == null)
+            {
+                throw new InvalidOperationError(task.Position, "Then 方法需要有效的执行上下文（ExternalManager）");
+            }
+
+            var manager = task.ExternalManager;
+
             return task.Then(result =>
             {
-                // 创建一个新的 VariateManager 来执行 continuation 函数
-                var manager = new VariateManager();
-
-                // 首先调用 Run(manager) 来捕获闭包
+                // 使用 ExternalManager（它有有效的 Interpreter）
                 var closedFunc = continuation.Run(manager);
-
-                // 如果返回的是函数（即闭包函数），使用它
-                if (closedFunc is FuncLangValue funcValue)
+                if (closedFunc is FuncLangValue closedFuncValue)
                 {
-                    continuation = funcValue;
+                    continuation = closedFuncValue;
                 }
 
                 // 现在调用带参数的 Run 方法
@@ -570,20 +572,24 @@ public static class TaskValueFuncStatic
                 {
                     return taskValue;
                 }
-                throw new TypeError(task, "Then 的 continuation 函数必须返回一个 Task");
+                throw new InvalidOperationError(task.Position, "Then 的 continuation 函数必须返回一个 Task");
             }, task.Position);
         }
 
         /// <summary>
         /// 实现任务重试机制
+        /// 注意：Retry 需要原始函数调用表达式，因此在 Operation.cs 中特殊处理
+        /// 这里只是占位符，实际实现在 Operation.cs 中
         /// </summary>
         /// <param name="retryCount">最大重试次数</param>
         /// <param name="delayMs">重试之间的延迟（毫秒）</param>
         /// <returns>带重试机制的 TaskLangValue</returns>
         public TaskLangValue Retry(IntLangValue retryCount, IntLangValue? delayMs = null)
         {
-            var delay = delayMs?.Value ?? 0;
-            return task.Retry(retryCount.Value, delay, task.Position);
+            // Retry 方法的实际实现在 Operation.cs 中，因为需要重新执行原始函数调用
+            // 这里抛出错误提示用户
+            throw new InvalidOperationError(task.Position,
+                "Retry 方法需要在函数调用上使用（如 func().Retry(3, 100)），内部实现已在 Operation.cs 中处理");
         }
     }
 }

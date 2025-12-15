@@ -18,7 +18,7 @@ namespace Old8Lang.AST.Expression;
 /// <remarks>
 /// 该类是Old8Lang表达式系统的核心组件，用于表示各种运算符和操作，包括：
 /// - 算术运算符：+, -, *, /, %, ^
-/// - 比较运算符：>, <, ==, !=, <=, >=
+/// - 比较运算符：>, &lt;, ==, !=, &gt;=, >=
 /// - 逻辑运算符：&&, ||, ^
 /// - 点运算符：.
 /// - 类型转换运算符：as
@@ -83,22 +83,22 @@ public class Operation(
     /// </summary>
     /// <returns>操作的字符串表示</returns>
     public override string ToString() => $"{Left}{OperaToString()}{Right}";
-    
+
     /// <summary>
     /// 操作的输出类型缓存
     /// </summary>
     private Type? Type { get; set; }
-    
+
     /// <summary>
     /// 左操作数
     /// </summary>
     public LangExpression? Left { get; } = left;
-    
+
     /// <summary>
     /// 右操作数
     /// </summary>
     public LangExpression? Right { get; } = right;
-    
+
     /// <summary>
     /// 运算符类型
     /// </summary>
@@ -270,127 +270,86 @@ public class Operation(
             }
             else if (dotLeftResult is TaskLangValue taskValue)
             {
+                // 设置外部管理器，确保 Then 等方法能访问有效的 Interpreter
+                taskValue.ExternalManager = manager;
+
                 if (Right is Instance instance)
                 {
-                    // 特殊处理 Then 和 Retry 方法，直接在这里调用以传递 manager
-                    switch (instance.Id.IdName)
+                    // Retry 方法需要特殊处理，因为需要重新执行原始函数调用
+                    if (instance.Id.IdName == "Retry")
                     {
-                        case "Then":
+                        if (instance.Ids.Count < 1 || instance.Ids.Count > 2)
                         {
-                            if (instance.Ids.Count != 1)
-                            {
-                                throw new ArgumentError(instance.Position, $"Then 方法需要 1 个参数，实际提供了 {instance.Ids.Count} 个");
-                            }
-
-                            var continuation = instance.Ids[0].Run(manager);
-                            if (continuation is not FuncLangValue funcValue)
-                            {
-                                throw new TypeError(instance, "Then 的参数必须是一个函数");
-                            }
-
-                            // 调用 TaskLangValue 的 Then 方法，传入包装了 manager 的 continuation
-                            return taskValue.Then(result =>
-                            {
-                                // 使用传入的 manager（它有有效的 Interpreter）
-                                var closedFunc = funcValue.Run(manager);
-                                if (closedFunc is FuncLangValue closedFuncValue)
-                                {
-                                    funcValue = closedFuncValue;
-                                }
-
-                                var args = new List<LangExpression> { result };
-                                var nextTaskResult = funcValue.Run(manager, args);
-
-                                if (nextTaskResult is TaskLangValue nextTask)
-                                {
-                                    return nextTask;
-                                }
-                                throw new TypeError(instance, "Then 的 continuation 函数必须返回一个 Task");
-                            }, instance.Position);
+                            throw new ArgumentError(instance.Position,
+                                $"Retry 方法需要 1-2 个参数，实际提供了 {instance.Ids.Count} 个");
                         }
 
-                        case "Retry":
+                        var retryCountValue = instance.Ids[0].Run(manager);
+                        if (retryCountValue is not IntLangValue retryCount)
                         {
-                            if (instance.Ids.Count < 1 || instance.Ids.Count > 2)
-                            {
-                                throw new ArgumentError(instance.Position, $"Retry 方法需要 1-2 个参数，实际提供了 {instance.Ids.Count} 个");
-                            }
+                            throw new TypeError(instance, "Retry 的第一个参数必须是整数");
+                        }
 
-                            var retryCountValue = instance.Ids[0].Run(manager);
-                            if (retryCountValue is not IntLangValue retryCount)
+                        var delayMs = 0;
+                        if (instance.Ids.Count == 2)
+                        {
+                            var delayValue = instance.Ids[1].Run(manager);
+                            if (delayValue is IntLangValue delayInt)
                             {
-                                throw new TypeError(instance, "Retry 的第一个参数必须是整数");
+                                delayMs = delayInt.Value;
                             }
-
-                            var delayMs = 0;
-                            if (instance.Ids.Count == 2)
+                            else
                             {
-                                var delayValue = instance.Ids[1].Run(manager);
-                                if (delayValue is IntLangValue delayInt)
+                                throw new TypeError(instance, "Retry 的第二个参数必须是整数");
+                            }
+                        }
+
+                        // Retry 需要重新执行原始函数，而不是重试同一个 Task 对象
+                        if (Left is not Instance funcCall)
+                        {
+                            throw new InvalidOperationError(instance, "Retry 只能用于异步函数调用（如 func().Retry(...)）");
+                        }
+
+                        // 创建一个包装的 Task，在其中实现重试逻辑
+                        var retryTask = Task.Run(async () =>
+                        {
+                            Exception? lastException = null;
+
+                            for (int i = 0; i <= retryCount.Value; i++)
+                            {
+                                try
                                 {
-                                    delayMs = delayInt.Value;
-                                }
-                                else
-                                {
-                                    throw new TypeError(instance, "Retry 的第二个参数必须是整数");
-                                }
-                            }
-
-                            // Retry 需要重新执行原始函数，而不是重试同一个 Task 对象
-                            // 因此我们需要找到创建 Task 的表达式并重新执行它
-                            // Left 应该是一个函数调用表达式（如 flakyTask()）
-
-                            if (Left is not Instance funcCall)
-                            {
-                                throw new InvalidOperationError(instance, "Retry 只能用于异步函数调用（如 func().Retry(...)）");
-                            }
-
-                            // 创建一个包装的 Task，在其中实现重试逻辑
-                            var retryTask = System.Threading.Tasks.Task.Run(async () =>
-                            {
-                                Exception? lastException = null;
-
-                                for (int i = 0; i <= retryCount.Value; i++)
-                                {
-                                    try
+                                    // 重新执行函数调用以获取新的 Task
+                                    var newTaskValue = funcCall.Run(manager);
+                                    if (newTaskValue is not TaskLangValue newTask)
                                     {
-                                        // 重新执行函数调用以获取新的 Task
-                                        var newTaskValue = funcCall.Run(manager);
-                                        if (newTaskValue is not TaskLangValue newTask)
-                                        {
-                                            throw new TypeError(instance, "Retry 只能用于返回 Task 的异步函数");
-                                        }
-
-                                        // 等待 Task 完成
-                                        return await newTask.AwaitAsync();
+                                        throw new TypeError(instance, "Retry 只能用于返回 Task 的异步函数");
                                     }
-                                    catch (Exception ex)
-                                    {
-                                        lastException = ex;
 
-                                        if (i < retryCount.Value)
-                                        {
-                                            // 重试前延迟
-                                            await System.Threading.Tasks.Task.Delay(delayMs);
-                                        }
+                                    // 等待 Task 完成
+                                    return await newTask.AwaitAsync();
+                                }
+                                catch (Exception ex)
+                                {
+                                    lastException = ex;
+
+                                    if (i < retryCount.Value)
+                                    {
+                                        // 重试前延迟
+                                        await Task.Delay(delayMs);
                                     }
                                 }
+                            }
 
-                                // 重试次数耗尽，抛出最后一次异常
-                                throw lastException ?? new Exception("任务执行失败，重试次数耗尽");
-                            });
+                            // 重试次数耗尽，抛出最后一次异常
+                            throw lastException ?? new Exception("任务执行失败，重试次数耗尽");
+                        });
 
-                            return new TaskLangValue(retryTask, CancellationToken.None, instance.Position);
-                        }
-
-                        default:
-                        {
-                            // 其他方法调用，使用原来的逻辑
-                            var ids = instance.Ids.Select(x => x.Run(manager) as LangExpression).ToList();
-                            var newInstance = new Instance(instance.Id, ids, instance.Position);
-                            return taskValue.Dot(newInstance);
-                        }
+                        return new TaskLangValue(retryTask, CancellationToken.None, instance.Position);
                     }
+
+                    // 其他方法调用（如 Then），使用扩展方法或 Dot 处理
+                    return taskValue.Dot(instance);
                 }
 
                 if (Right != null)

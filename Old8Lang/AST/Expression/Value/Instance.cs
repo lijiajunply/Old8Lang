@@ -208,16 +208,10 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 ThreadLangValue? tempThread = null;
 
                 // 调用函数
-                if (threadArgs.Count == 0)
-                {
-                    // 无参数情况
-                    tempThread = new ThreadLangValue(ThreadCallback, Position);
-                }
-                else
-                {
-                    // 带参数情况
-                    tempThread = new ThreadLangValue(_ => ThreadCallback(), null, Position);
-                }
+                // 无参数情况
+                tempThread = threadArgs.Count == 0
+                    ? new ThreadLangValue(ThreadCallback, Position)
+                    : new ThreadLangValue(_ => ThreadCallback(), null, Position); // 带参数情况
 
                 // 赋值给最终的线程变量
                 var thread = tempThread;
@@ -361,62 +355,98 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
     }
 
     public LangValueType FromClassToResult(LangValueType baseLangValue)
+    {
+        var type = baseLangValue.GetType();
+        MethodInfo? m = null;
+
+        // 对于具有扩展方法的类型，优先查找扩展方法而不是实例方法
+        // 这样可以避免找到 TaskLangValue.Then 实例方法而不是扩展方法
+        if (baseLangValue is DictionaryLangValue or ListLangValue or TaskLangValue)
         {
-            var type = baseLangValue.GetType();
-            var m = type.GetMethod(Id.IdName);
-            if (m == null)
+            type = baseLangValue switch
             {
-                type = baseLangValue switch
-                {
-                    DictionaryLangValue => Type.GetType("Old8Lang.AST.Expression.DictionaryValueFuncStatic"),
-                    ListLangValue => Type.GetType("Old8Lang.AST.Expression.ListValueFuncStatic"),
-                    TaskLangValue => Type.GetType("Old8Lang.AST.Expression.TaskValueFuncStatic"),
-                    _ => Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic")
-                };
-                m = type?.GetMethod(Id.IdName);
-            }
-
-            if (m == null && baseLangValue is not DictionaryLangValue or ListLangValue or TaskLangValue)
-            {
-                type = Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic");
-                m = type?.GetMethod(Id.IdName);
-            }
-
-            var os = new List<object>();
-
-            // 检查方法是否需要参数
-            var parameters = m?.GetParameters() ?? Array.Empty<ParameterInfo>();
-
-            // 对于静态方法（扩展方法），第一个参数是 baseLangValue
-            if (m?.IsStatic == true && parameters.Length > 0)
-            {
-                os.Add(baseLangValue);
-            }
-
-            // 只添加与方法参数数量匹配的参数
-            for (int i = 0; i < Ids.Count && os.Count < parameters.Length; i++)
-            {
-                // 对于实例方法，第一个参数已经是实例本身，所以跳过
-                if (m?.IsStatic == false && i == 0 && parameters.Length > 0)
-                {
-                    continue;
-                }
-
-                // 运行表达式获取参数值
-                // 如果参数已经是 LangValueType，则直接使用；否则调用 Run
-                var argValue = Ids[i] is LangValueType langValue
-                    ? langValue
-                    : Ids[i].Run(null!);
-                os.Add(argValue);
-            }
-
-            // 对于静态方法，实例参数为 null；对于实例方法，实例参数为 baseLangValue
-            object? invokeInstance = m?.IsStatic == false ? baseLangValue : null;
-
-            var r = m?.Invoke(invokeInstance, [.. os]);
-            if (r is LangValueType v) return v;
-            return ObjToValue(r!);
+                DictionaryLangValue => Type.GetType("Old8Lang.AST.Expression.DictionaryValueFuncStatic"),
+                ListLangValue => Type.GetType("Old8Lang.AST.Expression.ListValueFuncStatic"),
+                TaskLangValue => Type.GetType("Old8Lang.AST.Expression.TaskValueFuncStatic"),
+                _ => null
+            };
+            m = type?.GetMethod(Id.IdName);
         }
+
+        // 如果没有找到扩展方法，尝试在类型本身上查找
+        if (m == null)
+        {
+            type = baseLangValue.GetType();
+            m = type.GetMethod(Id.IdName);
+        }
+
+        // 如果还是没找到，尝试 ValueTypeFuncStatic
+        if (m == null)
+        {
+            type = Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic");
+            m = type?.GetMethod(Id.IdName);
+        }
+
+        var os = new List<object>();
+
+        // 检查方法是否需要参数
+        var parameters = m?.GetParameters() ?? Array.Empty<ParameterInfo>();
+
+        // 对于静态方法（扩展方法），第一个参数是 baseLangValue
+        if (m?.IsStatic == true && parameters.Length > 0)
+        {
+            os.Add(baseLangValue);
+        }
+
+        // 只添加与方法参数数量匹配的参数
+        for (int i = 0; i < Ids.Count && os.Count < parameters.Length; i++)
+        {
+            // 对于实例方法，第一个参数已经是实例本身，所以跳过
+            if (m?.IsStatic == false && i == 0 && parameters.Length > 0)
+            {
+                continue;
+            }
+
+            // 运行表达式获取参数值
+            // 如果参数已经是 LangValueType，则直接使用；否则调用 Run
+            // 对于 TaskLangValue，优先使用 ExternalManager
+            LangValueType argValue;
+            if (Ids[i] is LangValueType langValue)
+            {
+                argValue = langValue;
+            }
+            else if (baseLangValue is TaskLangValue { ExternalManager: not null } taskLangValue)
+            {
+                argValue = Ids[i].Run(taskLangValue.ExternalManager);
+            }
+            else
+            {
+                argValue = Ids[i].Run(null!);
+            }
+
+            os.Add(argValue);
+        }
+
+        // 补充缺失的 SourcePosition 参数（如果方法需要）
+        if (os.Count < parameters.Length)
+        {
+            for (int i = os.Count; i < parameters.Length; i++)
+            {
+                if (parameters[i].ParameterType == typeof(SourcePosition))
+                {
+                    // 使用 Instance 的位置信息
+                    os.Add(Position);
+                }
+            }
+        }
+
+        // 对于静态方法，实例参数为 null；对于实例方法，实例参数为 baseLangValue
+        object? invokeInstance = m?.IsStatic == false ? baseLangValue : null;
+
+        var r = m?.Invoke(invokeInstance, [.. os]);
+        if (r is LangValueType v) return v;
+        return ObjToValue(r!);
+    }
 
     public override string ToString()
     {
