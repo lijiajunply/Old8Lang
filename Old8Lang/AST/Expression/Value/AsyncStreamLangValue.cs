@@ -11,8 +11,8 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public class AsyncStreamLangValue : LangValueType
 {
-    private readonly IAsyncEnumerable<LangValueType> _asyncEnumerable;
-    private readonly CancellationToken _cancellationToken;
+    private readonly IAsyncEnumerable<LangValueType> AsyncEnumerable;
+    private readonly CancellationToken CancellationToken;
 
     /// <summary>
     /// 构造函数
@@ -20,8 +20,8 @@ public class AsyncStreamLangValue : LangValueType
     public AsyncStreamLangValue(IAsyncEnumerable<LangValueType> asyncEnumerable, CancellationToken cancellationToken = default, SourcePosition position = default)
         : base(position)
     {
-        _asyncEnumerable = asyncEnumerable;
-        _cancellationToken = cancellationToken;
+        AsyncEnumerable = asyncEnumerable;
+        CancellationToken = cancellationToken;
     }
 
     /// <summary>
@@ -29,7 +29,7 @@ public class AsyncStreamLangValue : LangValueType
     /// </summary>
     public IAsyncEnumerator<LangValueType> GetAsyncEnumerator()
     {
-        return _asyncEnumerable.GetAsyncEnumerator(_cancellationToken);
+        return AsyncEnumerable.GetAsyncEnumerator(CancellationToken);
     }
 
     /// <summary>
@@ -37,8 +37,8 @@ public class AsyncStreamLangValue : LangValueType
     /// </summary>
     public AsyncStreamLangValue Map(Func<LangValueType, LangValueType> mapper, SourcePosition position = default)
     {
-        var mappedEnumerable = _asyncEnumerable.Select(mapper);
-        return new AsyncStreamLangValue(mappedEnumerable, _cancellationToken, position);
+        var mappedEnumerable = AsyncEnumerable.Select(mapper);
+        return new AsyncStreamLangValue(mappedEnumerable, CancellationToken, position);
     }
 
     /// <summary>
@@ -46,8 +46,8 @@ public class AsyncStreamLangValue : LangValueType
     /// </summary>
     public AsyncStreamLangValue Filter(Func<LangValueType, bool> predicate, SourcePosition position = default)
     {
-        var filteredEnumerable = _asyncEnumerable.Where(predicate);
-        return new AsyncStreamLangValue(filteredEnumerable, _cancellationToken, position);
+        var filteredEnumerable = AsyncEnumerable.Where(predicate);
+        return new AsyncStreamLangValue(filteredEnumerable, CancellationToken, position);
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ public class AsyncStreamLangValue : LangValueType
     public async Task<LangValueType> Reduce(Func<LangValueType, LangValueType, LangValueType> reducer, LangValueType initialValue, SourcePosition position = default)
     {
         var result = initialValue;
-        await foreach (var item in _asyncEnumerable.WithCancellation(_cancellationToken))
+        await foreach (var item in AsyncEnumerable.WithCancellation(CancellationToken))
         {
             result = reducer(result, item);
         }
@@ -69,7 +69,7 @@ public class AsyncStreamLangValue : LangValueType
     public async Task<ListLangValue> ToList(SourcePosition position = default)
     {
         var list = new List<LangValueType>();
-        await foreach (var item in _asyncEnumerable.WithCancellation(_cancellationToken))
+        await foreach (var item in AsyncEnumerable.WithCancellation(CancellationToken))
         {
             list.Add(item);
         }
@@ -79,7 +79,7 @@ public class AsyncStreamLangValue : LangValueType
     /// <summary>
     /// 获取底层 IAsyncEnumerable 对象
     /// </summary>
-    public override object GetValue() => _asyncEnumerable;
+    public override object GetValue() => AsyncEnumerable;
 
     /// <summary>
     /// 类型字符串表示
@@ -123,7 +123,7 @@ public class AsyncStreamLangValue : LangValueType
     /// </summary>
     public static AsyncStreamLangValue Empty(SourcePosition position = default)
     {
-        return new AsyncStreamLangValue(AsyncEnumerable.Empty<LangValueType>(), default, position);
+        return new AsyncStreamLangValue(System.Linq.AsyncEnumerable.Empty<LangValueType>(), default, position);
     }
 
     /// <summary>
@@ -140,7 +140,7 @@ public class AsyncStreamLangValue : LangValueType
     public static AsyncStreamLangValue Range(int start, int count, SourcePosition position = default)
     {
         return new AsyncStreamLangValue(
-            AsyncEnumerable.Range(start, count).Select(i => (LangValueType)new IntLangValue(i, position)),
+            System.Linq.AsyncEnumerable.Range(start, count).Select(i => (LangValueType)new IntLangValue(i, position)),
             default,
             position
         );

@@ -341,6 +341,10 @@ public class TaskLangValue : LangValueType
     /// <summary>
     /// Dot 方法：支持属性访问
     /// </summary>
+    /// <remarks>
+    /// 注意：Then 和 Retry 方法的调用已经在 Operation.cs 中直接处理，
+    /// 因为它们需要访问 manager（包含 Interpreter）来正确执行 Lambda 函数
+    /// </remarks>
     public override LangValueType Dot(LangExpression dotExpression)
     {
         // 处理属性访问（ClassMemberId 继承自 LangId）
@@ -352,7 +356,6 @@ public class TaskLangValue : LangValueType
             {
                 "IsCompleted" => new BoolLangValue(IsCompleted, Position),
                 "Status" => new StringLangValue(Status.ToString(), Position),
-                "XAUAT" => new StringLangValue("西建大还我血汗钱我要回家", Position),
                 _ => throw new AttributeError(dotExpression.Position, propertyName, "Task")
             };
         }
@@ -432,7 +435,7 @@ public class TaskLangValue : LangValueType
         {
             if (t.IsFaulted)
             {
-                throw t.Exception?.InnerException ?? t.Exception;
+                throw (t.Exception?.InnerException ?? t.Exception)!;
             }
 
             var result = continuation(t.Result);

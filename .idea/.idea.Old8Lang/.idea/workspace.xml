@@ -18,8 +18,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/async_awaitasync_comprehensive_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/async_awaitasync_comprehensive_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/async_task_status_management.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/async_task_status_management.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/async_advanced_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/async_advanced_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/async_simple_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/async_simple_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/FuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/FuncStatic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AsyncStreamLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AsyncStreamLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -68,6 +74,8 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/GeneratorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TaskLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/IfStatement.cs" root0="SKIP_HIGHLIGHTING" />
@@ -100,7 +108,7 @@
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="SWEA" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -400,7 +408,7 @@
       <workItem from="1765734191994" duration="8791000" />
       <workItem from="1765776532895" duration="4492000" />
       <workItem from="1765791344254" duration="3118000" />
-      <workItem from="1765816155545" duration="11600000" />
+      <workItem from="1765816155545" duration="13901000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -745,7 +753,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="197" />
+    <option name="localTasksCounter" value="198" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -772,7 +780,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(compiler): 修复 in 操作符类型检查与 IL 生成问题&#10;&#10;- 修复 in 操作符右侧非集合类型时的类型检查逻辑&#10;- 优化 IL 生成中装箱值类型的处理方式&#10;- 统一局部变量存储与加载顺序，确保栈平衡&#10;- 添加缺失的静态方法调用指令&#10;- 清理冗余代码并增强类型安全检查&#10;- 更新相关集成测试用例以覆盖边界情况" />
     <MESSAGE value="feat(parser): 重构列表和字典语法解析逻辑&#10;&#10;- 移除 list 关键字，统一使用花括号 {} 表示列表和字典&#10;- 实现通过首个元素是否包含冒号来区分列表和字典&#10;- 支持列表和字典的尾随逗号语法&#10;- 更新语法文档和EBNF定义以反映新的语法规范&#10;- 修改测试用例以适配新的列表和字典解析逻辑&#10;- 废弃旧的 ParseList 和 ParseDictionary 方法&#10;- 优化函数参数解析逻辑，移除对 List 类型的特殊处理" />
     <MESSAGE value="feat(parser): 更新列表初始化语法并优化代码结构&#10;&#10;- 将列表初始化语法从 list[] 更改为 {}&#10;- 移除不必要的注释块，简化代码逻辑&#10;- 为类方法添加大括号以明确作用域&#10;- 更新程序入口文件路径配置&#10;- 启用编译加速测试功能&#10;- 修复斐波那契函数调用逻辑" />
     <MESSAGE value="feat(parser): 引入 native 关键字替代 import 方括号语法&#10;&#10;- 新增 Native 枚举值以支持 native 关键字识别&#10;- 更新 EBNF 语法规则，使用 native 替代 [import ...] 形式&#10;- 修改解析器逻辑，适配新的 native 语句结构&#10;- 支持批量导入(*)、选择性导入({})及别名(as)语法&#10;- 移除旧的方括号包围的 import 语句处理逻辑&#10;- 更新标准库文件使用新语法格式&#10;- 同步更新语法文档说明与示例代码" />
@@ -797,7 +804,8 @@
     <MESSAGE value="fix(ast): 修复 IfStatement 中的索引逻辑错误&#10;&#10;- 修正了 elifBlock 索引访问越界的问题&#10;- 调整 elseBlock 返回条件以匹配正确的索引位置&#10;- 更新索引计算方式确保与 elifBlock 的实际元素对应" />
     <MESSAGE value="test(async): 更新异步任务测试用例&#10;&#10;- 注释掉不可用的 Task.WhenAll、WhenAny、Then、WithTimeout 和 Retry 方法调用&#10;- 添加替代方案分别等待各个任务并打印结果&#10;- 修改异常抛出方式从 throw new Error 改为直接 throw 字符串&#10;- 修复部分变量未转换为字符串导致的类型错误&#10;- 更新 mixin 测试中对 log 方法的调用方式&#10;- 调整测试文件中的打印函数统一使用 PrintLine&#10;- 修正数值类型拼接字符串时缺少 ToStr() 转换的问题" />
     <MESSAGE value="feat(async): 实现 Task 类静态方法支持&#10;&#10;- 新增 TaskClassLangValue 类，提供 WhenAll、WhenAny、Delay 静态方法&#10;- 在解释器初始化时注册全局 Task 对象&#10;- 支持通过 Task.WhenAll([...]) 和 Task.WhenAny([...]) 调用任务组合方法&#10;- 实现 TaskStaticMethodWrapper 包装器，用于执行静态方法&#10;- 更新 Instance.cs 以支持 TaskStaticMethodWrapper 的调用&#10;- 优化 Operation.cs 中对 Task 类成员访问的处理逻辑&#10;- 移除 AsyncLib.cs 中不必要的变量声明&#10;- 更新异步测试用例，启用 Task.WhenAll 和 Task.WhenAny 的实际调用&#10;- 注释掉暂不可用的 Retry 方法测试代码" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(async): 实现 Task 类静态方法支持&#10;&#10;- 新增 TaskClassLangValue 类，提供 WhenAll、WhenAny、Delay 静态方法&#10;- 在解释器初始化时注册全局 Task 对象&#10;- 支持通过 Task.WhenAll([...]) 和 Task.WhenAny([...]) 调用任务组合方法&#10;- 实现 TaskStaticMethodWrapper 包装器，用于执行静态方法&#10;- 更新 Instance.cs 以支持 TaskStaticMethodWrapper 的调用&#10;- 优化 Operation.cs 中对 Task 类成员访问的处理逻辑&#10;- 移除 AsyncLib.cs 中不必要的变量声明&#10;- 更新异步测试用例，启用 Task.WhenAll 和 Task.WhenAny 的实际调用&#10;- 注释掉暂不可用的 Retry 方法测试代码" />
+    <MESSAGE value="feat(async): 完善异步任务状态管理与AwaitAsync功能&#10;&#10;- 统一使用GetUnixTimeMilliseconds替代GetCurrentTime以提高时间精度&#10;- 修改异常抛出方式，去除new Error语法，适配语言规范&#10;- 增强TaskLangValue类的状态同步与线程安全性&#10;- 实现Task对象属性访问支持（IsCompleted、Status等）&#10;- 优化任务超时控制逻辑与重试机制&#10;- 补充异步任务相关内置函数的实现细节&#10;- 更新测试用例以匹配新的行为规范&#10;- 增加Time模块导入以支持时间相关操作" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(async): 完善异步任务状态管理与AwaitAsync功能&#10;&#10;- 统一使用GetUnixTimeMilliseconds替代GetCurrentTime以提高时间精度&#10;- 修改异常抛出方式，去除new Error语法，适配语言规范&#10;- 增强TaskLangValue类的状态同步与线程安全性&#10;- 实现Task对象属性访问支持（IsCompleted、Status等）&#10;- 优化任务超时控制逻辑与重试机制&#10;- 补充异步任务相关内置函数的实现细节&#10;- 更新测试用例以匹配新的行为规范&#10;- 增加Time模块导入以支持时间相关操作" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

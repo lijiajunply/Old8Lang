@@ -233,7 +233,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                         var funcResult = spawnFunc.Run(threadManager, threadArgs);
 
                         // 设置线程结果
-                        tempThread!.SetResult(funcResult.GetValue());
+                        tempThread?.SetResult(funcResult.GetValue());
                     }
                     catch (Exception ex)
                     {
@@ -370,28 +370,29 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 {
                     DictionaryLangValue => Type.GetType("Old8Lang.AST.Expression.DictionaryValueFuncStatic"),
                     ListLangValue => Type.GetType("Old8Lang.AST.Expression.ListValueFuncStatic"),
+                    TaskLangValue => Type.GetType("Old8Lang.AST.Expression.TaskValueFuncStatic"),
                     _ => Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic")
                 };
                 m = type?.GetMethod(Id.IdName);
             }
 
-            if (m == null && baseLangValue is not DictionaryLangValue or ListLangValue)
+            if (m == null && baseLangValue is not DictionaryLangValue or ListLangValue or TaskLangValue)
             {
                 type = Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic");
                 m = type?.GetMethod(Id.IdName);
             }
 
             var os = new List<object>();
-            
+
             // 检查方法是否需要参数
             var parameters = m?.GetParameters() ?? Array.Empty<ParameterInfo>();
-            
+
             // 对于静态方法（扩展方法），第一个参数是 baseLangValue
             if (m?.IsStatic == true && parameters.Length > 0)
             {
                 os.Add(baseLangValue);
             }
-            
+
             // 只添加与方法参数数量匹配的参数
             for (int i = 0; i < Ids.Count && os.Count < parameters.Length; i++)
             {
@@ -400,9 +401,13 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 {
                     continue;
                 }
-                
+
                 // 运行表达式获取参数值
-                os.Add(Ids[i].Run(null!));
+                // 如果参数已经是 LangValueType，则直接使用；否则调用 Run
+                var argValue = Ids[i] is LangValueType langValue
+                    ? langValue
+                    : Ids[i].Run(null!);
+                os.Add(argValue);
             }
 
             // 对于静态方法，实例参数为 null；对于实例方法，实例参数为 baseLangValue

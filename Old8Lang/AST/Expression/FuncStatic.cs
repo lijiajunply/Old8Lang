@@ -532,3 +532,58 @@ public static class ListValueFuncStatic
         (nums[i], nums[j]) = (nums[j], nums[i]);
     }
 }
+
+/// <summary>
+/// TaskLangValue类型的扩展方法类，提供异步任务组合功能
+/// </summary>
+[Serializable]
+public static class TaskValueFuncStatic
+{
+    extension(TaskLangValue task)
+    {
+        /// <summary>
+        /// 任务完成后执行下一个任务
+        /// </summary>
+        /// <param name="continuation">接收前一个任务结果并返回新任务的函数</param>
+        /// <returns>新的 TaskLangValue</returns>
+        public TaskLangValue Then(FuncLangValue continuation)
+        {
+            return task.Then(result =>
+            {
+                // 创建一个新的 VariateManager 来执行 continuation 函数
+                var manager = new VariateManager();
+
+                // 首先调用 Run(manager) 来捕获闭包
+                var closedFunc = continuation.Run(manager);
+
+                // 如果返回的是函数（即闭包函数），使用它
+                if (closedFunc is FuncLangValue funcValue)
+                {
+                    continuation = funcValue;
+                }
+
+                // 现在调用带参数的 Run 方法
+                var args = new List<LangExpression> { result };
+                var nextTaskResult = continuation.Run(manager, args);
+
+                if (nextTaskResult is TaskLangValue taskValue)
+                {
+                    return taskValue;
+                }
+                throw new TypeError(task, "Then 的 continuation 函数必须返回一个 Task");
+            }, task.Position);
+        }
+
+        /// <summary>
+        /// 实现任务重试机制
+        /// </summary>
+        /// <param name="retryCount">最大重试次数</param>
+        /// <param name="delayMs">重试之间的延迟（毫秒）</param>
+        /// <returns>带重试机制的 TaskLangValue</returns>
+        public TaskLangValue Retry(IntLangValue retryCount, IntLangValue? delayMs = null)
+        {
+            var delay = delayMs?.Value ?? 0;
+            return task.Retry(retryCount.Value, delay, task.Position);
+        }
+    }
+}

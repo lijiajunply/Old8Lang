@@ -15,7 +15,7 @@ public class AsyncFuncLangValue : ImportInfo
 {
     public readonly LangId? Id;
     public readonly List<LangId>? Ids;
-    public readonly BlockStatement BlockStatement;
+    private readonly BlockStatement BlockStatement;
 
     // 闭包环境：捕获的作用域
     private VariateManager? CapturedScope { get; init; }
@@ -58,133 +58,121 @@ public class AsyncFuncLangValue : ImportInfo
     /// <param name="ids">参数表达式列表</param>
     /// <param name="cancellationToken">取消令牌</param>
     /// <returns>包含异步操作的 TaskLangValue</returns>
-    public TaskLangValue RunAsync(VariateManager variateManagerFunc, List<LangExpression> ids, CancellationToken cancellationToken = default)
+    public TaskLangValue RunAsync(VariateManager variateManagerFunc, List<LangExpression> ids,
+        CancellationToken cancellationToken = default)
     {
         // 创建 .NET Task
         var task = Task.Run(() =>
         {
+            // 检查取消请求
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // 参数数量检查
+            if (Ids != null && ids.Count > Ids.Count)
+            {
+                throw new ArgumentError(
+                    Position,
+                    $"异步函数 '{Id?.IdName ?? "anonymous"}' 期望最多 {Ids.Count} 个参数，但实际提供了 {ids.Count} 个参数"
+                );
+            }
+
+            // 使用捕获的作用域或调用时的作用域（与普通函数保持一致）
+            // 注意：不再创建深拷贝，允许异步函数修改外部作用域变量
+            var executionManager = CapturedScope ?? variateManagerFunc;
+
+            // 重置返回状态，确保异步函数体能够正常执行
+            executionManager.IsReturn = false;
+
+            // 为异步执行创建独立的调用栈上下文
+            var asyncCallStack = new List<CallStackFrame>(Old8Exception.CurrentCallStack);
+
+            // 临时替换全局调用栈
+            var originalCallStack = Old8Exception.CurrentCallStack;
+            Old8Exception.CurrentCallStack = asyncCallStack;
+
             try
             {
-                // 检查取消请求
-                cancellationToken.ThrowIfCancellationRequested();
+                // 增加递归深度
+                executionManager.RecursionDepth++;
 
-                // 参数数量检查
-                if (Ids != null && ids.Count > Ids.Count)
-                {
-                    throw new ArgumentError(
-                        Position,
-                        $"异步函数 '{Id?.IdName ?? "anonymous"}' 期望最多 {Ids.Count} 个参数，但实际提供了 {ids.Count} 个参数"
-                    );
-                }
+                // 入栈
+                Old8Exception.PushCallStack(Id?.IdName ?? "anonymous async", Position);
 
-                // 使用捕获的作用域或调用时的作用域（与普通函数保持一致）
-                // 注意：不再创建深拷贝，允许异步函数修改外部作用域变量
-                var executionManager = CapturedScope ?? variateManagerFunc;
-                
-                // 重置返回状态，确保异步函数体能够正常执行
-                executionManager.IsReturn = false;
-
-                // 为异步执行创建独立的调用栈上下文
-                var asyncCallStack = new List<CallStackFrame>(Old8Exception.CurrentCallStack);
-
-                // 临时替换全局调用栈
-                var originalCallStack = Old8Exception.CurrentCallStack;
-                Old8Exception.CurrentCallStack = asyncCallStack;
+                // 添加新作用域
+                executionManager.AddChildren();
+                executionManager.IsFunc = true;
 
                 try
                 {
-                    // 增加递归深度
-                    executionManager.RecursionDepth++;
-
-                    // 入栈
-                    Old8Exception.PushCallStack(Id?.IdName ?? "anonymous async", Position);
-
-                    // 添加新作用域
-                    executionManager.AddChildren();
-                    executionManager.IsFunc = true;
-
-                    try
+                    // 处理参数
+                    if (Ids != null && Ids.Count != 0)
                     {
-                        // 处理参数
-                        if (Ids != null && Ids.Count != 0)
+                        // 初始化默认参数值缓存（仅在首次调用时）
+                        if (CachedDefaultValues == null && Ids.Any(id => id.DefaultValue != null))
                         {
-                            // 初始化默认参数值缓存（仅在首次调用时）
-                            if (CachedDefaultValues == null && Ids.Any(id => id.DefaultValue != null))
+                            InitializeDefaultValueCache(executionManager);
+                        }
+
+                        // 评估参数
+                        var paramValues = ids.Select(t => t.Run(variateManagerFunc)).ToList();
+
+                        // 补全默认参数
+                        for (var i = paramValues.Count; i < Ids.Count; i++)
+                        {
+                            // 检查取消请求
+                            cancellationToken.ThrowIfCancellationRequested();
+
+                            var id = Ids[i];
+                            if (id.DefaultValue != null)
                             {
-                                InitializeDefaultValueCache(executionManager);
+                                // 优先使用缓存值（常量表达式）
+                                paramValues.Add(CachedDefaultValues?.TryGetValue(i, out var cachedValue) == true
+                                    ? cachedValue
+                                    : id.DefaultValue.Run(executionManager));
                             }
-
-                            // 评估参数
-                            var paramValues = ids.Select(t => t.Run(variateManagerFunc)).ToList();
-
-                            // 补全默认参数
-                            for (var i = paramValues.Count; i < Ids.Count; i++)
+                            else
                             {
-                                // 检查取消请求
-                                cancellationToken.ThrowIfCancellationRequested();
-                                
-                                var id = Ids[i];
-                                if (id.DefaultValue != null)
-                                {
-                                    // 优先使用缓存值（常量表达式）
-                                    if (CachedDefaultValues?.TryGetValue(i, out var cachedValue) == true)
-                                    {
-                                        paramValues.Add(cachedValue);
-                                    }
-                                    else
-                                    {
-                                        paramValues.Add(id.DefaultValue.Run(executionManager));
-                                    }
-                                }
-                                else
-                                {
-                                    throw new ArgumentError(
-                                        Position,
-                                        $"异步函数 '{Id?.IdName ?? "anonymous"}' 的参数 '{id.IdName}' 缺少实参且没有默认值"
-                                    );
-                                }
+                                throw new ArgumentError(
+                                    Position,
+                                    $"异步函数 '{Id?.IdName ?? "anonymous"}' 的参数 '{id.IdName}' 缺少实参且没有默认值"
+                                );
                             }
+                        }
 
-                            // 设置参数到作用域
+                        // 设置参数到作用域
                         for (var i = 0; i < Ids.Count; i++)
                         {
                             executionManager.Set(Ids[i], paramValues[i]);
                         }
                     }
 
-                        // 参数设置完成后，恢复非函数上下文标志
-                        // 这样函数体中的赋值语句可以正常查找和修改外部作用域的变量
-                        executionManager.IsFunc = false;
+                    // 参数设置完成后，恢复非函数上下文标志
+                    // 这样函数体中的赋值语句可以正常查找和修改外部作用域的变量
+                    executionManager.IsFunc = false;
 
-                        // 执行函数体
-                        BlockStatement.Run(executionManager);
+                    // 执行函数体
+                    BlockStatement.Run(executionManager);
 
-                        // 保存返回值（在清理之前）
-                        var result = executionManager.Result;
+                    // 保存返回值（在清理之前）
+                    var result = executionManager.Result;
 
-                        return result;
-                    }
-                    finally
-                    {
-                        // 清理资源
-                        executionManager.IsReturn = false;
-                        executionManager.IsFunc = false;
-                        executionManager.RemoveChildren();
-                    }
+                    return result;
                 }
                 finally
                 {
-                    executionManager.RecursionDepth--;
-                    Old8Exception.PopCallStack();
-
-                    // 恢复原始调用栈
-                    Old8Exception.CurrentCallStack = originalCallStack;
+                    // 清理资源
+                    executionManager.IsReturn = false;
+                    executionManager.IsFunc = false;
+                    executionManager.RemoveChildren();
                 }
             }
-            catch (Exception ex)
+            finally
             {
-                // 异常会被 Task 捕获并在 await 时重新抛出
-                throw;
+                executionManager.RecursionDepth--;
+                Old8Exception.PopCallStack();
+
+                // 恢复原始调用栈
+                Old8Exception.CurrentCallStack = originalCallStack;
             }
         }, cancellationToken);
 
@@ -233,7 +221,7 @@ public class AsyncFuncLangValue : ImportInfo
     /// <summary>
     /// 获取输出类型
     /// </summary>
-    public override Type? OutputType(LocalManager local)
+    public override Type OutputType(LocalManager local)
     {
         return typeof(Task<object>);
     }

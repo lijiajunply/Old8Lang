@@ -24,7 +24,7 @@ retryCount <- 0
 async func flakyTask() {
     retryCount++
     if retryCount < 3 {
-        throw new Error("任务失败，需要重试")
+        throw "任务失败，需要重试"
     }
     return "重试成功"
 }

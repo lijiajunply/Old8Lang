@@ -35,13 +35,12 @@ async func flakyTask() {
     retryCount <- retryCount + 1
     PrintLine("重试次数: " + retryCount.ToStr())
     if retryCount < 3 {
-        throw new Error("任务失败，需要重试")
+        throw "任务失败，需要重试"
     }
     return "重试成功"
 }
 
-// Retry 方法目前还不可用
-PrintLine("Retry 方法暂不可用")
+// 测试 Retry 方法
 retryTask <- flakyTask().Retry(3, 200)
 result5 <- await retryTask
 PrintLine("Retry 结果: " + result5)

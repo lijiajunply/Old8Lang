@@ -268,6 +268,136 @@ public class Operation(
                     return taskClassValue.Dot(Right);
                 }
             }
+            else if (dotLeftResult is TaskLangValue taskValue)
+            {
+                if (Right is Instance instance)
+                {
+                    // 特殊处理 Then 和 Retry 方法，直接在这里调用以传递 manager
+                    switch (instance.Id.IdName)
+                    {
+                        case "Then":
+                        {
+                            if (instance.Ids.Count != 1)
+                            {
+                                throw new ArgumentError(instance.Position, $"Then 方法需要 1 个参数，实际提供了 {instance.Ids.Count} 个");
+                            }
+
+                            var continuation = instance.Ids[0].Run(manager);
+                            if (continuation is not FuncLangValue funcValue)
+                            {
+                                throw new TypeError(instance, "Then 的参数必须是一个函数");
+                            }
+
+                            // 调用 TaskLangValue 的 Then 方法，传入包装了 manager 的 continuation
+                            return taskValue.Then(result =>
+                            {
+                                // 使用传入的 manager（它有有效的 Interpreter）
+                                var closedFunc = funcValue.Run(manager);
+                                if (closedFunc is FuncLangValue closedFuncValue)
+                                {
+                                    funcValue = closedFuncValue;
+                                }
+
+                                var args = new List<LangExpression> { result };
+                                var nextTaskResult = funcValue.Run(manager, args);
+
+                                if (nextTaskResult is TaskLangValue nextTask)
+                                {
+                                    return nextTask;
+                                }
+                                throw new TypeError(instance, "Then 的 continuation 函数必须返回一个 Task");
+                            }, instance.Position);
+                        }
+
+                        case "Retry":
+                        {
+                            if (instance.Ids.Count < 1 || instance.Ids.Count > 2)
+                            {
+                                throw new ArgumentError(instance.Position, $"Retry 方法需要 1-2 个参数，实际提供了 {instance.Ids.Count} 个");
+                            }
+
+                            var retryCountValue = instance.Ids[0].Run(manager);
+                            if (retryCountValue is not IntLangValue retryCount)
+                            {
+                                throw new TypeError(instance, "Retry 的第一个参数必须是整数");
+                            }
+
+                            var delayMs = 0;
+                            if (instance.Ids.Count == 2)
+                            {
+                                var delayValue = instance.Ids[1].Run(manager);
+                                if (delayValue is IntLangValue delayInt)
+                                {
+                                    delayMs = delayInt.Value;
+                                }
+                                else
+                                {
+                                    throw new TypeError(instance, "Retry 的第二个参数必须是整数");
+                                }
+                            }
+
+                            // Retry 需要重新执行原始函数，而不是重试同一个 Task 对象
+                            // 因此我们需要找到创建 Task 的表达式并重新执行它
+                            // Left 应该是一个函数调用表达式（如 flakyTask()）
+
+                            if (Left is not Instance funcCall)
+                            {
+                                throw new InvalidOperationError(instance, "Retry 只能用于异步函数调用（如 func().Retry(...)）");
+                            }
+
+                            // 创建一个包装的 Task，在其中实现重试逻辑
+                            var retryTask = System.Threading.Tasks.Task.Run(async () =>
+                            {
+                                Exception? lastException = null;
+
+                                for (int i = 0; i <= retryCount.Value; i++)
+                                {
+                                    try
+                                    {
+                                        // 重新执行函数调用以获取新的 Task
+                                        var newTaskValue = funcCall.Run(manager);
+                                        if (newTaskValue is not TaskLangValue newTask)
+                                        {
+                                            throw new TypeError(instance, "Retry 只能用于返回 Task 的异步函数");
+                                        }
+
+                                        // 等待 Task 完成
+                                        return await newTask.AwaitAsync();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        lastException = ex;
+
+                                        if (i < retryCount.Value)
+                                        {
+                                            // 重试前延迟
+                                            await System.Threading.Tasks.Task.Delay(delayMs);
+                                        }
+                                    }
+                                }
+
+                                // 重试次数耗尽，抛出最后一次异常
+                                throw lastException ?? new Exception("任务执行失败，重试次数耗尽");
+                            });
+
+                            return new TaskLangValue(retryTask, CancellationToken.None, instance.Position);
+                        }
+
+                        default:
+                        {
+                            // 其他方法调用，使用原来的逻辑
+                            var ids = instance.Ids.Select(x => x.Run(manager) as LangExpression).ToList();
+                            var newInstance = new Instance(instance.Id, ids, instance.Position);
+                            return taskValue.Dot(newInstance);
+                        }
+                    }
+                }
+
+                if (Right != null)
+                {
+                    return taskValue.Dot(Right);
+                }
+            }
             else if (dotLeftResult != null! && Right != null)
             {
                 return dotLeftResult.Dot(Right);
