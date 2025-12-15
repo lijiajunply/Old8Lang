@@ -1,7 +1,6 @@
 using Old8Lang.LangParser;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Linq;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
@@ -27,7 +26,7 @@ public class FuncLangValue : ImportInfo
     private VariateManager? CapturedScope { get; init; }
 
     // 函数类型：区分普通方法和Lambda表达式
-    public bool IsLambda { get; init; }
+    private bool IsLambda { get; init; }
 
     // 默认参数值缓存：缓存常量表达式的默认值，避免重复求值
     private Dictionary<int, LangValueType>? CachedDefaultValues { get; set; }
@@ -55,7 +54,7 @@ public class FuncLangValue : ImportInfo
     /// <summary>
     /// 检查函数是否是生成器函数（包含yield语句）
     /// </summary>
-    public bool IsGenerator => ContainsYieldStatement(BlockStatement);
+    private bool IsGenerator => ContainsYieldStatement(BlockStatement);
 
     /// <summary>
     /// 递归检查语句是否包含yield语句
@@ -281,7 +280,7 @@ public class FuncLangValue : ImportInfo
             var paramValues = ids.Select(t => t.Run(variateManagerFunc)).ToList();
 
             // 处理默认参数，补全缺失的参数值
-            if (Ids != null && Ids.Count > 0)
+            if (Ids is { Count: > 0 })
             {
                 for (var i = paramValues.Count; i < Ids.Count; i++)
                 {
@@ -308,7 +307,7 @@ public class FuncLangValue : ImportInfo
             var generator = new GeneratorLangValue(this, Position);
 
             // 将参数值设置到生成器的 ParameterValues 中
-            if (Ids != null && Ids.Count > 0)
+            if (Ids is { Count: > 0 })
             {
                 for (var i = 0; i < Ids.Count; i++)
                 {
