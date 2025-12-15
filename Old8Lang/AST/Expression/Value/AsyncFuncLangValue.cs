@@ -78,9 +78,9 @@ public class AsyncFuncLangValue : ImportInfo
                     );
                 }
 
-                // 为异步执行创建独立的 VariateManager 实例，确保状态隔离
-                var baseManager = CapturedScope ?? variateManagerFunc;
-                var executionManager = baseManager.NewManger();
+                // 使用捕获的作用域或调用时的作用域（与普通函数保持一致）
+                // 注意：不再创建深拷贝，允许异步函数修改外部作用域变量
+                var executionManager = CapturedScope ?? variateManagerFunc;
                 
                 // 重置返回状态，确保异步函数体能够正常执行
                 executionManager.IsReturn = false;
@@ -153,7 +153,11 @@ public class AsyncFuncLangValue : ImportInfo
                         }
                     }
 
-                            // 执行函数体，保持 IsFunc = true
+                        // 参数设置完成后，恢复非函数上下文标志
+                        // 这样函数体中的赋值语句可以正常查找和修改外部作用域的变量
+                        executionManager.IsFunc = false;
+
+                        // 执行函数体
                         BlockStatement.Run(executionManager);
 
                         // 保存返回值（在清理之前）

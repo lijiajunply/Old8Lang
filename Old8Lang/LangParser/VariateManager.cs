@@ -152,6 +152,12 @@ public class VariateManager
     public ControlFlowManager ControlFlowManager { get; } = new();
 
     /// <summary>
+    /// 标记当前是否在生成器上下文中执行
+    /// 用于区分生成器的yield暂停机制和普通循环的执行
+    /// </summary>
+    public bool IsInGenerator { get; set; } = false;
+
+    /// <summary>
     /// 最大递归深度限制，防止栈溢出
     /// </summary>
     private const int MaxRecursionDepth = 1000;
@@ -594,19 +600,10 @@ public class VariateManager
             Interpreter = this.Interpreter
         };
 
-        // 浅拷贝所有作用域：复制字典结构，但共享值对象
-        // 这是安全的，因为LangValueType是不可变的
-        foreach (var scope in Scopes)
-        {
-            var newScope = new Dictionary<string, LangValueType>(scope);
-            captured.Scopes.Add(newScope);
-        }
-
-        // 移除初始化时的空作用域（因为构造函数已经创建了一个）
-        if (captured.Scopes.Count > 0 && Scopes.Count > 0)
-        {
-            captured.Scopes.RemoveAt(0);
-        }
+        // 直接引用所有作用域（不拷贝），允许异步函数修改外部变量
+        // 注意：移除原来的浅拷贝逻辑，改为共享引用
+        captured.Scopes.Clear(); // 清除构造函数创建的初始作用域
+        captured.Scopes.AddRange(Scopes); // 直接添加对原始作用域的引用
 
         // 复制导入信息（线程安全）
         lock (ImportInfosLock)
