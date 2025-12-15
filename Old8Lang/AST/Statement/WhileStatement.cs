@@ -14,18 +14,17 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
 {
     public override void Run(VariateManager manager)
     {
-        manager.AddChildren();
         // 压入新的控制流状态
         manager.ControlFlowManager.PushState();
-        
+
         try
         {
             // 只执行一次循环迭代，然后检查yield标志
             // 这样生成器可以在每次yield后暂停执行
-            
+
             // 在每次循环迭代开始时重置控制流标志
             manager.ControlFlowManager.ResetCurrentState();
-            
+
             // 优化：直接获取布尔值，避免临时对象创建
             var value = expression.Run(manager);
             bool expr1;
@@ -42,32 +41,41 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
 
             if (expr1)
             {
+                // 重置循环体的执行位置，确保每次迭代从头开始
+                if (blockStatement is BlockStatement block)
+                {
+                    block.ResetGeneratorPosition();
+                }
+
+                // 循环体是嵌套的 BlockStatement，使用执行位置栈机制
                 blockStatement.Run(manager);
-                
+
                 // 处理break
                 if (manager.ControlFlowManager.BreakFlag)
                 {
+                    // 清除break标志，退出循环
+                    manager.ControlFlowManager.BreakFlag = false;
                     return;
                 }
-                
+
                 // 处理yield：如果循环体中遇到yield，立即返回以暂停执行
-                // 不执行循环变量更新，让下一次调用处理
+                // 不清除yield标志，让上层BlockStatement处理
                 if (manager.IsYield)
                 {
                     return;
                 }
-                
-                // continue由标志位控制，直接返回，让下一次调用处理
+
+                // 处理continue：清除continue标志，继续下一次迭代
                 if (manager.ControlFlowManager.ContinueFlag)
                 {
-                    return;
+                    manager.ControlFlowManager.ContinueFlag = false;
                 }
-                
-                // 正常执行，返回，让下一次调用处理下一次迭代
-                return;
+
+                // 正常执行完一次迭代，不返回，继续执行（但会被下面的逻辑处理）
             }
             else
             {
+                // 条件为false，循环结束
                 return;
             }
         }
@@ -75,7 +83,6 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
         {
             // 弹出当前控制流状态
             manager.ControlFlowManager.PopState();
-            manager.RemoveChildren();
         }
     }
 

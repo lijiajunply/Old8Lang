@@ -51,24 +51,34 @@ public class ForInStatement(
                         break;
                     }
                     
-                    // 赋值给标识符
-                    if (AllIds.Count == 1)
+                    // 检查生成器是否处于Suspended状态，表示有值生成
+                    if (generator.State == GeneratorLangValue.GeneratorState.Suspended)
                     {
-                        manager.Set(id, nextValue);
-                    }
-                    else
-                    {
-                        // 多个标识符的情况，只赋值给第一个
-                        manager.Set(id, nextValue);
-                    }
-                    
-                    // 执行循环体
-                    body.Run(manager);
-                    
-                    // 处理break
-                    if (manager.ControlFlowManager.BreakFlag)
-                    {
-                        break;
+                        // 使用generator.NextValue作为当前值
+                        var currentValue = generator.NextValue;
+                        
+                        if (currentValue != null && !(currentValue is VoidLangValue))
+                        {
+                            // 赋值给标识符
+                            if (AllIds.Count == 1)
+                            {
+                                manager.Set(id, currentValue);
+                            }
+                            else
+                            {
+                                // 多个标识符的情况，只赋值给第一个
+                                manager.Set(id, currentValue);
+                            }
+                            
+                            // 执行循环体
+                            body.Run(manager);
+                            
+                            // 处理break
+                            if (manager.ControlFlowManager.BreakFlag)
+                            {
+                                break;
+                            }
+                        }
                     }
                 }
             }

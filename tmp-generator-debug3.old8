@@ -1,0 +1,22 @@
+func gen(n:int) -> void {
+    PrintLine("=== gen called with n = " + n.ToStr())
+    while n < 3 {
+        PrintLine("=== while condition: n < 3, n = " + n.ToStr())
+        PrintLine("=== before yield, n = " + n.ToStr())
+        yield n
+        PrintLine("=== after yield, n = " + n.ToStr())
+        PrintLine("=== computing n + 1...")
+        tmp <- n + 1
+        PrintLine("=== n + 1 = " + tmp.ToStr())
+        PrintLine("=== assigning to n...")
+        n <- tmp
+        PrintLine("=== after assignment, n = " + n.ToStr())
+    }
+    PrintLine("=== while loop ended, n = " + n.ToStr())
+}
+
+PrintLine("*** Starting iteration")
+for i in gen(1) {
+    PrintLine("*** received: " + i.ToStr())
+}
+PrintLine("*** End iteration")

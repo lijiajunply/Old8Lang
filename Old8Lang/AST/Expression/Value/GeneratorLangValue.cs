@@ -82,45 +82,38 @@ public class GeneratorLangValue : LangValueType, ILangList
         
         State = GeneratorState.Running;
         
-        // 每次执行前清除yield标志，确保下一次迭代能正确执行
+        // 每次执行前清除yield和return标志，确保下一次迭代能正确执行
         LocalState!.IsYield = false;
+        LocalState.IsReturn = false;
 
-        // 只执行当前语句，不循环执行所有语句
-        if (ExecutionPosition < Func.BlockStatement.Count)
+        // 生成器的执行逻辑由ForInStatement处理
+        // 这里我们只需要执行生成器函数，直到遇到yield或return
+        // 注意：Func.BlockStatement.Run方法会执行到yield语句后返回
+        Func.BlockStatement.Run(LocalState);
+        
+        if (LocalState.IsYield)
         {
-            var statement = Func.BlockStatement[ExecutionPosition];
-            statement.Run(LocalState);
-            
-            if (LocalState.IsYield)
-            {
-                // 遇到yield，保存状态并返回值
-                NextValue = LocalState.Result;
-                State = GeneratorState.Suspended;
-                
-                // 无论yield语句在哪里，都递增执行位置
-                // 这样可以避免重复执行同一个语句导致的无限循环
-                // 生成器的执行状态由各个语句内部管理（如while循环的条件判断）
-                ExecutionPosition++;
-                
-                return NextValue;
-            }
-
-            if (LocalState.IsReturn)
-            {
-                // 遇到return，生成器完成
-                State = GeneratorState.Completed;
-                return new VoidLangValue();
-            }
-            
-            // 没有遇到yield或return，继续执行下一个语句
-            ExecutionPosition++;
-            // 递归调用自己，继续执行下一个语句
-            return Run(manager);
+            // 遇到yield，保存状态并返回值
+            NextValue = LocalState.Result;
+            State = GeneratorState.Suspended;
+            // 清除yield标志，确保循环体能正确执行
+            LocalState.IsYield = false;
+            return NextValue;
         }
-
-        // 函数执行完毕，生成器完成
-        State = GeneratorState.Completed;
-        return new VoidLangValue();
+        else if (LocalState.IsReturn)
+        {
+            // 遇到return，生成器完成
+            State = GeneratorState.Completed;
+            return new VoidLangValue();
+        }
+        else
+        {
+            // 没有遇到yield或return，函数执行完毕
+            // 无论是否还有语句，都将生成器标记为Completed
+            // 因为如果有yield语句，它应该已经被执行到了
+            State = GeneratorState.Completed;
+            return new VoidLangValue();
+        }
     }
 
     /// <summary>

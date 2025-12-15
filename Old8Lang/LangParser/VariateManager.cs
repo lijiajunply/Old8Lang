@@ -121,6 +121,17 @@ public class VariateManager
     /// </summary>
     public LangValueType Result { get; set; } = new VoidLangValue();
 
+    /// <summary>
+    /// 生成器执行位置，用于BlockStatement继续执行（已废弃，使用ExecutionPositionStack代替）
+    /// </summary>
+    public int ExecutionPosition { get; set; } = 0;
+
+    /// <summary>
+    /// 生成器执行位置栈，用于支持嵌套的 BlockStatement
+    /// 每个 BlockStatement 入口时压栈，出口时弹栈
+    /// </summary>
+    public Stack<int> ExecutionPositionStack { get; set; } = new();
+
     #endregion
 
     #region Block
