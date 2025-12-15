@@ -96,10 +96,12 @@ public class GeneratorLangValue : LangValueType, ILangList
                 // 遇到yield，保存状态并返回值
                 NextValue = LocalState.Result;
                 State = GeneratorState.Suspended;
-                // 递增ExecutionPosition，因为yield语句已经执行完毕
-                // 下一次调用时会执行yield语句后面的语句
-                // 这样可以确保生成器继续生成后续的值
+                
+                // 无论yield语句在哪里，都递增执行位置
+                // 这样可以避免重复执行同一个语句导致的无限循环
+                // 生成器的执行状态由各个语句内部管理（如while循环的条件判断）
                 ExecutionPosition++;
+                
                 return NextValue;
             }
 
@@ -185,9 +187,9 @@ public class GeneratorLangValue : LangValueType, ILangList
     /// <returns>生成器项的枚举</returns>
     public IEnumerable<LangValueType> GetItems()
     {
-        // 生成器的迭代逻辑由ForInStatement处理，这里不需要实现
-        // 直接返回空枚举，因为生成器的迭代是通过Run方法实现的
-        return Enumerable.Empty<LangValueType>();
+        // 生成器的迭代逻辑由ForInStatement处理，这里只返回空枚举
+        // 避免在迭代过程中影响生成器的状态
+        yield break;
     }
 
     /// <summary>

@@ -1,0 +1,10 @@
+func gen(n:int) -> void {
+    while n > 0 {
+        yield n
+        n <- n - 1
+    }
+}
+
+for i in gen(2) {
+    PrintLine(i)
+}

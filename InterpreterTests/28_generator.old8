@@ -33,7 +33,7 @@ for num in fibonacci(8) {
 
 // 定义一个生成器函数，用于生成字符串的每个字符
 func chars(s) {
-    for i <- 0, i < s.Length, i <- i + 1 {
+    for i <- 0, i < Len(s), i <- i + 1 {
         yield s[i]
     }
 }

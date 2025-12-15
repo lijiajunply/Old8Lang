@@ -1,0 +1,8 @@
+func gen(n){
+    yield n
+    yield n + 1
+}
+
+for i in gen(1){
+    PrintLine(i)
+}

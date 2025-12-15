@@ -48,6 +48,8 @@ public class ForStatement(
                 // 处理yield：如果循环体中遇到yield，返回以暂停执行
                 if (manager.IsYield)
                 {
+                    // 提前执行循环增量，确保生成器恢复时继续推进
+                    statement.Run(manager);
                     return;
                 }
                 
