@@ -279,21 +279,10 @@ public class FuncLangValue : ImportInfo
             
             // 计算所有传入参数的值，使用外部变量管理器
             var paramValues = ids.Select(t => t.Run(variateManagerFunc)).ToList();
-            
-            // 创建一个新的VariateManager，用于生成器的执行
-            // 这个VariateManager将作为生成器函数的执行环境
-            var generatorEnv = new VariateManager
-            {
-                LangInfo = variateManagerFunc.LangInfo,
-                Path = variateManagerFunc.Path,
-                Interpreter = variateManagerFunc.Interpreter,
-                IsFunc = true
-            };
-            
-            // 将参数值设置到生成器环境中
+
+            // 处理默认参数，补全缺失的参数值
             if (Ids != null && Ids.Count > 0)
             {
-                // 处理默认参数，补全缺失的参数值
                 for (var i = paramValues.Count; i < Ids.Count; i++)
                 {
                     var id = Ids[i];
@@ -310,26 +299,25 @@ public class FuncLangValue : ImportInfo
                             $"函数 '{Id?.IdName}' 的参数 '{id.IdName}' 缺少实参且没有默认值");
                     }
                 }
-                
-                // 将参数值设置到生成器环境中
+            }
+
+            // 注意：新架构不再使用 LocalState，而是通过 ParameterValues 传递参数
+            // GeneratorLangValue.Run 方法会在创建状态机时处理参数设置
+
+            // 对于生成器函数，返回GeneratorLangValue对象，而不是直接执行
+            var generator = new GeneratorLangValue(this, Position);
+
+            // 将参数值设置到生成器的 ParameterValues 中
+            if (Ids != null && Ids.Count > 0)
+            {
                 for (var i = 0; i < Ids.Count; i++)
                 {
                     var paramId = Ids[i];
                     var paramValue = paramValues[i];
-                    generatorEnv.Set(paramId, paramValue);
+                    generator.SetParameter(paramId.IdName, paramValue);
                 }
             }
-            
-            // 注意：我们不需要创建新的闭包函数，因为我们已经将参数值
-            // 设置到了生成器环境中，生成器函数可以直接使用这个环境
-            
-            // 对于生成器函数，返回GeneratorLangValue对象，而不是直接执行
-            var generator = new GeneratorLangValue(this, Position)
-            {
-                // 将生成器环境设置为LocalState，这样生成器函数就可以访问到参数值
-                LocalState = generatorEnv
-            };
-            
+
             return generator;
         }
 

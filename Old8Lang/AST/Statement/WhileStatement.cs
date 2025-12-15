@@ -22,8 +22,66 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
         }
         else
         {
-            // 旧架构：根据 IsInGenerator 标志决定执行模式
-            RunLegacy(manager);
+            // 标准 while 循环（非生成器）
+            RunStandard(manager);
+        }
+    }
+
+    /// <summary>
+    /// 标准 while 循环（非生成器）
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    private void RunStandard(VariateManager manager)
+    {
+        // 压入新的控制流状态
+        manager.ControlFlowManager.PushState();
+
+        try
+        {
+            // 标准 while 循环
+            while (true)
+            {
+                // 在每次循环迭代开始时重置控制流标志
+                manager.ControlFlowManager.ResetCurrentState();
+
+                // 获取条件表达式的值
+                var value = expression.Run(manager);
+                if (value is not BoolLangValue varBool)
+                {
+                    throw new TypeError(this, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
+                }
+
+                bool conditionResult = varBool.Value;
+                varBool.ReturnToPool();
+
+                // 如果条件为 false，退出循环
+                if (!conditionResult)
+                {
+                    break;
+                }
+
+                // 执行循环体
+                blockStatement.Run(manager);
+
+                // 处理 break
+                if (manager.ControlFlowManager.BreakFlag)
+                {
+                    manager.ControlFlowManager.BreakFlag = false;
+                    break;
+                }
+
+                // 处理 continue
+                if (manager.ControlFlowManager.ContinueFlag)
+                {
+                    manager.ControlFlowManager.ContinueFlag = false;
+                    continue;
+                }
+            }
+        }
+        finally
+        {
+            // 弹出当前控制流状态
+            manager.ControlFlowManager.PopState();
         }
     }
 
@@ -87,137 +145,6 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
                 {
                     manager.ControlFlowManager.ContinueFlag = false;
                     continue;
-                }
-            }
-        }
-        finally
-        {
-            // 弹出当前控制流状态
-            manager.ControlFlowManager.PopState();
-        }
-    }
-
-    /// <summary>
-    /// 使用旧架构运行（向后兼容）
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    private void RunLegacy(VariateManager manager)
-    {
-        // 压入新的控制流状态
-        manager.ControlFlowManager.PushState();
-
-        try
-        {
-            // 检查是否在生成器上下文中执行
-            bool isInGenerator = manager.IsInGenerator;
-
-            // 如果在生成器中，使用单次迭代模式（支持yield暂停）
-            // 否则，使用标准while循环模式
-            if (isInGenerator)
-            {
-                // 生成器模式：只执行一次循环迭代，然后检查yield标志
-                // 这样生成器可以在每次yield后暂停执行
-
-                // 在每次循环迭代开始时重置控制流标志
-                manager.ControlFlowManager.ResetCurrentState();
-
-                // 优化：直接获取布尔值，避免临时对象创建
-                var value = expression.Run(manager);
-                bool expr1;
-                if (value is BoolLangValue varBool)
-                {
-                    expr1 = varBool.Value;
-                    // 优化：将临时布尔对象归还到对象池
-                    varBool.ReturnToPool();
-                }
-                else
-                {
-                    throw new TypeError(this, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
-                }
-
-                if (expr1)
-                {
-                    // 重置循环体的执行位置，确保每次迭代从头开始
-                    if (blockStatement is BlockStatement block)
-                    {
-                        block.ResetGeneratorPosition();
-                    }
-
-                    // 循环体是嵌套的 BlockStatement，使用执行位置栈机制
-                    blockStatement.Run(manager);
-
-                    // 处理break
-                    if (manager.ControlFlowManager.BreakFlag)
-                    {
-                        // 清除break标志，退出循环
-                        manager.ControlFlowManager.BreakFlag = false;
-                        return;
-                    }
-
-                    // 处理yield：如果循环体中遇到yield，立即返回以暂停执行
-                    // 不清除yield标志，让上层BlockStatement处理
-                    if (manager.IsYield)
-                    {
-                        return;
-                    }
-
-                    // 处理continue：清除continue标志，继续下一次迭代
-                    if (manager.ControlFlowManager.ContinueFlag)
-                    {
-                        manager.ControlFlowManager.ContinueFlag = false;
-                    }
-                }
-                else
-                {
-                    // 条件为false，循环结束
-                    return;
-                }
-            }
-            else
-            {
-                // 标准while循环模式：循环直到条件为false
-                while (true)
-                {
-                    // 在每次循环迭代开始时重置控制流标志
-                    manager.ControlFlowManager.ResetCurrentState();
-
-                    // 优化：直接获取布尔值，避免临时对象创建
-                    var value = expression.Run(manager);
-                    bool expr1;
-                    if (value is BoolLangValue varBool)
-                    {
-                        expr1 = varBool.Value;
-                        // 优化：将临时布尔对象归还到对象池
-                        varBool.ReturnToPool();
-                    }
-                    else
-                    {
-                        throw new TypeError(this, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
-                    }
-
-                    // 如果条件为false，退出循环
-                    if (!expr1)
-                    {
-                        break;
-                    }
-
-                    // 执行循环体
-                    blockStatement.Run(manager);
-
-                    // 处理break
-                    if (manager.ControlFlowManager.BreakFlag)
-                    {
-                        // 清除break标志，退出循环
-                        manager.ControlFlowManager.BreakFlag = false;
-                        break;
-                    }
-
-                    // 处理continue：清除continue标志，继续下一次迭代
-                    if (manager.ControlFlowManager.ContinueFlag)
-                    {
-                        manager.ControlFlowManager.ContinueFlag = false;
-                        continue;
-                    }
                 }
             }
         }

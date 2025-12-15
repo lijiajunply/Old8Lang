@@ -15,20 +15,6 @@ public class BlockStatement : OldStatement
     private readonly List<OldStatement> OtherStatements = [];
     public override int Count => OtherStatements.Count;
 
-    /// <summary>
-    /// 生成器执行位置，用于恢复执行（仅在生成器上下文中使用）
-    /// 每个 BlockStatement 实例有自己的执行位置
-    /// </summary>
-    private int _generatorExecutionPosition = 0;
-
-    /// <summary>
-    /// 重置生成器执行位置（用于循环语句在每次迭代开始时重置）
-    /// </summary>
-    public void ResetGeneratorPosition()
-    {
-        _generatorExecutionPosition = 0;
-    }
-
     public BlockStatement(IEnumerable<IOldLangTree> statements, SourcePosition position = default) : base(position)
     {
         // 遍历所有语句
@@ -53,14 +39,35 @@ public class BlockStatement : OldStatement
 
     public override void Run(VariateManager manager)
     {
-        // 检查是否有生成器上下文，决定使用新架构还是旧架构
+        // 检查是否有生成器上下文，决定执行模式
         if (manager.GeneratorContext != null)
         {
             RunWithGeneratorContext(manager);
         }
         else
         {
-            RunLegacy(manager);
+            RunStandard(manager);
+        }
+    }
+
+    /// <summary>
+    /// 标准执行模式（非生成器）
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    private void RunStandard(VariateManager manager)
+    {
+        // 先执行导入语句
+        ImportRun(manager);
+
+        // 顺序执行所有语句
+        foreach (var statement in OtherStatements)
+        {
+            statement.Run(manager);
+
+            if (manager.IsReturn)
+            {
+                return;
+            }
         }
     }
 
@@ -116,56 +123,6 @@ public class BlockStatement : OldStatement
         // 执行完毕，标记为完成
         context.IsCompleted = true;
         context.CurrentStatementIndex = 0;
-    }
-
-    /// <summary>
-    /// 使用旧架构运行（向后兼容）
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    private void RunLegacy(VariateManager manager)
-    {
-        // 先执行 ImportStatements 列表中的语句，包括 ClassInit 和 FuncInit 语句
-        // 这样，当执行 OtherStatements 列表中的语句时，类和函数已经被添加到 ImportInfos 中了
-        ImportRun(manager);
-
-        // 从当前执行位置开始执行，用于生成器恢复执行
-        for (int i = _generatorExecutionPosition; i < OtherStatements.Count; i++)
-        {
-            var statement = OtherStatements[i];
-            statement.Run(manager);
-
-            if (manager.IsReturn)
-            {
-                // 返回时重置执行位置，因为函数已经结束
-                _generatorExecutionPosition = 0;
-                return;
-            }
-
-            // 遇到yield，不管是什么语句，都立即返回
-            if (manager.IsYield)
-            {
-                // 检查当前语句是否是yield语句本身，或者是循环语句
-                if (statement is YieldStatement)
-                {
-                    // 对于直接yield语句，保存下一个语句的位置
-                    _generatorExecutionPosition = i + 1;
-                }
-                else if (statement is WhileStatement || statement is ForStatement || statement is ForInStatement)
-                {
-                    // 对于循环语句中的yield，保持当前语句位置，让循环语句继续执行
-                    _generatorExecutionPosition = i;
-                }
-                else
-                {
-                    // 对于其他语句（如if语句）中的yield，保存下一个语句的位置
-                    _generatorExecutionPosition = i + 1;
-                }
-                return;
-            }
-        }
-
-        // 执行完毕，重置执行位置
-        _generatorExecutionPosition = 0;
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)

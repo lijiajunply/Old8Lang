@@ -22,28 +22,9 @@ public class GeneratorLangValue : LangValueType, ILangList
     private GeneratorStateMachine? StateMachine { get; set; }
 
     /// <summary>
-    /// 是否使用新的状态机架构
-    /// </summary>
-    /// <remarks>
-    /// 设置为true时使用新的GeneratorStateMachine，false时使用旧的LocalState方式
-    /// 在重构过程中，这个标志用于逐步迁移和测试
-    /// </remarks>
-    private bool UseStateMachine { get; set; } = true;  // 已启用新架构
-
-    /// <summary>
     /// 生成器当前状态
     /// </summary>
     public GeneratorState State { get; set; } = GeneratorState.Suspended;
-
-    /// <summary>
-    /// 生成器的执行位置（用于恢复执行）
-    /// </summary>
-    public int ExecutionPosition { get; set; }
-
-    /// <summary>
-    /// 生成器的局部变量状态
-    /// </summary>
-    public VariateManager? LocalState { get; set; }
 
     /// <summary>
     /// 生成器迭代器的下一个值
@@ -92,29 +73,11 @@ public class GeneratorLangValue : LangValueType, ILangList
     /// <returns>生成器的下一个值</returns>
     public override LangValueType Run(VariateManager manager)
     {
-        // 根据标志选择使用新架构还是旧架构
-        if (UseStateMachine)
-        {
-            return RunWithStateMachine(manager);
-        }
-        else
-        {
-            return RunLegacy(manager);
-        }
-    }
-
-    /// <summary>
-    /// 使用新的状态机架构运行生成器
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    /// <returns>生成器的下一个值</returns>
-    private LangValueType RunWithStateMachine(VariateManager manager)
-    {
         // 如果状态机还未初始化，则创建它
         if (StateMachine == null)
         {
             // 为生成器创建独立的变量环境
-            var generatorManager = LocalState ?? manager.CloneForGenerator();
+            var generatorManager = manager.CloneForGenerator();
 
             // 设置参数值到生成器环境中
             foreach (var (paramName, paramValue) in ParameterValues)
@@ -143,63 +106,6 @@ public class GeneratorLangValue : LangValueType, ILangList
     }
 
     /// <summary>
-    /// 使用旧架构运行生成器（向后兼容）
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    /// <returns>生成器的下一个值</returns>
-    private LangValueType RunLegacy(VariateManager manager)
-    {
-        // 注意：我们不需要创建新的LocalState，因为它已经在FuncLangValue.Run方法中被设置好了
-
-        State = GeneratorState.Running;
-
-        // 每次执行前清除yield和return标志，确保下一次迭代能正确执行
-        LocalState!.IsYield = false;
-        LocalState.IsReturn = false;
-
-        // 设置生成器上下文标记，让while/for循环知道当前在生成器中执行
-        var wasInGenerator = LocalState.IsInGenerator;
-        LocalState.IsInGenerator = true;
-
-        try
-        {
-            // 生成器的执行逻辑由ForInStatement处理
-            // 这里我们只需要执行生成器函数，直到遇到yield或return
-            // 注意：Func.BlockStatement.Run方法会执行到yield语句后返回
-            Func.BlockStatement.Run(LocalState);
-
-            if (LocalState.IsYield)
-            {
-                // 遇到yield，保存状态并返回值
-                NextValue = LocalState.Result;
-                State = GeneratorState.Suspended;
-                // 清除yield标志，确保循环体能正确执行
-                LocalState.IsYield = false;
-                return NextValue;
-            }
-            else if (LocalState.IsReturn)
-            {
-                // 遇到return，生成器完成
-                State = GeneratorState.Completed;
-                return new VoidLangValue();
-            }
-            else
-            {
-                // 没有遇到yield或return，函数执行完毕
-                // 无论是否还有语句，都将生成器标记为Completed
-                // 因为如果有yield语句，它应该已经被执行到了
-                State = GeneratorState.Completed;
-                return new VoidLangValue();
-            }
-        }
-        finally
-        {
-            // 恢复生成器上下文标记
-            LocalState.IsInGenerator = wasInGenerator;
-        }
-    }
-
-    /// <summary>
     /// 作为可调用对象执行，返回下一个值
     /// </summary>
     /// <param name="manager">变量管理器</param>
@@ -218,18 +124,8 @@ public class GeneratorLangValue : LangValueType, ILangList
     public void Reset()
     {
         State = GeneratorState.Suspended;
-        ExecutionPosition = 0;
         NextValue = null;
-
-        // 根据使用的架构重置对应的组件
-        if (UseStateMachine)
-        {
-            StateMachine?.Reset();
-        }
-        else
-        {
-            LocalState = null;
-        }
+        StateMachine?.Reset();
     }
 
     /// <summary>

@@ -24,17 +24,16 @@ public class YieldStatement(LangExpression yieldExpression, SourcePosition posit
         // 计算yield表达式的值
         var yieldValue = YieldExpression.Run(manager);
 
-        // 检查是否有生成器上下文
+        // 通过生成器上下文设置yield值和标志
         var genContext = manager.GeneratorContext;
         if (genContext != null)
         {
-            // 新架构：通过生成器上下文设置yield值和标志
             genContext.CurrentValue = yieldValue;
             genContext.HasYielded = true;
         }
         else
         {
-            // 旧架构（向后兼容）：使用全局标志
+            // 如果在非生成器上下文中使用yield，设置全局标志（用于兼容旧代码）
             manager.Result = yieldValue;
             manager.IsYield = true;
         }
