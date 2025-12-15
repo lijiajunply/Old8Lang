@@ -42,8 +42,8 @@ async func flakyTask() {
 
 // Retry 方法目前还不可用
 PrintLine("Retry 方法暂不可用")
-// retryTask <- flakyTask().Retry(3, 200)
-// result5 <- await retryTask
-// PrintLine("Retry 结果: " + result5)
+retryTask <- flakyTask().Retry(3, 200)
+result5 <- await retryTask
+PrintLine("Retry 结果: " + result5)
 
 PrintLine("\n所有测试完成!")
