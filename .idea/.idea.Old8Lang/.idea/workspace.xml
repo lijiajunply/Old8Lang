@@ -18,10 +18,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/FuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/FuncStatic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -61,6 +57,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/FuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/FuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
@@ -409,7 +406,7 @@
       <workItem from="1765734191994" duration="8791000" />
       <workItem from="1765776532895" duration="4492000" />
       <workItem from="1765791344254" duration="3118000" />
-      <workItem from="1765816155545" duration="15083000" />
+      <workItem from="1765816155545" duration="15404000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -754,7 +751,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="199" />
+    <option name="localTasksCounter" value="200" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -781,7 +778,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(parser): 更新列表初始化语法并优化代码结构&#10;&#10;- 将列表初始化语法从 list[] 更改为 {}&#10;- 移除不必要的注释块，简化代码逻辑&#10;- 为类方法添加大括号以明确作用域&#10;- 更新程序入口文件路径配置&#10;- 启用编译加速测试功能&#10;- 修复斐波那契函数调用逻辑" />
     <MESSAGE value="feat(parser): 引入 native 关键字替代 import 方括号语法&#10;&#10;- 新增 Native 枚举值以支持 native 关键字识别&#10;- 更新 EBNF 语法规则，使用 native 替代 [import ...] 形式&#10;- 修改解析器逻辑，适配新的 native 语句结构&#10;- 支持批量导入(*)、选择性导入({})及别名(as)语法&#10;- 移除旧的方括号包围的 import 语句处理逻辑&#10;- 更新标准库文件使用新语法格式&#10;- 同步更新语法文档说明与示例代码" />
     <MESSAGE value="refactor(parser): 将 import 关键字替换为 native&#10;&#10;- 更新语法关键字从 import 到 native&#10;- 修改类导入语句格式为 native &quot;DllName&quot; ClassName&#10;- 支持带别名的类导入语法 native &quot;DllName&quot; ClassName as Alias&#10;- 更新批量导入语法为 native &quot;DllName&quot; ClassName *&#10;- 更新选择性导入语法为 native &quot;DllName&quot; ClassName { Method1, Method2 }&#10;- 调整测试文件中的导入语句格式&#10;- 更新代码注释中的语法示例说明" />
     <MESSAGE value="feat(parser): 实现新的 import 语法支持&#10;&#10;- 新增 ImportItem 类用于表示导入项及其别名&#10;- 修改 ImportStatement 类以支持命名导入、默认导入和 from 子句&#10;- 更新语法规则，添加 from 和 as 关键字支持&#10;- 实现解析器对新 import 语法的完整支持&#10;- 支持传统 import 语法以保持向后兼容&#10;- 添加测试用例验证各种 import 语法场景&#10;- 更新语法文档和 EBNF 定义&#10;- 优化模块导入逻辑，区分不同导入方式的处理流程" />
@@ -806,7 +802,8 @@
     <MESSAGE value="feat(async): 实现 Task 类静态方法支持&#10;&#10;- 新增 TaskClassLangValue 类，提供 WhenAll、WhenAny、Delay 静态方法&#10;- 在解释器初始化时注册全局 Task 对象&#10;- 支持通过 Task.WhenAll([...]) 和 Task.WhenAny([...]) 调用任务组合方法&#10;- 实现 TaskStaticMethodWrapper 包装器，用于执行静态方法&#10;- 更新 Instance.cs 以支持 TaskStaticMethodWrapper 的调用&#10;- 优化 Operation.cs 中对 Task 类成员访问的处理逻辑&#10;- 移除 AsyncLib.cs 中不必要的变量声明&#10;- 更新异步测试用例，启用 Task.WhenAll 和 Task.WhenAny 的实际调用&#10;- 注释掉暂不可用的 Retry 方法测试代码" />
     <MESSAGE value="feat(async): 完善异步任务状态管理与AwaitAsync功能&#10;&#10;- 统一使用GetUnixTimeMilliseconds替代GetCurrentTime以提高时间精度&#10;- 修改异常抛出方式，去除new Error语法，适配语言规范&#10;- 增强TaskLangValue类的状态同步与线程安全性&#10;- 实现Task对象属性访问支持（IsCompleted、Status等）&#10;- 优化任务超时控制逻辑与重试机制&#10;- 补充异步任务相关内置函数的实现细节&#10;- 更新测试用例以匹配新的行为规范&#10;- 增加Time模块导入以支持时间相关操作" />
     <MESSAGE value="feat(async): 实现异步任务重试与链式调用功能&#10;&#10;- 新增 TaskLangValue 的 Retry 和 Then 扩展方法&#10;- 支持通过 flakyTask().Retry(3, 200) 语法实现任务重试&#10;- 支持通过 task.Then(nextTaskFunc) 实现任务链式调用&#10;- 优化异步函数执行时的作用域管理和调用栈处理&#10;- 统一异常抛出语法，去除 new Error() 用法&#10;- 改进异步流处理中的字段命名和访问方式&#10;- 增强异步任务状态管理与线程安全性&#10;- 更新测试用例以验证新的异步功能&#10;- 修复 Instance.cs 中的方法调用参数处理逻辑&#10;- 移除无用的 Task 属性 XAUAT" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(async): 实现异步任务重试与链式调用功能&#10;&#10;- 新增 TaskLangValue 的 Retry 和 Then 扩展方法&#10;- 支持通过 flakyTask().Retry(3, 200) 语法实现任务重试&#10;- 支持通过 task.Then(nextTaskFunc) 实现任务链式调用&#10;- 优化异步函数执行时的作用域管理和调用栈处理&#10;- 统一异常抛出语法，去除 new Error() 用法&#10;- 改进异步流处理中的字段命名和访问方式&#10;- 增强异步任务状态管理与线程安全性&#10;- 更新测试用例以验证新的异步功能&#10;- 修复 Instance.cs 中的方法调用参数处理逻辑&#10;- 移除无用的 Task 属性 XAUAT" />
+    <MESSAGE value="feat(async): 实现异步任务重试与链式调用功能&#10;&#10;- 新增 TaskLangValue 的 ExternalManager 属性，用于访问外部作用域&#10;- 实现 TaskLangValue 的 Retry 和 Then 扩展方法&#10;- 支持通过 flakyTask().Retry(3, 200) 语法实现任务重试&#10;- 支持通过 task.Then(nextTaskFunc) 实现任务链式调用&#10;- 优化异步函数执行时的作用域管理和调用栈处理&#10;- 统一异常抛出语法，去除 new Error() 用法&#10;- 改进异步流处理中的字段命名和访问方式&#10;- 增强异步任务状态管理与线程安全性&#10;- 更新测试用例以验证新的异步功能&#10;- 修复 Instance.cs 中的方法调用参数处理逻辑&#10;- 移除无用的 Task 属性 XAUAT" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(async): 实现异步任务重试与链式调用功能&#10;&#10;- 新增 TaskLangValue 的 ExternalManager 属性，用于访问外部作用域&#10;- 实现 TaskLangValue 的 Retry 和 Then 扩展方法&#10;- 支持通过 flakyTask().Retry(3, 200) 语法实现任务重试&#10;- 支持通过 task.Then(nextTaskFunc) 实现任务链式调用&#10;- 优化异步函数执行时的作用域管理和调用栈处理&#10;- 统一异常抛出语法，去除 new Error() 用法&#10;- 改进异步流处理中的字段命名和访问方式&#10;- 增强异步任务状态管理与线程安全性&#10;- 更新测试用例以验证新的异步功能&#10;- 修复 Instance.cs 中的方法调用参数处理逻辑&#10;- 移除无用的 Task 属性 XAUAT" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -409,7 +409,7 @@ public class TaskLangValue : LangValueType
             {
                 if (t.IsFaulted)
                 {
-                    throw t.Exception?.InnerException ?? t.Exception;
+                    throw (t.Exception?.InnerException ?? t.Exception)!;
                 }
 
                 return new ListLangValue(t.Result.ToList(), position) as LangValueType;
@@ -460,7 +460,7 @@ public class TaskLangValue : LangValueType
     /// <summary>
     /// 为任务添加超时限制
     /// </summary>
-    public TaskLangValue WithTimeout(int timeoutMs, SourcePosition position = default)
+    public TaskLangValue WithTimeout(int timeoutMs)
     {
         var timeoutTask = System.Threading.Tasks.Task
             .WhenAny(Task, System.Threading.Tasks.Task.Delay(timeoutMs, _cancellationToken))
@@ -473,7 +473,7 @@ public class TaskLangValue : LangValueType
 
                 return Task.Result;
             }, _cancellationToken);
-        return new TaskLangValue(timeoutTask, _cancellationToken, position);
+        return new TaskLangValue(timeoutTask, _cancellationToken);
     }
 
     /// <summary>

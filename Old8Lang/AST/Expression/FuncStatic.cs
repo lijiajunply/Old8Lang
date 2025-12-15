@@ -572,6 +572,7 @@ public static class TaskValueFuncStatic
                 {
                     return taskValue;
                 }
+
                 throw new InvalidOperationError(task.Position, "Then 的 continuation 函数必须返回一个 Task");
             }, task.Position);
         }
@@ -586,10 +587,12 @@ public static class TaskValueFuncStatic
         /// <returns>带重试机制的 TaskLangValue</returns>
         public TaskLangValue Retry(IntLangValue retryCount, IntLangValue? delayMs = null)
         {
-            // Retry 方法的实际实现在 Operation.cs 中，因为需要重新执行原始函数调用
-            // 这里抛出错误提示用户
-            throw new InvalidOperationError(task.Position,
-                "Retry 方法需要在函数调用上使用（如 func().Retry(3, 100)），内部实现已在 Operation.cs 中处理");
+            if (task.ExternalManager == null)
+            {
+                throw new InvalidOperationError(task.Position, "Then 方法需要有效的执行上下文（ExternalManager）");
+            }
+
+            return task.Retry(retryCount.Value, delayMs?.Value ?? 0);
         }
     }
 }
