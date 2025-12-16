@@ -18,9 +18,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/资源泄漏修复计划.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/2025-12-16-异步多线程评估报告.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251216-143740-异步多线程测试结果.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/run_async_thread_tests_v3.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/AsyncLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/AsyncLib.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,6 +103,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/AsyncLib.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/AsyncLib.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/AsyncLib.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/378b2b72dcfd47c7a335f353306873123e00/5d/0b33afd1/02000002pdb1.il" root0="FORCE_HIGHLIGHTING" />
@@ -147,6 +149,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHELLCHECK.PATH": "/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck",
     "WebServerToolWindowFactoryState": "false",
     "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
     "git-widget-placeholder": "master",
@@ -420,7 +423,7 @@
       <workItem from="1765734191994" duration="8791000" />
       <workItem from="1765776532895" duration="4492000" />
       <workItem from="1765791344254" duration="3118000" />
-      <workItem from="1765816155545" duration="18030000" />
+      <workItem from="1765816155545" duration="20102000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -765,7 +768,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="201" />
+    <option name="localTasksCounter" value="202" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -792,7 +795,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(parser): 将 import 关键字替换为 native&#10;&#10;- 更新语法关键字从 import 到 native&#10;- 修改类导入语句格式为 native &quot;DllName&quot; ClassName&#10;- 支持带别名的类导入语法 native &quot;DllName&quot; ClassName as Alias&#10;- 更新批量导入语法为 native &quot;DllName&quot; ClassName *&#10;- 更新选择性导入语法为 native &quot;DllName&quot; ClassName { Method1, Method2 }&#10;- 调整测试文件中的导入语句格式&#10;- 更新代码注释中的语法示例说明" />
     <MESSAGE value="feat(parser): 实现新的 import 语法支持&#10;&#10;- 新增 ImportItem 类用于表示导入项及其别名&#10;- 修改 ImportStatement 类以支持命名导入、默认导入和 from 子句&#10;- 更新语法规则，添加 from 和 as 关键字支持&#10;- 实现解析器对新 import 语法的完整支持&#10;- 支持传统 import 语法以保持向后兼容&#10;- 添加测试用例验证各种 import 语法场景&#10;- 更新语法文档和 EBNF 定义&#10;- 优化模块导入逻辑，区分不同导入方式的处理流程" />
     <MESSAGE value="feat(parser): 移除 import ... as ... 语法支持&#10;&#10;- 移除 ImportStatement 类中的 defaultImport 参数和相关逻辑&#10;- 修改 StatementParser 中的 ParseImportStatement 方法，不再处理 import module as alias 语法&#10;- 更新 Old8Lang.ebnf 文件，调整 importSpecifier 语法规则&#10;- 删除或更新使用 import ... as ... 语法的测试用例&#10;- 更新 Old8Lang_Grammar.md 文档，移除相关语法说明&#10;- 确保保留命名导入和重命名导入的支持&#10;- 确保传统 import 语法仍可正常使用" />
     <MESSAGE value="feat(parser): 支持未初始化字段声明和访问修饰符&#10;&#10;- 实现未初始化字段语法解析，自动赋予null默认值&#10;- 添加private、static等访问修饰符的支持和检查&#10;- 完善字段访问权限控制，防止外部访问私有成员&#10;- 优化类成员查找逻辑，支持继承和静态成员访问&#10;- 增强错误处理，禁止类外部使用未初始化字段语法&#10;- 更新字段定义机制，正确设置字段的访问属性&#10;- 改进导入语句解析，提高代码格式一致性" />
@@ -817,7 +819,8 @@
     <MESSAGE value="feat(async): 实现异步任务重试与链式调用功能&#10;&#10;- 新增 TaskLangValue 的 Retry 和 Then 扩展方法&#10;- 支持通过 flakyTask().Retry(3, 200) 语法实现任务重试&#10;- 支持通过 task.Then(nextTaskFunc) 实现任务链式调用&#10;- 优化异步函数执行时的作用域管理和调用栈处理&#10;- 统一异常抛出语法，去除 new Error() 用法&#10;- 改进异步流处理中的字段命名和访问方式&#10;- 增强异步任务状态管理与线程安全性&#10;- 更新测试用例以验证新的异步功能&#10;- 修复 Instance.cs 中的方法调用参数处理逻辑&#10;- 移除无用的 Task 属性 XAUAT" />
     <MESSAGE value="feat(async): 实现异步任务重试与链式调用功能&#10;&#10;- 新增 TaskLangValue 的 ExternalManager 属性，用于访问外部作用域&#10;- 实现 TaskLangValue 的 Retry 和 Then 扩展方法&#10;- 支持通过 flakyTask().Retry(3, 200) 语法实现任务重试&#10;- 支持通过 task.Then(nextTaskFunc) 实现任务链式调用&#10;- 优化异步函数执行时的作用域管理和调用栈处理&#10;- 统一异常抛出语法，去除 new Error() 用法&#10;- 改进异步流处理中的字段命名和访问方式&#10;- 增强异步任务状态管理与线程安全性&#10;- 更新测试用例以验证新的异步功能&#10;- 修复 Instance.cs 中的方法调用参数处理逻辑&#10;- 移除无用的 Task 属性 XAUAT" />
     <MESSAGE value="feat(lang): 实现 Retry 方法支持异步函数重试&#10;&#10;- 添加了对异步函数调用重试的支持&#10;- 实现了可配置的重试次数和延迟时间&#10;- 增加了参数验证和类型检查&#10;- 创建了新的 Task 包装器以支持重试逻辑&#10;- 提供了详细的错误提示信息&#10;- 修复了 Retry 方法的执行机制，确保每次重试都重新执行原函数" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 实现 Retry 方法支持异步函数重试&#10;&#10;- 添加了对异步函数调用重试的支持&#10;- 实现了可配置的重试次数和延迟时间&#10;- 增加了参数验证和类型检查&#10;- 创建了新的 Task 包装器以支持重试逻辑&#10;- 提供了详细的错误提示信息&#10;- 修复了 Retry 方法的执行机制，确保每次重试都重新执行原函数" />
+    <MESSAGE value="feat(async): 实现异步库资源自动清理机制&#10;&#10;- 添加 ResourceWrapper 类包装资源并跟踪访问时间&#10;- 引入定时器定期清理闲置资源&#10;- 更新 Mutex、Semaphore、AtomicInt、Channel 和 CancellationTokenSource 的存储结构&#10;- 修改所有资源操作方法以更新最后访问时间&#10;- 实现 CleanupResources 方法遍历并释放闲置资源&#10;- 添加取消令牌源的相关操作支持&#10;- 优化 Channel 操作逻辑以适配新的资源包装结构" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(async): 实现异步库资源自动清理机制&#10;&#10;- 添加 ResourceWrapper 类包装资源并跟踪访问时间&#10;- 引入定时器定期清理闲置资源&#10;- 更新 Mutex、Semaphore、AtomicInt、Channel 和 CancellationTokenSource 的存储结构&#10;- 修改所有资源操作方法以更新最后访问时间&#10;- 实现 CleanupResources 方法遍历并释放闲置资源&#10;- 添加取消令牌源的相关操作支持&#10;- 优化 Channel 操作逻辑以适配新的资源包装结构" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
