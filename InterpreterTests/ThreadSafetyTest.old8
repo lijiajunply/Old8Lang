@@ -65,13 +65,13 @@ func testIsCompletedSafety() {
 func testThreadException() {
     thread <- spawn(() -> {
         // 模拟异常
-        throw Exception("线程执行异常测试")
+        throw "线程执行异常测试"
     })
-    
+
     try {
         thread.Join()
     } catch (e) {
-        PrintLine("捕获到线程异常: " + e.Message)
+        PrintLine("捕获到线程异常: " + e)
     }
 }
 

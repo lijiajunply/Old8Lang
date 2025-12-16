@@ -171,9 +171,18 @@ public class ThreadLangValue : LangValueType
 
         lock (Lock)
         {
-            return Exception != null
-                ? throw new InvalidOperationError(this, "线程执行异常: " + Exception)
-                : ObjToValue(Result!);
+            if (Exception != null)
+            {
+                throw new InvalidOperationError(this, "线程执行异常: " + Exception);
+            }
+
+            // 如果 Result 为 null，返回 VoidLangValue
+            if (Result == null)
+            {
+                return new VoidLangValue();
+            }
+
+            return ObjToValue(Result);
         }
     }
 
@@ -294,6 +303,18 @@ public class ThreadLangValue : LangValueType
         {
             // 直接返回 IsCompleted 属性值，避免反射
             return new BoolLangValue(IsCompleted);
+        }
+
+        // 处理属性访问（LangId 类型）
+        if (dotExpression is LangId langId)
+        {
+            switch (langId.IdName)
+            {
+                case "State":
+                    return new StringLangValue(State.ToString());
+                case "IsCompleted":
+                    return new BoolLangValue(IsCompleted);
+            }
         }
 
         if (dotExpression is Instance { Id.IdName: "Cancel" })

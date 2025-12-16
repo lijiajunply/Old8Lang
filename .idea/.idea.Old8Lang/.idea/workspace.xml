@@ -18,7 +18,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/async_stream_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/async_stream_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/InterpreterTests/ThreadSafetyTest.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/ThreadSafetyTest.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ThreadLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ThreadLangValue.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,6 +97,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/GeneratorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/GeneratorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/GeneratorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
@@ -802,7 +805,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="213" />
+    <option name="localTasksCounter" value="214" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -829,7 +832,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(runtime): 实现多线程支持和线程管理功能&#10;&#10;- 添加 ThreadLangValue 类封装线程操作和状态管理&#10;- 实现 spawn 函数支持创建新线程执行函数&#10;- 实现 Join 方法用于等待线程完成并获取返回值&#10;- 扩展 Instance 类支持 Spawn 方法调用&#10;- 更新变量管理器字段命名和线程安全处理&#10;- 添加基础线程测试用例验证功能正确性&#10;- 更新词法分析器标记定义和格式化&#10;- 优化异步库 ChannelTryReceive 方法可空返回类型&#10;- 调整 IL 生成代码使用 foreach 替代 for 循环&#10;- 更新项目配置和开发环境设置文件" />
     <MESSAGE value="feat(generator): 实现生成器执行位置跟踪与恢复机制&#10;&#10;- 在 BlockStatement 中添加生成器执行位置字段和重置方法&#10;- 修改 BlockStatement.Run 方法支持从指定位置恢复执行&#10;- 优化 ForInStatement 处理生成器暂停状态下的值获取&#10;- 简化 GeneratorLangValue.Run 方法逻辑，移除手动位置管理&#10;- 更新 VariateManager 添加执行位置栈支持嵌套块语句&#10;- 调整 WhileStatement 适配新的生成器执行模型&#10;- 添加多个调试测试文件验证生成器行为" />
     <MESSAGE value="fix(runtime): 修复while循环只执行一次和异步函数作用域隔离问题&#10;&#10;- 修复WhileStatement.cs中while循环只执行一次的严重缺陷，区分生成器和普通上下文&#10;- 修改AsyncFuncLangValue.cs和VariateManager.cs，取消异步函数的深拷贝作用域隔离&#10;- 允许异步函数修改外部作用域变量，解决并发原语失效问题&#10;- 在VariateManager中添加IsInGenerator标记，支持生成器上下文识别&#10;- 调整workspace.xml中的变更列表和任务计数器" />
     <MESSAGE value="fix(interpreter): 修复异步函数和while循环执行问题&#10;&#10;- 修复while循环只执行一次的问题，通过IsInGenerator标志区分执行上下文&#10;- 修复异步函数无法修改外部作用域变量的问题，移除作用域深拷贝逻辑&#10;- 异步任务中变量修改现在可正确反映到外部作用域&#10;- while循环在非生成器上下文中恢复正常多次迭代&#10;- 通过Mutex和原子操作测试验证修复效果，计数结果从错误值变为正确值&#10;- 修复影响async_mutex.old8和async_atomic.old8等关键测试用例" />
@@ -854,7 +856,8 @@
     <MESSAGE value="feat(lang): 实现闭包作用域捕获优化和COW机制&#10;&#10;- 添加 CapturedScope 类用于缓存闭包捕获的作用域信息&#10;- 在 VariateManager 中引入 Copy-On-Write 机制优化闭包性能&#10;- 实现作用域共享标记和写时拷贝逻辑&#10;- 支持闭包快照创建时的零拷贝优化&#10;- 完善作用域管理的线程安全性和内存效率&#10;- 添加相关测试用例验证闭包和性能优化效果" />
     <MESSAGE value="feat(lang): 实现异步生成器和作用域捕获优化&#10;&#10;- 优化异步函数和生成器的作用域捕获机制，使用深拷贝确保状态隔离&#10;- 改进 BlockStatement 执行逻辑，支持 yield 恢复和嵌套执行栈管理&#10;- 完善 WhileStatement 对生成器上下文的支持，正确处理循环体执行栈帧&#10;- 更新 ImportError 构造函数，使用可空集合参数避免空引用异常&#10;- 修复测试文件中异常抛出语法，确保错误处理一致性&#10;- 添加异步生成器相关测试用例，验证 await 和 yield 协同工作能力&#10;- 优化 VariateManager 作用域查找缓存初始化逻辑和字段引用方式" />
     <MESSAGE value="docs(scope): 添加COW机制探索文档和ScopeLayer实现&#10;&#10;- 创建COW_REDESIGN.md文档，详细记录COW机制探索过程&#10;- 实现ScopeLayer类，支持分层作用域和延迟拷贝&#10;- 添加测试文件验证闭包和COW场景&#10;- 更新VariateManager变量查找缓存逻辑&#10;- 重构作用域写入方法，优化缓存更新机制" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(scope): 添加COW机制探索文档和ScopeLayer实现&#10;&#10;- 创建COW_REDESIGN.md文档，详细记录COW机制探索过程&#10;- 实现ScopeLayer类，支持分层作用域和延迟拷贝&#10;- 添加测试文件验证闭包和COW场景&#10;- 更新VariateManager变量查找缓存逻辑&#10;- 重构作用域写入方法，优化缓存更新机制" />
+    <MESSAGE value="fix(async): 修复异步流测试中断言和作用域隔离问题&#10;&#10;- 移除异步流测试中不必要的断言语句&#10;- 修复空异步生成器的实现，确保正确识别为异步函数&#10;- 调整异步函数作用域捕获机制，使用深拷贝避免并发冲突&#10;- 修复异常处理语法，确保错误信息正确获取&#10;- 优化测试用例结构，提高代码可读性和维护性" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(async): 修复异步流测试中断言和作用域隔离问题&#10;&#10;- 移除异步流测试中不必要的断言语句&#10;- 修复空异步生成器的实现，确保正确识别为异步函数&#10;- 调整异步函数作用域捕获机制，使用深拷贝避免并发冲突&#10;- 修复异常处理语法，确保错误信息正确获取&#10;- 优化测试用例结构，提高代码可读性和维护性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

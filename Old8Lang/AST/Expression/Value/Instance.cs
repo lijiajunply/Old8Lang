@@ -207,7 +207,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
                 // 使用临时变量来存储线程对象，避免闭包引用问题
                 ThreadLangValue? tempThread = null;
-                
+
                 // 创建取消令牌源
                 var cts = new CancellationTokenSource();
 
@@ -219,7 +219,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
                 // 赋值给最终的线程变量
                 var thread = tempThread;
-                
+
                 // 设置外部管理器
                 thread.ExternalManager = manager;
 
@@ -234,7 +234,8 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                         var funcResult = spawnFunc.Run(threadManager, threadArgs);
 
                         // 设置线程结果
-                        tempThread?.SetResult(funcResult.GetValue());
+                        // 如果函数返回 VoidLangValue，则设置 null 作为结果
+                        tempThread?.SetResult(funcResult is VoidLangValue ? null! : funcResult.GetValue());
                     }
                     catch (Exception ex)
                     {
