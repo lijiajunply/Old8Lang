@@ -83,13 +83,6 @@ public class AsyncFuncLangValue : ImportInfo
             // 重置返回状态，确保异步函数体能够正常执行
             executionManager.IsReturn = false;
 
-            // 为异步执行创建独立的调用栈上下文
-            var asyncCallStack = new List<CallStackFrame>(Old8Exception.CurrentCallStack);
-
-            // 临时替换全局调用栈
-            var originalCallStack = Old8Exception.CurrentCallStack;
-            Old8Exception.CurrentCallStack = asyncCallStack;
-
             try
             {
                 // 增加递归深度
@@ -170,9 +163,6 @@ public class AsyncFuncLangValue : ImportInfo
             {
                 executionManager.RecursionDepth--;
                 Old8Exception.PopCallStack();
-
-                // 恢复原始调用栈
-                Old8Exception.CurrentCallStack = originalCallStack;
             }
         }, cancellationToken);
 
