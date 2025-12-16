@@ -4,6 +4,9 @@ using Old8Lang.Error;
 using Old8Lang.LangParser;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System;
 
 namespace Old8Lang.AST.Statement;
 
@@ -141,6 +144,22 @@ public class AsyncFuncInit : OldStatement
         // 指定T为object
         fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
         ilGenerator.Emit(OpCodes.Call, fromResultMethod);
+        ilGenerator.Emit(OpCodes.Ret);
+    }
+    
+    /// <summary>
+    /// 实现MoveNext方法
+    /// </summary>
+    private void ImplementMoveNext(
+        ILGenerator ilGenerator,
+        Type stateMachineType,
+        FieldInfo stateField,
+        FieldInfo builderField,
+        FieldInfo awaiterField,
+        LocalManager local
+    )
+    {
+        // 简化实现：这个方法暂时不会被调用
         ilGenerator.Emit(OpCodes.Ret);
     }
 

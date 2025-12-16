@@ -1,0 +1,27 @@
+// 简单异步函数测试用例
+
+// 测试1：基本异步函数
+async func simpleAsync() {
+    return "Success"
+}
+
+// 测试2：带参数的异步函数
+async func asyncAdd(a:int, b:int) {
+    return a + b
+}
+
+// 测试3：带返回值的异步函数
+async func asyncReturn() {
+    value <- 42
+    return value
+}
+
+// 测试4：空异步函数
+async func asyncEmpty() {
+    // 空函数体
+}
+
+// 测试5：异步函数声明（无调用）
+async func asyncDeclare() {
+    return "Declared"
+}

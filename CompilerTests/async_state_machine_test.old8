@@ -1,0 +1,53 @@
+// 异步状态机测试用例
+
+// 测试1：基本异步函数
+async func simpleAsync() {
+    return "Success"
+}
+
+// 测试2：带await的异步函数
+async func asyncWithAwait() {
+    // 调用另一个异步函数
+    result <- await simpleAsync()
+    return "Result_" + result
+}
+
+// 测试3：嵌套await
+async func nestedAwait() {
+    result1 <- await simpleAsync()
+    result2 <- await asyncWithAwait()
+    return result1 + ":" + result2
+}
+
+// 测试4：异步函数链式调用
+async func asyncChain() {
+    async func step1() {
+        return "Step1"
+    }
+    
+    async func step2(prev:string) {
+        return prev + "_Step2"
+    }
+    
+    async func step3(prev:string) {
+        return prev + "_Step3"
+    }
+    
+    // 链式调用
+    result <- await step1()
+    result <- await step2(result)
+    result <- await step3(result)
+    
+    return result
+}
+
+// 调用测试函数
+result1 <- await simpleAsync()
+result2 <- await asyncWithAwait()
+result3 <- await nestedAwait()
+result4 <- await asyncChain()
+
+PrintLine(result1)
+PrintLine(result2)
+PrintLine(result3)
+PrintLine(result4)

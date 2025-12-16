@@ -72,10 +72,25 @@ public class AwaitExpression : LangExpression
         // 调用GetAwaiter()方法获取等待器
         ilGenerator.Emit(OpCodes.Callvirt, typeof(Task<object>).GetMethod("GetAwaiter")!);
         
-        // 获取等待器的结果类型
+        // 检查等待器是否已完成
         var awaiterType = typeof(Task<object>).GetMethod("GetAwaiter")!.ReturnType;
+        var isCompletedProperty = awaiterType.GetProperty("IsCompleted")!;
+        ilGenerator.Emit(OpCodes.Callvirt, isCompletedProperty.GetGetMethod()!);
         
-        // 调用GetResult()方法获取结果
+        // 如果已完成，直接获取结果
+        var completedLabel = ilGenerator.DefineLabel();
+        var notCompletedLabel = ilGenerator.DefineLabel();
+        ilGenerator.Emit(OpCodes.Brtrue_S, completedLabel);
+        
+        // 未完成，保存当前状态
+        ilGenerator.MarkLabel(notCompletedLabel);
+        
+        // 这里需要实现异步状态机的暂停和恢复逻辑
+        // 由于当前实现的限制，我们暂时使用同步等待
+        // 后续可以优化为真正的异步等待
+        
+        // 调用GetResult()方法获取结果（同步等待）
+        ilGenerator.MarkLabel(completedLabel);
         ilGenerator.Emit(OpCodes.Callvirt, awaiterType.GetMethod("GetResult")!);
     }
 
