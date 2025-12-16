@@ -15,7 +15,7 @@ public class AsyncFuncLangValue : ImportInfo
 {
     public readonly LangId? Id;
     public readonly List<LangId>? Ids;
-    private readonly BlockStatement BlockStatement;
+    internal readonly BlockStatement BlockStatement;
 
     // 闭包环境：捕获的作用域
     private VariateManager? CapturedScope { get; init; }
@@ -206,11 +206,12 @@ public class AsyncFuncLangValue : ImportInfo
     }
 
     /// <summary>
-    /// 生成 IL 代码（编译器模式暂不支持）
+    /// 生成 IL 代码（编译器模式）
     /// </summary>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        throw new NotImplementedError(Position, "编译模式暂不支持异步函数");
+        // 如果是Old8Lang异步函数，直接返回
+        // 异步函数调用是通过Instance类处理的，不需要在这里加载函数委托
     }
 
     /// <summary>

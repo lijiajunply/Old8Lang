@@ -1,0 +1,9 @@
+// 验证异步函数IL生成的简单测试
+
+async func simpleAsync() {
+    return "Success"
+}
+
+// 调用异步函数
+result <- await simpleAsync()
+PrintLine(result)

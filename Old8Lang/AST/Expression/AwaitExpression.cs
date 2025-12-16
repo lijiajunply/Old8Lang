@@ -62,11 +62,21 @@ public class AwaitExpression : LangExpression
     }
 
     /// <summary>
-    /// 生成 IL 代码（编译器模式暂不支持）
+    /// 生成 IL 代码（编译器模式）
     /// </summary>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        throw new NotImplementedError(Position, "编译模式暂不支持 await");
+        // 加载表达式的值（应该是Task<object>类型）
+        Expression.LoadIlValue(ilGenerator, local);
+        
+        // 调用GetAwaiter()方法获取等待器
+        ilGenerator.Emit(OpCodes.Callvirt, typeof(Task<object>).GetMethod("GetAwaiter")!);
+        
+        // 获取等待器的结果类型
+        var awaiterType = typeof(Task<object>).GetMethod("GetAwaiter")!.ReturnType;
+        
+        // 调用GetResult()方法获取结果
+        ilGenerator.Emit(OpCodes.Callvirt, awaiterType.GetMethod("GetResult")!);
     }
 
     /// <summary>

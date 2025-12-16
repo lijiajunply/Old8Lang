@@ -1,0 +1,45 @@
+// 异步语法测试用例
+
+// 测试1：简单的异步函数声明
+async func simpleAsync() {
+    return "Success"
+}
+
+// 测试2：带参数的异步函数
+async func asyncWithParams(x:int, y:int) {
+    return x + y
+}
+
+// 测试3：带返回类型注解的异步函数
+async func fetchData(url:string) {
+    return "Data: " + url
+}
+
+// 测试4：异步函数嵌套声明
+async func outerAsync() {
+    async func innerAsync() {
+        return "Inner"
+    }
+    
+    result <- await innerAsync()
+    return result
+}
+
+// 测试5：异步函数中的await表达式
+async func asyncAwait() {
+    task <- simpleAsync()
+    result <- await task
+    return result
+}
+
+// 测试6：异步函数作为参数
+async func higherOrderAsync() {
+    // 注：Old8Lang暂时不支持异步函数类型作为参数
+    return 0
+}
+
+// 测试7：异步函数返回另一个异步函数
+async func returnAsyncFunc() {
+    // 注：Old8Lang暂时不支持返回异步函数
+    return 0
+}
