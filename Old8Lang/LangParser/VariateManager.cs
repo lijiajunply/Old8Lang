@@ -423,7 +423,7 @@ public class VariateManager
             if (Scopes[i].TryGetValue(id.IdName, out var value))
             {
                 // 更新缓存
-                _lookupCache ??= new();
+                _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
                 _lookupCache[id.IdName] = (i, value);
                 return value;
             }
@@ -767,9 +767,9 @@ public class VariateManager
     {
         var generatorManager = new VariateManager
         {
-            LangInfo = this.LangInfo,
-            Path = this.Path,
-            Interpreter = this.Interpreter,
+            LangInfo = LangInfo,
+            Path = Path,
+            Interpreter = Interpreter,
             // 创建生成器专用的执行上下文
             GeneratorContext = new GeneratorExecutionContext()
         };

@@ -73,7 +73,10 @@ public class AsyncFuncLangValue : ImportInfo
             // 创建异步生成器，捕获当前作用域
             var generatorClosure = new AsyncFuncLangValue(Id, Ids, BlockStatement, Position)
             {
-                CapturedScope = manager.CaptureForClosure()
+                // 对于异步生成器，使用深拷贝创建独立作用域
+                // 这样生成器内部的变量修改不会影响外部作用域
+                // 生成器需要保持自己的局部状态（如循环变量）
+                CapturedScope = manager.Clone()
             };
 
             return new AsyncGeneratorLangValue(generatorClosure, Position);
@@ -82,7 +85,10 @@ public class AsyncFuncLangValue : ImportInfo
         // 创建新的异步函数副本，捕获当前作用域
         var closureFunc = new AsyncFuncLangValue(Id, Ids, BlockStatement, Position)
         {
-            CapturedScope = manager.CaptureForClosure()
+            // 注意：不使用 CaptureForClosure()，直接引用原始 manager
+            // 这样异步函数中的变量修改可以直接反映到外层作用域
+            // 避免 COW 机制导致的拷贝隔离问题
+            CapturedScope = manager
         };
         return closureFunc;
     }

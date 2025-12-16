@@ -82,8 +82,21 @@ public class BlockStatement : OldStatement
         // 先执行导入语句
         ImportRun(manager);
 
+        // 检查执行栈，如果栈不为空，说明需要跳转到栈顶指定的语句
+        int startIndex = context.CurrentStatementIndex;
+        if (context.ExecutionStack.Count > 0)
+        {
+            var frame = context.ExecutionStack.Peek();  // 查看栈顶，不弹出
+            // 如果 StatementIndex 不是 -1，说明是真正的位置，需要跳转
+            // 如果是 -1，说明是标志（如循环体标志），使用 CurrentStatementIndex
+            if (frame.StatementIndex >= 0)
+            {
+                startIndex = frame.StatementIndex;
+            }
+        }
+
         // 从保存的位置开始执行
-        for (int i = context.CurrentStatementIndex; i < OtherStatements.Count; i++)
+        for (int i = startIndex; i < OtherStatements.Count; i++)
         {
             var statement = OtherStatements[i];
             statement.Run(manager);
@@ -99,8 +112,12 @@ public class BlockStatement : OldStatement
                 }
                 else if (statement is WhileStatement || statement is ForStatement || statement is ForInStatement)
                 {
-                    // 对于循环语句中的yield，保持当前语句位置
-                    context.CurrentStatementIndex = i;
+                    // 对于循环语句中的yield，将循环位置压栈
+                    context.ExecutionStack.Push(new GeneratorExecutionContext.BlockExecutionFrame
+                    {
+                        StatementIndex = i,  // 保存循环语句的索引
+                        BlockId = "loop"
+                    });
                 }
                 else
                 {
@@ -120,9 +137,21 @@ public class BlockStatement : OldStatement
             }
         }
 
-        // 执行完毕，标记为完成
-        context.IsCompleted = true;
-        context.CurrentStatementIndex = 0;
+        // 执行完毕
+        // 只有顶层的 BlockStatement 才标记为完成
+        // 嵌套的 BlockStatement（如循环体）执行完毕不应该设置 IsCompleted
+        if (context.ExecutionStack.Count == 0)
+        {
+            // 顶层 BlockStatement 执行完毕，标记为完成
+            context.IsCompleted = true;
+            context.CurrentStatementIndex = 0;
+        }
+        else
+        {
+            // 嵌套 BlockStatement 执行完毕，不设置 IsCompleted
+            // 只重置 CurrentStatementIndex，准备下一次迭代
+            context.CurrentStatementIndex = 0;
+        }
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)

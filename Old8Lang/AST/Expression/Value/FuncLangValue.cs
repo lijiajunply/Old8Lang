@@ -89,31 +89,30 @@ public class FuncLangValue : ImportInfo
                     // 对于生成器函数，我们需要创建一个闭包，捕获当前作用域
                     var generatorClosure = new FuncLangValue(Id, Ids, BlockStatement, Position, IsLambda)
                     {
-                        // 使用浅拷贝快照捕获作用域
-                        // 复制作用域结构但共享值对象，性能优于深拷贝
-                        CapturedScope = manager.CaptureForClosure()
+                        // 生成器需要独立的作用域副本，使用深拷贝
+                        CapturedScope = manager.Clone()
                     };
-                    
+
                     return new GeneratorLangValue(generatorClosure, Position);
                 }
-                
+
                 // 没有参数的生成器函数
                 var noParamClosure = new FuncLangValue(Id, Ids, BlockStatement, Position, IsLambda)
                 {
-                    // 使用浅拷贝快照捕获作用域
-                    CapturedScope = manager.CaptureForClosure()
+                    // 生成器需要独立的作用域副本，使用深拷贝
+                    CapturedScope = manager.Clone()
                 };
-                
+
                 return new GeneratorLangValue(noParamClosure, Position);
             }
-            
+
             var closureFunc = new FuncLangValue(Id, Ids, BlockStatement, Position, IsLambda)
             {
-                // 使用浅拷贝快照捕获作用域
-                // 复制作用域结构但共享值对象，性能优于深拷贝
-                CapturedScope = manager.CaptureForClosure()
+                // 使用深拷贝创建独立的作用域副本
+                // 这样即使外层函数返回，lambda 仍然可以访问捕获的变量
+                CapturedScope = manager.Clone()
             };
-            
+
             return closureFunc;
         }
 

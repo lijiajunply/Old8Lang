@@ -1,0 +1,21 @@
+// 测试简单的异步生成器（不使用 await）
+
+import Async
+
+PrintLine("=== 测试简单的异步生成器 ===")
+
+async func simpleAsyncGen() {
+    i <- 1
+    while i <= 3 {
+        yield i
+        i <- i + 1
+    }
+}
+
+stream <- simpleAsyncGen()
+
+async for item in stream {
+    PrintLine("Item: " + item.ToStr())
+}
+
+PrintLine("简单异步生成器测试完成")

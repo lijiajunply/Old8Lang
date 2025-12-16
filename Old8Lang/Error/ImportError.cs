@@ -28,15 +28,15 @@ public class ImportError : RuntimeError
     /// <param name="node">AST节点</param>
     /// <param name="moduleName">无法导入的模块名称</param>
     /// <param name="attemptedPaths">尝试的文件路径列表</param>
-    public ImportError(IOldLangTree node, string moduleName, List<string> attemptedPaths = null) 
+    public ImportError(IOldLangTree node, string moduleName, List<string>? attemptedPaths = null) 
         : base(
             node, 
             ErrorCode,
-            BuildErrorMessage(moduleName, attemptedPaths),
+            BuildErrorMessage(moduleName, attemptedPaths ?? []),
             "请检查模块名称是否正确，或者模块是否存在")
     {
         ModuleName = moduleName;
-        AttemptedPaths = attemptedPaths ?? new List<string>();
+        AttemptedPaths = attemptedPaths ?? [];
     }
     
     /// <summary>
@@ -46,15 +46,15 @@ public class ImportError : RuntimeError
     /// <param name="moduleName">无法导入的模块名称</param>
     /// <param name="message">详细错误信息</param>
     /// <param name="attemptedPaths">尝试的文件路径列表</param>
-    public ImportError(IOldLangTree node, string moduleName, string message, List<string> attemptedPaths = null) 
+    public ImportError(IOldLangTree node, string moduleName, string message, List<string>? attemptedPaths = null) 
         : base(
             node, 
             ErrorCode,
-            BuildErrorMessage(moduleName, attemptedPaths, message),
+            BuildErrorMessage(moduleName, attemptedPaths ?? [], message),
             "请检查模块名称是否正确，或者模块是否存在")
     {
         ModuleName = moduleName;
-        AttemptedPaths = attemptedPaths ?? new List<string>();
+        AttemptedPaths = attemptedPaths ?? [];
     }
     
     /// <summary>
@@ -63,15 +63,15 @@ public class ImportError : RuntimeError
     /// <param name="position">源代码位置信息</param>
     /// <param name="moduleName">无法导入的模块名称</param>
     /// <param name="attemptedPaths">尝试的文件路径列表</param>
-    public ImportError(SourcePosition position, string moduleName, List<string> attemptedPaths = null) 
+    public ImportError(SourcePosition position, string moduleName, List<string>? attemptedPaths = null) 
         : base(
             position, 
             ErrorCode,
-            BuildErrorMessage(moduleName, attemptedPaths),
+            BuildErrorMessage(moduleName, attemptedPaths ?? []),
             "请检查模块名称是否正确，或者模块是否存在")
     {
         ModuleName = moduleName;
-        AttemptedPaths = attemptedPaths ?? new List<string>();
+        AttemptedPaths = attemptedPaths ?? [];
     }
     
     /// <summary>
@@ -98,7 +98,7 @@ public class ImportError : RuntimeError
     /// <param name="attemptedPaths">尝试的路径列表</param>
     /// <param name="message">附加错误信息</param>
     /// <returns>格式化的错误信息</returns>
-    private static string BuildErrorMessage(string moduleName, List<string> attemptedPaths, string message = null)
+    private static string BuildErrorMessage(string moduleName, List<string> attemptedPaths, string? message = null)
     {
         var errorMsg = new List<string> {
             $"无法导入模块 '{moduleName}'" 

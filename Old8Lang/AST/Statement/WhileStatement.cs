@@ -98,6 +98,15 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
         // 压入新的控制流状态
         manager.ControlFlowManager.PushState();
 
+        var context = manager.GeneratorContext!;
+
+        // 检查是否从 yield 恢复（栈中有保存的循环位置）
+        if (context.ExecutionStack.Count > 0)
+        {
+            // 从栈中弹出循环位置
+            context.ExecutionStack.Pop();
+        }
+
         try
         {
             // 标准 while 循环
@@ -122,16 +131,31 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
                     break;
                 }
 
+                // 执行循环体前，压栈一个标志，让循环体知道自己是嵌套的
+                context.ExecutionStack.Push(new GeneratorExecutionContext.BlockExecutionFrame
+                {
+                    StatementIndex = -1,  // -1 表示这只是一个标志，不是真正的位置
+                    BlockId = "loop_body_marker"
+                });
+
                 // 执行循环体
                 blockStatement.Run(manager);
 
+                // 循环体执行完毕后，弹出标志
+                if (context.ExecutionStack.Count > 0 && context.ExecutionStack.Peek().BlockId == "loop_body_marker")
+                {
+                    context.ExecutionStack.Pop();
+                }
+
                 // 检查是否遇到 yield（通过 GeneratorContext）
-                if (manager.GeneratorContext!.HasYielded)
+                if (context.HasYielded)
                 {
                     // 遇到 yield，立即返回以暂停执行
-                    // BlockStatement 已经保存了执行位置
                     return;
                 }
+
+                // 循环体执行完毕，重置索引为 0，准备下一次迭代
+                context.CurrentStatementIndex = 0;
 
                 // 处理 break
                 if (manager.ControlFlowManager.BreakFlag)
