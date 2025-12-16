@@ -18,7 +18,7 @@ Old8Lang 是一种动态类型的编程语言，具有类似 C#/Java 的语法�
 以下是 Old8Lang 的关键字：
 
 ```
-if elif else for while switch case default func class return try catch finally import and or xor not true false in as throw
+if elif else for while switch case default func class return try catch finally import and or xor not true false in as throw async await mixin
 ```
 
 ### 2.3 字面量
@@ -435,6 +435,75 @@ result <- add(1, 2)
 add <- (a:int, b:int) -> a + b
 ```
 
+#### 5.4.5 异步函数
+
+异步函数允许在不阻塞主线程的情况下执行耗时操作，使用 `async func` 关键字定义：
+
+```old8
+// 基本异步函数定义
+async func asyncAdd(a:int, b:int) -> int {
+    return a + b
+}
+
+// 异步函数另一种语法
+async asyncAdd2(a:int, b:int) -> int {
+    return a + b
+}
+
+// 带有延迟的异步函数
+async func delayedHello() -> string {
+    await Task.Delay(1000)
+    return "Hello after delay"
+}
+```
+
+异步函数的特点：
+- 内部可以使用 `await` 关键字等待其他异步操作
+- 返回值会自动包装为 `Task` 对象
+- 调用异步函数会立即返回 `Task` 对象，不会阻塞当前线程
+- 通过 `await` 可以获取异步函数的返回结果
+
+#### 5.4.6 await 表达式
+
+`await` 关键字用于等待异步操作完成，只能在异步函数内部使用：
+
+```old8
+async func asyncOperation() {
+    // 等待一个异步函数完成
+    result <- await asyncAdd(1, 2)
+    
+    // 等待 Task.Delay 完成
+    await Task.Delay(500)
+    
+    // 等待多个任务完成
+    results <- await Task.WhenAll([asyncAdd(1, 2), asyncAdd(3, 4), asyncAdd(5, 6)])
+    
+    // 等待第一个完成的任务
+    firstResult <- await Task.WhenAny([asyncAdd(1, 2), delayedHello()])
+}
+```
+
+#### 5.4.7 异步流与异步迭代
+
+Old8Lang 支持异步流和异步迭代，允许以异步方式遍历数据源：
+
+```old8
+// 创建异步流
+async func createAsyncStream() -> AsyncStream {
+    for i <- 0, i < 5, i++ {
+        await Task.Delay(100)
+        yield i
+    }
+}
+
+// 使用 for await...in 遍历异步流
+async func iterateAsyncStream() {
+    for await item in createAsyncStream() {
+        PrintLine("Received: " + item)
+    }
+}
+```
+
 ### 5.5 类声明与实例化
 
 #### 5.5.1 类声明
@@ -509,9 +578,107 @@ p.sayHello()
 t <- Test(1, 2)  // 调用带有参数的构造函数
 ```
 
-### 5.6 异常处理
+### 5.6 多线程
 
-#### 5.6.1 try-catch-finally 语句
+Old8Lang 支持多线程编程，允许创建和管理线程执行并行任务：
+
+#### 5.6.1 创建和启动线程
+
+使用 `spawn` 函数创建并启动新线程：
+
+```old8
+// 定义线程函数
+func threadMain() {
+    PrintLine("Thread is running")
+}
+
+// 创建并启动线程
+thread <- spawn(threadMain)
+
+// 等待线程完成
+thread.Join()
+
+// 使用带参数的线程函数
+func printNumber(num) {
+    PrintLine("Number: " + num)
+}
+
+// 传递参数给线程函数
+thread2 <- spawn(printNumber(42))
+thread2.Join()
+```
+
+#### 5.6.2 线程的其他操作
+
+```old8
+// 获取当前线程
+currentThread <- Thread.CurrentThread()
+
+// 线程休眠
+Thread.Sleep(1000)  // 休眠 1 秒
+
+// 线程状态查询
+if thread.IsAlive() {
+    PrintLine("Thread is still running")
+} else {
+    PrintLine("Thread has completed")
+}
+```
+
+#### 5.6.3 多线程同步
+
+```old8
+// 使用锁进行线程同步
+lockObject <- Object()
+
+counter <- 0
+
+func incrementCounter() {
+    for i <- 0, i < 1000, i++ {
+        // 锁保证同一时刻只有一个线程执行锁内代码
+        lock(lockObject) {
+            counter <- counter + 1
+        }
+    }
+}
+
+// 创建多个线程执行增量操作
+threads <- []
+for i <- 0, i < 10, i++ {
+    thread <- spawn(incrementCounter)
+    threads.Add(thread)
+}
+
+// 等待所有线程完成
+for thread in threads {
+    thread.Join()
+}
+
+PrintLine("Final counter: " + counter)  // 应该输出 10000
+```
+
+#### 5.6.4 spawn 函数的特点
+
+- `spawn` 函数用于创建并立即启动新线程
+- 可以接受带参数的函数调用
+- 返回值是一个 `Thread` 对象，可用于后续的线程管理
+- 支持传递多个参数给线程函数
+- 线程函数执行完后，线程自动终止
+
+#### 5.6.5 多线程与异步的区别
+
+| 特性 | 多线程 (spawn) | 异步 (async/await) |
+|------|---------------|-------------------|
+| 资源消耗 | 较高（创建线程开销） | 较低（基于任务调度） |
+| 并发模型 | 并行执行 | 异步非阻塞 |
+| 适用场景 | CPU密集型任务 | I/O密集型任务 |
+| 调度 | 操作系统线程调度 | 任务调度器 |
+| 上下文切换 | 较高开销 | 较低开销 |
+| 编程复杂度 | 较高（需要手动同步） | 较低（编译器处理异步流程） |
+
+### 5.7 异常处理
+
+#### 5.7.1 try-catch-finally 语句
 
 ```
 try {
@@ -936,16 +1103,114 @@ try {
 }
 ```
 
+### 8.5 异步编程示例
+
+```old8
+// 基本异步函数
+async func asyncAdd(a:int, b:int) -> int {
+    return a + b
+}
+
+// 带有 await 的异步函数
+async func fetchData() -> string {
+    PrintLine("开始获取数据...")
+    await Task.Delay(1500)
+    PrintLine("数据获取完成")
+    return "Hello, Async!"
+}
+
+// 主异步函数
+async func main() {
+    // 调用并等待异步函数
+    result <- await asyncAdd(5, 3)
+    PrintLine("5 + 3 = " + result)
+    
+    // 等待获取数据
+    data <- await fetchData()
+    PrintLine("获取到的数据: " + data)
+    
+    // 并行执行多个异步操作
+    tasks <- [
+        Task.Delay(1000).ThenTask(() -> "Task 1 done"),
+        Task.Delay(500).ThenTask(() -> "Task 2 done"),
+        Task.Delay(1500).ThenTask(() -> "Task 3 done")
+    ]
+    
+    results <- await Task.WhenAll(tasks)
+    PrintLine("并行任务结果: " + results)
+}
+
+// 调用主异步函数
+mainTask <- main()
+mainTask.Join()
+```
+
+### 8.6 多线程示例
+
+```old8
+// 线程函数
+func workerThread(threadId:int) {
+    for i <- 0, i < 5, i++ {
+        PrintLine("Thread " + threadId + ": " + i)
+        Thread.Sleep(100)
+    }
+}
+
+// 主函数
+func main() {
+    // 使用 spawn 函数创建并启动多个线程
+    threads <- []
+    for i <- 0, i < 3, i++ {
+        // 创建并启动线程，传递参数
+        thread <- spawn workerThread(i)
+        threads.Add(thread)
+    }
+    
+    // 等待所有线程完成
+    for thread in threads {
+        thread.Join()
+    }
+    
+    PrintLine("All threads completed")
+}
+
+// 执行主函数
+main()
+```
+
 ## 9. 编译与执行
 
 ### 9.1 解释模式
 
 解释模式下，Old8Lang 代码会逐条解释执行，无需编译。
 
+**异步和多线程支持**：
+- 完全支持异步函数 (`async func`)
+- 完全支持 `await` 表达式
+- 完全支持 `spawn` 函数创建多线程
+- 支持 Task API 和异步流
+
 ### 9.2 编译模式
 
 编译模式下，Old8Lang 代码会先被编译成中间代码，然后再执行。
 
+**异步和多线程支持**：
+- 当前编译模式下异步功能暂未完全支持
+- 多线程功能 (`spawn` 函数) 已支持
+- 建议在解释模式下开发和测试异步代码
+- 编译模式下使用异步功能可能会遇到运行时错误
+
 ## 10. 总结
 
-Old8Lang 是一种功能丰富的动态类型编程语言，具有清晰的语法结构和强大的表达能力。本文档详细介绍了 Old8Lang 的语法规则，包括词法、语法和语义。通过学习本文档，您应该能够理解和编写 Old8Lang 代码。
+Old8Lang 是一种功能丰富的动态类型编程语言，具有清晰的语法结构和强大的表达能力。本文档详细介绍了 Old8Lang 的语法规则，包括词法、语法和语义，特别是新增的异步编程和多线程功能。
+
+通过学习本文档，您应该能够理解和编写 Old8Lang 代码，包括：
+- 基本语法和数据类型
+- 控制流语句和函数
+- 类、继承和 mixin
+- 异常处理和导入机制
+- 异步编程模型（async/await）
+- Task API 和异步流
+- 多线程编程（spawn 函数）
+
+Old8Lang 支持解释模式和编译模式，为不同场景提供了灵活的选择。在解释模式下，您可以快速开发和测试代码，而编译模式则提供了更高的执行效率。
