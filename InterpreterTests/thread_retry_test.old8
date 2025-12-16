@@ -1,0 +1,48 @@
+// 测试Thread类的Retry方法实现
+
+PrintLine("=== 开始测试Thread.Retry方法 ===")
+
+// 1. 测试基础的重试功能 - 确保能成功重试
+PrintLine("\n1. 测试基础的重试功能")
+
+// 一个简单的不稳定函数，总是成功
+func simpleTask() {
+    PrintLine("SimpleTask 执行")
+    return "任务成功"
+}
+
+// 使用Retry方法，最多重试3次
+result1 <- spawn(simpleTask).Retry(3).Join()
+PrintLine("Retry 结果: " + result1)
+
+// 2. 测试带参数的重试
+PrintLine("\n2. 测试带参数的重试功能")
+
+// 一个带参数的函数
+func taskWithParams(a, b) {
+    PrintLine("带参数任务执行，参数: " + a + ", " + b)
+    return a + b
+}
+
+// 使用Retry方法，最多重试2次
+result2 <- spawn(taskWithParams, 10, 20).Retry(2).Join()
+PrintLine("带参数Retry 结果: " + result2)
+
+// 3. 测试重试机制能处理异常
+PrintLine("\n3. 测试重试机制能处理异常")
+
+// 一个总是失败的函数
+func failingTask() {
+    PrintLine("失败任务执行")
+    throw "任务失败"
+}
+
+try {
+    // 最多重试1次，应该会失败
+    result3 <- spawn(failingTask).Retry(1).Join()
+    PrintLine("测试失败: 应该抛出异常")
+} catch (e) {
+    PrintLine("测试成功: 捕获到预期异常")
+}
+
+PrintLine("\n=== Thread.Retry方法测试完成 ===")

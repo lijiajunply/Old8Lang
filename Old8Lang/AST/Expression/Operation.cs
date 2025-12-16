@@ -324,6 +324,61 @@ public class Operation(
                     return taskValue.Dot(Right);
                 }
             }
+            else if (dotLeftResult is ThreadLangValue threadValue)
+            {
+                // 设置外部管理器，确保 Then 等方法能访问有效的 Interpreter
+                threadValue.ExternalManager = manager;
+
+                if (Right is Instance instance)
+                {
+                    // Retry 方法需要特殊处理，因为需要重新执行原始函数调用
+                    if (instance.Id.IdName == "Retry")
+                    {
+                        if (instance.Ids.Count is < 1 or > 2)
+                        {
+                            throw new ArgumentError(instance.Position,
+                                $"Retry 方法需要 1-2 个参数，实际提供了 {instance.Ids.Count} 个");
+                        }
+
+                        var retryCountValue = instance.Ids[0].Run(manager);
+                        if (retryCountValue is not IntLangValue retryCount)
+                        {
+                            throw new TypeError(instance, "Retry 的第一个参数必须是整数");
+                        }
+
+                        var delayMs = 0;
+                        if (instance.Ids.Count == 2)
+                        {
+                            var delayValue = instance.Ids[1].Run(manager);
+                            if (delayValue is IntLangValue delayInt)
+                            {
+                                delayMs = delayInt.Value;
+                            }
+                            else
+                            {
+                                throw new TypeError(instance, "Retry 的第二个参数必须是整数");
+                            }
+                        }
+
+                        // Retry 需要重新执行原始函数，而不是重试同一个 Thread 对象
+                        if (Left is not Instance funcCall)
+                        {
+                            throw new InvalidOperationError(instance, "Retry 只能用于函数调用（如 func().Retry(...)）");
+                        }
+
+                        // 使用 ThreadRetryHelper 创建重试线程，实现代码抽离
+                        return ThreadRetryHelper.CreateRetryThread(funcCall, manager, retryCount.Value, delayMs, instance.Position);
+                    }
+
+                    // 其他方法调用（如 Then），使用扩展方法或 Dot 处理
+                    return threadValue.Dot(instance);
+                }
+
+                if (Right != null)
+                {
+                    return threadValue.Dot(Right);
+                }
+            }
             else if (dotLeftResult != null! && Right != null)
             {
                 return dotLeftResult.Dot(Right);
