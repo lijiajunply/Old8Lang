@@ -85,10 +85,9 @@ public class AsyncFuncLangValue : ImportInfo
         // 创建新的异步函数副本，捕获当前作用域
         var closureFunc = new AsyncFuncLangValue(Id, Ids, BlockStatement, Position)
         {
-            // 使用深拷贝创建独立的作用域副本
-            // 这样每次调用都有独立的作用域，避免并发访问时的冲突
-            // 对于异步函数，必须使用独立作用域，因为多个并发任务可能同时运行
-            CapturedScope = manager.Clone()
+            // 直接引用原始 manager，允许异步函数访问和修改外部作用域变量
+            // 并发安全性通过在 RunAsync 中为每个任务创建独立的参数作用域来保证
+            CapturedScope = manager
         };
         return closureFunc;
     }
@@ -118,9 +117,12 @@ public class AsyncFuncLangValue : ImportInfo
                 );
             }
 
-            // 使用捕获的作用域或调用时的作用域（与普通函数保持一致）
-            // 注意：不再创建深拷贝，允许异步函数修改外部作用域变量
-            var executionManager = CapturedScope ?? variateManagerFunc;
+            // 使用捕获的作用域或调用时的作用域
+            var baseManager = CapturedScope ?? variateManagerFunc;
+
+            // 克隆 baseManager 创建独立的执行作用域
+            // 这确保每个异步任务有独立的参数作用域，避免并发冲突
+            var executionManager = baseManager.Clone();
 
             // 重置返回状态，确保异步函数体能够正常执行
             executionManager.IsReturn = false;
@@ -198,6 +200,8 @@ public class AsyncFuncLangValue : ImportInfo
                     // 清理资源
                     executionManager.IsReturn = false;
                     executionManager.IsFunc = false;
+
+                    // 移除作用域
                     executionManager.RemoveChildren();
                 }
             }

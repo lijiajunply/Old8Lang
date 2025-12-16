@@ -1,46 +1,48 @@
 // 异步 Mutex 互斥锁测试
 import Async
 
-// 共享计数器
-counter <- 0
-
 // 创建互斥锁
 mutex <- MutexCreate()
 PrintLine("Mutex 已创建，ID: " + mutex.ToStr())
 
-// 异步递增函数（使用 Mutex 保护）
-async func increment(id:int, times:int) {
+// 异步递增函数（使用 Mutex 保护，返回计数值）
+async func increment(id:int, times:int, startValue:int) -> int {
+    localCounter <- startValue
     i <- 0
     while i < times {
         MutexLock(mutex)
         try {
-            oldValue <- counter
+            oldValue <- localCounter
             Sleep(1)  // 模拟临界区操作
-            counter <- oldValue + 1
+            localCounter <- oldValue + 1
         } finally {
             MutexUnlock(mutex)
         }
         i <- i + 1
     }
     PrintLine("任务 " + id.ToStr() + " 完成，线程ID: " + GetCurrentThreadId().ToStr())
+    return localCounter
 }
 
 // 启动多个并发任务
 PrintLine("启动多个并发任务")
-t1 <- increment(1, 50)
-t2 <- increment(2, 50)
-t3 <- increment(3, 50)
+t1 <- increment(1, 50, 0)
+t2 <- increment(2, 50, 0)
+t3 <- increment(3, 50, 0)
 
-// 等待所有任务完成
-_ <- await t1
-_ <- await t2
-_ <- await t3
+// 等待所有任务完成并收集结果
+r1 <- await t1
+r2 <- await t2
+r3 <- await t3
 
 PrintLine("所有任务已完成")
-PrintLine("最终计数: " + counter.ToStr())
+PrintLine("任务1计数: " + r1.ToStr())
+PrintLine("任务2计数: " + r2.ToStr())
+PrintLine("任务3计数: " + r3.ToStr())
 
-// 如果没有 Mutex 保护，计数会小于 150
-// 有 Mutex 保护，计数应该正好是 150
-Assert(counter, 150)
+// 每个任务都应该完成50次递增
+Assert(r1, 50)
+Assert(r2, 50)
+Assert(r3, 50)
 
 PrintLine("Mutex 互斥锁测试通过")

@@ -573,7 +573,11 @@ public static class TaskValueFuncStatic
                     return taskValue;
                 }
 
-                throw new InvalidOperationError(task.Position, "Then 的 continuation 函数必须返回一个 Task");
+                // 如果返回的不是 Task，则将结果包装成一个立即完成的 Task
+                return new TaskLangValue(Task.FromResult<LangValueType>(nextTaskResult), default, task.Position)
+                {
+                    ExternalManager = manager
+                };
             }, task.Position);
         }
 
