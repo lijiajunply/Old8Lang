@@ -17,7 +17,8 @@ public class AsyncStreamLangValue : LangValueType
     /// <summary>
     /// 构造函数
     /// </summary>
-    public AsyncStreamLangValue(IAsyncEnumerable<LangValueType> asyncEnumerable, CancellationToken cancellationToken = default, SourcePosition position = default)
+    private AsyncStreamLangValue(IAsyncEnumerable<LangValueType> asyncEnumerable,
+        CancellationToken cancellationToken = default, SourcePosition position = default)
         : base(position)
     {
         AsyncEnumerable = asyncEnumerable;
@@ -53,13 +54,15 @@ public class AsyncStreamLangValue : LangValueType
     /// <summary>
     /// 异步流归约操作
     /// </summary>
-    public async Task<LangValueType> Reduce(Func<LangValueType, LangValueType, LangValueType> reducer, LangValueType initialValue, SourcePosition position = default)
+    public async Task<LangValueType> Reduce(Func<LangValueType, LangValueType, LangValueType> reducer,
+        LangValueType initialValue, SourcePosition position = default)
     {
         var result = initialValue;
         await foreach (var item in AsyncEnumerable.WithCancellation(CancellationToken))
         {
             result = reducer(result, item);
         }
+
         return result;
     }
 
@@ -73,6 +76,7 @@ public class AsyncStreamLangValue : LangValueType
         {
             list.Add(item);
         }
+
         return new ListLangValue(list, position);
     }
 
@@ -113,7 +117,7 @@ public class AsyncStreamLangValue : LangValueType
     /// <summary>
     /// 获取 .NET 类型（编译器模式暂不支持）
     /// </summary>
-    public override Type? OutputType(LocalManager local)
+    public override Type OutputType(LocalManager local)
     {
         return typeof(IAsyncEnumerable<object>);
     }
@@ -123,15 +127,17 @@ public class AsyncStreamLangValue : LangValueType
     /// </summary>
     public static AsyncStreamLangValue Empty(SourcePosition position = default)
     {
-        return new AsyncStreamLangValue(System.Linq.AsyncEnumerable.Empty<LangValueType>(), default, position);
+        return new AsyncStreamLangValue(System.Linq.AsyncEnumerable.Empty<LangValueType>(), CancellationToken.None,
+            position);
     }
 
     /// <summary>
     /// 从可枚举对象创建异步流
     /// </summary>
-    public static AsyncStreamLangValue FromEnumerable(IEnumerable<LangValueType> enumerable, SourcePosition position = default)
+    public static AsyncStreamLangValue FromEnumerable(IEnumerable<LangValueType> enumerable,
+        SourcePosition position = default)
     {
-        return new AsyncStreamLangValue(enumerable.ToAsyncEnumerable(), default, position);
+        return new AsyncStreamLangValue(enumerable.ToAsyncEnumerable(), CancellationToken.None, position);
     }
 
     /// <summary>
@@ -141,7 +147,7 @@ public class AsyncStreamLangValue : LangValueType
     {
         return new AsyncStreamLangValue(
             System.Linq.AsyncEnumerable.Range(start, count).Select(i => (LangValueType)new IntLangValue(i, position)),
-            default,
+            CancellationToken.None,
             position
         );
     }

@@ -19,7 +19,7 @@ public class ForAwaitInStatement : OldStatement
     public readonly List<LangId>? AdditionalIds;
 
     // 获取所有标识符，包括主标识符和附加标识符
-    private List<LangId> AllIds => [Id, .. (AdditionalIds ?? [])];
+    private List<LangId> AllIds => [Id, .. AdditionalIds ?? []];
 
     /// <summary>
     /// 构造函数
@@ -46,7 +46,7 @@ public class ForAwaitInStatement : OldStatement
         manager.AddChildren();
         // 压入新的控制流状态
         manager.ControlFlowManager.PushState();
-        
+
         try
         {
             // 执行表达式，期望得到 AsyncStreamLangValue
@@ -63,10 +63,10 @@ public class ForAwaitInStatement : OldStatement
                 while (await enumerator.MoveNextAsync())
                 {
                     var idValue = enumerator.Current;
-                    
+
                     // 在每次循环迭代开始时重置控制流标志
                     manager.ControlFlowManager.ResetCurrentState();
-                    
+
                     if (AllIds.Count == 1)
                     {
                         // 单个标识符的情况
@@ -96,7 +96,7 @@ public class ForAwaitInStatement : OldStatement
                     }
 
                     Body.Run(manager);
-                    
+
                     // 处理break
                     if (manager.ControlFlowManager.BreakFlag)
                     {
