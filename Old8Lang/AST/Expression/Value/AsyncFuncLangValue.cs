@@ -85,10 +85,10 @@ public class AsyncFuncLangValue : ImportInfo
         // 创建新的异步函数副本，捕获当前作用域
         var closureFunc = new AsyncFuncLangValue(Id, Ids, BlockStatement, Position)
         {
-            // 注意：不使用 CaptureForClosure()，直接引用原始 manager
-            // 这样异步函数中的变量修改可以直接反映到外层作用域
-            // 避免 COW 机制导致的拷贝隔离问题
-            CapturedScope = manager
+            // 使用深拷贝创建独立的作用域副本
+            // 这样每次调用都有独立的作用域，避免并发访问时的冲突
+            // 对于异步函数，必须使用独立作用域，因为多个并发任务可能同时运行
+            CapturedScope = manager.Clone()
         };
         return closureFunc;
     }
