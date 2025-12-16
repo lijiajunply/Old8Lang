@@ -48,7 +48,42 @@ public class VariateManager
     /// Scopes[0] 是全局作用域，Scopes[^1] 是当前作用域
     /// 作用域栈用于实现变量的作用域规则和变量查找
     /// </remarks>
-    private List<Dictionary<string, LangValueType>> Scopes { get; } = [new()];
+    internal List<Dictionary<string, LangValueType>> Scopes { get; } = [new()];
+    
+    /// <summary>
+    /// 获取当前作用域的所有变量
+    /// </summary>
+    /// <returns>当前作用域的变量字典</returns>
+    public Dictionary<string, LangValueType> GetCurrentScope()
+    {
+        return Scopes[^1];
+    }
+    
+    /// <summary>
+    /// 获取父作用域的所有变量
+    /// </summary>
+    /// <returns>父作用域的变量字典，如果没有父作用域则返回null</returns>
+    public Dictionary<string, LangValueType>? GetParentScope()
+    {
+        return Scopes.Count > 1 ? Scopes[^2] : null;
+    }
+    
+    /// <summary>
+    /// 将变量添加到父作用域
+    /// </summary>
+    /// <param name="name">变量名</param>
+    /// <param name="value">变量值</param>
+    public void AddToParentScope(string name, LangValueType value)
+    {
+        if (Scopes.Count < 2)
+        {
+            // 没有父作用域，直接添加到当前作用域
+            Scopes[^1][name] = value;
+            return;
+        }
+        
+        Scopes[^2][name] = value;
+    }
 
     /// <summary>
     /// 作用域缓存池，使用ThreadLocal的Stack避免并发同步开销
@@ -145,6 +180,11 @@ public class VariateManager
     /// 当前是否处于类内部
     /// </summary>
     public bool IsClass { get; set; }
+
+    /// <summary>
+    /// 导入栈，用于检测循环依赖
+    /// </summary>
+    public Stack<string> ImportStack { get; set; } = new();
 
     /// <summary>
     /// 控制流管理器，用于管理break和continue等控制流语句的状态

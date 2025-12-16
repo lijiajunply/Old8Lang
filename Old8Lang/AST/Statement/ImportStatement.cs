@@ -57,123 +57,218 @@ public class ImportStatement(
     public override void Run(VariateManager manager)
     {
         var moduleName = importString;
+        var attemptedPaths = new List<string>();
+        string? resolvedPath = null;
+        bool isDirectory = false;
 
+        // 尝试解析模块路径
         if (manager.LangInfo!.LibInfos.Any(x => moduleName == x.LibName))
         {
-            var b = manager.LangInfo.LibInfos.Where(x => x.LibName == moduleName).Select(x => x.IsDir).ToArray()[0];
+            var libInfo = manager.LangInfo.LibInfos.First(x => x.LibName == moduleName);
+            isDirectory = libInfo.IsDir;
+            
             // 检查文件扩展名，只支持.old8和.ol
             var fileName = moduleName;
             var ext = Path.GetExtension(fileName).ToLower();
-            if (!b && ext != ".old8" && ext != ".ol")
+            if (!isDirectory && ext != ".old8" && ext != ".ol")
             {
                 fileName += ".old8"; // 默认使用.old8扩展名
             }
 
             var path = Path.Combine(manager.LangInfo.ImportPath, fileName);
-
+            attemptedPaths.Add(path);
+            
             // 检查文件或目录是否存在
             if (!File.Exists(path) && !Directory.Exists(path))
             {
                 // 尝试构建绝对路径
-                var absolutePath = Path.GetFullPath(path);
-                if (!File.Exists(absolutePath) && !Directory.Exists(absolutePath))
+                var fullPath = Path.GetFullPath(path);
+                attemptedPaths.Add(fullPath);
+                if (!File.Exists(fullPath) && !Directory.Exists(fullPath))
                 {
                     // 尝试从应用程序基目录查找
                     var appPath = Path.Combine(AppContext.BaseDirectory, path);
+                    attemptedPaths.Add(appPath);
                     if (!File.Exists(appPath) && !Directory.Exists(appPath))
                     {
                         // 所有尝试都失败，抛出导入错误
-                        throw new ImportError(Position, moduleName);
+                        throw new ImportError(Position, moduleName, attemptedPaths);
                     }
-
                     path = appPath;
                 }
                 else
                 {
-                    path = absolutePath;
+                    path = fullPath;
                 }
             }
-
-            var previousPath = manager.Path;
-            manager.Path = path;
-            var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
-            var a = manager.Interpreter.Build(code: code);
-
-            if (fromClause)
-            {
-                // 对于命名导入，我们需要先执行导入，然后根据需要获取指定的变量
-                // 暂时先导入所有内容，后续可以优化为只导入指定的变量
-                a.ImportRun(manager);
-            }
-            else
-            {
-                // 传统导入：导入所有内容
-                a.ImportRun(manager);
-            }
-
-            manager.Path = previousPath;
-            return;
+            resolvedPath = path;
         }
-
-        if (Apis.ImportInstall(moduleName))
+        else if (Apis.ImportInstall(moduleName))
         {
-            var b = manager.LangInfo.LibInfos.Where(x => x.LibName == moduleName).Select(x => x.IsDir).ToArray()[0];
+            var libInfo = manager.LangInfo.LibInfos.First(x => x.LibName == moduleName);
+            isDirectory = libInfo.IsDir;
+            
             // 检查文件扩展名，只支持.old8和.ol
             var fileName = moduleName;
             var ext = Path.GetExtension(fileName).ToLower();
-            if (!b && ext != ".old8" && ext != ".ol")
+            if (!isDirectory && ext != ".old8" && ext != ".ol")
             {
                 fileName += ".old8"; // 默认使用.old8扩展名
             }
 
             var path = Path.Combine(manager.LangInfo.ImportPath, fileName);
-            var previousPath = manager.Path;
-            manager.Path = path;
-            var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
-            var a = manager.Interpreter.Build(code: code);
-            a.ImportRun(manager);
-            manager.Path = previousPath;
-            return;
-        }
-
-        var dic = Path.GetDirectoryName(manager.Path)!;
-        // 检查文件扩展名，只支持.old8和.ol
-        var fileNameLocal = moduleName;
-        var extLocal = Path.GetExtension(fileNameLocal).ToLower();
-        if (extLocal != ".old8" && extLocal != ".ol")
-        {
-            fileNameLocal += ".old8"; // 默认使用.old8扩展名
-        }
-
-        // 修复：正确处理绝对路径和相对路径
-        var filePath = Path.IsPathRooted(fileNameLocal) ? fileNameLocal : Path.Combine(dic, fileNameLocal);
-        if (filePath.StartsWith("Users/") || filePath.StartsWith("Volumes/"))
-        {
-            filePath = "/" + filePath;
-        }
-
-        if (!File.Exists(filePath))
-        {
-            throw new ImportError(Position, moduleName);
-        }
-
-        var managerPath = manager.Path;
-        manager.Path = filePath;
-        var result = manager.Interpreter.Build(code: Apis.FromFile(filePath));
-
-        if (fromClause)
-        {
-            // 对于命名导入，我们需要先执行导入，然后根据需要获取指定的变量
-            // 暂时先导入所有内容，后续可以优化为只导入指定的变量
-            result.ImportRun(manager);
+            attemptedPaths.Add(path);
+            resolvedPath = path;
         }
         else
         {
-            // 传统导入：导入所有内容
-            result.ImportRun(manager);
+            var dic = Path.GetDirectoryName(manager.Path);
+            // 检查文件扩展名，只支持.old8和.ol
+            var fileNameLocal = moduleName;
+            var extLocal = Path.GetExtension(fileNameLocal).ToLower();
+            if (extLocal != ".old8" && extLocal != ".ol")
+            {
+                fileNameLocal += ".old8"; // 默认使用.old8扩展名
+            }
+
+            // 修复：正确处理绝对路径和相对路径
+            var filePath = Path.IsPathRooted(fileNameLocal) ? fileNameLocal : 
+                (dic != null ? Path.Combine(dic, fileNameLocal) : fileNameLocal);
+            
+            if (filePath.StartsWith("Users/") || filePath.StartsWith("Volumes/"))
+            {
+                filePath = "/" + filePath;
+            }
+            
+            attemptedPaths.Add(filePath);
+            
+            if (!File.Exists(filePath))
+            {
+                throw new ImportError(Position, moduleName, attemptedPaths);
+            }
+            resolvedPath = filePath;
         }
 
-        manager.Path = managerPath;
+        if (resolvedPath == null)
+        {
+            throw new ImportError(Position, moduleName, attemptedPaths);
+        }
+
+        // 获取绝对路径作为缓存键
+        var moduleAbsolutePath = Path.GetFullPath(resolvedPath);
+        
+        // 1. 检查循环依赖
+        if (manager.ImportStack.Contains(moduleAbsolutePath))
+        {
+            throw new ImportError(Position, moduleName, manager.ImportStack);
+        }
+        
+        // 2. 检查模块缓存
+        if (manager.Interpreter!.ModuleCache.TryGetValue(moduleAbsolutePath, out var cachedBlock))
+        {
+            // 使用缓存的模块
+            if (fromClause)
+            {
+                // 为命名导入创建独立作用域
+                manager.AddChildren();
+                // 对于缓存的模块，我们不需要再次执行它的函数和类定义语句
+                // 我们只需要执行它的变量赋值语句
+                // 函数和类已经在全局作用域中了
+                cachedBlock.ExecuteModule(manager, skipFunctionClassInit: true);
+                // 只导入指定的成员
+                ImportSpecifiedMembers(manager);
+                manager.RemoveChildren();
+            }
+            else
+            {
+                // 对于非命名导入，直接使用缓存的模块
+                // 但不要再次执行它的语句，因为函数和类已经在全局作用域中了
+                return;
+            }
+            return;
+        }
+        
+        // 3. 执行导入
+        manager.ImportStack.Push(moduleAbsolutePath);
+        try
+        {
+            var previousPath = manager.Path;
+            manager.Path = moduleAbsolutePath;
+            
+            var code = isDirectory ? Apis.FromDirectory(moduleAbsolutePath) : Apis.FromFile(moduleAbsolutePath);
+            var block = manager.Interpreter.Build(code: code);
+            
+            // 4. 缓存模块
+            manager.Interpreter.ModuleCache[moduleAbsolutePath] = block;
+            
+            if (fromClause)
+            {
+                // 为命名导入创建独立作用域
+                manager.AddChildren();
+                // 执行模块的非导入语句，包括函数定义、类定义和变量赋值
+                // 但跳过导入语句，避免递归导入
+                block.ExecuteModule(manager);
+                // 只导入指定的成员
+                ImportSpecifiedMembers(manager);
+                manager.RemoveChildren();
+            }
+            else
+            {
+                block.Run(manager);
+            }
+            
+            manager.Path = previousPath;
+        }
+        finally
+        {
+            // 确保无论导入成功与否，都从导入栈中移除
+            manager.ImportStack.Pop();
+        }
+    }
+    
+    /// <summary>
+    /// 只导入指定的成员到当前作用域
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    private void ImportSpecifiedMembers(VariateManager manager)
+    {
+        // 获取当前作用域的所有变量（模块导出的成员）
+        var currentScope = manager.Scopes[^1];
+        var parentScope = manager.Scopes[^2];
+        
+        // 如果没有指定导入成员，则导入所有成员
+        if (ImportSpecifiers.Count == 0)
+        {
+            // 直接将所有成员添加到父作用域
+            foreach (var (name, value) in currentScope)
+            {
+                parentScope[name] = value;
+            }
+            return;
+        }
+        
+        // 只导入指定的成员
+        foreach (var specifier in ImportSpecifiers)
+        {
+            // 首先尝试从当前作用域中查找（变量和常量）
+            if (currentScope.TryGetValue(specifier.Name, out var value))
+            {
+                // 将指定成员添加到父作用域，支持重命名
+                parentScope[specifier.Alias] = value;
+            }
+            // 然后尝试从父作用域中查找（可能是之前导入的变量）
+            else if (parentScope.TryGetValue(specifier.Name, out value))
+            {
+                // 将指定成员添加到父作用域，支持重命名
+                parentScope[specifier.Alias] = value;
+            }
+            // 如果仍然找不到，抛出错误
+            else
+            {
+                // 成员不存在，抛出错误
+                throw new ImportError(Position, importString, new List<string> { importString });
+            }
+        }
     }
 
     /// <summary>
@@ -184,50 +279,79 @@ public class ImportStatement(
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         string moduleName = importString;
+        string? resolvedPath = null;
+        bool isDirectory = false;
 
         var langInfo = Apis.ReadJson();
         if (langInfo.LibInfos.Any(x => moduleName == x.LibName))
         {
-            var b = langInfo.LibInfos.Where(x => x.LibName == moduleName).Select(x => x.IsDir).ToArray()[0];
+            var libInfo = langInfo.LibInfos.First(x => x.LibName == moduleName);
+            isDirectory = libInfo.IsDir;
+            
             // 检查文件扩展名，只支持.old8和.ol
             var fileName = moduleName;
             var ext = Path.GetExtension(fileName).ToLower();
-            if (!b && ext != ".old8" && ext != ".ol")
+            if (!isDirectory && ext != ".old8" && ext != ".ol")
             {
                 fileName += ".old8"; // 默认使用.old8扩展名
             }
 
-            var path = Path.Combine(langInfo.ImportPath, fileName);
-            var code = b ? Apis.FromDirectory(path) : Apis.FromFile(path);
+            resolvedPath = Path.Combine(langInfo.ImportPath, fileName);
+        }
+        else
+        {
+            var dic = Path.GetDirectoryName(local.FilePath)!;
+            // 检查文件扩展名，只支持.old8和.ol
+            var fileNameLocal = moduleName;
+            var extLocal = Path.GetExtension(fileNameLocal).ToLower();
+            if (extLocal != ".old8" && extLocal != ".ol")
+            {
+                fileNameLocal += ".old8"; // 默认使用.old8扩展名
+            }
 
-            var pPath = local.FilePath;
-            local.FilePath = path;
-            var block = local.Interpreter?.Build(code: code);
-            block?.GenerateImportIl(ilGenerator, local);
-            local.FilePath = pPath;
+            // 修复：正确处理绝对路径和相对路径
+            resolvedPath = Path.IsPathRooted(fileNameLocal) ? fileNameLocal : Path.Combine(dic, fileNameLocal);
+            if (resolvedPath.StartsWith("Users/") || resolvedPath.StartsWith("Volumes/"))
+            {
+                resolvedPath = "/" + resolvedPath;
+            }
+
+            if (!File.Exists(resolvedPath)) return;
+        }
+
+        if (resolvedPath == null)
+        {
             return;
         }
 
-        var dic = Path.GetDirectoryName(local.FilePath)!;
-        // 检查文件扩展名，只支持.old8和.ol
-        var fileNameLocal = moduleName;
-        var extLocal = Path.GetExtension(fileNameLocal).ToLower();
-        if (extLocal != ".old8" && extLocal != ".ol")
+        // 获取绝对路径作为缓存键
+        var moduleAbsolutePath = Path.GetFullPath(resolvedPath);
+        
+        // 检查模块缓存
+        if (local.Interpreter?.ModuleCache.TryGetValue(moduleAbsolutePath, out var cachedBlock) == true)
         {
-            fileNameLocal += ".old8"; // 默认使用.old8扩展名
+            // 使用缓存的模块
+            var cachedOriginalPath = local.FilePath;
+            local.FilePath = moduleAbsolutePath;
+            cachedBlock.GenerateImportIl(ilGenerator, local);
+            local.FilePath = cachedOriginalPath;
+            return;
         }
 
-        // 修复：正确处理绝对路径和相对路径
-        var filePath = Path.IsPathRooted(fileNameLocal) ? fileNameLocal : Path.Combine(dic, fileNameLocal);
-        if (filePath.StartsWith("Users/") || filePath.StartsWith("Volumes/"))
+        // 执行导入并缓存
+        var code = isDirectory ? Apis.FromDirectory(moduleAbsolutePath) : Apis.FromFile(moduleAbsolutePath);
+        var importOriginalPath = local.FilePath;
+        local.FilePath = moduleAbsolutePath;
+        var block = local.Interpreter?.Build(code: code);
+        
+        // 缓存模块
+        if (block != null && local.Interpreter != null)
         {
-            filePath = "/" + filePath;
+            local.Interpreter.ModuleCache[moduleAbsolutePath] = block;
         }
-
-        if (!File.Exists(filePath)) return;
-
-        var result = local.Interpreter?.Build(code: Apis.FromFile(filePath));
-        result?.GenerateImportIl(ilGenerator, local);
+        
+        block?.GenerateImportIl(ilGenerator, local);
+        local.FilePath = importOriginalPath;
     }
 
     /// <summary>

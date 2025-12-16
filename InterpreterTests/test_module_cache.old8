@@ -1,0 +1,39 @@
+// 测试模块缓存和作用域隔离
+PrintLine("测试模块缓存和作用域隔离")
+
+// 第一次导入模块 - 只导入变量，不导入函数
+PrintLine("第一次导入模块...")
+import { export_var1, export_var2 } from "./test_import_module.old8"
+
+// 直接调用函数，不通过导入
+PrintLine("直接调用函数 export_func1() = " + export_func1())
+PrintLine("export_var1 = " + export_var1)
+PrintLine("export_var2 = " + export_var2)
+
+// 修改导入的变量
+PrintLine("\n修改导入的变量...")
+export_var1 <- "修改后的值"
+PrintLine("export_var1 = " + export_var1)
+
+// 第二次导入同一个模块 - 只导入变量，不导入函数
+PrintLine("\n第二次导入同一个模块...")
+import { export_var1 as var1Again } from "./test_import_module.old8"
+
+PrintLine("直接调用函数 export_func1() = " + export_func1())
+PrintLine("export_var1 = " + export_var1)
+PrintLine("var1Again = " + var1Again)
+
+// 验证缓存是否生效（变量值应该保持修改后的值）
+PrintLine("\n验证模块缓存...")
+if export_var1 == var1Again {
+    PrintLine("✅ 模块缓存生效，变量值保持一致")
+} else {
+    PrintLine("❌ 模块缓存未生效，变量值不一致")
+}
+
+// 测试重命名导入
+PrintLine("\n测试重命名导入...")
+import { export_var2 as renamedVar2 } from "./test_import_module.old8"
+PrintLine("renamedVar2 = " + renamedVar2)
+
+PrintLine("\n✅ 模块缓存和命名导入测试完成")

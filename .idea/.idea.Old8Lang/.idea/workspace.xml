@@ -18,11 +18,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/异步和多线程原生支持测试计划.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Language/AsyncNativeTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Language/ThreadNativeTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/修复 Old8Lang Import 相关问题.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_circular_dependency.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_circular_dependency_a.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_circular_dependency_b.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_module_cache.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/2025-12-16-22-38-import-fix-report.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/extended_test.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ImportError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/ImportError.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangInterpreter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -777,7 +784,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="207" />
+    <option name="localTasksCounter" value="208" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -804,7 +811,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="perf(interpreter): 实现对象池化优化解释器性能&#10;&#10;- 为BoolLangValue、IntLangValue、DoubleLangValue、StringLangValue、CharLangValue等值类型实现对象池化&#10;- 添加ObjectPool和ObjectPoolManager管理对象池&#10;- 修改值对象构造函数支持默认参数和池化接口&#10;- 优化循环执行机制，使用标志位替代异常处理break和continue&#10;- 更新类型转换和运算方法使用对象池创建实例&#10;- 优化ForStatement中布尔表达式处理后归还临时对象&#10;- 移除BreakException和ContinueException异常类&#10;- 更新编译器测试中冗余的命名空间引用&#10;- 添加解释器性能基准测试用例&#10;- 编写性能优化计划文档说明优化目标和实施方案" />
     <MESSAGE value="refactor(control-flow): 重构控制流状态管理机制&#10;&#10;- 引入 ControlFlowManager 类统一管理 break 和 continue 状态&#10;- 所有循环语句在开始时压入状态，结束时弹出状态&#10;- 每次迭代前重置当前状态，确保控制流标志正确&#10;- 更新 BreakStatement 和 ContinueStatement 使用新的状态管理器&#10;- 删除旧的 VariateManager 中的 BreakFlag 和 ContinueFlag 属性&#10;- 添加详细测试验证控制流状态生命周期管理正确性&#10;- 编写分析报告确认循环结束时无需手动重置状态" />
     <MESSAGE value="fix(lang): 修复私有访问控制bug并完善类属性修饰符支持&#10;&#10;- 修复private/protected字段访问控制逻辑，确保只能在类内部访问&#10;- 完善this引用查找机制，使用GetValue替代GetAny确保正确识别内部访问&#10;- 添加ExternalManager传递机制，使方法调用时能正确判断访问上下文&#10;- 支持protected修饰符语法解析和语义检查&#10;- 实现字段类型假注功能，支持int、double、string、bool、char等类型&#10;- 支持多种修饰符组合，包括public、private、static及其组合使用&#10;- 添加对未初始化字段声明的支持&#10;- 完善字段声明列表解析，支持逗号分隔的多个字段声明&#10;- 更新语法测试和解释器测试用例，覆盖各类修饰符使用场景&#10;- 修复编译器相关配置项命名一致性问题&#10;- 移除不必要的System.Reflection引用&#10;- 更新项目文档，补充性能基准测试说明和架构信息" />
     <MESSAGE value="docs(reports): 添加性能优化项目完整文档&#10;&#10;- 新增五份详细报告，涵盖BenchmarkDotNet测试、COW代码清理、性能优化完成情况及项目总结&#10;- 包括解释器性能测试结果、优化技术验证、代码清理记录和项目最终评估&#10;- 提供完整的性能数据、优化前后对比及技术突破说明&#10;- 记录测试验证结果、待办事项和后续优化建议&#10;- 展示项目成果、技术亮点和工程实践经验总结" />
@@ -829,7 +835,8 @@
     <MESSAGE value="refactor: 移除异步流相关代码&#10;&#10;删除 ForAwaitInStatement 和 AsyncStreamLangValue 类及相关实现&#10;这些功能当前未被使用且增加了代码复杂度" />
     <MESSAGE value="feat(迭代器): 添加同步迭代器功能测试&#10;&#10;添加同步迭代器的全面测试，包括数组、字符串、字典、生成器等数据结构的迭代功能&#10;包含解释器测试、编译器测试及集成测试，并生成测试报告" />
     <MESSAGE value="test(async): 完善异步库测试用例&#10;&#10;- 增加 Mutex、Semaphore、AtomicInt 和 Channel 的完整功能测试&#10;- 添加原子整数的线程安全测试用例&#10;- 实现通道的多生产者多消费者测试场景&#10;- 补充工具函数如 Sleep、线程 ID 获取等功能验证&#10;- 优化现有测试结构和断言逻辑" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(async): 完善异步库测试用例&#10;&#10;- 增加 Mutex、Semaphore、AtomicInt 和 Channel 的完整功能测试&#10;- 添加原子整数的线程安全测试用例&#10;- 实现通道的多生产者多消费者测试场景&#10;- 补充工具函数如 Sleep、线程 ID 获取等功能验证&#10;- 优化现有测试结构和断言逻辑" />
+    <MESSAGE value="test(language): 添加异步和多线程原生功能测试&#10;&#10;- 新增 AsyncNativeTests.cs 文件，包含异步函数执行、参数传递、嵌套调用、异常处理、任务组合、延迟和 Lambda 表达式等测试用例&#10;- 新增 ThreadNativeTests.cs 文件，涵盖线程创建、参数传递、状态检查、异常处理、多线程同步、任务组合和延迟等功能测试&#10;- 编写详细的测试计划" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(language): 添加异步和多线程原生功能测试&#10;&#10;- 新增 AsyncNativeTests.cs 文件，包含异步函数执行、参数传递、嵌套调用、异常处理、任务组合、延迟和 Lambda 表达式等测试用例&#10;- 新增 ThreadNativeTests.cs 文件，涵盖线程创建、参数传递、状态检查、异常处理、多线程同步、任务组合和延迟等功能测试&#10;- 编写详细的测试计划" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

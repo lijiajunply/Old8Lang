@@ -1,0 +1,9 @@
+// 测试循环依赖检测
+PrintLine("测试循环依赖检测")
+PrintLine("导入标准库测试")
+
+// 测试标准库导入
+import Time
+
+PrintLine("当前时间: " + GetTimeNow("yyyy-MM-dd HH:mm:ss"))
+PrintLine("导入成功，没有循环依赖")

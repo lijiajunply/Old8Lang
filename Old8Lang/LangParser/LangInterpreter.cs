@@ -35,6 +35,12 @@ public class LangInterpreter
     public bool IsCompileOptimization { get; set; }
 
     /// <summary>
+    /// 模块缓存，用于存储已解析的模块，提高导入性能
+    /// 键为模块的绝对路径，值为解析后的BlockStatement
+    /// </summary>
+    public Dictionary<string, BlockStatement> ModuleCache { get; set; } = new();
+
+    /// <summary>
     /// 初始化LangInterpreter实例
     /// </summary>
     public LangInterpreter()
