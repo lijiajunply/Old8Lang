@@ -48,6 +48,102 @@ public class PrimaryParser(
             var expr = expressionParserFactory().ParseExpression();
             return new AwaitExpression(expr, position);
         }
+        
+        // 处理异步Lambda表达式 - 无参数情况
+        if (CurrentToken.Type == LangTokenType.Async && Peek().Type == LangTokenType.LeftParen)
+        {
+            // 异步Lambda表达式：async () -> block 或 async (params) -> block
+            var asyncToken = CurrentToken;
+            var position = new SourcePosition(asyncToken.Line, asyncToken.Column, tokenValue: asyncToken.Value);
+            Expect(LangTokenType.Async);
+            
+            var leftParenToken = CurrentToken;
+            Expect(LangTokenType.LeftParen);
+            
+            // 检查是否是无参数异步Lambda
+            if (CurrentToken.Type == LangTokenType.RightParen && Peek().Type == LangTokenType.Arrow)
+            {
+                // 无参数异步Lambda：async () -> block 或 async () -> expression
+                Expect(LangTokenType.RightParen);
+                Expect(LangTokenType.Arrow);
+
+                BlockStatement block;
+
+                // 检查是块语句还是表达式
+                if (CurrentToken.Type == LangTokenType.LeftBrace)
+                {
+                    // 块语句：async () -> { ... }
+                    block = statementParserFactory().ParseBlock();
+                }
+                else
+                {
+                    // 表达式：async () -> expression
+                    // 我们需要将表达式转换为块语句，添加return
+                    var expr = expressionParserFactory().ParseExpression();
+                    var returnStmt = new ReturnStatement(expr, position);
+                    block = new BlockStatement([returnStmt]);
+                }
+
+                // 创建异步Lambda表达式
+                return new AsyncFuncLangValue(null, [], block, position);
+            }
+            
+            // 有参数异步Lambda
+            var isLambda = true;
+            var ids = new List<LangId>();
+            
+            // 检查第一个元素是否是标识符
+            if (CurrentToken.Type == LangTokenType.Identifier)
+            {
+                // 解析第一个参数，允许类型注解
+                ids.Add(functionParser.ParseTypedIdentifier(true));
+
+                // 解析更多参数，允许类型注解
+                while (CurrentToken.Type == LangTokenType.Comma)
+                {
+                    Expect(LangTokenType.Comma);
+                    if (CurrentToken.Type != LangTokenType.Identifier)
+                    {
+                        // 不是标识符，不是Lambda表达式
+                        isLambda = false;
+                        break;
+                    }
+
+                    ids.Add(functionParser.ParseTypedIdentifier(true));
+                }
+
+                // 检查是否有箭头符号
+                if (isLambda && CurrentToken.Type == LangTokenType.RightParen && Peek().Type == LangTokenType.Arrow)
+                {
+                    // 异步Lambda表达式：async (params) -> block 或 async (params) -> expression
+                    Expect(LangTokenType.RightParen);
+                    Expect(LangTokenType.Arrow);
+
+                    BlockStatement block;
+
+                    // 检查是块语句还是表达式
+                    if (CurrentToken.Type == LangTokenType.LeftBrace)
+                    {
+                        // 块语句：async (params) -> { ... }
+                        block = statementParserFactory().ParseBlock();
+                    }
+                    else
+                    {
+                        // 表达式：async (params) -> expression
+                        // 我们需要将表达式转换为块语句，添加return
+                        var expr = expressionParserFactory().ParseExpression();
+                        var returnStmt = new ReturnStatement(expr, position);
+                        block = new BlockStatement([returnStmt]);
+                    }
+
+                    // 创建异步Lambda表达式
+                    return new AsyncFuncLangValue(null, ids, block, position);
+                }
+            }
+            
+            // 不是Lambda表达式，抛出错误
+            throw CreateSyntaxError("语法错误：异步Lambda表达式格式不正确");
+        }
 
         // 处理 not 表达式
         if (CurrentToken.Type == LangTokenType.Not)
@@ -501,7 +597,16 @@ public class PrimaryParser(
 
         // 保存当前位置，用于回滚
         var savedIndex = CurrentIndex;
-
+        
+        // 检查是否是异步Lambda表达式
+        var isAsync = false;
+        if (CurrentToken.Type == LangTokenType.Async && Peek().Type == LangTokenType.RightParen && Peek(2).Type == LangTokenType.Arrow)
+        {
+            // 异步无参数Lambda：async () -> block 或 async () -> expression
+            isAsync = true;
+            Expect(LangTokenType.Async);
+        }
+        
         // 检查是否是Lambda表达式：() -> block 或 (params) -> block
         if (CurrentToken.Type == LangTokenType.RightParen && Peek().Type == LangTokenType.Arrow)
         {
@@ -526,8 +631,15 @@ public class PrimaryParser(
                 block = new BlockStatement([returnStmt]);
             }
 
-            // 创建Lambda表达式，设置IsLambda为true
-            return new FuncLangValue(null, [], block, position, true);
+            // 创建Lambda表达式，根据isAsync标志决定创建AsyncFuncLangValue还是FuncLangValue
+            if (isAsync)
+            {
+                return new AsyncFuncLangValue(null, [], block, position);
+            }
+            else
+            {
+                return new FuncLangValue(null, [], block, position, true);
+            }
         }
 
         // 检查是否是有参数的Lambda表达式
@@ -535,6 +647,14 @@ public class PrimaryParser(
         // 如果是其他表达式（如数字、字符串、表达式调用等），则是元组
         var isLambda = true;
         var ids = new List<LangId>();
+        
+        // 检查是否是异步Lambda表达式（有参数）
+        if (CurrentToken.Type == LangTokenType.Async && Peek().Type == LangTokenType.Identifier)
+        {
+            // 异步有参数Lambda：async (params) -> block 或 async (params) -> expression
+            isAsync = true;
+            Expect(LangTokenType.Async);
+        }
 
         // 检查第一个元素是否是标识符
         if (CurrentToken.Type == LangTokenType.Identifier)
@@ -580,8 +700,15 @@ public class PrimaryParser(
                     block = new BlockStatement([returnStmt]);
                 }
 
-                // 创建Lambda表达式，设置IsLambda为true
-                return new FuncLangValue(null, ids, block, position, true);
+                // 创建Lambda表达式，根据isAsync标志决定创建AsyncFuncLangValue还是FuncLangValue
+                if (isAsync)
+                {
+                    return new AsyncFuncLangValue(null, ids, block, position);
+                }
+                else
+                {
+                    return new FuncLangValue(null, ids, block, position, true);
+                }
             }
 
             // 严格检查：如果看起来像 Lambda 参数列表但缺少 ->

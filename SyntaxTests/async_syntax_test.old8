@@ -43,3 +43,5 @@ async func returnAsyncFunc() {
     // 注：Old8Lang暂时不支持返回异步函数
     return 0
 }
+
+await returnAsyncFunc()

@@ -1,0 +1,38 @@
+// 异步Lambda表达式语法测试
+
+// 异步Lambda表达式作为变量赋值
+async_lambda1 <- async () -> 123
+
+async_lambda2 <- async () -> {
+    return 456
+}
+
+async_lambda3 <- async (x: int) -> x + 1
+
+async_lambda4 <- async (x: int, y: int) -> {
+    return x + y
+}
+
+// 异步Lambda表达式作为参数（简化类型注解）
+func test_async_lambda(func) {
+    return await func()
+}
+
+// 异步Lambda表达式作为返回值（简化类型注解）
+func create_async_lambda() {
+    return async () -> 789
+}
+
+// await func()语法测试
+async_func <- async () -> 123
+result <- await async_func()
+
+// await c.func()语法测试
+class TestClass {
+    async func async_method() -> int {
+        return 456
+    }
+}
+
+test <- TestClass()
+result2 <- await test.async_method()

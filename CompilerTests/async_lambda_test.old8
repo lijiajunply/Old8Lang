@@ -1,0 +1,33 @@
+// 异步Lambda表达式编译模式测试
+
+// 测试异步无参数Lambda表达式
+async_lambda1 <- async () -> 123
+result1 <- await async_lambda1()
+PrintLine("异步无参数Lambda表达式结果: " + result1)
+
+// 测试异步有参数Lambda表达式
+async_lambda2 <- async (x: int) -> x + 1
+result2 <- await async_lambda2(42)
+PrintLine("异步有参数Lambda表达式结果: " + result2)
+
+// 测试异步Lambda表达式块语句体
+async_lambda3 <- async (x: int, y: int) -> {
+    sum <- x + y
+    return sum
+}
+result3 <- await async_lambda3(10, 20)
+PrintLine("异步Lambda表达式块语句体结果: " + result3)
+
+// 测试await func()语法
+async_func <- async () -> 300
+result4 <- await async_func()
+PrintLine("await func()语法结果: " + result4)
+
+// 测试嵌套await
+async_outer <- async () -> {
+    async_inner <- async () -> 500
+    inner_result <- await async_inner()
+    return inner_result + 100
+}
+result5 <- await async_outer()
+PrintLine("嵌套await结果: " + result5)
