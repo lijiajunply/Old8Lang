@@ -444,7 +444,7 @@ public class TaskLangValue : LangValueType
     /// </summary>
     public TaskLangValue ThenTask(Func<LangValueType, TaskLangValue> continuation, SourcePosition position = default)
     {
-        var thenTask = Task.ContinueWith(t =>
+        var thenTask = Task.ContinueWith(async t =>
         {
             if (t.IsFaulted)
             {
@@ -452,8 +452,8 @@ public class TaskLangValue : LangValueType
             }
 
             var result = continuation(t.Result);
-            return result.AwaitAsync().Result;
-        }, _cancellationToken);
+            return await result.AwaitAsync();
+        }, _cancellationToken).Unwrap();
         return new TaskLangValue(thenTask, _cancellationToken, position);
     }
 
