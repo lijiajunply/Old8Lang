@@ -36,7 +36,23 @@ public static class AsyncLib
     }
     
     // 定时器，用于定期清理不再使用的资源
-    private static readonly Timer _cleanupTimer = new(CleanupResources, null, TimeSpan.FromMinutes(AutoCleanupIntervalMinutes), TimeSpan.FromMinutes(AutoCleanupIntervalMinutes));
+    private static Timer? _cleanupTimer;
+    
+    // 定时器属性，延迟初始化
+    private static Timer CleanupTimer
+    {
+        get
+        {
+            if (_cleanupTimer == null)
+            {
+                // 使用 Interlocked 确保线程安全的单例初始化
+                Interlocked.CompareExchange(ref _cleanupTimer, 
+                    new Timer(CleanupResources, null, TimeSpan.FromMinutes(AutoCleanupIntervalMinutes), TimeSpan.FromMinutes(AutoCleanupIntervalMinutes)), 
+                    null);
+            }
+            return _cleanupTimer;
+        }
+    }
     
     // 存储 Mutex 对象（使用 SemaphoreSlim 实现）
     private static readonly ConcurrentDictionary<int, ResourceWrapper<SemaphoreSlim>> Mutexes = new();
@@ -650,5 +666,58 @@ public static class AsyncLib
         Channels.TryRemove(channelId, out _);
     }
 
+    #endregion
+    
+    #region 资源管理
+    
+    /// <summary>
+    /// 关闭并清理所有资源，包括停止定时器
+    /// </summary>
+    public static void Shutdown()
+    {
+        // 停止并释放定时器
+        var timer = Interlocked.Exchange(ref _cleanupTimer, null);
+        if (timer != null)
+        {
+            // 先停止定时器
+            timer.Change(Timeout.Infinite, Timeout.Infinite);
+            // 释放定时器资源
+            timer.Dispose();
+        }
+        
+        // 清理所有 Mutex
+        foreach (var (id, wrapper) in Mutexes)
+        {
+            if (Mutexes.TryRemove(id, out var removedWrapper))
+            {
+                removedWrapper.Resource.Dispose();
+            }
+        }
+        
+        // 清理所有 Semaphore
+        foreach (var (id, wrapper) in Semaphores)
+        {
+            if (Semaphores.TryRemove(id, out var removedWrapper))
+            {
+                removedWrapper.Resource.Dispose();
+            }
+        }
+        
+        // 清理所有 AtomicInt
+        AtomicInts.Clear();
+        
+        // 清理所有取消令牌源
+        foreach (var (id, wrapper) in CancellationTokenSources)
+        {
+            if (CancellationTokenSources.TryRemove(id, out var removedWrapper))
+            {
+                removedWrapper.Resource.Dispose();
+            }
+        }
+        
+        // 清理所有 Channel
+        Channels.Clear();
+    }
+    
     #endregion
 }
