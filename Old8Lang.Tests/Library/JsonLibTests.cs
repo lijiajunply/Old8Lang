@@ -87,7 +87,7 @@ public class JsonLibTests
     public void Serialize_NullObject_ThrowsException()
     {
         // Arrange
-        object nullObject = null;
+        object? nullObject = null;
         
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => JsonLib.Serialize(nullObject));

@@ -20,7 +20,7 @@ public static class JsonLib
     /// <param name="obj">要序列化的对象</param>
     /// <param name="options">序列化选项</param>
     /// <returns>JSON字符串</returns>
-    public static string Serialize(object obj, JsonSerializerOptions? options = null)
+    public static string Serialize(object? obj, JsonSerializerOptions? options = null)
     {
         if (obj == null)
         {

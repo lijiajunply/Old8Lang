@@ -7,41 +7,41 @@ namespace Old8Lang.Tests.Library;
 /// </summary>
 public class SortLibTests
 {
-    private readonly int[] _unsortedArray = { 3, 1, 4, 1, 5, 9, 2, 6 };
-    private readonly int[] _sortedArray = { 1, 1, 2, 3, 4, 5, 6, 9 };
-    private readonly int[] _emptyArray = Array.Empty<int>();
-    private readonly int[] _singleElementArray = { 42 };
-    private readonly string[] _unsortedStringArray = { "banana", "apple", "cherry", "date", "blueberry" };
-    private readonly string[] _sortedStringArray = { "apple", "banana", "blueberry", "cherry", "date" };
+    private readonly int[] UnsortedArray = [3, 1, 4, 1, 5, 9, 2, 6];
+    private readonly int[] SortedArray = [1, 1, 2, 3, 4, 5, 6, 9];
+    private readonly int[] EmptyArray = [];
+    private readonly int[] SingleElementArray = [42];
+    private readonly string[] UnsortedStringArray = ["banana", "apple", "cherry", "date", "blueberry"];
+    private readonly string[] SortedStringArray = ["apple", "banana", "blueberry", "cherry", "date"];
 
     [Fact]
     public void QuickSort_UnsortedArray_ReturnsSortedArray()
     {
         // Act
-        var result = SortLib.QuickSort(_unsortedArray);
-        
+        var result = SortLib.QuickSort(UnsortedArray);
+
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(_sortedArray, result);
+        Assert.Equal(SortedArray, result);
     }
 
     [Fact]
     public void QuickSort_AlreadySortedArray_ReturnsSameArray()
     {
         // Act
-        var result = SortLib.QuickSort(_sortedArray);
-        
+        var result = SortLib.QuickSort(SortedArray);
+
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(_sortedArray, result);
+        Assert.Equal(SortedArray, result);
     }
 
     [Fact]
     public void QuickSort_EmptyArray_ReturnsEmptyArray()
     {
         // Act
-        var result = SortLib.QuickSort(_emptyArray);
-        
+        var result = SortLib.QuickSort(EmptyArray);
+
         // Assert
         Assert.NotNull(result);
         Assert.Empty(result);
@@ -51,85 +51,85 @@ public class SortLibTests
     public void QuickSort_SingleElementArray_ReturnsSameArray()
     {
         // Act
-        var result = SortLib.QuickSort(_singleElementArray);
-        
+        var result = SortLib.QuickSort(SingleElementArray);
+
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(_singleElementArray, result);
+        Assert.Equal(SingleElementArray, result);
     }
 
     [Fact]
     public void QuickSort_StringArray_ReturnsSortedArray()
     {
         // Act
-        var result = SortLib.QuickSort(_unsortedStringArray);
-        
+        var result = SortLib.QuickSort(UnsortedStringArray);
+
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(_sortedStringArray, result);
+        Assert.Equal(SortedStringArray, result);
     }
 
     [Fact]
     public void MergeSort_UnsortedArray_ReturnsSortedArray()
     {
         // Act
-        var result = SortLib.MergeSort(_unsortedArray);
-        
+        var result = SortLib.MergeSort(UnsortedArray);
+
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(_sortedArray, result);
+        Assert.Equal(SortedArray, result);
     }
 
     [Fact]
     public void BubbleSort_UnsortedArray_ReturnsSortedArray()
     {
         // Act
-        var result = SortLib.BubbleSort(_unsortedArray);
-        
+        var result = SortLib.BubbleSort(UnsortedArray);
+
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(_sortedArray, result);
+        Assert.Equal(SortedArray, result);
     }
 
     [Fact]
     public void SelectionSort_UnsortedArray_ReturnsSortedArray()
     {
         // Act
-        var result = SortLib.SelectionSort(_unsortedArray);
-        
+        var result = SortLib.SelectionSort(UnsortedArray);
+
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(_sortedArray, result);
+        Assert.Equal(SortedArray, result);
     }
 
     [Fact]
     public void InsertionSort_UnsortedArray_ReturnsSortedArray()
     {
         // Act
-        var result = SortLib.InsertionSort(_unsortedArray);
-        
+        var result = SortLib.InsertionSort(UnsortedArray);
+
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(_sortedArray, result);
+        Assert.Equal(SortedArray, result);
     }
 
     [Fact]
     public void HeapSort_UnsortedArray_ReturnsSortedArray()
     {
         // Act
-        var result = SortLib.HeapSort(_unsortedArray);
-        
+        var result = SortLib.HeapSort(UnsortedArray);
+
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(_sortedArray, result);
+        Assert.Equal(SortedArray, result);
     }
 
     [Fact]
     public void IsSorted_SortedArray_ReturnsTrue()
     {
         // Act
-        var result = SortLib.IsSorted(_sortedArray);
-        
+        var result = SortLib.IsSorted(SortedArray);
+
         // Assert
         Assert.True(result);
     }
@@ -138,8 +138,8 @@ public class SortLibTests
     public void IsSorted_UnsortedArray_ReturnsFalse()
     {
         // Act
-        var result = SortLib.IsSorted(_unsortedArray);
-        
+        var result = SortLib.IsSorted(UnsortedArray);
+
         // Assert
         Assert.False(result);
     }
@@ -148,84 +148,84 @@ public class SortLibTests
     public void SortList_QuickSort_ReturnsSortedList()
     {
         // Arrange
-        var list = _unsortedArray.ToList();
-        
+        var list = UnsortedArray.ToList();
+
         // Act
-        var result = SortLib.SortList(list, "quick");
-        
+        var result = SortLib.SortList(list);
+
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(_sortedArray.ToList(), result);
+        Assert.Equal(SortedArray.ToList(), result);
     }
 
     [Fact]
     public void SortList_MergeSort_ReturnsSortedList()
     {
         // Arrange
-        var list = _unsortedArray.ToList();
-        
+        var list = UnsortedArray.ToList();
+
         // Act
         var result = SortLib.SortList(list, "merge");
-        
+
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(_sortedArray.ToList(), result);
+        Assert.Equal(SortedArray.ToList(), result);
     }
 
     [Fact]
     public void SortList_BubbleSort_ReturnsSortedList()
     {
         // Arrange
-        var list = _unsortedArray.ToList();
-        
+        var list = UnsortedArray.ToList();
+
         // Act
         var result = SortLib.SortList(list, "bubble");
-        
+
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(_sortedArray.ToList(), result);
+        Assert.Equal(SortedArray.ToList(), result);
     }
 
     [Fact]
     public void SortList_SelectionSort_ReturnsSortedList()
     {
         // Arrange
-        var list = _unsortedArray.ToList();
-        
+        var list = UnsortedArray.ToList();
+
         // Act
         var result = SortLib.SortList(list, "selection");
-        
+
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(_sortedArray.ToList(), result);
+        Assert.Equal(SortedArray.ToList(), result);
     }
 
     [Fact]
     public void SortList_InsertionSort_ReturnsSortedList()
     {
         // Arrange
-        var list = _unsortedArray.ToList();
-        
+        var list = UnsortedArray.ToList();
+
         // Act
         var result = SortLib.SortList(list, "insertion");
-        
+
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(_sortedArray.ToList(), result);
+        Assert.Equal(SortedArray.ToList(), result);
     }
 
     [Fact]
     public void SortList_HeapSort_ReturnsSortedList()
     {
         // Arrange
-        var list = _unsortedArray.ToList();
-        
+        var list = UnsortedArray.ToList();
+
         // Act
         var result = SortLib.SortList(list, "heap");
-        
+
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(_sortedArray.ToList(), result);
+        Assert.Equal(SortedArray.ToList(), result);
     }
 
     [Fact]
@@ -239,8 +239,8 @@ public class SortLibTests
     public void SortList_InvalidSortType_ThrowsArgumentException()
     {
         // Arrange
-        var list = _unsortedArray.ToList();
-        
+        var list = UnsortedArray.ToList();
+
         // Act & Assert
         Assert.Throws<ArgumentException>(() => SortLib.SortList(list, "invalid"));
     }

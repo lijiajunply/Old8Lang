@@ -18,10 +18,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/CompilerTests/sync_iterator_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/sync_iterator_simple_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/sync_iterator_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/20251216-21-47-sync_iterator_test.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/HttpClientTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/AsyncLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/AsyncLibTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/CollectionLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/CollectionLibTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/JsonLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/JsonLibTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/SortLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/SortLibTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Old8Lang.Tests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Old8Lang.Tests.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/JsonLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/JsonLib.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,6 +66,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Library/AsyncLibTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/FuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/FuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/FuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
@@ -81,6 +86,8 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AsyncStreamLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AsyncStreamLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/GeneratorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/GeneratorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/GeneratorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
@@ -93,6 +100,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TaskLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/AsyncFuncInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForAwaitInStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/IfStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/WhileStatement.cs" root0="SKIP_HIGHLIGHTING" />
@@ -771,7 +779,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="205" />
+    <option name="localTasksCounter" value="206" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -798,7 +806,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="docs(core): 完善核心模块的XML文档注释&#10;&#10;- 为 Apis.cs 中的公共 API 方法添加详细的 XML 注释&#10;- 补充 Old8Lang.App/BasicInfo.cs 中命令行帮助信息的说明&#10;- 增强 Old8Lang/AST/Statement/ClassInit.cs 类定义语句的文档&#10;- 完善 Old8LangLib/ColorfulTerminal.cs 彩色终端模块的注释&#10;- 加强 Old8Lang/Compiler/Compiler.cs 编译器核心类的文档说明&#10;- 丰富 Old8LangLib/FileLib.cs 文件操作库的函数注释&#10;- 补充 Old8Lang/AST/Statement/FuncInit.cs 函数初始化类的说明&#10;- 完善 Old8Lang/AST/Expression/FuncStatic.cs 扩展方法类的注释&#10;- 统一调整各模块中的参数、返回值和异常说明&#10;- 规范化所有新增注释的格式和内容描述" />
     <MESSAGE value="docs(ast): 为ILangList接口添加注释&#10;&#10;- 添加了接口的中文注释说明&#10;- 明确了接口的用途和功能&#10;- 提高了代码的可读性和维护性" />
     <MESSAGE value="perf(interpreter): 实现对象池化优化解释器性能&#10;&#10;- 为BoolLangValue、IntLangValue、DoubleLangValue、StringLangValue、CharLangValue等值类型实现对象池化&#10;- 添加ObjectPool和ObjectPoolManager管理对象池&#10;- 修改值对象构造函数支持默认参数和池化接口&#10;- 优化循环执行机制，使用标志位替代异常处理break和continue&#10;- 更新类型转换和运算方法使用对象池创建实例&#10;- 优化ForStatement中布尔表达式处理后归还临时对象&#10;- 移除BreakException和ContinueException异常类&#10;- 更新编译器测试中冗余的命名空间引用&#10;- 添加解释器性能基准测试用例&#10;- 编写性能优化计划文档说明优化目标和实施方案" />
     <MESSAGE value="refactor(control-flow): 重构控制流状态管理机制&#10;&#10;- 引入 ControlFlowManager 类统一管理 break 和 continue 状态&#10;- 所有循环语句在开始时压入状态，结束时弹出状态&#10;- 每次迭代前重置当前状态，确保控制流标志正确&#10;- 更新 BreakStatement 和 ContinueStatement 使用新的状态管理器&#10;- 删除旧的 VariateManager 中的 BreakFlag 和 ContinueFlag 属性&#10;- 添加详细测试验证控制流状态生命周期管理正确性&#10;- 编写分析报告确认循环结束时无需手动重置状态" />
@@ -823,7 +830,8 @@
     <MESSAGE value="fix(compiler): 修复编译模式下函数缺少返回值类型注解的问题&#10;&#10;- 调整了简单代码编译测试用例，补充函数返回值类型注解&#10;- 修改了中等复杂度代码编译测试用例，明确函数返回类型&#10;- 更新了复杂代码编译测试用例，为函数参数添加类型注解&#10;- 修正了生成IL相关测试用例中的函数类型定义问题&#10;- 完善了执行编译后代码测试用例的类型声明&#10;- 优化了多重编译场景下的类型检查逻辑&#10;- 改进了IL验证测试用例的函数签名定义" />
     <MESSAGE value="refactor(core): 优化异步流和循环语句实现&#10;&#10;- 将 AsyncStreamLangValue 构造函数设为私有，增强封装性&#10;- 优化 Reduce 方法参数列表格式并添加空行提升可读性&#10;- 修复 ForAwaitInStatement 中 AllIds 属性的数组展开语法&#10;- 统一使用 CancellationToken.None 替代默认值提高一致性&#10;- 移除冗余空行并调整代码格式以符合编码规范&#10;- 更新 IDE 配置文件中的属性组件格式化方式" />
     <MESSAGE value="refactor: 移除异步流相关代码&#10;&#10;删除 ForAwaitInStatement 和 AsyncStreamLangValue 类及相关实现&#10;这些功能当前未被使用且增加了代码复杂度" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: 移除异步流相关代码&#10;&#10;删除 ForAwaitInStatement 和 AsyncStreamLangValue 类及相关实现&#10;这些功能当前未被使用且增加了代码复杂度" />
+    <MESSAGE value="feat(迭代器): 添加同步迭代器功能测试&#10;&#10;添加同步迭代器的全面测试，包括数组、字符串、字典、生成器等数据结构的迭代功能&#10;包含解释器测试、编译器测试及集成测试，并生成测试报告" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(迭代器): 添加同步迭代器功能测试&#10;&#10;添加同步迭代器的全面测试，包括数组、字符串、字典、生成器等数据结构的迭代功能&#10;包含解释器测试、编译器测试及集成测试，并生成测试报告" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
