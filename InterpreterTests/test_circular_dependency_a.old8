@@ -1,6 +1,0 @@
-// 模块 A，导入模块 B
-import { funcB } from "./test_circular_dependency_b"
-
-func funcA() {
-    return "funcA called"
-}

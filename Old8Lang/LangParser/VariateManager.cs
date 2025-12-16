@@ -49,7 +49,17 @@ public class VariateManager
     /// 作用域栈用于实现变量的作用域规则和变量查找
     /// </remarks>
     internal List<Dictionary<string, LangValueType>> Scopes { get; } = [new()];
-    
+
+    /// <summary>
+    /// COW（Copy-On-Write）标记数组，记录每个作用域是否共享
+    /// </summary>
+    /// <remarks>
+    /// - true: 作用域被共享（多个VariateManager引用），写入时需要拷贝
+    /// - false: 作用域未共享，可以直接修改
+    /// 用于优化闭包捕获，避免不必要的深拷贝
+    /// </remarks>
+    private readonly List<bool> ScopeSharedFlags = [false];
+
     /// <summary>
     /// 获取当前作用域的所有变量
     /// </summary>
@@ -58,7 +68,7 @@ public class VariateManager
     {
         return Scopes[^1];
     }
-    
+
     /// <summary>
     /// 获取父作用域的所有变量
     /// </summary>
@@ -67,7 +77,7 @@ public class VariateManager
     {
         return Scopes.Count > 1 ? Scopes[^2] : null;
     }
-    
+
     /// <summary>
     /// 将变量添加到父作用域
     /// </summary>
@@ -78,10 +88,12 @@ public class VariateManager
         if (Scopes.Count < 2)
         {
             // 没有父作用域，直接添加到当前作用域
+            EnsureScopeNotShared(Scopes.Count - 1); // COW: 确保作用域未共享
             Scopes[^1][name] = value;
             return;
         }
-        
+
+        EnsureScopeNotShared(Scopes.Count - 2); // COW: 确保父作用域未共享
         Scopes[^2][name] = value;
     }
 
@@ -235,6 +247,53 @@ public class VariateManager
 
     #endregion
 
+    #region Copy-On-Write Support
+
+    /// <summary>
+    /// 标记作用域为共享状态（用于闭包捕获）
+    /// </summary>
+    private void MarkScopesAsShared()
+    {
+        // 确保标记数组大小与作用域数组一致
+        while (ScopeSharedFlags.Count < Scopes.Count)
+        {
+            ScopeSharedFlags.Add(false);
+        }
+
+        // 标记所有作用域为共享
+        for (int i = 0; i < Scopes.Count; i++)
+        {
+            ScopeSharedFlags[i] = true;
+        }
+    }
+
+    /// <summary>
+    /// 在写入前确保作用域未共享（COW机制）
+    /// </summary>
+    /// <param name="scopeIndex">作用域索引</param>
+    private void EnsureScopeNotShared(int scopeIndex)
+    {
+        // 确保标记数组大小足够
+        while (ScopeSharedFlags.Count <= scopeIndex)
+        {
+            ScopeSharedFlags.Add(false);
+        }
+
+        // 如果作用域被标记为共享，则复制一份
+        if (ScopeSharedFlags[scopeIndex])
+        {
+            var originalScope = Scopes[scopeIndex];
+            var copiedScope = new Dictionary<string, LangValueType>(originalScope);
+            Scopes[scopeIndex] = copiedScope;
+            ScopeSharedFlags[scopeIndex] = false;
+
+            // 清除查找缓存，因为作用域引用已改变
+            _lookupCache?.Clear();
+        }
+    }
+
+    #endregion
+
     /// <summary>
     /// 设置变量值
     /// </summary>
@@ -245,6 +304,8 @@ public class VariateManager
     /// 1. 如果在函数内部，直接在当前作用域创建新变量
     /// 2. 否则，从当前作用域向上查找，找到则更新值
     /// 3. 未找到则在当前作用域创建新变量
+    ///
+    /// COW优化：写入前确保作用域未共享
     /// </remarks>
     public void Set(LangId id, LangValueType langValueType)
     {
@@ -252,6 +313,8 @@ public class VariateManager
         // 如果是，直接添加到当前作用域，创建新的局部变量
         if (IsFunc)
         {
+            var currentIndex = Scopes.Count - 1;
+            EnsureScopeNotShared(currentIndex); // COW: 确保作用域未共享
             Scopes[^1][id.IdName] = langValueType;
             return;
         }
@@ -260,11 +323,14 @@ public class VariateManager
         for (var i = Scopes.Count - 1; i >= 0; i--)
         {
             if (!Scopes[i].ContainsKey(id.IdName)) continue;
+            EnsureScopeNotShared(i); // COW: 确保作用域未共享
             Scopes[i][id.IdName] = langValueType;
             return;
         }
 
         // 2. 没有找到变量，在当前作用域创建新变量
+        var currentScopeIndex = Scopes.Count - 1;
+        EnsureScopeNotShared(currentScopeIndex); // COW: 确保作用域未共享
         Scopes[^1][id.IdName] = langValueType;
     }
 
@@ -289,6 +355,9 @@ public class VariateManager
             Scopes.Add(new Dictionary<string, LangValueType>());
         }
 
+        // COW: 添加对应的共享标记（新作用域默认未共享）
+        ScopeSharedFlags.Add(false);
+
         // 作用域变化，清理查找缓存
         _lookupCache?.Clear();
     }
@@ -306,6 +375,12 @@ public class VariateManager
         {
             var scopeToRemove = Scopes[^1];
             Scopes.RemoveAt(Scopes.Count - 1);
+
+            // COW: 同步移除共享标记
+            if (ScopeSharedFlags.Count > 0)
+            {
+                ScopeSharedFlags.RemoveAt(ScopeSharedFlags.Count - 1);
+            }
 
             // 优化：清空作用域并将其归还到缓存池，以便复用
             scopeToRemove.Clear();
@@ -614,6 +689,7 @@ public class VariateManager
         }
 
         // 清空全局作用域中的变量
+        EnsureScopeNotShared(0); // COW: 确保全局作用域未共享
         Scopes[0].Clear();
 
         // 清空导入信息（线程安全）
@@ -634,12 +710,15 @@ public class VariateManager
     }
 
     /// <summary>
-    /// 为闭包创建作用域快照（浅拷贝优化）
+    /// 为闭包创建作用域快照（浅拷贝优化 + COW）
     /// </summary>
     /// <returns>包含当前作用域快照的新VariateManager</returns>
     /// <remarks>
-    /// 使用浅拷贝策略：复制Scopes列表和字典结构，但不复制LangValueType对象
-    /// 这样可以在保持正确性的同时大幅减少内存分配
+    /// 使用 COW（Copy-On-Write）策略：
+    /// - 初始时直接引用作用域（零拷贝）
+    /// - 标记作用域为共享状态
+    /// - 首次写入时才进行拷贝
+    /// 这样可以在保持正确性的同时最大化性能
     /// </remarks>
     public VariateManager CaptureForClosure()
     {
@@ -650,10 +729,16 @@ public class VariateManager
             Interpreter = this.Interpreter
         };
 
-        // 直接引用所有作用域（不拷贝），允许异步函数修改外部变量
-        // 注意：移除原来的浅拷贝逻辑，改为共享引用
+        // COW优化：直接引用所有作用域（零拷贝），并标记为共享
         captured.Scopes.Clear(); // 清除构造函数创建的初始作用域
         captured.Scopes.AddRange(Scopes); // 直接添加对原始作用域的引用
+
+        // 标记原管理器的作用域为共享状态
+        MarkScopesAsShared();
+
+        // 同时标记新管理器的作用域为共享状态
+        captured.ScopeSharedFlags.Clear();
+        captured.ScopeSharedFlags.AddRange(ScopeSharedFlags);
 
         // 复制导入信息（线程安全）
         lock (ImportInfosLock)
@@ -691,9 +776,8 @@ public class VariateManager
 
         // 深拷贝作用域栈（生成器需要独立副本）
         generatorManager.Scopes.Clear(); // 清除构造函数创建的初始作用域
-        foreach (var scope in Scopes)
+        foreach (var newScope in Scopes.Select(scope => new Dictionary<string, LangValueType>(scope)))
         {
-            var newScope = new Dictionary<string, LangValueType>(scope);
             generatorManager.Scopes.Add(newScope);
         }
 
