@@ -85,16 +85,25 @@ public class VariateManager
     /// <param name="value">变量值</param>
     public void AddToParentScope(string name, LangValueType value)
     {
+        int targetScopeIndex;
         if (Scopes.Count < 2)
         {
             // 没有父作用域，直接添加到当前作用域
-            EnsureScopeNotShared(Scopes.Count - 1); // COW: 确保作用域未共享
+            targetScopeIndex = Scopes.Count - 1;
+            EnsureScopeNotShared(targetScopeIndex); // COW: 确保作用域未共享
             Scopes[^1][name] = value;
-            return;
+        }
+        else
+        {
+            // 添加到父作用域
+            targetScopeIndex = Scopes.Count - 2;
+            EnsureScopeNotShared(targetScopeIndex); // COW: 确保父作用域未共享
+            Scopes[^2][name] = value;
         }
 
-        EnsureScopeNotShared(Scopes.Count - 2); // COW: 确保父作用域未共享
-        Scopes[^2][name] = value;
+        // 更新缓存
+        _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
+        _lookupCache[name] = (targetScopeIndex, value);
     }
 
     /// <summary>
@@ -167,17 +176,6 @@ public class VariateManager
     /// 返回结果值
     /// </summary>
     public LangValueType Result { get; set; } = new VoidLangValue();
-
-    /// <summary>
-    /// 生成器执行位置，用于BlockStatement继续执行（已废弃，使用ExecutionPositionStack代替）
-    /// </summary>
-    public int ExecutionPosition { get; set; } = 0;
-
-    /// <summary>
-    /// 生成器执行位置栈，用于支持嵌套的 BlockStatement
-    /// 每个 BlockStatement 入口时压栈，出口时弹栈
-    /// </summary>
-    public Stack<int> ExecutionPositionStack { get; set; } = new();
 
     #endregion
 
@@ -316,6 +314,10 @@ public class VariateManager
             var currentIndex = Scopes.Count - 1;
             EnsureScopeNotShared(currentIndex); // COW: 确保作用域未共享
             Scopes[^1][id.IdName] = langValueType;
+
+            // 更新缓存
+            _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
+            _lookupCache[id.IdName] = (currentIndex, langValueType);
             return;
         }
 
@@ -325,6 +327,10 @@ public class VariateManager
             if (!Scopes[i].ContainsKey(id.IdName)) continue;
             EnsureScopeNotShared(i); // COW: 确保作用域未共享
             Scopes[i][id.IdName] = langValueType;
+
+            // 更新缓存
+            _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
+            _lookupCache[id.IdName] = (i, langValueType);
             return;
         }
 
@@ -332,6 +338,10 @@ public class VariateManager
         var currentScopeIndex = Scopes.Count - 1;
         EnsureScopeNotShared(currentScopeIndex); // COW: 确保作用域未共享
         Scopes[^1][id.IdName] = langValueType;
+
+        // 更新缓存
+        _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
+        _lookupCache[id.IdName] = (currentScopeIndex, langValueType);
     }
 
     /// <summary>
@@ -507,7 +517,12 @@ public class VariateManager
             throw new DuplicateNameError(langValueType.Position, name, "变量");
         }
 
+        var currentScopeIndex = Scopes.Count - 1;
         Scopes[^1][name] = langValueType;
+
+        // 更新缓存
+        _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
+        _lookupCache[name] = (currentScopeIndex, langValueType);
     }
 
     /// <summary>
@@ -541,42 +556,7 @@ public class VariateManager
     /// <returns>克隆后的变量管理器实例</returns>
     public VariateManager Clone()
     {
-        // 克隆方法实现
-        var newManager = new VariateManager
-        {
-            LangInfo = LangInfo,
-            Path = Path,
-            Interpreter = Interpreter,
-            IsFunc = IsFunc,
-            IsClass = IsClass,
-            IsReturn = IsReturn,
-            IsYield = IsYield,
-            Result = Result
-        };
-
-        // 深拷贝作用域栈
-        foreach (var scope in Scopes)
-        {
-            var newScope = new Dictionary<string, LangValueType>(scope);
-            newManager.Scopes.Add(newScope);
-        }
-
-        // 移除初始化时的空作用域（因为构造函数已经创建了一个）
-        if (newManager.Scopes.Count > 0 && Scopes.Count > 0)
-        {
-            newManager.Scopes.RemoveAt(0);
-        }
-
-        // 复制导入信息（线程安全）
-        lock (ImportInfosLock)
-        {
-            lock (newManager.ImportInfosLock)
-            {
-                newManager.ImportInfosList.AddRange(ImportInfosList);
-            }
-        }
-
-        return newManager;
+        return CloneInternal(copyIsYield: true);
     }
 
     /// <summary>
@@ -585,28 +565,39 @@ public class VariateManager
     /// <returns>新的变量管理器实例</returns>
     public VariateManager NewManger()
     {
+        return CloneInternal(copyIsYield: false);
+    }
+
+    /// <summary>
+    /// 克隆变量管理器的内部实现
+    /// </summary>
+    /// <param name="copyIsYield">是否复制 IsYield 字段</param>
+    /// <returns>克隆后的变量管理器实例</returns>
+    private VariateManager CloneInternal(bool copyIsYield)
+    {
         var newManager = new VariateManager
         {
             LangInfo = LangInfo,
             Path = Path,
             Interpreter = Interpreter,
-            // 复制返回和函数状态
-            IsReturn = IsReturn,
-            Result = Result,
             IsFunc = IsFunc,
-            IsClass = IsClass
+            IsClass = IsClass,
+            IsReturn = IsReturn,
+            Result = Result
         };
 
-        // 深拷贝作用域栈
-        foreach (var newScope in Scopes.Select(scope => new Dictionary<string, LangValueType>(scope)))
+        // 仅在需要时复制 IsYield（Clone 需要，NewManger 不需要）
+        if (copyIsYield)
         {
-            newManager.Scopes.Add(newScope);
+            newManager.IsYield = IsYield;
         }
 
-        // 移除初始化时的空作用域（因为构造函数已经创建了一个）
-        if (newManager.Scopes.Count > 0 && Scopes.Count > 0)
+        // 深拷贝作用域栈
+        newManager.Scopes.Clear(); // 清除构造函数创建的初始作用域
+        foreach (var scope in Scopes)
         {
-            newManager.Scopes.RemoveAt(0);
+            var newScope = new Dictionary<string, LangValueType>(scope);
+            newManager.Scopes.Add(newScope);
         }
 
         // 复制导入信息（线程安全）
@@ -710,23 +701,35 @@ public class VariateManager
     }
 
     /// <summary>
-    /// 为闭包创建作用域快照（浅拷贝优化 + COW）
+    /// 为闭包创建作用域快照（浅拷贝优化 + COW）- 已废弃
     /// </summary>
     /// <returns>包含当前作用域快照的新VariateManager</returns>
     /// <remarks>
+    /// ⚠️ 已废弃：此方法不适用于需要修改外部变量的闭包
+    ///
     /// 使用 COW（Copy-On-Write）策略：
     /// - 初始时直接引用作用域（零拷贝）
     /// - 标记作用域为共享状态
     /// - 首次写入时才进行拷贝
-    /// 这样可以在保持正确性的同时最大化性能
+    ///
+    /// 局限性：
+    /// - COW 在写入时会创建独立副本，导致闭包与原作用域隔离
+    /// - 闭包无法修改外部作用域的变量（与 Old8Lang 语义不符）
+    /// - 仅适用于完全只读的场景（极少见）
+    ///
+    /// 替代方案：
+    /// - 需要修改外部变量的闭包：使用 Clone() 深拷贝
+    /// - 只读闭包：使用 CaptureForReadOnlyClosure()（基于 ScopeLayer）
+    /// - 生成器：使用 CloneForGenerator()
     /// </remarks>
+    [Obsolete("此方法不适用于需要修改外部变量的闭包，请使用 Clone() 或 CaptureForReadOnlyClosure()")]
     public VariateManager CaptureForClosure()
     {
         var captured = new VariateManager
         {
-            LangInfo = this.LangInfo,
-            Path = this.Path,
-            Interpreter = this.Interpreter
+            LangInfo = LangInfo,
+            Path = Path,
+            Interpreter = Interpreter
         };
 
         // COW优化：直接引用所有作用域（零拷贝），并标记为共享

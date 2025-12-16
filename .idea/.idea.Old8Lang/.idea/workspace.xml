@@ -18,16 +18,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/test_await_gen.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_normal_generator.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_simple_async_gen.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/COW_REDESIGN.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/ScopeLayer.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_closure_cow.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_cow_scenarios.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_variable_lookup_performance.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/async_advanced_features.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/async_advanced_features.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ImportError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/ImportError.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/VariateManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -62,8 +58,8 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/.claude/settings.local.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
@@ -99,6 +95,8 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AsyncStreamLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/GeneratorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/GeneratorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/GeneratorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
@@ -129,6 +127,8 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangInterpreter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/ClassParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
@@ -808,7 +808,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="211" />
+    <option name="localTasksCounter" value="212" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -835,7 +835,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(async): 实现异步函数和await表达式支持&#10;&#10;- 添加异步函数声明语法：async func&#10;- 实现AwaitExpression解析和执行&#10;- 创建TaskLangValue封装.NET Task&#10;- 支持异步函数调用和返回值处理&#10;- 添加AsyncFuncInit和AsyncFuncLangValue类&#10;- 实现闭包捕获和异步执行上下文&#10;- 更新错误处理以支持异步调用栈&#10;- 添加异步相关原语和原子操作库&#10;- 创建AsyncLib提供Mutex、Semaphore等同步原语&#10;- 增加多个异步测试用例验证功能正确性&#10;- 更新语言版本字段名从Ver到Var&#10;- 添加Async库到默认库信息配置" />
     <MESSAGE value="feat(crypto): 添加加密库支持&#10;&#10;- 新增 AES 加密解密功能&#10;- 实现 RSA 加密解密功能&#10;- 添加 SHA256 和 SHA512 哈希算法&#10;- 支持 HMAC-SHA256 和 HMAC-SHA512 算法&#10;- 提供 Base64 编码解码功能&#10;- 实现 XOR 加密解密方法&#10;- 注册 Crypto 库到语言信息配置&#10;- 更新项目配置以包含新库文件" />
     <MESSAGE value="feat(runtime): 实现多线程支持和线程管理功能&#10;&#10;- 添加 ThreadLangValue 类封装线程操作和状态管理&#10;- 实现 spawn 函数支持创建新线程执行函数&#10;- 实现 Join 方法用于等待线程完成并获取返回值&#10;- 扩展 Instance 类支持 Spawn 方法调用&#10;- 更新变量管理器字段命名和线程安全处理&#10;- 添加基础线程测试用例验证功能正确性&#10;- 更新词法分析器标记定义和格式化&#10;- 优化异步库 ChannelTryReceive 方法可空返回类型&#10;- 调整 IL 生成代码使用 foreach 替代 for 循环&#10;- 更新项目配置和开发环境设置文件" />
     <MESSAGE value="feat(generator): 实现生成器执行位置跟踪与恢复机制&#10;&#10;- 在 BlockStatement 中添加生成器执行位置字段和重置方法&#10;- 修改 BlockStatement.Run 方法支持从指定位置恢复执行&#10;- 优化 ForInStatement 处理生成器暂停状态下的值获取&#10;- 简化 GeneratorLangValue.Run 方法逻辑，移除手动位置管理&#10;- 更新 VariateManager 添加执行位置栈支持嵌套块语句&#10;- 调整 WhileStatement 适配新的生成器执行模型&#10;- 添加多个调试测试文件验证生成器行为" />
@@ -860,7 +859,8 @@
     <MESSAGE value="feat(lang): 实现异步流和异步生成器功能&#10;&#10;- 新增异步生成器支持，使用 async func 和 yield 关键字&#10;- 实现 AsyncGeneratorLangValue 类来表示异步生成器实例&#10;- 添加 AsyncForInStatement 支持 async for-in 循环语法&#10;- 实现异步生成器状态机 (AsyncGeneratorStateMachine)&#10;- 更新语法定义文件，添加 asyncFuncDeclaration 和 asyncForInStatement&#10;- 完善解释器和编译器对异步流的支持&#10;- 添加完整的异步流测试用例，覆盖基本功能、参数传递、&#10;  break/continue、异常处理等场景&#10;- 支持异步流中生成键值对并通过多标识符解构&#10;- 实现异步生成器的取消和重置功能&#10;- 更新文档，添加异步流和异步迭代相关说明" />
     <MESSAGE value="feat(async): 添加高级并发原语支持&#10;&#10;- 实现 ReadWriteLock 读写锁功能，支持多读者或单写者访问&#10;- 添加 CountDownLatch 倒计时锁，用于等待一组操作完成&#10;- 实现 CyclicBarrier 循环栅栏，支持多线程协同分阶段执行&#10;- 在 AsyncLib 中集成上述三种并发原语的创建、获取、释放等方法&#10;- 添加资源自动清理机制，定期回收闲置的并发原语对象&#10;- 提供详细的使用示例和 API 文档说明&#10;- 增加完整的测试用例验证各项功能正确性" />
     <MESSAGE value="feat(lang): 实现闭包作用域捕获优化和COW机制&#10;&#10;- 添加 CapturedScope 类用于缓存闭包捕获的作用域信息&#10;- 在 VariateManager 中引入 Copy-On-Write 机制优化闭包性能&#10;- 实现作用域共享标记和写时拷贝逻辑&#10;- 支持闭包快照创建时的零拷贝优化&#10;- 完善作用域管理的线程安全性和内存效率&#10;- 添加相关测试用例验证闭包和性能优化效果" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 实现闭包作用域捕获优化和COW机制&#10;&#10;- 添加 CapturedScope 类用于缓存闭包捕获的作用域信息&#10;- 在 VariateManager 中引入 Copy-On-Write 机制优化闭包性能&#10;- 实现作用域共享标记和写时拷贝逻辑&#10;- 支持闭包快照创建时的零拷贝优化&#10;- 完善作用域管理的线程安全性和内存效率&#10;- 添加相关测试用例验证闭包和性能优化效果" />
+    <MESSAGE value="feat(lang): 实现异步生成器和作用域捕获优化&#10;&#10;- 优化异步函数和生成器的作用域捕获机制，使用深拷贝确保状态隔离&#10;- 改进 BlockStatement 执行逻辑，支持 yield 恢复和嵌套执行栈管理&#10;- 完善 WhileStatement 对生成器上下文的支持，正确处理循环体执行栈帧&#10;- 更新 ImportError 构造函数，使用可空集合参数避免空引用异常&#10;- 修复测试文件中异常抛出语法，确保错误处理一致性&#10;- 添加异步生成器相关测试用例，验证 await 和 yield 协同工作能力&#10;- 优化 VariateManager 作用域查找缓存初始化逻辑和字段引用方式" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 实现异步生成器和作用域捕获优化&#10;&#10;- 优化异步函数和生成器的作用域捕获机制，使用深拷贝确保状态隔离&#10;- 改进 BlockStatement 执行逻辑，支持 yield 恢复和嵌套执行栈管理&#10;- 完善 WhileStatement 对生成器上下文的支持，正确处理循环体执行栈帧&#10;- 更新 ImportError 构造函数，使用可空集合参数避免空引用异常&#10;- 修复测试文件中异常抛出语法，确保错误处理一致性&#10;- 添加异步生成器相关测试用例，验证 await 和 yield 协同工作能力&#10;- 优化 VariateManager 作用域查找缓存初始化逻辑和字段引用方式" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

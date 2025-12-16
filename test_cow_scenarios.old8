@@ -1,0 +1,117 @@
+// 演示新的 COW 机制使用场景
+
+PrintLine("=== COW 机制使用场景演示 ===")
+PrintLine("")
+
+// 场景 1: 只读闭包（适合 CaptureForReadOnlyClosure）
+PrintLine("场景 1: 只读闭包")
+PrintLine("- 闭包只读取外部变量，不修改")
+PrintLine("- 使用 ScopeLayer 零拷贝")
+PrintLine("")
+
+func createReadOnlyClosures() {
+    x <- 100
+    y <- 200
+    z <- 300
+
+    // 创建多个只读闭包
+    sum <- () -> x + y + z
+    avg <- () -> (x + y + z) / 3
+    max <- () -> {
+        result <- x
+        if y > result {
+            result <- y
+        }
+        if z > result {
+            result <- z
+        }
+        return result
+    }
+
+    PrintLine("sum() = " + sum().ToStr())
+    PrintLine("avg() = " + avg().ToStr())
+    PrintLine("max() = " + max().ToStr())
+    PrintLine("✓ 只读闭包：零拷贝，高性能")
+}
+
+createReadOnlyClosures()
+PrintLine("")
+
+// 场景 2: 写入闭包（需要深拷贝）
+PrintLine("场景 2: 写入闭包")
+PrintLine("- 闭包需要修改外部变量")
+PrintLine("- 必须使用 Clone() 深拷贝")
+PrintLine("")
+
+func createWriteClosures() {
+    counter <- 0
+
+    inc <- () -> {
+        counter <- counter + 1
+        return counter
+    }
+
+    dec <- () -> {
+        counter <- counter - 1
+        return counter
+    }
+
+    PrintLine("inc() = " + inc().ToStr())
+    PrintLine("inc() = " + inc().ToStr())
+    PrintLine("dec() = " + dec().ToStr())
+    PrintLine("counter = " + counter.ToStr())
+    PrintLine("✓ 写入闭包：深拷贝，正确语义")
+}
+
+createWriteClosures()
+PrintLine("")
+
+// 场景 3: 函数作为参数传递
+PrintLine("场景 3: 函数作为参数传递")
+PrintLine("- 高阶函数接收闭包作为参数")
+PrintLine("- 闭包携带捕获的作用域")
+PrintLine("")
+
+func applyTwice(fn, value) {
+    return fn(fn(value))
+}
+
+func makeAdder(n) {
+    return (x) -> x + n
+}
+
+add5 <- makeAdder(5)
+result <- applyTwice(add5, 10)
+PrintLine("applyTwice(add5, 10) = " + result.ToStr())
+PrintLine("✓ 函数参数传递：作用域快照")
+PrintLine("")
+
+// 场景 4: 生成器（独立状态）
+PrintLine("场景 4: 生成器")
+PrintLine("- 每个生成器实例需要独立状态")
+PrintLine("- 必须使用深拷贝避免互相干扰")
+PrintLine("")
+
+func range(start, end) {
+    i <- start
+    while i < end {
+        yield i
+        i <- i + 1
+    }
+}
+
+gen1 <- range(1, 4)
+gen2 <- range(10, 13)
+
+PrintLine("gen1: " + gen1().ToStr() + ", gen2: " + gen2().ToStr())
+PrintLine("gen1: " + gen1().ToStr() + ", gen2: " + gen2().ToStr())
+PrintLine("gen1: " + gen1().ToStr() + ", gen2: " + gen2().ToStr())
+PrintLine("✓ 生成器：独立状态，互不干扰")
+PrintLine("")
+
+// 总结
+PrintLine("=== COW 机制使用指南 ===")
+PrintLine("1. 只读闭包 -> CaptureForReadOnlyClosure() (零拷贝)")
+PrintLine("2. 写入闭包 -> Clone() (深拷贝)")
+PrintLine("3. 生成器 -> CloneForGenerator() (深拷贝 + 上下文)")
+PrintLine("4. 异步函数 -> 直接引用 manager (共享作用域)")
