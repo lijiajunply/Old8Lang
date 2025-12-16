@@ -2,6 +2,7 @@ using Old8Lang.Error;
 using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
+using Old8Lang.AST.Expression.Intermediates;
 
 namespace Old8Lang.AST.Statement;
 
@@ -9,13 +10,20 @@ public class ThrowStatement(LangExpression expression, SourcePosition position =
 {
     
     public override void Run(VariateManager manager)
-{
-    var value = expression.Run(manager);
-    // 使用CustomError抛出异常
-    throw new CustomError(
-        this,
-        value.ToDisplayString());
-}
+    {
+        var value = expression.Run(manager);
+        
+        // 如果值已经是ErrorLangValue，直接抛出其包含的原始异常
+        if (value is ErrorLangValue errorValue)
+        {
+            throw errorValue.Exception;
+        }
+        
+        // 否则，创建一个新的CustomError
+        throw new CustomError(
+            this,
+            value.ToDisplayString());
+    }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {

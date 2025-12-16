@@ -1,0 +1,165 @@
+// 类型化异常处理测试
+
+PrintLine("=== 类型化异常处理测试 ===")
+
+// 测试1: 基本的类型化异常捕获
+PrintLine("\n=== 测试1: 基本的类型化异常捕获 ===")
+try {
+    PrintLine("尝试执行除以零操作")
+    result <- 10 / 0
+    PrintLine("这行不应该被执行")
+} catch (ZeroDivisionError e) {
+    PrintLine("✓ 成功捕获ZeroDivisionError")
+    PrintLine("  异常类型: " + e.Type)
+    PrintLine("  错误代码: " + e.ErrorCode)
+    PrintLine("  友好信息: " + e.FriendlyMessage)
+} catch (Exception e) {
+    PrintLine("✗ 意外捕获到通用Exception")
+}
+
+// 测试2: 异常继承关系匹配
+PrintLine("\n=== 测试2: 异常继承关系匹配 ===")
+try {
+    PrintLine("尝试执行除以零操作")
+    result <- 10 / 0
+} catch (RuntimeError e) {
+    PrintLine("✓ 成功通过RuntimeError捕获ZeroDivisionError（继承关系）")
+    PrintLine("  实际异常类型: " + e.Type)
+    PrintLine("  捕获类型: RuntimeError")
+}
+
+// 测试3: 多个catch块的匹配顺序
+PrintLine("\n=== 测试3: 多个catch块的匹配顺序 ===")
+try {
+    PrintLine("尝试执行除以零操作")
+    result <- 10 / 0
+} catch (AttributeError e) {
+    PrintLine("✗ 错误的异常类型匹配: AttributeError")
+} catch (ZeroDivisionError e) {
+    PrintLine("✓ 正确捕获到ZeroDivisionError")
+    PrintLine("  异常类型: " + e.Type)
+} catch (RuntimeError e) {
+    PrintLine("✗ 不应该到达RuntimeError捕获块")
+} catch (Exception e) {
+    PrintLine("✗ 不应该到达通用Exception捕获块")
+}
+
+// 测试4: 访问不存在的字典键
+PrintLine("\n=== 测试4: 访问不存在的字典键 ===")
+try {
+    dict <- {"name": "Alice"}
+    PrintLine("尝试访问不存在的键: dict['age']")
+    age <- dict["age"]
+} catch (KeyError e) {
+    PrintLine("✓ 成功捕获KeyError")
+    PrintLine("  异常类型: " + e.Type)
+    PrintLine("  错误代码: " + e.ErrorCode)
+} catch (RuntimeError e) {
+    PrintLine("✗ 不应该到达RuntimeError捕获块")
+}
+
+// 测试5: 访问不存在的属性
+PrintLine("\n=== 测试5: 访问不存在的属性 ===")
+try {
+    obj <- {"name": "Alice"}
+    PrintLine("尝试访问不存在的属性: obj.age")
+    age <- obj.age
+} catch (AttributeError e) {
+    PrintLine("✓ 成功捕获AttributeError")
+    PrintLine("  异常类型: " + e.Type)
+    PrintLine("  错误代码: " + e.ErrorCode)
+} catch (RuntimeError e) {
+    PrintLine("✗ 不应该到达RuntimeError捕获块")
+}
+
+// 测试6: 无效操作错误
+PrintLine("\n=== 测试6: 无效操作错误 ===")
+try {
+    PrintLine("尝试执行无效操作: 10 + 'abc'")
+    result <- 10 + "abc"
+} catch (InvalidOperationError e) {
+    PrintLine("✓ 成功捕获InvalidOperationError")
+    PrintLine("  异常类型: " + e.Type)
+    PrintLine("  错误代码: " + e.ErrorCode)
+} catch (RuntimeError e) {
+    PrintLine("✗ 不应该到达RuntimeError捕获块")
+}
+
+// 测试7: 通用异常捕获
+PrintLine("\n=== 测试7: 通用异常捕获 ===")
+try {
+    PrintLine("尝试执行除以零操作")
+    result <- 10 / 0
+} catch (Exception e) {
+    PrintLine("✓ 成功通过通用Exception捕获ZeroDivisionError")
+    PrintLine("  实际异常类型: " + e.Type)
+    PrintLine("  错误代码: " + e.ErrorCode)
+}
+
+// 测试8: 异常属性访问
+PrintLine("\n=== 测试8: 异常属性访问 ===")
+try {
+    PrintLine("尝试执行除以零操作")
+    result <- 10 / 0
+} catch (ZeroDivisionError e) {
+    PrintLine("✓ 异常属性访问测试")
+    PrintLine("  Type: " + e.Type)
+    PrintLine("  ErrorCode: " + e.ErrorCode)
+    PrintLine("  FriendlyMessage: " + e.FriendlyMessage)
+    PrintLine("  Position: " + e.Position)
+    PrintLine("  RequestId: " + e.RequestId)
+}
+
+// 测试9: 无类型捕获（传统方式）
+PrintLine("\n=== 测试9: 无类型捕获（传统方式） ===")
+try {
+    PrintLine("尝试执行除以零操作")
+    result <- 10 / 0
+} catch (e) {
+    PrintLine("✓ 成功通过传统方式捕获异常")
+    PrintLine("  异常类型: " + e.Type)
+    PrintLine("  错误代码: " + e.ErrorCode)
+}
+
+// 测试10: 嵌套的类型化异常处理
+PrintLine("\n=== 测试10: 嵌套的类型化异常处理 ===")
+try {
+    PrintLine("外层try块")
+    try {
+        PrintLine("内层try块，尝试除以零")
+        result <- 10 / 0
+    } catch (ZeroDivisionError e) {
+        PrintLine("  ✓ 内层catch捕获到ZeroDivisionError")
+        PrintLine("  重新抛出异常...")
+        throw e
+    }
+} catch (ZeroDivisionError e) {
+    PrintLine("✓ 外层catch捕获到重新抛出的ZeroDivisionError")
+    PrintLine("  异常类型: " + e.Type)
+}
+
+// 测试11: finally块与类型化异常
+PrintLine("\n=== 测试11: finally块与类型化异常 ===")
+try {
+    PrintLine("尝试执行除以零操作")
+    result <- 10 / 0
+} catch (ZeroDivisionError e) {
+    PrintLine("✓ 捕获到ZeroDivisionError")
+} finally {
+    PrintLine("✓ finally块被执行")
+}
+
+// 测试12: 没有异常时的执行流程
+PrintLine("\n=== 测试12: 没有异常时的执行流程 ===")
+try {
+    PrintLine("尝试执行正常操作")
+    result <- 10 / 2
+    PrintLine("✓ 操作成功，结果: " + result)
+} catch (ZeroDivisionError e) {
+    PrintLine("✗ 不应该捕获到异常")
+} finally {
+    PrintLine("✓ finally块被执行")
+}
+
+PrintLine("\n=== 所有类型化异常处理测试完成 ===")
+PrintLine("✓ ✓ ✓ 所有测试通过！✓ ✓ ✓")

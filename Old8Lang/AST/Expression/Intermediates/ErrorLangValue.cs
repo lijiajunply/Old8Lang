@@ -79,6 +79,31 @@ public class ErrorLangValue(Old8Exception value) : LangValueType
     }
     
     /// <summary>
+    /// 获取异常类型名称
+    /// </summary>
+    public string Type => value.GetType().Name;
+    
+    /// <summary>
+    /// 获取异常的位置信息
+    /// </summary>
+    public string Position => value.Position.ToString();
+    
+    /// <summary>
+    /// 获取异常的建议
+    /// </summary>
+    public string? Suggestion => value.Suggestion;
+    
+    /// <summary>
+    /// 获取异常的时间戳
+    /// </summary>
+    public DateTime Timestamp => value.Timestamp;
+    
+    /// <summary>
+    /// 获取异常的请求ID
+    /// </summary>
+    public string RequestId => value.RequestId.ToString();
+    
+    /// <summary>
     /// 支持属性访问，如 e.FriendlyMessage
     /// </summary>
     public override LangValueType Dot(LangExpression dotExpression)
@@ -99,6 +124,16 @@ public class ErrorLangValue(Old8Exception value) : LangValueType
                     return new StringLangValue(value.Message);
                 case "ErrorCode":
                     return new StringLangValue(value.ErrorCode);
+                case "Type":
+                    return new StringLangValue(Type);
+                case "Position":
+                    return new StringLangValue(Position);
+                case "Suggestion":
+                    return Suggestion != null ? new StringLangValue(Suggestion) : new NullLangValue();
+                case "Timestamp":
+                    return new StringLangValue(Timestamp.ToString());
+                case "RequestId":
+                    return new StringLangValue(RequestId);
                 default:
                     throw new Old8Exception(
                         "ATTRIBUTE_ERROR",

@@ -168,7 +168,7 @@ public class TryStatement(
 
     private static bool IsMatch(Old8Exception exception, string exceptionType)
     {
-        if (string.IsNullOrEmpty(exceptionType) || exceptionType == "Exception")
+        if (string.IsNullOrEmpty(exceptionType) || exceptionType == "Exception" || exceptionType == "Old8Exception")
         {
             return true;
         }
@@ -176,18 +176,26 @@ public class TryStatement(
         var currentType = exception.GetType();
         while (currentType != null)
         {
+            // 精确匹配类型名称
             if (currentType.Name == exceptionType)
             {
                 return true;
             }
 
-            // 检查当前类型的完整命名空间，支持完整类型名称匹配
-            if (currentType.FullName?.Contains(exceptionType) == true)
+            // 精确匹配完整类型名称（包括命名空间）
+            if (currentType.FullName == exceptionType)
             {
                 return true;
             }
 
-            // 移动到父类
+            // 检查完整命名空间路径中的类型（支持"Error.RuntimeError"格式）
+            if (currentType.FullName?.EndsWith($".{exceptionType}") == true || 
+                currentType.FullName?.Contains($".{exceptionType}.") == true)
+            {
+                return true;
+            }
+
+            // 移动到父类，支持异常继承关系匹配
             currentType = currentType.BaseType;
         }
 
