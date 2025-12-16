@@ -39,26 +39,21 @@ public class AwaitExpression : LangExpression
             );
         }
 
-        // 检查任务是否已完成，如果已完成直接返回结果，避免阻塞
-        lock (taskValue)
+        // 检查任务是否已完成，如果已完成直接返回结果
+        if (taskValue.IsCompleted)
         {
-            if (taskValue.IsCompleted)
+            if (taskValue.Exception != null)
             {
-                if (taskValue.Exception != null)
-                {
-                    throw taskValue.Exception;
-                }
-                return taskValue.Result!;
+                throw taskValue.Exception;
             }
+            return taskValue.Result!;
         }
 
-        // 对于未完成的任务，使用异步等待但在当前线程同步执行
-        // 这是一种妥协方案，确保在现有解释器架构下工作
-        // 后续可以优化为真正的非阻塞实现
+        // 对于未完成的任务，直接异步等待并获取结果
+        // TaskLangValue.AwaitAsync() 内部已经处理了线程安全
         try
         {
-            // 使用 Task.Run 避免线程死锁
-            return Task.Run(async () => await taskValue.AwaitAsync()).GetAwaiter().GetResult();
+            return taskValue.AwaitAsync().GetAwaiter().GetResult();
         }
         catch (AggregateException aggEx)
         {
@@ -77,7 +72,7 @@ public class AwaitExpression : LangExpression
     /// <summary>
     /// 获取输出类型
     /// </summary>
-    public override Type? OutputType(LocalManager local)
+    public override Type OutputType(LocalManager local)
     {
         // await Task<T> 返回 T
         return typeof(object); // 简化处理

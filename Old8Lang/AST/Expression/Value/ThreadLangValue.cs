@@ -13,17 +13,17 @@ public class ThreadLangValue : LangValueType
     /// <summary>
     /// 线程对象
     /// </summary>
-    private readonly Thread _thread;
+    private readonly Thread Thread;
 
     /// <summary>
     /// 线程安全锁
     /// </summary>
-    private readonly object _lock = new();
+    private readonly Lock Lock = new();
 
     /// <summary>
     /// 线程执行结果
     /// </summary>
-    private object? _result;
+    private object? Result;
 
     /// <summary>
     /// 线程执行是否完成
@@ -33,7 +33,7 @@ public class ThreadLangValue : LangValueType
     /// <summary>
     /// 线程执行过程中发生的异常
     /// </summary>
-    private Exception? _exception;
+    private Exception? Exception;
 
     /// <summary>
     /// 构造函数
@@ -42,8 +42,8 @@ public class ThreadLangValue : LangValueType
     /// <param name="position">源代码位置</param>
     public ThreadLangValue(ThreadStart threadStart, SourcePosition position = default) : base(position)
     {
-        _thread = new Thread(threadStart);
-        _thread.Start();
+        Thread = new Thread(threadStart);
+        Thread.Start();
     }
 
     /// <summary>
@@ -55,8 +55,8 @@ public class ThreadLangValue : LangValueType
     public ThreadLangValue(ParameterizedThreadStart parameterizedThreadStart, object? parameter,
         SourcePosition position = default) : base(position)
     {
-        _thread = new Thread(parameterizedThreadStart);
-        _thread.Start(parameter);
+        Thread = new Thread(parameterizedThreadStart);
+        Thread.Start(parameter);
     }
 
     /// <summary>
@@ -65,16 +65,16 @@ public class ThreadLangValue : LangValueType
     /// <returns>线程执行结果</returns>
     public LangValueType Join()
     {
-        _thread.Join();
+        Thread.Join();
 
-        lock (_lock)
+        lock (Lock)
         {
-            if (_exception != null)
+            if (Exception != null)
             {
-                throw new InvalidOperationError(this, "线程执行异常: " + _exception.ToString());
+                throw new InvalidOperationError(this, "线程执行异常: " + Exception.ToString());
             }
 
-            return ObjToValue(_result!);
+            return ObjToValue(Result!);
         }
     }
 
@@ -84,9 +84,9 @@ public class ThreadLangValue : LangValueType
     /// <param name="result">执行结果</param>
     public void SetResult(object result)
     {
-        lock (_lock)
+        lock (Lock)
         {
-            _result = result;
+            Result = result;
             _isCompleted = true;
         }
     }
@@ -97,9 +97,9 @@ public class ThreadLangValue : LangValueType
     /// <param name="exception">异常对象</param>
     public void SetException(Exception exception)
     {
-        lock (_lock)
+        lock (Lock)
         {
-            _exception = exception;
+            Exception = exception;
             _isCompleted = true;
         }
     }
@@ -107,7 +107,7 @@ public class ThreadLangValue : LangValueType
     /// <summary>
     /// 获取线程状态
     /// </summary>
-    public ThreadState State => _thread.ThreadState;
+    public ThreadState State => Thread.ThreadState;
 
     /// <summary>
     /// 检查线程是否已完成
@@ -116,7 +116,7 @@ public class ThreadLangValue : LangValueType
     {
         get
         {
-            lock (_lock)
+            lock (Lock)
             {
                 return _isCompleted;
             }
@@ -140,18 +140,6 @@ public class ThreadLangValue : LangValueType
             null => new NullLangValue(),
             _ => new VoidLangValue() // 对于未知类型，返回 VoidLangValue
         };
-    }
-
-    /// <summary>
-    /// 运行方法，用于支持线程对象的方法调用
-    /// </summary>
-    /// <param name="manager">变量管理器</param>
-    /// <param name="args">方法参数</param>
-    /// <returns>方法调用结果</returns>
-    public LangValueType Run()
-    {
-        // 处理 Join 方法调用
-        return Join();
     }
 
     public override Type OutputType(LocalManager local)
