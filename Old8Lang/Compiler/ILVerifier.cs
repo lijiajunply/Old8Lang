@@ -10,7 +10,7 @@ namespace Old8Lang.Compiler;
 /// 这是一种可靠的验证方式，因为CLR在创建委托时会严格检查IL代码的正确性。
 /// 验证结果包含是否通过以及详细的错误信息，便于调试和修复IL生成问题。
 /// </remarks>
-public static class ILVerifier
+public static class IlVerifier
 {
     /// <summary>
     /// 验证动态方法生成的IL代码
@@ -29,7 +29,7 @@ public static class ILVerifier
     public static VerificationResult Verify(DynamicMethod dynamicMethod, string methodName = "DynamicMethod")
     {
         var result = new VerificationResult();
-        
+
         try
         {
             // 对于DynamicMethod，我们通过尝试创建委托来验证IL
@@ -38,7 +38,7 @@ public static class ILVerifier
             {
                 // 尝试创建委托，这会触发CLR的IL验证
                 dynamicMethod.CreateDelegate(typeof(Action));
-                
+
                 // 如果没有抛出异常，则IL代码基本有效
                 result.IsValid = true;
             }
@@ -79,7 +79,7 @@ public static class ILVerifier
                 StackTrace = ex.StackTrace
             });
         }
-        
+
         return result;
     }
 }
@@ -101,13 +101,13 @@ public class VerificationResult
     /// </summary>
     /// <value>如果IL代码有效则为true，否则为false</value>
     public bool IsValid { get; set; }
-    
+
     /// <summary>
     /// 验证过程中发现的错误列表
     /// </summary>
     /// <value>包含所有验证错误的列表，验证通过时为空列表</value>
     public List<VerificationError> Errors { get; set; }
-    
+
     /// <summary>
     /// 初始化VerificationResult实例
     /// </summary>
@@ -137,33 +137,33 @@ public class VerificationError
     /// 错误严重性
     /// </summary>
     public Severity Severity { get; set; }
-    
+
     /// <summary>
     /// 错误代码，用于标识不同类型的验证错误
     /// </summary>
     /// <value>错误代码，如"IL001"表示无效的IL代码</value>
     public string? Code { get; set; }
-    
+
     /// <summary>
     /// 错误消息，包含详细的错误描述
     /// </summary>
     public string? Message { get; set; }
-    
+
     /// <summary>
     /// 方法名称，用于标识出错的方法
     /// </summary>
     public string? MethodName { get; set; }
-    
+
     /// <summary>
     /// 错误位置偏移量，指示错误在IL代码中的位置
     /// </summary>
     public int Offset { get; set; }
-    
+
     /// <summary>
     /// 堆栈跟踪信息，用于调试复杂的验证错误
     /// </summary>
     public string? StackTrace { get; set; }
-    
+
     /// <summary>
     /// 错误上下文信息，提供错误发生时的相关上下文
     /// </summary>
@@ -179,12 +179,12 @@ public enum Severity
     /// 信息，仅用于提供验证过程中的信息
     /// </summary>
     Info,
-    
+
     /// <summary>
     /// 警告，IL代码可能存在问题，但不会导致程序崩溃
     /// </summary>
     Warning,
-    
+
     /// <summary>
     /// 错误，IL代码无效，会导致程序崩溃
     /// </summary>

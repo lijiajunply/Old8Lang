@@ -157,7 +157,7 @@ public static class Compiler
             if (ilVerificationEnabled)
             {
                 Log("开始验证IL代码", LogLevel.Debug);
-                var verificationResult = ILVerifier.Verify(dynamicMethod, "OldLangRun");
+                var verificationResult = IlVerifier.Verify(dynamicMethod, "OldLangRun");
 
                 if (!verificationResult.IsValid)
                 {

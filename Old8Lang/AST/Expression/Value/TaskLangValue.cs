@@ -378,14 +378,16 @@ public class TaskLangValue : LangValueType
     }
 
     /// <summary>
-    /// 生成 IL 代码（编译器模式暂不支持）
+    /// 生成 IL 代码，返回包装的 .NET Task&lt;object&gt; 类型
     /// </summary>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        throw new NotImplementedError(
-            Position,
-            "编译模式暂不支持 Task 类型"
-        );
+        // 加载 this 指针
+        ilGenerator.Emit(OpCodes.Ldarg_0);
+        // 调用 GetValue() 方法获取底层 Task 对象
+        ilGenerator.Emit(OpCodes.Call, GetType().GetMethod("GetValue")!);
+        // 将 Task<LangValueType> 转换为 Task<object>
+        ilGenerator.Emit(OpCodes.Castclass, typeof(Task<object>));
     }
 
     /// <summary>

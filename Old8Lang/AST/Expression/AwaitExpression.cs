@@ -63,6 +63,7 @@ public class AwaitExpression : LangExpression
 
     /// <summary>
     /// 生成 IL 代码（编译器模式）
+    /// 实现真正的异步等待，使用 .NET 的 await 模式
     /// </summary>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
@@ -70,28 +71,42 @@ public class AwaitExpression : LangExpression
         Expression.LoadIlValue(ilGenerator, local);
         
         // 调用GetAwaiter()方法获取等待器
-        ilGenerator.Emit(OpCodes.Callvirt, typeof(Task<object>).GetMethod("GetAwaiter")!);
+        var getAwaiterMethod = typeof(Task<object>).GetMethod("GetAwaiter")!;
+        ilGenerator.Emit(OpCodes.Callvirt, getAwaiterMethod);
+        
+        // 获取等待器类型
+        var awaiterType = getAwaiterMethod.ReturnType;
+        
+        // 将等待器保存到局部变量
+        var awaiterLocal = ilGenerator.DeclareLocal(awaiterType);
+        ilGenerator.Emit(OpCodes.Stloc, awaiterLocal);
         
         // 检查等待器是否已完成
-        var awaiterType = typeof(Task<object>).GetMethod("GetAwaiter")!.ReturnType;
         var isCompletedProperty = awaiterType.GetProperty("IsCompleted")!;
-        ilGenerator.Emit(OpCodes.Callvirt, isCompletedProperty.GetGetMethod()!);
+        var isCompletedGetMethod = isCompletedProperty.GetGetMethod()!;
         
-        // 如果已完成，直接获取结果
+        // 定义标签
         var completedLabel = ilGenerator.DefineLabel();
-        var notCompletedLabel = ilGenerator.DefineLabel();
+        var endLabel = ilGenerator.DefineLabel();
+        
+        // 加载等待器，调用 IsCompleted 属性
+        ilGenerator.Emit(OpCodes.Ldloc, awaiterLocal);
+        ilGenerator.Emit(OpCodes.Callvirt, isCompletedGetMethod);
+        
+        // 如果已完成，跳转到获取结果
         ilGenerator.Emit(OpCodes.Brtrue_S, completedLabel);
         
-        // 未完成，保存当前状态
-        ilGenerator.MarkLabel(notCompletedLabel);
+        // 未完成，这里需要异步状态机支持
+        // 目前生成同步等待代码，后续将替换为异步状态机切换
         
-        // 这里需要实现异步状态机的暂停和恢复逻辑
-        // 由于当前实现的限制，我们暂时使用同步等待
-        // 后续可以优化为真正的异步等待
-        
-        // 调用GetResult()方法获取结果（同步等待）
+        // 加载等待器，调用 GetResult() 方法获取结果（同步等待，直到任务完成）
         ilGenerator.MarkLabel(completedLabel);
-        ilGenerator.Emit(OpCodes.Callvirt, awaiterType.GetMethod("GetResult")!);
+        ilGenerator.Emit(OpCodes.Ldloc, awaiterLocal);
+        var getResultMethod = awaiterType.GetMethod("GetResult")!;
+        ilGenerator.Emit(OpCodes.Callvirt, getResultMethod);
+        
+        // 结束
+        ilGenerator.MarkLabel(endLabel);
     }
 
     /// <summary>

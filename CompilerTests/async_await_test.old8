@@ -1,0 +1,26 @@
+// 测试await关键字在异步函数内部的使用
+
+// 第一个异步函数，直接返回字符串
+async func simpleAsync() -> string {
+    PrintLine("Inside simpleAsync");
+    return "Hello, Async!";
+}
+
+// 第二个异步函数，使用await调用第一个异步函数
+async func asyncWithAwait() -> string {
+    PrintLine("Inside asyncWithAwait");
+    // 在异步函数内部使用await
+    result <- await simpleAsync();
+    PrintLine("After await simpleAsync");
+    PrintLine("Result: " + result);
+    return "Final: " + result;
+}
+
+// 主函数，调用异步函数但不使用await
+func main() -> void {
+    PrintLine("Start main");
+    // 直接调用异步函数，获取Task对象
+    task <- asyncWithAwait();
+    PrintLine("Called asyncWithAwait");
+    PrintLine("End main");
+}

@@ -12,9 +12,14 @@ public class FuncRunStatement : OldStatement
     private readonly Operation? Operation;
     private readonly AwaitExpression? AwaitExpr;
 
-    public FuncRunStatement(Instance instance, SourcePosition position = default) : base(position) => Instance = instance;
-    public FuncRunStatement(Operation operation, SourcePosition position = default) : base(position) => Operation = operation;
-    public FuncRunStatement(AwaitExpression awaitExpr, SourcePosition position = default) : base(position) => AwaitExpr = awaitExpr;
+    public FuncRunStatement(Instance instance, SourcePosition position = default) : base(position) =>
+        Instance = instance;
+
+    public FuncRunStatement(Operation operation, SourcePosition position = default) : base(position) =>
+        Operation = operation;
+
+    public FuncRunStatement(AwaitExpression awaitExpr, SourcePosition position = default) : base(position) =>
+        AwaitExpr = awaitExpr;
 
     public override void Run(VariateManager manager)
     {
@@ -23,7 +28,7 @@ public class FuncRunStatement : OldStatement
             AwaitExpr.Run(manager);
             return;
         }
-        
+
         if (Operation == null)
         {
             Instance?.Run(manager);
@@ -43,7 +48,7 @@ public class FuncRunStatement : OldStatement
             if (outputType != typeof(void)) ilGenerator.Emit(OpCodes.Pop);
             return;
         }
-        
+
         if (Operation == null)
         {
             if (Instance == null) return;
@@ -61,7 +66,7 @@ public class FuncRunStatement : OldStatement
 
     public override int Count => 0;
 
-    public override string ToString() =>
-        AwaitExpr != null ? AwaitExpr.ToString() : 
+    public override string? ToString() =>
+        AwaitExpr != null ? AwaitExpr.ToString() :
         Instance == null ? Operation == null ? "" : Operation.ToString() : Instance.ToString();
 }

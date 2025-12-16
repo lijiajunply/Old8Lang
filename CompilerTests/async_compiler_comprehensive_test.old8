@@ -1,0 +1,39 @@
+// 异步编译模式综合测试
+// 测试async/await的IL生成、Task类型支持和AsyncStateMachine生成
+
+// 测试1：简单异步函数，不使用Task.Delay
+async func simpleAsync() -> string {
+    PrintLine("Start simpleAsync");
+    // 直接返回结果，不使用await
+    PrintLine("End simpleAsync");
+    return "simpleAsync result";
+}
+
+// 测试2：带参数的异步函数
+async func asyncWithParams(x, y) -> int {
+    PrintLine("Start asyncWithParams: x=" + x + ", y=" + y);
+    // 直接返回结果，不使用await
+    return x + y;
+}
+
+// 主函数，运行所有测试
+// 注意：main函数不能使用await，因为它不是异步函数
+// 所以我们需要直接调用异步函数，不使用await
+func main() -> void {
+    PrintLine("=== 异步编译模式综合测试 ===");
+    
+    // 测试1：简单异步函数，直接调用（不使用await）
+    PrintLine("\n1. 测试简单异步函数：");
+    task1 <- simpleAsync();
+    PrintLine("Task created: " + task1);
+    
+    // 测试2：带参数的异步函数，直接调用（不使用await）
+    PrintLine("\n2. 测试带参数的异步函数：");
+    task2 <- asyncWithParams(5, 3);
+    PrintLine("Task created: " + task2);
+    
+    PrintLine("\n=== 所有测试完成 ===");
+}
+
+// 运行主函数
+main();

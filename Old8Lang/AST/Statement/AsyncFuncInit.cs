@@ -131,17 +131,9 @@ public class AsyncFuncInit : OldStatement
     private void GenerateAsyncMethodBody(ILGenerator ilGenerator, LocalManager local)
     {
         // 生成异步方法体
+        // BlockStatement会执行所有语句，包括return语句
+        // return语句会生成自己的ret指令，所以这里不需要再添加ret指令
         AsyncFuncValue.BlockStatement.GenerateIl(ilGenerator, local);
-        
-        // 返回一个已完成的Task
-        ilGenerator.Emit(OpCodes.Ldnull);
-        // 获取Task.FromResult<T>泛型方法
-        var fromResultMethod = typeof(Task).GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .First(m => m.Name == "FromResult" && m.IsGenericMethod);
-        // 指定T为object
-        fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
-        ilGenerator.Emit(OpCodes.Call, fromResultMethod);
-        ilGenerator.Emit(OpCodes.Ret);
     }
     
     /// <summary>
