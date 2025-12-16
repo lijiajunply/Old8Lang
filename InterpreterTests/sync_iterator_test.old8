@@ -1,0 +1,65 @@
+// 同步迭代器测试
+
+// 测试1：基本的数组迭代
+arr <- [1, 2, 3, 4, 5]
+PrintLine("测试1：数组迭代")
+for item in arr {
+    PrintLine(item)
+}
+
+// 测试2：字符串迭代
+str <- "hello"
+PrintLine("\n测试2：字符串迭代")
+for char in str {
+    PrintLine(char)
+}
+
+// 测试3：字典迭代
+dict <- {"a": 1, "b": 2, "c": 3}
+PrintLine("\n测试3：字典迭代")
+for key in dict {
+    PrintLine(key.ToStr() + ": " + dict[key].ToStr())
+}
+
+// 测试4：生成器迭代
+func generator() {
+    yield 10
+    yield 20
+    yield 30
+}
+
+PrintLine("\n测试4：生成器迭代")
+for item in generator() {
+    PrintLine(item)
+}
+
+// 测试5：嵌套迭代
+matrix <- [[1, 2], [3, 4], [5, 6]]
+PrintLine("\n测试5：嵌套迭代")
+for row in matrix {
+    for item in row {
+        PrintLine(item)
+    }
+}
+
+// 测试6：空集合迭代
+empty_arr <- []
+PrintLine("\n测试6：空数组迭代")
+count <- 0
+for item in empty_arr {
+    count++
+}
+PrintLine("空数组迭代次数：" + count)
+
+// 测试7：迭代过程中修改集合
+PrintLine("\n测试7：迭代过程中修改集合")
+mod_arr <- [1, 2, 3, 4, 5]
+result <- {}
+for item in mod_arr {
+    if item == 3 {
+        mod_arr <- [6, 7, 8]  // 修改集合，应该不影响当前迭代
+    }
+    result.Add(item)
+}
+PrintLine("迭代结果：" + result)
+PrintLine("最终集合：" + mod_arr)

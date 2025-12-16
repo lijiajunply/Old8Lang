@@ -1,0 +1,20 @@
+// 简单的同步迭代器测试
+
+// 测试1：基本的数组迭代
+arr <- [1, 2, 3]
+PrintLine("测试1：数组迭代")
+for item in arr {
+    PrintLine(item)
+}
+
+// 测试2：生成器迭代
+func generator() {
+    yield 10
+    yield 20
+    yield 30
+}
+
+PrintLine("\n测试2：生成器迭代")
+for item in generator() {
+    PrintLine(item)
+}
