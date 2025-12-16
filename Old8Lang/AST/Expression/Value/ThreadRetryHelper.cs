@@ -1,5 +1,3 @@
-using System;
-using System.Threading;
 using Old8Lang.Error;
 using Old8Lang.LangParser;
 
