@@ -60,6 +60,8 @@ public class TaskClassLangValue : LangValueType
                 "WhenAll" => WhenAll,
                 "WhenAny" => WhenAny,
                 "Delay" => Delay,
+                "FromResult" => FromResult,
+                "Run" => Run,
                 _ => null
             };
 
@@ -85,6 +87,8 @@ public class TaskClassLangValue : LangValueType
                 "WhenAll" => new TaskStaticMethodWrapper("WhenAll", WhenAll),
                 "WhenAny" => new TaskStaticMethodWrapper("WhenAny", WhenAny),
                 "Delay" => new TaskStaticMethodWrapper("Delay", Delay),
+                "FromResult" => new TaskStaticMethodWrapper("FromResult", FromResult),
+                "Run" => new TaskStaticMethodWrapper("Run", Run),
                 _ => throw new AttributeError(dotExpression.Position, methodName, "Task")
             };
         }
@@ -179,6 +183,41 @@ public class TaskClassLangValue : LangValueType
         }
 
         return TaskLangValue.Delay(delayMs.Value, CancellationToken.None, position);
+    }
+    
+    /// <summary>
+    /// FromResult 静态方法实现
+    /// </summary>
+    private static LangValueType FromResult(List<LangValueType> args, SourcePosition position)
+    {
+        if (args.Count != 1)
+        {
+            throw new ArgumentError(position,
+                $"FromResult 期望 1 个参数,但提供了 {args.Count} 个");
+        }
+
+        var resultValue = args[0];
+        return TaskLangValue.FromResult(resultValue, position);
+    }
+    
+    /// <summary>
+    /// Run 静态方法实现
+    /// </summary>
+    private static LangValueType Run(List<LangValueType> args, SourcePosition position)
+    {
+        if (args.Count != 1)
+        {
+            throw new ArgumentError(position,
+                $"Run 期望 1 个参数,但提供了 {args.Count} 个");
+        }
+
+        if (args[0] is not FuncLangValue funcValue)
+        {
+            var tempNode = new NullLangValue(position);
+            throw new TypeError(tempNode, "function", args[0].TypeToString());
+        }
+
+        return TaskLangValue.Run(funcValue, CancellationToken.None, position);
     }
 }
 

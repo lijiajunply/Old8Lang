@@ -18,18 +18,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/完善编译模式异步支持.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompilerTests/async_compiler_comprehensive_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Compiler/AsyncStateMachineGenerator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AwaitExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AwaitExpression.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/ILVerifier.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/ILVerifier.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

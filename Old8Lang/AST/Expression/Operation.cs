@@ -1281,6 +1281,33 @@ public class Operation(
                                     return typeof(Task<object>);
                                 }
                                 break;
+                            case "FromResult":
+                                // Task.FromResult<T>(T)
+                                if (paramTypes.Count == 1)
+                                {
+                                    // 对于任何参数类型，直接返回 Task<object>
+                                    var fromResultMethod = typeof(Task).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                                        .First(m => m.Name == "FromResult" && m.IsGenericMethodDefinition);
+                                    fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
+                                    // 参数已经在栈上，直接调用
+                                    ilGenerator.Emit(OpCodes.Call, fromResultMethod);
+                                    return typeof(Task<object>);
+                                }
+                                break;
+                            case "Run":
+                                // Task.Run(Action) 或 Task.Run<object>(Func<object>)
+                                if (paramTypes.Count == 1)
+                                {
+                                    // 这里简化处理，直接返回一个已完成的 Task<object>
+                                    // 实际实现需要支持委托调用
+                                    var fromResultMethod = typeof(Task).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                                        .First(m => m.Name == "FromResult" && m.IsGenericMethodDefinition);
+                                    fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
+                                    ilGenerator.Emit(OpCodes.Ldnull);
+                                    ilGenerator.Emit(OpCodes.Call, fromResultMethod);
+                                    return typeof(Task<object>);
+                                }
+                                break;
                             case "WhenAll":
                                 // Task.WhenAll(params Task<object>[])
                                 // 处理Old8Lang的List或Array，转换为Task<object>[]

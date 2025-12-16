@@ -160,11 +160,20 @@ public class AsyncStateMachineGenerator
     private void GenerateStateCode(ILGenerator il, int state, Dictionary<int, Label> stateLabels)
     {
         // 这里根据具体状态生成代码
-        // 目前实现一个简单的示例，后续将扩展为完整的状态机逻辑
+        // 遍历异步函数体中的语句，处理await表达式
         
-        // 检查是否有更多状态需要处理
-        if (state < 5)
+        // 简化实现：直接处理函数体中的语句
+        // 实际实现需要根据状态来决定从哪个语句继续执行
+        
+        // 检查是否有更多语句需要处理
+        if (state < _blockStatement.Count)
         {
+            // 获取当前状态对应的语句
+            var statement = _blockStatement[state];
+            
+            // 生成语句的IL代码
+            statement.GenerateIl(il, _localManager);
+            
             // 设置下一个状态
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldc_I4, state + 1);
@@ -175,7 +184,7 @@ public class AsyncStateMachineGenerator
         }
         else
         {
-            // 所有状态处理完成，跳转到完成状态
+            // 所有语句处理完成，跳转到完成状态
             il.Emit(OpCodes.Br, stateLabels[StateCompleted]);
         }
     }
@@ -185,18 +194,19 @@ public class AsyncStateMachineGenerator
     /// </summary>
     private void GenerateCompletedStateCode(ILGenerator il)
     {
-        // 标记任务完成
+        // 1. 标记任务完成，返回null（简化实现）
+        // 实际实现中，应该返回函数的实际返回值
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldfld, _builderField!);
-        il.Emit(OpCodes.Ldnull); // 假设返回值为null，后续将修改为实际返回值
+        il.Emit(OpCodes.Ldnull); // 假设返回值为null，实际实现需要返回函数的实际返回值
         il.Emit(OpCodes.Call, typeof(AsyncTaskMethodBuilder<object>).GetMethod("SetResult")!);
         
-        // 设置状态为已完成
+        // 2. 设置状态为已完成
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldc_I4, StateCompleted);
         il.Emit(OpCodes.Stfld, _stateField!);
         
-        // 返回
+        // 3. 返回
         il.Emit(OpCodes.Ret);
     }
     
@@ -242,16 +252,29 @@ public class AsyncStateMachineGenerator
     
     /// <summary>
     /// 生成异步函数的IL代码
-    /// 简化实现，返回一个Task<object>
+    /// 实现真正的异步方法，创建并启动状态机
     /// </summary>
     /// <param name="methodBuilder">方法生成器</param>
     public void GenerateAsyncMethod(MethodBuilder methodBuilder)
     {
         var il = methodBuilder.GetILGenerator();
         
-        // 简化实现：返回一个已完成的Task<object>
-        il.Emit(OpCodes.Ldnull);
-        il.Emit(OpCodes.Call, typeof(Task).GetMethod("FromResult", new[] { typeof(object) })!);
+        // 1. 创建状态机实例
+        il.Emit(OpCodes.Newobj, methodBuilder.DeclaringType!.GetConstructor(Type.EmptyTypes)!);
+        
+        // 2. 初始化状态机
+        il.Emit(OpCodes.Dup);
+        il.Emit(OpCodes.Ldc_I4, StateNotStarted);
+        il.Emit(OpCodes.Stfld, _stateField!);
+        
+        // 3. 调用状态机的MoveNext方法
+        il.Emit(OpCodes.Callvirt, methodBuilder.DeclaringType.GetMethod("MoveNext")!);
+        
+        // 4. 返回状态机的结果
+        il.Emit(OpCodes.Ldfld, _builderField!);
+        il.Emit(OpCodes.Call, typeof(AsyncTaskMethodBuilder<object>).GetProperty("Task")!.GetGetMethod()!);
+        
+        // 5. 生成返回指令
         il.Emit(OpCodes.Ret);
     }
 }

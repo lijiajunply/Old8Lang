@@ -440,6 +440,29 @@ public class TaskLangValue : LangValueType
             .ContinueWith(LangValueType (_) => new VoidLangValue(position), cancellationToken);
         return new TaskLangValue(delayTask, cancellationToken, position);
     }
+    
+    /// <summary>
+    /// 创建一个包含指定结果的已完成 Task
+    /// </summary>
+    public static TaskLangValue FromResult(LangValueType result, SourcePosition position = default)
+    {
+        var fromResultTask = System.Threading.Tasks.Task.FromResult(result);
+        return new TaskLangValue(fromResultTask, CancellationToken.None, position);
+    }
+    
+    /// <summary>
+    /// 在线程池上运行一个函数，并返回一个表示该操作的 Task
+    /// </summary>
+    public static TaskLangValue Run(FuncLangValue func, CancellationToken cancellationToken = default,
+        SourcePosition position = default)
+    {
+        // 创建一个新的变量管理器，用于函数执行
+        var manager = new VariateManager();
+        
+        // 在线程池上执行函数
+        var runTask = System.Threading.Tasks.Task.Run(() => func.Run(manager), cancellationToken);
+        return new TaskLangValue(runTask, cancellationToken, position);
+    }
 
     /// <summary>
     /// 任务完成后执行下一个任务
