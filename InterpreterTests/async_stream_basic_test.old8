@@ -1,0 +1,45 @@
+// 异步流（Async Stream）基本测试
+import Async
+
+// 测试1：简单的异步生成器
+async func simpleAsyncStream() {
+    yield 1
+    yield 2
+    yield 3
+}
+
+PrintLine("测试1：简单异步生成器")
+stream1 <- simpleAsyncStream()
+
+async for item in stream1 {
+    PrintLine("Item: " + item.ToStr())
+}
+
+// 测试2：带参数的异步生成器
+async func rangeAsyncStream(start:int, end:int) {
+    i <- start
+    while i <= end {
+        yield i
+        i <- i + 1
+    }
+}
+
+PrintLine("测试2：带参数的异步生成器")
+stream2 <- rangeAsyncStream(5, 8)
+
+async for num in stream2 {
+    PrintLine("Number: " + num.ToStr())
+}
+
+// 测试3：异步 for-in 中的 break
+PrintLine("测试3：async for-in 中的 break")
+stream3 <- rangeAsyncStream(1, 10)
+
+async for item in stream3 {
+    PrintLine("Item before break: " + item.ToStr())
+    if item == 3 {
+        break
+    }
+}
+
+PrintLine("所有异步流基本测试通过！")

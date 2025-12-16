@@ -8,8 +8,10 @@ statement = lrBlock
           | forStatement
           | whileStatement
           | forInStatement
+          | asyncForInStatement
           | switchStatement
           | funcDeclaration
+          | asyncFuncDeclaration
           | classDeclaration
           | funcRunStatement
           | classFuncRunStatement
@@ -44,11 +46,17 @@ whileStatement = "while" expression block ;
 
 forInStatement = "for" identifier ( "," identifier )* "in" expression block ;
 
+(* Async for-in statement for iterating over async streams (similar to C#'s await foreach) *)
+asyncForInStatement = "async" "for" identifier ( "," identifier )* "in" expression block ;
+
 switchStatement = "switch" expression "{" caseBlock* ( "default" block )? "}" ;
 
 caseBlock = "case" expression block ;
 
 funcDeclaration = accessModifier* ( "func" identifier | identifier ) "(" idList? ")" ( "->" identifier )? block ;
+
+(* Async function declaration (can be used as async generator if contains yield statements) *)
+asyncFuncDeclaration = accessModifier* "async" "func" identifier "(" idList? ")" ( "->" identifier )? block ;
 
 classDeclaration = accessModifier* "class" identifier ( "extends" identifier )? classBlock ;
 

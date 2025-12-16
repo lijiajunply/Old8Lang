@@ -1,0 +1,178 @@
+// 异步流（Async Stream）解释器测试
+import Async
+
+// 测试1：简单的异步生成器
+async func simpleAsyncStream() {
+    yield 1
+    yield 2
+    yield 3
+}
+
+PrintLine("测试1：简单异步生成器")
+stream1 <- simpleAsyncStream()
+
+async for item in stream1 {
+    PrintLine("Item: " + item.ToStr())
+}
+
+// 测试2：带参数的异步生成器
+async func rangeAsyncStream(start:int, end:int) {
+    i <- start
+    while i <= end {
+        yield i
+        i <- i + 1
+    }
+}
+
+PrintLine("测试2：带参数的异步生成器")
+stream2 <- rangeAsyncStream(5, 8)
+results <- {}
+
+async for num in stream2 {
+    results.Add(num)
+    PrintLine("Number: " + num.ToStr())
+}
+
+Assert(results.GetLength(), 4)
+
+// 测试3：异步流中使用 await
+async func delayedStream() {
+    i <- 1
+    while i <= 3 {
+        await Task.Delay(50)
+        yield i
+        i <- i + 1
+    }
+}
+
+PrintLine("测试3：异步流中使用 await")
+stream3 <- delayedStream()
+count3 <- 0
+
+async for item in stream3 {
+    count3 <- count3 + 1
+    PrintLine("Delayed item: " + item.ToStr())
+}
+
+Assert(count3, 3)
+
+// 测试4：async for-in 中的 break
+PrintLine("测试4：async for-in 中的 break")
+stream4 <- rangeAsyncStream(1, 10)
+count4 <- 0
+
+async for item in stream4 {
+    count4 <- count4 + 1
+    PrintLine("Item before break: " + item.ToStr())
+    if item == 5 {
+        break
+    }
+}
+
+Assert(count4, 5)
+
+// 测试5：async for-in 中的 continue
+PrintLine("测试5：async for-in 中的 continue")
+stream5 <- rangeAsyncStream(1, 5)
+evenCount <- 0
+
+async for item in stream5 {
+    if item % 2 == 1 {
+        continue
+    }
+    evenCount <- evenCount + 1
+    PrintLine("Even item: " + item.ToStr())
+}
+
+Assert(evenCount, 2)
+
+// 测试6：空的异步生成器
+async func emptyAsyncStream() {
+    // 不产生任何值
+    return
+}
+
+PrintLine("测试6：空的异步生成器")
+stream6 <- emptyAsyncStream()
+count6 <- 0
+
+async for item in stream6 {
+    count6 <- count6 + 1
+}
+
+Assert(count6, 0)
+PrintLine("Empty stream handled correctly")
+
+// 测试7：异步流生成元组（键值对）
+async func tupleStream() {
+    yield ("name", "Alice")
+    yield ("age", 30)
+    yield ("city", "Beijing")
+}
+
+PrintLine("测试7：异步流生成元组")
+stream7 <- tupleStream()
+
+async for key, value in stream7 {
+    PrintLine(key + " = " + value.ToStr())
+}
+
+// 测试8：异步 for-in 循环处理普通列表（向后兼容）
+PrintLine("测试8：async for-in 处理普通列表")
+normalList <- {10, 20, 30, 40, 50}
+sum8 <- 0
+
+async for item in normalList {
+    sum8 <- sum8 + item
+}
+
+Assert(sum8, 150)
+PrintLine("Sum of list: " + sum8.ToStr())
+
+// 测试9：嵌套的异步 for-in 循环
+PrintLine("测试9：嵌套的异步 for-in 循环")
+
+async func smallStream() {
+    yield 1
+    yield 2
+}
+
+outerStream <- smallStream()
+totalIterations <- 0
+
+async for outer in outerStream {
+    innerStream <- smallStream()
+
+    async for inner in innerStream {
+        totalIterations <- totalIterations + 1
+        PrintLine("Outer: " + outer.ToStr() + ", Inner: " + inner.ToStr())
+    }
+}
+
+Assert(totalIterations, 4)
+
+// 测试10：异步生成器中的异常处理
+async func streamWithError() {
+    yield 1
+    yield 2
+    throw "Test Error"
+    yield 3
+}
+
+PrintLine("测试10：异步生成器异常处理")
+stream10 <- streamWithError()
+errorCaught <- false
+
+try {
+    async for item in stream10 {
+        PrintLine("Item: " + item.ToStr())
+    }
+} catch {
+    err <- Exception.GetMessage()
+    errorCaught <- true
+    PrintLine("Caught error: " + err)
+}
+
+Assert(errorCaught, true)
+
+PrintLine("所有异步流解释器测试通过！")

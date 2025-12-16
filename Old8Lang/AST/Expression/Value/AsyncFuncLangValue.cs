@@ -39,10 +39,46 @@ public class AsyncFuncLangValue : ImportInfo
     }
 
     /// <summary>
-    /// Run 方法：返回捕获了闭包的异步函数副本
+    /// 检查函数是否是异步生成器函数（包含yield语句）
+    /// </summary>
+    private bool IsAsyncGenerator => ContainsYieldStatement(BlockStatement);
+
+    /// <summary>
+    /// 递归检查语句是否包含yield语句
+    /// </summary>
+    private bool ContainsYieldStatement(OldStatement stmt)
+    {
+        if (stmt is YieldStatement)
+            return true;
+
+        // 检查块语句中的子语句
+        for (int i = 0; i < stmt.Count; i++)
+        {
+            var child = stmt[i];
+            if (child != null && ContainsYieldStatement(child))
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Run 方法：返回捕获了闭包的异步函数副本或异步生成器
     /// </summary>
     public override LangValueType Run(VariateManager manager)
     {
+        // 检查是否为异步生成器函数
+        if (IsAsyncGenerator)
+        {
+            // 创建异步生成器，捕获当前作用域
+            var generatorClosure = new AsyncFuncLangValue(Id, Ids, BlockStatement, Position)
+            {
+                CapturedScope = manager.CaptureForClosure()
+            };
+
+            return new AsyncGeneratorLangValue(generatorClosure, Position);
+        }
+
         // 创建新的异步函数副本，捕获当前作用域
         var closureFunc = new AsyncFuncLangValue(Id, Ids, BlockStatement, Position)
         {

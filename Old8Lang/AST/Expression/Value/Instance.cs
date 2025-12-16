@@ -252,9 +252,52 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             // 检查是否为异步函数
             if (func is AsyncFuncLangValue asyncFunc)
             {
-                // 先调用 Run() 捕获闭包，然后调用返回的副本的 RunAsync()
-                var closedFunc = (AsyncFuncLangValue)asyncFunc.Run(manager);
-                result = closedFunc.RunAsync(manager, Ids);
+                // 先调用 Run() 捕获闭包（可能返回AsyncFuncLangValue或AsyncGeneratorLangValue）
+                var closedFunc = asyncFunc.Run(manager);
+
+                // 如果是异步生成器，需要设置参数
+                if (closedFunc is AsyncGeneratorLangValue asyncGen)
+                {
+                    // 计算参数值
+                    var paramValues = Ids.Select(t => t.Run(manager)).ToList();
+
+                    // 处理默认参数，补全缺失的参数值
+                    if (asyncFunc.Ids is { Count: > 0 })
+                    {
+                        for (var i = paramValues.Count; i < asyncFunc.Ids.Count; i++)
+                        {
+                            var id = asyncFunc.Ids[i];
+                            if (id.DefaultValue != null)
+                            {
+                                var defaultValue = id.DefaultValue.Run(manager);
+                                paramValues.Add(defaultValue);
+                            }
+                        }
+                    }
+
+                    // 将参数值设置到异步生成器
+                    if (asyncFunc.Ids is { Count: > 0 })
+                    {
+                        for (var i = 0; i < asyncFunc.Ids.Count; i++)
+                        {
+                            var paramId = asyncFunc.Ids[i];
+                            var paramValue = paramValues[i];
+                            asyncGen.SetParameter(paramId.IdName, paramValue);
+                        }
+                    }
+
+                    result = asyncGen;
+                }
+                else if (closedFunc is AsyncFuncLangValue closedAsyncFunc)
+                {
+                    // 如果是异步函数，调用 RunAsync()
+                    result = closedAsyncFunc.RunAsync(manager, Ids);
+                }
+                else
+                {
+                    // 不应该到达这里
+                    result = closedFunc;
+                }
             }
             else if (func is FuncLangValue funcValue)
             {

@@ -485,22 +485,75 @@ async func asyncOperation() {
 
 #### 5.4.7 异步流与异步迭代
 
-Old8Lang 支持异步流和异步迭代，允许以异步方式遍历数据源：
+Old8Lang 支持异步流（Async Stream）和异步迭代，类似于 C# 的 `IAsyncEnumerable<T>`。异步流允许以异步方式生成和遍历数据序列。
+
+**异步生成器函数**
+
+使用 `async func` 和 `yield` 关键字创建异步生成器：
 
 ```old8
-// 创建异步流
-async func createAsyncStream() -> AsyncStream {
-    for i <- 0, i < 5, i++ {
-        await Task.Delay(100)
-        yield i
+// 创建异步流生成器
+async func createAsyncStream() {
+    i <- 1
+    while i <= 5 {
+        await Task.Delay(100)  // 模拟异步操作
+        yield i                 // 生成值
+        i <- i + 1
     }
 }
 
-// 使用 for await...in 遍历异步流
-async func iterateAsyncStream() {
-    for await item in createAsyncStream() {
-        PrintLine("Received: " + item)
+// 带参数的异步生成器
+async func rangeAsync(start:int, end:int) {
+    i <- start
+    while i <= end {
+        await Task.Delay(50)
+        yield i
+        i <- i + 1
     }
+}
+```
+
+**async for-in 循环**
+
+使用 `async for-in` 语法遍历异步流：
+
+```old8
+// 遍历异步流
+async func processStream() {
+    stream <- createAsyncStream()
+
+    async for item in stream {
+        PrintLine("Received: " + item.ToStr())
+    }
+}
+
+// 带参数的异步流
+stream <- rangeAsync(1, 10)
+async for num in stream {
+    PrintLine(num.ToStr())
+}
+```
+
+**异步流的特点**：
+- 异步生成器函数使用 `async func` 声明，内部包含 `yield` 语句
+- 调用异步生成器函数会返回 `AsyncGeneratorLangValue` 对象
+- 使用 `async for-in` 循环遍历异步流
+- 支持 `break` 和 `continue` 语句
+- 每次迭代会异步等待下一个值的产生
+- 可以在异步生成器中使用 `await` 执行其他异步操作
+
+**键值对迭代**：
+
+```old8
+async func keyValueStream() {
+    yield ("key1", "value1")
+    yield ("key2", "value2")
+    yield ("key3", "value3")
+}
+
+stream <- keyValueStream()
+async for key, value in stream {
+    PrintLine(key + " = " + value)
 }
 ```
 

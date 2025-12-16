@@ -134,10 +134,18 @@ public class StatementParser(
             return ParseSwitchStatement();
         }
 
-        // 处理异步函数定义：async func
+        // 处理异步函数定义和异步 for-in 循环：async func / async for
         if (CurrentToken.Type == LangTokenType.Async)
         {
             Expect(LangTokenType.Async);
+
+            // 检查是否是 async for-in
+            if (CurrentToken.Type == LangTokenType.For)
+            {
+                return ParseAsyncForInStatement();
+            }
+
+            // 否则是 async func
             Expect(LangTokenType.Func);
             return functionParser.ParseAsyncFuncDeclaration();
         }
@@ -647,6 +655,42 @@ public class StatementParser(
 
         // 创建一个复合标识符，将所有标识符存储起来
         return new ForInStatement(identifiers[0], expression, block, position, identifiers.Skip(1).ToList());
+    }
+
+    // asyncForInStatement = "async" "for" identifier ( "," identifier )* "in" expression block ;
+    public AsyncForInStatement ParseAsyncForInStatement()
+    {
+        var asyncForToken = CurrentToken;
+        Expect(LangTokenType.For);
+
+        // 解析多个标识符，支持 key, value 格式
+        var identifiers = new List<LangId>();
+        while (true)
+        {
+            var identifier = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+            identifiers.Add(new LangId(identifier));
+
+            if (CurrentToken.Type != LangTokenType.Comma)
+                break;
+
+            Expect(LangTokenType.Comma);
+        }
+
+        Expect(LangTokenType.In);
+        var expression = expressionParser.ParseExpression();
+        var block = ParseBlock();
+
+        var position = new SourcePosition(asyncForToken.Line, asyncForToken.Column);
+
+        // 如果只有一个标识符，直接使用；否则使用多个标识符
+        if (identifiers.Count == 1)
+        {
+            return new AsyncForInStatement(identifiers[0], expression, block, position);
+        }
+
+        // 创建一个复合标识符，将所有标识符存储起来
+        return new AsyncForInStatement(identifiers[0], expression, block, position, identifiers.Skip(1).ToList());
     }
 
     // whileStatement = "while" expression block ;
