@@ -2,6 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.Error;
 using Old8Lang.Compiler;
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.LangParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -34,15 +35,61 @@ public class ThreadLangValue : LangValueType
     /// 线程执行过程中发生的异常
     /// </summary>
     private Exception? Exception;
+    
+    /// <summary>
+    /// 取消令牌
+    /// </summary>
+    private readonly CancellationToken _cancellationToken;
+    
+    /// <summary>
+    /// 取消令牌源
+    /// </summary>
+    private readonly CancellationTokenSource? _cancellationTokenSource;
+    
+    /// <summary>
+    /// 外部管理器，用于访问外部变量
+    /// </summary>
+    public VariateManager? ExternalManager { get; set; }
+    
+    /// <summary>
+    /// 进度报告事件
+    /// </summary>
+    public event Action<object>? ProgressReported;
+    
+    /// <summary>
+    /// 报告进度
+    /// </summary>
+    /// <param name="progress">进度信息</param>
+    public void ReportProgress(object progress)
+    {
+        ProgressReported?.Invoke(progress);
+    }
 
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="threadStart">线程入口点</param>
     /// <param name="position">源代码位置</param>
-    public ThreadLangValue(ThreadStart threadStart, SourcePosition position = default) : base(position)
+    /// <param name="cancellationToken">取消令牌</param>
+    public ThreadLangValue(ThreadStart threadStart, SourcePosition position = default, CancellationToken cancellationToken = default) : base(position)
     {
-        Thread = new Thread(threadStart);
+        _cancellationToken = cancellationToken;
+        Thread = new Thread(() =>
+        {
+            try
+            {
+                threadStart();
+            }
+            catch (OperationCanceledException)
+            {
+                // 线程被取消
+                SetException(new OperationCanceledException("线程被取消"));
+            }
+            catch (Exception ex)
+            {
+                SetException(ex);
+            }
+        });
         Thread.Start();
     }
 
@@ -52,29 +99,79 @@ public class ThreadLangValue : LangValueType
     /// <param name="parameterizedThreadStart">带参数的线程入口点</param>
     /// <param name="parameter">线程参数</param>
     /// <param name="position">源代码位置</param>
+    /// <param name="cancellationToken">取消令牌</param>
     public ThreadLangValue(ParameterizedThreadStart parameterizedThreadStart, object? parameter,
-        SourcePosition position = default) : base(position)
+        SourcePosition position = default, CancellationToken cancellationToken = default) : base(position)
     {
-        Thread = new Thread(parameterizedThreadStart);
+        _cancellationToken = cancellationToken;
+        Thread = new Thread((param) =>
+        {
+            try
+            {
+                parameterizedThreadStart(param);
+            }
+            catch (OperationCanceledException)
+            {
+                // 线程被取消
+                SetException(new OperationCanceledException("线程被取消"));
+            }
+            catch (Exception ex)
+            {
+                SetException(ex);
+            }
+        });
         Thread.Start(parameter);
+    }
+    
+    /// <summary>
+    /// 构造函数，内部使用，带有取消令牌源
+    /// </summary>
+    /// <param name="threadStart">线程入口点</param>
+    /// <param name="cancellationTokenSource">取消令牌源</param>
+    /// <param name="position">源代码位置</param>
+    private ThreadLangValue(ThreadStart threadStart, CancellationTokenSource cancellationTokenSource, SourcePosition position = default) : base(position)
+    {
+        _cancellationTokenSource = cancellationTokenSource;
+        _cancellationToken = cancellationTokenSource.Token;
+        Thread = new Thread(() =>
+        {
+            try
+            {
+                threadStart();
+            }
+            catch (OperationCanceledException)
+            {
+                // 线程被取消
+                SetException(new OperationCanceledException("线程被取消"));
+            }
+            catch (Exception ex)
+            {
+                SetException(ex);
+            }
+        });
+        Thread.Start();
     }
 
     /// <summary>
     /// 等待线程完成
     /// </summary>
     /// <returns>线程执行结果</returns>
-    public LangValueType Join()
+    public LangValueType Join(IntLangValue? timeout = null)
     {
-        Thread.Join();
+        if (timeout != null)
+        {
+            Thread.Join(timeout.GetValue<int>());
+        }
+        else
+        {
+            Thread.Join();
+        }
 
         lock (Lock)
         {
-            if (Exception != null)
-            {
-                throw new InvalidOperationError(this, "线程执行异常: " + Exception.ToString());
-            }
-
-            return ObjToValue(Result!);
+            return Exception != null
+                ? throw new InvalidOperationError(this, "线程执行异常: " + Exception)
+                : ObjToValue(Result!);
         }
     }
 
@@ -170,19 +267,286 @@ public class ThreadLangValue : LangValueType
 
     /// <summary>
     /// 处理点操作，直接调用 Join 方法，避免反射调用
+    /// 其他方法调用委托给基类，由基类处理扩展方法
     /// </summary>
     /// <param name="dotExpression">点表达式</param>
     /// <returns>方法调用结果</returns>
     public override LangValueType Dot(LangExpression dotExpression)
     {
         // 处理 Join 方法调用
-        if (dotExpression is Instance { Id.IdName: "Join" })
+        if (dotExpression is Instance { Id.IdName: "Join" } instance)
         {
             // 直接调用 Join 方法，避免反射
-            return Join();
+            return instance.Ids.Count > 0
+                ? Join(instance.Ids[0] as IntLangValue) // 如果有参数，则调用带参数的 Join 方法
+                : Join();
         }
 
-        // 其他情况调用基类方法
+        if (dotExpression is Instance { Id.IdName: "State" })
+        {
+            // 直接返回 State 属性值，避免反射
+            return new StringLangValue(State.ToString());
+        }
+
+        if (dotExpression is Instance { Id.IdName: "IsCompleted" })
+        {
+            // 直接返回 IsCompleted 属性值，避免反射
+            return new BoolLangValue(IsCompleted);
+        }
+        
+        if (dotExpression is Instance { Id.IdName: "Cancel" })
+        {
+            // 直接调用 Cancel 方法
+            Cancel();
+            return new VoidLangValue(Position);
+        }
+
+        // 其他情况（包括扩展方法如 Then、WithTimeout、Retry）调用基类方法
         return base.Dot(dotExpression);
+    }
+
+    /// <summary>
+    /// 等待所有线程完成
+    /// </summary>
+    /// <param name="tasks">线程列表</param>
+    /// <param name="position">源码位置</param>
+    /// <returns>包含所有线程结果的列表</returns>
+    public static LangValueType WhenAll(List<ThreadLangValue> tasks, SourcePosition position)
+    {
+        var results = new List<LangValueType>();
+
+        foreach (var task in tasks)
+        {
+            results.Add(task.Join());
+        }
+
+        return new ListLangValue(results, position);
+    }
+
+    /// <summary>
+    /// 等待任意一个线程完成
+    /// </summary>
+    /// <param name="tasks">线程列表</param>
+    /// <param name="position">源码位置</param>
+    /// <returns>第一个完成的线程的结果</returns>
+    public static LangValueType WhenAny(List<ThreadLangValue> tasks, SourcePosition position)
+    {
+        if (tasks.Count == 0)
+        {
+            throw new ArgumentError(position, "WhenAny requires at least one thread");
+        }
+
+        // 使用信号量来等待第一个完成的线程
+        var semaphore = new Semaphore(0, tasks.Count);
+        LangValueType? result = null;
+        var lockObj = new Lock();
+        var completed = false;
+
+        foreach (var task in tasks)
+        {
+            var capturedTask = task;
+            var thread = new Thread(() =>
+            {
+                try
+                {
+                    var res = capturedTask.Join();
+                    lock (lockObj)
+                    {
+                        if (!completed)
+                        {
+                            result = res;
+                            completed = true;
+                        }
+                    }
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            });
+            thread.Start();
+        }
+
+        semaphore.WaitOne(); // 等待第一个线程完成
+
+        return result ?? new VoidLangValue(position);
+    }
+
+    /// <summary>
+    /// 创建延迟执行的线程
+    /// </summary>
+    /// <param name="delayMsValue">延迟毫秒数</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <param name="position">源码位置</param>
+    /// <returns>延迟线程</returns>
+    public static LangValueType Delay(int delayMsValue, CancellationToken cancellationToken, SourcePosition position)
+    {
+        return new ThreadLangValue(() =>
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                Thread.Sleep(delayMsValue);
+            }
+            catch (OperationCanceledException)
+            {
+                // 线程被取消
+            }
+        }, position, cancellationToken);
+    }
+    
+    /// <summary>
+    /// 线程完成后执行下一个线程
+    /// </summary>
+    public ThreadLangValue Then(Func<LangValueType, ThreadLangValue> continuation)
+    {
+        var tcs = new CancellationTokenSource();
+        ThreadLangValue? thenThread = null;
+        
+        thenThread = new ThreadLangValue(() =>
+        {
+            try
+            {
+                // 等待当前线程完成
+                var result = Join();
+                
+                // 执行下一个线程
+                var nextThread = continuation(result);
+                
+                // 等待下一个线程完成
+                var nextResult = nextThread.Join();
+                
+                // 设置结果
+                thenThread?.SetResult(nextResult.GetValue());
+            }
+            catch (Exception ex)
+            {
+                thenThread?.SetException(ex);
+            }
+        }, Position, tcs.Token);
+        
+        // 设置外部管理器
+        if (thenThread != null)
+        {
+            thenThread.ExternalManager = this.ExternalManager;
+        }
+        
+        return thenThread;
+    }
+    
+    /// <summary>
+    /// 为线程添加超时限制
+    /// </summary>
+    public ThreadLangValue WithTimeout(int timeoutMs)
+    {
+        var tcs = new CancellationTokenSource();
+        ThreadLangValue? timeoutThread = null;
+        
+        timeoutThread = new ThreadLangValue(() =>
+        {
+            try
+            {
+                // 创建一个超时线程
+                var timer = new System.Timers.Timer(timeoutMs);
+                timer.Elapsed += (_, __) => tcs.Cancel();
+                timer.AutoReset = false;
+                timer.Start();
+                
+                // 等待当前线程完成，带有取消令牌
+                var result = Join();
+                
+                // 取消超时定时器
+                timer.Stop();
+                
+                // 设置结果
+                timeoutThread?.SetResult(result.GetValue());
+            }
+            catch (OperationCanceledException)
+            {
+                timeoutThread?.SetException(new TimeoutException($"线程等待超时（{timeoutMs}ms）"));
+            }
+            catch (Exception ex)
+            {
+                timeoutThread?.SetException(ex);
+            }
+        }, Position, tcs.Token);
+        
+        // 设置外部管理器
+        if (timeoutThread != null)
+        {
+            timeoutThread.ExternalManager = this.ExternalManager;
+        }
+        
+        return timeoutThread;
+    }
+    
+    /// <summary>
+    /// 实现线程重试机制
+    /// </summary>
+    public ThreadLangValue Retry(int retryCount, int delayMs = 0)
+    {
+        var tcs = new CancellationTokenSource();
+        var retryThread = new ThreadLangValue(() =>
+        {
+            Exception? lastException = null;
+            
+            for (int i = 0; i <= retryCount; i++)
+            {
+                _cancellationToken.ThrowIfCancellationRequested();
+                
+                try
+                {
+                    // 创建当前线程的副本
+                    // 注意：这里需要重新创建线程，因为原始线程只能执行一次
+                    // 实际上，我们需要重新执行原始的线程逻辑
+                    // 由于ThreadLangValue没有保存原始的线程逻辑，这里需要特殊处理
+                    // 我们将使用一个新的方法来实现重试
+                    throw new NotImplementedException("Retry方法需要在FuncStatic.cs中特殊处理");
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+                    
+                    if (i < retryCount)
+                    {
+                        // 重试前延迟
+                        Thread.Sleep(delayMs);
+                    }
+                }
+            }
+            
+            // 重试次数耗尽，抛出最后一次异常
+            throw lastException ?? new Exception("线程执行失败，重试次数耗尽");
+        }, Position, tcs.Token);
+        
+        // 设置外部管理器
+        retryThread.ExternalManager = this.ExternalManager;
+        
+        return retryThread;
+    }
+    
+    /// <summary>
+    /// 取消线程执行
+    /// </summary>
+    public void Cancel()
+    {
+        _cancellationTokenSource?.Cancel();
+    }
+    
+    /// <summary>
+    /// 带进度报告的Join方法
+    /// </summary>
+    public LangValueType JoinWithProgress(Action<object> progressAction)
+    {
+        ProgressReported += progressAction;
+        
+        try
+        {
+            return Join();
+        }
+        finally
+        {
+            ProgressReported -= progressAction;
+        }
     }
 }

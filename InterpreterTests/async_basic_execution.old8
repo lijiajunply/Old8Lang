@@ -3,7 +3,7 @@ import Async
 
 // 测试1：简单异步函数调用
 async func hello() {
-    Sleep(100)
+    await Task.Delay(100)
     return "Hello"
 }
 
@@ -15,7 +15,7 @@ Assert(result, "Hello")
 
 // 测试2：带参数的异步函数
 async func add(a:int, b:int) {
-    Sleep(50)
+    await Task.Delay(50)
     return a + b
 }
 

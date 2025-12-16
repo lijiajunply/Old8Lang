@@ -15,32 +15,24 @@ async func task2() {
     return 2
 }
 
-// result1 <- await Task.WhenAll([task1(), task2()])
-// PrintLine("WhenAll 结果: " + result1)
-// 替代方案:分别等待各个任务
-t1 <- task1()
-t2 <- task2()
-result1a <- await t1
-result1b <- await t2
-PrintLine("任务1结果: " + result1a.ToStr())
-PrintLine("任务2结果: " + result1b.ToStr())
+result1 <- await Task.WhenAll([task1(), task2()])
 
 // 测试2: 任务组合方法 - WhenAny
 PrintLine("\n=== 测试2: 任务组合方法 - WhenAny ===")
 
-// result2 <- await Task.WhenAny([task1(), task2()])
-// PrintLine("WhenAny 结果: " + result2)
-PrintLine("WhenAny 方法暂不可用(Task类未暴露)")
+result2 <- await Task.WhenAny([task1(), task2()])
+PrintLine("WhenAny 结果: " + result2)
+// PrintLine("WhenAny 方法暂不可用(Task类未暴露)")
 
 // 测试3: 任务组合方法 - Then
 PrintLine("\n=== 测试3: 任务组合方法 - Then ===")
 
-// result3 <- await task1().Then((res) -> {
-//     PrintLine("前一个任务结果: " + res)
-//     return task2()
-// })
-// PrintLine("Then 结果: " + result3)
-PrintLine("Then 方法暂不可用")
+result3 <- await task1().Then((res) -> {
+    PrintLine("前一个任务结果: " + res)
+    return task2()
+})
+PrintLine("Then 结果: " + result3)
+// PrintLine("Then 方法暂不可用")
 
 // 测试4: 任务组合方法 - WithTimeout
 PrintLine("\n=== 测试4: 任务组合方法 - WithTimeout ===")
@@ -67,24 +59,24 @@ async func flakyTask() {
     return "重试成功"
 }
 
-// result5 <- await flakyTask().Retry(3, 200)
-// PrintLine("Retry 结果: " + result5)
-PrintLine("Retry 方法暂不可用")
+result5 <- await flakyTask().Retry(3, 200)
+PrintLine("Retry 结果: " + result5)
+// PrintLine("Retry 方法暂不可用")
 
 // 测试6: 任务取消机制
 PrintLine("\n=== 测试6: 任务取消机制 ===")
 
 // 测试创建取消令牌源
-// ctsId <- CreateCancellationTokenSource()
-// PrintLine("取消令牌源创建成功")
-PrintLine("取消令牌功能暂不可用")
+ctsId <- CreateCancellationTokenSource()
+PrintLine("取消令牌源创建成功")
+// PrintLine("取消令牌功能暂不可用")
 
 // 测试延迟取消
-// Sleep(100)
-// CancelAfter(ctsId, 200)
-// PrintLine("已设置延迟取消")
+Sleep(100)
+CancelAfter(ctsId, 200)
+PrintLine("已设置延迟取消")
 
-// Sleep(300)
-// PrintLine("取消已执行")
+Sleep(300)
+PrintLine("取消已执行")
 
 PrintLine("\n所有测试完成!")

@@ -1,8 +1,9 @@
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.LangParser;
 
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.StaticValues;
 
 /// <summary>
 /// Task 类的全局对象,提供静态方法访问

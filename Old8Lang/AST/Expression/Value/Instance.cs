@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 
@@ -206,15 +207,21 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
                 // 使用临时变量来存储线程对象，避免闭包引用问题
                 ThreadLangValue? tempThread = null;
+                
+                // 创建取消令牌源
+                var cts = new CancellationTokenSource();
 
                 // 调用函数
                 // 无参数情况
                 tempThread = threadArgs.Count == 0
-                    ? new ThreadLangValue(ThreadCallback, Position)
-                    : new ThreadLangValue(_ => ThreadCallback(), null, Position); // 带参数情况
+                    ? new ThreadLangValue(ThreadCallback, Position, cts.Token)
+                    : new ThreadLangValue(_ => ThreadCallback(), null, Position, cts.Token); // 带参数情况
 
                 // 赋值给最终的线程变量
                 var thread = tempThread;
+                
+                // 设置外部管理器
+                thread.ExternalManager = manager;
 
                 result = thread;
                 return result;
@@ -361,13 +368,14 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
         // 对于具有扩展方法的类型，优先查找扩展方法而不是实例方法
         // 这样可以避免找到 TaskLangValue.Then 实例方法而不是扩展方法
-        if (baseLangValue is DictionaryLangValue or ListLangValue or TaskLangValue)
+        if (baseLangValue is DictionaryLangValue or ListLangValue or TaskLangValue or ThreadLangValue)
         {
             type = baseLangValue switch
             {
                 DictionaryLangValue => Type.GetType("Old8Lang.AST.Expression.DictionaryValueFuncStatic"),
                 ListLangValue => Type.GetType("Old8Lang.AST.Expression.ListValueFuncStatic"),
                 TaskLangValue => Type.GetType("Old8Lang.AST.Expression.TaskValueFuncStatic"),
+                ThreadLangValue => Type.GetType("Old8Lang.AST.Expression.ThreadValueFuncStatic"),
                 _ => null
             };
             m = type?.GetMethod(Id.IdName);
@@ -409,7 +417,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
             // 运行表达式获取参数值
             // 如果参数已经是 LangValueType，则直接使用；否则调用 Run
-            // 对于 TaskLangValue，优先使用 ExternalManager
+            // 对于 TaskLangValue 和 ThreadLangValue，优先使用 ExternalManager
             LangValueType argValue;
             if (Ids[i] is LangValueType langValue)
             {
@@ -418,6 +426,10 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             else if (baseLangValue is TaskLangValue { ExternalManager: not null } taskLangValue)
             {
                 argValue = Ids[i].Run(taskLangValue.ExternalManager);
+            }
+            else if (baseLangValue is ThreadLangValue { ExternalManager: not null } threadLangValue)
+            {
+                argValue = Ids[i].Run(threadLangValue.ExternalManager);
             }
             else
             {

@@ -1,0 +1,95 @@
+// 测试Thread类的高级功能：链式调用、重试、超时、取消和进度报告
+
+PrintLine("=== 开始测试Thread高级功能 ===")
+
+// 1. 测试链式调用（Then）
+PrintLine("\n1. 测试链式调用（Then）")
+
+func task1() {
+    PrintLine("Task 1 执行中")
+    return 1
+}
+
+func task2(res) {
+    PrintLine("Task 2 执行中，前一个任务结果: " + res)
+    return res + 1
+}
+
+func task3(res) {
+    PrintLine("Task 3 执行中，前一个任务结果: " + res)
+    return res + 1
+}
+
+// 使用spawn创建线程并测试链式调用
+thread1 <- spawn(task1)
+result1 <- thread1.Then((res) -> spawn(task2, res)).Then((res) -> spawn(task3, res)).Join()
+PrintLine("链式调用最终结果: " + result1)
+
+// 2. 测试超时控制（WithTimeout）
+PrintLine("\n2. 测试超时控制（WithTimeout）")
+
+func longRunningTask() {
+    PrintLine("长时间运行任务开始")
+    Thread.Sleep(2000)  // 休眠2秒
+    PrintLine("长时间运行任务结束")
+    return "completed"
+}
+
+// 测试超时功能
+thread2 <- spawn(longRunningTask)
+try {
+    result2 <- thread2.WithTimeout(1000).Join()
+    PrintLine("超时测试成功结果: " + result2)
+} catch (e) {
+    PrintLine("超时测试捕获到异常: " + e.ToString())
+}
+
+// 3. 测试取消机制（Cancel）
+PrintLine("\n3. 测试取消机制（Cancel）")
+
+func cancelableTask() {
+    PrintLine("可取消任务开始")
+    i <- 0
+    while i < 10 {
+        Thread.Sleep(500)  // 每次循环休眠500毫秒
+        PrintLine("可取消任务执行中: " + i)
+        i <- i + 1
+    }
+    PrintLine("可取消任务结束")
+    return "completed"
+}
+
+// 测试取消功能
+thread3 <- spawn(cancelableTask)
+PrintLine("等待1秒后取消任务")
+Thread.Sleep(1000)
+thread3.Cancel()
+try {
+    result3 <- thread3.Join()
+    PrintLine("取消测试结果: " + result3)
+} catch (e) {
+    PrintLine("取消测试捕获到异常: " + e.ToString())
+}
+
+// 4. 测试进度报告
+PrintLine("\n4. 测试进度报告")
+
+func progressTask() {
+    PrintLine("进度任务开始")
+    i <- 0
+    while i <= 100 {
+        Thread.Sleep(50)  // 每次循环休眠50毫秒
+        // 报告进度
+        PrintLine("进度: " + i + "%")
+        i <- i + 10
+    }
+    PrintLine("进度任务结束")
+    return "completed"
+}
+
+// 测试进度报告
+thread4 <- spawn(progressTask)
+result4 <- thread4.Join()
+PrintLine("进度任务结果: " + result4)
+
+PrintLine("\n=== Thread高级功能测试完成 ===")

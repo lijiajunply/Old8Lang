@@ -1,5 +1,6 @@
 using Old8Lang.AST.Statement;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 
@@ -44,26 +45,17 @@ public class LangInterpreter
 
         // 注册全局 Task 对象
         Manager.Set(new LangId("Task"), TaskClassLangValue.GetInstance());
+        Manager.Set(new LangId("Thread"), ThreadClassLangValue.GetInstance());
     }
 
     /// <summary>
-    /// 将代码构建为抽象语法树（AST）
-    /// </summary>
-    /// <param name="code">要编译的Old8Lang代码</param>
-    /// <returns>表示整个程序的块语句</returns>
-    public BlockStatement Build(string code)
-    {
-        return Build(code, null);
-    }
-
-    /// <summary>
-    /// 重载方法，支持传递文件名以获取更准确的错误信息
+    /// 支持传递文件名以获取更准确的错误信息
     /// </summary>
     /// <param name="code">要编译的Old8Lang代码</param>
     /// <param name="fileName">源代码文件名（可选）</param>
     /// <returns>表示整个程序的块语句</returns>
     /// <exception cref="SyntaxError">当代码语法错误时抛出</exception>
-    public BlockStatement Build(string code, string? fileName)
+    public BlockStatement Build(string code, string? fileName = null)
     {
         SourceCode = code;
         Manager.Path = fileName ?? "";
@@ -74,7 +66,7 @@ public class LangInterpreter
         // 词法分析：将代码转换为标记流
         var parser = LangTokenizer.Tokenize(code);
         if (parser == null) throw new SyntaxError(new SourcePosition(1, 1), "语法出错");
-        
+
         // 语法分析：将标记流转换为抽象语法树
         var result = new LangParser(parser, code, fileName).ParseProgram();
 
@@ -109,7 +101,7 @@ public class LangInterpreter
         // 确保行号至少为1，然后转换为0-based索引
         var safeLine = Math.Max(1, position.Line);
         var zeroBasedLine = safeLine - 1;
-        
+
         // 获取错误行前后各2行，最多显示5行上下文
         var startLine = Math.Max(0, zeroBasedLine - 2);
         var endLine = Math.Min(lines.Length - 1, zeroBasedLine + 2);
