@@ -1,0 +1,43 @@
+// 异步编程最佳实践测试 - 最简版
+
+// 测试1：基本异步函数
+async func simpleAsync() {
+    await Task.Delay(100)
+    return "Hello from async"
+}
+
+// 测试2：异常处理
+async func testException() {
+    try {
+        await Task.Delay(50)
+        throw "Test exception"
+    } catch (e) {
+        PrintLine("Caught: " + e)
+    }
+}
+
+// 测试3：并行任务
+async func parallelTasks() {
+    task1 <- Task.Delay(200).Then((res) -> "Task 1")
+    task2 <- Task.Delay(100).Then((res) -> "Task 2")
+    task3 <- Task.Delay(150).Then((res) -> "Task 3")
+    
+    results <- await Task.WhenAll([task1, task2, task3])
+    PrintLine("Parallel results: " + results)
+}
+
+PrintLine("=== 异步编程最佳实践测试 ===")
+    
+// 测试1：基本异步
+result <- await simpleAsync()
+PrintLine(result)
+    
+// 测试2：异常处理
+PrintLine("Testing exception handling...")
+await testException()
+    
+// 测试3：并行任务
+PrintLine("Testing parallel tasks...")
+await parallelTasks()
+
+PrintLine("=== 测试完成 ===")
