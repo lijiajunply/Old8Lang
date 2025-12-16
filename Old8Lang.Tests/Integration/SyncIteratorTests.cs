@@ -1,7 +1,6 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.LangParser;
-using System.Linq;
 
 namespace Old8Lang.Tests.Integration;
 

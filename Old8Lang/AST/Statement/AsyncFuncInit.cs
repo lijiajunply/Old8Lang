@@ -130,10 +130,9 @@ public class AsyncFuncInit : OldStatement
     /// </summary>
     private void GenerateAsyncMethodBody(ILGenerator ilGenerator, LocalManager local)
     {
-        // 生成异步方法体
-        // BlockStatement会执行所有语句，包括return语句
-        // return语句会生成自己的ret指令，所以这里不需要再添加ret指令
-        AsyncFuncValue.BlockStatement.GenerateIl(ilGenerator, local);
+        // 使用AsyncStateMachineGenerator生成异步函数体的IL代码
+        var stateMachineGenerator = new AsyncStateMachineGenerator(ilGenerator, local, AsyncFuncValue.BlockStatement);
+        stateMachineGenerator.GenerateAsyncMethodBody(ilGenerator);
     }
     
     /// <summary>
