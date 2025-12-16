@@ -1,6 +1,7 @@
 // 测试高级异步功能
 
 import Async
+import Time
 
 // 测试1: 任务组合方法 - WhenAll
 PrintLine("=== 测试1: 任务组合方法 - WhenAll ===")
@@ -48,18 +49,27 @@ try {
 // 测试5: 任务组合方法 - Retry
 PrintLine("\n=== 测试5: 任务组合方法 - Retry ===")
 
-retryCount <- 0
+// 注意：由于异步函数的作用域隔离机制，每次重试都会使用独立的作用域副本
+// 这确保了并发安全性和函数的纯度
+// 因此我们使用基于时间的方式来测试重试功能
+
+currentTime <- GetUnixTimeMilliseconds()
 
 async func flakyTask() {
-    retryCount <- retryCount + 1
-    PrintLine("重试次数: " + retryCount.ToStr())
-    if retryCount < 3 {
+    now <- GetUnixTimeMilliseconds()
+    elapsed <- now - currentTime
+
+    // 前2秒内失败，之后成功
+    if elapsed < 2000 {
+        PrintLine("任务失败，需要重试 (已过 " + elapsed.ToStr() + "ms)")
         throw "任务失败，需要重试"
     }
+
+    PrintLine("任务成功 (已过 " + elapsed.ToStr() + "ms)")
     return "重试成功"
 }
 
-result5 <- await flakyTask().Retry(3, 200)
+result5 <- await flakyTask().Retry(5, 500)
 PrintLine("Retry 结果: " + result5)
 // PrintLine("Retry 方法暂不可用")
 

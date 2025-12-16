@@ -1,5 +1,8 @@
 // 简单的异步功能测试
 
+import Async
+import Time
+
 // 测试任务组合方法 - Then
 
 async func task1() {
@@ -19,11 +22,17 @@ result <- await task1().Then((res) -> {
 PrintLine("Then 结果: " + result)
 
 // 测试 Retry 方法
-retryCount <- 0
+// 注意：由于异步函数的作用域隔离机制，每次重试都会使用独立的作用域副本
+// 因此我们使用基于时间的方式来测试重试功能
+
+startTime <- GetUnixTimeMilliseconds()
 
 async func flakyTask() {
-    retryCount++
-    if retryCount < 3 {
+    currentTime <- GetUnixTimeMilliseconds()
+    elapsed <- currentTime - startTime
+
+    // 前200毫秒内失败，之后成功
+    if elapsed < 200 {
         throw "任务失败，需要重试"
     }
     return "重试成功"
