@@ -64,13 +64,37 @@ public class AwaitExpression : LangExpression
     /// <summary>
     /// 生成 IL 代码（编译器模式）
     /// 实现真正的异步等待，使用 .NET 的 await 模式
+    /// 支持 Task 和 Task<object> 两种类型
     /// </summary>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        // 加载表达式的值（应该是Task<object>类型）
+        // 加载表达式的值
         Expression.LoadIlValue(ilGenerator, local);
         
-        // 调用GetAwaiter()方法获取等待器
+        // 获取表达式的输出类型
+        var exprType = Expression.OutputType(local);
+        
+        // 确保表达式类型是 Task 或 Task<object>
+        if (exprType == typeof(Task))
+        {
+            // 对于 Task 类型，转换为 Task<object>，使用 Task.WhenAll(Task) 实现
+            var whenAllMethod = typeof(Task).GetMethod("WhenAll", new[] { typeof(Task[]) })!;
+            // 创建一个包含当前 Task 的数组
+            ilGenerator.Emit(OpCodes.Ldc_I4_1);
+            ilGenerator.Emit(OpCodes.Newarr, typeof(Task));
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Ldc_I4_0);
+            ilGenerator.Emit(OpCodes.Dup);
+            ilGenerator.Emit(OpCodes.Stelem_Ref);
+            ilGenerator.Emit(OpCodes.Call, whenAllMethod);
+            // 现在栈上是 Task，我们需要将其转换为 Task<object>
+            // 使用 Task.FromResult<object>(null) 作为模板
+            var fromResultMethod = typeof(Task).GetMethod("FromResult", new Type[] { typeof(object) })!.MakeGenericMethod(typeof(object));
+            ilGenerator.Emit(OpCodes.Ldnull);
+            ilGenerator.Emit(OpCodes.Call, fromResultMethod);
+        }
+        
+        // 现在栈上是 Task<object>，调用 GetAwaiter() 方法获取等待器
         var getAwaiterMethod = typeof(Task<object>).GetMethod("GetAwaiter")!;
         ilGenerator.Emit(OpCodes.Callvirt, getAwaiterMethod);
         

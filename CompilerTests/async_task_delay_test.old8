@@ -1,0 +1,19 @@
+// 测试Task.Delay静态方法在异步函数中的使用
+
+// 异步函数，使用Task.Delay延迟
+async func asyncWithDelay() -> string {
+    PrintLine("Inside asyncWithDelay - Start");
+    // 使用Task.Delay延迟100毫秒
+    await Task.Delay(100);
+    PrintLine("Inside asyncWithDelay - After Delay");
+    return "Delay Completed";
+}
+
+// 主函数，调用异步函数
+func main() -> void {
+    PrintLine("Start main");
+    // 直接调用异步函数，获取Task对象
+    task <- asyncWithDelay();
+    PrintLine("Called asyncWithDelay");
+    PrintLine("End main");
+}

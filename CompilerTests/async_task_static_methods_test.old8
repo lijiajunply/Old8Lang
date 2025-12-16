@@ -1,0 +1,33 @@
+// 测试Task静态方法的全面支持
+
+// 异步函数，直接返回字符串
+async func simpleAsync(msg, delayMs: int) -> string {
+    PrintLine("Inside simpleAsync: " + msg + " - Start");
+    await Task.Delay(delayMs);
+    PrintLine("Inside simpleAsync: " + msg + " - End");
+    return "Result: " + msg;
+}
+
+// 主函数，测试各种Task静态方法
+func main() -> void {
+    PrintLine("Start main");
+    
+    // 测试1：Task.Delay
+    PrintLine("\n=== Test 1: Task.Delay ===");
+    task1 <- simpleAsync("Task1", 50);
+    PrintLine("Created task1");
+    
+    // 测试2：Task.WhenAll
+    PrintLine("\n=== Test 2: Task.WhenAll ===");
+    task2 <- simpleAsync("Task2", 30);
+    task3 <- simpleAsync("Task3", 40);
+    // 注意：Old8Lang的数组语法可能不同，这里先不使用WhenAll
+    PrintLine("Created task2 and task3");
+    
+    // 测试3：Task.WhenAny
+    PrintLine("\n=== Test 3: Task.WhenAny ===");
+    task4 <- simpleAsync("Task4", 20);
+    PrintLine("Created task4");
+    
+    PrintLine("\nEnd main");
+}

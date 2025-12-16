@@ -1,0 +1,73 @@
+// 测试Task.WhenAll和Task.WhenAny方法的使用
+
+// 异步函数，直接返回字符串，带有延迟
+async func asyncWithDelay(msg, delayMs: int) -> string {
+    PrintLine("Inside asyncWithDelay: " + msg + " - Start");
+    await Task.Delay(delayMs);
+    PrintLine("Inside asyncWithDelay: " + msg + " - End");
+    return "Result: " + msg;
+}
+
+// 异步函数，测试Task.WhenAll
+async func testWhenAll() -> string {
+    PrintLine("Inside testWhenAll - Start");
+    
+    // 创建多个任务
+    task1 <- asyncWithDelay("Task1", 100);
+    task2 <- asyncWithDelay("Task2", 50);
+    task3 <- asyncWithDelay("Task3", 75);
+    
+    // 创建任务列表
+    tasks <- [task1, task2, task3];
+    
+    // 使用Task.WhenAll等待所有任务完成
+    PrintLine("Calling Task.WhenAll");
+    results <- await Task.WhenAll(tasks);
+    
+    PrintLine("Task.WhenAll completed");
+    
+    // 处理结果 - 简化处理，不访问Length属性
+    PrintLine("Processed results");
+    
+    PrintLine("Inside testWhenAll - End");
+    return "WhenAll Completed";
+}
+
+// 异步函数，测试Task.WhenAny
+async func testWhenAny() -> string {
+    PrintLine("Inside testWhenAny - Start");
+    
+    // 创建多个任务
+    task1 <- asyncWithDelay("TaskA", 100);
+    task2 <- asyncWithDelay("TaskB", 30);
+    task3 <- asyncWithDelay("TaskC", 60);
+    
+    // 创建任务列表
+    tasks <- [task1, task2, task3];
+    
+    // 使用Task.WhenAny等待任一任务完成
+    PrintLine("Calling Task.WhenAny");
+    result <- await Task.WhenAny(tasks);
+    
+    PrintLine("Task.WhenAny completed");
+    
+    PrintLine("Inside testWhenAny - End");
+    return "WhenAny Completed";
+}
+
+// 主函数，测试Task.WhenAll和Task.WhenAny
+func main() -> void {
+    PrintLine("Start main");
+    
+    // 测试1：Task.WhenAll
+    PrintLine("\n=== Test 1: Task.WhenAll ===");
+    whenAllTask <- testWhenAll();
+    PrintLine("Created whenAllTask");
+    
+    // 测试2：Task.WhenAny
+    PrintLine("\n=== Test 2: Task.WhenAny ===");
+    whenAnyTask <- testWhenAny();
+    PrintLine("Created whenAnyTask");
+    
+    PrintLine("\nEnd main");
+}

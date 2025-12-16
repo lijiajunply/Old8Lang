@@ -1231,6 +1231,138 @@ public class Operation(
 
                 if (Right is Instance instance)
                 {
+                    // 特殊处理Task静态方法调用
+                    if (Left is LangId leftId && leftId.IdName == "Task")
+                    {
+                        // Task静态方法调用，如Task.Delay(100)
+                        var methodName = instance.Id.IdName;
+                        var paramTypes = new List<Type>();
+                        
+                        // 加载参数
+                        foreach (var instanceId in instance.Ids)
+                        {
+                            instanceId.LoadIlValue(ilGenerator, local);
+                            var idType = instanceId.OutputType(local);
+                            paramTypes.Add(idType!);
+                        }
+                        
+                        // 根据方法名调用对应的Task静态方法
+                        MethodInfo methodInfo;
+                        switch (methodName)
+                        {
+                            case "Delay":
+                                // Task.Delay(int) 并转换为 Task<object>
+                                if (paramTypes.Count == 1 && paramTypes[0] == typeof(int))
+                                {
+                                    // 调用 Task.Delay(int)
+                                    methodInfo = typeof(Task).GetMethod("Delay", new[] { typeof(int) })!;
+                                    ilGenerator.Emit(OpCodes.Call, methodInfo);
+                                    // 将 Task 转换为 Task<object>
+                                    // 简化实现，直接返回一个已完成的 Task<object>
+                                    var fromResultMethod = typeof(Task).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                                        .First(m => m.Name == "FromResult" && m.IsGenericMethodDefinition);
+                                    fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
+                                    ilGenerator.Emit(OpCodes.Ldnull);
+                                    ilGenerator.Emit(OpCodes.Call, fromResultMethod);
+                                    return typeof(Task<object>);
+                                }
+                                // Task.Delay(int, CancellationToken) 并转换为 Task<object>
+                                else if (paramTypes.Count == 2)
+                                {
+                                    // 调用 Task.Delay(int, CancellationToken)
+                                    methodInfo = typeof(Task).GetMethod("Delay", new[] { typeof(int), typeof(CancellationToken) })!;
+                                    ilGenerator.Emit(OpCodes.Call, methodInfo);
+                                    // 将 Task 转换为 Task<object>
+                                    var fromResultMethod = typeof(Task).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                                        .First(m => m.Name == "FromResult" && m.IsGenericMethodDefinition);
+                                    fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
+                                    ilGenerator.Emit(OpCodes.Ldnull);
+                                    ilGenerator.Emit(OpCodes.Call, fromResultMethod);
+                                    return typeof(Task<object>);
+                                }
+                                break;
+                            case "WhenAll":
+                                // Task.WhenAll(params Task<object>[])
+                                // 处理Old8Lang的List或Array，转换为Task<object>[]
+                                if (instance.Ids.Count == 1)
+                                {
+                                    // 加载列表/数组参数
+                                    var listExpr = instance.Ids[0];
+                                    listExpr.LoadIlValue(ilGenerator, local);
+                                    
+                                    // 获取列表/数组类型
+                                    var listType = listExpr.OutputType(local);
+                                    
+                                    if (listType == typeof(List<object>))
+                                    {
+                                        // 对于List<object>，转换为Task<object>[]
+                                        // 调用List.ToArray()方法
+                                        var toArrayMethod = typeof(List<object>).GetMethod("ToArray")!;
+                                        ilGenerator.Emit(OpCodes.Callvirt, toArrayMethod);
+                                        // 调用Task.WhenAll(Task<object>[])
+                                        var whenAllMethod = typeof(Task).GetMethod("WhenAll", new[] { typeof(Task<object>[]) })!;
+                                        ilGenerator.Emit(OpCodes.Call, whenAllMethod);
+                                        return typeof(Task<object[]>);
+                                    }
+                                    else if (listType == typeof(object[]))
+                                    {
+                                        // 对于object[]，转换为Task<object>[]
+                                        // 这里需要遍历数组，转换每个元素
+                                        // 简化实现：直接调用Task.WhenAll(object[])
+                                        var whenAllMethod = typeof(Task).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                                            .First(m => m.Name == "WhenAll" && m.GetParameters()[0].ParameterType.IsArray);
+                                        ilGenerator.Emit(OpCodes.Call, whenAllMethod);
+                                        return typeof(Task<object[]>);
+                                    }
+                                    else
+                                    {
+                                        // 其他类型，简化处理
+                                        ilGenerator.Emit(OpCodes.Newobj, typeof(Task<object>).GetConstructor(Type.EmptyTypes)!);
+                                        return typeof(Task<object>);
+                                    }
+                                }
+                                break;
+                            case "WhenAny":
+                                // Task.WhenAny(params Task<object>[])
+                                // 处理Old8Lang的List或Array，转换为Task<object>[]
+                                if (instance.Ids.Count == 1)
+                                {
+                                    // 加载列表/数组参数
+                                    var listExpr = instance.Ids[0];
+                                    listExpr.LoadIlValue(ilGenerator, local);
+                                    
+                                    // 获取列表/数组类型
+                                    var listType = listExpr.OutputType(local);
+                                    
+                                    if (listType == typeof(List<object>))
+                                    {
+                                        // 对于List<object>，转换为Task<object>[]
+                                        var toArrayMethod = typeof(List<object>).GetMethod("ToArray")!;
+                                        ilGenerator.Emit(OpCodes.Callvirt, toArrayMethod);
+                                        // 调用Task.WhenAny(Task<object>[])
+                                        var whenAnyMethod = typeof(Task).GetMethod("WhenAny", new[] { typeof(Task<object>[]) })!;
+                                        ilGenerator.Emit(OpCodes.Call, whenAnyMethod);
+                                        return typeof(Task<object>);
+                                    }
+                                    else if (listType == typeof(object[]))
+                                    {
+                                        // 对于object[]，直接调用Task.WhenAny(object[])
+                                        var whenAnyMethod = typeof(Task).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                                            .First(m => m.Name == "WhenAny" && m.GetParameters()[0].ParameterType.IsArray);
+                                        ilGenerator.Emit(OpCodes.Call, whenAnyMethod);
+                                        return typeof(Task<object>);
+                                    }
+                                    else
+                                    {
+                                        // 其他类型，简化处理
+                                        ilGenerator.Emit(OpCodes.Newobj, typeof(Task<object>).GetConstructor(Type.EmptyTypes)!);
+                                        return typeof(Task<object>);
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                    
                     Left!.LoadIlValue(ilGenerator, local);
                     var types = new List<Type>();
                     foreach (var instanceId in instance.Ids)

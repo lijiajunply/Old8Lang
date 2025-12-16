@@ -1,5 +1,7 @@
+using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.LangParser;
 
@@ -20,6 +22,25 @@ public class TaskClassLangValue : LangValueType
     public override string TypeToString() => "TaskClass";
 
     public override string ToDisplayString() => "Task";
+
+    /// <summary>
+    /// 生成 IL 代码，返回 Task 类型本身
+    /// </summary>
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
+    {
+        // 对于 Task 类静态方法，我们不需要加载实例
+        // 直接返回 Task 类型本身
+        ilGenerator.Emit(OpCodes.Ldtoken, typeof(Task));
+        ilGenerator.Emit(OpCodes.Call, typeof(Type).GetMethod("GetTypeFromHandle")!);
+    }
+
+    /// <summary>
+    /// 获取输出类型
+    /// </summary>
+    public override Type? OutputType(LocalManager local)
+    {
+        return typeof(Type);
+    }
 
     /// <summary>
     /// 外部管理器，用于访问外部变量
@@ -179,5 +200,41 @@ public class TaskStaticMethodWrapper(
     public LangValueType Invoke(List<LangValueType> args, SourcePosition position)
     {
         return method(args, position);
+    }
+
+    /// <summary>
+    /// 生成 IL 代码，返回对应Task静态方法的委托
+    /// </summary>
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
+    {
+        // 根据方法名生成对应的Task静态方法委托
+        switch (methodName)
+        {
+            case "WhenAll":
+                // 获取Task.WhenAll方法
+                var whenAllMethod = typeof(Task).GetMethod("WhenAll", new[] { typeof(IEnumerable<Task<object>>) })!;
+                ilGenerator.Emit(OpCodes.Ldnull);
+                break;
+            case "WhenAny":
+                // 获取Task.WhenAny方法
+                var whenAnyMethod = typeof(Task).GetMethod("WhenAny", new[] { typeof(IEnumerable<Task<object>>) })!;
+                ilGenerator.Emit(OpCodes.Ldnull);
+                break;
+            case "Delay":
+                // 获取Task.Delay方法
+                var delayMethod = typeof(Task).GetMethod("Delay", new[] { typeof(int) })!;
+                ilGenerator.Emit(OpCodes.Ldnull);
+                break;
+            default:
+                throw new InvalidOperationError(this.Position, $"不支持的Task静态方法: {methodName}");
+        }
+    }
+
+    /// <summary>
+    /// 获取输出类型
+    /// </summary>
+    public override Type? OutputType(LocalManager local)
+    {
+        return typeof(Delegate);
     }
 }
