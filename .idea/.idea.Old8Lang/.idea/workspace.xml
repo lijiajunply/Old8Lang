@@ -18,8 +18,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/InterpreterTests/53_filelib_enhanced.old8" beforeDir="false" afterPath="$PROJECT_DIR$/InterpreterTests/53_filelib_enhanced.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/AnyValueFuncStatic.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/StringValueFuncStatic.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/TaskValueFuncStatic.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ThreadValueFuncStatic.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ValueTypeFuncStatic.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Regex.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/RegexLib.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/StringLibTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/FuncStatic.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/StringLib.cs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,6 +74,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Library/AsyncLibTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Library/AsyncLibTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/FuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/FuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/FuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
@@ -146,6 +159,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/AsyncLib.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/AsyncLib.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/378b2b72dcfd47c7a335f353306873123e00/5d/0b33afd1/02000002pdb1.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
@@ -811,7 +825,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="217" />
+    <option name="localTasksCounter" value="218" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -838,7 +852,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(generator): 移除旧生成器架构并统一使用状态机模式&#10;&#10;- 删除 BlockStatement 中的生成器执行位置字段和重置方法&#10;- 移除 GeneratorLangValue 中的 LocalState 和 UseStateMachine 属性&#10;- 简化 FuncLangValue 中生成器环境的创建逻辑&#10;- 统一 WhileStatement 和 BlockStatement 的执行路径&#10;- 清理 YieldStatement 中的旧架构兼容代码&#10;- 更新相关类文件以适应新的生成器执行模型" />
     <MESSAGE value="refactor(ast): 优化AST节点引用和访问修饰符&#10;&#10;- 移除了多个文件中未使用的命名空间引用&#10;- 将FuncLangValue中的IsLambda属性从public改为private&#10;- 将FuncLangValue中的IsGenerator属性从public改为private&#10;- 更新了Ids非空判断的模式匹配语法&#10;- 清理了GeneratorExecutionContext和GeneratorStateMachine中不必要的using语句&#10;- 移除了YieldStatement中未使用的命名空间引用&#10;- 移除了ThreadLangValue中未使用的System.Threading引用" />
     <MESSAGE value="fix(ast): 修复 IfStatement 中的索引逻辑错误&#10;&#10;- 修正了 elifBlock 索引访问越界的问题&#10;- 调整 elseBlock 返回条件以匹配正确的索引位置&#10;- 更新索引计算方式确保与 elifBlock 的实际元素对应" />
     <MESSAGE value="test(async): 更新异步任务测试用例&#10;&#10;- 注释掉不可用的 Task.WhenAll、WhenAny、Then、WithTimeout 和 Retry 方法调用&#10;- 添加替代方案分别等待各个任务并打印结果&#10;- 修改异常抛出方式从 throw new Error 改为直接 throw 字符串&#10;- 修复部分变量未转换为字符串导致的类型错误&#10;- 更新 mixin 测试中对 log 方法的调用方式&#10;- 调整测试文件中的打印函数统一使用 PrintLine&#10;- 修正数值类型拼接字符串时缺少 ToStr() 转换的问题" />
@@ -863,7 +876,8 @@
     <MESSAGE value="fix(thread): 修复线程执行结果处理和异常传播问题&#10;&#10;- 调整 Instance.cs 中线程创建逻辑的代码格式和注释&#10;- 在 ThreadLangValue.cs 中完善 Result 为空时返回 VoidLangValue&#10;- 修复 ThreadSafetyTest.old8 中异常抛出和捕获语法&#10;- 支持通过属性访问线程状态 (State, IsCompleted)&#10;- 当函数返回 VoidLangValue 时正确设置线程结果为 null" />
     <MESSAGE value="feat(async): 优化异步函数作用域管理和执行结果处理&#10;&#10;- 修改异步函数作用域捕获机制，直接引用外部作用域并为每个任务创建独立参数作用域&#10;- 调整异步函数执行逻辑，确保并发安全性和作用域隔离&#10;- 改进 FuncStatic 中的 Task 处理，支持非 Task 返回值自动包装&#10;- 更新 async_mutex 测试用例，验证异步任务计数和结果返回功能&#10;- 完善异步函数执行完成后的作用域清理逻辑" />
     <MESSAGE value="feat(async): 改进异步函数重试机制和作用域管理&#10;&#10;- 引入Time模块支持基于时间的重试测试&#10;- 优化flakyTask重试逻辑，使用时间判断替代全局计数器&#10;- 调整Retry方法参数，增加重试次数和延迟时间&#10;- 更新异步测试用例，增强重试功能验证&#10;- 改进异步函数作用域隔离机制，确保并发安全性" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(async): 改进异步函数重试机制和作用域管理&#10;&#10;- 引入Time模块支持基于时间的重试测试&#10;- 优化flakyTask重试逻辑，使用时间判断替代全局计数器&#10;- 调整Retry方法参数，增加重试次数和延迟时间&#10;- 更新异步测试用例，增强重试功能验证&#10;- 改进异步函数作用域隔离机制，确保并发安全性" />
+    <MESSAGE value="feat(filelib): 完善文件库基础功能并跳过未实现特性测试&#10;&#10;- 更新文件行数统计方式，使用 Len 函数替代 Length 属性&#10;- 注释掉 CSV、XML 和 YAML 文件操作的具体测试逻辑&#10;- 调整测试结束提示信息，明确当前仅完成基础功能测试&#10;- 清理不再需要的测试文件删除列表项&#10;- 优化方法调用参数检查逻辑，支持可选参数处理&#10;- 增强 FuncLangValue 中方法调用的参数类型转换机制&#10;- 补充缺失可选参数的默认值填充逻辑&#10;- 提高对数组类型参数的支持能力，增强类型兼容性" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(filelib): 完善文件库基础功能并跳过未实现特性测试&#10;&#10;- 更新文件行数统计方式，使用 Len 函数替代 Length 属性&#10;- 注释掉 CSV、XML 和 YAML 文件操作的具体测试逻辑&#10;- 调整测试结束提示信息，明确当前仅完成基础功能测试&#10;- 清理不再需要的测试文件删除列表项&#10;- 优化方法调用参数检查逻辑，支持可选参数处理&#10;- 增强 FuncLangValue 中方法调用的参数类型转换机制&#10;- 补充缺失可选参数的默认值填充逻辑&#10;- 提高对数组类型参数的支持能力，增强类型兼容性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

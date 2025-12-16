@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.StaticValues;
+using Old8Lang.AST.Expression.ValueFunctions;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 
@@ -416,10 +417,10 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
         {
             type = baseLangValue switch
             {
-                DictionaryLangValue => Type.GetType("Old8Lang.AST.Expression.DictionaryValueFuncStatic"),
-                ListLangValue => Type.GetType("Old8Lang.AST.Expression.ListValueFuncStatic"),
-                TaskLangValue => Type.GetType("Old8Lang.AST.Expression.TaskValueFuncStatic"),
-                ThreadLangValue => Type.GetType("Old8Lang.AST.Expression.ThreadValueFuncStatic"),
+                DictionaryLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.DictionaryValueFuncStatic"),
+                ListLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.ListValueFuncStatic"),
+                TaskLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.TaskValueFuncStatic"),
+                ThreadLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.ThreadValueFuncStatic"),
                 _ => null
             };
             m = type?.GetMethod(Id.IdName);
@@ -435,7 +436,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
         // 如果还是没找到，尝试 ValueTypeFuncStatic
         if (m == null)
         {
-            type = Type.GetType("Old8Lang.AST.Expression.ValueTypeFuncStatic");
+            type = Type.GetType("Old8Lang.AST.Expression.ValueFunctions.ValueTypeFuncStatic");
             m = type?.GetMethod(Id.IdName);
         }
 
