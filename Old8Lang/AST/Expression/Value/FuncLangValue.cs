@@ -166,25 +166,92 @@ public class FuncLangValue : ImportInfo
     {
         if (Method != null)
         {
-            // 检查参数数量是否匹配（Method的参数数量减去this参数）
-            var expectedParams = Method.GetParameters().Length;
+            // 获取方法的所有参数
+            var methodParams = Method.GetParameters();
+            var expectedParams = methodParams.Length;
             if (obj != null) expectedParams--; // 如果有this参数，减去1
             var actualParams = ids.Count;
-            if (expectedParams != actualParams)
+
+            // 检查参数数量是否匹配，考虑可选参数
+            if (actualParams > expectedParams)
             {
                 throw new ArgumentError(Position,
-                    $"方法 '{Method.Name}' 期望 {expectedParams} 个参数，但实际提供了 {actualParams} 个参数");
+                    $"方法 '{Method.Name}' 期望最多 {expectedParams} 个参数，但实际提供了 {actualParams} 个参数");
+            }
+
+            // 检查是否所有缺失的参数都是可选参数
+            if (actualParams < expectedParams)
+            {
+                // 计算缺失参数的起始索引（考虑 this 参数）
+                var startIndex = obj != null ? actualParams + 1 : actualParams;
+
+                // 检查从 actualParams 开始的所有参数是否都有默认值
+                for (int i = startIndex; i < methodParams.Length; i++)
+                {
+                    if (!methodParams[i].HasDefaultValue)
+                    {
+                        throw new ArgumentError(Position,
+                            $"方法 '{Method.Name}' 的参数 '{methodParams[i].Name}' 缺少实参且没有默认值");
+                    }
+                }
             }
 
             var values = ids.Select(expr => expr.Run(variateManagerFunc)).ToList();
-            var a = Apis.ListToObjects(values).ToArray();
+            var convertedValues = Apis.ListToObjects(values).ToArray();
+
+            // 根据目标参数类型转换参数
+            var adjustedParams = new object?[convertedValues.Length];
+            var paramStartIndex = obj != null ? 1 : 0; // 如果有 this 参数，跳过第一个参数
+
+            for (int i = 0; i < convertedValues.Length; i++)
+            {
+                var methodParamIndex = i + paramStartIndex;
+                var targetType = methodParams[methodParamIndex].ParameterType;
+                var value = convertedValues[i];
+
+                // 如果目标类型是数组，且值是 List<object>，进行转换
+                if (targetType.IsArray && value is List<object> list)
+                {
+                    var elementType = targetType.GetElementType()!;
+                    var array = Array.CreateInstance(elementType, list.Count);
+                    for (int j = 0; j < list.Count; j++)
+                    {
+                        array.SetValue(Convert.ChangeType(list[j], elementType), j);
+                    }
+                    adjustedParams[i] = array;
+                }
+                else
+                {
+                    adjustedParams[i] = value;
+                }
+            }
+
+            // 如果有可选参数缺失，需要填充默认值
+            object?[] finalParams;
+            if (actualParams < expectedParams)
+            {
+                finalParams = new object?[expectedParams];
+                Array.Copy(adjustedParams, finalParams, actualParams);
+
+                // 填充默认值
+                var startIndex = obj != null ? actualParams + 1 : actualParams;
+                for (int i = startIndex; i < methodParams.Length; i++)
+                {
+                    var targetIndex = obj != null ? i - 1 : i;
+                    finalParams[targetIndex] = methodParams[i].DefaultValue;
+                }
+            }
+            else
+            {
+                finalParams = adjustedParams;
+            }
 
             object? invoke;
             try
             {
                 // 入栈：记录函数调用
                 Old8Exception.PushCallStack(Method?.Name ?? "Unknown", Position);
-                invoke = Method?.Invoke(obj, a);
+                invoke = Method?.Invoke(obj, finalParams);
             }
             catch (TargetInvocationException ex) when (ex.InnerException != null)
             {
