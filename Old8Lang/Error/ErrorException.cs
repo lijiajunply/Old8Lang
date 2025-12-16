@@ -155,7 +155,7 @@ public class Old8Exception : Exception
     /// <param name="sourceContext">源代码上下文</param>
     /// <param name="requestId">请求ID，用于跟踪分布式系统中的请求</param>
     /// <param name="innerException">内部异常</param>
-    protected Old8Exception(
+    public Old8Exception(
         string errorCode,
         string message,
         SourcePosition position,
@@ -180,7 +180,7 @@ public class Old8Exception : Exception
     /// <param name="requestId">请求ID</param>
     /// <param name="innerException">内部异常</param>
     /// <param name="variableStates">变量状态信息</param>
-    protected Old8Exception(
+    public Old8Exception(
         string errorCode,
         string message,
         SourcePosition position,
@@ -192,7 +192,7 @@ public class Old8Exception : Exception
         Dictionary<string, string> variableStates)
         : base(FormatErrorMessage(errorCode, message, position, suggestion,
             GetSourceContextFromInterpreter(position, sourceContext), DateTime.Now, requestId ?? Guid.NewGuid(), 
-            CurrentCallStack, variableStates), innerException)
+            GetCombinedCallStack(innerException), variableStates), innerException)
     {
         ErrorCode = errorCode;
         Position = position;
@@ -201,12 +201,12 @@ public class Old8Exception : Exception
         SourceContext = GetSourceContextFromInterpreter(position, sourceContext);
         Timestamp = DateTime.Now;
         RequestId = requestId ?? Guid.NewGuid();
-        // 复制当前调用栈
-        CallStack = new List<CallStackFrame>(CurrentCallStack);
+        // 获取合并后的调用栈
+        CallStack = GetCombinedCallStack(innerException);
         // 初始化变量状态
         VariableStates = variableStates;
     }
-
+    
     /// <summary>
     /// 从AST节点创建错误
     /// </summary>
@@ -217,7 +217,7 @@ public class Old8Exception : Exception
     /// <param name="sourceContext">源代码上下文</param>
     /// <param name="requestId">请求ID，用于跟踪分布式系统中的请求</param>
     /// <param name="innerException">内部异常</param>
-    protected Old8Exception(
+    public Old8Exception(
         string errorCode,
         string message,
         IOldLangTree node,
@@ -241,7 +241,7 @@ public class Old8Exception : Exception
     /// <param name="requestId">请求ID</param>
     /// <param name="innerException">内部异常</param>
     /// <param name="variableStates">变量状态信息</param>
-    protected Old8Exception(
+    public Old8Exception(
         string errorCode,
         string message,
         IOldLangTree node,
@@ -253,6 +253,27 @@ public class Old8Exception : Exception
         : this(errorCode, message, node.Position, node, suggestion,
             GetSourceContextFromInterpreter(node.Position, sourceContext), requestId, innerException, variableStates)
     {
+    }
+
+    /// <summary>
+    /// 合并当前调用栈和内部异常的调用栈
+    /// </summary>
+    /// <param name="innerException">内部异常</param>
+    /// <returns>合并后的调用栈</returns>
+    private static List<CallStackFrame> GetCombinedCallStack(Exception? innerException)
+    {
+        // 复制当前调用栈
+        var combinedCallStack = new List<CallStackFrame>(CurrentCallStack);
+        
+        // 如果有内部异常，并且是 Old8Exception 类型，合并其调用栈
+        if (innerException is Old8Exception old8InnerException)
+        {
+            // 将内部异常的调用栈添加到当前调用栈前面
+            // 这样可以保持调用链的正确顺序：最外层调用 -> 内层调用 -> 实际异常发生点
+            combinedCallStack.InsertRange(0, old8InnerException.CallStack);
+        }
+        
+        return combinedCallStack;
     }
 
     /// <summary>
@@ -307,8 +328,8 @@ public class Old8Exception : Exception
         const string cyan = "\u001b[36m";
         const string magenta = "\u001b[35m";
 
-        // 错误标题 - 标准化格式
-        sb.AppendLine($"{red}[{errorCode}]{reset} {yellow}{message}{reset}");
+        // 错误标题 - 标准化格式，避免重复显示错误代码
+        sb.AppendLine($"{red}[{errorCode}]{reset} {message}");
 
         // 基本信息
         sb.AppendLine($"{blue}时间:{reset} {timestamp:yyyy-MM-dd HH:mm:ss.fff}");

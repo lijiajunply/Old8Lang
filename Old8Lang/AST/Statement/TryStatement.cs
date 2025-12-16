@@ -173,21 +173,25 @@ public class TryStatement(
             return true;
         }
 
-        var type = exception.GetType().Name;
-        while (true)
+        var currentType = exception.GetType();
+        while (currentType != null)
         {
-            if (string.IsNullOrEmpty(type))
-            {
-                return false;
-            }
-
-            if (type == exceptionType)
+            if (currentType.Name == exceptionType)
             {
                 return true;
             }
 
-            type = exception.GetType().BaseType?.Name;
+            // 检查当前类型的完整命名空间，支持完整类型名称匹配
+            if (currentType.FullName?.Contains(exceptionType) == true)
+            {
+                return true;
+            }
+
+            // 移动到父类
+            currentType = currentType.BaseType;
         }
+
+        return false;
     }
 
     public override OldStatement this[int index] => this;

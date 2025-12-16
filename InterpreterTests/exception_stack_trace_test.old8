@@ -1,0 +1,114 @@
+// 测试异常堆栈跟踪改进
+
+PrintLine("=== 异常堆栈跟踪测试 ===")
+
+// 测试1：基本异常堆栈跟踪
+PrintLine("\n--- 测试1：基本异常堆栈跟踪 ---")
+
+func testBasicStackTrace() {
+    PrintLine("在 testBasicStackTrace 中调用 divideByZero")
+    divideByZero()
+}
+
+func divideByZero() {
+    PrintLine("在 divideByZero 中执行 10 / 0")
+    result <- 10 / 0
+}
+
+try {
+    testBasicStackTrace()
+} catch (e) {
+    PrintLine("捕获到异常: ")
+    PrintLine(e)
+}
+
+// 测试2：嵌套异常堆栈跟踪
+PrintLine("\n--- 测试2：嵌套异常堆栈跟踪 ---")
+
+func level1() {
+    PrintLine("在 level1 中调用 level2")
+    level2()
+}
+
+func level2() {
+    PrintLine("在 level2 中调用 level3")
+    level3()
+}
+
+func level3() {
+    PrintLine("在 level3 中调用 level4")
+    level4()
+}
+
+func level4() {
+    PrintLine("在 level4 中执行无效操作")
+    invalidArrayAccess()
+}
+
+func invalidArrayAccess() {
+    array <- [1, 2, 3]
+    PrintLine("尝试访问 array[10]")
+    value <- array[10]
+}
+
+try {
+    level1()
+} catch (e) {
+    PrintLine("捕获到嵌套异常: ")
+    PrintLine(e)
+}
+
+// 测试3：异常包装和重新抛出
+PrintLine("\n--- 测试3：异常包装和重新抛出 ---")
+
+func throwCustomError() {
+    PrintLine("在 throwCustomError 中抛出自定义异常")
+    throw "自定义错误信息"
+}
+
+func wrapAndRethrow() {
+    PrintLine("在 wrapAndRethrow 中调用 throwCustomError 并重新抛出")
+    try {
+        throwCustomError()
+    } catch (e) {
+        PrintLine("捕获到异常，然后重新抛出")
+        throw e
+    }
+}
+
+try {
+    wrapAndRethrow()
+} catch (e) {
+    PrintLine("捕获到重新抛出的异常: ")
+    PrintLine(e)
+}
+
+// 测试4：异常类型匹配
+PrintLine("\n--- 测试4：异常类型匹配 ---")
+
+func testExceptionTypeMatching() {
+    PrintLine("在 testExceptionTypeMatching 中执行 10 / 0")
+    result <- 10 / 0
+}
+
+try {
+    testExceptionTypeMatching()
+} catch (ZeroDivisionError e) {
+    PrintLine("捕获到 ZeroDivisionError: ")
+    PrintLine(e)
+} catch (Exception e) {
+    PrintLine("捕获到通用 Exception: ")
+    PrintLine(e)
+}
+
+// 测试5：访问异常属性
+PrintLine("\n--- 测试5：访问异常属性 ---")
+
+try {
+    testBasicStackTrace()
+} catch (e) {
+    PrintLine("异常信息: " + e.FriendlyMessage)
+    PrintLine("异常类型: " + type(e))
+}
+
+PrintLine("\n✅ 所有异常堆栈跟踪测试完成")

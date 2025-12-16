@@ -192,55 +192,28 @@ public class FuncLangValue : ImportInfo
                 // 转换 .NET 异常为 Old8Lang 异常
                 var innerException = ex.InnerException;
 
-                // FileNotFoundException 和 DirectoryNotFoundException -> FileNotFoundError
-                if (innerException is FileNotFoundException fileEx)
-                {
-                    throw new FileNotFoundError(Position, fileEx.FileName ?? "未知文件");
-                }
+                // 获取当前方法的调用栈信息
+                var currentCallStack = new List<CallStackFrame>(Old8Exception.CurrentCallStack);
+                
+                // 基础异常信息
+                string errorMessage = innerException.Message;
+                string errorCode = "RUNTIME_ERROR";
 
-                if (innerException is DirectoryNotFoundException dirEx)
-                {
-                    throw new FileNotFoundError(Position, dirEx.Message);
-                }
-
-                // ArgumentException -> ValueError
-                if (innerException is ArgumentException argEx)
-                {
-                    throw new ValueError(Position, argEx.Message);
-                }
-
-                // UnauthorizedAccessException -> PermissionError
-                if (innerException is UnauthorizedAccessException uaEx)
-                {
-                    throw new PermissionError(Position, uaEx.Message);
-                }
-
-                // NotImplementedException -> NotImplementedError
-                if (innerException is NotImplementedException niEx)
-                {
-                    throw new NotImplementedError(Position, niEx.Message);
-                }
-
-                // TimeoutException -> TimeoutError
-                if (innerException is TimeoutException toEx)
-                {
-                    throw new TimeoutError(Position, toEx.Message);
-                }
-
-                // InvalidCastException -> TypeError
-                if (innerException is InvalidCastException icEx)
-                {
-                    throw new TypeError(this, icEx.Message);
-                }
-
-                // OverflowException -> OverflowError
-                if (innerException is OverflowException ofEx)
-                {
-                    throw new OverflowError(Position, ofEx.Message);
-                }
-
-                // 其他异常保持原样
-                throw;
+                // 直接创建 Old8Exception，保留原始异常作为 innerException
+                throw new Old8Exception(
+                    errorCode,
+                    errorMessage,
+                    Position,
+                    null,
+                    null,
+                    null,
+                    null,
+                    innerException);
+            }
+            finally
+            {
+                // 出栈：函数调用结束
+                Old8Exception.PopCallStack();
             }
 
             if (invoke is null)
