@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Channels;
 
 namespace Old8LangLib;
@@ -9,21 +10,53 @@ namespace Old8LangLib;
 /// </summary>
 public static class AsyncLib
 {
+    // 资源自动清理间隔（分钟）
+    private const int AutoCleanupIntervalMinutes = 5;
+    
+    // 资源最大闲置时间（分钟），超过此时间未使用的资源将被自动清理
+    private const int MaxIdleTimeMinutes = 30;
+    
+    // 资源包装类，用于跟踪资源的最后访问时间
+    private class ResourceWrapper<T> where T : class
+    {
+        public T Resource { get; }
+        public long LastAccessTimeTicks { get; private set; } = DateTime.Now.Ticks;
+        
+        public ResourceWrapper(T resource)
+        {
+            Resource = resource;
+        }
+        
+        public void UpdateLastAccessTime()
+        {
+            LastAccessTimeTicks = DateTime.Now.Ticks;
+        }
+        
+        public bool IsIdle => DateTime.Now.Ticks - LastAccessTimeTicks > TimeSpan.FromMinutes(MaxIdleTimeMinutes).Ticks;
+    }
+    
+    // 定时器，用于定期清理不再使用的资源
+    private static readonly Timer _cleanupTimer = new(CleanupResources, null, TimeSpan.FromMinutes(AutoCleanupIntervalMinutes), TimeSpan.FromMinutes(AutoCleanupIntervalMinutes));
+    
     // 存储 Mutex 对象（使用 SemaphoreSlim 实现）
-    private static readonly ConcurrentDictionary<int, SemaphoreSlim> Mutexes = new();
+    private static readonly ConcurrentDictionary<int, ResourceWrapper<SemaphoreSlim>> Mutexes = new();
     private static int _mutexIdCounter;
 
     // 存储 Semaphore 对象
-    private static readonly ConcurrentDictionary<int, SemaphoreSlim> Semaphores = new();
+    private static readonly ConcurrentDictionary<int, ResourceWrapper<SemaphoreSlim>> Semaphores = new();
     private static int _semaphoreIdCounter;
 
     // 存储原子整数对象
-    private static readonly ConcurrentDictionary<int, AtomicInt> AtomicInts = new();
+    private static readonly ConcurrentDictionary<int, ResourceWrapper<AtomicInt>> AtomicInts = new();
     private static int _atomicIntIdCounter;
 
     // 存储通道对象（使用 Channel<object> 实现，支持任意类型数据）
-    private static readonly ConcurrentDictionary<int, Channel<object>> Channels = new();
+    private static readonly ConcurrentDictionary<int, ResourceWrapper<Channel<object>>> Channels = new();
     private static int _channelIdCounter;
+    
+    // 存储取消令牌源对象
+    private static readonly ConcurrentDictionary<int, ResourceWrapper<CancellationTokenSource>> CancellationTokenSources = new();
+    private static int _cancellationTokenSourceIdCounter;
 
     #region Mutex 互斥锁
 
@@ -34,7 +67,7 @@ public static class AsyncLib
     public static int MutexCreate()
     {
         var id = Interlocked.Increment(ref _mutexIdCounter);
-        Mutexes[id] = new SemaphoreSlim(1, 1); // 信号量初始值和最大值都是 1
+        Mutexes[id] = new ResourceWrapper<SemaphoreSlim>(new SemaphoreSlim(1, 1)); // 信号量初始值和最大值都是 1
         return id;
     }
 
@@ -44,12 +77,13 @@ public static class AsyncLib
     /// <param name="mutexId">Mutex ID</param>
     public static void MutexLock(int mutexId)
     {
-        if (!Mutexes.TryGetValue(mutexId, out var mutex))
+        if (!Mutexes.TryGetValue(mutexId, out var wrapper))
         {
             throw new ArgumentException($"Mutex ID {mutexId} 不存在");
         }
-
-        mutex.Wait();
+        
+        wrapper.UpdateLastAccessTime();
+        wrapper.Resource.Wait();
     }
 
     /// <summary>
@@ -60,12 +94,13 @@ public static class AsyncLib
     /// <returns>是否成功锁定</returns>
     public static bool MutexTryLock(int mutexId, int timeoutMs)
     {
-        if (!Mutexes.TryGetValue(mutexId, out var mutex))
+        if (!Mutexes.TryGetValue(mutexId, out var wrapper))
         {
             throw new ArgumentException($"Mutex ID {mutexId} 不存在");
         }
-
-        return mutex.Wait(timeoutMs);
+        
+        wrapper.UpdateLastAccessTime();
+        return wrapper.Resource.Wait(timeoutMs);
     }
 
     /// <summary>
@@ -74,12 +109,13 @@ public static class AsyncLib
     /// <param name="mutexId">Mutex ID</param>
     public static void MutexUnlock(int mutexId)
     {
-        if (!Mutexes.TryGetValue(mutexId, out var mutex))
+        if (!Mutexes.TryGetValue(mutexId, out var wrapper))
         {
             throw new ArgumentException($"Mutex ID {mutexId} 不存在");
         }
-
-        mutex.Release();
+        
+        wrapper.UpdateLastAccessTime();
+        wrapper.Resource.Release();
     }
 
     /// <summary>
@@ -88,9 +124,9 @@ public static class AsyncLib
     /// <param name="mutexId">Mutex ID</param>
     public static void MutexDispose(int mutexId)
     {
-        if (Mutexes.TryRemove(mutexId, out var mutex))
+        if (Mutexes.TryRemove(mutexId, out var wrapper))
         {
-            mutex.Dispose();
+            wrapper.Resource.Dispose();
         }
     }
 
@@ -112,7 +148,7 @@ public static class AsyncLib
         }
 
         var id = Interlocked.Increment(ref _semaphoreIdCounter);
-        Semaphores[id] = new SemaphoreSlim(initialCount, maxCount);
+        Semaphores[id] = new ResourceWrapper<SemaphoreSlim>(new SemaphoreSlim(initialCount, maxCount));
         return id;
     }
 
@@ -122,12 +158,13 @@ public static class AsyncLib
     /// <param name="semaphoreId">Semaphore ID</param>
     public static void SemaphoreAcquire(int semaphoreId)
     {
-        if (!Semaphores.TryGetValue(semaphoreId, out var semaphore))
+        if (!Semaphores.TryGetValue(semaphoreId, out var wrapper))
         {
             throw new ArgumentException($"Semaphore ID {semaphoreId} 不存在");
         }
-
-        semaphore.Wait();
+        
+        wrapper.UpdateLastAccessTime();
+        wrapper.Resource.Wait();
     }
 
     /// <summary>
@@ -138,12 +175,13 @@ public static class AsyncLib
     /// <returns>是否成功获取</returns>
     public static bool SemaphoreTryAcquire(int semaphoreId, int timeoutMs)
     {
-        if (!Semaphores.TryGetValue(semaphoreId, out var semaphore))
+        if (!Semaphores.TryGetValue(semaphoreId, out var wrapper))
         {
             throw new ArgumentException($"Semaphore ID {semaphoreId} 不存在");
         }
-
-        return semaphore.Wait(timeoutMs);
+        
+        wrapper.UpdateLastAccessTime();
+        return wrapper.Resource.Wait(timeoutMs);
     }
 
     /// <summary>
@@ -152,12 +190,13 @@ public static class AsyncLib
     /// <param name="semaphoreId">Semaphore ID</param>
     public static void SemaphoreRelease(int semaphoreId)
     {
-        if (!Semaphores.TryGetValue(semaphoreId, out var semaphore))
+        if (!Semaphores.TryGetValue(semaphoreId, out var wrapper))
         {
             throw new ArgumentException($"Semaphore ID {semaphoreId} 不存在");
         }
-
-        semaphore.Release();
+        
+        wrapper.UpdateLastAccessTime();
+        wrapper.Resource.Release();
     }
 
     /// <summary>
@@ -166,9 +205,9 @@ public static class AsyncLib
     /// <param name="semaphoreId">Semaphore ID</param>
     public static void SemaphoreDispose(int semaphoreId)
     {
-        if (Semaphores.TryRemove(semaphoreId, out var semaphore))
+        if (Semaphores.TryRemove(semaphoreId, out var wrapper))
         {
-            semaphore.Dispose();
+            wrapper.Resource.Dispose();
         }
     }
 
@@ -207,7 +246,7 @@ public static class AsyncLib
     public static int AtomicIntCreate(int initialValue)
     {
         var id = Interlocked.Increment(ref _atomicIntIdCounter);
-        AtomicInts[id] = new AtomicInt(initialValue);
+        AtomicInts[id] = new ResourceWrapper<AtomicInt>(new AtomicInt(initialValue));
         return id;
     }
 
@@ -218,12 +257,13 @@ public static class AsyncLib
     /// <returns>当前值</returns>
     public static int AtomicIntGet(int atomicId)
     {
-        if (!AtomicInts.TryGetValue(atomicId, out var atomic))
+        if (!AtomicInts.TryGetValue(atomicId, out var wrapper))
         {
             throw new ArgumentException($"AtomicInt ID {atomicId} 不存在");
         }
-
-        return atomic.Get();
+        
+        wrapper.UpdateLastAccessTime();
+        return wrapper.Resource.Get();
     }
 
     /// <summary>
@@ -233,12 +273,13 @@ public static class AsyncLib
     /// <param name="newValue">新值</param>
     public static void AtomicIntSet(int atomicId, int newValue)
     {
-        if (!AtomicInts.TryGetValue(atomicId, out var atomic))
+        if (!AtomicInts.TryGetValue(atomicId, out var wrapper))
         {
             throw new ArgumentException($"AtomicInt ID {atomicId} 不存在");
         }
-
-        atomic.Set(newValue);
+        
+        wrapper.UpdateLastAccessTime();
+        wrapper.Resource.Set(newValue);
     }
 
     /// <summary>
@@ -248,12 +289,13 @@ public static class AsyncLib
     /// <returns>自增后的值</returns>
     public static int AtomicIntIncrement(int atomicId)
     {
-        if (!AtomicInts.TryGetValue(atomicId, out var atomic))
+        if (!AtomicInts.TryGetValue(atomicId, out var wrapper))
         {
             throw new ArgumentException($"AtomicInt ID {atomicId} 不存在");
         }
-
-        return atomic.Increment();
+        
+        wrapper.UpdateLastAccessTime();
+        return wrapper.Resource.Increment();
     }
 
     /// <summary>
@@ -263,12 +305,13 @@ public static class AsyncLib
     /// <returns>自减后的值</returns>
     public static int AtomicIntDecrement(int atomicId)
     {
-        if (!AtomicInts.TryGetValue(atomicId, out var atomic))
+        if (!AtomicInts.TryGetValue(atomicId, out var wrapper))
         {
             throw new ArgumentException($"AtomicInt ID {atomicId} 不存在");
         }
-
-        return atomic.Decrement();
+        
+        wrapper.UpdateLastAccessTime();
+        return wrapper.Resource.Decrement();
     }
 
     /// <summary>
@@ -279,12 +322,13 @@ public static class AsyncLib
     /// <returns>操作后的值</returns>
     public static int AtomicIntAdd(int atomicId, int delta)
     {
-        if (!AtomicInts.TryGetValue(atomicId, out var atomic))
+        if (!AtomicInts.TryGetValue(atomicId, out var wrapper))
         {
             throw new ArgumentException($"AtomicInt ID {atomicId} 不存在");
         }
-
-        return atomic.Add(delta);
+        
+        wrapper.UpdateLastAccessTime();
+        return wrapper.Resource.Add(delta);
     }
 
     /// <summary>
@@ -296,12 +340,22 @@ public static class AsyncLib
     /// <returns>是否成功设置</returns>
     public static bool AtomicIntCompareAndSet(int atomicId, int expectedValue, int newValue)
     {
-        if (!AtomicInts.TryGetValue(atomicId, out var atomic))
+        if (!AtomicInts.TryGetValue(atomicId, out var wrapper))
         {
             throw new ArgumentException($"AtomicInt ID {atomicId} 不存在");
         }
+        
+        wrapper.UpdateLastAccessTime();
+        return wrapper.Resource.CompareAndSet(expectedValue, newValue);
+    }
 
-        return atomic.CompareAndSet(expectedValue, newValue);
+    /// <summary>
+    /// 销毁原子整数
+    /// </summary>
+    /// <param name="atomicId">AtomicInt ID</param>
+    public static void AtomicIntDispose(int atomicId)
+    {
+        AtomicInts.TryRemove(atomicId, out _);
     }
 
     #endregion
@@ -344,10 +398,6 @@ public static class AsyncLib
 
     #region 取消令牌
 
-    // 存储 CancellationTokenSource 对象
-    private static readonly ConcurrentDictionary<int, CancellationTokenSource> CancellationTokenSources = new();
-    private static int _cancellationTokenSourceIdCounter;
-
     /// <summary>
     /// 创建取消令牌源
     /// </summary>
@@ -355,7 +405,7 @@ public static class AsyncLib
     public static int CreateCancellationTokenSource()
     {
         var id = Interlocked.Increment(ref _cancellationTokenSourceIdCounter);
-        CancellationTokenSources[id] = new CancellationTokenSource();
+        CancellationTokenSources[id] = new ResourceWrapper<CancellationTokenSource>(new CancellationTokenSource());
         return id;
     }
 
@@ -365,12 +415,13 @@ public static class AsyncLib
     /// <param name="ctsId">取消令牌源 ID</param>
     public static void Cancel(int ctsId)
     {
-        if (!CancellationTokenSources.TryGetValue(ctsId, out var cts))
+        if (!CancellationTokenSources.TryGetValue(ctsId, out var wrapper))
         {
             throw new ArgumentException($"取消令牌源 ID {ctsId} 不存在");
         }
-
-        cts.Cancel();
+        
+        wrapper.UpdateLastAccessTime();
+        wrapper.Resource.Cancel();
     }
 
     /// <summary>
@@ -380,12 +431,13 @@ public static class AsyncLib
     /// <param name="delayMs">延迟毫秒数</param>
     public static void CancelAfter(int ctsId, int delayMs)
     {
-        if (!CancellationTokenSources.TryGetValue(ctsId, out var cts))
+        if (!CancellationTokenSources.TryGetValue(ctsId, out var wrapper))
         {
             throw new ArgumentException($"取消令牌源 ID {ctsId} 不存在");
         }
-
-        cts.CancelAfter(delayMs);
+        
+        wrapper.UpdateLastAccessTime();
+        wrapper.Resource.CancelAfter(delayMs);
     }
 
     /// <summary>
@@ -394,12 +446,69 @@ public static class AsyncLib
     /// <param name="ctsId">取消令牌源 ID</param>
     public static void DisposeCancellationTokenSource(int ctsId)
     {
-        if (CancellationTokenSources.TryRemove(ctsId, out var cts))
+        if (CancellationTokenSources.TryRemove(ctsId, out var wrapper))
         {
-            cts.Dispose();
+            wrapper.Resource.Dispose();
         }
     }
 
+    #endregion
+
+    #region 资源自动清理
+    
+    /// <summary>
+    /// 定期清理闲置资源
+    /// </summary>
+    /// <param name="state">定时器状态</param>
+    private static void CleanupResources(object? state)
+    {
+        // 清理闲置的 Mutex
+        foreach (var (id, wrapper) in Mutexes)
+        {
+            if (wrapper.IsIdle && Mutexes.TryRemove(id, out var removedWrapper))
+            {
+                removedWrapper.Resource.Dispose();
+            }
+        }
+        
+        // 清理闲置的 Semaphore
+        foreach (var (id, wrapper) in Semaphores)
+        {
+            if (wrapper.IsIdle && Semaphores.TryRemove(id, out var removedWrapper))
+            {
+                removedWrapper.Resource.Dispose();
+            }
+        }
+        
+        // 清理闲置的 AtomicInt
+        foreach (var (id, wrapper) in AtomicInts)
+        {
+            if (wrapper.IsIdle)
+            {
+                AtomicInts.TryRemove(id, out _);
+            }
+        }
+        
+        // 清理闲置的取消令牌源
+        foreach (var (id, wrapper) in CancellationTokenSources)
+        {
+            if (wrapper.IsIdle && CancellationTokenSources.TryRemove(id, out var removedWrapper))
+            {
+                removedWrapper.Resource.Dispose();
+            }
+        }
+        
+        // 清理闲置的 Channel
+        foreach (var (id, wrapper) in Channels)
+        {
+            if (wrapper.IsIdle)
+            {
+                Channels.TryRemove(id, out _);
+                // Channel 会自动释放资源，无需手动 Dispose
+            }
+        }
+    }
+    
     #endregion
 
     #region Channel 通道
@@ -411,7 +520,7 @@ public static class AsyncLib
     public static int ChannelCreate()
     {
         var id = Interlocked.Increment(ref _channelIdCounter);
-        Channels[id] = Channel.CreateUnbounded<object>();
+        Channels[id] = new ResourceWrapper<Channel<object>>(Channel.CreateUnbounded<object>());
         return id;
     }
 
@@ -428,7 +537,7 @@ public static class AsyncLib
         }
 
         var id = Interlocked.Increment(ref _channelIdCounter);
-        Channels[id] = Channel.CreateBounded<object>(capacity);
+        Channels[id] = new ResourceWrapper<Channel<object>>(Channel.CreateBounded<object>(capacity));
         return id;
     }
 
@@ -439,10 +548,13 @@ public static class AsyncLib
     /// <param name="value">要发送的数据</param>
     public static void ChannelSend(int channelId, object value)
     {
-        if (!Channels.TryGetValue(channelId, out var channel))
+        if (!Channels.TryGetValue(channelId, out var wrapper))
         {
             throw new ArgumentException($"Channel ID {channelId} 不存在");
         }
+        
+        wrapper.UpdateLastAccessTime();
+        var channel = wrapper.Resource;
 
         channel.Writer.WriteAsync(value).GetAwaiter().GetResult();
     }
@@ -456,10 +568,13 @@ public static class AsyncLib
     /// <returns>是否成功发送</returns>
     public static bool ChannelTrySend(int channelId, object value, int timeoutMs)
     {
-        if (!Channels.TryGetValue(channelId, out var channel))
+        if (!Channels.TryGetValue(channelId, out var wrapper))
         {
             throw new ArgumentException($"Channel ID {channelId} 不存在");
         }
+        
+        wrapper.UpdateLastAccessTime();
+        var channel = wrapper.Resource;
 
         var task = channel.Writer.WriteAsync(value).AsTask();
         return task.Wait(timeoutMs);
@@ -472,10 +587,13 @@ public static class AsyncLib
     /// <returns>接收到的数据</returns>
     public static object ChannelReceive(int channelId)
     {
-        if (!Channels.TryGetValue(channelId, out var channel))
+        if (!Channels.TryGetValue(channelId, out var wrapper))
         {
             throw new ArgumentException($"Channel ID {channelId} 不存在");
         }
+        
+        wrapper.UpdateLastAccessTime();
+        var channel = wrapper.Resource;
 
         return channel.Reader.ReadAsync().GetAwaiter().GetResult();
     }
@@ -488,10 +606,13 @@ public static class AsyncLib
     /// <returns>接收到的数据，如果超时则返回 null</returns>
     public static object? ChannelTryReceive(int channelId, int timeoutMs)
     {
-        if (!Channels.TryGetValue(channelId, out var channel))
+        if (!Channels.TryGetValue(channelId, out var wrapper))
         {
             throw new ArgumentException($"Channel ID {channelId} 不存在");
         }
+        
+        wrapper.UpdateLastAccessTime();
+        var channel = wrapper.Resource;
 
         var task = channel.Reader.ReadAsync().AsTask();
         if (task.Wait(timeoutMs))
@@ -509,10 +630,13 @@ public static class AsyncLib
     /// <param name="channelId">Channel ID</param>
     public static void ChannelClose(int channelId)
     {
-        if (!Channels.TryGetValue(channelId, out var channel))
+        if (!Channels.TryGetValue(channelId, out var wrapper))
         {
             throw new ArgumentException($"Channel ID {channelId} 不存在");
         }
+        
+        wrapper.UpdateLastAccessTime();
+        var channel = wrapper.Resource;
 
         channel.Writer.Complete();
     }
@@ -523,10 +647,7 @@ public static class AsyncLib
     /// <param name="channelId">Channel ID</param>
     public static void ChannelDispose(int channelId)
     {
-        if (Channels.TryRemove(channelId, out _))
-        {
-            // Channel 会自动释放资源，无需手动 Dispose
-        }
+        Channels.TryRemove(channelId, out _);
     }
 
     #endregion
