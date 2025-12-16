@@ -311,42 +311,8 @@ public class Operation(
                             throw new InvalidOperationError(instance, "Retry 只能用于异步函数调用（如 func().Retry(...)）");
                         }
 
-                        // 创建一个包装的 Task，在其中实现重试逻辑
-                        var retryTask = Task.Run(async () =>
-                        {
-                            Exception? lastException = null;
-
-                            for (int i = 0; i <= retryCount.Value; i++)
-                            {
-                                try
-                                {
-                                    // 重新执行函数调用以获取新的 Task
-                                    var newTaskValue = funcCall.Run(manager);
-                                    if (newTaskValue is not TaskLangValue newTask)
-                                    {
-                                        throw new TypeError(instance, "Retry 只能用于返回 Task 的异步函数");
-                                    }
-
-                                    // 等待 Task 完成
-                                    return await newTask.AwaitAsync();
-                                }
-                                catch (Exception ex)
-                                {
-                                    lastException = ex;
-
-                                    if (i < retryCount.Value)
-                                    {
-                                        // 重试前延迟
-                                        await Task.Delay(delayMs);
-                                    }
-                                }
-                            }
-
-                            // 重试次数耗尽，抛出最后一次异常
-                            throw lastException ?? new Exception("任务执行失败，重试次数耗尽");
-                        });
-
-                        return new TaskLangValue(retryTask, CancellationToken.None, instance.Position);
+                        // 使用 TaskRetryHelper 创建重试任务，实现代码抽离
+                        return TaskRetryHelper.CreateRetryTask(funcCall, manager, retryCount.Value, delayMs, instance.Position);
                     }
 
                     // 其他方法调用（如 Then），使用扩展方法或 Dot 处理
