@@ -523,6 +523,33 @@ public static class AsyncLib
                 // Channel 会自动释放资源，无需手动 Dispose
             }
         }
+
+        // 清理闲置的 ReadWriteLock
+        foreach (var (id, wrapper) in ReadWriteLocks)
+        {
+            if (wrapper.IsIdle && ReadWriteLocks.TryRemove(id, out var removedWrapper))
+            {
+                removedWrapper.Resource.Dispose();
+            }
+        }
+
+        // 清理闲置的 CountDownLatch
+        foreach (var (id, wrapper) in CountDownLatches)
+        {
+            if (wrapper.IsIdle && CountDownLatches.TryRemove(id, out var removedWrapper))
+            {
+                removedWrapper.Resource.Dispose();
+            }
+        }
+
+        // 清理闲置的 CyclicBarrier
+        foreach (var (id, wrapper) in CyclicBarriers)
+        {
+            if (wrapper.IsIdle && CyclicBarriers.TryRemove(id, out var removedWrapper))
+            {
+                removedWrapper.Resource.Dispose();
+            }
+        }
     }
     
     #endregion
@@ -667,7 +694,494 @@ public static class AsyncLib
     }
 
     #endregion
-    
+
+    #region 高级并发原语
+
+    #region ReadWriteLock（读写锁）
+
+    // 读写锁存储 - 允许多个读者或单个写者访问资源
+    private static readonly ConcurrentDictionary<int, ResourceWrapper<ReaderWriterLockSlim>> ReadWriteLocks = new();
+    private static int _readWriteLockIdCounter = 0;
+
+    /// <summary>
+    /// 创建读写锁
+    /// </summary>
+    /// <returns>读写锁ID</returns>
+    public static int ReadWriteLockCreate()
+    {
+        var lockId = Interlocked.Increment(ref _readWriteLockIdCounter);
+        var rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        var wrapper = new ResourceWrapper<ReaderWriterLockSlim>(rwLock);
+
+        ReadWriteLocks.TryAdd(lockId, wrapper);
+
+        return lockId;
+    }
+
+    /// <summary>
+    /// 获取读锁
+    /// </summary>
+    /// <param name="lockId">读写锁ID</param>
+    public static void ReadLockAcquire(int lockId)
+    {
+        if (!ReadWriteLocks.TryGetValue(lockId, out var wrapper))
+        {
+            throw new InvalidOperationException($"读写锁 {lockId} 不存在");
+        }
+
+        wrapper.Resource.EnterReadLock();
+        wrapper.UpdateLastAccessTime();
+    }
+
+    /// <summary>
+    /// 释放读锁
+    /// </summary>
+    /// <param name="lockId">读写锁ID</param>
+    public static void ReadLockRelease(int lockId)
+    {
+        if (!ReadWriteLocks.TryGetValue(lockId, out var wrapper))
+        {
+            throw new InvalidOperationException($"读写锁 {lockId} 不存在");
+        }
+
+        wrapper.Resource.ExitReadLock();
+    }
+
+    /// <summary>
+    /// 获取写锁
+    /// </summary>
+    /// <param name="lockId">读写锁ID</param>
+    public static void WriteLockAcquire(int lockId)
+    {
+        if (!ReadWriteLocks.TryGetValue(lockId, out var wrapper))
+        {
+            throw new InvalidOperationException($"读写锁 {lockId} 不存在");
+        }
+
+        wrapper.Resource.EnterWriteLock();
+        wrapper.UpdateLastAccessTime();
+    }
+
+    /// <summary>
+    /// 释放写锁
+    /// </summary>
+    /// <param name="lockId">读写锁ID</param>
+    public static void WriteLockRelease(int lockId)
+    {
+        if (!ReadWriteLocks.TryGetValue(lockId, out var wrapper))
+        {
+            throw new InvalidOperationException($"读写锁 {lockId} 不存在");
+        }
+
+        wrapper.Resource.ExitWriteLock();
+    }
+
+    /// <summary>
+    /// 尝试获取读锁（带超时）
+    /// </summary>
+    /// <param name="lockId">读写锁ID</param>
+    /// <param name="timeoutMs">超时时间（毫秒）</param>
+    /// <returns>是否成功获取锁</returns>
+    public static bool ReadLockTryAcquire(int lockId, int timeoutMs)
+    {
+        if (!ReadWriteLocks.TryGetValue(lockId, out var wrapper))
+        {
+            throw new InvalidOperationException($"读写锁 {lockId} 不存在");
+        }
+
+        bool acquired = wrapper.Resource.TryEnterReadLock(timeoutMs);
+        if (acquired)
+        {
+            wrapper.UpdateLastAccessTime();
+        }
+        return acquired;
+    }
+
+    /// <summary>
+    /// 尝试获取写锁（带超时）
+    /// </summary>
+    /// <param name="lockId">读写锁ID</param>
+    /// <param name="timeoutMs">超时时间（毫秒）</param>
+    /// <returns>是否成功获取锁</returns>
+    public static bool WriteLockTryAcquire(int lockId, int timeoutMs)
+    {
+        if (!ReadWriteLocks.TryGetValue(lockId, out var wrapper))
+        {
+            throw new InvalidOperationException($"读写锁 {lockId} 不存在");
+        }
+
+        bool acquired = wrapper.Resource.TryEnterWriteLock(timeoutMs);
+        if (acquired)
+        {
+            wrapper.UpdateLastAccessTime();
+        }
+        return acquired;
+    }
+
+    /// <summary>
+    /// 释放读写锁资源
+    /// </summary>
+    /// <param name="lockId">读写锁ID</param>
+    public static void ReadWriteLockDispose(int lockId)
+    {
+        if (ReadWriteLocks.TryRemove(lockId, out var wrapper))
+        {
+            wrapper.Resource.Dispose();
+        }
+    }
+
+    #endregion
+
+    #region CountDownLatch（倒计时锁）
+
+    /// <summary>
+    /// 倒计时锁实现
+    /// </summary>
+    private class CountDownLatch : IDisposable
+    {
+        private int _count;
+        private readonly ManualResetEventSlim _event = new(false);
+
+        public CountDownLatch(int initialCount)
+        {
+            if (initialCount < 0)
+                throw new ArgumentOutOfRangeException(nameof(initialCount), "计数不能为负数");
+
+            _count = initialCount;
+
+            // 如果初始计数为0，立即设置信号
+            if (_count == 0)
+            {
+                _event.Set();
+            }
+        }
+
+        public void CountDown()
+        {
+            // 使用 Interlocked 确保线程安全的递减
+            int newCount = Interlocked.Decrement(ref _count);
+
+            // 如果计数达到0，设置信号
+            if (newCount == 0)
+            {
+                _event.Set();
+            }
+        }
+
+        public void Wait()
+        {
+            _event.Wait();
+        }
+
+        public bool Wait(int timeoutMs)
+        {
+            return _event.Wait(timeoutMs);
+        }
+
+        public int GetCount()
+        {
+            // 返回当前计数，但不允许小于0
+            int currentCount = Volatile.Read(ref _count);
+            return Math.Max(0, currentCount);
+        }
+
+        public void Dispose()
+        {
+            _event.Dispose();
+        }
+    }
+
+    // 倒计时锁存储
+    private static readonly ConcurrentDictionary<int, ResourceWrapper<CountDownLatch>> CountDownLatches = new();
+    private static int _countDownLatchIdCounter = 0;
+
+    /// <summary>
+    /// 创建倒计时锁
+    /// </summary>
+    /// <param name="count">初始计数</param>
+    /// <returns>倒计时锁ID</returns>
+    public static int CountDownLatchCreate(int count)
+    {
+        var latchId = Interlocked.Increment(ref _countDownLatchIdCounter);
+        var latch = new CountDownLatch(count);
+        var wrapper = new ResourceWrapper<CountDownLatch>(latch);
+
+        CountDownLatches.TryAdd(latchId, wrapper);
+
+        return latchId;
+    }
+
+    /// <summary>
+    /// 倒计时锁减1
+    /// </summary>
+    /// <param name="latchId">倒计时锁ID</param>
+    public static void CountDownLatchCountDown(int latchId)
+    {
+        if (!CountDownLatches.TryGetValue(latchId, out var wrapper))
+        {
+            throw new InvalidOperationException($"倒计时锁 {latchId} 不存在");
+        }
+
+        wrapper.Resource.CountDown();
+        wrapper.UpdateLastAccessTime();
+    }
+
+    /// <summary>
+    /// 等待倒计时锁归零
+    /// </summary>
+    /// <param name="latchId">倒计时锁ID</param>
+    public static void CountDownLatchWait(int latchId)
+    {
+        if (!CountDownLatches.TryGetValue(latchId, out var wrapper))
+        {
+            throw new InvalidOperationException($"倒计时锁 {latchId} 不存在");
+        }
+
+        wrapper.Resource.Wait();
+        wrapper.UpdateLastAccessTime();
+    }
+
+    /// <summary>
+    /// 等待倒计时锁归零（带超时）
+    /// </summary>
+    /// <param name="latchId">倒计时锁ID</param>
+    /// <param name="timeoutMs">超时时间（毫秒）</param>
+    /// <returns>是否在超时前完成等待</returns>
+    public static bool CountDownLatchWaitTimeout(int latchId, int timeoutMs)
+    {
+        if (!CountDownLatches.TryGetValue(latchId, out var wrapper))
+        {
+            throw new InvalidOperationException($"倒计时锁 {latchId} 不存在");
+        }
+
+        bool success = wrapper.Resource.Wait(timeoutMs);
+        wrapper.UpdateLastAccessTime();
+        return success;
+    }
+
+    /// <summary>
+    /// 获取当前计数
+    /// </summary>
+    /// <param name="latchId">倒计时锁ID</param>
+    /// <returns>当前计数值</returns>
+    public static int CountDownLatchGetCount(int latchId)
+    {
+        if (!CountDownLatches.TryGetValue(latchId, out var wrapper))
+        {
+            throw new InvalidOperationException($"倒计时锁 {latchId} 不存在");
+        }
+
+        wrapper.UpdateLastAccessTime();
+        return wrapper.Resource.GetCount();
+    }
+
+    /// <summary>
+    /// 释放倒计时锁资源
+    /// </summary>
+    /// <param name="latchId">倒计时锁ID</param>
+    public static void CountDownLatchDispose(int latchId)
+    {
+        if (CountDownLatches.TryRemove(latchId, out var wrapper))
+        {
+            wrapper.Resource.Dispose();
+        }
+    }
+
+    #endregion
+
+    #region CyclicBarrier（循环栅栏）
+
+    /// <summary>
+    /// 循环栅栏实现 - 线程同步点,所有参与者都到达后才能继续
+    /// </summary>
+    private class CyclicBarrier : IDisposable
+    {
+        private readonly int _participantCount;
+        private int _waitingCount = 0;
+        private readonly ManualResetEventSlim _event = new(false);
+        private readonly object _lock = new();
+
+        public CyclicBarrier(int participantCount)
+        {
+            if (participantCount <= 0)
+                throw new ArgumentOutOfRangeException(nameof(participantCount), "参与者数量必须大于0");
+
+            _participantCount = participantCount;
+        }
+
+        public void Await()
+        {
+            lock (_lock)
+            {
+                _waitingCount++;
+
+                // 如果所有参与者都到达了
+                if (_waitingCount >= _participantCount)
+                {
+                    // 重置计数器并发出信号
+                    _waitingCount = 0;
+                    _event.Set();
+                    _event.Reset();
+                    return;
+                }
+            }
+
+            // 等待其他参与者
+            _event.Wait();
+        }
+
+        public bool Await(int timeoutMs)
+        {
+            lock (_lock)
+            {
+                _waitingCount++;
+
+                // 如果所有参与者都到达了
+                if (_waitingCount >= _participantCount)
+                {
+                    // 重置计数器并发出信号
+                    _waitingCount = 0;
+                    _event.Set();
+                    _event.Reset();
+                    return true;
+                }
+            }
+
+            // 等待其他参与者（带超时）
+            bool success = _event.Wait(timeoutMs);
+
+            // 如果超时，需要减少等待计数
+            if (!success)
+            {
+                lock (_lock)
+                {
+                    _waitingCount--;
+                }
+            }
+
+            return success;
+        }
+
+        public int GetParticipantCount()
+        {
+            return _participantCount;
+        }
+
+        public int GetWaitingCount()
+        {
+            lock (_lock)
+            {
+                return _waitingCount;
+            }
+        }
+
+        public void Dispose()
+        {
+            _event.Dispose();
+        }
+    }
+
+    // 循环栅栏存储
+    private static readonly ConcurrentDictionary<int, ResourceWrapper<CyclicBarrier>> CyclicBarriers = new();
+    private static int _cyclicBarrierIdCounter = 0;
+
+    /// <summary>
+    /// 创建循环栅栏
+    /// </summary>
+    /// <param name="participantCount">参与者数量</param>
+    /// <returns>循环栅栏ID</returns>
+    public static int CyclicBarrierCreate(int participantCount)
+    {
+        var barrierId = Interlocked.Increment(ref _cyclicBarrierIdCounter);
+        var barrier = new CyclicBarrier(participantCount);
+        var wrapper = new ResourceWrapper<CyclicBarrier>(barrier);
+
+        CyclicBarriers.TryAdd(barrierId, wrapper);
+
+        return barrierId;
+    }
+
+    /// <summary>
+    /// 等待所有参与者到达栅栏
+    /// </summary>
+    /// <param name="barrierId">循环栅栏ID</param>
+    public static void CyclicBarrierAwait(int barrierId)
+    {
+        if (!CyclicBarriers.TryGetValue(barrierId, out var wrapper))
+        {
+            throw new InvalidOperationException($"循环栅栏 {barrierId} 不存在");
+        }
+
+        wrapper.Resource.Await();
+        wrapper.UpdateLastAccessTime();
+    }
+
+    /// <summary>
+    /// 等待所有参与者到达栅栏（带超时）
+    /// </summary>
+    /// <param name="barrierId">循环栅栏ID</param>
+    /// <param name="timeoutMs">超时时间（毫秒）</param>
+    /// <returns>是否在超时前所有参与者都到达</returns>
+    public static bool CyclicBarrierAwaitTimeout(int barrierId, int timeoutMs)
+    {
+        if (!CyclicBarriers.TryGetValue(barrierId, out var wrapper))
+        {
+            throw new InvalidOperationException($"循环栅栏 {barrierId} 不存在");
+        }
+
+        bool success = wrapper.Resource.Await(timeoutMs);
+        wrapper.UpdateLastAccessTime();
+        return success;
+    }
+
+    /// <summary>
+    /// 获取参与者数量
+    /// </summary>
+    /// <param name="barrierId">循环栅栏ID</param>
+    /// <returns>参与者总数</returns>
+    public static int CyclicBarrierGetParticipantCount(int barrierId)
+    {
+        if (!CyclicBarriers.TryGetValue(barrierId, out var wrapper))
+        {
+            throw new InvalidOperationException($"循环栅栏 {barrierId} 不存在");
+        }
+
+        wrapper.UpdateLastAccessTime();
+        return wrapper.Resource.GetParticipantCount();
+    }
+
+    /// <summary>
+    /// 获取当前等待的线程数量
+    /// </summary>
+    /// <param name="barrierId">循环栅栏ID</param>
+    /// <returns>当前等待线程数</returns>
+    public static int CyclicBarrierGetWaitingCount(int barrierId)
+    {
+        if (!CyclicBarriers.TryGetValue(barrierId, out var wrapper))
+        {
+            throw new InvalidOperationException($"循环栅栏 {barrierId} 不存在");
+        }
+
+        wrapper.UpdateLastAccessTime();
+        return wrapper.Resource.GetWaitingCount();
+    }
+
+    /// <summary>
+    /// 释放循环栅栏资源
+    /// </summary>
+    /// <param name="barrierId">循环栅栏ID</param>
+    public static void CyclicBarrierDispose(int barrierId)
+    {
+        if (CyclicBarriers.TryRemove(barrierId, out var wrapper))
+        {
+            wrapper.Resource.Dispose();
+        }
+    }
+
+    #endregion
+
+    #endregion
+
     #region 资源管理
     
     /// <summary>
@@ -717,6 +1231,33 @@ public static class AsyncLib
         
         // 清理所有 Channel
         Channels.Clear();
+
+        // 清理所有 ReadWriteLock
+        foreach (var (id, wrapper) in ReadWriteLocks)
+        {
+            if (ReadWriteLocks.TryRemove(id, out var removedWrapper))
+            {
+                removedWrapper.Resource.Dispose();
+            }
+        }
+
+        // 清理所有 CountDownLatch
+        foreach (var (id, wrapper) in CountDownLatches)
+        {
+            if (CountDownLatches.TryRemove(id, out var removedWrapper))
+            {
+                removedWrapper.Resource.Dispose();
+            }
+        }
+
+        // 清理所有 CyclicBarrier
+        foreach (var (id, wrapper) in CyclicBarriers)
+        {
+            if (CyclicBarriers.TryRemove(id, out var removedWrapper))
+            {
+                removedWrapper.Resource.Dispose();
+            }
+        }
     }
     
     #endregion

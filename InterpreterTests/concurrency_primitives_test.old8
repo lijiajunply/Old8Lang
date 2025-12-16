@@ -1,0 +1,204 @@
+// 高级并发原语测试 - 简化版
+// 测试 ReadWriteLock、CountDownLatch 和 CyclicBarrier
+import Async
+
+PrintLine("=== 并发原语测试开始 ===")
+
+// ===================================
+// 测试1: ReadWriteLock 基本创建和销毁
+// ===================================
+PrintLine("\n测试1: ReadWriteLock - 基本创建和销毁")
+
+rwLock1 <- ReadWriteLockCreate()
+PrintLine("创建读写锁 ID: " + rwLock1.ToStr())
+
+// 测试读锁
+ReadLockAcquire(rwLock1)
+PrintLine("获取读锁成功")
+ReadLockRelease(rwLock1)
+PrintLine("释放读锁成功")
+
+// 测试写锁
+WriteLockAcquire(rwLock1)
+PrintLine("获取写锁成功")
+WriteLockRelease(rwLock1)
+PrintLine("释放写锁成功")
+
+ReadWriteLockDispose(rwLock1)
+PrintLine("✓ ReadWriteLock 基本测试通过")
+
+// ===================================
+// 测试2: ReadWriteLock - 多次获取和释放
+// ===================================
+PrintLine("\n测试2: ReadWriteLock - 多次获取和释放")
+
+rwLock2 <- ReadWriteLockCreate()
+
+// 连续获取和释放读锁
+ReadLockAcquire(rwLock2)
+ReadLockAcquire(rwLock2)  // 递归获取
+PrintLine("递归获取读锁成功")
+ReadLockRelease(rwLock2)
+ReadLockRelease(rwLock2)
+PrintLine("递归释放读锁成功")
+
+// 获取和释放写锁
+WriteLockAcquire(rwLock2)
+PrintLine("获取写锁成功")
+WriteLockRelease(rwLock2)
+PrintLine("释放写锁成功")
+
+ReadWriteLockDispose(rwLock2)
+PrintLine("✓ ReadWriteLock 多次获取释放测试通过")
+
+
+// ===================================
+// 测试3: CountDownLatch - 基本创建和倒计时
+// ===================================
+PrintLine("\n测试3: CountDownLatch - 基本功能")
+
+latch1 <- CountDownLatchCreate(3)
+PrintLine("创建倒计时锁 ID: " + latch1.ToStr() + ", 初始计数: 3")
+
+count <- CountDownLatchGetCount(latch1)
+Assert(count, 3)
+PrintLine("当前计数: " + count.ToStr())
+
+// 倒计时 3 次
+CountDownLatchCountDown(latch1)
+count1 <- CountDownLatchGetCount(latch1)
+Assert(count1, 2)
+PrintLine("倒计时一次，当前计数: " + count1.ToStr())
+
+CountDownLatchCountDown(latch1)
+count2 <- CountDownLatchGetCount(latch1)
+Assert(count2, 1)
+PrintLine("倒计时两次，当前计数: " + count2.ToStr())
+
+CountDownLatchCountDown(latch1)
+count3 <- CountDownLatchGetCount(latch1)
+Assert(count3, 0)
+PrintLine("倒计时三次，当前计数: " + count3.ToStr())
+
+// 等待（应该立即返回，因为已经归零）
+CountDownLatchWait(latch1)
+PrintLine("等待完成")
+
+CountDownLatchDispose(latch1)
+PrintLine("✓ CountDownLatch 基本功能测试通过")
+
+// ===================================
+// 测试4: CountDownLatch - 初始计数为0
+// ===================================
+PrintLine("\n测试4: CountDownLatch - 初始计数为0")
+
+latch2 <- CountDownLatchCreate(0)
+count4 <- CountDownLatchGetCount(latch2)
+Assert(count4, 0)
+
+// 应该立即返回
+CountDownLatchWait(latch2)
+PrintLine("等待立即返回（计数为0）")
+
+CountDownLatchDispose(latch2)
+PrintLine("✓ 初始计数为0测试通过")
+
+// ===================================
+// 测试5: CountDownLatch - 带超时的等待
+// ===================================
+PrintLine("\n测试5: CountDownLatch - 带超时的等待")
+
+latch3 <- CountDownLatchCreate(5)
+
+// 等待应该超时（因为计数还没归零）
+waitSuccess <- CountDownLatchWaitTimeout(latch3, 100)
+if waitSuccess {
+    PrintLine("错误：不应该等待成功")
+} else {
+    PrintLine("正确：等待超时（计数未归零）")
+}
+
+count5 <- CountDownLatchGetCount(latch3)
+Assert(count5, 5)
+
+CountDownLatchDispose(latch3)
+PrintLine("✓ 带超时的等待测试通过")
+
+// ===================================
+// 测试6: CyclicBarrier - 基本创建
+// ===================================
+PrintLine("\n测试6: CyclicBarrier - 基本创建")
+
+barrier1 <- CyclicBarrierCreate(3)
+PrintLine("创建循环栅栏 ID: " + barrier1.ToStr() + ", 参与者数量: 3")
+
+participantCount1 <- CyclicBarrierGetParticipantCount(barrier1)
+Assert(participantCount1, 3)
+PrintLine("参与者数量: " + participantCount1.ToStr())
+
+waitingCount1 <- CyclicBarrierGetWaitingCount(barrier1)
+Assert(waitingCount1, 0)
+PrintLine("当前等待数量: " + waitingCount1.ToStr())
+
+CyclicBarrierDispose(barrier1)
+PrintLine("✓ CyclicBarrier 基本创建测试通过")
+
+// ===================================
+// 测试7: CyclicBarrier - 参数验证
+// ===================================
+PrintLine("\n测试7: CyclicBarrier - 参数验证")
+
+barrier2 <- CyclicBarrierCreate(5)
+participantCount2 <- CyclicBarrierGetParticipantCount(barrier2)
+Assert(participantCount2, 5)
+
+barrier3 <- CyclicBarrierCreate(10)
+participantCount3 <- CyclicBarrierGetParticipantCount(barrier3)
+Assert(participantCount3, 10)
+
+CyclicBarrierDispose(barrier2)
+CyclicBarrierDispose(barrier3)
+PrintLine("✓ 参数验证测试通过")
+
+// ===================================
+// 测试8: 综合测试 - 资源清理
+// ===================================
+PrintLine("\n测试8: 综合测试 - 资源清理")
+
+// 创建多个资源
+locks <- {}
+for i <- 0, i < 5, i++ {
+    lock <- ReadWriteLockCreate()
+    locks.Add(lock)
+}
+
+latches <- {}
+for i <- 0, i < 5, i++ {
+    latch <- CountDownLatchCreate(i + 1)
+    latches.Add(latch)
+}
+
+barriers <- {}
+for i <- 0, i < 5, i++ {
+    barrier <- CyclicBarrierCreate(i + 1)
+    barriers.Add(barrier)
+}
+
+PrintLine("创建了 5 个读写锁、5 个倒计时锁、5 个循环栅栏")
+
+// 清理所有资源
+for lock in locks {
+    ReadWriteLockDispose(lock)
+}
+
+for latch in latches {
+    CountDownLatchDispose(latch)
+}
+
+for barrier in barriers {
+    CyclicBarrierDispose(barrier)
+}
+
+PrintLine("✓ 资源清理测试通过")
+
+PrintLine("\n=== 所有并发原语测试通过 ===")

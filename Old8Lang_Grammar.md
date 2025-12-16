@@ -729,6 +729,160 @@ PrintLine("Final counter: " + counter)  // 应该输出 10000
 | 上下文切换 | 较高开销 | 较低开销 |
 | 编程复杂度 | 较高（需要手动同步） | 较低（编译器处理异步流程） |
 
+#### 5.6.6 高级并发原语
+
+Old8Lang 提供了高级并发原语，帮助处理复杂的多线程同步场景。这些原语通过 `Async` 库提供。
+
+##### ReadWriteLock（读写锁）
+
+读写锁允许多个读者同时访问资源，或单个写者独占访问资源，适用于读多写少的场景：
+
+```old8
+import Async
+
+// 创建读写锁
+rwLock <- ReadWriteLockCreate()
+
+// 读者线程 - 多个读者可以同时读取
+func reader(id:int) -> void {
+    ReadLockAcquire(rwLock)
+    PrintLine("读者 " + id.ToStr() + " 正在读取")
+    Thread.Sleep(100)
+    ReadLockRelease(rwLock)
+}
+
+// 写者线程 - 写者独占访问
+func writer(id:int) -> void {
+    WriteLockAcquire(rwLock)
+    PrintLine("写者 " + id.ToStr() + " 正在写入")
+    Thread.Sleep(100)
+    WriteLockRelease(rwLock)
+}
+
+// 启动多个读者
+for i <- 0, i < 3, i++ {
+    spawn(reader, i)
+}
+
+// 尝试获取锁（带超时）
+success <- ReadLockTryAcquire(rwLock, 1000)
+if success {
+    ReadLockRelease(rwLock)
+}
+
+// 清理资源
+ReadWriteLockDispose(rwLock)
+```
+
+**ReadWriteLock 方法：**
+- `ReadWriteLockCreate()` - 创建读写锁
+- `ReadLockAcquire(lockId)` - 获取读锁
+- `ReadLockRelease(lockId)` - 释放读锁
+- `WriteLockAcquire(lockId)` - 获取写锁
+- `WriteLockRelease(lockId)` - 释放写锁
+- `ReadLockTryAcquire(lockId, timeoutMs)` - 尝试获取读锁（带超时）
+- `WriteLockTryAcquire(lockId, timeoutMs)` - 尝试获取写锁（带超时）
+- `ReadWriteLockDispose(lockId)` - 释放读写锁资源
+
+##### CountDownLatch（倒计时锁）
+
+倒计时锁用于等待一组操作完成，计数器归零后所有等待的线程都会继续执行：
+
+```old8
+import Async
+
+// 创建倒计时锁，初始计数为3
+latch <- CountDownLatchCreate(3)
+
+// 工作线程
+func worker(id:int) -> void {
+    PrintLine("工作线程 " + id.ToStr() + " 开始工作")
+    Thread.Sleep(1000)
+    PrintLine("工作线程 " + id.ToStr() + " 完成工作")
+
+    // 完成工作后倒计时
+    CountDownLatchCountDown(latch)
+}
+
+// 启动3个工作线程
+for i <- 0, i < 3, i++ {
+    spawn(worker, i)
+}
+
+PrintLine("主线程等待所有工作线程完成...")
+
+// 等待计数归零
+CountDownLatchWait(latch)
+
+PrintLine("所有工作线程已完成，主线程继续执行")
+
+// 清理资源
+CountDownLatchDispose(latch)
+```
+
+**CountDownLatch 方法：**
+- `CountDownLatchCreate(count)` - 创建倒计时锁
+- `CountDownLatchCountDown(latchId)` - 倒计时减1
+- `CountDownLatchWait(latchId)` - 等待计数归零
+- `CountDownLatchWaitTimeout(latchId, timeoutMs)` - 等待计数归零（带超时）
+- `CountDownLatchGetCount(latchId)` - 获取当前计数
+- `CountDownLatchDispose(latchId)` - 释放倒计时锁资源
+
+##### CyclicBarrier（循环栅栏）
+
+循环栅栏是一个同步点，所有参与者线程都到达栅栏后才能继续执行。与 CountDownLatch 不同，CyclicBarrier 可以重复使用：
+
+```old8
+import Async
+
+// 创建循环栅栏，3个参与者
+barrier <- CyclicBarrierCreate(3)
+
+// 参与者线程
+func participant(id:int) -> void {
+    // 第一阶段工作
+    PrintLine("参与者 " + id.ToStr() + " 完成第一阶段")
+    CyclicBarrierAwait(barrier)  // 等待其他参与者
+
+    // 第二阶段工作
+    PrintLine("参与者 " + id.ToStr() + " 完成第二阶段")
+    CyclicBarrierAwait(barrier)  // 再次等待（循环使用）
+
+    PrintLine("参与者 " + id.ToStr() + " 全部完成")
+}
+
+// 启动3个参与者
+threads <- {}
+for i <- 0, i < 3, i++ {
+    t <- spawn(participant, i)
+    threads.Add(t)
+}
+
+// 等待所有参与者完成
+for t in threads {
+    t.Join()
+}
+
+// 清理资源
+CyclicBarrierDispose(barrier)
+```
+
+**CyclicBarrier 方法：**
+- `CyclicBarrierCreate(participantCount)` - 创建循环栅栏
+- `CyclicBarrierAwait(barrierId)` - 等待所有参与者到达
+- `CyclicBarrierAwaitTimeout(barrierId, timeoutMs)` - 等待所有参与者到达（带超时）
+- `CyclicBarrierGetParticipantCount(barrierId)` - 获取参与者数量
+- `CyclicBarrierGetWaitingCount(barrierId)` - 获取当前等待的线程数
+- `CyclicBarrierDispose(barrierId)` - 释放循环栅栏资源
+
+**使用场景：**
+
+| 并发原语 | 适用场景 | 特点 |
+|---------|---------|------|
+| ReadWriteLock | 读多写少的共享数据访问 | 允许多个读者或单个写者 |
+| CountDownLatch | 等待一组操作完成 | 一次性使用，计数归零后不可重置 |
+| CyclicBarrier | 多线程协同分阶段执行 | 可重复使用，所有线程同步 |
+
 ### 5.7 异常处理
 
 #### 5.7.1 try-catch-finally 语句
