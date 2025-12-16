@@ -1,0 +1,9 @@
+// 简单的默认参数测试
+
+func add(a: int, b: 10) -> int {
+    return a + b;
+}
+
+// 执行测试
+PrintLine("add(5): " + add(5));
+PrintLine("add(5, 20): " + add(5, 20));

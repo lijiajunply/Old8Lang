@@ -199,6 +199,12 @@ public class LangId(string name, string assumptionType = "", LangExpression? def
             };
         }
 
+        // 如果没有显式类型注解，但有默认值，从默认值推断类型
+        if (DefaultValue != null)
+        {
+            return DefaultValue.OutputType(local) ?? typeof(object);
+        }
+
         if (local.InClassEnv != null && IdName == "this")
         {
             // 如果InClassEnv是TypeBuilder，返回typeof(object)，避免后续访问TypeBuilder的成员

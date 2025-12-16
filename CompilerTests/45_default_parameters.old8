@@ -1,0 +1,44 @@
+// 测试默认参数的编译模式
+// 测试函数定义和调用时的默认参数处理
+
+// 测试1：基本默认参数
+func add(a: int, b: 10) -> int {
+    return a + b;
+}
+
+// 测试2：多个默认参数
+func multiply(a: 2, b: 3, c: 4) -> int {
+    return a * b * c;
+}
+
+// 测试3：不同类型的默认参数
+func mixed(a: 1, b: 2.5, c: "hello") -> string {
+    return "a:" + a + ", b:" + b + ", c:" + c;
+}
+
+// 测试4：调用时省略部分默认参数
+func partialDefault(a: int, b: 10, c: 20) -> int {
+    return a + b + c;
+}
+
+// 执行测试
+PrintLine("测试1：基本默认参数");
+PrintLine("add(5): " + add(5));
+PrintLine("add(5, 20): " + add(5, 20));
+
+PrintLine("\n测试2：多个默认参数");
+PrintLine("multiply(): " + multiply());
+PrintLine("multiply(5): " + multiply(5));
+PrintLine("multiply(5, 6): " + multiply(5, 6));
+PrintLine("multiply(5, 6, 7): " + multiply(5, 6, 7));
+
+PrintLine("\n测试3：不同类型的默认参数");
+PrintLine("mixed(): " + mixed());
+PrintLine("mixed(10): " + mixed(10));
+PrintLine("mixed(10, 3.14): " + mixed(10, 3.14));
+PrintLine("mixed(10, 3.14, \"world\"): " + mixed(10, 3.14, "world"));
+
+PrintLine("\n测试4：调用时省略部分默认参数");
+PrintLine("partialDefault(1): " + partialDefault(1));
+PrintLine("partialDefault(1, 2): " + partialDefault(1, 2));
+PrintLine("partialDefault(1, 2, 3): " + partialDefault(1, 2, 3));

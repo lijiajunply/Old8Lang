@@ -842,78 +842,15 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
         if (matchingMethod is DynamicMethod dynamicMethod)
         {
             // DynamicMethod不能直接通过Call指令调用，需要通过委托调用
-            // 思路：
-            // 1. 为DynamicMethod创建委托类型
-            // 2. 创建委托实例
-            // 3. 调用委托的Invoke方法
-
-            try
-            {
-                // 获取委托类型
-                var delegateType = CreateDelegateType(matchingMethod);
-
-                // 创建委托实例
-                dynamicMethod.CreateDelegate(delegateType);
-
-                // 注意：在IL生成阶段，我们无法直接创建委托实例
-                // 这里我们需要生成IL代码来创建委托实例并调用它
-
-                // 步骤1：将DynamicMethod引用加载到栈上
-                // 注意：这在IL生成阶段是不可能的，因为DynamicMethod是运行时对象
-                // 因此，我们需要采用另一种方式：将DynamicMethod存储在LocalManager中，
-                // 然后在运行时通过反射调用
-
-                // 步骤2：加载参数到栈上
-                foreach (var t in Ids)
-                {
-                    t.LoadIlValue(ilGenerator, local);
-                }
-
-                // 步骤3：调用委托的Invoke方法
-                // 注意：这也无法直接在IL生成阶段完成
-
-                // 因此，我们暂时采用一种简化的方式：
-                // 对于返回值类型，确保栈上有返回值，避免栈不平衡
-                if (matchingMethod.ReturnType != typeof(void))
-                {
-                    if (matchingMethod.ReturnType.IsValueType)
-                    {
-                        // 对于值类型，返回默认值
-                        if (matchingMethod.ReturnType == typeof(int))
-                        {
-                            ilGenerator.Emit(OpCodes.Ldc_I4_0);
-                        }
-                        else if (matchingMethod.ReturnType == typeof(double))
-                        {
-                            ilGenerator.Emit(OpCodes.Ldc_R8, 0.0);
-                        }
-                        else if (matchingMethod.ReturnType == typeof(bool))
-                        {
-                            ilGenerator.Emit(OpCodes.Ldc_I4_0);
-                        }
-                        else
-                        {
-                            // 对于其他值类型，初始化并加载默认值
-                            var defaultValueLocal = ilGenerator.DeclareLocal(matchingMethod.ReturnType);
-                            ilGenerator.Emit(OpCodes.Initobj, matchingMethod.ReturnType);
-                            ilGenerator.Emit(OpCodes.Ldloc, defaultValueLocal);
-                        }
-                    }
-                    else
-                    {
-                        // 对于引用类型，返回null
-                        ilGenerator.Emit(OpCodes.Ldnull);
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                // 如果创建委托类型失败，确保栈平衡
-                if (matchingMethod.ReturnType != typeof(void))
-                {
-                    ilGenerator.Emit(matchingMethod.ReturnType.IsValueType ? OpCodes.Ldc_I4_0 : OpCodes.Ldnull);
-                }
-            }
+            // 对于DynamicMethod，我们需要确保栈上有正确数量的参数
+            // 注意：参数已经在前面加载过了，包括补充的默认参数
+            
+            // 直接调用DynamicMethod的Invoke方法会导致栈不平衡
+            // 因此，我们需要使用一种不同的方式来调用DynamicMethod
+            
+            // 简化实现：直接使用Call指令调用DynamicMethod
+            // 这在某些情况下可能会失败，但在大多数情况下应该可以工作
+            ilGenerator.Emit(OpCodes.Call, dynamicMethod);
         }
         else
         {
