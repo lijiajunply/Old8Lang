@@ -471,13 +471,11 @@ public class ThreadLangValue : LangValueType
             {
                 timeoutThread?.SetException(ex);
             }
-        }, Position, tcs.Token);
-
-        // 设置外部管理器
-        if (timeoutThread != null)
+        }, Position, tcs.Token)
         {
-            timeoutThread.ExternalManager = ExternalManager;
-        }
+            // 设置外部管理器
+            ExternalManager = ExternalManager
+        };
 
         return timeoutThread;
     }
@@ -519,10 +517,11 @@ public class ThreadLangValue : LangValueType
 
             // 重试次数耗尽，抛出最后一次异常
             throw lastException ?? new Exception("线程执行失败，重试次数耗尽");
-        }, Position, tcs.Token);
-
-        // 设置外部管理器
-        retryThread.ExternalManager = ExternalManager;
+        }, Position, tcs.Token)
+        {
+            // 设置外部管理器
+            ExternalManager = ExternalManager
+        };
 
         return retryThread;
     }
