@@ -1,0 +1,82 @@
+// 线程安全测试
+
+// 测试线程创建和 Join 方法
+func testThreadJoin() {
+    result: int <- 0
+    
+    // 创建一个线程，执行简单的加法操作
+    thread <- spawn(() -> {
+        for i in [0~100] {
+            result <- result + 1
+        }
+    })
+    
+    // 等待线程完成
+    thread.Join()
+    
+    PrintLine("线程执行结果: " + result)
+    PrintLine("线程是否已完成: " + thread.IsCompleted)
+}
+
+// 测试多个线程同时访问共享资源
+func testMultiThreadSafety() {
+    counter: int <- 0
+    threads: list <- {}
+    
+    // 创建 10 个线程，每个线程执行 1000 次加法
+    for i in [0~10] {
+        thread <- spawn(() -> {
+            for j in [0~1000] {
+                counter <- counter + 1
+            }
+        })
+        threads.Add(thread)
+    }
+    
+    // 等待所有线程完成
+    for thread in threads {
+        thread.Join()
+    }
+    
+    PrintLine("多线程执行结果: " + counter)
+    PrintLine("预期结果: 10000")
+}
+
+// 测试 IsCompleted 属性的线程安全性
+func testIsCompletedSafety() {
+    thread <- spawn(() -> {
+        // 模拟耗时操作
+        Thread.Sleep(1000)
+    })
+    
+    // 多次检查 IsCompleted 属性
+    for i in [0~20] {
+        completed: bool <- thread.IsCompleted
+        PrintLine("第 " + i + " 次检查，线程是否已完成: " + completed)
+        Thread.Sleep(100) // 等待 100ms
+    }
+    
+    // 最后等待线程完成并再次检查
+    thread.Join()
+    PrintLine("最终检查，线程是否已完成: " + thread.IsCompleted)
+}
+
+// 测试线程异常处理
+func testThreadException() {
+    thread <- spawn(() -> {
+        // 模拟异常
+        throw Exception("线程执行异常测试")
+    })
+    
+    try {
+        thread.Join()
+    } catch (e) {
+        PrintLine("捕获到线程异常: " + e.Message)
+    }
+}
+
+// 运行所有测试
+testThreadJoin()
+testMultiThreadSafety()
+testIsCompletedSafety()
+testThreadException()

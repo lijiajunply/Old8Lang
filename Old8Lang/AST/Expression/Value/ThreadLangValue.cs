@@ -16,6 +16,11 @@ public class ThreadLangValue : LangValueType
     private readonly Thread _thread;
 
     /// <summary>
+    /// 线程安全锁
+    /// </summary>
+    private readonly object _lock = new();
+
+    /// <summary>
     /// 线程执行结果
     /// </summary>
     private object? _result;
@@ -62,12 +67,15 @@ public class ThreadLangValue : LangValueType
     {
         _thread.Join();
 
-        if (_exception != null)
+        lock (_lock)
         {
-            throw new InvalidOperationError(this, "线程执行异常: " + _exception.ToString());
-        }
+            if (_exception != null)
+            {
+                throw new InvalidOperationError(this, "线程执行异常: " + _exception.ToString());
+            }
 
-        return ObjToValue(_result!);
+            return ObjToValue(_result!);
+        }
     }
 
     /// <summary>
@@ -76,8 +84,11 @@ public class ThreadLangValue : LangValueType
     /// <param name="result">执行结果</param>
     public void SetResult(object result)
     {
-        _result = result;
-        _isCompleted = true;
+        lock (_lock)
+        {
+            _result = result;
+            _isCompleted = true;
+        }
     }
 
     /// <summary>
@@ -86,8 +97,11 @@ public class ThreadLangValue : LangValueType
     /// <param name="exception">异常对象</param>
     public void SetException(Exception exception)
     {
-        _exception = exception;
-        _isCompleted = true;
+        lock (_lock)
+        {
+            _exception = exception;
+            _isCompleted = true;
+        }
     }
 
     /// <summary>
@@ -98,7 +112,16 @@ public class ThreadLangValue : LangValueType
     /// <summary>
     /// 检查线程是否已完成
     /// </summary>
-    public bool IsCompleted => _isCompleted;
+    public bool IsCompleted
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _isCompleted;
+            }
+        }
+    }
 
     /// <summary>
     /// 将对象转换为语言值类型
