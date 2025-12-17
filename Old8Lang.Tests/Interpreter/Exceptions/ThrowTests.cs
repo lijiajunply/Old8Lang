@@ -1,4 +1,5 @@
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
@@ -355,8 +356,19 @@ public class ThrowTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<StringLangValue>(result);
-        Assert.Equal("Found forbidden item: banana", ((StringLangValue)result).Value);
+
+        // result 应该是 ErrorLangValue，我们需要获取其 FriendlyMessage
+        if (result is ErrorLangValue errorValue)
+        {
+            Assert.Equal("Found forbidden item: banana", errorValue.FriendlyMessage);
+        }
+        else
+        {
+            // 如果不是 ErrorLangValue，尝试转换为字符串
+            var stringResult = result as StringLangValue;
+            Assert.NotNull(stringResult);
+            Assert.Equal("Found forbidden item: banana", stringResult.Value);
+        }
     }
 
     [Fact]
@@ -509,8 +521,19 @@ public class ThrowTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("caughtMessage"));
         Assert.NotNull(result);
-        Assert.IsType<StringLangValue>(result);
-        Assert.Equal("Dynamic error message with value: 42", ((StringLangValue)result).Value);
+
+        // result 应该是 ErrorLangValue，我们需要获取其 FriendlyMessage
+        if (result is ErrorLangValue errorValue)
+        {
+            Assert.Equal("Dynamic error message with value: 42", errorValue.FriendlyMessage);
+        }
+        else
+        {
+            // 如果不是 ErrorLangValue，尝试转换为字符串
+            var stringResult = result as StringLangValue;
+            Assert.NotNull(stringResult);
+            Assert.Equal("Dynamic error message with value: 42", stringResult.Value);
+        }
     }
 
     [Fact]
@@ -680,16 +703,18 @@ public class ThrowTests
             b <- 0
             try {
                 switch operation {
-                    case ""add"":
+                    case ""add""{
                         result <- a + b
-                    case ""subtract"":
-                        result <- a - b
-                    case ""divide"":
+                    }
+                    case ""subtract""
+                        {result <- a - b}
+                    case ""divide"" {
                         if b == 0 {
                             throw ""Division by zero in switch case""
                         }
                         result <- a / b
-                    default:
+                    }
+                    default
                         result <- 0
                 }
             } catch {

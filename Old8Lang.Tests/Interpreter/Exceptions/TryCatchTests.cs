@@ -3,6 +3,7 @@ using Xunit;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
+using Old8Lang.AST.Expression.Intermediates;
 
 namespace Old8Lang.Tests.Interpreter.Exceptions;
 
@@ -60,12 +61,24 @@ public class TryCatchTests
 
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result")) as StringLangValue;
-        var caughtException = interpreter.Manager.GetValue(new LangId("caughtException")) as StringLangValue;
+        var caughtException = interpreter.Manager.GetValue(new LangId("caughtException"));
 
         Assert.NotNull(result);
         Assert.NotNull(caughtException);
         Assert.Equal("caught", result.Value);
-        Assert.Equal("test error", caughtException.Value);
+
+        // caughtException 应该是 ErrorLangValue，我们需要获取其 FriendlyMessage
+        if (caughtException is ErrorLangValue errorValue)
+        {
+            Assert.Equal("test error", errorValue.FriendlyMessage);
+        }
+        else
+        {
+            // 如果不是 ErrorLangValue，尝试转换为字符串
+            var stringException = caughtException as StringLangValue;
+            Assert.NotNull(stringException);
+            Assert.Equal("test error", stringException.Value);
+        }
     }
 
     [Fact]

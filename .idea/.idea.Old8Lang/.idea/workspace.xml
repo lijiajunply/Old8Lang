@@ -18,16 +18,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/check_if_result.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_if_detailed.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_task_issue.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_if_isolated.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_if_simple.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/IfChild.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/IfChild.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/IfStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/IfStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/FinallyTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/FinallyTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/ThrowTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/ThrowTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/TryCatchTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/TryCatchTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ErrorLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ErrorLangValue.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,6 +75,8 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/EdgeCases/EmptyInputTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Exceptions/ErrorPropagationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Exceptions/NestedExceptionTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Exceptions/TryCatchTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Exceptions/TryCatchTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Expressions/ArithmeticTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Expressions/TypeConversionTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/InterpreterBoundaryTests.cs" root0="SKIP_HIGHLIGHTING" />
@@ -126,6 +123,9 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/FuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/FuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/FuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/ErrorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/ErrorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/ErrorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/ErrorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/ErrorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
@@ -927,7 +927,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="242" />
+    <option name="localTasksCounter" value="243" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -954,7 +954,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(async): 优化异步函数作用域管理和执行结果处理&#10;&#10;- 修改异步函数作用域捕获机制，直接引用外部作用域并为每个任务创建独立参数作用域&#10;- 调整异步函数执行逻辑，确保并发安全性和作用域隔离&#10;- 改进 FuncStatic 中的 Task 处理，支持非 Task 返回值自动包装&#10;- 更新 async_mutex 测试用例，验证异步任务计数和结果返回功能&#10;- 完善异步函数执行完成后的作用域清理逻辑" />
     <MESSAGE value="feat(async): 改进异步函数重试机制和作用域管理&#10;&#10;- 引入Time模块支持基于时间的重试测试&#10;- 优化flakyTask重试逻辑，使用时间判断替代全局计数器&#10;- 调整Retry方法参数，增加重试次数和延迟时间&#10;- 更新异步测试用例，增强重试功能验证&#10;- 改进异步函数作用域隔离机制，确保并发安全性" />
     <MESSAGE value="feat(filelib): 完善文件库基础功能并跳过未实现特性测试&#10;&#10;- 更新文件行数统计方式，使用 Len 函数替代 Length 属性&#10;- 注释掉 CSV、XML 和 YAML 文件操作的具体测试逻辑&#10;- 调整测试结束提示信息，明确当前仅完成基础功能测试&#10;- 清理不再需要的测试文件删除列表项&#10;- 优化方法调用参数检查逻辑，支持可选参数处理&#10;- 增强 FuncLangValue 中方法调用的参数类型转换机制&#10;- 补充缺失可选参数的默认值填充逻辑&#10;- 提高对数组类型参数的支持能力，增强类型兼容性" />
     <MESSAGE value="feat(core): 重构值类型扩展方法并新增正则表达式库&#10;&#10;- 将值类型扩展方法拆分到独立的 ValueFunctions 命名空间&#10;- 新增 AnyValueFuncStatic 类处理 JSON 序列化和反序列化&#10;- 新增 DictionaryValueFuncStatic 类提供字典操作功能&#10;- 新增 ListValueFuncStatic 类增强列表操作功能&#10;- 更新 Instance.cs 中的类型引用路径以适配新的命名空间结构&#10;- 新增 RegexLib.cs 提供正则表达式匹配、替换和提取功能&#10;- 添加 Regex.old8 声明文件以支持正则表达式库的原生导入&#10;- 优化错误处理和参数验证逻辑&#10;- 完善代码文档注释和类型安全检查" />
@@ -979,7 +978,8 @@
     <MESSAGE value="refactor(tests): 更新集合访问方法以使用新API&#10;&#10;- 将ArrayLangValue的Value属性访问改为GetItems()方法调用&#10;- 将ListLangValue的Value属性访问改为Values属性访问&#10;- 统一使用ElementAt()方法访问数组元素&#10;- 更新所有相关测试断言以匹配新的API调用方式&#10;- 确保测试逻辑不变仅修改访问方式" />
     <MESSAGE value="fix(interpreter): 修复整数除法和异常处理逻辑&#10;&#10;- 调整算术测试中整数除法期望值，确保截断小数部分&#10;- 更新除法结果类型断言为 IntLangValue 类型&#10;- 优化 AwaitExpression 异常展开逻辑，抛出内部异常&#10;- 使用箭头函数语法替换部分匿名函数定义&#10;- 增强 ErrorException 和 ErrorLangValue 的友好消息处理&#10;- TryStatement 默认提供 exception 变量用于异常捕获&#10;- 类方法命名规范化，init 方法名使用小写开头&#10;- 移除无用表达式语句，精简测试代码逻辑" />
     <MESSAGE value="fix(interpreter): 修复变量赋值和作用域管理问题&#10;&#10;- 修复函数内部变量访问，使用 this 关键字明确引用成员变量&#10;- 更新字符串长度函数调用为 len() 和 Len()&#10;- 支持数字与字符串拼接，自动转换为字符串类型&#10;- 保持函数上下文标志，确保变量遮蔽正常工作&#10;- 解析整数字面量时，超出范围自动转为双精度浮点数&#10;- 规范变量命名，移除特殊字符如 '$'&#10;- 类构造函数命名统一为小写 init&#10;- 循环语法更新为 [1~5] 格式&#10;- 常量声明语法调整为 x:const &lt;- 100&#10;- 实现只读变量管理机制，支持 const 声明和修改检查&#10;- 优化作用域查找逻辑，支持变量遮蔽和只读检查&#10;- 清理作用域时同步清理只读变量记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(interpreter): 修复变量赋值和作用域管理问题&#10;&#10;- 修复函数内部变量访问，使用 this 关键字明确引用成员变量&#10;- 更新字符串长度函数调用为 len() 和 Len()&#10;- 支持数字与字符串拼接，自动转换为字符串类型&#10;- 保持函数上下文标志，确保变量遮蔽正常工作&#10;- 解析整数字面量时，超出范围自动转为双精度浮点数&#10;- 规范变量命名，移除特殊字符如 '$'&#10;- 类构造函数命名统一为小写 init&#10;- 循环语法更新为 [1~5] 格式&#10;- 常量声明语法调整为 x:const &lt;- 100&#10;- 实现只读变量管理机制，支持 const 声明和修改检查&#10;- 优化作用域查找逻辑，支持变量遮蔽和只读检查&#10;- 清理作用域时同步清理只读变量记录" />
+    <MESSAGE value="fix(interpreter): 修复if语句作用域管理和Task类型处理问题&#10;&#10;- 在IfStatement中临时禁用函数上下文，允许修改外部变量&#10;- 恢复原始的IsFunc状态，确保作用域管理正确&#10;- 添加对Task和Task&lt;T&gt;类型的处理，等待结果后递归转换&#10;- 在EndToEndTests中添加调试信息，验证变量值和AST结构&#10;- 添加passCount变量的手动比较检查，确保逻辑正确&#10;- 使用ITestOutputHelper输出详细的测试调试信息" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(interpreter): 修复if语句作用域管理和Task类型处理问题&#10;&#10;- 在IfStatement中临时禁用函数上下文，允许修改外部变量&#10;- 恢复原始的IsFunc状态，确保作用域管理正确&#10;- 添加对Task和Task&lt;T&gt;类型的处理，等待结果后递归转换&#10;- 在EndToEndTests中添加调试信息，验证变量值和AST结构&#10;- 添加passCount变量的手动比较检查，确保逻辑正确&#10;- 使用ITestOutputHelper输出详细的测试调试信息" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1152,6 +1152,45 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="574" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/FinallyTests.cs</url>
+          <line>520</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/FinallyTests.cs" containingFunctionPresentation="方法 'Finally_WithArrayOperations_CleansUpArrayResources'">
+            <startOffsets>
+              <option value="17974" />
+            </startOffsets>
+            <endOffsets>
+              <option value="18025" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="575" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/FinallyTests.cs</url>
+          <line>427</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/FinallyTests.cs" containingFunctionPresentation="方法 'Finally_WithFunctionCall_ExecutesFinallyInFunction'">
+            <startOffsets>
+              <option value="14722" />
+            </startOffsets>
+            <endOffsets>
+              <option value="14785" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="576" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/FinallyTests.cs</url>
+          <line>425</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/FinallyTests.cs" containingFunctionPresentation="方法 'Finally_WithFunctionCall_ExecutesFinallyInFunction'">
+            <startOffsets>
+              <option value="14642" />
+            </startOffsets>
+            <endOffsets>
+              <option value="14665" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="577" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />

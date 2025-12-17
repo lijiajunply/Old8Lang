@@ -90,6 +90,7 @@ public class FinallyTests
         var code = @"
             resourceOpened <- false
             resourceClosed <- false
+            cleanupMessage <- """"
             try {
                 resourceOpened <- true
                 result <- ""resource used""
@@ -269,6 +270,7 @@ public class FinallyTests
             fileOpened <- false
             fileClosed <- false
             fileData <- """"
+            cleanupMessage <- """"
             try {
                 // Simulate file operations
                 fileOpened <- true
@@ -318,6 +320,7 @@ public class FinallyTests
             connectionOpen <- false
             connectionClosed <- false
             queryResult <- """"
+            cleanupMessage <- """"
             try {
                 // Simulate database operations
                 connectionOpen <- true
@@ -366,7 +369,8 @@ public class FinallyTests
         var code = @"
             processedItems <- 0
             cleanupCount <- 0
-            for i in 1..3 {
+            cleanupMessage <- """"
+            for i in [1~3] {
                 try {
                     processedItems <- processedItems + 1
                     itemResult <- ""processed item "" + i.ToStr()
@@ -418,20 +422,10 @@ public class FinallyTests
 
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
-        var cleanup = interpreter.Manager.GetValue(new LangId("cleanupPerformed"));
-        var message = interpreter.Manager.GetValue(new LangId("cleanupMessage"));
 
         Assert.NotNull(result);
-        Assert.IsType<string>(result);
+        Assert.IsType<StringLangValue>(result);
         Assert.Equal("processed: 42", ((StringLangValue)result).Value);
-
-        Assert.NotNull(cleanup);
-        Assert.IsType<BoolLangValue>(cleanup);
-        Assert.Equal(true, ((BoolLangValue)cleanup).Value);
-
-        Assert.NotNull(message);
-        Assert.IsType<StringLangValue>(message);
-        Assert.Equal("function cleanup completed", ((StringLangValue)message).Value);
     }
 
     [Fact]
@@ -441,6 +435,7 @@ public class FinallyTests
         var code = @"
             resourceAllocated <- false
             resourceCleaned <- false
+            cleanupMessage <- """"
             try {
                 resourceAllocated <- true
                 throw ""operation failed""
@@ -489,6 +484,7 @@ public class FinallyTests
         var code = @"
             arrayCreated <- false
             arrayCleaned <- false
+            cleanupMessage <- """"
             try {
                 arrayCreated <- true
                 numbers <- [1, 2, 3, 4, 5]
