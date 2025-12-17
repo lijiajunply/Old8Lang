@@ -1,5 +1,4 @@
 using Old8Lang.AST.Expression;
-using Xunit;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Value;
 

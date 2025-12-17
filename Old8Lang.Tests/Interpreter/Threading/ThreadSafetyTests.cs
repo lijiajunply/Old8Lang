@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Xunit;
 using Xunit.Abstractions;
-using Old8Lang;
 using Old8Lang.Interpreter;
 namespace Old8Lang.Tests.Interpreter.Threading;
 /// <summary>

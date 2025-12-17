@@ -1,13 +1,8 @@
-using System;
-using System.Threading.Tasks;
-using Xunit;
 using Xunit.Abstractions;
-using Old8Lang;
+
 namespace Old8Lang.Tests.Interpreter.Modules;
 using Old8Lang.Interpreter;
-using Old8Lang.AST.Expression.Intermediates;
 using System.Collections.Generic;
-using System.Linq;
 
 /// <summary>
 /// 原生库导入测试
