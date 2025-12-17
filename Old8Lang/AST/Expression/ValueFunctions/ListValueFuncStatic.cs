@@ -201,6 +201,15 @@ public static class ListValueFuncStatic
 
             return new IntLangValue(-1); // 未找到返回-1
         }
+
+        /// <summary>
+        /// 获取列表元素数量
+        /// </summary>
+        /// <returns>包含元素数量的IntLangValue</returns>
+        public IntLangValue Count()
+        {
+            return new IntLangValue(langValue.Values.Count);
+        }
     }
 
     /// <summary>
