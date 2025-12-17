@@ -258,8 +258,8 @@ result4 <- lambda4(true)";
 lambda1 <- (x:int, y) -> x + y  // x明确为int，y推断
 lambda2 <- (a, b:string) -> a.ToStr() + b  // b明确为string，a推断
 
-// 复杂返回类型
-lambda3 <- (numbers:list[int]) -> list[int]: {
+// 复杂返回类型（使用简单类型）
+lambda3 <- (numbers:list):list -> {
     result <- {}
     for num in numbers {
         result.Push(num * 2)

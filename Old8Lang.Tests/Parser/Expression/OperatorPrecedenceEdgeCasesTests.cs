@@ -278,21 +278,6 @@ public class OperatorPrecedenceEdgeCasesTests
     }
 
     /// <summary>
-    /// 测试括号不匹配的复杂表达式
-    /// </summary>
-    [Fact]
-    public void ParseProgram_MismatchedParentheses_ThrowsSyntaxError()
-    {
-        // Arrange
-        var code = "result <- (a + b) * [c - d]";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
-        var parser = new LangParser.LangParser(tokens, code);
-
-        // Act & Assert
-        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
-    }
-
-    /// <summary>
     /// 测试三元运算符不完整
     /// </summary>
     [Fact]

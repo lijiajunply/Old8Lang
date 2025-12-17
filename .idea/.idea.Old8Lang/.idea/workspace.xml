@@ -18,15 +18,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Reports/Old8Lang.Tests修复实施报告-2025-12-17.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Language/ThreadNativeTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Language/ThreadNativeTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Classes/AccessModifiersTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Classes/AccessModifiersTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Classes/ConstructorsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Classes/ConstructorsTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/ExceptionHandling/BasicExceptionHandlingTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/ExceptionHandling/BasicExceptionHandlingTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/OperatorPrecedenceEdgeCasesTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/OperatorPrecedenceEdgeCasesTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Interfaces/InterfaceBasicsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Interfaces/InterfaceBasicsTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Lambda/LambdaTypeInferenceTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Lambda/LambdaTypeInferenceTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -168,6 +160,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/ExpressionParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/ExpressionParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/ExpressionParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
@@ -852,7 +845,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="224" />
+    <option name="localTasksCounter" value="225" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -879,7 +872,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(async): 实现异步任务重试与链式调用功能&#10;&#10;- 新增 TaskLangValue 的 ExternalManager 属性，用于访问外部作用域&#10;- 实现 TaskLangValue 的 Retry 和 Then 扩展方法&#10;- 支持通过 flakyTask().Retry(3, 200) 语法实现任务重试&#10;- 支持通过 task.Then(nextTaskFunc) 实现任务链式调用&#10;- 优化异步函数执行时的作用域管理和调用栈处理&#10;- 统一异常抛出语法，去除 new Error() 用法&#10;- 改进异步流处理中的字段命名和访问方式&#10;- 增强异步任务状态管理与线程安全性&#10;- 更新测试用例以验证新的异步功能&#10;- 修复 Instance.cs 中的方法调用参数处理逻辑&#10;- 移除无用的 Task 属性 XAUAT" />
     <MESSAGE value="feat(lang): 实现 Retry 方法支持异步函数重试&#10;&#10;- 添加了对异步函数调用重试的支持&#10;- 实现了可配置的重试次数和延迟时间&#10;- 增加了参数验证和类型检查&#10;- 创建了新的 Task 包装器以支持重试逻辑&#10;- 提供了详细的错误提示信息&#10;- 修复了 Retry 方法的执行机制，确保每次重试都重新执行原函数" />
     <MESSAGE value="feat(async): 实现异步库资源自动清理机制&#10;&#10;- 添加 ResourceWrapper 类包装资源并跟踪访问时间&#10;- 引入定时器定期清理闲置资源&#10;- 更新 Mutex、Semaphore、AtomicInt、Channel 和 CancellationTokenSource 的存储结构&#10;- 修改所有资源操作方法以更新最后访问时间&#10;- 实现 CleanupResources 方法遍历并释放闲置资源&#10;- 添加取消令牌源的相关操作支持&#10;- 优化 Channel 操作逻辑以适配新的资源包装结构" />
     <MESSAGE value="fix(compiler): 修复编译模式下函数缺少返回值类型注解的问题&#10;&#10;- 调整了简单代码编译测试用例，补充函数返回值类型注解&#10;- 修改了中等复杂度代码编译测试用例，明确函数返回类型&#10;- 更新了复杂代码编译测试用例，为函数参数添加类型注解&#10;- 修正了生成IL相关测试用例中的函数类型定义问题&#10;- 完善了执行编译后代码测试用例的类型声明&#10;- 优化了多重编译场景下的类型检查逻辑&#10;- 改进了IL验证测试用例的函数签名定义" />
@@ -904,7 +896,8 @@
     <MESSAGE value="feat(lang): 完善类声明语法支持并修复编译器模式类型推断&#10;&#10;- 更新 ClassFuncInitStatement.GenerateIl 方法注释，明确类方法IL生成由ClassInit处理&#10;- 改进 Instance.LoadIlValue 方法，支持TypeBuilder查找和临时object类型处理&#10;- 优化 Operation.OutputType 方法，增强TypeBuilder类型推断逻辑&#10;- 修复 Instance.OutputType 方法，完善类类型查找机制&#10;- 添加综合类声明语法测试文件 comprehensive_class_declaration_test.old8&#10;- 添加类执行测试文件 comprehensive_class_execution_test.old8&#10;- 添加简单类编译器测试 simple_class_compiler_test.old8&#10;- 添加调试类类型测试 debug_class_type.old8&#10;- 更新 workspace.xml 配置，包含新增测试文件和变更记录" />
     <MESSAGE value="feat(parser): 添加抽象类、访问修饰符和异步语法的解析支持&#10;&#10;- 实现抽象类声明和继承语法解析&#10;- 支持抽象方法重载和构造函数链&#10;- 添加public、private、protected、static访问修饰符解析&#10;- 实现async/await异步函数语法解析&#10;- 支持类中异步方法和静态异步方法&#10;- 完善错误语法检测和异常处理机制" />
     <MESSAGE value="feat(tests): 添加边界条件和错误场景测试套件&#10;&#10;- 新增 SimpleBoundaryTests.cs 文件，包含 9 个边界条件测试方法&#10;- 覆盖数值边界、空值处理、空集合操作、字符串边界等场景&#10;- 实现集合索引、循环边界、类型转换和基础错误处理测试&#10;- 添加未终止字符串语法错误检测测试&#10;- 更新测试报告至第三阶段语法测试实施报告&#10;- 优化 LambdaParsingTests.cs 中的字符串字面量格式&#10;- 更新 workspace.xml 配置文件，反映新增测试文件和变更记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(tests): 添加边界条件和错误场景测试套件&#10;&#10;- 新增 SimpleBoundaryTests.cs 文件，包含 9 个边界条件测试方法&#10;- 覆盖数值边界、空值处理、空集合操作、字符串边界等场景&#10;- 实现集合索引、循环边界、类型转换和基础错误处理测试&#10;- 添加未终止字符串语法错误检测测试&#10;- 更新测试报告至第三阶段语法测试实施报告&#10;- 优化 LambdaParsingTests.cs 中的字符串字面量格式&#10;- 更新 workspace.xml 配置文件，反映新增测试文件和变更记录" />
+    <MESSAGE value="fix(tests): 修复线程和语法错误检测测试&#10;&#10;- 更新线程测试使用正确的 Old8Lang 语法 (spawn 而非 Thread)&#10;- 修复访问修饰符测试中的无效类语法场景&#10;- 修正构造函数测试中的语法错误用例&#10;- 调整异常处理测试以正确触发语法错误&#10;- 更新操作符优先级测试中的表达式&#10;- 移除不完整的接口声明测试用例&#10;- 修正 Lambda 类型推断的语法格式&#10;- 优化线程测试通过返回值而非共享变量传递结果&#10;- 修复线程属性调用和集合操作的语法问题&#10;- 提高语法错误检测测试的准确性和稳定性" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(tests): 修复线程和语法错误检测测试&#10;&#10;- 更新线程测试使用正确的 Old8Lang 语法 (spawn 而非 Thread)&#10;- 修复访问修饰符测试中的无效类语法场景&#10;- 修正构造函数测试中的语法错误用例&#10;- 调整异常处理测试以正确触发语法错误&#10;- 更新操作符优先级测试中的表达式&#10;- 移除不完整的接口声明测试用例&#10;- 修正 Lambda 类型推断的语法格式&#10;- 优化线程测试通过返回值而非共享变量传递结果&#10;- 修复线程属性调用和集合操作的语法问题&#10;- 提高语法错误检测测试的准确性和稳定性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

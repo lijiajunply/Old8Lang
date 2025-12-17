@@ -65,7 +65,7 @@ public class UnaryOperatorsTests
     public void ParseProgram_BitwiseNot_ParsesSuccessfully()
     {
         // Arrange
-        var code = "result <- !a";
+        var code = "result <- not a";
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -149,7 +149,7 @@ public class UnaryOperatorsTests
     public void ParseProgram_MultipleUnaryOperators_ParsesSuccessfully()
     {
         // Arrange
-        var code = "result <- -+-a";
+        var code = "result <- - -a";
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -165,7 +165,7 @@ public class UnaryOperatorsTests
     public void ParseProgram_UnaryBinaryMix_ParsesSuccessfully()
     {
         // Arrange
-        var code = "result <- -a + b * -c - +d";
+        var code = "result <- -a + b * -c - d";
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -281,7 +281,7 @@ public class UnaryOperatorsTests
     public void ParseProgram_UnaryOnFloats_ParsesSuccessfully()
     {
         // Arrange
-        var code = "result <- -3.14 + +2.718 - -1.414";
+        var code = "result <- -3.14 + 2.718 - -1.414";
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 

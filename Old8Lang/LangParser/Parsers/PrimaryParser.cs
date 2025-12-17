@@ -608,37 +608,51 @@ public class PrimaryParser(
         }
         
         // 检查是否是Lambda表达式：() -> block 或 (params) -> block
-        if (CurrentToken.Type == LangTokenType.RightParen && Peek().Type == LangTokenType.Arrow)
+        if (CurrentToken.Type == LangTokenType.RightParen)
         {
-            // 无参数Lambda：() -> block 或 () -> expression
             Expect(LangTokenType.RightParen);
-            Expect(LangTokenType.Arrow);
 
-            BlockStatement block;
-
-            // 检查是块语句还是表达式
-            if (CurrentToken.Type == LangTokenType.LeftBrace)
+            // 检查是否有返回类型注解：():returnType -> ...
+            LangId? returnTypeAnnotation = null;
+            if (CurrentToken.Type == LangTokenType.Colon && Peek().Type == LangTokenType.Identifier)
             {
-                // 块语句：() -> { ... }
-                block = statementParserFactory().ParseBlock();
-            }
-            else
-            {
-                // 表达式：() -> expression
-                // 我们需要将表达式转换为块语句，添加return
-                var expr = expressionParserFactory().ParseExpression();
-                var returnStmt = new ReturnStatement(expr, position);
-                block = new BlockStatement([returnStmt]);
+                Expect(LangTokenType.Colon);
+                var returnTypeName = CurrentToken.Value;
+                Expect(LangTokenType.Identifier);
+                returnTypeAnnotation = new LangId("", returnTypeName, null, position);
             }
 
-            // 创建Lambda表达式，根据isAsync标志决定创建AsyncFuncLangValue还是FuncLangValue
-            if (isAsync)
+            // 检查箭头符号
+            if (CurrentToken.Type == LangTokenType.Arrow)
             {
-                return new AsyncFuncLangValue(null, [], block, position);
-            }
-            else
-            {
-                return new FuncLangValue(null, [], block, position, true);
+                Expect(LangTokenType.Arrow);
+
+                BlockStatement block;
+
+                // 检查是块语句还是表达式
+                if (CurrentToken.Type == LangTokenType.LeftBrace)
+                {
+                    // 块语句：():returnType -> { ... }
+                    block = statementParserFactory().ParseBlock();
+                }
+                else
+                {
+                    // 表达式：():returnType -> expression
+                    // 我们需要将表达式转换为块语句，添加return
+                    var expr = expressionParserFactory().ParseExpression();
+                    var returnStmt = new ReturnStatement(expr, position);
+                    block = new BlockStatement([returnStmt]);
+                }
+
+                // 创建Lambda表达式，根据isAsync标志决定创建AsyncFuncLangValue还是FuncLangValue
+                if (isAsync)
+                {
+                    return new AsyncFuncLangValue(returnTypeAnnotation, [], block, position);
+                }
+                else
+                {
+                    return new FuncLangValue(returnTypeAnnotation, [], block, position, true);
+                }
             }
         }
 
@@ -660,7 +674,7 @@ public class PrimaryParser(
         if (CurrentToken.Type == LangTokenType.Identifier)
         {
             // 解析第一个参数，允许类型注解
-            ids.Add(functionParser.ParseTypedIdentifier(true));
+            ids.Add(ParseLambdaParameter());
 
             // 解析更多参数，允许类型注解
             while (CurrentToken.Type == LangTokenType.Comma)
@@ -673,41 +687,72 @@ public class PrimaryParser(
                     break;
                 }
 
-                ids.Add(functionParser.ParseTypedIdentifier(true));
+                ids.Add(ParseLambdaParameter());
             }
 
-            // 检查是否有箭头符号
-            if (isLambda && CurrentToken.Type == LangTokenType.RightParen && Peek().Type == LangTokenType.Arrow)
+            // 检查是否有箭头符号或返回类型注解
+            if (isLambda && CurrentToken.Type == LangTokenType.RightParen)
             {
-                // Lambda表达式：(params) -> block 或 (params) -> expression
                 Expect(LangTokenType.RightParen);
-                Expect(LangTokenType.Arrow);
 
-                BlockStatement block;
+                // 检查是否有返回类型注解：(params):returnType -> ...
+                LangId? returnTypeAnnotation = null;
+                if (CurrentToken.Type == LangTokenType.Colon)
+                {
+                    Expect(LangTokenType.Colon);
 
-                // 检查是块语句还是表达式
-                if (CurrentToken.Type == LangTokenType.LeftBrace)
-                {
-                    // 块语句：(params) -> { ... }
-                    block = statementParserFactory().ParseBlock();
-                }
-                else
-                {
-                    // 表达式：(params) -> expression
-                    // 我们需要将表达式转换为块语句，添加return
-                    var expr = expressionParserFactory().ParseExpression();
-                    var returnStmt = new ReturnStatement(expr, position);
-                    block = new BlockStatement([returnStmt]);
+                    // 解析简单返回类型注解
+                    if (CurrentToken.Type == LangTokenType.Identifier)
+                    {
+                        var returnTypeName = CurrentToken.Value;
+                        Expect(LangTokenType.Identifier);
+
+                        // 验证是否为支持的类型
+                        var supportedTypes = new[] { "int", "double", "string", "bool", "char", "void", "list", "dict" };
+                        if (!supportedTypes.Contains(returnTypeName))
+                        {
+                            throw CreateSyntaxError($"不支持的返回类型注解: {returnTypeName}。支持的类型: int, double, string, bool, char, void, list, dict");
+                        }
+
+                        returnTypeAnnotation = new LangId("", returnTypeName, null, position);
+                    }
+                    else
+                    {
+                        throw CreateSyntaxError($"期望返回类型名称，但得到 {CurrentToken.Type}");
+                    }
                 }
 
-                // 创建Lambda表达式，根据isAsync标志决定创建AsyncFuncLangValue还是FuncLangValue
-                if (isAsync)
+                // 检查箭头符号
+                if (CurrentToken.Type == LangTokenType.Arrow)
                 {
-                    return new AsyncFuncLangValue(null, ids, block, position);
-                }
-                else
-                {
-                    return new FuncLangValue(null, ids, block, position, true);
+                    Expect(LangTokenType.Arrow);
+
+                    BlockStatement block;
+
+                    // 检查是块语句还是表达式
+                    if (CurrentToken.Type == LangTokenType.LeftBrace)
+                    {
+                        // 块语句：(params):returnType -> { ... }
+                        block = statementParserFactory().ParseBlock();
+                    }
+                    else
+                    {
+                        // 表达式：(params):returnType -> expression
+                        // 我们需要将表达式转换为块语句，添加return
+                        var expr = expressionParserFactory().ParseExpression();
+                        var returnStmt = new ReturnStatement(expr, position);
+                        block = new BlockStatement([returnStmt]);
+                    }
+
+                    // 创建Lambda表达式，根据isAsync标志决定创建AsyncFuncLangValue还是FuncLangValue
+                    if (isAsync)
+                    {
+                        return new AsyncFuncLangValue(returnTypeAnnotation, ids, block, position);
+                    }
+                    else
+                    {
+                        return new FuncLangValue(returnTypeAnnotation, ids, block, position, true);
+                    }
                 }
             }
 
@@ -1144,5 +1189,57 @@ public class PrimaryParser(
         return new Instance(identifier, args);
     }
 
+    /// <summary>
+    /// 解析Lambda参数（支持简单类型注解）
+    /// </summary>
+    /// <returns>LangId标识符</returns>
+    private LangId ParseLambdaParameter()
+    {
+        var identifierToken = CurrentToken;
+        var position = new SourcePosition(identifierToken.Line, identifierToken.Column,
+            tokenValue: identifierToken.Value);
+        var value = identifierToken.Value;
+
+        // 检查当前token是否是标识符或关键字
+        if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.Func or LangTokenType.Class
+            or LangTokenType.If or LangTokenType.Else or LangTokenType.While or LangTokenType.For
+            or LangTokenType.Return or LangTokenType.Import or LangTokenType.True or LangTokenType.False)
+        {
+            CurrentIndex++;
+        }
+        else
+        {
+            Expect(LangTokenType.Identifier);
+        }
+
+        // 处理类型注解：identifier:type (只支持简单类型)
+        var typeAnnotation = "";
+        if (CurrentToken.Type == LangTokenType.Colon)
+        {
+            Expect(LangTokenType.Colon);
+
+            // 解析简单类型注解
+            if (CurrentToken.Type == LangTokenType.Identifier)
+            {
+                typeAnnotation = CurrentToken.Value;
+                Expect(LangTokenType.Identifier);
+
+                // 验证是否为支持的类型
+                var supportedTypes = new[] { "int", "double", "string", "bool", "char", "void", "list", "dict" };
+                if (!supportedTypes.Contains(typeAnnotation))
+                {
+                    throw CreateSyntaxError($"不支持的类型注解: {typeAnnotation}。支持的类型: int, double, string, bool, char, void, list, dict");
+                }
+            }
+            else
+            {
+                throw CreateSyntaxError($"期望类型名称，但得到 {CurrentToken.Type}");
+            }
+        }
+
+        return new LangId(value, typeAnnotation, null, position);
+    }
+
+    
     #endregion
 }
