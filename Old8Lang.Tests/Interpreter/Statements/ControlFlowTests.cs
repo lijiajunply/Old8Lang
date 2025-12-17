@@ -283,7 +283,7 @@ public class ControlFlowTests
                 }
             }
 
-            result <- ""Expensive electronics: "" + expensiveElectronics.Length.ToStr() + ", Affordable items: "" + affordableItems.Length.ToStr()
+            result <- ""Expensive electronics: "" + expensiveElectronics.Length.ToStr() + "", Affordable items: "" + affordableItems.Length.ToStr()
         ";
         var interpreter = new LangInterpreter();
 
@@ -385,7 +385,7 @@ public class ControlFlowTests
                 }
             }
 
-            result <- ""Count: "" + count.ToStr() + ", Sum of evens: "" + sum.ToStr()
+            result <- ""Count: "" + count.ToStr() + "", Sum of evens: "" + sum.ToStr()
         ";
         var interpreter = new LangInterpreter();
 
@@ -591,7 +591,7 @@ public class ControlFlowTests
 
                 status <- if hasFailed then ""Needs Improvement"" else ""Pass""
 
-                studentResult <- student[""name""] + "": " + average.ToStr() + " (" + grade + ") - " + status
+                studentResult <- student[""name""] + "": "" + average.ToStr() + "" ("" + grade + "") - "" + status
                 gradeStats.Add(studentResult)
             }
 

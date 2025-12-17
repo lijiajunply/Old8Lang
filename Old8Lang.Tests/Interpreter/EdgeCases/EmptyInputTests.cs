@@ -472,7 +472,7 @@ public class EmptyInputTests
         // Arrange
         var code = @"
             name <- """"
-            result <- $"""Hello {name}"""
+            result <- $""Hello {name}""
         ";
         var interpreter = new LangInterpreter();
 

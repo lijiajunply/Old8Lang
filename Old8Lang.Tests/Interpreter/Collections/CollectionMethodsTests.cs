@@ -213,7 +213,7 @@ public class CollectionMethodsTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<DictLangValue>(result);
+        Assert.IsType<DictionaryLangValue>(result);
     }
 
     [Fact]
