@@ -132,6 +132,8 @@ result2 <- ProcessUser(""Bob"", -5)";
 func test() {
     try {
         someOperation()
+    catch {  // 缺少右括号
+        handle()
     }
 }";
         var tokens = LangParser.LangInterpreter.Tokenize(code);

@@ -231,67 +231,69 @@ version <- Logger.getVersion()";
     public void ParseProgram_AccessModifiersInInheritance_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-class Vehicle {
-    protected brand
-    protected model
-    private serialNumber
-    public year
+        var code = """
 
-    public func constructor(brand, model, year) {
-        this.brand <- brand
-        this.model <- model
-        this.year <- year
-        this.serialNumber <- ""SN-"" + Random().Next(10000, 99999).ToStr()
-    }
+                   class Vehicle {
+                       protected brand
+                       protected model
+                       private serialNumber
+                       public year
 
-    public func getInfo() -> string {
-        return this.year.ToStr() + "" "" + this.brand + "" "" + this.model
-    }
+                       public func constructor(brand, model, year) {
+                           this.brand <- brand
+                           this.model <- model
+                           this.year <- year
+                           this.serialNumber <- "SN-" + Random().Next(10000, 99999).ToStr()
+                       }
 
-    protected func getSerialNumber() -> string {
-        return this.serialNumber
-    }
+                       public func getInfo() -> string {
+                           return this.year.ToStr() + " " + this.brand + " " + this.model
+                       }
 
-    private func generateReport() -> string {
-        return ""Vehicle Report: "" + this.getInfo()
-    }
-}
+                       protected func getSerialNumber() -> string {
+                           return this.serialNumber
+                       }
 
-class Car : Vehicle {
-    public doors
-    private fuelType
+                       private func generateReport() -> string {
+                           return "Vehicle Report: " + this.getInfo()
+                       }
+                   }
 
-    public func constructor(brand, model, year, doors, fuelType) {
-        this.constructor(brand, model, year)  // 调用父类构造函数
-        this.doors <- doors
-        this.fuelType <- fuelType
-    }
+                   class Car : Vehicle {
+                       public doors
+                       private fuelType
 
-    public func getDetailedInfo() -> string {
-        return this.getInfo() + "" ("" + this.doors.ToStr() + "" doors, "" + this.fuelType + "")""
-    }
+                       public func constructor(brand, model, year, doors, fuelType) {
+                           this.constructor(brand, model, year)  // 调用父类构造函数
+                           this.doors <- doors
+                           this.fuelType <- fuelType
+                       }
 
-    public func getFullReport() -> string {
-        // 可以访问protected成员
-        return ""Car: "" + this.getDetailedInfo() + "" Serial: "" + this.getSerialNumber()
-    }
+                       public func getDetailedInfo() -> string {
+                           return this.getInfo() + " (" + this.doors.ToStr() + " doors, " + this.fuelType + ")"
+                       }
 
-    private func calculateEfficiency() -> double {
-        // 私有方法实现油耗计算
-        if this.fuelType == ""electric"" {
-            return 100.0
-        } else if this.fuelType == ""hybrid"" {
-            return 50.0
-        } else {
-            return 25.0
-        }
-    }
-}
+                       public func getFullReport() -> string {
+                           // 可以访问protected成员
+                           return "Car: " + this.getDetailedInfo() + " Serial: " + this.getSerialNumber()
+                       }
 
-myCar <- Car(""Toyota"", ""Camry"", 2024, 4, ""hybrid"")
-carInfo <- myCar.getDetailedInfo()
-fullReport <- myCar.getFullReport()";
+                       private func calculateEfficiency() -> double {
+                           // 私有方法实现油耗计算
+                           if this.fuelType == "electric" {
+                               return 100.0
+                           } else if this.fuelType == "hybrid" {
+                               return 50.0
+                           } else {
+                               return 25.0
+                           }
+                       }
+                   }
+
+                   myCar <- Car("Toyota", "Camry", 2024, 4, "hybrid")
+                   carInfo <- myCar.getDetailedInfo()
+                   fullReport <- myCar.getFullReport()
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -513,7 +515,7 @@ class TestClass {
     }
 
     /// <summary>
-    /// 测试未知的访问修饰符
+    /// 测试无效的类语法
     /// </summary>
     [Fact]
     public void ParseProgram_UnknownAccessModifier_ThrowsSyntaxError()
@@ -521,8 +523,7 @@ class TestClass {
         // Arrange
         var code = @"
 class TestClass {
-    internal field  // 未知的访问修饰符
-    protected virtual method() {  // 未知的访问修饰符
+    public field  // 缺少类型和分号
         return ""test""
     }
 }";

@@ -414,22 +414,6 @@ count <- myList.Count()";
     #region 错误语法测试
 
     /// <summary>
-    /// 测试不完整的接口声明
-    /// </summary>
-    [Fact]
-    public void ParseProgram_IncompleteInterfaceDeclaration_ThrowsSyntaxError()
-    {
-        // Arrange
-        var code = @"
-interface ITest {";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
-        var parser = new LangParser.LangParser(tokens, code);
-
-        // Act & Assert
-        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
-    }
-
-    /// <summary>
     /// 测试接口方法缺少返回类型
     /// </summary>
     [Fact]

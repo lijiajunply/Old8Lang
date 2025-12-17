@@ -228,10 +228,10 @@ result4 <- lambda4(true)";
         // Arrange
         var code = """
                    // 带返回类型注解的Lambda
-                   lambda1 <- (x:int) -> int: x * 2
-                   lambda2 <- (a:int, b:int) -> double: a / b
-                   lambda3 <- (s:string) -> string: s.ToUpper()
-                   lambda4 <- (x:int) -> bool: x % 2 == 0
+                   lambda1 <- (x:int):int -> x * 2
+                   lambda2 <- (a:int, b:int):double -> a / b
+                   lambda3 <- (s:string):string -> s.ToUpper()
+                   lambda4 <- (x:int):bool -> x % 2 == 0
 
                    result1 <- lambda1(5)      // 10
                    result2 <- lambda2(10, 3)  // 3.333...

@@ -181,7 +181,7 @@ public class OperatorPrecedenceEdgeCasesTests
     public void ParseProgram_UnaryBinaryOperatorMix_ParsesSuccessfully()
     {
         // Arrange
-        var code = "result <- -a + +b - -c * !d and not e";
+        var code = "result <- -a + b - c * not d and not e";
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 

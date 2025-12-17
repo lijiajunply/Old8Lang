@@ -345,36 +345,38 @@ person <- Person(""Alice"", 30)";
     public void ParseProgram_ConstructorChaining_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-class Vehicle {
-    public brand
-    public model
-    public year
+        var code = """
 
-    public func constructor(brand, model, year: 2024) {
-        this.brand <- brand
-        this.model <- model
-        this.year <- year
-    }
-}
+                   class Vehicle {
+                       public brand
+                       public model
+                       public year
 
-class Car : Vehicle {
-    public doors
-    public fuelType
+                       public func constructor(brand, model, year: 2024) {
+                           this.brand <- brand
+                           this.model <- model
+                           this.year <- year
+                       }
+                   }
 
-    public func constructor(brand, model, doors: 4, fuelType: ""gasoline"") {
-        // 调用父类构造函数
-        this.constructor(brand, model)
-        this.doors <- doors
-        this.fuelType <- fuelType
-    }
+                   class Car : Vehicle {
+                       public doors
+                       public fuelType
 
-    public func getSpecs() -> string {
-        return this.year.ToStr() + "" "" + this.brand + "" "" + this.model + "" ("" + this.doors.ToStr() + "" doors, "" + this.fuelType + "")""
-    }
-}
+                       public func constructor(brand, model, doors: 4, fuelType: "gasoline") {
+                           // 调用父类构造函数
+                           this.constructor(brand, model)
+                           this.doors <- doors
+                           this.fuelType <- fuelType
+                       }
 
-myCar <- Car(""Toyota"", ""Camry"", 4, ""hybrid"")";
+                       public func getSpecs() -> string {
+                           return this.year.ToStr() + " " + this.brand + " " + this.model + " (" + this.doors.ToStr() + " doors, " + this.fuelType + ")"
+                       }
+                   }
+
+                   myCar <- Car("Toyota", "Camry", 4, "hybrid")
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -479,7 +481,7 @@ class TestClass {
     }
 
     /// <summary>
-    /// 测试不完整的构造函数定义
+    /// 测试无效的构造函数定义
     /// </summary>
     [Fact]
     public void ParseProgram_IncompleteConstructorDefinition_ThrowsSyntaxError()
@@ -487,9 +489,9 @@ class TestClass {
         // Arrange
         var code = @"
 class TestClass {
-    public func constructor(name) {
-        this.name <- name
-    // 缺少右大括号
+    public func constructor(  // 缺少右括号和参数列表
+        this.name <- ""test""
+    }
 }";
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
