@@ -1,0 +1,12 @@
+// 调试类类型推断
+class TestClass {
+    public value:int <- 100
+}
+
+func main() -> void {
+    // 简单测试，先不调用方法
+    t <- TestClass()
+    PrintLine("Instance created successfully")
+}
+
+main()

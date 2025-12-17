@@ -34,8 +34,9 @@ public class ClassFuncInitStatement : OldStatement
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        // FuncLangValue 没有 GenerateIl 方法，这里暂时留空
-        // 编译模式下可能需要实现此方法
+        // 类方法的IL生成由ClassInit.GenerateIl()中的DefineMethod方法处理
+        // 这里不需要生成任何IL代码，因为类方法已经在类定义时编译完成
+        // 这个语句主要用于将方法信息添加到类的TypeTemplate中，实际IL生成在ClassInit中完成
     }
 
     public override OldStatement this[int index] => this;

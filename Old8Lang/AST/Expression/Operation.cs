@@ -578,10 +578,20 @@ public class Operation(
         var leftType = Left?.OutputType(local);
         var rightType = Right?.OutputType(local);
 
-        // 如果leftType是TypeBuilder，返回typeof(object)，避免后续访问TypeBuilder的成员
-        if (leftType is TypeBuilder)
+        // 如果leftType是TypeBuilder，需要查找对应的已完成的类型
+        if (leftType is TypeBuilder typeBuilder)
         {
-            return typeof(object);
+            // 尝试从local.ClassVar中查找对应的已完成类型
+            var typeName = typeBuilder.Name;
+            if (local.ClassVar.TryGetValue(typeName, out var completedType))
+            {
+                leftType = completedType;
+            }
+            else
+            {
+                // 如果找不到对应的类型，说明类还在编译中，返回object
+                leftType = typeof(object);
+            }
         }
 
         // 处理成员访问（Dot操作符）
@@ -659,16 +669,36 @@ public class Operation(
         var leftType = Left?.OutputType(local);
         var rightType = Right?.OutputType(local);
 
-        // 如果leftType是TypeBuilder，返回typeof(object)，避免后续访问TypeBuilder的成员
-        if (leftType is TypeBuilder)
+        // 如果leftType是TypeBuilder，需要查找对应的已完成的类型
+        if (leftType is TypeBuilder typeBuilder)
         {
-            leftType = typeof(object);
+            // 尝试从local.ClassVar中查找对应的已完成类型
+            var typeName = typeBuilder.Name;
+            if (local.ClassVar.TryGetValue(typeName, out var completedType))
+            {
+                leftType = completedType;
+            }
+            else
+            {
+                // 如果找不到对应的类型，说明类还在编译中，返回object
+                leftType = typeof(object);
+            }
         }
 
-        // 如果rightType是TypeBuilder，返回typeof(object)，避免后续访问TypeBuilder的成员
-        if (rightType is TypeBuilder)
+        // 如果rightType是TypeBuilder，需要查找对应的已完成的类型
+        if (rightType is TypeBuilder rightTypeBuilder)
         {
-            rightType = typeof(object);
+            // 尝试从local.ClassVar中查找对应的已完成类型
+            var typeName = rightTypeBuilder.Name;
+            if (local.ClassVar.TryGetValue(typeName, out var completedType))
+            {
+                rightType = completedType;
+            }
+            else
+            {
+                // 如果找不到对应的类型，说明类还在编译中，返回object
+                rightType = typeof(object);
+            }
         }
 
         if (Left == null)
@@ -1248,10 +1278,10 @@ public class Operation(
                         // 找到了字段
                     }
                     // 如果 FieldVar 中没有，尝试从当前类型或父类中获取
-                    else if (local.InClassEnv is TypeBuilder typeBuilder)
+                    else if (local.InClassEnv is TypeBuilder classTypeBuilder)
                     {
                         // 对于 TypeBuilder，尝试从基类中查找字段
-                        var baseType = typeBuilder.BaseType;
+                        var baseType = classTypeBuilder.BaseType;
                         while (baseType != null && baseType != typeof(object))
                         {
                             fieldInfo = baseType.GetField(rightId.IdName, BindingFlags.Public | BindingFlags.Instance);

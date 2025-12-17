@@ -1,0 +1,209 @@
+// 类声明执行测试 - 解释器模式
+PrintLine("=== 类声明执行测试 ===")
+
+// 测试1: 基本类声明和方法
+PrintLine("\n1. 基本类声明:")
+class Person {
+    public name:string <- ""
+    public age:int <- 0
+
+    func init(name:string, age:int) {
+        this.name <- name
+        this.age <- age
+    }
+
+    func sayHello() -> string {
+        return "Hello, I'm " + this.name + " and I'm " + this.age.ToStr() + " years old"
+    }
+
+    func isAdult() -> bool {
+        return this.age >= 18
+    }
+}
+
+p <- Person("Alice", 25)
+PrintLine(p.sayHello())
+PrintLine("Is adult: " + p.isAdult().ToStr())
+
+// 测试2: 访问修饰符
+PrintLine("\n2. 访问修饰符:")
+class AccessTest {
+    public publicField:int <- 100
+    private privateField:string <- "secret"
+
+    static staticField:double <- 3.14
+    public static publicStaticField:int <- 42
+
+    func getPrivateField() -> string {
+        return this.privateField
+    }
+
+    func setPrivateField(value:string) {
+        this.privateField <- value
+    }
+}
+
+access <- AccessTest()
+PrintLine("Public field: " + access.publicField.ToStr())
+PrintLine("Private field via method: " + access.getPrivateField())
+access.setPrivateField("new secret")
+PrintLine("Modified private field: " + access.getPrivateField())
+PrintLine("Static field: " + AccessTest.staticField.ToStr())
+PrintLine("Public static field: " + AccessTest.publicStaticField.ToStr())
+
+// 测试3: 继承
+PrintLine("\n3. 继承:")
+class Animal {
+    public name:string <- ""
+
+    func init(name:string) {
+        this.name <- name
+    }
+
+    func makeSound() -> string {
+        return "Generic animal sound"
+    }
+
+    func getName() -> string {
+        return this.name
+    }
+}
+
+class Dog extends Animal {
+    public breed:string <- ""
+
+    func init(name:string, breed:string) {
+        this.name <- name
+        this.breed <- breed
+    }
+
+    func makeSound() -> string {
+        return "Woof! Woof!"
+    }
+
+    func getInfo() -> string {
+        return this.name + " is a " + this.breed
+    }
+}
+
+dog <- Dog("Buddy", "Golden Retriever")
+PrintLine("Dog name: " + dog.getName())
+PrintLine("Dog sound: " + dog.makeSound())
+PrintLine("Dog info: " + dog.getInfo())
+
+// 测试4: 接口实现
+PrintLine("\n4. 接口实现:")
+interface IDrawable {
+    func draw() -> void
+}
+
+interface IMovable {
+    func move(x:int, y:int) -> void
+}
+
+class Point implements IDrawable, IMovable {
+    public x:int <- 0
+    public y:int <- 0
+
+    func init(x:int, y:int) {
+        this.x <- x
+        this.y <- y
+    }
+
+    func draw() {
+        PrintLine("Drawing point at (" + this.x.ToStr() + ", " + this.y.ToStr() + ")")
+    }
+
+    func move(x:int, y:int) {
+        this.x <- x
+        this.y <- y
+        PrintLine("Moved to (" + x.ToStr() + ", " + y.ToStr() + ")")
+    }
+}
+
+point <- Point(5, 10)
+point.draw()
+point.move(15, 20)
+
+// 测试5: Mixin
+PrintLine("\n5. Mixin:")
+mixin Logger {
+    public func log(message:string) {
+        PrintLine("[LOG] " + message)
+    }
+}
+
+class User with Logger {
+    public name:string <- ""
+    public age:int <- 0
+
+    func init(name:string, age:int) {
+        this.name <- name
+        this.age <- age
+        this.log("User created: " + name)
+    }
+
+    func getInfo() -> string {
+        return this.name + " (" + this.age.ToStr() + ")"
+    }
+}
+
+user <- User("Bob", 30)
+PrintLine("User info: " + user.getInfo())
+user.log("User operation completed")
+
+// 测试6: 静态方法和实例方法
+PrintLine("\n6. 静态方法和实例方法:")
+class Counter {
+    static count:int <- 0
+    public instanceId:int <- 0
+
+    func init() {
+        Counter.count <- Counter.count + 1
+        this.instanceId <- Counter.count
+    }
+
+    static func getTotalCount() -> int {
+        return Counter.count
+    }
+
+    func getInstanceId() -> int {
+        return this.instanceId
+    }
+}
+
+c1 <- Counter()
+c2 <- Counter()
+c3 <- Counter()
+
+PrintLine("Instance 1 ID: " + c1.getInstanceId().ToStr())
+PrintLine("Instance 2 ID: " + c2.getInstanceId().ToStr())
+PrintLine("Instance 3 ID: " + c3.getInstanceId().ToStr())
+PrintLine("Total count: " + Counter.getTotalCount().ToStr())
+
+// 测试7: 带类型注解的字段
+PrintLine("\n7. 带类型注解的字段:")
+class TypedFields {
+    public intValue:int <- 42
+    private strValue:string <- "typed"
+    public doubleValue:double <- 3.14159
+    public boolValue:bool <- true
+
+    func getStrValue() -> string {
+        return this.strValue
+    }
+
+    func getAllInfo() -> string {
+        return "int:" + this.intValue.ToStr() +
+               ", str:" + this.getStrValue() +
+               ", double:" + this.doubleValue.ToStr() +
+               ", bool:" + this.boolValue.ToStr()
+    }
+}
+
+typed <- TypedFields()
+PrintLine("Typed fields info: " + typed.getAllInfo())
+
+PrintLine("\n" + "=".Repeat(50))
+PrintLine("所有类执行测试完成！✓")
+PrintLine("=".Repeat(50))

@@ -1,0 +1,33 @@
+// 简单的类编译器测试
+class SimplePerson {
+    public name:string <- ""
+    public age:int <- 0
+
+    func init(name:string, age:int) -> void {
+        this.name <- name
+        this.age <- age
+    }
+
+    func getName() -> string {
+        return this.name
+    }
+
+    func getAge() -> int {
+        return this.age
+    }
+
+    func setAge(newAge:int) -> void {
+        this.age <- newAge
+    }
+}
+
+func main() -> void {
+    p <- SimplePerson("Alice", 25)
+    PrintLine("Name: " + p.getName())
+    PrintLine("Age: " + p.getAge().ToStr())
+
+    p.setAge(26)
+    PrintLine("New Age: " + p.getAge().ToStr())
+}
+
+main()

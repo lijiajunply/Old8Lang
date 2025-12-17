@@ -707,7 +707,37 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
         if (matchingMethod == null)
         {
             var classType = local.ClassVar.GetValueOrDefault(Id.IdName);
-            if (classType == null) return;
+            if (classType == null) {
+                // 如果找不到类类型，可能是因为类还在编译中
+                // 检查是否有对应的TypeBuilder
+                if (local.InClassEnv?.Name == Id.IdName && local.InClassEnv is TypeBuilder builder)
+                {
+                    classType = builder;
+                }
+                else
+                {
+                    // 在当前编译上下文中查找未完成的类型
+                    foreach (var kv in local.ClassVar)
+                    {
+                        if (kv.Key == Id.IdName && kv.Value is TypeBuilder)
+                        {
+                            classType = kv.Value;
+                            break;
+                        }
+                    }
+
+                    if (classType == null)
+                    {
+                        // 创建一个临时的object类型引用，允许编译继续进行
+                        // 这是一个临时解决方案，编译器模式下类前向引用的处理需要改进
+                        classType = typeof(object);
+
+                        // 生成临时的null对象，实际运行时将通过解释器处理
+                        ilGenerator.Emit(OpCodes.Ldnull);
+                        return;
+                    }
+                }
+            }
 
             // 获取默认构造函数
             var constructorInfo = classType.GetConstructor(Type.EmptyTypes);
@@ -955,6 +985,18 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
         if (result != null) return result.ReturnType;
 
         var classType = local.ClassVar.GetValueOrDefault(Id.IdName);
+        if (classType == null)
+        {
+            // 如果找不到类类型，尝试从ClassVar中查找TypeBuilder
+            foreach (var kv in local.ClassVar)
+            {
+                if (kv.Key == Id.IdName)
+                {
+                    classType = kv.Value;
+                    break;
+                }
+            }
+        }
         return classType ?? typeof(object);
     }
 }

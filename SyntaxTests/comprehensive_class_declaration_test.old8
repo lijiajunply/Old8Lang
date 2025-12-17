@@ -1,0 +1,257 @@
+// 综合类声明语法测试
+// 测试目标：验证类声明、字段、方法、修饰符等各种语法组合
+
+// 测试1: 基本类声明
+PrintLine("=== 测试1: 基本类声明 ===")
+class BasicClass {
+    name <- ""
+    age <- 0
+
+    func init(name, age) {
+        this.name <- name
+        this.age <- age
+    }
+
+    func sayHello() {
+        return "Hello, I'm " + this.name + ", age " + this.age.ToStr()
+    }
+}
+
+basic <- BasicClass("Test", 25)
+PrintLine(basic.sayHello())
+
+// 测试2: 带修饰符的字段声明
+PrintLine("\n=== 测试2: 带修饰符的字段声明 ===")
+class ModifierTest {
+    public publicField <- "public"
+    private privateField <- "private"
+    static staticField <- "static"
+    public static publicStaticField <- "public static"
+
+    // 带类型注解的字段
+    public intField:int <- 42
+    private strField:string <- "secret"
+    static doubleField:double <- 3.14
+
+    func getPrivateField() {
+        return this.privateField
+    }
+}
+
+mod <- ModifierTest()
+PrintLine(mod.publicField)
+PrintLine(mod.getPrivateField())
+PrintLine(ModifierTest.staticField)
+PrintLine(ModifierTest.publicStaticField)
+
+// 测试3: 带修饰符的方法声明
+PrintLine("\n=== 测试3: 带修饰符的方法声明 ===")
+class MethodTest {
+    public publicMethod() {
+        return "public method"
+    }
+
+    private privateMethod() {
+        return "private method"
+    }
+
+    static staticMethod() {
+        return "static method"
+    }
+
+    public static publicStaticMethod() {
+        return "public static method"
+    }
+
+    func callPrivate() {
+        return this.privateMethod()
+    }
+}
+
+method <- MethodTest()
+PrintLine(method.publicMethod())
+PrintLine(method.callPrivate())
+PrintLine(MethodTest.staticMethod())
+PrintLine(MethodTest.publicStaticMethod())
+
+// 测试4: 多字段声明（逗号分隔）
+PrintLine("\n=== 测试4: 多字段声明 ===")
+class MultiFieldTest {
+    public a:int, b:int, c:int <- 0
+    private x:string, y:string <- "default"
+    static p:double, q:double <- 1.0
+}
+
+multi <- MultiFieldTest()
+PrintLine("a: " + multi.a.ToStr() + ", b: " + multi.b.ToStr() + ", c: " + multi.c.ToStr())
+
+// 测试5: 继承语法
+PrintLine("\n=== 测试5: 继承语法 ===")
+class Animal {
+    public name <- ""
+
+    func init(name) {
+        this.name <- name
+    }
+
+    func makeSound() {
+        return "Generic animal sound"
+    }
+}
+
+class Dog extends Animal {
+    breed <- ""
+
+    func init(name, breed) {
+        this.name <- name
+        this.breed <- breed
+    }
+
+    func makeSound() {
+        return "Woof! Woof!"
+    }
+
+    func getInfo() {
+        return this.name + " is a " + this.breed
+    }
+}
+
+dog <- Dog("Buddy", "Golden Retriever")
+PrintLine(dog.makeSound())
+PrintLine(dog.getInfo())
+
+// 测试6: 接口实现语法
+PrintLine("\n=== 测试6: 接口实现语法 ===")
+interface IDrawable {
+    func draw() -> void
+}
+
+interface IMovable {
+    func move(x:int, y:int) -> void
+}
+
+class Shape implements IDrawable, IMovable {
+    public x:int <- 0
+    public y:int <- 0
+
+    func draw() {
+        PrintLine("Drawing shape at (" + this.x.ToStr() + ", " + this.y.ToStr() + ")")
+    }
+
+    func move(x:int, y:int) {
+        this.x <- x
+        this.y <- y
+        PrintLine("Moved to (" + x.ToStr() + ", " + y.ToStr() + ")")
+    }
+}
+
+shape <- Shape()
+shape.draw()
+shape.move(10, 20)
+
+// 测试7: Mixin语法
+PrintLine("\n=== 测试7: Mixin语法 ===")
+mixin Logger {
+    public func log(message) {
+        PrintLine("[LOG] " + message)
+    }
+}
+
+mixin Validator {
+    public func validate(value:int) -> bool {
+        return value > 0
+    }
+}
+
+class User with Logger, Validator {
+    public name:string <- ""
+    public age:int <- 0
+
+    func init(name:string, age:int) {
+        this.name <- name
+        this.age <- age
+        this.log("User created: " + name)
+    }
+
+    func isValid() -> bool {
+        return this.validate(this.age)
+    }
+}
+
+user <- User("Alice", 25)
+user.log("User validation result: " + user.isValid().ToStr())
+
+// 测试8: 嵌套类声明
+PrintLine("\n=== 测试8: 嵌套类声明 ===")
+class OuterClass {
+    public value:int <- 100
+
+    func createInner() {
+        class InnerClass {
+            innerValue:int <- 200
+
+            func getValue() {
+                return this.innerValue
+            }
+        }
+        return InnerClass()
+    }
+}
+
+outer <- OuterClass()
+inner <- outer.createInner()
+PrintLine("Outer value: " + outer.value.ToStr())
+PrintLine("Inner value: " + inner.getValue().ToStr())
+
+// 测试9: 复杂的类型注解
+PrintLine("\n=== 测试9: 复杂的类型注解 ===")
+class TypeAnnotationTest {
+    public intArray:array <- [1, 2, 3]
+    public strList:list <- {"a", "b", "c"}
+    public dict:dictionary <- {"key": "value"}
+    public tuple:tuple <- (1, "test")
+
+    func processTypes() {
+        PrintLine("Array: " + this.intArray.ToStr())
+        PrintLine("List: " + this.strList.ToStr())
+        PrintLine("Dict: " + this.dict.ToStr())
+        PrintLine("Tuple: " + this.tuple.ToStr())
+    }
+}
+
+types <- TypeAnnotationTest()
+types.processTypes()
+
+// 测试10: 静态方法和实例方法混合
+PrintLine("\n=== 测试10: 静态方法和实例方法混合 ===")
+class StaticInstanceTest {
+    static instanceCount:int <- 0
+
+    public id:int <- 0
+
+    func init() {
+        StaticInstanceTest.instanceCount <- StaticInstanceTest.instanceCount + 1
+        this.id <- StaticInstanceTest.instanceCount
+    }
+
+    static func getInstanceCount() {
+        return StaticInstanceTest.instanceCount
+    }
+
+    func getInstanceId() {
+        return this.id
+    }
+}
+
+instance1 <- StaticInstanceTest()
+instance2 <- StaticInstanceTest()
+instance3 <- StaticInstanceTest()
+
+PrintLine("Total instances: " + StaticInstanceTest.getInstanceCount().ToStr())
+PrintLine("Instance 1 ID: " + instance1.getInstanceId().ToStr())
+PrintLine("Instance 2 ID: " + instance2.getInstanceId().ToStr())
+PrintLine("Instance 3 ID: " + instance3.getInstanceId().ToStr())
+
+PrintLine("\n" + "=".Repeat(60))
+PrintLine("所有类声明语法测试完成！✓")
+PrintLine("=".Repeat(60))
