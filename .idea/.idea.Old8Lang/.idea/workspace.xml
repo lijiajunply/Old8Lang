@@ -18,16 +18,66 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/test_arrow_functions.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_function_types.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/LargeDataPerformanceTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/MemoryUsageTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncFunctionTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncGeneratorTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncStreamTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AwaitTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/TaskAPITests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Basic/AssignmentTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Basic/ExpressionTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Basic/VariableTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ClassDeclarationTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ConstructorTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/InheritanceTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/InterfaceTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/MemberAccessTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/MixinTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Collections/ArrayTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Collections/CollectionMethodsTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Collections/DictionaryTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Collections/ListTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Collections/SliceTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Collections/TupleTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/EdgeCases/BoundaryTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/EdgeCases/EmptyInputTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/EdgeCases/ExtremeValuesTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/EdgeCases/TypeErrorsTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/EdgeCases/UnexpectedInputsTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/ErrorPropagationTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/FinallyTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/NestedExceptionTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/ThrowTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/TryCatchTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/ArithmeticTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/ComparisonTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/LogicalTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/RangeTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/StringTemplateTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/TernaryTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/TypeConversionTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/ClosureTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionDeclarationTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionOverloadTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/HigherOrderTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/LambdaTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/ImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/NamespaceTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/NativeImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/ConditionalTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/ControlFlowTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/JumpStatementsTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/LoopTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/SwitchTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ConcurrentPrimitiveTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/SpawnTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ThreadSafetyTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ThreadSynchronizationTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/InterpreterClassesTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/InterpreterClassesTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_async_thread_tests_v3.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run_async_thread_tests.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simple_performance_test.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_abstract.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_abstract2.old8" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,9 +118,13 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/InterpreterBoundaryTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/InterpreterBoundaryTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/InterpreterClassesTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/InterpreterClassesTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/InterpreterClassesTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/InterpreterClassesTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/InterpreterErrorHandlingTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Library/AsyncLibTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Library/AsyncLibTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
@@ -146,6 +200,9 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TypeTemplate.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/AsyncFuncInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/AsyncFuncInit.cs" root0="SKIP_HIGHLIGHTING" />
@@ -217,6 +274,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/d3/7ed6bf18/FileNotFoundException.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/ec/ce83ccf2/ArgumentNullException.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a840692e98b74557bc005b38213a22c72dad0/c8/58c2e0c9/Assert.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
@@ -872,7 +930,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="235" />
+    <option name="localTasksCounter" value="237" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -899,8 +957,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 实现异步流和异步生成器功能&#10;&#10;- 新增异步生成器支持，使用 async func 和 yield 关键字&#10;- 实现 AsyncGeneratorLangValue 类来表示异步生成器实例&#10;- 添加 AsyncForInStatement 支持 async for-in 循环语法&#10;- 实现异步生成器状态机 (AsyncGeneratorStateMachine)&#10;- 更新语法定义文件，添加 asyncFuncDeclaration 和 asyncForInStatement&#10;- 完善解释器和编译器对异步流的支持&#10;- 添加完整的异步流测试用例，覆盖基本功能、参数传递、&#10;  break/continue、异常处理等场景&#10;- 支持异步流中生成键值对并通过多标识符解构&#10;- 实现异步生成器的取消和重置功能&#10;- 更新文档，添加异步流和异步迭代相关说明" />
-    <MESSAGE value="feat(async): 添加高级并发原语支持&#10;&#10;- 实现 ReadWriteLock 读写锁功能，支持多读者或单写者访问&#10;- 添加 CountDownLatch 倒计时锁，用于等待一组操作完成&#10;- 实现 CyclicBarrier 循环栅栏，支持多线程协同分阶段执行&#10;- 在 AsyncLib 中集成上述三种并发原语的创建、获取、释放等方法&#10;- 添加资源自动清理机制，定期回收闲置的并发原语对象&#10;- 提供详细的使用示例和 API 文档说明&#10;- 增加完整的测试用例验证各项功能正确性" />
     <MESSAGE value="feat(lang): 实现闭包作用域捕获优化和COW机制&#10;&#10;- 添加 CapturedScope 类用于缓存闭包捕获的作用域信息&#10;- 在 VariateManager 中引入 Copy-On-Write 机制优化闭包性能&#10;- 实现作用域共享标记和写时拷贝逻辑&#10;- 支持闭包快照创建时的零拷贝优化&#10;- 完善作用域管理的线程安全性和内存效率&#10;- 添加相关测试用例验证闭包和性能优化效果" />
     <MESSAGE value="feat(lang): 实现异步生成器和作用域捕获优化&#10;&#10;- 优化异步函数和生成器的作用域捕获机制，使用深拷贝确保状态隔离&#10;- 改进 BlockStatement 执行逻辑，支持 yield 恢复和嵌套执行栈管理&#10;- 完善 WhileStatement 对生成器上下文的支持，正确处理循环体执行栈帧&#10;- 更新 ImportError 构造函数，使用可空集合参数避免空引用异常&#10;- 修复测试文件中异常抛出语法，确保错误处理一致性&#10;- 添加异步生成器相关测试用例，验证 await 和 yield 协同工作能力&#10;- 优化 VariateManager 作用域查找缓存初始化逻辑和字段引用方式" />
     <MESSAGE value="docs(scope): 添加COW机制探索文档和ScopeLayer实现&#10;&#10;- 创建COW_REDESIGN.md文档，详细记录COW机制探索过程&#10;- 实现ScopeLayer类，支持分层作用域和延迟拷贝&#10;- 添加测试文件验证闭包和COW场景&#10;- 更新VariateManager变量查找缓存逻辑&#10;- 重构作用域写入方法，优化缓存更新机制" />
@@ -924,7 +980,9 @@
     <MESSAGE value="fix(parser): 改进注释过滤器以正确处理字符串中的注释符号&#10;&#10;- 修复字符串字面量内 // 和 /* */ 被误识别为注释的问题&#10;- 添加双引号和单引号字符串状态跟踪&#10;- 实现转义字符处理逻辑，防止 \\&quot; 干扰字符串边界检测&#10;- 确保只有在字符串外部才进行注释识别和过滤&#10;- 更新测试用例，简化异步通道测试逻辑以提高稳定性&#10;- 调整词法分析器文档注释，明确说明字符串内注释符号的处理方式" />
     <MESSAGE value="docs(reports): 删除异步多线程和导入修复相关测试报告&#10;&#10;- 移除了2025-12-16的异步多线程评估报告&#10;- 删除了导入修复测试报告&#10;- 清理了同步迭代器测试报告&#10;- 移除了异步多线程测试结果详细记录&#10;- 统一清理了冗余的技术评估文档" />
     <MESSAGE value="test(interpreter): 添加解释器异步功能测试&#10;&#10;- 创建 InterpreterAsyncTests 测试类&#10;- 实现基础功能测试用例&#10;- 添加函数定义测试用例&#10;- 实现类定义测试用例&#10;- 添加异常处理和预期异常判断逻辑" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(interpreter): 添加解释器异步功能测试&#10;&#10;- 创建 InterpreterAsyncTests 测试类&#10;- 实现基础功能测试用例&#10;- 添加函数定义测试用例&#10;- 实现类定义测试用例&#10;- 添加异常处理和预期异常判断逻辑" />
+    <MESSAGE value="feat(dict): 为字典类型添加常用查询方法&#10;&#10;- 添加 Count 方法获取字典键值对数量&#10;- 实现 ContainsKey 方法检查键是否存在&#10;- 实现 ContainsValue 方法检查值是否存在&#10;- 添加 Keys 方法获取所有键的列表&#10;- 添加 Values 方法获取所有值的列表&#10;&#10;feat(list): 为列表类型添加元素计数方法&#10;&#10;- 添加 Count 方法获取列表元素数量" />
+    <MESSAGE value="chore(tests): 移除冗余的解释器测试文件&#10;&#10;- 删除了多个重复的解释器测试类文件&#10;- 移除了旧的失败分析脚本&#10;- 清理了重复的测试逻辑和代码片段&#10;- 统一了测试结构以提高维护性" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore(tests): 移除冗余的解释器测试文件&#10;&#10;- 删除了多个重复的解释器测试类文件&#10;- 移除了旧的失败分析脚本&#10;- 清理了重复的测试逻辑和代码片段&#10;- 统一了测试结构以提高维护性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
