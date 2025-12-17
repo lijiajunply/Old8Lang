@@ -20,15 +20,27 @@ public class IfStatement(
     public override void Run(VariateManager manager)
     {
         var r = true;
+
+        // 保存原始的 IsFunc 状态
+        var originalIsFunc = manager.IsFunc;
+
         manager.AddChildren();
+        // 在 if 语句块中，临时禁用函数上下文，允许修改外部变量
+        manager.IsFunc = false;
         ifChildBlock.Run(manager, ref r);
         manager.RemoveChildren();
+
         foreach (var variable in elifBlock.OfType<IfChild>())
         {
             manager.AddChildren();
+            // 在 elif 语句块中，临时禁用函数上下文，允许修改外部变量
+            manager.IsFunc = false;
             variable.Run(manager, ref r);
             manager.RemoveChildren();
         }
+
+        // 恢复原始的 IsFunc 状态
+        manager.IsFunc = originalIsFunc;
 
         if (r)
             elseBlockStatement?.Run(manager);

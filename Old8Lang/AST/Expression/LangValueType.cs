@@ -1,3 +1,4 @@
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.LangParser;
@@ -110,7 +111,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <param name="otherValueType">另一个值</param>
     /// <returns>比较结果，相等返回true，否则返回false</returns>
     public virtual bool Equal(LangValueType? otherValueType) => false;
-    
+
     /// <summary>
     /// 小于比较
     /// </summary>
@@ -118,7 +119,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <returns>比较结果，小于返回true，否则返回false</returns>
     /// <exception cref="InvalidOperationError">当不支持小于比较时抛出</exception>
     public virtual bool Less(LangValueType? otherValue) => throw new InvalidOperationError(this, "不支持Less操作");
-    
+
     /// <summary>
     /// 大于比较
     /// </summary>
@@ -126,7 +127,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <returns>比较结果，大于返回true，否则返回false</returns>
     /// <exception cref="InvalidOperationError">当不支持大于比较时抛出</exception>
     public virtual bool Greater(LangValueType? otherValue) => throw new InvalidOperationError(this, "不支持Greater操作");
-    
+
     /// <summary>
     /// 小于等于比较
     /// </summary>
@@ -235,12 +236,38 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// - Dictionary&lt;object, object&gt; → DictionaryLangValue
     /// - Tuple&lt;object, object&gt; → TupleLangValue
     /// - ValueTuple&lt;object, object&gt; → TupleLangValue
+    /// - Task 或 Task&lt;T&gt; → 等待结果后递归转换
     /// </remarks>
     public static LangValueType ObjToValue(object? value)
     {
         if (value == null)
         {
             return NullLangValue.Instance;
+        }
+
+        // 处理 Task 和 Task<T> 类型
+        var valueType = value.GetType();
+        if (valueType.Name is "Task`1" or "Task")
+        {
+            try
+            {
+                // 使用反射获取 Result 属性或等待 Task
+                var resultProperty = valueType.GetProperty("Result");
+                if (resultProperty != null)
+                {
+                    // 对于 Task<T>，获取 Result 属性
+                    var taskResult = resultProperty.GetValue(value);
+                    return ObjToValue(taskResult);
+                }
+
+                // 对于 Task (无返回值)，返回 VoidLangValue
+                return new VoidLangValue();
+            }
+            catch
+            {
+                // 如果无法获取 Task 结果，返回 VoidLangValue
+                return new VoidLangValue();
+            }
         }
 
         return value switch

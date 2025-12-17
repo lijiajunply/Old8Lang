@@ -2,6 +2,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Interpreter;
 using Old8Lang.LangParser;
+using Xunit.Abstractions;
 
 namespace Old8Lang.Tests.Integration;
 
@@ -12,6 +13,13 @@ namespace Old8Lang.Tests.Integration;
 [Collection("Sequential")]
 public class EndToEndTests
 {
+    private readonly ITestOutputHelper TestOutputHelper;
+
+    public EndToEndTests(ITestOutputHelper testOutputHelper)
+    {
+        TestOutputHelper = testOutputHelper;
+    }
+
     #region 数学计算场景 (3 个)
 
     [Fact]
@@ -259,53 +267,65 @@ public class EndToEndTests
     public void EndToEnd_ComplexBusinessLogic_WorksCorrectly()
     {
         // 测试复杂业务逻辑 - 订单处理系统
-        var code = """
+        var code = @"
+            // 定义价格计算函数
+            func calculateTotal(price, quantity, discount) {
+                subtotal <- price * quantity
+                discountAmount <- subtotal * discount / 100
+                return subtotal - discountAmount
+            }
 
-                               // 定义价格计算函数
-                               func calculateTotal(price, quantity, discount) {
-                                   subtotal <- price * quantity
-                                   discountAmount <- subtotal * discount / 100
-                                   return subtotal - discountAmount
-                               }
+            // 定义评级函数
+            func getGrade(score) {
+                if score >= 90 {
+                    return ""A""
+                } elif score >= 80 {
+                    return ""B""
+                } elif score >= 70 {
+                    return ""C""
+                } else {
+                    return ""D""
+                }
+            }
 
-                               // 定义评级函数
-                               func getGrade(score) {
-                                   if score >= 90 {
-                                       return "A"
-                                   } elif score >= 80 {
-                                       return "B"
-                                   } elif score >= 70 {
-                                       return "C"
-                                   } else {
-                                       return "D"
-                                   }
-                               }
+            // 订单 1: 价格 100, 数量 3, 折扣 10%
+            order1 <- calculateTotal(100, 3, 10)
 
-                               // 订单 1: 价格 100, 数量 3, 折扣 10%
-                               order1 <- calculateTotal(100, 3, 10)
+            // 订单 2: 价格 50, 数量 5, 折扣 20%
+            order2 <- calculateTotal(50, 5, 20)
 
-                               // 订单 2: 价格 50, 数量 5, 折扣 20%
-                               order2 <- calculateTotal(50, 5, 20)
+            // 计算总收入
+            totalRevenue <- order1 + order2
 
-                               // 计算总收入
-                               totalRevenue <- order1 + order2
+            // 评分系统
+            score1 <- 95
+            score2 <- 82
+            score3 <- 68
 
-                               // 评分系统
-                               score1 <- 95
-                               score2 <- 82
-                               score3 <- 68
+            grade1 <- getGrade(score1)
+            grade2 <- getGrade(score2)
+            grade3 <- getGrade(score3)
 
-                               grade1 <- getGrade(score1)
-                               grade2 <- getGrade(score2)
-                               grade3 <- getGrade(score3)
+            // 统计及格数量（分数 >= 70）
+            passCount <- 0
 
-                               // 统计及格数量（分数 >= 70）
-                               passCount <- 0
-                               if score1 >= 70 { passCount <- passCount + 1 }
-                               if score2 >= 70 { passCount <- passCount + 1 }
-                               if score3 >= 70 { passCount <- passCount + 1 }
-                           
-                   """;
+            // 在if语句前验证变量值
+            debugScore1 <- score1
+            debugScore2 <- score2
+            debugScore3 <- score3
+
+            if score1 >= 70 {
+                passCount <- passCount + 1
+            }
+
+            if score2 >= 70 {
+                passCount <- passCount + 1
+            }
+
+            if score3 >= 70 {
+                passCount <- passCount + 1
+            }
+        ";
         var interpreter = new LangInterpreter();
 
         var ast = interpreter.Build(code);
@@ -320,7 +340,60 @@ public class EndToEndTests
         Assert.Equal("A", ((StringLangValue)interpreter.Manager.GetValue(new LangId("grade1"))!).Value);
         Assert.Equal("B", ((StringLangValue)interpreter.Manager.GetValue(new LangId("grade2"))!).Value);
         Assert.Equal("D", ((StringLangValue)interpreter.Manager.GetValue(new LangId("grade3"))!).Value);
-        Assert.Equal(2, ((IntLangValue)interpreter.Manager.GetValue(new LangId("passCount"))!).Value);
+
+        // 调试AST结构
+        TestOutputHelper.WriteLine($"AST structure: {ast.GetType().Name} with {ast.Count} statements");
+        for (int i = 0; i < ast.Count; i++)
+        {
+            TestOutputHelper.WriteLine($"  Statement {i}: {ast[i].GetType().Name} - {ast[i]}");
+        }
+
+        // 检查所有相关变量
+        TestOutputHelper.WriteLine("=== All variables check ===");
+
+        var allVariables = new[] {
+            "order1", "order2", "totalRevenue",
+            "score1", "score2", "score3",
+            "grade1", "grade2", "grade3",
+            "passCount", "debugScore1", "debugScore2", "debugScore3"
+        };
+
+        foreach (var varName in allVariables)
+        {
+            var value = interpreter.Manager.GetValue(new LangId(varName));
+            TestOutputHelper.WriteLine($"{varName}: {value} ({value?.GetType().Name})");
+
+            // 检查是否包含"Task"字符串
+            if (value?.GetType().Name.Contains("Task") == true)
+            {
+                TestOutputHelper.WriteLine($"  ⚠️  WARNING: {varName} appears to be a Task type!");
+            }
+        }
+
+        // 验证关键变量的值
+        var score1Val = interpreter.Manager.GetValue(new LangId("score1"));
+        var score2Val = interpreter.Manager.GetValue(new LangId("score2"));
+        var score3Val = interpreter.Manager.GetValue(new LangId("score3"));
+        var passCountVal = interpreter.Manager.GetValue(new LangId("passCount"));
+
+        if (score1Val is IntLangValue s1 && score2Val is IntLangValue s2 && score3Val is IntLangValue s3 && passCountVal is IntLangValue pc)
+        {
+            TestOutputHelper.WriteLine($"Score values: score1={s1.Value}, score2={s2.Value}, score3={s3.Value}");
+            TestOutputHelper.WriteLine($"Expected passCount: 2, Actual: {pc.Value}");
+
+            // 手动验证比较操作
+            TestOutputHelper.WriteLine("Manual comparison checks:");
+            TestOutputHelper.WriteLine($"  score1 >= 70: {s1.Value >= 70}");
+            TestOutputHelper.WriteLine($"  score2 >= 70: {s2.Value >= 70}");
+            TestOutputHelper.WriteLine($"  score3 >= 70: {s3.Value >= 70}");
+
+            Assert.Equal(2, pc.Value);
+        }
+        else
+        {
+            var types = $"score1={score1Val?.GetType().Name}, score2={score2Val?.GetType().Name}, score3={score3Val?.GetType().Name}, passCount={passCountVal?.GetType().Name}";
+            Assert.Fail($"Variables are not expected IntLangValue types: {types}");
+        }
     }
 
     #endregion
