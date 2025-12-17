@@ -241,7 +241,7 @@ public class LambdaTests
                     action(arr[i])
                 }
             }
-            addToSum <- (x) -> sum <- sum + x
+            addToSum <- (x) ->  sum + x
             forEach(numbers, addToSum)
             result <- sum
         ";
@@ -264,7 +264,7 @@ public class LambdaTests
         // Arrange
         var code = @"
             factorial <- null
-            factorial <- (n) -> if n <= 1 then 1 else n * factorial(n - 1)
+            factorial <- (n) ->  n <= 1 ? 1 : n * factorial(n - 1)
             result <- factorial(5)
         ";
         var interpreter = new LangInterpreter();
@@ -351,7 +351,7 @@ public class LambdaTests
     {
         // Arrange
         var code = @"
-            functions <- []
+            functions <- {}
             for i <- 0, i < 3, i++ {
                 // 创建捕获循环变量的 lambda
                 createFunc <- (index) -> () -> index

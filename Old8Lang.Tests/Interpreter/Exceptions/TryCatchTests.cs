@@ -488,7 +488,7 @@ public class TryCatchTests
 
         Assert.NotNull(processed);
         Assert.NotNull(errors);
-        Assert.Equal(7, processed.Value); // 1 + 2 + 4 + 5 = 12 (跳过 3)
+        Assert.Equal(12, processed.Value); // 1 + 2 + 4 + 5 = 12 (跳过 3)
         Assert.Equal(1, errors.Value);   // 只有一个错误（value == 3）
     }
 }

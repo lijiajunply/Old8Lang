@@ -531,7 +531,7 @@ public class HigherOrderTests
                 return result
             }
 
-            validate <- (x:int) -> if x < 0 then 0 else x
+            validate <- (x:int) -> x < 0 ? 0 : x
             normalize <- (x:int) -> if x > 100 then 100 else x
             scale <- (x:int) -> x * 10
             offset <- (x:int) -> x + 5
@@ -678,12 +678,12 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func accumulate(collection:{int}, operation:func) -> {int} {
+            func accumulate(collection:list, operation:function) -> list {
                 result <- {}
-                if collection.Length > 0 {
+                if len(collection) > 0 {
                     runningTotal <- collection[0]
                     result.Add(runningTotal)
-                    for i in 1..collection.Length-1 {
+                    for i in [1~len(collection)-1] {
                         runningTotal <- operation(runningTotal, collection[i])
                         result.Add(runningTotal)
                     }
