@@ -13,6 +13,8 @@ public class TypeTemplate(
     string? parentClassName = null,
     bool isMixin = false,
     List<string>? mixinNames = null,
+    List<string>? implementsNames = null,
+    bool isInterface = false,
     SourcePosition position = default)
     : ImportInfo(position)
 {
@@ -22,14 +24,21 @@ public class TypeTemplate(
     public readonly string? ParentClassName = parentClassName;
     public readonly bool IsMixin = isMixin;
     public readonly List<string> MixinNames = mixinNames ?? [];
+    public readonly List<string> ImplementsNames = implementsNames ?? [];
+    public readonly bool IsInterface = isInterface;
 
     public override string ToString()
     {
-        var baseStr = IsMixin ? $"MixinTemplate({ClassName})" : $"TypeTemplate({ClassName})";
+        var baseStr = IsInterface ? $"InterfaceTemplate({ClassName})" : IsMixin ? $"MixinTemplate({ClassName})" : $"TypeTemplate({ClassName})";
         
         if (ParentClassName != null)
         {
             baseStr += $" extends {ParentClassName}";
+        }
+        
+        if (ImplementsNames.Count > 0)
+        {
+            baseStr += $" implements {string.Join(", ", ImplementsNames)}";
         }
         
         if (MixinNames.Count > 0)
@@ -41,9 +50,9 @@ public class TypeTemplate(
     }
 
     /// <summary>
-    /// 递归获取所有父类和mixin的成员变量和方法
+    /// 递归获取所有父类、mixin和接口的成员变量和方法
     /// </summary>
-    /// <param name="manager">变量管理器，用于获取父类和mixin信息</param>
+    /// <param name="manager">变量管理器，用于获取父类、mixin和接口信息</param>
     /// <param name="type">当前类型模板</param>
     /// <param name="allVariates">用于存储所有成员的字典</param>
     private void GetAllParentMembers(LangParser.VariateManager manager, TypeTemplate type,
@@ -62,6 +71,23 @@ public class TypeTemplate(
                              !allVariates.ContainsKey(parentMember.Key)))
                 {
                     allVariates[parentMember.Key] = parentMember.Value;
+                }
+            }
+        }
+        
+        // 处理所有实现的接口
+        foreach (var interfaceName in type.ImplementsNames)
+        {
+            if (manager.GetAny(new LangId(interfaceName)) is TypeTemplate interfaceType)
+            {
+                // 递归获取接口的成员（接口可以继承其他接口）
+                GetAllParentMembers(manager, interfaceType, allVariates);
+                
+                // 添加当前接口的成员
+                foreach (var interfaceMember in interfaceType.Variates.Where(interfaceMember =>
+                             !allVariates.ContainsKey(interfaceMember.Key)))
+                {
+                    allVariates[interfaceMember.Key] = interfaceMember.Value;
                 }
             }
         }

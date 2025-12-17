@@ -65,6 +65,16 @@ public class LocalManager
     /// 关联的解释器实例
     /// </summary>
     public LangInterpreter? Interpreter { get; init; }
+    
+    /// <summary>
+    /// 动态程序集
+    /// </summary>
+    public AssemblyBuilder? DynamicAssembly { get; set; }
+    
+    /// <summary>
+    /// 动态模块
+    /// </summary>
+    public ModuleBuilder? DynamicModule { get; set; }
 
     /// <summary>
     /// break语句的目标标签
@@ -290,7 +300,9 @@ public class LocalManager
             Interpreter = Interpreter,
             InClassEnv = InClassEnv,
             BreakLabel = BreakLabel,
-            ContinueLabel = ContinueLabel
+            ContinueLabel = ContinueLabel,
+            DynamicAssembly = DynamicAssembly,
+            DynamicModule = DynamicModule
         };
 
         // 克隆局部变量

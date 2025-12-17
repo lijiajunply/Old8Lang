@@ -38,6 +38,7 @@ public class ClassParser(
 
         string? parentClassName = null;
         List<string> mixinNames = new List<string>();
+        List<string> implementsNames = new List<string>();
         
         // 处理继承语法：class Name extends ParentClass {
         if (CurrentToken is { Type: LangTokenType.Extends })
@@ -50,6 +51,32 @@ public class ClassParser(
             {
                 parentClassName = CurrentToken.Value;
                 CurrentIndex++;
+            }
+        }
+        
+        // 处理 implements 子句：class Name implements Interface1, Interface2 {
+        if (CurrentToken is { Type: LangTokenType.Implements })
+        {
+            // 跳过 implements 关键字
+            Expect(LangTokenType.Implements);
+            
+            // 解析多个接口，用逗号分隔
+            while (true)
+            {
+                if (CurrentToken.Type == LangTokenType.Identifier)
+                {
+                    implementsNames.Add(CurrentToken.Value);
+                    CurrentIndex++;
+                }
+                
+                // 检查是否还有更多接口
+                if (CurrentToken.Type == LangTokenType.Comma)
+                {
+                    CurrentIndex++;
+                    continue;
+                }
+                
+                break;
             }
         }
         
@@ -81,7 +108,30 @@ public class ClassParser(
 
         var classBlock = ParseClassBlock();
         return new ClassInit(new TypeTemplate(className, classBlock.ToAnyData(), classBlock.ToStaticData(),
-            parentClassName, isMixin, mixinNames));
+            parentClassName, isMixin, mixinNames, implementsNames));
+    }
+    
+    public ClassInit ParseInterfaceDeclaration()
+    {
+        // 检查是 interface
+        if (CurrentToken.Type == LangTokenType.Interface)
+        {
+            Expect(LangTokenType.Interface);
+        }
+        else
+        {
+            throw new InvalidOperationException("Expected interface keyword");
+        }
+        
+        var interfaceName = CurrentToken.Value;
+        Expect(LangTokenType.Identifier);
+
+        // 解析接口块
+        var interfaceBlock = ParseClassBlock();
+        
+        // 接口作为特殊的类处理，isInterface 标志为 true
+        return new ClassInit(new TypeTemplate(interfaceName, interfaceBlock.ToAnyData(), interfaceBlock.ToStaticData(),
+            null, false, new List<string>(), new List<string>(), true));
     }
 
     /// <summary>

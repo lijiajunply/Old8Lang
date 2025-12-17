@@ -13,6 +13,7 @@ statement = lrBlock
           | funcDeclaration
           | asyncFuncDeclaration
           | classDeclaration
+          | interfaceDeclaration
           | funcRunStatement
           | classFuncRunStatement
           | importStatement
@@ -58,7 +59,13 @@ funcDeclaration = accessModifier* ( "func" identifier | identifier ) "(" idList?
 (* Async function declaration (can be used as async generator if contains yield statements) *)
 asyncFuncDeclaration = accessModifier* "async" "func" identifier "(" idList? ")" ( "->" identifier )? block ;
 
-classDeclaration = accessModifier* "class" identifier ( "extends" identifier )? classBlock ;
+classDeclaration = accessModifier* "class" identifier ( "extends" identifier )? ( "implements" identifier ( "," identifier )* )? classBlock ;
+
+interfaceDeclaration = accessModifier* "interface" identifier interfaceBlock ;
+
+interfaceBlock = "{" interfaceMember* "}";
+
+interfaceMember = accessModifier* funcDeclaration ;
 
 classBlock = "{" classMember* "}";
 

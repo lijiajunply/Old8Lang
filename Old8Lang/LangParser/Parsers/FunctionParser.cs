@@ -71,8 +71,21 @@ public class FunctionParser(
             updatedFuncName = new LangId(funcName.IdName, returnType, position: funcName.Position);
         }
 
-        var stmtParser = statementParserFactory();
-        var block = stmtParser.ParseBlock();
+        BlockStatement block;
+        
+        // 检查是否在接口中，接口方法只有签名，没有实现体
+        // 如果下一个token是右大括号，说明是接口方法，不需要解析函数体
+        if (CurrentToken.Type == LangTokenType.RightBrace)
+        {
+            // 接口方法，创建空的BlockStatement
+            block = new BlockStatement(new List<IOldLangTree>());
+        }
+        else
+        {
+            // 普通函数，解析函数体
+            var stmtParser = statementParserFactory();
+            block = stmtParser.ParseBlock();
+        }
 
         // 普通函数声明,生成 FuncInit，设置 IsLambda 为 false
         return new FuncInit(new FuncLangValue(updatedFuncName, parameters, block, isLambda: false));

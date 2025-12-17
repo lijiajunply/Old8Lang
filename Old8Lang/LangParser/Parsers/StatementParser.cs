@@ -252,6 +252,12 @@ public class StatementParser(
         {
             return classParser.ParseClassDeclaration();
         }
+        
+        // 处理interface定义：interface identifier block
+        if (CurrentToken.Type == LangTokenType.Interface)
+        {
+            return classParser.ParseInterfaceDeclaration();
+        }
 
         // 处理import语句：import module
         if (CurrentToken.Type == LangTokenType.Import)

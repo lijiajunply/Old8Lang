@@ -1,0 +1,34 @@
+// 接口声明
+interface IDrawable {
+    func draw() -> void
+}
+
+// 类实现接口
+class Circle implements IDrawable {
+    func draw() -> void {
+        PrintLine("Drawing circle")
+    }
+}
+
+// 多接口实现
+interface IResizable {
+    func resize(width: int, height: int) -> void
+}
+
+class Rectangle implements IDrawable, IResizable {
+    func draw() -> void {
+        PrintLine("Drawing rectangle")
+    }
+    
+    func resize(width: int, height: int) -> void {
+        PrintLine("Resizing rectangle to " + width + "x" + height)
+    }
+}
+
+// 测试代码
+circle <- Circle()
+circle.draw()
+
+rectangle <- Rectangle()
+rectangle.draw()
+rectangle.resize(10, 20)

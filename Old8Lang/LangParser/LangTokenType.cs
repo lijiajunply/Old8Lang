@@ -264,7 +264,15 @@ public enum LangTokenType
     /// <summary>
     /// yield
     /// </summary>
-    Yield
+    Yield,
+    /// <summary>
+    /// interface
+    /// </summary>
+    Interface,
+    /// <summary>
+    /// implements
+    /// </summary>
+    Implements
 }
 
 public enum KeywordType
@@ -308,5 +316,7 @@ public enum KeywordType
     Protected,
     Async,
     Await,
-    Yield
+    Yield,
+    Interface,
+    Implements
 }
