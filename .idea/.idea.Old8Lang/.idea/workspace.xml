@@ -18,27 +18,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.CompilerBenchmarkTests-20251218-010407.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.InterpreterBenchmarkTests-20251218-010206.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.InterpreterBenchmarkTests-20251218-010602.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.CompilerBenchmarkTests-report-github.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.CompilerBenchmarkTests-report.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.CompilerBenchmarkTests-report.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.InterpreterBenchmarkTests-report-github.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.InterpreterBenchmarkTests-report.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.InterpreterBenchmarkTests-report.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/AdvancedPerformanceTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/PerformanceMonitor.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/InterpreterAsyncTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/InterpreterBoundaryTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/InterpreterClassesTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/InterpreterCollectionsTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/InterpreterConcurrencyTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/InterpreterControlFlowTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/InterpreterDataStructuresTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/InterpreterErrorHandlingTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/InterpreterExecutionTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/InterpreterFunctionsTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/InterpreterIntegrationEdgeCases.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/InterpreterInterfacesTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/InterpreterScenariosTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/InterpreterTypesTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/2025-12-16-22-38-import-fix-report.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/2025-12-16-异步多线程评估报告.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/20251216-143740-异步多线程测试结果.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/20251216-21-47-sync_iterator_test.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/20251216-新生成器架构测试报告.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/Old8Lang.Tests修复实施报告-2025-12-17.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/类声明语法检查报告.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Old8Lang.Tests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Old8Lang.Tests.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -167,6 +162,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/WhileStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/WhileStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Apis.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Compiler/AsyncStateMachineGenerator.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Compiler/Compiler.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Compiler/ILVerifier.cs" root0="SKIP_HIGHLIGHTING" />
@@ -875,7 +871,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="233" />
+    <option name="localTasksCounter" value="234" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -902,7 +898,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(async): 完善异步库测试用例&#10;&#10;- 增加 Mutex、Semaphore、AtomicInt 和 Channel 的完整功能测试&#10;- 添加原子整数的线程安全测试用例&#10;- 实现通道的多生产者多消费者测试场景&#10;- 补充工具函数如 Sleep、线程 ID 获取等功能验证&#10;- 优化现有测试结构和断言逻辑" />
     <MESSAGE value="test(language): 添加异步和多线程原生功能测试&#10;&#10;- 新增 AsyncNativeTests.cs 文件，包含异步函数执行、参数传递、嵌套调用、异常处理、任务组合、延迟和 Lambda 表达式等测试用例&#10;- 新增 ThreadNativeTests.cs 文件，涵盖线程创建、参数传递、状态检查、异常处理、多线程同步、任务组合和延迟等功能测试&#10;- 编写详细的测试计划" />
     <MESSAGE value="feat(lang): 实现异步流和异步生成器功能&#10;&#10;- 新增异步生成器支持，使用 async func 和 yield 关键字&#10;- 实现 AsyncGeneratorLangValue 类来表示异步生成器实例&#10;- 添加 AsyncForInStatement 支持 async for-in 循环语法&#10;- 实现异步生成器状态机 (AsyncGeneratorStateMachine)&#10;- 更新语法定义文件，添加 asyncFuncDeclaration 和 asyncForInStatement&#10;- 完善解释器和编译器对异步流的支持&#10;- 添加完整的异步流测试用例，覆盖基本功能、参数传递、&#10;  break/continue、异常处理等场景&#10;- 支持异步流中生成键值对并通过多标识符解构&#10;- 实现异步生成器的取消和重置功能&#10;- 更新文档，添加异步流和异步迭代相关说明" />
     <MESSAGE value="feat(async): 添加高级并发原语支持&#10;&#10;- 实现 ReadWriteLock 读写锁功能，支持多读者或单写者访问&#10;- 添加 CountDownLatch 倒计时锁，用于等待一组操作完成&#10;- 实现 CyclicBarrier 循环栅栏，支持多线程协同分阶段执行&#10;- 在 AsyncLib 中集成上述三种并发原语的创建、获取、释放等方法&#10;- 添加资源自动清理机制，定期回收闲置的并发原语对象&#10;- 提供详细的使用示例和 API 文档说明&#10;- 增加完整的测试用例验证各项功能正确性" />
@@ -927,7 +922,8 @@
     <MESSAGE value="feat(parser): 支持抽象类和抽象方法语法&#10;&#10;- 在 LangTokenType 中添加 Abstract 关键字类型&#10;- 扩展 ClassMemberId 枚举以支持 Abstract 修饰符&#10;- 更新 ClassParser 以识别和解析 abstract 类和方法&#10;- 实现抽象方法声明的解析逻辑，确保无方法体&#10;- 修改 TypeTemplate 以存储和显示抽象类信息&#10;- 更新测试用例以验证抽象类和方法的解析&#10;- 添加新的测试文件 test_abstract.old8 和 test_abstract2.old8&#10;- 调整 StatementParser 以处理 abstract 类声明&#10;- 修正接口与抽象类交互测试中的继承关键字为 extends" />
     <MESSAGE value="132" />
     <MESSAGE value="fix(parser): 改进注释过滤器以正确处理字符串中的注释符号&#10;&#10;- 修复字符串字面量内 // 和 /* */ 被误识别为注释的问题&#10;- 添加双引号和单引号字符串状态跟踪&#10;- 实现转义字符处理逻辑，防止 \\&quot; 干扰字符串边界检测&#10;- 确保只有在字符串外部才进行注释识别和过滤&#10;- 更新测试用例，简化异步通道测试逻辑以提高稳定性&#10;- 调整词法分析器文档注释，明确说明字符串内注释符号的处理方式" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(parser): 改进注释过滤器以正确处理字符串中的注释符号&#10;&#10;- 修复字符串字面量内 // 和 /* */ 被误识别为注释的问题&#10;- 添加双引号和单引号字符串状态跟踪&#10;- 实现转义字符处理逻辑，防止 \\&quot; 干扰字符串边界检测&#10;- 确保只有在字符串外部才进行注释识别和过滤&#10;- 更新测试用例，简化异步通道测试逻辑以提高稳定性&#10;- 调整词法分析器文档注释，明确说明字符串内注释符号的处理方式" />
+    <MESSAGE value="docs(reports): 删除异步多线程和导入修复相关测试报告&#10;&#10;- 移除了2025-12-16的异步多线程评估报告&#10;- 删除了导入修复测试报告&#10;- 清理了同步迭代器测试报告&#10;- 移除了异步多线程测试结果详细记录&#10;- 统一清理了冗余的技术评估文档" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(reports): 删除异步多线程和导入修复相关测试报告&#10;&#10;- 移除了2025-12-16的异步多线程评估报告&#10;- 删除了导入修复测试报告&#10;- 清理了同步迭代器测试报告&#10;- 移除了异步多线程测试结果详细记录&#10;- 统一清理了冗余的技术评估文档" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
