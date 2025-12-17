@@ -18,34 +18,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/CompilerTests/function_call_syntax_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Async/AsyncAwaitBasicsTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Async/AsyncErrorHandlingTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Classes/AccessModifiersTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Classes/ConstructorsTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/ExceptionHandling/BasicExceptionHandlingTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/ComplexArithmeticExpressionsTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/OperatorPrecedenceEdgeCasesTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Expression/UnaryOperatorsTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/FunctionCalls/ChainedFunctionCallsTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/FunctionCalls/CollectionFunctionCallsTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Functions/FunctionOverloadingTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Functions/HigherOrderFunctionsTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Interfaces/AbstractClassTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Interfaces/InterfaceAbstractClassInteractionTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Interfaces/InterfaceBasicsTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Lambda/ClosureBehaviorTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Lambda/LambdaCapturingTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Lambda/LambdaTypeInferenceTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/FunctionCallExpression.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/测试实施报告-2025-12-17.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/第二阶段语法测试实施报告-2025-12-17.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/comprehensive_function_call_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/simple_function_call_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_cla_0_a_syntax.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/EdgeCases/SimpleBoundaryTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/第三阶段语法测试实施报告-2025-12-17.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ExpressionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ExpressionParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Advanced/LambdaParsingTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Advanced/LambdaParsingTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -866,7 +842,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="222" />
+    <option name="localTasksCounter" value="223" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -893,7 +869,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(async): 完善异步任务状态管理与AwaitAsync功能&#10;&#10;- 统一使用GetUnixTimeMilliseconds替代GetCurrentTime以提高时间精度&#10;- 修改异常抛出方式，去除new Error语法，适配语言规范&#10;- 增强TaskLangValue类的状态同步与线程安全性&#10;- 实现Task对象属性访问支持（IsCompleted、Status等）&#10;- 优化任务超时控制逻辑与重试机制&#10;- 补充异步任务相关内置函数的实现细节&#10;- 更新测试用例以匹配新的行为规范&#10;- 增加Time模块导入以支持时间相关操作" />
     <MESSAGE value="feat(async): 实现异步任务重试与链式调用功能&#10;&#10;- 新增 TaskLangValue 的 Retry 和 Then 扩展方法&#10;- 支持通过 flakyTask().Retry(3, 200) 语法实现任务重试&#10;- 支持通过 task.Then(nextTaskFunc) 实现任务链式调用&#10;- 优化异步函数执行时的作用域管理和调用栈处理&#10;- 统一异常抛出语法，去除 new Error() 用法&#10;- 改进异步流处理中的字段命名和访问方式&#10;- 增强异步任务状态管理与线程安全性&#10;- 更新测试用例以验证新的异步功能&#10;- 修复 Instance.cs 中的方法调用参数处理逻辑&#10;- 移除无用的 Task 属性 XAUAT" />
     <MESSAGE value="feat(async): 实现异步任务重试与链式调用功能&#10;&#10;- 新增 TaskLangValue 的 ExternalManager 属性，用于访问外部作用域&#10;- 实现 TaskLangValue 的 Retry 和 Then 扩展方法&#10;- 支持通过 flakyTask().Retry(3, 200) 语法实现任务重试&#10;- 支持通过 task.Then(nextTaskFunc) 实现任务链式调用&#10;- 优化异步函数执行时的作用域管理和调用栈处理&#10;- 统一异常抛出语法，去除 new Error() 用法&#10;- 改进异步流处理中的字段命名和访问方式&#10;- 增强异步任务状态管理与线程安全性&#10;- 更新测试用例以验证新的异步功能&#10;- 修复 Instance.cs 中的方法调用参数处理逻辑&#10;- 移除无用的 Task 属性 XAUAT" />
     <MESSAGE value="feat(lang): 实现 Retry 方法支持异步函数重试&#10;&#10;- 添加了对异步函数调用重试的支持&#10;- 实现了可配置的重试次数和延迟时间&#10;- 增加了参数验证和类型检查&#10;- 创建了新的 Task 包装器以支持重试逻辑&#10;- 提供了详细的错误提示信息&#10;- 修复了 Retry 方法的执行机制，确保每次重试都重新执行原函数" />
@@ -918,7 +893,8 @@
     <MESSAGE value="refactor(async): 重构异步函数生成逻辑&#10;&#10;- 引入AsyncStateMachineGenerator类统一处理异步状态机生成&#10;- 修改AsyncFuncInit使用新的状态机生成器&#10;- 移除不必要的using引用以减少依赖&#10;- 重命名私有字段以符合命名规范&#10;- 简化异步方法体生成逻辑&#10;- 更新相关测试文件移除冗余引用" />
     <MESSAGE value="feat(lang): 实现空值合并运算符和解构赋值语法&#10;&#10;- 添加空值合并运算符 ?? 的词法和语法支持&#10;- 实现空值合并运算符在解释器和编译器中的运行时行为&#10;- 添加数组解构赋值 [a, b] &lt;- array 语法支持&#10;- 添加对象解构赋值 {name, age} &lt;- obj 语法支持&#10;- 支持对象解构中的属性别名 {name: newName} &lt;- obj&#10;- 更新解析器以识别新的语法结构&#10;- 在编译模式下实现解构赋值的 IL 生成&#10;- 添加相关测试用例验证新语法功能" />
     <MESSAGE value="feat(lang): 完善类声明语法支持并修复编译器模式类型推断&#10;&#10;- 更新 ClassFuncInitStatement.GenerateIl 方法注释，明确类方法IL生成由ClassInit处理&#10;- 改进 Instance.LoadIlValue 方法，支持TypeBuilder查找和临时object类型处理&#10;- 优化 Operation.OutputType 方法，增强TypeBuilder类型推断逻辑&#10;- 修复 Instance.OutputType 方法，完善类类型查找机制&#10;- 添加综合类声明语法测试文件 comprehensive_class_declaration_test.old8&#10;- 添加类执行测试文件 comprehensive_class_execution_test.old8&#10;- 添加简单类编译器测试 simple_class_compiler_test.old8&#10;- 添加调试类类型测试 debug_class_type.old8&#10;- 更新 workspace.xml 配置，包含新增测试文件和变更记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 完善类声明语法支持并修复编译器模式类型推断&#10;&#10;- 更新 ClassFuncInitStatement.GenerateIl 方法注释，明确类方法IL生成由ClassInit处理&#10;- 改进 Instance.LoadIlValue 方法，支持TypeBuilder查找和临时object类型处理&#10;- 优化 Operation.OutputType 方法，增强TypeBuilder类型推断逻辑&#10;- 修复 Instance.OutputType 方法，完善类类型查找机制&#10;- 添加综合类声明语法测试文件 comprehensive_class_declaration_test.old8&#10;- 添加类执行测试文件 comprehensive_class_execution_test.old8&#10;- 添加简单类编译器测试 simple_class_compiler_test.old8&#10;- 添加调试类类型测试 debug_class_type.old8&#10;- 更新 workspace.xml 配置，包含新增测试文件和变更记录" />
+    <MESSAGE value="feat(parser): 添加抽象类、访问修饰符和异步语法的解析支持&#10;&#10;- 实现抽象类声明和继承语法解析&#10;- 支持抽象方法重载和构造函数链&#10;- 添加public、private、protected、static访问修饰符解析&#10;- 实现async/await异步函数语法解析&#10;- 支持类中异步方法和静态异步方法&#10;- 完善错误语法检测和异常处理机制" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 添加抽象类、访问修饰符和异步语法的解析支持&#10;&#10;- 实现抽象类声明和继承语法解析&#10;- 支持抽象方法重载和构造函数链&#10;- 添加public、private、protected、static访问修饰符解析&#10;- 实现async/await异步函数语法解析&#10;- 支持类中异步方法和静态异步方法&#10;- 完善错误语法检测和异常处理机制" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

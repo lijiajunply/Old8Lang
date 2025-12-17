@@ -199,13 +199,15 @@ b <- 10";
     public void ParseProgram_LambdaWithNestedIf_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"max <- (x, y) -> {
-    if x > y {
-        return x
-    } else {
-        return y
-    }
-}";
+        var code = """
+                   max <- (x, y) -> {
+                       if x > y {
+                           return x
+                       } else {
+                           return y
+                       }
+                   }
+                   """;
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
 
