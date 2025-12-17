@@ -178,43 +178,45 @@ result3 <- operations[index3](10, 5)     // subtract(10, 5) = 5";
     public void ParseProgram_ComplexChainedExpression_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-class MathHelper {
-    public func getOperations() {
-        return [
-            this.getBinaryOps(),
-            this.getUnaryOps()
-        ]
-    }
+        var code = """
 
-    public func getBinaryOps() {
-        return [
-            (a, b) -> a + b,
-            (a, b) -> a * b,
-            (a, b) -> a - b,
-            (a, b) -> a / b if b != 0 else 0
-        ]
-    }
+                   class MathHelper {
+                       public func getOperations() {
+                           return [
+                               this.getBinaryOps(),
+                               this.getUnaryOps()
+                           ]
+                       }
 
-    public func getUnaryOps() {
-        return [
-            (x) -> -x,
-            (x) -> x * x,
-            (x) -> x + 1,
-            (x) -> x / 2.0
-        ]
-    }
-}
+                       public func getBinaryOps() {
+                           return [
+                               (a, b) -> a + b,
+                               (a, b) -> a * b,
+                               (a, b) -> a - b,
+                               (a, b) -> b != 0 ? a / b : 0
+                           ]
+                       }
 
-helper <- MathHelper()
-allOps <- helper.getOperations()
-binaryOps <- allOps[0]
-unaryOps <- allOps[1]
+                       public func getUnaryOps() {
+                           return [
+                               (x) -> -x,
+                               (x) -> x * x,
+                               (x) -> x + 1,
+                               (x) -> x / 2.0
+                           ]
+                       }
+                   }
 
-// 复杂的链式调用
-result1 <- binaryOps[0](binaryOps[1](3, 4), binaryOps[2](10, 2))  // add(multiply(3,4), subtract(10,2)) = add(12, 8) = 20
-result2 <- unaryOps[1](binaryOps[0](5, 3))                       // square(add(5,3)) = square(8) = 64
-result3 <- binaryOps[3](unaryOps[2](10), unaryOps[3](8))         // divide(increment(10), halve(8)) = divide(11, 4) = 2.75";
+                   helper <- MathHelper()
+                   allOps <- helper.getOperations()
+                   binaryOps <- allOps[0]
+                   unaryOps <- allOps[1]
+
+                   // 复杂的链式调用
+                   result1 <- binaryOps[0](binaryOps[1](3, 4), binaryOps[2](10, 2))  // add(multiply(3,4), subtract(10,2)) = add(12, 8) = 20
+                   result2 <- unaryOps[1](binaryOps[0](5, 3))                       // square(add(5,3)) = square(8) = 64
+                   result3 <- binaryOps[3](unaryOps[2](10), unaryOps[3](8))         // divide(increment(10), halve(8)) = divide(11, 4) = 2.75
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -478,7 +480,7 @@ result <- chain[0](5)";
         var code = @"
 func test(x) { return x }
 chain <- [test]
-result <- chain[0]";  // 缺少函数调用的括号
+result <- chain[0]"; // 缺少函数调用的括号
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -498,7 +500,7 @@ result <- chain[0]";  // 缺少函数调用的括号
         var code = @"
 func test(x) { return x }
 chain <- [test]
-result <- chain[""not-a-number""](123)";  // 字符串索引
+result <- chain[""not-a-number""](123)"; // 字符串索引
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 

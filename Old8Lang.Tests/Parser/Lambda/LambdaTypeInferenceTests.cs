@@ -253,23 +253,25 @@ result4 <- lambda4(true)";
     public void ParseProgram_MixedTypeAnnotationsLambda_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-// 部分参数有类型注解，部分没有
-lambda1 <- (x:int, y) -> x + y  // x明确为int，y推断
-lambda2 <- (a, b:string) -> a.ToStr() + b  // b明确为string，a推断
+        var code = """
 
-// 复杂返回类型（使用简单类型）
-lambda3 <- (numbers:list):list -> {
-    result <- {}
-    for num in numbers {
-        result.Push(num * 2)
-    }
-    return result
-}
+                   // 部分参数有类型注解，部分没有
+                   lambda1 <- (x:int, y) -> x + y  // x明确为int，y推断
+                   lambda2 <- (a, b:string) -> a.ToStr() + b  // b明确为string，a推断
 
-result1 <- lambda1(5, ""hello"")
-result2 <- lambda2(42, "" world"")
-result3 <- lambda3({1, 2, 3})";
+                   // 复杂返回类型（使用简单类型）
+                   lambda3 <- (numbers:list):list -> {
+                       result <- {}
+                       for num in numbers {
+                           result.Push(num * 2)
+                       }
+                       return result
+                   }
+
+                   result1 <- lambda1(5, "hello")
+                   result2 <- lambda2(42, " world")
+                   result3 <- lambda3({1, 2, 3})
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 

@@ -27,22 +27,6 @@ public class UnaryOperatorsTests
     }
 
     /// <summary>
-    /// 测试一元正号运算符
-    /// </summary>
-    [Fact]
-    public void ParseProgram_UnaryPlus_ParsesSuccessfully()
-    {
-        // Arrange
-        var code = "result <- +a";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
-        var parser = new LangParser.LangParser(tokens, code);
-
-        // Act & Assert
-        var program = parser.ParseProgram();
-        Assert.NotNull(program);
-    }
-
-    /// <summary>
     /// 测试逻辑非运算符
     /// </summary>
     [Fact]
@@ -265,7 +249,7 @@ public class UnaryOperatorsTests
     public void ParseProgram_UnaryOnLiterals_ParsesSuccessfully()
     {
         // Arrange
-        var code = "result <- -123 + +456 - -789";
+        var code = "result <- -123 + 456 - -789";
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 

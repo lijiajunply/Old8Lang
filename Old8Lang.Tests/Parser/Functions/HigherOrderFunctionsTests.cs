@@ -317,31 +317,33 @@ result <- add5(10)";
     public void ParseProgram_FunctionPipeline_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-func pipeline() {
-    return (functions) -> (input) -> {
-        result <- input
-        for func in functions {
-            result <- func(result)
-        }
-        return result
-    }
-}
+        var code = """
 
-func double(x) -> int {
-    return x * 2
-}
+                   func pipeline() {
+                       return (functions) -> (input) -> {
+                           result <- input
+                           for fun in functions {
+                               result <- fun(result)
+                           }
+                           return result
+                       }
+                   }
 
-func add10(x) -> int {
-    return x + 10
-}
+                   func double(x) -> int {
+                       return x * 2
+                   }
 
-func toString(x) -> string {
-    return x.ToStr()
-}
+                   func add10(x) -> int {
+                       return x + 10
+                   }
 
-process <- pipeline()({double, add10, toString})
-result <- process(5)";
+                   func toString(x) -> string {
+                       return x.ToStr()
+                   }
+
+                   process <- pipeline()({double, add10, toString})
+                   result <- process(5)
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 

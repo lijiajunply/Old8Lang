@@ -370,79 +370,80 @@ listResult <- processor.Process({1, 2, 3})";
     public void ParseProgram_AbstractClassConstructorChain_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-abstract class Vehicle {
-    protected make
-    protected model
-    protected year
+        var code = """
+                   abstract class Vehicle {
+                       protected make
+                       protected model
+                       protected year
 
-    public func constructor(make:string, model:string, year:int) {
-        this.make <- make
-        this.model <- model
-        this.year <- year
-        PrintLine(""Vehicle created: "" + make + "" "" + model + "" "" + year.ToStr())
-    }
+                       public func constructor(make:string, model:string, year:int) {
+                           this.make <- make
+                           this.model <- model
+                           this.year <- year
+                           PrintLine("Vehicle created: " + make + " " + model + " " + year.ToStr())
+                       }
 
-    abstract func StartEngine() -> void
-    abstract func StopEngine() -> void
+                       abstract func StartEngine() -> void
+                       abstract func StopEngine() -> void
 
-    public func GetInfo() -> string {
-        return this.year.ToStr() + "" "" + this.make + "" "" + this.model
-    }
-}
+                       public func GetInfo() -> string {
+                           return this.year.ToStr() + " " + this.make + " " + this.model
+                       }
+                   }
 
-abstract class Car : Vehicle {
-    protected numDoors
-    protected fuelType
+                   abstract class Car : Vehicle {
+                       protected numDoors
+                       protected fuelType
 
-    public func constructor(make:string, model:string, year:int, doors:int, fuel:string) {
-        super(make, model, year)
-        this.numDoors <- doors
-        this.fuelType <- fuel
-        PrintLine(""Car specific properties set"")
-    }
+                       public func constructor(make:string, model:string, year:int, doors:int, fuel:string) {
+                           super(make, model, year)
+                           this.numDoors <- doors
+                           this.fuelType <- fuel
+                           PrintLine("Car specific properties set")
+                       }
 
-    public override func StartEngine() -> void {
-        PrintLine(""Car engine started (""
-    }
+                       public override func StartEngine() -> void {
+                           PrintLine("Car engine started ("
+                       }
 
-    public override func StopEngine() -> void {
-        PrintLine(""Car engine stopped"")
-    }
+                       public override func StopEngine() -> void {
+                           PrintLine("Car engine stopped")
+                       }
 
-    abstract func OpenTrunk() -> void
-}
+                       abstract func OpenTrunk() -> void
+                   }
 
-class ElectricCar : Car {
-    private batteryCapacity
+                   class ElectricCar : Car {
+                       private batteryCapacity
 
-    public func constructor(make:string, model:string, year:int, doors:int) {
-        super(make, model, year, doors, ""electric"")
-        this.batteryCapacity <- 100
-        PrintLine(""Electric car initialized"")
-    }
+                       public func constructor(make:string, model:string, year:int, doors:int) {
+                           super(make, model, year, doors, "electric")
+                           this.batteryCapacity <- 100
+                           PrintLine("Electric car initialized")
+                       }
 
-    public override func StartEngine() -> void {
-        PrintLine(""Electric motor started silently"")
-    }
+                       public override func StartEngine() -> void {
+                           PrintLine("Electric motor started silently")
+                       }
 
-    public override func StopEngine() -> void {
-        PrintLine(""Electric motor stopped"")
-    }
+                       public override func StopEngine() -> void {
+                           PrintLine("Electric motor stopped")
+                       }
 
-    public override func OpenTrunk() -> void {
-        PrintLine(""Electric trunk opened"")
-    }
+                       public override func OpenTrunk() -> void {
+                           PrintLine("Electric trunk opened")
+                       }
 
-    public func ChargeBattery() -> void {
-        PrintLine(""Charging battery: "" + this.batteryCapacity.ToStr() + ""%"")
+                       public func ChargeBattery() -> void {
+                           PrintLine("Charging battery: " + this.batteryCapacity.ToStr() + "%")
 
-tesla <- ElectricCar(""Tesla"", ""Model 3"", 2023, 4)
-tesla.StartEngine()
-tesla.OpenTrunk()
-tesla.ChargeBattery()
-tesla.StopEngine()
-info <- tesla.GetInfo()";
+                   tesla <- ElectricCar("Tesla", "Model 3", 2023, 4)
+                   tesla.StartEngine()
+                   tesla.OpenTrunk()
+                   tesla.ChargeBattery()
+                   tesla.StopEngine()
+                   info <- tesla.GetInfo()
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -462,8 +463,9 @@ info <- tesla.GetInfo()";
     public void ParseProgram_IncompleteAbstractClass_ThrowsSyntaxError()
     {
         // Arrange
-        var code = @"
-abstract class TestAbstract {";
+        var code = """
+                   abstract class TestAbstract {
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 

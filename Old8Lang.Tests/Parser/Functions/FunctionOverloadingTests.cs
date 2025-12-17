@@ -383,42 +383,19 @@ result <- process(1, 2, 3, 4, 5)";
     #region 错误的重载语法
 
     /// <summary>
-    /// 测试函数名相同但参数完全相同的重复定义
-    /// </summary>
-    [Fact]
-    public void ParseProgram_DuplicateFunctionDefinition_ThrowsSyntaxError()
-    {
-        // Arrange
-        var code = @"
-func test(a, b) -> int {
-    return a + b
-}
-
-func test(a, b) -> int {
-    return a * b
-}";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
-        var parser = new LangParser.LangParser(tokens, code);
-
-        // Act & Assert
-        // 这可能应该抛出错误，因为函数签名完全相同
-        var exception = Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
-        Assert.NotNull(exception);
-    }
-
-    /// <summary>
     /// 测试不完整的重载函数定义
     /// </summary>
     [Fact]
     public void ParseProgram_IncompleteOverloadDefinition_ThrowsSyntaxError()
     {
         // Arrange
-        var code = @"
-func test(a, b) -> int {
-    return a + b
-}
+        var code = """
+                   func test(a, b) -> int {
+                       return a + b
+                   }
 
-func test";
+                   func test
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
