@@ -19,10 +19,12 @@ public class SetStatement : OldStatement
     /// 变量标识符（用于普通变量赋值）
     /// </summary>
     public readonly LangId? Id;
+
     /// <summary>
     /// 左侧表达式（用于成员访问或索引访问赋值）
     /// </summary>
     public readonly LangExpression? LeftExpression;
+
     /// <summary>
     /// 赋值表达式
     /// </summary>
@@ -150,6 +152,119 @@ public class SetStatement : OldStatement
         // 处理成员访问赋值：this.name <- value, person.name <- value
         if (LeftExpression is Operation operation)
         {
+            // 处理数组解构赋值：[a, b] <- [1, 2]
+            if (operation.Left is LangId { IdName: "array_destruct" } && operation.Opera == LangTokenType.LeftBracket)
+            {
+                // 从字符串中解析解构的标识符列表
+                var identifiersStr = operation.Right?.ToString() ??
+                                     throw new InvalidOperationError(this, "数组解构赋值需要有效的标识符列表");
+
+                // 解析标识符列表字符串，格式："a,b,null"
+                var identStrs = identifiersStr.Split(',');
+
+                // 获取右侧数组值
+                if (result is ListLangValue listValue)
+                {
+                    // 列表类型
+                    for (int i = 0; i < identStrs.Length; i++)
+                    {
+                        var identStr = identStrs[i].Trim();
+                        if (identStr == "null") continue; // 跳过空元素
+
+                        // 获取列表元素
+                        if (i < listValue.Values.Count)
+                        {
+                            var elementValue = listValue.Values[i];
+                            // 执行赋值
+                            manager.Set(new LangId(identStr), elementValue);
+                        }
+                    }
+                }
+                else if (result is ArrayLangValue arrayValue)
+                {
+                    // 数组类型
+                    var items = arrayValue.GetItems().ToList();
+                    for (int i = 0; i < identStrs.Length; i++)
+                    {
+                        var identStr = identStrs[i].Trim();
+                        if (identStr == "null") continue; // 跳过空元素
+
+                        // 获取数组元素
+                        if (i < items.Count)
+                        {
+                            var elementValue = items[i];
+                            // 执行赋值
+                            manager.Set(new LangId(identStr), elementValue);
+                        }
+                    }
+                }
+                else
+                {
+                    throw new TypeError(this, "数组解构赋值右侧必须是数组或列表类型");
+                }
+
+                return;
+            }
+
+            // 处理对象解构赋值：{name, age} <- person
+            if (operation.Left is LangId { IdName: "object_destruct" } && operation.Opera == LangTokenType.LeftBrace)
+            {
+                // 从字符串中解析解构的属性列表
+                var propertiesStr = operation.Right?.ToString() ??
+                                    throw new InvalidOperationError(this, "对象解构赋值需要有效的属性列表");
+
+                // 获取右侧对象值
+                if (result is not AnyLangValue objectValue)
+                {
+                    throw new TypeError(this, "对象解构赋值右侧必须是对象类型");
+                }
+
+                // 解析属性列表字符串，格式："name,age,id:userId"
+                var propStrs = propertiesStr.Split(',');
+
+                // 执行解构赋值
+                foreach (var propStr in propStrs)
+                {
+                    var propStrTrimmed = propStr.Trim();
+                    if (propStrTrimmed.Contains(":"))
+                    {
+                        // 处理带别名的对象解构：name: newName
+                        var parts = propStrTrimmed.Split(':');
+                        var propName = parts[0].Trim();
+                        var aliasName = parts[1].Trim();
+
+                        // 获取属性值
+                        if (objectValue.Result.TryGetValue(propName, out var propValue))
+                        {
+                            // 执行赋值
+                            manager.Set(new LangId(aliasName), propValue);
+                        }
+                        else
+                        {
+                            throw new NameError(this, propName);
+                        }
+                    }
+                    else
+                    {
+                        // 处理基本对象解构：name
+                        var propName = propStrTrimmed;
+
+                        // 获取属性值
+                        if (objectValue.Result.TryGetValue(propName, out var propValue))
+                        {
+                            // 执行赋值
+                            manager.Set(new LangId(propName), propValue);
+                        }
+                        else
+                        {
+                            throw new NameError(this, propName);
+                        }
+                    }
+                }
+
+                return;
+            }
+
             // 检查是否是 DOT 操作（成员访问）
             if (operation.Opera == LangTokenType.Dot)
             {
@@ -237,10 +352,108 @@ public class SetStatement : OldStatement
         }
         else if (LeftExpression != null)
         {
-            if (LeftExpression is Operation { Opera: LangTokenType.Dot } operation)
+            if (LeftExpression is Operation operation)
             {
+                // 处理数组解构赋值: [a, b, c] <- array
+                if (operation is { Left: LangId { IdName: "array_destruct" }, Opera: LangTokenType.LeftBracket })
+                {
+                    // 解析解构的标识符列表
+                    var identifiersStr = operation.Right?.ToString() ??
+                                         throw new InvalidOperationError(this, "数组解构赋值需要有效的标识符列表");
+                    var identStrs = identifiersStr.Split(',');
+
+                    // 生成右侧数组值的IL
+                    Value.LoadIlValue(ilGenerator, local);
+
+                    // 保存右侧数组值到局部变量
+                    var arrayLocal = ilGenerator.DeclareLocal(typeof(object));
+                    ilGenerator.Emit(OpCodes.Stloc, arrayLocal);
+
+                    // 遍历标识符列表，生成解构赋值IL
+                    for (int i = 0; i < identStrs.Length; i++)
+                    {
+                        var identStr = identStrs[i].Trim();
+                        if (identStr == "null") continue; // 跳过空元素
+
+                        // 加载数组
+                        ilGenerator.Emit(OpCodes.Ldloc, arrayLocal);
+
+                        // 加载索引
+                        ilGenerator.Emit(OpCodes.Ldc_I4, i);
+
+                        // 获取数组元素
+                        ilGenerator.Emit(OpCodes.Ldelem_Ref);
+
+                        // 将元素赋值给对应的变量
+                        var localVar = local.GetOrCreateLocalVar(ilGenerator, identStr, typeof(object));
+                        ilGenerator.Emit(OpCodes.Stloc, localVar);
+                    }
+
+                    return;
+                }
+
+                // 处理对象解构赋值: {name, age} <- person
+                if (operation.Left is LangId { IdName: "object_destruct" } &&
+                    operation.Opera == LangTokenType.LeftBrace)
+                {
+                    // 解析解构的属性列表
+                    var propertiesStr = operation.Right?.ToString() ??
+                                        throw new InvalidOperationError(this, "对象解构赋值需要有效的属性列表");
+                    var propStrs = propertiesStr.Split(',');
+
+                    // 生成右侧对象值的IL
+                    Value.LoadIlValue(ilGenerator, local);
+
+                    // 保存右侧对象值到局部变量
+                    var objLocal = ilGenerator.DeclareLocal(typeof(object));
+                    ilGenerator.Emit(OpCodes.Stloc, objLocal);
+
+                    // 遍历属性列表，生成解构赋值IL
+                    foreach (var propStr in propStrs)
+                    {
+                        var propStrTrimmed = propStr.Trim();
+                        string propName, aliasName;
+
+                        if (propStrTrimmed.Contains(":"))
+                        {
+                            // 处理带别名的对象解构：name: newName
+                            var parts = propStrTrimmed.Split(':');
+                            propName = parts[0].Trim();
+                            aliasName = parts[1].Trim();
+                        }
+                        else
+                        {
+                            // 只有属性名，没有别名
+                            propName = propStrTrimmed;
+                            aliasName = propStrTrimmed;
+                        }
+
+                        // 加载对象
+                        ilGenerator.Emit(OpCodes.Ldloc, objLocal);
+
+                        // 获取属性值（假设是AnyLangValue类型，有Result字典）
+                        // 这里简化处理，直接调用反射获取属性值
+                        var getPropertyMethod = typeof(AnyLangValue).GetMethod("GetPropertyValue",
+                                                    BindingFlags.Public | BindingFlags.Instance) ??
+                                                throw new InvalidOperationError(this,
+                                                    "AnyLangValue类型缺少GetPropertyValue方法");
+
+                        // 加载属性名
+                        ilGenerator.Emit(OpCodes.Ldstr, propName);
+
+                        // 调用GetPropertyValue方法
+                        ilGenerator.Emit(OpCodes.Callvirt, getPropertyMethod);
+
+                        // 将属性值赋值给对应的变量
+                        var localVar = local.GetOrCreateLocalVar(ilGenerator, aliasName, typeof(object));
+                        ilGenerator.Emit(OpCodes.Stloc, localVar);
+                    }
+
+                    return;
+                }
+
                 // 处理成员访问或索引访问赋值: left.right <- value 或 left[right] <- value
-                if (operation.Right is LangId memberId)
+                if (operation.Opera == LangTokenType.Dot && operation.Right is LangId memberId)
                 {
                     // 成员访问赋值: left.right <- value
 
@@ -264,7 +477,8 @@ public class SetStatement : OldStatement
                             var baseType = typeBuilder.BaseType;
                             while (baseType != null && baseType != typeof(object))
                             {
-                                fieldInfo = baseType.GetField(memberId.IdName, BindingFlags.Public | BindingFlags.Instance);
+                                fieldInfo = baseType.GetField(memberId.IdName,
+                                    BindingFlags.Public | BindingFlags.Instance);
                                 if (fieldInfo != null) break;
                                 baseType = baseType.BaseType;
                             }
@@ -272,7 +486,8 @@ public class SetStatement : OldStatement
                         else
                         {
                             // 对于已创建的类型，直接获取字段
-                            fieldInfo = local.InClassEnv.GetField(memberId.IdName, BindingFlags.Public | BindingFlags.Instance);
+                            fieldInfo = local.InClassEnv.GetField(memberId.IdName,
+                                BindingFlags.Public | BindingFlags.Instance);
                         }
 
                         if (fieldInfo != null)
@@ -330,7 +545,7 @@ public class SetStatement : OldStatement
                     }
                     // 如果是TypeBuilder或typeof(object)，跳过此操作
                 }
-                else
+                else if (operation.Opera == LangTokenType.Dot)
                 {
                     // 索引访问赋值: left[right] <- value
                     // 加载左对象

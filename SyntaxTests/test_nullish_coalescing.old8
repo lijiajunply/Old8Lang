@@ -1,0 +1,30 @@
+// 测试空值合并运算符
+
+PrintLine("=== 空值合并运算符测试 ===")
+
+// 测试左侧值为null的情况
+value <- null
+result <- value ?? "default"
+PrintLine("空值合并测试1: " + result) // 应该输出: default
+
+// 测试左侧值不为null的情况
+value <- "actual"
+result <- value ?? "default"
+PrintLine("空值合并测试2: " + result) // 应该输出: actual
+
+// 测试嵌套空值合并
+value1 <- null
+value2 <- null
+result <- value1 ?? value2 ?? "final_default"
+PrintLine("空值合并测试3: " + result) // 应该输出: final_default
+
+// 测试不同类型的值
+num <- null
+result <- num ?? 42
+PrintLine("空值合并测试4: " + result) // 应该输出: 42
+
+bool_val <- null
+result <- bool_val ?? true
+PrintLine("空值合并测试5: " + result) // 应该输出: True
+
+PrintLine("=== 所有测试完成 ===")

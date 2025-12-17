@@ -14,6 +14,7 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
     #region Expression
 
     // expression = boolOpera
+    //            | nullishCoalescing
     //            | ternaryExpression
     //            | binaryExpression
     //            | dotExpr
@@ -26,7 +27,9 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
     {
         // 1. 解析逻辑表达式
         var expr = ParseBoolOpera();
-        // 2. 解析三元表达式（最低优先级）
+        // 2. 解析空值合并表达式
+        expr = ParseNullishCoalescing(expr);
+        // 3. 解析三元表达式（最低优先级）
         expr = ParseTernaryExpression(expr);
         return expr;
     }
@@ -42,6 +45,25 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
             var operatorToken = CurrentToken;
             var position = CreateSourcePosition(operatorToken);
             Expect(operatorToken.Type);
+            var right = ParseBinaryExpression();
+            left = new Operation(left, operatorToken.Type, right, position);
+        }
+
+        return left;
+    }
+
+    /// <summary>
+    /// 解析空值合并表达式
+    /// nullishCoalescing = expression "??" expression ;
+    /// </summary>
+    public LangExpression ParseNullishCoalescing(LangExpression left)
+    {
+        while (CurrentToken.Type == LangTokenType.NullishCoalescing)
+        {
+            var operatorToken = CurrentToken;
+            var position = CreateSourcePosition(operatorToken);
+            Expect(LangTokenType.NullishCoalescing);
+            // 空值合并运算符的右操作数优先级与逻辑表达式相同
             var right = ParseBinaryExpression();
             left = new Operation(left, operatorToken.Type, right, position);
         }

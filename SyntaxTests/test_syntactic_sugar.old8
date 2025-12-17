@@ -1,0 +1,83 @@
+// 测试空值合并运算符和解构赋值语法
+
+// 1. 空值合并运算符测试
+PrintLine("=== 空值合并运算符测试 ===");
+
+a <- null;
+result1 <- a ?? "default";
+PrintLine(result1); // 应该输出: default
+
+b <- "value";
+result2 <- b ?? "default";
+PrintLine(result2); // 应该输出: value
+
+c <- 0;
+result3 <- c ?? 42;
+PrintLine(result3); // 应该输出: 0
+
+// 2. 数组解构赋值测试
+PrintLine("\n=== 数组解构赋值测试 ===");
+
+// 基本数组解构
+array <- [1, 2, 3];
+[a, b, c] <- array;
+PrintLine(a); // 应该输出: 1
+PrintLine(b); // 应该输出: 2
+PrintLine(c); // 应该输出: 3
+
+// 跳过元素
+[d, , e] <- [4, 5, 6];
+PrintLine(d); // 应该输出: 4
+PrintLine(e); // 应该输出: 6
+
+// 列表类型解构
+list <- [7, 8, 9];
+[f, g, h] <- list;
+PrintLine(f); // 应该输出: 7
+PrintLine(g); // 应该输出: 8
+PrintLine(h); // 应该输出: 9
+
+// 3. 对象解构赋值测试
+PrintLine("\n=== 对象解构赋值测试 ===");
+
+// 定义类
+class Person {
+    func init(name, age) {
+        this.name <- name;
+        this.age <- age;
+        this.id <- 123;
+    }
+};
+
+// 创建对象
+person <- Person("Alice", 30);
+
+// 基本对象解构
+{name, age} <- person;
+PrintLine(name); // 应该输出: Alice
+PrintLine(age); // 应该输出: 30
+
+// 带别名的对象解构
+{name: personName, id: userId} <- person;
+PrintLine(personName); // 应该输出: Alice
+PrintLine(userId); // 应该输出: 123
+
+// 混合使用基本解构和别名解构
+{name: n, age, id: i} <- person;
+PrintLine(n); // 应该输出: Alice
+PrintLine(age); // 应该输出: 30
+PrintLine(i); // 应该输出: 123
+
+// 4. 组合测试
+PrintLine("\n=== 组合测试 ===");
+
+// 空值合并与解构结合
+optionalArray <- null;
+[x, y] <- optionalArray ?? [10, 20];
+PrintLine(x); // 应该输出: 10
+PrintLine(y); // 应该输出: 20
+
+// 简单对象解构与空值合并结合
+optionalObj <- null;
+{name: objName} <- optionalObj ?? Person("Default", 18);
+PrintLine(objName); // 应该输出: Default

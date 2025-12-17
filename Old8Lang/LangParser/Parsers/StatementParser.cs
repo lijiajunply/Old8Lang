@@ -265,10 +265,21 @@ public class StatementParser(
             return ParseImportStatement();
         }
 
+        // 特殊处理数组解构赋值和对象解构赋值
+        if (CurrentToken.Type == LangTokenType.LeftBracket)
+        {
+            // 数组解构赋值：[a, b] <- [1, 2]
+            return ParseArrayDestructuring();
+        }
+        else if (CurrentToken.Type == LangTokenType.LeftBrace)
+        {
+            // 对象解构赋值：{name, age} <- person
+            return ParseObjectDestructuring();
+        }
+        
         // 处理赋值语句：identifier｜this <- expression 或 a.name <- value 或 this.name <- value 或 a[b] <- value
         // 先尝试解析可能的左值表达式开头
-        if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.This or LangTokenType.LeftBrace
-            or LangTokenType.LeftBracket)
+        if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.This)
         {
             // 检查是否是赋值语句，允许左值表达式包含成员访问或索引访问
             // 例如：identifier <- value, this.name <- value, a[b] <- value
@@ -556,8 +567,11 @@ public class StatementParser(
             return new SetStatement(id, expr, id.Position);
         }
 
-        // 解析左值表达式
-        var leftExpr = expressionParser.ParseExpression();
+        // 解析左值表达式 - 只能是标识符、this或复杂左值（如a.b或a[b]），不能是解构模式
+        var leftExpr = primaryParser.ParsePrimary();
+        
+        // 处理点访问和索引访问等复杂左值表达式
+        leftExpr = expressionParser.ParseDotExpr(leftExpr);
 
         // 检查是否有类型注解
         var assumptionType = "";
@@ -581,6 +595,136 @@ public class StatementParser(
 
         // 复杂左值表达式赋值：a[b] <- value 或 a.a <- value 或 this.a <- value
         return new SetStatement(leftExpr, expression, leftExpr.Position);
+    }
+    
+    /// <summary>
+    /// 解析数组解构赋值：[a, b] <- [1, 2]
+    /// </summary>
+    private SetStatement ParseArrayDestructuring()
+    {
+        Expect(LangTokenType.LeftBracket);
+        var position = CreateSourcePosition(CurrentToken);
+        
+        // 解析解构的标识符列表
+        var identifiers = new List<string>();
+        while (CurrentToken.Type != LangTokenType.RightBracket)
+        {
+            // 允许跳过空元素，如 [a, , b]
+            if (CurrentToken.Type == LangTokenType.Comma)
+            {
+                identifiers.Add("null");
+                Expect(LangTokenType.Comma);
+                continue;
+            }
+            
+            // 解析标识符，只能是简单标识符，不能是复杂表达式
+            if (CurrentToken.Type != LangTokenType.Identifier)
+            {
+                throw CreateSyntaxError("数组解构赋值中的标识符必须是简单标识符");
+            }
+            var ident = CurrentToken.Value;
+            identifiers.Add(ident);
+            Expect(LangTokenType.Identifier);
+            
+            // 检查是否还有更多元素
+            if (CurrentToken.Type == LangTokenType.Comma)
+            {
+                Expect(LangTokenType.Comma);
+            }
+        }
+        Expect(LangTokenType.RightBracket);
+        
+        // 检查是否有类型注解
+        var assumptionType = "";
+        if (CurrentToken.Type == LangTokenType.Colon)
+        {
+            Expect(LangTokenType.Colon);
+            assumptionType = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+        }
+        
+        Expect(LangTokenType.Assignment);
+        var expression = expressionParser.ParseExpression();
+        
+        // 创建一个特殊的SetStatement，其中Id是一个Operation，表示数组解构
+        var destructExpr = new Operation(
+            new LangId("array_destruct"),
+            LangTokenType.LeftBracket,
+            new LangId(string.Join(",", identifiers)),
+            position);
+        
+        return new SetStatement(destructExpr, expression, position);
+    }
+    
+    /// <summary>
+    /// 解析对象解构赋值：{name, age} <- person
+    /// </summary>
+    private SetStatement ParseObjectDestructuring()
+    {
+        Expect(LangTokenType.LeftBrace);
+        var position = CreateSourcePosition(CurrentToken);
+        
+        // 解析解构的属性列表
+        var properties = new List<string>();
+        while (CurrentToken.Type != LangTokenType.RightBrace)
+        {
+            // 解析属性名
+            if (CurrentToken.Type != LangTokenType.Identifier)
+            {
+                throw CreateSyntaxError("对象解构赋值中的属性名必须是简单标识符");
+            }
+            var propertyName = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+            
+            // 检查是否有别名，如 {name: newName}
+            var aliasName = propertyName;
+            if (CurrentToken.Type == LangTokenType.Colon)
+            {
+                Expect(LangTokenType.Colon);
+                if (CurrentToken.Type != LangTokenType.Identifier)
+                {
+                    throw CreateSyntaxError("对象解构赋值中的别名必须是简单标识符");
+                }
+                aliasName = CurrentToken.Value;
+                Expect(LangTokenType.Identifier);
+                
+                // 格式：propertyName:aliasName
+                properties.Add($"{propertyName}:{aliasName}");
+            }
+            else
+            {
+                // 只有属性名，没有别名
+                properties.Add(propertyName);
+            }
+            
+            // 检查是否还有更多属性
+            if (CurrentToken.Type == LangTokenType.Comma)
+            {
+                Expect(LangTokenType.Comma);
+            }
+        }
+        Expect(LangTokenType.RightBrace);
+        
+        // 检查是否有类型注解
+        var assumptionType = "";
+        if (CurrentToken.Type == LangTokenType.Colon)
+        {
+            Expect(LangTokenType.Colon);
+            assumptionType = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+        }
+        
+        Expect(LangTokenType.Assignment);
+        var expression = expressionParser.ParseExpression();
+        
+        // 创建一个特殊的SetStatement，其中Id是一个Operation，表示对象解构
+        var destructExpr = new Operation(
+            new LangId("object_destruct"),
+            LangTokenType.LeftBrace,
+            new LangId(string.Join(",", properties)),
+            position);
+        
+        return new SetStatement(destructExpr, expression, position);
     }
 
     // ifStatement = "if" expression block ( "elif" expression block )* ( "else" block )? ;

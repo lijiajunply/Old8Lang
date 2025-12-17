@@ -297,6 +297,20 @@ public class AnyLangValue : LangValueType
         Result.TryAdd(id.IdName, langValueType);
     }
 
+    /// <summary>
+    /// 获取对象的属性值，用于编译模式下的对象解构赋值
+    /// </summary>
+    /// <param name="propertyName">属性名称</param>
+    /// <returns>属性值</returns>
+    public LangValueType GetPropertyValue(string propertyName)
+    {
+        if (Result.TryGetValue(propertyName, out var value))
+        {
+            return value;
+        }
+        throw new AttributeError(this, propertyName, Id.IdName);
+    }
+
     public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)
     {
         if (otherLangValueType is not TypeLangValue type)

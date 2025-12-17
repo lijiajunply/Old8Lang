@@ -411,6 +411,12 @@ public static class LangTokenizer
 
             if (code[i] == '?')
             {
+                if (i + 1 < code.Length && code[i + 1] == '?')
+                {
+                    tokens.Add(new LangToken("??", LangTokenType.NullishCoalescing, line, i - column));
+                    i++;
+                    continue;
+                }
                 tokens.Add(new LangToken("?", LangTokenType.Question, line, i - column));
                 continue;
             }

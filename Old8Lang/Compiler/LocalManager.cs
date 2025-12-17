@@ -430,4 +430,41 @@ public class LocalManager
     /// </summary>
     /// <returns>局部变量的数量</returns>
     public int GetCount() => LocalVar.Count;
+
+    /// <summary>
+    /// 获取或创建局部变量
+    /// </summary>
+    /// <param name="name">变量名</param>
+    /// <param name="type">变量类型</param>
+    /// <returns>LocalBuilder实例</returns>
+    public LocalBuilder GetOrCreateLocalVar(string name, Type type)
+    {
+        if (LocalVar.TryGetValue(name, out var localVar))
+        {
+            return localVar;
+        }
+        
+        // 创建新的局部变量
+        throw new InvalidOperationException("GetOrCreateLocalVar方法需要ILGenerator实例来创建新的局部变量");
+    }
+
+    /// <summary>
+    /// 获取或创建局部变量（带ILGenerator实例）
+    /// </summary>
+    /// <param name="ilGenerator">ILGenerator实例</param>
+    /// <param name="name">变量名</param>
+    /// <param name="type">变量类型</param>
+    /// <returns>LocalBuilder实例</returns>
+    public LocalBuilder GetOrCreateLocalVar(ILGenerator ilGenerator, string name, Type type)
+    {
+        if (LocalVar.TryGetValue(name, out var localVar))
+        {
+            return localVar;
+        }
+        
+        // 创建新的局部变量
+        localVar = ilGenerator.DeclareLocal(type);
+        LocalVar[name] = localVar;
+        return localVar;
+    }
 }
