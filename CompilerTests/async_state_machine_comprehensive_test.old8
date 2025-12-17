@@ -1,0 +1,102 @@
+// 测试完整的异步状态机生成
+
+// 测试1：基本的await表达式
+async func testBasicAwait() -> string {
+    PrintLine("Inside testBasicAwait - Start");
+    
+    // 简单的await表达式
+    delayTask <- Task.Delay(50);
+    await delayTask;
+    
+    PrintLine("Inside testBasicAwait - After Delay");
+    
+    return "Basic Await Completed";
+}
+
+// 测试2：多个await表达式
+async func testMultipleAwait() -> string {
+    PrintLine("Inside testMultipleAwait - Start");
+    
+    // 第一个await
+    PrintLine("testMultipleAwait - Before Delay 1");
+    await Task.Delay(30);
+    PrintLine("testMultipleAwait - After Delay 1");
+    
+    // 第二个await
+    PrintLine("testMultipleAwait - Before Delay 2");
+    await Task.Delay(20);
+    PrintLine("testMultipleAwait - After Delay 2");
+    
+    // 第三个await
+    PrintLine("testMultipleAwait - Before Delay 3");
+    await Task.Delay(10);
+    PrintLine("testMultipleAwait - After Delay 3");
+    
+    PrintLine("Inside testMultipleAwait - End");
+    return "Multiple Await Completed";
+}
+
+// 测试3：使用Task.FromResult
+async func testFromResult() -> string {
+    PrintLine("Inside testFromResult - Start");
+    
+    // 使用Task.FromResult创建已完成的任务
+    resultTask <- Task.FromResult("FromResult Test");
+    
+    // 使用await获取结果
+    result <- await resultTask;
+    
+    PrintLine("FromResult result: " + result);
+    
+    return "FromResult Completed";
+}
+
+// 测试4：组合使用Task静态方法
+async func testTaskCombine() -> string {
+    PrintLine("Inside testTaskCombine - Start");
+    
+    // 创建多个任务
+    task1 <- Task.FromResult("Task1 Result");
+    task2 <- Task.Delay(40);
+    task3 <- Task.FromResult("Task3 Result");
+    
+    PrintLine("Created tasks");
+    
+    // 使用await等待所有任务完成
+    result1 <- await task1;
+    await task2;
+    result3 <- await task3;
+    
+    PrintLine("All tasks completed");
+    PrintLine("Result1: " + result1);
+    PrintLine("Result3: " + result3);
+    
+    return "Task Combine Completed";
+}
+
+// 主函数，运行所有测试
+func main() -> void {
+    PrintLine("Start main");
+    
+    // 运行测试1：基本的await表达式
+    PrintLine("\n=== Test 1: Basic Await ===");
+    basicTask <- testBasicAwait();
+    PrintLine("Created basicTask");
+    
+    // 运行测试2：多个await表达式
+    PrintLine("\n=== Test 2: Multiple Await ===");
+    multipleTask <- testMultipleAwait();
+    PrintLine("Created multipleTask");
+    
+    // 运行测试3：Task.FromResult
+    PrintLine("\n=== Test 3: Task.FromResult ===");
+    fromResultTask <- testFromResult();
+    PrintLine("Created fromResultTask");
+    
+    // 运行测试4：组合使用Task静态方法
+    PrintLine("\n=== Test 4: Task Combine ===");
+    combineTask <- testTaskCombine();
+    PrintLine("Created combineTask");
+    
+    PrintLine("\nEnd main");
+}
