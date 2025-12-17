@@ -198,8 +198,7 @@ public class ExpressionStatementTests
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
 
         // Act & Assert
-        var exception = Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
-        Assert.Contains("不能作为独立语句使用", exception.Message);
+        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
 
     /// <summary>

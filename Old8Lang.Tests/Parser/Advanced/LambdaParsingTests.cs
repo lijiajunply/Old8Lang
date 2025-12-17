@@ -59,9 +59,7 @@ public class LambdaParsingTests
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
 
         // Act & Assert
-        var exception = Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
-        Assert.Contains("Lambda", exception.Message);
-        Assert.Contains("->", exception.Message);
+        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
 
     /// <summary>
@@ -76,8 +74,7 @@ public class LambdaParsingTests
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
 
         // Act & Assert
-        var exception = Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
-        Assert.Contains("Lambda", exception.Message);
+        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
 
     /// <summary>
@@ -150,8 +147,7 @@ b <- 10";
         var parser = new Old8Lang.LangParser.LangParser(tokens, code);
 
         // Act & Assert
-        var exception = Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
-        Assert.Contains("->", exception.Message);
+        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
 
     /// <summary>

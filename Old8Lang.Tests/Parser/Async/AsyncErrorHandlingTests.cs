@@ -224,29 +224,30 @@ finalResult <- await topFunction()";
     public void ParseProgram_AsyncTimeoutHandling_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-async func loadWithTimeout(url:string, timeoutMs:int) -> string {
-    startTime <- CurrentTime()
-    try {
-        result <- await fetchDataWithTimeout(url, timeoutMs)
-        return result
-    } catch (error) {
-        return ""Timeout or error: "" + error.ToStr()
-    }
-}
+        var code = """
+                   async func loadWithTimeout(url:string, timeoutMs:int) -> string {
+                       startTime <- CurrentTime()
+                       try {
+                           result <- await fetchDataWithTimeout(url, timeoutMs)
+                           return result
+                       } catch (error) {
+                           return "Timeout or error: " + error.ToStr()
+                       }
+                   }
 
-async func fetchDataWithTimeout(url:string, timeoutMs:int) -> string {
-    // 模拟长时间操作
-    await simulateDelay(timeoutMs + 1000)  // 故意超时
-    return ""Data from "" + url
-}
+                   async func fetchDataWithTimeout(url:string, timeoutMs:int) -> string {
+                       // 模拟长时间操作
+                       await simulateDelay(timeoutMs + 1000)  // 故意超时
+                       return "Data from " + url
+                   }
 
-async func simulateDelay(ms:int) -> void {
-    // 模拟延迟
-    PrintLine(""Delaying for "" + ms.ToStr() + "" ms"")
-}
+                   async func simulateDelay(ms:int) -> void {
+                       // 模拟延迟
+                       PrintLine("Delaying for " + ms.ToStr() + " ms")
+                   }
 
-result <- await loadWithTimeout(""http://example.com"", 5000)";
+                   result <- await loadWithTimeout("http://example.com", 5000)
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 

@@ -161,7 +161,7 @@ public class ThreadNativeTests
                    }
 
                    // 验证结果列表不为空（表示至少有一些线程完成了工作）
-                   Assert(results != {}, "结果列表不应为空")
+                   Assert(results != {}, true)
 
                    """;
         
@@ -252,7 +252,7 @@ public class ThreadNativeTests
                    }
 
                    // 验证结果列表不为空
-                   Assert(results != {}, "结果列表不应为空")
+                   Assert(results != {}, true)
 
                    """;
         
@@ -291,7 +291,7 @@ public class ThreadNativeTests
                    }
 
                    // 验证结果列表不为空
-                   Assert(results != {}, "结果列表不应为空")
+                   Assert(results != {}, true)
 
                    """;
         

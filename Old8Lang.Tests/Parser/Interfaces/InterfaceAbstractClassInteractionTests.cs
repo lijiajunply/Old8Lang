@@ -17,92 +17,94 @@ public class InterfaceAbstractClassInteractionTests
     public void ParseProgram_AbstractClassImplementingInterface_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-interface IComparable {
-    func CompareTo(other) -> int
-}
+        var code = """
 
-interface ICloneable {
-    func Clone() -> object
-}
+                   interface IComparable {
+                       func CompareTo(other) -> int
+                   }
 
-abstract class Shape : IComparable, ICloneable {
-    protected name
-    protected area
+                   interface ICloneable {
+                       func Clone() -> object
+                   }
 
-    public func constructor(name:string) {
-        this.name <- name
-        this.area <- 0
-    }
+                   abstract class Shape implements IComparable, ICloneable {
+                       protected name
+                       protected area
 
-    // IComparable 实现（提供默认实现）
-    public func CompareTo(other) -> int {
-        if this.area < other.area {
-            return -1
-        } else if this.area > other.area {
-            return 1
-        } else {
-            return 0
-        }
-    }
+                       public func constructor(name:string) {
+                           this.name <- name
+                           this.area <- 0
+                       }
 
-    // ICloneable 作为抽象方法，由子类实现
-    abstract func Clone() -> object
+                       // IComparable 实现（提供默认实现）
+                       public func CompareTo(other) -> int {
+                           if this.area < other.area {
+                               return -1
+                           } else if this.area > other.area {
+                               return 1
+                           } else {
+                               return 0
+                           }
+                       }
 
-    abstract func CalculateArea() -> double
+                       // ICloneable 作为抽象方法，由子类实现
+                       abstract func Clone() -> object
 
-    public func GetInfo() -> string {
-        return ""Shape: "" + this.name + "", Area: "" + this.area.ToStr()
-    }
-}
+                       abstract func CalculateArea() -> double
 
-class Circle : Shape {
-    private radius
+                       public func GetInfo() -> string {
+                           return "Shape: " + this.name + ", Area: " + this.area.ToStr()
+                       }
+                   }
 
-    public func constructor(radius:double) {
-        super(""Circle"")
-        this.radius <- radius
-        this.CalculateArea()
-    }
+                   class Circle extends Shape {
+                       private radius
 
-    public override func CalculateArea() -> double {
-        this.area <- 3.14159 * this.radius * this.radius
-        return this.area
-    }
+                       public func constructor(radius:double) {
+                           super("Circle")
+                           this.radius <- radius
+                           this.CalculateArea()
+                       }
 
-    public override func Clone() -> object {
-        return Circle(this.radius)
-    }
-}
+                       public override func CalculateArea() -> double {
+                           this.area <- 3.14159 * this.radius * this.radius
+                           return this.area
+                       }
 
-class Rectangle : Shape {
-    private width
-    private height
+                       public override func Clone() -> object {
+                           return Circle(this.radius)
+                       }
+                   }
 
-    public func constructor(width:double, height:double) {
-        super(""Rectangle"")
-        this.width <- width
-        this.height <- height
-        this.CalculateArea()
-    }
+                   class Rectangle : Shape {
+                       private width
+                       private height
 
-    public override func CalculateArea() -> double {
-        this.area <- this.width * this.height
-        return this.area
-    }
+                       public func constructor(width:double, height:double) {
+                           super("Rectangle")
+                           this.width <- width
+                           this.height <- height
+                           this.CalculateArea()
+                       }
 
-    public override func Clone() -> object {
-        return Rectangle(this.width, this.height)
-    }
-}
+                       public override func CalculateArea() -> double {
+                           this.area <- this.width * this.height
+                           return this.area
+                       }
 
-circle1 <- Circle(5.0)
-circle2 <- Circle(3.0)
-rect1 <- Rectangle(4.0, 6.0)
+                       public override func Clone() -> object {
+                           return Rectangle(this.width, this.height)
+                       }
+                   }
 
-comparison <- circle1.CompareTo(circle2)
-circleClone <- circle1.Clone()
-rectClone <- rect1.Clone()";
+                   circle1 <- Circle(5.0)
+                   circle2 <- Circle(3.0)
+                   rect1 <- Rectangle(4.0, 6.0)
+
+                   comparison <- circle1.CompareTo(circle2)
+                   circleClone <- circle1.Clone()
+                   rectClone <- rect1.Clone()
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
