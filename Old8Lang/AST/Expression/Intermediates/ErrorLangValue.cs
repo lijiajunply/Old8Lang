@@ -86,7 +86,7 @@ public class ErrorLangValue(Old8Exception value) : LangValueType
     /// <summary>
     /// 获取异常的位置信息
     /// </summary>
-    public string Position => value.Position.ToString();
+    public new string Position => value.Position.ToString();
     
     /// <summary>
     /// 获取异常的建议

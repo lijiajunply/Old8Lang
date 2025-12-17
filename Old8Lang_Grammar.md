@@ -18,7 +18,7 @@ Old8Lang 是一种动态类型的编程语言，具有类似 C#/Java 的语法�
 以下是 Old8Lang 的关键字：
 
 ```
-if elif else for while switch case default func class return try catch finally import and or xor not true false in as throw async await mixin
+if elif else for while switch case default func class interface implements return try catch finally import and or xor not true false in as throw async await mixin
 ```
 
 ### 2.3 字面量
@@ -622,13 +622,80 @@ class Product extends BaseClass with Logger, Serializable {
 }
 ```
 
-#### 5.5.4 类实例化
+#### 5.5.4 接口声明
+
+接口是一种抽象类型，定义了类必须实现的方法签名，但不包含方法实现。使用 `interface` 关键字声明接口：
+
+```
+interface IDrawable {
+    func draw() -> void
+}
+
+interface IResizable {
+    func resize(width:int, height:int) -> void
+}
+```
+
+#### 5.5.5 实现接口
+
+类可以通过 `implements` 关键字实现一个或多个接口：
+
+```
+// 实现单个接口
+class Circle implements IDrawable {
+    func draw() -> void {
+        PrintLine("Drawing circle")
+    }
+}
+
+// 实现多个接口
+class Rectangle implements IDrawable, IResizable {
+    func draw() -> void {
+        PrintLine("Drawing rectangle")
+    }
+    
+    func resize(width:int, height:int) -> void {
+        PrintLine("Resizing rectangle to " + width + "x" + height)
+    }
+}
+```
+
+接口实现要求：
+- 实现类必须实现接口中声明的所有方法
+- 方法签名（参数类型、返回类型）必须与接口中声明的完全一致
+- 接口方法默认为 public，实现类中的对应方法也必须是 public
+
+#### 5.5.6 继承与接口结合
+
+类可以同时继承一个父类和实现多个接口：
+
+```
+class AdvancedShape extends BaseShape implements IDrawable, IResizable, IColorable {
+    func draw() -> void {
+        PrintLine("Drawing advanced shape")
+    }
+    
+    func resize(width:int, height:int) -> void {
+        PrintLine("Resizing advanced shape")
+    }
+    
+    func setColor(color:string) -> void {
+        PrintLine("Setting color to " + color)
+    }
+}
+```
+
+#### 5.5.7 类实例化
 
 ```
 p <- Person("Alice", 30)
 p.sayHello()
 
 t <- Test(1, 2)  // 调用带有参数的构造函数
+
+// 接口类型的使用
+drawable:IDrawable <- Circle()
+drawable.draw()  // 调用接口方法
 ```
 
 ### 5.6 多线程
