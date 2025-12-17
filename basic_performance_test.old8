@@ -1,0 +1,128 @@
+// 基础性能测试脚本
+
+PrintLine("Old8Lang 性能测试开始...")
+PrintLine("")
+
+// 1. 大型数据集合处理性能测试
+PrintLine("=== 大型数据集合处理性能测试 ===")
+
+start_time1 <- OS.GetElapsedMilliseconds()
+
+// 创建大型数据集
+large_list <- {}
+for i <- 0, i < 5000, i <- i + 1 {
+    large_list.Push(i)
+}
+
+// 数据处理
+sum <- 0
+for item in large_list {
+    sum <- sum + item
+}
+
+end_time1 <- OS.GetElapsedMilliseconds()
+execution_time1 <- end_time1 - start_time1
+
+PrintLine("处理了 " + large_list.Count().ToStr() + " 个元素")
+PrintLine("总和: " + sum.ToStr())
+PrintLine("执行时间: " + execution_time1.ToStr() + " ms")
+PrintLine("")
+
+// 2. 复杂表达式解析性能测试
+PrintLine("=== 复杂表达式解析性能测试 ===")
+
+start_time2 <- OS.GetElapsedMilliseconds()
+
+// 复杂数学表达式
+a <- 100
+b <- 200
+c <- 50
+
+// 嵌套表达式
+result1 <- (a + b) * (c - (a / b)) + (b % c)
+
+// 复杂条件表达式
+result2 <- ((a > b) && (b > c)) || ((a + b + c) > 300)
+
+// 多层嵌套函数调用
+func helper(x) { return x * x + x }
+func helper2(y) { return helper(y) + helper(y + 1) }
+
+result3 <- helper2(a) + helper2(b) - helper2(c)
+
+// 复杂字符串表达式
+str1 <- "Hello"
+str2 <- "World"
+result4 <- str1 + " " + str2 + " " + a.ToStr()
+
+end_time2 <- OS.GetElapsedMilliseconds()
+execution_time2 <- end_time2 - start_time2
+
+PrintLine("复杂表达式结果1: " + result1.ToStr())
+PrintLine("复杂表达式结果2: " + result2.ToStr())
+PrintLine("复杂表达式结果3: " + result3.ToStr())
+PrintLine("复杂表达式结果4: " + result4)
+PrintLine("执行时间: " + execution_time2.ToStr() + " ms")
+PrintLine("")
+
+// 3. 内存使用情况测试
+PrintLine("=== 内存使用情况测试 ===")
+
+start_time3 <- OS.GetElapsedMilliseconds()
+
+// 创建多个大型列表
+list1 <- {}
+list2 <- {}
+
+// 为每个列表添加大量数据
+for i <- 0, i < 1000, i <- i + 1 {
+    list1.Push("string_" + i.ToStr())
+    list2.Push(i * 2)
+}
+
+// 复杂数据操作
+total <- 0
+for item in list2 {
+    total <- total + item
+}
+
+// 字符串处理
+base_string <- "The quick brown fox"
+result_list <- {}
+for i <- 0, i < 500, i <- i + 1 {
+    result_list.Push(base_string + "_iteration_" + i.ToStr())
+}
+
+end_time3 <- OS.GetElapsedMilliseconds()
+execution_time3 <- end_time3 - start_time3
+
+PrintLine("创建了 " + list1.Count().ToStr() + " 个字符串元素")
+PrintLine("创建了 " + list2.Count().ToStr() + " 个数字元素")
+PrintLine("数字总和: " + total.ToStr())
+PrintLine("创建了 " + result_list.Count().ToStr() + " 个字符串结果")
+PrintLine("执行时间: " + execution_time3.ToStr() + " ms")
+PrintLine("")
+
+// 性能测试总结
+total_time <- execution_time1 + execution_time2 + execution_time3
+PrintLine("=== 性能测试总结 ===")
+PrintLine("大型数据集合处理时间: " + execution_time1.ToStr() + " ms")
+PrintLine("复杂表达式解析时间: " + execution_time2.ToStr() + " ms")
+PrintLine("内存使用测试时间: " + execution_time3.ToStr() + " ms")
+PrintLine("总执行时间: " + total_time.ToStr() + " ms")
+
+// 性能评级
+if total_time < 50 {
+    PrintLine("性能评级: 优秀 ⭐⭐⭐⭐⭐")
+} else if total_time < 100 {
+    PrintLine("性能评级: 良好 ⭐⭐⭐⭐")
+} else if total_time < 200 {
+    PrintLine("性能评级: 一般 ⭐⭐⭐")
+} else if total_time < 500 {
+    PrintLine("性能评级: 较慢 ⭐⭐")
+} else {
+    PrintLine("性能评级: 需要优化 ⭐")
+}
+
+PrintLine("")
+PrintLine("性能测试完成！")

@@ -1,0 +1,112 @@
+// 简化的性能测试脚本
+
+// 1. 大型数据集合处理性能测试
+func test_large_dataset_performance() {
+    PrintLine("=== 大型数据集合处理性能测试 ===")
+
+    // 创建大型数据集
+    large_list <- {}
+    for i <- 0, i < 10000, i <- i + 1 {
+        large_list.Push(i)
+    }
+
+    // 数据处理
+    sum <- 0
+    for item in large_list {
+        sum <- sum + item
+        if item > 5000 {
+            break
+        }
+    }
+
+    PrintLine("处理了5001个元素")
+    PrintLine("总和: " + sum.ToStr())
+    PrintLine("")
+}
+
+// 2. 复杂表达式解析性能测试
+func test_complex_expression_performance() {
+    PrintLine("=== 复杂表达式解析性能测试 ===")
+
+    // 复杂数学表达式
+    a <- 100
+    b <- 200
+    c <- 50
+
+    // 嵌套表达式
+    result1 <- (a + b) * (c - (a / b)) + (b % c)
+
+    // 复杂条件表达式
+    result2 <- ((a > b) && (b > c)) || ((a + b + c) > 300)
+
+    // 多层嵌套函数调用
+    func helper(x) { return x * x + x }
+    func helper2(y) { return helper(y) + helper(y + 1) }
+
+    result3 <- helper2(a) + helper2(b) - helper2(c)
+
+    // 复杂字符串表达式
+    str1 <- "Hello"
+    str2 <- "World"
+    result4 <- str1 + " " + str2 + " " + a.ToStr()
+
+    PrintLine("复杂表达式结果1: " + result1.ToStr())
+    PrintLine("复杂表达式结果2: " + result2.ToStr())
+    PrintLine("复杂表达式结果3: " + result3.ToStr())
+    PrintLine("复杂表达式结果4: " + result4)
+    PrintLine("")
+}
+
+// 3. 内存使用情况测试
+func test_memory_usage_performance() {
+    PrintLine("=== 内存使用情况测试 ===")
+
+    // 创建多个大型列表
+    list1 <- {}
+    list2 <- {}
+    list3 <- {}
+
+    // 为每个列表添加大量数据
+    for i <- 0, i < 5000, i <- i + 1 {
+        list1.Push("string_" + i.ToStr())
+        list2.Push(i * 2)
+        list3.Push(i * 3)
+    }
+
+    // 创建字典
+    dict1 <- {}
+    for i <- 0, i < 1000, i <- i + 1 {
+        dict1["key_" + i.ToStr()] <- "value_" + i.ToStr()
+    }
+
+    // 复杂数据操作
+    total <- 0
+    for item in list2 {
+        total <- total + item
+    }
+
+    // 字符串处理
+    base_string <- "The quick brown fox jumps over the lazy dog"
+    result_list <- {}
+    for i <- 0, i < 1000, i <- i + 1 {
+        result_list.Push(base_string + "_iteration_" + i.ToStr())
+    }
+
+    PrintLine("创建了 " + list1.Count().ToStr() + " 个字符串元素")
+    PrintLine("创建了 " + list2.Count().ToStr() + " 个数字元素")
+    PrintLine("创建了 " + list3.Count().ToStr() + " 个整数元素")
+    PrintLine("创建了 " + dict1.Count().ToStr() + " 个字典条目")
+    PrintLine("数字总和: " + total.ToStr())
+    PrintLine("创建了 " + result_list.Count().ToStr() + " 个字符串结果")
+    PrintLine("")
+}
+
+// 执行所有性能测试
+PrintLine("Old8Lang 性能测试开始...")
+PrintLine("")
+
+test_large_dataset_performance()
+test_complex_expression_performance()
+test_memory_usage_performance()
+
+PrintLine("性能测试完成！")

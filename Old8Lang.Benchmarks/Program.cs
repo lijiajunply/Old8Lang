@@ -4,6 +4,9 @@ using Old8Lang.Benchmarks;
 // 运行性能基准测试
 Console.WriteLine("=== Old8Lang 性能基准测试 ===\n");
 
+Console.WriteLine("正在运行高级性能测试...");
+BenchmarkRunner.Run<AdvancedPerformanceTests>();
+
 // 运行解释器性能测试
 Console.WriteLine("正在运行解释器性能测试...");
 BenchmarkRunner.Run<InterpreterBenchmarkTests>();
