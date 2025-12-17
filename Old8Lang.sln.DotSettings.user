@@ -35,7 +35,10 @@
   &lt;Assembly Path="/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/OldLib/dll/Old8LangLib.dll" /&gt;
   &lt;Assembly Path="/usr/local/share/dotnet/shared/Microsoft.NETCore.App/10.0.0/System.Runtime.dll" /&gt;
 &lt;/AssemblyExplorer&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=e9de5ea7_002D95aa_002D45c5_002D91d2_002Dc46acccab710/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="&amp;lt;Old8Lang.Tests&amp;gt; 中的所有测试 #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=34038497_002Dcaa6_002D4590_002D9735_002Da11ac1a57cd0/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="ParseProgram_AbstractClassInstantiation_ThrowsSyntaxError" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;Project Location="/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests" Presentation="&amp;lt;Old8Lang.Tests&amp;gt;" /&gt;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=e9de5ea7_002D95aa_002D45c5_002D91d2_002Dc46acccab710/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="&amp;lt;Old8Lang.Tests&amp;gt; 中的所有测试 #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Project Location="/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests" Presentation="&amp;lt;Old8Lang.Tests&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=fcae5552_002D40ef_002D409a_002D8c5b_002Db548ebb4a1d6/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="&amp;lt;Old8Lang.Tests&amp;gt; 中的所有测试" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;

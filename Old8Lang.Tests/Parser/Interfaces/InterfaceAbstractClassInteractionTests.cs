@@ -66,12 +66,12 @@ public class InterfaceAbstractClassInteractionTests
                            this.CalculateArea()
                        }
 
-                       public override func CalculateArea() -> double {
+                       public func CalculateArea() -> double {
                            this.area <- 3.14159 * this.radius * this.radius
                            return this.area
                        }
 
-                       public override func Clone() -> object {
+                       public func Clone() -> object {
                            return Circle(this.radius)
                        }
                    }
@@ -87,12 +87,12 @@ public class InterfaceAbstractClassInteractionTests
                            this.CalculateArea()
                        }
 
-                       public override func CalculateArea() -> double {
+                       public func CalculateArea() -> double {
                            this.area <- this.width * this.height
                            return this.area
                        }
 
-                       public override func Clone() -> object {
+                       public func Clone() -> object {
                            return Rectangle(this.width, this.height)
                        }
                    }
@@ -120,106 +120,109 @@ public class InterfaceAbstractClassInteractionTests
     public void ParseProgram_ComplexInheritanceInterfaceHierarchy_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-interface ISerializable {
-    func Serialize() -> string
-    func Deserialize(data:string) -> void
-}
+        var code = """
 
-interface IDisposable {
-    func Dispose() -> void
-}
+                   interface ISerializable {
+                       func Serialize() -> string
+                       func Deserialize(data:string) -> void
+                   }
 
-interface ILogger {
-    func Log(message:string) -> void
-    func GetLogs() -> list
-}
+                   interface IDisposable {
+                       func Dispose() -> void
+                   }
 
-abstract class Component : IDisposable {
-    protected name
-    protected isDisposed
+                   interface ILogger {
+                       func Log(message:string) -> void
+                       func GetLogs() -> list
+                   }
 
-    public func constructor(name:string) {
-        this.name <- name
-        this.isDisposed <- false
-    }
+                   abstract class Component implements IDisposable {
+                       protected name
+                       protected isDisposed
 
-    public virtual func Dispose() -> void {
-        if not this.isDisposed {
-            this.isDisposed <- true
-            PrintLine(""Component "" + this.name + "" disposed"")
-        }
-    }
+                       public func constructor(name:string) {
+                           this.name <- name
+                           this.isDisposed <- false
+                       }
 
-    abstract func Initialize() -> void
-    abstract func Update() -> void
-}
+                       public func Dispose() -> void {
+                           if not this.isDisposed {
+                               this.isDisposed <- true
+                               PrintLine("Component " + this.name + " disposed")
+                           }
+                       }
 
-abstract class NetworkComponent : Component, ISerializable {
-    protected address
-    protected port
+                       abstract func Initialize() -> void
+                       abstract func Update() -> void
+                   }
 
-    public func constructor(name:string, address:string, port:int) {
-        super(name)
-        this.address <- address
-        this.port <- port
-    }
+                   abstract class NetworkComponent extends Component implements ISerializable {
+                       protected address
+                       protected port
 
-    public func Serialize() -> string {
-        return ""{name:'"" + this.name + ""',address:'"" + this.address + ""',port:"""" + this.port.ToStr() + """"}""
+                       public func constructor(name:string, address:string, port:int) {
+                           super(name)
+                           this.address <- address
+                           this.port <- port
+                       }
 
-    public func Deserialize(data:string) -> void {
-        PrintLine(""Deserializing network component: "" + data)
-    }
+                       public func Serialize() -> string {
+                           return "Name:" + this.name + " Address:" + this.address + " Port:" + this.port.ToStr()
+                       }
 
-    public override func Update() -> void {
-        PrintLine(""Network component updating..."")
-    }
-}
+                       public func Deserialize(data:string) -> void {
+                           PrintLine("Deserializing network component: " + data)
+                       }
 
-class Server : NetworkComponent, ILogger {
-    private logs
-    private maxLogSize
+                       public func Update() -> void {
+                           PrintLine("Network component updating...")
+                       }
+                   }
 
-    public func constructor(name:string, address:string, port:int) {
-        super(name, address, port)
-        this.logs <- {}
-        this.maxLogSize <- 100
-    }
+                   class Server extends NetworkComponent implements ILogger {
+                       private logs
+                       private maxLogSize
 
-    public override func Initialize() -> void {
-        PrintLine(""Server "" + this.name + "" initializing on "" + this.address + "":"" + this.port.ToStr())
-    }
+                       public func constructor(name:string, address:string, port:int) {
+                           super(name, address, port)
+                           this.logs <- {}
+                           this.maxLogSize <- 100
+                       }
 
-    public override func Update() -> void {
-        super.Update()
-        PrintLine(""Server processing requests..."")
-    }
+                       public func Initialize() -> void {
+                           PrintLine("Server " + this.name + " initializing on " + this.address + ":" + this.port.ToStr())
+                       }
 
-    public func Log(message:string) -> void {
-        if this.logs.Count() < this.maxLogSize {
-            this.logs.Push(message)
-        }
-        PrintLine(""[SERVER] "" + message)
-    }
+                       public func Update() -> void {
+                           super.Update()
+                           PrintLine("Server processing requests...")
+                       }
 
-    public func GetLogs() -> list {
-        return this.logs
-    }
+                       public func Log(message:string) -> void {
+                           if this.logs.Count() < this.maxLogSize {
+                               this.logs.Push(message)
+                           }
+                           PrintLine("[SERVER] " + message)
+                       }
 
-    public override func Dispose() -> void {
-        this.Log(""Server shutting down..."")
-        super.Dispose()
-    }
-}
+                       public func GetLogs() -> list {
+                           return this.logs
+                       }
 
-server <- Server(""MainServer"", ""192.168.1.1"", 8080)
-server.Initialize()
-server.Log(""Server started successfully"")
-server.Update()
-logs <- server.GetLogs()
-serializedData <- server.Serialize()
-server.Dispose()";
+                       public func Dispose() -> void {
+                           this.Log("Server shutting down...")
+                           super.Dispose()
+                       }
+                   }
+
+                   server <- Server("MainServer", "192.168.1.1", 8080)
+                   server.Initialize()
+                   server.Log("Server started successfully")
+                   server.Update()
+                   logs <- server.GetLogs()
+                   serializedData <- server.Serialize()
+                   server.Dispose()
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -246,7 +249,7 @@ interface IMovable {
     func GetPosition() -> dict
 }
 
-abstract class Shape : IDrawable {
+abstract class Shape implements IDrawable {
     protected x
     protected y
 
@@ -263,7 +266,7 @@ abstract class Shape : IDrawable {
     abstract func GetArea() -> double
 }
 
-class Circle : Shape, IMovable {
+class Circle extends Shape implements IMovable {
     private radius
 
     public func constructor(x:double, y:double, radius:double) {
@@ -271,11 +274,11 @@ class Circle : Shape, IMovable {
         this.radius <- radius
     }
 
-    public override func Draw() -> void {
+    public func Draw() -> void {
         PrintLine(""Drawing circle at ("" + this.x.ToStr() + "", "" + this.y.ToStr() + "") with radius "" + this.radius.ToStr())
     }
 
-    public override func GetArea() -> double {
+    public func GetArea() -> double {
         return 3.14159 * this.radius * this.radius
     }
 
@@ -285,7 +288,7 @@ class Circle : Shape, IMovable {
     }
 }
 
-class Rectangle : Shape, IMovable {
+class Rectangle extends Shape implements IMovable {
     private width
     private height
 
@@ -295,11 +298,11 @@ class Rectangle : Shape, IMovable {
         this.height <- height
     }
 
-    public override func Draw() -> void {
+    public func Draw() -> void {
         PrintLine(""Drawing rectangle at ("" + this.x.ToStr() + "", "" + this.y.ToStr() + "") with size "" + this.width.ToStr() + ""x"" + this.height.ToStr())
     }
 
-    public override func GetArea() -> double {
+    public func GetArea() -> double {
         return this.width * this.height
     }
 
@@ -312,9 +315,7 @@ class Rectangle : Shape, IMovable {
 // 使用接口作为参数的函数
 func DrawAllShapes(shapes:list) -> void {
     for shape in shapes {
-        if shape is IDrawable {
-            shape.Draw()
-        }
+        shape.Draw()
     }
 }
 
@@ -323,12 +324,10 @@ func GetLargestShape(shapes:list) -> IDrawable {
     largestArea <- -1
 
     for shape in shapes {
-        if shape is IDrawable {
-            area <- shape.GetArea()
-            if area > largestArea {
-                largestArea <- area
-                largest <- shape
-            }
+        area <- shape.GetArea()
+        if area > largestArea {
+            largestArea <- area
+            largest <- shape
         }
     }
 
@@ -337,9 +336,7 @@ func GetLargestShape(shapes:list) -> IDrawable {
 
 func MoveAllMovableShapes(shapes:list, dx:double, dy:double) -> void {
     for shape in shapes {
-        if shape is IMovable {
-            shape.Move(dx, dy)
-        }
+        shape.Move(dx, dy)
     }
 }
 
@@ -397,7 +394,7 @@ interface ILogger {
     }
 }
 
-abstract class BaseLogger : ILogger {
+abstract class BaseLogger implements ILogger {
     protected logLevel
 
     public func constructor(level:string) {
@@ -417,7 +414,7 @@ abstract class BaseLogger : ILogger {
     abstract func ExportLogs() -> string
 }
 
-class FileLogger : BaseLogger {
+class FileLogger extends BaseLogger {
     private fileName
     private logs
 
@@ -427,12 +424,12 @@ class FileLogger : BaseLogger {
         this.logs <- {}
     }
 
-    public override func ClearLogs() -> void {
+    public func ClearLogs() -> void {
         this.logs <- {}
         PrintLine(""File logs cleared"")
     }
 
-    public override func ExportLogs() -> string {
+    public func ExportLogs() -> string {
         content <- ""File: "" + this.fileName + ""\nLogs:\n""
         for log in this.logs {
             content <- content + log + ""\n""
@@ -446,7 +443,7 @@ class FileLogger : BaseLogger {
     }
 }
 
-class ConsoleLogger : BaseLogger {
+class ConsoleLogger extends BaseLogger {
     private maxMessages
 
     public func constructor(maxMessages:int) {
@@ -454,12 +451,12 @@ class ConsoleLogger : BaseLogger {
         this.maxMessages <- maxMessages
     }
 
-    public override func ClearLogs() -> void {
+    public func ClearLogs() -> void {
         // Console不需要清除日志
         PrintLine(""Console does not store logs"")
     }
 
-    public override func ExportLogs() -> string {
+    public func ExportLogs() -> string {
         return ""Console logs cannot be exported""
     }
 }
@@ -525,7 +522,7 @@ abstract class Person {
     }
 }
 
-class Employee : Person, IWorker {
+class Employee extends Person implements IWorker {
     private salary
     private position
 
@@ -544,7 +541,7 @@ class Employee : Person, IWorker {
     }
 }
 
-class Driver : Person, IDriver {
+class Driver extends Person implements IDriver {
     private licenseNumber
     private vehicleType
 
@@ -563,7 +560,7 @@ class Driver : Person, IDriver {
     }
 }
 
-class DeliveryDriver : Driver, IWorker {
+class DeliveryDriver extends Driver implements IWorker {
     private salary
     private deliveries
 
@@ -598,44 +595,16 @@ func ProcessDriver(driver:IDriver) -> void {
     PrintLine(""License: "" + driver.GetLicense())
 }
 
-func CheckPersonCapabilities(person) -> void {
-    PrintLine(""Checking capabilities of: "" + person.GetName())
-
-    if person is IWorker {
-        PrintLine(""  Can work"")
-        ProcessWorker(person)
-    }
-
-    if person is IDriver {
-        PrintLine(""  Can drive"")
-        ProcessDriver(person)
-    }
-}
-
 // 创建不同类型的对象
 emp <- Employee(""Alice"", 30, 50000.0, ""Software Engineer"")
 driver <- Driver(""Bob"", 35, ""D123456"", ""Car"")
 deliveryDriver <- DeliveryDriver(""Charlie"", 25, ""D789012"", 40000.0)
 
-people <- {emp, driver, deliveryDriver}
-
-// 检查每个人的能力
-for person in people {
-    CheckPersonCapabilities(person)
-    PrintLine("""")
-}
-
-// 类型转换测试
-deliveryPerson <- deliveryDriver
-if deliveryPerson is IWorker {
-    worker <- deliveryPerson as IWorker
-    worker.Work()
-}
-
-if deliveryPerson is IDriver {
-    driver <- deliveryPerson as IDriver
-    driver.Drive()
-}";
+// 直接调用方法，不需要运行时类型检查
+ProcessWorker(emp)
+ProcessDriver(driver)
+ProcessWorker(deliveryDriver)
+ProcessDriver(deliveryDriver)";
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -655,21 +624,23 @@ if deliveryPerson is IDriver {
     public void ParseProgram_AbstractClassMissingInterfaceMethods_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-interface ITestInterface {
-    func Method1() -> void
-    func Method2() -> string
-}
+        var code = """
 
-abstract class AbstractTest : ITestInterface {
-    // 只实现了部分接口方法
-    public func Method1() -> void {
-        PrintLine(""Method1 implemented in abstract class"")
-    }
+                   interface ITestInterface {
+                       func Method1() -> void
+                       func Method2() -> string
+                   }
 
-    // Method2 未实现，应该成为抽象方法
-    // abstract func Method2() -> string
-}";
+                   abstract class AbstractTest implements ITestInterface {
+                       // 只实现了部分接口方法
+                       public func Method1() -> void {
+                           PrintLine("Method1 implemented in abstract class")
+                       }
+
+                       // Method2 未实现，应该成为抽象方法
+                       // abstract func Method2() -> string
+                   }
+                   """;
 
         // 语法上可能正确，但语义上应该报错
         var tokens = LangParser.LangInterpreter.Tokenize(code);
@@ -692,7 +663,7 @@ interface IInterface {
     func DoSomething(param:int) -> string
 }
 
-abstract class AbstractClass : IInterface {
+abstract class AbstractClass implements IInterface {
     // 参数类型或返回类型不匹配
     public func DoSomething(param:string) -> void {
         PrintLine(""Parameter type mismatch"")
