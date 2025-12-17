@@ -619,6 +619,7 @@ public static class LangTokenizer
 /// - 单行注释 (// ...)
 /// - 多行注释 (/* ... */)
 /// 过滤过程中会保留换行符，以确保后续词法分析时行号的准确性。
+/// 重要：字符串字面量中的 // 和 /* */ 不会被误认为注释。
 /// </remarks>
 public struct FilteringCommentsTokenizer(string input)
 {
@@ -634,65 +635,107 @@ public struct FilteringCommentsTokenizer(string input)
     public string FilteringComments()
     {
         var result = new StringBuilder();
+        bool inDoubleQuoteString = false;
+        bool inSingleQuoteString = false;
+        bool escapeNext = false;
 
         // 扫描整个输入字符串
         while (CurrentIndex < input.Length)
         {
             var currentChar = input[CurrentIndex];
 
-            // 处理单行注释
-            if (currentChar == '/' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '/')
-            {
-                // 跳过单行注释，但保留换行符
-                Advance(); // 跳过 '/'  
-                Advance(); // 跳过 '/'  
-
-                // 跳过注释内容直到换行符
-                while (CurrentIndex < input.Length && input[CurrentIndex] != '\n')
-                {
-                    Advance();
-                }
-
-                // 保留换行符
-                if (CurrentIndex < input.Length && input[CurrentIndex] == '\n')
-                {
-                    result.Append('\n');
-                    Advance();
-                }
-            }
-            // 处理多行注释
-            else if (currentChar == '/' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '*')
-            {
-                // 跳过多行注释，但保留其中的换行符
-                Advance(); // 跳过 '/'  
-                Advance(); // 跳过 '*'  
-
-                // 跳过注释内容直到结束标记
-                while (CurrentIndex < input.Length)
-                {
-                    // 检查是否到达注释结束标记 */
-                    if (input[CurrentIndex] == '*' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '/')
-                    {
-                        Advance(); // 跳过 '*'  
-                        Advance(); // 跳过 '/'  
-                        break;
-                    }
-
-                    // 保留多行注释中的换行符
-                    if (input[CurrentIndex] == '\n')
-                    {
-                        result.Append('\n');
-                    }
-
-                    Advance();
-                }
-            }
-            // 处理普通字符
-            else
+            // 处理转义字符
+            if (escapeNext)
             {
                 result.Append(currentChar);
                 Advance();
+                escapeNext = false;
+                continue;
             }
+
+            // 处理转义字符开始
+            if (currentChar == '\\' && (inDoubleQuoteString || inSingleQuoteString))
+            {
+                result.Append(currentChar);
+                Advance();
+                escapeNext = true;
+                continue;
+            }
+
+            // 处理字符串字面量
+            if (currentChar == '"' && !inSingleQuoteString)
+            {
+                inDoubleQuoteString = !inDoubleQuoteString;
+                result.Append(currentChar);
+                Advance();
+                continue;
+            }
+
+            if (currentChar == '\'' && !inDoubleQuoteString)
+            {
+                inSingleQuoteString = !inSingleQuoteString;
+                result.Append(currentChar);
+                Advance();
+                continue;
+            }
+
+            // 只有在字符串外部才处理注释
+            if (!inDoubleQuoteString && !inSingleQuoteString)
+            {
+                // 处理单行注释
+                if (currentChar == '/' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '/')
+                {
+                    // 跳过单行注释，但保留换行符
+                    Advance(); // 跳过 '/'
+                    Advance(); // 跳过 '/'
+
+                    // 跳过注释内容直到换行符
+                    while (CurrentIndex < input.Length && input[CurrentIndex] != '\n')
+                    {
+                        Advance();
+                    }
+
+                    // 保留换行符
+                    if (CurrentIndex < input.Length && input[CurrentIndex] == '\n')
+                    {
+                        result.Append('\n');
+                        Advance();
+                    }
+                    continue;
+                }
+                // 处理多行注释
+                else if (currentChar == '/' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '*')
+                {
+                    // 跳过多行注释，但保留其中的换行符
+                    Advance(); // 跳过 '/'
+                    Advance(); // 跳过 '*'
+
+                    // 跳过注释内容直到结束标记
+                    while (CurrentIndex < input.Length)
+                    {
+                        // 检查是否到达注释结束标记 */
+                        if (input[CurrentIndex] == '*' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '/')
+                        {
+                            Advance(); // 跳过 '*'
+                            Advance(); // 跳过 '/'
+                            break;
+                        }
+
+                        // 保留多行注释中的换行符
+                        if (input[CurrentIndex] == '\n')
+                        {
+                            result.Append('\n');
+                        }
+
+                        Advance();
+                    }
+                    continue;
+                }
+            }
+
+            // 处理普通字符（包括字符串内的内容）
+            result.Append(currentChar);
+            Advance();
         }
 
         return result.ToString();
