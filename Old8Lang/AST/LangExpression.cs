@@ -30,30 +30,44 @@ public abstract class LangExpression : IOldLangTree
     public virtual void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
     {
         // 先获取值的类型
-        var type = OutputType(local) ?? typeof(int); // 默认类型为int
+        var valueType = OutputType(local) ?? typeof(int); // 默认类型为int
+
+        // 检查变量是否已经在LocalVarTypes中有类型注解
+        if (local.LocalVarTypes.TryGetValue(idName, out var existingType))
+        {
+            // 验证新值的类型与现有类型注解匹配
+            local.ValidateType(existingType, valueType, Position);
+        }
+        else
+        {
+            // 如果变量还没有类型注解，保存新值的类型到LocalVarTypes
+            local.LocalVarTypes[idName] = valueType;
+        }
 
         // 先声明变量，确保在使用前已经存在
-        var b = local.GetLocalVar(idName);
-        if (b != null)
+        var localVar = local.GetLocalVar(idName);
+        if (localVar != null)
         {
-            if (b.LocalType != type)
+            if (localVar.LocalType != valueType)
             {
+                // 类型不匹配，重新声明变量
                 local.RemoveLocalVar(idName);
-                b = ilGenerator.DeclareLocal(type);
-                local.AddLocalVar(idName, b);
+                localVar = ilGenerator.DeclareLocal(valueType);
+                local.AddLocalVar(idName, localVar);
             }
         }
         else
         {
-            b = ilGenerator.DeclareLocal(type);
-            local.AddLocalVar(idName, b);
+            // 首次声明变量
+            localVar = ilGenerator.DeclareLocal(valueType);
+            local.AddLocalVar(idName, localVar);
         }
 
         // 然后加载值
         LoadIlValue(ilGenerator, local);
 
         // 最后存储到变量
-        ilGenerator.Emit(OpCodes.Stloc, b.LocalIndex);
+        ilGenerator.Emit(OpCodes.Stloc, localVar.LocalIndex);
     }
 
     public virtual Type? OutputType(LocalManager local)

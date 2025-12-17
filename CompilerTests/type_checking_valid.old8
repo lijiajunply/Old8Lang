@@ -1,0 +1,88 @@
+// 编译模式类型检查测试用例 - 仅包含正确的场景
+// 这个文件包含各种正确的类型使用场景，用于验证编译模式下的静态类型检查功能
+
+// 测试1：正确的函数定义和调用
+func add(a:int, b:int) -> int {
+    return a + b
+}
+
+// 测试2：正确的类型转换
+func correct_cast(a:int) -> double {
+    return a as double
+}
+
+// 测试3：正确的变量赋值
+func correct_var_assignment() -> void {
+    x:int <- 10
+    x <- 20  // 正确：相同类型赋值
+}
+
+// 测试4：正确的函数调用
+func correct_function_call() -> void {
+    result:int <- add(10, 20)  // 正确：参数类型匹配
+    double_result:double <- correct_cast(result)  // 正确：参数类型匹配
+}
+
+// 测试5：正确的void函数
+func void_function() -> void {
+    // 没有返回值
+}
+
+// 测试6：正确的字符串操作
+func string_operation() -> string {
+    s:string <- "hello"
+    s <- s + " world"  // 正确：字符串拼接
+    return s
+}
+
+// 测试7：正确的布尔类型
+func bool_operation(a:bool, b:bool) -> bool {
+    return a and b  // 正确：布尔操作
+}
+
+// 测试8：正确的列表类型
+func list_operation() -> void {
+    my_list:list <- [1, 2, 3, 4, 5]  // 正确：列表初始化
+}
+
+// 主函数
+func main() -> void {
+    PrintLine("===== 编译模式类型检查测试 - 正确场景 =====")
+    
+    // 测试1：正确的函数调用
+    result:int <- add(10, 20)
+    PrintLine("add(10, 20) = " + result.ToStr())
+    
+    // 测试2：正确的类型转换
+    double_result:double <- correct_cast(100)
+    PrintLine("correct_cast(100) = " + double_result.ToStr())
+    
+    // 测试3：正确的变量赋值
+    correct_var_assignment()
+    PrintLine("变量赋值测试通过")
+    
+    // 测试4：正确的函数调用
+    correct_function_call()
+    PrintLine("函数调用测试通过")
+    
+    // 测试5：正确的void函数
+    void_function()
+    PrintLine("void函数测试通过")
+    
+    // 测试6：正确的字符串操作
+    str_result:string <- string_operation()
+    PrintLine("字符串操作结果: " + str_result)
+    
+    // 测试7：正确的布尔操作
+    bool_result:bool <- bool_operation(true, false)
+    PrintLine("布尔操作结果: " + bool_result.ToStr())
+    
+    // 测试8：正确的列表操作
+    list_operation()
+    PrintLine("列表操作测试通过")
+    
+    PrintLine("===== 所有测试通过！=====")
+}
+
+// 执行主函数
+main()

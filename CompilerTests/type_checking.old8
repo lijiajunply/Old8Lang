@@ -1,0 +1,109 @@
+// 编译模式类型检查测试用例
+// 这个文件包含各种类型检查场景，用于验证编译模式下的静态类型检查功能
+
+// 测试1：正确的类型注解
+func add(a:int, b:int) -> int {
+    return a + b
+}
+
+// 测试2：错误的参数类型
+func wrong_param_type(a:int, b:string) -> int {
+    return a + b  // 错误：int和string不能相加
+}
+
+// 测试3：错误的返回值类型
+func wrong_return_type(a:int, b:int) -> string {
+    return a + b  // 错误：返回int类型，期望string类型
+}
+
+// 测试4：变量赋值类型不匹配
+func wrong_var_assignment() -> void {
+    x:int <- 10
+    x <- "string"  // 错误：不能将string赋值给int类型变量
+}
+
+// 测试5：函数调用参数类型不匹配
+func call_wrong_params() -> void {
+    result <- add(10, "20")  // 错误：第二个参数应该是int类型
+}
+
+// 测试6：缺少返回值类型注解
+func missing_return_type(a:int, b:int) {
+    return a + b  // 错误：缺少返回值类型注解
+}
+
+// 测试7：缺少参数类型注解
+func missing_param_type(a, b:int) -> int {
+    return a + b  // 错误：第一个参数缺少类型注解
+}
+
+// 测试8：正确的类型转换
+func correct_cast(a:int) -> double {
+    return a as double  // 正确：int可以转换为double
+}
+
+// 测试9：错误的类型转换
+func wrong_cast(a:string) -> int {
+    return a as int  // 错误：不能将string转换为int
+}
+
+// 测试10：正确的默认参数
+func with_default_param(a:int, b:int) -> int {
+    return a + b  // 正确：默认参数类型匹配
+}
+
+// 测试11：错误的默认参数类型
+func wrong_default_param(a:int, b:string) -> string {
+    return a + b  // 错误：默认参数类型不匹配
+}
+
+// 测试12：正确的数组类型
+func correct_array() -> void {
+    arr:list <- [1, 2, 3, 4, 5]  // 正确：数组元素类型匹配
+}
+
+// 测试13：变量赋值类型不匹配（简化版本）
+func simple_wrong_assignment() -> void {
+    x:int <- 10
+    x <- 20.5  // 错误：不能将double赋值给int类型变量
+}
+
+// 测试14：正确的函数调用
+func correct_call() -> void {
+    result:int <- add(10, 20)  // 正确：参数类型匹配
+}
+
+// 测试15：错误的函数调用（简化版本）
+func simple_wrong_call() -> void {
+    result:int <- add(10, 20.5)  // 错误：第二个参数应该是int类型
+}
+
+// 主函数
+func main() -> void {
+    PrintLine("类型检查测试开始")
+    
+    // 测试正确的函数调用
+    result:int <- add(10, 20)
+    PrintLine("add(10, 20) = " + result.ToStr())
+    
+    // 测试正确的类型转换
+    double_result:double <- correct_cast(100)
+    PrintLine("correct_cast(100) = " + double_result.ToStr())
+    
+    // 测试正确的函数调用（带两个参数）
+    result2:int <- with_default_param(5, 10)
+    PrintLine("with_default_param(5, 10) = " + result2.ToStr())
+    
+    // 测试正确的数组
+    correct_array()
+    PrintLine("正确的数组类型测试通过")
+    
+    // 测试正确的函数调用
+    correct_call()
+    PrintLine("正确的函数调用测试通过")
+    
+    PrintLine("类型检查测试结束")
+}
+
+// 执行主函数
+main()

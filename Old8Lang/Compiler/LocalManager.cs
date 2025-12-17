@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
 using Old8Lang.AST.Expression;
 using Old8Lang.Error;
 using Old8Lang.LangParser;
@@ -98,7 +99,35 @@ public class LocalManager
     /// <exception cref="CompilerException">编译异常</exception>
     public void ReportError(string message, SourcePosition position)
     {
-        var errorMessage = $"{FilePath}:{position.Line}:{position.Column} - {message}";
+        // 构建详细的错误信息
+        var errorBuilder = new StringBuilder();
+        
+        // 错误位置信息
+        errorBuilder.AppendLine($"错误位置: {FilePath}:{position.Line}:{position.Column}");
+        errorBuilder.AppendLine(new string('-', 60));
+        
+        // 错误详情
+        errorBuilder.AppendLine($"错误信息: {message}");
+        errorBuilder.AppendLine(new string('-', 60));
+        
+        // 通用编译模式提示
+        errorBuilder.AppendLine("编译模式下的类型检查规则：");
+        errorBuilder.AppendLine("1. 所有函数必须显式声明返回类型");
+        errorBuilder.AppendLine("2. 所有函数参数必须有类型注解或默认值");
+        errorBuilder.AppendLine("3. 变量赋值必须保持类型一致");
+        errorBuilder.AppendLine("4. 函数调用的参数类型必须与声明匹配");
+        errorBuilder.AppendLine("5. 支持的类型：int, double, string, bool, char, void, list<T>, array<T>, dictionary<K,V>");
+        errorBuilder.AppendLine(new string('-', 60));
+        
+        // 通用修复建议
+        errorBuilder.AppendLine("通用修复建议：");
+        errorBuilder.AppendLine("- 确保所有变量声明都有类型注解");
+        errorBuilder.AppendLine("- 检查赋值语句的类型一致性");
+        errorBuilder.AppendLine("- 验证函数调用的参数类型");
+        errorBuilder.AppendLine("- 确保函数返回类型与return语句匹配");
+        errorBuilder.AppendLine(new string('-', 60));
+        
+        var errorMessage = errorBuilder.ToString();
         throw new CompilerException(errorMessage, position);
     }
 
@@ -108,17 +137,133 @@ public class LocalManager
     /// <param name="expected">预期类型</param>
     /// <param name="actual">实际类型</param>
     /// <param name="position">源代码位置</param>
-    /// <returns>如果类型兼容返回true，否则返回false并报告错误</returns>
+    /// <returns>如果类型兼容返回true，否则报告错误</returns>
     public bool ValidateType(Type? expected, Type? actual, SourcePosition position)
     {
         if (expected == null || actual == null)
+        {
+            ReportError("类型无效: 预期类型或实际类型为null", position);
             return false;
+        }
 
-        if (expected == actual || expected.IsAssignableFrom(actual))
+        // 类型完全匹配
+        if (expected == actual)
+            return true;
+
+        // 可赋值类型检查
+        if (expected.IsAssignableFrom(actual))
+            return true;
+
+        // 基本类型转换检查
+        if (IsBasicTypeConversionAllowed(expected, actual))
+            return true;
+
+        // 集合类型兼容性检查
+        if (IsCollectionTypeCompatible(expected, actual))
             return true;
 
         ReportError($"类型不兼容: 预期 {expected.Name}, 实际 {actual.Name}", position);
         return false;
+    }
+
+    /// <summary>
+    /// 检查基本类型转换是否允许
+    /// </summary>
+    /// <param name="expected">预期类型</param>
+    /// <param name="actual">实际类型</param>
+    /// <returns>如果基本类型转换允许返回true，否则返回false</returns>
+    private bool IsBasicTypeConversionAllowed(Type expected, Type actual)
+    {
+        // 允许int到double的转换
+        if (expected == typeof(double) && actual == typeof(int))
+            return true;
+        // 允许char到int的转换
+        if (expected == typeof(int) && actual == typeof(char))
+            return true;
+        // 允许char到double的转换
+        if (expected == typeof(double) && actual == typeof(char))
+            return true;
+        // 允许bool到其他类型的转换
+        if (actual == typeof(bool) && (expected == typeof(int) || expected == typeof(double)))
+            return true;
+        return false;
+    }
+
+    /// <summary>
+    /// 检查集合类型是否兼容
+    /// </summary>
+    /// <param name="expected">预期类型</param>
+    /// <param name="actual">实际类型</param>
+    /// <returns>如果集合类型兼容返回true，否则返回false</returns>
+    private bool IsCollectionTypeCompatible(Type expected, Type actual)
+    {
+        // 检查是否为泛型集合
+        if (!expected.IsGenericType || !actual.IsGenericType)
+            return false;
+
+        // 检查集合类型是否相同（如List<>和List<>）
+        if (expected.GetGenericTypeDefinition() != actual.GetGenericTypeDefinition())
+            return false;
+
+        // 检查泛型参数是否兼容
+        var expectedArgs = expected.GetGenericArguments();
+        var actualArgs = actual.GetGenericArguments();
+
+        if (expectedArgs.Length != actualArgs.Length)
+            return false;
+
+        // 检查每个泛型参数是否兼容
+        for (int i = 0; i < expectedArgs.Length; i++)
+        {
+            if (expectedArgs[i] != actualArgs[i] && !expectedArgs[i].IsAssignableFrom(actualArgs[i]))
+                return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 验证变量是否有类型注解
+    /// </summary>
+    /// <param name="varName">变量名</param>
+    /// <param name="position">源代码位置</param>
+    /// <returns>如果变量有类型注解返回true，否则报告错误</returns>
+    public bool ValidateVarHasTypeAnnotation(string varName, SourcePosition position)
+    {
+        if (!LocalVarTypes.ContainsKey(varName))
+        {
+            ReportError($"变量 '{varName}' 缺少类型注解（编译模式要求所有变量必须显式声明类型）", position);
+            return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// 获取变量类型
+    /// </summary>
+    /// <param name="varName">变量名</param>
+    /// <param name="position">源代码位置</param>
+    /// <returns>变量类型，如果变量不存在则报告错误</returns>
+    public Type GetVarType(string varName, SourcePosition position)
+    {
+        if (LocalVarTypes.TryGetValue(varName, out var type))
+            return type;
+        
+        ReportError($"变量 '{varName}' 未声明或缺少类型注解", position);
+        return typeof(object); // 不会执行到这里，因为前面已经抛出异常
+    }
+
+    /// <summary>
+    /// 验证赋值类型兼容性
+    /// </summary>
+    /// <param name="varName">变量名</param>
+    /// <param name="valueType">值类型</param>
+    /// <param name="position">源代码位置</param>
+    /// <returns>如果赋值类型兼容返回true，否则报告错误</returns>
+    public bool ValidateAssignmentType(string varName, Type valueType, SourcePosition position)
+    {
+        var varType = GetVarType(varName, position);
+        return ValidateType(varType, valueType, position);
     }
 
     /// <summary>

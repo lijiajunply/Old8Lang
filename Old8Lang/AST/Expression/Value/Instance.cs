@@ -767,12 +767,20 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 var paramType = matchingParams[i].ParameterType;
                 var idType = id.OutputType(local);
 
-                // 确保参数类型与方法期望的类型匹配
+                // 使用LocalManager的ValidateType方法验证参数类型
+                if (idType != null)
+                {
+                    // 执行类型验证，确保参数类型与方法期望的类型兼容
+                    local.ValidateType(paramType, idType, id.Position);
+                }
+
+                // 处理必要的类型转换
                 if (idType != null && paramType != idType)
                 {
-                    if (paramType == typeof(int) && idType == typeof(int))
+                    if (paramType == typeof(object) && idType.IsValueType)
                     {
-                        // 类型已经匹配，不需要转换
+                        // 从值类型转换为object，需要装箱
+                        ilGenerator.Emit(OpCodes.Box, idType);
                     }
                     else if (paramType == typeof(int) && idType == typeof(object))
                     {
@@ -784,11 +792,6 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                         // 从object转换为double
                         ilGenerator.Emit(OpCodes.Unbox_Any, typeof(double));
                     }
-                    else if (paramType == typeof(object) && idType.IsValueType)
-                    {
-                        // 从值类型转换为object，需要装箱
-                        ilGenerator.Emit(OpCodes.Box, idType);
-                    }
                     else if (paramType == typeof(int) && idType == typeof(double))
                     {
                         // 从double转换为int
@@ -798,6 +801,11 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                     {
                         // 从int转换为double
                         ilGenerator.Emit(OpCodes.Conv_R8);
+                    }
+                    else if (paramType == typeof(string) && idType != typeof(string))
+                    {
+                        // 从其他类型转换为string
+                        ilGenerator.Emit(OpCodes.Call, idType.GetMethod("ToString", Type.EmptyTypes)!);
                     }
                 }
             }
@@ -819,6 +827,13 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                     var paramType = matchingParams[i].ParameterType;
                     var defaultType = param.DefaultValue.OutputType(local);
 
+                    // 使用LocalManager的ValidateType方法验证默认参数类型
+                    if (defaultType != null)
+                    {
+                        local.ValidateType(paramType, defaultType, param.Position);
+                    }
+
+                    // 处理必要的类型转换
                     if (defaultType != null && paramType != defaultType)
                     {
                         if (paramType == typeof(object) && defaultType.IsValueType)

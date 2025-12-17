@@ -18,7 +18,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncFuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncFuncInit.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.trae/documents/强化Old8Lang编译模式静态类型检查.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/type_checking.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/LangExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/LangExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -821,7 +826,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="219" />
+    <option name="localTasksCounter" value="220" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -848,7 +853,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(ast): 修复 IfStatement 中的索引逻辑错误&#10;&#10;- 修正了 elifBlock 索引访问越界的问题&#10;- 调整 elseBlock 返回条件以匹配正确的索引位置&#10;- 更新索引计算方式确保与 elifBlock 的实际元素对应" />
     <MESSAGE value="test(async): 更新异步任务测试用例&#10;&#10;- 注释掉不可用的 Task.WhenAll、WhenAny、Then、WithTimeout 和 Retry 方法调用&#10;- 添加替代方案分别等待各个任务并打印结果&#10;- 修改异常抛出方式从 throw new Error 改为直接 throw 字符串&#10;- 修复部分变量未转换为字符串导致的类型错误&#10;- 更新 mixin 测试中对 log 方法的调用方式&#10;- 调整测试文件中的打印函数统一使用 PrintLine&#10;- 修正数值类型拼接字符串时缺少 ToStr() 转换的问题" />
     <MESSAGE value="feat(async): 实现 Task 类静态方法支持&#10;&#10;- 新增 TaskClassLangValue 类，提供 WhenAll、WhenAny、Delay 静态方法&#10;- 在解释器初始化时注册全局 Task 对象&#10;- 支持通过 Task.WhenAll([...]) 和 Task.WhenAny([...]) 调用任务组合方法&#10;- 实现 TaskStaticMethodWrapper 包装器，用于执行静态方法&#10;- 更新 Instance.cs 以支持 TaskStaticMethodWrapper 的调用&#10;- 优化 Operation.cs 中对 Task 类成员访问的处理逻辑&#10;- 移除 AsyncLib.cs 中不必要的变量声明&#10;- 更新异步测试用例，启用 Task.WhenAll 和 Task.WhenAny 的实际调用&#10;- 注释掉暂不可用的 Retry 方法测试代码" />
     <MESSAGE value="feat(async): 完善异步任务状态管理与AwaitAsync功能&#10;&#10;- 统一使用GetUnixTimeMilliseconds替代GetCurrentTime以提高时间精度&#10;- 修改异常抛出方式，去除new Error语法，适配语言规范&#10;- 增强TaskLangValue类的状态同步与线程安全性&#10;- 实现Task对象属性访问支持（IsCompleted、Status等）&#10;- 优化任务超时控制逻辑与重试机制&#10;- 补充异步任务相关内置函数的实现细节&#10;- 更新测试用例以匹配新的行为规范&#10;- 增加Time模块导入以支持时间相关操作" />
@@ -873,7 +877,8 @@
     <MESSAGE value="feat(async): 改进异步函数重试机制和作用域管理&#10;&#10;- 引入Time模块支持基于时间的重试测试&#10;- 优化flakyTask重试逻辑，使用时间判断替代全局计数器&#10;- 调整Retry方法参数，增加重试次数和延迟时间&#10;- 更新异步测试用例，增强重试功能验证&#10;- 改进异步函数作用域隔离机制，确保并发安全性" />
     <MESSAGE value="feat(filelib): 完善文件库基础功能并跳过未实现特性测试&#10;&#10;- 更新文件行数统计方式，使用 Len 函数替代 Length 属性&#10;- 注释掉 CSV、XML 和 YAML 文件操作的具体测试逻辑&#10;- 调整测试结束提示信息，明确当前仅完成基础功能测试&#10;- 清理不再需要的测试文件删除列表项&#10;- 优化方法调用参数检查逻辑，支持可选参数处理&#10;- 增强 FuncLangValue 中方法调用的参数类型转换机制&#10;- 补充缺失可选参数的默认值填充逻辑&#10;- 提高对数组类型参数的支持能力，增强类型兼容性" />
     <MESSAGE value="feat(core): 重构值类型扩展方法并新增正则表达式库&#10;&#10;- 将值类型扩展方法拆分到独立的 ValueFunctions 命名空间&#10;- 新增 AnyValueFuncStatic 类处理 JSON 序列化和反序列化&#10;- 新增 DictionaryValueFuncStatic 类提供字典操作功能&#10;- 新增 ListValueFuncStatic 类增强列表操作功能&#10;- 更新 Instance.cs 中的类型引用路径以适配新的命名空间结构&#10;- 新增 RegexLib.cs 提供正则表达式匹配、替换和提取功能&#10;- 添加 Regex.old8 声明文件以支持正则表达式库的原生导入&#10;- 优化错误处理和参数验证逻辑&#10;- 完善代码文档注释和类型安全检查" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(core): 重构值类型扩展方法并新增正则表达式库&#10;&#10;- 将值类型扩展方法拆分到独立的 ValueFunctions 命名空间&#10;- 新增 AnyValueFuncStatic 类处理 JSON 序列化和反序列化&#10;- 新增 DictionaryValueFuncStatic 类提供字典操作功能&#10;- 新增 ListValueFuncStatic 类增强列表操作功能&#10;- 更新 Instance.cs 中的类型引用路径以适配新的命名空间结构&#10;- 新增 RegexLib.cs 提供正则表达式匹配、替换和提取功能&#10;- 添加 Regex.old8 声明文件以支持正则表达式库的原生导入&#10;- 优化错误处理和参数验证逻辑&#10;- 完善代码文档注释和类型安全检查" />
+    <MESSAGE value="refactor(async): 重构异步函数生成逻辑&#10;&#10;- 引入AsyncStateMachineGenerator类统一处理异步状态机生成&#10;- 修改AsyncFuncInit使用新的状态机生成器&#10;- 移除不必要的using引用以减少依赖&#10;- 重命名私有字段以符合命名规范&#10;- 简化异步方法体生成逻辑&#10;- 更新相关测试文件移除冗余引用" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(async): 重构异步函数生成逻辑&#10;&#10;- 引入AsyncStateMachineGenerator类统一处理异步状态机生成&#10;- 修改AsyncFuncInit使用新的状态机生成器&#10;- 移除不必要的using引用以减少依赖&#10;- 重命名私有字段以符合命名规范&#10;- 简化异步方法体生成逻辑&#10;- 更新相关测试文件移除冗余引用" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

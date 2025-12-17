@@ -211,7 +211,16 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
                     // 如果有默认值，可以从默认值推断类型，不报错
                     if (param.DefaultValue != null)
                     {
-                        // 从默认值推断类型（在后续处理中会自动使用）
+                        // 验证默认值的类型有效性
+                        if (param.DefaultValue.OutputType(local) == null)
+                        {
+                            var defaultErrorMsg = $"[编译模式错误] 函数 '{FuncLangValue.Id?.IdName}' 的参数 '{param.IdName}' 的默认值类型无效\n\n" +
+                                               $"默认值必须是一个有效的表达式，可以推断出具体类型。\n\n" +
+                                               $"修复示例：\n" +
+                                               $"  func {FuncLangValue.Id?.IdName}(..., {param.IdName}: 0, ...) -> returnType {{ ... }}\n" +
+                                               $"  func {FuncLangValue.Id?.IdName}(..., {param.IdName}: \"string\", ...) -> returnType {{ ... }}";
+                            local.ReportError(defaultErrorMsg, param.Position);
+                        }
                         continue;
                     }
 
@@ -232,13 +241,32 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
         // 2. 验证返回值类型注解
         if (FuncLangValue.Id != null && string.IsNullOrEmpty(FuncLangValue.Id.AssumptionType))
         {
-            var errorMsg = $"[编译模式错误] 函数 '{FuncLangValue.Id.IdName}' 缺少返回值类型注解\n\n" +
-                          $"编译模式下所有函数必须显式声明返回类型，不能通过return语句推断。\n\n" +
-                          $"修复示例：\n" +
-                          $"  方式1：func {FuncLangValue.Id.IdName}(...) -> int {{ return ... }}\n" +
-                          $"  方式2：func {FuncLangValue.Id.IdName}(...) -> void {{ ... }}\n" +
-                          $"  方式3：{FuncLangValue.Id.IdName}:int(...) -> {{ return ... }}";
-            local.ReportError(errorMsg, FuncLangValue.Id.Position);
+            // 对于Lambda表达式，如果没有显式的返回类型注解，尝试从函数体推断
+            if (!IsLambda)
+            {
+                // 普通函数必须显式声明返回类型
+                var errorMsg = $"[编译模式错误] 函数 '{FuncLangValue.Id.IdName}' 缺少返回值类型注解\n\n" +
+                              $"编译模式下所有函数必须显式声明返回类型，不能通过return语句推断。\n\n" +
+                              $"修复示例：\n" +
+                              $"  方式1：func {FuncLangValue.Id.IdName}(...) -> int {{ return ... }}\n" +
+                              $"  方式2：func {FuncLangValue.Id.IdName}(...) -> void {{ ... }}\n" +
+                              $"  方式3：{FuncLangValue.Id.IdName}:int(...) -> {{ return ... }}";
+                local.ReportError(errorMsg, FuncLangValue.Id.Position);
+            }
+        }
+        else if (FuncLangValue.Id != null && !string.IsNullOrEmpty(FuncLangValue.Id.AssumptionType))
+        {
+            // 验证返回类型注解的有效性
+            var returnType = FuncLangValue.Id.OutputType(local);
+            if (returnType == null)
+            {
+                var errorMsg = $"[编译模式错误] 函数 '{FuncLangValue.Id.IdName}' 的返回类型注解 '{FuncLangValue.Id.AssumptionType}' 无效\n\n" +
+                              $"请使用有效的类型注解，如：int, double, string, bool, char, void, list<T>, array<T>, dictionary<K,V>\n\n" +
+                              $"修复示例：\n" +
+                              $"  func {FuncLangValue.Id.IdName}(...) -> int {{ return ... }}\n" +
+                              $"  func {FuncLangValue.Id.IdName}(...) -> void {{ ... }}";
+                local.ReportError(errorMsg, FuncLangValue.Id.Position);
+            }
         }
     }
 
