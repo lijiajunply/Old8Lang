@@ -150,7 +150,7 @@ public class StatementParser(
             return functionParser.ParseAsyncFuncDeclaration();
         }
 
-        // 处理函数定义
+        // 处理函数定义（包括带有修饰符的函数定义）
         if (CurrentToken.Type == LangTokenType.Func)
         {
             return functionParser.ParseFuncDeclaration();

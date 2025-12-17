@@ -454,7 +454,7 @@ public class ThreadLangValue : LangValueType
             thenThread.ExternalManager = ExternalManager;
         }
 
-        return thenThread;
+        return thenThread ?? throw new ArgumentError(Position, "Then continuation must return a thread");
     }
 
     /// <summary>
