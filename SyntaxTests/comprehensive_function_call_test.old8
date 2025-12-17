@@ -1,0 +1,140 @@
+// 综合函数调用测试 - 验证 cla[0](a) 语法和各种变体
+
+PrintLine("=== 函数调用语法测试 ===")
+
+// 测试1: 基本的列表索引函数调用
+PrintLine("\n1. 基本列表索引函数调用:")
+func greet(name) -> string {
+    return "Hello, " + name
+}
+
+func add(a, b) -> int {
+    return a + b
+}
+
+// 创建函数列表
+funcArray <- [greet, add]
+PrintLine("函数列表创建成功")
+
+// 调用列表中的函数
+result1 <- funcArray[0]("Alice")
+result2 <- funcArray[1](5, 3)
+PrintLine("greet结果: " + result1)
+PrintLine("add结果: " + result2.ToStr())
+
+// 测试2: 嵌套的函数调用
+PrintLine("\n2. 嵌套的函数调用:")
+func createAdder(x) {
+    return (y) -> {
+        return x + y
+    }
+}
+
+adderList <- [createAdder(5), createAdder(10)]
+result3 <- adderList[0](3)  // 5 + 3 = 8
+result4 <- adderList[1](7)  // 10 + 7 = 17
+PrintLine("adder[0](3): " + result3.ToStr())
+PrintLine("adder[1](7): " + result4.ToStr())
+
+// 测试3: 类方法返回函数的调用
+PrintLine("\n3. 类方法返回函数的调用:")
+class MathHelper {
+    func getMultiplier(factor) {
+        return (x) -> {
+            return x * factor
+        }
+    }
+
+    func getCalculator() {
+        return (a, b) -> {
+            return a.ToStr() + " + " + b.ToStr() + " = " + (a + b).ToStr()
+        }
+    }
+}
+
+math <- MathHelper()
+multipliers <- [math.getMultiplier(2), math.getMultiplier(3), math.getMultiplier(5)]
+calculators <- [math.getCalculator()]
+
+result5 <- multipliers[0](10)  // 10 * 2 = 20
+result6 <- multipliers[1](10)  // 10 * 3 = 30
+result7 <- multipliers[2](10)  // 10 * 5 = 50
+result8 <- calculators[0](15, 25)
+
+PrintLine("2 × 10 = " + result5.ToStr())
+PrintLine("3 × 10 = " + result6.ToStr())
+PrintLine("5 × 10 = " + result7.ToStr())
+PrintLine("计算器结果: " + result8)
+
+// 测试4: 字典中的函数调用
+PrintLine("\n4. 字典中的函数调用:")
+func double(x) -> int { return x * 2 }
+func triple(x) -> int { return x * 3 }
+
+funcDict <- {
+    "double": double,
+    "triple": triple
+}
+
+// 通过字典键获取函数并调用
+doubleFunc <- funcDict["double"]
+tripleFunc <- funcDict["triple"]
+result9 <- doubleFunc(8)   // 8 * 2 = 16
+result10 <- tripleFunc(8)  // 8 * 3 = 24
+
+PrintLine("double(8): " + result9.ToStr())
+PrintLine("triple(8): " + result10.ToStr())
+
+// 测试5: 链式函数调用
+PrintLine("\n5. 链式函数调用:")
+func compose(f, g) {
+    return (x) -> {
+        return f(g(x))
+    }
+}
+
+func add1(x) -> int { return x + 1 }
+func multiply2(x) -> int { return x * 2 }
+
+composers <- [
+    compose(add1, multiply2),   // add1(multiply2(x)) = multiply2(x) + 1
+    compose(multiply2, add1)    // multiply2(add1(x)) = (x + 1) * 2
+]
+
+result11 <- composers[0](5)  // add1(multiply2(5)) = 5 * 2 + 1 = 11
+result12 <- composers[1](5)  // multiply2(add1(5)) = (5 + 1) * 2 = 12
+
+PrintLine("add1(multiply2(5)): " + result11.ToStr())
+PrintLine("multiply2(add1(5)): " + result12.ToStr())
+
+// 测试6: 复杂表达式函数调用
+PrintLine("\n6. 复杂表达式函数调用:")
+
+// 预先定义操作函数
+func addFunc(a, b) -> int { return a + b }
+func subtractFunc(a, b) -> int { return a - b }
+func multiplyFunc(a, b) -> int { return a * b }
+func defaultFunc(a, b) -> int { return 0 }
+
+func getOperation(opName) {
+    if opName == "add" {
+        return addFunc
+    } else if opName == "subtract" {
+        return subtractFunc
+    } else if opName == "multiply" {
+        return multiplyFunc
+    } else {
+        return defaultFunc
+    }
+}
+
+operations <- [getOperation("add"), getOperation("subtract"), getOperation("multiply")]
+opNames <- ["add", "subtract", "multiply"]
+for i <- 0, i < 3, i <- i + 1 {
+    result <- operations[i](10, 5)
+    PrintLine(opNames[i] + "(10, 5) = " + result.ToStr())
+}
+
+PrintLine("\n" + "=".Repeat(50))
+PrintLine("所有函数调用语法测试完成！✓")
+PrintLine("=".Repeat(50))

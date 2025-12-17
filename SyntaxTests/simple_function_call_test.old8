@@ -1,0 +1,50 @@
+// 简单的函数调用测试 - 验证 cla[0](a) 语法
+PrintLine("=== 函数调用语法测试 ===")
+
+// 测试1: 基本的列表索引函数调用
+PrintLine("1. 基本列表索引函数调用:")
+func greet(name) -> string {
+    return "Hello, " + name
+}
+
+func add(a, b) -> int {
+    return a + b
+}
+
+func multiply(x) -> int {
+    return x * 2
+}
+
+// 创建函数列表
+funcList <- [greet, add, multiply]
+PrintLine("函数列表创建成功")
+
+// 调用列表中的函数
+result1 <- funcList[0]("Alice")
+result2 <- funcList[1](5, 3)
+result3 <- funcList[2](10)
+
+PrintLine("greet结果: " + result1)
+PrintLine("add结果: " + result2.ToStr())
+PrintLine("multiply结果: " + result3.ToStr())
+
+// 测试2: 字典中的函数调用
+PrintLine("2. 字典中的函数调用:")
+func double(x) -> int { return x * 2 }
+func triple(x) -> int { return x * 3 }
+
+funcDict <- {
+    "double": double,
+    "triple": triple
+}
+
+// 通过字典键获取函数并调用
+doubleFunc <- funcDict["double"]
+tripleFunc <- funcDict["triple"]
+result4 <- doubleFunc(8)   // 8 * 2 = 16
+result5 <- tripleFunc(8)  // 8 * 3 = 24
+
+PrintLine("double(8): " + result4.ToStr())
+PrintLine("triple(8): " + result5.ToStr())
+
+PrintLine("所有函数调用语法测试完成！✓")

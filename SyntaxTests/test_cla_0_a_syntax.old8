@@ -1,0 +1,12 @@
+// 测试 cla[0](a) 语法
+func testFunc(x) -> string {
+    return "Hello, " + x.ToStr()
+}
+
+// 创建一个包含函数的列表
+funcList <- [testFunc]
+PrintLine("List created")
+
+// 尝试调用 cla[0](a) 语法
+result <- funcList[0]("World")
+PrintLine("Result: " + result)

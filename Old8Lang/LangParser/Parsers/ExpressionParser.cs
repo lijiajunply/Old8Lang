@@ -9,7 +9,8 @@ namespace Old8Lang.LangParser.Parsers;
 /// 表达式解析器
 /// 负责解析各种表达式，包括算术、逻辑、比较、三元表达式等
 /// </summary>
-public class ExpressionParser(ParserContext context, PrimaryParser primaryParser) : ParserBase(context)
+public class ExpressionParser(ParserContext context, PrimaryParser primaryParser, FunctionParser functionParser)
+    : ParserBase(context)
 {
     #region Expression
 
@@ -242,6 +243,19 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
                 Expect(LangTokenType.RightBracket);
                 // 使用CONCAT操作符表示索引访问，后续在GenerateIl中处理
                 left = new Operation(left, LangTokenType.Dot, right, position);
+            }
+            else if (CurrentToken.Type == LangTokenType.LeftParen)
+            {
+                // 处理函数调用: left(arguments)
+                var leftParenToken = CurrentToken;
+                var position = new SourcePosition(leftParenToken.Line, leftParenToken.Column,
+                    tokenValue: leftParenToken.Value);
+                Expect(LangTokenType.LeftParen);
+                var args = functionParser.ParseArgList();
+                Expect(LangTokenType.RightParen);
+
+                // 创建函数调用表达式
+                left = new FunctionCallExpression(left, args, position);
             }
             else
             {

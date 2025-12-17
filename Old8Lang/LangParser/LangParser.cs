@@ -85,7 +85,7 @@ public class LangParser
             FunctionParser);
 
         // 创建ExpressionParser（仅依赖PrimaryParser）
-        ExpressionParser = new ExpressionParser(Context, PrimaryParser);
+        ExpressionParser = new ExpressionParser(Context, PrimaryParser, FunctionParser);
 
         // 创建ClassParser（需要延迟加载StatementParser和ExpressionParser）
         ClassParser = new ClassParser(

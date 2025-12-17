@@ -1,0 +1,22 @@
+// 编译器模式函数调用语法测试
+func greet(name:string) -> string {
+    return "Hello, " + name
+}
+
+func add(a:int, b:int) -> int {
+    return a + b
+}
+
+func main() -> void {
+    // 创建函数列表
+    funcList <- [greet, add]
+
+    // 调用列表中的函数
+    result1 <- funcList[0]("Alice")
+    result2 <- funcList[1](5, 3)
+
+    PrintLine("greet结果: " + result1)
+    PrintLine("add结果: " + result2.ToStr())
+}
+
+main()
