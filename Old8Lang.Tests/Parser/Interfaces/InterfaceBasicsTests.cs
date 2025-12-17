@@ -17,31 +17,32 @@ public class InterfaceBasicsTests
     public void ParseProgram_BasicInterfaceDeclaration_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-interface IDrawable {
-    Draw() -> void
-    GetArea() -> double
-}
+        var code = """
+                   interface IDrawable {
+                       func Draw() -> void
+                       func GetArea() -> double
+                   }
 
-class Circle : IDrawable {
-    public radius
+                   class Circle implements IDrawable {
+                       public radius
 
-    public func constructor(radius:double) {
-        this.radius <- radius
-    }
+                       public func constructor(radius:double) {
+                           this.radius <- radius
+                       }
 
-    public func Draw() -> void {
-        PrintLine(""Drawing a circle with radius "" + this.radius.ToStr())
-    }
+                       public func Draw() -> void {
+                           PrintLine("Drawing a circle with radius " + this.radius.ToStr())
+                       }
 
-    public func GetArea() -> double {
-        return 3.14159 * this.radius * this.radius
-    }
-}
+                       public func GetArea() -> double {
+                           return 3.14159 * this.radius * this.radius
+                       }
+                   }
 
-circle <- Circle(5.0)
-circle.Draw()
-area <- circle.GetArea()";
+                   circle <- Circle(5.0)
+                   circle.Draw()
+                   area <- circle.GetArea()
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -57,50 +58,52 @@ area <- circle.GetArea()";
     public void ParseProgram_InterfaceWithProperties_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-interface IShape {
-    Name
-    Color
+        var code = """
 
-    func GetName() -> string
-    func SetName(name:string) -> void
-    func GetColor() -> string
-    func SetColor(color:string) -> void
-}
+                   interface IShape {
+                       Name
+                       Color
 
-class Rectangle : IShape {
-    public Name
-    public Color
-    public width
-    public height
+                       func GetName() -> string
+                       func SetName(name:string) -> void
+                       func GetColor() -> string
+                       func SetColor(color:string) -> void
+                   }
 
-    public func constructor(width:double, height:double) {
-        this.width <- width
-        this.height <- height
-        this.Name <- ""Rectangle""
-        this.Color <- ""Blue""
-    }
+                   class Rectangle implements IShape {
+                       public Name
+                       public Color
+                       public width
+                       public height
 
-    public func GetName() -> string {
-        return this.Name
-    }
+                       public func constructor(width:double, height:double) {
+                           this.width <- width
+                           this.height <- height
+                           this.Name <- "Rectangle"
+                           this.Color <- "Blue"
+                       }
 
-    public func SetName(name:string) -> void {
-        this.Name <- name
-    }
+                       public func GetName() -> string {
+                           return this.Name
+                       }
 
-    public func GetColor() -> string {
-        return this.Color
-    }
+                       public func SetName(name:string) -> void {
+                           this.Name <- name
+                       }
 
-    public func SetColor(color:string) -> void {
-        this.Color <- color
-    }
-}
+                       public func GetColor() -> string {
+                           return this.Color
+                       }
 
-rect <- Rectangle(10.0, 5.0)
-rect.SetName(""MyRectangle"")
-rect.SetColor(""Red"")";
+                       public func SetColor(color:string) -> void {
+                           this.Color <- color
+                       }
+                   }
+
+                   rect <- Rectangle(10.0, 5.0)
+                   rect.SetName("MyRectangle")
+                   rect.SetColor("Red")
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -116,52 +119,54 @@ rect.SetColor(""Red"")";
     public void ParseProgram_MultipleInterfaceImplementation_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-interface ISerializable {
-    func Serialize() -> string
-    func Deserialize(data:string) -> void
-}
+        var code = """
 
-interface ICloneable {
-    func Clone() -> object
-}
+                   interface ISerializable {
+                       func Serialize() -> string
+                       func Deserialize(data:string) -> void
+                   }
 
-interface IDrawable {
-    func Draw() -> void
-}
+                   interface ICloneable {
+                       func Clone() -> object
+                   }
 
-class ComplexObject : ISerializable, ICloneable, IDrawable {
-    public id
-    public name
+                   interface IDrawable {
+                       func Draw() -> void
+                   }
 
-    public func constructor(id:int, name:string) {
-        this.id <- id
-        this.name <- name
-    }
+                   class ComplexObject implements ISerializable, ICloneable, IDrawable {
+                       public id
+                       public name
 
-    public func Serialize() -> string {
-        return ""{id:"" + this.id.ToStr() + "",name:"""" + this.name + """"}""
-    }
+                       public func constructor(id:int, name:string) {
+                           this.id <- id
+                           this.name <- name
+                       }
 
-    public func Deserialize(data:string) -> void {
-        // 简化的反序列化逻辑
-        this.id <- 0
-        this.name <- data
-    }
+                       public func Serialize() -> string {
+                           return "ID:" + this.id.ToStr() + "Name:" + this.name
+                       }
 
-    public func Clone() -> object {
-        return ComplexObject(this.id, this.name)
-    }
+                       public func Deserialize(data:string) -> void {
+                           // 简化的反序列化逻辑
+                           this.id <- 0
+                           this.name <- data
+                       }
 
-    public func Draw() -> void {
-        PrintLine(""Drawing object: "" + this.name)
-    }
-}
+                       public func Clone() -> object {
+                           return ComplexObject(this.id, this.name)
+                       }
 
-obj <- ComplexObject(1, ""TestObject"")
-serialized <- obj.Serialize()
-clone <- obj.Clone()
-obj.Draw()";
+                       public func Draw() -> void {
+                           PrintLine("Drawing object: " + this.name)
+                       }
+                   }
+
+                   obj <- ComplexObject(1, "TestObject")
+                   serialized <- obj.Serialize()
+                   clone <- obj.Clone()
+                   obj.Draw()
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -178,23 +183,19 @@ obj.Draw()";
     {
         // Arrange
         var code = @"
-interface IAnimal {
+interface IMammal {
     Name
-    func MakeSound() -> void
+    func GiveBirth() -> void
+    func FeedMilk() -> void
     func Eat() -> void
 }
 
-interface IMammal : IAnimal {
-    func GiveBirth() -> void
-    func FeedMilk() -> void
-}
-
-interface IDomesticAnimal : IAnimal {
+interface IDomesticAnimal {
     func Train() -> void
     func Pet() -> void
 }
 
-class Dog : IMammal, IDomesticAnimal {
+class Dog implements IMammal, IDomesticAnimal {
     public Name
     public breed
 
@@ -247,32 +248,34 @@ dog.Pet()";
     public void ParseProgram_InterfaceStaticMembers_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-interface ILogger {
-    public static LOG_LEVEL_INFO <- ""INFO""
-    public static LOG_LEVEL_ERROR <- ""ERROR""
+        var code = """
 
-    public static func Log(level:string, message:string) -> void
-    public static func Error(message:string) -> void
-    public static func Info(message:string) -> void
-}
+                   interface ILogger {
+                       public static LOG_LEVEL_INFO <- "INFO"
+                       public static LOG_LEVEL_ERROR <- "ERROR"
 
-class ConsoleLogger : ILogger {
-    public static func Log(level:string, message:string) -> void {
-        PrintLine(""["" + level + ""] "" + message)
-    }
+                       public static func Log(level:string, message:string) -> void
+                       public static func Error(message:string) -> void
+                       public static func Info(message:string) -> void
+                   }
 
-    public static func Error(message:string) -> void {
-        Log(LOG_LEVEL_ERROR, message)
-    }
+                   class ConsoleLogger implements ILogger {
+                       public static func Log(level:string, message:string) -> void {
+                           PrintLine("[" + level + "] " + message)
+                       }
 
-    public static func Info(message:string) -> void {
-        Log(LOG_LEVEL_INFO, message)
-    }
-}
+                       public static func Error(message:string) -> void {
+                           Log(LOG_LEVEL_ERROR, message)
+                       }
 
-ConsoleLogger.Info(""Application started"")
-ConsoleLogger.Error(""Something went wrong!"")";
+                       public static func Info(message:string) -> void {
+                           Log(LOG_LEVEL_INFO, message)
+                       }
+                   }
+
+                   ConsoleLogger.Info("Application started")
+                   ConsoleLogger.Error("Something went wrong!")
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -299,7 +302,7 @@ interface ICalculator {
     func Calculate(values:list) -> int
 }
 
-class SimpleCalculator : ICalculator {
+class SimpleCalculator implements ICalculator {
     public func Calculate(a:int, b:int) -> int {
         return a + b
     }
@@ -349,13 +352,16 @@ interface ICollection {
     func Clear() -> void
 }
 
-interface IList : ICollection {
+interface IList {
+    func Add(item) -> void
+    func Remove(item) -> void
+    func Clear() -> void
     func Get(index:int) -> object
     func Set(index:int, item) -> void
     func IndexOf(item) -> int
 }
 
-class List : IList {
+class List implements IList {
     private items
 
     public func constructor() {
@@ -446,7 +452,7 @@ interface IRequired {
     func Method2() -> string
 }
 
-class IncompleteClass : IRequired {
+class IncompleteClass implements IRequired {
     // 只实现了Method1，缺少Method2
     public func Method1() -> void {
         PrintLine(""Method1 implemented"")

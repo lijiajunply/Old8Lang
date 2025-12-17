@@ -259,7 +259,7 @@ version <- Logger.getVersion()";
                        }
                    }
 
-                   class Car : Vehicle {
+                   class Car extends Vehicle {
                        public doors
                        private fuelType
 
@@ -474,20 +474,19 @@ newValue <- TypedAccessClass.toggleBool()";
     public void ParseProgram_InvalidAccessModifierCombination_ThrowsSyntaxError()
     {
         // Arrange
-        var code = @"
-class TestClass {
-    public private field  // 无效的组合访问修饰符
-    public static private method() {  // 多个修饰符的顺序可能错误
-        return ""test""
-    }
-}";
+        var code = """
+                   class TestClass {
+                       public private field  // 无效的组合访问修饰符
+                       public static private method() {  // 多个修饰符的顺序可能错误
+                           return "test"
+                       }
+                   }
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
-        // 可能应该抛出语法错误，但这取决于语言规范
-        var program = parser.ParseProgram();
-        Assert.NotNull(program);
+        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
 
     /// <summary>

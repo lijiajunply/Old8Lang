@@ -359,7 +359,7 @@ person <- Person(""Alice"", 30)";
                        }
                    }
 
-                   class Car : Vehicle {
+                   class Car extends Vehicle {
                        public doors
                        public fuelType
 

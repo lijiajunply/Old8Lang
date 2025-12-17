@@ -235,33 +235,35 @@ await logMessage(""Test message"")";
     public void ParseProgram_AsyncClassMethods_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-class DataLoader {
-    private url
+        var code = """
 
-    public func constructor(url:string) {
-        this.url <- url
-    }
+                   class DataLoader {
+                       private url
 
-    public async func load() -> string {
-        response <- await fetchFromServer(this.url)
-        return response
-    }
+                       public func constructor(url:string) {
+                           this.url <- url
+                       }
 
-    private async func fetchFromServer(url:string) -> string {
-        return ""Data from "" + url
-    }
+                       public async func load() -> string {
+                           response <- await fetchFromServer(this.url)
+                           return response
+                       }
 
-    public async func processAndLoad() -> string {
-        raw <- await this.load()
-        processed <- ""Processed: "" + raw
-        return processed
-    }
-}
+                       private async func fetchFromServer(url:string) -> string {
+                           return "Data from " + url
+                       }
 
-loader <- DataLoader(""http://example.com"")
-data <- await loader.processAndLoad()
-PrintLine(data)";
+                       public async func processAndLoad() -> string {
+                           raw <- await this.load()
+                           processed <- "Processed: " + raw
+                           return processed
+                       }
+                   }
+
+                   loader <- DataLoader("http://example.com")
+                   data <- await loader.processAndLoad()
+                   PrintLine(data)
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 

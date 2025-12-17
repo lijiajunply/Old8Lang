@@ -18,7 +18,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Async/AsyncAwaitBasicsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Async/AsyncAwaitBasicsTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Classes/AccessModifiersTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Classes/AccessModifiersTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Classes/ConstructorsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Classes/ConstructorsTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Interfaces/InterfaceBasicsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Interfaces/InterfaceBasicsTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,6 +70,8 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Parser/Classes/ConstructorsTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Parser/ExceptionHandling/BasicExceptionHandlingTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Parser/ExceptionHandling/BasicExceptionHandlingTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Parser/Expression/OperatorPrecedenceEdgeCasesTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Parser/Expression/UnaryOperatorsTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Parser/Interfaces/InterfaceBasicsTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/AwaitExpression.cs" root0="SKIP_HIGHLIGHTING" />
@@ -160,6 +166,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/ExpressionParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/ExpressionParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/ExpressionParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
@@ -845,7 +852,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="225" />
+    <option name="localTasksCounter" value="227" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -872,8 +879,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 实现 Retry 方法支持异步函数重试&#10;&#10;- 添加了对异步函数调用重试的支持&#10;- 实现了可配置的重试次数和延迟时间&#10;- 增加了参数验证和类型检查&#10;- 创建了新的 Task 包装器以支持重试逻辑&#10;- 提供了详细的错误提示信息&#10;- 修复了 Retry 方法的执行机制，确保每次重试都重新执行原函数" />
-    <MESSAGE value="feat(async): 实现异步库资源自动清理机制&#10;&#10;- 添加 ResourceWrapper 类包装资源并跟踪访问时间&#10;- 引入定时器定期清理闲置资源&#10;- 更新 Mutex、Semaphore、AtomicInt、Channel 和 CancellationTokenSource 的存储结构&#10;- 修改所有资源操作方法以更新最后访问时间&#10;- 实现 CleanupResources 方法遍历并释放闲置资源&#10;- 添加取消令牌源的相关操作支持&#10;- 优化 Channel 操作逻辑以适配新的资源包装结构" />
     <MESSAGE value="fix(compiler): 修复编译模式下函数缺少返回值类型注解的问题&#10;&#10;- 调整了简单代码编译测试用例，补充函数返回值类型注解&#10;- 修改了中等复杂度代码编译测试用例，明确函数返回类型&#10;- 更新了复杂代码编译测试用例，为函数参数添加类型注解&#10;- 修正了生成IL相关测试用例中的函数类型定义问题&#10;- 完善了执行编译后代码测试用例的类型声明&#10;- 优化了多重编译场景下的类型检查逻辑&#10;- 改进了IL验证测试用例的函数签名定义" />
     <MESSAGE value="refactor(core): 优化异步流和循环语句实现&#10;&#10;- 将 AsyncStreamLangValue 构造函数设为私有，增强封装性&#10;- 优化 Reduce 方法参数列表格式并添加空行提升可读性&#10;- 修复 ForAwaitInStatement 中 AllIds 属性的数组展开语法&#10;- 统一使用 CancellationToken.None 替代默认值提高一致性&#10;- 移除冗余空行并调整代码格式以符合编码规范&#10;- 更新 IDE 配置文件中的属性组件格式化方式" />
     <MESSAGE value="refactor: 移除异步流相关代码&#10;&#10;删除 ForAwaitInStatement 和 AsyncStreamLangValue 类及相关实现&#10;这些功能当前未被使用且增加了代码复杂度" />
@@ -897,7 +902,9 @@
     <MESSAGE value="feat(parser): 添加抽象类、访问修饰符和异步语法的解析支持&#10;&#10;- 实现抽象类声明和继承语法解析&#10;- 支持抽象方法重载和构造函数链&#10;- 添加public、private、protected、static访问修饰符解析&#10;- 实现async/await异步函数语法解析&#10;- 支持类中异步方法和静态异步方法&#10;- 完善错误语法检测和异常处理机制" />
     <MESSAGE value="feat(tests): 添加边界条件和错误场景测试套件&#10;&#10;- 新增 SimpleBoundaryTests.cs 文件，包含 9 个边界条件测试方法&#10;- 覆盖数值边界、空值处理、空集合操作、字符串边界等场景&#10;- 实现集合索引、循环边界、类型转换和基础错误处理测试&#10;- 添加未终止字符串语法错误检测测试&#10;- 更新测试报告至第三阶段语法测试实施报告&#10;- 优化 LambdaParsingTests.cs 中的字符串字面量格式&#10;- 更新 workspace.xml 配置文件，反映新增测试文件和变更记录" />
     <MESSAGE value="fix(tests): 修复线程和语法错误检测测试&#10;&#10;- 更新线程测试使用正确的 Old8Lang 语法 (spawn 而非 Thread)&#10;- 修复访问修饰符测试中的无效类语法场景&#10;- 修正构造函数测试中的语法错误用例&#10;- 调整异常处理测试以正确触发语法错误&#10;- 更新操作符优先级测试中的表达式&#10;- 移除不完整的接口声明测试用例&#10;- 修正 Lambda 类型推断的语法格式&#10;- 优化线程测试通过返回值而非共享变量传递结果&#10;- 修复线程属性调用和集合操作的语法问题&#10;- 提高语法错误检测测试的准确性和稳定性" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(tests): 修复线程和语法错误检测测试&#10;&#10;- 更新线程测试使用正确的 Old8Lang 语法 (spawn 而非 Thread)&#10;- 修复访问修饰符测试中的无效类语法场景&#10;- 修正构造函数测试中的语法错误用例&#10;- 调整异常处理测试以正确触发语法错误&#10;- 更新操作符优先级测试中的表达式&#10;- 移除不完整的接口声明测试用例&#10;- 修正 Lambda 类型推断的语法格式&#10;- 优化线程测试通过返回值而非共享变量传递结果&#10;- 修复线程属性调用和集合操作的语法问题&#10;- 提高语法错误检测测试的准确性和稳定性" />
+    <MESSAGE value="feat(parser): 支持Lambda表达式返回类型注解和参数类型注解&#10;&#10;- 实现Lambda表达式返回类型注解语法:(params):returnType -&gt; expression&#10;- 支持Lambda参数类型注解语法:(param:type) -&gt; expression&#10;- 限制类型注解为简单类型:int,double,string,bool,char,void,list,dict&#10;- 添加ParseLambdaParameter方法处理参数解析和类型验证&#10;- 更新无参数Lambda表达式解析逻辑支持返回类型注解&#10;- 增强错误处理机制报告不支持的类型注解&#10;- 修复UnaryOperatorsTests中的操作符表达式测试用例&#10;- 移除OperatorPrecedenceEdgeCasesTests中不匹配括号的测试&#10;- 更新LambdaTypeInferenceTests中的类型推断测试语法" />
+    <MESSAGE value="test(parser): 更新测试代码中的字符串字面量语法&#10;&#10;- 将多处测试代码中的@&quot;字符串&quot;语法更新为&quot;&quot;&quot;字符串&quot;&quot;&quot;语法&#10;- 统一抽象类构造函数链测试中的代码缩进格式&#10;- 移除重复的函数定义错误测试用例&#10;- 修正一元运算符测试中正号运算符的相关测试&#10;- 调整多个测试方法中的代码格式以提高可读性&#10;- 更新链式函数调用测试中的三元运算符语法&#10;- 规范函数管道测试中的变量命名和代码结构" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(parser): 更新测试代码中的字符串字面量语法&#10;&#10;- 将多处测试代码中的@&quot;字符串&quot;语法更新为&quot;&quot;&quot;字符串&quot;&quot;&quot;语法&#10;- 统一抽象类构造函数链测试中的代码缩进格式&#10;- 移除重复的函数定义错误测试用例&#10;- 修正一元运算符测试中正号运算符的相关测试&#10;- 调整多个测试方法中的代码格式以提高可读性&#10;- 更新链式函数调用测试中的三元运算符语法&#10;- 规范函数管道测试中的变量命名和代码结构" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
