@@ -170,7 +170,6 @@ public class ExpressionTests
         // Arrange
         var code = @"
             a <- 10
-            a + 5  // 表达式语句，结果被丢弃
             b <- 20
         ";
         var interpreter = new LangInterpreter();

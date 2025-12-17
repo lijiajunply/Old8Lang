@@ -323,7 +323,7 @@ public class VariableTests
         var code = @"
             class Person {
                 public name:string
-                func Init(n:string) {
+                func init(n:string) {
                     name <- n
                 }
             }

@@ -40,7 +40,7 @@ public class ConcurrentPrimitiveTests
         var code = @"
             counter <- 0
             // 原子递增操作模拟
-            atomic_increment <- func(ref_value) {
+            atomic_increment <- (ref_value) -> {
                 current <- ref_value
                 result <- current + 1
                 return result
@@ -57,7 +57,7 @@ public class ConcurrentPrimitiveTests
         var code = @"
             value <- 10
             // 原子比较并交换操作模拟
-            compare_and_swap <- func(ref_value, expected, new_value) {
+            compare_and_swap <- (ref_value, expected, new_value) -> {
                 if ref_value == expected {
                     return new_value
                 } else {

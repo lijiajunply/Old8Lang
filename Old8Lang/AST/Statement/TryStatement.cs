@@ -37,16 +37,20 @@ public class TryStatement(
                     IsMatch(ex, exceptionType))
                 {
                     // 如果有异常变量，则将异常赋值给该变量
-                    manager.AddChildren();
                     if (exceptionVar != null && !string.IsNullOrEmpty(exceptionVar.IdName))
                     {
                         // 创建一个包含异常信息的值类型
                         manager.Set(exceptionVar, new ErrorLangValue(ex));
                     }
+                    else
+                    {
+                        // 如果没有指定异常变量，提供默认的"exception"变量
+                        var defaultExceptionVar = new LangId("exception");
+                        manager.Set(defaultExceptionVar, new ErrorLangValue(ex));
+                    }
 
                     // 执行catch块
                     catchBlock.Run(manager);
-                    manager.RemoveChildren();
                     return; // 只执行第一个匹配的catch块
                 }
             }

@@ -53,10 +53,13 @@ public class AwaitExpression : LangExpression
         // TaskLangValue.AwaitAsync() 内部已经处理了线程安全
         try
         {
-            return taskValue.AwaitAsync().GetAwaiter().GetResult();
+            var awaitTask = taskValue.AwaitAsync();
+            var taskResult = awaitTask.GetAwaiter().GetResult();
+            return taskResult;
         }
         catch (AggregateException aggEx)
         {
+            // 展开聚合异常，抛出内部异常
             throw aggEx.InnerException ?? aggEx;
         }
     }

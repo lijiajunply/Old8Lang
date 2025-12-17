@@ -85,6 +85,16 @@ public class Old8Exception : Exception
     /// Old8Lang调用栈
     /// </summary>
     public List<CallStackFrame> CallStack { get; set; }
+
+    /// <summary>
+    /// 原始错误消息（不包含格式化信息）
+    /// </summary>
+    public string OriginalMessage { get; }
+
+    /// <summary>
+    /// 友好的错误消息（用于字符串拼接和显示）
+    /// </summary>
+    public virtual string FriendlyMessage => OriginalMessage.Split('\n')[0];
     
     /// <summary>
     /// 变量状态信息
@@ -202,6 +212,8 @@ public class Old8Exception : Exception
         SourceContext = GetSourceContextFromInterpreter(position, sourceContext);
         Timestamp = DateTime.Now;
         RequestId = requestId ?? Guid.NewGuid();
+        // 保存原始消息
+        OriginalMessage = message;
         // 获取合并后的调用栈
         CallStack = GetCombinedCallStack(innerException);
         // 初始化变量状态

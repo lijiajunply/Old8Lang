@@ -23,7 +23,7 @@ public class ErrorLangValue(Old8Exception value) : LangValueType
     /// <summary>
     /// 获取友好的错误信息
     /// </summary>
-    public string FriendlyMessage => value.Message.Split('\n')[0];
+    public string FriendlyMessage => value.FriendlyMessage;
 
     public override string ToString()
     {
@@ -102,7 +102,16 @@ public class ErrorLangValue(Old8Exception value) : LangValueType
     /// 获取异常的请求ID
     /// </summary>
     public string RequestId => value.RequestId.ToString();
-    
+  
+    /// <summary>
+    /// 获取简短的字符串表示，用于字符串拼接和显示
+    /// </summary>
+    public override string ToDisplayString()
+    {
+        // 返回友好的错误消息，不包含格式化信息
+        return FriendlyMessage;
+    }
+
     /// <summary>
     /// 支持属性访问，如 e.FriendlyMessage
     /// </summary>
@@ -111,7 +120,7 @@ public class ErrorLangValue(Old8Exception value) : LangValueType
         if (dotExpression is LangId langId)
         {
             var propertyName = langId.IdName;
-            
+
             switch (propertyName)
             {
                 case "FriendlyMessage":
@@ -143,7 +152,7 @@ public class ErrorLangValue(Old8Exception value) : LangValueType
                         "请检查属性名称是否正确");
             }
         }
-        
+
         return base.Dot(dotExpression);
     }
 }

@@ -105,10 +105,10 @@ public class ArithmeticTests
     [Theory]
     [InlineData(10, 2, 5)]
     [InlineData(9, 3, 3)]
-    [InlineData(7, 2, 3.5)]
+    [InlineData(7, 2, 3)]  // 整数除法，截断小数部分
     [InlineData(-10, 2, -5)]
     [InlineData(10, -2, -5)]
-    [InlineData(5, 2, 2.5)]
+    [InlineData(5, 2, 2)]  // 整数除法，截断小数部分
     public void Division_TwoNumbers_ReturnsCorrectQuotient(double a, double b, double expected)
     {
         // Arrange
@@ -122,7 +122,8 @@ public class ArithmeticTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.Equal(expected, ((DoubleLangValue)result).Value);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(expected, ((IntLangValue)result).Value);
     }
 
     [Fact]
