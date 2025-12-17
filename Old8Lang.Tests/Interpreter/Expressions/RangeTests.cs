@@ -559,12 +559,12 @@ public class RangeTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(5, list.Value.Count);
-        Assert.Equal(1, ((IntLangValue)list.Value[0]).Value);
-        Assert.Equal(2, ((IntLangValue)list.Value[1]).Value);
-        Assert.Equal(3, ((IntLangValue)list.Value[2]).Value);
-        Assert.Equal(4, ((IntLangValue)list.Value[3]).Value);
-        Assert.Equal(5, ((IntLangValue)list.Value[4]).Value);
+        Assert.Equal(5, list.Values.Count);
+        Assert.Equal(1, ((IntLangValue)list.Values[0]).Value);
+        Assert.Equal(2, ((IntLangValue)list.Values[1]).Value);
+        Assert.Equal(3, ((IntLangValue)list.Values[2]).Value);
+        Assert.Equal(4, ((IntLangValue)list.Values[3]).Value);
+        Assert.Equal(5, ((IntLangValue)list.Values[4]).Value);
     }
 
     [Fact]

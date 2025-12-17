@@ -252,10 +252,10 @@ public class AwaitTests
         Assert.NotNull(result);
         Assert.IsType<ArrayLangValue>(result);
         var array = (ArrayLangValue)result;
-        Assert.Equal(3, array.Value.Count);
-        Assert.Equal(0, ((IntLangValue)array.Value[0]).Value);
-        Assert.Equal(2, ((IntLangValue)array.Value[1]).Value);
-        Assert.Equal(4, ((IntLangValue)array.Value[2]).Value);
+        Assert.Equal(3, array.GetItems().Count());
+        Assert.Equal(0, ((IntLangValue)array.GetItems().ElementAt(0)).Value);
+        Assert.Equal(2, ((IntLangValue)array.GetItems().ElementAt(1)).Value);
+        Assert.Equal(4, ((IntLangValue)array.GetItems().ElementAt(2)).Value);
     }
 
     [Fact]

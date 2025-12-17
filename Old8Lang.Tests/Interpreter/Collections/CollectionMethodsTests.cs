@@ -32,10 +32,10 @@ public class CollectionMethodsTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(3, list.Value.Count);
-        Assert.Equal(1, ((IntLangValue)list.Value[0]).Value);
-        Assert.Equal(2, ((IntLangValue)list.Value[1]).Value);
-        Assert.Equal(3, ((IntLangValue)list.Value[2]).Value);
+        Assert.Equal(3, list.Values.Count);
+        Assert.Equal(1, ((IntLangValue)list.Values[0]).Value);
+        Assert.Equal(2, ((IntLangValue)list.Values[1]).Value);
+        Assert.Equal(3, ((IntLangValue)list.Values[2]).Value);
     }
 
     [Fact]
@@ -58,11 +58,11 @@ public class CollectionMethodsTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(4, list.Value.Count);
-        Assert.Equal(10, ((IntLangValue)list.Value[0]).Value);
-        Assert.Equal(20, ((IntLangValue)list.Value[1]).Value);
-        Assert.Equal(40, ((IntLangValue)list.Value[2]).Value);
-        Assert.Equal(50, ((IntLangValue)list.Value[3]).Value);
+        Assert.Equal(4, list.Values.Count);
+        Assert.Equal(10, ((IntLangValue)list.Values[0]).Value);
+        Assert.Equal(20, ((IntLangValue)list.Values[1]).Value);
+        Assert.Equal(40, ((IntLangValue)list.Values[2]).Value);
+        Assert.Equal(50, ((IntLangValue)list.Values[3]).Value);
     }
 
     [Fact]
@@ -85,12 +85,12 @@ public class CollectionMethodsTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(5, list.Value.Count);
-        Assert.Equal(1, ((IntLangValue)list.Value[0]).Value);
-        Assert.Equal(2, ((IntLangValue)list.Value[1]).Value);
-        Assert.Equal(3, ((IntLangValue)list.Value[2]).Value);
-        Assert.Equal(4, ((IntLangValue)list.Value[3]).Value);
-        Assert.Equal(5, ((IntLangValue)list.Value[4]).Value);
+        Assert.Equal(5, list.Values.Count);
+        Assert.Equal(1, ((IntLangValue)list.Values[0]).Value);
+        Assert.Equal(2, ((IntLangValue)list.Values[1]).Value);
+        Assert.Equal(3, ((IntLangValue)list.Values[2]).Value);
+        Assert.Equal(4, ((IntLangValue)list.Values[3]).Value);
+        Assert.Equal(5, ((IntLangValue)list.Values[4]).Value);
     }
 
     [Fact]
@@ -136,13 +136,13 @@ public class CollectionMethodsTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(6, list.Value.Count);
-        Assert.Equal(1, ((IntLangValue)list.Value[0]).Value);
-        Assert.Equal(2, ((IntLangValue)list.Value[1]).Value);
-        Assert.Equal(3, ((IntLangValue)list.Value[2]).Value);
-        Assert.Equal(5, ((IntLangValue)list.Value[3]).Value);
-        Assert.Equal(8, ((IntLangValue)list.Value[4]).Value);
-        Assert.Equal(9, ((IntLangValue)list.Value[5]).Value);
+        Assert.Equal(6, list.Values.Count);
+        Assert.Equal(1, ((IntLangValue)list.Values[0]).Value);
+        Assert.Equal(2, ((IntLangValue)list.Values[1]).Value);
+        Assert.Equal(3, ((IntLangValue)list.Values[2]).Value);
+        Assert.Equal(5, ((IntLangValue)list.Values[3]).Value);
+        Assert.Equal(8, ((IntLangValue)list.Values[4]).Value);
+        Assert.Equal(9, ((IntLangValue)list.Values[5]).Value);
     }
 
     [Fact]
@@ -165,10 +165,10 @@ public class CollectionMethodsTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(3, list.Value.Count);
-        Assert.Equal("third", ((StringLangValue)list.Value[0]).Value);
-        Assert.Equal("second", ((StringLangValue)list.Value[1]).Value);
-        Assert.Equal("first", ((StringLangValue)list.Value[2]).Value);
+        Assert.Equal(3, list.Values.Count);
+        Assert.Equal("third", ((StringLangValue)list.Values[0]).Value);
+        Assert.Equal("second", ((StringLangValue)list.Values[1]).Value);
+        Assert.Equal("first", ((StringLangValue)list.Values[2]).Value);
     }
 
     [Fact]
@@ -354,13 +354,13 @@ public class CollectionMethodsTests
         Assert.NotNull(result);
         Assert.IsType<ArrayLangValue>(result);
         var array = (ArrayLangValue)result;
-        Assert.Equal(6, array.Value.Count);
-        Assert.Equal(1, ((IntLangValue)array.Value[0]).Value);
-        Assert.Equal(2, ((IntLangValue)array.Value[1]).Value);
-        Assert.Equal(3, ((IntLangValue)array.Value[2]).Value);
-        Assert.Equal(5, ((IntLangValue)array.Value[3]).Value);
-        Assert.Equal(8, ((IntLangValue)array.Value[4]).Value);
-        Assert.Equal(9, ((IntLangValue)array.Value[5]).Value);
+        Assert.Equal(6, array.GetItems().Count());
+        Assert.Equal(1, ((IntLangValue)array.GetItems().ElementAt(0)).Value);
+        Assert.Equal(2, ((IntLangValue)array.GetItems().ElementAt(1)).Value);
+        Assert.Equal(3, ((IntLangValue)array.GetItems().ElementAt(2)).Value);
+        Assert.Equal(5, ((IntLangValue)array.GetItems().ElementAt(3)).Value);
+        Assert.Equal(8, ((IntLangValue)array.GetItems().ElementAt(4)).Value);
+        Assert.Equal(9, ((IntLangValue)array.GetItems().ElementAt(5)).Value);
     }
 
     [Fact]
@@ -383,12 +383,12 @@ public class CollectionMethodsTests
         Assert.NotNull(result);
         Assert.IsType<ArrayLangValue>(result);
         var array = (ArrayLangValue)result;
-        Assert.Equal(5, array.Value.Count);
-        Assert.Equal(2, ((IntLangValue)array.Value[0]).Value);
-        Assert.Equal(4, ((IntLangValue)array.Value[1]).Value);
-        Assert.Equal(6, ((IntLangValue)array.Value[2]).Value);
-        Assert.Equal(8, ((IntLangValue)array.Value[3]).Value);
-        Assert.Equal(10, ((IntLangValue)array.Value[4]).Value);
+        Assert.Equal(5, array.GetItems().Count());
+        Assert.Equal(2, ((IntLangValue)array.GetItems().ElementAt(0)).Value);
+        Assert.Equal(4, ((IntLangValue)array.GetItems().ElementAt(1)).Value);
+        Assert.Equal(6, ((IntLangValue)array.GetItems().ElementAt(2)).Value);
+        Assert.Equal(8, ((IntLangValue)array.GetItems().ElementAt(3)).Value);
+        Assert.Equal(10, ((IntLangValue)array.GetItems().ElementAt(4)).Value);
     }
 
     [Fact]
@@ -411,12 +411,12 @@ public class CollectionMethodsTests
         Assert.NotNull(result);
         Assert.IsType<ArrayLangValue>(result);
         var array = (ArrayLangValue)result;
-        Assert.Equal(5, array.Value.Count);
-        Assert.Equal(1, ((IntLangValue)array.Value[0]).Value);
-        Assert.Equal(4, ((IntLangValue)array.Value[1]).Value);
-        Assert.Equal(9, ((IntLangValue)array.Value[2]).Value);
-        Assert.Equal(16, ((IntLangValue)array.Value[3]).Value);
-        Assert.Equal(25, ((IntLangValue)array.Value[4]).Value);
+        Assert.Equal(5, array.GetItems().Count());
+        Assert.Equal(1, ((IntLangValue)array.GetItems().ElementAt(0)).Value);
+        Assert.Equal(4, ((IntLangValue)array.GetItems().ElementAt(1)).Value);
+        Assert.Equal(9, ((IntLangValue)array.GetItems().ElementAt(2)).Value);
+        Assert.Equal(16, ((IntLangValue)array.GetItems().ElementAt(3)).Value);
+        Assert.Equal(25, ((IntLangValue)array.GetItems().ElementAt(4)).Value);
     }
 
     [Fact]
@@ -482,11 +482,11 @@ public class CollectionMethodsTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(4, list.Value.Count);
-        Assert.Equal("apple", ((StringLangValue)list.Value[0]).Value);
-        Assert.Equal("banana", ((StringLangValue)list.Value[1]).Value);
-        Assert.Equal("cherry", ((StringLangValue)list.Value[2]).Value);
-        Assert.Equal("date", ((StringLangValue)list.Value[3]).Value);
+        Assert.Equal(4, list.Values.Count);
+        Assert.Equal("apple", ((StringLangValue)list.Values[0]).Value);
+        Assert.Equal("banana", ((StringLangValue)list.Values[1]).Value);
+        Assert.Equal("cherry", ((StringLangValue)list.Values[2]).Value);
+        Assert.Equal("date", ((StringLangValue)list.Values[3]).Value);
     }
 
     [Fact]
@@ -725,7 +725,7 @@ public class CollectionMethodsTests
         Assert.NotNull(result);
         Assert.IsType<ArrayLangValue>(result);
         var array = (ArrayLangValue)result;
-        Assert.Equal(5, array.Value.Count);
+        Assert.Equal(5, array.GetItems().Count());
     }
 
     [Fact]
@@ -748,12 +748,12 @@ public class CollectionMethodsTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(5, list.Value.Count);
-        Assert.Equal(6, ((IntLangValue)list.Value[0]).Value);
-        Assert.Equal(7, ((IntLangValue)list.Value[1]).Value);
-        Assert.Equal(8, ((IntLangValue)list.Value[2]).Value);
-        Assert.Equal(9, ((IntLangValue)list.Value[3]).Value);
-        Assert.Equal(10, ((IntLangValue)list.Value[4]).Value);
+        Assert.Equal(5, list.Values.Count);
+        Assert.Equal(6, ((IntLangValue)list.Values[0]).Value);
+        Assert.Equal(7, ((IntLangValue)list.Values[1]).Value);
+        Assert.Equal(8, ((IntLangValue)list.Values[2]).Value);
+        Assert.Equal(9, ((IntLangValue)list.Values[3]).Value);
+        Assert.Equal(10, ((IntLangValue)list.Values[4]).Value);
     }
 
     [Fact]
@@ -776,11 +776,11 @@ public class CollectionMethodsTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(4, list.Value.Count);
-        Assert.Equal(1, ((IntLangValue)list.Value[0]).Value);
-        Assert.Equal(2, ((IntLangValue)list.Value[1]).Value);
-        Assert.Equal(3, ((IntLangValue)list.Value[2]).Value);
-        Assert.Equal(4, ((IntLangValue)list.Value[3]).Value);
+        Assert.Equal(4, list.Values.Count);
+        Assert.Equal(1, ((IntLangValue)list.Values[0]).Value);
+        Assert.Equal(2, ((IntLangValue)list.Values[1]).Value);
+        Assert.Equal(3, ((IntLangValue)list.Values[2]).Value);
+        Assert.Equal(4, ((IntLangValue)list.Values[3]).Value);
     }
 
     [Fact]
@@ -804,12 +804,12 @@ public class CollectionMethodsTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(6, list.Value.Count);
-        Assert.Equal(1, ((IntLangValue)list.Value[0]).Value);
-        Assert.Equal(2, ((IntLangValue)list.Value[1]).Value);
-        Assert.Equal(3, ((IntLangValue)list.Value[2]).Value);
-        Assert.Equal(4, ((IntLangValue)list.Value[3]).Value);
-        Assert.Equal(5, ((IntLangValue)list.Value[4]).Value);
-        Assert.Equal(6, ((IntLangValue)list.Value[5]).Value);
+        Assert.Equal(6, list.Values.Count);
+        Assert.Equal(1, ((IntLangValue)list.Values[0]).Value);
+        Assert.Equal(2, ((IntLangValue)list.Values[1]).Value);
+        Assert.Equal(3, ((IntLangValue)list.Values[2]).Value);
+        Assert.Equal(4, ((IntLangValue)list.Values[3]).Value);
+        Assert.Equal(5, ((IntLangValue)list.Values[4]).Value);
+        Assert.Equal(6, ((IntLangValue)list.Values[5]).Value);
     }
 }

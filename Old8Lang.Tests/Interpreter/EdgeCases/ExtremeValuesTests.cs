@@ -248,8 +248,8 @@ public class ExtremeValuesTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var innerList = (ListLangValue)result;
-        Assert.Equal(1, innerList.Value.Count);
-        Assert.Equal(1, ((IntLangValue)innerList.Value[0]).Value);
+        Assert.Equal(1, innerList.Values.Count);
+        Assert.Equal(1, ((IntLangValue)innerList.Values[0]).Value);
     }
 
     [Fact]

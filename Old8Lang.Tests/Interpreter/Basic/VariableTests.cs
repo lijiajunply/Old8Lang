@@ -251,7 +251,7 @@ public class VariableTests
         Assert.NotNull(result);
         Assert.IsType<ArrayLangValue>(result);
         var array = (ArrayLangValue)result;
-        Assert.Equal(5, array.Value.Count);
+        Assert.Equal(5, array.GetItems().Count());
     }
 
     [Fact]
@@ -273,7 +273,7 @@ public class VariableTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(3, list.Value.Count);
+        Assert.Equal(3, list.Values.Count);
     }
 
     [Fact]
@@ -293,7 +293,7 @@ public class VariableTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("x"));
         Assert.NotNull(result);
-        Assert.IsType<DictLangValue>(result);
+        Assert.IsType<DictionaryLangValue>(result);
     }
 
     [Fact]
@@ -339,7 +339,7 @@ public class VariableTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("x"));
         Assert.NotNull(result);
-        Assert.IsType<ClassValue>(result);
+        Assert.IsType<AnyLangValue>(result);
     }
 
     [Fact]
@@ -539,7 +539,7 @@ public class VariableTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("x"));
         Assert.NotNull(result);
-        Assert.IsType<DictLangValue>(result);
+        Assert.IsType<DictionaryLangValue>(result);
     }
 
     [Fact]

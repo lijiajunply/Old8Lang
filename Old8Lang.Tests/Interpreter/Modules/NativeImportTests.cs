@@ -5,7 +5,10 @@ using Xunit.Abstractions;
 using Old8Lang;
 namespace Old8Lang.Tests.Interpreter.Modules;
 using Old8Lang.Interpreter;
+using Old8Lang.AST.Expression.Intermediates;
 using System.Collections.Generic;
+using System.Linq;
+
 /// <summary>
 /// 原生库导入测试
 /// 测试native语句、C#方法绑定、外部库调用等原生功能
@@ -17,23 +20,11 @@ public class NativeImportTests
 {
     private readonly ITestOutputHelper _output;
 
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
     public NativeImportTests(ITestOutputHelper output)
     {
         _output = output;
     }
-    [Fact]
+
     private Dictionary<string, object> TestInterpreter(string code)
     {
         var interpreter = new LangInterpreter();
@@ -46,6 +37,7 @@ public class NativeImportTests
         return result;
     }
 
+    [Fact]
     public void NativeImport_BasicNativeStatement_SimpleNativeMethod()
     {
         var code = @"
@@ -57,19 +49,8 @@ public class NativeImportTests
         Assert.True(result.ContainsKey("final_result"));
         Assert.Equal(5, Convert.ToInt32(result["final_result"]));
     }
+
     [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
     public void NativeImport_NativeMathFunctions_MathOperations()
     {
         var code = @"
@@ -96,853 +77,594 @@ public class NativeImportTests
         Assert.Equal(8, Convert.ToInt32(results.max));
         Assert.Equal(3, Convert.ToInt32(results.min));
     }
+
     [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
     public void NativeImport_NativeStringFunctions_StringOperations()
     {
         var code = @"
             // 原生字符串函数测试
-            test_string <- ""Hello World""
-            native length_result <- test_string.Length
-            native upper_result <- test_string.ToUpper()
-            native lower_result <- test_string.ToLower()
-            native contains_result <- test_string.Contains(""World"")
-            native substring_result <- test_string.Substring(0, 5)
+            native upper_result <- String.ToUpper(""hello world"")
+            native lower_result <- String.ToLower(""HELLO WORLD"")
+            native length_result <- String.Length(""test string"")
+            native trim_result <- String.Trim(""  spaced text  "")
+            native contains_result <- String.Contains(""hello world"", ""world"")
             string_results <- {
-                original: test_string,
-                length: length_result,
                 upper: upper_result,
                 lower: lower_result,
-                contains: contains_result,
-                substring: substring_result
+                length: length_result,
+                trimmed: trim_result,
+                contains: contains_result
             }
         ";
         var result = TestInterpreter(code);
         Assert.True(result.ContainsKey("string_results"));
         var results = result["string_results"] as dynamic;
-        Assert.Equal("Hello World", results.original);
-        Assert.Equal(11, Convert.ToInt32(results.length));
         Assert.Equal("HELLO WORLD", results.upper);
         Assert.Equal("hello world", results.lower);
+        Assert.Equal(11, Convert.ToInt32(results.length));
+        Assert.Equal("spaced text", results.trimmed);
         Assert.Equal(true, results.contains);
-        Assert.Equal("Hello", results.substring);
     }
+
     [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
     public void NativeImport_NativeDateTimeFunctions_DateTimeOperations()
     {
         var code = @"
-            // 原生DateTime函数测试
+            // 原生日期时间函数测试
             native current_time <- DateTime.Now
             native today <- DateTime.Today
             native specific_date <- new DateTime(2023, 12, 25)
-            native year_result <- specific_date.Year
-            native month_result <- specific_date.Month
-            native day_result <- specific_date.Day
+            native year <- specific_date.Year
+            native month <- specific_date.Month
+            native day <- specific_date.Day
             datetime_results <- {
-                has_current_time: current_time != null,
-                has_today: today != null,
-                specific_year: year_result,
-                specific_month: month_result,
-                specific_day: day_result
+                current: current_time,
+                today: today,
+                specific: specific_date,
+                year: year,
+                month: month,
+                day: day
             }
         ";
         var result = TestInterpreter(code);
         Assert.True(result.ContainsKey("datetime_results"));
         var results = result["datetime_results"] as dynamic;
-        Assert.Equal(true, results.has_current_time);
-        Assert.Equal(true, results.has_today);
-        Assert.Equal(2023, Convert.ToInt32(results.specific_year));
-        Assert.Equal(12, Convert.ToInt32(results.specific_month));
-        Assert.Equal(25, Convert.ToInt32(results.specific_day));
+        Assert.Equal(2023, Convert.ToInt32(results.year));
+        Assert.Equal(12, Convert.ToInt32(results.month));
+        Assert.Equal(25, Convert.ToInt32(results.day));
     }
+
     [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
     public void NativeImport_NativeConsoleFunctions_ConsoleOperations()
     {
         var code = @"
-            // 原生Console函数测试
-            message <- ""Test Message""
-            native console_write <- Console.WriteLine(message)
-            // 测试Console输入（在实际环境中可能需要用户输入，这里模拟）
-            try {
-                native console_read_attempt <- Console.ReadLine()
-                console_input_available <- true
-            } catch e {
-                console_input_available <- false
-                console_error <- e.message
-            }
-            console_results <- {
-                message_written: console_write == null,  // WriteLine通常返回void
-                input_available: console_input_available
+            // 原生控制台函数测试
+            native title <- Console.Title
+            native window_width <- Console.WindowWidth
+            native window_height <- Console.WindowHeight
+            console_info <- {
+                title: title,
+                width: window_width,
+                height: window_height
             }
         ";
         var result = TestInterpreter(code);
-        Assert.True(result.ContainsKey("console_results"));
-        var results = result["console_results"] as dynamic;
-        // Console.WriteLine的返回值测试
-        // input_available可能会因为环境问题而不同
+        Assert.True(result.ContainsKey("console_info"));
+        var info = result["console_info"] as dynamic;
+        Assert.True(info.width > 0);
+        Assert.True(info.height > 0);
     }
+
     [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
-    public void NativeImport_NativeFileOperations_FileSystemFunctions()
+    public void NativeImport_NativeFileOperations_FileOperations()
     {
         var code = @"
             // 原生文件操作测试
-            test_content <- ""Test file content""
-            test_file_path <- ""test_native_file.txt""
-            // 写文件
-            try {
-                native write_result <- File.WriteAllText(test_file_path, test_content)
-                file_write_success <- true
-            } catch e {
-                file_write_success <- false
-                write_error <- e.message
-            }
-            // 读文件
-            try {
-                native read_result <- File.ReadAllText(test_file_path)
-                file_read_success <- true
-            } catch e {
-                file_read_success <- false
-                read_error <- e.message
-            }
-            // 检查文件是否存在
-            try {
-                native exists_result <- File.Exists(test_file_path)
-                file_exists <- exists_result
-            } catch e {
-                file_exists <- false
-                exists_error <- e.message
-            }
-            file_results <- {
-                write_success: file_write_success,
-                read_success: file_read_success,
-                file_exists: file_exists,
-                read_content: read_result if file_read_success else null
+            native current_dir <- Environment.CurrentDirectory
+            native temp_path <- Path.GetTempPath()
+            native user_name <- Environment.UserName
+            file_info <- {
+                current_directory: current_dir,
+                temp_path: temp_path,
+                user_name: user_name
             }
         ";
         var result = TestInterpreter(code);
-        Assert.True(result.ContainsKey("file_results"));
-        var results = result["file_results"] as dynamic;
-        // 文件操作的结果取决于执行环境的权限
-        // 至少应该有结果对象返回
-        Assert.NotNull(results);
+        Assert.True(result.ContainsKey("file_info"));
+        var info = result["file_info"] as dynamic;
+        Assert.NotNull(info.current_directory);
+        Assert.NotNull(info.temp_path);
+        Assert.NotNull(info.user_name);
     }
+
     [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
-    public void NativeImport_NativeEnvironmentFunctions_EnvironmentAccess()
+    public void NativeImport_NativeEnvironmentVariables_EnvironmentAccess()
     {
         var code = @"
-            // 原生Environment函数测试
-            try {
-                native machine_name <- Environment.MachineName
-                native os_version <- Environment.OSVersion.ToString()
-                native processor_count <- Environment.ProcessorCount
-                native current_directory <- Environment.CurrentDirectory
-                environment_results <- {
-                    machine_name: machine_name,
-                    os_version: os_version,
-                    processor_count: processor_count,
-                    current_directory: current_directory
-                }
-            } catch e {
-                environment_results <- {
-                    error: e.message,
-                    access_failed: true
-                }
+            // 原生环境变量测试
+            native path_var <- Environment.GetEnvironmentVariable(""PATH"")
+            native machine_name <- Environment.MachineName
+            native os_version <- Environment.OSVersion
+            native processor_count <- Environment.ProcessorCount
+            env_info <- {
+                path: path_var,
+                machine_name: machine_name,
+                os_version: os_version,
+                processor_count: processor_count
             }
         ";
         var result = TestInterpreter(code);
-        Assert.True(result.ContainsKey("environment_results"));
-        var results = result["environment_results"] as dynamic;
-        Assert.NotNull(results);
-        // 环境访问可能因权限而失败，但应该返回结果对象
+        Assert.True(result.ContainsKey("env_info"));
+        var info = result["env_info"] as dynamic;
+        Assert.NotNull(info.machine_name);
+        Assert.True(Convert.ToInt32(info.processor_count) > 0);
     }
+
     [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
-    public void NativeImport_NativeCollectionsMethods_CollectionOperations()
-    {
-        var code = @"
-            // 原生集合方法测试
-            test_list <- {1, 2, 3, 4, 5}
-            test_dict <- {""a"": 1, ""b"": 2}
-            try {
-                // 列表操作
-                native list_count <- test_list.Count
-                native list_contains <- test_list.Contains(3)
-                native list_first <- test_list.First()
-                // 字典操作
-                native dict_count <- test_dict.Count
-                native dict_contains_key <- test_dict.ContainsKey(""a"")
-                native dict_keys <- test_dict.Keys
-                collection_results <- {
-                    list_count: list_count,
-                    list_contains: list_contains,
-                    list_first: list_first,
-                    dict_count: dict_count,
-                    dict_contains_key: dict_contains_key,
-                    dict_keys_available: dict_keys != null
-                }
-            } catch e {
-                collection_results <- {
-                    error: e.message,
-                    collection_access_failed: true
-                }
-            }
-        ";
-        var result = TestInterpreter(code);
-        Assert.True(result.ContainsKey("collection_results"));
-        var results = result["collection_results"] as dynamic;
-        Assert.NotNull(results);
-    }
-    [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
-    public void NativeImport_NativeTypeConversion_TypeConversionOperations()
+    public void NativeImport_NativeTypeConversion_TypeOperations()
     {
         var code = @"
             // 原生类型转换测试
-            string_number <- ""42""
-            float_string <- ""3.14""
-            bool_string <- ""true""
-            try {
-                // 类型转换
-                native int_parse <- Convert.ToInt32(string_number)
-                native double_parse <- Convert.ToDouble(float_string)
-                native bool_parse <- Convert.ToBoolean(bool_string)
-                // 类型检查
-                native is_int_string <- string_number.GetType().Name
-                native parsed_int_type <- int_parse.GetType().Name
-                conversion_results <- {
-                    parsed_int: int_parse,
-                    parsed_double: double_parse,
-                    parsed_bool: bool_parse,
-                    original_string_type: is_int_string,
-                    parsed_type: parsed_int_type
-                }
-            } catch e {
-                conversion_results <- {
-                    error: e.message,
-                    conversion_failed: true
-                }
+            string_num <- ""123""
+            native int_result <- Convert.ToInt32(string_num)
+            native double_result <- Convert.ToDouble(string_num)
+            native bool_result <- Convert.ToBoolean(1)
+            native string_result <- Convert.ToString(456)
+            conversion_results <- {
+                int_value: int_result,
+                double_value: double_result,
+                bool_value: bool_result,
+                string_value: string_result
             }
         ";
         var result = TestInterpreter(code);
         Assert.True(result.ContainsKey("conversion_results"));
         var results = result["conversion_results"] as dynamic;
-        Assert.NotNull(results);
+        Assert.Equal(123, Convert.ToInt32(results.int_value));
+        Assert.Equal(123.0, Convert.ToDouble(results.double_value));
+        Assert.Equal(true, results.bool_value);
+        Assert.Equal("456", results.string_value);
     }
+
     [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
-    public void NativeImport_NativeGuidOperations_GuidFunctions()
+    public void NativeImport_NativeArrayOperations_ArrayManipulations()
     {
         var code = @"
-            // 原生Guid操作测试
-            try {
-                // 创建新Guid
-                native new_guid <- Guid.NewGuid()
-                native guid_string <- new_guid.ToString()
-                // 解析Guid字符串
-                test_guid_string <- ""12345678-1234-1234-1234-123456789abc""
-                native parsed_guid <- Guid.Parse(test_guid_string)
-                // Guid比较
-                native guid_equals <- new_guid.Equals(new_guid)
-                guid_results <- {
-                    new_guid_string: guid_string,
-                    parsed_guid_string: parsed_guid.ToString(),
-                    guid_equals_self: guid_equals,
-                    guid_length: guid_string.Length
-                }
-            } catch e {
-                guid_results <- {
-                    error: e.message,
-                    guid_operations_failed: true
-                }
+            // 原生数组操作测试
+            native array_length <- [1, 2, 3, 4, 5].Length
+            native array_sort <- Array.Sort([3, 1, 4, 1, 5])
+            native array_reverse <- Array.Reverse([1, 2, 3])
+            array_results <- {
+                original_length: array_length,
+                sorted_length: array_sort,
+                reversed_length: array_reverse
+            }
+        ";
+        var result = TestInterpreter(code);
+        Assert.True(result.ContainsKey("array_results"));
+        var results = result["array_results"] as dynamic;
+        Assert.Equal(5, Convert.ToInt32(results.original_length));
+    }
+
+    [Fact]
+    public void NativeImport_NativeListOperations_ListManipulations()
+    {
+        var code = @"
+            // 原生列表操作测试
+            native list_count <- List({1, 2, 3}).Count
+            native list_contains <- List({1, 2, 3}).Contains(2)
+            native list_index <- List({""a"", ""b"", ""c""}).IndexOf(""b"")
+            list_results <- {
+                count: list_count,
+                contains: list_contains,
+                index: list_index
+            }
+        ";
+        var result = TestInterpreter(code);
+        Assert.True(result.ContainsKey("list_results"));
+        var results = result["list_results"] as dynamic;
+        Assert.Equal(3, Convert.ToInt32(results.count));
+        Assert.Equal(true, results.contains);
+        Assert.Equal(1, Convert.ToInt32(results.index));
+    }
+
+    [Fact]
+    public void NativeImport_NativeDictionaryOperations_DictionaryManipulations()
+    {
+        var code = @"
+            // 原生字典操作测试
+            dict_var <- {""key1"": ""value1"", ""key2"": ""value2""}
+            native dict_count <- dict_var.Count
+            native contains_key <- dict_var.ContainsKey(""key1"")
+            native contains_value <- dict_var.ContainsValue(""value2"")
+            dict_results <- {
+                count: dict_count,
+                has_key: contains_key,
+                has_value: contains_value
+            }
+        ";
+        var result = TestInterpreter(code);
+        Assert.True(result.ContainsKey("dict_results"));
+        var results = result["dict_results"] as dynamic;
+        Assert.Equal(2, Convert.ToInt32(results.count));
+        Assert.Equal(true, results.has_key);
+        Assert.Equal(true, results.has_value);
+    }
+
+    [Fact]
+    public void NativeImport_NativeGuidOperations_GuidManipulations()
+    {
+        var code = @"
+            // 原生GUID操作测试
+            native new_guid <- Guid.NewGuid()
+            native guid_string <- new_guid.ToString()
+            native is_empty <- Guid.NewGuid() != Guid.Empty
+            guid_results <- {
+                new_id: new_guid,
+                string_representation: guid_string,
+                not_empty: is_empty
             }
         ";
         var result = TestInterpreter(code);
         Assert.True(result.ContainsKey("guid_results"));
         var results = result["guid_results"] as dynamic;
-        Assert.NotNull(results);
+        Assert.NotNull(results.string_representation);
+        Assert.Equal(true, results.not_empty);
     }
+
     [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
-    public void NativeImport_NativeRandomOperations_RandomNumberGeneration()
+    public void NativeImport_NativeRandomOperations_RandomNumbers()
     {
         var code = @"
-            // 原生随机数生成测试
-            try {
-                native random <- new Random()
-                native random_int <- random.Next(1, 100)
-                native random_double <- random.NextDouble()
-                native random_bytes_length <- 10
-                // 生成随机字节
-                random_bytes <- {}
-                i <- 0
-                while i < 5 {
-                    native random_byte <- random.Next(0, 256)
-                    random_bytes <- random_bytes.concat({random_byte})
-                    i <- i + 1
-                }
-                random_results <- {
-                    random_int_range: random_int >= 1 && random_int < 100,
-                    random_double_range: random_double >= 0.0 && random_double < 1.0,
-                    random_bytes_count: random_bytes.length,
-                    has_random_values: true
-                }
-            } catch e {
-                random_results <- {
-                    error: e.message,
-                    random_operations_failed: true
-                }
+            // 原生随机数操作测试
+            native random_obj <- new Random()
+            native random_int <- random_obj.Next(1, 100)
+            native random_double <- random_obj.NextDouble()
+            random_results <- {
+                integer_value: random_int,
+                double_value: random_double
             }
         ";
         var result = TestInterpreter(code);
         Assert.True(result.ContainsKey("random_results"));
         var results = result["random_results"] as dynamic;
-        Assert.NotNull(results);
+        Assert.True(Convert.ToInt32(results.integer_value) >= 1);
+        Assert.True(Convert.ToInt32(results.integer_value) <= 100);
+        Assert.True(Convert.ToDouble(results.double_value) >= 0.0);
+        Assert.True(Convert.ToDouble(results.double_value) < 1.0);
     }
+
     [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
-    public void NativeImport_NativeStringBuilder_StringBuilderOperations()
-    {
-        var code = @"
-            // 原生StringBuilder操作测试
-            try {
-                native sb <- new StringBuilder()
-                native sb_append <- sb.Append(""Hello"")
-                native sb_append_line <- sb.AppendLine("" World"")
-                native sb_append_format <- sb.AppendFormat("" Number: {0}"", 42)
-                native final_string <- sb.ToString()
-                stringbuilder_results <- {
-                    final_content: final_string,
-                    content_length: final_string.Length,
-                    builder_operations_completed: true
-                }
-            } catch e {
-                stringbuilder_results <- {
-                    error: e.message,
-                    stringbuilder_operations_failed: true
-                }
-            }
-        ";
-        var result = TestInterpreter(code);
-        Assert.True(result.ContainsKey("stringbuilder_results"));
-        var results = result["stringbuilder_results"] as dynamic;
-        Assert.NotNull(results);
-    }
-    [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
-    public void NativeImport_NativePathOperations_PathManipulation()
-    {
-        var code = @"
-            // 原生路径操作测试
-            test_path1 <- ""/home/user""
-            test_path2 <- ""documents/file.txt""
-            try {
-                native combined_path <- Path.Combine(test_path1, test_path2)
-                native directory_name <- Path.GetDirectoryName(combined_path)
-                native file_name <- Path.GetFileName(combined_path)
-                native file_extension <- Path.GetExtension(combined_path)
-                native path_without_extension <- Path.GetFileNameWithoutExtension(combined_path)
-                path_results <- {
-                    combined: combined_path,
-                    directory: directory_name,
-                    filename: file_name,
-                    extension: file_extension,
-                    name_without_extension: path_without_extension
-                }
-            } catch e {
-                path_results <- {
-                    error: e.message,
-                    path_operations_failed: true
-                }
-            }
-        ";
-        var result = TestInterpreter(code);
-        Assert.True(result.ContainsKey("path_results"));
-        var results = result["path_results"] as dynamic;
-        Assert.NotNull(results);
-    }
-    [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
-    public void NativeImport_NativeRegexOperations_RegularExpressionOperations()
-    {
-        var code = @"
-            // 原生正则表达式操作测试
-            test_text <- ""The price is $123.45 for item #ABC""
-            pattern <- ""\\$[0-9]+\\.[0-9]{2}""
-            try {
-                native regex <- new Regex(pattern)
-                native match_result <- regex.Match(test_text)
-                native is_match <- regex.IsMatch(test_text)
-                native matches <- regex.Matches(test_text)
-                native replace_result <- regex.Replace(test_text, ""$0.00"")
-                regex_results <- {
-                    text: test_text,
-                    pattern: pattern,
-                    has_match: is_match,
-                    match_success: match_result.Success,
-                    replacement_result: replace_result,
-                    regex_operations_completed: true
-                }
-            } catch e {
-                regex_results <- {
-                    error: e.message,
-                    regex_operations_failed: true
-                }
-            }
-        ";
-        var result = TestInterpreter(code);
-        Assert.True(result.ContainsKey("regex_results"));
-        var results = result["regex_results"] as dynamic;
-        Assert.NotNull(results);
-    }
-    [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
-    public void NativeImport_NativeWebClientOperations_WebClientOperations()
-    {
-        var code = @"
-            // 原生WebClient操作测试（可能因网络环境而变化）
-            test_url <- ""https://httpbin.org/get""
-            try {
-                native client <- new WebClient()
-                // 注意：实际网络请求可能超时或失败，这里主要测试native语句语法
-                // native response <- client.DownloadString(test_url)
-                webclient_results <- {
-                    client_created: client != null,
-                    network_operations_attempted: true,
-                    note: ""Network operations may fail due to environment""
-                }
-            } catch e {
-                webclient_results <- {
-                    error: e.message,
-                    webclient_operations_failed: true
-                }
-            }
-        ";
-        var result = TestInterpreter(code);
-        Assert.True(result.ContainsKey("webclient_results"));
-        var results = result["webclient_results"] as dynamic;
-        Assert.NotNull(results);
-    }
-    [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
-    public void NativeImport_NativeJsonOperations_JsonSerialization()
+    public void NativeImport_NativeJsonOperations_JsonManipulations()
     {
         var code = @"
             // 原生JSON操作测试
-            test_object <- {name: ""Test"", value: 42, active: true}
-            try {
-                // 使用JavaScriptSerializer或其他JSON序列化器
-                // 注意：具体的类名可能因.NET版本而异
-                native json_serializer <- new System.Web.Script.Serialization.JavaScriptSerializer()
-                native json_string <- json_serializer.Serialize(test_object)
-                json_results <- {
-                    original_object: test_object,
-                    serialized_json: json_string,
-                    serialization_attempted: true
-                }
-            } catch e {
-                // 如果JavaScriptSerializer不可用，尝试其他方法或标记失败
-                json_results <- {
-                    error: e.message,
-                    json_operations_failed: true,
-                    fallback_note: ""JSON serialization may require specific references""
-                }
+            json_string -> ""{\""name\"": \""test\"", \""value\"": 123}""
+            native json_parse <- Json.Parse(json_string)
+            native json_stringify <- Json.Stringify({name: ""test"", value: 123})
+            json_results <- {
+                parsed: json_parse,
+                stringified: json_stringify
             }
         ";
         var result = TestInterpreter(code);
         Assert.True(result.ContainsKey("json_results"));
         var results = result["json_results"] as dynamic;
-        Assert.NotNull(results);
+        Assert.NotNull(results.stringified);
     }
+
     [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
+    public void NativeImport_NativeRegexOperations_RegexPattern()
     {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
+        var code = @"
+            // 原生正则表达式操作测试
+            test_text <- ""Hello World 123""
+            native is_match <- Regex.IsMatch(test_text, ""\d+"")
+            native match_result <- Regex.Match(test_text, ""\d+"")
+            native replace_result <- Regex.Replace(test_text, ""\d+"", ""999"")
+            regex_results <- {
+                is_number_match: is_match,
+                match_value: match_result,
+                replaced_text: replace_result
+            }
+        ";
+        var result = TestInterpreter(code);
+        Assert.True(result.ContainsKey("regex_results"));
+        var results = result["regex_results"] as dynamic;
+        Assert.Equal(true, results.is_number_match);
+        Assert.Equal("Hello World 999", results.replaced_text);
     }
 
-    public void NativeImport_NativeExceptionHandling_NativeExceptionHandling()
+    [Fact]
+    public void NativeImport_NativeWebOperations_UriParsing()
+    {
+        var code = @"
+            // 原生Web操作测试
+            test_url <- ""https://www.example.com:8080/path?query=value""
+            native uri_obj <- new Uri(test_url)
+            native scheme <- uri_obj.Scheme
+            native host <- uri_obj.Host
+            native port <- uri_obj.Port
+            native path <- uri_obj.AbsolutePath
+            uri_results <- {
+                protocol: scheme,
+                hostname: host,
+                port_number: port,
+                file_path: path
+            }
+        ";
+        var result = TestInterpreter(code);
+        Assert.True(result.ContainsKey("uri_results"));
+        var results = result["uri_results"] as dynamic;
+        Assert.Equal("https", results.protocol);
+        Assert.Equal("www.example.com", results.hostname);
+        Assert.Equal(8080, Convert.ToInt32(results.port_number));
+        Assert.Equal("/path", results.file_path);
+    }
+
+    [Fact]
+    public void NativeImport_CustomNativeMethod_UserDefined()
+    {
+        var code = @"
+            // 自定义原生方法测试
+            custom_add <- func(a, b) -> a + b
+            result <- custom_add(3, 4)
+        ";
+        var result = TestInterpreter(code);
+        Assert.True(result.ContainsKey("result"));
+        Assert.Equal(7, Convert.ToInt32(result["result"]));
+    }
+
+    [Fact]
+    public void NativeImport_NativeMethodParameters_ParameterPassing()
+    {
+        var code = @"
+            // 原生方法参数传递测试
+            param1 <- 10
+            param2 <- 20
+            native max_result <- Math.Max(param1, param2)
+            native min_result <- Math.Min(param1, param2)
+            param_results <- {
+                maximum: max_result,
+                minimum: min_result
+            }
+        ";
+        var result = TestInterpreter(code);
+        Assert.True(result.ContainsKey("param_results"));
+        var results = result["param_results"] as dynamic;
+        Assert.Equal(20, Convert.ToInt32(results.maximum));
+        Assert.Equal(10, Convert.ToInt32(results.minimum));
+    }
+
+    [Fact]
+    public void NativeImport_NativeMethodChaining_MethodChaining()
+    {
+        var code = @"
+            // 原生方法链式调用测试
+            test_string <- ""  Hello World  ""
+            native chained_result <- test_string.Trim().ToLower()
+            native length_result <- test_string.Trim().ToLower().Length
+            chaining_results <- {
+                processed_string: chained_result,
+                final_length: length_result
+            }
+        ";
+        var result = TestInterpreter(code);
+        Assert.True(result.ContainsKey("chaining_results"));
+        var results = result["chaining_results"] as dynamic;
+        Assert.Equal("hello world", results.processed_string);
+        Assert.Equal(11, Convert.ToInt32(results.final_length));
+    }
+
+    [Fact]
+    public void NativeImport_NativeExceptionHandling_ErrorHandling()
     {
         var code = @"
             // 原生异常处理测试
-            exception_handling_results <- {}
+            test_value <- 0
             try {
-                // 故意触发除零错误
-                native division_error <- 10 / 0
-                exception_handling_results[""division_error_caught""] <- false
-            } catch e {
-                exception_handling_results[""division_error_caught""] <- true
-                exception_handling_results[""division_error_type""] <- e.GetType().Name
-                exception_handling_results[""division_error_message""] <- e.Message
+                native div_result <- 10 / test_value
+                error_occurred <- false
+            } catch {
+                error_occurred <- true
             }
-            try {
-                // 故意触发空引用错误
-                native null_reference <- ((object)null).ToString()
-                exception_handling_results[""null_reference_caught""] <- false
-            } catch e {
-                exception_handling_results[""null_reference_caught""] <- true
-                exception_handling_results[""null_reference_type""] <- e.GetType().Name
-                exception_handling_results[""null_reference_message""] <- e.Message
-            }
-            try {
-                // 故意触发索引越界错误
-                test_array <- {1, 2, 3}
-                native index_error <- test_array[10]
-                exception_handling_results[""index_error_caught""] <- false
-            } catch e {
-                exception_handling_results[""index_error_caught""] <- true
-                exception_handling_results[""index_error_type""] <- e.GetType().Name
-                exception_handling_results[""index_error_message""] <- e.Message
+            exception_result <- {
+                has_error: error_occurred
             }
         ";
         var result = TestInterpreter(code);
-        Assert.True(result.ContainsKey("exception_handling_results"));
-        var results = result["exception_handling_results"] as dynamic;
-        Assert.NotNull(results);
-        // 验证异常被正确捕获
-        Assert.Equal(true, results.division_error_caught);
+        Assert.True(result.ContainsKey("exception_result"));
+        var exceptionResult = result["exception_result"] as dynamic;
+        Assert.True(exceptionResult.has_error);
     }
+
     [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
-    public void NativeImport_NativeTypeReflection_TypeInformation()
+    public void NativeImport_NativeStaticProperties_StaticAccess()
     {
         var code = @"
-            // 原生类型反射测试
-            test_string <- ""Hello""
-            test_number <- 42
-            test_list <- {1, 2, 3}
-            try {
-                // 获取类型信息
-                native string_type <- test_string.GetType()
-                native number_type <- test_number.GetType()
-                native list_type <- test_list.GetType()
-                native string_type_name <- string_type.Name
-                native number_type_name <- number_type.Name
-                native list_type_name <- list_type.Name
-                reflection_results <- {
-                    string_type: string_type_name,
-                    number_type: number_type_name,
-                    list_type: list_type_name,
-                    reflection_successful: true
-                }
-            } catch e {
-                reflection_results <- {
-                    error: e.message,
-                    reflection_failed: true
-                }
+            // 原生静态属性访问测试
+            native math_pi <- Math.PI
+            native math_e <- Math.E
+            native today <- DateTime.Today
+            static_results <- {
+                pi_value: math_pi,
+                e_value: math_e,
+                current_date: today
             }
         ";
         var result = TestInterpreter(code);
-        Assert.True(result.ContainsKey("reflection_results"));
-        var results = result["reflection_results"] as dynamic;
-        Assert.NotNull(results);
+        Assert.True(result.ContainsKey("static_results"));
+        var results = result["static_results"] as dynamic;
+        Assert.True(Convert.ToDouble(results.pi_value) > 3.14);
+        Assert.True(Convert.ToDouble(results.e_value) > 2.71);
+        Assert.NotNull(results.current_date);
     }
+
     [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
-    public void NativeImport_NativeLinqOperations_LinqQueryOperations()
+    public void NativeImport_NativeComplexObjects_ObjectCreation()
     {
         var code = @"
-            // 原生LINQ操作测试
-            test_list <- {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-            try {
-                // LINQ查询操作
-                native where_result <- test_list.Where(x => x > 5)
-                native select_result <- test_list.Select(x => x * 2)
-                native first_result <- test_list.First()
-                native first_or_default_result <- test_list.FirstOrDefault(x => x > 100)
-                native count_result <- test_list.Count()
-                native sum_result <- test_list.Sum()
-                linq_results <- {
-                    where_count: where_result.Count(),
-                    select_count: select_result.Count(),
-                    first_value: first_result,
-                    first_or_default_is_default: first_or_default_result == 0,
-                    total_count: count_result,
-                    total_sum: sum_result,
-                    linq_operations_successful: true
-                }
-            } catch e {
-                linq_results <- {
-                    error: e.message,
-                    linq_operations_failed: true
-                }
+            // 原生复杂对象创建测试
+            native list_obj <- new List<string>()
+            native dict_obj <- new Dictionary<string, int>()
+            native array_obj <- new int[5]
+            object_results <- {
+                list_created: list_obj,
+                dict_created: dict_obj,
+                array_created: array_obj
             }
         ";
         var result = TestInterpreter(code);
-        Assert.True(result.ContainsKey("linq_results"));
-        var results = result["linq_results"] as dynamic;
-        Assert.NotNull(results);
+        Assert.True(result.ContainsKey("object_results"));
+        var results = result["object_results"] as dynamic;
+        Assert.NotNull(results.list_created);
+        Assert.NotNull(results.dict_created);
+        Assert.NotNull(results.array_created);
     }
+
     [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
-    public void NativeImport_NativeEnumOperations_EnumOperations()
+    public void NativeImport_NativeMethodOverloading_OverloadedMethods()
     {
         var code = @"
-            // 原生枚举操作测试
-            try {
-                // 使用系统枚举
-                native day_of_week <- DayOfWeek.Monday
-                native day_value <- Convert.ToInt32(day_of_week)
-                native day_name <- day_of_week.ToString()
-                // 枚举解析
-                native parsed_day <- Enum.Parse(typeof(DayOfWeek), ""Friday"")
-                native parsed_day_name <- parsed_day.ToString()
-                enum_results <- {
-                    original_day: day_name,
-                    day_integer_value: day_value,
-                    parsed_day: parsed_day_name,
-                    enum_operations_successful: true
-                }
-            } catch e {
-                enum_results <- {
-                    error: e.message,
-                    enum_operations_failed: true
-                }
+            // 原生方法重载测试
+            native abs_int <- Math.Abs(-5)
+            native abs_double <- Math.Abs(-5.5)
+            native round_default <- Math.Round(3.7)
+            native round_digits <- Math.Round(3.14159, 2)
+            overload_results <- {
+                int_absolute: abs_int,
+                double_absolute: abs_double,
+                rounded_default: round_default,
+                rounded_precise: round_digits
             }
         ";
         var result = TestInterpreter(code);
-        Assert.True(result.ContainsKey("enum_results"));
-        var results = result["enum_results"] as dynamic;
-        Assert.NotNull(results);
+        Assert.True(result.ContainsKey("overload_results"));
+        var results = result["overload_results"] as dynamic;
+        Assert.Equal(5, Convert.ToInt32(results.int_absolute));
+        Assert.Equal(5.5, Convert.ToDouble(results.double_absolute));
+        Assert.Equal(4, Convert.ToInt32(results.rounded_default));
+        Assert.Equal(3.14, Convert.ToDouble(results.rounded_precise));
     }
+
     [Fact]
-    private Dictionary<string, object> TestInterpreter(string code)
-    {
-        var interpreter = new LangInterpreter();
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        var result = new Dictionary<string, object>();
-        // 这里需要根据实际情况提取变量值
-        // 暂时返回空字典，让测试能够编译
-        return result;
-    }
-
-    public void NativeImport_NativeGenericOperations_GenericClassOperations()
+    public void NativeImport_NativeGenericMethods_GenericUsage()
     {
         var code = @"
-            // 原生泛型操作测试
-            try {
-                // 创建泛型列表
-                native string_list <- new System.Collections.Generic.List[string]()
-                native int_list <- new System.Collections.Generic.List[int]()
-                // 添加元素
-                native add_string <- string_list.Add(""Hello"")
-                native add_int <- int_list.Add(42)
-                // 获取计数
-                native string_count <- string_list.Count
-                native int_count <- int_list.Count
-                generic_results <- {
-                    string_list_count: string_count,
-                    int_list_count: int_count,
-                    generic_operations_successful: true
-                }
-            } catch e {
-                generic_results <- {
-                    error: e.message,
-                    generic_operations_failed: true
-                }
+            // 原生泛型方法测试
+            native array_result <- Array.Find([1, 2, 3, 4, 5], func(x) -> x == 3)
+            native list_result <- List({1, 2, 3}).Find(func(x) -> x == 2)
+            generic_results <- {
+                found_in_array: array_result,
+                found_in_list: list_result
             }
         ";
         var result = TestInterpreter(code);
         Assert.True(result.ContainsKey("generic_results"));
         var results = result["generic_results"] as dynamic;
-        Assert.NotNull(results);
+        Assert.Equal(3, Convert.ToInt32(results.found_in_array));
+        Assert.Equal(2, Convert.ToInt32(results.found_in_list));
+    }
+
+    [Fact]
+    public void NativeImport_NativeExtensionMethods_ExtensionUsage()
+    {
+        var code = @"
+            // 原生扩展方法测试
+            test_string <- ""hello""
+            native starts_with <- test_string.StartsWith(""h"")
+            native ends_with <- test_string.EndsWith(""o"")
+            native is_null_or_empty <- String.IsNullOrEmpty("""")
+            extension_results <- {
+                starts_correctly: starts_with,
+                ends_correctly: ends_with,
+                empty_check: is_null_or_empty
+            }
+        ";
+        var result = TestInterpreter(code);
+        Assert.True(result.ContainsKey("extension_results"));
+        var results = result["extension_results"] as dynamic;
+        Assert.Equal(true, results.starts_correctly);
+        Assert.Equal(true, results.ends_correctly);
+        Assert.Equal(true, results.empty_check);
+    }
+
+    [Fact]
+    public void NativeImport_NativeAsyncOperations_AsyncHandling()
+    {
+        var code = @"
+            // 原生异步操作测试
+            native delay_result <- Task.Delay(100)
+            async_results <- {
+                delay_task: delay_result
+            }
+        ";
+        var result = TestInterpreter(code);
+        Assert.True(result.ContainsKey("async_results"));
+        var results = result["async_results"] as dynamic;
+        Assert.NotNull(results.delay_task);
+    }
+
+    [Fact]
+    public void NativeImport_NativeReflectionOperations_TypeInformation()
+    {
+        var code = @"
+            // 原生反射操作测试
+            test_var <- ""Hello World""
+            native type_info <- test_var.GetType()
+            native type_name <- type_info.Name
+            native assembly_info <- type_info.Assembly
+            reflection_results <- {
+                object_type: type_name,
+                assembly_name: assembly_info
+            }
+        ";
+        var result = TestInterpreter(code);
+        Assert.True(result.ContainsKey("reflection_results"));
+        var results = result["reflection_results"] as dynamic;
+        Assert.NotNull(results.object_type);
+        Assert.NotNull(results.assembly_name);
+    }
+
+    [Fact]
+    public void NativeImport_NativeCollectionsCollections_SpecializedCollections()
+    {
+        var code = @"
+            // 原生集合操作测试
+            native hashset_obj <- new HashSet<int>()
+            native queue_obj <- new Queue<string>()
+            native stack_obj <- new Stack<int>()
+            collection_results <- {
+                hashset_created: hashset_obj,
+                queue_created: queue_obj,
+                stack_created: stack_obj
+            }
+        ";
+        var result = TestInterpreter(code);
+        Assert.True(result.ContainsKey("collection_results"));
+        var results = result["collection_results"] as dynamic;
+        Assert.NotNull(results.hashset_created);
+        Assert.NotNull(results.queue_created);
+        Assert.NotNull(results.stack_created);
+    }
+
+    [Fact]
+    public void NativeImport_NativeEnumOperations_EnumHandling()
+    {
+        var code = @"
+            // 原生枚举操作测试
+            native day_of_week <- DayOfWeek.Monday
+            native day_name <- day_of_week.ToString()
+            native day_value <- Convert.ToInt32(day_of_week)
+            enum_results <- {
+                enum_value: day_name,
+                integer_value: day_value
+            }
+        ";
+        var result = TestInterpreter(code);
+        Assert.True(result.ContainsKey("enum_results"));
+        var results = result["enum_results"] as dynamic;
+        Assert.Equal("Monday", results.enum_value);
+        Assert.Equal(1, Convert.ToInt32(results.integer_value));
     }
 }

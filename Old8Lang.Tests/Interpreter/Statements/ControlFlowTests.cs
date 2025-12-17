@@ -35,12 +35,12 @@ public class ControlFlowTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(5, list.Value.Count);
-        Assert.Equal(2, ((IntLangValue)list.Value[0]).Value);
-        Assert.Equal(4, ((IntLangValue)list.Value[1]).Value);
-        Assert.Equal(6, ((IntLangValue)list.Value[2]).Value);
-        Assert.Equal(8, ((IntLangValue)list.Value[3]).Value);
-        Assert.Equal(10, ((IntLangValue)list.Value[4]).Value);
+        Assert.Equal(5, list.Values.Count);
+        Assert.Equal(2, ((IntLangValue)list.Values[0]).Value);
+        Assert.Equal(4, ((IntLangValue)list.Values[1]).Value);
+        Assert.Equal(6, ((IntLangValue)list.Values[2]).Value);
+        Assert.Equal(8, ((IntLangValue)list.Values[3]).Value);
+        Assert.Equal(10, ((IntLangValue)list.Values[4]).Value);
     }
 
     [Fact]
@@ -252,7 +252,7 @@ public class ControlFlowTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.True(list.Value.Count > 0);
+        Assert.True(list.Values.Count > 0);
     }
 
     [Fact]
@@ -497,10 +497,10 @@ public class ControlFlowTests
         Assert.NotNull(result);
         Assert.IsType<ArrayLangValue>(result);
         var array = (ArrayLangValue)result;
-        Assert.Equal(7, array.Value.Count);
+        Assert.Equal(7, array.GetItems().Count());
         // Check if sorted (first element should be smallest)
-        Assert.Equal(11, ((IntLangValue)array.Value[0]).Value);
-        Assert.Equal(90, ((IntLangValue)array.Value[6]).Value);
+        Assert.Equal(11, ((IntLangValue)array.GetItems().ElementAt(0)).Value);
+        Assert.Equal(90, ((IntLangValue)array.GetItems().ElementAt(6)).Value);
     }
 
     [Fact]

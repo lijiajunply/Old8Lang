@@ -5,6 +5,7 @@ using Xunit.Abstractions;
 using Old8Lang;
 namespace Old8Lang.Tests.Interpreter.Threading;
 using Old8Lang.Interpreter;
+using Old8Lang.AST.Expression.Intermediates;
 using System.Collections.Generic;
 /// <summary>
 /// 并发原语测试

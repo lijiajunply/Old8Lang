@@ -62,12 +62,12 @@ public class HigherOrderTests
         Assert.NotNull(resultList);
         Assert.IsType<ListLangValue>(resultList);
         var list = (ListLangValue)resultList;
-        Assert.Equal(5, list.Value.Count);
-        Assert.Equal(2, ((IntLangValue)list.Value[0]).Value);
-        Assert.Equal(4, ((IntLangValue)list.Value[1]).Value);
-        Assert.Equal(6, ((IntLangValue)list.Value[2]).Value);
-        Assert.Equal(8, ((IntLangValue)list.Value[3]).Value);
-        Assert.Equal(10, ((IntLangValue)list.Value[4]).Value);
+        Assert.Equal(5, list.Values.Count);
+        Assert.Equal(2, ((IntLangValue)list.Values[0]).Value);
+        Assert.Equal(4, ((IntLangValue)list.Values[1]).Value);
+        Assert.Equal(6, ((IntLangValue)list.Values[2]).Value);
+        Assert.Equal(8, ((IntLangValue)list.Values[3]).Value);
+        Assert.Equal(10, ((IntLangValue)list.Values[4]).Value);
     }
 
     [Fact]
@@ -130,12 +130,12 @@ public class HigherOrderTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(5, list.Value.Count);
-        Assert.Equal(1, ((IntLangValue)list.Value[0]).Value);
-        Assert.Equal(4, ((IntLangValue)list.Value[1]).Value);
-        Assert.Equal(9, ((IntLangValue)list.Value[2]).Value);
-        Assert.Equal(16, ((IntLangValue)list.Value[3]).Value);
-        Assert.Equal(25, ((IntLangValue)list.Value[4]).Value);
+        Assert.Equal(5, list.Values.Count);
+        Assert.Equal(1, ((IntLangValue)list.Values[0]).Value);
+        Assert.Equal(4, ((IntLangValue)list.Values[1]).Value);
+        Assert.Equal(9, ((IntLangValue)list.Values[2]).Value);
+        Assert.Equal(16, ((IntLangValue)list.Values[3]).Value);
+        Assert.Equal(25, ((IntLangValue)list.Values[4]).Value);
     }
 
     [Fact]
@@ -167,12 +167,12 @@ public class HigherOrderTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(5, list.Value.Count);
-        Assert.Equal(2, ((IntLangValue)list.Value[0]).Value);
-        Assert.Equal(4, ((IntLangValue)list.Value[1]).Value);
-        Assert.Equal(6, ((IntLangValue)list.Value[2]).Value);
-        Assert.Equal(8, ((IntLangValue)list.Value[3]).Value);
-        Assert.Equal(10, ((IntLangValue)list.Value[4]).Value);
+        Assert.Equal(5, list.Values.Count);
+        Assert.Equal(2, ((IntLangValue)list.Values[0]).Value);
+        Assert.Equal(4, ((IntLangValue)list.Values[1]).Value);
+        Assert.Equal(6, ((IntLangValue)list.Values[2]).Value);
+        Assert.Equal(8, ((IntLangValue)list.Values[3]).Value);
+        Assert.Equal(10, ((IntLangValue)list.Values[4]).Value);
     }
 
     [Fact]
@@ -512,10 +512,10 @@ public class HigherOrderTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(3, list.Value.Count);
-        Assert.Equal("Alice1", ((StringLangValue)list.Value[0]).Value);
-        Assert.Equal("Bob2", ((StringLangValue)list.Value[1]).Value);
-        Assert.Equal("Charlie3", ((StringLangValue)list.Value[2]).Value);
+        Assert.Equal(3, list.Values.Count);
+        Assert.Equal("Alice1", ((StringLangValue)list.Values[0]).Value);
+        Assert.Equal("Bob2", ((StringLangValue)list.Values[1]).Value);
+        Assert.Equal("Charlie3", ((StringLangValue)list.Values[2]).Value);
     }
 
     [Fact]
@@ -705,11 +705,11 @@ public class HigherOrderTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(5, list.Value.Count);
-        Assert.Equal(1, ((IntLangValue)list.Value[0]).Value);
-        Assert.Equal(3, ((IntLangValue)list.Value[1]).Value); // 1+2
-        Assert.Equal(6, ((IntLangValue)list.Value[2]).Value); // 3+3
-        Assert.Equal(10, ((IntLangValue)list.Value[3]).Value); // 6+4
-        Assert.Equal(15, ((IntLangValue)list.Value[4]).Value); // 10+5
+        Assert.Equal(5, list.Values.Count);
+        Assert.Equal(1, ((IntLangValue)list.Values[0]).Value);
+        Assert.Equal(3, ((IntLangValue)list.Values[1]).Value); // 1+2
+        Assert.Equal(6, ((IntLangValue)list.Values[2]).Value); // 3+3
+        Assert.Equal(10, ((IntLangValue)list.Values[3]).Value); // 6+4
+        Assert.Equal(15, ((IntLangValue)list.Values[4]).Value); // 10+5
     }
 }

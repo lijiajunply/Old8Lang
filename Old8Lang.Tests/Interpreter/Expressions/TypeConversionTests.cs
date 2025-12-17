@@ -608,12 +608,12 @@ public class TypeConversionTests
         Assert.NotNull(result);
         Assert.IsType<ArrayLangValue>(result);
         var array = (ArrayLangValue)result;
-        Assert.Equal(5, array.Values.Count);
-        Assert.Equal(1, ((IntLangValue)array.Values[0]).Value);
-        Assert.Equal(2, ((IntLangValue)array.Values[1]).Value);
-        Assert.Equal(3, ((IntLangValue)array.Values[2]).Value);
-        Assert.Equal(4, ((IntLangValue)array.Values[3]).Value);
-        Assert.Equal(5, ((IntLangValue)array.Values[4]).Value);
+        Assert.Equal(5, array.GetItems().Count());
+        Assert.Equal(1, ((IntLangValue)array.GetItems().ElementAt(0)).Value);
+        Assert.Equal(2, ((IntLangValue)array.GetItems().ElementAt(1)).Value);
+        Assert.Equal(3, ((IntLangValue)array.GetItems().ElementAt(2)).Value);
+        Assert.Equal(4, ((IntLangValue)array.GetItems().ElementAt(3)).Value);
+        Assert.Equal(5, ((IntLangValue)array.GetItems().ElementAt(4)).Value);
     }
 
     [Fact]
@@ -635,7 +635,7 @@ public class TypeConversionTests
         Assert.NotNull(result);
         Assert.IsType<ListLangValue>(result);
         var list = (ListLangValue)result;
-        Assert.Equal(4, list.Value.Count);
+        Assert.Equal(4, list.Values.Count);
         Assert.Equal(1, ((IntLangValue)list.Values[0]).Value);
         Assert.Equal("hello", ((StringLangValue)list.Values[1]).Value);
         Assert.Equal(true, ((BoolLangValue)list.Values[2]).Value);
