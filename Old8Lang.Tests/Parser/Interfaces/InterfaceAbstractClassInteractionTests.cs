@@ -76,7 +76,7 @@ public class InterfaceAbstractClassInteractionTests
                        }
                    }
 
-                   class Rectangle : Shape {
+                   class Rectangle extends Shape {
                        private width
                        private height
 

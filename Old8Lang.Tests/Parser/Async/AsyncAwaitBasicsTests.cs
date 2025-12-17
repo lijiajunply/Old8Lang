@@ -60,21 +60,24 @@ result <- processData(""hello"", 2)";
     public void ParseProgram_BasicAwaitExpression_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-async func main() {
-    data <- await fetchData()
-    processed <- await processData(data, 2)
-    PrintLine(processed)
-}
+        var code = """
 
-async func fetchData() -> string {
-    return ""Sample data""
-}
+                   async func main() {
+                       data <- await fetchData()
+                       processed <- await processData(data, 2)
+                       PrintLine(processed)
+                   }
 
-async func processData(input:string, multiplier:int) -> int {
-    return input.Length() * multiplier
+                   async func fetchData() -> string {
+                       return "Sample data"
+                   }
 
-main()";
+                   async func processData(input:string, multiplier:int) -> int {
+                       return input.Length() * multiplier
+                   }
+                   
+                   main()
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -279,29 +282,30 @@ await logMessage(""Test message"")";
     public void ParseProgram_StaticAsyncMethods_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-class NetworkUtils {
-    public static async func download(url:string) -> string {
-        response <- await httpRequest(url)
-        return response
-    }
+        var code = """
+                   class NetworkUtils {
+                       public static async func download(url:string) -> string {
+                           response <- await httpRequest(url)
+                           return response
+                       }
 
-    public static async func upload(url:string, data:string) -> bool {
-        success <- await sendRequest(url, data)
-        return success
-    }
+                       public static async func upload(url:string, data:string) -> bool {
+                           success <- await sendRequest(url, data)
+                           return success
+                       }
 
-    private static async func httpRequest(url:string) -> string {
-        return ""Response from "" + url
-    }
+                       private static async func httpRequest(url:string) -> string {
+                           return "Response from " + url
+                       }
 
-    private static async func sendRequest(url:string, data:string) -> bool {
-        return true
-    }
-}
+                       private static async func sendRequest(url:string, data:string) -> bool {
+                           return true
+                       }
+                   }
 
-downloaded <- await NetworkUtils.download(""http://example.com"")
-uploaded <- await NetworkUtils.upload(""http://api.example.com"", ""data"")";
+                   downloaded <- await NetworkUtils.download("http://example.com")
+                   uploaded <- await NetworkUtils.upload("http://api.example.com", "data")
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 

@@ -1,0 +1,16 @@
+abstract class Animal {
+    abstract func MakeSound() -> void
+    func Eat() -> void {
+        PrintLine("Animal is eating")
+    }
+}
+
+class Dog extends Animal {
+    public override func MakeSound() -> void {
+        PrintLine("Woof!")
+    }
+}
+
+dog <- Dog()
+dog.MakeSound()
+dog.Eat()

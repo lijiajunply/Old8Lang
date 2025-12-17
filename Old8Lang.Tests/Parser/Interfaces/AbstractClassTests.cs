@@ -35,10 +35,11 @@ abstract class Shape {
     public void ParseProgram_AbstractClassInheritanceChain_ThrowsSyntaxError()
     {
         // Arrange
-        var code = @"
-abstract class Animal {
-    protected name
-}";
+        var code = """
+                   abstract class Animal {
+                       protected name
+                   }
+                   """;
         var tokens = LangParser.LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 

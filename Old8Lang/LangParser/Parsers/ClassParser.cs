@@ -17,7 +17,16 @@ public class ClassParser(
 {
     public ClassInit ParseClassDeclaration()
     {
+        bool isAbstract = false;
         bool isMixin = false;
+
+        // 检查 abstract 修饰符
+        if (CurrentToken.Type == LangTokenType.Abstract)
+        {
+            isAbstract = true;
+            Expect(LangTokenType.Abstract);
+        }
+
         // 检查是 class 还是 mixin
         if (CurrentToken.Type == LangTokenType.Class)
         {
@@ -108,7 +117,7 @@ public class ClassParser(
 
         var classBlock = ParseClassBlock();
         return new ClassInit(new TypeTemplate(className, classBlock.ToAnyData(), classBlock.ToStaticData(),
-            parentClassName, isMixin, mixinNames, implementsNames));
+            parentClassName, isMixin, mixinNames, implementsNames, isInterface: false, isAbstract: isAbstract));
     }
     
     public ClassInit ParseInterfaceDeclaration()
@@ -162,6 +171,10 @@ public class ClassParser(
                     modifiers.Add(AccessModifierType.Static);
                     Expect(LangTokenType.Static);
                     break;
+                case LangTokenType.Abstract:
+                    modifiers.Add(AccessModifierType.Abstract);
+                    Expect(LangTokenType.Abstract);
+                    break;
                 default:
                     return modifiers;
             }
@@ -194,9 +207,17 @@ public class ClassParser(
 
                 // 尝试解析修饰符
                 List<AccessModifierType> modifiers = [];
-                if (CurrentToken.Type is LangTokenType.Public or LangTokenType.Private or LangTokenType.Protected or LangTokenType.Static)
+                if (CurrentToken.Type is LangTokenType.Public or LangTokenType.Private or LangTokenType.Protected or LangTokenType.Static or LangTokenType.Abstract)
                 {
                     modifiers = ParseAccessModifiers();
+                }
+
+                // 检查是否是抽象方法声明：[modifiers] abstract func identifier(...) -> returnType
+                if (modifiers.Any(m => m == AccessModifierType.Abstract) && CurrentToken.Type == LangTokenType.Func)
+                {
+                    var abstractMethodDeclaration = ParseAbstractMethodDeclaration(modifiers);
+                    statements.Add(abstractMethodDeclaration);
+                    continue;
                 }
 
                 // 检查是否是字段声明（带类型假注或多字段）：[modifiers] identifier[:type] [, identifier[:type]]* [<- value]
@@ -389,5 +410,117 @@ public class ClassParser(
         }
 
         return fields;
+    }
+
+    /// <summary>
+    /// 解析抽象方法声明
+    /// 语法：[modifiers] abstract func identifier(...) -> returnType
+    /// </summary>
+    /// <param name="modifiers">修饰符列表</param>
+    /// <returns>抽象方法声明语句</returns>
+    private OldStatement ParseAbstractMethodDeclaration(List<AccessModifierType> modifiers)
+    {
+        var position = CreateSourcePosition(CurrentToken);
+
+        // 跳过 func 关键字
+        Expect(LangTokenType.Func);
+
+        // 解析方法名
+        if (CurrentToken.Type != LangTokenType.Identifier)
+        {
+            throw CreateSyntaxError($"期望方法名，但得到 {CurrentToken.Type}");
+        }
+
+        var methodName = CurrentToken.Value;
+        Expect(LangTokenType.Identifier);
+
+        // 解析参数列表
+        Expect(LangTokenType.LeftParen);
+        var parameters = new List<LangId>();
+
+        while (CurrentToken.Type != LangTokenType.RightParen)
+        {
+            if (CurrentToken.Type == LangTokenType.EndOfFile)
+            {
+                throw CreateSyntaxError("意外的文件结束符，期望 ')'");
+            }
+
+            // 解析参数：[name]:type 或 name
+            var paramPosition = CreateSourcePosition(CurrentToken);
+            var paramName = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+
+            string paramType = "";
+
+            // 检查是否有类型注解
+            if (CurrentToken.Type == LangTokenType.Colon)
+            {
+                Expect(LangTokenType.Colon);
+                if (CurrentToken.Type == LangTokenType.Identifier)
+                {
+                    paramType = CurrentToken.Value;
+                    Expect(LangTokenType.Identifier);
+                }
+                else
+                {
+                    throw CreateSyntaxError($"期望参数类型，但得到 {CurrentToken.Type}");
+                }
+            }
+
+            // 检查是否有默认值
+            LangExpression? defaultValue = null;
+            if (CurrentToken.Type == LangTokenType.Assignment)
+            {
+                Expect(LangTokenType.Assignment);
+                var exprParser = expressionParserFactory();
+                defaultValue = exprParser.ParseExpression();
+            }
+
+            var paramId = new LangId(paramName, paramType, defaultValue, paramPosition);
+            parameters.Add(paramId);
+
+            // 检查是否有更多参数
+            if (CurrentToken.Type == LangTokenType.Comma)
+            {
+                Expect(LangTokenType.Comma);
+                continue;
+            }
+
+            break;
+        }
+
+        Expect(LangTokenType.RightParen);
+
+        // 解析返回类型
+        string returnType = "";
+        if (CurrentToken.Type == LangTokenType.Arrow)
+        {
+            Expect(LangTokenType.Arrow);
+            if (CurrentToken.Type == LangTokenType.Identifier)
+            {
+                returnType = CurrentToken.Value;
+                Expect(LangTokenType.Identifier);
+            }
+            else
+            {
+                throw CreateSyntaxError($"期望返回类型，但得到 {CurrentToken.Type}");
+            }
+        }
+
+        // 抽象方法不能有方法体
+        if (CurrentToken.Type == LangTokenType.LeftBrace)
+        {
+            throw CreateSyntaxError("抽象方法不能有方法体");
+        }
+
+        // 创建抽象方法的FuncLangValue（没有方法体）
+        var methodId = new LangId(methodName, returnType, position: position);
+        var funcLangValue = new FuncLangValue(methodId, parameters, new BlockStatement([]), position, isLambda: false);
+
+        // 创建类成员ID
+        var memberId = new ClassMemberId(methodName, returnType, modifiers, position);
+
+        // 创建抽象方法声明
+        return new ClassFuncInitStatement(memberId, funcLangValue, position);
     }
 }

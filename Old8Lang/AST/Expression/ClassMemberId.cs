@@ -10,7 +10,8 @@ public enum AccessModifierType
     Public,
     Private,
     Protected,
-    Static
+    Static,
+    Abstract
 }
 
 /// <summary>

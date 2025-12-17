@@ -15,6 +15,7 @@ public class TypeTemplate(
     List<string>? mixinNames = null,
     List<string>? implementsNames = null,
     bool isInterface = false,
+    bool isAbstract = false,
     SourcePosition position = default)
     : ImportInfo(position)
 {
@@ -26,26 +27,27 @@ public class TypeTemplate(
     public readonly List<string> MixinNames = mixinNames ?? [];
     public readonly List<string> ImplementsNames = implementsNames ?? [];
     public readonly bool IsInterface = isInterface;
+    public readonly bool IsAbstract = isAbstract;
 
     public override string ToString()
     {
-        var baseStr = IsInterface ? $"InterfaceTemplate({ClassName})" : IsMixin ? $"MixinTemplate({ClassName})" : $"TypeTemplate({ClassName})";
-        
+        var baseStr = IsInterface ? $"InterfaceTemplate({ClassName})" : IsMixin ? $"MixinTemplate({ClassName})" : IsAbstract ? $"AbstractTypeTemplate({ClassName})" : $"TypeTemplate({ClassName})";
+
         if (ParentClassName != null)
         {
             baseStr += $" extends {ParentClassName}";
         }
-        
+
         if (ImplementsNames.Count > 0)
         {
             baseStr += $" implements {string.Join(", ", ImplementsNames)}";
         }
-        
+
         if (MixinNames.Count > 0)
         {
             baseStr += $" with {string.Join(", ", MixinNames)}";
         }
-        
+
         return baseStr;
     }
 
