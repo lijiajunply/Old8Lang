@@ -16,7 +16,7 @@ public class ClosureTests
         // Arrange
         var code = @"
             multiplier <- 3
-            func createMultiplier() -> func {
+            func createMultiplier() -> function {
                 return (x:int) -> x * multiplier
             }
             triple <- createMultiplier()
@@ -42,7 +42,7 @@ public class ClosureTests
         var code = @"
             base <- 10
             offset <- 5
-            func createCalculator() -> func {
+            func createCalculator() -> function {
                 return (x:int) -> x * base + offset
             }
             calculator <- createCalculator()
@@ -67,7 +67,7 @@ public class ClosureTests
         // Arrange
         var code = @"
             prefix <- ""Hello""
-            func createGreeter() -> func {
+            func createGreeter() -> function {
                 return (name:string) -> prefix + "", "" + name
             }
             greeter <- createGreeter()
@@ -92,13 +92,13 @@ public class ClosureTests
         // Arrange
         var code = @"
             counter <- 0
-            func createIncrementer() -> func {
+            func createIncrementer() -> function {
                 return () -> {
                     counter <- counter + 1
                     return counter
                 }
             }
-            func createGetter() -> func {
+            func createGetter() -> function {
                 return () -> counter
             }
             incrementer <- createIncrementer()
@@ -168,7 +168,7 @@ public class ClosureTests
     {
         // Arrange
         var code = @"
-            func createPowerFunction(power:int) -> func {
+            func createPowerFunction(power:int) -> function {
                 return (base:int) -> base ^ power
             }
             square <- createPowerFunction(2)
@@ -202,7 +202,7 @@ public class ClosureTests
         // Arrange
         var code = @"
             factors <- [2, 3, 5]
-            func createArrayMultiplier() -> func {
+            func createArrayMultiplier() -> function {
                 return (x:int) -> {
                     result <- x
                     for factor in factors {
@@ -233,7 +233,7 @@ public class ClosureTests
         // Arrange
         var code = @"
             accumulator <- 0
-            func createAccumulator() -> func {
+            func createAccumulator() -> function {
                 return (value:int) -> {
                     accumulator <- accumulator + value
                     return accumulator
@@ -274,7 +274,7 @@ public class ClosureTests
         // Arrange
         var code = @"
             outer <- 10
-            func createOuter() -> func {
+            func createOuter() -> function {
                 middle <- 5
                 return () -> {
                     inner <- 2
@@ -304,7 +304,7 @@ public class ClosureTests
         // Arrange
         var code = @"
             debugMode <- true
-            func createLogger() -> func {
+            func createLogger() -> function {
                 return (message:string) -> {
                     if debugMode {
                         return ""[DEBUG] "" + message
@@ -335,7 +335,7 @@ public class ClosureTests
         // Arrange
         var code = @"
             config <- {""prefix"": ""Mr"", ""suffix"": ""Jr""}
-            func createNameFormatter() -> func {
+            func createNameFormatter() -> function {
                 return (firstName:string, lastName:string) -> {
                     return config[""prefix""] + ""."" + firstName + "" "" + lastName + "" "" + config[""suffix""]
                 }
@@ -402,7 +402,7 @@ public class ClosureTests
             func add(a:int, b:int) -> int {
                 return a + b
             }
-            func createAdder() -> func {
+            func createAdder() -> function {
                 return (x:int) -> add(x, 10)
             }
             adder <- createAdder()
@@ -427,7 +427,7 @@ public class ClosureTests
         // Arrange
         var code = @"
             threshold <- 50
-            func createThresholdChecker() -> func {
+            func createThresholdChecker() -> function {
                 return (value:int) -> {
                     if value > threshold {
                         return ""above threshold""
@@ -472,7 +472,7 @@ public class ClosureTests
     {
         // Arrange
         var code = @"
-            func createRecursiveCounter() -> func {
+            func createRecursiveCounter() -> function {
                 counter <- 0
                 func recursive() -> int {
                     if counter < 5 {
@@ -510,7 +510,7 @@ public class ClosureTests
                 ""age"": 25,
                 ""hobbies"": {""reading"", ""coding""}
             }
-            func createPersonInfo() -> func {
+            func createPersonInfo() -> function {
                 return () -> {
                     return person[""name""] + "" is "" + person[""age""].ToStr() + "" years old""
                 }
@@ -537,7 +537,7 @@ public class ClosureTests
         // Arrange
         var code = @"
             logMessages <- {}
-            func createLogger() -> func {
+            func createLogger() -> function {
                 return (message:string) -> {
                     logMessages.Push(message)
                     return ""Logged: "" + message
@@ -578,7 +578,7 @@ public class ClosureTests
         // Arrange
         var code = @"
             state <- 0
-            func createStateModifier() -> (func, func) {
+            func createStateModifier() -> tuple {
                 func increment() -> int {
                     state <- state + 1
                     return state
@@ -633,10 +633,10 @@ public class ClosureTests
         // Arrange
         var code = @"
             level1 <- 1
-            func createLevel1() -> func {
+            func createLevel1() -> function {
                 level2 <- 10
                 return () -> {
-                    func createLevel2() -> func {
+                    func createLevel2() -> function {
                         level3 <- 100
                         return () -> level1 + level2 + level3
                     }

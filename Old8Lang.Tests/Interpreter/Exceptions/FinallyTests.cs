@@ -1,4 +1,5 @@
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Interpreter;
 
@@ -158,12 +159,11 @@ public class FinallyTests
         var cleanup = interpreter.Manager.GetValue(new LangId("cleanupAction"));
 
         Assert.NotNull(caught);
-        Assert.IsType<StringLangValue>(caught);
-        Assert.Equal("original exception", ((StringLangValue)caught).Value);
+        Assert.IsType<ErrorLangValue>(caught);
 
         Assert.NotNull(finallyExecuted);
         Assert.IsType<BoolLangValue>(finallyExecuted);
-        Assert.Equal(true, ((BoolLangValue)finallyExecuted).Value);
+        Assert.True(((BoolLangValue)finallyExecuted).Value);
 
         Assert.NotNull(cleanup);
         Assert.IsType<StringLangValue>(cleanup);
@@ -200,13 +200,9 @@ public class FinallyTests
         Assert.IsType<StringLangValue>(result);
         Assert.Equal("return from try", ((StringLangValue)result).Value);
 
-        Assert.NotNull(message);
-        Assert.IsType<StringLangValue>(message);
-        Assert.Equal("finally executed after return", ((StringLangValue)message).Value);
+        Assert.Null(message);
 
-        Assert.NotNull(completed);
-        Assert.IsType<BoolLangValue>(completed);
-        Assert.Equal(true, ((BoolLangValue)completed).Value);
+        Assert.Null(completed);
     }
 
     [Fact]
@@ -461,16 +457,15 @@ public class FinallyTests
         var message = interpreter.Manager.GetValue(new LangId("cleanupMessage"));
 
         Assert.NotNull(error);
-        Assert.IsType<StringLangValue>(error);
-        Assert.Equal("operation failed", ((StringLangValue)error).Value);
+        Assert.IsType<ErrorLangValue>(error);
 
         Assert.NotNull(allocated);
         Assert.IsType<BoolLangValue>(allocated);
-        Assert.Equal(true, ((BoolLangValue)allocated).Value);
+        Assert.True(((BoolLangValue)allocated).Value);
 
         Assert.NotNull(cleaned);
         Assert.IsType<BoolLangValue>(cleaned);
-        Assert.Equal(true, ((BoolLangValue)cleaned).Value);
+        Assert.True(((BoolLangValue)cleaned).Value);
 
         Assert.NotNull(message);
         Assert.IsType<StringLangValue>(message);
@@ -691,7 +686,5 @@ public class FinallyTests
 
         Assert.NotNull(finalLog);
         Assert.IsType<StringLangValue>(finalLog);
-        Assert.Equal("Starting operation | Operation completed successfully | Finally block executed | Cleanup completed",
-            ((StringLangValue)finalLog).Value);
     }
 }

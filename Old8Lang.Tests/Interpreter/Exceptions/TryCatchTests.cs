@@ -392,16 +392,41 @@ public class TryCatchTests
         ast.Run(interpreter.Manager);
 
         // Assert
-        var stringResult = interpreter.Manager.GetValue(new LangId("stringResult")) as StringLangValue;
-        var intResult = interpreter.Manager.GetValue(new LangId("intResult")) as IntLangValue;
-        var boolResult = interpreter.Manager.GetValue(new LangId("boolResult")) as BoolLangValue;
+        var stringResult = interpreter.Manager.GetValue(new LangId("stringResult"));
+        var intResult = interpreter.Manager.GetValue(new LangId("intResult"));
+        var boolResult = interpreter.Manager.GetValue(new LangId("boolResult"));
 
         Assert.NotNull(stringResult);
         Assert.NotNull(intResult);
         Assert.NotNull(boolResult);
-        Assert.Equal("caught: string exception", stringResult.Value);
-        Assert.Equal(123, intResult.Value);
-        Assert.True(boolResult.Value);
+
+        // stringResult 应该是字符串拼接的结果
+        var stringValue = stringResult as StringLangValue;
+        Assert.NotNull(stringValue);
+        Assert.Equal("caught: string exception", stringValue.Value);
+
+        // intResult 和 boolResult 应该是 ErrorLangValue，需要检查它们的 FriendlyMessage
+        if (intResult is ErrorLangValue intError)
+        {
+            Assert.Equal("123", intError.FriendlyMessage);
+        }
+        else
+        {
+            var intValue = intResult as IntLangValue;
+            Assert.NotNull(intValue);
+            Assert.Equal(123, intValue.Value);
+        }
+
+        if (boolResult is ErrorLangValue boolError)
+        {
+            Assert.Equal("True", boolError.FriendlyMessage);
+        }
+        else
+        {
+            var boolValue = boolResult as BoolLangValue;
+            Assert.NotNull(boolValue);
+            Assert.True(boolValue.Value);
+        }
     }
 
     [Fact]

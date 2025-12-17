@@ -139,7 +139,7 @@ public class FunctionCallTests
         // Arrange
         var code = @"
             func createInfo(name:string, age:int, height:double, isActive:bool) -> string {
-                status <- if isActive then ""active"" else ""inactive""
+                status <- isActive ? ""active"" : ""inactive""
                 return name + "" ("" + age.ToStr() + "", "" + height.ToStr() + "", "" + status + "")""
             }
             result <- createInfo(""Alice"", 25, 1.65, true)
@@ -162,7 +162,7 @@ public class FunctionCallTests
     {
         // Arrange
         var code = @"
-            func greet(name:string, greeting:string = ""Hello"") -> string {
+            func greet(name:string, greeting: ""Hello"") -> string {
                 return greeting + "", "" + name
             }
             result1 <- greet(""Alice"", ""Hi"")
@@ -221,7 +221,7 @@ public class FunctionCallTests
         // Arrange
         var code = @"
             func findMax(numbers:List) -> int {
-                if numbers.Length == 0 {
+                if len(numbers) == 0 {
                     return 0
                 }
                 max <- numbers[0]
@@ -253,7 +253,7 @@ public class FunctionCallTests
     {
         // Arrange
         var code = @"
-            func getValue(data:Dictionary, key:string, defaultValue:any) -> any {
+            func getValue(data:dict, key:string, defaultValue:any) -> any {
                 if data.ContainsKey(key) {
                     return data[key]
                 } else {
@@ -360,10 +360,10 @@ public class FunctionCallTests
     {
         // Arrange
         var code = @"
-            func processNumbers(transformer:func, numbers:[int]) -> [int] {
-                result <- []
+            func processNumbers(transformer:function, numbers:array) -> array {
+                result <- {}
                 for num in numbers {
-                    result.Push(transformer(num))
+                    result.Add(transformer(num))
                 }
                 return result
             }
@@ -491,7 +491,7 @@ public class FunctionCallTests
     {
         // Arrange
         var code = @"
-            func analyzeString(text:string) -> (int, int, int) {
+            func analyzeString(text:string) -> tuple {
                 letters <- 0
                 digits <- 0
                 others <- 0
@@ -548,7 +548,7 @@ public class FunctionCallTests
             }
 
             func addMessage(msg:string) {
-                messages.Push(msg)
+                messages.Add(msg)
             }
 
             func processAction(action:string) {
@@ -561,8 +561,8 @@ public class FunctionCallTests
             processAction(""Task 2"")
 
             counterResult <- counter
-            messagesCount <- messages.Length
-            lastMessage <- messages[messages.Length - 1]
+            messagesCount <- len(messages)
+            lastMessage <- messages[- 1]
         ";
         var interpreter = new LangInterpreter();
 
@@ -593,12 +593,12 @@ public class FunctionCallTests
     {
         // Arrange
         var code = @"
-            func buildUrl(base:string, path:string = """", params:Dictionary = {}) -> string {
+            func buildUrl(base:string, path: """", params: {}) -> string {
                 url <- base
-                if path.Length > 0 {
+                if len(path) > 0 {
                     url <- url + ""/"" + path
                 }
-                if params.Count > 0 {
+                if len(params) > 0 {
                     url <- url + ""?""
                     first <- true
                     for key in params.Keys {
@@ -693,7 +693,7 @@ public class FunctionCallTests
     {
         // Arrange
         var code = @"
-            func createComplexData() -> (string, int, [string], Dictionary, bool) {
+            func createComplexData() -> tuple {
                 name <- ""Alice""
                 age <- 25
                 hobbies <- {""reading"", ""coding"", ""music""}
