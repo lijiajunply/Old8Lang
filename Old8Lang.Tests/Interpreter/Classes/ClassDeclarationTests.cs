@@ -134,11 +134,11 @@ public class ClassDeclarationTests
                 public value <- 0
 
                 func increment() {
-                    value <- value + 1
+                    this.value <- value + 1
                 }
 
                 func getValue() {
-                    return value
+                    return this.value
                 }
             }
 
@@ -472,7 +472,7 @@ public class ClassDeclarationTests
                         return 0
                     }
                     words <- text.Split(' ')
-                    return words.Length
+                    return len(words)
                 }
 
                 static func capitalize(text) -> string {
@@ -482,7 +482,7 @@ public class ClassDeclarationTests
                     first <- text[0].ToString().ToUpper()
                     rest <- """"
                     i <- 1
-                    while i < text.Length {
+                    while i < Len(text) {
                         rest <- rest + text[i]
                         i <- i + 1
                     }

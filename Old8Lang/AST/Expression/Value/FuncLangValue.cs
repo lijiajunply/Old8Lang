@@ -447,9 +447,8 @@ public class FuncLangValue : ImportInfo
                 }
             }
 
-            // 参数设置完成后，恢复非函数上下文标志
-            // 这样函数体中的赋值语句可以正常查找和修改外部作用域的变量
-            executionManager.IsFunc = false;
+            // 保持函数上下文标志，确保变量遮蔽正常工作
+            // executionManager.IsFunc = true; // 已经设置为true，不要重置
 
             // 运行方法体
             BlockStatement.Run(executionManager);

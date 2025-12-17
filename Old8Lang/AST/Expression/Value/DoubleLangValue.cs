@@ -19,6 +19,12 @@ public class DoubleLangValue(double doubleValue = 0, SourcePosition position = d
 
     public override LangValueType Plus(LangValueType otherLangValueType)
     {
+        if (otherLangValueType is StringLangValue)
+        {
+            // 字符串拼接：数字 + 字符串 = 字符串
+            return new StringLangValue(Value + otherLangValueType.ToDisplayString());
+        }
+
         if (otherLangValueType is not IntLangValue and not DoubleLangValue)
             throw new InvalidOperationError(this, $"不支持浮点数与类型 '{otherLangValueType.GetType().Name}' 的加法操作");
 

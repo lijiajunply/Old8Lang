@@ -1069,20 +1069,30 @@ public class PrimaryParser(
     /// <summary>
     /// 解析整数字面量
     /// </summary>
-    /// <returns>整数值</returns>
-    public IntLangValue ParseIntLiteral()
+    /// <returns>整数值或双精度浮点数值</returns>
+    public LangValueType ParseIntLiteral()
     {
         var numberToken = CurrentToken;
         var position = CreateSourcePosition(numberToken);
         var value = numberToken.Value;
         Expect(LangTokenType.Number);
+
+        // 尝试解析为整数，如果超出Int32范围则转为双精度浮点数
         try
         {
             return new IntLangValue(int.Parse(value), position);
         }
         catch
         {
-            throw CreateSyntaxError("无法解析整数字面量");
+            // 整数解析失败，可能是超出范围，尝试解析为双精度浮点数
+            try
+            {
+                return new DoubleLangValue(double.Parse(value), position);
+            }
+            catch
+            {
+                throw CreateSyntaxError($"无法解析数字字面量 '{value}'");
+            }
         }
     }
 

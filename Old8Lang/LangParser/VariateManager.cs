@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
@@ -133,6 +134,11 @@ public class VariateManager
     /// 变量查找缓存，使用ThreadStatic避免线程同步开销
     /// </summary>
     [ThreadStatic] private static Dictionary<string, (int scopeIndex, LangValueType value)>? _lookupCache;
+
+    /// <summary>
+    /// 只读变量集合，使用ThreadStatic避免线程同步开销 (变量名 -> 作用域索引)
+    /// </summary>
+    private Dictionary<string, int> _readonlyVariables = new();
 
     /// <summary>
     /// 导入信息列表，包含导入的函数、类和原生类型
@@ -293,6 +299,72 @@ public class VariateManager
 
     #endregion
 
+    #region 只读变量管理
+
+    /// <summary>
+    /// 检查变量是否为只读
+    /// </summary>
+    /// <param name="variableName">变量名</param>
+    /// <returns>如果变量是只读的返回true</returns>
+    public bool IsReadonly(string variableName)
+    {
+        return _readonlyVariables.ContainsKey(variableName);
+    }
+
+    /// <summary>
+    /// 将变量标记为只读
+    /// </summary>
+    /// <param name="variableName">变量名</param>
+    /// <param name="scopeIndex">作用域索引</param>
+    private void MarkAsReadonly(string variableName, int scopeIndex)
+    {
+        _readonlyVariables[variableName] = scopeIndex;
+    }
+
+    /// <summary>
+    /// 清理指定作用域及更深作用域的只读变量
+    /// </summary>
+    /// <param name="scopeIndex">作用域索引，清理此索引及更大索引的所有只读变量</param>
+    private void ClearReadonlyInScope(int scopeIndex)
+    {
+        var toRemove = new List<string>();
+        foreach (var kvp in _readonlyVariables)
+        {
+            // 清理指定作用域及所有更深作用域中的只读变量
+            if (kvp.Value >= scopeIndex)
+            {
+                toRemove.Add(kvp.Key);
+            }
+        }
+
+        foreach (var key in toRemove)
+        {
+            _readonlyVariables.Remove(key);
+        }
+    }
+
+    /// <summary>
+    /// 检查是否可以修改指定变量
+    /// </summary>
+    /// <param name="variableName">变量名</param>
+    /// <param name="variableScopeIndex">变量所在的作用域索引</param>
+    /// <param name="node">节点</param>
+    /// <exception cref="InvalidOperationError">当尝试修改只读变量时抛出</exception>
+    private void CheckCanModify(string variableName, int variableScopeIndex, IOldLangTree node)
+    {
+        if (_readonlyVariables.TryGetValue(variableName, out var readonlyScopeIndex))
+        {
+            // 只有当变量被标记为只读的作用域与变量当前所在的作用域相同或更浅时，才不能修改
+            // 这意味着变量是在其当前作用域或祖先作用域中被标记为只读的
+            if (readonlyScopeIndex <= variableScopeIndex)
+            {
+                throw new InvalidOperationError(node, $"不能修改只读变量 '{variableName}' (定义在作用域 {readonlyScopeIndex})");
+            }
+        }
+    }
+
+    #endregion
+
     /// <summary>
     /// 设置变量值
     /// </summary>
@@ -322,23 +394,62 @@ public class VariateManager
             return;
         }
 
-        // 1. 先查找变量，从当前作用域向父作用域查找
-        for (var i = Scopes.Count - 1; i >= 0; i--)
+        // 1. 首先检查当前作用域是否已存在此变量
+        var currentScopeIndex = Scopes.Count - 1;
+        if (Scopes[currentScopeIndex].ContainsKey(id.IdName))
         {
-            if (!Scopes[i].ContainsKey(id.IdName)) continue;
-            EnsureScopeNotShared(i); // COW: 确保作用域未共享
-            Scopes[i][id.IdName] = langValueType;
+            // 检查是否可以修改现有变量（只读检查）
+            CheckCanModify(id.IdName, currentScopeIndex, id);
+
+            EnsureScopeNotShared(currentScopeIndex); // COW: 确保作用域未共享
+            Scopes[currentScopeIndex][id.IdName] = langValueType;
 
             // 更新缓存
             _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
-            _lookupCache[id.IdName] = (i, langValueType);
+            _lookupCache[id.IdName] = (currentScopeIndex, langValueType);
             return;
         }
 
-        // 2. 没有找到变量，在当前作用域创建新变量
-        var currentScopeIndex = Scopes.Count - 1;
+        // 2. 如果当前作用域没有此变量，再查找父作用域
+        // 但只有在不在函数内部时才修改父作用域变量（实现变量遮蔽）
+        if (!IsFunc)
+        {
+            for (var i = Scopes.Count - 2; i >= 0; i--) // 跳过当前作用域，从父作用域开始查找
+            {
+                if (!Scopes[i].ContainsKey(id.IdName)) continue;
+
+                // 检查是否可以修改现有变量（只读检查）
+                CheckCanModify(id.IdName, i, id);
+
+                EnsureScopeNotShared(i); // COW: 确保作用域未共享
+                Scopes[i][id.IdName] = langValueType;
+
+                // 更新缓存
+                _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
+                _lookupCache[id.IdName] = (i, langValueType);
+                return;
+            }
+        }
+
+        // 3. 检查是否在当前作用域或祖先作用域中被标记为只读
+        if (_readonlyVariables.TryGetValue(id.IdName, out var readonlyScopeIndex))
+        {
+            // 只有当只读标记的作用域是当前作用域或祖先作用域时才阻止
+            if (readonlyScopeIndex <= currentScopeIndex)
+            {
+                throw new InvalidOperationError(id, $"不能修改只读变量 '{id.IdName}' (定义在作用域 {readonlyScopeIndex})");
+            }
+        }
+
+        // 4. 在当前作用域创建新变量
         EnsureScopeNotShared(currentScopeIndex); // COW: 确保作用域未共享
-        Scopes[^1][id.IdName] = langValueType;
+        Scopes[currentScopeIndex][id.IdName] = langValueType;
+
+        // 检查是否是const变量，如果是则标记为只读
+        if (id.AssumptionType?.Equals("const", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            MarkAsReadonly(id.IdName, currentScopeIndex);
+        }
 
         // 更新缓存
         _lookupCache ??= new Dictionary<string, (int scopeIndex, LangValueType value)>();
@@ -403,6 +514,11 @@ public class VariateManager
 
             // 作用域变化，清理查找缓存
             _lookupCache?.Clear();
+
+            // 清理被移除的作用域中的只读变量
+            // 移除的是当前最后一个作用域（索引为Scopes.Count）
+            // 注意：此时作用域已经被移除，所以当前Scopes.Count已经减1
+            ClearReadonlyInScope(Scopes.Count);
         }
     }
 
@@ -699,6 +815,9 @@ public class VariateManager
 
         // 清理查找缓存
         _lookupCache?.Clear();
+
+        // 清理只读变量记录
+        _readonlyVariables.Clear();
     }
 
     /// <summary>

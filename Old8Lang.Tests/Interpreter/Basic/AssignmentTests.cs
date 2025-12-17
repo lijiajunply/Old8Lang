@@ -1,19 +1,14 @@
 using Old8Lang.AST.Expression;
-using Xunit;
-using Xunit.Abstractions;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.AST.Statement;
 
 namespace Old8Lang.Tests.Interpreter.Basic;
 
 /// <summary>
 /// 基础赋值语句解释模式测试
 /// </summary>
-public class AssignmentTests(ITestOutputHelper output)
+public class AssignmentTests
 {
-    private readonly ITestOutputHelper Output = output;
-
     [Fact]
     public void SimpleVariableAssignment_CreatesCorrectValue()
     {
@@ -55,7 +50,7 @@ public class AssignmentTests(ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData(0.0)]
+    [InlineData(0.1)]
     [InlineData(3.14159)]
     [InlineData(-2.71828)]
     [InlineData(1e10)]

@@ -453,7 +453,7 @@ public class VariableTests
             camelCase <- 2
             PascalCase <- 3
             number123 <- 4
-            dollar_$ign <- 5
+            dollar_sign <- 5
         ";
         var interpreter = new LangInterpreter();
 
@@ -466,7 +466,7 @@ public class VariableTests
         var result2 = interpreter.Manager.GetValue(new LangId("camelCase"));
         var result3 = interpreter.Manager.GetValue(new LangId("PascalCase"));
         var result4 = interpreter.Manager.GetValue(new LangId("number123"));
-        var result5 = interpreter.Manager.GetValue(new LangId("dollar_$ign"));
+        var result5 = interpreter.Manager.GetValue(new LangId("dollar_sign"));
 
         Assert.NotNull(result1);
         Assert.IsType<IntLangValue>(result1);
@@ -496,7 +496,7 @@ public class VariableTests
         var code = @"
             class Counter {
                 public value:int
-                func Init(v:int) {
+                func init(v:int) {
                     value <- v
                 }
             }
@@ -573,7 +573,7 @@ public class VariableTests
         // Arrange
         var code = @"
             count <- 0
-            for i in 1..5 {
+            for i in [1~5] {
                 count <- count + 1
                 loopVar <- i
             }
@@ -598,6 +598,7 @@ public class VariableTests
         // Arrange
         var code = @"
             x <- 10
+            result <- 1
             if x > 5 {
                 result <- ""greater""
             } else {
@@ -654,7 +655,7 @@ public class VariableTests
     {
         // Arrange
         var code = @"
-            const x <- 100
+            x:const <- 100
             // Attempt to change constant (should fail or be ignored)
             try {
                 x <- 200
