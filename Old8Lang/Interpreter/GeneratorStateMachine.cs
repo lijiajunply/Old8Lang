@@ -1,15 +1,15 @@
-using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
+using Old8Lang.LangParser;
 
-namespace Old8Lang.LangParser;
+namespace Old8Lang.Interpreter;
 
 /// <summary>
-/// 异步生成器状态机
-/// 类似于 GeneratorStateMachine，但支持异步操作
-/// 每个异步生成器实例都有独立的状态机
-/// 负责管理异步生成器的执行状态、局部变量和控制流
+/// 生成器状态机
+/// 参考C#的生成器实现，每个生成器实例都有独立的状态机
+/// 负责管理生成器的执行状态、局部变量和控制流
 /// </summary>
-public class AsyncGeneratorStateMachine
+public class GeneratorStateMachine
 {
     /// <summary>
     /// 生成器状态枚举
@@ -17,7 +17,7 @@ public class AsyncGeneratorStateMachine
     public enum State
     {
         /// <summary>
-        /// 未开始：生成器刚创建，还未执行第一次MoveNextAsync
+        /// 未开始：生成器刚创建，还未执行第一次MoveNext
         /// </summary>
         NotStarted = 0,
 
@@ -43,9 +43,9 @@ public class AsyncGeneratorStateMachine
     public State CurrentState { get; set; } = State.NotStarted;
 
     /// <summary>
-    /// 异步函数引用
+    /// 生成器函数引用
     /// </summary>
-    public AsyncFuncLangValue AsyncGeneratorFunction { get; }
+    public FuncLangValue GeneratorFunction { get; }
 
     /// <summary>
     /// 生成器的局部变量环境（独立副本）
@@ -59,46 +59,32 @@ public class AsyncGeneratorStateMachine
     public GeneratorExecutionContext ExecutionContext { get; }
 
     /// <summary>
-    /// 取消令牌
-    /// </summary>
-    private CancellationToken CancellationToken { get; }
-
-    /// <summary>
     /// 构造函数
     /// </summary>
-    /// <param name="asyncGeneratorFunction">异步生成器函数</param>
+    /// <param name="generatorFunction">生成器函数</param>
     /// <param name="localEnvironment">局部变量环境</param>
-    /// <param name="cancellationToken">取消令牌</param>
-    public AsyncGeneratorStateMachine(
-        AsyncFuncLangValue asyncGeneratorFunction,
-        VariateManager localEnvironment,
-        CancellationToken cancellationToken = default)
+    public GeneratorStateMachine(FuncLangValue generatorFunction, VariateManager localEnvironment)
     {
-        AsyncGeneratorFunction = asyncGeneratorFunction ??
-                                 throw new ArgumentNullException(nameof(asyncGeneratorFunction));
+        GeneratorFunction = generatorFunction ?? throw new ArgumentNullException(nameof(generatorFunction));
         LocalEnvironment = localEnvironment ?? throw new ArgumentNullException(nameof(localEnvironment));
         ExecutionContext = new GeneratorExecutionContext();
-        CancellationToken = cancellationToken;
 
         // 设置生成器上下文到环境中
         LocalEnvironment.GeneratorContext = ExecutionContext;
     }
 
     /// <summary>
-    /// 异步执行到下一个yield点
-    /// 这是异步生成器状态机的核心方法，类似C#的IAsyncEnumerator.MoveNextAsync()
+    /// 执行到下一个yield点
+    /// 这是生成器状态机的核心方法，类似C#的IEnumerator.MoveNext()
     /// </summary>
     /// <returns>如果还有更多值返回true，否则返回false</returns>
-    public async Task<bool> MoveNextAsync()
+    public bool MoveNext()
     {
         // 如果已完成，直接返回false
         if (CurrentState == State.Completed)
         {
             return false;
         }
-
-        // 检查取消请求
-        CancellationToken.ThrowIfCancellationRequested();
 
         try
         {
@@ -108,14 +94,9 @@ public class AsyncGeneratorStateMachine
             // 清除上次yield的标志
             ExecutionContext.HasYielded = false;
 
-            // 执行异步生成器函数体
-            // 由于 BlockStatement.Run 是同步的，我们在Task中执行它
-            // 真正的异步操作发生在 await 表达式中
-            await Task.Run(() =>
-            {
-                CancellationToken.ThrowIfCancellationRequested();
-                AsyncGeneratorFunction.BlockStatement.Run(LocalEnvironment);
-            }, CancellationToken);
+            // 执行生成器函数体
+            // BlockStatement会检查ExecutionContext.HasYielded来决定是否继续执行
+            GeneratorFunction.BlockStatement.Run(LocalEnvironment);
 
             // 检查执行结果
             if (ExecutionContext.HasYielded)
@@ -164,7 +145,6 @@ public class AsyncGeneratorStateMachine
     /// </summary>
     public override string ToString()
     {
-        return
-            $"AsyncGeneratorStateMachine[State={CurrentState}, Position={ExecutionContext.CurrentStatementIndex}]";
+        return $"GeneratorStateMachine[State={CurrentState}, Position={ExecutionContext.CurrentStatementIndex}]";
     }
 }

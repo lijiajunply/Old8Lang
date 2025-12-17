@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Expression;
 
@@ -18,7 +19,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result <- a + b * c - d / e";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -34,7 +35,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result <- a + b > c * d and e < f or g == h";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -50,7 +51,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result <- (a + b) * (c - d) and (e < f)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -66,7 +67,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result <- a ^ b ^ c + d * e";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -82,7 +83,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result <- a + b % c * d - e / f";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -98,7 +99,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result <- a and b or c xor d and not e";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -114,7 +115,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result <- a > b ? c + d : e * f < g ? h : i";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -130,7 +131,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result <- a < b < c > d == e != f <= g >= h";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -150,7 +151,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result <- a + b - c + d - e + f";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -166,7 +167,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result <- ((a + b) * (c - d)) > ((e / f) + (g % h)) ? (i and j) : (k or l)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -182,7 +183,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result <- -a + b - c * not d and not e";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -198,7 +199,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result <- func(a + b) * method(c - d) + prop[e / f]";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -214,7 +215,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result <- arr[a + b] + dict[c * d] - list[e - f]";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -234,7 +235,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result <- a > b > c and d < e < f";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -250,7 +251,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result <- obj.method(a + b) > collection[c] and arr[0] == func(d)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -270,7 +271,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result <- a b + c";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -285,7 +286,7 @@ public class OperatorPrecedenceEdgeCasesTests
     {
         // Arrange
         var code = "result := a > b ? c + d";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

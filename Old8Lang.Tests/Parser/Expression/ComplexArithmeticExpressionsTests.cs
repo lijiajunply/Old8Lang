@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Expression;
 
@@ -18,7 +19,7 @@ public class ComplexArithmeticExpressionsTests
     {
         // Arrange
         var code = "result <- ((a + b) * (c - d)) / (e ^ f)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -34,7 +35,7 @@ public class ComplexArithmeticExpressionsTests
     {
         // Arrange
         var code = "result <- a + b * c - d / e % f";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -50,7 +51,7 @@ public class ComplexArithmeticExpressionsTests
     {
         // Arrange
         var code = "result <- a + b + c + d + e + f + g + h";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -66,7 +67,7 @@ public class ComplexArithmeticExpressionsTests
     {
         // Arrange
         var code = "result <- -a * (b + -c) / (-d + e)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -82,7 +83,7 @@ public class ComplexArithmeticExpressionsTests
     {
         // Arrange
         var code = "result <- ((((a + b)))) * (((c - d)))";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -98,7 +99,7 @@ public class ComplexArithmeticExpressionsTests
     {
         // Arrange
         var code = "result <- 3.14 * (radius ^ 2) + 2.718 * exp";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -118,7 +119,7 @@ public class ComplexArithmeticExpressionsTests
     {
         // Arrange
         var code = "result <- a +";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -133,7 +134,7 @@ public class ComplexArithmeticExpressionsTests
     {
         // Arrange
         var code = "result <- + b";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -148,7 +149,7 @@ public class ComplexArithmeticExpressionsTests
     {
         // Arrange
         var code = "result <- (a + b * c";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -163,7 +164,7 @@ public class ComplexArithmeticExpressionsTests
     {
         // Arrange
         var code = "result <- a + b)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -178,7 +179,7 @@ public class ComplexArithmeticExpressionsTests
     {
         // Arrange
         var code = "result <- a + * b";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -197,7 +198,7 @@ public class ComplexArithmeticExpressionsTests
     {
         // Arrange
         var code = "result <- 0 * a + 0 / b + 0 - a";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -213,7 +214,7 @@ public class ComplexArithmeticExpressionsTests
     {
         // Arrange
         var code = "result <- 999999999 + 111111111 * 888888888";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -229,7 +230,7 @@ public class ComplexArithmeticExpressionsTests
     {
         // Arrange
         var code = "result <- 0.1 + 0.2 - 0.3 * 1.0 / 4.0";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

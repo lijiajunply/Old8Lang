@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Functions;
 
@@ -32,7 +33,7 @@ func multiply(x, y) -> int {
 
 result1 <- apply(add, 5, 3)
 result2 <- apply(multiply, 5, 3)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -61,7 +62,7 @@ multiplier <- getMultiplier(5)
 
 result1 <- adder(3, 4)
 result2 <- multiplier(6)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -91,7 +92,7 @@ func double(x) -> int {
 
 numbers <- {1, 2, 3, 4, 5}
 doubled <- map(double, numbers)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -123,7 +124,7 @@ func isEven(x) -> bool {
 
 numbers <- {1, 2, 3, 4, 5, 6}
 evens <- filter(isEven, numbers)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -153,7 +154,7 @@ func add(a, b) -> int {
 
 numbers <- {1, 2, 3, 4, 5}
 sum <- reduce(add, numbers, 0)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -186,7 +187,7 @@ multiplyThenAdd <- compose(add1, multiply2)
 
 result1 <- addThenMultiply(5)  // (5 + 1) * 2 = 12
 result2 <- multiplyThenAdd(5)  // (5 * 2) + 1 = 11";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -222,7 +223,7 @@ multiplyBy3 <- curriedMultiply(3)
 
 result1 <- add5(10)      // 15
 result2 <- multiplyBy3(7) // 21";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -272,7 +273,7 @@ func chain(input) {
 
 numbers <- {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 result <- chain(numbers)({(list) -> filter((x) -> x % 2 == 0, list), (list) -> map((x) -> x * 2, list)})";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -302,7 +303,7 @@ func add1(x) -> int {
 
 add5 <- repeat(add1, 5)
 result <- add5(10)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -344,7 +345,7 @@ result <- add5(10)";
                    process <- pipeline()({double, add10, toString})
                    result <- process(5)
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -389,7 +390,7 @@ helper <- ArrayHelper(numbers)
 
 evens <- helper.filter((x) -> x % 2 == 0)
 doubled <- helper.map((x) -> x * 2)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -422,7 +423,7 @@ multiply3 <- makeMultiplier(3)
 
 result1 <- add10(5)      // 15
 result2 <- multiply3(7)  // 21";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -449,7 +450,7 @@ func outer() {
 
 inner <- outer()()
 result <- inner";  // should be 15
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -474,7 +475,7 @@ func test(func) {
 }
 
 test(123)";  // 传入的不是函数
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -496,7 +497,7 @@ func test() {
 }
 
 test()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -516,7 +517,7 @@ func test() {
 }
 
 result <- test() + 456";  // 尝试对函数调用结果进行运算
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

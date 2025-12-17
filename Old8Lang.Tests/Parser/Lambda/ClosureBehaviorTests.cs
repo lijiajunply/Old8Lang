@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Lambda;
 
@@ -21,7 +22,7 @@ public class ClosureBehaviorTests
 x <- 10
 closure <- (y) -> x + y
 result <- closure(5)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -48,7 +49,7 @@ makeIncrementer <- (step) -> {
 incBy2 <- makeIncrementer(2)
 value1 <- incBy2()
 value2 <- incBy2()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -70,7 +71,7 @@ closure2 <- (y) -> y * shared
 
 result1 <- closure1(5)
 result2 <- closure2(3)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -99,7 +100,7 @@ acc2 <- makeAccumulator(100)
 
 result1 <- acc1(5)
 result2 <- acc2(5)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -124,7 +125,7 @@ emptyClosure2 <- () -> ""hello""
 
 value1 <- emptyClosure1()
 value2 <- emptyClosure2()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -146,7 +147,7 @@ c <- 3
 
 complexClosure <- (x, y) -> a + b + c + x + y
 result <- complexClosure(10, 20)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -167,7 +168,7 @@ result <- complexClosure(10, 20)";
         // Arrange
         var code = @"
 closure <- (x) -> undefinedVar + x";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -184,7 +185,7 @@ closure <- (x) -> undefinedVar + x";
         // Arrange
         var code = @"
 closure1 <- (x) -> ";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

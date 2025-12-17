@@ -1,4 +1,4 @@
-namespace Old8Lang.LangParser;
+namespace Old8Lang.Interpreter;
 
 /// <summary>
 /// 控制流管理器，用于管理break和continue等控制流语句的状态

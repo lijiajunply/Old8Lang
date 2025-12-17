@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Functions;
 
@@ -28,7 +29,7 @@ func add(a, b, c) -> int {
 
 result1 <- add(1, 2)
 result2 <- add(1, 2, 3)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -55,7 +56,7 @@ func add(a:string, b:string) -> string {
 func add(a:double, b:double) -> double {
     return a + b
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -86,7 +87,7 @@ func process(a:string) -> string {
 func process(a, b) -> string {
     return a.ToStr() + "" + "" + b.ToStr()
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -113,7 +114,7 @@ func greet(name, message: ""Welcome"") -> string {
 func greet(name, message, title: ""Mr."") -> string {
     return title + "" "" + name + "" - "" + message
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -140,7 +141,7 @@ func calculate(a) -> string {
 func calculate(a) -> double {
     return a * 2.5
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -173,7 +174,7 @@ class Calculator {
         return a + b
     }
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -216,7 +217,7 @@ class MathUtils {
         }
     }
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -247,7 +248,7 @@ func outer(x) {
 
     return inner(5)
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -278,7 +279,7 @@ func factorial(n, acc) -> int {
         return factorial(n - 1, n * acc)
     }
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -311,7 +312,7 @@ func multiply(x, y) -> int {
 }
 
 result <- apply(add, 5, 3)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -340,7 +341,7 @@ func test(b) -> string {
 }
 
 result <- test(123)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -370,7 +371,7 @@ func process(a, b, c, d) -> int {
 }
 
 result <- process(1, 2, 3, 4, 5)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -396,7 +397,7 @@ result <- process(1, 2, 3, 4, 5)";
 
                    func test
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Async;
 
@@ -23,7 +24,7 @@ async func fetchData() -> string {
 }
 
 result <- fetchData()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -45,7 +46,7 @@ async func processData(data:string, factor:int) -> int {
 }
 
 result <- processData(""hello"", 2)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -78,7 +79,7 @@ result <- processData(""hello"", 2)";
                    
                    main()
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -113,7 +114,7 @@ async func main() {
 }
 
 main()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -144,7 +145,7 @@ async func innerFunction2(input:string) -> string {
 }
 
 finalResult <- await outerFunction()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -189,7 +190,7 @@ result2 <- await getIntData()
 result3 <- await getBoolData()
 result4 <- await getListData()
 result5 <- await getDictData()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -219,7 +220,7 @@ async func notifySystem() -> void {
 }
 
 await logMessage(""Test message"")";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -263,11 +264,11 @@ await logMessage(""Test message"")";
                        }
                    }
 
-                   loader <- DataLoader("http://example.com")
+                   loader <- DataLoader("http-example.com")
                    data <- await loader.processAndLoad()
                    PrintLine(data)
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -306,7 +307,7 @@ await logMessage(""Test message"")";
                    downloaded <- await NetworkUtils.download("http://example.com")
                    uploaded <- await NetworkUtils.upload("http://api.example.com", "data")
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -327,7 +328,7 @@ await logMessage(""Test message"")";
         // Arrange
         var code = @"
 async func testFunc ";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -351,7 +352,7 @@ func regularFunction() {
 async func someAsyncCall() -> string {
     return ""result""
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -371,7 +372,7 @@ async func someAsyncCall() -> string {
 func async testFunc() -> string {  // async应该在func之前
     return ""test""
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -390,7 +391,7 @@ async func testFunc() -> string {
     result <- await
     return result
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -424,7 +425,7 @@ async func fetchData(url:string) -> string {
 
 urls <- {""url1"", ""url2"", ""url3""}
 allData <- await loadMultipleData(urls)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -465,7 +466,7 @@ async func loadDefaultData() -> string {
 result1 <- await conditionalLoad(""user"")
 result2 <- await conditionalLoad(""post"")
 result3 <- await conditionalLoad(""other"")";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

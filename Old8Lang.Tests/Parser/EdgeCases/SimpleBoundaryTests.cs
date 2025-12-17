@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.EdgeCases;
 
@@ -40,7 +41,7 @@ zeroFloat <- 0.0
 // 浮点数运算
 floatResult1 <- largeFloat * 2.0
 floatResult2 <- smallFloat / 2.0";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -80,7 +81,7 @@ nullOrTrue <- null or true
 // 空值三元操作
 ternaryResult1 <- null != null ? ""not null"" : ""is null""
 ternaryResult2 <- notNullValue != null ? ""not null"" : ""is null""";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -119,7 +120,7 @@ isDictEmpty <- emptyDict.Count() == 0
 listAfterAdd <- emptyList.Push(42)
 arrayAfterAdd <- emptyArray.Push(24)
 dictAfterAdd <- emptyDict";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -156,7 +157,7 @@ isEmpty1 <- emptyString == """"
 combinedString <- emptyString + normalString
 stringWithNull <- normalString + null";
 
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -197,7 +198,7 @@ isIndexValid2 <- (listSize - 1) < listSize
 // 边界值运算
 boundarySum1 <- testList[0] + testList[listSize - 1]
 boundarySum2 <- testArray[0] + testArray[arraySize - 1]";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -241,7 +242,7 @@ loopResult <- 0
 for i <- -2, i <= 2, i <- i + 1 {
     loopResult <- loopResult + i
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -284,7 +285,7 @@ orResult <- boolVal or false
 isEqual <- intVal == 42
 isGreater <- floatVal > 3.0
 isLess <- intVal < 100";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -336,7 +337,7 @@ try {
 
 // 未终止的字符串（语法错误测试）
 // unterminatedString <- ""This string is not terminated";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -355,7 +356,7 @@ try {
                    unterminatedString <- This string is not terminated
                    another <- 123 
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

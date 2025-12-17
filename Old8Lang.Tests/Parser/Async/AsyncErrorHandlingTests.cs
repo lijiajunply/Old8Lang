@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Async;
 
@@ -36,7 +37,7 @@ async func fetchData(url:string) -> string {
 
 result1 <- await safeLoadData(""good_url"")
 result2 <- await safeLoadData(""bad_url"")";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -78,7 +79,7 @@ async func loadProfile(user:string) -> string {
 }
 
 result <- await robustLoad()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -122,7 +123,7 @@ async func closeConnection(connection:string) -> void {
 }
 
 result <- await processDataWithCleanup()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -165,7 +166,7 @@ async func dangerousOperation2(input:string) -> string {
 }
 
 result <- await processData()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -205,7 +206,7 @@ async func bottomFunction() -> string {
 }
 
 finalResult <- await topFunction()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -226,7 +227,6 @@ finalResult <- await topFunction()";
         // Arrange
         var code = """
                    async func loadWithTimeout(url:string, timeoutMs:int) -> string {
-                       startTime <- CurrentTime()
                        try {
                            result <- await fetchDataWithTimeout(url, timeoutMs)
                            return result
@@ -248,7 +248,7 @@ finalResult <- await topFunction()";
 
                    result <- await loadWithTimeout("http://example.com", 5000)
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -306,7 +306,7 @@ async func processData(data:int) -> string {
 
 result1 <- await validateAndProcess(10)
 result2 <- await validateAndProcess(-5)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -374,7 +374,7 @@ async func releaseResource2(resource:string) -> void {
 }
 
 result <- await processWithResourceManagement()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -400,7 +400,7 @@ async func testFunc() -> string {
         return data
     catch  // 缺少括号和参数
     }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -419,7 +419,7 @@ async func testFunc() -> string {
     await someOperation()
     throw  // 缺少异常值
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

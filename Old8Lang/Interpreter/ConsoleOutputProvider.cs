@@ -1,4 +1,4 @@
-namespace Old8Lang.LangParser;
+namespace Old8Lang.Interpreter;
 
 public class ConsoleOutputProvider : AbsOutputProvider
 {

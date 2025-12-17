@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.FunctionCalls;
 
@@ -29,7 +30,7 @@ func add(a, b) -> int {
 funcList <- [greet, add]
 result1 <- funcList[0](""Alice"")
 result2 <- funcList[1](5, 3)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -60,7 +61,7 @@ funcDict <- {
 
 result1 <- funcDict[""double""](8)
 result2 <- funcDict[""triple""](8)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -87,7 +88,7 @@ func cube(x) -> int {
 funcArray <- [square, cube]
 result1 <- funcArray[0](4)
 result2 <- funcArray[1](3)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -125,7 +126,7 @@ result1 <- funcMatrix[0][0](5, 3)   // add(5, 3) = 8
 result2 <- funcMatrix[0][1](5, 3)   // multiply(5, 3) = 15
 result3 <- funcMatrix[1][0](5, 3)   // subtract(5, 3) = 2
 result4 <- funcMatrix[1][1](5, 3)   // add(5, 3) = 8";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -157,7 +158,7 @@ operations <- [getOperation(""add""), getOperation(""multiply""), getOperation("
 result1 <- operations[0](10, 5)
 result2 <- operations[1](10, 5)
 result3 <- operations[2](10, 5)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -187,7 +188,7 @@ math <- MathHelper()
 operations <- [math.getMultiplier(2), math.getAdder(5)]
 result1 <- operations[0](10)  // 10 * 2 = 20
 result2 <- operations[1](10)  // 10 + 5 = 15";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -240,7 +241,7 @@ result4 <- mathFuncs[3](8)    // halve(8) = 4.0
 result5 <- stringFuncs[""upper""](""hello"")      // HELLO
 result6 <- stringFuncs[""lower""](""WORLD"")      // world
 result7 <- stringFuncs[""reverse""](""abcde"")   // edcba";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -283,7 +284,7 @@ ltFunc <- getCompareFunc(""lt"")
 
 result1 <- gtFunc(10, 5)   // true
 result2 <- ltFunc(10, 5)   // false";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -320,7 +321,7 @@ result1 <- composers[0](5)  // add1(multiply2(5)) = add1(10) = 11
 result2 <- composers[1](5)  // multiply2(add1(5)) = multiply2(6) = 12
 result3 <- composers[2](5)  // square(add1(5)) = square(6) = 36
 result4 <- composers[3](5)  // toString(square(5)) = toString(25) = ""25""";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -384,7 +385,7 @@ boolResult2 <- negativeCheck(10)   // false
 boolResult3 <- zeroCheck(0)        // true
 boolResult4 <- evenCheck(10)       // true
 boolResult5 <- oddCheck(10)        // false";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -410,7 +411,7 @@ emptyDict <- {}
 // 语法解析应该成功，但运行时可能出错
 // result <- emptyList[0](123)
 // result2 <- emptyDict[""key""](456)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -433,7 +434,7 @@ func test(x) -> int {
 funcList <- [test]
 // 语法解析应该成功，但运行时可能出错
 // result <- funcList[5](10)  // 索引5越界";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -453,7 +454,7 @@ mixedList <- [1, 2, 3, ""hello"", true]
 // 语法解析应该成功，但运行时可能出错
 // result <- mixedList[0](10)  // 尝试调用整数
 // result2 <- mixedList[3](""test"")  // 尝试调用字符串";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -478,7 +479,7 @@ funcList <- [add]
 // result1 <- funcList[0](5)        // 参数太少
 // result2 <- funcList[0](5, 3, 2)  // 参数太多
 result3 <- funcList[0](5, 3)        // 正确";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -518,7 +519,7 @@ result1 <- funcCube[0][0][0](5)   // identity(5) = 5
 result2 <- funcCube[0][0][1](5)   // double(5) = 10
 result3 <- funcCube[0][1][0](5)   // triple(5) = 15
 result4 <- funcCube[1][0][0](5)   // double(5) = 10";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -545,7 +546,7 @@ result1 <- ops[0](x, y) + 10     // add(x,y) + 10
 result2 <- ops[1](x, y) * 2      // multiply(x,y) * 2
 result3 <- ops[0](x, y) > 7      // add(x,y) > 7
 result4 <- ops[1](x, y) == 15    // multiply(x,y) == 15";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -568,7 +569,7 @@ result4 <- ops[1](x, y) == 15    // multiply(x,y) == 15";
 func test(x) { return x }
 funcList <- [test]
 result <- funcList[0";  // 缺少函数调用的括号
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -586,7 +587,7 @@ result <- funcList[0";  // 缺少函数调用的括号
 func test(x) { return x }
 funcList <- [test]
 result <- funcList";  // 缺少索引操作
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

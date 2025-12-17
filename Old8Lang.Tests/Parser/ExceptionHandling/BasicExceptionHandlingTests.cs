@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.ExceptionHandling;
 
@@ -32,7 +33,7 @@ func DivideNumbers(a:double, b:double) -> double {
 
 result1 <- DivideNumbers(10, 2)
 result2 <- DivideNumbers(10, 0)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -72,7 +73,7 @@ func FileOperation(filename:string) -> string {
 
 result1 <- FileOperation(""data.txt"")
 result2 <- FileOperation(""error.txt"")";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -109,7 +110,7 @@ func ProcessUser(name:string, age:int) -> string {
 
 result1 <- ProcessUser(""Alice"", 25)
 result2 <- ProcessUser(""Bob"", -5)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -136,7 +137,7 @@ func test() {
         handle()
     }
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -154,7 +155,7 @@ func test() {
 func test() {
     throw
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

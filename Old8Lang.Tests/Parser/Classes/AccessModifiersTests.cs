@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Classes;
 
@@ -41,7 +42,7 @@ class Person {
 person <- Person(""Alice"", 25, ""alice@example.com"")
 details <- person.getDetails()
 person.updateEmail(""alice@newdomain.com"")";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -94,7 +95,7 @@ class BankAccount {
 account <- BankAccount(""Alice"", 1000)
 account.deposit(500)
 currentBalance <- account.getBalance()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -142,7 +143,7 @@ result1 <- MathUtils.add(5, 3)
 result2 <- MathUtils.multiply(4, 7)
 result3 <- MathUtils.factorial(5)
 operationCount <- MathUtils.getOperationCount()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -212,7 +213,7 @@ logger2.log(""Another logger message"")
 logs1 <- logger1.getLogs()
 totalInstances <- Logger.getInstanceCount()
 version <- Logger.getVersion()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -294,7 +295,7 @@ version <- Logger.getVersion()";
                    carInfo <- myCar.getDetailedInfo()
                    fullReport <- myCar.getFullReport()
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -365,7 +366,7 @@ manager2.loadConfig(""timeout"")
 
 info1 <- manager1.getInstanceInfo()
 dbConfig <- ConfigManager.getConfig(""database"")";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -406,7 +407,7 @@ class DefaultAccessClass {
 }
 
 instance <- DefaultAccessClass()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -455,7 +456,7 @@ class TypedAccessClass {
 instance <- TypedAccessClass(42, ""hello"", 3.14)
 TypedAccessClass.boolField <- true
 newValue <- TypedAccessClass.toggleBool()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -482,7 +483,7 @@ newValue <- TypedAccessClass.toggleBool()";
                        }
                    }
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -506,7 +507,7 @@ class TestClass {
         // constructor body
     }
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -526,7 +527,7 @@ class TestClass {
         return ""test""
     }
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

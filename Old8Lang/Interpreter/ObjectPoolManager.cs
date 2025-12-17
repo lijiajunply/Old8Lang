@@ -1,6 +1,6 @@
 using Old8Lang.AST.Expression.Value;
 
-namespace Old8Lang.LangParser;
+namespace Old8Lang.Interpreter;
 
 /// <summary>
 /// 对象池管理器，管理各种类型的值对象池

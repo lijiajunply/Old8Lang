@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Expression;
 
@@ -19,7 +20,7 @@ public class InExpressionTests
     {
         // Arrange
         var code = "a <- 1 in [1, 2, 3]";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -37,7 +38,7 @@ public class InExpressionTests
     {
         // Arrange
         var code = "if 5 in [1, 3, 5, 7] { a <- 1 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -55,7 +56,7 @@ public class InExpressionTests
     {
         // Arrange
         var code = "a <- 1 in [1, 2, 3] and 4 in [3, 4, 5]";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -73,7 +74,7 @@ public class InExpressionTests
     {
         // Arrange
         var code = "a <- 'a' in 'abc'";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -95,7 +96,7 @@ public class InExpressionTests
     {
         // Arrange
         var code = "for item in [1, 2, 3] { a <- item }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -117,7 +118,7 @@ public class InExpressionTests
                 a <- item
             }
         }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -142,7 +143,7 @@ for item in [1, 2, 3] {
 
 // in表达式
 b <- 2 in [1, 2, 3]";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -164,7 +165,7 @@ b <- 2 in [1, 2, 3]";
     {
         // Arrange
         var code = "a <- 1 in";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -179,7 +180,7 @@ b <- 2 in [1, 2, 3]";
     {
         // Arrange
         var code = "a <- 1 in ";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

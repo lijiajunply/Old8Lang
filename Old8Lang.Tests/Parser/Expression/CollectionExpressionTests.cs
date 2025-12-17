@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Expression;
 
@@ -18,7 +19,7 @@ public class CollectionExpressionTests
     {
         // Arrange
         var code = "a <- [1 2 3]";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -33,7 +34,7 @@ public class CollectionExpressionTests
     {
         // Arrange
         var code = "a <- [1, 2, 3";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -48,7 +49,7 @@ public class CollectionExpressionTests
     {
         // Arrange
         var code = "a <- [1, 2, 3,]";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -67,7 +68,7 @@ public class CollectionExpressionTests
     {
         // Arrange
         var code = "a <- {\"key\" \"value\"}";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -82,7 +83,7 @@ public class CollectionExpressionTests
     {
         // Arrange
         var code = "a <- {\"key\":}";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -97,7 +98,7 @@ public class CollectionExpressionTests
     {
         // Arrange
         var code = "a <- {:\"value\"}";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -116,7 +117,7 @@ public class CollectionExpressionTests
     {
         // Arrange
         var code = "PrintLine(\"Hello\"";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -131,7 +132,7 @@ public class CollectionExpressionTests
     {
         // Arrange
         var code = "Add(1 2)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -146,7 +147,7 @@ public class CollectionExpressionTests
     {
         // Arrange
         var code = "Add(1, 2,)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -165,7 +166,7 @@ public class CollectionExpressionTests
     {
         // Arrange
         var code = "a <- array[0";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -180,7 +181,7 @@ public class CollectionExpressionTests
     {
         // Arrange
         var code = "a <- array[]";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -199,7 +200,7 @@ public class CollectionExpressionTests
     {
         // Arrange
         var code = "a <- obj.";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -214,7 +215,7 @@ public class CollectionExpressionTests
     {
         // Arrange
         var code = "a <- obj..field";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -233,7 +234,7 @@ public class CollectionExpressionTests
     {
         // Arrange
         var code = "a <- [1~]";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -248,7 +249,7 @@ public class CollectionExpressionTests
     {
         // Arrange
         var code = "a <- [~10]";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

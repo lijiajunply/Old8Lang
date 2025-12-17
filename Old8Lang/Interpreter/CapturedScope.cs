@@ -1,7 +1,8 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.LangParser;
 
-namespace Old8Lang.LangParser;
+namespace Old8Lang.Interpreter;
 
 /// <summary>
 /// 闭包捕获的作用域缓存

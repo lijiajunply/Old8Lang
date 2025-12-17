@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Interfaces;
 
@@ -43,7 +44,7 @@ public class InterfaceBasicsTests
                    circle.Draw()
                    area <- circle.GetArea()
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -104,7 +105,7 @@ public class InterfaceBasicsTests
                    rect.SetName("MyRectangle")
                    rect.SetColor("Red")
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -167,7 +168,7 @@ public class InterfaceBasicsTests
                    clone <- obj.Clone()
                    obj.Draw()
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -233,7 +234,7 @@ dog <- Dog(""Buddy"", ""Golden Retriever"")
 dog.MakeSound()
 dog.Train()
 dog.Pet()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -276,7 +277,7 @@ dog.Pet()";
                    ConsoleLogger.Info("Application started")
                    ConsoleLogger.Error("Something went wrong!")
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -324,7 +325,7 @@ calc <- SimpleCalculator()
 intResult <- calc.Calculate(5, 3)
 doubleResult <- calc.Calculate(2.5, 4.0)
 listResult <- calc.Calculate({1, 2, 3, 4, 5})";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -407,7 +408,7 @@ myList <- List()
 myList.Add(""item1"")
 myList.Add(""item2"")
 count <- myList.Count()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -430,7 +431,7 @@ count <- myList.Count()";
 interface ITest {
     func DoSomething()
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -462,7 +463,7 @@ class IncompleteClass implements IRequired {
 }";
 
         // 这在语法上可能正确，但语义上应该报错
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

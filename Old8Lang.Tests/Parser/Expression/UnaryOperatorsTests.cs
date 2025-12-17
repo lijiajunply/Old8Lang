@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Expression;
 
@@ -18,7 +19,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- -a";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -34,7 +35,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- not condition";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -50,7 +51,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- not a";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -66,7 +67,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- ++a";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -82,7 +83,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- --a";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -98,7 +99,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- a++";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -114,7 +115,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- a--";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -134,7 +135,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- - -a";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -150,7 +151,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- -a + b * -c - d";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -166,7 +167,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- -(a + b)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -182,7 +183,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- -func(a, b)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -198,7 +199,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- -arr[0]";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -214,7 +215,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- -obj.property";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -230,7 +231,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- not (a > b and c < d) or not e";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -250,7 +251,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- -123 + 456 - -789";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -266,7 +267,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- -3.14 + 2.718 - -1.414";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -282,7 +283,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- not true and not false";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -298,7 +299,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- not (not condition)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -318,7 +319,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- -";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -333,7 +334,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- not";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -348,7 +349,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- !";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -363,7 +364,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- ++";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -378,7 +379,7 @@ public class UnaryOperatorsTests
     {
         // Arrange
         var code = "result <- - a b";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

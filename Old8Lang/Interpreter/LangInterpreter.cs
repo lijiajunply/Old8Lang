@@ -1,9 +1,10 @@
-using Old8Lang.AST.Statement;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.StaticValues;
+using Old8Lang.AST.Statement;
 using Old8Lang.Error;
+using Old8Lang.LangParser;
 
-namespace Old8Lang.LangParser;
+namespace Old8Lang.Interpreter;
 
 /// <summary>
 /// Old8Lang 解释器核心类，负责将代码转换为抽象语法树并执行
@@ -73,7 +74,7 @@ public class LangInterpreter
         if (parser == null) throw new SyntaxError(new SourcePosition(1, 1), "语法出错");
 
         // 语法分析：将标记流转换为抽象语法树
-        var result = new LangParser(parser, code, fileName).ParseProgram();
+        var result = new LangParser.LangParser(parser, code, fileName).ParseProgram();
 
         return result;
     }

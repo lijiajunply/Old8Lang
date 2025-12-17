@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.FunctionCalls;
 
@@ -34,7 +35,7 @@ operations <- [getCalculator(""add""), getCalculator(""multiply""), getCalculato
 result1 <- operations[0](10, 5)
 result2 <- operations[1](10, 5)
 result3 <- operations[2](10, 5)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -85,7 +86,7 @@ mathResult1 <- mathOps[0](5, 3)    // add(5, 3) = 8
 mathResult2 <- mathOps[1](5, 3)    // multiply(5, 3) = 15
 stringResult1 <- stringOps[0](""hello"")  // upper(""hello"") = ""HELLO""
 stringResult2 <- stringOps[1](""WORLD"")  // lower(""WORLD"") = ""world""";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -124,7 +125,7 @@ result1 <- addFuncs[0](10, 5)        // add(10, 5) = 15
 result2 <- addFuncs[1](10, 5, 3)     // add(10, 5, 3) = 18
 result3 <- multiplyFuncs[0](10, 5)   // multiply(10, 5) = 50
 result4 <- multiplyFuncs[1](10, 5, 3) // multiply(10, 5, 3) = 150";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -163,7 +164,7 @@ index3 <- getOperationIndex(""subtract"")
 result1 <- operations[index1](10, 5)     // add(10, 5) = 15
 result2 <- operations[index2](10, 5)     // multiply(10, 5) = 50
 result3 <- operations[index3](10, 5)     // subtract(10, 5) = 5";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -217,7 +218,7 @@ result3 <- operations[index3](10, 5)     // subtract(10, 5) = 5";
                    result2 <- unaryOps[1](binaryOps[0](5, 3))                       // square(add(5,3)) = square(8) = 64
                    result3 <- binaryOps[3](unaryOps[2](10), unaryOps[3](8))         // divide(increment(10), halve(8)) = divide(11, 4) = 2.75
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -272,7 +273,7 @@ if shouldAct {
 } else {
     result <- x
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -317,7 +318,7 @@ chain <- createRecursiveChain()
 
 result1 <- chain[0](1, 3)  // (((1 * 2) * 2) * 2) = 8
 result2 <- chain[1](1, 3)  // (((1 + 1) + 1) + 1) = 4";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -357,7 +358,7 @@ pipeline <- createPipeline()
 result1 <- pipeline[0](pipeline[1](10))                    // increment(double(10)) = increment(20) = 21
 result2 <- pipeline[2](pipeline[3](pipeline[4](5)))       // subtract3(halve(square(5))) = subtract3(halve(25)) = subtract3(12.5) = 9.5
 result3 <- applyPipeline(pipeline, 0, 10, 3)               // increment(double(subtract3(10))) = increment(double(7)) = increment(14) = 15";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -410,7 +411,7 @@ chain3 <- buildChain({""square"", ""add1"", ""double"", ""halve""})
 result1 <- chain1[0](chain1[1](chain1[2](2)))        // add1(double(square(2))) = add1(double(4)) = add1(8) = 9
 result2 <- executeChain(chain2, 0, 10)                // double(halve(negate(10))) = double(halve(-10)) = double(-5) = -10
 result3 <- executeChain(chain3, 0, 3)                 // square(add1(double(halve(3)))) = square(add1(double(1.5))) = square(add1(3)) = square(4) = 16";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -433,7 +434,7 @@ result3 <- executeChain(chain3, 0, 3)                 // square(add1(double(halv
 emptyChain <- []
 // 语法解析应该成功，但运行时可能出错
 // result <- emptyChain[0](123)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -458,7 +459,7 @@ func createCircularChain() {
 
 chain <- createCircularChain()
 result <- chain[0](5)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -481,7 +482,7 @@ result <- chain[0](5)";
 func test(x) { return x }
 chain <- [test]
 result <- chain[0]"; // 缺少函数调用的括号
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -501,7 +502,7 @@ result <- chain[0]"; // 缺少函数调用的括号
 func test(x) { return x }
 chain <- [test]
 result <- chain[""not-a-number""](123)"; // 字符串索引
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

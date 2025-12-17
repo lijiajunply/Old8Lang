@@ -1,6 +1,7 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Language;
 
@@ -20,7 +21,7 @@ public class EdgeCaseTests
     {
         // Arrange
         var code = "a <- \"\"";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -42,7 +43,7 @@ public class EdgeCaseTests
     {
         // Arrange
         var code = "if true {}";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -66,7 +67,7 @@ public class EdgeCaseTests
     {
         // Arrange
         var code = $"a <- {int.MaxValue}";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -88,7 +89,7 @@ public class EdgeCaseTests
     {
         // Arrange
         var code = $"a <- {int.MinValue}";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -109,7 +110,7 @@ public class EdgeCaseTests
     {
         // Arrange
         var code = "a <- 0";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -131,7 +132,7 @@ public class EdgeCaseTests
     {
         // Arrange
         var code = "a <- 1.7976931348623157E+308";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -150,7 +151,7 @@ public class EdgeCaseTests
     {
         // Arrange
         var code = "a <- 0.0000000001";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -185,7 +186,7 @@ if true {
         }
     }
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -205,7 +206,7 @@ if true {
     {
         // Arrange
         var code = "a <- [[1, 2], [3, 4]]";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -226,7 +227,7 @@ if true {
     {
         // Arrange
         var code = "a <- {\"outer\": {\"inner\": 1}}";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -245,7 +246,7 @@ if true {
     {
         // Arrange
         var code = "a <- ((((1 + 2) * 3) - 4) / 5)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -271,7 +272,7 @@ if true {
         // Arrange
         var longString = new string('a', 10000);
         var code = $"a <- \"{longString}\"";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -294,7 +295,7 @@ if true {
         // Arrange
         var longId = new string('a', 1000);
         var code = $"{longId} <- 1";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -317,7 +318,7 @@ if true {
         // Arrange
         var elements = string.Join(", ", Enumerable.Range(1, 100));
         var code = $"a <- [{elements}]";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -342,7 +343,7 @@ if true {
     {
         // Arrange
         var code = "a <- \"Hello\\nWorld\"";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -361,7 +362,7 @@ if true {
     {
         // Arrange
         var code = "a <- \"Hello\\tWorld\"";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -380,7 +381,7 @@ if true {
     {
         // Arrange
         var code = "a <- \"Hello \\\"World\\\"\"";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -399,7 +400,7 @@ if true {
     {
         // Arrange
         var code = "a <- \"你好世界🌍\"";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -425,7 +426,7 @@ if true {
     {
         // Arrange
         var code = "a <- 0.123456789012345";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -447,7 +448,7 @@ if true {
     {
         // Arrange
         var code = "a <- 1.23e10";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -466,7 +467,7 @@ if true {
     {
         // Arrange
         var code = "a <- 1.23e-10";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -489,7 +490,7 @@ if true {
     {
         // Arrange
         var code = "x <- 1";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -511,7 +512,7 @@ if true {
     {
         // Arrange
         var code = "_test <- 1";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -537,7 +538,7 @@ if true {
     {
         // Arrange
         var code = "result <- (1 + 2) * (3 - 4) / (5 + 6) and true or false";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act
@@ -563,7 +564,7 @@ b <- 2
 c <- 3
 d <- 4
 e <- 5";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act

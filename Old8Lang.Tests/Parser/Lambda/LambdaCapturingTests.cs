@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Lambda;
 
@@ -21,7 +22,7 @@ public class LambdaCapturingTests
 x <- 10
 lambda1 <- (y) -> x + y
 result <- lambda1(5)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -43,7 +44,7 @@ func makeAdder(x) {
 
 add10 <- makeAdder(10)
 result <- add10(5)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -67,7 +68,7 @@ outer <- (y) -> {
 
 inner <- outer(3)
 result <- inner(2)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -88,7 +89,7 @@ result <- inner(2)";
         // Arrange
         var code = @"
 lambda1 <- (x) -> ";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

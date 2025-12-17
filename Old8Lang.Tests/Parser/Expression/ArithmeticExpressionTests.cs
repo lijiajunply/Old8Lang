@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Expression;
 
@@ -18,7 +19,7 @@ public class ArithmeticExpressionTests
     {
         // Arrange
         var code = "a <- 1 +";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -33,7 +34,7 @@ public class ArithmeticExpressionTests
     {
         // Arrange
         var code = "a <- + 1";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -48,7 +49,7 @@ public class ArithmeticExpressionTests
     {
         // Arrange
         var code = "a <- 1 + + 2";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -63,7 +64,7 @@ public class ArithmeticExpressionTests
     {
         // Arrange
         var code = "a <- 5 *";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -78,7 +79,7 @@ public class ArithmeticExpressionTests
     {
         // Arrange
         var code = "a <- 10 /";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -93,7 +94,7 @@ public class ArithmeticExpressionTests
     {
         // Arrange
         var code = "a <- not";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -112,7 +113,7 @@ public class ArithmeticExpressionTests
     {
         // Arrange
         var code = "a <- (1 + 2";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -127,7 +128,7 @@ public class ArithmeticExpressionTests
     {
         // Arrange
         var code = "a <- 1 + 2)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -142,7 +143,7 @@ public class ArithmeticExpressionTests
     {
         // Arrange
         var code = "a <- ()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -157,7 +158,7 @@ public class ArithmeticExpressionTests
     {
         // Arrange
         var code = "a <- <- 1";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

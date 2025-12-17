@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Expression;
 
@@ -18,7 +19,7 @@ public class ComparisonLogicalTests
     {
         // Arrange
         var code = "a <- x >";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -33,7 +34,7 @@ public class ComparisonLogicalTests
     {
         // Arrange
         var code = "a <- x ==";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -48,7 +49,7 @@ public class ComparisonLogicalTests
     {
         // Arrange
         var code = "a <- x !=";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -67,7 +68,7 @@ public class ComparisonLogicalTests
     {
         // Arrange
         var code = "a <- true and";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -82,7 +83,7 @@ public class ComparisonLogicalTests
     {
         // Arrange
         var code = "a <- false or";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -97,7 +98,7 @@ public class ComparisonLogicalTests
     {
         // Arrange
         var code = "a <- true xor";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -116,7 +117,7 @@ public class ComparisonLogicalTests
     {
         // Arrange
         var code = "a <- condition 1 : 2";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -131,7 +132,7 @@ public class ComparisonLogicalTests
     {
         // Arrange
         var code = "a <- condition ? 1";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -146,7 +147,7 @@ public class ComparisonLogicalTests
     {
         // Arrange
         var code = "a <- ? 1 : 2";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -161,7 +162,7 @@ public class ComparisonLogicalTests
     {
         // Arrange
         var code = "a <- condition ? : 2";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -176,7 +177,7 @@ public class ComparisonLogicalTests
     {
         // Arrange
         var code = "a <- condition ? 1 :";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -195,7 +196,7 @@ public class ComparisonLogicalTests
     {
         // Arrange
         var code = "a <- value as";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

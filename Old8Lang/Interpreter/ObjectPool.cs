@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Old8Lang.LangParser;
+namespace Old8Lang.Interpreter;
 
 /// <summary>
 /// 对象池实现，用于减少频繁创建和销毁对象的开销

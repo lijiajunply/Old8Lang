@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Classes;
 
@@ -33,7 +34,7 @@ class Person {
 }
 
 person <- Person()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -64,7 +65,7 @@ class Person {
 }
 
 person <- Person(""Alice"", 25)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -114,7 +115,7 @@ person1 <- Person()
 person2 <- Person(""Bob"")
 person3 <- Person(""Charlie"", 30)
 person4 <- Person(""David"", 35, ""david@example.com"")";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -161,7 +162,7 @@ class BankAccount {
 }
 
 account <- BankAccount(""Alice"", 1000)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -202,7 +203,7 @@ class Logger {
 }
 
 logger <- Logger(50)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -238,7 +239,7 @@ class Config {
 
 // 不需要实例化，静态构造函数会在类加载时调用
 debugMode <- Config.getSetting(""debug"")";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -283,7 +284,7 @@ class SafeDivisor {
 
 safeDiv <- SafeDivisor(0)
 normalDiv <- SafeDivisor(5)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -330,7 +331,7 @@ class Person {
 }
 
 person <- Person(""Alice"", 30)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -377,7 +378,7 @@ person <- Person(""Alice"", 30)";
 
                    myCar <- Car("Toyota", "Camry", 4, "hybrid")
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -415,7 +416,7 @@ product1 <- Product(""Book"")
 product2 <- Product(""Phone"", 599.99)
 product3 <- Product(""Laptop"", 1299.99, ""electronics"")
 product4 <- Product(""Desk"", 299.99, ""furniture"", false)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -446,7 +447,7 @@ class TypedClass {
 }
 
 instance <- TypedClass(42, ""Hello"", 3.14, true)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -471,7 +472,7 @@ class TestClass {
         this.name <- name
     }
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -493,7 +494,7 @@ class TestClass {
         this.name <- ""test""
     }
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -514,7 +515,7 @@ class TestClass {
         return ""initialized""
     }
 }";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Lambda;
 
@@ -34,7 +35,7 @@ result1 <- lambda1(5)
 result2 <- lambda2(3, 4)
 result3 <- lambda3(""hello"")
 result4 <- lambda4(true)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -66,7 +67,7 @@ result1 <- lambda1(10, 3)      // 3.333...
 result2 <- lambda2(42)        // ""Value: 42""
 result3 <- lambda3(3.14)      // 3
 result4 <- lambda4(""abc"", 3) // ""abcabcabc""";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -94,7 +95,7 @@ lambda3 <- (a, b) -> a > b ? a : b
 result1 <- lambda1(-5)    // 5
 result2 <- lambda2(4)     // ""even""
 result3 <- lambda3(3, 7)  // 7";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -137,7 +138,7 @@ scores <- {""math"": 90, ""english"": 85, ""science"": 95}
 length <- lambda1(numbers)
 doubled <- lambda2(numbers)
 total <- lambda3(scores)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -181,7 +182,7 @@ formatHello <- makeFormatter(""Hello"")
 result1 <- add10(5)              // 15
 result2 <- multiply(4, 3)         // 12
 result3 <- formatHello(""World"") // ""Hello World""";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -211,7 +212,7 @@ result1 <- lambda1(5)
 result2 <- lambda2(3, 4)
 result3 <- lambda3(""hello"")
 result4 <- lambda4(true)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -238,7 +239,7 @@ result4 <- lambda4(true)";
                    result3 <- lambda3("hello") // "HELLO"
                    result4 <- lambda4(4)      // true
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -272,7 +273,7 @@ result4 <- lambda4(true)";
                    result2 <- lambda2(42, " world")
                    result3 <- lambda3({1, 2, 3})
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -300,7 +301,7 @@ lambda3 <- () -> true
 result1 <- lambda1()
 result2 <- lambda2()
 result3 <- lambda3()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -326,7 +327,7 @@ intResult1 <- identity(42)        // int类型
 stringResult1 <- identity(""test"") // string类型
 intResult2 <- first(1, 2)         // int类型
 stringResult2 <- second(""a"", ""b"") // string类型";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -354,7 +355,7 @@ multiply3 <- makeMultiplier(3)
 result1 <- add10(5)        // 15
 result2 <- multiply3(7)    // 21";
 
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -382,7 +383,7 @@ result1 <- operations[0](10)      // 11
 result2 <- operations[1](""hello"") // ""HELLO""
 result3 <- operations[2](true)    // false
 result4 <- operations[3](5, 3)    // 8";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -409,7 +410,7 @@ lambda2 <- (condition) -> condition ? 123 : ""false""
 // 语法解析应该成功，但类型检查可能需要额外信息
 result1 <- lambda1(5)
 result2 <- lambda2(true)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -439,7 +440,7 @@ lambda2 <- () -> {
 // 语法解析应该成功，但可能需要类型注解或上下文
 // result1 <- lambda1(5)
 // result2 <- lambda2()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -462,7 +463,7 @@ lambda2 <- () -> {
 lambda1 <- (x:invalid_type) -> x  // 无效类型
 lambda2 <- (x:int) -> invalid_type: x  // 无效返回类型
 lambda3 <- (x:int::extra) -> x  // 错误的注解语法";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -480,7 +481,7 @@ lambda3 <- (x:int::extra) -> x  // 错误的注解语法";
 lambda1 <- (x: -> x  // 缺少类型
 lambda2 <- (x:int) ->  // 缺少返回类型和函数体
 lambda3 <- ( -> x  // 缺少参数和类型";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert

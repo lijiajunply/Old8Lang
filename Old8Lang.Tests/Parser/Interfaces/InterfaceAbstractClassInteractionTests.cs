@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Parser.Interfaces;
 
@@ -105,7 +106,7 @@ public class InterfaceAbstractClassInteractionTests
                    circleClone <- circle1.Clone()
                    rectClone <- rect1.Clone()
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -223,7 +224,7 @@ public class InterfaceAbstractClassInteractionTests
                    serializedData <- server.Serialize()
                    server.Dispose()
                    """;
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -360,7 +361,7 @@ MoveAllMovableShapes(shapes, 5, 5)
 
 PrintLine(""Drawing shapes after moving:"")
 DrawAllShapes(shapes)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -474,7 +475,7 @@ consoleLogger.LogError(""Console error"")
 fileLogger.WriteToFile(""Test data"")
 exported <- fileLogger.ExportLogs()
 fileLogger.ClearLogs()";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -605,7 +606,7 @@ ProcessWorker(emp)
 ProcessDriver(driver)
 ProcessWorker(deliveryDriver)
 ProcessDriver(deliveryDriver)";
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -643,7 +644,7 @@ ProcessDriver(deliveryDriver)";
                    """;
 
         // 语法上可能正确，但语义上应该报错
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
@@ -671,7 +672,7 @@ abstract class AbstractClass implements IInterface {
 }";
 
         // 语法解析可能成功，但语义检查应该报错
-        var tokens = LangParser.LangInterpreter.Tokenize(code);
+        var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
         // Act & Assert
