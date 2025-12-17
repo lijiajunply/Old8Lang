@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <Folder Include="Compiler\" />
+    <Folder Include="Interpreter\" />
   </ItemGroup>
 
 </Project>
