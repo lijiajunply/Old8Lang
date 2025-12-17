@@ -441,7 +441,7 @@ public class ThrowTests
             class UserProfile {
                 public name:string
                 public age:int
-                func Init(userName:string, userAge:int) {
+                func init(userName:string, userAge:int) {
                     if userAge < 0 {
                         throw ""Invalid age: "" + userAge.ToStr()
                     }
@@ -449,6 +449,7 @@ public class ThrowTests
                     age <- userAge
                 }
             }
+
             try {
                 user <- UserProfile(""Alice"", -5)
                 result <- ""User created successfully""
@@ -635,10 +636,10 @@ public class ThrowTests
                         throw false
                     }
                 } catch {
-                    result <- type + "" exception caught: "" + exception.ToStr()
+                    return type + "" exception caught: "" + exception.ToStr()
                 }
             }
-            testException(""string"")
+            result <- testException(""string"")
         ";
         var interpreter = new LangInterpreter();
 
