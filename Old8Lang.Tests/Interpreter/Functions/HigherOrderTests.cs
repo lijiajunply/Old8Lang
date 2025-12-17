@@ -143,7 +143,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func filter(collection:{int}, predicate:func) -> {int} {
+            func filter(collection:list, predicate:function) -> list {
                 result <- {}
                 for item in collection {
                     if predicate(item) {
@@ -209,7 +209,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func compose(f:func, g:func) -> func {
+            func compose(f:function, g:function) -> function {
                 return (x:int) -> f(g(x))
             }
             addFive <- (x:int) -> x + 5
@@ -235,7 +235,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func curry(binaryFunc:func) -> func {
+            func curry(binaryFunc:function) -> function {
                 return (a:int) -> {
                     return (b:int) -> binaryFunc(a, b)
                 }
@@ -456,12 +456,12 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func flip(func:func) -> func {
-                return (a:int, b:string) -> func(b, a)
+            func flip(fun:function) -> function {
+                return (a:int, b:string) -> fun(b, a)
             }
             func repeat(text:string, count:int) -> string {
                 result <- """"
-                for i in 1..count {
+                for i in [1~count] {
                     result <- result + text
                 }
                 return result
@@ -565,9 +565,9 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func foldRight(collection:{string}, accumulator:func, initial:string) -> string {
+            func foldRight(collection:list, accumulator:function, initial:string) -> string {
                 result <- initial
-                for i in collection.Length-1..0 {
+                for i in [collection.Length-1~0] {
                     item <- collection[i]
                     result <- accumulator(item, result)
                 }
@@ -631,7 +631,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func debounce(func:func, delayMs:int) -> func {
+            func debounce(fun:function, delayMs:int) -> function {
                 timeoutId <- -1
                 return (x:int) -> {
                     // Simulate debounce logic
@@ -641,7 +641,7 @@ public class HigherOrderTests
                     }
                     // Set new timeout
                     timeoutId <- 1
-                    return func(x)
+                    return fun(x)
                 }
             }
             func process(value:int) -> int {

@@ -346,6 +346,141 @@ public class ExpressionParserTests
         Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
     }
 
+    /// <summary>
+    /// 测试简单的 if-then-else 三元表达式 - if a > b then x else y
+    /// </summary>
+    [Fact]
+    public void ParseIfThenElseTernaryExpression_Simple_ParsesSuccessfully()
+    {
+        // Arrange
+        var code = "result <- if a > b then x else y";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act
+        var result = parser.ParseProgram();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(1, result.Count);
+        var setStmt = Assert.IsType<SetStatement>(result[0]);
+        Assert.IsType<TernaryExpression>(setStmt.Value);
+    }
+
+    /// <summary>
+    /// 测试嵌套的 if-then-else 三元表达式 - if a then if b then c else d else e
+    /// </summary>
+    [Fact]
+    public void ParseIfThenElseTernaryExpression_Nested_ParsesSuccessfully()
+    {
+        // Arrange
+        var code = "result <- if a then if b then c else d else e";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act
+        var result = parser.ParseProgram();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(1, result.Count);
+        var setStmt = Assert.IsType<SetStatement>(result[0]);
+        Assert.IsType<TernaryExpression>(setStmt.Value);
+    }
+
+    /// <summary>
+    /// 测试 if-then-else 三元表达式中的算术运算 - if a > 0 then a * 2 else a / 2
+    /// </summary>
+    [Fact]
+    public void ParseIfThenElseTernaryExpression_WithArithmetic_ParsesSuccessfully()
+    {
+        // Arrange
+        var code = "result <- if a > 0 then a * 2 else a / 2";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act
+        var result = parser.ParseProgram();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(1, result.Count);
+        var setStmt = Assert.IsType<SetStatement>(result[0]);
+        Assert.IsType<TernaryExpression>(setStmt.Value);
+    }
+
+    /// <summary>
+    /// 测试 if-then-else 三元表达式缺少 then 关键字 - 抛出语法错误
+    /// </summary>
+    [Fact]
+    public void ParseIfThenElseTernaryExpression_MissingThen_ThrowsSyntaxError()
+    {
+        // Arrange
+        var code = "result <- if a > b x else y";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act & Assert
+        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
+    }
+
+    /// <summary>
+    /// 测试 if-then-else 三元表达式缺少 else 关键字 - 抛出语法错误
+    /// </summary>
+    [Fact]
+    public void ParseIfThenElseTernaryExpression_MissingElse_ThrowsSyntaxError()
+    {
+        // Arrange
+        var code = "result <- if a > b then x";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act & Assert
+        Assert.ThrowsAny<SyntaxError>(() => parser.ParseProgram());
+    }
+
+    /// <summary>
+    /// 测试 if-then-else 三元表达式复杂条件 - if x > 10 and x < 20 then "in range" else "out of range"
+    /// </summary>
+    [Fact]
+    public void ParseIfThenElseTernaryExpression_ComplexCondition_ParsesSuccessfully()
+    {
+        // Arrange
+        var code = "result <- if x > 10 and x < 20 then \"in range\" else \"out of range\"";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act
+        var result = parser.ParseProgram();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(1, result.Count);
+        var setStmt = Assert.IsType<SetStatement>(result[0]);
+        Assert.IsType<TernaryExpression>(setStmt.Value);
+    }
+
+    /// <summary>
+    /// 测试混合的三元表达式 - if a then b ? c : d else e
+    /// </summary>
+    [Fact]
+    public void ParseMixedTernaryExpression_IfThenElseWithQuestionColon_ParsesSuccessfully()
+    {
+        // Arrange
+        var code = "result <- if a then b ? c : d else e";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act
+        var result = parser.ParseProgram();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(1, result.Count);
+        var setStmt = Assert.IsType<SetStatement>(result[0]);
+        Assert.IsType<TernaryExpression>(setStmt.Value);
+    }
+
     #endregion
 
     #region 布尔运算测试

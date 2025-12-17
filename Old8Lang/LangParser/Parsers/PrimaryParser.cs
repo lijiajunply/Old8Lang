@@ -187,6 +187,47 @@ public class PrimaryParser(
             return new Operation(expr, LangTokenType.Minus, new IntLangValue(1), position);
         }
 
+        // 处理 if-then-else 三元表达式
+        if (CurrentToken.Type == LangTokenType.If)
+        {
+            var ifToken = CurrentToken;
+            var position = new SourcePosition(ifToken.Line, ifToken.Column, tokenValue: ifToken.Value);
+            Expect(LangTokenType.If);
+
+            // 解析条件表达式
+            var condition = expressionParserFactory().ParseExpression();
+
+            // 检查是否有 then 关键字
+            if (CurrentToken.Type == LangTokenType.Then)
+            {
+                Expect(LangTokenType.Then);
+
+                // 解析 true 分支表达式
+                var trueExpr = expressionParserFactory().ParseExpression();
+
+                // 检查是否有 else 关键字
+                if (CurrentToken.Type == LangTokenType.Else)
+                {
+                    Expect(LangTokenType.Else);
+
+                    // 解析 false 分支表达式
+                    var falseExpr = expressionParserFactory().ParseExpression();
+
+                    // 创建三元表达式节点
+                    // 语法：if condition then trueExpr else falseExpr
+                    return new TernaryExpression(condition, trueExpr, falseExpr, position);
+                }
+                else
+                {
+                    throw CreateSyntaxError("语法错误：if-then-else 表达式不完整，缺少 'else' 和假值分支。建议：使用完整的 if-then-else 表达式格式 'if condition then trueValue else falseValue'。");
+                }
+            }
+            else
+            {
+                throw CreateSyntaxError("语法错误：if 表达式后缺少 'then' 关键字。如果要使用 if-then-else 三元表达式，请使用格式 'if condition then value else value'。");
+            }
+        }
+
         // 处理关键字作为标识符的情况
         if (CurrentToken.Type is LangTokenType.Func or
             LangTokenType.Class or

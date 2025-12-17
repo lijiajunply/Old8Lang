@@ -107,7 +107,7 @@ public class FunctionDeclarationTests
     {
         // Arrange
         var code = @"
-            subtract(a, b) -> a - b
+            subtract <- (a, b) -> a - b
             result <- subtract(10, 3)
         ";
         var interpreter = new LangInterpreter();
