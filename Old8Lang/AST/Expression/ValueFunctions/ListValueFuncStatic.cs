@@ -413,7 +413,16 @@ public static class ListValueFuncStatic
             return new VoidLangValue();
         }
 
-        
+        /// <summary>
+        /// 将列表转换为数组
+        /// </summary>
+        /// <returns>包含相同元素的新数组</returns>
+        public ArrayLangValue ToArray()
+        {
+            return new ArrayLangValue(langValue.Values);
+        }
+
+
         /// <summary>
         /// 检查列表中是否所有元素都满足条件
         /// </summary>
