@@ -267,9 +267,9 @@ public class TypeConversionTests
             charValue1 <- 'A'
             charValue2 <- '0'
             charValue3 <- '9'
-            intValue1 <- charValue1.ToInt32()
-            intValue2 <- charValue2.ToInt32()
-            intValue3 <- charValue3.ToInt32()
+            intValue1 <- charValue1.ToInt()
+            intValue2 <- charValue2.ToInt()
+            intValue3 <- charValue3.ToInt()
         ";
         var interpreter = new LangInterpreter();
 

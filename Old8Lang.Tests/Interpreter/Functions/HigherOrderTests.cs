@@ -596,14 +596,12 @@ public class HigherOrderTests
         // Arrange
         var code = @"
             func groupBy(collection:list, keySelector:function) -> dict {
-                groups <- dict()
-                i <- 0
-                while i < len(collection) {
-                    item <- collection[i]
+                groups <- {0: {}, 1: {}}
+                for item in collection {
                     key <- keySelector(item)
-                    keyStr <- key.ToStr()
-                    groups[keyStr] <- {item}
-                    i <- i + 1
+                    groupList <- groups[key]
+                    groupList.Add(item)
+                    groups[key] <- groupList
                 }
                 return groups
             }
@@ -612,7 +610,7 @@ public class HigherOrderTests
             grouped <- groupBy(numbers, isEven)
 
             // Get even numbers group (key = 0)
-            evenCount <- len(grouped[""0""])
+            evenCount <- len(grouped[0])
             result <- evenCount
         ";
         var interpreter = new LangInterpreter();

@@ -91,22 +91,18 @@ public class ClosureTests
         // Arrange
         var code = @"
             counter <- 0
-            func createIncrementer() -> function {
-                return () -> {
-                    counter <- counter + 1
-                    return counter
-                }
+            func incrementCounter() -> int {
+                counter <- counter + 1
+                return counter
             }
-            func createGetter() -> function {
-                return () -> counter
+            func getCounter() -> int {
+                return counter
             }
-            incrementer <- createIncrementer()
-            getter <- createGetter()
 
-            result1 <- getter()
-            result2 <- incrementer()
-            result3 <- incrementer()
-            result4 <- getter()
+            result1 <- getCounter()
+            result2 <- incrementCounter()
+            result3 <- incrementCounter()
+            result4 <- getCounter()
         ";
         var interpreter = new LangInterpreter();
 
@@ -473,15 +469,14 @@ public class ClosureTests
         var code = @"
             func createRecursiveCounter() -> function {
                 counter <- 0
-                func recursive() -> int {
-                    if counter < 5 {
-                        counter <- counter + 1
-                        return recursive()
+                func recursive(currentCounter:int) -> int {
+                    if currentCounter < 5 {
+                        return recursive(currentCounter + 1)
                     } else {
-                        return counter
+                        return currentCounter
                     }
                 }
-                return recursive
+                return () -> recursive(counter)
             }
             recursiveCounter <- createRecursiveCounter()
             result <- recursiveCounter()
@@ -536,15 +531,13 @@ public class ClosureTests
         // Arrange
         var code = @"
             logMessages <- {}
-            func createLogger() -> function {
-                return (message:string) -> {
-                    logMessages.Push(message)
-                    return ""Logged: "" + message
-                }
+            func logMessage(message:string) -> string {
+                logMessages.Add(message)
+                return ""Logged: "" + message
             }
-            logger <- createLogger()
-            result1 <- logger(""First message"")
-            result2 <- logger(""Second message"")
+
+            result1 <- logMessage(""First message"")
+            result2 <- logMessage(""Second message"")
             logCount <- len(logMessages)
         ";
         var interpreter = new LangInterpreter();

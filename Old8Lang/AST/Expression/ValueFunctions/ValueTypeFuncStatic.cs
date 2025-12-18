@@ -31,7 +31,272 @@ public static class ValueTypeFuncStatic
                 return new IntLangValue(Convert.ToInt32(charValue.Value));
             }
 
-            return new IntLangValue(int.Parse(type.ToString()));
+            if (type is BoolLangValue boolValue)
+            {
+                return new IntLangValue(boolValue.Value ? 1 : 0);
+            }
+
+            if (type is StringLangValue stringValue)
+            {
+                var str = stringValue.Value;
+                // Handle quoted strings
+                if (str.StartsWith("\"") && str.EndsWith("\""))
+                {
+                    str = str.Substring(1, str.Length - 2);
+                }
+
+                // Handle common boolean strings
+                if (str.Equals("true", StringComparison.OrdinalIgnoreCase))
+                {
+                    return new IntLangValue(1);
+                }
+                if (str.Equals("false", StringComparison.OrdinalIgnoreCase))
+                {
+                    return new IntLangValue(0);
+                }
+
+                // Try to parse as integer
+                if (int.TryParse(str, out var intResult))
+                {
+                    return new IntLangValue(intResult);
+                }
+
+                // Try to parse as double and convert to int
+                if (double.TryParse(str, out var doubleResult))
+                {
+                    return new IntLangValue(Convert.ToInt32(doubleResult));
+                }
+
+                throw new FormatException($"Cannot convert '{stringValue.Value}' to integer");
+            }
+
+            if (type is NullLangValue)
+            {
+                return new IntLangValue(0);
+            }
+
+            throw new FormatException($"Cannot convert {type.GetType().Name} to integer");
+        }
+
+        /// <summary>
+        /// 将值转换为浮点数类型
+        /// </summary>
+        /// <returns>转换后的浮点数类型值</returns>
+        public DoubleLangValue ToDouble()
+        {
+            if (type is DoubleLangValue doubleValue)
+            {
+                return doubleValue;
+            }
+
+            if (type is IntLangValue intValue)
+            {
+                return new DoubleLangValue(Convert.ToDouble(intValue.Value));
+            }
+
+            if (type is StringLangValue stringValue)
+            {
+                var str = stringValue.Value;
+                // Handle quoted strings
+                if (str.StartsWith("\"") && str.EndsWith("\""))
+                {
+                    str = str.Substring(1, str.Length - 2);
+                }
+
+                // Handle boolean strings
+                if (str.Equals("true", StringComparison.OrdinalIgnoreCase))
+                {
+                    return new DoubleLangValue(1.0);
+                }
+                if (str.Equals("false", StringComparison.OrdinalIgnoreCase))
+                {
+                    return new DoubleLangValue(0.0);
+                }
+
+                // Try to parse as double
+                if (double.TryParse(str, out var doubleResult))
+                {
+                    return new DoubleLangValue(doubleResult);
+                }
+
+                throw new FormatException($"Cannot convert '{stringValue.Value}' to double");
+            }
+
+            if (type is BoolLangValue boolValue)
+            {
+                return new DoubleLangValue(boolValue.Value ? 1.0 : 0.0);
+            }
+
+            if (type is NullLangValue)
+            {
+                return new DoubleLangValue(0.0);
+            }
+
+            throw new FormatException($"Cannot convert {type.GetType().Name} to double");
+        }
+
+        /// <summary>
+        /// 将值转换为布尔类型
+        /// </summary>
+        /// <returns>转换后的布尔类型值</returns>
+        public BoolLangValue ToBool()
+        {
+            if (type is BoolLangValue boolValue)
+            {
+                return boolValue;
+            }
+
+            if (type is IntLangValue intValue)
+            {
+                return new BoolLangValue(intValue.Value != 0);
+            }
+
+            if (type is DoubleLangValue doubleValue)
+            {
+                return new BoolLangValue(doubleValue.Value != 0.0);
+            }
+
+            if (type is StringLangValue stringValue)
+            {
+                var str = stringValue.Value;
+                // Handle quoted strings
+                if (str.StartsWith("\"") && str.EndsWith("\""))
+                {
+                    str = str.Substring(1, str.Length - 2);
+                }
+
+                // Handle boolean strings
+                if (str.Equals("true", StringComparison.OrdinalIgnoreCase))
+                {
+                    return new BoolLangValue(true);
+                }
+                if (str.Equals("false", StringComparison.OrdinalIgnoreCase))
+                {
+                    return new BoolLangValue(false);
+                }
+
+                // Handle numeric strings
+                if (int.TryParse(str, out var intResult))
+                {
+                    return new BoolLangValue(intResult != 0);
+                }
+
+                if (double.TryParse(str, out var doubleResult))
+                {
+                    return new BoolLangValue(doubleResult != 0.0);
+                }
+
+                // Non-empty string is true
+                return new BoolLangValue(!string.IsNullOrEmpty(str));
+            }
+
+            if (type is NullLangValue)
+            {
+                return new BoolLangValue(false);
+            }
+
+            throw new FormatException($"Cannot convert {type.GetType().Name} to bool");
+        }
+
+        /// <summary>
+        /// 将值转换为字符类型
+        /// </summary>
+        /// <returns>转换后的字符类型值</returns>
+        public CharLangValue ToChar()
+        {
+            if (type is CharLangValue charValue)
+            {
+                return charValue;
+            }
+
+            if (type is IntLangValue intValue)
+            {
+                if (intValue.Value >= 0 && intValue.Value <= 65535)
+                {
+                    return new CharLangValue(Convert.ToChar(intValue.Value));
+                }
+                throw new FormatException($"Integer value {intValue.Value} is out of valid character range");
+            }
+
+            if (type is StringLangValue stringValue)
+            {
+                var str = stringValue.Value;
+                // Handle quoted strings
+                if (str.StartsWith("\"") && str.EndsWith("\""))
+                {
+                    str = str.Substring(1, str.Length - 2);
+                }
+
+                if (str.Length == 1)
+                {
+                    return new CharLangValue(str[0]);
+                }
+                throw new FormatException($"String '{stringValue.Value}' is not a single character");
+            }
+
+            if (type is NullLangValue)
+            {
+                return new CharLangValue('\0');
+            }
+
+            throw new FormatException($"Cannot convert {type.GetType().Name} to char");
+        }
+
+        /// <summary>
+        /// 将值转换为列表类型
+        /// </summary>
+        /// <returns>转换后的列表类型值</returns>
+        public ListLangValue ToList()
+        {
+            if (type is ListLangValue listValue)
+            {
+                return listValue;
+            }
+
+            if (type is NullLangValue)
+            {
+                return new ListLangValue(new List<LangExpression>());
+            }
+
+            throw new FormatException($"Cannot convert {type.GetType().Name} to list");
+        }
+
+        /// <summary>
+        /// 将值转换为数组类型
+        /// </summary>
+        /// <returns>转换后的数组类型值</returns>
+        public ArrayLangValue ToArray()
+        {
+            if (type is ArrayLangValue arrayValue)
+            {
+                return arrayValue;
+            }
+
+            if (type is NullLangValue)
+            {
+                return new ArrayLangValue(new List<LangValueType>());
+            }
+
+            throw new FormatException($"Cannot convert {type.GetType().Name} to array");
+        }
+
+        /// <summary>
+        /// 将值转换为元组类型
+        /// </summary>
+        /// <returns>转换后的元组类型值</returns>
+        public TupleLangValue ToTuple()
+        {
+            if (type is TupleLangValue tupleValue)
+            {
+                return tupleValue;
+            }
+
+            if (type is NullLangValue)
+            {
+                return new TupleLangValue(new LangId("null"), new LangId("null"));
+            }
+
+            throw new FormatException($"Cannot convert {type.GetType().Name} to tuple");
         }
 
         /// <summary>
@@ -71,7 +336,7 @@ public static class ValueTypeFuncStatic
             return new BoolLangValue(type.Equal(otherValue));
         }
 
-        public BoolLangValue ToBool(LangValueType otherValue)
+        public BoolLangValue EqualsTo(LangValueType otherValue)
         {
             return new BoolLangValue(type.Equal(otherValue));
         }

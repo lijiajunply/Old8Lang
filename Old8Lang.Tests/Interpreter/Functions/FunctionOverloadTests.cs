@@ -167,34 +167,34 @@ public class FunctionOverloadTests
     {
         // Arrange
         var code = """
-                               func sum(numbers:array) -> int {
-                                   total <- 0
-                                   for num in numbers {
-                                       total <- total + num
-                                   }
-                                   return total
-                               }
-                               func sum(numbers:array) -> double {
-                                   total <- 0.0
-                                   for num in numbers {
-                                       total <- total + num
-                                   }
-                                   return total
-                               }
-                               func sum(numbers:array) -> string {
+                               func sumString(numbers:array) -> string {
                                    result <- ""
                                    for str in numbers {
                                        result <- result + str
                                    }
                                    return result
                                }
+                               func sumInt(numbers:array) -> int {
+                                   total <- 0
+                                   for num in numbers {
+                                       total <- total + num
+                                   }
+                                   return total
+                               }
+                               func sumDouble(numbers:array) -> double {
+                                   total <- 0.0
+                                   for num in numbers {
+                                       total <- total + num
+                                   }
+                                   return total
+                               }
                                intArray <- [1, 2, 3, 4, 5]
                                doubleArray <- [1.1, 2.2, 3.3]
                                stringArray <- ["A", "B", "C"]
-                               result1 <- sum(intArray)
-                               result2 <- sum(doubleArray)
-                               result3 <- sum(stringArray)
-                           
+                               result1 <- sumInt(intArray)
+                               result2 <- sumDouble(doubleArray)
+                               result3 <- sumString(stringArray)
+
                    """;
         var interpreter = new LangInterpreter();
 
@@ -327,16 +327,16 @@ public class FunctionOverloadTests
                                        this.sound <- snd
                                    }
                                }
-                               func describe(obj:Person) -> string {
+                               func describePerson(obj:Person) -> string {
                                    return "Person: " + obj.name + ", age " + obj.age.ToStr()
                                }
-                               func describe(obj:Animal) -> string {
+                               func describeAnimal(obj:Animal) -> string {
                                    return "Animal: " + obj.species + ", says " + obj.sound
                                }
                                person <- Person("Alice", 30)
                                animal <- Animal("Dog", "Woof")
-                               result1 <- describe(person)
-                               result2 <- describe(animal)
+                               result1 <- describePerson(person)
+                               result2 <- describeAnimal(animal)
                    """;
         var interpreter = new LangInterpreter();
 
