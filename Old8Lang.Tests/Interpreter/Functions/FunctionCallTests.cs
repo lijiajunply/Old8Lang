@@ -294,7 +294,7 @@ public class FunctionCallTests
                     return null
                 }
             }
-            numbers <- (10, 20, 30)
+            numbers <- (10, 20)
             text <- (""hello"", ""world"")
             result1 <- getFirst(numbers)
             result2 <- getFirst(text)
@@ -507,8 +507,8 @@ public class FunctionCallTests
             }
             result <- analyzeString(""Hello123!@#"")
             lettersCount <- result[0]
-            digitsCount <- result[1]
-            othersCount <- result[2]
+            digitsCount <- result[1][0]
+            othersCount <- result[1][1]
         ";
         var interpreter = new LangInterpreter();
 

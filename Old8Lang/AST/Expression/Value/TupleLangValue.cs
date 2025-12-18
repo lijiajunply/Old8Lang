@@ -1,6 +1,8 @@
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
 using Old8Lang.LangParser;
+using Old8Lang.Error;
+using System.Linq;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -14,7 +16,7 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
 {
     public readonly LangExpression V1 = v1;
     public readonly LangExpression V2 = v2;
-    
+
     public ValueTuple<LangValueType, LangValueType> Value { get; private set; }
 
     public override LangValueType Run(VariateManager manager)
@@ -41,6 +43,101 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
 
     public override string ToString() => $"({V1},{V2})";
     public override object GetValue() => (Value.Item1.GetValue(), Value.Item2.GetValue());
+
+    // 支持多元元组的构造函数
+    public TupleLangValue(List<LangExpression> elements, SourcePosition position = default) : this(elements[0], elements[1], position)
+    {
+        // 如果是多元元组，递归构建嵌套结构
+        for (int i = 2; i < elements.Count; i++)
+        {
+            V2 = new TupleLangValue(V2, elements[i], position);
+        }
+    }
+
+    /// <summary>
+    /// 获取元组指定索引的元素
+    /// </summary>
+    /// <param name="index">索引值</param>
+    /// <returns>指定索引的元素</returns>
+    public LangValueType Get(IntLangValue index)
+    {
+        return Get(index.Value);
+    }
+
+    /// <summary>
+    /// 获取元组指定索引的元素（支持二元元组）
+    /// </summary>
+    /// <param name="index">索引值</param>
+    /// <returns>指定索引的元素</returns>
+    public LangValueType Get(int index)
+    {
+        if (index == 0)
+            return Value.Item1;
+        if (index == 1)
+            return Value.Item2;
+
+        throw new InvalidOperationError(this, $"元组索引越界: {index}，当前元组只支持索引 0、1");
+    }
+
+    /// <summary>
+    /// 支持元组的点操作访问，包括索引访问
+    /// </summary>
+    /// <param name="dotExpression">点操作表达式</param>
+    /// <returns>访问结果</returns>
+    public override LangValueType Dot(LangExpression dotExpression)
+    {
+        // 支持数字索引访问：tuple.0, tuple.1, tuple.2 等
+        if (dotExpression is LangId id)
+        {
+            if (int.TryParse(id.IdName, out int index))
+            {
+                return Get(index);
+            }
+
+            // 支持 ToStr() 方法
+            if (id.IdName == "ToStr")
+            {
+                return new StringLangValue(ToString());
+            }
+
+            // 支持 Length 属性
+            if (id.IdName == "Length")
+            {
+                // 计算元组的长度（对于嵌套元组，需要计算所有元素的总数）
+                int length = GetTupleLength(this);
+                return new IntLangValue(length);
+            }
+        }
+
+        // 如果是Instance，检查是否是ToStr()调用
+        if (dotExpression is Instance instance &&
+            instance.Ids.Count == 0)
+        {
+            if (instance.Id.IdName == "ToStr")
+            {
+                return new StringLangValue(ToString());
+            }
+
+            if (instance.Id.IdName == "Length")
+            {
+                // 计算元组的长度（对于嵌套元组，需要计算所有元素的总数）
+                int length = GetTupleLength(this);
+                return new IntLangValue(length);
+            }
+        }
+
+        throw new InvalidOperationError(this, $"不支持元组的点操作: {dotExpression}");
+    }
+
+    /// <summary>
+    /// 计算元组的长度（二元元组固定为2）
+    /// </summary>
+    /// <param name="tuple">要计算长度的元组</param>
+    /// <returns>元组中元素的总数</returns>
+    private static int GetTupleLength(TupleLangValue tuple)
+    {
+        return 2; // 二元元组固定为2个元素
+    }
 
     // 覆盖 Equal 方法以支持元组深度比较
     public override bool Equal(LangValueType? otherValueType)

@@ -363,7 +363,7 @@ public class ClosureTests
             multipliers <- {}
             for i <- 1, i <= 3, i++ {
                 multiplier <- (x:int) -> x * i
-                multipliers.Push(multiplier)
+                multipliers.Add(multiplier)
             }
             result1 <- multipliers[0](10)
             result2 <- multipliers[1](10)

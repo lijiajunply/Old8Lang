@@ -32,6 +32,34 @@ public class CharLangValue(char value = default, SourcePosition position = defau
         return false;
     }
 
+    public override bool Greater(LangValueType? otherValue)
+    {
+        if (otherValue is CharLangValue c)
+            return Value > c.Value;
+        throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
+    }
+
+    public override bool Less(LangValueType? otherValue)
+    {
+        if (otherValue is CharLangValue c)
+            return Value < c.Value;
+        throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
+    }
+
+    public override bool GreaterEqual(LangValueType? otherValue)
+    {
+        if (otherValue is CharLangValue c)
+            return Value >= c.Value;
+        throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
+    }
+
+    public override bool LessEqual(LangValueType? otherValue)
+    {
+        if (otherValue is CharLangValue c)
+            return Value <= c.Value;
+        throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
+    }
+
     public override object GetValue() => Value;
 
     public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)

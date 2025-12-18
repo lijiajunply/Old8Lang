@@ -46,6 +46,12 @@ public class LangListItem(LangId listId, LangExpression key, SourcePosition posi
             return str.Get(intResult);
         }
 
+        if (a is TupleLangValue tuple)
+        {
+            if (result is not IntLangValue intResult) throw new TypeError(this, "IntValue", result.GetType().Name);
+            return tuple.Get(intResult);
+        }
+
         throw new InvalidOperationError(this, $"不支持的集合类型: {a?.GetType().Name ?? "null"}");
     }
 

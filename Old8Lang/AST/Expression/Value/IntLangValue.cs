@@ -176,6 +176,8 @@ public class IntLangValue(int intValue = 0, SourcePosition position = default) :
             return Value < d.Value;
         if (otherValue is IntLangValue i)
             return Value < i.Value;
+        if (otherValue is CharLangValue c)
+            return Value < c.Value;
         throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
@@ -185,6 +187,8 @@ public class IntLangValue(int intValue = 0, SourcePosition position = default) :
             return Value > d.Value;
         if (otherValue is IntLangValue i)
             return Value > i.Value;
+        if (otherValue is CharLangValue c)
+            return Value > c.Value;
         throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
@@ -194,6 +198,8 @@ public class IntLangValue(int intValue = 0, SourcePosition position = default) :
             return Value <= d.Value;
         if (otherValue is IntLangValue i)
             return Value <= i.Value;
+        if (otherValue is CharLangValue c)
+            return Value <= c.Value;
         throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
@@ -203,6 +209,8 @@ public class IntLangValue(int intValue = 0, SourcePosition position = default) :
             return Value >= d.Value;
         if (otherValue is IntLangValue i)
             return Value >= i.Value;
+        if (otherValue is CharLangValue c)
+            return Value >= c.Value;
         throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
