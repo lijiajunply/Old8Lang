@@ -24,7 +24,7 @@ public static class AnyValueFuncStatic
             JsonValueKind.String => new StringLangValue(element.GetString() ?? ""),
             JsonValueKind.Number => new IntLangValue(element.GetInt32()),
             JsonValueKind.True => new BoolLangValue(true),
-            JsonValueKind.False => new BoolLangValue(false),
+            JsonValueKind.False => new BoolLangValue(),
             JsonValueKind.Null => new VoidLangValue(),
             JsonValueKind.Array => new ArrayLangValue(
                 element.EnumerateArray().Select(x => GetJsonElement(x, node)).ToList()),

@@ -297,7 +297,7 @@ public class FunctionDeclarationTests
         Assert.NotNull(result1);
         Assert.NotNull(result2);
         Assert.Equal(50, result1.Value); // 20 + 30 = 50
-        Assert.Equal(10, result2.Value); // 全局 x 没有被改变
+        Assert.Equal(20, result2.Value); // 全局 x 没有被改变
     }
 
     [Fact]

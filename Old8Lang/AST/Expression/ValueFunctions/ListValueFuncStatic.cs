@@ -11,22 +11,7 @@ namespace Old8Lang.AST.Expression.ValueFunctions;
 [Serializable]
 public static class ListValueFuncStatic
 {
-    /// <summary>
-    /// 连接字符串数组为单个字符串
-    /// </summary>
     /// <param name="langValue">字符串数组</param>
-    /// <param name="separator">分隔符</param>
-    /// <returns>连接后的字符串</returns>
-    public static StringLangValue Join(this ListLangValue langValue, StringLangValue separator)
-    {
-        if (langValue == null)
-        {
-            throw new ArgumentNullException(nameof(langValue), "字符串数组不能为空");
-        }
-
-        return new StringLangValue(string.Join(separator.Value, langValue));
-    }
-
     extension(ListLangValue langValue)
     {
         /// <summary>
@@ -392,6 +377,21 @@ public static class ListValueFuncStatic
             var takeCount = Math.Max(0, Math.Min(count.Value, langValue.Values.Count));
             var result = langValue.Values.Take(takeCount).ToList();
             return new ListLangValue(result);
+        }
+
+        /// <summary>
+        /// 连接字符串数组为单个字符串
+        /// </summary>
+        /// <param name="separator">分隔符</param>
+        /// <returns>连接后的字符串</returns>
+        public StringLangValue Join(StringLangValue separator)
+        {
+            if (langValue == null)
+            {
+                throw new ArgumentNullException(nameof(langValue), "字符串数组不能为空");
+            }
+
+            return new StringLangValue(string.Join(separator.Value, langValue));
         }
     }
 

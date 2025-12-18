@@ -262,7 +262,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                     throw new ArgumentError(this, "tuple 函数不需要参数");
                 }
 
-                return new TupleLangValue(NullLangValue.Instance, NullLangValue.Instance);
+                return new TupleLangValue(true, Position);
             }
         }
 

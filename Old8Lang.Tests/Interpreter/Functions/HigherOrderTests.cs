@@ -74,7 +74,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func createMultiplier(factor:int) -> func {
+            func createMultiplier(factor:int) -> function {
                 return (x:int) -> x * factor
             }
             doubler <- createMultiplier(2)
@@ -266,8 +266,8 @@ public class HigherOrderTests
         var code = @"
             func pipe(value:int, functions:list) -> int {
                 result <- value
-                for func in functions {
-                    result <- func(result)
+                for fun in functions {
+                    result <- fun(result)
                 }
                 return result
             }
@@ -383,7 +383,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func throttle(inputFunc:func, delayMs:int) -> func {
+            func throttle(inputFunc:function, delayMs:int) -> function {
                 lastExecution <- 0
                 return (x:int) -> {
                     currentTime <- 1000000 // Simulate current time
@@ -489,7 +489,7 @@ public class HigherOrderTests
             func zip(list1:list, list2:list, combiner:func) -> list {
                 result <- {}
                 minLength <- if len(list1) < len(list2) then len(list1) else len(list2)
-                for i in 0..minLength-1 {
+                for i in [0~<(minLength-1)+1] {
                     combined <- combiner(list1[i], list2[i])
                     result.Add(combined)
                 }

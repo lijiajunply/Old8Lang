@@ -14,7 +14,7 @@ public class TupleTests
     {
         // Arrange
         var code = @"
-            emptyTuple <- ()
+            emptyTuple <- tuple()
             result <- len(emptyTuple)
         ";
         var interpreter = new LangInterpreter();
@@ -141,7 +141,7 @@ public class TupleTests
     {
         // Arrange
         var code = @"
-            empty <- ()
+            empty <- tuple()
             single <- (42,)
             multiple <- (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
             result1 <- len(empty)
@@ -788,9 +788,9 @@ public class TupleTests
     {
         // Arrange
         var code = @"
-            range1 <- 1..5
-            range2 <- 10..15
-            range3 <- -3..3
+            range1 <- [1~5]
+            range2 <- [10~15]
+            range3 <- [-3~3]
             result1 <- range1[0]
             result2 <- range1[4]
             result3 <- len(range1)
