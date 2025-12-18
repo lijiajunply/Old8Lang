@@ -96,7 +96,8 @@ public class ControlFlowTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(1000, ((IntLangValue)result).Value); // Sum of 1-50 excluding multiples of 5 (which is 1040-40=1000)
+        Assert.Equal(1000,
+            ((IntLangValue)result).Value); // Sum of 1-50 excluding multiples of 5 (which is 1040-40=1000)
     }
 
     [Fact]
@@ -306,34 +307,34 @@ public class ControlFlowTests
     public void ControlFlow_StateMachine_SimpleStateMachine()
     {
         // Arrange
-        var code = @"
-            state <- ""START""
-            steps <- 0
-            maxSteps <- 20
+        var code = """
+                               state <- "START"
+                               steps <- 0
+                               maxSteps <- 20
 
-            while steps < maxSteps {
-                steps <- steps + 1
+                               while steps < maxSteps {
+                                   steps <- steps + 1
 
-                switch state {
-                    case ""START"" {
-                        state <- ""PROCESSING""
-                    }
-                    case ""PROCESSING"" {
-                        if steps > 5 {
-                            state <- ""COMPLETE""
-                        }
-                    }
-                    case ""COMPLETE"" {
-                        break
-                    }
-                    default {
-                        state <- ""START""
-                    }
-                }
-            }
+                                   switch state {
+                                       case "START" {
+                                           state <- "PROCESSING"
+                                       }
+                                       case "PROCESSING" {
+                                           if steps > 5 {
+                                               state <- "COMPLETE"
+                                           }
+                                       }
+                                       case "COMPLETE" {
+                                           break
+                                       }
+                                       default {
+                                           state <- "START"
+                                       }
+                                   }
+                               }
 
-            result <- ""Final state: "" + state + "", Steps taken: "" + steps
-        ";
+                               result <- "Final state: " + state + ", Steps taken: " + steps
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act

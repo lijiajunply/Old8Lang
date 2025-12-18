@@ -682,7 +682,8 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             }
             else
             {
-                argValue = Ids[i].Run(null!);
+                // 使用传入的 manager 参数来运行表达式，而不是 null
+                argValue = Ids[i].Run(manager);
             }
 
             os.Add(argValue);

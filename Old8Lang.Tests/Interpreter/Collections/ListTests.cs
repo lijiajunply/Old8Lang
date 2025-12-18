@@ -733,11 +733,11 @@ public class ListTests
 
         Assert.NotNull(result2);
         Assert.IsType<IntLangValue>(result2);
-        Assert.Equal(3, ((IntLangValue)result2).Value);
+        Assert.Equal(2, ((IntLangValue)result2).Value);
 
         Assert.NotNull(result3);
         Assert.IsType<IntLangValue>(result3);
-        Assert.Equal(4, ((IntLangValue)result3).Value);
+        Assert.Equal(3, ((IntLangValue)result3).Value);
 
         Assert.NotNull(result4);
         Assert.IsType<IntLangValue>(result4);
@@ -754,8 +754,8 @@ public class ListTests
         // Arrange
         var code = @"
             items <- {1, 2, 3, 4, 5, 6, 7}
-            removed1 <- items.Remove(2)
-            removed2 <- items.Remove(3)
+            removed1 <- items.RemoveAt(2)
+            removed2 <- items.RemoveAt(2)
             result1 <- removed1
             result2 <- removed2
             result3 <- len(items)

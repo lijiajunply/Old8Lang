@@ -199,7 +199,7 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
             }
 
             // 对于其他方法调用，使用扩展方法机制
-            return instance.FromClassToResult(this);
+            return instance.FromClassToResult(this, manager);
         }
 
         throw new InvalidOperationError(this, $"不支持元组的点操作: {dotExpression}");

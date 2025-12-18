@@ -1,5 +1,6 @@
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.LangParser.Core;
 
@@ -234,30 +235,100 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
             }
             else if (CurrentToken.Type == LangTokenType.LeftBracket)
             {
-                // 处理索引访问: left[right]
+                // 处理索引访问或切片: left[right] 或 left[start:end]
                 var leftBracketToken = CurrentToken;
                 var position = new SourcePosition(leftBracketToken.Line, leftBracketToken.Column,
                     tokenValue: leftBracketToken.Value);
                 Expect(LangTokenType.LeftBracket);
-                var right = ParseExpression(); // 允许索引是复杂表达式
-                Expect(LangTokenType.RightBracket);
 
-                // 创建LangListItem而不是Operation
-                // 如果left是LangId，直接创建LangListItem
-                if (left is LangId leftId)
+                // 检查是否是切片语法（包含冒号）
+                var isSlice = false;
+                var lookAheadIndex = CurrentIndex;
+
+                // 向前查找冒号，但不要越过右方括号
+                while (lookAheadIndex < CurrentIndex + 10 && lookAheadIndex < Tokens.Count) // 限制查找深度避免无限循环
                 {
-                    left = new LangListItem(leftId, right, position);
+                    var checkToken = Tokens[lookAheadIndex];
+                    if (checkToken.Type == LangTokenType.Colon)
+                    {
+                        isSlice = true;
+                        break;
+                    }
+                    if (checkToken.Type == LangTokenType.RightBracket)
+                    {
+                        break;
+                    }
+                    lookAheadIndex++;
                 }
-                // 如果left是LangListItem，这是嵌套索引访问，需要特殊处理
-                else if (left is LangListItem nestedItem)
+
+                if (isSlice)
                 {
-                    // 创建一个特殊的嵌套索引访问表达式
-                    left = new NestedIndexAccess(nestedItem, right, position);
+                    // 解析切片语法
+                    var start = ParseExpression();
+                    LangExpression? end = null;
+                    LangExpression? step = null;
+
+                    if (CurrentToken.Type == LangTokenType.Colon)
+                    {
+                        Expect(LangTokenType.Colon);
+
+                        // 检查是否有 end 参数
+                        if (CurrentToken.Type != LangTokenType.Colon && CurrentToken.Type != LangTokenType.RightBracket)
+                        {
+                            end = ParseExpression();
+                        }
+
+                        // 检查是否有第二个冒号（步长参数）
+                        if (CurrentToken.Type == LangTokenType.Colon)
+                        {
+                            Expect(LangTokenType.Colon);
+                            if (CurrentToken.Type != LangTokenType.RightBracket)
+                            {
+                                step = ParseExpression();
+                            }
+                        }
+                    }
+
+                    Expect(LangTokenType.RightBracket);
+
+                    // 处理嵌套切片
+                    if (left is LangId leftId)
+                    {
+                        left = new SliceLangValue(leftId, start, end, step);
+                    }
+                    else if (left is LangListItem nestedItem)
+                    {
+                        left = new NestedSliceAccess(nestedItem, start, end, step, position);
+                    }
+                    else
+                    {
+                        // 其他类型的切片访问
+                        left = new SliceLangValue(new LangId(""), start, end, step); // 临时处理
+                    }
                 }
-                // 如果left是Operation，这也是嵌套访问
                 else
                 {
-                    left = new Operation(left, LangTokenType.Dot, right, position);
+                    // 解析普通索引访问
+                    var right = ParseExpression(); // 允许索引是复杂表达式
+                    Expect(LangTokenType.RightBracket);
+
+                    // 创建LangListItem而不是Operation
+                    // 如果left是LangId，直接创建LangListItem
+                    if (left is LangId leftId)
+                    {
+                        left = new LangListItem(leftId, right, position);
+                    }
+                    // 如果left是LangListItem，这是嵌套索引访问，需要特殊处理
+                    else if (left is LangListItem nestedItem)
+                    {
+                        // 创建一个特殊的嵌套索引访问表达式
+                        left = new NestedIndexAccess(nestedItem, right, position);
+                    }
+                    // 如果left是Operation，这也是嵌套访问
+                    else
+                    {
+                        left = new Operation(left, LangTokenType.Dot, right, position);
+                    }
                 }
             }
             else if (CurrentToken.Type == LangTokenType.LeftParen)

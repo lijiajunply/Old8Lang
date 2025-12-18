@@ -347,7 +347,7 @@ public static class ListValueFuncStatic
         /// <returns>VoidLangValue，表示操作完成</returns>
         public VoidLangValue ForEach(FuncLangValue action)
         {
-            // 尝试获取当前的 VariateManager，如果没有则创建新的
+            // 获取当前的 VariateManager
             var manager = ExecutionContext.GetCurrentManager();
             if (manager == null)
             {
@@ -355,14 +355,65 @@ public static class ListValueFuncStatic
                 manager = new VariateManager();
             }
 
-            foreach (var item in langValue.Values)
+            // 检查 action 是否是 lambda（lambda 通常 Id 为 null 且没有 Method）
+            bool isLambda = action.Id == null && action.Method == null;
+
+            if (isLambda)
             {
-                action.Run(manager, new List<LangExpression> { item });
+                // 对于 lambda，我们需要避免使用闭包机制（深拷贝）
+                // 而是直接传递原始 manager 以支持外部变量访问
+                foreach (var item in langValue.Values)
+                {
+                    // 直接执行 lambda 的主体，不创建闭包
+                    // 保存当前作用域
+                    var savedScopes = new List<Dictionary<string, LangValueType>>(manager.Scopes);
+
+                    try
+                    {
+                        // 添加新的作用域层级
+                        manager.AddChildren();
+                        manager.IsFunc = true;
+
+                        // 将参数添加到当前作用域
+                        if (action.Ids.Count == 1)
+                        {
+                            var paramId = action.Ids[0];
+                            manager.Set(paramId, item);
+                        }
+                        else if (action.Ids.Count > 0)
+                        {
+                            // 如果有多个参数，将 item 作为第一个参数
+                            var firstParamId = action.Ids[0];
+                            manager.Set(firstParamId, item);
+                        }
+
+                        // 执行 lambda 主体
+                        action.BlockStatement.Run(manager);
+                    }
+                    finally
+                    {
+                        // 恢复作用域
+                        manager.Scopes.Clear();
+                        manager.Scopes.AddRange(savedScopes);
+                        manager.IsFunc = false;
+                        manager.IsReturn = false;
+                        manager.Result = null;
+                    }
+                }
+            }
+            else
+            {
+                // 对于非 lambda（原生方法），使用正常的 Run 调用
+                foreach (var item in langValue.Values)
+                {
+                    action.Run(manager, new List<LangExpression> { item });
+                }
             }
 
             return new VoidLangValue();
         }
 
+        
         /// <summary>
         /// 检查列表中是否所有元素都满足条件
         /// </summary>
