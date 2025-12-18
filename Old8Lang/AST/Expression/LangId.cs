@@ -1,4 +1,5 @@
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 
@@ -15,18 +16,22 @@ namespace Old8Lang.AST.Expression;
 /// 该类是Old8Lang表达式系统的基础组件，用于表示各种标识符。
 /// 支持类型注解、默认值、"this"关键字处理等功能。
 /// </remarks>
-public class LangId(string name, string assumptionType = "", LangExpression? defaultValue = null, SourcePosition position = default) : LangExpression(position)
+public class LangId(
+    string name,
+    string assumptionType = "",
+    LangExpression? defaultValue = null,
+    SourcePosition position = default) : LangExpression(position)
 {
     /// <summary>
     /// 标识符名称
     /// </summary>
     public readonly string IdName = name;
-    
+
     /// <summary>
     /// 类型注解，用于类型检查和推断
     /// </summary>
     public string AssumptionType { get; } = assumptionType;
-    
+
     /// <summary>
     /// 默认值表达式
     /// </summary>
@@ -71,7 +76,7 @@ public class LangId(string name, string assumptionType = "", LangExpression? def
     /// 3. 如果不是普通变量，尝试获取类或函数
     /// 4. 如果都没有找到，抛出NameError异常
     /// </remarks>
-    public override LangValueType Run(LangParser.VariateManager manager) 
+    public override LangValueType Run(LangParser.VariateManager manager)
     {
         if (IdName == "this")
         {
@@ -81,26 +86,33 @@ public class LangId(string name, string assumptionType = "", LangExpression? def
             {
                 return thisValue;
             }
-            
+
             // 如果没有找到，抛出NameError异常，因为this关键字只能在类的方法中使用
             throw new NameError(this, "this");
         }
-        
+
         // 先尝试获取普通变量
         var value = manager.GetValue(this);
         if (value != null)
         {
             return value;
         }
-        
+
         // 如果不是普通变量，尝试获取类或函数
         var anyValue = manager.GetAny(this);
         if (anyValue != null)
         {
             return anyValue as LangValueType ?? throw new NameError(this, IdName);
         }
-        
-        // 如果都没有找到，抛出NameError异常
+
+        // 如果都没有找到，检查是否是类型关键字
+        var supportedTypes = new[]
+            { "int", "double", "string", "bool", "char", "void", "list", "dict", "array", "dictionary", "tuple" };
+        if (supportedTypes.Contains(IdName))
+        {
+            return new TypeLangValue(IdName);
+        }
+
         throw new NameError(this, IdName);
     }
 
@@ -116,7 +128,7 @@ public class LangId(string name, string assumptionType = "", LangExpression? def
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         var value = local.GetLocalVar(IdName);
-        if (value is null) 
+        if (value is null)
         {
             // 检查是否是函数参数
             // 函数参数是通过Ldarg指令访问的，而不是Ldloc指令
@@ -151,7 +163,7 @@ public class LangId(string name, string assumptionType = "", LangExpression? def
         {
             // 解析泛型类型注解，如 "list<int>" 或 "array<string>"
             var typeName = AssumptionType.Trim().ToLower();
-            
+
             // 检查是否为泛型类型
             if (typeName.Contains('<') && typeName.EndsWith('>'))
             {
@@ -159,7 +171,7 @@ public class LangId(string name, string assumptionType = "", LangExpression? def
                 var genericIndex = typeName.IndexOf('<');
                 var baseTypeName = typeName[..genericIndex].Trim();
                 var genericArg = typeName[(genericIndex + 1)..^1].Trim();
-                
+
                 // 解析泛型参数类型
                 var argType = genericArg switch
                 {
@@ -171,7 +183,7 @@ public class LangId(string name, string assumptionType = "", LangExpression? def
                     "object" => typeof(object),
                     _ => typeof(object) // 默认为object
                 };
-                
+
                 // 返回泛型类型
                 return baseTypeName switch
                 {
@@ -181,7 +193,7 @@ public class LangId(string name, string assumptionType = "", LangExpression? def
                     _ => typeof(object) // 未知泛型类型，默认为object
                 };
             }
-            
+
             // 非泛型类型
             return typeName switch
             {

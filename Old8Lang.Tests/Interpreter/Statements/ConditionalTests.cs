@@ -253,7 +253,7 @@ public class ConditionalTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
-        Assert.Equal(true, ((BoolLangValue)result).Value);
+        Assert.True(((BoolLangValue)result).Value);
     }
 
     [Fact]
@@ -261,7 +261,7 @@ public class ConditionalTests
     {
         // Arrange
         var code = @"
-            func isEven(x) {
+            func isEven(x:int) -> bool {
                 return x % 2 == 0
             }
             number <- 4

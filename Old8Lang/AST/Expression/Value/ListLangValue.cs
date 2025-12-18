@@ -35,9 +35,12 @@ public class ListLangValue : LangValueType, ILangList
 
     public override LangValueType Run(LangParser.VariateManager manager)
     {
-        if (Values.Count > 0) return this;
-        foreach (var expr in Value)
-            Values.Add(expr.Run(manager));
+        // 只有当Values为空且Value中有表达式时才需要执行
+        if (Values.Count == 0 && Value.Count > 0)
+        {
+            foreach (var expr in Value)
+                Values.Add(expr.Run(manager));
+        }
         return this;
     }
 

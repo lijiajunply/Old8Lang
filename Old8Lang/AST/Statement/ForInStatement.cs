@@ -16,7 +16,6 @@ public class ForInStatement(
     SourcePosition position = default,
     List<LangId>? additionalIds = null) : OldStatement(position)
 {
-    
     // 获取所有标识符，包括主标识符和附加标识符
     private List<LangId> AllIds
     {
@@ -28,11 +27,11 @@ public class ForInStatement(
         manager.AddChildren();
         // 压入新的控制流状态
         manager.ControlFlowManager.PushState();
-        
+
         try
         {
             var value = expression.Run(manager);
-            
+
             // 处理生成器对象
             if (value is GeneratorLangValue generator)
             {
@@ -41,22 +40,22 @@ public class ForInStatement(
                 {
                     // 在每次循环迭代开始时重置控制流标志
                     manager.ControlFlowManager.ResetCurrentState();
-                    
+
                     // 运行生成器，获取下一个值
                     var nextValue = generator.Run(manager);
-                    
+
                     // 检查生成器是否已完成
                     if (generator.State == GeneratorLangValue.GeneratorState.Completed)
                     {
                         break;
                     }
-                    
+
                     // 检查生成器是否处于Suspended状态，表示有值生成
                     if (generator.State == GeneratorLangValue.GeneratorState.Suspended)
                     {
                         // 使用generator.NextValue作为当前值
                         var currentValue = generator.NextValue;
-                        
+
                         if (currentValue != null && !(currentValue is VoidLangValue))
                         {
                             // 赋值给标识符
@@ -69,10 +68,10 @@ public class ForInStatement(
                                 // 多个标识符的情况，只赋值给第一个
                                 manager.Set(id, currentValue);
                             }
-                            
+
                             // 执行循环体
                             body.Run(manager);
-                            
+
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
                             {
@@ -89,7 +88,7 @@ public class ForInStatement(
                 {
                     // 在每次循环迭代开始时重置控制流标志
                     manager.ControlFlowManager.ResetCurrentState();
-                    
+
                     if (AllIds.Count == 1)
                     {
                         // 单个标识符的情况，保持原有行为
@@ -119,7 +118,7 @@ public class ForInStatement(
                     }
 
                     body.Run(manager);
-                    
+
                     // 处理break
                     if (manager.ControlFlowManager.BreakFlag)
                     {
@@ -143,53 +142,53 @@ public class ForInStatement(
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         var ty = expression.OutputType(local) ?? typeof(object);
-        
+
         // 对于字典类型，使用特殊处理
         if (ty == typeof(Dictionary<object, object>))
         {
             GenerateDictionaryIl(ilGenerator, local);
             return;
         }
-        
+
         // 非字典类型，使用普通的IEnumerator处理
         var enumerator = ilGenerator.DeclareLocal(typeof(IEnumerator));
         var current = ilGenerator.DeclareLocal(typeof(object));
-        
+
         // 获取枚举器
         var getEnumeratorMethod = typeof(IEnumerable).GetMethod("GetEnumerator")!;
         expression.LoadIlValue(ilGenerator, local);
         ilGenerator.Emit(OpCodes.Callvirt, getEnumeratorMethod);
         ilGenerator.Emit(OpCodes.Stloc, enumerator);
-        
+
         // 定义循环标签
         var loopStart = ilGenerator.DefineLabel();
         var loopEnd = ilGenerator.DefineLabel();
         var continueLabel = ilGenerator.DefineLabel();
-        
+
         // 保存当前的break和continue标签
         var oldBreakLabel = local.BreakLabel;
         var oldContinueLabel = local.ContinueLabel;
-        
+
         // 设置当前循环的break和continue标签
         local.BreakLabel = loopEnd;
         local.ContinueLabel = continueLabel;
-        
+
         // 循环开始
         ilGenerator.MarkLabel(loopStart);
-        
+
         // 调用MoveNext
         var moveNextMethod = typeof(IEnumerator).GetMethod("MoveNext")!;
         ilGenerator.Emit(OpCodes.Ldloc, enumerator);
         ilGenerator.Emit(OpCodes.Callvirt, moveNextMethod);
         ilGenerator.Emit(OpCodes.Brfalse, loopEnd);
-        
+
         // 获取当前元素
         var currentProperty = typeof(IEnumerator).GetProperty("Current")!;
         var getCurrentMethod = currentProperty.GetGetMethod()!;
         ilGenerator.Emit(OpCodes.Ldloc, enumerator);
         ilGenerator.Emit(OpCodes.Callvirt, getCurrentMethod);
         ilGenerator.Emit(OpCodes.Stloc, current);
-        
+
         // 处理标识符赋值
         if (AllIds.Count == 1)
         {
@@ -201,24 +200,24 @@ public class ForInStatement(
             // 多个标识符，只赋值给第一个
             local.AddLocalVar(AllIds[0].IdName, current);
         }
-        
+
         // 生成循环体
         body.GenerateIl(ilGenerator, local);
-        
+
         // 继续标签
         ilGenerator.MarkLabel(continueLabel);
-        
+
         // 跳回循环开始
         ilGenerator.Emit(OpCodes.Br, loopStart);
-        
+
         // 循环结束
         ilGenerator.MarkLabel(loopEnd);
-        
+
         // 恢复之前的break和continue标签
         local.BreakLabel = oldBreakLabel;
         local.ContinueLabel = oldContinueLabel;
     }
-    
+
     /// <summary>
     /// 生成字典类型的IL代码，使用更简单可靠的方式
     /// </summary>

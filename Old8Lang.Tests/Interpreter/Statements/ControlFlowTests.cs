@@ -462,12 +462,12 @@ public class ControlFlowTests
         // Arrange
         var code = @"
             numbers <- [64, 34, 25, 12, 22, 11, 90]
-            n <- numbers.Length
+            n <- len(numbers)
 
-            for i in 0..<n {
+            for i in [0~n] {
                 swapped <- false
 
-                for j in 0..(n - i - 2) {
+                for j in [0~(n - i - 2)] {
                     if numbers[j] > numbers[j + 1] {
                         // Swap elements
                         temp <- numbers[j]
@@ -512,7 +512,7 @@ public class ControlFlowTests
             found <- false
             index <- -1
             low <- 0
-            high <- sortedArray.Length - 1
+            high <- len(sortedArray) - 1
             iterations <- 0
 
             while low <= high and iterations < 20 {

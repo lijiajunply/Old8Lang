@@ -197,6 +197,7 @@ public class DictionaryLangValue : LangValueType, ILangList
         throw new InvalidOperationError(this, "字典类型不支持切片操作");
     }
 
+    
     public override Type OutputType(LocalManager local) => typeof(Dictionary<object, object>);
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)

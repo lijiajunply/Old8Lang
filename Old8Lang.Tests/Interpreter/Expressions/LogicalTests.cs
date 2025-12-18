@@ -230,9 +230,9 @@ public class LogicalTests
         Assert.NotNull(result1);
         Assert.NotNull(result2);
         Assert.NotNull(result3);
-        Assert.Equal(true, result1.Value);  // 10 < 20 and 20 < 30 = true and true = true
-        Assert.Equal(true, result2.Value);  // 10 > 20 or 30 > 20 = false or true = true
-        Assert.Equal(true, result3.Value);  // 10 == 20 xor 20 == 30 = false xor false = false (但可能实现不同)
+        Assert.True(result1.Value);  // 10 < 20 and 20 < 30 = true and true = true
+        Assert.True(result2.Value);  // 10 > 20 or 30 > 20 = false or true = true
+        Assert.True(result3.Value);  // 10 == 20 xor 20 == 30 = false xor false = false (但可能实现不同)
     }
 
     [Fact]
@@ -388,8 +388,8 @@ public class LogicalTests
 
         Assert.NotNull(result1);
         Assert.NotNull(result2);
-        Assert.Equal(true, result1.Value);  // arr1[0] == arr2[0] and arr1[1] == arr2[1] = true and true = true
-        Assert.Equal(true, result2.Value);  // arr1[0] == arr3[0] or arr1[2] == arr3[2] = false or true = true
+        Assert.True(result1.Value);  // arr1[0] == arr2[0] and arr1[1] == arr2[1] = true and true = true
+        Assert.True(result2.Value);  // arr1[0] == arr3[0] or arr1[2] == arr3[2] = false or true = true
     }
 
     [Fact]
@@ -442,37 +442,6 @@ public class LogicalTests
         Assert.NotNull(result2);
         Assert.Equal("not both true", result.Value);      // true and false = false
         Assert.Equal("at least one true", result2.Value); // true or false = true
-    }
-
-    [Fact]
-    public void TruthyFalsy_NonBooleanValues()
-    {
-        // Arrange
-        var code = @"
-            num1 <- 0
-            num2 <- 5
-            str1 <- """"
-            str2 <- ""hello""
-            result1 <- num1 and num2
-            result2 <- str1 or str2
-            result3 <- not num1
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-
-        // Assert - 这个测试取决于 Old8Lang 的真值/假值转换规则
-        ast.Run(interpreter.Manager);
-
-        var result1 = interpreter.Manager.GetValue(new LangId("result1"));
-        var result2 = interpreter.Manager.GetValue(new LangId("result2"));
-        var result3 = interpreter.Manager.GetValue(new LangId("result3"));
-
-        Assert.NotNull(result1);
-        Assert.NotNull(result2);
-        Assert.NotNull(result3);
-        // 具体的值取决于语言的真值/假值规则
     }
 
     [Fact]

@@ -15,7 +15,7 @@ public class RangeTests
     {
         // Arrange
         var code = @"
-            range1 <- 1..5
+            range1 <- [1~5]
             result1 <- range1
         ";
         var interpreter = new LangInterpreter();
@@ -27,7 +27,7 @@ public class RangeTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result1"));
         Assert.NotNull(result);
-        Assert.IsType<RangeLangValue>(result);
+        Assert.IsType<ArrayLangValue>(result);
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public class RangeTests
     {
         // Arrange
         var code = @"
-            range2 <- 1..<5
+            range2 <- [1~5]
             result2 <- range2
         ";
         var interpreter = new LangInterpreter();
@@ -47,7 +47,7 @@ public class RangeTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result2"));
         Assert.NotNull(result);
-        Assert.IsType<RangeLangValue>(result);
+        Assert.IsType<ArrayLangValue>(result);
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public class RangeTests
         // Arrange
         var code = @"
             sum <- 0
-            for i in 1..5 {
+            for i in [1~5] {
                 sum <- sum + i
             }
             result <- sum
@@ -80,7 +80,7 @@ public class RangeTests
         // Arrange
         var code = @"
             sum <- 0
-            for i in 1..<5 {
+            for i in [1~5[ {
                 sum <- sum + i
             }
             result <- sum
@@ -104,7 +104,7 @@ public class RangeTests
         // Arrange
         var code = @"
             sum <- 0
-            for i in -3..2 {
+            for i in [-3~2] {
                 sum <- sum + i
             }
             result <- sum
@@ -128,7 +128,7 @@ public class RangeTests
         // Arrange
         var code = @"
             sum <- 0
-            for i in 0..4 {
+            for i in [0~4] {
                 sum <- sum + i
             }
             result <- sum
@@ -152,7 +152,7 @@ public class RangeTests
         // Arrange
         var code = @"
             count <- 0
-            for i in 5..5 {
+            for i in [5~5] {
                 count <- count + 1
             }
             result <- count
@@ -176,7 +176,7 @@ public class RangeTests
         // Arrange
         var code = @"
             count <- 0
-            for i in 5..<5 {
+            for i in [5~5[ {
                 count <- count + 1
             }
             result <- count
@@ -200,7 +200,7 @@ public class RangeTests
         // Arrange
         var code = @"
             count <- 0
-            for i in 1000..<1005 {
+            for i in [1000~1005[ {
                 count <- count + 1
             }
             result <- count
@@ -224,7 +224,7 @@ public class RangeTests
         // Arrange
         var code = @"
             sum <- 0
-            for i in 5..1 {
+            for i in [5~1] {
                 sum <- sum + i
             }
             result <- sum
@@ -250,7 +250,7 @@ public class RangeTests
             start <- 3
             end <- 8
             sum <- 0
-            for i in start..end {
+            for i in [start~end] {
                 sum <- sum + i
             }
             result <- sum
@@ -276,7 +276,7 @@ public class RangeTests
             base <- 2
             multiplier <- 3
             sum <- 0
-            for i in base..(base * multiplier) {
+            for i in [base~(base * multiplier)] {
                 sum <- sum + i
             }
             result <- sum
@@ -300,8 +300,8 @@ public class RangeTests
         // Arrange
         var code = @"
             product <- 0
-            for i in 1..3 {
-                for j in 1..2 {
+            for i in [1~3] {
+                for j in [1~2] {
                     product <- product + (i * j)
                 }
             }
@@ -326,7 +326,7 @@ public class RangeTests
         // Arrange
         var code = @"
             sum <- 0
-            for i in 1..10 {
+            for i in [1~10] {
                 if i % 2 == 0 {
                     continue
                 }
@@ -353,7 +353,7 @@ public class RangeTests
         // Arrange
         var code = @"
             sum <- 0
-            for i in 1..100 {
+            for i in [1~100] {
                 sum <- sum + i
                 if i >= 5 {
                     break
@@ -381,7 +381,7 @@ public class RangeTests
         var code = @"
             numbers <- [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
             sum <- 0
-            for i in 2..5 {
+            for i in [2~5] {
                 sum <- sum + numbers[i]
             }
             result <- sum
@@ -406,7 +406,7 @@ public class RangeTests
         var code = @"
             items <- {""a"", ""b"", ""c"", ""d"", ""e""}
             resultString <- """"
-            for i in 1..<4 {
+            for i in [1~4[ {
                 resultString <- resultString + items[i]
             }
             result <- resultString
@@ -431,7 +431,7 @@ public class RangeTests
         var code = @"
             text <- ""hello""
             resultString <- """"
-            for i in 0..<text.Length {
+            for i in [0~text.Length[ {
                 charValue <- text[i]
                 resultString <- resultString + charValue.ToStr()
             }
@@ -457,7 +457,7 @@ public class RangeTests
         var code = @"
             count <- 0
             sum <- 0.0
-            for i in 1.0..5.0 {
+            for i in [1.0~5.0] {
                 count <- count + 1
                 sum <- sum + i
             }
@@ -489,7 +489,7 @@ public class RangeTests
         // Arrange
         var code = @"
             sum <- 0
-            for i in 0..10 {
+            for i in [0~10] {
                 if i % 2 == 0 { // Simulate step of 2
                     sum <- sum + i
                 }
@@ -516,7 +516,7 @@ public class RangeTests
         var code = @"
             func sumRange(start:int, end:int) -> int {
                 sum <- 0
-                for i in start..end {
+                for i in [start~end] {
                     sum <- sum + i
                 }
                 return sum
@@ -542,7 +542,7 @@ public class RangeTests
         // Arrange
         var code = @"
             numbers <- {}
-            for i in 1..5 {
+            for i in [1~5] {
                 numbers.Add(i)
             }
             result <- numbers
@@ -573,13 +573,13 @@ public class RangeTests
         var code = @"
             // Test very large range
             largeCount <- 0
-            for i in 1000000..<1000002 {
+            for i in [1000000~1000002[ {
                 largeCount <- largeCount + 1
             }
 
             // Test negative to positive range
             crossZeroSum <- 0
-            for i in -2..2 {
+            for i in [-2~2] {
                 crossZeroSum <- crossZeroSum + i
             }
 
@@ -611,7 +611,7 @@ public class RangeTests
         // Arrange
         var code = @"
             factorial <- 1
-            for i in 1..5 {
+            for i in [1~5] {
                 factorial <- factorial * i
             }
             result <- factorial
@@ -638,15 +638,15 @@ public class RangeTests
             sum2 <- 0
             sum3 <- 0
 
-            for i in 1..3 {
+            for i in [1~3] {
                 sum1 <- sum1 + i
             }
 
-            for j in 5..7 {
+            for j in [5~7] {
                 sum2 <- sum2 + j
             }
 
-            for k in 10..<13 {
+            for k in [10~13[ {
                 sum3 <- sum3 + k
             }
 

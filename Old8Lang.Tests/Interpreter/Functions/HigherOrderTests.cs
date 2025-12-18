@@ -40,7 +40,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func calculate(numbers:{int}, transformer:func) -> {int} {
+            func calculate(numbers:list, transformer:func) -> {
                 results <- {}
                 for num in numbers {
                     transformed <- transformer(num)
@@ -106,7 +106,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func map(collection:{int}, mapper:func) -> {int} {
+            func map(collection:list, mapper:func) -> {
                 result <- {}
                 for item in collection {
                     mappedItem <- mapper(item)
@@ -179,7 +179,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func reduce(collection:{int}, accumulator:func, initialValue:int) -> int {
+            func reduce(collection:list, accumulator:func, initialValue:int) -> int {
                 result <- initialValue
                 for item in collection {
                     result <- accumulator(result, item)
@@ -264,7 +264,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func pipe(value:int, functions:{func}) -> int {
+            func pipe(value:int, functions:list) -> int {
                 result <- value
                 for func in functions {
                     result <- func(result)
@@ -486,7 +486,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func zip(list1:{int}, list2:{string}, combiner:func) -> {string} {
+            func zip(list1:list, list2:list, combiner:func) -> {
                 result <- {}
                 minLength <- if list1.Length < list2.Length then list1.Length else list2.Length
                 for i in 0..minLength-1 {
@@ -522,7 +522,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func chain(value:int, processors:{func}) -> int {
+            func chain(value:int, processors:list) -> int {
                 result <- value
                 for processor in processors {
                     result <- processor(result)
@@ -593,7 +593,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func groupBy(collection:{int}, keySelector:func) -> {{int}} {
+            func groupBy(collection:list, keySelector:func) -> {
                 groups <- {}
                 for item in collection {
                     key <- keySelector(item)

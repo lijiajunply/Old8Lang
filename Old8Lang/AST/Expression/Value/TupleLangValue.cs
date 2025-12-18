@@ -65,7 +65,7 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
     }
 
     /// <summary>
-    /// 获取元组指定索引的元素（支持二元元组）
+    /// 获取元组指定索引的元素（支持嵌套多元元组）
     /// </summary>
     /// <param name="index">索引值</param>
     /// <returns>指定索引的元素</returns>
@@ -73,8 +73,22 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
     {
         if (index == 0)
             return Value.Item1;
+
         if (index == 1)
+        {
+            // 如果第二个元素是嵌套元组，返回其第一个元素
+            if (Value.Item2 is TupleLangValue secondNested)
+            {
+                return secondNested.Get(0);
+            }
             return Value.Item2;
+        }
+
+        // 对于索引大于1的情况，需要在第二个元素的嵌套元组中查找
+        if (Value.Item2 is TupleLangValue nestedTuple)
+        {
+            return nestedTuple.Get(index - 1);
+        }
 
         throw new InvalidOperationError(this, $"元组索引越界: {index}，当前元组只支持索引 0、1");
     }
@@ -130,12 +144,17 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
     }
 
     /// <summary>
-    /// 计算元组的长度（二元元组固定为2）
+    /// 计算元组的长度（支持嵌套多元元组）
     /// </summary>
     /// <param name="tuple">要计算长度的元组</param>
     /// <returns>元组中元素的总数</returns>
     private static int GetTupleLength(TupleLangValue tuple)
     {
+        // 如果第二个元素是嵌套元组，则递归计算长度
+        if (tuple.Value.Item2 is TupleLangValue lengthTuple)
+        {
+            return 1 + GetTupleLength(lengthTuple);
+        }
         return 2; // 二元元组固定为2个元素
     }
 

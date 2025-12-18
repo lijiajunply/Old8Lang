@@ -193,6 +193,8 @@ public class DoubleLangValue(double doubleValue = 0, SourcePosition position = d
     {
         if (otherValueType is DoubleLangValue b)
             return Math.Abs(Value - b.Value) < 0.03;
+        if (otherValueType is IntLangValue i)
+            return Value == i.Value;
         return false;
     }
 

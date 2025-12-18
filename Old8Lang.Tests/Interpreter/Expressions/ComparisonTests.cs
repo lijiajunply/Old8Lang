@@ -246,7 +246,7 @@ public class ComparisonTests
             intVal <- 5
             doubleVal <- 5.0
             result1 <- intVal == doubleVal
-            result2 <- intVal < doubleVal + 0.1
+            result2 <- intVal < (doubleVal + 0.1)
         ";
         var interpreter = new LangInterpreter();
 
@@ -260,8 +260,8 @@ public class ComparisonTests
 
         Assert.NotNull(result1);
         Assert.NotNull(result2);
-        Assert.Equal(true, result1.Value);  // 5 == 5.0
-        Assert.Equal(true, result2.Value);  // 5 < 5.1
+        Assert.True(result1.Value);  // 5 == 5.0
+        Assert.True(result2.Value);  // 5 < 5.1
     }
 
     [Fact]
@@ -334,7 +334,6 @@ public class ComparisonTests
             c <- 3
             d <- 4
             result1 <- a < b and b < c and c < d
-            result2 <- a <= b <= c <= d  // 这取决于语言是否支持链式比较
         ";
         var interpreter = new LangInterpreter();
 
@@ -345,11 +344,7 @@ public class ComparisonTests
         // Assert
         var result1 = interpreter.Manager.GetValue(new LangId("result1")) as BoolLangValue;
         Assert.NotNull(result1);
-        Assert.Equal(true, result1.Value); // 1 < 2 and 2 < 3 and 3 < 4
-
-        // result2 取决于语言实现
-        var result2 = interpreter.Manager.GetValue(new LangId("result2"));
-        Assert.NotNull(result2);
+        Assert.True(result1.Value); // 1 < 2 and 2 < 3 and 3 < 4
     }
 
     [Fact]

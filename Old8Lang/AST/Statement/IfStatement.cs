@@ -24,18 +24,42 @@ public class IfStatement(
         // 保存原始的 IsFunc 状态
         var originalIsFunc = manager.IsFunc;
 
+        // 处理 if 块
         manager.AddChildren();
+        var parentScopeIndex = manager.Scopes.Count - 2;
+        var initialVariables = new HashSet<string>(manager.Scopes[parentScopeIndex].Keys);
+
         // 在 if 语句块中，临时禁用函数上下文，允许修改外部变量
         manager.IsFunc = false;
         ifChildBlock.Run(manager, ref r);
+
+        // 同步变量修改到父作用域
+        var childScope = manager.Scopes[^1];
+        var parentScope = manager.Scopes[parentScopeIndex];
+        foreach (var kvp in childScope)
+        {
+            parentScope[kvp.Key] = kvp.Value;
+        }
         manager.RemoveChildren();
 
+        // 处理 elif 块
         foreach (var variable in elifBlock.OfType<IfChild>())
         {
             manager.AddChildren();
+            parentScopeIndex = manager.Scopes.Count - 2;
+            initialVariables = new HashSet<string>(manager.Scopes[parentScopeIndex].Keys);
+
             // 在 elif 语句块中，临时禁用函数上下文，允许修改外部变量
             manager.IsFunc = false;
             variable.Run(manager, ref r);
+
+            // 同步变量修改到父作用域
+            childScope = manager.Scopes[^1];
+            parentScope = manager.Scopes[parentScopeIndex];
+            foreach (var kvp in childScope)
+            {
+                parentScope[kvp.Key] = kvp.Value;
+            }
             manager.RemoveChildren();
         }
 
