@@ -196,15 +196,15 @@ public class TupleTests
 
         Assert.NotNull(result1);
         Assert.IsType<BoolLangValue>(result1);
-        Assert.Equal(true, ((BoolLangValue)result1).Value);
+        Assert.True(((BoolLangValue)result1).Value);
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(true, ((BoolLangValue)result2).Value);
+        Assert.True(((BoolLangValue)result2).Value);
 
         Assert.NotNull(result3);
         Assert.IsType<BoolLangValue>(result3);
-        Assert.Equal(false, ((BoolLangValue)result3).Value);
+        Assert.False(((BoolLangValue)result3).Value);
     }
 
     [Fact]
@@ -668,19 +668,19 @@ public class TupleTests
 
         Assert.NotNull(result1);
         Assert.IsType<BoolLangValue>(result1);
-        Assert.Equal(true, ((BoolLangValue)result1).Value);
+        Assert.True(((BoolLangValue)result1).Value);
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(false, ((BoolLangValue)result2).Value);
+        Assert.False(((BoolLangValue)result2).Value);
 
         Assert.NotNull(result3);
         Assert.IsType<BoolLangValue>(result3);
-        Assert.Equal(false, ((BoolLangValue)result3).Value);
+        Assert.False(((BoolLangValue)result3).Value);
 
         Assert.NotNull(result4);
         Assert.IsType<BoolLangValue>(result4);
-        Assert.Equal(true, ((BoolLangValue)result4).Value);
+        Assert.True(((BoolLangValue)result4).Value);
     }
 
     [Fact]

@@ -274,7 +274,7 @@ public class PrimaryParser(
             LangTokenType.LeftBracket => ParseArrayOrRange(),
             LangTokenType.LeftParen => ParseLambdaOrTuple(),
             LangTokenType.LeftBrace => ParseListOrDictionary(),
-            LangTokenType.Dollar => ParseStringTree(), // 处理字符串模板：$"string", ${expression}, $($"string")
+            LangTokenType.Dollar => ParseStringTemplate(), // 处理字符串模板：$"string", ${expression}, $($"string")
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftBracket => ParseListInitOrSlice(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseInstantiate(),
             LangTokenType.Identifier => ParseIdentifier(),
@@ -934,7 +934,7 @@ public class PrimaryParser(
     /// - $"string ${expression} string" 混合模板
     /// </summary>
     /// <returns>字符串树</returns>
-    public LangExpression ParseStringTree()
+    public LangExpression ParseStringTemplate()
     {
         // 检查当前token是否是Dollar（用于字符串插值）
         if (CurrentToken.Type == LangTokenType.Dollar)
@@ -1074,7 +1074,7 @@ public class PrimaryParser(
                     }
                 }
 
-                return new StringTreeList(parts, position);
+                return new StringTemplateValue(parts, position);
             }
         }
 

@@ -159,7 +159,7 @@ public class FunctionOverloadTests
 
         Assert.NotNull(boolResult);
         Assert.IsType<BoolLangValue>(boolResult);
-        Assert.Equal(false, ((BoolLangValue)boolResult).Value);
+        Assert.False(((BoolLangValue)boolResult).Value);
     }
 
     [Fact]
@@ -550,15 +550,15 @@ public class FunctionOverloadTests
 
         Assert.NotNull(result1);
         Assert.IsType<BoolLangValue>(result1);
-        Assert.Equal(true, ((BoolLangValue)result1).Value);
+        Assert.True(((BoolLangValue)result1).Value);
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(true, ((BoolLangValue)result2).Value);
+        Assert.True(((BoolLangValue)result2).Value);
 
         Assert.NotNull(result3);
         Assert.IsType<BoolLangValue>(result3);
-        Assert.Equal(true, ((BoolLangValue)result3).Value);
+        Assert.True(((BoolLangValue)result3).Value);
     }
 
     [Fact]
@@ -699,7 +699,7 @@ public class FunctionOverloadTests
 
         Assert.NotNull(result3);
         Assert.IsType<BoolLangValue>(result3);
-        Assert.Equal(true, ((BoolLangValue)result3).Value);
+        Assert.True(((BoolLangValue)result3).Value);
 
         Assert.NotNull(result4);
         Assert.IsType<IntLangValue>(result4);
@@ -711,7 +711,7 @@ public class FunctionOverloadTests
 
         Assert.NotNull(result6);
         Assert.IsType<BoolLangValue>(result6);
-        Assert.Equal(false, ((BoolLangValue)result6).Value);
+        Assert.False(((BoolLangValue)result6).Value);
     }
 
     [Fact]

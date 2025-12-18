@@ -91,7 +91,7 @@ public class TernaryTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
-        Assert.Equal(true, ((BoolLangValue)result).Value);
+        Assert.True(((BoolLangValue)result).Value);
     }
 
     [Fact]
@@ -256,10 +256,10 @@ public class TernaryTests
     public void Ternary_WithDictionaryOperations_ConditionsOnDictionaries()
     {
         // Arrange
-        var code = @"
-            config <- {""theme"": ""dark"", ""notifications"": true}
-            result <- if config.ContainsKey(""theme"") then config[""theme""] else ""light""
-        ";
+        var code = """
+                   config <- {"theme": "dark", "notifications": true}
+                   result <- if config.ContainsKey("theme") then config["theme"] else "light"
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -478,10 +478,10 @@ public class TernaryTests
     public void Ternary_WithBooleanLiterals_DirectBooleanValues()
     {
         // Arrange
-        var code = @"
-            result1 <- if true then ""yes"" else ""no""
-            result2 <- if false then ""yes"" else ""no""
-        ";
+        var code = """
+                   result1 <- if true then "yes" else "no"
+                   result2 <- if false then "yes" else "no"
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act

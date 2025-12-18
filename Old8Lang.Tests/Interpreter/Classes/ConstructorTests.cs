@@ -217,7 +217,7 @@ public class ConstructorTests
 
         Assert.NotNull(resultActive);
         Assert.IsType<BoolLangValue>(resultActive);
-        Assert.Equal(true, ((BoolLangValue)resultActive).Value);
+        Assert.True(((BoolLangValue)resultActive).Value);
     }
 
     [Fact]
@@ -308,15 +308,15 @@ public class ConstructorTests
 
         Assert.NotNull(validResult);
         Assert.IsType<BoolLangValue>(validResult);
-        Assert.Equal(true, ((BoolLangValue)validResult).Value);
+        Assert.True(((BoolLangValue)validResult).Value);
 
         Assert.NotNull(invalid1Result);
         Assert.IsType<BoolLangValue>(invalid1Result);
-        Assert.Equal(false, ((BoolLangValue)invalid1Result).Value);
+        Assert.False(((BoolLangValue)invalid1Result).Value);
 
         Assert.NotNull(invalid2Result);
         Assert.IsType<BoolLangValue>(invalid2Result);
-        Assert.Equal(false, ((BoolLangValue)invalid2Result).Value);
+        Assert.False(((BoolLangValue)invalid2Result).Value);
     }
 
     [Fact]
@@ -464,7 +464,7 @@ public class ConstructorTests
 
         Assert.NotNull(ssl4);
         Assert.IsType<BoolLangValue>(ssl4);
-        Assert.Equal(true, ((BoolLangValue)ssl4).Value);
+        Assert.True(((BoolLangValue)ssl4).Value);
     }
 
     [Fact]
@@ -748,11 +748,11 @@ public class ConstructorTests
 
         Assert.NotNull(result1);
         Assert.IsType<BoolLangValue>(result1);
-        Assert.Equal(true, ((BoolLangValue)result1).Value);
+        Assert.True(((BoolLangValue)result1).Value);
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(false, ((BoolLangValue)result2).Value);
+        Assert.False(((BoolLangValue)result2).Value);
     }
 
     [Fact]

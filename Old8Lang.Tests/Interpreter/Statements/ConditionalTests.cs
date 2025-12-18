@@ -414,7 +414,7 @@ public class ConditionalTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
-        Assert.Equal(true, ((BoolLangValue)result).Value); // 5 < 10 and 10 < 15 = true and true = true
+        Assert.True(((BoolLangValue)result).Value); // 5 < 10 and 10 < 15 = true and true = true
     }
 
     [Fact]

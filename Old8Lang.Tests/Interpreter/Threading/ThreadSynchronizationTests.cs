@@ -79,7 +79,7 @@ public class ThreadSynchronizationTests
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
         // Should be false because timeout occurs
-        Assert.Equal(false, ((BoolLangValue)result).Value);
+        Assert.False(((BoolLangValue)result).Value);
     }
 
     [Fact]
@@ -591,7 +591,7 @@ public class ThreadSynchronizationTests
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
         // Should detect potential deadlock
-        Assert.Equal(true, ((BoolLangValue)result).Value);
+        Assert.True(((BoolLangValue)result).Value);
     }
 
     [Fact]
@@ -690,7 +690,7 @@ public class ThreadSynchronizationTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
-        Assert.Equal(true, ((BoolLangValue)result).Value);
+        Assert.True(((BoolLangValue)result).Value);
     }
 
     [Fact]
@@ -756,7 +756,7 @@ public class ThreadSynchronizationTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
-        Assert.Equal(true, ((BoolLangValue)result).Value);
+        Assert.True(((BoolLangValue)result).Value);
     }
 
     [Fact]

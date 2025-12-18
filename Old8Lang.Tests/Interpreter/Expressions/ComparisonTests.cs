@@ -289,9 +289,9 @@ public class ComparisonTests
         Assert.NotNull(result1);
         Assert.NotNull(result2);
         Assert.NotNull(result3);
-        Assert.Equal(true, result1.Value);   // 10 < 20
-        Assert.Equal(false, result2.Value);  // 10 != 20
-        Assert.Equal(false, result3.Value);  // 10 !> 20
+        Assert.True(result1.Value);   // 10 < 20
+        Assert.False(result2.Value);  // 10 != 20
+        Assert.False(result3.Value);  // 10 !> 20
     }
 
     [Fact]
@@ -319,9 +319,9 @@ public class ComparisonTests
         Assert.NotNull(result1);
         Assert.NotNull(result2);
         Assert.NotNull(result3);
-        Assert.Equal(true, result1.Value);  // 15 > 5
-        Assert.Equal(true, result2.Value);  // 50 == 50
-        Assert.Equal(true, result3.Value);  // 2 >= 2
+        Assert.True(result1.Value);  // 15 > 5
+        Assert.True(result2.Value);  // 50 == 50
+        Assert.True(result3.Value);  // 2 >= 2
     }
 
     [Fact]
@@ -414,8 +414,8 @@ public class ComparisonTests
 
         Assert.NotNull(result1);
         Assert.NotNull(result2);
-        Assert.Equal(true, result1.Value); // 10 < 20
-        Assert.Equal(true, result2.Value); // 10 + 20 == 30
+        Assert.True(result1.Value); // 10 < 20
+        Assert.True(result2.Value); // 10 + 20 == 30
     }
 
     [Fact]
@@ -444,9 +444,9 @@ public class ComparisonTests
         Assert.NotNull(result1);
         Assert.NotNull(result2);
         Assert.NotNull(result3);
-        Assert.Equal(true, result1.Value); // arr1[0] == arr2[0] == 1
-        Assert.Equal(true, result2.Value); // arr1[4] != arr3[4] == 5 != 6
-        Assert.Equal(true, result3.Value); // arr1[2] < arr3[4] == 3 < 6
+        Assert.True(result1.Value); // arr1[0] == arr2[0] == 1
+        Assert.True(result2.Value); // arr1[4] != arr3[4] == 5 != 6
+        Assert.True(result3.Value); // arr1[2] < arr3[4] == 3 < 6
     }
 
     [Fact]
@@ -475,8 +475,8 @@ public class ComparisonTests
         Assert.NotNull(result1);
         Assert.NotNull(result2);
         Assert.NotNull(result3);
-        Assert.Equal(true, result1.Value);  // "apple" < "banana" (lexicographic)
-        Assert.Equal(false, result2.Value); // "apple" != "Apple" (case sensitive)
+        Assert.True(result1.Value);  // "apple" < "banana" (lexicographic)
+        Assert.False(result2.Value); // "apple" != "Apple" (case sensitive)
         // result3 取决于具体的大小写敏感比较实现
     }
 

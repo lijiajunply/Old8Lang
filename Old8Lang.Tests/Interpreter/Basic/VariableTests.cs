@@ -67,7 +67,7 @@ public class VariableTests
 
         Assert.NotNull(boolResult);
         Assert.IsType<BoolLangValue>(boolResult);
-        Assert.Equal(true, ((BoolLangValue)boolResult).Value);
+        Assert.True(((BoolLangValue)boolResult).Value);
 
         Assert.NotNull(charResult);
         Assert.IsType<CharLangValue>(charResult);
@@ -116,7 +116,7 @@ public class VariableTests
         var result = interpreter.Manager.GetValue(new LangId("x"));
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
-        Assert.Equal(true, ((BoolLangValue)result).Value);
+        Assert.True(((BoolLangValue)result).Value);
     }
 
     [Fact]

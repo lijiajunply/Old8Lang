@@ -87,7 +87,7 @@ public class MixinTests
 
         Assert.NotNull(result4);
         Assert.IsType<BoolLangValue>(result4);
-        Assert.Equal(false, ((BoolLangValue)result4).Value);
+        Assert.False(((BoolLangValue)result4).Value);
     }
 
     [Fact]
@@ -294,15 +294,15 @@ public class MixinTests
 
         Assert.NotNull(isValid);
         Assert.IsType<BoolLangValue>(isValid);
-        Assert.Equal(false, ((BoolLangValue)isValid).Value);
+        Assert.False(((BoolLangValue)isValid).Value);
 
         Assert.NotNull(hasErrors);
         Assert.IsType<BoolLangValue>(hasErrors);
-        Assert.Equal(true, ((BoolLangValue)hasErrors).Value);
+        Assert.True(((BoolLangValue)hasErrors).Value);
 
         Assert.NotNull(configValue);
         Assert.IsType<BoolLangValue>(configValue);
-        Assert.Equal(true, ((BoolLangValue)configValue).Value);
+        Assert.True(((BoolLangValue)configValue).Value);
     }
 
     [Fact]

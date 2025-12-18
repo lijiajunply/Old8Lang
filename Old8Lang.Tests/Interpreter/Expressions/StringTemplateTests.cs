@@ -336,10 +336,10 @@ public class StringTemplateTests
     public void StringTemplate_WithQuotes_HandlesCorrectly()
     {
         // Arrange
-        var code = @"
-            message <- ""Hello, World!""
-            result <- $""She said: {message}""
-        ";
+        var code = """
+                   message <- "Hello, World!"
+                   result <- $"She said: {message}"
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -350,7 +350,7 @@ public class StringTemplateTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
-        Assert.Equal("She said: \"Hello, World!\"", ((StringLangValue)result).Value);
+        Assert.Equal("She said: Hello, World!", ((StringLangValue)result).Value);
     }
 
     [Fact]

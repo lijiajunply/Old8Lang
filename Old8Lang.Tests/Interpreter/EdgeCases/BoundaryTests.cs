@@ -829,11 +829,11 @@ public class BoundaryTests
         var result5 = interpreter.Manager.GetValue(new LangId("result5"));
         var result6 = interpreter.Manager.GetValue(new LangId("result6"));
 
-        Assert.Equal(true, ((BoolLangValue)result1).Value);
-        Assert.Equal(false, ((BoolLangValue)result2).Value);
-        Assert.Equal(false, ((BoolLangValue)result3).Value);
-        Assert.Equal(true, ((BoolLangValue)result4).Value);
-        Assert.Equal(false, ((BoolLangValue)result5).Value);
-        Assert.Equal(true, ((BoolLangValue)result6).Value);
+        Assert.True(((BoolLangValue)result1).Value);
+        Assert.False(((BoolLangValue)result2).Value);
+        Assert.False(((BoolLangValue)result3).Value);
+        Assert.True(((BoolLangValue)result4).Value);
+        Assert.False(((BoolLangValue)result5).Value);
+        Assert.True(((BoolLangValue)result6).Value);
     }
 }

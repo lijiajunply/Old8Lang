@@ -216,7 +216,7 @@ public class EmptyInputTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
-        Assert.Equal(true, ((BoolLangValue)result).Value);
+        Assert.True(((BoolLangValue)result).Value);
     }
 
     [Fact]
@@ -243,7 +243,7 @@ public class EmptyInputTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
-        Assert.Equal(true, ((BoolLangValue)result).Value);
+        Assert.True(((BoolLangValue)result).Value);
     }
 
     [Fact]
@@ -660,7 +660,7 @@ public class EmptyInputTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
-        Assert.Equal(true, ((BoolLangValue)result).Value);
+        Assert.True(((BoolLangValue)result).Value);
     }
 
     [Fact]

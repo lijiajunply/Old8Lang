@@ -114,7 +114,7 @@ public class DictionaryTests
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(true, ((BoolLangValue)result2).Value);
+        Assert.True(((BoolLangValue)result2).Value);
 
         Assert.NotNull(result3);
         Assert.IsType<IntLangValue>(result3);
@@ -145,15 +145,15 @@ public class DictionaryTests
 
         Assert.NotNull(result1);
         Assert.IsType<BoolLangValue>(result1);
-        Assert.Equal(true, ((BoolLangValue)result1).Value);
+        Assert.True(((BoolLangValue)result1).Value);
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(true, ((BoolLangValue)result2).Value);
+        Assert.True(((BoolLangValue)result2).Value);
 
         Assert.NotNull(result3);
         Assert.IsType<BoolLangValue>(result3);
-        Assert.Equal(false, ((BoolLangValue)result3).Value);
+        Assert.False(((BoolLangValue)result3).Value);
     }
 
     [Fact]
@@ -183,11 +183,11 @@ public class DictionaryTests
 
         Assert.NotNull(result1);
         Assert.IsType<BoolLangValue>(result1);
-        Assert.Equal(true, ((BoolLangValue)result1).Value);
+        Assert.True(((BoolLangValue)result1).Value);
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(false, ((BoolLangValue)result2).Value);
+        Assert.False(((BoolLangValue)result2).Value);
 
         Assert.NotNull(result3);
         Assert.IsType<IntLangValue>(result3);
@@ -195,7 +195,7 @@ public class DictionaryTests
 
         Assert.NotNull(result4);
         Assert.IsType<BoolLangValue>(result4);
-        Assert.Equal(false, ((BoolLangValue)result4).Value);
+        Assert.False(((BoolLangValue)result4).Value);
     }
 
     [Fact]
@@ -224,7 +224,7 @@ public class DictionaryTests
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(false, ((BoolLangValue)result2).Value);
+        Assert.False(((BoolLangValue)result2).Value);
     }
 
     [Fact]
@@ -255,11 +255,11 @@ public class DictionaryTests
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(true, ((BoolLangValue)result2).Value);
+        Assert.True(((BoolLangValue)result2).Value);
 
         Assert.NotNull(result3);
         Assert.IsType<BoolLangValue>(result3);
-        Assert.Equal(false, ((BoolLangValue)result3).Value);
+        Assert.False(((BoolLangValue)result3).Value);
     }
 
     [Fact]
@@ -290,11 +290,11 @@ public class DictionaryTests
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(true, ((BoolLangValue)result2).Value);
+        Assert.True(((BoolLangValue)result2).Value);
 
         Assert.NotNull(result3);
         Assert.IsType<BoolLangValue>(result3);
-        Assert.Equal(false, ((BoolLangValue)result3).Value);
+        Assert.False(((BoolLangValue)result3).Value);
     }
 
     [Fact]
@@ -330,7 +330,7 @@ public class DictionaryTests
 
         Assert.NotNull(value3);
         Assert.IsType<BoolLangValue>(value3);
-        Assert.Equal(false, ((BoolLangValue)value3).Value);
+        Assert.False(((BoolLangValue)value3).Value);
 
         Assert.NotNull(value4);
         Assert.IsType<StringLangValue>(value4);
@@ -487,11 +487,11 @@ public class DictionaryTests
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(true, ((BoolLangValue)result2).Value);
+        Assert.True(((BoolLangValue)result2).Value);
 
         Assert.NotNull(result3);
         Assert.IsType<BoolLangValue>(result3);
-        Assert.Equal(false, ((BoolLangValue)result3).Value);
+        Assert.False(((BoolLangValue)result3).Value);
 
         Assert.NotNull(result4);
         Assert.IsType<IntLangValue>(result4);
@@ -499,7 +499,7 @@ public class DictionaryTests
 
         Assert.NotNull(result5);
         Assert.IsType<BoolLangValue>(result5);
-        Assert.Equal(true, ((BoolLangValue)result5).Value);
+        Assert.True(((BoolLangValue)result5).Value);
     }
 
     [Fact]
@@ -566,19 +566,19 @@ public class DictionaryTests
 
         Assert.NotNull(result1);
         Assert.IsType<BoolLangValue>(result1);
-        Assert.Equal(true, ((BoolLangValue)result1).Value);
+        Assert.True(((BoolLangValue)result1).Value);
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(false, ((BoolLangValue)result2).Value);
+        Assert.False(((BoolLangValue)result2).Value);
 
         Assert.NotNull(result3);
         Assert.IsType<BoolLangValue>(result3);
-        Assert.Equal(false, ((BoolLangValue)result3).Value);
+        Assert.False(((BoolLangValue)result3).Value);
 
         Assert.NotNull(result4);
         Assert.IsType<BoolLangValue>(result4);
-        Assert.Equal(true, ((BoolLangValue)result4).Value);
+        Assert.True(((BoolLangValue)result4).Value);
     }
 
     [Fact]
@@ -626,15 +626,15 @@ public class DictionaryTests
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(true, ((BoolLangValue)result2).Value);
+        Assert.True(((BoolLangValue)result2).Value);
 
         Assert.NotNull(result3);
         Assert.IsType<BoolLangValue>(result3);
-        Assert.Equal(true, ((BoolLangValue)result3).Value);
+        Assert.True(((BoolLangValue)result3).Value);
 
         Assert.NotNull(result4);
         Assert.IsType<BoolLangValue>(result4);
-        Assert.Equal(false, ((BoolLangValue)result4).Value);
+        Assert.False(((BoolLangValue)result4).Value);
     }
 
     [Fact]
@@ -784,10 +784,10 @@ public class DictionaryTests
 
         Assert.NotNull(result5);
         Assert.IsType<BoolLangValue>(result5);
-        Assert.Equal(false, ((BoolLangValue)result5).Value);
+        Assert.False(((BoolLangValue)result5).Value);
 
         Assert.NotNull(result6);
         Assert.IsType<BoolLangValue>(result6);
-        Assert.Equal(true, ((BoolLangValue)result6).Value);
+        Assert.True(((BoolLangValue)result6).Value);
     }
 }

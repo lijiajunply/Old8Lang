@@ -14,11 +14,16 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <param name="position"></param>
 /// <param name="includeStart">是否包含起始值</param>
 /// <param name="includeEnd">是否包含结束值</param>
-public class RangeLangValue(LangExpression? start, LangExpression? end, SourcePosition position = default, bool includeStart = true, bool includeEnd = true) : LangValueType(position)
+public class RangeLangValue(
+    LangExpression? start,
+    LangExpression? end,
+    SourcePosition position = default,
+    bool includeStart = true,
+    bool includeEnd = true) : LangValueType(position)
 {
     public bool IncludeStart { get; } = includeStart;
     public bool IncludeEnd { get; } = includeEnd;
-    
+
     public override LangValueType Run(VariateManager manager)
     {
         var results = new List<LangValueType>();
@@ -41,10 +46,19 @@ public class RangeLangValue(LangExpression? start, LangExpression? end, SourcePo
 
         // 检查范围是否有效
         if (startNum > endNum)
-            return new ArrayLangValue(new List<LangValueType>()); // 返回空数组
-
-        for (var i = startNum; i <= endNum; i++)
-            results.Add(new IntLangValue(i));
+        {
+            for (var i = startNum; i >= endNum; i--)
+            {
+                results.Add(new IntLangValue(i));
+            }
+        }
+        else
+        {
+            for (var i = startNum; i <= endNum; i++)
+            {
+                results.Add(new IntLangValue(i));
+            }
+        }
 
         return new ArrayLangValue(results);
     }

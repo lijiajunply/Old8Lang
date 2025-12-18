@@ -282,11 +282,11 @@ public class ClassInstantiationTests
 
         Assert.NotNull(error1);
         Assert.IsType<BoolLangValue>(error1);
-        Assert.Equal(false, ((BoolLangValue)error1).Value);
+        Assert.False(((BoolLangValue)error1).Value);
 
         Assert.NotNull(error2);
         Assert.IsType<BoolLangValue>(error2);
-        Assert.Equal(true, ((BoolLangValue)error2).Value);
+        Assert.True(((BoolLangValue)error2).Value);
 
         Assert.NotNull(msg1);
         Assert.IsType<StringLangValue>(msg1);
@@ -342,11 +342,11 @@ public class ClassInstantiationTests
 
         Assert.NotNull(connected1);
         Assert.IsType<BoolLangValue>(connected1);
-        Assert.Equal(false, ((BoolLangValue)connected1).Value);
+        Assert.False(((BoolLangValue)connected1).Value);
 
         Assert.NotNull(connected2);
         Assert.IsType<BoolLangValue>(connected2);
-        Assert.Equal(true, ((BoolLangValue)connected2).Value);
+        Assert.True(((BoolLangValue)connected2).Value);
 
         Assert.NotNull(connections);
         Assert.IsType<IntLangValue>(connections);
@@ -465,11 +465,11 @@ public class ClassInstantiationTests
 
         Assert.NotNull(valid1);
         Assert.IsType<BoolLangValue>(valid1);
-        Assert.Equal(true, ((BoolLangValue)valid1).Value);
+        Assert.True(((BoolLangValue)valid1).Value);
 
         Assert.NotNull(valid2);
         Assert.IsType<BoolLangValue>(valid2);
-        Assert.Equal(false, ((BoolLangValue)valid2).Value);
+        Assert.False(((BoolLangValue)valid2).Value);
 
         Assert.NotNull(bal1);
         Assert.IsType<DoubleLangValue>(bal1);
@@ -577,7 +577,7 @@ public class ClassInstantiationTests
 
         Assert.NotNull(isNull);
         Assert.IsType<BoolLangValue>(isNull);
-        Assert.Equal(true, ((BoolLangValue)isNull).Value);
+        Assert.True(((BoolLangValue)isNull).Value);
     }
 
     [Fact]

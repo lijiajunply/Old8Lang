@@ -110,7 +110,7 @@ public class LogicalTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
-        Assert.Equal(false, ((BoolLangValue)result).Value);
+        Assert.False(((BoolLangValue)result).Value);
     }
 
     [Fact]
@@ -128,7 +128,7 @@ public class LogicalTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
-        Assert.Equal(true, ((BoolLangValue)result).Value);
+        Assert.True(((BoolLangValue)result).Value);
     }
 
     [Fact]
@@ -147,7 +147,7 @@ public class LogicalTests
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
         // (true and false) or (true and true) = false or true = true
-        Assert.Equal(true, ((BoolLangValue)result).Value);
+        Assert.True(((BoolLangValue)result).Value);
     }
 
     [Fact]
@@ -166,7 +166,7 @@ public class LogicalTests
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
         // true and (false or true) and false = true and true and false = false
-        Assert.Equal(false, ((BoolLangValue)result).Value);
+        Assert.False(((BoolLangValue)result).Value);
     }
 
     [Fact]
@@ -198,10 +198,10 @@ public class LogicalTests
         Assert.NotNull(result2);
         Assert.NotNull(result3);
         Assert.NotNull(result4);
-        Assert.Equal(false, result1.Value); // true and false = false
-        Assert.Equal(true, result2.Value);  // true or true = true
-        Assert.Equal(true, result3.Value);  // true xor false = true
-        Assert.Equal(false, result4.Value); // not true = false
+        Assert.False(result1.Value); // true and false = false
+        Assert.True(result2.Value);  // true or true = true
+        Assert.True(result3.Value);  // true xor false = true
+        Assert.False(result4.Value); // not true = false
     }
 
     [Fact]
@@ -262,8 +262,8 @@ public class LogicalTests
 
         Assert.NotNull(result1);
         Assert.NotNull(result2);
-        Assert.Equal(true, result1.Value); // isPositive(10) and isEven(10) = true and true = true
-        Assert.Equal(true, result2.Value); // isPositive(10) or isEven(-5) = true or false = true
+        Assert.True(result1.Value); // isPositive(10) and isEven(10) = true and true = true
+        Assert.True(result2.Value); // isPositive(10) or isEven(-5) = true or false = true
     }
 
     [Fact]
@@ -291,7 +291,7 @@ public class LogicalTests
 
         Assert.NotNull(result);
         Assert.NotNull(finalCounter);
-        Assert.Equal(false, result.Value);
+        Assert.False(result.Value);
         // 如果支持短路求值，increment() 不应该被调用
         Assert.Equal(0, finalCounter.Value); // 短路求值
     }
@@ -321,7 +321,7 @@ public class LogicalTests
 
         Assert.NotNull(result);
         Assert.NotNull(finalCounter);
-        Assert.Equal(true, result.Value);
+        Assert.True(result.Value);
         // 如果支持短路求值，increment() 不应该被调用
         Assert.Equal(0, finalCounter.Value); // 短路求值
     }
@@ -415,7 +415,7 @@ public class LogicalTests
         var result = interpreter.Manager.GetValue(new LangId("result")) as BoolLangValue;
         Assert.NotNull(result);
         // (true and true) or (not true) = true or false = true
-        Assert.Equal(true, result.Value);
+        Assert.True(result.Value);
     }
 
     [Fact]
@@ -466,6 +466,6 @@ public class LogicalTests
         // (5 + 10 > 15) and (15 - 10 == 5) or (5 * 10 < 100)
         // (15 > 15) and (5 == 5) or (50 < 100)
         // false and true or true = false or true = true
-        Assert.Equal(true, result.Value);
+        Assert.True(result.Value);
     }
 }

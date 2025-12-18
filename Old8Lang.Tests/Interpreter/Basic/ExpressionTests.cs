@@ -437,7 +437,7 @@ public class ExpressionTests
         Assert.NotNull(result3);
 
         Assert.False(result1.Value); // not true = false
-        Assert.Equal(true, result2.Value);  // not false = true
+        Assert.True(result2.Value);  // not false = true
         Assert.Equal(-8, result3.Value);    // -(5 + 3) = -8
     }
 

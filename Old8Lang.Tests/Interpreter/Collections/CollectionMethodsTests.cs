@@ -235,7 +235,7 @@ public class CollectionMethodsTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
-        Assert.Equal(false, ((BoolLangValue)result).Value);
+        Assert.False(((BoolLangValue)result).Value);
     }
 
     [Fact]

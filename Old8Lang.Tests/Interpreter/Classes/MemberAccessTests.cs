@@ -637,15 +637,15 @@ public class MemberAccessTests
 
         Assert.NotNull(passing1);
         Assert.IsType<BoolLangValue>(passing1);
-        Assert.Equal(true, ((BoolLangValue)passing1).Value);
+        Assert.True(((BoolLangValue)passing1).Value);
 
         Assert.NotNull(passing2);
         Assert.IsType<BoolLangValue>(passing2);
-        Assert.Equal(true, ((BoolLangValue)passing2).Value);
+        Assert.True(((BoolLangValue)passing2).Value);
 
         Assert.NotNull(passing3);
         Assert.IsType<BoolLangValue>(passing3);
-        Assert.Equal(false, ((BoolLangValue)passing3).Value);
+        Assert.False(((BoolLangValue)passing3).Value);
 
         Assert.NotNull(perf1);
         Assert.IsType<StringLangValue>(perf1);
@@ -870,11 +870,11 @@ public class MemberAccessTests
 
         Assert.NotNull(setResult1);
         Assert.IsType<BoolLangValue>(setResult1);
-        Assert.Equal(true, ((BoolLangValue)setResult1).Value);
+        Assert.True(((BoolLangValue)setResult1).Value);
 
         Assert.NotNull(setResult2);
         Assert.IsType<BoolLangValue>(setResult2);
-        Assert.Equal(false, ((BoolLangValue)setResult2).Value);
+        Assert.False(((BoolLangValue)setResult2).Value);
     }
 
     [Fact]
@@ -933,11 +933,11 @@ public class MemberAccessTests
 
         Assert.NotNull(hasName);
         Assert.IsType<BoolLangValue>(hasName);
-        Assert.Equal(true, ((BoolLangValue)hasName).Value);
+        Assert.True(((BoolLangValue)hasName).Value);
 
         Assert.NotNull(hasMissing);
         Assert.IsType<BoolLangValue>(hasMissing);
-        Assert.Equal(false, ((BoolLangValue)hasMissing).Value);
+        Assert.False(((BoolLangValue)hasMissing).Value);
 
         Assert.NotNull(nameValue);
         Assert.IsType<StringLangValue>(nameValue);
@@ -949,6 +949,6 @@ public class MemberAccessTests
 
         Assert.NotNull(isActiveValue);
         Assert.IsType<BoolLangValue>(isActiveValue);
-        Assert.Equal(true, ((BoolLangValue)isActiveValue).Value);
+        Assert.True(((BoolLangValue)isActiveValue).Value);
     }
 }

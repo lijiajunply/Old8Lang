@@ -306,8 +306,8 @@ public class LambdaTests
 
         Assert.NotNull(result1);
         Assert.NotNull(result2);
-        Assert.Equal(true, result1.Value);  // 15 > 10
-        Assert.Equal(false, result2.Value); // 5 > 10
+        Assert.True(result1.Value);  // 15 > 10
+        Assert.False(result2.Value); // 5 > 10
     }
 
     [Fact]
@@ -410,9 +410,9 @@ public class LambdaTests
         Assert.NotNull(result1);
         Assert.NotNull(result2);
         Assert.NotNull(result3);
-        Assert.Equal(false, result1.Value); // true and false = false
-        Assert.Equal(true, result2.Value);  // true or false = true
-        Assert.Equal(false, result3.Value); // not true = false
+        Assert.False(result1.Value); // true and false = false
+        Assert.True(result2.Value);  // true or false = true
+        Assert.False(result3.Value); // not true = false
     }
 
     [Fact]

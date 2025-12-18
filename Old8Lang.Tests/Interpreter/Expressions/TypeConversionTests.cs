@@ -201,19 +201,19 @@ public class TypeConversionTests
 
         Assert.NotNull(result1);
         Assert.IsType<BoolLangValue>(result1);
-        Assert.Equal(true, ((BoolLangValue)result1).Value);
+        Assert.True(((BoolLangValue)result1).Value);
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(false, ((BoolLangValue)result2).Value);
+        Assert.False(((BoolLangValue)result2).Value);
 
         Assert.NotNull(result3);
         Assert.IsType<BoolLangValue>(result3);
-        Assert.Equal(true, ((BoolLangValue)result3).Value);
+        Assert.True(((BoolLangValue)result3).Value);
 
         Assert.NotNull(result4);
         Assert.IsType<BoolLangValue>(result4);
-        Assert.Equal(false, ((BoolLangValue)result4).Value);
+        Assert.False(((BoolLangValue)result4).Value);
     }
 
     [Fact]
@@ -460,19 +460,19 @@ public class TypeConversionTests
 
         Assert.NotNull(result1);
         Assert.IsType<BoolLangValue>(result1);
-        Assert.Equal(false, ((BoolLangValue)result1).Value); // 0 = false
+        Assert.False(((BoolLangValue)result1).Value); // 0 = false
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(true, ((BoolLangValue)result2).Value); // non-zero = true
+        Assert.True(((BoolLangValue)result2).Value); // non-zero = true
 
         Assert.NotNull(result3);
         Assert.IsType<BoolLangValue>(result3);
-        Assert.Equal(true, ((BoolLangValue)result3).Value); // non-zero = true
+        Assert.True(((BoolLangValue)result3).Value); // non-zero = true
 
         Assert.NotNull(result4);
         Assert.IsType<BoolLangValue>(result4);
-        Assert.Equal(true, ((BoolLangValue)result4).Value); // non-zero = true
+        Assert.True(((BoolLangValue)result4).Value); // non-zero = true
     }
 
     [Fact]
@@ -503,19 +503,19 @@ public class TypeConversionTests
 
         Assert.NotNull(result1);
         Assert.IsType<BoolLangValue>(result1);
-        Assert.Equal(false, ((BoolLangValue)result1).Value); // 0.0 = false
+        Assert.False(((BoolLangValue)result1).Value); // 0.0 = false
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(true, ((BoolLangValue)result2).Value); // non-zero = true
+        Assert.True(((BoolLangValue)result2).Value); // non-zero = true
 
         Assert.NotNull(result3);
         Assert.IsType<BoolLangValue>(result3);
-        Assert.Equal(true, ((BoolLangValue)result3).Value); // non-zero = true
+        Assert.True(((BoolLangValue)result3).Value); // non-zero = true
 
         Assert.NotNull(result4);
         Assert.IsType<BoolLangValue>(result4);
-        Assert.Equal(true, ((BoolLangValue)result4).Value); // non-zero = true
+        Assert.True(((BoolLangValue)result4).Value); // non-zero = true
     }
 
     [Fact]
@@ -546,19 +546,19 @@ public class TypeConversionTests
 
         Assert.NotNull(result1);
         Assert.IsType<BoolLangValue>(result1);
-        Assert.Equal(false, ((BoolLangValue)result1).Value); // "0" = false
+        Assert.False(((BoolLangValue)result1).Value); // "0" = false
 
         Assert.NotNull(result2);
         Assert.IsType<BoolLangValue>(result2);
-        Assert.Equal(true, ((BoolLangValue)result2).Value); // "1" = true
+        Assert.True(((BoolLangValue)result2).Value); // "1" = true
 
         Assert.NotNull(result3);
         Assert.IsType<BoolLangValue>(result3);
-        Assert.Equal(true, ((BoolLangValue)result3).Value); // "-1" = true
+        Assert.True(((BoolLangValue)result3).Value); // "-1" = true
 
         Assert.NotNull(result4);
         Assert.IsType<BoolLangValue>(result4);
-        Assert.Equal(true, ((BoolLangValue)result4).Value); // "2" = true
+        Assert.True(((BoolLangValue)result4).Value); // "2" = true
     }
 
     [Fact]
@@ -637,7 +637,7 @@ public class TypeConversionTests
         Assert.Equal(4, list.Values.Count);
         Assert.Equal(1, ((IntLangValue)list.Values[0]).Value);
         Assert.Equal("hello", ((StringLangValue)list.Values[1]).Value);
-        Assert.Equal(true, ((BoolLangValue)list.Values[2]).Value);
+        Assert.True(((BoolLangValue)list.Values[2]).Value);
         Assert.Equal(3.14, ((DoubleLangValue)list.Values[3]).Value);
     }
 

@@ -190,7 +190,7 @@ public class RangeTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(0, ((IntLangValue)result).Value);
+        Assert.Equal(1, ((IntLangValue)result).Value);
     }
 
     [Fact]
@@ -290,7 +290,7 @@ public class RangeTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(12, ((IntLangValue)result).Value); // 2+3+4+5+6 = 20
+        Assert.Equal(20, ((IntLangValue)result).Value); // 2+3+4+5+6 = 20
     }
 
     [Fact]

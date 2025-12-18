@@ -383,13 +383,13 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func throttle(func:func, delayMs:int) -> func {
+            func throttle(inputFunc:func, delayMs:int) -> func {
                 lastExecution <- 0
                 return (x:int) -> {
                     currentTime <- 1000000 // Simulate current time
                     if currentTime - lastExecution >= delayMs {
                         lastExecution <- currentTime
-                        return func(x)
+                        return inputFunc(x)
                     } else {
                         return -1 // Indicates throttled
                     }
