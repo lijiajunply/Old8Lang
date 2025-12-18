@@ -18,35 +18,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.trae/documents/修复NestedException问题.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.trae/documents/修复函数重载检查逻辑.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AwaitTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AwaitTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/ThrowTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/ThrowTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/TryCatchTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/TryCatchTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/ArithmeticTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/ArithmeticTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/StringTemplateTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/StringTemplateTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionOverloadTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionOverloadTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionDeclarationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionDeclarationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/HigherOrderTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/HigherOrderTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/LambdaTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/LambdaTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/ControlFlowTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/ControlFlowTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/JumpStatementsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/JumpStatementsTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/LoopTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/LoopTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ErrorLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ErrorLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeStaticAny.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeStaticAny.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AwaitExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AwaitExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ClassMemberId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ClassMemberId.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/FunctionCallExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/FunctionCallExpression.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ListLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ThreadLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ThreadLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeTemplate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeTemplate.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/TryStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/TryStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/BoolLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/BoolLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,6 +96,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/LangId.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
@@ -456,7 +446,7 @@
       <workItem from="1765776532895" duration="4492000" />
       <workItem from="1765791344254" duration="3118000" />
       <workItem from="1765816155545" duration="30580000" />
-      <workItem from="1766037121468" duration="13339000" />
+      <workItem from="1766037121468" duration="14500000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -801,7 +791,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="255" />
+    <option name="localTasksCounter" value="256" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -828,7 +818,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(parser): 更新抽象类测试用例以验证语法错误&#10;&#10;- 修改所有抽象类相关测试用例，验证解析器能正确抛出语法错误&#10;- 移除不再支持的abstract关键字相关测试代码&#10;- 简化测试断言逻辑，统一使用Assert.ThrowsAny&lt;SyntaxError&gt;&#10;- 更新接口与抽象类交互测试中的语法关键字&#10;- 优化多行字符串字面量的格式化方式&#10;- 修正线程测试中的断言参数顺序问题&#10;- 移除对异常消息内容的具体验证&#10;- 更新IDEA项目配置文件中的变更记录" />
     <MESSAGE value="feat(parser): 支持抽象类和抽象方法语法&#10;&#10;- 在 LangTokenType 中添加 Abstract 关键字类型&#10;- 扩展 ClassMemberId 枚举以支持 Abstract 修饰符&#10;- 更新 ClassParser 以识别和解析 abstract 类和方法&#10;- 实现抽象方法声明的解析逻辑，确保无方法体&#10;- 修改 TypeTemplate 以存储和显示抽象类信息&#10;- 更新测试用例以验证抽象类和方法的解析&#10;- 添加新的测试文件 test_abstract.old8 和 test_abstract2.old8&#10;- 调整 StatementParser 以处理 abstract 类声明&#10;- 修正接口与抽象类交互测试中的继承关键字为 extends" />
     <MESSAGE value="132" />
     <MESSAGE value="fix(parser): 改进注释过滤器以正确处理字符串中的注释符号&#10;&#10;- 修复字符串字面量内 // 和 /* */ 被误识别为注释的问题&#10;- 添加双引号和单引号字符串状态跟踪&#10;- 实现转义字符处理逻辑，防止 \\&quot; 干扰字符串边界检测&#10;- 确保只有在字符串外部才进行注释识别和过滤&#10;- 更新测试用例，简化异步通道测试逻辑以提高稳定性&#10;- 调整词法分析器文档注释，明确说明字符串内注释符号的处理方式" />
@@ -853,7 +842,8 @@
     <MESSAGE value="feat(lang): 实现扩展范围表达式和错误传播机制&#10;&#10;- 新增扩展范围表达式语法支持：[start~&lt;end]、[start&gt;~end]、[start&gt;~&lt;end]&#10;- 实现排除边界范围的解析和执行逻辑&#10;- 添加范围表达式的ToString显示优化，使用括号表示包含/排除状态&#10;- 完善错误传播机制，支持跨作用域和函数调用链的错误传递&#10;- 增强类型检查和运行时错误处理能力&#10;- 更新导入模块测试用例，从内联代码改为文件读取方式&#10;- 修复布尔值比较的大小写问题，统一使用小写true/false&#10;- 优化循环和条件语句中的范围表达式使用&#10;- 添加完整的扩展范围表达式单元测试覆盖&#10;- 改进错误处理测试，增加多种错误场景验证" />
     <MESSAGE value="123" />
     <MESSAGE value="feat(lang): 统一使用 len() 函数获取长度&#10;&#10;- 将所有 Length 属性访问替换为 len() 函数调用&#10;- 更新数组、列表、字符串、元组等类型的长度获取方式&#10;- 修正类成员访问和集合操作中的长度计算逻辑&#10;- 修复控制流和函数调用中的边界条件检查&#10;- 调整测试用例以适应新的长度获取语法" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 统一使用 len() 函数获取长度&#10;&#10;- 将所有 Length 属性访问替换为 len() 函数调用&#10;- 更新数组、列表、字符串、元组等类型的长度获取方式&#10;- 修正类成员访问和集合操作中的长度计算逻辑&#10;- 修复控制流和函数调用中的边界条件检查&#10;- 调整测试用例以适应新的长度获取语法" />
+    <MESSAGE value="feat(interpreter): 支持函数重载和类型检查&#10;&#10;- 修改 Dot 方法签名，添加 VariateManager 参数以支持运行时类型检查&#10;- 更新 ArrayLangValue、DictionaryLangValue、ListLangValue 等类型的 Dot 实现&#10;- 改进 FuncInit 函数定义检查逻辑，增加参数类型和返回类型匹配&#10;- 完善 Instance 类中的函数重载解析机制，支持基于参数类型的精确匹配&#10;- 修复 ControlFlowTests 和 JumpStatementsTests 中的循环语法错误&#10;- 更新 FunctionCallTests 和 FunctionOverloadTests 中的函数声明语法&#10;- 增强 TryStatement 对 return 语句的处理能力&#10;- 移除 PrimaryParser 中对 await 表达式的冗余处理&#10;- 优化 ThreadClassLangValue 和 TaskClassLangValue 的参数执行逻辑&#10;- 补充 VariateManager.GetFunc 方法注释，明确其仅匹配函数名和参数数量" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(interpreter): 支持函数重载和类型检查&#10;&#10;- 修改 Dot 方法签名，添加 VariateManager 参数以支持运行时类型检查&#10;- 更新 ArrayLangValue、DictionaryLangValue、ListLangValue 等类型的 Dot 实现&#10;- 改进 FuncInit 函数定义检查逻辑，增加参数类型和返回类型匹配&#10;- 完善 Instance 类中的函数重载解析机制，支持基于参数类型的精确匹配&#10;- 修复 ControlFlowTests 和 JumpStatementsTests 中的循环语法错误&#10;- 更新 FunctionCallTests 和 FunctionOverloadTests 中的函数声明语法&#10;- 增强 TryStatement 对 return 语句的处理能力&#10;- 移除 PrimaryParser 中对 await 表达式的冗余处理&#10;- 优化 ThreadClassLangValue 和 TaskClassLangValue 的参数执行逻辑&#10;- 补充 VariateManager.GetFunc 方法注释，明确其仅匹配函数名和参数数量" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1055,13 +1045,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs</url>
-          <line>277</line>
+          <line>276</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs" containingFunctionPresentation="方法 'FunctionCall_WithDictionaryParameters_PassesDictionariesCorrectly'">
             <startOffsets>
-              <option value="8347" />
+              <option value="8239" />
             </startOffsets>
             <endOffsets>
-              <option value="8371" />
+              <option value="8263" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="580" />

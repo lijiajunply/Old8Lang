@@ -19,7 +19,6 @@ public enum AccessModifierType
 /// </summary>
 public class ClassMemberId : LangId
 {
-    
     /// <summary>
     /// 互斥的修饰符组
     /// </summary>
@@ -108,7 +107,7 @@ public class ClassMemberId : LangId
     {
         var newModifiers = new HashSet<AccessModifierType>(Modifiers) { modifier };
         // 检查互斥修饰符
-        if (MutuallyExclusiveModifiers.Select(exclusiveGroup => newModifiers.Count(m => exclusiveGroup.Contains(m)))
+        if (MutuallyExclusiveModifiers.Select(exclusiveGroup => newModifiers.Count(exclusiveGroup.Contains))
             .Any(count => count > 1))
         {
             throw new SyntaxError(Position, $"修饰符 {modifier} 与已有的修饰符互斥");

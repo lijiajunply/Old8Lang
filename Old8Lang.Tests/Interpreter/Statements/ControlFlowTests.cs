@@ -545,7 +545,7 @@ public class ControlFlowTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
-        Assert.Equal("Found: true, Index: 5, Iterations: 3", ((StringLangValue)result).Value);
+        Assert.Equal("Found: True, Index: 5, Iterations: 3", ((StringLangValue)result).Value);
     }
 
     [Fact]

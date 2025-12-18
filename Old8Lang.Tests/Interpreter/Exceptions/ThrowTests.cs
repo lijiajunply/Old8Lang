@@ -105,7 +105,7 @@ public class ThrowTests
         var result = interpreter.Manager.GetValue(new LangId("status"));
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
-        Assert.Equal("Status: True", ((StringLangValue)result).Value);
+        Assert.Equal("Status: true", ((StringLangValue)result).Value);
     }
 
     [Fact]
@@ -180,13 +180,13 @@ public class ThrowTests
         // 字符串拼接应该产生 StringLangValue
         if (result is ErrorLangValue errorValue)
         {
-            Assert.Equal("Exception is null: False", errorValue.FriendlyMessage);
+            Assert.Equal("Exception is null: false", errorValue.FriendlyMessage);
         }
         else
         {
             var stringResult = result as StringLangValue;
             Assert.NotNull(stringResult);
-            Assert.Equal("Exception is null: False", stringResult.Value);
+            Assert.Equal("Exception is null: false", stringResult.Value);
         }
     }
 

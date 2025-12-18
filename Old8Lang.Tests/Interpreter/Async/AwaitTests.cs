@@ -206,7 +206,7 @@ public class AwaitTests
                 return ""item "" + item.ToStr() + "" processed""
             }
             results <- {""""}
-            for i in 1..3 {
+            for i in [1~3] {
                 result <- await processItem(i)
                 results.Add(result)
             }
@@ -235,7 +235,7 @@ public class AwaitTests
                 return index * 2
             }
             items <- [0, 0, 0]
-            for i in 0..2 {
+            for i in [0~2] {
                 items[i] <- await fetchItem(i)
             }
             result <- items

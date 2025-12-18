@@ -40,7 +40,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func calculate(numbers:list, transformer:func) -> {
+            func calculate(numbers:list, transformer:func) -> list {
                 results <- {}
                 for num in numbers {
                     transformed <- transformer(num)
@@ -106,7 +106,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func map(collection:list, mapper:func) -> {
+            func map(collection:list, mapper:func) -> list {
                 result <- {}
                 for item in collection {
                     mappedItem <- mapper(item)
@@ -486,7 +486,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func zip(list1:list, list2:list, combiner:func) -> {
+            func zip(list1:list, list2:list, combiner:func) -> list {
                 result <- {}
                 minLength <- if len(list1) < len(list2) then len(list1) else len(list2)
                 for i in 0..minLength-1 {
@@ -593,7 +593,7 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func groupBy(collection:list, keySelector:func) -> {
+            func groupBy(collection:list, keySelector:func) -> dict {
                 groups <- {}
                 for item in collection {
                     key <- keySelector(item)

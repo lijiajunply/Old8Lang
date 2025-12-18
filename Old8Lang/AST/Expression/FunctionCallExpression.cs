@@ -28,7 +28,8 @@ public class FunctionCallExpression : LangExpression
     /// <param name="functionExpression">要调用的函数表达式</param>
     /// <param name="arguments">函数调用参数列表</param>
     /// <param name="position">位置信息</param>
-    public FunctionCallExpression(LangExpression functionExpression, List<LangExpression> arguments, SourcePosition position = default)
+    public FunctionCallExpression(LangExpression functionExpression, List<LangExpression> arguments,
+        SourcePosition position = default)
         : base(position)
     {
         FunctionExpression = functionExpression;
@@ -56,7 +57,7 @@ public class FunctionCallExpression : LangExpression
         return $"{FunctionExpression}({argsStr})";
     }
 
-    public override Type? OutputType(LocalManager local)
+    public override Type OutputType(LocalManager local)
     {
         // 编译器模式下的类型推断
         // 由于函数表达式可能很复杂，暂时返回 object 类型

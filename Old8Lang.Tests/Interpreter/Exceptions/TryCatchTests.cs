@@ -417,7 +417,7 @@ public class TryCatchTests
 
         if (boolResult is ErrorLangValue boolError)
         {
-            Assert.Equal("True", boolError.FriendlyMessage);
+            Assert.Equal("true", boolError.FriendlyMessage);
         }
         else
         {

@@ -266,7 +266,7 @@ public class FunctionDeclarationTests
 
         Assert.NotNull(result1);
         Assert.NotNull(result2);
-        Assert.Equal(10, result1.Value); // complexCalculation(5, 20): 10 > 30? false, return 30 - 10 = 20
+        Assert.Equal(20, result1.Value); // complexCalculation(5, 20): 10 > 30? false, return 30 - 10 = 20
         Assert.Equal(10, result2.Value); // complexCalculation(15, 10): 30 > 20? true, return 30 - 20 = 10
     }
 

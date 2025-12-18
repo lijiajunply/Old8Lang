@@ -86,7 +86,7 @@ public class LangId(
             {
                 throw new NameError(this, "this");
             }
-            
+
             var thisValue = manager.GetValue(new LangId("this"));
             if (thisValue != null)
             {
@@ -98,7 +98,7 @@ public class LangId(
         }
 
         // 先尝试获取普通变量
-        if (manager != null)
+        if (manager != null!)
         {
             var value = manager.GetValue(this);
             if (value != null)

@@ -24,7 +24,7 @@ public class SetStatement : OldStatement
     /// <summary>
     /// 左侧表达式（用于成员访问或索引访问赋值）
     /// </summary>
-    public readonly LangExpression? LeftExpression;
+    private readonly LangExpression? LeftExpression;
 
     /// <summary>
     /// 赋值表达式
@@ -100,11 +100,19 @@ public class SetStatement : OldStatement
                 { "bool", ["bool"] },
                 { "char", ["char"] },
                 { "array", ["array"] },
-                { "dictionary", ["dictionary"] },
+                { "dictionary", ["dictionary", "dict"] },
                 { "list", ["list"] },
                 { "tuple", ["tuple"] },
                 { "type", ["type"] },
-                { "function", ["function"] }
+                { "function", ["function"] },
+                {
+                    "any",
+                    [
+                        "int", "double", "string", "bool", "char", "array", "dictionary", "list", "tuple", "type",
+                        "function"
+                    ]
+                },
+                { "task", ["task"] }
             };
 
             // 检查基础类型是否匹配
@@ -154,7 +162,7 @@ public class SetStatement : OldStatement
         if (LeftExpression is Operation operation)
         {
             // 处理数组解构赋值：[a, b] <- [1, 2]
-            if (operation.Left is LangId { IdName: "array_destruct" } && operation.Opera == LangTokenType.LeftBracket)
+            if (operation is { Left: LangId { IdName: "array_destruct" }, Opera: LangTokenType.LeftBracket })
             {
                 // 从字符串中解析解构的标识符列表
                 var identifiersStr = operation.Right?.ToString() ??
@@ -208,7 +216,7 @@ public class SetStatement : OldStatement
             }
 
             // 处理对象解构赋值：{name, age} <- person
-            if (operation.Left is LangId { IdName: "object_destruct" } && operation.Opera == LangTokenType.LeftBrace)
+            if (operation is { Left: LangId { IdName: "object_destruct" }, Opera: LangTokenType.LeftBrace })
             {
                 // 从字符串中解析解构的属性列表
                 var propertiesStr = operation.Right?.ToString() ??
@@ -394,13 +402,12 @@ public class SetStatement : OldStatement
                 }
 
                 // 处理对象解构赋值: {name, age} <- person
-                if (operation.Left is LangId { IdName: "object_destruct" } &&
-                    operation.Opera == LangTokenType.LeftBrace)
+                if (operation is { Left: LangId { IdName: "object_destruct" }, Opera: LangTokenType.LeftBrace })
                 {
                     // 解析解构的属性列表
                     var propertiesStr = operation.Right?.ToString() ??
                                         throw new InvalidOperationError(this, "对象解构赋值需要有效的属性列表");
-                    var propStrs = propertiesStr.Split(',');
+                    var propStrings = propertiesStr.Split(',');
 
                     // 生成右侧对象值的IL
                     Value.LoadIlValue(ilGenerator, local);
@@ -410,7 +417,7 @@ public class SetStatement : OldStatement
                     ilGenerator.Emit(OpCodes.Stloc, objLocal);
 
                     // 遍历属性列表，生成解构赋值IL
-                    foreach (var propStr in propStrs)
+                    foreach (var propStr in propStrings)
                     {
                         var propStrTrimmed = propStr.Trim();
                         string propName, aliasName;
@@ -454,7 +461,7 @@ public class SetStatement : OldStatement
                 }
 
                 // 处理成员访问或索引访问赋值: left.right <- value 或 left[right] <- value
-                if (operation.Opera == LangTokenType.Dot && operation.Right is LangId memberId)
+                if (operation is { Opera: LangTokenType.Dot, Right: LangId memberId })
                 {
                     // 成员访问赋值: left.right <- value
 
@@ -464,10 +471,8 @@ public class SetStatement : OldStatement
                         // 加载 this（参数0）
                         ilGenerator.Emit(OpCodes.Ldarg_0);
 
-                        FieldInfo? fieldInfo = null;
-
                         // 从 FieldVar 中获取字段信息
-                        if (local.FieldVar.TryGetValue(memberId.IdName, out fieldInfo))
+                        if (local.FieldVar.TryGetValue(memberId.IdName, out var fieldInfo))
                         {
                             // 找到了字段
                         }

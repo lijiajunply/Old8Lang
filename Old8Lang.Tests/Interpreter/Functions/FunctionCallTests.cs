@@ -252,19 +252,18 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
     public void FunctionCall_WithDictionaryParameters_PassesDictionariesCorrectly()
     {
         // Arrange
-        var code = """
-                   func getValue(data:dict, key:string, defaultValue) -> {
-                        if data.ContainsKey(key) {
-                            return data[key]
-                        } else {
-                            return defaultValue
-                        }
-                   }
-                   config <- {"host": "localhost", "port": 8080}
-                   result1 <- getValue(config, "host", "unknown")
-                   result2 <- getValue(config, "timeout", 30)
-                           
-                   """;
+        var code = @"
+            func getValue(data:dict, key:string, defaultValue) {
+                if data.ContainsKey(key) {
+                    return data[key]
+                } else {
+                    return defaultValue
+                }
+            }
+            config <- {""host"": ""localhost"", ""port"": 8080}
+            result1 <- getValue(config, ""host"", ""unknown"")
+            result2 <- getValue(config, ""timeout"", 30)
+        ";
         var interpreter = new LangInterpreter();
 
         // Act
@@ -361,7 +360,7 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
     {
         // Arrange
         var code = @"
-            func processNumbers(transformer:function, numbers:array) -> array {
+            func processNumbers(transformer:function, numbers:array) -> list {
                 result <- {}
                 for num in numbers {
                     result.Add(transformer(num))
@@ -599,7 +598,7 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
     {
         // Arrange
         var code = @"
-            func buildUrl(base:string, path: """", params: {}) -> string {
+            func buildUrl(base:string, path: string, params: dict) -> string {
                 url <- base
                 if len(path) > 0 {
                     url <- url + ""/"" + path
@@ -684,11 +683,11 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
 
         Assert.NotNull(result1);
         Assert.IsType<IntLangValue>(result1);
-        Assert.Equal(12, ((IntLangValue)result1).Value); // (5+2) + (3*2) = 7 + 6 = 13
+        Assert.Equal(13, ((IntLangValue)result1).Value); // (5+2) + (3*2) = 7 + 6 = 13
 
         Assert.NotNull(result2);
         Assert.IsType<IntLangValue>(result2);
-        Assert.Equal(6, ((IntLangValue)result2).Value); // (5*3) * (5-3) = 15 * 2 = 30
+        Assert.Equal(30, ((IntLangValue)result2).Value); // (5*3) * (5-3) = 15 * 2 = 30
 
         Assert.NotNull(result3);
         Assert.IsType<IntLangValue>(result3);

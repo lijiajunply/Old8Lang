@@ -194,7 +194,7 @@ public class ArithmeticTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.Equal(expected, ((DoubleLangValue)result).Value);
+        Assert.Equal(expected, ((IntLangValue)result).Value);
     }
 
     [Fact]
@@ -211,7 +211,7 @@ public class ArithmeticTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.Equal(11.0, ((DoubleLangValue)result).Value);
+        Assert.Equal(11, ((IntLangValue)result).Value);
     }
 
     [Fact]
@@ -228,7 +228,7 @@ public class ArithmeticTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.Equal(5.0, ((DoubleLangValue)result).Value);
+        Assert.Equal(5, ((IntLangValue)result).Value);
     }
 
     [Fact]
@@ -321,7 +321,7 @@ public class ArithmeticTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.Equal(7.0, ((DoubleLangValue)result).Value);
+        Assert.Equal(7, ((IntLangValue)result).Value);
     }
 
     [Fact]
@@ -347,7 +347,7 @@ public class ArithmeticTests
         Assert.NotNull(c);
         Assert.NotNull(d);
         Assert.Equal(50, ((IntLangValue)c).Value); // 10 + 20 * 2 = 50
-        Assert.Equal(15.0, ((DoubleLangValue)d).Value); // (10 + 20) / 2 = 15
+        Assert.Equal(15, ((IntLangValue)d).Value); // (10 + 20) / 2 = 15
     }
 
     [Theory]

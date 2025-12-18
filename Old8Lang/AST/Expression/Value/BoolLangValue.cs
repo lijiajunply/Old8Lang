@@ -14,7 +14,7 @@ namespace Old8Lang.AST.Expression.Value;
 public class BoolLangValue(bool value = false, SourcePosition position = default) : LangValueType(position), IPoolable
 {
     public bool Value = value;
-    public override string ToString() => Value.ToString();
+    public override string ToString() => Value ? "true" : "false";
     public override LangValueType Run(VariateManager manager) => this;
 
     public override bool Equal(LangValueType? otherValueType)

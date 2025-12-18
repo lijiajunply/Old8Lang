@@ -101,7 +101,7 @@ public class LambdaTests
     {
         // Arrange
         var code = @"
-            multiply <- (x:int, y:int) -> int => x * y
+            multiply <- (x:int, y:int):int -> { return x * y }
             result <- multiply(6, 7)
         ";
         var interpreter = new LangInterpreter();
@@ -236,11 +236,11 @@ public class LambdaTests
             numbers <- [1, 2, 3, 4, 5]
             sum <- 0
             forEach <- (arr, action) -> {
-                for i <- 0, i < 5, i++ {
+                for i <- 0, i < len(arr), i++ {
                     action(arr[i])
                 }
             }
-            addToSum <- (x) ->  sum + x
+            addToSum <- (x) -> { sum <- sum + x }
             forEach(numbers, addToSum)
             result <- sum
         ";
@@ -262,8 +262,13 @@ public class LambdaTests
     {
         // Arrange
         var code = @"
-            factorial <- null
-            factorial <- (n) ->  n <= 1 ? 1 : n * factorial(n - 1)
+            func factorial(n) {
+                if n <= 1 {
+                    return 1
+                } else {
+                    return n * factorial(n - 1)
+                }
+            }
             result <- factorial(5)
         ";
         var interpreter = new LangInterpreter();
