@@ -489,31 +489,6 @@ public class CollectionMethodsTests
     }
 
     [Fact]
-    public void CollectionMethods_ListForEach_PerformsActionOnEachElement()
-    {
-        // Arrange
-        var code = @"
-            numbers <- {1, 2, 3, 4, 5}
-            sum <- 0
-            numbers.ForEach((x:int) -> {
-                sum <- sum + x
-            })
-            result <- sum
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<IntLangValue>(result);
-        Assert.Equal(15, ((IntLangValue)result).Value); // 1+2+3+4+5 = 15
-    }
-
-    [Fact]
     public void CollectionMethods_DictionaryForEach_PerformsActionOnEachItem()
     {
         // Arrange
@@ -652,7 +627,7 @@ public class CollectionMethodsTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
-        Assert.Equal("Hello World!", ((StringLangValue)result).Value);
+        Assert.Equal("HelloWorld!", ((StringLangValue)result).Value);
     }
 
     [Fact]

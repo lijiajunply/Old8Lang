@@ -264,7 +264,7 @@ public class BoundaryTests
         // Arrange
         var code = @"
             sum <- 0
-            for i in 0..-1 {
+            for i in [0~<-1] {
                 sum <- sum + i
             }
             result <- sum
@@ -288,7 +288,7 @@ public class BoundaryTests
         // Arrange
         var code = @"
             sum <- 0
-            for i in 1..1 {
+            for i in [1~1] {
                 sum <- sum + i
             }
             result <- sum
@@ -311,7 +311,7 @@ public class BoundaryTests
     {
         // Arrange
         var code = @"
-            emptyRange <- 5..<5
+            emptyRange <- [5~<5]
             count <- 0
             for i in emptyRange {
                 count <- count + 1
@@ -336,7 +336,7 @@ public class BoundaryTests
     {
         // Arrange
         var code = @"
-            singleRange <- 5..5
+            singleRange <- [5~5]
             count <- 0
             sum <- 0
             for i in singleRange {
@@ -758,7 +758,7 @@ public class BoundaryTests
         var code = @"
             items <- {}
             // Add many items to test capacity growth
-            for i in 0..1000 {
+            for i in [0~1000] {
                 items.Add(i)
             }
             result <- len(items)

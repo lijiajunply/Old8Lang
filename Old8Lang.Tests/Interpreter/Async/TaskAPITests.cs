@@ -14,10 +14,10 @@ public class TaskAPITests
     {
         // Arrange
         var code = @"
-            task <- async.Task.Run(() -> {
+            task <- async () -> {
                 return 42
-            })
-            result <- task.Result
+            }
+            result <- await task()
         ";
         var interpreter = new LangInterpreter();
 
@@ -136,7 +136,7 @@ public class TaskAPITests
     {
         // Arrange
         var code = @"
-            originalTask <- async.Task.Run(() -> {
+            originalTask <- async Task.Run(() -> {
                 return 10
             })
             continuationTask <- originalTask.ContinueWith((result) -> {

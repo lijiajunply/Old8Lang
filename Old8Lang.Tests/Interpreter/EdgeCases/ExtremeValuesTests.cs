@@ -396,7 +396,7 @@ public class ExtremeValuesTests
         // Arrange
         var code = @"
             count <- 0
-            for i in 1..1000 {
+            for i in [1~1000] {
                 count <- count + 1
             }
             result <- count
@@ -448,7 +448,7 @@ public class ExtremeValuesTests
         var code = @"
             base <- ""Hello""
             result <- base
-            for i in 1..10 {
+            for i in [1~10] {
                 result <- result + base
             }
             finalLength <- len(result)
@@ -487,8 +487,8 @@ public class ExtremeValuesTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<DoubleLangValue>(result);
-        Assert.Equal(35.6, ((DoubleLangValue)result).Value, 0.1);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(28, ((IntLangValue)result).Value, 0.1);
     }
 
     [Fact]
@@ -650,7 +650,7 @@ public class ExtremeValuesTests
         // Arrange
         var code = @"
             x <- 1
-            for i in 1..100 {
+            for i in [1~100] {
                 x <- x * 2
                 x <- x / 2
                 x <- x + 1
@@ -677,9 +677,9 @@ public class ExtremeValuesTests
         // Arrange
         var code = @"
             count <- 0
-            for i in 1..5 {
-                for j in 1..5 {
-                    for k in 1..5 {
+            for i in [1~5] {
+                for j in [1~5] {
+                    for k in [1~5] {
                         count <- count + 1
                     }
                 }

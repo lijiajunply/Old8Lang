@@ -178,8 +178,8 @@ public class ListTests
         // Arrange
         var code = @"
             items <- {1, 2, 3}
-            items.Push(4)
-            items.Push(5)
+            items.Add(4)
+            items.Add(5)
             result1 <- len(items)
             result2 <- items[3]
             result3 <- items[4]

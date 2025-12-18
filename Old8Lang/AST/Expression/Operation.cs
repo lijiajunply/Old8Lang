@@ -242,6 +242,14 @@ public class Operation(
             }
             else if (dotLeftResult is ArrayLangValue array)
             {
+                // 处理数组方法调用
+                if (Right is Instance instance)
+                {
+                    var ids = instance.Ids.Select(x => x.Run(manager)).OfType<LangExpression>().ToList();
+                    var newInstance = new Instance(instance.Id, ids);
+                    return array.Dot(newInstance, manager);
+                }
+
                 // 处理数组索引访问，需要先运行Right表达式
                 if (Right != null)
                 {
@@ -251,7 +259,8 @@ public class Operation(
                         return array.Get(intValue);
                     }
 
-                    throw new InvalidOperationError(this, $"数组索引必须是整数类型，当前为 '{arrayIndexResult.GetType().Name}'");
+                    // 如果不是整数索引，则作为方法调用处理
+                    return array.Dot(Right, manager);
                 }
             }
             else if (dotLeftResult is TaskClassLangValue taskClassValue)

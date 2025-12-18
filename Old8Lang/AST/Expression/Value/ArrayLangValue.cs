@@ -80,8 +80,14 @@ public class ArrayLangValue : LangValueType, ILangList
         // 如果是Instance，可能是方法调用
         if (dotExpression is Instance instance)
         {
-            // 对于方法调用，使用扩展方法机制
-            return instance.FromClassToResult(this);
+            var methodName = instance.Id.IdName;
+
+            // 检查是否是已知的 Array 方法，如果找到就调用 FromClassToResult
+            var knownMethods = new[] { "Count", "Sort", "Distinct", "Map", "Filter", "Reduce", "Get", "Set", "Length" };
+            if (knownMethods.Contains(methodName))
+            {
+                return instance.FromClassToResult(this);
+            }
         }
 
         // 如果 dotExpression 是一个整数值或可以转换为整数的表达式，则视为索引访问

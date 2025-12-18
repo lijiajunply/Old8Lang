@@ -84,6 +84,15 @@ public static class ListValueFuncStatic
         }
 
         /// <summary>
+        /// 返回列表元素数量
+        /// </summary>
+        /// <returns>包含元素数量的IntLangValue</returns>
+        public IntLangValue Count()
+        {
+            return new IntLangValue(langValue.Values.Count);
+        }
+
+        /// <summary>
         /// 对列表进行排序
         /// </summary>
         /// <returns>排序后的列表（原地排序）</returns>
@@ -105,10 +114,9 @@ public static class ListValueFuncStatic
             {
                 // 创建临时变量管理器
                 var manager = new VariateManager();
-                manager.Set(new LangId("item"), item);
 
                 // 执行谓词函数
-                var result = predicate.Run(manager);
+                var result = predicate.Run(manager, new List<LangExpression> { item });
 
                 // 如果结果为真，则保留该元素
                 if (result is BoolLangValue { Value: true })
@@ -132,10 +140,9 @@ public static class ListValueFuncStatic
             {
                 // 创建临时变量管理器
                 var manager = new VariateManager();
-                manager.Set(new LangId("item"), item);
 
                 // 执行转换函数
-                var result = transform.Run(manager);
+                var result = transform.Run(manager, new List<LangExpression> { item });
                 mapped.Add(result);
             }
 
@@ -155,11 +162,9 @@ public static class ListValueFuncStatic
             {
                 // 创建临时变量管理器
                 var manager = new VariateManager();
-                manager.Set(new LangId("accumulator"), accumulator);
-                manager.Set(new LangId("item"), item);
 
                 // 执行归约函数
-                accumulator = reducer.Run(manager);
+                accumulator = reducer.Run(manager, new List<LangExpression> { accumulator, item });
             }
 
             return accumulator;
@@ -204,15 +209,6 @@ public static class ListValueFuncStatic
         }
 
         /// <summary>
-        /// 获取列表元素数量
-        /// </summary>
-        /// <returns>包含元素数量的IntLangValue</returns>
-        public IntLangValue Count()
-        {
-            return new IntLangValue(langValue.Values.Count);
-        }
-
-        /// <summary>
         /// 连接两个列表，返回包含所有元素的新列表
         /// </summary>
         /// <param name="otherList">要连接的另一个列表</param>
@@ -240,10 +236,27 @@ public static class ListValueFuncStatic
             for (var i = 1; i < langValue.Values.Count; i++)
             {
                 var manager = new VariateManager();
-                manager.Set(new LangId("accumulator"), result);
-                manager.Set(new LangId("item"), langValue.Values[i]);
 
-                result = accumulator.Run(manager);
+                result = accumulator.Run(manager, new List<LangExpression> { result, langValue.Values[i] });
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 对列表元素进行聚合操作，使用指定的初始值
+        /// </summary>
+        /// <param name="accumulator">聚合函数，接受累加器和当前元素，返回新的累加器值</param>
+        /// <param name="seed">聚合的初始值</param>
+        /// <returns>聚合后的结果值</returns>
+        public LangValueType Aggregate(FuncLangValue accumulator, LangValueType seed)
+        {
+            var result = seed;
+            for (var i = 0; i < langValue.Values.Count; i++)
+            {
+                var manager = new VariateManager();
+
+                result = accumulator.Run(manager, new List<LangExpression> { result, langValue.Values[i] });
             }
 
             return result;
@@ -259,9 +272,8 @@ public static class ListValueFuncStatic
             foreach (var item in langValue.Values)
             {
                 var manager = new VariateManager();
-                manager.Set(new LangId("item"), item);
 
-                var result = predicate.Run(manager);
+                var result = predicate.Run(manager, new List<LangExpression> { item });
                 if (result is BoolLangValue { Value: true })
                 {
                     return item;
@@ -293,9 +305,8 @@ public static class ListValueFuncStatic
             foreach (var item in langValue.Values)
             {
                 var manager = new VariateManager();
-                manager.Set(new LangId("item"), item);
 
-                var result = predicate.Run(manager);
+                var result = predicate.Run(manager, new List<LangExpression> { item });
                 if (result is BoolLangValue { Value: true })
                 {
                     return new BoolLangValue(true);
@@ -324,7 +335,7 @@ public static class ListValueFuncStatic
         /// <returns>VoidLangValue，表示操作完成</returns>
         public VoidLangValue Clear()
         {
-            langValue.Values.Clear();
+            langValue.ClearInternal();
             return new VoidLangValue();
         }
 
@@ -335,12 +346,17 @@ public static class ListValueFuncStatic
         /// <returns>VoidLangValue，表示操作完成</returns>
         public VoidLangValue ForEach(FuncLangValue action)
         {
+            // 尝试获取当前的 VariateManager，如果没有则创建新的
+            var manager = ExecutionContext.GetCurrentManager();
+            if (manager == null)
+            {
+                // 如果没有找到外部 manager，创建新的
+                manager = new VariateManager();
+            }
+
             foreach (var item in langValue.Values)
             {
-                var manager = new VariateManager();
-                manager.Set(new LangId("item"), item);
-
-                action.Run(manager);
+                action.Run(manager, new List<LangExpression> { item });
             }
 
             return new VoidLangValue();
@@ -356,9 +372,8 @@ public static class ListValueFuncStatic
             foreach (var item in langValue.Values)
             {
                 var manager = new VariateManager();
-                manager.Set(new LangId("item"), item);
 
-                var result = predicate.Run(manager);
+                var result = predicate.Run(manager, new List<LangExpression> { item });
                 if (result is BoolLangValue { Value: false })
                 {
                     return new BoolLangValue(false);

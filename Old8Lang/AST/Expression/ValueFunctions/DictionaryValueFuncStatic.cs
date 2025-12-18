@@ -1,4 +1,5 @@
 using System.Linq;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
@@ -172,34 +173,30 @@ public static class DictionaryValueFuncStatic
         /// </summary>
         /// <param name="key">要更新的键</param>
         /// <param name="newValue">新的值</param>
-        /// <returns>更新后的字典</returns>
-        public DictionaryLangValue Update(LangValueType key, LangValueType newValue)
+        /// <returns>VoidLangValue，表示操作完成</returns>
+        public VoidLangValue Update(LangValueType key, LangValueType newValue)
         {
-            // 创建一个新字典，使用默认构造函数
-            var newDict = new DictionaryLangValue();
-
-            // 复制当前字典的所有键值对
-            var keyUpdated = false;
-            foreach (var (existingKey, existingValue) in langValue.Value)
+            // 查找并更新现有的键值对
+            var keyFound = false;
+            for (int i = 0; i < langValue.Value.Count; i++)
             {
+                var (existingKey, existingValue) = langValue.Value[i];
                 if (existingKey.Equal(key))
                 {
-                    newDict.Value.Add((key, newValue)); // 更新值
-                    keyUpdated = true;
-                }
-                else
-                {
-                    newDict.Value.Add((existingKey, existingValue)); // 保持原值
+                    // 更新现有键的值
+                    langValue.Value[i] = (existingKey, newValue);
+                    keyFound = true;
+                    break;
                 }
             }
 
             // 如果键不存在，添加新的键值对
-            if (!keyUpdated)
+            if (!keyFound)
             {
-                newDict.Value.Add((key, newValue));
+                langValue.Value.Add((key, newValue));
             }
 
-            return newDict;
+            return new VoidLangValue();
         }
     }
 }

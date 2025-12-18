@@ -16,6 +16,8 @@ public class ListLangValue : LangValueType, ILangList
 
     public readonly List<LangValueType> Values = [];
 
+    private bool hasBeenCleared = false;
+
 
     public ListLangValue(List<LangExpression> value, SourcePosition position = default) : base(position)
     {
@@ -36,8 +38,8 @@ public class ListLangValue : LangValueType, ILangList
 
     public override LangValueType Run(VariateManager manager)
     {
-        // 只有当Values为空且Value中有表达式时才需要执行
-        if (Values.Count == 0 && Value.Count > 0)
+        // 只有当Values为空且Value中有表达式时才需要执行，且没有被手动清空过
+        if (Values.Count == 0 && Value.Count > 0 && !hasBeenCleared)
         {
             foreach (var expr in Value)
                 Values.Add(expr.Run(manager));
@@ -130,7 +132,7 @@ public class ListLangValue : LangValueType, ILangList
         // 如果是 Instance，则作为方法调用
         if (dotExpression is Instance a)
         {
-            return a.FromClassToResult(this);
+            return a.FromClassToResult(this, manager);
         }
 
         throw new InvalidOperationError(this, "列表类型只支持索引访问或实例方法调用");
@@ -166,6 +168,15 @@ public class ListLangValue : LangValueType, ILangList
     public IEnumerable<LangValueType> GetItems() => Values;
 
     public int GetLength() => Values.Count;
+
+    /// <summary>
+    /// 内部清空方法，同时清空 Values 并设置清空标志
+    /// </summary>
+    public void ClearInternal()
+    {
+        Values.Clear();
+        hasBeenCleared = true;
+    }
 
     public LangValueType Slice(int start, int end)
     {

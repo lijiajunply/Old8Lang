@@ -5,6 +5,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using System.Reflection;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -76,7 +77,21 @@ public class DictionaryLangValue : LangValueType, ILangList
                     // 返回字典的值集合
                     return new ListLangValue(Value.Select(x => x.Value).ToList());
                 default:
-                    // 将其他属性名作为字符串键来访问字典值
+                    // 首先检查是否是扩展方法调用
+                    var extensionType =
+                        Type.GetType("Old8Lang.AST.Expression.ValueFunctions.DictionaryValueFuncStatic");
+                    if (extensionType != null)
+                    {
+                        var method = extensionType.GetMethod(langId.IdName);
+                        if (method != null)
+                        {
+                            // 找到扩展方法，创建 Instance 来处理方法调用
+                            var instance = new Instance(new LangId(langId.IdName), []);
+                            return instance.FromClassToResult(this);
+                        }
+                    }
+
+                    // 如果不是扩展方法，将属性名作为字符串键来访问字典值
                     var key = new StringLangValue(langId.IdName);
                     return Get(key);
             }
@@ -95,15 +110,53 @@ public class DictionaryLangValue : LangValueType, ILangList
                     : new ListLangValue(Value.Select(x => x.Value).ToList());
             }
 
-            // 检查是否是索引访问：data[key] 被错误解析为点操作
-            // 当 Instance 表示索引访问时，提取索引值并调用 Get 方法
-            if (a.Ids is { Count: 1 })
+            // 检查是否是已知的方法调用（如 ContainsKey, GetOrElse 等）
+            var extensionType = typeof(Old8Lang.AST.Expression.ValueFunctions.DictionaryValueFuncStatic);
+            if (extensionType != null)
+            {
+                var method = extensionType.GetMethod(methodName);
+                if (method != null)
+                {
+                    // 对于 Merge 和 Update 方法，需要特殊处理参数
+                    if (methodName == "Merge" || methodName == "Update")
+                    {
+                        // 手动处理参数，确保使用正确的 manager
+                        var parameters = method.GetParameters();
+                        var args = new List<object>();
+
+                        for (int i = 0; i < parameters.Length; i++)
+                        {
+                            if (i == 0) // 第一个参数是 this (当前字典对象)
+                            {
+                                args.Add(this);
+                            }
+                            else
+                            {
+                                // 运行参数表达式，使用正确的 manager
+                                var argValue = a.Ids[i - 1].Run(manager);
+                                args.Add(argValue);
+                            }
+                        }
+
+                        return (LangValueType)method.Invoke(null, args.ToArray())!;
+                    }
+
+                    // 对于其他方法，调用 FromClassToResult 来处理方法调用
+                    return a.FromClassToResult(this);
+                }
+            }
+
+            // 只有在特定情况下才当作索引访问：方法名不是已知方法且只有一个参数
+            if (a.Ids is { Count: 1 } && methodName != "Get" && methodName != "ContainsKey" &&
+                methodName != "GetOrElse" && methodName != "Merge" && methodName != "Update" &&
+                methodName != "Keys" && methodName != "Values")
             {
                 // 运行索引表达式获取键值
                 var result = a.Ids[0].Run(manager);
                 return Get(result);
             }
 
+            // 默认情况下，调用 FromClassToResult
             return a.FromClassToResult(this);
         }
 

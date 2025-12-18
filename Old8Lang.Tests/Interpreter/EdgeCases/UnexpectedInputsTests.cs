@@ -315,7 +315,7 @@ public class UnexpectedInputsTests
         var code = @"
             try {
                 count <- 0
-                for i in 5..1 {
+                for i in [5~1] {
                     count <- count + 1
                 }
                 result <- count
@@ -342,7 +342,7 @@ public class UnexpectedInputsTests
         var code = @"
             try {
                 count <- 0
-                for i in 1..<1000000 {
+                for i in [1~<1000000] {
                     count <- count + 1
                     if count >= 10 {
                         break
@@ -540,7 +540,7 @@ public class UnexpectedInputsTests
         var code = @"
             try {
                 bigArray <- []
-                for i in 1..100000 {
+                for i in [1~100000] {
                     bigArray.Add(i)
                     if len(bigArray) >= 10 {
                         break

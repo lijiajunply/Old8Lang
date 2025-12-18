@@ -110,7 +110,7 @@ public class EmptyInputTests
         // Arrange
         var code = @"
             emptyDict <- {}
-            result <- emptyDict.Count
+            result <- emptyDict.Count()
         ";
         var interpreter = new LangInterpreter();
 
@@ -130,7 +130,7 @@ public class EmptyInputTests
     {
         // Arrange
         var code = @"
-            emptyTuple <- ()
+            emptyTuple <- tuple()
             result <- len(emptyTuple)
         ";
         var interpreter = new LangInterpreter();
@@ -151,7 +151,7 @@ public class EmptyInputTests
     {
         // Arrange
         var code = @"
-            emptyRange <- 5..<5
+            emptyRange <- [5~<5]
             count <- 0
             for i in emptyRange {
                 count <- count + 1
@@ -227,7 +227,7 @@ public class EmptyInputTests
             interface EmptyInterface {
                 // Empty interface
             }
-            class TestClass < EmptyInterface {
+            class TestClass implements EmptyInterface {
                 // Implementation
             }
             testObj <- TestClass()
@@ -324,7 +324,7 @@ public class EmptyInputTests
         // Arrange
         var code = @"
             count <- 0
-            for i in 1..5 {
+            for i in [1~5] {
                 // Empty loop body
             }
             result <- count
@@ -516,7 +516,7 @@ public class EmptyInputTests
     {
         // Arrange
         var code = @"
-            emptyDict <- {}
+            emptyDict <- dict()
             count <- 0
             for key in emptyDict.Keys {
                 count <- count + 1

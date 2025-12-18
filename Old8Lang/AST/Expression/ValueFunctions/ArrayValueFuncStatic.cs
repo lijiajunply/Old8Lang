@@ -11,127 +11,135 @@ namespace Old8Lang.AST.Expression.ValueFunctions;
 [Serializable]
 public static class ArrayValueFuncStatic
 {
-    extension(ArrayLangValue arrayValue)
+    /// <summary>
+    /// 获取数组的长度
+    /// </summary>
+    /// <param name="arrayValue">数组</param>
+    /// <returns>数组长度</returns>
+    public static IntLangValue Count(this ArrayLangValue arrayValue)
     {
-        /// <summary>
-        /// 对数组进行排序
-        /// </summary>
-        /// <returns>排序后的数组（返回新数组）</returns>
-        public ArrayLangValue Sort()
-        {
-            var items = arrayValue.GetItems().ToList();
-            var itemsArray = items.ToArray();
-            QuickSort(itemsArray, 0, itemsArray.Length - 1);
-            return new ArrayLangValue(itemsArray.ToList());
-        }
+        return new IntLangValue(arrayValue.GetLength());
+    }
 
-        /// <summary>
-        /// 移除数组中的重复元素
-        /// </summary>
-        /// <returns>包含去重后元素的新数组</returns>
-        public ArrayLangValue Distinct()
-        {
-            var distinct = new List<LangValueType>();
-            var items = arrayValue.GetItems();
+    /// <summary>
+    /// 对数组进行排序
+    /// </summary>
+    /// <param name="arrayValue">要排序的数组</param>
+    /// <returns>排序后的数组（返回新数组）</returns>
+    public static ArrayLangValue Sort(this ArrayLangValue arrayValue)
+    {
+        var items = arrayValue.GetItems().ToList();
+        var itemsArray = items.ToArray();
+        QuickSort(itemsArray, 0, itemsArray.Length - 1);
+        return new ArrayLangValue(itemsArray.ToList());
+    }
 
-            foreach (var item in items)
+    /// <summary>
+    /// 移除数组中的重复元素
+    /// </summary>
+    /// <param name="arrayValue">要去重的数组</param>
+    /// <returns>包含去重后元素的新数组</returns>
+    public static ArrayLangValue Distinct(this ArrayLangValue arrayValue)
+    {
+        var distinct = new List<LangValueType>();
+        var items = arrayValue.GetItems();
+
+        foreach (var item in items)
+        {
+            var isDuplicate = false;
+            foreach (var d in distinct)
             {
-                var isDuplicate = false;
-                foreach (var d in distinct)
+                if (item.Equal(d))
                 {
-                    if (item.Equal(d))
-                    {
-                        isDuplicate = true;
-                        break;
-                    }
-                }
-
-                if (!isDuplicate)
-                {
-                    distinct.Add(item);
-                }
-            }
-
-            return new ArrayLangValue(distinct);
-        }
-
-        /// <summary>
-        /// 使用转换函数映射数组元素
-        /// </summary>
-        /// <param name="transform">转换函数，将元素转换为新值</param>
-        /// <returns>包含转换后元素的新数组</returns>
-        public ArrayLangValue Map(FuncLangValue transform)
-        {
-            var mapped = new List<LangValueType>();
-            var items = arrayValue.GetItems();
-
-            foreach (var item in items)
-            {
-                // 创建临时变量管理器
-                var manager = new VariateManager();
-                manager.Set(new LangId("item"), item);
-
-                // 执行转换函数
-                var result = transform.Run(manager);
-                mapped.Add(result);
-            }
-
-            return new ArrayLangValue(mapped);
-        }
-
-        /// <summary>
-        /// 使用谓词函数过滤数组元素
-        /// </summary>
-        /// <param name="predicate">谓词函数，返回布尔值</param>
-        /// <returns>包含满足条件元素的新数组</returns>
-        public ArrayLangValue Filter(FuncLangValue predicate)
-        {
-            var filtered = new List<LangValueType>();
-            var items = arrayValue.GetItems();
-
-            foreach (var item in items)
-            {
-                // 创建临时变量管理器
-                var manager = new VariateManager();
-                manager.Set(new LangId("item"), item);
-
-                // 执行谓词函数
-                var result = predicate.Run(manager);
-
-                // 如果结果为真，则保留该元素
-                if (result is BoolLangValue { Value: true })
-                {
-                    filtered.Add(item);
+                    isDuplicate = true;
+                    break;
                 }
             }
 
-            return new ArrayLangValue(filtered);
-        }
-
-        /// <summary>
-        /// 使用归约函数将数组元素归约为单个值
-        /// </summary>
-        /// <param name="reducer">归约函数，接受累加器和当前元素，返回新的累加器值</param>
-        /// <param name="initialValue">初始累加器值</param>
-        /// <returns>归约后的结果值</returns>
-        public LangValueType Reduce(FuncLangValue reducer, LangValueType initialValue)
-        {
-            var accumulator = initialValue;
-            var items = arrayValue.GetItems();
-
-            foreach (var item in items)
+            if (!isDuplicate)
             {
-                // 创建临时变量管理器
-                var manager = new VariateManager();
-                manager.Set(new LangId("accumulator"), accumulator);
-                manager.Set(new LangId("item"), item);
-
-                // 执行归约函数
-                accumulator = reducer.Run(manager);
+                distinct.Add(item);
             }
-
-            return accumulator;
         }
+
+        return new ArrayLangValue(distinct);
+    }
+
+    /// <summary>
+    /// 使用转换函数映射数组元素
+    /// </summary>
+    /// <param name="arrayValue">要映射的数组</param>
+    /// <param name="transform">转换函数，将元素转换为新值</param>
+    /// <returns>包含转换后元素的新数组</returns>
+    public static ArrayLangValue Map(this ArrayLangValue arrayValue, FuncLangValue transform)
+    {
+        var mapped = new List<LangValueType>();
+        var items = arrayValue.GetItems();
+
+        foreach (var item in items)
+        {
+            // 创建临时变量管理器
+            var manager = new VariateManager();
+
+            // 执行转换函数，传递当前元素作为参数
+            var result = transform.Run(manager, new List<LangExpression> { item });
+            mapped.Add(result);
+        }
+
+        return new ArrayLangValue(mapped);
+    }
+
+    /// <summary>
+    /// 使用谓词函数过滤数组元素
+    /// </summary>
+    /// <param name="arrayValue">要过滤的数组</param>
+    /// <param name="predicate">谓词函数，返回布尔值</param>
+    /// <returns>包含满足条件元素的新数组</returns>
+    public static ArrayLangValue Filter(this ArrayLangValue arrayValue, FuncLangValue predicate)
+    {
+        var filtered = new List<LangValueType>();
+        var items = arrayValue.GetItems();
+
+        foreach (var item in items)
+        {
+            // 创建临时变量管理器
+            var manager = new VariateManager();
+
+            // 执行谓词函数，传递当前元素作为参数
+            var result = predicate.Run(manager, new List<LangExpression> { item });
+
+            // 如果结果为真，则保留该元素
+            if (result is BoolLangValue { Value: true })
+            {
+                filtered.Add(item);
+            }
+        }
+
+        return new ArrayLangValue(filtered);
+    }
+
+    /// <summary>
+    /// 使用归约函数将数组元素归约为单个值
+    /// </summary>
+    /// <param name="arrayValue">要归约的数组</param>
+    /// <param name="reducer">归约函数，接受累加器和当前元素，返回新的累加器值</param>
+    /// <param name="initialValue">初始累加器值</param>
+    /// <returns>归约后的结果值</returns>
+    public static LangValueType Reduce(this ArrayLangValue arrayValue, FuncLangValue reducer, LangValueType initialValue)
+    {
+        var accumulator = initialValue;
+        var items = arrayValue.GetItems();
+
+        foreach (var item in items)
+        {
+            // 创建临时变量管理器
+            var manager = new VariateManager();
+
+            // 执行归约函数，传递累加器和当前元素作为参数
+            accumulator = reducer.Run(manager, new List<LangExpression> { accumulator, item });
+        }
+
+        return accumulator;
     }
 
     /// <summary>

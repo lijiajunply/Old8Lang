@@ -255,6 +255,15 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
                 return new DictionaryLangValue();
             }
+            case "tuple" or "Tuple":
+            {
+                if (Ids.Count > 0)
+                {
+                    throw new ArgumentError(this, "tuple 函数不需要参数");
+                }
+
+                return new TupleLangValue(NullLangValue.Instance, NullLangValue.Instance);
+            }
         }
 
         // 获取所有可能的匹配函数（函数名和参数数量匹配）
@@ -548,8 +557,19 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
     public LangValueType FromClassToResult(LangValueType baseLangValue)
     {
+        return FromClassToResult(baseLangValue, null);
+    }
+
+    public LangValueType FromClassToResult(LangValueType baseLangValue, VariateManager? manager)
+    {
         var type = baseLangValue.GetType();
         MethodInfo? m = null;
+
+        // 设置执行上下文，以便扩展方法可以访问当前的 VariateManager
+        if (manager != null)
+        {
+            Old8Lang.AST.Expression.ValueFunctions.ExecutionContext.SetCurrentManager(manager);
+        }
 
         // 对于具有扩展方法的类型，优先查找扩展方法而不是实例方法
         // 这样可以避免找到 TaskLangValue.Then 实例方法而不是扩展方法
@@ -558,23 +578,39 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
         {
             type = baseLangValue switch
             {
-                DictionaryLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.DictionaryValueFuncStatic"),
-                ListLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.ListValueFuncStatic"),
-                TaskLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.TaskValueFuncStatic"),
-                ThreadLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.ThreadValueFuncStatic"),
-                StringLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.StringValueFuncStatic"),
-                TupleLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.TupleValueFuncStatic"),
-                ArrayLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.ArrayValueFuncStatic"),
+                DictionaryLangValue => typeof(Old8Lang.AST.Expression.ValueFunctions.DictionaryValueFuncStatic),
+                ListLangValue => typeof(Old8Lang.AST.Expression.ValueFunctions.ListValueFuncStatic),
+                TaskLangValue => typeof(Old8Lang.AST.Expression.ValueFunctions.TaskValueFuncStatic),
+                ThreadLangValue => typeof(Old8Lang.AST.Expression.ValueFunctions.ThreadValueFuncStatic),
+                StringLangValue => typeof(Old8Lang.AST.Expression.ValueFunctions.StringValueFuncStatic),
+                TupleLangValue => typeof(Old8Lang.AST.Expression.ValueFunctions.TupleValueFuncStatic),
+                ArrayLangValue => typeof(Old8Lang.AST.Expression.ValueFunctions.ArrayValueFuncStatic),
                 _ => null
             };
-            m = type?.GetMethod(Id.IdName);
+
+            // 根据参数数量查找正确的重载
+            var allMethods = type?.GetMethods().Where(x => x.Name == Id.IdName).ToArray();
+            if (allMethods != null && allMethods.Length > 0)
+            {
+                // 预期参数数量 = 传入参数数量 + 1 (扩展方法的第一个参数是baseLangValue)
+                var expectedParamCount = Ids.Count + 1;
+                m = allMethods.FirstOrDefault(x => x.GetParameters().Length == expectedParamCount) ?? allMethods[0];
+            }
         }
 
         // 如果没有找到扩展方法，尝试在类型本身上查找
         if (m == null)
         {
             type = baseLangValue.GetType();
-            m = type.GetMethod(Id.IdName);
+            // 根据参数数量查找正确的重载
+            var allInstanceMethods = type?.GetMethods().Where(x => x.Name == Id.IdName).ToArray();
+            if (allInstanceMethods != null && allInstanceMethods.Length > 0)
+            {
+                // 对于实例方法，预期参数数量 = 传入参数数量
+                var expectedParamCount = Ids.Count;
+                m = allInstanceMethods.FirstOrDefault(x => x.GetParameters().Length == expectedParamCount) ??
+                    allInstanceMethods[0];
+            }
         }
 
         // 如果还是没找到，尝试 ValueTypeFuncStatic
@@ -644,9 +680,17 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
         // 对于静态方法，实例参数为 null；对于实例方法，实例参数为 baseLangValue
         object? invokeInstance = m?.IsStatic == false ? baseLangValue : null;
 
-        var r = m?.Invoke(invokeInstance, [.. os]);
-        if (r is LangValueType v) return v;
-        return ObjToValue(r!);
+        try
+        {
+            var r = m?.Invoke(invokeInstance, [.. os]);
+            if (r is LangValueType v) return v;
+            return ObjToValue(r!);
+        }
+        finally
+        {
+            // 清理执行上下文
+            Old8Lang.AST.Expression.ValueFunctions.ExecutionContext.ClearCurrentManager();
+        }
     }
 
     public override string ToString()
