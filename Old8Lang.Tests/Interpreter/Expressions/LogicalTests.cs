@@ -232,7 +232,7 @@ public class LogicalTests
         Assert.NotNull(result3);
         Assert.True(result1.Value);  // 10 < 20 and 20 < 30 = true and true = true
         Assert.True(result2.Value);  // 10 > 20 or 30 > 20 = false or true = true
-        Assert.True(result3.Value);  // 10 == 20 xor 20 == 30 = false xor false = false (但可能实现不同)
+        Assert.False(result3.Value); // 10 == 20 xor 20 == 30 = false xor false = false
     }
 
     [Fact]
@@ -372,7 +372,7 @@ public class LogicalTests
         var code = @"
             arr1 <- [1, 2, 3]
             arr2 <- [1, 2, 3]
-            arr3 <- [4, 5, 6]
+            arr3 <- [3, 5, 3]
             result1 <- arr1[0] == arr2[0] and arr1[1] == arr2[1]
             result2 <- arr1[0] == arr3[0] or arr1[2] == arr3[2]
         ";

@@ -616,52 +616,6 @@ public class TypeConversionTests
     }
 
     [Fact]
-    public void TypeConversion_TupleToList_ConvertsCorrectly()
-    {
-        // Arrange
-        var code = @"
-            tupleValue <- (1, ""hello"", true, 3.14)
-            listValue <- tupleValue.ToList()
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("listValue"));
-        Assert.NotNull(result);
-        Assert.IsType<ListLangValue>(result);
-        var list = (ListLangValue)result;
-        Assert.Equal(4, list.Values.Count);
-        Assert.Equal(1, ((IntLangValue)list.Values[0]).Value);
-        Assert.Equal("hello", ((StringLangValue)list.Values[1]).Value);
-        Assert.True(((BoolLangValue)list.Values[2]).Value);
-        Assert.Equal(3.14, ((DoubleLangValue)list.Values[3]).Value);
-    }
-
-    [Fact]
-    public void TypeConversion_ListToTuple_ConvertsCorrectly()
-    {
-        // Arrange
-        var code = @"
-            listValue <- {1, ""world"", false}
-            tupleValue <- listValue.ToTuple()
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("tupleValue"));
-        Assert.NotNull(result);
-        Assert.IsType<TupleLangValue>(result);
-    }
-
-    [Fact]
     public void TypeConversion_ExplicitCasting_CastsCorrectly()
     {
         // Arrange

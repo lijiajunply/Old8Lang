@@ -277,6 +277,11 @@ public static class ValueTypeFuncStatic
                 return new ArrayLangValue(new List<LangValueType>());
             }
 
+            if (type is ListLangValue listValue)
+            {
+                return new ArrayLangValue(listValue.GetItems());
+            }
+
             throw new FormatException($"Cannot convert {type.GetType().Name} to array");
         }
 
