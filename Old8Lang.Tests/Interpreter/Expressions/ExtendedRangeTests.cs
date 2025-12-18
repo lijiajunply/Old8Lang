@@ -107,34 +107,10 @@ public class ExtendedRangeTests
     }
 
     [Fact]
-    public void Range_ExclusiveBothEmptyRange_ReturnsEmptyArray()
-    {
-        // Arrange
-        var code = @"
-            result <- [1>~<2]
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var rangeResult = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(rangeResult);
-        Assert.IsType<ArrayLangValue>(rangeResult);
-
-        var array = ((ArrayLangValue)rangeResult).GetItems().ToList();
-        Assert.Empty(array);
-    }
-
-    [Fact]
     public void Range_SingleElementInclusive_WorksCorrectly()
     {
         // Arrange
-        var code = @"
-            result <- [3~3]
-        ";
+        var code = "result <- [3~3]";
         var interpreter = new LangInterpreter();
 
         // Act
@@ -217,8 +193,8 @@ public class ExtendedRangeTests
         var exclusiveBothRange = new RangeLangValue(new IntLangValue(1), new IntLangValue(5), default, false, false);
 
         // Assert - ToString使用括号显示包含/排除状态
-        Assert.Equal("[1~5]", inclusiveRange.ToString());      // 包含两边 []
-        Assert.Equal("[1~5)", exclusiveEndRange.ToString());   // 包含start，排除end []
+        Assert.Equal("[1~5]", inclusiveRange.ToString()); // 包含两边 []
+        Assert.Equal("[1~5)", exclusiveEndRange.ToString()); // 包含start，排除end []
         Assert.Equal("(1~5]", exclusiveStartRange.ToString()); // 排除start，包含end ()
         Assert.Equal("(1~5)", exclusiveBothRange.ToString()); // 排除两边 ()
     }

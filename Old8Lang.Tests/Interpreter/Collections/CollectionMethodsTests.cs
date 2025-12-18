@@ -612,11 +612,11 @@ public class CollectionMethodsTests
     public void CollectionMethods_ListAggregate_AggregatesListElements()
     {
         // Arrange
-        var code = @"
-            words <- {""Hello"", "", "", ""World"", ""!""}
-            sentence <- words.Aggregate((acc:string, word:string) -> acc + word, """")
-            result <- sentence
-        ";
+        var code = """
+                   words <- {"Hello", ", ", "World", "!"}
+                   sentence <- words.Aggregate((acc:string, word:string) -> acc + word, "")
+                   result <- sentence
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -627,7 +627,7 @@ public class CollectionMethodsTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
-        Assert.Equal("HelloWorld!", ((StringLangValue)result).Value);
+        Assert.Equal("Hello, World!", ((StringLangValue)result).Value);
     }
 
     [Fact]

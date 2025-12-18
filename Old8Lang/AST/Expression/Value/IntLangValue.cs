@@ -46,7 +46,10 @@ public class IntLangValue(int intValue = 0, SourcePosition position = default) :
     public override LangValueType Minus(LangValueType otherLangValueType)
     {
         if (otherLangValueType is DoubleLangValue)
-            return otherLangValueType.Minus(this);
+        {
+            return DoubleLangValue.Create(Value - otherLangValueType.GetValue<double>());
+        }
+
         if (otherLangValueType is IntLangValue otherInt)
         {
             try
@@ -246,7 +249,7 @@ public class IntLangValue(int intValue = 0, SourcePosition position = default) :
     {
         ilGenerator.Emit(OpCodes.Ldc_I4, Value);
     }
-    
+
     /// <summary>
     /// 重置对象状态，使其可以被复用
     /// </summary>
@@ -255,7 +258,7 @@ public class IntLangValue(int intValue = 0, SourcePosition position = default) :
         Value = 0;
         // Position是只读属性，无法修改
     }
-    
+
     /// <summary>
     /// 从对象池获取IntLangValue实例
     /// </summary>
@@ -269,7 +272,7 @@ public class IntLangValue(int intValue = 0, SourcePosition position = default) :
         instance.Position = position;
         return instance;
     }
-    
+
     /// <summary>
     /// 将实例归还到对象池
     /// </summary>

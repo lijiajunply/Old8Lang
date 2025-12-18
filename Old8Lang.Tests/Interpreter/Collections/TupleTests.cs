@@ -836,7 +836,7 @@ public class TupleTests
     {
         // Arrange
         var code = @"
-            func GetMinMax(numbers:[int]) -> (int, int) {
+            func GetMinMax(numbers:array) -> tuple {
                 if len(numbers) == 0 {
                     return (0, 0)
                 }
@@ -849,7 +849,7 @@ public class TupleTests
                 return (min, max)
             }
 
-            func DivideAndRemainder(dividend:int, divisor:int) -> (int, int) {
+            func DivideAndRemainder(dividend:int, divisor:int) -> tuple {
                 quotient <- dividend / divisor
                 remainder <- dividend % divisor
                 return (quotient, remainder)

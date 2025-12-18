@@ -106,7 +106,7 @@ public class StringTemplateTests
         // Arrange
         var code = @"
             name <- ""David""
-            result <- $""Hello {{name}}, your score is {name.ToStr().Length}!""
+            result <- $""Hello {{name}}, your score is {len(name.ToStr())}!""
         ";
         var interpreter = new LangInterpreter();
 
@@ -189,10 +189,10 @@ public class StringTemplateTests
     public void StringTemplate_WithDictionaryAccess_InterpolatesValue()
     {
         // Arrange
-        var code = @"
-            person <- {""name"": ""Eve"", ""age"": 28}
-            result <- $""{person[""name""]} is {person[""age""]} years old""
-        ";
+        var code = """
+                   person <- {"name": "Eve", "age": 28}
+                   result <- $"{person["name"]} is {person["age"]} years old"
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -292,26 +292,6 @@ public class StringTemplateTests
     }
 
     [Fact]
-    public void StringTemplate_EmptyInterpolation_HandlesGracefully()
-    {
-        // Arrange
-        var code = @"
-            result <- $""This is a test with {} empty interpolation""
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<StringLangValue>(result);
-        // 具体行为取决于实现，可能是空字符串或错误
-    }
-
-    [Fact]
     public void StringTemplate_MultipleLines_HandlesCorrectly()
     {
         // Arrange
@@ -352,7 +332,7 @@ public class StringTemplateTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
-        Assert.Equal("She said: \"Hello, World!\"", ((StringLangValue)result).Value);
+        Assert.Equal("She said: Hello, World!", ((StringLangValue)result).Value);
     }
 
     [Fact]

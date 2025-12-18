@@ -55,7 +55,7 @@ public class SliceTests
 
         Assert.NotNull(result5);
         Assert.IsType<IntLangValue>(result5);
-        Assert.Equal(9, ((IntLangValue)result5).Value);
+        Assert.Equal(10, ((IntLangValue)result5).Value); // slice3 = [8, 9, 10], so slice3[2] = 10
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public class SliceTests
 
         Assert.NotNull(result6);
         Assert.IsType<IntLangValue>(result6);
-        Assert.Equal(5, ((IntLangValue)result6).Value);
+        Assert.Equal(6, ((IntLangValue)result6).Value); // reverse = [10,9,8,7,6,5,4,3,2], so reverse[4] = 6
     }
 
     [Fact]
@@ -268,8 +268,8 @@ public class SliceTests
             text <- ""Hello, World! Welcome to Old8Lang""
             slice1 <- text[0:5]
             slice2 <- text[7:12]
-            slice3 <- text[14:22]
-            slice4 <- text[27:]
+            slice3 <- text[14:21]
+            slice4 <- text[25:]
             result1 <- slice1
             result2 <- slice2
             result3 <- slice3
@@ -312,7 +312,7 @@ public class SliceTests
             text <- ""ABCDEFGHIJKLMNO""
             everyOther <- text[0:15:2]
             everyThird <- text[0:15:3]
-            reverse <- text[14:0:-1]
+            reverse <- text[14::-1]
             result1 <- everyOther
             result2 <- everyThird
             result3 <- reverse
@@ -330,7 +330,7 @@ public class SliceTests
 
         Assert.NotNull(result1);
         Assert.IsType<StringLangValue>(result1);
-        Assert.Equal("ACEGIMO", ((StringLangValue)result1).Value);
+        Assert.Equal("ACEGIKMO", ((StringLangValue)result1).Value); // indices: 0,2,4,6,8,10,12,14
 
         Assert.NotNull(result2);
         Assert.IsType<StringLangValue>(result2);
@@ -454,9 +454,9 @@ public class SliceTests
             ]
             rows <- matrix[1:3]
             rowSlice <- matrix[1][1:3]
-            subMatrix <- []
+            subMatrix <- {}
             for i <- 1, i < 3, i++ {
-                subMatrix.Push(matrix[i][1:3])
+                subMatrix.Add(matrix[i][1:3])
             }
             result1 <- len(rows)
             result2 <- rowSlice[0]
@@ -695,7 +695,7 @@ public class SliceTests
 
         Assert.NotNull(result5);
         Assert.IsType<IntLangValue>(result5);
-        Assert.Equal(4, ((IntLangValue)result5).Value); // 20, 40, 60, 80
+        Assert.Equal(5, ((IntLangValue)result5).Value); // evens = [20, 40, 60, 80, 100], 5 elements
 
         Assert.NotNull(result6);
         Assert.IsType<IntLangValue>(result6);

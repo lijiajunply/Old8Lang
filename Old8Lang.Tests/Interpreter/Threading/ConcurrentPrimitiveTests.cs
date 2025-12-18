@@ -202,7 +202,7 @@ public class ConcurrentPrimitiveTests
     {
         var code = @"
             // 原子引用模拟
-            atomic_ref <- func(initial_value) {
+            atomic_ref <- (initial_value) -> {
                 return {
                     value: initial_value,
                     get: func(this) { return this.value },

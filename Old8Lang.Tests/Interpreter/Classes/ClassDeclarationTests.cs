@@ -277,18 +277,18 @@ public class ClassDeclarationTests
                 public playerName <- """"
 
                 static func addToScore(points) {
-                    score <- score + points
+                    this.score <- score + points
                     if score > highScore {
-                        highScore <- score
+                        highScore <- this.score
                     }
                 }
 
                 static func getScore() {
-                    return score
+                    return this.score
                 }
 
                 static func getHighScore() {
-                    return highScore
+                    return this.highScore
                 }
             }
 
