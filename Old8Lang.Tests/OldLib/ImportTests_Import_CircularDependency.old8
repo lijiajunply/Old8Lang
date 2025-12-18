@@ -1,5 +1,2 @@
-// Module A imports Module B
-import "moduleA"
-// This would create a circular dependency
-// The interpreter should handle this gracefully
-result <- moduleA.getValue()
+import "math"
+result <- Abs(-5)

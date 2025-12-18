@@ -1,0 +1,22 @@
+// 选择性懒导入测试 - 懒导入特定函数
+lazy import { CalculateLargeNumber, PI } from "lazy_math"
+
+// 检查函数是否可用（此时应该还未加载）
+status1 <- "Not loaded"
+
+// 使用导入的函数（此时会触发加载）
+result1 <- CalculateLargeNumber()
+
+// 使用导入的常量
+result2 <- PI
+
+// 测试未导入的函数应该不可用
+try {
+    result3 <- HeavyOperation()
+    error_occurred <- false
+} catch {
+    error_occurred <- true
+    error_message <- "Function not imported"
+}
+
+status2 <- "Loaded"

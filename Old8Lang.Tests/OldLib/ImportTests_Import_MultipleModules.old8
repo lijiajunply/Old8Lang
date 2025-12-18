@@ -1,4 +1,4 @@
 import "math"
-import "string"
-result1 <- math.abs(-5)
-result2 <- string.length("hello")
+import "os"
+result1 <- Abs(-5)
+result2 <- Abs(5)

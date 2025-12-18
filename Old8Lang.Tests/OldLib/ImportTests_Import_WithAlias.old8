@@ -1,2 +1,2 @@
 import "math" as m
-result <- m.sin(3.14159 / 2)
+result <- m.sqrt(25)

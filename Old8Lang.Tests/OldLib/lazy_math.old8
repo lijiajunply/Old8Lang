@@ -1,0 +1,15 @@
+// 懒导入测试模块
+func CalculateLargeNumber() -> double {
+    // 模拟一个耗时的数学计算
+    result <- 0.0
+    for i in [1~100000] {
+        result <- result + i * 0.001
+    }
+    return result
+}
+
+const PI <- 3.14159265359
+
+func HeavyOperation() -> string {
+    return "Heavy computation completed"
+}

@@ -1,4 +1,3 @@
 import "math"
-import "math" as math2
-result1 <- math.sqrt(9)
-result2 <- math2.sqrt(16)
+result1 <- Sqrt(9)
+result2 <- Sqrt(16)

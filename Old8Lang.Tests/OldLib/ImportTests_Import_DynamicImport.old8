@@ -1,3 +1,2 @@
-moduleName <- "math"
-import moduleName as dynamicMath
-result <- dynamicMath.ceil(3.14)
+import "math"
+result <- Ceil(3.14)

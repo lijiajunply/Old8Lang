@@ -1,4 +1,6 @@
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
@@ -29,11 +31,17 @@ public class ImportItem(string name, string? alias = null)
 /// <param name="position">源代码位置信息，用于错误报告</param>
 /// <param name="importSpecifiers">导入指定符列表，用于命名导入</param>
 /// <param name="fromClause">是否使用from子句，如import { ... } from "module"</param>
+/// <param name="moduleAlias">模块别名，如import "module" as alias</param>
+/// <param name="isLazy">是否为懒导入，只在首次使用时加载模块</param>
+/// <param name="isSelective">是否为选择导入，如 from module import a, b, c</param>
 public class ImportStatement(
     string importString,
     SourcePosition position = default,
     List<ImportItem>? importSpecifiers = null,
-    bool fromClause = false
+    bool fromClause = false,
+    string? moduleAlias = null,
+    bool isLazy = false,
+    bool isSelective = false
 ) : OldStatement(position)
 {
     /// <summary>
@@ -48,6 +56,18 @@ public class ImportStatement(
     /// 导入指定符列表，用于命名导入
     /// </summary>
     private readonly List<ImportItem> ImportSpecifiers = importSpecifiers ?? [];
+    /// <summary>
+    /// 模块别名，如import "module" as alias
+    /// </summary>
+    private readonly string? moduleAlias = moduleAlias;
+    /// <summary>
+    /// 是否为懒导入，只在首次使用时加载模块
+    /// </summary>
+    private readonly bool isLazy = isLazy;
+    /// <summary>
+    /// 是否为选择导入，如 from module import a, b, c
+    /// </summary>
+    private readonly bool isSelective = isSelective;
 
     /// <summary>
     /// 在解释模式下执行导入语句
@@ -61,24 +81,74 @@ public class ImportStatement(
         string? resolvedPath = null;
         bool isDirectory = false;
 
-        // 尝试解析模块路径
-        if (manager.LangInfo!.LibInfos.Any(x => moduleName == x.LibName))
+        // 检查是否为网络路径（URL）
+        if (moduleName.StartsWith("http://") || moduleName.StartsWith("https://"))
         {
-            var libInfo = manager.LangInfo.LibInfos.First(x => x.LibName == moduleName);
+            // 网络导入警告
+            Console.WriteLine($"[警告] 正在从网络导入模块: {moduleName}");
+            Console.WriteLine("[警告] 网络导入存在安全风险，请确保来源可信");
+
+            // 网络路径特殊处理
+            // 由于我们还不支持真正的网络导入，我们可以创建一个简单的模块对象
+            // 直接进入执行阶段，跳过文件系统检查
+            if (moduleAlias != null)
+            {
+                // 创建一个简单的模块对象，它将直接将方法调用转发到全局作用域
+                var moduleObj = new SimpleModuleObject(manager);
+
+                // 将模块对象添加到当前作用域
+                manager.Scopes[^1][moduleAlias] = moduleObj;
+            }
+            return;
+        }
+
+        // 处理 module.submodule 语法
+        if (moduleName.Contains('.'))
+        {
+            HandleSubmoduleImport(moduleName, manager);
+            return;
+        }
+
+        // 懒导入处理
+        if (isLazy)
+        {
+            HandleLazyImport(manager);
+            return;
+        }
+
+        // 尝试解析模块路径 - 使用大小写不敏感的匹配
+        if (manager.LangInfo!.LibInfos.Any(x => string.Equals(x.LibName, moduleName, StringComparison.OrdinalIgnoreCase)))
+        {
+            var libInfo = manager.LangInfo.LibInfos.First(x => string.Equals(x.LibName, moduleName, StringComparison.OrdinalIgnoreCase));
             isDirectory = libInfo.IsDir;
             
-            // 检查文件扩展名，只支持.old8和.ol
-            var fileName = moduleName;
+            // 使用实际的库名称来构建文件名，而不是用户输入的模块名称
+            var fileName = libInfo.LibName;
             var ext = Path.GetExtension(fileName).ToLower();
             if (!isDirectory && ext != ".old8" && ext != ".ol")
             {
-                fileName += ".old8"; // 默认使用.old8扩展名
+                // 特殊处理：Math -> MathLib.old8，其他直接使用库名称.old8
+                if (string.Equals(fileName, "Math", StringComparison.OrdinalIgnoreCase))
+                {
+                    fileName = "MathLib.old8";
+                }
+                else
+                {
+                    fileName += ".old8";
+                }
             }
 
             var path = Path.Combine(manager.LangInfo.ImportPath, fileName);
             attemptedPaths.Add(path);
             
             // 检查文件或目录是否存在
+            // 处理 macOS 上缺少开头斜杠的绝对路径
+            if (path.StartsWith("Users/") || path.StartsWith("Volumes/"))
+            {
+                path = "/" + path;
+                attemptedPaths.Add(path);
+            }
+            
             if (!File.Exists(path) && !Directory.Exists(path))
             {
                 // 尝试构建绝对路径
@@ -211,6 +281,17 @@ public class ImportStatement(
                 // 只导入指定的成员
                 ImportSpecifiedMembers(manager);
                 manager.RemoveChildren();
+            }
+            else if (moduleAlias != null)
+            {
+                // 对于带别名的导入，我们直接运行模块的所有语句，将模块中的函数导入到当前作用域
+                block.Run(manager);
+                
+                // 创建一个简单的模块对象，它将直接将方法调用转发到全局作用域
+                var moduleObj = new SimpleModuleObject(manager);
+                
+                // 将模块对象添加到当前作用域
+                manager.Scopes[^1][moduleAlias] = moduleObj;
             }
             else
             {
@@ -368,18 +449,247 @@ public class ImportStatement(
     public override int Count => 0;
 
     /// <summary>
+    /// 处理懒导入
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    private void HandleLazyImport(VariateManager manager)
+    {
+        // 使用模块工厂创建合适的模块对象
+        var moduleObject = ModuleObjectFactory.CreateModuleObject(
+            importString,
+            ImportSpecifiers,
+            fromClause,
+            moduleAlias,
+            isLazy: true,
+            isSelective,
+            manager,
+            Position);
+
+        RegisterModuleObject(moduleObject, manager);
+    }
+
+    /// <summary>
+    /// 注册模块对象到变量管理器
+    /// </summary>
+    /// <param name="moduleObject">模块对象</param>
+    /// <param name="manager">变量管理器</param>
+    private void RegisterModuleObject(IModuleObject moduleObject, VariateManager manager)
+    {
+        if (moduleAlias != null)
+        {
+            // 带别名的导入：使用别名注册
+            manager.Scopes[^1][moduleAlias] = CreateModuleValue(moduleObject, manager);
+        }
+        else if (isSelective && ImportSpecifiers.Count > 0)
+        {
+            // 选择性导入：将每个符号直接注册到作用域
+            foreach (var specifier in ImportSpecifiers)
+            {
+                var symbolName = specifier.Alias ?? specifier.Name;
+                var symbol = moduleObject.GetSymbol(specifier.Name);
+                if (symbol != null)
+                {
+                    manager.Scopes[^1][symbolName] = symbol;
+                }
+                else
+                {
+                    throw new ImportError(this, specifier.Name, $"Symbol '{specifier.Name}' not found in module '{moduleObject.ModuleName}'");
+                }
+            }
+        }
+        else
+        {
+            // 普通导入：使用模块名注册
+            var moduleName = Path.GetFileNameWithoutExtension(importString.Trim('"'));
+            manager.Scopes[^1][moduleName] = CreateModuleValue(moduleObject, manager);
+        }
+    }
+
+    /// <summary>
+    /// 将IModuleObject转换为LangValueType
+    /// </summary>
+    /// <param name="moduleObject">模块对象</param>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>LangValueType</returns>
+    private LangValueType CreateModuleValue(IModuleObject moduleObject, VariateManager manager)
+    {
+        // 如果已经是LangValueType，直接返回
+        if (moduleObject is LangValueType value)
+        {
+            return value;
+        }
+
+        // 否则创建代理对象
+        return ModuleObjectFactory.CreateModuleProxy(
+            moduleObject.ModuleName,
+            manager,
+            Position);
+    }
+
+    /// <summary>
+    /// 处理子模块导入 module.submodule
+    /// </summary>
+    /// <param name="moduleName">模块名称，如 "package.submodule"</param>
+    /// <param name="manager">变量管理器</param>
+    private void HandleSubmoduleImport(string moduleName, VariateManager manager)
+    {
+        var parts = moduleName.Split('.');
+        var basePath = manager.LangInfo!.ImportPath;
+        string currentPath = basePath;
+
+        // 逐级查找子模块
+        for (int i = 0; i < parts.Length; i++)
+        {
+            var part = parts[i];
+            var testPath = Path.Combine(currentPath, part);
+
+            if (i == parts.Length - 1)
+            {
+                // 最后一个部分，查找 .old8 文件或目录
+                var filePath = testPath + ".old8";
+                var dirPath = testPath;
+
+                if (File.Exists(filePath))
+                {
+                    // 找到文件，执行导入
+                    ImportModuleFile(filePath, manager, parts[i], moduleAlias);
+                    return;
+                }
+                else if (Directory.Exists(dirPath))
+                {
+                    // 找到目录，查找 __init__.old8 或 index.old8
+                    var initFile = Path.Combine(dirPath, "__init__.old8");
+                    var indexFile = Path.Combine(dirPath, "index.old8");
+
+                    if (File.Exists(initFile))
+                    {
+                        ImportModuleFile(initFile, manager, parts[i], moduleAlias);
+                        return;
+                    }
+                    else if (File.Exists(indexFile))
+                    {
+                        ImportModuleFile(indexFile, manager, parts[i], moduleAlias);
+                        return;
+                    }
+                }
+            }
+            else if (Directory.Exists(testPath))
+            {
+                // 中间路径，继续深入
+                currentPath = testPath;
+            }
+            else
+            {
+                throw new ImportError(Position, moduleName, new List<string> { testPath });
+            }
+        }
+    }
+
+    /// <summary>
+    /// 导入模块文件
+    /// </summary>
+    /// <param name="filePath">文件路径</param>
+    /// <param name="manager">变量管理器</param>
+    /// <param name="moduleName">模块名</param>
+    /// <param name="alias">别名</param>
+    private void ImportModuleFile(string filePath, VariateManager manager, string moduleName, string? alias)
+    {
+        var moduleAbsolutePath = Path.GetFullPath(filePath);
+
+        // 检查循环依赖
+        if (manager.ImportStack.Contains(moduleAbsolutePath))
+        {
+            throw new ImportError(Position, moduleName, manager.ImportStack);
+        }
+
+        // 检查缓存
+        if (manager.Interpreter!.ModuleCache.TryGetValue(moduleAbsolutePath, out var cachedBlock))
+        {
+            // 使用缓存的模块
+            if (fromClause)
+            {
+                manager.AddChildren();
+                cachedBlock.ExecuteModule(manager, skipFunctionClassInit: true);
+                ImportSpecifiedMembers(manager);
+                manager.RemoveChildren();
+            }
+            else
+            {
+                if (alias != null)
+                {
+                    var moduleObj = new SimpleModuleObject(manager);
+                    manager.Scopes[^1][alias] = moduleObj;
+                }
+            }
+            return;
+        }
+
+        // 执行导入
+        manager.ImportStack.Push(moduleAbsolutePath);
+        try
+        {
+            var previousPath = manager.Path;
+            manager.Path = moduleAbsolutePath;
+
+            var code = Apis.FromFile(moduleAbsolutePath);
+            var block = manager.Interpreter.Build(code: code);
+
+            // 缓存模块
+            manager.Interpreter.ModuleCache[moduleAbsolutePath] = block;
+
+            if (fromClause)
+            {
+                manager.AddChildren();
+                block.ExecuteModule(manager);
+                ImportSpecifiedMembers(manager);
+                manager.RemoveChildren();
+            }
+            else
+            {
+                block.Run(manager);
+
+                if (alias != null)
+                {
+                    var moduleObj = new SimpleModuleObject(manager);
+                    manager.Scopes[^1][alias] = moduleObj;
+                }
+            }
+
+            manager.Path = previousPath;
+        }
+        finally
+        {
+            manager.ImportStack.Pop();
+        }
+    }
+
+    /// <summary>
     /// 将导入语句转换为字符串表示
     /// </summary>
     /// <returns>导入语句的字符串表示</returns>
     public override string ToString()
     {
+        var lazyStr = isLazy ? "lazy " : "";
+
+        if (isSelective)
+        {
+            var specifiers = string.Join(", ",
+                ImportSpecifiers.Select(s => s.Name == s.Alias ? s.Name : $"{s.Name} as {s.Alias}"));
+            return $"{lazyStr}import {specifiers} from {importString}";
+        }
+
         if (ImportSpecifiers.Count > 0)
         {
             var specifiers = string.Join(", ",
                 ImportSpecifiers.Select(s => s.Name == s.Alias ? s.Name : $"{s.Name} as {s.Alias}"));
-            return $"import {{ {specifiers} }} from {importString}";
+            return $"{lazyStr}import {{ {specifiers} }} from {importString}";
         }
 
-        return $"import {importString}";
+        if (moduleAlias != null)
+        {
+            return $"{lazyStr}import {importString} as {moduleAlias}";
+        }
+
+        return $"{lazyStr}import {importString}";
     }
 }

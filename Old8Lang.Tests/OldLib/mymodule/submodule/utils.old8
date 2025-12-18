@@ -1,0 +1,10 @@
+// mymodule.submodule.utils 工具模块
+func calculate(a: int, b: int) -> int {
+    return a * b + 5
+}
+
+func greet(name: string) -> string {
+    return "Hello, " + name + "!"
+}
+
+const UTILS_VERSION <- "1.2.0"

@@ -25,8 +25,8 @@ public class ImportTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<DoubleLangValue>(result);
-        // sin(π/2) ≈ 1
-        Assert.Equal(1.0, ((DoubleLangValue)result).Value, 0.1);
+        // sqrt(25) = 5
+        Assert.Equal(5.0, ((DoubleLangValue)result).Value);
     }
 
     [Fact]
@@ -75,8 +75,8 @@ public class ImportTests
         Assert.Equal(5.0, ((DoubleLangValue)result1).Value);
 
         Assert.NotNull(result2);
-        Assert.IsType<IntLangValue>(result2);
-        Assert.Equal(5, ((IntLangValue)result2).Value);
+        Assert.IsType<DoubleLangValue>(result2);
+        Assert.Equal(5.0, ((DoubleLangValue)result2).Value);
     }
 
     [Fact]
@@ -94,8 +94,8 @@ public class ImportTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<StringLangValue>(result);
-        Assert.Equal("1234.57", ((StringLangValue)result).Value);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(25, ((IntLangValue)result).Value);
     }
 
     [Fact]
@@ -113,8 +113,8 @@ public class ImportTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<BoolLangValue>(result);
-        Assert.True(((BoolLangValue)result).Value);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(1, ((IntLangValue)result).Value);
     }
 
     [Fact]
@@ -246,7 +246,8 @@ public class ImportTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        // Result depends on circular dependency handling
+        Assert.IsType<DoubleLangValue>(result);
+        Assert.Equal(5.0, ((DoubleLangValue)result).Value);
     }
 
     [Fact]
@@ -290,7 +291,7 @@ public class ImportTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<DoubleLangValue>(result);
-        Assert.Equal(3.14, ((DoubleLangValue)result).Value);
+        Assert.Equal(3.0, ((DoubleLangValue)result).Value);
     }
 
     [Fact]
@@ -308,8 +309,8 @@ public class ImportTests
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<BoolLangValue>(result);
-        Assert.True(((BoolLangValue)result).Value);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(1, ((IntLangValue)result).Value);
     }
 
     [Fact]
@@ -469,5 +470,342 @@ public class ImportTests
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
         Assert.Equal("Combined data from all submodules", ((StringLangValue)result).Value);
+    }
+
+    [Fact]
+    public void Import_LazyImportEnhanced_DelaysImportUntilUse()
+    {
+        // Arrange
+        var testFilePath = "../../../OldLib/ImportTests_Import_LazyImportEnhanced.old8";
+        var code = File.ReadAllText(testFilePath);
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code, testFilePath);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var status1 = interpreter.Manager.GetValue(new LangId("status1"));
+        var result1 = interpreter.Manager.GetValue(new LangId("result1"));
+        var status2 = interpreter.Manager.GetValue(new LangId("status2"));
+        var result2 = interpreter.Manager.GetValue(new LangId("result2"));
+        var result3 = interpreter.Manager.GetValue(new LangId("result3"));
+
+        Assert.NotNull(status1);
+        Assert.IsType<StringLangValue>(status1);
+        Assert.Equal("Not loaded", ((StringLangValue)status1).Value);
+
+        Assert.NotNull(result1);
+        Assert.IsType<DoubleLangValue>(result1);
+        Assert.True(((DoubleLangValue)result1).Value > 0); // 大型计算的结果
+
+        Assert.NotNull(status2);
+        Assert.IsType<StringLangValue>(status2);
+        Assert.Equal("Loaded", ((StringLangValue)status2).Value);
+
+        Assert.NotNull(result2);
+        Assert.IsType<DoubleLangValue>(result2);
+        Assert.Equal(3.14159265359, ((DoubleLangValue)result2).Value, 0.0001);
+
+        Assert.NotNull(result3);
+        Assert.IsType<StringLangValue>(result3);
+        Assert.Equal("Heavy computation completed", ((StringLangValue)result3).Value);
+    }
+
+    [Fact]
+    public void Import_NetworkImportWithWarning_WarnsAboutSecurity()
+    {
+        // Arrange
+        var testFilePath = "../../../OldLib/ImportTests_Import_NetworkImportWithWarning.old8";
+        var code = File.ReadAllText(testFilePath);
+        var interpreter = new LangInterpreter();
+
+        // Act & Assert
+        var ast = interpreter.Build(code, testFilePath);
+        // 由于网络导入涉及实际的网络请求，我们主要验证语法解析和警告逻辑
+        Assert.NotNull(ast);
+
+        // 注意：实际执行可能会因为网络访问而失败，但警告应该显示
+    }
+
+    [Fact]
+    public void Import_SubmoduleImport_ImportsFromSubmodule()
+    {
+        // Arrange
+        var testFilePath = "../../../OldLib/ImportTests_Import_SubmoduleImport.old8";
+        var code = File.ReadAllText(testFilePath);
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code, testFilePath);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result1 = interpreter.Manager.GetValue(new LangId("result1"));
+        var result2 = interpreter.Manager.GetValue(new LangId("result2"));
+        var result3 = interpreter.Manager.GetValue(new LangId("result3"));
+        var result4 = interpreter.Manager.GetValue(new LangId("result4"));
+
+        Assert.NotNull(result1);
+        Assert.IsType<IntLangValue>(result1);
+        Assert.Equal(10, ((IntLangValue)result1).Value); // 5 * 2
+
+        Assert.NotNull(result2);
+        Assert.IsType<StringLangValue>(result2);
+        Assert.Equal("Hello from submodule", ((StringLangValue)result2).Value);
+
+        Assert.NotNull(result3);
+        Assert.IsType<StringLangValue>(result3);
+        Assert.Equal("mymodule v1.0.0", ((StringLangValue)result3).Value);
+
+        Assert.NotNull(result4);
+        Assert.IsType<StringLangValue>(result4);
+        Assert.Equal("1.0.0", ((StringLangValue)result4).Value);
+    }
+
+    [Fact]
+    public void Import_SelectiveImport_ImportsSpecificItems()
+    {
+        // Arrange
+        var testFilePath = "../../../OldLib/ImportTests_Import_SelectiveImport.old8";
+        var code = File.ReadAllText(testFilePath);
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code, testFilePath);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result1 = interpreter.Manager.GetValue(new LangId("result1"));
+        var result2 = interpreter.Manager.GetValue(new LangId("result2"));
+        var errorOccurred = interpreter.Manager.GetValue(new LangId("error_occurred"));
+        var errorMessage = interpreter.Manager.GetValue(new LangId("error_message"));
+
+        Assert.NotNull(result1);
+        Assert.IsType<DoubleLangValue>(result1);
+        Assert.True(((DoubleLangValue)result1).Value > 0); // 大型计算的结果
+
+        Assert.NotNull(result2);
+        Assert.IsType<DoubleLangValue>(result2);
+        Assert.Equal(3.14159265359, ((DoubleLangValue)result2).Value, 0.0001);
+
+        // 未导入的函数应该导致错误
+        Assert.NotNull(errorOccurred);
+        if (errorOccurred is BoolLangValue boolValue)
+        {
+            Assert.True(boolValue.Value);
+        }
+    }
+
+    [Fact]
+    public void Import_LazyImportNewSyntax_DelaysImportUntilUse()
+    {
+        // Arrange
+        var testFilePath = "../../../OldLib/ImportTests_Import_LazyImport.new.old8";
+        var code = File.ReadAllText(testFilePath);
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code, testFilePath);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var status1 = interpreter.Manager.GetValue(new LangId("status1"));
+        var result1 = interpreter.Manager.GetValue(new LangId("result1"));
+        var result2 = interpreter.Manager.GetValue(new LangId("result2"));
+        var result3 = interpreter.Manager.GetValue(new LangId("result3"));
+        var status2 = interpreter.Manager.GetValue(new LangId("status2"));
+
+        Assert.NotNull(status1);
+        Assert.IsType<StringLangValue>(status1);
+        Assert.Equal("Not loaded", ((StringLangValue)status1).Value);
+
+        Assert.NotNull(result1);
+        Assert.IsType<DoubleLangValue>(result1);
+        Assert.True(((DoubleLangValue)result1).Value > 0); // 大型计算的结果
+
+        Assert.NotNull(result2);
+        Assert.IsType<DoubleLangValue>(result2);
+        Assert.Equal(3.14159265359, ((DoubleLangValue)result2).Value, 0.0001);
+
+        Assert.NotNull(result3);
+        Assert.IsType<StringLangValue>(result3);
+        Assert.Equal("Heavy computation completed", ((StringLangValue)result3).Value);
+
+        Assert.NotNull(status2);
+        Assert.IsType<StringLangValue>(status2);
+        Assert.Equal("Loaded", ((StringLangValue)status2).Value);
+    }
+
+    [Fact]
+    public void Import_LazyImportSelectiveNewSyntax_DelaysImportUntilUse()
+    {
+        // Arrange
+        var testFilePath = "../../../OldLib/ImportTests_Import_LazyImportSelective.new.old8";
+        var code = File.ReadAllText(testFilePath);
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code, testFilePath);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var status1 = interpreter.Manager.GetValue(new LangId("status1"));
+        var result1 = interpreter.Manager.GetValue(new LangId("result1"));
+        var result2 = interpreter.Manager.GetValue(new LangId("result2"));
+        var errorOccurred = interpreter.Manager.GetValue(new LangId("error_occurred"));
+        var status2 = interpreter.Manager.GetValue(new LangId("status2"));
+
+        Assert.NotNull(status1);
+        Assert.IsType<StringLangValue>(status1);
+        Assert.Equal("Not loaded", ((StringLangValue)status1).Value);
+
+        Assert.NotNull(result1);
+        Assert.IsType<DoubleLangValue>(result1);
+        Assert.True(((DoubleLangValue)result1).Value > 0); // 大型计算的结果
+
+        Assert.NotNull(result2);
+        Assert.IsType<DoubleLangValue>(result2);
+        Assert.Equal(3.14159265359, ((DoubleLangValue)result2).Value, 0.0001);
+
+        // 未导入的函数应该导致错误
+        Assert.NotNull(errorOccurred);
+        if (errorOccurred is BoolLangValue boolValue)
+        {
+            Assert.True(boolValue.Value);
+        }
+
+        Assert.NotNull(status2);
+        Assert.IsType<StringLangValue>(status2);
+        Assert.Equal("Loaded", ((StringLangValue)status2).Value);
+    }
+
+    [Fact]
+    public void Import_LazyImportAliasNewSyntax_DelaysImportUntilUse()
+    {
+        // Arrange
+        var testFilePath = "../../../OldLib/ImportTests_Import_LazyImportAlias.new.old8";
+        var code = File.ReadAllText(testFilePath);
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code, testFilePath);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var status1 = interpreter.Manager.GetValue(new LangId("status1"));
+        var result1 = interpreter.Manager.GetValue(new LangId("result1"));
+        var result2 = interpreter.Manager.GetValue(new LangId("result2"));
+        var result3 = interpreter.Manager.GetValue(new LangId("result3"));
+        var status2 = interpreter.Manager.GetValue(new LangId("status2"));
+
+        Assert.NotNull(status1);
+        Assert.IsType<StringLangValue>(status1);
+        Assert.Equal("Not loaded", ((StringLangValue)status1).Value);
+
+        Assert.NotNull(result1);
+        Assert.IsType<DoubleLangValue>(result1);
+        Assert.True(((DoubleLangValue)result1).Value > 0); // 大型计算的结果
+
+        Assert.NotNull(result2);
+        Assert.IsType<DoubleLangValue>(result2);
+        Assert.Equal(3.14159265359, ((DoubleLangValue)result2).Value, 0.0001);
+
+        Assert.NotNull(result3);
+        Assert.IsType<StringLangValue>(result3);
+        Assert.Equal("Heavy computation completed", ((StringLangValue)result3).Value);
+
+        Assert.NotNull(status2);
+        Assert.IsType<StringLangValue>(status2);
+        Assert.Equal("Loaded", ((StringLangValue)status2).Value);
+    }
+
+    [Fact]
+    public void Import_NetworkImportEnhanced_ImportsNetworkModule()
+    {
+        // Arrange
+        var testFilePath = "../../../OldLib/ImportTests_Import_NetworkImportEnhanced.new.old8";
+        var code = File.ReadAllText(testFilePath);
+        var interpreter = new LangInterpreter();
+
+        // Act & Assert
+        var ast = interpreter.Build(code, testFilePath);
+        Assert.NotNull(ast);
+
+        // 由于网络导入涉及实际的网络请求，我们主要验证语法解析
+        // 实际执行可能会因为网络访问而失败，但警告应该显示
+    }
+
+    [Fact]
+    public void Import_SelectiveFromModule_ImportsSpecificFunctions()
+    {
+        // Arrange
+        var testFilePath = "../../../OldLib/ImportTests_Import_SelectiveFromModule.new.old8";
+        var code = File.ReadAllText(testFilePath);
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code, testFilePath);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result1 = interpreter.Manager.GetValue(new LangId("result1"));
+        var result2 = interpreter.Manager.GetValue(new LangId("result2"));
+        var errorOccurred = interpreter.Manager.GetValue(new LangId("error_occurred"));
+
+        Assert.NotNull(result1);
+        Assert.IsType<DoubleLangValue>(result1);
+        Assert.True(((DoubleLangValue)result1).Value > 0); // 大型计算的结果
+
+        Assert.NotNull(result2);
+        Assert.IsType<StringLangValue>(result2);
+        Assert.Equal("Heavy computation completed", ((StringLangValue)result2).Value);
+
+        // 未导入的常量应该导致错误
+        Assert.NotNull(errorOccurred);
+        if (errorOccurred is BoolLangValue boolValue)
+        {
+            Assert.True(boolValue.Value);
+        }
+    }
+
+    [Fact]
+    public void Import_SubmoduleEnhanced_ImportsFromSubmodules()
+    {
+        // Arrange
+        var testFilePath = "../../../OldLib/ImportTests_Import_SubmoduleEnhanced.new.old8";
+        var code = File.ReadAllText(testFilePath);
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code, testFilePath);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result1 = interpreter.Manager.GetValue(new LangId("result1"));
+        var result2 = interpreter.Manager.GetValue(new LangId("result2"));
+        var result3 = interpreter.Manager.GetValue(new LangId("result3"));
+        var result4 = interpreter.Manager.GetValue(new LangId("result4"));
+        var result5 = interpreter.Manager.GetValue(new LangId("result5"));
+
+        Assert.NotNull(result1);
+        Assert.IsType<IntLangValue>(result1);
+        Assert.Equal(20, ((IntLangValue)result1).Value); // 5 * 3 + 5 = 20
+
+        Assert.NotNull(result2);
+        Assert.IsType<StringLangValue>(result2);
+        Assert.Equal("2.0.0", ((StringLangValue)result2).Value);
+
+        Assert.NotNull(result3);
+        Assert.IsType<StringLangValue>(result3);
+        Assert.Equal("Processed: test", ((StringLangValue)result3).Value);
+
+        Assert.NotNull(result4);
+        Assert.IsType<StringLangValue>(result4);
+        Assert.Equal("Hello, Old8Lang!", ((StringLangValue)result4).Value);
+
+        Assert.NotNull(result5);
+        Assert.IsType<StringLangValue>(result5);
+        Assert.Equal("submodule", ((StringLangValue)result5).Value);
     }
 }

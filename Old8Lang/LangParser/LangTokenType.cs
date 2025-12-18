@@ -298,7 +298,12 @@ public enum LangTokenType
     /// <summary>
     /// abstract
     /// </summary>
-    Abstract
+    Abstract,
+
+    /// <summary>
+    /// lazy
+    /// </summary>
+    Lazy
 }
 
 public enum KeywordType
@@ -346,5 +351,6 @@ public enum KeywordType
     Yield,
     Interface,
     Implements,
-    Abstract
+    Abstract,
+    Lazy
 }

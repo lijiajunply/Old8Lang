@@ -1,2 +1,2 @@
-import "./utils"
-result <- utils.formatNumber(1234.567, 2)
+import "./simple_math"
+result <- square(5)

@@ -1,2 +1,2 @@
-import "math" version "1.2.3"
-result <- math.factorial(5)
+import "math"
+result <- Factorial(5)

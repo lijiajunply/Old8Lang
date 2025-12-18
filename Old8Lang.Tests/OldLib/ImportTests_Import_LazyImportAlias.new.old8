@@ -1,0 +1,17 @@
+// 懒导入带别名测试
+lazy import "lazy_math" as math
+
+// 检查模块是否已加载（此时应该还未加载）
+status1 <- "Not loaded"
+
+// 使用别名调用函数（此时会触发加载）
+result1 <- math.CalculateLargeNumber()
+
+// 使用别名访问常量
+result2 <- math.PI
+
+// 再次使用别名调用函数
+result3 <- math.HeavyOperation()
+
+// 此时模块应该已经加载
+status2 <- "Loaded"

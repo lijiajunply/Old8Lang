@@ -1,0 +1,7 @@
+// 父模块初始化文件
+const MODULE_NAME <- "mymodule"
+const VERSION <- "1.0.0"
+
+func GetInfo() -> string {
+    return MODULE_NAME + " v" + VERSION
+}

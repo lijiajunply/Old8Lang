@@ -905,9 +905,20 @@ public class StatementParser(
     }
 
     /// <summary>
-    /// importStatement = "import" ( importSpecifier "from" )? ( identifier | STRING ) ;
-    /// importSpecifier = "{" importItem ( "," importItem )* "}";
+    /// importStatement = "import" ( "lazy" )? ( importSpecifier "from" )? ( identifier | STRING ) ;
+    /// importSpecifier = "{" importItem ( "," importItem )* "}" | importItem ( "," importItem )* ;
     /// importItem = identifier ( "as" identifier )?;
+    ///
+    /// 支持的语法：
+    /// - import module
+    /// - import "module"
+    /// - import module as alias
+    /// - import { item1, item2 as alias2 } from module
+    /// - import item1, item2 from module
+    /// - lazy import module
+    /// - lazy import module as alias
+    /// - lazy import { item1, item2 } from module
+    /// - lazy import item1, item2 from module
     /// </summary>
     /// <returns>引入模块</returns>
     public ImportStatement ParseImportStatement()
@@ -918,7 +929,16 @@ public class StatementParser(
 
         List<ImportItem>? importSpecifiers = null;
         bool fromClause = false;
+        bool isLazy = false;
+        bool isSelective = false;
         string moduleName;
+
+        // 检查是否为懒导入：lazy import
+        if (CurrentToken.Type == LangTokenType.Lazy)
+        {
+            Expect(LangTokenType.Lazy); // 消耗 "lazy"
+            isLazy = true;
+        }
 
         // 检查是否有导入指定项
         if (CurrentToken.Type == LangTokenType.LeftBrace)
@@ -964,9 +984,67 @@ public class StatementParser(
         }
         else if (CurrentToken.Type == LangTokenType.Identifier)
         {
-            // 传统导入：import module
-            moduleName = CurrentToken.Value;
+            // 可能是传统导入：import module
+            // 或者是选择导入：import item1, item2 from module
+
+            // 保存当前位置，用于前瞻检查
+            var savedIndex = CurrentIndex;
+
+            // 尝试解析第一个标识符
+            var firstIdentifier = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
+
+            // 检查是否是选择导入：item1, item2 from module
+            if (CurrentToken.Type == LangTokenType.Comma ||
+                (CurrentToken.Type == LangTokenType.Identifier && CurrentToken.Value == "from"))
+            {
+                // 这是选择导入：import item1, item2 from module
+                isSelective = true;
+                importSpecifiers = new List<ImportItem>();
+                importSpecifiers.Add(new ImportItem(firstIdentifier));
+
+                // 解析更多的导入项
+                while (CurrentToken.Type == LangTokenType.Comma)
+                {
+                    Expect(LangTokenType.Comma);
+                    string name = CurrentToken.Value;
+                    Expect(LangTokenType.Identifier);
+
+                    string? alias = null;
+                    if (CurrentToken.Type == LangTokenType.As)
+                    {
+                        Expect(LangTokenType.As);
+                        alias = CurrentToken.Value;
+                        Expect(LangTokenType.Identifier);
+                    }
+
+                    importSpecifiers.Add(new ImportItem(name, alias));
+                }
+
+                // 必须有 from 子句
+                fromClause = true;
+                Expect(LangTokenType.From);
+
+                // 解析模块名
+                if (CurrentToken.Type == LangTokenType.String)
+                {
+                    moduleName = CurrentToken.Value;
+                    Expect(LangTokenType.String);
+                }
+                else
+                {
+                    moduleName = CurrentToken.Value;
+                    Expect(LangTokenType.Identifier);
+                }
+            }
+            else
+            {
+                // 这是传统导入：import module
+                // 回退第一个标识符作为模块名
+                CurrentIndex = savedIndex;
+                moduleName = CurrentToken.Value;
+                Expect(LangTokenType.Identifier);
+            }
         }
         else if (CurrentToken.Type == LangTokenType.String)
         {
@@ -979,7 +1057,16 @@ public class StatementParser(
             throw CreateSyntaxError("Expected identifier, string, or left brace after import");
         }
 
-        return new ImportStatement(moduleName, position, importSpecifiers, fromClause);
+        // 检查是否有模块别名：as alias
+        string? moduleAlias = null;
+        if (CurrentToken.Type == LangTokenType.As)
+        {
+            Expect(LangTokenType.As);
+            moduleAlias = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+        }
+
+        return new ImportStatement(moduleName, position, importSpecifiers, fromClause, moduleAlias, isLazy, isSelective);
     }
 
     /// <summary>

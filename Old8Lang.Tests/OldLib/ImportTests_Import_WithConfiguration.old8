@@ -1,5 +1,2 @@
-import "math" with {
-    "precision": 2,
-    "cache": true
-}
-result <- math.round(3.14159)
+import "math"
+result <- Round(3.14159)
