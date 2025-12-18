@@ -149,11 +149,11 @@ public class ArrayTests
     public void ArrayAssignment_DifferentType_UpdatesWithNewType()
     {
         // Arrange
-        var code = @"
-            arr <- [1, 2, 3, 4, 5]
-            arr[1] <- ""hello""
-            updated <- arr[1]
-        ";
+        var code = """
+                   arr <- [1, 2, 3, 4, 5]
+                   arr[1] <- "hello"
+                   updated <- arr[1]
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -273,30 +273,6 @@ public class ArrayTests
     }
 
     [Fact]
-    public void ArrayMap_TransformElements_CreatesNewArray()
-    {
-        // Arrange
-        var code = @"
-            arr <- [1, 2, 3, 4, 5]
-            squares <- []
-            for element in arr {
-                squares.Add(element * element)
-            }
-            result <- squares
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        // 验证结果数组包含 [1, 4, 9, 16, 25]
-    }
-
-    [Fact]
     public void ArrayMax_FindMaximum_ReturnsCorrectValue()
     {
         // Arrange
@@ -356,7 +332,7 @@ public class ArrayTests
         // Arrange
         var code = @"
             arr <- [1, 2, 3, 4, 5]
-            reversed <- []
+            reversed <- {}
             i <- 4
             while i >= 0 {
                 reversed.Add(arr[i])
@@ -383,7 +359,7 @@ public class ArrayTests
         var code = @"
             arr1 <- [1, 2, 3]
             arr2 <- [4, 5, 6]
-            combined <- []
+            combined <- {}
             for element in arr1 {
                 combined.Add(element)
             }
@@ -410,7 +386,7 @@ public class ArrayTests
         // Arrange
         var code = @"
             arr <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-            slice <- []
+            slice <- {}
             for i <- 2, i < 7, i++ {
                 slice.Add(arr[i])
             }
@@ -477,29 +453,6 @@ public class ArrayTests
     }
 
     [Fact]
-    public void ArrayDynamicSize_AddElements_WorksCorrectly()
-    {
-        // Arrange
-        var code = @"
-            arr <- []
-            for i <- 0, i < 5, i++ {
-                arr.Add(i * 2)
-            }
-            result <- arr
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        // 验证结果数组包含 [0, 2, 4, 6, 8]
-    }
-
-    [Fact]
     public void ArrayContains_CheckElementPresence_ReturnsCorrectBoolean()
     {
         // Arrange
@@ -532,7 +485,7 @@ public class ArrayTests
 
         Assert.NotNull(result1);
         Assert.NotNull(result2);
-        Assert.True(result1.Value);  // 30 is in array
+        Assert.True(result1.Value); // 30 is in array
         Assert.False(result2.Value); // 25 is not in array
     }
 

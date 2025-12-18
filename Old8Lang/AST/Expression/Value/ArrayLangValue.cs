@@ -47,62 +47,9 @@ public class ArrayLangValue : LangValueType, ILangList
             if (idx < 0)
                 idx = RunResult.Length + idx;
 
-            // 类型检查和转换：确保添加的元素类型与数组中已有的元素类型一致
-            // 如果类型不一致，尝试进行类型转换
+            // 支持动态类型数组：允许数组中包含不同类型的元素
+            // 直接使用新值，不进行类型转换
             LangValueType convertedValue = value;
-            if (RunResult.Length > 0 && RunResult[idx] != null!)
-            {
-                var existingType = RunResult[idx].TypeToString().ToLower();
-                var newValueType = value.TypeToString().ToLower();
-
-                if (existingType != newValueType)
-                {
-                    // 尝试进行类型转换
-                    try
-                    {
-                        // 创建类型值用于转换
-                        var targetType = new TypeLangValue(existingType);
-                        // 调用 Converse 方法进行类型转换
-                        convertedValue = value.Converse(targetType, new VariateManager());
-                    }
-                    catch (Exception e)
-                    {
-                        // 如果转换失败，抛出类型不匹配错误
-                        throw new TypeError(this, existingType, newValueType,
-                            $"数组元素类型必须一致，无法将 {newValueType} 转换为 {existingType}: {e.Message}");
-                    }
-                }
-            }
-            else if (RunResult.Length > 0)
-            {
-                // 如果数组元素为空，检查其他非空元素的类型
-                foreach (var t in RunResult)
-                {
-                    if (t == null!) continue;
-                    var existingType = t.TypeToString().ToLower();
-                    var newValueType = value.TypeToString().ToLower();
-
-                    if (existingType != newValueType)
-                    {
-                        // 尝试进行类型转换
-                        try
-                        {
-                            // 创建类型值用于转换
-                            var targetType = new TypeLangValue(existingType);
-                            // 调用 Converse 方法进行类型转换
-                            convertedValue = value.Converse(targetType, new VariateManager());
-                        }
-                        catch (Exception e)
-                        {
-                            // 如果转换失败，抛出类型不匹配错误
-                            throw new TypeError(this, existingType, newValueType,
-                                $"数组元素类型必须一致，无法将 {newValueType} 转换为 {existingType}: {e.Message}");
-                        }
-                    }
-
-                    break;
-                }
-            }
 
             RunResult[idx] = convertedValue;
         }

@@ -18,12 +18,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionOverloadTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionOverloadTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/HigherOrderTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/HigherOrderTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/LambdaTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/LambdaTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/LoopTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/LoopTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TupleLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Collections/ArrayTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Collections/ArrayTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/NestedExceptionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Exceptions/NestedExceptionTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,6 +61,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/AwaitTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Basic/VariableTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Collections/ArrayTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Collections/SliceTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Collections/TupleTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Exceptions/ErrorPropagationTests.cs" root0="SKIP_HIGHLIGHTING" />
@@ -89,6 +87,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/LangId.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
@@ -438,7 +437,7 @@
       <workItem from="1765776532895" duration="4492000" />
       <workItem from="1765791344254" duration="3118000" />
       <workItem from="1765816155545" duration="30580000" />
-      <workItem from="1766037121468" duration="17088000" />
+      <workItem from="1766037121468" duration="17472000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -783,7 +782,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="258" />
+    <option name="localTasksCounter" value="259" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -810,7 +809,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(parser): 改进注释过滤器以正确处理字符串中的注释符号&#10;&#10;- 修复字符串字面量内 // 和 /* */ 被误识别为注释的问题&#10;- 添加双引号和单引号字符串状态跟踪&#10;- 实现转义字符处理逻辑，防止 \\&quot; 干扰字符串边界检测&#10;- 确保只有在字符串外部才进行注释识别和过滤&#10;- 更新测试用例，简化异步通道测试逻辑以提高稳定性&#10;- 调整词法分析器文档注释，明确说明字符串内注释符号的处理方式" />
     <MESSAGE value="docs(reports): 删除异步多线程和导入修复相关测试报告&#10;&#10;- 移除了2025-12-16的异步多线程评估报告&#10;- 删除了导入修复测试报告&#10;- 清理了同步迭代器测试报告&#10;- 移除了异步多线程测试结果详细记录&#10;- 统一清理了冗余的技术评估文档" />
     <MESSAGE value="test(interpreter): 添加解释器异步功能测试&#10;&#10;- 创建 InterpreterAsyncTests 测试类&#10;- 实现基础功能测试用例&#10;- 添加函数定义测试用例&#10;- 实现类定义测试用例&#10;- 添加异常处理和预期异常判断逻辑" />
     <MESSAGE value="feat(dict): 为字典类型添加常用查询方法&#10;&#10;- 添加 Count 方法获取字典键值对数量&#10;- 实现 ContainsKey 方法检查键是否存在&#10;- 实现 ContainsValue 方法检查值是否存在&#10;- 添加 Keys 方法获取所有键的列表&#10;- 添加 Values 方法获取所有值的列表&#10;&#10;feat(list): 为列表类型添加元素计数方法&#10;&#10;- 添加 Count 方法获取列表元素数量" />
@@ -835,7 +833,8 @@
     <MESSAGE value="feat(interpreter): 支持函数重载和类型检查&#10;&#10;- 修改 Dot 方法签名，添加 VariateManager 参数以支持运行时类型检查&#10;- 更新 ArrayLangValue、DictionaryLangValue、ListLangValue 等类型的 Dot 实现&#10;- 改进 FuncInit 函数定义检查逻辑，增加参数类型和返回类型匹配&#10;- 完善 Instance 类中的函数重载解析机制，支持基于参数类型的精确匹配&#10;- 修复 ControlFlowTests 和 JumpStatementsTests 中的循环语法错误&#10;- 更新 FunctionCallTests 和 FunctionOverloadTests 中的函数声明语法&#10;- 增强 TryStatement 对 return 语句的处理能力&#10;- 移除 PrimaryParser 中对 await 表达式的冗余处理&#10;- 优化 ThreadClassLangValue 和 TaskClassLangValue 的参数执行逻辑&#10;- 补充 VariateManager.GetFunc 方法注释，明确其仅匹配函数名和参数数量" />
     <MESSAGE value="fix(interpreter): 修正算术运算和布尔值测试中的类型检查与预期值&#10;&#10;- 更新 ArithmeticTests 中的断言以使用 IntLangValue 替代 DoubleLangValue&#10;- 修正 AwaitTests 中循环语法从 range 表达式改为数组枚举&#10;- 在 BoolLangValue.ToString() 中明确返回 &quot;true&quot; 或 &quot;false&quot;&#10;- 简化 ClassMemberId 中互斥修饰符检查的 LINQ 查询&#10;- 更新 ControlFlowTests 中字符串比较期望值为大写 &quot;True&quot;&#10;- 修正 FunctionCallTests 和相关测试中的函数声明及调用细节&#10;- 改正 LambdaTests 中闭包和阶乘函数的定义方式&#10;- 优化 Operation 类型处理中的条件判断结构&#10;- 更新 SetStatement 中字典类型的别名为 &quot;dict&quot; 并增加 any/task 类型支持&#10;- 修复 StringTemplateTests 中的断言并调整模板字符串格式&#10;- 统一 ThrowTests 与 TryCatchTests 中布尔值输出为小写形式" />
     <MESSAGE value="test(interpreter): 将布尔断言从 Assert.Equal 改为 Assert.True/False&#10;&#10;- 统一使用 Assert.True 和 Assert.False 来验证布尔值&#10;- 替换所有 Assert.Equal(true, ...) 的调用&#10;- 替换所有 Assert.Equal(false, ...) 的调用&#10;- 提高测试代码的一致性和可读性" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(interpreter): 将布尔断言从 Assert.Equal 改为 Assert.True/False&#10;&#10;- 统一使用 Assert.True 和 Assert.False 来验证布尔值&#10;- 替换所有 Assert.Equal(true, ...) 的调用&#10;- 替换所有 Assert.Equal(false, ...) 的调用&#10;- 提高测试代码的一致性和可读性" />
+    <MESSAGE value="refactor(interpreter): 优化函数重载与类型比较逻辑&#10;&#10;- 删除不支持按返回类型重载的测试用例&#10;- 统一构造函数命名规范，使用 init 替代 Init&#10;- 修正字符转整数方法调用，使用 ToInt() 替代 ToInt32()&#10;- 更新高阶函数参数类型声明，function 替代 func&#10;- 移除冗余的 lambda 数组操作测试&#10;- 强化列表与元组的类型比较逻辑，防止互相混淆&#10;- 明确元组类型标识，增强类型安全性&#10;- 修正循环初始化语法，统一使用花括号初始化集合&#10;- 增加类型检查注释，提升代码可维护性" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(interpreter): 优化函数重载与类型比较逻辑&#10;&#10;- 删除不支持按返回类型重载的测试用例&#10;- 统一构造函数命名规范，使用 init 替代 Init&#10;- 修正字符转整数方法调用，使用 ToInt() 替代 ToInt32()&#10;- 更新高阶函数参数类型声明，function 替代 func&#10;- 移除冗余的 lambda 数组操作测试&#10;- 强化列表与元组的类型比较逻辑，防止互相混淆&#10;- 明确元组类型标识，增强类型安全性&#10;- 修正循环初始化语法，统一使用花括号初始化集合&#10;- 增加类型检查注释，提升代码可维护性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
