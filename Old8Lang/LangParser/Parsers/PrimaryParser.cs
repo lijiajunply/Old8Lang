@@ -961,6 +961,9 @@ public class PrimaryParser(
                 var i = 0;
                 var len = stringValue.Length;
 
+                // Debug: 打印完整的字符串内容
+                // System.Console.WriteLine($"Debug: 字符串模板完整内容: '{stringValue}', 长度: {len}");
+
                 while (i < len)
                 {
                     var c = stringValue[i];
@@ -981,12 +984,55 @@ public class PrimaryParser(
                             i += 1;
                             var exprStart = i;
                             var braceCount = 1;
+                            var inString = false;
+                            var stringChar = '\0'; // 记录当前字符串的引号类型（单引号或双引号）
 
                             // 查找匹配的 }
                             var foundMatchingBrace = false;
                             while (i < len && braceCount > 0)
                             {
                                 c = stringValue[i];
+
+                                // Debug: 详细跟踪
+                                // System.Console.WriteLine($"Debug: i={i}, c='{c}', braceCount={braceCount}, inString={inString}");
+
+                                // 处理字符串中的引号
+                                if (!inString && (c == '"' || c == '\''))
+                                {
+                                    inString = true;
+                                    stringChar = c;
+                                    // System.Console.WriteLine($"Debug: 进入字符串模式, stringChar='{stringChar}'");
+                                    i++;
+                                    continue;
+                                }
+
+                                if (inString)
+                                {
+                                    // 在字符串中，查找匹配的结束引号
+                                    if (c == stringChar)
+                                    {
+                                        // 检查是否是转义引号
+                                        var isEscaped = false;
+                                        var backslashCount = 0;
+                                        var j = i - 1;
+                                        while (j >= 0 && stringValue[j] == '\\')
+                                        {
+                                            backslashCount++;
+                                            j--;
+                                        }
+                                        isEscaped = (backslashCount % 2) == 1;
+
+                                        if (!isEscaped)
+                                        {
+                                            inString = false;
+                                            stringChar = '\0';
+                                        }
+                                    }
+                                    i++;
+                                    continue;
+                                }
+
+                                // 不在字符串中，才处理大括号
                                 if (c == '{')
                                 {
                                     braceCount++;
@@ -1008,6 +1054,8 @@ public class PrimaryParser(
                             {
                                 // 提取表达式字符串
                                 var exprStr = stringValue.Substring(exprStart, i - exprStart).Trim();
+                                // Debug: 打印提取的表达式
+                                // System.Console.WriteLine($"Debug: 提取到表达式: '{exprStr}'");
 
                                 // 检查表达式是否为空
                                 if (string.IsNullOrWhiteSpace(exprStr))
@@ -1043,6 +1091,9 @@ public class PrimaryParser(
                             else
                             {
                                 // 未找到匹配的 }，抛出语法错误
+                                // Debug: 打印详细信息
+                                // System.Console.WriteLine($"Debug: 未找到匹配的大括号, exprStart={exprStart}, i={i}, len={len}, braceCount={braceCount}");
+                                // System.Console.WriteLine($"Debug: 字符串片段: '{stringValue.Substring(exprStart, Math.Min(i - exprStart + 20, stringValue.Length - exprStart))}'");
                                 throw CreateSyntaxError("字符串模板中缺少匹配的右大括号 '}'");
                             }
                         }

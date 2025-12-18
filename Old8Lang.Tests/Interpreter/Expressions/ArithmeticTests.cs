@@ -1,3 +1,4 @@
+using System.Globalization;
 using Old8Lang.AST.Expression;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Value;
@@ -42,7 +43,14 @@ public class ArithmeticTests
     public void Addition_TwoDoubles_ReturnsCorrectSum(double a, double b, double expected)
     {
         // Arrange
-        var code = $"result <- {a} + {b}";
+        // 确保浮点数在生成的代码中被正确识别为浮点数
+        var aStr = a == 0 && a.ToString(CultureInfo.InvariantCulture) == "0"
+            ? "0.0"
+            : a.ToString(CultureInfo.InvariantCulture);
+        var bStr = b == 0 && b.ToString(CultureInfo.InvariantCulture) == "0"
+            ? "0.0"
+            : b.ToString(CultureInfo.InvariantCulture);
+        var code = $"result <- {aStr} + {bStr}";
         var interpreter = new LangInterpreter();
 
         // Act
@@ -53,7 +61,20 @@ public class ArithmeticTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<DoubleLangValue>(result);
-        Assert.Equal(expected, ((DoubleLangValue)result).Value);
+        var actualValue = ((DoubleLangValue)result).Value;
+
+        // 对于浮点数精度问题，使用近似比较
+        if (double.IsNaN(expected) || double.IsInfinity(expected))
+        {
+            Assert.Equal(expected, actualValue);
+        }
+        else
+        {
+            // 使用适当的容差进行浮点数比较
+            var tolerance = Math.Abs(expected) * 1e-15 + 1e-15;
+            Assert.True(Math.Abs(expected - actualValue) <= tolerance,
+                $"Expected: {expected}, Actual: {actualValue}, Difference: {Math.Abs(expected - actualValue)}");
+        }
     }
 
     [Theory]
@@ -104,10 +125,10 @@ public class ArithmeticTests
     [Theory]
     [InlineData(10, 2, 5)]
     [InlineData(9, 3, 3)]
-    [InlineData(7, 2, 3)]  // 整数除法，截断小数部分
+    [InlineData(7, 2, 3)] // 整数除法，截断小数部分
     [InlineData(-10, 2, -5)]
     [InlineData(10, -2, -5)]
-    [InlineData(5, 2, 2)]  // 整数除法，截断小数部分
+    [InlineData(5, 2, 2)] // 整数除法，截断小数部分
     public void Division_TwoNumbers_ReturnsCorrectQuotient(double a, double b, double expected)
     {
         // Arrange
@@ -177,10 +198,10 @@ public class ArithmeticTests
     }
 
     [Theory]
-    [InlineData(2, 3, 8)]        // 2^3 = 8
-    [InlineData(5, 0, 1)]        // 5^0 = 1
-    [InlineData(0, 5, 0)]        // 0^5 = 0
-    [InlineData(-2, 3, -8)]      // (-2)^3 = -8
+    [InlineData(2, 3, 8)] // 2^3 = 8
+    [InlineData(5, 0, 1)] // 5^0 = 1
+    [InlineData(0, 5, 0)] // 0^5 = 0
+    [InlineData(-2, 3, -8)] // (-2)^3 = -8
     public void PowerOperation_TwoIntegers_ReturnsCorrectResult(int a, int b, int expected)
     {
         // Arrange

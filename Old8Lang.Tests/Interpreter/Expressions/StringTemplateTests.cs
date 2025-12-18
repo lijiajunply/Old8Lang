@@ -409,6 +409,7 @@ public class StringTemplateTests
         var code = @"
             isAdmin <- true
             name <- ""Frank""
+            greeting <- """"  // 在作用域外预定义变量
             if isAdmin {
                 greeting <- $""Welcome, Administrator {name}!""
             } else {

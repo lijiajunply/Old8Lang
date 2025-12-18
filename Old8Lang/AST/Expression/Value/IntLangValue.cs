@@ -36,7 +36,8 @@ public class IntLangValue(int intValue = 0, SourcePosition position = default) :
             }
             catch (OverflowException)
             {
-                throw new OverflowError(this, "整数加法");
+                // 在整数溢出时自动转换为双精度浮点数
+                return DoubleLangValue.Create((double)Value + (double)otherInt.Value);
             }
         }
 
@@ -61,7 +62,8 @@ public class IntLangValue(int intValue = 0, SourcePosition position = default) :
             }
             catch (OverflowException)
             {
-                throw new OverflowError(this, "整数减法");
+                // 在整数溢出时自动转换为双精度浮点数
+                return DoubleLangValue.Create((double)Value - (double)otherInt.Value);
             }
         }
 
@@ -87,7 +89,8 @@ public class IntLangValue(int intValue = 0, SourcePosition position = default) :
             }
             catch (OverflowException)
             {
-                throw new OverflowError(this, "整数乘法");
+                // 在整数溢出时自动转换为双精度浮点数
+                return DoubleLangValue.Create((double)Value * (double)otherInt.Value);
             }
         }
 

@@ -18,12 +18,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/TypeConversionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/TypeConversionTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/ClosureTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/ClosureTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionOverloadTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionOverloadTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/HigherOrderTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/HigherOrderTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ValueTypeFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ValueTypeFuncStatic.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug_test.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_simple_calc.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/ArithmeticTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/ArithmeticTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/StringTemplateTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/StringTemplateTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,6 +62,11 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/AsyncGeneratorTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Expressions/StringTemplateTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Expressions/StringTemplateTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Expressions/StringTemplateTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Expressions/StringTemplateTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Functions/ClosureTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Functions/ClosureTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Functions/ClosureTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs" root0="SKIP_HIGHLIGHTING" />
@@ -91,6 +95,10 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/ExpressionParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/ExpressionParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/ExpressionParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
@@ -416,7 +424,7 @@
       <workItem from="1765816155545" duration="30580000" />
       <workItem from="1766037121468" duration="28333000" />
       <workItem from="1766082960788" duration="2522000" />
-      <workItem from="1766085560295" duration="5806000" />
+      <workItem from="1766085560295" duration="6392000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -761,7 +769,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="275" />
+    <option name="localTasksCounter" value="276" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -788,7 +796,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(lang): 优化类型比较和控制流逻辑&#10;&#10;- 修改 IntLangValue 和 DoubleLangValue 的 Equals 方法，支持跨类型比较&#10;- 更新 ForInStatement 的作用域管理和控制流处理逻辑&#10;- 调整 IfStatement 中变量作用域同步机制&#10;- 修复 ListLangValue 初始化逻辑，避免重复执行&#10;- 更新 Range 表达式语法从 .. 和 ..&lt; 改为 [~] 和 [~[ 格式&#10;- 修改元组索引访问逻辑，支持嵌套多元组结构&#10;- 优化函数调用测试用例及参数传递方式&#10;- 统一测试断言方法，使用 Assert.True 替代 Assert.Equal(true, ...)&#10;- 移除不支持的链式比较表达式测试&#10;- 更新类型关键字识别逻辑，增强 LangId 类型推导能力" />
     <MESSAGE value="refactor(interpreter): 统一使用VariateManager简化类型引用&#10;&#10;- 将所有文件中的LangParser.VariateManager替换为VariateManager&#10;- 移除冗余的命名空间引用前缀&#10;- 更新方法签名以使用简化的类型名称&#10;- 确保所有相关类和接口的一致性&#10;- 优化代码可读性和维护性&#10;&#10;fix(tests): 更新范围测试断言值&#10;&#10;- 修改RangeTests中的预期结果值&#10;- 调整循环边界条件的测试用例&#10;- 删除重复的双精度数值测试&#10;- 确保范围迭代逻辑的准确性&#10;- 验证大型范围处理的正确性" />
     <MESSAGE value="feat(lang): 实现扩展范围表达式和错误传播机制&#10;&#10;- 新增扩展范围表达式语法支持：[start~&lt;end]、[start&gt;~end]、[start&gt;~&lt;end]&#10;- 实现排除边界范围的解析和执行逻辑&#10;- 添加范围表达式的ToString显示优化，使用括号表示包含/排除状态&#10;- 完善错误传播机制，支持跨作用域和函数调用链的错误传递&#10;- 增强类型检查和运行时错误处理能力&#10;- 更新导入模块测试用例，从内联代码改为文件读取方式&#10;- 修复布尔值比较的大小写问题，统一使用小写true/false&#10;- 优化循环和条件语句中的范围表达式使用&#10;- 添加完整的扩展范围表达式单元测试覆盖&#10;- 改进错误处理测试，增加多种错误场景验证" />
     <MESSAGE value="123" />
@@ -813,7 +820,8 @@
     <MESSAGE value="feat(lang): 支持从模块导入所有函数&#10;&#10;- 修改 import 语法以支持通配符导入&#10;- 更新测试用例以验证新语法&#10;- 添加 math 模块包含常用数学函数&#10;- 实现 min、max、sqrt 和 pow 函数&#10;- 确保导入语句与新语法兼容" />
     <MESSAGE value="fix(interpreter): 修复函数调用和高阶函数实现问题&#10;&#10;- 修正 closure 测试中的字符串拼接空格问题&#10;- 更新函数参数类型注解和数组字面量语法&#10;- 修复函数调用测试中断言期望值&#10;- 改进高阶函数 groupBy 实现逻辑&#10;- 添加测试和修复原则文档说明&#10;- 调整可选参数默认值语法格式" />
     <MESSAGE value="test(interpreter): 更新函数调用和高阶函数测试用例&#10;&#10;- 修改 processNumbers 函数为两个独立实现以支持不同场景测试&#10;- 使用原始字符串字面量语法重构数组重载测试代码&#10;- 修正 memoize 高阶函数测试逻辑并添加缓存命中统计&#10;- 简化 groupBy 函数实现并修复类型声明错误&#10;- 调整断言逻辑以更准确验证函数行为和结果值&#10;- 移除冗余变量跟踪并优化测试可读性" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(interpreter): 更新函数调用和高阶函数测试用例&#10;&#10;- 修改 processNumbers 函数为两个独立实现以支持不同场景测试&#10;- 使用原始字符串字面量语法重构数组重载测试代码&#10;- 修正 memoize 高阶函数测试逻辑并添加缓存命中统计&#10;- 简化 groupBy 函数实现并修复类型声明错误&#10;- 调整断言逻辑以更准确验证函数行为和结果值&#10;- 移除冗余变量跟踪并优化测试可读性" />
+    <MESSAGE value="refactor(interpreter): 优化函数调用和类型转换实现&#10;&#10;- 简化闭包测试中的函数创建逻辑，移除不必要的包装函数&#10;- 重构递归计数器测试，改进参数传递和调用方式&#10;- 更新日志记录测试，直接调用函数而非工厂模式&#10;- 修改函数重载测试，为不同类型数组使用独立函数名&#10;- 改进高阶函数测试，优化groupBy实现和类型处理&#10;- 增强类型转换功能，支持布尔值、字符串到整数的灵活转换&#10;- 扩展类型转换方法，新增ToDouble、ToBool、ToChar等转换函数&#10;- 修复类型比较方法命名冲突，将ToBool重命名为EqualsTo&#10;- 更新字符转换逻辑，支持整数和字符串到字符的转换&#10;- 完善列表和数组转换实现，添加空值处理机制" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(interpreter): 优化函数调用和类型转换实现&#10;&#10;- 简化闭包测试中的函数创建逻辑，移除不必要的包装函数&#10;- 重构递归计数器测试，改进参数传递和调用方式&#10;- 更新日志记录测试，直接调用函数而非工厂模式&#10;- 修改函数重载测试，为不同类型数组使用独立函数名&#10;- 改进高阶函数测试，优化groupBy实现和类型处理&#10;- 增强类型转换功能，支持布尔值、字符串到整数的灵活转换&#10;- 扩展类型转换方法，新增ToDouble、ToBool、ToChar等转换函数&#10;- 修复类型比较方法命名冲突，将ToBool重命名为EqualsTo&#10;- 更新字符转换逻辑，支持整数和字符串到字符的转换&#10;- 完善列表和数组转换实现，添加空值处理机制" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
