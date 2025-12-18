@@ -16,7 +16,7 @@ public class ListLangValue : LangValueType, ILangList
 
     public readonly List<LangValueType> Values = [];
 
-    private bool hasBeenCleared = false;
+    private bool HasBeenCleared;
 
 
     public ListLangValue(List<LangExpression> value, SourcePosition position = default) : base(position)
@@ -39,11 +39,12 @@ public class ListLangValue : LangValueType, ILangList
     public override LangValueType Run(VariateManager manager)
     {
         // 只有当Values为空且Value中有表达式时才需要执行，且没有被手动清空过
-        if (Values.Count == 0 && Value.Count > 0 && !hasBeenCleared)
+        if (Values.Count == 0 && Value.Count > 0 && !HasBeenCleared)
         {
             foreach (var expr in Value)
                 Values.Add(expr.Run(manager));
         }
+
         return this;
     }
 
@@ -175,15 +176,51 @@ public class ListLangValue : LangValueType, ILangList
     public void ClearInternal()
     {
         Values.Clear();
-        hasBeenCleared = true;
+        HasBeenCleared = true;
     }
 
-    public LangValueType Slice(int start, int end)
+    public LangValueType Slice(int start, int end, int step)
     {
-        if (start < 0) start += Values.Count;
-        if (end < 0) end += Values.Count + 1;
-        // 使用接受 List<LangValueType> 的构造函数，因为 Values 已经包含了运行后的值
-        return new ListLangValue(Values[start..end], Position);
+        var length = Values.Count;
+        var result = new List<LangValueType>();
+
+        if (step > 0)
+        {
+            // 正向切片
+            if (start < 0) start += length;
+            if (end < 0) end += length;
+
+            start = Math.Max(0, Math.Min(start, length));
+            end = Math.Max(0, Math.Min(end, length));
+
+            for (int i = start; i < end; i += step)
+            {
+                result.Add(Values[i]);
+            }
+        }
+        else if (step < 0)
+        {
+            // 反向切片
+            // 处理负数索引，但保留 -1 作为特殊值（表示"到开头之前"）
+            if (start < -1) start += length;
+            if (end < -1) end += length;
+
+            // 设置边界
+            if (start >= length) start = length - 1;
+            if (start < -1) start = -1;
+            if (end >= length) end = length - 1;
+
+            for (int i = start; i > end; i += step)
+            {
+                result.Add(Values[i]);
+            }
+        }
+        else
+        {
+            throw new InvalidOperationError(this, "切片步长不能为0");
+        }
+
+        return new ListLangValue(result, Position);
     }
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)

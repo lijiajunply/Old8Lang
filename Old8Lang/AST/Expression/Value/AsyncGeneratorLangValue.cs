@@ -46,9 +46,9 @@ public class AsyncGeneratorLangValue : LangValueType, ILangList
     /// </summary>
     public enum AsyncGeneratorState
     {
-        Suspended,   // 已暂停，等待下一个值
-        Running,     // 正在执行
-        Completed    // 已完成
+        Suspended, // 已暂停，等待下一个值
+        Running, // 正在执行
+        Completed // 已完成
     }
 
     /// <summary>
@@ -93,7 +93,7 @@ public class AsyncGeneratorLangValue : LangValueType, ILangList
 
             // 创建异步状态机
             StateMachine = new AsyncGeneratorStateMachine(AsyncFunc, generatorManager,
-                CancellationTokenSource?.Token ?? default);
+                CancellationTokenSource?.Token ?? CancellationToken.None);
         }
 
         // 异步获取下一个值
@@ -106,15 +106,13 @@ public class AsyncGeneratorLangValue : LangValueType, ILangList
                 NextValue = StateMachine.Current;
                 return NextValue ?? new VoidLangValue();
             }
-            else
-            {
-                // 生成器完成
-                State = AsyncGeneratorState.Completed;
-                return (LangValueType)new VoidLangValue();
-            }
-        }, CancellationTokenSource?.Token ?? default);
 
-        return new TaskLangValue(task, CancellationTokenSource?.Token ?? default, Position);
+            // 生成器完成
+            State = AsyncGeneratorState.Completed;
+            return new VoidLangValue();
+        }, CancellationTokenSource?.Token ?? CancellationToken.None);
+
+        return new TaskLangValue(task, CancellationTokenSource?.Token ?? CancellationToken.None, Position);
     }
 
     /// <summary>
@@ -220,12 +218,13 @@ public class AsyncGeneratorLangValue : LangValueType, ILangList
     }
 
     /// <summary>
-    /// 对生成器进行切片
+    /// 对生成器进行切片（带步长）
     /// </summary>
     /// <param name="start">起始索引</param>
     /// <param name="end">结束索引</param>
+    /// <param name="step">步长</param>
     /// <returns>切片后的生成器</returns>
-    public LangValueType Slice(int start, int end)
+    public LangValueType Slice(int start, int end, int step)
     {
         // 异步生成器不支持切片
         throw new NotSupportedException("异步生成器不支持切片操作");

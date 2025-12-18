@@ -1,5 +1,4 @@
 using System.Reflection.Emit;
-using System.Linq;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
@@ -67,6 +66,7 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
     /// <summary>
     /// 创建空元组的专用构造函数
     /// </summary>
+    /// <param name="isEmpty"></param>
     /// <param name="position">源代码位置</param>
     public TupleLangValue(bool isEmpty, SourcePosition position = default) : this(new NullLangValue(),
         new NullLangValue(), position)
@@ -74,7 +74,7 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
         if (isEmpty)
         {
             // 标记为空元组
-            _isEmpty = true;
+            IsEmpty = true;
         }
         else
         {
@@ -83,7 +83,7 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
     }
 
     // 标记是否为空元组
-    private readonly bool _isEmpty = false;
+    private readonly bool IsEmpty;
 
     /// <summary>
     /// 获取元组指定索引的元素
@@ -102,7 +102,7 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
     /// <returns>指定索引的元素</returns>
     public LangValueType Get(int index)
     {
-        if (_isEmpty)
+        if (IsEmpty)
         {
             throw new InvalidOperationError(this, $"元组索引越界: {index}，空元组不支持任何索引访问");
         }
@@ -252,7 +252,7 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
     // 实现ILangList接口
     public IEnumerable<LangValueType> GetItems()
     {
-        if (_isEmpty)
+        if (IsEmpty)
         {
             return new List<LangValueType>();
         }
@@ -264,7 +264,7 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
 
     public int GetLength()
     {
-        if (_isEmpty)
+        if (IsEmpty)
         {
             return 0;
         }
@@ -279,8 +279,16 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
         var items = new List<LangValueType>();
         CollectElements(this, items);
 
-        // 检查边界
-        if (start < 0 || end > items.Count || start >= end)
+        // 处理负数索引：-1 表示最后一个元素
+        if (start < 0) start += items.Count;
+        if (end < 0) end += items.Count;
+
+        // 确保索引在有效范围内
+        start = Math.Max(0, Math.Min(start, items.Count));
+        end = Math.Max(0, Math.Min(end, items.Count));
+
+        // 如果 start >= end，返回空元组
+        if (start >= end)
         {
             return new TupleLangValue(new NullLangValue(), new NullLangValue());
         }
@@ -293,6 +301,57 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
         }
 
         return CreateTupleFromList(sliceItems);
+    }
+
+    public LangValueType Slice(int start, int end, int step)
+    {
+        var items = new List<LangValueType>();
+        CollectElements(this, items);
+        var length = items.Count;
+        var result = new List<LangValueType>();
+
+        if (step > 0)
+        {
+            // 正向切片
+            if (start < 0) start += length;
+            if (end < 0) end += length;
+
+            start = Math.Max(0, Math.Min(start, length));
+            end = Math.Max(0, Math.Min(end, length));
+
+            for (int i = start; i < end; i += step)
+            {
+                result.Add(items[i]);
+            }
+        }
+        else if (step < 0)
+        {
+            // 反向切片
+            // 处理负数索引，但保留 -1 作为特殊值（表示"到开头之前"）
+            if (start < -1) start += length;
+            if (end < -1) end += length;
+
+            // 设置边界
+            if (start >= length) start = length - 1;
+            if (start < -1) start = -1;
+            if (end >= length) end = length - 1;
+
+            for (int i = start; i > end; i += step)
+            {
+                result.Add(items[i]);
+            }
+        }
+        else
+        {
+            throw new InvalidOperationError(this, "切片步长不能为0");
+        }
+
+        if (result.Count == 0)
+        {
+            return new TupleLangValue(new NullLangValue(), new NullLangValue());
+        }
+
+        return CreateTupleFromList(result);
     }
 
     public void Set(LangValueType index, LangValueType value)

@@ -97,12 +97,10 @@ public class GeneratorLangValue : LangValueType, ILangList
             NextValue = StateMachine.Current;
             return NextValue ?? new VoidLangValue();
         }
-        else
-        {
-            // 生成器完成
-            State = GeneratorState.Completed;
-            return new VoidLangValue();
-        }
+
+        // 生成器完成
+        State = GeneratorState.Completed;
+        return new VoidLangValue();
     }
 
     /// <summary>
@@ -184,17 +182,18 @@ public class GeneratorLangValue : LangValueType, ILangList
     }
 
     /// <summary>
-    /// 对生成器进行切片
+    /// 对生成器进行切片（带步长）
     /// </summary>
     /// <param name="start">起始索引</param>
     /// <param name="end">结束索引</param>
+    /// <param name="step">步长</param>
     /// <returns>切片后的生成器</returns>
-    public LangValueType Slice(int start, int end)
+    public LangValueType Slice(int start, int end, int step)
     {
         // 创建一个新的生成器函数，实现切片逻辑
         var slicedFunc = new FuncLangValue(
             null,
-            new List<LangId>(),
+            [],
             new BlockStatement(new List<OldStatement>()),
             Position
         );

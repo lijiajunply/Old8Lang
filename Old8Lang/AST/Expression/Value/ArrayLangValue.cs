@@ -137,12 +137,48 @@ public class ArrayLangValue : LangValueType, ILangList
     public IEnumerable<LangValueType> GetItems() => RunResult;
     public int GetLength() => RunResult.Length;
 
-    public LangValueType Slice(int start, int end)
+    public LangValueType Slice(int start, int end, int step)
     {
-        if (start < 0) start += RunResult.Length;
-        if (end < 0) end += RunResult.Length + 1;
-        // 使用接受 List<LangValueType> 的构造函数，因为 RunResult 已经包含了运行后的值
-        return new ArrayLangValue(RunResult[start..end].ToList(), Position);
+        var length = RunResult.Length;
+        var result = new List<LangValueType>();
+
+        if (step > 0)
+        {
+            // 正向切片
+            if (start < 0) start += length;
+            if (end < 0) end += length;
+
+            start = Math.Max(0, Math.Min(start, length));
+            end = Math.Max(0, Math.Min(end, length));
+
+            for (int i = start; i < end; i += step)
+            {
+                result.Add(RunResult[i]);
+            }
+        }
+        else if (step < 0)
+        {
+            // 反向切片
+            // 处理负数索引，但保留 -1 作为特殊值（表示"到开头之前"）
+            if (start < -1) start += length;
+            if (end < -1) end += length;
+
+            // 设置边界
+            if (start >= length) start = length - 1;
+            if (start < -1) start = -1;
+            if (end >= length) end = length - 1;
+
+            for (int i = start; i > end; i += step)
+            {
+                result.Add(RunResult[i]);
+            }
+        }
+        else
+        {
+            throw new InvalidOperationError(this, "切片步长不能为0");
+        }
+
+        return new ArrayLangValue(result, Position);
     }
 
 

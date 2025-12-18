@@ -140,11 +140,50 @@ public class StringLangValue(string context = "", SourcePosition position = defa
         return CharLangValue.Create(Value[i]);
     }
 
-    public LangValueType Slice(int start, int end)
+    public LangValueType Slice(int start, int end, int step)
     {
-        if (start < 0) start += Value.Length;
-        if (end < 0) end += Value.Length + 1;
-        return Create(Value[start..end]);
+        var length = Value.Length;
+        var result = new StringBuilder();
+
+        if (step > 0)
+        {
+            // 正向切片
+            // 处理负数索引
+            if (start < 0) start += length;
+            if (end < 0) end += length;
+
+            start = Math.Max(0, Math.Min(start, length));
+            end = Math.Max(0, Math.Min(end, length));
+
+            for (int i = start; i < end; i += step)
+            {
+                result.Append(Value[i]);
+            }
+        }
+        else if (step < 0)
+        {
+            // 反向切片
+            // 处理负数索引，但保留 -1 作为特殊值（表示"到开头之前"）
+            if (start < -1) start += length;
+            if (end < -1) end += length;
+
+            // 设置边界
+            if (start >= length) start = length - 1;
+            if (start < -1) start = -1;
+            if (end >= length) end = length - 1;
+            // end 可以是 -1，表示切片到开头之前（即包含索引 0）
+
+            for (int i = start; i > end; i += step)
+            {
+                result.Append(Value[i]);
+            }
+        }
+        else
+        {
+            throw new InvalidOperationError(this, "切片步长不能为0");
+        }
+
+        return Create(result.ToString());
     }
 
     public void Set(LangValueType index, LangValueType value)

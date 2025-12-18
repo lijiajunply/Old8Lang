@@ -203,44 +203,46 @@ result2 <- operations[1](10)  // 10 + 5 = 15";
     public void ParseProgram_MethodReturningFunctionCollectionCall_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-class FunctionFactory {
-    public func createMathFunctions() {
-        return [
-            (x) -> x * 2,           // double
-            (x) -> x * x,           // square
-            (x) -> x + 1,           // increment
-            (x) -> x / 2.0          // halve
-        ]
-    }
+        var code = """
 
-    public func createStringFunctions() {
-        return {
-            ""upper"": (s) -> s.ToUpper(),
-            ""lower"": (s) -> s.ToLower(),
-            ""reverse"": (s) -> {
-                result <- """"
-                for i <- s.Count() - 1, i >= 0, i <- i - 1 {
-                    result <- result + s[i]
-                }
-                return result
-            }
-        }
-    }
-}
+                   class FunctionFactory {
+                       public func createMathFunctions() {
+                           return [
+                               (x) -> x * 2,           // double
+                               (x) -> x * x,           // square
+                               (x) -> x + 1,           // increment
+                               (x) -> x / 2.0          // halve
+                           ]
+                       }
 
-factory <- FunctionFactory()
-mathFuncs <- factory.createMathFunctions()
-stringFuncs <- factory.createStringFunctions()
+                       public func createStringFunctions() {
+                           return {
+                               "upper": (s) -> s.ToUpper(),
+                               "lower": (s) -> s.ToLower(),
+                               "reverse": (s) -> {
+                                   result <- ""
+                                   for i <- s.Count() - 1, i >= 0, i <- i - 1 {
+                                       result <- result + s[i]
+                                   }
+                                   return result
+                               }
+                           }
+                       }
+                   }
 
-result1 <- mathFuncs[0](10)   // double(10) = 20
-result2 <- mathFuncs[1](5)    // square(5) = 25
-result3 <- mathFuncs[2](7)    // increment(7) = 8
-result4 <- mathFuncs[3](8)    // halve(8) = 4.0
+                   factory <- FunctionFactory()
+                   mathFuncs <- factory.createMathFunctions()
+                   stringFuncs <- factory.createStringFunctions()
 
-result5 <- stringFuncs[""upper""](""hello"")      // HELLO
-result6 <- stringFuncs[""lower""](""WORLD"")      // world
-result7 <- stringFuncs[""reverse""](""abcde"")   // edcba";
+                   result1 <- mathFuncs[0](10)   // double(10) = 20
+                   result2 <- mathFuncs[1](5)    // square(5) = 25
+                   result3 <- mathFuncs[2](7)    // increment(7) = 8
+                   result4 <- mathFuncs[3](8)    // halve(8) = 4.0
+
+                   result5 <- stringFuncs["upper"]("hello")      // HELLO
+                   result6 <- stringFuncs["lower"]("WORLD")      // world
+                   result7 <- stringFuncs["reverse"]("abcde")   // edcba
+                   """;
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -568,7 +570,7 @@ result4 <- ops[1](x, y) == 15    // multiply(x,y) == 15";
         var code = @"
 func test(x) { return x }
 funcList <- [test]
-result <- funcList[0";  // 缺少函数调用的括号
+result <- funcList[0"; // 缺少函数调用的括号
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -586,7 +588,7 @@ result <- funcList[0";  // 缺少函数调用的括号
         var code = @"
 func test(x) { return x }
 funcList <- [test]
-result <- funcList";  // 缺少索引操作
+result <- funcList"; // 缺少索引操作
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 

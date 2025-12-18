@@ -7,7 +7,16 @@ public interface ILangList
 {
     public IEnumerable<LangValueType> GetItems();
     public int GetLength();
-    public LangValueType Slice(int start, int end);
+
+    /// <summary>
+    /// 切片操作，支持步长
+    /// </summary>
+    /// <param name="start">起始索引</param>
+    /// <param name="end">结束索引</param>
+    /// <param name="step">步长（默认为1，负数表示反向）</param>
+    /// <returns>切片结果</returns>
+    public LangValueType Slice(int start, int end, int step);
+
     public void Set(LangValueType index, LangValueType value);
     public bool In(LangValueType value);
 }

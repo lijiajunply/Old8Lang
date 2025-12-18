@@ -627,7 +627,7 @@ public class ListTests
         var code = @"
             words <- {""Hello"", ""World"", ""from"", ""Old8Lang""}
             result1 <- words.Join("" "")
-            result2 <- words.Join("", "")
+            result2 <- words.Join("""")
             result3 <- words.Join("" - "")
             numbers <- {1, 2, 3, 4, 5}
             result4 <- numbers.Join(""|"")

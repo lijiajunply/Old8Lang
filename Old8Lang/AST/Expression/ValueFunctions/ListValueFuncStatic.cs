@@ -79,11 +79,26 @@ public static class ListValueFuncStatic
         /// <summary>
         /// 对列表进行排序
         /// </summary>
-        /// <returns>排序后的列表（原地排序）</returns>
+        /// <returns>排序后的新列表</returns>
         public ListLangValue Sort()
         {
-            QuickSort(langValue.Values, 0, langValue.Values.Count - 1);
-            return langValue;
+            // 创建新列表副本以避免修改原列表
+            var sortedValues = new List<LangValueType>(langValue.Values);
+            QuickSort(sortedValues, 0, sortedValues.Count - 1);
+            return new ListLangValue(sortedValues);
+        }
+
+        /// <summary>
+        /// 使用自定义比较函数对列表进行排序
+        /// </summary>
+        /// <param name="comparer">比较函数，接受两个元素，返回负数（a<b）、0（a==b）或正数（a>b）</param>
+        /// <returns>排序后的新列表</returns>
+        public ListLangValue Sort(FuncLangValue comparer)
+        {
+            // 创建新列表副本以避免修改原列表
+            var sortedValues = new List<LangValueType>(langValue.Values);
+            QuickSortWithComparer(sortedValues, 0, sortedValues.Count - 1, comparer);
+            return new ListLangValue(sortedValues);
         }
 
         /// <summary>
@@ -157,11 +172,13 @@ public static class ListValueFuncStatic
         /// <summary>
         /// 反转列表元素顺序
         /// </summary>
-        /// <returns>反转后的列表（原地反转）</returns>
+        /// <returns>反转后的新列表</returns>
         public ListLangValue Reverse()
         {
-            langValue.Values.Reverse();
-            return langValue;
+            // 创建新列表副本以避免修改原列表
+            var reversedValues = new List<LangValueType>(langValue.Values);
+            reversedValues.Reverse();
+            return new ListLangValue(reversedValues);
         }
 
         /// <summary>
@@ -429,7 +446,7 @@ public static class ListValueFuncStatic
                 throw new ArgumentNullException(nameof(langValue), "字符串数组不能为空");
             }
 
-            return new StringLangValue(string.Join(separator.Value, langValue));
+            return new StringLangValue(string.Join(separator.Value, langValue.Values.Select(v => v.ToDisplayString())));
         }
     }
 
@@ -472,6 +489,59 @@ public static class ListValueFuncStatic
             if (!nums[j].Less(pivot)) continue;
             i++;
             Swap(nums, i, j);
+        }
+
+        Swap(nums, i + 1, right);
+        return i + 1;
+    }
+
+    /// <summary>
+    /// 使用自定义比较器的快速排序算法
+    /// </summary>
+    /// <param name="nums">要排序的列表</param>
+    /// <param name="left">排序范围的左边界</param>
+    /// <param name="right">排序范围的右边界</param>
+    /// <param name="comparer">比较函数</param>
+    private static void QuickSortWithComparer(List<LangValueType> nums, int left, int right, FuncLangValue comparer)
+    {
+        while (true)
+        {
+            if (left < right)
+            {
+                int pivotIndex = PartitionWithComparer(nums, left, right, comparer);
+                QuickSortWithComparer(nums, left, pivotIndex - 1, comparer);
+                left = pivotIndex + 1;
+                continue;
+            }
+
+            break;
+        }
+    }
+
+    /// <summary>
+    /// 使用自定义比较器的快速排序分区函数
+    /// </summary>
+    /// <param name="nums">要分区的列表</param>
+    /// <param name="left">分区范围的左边界</param>
+    /// <param name="right">分区范围的右边界</param>
+    /// <param name="comparer">比较函数</param>
+    /// <returns>枢轴元素的最终位置</returns>
+    private static int PartitionWithComparer(List<LangValueType> nums, int left, int right, FuncLangValue comparer)
+    {
+        var pivot = nums[right];
+        var i = left - 1;
+        var manager = new VariateManager();
+
+        for (var j = left; j < right; j++)
+        {
+            // 调用比较函数：comparer(nums[j], pivot)
+            // 如果返回负数，表示 nums[j] < pivot
+            var result = comparer.Run(manager, new List<LangExpression> { nums[j], pivot });
+            if (result is IntLangValue intResult && intResult.Value < 0)
+            {
+                i++;
+                Swap(nums, i, j);
+            }
         }
 
         Swap(nums, i + 1, right);

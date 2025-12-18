@@ -1,6 +1,5 @@
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Interpreter;
-using System.Linq;
 using Old8Lang.AST.Expression.Intermediates;
 
 namespace Old8Lang.AST.Expression.ValueFunctions;
@@ -31,7 +30,7 @@ public static class TupleValueFuncStatic
         public StringLangValue Join(StringLangValue separator)
         {
             var elements = GetAllElements(tuple);
-            var separatorValue = separator?.Value ?? "";
+            var separatorValue = separator.Value;
 
             var result = string.Join(separatorValue, elements.Select(e => e.ToDisplayString()));
             return new StringLangValue(result);
@@ -59,18 +58,14 @@ public static class TupleValueFuncStatic
             var elements = GetAllElements(tuple);
 
             // 尝试获取当前的 VariateManager，如果没有则创建新的
-            var manager = ExecutionContext.GetCurrentManager();
-            if (manager == null)
-            {
-                manager = new VariateManager();
-            }
+            var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
             foreach (var item in elements)
             {
                 try
                 {
-                    var result = predicate.Run(manager, new List<LangExpression> { item });
-                    if (result is BoolLangValue boolResult && boolResult.Value)
+                    var result = predicate.Run(manager, [item]);
+                    if (result is BoolLangValue { Value: true })
                     {
                         return item;
                     }
@@ -95,18 +90,14 @@ public static class TupleValueFuncStatic
             var filteredElements = new List<LangValueType>();
 
             // 尝试获取当前的 VariateManager，如果没有则创建新的
-            var manager = ExecutionContext.GetCurrentManager();
-            if (manager == null)
-            {
-                manager = new VariateManager();
-            }
+            var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
             foreach (var item in elements)
             {
                 try
                 {
-                    var result = predicate.Run(manager, new List<LangExpression> { item });
-                    if (result is BoolLangValue boolResult && boolResult.Value)
+                    var result = predicate.Run(manager, [item]);
+                    if (result is BoolLangValue { Value: true })
                     {
                         filteredElements.Add(item);
                     }
@@ -132,17 +123,13 @@ public static class TupleValueFuncStatic
             var transformedElements = new List<LangValueType>();
 
             // 尝试获取当前的 VariateManager，如果没有则创建新的
-            var manager = ExecutionContext.GetCurrentManager();
-            if (manager == null)
-            {
-                manager = new VariateManager();
-            }
+            var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
             foreach (var item in elements)
             {
                 try
                 {
-                    var result = func.Run(manager, new List<LangExpression> { item });
+                    var result = func.Run(manager, [item]);
                     transformedElements.Add(result);
                 }
                 catch
@@ -167,17 +154,13 @@ public static class TupleValueFuncStatic
             var result = seed;
 
             // 尝试获取当前的 VariateManager，如果没有则创建新的
-            var manager = ExecutionContext.GetCurrentManager();
-            if (manager == null)
-            {
-                manager = new VariateManager();
-            }
+            var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
             foreach (var item in elements)
             {
                 try
                 {
-                    result = reducer.Run(manager, new List<LangExpression> { result, item });
+                    result = reducer.Run(manager, [result, item]);
                 }
                 catch
                 {
@@ -198,17 +181,13 @@ public static class TupleValueFuncStatic
             var elements = GetAllElements(tuple);
 
             // 尝试获取当前的 VariateManager，如果没有则创建新的
-            var manager = ExecutionContext.GetCurrentManager();
-            if (manager == null)
-            {
-                manager = new VariateManager();
-            }
+            var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
             foreach (var item in elements)
             {
                 try
                 {
-                    action.Run(manager, new List<LangExpression> { item });
+                    action.Run(manager, [item]);
                 }
                 catch
                 {
@@ -231,11 +210,7 @@ public static class TupleValueFuncStatic
             if (comparer != null)
             {
                 // 尝试获取当前的 VariateManager，如果没有则创建新的
-                var manager = ExecutionContext.GetCurrentManager();
-                if (manager == null)
-                {
-                    manager = new VariateManager();
-                }
+                var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
                 // 使用自定义比较器排序
                 var sortedElements = elements.ToList();
@@ -246,8 +221,8 @@ public static class TupleValueFuncStatic
                         try
                         {
                             var result = comparer.Run(manager,
-                                new List<LangExpression> { sortedElements[i], sortedElements[j] });
-                            if (result is IntLangValue intResult && intResult.Value > 0)
+                                [sortedElements[i], sortedElements[j]]);
+                            if (result is IntLangValue { Value: > 0 })
                             {
                                 (sortedElements[i], sortedElements[j]) = (sortedElements[j], sortedElements[i]);
                             }
@@ -366,18 +341,25 @@ public static class TupleValueFuncStatic
         {
             if (elements.Count == 0)
             {
-                return new TupleLangValue(new NullLangValue(), new NullLangValue());
+                var emptyTuple = new TupleLangValue(new NullLangValue(), new NullLangValue());
+                emptyTuple.Run(new VariateManager());
+                return emptyTuple;
             }
 
             if (elements.Count == 1)
             {
-                return new TupleLangValue(elements[0], new NullLangValue());
+                var singleTuple = new TupleLangValue(elements[0], new NullLangValue());
+                singleTuple.Run(new VariateManager());
+                return singleTuple;
             }
 
             var result = new TupleLangValue(elements[0], elements[1]);
+            result.Run(new VariateManager()); // 初始化第一个二元元组的 Value
+
             for (int i = 2; i < elements.Count; i++)
             {
                 result = new TupleLangValue(result, elements[i]);
+                result.Run(new VariateManager()); // 初始化每个嵌套元组的 Value
             }
 
             return result;

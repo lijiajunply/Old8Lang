@@ -376,7 +376,7 @@ public class AdvancedOperatorsTests
     public void ParseDotExpr_DictionaryKeyAccess_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"result <- dict[""key""]";
+        var code = """result <- dict["key"]""";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 

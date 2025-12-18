@@ -49,42 +49,44 @@ result3 <- operations[2](10, 5)";
     public void ParseProgram_MethodChainFunctionCall_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-class FunctionProvider {
-    public func getOperations() {
-        return {
-            ""math"": [this.getAdder(), this.getMultiplier()],
-            ""string"": [this.getUpper(), this.getLower()]
-        }
-    }
+        var code = """
 
-    public func getAdder() {
-        return (a, b) -> a + b
-    }
+                   class FunctionProvider {
+                       public func getOperations() {
+                           return {
+                               "math": [this.getAdder(), this.getMultiplier()],
+                               "string": [this.getUpper(), this.getLower()]
+                           }
+                       }
 
-    public func getMultiplier() {
-        return (a, b) -> a * b
-    }
+                       public func getAdder() {
+                           return (a, b) -> a + b
+                       }
 
-    public func getUpper() {
-        return (s) -> s.ToUpper()
-    }
+                       public func getMultiplier() {
+                           return (a, b) -> a * b
+                       }
 
-    public func getLower() {
-        return (s) -> s.ToLower()
-    }
-}
+                       public func getUpper() {
+                           return (s) -> s.ToUpper()
+                       }
 
-provider <- FunctionProvider()
-operations <- provider.getOperations()
+                       public func getLower() {
+                           return (s) -> s.ToLower()
+                       }
+                   }
 
-mathOps <- operations[""math""]
-stringOps <- operations[""string""]
+                   provider <- FunctionProvider()
+                   operations <- provider.getOperations()
 
-mathResult1 <- mathOps[0](5, 3)    // add(5, 3) = 8
-mathResult2 <- mathOps[1](5, 3)    // multiply(5, 3) = 15
-stringResult1 <- stringOps[0](""hello"")  // upper(""hello"") = ""HELLO""
-stringResult2 <- stringOps[1](""WORLD"")  // lower(""WORLD"") = ""world""";
+                   mathOps <- operations["math"]
+                   stringOps <- operations["string"]
+
+                   mathResult1 <- mathOps[0](5, 3)    // add(5, 3) = 8
+                   mathResult2 <- mathOps[1](5, 3)    // multiply(5, 3) = 15
+                   stringResult1 <- stringOps[0]("hello")  // upper("hello") = "HELLO"
+                   stringResult2 <- stringOps[1]("WORLD")  // lower("WORLD") = "world"
+                   """;
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -100,30 +102,32 @@ stringResult2 <- stringOps[1](""WORLD"")  // lower(""WORLD"") = ""world""";
     public void ParseProgram_DeepChainedFunctionCall_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-func createFactory() {
-    return {
-        ""operations"": [
-            {
-                ""name"": ""add"",
-                ""funcs"": [(a, b) -> a + b, (a, b, c) -> a + b + c]
-            },
-            {
-                ""name"": ""multiply"",
-                ""funcs"": [(a, b) -> a * b, (a, b, c) -> a * b * c]
-            }
-        ]
-    }
-}
+        var code = """
 
-factory <- createFactory()
-addFuncs <- factory[""operations""][0][""funcs""]
-multiplyFuncs <- factory[""operations""][1][""funcs""]
+                   func createFactory() {
+                       return {
+                           "operations": [
+                               {
+                                   "name": "add",
+                                   "funcs": [(a, b) -> a + b, (a, b, c) -> a + b + c]
+                               },
+                               {
+                                   "name": "multiply",
+                                   "funcs": [(a, b) -> a * b, (a, b, c) -> a * b * c]
+                               }
+                           ]
+                       }
+                   }
 
-result1 <- addFuncs[0](10, 5)        // add(10, 5) = 15
-result2 <- addFuncs[1](10, 5, 3)     // add(10, 5, 3) = 18
-result3 <- multiplyFuncs[0](10, 5)   // multiply(10, 5) = 50
-result4 <- multiplyFuncs[1](10, 5, 3) // multiply(10, 5, 3) = 150";
+                   factory <- createFactory()
+                   addFuncs <- factory["operations"][0]["funcs"]
+                   multiplyFuncs <- factory["operations"][1]["funcs"]
+
+                   result1 <- addFuncs[0](10, 5)        // add(10, 5) = 15
+                   result2 <- addFuncs[1](10, 5, 3)     // add(10, 5, 3) = 18
+                   result3 <- multiplyFuncs[0](10, 5)   // multiply(10, 5) = 50
+                   result4 <- multiplyFuncs[1](10, 5, 3) // multiply(10, 5, 3) = 150
+                   """;
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -497,10 +501,11 @@ result <- chain[0]"; // 缺少函数调用的括号
     public void ParseProgram_InvalidIndexType_ThrowsSyntaxError()
     {
         // Arrange
-        var code = @"
-func test(x) { return x }
-chain <- [test]
-result <- chain[""not-a-number""](123)"; // 字符串索引
+        var code = """
+                   func test(x) { return x }
+                   chain <- [test]
+                   result <- chain["not-a-number"](123)
+                   """; // 字符串索引
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 

@@ -1235,41 +1235,79 @@ public class PrimaryParser(
             tokenValue: leftBracketToken.Value);
         Expect(LangTokenType.LeftBracket);
 
-        // 检查是否是空索引访问：list[]
-        if (CurrentToken.Type == LangTokenType.RightBracket)
+        // 检查是否是开放式切片的开始：list[:...] 或 list[::...]
+        if (CurrentToken.Type == LangTokenType.Colon)
         {
-            // 空索引访问是无效的，抛出错误
-            throw CreateSyntaxError("语法错误：索引访问不能为空。建议：提供有效的索引表达式，如 array[0]。");
-        }
+            // 开放式切片：[:end], [:end:step], 或 [::step]
+            Expect(LangTokenType.Colon);
 
-        // 处理切片：list[start:end]
-        if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.Number or LangTokenType.LeftBracket)
-        {
-            var start = expressionParserFactory().ParseExpression();
+            LangExpression? end = null;
+            LangExpression? step = null;
+
+            // 检查是否有 end 参数（如果不是冒号或右括号）
+            if (CurrentToken.Type != LangTokenType.Colon && CurrentToken.Type != LangTokenType.RightBracket)
+            {
+                end = expressionParserFactory().ParseExpression();
+            }
+
+            // 检查是否有第二个冒号（步长参数）
             if (CurrentToken.Type == LangTokenType.Colon)
             {
                 Expect(LangTokenType.Colon);
-                var end = expressionParserFactory().ParseExpression();
-                Expect(LangTokenType.RightBracket);
-                return new SliceLangValue(identifier, start, end);
+                // 只有在不是右括号时才解析 step
+                if (CurrentToken.Type != LangTokenType.RightBracket)
+                {
+                    step = expressionParserFactory().ParseExpression();
+                }
             }
 
-            if (CurrentToken.Type == LangTokenType.RightBracket)
-            {
-                // 列表访问：list[index] - 使用 OldItem
-                Expect(LangTokenType.RightBracket);
-                return new LangListItem(identifier, start, position);
-            }
-
-            // 如果既不是冒号也不是右方括号，则为语法错误
-            throw CreateSyntaxError(
-                $"语法错误：索引或切片语法错误。在 '{CurrentToken.Value}' 处期望 ':' 或 ']'。建议：使用 array[index] 进行索引访问，或使用 array[start:end] 进行切片。");
+            Expect(LangTokenType.RightBracket);
+            return new SliceLangValue(identifier, null, end, step);
         }
 
-        // 处理列表访问：list[index] （默认情况）- 使用 OldItem
-        var index = expressionParserFactory().ParseExpression();
-        Expect(LangTokenType.RightBracket);
-        return new LangListItem(identifier, index, position);
+        // 处理切片或索引访问：list[start:end], list[start:end:step], list[start:], list[start::step], list[index]
+        // 尝试解析第一个表达式（可能是索引或切片的起始值）
+        var start = expressionParserFactory().ParseExpression();
+
+        if (CurrentToken.Type == LangTokenType.Colon)
+        {
+            // 这是切片操作
+            Expect(LangTokenType.Colon);
+
+            LangExpression? end = null;
+            LangExpression? step = null;
+
+            // 检查是否有 end 参数（如果不是冒号或右括号）
+            if (CurrentToken.Type != LangTokenType.Colon && CurrentToken.Type != LangTokenType.RightBracket)
+            {
+                end = expressionParserFactory().ParseExpression();
+            }
+
+            // 检查是否有第二个冒号（步长参数）
+            if (CurrentToken.Type == LangTokenType.Colon)
+            {
+                Expect(LangTokenType.Colon);
+                // 只有在不是右括号时才解析 step
+                if (CurrentToken.Type != LangTokenType.RightBracket)
+                {
+                    step = expressionParserFactory().ParseExpression();
+                }
+            }
+
+            Expect(LangTokenType.RightBracket);
+            return new SliceLangValue(identifier, start, end, step);
+        }
+
+        if (CurrentToken.Type == LangTokenType.RightBracket)
+        {
+            // 列表访问：list[index] - 使用 OldItem
+            Expect(LangTokenType.RightBracket);
+            return new LangListItem(identifier, start, position);
+        }
+
+        // 如果既不是冒号也不是右方括号，则为语法错误
+        throw CreateSyntaxError(
+            $"语法错误：索引或切片语法错误。在 '{CurrentToken.Value}' 处期望 ':' 或 ']'。建议：使用 array[index] 进行索引访问，或使用 array[start:end] 进行切片。");
     }
 
     /// <summary>

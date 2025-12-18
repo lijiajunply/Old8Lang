@@ -87,7 +87,7 @@ public class DictionaryLangValue : LangValueType, ILangList
                         if (method != null)
                         {
                             // 设置执行上下文，以便扩展方法可以访问当前的 VariateManager
-                            Old8Lang.AST.Expression.ValueFunctions.ExecutionContext.SetCurrentManager(manager);
+                            ValueFunctions.ExecutionContext.SetCurrentManager(manager);
 
                             // 找到扩展方法，创建 Instance 来处理方法调用
                             var instance = new Instance(new LangId(langId.IdName), []);
@@ -115,45 +115,44 @@ public class DictionaryLangValue : LangValueType, ILangList
             }
 
             // 检查是否是已知的方法调用（如 ContainsKey, GetOrElse 等）
-            var extensionType = typeof(Old8Lang.AST.Expression.ValueFunctions.DictionaryValueFuncStatic);
-            if (extensionType != null)
+            var extensionType = typeof(ValueFunctions.DictionaryValueFuncStatic);
+
+            var method = extensionType.GetMethod(methodName);
+            if (method != null)
             {
-                var method = extensionType.GetMethod(methodName);
-                if (method != null)
+                // 对于 Merge 和 Update 方法，需要特殊处理参数
+                if (methodName == "Merge" || methodName == "Update")
                 {
-                    // 对于 Merge 和 Update 方法，需要特殊处理参数
-                    if (methodName == "Merge" || methodName == "Update")
+                    // 设置执行上下文，以便扩展方法可以访问当前的 VariateManager
+                    ValueFunctions.ExecutionContext.SetCurrentManager(manager);
+
+                    // 手动处理参数，确保使用正确的 manager
+                    var parameters = method.GetParameters();
+                    var args = new List<object>();
+
+                    for (int i = 0; i < parameters.Length; i++)
                     {
-                        // 设置执行上下文，以便扩展方法可以访问当前的 VariateManager
-                        Old8Lang.AST.Expression.ValueFunctions.ExecutionContext.SetCurrentManager(manager);
-
-                        // 手动处理参数，确保使用正确的 manager
-                        var parameters = method.GetParameters();
-                        var args = new List<object>();
-
-                        for (int i = 0; i < parameters.Length; i++)
+                        if (i == 0) // 第一个参数是 this (当前字典对象)
                         {
-                            if (i == 0) // 第一个参数是 this (当前字典对象)
-                            {
-                                args.Add(this);
-                            }
-                            else
-                            {
-                                // 运行参数表达式，使用正确的 manager
-                                var argValue = a.Ids[i - 1].Run(manager);
-                                args.Add(argValue);
-                            }
+                            args.Add(this);
                         }
-
-                        return (LangValueType)method.Invoke(null, args.ToArray())!;
+                        else
+                        {
+                            // 运行参数表达式，使用正确的 manager
+                            var argValue = a.Ids[i - 1].Run(manager);
+                            args.Add(argValue);
+                        }
                     }
 
-                    // 对于其他方法，调用 FromClassToResult 来处理方法调用
-                    // 设置执行上下文，以便扩展方法可以访问当前的 VariateManager
-                    Old8Lang.AST.Expression.ValueFunctions.ExecutionContext.SetCurrentManager(manager);
-                    return a.FromClassToResult(this);
+                    return (LangValueType)method.Invoke(null, args.ToArray())!;
                 }
+
+                // 对于其他方法，调用 FromClassToResult 来处理方法调用
+                // 设置执行上下文，以便扩展方法可以访问当前的 VariateManager
+                ValueFunctions.ExecutionContext.SetCurrentManager(manager);
+                return a.FromClassToResult(this);
             }
+
 
             // 只有在特定情况下才当作索引访问：方法名不是已知方法且只有一个参数
             if (a.Ids is { Count: 1 } && methodName != "Get" && methodName != "ContainsKey" &&
@@ -285,7 +284,7 @@ public class DictionaryLangValue : LangValueType, ILangList
 
     public int GetLength() => Value.Count;
 
-    public LangValueType Slice(int start, int end)
+    public LangValueType Slice(int start, int end, int step)
     {
         throw new InvalidOperationError(this, "字典类型不支持切片操作");
     }
