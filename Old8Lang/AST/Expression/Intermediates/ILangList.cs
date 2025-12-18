@@ -17,6 +17,14 @@ public interface ILangList
     /// <returns>切片结果</returns>
     public LangValueType Slice(int start, int end, int step);
 
+    /// <summary>
+    /// 切片赋值操作：替换或删除指定范围的元素
+    /// </summary>
+    /// <param name="start">起始索引</param>
+    /// <param name="end">结束索引</param>
+    /// <param name="values">要替换的值（如果为空列表则删除）</param>
+    public void SetSlice(int start, int end, IEnumerable<LangValueType> values);
+
     public void Set(LangValueType index, LangValueType value);
     public bool In(LangValueType value);
 }

@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public class ArrayLangValue : LangValueType, ILangList
 {
-    private readonly LangValueType[] RunResult;
+    private readonly LangValueType[] RunResult; // 保持固定大小数组
     private readonly List<LangExpression> Values = [];
 
     public ArrayLangValue(IEnumerable<LangExpression> valuesList, SourcePosition position = default) : base(position)
@@ -181,6 +181,46 @@ public class ArrayLangValue : LangValueType, ILangList
         return new ArrayLangValue(result, Position);
     }
 
+    /// <summary>
+    /// 切片赋值：替换或删除指定范围的元素
+    /// 注意：由于数组底层使用固定大小的数组，切片赋值会抛出错误
+    /// 建议使用 List 类型来支持切片赋值
+    /// </summary>
+    public void SetSlice(int start, int end, IEnumerable<LangValueType> values)
+    {
+        var length = RunResult.Length;
+
+        // 处理负数索引
+        if (start < 0) start += length;
+        if (end < 0) end += length;
+
+        // 边界检查
+        start = Math.Max(0, Math.Min(start, length));
+        end = Math.Max(0, Math.Min(end, length));
+
+        // 确保 start <= end
+        if (start > end)
+        {
+            (start, end) = (end, start);
+        }
+
+        var valuesList = values.ToList();
+        var rangeLength = end - start;
+
+        // 数组不支持改变大小，因此新值数量必须等于要替换的范围长度
+        if (valuesList.Count != rangeLength)
+        {
+            throw new InvalidOperationError(this,
+                $"数组切片赋值不支持改变数组大小。要替换的范围长度为 {rangeLength}，但提供了 {valuesList.Count} 个新值。" +
+                $"如果需要改变大小，请使用列表类型 {{...}} 而不是数组类型 [...]");
+        }
+
+        // 替换指定范围的元素
+        for (int i = 0; i < rangeLength; i++)
+        {
+            RunResult[start + i] = valuesList[i];
+        }
+    }
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {

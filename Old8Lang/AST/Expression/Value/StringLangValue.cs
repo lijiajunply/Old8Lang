@@ -191,6 +191,11 @@ public class StringLangValue(string context = "", SourcePosition position = defa
         throw new InvalidOperationError(this, "字符串索引修改不可使用");
     }
 
+    public void SetSlice(int start, int end, IEnumerable<LangValueType> values)
+    {
+        throw new InvalidOperationError(this, "字符串是不可变类型，不支持切片赋值操作");
+    }
+
     public bool In(LangValueType value)
     {
         return Value.Contains(value.GetValue<char>());

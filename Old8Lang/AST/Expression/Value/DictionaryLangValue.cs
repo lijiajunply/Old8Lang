@@ -229,6 +229,11 @@ public class DictionaryLangValue : LangValueType, ILangList
         }
     }
 
+    public void SetSlice(int start, int end, IEnumerable<LangValueType> values)
+    {
+        throw new InvalidOperationError(this, "字典类型不支持切片赋值操作");
+    }
+
     public bool In(LangValueType value)
     {
         // 检查键是否存在（与编译模式的ContainsKey行为一致）

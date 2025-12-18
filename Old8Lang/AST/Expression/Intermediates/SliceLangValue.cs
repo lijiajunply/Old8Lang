@@ -12,13 +12,32 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <param name="step"></param>
 public class SliceLangValue(LangId id, LangExpression? start = null, LangExpression? end = null, LangExpression? step = null) : LangValueType
 {
+    /// <summary>
+    /// 集合标识符
+    /// </summary>
+    public LangId Id { get; } = id;
+
+    /// <summary>
+    /// 起始索引表达式
+    /// </summary>
+    public LangExpression? Start { get; } = start;
+
+    /// <summary>
+    /// 结束索引表达式
+    /// </summary>
+    public LangExpression? End { get; } = end;
+
+    /// <summary>
+    /// 步长表达式
+    /// </summary>
+    public LangExpression? Step { get; } = step;
 
     public override LangValueType Run(VariateManager manager)
     {
-        var value = id.Run(manager);
-        var start1 = start?.Run(manager);
-        var end1 = end?.Run(manager);
-        var step1 = step?.Run(manager);
+        var value = Id.Run(manager);
+        var start1 = Start?.Run(manager);
+        var end1 = End?.Run(manager);
+        var step1 = Step?.Run(manager);
 
         if (value is not ILangList list) throw new InvalidOperationError(this, $"类型 '{value.GetType().Name}' 不支持切片操作");
 
@@ -49,14 +68,14 @@ public class SliceLangValue(LangId id, LangExpression? start = null, LangExpress
 
     public override string ToString()
     {
-        if (start != null && end != null && step != null)
-            return $"{id}[{start}:{end}:{step}]";
-        if (start != null && end != null)
-            return $"{id}[{start}:{end}]";
-        if (start != null)
-            return $"{id}[{start}:]";
-        if (end != null)
-            return $"{id}[:{end}]";
-        return $"{id}[:]"; // Old8Lang 风格的切片表达式
+        if (Start != null && End != null && Step != null)
+            return $"{Id}[{Start}:{End}:{Step}]";
+        if (Start != null && End != null)
+            return $"{Id}[{Start}:{End}]";
+        if (Start != null)
+            return $"{Id}[{Start}:]";
+        if (End != null)
+            return $"{Id}[:{End}]";
+        return $"{Id}[:]"; // Old8Lang 风格的切片表达式
     }
 }

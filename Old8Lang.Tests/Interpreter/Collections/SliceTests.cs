@@ -557,9 +557,9 @@ public class SliceTests
     {
         // Arrange
         var code = @"
-            numbers <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-            numbers[2:5] <- []
-            numbers[4:7] <- []
+            numbers <- {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+            numbers[2:5] <- {}
+            numbers[2:4] <- {}
             result1 <- len(numbers)
             result2 <- numbers[1]
             result3 <- numbers[2]
@@ -581,7 +581,7 @@ public class SliceTests
 
         Assert.NotNull(result1);
         Assert.IsType<IntLangValue>(result1);
-        Assert.Equal(4, ((IntLangValue)result1).Value); // After removing [2:5] and then [4:7]
+        Assert.Equal(5, ((IntLangValue)result1).Value); // After removing [2:5] and then [2:4]
 
         Assert.NotNull(result2);
         Assert.IsType<IntLangValue>(result2);
@@ -589,11 +589,11 @@ public class SliceTests
 
         Assert.NotNull(result3);
         Assert.IsType<IntLangValue>(result3);
-        Assert.Equal(6, ((IntLangValue)result3).Value);
+        Assert.Equal(8, ((IntLangValue)result3).Value);
 
         Assert.NotNull(result4);
         Assert.IsType<IntLangValue>(result4);
-        Assert.Equal(7, ((IntLangValue)result4).Value);
+        Assert.Equal(9, ((IntLangValue)result4).Value);
 
         Assert.NotNull(result5);
         Assert.IsType<IntLangValue>(result5);

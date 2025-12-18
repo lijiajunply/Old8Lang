@@ -368,6 +368,65 @@ public class SetStatement : OldStatement
                 }
             }
         }
+        // 处理切片赋值：array[start:end] <- values
+        else if (LeftExpression is SliceLangValue sliceValue)
+        {
+            // 获取集合对象
+            var collectionValue = sliceValue.Id.Run(manager);
+
+            // 检查集合是否是ILangList类型
+            if (collectionValue is not ILangList listCollection)
+            {
+                throw new InvalidOperationError(this,
+                    $"类型 '{collectionValue.GetType().Name}' 不支持切片赋值操作");
+            }
+
+            // 计算切片参数
+            var length = listCollection.GetLength();
+            var start1 = sliceValue.Start?.Run(manager);
+            var end1 = sliceValue.End?.Run(manager);
+            var step1 = sliceValue.Step?.Run(manager);
+
+            var stepValue = step1?.GetValue<int>() ?? 1;
+
+            if (stepValue == 0)
+                throw new InvalidOperationError(this, "切片步长不能为0");
+
+            if (stepValue != 1)
+            {
+                throw new InvalidOperationError(this,
+                    "切片赋值不支持步长参数。如果需要使用步长，请使用循环逐个赋值");
+            }
+
+            // 计算起始和结束索引
+            int startValue, endValue;
+            if (stepValue > 0)
+            {
+                startValue = start1?.GetValue<int>() ?? 0;
+                endValue = end1?.GetValue<int>() ?? length;
+            }
+            else
+            {
+                startValue = start1?.GetValue<int>() ?? length - 1;
+                endValue = end1?.GetValue<int>() ?? -1;
+            }
+
+            // 获取要赋值的值列表
+            IEnumerable<LangValueType> valuesList;
+            if (result is ILangList resultList)
+            {
+                valuesList = resultList.GetItems();
+            }
+            else
+            {
+                throw new TypeError(this, "ILangList", result.GetType().Name,
+                    "切片赋值的右侧必须是列表、数组或其他可迭代类型");
+            }
+
+            // 调用SetSlice方法
+            listCollection.SetSlice(startValue, endValue, valuesList);
+            return;
+        }
         // 处理索引访问赋值：array[index] <- value, list[index] <- value, dict[key] <- value
         else if (LeftExpression is LangListItem listItem)
         {

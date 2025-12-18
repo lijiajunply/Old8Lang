@@ -382,6 +382,11 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
         RebuildFromElements(allElements);
     }
 
+    public void SetSlice(int start, int end, IEnumerable<LangValueType> values)
+    {
+        throw new InvalidOperationError(this, "元组是不可变类型，不支持切片赋值操作");
+    }
+
     /// <summary>
     /// 从元素列表重建元组结构
     /// </summary>

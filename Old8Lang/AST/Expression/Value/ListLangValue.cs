@@ -223,6 +223,44 @@ public class ListLangValue : LangValueType, ILangList
         return new ListLangValue(result, Position);
     }
 
+    /// <summary>
+    /// 切片赋值：替换或删除指定范围的元素
+    /// </summary>
+    public void SetSlice(int start, int end, IEnumerable<LangValueType> values)
+    {
+        var length = Values.Count;
+
+        // 处理负数索引
+        if (start < 0) start += length;
+        if (end < 0) end += length;
+
+        // 边界检查
+        start = Math.Max(0, Math.Min(start, length));
+        end = Math.Max(0, Math.Min(end, length));
+
+        // 确保 start <= end
+        if (start > end)
+        {
+            (start, end) = (end, start);
+        }
+
+        // 计算要删除的元素数量
+        int removeCount = end - start;
+
+        // 删除指定范围的元素
+        if (removeCount > 0)
+        {
+            Values.RemoveRange(start, removeCount);
+        }
+
+        // 插入新值
+        var valuesList = values.ToList();
+        if (valuesList.Count > 0)
+        {
+            Values.InsertRange(start, valuesList);
+        }
+    }
+
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 确定列表元素的类型

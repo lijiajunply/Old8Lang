@@ -243,6 +243,15 @@ public class AsyncGeneratorLangValue : LangValueType, ILangList
     }
 
     /// <summary>
+    /// 切片赋值操作
+    /// </summary>
+    /// <exception cref="NotSupportedException">异步生成器不支持切片赋值</exception>
+    public void SetSlice(int start, int end, IEnumerable<LangValueType> values)
+    {
+        throw new NotSupportedException("异步生成器不支持切片赋值操作");
+    }
+
+    /// <summary>
     /// 检查值是否在生成器中
     /// </summary>
     /// <param name="value">要检查的值</param>
