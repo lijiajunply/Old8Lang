@@ -190,6 +190,37 @@ public static class DictionaryValueFuncStatic
         }
 
         /// <summary>
+        /// 更新指定键的值
+        /// </summary>
+        /// <param name="key">要更新的键</param>
+        /// <param name="value">新的值</param>
+        /// <returns>VoidLangValue，表示操作完成</returns>
+        public VoidLangValue Update(StringLangValue key, LangValueType value)
+        {
+            // 查找并更新现有的键值对
+            var keyFound = false;
+            for (int i = 0; i < langValue.Value.Count; i++)
+            {
+                var (existingKey, existingValue) = langValue.Value[i];
+                if (existingKey.Equal(key))
+                {
+                    // 更新现有键的值
+                    langValue.Value[i] = (existingKey, value);
+                    keyFound = true;
+                    break;
+                }
+            }
+
+            // 如果键不存在，添加新的键值对
+            if (!keyFound)
+            {
+                langValue.Value.Add((key, value));
+            }
+
+            return new VoidLangValue();
+        }
+
+        /// <summary>
         /// 清空字典中的所有键值对
         /// </summary>
         /// <returns>VoidLangValue，表示操作完成</returns>
@@ -309,7 +340,7 @@ public static class DictionaryValueFuncStatic
         /// <returns>VoidLangValue，表示操作完成</returns>
         public VoidLangValue ForEach(FuncLangValue action)
         {
-            // 尝试获取当前的 VariateManager，如果没有则创建新的
+            // 获取当前的 VariateManager
             var manager = ExecutionContext.GetCurrentManager();
             if (manager == null)
             {
@@ -317,15 +348,75 @@ public static class DictionaryValueFuncStatic
                 manager = new VariateManager();
             }
 
-            foreach (var (key, value) in langValue.Value)
+            // 检查 action 是否是 lambda（lambda 通常 Id 为 null 且没有 Method）
+            bool isLambda = action.Id == null && action.Method == null;
+
+            if (isLambda)
             {
-                try
+                // 对于 lambda，我们需要避免使用闭包机制（深拷贝）
+                // 而是直接传递原始 manager 以支持外部变量访问
+                foreach (var (key, value) in langValue.Value)
                 {
-                    action.Run(manager, new List<LangExpression> { key, value });
+                    try
+                    {
+                        // 直接执行 lambda 的主体，不创建闭包
+                        // 保存当前作用域
+                        var savedScopes = new List<Dictionary<string, LangValueType>>(manager.Scopes);
+
+                        try
+                        {
+                            // 添加新的作用域层级
+                            manager.AddChildren();
+                            manager.IsFunc = true;
+
+                            // 将参数添加到当前作用域
+                            if (action.Ids.Count >= 2)
+                            {
+                                // 两个参数：键和值
+                                var keyId = action.Ids[0];
+                                var valueId = action.Ids[1];
+                                manager.Set(keyId, key);
+                                manager.Set(valueId, value);
+                            }
+                            else if (action.Ids.Count == 1)
+                            {
+                                // 一个参数：只传递值
+                                var valueId = action.Ids[0];
+                                manager.Set(valueId, value);
+                            }
+
+                            // 执行 lambda 主体
+                            action.BlockStatement.Run(manager);
+                        }
+                        finally
+                        {
+                            // 恢复作用域
+                            manager.Scopes.Clear();
+                            manager.Scopes.AddRange(savedScopes);
+                            manager.IsFunc = false;
+                            manager.IsReturn = false;
+                            manager.Result = null;
+                        }
+                    }
+                    catch
+                    {
+                        // 忽略执行错误，继续处理下一项
+                    }
                 }
-                catch
+            }
+            else
+            {
+                // 对于非 lambda（原生方法），使用正常的 Run 调用
+                foreach (var (key, value) in langValue.Value)
                 {
-                    // 忽略执行错误，继续处理下一项
+                    try
+                    {
+                        action.Run(manager, new List<LangExpression> { key, value });
+                    }
+                    catch
+                    {
+                        // 忽略执行错误，继续处理下一项
+                    }
                 }
             }
 

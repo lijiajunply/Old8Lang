@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using Old8Lang.AST.Expression.Intermediates;
@@ -117,7 +118,32 @@ public class DictionaryLangValue : LangValueType, ILangList
             // 检查是否是已知的方法调用（如 ContainsKey, GetOrElse 等）
             var extensionType = typeof(ValueFunctions.DictionaryValueFuncStatic);
 
-            var method = extensionType.GetMethod(methodName);
+            MethodInfo? method;
+            // 对于 Update 方法，根据参数数量选择正确的重载
+            if (methodName == "Update")
+            {
+                if (a.Ids.Count == 1)
+                {
+                    // Update(otherDictionary) - 一个参数
+                    method = extensionType.GetMethod(methodName, [typeof(DictionaryLangValue)]);
+                }
+                else if (a.Ids.Count == 2)
+                {
+                    // Update(key, value) - 两个参数
+                    method = extensionType.GetMethod(methodName,
+                        new[] { typeof(StringLangValue), typeof(LangValueType) });
+                }
+                else
+                {
+                    method = null;
+                }
+            }
+            else
+            {
+                // 对于其他方法，使用普通的查找
+                method = extensionType.GetMethod(methodName);
+            }
+
             if (method != null)
             {
                 // 对于 Merge 和 Update 方法，需要特殊处理参数
