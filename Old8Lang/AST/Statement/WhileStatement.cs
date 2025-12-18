@@ -50,7 +50,8 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
                 }
 
                 bool conditionResult = varBool.Value;
-                varBool.ReturnToPool();
+                // 注意：不要在这里调用 ReturnToPool()，因为表达式可能会重用这个对象
+                // 如果在这里归还到池并重置，下次迭代时可能会得到错误的值
 
                 // 如果条件为 false，退出循环
                 if (!conditionResult)
@@ -119,7 +120,8 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
                 }
 
                 bool conditionResult = varBool.Value;
-                varBool.ReturnToPool();
+                // 注意：不要在这里调用 ReturnToPool()，因为表达式可能会重用这个对象
+                // 如果在这里归还到池并重置，下次迭代时可能会得到错误的值
 
                 // 如果条件为 false，退出循环
                 if (!conditionResult)

@@ -63,7 +63,6 @@ dotnet test --filter "FullyQualifiedName~Old8Lang.Tests.ParsersTests"
 ./run_interpreter_tests.sh             # Test interpreter mode execution
 ./run_compiler_tests.sh                # Test compiler mode execution
 ./run_comprehensive_compiler_tests.sh  # Run all compiler tests with detailed report
-./analyze_failures.sh                  # Analyze and report test failures
 
 # Run performance benchmarks
 dotnet run --project Old8Lang.Benchmarks --configuration Release
@@ -78,7 +77,7 @@ The AST is organized in `Old8Lang/AST/`:
 - **Expression/**: Expression nodes including operations, values, function calls, member access
   - `Operation.cs`: Binary operations (arithmetic, comparison, logical)
   - `LangId.cs`: Variable identifiers
-  - `FuncStatic.cs`: Static function calls
+  - `FunctionCallExpression.cs`: Function call expressions
   - `ClassMemberId.cs`: Member access expressions
   - `Value/`: Literal value types (int, double, string, bool, char, arrays, lists, dictionaries, tuples, ranges)
   - `Intermediates/`: Complex expressions (lambdas, instantiation, string templates)
@@ -88,12 +87,14 @@ The AST is organized in `Old8Lang/AST/`:
   - `IfStatement.cs` & `IfChild.cs`: Conditional statements
   - `ForStatement.cs`, `ForInStatement.cs`, `WhileStatement.cs`: Loop statements
   - `SwitchStatement.cs`: Switch-case statements
-  - `FuncInit.cs`: Function declarations
+  - `FuncInit.cs`, `AsyncFuncInit.cs`: Function declarations
   - `ClassInit.cs`: Class declarations
   - `ImportStatement.cs`: Import statements
   - `NativeStatement.cs`: Native C# method bindings
   - `BlockStatement.cs`: Block statements
   - `ReturnStatement.cs`, `BreakStatement.cs`, `ContinueStatement.cs`: Control flow
+  - `TryStatement.cs`, `ThrowStatement.cs`: Exception handling
+  - `YieldStatement.cs`: Generator support
 
 - **Visitor/**: Visitor pattern implementation for AST traversal
 
@@ -105,6 +106,12 @@ Located in `Old8Lang/LangParser/`:
 - `LangToken.cs` & `LangTokenType.cs`: Token definitions and lexical analysis
 - `LangInterpreter.cs`: Interpreter orchestrating parsing and execution
 - `VariateManager.cs`: Variable storage and scope management
+- `Parsers/`: Specialized parsers
+  - `ExpressionParser.cs`: Expression parsing
+  - `StatementParser.cs`: Statement parsing
+  - `FunctionParser.cs`: Function declaration parsing
+  - `ClassParser.cs`: Class declaration parsing
+  - `PrimaryParser.cs`: Primary expression parsing
 
 ### Compiler
 
@@ -112,6 +119,9 @@ Located in `Old8Lang/Compiler/`:
 
 - `Compiler.cs`: Compiles AST to intermediate code (IL-like)
 - `LocalManager.cs`: Manages local variables during compilation
+- `ILVerifier.cs`: Verifies generated IL code
+- `TypeConversion.cs`: Handles type conversions
+- `AsyncStateMachineGenerator.cs`: Generates async state machines
 
 ### Compiler Configuration
 
@@ -156,7 +166,7 @@ After testing, generate test reports in `Reports/` directory:
 
 ## Language Syntax Reference
 
-Full syntax is documented in `Old8Lang_Grammar.md` and EBNF in `Old8Lang.ebnf`.
+Full syntax is documented in `Old8Lang_Grammar.md` and EBNF in `Old8Lang/Old8Lang.ebnf`.
 
 Key syntax elements:
 - Assignment: `<-` operator (e.g., `a <- 123`)
@@ -180,7 +190,7 @@ When adding new language features:
 1. **Syntax testing**: Add test to `SyntaxTests/`, ensure parsing works
 2. **Interpreter testing**: Add test to `InterpreterTests/`, verify interpreter execution
 3. **Compiler testing**: Add test to `CompilerTests/`, verify compiler execution
-4. **Documentation**: Update `Old8Lang.ebnf` and `Old8Lang_Grammar.md`
+4. **Documentation**: Update `Old8Lang/Old8Lang.ebnf` and `Old8Lang_Grammar.md`
 
 ### Compiler Mode Type Annotation Rules
 
@@ -269,9 +279,7 @@ func example(
 
 **Note**: The codebase is in the process of transitioning to visitor pattern:
 - AST nodes are being refactored to support visitor pattern
-- See commits 3ced530, 39ae648 for visitor pattern refactoring progress
-
-When working with AST nodes, be aware that the visitor pattern implementation is ongoing.
+- When working with AST nodes, be aware that the visitor pattern implementation is ongoing
 
 ### Recent Refactoring
 
@@ -280,5 +288,3 @@ Recent changes include:
 - AST expression type system refactoring
 - Renamed `OldIf` to `IfChild`
 - Removed `GetChildType()` method from `ILangList` interface
-
-If encountering issues with these changes, refer to commits: c515c17, 835c531, 39ae648, 3ced530.

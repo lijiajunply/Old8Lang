@@ -64,7 +64,15 @@ public class BlockStatement : OldStatement
         {
             statement.Run(manager);
 
+            // 检查 return 语句
             if (manager.IsReturn)
+            {
+                return;
+            }
+
+            // 检查 break 和 continue 语句
+            // 如果在块内遇到 break 或 continue，应该立即停止执行后续语句
+            if (manager.ControlFlowManager.BreakFlag || manager.ControlFlowManager.ContinueFlag)
             {
                 return;
             }
@@ -133,6 +141,13 @@ public class BlockStatement : OldStatement
                 // 标记生成器完成
                 context.IsCompleted = true;
                 context.CurrentStatementIndex = 0;
+                return;
+            }
+
+            // 检查 break 和 continue 语句
+            // 如果在块内遇到 break 或 continue，应该立即停止执行后续语句
+            if (manager.ControlFlowManager.BreakFlag || manager.ControlFlowManager.ContinueFlag)
+            {
                 return;
             }
         }

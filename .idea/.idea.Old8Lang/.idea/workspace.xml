@@ -18,25 +18,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/ControlFlowException.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_assignment.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_matrix.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_matrix_mult.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_range.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_range_detail.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/TypeConversionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Expressions/TypeConversionTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/ControlFlowTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/ControlFlowTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/JumpStatementsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/JumpStatementsTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ValueTypeFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ValueTypeFuncStatic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BreakStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BreakStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ContinueStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ContinueStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ExpressionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ExpressionParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,6 +99,9 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Statements/ControlFlowTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Statements/ControlFlowTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Statements/ControlFlowTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Statements/ControlFlowTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Statements/JumpStatementsTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Statements/JumpStatementsTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/LangId.cs" root0="SKIP_HIGHLIGHTING" />
@@ -148,12 +140,17 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BreakStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BreakStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BreakStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ContinueStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ContinueStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ContinueStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ContinueStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
@@ -169,12 +166,17 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/IfStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/IfStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/IfStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SetStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SwitchStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/WhileStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Interpreter/ControlFlowManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Interpreter/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Interpreter/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Interpreter/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/ExpressionParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />

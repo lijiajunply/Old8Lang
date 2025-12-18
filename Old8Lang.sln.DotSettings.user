@@ -35,6 +35,12 @@
   &lt;Assembly Path="/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/OldLib/dll/Old8LangLib.dll" /&gt;
   &lt;Assembly Path="/usr/local/share/dotnet/shared/Microsoft.NETCore.App/10.0.0/System.Runtime.dll" /&gt;
 &lt;/AssemblyExplorer&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=58c56b00_002Df81e_002D48fd_002Da74f_002Dc8e84271fcf4/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Continuous Testing" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;And&gt;
+    &lt;Namespace&gt;Old8Lang.Tests.Interpreter.Statements&lt;/Namespace&gt;
+    &lt;Project Location="/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests" Presentation="&amp;lt;Old8Lang.Tests&amp;gt;" /&gt;
+  &lt;/And&gt;
+&lt;/SessionState&gt;</s:String>
 	
 	
 	

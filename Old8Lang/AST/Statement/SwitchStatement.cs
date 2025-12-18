@@ -36,12 +36,37 @@ public class SwitchStatement(
             if (isMatch)
             {
                 oldCase.BlockStatement.Run(manager);
+
                 // 如果case块中执行了return语句，直接返回
+                if (manager.IsReturn)
+                {
+                    return;
+                }
+
+                // 如果case块中执行了break，清除break标志（只跳出switch，不影响外层循环）
+                if (manager.ControlFlowManager.BreakFlag)
+                {
+                    manager.ControlFlowManager.BreakFlag = false;
+                    return;
+                }
+
+                // 如果case块中执行了continue，保留continue标志（让外层循环处理）
+                if (manager.ControlFlowManager.ContinueFlag)
+                {
+                    return;
+                }
+
                 return;
             }
         }
 
         defaultBlockStatement?.Run(manager);
+
+        // 同样处理default块中的break和continue
+        if (manager.ControlFlowManager.BreakFlag)
+        {
+            manager.ControlFlowManager.BreakFlag = false;
+        }
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)

@@ -380,6 +380,44 @@ public static class ListValueFuncStatic
         }
 
         /// <summary>
+        /// 移除并返回列表的最后一个元素
+        /// </summary>
+        /// <returns>被移除的最后一个元素</returns>
+        /// <exception cref="InvalidOperationError">当列表为空时抛出</exception>
+        public LangValueType Pop()
+        {
+            if (langValue.Values.Count == 0)
+            {
+                throw new InvalidOperationError(langValue, "无法从空列表中移除元素");
+            }
+
+            var lastIndex = langValue.Values.Count - 1;
+            var lastElement = langValue.Values[lastIndex];
+            langValue.Values.RemoveAt(lastIndex);
+            return lastElement;
+        }
+
+        /// <summary>
+        /// 获取列表的切片（子列表）
+        /// </summary>
+        /// <param name="start">起始索引（包含）</param>
+        /// <param name="end">结束索引（不包含）</param>
+        /// <returns>包含切片元素的新列表</returns>
+        public ListLangValue Slice(IntLangValue start, IntLangValue end)
+        {
+            var startIndex = Math.Max(0, Math.Min(start.Value, langValue.Values.Count));
+            var endIndex = Math.Max(0, Math.Min(end.Value, langValue.Values.Count));
+
+            if (startIndex > endIndex)
+            {
+                return new ListLangValue(new List<LangValueType>());
+            }
+
+            var result = langValue.Values.Skip(startIndex).Take(endIndex - startIndex).ToList();
+            return new ListLangValue(result);
+        }
+
+        /// <summary>
         /// 连接字符串数组为单个字符串
         /// </summary>
         /// <param name="separator">分隔符</param>

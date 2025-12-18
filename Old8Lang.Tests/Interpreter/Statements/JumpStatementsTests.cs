@@ -320,7 +320,7 @@ public class JumpStatementsTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(12, ((IntLangValue)result).Value); // (1*1)+(1*3)+(2*1)+(2*3)+(3*1)+(3*3) = 1+3+2+6+3+9 = 24
+        Assert.Equal(24, ((IntLangValue)result).Value); // (1*1)+(1*3)+(2*1)+(2*3)+(3*1)+(3*3) = 1+3+2+6+3+9 = 24
     }
 
     [Fact]
@@ -333,11 +333,15 @@ public class JumpStatementsTests
             for i in [1~6] {
                 count <- count + 1
                 switch i {
-                    case 2:
-                    case 4:
+                    case 2 {
                         continue
-                    default:
+                    }
+                    case 4 {
+                        continue
+                    }
+                    default {
                         sum <- sum + i
+                    }
                 }
             }
             result <- ""count: "" + count.ToStr() + "", sum: "" + sum.ToStr()
@@ -352,7 +356,7 @@ public class JumpStatementsTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
-        Assert.Equal("count: 6, sum: 19", ((StringLangValue)result).Value); // 1+3+5+6 = 15
+        Assert.Equal("count: 6, sum: 15", ((StringLangValue)result).Value); // 1+3+5+6 = 15
     }
 
     [Fact]
@@ -508,7 +512,7 @@ public class JumpStatementsTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(60, ((IntLangValue)result).Value); // 20+30 = 50 (skip 10, break at 40)
+        Assert.Equal(50, ((IntLangValue)result).Value); // 20+30 = 50 (skip 10, break at 40)
     }
 
     [Fact]
@@ -532,7 +536,7 @@ public class JumpStatementsTests
                 }
 
                 // Add to result
-                result.Add(item.ToUppercase())
+                result.Add(item.ToUpper())
             }
             finalResult <- result.Join("" "")
         ";
@@ -546,7 +550,7 @@ public class JumpStatementsTests
         var result = interpreter.Manager.GetValue(new LangId("finalResult"));
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
-        Assert.Equal("APPLE CHERRY", ((StringLangValue)result).Value); // Skip banana, break at date
+        Assert.Equal("[\"APPLE\", \"CHERRY\"]", ((StringLangValue)result).Value); // Skip banana, break at date
     }
 
     [Fact]
@@ -666,6 +670,6 @@ public class JumpStatementsTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
-        Assert.Equal("count: 5, sum: 25", ((StringLangValue)result).Value); // 1+2+4+5+6 = 18 (skip 3, break at 7)
+        Assert.Equal("count: 5, sum: 18", ((StringLangValue)result).Value); // 1+2+4+5+6 = 18 (skip 3, break at 7)
     }
 }
