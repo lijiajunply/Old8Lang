@@ -27,6 +27,8 @@ public class ForStatement(
             setStatement.Run(manager);
             while (true)
             {
+                // 重置控制流状态，确保每次循环迭代开始时清除之前的break/continue标志
+                manager.ControlFlowManager.ResetCurrentState();
 
                 var varExpr = expression.Run(manager);
                 bool expr1;
@@ -54,12 +56,14 @@ public class ForStatement(
                 // 处理break
                 if (manager.ControlFlowManager.BreakFlag)
                 {
+                    manager.ControlFlowManager.BreakFlag = false;
                     break;
                 }
 
                 // 处理continue，执行循环增量操作
                 if (manager.ControlFlowManager.ContinueFlag)
                 {
+                    manager.ControlFlowManager.ContinueFlag = false;
                     statement.Run(manager);
                     continue;
                 }

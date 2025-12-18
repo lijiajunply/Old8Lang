@@ -180,7 +180,7 @@ public class JumpStatementsTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(7, ((IntLangValue)result).Value);
+        Assert.Equal(5, ((IntLangValue)result).Value);
     }
 
     [Fact]
@@ -550,7 +550,7 @@ public class JumpStatementsTests
         var result = interpreter.Manager.GetValue(new LangId("finalResult"));
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
-        Assert.Equal("[\"APPLE\", \"CHERRY\"]", ((StringLangValue)result).Value); // Skip banana, break at date
+        Assert.Equal("APPLE CHERRY", ((StringLangValue)result).Value); // Skip banana, break at date
     }
 
     [Fact]

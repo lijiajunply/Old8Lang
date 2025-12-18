@@ -597,32 +597,33 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
     public void FunctionCall_WithOptionalParameters_HandlesMissingArgs()
     {
         // Arrange
-        var code = @"
-            func buildUrl(base:string, path: string, params: dict) -> string {
-                url <- base
-                if len(path) > 0 {
-                    url <- url + ""/"" + path
-                }
-                
-                if len(params) > 0 {
-                    url <- url + ""?""
-                    first <- true
-                    for key in params.Keys {
-                        if not first {
-                            url <- url + ""&""
-                        }
-                        url <- url + key + ""="" + params[key].ToStr()
-                        first <- false
-                    }
-                }
-                return url
-            }
+        var code = """
+                               func buildUrl(base:string, path: string, params: dict) -> string {
+                                   url <- base
+                                   if len(path) > 0 {
+                                       url <- url + "/" + path
+                                   }
+                                   
+                                   if len(params) > 0 {
+                                       url <- url + "?"
+                                       first <- true
+                                       for key in params.Keys {
+                                           if not first {
+                                               url <- url + "&"
+                                           }
+                                           url <- url + key + "=" + params[key].ToStr()
+                                           first <- false
+                                       }
+                                   }
+                                   return url
+                               }
 
-            result1 <- buildUrl(""https://api.example.com"")
-            result2 <- buildUrl(""https://api.example.com"", ""users"")
-            queryParams <- {""page"": ""1"", ""limit"": ""10""}
-            result3 <- buildUrl(""https://api.example.com"", ""users"", queryParams)
-        ";
+                               result1 <- buildUrl("https://api.example.com")
+                               result2 <- buildUrl("https://api.example.com", "users")
+                               queryParams <- {"page": "1", "limit": "10"}
+                               result3 <- buildUrl("https://api.example.com", "users", queryParams)
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act

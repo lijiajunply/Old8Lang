@@ -158,6 +158,25 @@ public class SetStatement : OldStatement
             }
         }
 
+        // 处理嵌套索引访问赋值：array[0][0] <- value
+        if (LeftExpression is NestedIndexAccess nestedIndexAccess)
+        {
+            // 运行基础索引访问，获取容器对象
+            var baseResult = nestedIndexAccess.BaseIndex.Run(manager);
+
+            // 获取嵌套索引值
+            var nestedIndexValue = nestedIndexAccess.NestedIndex.Run(manager);
+
+            // 检查基础结果是否支持索引访问
+            if (baseResult is ILangList baseCollection)
+            {
+                baseCollection.Set(nestedIndexValue, result);
+                return;
+            }
+
+            throw new InvalidOperationError(this, $"不支持的嵌套索引赋值类型: {baseResult?.GetType().Name ?? "null"}");
+        }
+
         // 处理成员访问赋值：this.name <- value, person.name <- value
         if (LeftExpression is Operation operation)
         {

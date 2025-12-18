@@ -18,8 +18,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug_switch_break.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/JumpStatementsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/JumpStatementsTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,14 +63,19 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/AsyncGeneratorTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Statements/ControlFlowTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Statements/ControlFlowTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/DictionaryLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TupleLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TupleLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SwitchStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/ExpressionParser.cs" root0="SKIP_HIGHLIGHTING" />
@@ -397,7 +406,7 @@
       <workItem from="1765816155545" duration="30580000" />
       <workItem from="1766037121468" duration="28333000" />
       <workItem from="1766082960788" duration="2522000" />
-      <workItem from="1766085560295" duration="2333000" />
+      <workItem from="1766085560295" duration="2918000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -742,7 +751,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="270" />
+    <option name="localTasksCounter" value="271" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -769,7 +778,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(interpreter): 更新函数和异常处理测试用例&#10;&#10;- 将函数返回类型 func 统一改为 function&#10;- 更新字典和数组类型声明及操作方法&#10;- 优化异常处理测试，增强 ErrorLangValue 类型检查&#10;- 调整循环语法格式和条件判断方式&#10;- 改进函数参数默认值和可选参数处理&#10;- 更新类型断言和值比较方式，提高测试准确性" />
     <MESSAGE value="feat(parser): 实现 if-then-else 三元表达式解析功能&#10;&#10;- 新增对简单及嵌套 if-then-else 三元表达式的解析支持&#10;- 支持在三元表达式中使用算术运算和复杂条件判断&#10;- 添加对混合三元表达式（如与传统 ?: 表达式结合）的解析&#10;- 完善错误处理，针对缺失 then 或 else 关键字的情况抛出语法错误&#10;- 更新词法分析器以识别新的关键字 Then&#10;- 扩展 PrimaryParser 来处理完整的 if-then-else 结构并构建相应 AST 节点&#10;- 添加多个单元测试用例覆盖各种合法及非法情况下的三元表达式解析验证" />
     <MESSAGE value="fix(tests): 修复异常处理测试中的函数命名和返回逻辑&#10;&#10;- 将UserProfile类中的Init方法重命名为init以符合命名规范&#10;- 在测试代码中添加了try-catch块来验证异常抛出功能&#10;- 修改catch块中的赋值操作为return语句以正确返回异常信息&#10;- 更新testException调用方式，将其返回值赋给result变量" />
     <MESSAGE value="test: 移除未使用的命名空间引用&#10;&#10;- 删除了多个测试文件中对 Old8Lang.LangParser 的无用引用&#10;- 清理了对 Xunit 的冗余 using 语句&#10;- 移除了对 System.Threading.Tasks 和 System 的不必要导入&#10;- 简化了并发原语测试中的命名空间声明&#10;- 统一了测试文件的命名空间引用风格" />
@@ -794,7 +802,8 @@
     <MESSAGE value="fix(interpreter): 修复静态方法中this引用和集合切片逻辑&#10;&#10;- 修复类静态方法中score和highScore变量的this引用问题&#10;- 更新集合聚合测试用例的字符串字面量语法和期望值&#10;- 调整线程测试中原子引用的函数定义语法&#10;- 移除范围测试中无效的空范围测试用例&#10;- 修复IntLangValue中减法运算的double类型处理逻辑&#10;- 更新切片测试中索引计算和集合字面量语法&#10;- 修正字符串模板测试中的插值表达式和期望结果&#10;- 更新元组测试中的函数返回类型声明语法" />
     <MESSAGE value="refactor(parser): 重构嵌套索引访问处理逻辑&#10;&#10;- 引入新的 NestedIndexAccess 类专门处理 array[index1][index2] 场景&#10;- 修改 ExpressionParser 中的索引访问解析逻辑，使用专用表达式节点&#10;- 优化 Instance 类中的方法参数匹配逻辑，支持可选参数处理&#10;- 完善 TupleLangValue 的扁平化访问和直接子元素访问功能&#10;- 更新多个测试用例以适配语法变更，将 .. 范围语法改为 [~] 语法&#10;- 修复部分测试中使用的函数命名大小写问题&#10;- 调整集合方法调用后的赋值方式，确保返回值正确处理" />
     <MESSAGE value="feat(parser): 实现切片语法解析和嵌套切片访问支持&#10;&#10;- 添加对切片语法 [start:end:step] 的完整解析支持&#10;- 引入 NestedSliceAccess 类处理嵌套切片访问场景&#10;- 优化索引访问解析逻辑，区分普通索引和切片操作&#10;- 支持开放式切片和步长参数的解析&#10;- 完善切片相关 AST 节点的类型检查和错误处理&#10;- 更新测试用例以验证新的切片语法功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 实现切片语法解析和嵌套切片访问支持&#10;&#10;- 添加对切片语法 [start:end:step] 的完整解析支持&#10;- 引入 NestedSliceAccess 类处理嵌套切片访问场景&#10;- 优化索引访问解析逻辑，区分普通索引和切片操作&#10;- 支持开放式切片和步长参数的解析&#10;- 完善切片相关 AST 节点的类型检查和错误处理&#10;- 更新测试用例以验证新的切片语法功能" />
+    <MESSAGE value="feat(dictionary): 实现字典 Update 方法重载和优化 ForEach 执行逻辑&#10;&#10;- 为 DictionaryLangValue 添加 Update 方法的参数重载支持&#10;- 支持 Update(key, value) 和 Update(otherDictionary) 两种调用形式&#10;- 优化 DictionaryValueFuncStatic 中 ForEach 方法的 lambda 执行逻辑&#10;- 针对 lambda 表达式直接操作作用域，避免闭包深拷贝开销&#10;- 改进字典键值更新机制，确保键存在时更新、不存在时插入&#10;- 完善方法调用时的参数匹配和类型检查逻辑" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(dictionary): 实现字典 Update 方法重载和优化 ForEach 执行逻辑&#10;&#10;- 为 DictionaryLangValue 添加 Update 方法的参数重载支持&#10;- 支持 Update(key, value) 和 Update(otherDictionary) 两种调用形式&#10;- 优化 DictionaryValueFuncStatic 中 ForEach 方法的 lambda 执行逻辑&#10;- 针对 lambda 表达式直接操作作用域，避免闭包深拷贝开销&#10;- 改进字典键值更新机制，确保键存在时更新、不存在时插入&#10;- 完善方法调用时的参数匹配和类型检查逻辑" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

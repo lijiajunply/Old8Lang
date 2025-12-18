@@ -43,10 +43,9 @@ public class SwitchStatement(
                     return;
                 }
 
-                // 如果case块中执行了break，清除break标志（只跳出switch，不影响外层循环）
+                // 如果case块中执行了break，保留break标志（让它能够跳出外层循环）
                 if (manager.ControlFlowManager.BreakFlag)
                 {
-                    manager.ControlFlowManager.BreakFlag = false;
                     return;
                 }
 
@@ -62,11 +61,8 @@ public class SwitchStatement(
 
         defaultBlockStatement?.Run(manager);
 
-        // 同样处理default块中的break和continue
-        if (manager.ControlFlowManager.BreakFlag)
-        {
-            manager.ControlFlowManager.BreakFlag = false;
-        }
+        // default块中的break和continue保持原样，不需要特殊处理
+        // break和continue标志会被保留，让外层循环处理
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
