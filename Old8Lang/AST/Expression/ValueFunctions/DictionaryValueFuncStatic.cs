@@ -1,5 +1,7 @@
+using System.Linq;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression.ValueFunctions;
 
@@ -107,6 +109,97 @@ public static class DictionaryValueFuncStatic
                 values.Add(value);
             }
             return new ListLangValue(values);
+        }
+
+        /// <summary>
+        /// 根据键获取字典中的值，如果键不存在则返回默认值
+        /// </summary>
+        /// <param name="key">要查找的键</param>
+        /// <param name="defaultValue">键不存在时的默认值</param>
+        /// <returns>对应的值或默认值</returns>
+        public LangValueType GetOrElse(LangValueType key, LangValueType defaultValue)
+        {
+            foreach (var (k, v) in langValue.Value)
+            {
+                if (k.Equal(key))
+                {
+                    return v;
+                }
+            }
+            return defaultValue;
+        }
+
+        /// <summary>
+        /// 将另一个字典合并到当前字典中，如果有重复键，当前字典的值优先
+        /// </summary>
+        /// <param name="otherDictionary">要合并的另一个字典</param>
+        /// <returns>合并后的新字典</returns>
+        public DictionaryLangValue Merge(DictionaryLangValue otherDictionary)
+        {
+            // 创建一个新字典，使用默认构造函数
+            var newDict = new DictionaryLangValue();
+
+            // 复制当前字典的所有键值对
+            foreach (var (key, value) in langValue.Value)
+            {
+                newDict.Value.Add((key, value));
+            }
+
+            // 添加另一个字典的键值对，跳过重复的键
+            foreach (var (key, value) in otherDictionary.Value)
+            {
+                var keyExists = false;
+                foreach (var (existingKey, _) in newDict.Value)
+                {
+                    if (existingKey.Equal(key))
+                    {
+                        keyExists = true;
+                        break;
+                    }
+                }
+
+                if (!keyExists)
+                {
+                    newDict.Value.Add((key, value));
+                }
+            }
+
+            return newDict;
+        }
+
+        /// <summary>
+        /// 更新字典中指定键的值，如果键不存在则添加
+        /// </summary>
+        /// <param name="key">要更新的键</param>
+        /// <param name="newValue">新的值</param>
+        /// <returns>更新后的字典</returns>
+        public DictionaryLangValue Update(LangValueType key, LangValueType newValue)
+        {
+            // 创建一个新字典，使用默认构造函数
+            var newDict = new DictionaryLangValue();
+
+            // 复制当前字典的所有键值对
+            var keyUpdated = false;
+            foreach (var (existingKey, existingValue) in langValue.Value)
+            {
+                if (existingKey.Equal(key))
+                {
+                    newDict.Value.Add((key, newValue)); // 更新值
+                    keyUpdated = true;
+                }
+                else
+                {
+                    newDict.Value.Add((existingKey, existingValue)); // 保持原值
+                }
+            }
+
+            // 如果键不存在，添加新的键值对
+            if (!keyUpdated)
+            {
+                newDict.Value.Add((key, newValue));
+            }
+
+            return newDict;
         }
     }
 }

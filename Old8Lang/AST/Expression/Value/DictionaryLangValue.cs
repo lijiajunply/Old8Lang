@@ -26,7 +26,8 @@ public class DictionaryLangValue : LangValueType, ILangList
         Tuples = [];
     }
 
-    public DictionaryLangValue(List<KeyValuePair<LangExpression, LangExpression>> list, SourcePosition position = default) :
+    public DictionaryLangValue(List<KeyValuePair<LangExpression, LangExpression>> list,
+        SourcePosition position = default) :
         base(position)
     {
         Tuples = list.Select(x => new TupleLangValue(x.Key, x.Value)).ToList();
@@ -85,22 +86,24 @@ public class DictionaryLangValue : LangValueType, ILangList
         if (dotExpression is Instance a)
         {
             // 检查是否是 Keys 或 Values 属性调用（通过方法名）
-            var methodName = a.Id?.IdName;
-            if (methodName == "Keys" || methodName == "Values")
+            var methodName = a.Id.IdName;
+            if (methodName is "Keys" or "Values")
             {
                 // 直接返回对应的集合，不调用 FromClassToResult
-                return methodName == "Keys" ? new ListLangValue(Value.Select(x => x.Key).ToList()) : new ListLangValue(Value.Select(x => x.Value).ToList());
+                return methodName == "Keys"
+                    ? new ListLangValue(Value.Select(x => x.Key).ToList())
+                    : new ListLangValue(Value.Select(x => x.Value).ToList());
             }
-            
+
             // 检查是否是索引访问：data[key] 被错误解析为点操作
             // 当 Instance 表示索引访问时，提取索引值并调用 Get 方法
-            if (a.Ids != null && a.Ids.Count == 1)
+            if (a.Ids is { Count: 1 })
             {
                 // 运行索引表达式获取键值
                 var result = a.Ids[0].Run(manager);
                 return Get(result);
             }
-            
+
             return a.FromClassToResult(this);
         }
 
@@ -225,7 +228,7 @@ public class DictionaryLangValue : LangValueType, ILangList
         throw new InvalidOperationError(this, "字典类型不支持切片操作");
     }
 
-    
+
     public override Type OutputType(LocalManager local) => typeof(Dictionary<object, object>);
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)

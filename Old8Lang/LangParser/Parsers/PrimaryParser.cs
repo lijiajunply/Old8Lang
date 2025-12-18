@@ -48,7 +48,7 @@ public class PrimaryParser(
             var expr = expressionParserFactory().ParseExpression();
             return new AwaitExpression(expr, position);
         }
-        
+
         // 处理异步Lambda表达式 - 无参数情况
         if (CurrentToken.Type == LangTokenType.Async && Peek().Type == LangTokenType.LeftParen)
         {
@@ -56,10 +56,10 @@ public class PrimaryParser(
             var asyncToken = CurrentToken;
             var position = new SourcePosition(asyncToken.Line, asyncToken.Column, tokenValue: asyncToken.Value);
             Expect(LangTokenType.Async);
-            
+
             var leftParenToken = CurrentToken;
             Expect(LangTokenType.LeftParen);
-            
+
             // 检查是否是无参数异步Lambda
             if (CurrentToken.Type == LangTokenType.RightParen && Peek().Type == LangTokenType.Arrow)
             {
@@ -87,11 +87,11 @@ public class PrimaryParser(
                 // 创建异步Lambda表达式
                 return new AsyncFuncLangValue(null, [], block, position);
             }
-            
+
             // 有参数异步Lambda
             var isLambda = true;
             var ids = new List<LangId>();
-            
+
             // 检查第一个元素是否是标识符
             if (CurrentToken.Type == LangTokenType.Identifier)
             {
@@ -140,7 +140,7 @@ public class PrimaryParser(
                     return new AsyncFuncLangValue(null, ids, block, position);
                 }
             }
-            
+
             // 不是Lambda表达式，抛出错误
             throw CreateSyntaxError("语法错误：异步Lambda表达式格式不正确");
         }
@@ -219,12 +219,14 @@ public class PrimaryParser(
                 }
                 else
                 {
-                    throw CreateSyntaxError("语法错误：if-then-else 表达式不完整，缺少 'else' 和假值分支。建议：使用完整的 if-then-else 表达式格式 'if condition then trueValue else falseValue'。");
+                    throw CreateSyntaxError(
+                        "语法错误：if-then-else 表达式不完整，缺少 'else' 和假值分支。建议：使用完整的 if-then-else 表达式格式 'if condition then trueValue else falseValue'。");
                 }
             }
             else
             {
-                throw CreateSyntaxError("语法错误：if 表达式后缺少 'then' 关键字。如果要使用 if-then-else 三元表达式，请使用格式 'if condition then value else value'。");
+                throw CreateSyntaxError(
+                    "语法错误：if 表达式后缺少 'then' 关键字。如果要使用 if-then-else 三元表达式，请使用格式 'if condition then value else value'。");
             }
         }
 
@@ -668,16 +670,17 @@ public class PrimaryParser(
 
         // 保存当前位置，用于回滚
         var savedIndex = CurrentIndex;
-        
+
         // 检查是否是异步Lambda表达式
         var isAsync = false;
-        if (CurrentToken.Type == LangTokenType.Async && Peek().Type == LangTokenType.RightParen && Peek(2).Type == LangTokenType.Arrow)
+        if (CurrentToken.Type == LangTokenType.Async && Peek().Type == LangTokenType.RightParen &&
+            Peek(2).Type == LangTokenType.Arrow)
         {
             // 异步无参数Lambda：async () -> block 或 async () -> expression
             isAsync = true;
             Expect(LangTokenType.Async);
         }
-        
+
         // 检查是否是Lambda表达式：() -> block 或 (params) -> block
         if (CurrentToken.Type == LangTokenType.RightParen)
         {
@@ -732,7 +735,7 @@ public class PrimaryParser(
         // 如果是其他表达式（如数字、字符串、表达式调用等），则是元组
         var isLambda = true;
         var ids = new List<LangId>();
-        
+
         // 检查是否是异步Lambda表达式（有参数）
         if (CurrentToken.Type == LangTokenType.Async && Peek().Type == LangTokenType.Identifier)
         {
@@ -779,10 +782,12 @@ public class PrimaryParser(
                         Expect(LangTokenType.Identifier);
 
                         // 验证是否为支持的类型
-                        var supportedTypes = new[] { "int", "double", "string", "bool", "char", "void", "list", "dict" };
+                        var supportedTypes = new[]
+                            { "int", "double", "string", "bool", "char", "void", "list", "dict" };
                         if (!supportedTypes.Contains(returnTypeName))
                         {
-                            throw CreateSyntaxError($"不支持的返回类型注解: {returnTypeName}。支持的类型: int, double, string, bool, char, void, list, dict");
+                            throw CreateSyntaxError(
+                                $"不支持的返回类型注解: {returnTypeName}。支持的类型: int, double, string, bool, char, void, list, dict");
                         }
 
                         returnTypeAnnotation = new LangId("", returnTypeName, null, position);
@@ -1134,7 +1139,17 @@ public class PrimaryParser(
         var position = new SourcePosition(charToken.Line, charToken.Column, tokenValue: charToken.Value);
         var value = charToken.Value;
         Expect(LangTokenType.Char);
-        return new CharLangValue(value[0], position);
+        char c;
+        try
+        {
+            c = char.Parse(value);
+        }
+        catch
+        {
+            c = value[0];
+        }
+
+        return new CharLangValue(c, position);
     }
 
     /// <summary>
@@ -1309,7 +1324,8 @@ public class PrimaryParser(
                 var supportedTypes = new[] { "int", "double", "string", "bool", "char", "void", "list", "dict" };
                 if (!supportedTypes.Contains(typeAnnotation))
                 {
-                    throw CreateSyntaxError($"不支持的类型注解: {typeAnnotation}。支持的类型: int, double, string, bool, char, void, list, dict");
+                    throw CreateSyntaxError(
+                        $"不支持的类型注解: {typeAnnotation}。支持的类型: int, double, string, bool, char, void, list, dict");
                 }
             }
             else
@@ -1321,6 +1337,5 @@ public class PrimaryParser(
         return new LangId(value, typeAnnotation, null, position);
     }
 
-    
     #endregion
 }

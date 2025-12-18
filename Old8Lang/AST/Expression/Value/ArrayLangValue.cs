@@ -74,9 +74,16 @@ public class ArrayLangValue : LangValueType, ILangList
         return RunResult[index];
     }
 
-    // 覆盖 Dot 方法以支持嵌套索引访问，如 array[0][0]
+    // 覆盖 Dot 方法以支持嵌套索引访问和方法调用，如 array[0][0] 和 array.Sort()
     public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
+        // 如果是Instance，可能是方法调用
+        if (dotExpression is Instance instance)
+        {
+            // 对于方法调用，使用扩展方法机制
+            return instance.FromClassToResult(this);
+        }
+
         // 如果 dotExpression 是一个整数值或可以转换为整数的表达式，则视为索引访问
         if (dotExpression is IntLangValue intValue)
         {

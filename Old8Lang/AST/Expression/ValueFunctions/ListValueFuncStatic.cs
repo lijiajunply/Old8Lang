@@ -211,6 +211,174 @@ public static class ListValueFuncStatic
         {
             return new IntLangValue(langValue.Values.Count);
         }
+
+        /// <summary>
+        /// 连接两个列表，返回包含所有元素的新列表
+        /// </summary>
+        /// <param name="otherList">要连接的另一个列表</param>
+        /// <returns>包含两个列表所有元素的新列表</returns>
+        public ListLangValue Concat(ListLangValue otherList)
+        {
+            var result = new List<LangValueType>(langValue.Values);
+            result.AddRange(otherList.Values);
+            return new ListLangValue(result);
+        }
+
+        /// <summary>
+        /// 对列表元素进行聚合操作
+        /// </summary>
+        /// <param name="accumulator">聚合函数，接受累加器和当前元素，返回新的累加器值</param>
+        /// <returns>聚合后的结果值</returns>
+        public LangValueType Aggregate(FuncLangValue accumulator)
+        {
+            if (langValue.Values.Count == 0)
+            {
+                throw new InvalidOperationError(langValue, "无法对空列表进行聚合操作");
+            }
+
+            var result = langValue.Values[0];
+            for (var i = 1; i < langValue.Values.Count; i++)
+            {
+                var manager = new VariateManager();
+                manager.Set(new LangId("accumulator"), result);
+                manager.Set(new LangId("item"), langValue.Values[i]);
+
+                result = accumulator.Run(manager);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 查找列表中第一个满足条件的元素
+        /// </summary>
+        /// <param name="predicate">谓词函数，返回布尔值</param>
+        /// <returns>第一个满足条件的元素，如果找不到则返回Null</returns>
+        public LangValueType Find(FuncLangValue predicate)
+        {
+            foreach (var item in langValue.Values)
+            {
+                var manager = new VariateManager();
+                manager.Set(new LangId("item"), item);
+
+                var result = predicate.Run(manager);
+                if (result is BoolLangValue { Value: true })
+                {
+                    return item;
+                }
+            }
+
+            return new NullLangValue();
+        }
+
+        /// <summary>
+        /// 跳过列表的前n个元素，返回剩余元素
+        /// </summary>
+        /// <param name="count">要跳过的元素数量</param>
+        /// <returns>包含剩余元素的新列表</returns>
+        public ListLangValue Skip(IntLangValue count)
+        {
+            var skipCount = Math.Max(0, Math.Min(count.Value, langValue.Values.Count));
+            var result = langValue.Values.Skip(skipCount).ToList();
+            return new ListLangValue(result);
+        }
+
+        /// <summary>
+        /// 检查列表中是否有任何元素满足条件
+        /// </summary>
+        /// <param name="predicate">谓词函数，返回布尔值</param>
+        /// <returns>如果有元素满足条件则返回true，否则返回false</returns>
+        public BoolLangValue Any(FuncLangValue predicate)
+        {
+            foreach (var item in langValue.Values)
+            {
+                var manager = new VariateManager();
+                manager.Set(new LangId("item"), item);
+
+                var result = predicate.Run(manager);
+                if (result is BoolLangValue { Value: true })
+                {
+                    return new BoolLangValue(true);
+                }
+            }
+
+            return new BoolLangValue(false);
+        }
+
+        /// <summary>
+        /// 在指定索引处插入元素
+        /// </summary>
+        /// <param name="index">插入位置的索引</param>
+        /// <param name="element">要插入的元素</param>
+        /// <returns>VoidLangValue，表示操作完成</returns>
+        public VoidLangValue Insert(IntLangValue index, LangValueType element)
+        {
+            var insertIndex = Math.Max(0, Math.Min(index.Value, langValue.Values.Count));
+            langValue.Values.Insert(insertIndex, element);
+            return new VoidLangValue();
+        }
+
+        /// <summary>
+        /// 清空列表中的所有元素
+        /// </summary>
+        /// <returns>VoidLangValue，表示操作完成</returns>
+        public VoidLangValue Clear()
+        {
+            langValue.Values.Clear();
+            return new VoidLangValue();
+        }
+
+        /// <summary>
+        /// 对列表中的每个元素执行操作
+        /// </summary>
+        /// <param name="action">操作函数，接受当前元素作为参数</param>
+        /// <returns>VoidLangValue，表示操作完成</returns>
+        public VoidLangValue ForEach(FuncLangValue action)
+        {
+            foreach (var item in langValue.Values)
+            {
+                var manager = new VariateManager();
+                manager.Set(new LangId("item"), item);
+
+                action.Run(manager);
+            }
+
+            return new VoidLangValue();
+        }
+
+        /// <summary>
+        /// 检查列表中是否所有元素都满足条件
+        /// </summary>
+        /// <param name="predicate">谓词函数，返回布尔值</param>
+        /// <returns>如果所有元素都满足条件则返回true，否则返回false</returns>
+        public BoolLangValue All(FuncLangValue predicate)
+        {
+            foreach (var item in langValue.Values)
+            {
+                var manager = new VariateManager();
+                manager.Set(new LangId("item"), item);
+
+                var result = predicate.Run(manager);
+                if (result is BoolLangValue { Value: false })
+                {
+                    return new BoolLangValue(false);
+                }
+            }
+
+            return new BoolLangValue(true);
+        }
+
+        /// <summary>
+        /// 获取列表的前n个元素
+        /// </summary>
+        /// <param name="count">要获取的元素数量</param>
+        /// <returns>包含前n个元素的新列表</returns>
+        public ListLangValue Take(IntLangValue count)
+        {
+            var takeCount = Math.Max(0, Math.Min(count.Value, langValue.Values.Count));
+            var result = langValue.Values.Take(takeCount).ToList();
+            return new ListLangValue(result);
+        }
     }
 
     /// <summary>

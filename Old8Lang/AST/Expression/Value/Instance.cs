@@ -246,15 +246,25 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                     }
                 }
             }
+            case "dict" or "Dict":
+            {
+                if (Ids.Count > 0)
+                {
+                    throw new ArgumentError(this, "Dict 函数不需要参数");
+                }
+
+                return new DictionaryLangValue();
+            }
         }
 
         // 获取所有可能的匹配函数（函数名和参数数量匹配）
-        var matchingFuncs = manager.ImportInfos
+        var matchingFunctions = manager.ImportInfos
             .Where(x => (x is FuncLangValue func && func.Id!.IdName == Id.IdName && func.Ids?.Count == Ids.Count)
-                       || (x is AsyncFuncLangValue asyncFunc && asyncFunc.Id!.IdName == Id.IdName && asyncFunc.Ids?.Count == Ids.Count))
+                        || (x is AsyncFuncLangValue asyncFunc && asyncFunc.Id!.IdName == Id.IdName &&
+                            asyncFunc.Ids?.Count == Ids.Count))
             .ToList();
 
-        if (matchingFuncs.Count > 0)
+        if (matchingFunctions.Count > 0)
         {
             // 计算参数的实际值和类型
             var paramValues = Ids.Select(t => t.Run(manager)).ToList();
@@ -263,7 +273,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             object? bestMatch = null;
             bool foundExactMatch = false;
 
-            foreach (var func in matchingFuncs)
+            foreach (var func in matchingFunctions)
             {
                 if (func is FuncLangValue funcValue && funcValue.Ids != null)
                 {
@@ -400,7 +410,8 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                     // 保存init方法的引用
                     if (instance.Result.TryGetValue("init", out var initResult))
                     {
-                        if (initResult is not FuncLangValue initFunc) throw new TypeError(this, "FuncValue", "init 不是函数类型");
+                        if (initResult is not FuncLangValue initFunc)
+                            throw new TypeError(this, "FuncValue", "init 不是函数类型");
 
                         // 在调用init方法前，将当前实例添加到AnyInfo中，以便this关键字访问
                         instance.Manager.Set(new LangId("this"), instance);
@@ -542,7 +553,8 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
         // 对于具有扩展方法的类型，优先查找扩展方法而不是实例方法
         // 这样可以避免找到 TaskLangValue.Then 实例方法而不是扩展方法
-        if (baseLangValue is DictionaryLangValue or ListLangValue or TaskLangValue or ThreadLangValue)
+        if (baseLangValue is DictionaryLangValue or ListLangValue or TaskLangValue or ThreadLangValue or StringLangValue
+            or TupleLangValue or ArrayLangValue)
         {
             type = baseLangValue switch
             {
@@ -550,6 +562,9 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 ListLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.ListValueFuncStatic"),
                 TaskLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.TaskValueFuncStatic"),
                 ThreadLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.ThreadValueFuncStatic"),
+                StringLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.StringValueFuncStatic"),
+                TupleLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.TupleValueFuncStatic"),
+                ArrayLangValue => Type.GetType("Old8Lang.AST.Expression.ValueFunctions.ArrayValueFuncStatic"),
                 _ => null
             };
             m = type?.GetMethod(Id.IdName);
@@ -836,7 +851,8 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
         if (matchingMethod == null)
         {
             var classType = local.ClassVar.GetValueOrDefault(Id.IdName);
-            if (classType == null) {
+            if (classType == null)
+            {
                 // 如果找不到类类型，可能是因为类还在编译中
                 // 检查是否有对应的TypeBuilder
                 if (local.InClassEnv?.Name == Id.IdName && local.InClassEnv is TypeBuilder builder)
@@ -1018,10 +1034,10 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             // DynamicMethod不能直接通过Call指令调用，需要通过委托调用
             // 对于DynamicMethod，我们需要确保栈上有正确数量的参数
             // 注意：参数已经在前面加载过了，包括补充的默认参数
-            
+
             // 直接调用DynamicMethod的Invoke方法会导致栈不平衡
             // 因此，我们需要使用一种不同的方式来调用DynamicMethod
-            
+
             // 简化实现：直接使用Call指令调用DynamicMethod
             // 这在某些情况下可能会失败，但在大多数情况下应该可以工作
             ilGenerator.Emit(OpCodes.Call, dynamicMethod);
@@ -1031,23 +1047,6 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             // 对于普通方法，使用Call指令直接调用
             ilGenerator.Emit(OpCodes.Call, matchingMethod);
         }
-    }
-
-    /// <summary>
-    /// 根据MethodInfo创建对应的委托类型
-    /// </summary>
-    /// <param name="method">方法信息</param>
-    /// <returns>委托类型</returns>
-    private Type CreateDelegateType(MethodInfo method)
-    {
-        var parameters = method.GetParameters();
-        var paramTypes = parameters.Select(p => p.ParameterType).ToArray();
-
-        // 使用Expression.GetDelegateType创建委托类型
-        // 这个方法会根据参数类型和返回类型创建合适的委托类型
-        return System.Linq.Expressions.Expression.GetDelegateType(
-            [.. paramTypes, method.ReturnType]
-        );
     }
 
     public override Type OutputType(LocalManager local)
@@ -1126,6 +1125,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 }
             }
         }
+
         return classType ?? typeof(object);
     }
 }

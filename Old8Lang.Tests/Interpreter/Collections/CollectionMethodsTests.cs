@@ -197,7 +197,7 @@ public class CollectionMethodsTests
     {
         // Arrange
         var code = @"
-            scores <- {}
+            scores <- dict()
             scores.Add(""Alice"", 95)
             scores.Add(""Bob"", 87)
             scores.Add(""Charlie"", 92)

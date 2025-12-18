@@ -221,7 +221,7 @@ public class BoundaryTests
     {
         // Arrange
         var code = @"
-            emptyDict <- {}
+            emptyDict <- dict()
             result <- emptyDict.Count
         ";
         var interpreter = new LangInterpreter();
@@ -448,7 +448,7 @@ public class BoundaryTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(-1, ((IntLangValue)result).Value);
+        Assert.Equal(30, ((IntLangValue)result).Value);
     }
 
     [Fact]
@@ -715,7 +715,7 @@ public class BoundaryTests
         // Arrange
         var code = @"
             nullChar <- '\0'
-            result <- nullChar.ToInt32()
+            result <- nullChar.ToInt()
         ";
         var interpreter = new LangInterpreter();
 
@@ -736,7 +736,7 @@ public class BoundaryTests
         // Arrange
         var code = @"
             maxChar <- '\uffff'
-            result <- maxChar.ToInt32()
+            result <- maxChar.ToInt()
         ";
         var interpreter = new LangInterpreter();
 

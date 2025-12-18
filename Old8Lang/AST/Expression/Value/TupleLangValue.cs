@@ -132,21 +132,27 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
             }
         }
 
-        // 如果是Instance，检查是否是ToStr()调用
-        if (dotExpression is Instance instance &&
-            instance.Ids.Count == 0)
+        // 如果是Instance，检查是否是方法调用
+        if (dotExpression is Instance instance)
         {
-            if (instance.Id.IdName == "ToStr")
+            // 处理无参数的方法调用
+            if (instance.Ids.Count == 0)
             {
-                return new StringLangValue(ToString());
+                if (instance.Id.IdName == "ToStr")
+                {
+                    return new StringLangValue(ToString());
+                }
+
+                if (instance.Id.IdName == "Length")
+                {
+                    // 计算元组的长度（对于嵌套元组，需要计算所有元素的总数）
+                    int length = GetTupleLength(this);
+                    return new IntLangValue(length);
+                }
             }
 
-            if (instance.Id.IdName == "Length")
-            {
-                // 计算元组的长度（对于嵌套元组，需要计算所有元素的总数）
-                int length = GetTupleLength(this);
-                return new IntLangValue(length);
-            }
+            // 对于其他方法调用，使用扩展方法机制
+            return instance.FromClassToResult(this);
         }
 
         throw new InvalidOperationError(this, $"不支持元组的点操作: {dotExpression}");
