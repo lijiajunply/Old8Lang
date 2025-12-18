@@ -17,7 +17,7 @@ public class ClassInstantiationTests
             class Person {
                 public name:string
                 public age:int
-                func Init() {
+                func init() {
                     name <- ""Unknown""
                     age <- 0
                 }
@@ -44,7 +44,7 @@ public class ClassInstantiationTests
             class Person {
                 public name:string
                 public age:int
-                func Init(n:string, a:int) {
+                func init(n:string, a:int) {
                     name <- n
                     age <- a
                 }
@@ -83,7 +83,7 @@ public class ClassInstantiationTests
         var code = @"
             class Counter {
                 public value:int
-                func Init(v:int) {
+                func init(v:int) {
                     value <- v
                 }
                 func Increment() -> void {
@@ -125,7 +125,7 @@ public class ClassInstantiationTests
             class Address {
                 public street:string
                 public city:string
-                func Init(s:string, c:string) {
+                func init(s:string, c:string) {
                     street <- s
                     city <- c
                 }
@@ -133,7 +133,7 @@ public class ClassInstantiationTests
             class Person {
                 public name:string
                 public address:Address
-                func Init(n:string, addr:Address) {
+                func init(n:string, addr:Address) {
                     name <- n
                     address <- addr
                 }
@@ -170,7 +170,7 @@ public class ClassInstantiationTests
             class Point {
                 public x:int
                 public y:int
-                func Init(xPos:int, yPos:int) {
+                func init(xPos:int, yPos:int) {
                     x <- xPos
                     y <- yPos
                 }
@@ -214,7 +214,7 @@ public class ClassInstantiationTests
                 public name:string
                 public price:double
                 public category:string
-                func Init(n:string, p:double, c:""General"") {
+                func init(n:string, p:double, c:""General"") {
                     name <- n
                     price <- p
                     category <- c
@@ -254,7 +254,7 @@ public class ClassInstantiationTests
                 public message:string
                 public level:string
                 public isError:bool
-                func Init(ts:int, msg:string, lvl:string, err:bool) {
+                func init(ts:int, msg:string, lvl:string, err:bool) {
                     timestamp <- ts
                     message <- msg
                     level <- lvl
@@ -305,7 +305,7 @@ public class ClassInstantiationTests
             class Database {
                 public connected:bool
                 public connectionCount:int
-                func Init() {
+                func init() {
                     connected <- false
                     connectionCount <- 0
                     Connect()
@@ -361,7 +361,7 @@ public class ClassInstantiationTests
             class Engine {
                 public horsepower:int
                 public cylinders:int
-                func Init(hp:int, cyl:int) {
+                func init(hp:int, cyl:int) {
                     horsepower <- hp
                     cylinders <- cyl
                 }
@@ -369,7 +369,7 @@ public class ClassInstantiationTests
             class Wheel {
                 public size:int
                 public brand:string
-                func Init(s:int, b:string) {
+                func init(s:int, b:string) {
                     size <- s
                     brand <- b
                 }
@@ -378,8 +378,8 @@ public class ClassInstantiationTests
                 public make:string
                 public model:string
                 public engine:Engine
-                public wheels:{Wheel}
-                func Init(mk:string, mdl:string) {
+                public wheels:Wheel
+                func init(mk:string, mdl:string) {
                     make <- mk
                     model <- mdl
                     engine <- Engine(300, 6)
@@ -427,7 +427,7 @@ public class ClassInstantiationTests
             class BankAccount {
                 public balance:double
                 public accountNumber:string
-                func Init(accNum:string, initialBalance:double) {
+                func init(accNum:string, initialBalance:double) {
                     if len(accNum) < 5 {
                         accountNumber <- ""INVALID""
                     } else {
@@ -488,7 +488,7 @@ public class ClassInstantiationTests
             class Shape {
                 public type:string
                 public area:double
-                func Init() {
+                func init() {
                     type <- ""Unknown""
                     area <- 0.0
                 }
@@ -496,14 +496,14 @@ public class ClassInstantiationTests
                     return type + "" with area "" + area.ToStr()
                 }
             }
-            class Circle < Shape {
-                func Init(radius:double) {
+            class Circle extends Shape {
+                func init(radius:double) {
                     type <- ""Circle""
                     area <- 3.14159 * radius * radius
                 }
             }
-            class Rectangle < Shape {
-                func Init(width:double, height:double) {
+            class Rectangle extends Shape {
+                func init(width:double, height:double) {
                     type <- ""Rectangle""
                     area <- width * height
                 }
@@ -546,7 +546,7 @@ public class ClassInstantiationTests
             class Node {
                 public value:int
                 public next:Node
-                func Init(v:int) {
+                func init(v:int) {
                     value <- v
                     next <- null
                 }
@@ -588,7 +588,7 @@ public class ClassInstantiationTests
             class LinkedList {
                 public value:int
                 public next:LinkedList
-                func Init(v:int) {
+                func init(v:int) {
                     value <- v
                     next <- null
                 }
@@ -634,7 +634,7 @@ public class ClassInstantiationTests
                 public x:double
                 public y:double
                 public label:string
-                func Init(xPos:double, yPos:double, lbl:string) {
+                func init(xPos:double, yPos:double, lbl:string) {
                     x <- xPos
                     y <- yPos
                     label <- lbl
@@ -689,23 +689,23 @@ public class ClassInstantiationTests
         var code = @"
             class Animal {
                 public name:string
-                func Init(n:string) {
+                func init(n:string) {
                     name <- n
                 }
                 func MakeSound() -> string {
                     return ""Generic animal sound""
                 }
             }
-            class Dog < Animal {
-                func Init(n:string) {
+            class Dog extends Animal {
+                func init(n:string) {
                     name <- n
                 }
                 func MakeSound() -> string {
                     return ""Woof!""
                 }
             }
-            class Cat < Animal {
-                func Init(n:string) {
+            class Cat extends Animal {
+                func init(n:string) {
                     name <- n
                 }
                 func MakeSound() -> string {

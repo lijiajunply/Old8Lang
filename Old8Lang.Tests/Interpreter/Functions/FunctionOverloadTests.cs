@@ -309,34 +309,34 @@ public class FunctionOverloadTests
     public void FunctionOverload_WithComplexTypes_OverloadsClassParameters()
     {
         // Arrange
-        var code = @"
-            class Person {
-                public name:string
-                public age:int
-                func init(n:string, a:int) {
-                    name <- n
-                    age <- a
-                }
-            }
-            class Animal {
-                public species:string
-                public sound:string
-                func init(s:string, snd:string) {
-                    species <- s
-                    sound <- snd
-                }
-            }
-            func describe(obj:Person) -> string {
-                return ""Person: "" + obj.name + "", age "" + obj.age.ToStr()
-            }
-            func describe(obj:Animal) -> string {
-                return ""Animal: "" + obj.species + "", says "" + obj.sound
-            }
-            person <- Person(""Alice"", 30)
-            animal <- Animal(""Dog"", ""Woof"")
-            result1 <- describe(person)
-            result2 <- describe(animal)
-        ";
+        var code = """
+                               class Person {
+                                   public name:string
+                                   public age:int
+                                   func init(n:string, a:int) {
+                                       this.name <- n
+                                       this.age <- a
+                                   }
+                               }
+                               class Animal {
+                                   public species:string
+                                   public sound:string
+                                   func init(s:string, snd:string) {
+                                       this.species <- s
+                                       this.sound <- snd
+                                   }
+                               }
+                               func describe(obj:Person) -> string {
+                                   return "Person: " + obj.name + ", age " + obj.age.ToStr()
+                               }
+                               func describe(obj:Animal) -> string {
+                                   return "Animal: " + obj.species + ", says " + obj.sound
+                               }
+                               person <- Person("Alice", 30)
+                               animal <- Animal("Dog", "Woof")
+                               result1 <- describe(person)
+                               result2 <- describe(animal)
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act

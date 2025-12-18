@@ -219,24 +219,24 @@ public class ErrorPropagationTests
         var code = @"
             class Calculator {
                 func Init(value: int) {
-                    self.value <- value
+                    this.value <- value
                 }
 
                 func Divide(divisor: int) -> Calculator {
                     if divisor == 0 {
                         throw ""Division by zero in Calculator""
                     }
-                    self.value <- self.value / divisor
-                    return self
+                    this.value <- this.value / divisor
+                    return this
                 }
 
                 func Multiply(factor: int) -> Calculator {
-                    self.value <- self.value * factor
-                    return self
+                    this.value <- this.value * factor
+                    return this
                 }
 
                 func GetValue() -> int {
-                    return self.value
+                    return this.value
                 }
             }
 

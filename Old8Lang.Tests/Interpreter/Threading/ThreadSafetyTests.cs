@@ -63,16 +63,16 @@ public class ThreadSafetyTests
             safe_counter <- func(initial_value) {
                 return {
                     value: initial_value,
-                    increment: func(self) {
-                        self.value <- self.value + 1
-                        return self.value
+                    increment: func(this) {
+                        this.value <- this.value + 1
+                        return this.value
                     },
-                    decrement: func(self) {
-                        self.value <- self.value - 1
-                        return self.value
+                    decrement: func(this) {
+                        this.value <- this.value - 1
+                        return this.value
                     },
-                    get: func(self) {
-                        return self.value
+                    get: func(this) {
+                        return this.value
                     }
                 }
             }
@@ -238,27 +238,27 @@ public class ThreadSafetyTests
                     items: {},
                     size: 0,
                     lock_acquired: false,
-                    add: func(self, item) {
+                    add: func(this, item) {
                         // 简化的锁机制
-                        if !self.lock_acquired {
-                            self.lock_acquired <- true
-                            self.items <- self.items.concat({item})
-                            self.size <- self.size + 1
-                            self.lock_acquired <- false
+                        if !this.lock_acquired {
+                            this.lock_acquired <- true
+                            this.items <- this.items.concat({item})
+                            this.size <- this.size + 1
+                            this.lock_acquired <- false
                             return true
                         } else {
                             return false
                         }
                     },
-                    get: func(self, index) {
-                        if index >= 0 && index < self.size {
-                            return self.items[index]
+                    get: func(this, index) {
+                        if index >= 0 && index < this.size {
+                            return this.items[index]
                         } else {
                             return null
                         }
                     },
-                    get_size: func(self) {
-                        return self.size
+                    get_size: func(this) {
+                        return this.size
                     }
                 }
             }
@@ -286,16 +286,16 @@ public class ThreadSafetyTests
             atomic_value <- func(initial_value) {
                 return {
                     value: initial_value,
-                    compare_and_set: func(self, expected, new_value) {
-                        if self.value == expected {
-                            self.value <- new_value
+                    compare_and_set: func(this, expected, new_value) {
+                        if this.value == expected {
+                            this.value <- new_value
                             return true
                         } else {
                             return false
                         }
                     },
-                    get: func(self) {
-                        return self.value
+                    get: func(this) {
+                        return this.value
                     }
                 }
             }
@@ -332,34 +332,34 @@ public class ThreadSafetyTests
                 return {
                     owner: null,
                     count: 0,
-                    lock: func(self, thread_id) {
-                        if self.owner == null {
-                            self.owner <- thread_id
-                            self.count <- 1
+                    lock: func(this, thread_id) {
+                        if this.owner == null {
+                            this.owner <- thread_id
+                            this.count <- 1
                             return true
-                        } else if self.owner == thread_id {
-                            self.count <- self.count + 1
+                        } else if this.owner == thread_id {
+                            this.count <- this.count + 1
                             return true
                         } else {
                             return false
                         }
                     },
-                    unlock: func(self, thread_id) {
-                        if self.owner == thread_id {
-                            self.count <- self.count - 1
-                            if self.count == 0 {
-                                self.owner <- null
+                    unlock: func(this, thread_id) {
+                        if this.owner == thread_id {
+                            this.count <- this.count - 1
+                            if this.count == 0 {
+                                this.owner <- null
                             }
                             return true
                         } else {
                             return false
                         }
                     },
-                    get_count: func(self) {
-                        return self.count
+                    get_count: func(this) {
+                        return this.count
                     },
-                    get_owner: func(self) {
-                        return self.owner
+                    get_owner: func(this) {
+                        return this.owner
                     }
                 }
             }
@@ -394,40 +394,40 @@ public class ThreadSafetyTests
                 return {
                     readers: 0,
                     writer: null,
-                    read_lock: func(self, thread_id) {
-                        if self.writer == null {
-                            self.readers <- self.readers + 1
+                    read_lock: func(this, thread_id) {
+                        if this.writer == null {
+                            this.readers <- this.readers + 1
                             return true
                         } else {
                             return false
                         }
                     },
-                    read_unlock: func(self, thread_id) {
-                        if self.readers > 0 {
-                            self.readers <- self.readers - 1
+                    read_unlock: func(this, thread_id) {
+                        if this.readers > 0 {
+                            this.readers <- this.readers - 1
                             return true
                         } else {
                             return false
                         }
                     },
-                    write_lock: func(self, thread_id) {
-                        if self.writer == null && self.readers == 0 {
-                            self.writer <- thread_id
+                    write_lock: func(this, thread_id) {
+                        if this.writer == null && this.readers == 0 {
+                            this.writer <- thread_id
                             return true
                         } else {
                             return false
                         }
                     },
-                    write_unlock: func(self, thread_id) {
-                        if self.writer == thread_id {
-                            self.writer <- null
+                    write_unlock: func(this, thread_id) {
+                        if this.writer == thread_id {
+                            this.writer <- null
                             return true
                         } else {
                             return false
                         }
                     },
-                    get_reader_count: func(self) {
-                        return self.readers
+                    get_reader_count: func(this) {
+                        return this.readers
                     }
                 }
             }
@@ -461,21 +461,21 @@ public class ThreadSafetyTests
             thread_local_storage <- func() {
                 return {
                     storage: {},
-                    set: func(self, thread_id, key, value) {
-                        if self.storage[thread_id] == null {
-                            self.storage[thread_id] <- {}
+                    set: func(this, thread_id, key, value) {
+                        if this.storage[thread_id] == null {
+                            this.storage[thread_id] <- {}
                         }
-                        self.storage[thread_id][key] <- value
+                        this.storage[thread_id][key] <- value
                     },
-                    get: func(self, thread_id, key) {
-                        if self.storage[thread_id] != null {
-                            return self.storage[thread_id][key]
+                    get: func(this, thread_id, key) {
+                        if this.storage[thread_id] != null {
+                            return this.storage[thread_id][key]
                         } else {
                             return null
                         }
                     },
-                    remove: func(self, thread_id) {
-                        self.storage[thread_id] <- null
+                    remove: func(this, thread_id) {
+                        this.storage[thread_id] <- null
                     }
                 }
             }
@@ -509,14 +509,14 @@ public class ThreadSafetyTests
                 return {
                     barrier_reached: false,
                     data: null,
-                    write_with_barrier: func(self, value) {
-                        self.data <- value
-                        self.barrier_reached <- true
+                    write_with_barrier: func(this, value) {
+                        this.data <- value
+                        this.barrier_reached <- true
                         return true
                     },
-                    read_with_barrier: func(self) {
-                        if self.barrier_reached {
-                            return self.data
+                    read_with_barrier: func(this) {
+                        if this.barrier_reached {
+                            return this.data
                         } else {
                             return null
                         }
@@ -543,20 +543,20 @@ public class ThreadSafetyTests
             lock_manager <- func() {
                 return {
                     locks: {},
-                    acquire_lock: func(self, lock_id, thread_id) {
-                        if self.locks[lock_id] == null {
-                            self.locks[lock_id] <- thread_id
+                    acquire_lock: func(this, lock_id, thread_id) {
+                        if this.locks[lock_id] == null {
+                            this.locks[lock_id] <- thread_id
                             return true
                         } else {
                             return false
                         }
                     },
-                    check_circular_wait: func(self, thread_id, requested_locks) {
+                    check_circular_wait: func(this, thread_id, requested_locks) {
                         // 简化的循环等待检测
                         i <- 0
                         while i < requested_locks.length {
                             lock_id <- requested_locks[i]
-                            owner <- self.locks[lock_id]
+                            owner <- this.locks[lock_id]
                             if owner != thread_id {
                                 // 检查该锁的拥有者是否也在等待当前线程持有的锁
                                 // 这里简化处理，假设有循环等待
@@ -597,7 +597,7 @@ public class ThreadSafetyTests
                         ""memory"": 4
                     },
                     held_locks: {},
-                    acquire_locks: func(self, thread_id, requested_locks) {
+                    acquire_locks: func(this, thread_id, requested_locks) {
                         // 按层级顺序排序锁
                         sorted_locks <- requested_locks
                         // 检查是否按层级顺序请求
@@ -605,7 +605,7 @@ public class ThreadSafetyTests
                         while i < sorted_locks.length - 1 {
                             current_lock <- sorted_locks[i]
                             next_lock <- sorted_locks[i + 1]
-                            if self.lock_hierarchy[current_lock] > self.lock_hierarchy[next_lock] {
+                            if this.lock_hierarchy[current_lock] > this.lock_hierarchy[next_lock] {
                                 return false  // 违反层级顺序
                             }
                             i <- i + 1
@@ -614,16 +614,16 @@ public class ThreadSafetyTests
                         j <- 0
                         while j < sorted_locks.length {
                             lock_id <- sorted_locks[j]
-                            self.held_locks[lock_id] <- thread_id
+                            this.held_locks[lock_id] <- thread_id
                             j <- j + 1
                         }
                         return true
                     },
-                    release_locks: func(self, thread_id, locks) {
+                    release_locks: func(this, thread_id, locks) {
                         i <- 0
                         while i < locks.length {
                             lock_id <- locks[i]
-                            self.held_locks[lock_id] <- null
+                            this.held_locks[lock_id] <- null
                             i <- i + 1
                         }
                     }
@@ -651,16 +651,16 @@ public class ThreadSafetyTests
                     owner: null,
                     locked: false,
                     wait_start_time: null,
-                    try_lock_with_timeout: func(self, thread_id, timeout_ms) {
-                        if !self.locked {
-                            self.locked <- true
-                            self.owner <- thread_id
+                    try_lock_with_timeout: func(this, thread_id, timeout_ms) {
+                        if !this.locked {
+                            this.locked <- true
+                            this.owner <- thread_id
                             return {success: true, reason: ""acquired immediately""}
-                        } else if self.owner == thread_id {
+                        } else if this.owner == thread_id {
                             return {success: true, reason: ""already owner""}
                         } else {
-                            if self.wait_start_time == null {
-                                self.wait_start_time <- 0  // 模拟时间戳
+                            if this.wait_start_time == null {
+                                this.wait_start_time <- 0  // 模拟时间戳
                             }
                             // 简化的超时检查
                             elapsed_time <- 0  // 在实际实现中会计算真实时间差
@@ -671,11 +671,11 @@ public class ThreadSafetyTests
                             }
                         }
                     },
-                    unlock: func(self, thread_id) {
-                        if self.owner == thread_id {
-                            self.locked <- false
-                            self.owner <- null
-                            self.wait_start_time <- null
+                    unlock: func(this, thread_id) {
+                        if this.owner == thread_id {
+                            this.locked <- false
+                            this.owner <- null
+                            this.wait_start_time <- null
                             return true
                         } else {
                             return false
@@ -710,21 +710,21 @@ public class ThreadSafetyTests
                 return {
                     value: initial_value,
                     processing: false,
-                    async_update: func(self, new_value) {
-                        if !self.processing {
-                            self.processing <- true
-                            self.value <- new_value
-                            self.processing <- false
+                    async_update: func(this, new_value) {
+                        if !this.processing {
+                            this.processing <- true
+                            this.value <- new_value
+                            this.processing <- false
                             return true
                         } else {
                             return false
                         }
                     },
-                    get_value: func(self) {
-                        return self.value
+                    get_value: func(this) {
+                        return this.value
                     },
-                    is_processing: func(self) {
-                        return self.processing
+                    is_processing: func(this) {
+                        return this.processing
                     }
                 }
             }
@@ -759,7 +759,7 @@ public class ThreadSafetyTests
                 return {
                     buckets: {},
                     bucket_count: 16,
-                    hash_key: func(self, key) {
+                    hash_key: func(this, key) {
                         // 简化的哈希函数
                         hash_value <- 0
                         i <- 0
@@ -767,29 +767,29 @@ public class ThreadSafetyTests
                             hash_value <- hash_value + (key[i].charCodeAt(0) if key[i].charCodeAt != null else 0)
                             i <- i + 1
                         }
-                        return hash_value % self.bucket_count
+                        return hash_value % this.bucket_count
                     },
-                    put: func(self, key, value) {
-                        bucket_index <- self.hash_key(self, key)
-                        if self.buckets[bucket_index] == null {
-                            self.buckets[bucket_index] <- {}
+                    put: func(this, key, value) {
+                        bucket_index <- this.hash_key(this, key)
+                        if this.buckets[bucket_index] == null {
+                            this.buckets[bucket_index] <- {}
                         }
-                        self.buckets[bucket_index][key] <- value
+                        this.buckets[bucket_index][key] <- value
                         return true
                     },
-                    get: func(self, key) {
-                        bucket_index <- self.hash_key(self, key)
-                        if self.buckets[bucket_index] != null {
-                            return self.buckets[bucket_index][key]
+                    get: func(this, key) {
+                        bucket_index <- this.hash_key(this, key)
+                        if this.buckets[bucket_index] != null {
+                            return this.buckets[bucket_index][key]
                         } else {
                             return null
                         }
                     },
-                    remove: func(self, key) {
-                        bucket_index <- self.hash_key(self, key)
-                        if self.buckets[bucket_index] != null {
-                            old_value <- self.buckets[bucket_index][key]
-                            self.buckets[bucket_index][key] <- null
+                    remove: func(this, key) {
+                        bucket_index <- this.hash_key(this, key)
+                        if this.buckets[bucket_index] != null {
+                            old_value <- this.buckets[bucket_index][key]
+                            this.buckets[bucket_index][key] <- null
                             return old_value
                         } else {
                             return null
@@ -831,42 +831,42 @@ public class ThreadSafetyTests
                     capacity: capacity,
                     size: 0,
                     operation_in_progress: false,
-                    put: func(self, item) {
-                        if self.operation_in_progress {
+                    put: func(this, item) {
+                        if this.operation_in_progress {
                             return false
                         }
-                        self.operation_in_progress <- true
-                        if self.size < self.capacity {
-                            self.items <- self.items.concat({item})
-                            self.size <- self.size + 1
-                            self.operation_in_progress <- false
+                        this.operation_in_progress <- true
+                        if this.size < this.capacity {
+                            this.items <- this.items.concat({item})
+                            this.size <- this.size + 1
+                            this.operation_in_progress <- false
                             return true
                         } else {
-                            self.operation_in_progress <- false
+                            this.operation_in_progress <- false
                             return false
                         }
                     },
-                    take: func(self) {
-                        if self.operation_in_progress {
+                    take: func(this) {
+                        if this.operation_in_progress {
                             return null
                         }
-                        self.operation_in_progress <- true
-                        if self.size > 0 {
-                            item <- self.items[0]
-                            self.items <- self.items.slice(1)
-                            self.size <- self.size - 1
-                            self.operation_in_progress <- false
+                        this.operation_in_progress <- true
+                        if this.size > 0 {
+                            item <- this.items[0]
+                            this.items <- this.items.slice(1)
+                            this.size <- this.size - 1
+                            this.operation_in_progress <- false
                             return item
                         } else {
-                            self.operation_in_progress <- false
+                            this.operation_in_progress <- false
                             return null
                         }
                     },
-                    get_size: func(self) {
-                        return self.size
+                    get_size: func(this) {
+                        return this.size
                     },
-                    is_empty: func(self) {
-                        return self.size == 0
+                    is_empty: func(this) {
+                        return this.size == 0
                     }
                 }
             }

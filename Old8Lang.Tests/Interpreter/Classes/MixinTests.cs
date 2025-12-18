@@ -44,10 +44,10 @@ public class MixinTests
                 }
             }
 
-            class Sprite < Drawable, Movable {
+            class Sprite with Drawable, Movable {
                 public name <- """"
 
-                func Sprite(n:string) {
+                func init(n:string) {
                     name <- n
                 }
             }
@@ -103,7 +103,7 @@ public class MixinTests
                 }
             }
 
-            mixin VerboseLogger < Logger {
+            mixin VerboseLogger extends Logger {
                 public verbose <- false
 
                 func Log(message:string) -> void {
@@ -115,10 +115,10 @@ public class MixinTests
                 }
             }
 
-            class Application < VerboseLogger {
+            class Application with VerboseLogger {
                 public name <- """"
 
-                func App(n:string) {
+                func init(n:string) {
                     name <- n
                 }
             }
@@ -162,7 +162,7 @@ public class MixinTests
                 }
             }
 
-            class AdvancedCalculator < Calculator {
+            class AdvancedCalculator with Calculator {
                 func Add(a:double, b:double) -> double {
                     // Override with validation
                     if a < 0 or b < 0 {
@@ -252,10 +252,10 @@ public class MixinTests
                 }
             }
 
-            class FormComponent < Configurable, Validatable {
+            class FormComponent with Configurable, Validatable {
                 public value <- """"
 
-                func FormComponent() {
+                func init() {
                     super.Configurable()
                     super.Validatable()
                 }
@@ -313,7 +313,7 @@ public class MixinTests
             class Shape {
                 public name <- """"
 
-                func Shape(n:string) {
+                func init(n:string) {
                     name <- n
                 }
 
@@ -334,10 +334,10 @@ public class MixinTests
                 }
             }
 
-            class ColoredCircle < Shape, Colorable {
+            class ColoredCircle extends Shape with Colorable {
                 public radius <- 0
 
-                func ColoredCircle(n:string, r:double) {
+                func init(n:string, r:double) {
                     super.Shape(n)
                     radius <- r
                 }
@@ -374,7 +374,7 @@ public class MixinTests
                 func Load() -> void
             }
 
-            class DatabaseObject < Persistence {
+            class DatabaseObject with Persistence {
                 public id <- 0
                 public data <- """"
 
@@ -387,7 +387,7 @@ public class MixinTests
                 }
             }
 
-            class FileSystemObject < Persistence {
+            class FileSystemObject with Persistence {
                 public filename <- """"
 
                 func Save() -> void {
@@ -445,7 +445,7 @@ public class MixinTests
                 }
             }
 
-            mixin ExtendedFeatures < BasicFeatures {
+            mixin ExtendedFeatures extends BasicFeatures {
                 public version <- 1
 
                 func ExtendedFeatures() {
@@ -458,7 +458,7 @@ public class MixinTests
                 }
             }
 
-            mixin AdvancedFeatures < ExtendedFeatures {
+            mixin AdvancedFeatures extends ExtendedFeatures {
                 public features <- {}
 
                 func AdvancedFeatures() {
@@ -475,8 +475,8 @@ public class MixinTests
                 }
             }
 
-            class AdvancedObject < AdvancedFeatures {
-                func AdvancedObject(n:string, v:int) {
+            class AdvancedObject with AdvancedFeatures {
+                func init(n:string, v:int) {
                     super.BasicFeatures()
                     SetName(n)
                     version <- v
@@ -537,8 +537,8 @@ public class MixinTests
                 public x <- 0
                 public y <- 0
 
-                func GameObject(id:int) {
-                    self.id <- id
+                func init(id:int) {
+                    this.id <- id
                 }
 
                 func MoveTo(newX:int, newY:int) -> void {
@@ -551,8 +551,8 @@ public class MixinTests
             player <- GameObject(1)
             // In a real implementation, there would be a way to apply mixin at runtime
             // For this test, we'll create a class that includes the mixin
-            class Player < GameObject, EventSystem {
-                func Player(id:int) {
+            class Player extends GameObject with EventSystem {
+                func init(id:int) {
                     super.GameObject(id)
                 }
 
@@ -630,10 +630,10 @@ public class MixinTests
                 }
             }
 
-            class Document < Timed, Versioned {
+            class Document with Timed, Versioned {
                 public content <- """"
 
-                func Document(text:string) {
+                func init(text:string) {
                     super.Timed()
                     super.Versioned()
                     content <- text
@@ -684,13 +684,13 @@ public class MixinTests
                 }
             }
 
-            mixin C < A, B {
+            mixin C with A, B {
                 func Method() -> string {
                     return ""C-""
                 }
             }
 
-            class TestClass < C, B, A {
+            class TestClass with C, B, A {
                 func TestMethod() -> string {
                     return ""Class-""
                 }
@@ -736,10 +736,10 @@ public class MixinTests
                 }
             }
 
-            class Counter < CounterMixin {
+            class Counter with CounterMixin {
                 public instanceId <- 0
 
-                func Counter() {
+                func init() {
                     instanceId <- CounterMixin.Increment()
                 }
 

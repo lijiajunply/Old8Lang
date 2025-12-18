@@ -18,10 +18,10 @@ public class InterfaceTests
                 func Draw() -> void
             }
 
-            class Circle < Drawable {
+            class Circle implements Drawable {
                 public radius <- 0
 
-                func Circle(r:double) {
+                func init(r:double) {
                     radius <- r
                 }
 
@@ -59,13 +59,13 @@ public class InterfaceTests
                 func Move(dx:double, dy:double) -> void
             }
 
-            class Rectangle < Shape, Movable {
+            class Rectangle implements Shape, Movable {
                 public width <- 0
                 public height <- 0
                 public x <- 0
                 public y <- 0
 
-                func Rectangle(w:double, h:double) {
+                func init(w:double, h:double) {
                     width <- w
                     height <- h
                 }
@@ -119,14 +119,14 @@ public class InterfaceTests
                 func GetArea() -> double
             }
 
-            interface SolidShape < Shape {
+            interface SolidShape extends Shape {
                 func GetVolume() -> double
             }
 
-            class Cube < SolidShape {
+            class Cube implements SolidShape {
                 public side <- 0
 
-                func Cube(s:double) {
+                func init(s:double) {
                     side <- s
                 }
 
@@ -174,10 +174,10 @@ public class InterfaceTests
                 }
             }
 
-            class User < Loggable {
+            class User implements Loggable {
                 public name <- """"
 
-                func User(n:string) {
+                func init(n:string) {
                     name <- n
                 }
 
@@ -187,11 +187,11 @@ public class InterfaceTests
                 }
             }
 
-            class Product < Loggable {
+            class Product implements Loggable {
                 public id <- 0
                 public name <- """"
 
-                func Product(i:int, n:string) {
+                func init(i:int, n:string) {
                     id <- i
                     name <- n
                 }
@@ -233,10 +233,10 @@ public class InterfaceTests
                 func Draw() -> string
             }
 
-            class Circle < Drawable {
+            class Circle implements Drawable {
                 public radius <- 0
 
-                func Circle(r:double) {
+                func init(r:double) {
                     radius <- r
                 }
 
@@ -245,10 +245,10 @@ public class InterfaceTests
                 }
             }
 
-            class Square < Drawable {
+            class Square implements Drawable {
                 public side <- 0
 
-                func Square(s:double) {
+                func init(s:double) {
                     side <- s
                 }
 
@@ -288,11 +288,11 @@ public class InterfaceTests
                 func GetInfo() -> string
             }
 
-            class Employee < Identifiable {
+            class Employee implements Identifiable {
                 public Id <- """"
                 public name <- """"
 
-                func Employee(id:string, n:string) {
+                func init(id:string, n:string) {
                     Id <- id
                     name <- n
                 }
@@ -336,7 +336,7 @@ public class InterfaceTests
                 func Size() -> int
             }
 
-            class ListContainer < Container {
+            class ListContainer implements Container {
                 private items <- {}
 
                 func Add(item:any) -> void {
@@ -402,7 +402,7 @@ public class InterfaceTests
                 func GetSpeed() -> double
             }
 
-            class Car < Vehicle {
+            class Car implements Vehicle {
                 public speed <- 0
 
                 func Start() -> void {
@@ -461,11 +461,11 @@ public class InterfaceTests
                 func Serialize() -> string
             }
 
-            class Product < Comparable, Serializable {
+            class Product implements Comparable, Serializable {
                 public id <- 0
                 public name <- """"
 
-                func Product(i:int, n:string) {
+                func init(i:int, n:string) {
                     id <- i
                     name <- n
                 }
@@ -516,10 +516,10 @@ public class InterfaceTests
                 func Run() -> void
             }
 
-            class Machine < Runnable {
+            class Machine implements Runnable {
                 public name <- """"
 
-                func Machine(n:string) {
+                func init(n:string) {
                     name <- n
                 }
 
@@ -572,10 +572,10 @@ public class InterfaceTests
                 func Print() -> string
             }
 
-            class Document < Printable {
+            class Document implements Printable {
                 public content <- """"
 
-                func Document(text:string) {
+                func init(text:string) {
                     content <- text
                 }
 
@@ -627,13 +627,13 @@ public class InterfaceTests
                 func Process(data:any) -> any
             }
 
-            class DataProcessor < Processor {
+            class DataProcessor implements Processor {
                 func Process(data:any) -> any {
                     return ""Processed: "" + data.ToStr()
                 }
             }
 
-            class DataValidator < Processor {
+            class DataValidator implements Processor {
                 func Process(data:any) -> any {
                     return data != null
                 }
@@ -684,10 +684,10 @@ public class InterfaceTests
                 func GetType() -> string
             }
 
-            class Widget < Factory {
+            class Widget implements Factory {
                 public id <- 0
 
-                func Widget() {
+                func init() {
                     id <- 42
                 }
 

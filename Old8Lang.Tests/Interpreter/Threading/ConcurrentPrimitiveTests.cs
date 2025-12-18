@@ -205,15 +205,15 @@ public class ConcurrentPrimitiveTests
             atomic_ref <- func(initial_value) {
                 return {
                     value: initial_value,
-                    get: func(self) { return self.value },
-                    set: func(self, new_value) {
-                        old_value <- self.value
-                        self.value <- new_value
+                    get: func(this) { return this.value },
+                    set: func(this, new_value) {
+                        old_value <- this.value
+                        this.value <- new_value
                         return old_value
                     },
-                    compare_and_set: func(self, expected, new_value) {
-                        if self.value == expected {
-                            self.value <- new_value
+                    compare_and_set: func(this, expected, new_value) {
+                        if this.value == expected {
+                            this.value <- new_value
                             return true
                         } else {
                             return false
@@ -242,19 +242,19 @@ public class ConcurrentPrimitiveTests
                     second_value: null,
                     first_waiting: false,
                     second_waiting: false,
-                    exchange: func(self, value) {
-                        if !self.first_waiting {
-                            self.first_value <- value
-                            self.first_waiting <- true
+                    exchange: func(this, value) {
+                        if !this.first_waiting {
+                            this.first_value <- value
+                            this.first_waiting <- true
                             return null  // 等待另一个线程
-                        } else if !self.second_waiting {
-                            self.second_value <- value
-                            self.second_waiting <- true
-                            first_result <- self.second_value
-                            second_result <- self.first_value
+                        } else if !this.second_waiting {
+                            this.second_value <- value
+                            this.second_waiting <- true
+                            first_result <- this.second_value
+                            second_result <- this.first_value
                             // 重置状态
-                            self.first_waiting <- false
-                            self.second_waiting <- false
+                            this.first_waiting <- false
+                            this.second_waiting <- false
                             return first_result
                         } else {
                             return null
@@ -280,19 +280,19 @@ public class ConcurrentPrimitiveTests
                     completed: false,
                     value: null,
                     exception: null,
-                    set_value: func(self, value) {
-                        self.value <- value
-                        self.completed <- true
+                    set_value: func(this, value) {
+                        this.value <- value
+                        this.completed <- true
                     },
-                    get_value: func(self) {
-                        if self.completed {
-                            return self.value
+                    get_value: func(this) {
+                        if this.completed {
+                            return this.value
                         } else {
                             return ""pending""
                         }
                     },
-                    is_completed: func(self) {
-                        return self.completed
+                    is_completed: func(this) {
+                        return this.completed
                     }
                 }
             }
@@ -324,11 +324,11 @@ public class ConcurrentPrimitiveTests
             // 阶段器模拟
             phaser <- func() {
                 return {
-                    register: func(self) {
+                    register: func(this) {
                         registered <- registered + 1
                         return registered
                     },
-                    arrive_and_await_advance: func(self) {
+                    arrive_and_await_advance: func(this) {
                         registered <- registered - 1
                         if registered == 0 {
                             phase <- phase + 1
@@ -337,7 +337,7 @@ public class ConcurrentPrimitiveTests
                             return phase  // 当前阶段号
                         }
                     },
-                    get_phase: func(self) {
+                    get_phase: func(this) {
                         return phase
                     }
                 }
@@ -365,31 +365,31 @@ public class ConcurrentPrimitiveTests
                 return {
                     queue: {},
                     waiting_consumers: {},
-                    put: func(self, item) {
-                        if self.waiting_consumers.length > 0 {
+                    put: func(this, item) {
+                        if this.waiting_consumers.length > 0 {
                             // 直接传输给等待的消费者
-                            consumer <- self.waiting_consumers[0]
-                            self.waiting_consumers <- self.waiting_consumers.slice(1)
+                            consumer <- this.waiting_consumers[0]
+                            this.waiting_consumers <- this.waiting_consumers.slice(1)
                             return ""transferred""
                         } else {
                             // 放入队列
-                            self.queue <- self.queue.concat({item})
+                            this.queue <- this.queue.concat({item})
                             return ""queued""
                         }
                     },
-                    take: func(self) {
-                        if self.queue.length > 0 {
+                    take: func(this) {
+                        if this.queue.length > 0 {
                             // 从队列中取出
-                            item <- self.queue[0]
-                            self.queue <- self.queue.slice(1)
+                            item <- this.queue[0]
+                            this.queue <- this.queue.slice(1)
                             return item
                         } else {
                             // 等待生产者
                             return ""waiting""
                         }
                     },
-                    size: func(self) {
-                        return self.queue.length
+                    size: func(this) {
+                        return this.queue.length
                     }
                 }
             }
@@ -417,8 +417,8 @@ public class ConcurrentPrimitiveTests
                 return {
                     stamp: 0,
                     state: ""unlocked"",  // unlocked, reading, writing
-                    optimistic_read: func(self) {
-                        stamp <- self.stamp
+                    optimistic_read: func(this) {
+                        stamp <- this.stamp
                         return {
                             stamp: stamp,
                             validate: func(lock_ref) {
@@ -426,18 +426,18 @@ public class ConcurrentPrimitiveTests
                             }
                         }
                     },
-                    write_lock: func(self) {
-                        if self.state == ""unlocked"" {
-                            self.state <- ""writing""
-                            self.stamp <- self.stamp + 1
+                    write_lock: func(this) {
+                        if this.state == ""unlocked"" {
+                            this.state <- ""writing""
+                            this.stamp <- this.stamp + 1
                             return true
                         } else {
                             return false
                         }
                     },
-                    write_unlock: func(self) {
-                        self.state <- ""unlocked""
-                        self.stamp <- self.stamp + 1
+                    write_unlock: func(this) {
+                        this.state <- ""unlocked""
+                        this.stamp <- this.stamp + 1
                     }
                 }
             }
@@ -465,28 +465,28 @@ public class ConcurrentPrimitiveTests
                 return {
                     items: {},
                     capacity: capacity,
-                    put: func(self, item) {
-                        if self.items.length < self.capacity {
-                            self.items <- self.items.concat({item})
+                    put: func(this, item) {
+                        if this.items.length < this.capacity {
+                            this.items <- this.items.concat({item})
                             return true
                         } else {
                             return false  // 队列已满
                         }
                     },
-                    take: func(self) {
-                        if self.items.length > 0 {
-                            item <- self.items[0]
-                            self.items <- self.items.slice(1)
+                    take: func(this) {
+                        if this.items.length > 0 {
+                            item <- this.items[0]
+                            this.items <- this.items.slice(1)
                             return item
                         } else {
                             return null  // 队列为空
                         }
                     },
-                    size: func(self) {
-                        return self.items.length
+                    size: func(this) {
+                        return this.items.length
                     },
-                    is_empty: func(self) {
-                        return self.items.length == 0
+                    is_empty: func(this) {
+                        return this.items.length == 0
                     }
                 }
             }
@@ -524,33 +524,33 @@ public class ConcurrentPrimitiveTests
                             next: null
                         }
                     },
-                    put: func(self, value) {
-                        new_node <- self.node(value)
-                        if self.tail == null {
-                            self.head <- new_node
-                            self.tail <- new_node
+                    put: func(this, value) {
+                        new_node <- this.node(value)
+                        if this.tail == null {
+                            this.head <- new_node
+                            this.tail <- new_node
                         } else {
-                            self.tail.next <- new_node
-                            self.tail <- new_node
+                            this.tail.next <- new_node
+                            this.tail <- new_node
                         }
-                        self.count <- self.count + 1
+                        this.count <- this.count + 1
                         return true
                     },
-                    take: func(self) {
-                        if self.head == null {
+                    take: func(this) {
+                        if this.head == null {
                             return null
                         } else {
-                            value <- self.head.value
-                            self.head <- self.head.next
-                            if self.head == null {
-                                self.tail <- null
+                            value <- this.head.value
+                            this.head <- this.head.next
+                            if this.head == null {
+                                this.tail <- null
                             }
-                            self.count <- self.count - 1
+                            this.count <- this.count - 1
                             return value
                         }
                     },
-                    size: func(self) {
-                        return self.count
+                    size: func(this) {
+                        return this.count
                     }
                 }
             }
@@ -577,30 +577,30 @@ public class ConcurrentPrimitiveTests
             delay_queue <- func() {
                 return {
                     items: {},
-                    add: func(self, item, delay_ms) {
+                    add: func(this, item, delay_ms) {
                         delayed_item <- {
                             item: item,
                             execute_time: 0,  // 在实际实现中会是当前时间 + 延迟
                             delay: delay_ms
                         }
-                        self.items <- self.items.concat({delayed_item})
+                        this.items <- this.items.concat({delayed_item})
                         return ""scheduled""
                     },
-                    take_ready: func(self) {
+                    take_ready: func(this) {
                         ready_items <- {}
                         i <- 0
-                        while i < self.items.length {
-                            item <- self.items[i]
+                        while i < this.items.length {
+                            item <- this.items[i]
                             // 简化：假设所有延迟都到期的项目都可以取出
                             ready_items <- ready_items.concat({item.item})
                             i <- i + 1
                         }
                         // 清空已取出的项目
-                        self.items <- {}
+                        this.items <- {}
                         return ready_items
                     },
-                    size: func(self) {
-                        return self.items.length
+                    size: func(this) {
+                        return this.items.length
                     }
                 }
             }
@@ -627,33 +627,33 @@ public class ConcurrentPrimitiveTests
                 return {
                     waiting_producer: null,
                     waiting_consumer: null,
-                    put: func(self, item) {
-                        if self.waiting_consumer != null {
+                    put: func(this, item) {
+                        if this.waiting_consumer != null {
                             // 直接传递给等待的消费者
-                            consumer_result <- self.waiting_consumer
-                            self.waiting_consumer <- null
+                            consumer_result <- this.waiting_consumer
+                            this.waiting_consumer <- null
                             return {
                                 success: true,
                                 transferred_to: consumer_result
                             }
                         } else {
                             // 等待消费者
-                            self.waiting_producer <- item
+                            this.waiting_producer <- item
                             return {
                                 success: false,
                                 reason: ""waiting for consumer""
                             }
                         }
                     },
-                    take: func(self) {
-                        if self.waiting_producer != null {
+                    take: func(this) {
+                        if this.waiting_producer != null {
                             // 直接从生产者获取
-                            item <- self.waiting_producer
-                            self.waiting_producer <- null
+                            item <- this.waiting_producer
+                            this.waiting_producer <- null
                             return item
                         } else {
                             // 等待生产者
-                            self.waiting_consumer <- ""consumer_waiting""
+                            this.waiting_consumer <- ""consumer_waiting""
                             return null
                         }
                     }
@@ -677,35 +677,35 @@ public class ConcurrentPrimitiveTests
             priority_queue <- func() {
                 return {
                     items: {},
-                    put: func(self, item, priority) {
+                    put: func(this, item, priority) {
                         prioritized_item <- {
                             item: item,
                             priority: priority
                         }
-                        self.items <- self.items.concat({prioritized_item})
+                        this.items <- this.items.concat({prioritized_item})
                         // 按优先级排序
-                        i <- self.items.length - 1
+                        i <- this.items.length - 1
                         while i > 0 {
-                            if self.items[i].priority < self.items[i - 1].priority {
-                                temp <- self.items[i]
-                                self.items[i] <- self.items[i - 1]
-                                self.items[i - 1] <- temp
+                            if this.items[i].priority < this.items[i - 1].priority {
+                                temp <- this.items[i]
+                                this.items[i] <- this.items[i - 1]
+                                this.items[i - 1] <- temp
                             }
                             i <- i - 1
                         }
                         return true
                     },
-                    take: func(self) {
-                        if self.items.length > 0 {
-                            item <- self.items[0]
-                            self.items <- self.items.slice(1)
+                    take: func(this) {
+                        if this.items.length > 0 {
+                            item <- this.items[0]
+                            this.items <- this.items.slice(1)
                             return item.item
                         } else {
                             return null
                         }
                     },
-                    size: func(self) {
-                        return self.items.length
+                    size: func(this) {
+                        return this.items.length
                     }
                 }
             }
@@ -736,44 +736,44 @@ public class ConcurrentPrimitiveTests
                     locked: false,
                     owner: null,
                     wait_count: 0,
-                    try_lock: func(self, thread_id) {
-                        if !self.locked {
-                            self.locked <- true
-                            self.owner <- thread_id
+                    try_lock: func(this, thread_id) {
+                        if !this.locked {
+                            this.locked <- true
+                            this.owner <- thread_id
                             return true
                         } else {
                             return false
                         }
                     },
-                    lock_with_timeout: func(self, thread_id, timeout_ms) {
-                        if !self.locked {
-                            self.locked <- true
-                            self.owner <- thread_id
+                    lock_with_timeout: func(this, thread_id, timeout_ms) {
+                        if !this.locked {
+                            this.locked <- true
+                            this.owner <- thread_id
                             return {success: true, reason: ""acquired immediately""}
-                        } else if self.owner == thread_id {
+                        } else if this.owner == thread_id {
                             return {success: true, reason: ""already owner""}
                         } else {
-                            self.wait_count <- self.wait_count + 1
-                            return {success: false, reason: ""timeout"", waiting: self.wait_count}
+                            this.wait_count <- this.wait_count + 1
+                            return {success: false, reason: ""timeout"", waiting: this.wait_count}
                         }
                     },
-                    unlock: func(self, thread_id) {
-                        if self.owner == thread_id {
-                            self.locked <- false
-                            self.owner <- null
-                            if self.wait_count > 0 {
-                                self.wait_count <- self.wait_count - 1
+                    unlock: func(this, thread_id) {
+                        if this.owner == thread_id {
+                            this.locked <- false
+                            this.owner <- null
+                            if this.wait_count > 0 {
+                                this.wait_count <- this.wait_count - 1
                             }
                             return true
                         } else {
                             return false
                         }
                     },
-                    is_locked: func(self) {
-                        return self.locked
+                    is_locked: func(this) {
+                        return this.locked
                     },
-                    get_owner: func(self) {
-                        return self.owner
+                    get_owner: func(this) {
+                        return this.owner
                     }
                 }
             }

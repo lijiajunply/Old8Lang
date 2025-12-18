@@ -18,9 +18,9 @@ public class MemberAccessTests
                 public name <- """"
                 public age <- 0
 
-                func Person(name:string, age:int) {
-                    self.name <- name
-                    self.age <- age
+                func init(name:string, age:int) {
+                    this.name <- name
+                    this.age <- age
                 }
             }
 
@@ -90,7 +90,7 @@ public class MemberAccessTests
             class Calculator {
                 public value <- 0
 
-                func Calculator(initialValue:int) {
+                func init(initialValue:int) {
                     value <- initialValue
                 }
 
@@ -143,9 +143,9 @@ public class MemberAccessTests
                 public street <- """"
                 public city <- """"
 
-                func Address(street:string, city:string) {
-                    self.street <- street
-                    self.city <- city
+                func init(street:string, city:string) {
+                    this.street <- street
+                    this.city <- city
                 }
 
                 func GetFullAddress() -> string {
@@ -157,9 +157,9 @@ public class MemberAccessTests
                 public name <- """"
                 public address <- null
 
-                func Person(name:string, address:Address) {
-                    self.name <- name
-                    self.address <- address
+                func init(name:string, address:Address) {
+                    this.name <- name
+                    this.address <- address
                 }
 
                 func GetInfo() -> string {
@@ -269,7 +269,7 @@ public class MemberAccessTests
                 static count <- 0
                 public instanceId <- 0
 
-                func Counter() {
+                func init() {
                     count <- count + 1
                     instanceId <- count
                 }
@@ -401,7 +401,7 @@ public class MemberAccessTests
                 private pi <- 3.14159
 
                 func Circle(radius:double) {
-                    self.radius <- radius
+                    this.radius <- radius
                 }
 
                 func GetArea() -> double {
@@ -462,8 +462,8 @@ public class MemberAccessTests
                 public y <- 0
 
                 func Point(x:double, y:double) {
-                    self.x <- x
-                    self.y <- y
+                    this.x <- x
+                    this.y <- y
                 }
 
                 func DistanceTo(other:Point) -> double {
@@ -478,8 +478,8 @@ public class MemberAccessTests
                 public end <- null
 
                 func Line(start:Point, end:Point) {
-                    self.start <- start
-                    self.end <- end
+                    this.start <- start
+                    this.end <- end
                 }
 
                 func GetLength() -> double {
@@ -532,17 +532,17 @@ public class MemberAccessTests
 
                 func Append(text:string) -> StringBuilder {
                     content <- content + text
-                    return self
+                    return this
                 }
 
                 func AppendLine(text:string) -> StringBuilder {
                     content <- content + text + ""\n""
-                    return self
+                    return this
                 }
 
                 func Clear() -> StringBuilder {
                     content <- """"
-                    return self
+                    return this
                 }
 
                 func ToString() -> string {
@@ -584,9 +584,9 @@ public class MemberAccessTests
                 public attendance <- 0
 
                 func Student(name:string, grade:int, attendance:double) {
-                    self.name <- name
-                    self.grade <- grade
-                    self.attendance <- attendance
+                    this.name <- name
+                    this.grade <- grade
+                    this.attendance <- attendance
                 }
 
                 func IsPassing() -> bool {
@@ -750,9 +750,9 @@ public class MemberAccessTests
                 public year <- 0
 
                 func Vehicle(brand:string, model:string, year:int) {
-                    self.brand <- brand
-                    self.model <- model
-                    self.year <- year
+                    this.brand <- brand
+                    this.model <- model
+                    this.year <- year
                 }
 
                 func GetInfo() -> string {
@@ -766,8 +766,8 @@ public class MemberAccessTests
 
                 func Car(brand:string, model:string, year:int, doors:int, fuelType:string) {
                     super.Vehicle(brand, model, year)
-                    self.doors <- doors
-                    self.fuelType <- fuelType
+                    this.doors <- doors
+                    this.fuelType <- fuelType
                 }
 
                 func GetCarInfo() -> string {

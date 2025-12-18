@@ -18,7 +18,7 @@ public class ConstructorTests
                 public name <- """"
                 public age <- 0
 
-                func Person() {
+                func init() {
                     name <- ""Unknown""
                     age <- 0
                 }
@@ -48,9 +48,9 @@ public class ConstructorTests
                 public name <- """"
                 public age <- 0
 
-                func Person(name:string, age:int) {
-                    self.name <- name
-                    self.age <- age
+                func init(name:string, age:int) {
+                    this.name <- name
+                    this.age <- age
                 }
             }
             person <- Person(""Alice"", 25)
@@ -86,9 +86,9 @@ public class ConstructorTests
                 public fontSize <- 12
                 public notifications <- true
 
-                func Settings(theme:string = ""dark"", fontSize:int = 14) {
-                    self.theme <- theme
-                    self.fontSize <- fontSize
+                func init(theme: ""dark"", fontSize:int = 14) {
+                    this.theme <- theme
+                    this.fontSize <- fontSize
                 }
             }
             settings1 <- Settings()
@@ -131,19 +131,19 @@ public class ConstructorTests
                 public width <- 0
                 public height <- 0
 
-                func Rectangle() {
+                func init() {
                     width <- 1
                     height <- 1
                 }
 
-                func Rectangle(side:double) {
+                func init(side:double) {
                     width <- side
                     height <- side
                 }
 
-                func Rectangle(width:double, height:double) {
-                    self.width <- width
-                    self.height <- height
+                func init(width:double, height:double) {
+                    this.width <- width
+                    this.height <- height
                 }
             }
             rect1 <- Rectangle()
@@ -188,12 +188,12 @@ public class ConstructorTests
                 public owner <- """"
                 public isActive <- true
 
-                func BankAccount(accountNumber:string, initialBalance:double, owner:string) {
-                    self.accountNumber <- accountNumber
-                    self.balance <- initialBalance
-                    self.owner <- owner
+                func init(accountNumber:string, initialBalance:double, owner:string) {
+                    this.accountNumber <- accountNumber
+                    this.balance <- initialBalance
+                    this.owner <- owner
                     if initialBalance < 0 {
-                        self.isActive <- false
+                        this.isActive <- false
                     }
                 }
             }
@@ -229,9 +229,9 @@ public class ConstructorTests
                 public street <- """"
                 public city <- """"
 
-                func Address(street:string, city:string) {
-                    self.street <- street
-                    self.city <- city
+                func init(street:string, city:string) {
+                    this.street <- street
+                    this.city <- city
                 }
             }
 
@@ -239,9 +239,9 @@ public class ConstructorTests
                 public name <- """"
                 public address <- null
 
-                func Person(name:string, street:string, city:string) {
-                    self.name <- name
-                    self.address <- Address(street, city)
+                func init(name:string, street:string, city:string) {
+                    this.name <- name
+                    this.address <- Address(street, city)
                 }
             }
 
@@ -277,15 +277,15 @@ public class ConstructorTests
                 public email <- """"
                 public age <- 0
 
-                func User(email:string, age:int) {
+                func init(email:string, age:int) {
                     if age < 0 or age > 150 {
                         return null  // 返回null表示创建失败
                     }
                     if not email.Contains(""@"") {
                         return null
                     }
-                    self.email <- email
-                    self.age <- age
+                    this.email <- email
+                    this.age <- age
                 }
             }
             validUser <- User(""test@example.com"", 25)
@@ -327,8 +327,8 @@ public class ConstructorTests
             class Logger {
                 public logs <- []
 
-                func Logger() {
-                    self.log(""Logger initialized"")
+                func init() {
+                    this.log(""Logger initialized"")
                 }
 
                 func log(message:string) {
@@ -368,8 +368,8 @@ public class ConstructorTests
                 public numbers <- []
                 public sum <- 0
 
-                func Statistics(numbers:[int]) {
-                    self.numbers <- numbers
+                func init(numbers:[int]) {
+                    this.numbers <- numbers
                     for n in numbers {
                         sum <- sum + n
                     }
@@ -410,11 +410,11 @@ public class ConstructorTests
                 public timeout <- 30
                 public sslEnabled <- false
 
-                func Configuration(host:string = ""localhost"", port:int = 8080, timeout:int = 30, sslEnabled:bool = false) {
-                    self.host <- host
-                    self.port <- port
-                    self.timeout <- timeout
-                    self.sslEnabled <- sslEnabled
+                func init(host:string = ""localhost"", port:int = 8080, timeout:int = 30, sslEnabled:bool = false) {
+                    this.host <- host
+                    this.port <- port
+                    this.timeout <- timeout
+                    this.sslEnabled <- sslEnabled
                 }
             }
 
@@ -478,17 +478,17 @@ public class ConstructorTests
                 public category <- """"
                 public discount <- 0.0
 
-                func Product(name:string, price:double) {
-                    self.name <- name
-                    self.price <- price
-                    self.category <- ""General""
+                func init(name:string, price:double) {
+                    this.name <- name
+                    this.price <- price
+                    this.category <- ""General""
                 }
 
-                func Product(name:string, price:double, category:string, discount:double) {
+                func init(name:string, price:double, category:string, discount:double) {
                     // 先调用基础构造函数
-                    self.Product(name, price)
-                    self.category <- category
-                    self.discount <- discount
+                    this.Product(name, price)
+                    this.category <- category
+                    this.discount <- discount
                 }
             }
 
@@ -538,7 +538,7 @@ public class ConstructorTests
                 static count <- 0
                 public id <- 0
 
-                func Counter() {
+                func init() {
                     count <- count + 1
                     id <- count
                 }
@@ -594,7 +594,7 @@ public class ConstructorTests
             class Calculator {
                 public result <- 0
 
-                func Calculator(x:int, y:int, operation:string = ""add"") {
+                func init(x:int, y:int, operation: ""add"") {
                     if operation == ""add"" {
                         result <- x + y
                     } else if operation == ""multiply"" {
@@ -650,13 +650,13 @@ public class ConstructorTests
                 public level <- 1
                 public experience <- 0
 
-                func GameCharacter(name:string, level:int = 1) {
-                    self.name <- name
-                    self.level <- level
-                    self.maxHealth <- 50 + (level * 20)
-                    self.health <- self.maxHealth
-                    self.isAlive <- true
-                    self.experience <- 0
+                func init(name:string, level:int = 1) {
+                    this.name <- name
+                    this.level <- level
+                    this.maxHealth <- 50 + (level * 20)
+                    this.health <- this.maxHealth
+                    this.isAlive <- true
+                    this.experience <- 0
                 }
 
                 func TakeDamage(damage:int) {
@@ -714,9 +714,9 @@ public class ConstructorTests
                 public processFunc <- null
                 public validator <- null
 
-                func Processor(processor:func, validator:func) {
-                    self.processFunc <- processor
-                    self.validator <- validator
+                func init(processor:func, validator:func) {
+                    this.processFunc <- processor
+                    this.validator <- validator
                 }
 
                 func Process(data:int) -> bool {
@@ -766,9 +766,9 @@ public class ConstructorTests
                 public interestRate <- 0.0
                 public overdraftLimit <- 0.0
 
-                func Account(accountType:string, initialBalance:double) {
-                    self.accountType <- accountType
-                    self.balance <- initialBalance
+                func init(accountType:string, initialBalance:double) {
+                    this.accountType <- accountType
+                    this.balance <- initialBalance
 
                     if accountType == ""savings"" {
                         interestRate <- 0.02

@@ -467,7 +467,7 @@ public class ClosureTests
     }
 
     [Fact]
-    public void Closure_WithRecursion_ClosureCallingItself()
+    public void Closure_WithRecursion_ClosureCallingItthis()
     {
         // Arrange
         var code = @"
