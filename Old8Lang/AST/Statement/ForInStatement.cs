@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
@@ -38,7 +39,7 @@ public class ForInStatement(
                 // 生成器迭代逻辑
                 while (true)
                 {
-                    // 在每次循环迭代开始时重置控制流标志
+                     // 在每次循环迭代开始时重置控制流标志
                     manager.ControlFlowManager.ResetCurrentState();
 
                     // 运行生成器，获取下一个值
@@ -68,7 +69,15 @@ public class ForInStatement(
                             // 处理break
                             if (manager.ControlFlowManager.BreakFlag)
                             {
+                                manager.ControlFlowManager.BreakFlag = false;
                                 break;
+                            }
+
+                            // 处理continue
+                            if (manager.ControlFlowManager.ContinueFlag)
+                            {
+                                manager.ControlFlowManager.ContinueFlag = false;
+                                continue;
                             }
                         }
                     }
@@ -79,9 +88,6 @@ public class ForInStatement(
             {
                 foreach (var idValue in oldList.GetItems())
                 {
-                    // 在每次循环迭代开始时重置控制流标志
-                    manager.ControlFlowManager.ResetCurrentState();
-
                     if (AllIds.Count == 1)
                     {
                         // 单个标识符的情况，保持原有行为
@@ -110,12 +116,21 @@ public class ForInStatement(
                         }
                     }
 
+                    // 执行循环体
                     body.Run(manager);
 
                     // 处理break
                     if (manager.ControlFlowManager.BreakFlag)
                     {
+                        manager.ControlFlowManager.BreakFlag = false;
                         break;
+                    }
+
+                    // 处理continue
+                    if (manager.ControlFlowManager.ContinueFlag)
+                    {
+                        manager.ControlFlowManager.ContinueFlag = false;
+                        continue;
                     }
                 }
             }

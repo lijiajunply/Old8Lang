@@ -41,8 +41,6 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
             // 标准 while 循环
             while (true)
             {
-                // 在每次循环迭代开始时重置控制流标志
-                manager.ControlFlowManager.ResetCurrentState();
 
                 // 获取条件表达式的值
                 var value = expression.Run(manager);
@@ -112,8 +110,6 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
             // 标准 while 循环
             while (true)
             {
-                // 在每次循环迭代开始时重置控制流标志
-                manager.ControlFlowManager.ResetCurrentState();
 
                 // 获取条件表达式的值
                 var value = expression.Run(manager);
@@ -170,6 +166,9 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
                     manager.ControlFlowManager.ContinueFlag = false;
                     continue;
                 }
+
+                // 循环体执行完毕，重置索引为 0，准备下一次迭代
+                context.CurrentStatementIndex = 0;
             }
         }
         finally

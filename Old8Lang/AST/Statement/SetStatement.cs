@@ -1,3 +1,4 @@
+using System;
 using Old8Lang.LangParser;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -336,6 +337,54 @@ public class SetStatement : OldStatement
             {
                 listCollection.Set(indexValue, result);
                 return;
+            }
+        }
+        // 处理嵌套索引赋值：matrix[0][1] <- value
+        else if (LeftExpression is Operation { Opera: LangTokenType.Dot } nestedIndexOperation)
+        {
+            // 检查是否是嵌套索引操作（如 matrix[0][1]）
+            // 左侧应该是另一个索引操作，右侧应该是最终索引
+            if (nestedIndexOperation.Left is LangListItem outerListItem &&
+                nestedIndexOperation.Right is LangExpression finalIndex)
+            {
+                // 获取外层索引的值：matrix[0] 返回内层数组
+                var outerCollectionValue = manager.GetValue(outerListItem.ListId);
+                var outerIndexValue = outerListItem.Key.Run(manager);
+
+                if (outerCollectionValue is ArrayLangValue outerArray)
+                {
+                    // 获取内层数组
+                    var innerArray = outerArray.Get(outerIndexValue as IntLangValue ??
+                                                 throw new TypeError(this, "IntLangValue", outerIndexValue.GetType().Name));
+
+                    // 检查内层数组是否是ILangList类型
+                    if (innerArray is ILangList innerListCollection)
+                    {
+                        // 获取最终索引
+                        var finalIndexValue = finalIndex.Run(manager);
+
+                        // 设置内层数组的元素
+                        innerListCollection.Set(finalIndexValue, result);
+                        return;
+                    }
+                }
+                else if (outerCollectionValue is ListLangValue outerList)
+                {
+                    // 获取内层数组
+                    var innerArray = outerList.Get(outerIndexValue as IntLangValue ??
+                                                throw new TypeError(this, "IntLangValue", outerIndexValue.GetType().Name));
+
+                    // 检查内层数组是否是ILangList类型
+                    if (innerArray is ILangList innerListCollection)
+                    {
+                        // 获取最终索引
+                        var finalIndexValue = finalIndex.Run(manager);
+
+                        // 设置内层数组的元素
+                        innerListCollection.Set(finalIndexValue, result);
+                        return;
+                    }
+                }
             }
         }
 

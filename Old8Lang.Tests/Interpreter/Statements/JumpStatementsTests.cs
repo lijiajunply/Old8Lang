@@ -291,7 +291,7 @@ public class JumpStatementsTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(18, ((IntLangValue)result).Value); // 4+5+6+7 = 18
+        Assert.Equal(22, ((IntLangValue)result).Value); // 4+5+6+7 = 22
     }
 
     [Fact]

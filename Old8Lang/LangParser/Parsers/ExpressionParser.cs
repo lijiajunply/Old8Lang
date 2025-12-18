@@ -241,8 +241,25 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
                 Expect(LangTokenType.LeftBracket);
                 var right = ParseExpression(); // 允许索引是复杂表达式
                 Expect(LangTokenType.RightBracket);
-                // 使用CONCAT操作符表示索引访问，后续在GenerateIl中处理
-                left = new Operation(left, LangTokenType.Dot, right, position);
+
+                // 创建LangListItem而不是Operation
+                // 如果left是LangId，直接创建LangListItem
+                if (left is LangId leftId)
+                {
+                    left = new LangListItem(leftId, right, position);
+                }
+                // 如果left是LangListItem，这是嵌套索引访问，需要特殊处理
+                else if (left is LangListItem nestedItem)
+                {
+                    // 对于嵌套索引，我们需要将其包装为Operation，在运行时处理
+                    // 这里暂时保持为Operation，但需要在SetStatement中特殊处理
+                    left = new Operation(left, LangTokenType.Dot, right, position);
+                }
+                // 如果left是Operation，这也是嵌套访问
+                else
+                {
+                    left = new Operation(left, LangTokenType.Dot, right, position);
+                }
             }
             else if (CurrentToken.Type == LangTokenType.LeftParen)
             {

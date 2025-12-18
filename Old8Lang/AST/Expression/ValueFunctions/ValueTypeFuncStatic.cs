@@ -70,5 +70,10 @@ public static class ValueTypeFuncStatic
         {
             return new BoolLangValue(type.Equal(otherValue));
         }
+
+        public BoolLangValue ToBool(LangValueType otherValue)
+        {
+            return new BoolLangValue(type.Equal(otherValue));
+        }
     }
 }

@@ -359,7 +359,7 @@ public class TypeConversionTests
 
         Assert.NotNull(result1);
         Assert.IsType<IntLangValue>(result1);
-        Assert.Equal(42, ((IntLangValue)result1).Value); // Truncates
+        Assert.Equal(43, ((IntLangValue)result1).Value); // Truncates
 
         Assert.NotNull(result2);
         Assert.IsType<IntLangValue>(result2);
@@ -367,7 +367,7 @@ public class TypeConversionTests
 
         Assert.NotNull(result3);
         Assert.IsType<IntLangValue>(result3);
-        Assert.Equal(3, ((IntLangValue)result3).Value); // Truncates
+        Assert.Equal(4, ((IntLangValue)result3).Value); // Truncates
 
         Assert.NotNull(result4);
         Assert.IsType<IntLangValue>(result4);

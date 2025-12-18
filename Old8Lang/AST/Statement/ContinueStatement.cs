@@ -12,7 +12,7 @@ public class ContinueStatement(SourcePosition position = default) : OldStatement
 {
     public override void Run(VariateManager manager)
     {
-        // 优化：使用ControlFlowManager管理控制流状态，符合单一职责原则
+        // 使用ControlFlowManager管理控制流状态
         manager.ControlFlowManager.ContinueFlag = true;
     }
 
