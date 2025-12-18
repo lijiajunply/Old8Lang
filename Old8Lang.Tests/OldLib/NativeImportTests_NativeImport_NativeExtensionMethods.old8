@@ -1,0 +1,10 @@
+// 原生扩展方法测试
+test_string <- "hello"
+native starts_with <- test_string.StartsWith("h")
+native ends_with <- test_string.EndsWith("o")
+native is_null_or_empty <- String.IsNullOrEmpty("")
+extension_results <- {
+    starts_correctly: starts_with,
+    ends_correctly: ends_with,
+    empty_check: is_null_or_empty
+}

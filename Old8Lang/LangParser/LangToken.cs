@@ -405,6 +405,13 @@ public static class LangTokenizer
 
             if (code[i] == '~')
             {
+                if (i + 1 < code.Length && code[i + 1] == '<')
+                {
+                    tokens.Add(new LangToken("~<", LangTokenType.WavyLessThan, line, i - column));
+                    i++;
+                    continue;
+                }
+
                 tokens.Add(new LangToken("~", LangTokenType.Wavy, line, i - column));
                 continue;
             }
@@ -454,6 +461,20 @@ public static class LangTokenizer
                 if (i + 1 < code.Length && code[i + 1] == '=')
                 {
                     tokens.Add(new LangToken(">=", LangTokenType.GreaterThanEquals, line, i - column));
+                    i++;
+                    continue;
+                }
+
+                if (i + 1 < code.Length && code[i + 1] == '~')
+                {
+                    if (i + 2 < code.Length && code[i + 2] == '<')
+                    {
+                        tokens.Add(new LangToken(">~<", LangTokenType.GreaterThanWavyLessThan, line, i - column));
+                        i += 2;
+                        continue;
+                    }
+
+                    tokens.Add(new LangToken(">~", LangTokenType.GreaterThanWavy, line, i - column));
                     i++;
                     continue;
                 }

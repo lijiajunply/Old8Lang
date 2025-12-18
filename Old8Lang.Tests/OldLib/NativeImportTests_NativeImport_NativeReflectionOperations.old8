@@ -1,0 +1,9 @@
+// 原生反射操作测试
+test_var <- "Hello World"
+native type_info <- test_var.GetType()
+native type_name <- type_info.Name
+native assembly_info <- type_info.Assembly
+reflection_results <- {
+    object_type: type_name,
+    assembly_name: assembly_info
+}

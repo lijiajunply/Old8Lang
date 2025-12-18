@@ -1,0 +1,11 @@
+// 原生方法重载测试
+native abs_int <- Math.Abs(-5)
+native abs_double <- Math.Abs(-5.5)
+native round_default <- Math.Round(3.7)
+native round_digits <- Math.Round(3.14159, 2)
+overload_results <- {
+    int_absolute: abs_int,
+    double_absolute: abs_double,
+    rounded_default: round_default,
+    rounded_precise: round_digits
+}

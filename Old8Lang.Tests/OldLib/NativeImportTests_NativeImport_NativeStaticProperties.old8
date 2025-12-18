@@ -1,0 +1,9 @@
+// 原生静态属性访问测试
+native math_pi <- Math.PI
+native math_e <- Math.E
+native today <- DateTime.Today
+static_results <- {
+    pi_value: math_pi,
+    e_value: math_e,
+    current_date: today
+}

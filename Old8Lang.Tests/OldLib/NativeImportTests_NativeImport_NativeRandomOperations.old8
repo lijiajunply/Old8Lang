@@ -1,0 +1,8 @@
+// 原生随机数操作测试
+native random_obj <- new Random()
+native random_int <- random_obj.Next(1, 100)
+native random_double <- random_obj.NextDouble()
+random_results <- {
+    integer_value: random_int,
+    double_value: random_double
+}

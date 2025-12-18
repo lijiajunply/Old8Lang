@@ -1,0 +1,3 @@
+import from "math" { sin as sine, cos as cosine }
+angle <- 3.14159 / 4
+result <- sine(angle) / cosine(angle)

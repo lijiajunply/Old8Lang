@@ -1,0 +1,4 @@
+import "database" as db
+conn1 <- db.createConnection("mysql")
+conn2 <- db.createConnection("postgresql")
+result <- db.validateConnections([conn1, conn2])

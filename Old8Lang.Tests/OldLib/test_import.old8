@@ -1,0 +1,2 @@
+import "simple_math.old8"
+result <- square(4.0)

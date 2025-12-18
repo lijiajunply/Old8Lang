@@ -1,0 +1,10 @@
+useDebug <- true
+if useDebug {
+    import "logging"
+}
+if useDebug {
+    logging.info("Debug mode enabled")
+    result <- "logging imported"
+} else {
+    result <- "logging not imported"
+}

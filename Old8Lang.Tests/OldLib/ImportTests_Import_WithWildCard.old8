@@ -1,0 +1,2 @@
+import from "math" *
+result <- min(max(10, 5), 15)

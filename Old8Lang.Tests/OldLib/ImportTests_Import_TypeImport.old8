@@ -1,0 +1,10 @@
+import from "collections" { Stack, Queue }
+stack <- Stack<string>()
+queue <- Queue<int>()
+stack.Push("first")
+stack.Push("second")
+queue.Enqueue(1)
+queue.Enqueue(2)
+stackSize <- stack.Size()
+queueSize <- queue.Size()
+result <- "Stack: " + stackSize.ToStr() + ", Queue: " + queueSize.ToStr()

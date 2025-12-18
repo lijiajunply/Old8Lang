@@ -1,0 +1,6 @@
+try {
+    import "nonexistent.module"
+    result <- "Import successful"
+} catch {
+    result <- "Import failed: " + exception
+}

@@ -1,0 +1,3 @@
+import "database.connection"
+conn <- database.connection.create("localhost", 5432)
+result <- conn.isConnected()

@@ -1,0 +1,4 @@
+import "math"
+import "string"
+result1 <- math.abs(-5)
+result2 <- string.length("hello")

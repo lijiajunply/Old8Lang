@@ -1,0 +1,5 @@
+func calculateCircleArea(radius:double) -> double {
+    import "math"
+    return math.pi * math.pow(radius, 2)
+}
+result <- calculateCircleArea(5.0)

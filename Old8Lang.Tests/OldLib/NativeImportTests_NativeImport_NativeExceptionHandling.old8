@@ -1,0 +1,11 @@
+// 原生异常处理测试
+test_value <- 0
+try {
+    native div_result <- 10 / test_value
+    error_occurred <- false
+} catch {
+    error_occurred <- true
+}
+exception_result <- {
+    has_error: error_occurred
+}

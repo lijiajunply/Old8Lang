@@ -1,0 +1,9 @@
+// 原生数组操作测试
+native array_length <- [1, 2, 3, 4, 5].Length
+native array_sort <- Array.Sort([3, 1, 4, 1, 5])
+native array_reverse <- Array.Reverse([1, 2, 3])
+array_results <- {
+    original_length: array_length,
+    sorted_length: array_sort,
+    reversed_length: array_reverse
+}

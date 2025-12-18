@@ -1,0 +1,11 @@
+// 原生环境变量测试
+native path_var <- Environment.GetEnvironmentVariable("PATH")
+native machine_name <- Environment.MachineName
+native os_version <- Environment.OSVersion
+native processor_count <- Environment.ProcessorCount
+env_info <- {
+    path: path_var,
+    machine_name: machine_name,
+    os_version: os_version,
+    processor_count: processor_count
+}

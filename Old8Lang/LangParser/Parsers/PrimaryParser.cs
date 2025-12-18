@@ -479,14 +479,44 @@ public class PrimaryParser(
         var exprStartIndex = CurrentIndex;
 
         elements.Add(expressionParserFactory().ParseExpression());
-        if (CurrentToken.Type == LangTokenType.Wavy)
+
+        // 检查是否是范围表达式（支持包含和排除边界）
+        var rangeTokenType = CurrentToken.Type;
+        if (rangeTokenType is LangTokenType.Wavy or LangTokenType.WavyLessThan or
+            LangTokenType.GreaterThanWavy or LangTokenType.GreaterThanWavyLessThan)
         {
-            var wavyToken = CurrentToken;
-            var rangePosition = new SourcePosition(wavyToken.Line, wavyToken.Column, tokenValue: wavyToken.Value);
-            Expect(LangTokenType.Wavy);
+            var rangeToken = CurrentToken;
+            var rangePosition = new SourcePosition(rangeToken.Line, rangeToken.Column, tokenValue: rangeToken.Value);
+
+            // 根据token类型确定边界排除规则
+            bool includeStart = true;
+            bool includeEnd = true;
+
+            switch (rangeTokenType)
+            {
+                case LangTokenType.Wavy: // [start~end] - 包含两边
+                    includeStart = true;
+                    includeEnd = true;
+                    break;
+                case LangTokenType.WavyLessThan: // [start~<end] - 包含start，排除end
+                    includeStart = true;
+                    includeEnd = false;
+                    break;
+                case LangTokenType.GreaterThanWavy: // [start>~end] - 排除start，包含end
+                    includeStart = false;
+                    includeEnd = true;
+                    break;
+                case LangTokenType.GreaterThanWavyLessThan: // [start>~<end] - 排除两边
+                    includeStart = false;
+                    includeEnd = false;
+                    break;
+            }
+
+            Expect(rangeTokenType);
             elements.Add(expressionParserFactory().ParseExpression());
             Expect(LangTokenType.RightBracket);
-            return new RangeLangValue(elements[0], elements[1], rangePosition);
+
+            return new RangeLangValue(elements[0], elements[1], rangePosition, includeStart, includeEnd);
         }
 
         // 检查是否是列表推导式

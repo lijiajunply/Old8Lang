@@ -49,8 +49,8 @@ public class ControlFlowTests
         var code = @"
             matrix <- [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
             diagonalSum <- 0
-            for i in 0..<matrix.Length {
-                for j in 0..<matrix[i].Length {
+            for i in [0~matrix.Length[ {
+                for j in [0~matrix[i].Length[ {
                     if i == j {
                         diagonalSum <- diagonalSum + matrix[i][j]
                     }
@@ -122,6 +122,8 @@ public class ControlFlowTests
                         result.Add(""four"")
                     case 5:
                         result.Add(""five"")
+                    case 6:
+                        result.Add(""six"")
                     default:
                         result.Add(""unknown"")
                 }
@@ -221,7 +223,7 @@ public class ControlFlowTests
             fibonacci <- {}
             a <- 0
             b <- 1
-            for i in 0..10 {
+            for i in [0~10] {
                 fibonacci.Add(a)
 
                 if i % 2 == 0 {
@@ -405,7 +407,7 @@ public class ControlFlowTests
         // Arrange
         var code = @"
             result <- {}
-            for i in 1..20 {
+            for i in [1~20] {
                 output <- """"
 
                 if i % 3 == 0 {
@@ -423,7 +425,7 @@ public class ControlFlowTests
                 // Special condition for prime numbers
                 isPrime <- true
                 if i > 1 {
-                    for j in 2..i-1 {
+                    for j in [2~(i-1)] {
                         if i % j == 0 {
                             isPrime <- false
                             break
@@ -543,7 +545,7 @@ public class ControlFlowTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
-        Assert.Equal("Found: True, Index: 5, Iterations: 3", ((StringLangValue)result).Value);
+        Assert.Equal("Found: true, Index: 5, Iterations: 3", ((StringLangValue)result).Value);
     }
 
     [Fact]

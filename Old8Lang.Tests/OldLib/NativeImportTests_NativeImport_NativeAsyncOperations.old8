@@ -1,0 +1,5 @@
+// 原生异步操作测试
+native delay_result <- Task.Delay(100)
+async_results <- {
+    delay_task: delay_result
+}

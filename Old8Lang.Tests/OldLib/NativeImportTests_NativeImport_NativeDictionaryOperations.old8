@@ -1,0 +1,10 @@
+// 原生字典操作测试
+dict_var <- {"key1": "value1", "key2": "value2"}
+native dict_count <- dict_var.Count
+native contains_key <- dict_var.ContainsKey("key1")
+native contains_value <- dict_var.ContainsValue("value2")
+dict_results <- {
+    count: dict_count,
+    has_key: contains_key,
+    has_value: contains_value
+}

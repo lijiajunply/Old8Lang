@@ -12,8 +12,12 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <param name="start"></param>
 /// <param name="end"></param>
 /// <param name="position"></param>
-public class RangeLangValue(LangExpression? start, LangExpression? end, SourcePosition position = default) : LangValueType(position)
+/// <param name="includeStart">是否包含起始值</param>
+/// <param name="includeEnd">是否包含结束值</param>
+public class RangeLangValue(LangExpression? start, LangExpression? end, SourcePosition position = default, bool includeStart = true, bool includeEnd = true) : LangValueType(position)
 {
+    public bool IncludeStart { get; } = includeStart;
+    public bool IncludeEnd { get; } = includeEnd;
     
     public override LangValueType Run(VariateManager manager)
     {
@@ -26,7 +30,20 @@ public class RangeLangValue(LangExpression? start, LangExpression? end, SourcePo
             throw new TypeError(this, "IntValue",
                 $"RangeValue: start 或 end 不是 IntValue，实际得到了 {startValue?.GetType().Name} 和 {endValue?.GetType().Name}");
 
-        for (var i = startIntValue.Value; i <= endIntValue.Value; i++)
+        // 根据包含规则调整起始值
+        var startNum = startIntValue.Value;
+        var endNum = endIntValue.Value;
+
+        if (!IncludeStart)
+            startNum++;
+        if (!IncludeEnd)
+            endNum--;
+
+        // 检查范围是否有效
+        if (startNum > endNum)
+            return new ArrayLangValue(new List<LangValueType>()); // 返回空数组
+
+        for (var i = startNum; i <= endNum; i++)
             results.Add(new IntLangValue(i));
 
         return new ArrayLangValue(results);
@@ -59,5 +76,10 @@ public class RangeLangValue(LangExpression? start, LangExpression? end, SourcePo
 
     public override Type OutputType(LocalManager local) => typeof(IEnumerable<int>);
 
-    public override string ToString() => $"{start}..{end}"; // Old8Lang 风格的范围表达式
+    public override string ToString()
+    {
+        var startSymbol = IncludeStart ? "[" : "(";
+        var endSymbol = IncludeEnd ? "]" : ")";
+        return $"{startSymbol}{start}~{end}{endSymbol}";
+    }
 }

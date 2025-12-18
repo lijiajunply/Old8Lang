@@ -1,0 +1,5 @@
+lazy import "expensive.heavy.math"
+// Module not loaded yet
+result1 <- "Not loaded"
+// First use triggers import
+result2 <- heavy.math.complexCalculation()

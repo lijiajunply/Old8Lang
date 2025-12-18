@@ -1,0 +1,12 @@
+// 原生类型转换测试
+string_num <- "123"
+native int_result <- Convert.ToInt32(string_num)
+native double_result <- Convert.ToDouble(string_num)
+native bool_result <- Convert.ToBoolean(1)
+native string_result <- Convert.ToString(456)
+conversion_results <- {
+    int_value: int_result,
+    double_value: double_result,
+    bool_value: bool_result,
+    string_value: string_result
+}

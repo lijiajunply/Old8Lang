@@ -1,0 +1,55 @@
+// 扩展范围表达式测试文件
+// 支持新的排除语法：[start~<end]、[start>~end]、[start>~<end]
+
+PrintLine("=== 扩展范围表达式测试 ===")
+
+// 传统的包含范围 [1~5] - 包含 1,2,3,4,5
+inclusive_range <- [1~5]
+Print("包含范围 [1~5]: ")
+for i in inclusive_range {
+    Print(i.ToStr() + " ")
+}
+PrintLine("")
+
+// 排除右边界 [1~<5] - 包含 1,2,3,4
+exclusive_end <- [1~<5]
+Print("排除右边界 [1~<5]: ")
+for i in exclusive_end {
+    Print(i.ToStr() + " ")
+}
+PrintLine("")
+
+// 排除左边界 [1>~5] - 包含 2,3,4,5
+exclusive_start <- [1>~5]
+Print("排除左边界 [1>~5]: ")
+for i in exclusive_start {
+    Print(i.ToStr() + " ")
+}
+PrintLine("")
+
+// 排除两边边界 [1>~<5] - 包含 2,3,4
+exclusive_both <- [1>~<5]
+Print("排除两边边界 [1>~<5]: ")
+for i in exclusive_both {
+    Print(i.ToStr() + " ")
+}
+PrintLine("")
+
+// 边界情况 - 排除后为空
+empty_range <- [1>~<2]
+Print("排除后为空 [1>~<2]: ")
+count <- 0
+for i in empty_range {
+    count <- count + 1
+}
+PrintLine("长度: " + count.ToStr())
+
+// 负数测试
+negative_range <- [-2>~<2]
+Print("负数范围 [-2>~<2]: ")
+for i in negative_range {
+    Print(i.ToStr() + " ")
+}
+PrintLine("")
+
+PrintLine("=== 测试完成 ===")

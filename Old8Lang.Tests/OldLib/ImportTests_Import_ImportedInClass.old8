@@ -1,0 +1,10 @@
+class Calculator {
+    func Init() {
+        import "math"
+    }
+    func distance(x1:double, y1:double, x2:double, y2:double) -> double {
+        return math.sqrt(math.pow(x2 - x1, 2) + math.pow(y2 - y1, 2))
+    }
+}
+calc <- Calculator()
+result <- calc.distance(0, 0, 3, 4)

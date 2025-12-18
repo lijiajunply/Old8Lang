@@ -1,0 +1,8 @@
+// 原生JSON操作测试
+json_string -> "{\"name\": \"test\", \"value\": 123}"
+native json_parse <- Json.Parse(json_string)
+native json_stringify <- Json.Stringify({name: "test", value: 123})
+json_results <- {
+    parsed: json_parse,
+    stringified: json_stringify
+}

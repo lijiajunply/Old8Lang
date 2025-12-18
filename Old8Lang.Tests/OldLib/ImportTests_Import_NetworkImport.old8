@@ -1,0 +1,2 @@
+import "https://api.example.com/utils" as apiUtils
+result <- apiUtils.validateEmail("test@example.com")

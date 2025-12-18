@@ -188,6 +188,21 @@ public enum LangTokenType
     Wavy,
 
     /// <summary>
+    /// ~< (范围表达式排除右边界)
+    /// </summary>
+    WavyLessThan,
+
+    /// <summary>
+    /// >~ (范围表达式排除左边界)
+    /// </summary>
+    GreaterThanWavy,
+
+    /// <summary>
+    /// >~< (范围表达式排除两边边界)
+    /// </summary>
+    GreaterThanWavyLessThan,
+
+    /// <summary>
     /// not
     /// </summary>
     Not,

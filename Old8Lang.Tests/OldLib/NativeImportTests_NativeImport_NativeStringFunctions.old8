@@ -1,0 +1,13 @@
+// 原生字符串函数测试
+native upper_result <- String.ToUpper("hello world")
+native lower_result <- String.ToLower("HELLO WORLD")
+native length_result <- String.Length("test string")
+native trim_result <- String.Trim("  spaced text  ")
+native contains_result <- String.Contains("hello world", "world")
+string_results <- {
+    upper: upper_result,
+    lower: lower_result,
+    length: length_result,
+    trimmed: trim_result,
+    contains: contains_result
+}

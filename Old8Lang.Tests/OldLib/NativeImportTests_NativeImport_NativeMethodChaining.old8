@@ -1,0 +1,8 @@
+// 原生方法链式调用测试
+test_string <- "  Hello World  "
+native chained_result <- test_string.Trim().ToLower()
+native length_result <- test_string.Trim().ToLower().Length
+chaining_results <- {
+    processed_string: chained_result,
+    final_length: length_result
+}

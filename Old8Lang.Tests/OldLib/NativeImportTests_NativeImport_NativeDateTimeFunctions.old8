@@ -1,0 +1,15 @@
+// 原生日期时间函数测试
+native current_time <- DateTime.Now
+native today <- DateTime.Today
+native specific_date <- new DateTime(2023, 12, 25)
+native year <- specific_date.Year
+native month <- specific_date.Month
+native day <- specific_date.Day
+datetime_results <- {
+    current: current_time,
+    today: today,
+    specific: specific_date,
+    year: year,
+    month: month,
+    day: day
+}

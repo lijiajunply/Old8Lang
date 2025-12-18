@@ -1,0 +1,3 @@
+// 自定义原生方法测试
+custom_add <- func(a, b) -> a + b
+result <- custom_add(3, 4)
