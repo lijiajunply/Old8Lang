@@ -1,7 +1,0 @@
-// 原生泛型方法测试
-native array_result <- Array.Find([1, 2, 3, 4, 5], func(x) -> x == 3)
-native list_result <- List({1, 2, 3}).Find(func(x) -> x == 2)
-generic_results <- {
-    found_in_array: array_result,
-    found_in_list: list_result
-}

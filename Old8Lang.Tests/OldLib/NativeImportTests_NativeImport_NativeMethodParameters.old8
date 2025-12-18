@@ -1,9 +1,0 @@
-// 原生方法参数传递测试
-param1 <- 10
-param2 <- 20
-native max_result <- Math.Max(param1, param2)
-native min_result <- Math.Min(param1, param2)
-param_results <- {
-    maximum: max_result,
-    minimum: min_result
-}

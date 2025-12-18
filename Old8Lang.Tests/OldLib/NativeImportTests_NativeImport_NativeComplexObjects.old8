@@ -1,9 +1,0 @@
-// 原生复杂对象创建测试
-native list_obj <- new List<string>()
-native dict_obj <- new Dictionary<string, int>()
-native array_obj <- new int[5]
-object_results <- {
-    list_created: list_obj,
-    dict_created: dict_obj,
-    array_created: array_obj
-}

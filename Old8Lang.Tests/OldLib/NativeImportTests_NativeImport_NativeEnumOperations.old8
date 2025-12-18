@@ -1,8 +1,0 @@
-// 原生枚举操作测试
-native day_of_week <- DayOfWeek.Monday
-native day_name <- day_of_week.ToString()
-native day_value <- Convert.ToInt32(day_of_week)
-enum_results <- {
-    enum_value: day_name,
-    integer_value: day_value
-}

@@ -1,9 +1,0 @@
-// 原生GUID操作测试
-native new_guid <- Guid.NewGuid()
-native guid_string <- new_guid.ToString()
-native is_empty <- Guid.NewGuid() != Guid.Empty
-guid_results <- {
-    new_id: new_guid,
-    string_representation: guid_string,
-    not_empty: is_empty
-}

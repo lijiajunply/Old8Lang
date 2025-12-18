@@ -1,9 +1,0 @@
-// 原生集合操作测试
-native hashset_obj <- new HashSet<int>()
-native queue_obj <- new Queue<string>()
-native stack_obj <- new Stack<int>()
-collection_results <- {
-    hashset_created: hashset_obj,
-    queue_created: queue_obj,
-    stack_created: stack_obj
-}

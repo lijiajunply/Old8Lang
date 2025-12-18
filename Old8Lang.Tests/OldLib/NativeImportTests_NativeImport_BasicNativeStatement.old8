@@ -1,3 +1,0 @@
-// 基础native语句测试
-native result <- Math.Abs(-5)
-final_result <- result

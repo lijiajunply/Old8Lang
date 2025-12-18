@@ -1,9 +1,0 @@
-// 原生列表操作测试
-native list_count <- List({1, 2, 3}).Count
-native list_contains <- List({1, 2, 3}).Contains(2)
-native list_index <- List({"a", "b", "c"}).IndexOf("b")
-list_results <- {
-    count: list_count,
-    contains: list_contains,
-    index: list_index
-}

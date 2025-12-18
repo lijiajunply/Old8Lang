@@ -1,9 +1,0 @@
-// 原生控制台函数测试
-native title <- Console.Title
-native window_width <- Console.WindowWidth
-native window_height <- Console.WindowHeight
-console_info <- {
-    title: title,
-    width: window_width,
-    height: window_height
-}

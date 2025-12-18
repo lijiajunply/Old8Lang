@@ -1,9 +1,0 @@
-// 原生文件操作测试
-native current_dir <- Environment.CurrentDirectory
-native temp_path <- Path.GetTempPath()
-native user_name <- Environment.UserName
-file_info <- {
-    current_directory: current_dir,
-    temp_path: temp_path,
-    user_name: user_name
-}
