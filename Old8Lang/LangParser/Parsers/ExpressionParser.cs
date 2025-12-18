@@ -251,9 +251,8 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
                 // 如果left是LangListItem，这是嵌套索引访问，需要特殊处理
                 else if (left is LangListItem nestedItem)
                 {
-                    // 对于嵌套索引，我们需要将其包装为Operation，在运行时处理
-                    // 这里暂时保持为Operation，但需要在SetStatement中特殊处理
-                    left = new Operation(left, LangTokenType.Dot, right, position);
+                    // 创建一个特殊的嵌套索引访问表达式
+                    left = new NestedIndexAccess(nestedItem, right, position);
                 }
                 // 如果left是Operation，这也是嵌套访问
                 else

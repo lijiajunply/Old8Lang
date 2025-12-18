@@ -121,7 +121,7 @@ public class CollectionMethodsTests
         // Arrange
         var code = @"
             numbers <- {5, 2, 8, 1, 9, 3}
-            numbers.Sort()
+            numbers <- numbers.Sort()
             result <- numbers
         ";
         var interpreter = new LangInterpreter();
@@ -150,7 +150,7 @@ public class CollectionMethodsTests
         // Arrange
         var code = @"
             items <- {""first"", ""second"", ""third""}
-            items.Reverse()
+            items <- items.Reverse()
             result <- items
         ";
         var interpreter = new LangInterpreter();

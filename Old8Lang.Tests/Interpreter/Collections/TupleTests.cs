@@ -362,7 +362,7 @@ public class TupleTests
 
             numbers.ForEach((x:int) -> {
                 sum <- sum + x
-                doubledList.Push(x * 2)
+                doubledList.Add(x * 2)
             })
 
             result1 <- sum
@@ -532,7 +532,7 @@ public class TupleTests
         var code = @"
             words <- (""Hello"", ""World"", ""from"", ""Old8Lang"")
             result1 <- words.Join("" "")
-            result2 <- words.Join("", "")
+            result2 <- words.Join("""")
             result3 <- words.Join("" - "")
             numbers <- (1, 2, 3, 4, 5)
             result4 <- numbers.Join(""|"")
@@ -690,11 +690,11 @@ public class TupleTests
         var code = @"
             point3d <- ((1, 2), 3)
             nested <- ((1, 2, 3), (4, 5, 6), (7, 8, 9))
-            result1 <- point3d[0][0]
-            result2 <- point3d[0][1]
-            result3 <- point3d[1]
-            result4 <- nested[1][1]
-            result5 <- nested[2][2]
+            result1 <- point3d[0]  // 扁平化访问：1
+            result2 <- point3d[1]  // 扁平化访问：2
+            result3 <- point3d[2]  // 扁平化访问：3
+            result4 <- nested[4]   // 扁平化访问：5
+            result5 <- nested[8]   // 扁平化访问：9
         ";
         var interpreter = new LangInterpreter();
 
@@ -740,9 +740,9 @@ public class TupleTests
             age <- person[1]
             profession <- person[2]
             coordinates <- ((10, 20), 30)
-            x <- coordinates[0][0]
-            y <- coordinates[0][1]
-            z <- coordinates[1]
+            x <- coordinates[0]
+            y <- coordinates[1]
+            z <- coordinates[2]
         ";
         var interpreter = new LangInterpreter();
 

@@ -594,7 +594,31 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             {
                 // 预期参数数量 = 传入参数数量 + 1 (扩展方法的第一个参数是baseLangValue)
                 var expectedParamCount = Ids.Count + 1;
-                m = allMethods.FirstOrDefault(x => x.GetParameters().Length == expectedParamCount) ?? allMethods[0];
+
+                // 首先查找精确匹配的参数数量
+                m = allMethods.FirstOrDefault(x => x.GetParameters().Length == expectedParamCount);
+
+                // 如果没找到，查找有可选参数的方法
+                if (m == null)
+                {
+                    m = allMethods.FirstOrDefault(x =>
+                    {
+                        var parameters = x.GetParameters();
+                        if (parameters.Length < expectedParamCount) return false;
+
+                        // 检查除了第一个参数（baseLangValue）之外，剩余的参数是否都是可选的
+                        for (int i = expectedParamCount; i < parameters.Length; i++)
+                        {
+                            if (!parameters[i].IsOptional && !parameters[i].HasDefaultValue)
+                                return false;
+                        }
+
+                        return true;
+                    });
+                }
+
+                // 如果还是没找到，使用第一个方法
+                m ??= allMethods[0];
             }
         }
 
@@ -664,7 +688,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             os.Add(argValue);
         }
 
-        // 补充缺失的 SourcePosition 参数（如果方法需要）
+        // 补充缺失的参数，包括可选参数的默认值和 SourcePosition 参数
         if (os.Count < parameters.Length)
         {
             for (int i = os.Count; i < parameters.Length; i++)
@@ -673,6 +697,11 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 {
                     // 使用 Instance 的位置信息
                     os.Add(Position);
+                }
+                else if (parameters[i].IsOptional || parameters[i].HasDefaultValue)
+                {
+                    // 使用可选参数的默认值
+                    os.Add(parameters[i].DefaultValue!);
                 }
             }
         }

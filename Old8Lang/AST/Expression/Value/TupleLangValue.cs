@@ -107,6 +107,7 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
             throw new InvalidOperationError(this, $"元组索引越界: {index}，空元组不支持任何索引访问");
         }
 
+        // 收集所有元素用于扁平化访问
         var allElements = new List<LangValueType>();
         CollectElements(this, allElements);
 
@@ -115,7 +116,33 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
             throw new InvalidOperationError(this, $"元组索引越界: {index}，当前元组只支持索引 0 到 {allElements.Count - 1}");
         }
 
+        // 返回扁平化访问的结果
         return allElements[index];
+    }
+
+    /// <summary>
+    /// 获取元组的直接子元素（不支持扁平化）
+    /// 用于嵌套访问：tuple[index1][index2]
+    /// </summary>
+    /// <param name="index">索引值（只能是0或1）</param>
+    /// <returns>直接子元素</returns>
+    public LangValueType GetDirectChild(int index)
+    {
+        if (IsEmpty)
+        {
+            throw new InvalidOperationError(this, $"元组索引越界: {index}，空元组不支持任何索引访问");
+        }
+
+        if (index == 0)
+        {
+            return Value.Item1;
+        }
+
+        return index switch
+        {
+            1 => Value.Item2,
+            _ => throw new InvalidOperationError(this, $"元组直接子元素访问索引越界: {index}，只支持索引 0 和 1")
+        };
     }
 
     /// <summary>
@@ -395,24 +422,25 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
     {
         if (elements.Count == 0)
         {
-            Value = (new NullLangValue(), new NullLangValue());
+            Value = (NullLangValue.Instance, NullLangValue.Instance);
             return;
         }
 
         if (elements.Count == 1)
         {
-            Value = (elements[0], new NullLangValue());
+            Value = (elements[0], NullLangValue.Instance);
             return;
         }
 
-        // 对于多元元组，创建嵌套结构
-        var result = new TupleLangValue(elements[0], elements[1]);
-        for (int i = 2; i < elements.Count; i++)
+        if (elements.Count == 2)
         {
-            result = new TupleLangValue(result, elements[i]);
+            Value = (elements[0], elements[1]);
+            return;
         }
 
-        Value = result.Value;
+        // 对于多元元组（>2个元素），创建嵌套结构
+        var nested = BuildNestedTupleWithValues(elements, 1);
+        Value = (elements[0], nested);
     }
 
     public bool In(LangValueType value)
@@ -434,8 +462,9 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
         {
             CollectElements(nested1, items);
         }
-        else
+        else if (tuple.Value.Item1 is not NullLangValue)
         {
+            // 跳过 NullLangValue（用于单元素元组的占位符）
             items.Add(tuple.Value.Item1);
         }
 
@@ -444,8 +473,9 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
         {
             CollectElements(nested2, items);
         }
-        else
+        else if (tuple.Value.Item2 is not NullLangValue)
         {
+            // 跳过 NullLangValue（用于单元素元组的占位符）
             items.Add(tuple.Value.Item2);
         }
     }
@@ -459,20 +489,55 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
     {
         if (elements.Count == 0)
         {
-            return new TupleLangValue(new NullLangValue(), new NullLangValue());
+            var emptyTuple = new TupleLangValue(NullLangValue.Instance, NullLangValue.Instance);
+            emptyTuple.Value = (NullLangValue.Instance, NullLangValue.Instance);
+            return emptyTuple;
         }
 
         if (elements.Count == 1)
         {
-            return new TupleLangValue(elements[0], new NullLangValue());
+            var singleTuple = new TupleLangValue(elements[0], NullLangValue.Instance);
+            singleTuple.Value = (elements[0], NullLangValue.Instance);
+            return singleTuple;
         }
 
-        var result = new TupleLangValue(elements[0], elements[1]);
-        for (int i = 2; i < elements.Count; i++)
+        if (elements.Count == 2)
         {
-            result = new TupleLangValue(result, elements[i]);
+            var twoTuple = new TupleLangValue(elements[0], elements[1]);
+            twoTuple.Value = (elements[0], elements[1]);
+            return twoTuple;
         }
 
+        // 对于多元元组（>2个元素），创建嵌套结构并设置Value
+        var result = BuildNestedTupleWithValues(elements, 0);
         return result;
+    }
+
+    /// <summary>
+    /// 从元素列表递归构建嵌套元组，并直接设置Value
+    /// </summary>
+    private static TupleLangValue BuildNestedTupleWithValues(List<LangValueType> elements, int index)
+    {
+        if (index >= elements.Count - 1)
+        {
+            // 最后一个元素
+            var lastTuple = new TupleLangValue(elements[index], NullLangValue.Instance);
+            lastTuple.Value = (elements[index], NullLangValue.Instance);
+            return lastTuple;
+        }
+
+        if (index == elements.Count - 2)
+        {
+            // 最后两个元素
+            var tuple = new TupleLangValue(elements[index], elements[index + 1]);
+            tuple.Value = (elements[index], elements[index + 1]);
+            return tuple;
+        }
+
+        // 递归构建
+        var nested = BuildNestedTupleWithValues(elements, index + 1);
+        var currentTuple = new TupleLangValue(elements[index], nested);
+        currentTuple.Value = (elements[index], nested);
+        return currentTuple;
     }
 }

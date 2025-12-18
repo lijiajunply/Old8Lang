@@ -484,7 +484,7 @@ public class AwaitTests
             class DataItem {
                 public value:string
                 public timestamp:int
-                func Init(v:string) {
+                func init(v:string) {
                     value <- v
                     timestamp <- 123456
                 }
