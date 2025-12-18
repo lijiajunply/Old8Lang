@@ -18,12 +18,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/debug_switch_break.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/ClosureTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/ClosureTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/JumpStatementsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/JumpStatementsTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SwitchStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/HigherOrderTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/HigherOrderTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,6 +62,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/AsyncGeneratorTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Functions/ClosureTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Statements/ControlFlowTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Statements/ControlFlowTests.cs" root0="SKIP_HIGHLIGHTING" />
@@ -75,6 +75,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TupleLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ForStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/SwitchStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
@@ -406,7 +407,7 @@
       <workItem from="1765816155545" duration="30580000" />
       <workItem from="1766037121468" duration="28333000" />
       <workItem from="1766082960788" duration="2522000" />
-      <workItem from="1766085560295" duration="2918000" />
+      <workItem from="1766085560295" duration="3671000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -751,7 +752,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="271" />
+    <option name="localTasksCounter" value="273" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -778,8 +779,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(parser): 实现 if-then-else 三元表达式解析功能&#10;&#10;- 新增对简单及嵌套 if-then-else 三元表达式的解析支持&#10;- 支持在三元表达式中使用算术运算和复杂条件判断&#10;- 添加对混合三元表达式（如与传统 ?: 表达式结合）的解析&#10;- 完善错误处理，针对缺失 then 或 else 关键字的情况抛出语法错误&#10;- 更新词法分析器以识别新的关键字 Then&#10;- 扩展 PrimaryParser 来处理完整的 if-then-else 结构并构建相应 AST 节点&#10;- 添加多个单元测试用例覆盖各种合法及非法情况下的三元表达式解析验证" />
-    <MESSAGE value="fix(tests): 修复异常处理测试中的函数命名和返回逻辑&#10;&#10;- 将UserProfile类中的Init方法重命名为init以符合命名规范&#10;- 在测试代码中添加了try-catch块来验证异常抛出功能&#10;- 修改catch块中的赋值操作为return语句以正确返回异常信息&#10;- 更新testException调用方式，将其返回值赋给result变量" />
     <MESSAGE value="test: 移除未使用的命名空间引用&#10;&#10;- 删除了多个测试文件中对 Old8Lang.LangParser 的无用引用&#10;- 清理了对 Xunit 的冗余 using 语句&#10;- 移除了对 System.Threading.Tasks 和 System 的不必要导入&#10;- 简化了并发原语测试中的命名空间声明&#10;- 统一了测试文件的命名空间引用风格" />
     <MESSAGE value="feat(lang): 增强元组和字符类型功能并修复测试用例&#10;&#10;- 实现多元元组构造函数，支持递归构建嵌套结构&#10;- 添加元组索引访问功能，支持通过数字索引获取元素&#10;- 实现元组点操作访问，支持 Length 属性和 ToStr() 方法&#10;- 为 CharLangValue 添加大小比较方法(Greater,Less等)&#10;- 在 IntLangValue 中增加与 CharLangValue 的比较支持&#10;- 修复 ArrayTests.cs 中的数组初始化语法错误&#10;- 修正 ClosureTests.cs 中的集合方法调用问题&#10;- 更新 FunctionCallTests.cs 中的元组访问方式&#10;- 完善 LangListItem.cs 对元组类型的处理逻辑&#10;- 添加多个调试用的元组相关测试文件配置" />
     <MESSAGE value="refactor(lang): 优化类型比较和控制流逻辑&#10;&#10;- 修改 IntLangValue 和 DoubleLangValue 的 Equals 方法，支持跨类型比较&#10;- 更新 ForInStatement 的作用域管理和控制流处理逻辑&#10;- 调整 IfStatement 中变量作用域同步机制&#10;- 修复 ListLangValue 初始化逻辑，避免重复执行&#10;- 更新 Range 表达式语法从 .. 和 ..&lt; 改为 [~] 和 [~[ 格式&#10;- 修改元组索引访问逻辑，支持嵌套多元组结构&#10;- 优化函数调用测试用例及参数传递方式&#10;- 统一测试断言方法，使用 Assert.True 替代 Assert.Equal(true, ...)&#10;- 移除不支持的链式比较表达式测试&#10;- 更新类型关键字识别逻辑，增强 LangId 类型推导能力" />
@@ -803,7 +802,9 @@
     <MESSAGE value="refactor(parser): 重构嵌套索引访问处理逻辑&#10;&#10;- 引入新的 NestedIndexAccess 类专门处理 array[index1][index2] 场景&#10;- 修改 ExpressionParser 中的索引访问解析逻辑，使用专用表达式节点&#10;- 优化 Instance 类中的方法参数匹配逻辑，支持可选参数处理&#10;- 完善 TupleLangValue 的扁平化访问和直接子元素访问功能&#10;- 更新多个测试用例以适配语法变更，将 .. 范围语法改为 [~] 语法&#10;- 修复部分测试中使用的函数命名大小写问题&#10;- 调整集合方法调用后的赋值方式，确保返回值正确处理" />
     <MESSAGE value="feat(parser): 实现切片语法解析和嵌套切片访问支持&#10;&#10;- 添加对切片语法 [start:end:step] 的完整解析支持&#10;- 引入 NestedSliceAccess 类处理嵌套切片访问场景&#10;- 优化索引访问解析逻辑，区分普通索引和切片操作&#10;- 支持开放式切片和步长参数的解析&#10;- 完善切片相关 AST 节点的类型检查和错误处理&#10;- 更新测试用例以验证新的切片语法功能" />
     <MESSAGE value="feat(dictionary): 实现字典 Update 方法重载和优化 ForEach 执行逻辑&#10;&#10;- 为 DictionaryLangValue 添加 Update 方法的参数重载支持&#10;- 支持 Update(key, value) 和 Update(otherDictionary) 两种调用形式&#10;- 优化 DictionaryValueFuncStatic 中 ForEach 方法的 lambda 执行逻辑&#10;- 针对 lambda 表达式直接操作作用域，避免闭包深拷贝开销&#10;- 改进字典键值更新机制，确保键存在时更新、不存在时插入&#10;- 完善方法调用时的参数匹配和类型检查逻辑" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(dictionary): 实现字典 Update 方法重载和优化 ForEach 执行逻辑&#10;&#10;- 为 DictionaryLangValue 添加 Update 方法的参数重载支持&#10;- 支持 Update(key, value) 和 Update(otherDictionary) 两种调用形式&#10;- 优化 DictionaryValueFuncStatic 中 ForEach 方法的 lambda 执行逻辑&#10;- 针对 lambda 表达式直接操作作用域，避免闭包深拷贝开销&#10;- 改进字典键值更新机制，确保键存在时更新、不存在时插入&#10;- 完善方法调用时的参数匹配和类型检查逻辑" />
+    <MESSAGE value="fix(interpreter): 修复循环控制流和嵌套索引赋值问题&#10;&#10;- 在ForStatement中重置控制流状态以正确处理break/continue&#10;- 修复SetStatement中的嵌套索引访问赋值逻辑&#10;- 调整SwitchStatement中break标志的处理方式&#10;- 更新测试用例中的预期结果和代码格式&#10;- 修正JumpStatementsTests中断言的期望值" />
+    <MESSAGE value="feat(lang): 支持从模块导入所有函数&#10;&#10;- 修改 import 语法以支持通配符导入&#10;- 更新测试用例以验证新语法&#10;- 添加 math 模块包含常用数学函数&#10;- 实现 min、max、sqrt 和 pow 函数&#10;- 确保导入语句与新语法兼容" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 支持从模块导入所有函数&#10;&#10;- 修改 import 语法以支持通配符导入&#10;- 更新测试用例以验证新语法&#10;- 添加 math 模块包含常用数学函数&#10;- 实现 min、max、sqrt 和 pow 函数&#10;- 确保导入语句与新语法兼容" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

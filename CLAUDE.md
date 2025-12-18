@@ -192,6 +192,43 @@ When adding new language features:
 3. **Compiler testing**: Add test to `CompilerTests/`, verify compiler execution
 4. **Documentation**: Update `Old8Lang/Old8Lang.ebnf` and `Old8Lang_Grammar.md`
 
+### Testing and Bug Fixing Principles
+
+**IMPORTANT**: When fixing failing tests, follow these principles:
+
+1. **Fix Code Logic, Not Test Expectations**:
+   - **Never** modify test expectations to accommodate buggy implementations
+   - **Always** fix the underlying code logic to produce the correct expected behavior
+   - Test failures indicate bugs in the implementation, not incorrect expectations
+
+2. **Root Cause Analysis**:
+   - Investigate why the actual result differs from the expected result
+   - Understand the language specification and intended behavior
+   - Identify the exact point where the implementation deviates from expectations
+
+3. **Proper Fix Implementation**:
+   - Fix the actual bug in the code implementation
+   - Ensure the fix aligns with the language design and specification
+   - Verify that the fix doesn't break other functionality
+
+4. **Example of Wrong Approach**:
+   ```csharp
+   // WRONG: Changing expectation to match buggy behavior
+   Assert.Equal(8, actualValue); // Because implementation returns 8 instead of 16
+   ```
+
+5. **Example of Right Approach**:
+   ```csharp
+   // RIGHT: Keep correct expectation and fix the implementation
+   Assert.Equal(16, actualValue); // Because 4 * 4 should equal 16
+   // Then go fix the code that produces 8 instead of 16
+   ```
+
+6. **When to Modify Tests**:
+   - Only modify tests when the test itself is wrong (e.g., misunderstanding of language semantics)
+   - Never modify tests just to make them pass with buggy implementations
+   - If uncertain about expected behavior, consult language specification or project maintainers
+
 ### Compiler Mode Type Annotation Rules
 
 **IMPORTANT**: Compiler mode (`-c`) and interpreter mode (`-f`) have different type annotation requirements:

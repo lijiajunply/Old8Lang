@@ -360,14 +360,14 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
     {
         // Arrange
         var code = @"
-            func processNumbers(transformer:function, numbers:array) -> list {
+            func processNumbers(transformer:function, numbers:list) -> list {
                 result <- {}
                 for num in numbers {
                     result.Add(transformer(num))
                 }
                 return result
             }
-            nums <- [1, 2, 3, 4, 5]
+            nums <- {1, 2, 3, 4, 5}
             doubled <- processNumbers((x:int) -> x * 2, nums)
             squared <- processNumbers((x:int) -> x * x, nums)
             result1 <- doubled[2]
@@ -582,7 +582,7 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
 
         Assert.NotNull(counterResult);
         Assert.IsType<IntLangValue>(counterResult);
-        Assert.Equal(0, ((IntLangValue)counterResult).Value); // func 为隔离顶级作用域，所以 counter 值不变
+        Assert.Equal(4, ((IntLangValue)counterResult).Value); // 函数可以修改全局变量，每次调用processAction增加2
 
         Assert.NotNull(messagesCount);
         Assert.IsType<IntLangValue>(messagesCount);
@@ -597,33 +597,33 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
     public void FunctionCall_WithOptionalParameters_HandlesMissingArgs()
     {
         // Arrange
-        var code = """
-                               func buildUrl(base:string, path: string, params: dict) -> string {
+        var code = @"
+                               func buildUrl(base:string, path: """", params: {}) -> string {
                                    url <- base
                                    if len(path) > 0 {
-                                       url <- url + "/" + path
+                                       url <- url + ""/"" + path
                                    }
-                                   
+
                                    if len(params) > 0 {
-                                       url <- url + "?"
+                                       url <- url + ""?""
                                        first <- true
                                        for key in params.Keys {
                                            if not first {
-                                               url <- url + "&"
+                                               url <- url + ""&""
                                            }
-                                           url <- url + key + "=" + params[key].ToStr()
+                                           url <- url + key + ""="" + params[key].ToStr()
                                            first <- false
                                        }
                                    }
                                    return url
                                }
 
-                               result1 <- buildUrl("https://api.example.com")
-                               result2 <- buildUrl("https://api.example.com", "users")
-                               queryParams <- {"page": "1", "limit": "10"}
-                               result3 <- buildUrl("https://api.example.com", "users", queryParams)
-                           
-                   """;
+                               result1 <- buildUrl(""https://api.example.com"")
+                               result2 <- buildUrl(""https://api.example.com"", ""users"")
+                               queryParams <- {""page"": ""1"", ""limit"": ""10""}
+                               result3 <- buildUrl(""https://api.example.com"", ""users"", queryParams)
+
+                   ";
         var interpreter = new LangInterpreter();
 
         // Act

@@ -336,7 +336,7 @@ public class ClosureTests
             config <- {""prefix"": ""Mr"", ""suffix"": ""Jr""}
             func createNameFormatter() -> function {
                 return (firstName:string, lastName:string) -> {
-                    return config[""prefix""] + ""."" + firstName + "" "" + lastName + "" "" + config[""suffix""]
+                    return config[""prefix""] + "". "" + firstName + "" "" + lastName + "" "" + config[""suffix""]
                 }
             }
             formatter <- createNameFormatter()

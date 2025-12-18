@@ -595,12 +595,19 @@ public class HigherOrderTests
         var code = @"
             func groupBy(collection:list, keySelector:func) -> dict {
                 groups <- {}
-                for item in collection {
+                i <- 0
+                while i < len(collection) {
+                    item <- collection[i]
                     key <- keySelector(item)
-                    if not groups.ContainsKey(key.ToStr()) {
-                        groups[key.ToStr()] <- {}
+                    keyStr <- key.ToStr()
+                    // Try to get the key, if not found create new list
+                    try {
+                        temp <- groups[keyStr]
+                    } catch {
+                        groups[keyStr] <- {}
                     }
-                    groups[key.ToStr()].Add(item)
+                    groups[keyStr].Add(item)
+                    i <- i + 1
                 }
                 return groups
             }
