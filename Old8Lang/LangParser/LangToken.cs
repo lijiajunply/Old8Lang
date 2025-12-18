@@ -318,7 +318,82 @@ public static class LangTokenizer
                         if (i + 1 < code.Length)
                         {
                             i++;
-                            sb.Append(code[i]);
+                            // 处理常见转义字符
+                            switch (code[i])
+                            {
+                                case 'n':
+                                    sb.Append('\n');
+                                    break;
+                                case 't':
+                                    sb.Append('\t');
+                                    break;
+                                case 'r':
+                                    sb.Append('\r');
+                                    break;
+                                case '\\':
+                                    sb.Append('\\');
+                                    break;
+                                case '\'':
+                                    sb.Append('\'');
+                                    break;
+                                case '"':
+                                    sb.Append('"');
+                                    break;
+                                case '0':
+                                    sb.Append('\0');
+                                    break;
+                                case 'u':
+                                    // 处理Unicode转义序列 \uXXXX
+                                    if (i + 4 < code.Length)
+                                    {
+                                        var hexStr = code.Substring(i + 1, 4);
+                                        if (int.TryParse(hexStr, System.Globalization.NumberStyles.HexNumber, null, out var unicodeCode))
+                                        {
+                                            sb.Append((char)unicodeCode);
+                                            i += 4; // 跳过4位十六进制数
+                                        }
+                                        else
+                                        {
+                                            // 如果解析失败，将原始字符追加
+                                            sb.Append("\\u" + hexStr);
+                                            i += 4;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // Unicode序列不完整，追加原始字符
+                                        sb.Append("\\u");
+                                    }
+                                    break;
+                                case 'x':
+                                    // 处理十六进制转义序列 \xXX
+                                    if (i + 2 < code.Length)
+                                    {
+                                        var hexStr = code.Substring(i + 1, 2);
+                                        if (int.TryParse(hexStr, System.Globalization.NumberStyles.HexNumber, null, out var hexCode))
+                                        {
+                                            sb.Append((char)hexCode);
+                                            i += 2; // 跳过2位十六进制数
+                                        }
+                                        else
+                                        {
+                                            // 如果解析失败，将原始字符追加
+                                            sb.Append("\\x" + hexStr);
+                                            i += 2;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // 十六进制序列不完整，追加原始字符
+                                        sb.Append("\\x");
+                                    }
+                                    break;
+                                default:
+                                    // 未知的转义字符，追加原始字符
+                                    sb.Append('\\');
+                                    sb.Append(code[i]);
+                                    break;
+                            }
                         }
                     }
                     else if (code[i] == '\'') // 遇到未转义的单引号，结束字符
@@ -339,7 +414,8 @@ public static class LangTokenizer
                     i++;
                 }
 
-                tokens.Add(new LangToken(sb.ToString(), LangTokenType.Char, line, i - column));
+                // 为字符token添加单引号以保持格式一致性
+                tokens.Add(new LangToken("'" + sb.ToString() + "'", LangTokenType.Char, line, i - column));
                 continue;
             }
 

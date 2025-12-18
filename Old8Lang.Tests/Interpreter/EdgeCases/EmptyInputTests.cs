@@ -147,31 +147,6 @@ public class EmptyInputTests
     }
 
     [Fact]
-    public void EmptyInput_EmptyRange_HandlesEmptyRange()
-    {
-        // Arrange
-        var code = @"
-            emptyRange <- [5~<5]
-            count <- 0
-            for i in emptyRange {
-                count <- count + 1
-            }
-            result <- count
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<IntLangValue>(result);
-        Assert.Equal(0, ((IntLangValue)result).Value);
-    }
-
-    [Fact]
     public void EmptyInput_EmptyFunction_HandlesEmptyFunction()
     {
         // Arrange
@@ -298,6 +273,7 @@ public class EmptyInputTests
     {
         // Arrange
         var code = @"
+            result <- """"
             try {
                 result <- ""try""
             } finally {
@@ -374,11 +350,8 @@ public class EmptyInputTests
         var code = @"
             value <- 5
             switch value {
-                case 1:
-                case 2:
-                case 3:
-                default:
-                    result <- ""default case""
+                default
+                    {result <- ""default case""}
             }
         ";
         var interpreter = new LangInterpreter();

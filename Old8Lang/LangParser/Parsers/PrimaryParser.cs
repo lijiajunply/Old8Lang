@@ -1190,17 +1190,72 @@ public class PrimaryParser(
         var position = new SourcePosition(charToken.Line, charToken.Column, tokenValue: charToken.Value);
         var value = charToken.Value;
         Expect(LangTokenType.Char);
-        char c;
+
+        char c = ParseCharValue(value);
+
+        return new CharLangValue(c, position);
+    }
+
+    /// <summary>
+    /// 解析字符值，支持Unicode转义序列
+    /// </summary>
+    /// <param name="value">字符字面量值</param>
+    /// <returns>解析后的字符</returns>
+    private static char ParseCharValue(string value)
+    {
+        // 移除首尾的单引号
+        if (value.StartsWith('\'') && value.EndsWith('\'') && value.Length >= 3)
+        {
+            var content = value.Substring(1, value.Length - 2);
+
+            // 处理转义字符
+            if (content.StartsWith('\\'))
+            {
+                switch (content)
+                {
+                    case "\\n": return '\n';
+                    case "\\t": return '\t';
+                    case "\\r": return '\r';
+                    case "\\": return '\\';
+                    case "\'": return '\'';
+                    case "\"": return '\"';
+                    case "\\0": return '\0';
+                    default:
+                        // 处理Unicode转义序列 \uXXXX
+                        if (content.StartsWith("\\u") && content.Length == 6)
+                        {
+                            var hexCode = content.Substring(2);
+                            if (int.TryParse(hexCode, System.Globalization.NumberStyles.HexNumber, null, out var code))
+                            {
+                                return (char)code;
+                            }
+                        }
+                        // 处理十六进制转义序列 \xXX
+                        if (content.StartsWith("\\x") && content.Length >= 3)
+                        {
+                            var hexCode = content.Substring(2);
+                            if (int.TryParse(hexCode, System.Globalization.NumberStyles.HexNumber, null, out var code))
+                            {
+                                return (char)code;
+                            }
+                        }
+                        break;
+                }
+            }
+
+            // 普通字符或未识别的转义序列，取第一个字符
+            return content[0];
+        }
+
+        // 如果格式不正确，尝试直接解析
         try
         {
-            c = char.Parse(value);
+            return char.Parse(value);
         }
         catch
         {
-            c = value[0];
+            return value.Length > 0 ? value[0] : '\0';
         }
-
-        return new CharLangValue(c, position);
     }
 
     /// <summary>

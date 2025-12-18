@@ -28,11 +28,11 @@ public class DoubleLangValue(double doubleValue = 0, SourcePosition position = d
             throw new InvalidOperationError(this, $"不支持浮点数与类型 '{otherLangValueType.GetType().Name}' 的加法操作");
 
         var result = Value + double.Parse(otherLangValueType.ToString());
-        if (double.IsNaN(result) || double.IsInfinity(result))
+        if (double.IsNaN(result))
         {
-            throw new OverflowError(this, "浮点数加法");
+            throw new OverflowError(this, "浮点数加法产生NaN");
         }
-
+        // Allow infinity values as they are mathematically valid
         return Create(result);
     }
 
@@ -42,11 +42,11 @@ public class DoubleLangValue(double doubleValue = 0, SourcePosition position = d
             throw new InvalidOperationError(this, $"不支持浮点数与类型 '{otherLangValueType.GetType().Name}' 的减法操作");
 
         var result = Value - double.Parse(otherLangValueType.ToString());
-        if (double.IsNaN(result) || double.IsInfinity(result))
+        if (double.IsNaN(result))
         {
-            throw new OverflowError(this, "浮点数减法");
+            throw new OverflowError(this, "浮点数减法产生NaN");
         }
-
+        // Allow infinity values as they are mathematically valid
         return Create(result);
     }
 
@@ -56,11 +56,11 @@ public class DoubleLangValue(double doubleValue = 0, SourcePosition position = d
             throw new InvalidOperationError(this, $"不支持浮点数与类型 '{otherLangValueType.GetType().Name}' 的乘法操作");
 
         var result = Value * double.Parse(otherLangValueType.ToString());
-        if (double.IsNaN(result) || double.IsInfinity(result))
+        if (double.IsNaN(result))
         {
-            throw new OverflowError(this, "浮点数乘法");
+            throw new OverflowError(this, "浮点数乘法产生NaN");
         }
-
+        // Allow infinity values as they are mathematically valid
         return Create(result);
     }
 
@@ -116,11 +116,11 @@ public class DoubleLangValue(double doubleValue = 0, SourcePosition position = d
         }
 
         var result = Value % divisor;
-        if (double.IsNaN(result) || double.IsInfinity(result))
+        if (double.IsNaN(result))
         {
-            throw new OverflowError(this, "浮点数取模");
+            throw new OverflowError(this, "浮点数取模产生NaN");
         }
-
+        // Allow infinity values as they are mathematically valid
         return Create(result);
     }
 
@@ -141,11 +141,11 @@ public class DoubleLangValue(double doubleValue = 0, SourcePosition position = d
         }
 
         var result = Math.Pow(Value, exponent);
-        if (double.IsNaN(result) || double.IsInfinity(result))
+        if (double.IsNaN(result))
         {
-            throw new OverflowError(this, "浮点数幂运算");
+            throw new OverflowError(this, "浮点数幂运算产生NaN");
         }
-
+        // Allow infinity values as they are mathematically valid
         return Create(result);
     }
 

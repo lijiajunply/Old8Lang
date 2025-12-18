@@ -191,7 +191,9 @@ public class StringTemplateTests
         // Arrange
         var code = """
                    person <- {"name": "Eve", "age": 28}
-                   result <- $"{person["name"]} is {person["age"]} years old"
+                   a <- person["name"]
+                   b <- person["age"]
+                   result <- $"{a} is {b} years old"
                    """;
         var interpreter = new LangInterpreter();
 

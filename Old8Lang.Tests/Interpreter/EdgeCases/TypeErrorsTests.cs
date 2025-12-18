@@ -459,6 +459,7 @@ public class TypeErrorsTests
         // Arrange
         var code = @"
             text <- ""hello""
+            type <- """"
             try {
                 result <- text.Add(1)
                 type <- ""success""
@@ -584,6 +585,8 @@ public class TypeErrorsTests
             func processNumber(n:int) -> int {
                 return n * 2
             }
+            result <- """"
+            type <- """"
             try {
                 result <- processNumber(""hello"")
                 type <- ""success""
@@ -676,6 +679,8 @@ public class TypeErrorsTests
     {
         // Arrange
         var code = @"
+            result <- """"
+            type <- """"
             try {
                 // Complex type coercion chain
                 result <- ""5"" + true + null + 3.14

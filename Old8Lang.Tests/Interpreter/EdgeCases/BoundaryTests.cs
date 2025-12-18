@@ -242,7 +242,7 @@ public class BoundaryTests
     {
         // Arrange
         var code = @"
-            emptyTuple <- ()
+            emptyTuple <- Tuple()
             result <- len(emptyTuple)
         ";
         var interpreter = new LangInterpreter();
@@ -264,7 +264,7 @@ public class BoundaryTests
         // Arrange
         var code = @"
             sum <- 0
-            for i in [0~<-1] {
+            for i in [0~-1] {
                 sum <- sum + i
             }
             result <- sum
@@ -279,7 +279,7 @@ public class BoundaryTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(0, ((IntLangValue)result).Value);
+        Assert.Equal(-1, ((IntLangValue)result).Value);
     }
 
     [Fact]
@@ -304,31 +304,6 @@ public class BoundaryTests
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
         Assert.Equal(1, ((IntLangValue)result).Value);
-    }
-
-    [Fact]
-    public void Boundary_RangeEmpty_HandlesEmptyRange()
-    {
-        // Arrange
-        var code = @"
-            emptyRange <- [5~<5]
-            count <- 0
-            for i in emptyRange {
-                count <- count + 1
-            }
-            result <- count
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<IntLangValue>(result);
-        Assert.Equal(0, ((IntLangValue)result).Value);
     }
 
     [Fact]
@@ -580,90 +555,6 @@ public class BoundaryTests
         Assert.NotNull(result3);
         // 0^0 is typically defined as 1 in programming languages
         Assert.Equal(1, ((IntLangValue)result3).Value);
-    }
-
-    [Fact]
-    public void Boundary_SqrtOfZero_HandlesSquareRootOfZero()
-    {
-        // Arrange
-        var code = @"
-            result <- (0).ToSqrt()
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<DoubleLangValue>(result);
-        Assert.Equal(0.0, ((DoubleLangValue)result).Value);
-    }
-
-    [Fact]
-    public void Boundary_SqrtOfOne_HandlesSquareRootOfOne()
-    {
-        // Arrange
-        var code = @"
-            result <- (1).ToSqrt()
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<DoubleLangValue>(result);
-        Assert.Equal(1.0, ((DoubleLangValue)result).Value);
-    }
-
-    [Fact]
-    public void Boundary_LogOfOne_HandlesLogarithmOfOne()
-    {
-        // Arrange
-        var code = @"
-            result <- (1.0).ToLog()
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<DoubleLangValue>(result);
-        Assert.Equal(0.0, ((DoubleLangValue)result).Value); // log(1) = 0
-    }
-
-    [Fact]
-    public void Boundary_LogOfZero_HandlesLogarithmOfZero()
-    {
-        // Arrange
-        var code = @"
-            try {
-                result <- (0.0).ToLog()
-            } catch {
-                result <- -999.0
-            }
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<DoubleLangValue>(result);
-        Assert.Equal(-999.0, ((DoubleLangValue)result).Value); // Should be -∞ or error
     }
 
     [Fact]

@@ -179,7 +179,7 @@ public class ExtremeValuesTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(31, ((IntLangValue)result).Value); // 20 + 1 + 20
+        Assert.Equal(41, ((IntLangValue)result).Value); // 20 + 1 + 20
     }
 
     [Fact]
@@ -581,7 +581,7 @@ public class ExtremeValuesTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(17, ((IntLangValue)result).Value); // 15 + 1 + 15
+        Assert.Equal(31, ((IntLangValue)result).Value); // 15 + 1 + 15
     }
 
     [Fact]
@@ -592,17 +592,17 @@ public class ExtremeValuesTests
             value <- 5
             result <- 0
             switch value {
-                case 1: result <- 1
-                case 2: result <- 2
-                case 3: result <- 3
-                case 4: result <- 4
-                case 5: result <- 5
-                case 6: result <- 6
-                case 7: result <- 7
-                case 8: result <- 8
-                case 9: result <- 9
-                case 10: result <- 10
-                default: result <- 0
+                case 1 { result <- 1 }
+                case 2 { result <- 2 }
+                case 3 { result <- 3 }
+                case 4 { result <- 4 }
+                case 5 { result <- 5 }
+                case 6 { result <- 6 }
+                case 7 { result <- 7 }
+                case 8 { result <- 8 }
+                case 9 { result <- 9 }
+                case 10 { result <- 10 }
+                default { result <- 0 }
             }
         ";
         var interpreter = new LangInterpreter();

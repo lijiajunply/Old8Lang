@@ -644,6 +644,12 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             m = type?.GetMethod(Id.IdName);
         }
 
+        // 如果找不到方法，抛出异常
+        if (m == null)
+        {
+            throw new AttributeError(baseLangValue, Id.IdName, baseLangValue.GetType().Name);
+        }
+
         var os = new List<object>();
 
         // 检查方法是否需要参数
