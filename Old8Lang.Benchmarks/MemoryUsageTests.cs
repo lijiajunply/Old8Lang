@@ -1,9 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using Old8Lang.AST.Statement;
 using Old8Lang.Interpreter;
-using Old8Lang.LangParser;
-using System.Diagnostics;
-using System;
 
 namespace Old8Lang.Benchmarks;
 

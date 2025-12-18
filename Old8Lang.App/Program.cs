@@ -3,7 +3,6 @@ using Old8Lang;
 using Old8Lang.App;
 using Old8Lang.Compiler;
 using Old8Lang.Interpreter;
-using Old8Lang.LangParser;
 
 // 调试模式下的默认参数设置
 #if DEBUG

@@ -336,7 +336,7 @@ public class TypeErrorsTests
             arr1 <- [1, 2, 3]
             arr2 <- [1, 2, 3]
             try {
-                result <- arr1 = arr2
+                result <- arr1 == arr2
                 type <- ""success""
             } catch {
                 result <- ""type error""

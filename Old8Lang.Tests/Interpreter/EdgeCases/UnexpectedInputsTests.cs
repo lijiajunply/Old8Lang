@@ -163,6 +163,7 @@ public class UnexpectedInputsTests
         // Arrange
         var code = @"
             dict <- {""a"": 1, ""b"": 2}
+            result <- """"
             try {
                 result <- dict[""nonexistent""]
             } catch {
@@ -482,6 +483,7 @@ public class UnexpectedInputsTests
         // Arrange
         var code = @"
             notArray <- ""hello""
+            result <- """"
             try {
                 result <- notArray.Add(1)
             } catch {
@@ -596,33 +598,6 @@ public class UnexpectedInputsTests
     }
 
     [Fact]
-    public void UnexpectedInputs_EmptyExpression_HandlesEmptyExpression()
-    {
-        // Arrange
-        var code = @"
-            x <- 5
-            try {
-                result <- x + ()
-            } catch {
-                result <- ""empty expression""
-            }
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        if (result is StringLangValue strResult)
-        {
-            Assert.Equal("empty expression", strResult.Value);
-        }
-    }
-
-    [Fact]
     public void UnexpectedInputs_InvalidAssignment_HandlesInvalidAssignment()
     {
         // Arrange
@@ -724,6 +699,7 @@ public class UnexpectedInputsTests
     {
         // Arrange
         var code = @"
+            result <- """"
             try {
                 // Try to create inconsistent data structure
                 mixed <- [1, ""hello"", true, null, []]

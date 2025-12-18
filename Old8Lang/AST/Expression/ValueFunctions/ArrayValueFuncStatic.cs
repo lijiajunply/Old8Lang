@@ -1,7 +1,5 @@
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.Error;
 using Old8Lang.Interpreter;
-using Old8Lang.LangParser;
 
 namespace Old8Lang.AST.Expression.ValueFunctions;
 
@@ -82,7 +80,7 @@ public static class ArrayValueFuncStatic
             var manager = new VariateManager();
 
             // 执行转换函数，传递当前元素作为参数
-            var result = transform.Run(manager, new List<LangExpression> { item });
+            var result = transform.Run(manager, [item]);
             mapped.Add(result);
         }
 
@@ -106,7 +104,7 @@ public static class ArrayValueFuncStatic
             var manager = new VariateManager();
 
             // 执行谓词函数，传递当前元素作为参数
-            var result = predicate.Run(manager, new List<LangExpression> { item });
+            var result = predicate.Run(manager, [item]);
 
             // 如果结果为真，则保留该元素
             if (result is BoolLangValue { Value: true })
@@ -125,7 +123,8 @@ public static class ArrayValueFuncStatic
     /// <param name="reducer">归约函数，接受累加器和当前元素，返回新的累加器值</param>
     /// <param name="initialValue">初始累加器值</param>
     /// <returns>归约后的结果值</returns>
-    public static LangValueType Reduce(this ArrayLangValue arrayValue, FuncLangValue reducer, LangValueType initialValue)
+    public static LangValueType Reduce(this ArrayLangValue arrayValue, FuncLangValue reducer,
+        LangValueType initialValue)
     {
         var accumulator = initialValue;
         var items = arrayValue.GetItems();
@@ -136,10 +135,15 @@ public static class ArrayValueFuncStatic
             var manager = new VariateManager();
 
             // 执行归约函数，传递累加器和当前元素作为参数
-            accumulator = reducer.Run(manager, new List<LangExpression> { accumulator, item });
+            accumulator = reducer.Run(manager, [accumulator, item]);
         }
 
         return accumulator;
+    }
+
+    public static ListLangValue ToList(this ArrayLangValue value)
+    {
+        return new ListLangValue(value.GetItems().ToList());
     }
 
     /// <summary>

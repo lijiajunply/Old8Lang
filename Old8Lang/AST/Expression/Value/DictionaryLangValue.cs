@@ -1,11 +1,9 @@
-using Old8Lang.LangParser;
 using System.Reflection.Emit;
 using System.Text;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
-using System.Reflection;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -67,9 +65,12 @@ public class DictionaryLangValue : LangValueType, ILangList
         // 处理属性访问：obj.property
         if (dotExpression is LangId langId)
         {
-            // 特殊处理 Keys 和 Values 属性
+            // 特殊处理 Count, Keys 和 Values 属性
             switch (langId.IdName)
             {
+                case "Count":
+                    // 返回字典的键值对数量
+                    return new IntLangValue(Value.Count);
                 case "Keys":
                     // 返回字典的键集合
                     return new ListLangValue(Value.Select(x => x.Key).ToList());
@@ -85,6 +86,9 @@ public class DictionaryLangValue : LangValueType, ILangList
                         var method = extensionType.GetMethod(langId.IdName);
                         if (method != null)
                         {
+                            // 设置执行上下文，以便扩展方法可以访问当前的 VariateManager
+                            Old8Lang.AST.Expression.ValueFunctions.ExecutionContext.SetCurrentManager(manager);
+
                             // 找到扩展方法，创建 Instance 来处理方法调用
                             var instance = new Instance(new LangId(langId.IdName), []);
                             return instance.FromClassToResult(this);
@@ -120,6 +124,9 @@ public class DictionaryLangValue : LangValueType, ILangList
                     // 对于 Merge 和 Update 方法，需要特殊处理参数
                     if (methodName == "Merge" || methodName == "Update")
                     {
+                        // 设置执行上下文，以便扩展方法可以访问当前的 VariateManager
+                        Old8Lang.AST.Expression.ValueFunctions.ExecutionContext.SetCurrentManager(manager);
+
                         // 手动处理参数，确保使用正确的 manager
                         var parameters = method.GetParameters();
                         var args = new List<object>();
@@ -142,6 +149,8 @@ public class DictionaryLangValue : LangValueType, ILangList
                     }
 
                     // 对于其他方法，调用 FromClassToResult 来处理方法调用
+                    // 设置执行上下文，以便扩展方法可以访问当前的 VariateManager
+                    Old8Lang.AST.Expression.ValueFunctions.ExecutionContext.SetCurrentManager(manager);
                     return a.FromClassToResult(this);
                 }
             }

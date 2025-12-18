@@ -457,7 +457,7 @@ public class ListTests
 
             numbers.ForEach((x:int) -> {
                 sum <- sum + x
-                doubledList.Push(x * 2)
+                doubledList.Add(x * 2)
             })
 
             result1 <- sum

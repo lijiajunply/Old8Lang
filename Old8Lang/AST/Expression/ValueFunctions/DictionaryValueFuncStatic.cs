@@ -1,7 +1,5 @@
-using System.Linq;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression.ValueFunctions;
@@ -40,30 +38,20 @@ public static class DictionaryValueFuncStatic
         /// 根据键从字典中移除键值对
         /// </summary>
         /// <param name="key">要移除的键</param>
-        /// <returns>被移除的值</returns>
-        /// <exception cref="KeyError">当键不存在时抛出</exception>
-        public LangValueType Remove(LangValueType key)
+        /// <returns>是否成功移除的BoolLangValue</returns>
+        public BoolLangValue Remove(LangValueType key)
         {
             for (var i = 0; i < langValue.Value.Count; i++)
             {
                 if (!langValue.Value[i].Key.Equal(key)) continue;
-                var a = langValue.Value[i].Value;
                 langValue.Value.RemoveAt(i);
-                return a;
+                return new BoolLangValue(true);
             }
 
-            throw new KeyError(langValue, "键不存在");
+            return new BoolLangValue(false);
         }
 
-        /// <summary>
-        /// 获取字典中键值对的数量
-        /// </summary>
-        /// <returns>包含数量的IntLangValue</returns>
-        public IntLangValue Count()
-        {
-            return new IntLangValue(langValue.Value.Count);
-        }
-
+    
         /// <summary>
         /// 检查字典是否包含指定的键
         /// </summary>
@@ -169,31 +157,176 @@ public static class DictionaryValueFuncStatic
         }
 
         /// <summary>
-        /// 更新字典中指定键的值，如果键不存在则添加
+        /// 使用另一个字典更新当前字典的键值对
         /// </summary>
-        /// <param name="key">要更新的键</param>
-        /// <param name="newValue">新的值</param>
+        /// <param name="otherDictionary">包含更新内容的字典</param>
         /// <returns>VoidLangValue，表示操作完成</returns>
-        public VoidLangValue Update(LangValueType key, LangValueType newValue)
+        public VoidLangValue Update(DictionaryLangValue otherDictionary)
         {
-            // 查找并更新现有的键值对
-            var keyFound = false;
-            for (int i = 0; i < langValue.Value.Count; i++)
+            foreach (var (key, value) in otherDictionary.Value)
             {
-                var (existingKey, existingValue) = langValue.Value[i];
-                if (existingKey.Equal(key))
+                // 查找并更新现有的键值对
+                var keyFound = false;
+                for (int i = 0; i < langValue.Value.Count; i++)
                 {
-                    // 更新现有键的值
-                    langValue.Value[i] = (existingKey, newValue);
-                    keyFound = true;
-                    break;
+                    var (existingKey, existingValue) = langValue.Value[i];
+                    if (existingKey.Equal(key))
+                    {
+                        // 更新现有键的值
+                        langValue.Value[i] = (existingKey, value);
+                        keyFound = true;
+                        break;
+                    }
+                }
+
+                // 如果键不存在，添加新的键值对
+                if (!keyFound)
+                {
+                    langValue.Value.Add((key, value));
                 }
             }
 
-            // 如果键不存在，添加新的键值对
-            if (!keyFound)
+            return new VoidLangValue();
+        }
+
+        /// <summary>
+        /// 清空字典中的所有键值对
+        /// </summary>
+        /// <returns>VoidLangValue，表示操作完成</returns>
+        public VoidLangValue Clear()
+        {
+            langValue.Value.Clear();
+            return new VoidLangValue();
+        }
+
+        /// <summary>
+        /// 创建字典的独立副本
+        /// </summary>
+        /// <returns>新的字典副本</returns>
+        public DictionaryLangValue Clone()
+        {
+            var newDict = new DictionaryLangValue();
+            foreach (var (key, value) in langValue.Value)
             {
-                langValue.Value.Add((key, newValue));
+                newDict.Value.Add((key, value));
+            }
+            return newDict;
+        }
+
+        /// <summary>
+        /// 根据键安全获取字典中的值，如果键不存在则返回默认值
+        /// </summary>
+        /// <param name="key">要查找的键</param>
+        /// <param name="defaultValue">键不存在时的默认值</param>
+        /// <returns>对应的值或默认值</returns>
+        public LangValueType TryGet(LangValueType key, LangValueType defaultValue)
+        {
+            foreach (var (k, v) in langValue.Value)
+            {
+                if (k.Equal(key))
+                {
+                    return v;
+                }
+            }
+            return defaultValue;
+        }
+
+        /// <summary>
+        /// 使用函数转换字典中的所有值
+        /// </summary>
+        /// <param name="func">转换函数，接收值作为参数</param>
+        /// <returns>包含转换后值的新字典</returns>
+        public DictionaryLangValue Map(FuncLangValue func)
+        {
+            var newDict = new DictionaryLangValue();
+
+            // 尝试获取当前的 VariateManager，如果没有则创建新的
+            var manager = ExecutionContext.GetCurrentManager();
+            if (manager == null)
+            {
+                // 如果没有找到外部 manager，创建新的
+                manager = new VariateManager();
+            }
+
+            foreach (var (key, value) in langValue.Value)
+            {
+                try
+                {
+                    var result = func.Run(manager, new List<LangExpression> { value });
+                    newDict.Value.Add((key, result));
+                }
+                catch
+                {
+                    // 如果转换失败，保留原值
+                    newDict.Value.Add((key, value));
+                }
+            }
+
+            return newDict;
+        }
+
+        /// <summary>
+        /// 使用条件过滤字典的键值对
+        /// </summary>
+        /// <param name="predicate">过滤函数，接收键值对作为参数，返回布尔值</param>
+        /// <returns>包含满足条件键值对的新字典</returns>
+        public DictionaryLangValue Filter(FuncLangValue predicate)
+        {
+            var newDict = new DictionaryLangValue();
+
+            // 尝试获取当前的 VariateManager，如果没有则创建新的
+            var manager = ExecutionContext.GetCurrentManager();
+            if (manager == null)
+            {
+                // 如果没有找到外部 manager，创建新的
+                manager = new VariateManager();
+            }
+
+            foreach (var (key, value) in langValue.Value)
+            {
+                try
+                {
+                    var result = predicate.Run(manager, new List<LangExpression> { key, value });
+                    if (result is BoolLangValue boolResult && boolResult.Value)
+                    {
+                        newDict.Value.Add((key, value));
+                    }
+                }
+                catch
+                {
+                    // 如果过滤函数失败，保留该项
+                    newDict.Value.Add((key, value));
+                }
+            }
+
+            return newDict;
+        }
+
+        /// <summary>
+        /// 对字典中的每个键值对执行指定的操作
+        /// </summary>
+        /// <param name="action">要执行的操作函数，接收键值对作为参数</param>
+        /// <returns>VoidLangValue，表示操作完成</returns>
+        public VoidLangValue ForEach(FuncLangValue action)
+        {
+            // 尝试获取当前的 VariateManager，如果没有则创建新的
+            var manager = ExecutionContext.GetCurrentManager();
+            if (manager == null)
+            {
+                // 如果没有找到外部 manager，创建新的
+                manager = new VariateManager();
+            }
+
+            foreach (var (key, value) in langValue.Value)
+            {
+                try
+                {
+                    action.Run(manager, new List<LangExpression> { key, value });
+                }
+                catch
+                {
+                    // 忽略执行错误，继续处理下一项
+                }
             }
 
             return new VoidLangValue();

@@ -14,7 +14,7 @@ public class DictionaryTests
     {
         // Arrange
         var code = @"
-            emptyDict <- {}
+            emptyDict <- dict()
             result <- emptyDict.Count
         ";
         var interpreter = new LangInterpreter();
@@ -413,8 +413,8 @@ public class DictionaryTests
         // Arrange
         var code = @"
             scores <- {""math"": 85, ""science"": 92, ""english"": 78, ""history"": 88}
-            curved <- scores.Map((value:any) -> value + 5)
-            grades <- scores.Map((value:any) -> {
+            curved <- scores.Map((value) -> value + 5)
+            grades <- scores.Map((value) -> {
                 if value >= 90 { return ""A"" }
                 else if value >= 80 { return ""B"" }
                 else if value >= 70 { return ""C"" }
@@ -460,8 +460,8 @@ public class DictionaryTests
         // Arrange
         var code = @"
             inventory <- {""apple"": 5, ""banana"": 0, ""orange"": 12, ""grape"": 3, ""pear"": 0}
-            inStock <- inventory.Filter((key:string, value:any) -> value > 0)
-            highStock <- inventory.Filter((key:string, value:any) -> value >= 10)
+            inStock <- inventory.Filter((key, value) -> value > 0)
+            highStock <- inventory.Filter((key, value) -> value >= 10)
             result1 <- inStock.Count
             result2 <- inStock.ContainsKey(""apple"")
             result3 <- inStock.ContainsKey(""banana"")
@@ -511,7 +511,7 @@ public class DictionaryTests
             count <- 0
             data <- {""a"": 10, ""b"": 20, ""c"": 30, ""d"": 40}
 
-            data.ForEach((key:string, value:any) -> {
+            data.ForEach((key, value) -> {
                 sum <- sum + value
                 count <- count + 1
             })

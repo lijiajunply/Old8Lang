@@ -263,6 +263,22 @@ public class Operation(
                     return array.Dot(Right, manager);
                 }
             }
+            else if (dotLeftResult is DictionaryLangValue dict)
+            {
+                // 处理字典方法调用
+                if (Right is Instance instance)
+                {
+                    var ids = instance.Ids.Select(x => x.Run(manager)).OfType<LangExpression>().ToList();
+                    var newInstance = new Instance(instance.Id, ids);
+                    return dict.Dot(newInstance, manager);
+                }
+
+                // 处理字典属性访问和方法调用
+                if (Right != null)
+                {
+                    return dict.Dot(Right, manager);
+                }
+            }
             else if (dotLeftResult is TaskClassLangValue taskClassValue)
             {
                 if (Right is Instance instance)

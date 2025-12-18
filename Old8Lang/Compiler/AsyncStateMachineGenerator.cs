@@ -2,9 +2,6 @@ using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Statement;
-using System.Collections.Generic;
-using Old8Lang.Error;
-using Old8Lang.LangParser;
 using Old8Lang.AST;
 
 namespace Old8Lang.Compiler;
