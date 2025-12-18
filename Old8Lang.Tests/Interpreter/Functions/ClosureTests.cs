@@ -545,7 +545,7 @@ public class ClosureTests
             logger <- createLogger()
             result1 <- logger(""First message"")
             result2 <- logger(""Second message"")
-            logCount <- logMessages.Length
+            logCount <- len(logMessages)
         ";
         var interpreter = new LangInterpreter();
 

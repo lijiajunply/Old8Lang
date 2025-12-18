@@ -488,7 +488,7 @@ public class HigherOrderTests
         var code = @"
             func zip(list1:list, list2:list, combiner:func) -> {
                 result <- {}
-                minLength <- if list1.Length < list2.Length then list1.Length else list2.Length
+                minLength <- if len(list1) < len(list2) then len(list1) else len(list2)
                 for i in 0..minLength-1 {
                     combined <- combiner(list1[i], list2[i])
                     result.Add(combined)
@@ -566,7 +566,7 @@ public class HigherOrderTests
         var code = @"
             func foldRight(collection:list, accumulator:function, initial:string) -> string {
                 result <- initial
-                for i in [collection.Length-1~0] {
+                for i in [len(collection)-1~0] {
                     item <- collection[i]
                     result <- accumulator(item, result)
                 }
@@ -609,7 +609,7 @@ public class HigherOrderTests
             grouped <- groupBy(numbers, isEven)
 
             // Get even numbers group (key = 0)
-            evenCount <- grouped[""0""].Length
+            evenCount <- len(grouped[""0""])
             result <- evenCount
         ";
         var interpreter = new LangInterpreter();

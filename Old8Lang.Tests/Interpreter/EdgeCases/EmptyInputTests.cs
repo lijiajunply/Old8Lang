@@ -47,7 +47,7 @@ public class EmptyInputTests
         // Arrange
         var code = @"
             emptyString <- """"
-            result <- emptyString.Length
+            result <- len(emptyString)
         ";
         var interpreter = new LangInterpreter();
 
@@ -68,7 +68,7 @@ public class EmptyInputTests
         // Arrange
         var code = @"
             emptyArray <- []
-            result <- emptyArray.Length
+            result <- len(emptyArray)
         ";
         var interpreter = new LangInterpreter();
 
@@ -89,7 +89,7 @@ public class EmptyInputTests
         // Arrange
         var code = @"
             emptyList <- {}
-            result <- emptyList.Length
+            result <- len(emptyList)
         ";
         var interpreter = new LangInterpreter();
 
@@ -131,7 +131,7 @@ public class EmptyInputTests
         // Arrange
         var code = @"
             emptyTuple <- ()
-            result <- emptyTuple.Length
+            result <- len(emptyTuple)
         ";
         var interpreter = new LangInterpreter();
 

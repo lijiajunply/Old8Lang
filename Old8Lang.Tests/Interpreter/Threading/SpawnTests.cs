@@ -181,7 +181,7 @@ public class SpawnTests
         var code = @"
             func reverseString(s:string) -> string {
                 result <- """"
-                for i in s.Length-1..0 {
+                for i in len(s)-1..0 {
                     result <- result + s[i]
                 }
                 return result

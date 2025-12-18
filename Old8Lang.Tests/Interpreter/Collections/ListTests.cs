@@ -15,7 +15,7 @@ public class ListTests
         // Arrange
         var code = @"
             emptyList <- {}
-            result <- emptyList.Length
+            result <- len(emptyList)
         ";
         var interpreter = new LangInterpreter();
 
@@ -36,7 +36,7 @@ public class ListTests
         // Arrange
         var code = @"
             numbers <- {1, 2, 3, 4, 5}
-            result <- numbers.Length
+            result <- len(numbers)
         ";
         var interpreter = new LangInterpreter();
 
@@ -57,7 +57,7 @@ public class ListTests
         // Arrange
         var code = @"
             mixed <- {1, ""hello"", true, 3.14, 'A'}
-            result <- mixed.Length
+            result <- len(mixed)
         ";
         var interpreter = new LangInterpreter();
 
@@ -144,9 +144,9 @@ public class ListTests
             empty <- {}
             single <- {42}
             multiple <- {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-            result1 <- empty.Length
-            result2 <- single.Length
-            result3 <- multiple.Length
+            result1 <- len(empty)
+            result2 <- len(single)
+            result3 <- len(multiple)
         ";
         var interpreter = new LangInterpreter();
 
@@ -180,7 +180,7 @@ public class ListTests
             items <- {1, 2, 3}
             items.Push(4)
             items.Push(5)
-            result1 <- items.Length
+            result1 <- len(items)
             result2 <- items[3]
             result3 <- items[4]
         ";
@@ -216,7 +216,7 @@ public class ListTests
             items <- {1, 2, 3, 4, 5}
             popped1 <- items.Pop()
             popped2 <- items.Pop()
-            result1 <- items.Length
+            result1 <- len(items)
             result2 <- popped1
             result3 <- popped2
         ";
@@ -251,7 +251,7 @@ public class ListTests
         var code = @"
             items <- {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
             items.Clear()
-            result <- items.Length
+            result <- len(items)
         ";
         var interpreter = new LangInterpreter();
 
@@ -341,9 +341,9 @@ public class ListTests
             evens <- numbers.Filter((x:int) -> x % 2 == 0)
             odds <- numbers.Filter((x:int) -> x % 2 == 1)
             greaterThan5 <- numbers.Filter((x:int) -> x > 5)
-            result1 <- evens.Length
-            result2 <- odds.Length
-            result3 <- greaterThan5.Length
+            result1 <- len(evens)
+            result2 <- len(odds)
+            result3 <- len(greaterThan5)
         ";
         var interpreter = new LangInterpreter();
 
@@ -378,7 +378,7 @@ public class ListTests
             doubled <- numbers.Map((x:int) -> x * 2)
             squared <- numbers.Map((x:int) -> x * x)
             toString <- numbers.Map((x:int) -> ""num: "" + x.ToStr())
-            result1 <- doubled.Length
+            result1 <- len(doubled)
             result2 <- doubled[2]
             result3 <- squared[3]
         ";
@@ -461,7 +461,7 @@ public class ListTests
             })
 
             result1 <- sum
-            result2 <- doubledList.Length
+            result2 <- len(doubledList)
             result3 <- doubledList[2]
         ";
         var interpreter = new LangInterpreter();
@@ -586,9 +586,9 @@ public class ListTests
             slice1 <- numbers.Slice(2, 5)
             slice2 <- numbers.Slice(0, 3)
             slice3 <- numbers.Slice(7, 10)
-            result1 <- slice1.Length
+            result1 <- len(slice1)
             result2 <- slice1[0]
-            result3 <- slice2.Length
+            result3 <- len(slice2)
             result4 <- slice3[2]
         ";
         var interpreter = new LangInterpreter();
@@ -665,7 +665,7 @@ public class ListTests
             list1 <- {1, 2, 3}
             list2 <- {4, 5, 6}
             combined <- list1.Concat(list2)
-            result1 <- combined.Length
+            result1 <- len(combined)
             result2 <- combined[2]
             result3 <- combined[3]
             result4 <- combined[5]
@@ -708,7 +708,7 @@ public class ListTests
             items.Insert(2, 3)
             items.Insert(0, 0)
             items.Insert(6, 6)
-            result1 <- items.Length
+            result1 <- len(items)
             result2 <- items[2]
             result3 <- items[3]
             result4 <- items[0]
@@ -758,7 +758,7 @@ public class ListTests
             removed2 <- items.Remove(3)
             result1 <- removed1
             result2 <- removed2
-            result3 <- items.Length
+            result3 <- len(items)
             result4 <- items[2]
         ";
         var interpreter = new LangInterpreter();

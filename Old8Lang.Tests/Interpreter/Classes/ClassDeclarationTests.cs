@@ -458,7 +458,7 @@ public class ClassDeclarationTests
             class StringUtils {
                 static func reverse(text) -> string {
                     result <- """"
-                    i <- text.Length - 1
+                    i <- len(text) - 1
                     while i >= 0 {
                         result <- result + text[i]
                         i <- i - 1

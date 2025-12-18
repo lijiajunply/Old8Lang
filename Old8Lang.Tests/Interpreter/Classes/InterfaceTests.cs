@@ -348,7 +348,7 @@ public class InterfaceTests
                 }
 
                 func Size() -> int {
-                    return items.Length
+                    return len(items)
                 }
             }
 

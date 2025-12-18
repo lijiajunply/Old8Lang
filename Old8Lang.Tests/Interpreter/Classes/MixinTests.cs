@@ -248,7 +248,7 @@ public class MixinTests
                 }
 
                 func HasErrors() -> bool {
-                    return errors.Length > 0
+                    return len(errors) > 0
                 }
             }
 
@@ -261,7 +261,7 @@ public class MixinTests
                 }
 
                 func Validate() -> bool {
-                    if value.Length == 0 {
+                    if len(value) == 0 {
                         AddError(""Value cannot be empty"")
                         return false
                     }

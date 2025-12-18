@@ -99,7 +99,7 @@ public class ExtremeValuesTests
         // Arrange
         var code = @"
             hugeNumber <- 999999999999999999
-            result <- hugeNumber.ToStr().Length > 10
+            result <- len(hugeNumber.ToStr()) > 10
         ";
         var interpreter = new LangInterpreter();
 
@@ -167,7 +167,7 @@ public class ExtremeValuesTests
         // Arrange
         var code = @"
             largeArray <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-            result <- largeArray.Length + largeArray[0] + largeArray[19]
+            result <- len(largeArray) + largeArray[0] + largeArray[19]
         ";
         var interpreter = new LangInterpreter();
 
@@ -213,7 +213,7 @@ public class ExtremeValuesTests
         // Arrange
         var code = @"
             longString <- ""This is a very long string that contains many words and characters to test how the interpreter handles strings with significant length without performance issues or memory problems.""
-            result <- longString.Length > 50
+            result <- len(longString) > 50
         ";
         var interpreter = new LangInterpreter();
 
@@ -451,7 +451,7 @@ public class ExtremeValuesTests
             for i in 1..10 {
                 result <- result + base
             }
-            finalLength <- result.Length
+            finalLength <- len(result)
         ";
         var interpreter = new LangInterpreter();
 
@@ -569,7 +569,7 @@ public class ExtremeValuesTests
         // Arrange
         var code = @"
             largeTuple <- (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
-            result <- largeTuple.Length + largeTuple[0] + largeTuple[14]
+            result <- len(largeTuple) + largeTuple[0] + largeTuple[14]
         ";
         var interpreter = new LangInterpreter();
 

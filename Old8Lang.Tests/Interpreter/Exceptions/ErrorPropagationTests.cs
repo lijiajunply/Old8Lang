@@ -283,7 +283,7 @@ public class ErrorPropagationTests
             func process_collection(items: list) -> int {
                 total <- 0
                 i <- 0
-                while i < items.Length() {
+                while i < len(items)() {
                     item <- items[i]
                     if item == ""error"" {
                         throw ""Error processing item at index "" + i.ToStr()

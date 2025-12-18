@@ -346,7 +346,7 @@ public class MemberAccessTests
 
                 func AddData(value:int) {
                     data.Push(value)
-                    metadata[""count""] <- data.Length
+                    metadata[""count""] <- len(data)
                 }
             }
 
@@ -357,7 +357,7 @@ public class MemberAccessTests
             result4 <- container.GetMetadata(""count"")
 
             container.AddData(60)
-            result5 <- container.data.Length
+            result5 <- container.len(data)
             result6 <- container.GetMetadata(""count"")
         ";
         var interpreter = new LangInterpreter();
@@ -552,7 +552,7 @@ public class MemberAccessTests
 
             builder <- StringBuilder()
             result <- builder.Append(""Hello"").AppendLine("" World"").Append(""!"").ToString()
-            length <- result.Length
+            length <- len(result)
         ";
         var interpreter = new LangInterpreter();
 
@@ -687,7 +687,7 @@ public class MemberAccessTests
                 }
 
                 func GetMemberCount() -> int {
-                    return members.Length
+                    return len(members)
                 }
 
                 func GetBookTitles() -> [string] {
@@ -705,7 +705,7 @@ public class MemberAccessTests
             author1 <- book1[""author""]
 
             library.AddBook(""Animal Farm"", ""Orwell"", 1945)
-            totalBooks <- library.books.Length
+            totalBooks <- library.len(books)
 
             memberCount <- library.GetMemberCount()
             allTitles <- library.GetBookTitles()

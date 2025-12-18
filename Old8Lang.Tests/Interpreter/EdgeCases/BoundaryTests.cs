@@ -117,7 +117,7 @@ public class BoundaryTests
         // Arrange
         var code = @"
             emptyArray <- []
-            result <- emptyArray.Length
+            result <- len(emptyArray)
         ";
         var interpreter = new LangInterpreter();
 
@@ -159,7 +159,7 @@ public class BoundaryTests
         // Arrange
         var code = @"
             emptyList <- {}
-            result <- emptyList.Length
+            result <- len(emptyList)
         ";
         var interpreter = new LangInterpreter();
 
@@ -180,7 +180,7 @@ public class BoundaryTests
         // Arrange
         var code = @"
             emptyString <- """"
-            result <- emptyString.Length
+            result <- len(emptyString)
         ";
         var interpreter = new LangInterpreter();
 
@@ -201,7 +201,7 @@ public class BoundaryTests
         // Arrange
         var code = @"
             singleChar <- ""A""
-            result <- singleChar.Length
+            result <- len(singleChar)
         ";
         var interpreter = new LangInterpreter();
 
@@ -243,7 +243,7 @@ public class BoundaryTests
         // Arrange
         var code = @"
             emptyTuple <- ()
-            result <- emptyTuple.Length
+            result <- len(emptyTuple)
         ";
         var interpreter = new LangInterpreter();
 
@@ -385,7 +385,7 @@ public class BoundaryTests
         // Arrange
         var code = @"
             arr <- [10, 20, 30]
-            lastIndex <- arr.Length - 1
+            lastIndex <- len(arr) - 1
             result <- arr[lastIndex]
         ";
         var interpreter = new LangInterpreter();
@@ -693,7 +693,7 @@ public class BoundaryTests
         // Arrange
         var code = @"
             text <- ""hello""
-            lastIndex <- text.Length - 1
+            lastIndex <- len(text) - 1
             result <- text[lastIndex]
         ";
         var interpreter = new LangInterpreter();
@@ -761,7 +761,7 @@ public class BoundaryTests
             for i in 0..1000 {
                 items.Add(i)
             }
-            result <- items.Length
+            result <- len(items)
         ";
         var interpreter = new LangInterpreter();
 

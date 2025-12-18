@@ -484,7 +484,7 @@ public class JumpStatementsTests
         var code = @"
             array <- [10, 20, 30, 40, 50, 60]
             sum <- 0
-            for i in 0..<array.Length {
+            for i in 0..<len(array) {
                 value <- array[i]
                 if value == 40 {
                     break
@@ -516,7 +516,7 @@ public class JumpStatementsTests
         var code = @"
             items <- {""apple"", ""banana"", ""cherry"", ""date"", ""elderberry""}
             result <- {}
-            for i in 0..<items.Length {
+            for i in 0..<len(items) {
                 item <- items[i]
 
                 // Skip items starting with 'b'

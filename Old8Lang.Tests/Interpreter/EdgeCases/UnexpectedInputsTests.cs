@@ -287,7 +287,7 @@ public class UnexpectedInputsTests
         // Arrange
         var code = @"
             func process(text:string) -> int {
-                return text.Length
+                return len(text)
             }
             try {
                 result <- process(123)
@@ -458,7 +458,7 @@ public class UnexpectedInputsTests
         var code = @"
             notString <- 42
             try {
-                result <- notString.Length
+                result <- len(notString)
             } catch {
                 result <- ""not a string""
             }
@@ -542,11 +542,11 @@ public class UnexpectedInputsTests
                 bigArray <- []
                 for i in 1..100000 {
                     bigArray.Add(i)
-                    if bigArray.Length >= 10 {
+                    if len(bigArray) >= 10 {
                         break
                     }
                 }
-                result <- bigArray.Length
+                result <- len(bigArray)
             } catch {
                 result <- ""memory error""
             }
@@ -577,7 +577,7 @@ public class UnexpectedInputsTests
         var code = @"
             try {
                 result <- ""Hello"" + char(127) + ""World""
-                valid <- result.Length > 5
+                valid <- len(result) > 5
             } catch {
                 result <- ""invalid character""
                 valid <- false

@@ -15,7 +15,7 @@ public class TupleTests
         // Arrange
         var code = @"
             emptyTuple <- ()
-            result <- emptyTuple.Length
+            result <- len(emptyTuple)
         ";
         var interpreter = new LangInterpreter();
 
@@ -36,7 +36,7 @@ public class TupleTests
         // Arrange
         var code = @"
             tuple <- (1, 2, 3, 4, 5)
-            result <- tuple.Length
+            result <- len(tuple)
         ";
         var interpreter = new LangInterpreter();
 
@@ -57,7 +57,7 @@ public class TupleTests
         // Arrange
         var code = @"
             mixed <- (1, ""hello"", true, 3.14, 'A')
-            result <- mixed.Length
+            result <- len(mixed)
         ";
         var interpreter = new LangInterpreter();
 
@@ -144,9 +144,9 @@ public class TupleTests
             empty <- ()
             single <- (42,)
             multiple <- (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-            result1 <- empty.Length
-            result2 <- single.Length
-            result3 <- multiple.Length
+            result1 <- len(empty)
+            result2 <- len(single)
+            result3 <- len(multiple)
         ";
         var interpreter = new LangInterpreter();
 
@@ -246,9 +246,9 @@ public class TupleTests
             evens <- numbers.Filter((x:int) -> x % 2 == 0)
             odds <- numbers.Filter((x:int) -> x % 2 == 1)
             greaterThan5 <- numbers.Filter((x:int) -> x > 5)
-            result1 <- evens.Length
-            result2 <- odds.Length
-            result3 <- greaterThan5.Length
+            result1 <- len(evens)
+            result2 <- len(odds)
+            result3 <- len(greaterThan5)
         ";
         var interpreter = new LangInterpreter();
 
@@ -283,7 +283,7 @@ public class TupleTests
             doubled <- numbers.Map((x:int) -> x * 2)
             squared <- numbers.Map((x:int) -> x * x)
             toString <- numbers.Map((x:int) -> ""num: "" + x.ToStr())
-            result1 <- doubled.Length
+            result1 <- len(doubled)
             result2 <- doubled[2]
             result3 <- squared[3]
         ";
@@ -366,7 +366,7 @@ public class TupleTests
             })
 
             result1 <- sum
-            result2 <- doubledList.Length
+            result2 <- len(doubledList)
             result3 <- doubledList[2]
         ";
         var interpreter = new LangInterpreter();
@@ -491,9 +491,9 @@ public class TupleTests
             slice1 <- numbers.Slice(2, 5)
             slice2 <- numbers.Slice(0, 3)
             slice3 <- numbers.Slice(7, 10)
-            result1 <- slice1.Length
+            result1 <- len(slice1)
             result2 <- slice1[0]
-            result3 <- slice2.Length
+            result3 <- len(slice2)
             result4 <- slice3[2]
         ";
         var interpreter = new LangInterpreter();
@@ -570,7 +570,7 @@ public class TupleTests
             tuple1 <- (1, 2, 3)
             tuple2 <- (4, 5, 6)
             combined <- tuple1.Concat(tuple2)
-            result1 <- combined.Length
+            result1 <- len(combined)
             result2 <- combined[2]
             result3 <- combined[3]
             result4 <- combined[5]
@@ -793,7 +793,7 @@ public class TupleTests
             range3 <- -3..3
             result1 <- range1[0]
             result2 <- range1[4]
-            result3 <- range1.Length
+            result3 <- len(range1)
             result4 <- range2[2]
             result5 <- range3[3]
         ";
@@ -837,7 +837,7 @@ public class TupleTests
         // Arrange
         var code = @"
             func GetMinMax(numbers:[int]) -> (int, int) {
-                if numbers.Length == 0 {
+                if len(numbers) == 0 {
                     return (0, 0)
                 }
                 min <- numbers[0]

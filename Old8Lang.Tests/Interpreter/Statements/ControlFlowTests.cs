@@ -49,8 +49,8 @@ public class ControlFlowTests
         var code = @"
             matrix <- [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
             diagonalSum <- 0
-            for i in [0~matrix.Length[ {
-                for j in [0~matrix[i].Length[ {
+            for i in [0~len(matrix)[ {
+                for j in [0~len(matrix[i])[ {
                     if i == j {
                         diagonalSum <- diagonalSum + matrix[i][j]
                     }
@@ -158,7 +158,7 @@ public class ControlFlowTests
                     children.Add(""Child: "" + age.ToStr())
                 }
             }
-            result <- ""Adults: "" + adults.Length.ToStr() + "", Children: "" + children.Length.ToStr()
+            result <- ""Adults: "" + len(adults).ToStr() + "", Children: "" + len(children).ToStr()
         ";
         var interpreter = new LangInterpreter();
 
@@ -284,7 +284,7 @@ public class ControlFlowTests
                 }
             }
 
-            result <- ""Expensive electronics: "" + expensiveElectronics.Length.ToStr() + "", Affordable items: "" + affordableItems.Length.ToStr()
+            result <- ""Expensive electronics: "" + len(expensiveElectronics).ToStr() + "", Affordable items: "" + len(affordableItems).ToStr()
         ";
         var interpreter = new LangInterpreter();
 
@@ -363,7 +363,7 @@ public class ControlFlowTests
             count <- 0
             stack <- {tree}
 
-            while stack.Length > 0 {
+            while len(stack) < 0 {
                 node <- stack.RemoveAt(0)
 
                 if node != null {

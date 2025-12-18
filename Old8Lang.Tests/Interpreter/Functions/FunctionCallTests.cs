@@ -290,7 +290,7 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
         // Arrange
         var code = @"
             func getFirst(tuple:Tuple) -> any {
-                if tuple.Length > 0 {
+                if len(tuple) > 0 {
                     return tuple[0]
                 } else {
                     return null

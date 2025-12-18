@@ -18,10 +18,10 @@ public class SliceTests
             slice1 <- numbers[2:5]
             slice2 <- numbers[0:3]
             slice3 <- numbers[7:10]
-            result1 <- slice1.Length
+            result1 <- len(slice1)
             result2 <- slice1[0]
             result3 <- slice1[2]
-            result4 <- slice2.Length
+            result4 <- len(slice2)
             result5 <- slice3[2]
         ";
         var interpreter = new LangInterpreter();
@@ -67,9 +67,9 @@ public class SliceTests
             step2 <- numbers[0:10:2]
             step3 <- numbers[1:10:3]
             reverse <- numbers[9:0:-1]
-            result1 <- step2.Length
+            result1 <- len(step2)
             result2 <- step2[2]
-            result3 <- step3.Length
+            result3 <- len(step3)
             result4 <- step3[2]
             result5 <- reverse[0]
             result6 <- reverse[4]
@@ -122,11 +122,11 @@ public class SliceTests
             fromStart <- numbers[:5]
             toEnd <- numbers[5:]
             all <- numbers[:]
-            result1 <- fromStart.Length
+            result1 <- len(fromStart)
             result2 <- fromStart[4]
-            result3 <- toEnd.Length
+            result3 <- len(toEnd)
             result4 <- toEnd[0]
-            result5 <- all.Length
+            result5 <- len(all)
             result6 <- all[7]
         ";
         var interpreter = new LangInterpreter();
@@ -177,7 +177,7 @@ public class SliceTests
             slice1 <- fruits[1:4]
             slice2 <- fruits[3:6]
             slice3 <- fruits[:3]
-            result1 <- slice1.Length
+            result1 <- len(slice1)
             result2 <- slice1[1]
             result3 <- slice2[2]
             result4 <- slice3[0]
@@ -220,11 +220,11 @@ public class SliceTests
             slice1 <- numbers[2:6]
             slice2 <- numbers[4:8]
             slice3 <- numbers[1:9:2]
-            result1 <- slice1.Length
+            result1 <- len(slice1)
             result2 <- slice1[0]
             result3 <- slice1[3]
             result4 <- slice2[1]
-            result5 <- slice3.Length
+            result5 <- len(slice3)
         ";
         var interpreter = new LangInterpreter();
 
@@ -351,9 +351,9 @@ public class SliceTests
             exceptLast <- numbers[0:-1]
             middle <- numbers[2:-2]
             lastOne <- numbers[-1:]
-            result1 <- lastThree.Length
+            result1 <- len(lastThree)
             result2 <- lastThree[0]
-            result3 <- exceptLast.Length
+            result3 <- len(exceptLast)
             result4 <- middle[0]
             result5 <- lastOne[0]
         ";
@@ -401,11 +401,11 @@ public class SliceTests
             beforeStart <- numbers[-10:3]
             empty1 <- numbers[5:5]
             empty2 <- numbers[3:2]
-            result1 <- overEnd.Length
+            result1 <- len(overEnd)
             result2 <- overEnd[2]
-            result3 <- beforeStart.Length
-            result4 <- empty1.Length
-            result5 <- empty2.Length
+            result3 <- len(beforeStart)
+            result4 <- len(empty1)
+            result5 <- len(empty2)
         ";
         var interpreter = new LangInterpreter();
 
@@ -458,7 +458,7 @@ public class SliceTests
             for i <- 1, i < 3, i++ {
                 subMatrix.Push(matrix[i][1:3])
             }
-            result1 <- rows.Length
+            result1 <- len(rows)
             result2 <- rowSlice[0]
             result3 <- rowSlice[1]
             result4 <- subMatrix[0][0]
@@ -511,7 +511,7 @@ public class SliceTests
             result3 <- numbers[4]
             result4 <- numbers[7]
             result5 <- numbers[8]
-            result6 <- numbers.Length
+            result6 <- len(numbers)
         ";
         var interpreter = new LangInterpreter();
 
@@ -560,7 +560,7 @@ public class SliceTests
             numbers <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
             numbers[2:5] <- []
             numbers[4:7] <- []
-            result1 <- numbers.Length
+            result1 <- len(numbers)
             result2 <- numbers[1]
             result3 <- numbers[2]
             result4 <- numbers[3]
@@ -611,8 +611,8 @@ public class SliceTests
             numbers <- [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
             slice1 <- numbers[start:end]
             slice2 <- numbers[0:end:step]
-            slice3 <- numbers[start:numbers.Length]
-            result1 <- slice1.Length
+            slice3 <- numbers[start:len(numbers)]
+            result1 <- len(slice1)
             result2 <- slice1[0]
             result3 <- slice2[2]
             result4 <- slice3[3]
@@ -653,14 +653,14 @@ public class SliceTests
         var code = @"
             numbers <- [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
             middleThird <- numbers[3:7]
-            firstHalf <- numbers[0:numbers.Length/2]
-            lastQuarter <- numbers[numbers.Length*3/4:numbers.Length]
-            evens <- numbers[1:numbers.Length:2]
-            result1 <- middleThird.Length
+            firstHalf <- numbers[0:len(numbers)/2]
+            lastQuarter <- numbers[len(numbers)*3/4:len(numbers)]
+            evens <- numbers[1:len(numbers):2]
+            result1 <- len(middleThird)
             result2 <- middleThird[0]
-            result3 <- firstHalf.Length
+            result3 <- len(firstHalf)
             result4 <- lastQuarter[0]
-            result5 <- evens.Length
+            result5 <- len(evens)
             result6 <- evens[2]
         ";
         var interpreter = new LangInterpreter();
@@ -716,7 +716,7 @@ public class SliceTests
             result2 <- letters
             result3 <- mixed
             result4 <- symbols
-            result5 <- text[0:text.Length]
+            result5 <- text[0:len(text)]
         ";
         var interpreter = new LangInterpreter();
 

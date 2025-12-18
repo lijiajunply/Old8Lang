@@ -529,7 +529,7 @@ public class FunctionOverloadTests
                 return a > b
             }
             func compare(a:string, b:string) -> bool {
-                return a.Length > b.Length
+                return len(a) > len(b)
             }
             func compare(a:double, b:double) -> bool {
                 return a > b
@@ -613,7 +613,7 @@ public class FunctionOverloadTests
                 return ch.ToInt32()
             }
             func process(s:string) -> int {
-                return s.Length
+                return len(s)
             }
             func process(i:int) -> int {
                 return i * 2

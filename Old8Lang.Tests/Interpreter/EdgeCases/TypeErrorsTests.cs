@@ -429,7 +429,7 @@ public class TypeErrorsTests
         var code = @"
             number <- 42
             try {
-                result <- number.Length
+                result <- len(number)
                 type <- ""success""
             } catch {
                 result <- ""type error""

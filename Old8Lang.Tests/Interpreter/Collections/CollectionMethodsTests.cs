@@ -177,7 +177,7 @@ public class CollectionMethodsTests
         var code = @"
             items <- {1, 2, 3, 4, 5}
             items.Clear()
-            result <- items.Length
+            result <- len(items)
         ";
         var interpreter = new LangInterpreter();
 
@@ -291,7 +291,7 @@ public class CollectionMethodsTests
         var code = @"
             data <- {""a"": 1, ""b"": 2, ""c"": 3}
             keys <- data.Keys
-            keyCount <- keys.Length
+            keyCount <- len(keys)
             result <- keyCount
         ";
         var interpreter = new LangInterpreter();

@@ -180,7 +180,7 @@ public class ClassInstantiationTests
             }
             points <- [Point(0, 0), Point(3, 4), Point(5, 12)]
             distances <- [0.0, 0.0, 0.0]
-            for i in 0..<points.Length {
+            for i in 0..<len(points) {
                 distances[i] <- points[i].Distance()
             }
             result1 <- distances[1]
@@ -392,7 +392,7 @@ public class ClassInstantiationTests
             }
             car <- Car(""Tesla"", ""Model S"")
             horsepower <- car.engine.horsepower
-            wheelCount <- car.wheels.Length
+            wheelCount <- car.len(wheels)
             wheelBrand <- car.wheels[0].brand
         ";
         var interpreter = new LangInterpreter();
@@ -428,7 +428,7 @@ public class ClassInstantiationTests
                 public balance:double
                 public accountNumber:string
                 func Init(accNum:string, initialBalance:double) {
-                    if accNum.Length < 5 {
+                    if len(accNum) < 5 {
                         accountNumber <- ""INVALID""
                     } else {
                         accountNumber <- accNum

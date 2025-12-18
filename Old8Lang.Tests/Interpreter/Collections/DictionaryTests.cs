@@ -234,7 +234,7 @@ public class DictionaryTests
         var code = @"
             user <- {""id"": 123, ""username"": ""alice"", ""email"": ""alice@example.com"", ""active"": true}
             keys <- user.Keys
-            result1 <- keys.Length
+            result1 <- len(keys)
             result2 <- keys.Contains(""username"")
             result3 <- keys.Contains(""password"")
         ";
@@ -269,7 +269,7 @@ public class DictionaryTests
         var code = @"
             grades <- {""math"": 95, ""science"": 87, ""history"": 92, ""english"": 88}
             values <- grades.Values
-            result1 <- values.Length
+            result1 <- len(values)
             result2 <- values.Contains(95)
             result3 <- values.Contains(100)
         ";
@@ -648,9 +648,9 @@ public class DictionaryTests
                 ""mixed"": {1, ""two"", true, 4.0}
             }
 
-            result1 <- data[""numbers""].Length
-            result2 <- data[""strings""].Length
-            result3 <- data[""mixed""].Length
+            result1 <- len(data[""numbers""])
+            result2 <- len(data[""strings""])
+            result3 <- len(data[""mixed""])
             result4 <- data[""numbers""][2]
             result5 <- data[""strings""][0]
         ";

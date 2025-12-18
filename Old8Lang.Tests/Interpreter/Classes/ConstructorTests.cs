@@ -337,7 +337,7 @@ public class ConstructorTests
             }
 
             logger <- Logger()
-            resultCount <- logger.logs.Length
+            resultCount <- logger.len(logs)
             resultMessage <- logger.logs[0]
         ";
         var interpreter = new LangInterpreter();
@@ -378,7 +378,7 @@ public class ConstructorTests
 
             stats <- Statistics([1, 2, 3, 4, 5])
             resultSum <- stats.sum
-            resultCount <- stats.numbers.Length
+            resultCount <- stats.len(numbers)
         ";
         var interpreter = new LangInterpreter();
 

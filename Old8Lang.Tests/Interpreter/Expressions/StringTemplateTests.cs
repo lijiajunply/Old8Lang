@@ -106,7 +106,7 @@ public class StringTemplateTests
         // Arrange
         var code = @"
             name <- ""David""
-            result <- $""Hello {{name}}, your score is {name.ToStr().Length}!""
+            result <- $""Hello {{name}}, your score is {len(name.ToStr())}!""
         ";
         var interpreter = new LangInterpreter();
 
