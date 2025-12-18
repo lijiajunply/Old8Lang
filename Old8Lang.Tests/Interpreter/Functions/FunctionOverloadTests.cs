@@ -166,35 +166,36 @@ public class FunctionOverloadTests
     public void FunctionOverload_WithArrays_OverloadsArrayParameters()
     {
         // Arrange
-        var code = @"
-            func sum(numbers:array) -> int {
-                total <- 0
-                for num in numbers {
-                    total <- total + num
-                }
-                return total
-            }
-            func sum(numbers:array) -> double {
-                total <- 0.0
-                for num in numbers {
-                    total <- total + num
-                }
-                return total
-            }
-            func sum(numbers:array) -> string {
-                result <- """"
-                for str in numbers {
-                    result <- result + str
-                }
-                return result
-            }
-            intArray <- [1, 2, 3, 4, 5]
-            doubleArray <- [1.1, 2.2, 3.3]
-            stringArray <- [""A"", ""B"", ""C""]
-            result1 <- sum(intArray)
-            result2 <- sum(doubleArray)
-            result3 <- sum(stringArray)
-        ";
+        var code = """
+                               func sum(numbers:array) -> int {
+                                   total <- 0
+                                   for num in numbers {
+                                       total <- total + num
+                                   }
+                                   return total
+                               }
+                               func sum(numbers:array) -> double {
+                                   total <- 0.0
+                                   for num in numbers {
+                                       total <- total + num
+                                   }
+                                   return total
+                               }
+                               func sum(numbers:array) -> string {
+                                   result <- ""
+                                   for str in numbers {
+                                       result <- result + str
+                                   }
+                                   return result
+                               }
+                               intArray <- [1, 2, 3, 4, 5]
+                               doubleArray <- [1.1, 2.2, 3.3]
+                               stringArray <- ["A", "B", "C"]
+                               result1 <- sum(intArray)
+                               result2 <- sum(doubleArray)
+                               result3 <- sum(stringArray)
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act

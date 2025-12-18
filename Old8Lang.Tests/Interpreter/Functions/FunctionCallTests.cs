@@ -360,7 +360,14 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
     {
         // Arrange
         var code = @"
-            func processNumbers(transformer:function, numbers:list) -> list {
+            func processNumbers1(transformer:function, numbers:list) -> list {
+                result <- {}
+                for num in numbers {
+                    result.Add(transformer(num))
+                }
+                return result
+            }
+            func processNumbers2(transformer:function, numbers:list) -> list {
                 result <- {}
                 for num in numbers {
                     result.Add(transformer(num))
@@ -368,8 +375,8 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
                 return result
             }
             nums <- {1, 2, 3, 4, 5}
-            doubled <- processNumbers((x:int) -> x * 2, nums)
-            squared <- processNumbers((x:int) -> x * x, nums)
+            doubled <- processNumbers1((x:int) -> x * 2, nums)
+            squared <- processNumbers2((x:int) -> x * x, nums)
             result1 <- doubled[2]
             result2 <- squared[3]
         ";
