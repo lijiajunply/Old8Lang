@@ -2,6 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 
 namespace Old8Lang.AST.Expression.Value;
@@ -33,7 +34,7 @@ public class ListLangValue : LangValueType, ILangList
         Value = [];
     }
 
-    public override LangValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(VariateManager manager)
     {
         // 只有当Values为空且Value中有表达式时才需要执行
         if (Values.Count == 0 && Value.Count > 0)
@@ -78,7 +79,7 @@ public class ListLangValue : LangValueType, ILangList
                         // 创建类型值用于转换
                         var targetType = new TypeLangValue(existingType);
                         // 调用 Converse 方法进行类型转换
-                        convertedValue = value.Converse(targetType, new LangParser.VariateManager());
+                        convertedValue = value.Converse(targetType, new VariateManager());
                     }
                     catch (Exception e)
                     {
@@ -116,7 +117,7 @@ public class ListLangValue : LangValueType, ILangList
         // 如果是其他类型的表达式，尝试将其作为索引
         if (dotExpression is not Instance)
         {
-            var tempManager = new LangParser.VariateManager();
+            var tempManager = new VariateManager();
             var result = dotExpression.Run(tempManager);
 
             if (result is IntLangValue idx)
@@ -251,7 +252,7 @@ public class ListLangValue : LangValueType, ILangList
         return typeof(List<>).MakeGenericType(itemType ?? typeof(object));
     }
 
-    public override LangValueType Converse(LangValueType otherLangValueType, LangParser.VariateManager manager)
+    public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)
     {
         if (otherLangValueType is not TypeLangValue value)
             throw new TypeError(this, "TypeValue", otherLangValueType.GetType().Name);

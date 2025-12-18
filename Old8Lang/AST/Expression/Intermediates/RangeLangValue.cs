@@ -2,6 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
@@ -14,7 +15,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 public class RangeLangValue(LangExpression? start, LangExpression? end, SourcePosition position = default) : LangValueType(position)
 {
     
-    public override LangValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(VariateManager manager)
     {
         var results = new List<LangValueType>();
 

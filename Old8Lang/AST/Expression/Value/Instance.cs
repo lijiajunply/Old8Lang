@@ -5,6 +5,7 @@ using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.ValueFunctions;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -20,7 +21,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
     public readonly List<LangExpression> Ids = ids;
     public readonly LangId Id = langId;
 
-    public override LangValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(VariateManager manager)
     {
         LangValueType result;
         var results = Ids.Select(t => t.Run(manager)).ToList();

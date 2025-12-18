@@ -1,5 +1,6 @@
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST;
 
@@ -17,7 +18,7 @@ public abstract class OldStatement : IOldLangTree
         Position = position;
     }
     
-    public abstract void Run(LangParser.VariateManager manager);
+    public abstract void Run(VariateManager manager);
 
     public abstract void GenerateIl(ILGenerator ilGenerator, LocalManager local);
 

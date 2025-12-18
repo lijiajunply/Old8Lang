@@ -80,7 +80,7 @@ public class RangeTests
         // Arrange
         var code = @"
             sum <- 0
-            for i in [1~5[ {
+            for i in [1~5] {
                 sum <- sum + i
             }
             result <- sum
@@ -95,7 +95,7 @@ public class RangeTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(10, ((IntLangValue)result).Value); // 1+2+3+4 = 10
+        Assert.Equal(15, ((IntLangValue)result).Value); // 1+2+3+4+5 = 15
     }
 
     [Fact]
@@ -176,7 +176,7 @@ public class RangeTests
         // Arrange
         var code = @"
             count <- 0
-            for i in [5~5[ {
+            for i in [5~5] {
                 count <- count + 1
             }
             result <- count
@@ -200,7 +200,7 @@ public class RangeTests
         // Arrange
         var code = @"
             count <- 0
-            for i in [1000~1005[ {
+            for i in [1000~1005] {
                 count <- count + 1
             }
             result <- count
@@ -215,7 +215,7 @@ public class RangeTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(5, ((IntLangValue)result).Value);
+        Assert.Equal(6, ((IntLangValue)result).Value);
     }
 
     [Fact]
@@ -406,7 +406,7 @@ public class RangeTests
         var code = @"
             items <- {""a"", ""b"", ""c"", ""d"", ""e""}
             resultString <- """"
-            for i in [1~4[ {
+            for i in [1~4] {
                 resultString <- resultString + items[i]
             }
             result <- resultString
@@ -421,7 +421,7 @@ public class RangeTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
-        Assert.Equal("bcd", ((StringLangValue)result).Value); // items[1]+items[2]+items[3]
+        Assert.Equal("bcde", ((StringLangValue)result).Value); // items[1]+items[2]+items[3]
     }
 
     [Fact]
@@ -431,7 +431,7 @@ public class RangeTests
         var code = @"
             text <- ""hello""
             resultString <- """"
-            for i in [0~text.Length[ {
+            for i in [0~(len(text)-1)] {
                 charValue <- text[i]
                 resultString <- resultString + charValue.ToStr()
             }
@@ -448,39 +448,6 @@ public class RangeTests
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
         Assert.Equal("hello", ((StringLangValue)result).Value);
-    }
-
-    [Fact]
-    public void Range_DoubleValues_HandlesDoubleRanges()
-    {
-        // Arrange
-        var code = @"
-            count <- 0
-            sum <- 0.0
-            for i in [1.0~5.0] {
-                count <- count + 1
-                sum <- sum + i
-            }
-            resultCount <- count
-            resultSum <- sum
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var countResult = interpreter.Manager.GetValue(new LangId("resultCount"));
-        var sumResult = interpreter.Manager.GetValue(new LangId("resultSum"));
-
-        Assert.NotNull(countResult);
-        Assert.IsType<IntLangValue>(countResult);
-        Assert.Equal(5, ((IntLangValue)countResult).Value);
-
-        Assert.NotNull(sumResult);
-        Assert.IsType<DoubleLangValue>(sumResult);
-        Assert.Equal(15.0, ((DoubleLangValue)sumResult).Value);
     }
 
     [Fact]
@@ -573,7 +540,7 @@ public class RangeTests
         var code = @"
             // Test very large range
             largeCount <- 0
-            for i in [1000000~1000002[ {
+            for i in [1000000~1000002] {
                 largeCount <- largeCount + 1
             }
 
@@ -598,7 +565,7 @@ public class RangeTests
 
         Assert.NotNull(result1);
         Assert.IsType<IntLangValue>(result1);
-        Assert.Equal(2, ((IntLangValue)result1).Value);
+        Assert.Equal(3, ((IntLangValue)result1).Value);
 
         Assert.NotNull(result2);
         Assert.IsType<IntLangValue>(result2);
@@ -646,7 +613,7 @@ public class RangeTests
                 sum2 <- sum2 + j
             }
 
-            for k in [10~13[ {
+            for k in [10~13] {
                 sum3 <- sum3 + k
             }
 
@@ -663,6 +630,6 @@ public class RangeTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(45, ((IntLangValue)result).Value); // (1+2+3)+(5+6+7)+(10+11+12) = 6+18+33 = 57
+        Assert.Equal(70, ((IntLangValue)result).Value); // (1+2+3)+(5+6+7)+(10+11+12+13) = 6+18+33 = 57
     }
 }

@@ -1,5 +1,6 @@
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -57,7 +58,7 @@ public class TypeTemplate(
     /// <param name="manager">变量管理器，用于获取父类、mixin和接口信息</param>
     /// <param name="type">当前类型模板</param>
     /// <param name="allVariates">用于存储所有成员的字典</param>
-    private void GetAllParentMembers(LangParser.VariateManager manager, TypeTemplate type,
+    private void GetAllParentMembers(VariateManager manager, TypeTemplate type,
         Dictionary<ClassMemberId, LangExpression> allVariates)
     {
         // 如果有父类，递归获取父类的所有成员
@@ -117,7 +118,7 @@ public class TypeTemplate(
     /// </summary>
     /// <param name="manager">变量管理器，用于获取父类信息</param>
     /// <returns>类的实例</returns>
-    public AnyLangValue CreateInstance(LangParser.VariateManager manager)
+    public AnyLangValue CreateInstance(VariateManager manager)
     {
         // 合并所有祖先类和子类的成员
         var allVariates = new Dictionary<ClassMemberId, LangExpression>();
@@ -137,7 +138,7 @@ public class TypeTemplate(
         return instance;
     }
 
-    public override LangValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(VariateManager manager)
     {
         return this;
     }
@@ -148,7 +149,7 @@ public class TypeTemplate(
     /// <param name="right">要访问的成员或方法</param>
     /// <param name="manager">变量管理器</param>
     /// <returns>访问结果</returns>
-    public LangValueType Dot(LangExpression right, LangParser.VariateManager manager)
+    public LangValueType Dot(LangExpression right, VariateManager manager)
     {
         return right switch
         {
@@ -164,7 +165,7 @@ public class TypeTemplate(
     /// <param name="id">成员名称</param>
     /// <param name="manager">变量管理器</param>
     /// <returns>成员值</returns>
-    private LangValueType GetStaticMember(LangId id, LangParser.VariateManager manager)
+    private LangValueType GetStaticMember(LangId id, VariateManager manager)
     {
         // 查找实际的 ClassMemberId（包含修饰符信息）
         ClassMemberId? actualMemberId = null;
@@ -235,7 +236,7 @@ public class TypeTemplate(
     /// <param name="instance">方法调用实例</param>
     /// <param name="manager">变量管理器</param>
     /// <returns>方法调用结果</returns>
-    private LangValueType CallStaticMethod(Instance instance, LangParser.VariateManager manager)
+    private LangValueType CallStaticMethod(Instance instance, VariateManager manager)
     {
         // 查找静态方法
         foreach (var (key, value) in StaticVariates)

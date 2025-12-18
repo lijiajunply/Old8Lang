@@ -1,6 +1,7 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
@@ -12,7 +13,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 public class StringTreeList(List<LangExpression> list, SourcePosition position = default) : LangValueType(position)
 {
 
-    public override LangValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(VariateManager manager)
     {
         var result = list.Select(item => item.Run(manager)).Aggregate(string.Empty,
             (current, exprResult) => current + exprResult.ToDisplayString());

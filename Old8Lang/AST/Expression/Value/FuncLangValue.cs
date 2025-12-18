@@ -5,6 +5,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -149,7 +150,7 @@ public class FuncLangValue : ImportInfo
             {
                 if (i < paramValues.Count)
                 {
-                    generatorManager.Set(Ids[i], paramValues[i]);
+                    generatorManager.SetParameter(Ids[i], paramValues[i]);
                 }
             }
         }
@@ -441,9 +442,10 @@ public class FuncLangValue : ImportInfo
                 }
 
                 // 然后将所有参数值（包括默认参数）设置到函数的变量管理器中
+                // 使用SetParameter确保参数在当前作用域中创建新变量，保持递归调用中的独立性
                 for (var i = 0; i < Ids.Count; i++)
                 {
-                    executionManager.Set(Ids[i], paramValues[i]);
+                    executionManager.SetParameter(Ids[i], paramValues[i]);
                 }
             }
 

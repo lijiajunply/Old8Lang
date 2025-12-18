@@ -2,6 +2,7 @@ using Old8Lang.Error;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using System.Reflection.Emit;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression;
 
@@ -34,7 +35,7 @@ public class FunctionCallExpression : LangExpression
         Arguments = arguments;
     }
 
-    public override LangValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(VariateManager manager)
     {
         // 1. 运行函数表达式获取函数对象
         var functionValue = FunctionExpression.Run(manager);

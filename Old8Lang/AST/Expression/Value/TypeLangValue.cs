@@ -1,6 +1,7 @@
 using Old8Lang.Error;
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -15,7 +16,7 @@ public class TypeLangValue : LangValueType
     public TypeLangValue(LangExpression expression) => Expression = expression;
     public TypeLangValue(string value) => Value = value;
 
-    public override LangValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(VariateManager manager)
     {
         var result = Expression?.Run(manager);
         if (result == null) throw new InvalidOperationError(this, "类型表达式求值失败");

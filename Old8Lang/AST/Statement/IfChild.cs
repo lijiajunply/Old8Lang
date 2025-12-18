@@ -1,6 +1,7 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Statement;
 
@@ -8,7 +9,7 @@ public class IfChild(LangExpression expression, BlockStatement blockStatement, S
     : OldStatement(position)
 {
     
-    public void Run(LangParser.VariateManager manager, ref bool r)
+    public void Run(VariateManager manager, ref bool r)
     {
         if (!r) return;
         var exprValue = expression.Run(manager);
@@ -19,7 +20,7 @@ public class IfChild(LangExpression expression, BlockStatement blockStatement, S
 
     public override string ToString() => $"{expression}\n {{ {blockStatement} }}";
 
-    public override void Run(LangParser.VariateManager manager)
+    public override void Run(VariateManager manager)
     {
         blockStatement.Run(manager);
     }

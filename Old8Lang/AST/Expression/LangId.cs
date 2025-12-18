@@ -2,6 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression;
 
@@ -76,7 +77,7 @@ public class LangId(
     /// 3. 如果不是普通变量，尝试获取类或函数
     /// 4. 如果都没有找到，抛出NameError异常
     /// </remarks>
-    public override LangValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(VariateManager manager)
     {
         if (IdName == "this")
         {

@@ -1,6 +1,7 @@
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 
 namespace Old8Lang.AST.Expression.Value;
@@ -18,7 +19,7 @@ public class LangListItem(LangId listId, LangExpression key, SourcePosition posi
     public readonly LangExpression Key = key;
 
 
-    public override LangValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(VariateManager manager)
     {
         var a = manager.GetValue(ListId);
         LangExpression result = Key.Run(manager);

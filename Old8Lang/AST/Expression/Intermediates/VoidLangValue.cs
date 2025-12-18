@@ -1,6 +1,7 @@
 using Old8Lang.Error;
 using System.Reflection.Emit;
 using Old8Lang.Compiler;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
@@ -13,7 +14,7 @@ public class VoidLangValue(SourcePosition position = default) : LangValueType(po
 
     public override object GetValue() => throw new InvalidOperationError(this, "尝试访问无效值（VoidValue）");
 
-    public override LangValueType Run(LangParser.VariateManager manager) => this;
+    public override LangValueType Run(VariateManager manager) => this;
 
     public override string ToString() => ""; // VoidValue 转换为字符串时返回空字符串，而不是抛出异常
 

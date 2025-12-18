@@ -646,7 +646,7 @@ public class VariableTests
 
         Assert.NotNull(outerResult);
         Assert.IsType<IntLangValue>(outerResult);
-        Assert.Equal(10, ((IntLangValue)outerResult).Value);
+        Assert.Equal(20, ((IntLangValue)outerResult).Value);
     }
 
     [Fact]

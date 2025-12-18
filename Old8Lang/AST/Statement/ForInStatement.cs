@@ -6,6 +6,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Statement;
 
@@ -56,18 +57,11 @@ public class ForInStatement(
                         // 使用generator.NextValue作为当前值
                         var currentValue = generator.NextValue;
 
-                        if (currentValue != null && !(currentValue is VoidLangValue))
+                        if (currentValue != null && currentValue is not VoidLangValue)
                         {
                             // 赋值给标识符
-                            if (AllIds.Count == 1)
-                            {
-                                manager.Set(id, currentValue);
-                            }
-                            else
-                            {
-                                // 多个标识符的情况，只赋值给第一个
-                                manager.Set(id, currentValue);
-                            }
+                            // 多个标识符的情况，只赋值给第一个
+                            manager.Set(id, currentValue);
 
                             // 执行循环体
                             body.Run(manager);
@@ -105,7 +99,7 @@ public class ForInStatement(
                             // 字典键值对，赋值给多个标识符
                             var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
 
-                            for (int i = 0; i < AllIds.Count && i < values.Count; i++)
+                            for (var i = 0; i < AllIds.Count && i < values.Count; i++)
                             {
                                 manager.Set(AllIds[i], values[i]);
                             }

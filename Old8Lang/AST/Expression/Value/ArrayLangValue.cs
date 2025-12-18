@@ -2,6 +2,7 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -29,7 +30,7 @@ public class ArrayLangValue : LangValueType, ILangList
     public ArrayLangValue(List<object> a, SourcePosition position = default) : base(position) =>
         RunResult = [.. a.Select(ObjToValue)];
 
-    public override LangValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(VariateManager manager)
     {
         for (var i = 0; i < Values.Count; i++)
             RunResult[i] = Values[i].Run(manager);
@@ -62,7 +63,7 @@ public class ArrayLangValue : LangValueType, ILangList
                         // 创建类型值用于转换
                         var targetType = new TypeLangValue(existingType);
                         // 调用 Converse 方法进行类型转换
-                        convertedValue = value.Converse(targetType, new LangParser.VariateManager());
+                        convertedValue = value.Converse(targetType, new VariateManager());
                     }
                     catch (Exception e)
                     {
@@ -89,7 +90,7 @@ public class ArrayLangValue : LangValueType, ILangList
                             // 创建类型值用于转换
                             var targetType = new TypeLangValue(existingType);
                             // 调用 Converse 方法进行类型转换
-                            convertedValue = value.Converse(targetType, new LangParser.VariateManager());
+                            convertedValue = value.Converse(targetType, new VariateManager());
                         }
                         catch (Exception e)
                         {
@@ -137,7 +138,7 @@ public class ArrayLangValue : LangValueType, ILangList
 
         // 如果是其他类型的表达式，尝试将其作为索引（可能需要运行表达式）
         // 这里需要一个 manager，但我们没有，所以使用一个临时的
-        var tempManager = new LangParser.VariateManager();
+        var tempManager = new VariateManager();
         var result = dotExpression.Run(tempManager);
 
         if (result is IntLangValue idx)
@@ -230,7 +231,7 @@ public class ArrayLangValue : LangValueType, ILangList
 
     public override Type OutputType(LocalManager local) => typeof(object[]);
 
-    public override LangValueType Converse(LangValueType otherLangValueType, LangParser.VariateManager manager)
+    public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)
     {
         if (otherLangValueType is not TypeLangValue value)
             throw new TypeError(this, "TypeValue", otherLangValueType.GetType().Name);

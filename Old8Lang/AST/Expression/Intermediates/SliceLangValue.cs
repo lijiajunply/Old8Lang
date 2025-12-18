@@ -1,4 +1,5 @@
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
@@ -11,7 +12,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 public class SliceLangValue(LangId id, LangExpression? start = null, LangExpression? end = null) : LangValueType
 {
     
-    public override LangValueType Run(LangParser.VariateManager manager)
+    public override LangValueType Run(VariateManager manager)
     {
         var value = id.Run(manager);
         var start1 = start?.Run(manager);
