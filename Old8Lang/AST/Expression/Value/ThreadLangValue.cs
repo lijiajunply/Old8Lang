@@ -282,8 +282,9 @@ public class ThreadLangValue : LangValueType
     /// 其他方法调用委托给基类，由基类处理扩展方法
     /// </summary>
     /// <param name="dotExpression">点表达式</param>
+    /// <param name="manager">变量管理器</param>
     /// <returns>方法调用结果</returns>
-    public override LangValueType Dot(LangExpression dotExpression)
+    public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
         // 处理 Join 方法调用
         if (dotExpression is Instance { Id.IdName: "Join" } instance)
@@ -326,7 +327,7 @@ public class ThreadLangValue : LangValueType
         }
 
         // 其他情况（包括扩展方法如 Then、WithTimeout、Retry）调用基类方法
-        return base.Dot(dotExpression);
+        return base.Dot(dotExpression, manager);
     }
 
     /// <summary>

@@ -48,7 +48,7 @@ public class TaskClassLangValue : LangValueType
     /// </summary>
     public VariateManager? ExternalManager { get; set; }
 
-    public override LangValueType Dot(LangExpression dotExpression)
+    public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
         // 处理 Task.WhenAll(...) 形式的调用
         if (dotExpression is Instance instance)
@@ -71,8 +71,8 @@ public class TaskClassLangValue : LangValueType
                 throw new AttributeError(dotExpression.Position, methodName, "Task");
             }
 
-            // 使用 ExternalManager 执行参数
-            var currentManager = ExternalManager ?? throw new InvalidOperationError(dotExpression.Position, "未设置外部管理器");
+            // 使用 ExternalManager 或传入的 manager 执行参数
+            var currentManager = ExternalManager ?? manager;
             var args = instance.Ids.Select(id => id.Run(currentManager)).ToList();
             return method(args, instance.Position);
         }

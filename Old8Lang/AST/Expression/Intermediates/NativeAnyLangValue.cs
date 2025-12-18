@@ -22,7 +22,7 @@ public class NativeAnyLangValue(string dllName, string className, string path, s
 
     private VariateManager Manager = new();
 
-    public override LangValueType Dot(LangExpression dotExpression)
+    public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
         if (dotExpression is LangId id)
         {

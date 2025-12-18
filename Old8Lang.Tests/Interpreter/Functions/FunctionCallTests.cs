@@ -192,7 +192,7 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
     {
         // Arrange
         var code = @"
-            func sum(numbers:[int]) -> int {
+            func sum(numbers:array) -> int {
                 total <- 0
                 for num in numbers {
                     total <- total + num
@@ -289,7 +289,7 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
     {
         // Arrange
         var code = @"
-            func getFirst(tuple:Tuple) -> any {
+            func getFirst(tuple:tuple) {
                 if len(tuple) > 0 {
                     return tuple[0]
                 } else {
@@ -451,7 +451,7 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
     {
         // Arrange
         var code = @"
-            func findFirstNegative(numbers:[int]) -> int {
+            func findFirstNegative(numbers:array) -> int {
                 for num in numbers {
                     if num < 0 {
                         return num

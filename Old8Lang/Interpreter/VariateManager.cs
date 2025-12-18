@@ -568,6 +568,9 @@ public class VariateManager
     /// <returns>找到的函数（FuncLangValue或AsyncFuncLangValue）或null</returns>
     public ImportInfo? GetFunc(LangId id, int paramCount)
     {
+        // 注意：这个方法只比较函数名和参数数量，不比较参数类型
+        // 在解释模式下，参数类型是在运行时确定的，所以无法在调用前选择正确的重载函数
+        // 这里返回第一个匹配的函数，具体的重载解析需要在函数调用时进行
         return ImportInfos.FirstOrDefault(x =>
             (x is FuncLangValue func && func.Id!.IdName == id.IdName && func.Ids?.Count == paramCount) ||
             (x is AsyncFuncLangValue asyncFunc && asyncFunc.Id!.IdName == id.IdName &&

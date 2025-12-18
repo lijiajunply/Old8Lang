@@ -82,6 +82,11 @@ public class LangId(
         if (IdName == "this")
         {
             // 直接从变量储存器中获取名为"this"的变量
+            if (manager == null)
+            {
+                throw new NameError(this, "this");
+            }
+            
             var thisValue = manager.GetValue(new LangId("this"));
             if (thisValue != null)
             {
@@ -93,17 +98,20 @@ public class LangId(
         }
 
         // 先尝试获取普通变量
-        var value = manager.GetValue(this);
-        if (value != null)
+        if (manager != null)
         {
-            return value;
-        }
+            var value = manager.GetValue(this);
+            if (value != null)
+            {
+                return value;
+            }
 
-        // 如果不是普通变量，尝试获取类或函数
-        var anyValue = manager.GetAny(this);
-        if (anyValue != null)
-        {
-            return anyValue as LangValueType ?? throw new NameError(this, IdName);
+            // 如果不是普通变量，尝试获取类或函数
+            var anyValue = manager.GetAny(this);
+            if (anyValue != null)
+            {
+                return anyValue as LangValueType ?? throw new NameError(this, IdName);
+            }
         }
 
         // 如果都没有找到，检查是否是类型关键字

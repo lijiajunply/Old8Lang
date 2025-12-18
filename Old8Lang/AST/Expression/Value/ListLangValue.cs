@@ -108,7 +108,7 @@ public class ListLangValue : LangValueType, ILangList
     public override string ToString() =>
         "[" + string.Join(", ", Values) + "]"; // Old8Lang 风格的列表，使用 [ ] 包裹
 
-    public override LangValueType Dot(LangExpression dotExpression)
+    public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
         // 先检查是否是索引访问
         if (dotExpression is IntLangValue intValue)
@@ -119,8 +119,7 @@ public class ListLangValue : LangValueType, ILangList
         // 如果是其他类型的表达式，尝试将其作为索引
         if (dotExpression is not Instance)
         {
-            var tempManager = new VariateManager();
-            var result = dotExpression.Run(tempManager);
+            var result = dotExpression.Run(manager);
 
             if (result is IntLangValue idx)
             {

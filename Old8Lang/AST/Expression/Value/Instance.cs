@@ -248,69 +248,197 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             }
         }
 
-        // 先尝试根据函数名和参数数量查找重载函数
-        var func = manager.GetFunc(Id, Ids.Count);
-        if (func != null)
+        // 获取所有可能的匹配函数（函数名和参数数量匹配）
+        var matchingFuncs = manager.ImportInfos
+            .Where(x => (x is FuncLangValue func && func.Id!.IdName == Id.IdName && func.Ids?.Count == Ids.Count)
+                       || (x is AsyncFuncLangValue asyncFunc && asyncFunc.Id!.IdName == Id.IdName && asyncFunc.Ids?.Count == Ids.Count))
+            .ToList();
+
+        if (matchingFuncs.Count > 0)
         {
-            // 检查是否为异步函数
-            if (func is AsyncFuncLangValue asyncFunc)
+            // 计算参数的实际值和类型
+            var paramValues = Ids.Select(t => t.Run(manager)).ToList();
+
+            // 查找最匹配的函数
+            object? bestMatch = null;
+            bool foundExactMatch = false;
+
+            foreach (var func in matchingFuncs)
             {
-                // 先调用 Run() 捕获闭包（可能返回AsyncFuncLangValue或AsyncGeneratorLangValue）
-                var closedFunc = asyncFunc.Run(manager);
-
-                // 如果是异步生成器，需要设置参数
-                if (closedFunc is AsyncGeneratorLangValue asyncGen)
+                if (func is FuncLangValue funcValue && funcValue.Ids != null)
                 {
-                    // 计算参数值
-                    var paramValues = Ids.Select(t => t.Run(manager)).ToList();
+                    bool isMatch = true;
+                    bool isExactMatch = true;
 
-                    // 处理默认参数，补全缺失的参数值
-                    if (asyncFunc.Ids is { Count: > 0 })
+                    // 检查每个参数的类型是否匹配
+                    for (int i = 0; i < funcValue.Ids.Count; i++)
                     {
-                        for (var i = paramValues.Count; i < asyncFunc.Ids.Count; i++)
+                        var paramType = funcValue.Ids[i].AssumptionType;
+                        var argValue = paramValues[i];
+
+                        // 如果参数没有类型注解，视为匹配
+                        if (string.IsNullOrEmpty(paramType))
                         {
-                            var id = asyncFunc.Ids[i];
-                            if (id.DefaultValue != null)
+                            isExactMatch = false;
+                            continue;
+                        }
+
+                        // 检查参数类型是否匹配
+                        string argTypeName = argValue.GetType().Name;
+                        if (argTypeName.StartsWith(paramType, StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+
+                        // 类型不匹配
+                        isMatch = false;
+                        break;
+                    }
+
+                    if (isMatch)
+                    {
+                        if (isExactMatch)
+                        {
+                            // 找到精确匹配，直接使用
+                            bestMatch = funcValue;
+                            foundExactMatch = true;
+                            break;
+                        }
+                        else if (bestMatch == null)
+                        {
+                            // 记录第一个匹配的函数
+                            bestMatch = funcValue;
+                        }
+                    }
+                }
+                else if (func is AsyncFuncLangValue asyncFuncValue)
+                {
+                    // 异步函数暂时只检查数量
+                    bestMatch = asyncFuncValue;
+                    break;
+                }
+            }
+
+            // 如果找到匹配的函数，调用它
+            if (bestMatch != null)
+            {
+                if (bestMatch is AsyncFuncLangValue asyncFunc)
+                {
+                    // 先调用 Run() 捕获闭包（可能返回AsyncFuncLangValue或AsyncGeneratorLangValue）
+                    var closedFunc = asyncFunc.Run(manager);
+
+                    // 如果是异步生成器，需要设置参数
+                    if (closedFunc is AsyncGeneratorLangValue asyncGen)
+                    {
+                        // 计算参数值
+                        var paramValuesCopy = Ids.Select(t => t.Run(manager)).ToList();
+
+                        // 处理默认参数，补全缺失的参数值
+                        if (asyncFunc.Ids is { Count: > 0 })
+                        {
+                            for (var i = paramValuesCopy.Count; i < asyncFunc.Ids.Count; i++)
                             {
-                                var defaultValue = id.DefaultValue.Run(manager);
-                                paramValues.Add(defaultValue);
+                                var id = asyncFunc.Ids[i];
+                                if (id.DefaultValue != null)
+                                {
+                                    var defaultValue = id.DefaultValue.Run(manager);
+                                    paramValuesCopy.Add(defaultValue);
+                                }
                             }
                         }
-                    }
 
-                    // 将参数值设置到异步生成器
-                    if (asyncFunc.Ids is { Count: > 0 })
-                    {
-                        for (var i = 0; i < asyncFunc.Ids.Count; i++)
+                        // 将参数值设置到异步生成器
+                        if (asyncFunc.Ids is { Count: > 0 })
                         {
-                            var paramId = asyncFunc.Ids[i];
-                            var paramValue = paramValues[i];
-                            asyncGen.SetParameter(paramId.IdName, paramValue);
+                            for (var i = 0; i < asyncFunc.Ids.Count; i++)
+                            {
+                                var paramId = asyncFunc.Ids[i];
+                                var paramValue = paramValuesCopy[i];
+                                asyncGen.SetParameter(paramId.IdName, paramValue);
+                            }
                         }
-                    }
 
-                    result = asyncGen;
+                        result = asyncGen;
+                    }
+                    else if (closedFunc is AsyncFuncLangValue closedAsyncFunc)
+                    {
+                        // 如果是异步函数，调用 RunAsync()
+                        result = closedAsyncFunc.RunAsync(manager, Ids);
+                    }
+                    else
+                    {
+                        // 不应该到达这里
+                        result = closedFunc;
+                    }
                 }
-                else if (closedFunc is AsyncFuncLangValue closedAsyncFunc)
+                else if (bestMatch is FuncLangValue funcValue)
                 {
-                    // 如果是异步函数，调用 RunAsync()
-                    result = closedAsyncFunc.RunAsync(manager, Ids);
+                    // 找到匹配的重载函数，直接调用
+                    result = funcValue.Run(manager, Ids);
                 }
                 else
                 {
-                    // 不应该到达这里
-                    result = closedFunc;
+                    // 其他类型的 ImportInfo，使用单参数 Run
+                    result = ((ImportInfo)bestMatch).Run(manager);
                 }
-            }
-            else if (func is FuncLangValue funcValue)
-            {
-                // 找到匹配的重载函数，直接调用
-                result = funcValue.Run(manager, Ids);
             }
             else
             {
-                // 其他类型的 ImportInfo，使用单参数 Run
-                result = func.Run(manager);
+                // 没有找到匹配的函数，使用原来的方式查找
+                var idResult = Id.Run(manager);
+                result = idResult;
+
+                // 后续处理...
+                if (idResult is TypeTemplate typeTemplate)
+                {
+                    // 创建类的实例
+                    var instance = typeTemplate.CreateInstance(manager);
+
+                    // 初始化实例，设置Interpreter
+                    instance.Init(manager.Interpreter);
+
+                    // 保存init方法的引用
+                    if (instance.Result.TryGetValue("init", out var initResult))
+                    {
+                        if (initResult is not FuncLangValue initFunc) throw new TypeError(this, "FuncValue", "init 不是函数类型");
+
+                        // 在调用init方法前，将当前实例添加到AnyInfo中，以便this关键字访问
+                        instance.Manager.Set(new LangId("this"), instance);
+                        instance.Manager.IsFunc = true; // 设置为函数上下文
+
+                        // 调用init方法，并将参数传递给它
+                        initFunc.Run(instance.Manager, Ids);
+
+                        // 恢复非函数上下文标志
+                        instance.Manager.IsFunc = false;
+                    }
+                    else if (Ids.Count != 0)
+                    {
+                        throw new InvalidOperationError(this, "找不到对应的init函数");
+                    }
+
+                    result = instance;
+                }
+                // 如果idResult是FuncLangValue，则调用它
+                else if (idResult is FuncLangValue funcValue)
+                {
+                    // 直接调用函数，参数表达式会在函数体内执行
+                    result = funcValue.Run(manager, Ids);
+                }
+                // 如果idResult是AsyncFuncLangValue，则调用它
+                else if (idResult is AsyncFuncLangValue asyncFuncValue)
+                {
+                    // 先调用 Run() 捕获闭包，然后调用返回的副本的 RunAsync()
+                    var closedAsyncFunc = (AsyncFuncLangValue)asyncFuncValue.Run(manager);
+                    result = closedAsyncFunc.RunAsync(manager, Ids);
+                }
+                // 如果idResult是TaskStaticMethodWrapper，则调用它
+                else if (idResult is TaskStaticMethodWrapper taskMethodWrapper)
+                {
+                    // 执行静态方法
+                    var args = Ids.Select(id => id.Run(manager)).ToList();
+                    result = taskMethodWrapper.Invoke(args, Position);
+                }
             }
         }
         else

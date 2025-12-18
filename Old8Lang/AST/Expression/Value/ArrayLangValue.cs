@@ -128,7 +128,7 @@ public class ArrayLangValue : LangValueType, ILangList
     }
 
     // 覆盖 Dot 方法以支持嵌套索引访问，如 array[0][0]
-    public override LangValueType Dot(LangExpression dotExpression)
+    public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
         // 如果 dotExpression 是一个整数值或可以转换为整数的表达式，则视为索引访问
         if (dotExpression is IntLangValue intValue)
@@ -137,9 +137,7 @@ public class ArrayLangValue : LangValueType, ILangList
         }
 
         // 如果是其他类型的表达式，尝试将其作为索引（可能需要运行表达式）
-        // 这里需要一个 manager，但我们没有，所以使用一个临时的
-        var tempManager = new VariateManager();
-        var result = dotExpression.Run(tempManager);
+        var result = dotExpression.Run(manager);
 
         if (result is IntLangValue idx)
         {
@@ -147,7 +145,7 @@ public class ArrayLangValue : LangValueType, ILangList
         }
 
         // 如果不是索引访问，调用父类的 Dot 方法（会报错）
-        return base.Dot(dotExpression);
+        return base.Dot(dotExpression, manager);
     }
 
     // 覆盖 Equal 方法以支持数组深度比较

@@ -139,7 +139,7 @@ public class Operation(
             {
                 // 设置外部管理器，确保访问控制能够正确识别这是内部访问
                 anyValue.ExternalManager = manager;
-                return anyValue.Dot(Right);
+                return anyValue.Dot(Right, manager);
             }
 
             throw new NameError(Left, "this");
@@ -186,14 +186,14 @@ public class Operation(
                     var newInstance = new Instance(r1.Id, ids, r1.Position);
                     // 设置外部管理器，确保能访问最新的外部变量
                     any.ExternalManager = manager;
-                    return any.Dot(newInstance);
+                    return any.Dot(newInstance, manager);
                 }
 
                 if (Right != null)
                 {
                     // 设置外部管理器，确保能访问最新的外部变量
                     any.ExternalManager = manager;
-                    return any.Dot(Right);
+                    return any.Dot(Right, manager);
                 }
             }
             else if (dotLeftResult is ListLangValue list)
@@ -202,7 +202,7 @@ public class Operation(
                 {
                     var ids = instance.Ids.Select(x => x.Run(manager)).OfType<LangExpression>().ToList();
                     var newInstance = new Instance(instance.Id, ids);
-                    return list.Dot(newInstance);
+                    return list.Dot(newInstance, manager);
                 }
 
                 if (Right != null)
@@ -215,14 +215,14 @@ public class Operation(
                     }
 
                     // 如果不是整数索引，则作为方法调用处理
-                    return list.Dot(Right);
+                    return list.Dot(Right, manager);
                 }
             }
             else if (dotLeftResult is NativeStaticAny native)
             {
                 if (Right is not Instance r1) throw new InvalidOperationError(this, "原生静态类型操作需要实例");
                 var newInstance = new Instance(r1.Id, r1.Ids);
-                return native.Dot(newInstance);
+                return native.Dot(newInstance, manager);
             }
             // 处理静态成员访问：ClassName.staticMember
             else if (dotLeftResult is TypeTemplate typeTemplate)
@@ -260,14 +260,14 @@ public class Operation(
                 {
                     // 设置外部管理器，确保能访问最新的外部变量
                     taskClassValue.ExternalManager = manager;
-                    return taskClassValue.Dot(instance);
+                    return taskClassValue.Dot(instance, manager);
                 }
 
                 if (Right != null)
                 {
                     // 设置外部管理器，确保能访问最新的外部变量
                     taskClassValue.ExternalManager = manager;
-                    return taskClassValue.Dot(Right);
+                    return taskClassValue.Dot(Right, manager);
                 }
             }
             else if (dotLeftResult is TaskLangValue taskValue)
@@ -318,12 +318,12 @@ public class Operation(
                     }
 
                     // 其他方法调用（如 Then），使用扩展方法或 Dot 处理
-                    return taskValue.Dot(instance);
+                    return taskValue.Dot(instance, manager);
                 }
 
                 if (Right != null)
                 {
-                    return taskValue.Dot(Right);
+                    return taskValue.Dot(Right, manager);
                 }
             }
             else if (dotLeftResult is ThreadLangValue threadValue)
@@ -374,17 +374,17 @@ public class Operation(
                     }
 
                     // 其他方法调用（如 Then），使用扩展方法或 Dot 处理
-                    return threadValue.Dot(instance);
+                    return threadValue.Dot(instance, manager);
                 }
 
                 if (Right != null)
                 {
-                    return threadValue.Dot(Right);
+                    return threadValue.Dot(Right, manager);
                 }
             }
             else if (dotLeftResult != null! && Right != null)
             {
-                return dotLeftResult.Dot(Right);
+                return dotLeftResult.Dot(Right, manager);
                 // throw new InvalidOperationError(this, $"类型 '{dotLeftResult.GetType().Name}' 不支持点操作");
             }
             else

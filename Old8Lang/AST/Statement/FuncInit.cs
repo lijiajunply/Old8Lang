@@ -32,13 +32,15 @@ public class FuncInit(FuncLangValue a, SourcePosition position = default) : OldS
     /// <exception cref="DuplicateNameError">当函数已存在时抛出</exception>
     public override void Run(VariateManager manager)
     {
-        // 检查函数是否已存在（只有当函数名和参数数量都相同时才视为重复）
+        // 检查函数是否已存在（只有当函数名、参数数量、参数类型和返回类型都相同时才视为重复）
         if (FuncLangValue.Id != null)
         {
             var existingFunc = manager.ImportInfos.FirstOrDefault(info =>
                 info is FuncLangValue func &&
                 func.Id?.IdName == FuncLangValue.Id.IdName &&
-                func.Ids?.Count == FuncLangValue.Ids?.Count);
+                func.Ids?.Count == FuncLangValue.Ids?.Count &&
+                func.Ids?.Zip(FuncLangValue.Ids!, (a, b) => a.AssumptionType == b.AssumptionType).All(x => x) == true &&
+                func.Id?.AssumptionType == FuncLangValue.Id?.AssumptionType);
 
             if (existingFunc != null)
             {

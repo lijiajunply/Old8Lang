@@ -218,21 +218,21 @@ public class FunctionOverloadTests
     {
         // Arrange
         var code = @"
-            func sum(numbers:[int]) -> int {
+            func sum(numbers:array) -> int {
                 total <- 0
                 for num in numbers {
                     total <- total + num
                 }
                 return total
             }
-            func sum(numbers:[double]) -> double {
+            func sum(numbers:array) -> double {
                 total <- 0.0
                 for num in numbers {
                     total <- total + num
                 }
                 return total
             }
-            func sum(numbers:[string]) -> string {
+            func sum(numbers:array) -> string {
                 result <- """"
                 for str in numbers {
                     result <- result + str
@@ -274,22 +274,21 @@ public class FunctionOverloadTests
     public void FunctionOverload_WithLists_OverloadsListParameters()
     {
         // Arrange
-        var code = @"
-            func first(list:{int}) -> int {
+        var code = @"            func firstInt(list:list) -> int {
                 return list[0]
             }
-            func first(list:{string}) -> string {
+            func firstString(list:list) -> string {
                 return list[0]
             }
-            func first(list:{double}) -> double {
+            func firstDouble(list:list) -> double {
                 return list[0]
             }
             intList <- {10, 20, 30}
             stringList <- {""x"", ""y"", ""z""}
             doubleList <- {1.5, 2.5, 3.5}
-            result1 <- first(intList)
-            result2 <- first(stringList)
-            result3 <- first(doubleList)
+            result1 <- firstInt(intList)
+            result2 <- firstString(stringList)
+            result3 <- firstDouble(doubleList)
         ";
         var interpreter = new LangInterpreter();
 
@@ -473,7 +472,7 @@ public class FunctionOverloadTests
             func sum(a:int, b:int, c:int) -> int {
                 return a + b + c
             }
-            func sum(numbers:{int}) -> int {
+            func sum(numbers:list) -> int {
                 total <- 0
                 for num in numbers {
                     total <- total + num

@@ -24,7 +24,7 @@ public class ThreadClassLangValue : LangValueType
     /// </summary>
     public VariateManager? ExternalManager { get; set; }
 
-    public override LangValueType Dot(LangExpression dotExpression)
+    public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
         // 处理 Task.WhenAll(...) 形式的调用
         if (dotExpression is Instance instance)
@@ -56,7 +56,7 @@ public class ThreadClassLangValue : LangValueType
             else
             {
                 // 对于简单的静态方法（如 Sleep），直接执行参数
-                args = instance.Ids.Select(id => id.Run(null!)).ToList();
+                args = instance.Ids.Select(id => id.Run(manager)).ToList();
             }
             return method(args, instance.Position);
         }

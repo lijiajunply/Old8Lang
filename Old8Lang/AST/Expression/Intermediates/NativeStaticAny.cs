@@ -1,5 +1,6 @@
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
@@ -12,7 +13,7 @@ public class NativeStaticAny(string className, Type classType) : ImportInfo
 {
     public readonly string ClassName = className;
 
-    public override LangValueType Dot(LangExpression dotExpression)
+    public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
         if (dotExpression is LangId id)
         {

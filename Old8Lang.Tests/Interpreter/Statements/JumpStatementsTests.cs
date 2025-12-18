@@ -15,7 +15,7 @@ public class JumpStatementsTests
         // Arrange
         var code = @"
             sum <- 0
-            for i in 1..10 {
+            for i in [1~10] {
                 sum <- sum + i
                 if i == 5 {
                     break
@@ -42,7 +42,7 @@ public class JumpStatementsTests
         // Arrange
         var code = @"
             count <- 0
-            for i in 1..10 {
+            for i in [1~10] {
                 count <- count + 1
                 break
                 count <- count + 1 // This should not execute
@@ -124,9 +124,9 @@ public class JumpStatementsTests
         var code = @"
             outerCount <- 0
             innerCount <- 0
-            for i in 1..5 {
+            for i in [1~5] {
                 outerCount <- outerCount + 1
-                for j in 1..5 {
+                for j in [1~5] {
                     innerCount <- innerCount + 1
                     if j == 3 {
                         break
@@ -154,13 +154,15 @@ public class JumpStatementsTests
         // Arrange
         var code = @"
             count <- 0
-            for i in 1..10 {
+            for i in [1~10] {
                 count <- count + 1
                 switch i {
-                    case 5:
+                    case 5 {
                         break
-                    default:
+                    }
+                    default {
                         // Continue loop
+                    }
                 }
                 if i >= 7 {
                     break
@@ -187,7 +189,7 @@ public class JumpStatementsTests
         // Arrange
         var code = @"
             sum <- 0
-            for i in 1..10 {
+            for i in [1~10] {
                 if i % 2 == 0 {
                     continue
                 }
@@ -214,7 +216,7 @@ public class JumpStatementsTests
         // Arrange
         var code = @"
             sum <- 0
-            for i in 1..5 {
+            for i in [1~5] {
                 if i <= 2 {
                     continue
                 }
@@ -298,8 +300,8 @@ public class JumpStatementsTests
         // Arrange
         var code = @"
             sum <- 0
-            for i in 1..3 {
-                for j in 1..3 {
+            for i in [1~3] {
+                for j in [1~3] {
                     if j == 2 {
                         continue
                     }
@@ -328,7 +330,7 @@ public class JumpStatementsTests
         var code = @"
             count <- 0
             sum <- 0
-            for i in 1..6 {
+            for i in [1~6] {
                 count <- count + 1
                 switch i {
                     case 2:
@@ -360,7 +362,7 @@ public class JumpStatementsTests
         var code = @"
             sum <- 0
             count <- 0
-            for i in 1..20 {
+            for i in [1~20] {
                 count <- count + 1
                 if i < 5 {
                     continue
@@ -484,7 +486,7 @@ public class JumpStatementsTests
         var code = @"
             array <- [10, 20, 30, 40, 50, 60]
             sum <- 0
-            for i in 0..<len(array) {
+            for i in [0~<len(array)] {
                 value <- array[i]
                 if value == 40 {
                     break
@@ -516,7 +518,7 @@ public class JumpStatementsTests
         var code = @"
             items <- {""apple"", ""banana"", ""cherry"", ""date"", ""elderberry""}
             result <- {}
-            for i in 0..<len(items) {
+            for i in [0~<len(items)] {
                 item <- items[i]
 
                 // Skip items starting with 'b'
@@ -556,7 +558,7 @@ public class JumpStatementsTests
             skipped <- 0
             stopped <- 0
 
-            for i in 1..15 {
+            for i in [1~15] {
                 if i > 12 {
                     stopped <- stopped + 1
                     break
@@ -594,10 +596,10 @@ public class JumpStatementsTests
             level2Count <- 0
             targetFound <- false
 
-            for i in 1..10 {
+            for i in [1~10] {
                 level1Count <- level1Count + 1
 
-                for j in 1..10 {
+                for j in [1~10] {
                     level2Count <- level2Count + 1
 
                     if i == 5 and j == 7 {
@@ -634,7 +636,7 @@ public class JumpStatementsTests
             count <- 0
             sum <- 0
 
-            for i in 1..10 {
+            for i in [1~10] {
                 try {
                     if i == 7 {
                         break

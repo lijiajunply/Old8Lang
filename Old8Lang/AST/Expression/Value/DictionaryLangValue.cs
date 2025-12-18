@@ -46,7 +46,7 @@ public class DictionaryLangValue : LangValueType, ILangList
         return this;
     }
 
-    public override LangValueType Dot(LangExpression dotExpression)
+    public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
         // 优先检查是否是字符串键的索引访问
         if (dotExpression is StringLangValue stringKey)
@@ -58,23 +58,50 @@ public class DictionaryLangValue : LangValueType, ILangList
         if (dotExpression is not Instance and not LangId)
         {
             // 尝试运行表达式获取键值
-            var tempManager = new VariateManager();
-            var result = dotExpression.Run(tempManager);
+            var result = dotExpression.Run(manager);
             return Get(result);
-        }
-
-        // 处理方法调用
-        if (dotExpression is Instance a)
-        {
-            return a.FromClassToResult(this);
         }
 
         // 处理属性访问：obj.property
         if (dotExpression is LangId langId)
         {
-            // 将属性名作为字符串键来访问字典值
-            var key = new StringLangValue(langId.IdName);
-            return Get(key);
+            // 特殊处理 Keys 和 Values 属性
+            switch (langId.IdName)
+            {
+                case "Keys":
+                    // 返回字典的键集合
+                    return new ListLangValue(Value.Select(x => x.Key).ToList());
+                case "Values":
+                    // 返回字典的值集合
+                    return new ListLangValue(Value.Select(x => x.Value).ToList());
+                default:
+                    // 将其他属性名作为字符串键来访问字典值
+                    var key = new StringLangValue(langId.IdName);
+                    return Get(key);
+            }
+        }
+
+        // 处理方法调用
+        if (dotExpression is Instance a)
+        {
+            // 检查是否是 Keys 或 Values 属性调用（通过方法名）
+            var methodName = a.Id?.IdName;
+            if (methodName == "Keys" || methodName == "Values")
+            {
+                // 直接返回对应的集合，不调用 FromClassToResult
+                return methodName == "Keys" ? new ListLangValue(Value.Select(x => x.Key).ToList()) : new ListLangValue(Value.Select(x => x.Value).ToList());
+            }
+            
+            // 检查是否是索引访问：data[key] 被错误解析为点操作
+            // 当 Instance 表示索引访问时，提取索引值并调用 Get 方法
+            if (a.Ids != null && a.Ids.Count == 1)
+            {
+                // 运行索引表达式获取键值
+                var result = a.Ids[0].Run(manager);
+                return Get(result);
+            }
+            
+            return a.FromClassToResult(this);
         }
 
         throw new InvalidOperationError(this, "字典类型只支持实例调用操作、属性访问或键索引访问");

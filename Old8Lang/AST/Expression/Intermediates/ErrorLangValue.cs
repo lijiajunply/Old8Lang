@@ -116,17 +116,9 @@ public class ErrorLangValue(Old8Exception value) : LangValueType
     }
 
     /// <summary>
-    /// 支持属性访问，如 e.FriendlyMessage
-    /// </summary>
-    public override LangValueType Dot(LangExpression dotExpression)
-    {
-        return Dot(dotExpression, null);
-    }
-
-    /// <summary>
     /// 支持属性访问，带VariManager参数
     /// </summary>
-    public LangValueType Dot(LangExpression dotExpression, VariateManager? manager)
+    public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
         if (dotExpression is LangId langId)
         {

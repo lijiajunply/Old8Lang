@@ -49,8 +49,8 @@ public class ControlFlowTests
         var code = @"
             matrix <- [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
             diagonalSum <- 0
-            for i in [0~len(matrix)[ {
-                for j in [0~len(matrix[i])[ {
+            for i in [0~len(matrix)] {
+                for j in [0~len(matrix[i])] {
                     if i == j {
                         diagonalSum <- diagonalSum + matrix[i][j]
                     }
@@ -469,7 +469,7 @@ public class ControlFlowTests
             for i in [0~n] {
                 swapped <- false
 
-                for j in [0~(n - i - 2)] {
+                for j in [0~<(n - i - 1)] {
                     if numbers[j] > numbers[j + 1] {
                         // Swap elements
                         temp <- numbers[j]

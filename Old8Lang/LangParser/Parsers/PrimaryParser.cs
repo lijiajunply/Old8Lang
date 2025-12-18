@@ -187,16 +187,6 @@ public class PrimaryParser(
             return new Operation(expr, LangTokenType.Minus, new IntLangValue(1), position);
         }
 
-        // 处理 await 表达式
-        if (CurrentToken.Type == LangTokenType.Await)
-        {
-            var awaitToken = CurrentToken;
-            var position = new SourcePosition(awaitToken.Line, awaitToken.Column, tokenValue: awaitToken.Value);
-            Expect(LangTokenType.Await);
-            var expr = expressionParserFactory().ParseExpression();
-            return new AwaitExpression(expr, position);
-        }
-
         // 处理 if-then-else 三元表达式
         if (CurrentToken.Type == LangTokenType.If)
         {

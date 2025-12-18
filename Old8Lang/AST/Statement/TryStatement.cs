@@ -27,6 +27,11 @@ public class TryStatement(
         try
         {
             tryBlock.Run(manager);
+            // 检查try块是否执行了return语句
+            if (manager.IsReturn)
+            {
+                return;
+            }
         }
         catch (Old8Exception ex)
         {
@@ -52,6 +57,11 @@ public class TryStatement(
 
                     // 执行catch块
                     catchBlock.Run(manager);
+                    // 检查catch块是否执行了return语句
+                    if (manager.IsReturn)
+                    {
+                        return;
+                    }
                     return; // 只执行第一个匹配的catch块
                 }
             }

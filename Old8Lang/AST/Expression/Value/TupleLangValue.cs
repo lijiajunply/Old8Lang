@@ -98,8 +98,9 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
     /// 支持元组的点操作访问，包括索引访问
     /// </summary>
     /// <param name="dotExpression">点操作表达式</param>
+    /// <param name="manager">变量管理器</param>
     /// <returns>访问结果</returns>
-    public override LangValueType Dot(LangExpression dotExpression)
+    public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
         // 支持数字索引访问：tuple.0, tuple.1, tuple.2 等
         if (dotExpression is LangId id)

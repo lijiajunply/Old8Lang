@@ -149,7 +149,7 @@ public class TypeTemplate(
     /// <param name="right">要访问的成员或方法</param>
     /// <param name="manager">变量管理器</param>
     /// <returns>访问结果</returns>
-    public LangValueType Dot(LangExpression right, VariateManager manager)
+    public override LangValueType Dot(LangExpression right, VariateManager manager)
     {
         return right switch
         {

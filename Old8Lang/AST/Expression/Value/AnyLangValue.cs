@@ -92,7 +92,7 @@ public class AnyLangValue : LangValueType
         return this;
     }
 
-    public override LangValueType Dot(LangExpression dotExpression)
+    public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
         switch (dotExpression)
         {

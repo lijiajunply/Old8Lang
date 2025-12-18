@@ -84,10 +84,11 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// 点操作，用于访问对象的属性或方法
     /// </summary>
     /// <param name="dotExpression">点后面的表达式</param>
+    /// <param name="manager">变量管理器，用于运行表达式</param>
     /// <returns>点操作结果</returns>
     /// <exception cref="AttributeError">当访问不存在的属性时抛出</exception>
     /// <exception cref="InvalidOperationError">当不支持点操作时抛出</exception>
-    public virtual LangValueType Dot(LangExpression dotExpression)
+    public virtual LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
         if (dotExpression is LangId id)
         {

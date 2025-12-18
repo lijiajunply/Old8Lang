@@ -614,7 +614,7 @@ public class LoopTests
         var code = @"
             result <- """"
             for i <- 0, i < 5, i++ {
-                result <- result + i + ""
+                result <- result + i + """"
             }
         ";
         var interpreter = new LangInterpreter();
@@ -635,7 +635,7 @@ public class LoopTests
     {
         // Arrange
         var code = @"
-            numbers <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            numbers <- {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
             evens <- []
             for num in numbers {
                 if num % 2 == 0 {

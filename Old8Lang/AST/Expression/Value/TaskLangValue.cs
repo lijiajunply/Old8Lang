@@ -352,7 +352,7 @@ public class TaskLangValue : LangValueType
     /// Then 方法通过扩展方法实现（在 FuncStatic.cs 中），通过 ExternalManager 访问 Interpreter
     /// Retry 方法在 Operation.cs 中特殊处理，因为需要重新执行原始函数调用
     /// </remarks>
-    public override LangValueType Dot(LangExpression dotExpression)
+    public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
         // 处理属性访问（ClassMemberId 继承自 LangId）
         if (dotExpression is LangId id)
@@ -375,7 +375,7 @@ public class TaskLangValue : LangValueType
         }
 
         // 其他情况使用基类实现
-        return base.Dot(dotExpression);
+        return base.Dot(dotExpression, manager);
     }
 
     /// <summary>
