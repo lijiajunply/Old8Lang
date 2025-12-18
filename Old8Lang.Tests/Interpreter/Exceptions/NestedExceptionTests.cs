@@ -46,8 +46,7 @@ public class NestedExceptionTests
     public void NestedException_BubbleUp_OuterCatchesInner()
     {
         // Arrange
-        var code = @"
-            outer_result <- """"
+        var code = @"            outer_result <- """"
 
             try {
                 try {
@@ -55,7 +54,11 @@ public class NestedExceptionTests
                     result <- 1 / 0
                 } catch (e1) {
                     // 检查异常类型，如果不是我们想要的类型就重新抛出
-                    outer_result <- ""Should not reach here""
+                    if typeof(e1) != ""ZeroDivisionError"" {
+                        outer_result <- ""Should not reach here""
+                    } else {
+                        throw e1; // 重新抛出除零错误
+                    }
                 }
             } catch (e2) {
                 outer_result <- ""Outer caught""
@@ -118,8 +121,7 @@ public class NestedExceptionTests
     public void NestedException_DifferentExceptionTypes_TypeSpecificHandling()
     {
         // Arrange
-        var code = @"
-            results <- {}
+        var code = @"            results <- []
 
             try {
                 try {
@@ -172,9 +174,7 @@ public class NestedExceptionTests
     public void NestedException_NestedInLoops_ExceptionInIteration()
     {
         // Arrange
-        var code = @"
-            iteration_results <- {}
-            i <- 0
+        var code = @"            i <- 0
             success_count <- 0
             error_count <- 0
 
@@ -269,8 +269,7 @@ public class NestedExceptionTests
     public void NestedException_ConditionalNesting_DynamicExceptionHandling()
     {
         // Arrange
-        var code = @"
-            conditional_results <- {}
+        var code = @"            conditional_results <- []
             use_nested <- true
 
             try {
@@ -312,34 +311,33 @@ public class NestedExceptionTests
     public void NestedException_ResourceManagement_CleanupOrder()
     {
         // Arrange
-        var code = @"
-            cleanup_order <- {}
+        var code = @"            cleanup_order <- {}
 
             try {
                 // 外层资源
                 resource1 <- ""resource1_opened""
-                cleanup_order <- cleanup_order.Push(""resource1_opened"")
+                cleanup_order.Add(""resource1_opened"")
 
                 try {
                     // 内层资源
                     resource2 <- ""resource2_opened""
-                    cleanup_order <- cleanup_order.Push(""resource2_opened"")
+                    cleanup_order.Add(""resource2_opened"")
 
                     try {
                         // 最深层操作，可能抛出异常
                         result <- 7 / 0
                     } catch (e3) {
-                        cleanup_order <- cleanup_order.Push(""deep_error_caught"")
+                        cleanup_order.Add(""deep_error_caught"")
                     } finally {
-                        cleanup_order <- cleanup_order.Push(""resource2_cleanup"")
+                        cleanup_order.Add(""resource2_cleanup"")
                     }
                 } catch (e2) {
-                    cleanup_order <- cleanup_order.Push(""middle_error_caught"")
+                    cleanup_order.Add(""middle_error_caught"")
                 } finally {
-                    cleanup_order <- cleanup_order.Push(""resource1_cleanup"")
+                    cleanup_order.Add(""resource1_cleanup"")
                 }
             } catch (e1) {
-                cleanup_order <- cleanup_order.Push(""outer_error_caught"")
+                cleanup_order.Add(""outer_error_caught"")
             }
         ";
         var interpreter = new LangInterpreter();
@@ -423,8 +421,7 @@ public class NestedExceptionTests
     public void NestedException_ExceptionSuppression_SwallowingExceptions()
     {
         // Arrange
-        var code = @"
-            suppression_results <- {}
+        var code = @"            suppression_results <- []
 
             try {
                 try {
@@ -465,28 +462,27 @@ public class NestedExceptionTests
     public void NestedException_DeepNestingWithFinally_FinallyExecutionOrder()
     {
         // Arrange
-        var code = @"
-            execution_log <- {}
+        var code = @"            execution_log <- {}
 
             try {
                 try {
                     try {
-                        execution_log <- execution_log.Push(""level3_try"")
+                        execution_log.Add(""level3_try"")
                         result <- 1 / 0
                     } catch (e3) {
-                        execution_log <- execution_log.Push(""level3_catch"")
+                        execution_log.Add(""level3_catch"")
                     } finally {
-                        execution_log <- execution_log.Push(""level3_finally"")
+                        execution_log.Add(""level3_finally"")
                     }
                 } catch (e2) {
-                    execution_log <- execution_log.Push(""level2_catch"")
+                    execution_log.Add(""level2_catch"")
                 } finally {
-                    execution_log <- execution_log.Push(""level2_finally"")
+                    execution_log.Add(""level2_finally"")
                 }
             } catch (e1) {
-                execution_log <- execution_log.Push(""level1_catch"")
+                execution_log.Add(""level1_catch"")
             } finally {
-                execution_log <- execution_log.Push(""level1_finally"")
+                execution_log.Add(""level1_finally"")
             }
         ";
         var interpreter = new LangInterpreter();
@@ -520,8 +516,7 @@ public class NestedExceptionTests
     public void NestedException_CustomExceptionHandling_ErrorClassification()
     {
         // Arrange
-        var code = @"
-            error_categories <- {}
+        var code = @"            error_categories <- []
 
             try {
                 try {
@@ -579,11 +574,10 @@ public class NestedExceptionTests
     public void NestedException_RecursiveFunction_ExceptionInRecursion()
     {
         // Arrange
-        var code = @"
-            recursion_log <- {}
+        var code = @"            recursion_log <- {}
 
             func recursive_func(n) -> string {
-                recursion_log <- recursion_log.Push(""enter_level_"" + n.ToStr())
+                recursion_log.Add(""enter_level_"" + n.ToStr())
                 try {
                     try {
                         if n == 0 {
@@ -594,11 +588,11 @@ public class NestedExceptionTests
                             return ""negative""
                         }
                     } catch (inner) {
-                        recursion_log <- recursion_log.Push(""inner_catch_level_"" + n.ToStr())
+                        recursion_log.Add(""inner_catch_level_"" + n.ToStr())
                         return ""inner_caught_at_"" + n.ToStr()
                     }
                 } catch (outer) {
-                    recursion_log <- recursion_log.Push(""outer_catch_level_"" + n.ToStr())
+                    recursion_log.Add(""outer_catch_level_"" + n.ToStr())
                     return ""outer_caught_at_"" + n.ToStr()
                 }
             }

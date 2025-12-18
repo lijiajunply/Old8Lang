@@ -50,6 +50,8 @@ public class ListLangValue : LangValueType, ILangList
         int idx = i.Value;
         if (idx < 0)
             idx = Values.Count + idx;
+        if (idx < 0 || idx >= Values.Count)
+            throw new IndexError(this, idx, Values.Count);
         return Values[idx];
     }
 

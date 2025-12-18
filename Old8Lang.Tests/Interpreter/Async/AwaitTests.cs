@@ -514,11 +514,11 @@ public class AwaitTests
         // Arrange
         var code = @"
             multiplier <- 5
-            async func createMultiplier() -> func {
+            async func createMultiplier() -> function {
                 return async (x:int) -> x * multiplier
             }
             multiply <- await createMultiplier()
-            result <- multiply(8)
+            result <- await multiply(8)
         ";
         var interpreter = new LangInterpreter();
 

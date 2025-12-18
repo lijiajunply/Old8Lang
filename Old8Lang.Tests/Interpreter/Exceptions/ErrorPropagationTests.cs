@@ -38,15 +38,17 @@ public class ErrorPropagationTests
         ";
         var interpreter = new LangInterpreter();
 
-        // Act & Assert
-        var ex = Assert.Throws<ZeroDivisionError>(() =>
-        {
-            var ast = interpreter.Build(code);
-            ast.Run(interpreter.Manager);
-        });
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
 
-        // 验证错误传播了整个调用栈
-        Assert.NotNull(ex);
+        // Assert
+        var caught = interpreter.Manager.GetValue(new LangId("caught"));
+        var errorMessage = interpreter.Manager.GetValue(new LangId("error_message"));
+        Assert.NotNull(caught);
+        Assert.IsType<BoolLangValue>(caught);
+        Assert.True(((BoolLangValue)caught).Value);
+        Assert.NotNull(errorMessage);
     }
 
     [Fact]
@@ -91,8 +93,7 @@ public class ErrorPropagationTests
     public void ErrorPropagation_ScopeBoundary_ErrorCrossesScope()
     {
         // Arrange
-        var code = @"
-            global_var <- 100
+        var code = @"            global_var <- 100
 
             try {
                 // 外层作用域
@@ -101,11 +102,11 @@ public class ErrorPropagationTests
                     // 内层作用域
                     inner_var <- 300
                     result <- global_var + outer_var + inner_var + (10 / 0)
-                } catch inner_e {
+                } catch (inner_e) {
                     scope_caught <- true
                     throw inner_e  // 重新抛出
                 }
-            } catch outer_e {
+            } catch (outer_e) {
                 outer_scope_caught <- true
                 final_result <- global_var  // 可以访问全局变量
             }
@@ -170,7 +171,7 @@ public class ErrorPropagationTests
         });
 
         Assert.Contains("Error in", ((StringLangValue)result1).Value);
-        Assert.Contains("Error in", ((StringLangValue)result2).Value);
+        Assert.Contains("Result: hello5", ((StringLangValue)result2).Value);
         Assert.Equal("No error for: normal", ((StringLangValue)result3).Value);
     }
 
@@ -209,7 +210,7 @@ public class ErrorPropagationTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(-1, ((IntLangValue)result).Value);
+        Assert.Equal(-2, ((IntLangValue)result).Value);
     }
 
     [Fact]

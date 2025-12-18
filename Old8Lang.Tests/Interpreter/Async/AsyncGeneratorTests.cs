@@ -14,7 +14,7 @@ public class AsyncGeneratorTests
     {
         // Arrange
         var code = @"
-            func simpleGenerator() -> async {
+            func simpleGenerator() {
                 yield 1
                 yield 2
                 yield 3
@@ -43,13 +43,13 @@ public class AsyncGeneratorTests
     {
         // Arrange
         var code = @"
-            func rangeGenerator(start:int, end:int) -> async {
-                for i in start..end {
+            async func rangeGenerator(start:int, end:int) {
+                for i in [start~end] {
                     yield i
                 }
             }
             sum <- 0
-            for value in rangeGenerator(5, 10) {
+            async for value in rangeGenerator(5, 10) {
                 sum <- sum + value
             }
             result <- sum
@@ -141,8 +141,8 @@ public class AsyncGeneratorTests
     {
         // Arrange
         var code = @"
-            func delayedGenerator() -> async {
-                for i in 1..5 {
+            func delayedGenerator() {
+                for i in [1~5] {
                     await async.Sleep(10)
                     yield i
                 }
@@ -171,9 +171,9 @@ public class AsyncGeneratorTests
     {
         // Arrange
         var code = @"
-            func evenGenerator(limit:int) -> async {
-                for i in 1..limit {
-                    if i % 2 = 0 {
+            func evenGenerator(limit:int) {
+                for i in [1~limit] {
+                    if i % 2 == 0 {
                         yield i
                     }
                 }
@@ -237,7 +237,7 @@ public class AsyncGeneratorTests
     {
         // Arrange
         var code = @"
-            func errorGenerator() -> async {
+            func errorGenerator() {
                 yield ""start""
                 try {
                     // This might cause an error
@@ -325,7 +325,7 @@ public class AsyncGeneratorTests
     {
         // Arrange
         var code = @"
-            func factorialGenerator(n:int) -> async {
+            func factorialGenerator(n:int) {
                 result <- 1
                 for i in 1..n {
                     result <- result * i
@@ -391,7 +391,7 @@ public class AsyncGeneratorTests
     {
         // Arrange
         var code = @"
-            func complexGenerator() -> async {
+            func complexGenerator() {
                 matrix <- [
                     [1, 2, 3],
                     [4, 5, 6],
@@ -429,7 +429,7 @@ public class AsyncGeneratorTests
     {
         // Arrange
         var code = @"
-            func memoryEfficientGenerator() -> async {
+            func memoryEfficientGenerator() {
                 // Generate numbers one at a time without storing all
                 for i in 1..1000 {
                     yield i * i
@@ -465,7 +465,7 @@ public class AsyncGeneratorTests
         // Arrange
         var code = @"
             data <- [10, 20, 30, 40, 50]
-            func processDataGenerator(dataList) -> async {
+            func processDataGenerator(dataList) {
                 for item in dataList {
                     processed <- item * 2 + 5
                     yield processed
@@ -505,8 +505,8 @@ public class AsyncGeneratorTests
                 cache[n] <- result
                 return result
             }
-            func cachedGenerator(limit:int) -> async {
-                for i in 1..limit {
+            func cachedGenerator(limit:int) {
+                for i in [1~limit] {
                     yield expensiveComputation(i)
                 }
             }
@@ -534,9 +534,9 @@ public class AsyncGeneratorTests
     {
         // Arrange
         var code = @"
-            func timeBasedGenerator() -> async {
+            func timeBasedGenerator() {
                 start <- async.Now()
-                for i in 1..3 {
+                for i in [1~3] {
                     elapsed <- async.Now() - start
                     yield i + elapsed
                     await async.Sleep(10)
@@ -567,7 +567,7 @@ public class AsyncGeneratorTests
         // Arrange
         var code = @"
             callCount <- 0
-            func lazyGenerator() -> async {
+            func lazyGenerator() {
                 for i in 1..5 {
                     callCount <- callCount + 1
                     yield i * callCount
@@ -645,7 +645,7 @@ public class AsyncGeneratorTests
     {
         // Arrange
         var code = @"
-            func resilientGenerator() -> async {
+            func resilientGenerator() {
                 for i in 1..5 {
                     try {
                         if i = 3 {
@@ -717,7 +717,7 @@ public class AsyncGeneratorTests
     {
         // Arrange
         var code = @"
-            func treeGenerator() -> async {
+            func treeGenerator() {
                 // Simulate a binary tree traversal
                 tree <- {
                     ""value"": 1,

@@ -39,7 +39,7 @@ public class FinallyTests
 
         Assert.NotNull(cleanup);
         Assert.IsType<BoolLangValue>(cleanup);
-        Assert.Equal(true, ((BoolLangValue)cleanup).Value);
+        Assert.True(((BoolLangValue)cleanup).Value);
 
         Assert.NotNull(message);
         Assert.IsType<StringLangValue>(message);
@@ -77,7 +77,7 @@ public class FinallyTests
 
         Assert.NotNull(finallyExecuted);
         Assert.IsType<BoolLangValue>(finallyExecuted);
-        Assert.Equal(true, ((BoolLangValue)finallyExecuted).Value);
+        Assert.True(((BoolLangValue)finallyExecuted).Value);
 
         Assert.NotNull(finallyMessage);
         Assert.IsType<StringLangValue>(finallyMessage);
@@ -120,11 +120,11 @@ public class FinallyTests
 
         Assert.NotNull(opened);
         Assert.IsType<BoolLangValue>(opened);
-        Assert.Equal(true, ((BoolLangValue)opened).Value);
+        Assert.True(((BoolLangValue)opened).Value);
 
         Assert.NotNull(closed);
         Assert.IsType<BoolLangValue>(closed);
-        Assert.Equal(true, ((BoolLangValue)closed).Value);
+        Assert.True(((BoolLangValue)closed).Value);
 
         Assert.NotNull(message);
         Assert.IsType<StringLangValue>(message);
@@ -243,11 +243,11 @@ public class FinallyTests
 
         Assert.NotNull(innerF);
         Assert.IsType<BoolLangValue>(innerF);
-        Assert.Equal(true, ((BoolLangValue)innerF).Value);
+        Assert.True(((BoolLangValue)innerF).Value);
 
         Assert.NotNull(outerF);
         Assert.IsType<BoolLangValue>(outerF);
-        Assert.Equal(true, ((BoolLangValue)outerF).Value);
+        Assert.True(((BoolLangValue)outerF).Value);
 
         Assert.NotNull(innerMsg);
         Assert.IsType<StringLangValue>(innerMsg);
@@ -297,11 +297,11 @@ public class FinallyTests
 
         Assert.NotNull(opened);
         Assert.IsType<BoolLangValue>(opened);
-        Assert.Equal(true, ((BoolLangValue)opened).Value);
+        Assert.True(((BoolLangValue)opened).Value);
 
         Assert.NotNull(closed);
         Assert.IsType<BoolLangValue>(closed);
-        Assert.Equal(true, ((BoolLangValue)closed).Value);
+        Assert.True(((BoolLangValue)closed).Value);
 
         Assert.NotNull(message);
         Assert.IsType<StringLangValue>(message);
@@ -347,11 +347,11 @@ public class FinallyTests
 
         Assert.NotNull(open);
         Assert.IsType<BoolLangValue>(open);
-        Assert.Equal(true, ((BoolLangValue)open).Value);
+        Assert.True(((BoolLangValue)open).Value);
 
         Assert.NotNull(closed);
         Assert.IsType<BoolLangValue>(closed);
-        Assert.Equal(true, ((BoolLangValue)closed).Value);
+        Assert.True(((BoolLangValue)closed).Value);
 
         Assert.NotNull(message);
         Assert.IsType<StringLangValue>(message);
@@ -513,11 +513,11 @@ public class FinallyTests
 
         Assert.NotNull(created);
         Assert.IsType<BoolLangValue>(created);
-        Assert.Equal(true, ((BoolLangValue)created).Value);
+        Assert.True(((BoolLangValue)created).Value);
 
         Assert.NotNull(cleaned);
         Assert.IsType<BoolLangValue>(cleaned);
-        Assert.Equal(true, ((BoolLangValue)cleaned).Value);
+        Assert.True(((BoolLangValue)cleaned).Value);
 
         Assert.NotNull(message);
         Assert.IsType<StringLangValue>(message);
@@ -639,15 +639,15 @@ public class FinallyTests
 
         Assert.NotNull(step1);
         Assert.IsType<BoolLangValue>(step1);
-        Assert.Equal(true, ((BoolLangValue)step1).Value);
+        Assert.True(((BoolLangValue)step1).Value);
 
         Assert.NotNull(step2);
         Assert.IsType<BoolLangValue>(step2);
-        Assert.Equal(true, ((BoolLangValue)step2).Value);
+        Assert.True(((BoolLangValue)step2).Value);
 
         Assert.NotNull(step3);
         Assert.IsType<BoolLangValue>(step3);
-        Assert.Equal(true, ((BoolLangValue)step3).Value);
+        Assert.True(((BoolLangValue)step3).Value);
 
         Assert.NotNull(summary);
         Assert.IsType<StringLangValue>(summary);
