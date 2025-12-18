@@ -1,3 +1,3 @@
-import from "math" { sqrt, pow }
+import "math"
 result1 <- sqrt(25)
 result2 <- pow(2, 3)

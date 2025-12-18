@@ -1,0 +1,21 @@
+func min(a:double, b:double) -> double {
+    if a < b {
+        return a + 0.0
+    }
+    return b + 0.0
+}
+
+func max(a:double, b:double) -> double {
+    if a > b {
+        return a + 0.0
+    }
+    return b + 0.0
+}
+
+func sqrt(x:double) -> double {
+    return x ^ 0.5 + 0.0
+}
+
+func pow(base:double, exp:double) -> double {
+    return base ^ exp + 0.0
+}
