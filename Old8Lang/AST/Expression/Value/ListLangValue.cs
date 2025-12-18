@@ -136,9 +136,15 @@ public class ListLangValue : LangValueType, ILangList
         throw new InvalidOperationError(this, "列表类型只支持索引访问或实例方法调用");
     }
 
-    // 覆盖 Equal 方法以支持列表深度比较
+    /// <summary>
+    /// 覆盖 Equal 方法以支持列表深度比较
+    /// 确保列表只与列表比较，不会被误认为元组
+    /// </summary>
+    /// <param name="otherValueType">要比较的值类型</param>
+    /// <returns>只有同为列表且元素相等时才返回true</returns>
     public override bool Equal(LangValueType? otherValueType)
     {
+        // 严格的类型检查：只有同为列表才能比较，排除元组
         if (otherValueType is not ListLangValue otherList)
             return false;
 

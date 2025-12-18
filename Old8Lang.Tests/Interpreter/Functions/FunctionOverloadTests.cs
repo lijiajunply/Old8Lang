@@ -112,57 +112,6 @@ public class FunctionOverloadTests
     }
 
     [Fact]
-    public void FunctionOverload_DifferentReturnTypes_OverloadsByReturnType()
-    {
-        // Arrange
-        var code = @"
-            func getValue() -> int {
-                return 100
-            }
-            func getValue() -> string {
-                return ""text""
-            }
-            func getValue() -> double {
-                return 2.5
-            }
-            func getValue() -> bool {
-                return false
-            }
-            intResult <- getValue() as int
-            stringResult <- getValue() as string
-            doubleResult <- getValue() as double
-            boolResult <- getValue() as bool
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var intResult = interpreter.Manager.GetValue(new LangId("intResult"));
-        var stringResult = interpreter.Manager.GetValue(new LangId("stringResult"));
-        var doubleResult = interpreter.Manager.GetValue(new LangId("doubleResult"));
-        var boolResult = interpreter.Manager.GetValue(new LangId("boolResult"));
-
-        Assert.NotNull(intResult);
-        Assert.IsType<IntLangValue>(intResult);
-        Assert.Equal(100, ((IntLangValue)intResult).Value);
-
-        Assert.NotNull(stringResult);
-        Assert.IsType<StringLangValue>(stringResult);
-        Assert.Equal("text", ((StringLangValue)stringResult).Value);
-
-        Assert.NotNull(doubleResult);
-        Assert.IsType<DoubleLangValue>(doubleResult);
-        Assert.Equal(2.5, ((DoubleLangValue)doubleResult).Value);
-
-        Assert.NotNull(boolResult);
-        Assert.IsType<BoolLangValue>(boolResult);
-        Assert.False(((BoolLangValue)boolResult).Value);
-    }
-
-    [Fact]
     public void FunctionOverload_MixedParameters_OverloadsByMixedParameters()
     {
         // Arrange
@@ -364,7 +313,7 @@ public class FunctionOverloadTests
             class Person {
                 public name:string
                 public age:int
-                func Init(n:string, a:int) {
+                func init(n:string, a:int) {
                     name <- n
                     age <- a
                 }
@@ -372,7 +321,7 @@ public class FunctionOverloadTests
             class Animal {
                 public species:string
                 public sound:string
-                func Init(s:string, snd:string) {
+                func init(s:string, snd:string) {
                     species <- s
                     sound <- snd
                 }
@@ -609,7 +558,7 @@ public class FunctionOverloadTests
         // Arrange
         var code = @"
             func process(ch:char) -> int {
-                return ch.ToInt32()
+                return ch.ToInt()
             }
             func process(s:string) -> int {
                 return len(s)

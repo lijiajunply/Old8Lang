@@ -43,6 +43,13 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
     }
 
     public override string ToString() => $"({V1},{V2})";
+
+    /// <summary>
+    /// 明确标识元组类型，防止与列表混淆
+    /// </summary>
+    /// <returns>返回 "Tuple" 作为类型标识</returns>
+    public override string TypeToString() => "Tuple";
+
     public override object GetValue() => (Value.Item1.GetValue(), Value.Item2.GetValue());
 
     // 支持多元元组的构造函数
@@ -160,9 +167,15 @@ public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition
         return 2; // 二元元组固定为2个元素
     }
 
-    // 覆盖 Equal 方法以支持元组深度比较
+    /// <summary>
+    /// 覆盖 Equal 方法以支持元组深度比较
+    /// 确保元组只与元组比较，不会被误认为列表
+    /// </summary>
+    /// <param name="otherValueType">要比较的值类型</param>
+    /// <returns>只有同为元组且元素相等时才返回true</returns>
     public override bool Equal(LangValueType? otherValueType)
     {
+        // 严格的类型检查：只有同为元组才能比较
         if (otherValueType is not TupleLangValue otherTuple)
             return false;
 

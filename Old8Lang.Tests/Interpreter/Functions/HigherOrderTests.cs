@@ -324,13 +324,13 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func memoize(func:func) -> func {
+            func memoize(fun:function) -> function {
                 cache <- {}
                 return (x:int) -> {
                     if cache.ContainsKey(x.ToStr()) {
                         return cache[x.ToStr()]
                     } else {
-                        result <- func(x)
+                        result <- fun(x)
                         cache[x.ToStr()] <- result
                         return result
                     }
@@ -428,8 +428,8 @@ public class HigherOrderTests
     {
         // Arrange
         var code = @"
-            func partial(func:func, firstArg:string) -> func {
-                return (secondArg:int) -> func(firstArg, secondArg)
+            func partial(fun:function, firstArg:string) -> function {
+                return (secondArg:int) -> fun(firstArg, secondArg)
             }
             func greet(name:string, age:int) -> string {
                 return ""Hello "" + name + "", you are "" + age.ToStr() + "" years old""

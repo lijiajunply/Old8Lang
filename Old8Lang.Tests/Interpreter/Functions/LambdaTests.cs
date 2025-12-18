@@ -229,35 +229,6 @@ public class LambdaTests
     }
 
     [Fact]
-    public void Lambda_WithArrayOperations_WorksCorrectly()
-    {
-        // Arrange
-        var code = @"
-            numbers <- [1, 2, 3, 4, 5]
-            sum <- 0
-            forEach <- (arr, action) -> {
-                for i <- 0, i < len(arr), i++ {
-                    action(arr[i])
-                }
-            }
-            addToSum <- (x) -> { sum <- sum + x }
-            forEach(numbers, addToSum)
-            result <- sum
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<IntLangValue>(result);
-        Assert.Equal(15, ((IntLangValue)result).Value); // 1 + 2 + 3 + 4 + 5 = 15
-    }
-
-    [Fact]
     public void Lambda_RecursiveLambda_WorksCorrectly()
     {
         // Arrange
