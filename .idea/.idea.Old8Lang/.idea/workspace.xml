@@ -19,12 +19,11 @@
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.NetLib/HttpClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.NetLib/HttpWebClient.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.NetLib/WebApiClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.NetLib/WebApiClient.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/HttpClientTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/HttpWebClientTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/net_import_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/net_import_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/Net.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/Net.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/dll/Old8Lang.NetLib.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/OldLib/dll/Old8Lang.NetLib.dll" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,7 +55,6 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///Immediate 窗口" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/.claude/settings.local.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
@@ -64,47 +62,12 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ClassDeclarationTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/BasicImport/AliasImportTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Unified/UnifiedModuleArchitectureTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ModuleObjects/BaseModuleObject.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ModuleObjects/LangModuleObject.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ModuleObjects/SelectiveModuleObject.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ModuleObjects/SelectiveModuleObject.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ModuleObjects/SimpleModuleObjectProxy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Apis.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
@@ -138,41 +101,41 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Debug&quot;,
-    &quot;.NET 项目.Old8Lang.Benchmarks.executor&quot;: &quot;Run&quot;,
-    &quot;07d79105-db56-470d-b872-543f396b1133.executor&quot;: &quot;Debug&quot;,
-    &quot;34038497-caa6-4590-9735-a11ac1a57cd0.executor&quot;: &quot;Debug&quot;,
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;e9de5ea7-95aa-45c5-91d2-c46acccab710.executor&quot;: &quot;Debug&quot;,
-    &quot;fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
+    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
+    ".NET 项目.LibTest.executor": "Run",
+    ".NET 项目.Old8Lang.App.executor": "Run",
+    ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
+    "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
+    "34038497-caa6-4590-9735-a11ac1a57cd0.executor": "Debug",
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHELLCHECK.PATH": "/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck",
+    "WebServerToolWindowFactoryState": "false",
+    "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
+    "fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor": "Debug",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;PLAIN_TEXT&quot;,
-      &quot;Markdown&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "PLAIN_TEXT",
+      "Markdown"
     ]
   }
-}</component>
+}]]></component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
@@ -432,6 +395,7 @@
       <workItem from="1766082960788" duration="2522000" />
       <workItem from="1766085560295" duration="10610000" />
       <workItem from="1766098235624" duration="16792000" />
+      <workItem from="1766146301314" duration="922000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -776,7 +740,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="294" />
+    <option name="localTasksCounter" value="295" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -803,7 +767,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(parser): 实现切片语法解析和嵌套切片访问支持&#10;&#10;- 添加对切片语法 [start:end:step] 的完整解析支持&#10;- 引入 NestedSliceAccess 类处理嵌套切片访问场景&#10;- 优化索引访问解析逻辑，区分普通索引和切片操作&#10;- 支持开放式切片和步长参数的解析&#10;- 完善切片相关 AST 节点的类型检查和错误处理&#10;- 更新测试用例以验证新的切片语法功能" />
     <MESSAGE value="feat(dictionary): 实现字典 Update 方法重载和优化 ForEach 执行逻辑&#10;&#10;- 为 DictionaryLangValue 添加 Update 方法的参数重载支持&#10;- 支持 Update(key, value) 和 Update(otherDictionary) 两种调用形式&#10;- 优化 DictionaryValueFuncStatic 中 ForEach 方法的 lambda 执行逻辑&#10;- 针对 lambda 表达式直接操作作用域，避免闭包深拷贝开销&#10;- 改进字典键值更新机制，确保键存在时更新、不存在时插入&#10;- 完善方法调用时的参数匹配和类型检查逻辑" />
     <MESSAGE value="fix(interpreter): 修复循环控制流和嵌套索引赋值问题&#10;&#10;- 在ForStatement中重置控制流状态以正确处理break/continue&#10;- 修复SetStatement中的嵌套索引访问赋值逻辑&#10;- 调整SwitchStatement中break标志的处理方式&#10;- 更新测试用例中的预期结果和代码格式&#10;- 修正JumpStatementsTests中断言的期望值" />
     <MESSAGE value="feat(lang): 支持从模块导入所有函数&#10;&#10;- 修改 import 语法以支持通配符导入&#10;- 更新测试用例以验证新语法&#10;- 添加 math 模块包含常用数学函数&#10;- 实现 min、max、sqrt 和 pow 函数&#10;- 确保导入语句与新语法兼容" />
@@ -828,7 +791,8 @@
     <MESSAGE value="feat(import): 实现动态导入功能并重构导入语句解析逻辑&#10;&#10;- 添加对 dynamic import 语法的支持，允许在运行时确定模块名&#10;- 重构 StatementParser 中的导入语句解析逻辑，优化关键字处理流程&#10;- 更新 BlockStatement 以正确处理动态导入语句的执行顺序&#10;- 为 ImportStatement 添加 IsDynamicImport 公共属性&#10;- 修改动态导入语法格式从 &quot;import dynamic moduleName&quot; 为 &quot;dynamic import moduleName&quot;&#10;- 支持动态导入与别名结合使用（dynamic import moduleName as alias）&#10;- 修复多个测试文件中的导入语法以适配新格式&#10;- 添加多个动态导入测试用例，覆盖基本、条件和表达式场景&#10;- 调整 workspace.xml 中的变更记录和任务计数器&#10;- 移除旧的切片操作步长参数相关提交信息" />
     <MESSAGE value="feat(import): 实现动态导入功能并重构导入语句解析逻辑&#10;&#10;- 添加对 dynamic import 语法的支持，允许在运行时确定模块名&#10;- 重构 StatementParser 中的导入语句解析逻辑，优化关键字处理流程&#10;- 更新 BlockStatement 以正确处理动态导入语句的执行顺序&#10;- 为 ImportStatement 添加 IsDynamicImport 公共属性&#10;- 修改动态导入语法格式从 &quot;import dynamic moduleName&quot; 为 &quot;dynamic import moduleName&quot;&#10;- 支持动态导入与别名结合使用（dynamic import moduleName as alias）&#10;- 修复多个测试文件中的导入语法以适配新格式&#10;- 添加多个动态导入测试用例，覆盖基本、条件和表达式场景&#10;- 调整 workspace.xml 中的变更记录和任务计数器&#10;- 移除旧的切片操作步长参数相关提交信息&#10;- 移除了冗余的命名空间引用和不必要的 using 语句&#10;- 简化了模块导入相关的类型检查和注册逻辑&#10;- 更新了模块工厂的实现，移除了旧的模块对象转换逻辑&#10;- 优化了模块路径解析逻辑，增强 macOS 路径兼容性&#10;- 移除了废弃的 UseUnifiedFactory 属性及相关旧逻辑&#10;- 更新了测试基类，移除了手动设置 ImportPath 的逻辑&#10;- 简化了模块导入测试用例，提高测试稳定性&#10;- 修复了动态导入中的异常处理逻辑&#10;- 调整了模块导入的缓存处理机制&#10;- 更新了 LangInfo 类的文档注释，明确包管理路径含义" />
     <MESSAGE value="feat(config): 重构配置加载与验证逻辑&#10;&#10;- 新增 loadConfig 函数支持多环境配置加载&#10;- 实现 production 和 development 配置映射&#10;- 添加 validateConfig 函数校验必要字段&#10;- 移除旧的 getConfig 实现&#10;- 更新导入语句处理逻辑&#10;- 调整模块路径解析策略&#10;- 修改本地包管理器模块匹配方式&#10;- 移除自动安装依赖功能&#10;- 优化项目内模块解析流程" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(config): 重构配置加载与验证逻辑&#10;&#10;- 新增 loadConfig 函数支持多环境配置加载&#10;- 实现 production 和 development 配置映射&#10;- 添加 validateConfig 函数校验必要字段&#10;- 移除旧的 getConfig 实现&#10;- 更新导入语句处理逻辑&#10;- 调整模块路径解析策略&#10;- 修改本地包管理器模块匹配方式&#10;- 移除自动安装依赖功能&#10;- 优化项目内模块解析流程" />
+    <MESSAGE value="refactor(net): 重命名 HttpClient 为 HttpWebClient&#10;&#10;- 将 Old8Lang.NetLib 中的 HttpClient 类重命名为 HttpWebClient&#10;- 更新所有引用 HttpClient 的代码，包括 WebApiClient 和相关测试&#10;- 修改 Net.old8 中的原生类型声明，将 HttpClient 替换为 HttpWebClient&#10;- 重命名 HttpClientTests 测试文件为 HttpWebClientTests&#10;- 更新 net_import_test.old8 中的导入语句语法&#10;- 优化 NativeAnyLangValue.cs 中构造函数判空逻辑" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(net): 重命名 HttpClient 为 HttpWebClient&#10;&#10;- 将 Old8Lang.NetLib 中的 HttpClient 类重命名为 HttpWebClient&#10;- 更新所有引用 HttpClient 的代码，包括 WebApiClient 和相关测试&#10;- 修改 Net.old8 中的原生类型声明，将 HttpClient 替换为 HttpWebClient&#10;- 重命名 HttpClientTests 测试文件为 HttpWebClientTests&#10;- 更新 net_import_test.old8 中的导入语句语法&#10;- 优化 NativeAnyLangValue.cs 中构造函数判空逻辑" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
