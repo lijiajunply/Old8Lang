@@ -5,7 +5,7 @@ namespace Old8Lang.NetLib;
 /// </summary>
 public class WebApiClient : IDisposable
 {
-    private readonly HttpClient HttpClient;
+    private readonly HttpWebClient HttpWebClient;
     private readonly string BaseUrl;
     private readonly Dictionary<string, string> DefaultHeaders;
     private bool Disposed;
@@ -16,7 +16,7 @@ public class WebApiClient : IDisposable
     public WebApiClient(string baseUrl)
     {
         BaseUrl = EnsureTrailingSlash(baseUrl);
-        HttpClient = new HttpClient();
+        HttpWebClient = new HttpWebClient();
         DefaultHeaders = new Dictionary<string, string>
         {
             { "Accept", "application/json" },
@@ -26,7 +26,7 @@ public class WebApiClient : IDisposable
         // 添加默认请求头
         foreach (var header in DefaultHeaders)
         {
-            HttpClient.AddDefaultHeader(header.Key, header.Value);
+            HttpWebClient.AddDefaultHeader(header.Key, header.Value);
         }
     }
 
@@ -49,7 +49,7 @@ public class WebApiClient : IDisposable
     public void AddDefaultHeader(string name, string value)
     {
         DefaultHeaders[name] = value;
-        HttpClient.AddDefaultHeader(name, value);
+        HttpWebClient.AddDefaultHeader(name, value);
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public class WebApiClient : IDisposable
     public void RemoveDefaultHeader(string name)
     {
         DefaultHeaders.Remove(name);
-        HttpClient.RemoveDefaultHeader(name);
+        HttpWebClient.RemoveDefaultHeader(name);
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ public class WebApiClient : IDisposable
     /// </summary>
     public void SetTimeout(int milliseconds)
     {
-        HttpClient.SetTimeout(milliseconds);
+        HttpWebClient.SetTimeout(milliseconds);
     }
 
     /// <summary>
@@ -102,7 +102,7 @@ public class WebApiClient : IDisposable
         Dictionary<string, object>? queryParams = null)
     {
         string url = BuildUrl(endpoint, pathParams, queryParams);
-        return await HttpClient.GetAsync(url);
+        return await HttpWebClient.GetAsync(url);
     }
 
     /// <summary>
@@ -113,7 +113,7 @@ public class WebApiClient : IDisposable
     {
         string url = BuildUrl(endpoint, pathParams, queryParams);
         string content = requestBody != null ? System.Text.Json.JsonSerializer.Serialize(requestBody) : string.Empty;
-        return await HttpClient.PostAsync(url, content);
+        return await HttpWebClient.PostAsync(url, content);
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ public class WebApiClient : IDisposable
     {
         string url = BuildUrl(endpoint, pathParams, queryParams);
         string content = requestBody != null ? System.Text.Json.JsonSerializer.Serialize(requestBody) : string.Empty;
-        return await HttpClient.PutAsync(url, content);
+        return await HttpWebClient.PutAsync(url, content);
     }
 
     /// <summary>
@@ -134,7 +134,7 @@ public class WebApiClient : IDisposable
         Dictionary<string, object>? queryParams = null)
     {
         string url = BuildUrl(endpoint, pathParams, queryParams);
-        return await HttpClient.DeleteAsync(url);
+        return await HttpWebClient.DeleteAsync(url);
     }
 
     /// <summary>
@@ -160,7 +160,7 @@ public class WebApiClient : IDisposable
             httpRequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
 
-        var response = await HttpClient.GetUnderlyingClient().SendAsync(httpRequest);
+        var response = await HttpWebClient.GetUnderlyingClient().SendAsync(httpRequest);
 
         return new HttpResponse
         {
@@ -177,7 +177,7 @@ public class WebApiClient : IDisposable
     public System.Net.Http.HttpClient GetUnderlyingClient()
     {
         // 这里需要修改HttpClient类，添加一个方法来获取底层的System.Net.Http.HttpClient实例
-        return HttpClient.GetUnderlyingClient();
+        return HttpWebClient.GetUnderlyingClient();
     }
 
     /// <summary>
@@ -189,7 +189,7 @@ public class WebApiClient : IDisposable
         {
             if (disposing)
             {
-                HttpClient.Dispose();
+                HttpWebClient.Dispose();
             }
 
             Disposed = true;

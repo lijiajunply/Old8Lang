@@ -5,17 +5,17 @@ namespace Old8Lang.NetLib;
 /// <summary>
 /// HTTP客户端类，用于发送HTTP请求
 /// </summary>
-public class HttpClient : IDisposable
+public class HttpWebClient : IDisposable
 {
-    private readonly System.Net.Http.HttpClient Client;
+    private readonly HttpClient Client;
     private readonly Dictionary<string, string> DefaultHeaders;
 
     /// <summary>
     /// 构造函数
     /// </summary>
-    public HttpClient()
+    public HttpWebClient()
     {
-        Client = new System.Net.Http.HttpClient();
+        Client = new HttpClient();
         DefaultHeaders = new Dictionary<string, string>();
     }
 
@@ -272,7 +272,7 @@ public class HttpClient : IDisposable
     /// <summary>
     /// 获取底层System.Net.Http.HttpClient实例，用于高级操作
     /// </summary>
-    public System.Net.Http.HttpClient GetUnderlyingClient()
+    public HttpClient GetUnderlyingClient()
     {
         return Client;
     }

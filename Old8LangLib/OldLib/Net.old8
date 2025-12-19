@@ -3,7 +3,7 @@
 // 导入SocketClient类的方法
 native "Old8Lang.NetLib" SocketClient
 // 导入HttpClient类的方法
-native "Old8Lang.NetLib" HttpClient
+native "Old8Lang.NetLib" HttpWebClient
 // 导入MqttClient类的方法
 native "Old8Lang.NetLib" MqttClient
 // 导入WebSocketClient类的方法

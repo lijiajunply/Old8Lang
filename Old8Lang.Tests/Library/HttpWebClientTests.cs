@@ -1,12 +1,12 @@
 namespace Old8Lang.Tests.Library;
 
-public class HttpClientTests
+public class HttpWebClientTests
 {
     [Fact]
     public async Task HttpClient_ShouldBeAbleToSendGetRequest()
     {
         // 测试 HttpClient 发送 GET 请求
-        using var client = new Old8Lang.NetLib.HttpClient();
+        using var client = new Old8Lang.NetLib.HttpWebClient();
         
         // 设置超时时间
         client.SetTimeout(5000);
@@ -27,7 +27,7 @@ public class HttpClientTests
     public async Task HttpClient_ShouldBeAbleToSendPostRequest()
     {
         // 测试 HttpClient 发送 POST 请求
-        using var client = new Old8Lang.NetLib.HttpClient();
+        using var client = new Old8Lang.NetLib.HttpWebClient();
         
         // 设置超时时间
         client.SetTimeout(5000);
@@ -47,7 +47,7 @@ public class HttpClientTests
     public async Task HttpClient_ShouldHandleDefaultHeaders()
     {
         // 测试 HttpClient 默认请求头
-        using var client = new Old8Lang.NetLib.HttpClient();
+        using var client = new Old8Lang.NetLib.HttpWebClient();
         
         // 添加默认请求头
         client.AddDefaultHeader("User-Agent", "Old8Lang/1.0");
@@ -72,7 +72,7 @@ public class HttpClientTests
     public async Task HttpClient_ShouldHandleInvalidUrl()
     {
         // 测试 HttpClient 处理无效 URL
-        using var client = new Old8Lang.NetLib.HttpClient();
+        using var client = new Old8Lang.NetLib.HttpWebClient();
         
         // 设置超时时间
         client.SetTimeout(1000);
@@ -88,7 +88,7 @@ public class HttpClientTests
     public async Task HttpClient_ShouldHandleTimeout()
     {
         // 测试 HttpClient 超时处理
-        using var client = new Old8Lang.NetLib.HttpClient();
+        using var client = new Old8Lang.NetLib.HttpWebClient();
         
         // 设置非常短的超时时间
         client.SetTimeout(10);

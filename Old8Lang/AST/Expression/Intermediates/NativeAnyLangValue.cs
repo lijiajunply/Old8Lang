@@ -54,7 +54,7 @@ public class NativeAnyLangValue(string dllName, string className, string path, s
         var assembly = Assembly.LoadFile(path);
         ClassType = assembly.GetType($"{dllName}.{ClassName}")!;
         var constructors = ClassType.GetConstructors();
-        if (constructors != null && constructors.Length > 0)
+        if (constructors is { Length: > 0 })
             Constructor = constructors[0];
         Manager = manager.Clone();
         return this;
