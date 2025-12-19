@@ -296,6 +296,11 @@ public enum LangTokenType
     Implements,
 
     /// <summary>
+    /// super
+    /// </summary>
+    Super,
+
+    /// <summary>
     /// abstract
     /// </summary>
     Abstract,

@@ -359,6 +359,48 @@ public class AnyLangValue : LangValueType
         throw new AttributeError(this, propertyName, Id.IdName);
     }
 
+    /// <summary>
+    /// 获取父类实例（super关键字对应的值）
+    /// </summary>
+    /// <returns>父类实例，如果没有父类则返回null</returns>
+    public AnyLangValue? GetSuperInstance()
+    {
+        try
+        {
+            // 获取当前实例的类型模板
+            var currentTypeTemplate = Manager.GetAny(new LangId(Id.IdName)) as TypeTemplate;
+            if (currentTypeTemplate?.ParentClassName == null)
+            {
+                return null; // 没有父类
+            }
+
+            // 获取父类类型模板
+            var parentTypeTemplate = Manager.GetAny(new LangId(currentTypeTemplate.ParentClassName)) as TypeTemplate;
+            if (parentTypeTemplate == null)
+            {
+                return null; // 父类类型模板未找到
+            }
+
+            // 创建父类实例
+            var superInstance = parentTypeTemplate.CreateInstance(Manager);
+
+            // 将当前实例的字段值复制到父类实例中（只复制父类拥有的字段）
+            foreach (var member in superInstance.Result)
+            {
+                if (Result.TryGetValue(member.Key, out var currentValue))
+                {
+                    superInstance.Set(new LangId(member.Key), currentValue);
+                }
+            }
+
+            return superInstance;
+        }
+        catch
+        {
+            return null; // 出现任何错误都返回null
+        }
+    }
+
     public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)
     {
         if (otherLangValueType is not TypeLangValue type)

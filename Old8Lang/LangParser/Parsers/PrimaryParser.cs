@@ -265,6 +265,15 @@ public class PrimaryParser(
             return new LangId(thisToken.Value, position: position);
         }
 
+        if (CurrentToken.Type == LangTokenType.Super)
+        {
+            // 创建一个 SuperExpression 对象来处理 super 关键字
+            var superToken = CurrentToken;
+            var position = new SourcePosition(superToken.Line, superToken.Column, tokenValue: superToken.Value);
+            Expect(LangTokenType.Super);
+            return new SuperExpression(position);
+        }
+
         return CurrentToken.Type switch
         {
             LangTokenType.String => ParseStringLiteral(),

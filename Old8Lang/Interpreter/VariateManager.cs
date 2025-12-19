@@ -603,6 +603,28 @@ public class VariateManager
     }
 
     /// <summary>
+    /// 获取当前类实例（this关键字对应的值）
+    /// </summary>
+    /// <returns>当前类实例，如果不在类方法中则返回null</returns>
+    public AnyLangValue? GetCurrentInstance()
+    {
+        try
+        {
+            var thisValue = GetValue(new LangId("this"));
+            if (thisValue is AnyLangValue anyValue)
+            {
+                return anyValue;
+            }
+            return null;
+        }
+        catch
+        {
+            // 没有找到this变量，说明不在类方法中
+            return null;
+        }
+    }
+
+    /// <summary>
     /// 添加类或函数到导入信息列表（线程安全）
     /// </summary>
     /// <param name="langValue">要添加的导入信息</param>
