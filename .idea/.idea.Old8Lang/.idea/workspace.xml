@@ -19,21 +19,18 @@
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/COW_REDESIGN.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GENERATOR_REFACTOR_PLAN.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_LazyImportEnhanced.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_LazyImportEnhanced.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/lazy_math.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/lazy_math.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/AliasImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/AliasImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/SelectiveImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/SelectiveImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/counter_module.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/counter_module.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/dynamic_path_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/dynamic_path_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/heavy_module.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/heavy_module.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_wildcard_module.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_wildcard_module.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_wildcard_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_wildcard_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/mixed_module.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/mixed_module.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/mixed_selective_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/mixed_selective_test.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang_Functions_Error_Analysis_Plan.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/interpreter_test_results.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lazy_test_module.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_lazy.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_lazy_complete.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_lazy_correct.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_lazy_final.old8" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -425,7 +422,7 @@
       <workItem from="1766037121468" duration="28333000" />
       <workItem from="1766082960788" duration="2522000" />
       <workItem from="1766085560295" duration="10610000" />
-      <workItem from="1766098235624" duration="10638000" />
+      <workItem from="1766098235624" duration="11666000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -770,7 +767,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="289" />
+    <option name="localTasksCounter" value="290" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -797,7 +794,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(control-flow): 完善控制流语句的执行逻辑&#10;&#10;- 在 BlockStatement 中增加对 break 和 continue 语句的检查&#10;- 在 SwitchStatement 中正确处理 case 块内的 return、break 和 continue&#10;- 修正 WhileStatement 中条件值对象的池化问题&#10;- 更新 SetStatement 中嵌套索引赋值的处理逻辑&#10;- 修复 JumpStatementsTests 中多个测试用例的预期结果&#10;- 完善 CLAUDE.md 文档中的项目结构描述和文件路径引用" />
     <MESSAGE value="feat(parser): 支持切片操作的步长参数&#10;&#10;- 为数组、列表、字符串和元组的 Slice 方法添加步长参数支持&#10;- 更新解析器以识别带步长的切片语法 [start:end:step]&#10;- 支持正向和反向切片，包括负数索引处理&#10;- 添加对开放式切片（如 [:end] 或 [start:]）的支持&#10;- 完善切片边界检查和错误处理逻辑&#10;- 修复字典类型不支持切片时的错误提示&#10;- 更新相关测试用例以验证新功能" />
     <MESSAGE value="feat(interpreter): 实现切片赋值功能并完善相关类型支持&#10;&#10;- 为 ArrayLangValue 和 ListLangValue 实现 SetSlice 方法，支持切片赋值操作&#10;- 在 ILangList 接口新增 SetSlice 方法定义，统一集合类型切片赋值行为&#10;- 为不支持切片赋值的类型（如 String、Dictionary、Generator 等）添加明确错误提示&#10;- 更新 SetStatement 以处理 SliceLangValue 的赋值逻辑&#10;- 完善 SliceLangValue 类，暴露切片参数属性并优化 toString 表示&#10;- 修复 SliceTests 测试用例中集合字面量语法及预期结果&#10;- 调整 ArrayLangValue 中 RunResult 字段注释，强调其固定大小特性" />
     <MESSAGE value="fix(interpreter): 修复静态方法中this引用和集合切片逻辑&#10;&#10;- 修复类静态方法中score和highScore变量的this引用问题&#10;- 更新集合聚合测试用例的字符串字面量语法和期望值&#10;- 调整线程测试中原子引用的函数定义语法&#10;- 移除范围测试中无效的空范围测试用例&#10;- 修复IntLangValue中减法运算的double类型处理逻辑&#10;- 更新切片测试中索引计算和集合字面量语法&#10;- 修正字符串模板测试中的插值表达式和期望结果&#10;- 更新元组测试中的函数返回类型声明语法" />
@@ -822,7 +818,8 @@
     <MESSAGE value="refactor(module): 统一模块对象架构设计&#10;&#10;- 删除重复的模块类和工厂类&#10;- 引入 UnifiedModule 作为统一模块实现&#10;- 创建 ModuleFactory 统一管理模块创建&#10;- 简化目录结构，从12个文件减少到6个核心文件&#10;- 保持向后兼容性，现有代码无需大幅修改&#10;- 降低代码复杂度，提高可维护性" />
     <MESSAGE value="feat(lang): 实现懒导入功能并修复模块导入问题&#10;&#10;- 添加对 lazy import 语法的支持，包括基本语法和带别名导入&#10;- 修复模块导入路径配置问题，确保测试环境正确加载模块&#10;- 更新模块架构以支持统一的模块加载机制&#10;- 修复条件导入测试中模块版本访问方式&#10;- 完善解析器对懒导入关键字的识别和处理&#10;- 实现懒加载模块的线程安全加载机制&#10;- 添加完整的懒导入功能测试用例&#10;- 优化模块符号提取逻辑以适配新架构&#10;- 更新测试基类中的模块导入路径配置&#10;- 修复高级导入测试中断言类型不匹配问题" />
     <MESSAGE value="refactor(tests): 简化命名空间引用并更新字符串字面量语法&#10;&#10;- 移除了冗余的命名空间前缀，简化类型引用&#10;- 将多行字符串字面量从 &quot;@&quot; 更新为 &quot;&quot;&quot; 语法&#10;- 统一了错误类型和值类型的引用方式&#10;- 提高了测试代码的一致性和可读性" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(tests): 简化命名空间引用并更新字符串字面量语法&#10;&#10;- 移除了冗余的命名空间前缀，简化类型引用&#10;- 将多行字符串字面量从 &quot;@&quot; 更新为 &quot;&quot;&quot; 语法&#10;- 统一了错误类型和值类型的引用方式&#10;- 提高了测试代码的一致性和可读性" />
+    <MESSAGE value="feat(import): 添加动态导入支持&#10;&#10;- 新增 IsDynamic 和 DynamicModuleExpression 属性以支持运行时模块名解析&#10;- 实现 HandleDynamicImport 方法处理动态导入逻辑&#10;- 更新 ToString 方法以正确显示动态导入语句&#10;- 支持动态导入与选择性导入、懒导入的组合使用&#10;- 添加动态导入的错误处理机制&#10;- 扩展模块工厂以支持动态模块创建&#10;- 保持与现有静态导入语法的兼容性" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(import): 添加动态导入支持&#10;&#10;- 新增 IsDynamic 和 DynamicModuleExpression 属性以支持运行时模块名解析&#10;- 实现 HandleDynamicImport 方法处理动态导入逻辑&#10;- 更新 ToString 方法以正确显示动态导入语句&#10;- 支持动态导入与选择性导入、懒导入的组合使用&#10;- 添加动态导入的错误处理机制&#10;- 扩展模块工厂以支持动态模块创建&#10;- 保持与现有静态导入语法的兼容性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

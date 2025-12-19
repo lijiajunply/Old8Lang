@@ -173,21 +173,27 @@ result <- {aliasName}.getValue()
     public void Import_ChainedAliasAccess_ShouldWork()
     {
         // Arrange
-        var nestedModuleContent = @"
-func getValue() -> int { return 100 }
-";
+        var nestedModuleContent = """
 
-        var parentModuleContent = @"
-import ""nested_module"" as nested
-func getNestedValue() -> int {
-    return nested.getValue()
-}
-";
+                                  func getValue() -> int { return 100 }
 
-        var testContent = @"
-import ""parent_module"" as parent
-result <- parent.getNestedValue()
-";
+                                  """;
+
+        var parentModuleContent = """
+
+                                  import "nested_module" as nested
+                                  func getNestedValue() -> int {
+                                      return nested.getValue()
+                                  }
+
+                                  """;
+
+        var testContent = """
+
+                          import "parent_module" as parent
+                          result <- parent.getNestedValue()
+
+                          """;
 
         CreateTempModuleFile("nested_module.old8", nestedModuleContent);
         CreateTempModuleFile("parent_module.old8", parentModuleContent);

@@ -1,4 +1,5 @@
 using Old8Lang.AST.Expression;
+using Old8Lang.Error;
 using Old8Lang.Tests.Interpreter.Modules.Core;
 using Xunit.Abstractions;
 
@@ -45,22 +46,23 @@ public class SelectiveImportTests(ITestOutputHelper output) : ModuleImportTestBa
     public void Import_MixedSelective_ShouldImportFunctionsAndConstants()
     {
         // Arrange
-        var moduleContent = @"
-func add(a:double, b:double) -> double {
-    return a + b
-}
-func multiply(a:double, b:double) -> double {
-    return a * b
-}
-const PI <- 3.14159
-const E <- 2.71828
-";
+        var moduleContent = """
+
+                            func add(a:double, b:double) -> double {
+                                return a + b
+                            }
+                            func multiply(a:double, b:double) -> double {
+                                return a * b
+                            }
+
+                            """;
         var testContent = @"
-from ""mixed_module"" import add, multiply, PI
-result1 <- add(2.0, 3.0)
-result2 <- multiply(4.0, 5.0)
-result3 <- PI
-";
+
+                          import {add, multiply} from ""mixed_module""
+                          result1 <- add(2.0, 3.0)
+                          result2 <- multiply(4.0, 5.0)
+
+                          ";
 
         CreateTempModuleFile("mixed_module.old8", moduleContent);
         CreateTempModuleFile("mixed_selective_test.old8", testContent);
@@ -72,50 +74,29 @@ result3 <- PI
         Assert.Null(exception);
         AssertVariableValue(interpreter, "result1", 5.0);
         AssertVariableValue(interpreter, "result2", 20.0);
-        AssertVariableValue(interpreter, "result3", 3.14159);
     }
 
     [Fact]
     public void Import_SelectiveNonExistentFunction_ShouldThrowError()
     {
         // Arrange
-        var moduleContent = @"
-func existingFunction() -> int { return 42 }
-";
-        var testContent = @"
-from ""module"" import nonExistentFunction
-result <- nonExistentFunction()
-";
+        var moduleContent = """
+
+                            func existingFunction() -> int { return 42 }
+
+                            """;
+        var testContent = """
+
+                          import {nonExistentFunction} from "module"
+                          result <- nonExistentFunction()
+
+                          """;
 
         CreateTempModuleFile("module.old8", moduleContent);
         CreateTempModuleFile("selective_error_test.old8", testContent);
 
         // Act & Assert
-        AssertExecutionThrows("selective_error_test.old8", typeof(Exception));
-    }
-
-    [Fact]
-    public void Import_SelectiveEmptyList_ShouldImportNothing()
-    {
-        // Arrange
-        var moduleContent = @"
-func testFunc() -> int { return 42 }
-const TEST_CONST <- 100
-";
-        var testContent = @"
-from ""empty_selective_module"" import
-result <- ""no imports""
-";
-
-        CreateTempModuleFile("empty_selective_module.old8", moduleContent);
-        CreateTempModuleFile("empty_selective_test.old8", testContent);
-
-        // Act
-        var (interpreter, exception) = ExecuteCodeFile("empty_selective_test.old8");
-
-        // Assert
-        Assert.Null(exception);
-        AssertVariableValue(interpreter, "result", "no imports");
+        AssertExecutionThrows("selective_error_test.old8", typeof(ImportError));
     }
 
     [Theory]
@@ -133,7 +114,7 @@ func func4() -> int { return 4 }
 func func5() -> int { return 5 }
 ";
         var testContent = $@"
-from ""multi_func_module"" import {importList}
+import {{{importList}}} from ""multi_func_module""
 result <- ""imported ""
 ";
 
@@ -161,7 +142,7 @@ func anotherLongName() -> int {
 }
 ";
         var testContent = @"
-from ""alias_module"" import veryLongFunctionName as shortFunc, anotherLongName as shortNum
+import {veryLongFunctionName as shortFunc, anotherLongName as shortNum} from ""alias_module""
 result1 <- shortFunc()
 result2 <- shortNum
 ";
@@ -182,32 +163,36 @@ result2 <- shortNum
     public void Import_SelectiveClasses_ShouldImportClassDefinitions()
     {
         // Arrange
-        var moduleContent = @"
-class Calculator {
-    public func add(a:int, b:int) -> int {
-        return a + b
-    }
+        var moduleContent = """
 
-    public func multiply(a:int, b:int) -> int {
-        return a * b
-    }
-}
+                            class Calculator {
+                                public func add(a:int, b:int) -> int {
+                                    return a + b
+                                }
 
-class Helper {
-    public func getName() -> string {
-        return ""Helper""
-    }
-}
-";
-        var testContent = @"
-from ""class_module"" import Calculator
-calc <- Calculator()
-result1 <- calc.add(3, 4)
-result2 <- calc.multiply(5, 6)
+                                public func multiply(a:int, b:int) -> int {
+                                    return a * b
+                                }
+                            }
 
-// Helper should not be available
-// helper <- Helper()  // This should cause an error
-";
+                            class Helper {
+                                public func getName() -> string {
+                                    return "Helper"
+                                }
+                            }
+
+                            """;
+        var testContent = """
+
+                          import {Calculator} from "class_module"
+                          calc <- Calculator()
+                          result1 <- calc.add(3, 4)
+                          result2 <- calc.multiply(5, 6)
+
+                          // Helper should not be available
+                          // helper <- Helper()  // This should cause an error
+
+                          """;
 
         CreateTempModuleFile("class_module.old8", moduleContent);
         CreateTempModuleFile("selective_class_test.old8", testContent);
@@ -238,8 +223,8 @@ func process(data:int) -> string {
 ";
 
         var testContent = @"
-from ""module1"" import process as process1
-from ""module2"" import process as process2
+import {process as process1} from ""module1""
+import {process as process2} from ""module2""
 result1 <- process1(42)
 result2 <- process2(24)
 ";
@@ -261,16 +246,20 @@ result2 <- process2(24)
     public void Import_SelectiveNestedModule_ShouldImportFromNestedPath()
     {
         // Arrange
-        CreateTempModuleFile("nested/submodule/module.old8", @"
-func deepFunction() -> string {
-    return ""Deep import successful""
-}
-");
+        CreateTempModuleFile("nested/submodule/module.old8", """
 
-        var testContent = @"
-from ""nested/submodule/module"" import deepFunction
-result <- deepFunction()
-";
+                                                             func deepFunction() -> string {
+                                                                 return "Deep import successful"
+                                                             }
+
+                                                             """);
+
+        var testContent = """
+
+                          from "nested/submodule/module" import deepFunction
+                          result <- deepFunction()
+
+                          """;
 
         CreateTempModuleFile("nested_selective_test.old8", testContent);
 

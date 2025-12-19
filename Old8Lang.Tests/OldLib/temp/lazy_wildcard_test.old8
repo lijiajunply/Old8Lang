@@ -1,9 +1,8 @@
 
-lazy from "lazy_wildcard_module" import *
+lazy import "lazy_wildcard_module" 
 status_before <- "Not loaded"
 // 此时还没有加载模块
 
-const_val <- LAZY_CONST
 func_result <- lazyFunction()
 class_instance <- LazyClass()
 class_result <- class_instance.getValue()

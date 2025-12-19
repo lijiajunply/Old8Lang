@@ -65,7 +65,6 @@ public class StatementParser(
         }
 
 
-
         // 处理括号块：(statement)
         if (CurrentToken.Type == LangTokenType.LeftParen)
         {
@@ -91,7 +90,6 @@ public class StatementParser(
             // 需要确保 "in" 关键字前面只有标识符和逗号
             var tempIndex = CurrentIndex + 1;
             var foundIn = false;
-            var inPosition = 0;
             var scanLimit = Math.Min(tempIndex + 20, Tokens.Count); // 限制前瞻深度
 
             // 跳过所有标识符和逗号，查找 "in" 关键字
@@ -101,7 +99,6 @@ public class StatementParser(
                 if (token.Type == LangTokenType.In)
                 {
                     foundIn = true;
-                    inPosition = tempIndex;
                     break;
                 }
 
@@ -254,7 +251,7 @@ public class StatementParser(
         {
             return classParser.ParseClassDeclaration();
         }
-        
+
         // 处理interface定义：interface identifier block
         if (CurrentToken.Type == LangTokenType.Interface)
         {
@@ -280,7 +277,7 @@ public class StatementParser(
             // 对象解构赋值：{name, age} <- person
             return ParseObjectDestructuring();
         }
-        
+
         // 处理赋值语句：identifier｜this <- expression 或 a.name <- value 或 this.name <- value 或 a[b] <- value
         // 先尝试解析可能的左值表达式开头
         if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.This)
@@ -381,7 +378,7 @@ public class StatementParser(
                 }
 
                 // 如果是 await 表达式，允许作为独立语句
-                if (expr is Old8Lang.AST.Expression.AwaitExpression awaitExpr)
+                if (expr is AwaitExpression awaitExpr)
                 {
                     // 创建一个 FuncRunStatement 来执行 await 表达式
                     return new FuncRunStatement(awaitExpr, expr.Position);
@@ -573,7 +570,7 @@ public class StatementParser(
 
         // 解析左值表达式 - 只能是标识符、this或复杂左值（如a.b或a[b]），不能是解构模式
         var leftExpr = primaryParser.ParsePrimary();
-        
+
         // 处理点访问和索引访问等复杂左值表达式
         leftExpr = expressionParser.ParseDotExpr(leftExpr);
 
@@ -600,15 +597,15 @@ public class StatementParser(
         // 复杂左值表达式赋值：a[b] <- value 或 a.a <- value 或 this.a <- value
         return new SetStatement(leftExpr, expression, leftExpr.Position);
     }
-    
+
     /// <summary>
-    /// 解析数组解构赋值：[a, b] <- [1, 2]
+    /// 解析数组解构赋值：[a, b] &lt;- [1, 2]
     /// </summary>
     private SetStatement ParseArrayDestructuring()
     {
         Expect(LangTokenType.LeftBracket);
         var position = CreateSourcePosition(CurrentToken);
-        
+
         // 解析解构的标识符列表
         var identifiers = new List<string>();
         while (CurrentToken.Type != LangTokenType.RightBracket)
@@ -620,24 +617,26 @@ public class StatementParser(
                 Expect(LangTokenType.Comma);
                 continue;
             }
-            
+
             // 解析标识符，只能是简单标识符，不能是复杂表达式
             if (CurrentToken.Type != LangTokenType.Identifier)
             {
                 throw CreateSyntaxError("数组解构赋值中的标识符必须是简单标识符");
             }
+
             var ident = CurrentToken.Value;
             identifiers.Add(ident);
             Expect(LangTokenType.Identifier);
-            
+
             // 检查是否还有更多元素
             if (CurrentToken.Type == LangTokenType.Comma)
             {
                 Expect(LangTokenType.Comma);
             }
         }
+
         Expect(LangTokenType.RightBracket);
-        
+
         // 检查是否有类型注解
         var assumptionType = "";
         if (CurrentToken.Type == LangTokenType.Colon)
@@ -646,28 +645,28 @@ public class StatementParser(
             assumptionType = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
         }
-        
+
         Expect(LangTokenType.Assignment);
         var expression = expressionParser.ParseExpression();
-        
+
         // 创建一个特殊的SetStatement，其中Id是一个Operation，表示数组解构
         var destructExpr = new Operation(
             new LangId("array_destruct"),
             LangTokenType.LeftBracket,
             new LangId(string.Join(",", identifiers)),
             position);
-        
+
         return new SetStatement(destructExpr, expression, position);
     }
-    
+
     /// <summary>
-    /// 解析对象解构赋值：{name, age} <- person
+    /// 解析对象解构赋值：{name, age} &lt;- person
     /// </summary>
     private SetStatement ParseObjectDestructuring()
     {
         Expect(LangTokenType.LeftBrace);
         var position = CreateSourcePosition(CurrentToken);
-        
+
         // 解析解构的属性列表
         var properties = new List<string>();
         while (CurrentToken.Type != LangTokenType.RightBrace)
@@ -677,9 +676,10 @@ public class StatementParser(
             {
                 throw CreateSyntaxError("对象解构赋值中的属性名必须是简单标识符");
             }
+
             var propertyName = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
-            
+
             // 检查是否有别名，如 {name: newName}
             var aliasName = propertyName;
             if (CurrentToken.Type == LangTokenType.Colon)
@@ -689,9 +689,10 @@ public class StatementParser(
                 {
                     throw CreateSyntaxError("对象解构赋值中的别名必须是简单标识符");
                 }
+
                 aliasName = CurrentToken.Value;
                 Expect(LangTokenType.Identifier);
-                
+
                 // 格式：propertyName:aliasName
                 properties.Add($"{propertyName}:{aliasName}");
             }
@@ -700,34 +701,33 @@ public class StatementParser(
                 // 只有属性名，没有别名
                 properties.Add(propertyName);
             }
-            
+
             // 检查是否还有更多属性
             if (CurrentToken.Type == LangTokenType.Comma)
             {
                 Expect(LangTokenType.Comma);
             }
         }
+
         Expect(LangTokenType.RightBrace);
-        
+
         // 检查是否有类型注解
-        var assumptionType = "";
         if (CurrentToken.Type == LangTokenType.Colon)
         {
             Expect(LangTokenType.Colon);
-            assumptionType = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
         }
-        
+
         Expect(LangTokenType.Assignment);
         var expression = expressionParser.ParseExpression();
-        
+
         // 创建一个特殊的SetStatement，其中Id是一个Operation，表示对象解构
         var destructExpr = new Operation(
             new LangId("object_destruct"),
             LangTokenType.LeftBrace,
             new LangId(string.Join(",", properties)),
             position);
-        
+
         return new SetStatement(destructExpr, expression, position);
     }
 
@@ -958,16 +958,6 @@ public class StatementParser(
             Expect(LangTokenType.Import); // 消耗 "import"
         }
 
-        // 检查是否为动态导入：import dynamic (旧语法，保持兼容性)
-        if (!isDynamic && CurrentToken.Type == LangTokenType.Dynamic)
-        {
-            Expect(LangTokenType.Dynamic); // 消耗 "dynamic"
-            isDynamic = true;
-
-            // 解析动态模块表达式
-            dynamicModuleExpression = expressionParser.ParseExpression();
-        }
-
         // 检查是否有导入指定项
         if (CurrentToken.Type == LangTokenType.LeftBrace)
         {
@@ -1024,12 +1014,15 @@ public class StatementParser(
 
             // 检查是否是选择导入：item1, item2 from module
             if (CurrentToken.Type == LangTokenType.Comma ||
-                (CurrentToken.Type == LangTokenType.Identifier && CurrentToken.Value == "from"))
+                CurrentToken is { Type: LangTokenType.Identifier, Value: "from" })
             {
                 // 这是选择导入：import item1, item2 from module
                 isSelective = true;
-                importSpecifiers = new List<ImportItem>();
-                importSpecifiers.Add(new ImportItem(firstIdentifier));
+                importSpecifiers =
+                [
+                    new ImportItem(firstIdentifier)
+                    // 解析更多的导入项
+                ];
 
                 // 解析更多的导入项
                 while (CurrentToken.Type == LangTokenType.Comma)
@@ -1083,10 +1076,8 @@ public class StatementParser(
         else if (isDynamic)
         {
             // 动态导入：解析模块名表达式
-            if (dynamicModuleExpression == null)
-            {
-                dynamicModuleExpression = expressionParser.ParseExpression();
-            }
+            dynamicModuleExpression ??= expressionParser.ParseExpression();
+
             moduleName = "__dynamic_module__";
         }
         else
@@ -1103,7 +1094,8 @@ public class StatementParser(
             Expect(LangTokenType.Identifier);
         }
 
-        return new ImportStatement(moduleName, position, importSpecifiers, fromClause, moduleAlias, isLazy, isSelective, isDynamic, dynamicModuleExpression);
+        return new ImportStatement(moduleName, position, importSpecifiers, fromClause, moduleAlias, isLazy, isSelective,
+            isDynamic, dynamicModuleExpression);
     }
 
     /// <summary>

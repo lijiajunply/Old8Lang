@@ -1,6 +1,5 @@
+dynamic import "dynamic_math" as math
 
-module_name <- "dynamic_math"
-import dynamic module_name as math
 result1 <- math.add(2.5, 3.5)
 result2 <- math.multiply(4.0, 2.5)
-result3 <- math.PI
+result3 <- math.PI()

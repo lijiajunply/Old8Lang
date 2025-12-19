@@ -44,12 +44,11 @@ public class DynamicImportTests : ModuleImportTestBase
                          """;
 
         var testContent = """
-
-                          module_name <- "dynamic_math"
-                          import dynamic module_name as math
+                          dynamic import "dynamic_math" as math
+                          
                           result1 <- math.add(2.5, 3.5)
                           result2 <- math.multiply(4.0, 2.5)
-                          result3 <- math.PI
+                          result3 <- math.PI()
 
                           """;
 
@@ -244,42 +243,50 @@ result3 <- calc.subtract(10.0, 3.0)
         // Arrange
         var modules = new Dictionary<string, string>
         {
-            ["plugin1"] = @"
-func getName() -> string { return ""Plugin 1"" }
-func getValue() -> int { return 100 }
-",
-            ["plugin2"] = @"
-func getName() -> string { return ""Plugin 2"" }
-func getValue() -> int { return 200 }
-",
-            ["plugin3"] = @"
-func getName() -> string { return ""Plugin 3"" }
-func getValue() -> int { return 300 }
-"
+            ["plugin1"] = """
+
+                          func getName() -> string { return "Plugin 1" }
+                          func getValue() -> int { return 100 }
+
+                          """,
+            ["plugin2"] = """
+
+                          func getName() -> string { return "Plugin 2" }
+                          func getValue() -> int { return 200 }
+
+                          """,
+            ["plugin3"] = """
+
+                          func getName() -> string { return "Plugin 3" }
+                          func getValue() -> int { return 300 }
+
+                          """
         };
 
-        var testContent = @"
-plugin_names <- [""plugin1"", ""plugin2"", ""plugin3""]
-results <- {}
-total <- 0
+        var testContent = """
 
-i <- 0
-while i < plugin_names.Size() {
-    module_name <- plugin_names[i]
+                          plugin_names <- ["plugin1", "plugin2", "plugin3"]
+                          results <- {}
+                          total <- 0
 
-    import dynamic module_name as plugin
-    plugin_name <- plugin.getName()
-    plugin_value <- plugin.getValue()
+                          i <- 0
+                          while i < plugin_names.Size() {
+                              module_name <- plugin_names[i]
 
-    results.Add(plugin_name)
-    total <- total + plugin_value
+                              import dynamic module_name as plugin
+                              plugin_name <- plugin.getName()
+                              plugin_value <- plugin.getValue()
 
-    i <- i + 1
-}
+                              results.Add(plugin_name)
+                              total <- total + plugin_value
 
-result1 <- results[0]
-result2 <- total
-";
+                              i <- i + 1
+                          }
+
+                          result1 <- results[0]
+                          result2 <- total
+
+                          """;
 
         // 创建插件模块
         foreach (var module in modules)

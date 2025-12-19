@@ -1,5 +1,5 @@
 
-from "class_module" import Calculator
+import {Calculator} from "class_module"
 calc <- Calculator()
 result1 <- calc.add(3, 4)
 result2 <- calc.multiply(5, 6)

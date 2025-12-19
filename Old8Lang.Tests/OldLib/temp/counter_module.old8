@@ -1,5 +1,5 @@
 
-const LOAD_COUNTER <- 0
+LOAD_COUNTER:const <- 0
 func incrementAndGet() -> int {
     // 模拟模块级别的状态
     return LOAD_COUNTER + 1
