@@ -1,0 +1,10 @@
+
+import "module_factory" as factory
+
+basic_calc <- factory.createCalculator("basic")
+scientific_calc <- factory.createCalculator("scientific")
+
+result1 <- basic_calc["add"](5, 3)
+result2 <- basic_calc["multiply"](4, 6)
+result3 <- scientific_calc["sqrt"](16)
+result4 <- scientific_calc["power"](2, 3)

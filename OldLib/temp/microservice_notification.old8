@@ -1,0 +1,7 @@
+
+func sendNotification(userId:int, message:string) -> bool {
+    return true
+}
+func getNotifications(userId:int) -> list {
+    return {{"Notification 1"}, {"Notification 2"}}
+}

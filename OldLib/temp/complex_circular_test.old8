@@ -1,0 +1,10 @@
+
+import "core" as core
+import "utils" as utils
+import "config" as config
+import "helpers" as helpers
+try {
+    result <- core.initialize()
+} catch {
+    result <- "Circular dependency detected"
+}

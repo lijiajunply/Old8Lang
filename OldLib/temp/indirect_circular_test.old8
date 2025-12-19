@@ -1,0 +1,7 @@
+
+import "indirect_module_a" as a
+try {
+    result <- a.getA()
+} catch {
+    result <- -1  // 表示检测到循环依赖
+}

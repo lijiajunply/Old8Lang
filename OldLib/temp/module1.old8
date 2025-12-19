@@ -1,0 +1,4 @@
+
+func process(data:int) -> string {
+    return "Module1: " + data.ToStr()
+}

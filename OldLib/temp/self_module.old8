@@ -1,0 +1,5 @@
+
+import "self_module"
+func getValue() -> int {
+    return 42
+}

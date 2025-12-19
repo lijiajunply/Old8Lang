@@ -1,0 +1,5 @@
+
+import "diamond_d"
+func getCValue() -> int {
+    return getSharedValue() + 200
+}

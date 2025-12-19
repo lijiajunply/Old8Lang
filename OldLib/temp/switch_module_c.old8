@@ -1,0 +1,4 @@
+
+func featureC() -> string {
+    return "Feature C activated"
+}

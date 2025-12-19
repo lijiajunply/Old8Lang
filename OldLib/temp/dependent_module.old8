@@ -1,0 +1,5 @@
+
+import "missing_dependency"
+func getValue() -> int {
+    return dependency.getValue()
+}

@@ -33,7 +33,19 @@ public abstract class ModuleImportTestBase(ITestOutputHelper output)
     /// </summary>
     protected (LangInterpreter interpreter, Exception? exception) ExecuteCodeFile(string relativeFilePath)
     {
+        // 首先尝试在主目录中查找文件
         var fullPath = Path.Combine(TestFilesDirectory, relativeFilePath);
+
+        // 如果主目录中不存在，尝试在 temp 子目录中查找
+        if (!File.Exists(fullPath))
+        {
+            var tempPath = Path.Combine(TestFilesDirectory, "temp", relativeFilePath);
+            if (File.Exists(tempPath))
+            {
+                fullPath = tempPath;
+            }
+        }
+
         if (!File.Exists(fullPath))
         {
             throw new FileNotFoundException($"测试文件不存在: {fullPath}");

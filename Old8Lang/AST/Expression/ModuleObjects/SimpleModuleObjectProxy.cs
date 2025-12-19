@@ -11,10 +11,9 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 public class SimpleModuleObjectProxy : LangValueType, IModuleObject
 {
     private readonly string _moduleName;
-    private readonly VariateManager _sourceManager;
-    private readonly SourcePosition _position;
-    private readonly Dictionary<string, LangValueType> _symbolCache = new();
-    private bool _initialized = false;
+    private readonly VariateManager SourceManager;
+    private readonly Dictionary<string, LangValueType> SymbolCache = new();
+    private bool Initialized;
 
     /// <summary>
     /// 构造函数
@@ -26,8 +25,8 @@ public class SimpleModuleObjectProxy : LangValueType, IModuleObject
         : base(position)
     {
         _moduleName = moduleName;
-        _sourceManager = manager;
-        _position = position;
+        SourceManager = manager;
+        Position = position;
     }
 
     #region IModuleObject Implementation
@@ -40,12 +39,12 @@ public class SimpleModuleObjectProxy : LangValueType, IModuleObject
     /// <summary>
     /// 模块是否已加载
     /// </summary>
-    public bool IsLoaded => _initialized;
+    public bool IsLoaded => Initialized;
 
     /// <summary>
     /// 模块加载状态
     /// </summary>
-    public ModuleLoadingState LoadingState => _initialized ? ModuleLoadingState.Loaded : ModuleLoadingState.NotLoaded;
+    public ModuleLoadingState LoadingState => Initialized ? ModuleLoadingState.Loaded : ModuleLoadingState.NotLoaded;
 
     /// <summary>
     /// 获取模块中的符号
@@ -55,7 +54,7 @@ public class SimpleModuleObjectProxy : LangValueType, IModuleObject
     public LangValueType? GetSymbol(string symbolName)
     {
         EnsureInitialized();
-        _symbolCache.TryGetValue(symbolName, out var symbol);
+        SymbolCache.TryGetValue(symbolName, out var symbol);
         return symbol;
     }
 
@@ -67,7 +66,7 @@ public class SimpleModuleObjectProxy : LangValueType, IModuleObject
     public bool HasSymbol(string symbolName)
     {
         EnsureInitialized();
-        return _symbolCache.ContainsKey(symbolName);
+        return SymbolCache.ContainsKey(symbolName);
     }
 
     /// <summary>
@@ -77,7 +76,7 @@ public class SimpleModuleObjectProxy : LangValueType, IModuleObject
     public IEnumerable<string> GetExportedSymbols()
     {
         EnsureInitialized();
-        return _symbolCache.Keys;
+        return SymbolCache.Keys;
     }
 
     /// <summary>
@@ -120,16 +119,16 @@ public class SimpleModuleObjectProxy : LangValueType, IModuleObject
             }
 
             // 3. 尝试从全局作用域中获取函数（兼容旧行为）
-            if (_sourceManager.GetValue(new LangId(functionName)) is FuncLangValue globalFuncValue)
+            if (SourceManager.GetValue(new LangId(functionName)) is FuncLangValue globalFuncValue)
             {
                 // 缓存结果以提高后续访问性能
-                _symbolCache[functionName] = globalFuncValue;
+                SymbolCache[functionName] = globalFuncValue;
                 return globalFuncValue.Run(currentManager, instance.Ids);
             }
 
-            if (_sourceManager.GetValue(new LangId(upperCaseName)) is FuncLangValue globalUpperFuncValue)
+            if (SourceManager.GetValue(new LangId(upperCaseName)) is FuncLangValue globalUpperFuncValue)
             {
-                _symbolCache[upperCaseName] = globalUpperFuncValue;
+                SymbolCache[upperCaseName] = globalUpperFuncValue;
                 return globalUpperFuncValue.Run(currentManager, instance.Ids);
             }
 
@@ -147,10 +146,10 @@ public class SimpleModuleObjectProxy : LangValueType, IModuleObject
             }
 
             // 2. 尝试从全局作用域中获取
-            var globalValue = _sourceManager.GetValue(simpleLangId);
+            var globalValue = SourceManager.GetValue(simpleLangId);
             if (globalValue != null)
             {
-                _symbolCache[propertyName] = globalValue;
+                SymbolCache[propertyName] = globalValue;
                 return globalValue;
             }
 
@@ -166,7 +165,7 @@ public class SimpleModuleObjectProxy : LangValueType, IModuleObject
     /// <returns>字符串表示</returns>
     public override string ToString()
     {
-        var status = _initialized ? $"proxy" : "uninitialized";
+        var status = Initialized ? $"proxy" : "uninitialized";
         return $"<module proxy {_moduleName} ({status})>";
     }
 
@@ -179,9 +178,9 @@ public class SimpleModuleObjectProxy : LangValueType, IModuleObject
     /// </summary>
     private void EnsureInitialized()
     {
-        if (!_initialized)
+        if (!Initialized)
         {
-            _initialized = true;
+            Initialized = true;
             // 这里可以添加预加载逻辑，如果需要的话
         }
     }

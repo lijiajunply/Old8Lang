@@ -1,0 +1,9 @@
+
+counter <- 0
+func increment() -> int {
+    counter <- counter + 1
+    return counter
+}
+func getCounter() -> int {
+    return counter
+}

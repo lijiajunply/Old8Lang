@@ -9,7 +9,6 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 public class LazyModuleObject : BaseModuleObject
 {
     private readonly VariateManager SourceManager;
-    private readonly SourcePosition _position;
 
     /// <summary>
     /// 构造函数
@@ -21,7 +20,6 @@ public class LazyModuleObject : BaseModuleObject
         : base(moduleName, position)
     {
         SourceManager = manager;
-        _position = position;
         // 不在构造函数中加载模块
     }
 
@@ -38,7 +36,7 @@ public class LazyModuleObject : BaseModuleObject
         try
         {
             // 创建导入语句并执行
-            var importStatement = new ImportStatement(ModuleName, _position);
+            var importStatement = new ImportStatement(ModuleName, Position);
             importStatement.Run(manager);
 
             // 提取模块中的所有符号

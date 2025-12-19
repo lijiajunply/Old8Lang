@@ -10,7 +10,6 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 public class LazyItemWrapper(string moduleName, string itemName, VariateManager manager, SourcePosition position)
     : LangValueType(position)
 {
-    private readonly SourcePosition position = position;
     private bool Loaded;
     private LangValueType? LoadedItem;
 
@@ -29,7 +28,7 @@ public class LazyItemWrapper(string moduleName, string itemName, VariateManager 
             return LoadedItem.Dot(dotExpression, currentManager);
         }
 
-        throw new AttributeError(this, dotExpression.ToString(), "LazyItem");
+        throw new AttributeError(this, dotExpression + " is not callable", "LazyItem");
     }
 
     /// <summary>
@@ -55,8 +54,8 @@ public class LazyItemWrapper(string moduleName, string itemName, VariateManager 
         try
         {
             // 执行实际的导入
-            var importItems = new List<ImportItem> { new ImportItem(itemName) };
-            var importStatement = new ImportStatement(moduleName, position, importItems, fromClause: true);
+            var importItems = new List<ImportItem> { new(itemName) };
+            var importStatement = new ImportStatement(moduleName, Position, importItems, fromClause: true);
             importStatement.Run(manager);
 
             // 查找导入的项目

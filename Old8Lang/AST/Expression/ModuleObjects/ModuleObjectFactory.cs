@@ -34,7 +34,7 @@ public static class ModuleObjectFactory
         var cleanModuleName = moduleName.Trim('"');
 
         // 1. 处理选择性导入
-        if ((fromClause || isSelective) && importSpecifiers != null && importSpecifiers.Count > 0)
+        if ((fromClause || isSelective) && importSpecifiers is { Count: > 0 })
         {
             return new SelectiveModuleObject(cleanModuleName, importSpecifiers, isLazy, manager, position);
         }
@@ -50,10 +50,8 @@ public static class ModuleObjectFactory
         {
             return new LazyModuleObject(cleanModuleName, manager, position);
         }
-        else
-        {
-            return new EagerModuleObject(cleanModuleName, manager, position);
-        }
+
+        return new EagerModuleObject(cleanModuleName, manager, position);
     }
 
     /// <summary>

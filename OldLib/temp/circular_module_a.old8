@@ -1,0 +1,8 @@
+
+import "circular_module_b"
+func funcA() -> int {
+    return 10 + getValueB()
+}
+func getValueA() -> int {
+    return 5
+}

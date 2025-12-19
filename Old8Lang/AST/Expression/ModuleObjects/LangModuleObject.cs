@@ -6,7 +6,7 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 /// <summary>
 /// 简单模块对象，用于处理带别名的模块导入
 /// </summary>
-public class SimpleModuleObject(VariateManager manager, SourcePosition position = default) : LangValueType(position)
+public class LangModuleObject(VariateManager manager, SourcePosition position = default) : LangValueType(position)
 {
     /// <summary>
     /// 处理方法调用，将其转发到全局作用域

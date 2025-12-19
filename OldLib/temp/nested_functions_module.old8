@@ -1,0 +1,11 @@
+
+func outerFunction() -> string {
+    func innerFunction() -> string {
+        return "Inner"
+    }
+    return "Outer: " + innerFunction()
+}
+
+func standaloneFunction() -> string {
+    return "Standalone"
+}

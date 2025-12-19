@@ -8,9 +8,6 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 /// </summary>
 public class EagerModuleObject : BaseModuleObject
 {
-    private readonly VariateManager SourceManager;
-    private readonly SourcePosition _position;
-
     /// <summary>
     /// 构造函数
     /// </summary>
@@ -20,9 +17,6 @@ public class EagerModuleObject : BaseModuleObject
     public EagerModuleObject(string moduleName, VariateManager manager, SourcePosition position = default)
         : base(moduleName, position)
     {
-        SourceManager = manager;
-        _position = position;
-
         // 立即加载模块
         LoadModule(manager);
     }
@@ -44,12 +38,12 @@ public class EagerModuleObject : BaseModuleObject
     /// 加载模块（实际在构造函数中已完成）
     /// </summary>
     /// <param name="manager">变量管理器</param>
-    protected override void LoadModule(VariateManager manager)
+    protected sealed override void LoadModule(VariateManager manager)
     {
         if (IsLoaded) return; // 已经在构造函数中加载
 
         // 创建导入语句并执行
-        var importStatement = new ImportStatement(ModuleName, _position);
+        var importStatement = new ImportStatement(ModuleName, Position);
         importStatement.Run(manager);
 
         // 提取模块中的所有符号

@@ -1,0 +1,6 @@
+
+func func1() -> int { return 1 }
+func func2() -> int { return 2 }
+func func3() -> int { return 3 }
+func func4() -> int { return 4 }
+func func5() -> int { return 5 }

@@ -1,0 +1,24 @@
+
+import "math" as math
+import "graphics" as gfx
+
+player <- gfx.createSprite("player.png")
+enemy <- gfx.createSprite("enemy.png")
+
+func updateGame() -> string {
+    playerPos <- math.vec2(10.0, 20.0)
+    enemyPos <- math.vec2(30.0, 40.0)
+
+    player <- gfx.setPosition(player, playerPos)
+    enemy <- gfx.setPosition(enemy, enemyPos)
+
+    dist <- math.distance(playerPos, enemyPos)
+
+    if dist < 15.0 {
+        return "Enemy is near! Distance: " + dist.ToStr()
+    } else {
+        return "Enemy is far away. Distance: " + dist.ToStr()
+    }
+}
+
+result <- updateGame()

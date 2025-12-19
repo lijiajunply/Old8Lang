@@ -1,0 +1,3 @@
+
+import "dependent_module"
+result <- dependent_module.getValue()

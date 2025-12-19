@@ -1,0 +1,5 @@
+
+func getModuleInfo() -> string {
+    return "Absolute path module loaded"
+}
+const ABSOLUTE_CONST <- 42

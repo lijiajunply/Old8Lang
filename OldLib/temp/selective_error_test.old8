@@ -1,0 +1,3 @@
+
+from "module" import nonExistentFunction
+result <- nonExistentFunction()

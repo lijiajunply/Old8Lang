@@ -1,0 +1,17 @@
+
+user_type <- "premium"
+user_region <- "us"
+
+if (user_type == "premium") {
+    if (user_region == "us") {
+        import "level1_module" as l1
+        result <- l1.level1Feature() + " - US Premium"
+    } else if (user_region == "eu") {
+        import "level2_module" as l2
+        result <- l2.level2Feature() + " - EU Premium"
+    } else {
+        result <- "Premium - Other region"
+    }
+} else {
+    result <- "Basic user"
+}

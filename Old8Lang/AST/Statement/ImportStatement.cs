@@ -100,7 +100,7 @@ public class ImportStatement(
             if (ModuleAlias != null)
             {
                 // 创建一个简单的模块对象，它将直接将方法调用转发到全局作用域
-                var moduleObj = new SimpleModuleObject(manager);
+                var moduleObj = new LangModuleObject(manager);
 
                 // 将模块对象添加到当前作用域
                 manager.Scopes[^1][ModuleAlias] = moduleObj;
@@ -293,7 +293,7 @@ public class ImportStatement(
                 block.Run(manager);
 
                 // 创建一个简单的模块对象，它将直接将方法调用转发到全局作用域
-                var moduleObj = new SimpleModuleObject(manager);
+                var moduleObj = new LangModuleObject(manager);
 
                 // 将模块对象添加到当前作用域
                 manager.Scopes[^1][ModuleAlias] = moduleObj;
@@ -624,7 +624,7 @@ public class ImportStatement(
             {
                 if (alias != null)
                 {
-                    var moduleObj = new SimpleModuleObject(manager);
+                    var moduleObj = new LangModuleObject(manager);
                     manager.Scopes[^1][alias] = moduleObj;
                 }
             }
@@ -658,7 +658,7 @@ public class ImportStatement(
 
                 if (alias != null)
                 {
-                    var moduleObj = new SimpleModuleObject(manager);
+                    var moduleObj = new LangModuleObject(manager);
                     manager.Scopes[^1][alias] = moduleObj;
                 }
             }

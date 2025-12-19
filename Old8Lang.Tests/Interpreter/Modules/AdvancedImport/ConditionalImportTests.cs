@@ -404,16 +404,21 @@ func expensiveOperation() -> string {
     // 模拟耗时操作
     return ""Expensive operation completed""
 }
-const HEAVY_DATA <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+func getDataSize() -> int {
+    HEAVY_DATA:const <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    return HEAVY_DATA.Size()
+}
 ";
 
         var testContent = @"
 enable_expensive <- false
+result <- """"
+data_size <- 0
 
 if (enable_expensive) {
-    lazy import ""expensive_module"" as exp
+    import ""expensive_module"" as exp
     result <- exp.expensiveOperation()
-    data_size <- exp.HEAVY_DATA.Size()
+    data_size <- exp.getDataSize()
 } else {
     result <- ""Expensive features disabled""
     data_size <- 0
@@ -430,5 +435,44 @@ if (enable_expensive) {
         Assert.Null(exception);
         AssertVariableValue(interpreter, "result", "Expensive features disabled");
         AssertVariableValue(interpreter, "data_size", 0);
+    }
+
+    [Fact]
+    public void Import_ConditionalLazyImport_WhenTrue_ShouldImportModule()
+    {
+        // Arrange
+        var expensiveModule = @"
+func expensiveOperation() -> string {
+    return ""Expensive operation completed""
+}
+func getSimpleValue() -> int {
+    return 42
+}
+";
+
+        var testContent = @"
+enable_expensive <- true
+result <- """"
+simple_value <- 0
+if (enable_expensive) {
+    import ""expensive_module"" as exp
+    result <- exp.expensiveOperation()
+    simple_value <- exp.getSimpleValue()
+} else {
+    result <- ""Expensive features disabled""
+    simple_value <- 0
+}
+";
+
+        CreateTempModuleFile("expensive_module.old8", expensiveModule);
+        CreateTempModuleFile("lazy_conditional_true_test.old8", testContent);
+
+        // Act
+        var (interpreter, exception) = ExecuteCodeFile("lazy_conditional_true_test.old8");
+
+        // Assert
+        Assert.Null(exception);
+        AssertVariableValue(interpreter, "result", "Expensive operation completed");
+        AssertVariableValue(interpreter, "simple_value", 42);
     }
 }

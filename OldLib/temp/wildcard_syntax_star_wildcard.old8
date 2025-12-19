@@ -1,0 +1,3 @@
+
+from "wildcard_syntax_module" import *
+result <- testFunction()

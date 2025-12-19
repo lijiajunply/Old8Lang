@@ -1,0 +1,8 @@
+
+module_name <- "nonexistent_module"
+try {
+    import dynamic module_name as missing_module
+    result <- "Module loaded successfully"
+} catch {
+    result <- "Module not found: " + module_name
+}

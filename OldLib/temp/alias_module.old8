@@ -1,0 +1,7 @@
+
+func veryLongFunctionName() -> string {
+    return "success"
+}
+func anotherLongName() -> int {
+    return 100
+}

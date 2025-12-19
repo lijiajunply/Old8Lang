@@ -1,0 +1,3 @@
+
+import "math" as module123
+result <- module123.getValue()

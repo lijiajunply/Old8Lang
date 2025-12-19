@@ -11,8 +11,6 @@ public abstract class BaseModuleObject : LangValueType, IModuleObject
 {
     private readonly Dictionary<string, LangValueType> Symbols = new();
     private readonly Lock LoadLock = new();
-    private ModuleLoadingState _loadingState = ModuleLoadingState.NotLoaded;
-    private Exception? LoadException;
 
     /// <summary>
     /// 构造函数
@@ -35,16 +33,12 @@ public abstract class BaseModuleObject : LangValueType, IModuleObject
     /// <summary>
     /// 模块是否已加载
     /// </summary>
-    public bool IsLoaded => _loadingState == ModuleLoadingState.Loaded;
+    public bool IsLoaded => LoadingState == ModuleLoadingState.Loaded;
 
     /// <summary>
     /// 模块加载状态
     /// </summary>
-    public ModuleLoadingState LoadingState
-    {
-        get => _loadingState;
-        protected set => _loadingState = value;
-    }
+    public ModuleLoadingState LoadingState { get; private set; }
 
     /// <summary>
     /// 获取模块中的符号
@@ -89,7 +83,7 @@ public abstract class BaseModuleObject : LangValueType, IModuleObject
         {
             lock (LoadLock)
             {
-                if (!IsLoaded && _loadingState != ModuleLoadingState.Loading)
+                if (!IsLoaded && LoadingState != ModuleLoadingState.Loading)
                 {
                     PerformModuleLoad(manager);
                 }
@@ -127,7 +121,7 @@ public abstract class BaseModuleObject : LangValueType, IModuleObject
         if (dotExpression is Instance instance)
         {
             // 处理函数调用：module.function(args)
-            var functionName = instance.Id?.IdName;
+            var functionName = instance.Id.IdName;
             if (!string.IsNullOrEmpty(functionName))
             {
                 var func = GetSymbol(functionName) ?? GetSymbolIgnoreCase(functionName);
@@ -150,7 +144,7 @@ public abstract class BaseModuleObject : LangValueType, IModuleObject
     /// <returns>字符串表示</returns>
     public override string ToString()
     {
-        return $"<module {ModuleName} ({_loadingState})>";
+        return $"<module {ModuleName} ({LoadingState})>";
     }
 
     #endregion
@@ -191,8 +185,7 @@ public abstract class BaseModuleObject : LangValueType, IModuleObject
     /// <param name="exception">异常信息</param>
     protected void OnLoadFailed(Exception exception)
     {
-        _loadingState = ModuleLoadingState.LoadFailed;
-        LoadException = exception;
+        LoadingState = ModuleLoadingState.LoadFailed;
     }
 
     /// <summary>
@@ -200,8 +193,7 @@ public abstract class BaseModuleObject : LangValueType, IModuleObject
     /// </summary>
     protected void OnLoadSuccess()
     {
-        _loadingState = ModuleLoadingState.Loaded;
-        LoadException = null;
+        LoadingState = ModuleLoadingState.Loaded;
     }
 
     #endregion
@@ -238,7 +230,7 @@ public abstract class BaseModuleObject : LangValueType, IModuleObject
     {
         try
         {
-            _loadingState = ModuleLoadingState.Loading;
+            LoadingState = ModuleLoadingState.Loading;
             LoadModule(manager);
             OnLoadSuccess();
         }

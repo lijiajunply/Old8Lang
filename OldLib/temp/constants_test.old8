@@ -1,0 +1,5 @@
+
+import "constants_module"
+pi_value <- constants_module.PI
+e_value <- constants_module.E
+pi_func <- constants_module.getPi()

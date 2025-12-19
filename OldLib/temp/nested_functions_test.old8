@@ -1,0 +1,4 @@
+
+from "nested_functions_module" import *
+result1 <- outerFunction()
+result2 <- standaloneFunction()

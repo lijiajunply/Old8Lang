@@ -1,0 +1,11 @@
+
+lazy import "heavy_module" as heavy
+status_before <- "Not loaded yet"
+
+// 此时模块还未加载
+quick_result <- heavy.quickFunction()
+status_after_quick <- "Loaded after quick call"
+
+// 重型计算会延迟到实际调用时
+heavy_result <- heavy.heavyComputation()
+status_after_heavy <- "Loaded after heavy call"

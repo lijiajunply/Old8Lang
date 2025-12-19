@@ -1,0 +1,6 @@
+
+import "utils"
+import "config"
+func initialize() -> string {
+    return "Core initialized"
+}

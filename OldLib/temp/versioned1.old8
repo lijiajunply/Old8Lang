@@ -1,0 +1,7 @@
+
+func getVersion() -> string {
+    return "Version 1.0"
+}
+func process(data:string) -> string {
+    return "Processed by v1: " + data
+}

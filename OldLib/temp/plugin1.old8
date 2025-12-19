@@ -1,0 +1,3 @@
+
+func getName() -> string { return "Plugin 1" }
+func getValue() -> int { return 100 }

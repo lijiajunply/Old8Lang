@@ -1,0 +1,5 @@
+
+from "wildcard_classes" import *
+result1 <- MathUtils.add(3, 4)
+result2 <- StringUtils.concat("Hello", "World")
+result3 <- helperFunction()

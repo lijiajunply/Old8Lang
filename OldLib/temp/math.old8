@@ -1,0 +1,13 @@
+
+func vec2(x:double, y:double) -> dict {
+    return {"x": x, "y": y}
+}
+func distance(a:dict, b:dict) -> double {
+    dx <- b["x"] - a["x"]
+    dy <- b["y"] - a["y"]
+    return sqrt(dx * dx + dy * dy)
+}
+func normalize(vec:dict) -> dict {
+    length <- sqrt(vec["x"] * vec["x"] + vec["y"] * vec["y"])
+    return {"x": vec["x"] / length, "y": vec["y"] / length}
+}

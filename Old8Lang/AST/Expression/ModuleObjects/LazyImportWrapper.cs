@@ -11,7 +11,6 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 public class LazyImportWrapper(string moduleName, VariateManager manager, SourcePosition position)
     : LangValueType(position)
 {
-    private readonly SourcePosition position = position;
     private bool Loaded;
     private LangValueType? LoadedModule;
 
@@ -43,7 +42,7 @@ public class LazyImportWrapper(string moduleName, VariateManager manager, Source
         try
         {
             // 执行实际的导入
-            var importStatement = new ImportStatement(moduleName, position);
+            var importStatement = new ImportStatement(moduleName, Position);
             importStatement.Run(manager);
 
             // 查找导入的模块对象

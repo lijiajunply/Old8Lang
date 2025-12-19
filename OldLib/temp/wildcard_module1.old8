@@ -1,0 +1,5 @@
+
+const VALUE <- 100
+func getValue() -> int {
+    return VALUE
+}

@@ -1,11 +1,13 @@
 
 enable_expensive <- false
+result <- ""
+simple_value <- 0
 
 if (enable_expensive) {
-    lazy import "expensive_module" as exp
+    import "expensive_module" as exp
     result <- exp.expensiveOperation()
-    data_size <- exp.HEAVY_DATA.Size()
+    simple_value <- exp.getSimpleValue()
 } else {
     result <- "Expensive features disabled"
-    data_size <- 0
+    simple_value <- 0
 }

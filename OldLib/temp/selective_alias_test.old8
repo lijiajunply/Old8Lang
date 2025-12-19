@@ -1,0 +1,4 @@
+
+from "alias_module" import veryLongFunctionName as shortFunc, anotherLongName as shortNum
+result1 <- shortFunc()
+result2 <- shortNum

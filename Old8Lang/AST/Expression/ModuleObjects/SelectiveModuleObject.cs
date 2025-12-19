@@ -13,7 +13,6 @@ public class SelectiveModuleObject : BaseModuleObject
     private readonly List<ImportItem> SelectedItems;
     private readonly bool IsLazy;
     private readonly VariateManager SourceManager;
-    private readonly SourcePosition _position;
 
     /// <summary>
     /// 构造函数
@@ -35,7 +34,6 @@ public class SelectiveModuleObject : BaseModuleObject
         SelectedItems = selectedItems;
         IsLazy = isLazy;
         SourceManager = manager;
-        _position = position;
 
         if (!IsLazy)
         {
@@ -51,7 +49,7 @@ public class SelectiveModuleObject : BaseModuleObject
     /// <returns>生成的模块名称</returns>
     private static string GenerateModuleName(string sourceModuleName, List<ImportItem> selectedItems)
     {
-        var itemNames = string.Join(", ", selectedItems.Select(item => item.Alias ?? item.Name));
+        var itemNames = string.Join(", ", selectedItems.Select(item => item.Alias));
         return $"{sourceModuleName}[{itemNames}]";
     }
 
@@ -68,7 +66,7 @@ public class SelectiveModuleObject : BaseModuleObject
         try
         {
             // 创建导入语句并执行
-            var importStatement = new ImportStatement(SourceModuleName, _position);
+            var importStatement = new ImportStatement(SourceModuleName, Position);
             importStatement.Run(manager);
 
             // 提取选定的符号
@@ -100,7 +98,7 @@ public class SelectiveModuleObject : BaseModuleObject
         foreach (var importItem in SelectedItems)
         {
             var sourceName = importItem.Name;
-            var targetName = importItem.Alias ?? sourceName;
+            var targetName = importItem.Alias;
 
             // 查找源符号
             if (currentScope.TryGetValue(sourceName, out var symbolValue))

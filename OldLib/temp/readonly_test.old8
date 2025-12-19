@@ -1,0 +1,3 @@
+
+import "readonly_module"
+result <- readonly_module.getValue()

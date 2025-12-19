@@ -1,0 +1,3 @@
+
+from "empty_selective_module" import
+result <- "no imports"

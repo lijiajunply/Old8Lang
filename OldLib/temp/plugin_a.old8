@@ -1,0 +1,6 @@
+
+// 插件A实现
+import "plugin_interface"
+func initialize() -> string { return "Plugin A initialized" }
+func execute(input:string) -> string { return "Plugin A processed: " + input }
+func cleanup() -> string { return "Plugin A cleaned up" }

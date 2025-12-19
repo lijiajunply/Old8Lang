@@ -1,0 +1,3 @@
+
+func leaf3Function() -> string { return "Leaf3" }
+const LEAF3_CONST <- 300
