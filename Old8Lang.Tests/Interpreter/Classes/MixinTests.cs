@@ -39,7 +39,7 @@ public class MixinTests
                     y <- newY
                 }
 
-                func GetPosition() -> (double, double) {
+                func GetPosition() -> tuple {
                     return (x, y)
                 }
             }
@@ -166,9 +166,9 @@ public class MixinTests
                 func Add(a:double, b:double) -> double {
                     // Override with validation
                     if a < 0 or b < 0 {
-                        return 0
+                        return 0.0  // 确保返回double类型
                     }
-                    return super.Add(a, b)
+                    return a + b  // 直接调用原始实现，避免无限递归
                 }
 
                 func AddAll(numbers:[double]) -> double {
@@ -244,7 +244,7 @@ public class MixinTests
                 }
 
                 func AddError(error:string) -> void {
-                    errors.Push(error)
+                    errors.Add(error)
                 }
 
                 func HasErrors() -> bool {
@@ -256,8 +256,8 @@ public class MixinTests
                 public value <- """"
 
                 func init() {
-                    super.Configurable()
-                    super.Validatable()
+                    this.Configurable()
+                    this.Validatable()
                 }
 
                 func Validate() -> bool {
@@ -338,7 +338,7 @@ public class MixinTests
                 public radius <- 0
 
                 func init(n:string, r:double) {
-                    super.Shape(n)
+                    this.Shape(n)
                     radius <- r
                 }
 
@@ -449,7 +449,7 @@ public class MixinTests
                 public version <- 1
 
                 func ExtendedFeatures() {
-                    super.BasicFeatures()
+                    this.BasicFeatures()
                     version <- 1
                 }
 
@@ -462,12 +462,12 @@ public class MixinTests
                 public features <- {}
 
                 func AdvancedFeatures() {
-                    super.ExtendedFeatures()
+                    this.ExtendedFeatures()
                     features <- {""feature1"", ""feature2""}
                 }
 
                 func AddFeature(feature:string) -> void {
-                    features.Push(feature)
+                    features.Add(feature)
                 }
 
                 func GetAllFeatures() -> string {
@@ -477,7 +477,7 @@ public class MixinTests
 
             class AdvancedObject with AdvancedFeatures {
                 func init(n:string, v:int) {
-                    super.BasicFeatures()
+                    this.BasicFeatures()
                     SetName(n)
                     version <- v
                 }
@@ -499,9 +499,9 @@ public class MixinTests
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
         // Result should contain name, version, and features
-        Assert.True(((StringLangValue)result).Value.Contains("MyObject"));
-        Assert.True(((StringLangValue)result).Value.Contains("v2"));
-        Assert.True(((StringLangValue)result).Value.Contains("feature3"));
+        Assert.Contains("MyObject", ((StringLangValue)result).Value);
+        Assert.Contains("v2", ((StringLangValue)result).Value);
+        Assert.Contains("feature3", ((StringLangValue)result).Value);
     }
 
     [Fact]
@@ -553,7 +553,7 @@ public class MixinTests
             // For this test, we'll create a class that includes the mixin
             class Player extends GameObject with EventSystem {
                 func init(id:int) {
-                    super.GameObject(id)
+                    this.GameObject(id)
                 }
 
                 func MoveWithEvent(newX:int, newY:int) -> void {
@@ -626,7 +626,7 @@ public class MixinTests
 
                 func IncrementVersion() -> void {
                     version <- version + 1
-                    history.Push(""version "" + version.ToStr())
+                    history.Add(""version "" + version.ToStr())
                 }
             }
 
@@ -634,8 +634,8 @@ public class MixinTests
                 public content <- """"
 
                 func init(text:string) {
-                    super.Timed()
-                    super.Versioned()
+                    this.Timed()
+                    this.Versioned()
                     content <- text
                 }
 

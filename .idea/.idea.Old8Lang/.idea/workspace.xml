@@ -19,9 +19,9 @@
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeTemplate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeTemplate.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/MixinTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/MixinTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,6 +63,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
@@ -394,7 +395,7 @@
       <workItem from="1766085560295" duration="10610000" />
       <workItem from="1766098235624" duration="16792000" />
       <workItem from="1766146301314" duration="8804000" />
-      <workItem from="1766156569385" duration="757000" />
+      <workItem from="1766156569385" duration="1528000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -739,7 +740,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="301" />
+    <option name="localTasksCounter" value="302" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -766,7 +767,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(interpreter): 更新函数调用和高阶函数测试用例&#10;&#10;- 修改 processNumbers 函数为两个独立实现以支持不同场景测试&#10;- 使用原始字符串字面量语法重构数组重载测试代码&#10;- 修正 memoize 高阶函数测试逻辑并添加缓存命中统计&#10;- 简化 groupBy 函数实现并修复类型声明错误&#10;- 调整断言逻辑以更准确验证函数行为和结果值&#10;- 移除冗余变量跟踪并优化测试可读性" />
     <MESSAGE value="refactor(interpreter): 优化函数调用和类型转换实现&#10;&#10;- 简化闭包测试中的函数创建逻辑，移除不必要的包装函数&#10;- 重构递归计数器测试，改进参数传递和调用方式&#10;- 更新日志记录测试，直接调用函数而非工厂模式&#10;- 修改函数重载测试，为不同类型数组使用独立函数名&#10;- 改进高阶函数测试，优化groupBy实现和类型处理&#10;- 增强类型转换功能，支持布尔值、字符串到整数的灵活转换&#10;- 扩展类型转换方法，新增ToDouble、ToBool、ToChar等转换函数&#10;- 修复类型比较方法命名冲突，将ToBool重命名为EqualsTo&#10;- 更新字符转换逻辑，支持整数和字符串到字符的转换&#10;- 完善列表和数组转换实现，添加空值处理机制" />
     <MESSAGE value="refactor(interpreter): 优化算术运算和字符串模板解析&#10;&#10;- 改进浮点数运算的精度处理，使用容差比较替代直接相等判断&#10;- 在整数溢出时自动转换为双精度浮点数，避免抛出异常&#10;- 增强字符串模板解析逻辑，正确处理嵌套大括号和转义字符&#10;- 修复字符串模板中表达式提取的边界条件问题&#10;- 更新算术测试用例，确保浮点数和整数运算的准确性&#10;- 移除无效的类型转换测试方法，简化测试结构" />
     <MESSAGE value="fix(tests): 修正逻辑表达式和类型转换测试用例&#10;&#10;- 修正 LogicalTests 中 XOR 表达式的结果断言&#10;- 更新数组比较测试中的数组初始化值&#10;- 移除 TupleToList 和 ListToTuple 的类型转换测试&#10;- 增强 ValueTypeFuncStatic 对 ListLangValue 到 ArrayLangValue 的转换支持" />
@@ -791,7 +791,8 @@
     <MESSAGE value="feat(lang): 支持嵌套类的实例化和注册&#10;&#10;- 在AnyLangValue中添加嵌套类访问逻辑&#10;- 实现嵌套类的递归注册机制&#10;- 修改BlockStatement以支持嵌套类的ClassMemberId标识&#10;- 为ClassInit添加公共属性AnyLangValue以便访问类模板&#10;- 移除冗余的模块对象架构文件和并发原语测试文件" />
     <MESSAGE value="test(interpreter): 更新类继承和实例化测试用例&#10;&#10;- 修改测试代码中的字符串字面量语法为原始字符串&#10;- 更新类继承测试中的代码格式和字段访问方式&#10;- 修正实例化测试中的循环语法和方法调用&#10;- 调整类成员访问逻辑以适应新的嵌套类支持&#10;- 优化测试代码结构提高可读性和维护性" />
     <MESSAGE value="feat(lang): 实现super关键字支持&#10;&#10;- 在LangTokenType中添加Super枚举值&#10;- 新增SuperExpression类处理super表达式解析&#10;- 扩展AnyLangValue类，增加GetSuperInstance方法获取父类实例&#10;- 在VariateManager中添加GetCurrentInstance方法获取当前实例&#10;- 更新PrimaryParser以识别和解析super关键字&#10;- 添加SuperTests测试文件验证super关键字功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 实现super关键字支持&#10;&#10;- 在LangTokenType中添加Super枚举值&#10;- 新增SuperExpression类处理super表达式解析&#10;- 扩展AnyLangValue类，增加GetSuperInstance方法获取父类实例&#10;- 在VariateManager中添加GetCurrentInstance方法获取当前实例&#10;- 更新PrimaryParser以识别和解析super关键字&#10;- 添加SuperTests测试文件验证super关键字功能" />
+    <MESSAGE value="feat(lang): 实现类成员继承与访问控制机制&#10;&#10;- 添加函数查找缓存提升类方法查找效率&#10;- 实现递归获取父类和接口成员功能&#10;- 完善内部访问检查逻辑&#10;- 重构成员查找机制支持继承和缓存&#10;- 优化变量同步方法提升性能&#10;- 修复嵌套类查找逻辑&#10;- 更新测试用例适配新实现" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 实现类成员继承与访问控制机制&#10;&#10;- 添加函数查找缓存提升类方法查找效率&#10;- 实现递归获取父类和接口成员功能&#10;- 完善内部访问检查逻辑&#10;- 重构成员查找机制支持继承和缓存&#10;- 优化变量同步方法提升性能&#10;- 修复嵌套类查找逻辑&#10;- 更新测试用例适配新实现" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

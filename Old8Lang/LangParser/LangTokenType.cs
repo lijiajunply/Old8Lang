@@ -363,5 +363,6 @@ public enum KeywordType
     Implements,
     Abstract,
     Lazy,
-    Dynamic
+    Dynamic,
+    Super
 }
