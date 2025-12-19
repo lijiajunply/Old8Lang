@@ -134,6 +134,9 @@ public class TypeTemplate(
         // 创建一个新的AnyLangValue实例，传递合并后的所有成员变量和方法
         var instance = new AnyLangValue(new LangId(ClassName), allVariates, Position);
 
+        // 关键：将类型模板添加到实例的管理器中，这样实例就能查找自己的类型信息
+        instance.Manager.AddClassAndFunc(this);
+
         return instance;
     }
 

@@ -433,45 +433,47 @@ public class ClassDeclarationTests
     public void ClassDeclaration_WithComplexMethods_HandlesCorrectly()
     {
         // Arrange
-        var code = @"
-            class StringUtils {
-                static func reverse(text) -> string {
-                    result <- """"
-                    i <- len(text) - 1
-                    while i >= 0 {
-                        result <- result + text[i]
-                        i <- i - 1
-                    }
-                    return result
-                }
+        var code = """
 
-                static func countWords(text) -> int {
-                    if text == """" {
-                        return 0
-                    }
-                    words <- text.Split(' ')
-                    return len(words)
-                }
+                               class StringUtils {
+                                   static func reverse(text) -> string {
+                                       result <- ""
+                                       i <- len(text) - 1
+                                       while i >= 0 {
+                                           result <- result + text[i]
+                                           i <- i - 1
+                                       }
+                                       return result
+                                   }
 
-                static func capitalize(text) -> string {
-                    if text == """" {
-                        return """"
-                    }
-                    first <- text[0].ToString().ToUpper()
-                    rest <- """"
-                    i <- 1
-                    while i < Len(text) {
-                        rest <- rest + text[i]
-                        i <- i + 1
-                    }
-                    return first + rest
-                }
-            }
+                                   static func countWords(text) -> int {
+                                       if text == "" {
+                                           return 0
+                                       }
+                                       words <- text.Split(' ')
+                                       return len(words)
+                                   }
 
-            reversed <- StringUtils.reverse(""hello"")
-            wordCount <- StringUtils.countWords(""hello world old8lang"")
-            capitalized <- StringUtils.capitalize(""old8lang"")
-        ";
+                                   static func capitalize(text) -> string {
+                                       if text == "" {
+                                           return ""
+                                       }
+                                       first <- text[0].ToString().ToUpper()
+                                       rest <- ""
+                                       i <- 1
+                                       while i < Len(text) {
+                                           rest <- rest + text[i]
+                                           i <- i + 1
+                                       }
+                                       return first + rest
+                                   }
+                               }
+
+                               reversed <- StringUtils.reverse("hello")
+                               wordCount <- StringUtils.countWords("hello world old8lang")
+                               capitalized <- StringUtils.capitalize("old8lang")
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -578,9 +580,9 @@ public class ClassDeclarationTests
         Assert.IsType<IntLangValue>(result2);
         Assert.IsType<IntLangValue>(result3);
 
-        Assert.Equal(15, ((IntLangValue)result1).Value);  // 5 + 10
-        Assert.Equal(10, ((IntLangValue)result2).Value);  // 3 + 7
-        Assert.Equal(6, ((IntLangValue)result3).Value);   // 1 + 2 + 3
+        Assert.Equal(15, ((IntLangValue)result1).Value); // 5 + 10
+        Assert.Equal(10, ((IntLangValue)result2).Value); // 3 + 7
+        Assert.Equal(6, ((IntLangValue)result3).Value); // 1 + 2 + 3
     }
 
     [Fact]

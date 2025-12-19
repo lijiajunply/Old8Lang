@@ -17,6 +17,198 @@ public class AnyLangValue : LangValueType
 
     public readonly VariateManager Manager;
 
+    /// <summary>
+    /// 函数查找缓存，用于提高类方法查找效率
+    /// </summary>
+    private readonly Dictionary<string, (ClassMemberId memberId, LangValueType value)> _functionLookupCache = [];
+
+    /// <summary>
+    /// 获取所有可用的成员（包括继承的成员）
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>包含所有成员的字典</returns>
+    private Dictionary<ClassMemberId, LangExpression> GetAllMembers(VariateManager manager)
+    {
+        var allMembers = new Dictionary<ClassMemberId, LangExpression>(Variates);
+
+        // 获取当前类的类型模板
+        var currentTypeTemplate = Manager.GetAny(new LangId(Id.IdName)) as TypeTemplate;
+        if (currentTypeTemplate != null)
+        {
+            // 获取所有父类成员
+            GetAllParentMembers(manager, currentTypeTemplate, allMembers);
+        }
+
+        return allMembers;
+    }
+
+    /// <summary>
+    /// 递归获取所有父类成员
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    /// <param name="type">类型模板</param>
+    /// <param name="allMembers">存储所有成员的字典</param>
+    private void GetAllParentMembers(VariateManager manager, TypeTemplate type, Dictionary<ClassMemberId, LangExpression> allMembers)
+    {
+        // 如果有父类，递归获取父类的所有成员
+        if (type.ParentClassName != null)
+        {
+            if (manager.GetAny(new LangId(type.ParentClassName)) is TypeTemplate parentType)
+            {
+                // 先递归获取祖父类的成员
+                GetAllParentMembers(manager, parentType, allMembers);
+
+                // 然后添加直接父类的成员，允许子类方法覆盖父类方法
+                foreach (var parentMember in parentType.Variates)
+                {
+                    // 如果还没有这个成员，添加父类的成员
+                    if (!allMembers.ContainsKey(parentMember.Key))
+                    {
+                        allMembers[parentMember.Key] = parentMember.Value;
+                    }
+                }
+            }
+        }
+
+        // 处理所有实现的接口
+        foreach (var interfaceName in type.ImplementsNames)
+        {
+            if (manager.GetAny(new LangId(interfaceName)) is TypeTemplate interfaceType)
+            {
+                // 递归获取接口的成员（接口可以继承其他接口）
+                GetAllParentMembers(manager, interfaceType, allMembers);
+
+                // 添加当前接口的成员
+                foreach (var interfaceMember in interfaceType.Variates.Where(interfaceMember =>
+                             !allMembers.ContainsKey(interfaceMember.Key)))
+                {
+                    allMembers[interfaceMember.Key] = interfaceMember.Value;
+                }
+            }
+        }
+
+        // 处理所有mixin类
+        foreach (var mixinName in type.MixinNames)
+        {
+            if (manager.GetAny(new LangId(mixinName)) is TypeTemplate mixinType)
+            {
+                // 添加mixin的成员
+                foreach (var mixinMember in mixinType.Variates.Where(mixinMember =>
+                             !allMembers.ContainsKey(mixinMember.Key)))
+                {
+                    allMembers[mixinMember.Key] = mixinMember.Value;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 检查调用上下文是否在类内部
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>如果是在类内部访问返回true</returns>
+    private bool CheckInternalAccess(VariateManager manager)
+    {
+        // 首先检查自己的 Manager 中是否有 this（在类方法内部访问时）
+        try
+        {
+            var thisInManager = Manager.GetValue(new LangId("this"));
+            if (ReferenceEquals(thisInManager, this))
+            {
+                return true;
+            }
+        }
+        catch
+        {
+            // Manager 中没有 this
+        }
+
+        // 如果还没有确认是内部访问，再检查 ExternalManager
+        if (ExternalManager != null)
+        {
+            try
+            {
+                var thisInfo = ExternalManager.GetValue(new LangId("this"));
+                // GetValue 返回 LangValueType，AnyLangValue 继承自 LangValueType
+                // 所以可以直接比较引用
+                if (ReferenceEquals(thisInfo, this))
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+                // ExternalManager 中没有 this，说明不在类内部
+            }
+        }
+
+        // 检查传入的manager中是否有this
+        try
+        {
+            var thisInManager = manager.GetValue(new LangId("this"));
+            if (ReferenceEquals(thisInManager, this))
+            {
+                return true;
+            }
+        }
+        catch
+        {
+            // manager 中没有 this
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 查找类成员（支持继承和缓存）
+    /// </summary>
+    /// <param name="memberName">成员名称</param>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>找到的成员信息，如果未找到则返回null</returns>
+    private (ClassMemberId? memberId, LangValueType? value)? FindMember(string memberName, VariateManager manager)
+    {
+        // 1. 首先检查缓存
+        if (_functionLookupCache.TryGetValue(memberName, out var cached))
+        {
+            return (cached.Item1, cached.Item2);
+        }
+
+        // 2. 在Result字典中查找已初始化的成员
+        if (Result.TryGetValue(memberName, out var resultValue))
+        {
+            var cacheEntry = (new ClassMemberId(memberName), resultValue);
+            _functionLookupCache[memberName] = cacheEntry;
+            return (cacheEntry.Item1, cacheEntry.Item2);
+        }
+
+        // 3. 在所有成员（包括继承的成员）中查找
+        var allMembers = GetAllMembers(manager);
+        ClassMemberId? foundMemberId = null;
+        LangExpression? foundExpression = null;
+
+        foreach (var (memberId, expression) in allMembers)
+        {
+            if (memberId.IdName == memberName)
+            {
+                foundMemberId = memberId;
+                foundExpression = expression;
+                break;
+            }
+        }
+
+        // 4. 如果找到了成员表达式，运行它并缓存结果
+        if (foundExpression != null)
+        {
+            var value = foundExpression as LangValueType ?? foundExpression.Run(manager);
+            var cacheEntry = (foundMemberId!, value);
+            _functionLookupCache[memberName] = cacheEntry;
+            return (foundMemberId, value);
+        }
+
+        // 5. 如果没有找到，返回null
+        return null;
+    }
+
     public AnyLangValue(LangId id, Dictionary<ClassMemberId, LangExpression> variates,
         SourcePosition position = default) :
         base(position)
@@ -27,10 +219,6 @@ public class AnyLangValue : LangValueType
         {
             IsClass = true
         };
-
-        // 初始化Result字典，运行变量表达式
-        // 注意：不要在这里运行表达式，因为此时Interpreter还没有被设置
-        // 而是在Instance.Run方法中，当调用init方法前设置Interpreter
     }
 
     /// <summary>
@@ -97,93 +285,49 @@ public class AnyLangValue : LangValueType
         {
             case LangId id:
             {
-                // 查找字段的ClassMemberId，获取访问修饰符
-                ClassMemberId? memberId = null;
-                foreach (var (key, _) in Variates)
+                // 使用新的查找机制
+                var memberInfo = FindMember(id.IdName, manager);
+                if (memberInfo.HasValue)
                 {
-                    if (key.IdName == id.IdName)
+                    var (memberId, value) = memberInfo.Value;
+
+                    // 检查访问权限
+                    bool isPrivate = memberId?.HasModifier(AccessModifierType.Private) ?? false;
+                    bool isProtected = memberId?.HasModifier(AccessModifierType.Protected) ?? false;
+
+                    // 检查调用上下文是否在类内部
+                    bool isInternalAccess = CheckInternalAccess(manager);
+
+                    // 外部无法访问私有字段
+                    if (isPrivate && !isInternalAccess)
                     {
-                        memberId = key;
-                        break;
+                        throw new AttributeError(this, id.IdName, Id.IdName);
                     }
-                }
 
-                // 检查访问权限
-                bool isPrivate = memberId?.HasModifier(AccessModifierType.Private) ?? false;
-                bool isProtected = memberId?.HasModifier(AccessModifierType.Protected) ?? false;
-                bool isStatic = memberId?.HasModifier(AccessModifierType.Static) ?? false;
-
-                // 检查调用上下文是否在类内部
-                // 关键：需要检查外部管理器（ExternalManager）中的 this，而不是当前实例的 Manager
-                bool isInternalAccess = false;
-
-                // 首先检查自己的 Manager 中是否有 this（在类方法内部访问时）
-                try
-                {
-                    var thisInManager = Manager.GetValue(new LangId("this"));
-                    if (ReferenceEquals(thisInManager, this))
+                    // 外部无法访问保护字段（protected 的语义与 private 在 Old8Lang 中相同，因为没有继承）
+                    if (isProtected && !isInternalAccess)
                     {
-                        isInternalAccess = true;
+                        throw new AttributeError(this, id.IdName, Id.IdName);
                     }
-                }
-                catch
-                {
-                    // Manager 中没有 this
-                }
 
-                // 如果还没有确认是内部访问，再检查 ExternalManager
-                if (!isInternalAccess && ExternalManager != null)
-                {
-                    try
-                    {
-                        var thisInfo = ExternalManager.GetValue(new LangId("this"));
-                        // GetValue 返回 LangValueType，AnyLangValue 继承自 LangValueType
-                        // 所以可以直接比较引用
-                        if (ReferenceEquals(thisInfo, this))
-                        {
-                            isInternalAccess = true;
-                        }
-                    }
-                    catch
-                    {
-                        // ExternalManager 中没有 this，说明不在类内部
-                    }
-                }
-
-                // 外部无法访问私有字段
-                if (isPrivate && !isInternalAccess)
-                {
-                    throw new AttributeError(this, id.IdName, Id.IdName);
-                }
-
-                // 外部无法访问保护字段（protected 的语义与 private 在 Old8Lang 中相同，因为没有继承）
-                if (isProtected && !isInternalAccess)
-                {
-                    throw new AttributeError(this, id.IdName, Id.IdName);
-                }
-
-                // 首先检查Result字典中是否有该属性
-                if (Result.TryGetValue(id.IdName, out var value))
-                {
-                    // 检查value是否是函数类型
+                    // 如果找到的是函数类型
                     if (value is FuncLangValue funcValue)
                     {
                         // 在调用类方法时，将当前实例作为"this"变量添加到变量储存器中
-                        Manager.Set(new LangId("this"), this);
-                        var funcResult = funcValue.Run(Manager);
+                        var currentManager = ExternalManager ?? Manager;
+                        currentManager.Set(new LangId("this"), this);
+
+                        // 将实例的所有成员变量添加到Manager中，以便方法内部直接访问
+                        foreach (var member in Result)
+                        {
+                            currentManager.Set(new LangId(member.Key), member.Value);
+                        }
+
+                        var funcResult = funcValue.Run(currentManager);
                         return funcResult;
                     }
 
                     return value;
-                }
-
-                // 检查Variates字典中是否有该属性（成员变量）
-                // 使用类名创建ClassMemberId进行查找
-                var classMemberId = new ClassMemberId(id);
-                if (Variates.TryGetValue(classMemberId, out var variate))
-                {
-                    // 如果有，运行它并返回结果
-                    return variate.Run(Manager);
                 }
 
                 // 如果没有找到，抛出AttributeError异常
@@ -204,15 +348,34 @@ public class AnyLangValue : LangValueType
                 // 首先获取方法名
                 var methodName = instance.Id.IdName;
 
-                // 检查Result字典中是否有该方法
-                if (Result.TryGetValue(methodName, out var value))
+                // 使用新的查找机制
+                var memberInfo = FindMember(methodName, manager);
+                if (memberInfo.HasValue)
                 {
+                    var (memberId, value) = memberInfo.Value;
+
+                    // 检查访问权限
+                    bool isPrivate = memberId?.HasModifier(AccessModifierType.Private) ?? false;
+                    bool isProtected = memberId?.HasModifier(AccessModifierType.Protected) ?? false;
+
+                    // 检查调用上下文是否在类内部
+                    bool isInternalAccess = CheckInternalAccess(manager);
+
+                    // 外部无法访问私有字段
+                    if (isPrivate && !isInternalAccess)
+                    {
+                        throw new AttributeError(this, methodName, Id.IdName);
+                    }
+
+                    // 外部无法访问保护字段
+                    if (isProtected && !isInternalAccess)
+                    {
+                        throw new AttributeError(this, methodName, Id.IdName);
+                    }
+
+                    // 如果找到的是函数类型
                     if (value is FuncLangValue funcValue)
                     {
-                        // 处理方法参数，先运行参数表达式，这样可以访问外部变量
-                        List<LangExpression> methodArgs = [];
-                        methodArgs.AddRange(instance.Ids);
-
                         // 使用外部管理器或内部管理器作为回退
                         var currentManager = ExternalManager ?? Manager;
 
@@ -231,33 +394,16 @@ public class AnyLangValue : LangValueType
 
                         try
                         {
+                            // 处理方法参数，先运行参数表达式，这样可以访问外部变量
+                            List<LangExpression> methodArgs = [];
+                            methodArgs.AddRange(instance.Ids);
+
                             // 调用方法时使用当前管理器，这样可以访问外部变量
                             var funcResult = funcValue.Run(currentManager, methodArgs);
 
                             // 方法调用完成后，将管理器中修改的变量同步回实例的 Result 字典
                             // 对于直接修改的变量（如logs <- logs + "text"），需要从manager同步回实例
-                            // 但对于通过this.x <- value修改的变量，SetStatement已经直接修改了实例的Result字典
-                            // 我们需要比较并只同步真正需要同步的变量
-                            foreach (var member in Result.Keys.ToList())
-                            {
-                                var updatedValue = currentManager.GetValue(new LangId(member));
-                                if (updatedValue != null)
-                                {
-                                    // 比较字符串表示，如果不同则需要同步
-                                    var currentValueStr = Result[member].ToString();
-                                    var updatedValueStr = updatedValue.ToString();
-
-                                    if (currentValueStr != updatedValueStr)
-                                    {
-                                        // 如果新值包含内容而原值不包含，很可能是直接变量赋值需要同步
-                                        // 特别是对于字符串变量，任何修改都应该同步
-                                        if (currentValueStr != updatedValueStr && !currentValueStr.Contains(updatedValueStr))
-                                        {
-                                            Result[member] = updatedValue;
-                                        }
-                                    }
-                                }
-                            }
+                            SyncVariablesFromManager(currentManager);
 
                             return funcResult;
                         }
@@ -267,115 +413,21 @@ public class AnyLangValue : LangValueType
                             ExternalManager = originalExternalManager;
                         }
                     }
-                }
-
-                // 检查Variates字典中是否有该方法
-                if (Variates.TryGetValue(new ClassMemberId(instance.Id), out var variate))
-                {
-                    // 在调用类方法时，将当前实例添加到变量储存器中，以便this关键字访问
-                    Manager.Set(new LangId("this"), this);
-
-                    // 将实例的所有成员变量添加到Manager中，以便方法内部直接访问
-                    foreach (var member in Result)
+                    else
                     {
-                        Manager.Set(new LangId(member.Key), member.Value);
-                    }
-
-                    // 使用外部管理器或内部管理器作为回退
-                    var currentManager = ExternalManager ?? Manager;
-
-                    var methodValue = variate.Run(currentManager);
-                    if (methodValue is FuncLangValue funcValue)
-                    {
-                        // 处理方法参数，先运行参数表达式，这样可以访问外部变量
-                        List<LangExpression> methodArgs = [];
-                        methodArgs.AddRange(instance.Ids);
-
-                        // 在调用类方法时，将当前实例添加到变量储存器中，以便this关键字访问
-                        currentManager.Set(new LangId("this"), this);
-
-                        // 将实例的所有成员变量添加到Manager中，以便方法内部直接访问
-                        foreach (var member in Result)
-                        {
-                            currentManager.Set(new LangId(member.Key), member.Value);
-                        }
-
-                        // 调用方法时使用当前管理器，这样可以访问外部变量
-                        var funcResult = funcValue.Run(currentManager, methodArgs);
-
-                        // 方法调用完成后，将管理器中修改的变量同步回实例的 Result 字典
-                        // 对于直接修改的变量（如logs <- logs + "text"），需要从manager同步回实例
-                        // 但对于通过this.x <- value修改的变量，SetStatement已经直接修改了实例的Result字典
-                        foreach (var member in Result.Keys.ToList())
-                        {
-                            var updatedValue = currentManager.GetValue(new LangId(member));
-                            if (updatedValue != null)
-                            {
-                                // 比较字符串表示，如果不同则需要同步
-                                var currentValueStr = Result[member].ToString();
-                                var updatedValueStr = updatedValue.ToString();
-
-                                if (currentValueStr != updatedValueStr)
-                                {
-                                    // 如果新值包含内容而原值不包含，很可能是直接变量赋值需要同步
-                                    // 特别是对于字符串变量，任何修改都应该同步
-                                    if (currentValueStr != updatedValueStr && !currentValueStr.Contains(updatedValueStr))
-                                    {
-                                        Result[member] = updatedValue;
-                                    }
-                                }
-                            }
-                        }
-
-                        return funcResult;
+                        // 不是函数类型，直接返回值
+                        return value;
                     }
                 }
 
-                // 如果没有找到，检查是否是嵌套类访问
-                // 首先检查当前实例的Variates中是否有嵌套类
-                foreach (var (memberId, memberExpr) in Variates)
+                // 如果没有找到方法，检查是否是嵌套类访问
+                var nestedClassInfo = FindNestedClass(methodName, manager);
+                if (nestedClassInfo != null)
                 {
-                    if (memberId.IdName == methodName && memberExpr is TypeTemplate)
+                    // 如果是无参数的Instance调用，创建实例
+                    if (instance.Ids.Count == 0)
                     {
-                        // 找到嵌套类，如果是无参数的Instance调用，创建实例
-                        if (instance.Ids.Count == 0)
-                        {
-                            var nestedTypeTemplate = (TypeTemplate)memberExpr.Run(Manager);
-                            return nestedTypeTemplate.CreateInstance(Manager);
-                        }
-                    }
-                }
-
-                // 如果当前实例的Variates中没有，尝试从Manager获取类型模板
-                var typeTemplate = Manager.GetAny(new LangId(Id.IdName)) as TypeTemplate;
-
-                // 如果直接通过Id找不到，尝试查找所有注册的类型
-                if (typeTemplate == null)
-                {
-                    // 查找所有ImportInfos中匹配的类型模板
-                    foreach (var importInfo in Manager.ImportInfos)
-                    {
-                        if (importInfo is TypeTemplate tt && tt.ClassName == Id.IdName)
-                        {
-                            typeTemplate = tt;
-                            break;
-                        }
-                    }
-                }
-                if (typeTemplate != null)
-                {
-                    // 检查该类型是否有嵌套类
-                    foreach (var (memberId, memberExpr) in typeTemplate.Variates)
-                    {
-                        if (memberId.IdName == methodName && memberExpr is TypeTemplate)
-                        {
-                            // 找到嵌套类，如果是无参数的Instance调用，创建实例
-                            if (instance.Ids.Count == 0)
-                            {
-                                var nestedTypeTemplate = (TypeTemplate)memberExpr.Run(Manager);
-                                return nestedTypeTemplate.CreateInstance(Manager);
-                            }
-                        }
+                        return nestedClassInfo.CreateInstance(Manager);
                     }
                 }
 
@@ -408,6 +460,86 @@ public class AnyLangValue : LangValueType
             return value;
         }
         throw new AttributeError(this, propertyName, Id.IdName);
+    }
+
+    /// <summary>
+    /// 同步管理器中的变量回实例的Result字典
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    private void SyncVariablesFromManager(VariateManager manager)
+    {
+        // 方法调用完成后，将管理器中修改的变量同步回实例的 Result 字典
+        // 对于直接修改的变量（如logs <- logs + "text"），需要从manager同步回实例
+        // 但对于通过this.x <- value修改的变量，SetStatement已经直接修改了实例的Result字典
+        foreach (var member in Result.Keys.ToList())
+        {
+            var updatedValue = manager.GetValue(new LangId(member));
+            if (updatedValue != null)
+            {
+                // 比较字符串表示，如果不同则需要同步
+                var currentValueStr = Result[member].ToString();
+                var updatedValueStr = updatedValue.ToString();
+
+                if (currentValueStr != updatedValueStr)
+                {
+                    // 如果新值包含内容而原值不包含，很可能是直接变量赋值需要同步
+                    // 特别是对于字符串变量，任何修改都应该同步
+                    if (currentValueStr != updatedValueStr && !currentValueStr.Contains(updatedValueStr))
+                    {
+                        Result[member] = updatedValue;
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 查找嵌套类
+    /// </summary>
+    /// <param name="className">类名</param>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>找到的类型模板，如果未找到则返回null</returns>
+    private TypeTemplate? FindNestedClass(string className, VariateManager manager)
+    {
+        // 首先检查当前实例的Variates中是否有嵌套类
+        foreach (var (memberId, memberExpr) in Variates)
+        {
+            if (memberId.IdName == className && memberExpr is TypeTemplate typeTemplate)
+            {
+                return typeTemplate;
+            }
+        }
+
+        // 如果当前实例的Variates中没有，尝试从Manager获取类型模板
+        var currentTypeTemplate = Manager.GetAny(new LangId(Id.IdName)) as TypeTemplate;
+        if (currentTypeTemplate != null)
+        {
+            // 检查该类型是否有嵌套类
+            foreach (var (memberId, memberExpr) in currentTypeTemplate.Variates)
+            {
+                if (memberId.IdName == className && memberExpr is TypeTemplate nestedTypeTemplate)
+                {
+                    return nestedTypeTemplate;
+                }
+            }
+        }
+
+        // 如果直接通过Id找不到，尝试查找所有注册的类型
+        foreach (var importInfo in Manager.ImportInfos)
+        {
+            if (importInfo is TypeTemplate tt && tt.ClassName == Id.IdName)
+            {
+                foreach (var (memberId, memberExpr) in tt.Variates)
+                {
+                    if (memberId.IdName == className && memberExpr is TypeTemplate nestedTypeTemplate)
+                    {
+                        return nestedTypeTemplate;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     /// <summary>

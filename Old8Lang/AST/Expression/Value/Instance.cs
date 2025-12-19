@@ -538,7 +538,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 // 恢复非函数上下文标志
                 anyValue.Manager.IsFunc = false;
             }
-            else if (results.Count != 0)
+            else if (Ids.Count != 0)
             {
                 throw new InvalidOperationError(this, "找不到对应的init函数");
             }
