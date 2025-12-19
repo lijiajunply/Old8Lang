@@ -1,4 +1,0 @@
-
-import "conditional_base"
-func enhancedFunction() -> string { return "Enhanced: " + baseFunction() }
-const ENHANCED_CONST <- 100

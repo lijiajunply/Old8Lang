@@ -1,7 +1,0 @@
-
-func testFeature() -> string {
-    return "Test feature active"
-}
-func prodFeature() -> string {
-    return "Production feature active"
-}

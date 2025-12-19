@@ -1,5 +1,0 @@
-
-import "math_module" as m
-import "string_module" as s
-math_result <- m.add(3.0, 4.0)
-string_result <- s.repeat("Hello", 3)

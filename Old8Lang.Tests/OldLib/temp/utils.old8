@@ -1,6 +1,7 @@
 
-import "core"
-import "helpers"
-func utility() -> string {
-    return "Utility function"
+func formatDate(date:string) -> string {
+    return "2024-01-01"
+}
+func generateToken() -> string {
+    return "jwt_token_12345"
 }

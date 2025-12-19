@@ -1,6 +1,0 @@
-
-import "core"
-import "config"
-func help() -> string {
-    return "Helper function"
-}

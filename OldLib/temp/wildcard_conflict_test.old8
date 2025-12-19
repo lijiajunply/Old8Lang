@@ -1,8 +1,0 @@
-
-from "wildcard_module1" import *
-local_value1 <- getValue()
-local_module1_value <- VALUE
-
-from "wildcard_module2" import *
-local_value2 <- getValue()
-local_module2_value <- VALUE

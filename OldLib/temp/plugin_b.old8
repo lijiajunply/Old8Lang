@@ -1,6 +1,0 @@
-
-// 插件B实现
-import "plugin_interface"
-func initialize() -> string { return "Plugin B initialized" }
-func execute(input:string) -> string { return "Plugin B processed: " + input.ToUpper() }
-func cleanup() -> string { return "Plugin B cleaned up" }

@@ -1,8 +1,0 @@
-
-import "circular_class_a" as a
-try {
-    instanceA <- a.ClassA()
-    result <- instanceA.getValue()
-} catch {
-    result <- -1
-}

@@ -1,3 +1,0 @@
-
-import "nonexistent_file"
-result <- 42

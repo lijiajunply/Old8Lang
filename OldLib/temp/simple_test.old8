@@ -1,4 +1,0 @@
-
-import "test_math"
-result1 <- test_math.add(2.0, 3.0)
-result2 <- test_math.multiply(4.0, 5.0)

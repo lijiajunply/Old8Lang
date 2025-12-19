@@ -1,9 +1,0 @@
-
-// 模拟用户输入
-operation_type <- "calculator"
-module_name <- operation_type + "_dynamic"
-
-import dynamic module_name as calc
-result1 <- calc.add(10.0, 5.0)
-result2 <- calc.multiply(4.0, 3.0)
-result3 <- calc.subtract(10.0, 3.0)

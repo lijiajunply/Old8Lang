@@ -1,3 +1,0 @@
-
-import "math" as m
-result <- m.getValue()

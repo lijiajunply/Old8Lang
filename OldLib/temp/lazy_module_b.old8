@@ -1,8 +1,0 @@
-
-lazy import "lazy_module_a" as a
-func funcB() -> string {
-    return "B calls A: " + a.funcA()
-}
-func standaloneB() -> string {
-    return "B standalone"
-}

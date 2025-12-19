@@ -1,7 +1,0 @@
-
-func trackEvent(eventName:string) -> string {
-    return "Event tracked: " + eventName
-}
-func incrementCounter(counterName:string) -> string {
-    return "Counter incremented: " + counterName
-}

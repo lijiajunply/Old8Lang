@@ -1,2 +1,0 @@
-
-func existingFunction() -> int { return 42 }

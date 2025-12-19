@@ -1,3 +1,0 @@
-
-from "multi_func_module" import func1
-result <- "imported "

@@ -1,6 +1,0 @@
-
-func expensiveOperation() -> string {
-    // 模拟耗时操作
-    return "Expensive operation completed"
-}
-const HEAVY_DATA <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]

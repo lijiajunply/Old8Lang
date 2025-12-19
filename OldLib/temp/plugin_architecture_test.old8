@@ -1,7 +1,0 @@
-
-import "plugin_loader" as loader
-pluginA <- loader.loadPlugin("A")
-pluginB <- loader.loadPlugin("B")
-
-result1 <- pluginA["execute"]("test data")
-result2 <- pluginB["execute"]("test data")

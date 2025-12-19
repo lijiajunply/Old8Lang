@@ -1,8 +1,0 @@
-
-lazy import "lazy_circular_b" as b
-func funcA() -> string {
-    return "A calls B: " + b.funcB()
-}
-func standaloneA() -> string {
-    return "A standalone"
-}

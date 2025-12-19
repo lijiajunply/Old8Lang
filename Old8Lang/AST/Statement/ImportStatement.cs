@@ -149,12 +149,12 @@ public class ImportStatement(
             return;
         }
 
-        // 尝试解析模块路径 - 使用大小写不敏感的匹配
+        // 看一下是否为本地包管理器下的模块
         manager.LangInfo ??= Apis.ReadJson();
         if (manager.LangInfo.LibInfos.Any(x => moduleName == x.LibName))
         {
             var libInfo = manager.LangInfo.LibInfos.First(x =>
-                string.Equals(x.LibName, moduleName, StringComparison.OrdinalIgnoreCase));
+                string.Equals(x.LibName, moduleName));
             isDirectory = libInfo.IsDir;
 
             // 使用实际的库名称来构建文件名，而不是用户输入的模块名称
@@ -202,24 +202,7 @@ public class ImportStatement(
 
             resolvedPath = path;
         }
-        else if (Apis.ImportInstall(moduleName))
-        {
-            var libInfo = manager.LangInfo.LibInfos.First(x => x.LibName == moduleName);
-            isDirectory = libInfo.IsDir;
-
-            // 检查文件扩展名，只支持.old8和.ol
-            var fileName = moduleName;
-            var ext = Path.GetExtension(fileName).ToLower();
-            if (!isDirectory && ext != ".old8" && ext != ".ol")
-            {
-                fileName += ".old8"; // 默认使用.old8扩展名
-            }
-
-            var path = Path.Combine(manager.LangInfo.ImportPath, fileName);
-            attemptedPaths.Add(path);
-            resolvedPath = path;
-        }
-        else
+        else // 看一下是否为本项目/本地原始库（非安装在包管理下的）
         {
             var dic = Path.GetDirectoryName(manager.Path);
             // 检查文件扩展名，只支持.old8和.ol

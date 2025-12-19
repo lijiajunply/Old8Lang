@@ -1,3 +1,0 @@
-
-func getName() -> string { return "Plugin 3" }
-func getValue() -> int { return 300 }

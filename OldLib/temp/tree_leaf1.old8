@@ -1,3 +1,0 @@
-
-func leaf1Function() -> string { return "Leaf1" }
-const LEAF1_CONST <- 100

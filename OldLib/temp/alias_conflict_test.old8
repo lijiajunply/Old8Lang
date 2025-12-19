@@ -1,8 +1,0 @@
-
-func processData(data:string) -> string {
-    return "local: " + data
-}
-
-import "process_module" as proc
-local_result <- processData("test")
-module_result <- proc.processData(5.0)

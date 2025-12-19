@@ -1,6 +1,0 @@
-
-from "large_wildcard_module" import *
-result0 <- func0()
-result99 <- func99()
-const0 <- CONST0
-const99 <- CONST99

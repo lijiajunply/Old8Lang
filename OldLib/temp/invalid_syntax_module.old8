@@ -1,4 +1,0 @@
-
-func broken_function( -> int {  // 缺少参数和右括号
-    return 42
-}

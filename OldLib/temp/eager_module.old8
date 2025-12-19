@@ -1,3 +1,0 @@
-
-const EAGER_VALUE <- 100
-func eagerFunction() -> string { return "Eager" }

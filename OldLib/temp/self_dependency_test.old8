@@ -1,3 +1,0 @@
-
-import "self_module" as self
-result <- self.getValue()

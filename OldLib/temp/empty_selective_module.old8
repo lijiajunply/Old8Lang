@@ -1,3 +1,0 @@
-
-func testFunc() -> int { return 42 }
-const TEST_CONST <- 100

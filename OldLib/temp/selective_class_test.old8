@@ -1,8 +1,0 @@
-
-from "class_module" import Calculator
-calc <- Calculator()
-result1 <- calc.add(3, 4)
-result2 <- calc.multiply(5, 6)
-
-// Helper should not be available
-// helper <- Helper()  // This should cause an error

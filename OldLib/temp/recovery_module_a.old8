@@ -1,5 +1,0 @@
-
-import "recovery_module_b"
-func testA() -> string {
-    return "Module A"
-}

@@ -1,7 +1,0 @@
-
-func calculateArea(radius:double) -> double {
-    return 3.14159 * radius * radius
-}
-func calculatePerimeter(radius:double) -> double {
-    return 2 * 3.14159 * radius
-}

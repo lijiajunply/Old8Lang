@@ -1,2 +1,0 @@
-
-func getValue() -> int { return 100 }
