@@ -111,20 +111,24 @@ string_result <- s.repeat(""Hello"", 3)
     public void Import_AliasWithSameNameAsExisting_ShouldNotConflict()
     {
         // Arrange
-        var moduleContent = @"
-func processData(data:double) -> double {
-    return data * 2
-}
-";
-        var testContent = @"
-func processData(data:string) -> string {
-    return ""local: "" + data
-}
+        var moduleContent = """
 
-import ""process_module"" as proc
-local_result <- processData(""test"")
-module_result <- proc.processData(5.0)
-";
+                            func processData(data:double) -> double {
+                                return data * 2
+                            }
+
+                            """;
+        var testContent = """
+
+                          func processData(data:string) -> string {
+                              return "local: " + data
+                          }
+
+                          import "process_module" as proc
+                          local_result <- processData("test")
+                          module_result <- proc.processData(5.0)
+
+                          """;
 
         CreateTempModuleFile("process_module.old8", moduleContent);
         CreateTempModuleFile("alias_conflict_test.old8", testContent);

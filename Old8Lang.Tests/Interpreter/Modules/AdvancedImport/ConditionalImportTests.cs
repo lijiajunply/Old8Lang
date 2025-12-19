@@ -31,25 +31,34 @@ public class ConditionalImportTests : ModuleImportTestBase
     public void Import_ConditionalWithTrueCondition_ShouldImportModule()
     {
         // Arrange
-        var debugModule = @"
-func debugLog(message:string) -> string {
-    return ""[DEBUG] "" + message
-}
-DEBUG_MODE:const <- true
-";
+        var debugModule = """
 
-        var testContent = @"
-is_debug <- true
+                          func debugLog(message:string) -> string {
+                              return "[DEBUG] " + message
+                          }
+                          
+                          func debugmode() {
+                              return true
+                          }
 
-if (is_debug) {
-    import ""debug_module"" as debug
-    result <- debug.debugLog(""Debug message"")
-    debug_mode <- debug.DEBUG_MODE
-} else {
-    result <- ""No debug module""
-    debug_mode <- false
-}
-";
+                          """;
+
+        var testContent = """
+
+                          is_debug <- true
+                          result <- ""
+                          debug_mode <- true
+
+                          if (is_debug) {
+                              import "debug_module" as debug
+                              result <- debug.debugLog("Debug message")
+                              debug_mode <- debug.debugmode()
+                          } else {
+                              result <- "No debug module"
+                              debug_mode <- false
+                          }
+
+                          """;
 
         CreateTempModuleFile("debug_module.old8", debugModule);
         CreateTempModuleFile("conditional_true_test.old8", testContent);
@@ -156,29 +165,35 @@ result <- result_list[0]  // 应该只有日志信息
     public void Import_ConditionalWithComplexExpression_ShouldEvaluateExpression()
     {
         // Arrange
-        var advancedModule = @"
-func advancedFeature() -> string {
-    return ""Advanced functionality""
-}
-VERSION:const <- ""2.0""
-";
+        var advancedModule = """
 
-        var testContent = @"
-user_level <- 3
-feature_enabled <- user_level > 2
-version_check <- ""1.5""
+                             func advancedFeature() -> string {
+                                 return "Advanced functionality"
+                             }
+                             
+                             func version() {
+                                return "2.0"
+                             }
 
-// 复杂条件表达式
-if (feature_enabled && version_check < ""2.0"") {
-    import ""advanced_module"" as adv
-    result <- ""Using old version: "" + adv.advancedFeature()
-} else if (feature_enabled && version_check >= ""2.0"") {
-    import ""advanced_module"" as adv
-    result <- ""Using latest version: "" + adv.advancedFeature() + "" v"" + adv.VERSION
-} else {
-    result <- ""Basic features only""
-}
-";
+                             """;
+
+        var testContent = """
+                          user_level <- 3
+                          feature_enabled <- user_level > 2
+                          version_check <- "1.5"
+                          result <- ""
+
+                          // 复杂条件表达式
+                          if (feature_enabled && version_check < "2.0") {
+                              import "advanced_module" as adv
+                              result <- "Using old version: " + adv.advancedFeature()
+                          } else if (feature_enabled && version_check >= "2.0") {
+                              import "advanced_module" as adv
+                              result <- "Using latest version: " + adv.advancedFeature() + " v" + adv.version()
+                          } else {
+                              result <- "Basic features only"
+                          }
+                          """;
 
         CreateTempModuleFile("advanced_module.old8", advancedModule);
         CreateTempModuleFile("complex_conditional_test.old8", testContent);
@@ -195,44 +210,52 @@ if (feature_enabled && version_check < ""2.0"") {
     public void Import_ConditionalWithRuntimeVariable_ShouldAdaptToRuntime()
     {
         // Arrange
-        var testModule = @"
-func testFeature() -> string {
-    return ""Test feature active""
-}
-func prodFeature() -> string {
-    return ""Production feature active""
-}
-";
+        var testModule = """
 
-        var runtimeTestContent = @"
-// 模拟运行时环境检查
-environment <- ""test""
+                         func testFeature() -> string {
+                             return "Test feature active"
+                         }
+                         func prodFeature() -> string {
+                             return "Production feature active"
+                         }
 
-if (environment == ""test"") {
-    import ""runtime_module"" as runtime
-    result <- runtime.testFeature()
-} else if (environment == ""production"") {
-    import ""runtime_module"" as runtime
-    result <- runtime.prodFeature()
-} else {
-    result <- ""Unknown environment""
-}
-";
+                         """;
 
-        var productionTestContent = @"
-// 模拟运行时环境检查
-environment <- ""production""
+        var runtimeTestContent = """
 
-if (environment == ""test"") {
-    import ""runtime_module"" as runtime
-    result <- runtime.testFeature()
-} else if (environment == ""production"") {
-    import ""runtime_module"" as runtime
-    result <- runtime.prodFeature()
-} else {
-    result <- ""Unknown environment""
-}
-";
+                                 // 模拟运行时环境检查
+                                 environment <- "test"
+                                 result <- ""
+
+                                 if (environment == "test") {
+                                     import "runtime_module" as runtime
+                                     result <- runtime.testFeature()
+                                 } else if (environment == "production") {
+                                     import "runtime_module" as runtime
+                                     result <- runtime.prodFeature()
+                                 } else {
+                                     result <- "Unknown environment"
+                                 }
+
+                                 """;
+
+        var productionTestContent = """
+
+                                    // 模拟运行时环境检查
+                                    environment <- "production"
+                                    result <- ""
+
+                                    if (environment == "test") {
+                                        import "runtime_module" as runtime
+                                        result <- runtime.testFeature()
+                                    } else if (environment == "production") {
+                                        import "runtime_module" as runtime
+                                        result <- runtime.prodFeature()
+                                    } else {
+                                        result <- "Unknown environment"
+                                    }
+
+                                    """;
 
         CreateTempModuleFile("runtime_module.old8", testModule);
         CreateTempModuleFile("runtime_test_test.old8", runtimeTestContent);

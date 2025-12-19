@@ -1,0 +1,11 @@
+// 测试懒导入功能
+lazy import "simple_test_module" as tm
+
+// 测试访问懒导入模块的属性
+result <- tm.value
+moduleName <- tm.name
+
+// 输出结果
+PrintLine("懒导入测试成功！")
+PrintLine("模块名称：" + moduleName.ToStr())
+PrintLine("value值：" + result.ToStr())

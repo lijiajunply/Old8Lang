@@ -25,7 +25,20 @@ public abstract class ModuleImportTestBase(ITestOutputHelper output)
     /// </summary>
     private LangInterpreter CreateInterpreter()
     {
-        return new LangInterpreter();
+        var interpreter = new LangInterpreter();
+
+        // 配置导入路径为测试文件目录
+        var tempDir = Path.Combine(TestFilesDirectory, "temp");
+        if (!interpreter.Manager.LangInfo!.ImportPath.Equals(tempDir, StringComparison.OrdinalIgnoreCase))
+        {
+            // 确保temp目录存在
+            Directory.CreateDirectory(tempDir);
+
+            // 设置导入路径
+            interpreter.Manager.LangInfo.ImportPath = tempDir;
+        }
+
+        return interpreter;
     }
 
     /// <summary>

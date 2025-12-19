@@ -2,4 +2,7 @@
 func advancedFeature() -> string {
     return "Advanced functionality"
 }
-VERSION:const <- "2.0"
+
+func version() {
+   return "2.0"
+}

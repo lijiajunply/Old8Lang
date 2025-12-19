@@ -1,6 +1,7 @@
 
 // 模拟运行时环境检查
 environment <- "production"
+result <- ""
 
 if (environment == "test") {
     import "runtime_module" as runtime

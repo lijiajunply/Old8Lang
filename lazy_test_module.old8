@@ -1,0 +1,3 @@
+value <- 42
+name <- "lazy_test_module"
+description <- "这是一个用于测试懒导入功能的模块"

@@ -195,7 +195,7 @@ public class UnifiedModule(
     {
         try
         {
-            if (LoadMode == ModuleLoadMode.Eager || LoadMode == ModuleLoadMode.Selective)
+            if (LoadMode == ModuleLoadMode.Eager || LoadMode == ModuleLoadMode.Selective || LoadMode == ModuleLoadMode.Lazy)
             {
                 LoadModuleFromImport(manager);
             }

@@ -261,8 +261,9 @@ public class StatementParser(
             return classParser.ParseInterfaceDeclaration();
         }
 
-        // 处理import语句：import module
-        if (CurrentToken.Type == LangTokenType.Import)
+        // 处理import语句：import module 或 lazy import module
+        if (CurrentToken.Type == LangTokenType.Import ||
+            CurrentToken.Type == LangTokenType.Lazy)
         {
             return ParseImportStatement();
         }
@@ -925,20 +926,21 @@ public class StatementParser(
     {
         var importToken = CurrentToken;
         var position = new SourcePosition(importToken.Line, importToken.Column, tokenValue: importToken.Value);
-        Expect(LangTokenType.Import);
-
-        List<ImportItem>? importSpecifiers = null;
-        bool fromClause = false;
-        bool isLazy = false;
-        bool isSelective = false;
-        string moduleName;
 
         // 检查是否为懒导入：lazy import
+        bool isLazy = false;
         if (CurrentToken.Type == LangTokenType.Lazy)
         {
             Expect(LangTokenType.Lazy); // 消耗 "lazy"
             isLazy = true;
         }
+
+        Expect(LangTokenType.Import); // 消耗 "import"
+
+        List<ImportItem>? importSpecifiers = null;
+        bool fromClause = false;
+        bool isSelective = false;
+        string moduleName;
 
         // 检查是否有导入指定项
         if (CurrentToken.Type == LangTokenType.LeftBrace)
