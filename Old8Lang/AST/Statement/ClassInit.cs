@@ -20,6 +20,11 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
     /// 类模板信息，包含类的完整定义
     /// </summary>
     private readonly TypeTemplate anyLangValue = anyLangValue;
+
+    /// <summary>
+    /// 公共属性，用于访问类模板信息
+    /// </summary>
+    public TypeTemplate AnyLangValue => anyLangValue;
     
     /// <summary>
     /// 在解释模式下执行类定义
@@ -28,6 +33,9 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
     /// <exception cref="DuplicateNameError">当类名已存在时抛出</exception>
     public override void Run(VariateManager manager)
     {
+        // 首先注册所有嵌套类
+        RegisterNestedClasses(manager);
+
         // 检查类是否已存在
         var existingClass = manager.GetAny(new LangId(anyLangValue.ClassName));
 
@@ -38,6 +46,41 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
 
         // 立即将类添加到ImportInfos中，以便在类定义内部访问
         manager.AddClassAndFunc(anyLangValue);
+    }
+
+    /// <summary>
+    /// 递归注册嵌套类
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    private void RegisterNestedClasses(VariateManager manager)
+    {
+        // 查找Variates中的嵌套类
+        foreach (var (memberId, memberExpr) in anyLangValue.Variates)
+        {
+            if (memberExpr is TypeTemplate nestedTypeTemplate)
+            {
+                // 递归注册嵌套类的嵌套类
+                var nestedClassInit = new ClassInit(nestedTypeTemplate, nestedTypeTemplate.Position);
+                nestedClassInit.RegisterNestedClasses(manager);
+
+                // 注册嵌套类到管理器
+                manager.AddClassAndFunc(nestedTypeTemplate);
+            }
+        }
+
+        // 查找StaticVariates中的嵌套类
+        foreach (var (memberId, memberExpr) in anyLangValue.StaticVariates)
+        {
+            if (memberExpr is TypeTemplate nestedTypeTemplate)
+            {
+                // 递归注册嵌套类的嵌套类
+                var nestedClassInit = new ClassInit(nestedTypeTemplate, nestedTypeTemplate.Position);
+                nestedClassInit.RegisterNestedClasses(manager);
+
+                // 注册嵌套类到管理器
+                manager.AddClassAndFunc(nestedTypeTemplate);
+            }
+        }
     }
 
     /// <summary>

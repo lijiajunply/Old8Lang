@@ -154,7 +154,7 @@ public class TypeTemplate(
         return right switch
         {
             LangId id => GetStaticMember(id, manager),
-            Instance instance => CallStaticMethod(instance, manager),
+            Instance instance => TryCreateInstanceOrCallStaticMethod(instance, manager),
             _ => throw new InvalidOperationException($"不支持的静态成员访问: {right.GetType().Name}")
         };
     }
@@ -191,7 +191,20 @@ public class TypeTemplate(
             }
         }
 
-        // 3. 如果没找到，查找当前类的实例成员
+        // 3. 如果没找到，查找嵌套类
+        if (actualMemberId == null)
+        {
+            foreach (var (memberId, memberExpr) in Variates)
+            {
+                if (memberId.IdName == id.IdName && memberExpr is TypeTemplate)
+                {
+                    // 找到嵌套类，执行并返回类型模板
+                    return memberExpr.Run(manager);
+                }
+            }
+        }
+
+        // 4. 如果没找到，查找当前类的实例成员
         if (actualMemberId == null)
         {
             foreach (var (memberId, memberExpr) in Variates)
@@ -267,5 +280,43 @@ public class TypeTemplate(
         }
 
         throw new NameError(this, instance.Id.IdName);
+    }
+
+    /// <summary>
+    /// 尝试创建嵌套类实例或调用静态方法
+    /// </summary>
+    /// <param name="instance">实例表达式</param>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>创建的实例或方法调用结果</returns>
+    private LangValueType TryCreateInstanceOrCallStaticMethod(Instance instance, VariateManager manager)
+    {
+        // 首先检查是否是嵌套类的实例化
+        if (instance.Ids.Count == 0)  // 没有参数，可能是类实例化
+        {
+            // 查找嵌套类
+            foreach (var (memberId, memberExpr) in Variates)
+            {
+                if (memberId.IdName == instance.Id.IdName && memberExpr is TypeTemplate)
+                {
+                    // 找到嵌套类，创建实例
+                    var nestedTypeTemplate = (TypeTemplate)memberExpr.Run(manager);
+                    return nestedTypeTemplate.CreateInstance(manager);
+                }
+            }
+
+            // 也检查静态成员中的嵌套类
+            foreach (var (memberId, memberExpr) in StaticVariates)
+            {
+                if (memberId.IdName == instance.Id.IdName && memberExpr is TypeTemplate)
+                {
+                    // 找到嵌套类，创建实例
+                    var nestedTypeTemplate = (TypeTemplate)memberExpr.Run(manager);
+                    return nestedTypeTemplate.CreateInstance(manager);
+                }
+            }
+        }
+
+        // 如果不是嵌套类实例化，尝试调用静态方法
+        return CallStaticMethod(instance, manager);
     }
 }

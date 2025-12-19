@@ -280,6 +280,54 @@ public class AnyLangValue : LangValueType
                     }
                 }
 
+                // 如果没有找到，检查是否是嵌套类访问
+                // 首先检查当前实例的Variates中是否有嵌套类
+                foreach (var (memberId, memberExpr) in Variates)
+                {
+                    if (memberId.IdName == methodName && memberExpr is TypeTemplate)
+                    {
+                        // 找到嵌套类，如果是无参数的Instance调用，创建实例
+                        if (instance.Ids.Count == 0)
+                        {
+                            var nestedTypeTemplate = (TypeTemplate)memberExpr.Run(Manager);
+                            return nestedTypeTemplate.CreateInstance(Manager);
+                        }
+                    }
+                }
+
+                // 如果当前实例的Variates中没有，尝试从Manager获取类型模板
+                var typeTemplate = Manager.GetAny(new LangId(Id.IdName)) as TypeTemplate;
+
+                // 如果直接通过Id找不到，尝试查找所有注册的类型
+                if (typeTemplate == null)
+                {
+                    // 查找所有ImportInfos中匹配的类型模板
+                    foreach (var importInfo in Manager.ImportInfos)
+                    {
+                        if (importInfo is TypeTemplate tt && tt.ClassName == Id.IdName)
+                        {
+                            typeTemplate = tt;
+                            break;
+                        }
+                    }
+                }
+                if (typeTemplate != null)
+                {
+                    // 检查该类型是否有嵌套类
+                    foreach (var (memberId, memberExpr) in typeTemplate.Variates)
+                    {
+                        if (memberId.IdName == methodName && memberExpr is TypeTemplate)
+                        {
+                            // 找到嵌套类，如果是无参数的Instance调用，创建实例
+                            if (instance.Ids.Count == 0)
+                            {
+                                var nestedTypeTemplate = (TypeTemplate)memberExpr.Run(Manager);
+                                return nestedTypeTemplate.CreateInstance(Manager);
+                            }
+                        }
+                    }
+                }
+
                 // 如果没有找到，抛出AttributeError异常
                 throw new AttributeError(this, methodName, Id.IdName);
             }

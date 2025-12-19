@@ -344,9 +344,11 @@ public class BlockStatement : OldStatement
             case ClassFuncInitStatement classFuncInit:
                 // 直接使用 ClassFuncInitStatement 中的 ClassMemberId
                 return (id: classFuncInit.Id, Expr: classFuncInit.FuncValue);
-            case ClassInit:
-                // 对于 ClassInit，我们不需要将其转换为字典中的键值对
-                return (null, null);
+            case ClassInit classInit:
+                // 对于嵌套类，创建一个特殊的ClassMemberId来标识它
+                var nestedClassId = new ClassMemberId(classInit.AnyLangValue.ClassName, "", [], classInit.Position);
+                // 将嵌套类作为TypeTemplate存储
+                return (id: nestedClassId, Expr: classInit.AnyLangValue);
             default:
                 return (null, null);
         }

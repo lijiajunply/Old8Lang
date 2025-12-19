@@ -17,8 +17,8 @@ public class SpawnTests
             func simpleTask() -> int {
                 return 42
             }
-            task <- spawn simpleTask()
-            result <- task
+            task <- spawn(simpleTask)
+            result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
 
@@ -41,8 +41,8 @@ public class SpawnTests
             func calculate(x:int, y:int) -> int {
                 return x * y
             }
-            task <- spawn calculate(6, 7)
-            result <- task
+            task <- spawn(calculate, 6, 7)
+            result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
 
@@ -65,12 +65,12 @@ public class SpawnTests
             func getSquare(n:int) -> int {
                 return n * n
             }
-            task1 <- spawn getSquare(5)
-            task2 <- spawn getSquare(10)
-            task3 <- spawn getSquare(15)
-            result1 <- task1
-            result2 <- task2
-            result3 <- task3
+            task1 <- spawn(getSquare, 5)
+            task2 <- spawn(getSquare, 10)
+            task3 <- spawn(getSquare, 15)
+            result1 <- task1.Join()
+            result2 <- task2.Join()
+            result3 <- task3.Join()
         ";
         var interpreter = new LangInterpreter();
 
@@ -102,8 +102,8 @@ public class SpawnTests
         // Arrange
         var code = @"
             operation <- (x:int) -> x * 10
-            task <- spawn operation(8)
-            result <- task
+            task <- spawn(operation, 8)
+            result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
 
@@ -129,8 +129,8 @@ public class SpawnTests
                 }
                 return fibonacci(n - 1) + fibonacci(n - 2)
             }
-            task <- spawn fibonacci(10)
-            result <- task
+            task <- spawn(fibonacci, 10)
+            result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
 
@@ -158,8 +158,8 @@ public class SpawnTests
                 return sum
             }
             numbers <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-            task <- spawn sumArray(numbers)
-            result <- task
+            task <- spawn(sumArray, numbers)
+            result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
 
@@ -181,13 +181,13 @@ public class SpawnTests
         var code = @"
             func reverseString(s:string) -> string {
                 result <- """"
-                for i in len(s)-1..0 {
-                    result <- result + s[i]
+                for i in [0~<len(s)] {
+                    result <- s[i] + result
                 }
                 return result
             }
-            task <- spawn reverseString(""hello world"")
-            result <- task
+            task <- spawn(reverseString, ""hello world"")
+            result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
 
@@ -209,17 +209,17 @@ public class SpawnTests
         var code = @"
             func processData(id:int, delay:int) -> string {
                 // Simulate processing delay
-                for i in 1..delay {
+                for i in [1~delay] {
                     // Busy wait
                 }
                 return ""Task "" + id.ToStr() + "" completed""
             }
-            task1 <- spawn processData(1, 1000)
-            task2 <- spawn processData(2, 1000)
-            task3 <- spawn processData(3, 1000)
-            result1 <- task1
-            result2 <- task2
-            result3 <- task3
+            task1 <- spawn(processData, 1, 1000)
+            task2 <- spawn(processData, 2, 1000)
+            task3 <- spawn(processData, 3, 1000)
+            result1 <- task1.Join()
+            result2 <- task2.Join()
+            result3 <- task3.Join()
         ";
         var interpreter = new LangInterpreter();
 
@@ -252,18 +252,19 @@ public class SpawnTests
         var code = @"
             class Calculator {
                 public result:int
-                func Init() {
-                    result <- 0
+                func init() {
+                    this.result <- 0
                 }
                 func compute(a:int, b:int) -> void {
-                    result <- a + b
+                    this.result <- a + b
                 }
                 func getResult() -> int {
-                    return result
+                    return this.result
                 }
             }
             calc <- Calculator()
-            task <- spawn calc.compute(15, 27)
+            task <- spawn(calc.compute, 15, 27)
+            task.Join()
             // Wait for task completion
             finalResult <- calc.getResult()
         ";
@@ -289,13 +290,13 @@ public class SpawnTests
                 return n * n
             }
             func coordinatorTask() -> int {
-                task1 <- spawn workerTask(3)
-                task2 <- spawn workerTask(4)
-                task3 <- spawn workerTask(5)
-                return task1 + task2 + task3
+                task1 <- spawn(workerTask, 3)
+                task2 <- spawn(workerTask, 4)
+                task3 <- spawn(workerTask, 5)
+                return task1.Join() + task2.Join() + task3.Join()
             }
-            task <- spawn coordinatorTask()
-            result <- task
+            task <- spawn(coordinatorTask)
+            result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
 
@@ -318,9 +319,10 @@ public class SpawnTests
             func riskyTask() -> int {
                 throw ""Task failed""
             }
+            result <- 0
             try {
-                task <- spawn riskyTask()
-                result <- task
+                task <- spawn(riskyTask)
+                result <- task.Join()
             } catch {
                 result <- -1
             }
@@ -343,10 +345,10 @@ public class SpawnTests
     {
         // Arrange
         var code = @"
-            func loadData() -> {int} {
+            func loadData() -> list {
                 return {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
             }
-            func filterEven(numbers:{int}) -> {int} {
+            func filterEven(numbers:list) -> list {
                 result <- {}
                 for num in numbers {
                     if num % 2 == 0 {
@@ -355,14 +357,14 @@ public class SpawnTests
                 }
                 return result
             }
-            func squareNumbers(numbers:{int}) -> {int} {
+            func squareNumbers(numbers:list) -> list {
                 result <- {}
                 for num in numbers {
                     result.Add(num * num)
                 }
                 return result
             }
-            func sumNumbers(numbers:{int}) -> int {
+            func sumNumbers(numbers:list) -> int {
                 sum <- 0
                 for num in numbers {
                     sum <- sum + num
@@ -370,11 +372,11 @@ public class SpawnTests
                 return sum
             }
             // Pipeline stages
-            loadTask <- spawn loadData()
-            evenTask <- spawn filterEven(loadTask)
-            squareTask <- spawn squareNumbers(evenTask)
-            sumTask <- spawn sumNumbers(squareTask)
-            result <- sumTask
+            loadTask <- spawn(loadData).Join()
+            evenTask <- spawn(filterEven, loadTask).Join()
+            squareTask <- spawn(squareNumbers, evenTask).Join()
+            sumTask <- spawn(sumNumbers, squareTask)
+            result <- sumTask.Join()
         ";
         var interpreter = new LangInterpreter();
 
@@ -394,14 +396,14 @@ public class SpawnTests
     {
         // Arrange
         var code = @"
-            func mapSquare(numbers:{int}) -> {int} {
+            func mapSquare(numbers:list) -> list {
                 result <- {}
                 for num in numbers {
                     result.Add(num * num)
                 }
                 return result
             }
-            func reduceSum(numbers:{int}) -> int {
+            func reduceSum(numbers:list) -> int {
                 sum <- 0
                 for num in numbers {
                     sum <- sum + num
@@ -409,9 +411,10 @@ public class SpawnTests
                 return sum
             }
             input <- {1, 2, 3, 4, 5}
-            mapTask <- spawn mapSquare(input)
-            reduceTask <- spawn reduceSum(mapTask)
-            result <- reduceTask
+            mapTask <- spawn(mapSquare, input)
+            map <- mapTask.Join()
+            reduceTask <- spawn(reduceSum, map)
+            result <- reduceTask.Join()
         ";
         var interpreter = new LangInterpreter();
 
@@ -440,11 +443,11 @@ public class SpawnTests
             func taskC(dependency:int) -> int {
                 return dependency + 5
             }
-            taskA_handle <- spawn taskA()
-            taskB_handle <- spawn taskB(taskA_handle)
-            taskC_handle <- spawn taskC(taskA_handle)
-            resultB <- taskB_handle
-            resultC <- taskC_handle
+            taskA_handle <- spawn(taskA).Join()
+            taskB_handle <- spawn(taskB, taskA_handle)
+            taskC_handle <- spawn(taskC, taskA_handle)
+            resultB <- taskB_handle.Join()
+            resultC <- taskC_handle.Join()
         ";
         var interpreter = new LangInterpreter();
 
@@ -471,14 +474,15 @@ public class SpawnTests
         // Arrange
         var code = @"
             func longTask() -> string {
-                for i in 1..1000000 {
+                for i in [1~1000000] {
                     // Long computation
                 }
                 return ""completed""
             }
+            result <- """"
             try {
-                task <- spawn longTask() with timeout 100
-                result <- task
+                task <- spawn(longTask)
+                result <- task.Join()
             } catch {
                 result <- ""timeout""
             }
@@ -542,17 +546,17 @@ public class SpawnTests
         var code = @"
             func computePartial(start:int, end:int) -> int {
                 sum <- 0
-                for i in start..end {
+                for i in [start~end] {
                     sum <- sum + i
                 }
                 return sum
             }
             // Divide work among tasks
-            task1 <- spawn computePartial(1, 25)
-            task2 <- spawn computePartial(26, 50)
-            task3 <- spawn computePartial(51, 75)
-            task4 <- spawn computePartial(76, 100)
-            result <- task1 + task2 + task3 + task4
+            task1 <- spawn(computePartial, 1, 25)
+            task2 <- spawn(computePartial, 26, 50)
+            task3 <- spawn(computePartial, 51, 75)
+            task4 <- spawn(computePartial, 76, 100)
+            result <- task1.Join() + task2.Join() + task3.Join() + task4.Join()
         ";
         var interpreter = new LangInterpreter();
 
@@ -576,8 +580,8 @@ public class SpawnTests
                 await Task.Delay(100)
                 return ""Async completed""
             }
-            task <- spawn asyncTask()
-            result <- task
+            task <- spawn(asyncTask)
+            result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
 
@@ -601,11 +605,11 @@ public class SpawnTests
                 if depth >= maxDepth {
                     return 1
                 }
-                subTask <- spawn recursiveTask(depth + 1, maxDepth)
-                return 1 + subTask
+                subTask <- spawn(recursiveTask, depth + 1, maxDepth)
+                return 1 + subTask.Join()
             }
-            task <- spawn recursiveTask(0, 5)
-            result <- task
+            task <- spawn(recursiveTask, 0, 5)
+            result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
 
@@ -628,9 +632,9 @@ public class SpawnTests
             func simpleTask() -> string {
                 return ""Task completed""
             }
-            task1 <- spawn simpleTask()
-            task2 <- spawn simpleTask()
-            task3 <- spawn simpleTask()
+            task1 <- spawn(simpleTask)
+            task2 <- spawn(simpleTask)
+            task3 <- spawn(simpleTask)
             id1 <- task1.Id()
             id2 <- task2.Id()
             id3 <- task3.Id()
@@ -658,13 +662,13 @@ public class SpawnTests
                 return ""Done""
             }
             func slowTask() -> string {
-                for i in 1..10000 {
+                for i in [1~10000] {
                     // Simulate work
                 }
                 return ""Done""
             }
-            quickTask_handle <- spawn quickTask()
-            slowTask_handle <- spawn slowTask()
+            quickTask_handle <- spawn(quickTask)
+            slowTask_handle <- spawn(slowTask)
             quickStatus <- quickTask_handle.Status()
             slowStatus <- slowTask_handle.Status()
             // Wait and check final status

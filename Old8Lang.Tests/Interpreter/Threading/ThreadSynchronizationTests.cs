@@ -21,9 +21,9 @@ public class ThreadSynchronizationTests
                 sharedResource <- sharedResource + 1
                 mutex.Unlock()
             }
-            threads <- []
-            for i in 1..5 {
-                thread <- spawn incrementResource()
+            threads <- {}
+            for i in [1~5] {
+                thread <- spawn(incrementResource)
                 threads.Add(thread)
             }
             for thread in threads {
@@ -62,7 +62,7 @@ public class ThreadSynchronizationTests
                 locked <- false
             }
             // Start a thread that holds the lock
-            holderThread <- spawn holdLock()
+            holderThread <- spawn(holdLock)
             threading.Sleep(50) // Give holder time to acquire lock
             // Try to lock with timeout
             result <- lockWithTimeout()
@@ -100,9 +100,9 @@ public class ThreadSynchronizationTests
                 activeCount <- activeCount - 1
                 semaphore.Release()
             }
-            threads <- []
-            for i in 1..5 {
-                thread <- spawn worker(i)
+            threads <- {}
+            for i in [1~5] {
+                thread <- spawn(worker, i)
                 threads.Add(thread)
             }
             for thread in threads {
@@ -145,8 +145,8 @@ public class ThreadSynchronizationTests
                 condition.Signal()
                 mutex.Unlock()
             }
-            waiterThread <- spawn waiter()
-            signallerThread <- spawn signaller()
+            waiterThread <- spawn(waiter)
+            signallerThread <- spawn(signaller)
             waiterThread.Wait()
             signallerThread.Wait()
             result <- ""condition signaled""
@@ -179,9 +179,9 @@ public class ThreadSynchronizationTests
                 barrier.Signal()
                 result <- ""all participants ready""
             }
-            threads <- []
-            for i in 1..3 {
-                thread <- spawn participant(i)
+            threads <- {}
+            for i in [1~3] {
+                thread <- spawn(participant, i)
                 threads.Add(thread)
             }
             for thread in threads {
@@ -222,11 +222,11 @@ public class ThreadSynchronizationTests
                 rwLock.WriteUnlock()
             }
             // Start readers and writers
-            threads <- []
-            threads.Add(spawn writer(10))
-            threads.Add(spawn writer(20))
-            threads.Add(spawn reader(1))
-            threads.Add(spawn reader(2))
+            threads <- {}
+            threads.Add(spawn(writer, 10))
+            threads.Add(spawn(writer, 20))
+            threads.Add(spawn(reader, 1))
+            threads.Add(spawn(reader, 2))
             for thread in threads {
                 thread.Wait()
             }
@@ -258,8 +258,8 @@ public class ThreadSynchronizationTests
                 return atomicCounter.Get()
             }
             threads <- []
-            for i in 1..10 {
-                thread <- spawn incrementCounter()
+            for i in [1~10] {
+                thread <- spawn(incrementCounter)
                 threads.Add(thread)
             }
             for thread in threads {
@@ -295,8 +295,8 @@ public class ThreadSynchronizationTests
                 threading.Sleep(50)
                 event.Signal()
             }
-            waiterThread <- spawn waiter()
-            signallerThread <- spawn signaller()
+            waiterThread <- spawn(waiter)
+            signallerThread <- spawn(signaller)
             waiterThread.Wait()
             signallerThread.Wait()
         ";
@@ -328,8 +328,8 @@ public class ThreadSynchronizationTests
             }
             // Start workers
             threads <- []
-            for i in 1..3 {
-                thread <- spawn worker(i)
+            for i in [1~3] {
+                thread <- spawn(worker, i)
                 threads.Add(thread)
             }
             // Wait for all workers
@@ -521,7 +521,7 @@ public class ThreadSynchronizationTests
                 }
                 reentrantLock.Unlock()
             }
-            thread <- spawn nestedFunction(1)
+            thread <- spawn(nestedFunction, 1)
             thread.Wait()
             result <- nestedCount
         ";
@@ -574,8 +574,8 @@ public class ThreadSynchronizationTests
                     lock2.Unlock()
                 }
             }
-            t1 <- spawn thread1()
-            t2 <- spawn thread2()
+            t1 <- spawn(thread1)
+            t2 <- spawn(thread2)
             t1.Wait()
             t2.Wait()
             result <- deadlockDetected
@@ -607,8 +607,8 @@ public class ThreadSynchronizationTests
             }
             threads <- []
             results <- []
-            for i in 1..3 {
-                thread <- spawn worker(i)
+            for i in [1~3] {
+                thread <- spawn(worker, i)
                 threads.Add(thread)
             }
             for thread in threads {
@@ -642,7 +642,7 @@ public class ThreadSynchronizationTests
             }
             // Submit work items to thread pool
             futures <- []
-            for i in 1..10 {
+            for i in [1~10] {
                 future <- threadPool.Submit(() -> workItem(i))
                 futures.Add(future)
             }
@@ -702,7 +702,7 @@ public class ThreadSynchronizationTests
                 threading.Sleep(100)
                 return ""task completed""
             }
-            thread <- spawn longRunningTask()
+            thread <- spawn(longRunningTask)
             // Wait for thread to complete with timeout
             if thread.Wait(200) {
                 result <- thread.GetResult()
