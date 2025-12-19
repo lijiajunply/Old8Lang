@@ -182,6 +182,6 @@ public class StandardLibraryImportTests(ITestOutputHelper output) : ModuleImport
 
         // 应该抛出导入异常
         Assert.NotNull(exception);
-        Assert.IsType<Old8Lang.Error.ImportError>(exception);
+        Assert.IsType<Error.ImportError>(exception);
     }
 }

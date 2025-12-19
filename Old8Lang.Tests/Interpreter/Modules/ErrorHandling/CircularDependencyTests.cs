@@ -405,7 +405,7 @@ try {
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
 
-        if (result is Old8Lang.AST.Expression.Value.StringLangValue stringResult)
+        if (result is AST.Expression.Value.StringLangValue stringResult)
         {
             var message = stringResult.Value;
             if (message.Contains("Circular"))

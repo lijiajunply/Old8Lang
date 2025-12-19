@@ -23,31 +23,35 @@ public class DynamicImportTests : ModuleImportTestBase
         Assert.Null(exception);
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<Old8Lang.AST.Expression.Value.DoubleLangValue>(result);
-        Assert.Equal(4.0, ((Old8Lang.AST.Expression.Value.DoubleLangValue)result).Value);
+        Assert.IsType<AST.Expression.Value.DoubleLangValue>(result);
+        Assert.Equal(4.0, ((AST.Expression.Value.DoubleLangValue)result).Value);
     }
 
     [Fact]
     public void Import_DynamicModulePath_ShouldImportFromVariablePath()
     {
         // Arrange
-        var mathModule = @"
-func add(a:double, b:double) -> double {
-    return a + b
-}
-func multiply(a:double, b:double) -> double {
-    return a * b
-}
-PI:const <- 3.14159
-";
+        var mathModule = """
 
-        var testContent = @"
-module_name <- ""dynamic_math""
-import dynamic module_name as math
-result1 <- math.add(2.5, 3.5)
-result2 <- math.multiply(4.0, 2.5)
-result3 <- math.PI
-";
+                         func add(a:double, b:double) -> double {
+                             return a + b
+                         }
+                         func multiply(a:double, b:double) -> double {
+                             return a * b
+                         }
+                         PI:const <- 3.14159
+
+                         """;
+
+        var testContent = """
+
+                          module_name <- "dynamic_math"
+                          import dynamic module_name as math
+                          result1 <- math.add(2.5, 3.5)
+                          result2 <- math.multiply(4.0, 2.5)
+                          result3 <- math.PI
+
+                          """;
 
         CreateTempModuleFile("dynamic_math.old8", mathModule);
         CreateTempModuleFile("dynamic_path_test.old8", testContent);

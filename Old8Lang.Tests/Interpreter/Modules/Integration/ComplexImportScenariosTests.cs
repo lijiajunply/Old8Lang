@@ -19,8 +19,8 @@ public class ComplexImportScenariosTests(ITestOutputHelper output) : ModuleImpor
         Assert.Null(exception);
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<Old8Lang.AST.Expression.Value.StringLangValue>(result);
-        Assert.Equal("Combined data from all submodules", ((Old8Lang.AST.Expression.Value.StringLangValue)result).Value);
+        Assert.IsType<AST.Expression.Value.StringLangValue>(result);
+        Assert.Equal("Combined data from all submodules", ((AST.Expression.Value.StringLangValue)result).Value);
     }
 
     [Fact]

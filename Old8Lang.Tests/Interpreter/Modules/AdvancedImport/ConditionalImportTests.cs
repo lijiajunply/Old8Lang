@@ -23,8 +23,8 @@ public class ConditionalImportTests : ModuleImportTestBase
         Assert.Null(exception);
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
-        Assert.IsType<Old8Lang.AST.Expression.Value.StringLangValue>(result);
-        Assert.Equal("logging imported", ((Old8Lang.AST.Expression.Value.StringLangValue)result).Value);
+        Assert.IsType<AST.Expression.Value.StringLangValue>(result);
+        Assert.Equal("logging imported", ((AST.Expression.Value.StringLangValue)result).Value);
     }
 
     [Fact]

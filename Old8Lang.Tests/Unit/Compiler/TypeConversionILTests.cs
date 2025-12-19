@@ -154,7 +154,7 @@ public class TypeConversionILTests
         Assert.Equal(typeof(char), resultType);
     }
     
-    private static System.Reflection.Emit.ILGenerator GetILGenerator(out MethodBuilder methodBuilder)
+    private static ILGenerator GetILGenerator(out MethodBuilder methodBuilder)
     {
         // Create a dynamic assembly
         var assemblyName = new AssemblyName("TestAssembly");
