@@ -3,6 +3,6 @@ api_version <- 2
 module_base_name <- "versioned"
 module_full_name <- module_base_name + api_version.ToStr()
 
-import dynamic module_full_name as api
+dynamic import module_full_name as api
 result1 <- api.getVersion()
 result2 <- api.process("test data")

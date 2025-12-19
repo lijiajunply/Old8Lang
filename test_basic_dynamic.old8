@@ -1,0 +1,6 @@
+// 最基本的动态导入测试
+PrintLine("开始动态导入测试")
+module_name <- "dynamic_validation_test_module"
+PrintLine("模块名称: " + module_name)
+dynamic import module_name as test_module
+PrintLine("动态导入完成")

@@ -3,6 +3,6 @@
 module_path <- "dynamic_alias"
 alias_name <- "processor"
 
-import dynamic module_path as alias_name
+dynamic import module_path as alias_name
 result1 <- processor.processData("dynamic test")
 result2 <- processor.getVersion()

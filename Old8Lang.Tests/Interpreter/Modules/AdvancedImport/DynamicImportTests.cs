@@ -99,7 +99,7 @@ if (math_level == ""basic"") {
     module_path <- ""runtime_basic""  // 默认
 }
 
-import dynamic module_path as math_engine
+dynamic import module_path as math_engine
 result1 <- math_engine.calculate(5.0, 3.0)
 result2 <- math_engine.getName()
 ";
@@ -144,7 +144,7 @@ api_version <- 2
 module_base_name <- ""versioned""
 module_full_name <- module_base_name + api_version.ToStr()
 
-import dynamic module_full_name as api
+dynamic import module_full_name as api
 result1 <- api.getVersion()
 result2 <- api.process(""test data"")
 ";
@@ -218,7 +218,7 @@ func divide(a:double, b:double) -> double {
 operation_type <- ""calculator""
 module_name <- operation_type + ""_dynamic""
 
-import dynamic module_name as calc
+dynamic import module_name as calc
 result1 <- calc.add(10.0, 5.0)
 result2 <- calc.multiply(4.0, 3.0)
 result3 <- calc.subtract(10.0, 3.0)
@@ -270,10 +270,10 @@ result3 <- calc.subtract(10.0, 3.0)
                           total <- 0
 
                           i <- 0
-                          while i < plugin_names.Size() {
+                          while i < len(plugin_names) {
                               module_name <- plugin_names[i]
 
-                              import dynamic module_name as plugin
+                              dynamic import module_name as plugin
                               plugin_name <- plugin.getName()
                               plugin_value <- plugin.getValue()
 
@@ -329,7 +329,7 @@ func getCacheConfig() -> dict {
         var testContent = @"
 // 模拟从配置文件读取
 config_source <- ""dynamic_config""
-import dynamic config_source as config
+dynamic import config_source as config
 
 db_config <- config.getDatabaseConfig()
 cache_config <- config.getCacheConfig()
@@ -410,7 +410,7 @@ func getVersion() -> string {
 module_path <- ""dynamic_alias""
 alias_name <- ""processor""
 
-import dynamic module_path as alias_name
+dynamic import module_path as alias_name
 result1 <- processor.processData(""dynamic test"")
 result2 <- processor.getVersion()
 ";

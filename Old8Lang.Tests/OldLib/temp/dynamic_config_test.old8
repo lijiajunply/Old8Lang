@@ -1,7 +1,7 @@
 
 // 模拟从配置文件读取
 config_source <- "dynamic_config"
-import dynamic config_source as config
+dynamic import config_source as config
 
 db_config <- config.getDatabaseConfig()
 cache_config <- config.getCacheConfig()

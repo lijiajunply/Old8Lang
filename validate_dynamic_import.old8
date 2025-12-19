@@ -1,0 +1,42 @@
+// 动态导入功能验证测试
+PrintLine("=== 开始动态导入验证 ===")
+
+// 测试1: 基本动态导入
+module_name <- "dynamic_validation_test_module"
+PrintLine("准备动态导入模块: " + module_name)
+
+dynamic import module_name as dyn_mod
+PrintLine("动态导入成功完成")
+
+// 测试2: 访问模块成员
+test_value <- dyn_mod.value
+test_name <- dyn_mod.name
+test_result <- dyn_mod.calculate(10, 5)
+test_info <- dyn_mod.getInfo()
+
+// 测试3: 验证结果
+PrintLine("模块值: " + test_value.ToStr())
+PrintLine("模块名: " + test_name)
+PrintLine("计算结果 (10+5): " + test_result.ToStr())
+PrintLine("模块信息: " + test_info)
+
+// 测试4: 验证类型
+value_type <- test_value.GetType()
+name_type <- test_name.GetType()
+result_type <- test_result.GetType()
+info_type <- test_info.GetType()
+
+PrintLine("值类型: " + value_type.ToStr())
+PrintLine("名称类型: " + name_type)
+PrintLine("结果类型: " + result_type)
+PrintLine("信息类型: " + info_type)
+
+// 测试5: 条件动态导入
+condition <- true
+if condition {
+    conditional_module <- "dynamic_validation_test_module"
+    dynamic import conditional_module as conditional_mod
+    PrintLine("条件导入测试: " + conditional_mod.name)
+}
+
+PrintLine("=== 动态导入验证完成 ===")

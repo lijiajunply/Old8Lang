@@ -1,0 +1,3 @@
+// 最小动态导入测试
+module_name <- "test"
+dynamic import module_name

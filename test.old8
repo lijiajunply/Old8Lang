@@ -1,0 +1,2 @@
+// 创建一个简单的测试模块
+message <- "Hello from dynamic module!"

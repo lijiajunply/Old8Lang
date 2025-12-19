@@ -1,0 +1,7 @@
+// 测试动态导入后添加更多语句
+PrintLine("开始测试")
+module_name <- "test"
+PrintLine("模块名称: " + module_name)
+dynamic import module_name as test_mod
+PrintLine("动态导入完成")
+PrintLine("测试结束")

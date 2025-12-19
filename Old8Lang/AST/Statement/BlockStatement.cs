@@ -23,7 +23,18 @@ public class BlockStatement : OldStatement
             // 根据语句类型添加到不同的列表中
             switch (statement)
             {
-                case ImportStatement or NativeStatement or FuncInit or ClassInit:
+                case ImportStatement importStmt:
+                    // 动态导入需要放在 OtherStatements 中，以便在正常语句流中执行
+                    if (importStmt.IsDynamicImport)
+                    {
+                        OtherStatements.Add(statement);
+                    }
+                    else
+                    {
+                        ImportStatements.Add(statement);
+                    }
+                    break;
+                case NativeStatement or FuncInit or ClassInit:
                     ImportStatements.Add(statement);
                     break;
                 case ReturnStatement:

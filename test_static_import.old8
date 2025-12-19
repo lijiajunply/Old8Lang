@@ -1,0 +1,5 @@
+// 测试静态导入是否也有类似问题
+PrintLine("开始测试")
+import test as test_mod
+PrintLine("静态导入完成")
+PrintLine("测试结束")

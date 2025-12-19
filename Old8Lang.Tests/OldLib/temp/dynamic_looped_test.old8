@@ -4,10 +4,10 @@ results <- {}
 total <- 0
 
 i <- 0
-while i < plugin_names.Size() {
+while i < len(plugin_names) {
     module_name <- plugin_names[i]
 
-    import dynamic module_name as plugin
+    dynamic import module_name as plugin
     plugin_name <- plugin.getName()
     plugin_value <- plugin.getValue()
 

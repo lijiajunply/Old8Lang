@@ -1,0 +1,32 @@
+// 完整的动态导入功能测试
+PrintLine("=== 完整动态导入测试 ===")
+
+// 测试1: 基本动态导入
+module_name <- "test"
+PrintLine("准备动态导入: " + module_name)
+
+dynamic import module_name as test_mod
+PrintLine("动态导入成功完成！")
+
+// 测试2: 访问模块成员
+message <- test_mod.message
+PrintLine("模块消息: " + message)
+
+// 测试3: 条件动态导入
+condition <- true
+if condition {
+    alt_module <- "test"
+    dynamic import alt_module as alt_mod
+    PrintLine("条件导入: " + alt_mod.message)
+}
+
+// 测试4: 复杂表达式动态导入
+base_name <- "te"
+suffix <- "st"
+full_module_name <- base_name + suffix
+
+PrintLine("使用复杂表达式动态导入...")
+dynamic import full_module_name as complex_mod
+PrintLine("复杂表达式导入成功: " + complex_mod.message)
+
+PrintLine("=== 所有动态导入测试完成 ===")

@@ -929,10 +929,10 @@ public class StatementParser(
         var position = new SourcePosition(importToken.Line, importToken.Column, tokenValue: importToken.Value);
 
         List<ImportItem>? importSpecifiers = null;
-        bool fromClause = false;
-        bool isSelective = false;
-        bool isLazy = false;
-        bool isDynamic = false;
+        var fromClause = false;
+        var isSelective = false;
+        var isLazy = false;
+        var isDynamic = false;
         LangExpression? dynamicModuleExpression = null;
         string moduleName;
 
@@ -941,22 +941,17 @@ public class StatementParser(
         {
             Expect(LangTokenType.Lazy); // 消耗 "lazy"
             isLazy = true;
-            Expect(LangTokenType.Import); // 消耗 "import"
+            // 消耗 "import"
         }
         else if (CurrentToken.Type == LangTokenType.Dynamic)
         {
             Expect(LangTokenType.Dynamic); // 消耗 "dynamic"
             isDynamic = true;
-            Expect(LangTokenType.Import); // 消耗 "import"
+        }
 
-            // 对于 dynamic import 语法，立即解析模块名表达式
-            dynamicModuleExpression = expressionParser.ParseExpression();
-        }
-        else
-        {
-            // 普通导入
-            Expect(LangTokenType.Import); // 消耗 "import"
-        }
+        // 普通导入
+        // 消耗 "import"
+        Expect(LangTokenType.Import); // 消耗 "import"
 
         // 检查是否有导入指定项
         if (CurrentToken.Type == LangTokenType.LeftBrace)
@@ -968,7 +963,7 @@ public class StatementParser(
             do
             {
                 // 解析导入项
-                string name = CurrentToken.Value;
+                var name = CurrentToken.Value;
                 Expect(LangTokenType.Identifier);
 
                 string? alias = null;
@@ -980,7 +975,7 @@ public class StatementParser(
                 }
 
                 importSpecifiers.Add(new ImportItem(name, alias));
-            } while (CurrentToken.Type == LangTokenType.Comma && (CurrentIndex++ > -1));
+            } while (CurrentToken.Type == LangTokenType.Comma && CurrentIndex++ > -1);
 
             Expect(LangTokenType.RightBrace);
 
@@ -999,6 +994,13 @@ public class StatementParser(
                 moduleName = CurrentToken.Value;
                 Expect(LangTokenType.Identifier);
             }
+        }
+        else if (isDynamic && CurrentToken.Type == LangTokenType.Identifier)
+        {
+            // 动态导入：创建标识符表达式，避免在解析阶段调用表达式解析器
+            dynamicModuleExpression = new LangId(CurrentToken.Value, "", null, new SourcePosition(CurrentToken.Line, CurrentToken.Column));
+            Expect(LangTokenType.Identifier);  // 消耗标识符
+            moduleName = "__dynamic_module__";
         }
         else if (CurrentToken.Type == LangTokenType.Identifier)
         {

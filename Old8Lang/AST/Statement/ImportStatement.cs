@@ -86,6 +86,11 @@ public class ImportStatement(
     private readonly bool IsDynamic = isDynamic;
 
     /// <summary>
+    /// 公共属性：是否为动态导入
+    /// </summary>
+    public bool IsDynamicImport => IsDynamic;
+
+    /// <summary>
     /// 动态模块表达式，用于在运行时计算模块名
     /// </summary>
     private readonly LangExpression? DynamicModuleExpression = dynamicModuleExpression;

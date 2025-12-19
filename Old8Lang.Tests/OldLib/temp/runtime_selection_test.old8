@@ -10,6 +10,6 @@ if (math_level == "basic") {
     module_path <- "runtime_basic"  // 默认
 }
 
-import dynamic module_path as math_engine
+dynamic import module_path as math_engine
 result1 <- math_engine.calculate(5.0, 3.0)
 result2 <- math_engine.getName()
