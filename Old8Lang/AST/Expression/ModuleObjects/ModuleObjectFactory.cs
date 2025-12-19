@@ -1,7 +1,7 @@
 using Old8Lang.AST.Statement;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.ModuleObjects;
 
 /// <summary>
 /// 模块对象工厂，负责根据导入配置创建合适的模块对象

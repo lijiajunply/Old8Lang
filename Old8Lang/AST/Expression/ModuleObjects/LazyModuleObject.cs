@@ -1,8 +1,7 @@
 using Old8Lang.AST.Statement;
-using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.ModuleObjects;
 
 /// <summary>
 /// 懒加载模块对象，只在首次访问时加载模块内容

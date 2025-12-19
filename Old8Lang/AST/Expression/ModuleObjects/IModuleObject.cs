@@ -1,6 +1,6 @@
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.ModuleObjects;
 
 /// <summary>
 /// 模块对象接口，定义所有模块对象应该实现的基本功能

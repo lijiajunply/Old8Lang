@@ -18,7 +18,7 @@ public class InheritanceTests
                 public name <- """"
 
                 func init(n:string) {
-                    name <- n
+                    this.name <- n
                 }
 
                 func speak() -> string {
@@ -26,7 +26,7 @@ public class InheritanceTests
                 }
 
                 func getName() -> string {
-                    return name
+                    return this.name
                 }
             }
 
@@ -79,15 +79,15 @@ public class InheritanceTests
                 public brand <- """"
 
                 func init(b:string) {
-                    brand <- b
+                    this.brand <- b
                 }
 
                 func accelerate(amount) {
-                    speed <- speed + amount
+                    this.speed <- this.speed + amount
                 }
 
                 func getInfo() -> string {
-                    return brand + "" vehicle at "" + speed + "" km/h""
+                    return this.brand + "" vehicle at "" + this.speed + "" km/h""
                 }
             }
 
@@ -95,21 +95,21 @@ public class InheritanceTests
                 public doors <- 4
 
                 func openDoors() -> string {
-                    return ""Opening "" + doors + "" doors""
+                    return ""Opening "" + this.doors + "" doors""
                 }
 
                 func getInfo() -> string {
-                    return brand + "" car with "" + doors + "" doors at "" + speed + "" km/h""
+                    return this.brand + "" car with "" + this.doors + "" doors at "" + this.speed + "" km/h""
                 }
             }
 
             class SportsCar extends Car {
                 func accelerate(amount) {
-                    speed <- speed + amount * 2  // Sports cars accelerate faster
+                    this.speed <- this.speed + amount * 2  // Sports cars accelerate faster
                 }
 
                 func turboBoost() -> string {
-                    speed <- speed + 50
+                    this.speed <- this.speed + 50
                     return ""Turbo boost activated!""
                 }
             }
@@ -168,15 +168,15 @@ public class InheritanceTests
                 public radius <- 0.0
 
                 func init(r) {
-                    radius <- r
+                    this.radius <- r
                 }
 
                 func getArea() -> double {
-                    return 3.14159 * radius * radius
+                    return 3.14159 * this.radius * this.radius
                 }
 
                 func getPerimeter() -> double {
-                    return 2 * 3.14159 * radius
+                    return 2 * 3.14159 * this.radius
                 }
 
                 func getType() -> string {
@@ -189,16 +189,16 @@ public class InheritanceTests
                 public height <- 0.0
 
                 func init(w, h) {
-                    width <- w
-                    height <- h
+                    this.width <- w
+                    this.height <- h
                 }
 
                 func getArea() -> double {
-                    return width * height
+                    return this.width * this.height
                 }
 
                 func getPerimeter() -> double {
-                    return 2 * (width + height)
+                    return 2 * (this.width + this.height)
                 }
 
                 func getType() -> string {
@@ -347,7 +347,7 @@ public class InheritanceTests
                 }
 
                 func serialize() -> string {
-                    return ""{""name"":"""" + name + """", ""price"": """" + price + """"}""
+                    return ""{\""name\"":\"""" + name + ""\"", \""price\"":\"""" + price + ""\""}""
                 }
 
                 func deserialize(data:string) {
@@ -481,16 +481,16 @@ public class InheritanceTests
                 public salary <- 0.0
 
                 func init(n:string, s:double) {
-                    name <- n
-                    salary <- s
+                    this.name <- n
+                    this.salary <- s
                 }
 
                 func calculateBonus() -> double {
-                    return salary * 0.1  // 10% bonus for regular employee
+                    return this.salary * 0.1  // 10% bonus for regular employee
                 }
 
                 func getInfo() -> string {
-                    return name + "" earns "" + salary + "" with bonus "" + calculateBonus()
+                    return this.name + "" earns "" + this.salary + "" with bonus "" + this.calculateBonus()
                 }
             }
 
@@ -498,20 +498,21 @@ public class InheritanceTests
                 private teamSize <- 0
 
                 func init(n:string, s:double, team:int) {
-                    this.init(n, s)  // Call parent constructor
-                    teamSize <- team
+                    this.name <- n
+                    this.salary <- s
+                    this.teamSize <- team
                 }
 
                 func calculateBonus() -> double {
-                    return salary * 0.2 + teamSize * 100  // 20% bonus + team bonus
+                    return this.salary * 0.2 + this.teamSize * 100  // 20% bonus + team bonus
                 }
 
                 func getTeamSize() -> int {
-                    return teamSize
+                    return this.teamSize
                 }
 
                 func getInfo() -> string {
-                    return name + "" (Manager) with team of "" + teamSize + "" earns "" + salary + "" with bonus "" + calculateBonus()
+                    return this.name + "" (Manager) with team of "" + this.teamSize + "" earns "" + this.salary + "" with bonus "" + this.calculateBonus()
                 }
             }
 
@@ -661,7 +662,8 @@ public class InheritanceTests
                 func getName() -> string
             }
 
-            interface IAdvancedShape extends IBasicShape {
+            interface IAdvancedShape {
+                func getName() -> string
                 func calculateComplexity() -> int
             }
 

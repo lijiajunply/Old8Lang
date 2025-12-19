@@ -1,7 +1,8 @@
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.ModuleObjects;
 
 /// <summary>
 /// 模块对象基类，提供模块对象的通用功能实现
@@ -9,7 +10,7 @@ namespace Old8Lang.AST.Expression.Value;
 public abstract class BaseModuleObject : LangValueType, IModuleObject
 {
     private readonly Dictionary<string, LangValueType> Symbols = new();
-    private readonly Lock _loadLock = new();
+    private readonly Lock LoadLock = new();
     private ModuleLoadingState _loadingState = ModuleLoadingState.NotLoaded;
     private Exception? LoadException;
 
@@ -86,7 +87,7 @@ public abstract class BaseModuleObject : LangValueType, IModuleObject
     {
         if (!IsLoaded)
         {
-            lock (_loadLock)
+            lock (LoadLock)
             {
                 if (!IsLoaded && _loadingState != ModuleLoadingState.Loading)
                 {
@@ -140,7 +141,7 @@ public abstract class BaseModuleObject : LangValueType, IModuleObject
             }
         }
 
-        throw new AttributeError(this, dotExpression.ToString(), ModuleName);
+        throw new AttributeError(this, dotExpression.ToString() ?? "", ModuleName);
     }
 
     /// <summary>

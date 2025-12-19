@@ -1,8 +1,9 @@
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.ModuleObjects;
 
 /// <summary>
 /// 懒导入包装器，延迟加载模块直到首次使用

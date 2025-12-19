@@ -2,7 +2,7 @@ using Old8Lang.AST.Statement;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.ModuleObjects;
 
 /// <summary>
 /// 懒加载特定项目的包装器，用于选择导入的懒加载
@@ -11,22 +11,22 @@ public class LazyItemWrapper(string moduleName, string itemName, VariateManager 
     : LangValueType(position)
 {
     private readonly SourcePosition position = position;
-    private bool loaded = false;
-    private LangValueType? loadedItem;
+    private bool Loaded;
+    private LangValueType? LoadedItem;
 
     /// <summary>
     /// 当作为函数调用时触发懒加载
     /// </summary>
     public override LangValueType Dot(LangExpression dotExpression, VariateManager currentManager)
     {
-        if (!loaded)
+        if (!Loaded)
         {
             LoadItem();
         }
 
-        if (loadedItem != null)
+        if (LoadedItem != null)
         {
-            return loadedItem.Dot(dotExpression, currentManager);
+            return LoadedItem.Dot(dotExpression, currentManager);
         }
 
         throw new AttributeError(this, dotExpression.ToString(), "LazyItem");
@@ -37,12 +37,12 @@ public class LazyItemWrapper(string moduleName, string itemName, VariateManager 
     /// </summary>
     public override bool Equal(LangValueType? otherValueType)
     {
-        if (!loaded)
+        if (!Loaded)
         {
             LoadItem();
         }
 
-        return loadedItem?.Equal(otherValueType) ?? false;
+        return LoadedItem?.Equal(otherValueType) ?? false;
     }
 
     /// <summary>
@@ -50,7 +50,7 @@ public class LazyItemWrapper(string moduleName, string itemName, VariateManager 
     /// </summary>
     private void LoadItem()
     {
-        if (loaded) return;
+        if (Loaded) return;
 
         try
         {
@@ -62,14 +62,14 @@ public class LazyItemWrapper(string moduleName, string itemName, VariateManager 
             // 查找导入的项目
             if (manager.Scopes.Count > 0 && manager.Scopes[^1].TryGetValue(itemName, out var item))
             {
-                loadedItem = item;
+                LoadedItem = item;
             }
             else
             {
                 throw new ImportError(this, $"{moduleName}.{itemName}", $"Item {itemName} not found");
             }
 
-            loaded = true;
+            Loaded = true;
         }
         catch (Exception ex)
         {
@@ -78,5 +78,5 @@ public class LazyItemWrapper(string moduleName, string itemName, VariateManager 
     }
 
     public override string ToString() =>
-        loaded ? loadedItem?.ToString() ?? "Loaded" : $"LazyItem({itemName} from {moduleName})";
+        Loaded ? LoadedItem?.ToString() ?? "Loaded" : $"LazyItem({itemName} from {moduleName})";
 }

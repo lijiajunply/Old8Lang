@@ -1,8 +1,7 @@
 using Old8Lang.AST.Statement;
-using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.ModuleObjects;
 
 /// <summary>
 /// 即时加载模块对象，在构造时立即加载模块内容

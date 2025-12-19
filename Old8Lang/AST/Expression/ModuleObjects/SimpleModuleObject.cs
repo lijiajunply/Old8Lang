@@ -1,8 +1,7 @@
-using Old8Lang.AST.Expression.Intermediates;
-using Old8Lang.Error;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.ModuleObjects;
 
 /// <summary>
 /// 简单模块对象，用于处理带别名的模块导入
