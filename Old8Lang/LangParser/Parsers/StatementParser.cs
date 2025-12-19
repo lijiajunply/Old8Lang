@@ -261,9 +261,10 @@ public class StatementParser(
             return classParser.ParseInterfaceDeclaration();
         }
 
-        // 处理import语句：import module 或 lazy import module
+        // 处理import语句：import module, lazy import module, 或 dynamic import module
         if (CurrentToken.Type == LangTokenType.Import ||
-            CurrentToken.Type == LangTokenType.Lazy)
+            CurrentToken.Type == LangTokenType.Lazy ||
+            CurrentToken.Type == LangTokenType.Dynamic)
         {
             return ParseImportStatement();
         }
@@ -927,20 +928,45 @@ public class StatementParser(
         var importToken = CurrentToken;
         var position = new SourcePosition(importToken.Line, importToken.Column, tokenValue: importToken.Value);
 
-        // 检查是否为懒导入：lazy import
+        List<ImportItem>? importSpecifiers = null;
+        bool fromClause = false;
+        bool isSelective = false;
         bool isLazy = false;
+        bool isDynamic = false;
+        LangExpression? dynamicModuleExpression = null;
+        string moduleName;
+
+        // 检查导入修饰符：lazy import 或 dynamic import
         if (CurrentToken.Type == LangTokenType.Lazy)
         {
             Expect(LangTokenType.Lazy); // 消耗 "lazy"
             isLazy = true;
+            Expect(LangTokenType.Import); // 消耗 "import"
+        }
+        else if (CurrentToken.Type == LangTokenType.Dynamic)
+        {
+            Expect(LangTokenType.Dynamic); // 消耗 "dynamic"
+            isDynamic = true;
+            Expect(LangTokenType.Import); // 消耗 "import"
+
+            // 对于 dynamic import 语法，立即解析模块名表达式
+            dynamicModuleExpression = expressionParser.ParseExpression();
+        }
+        else
+        {
+            // 普通导入
+            Expect(LangTokenType.Import); // 消耗 "import"
         }
 
-        Expect(LangTokenType.Import); // 消耗 "import"
+        // 检查是否为动态导入：import dynamic (旧语法，保持兼容性)
+        if (!isDynamic && CurrentToken.Type == LangTokenType.Dynamic)
+        {
+            Expect(LangTokenType.Dynamic); // 消耗 "dynamic"
+            isDynamic = true;
 
-        List<ImportItem>? importSpecifiers = null;
-        bool fromClause = false;
-        bool isSelective = false;
-        string moduleName;
+            // 解析动态模块表达式
+            dynamicModuleExpression = expressionParser.ParseExpression();
+        }
 
         // 检查是否有导入指定项
         if (CurrentToken.Type == LangTokenType.LeftBrace)
@@ -1054,9 +1080,18 @@ public class StatementParser(
             moduleName = CurrentToken.Value;
             Expect(LangTokenType.String);
         }
+        else if (isDynamic)
+        {
+            // 动态导入：解析模块名表达式
+            if (dynamicModuleExpression == null)
+            {
+                dynamicModuleExpression = expressionParser.ParseExpression();
+            }
+            moduleName = "__dynamic_module__";
+        }
         else
         {
-            throw CreateSyntaxError("Expected identifier, string, or left brace after import");
+            throw CreateSyntaxError("Expected identifier, string, dynamic expression, or left brace after import");
         }
 
         // 检查是否有模块别名：as alias
@@ -1068,7 +1103,7 @@ public class StatementParser(
             Expect(LangTokenType.Identifier);
         }
 
-        return new ImportStatement(moduleName, position, importSpecifiers, fromClause, moduleAlias, isLazy, isSelective);
+        return new ImportStatement(moduleName, position, importSpecifiers, fromClause, moduleAlias, isLazy, isSelective, isDynamic, dynamicModuleExpression);
     }
 
     /// <summary>

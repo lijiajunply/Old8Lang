@@ -1,8 +1,0 @@
-// 创建一个简单的测试模块
-lazy import "MathLib" as math
-
-// 测试访问懒导入模块
-result <- math.PI
-
-// 输出结果
-PrintLine("懒导入测试成功，PI 值为：" + result.ToStr())

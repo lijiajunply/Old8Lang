@@ -303,7 +303,12 @@ public enum LangTokenType
     /// <summary>
     /// lazy
     /// </summary>
-    Lazy
+    Lazy,
+
+    /// <summary>
+    /// dynamic
+    /// </summary>
+    Dynamic
 }
 
 public enum KeywordType
@@ -352,5 +357,6 @@ public enum KeywordType
     Interface,
     Implements,
     Abstract,
-    Lazy
+    Lazy,
+    Dynamic
 }

@@ -1,5 +1,6 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.ModuleObjects;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
@@ -35,6 +36,8 @@ public class ImportItem(string name, string? alias = null)
 /// <param name="moduleAlias">模块别名，如import "module" as alias</param>
 /// <param name="isLazy">是否为懒导入，只在首次使用时加载模块</param>
 /// <param name="isSelective">是否为选择导入，如 from module import a, b, c</param>
+/// <param name="isDynamic">是否为动态导入，模块名在运行时计算</param>
+/// <param name="dynamicModuleExpression">动态模块表达式</param>
 public class ImportStatement(
     string importString,
     SourcePosition position = default,
@@ -42,7 +45,9 @@ public class ImportStatement(
     bool fromClause = false,
     string? moduleAlias = null,
     bool isLazy = false,
-    bool isSelective = false
+    bool isSelective = false,
+    bool isDynamic = false,
+    LangExpression? dynamicModuleExpression = null
 ) : OldStatement(position)
 {
     /// <summary>
@@ -74,6 +79,16 @@ public class ImportStatement(
     /// 是否为选择导入，如 from module import a, b, c
     /// </summary>
     private readonly bool IsSelective = isSelective;
+
+    /// <summary>
+    /// 是否为动态导入，模块名在运行时计算
+    /// </summary>
+    private readonly bool IsDynamic = isDynamic;
+
+    /// <summary>
+    /// 动态模块表达式，用于在运行时计算模块名
+    /// </summary>
+    private readonly LangExpression? DynamicModuleExpression = dynamicModuleExpression;
 
     /// <summary>
     /// 是否启用统一工厂模式
@@ -118,6 +133,13 @@ public class ImportStatement(
         if (moduleName.Contains('.'))
         {
             HandleSubmoduleImport(moduleName, manager);
+            return;
+        }
+
+        // 动态导入处理
+        if (IsDynamic)
+        {
+            HandleDynamicImport(manager);
             return;
         }
 
@@ -315,7 +337,8 @@ public class ImportStatement(
                     {
                         // 选择性导入
                         var selectedSymbols = ImportSpecifiers.Select(item => item.Alias).ToList();
-                        moduleValue = ModuleFactory.CreateSelectiveModule(ImportString, selectedSymbols, manager, Position);
+                        moduleValue =
+                            ModuleFactory.CreateSelectiveModule(ImportString, selectedSymbols, manager, Position);
                     }
                     else
                     {
@@ -760,26 +783,114 @@ public class ImportStatement(
     public override string ToString()
     {
         var lazyStr = IsLazy ? "lazy " : "";
+        var dynamicStr = IsDynamic ? "dynamic " : "";
 
         if (IsSelective)
         {
             var specifiers = string.Join(", ",
                 ImportSpecifiers.Select(s => s.Name == s.Alias ? s.Name : $"{s.Name} as {s.Alias}"));
-            return $"{lazyStr}import {specifiers} from {ImportString}";
+            var prefix = IsDynamic ? $"{dynamicStr}import {specifiers} from " : $"{lazyStr}import {specifiers} from ";
+            return $"{prefix}{(IsDynamic ? DynamicModuleExpression?.ToString() ?? ImportString : ImportString)}";
         }
 
         if (ImportSpecifiers.Count > 0)
         {
             var specifiers = string.Join(", ",
                 ImportSpecifiers.Select(s => s.Name == s.Alias ? s.Name : $"{s.Name} as {s.Alias}"));
-            return $"{lazyStr}import {{ {specifiers} }} from {ImportString}";
+            var prefix = IsDynamic
+                ? $"{dynamicStr}import {{ {specifiers} }} from "
+                : $"{lazyStr}import {{ {specifiers} }} from ";
+            return $"{prefix}{(IsDynamic ? DynamicModuleExpression?.ToString() ?? ImportString : ImportString)}";
         }
 
         if (ModuleAlias != null)
         {
-            return $"{lazyStr}import {ImportString} as {ModuleAlias}";
+            var prefix = IsDynamic ? $"{dynamicStr}import " : $"{lazyStr}import ";
+            var modulePart = IsDynamic ? DynamicModuleExpression?.ToString() ?? ImportString : ImportString;
+            return $"{prefix}{modulePart} as {ModuleAlias}";
         }
 
-        return $"{lazyStr}import {ImportString}";
+        var basePrefix = IsDynamic ? $"{dynamicStr}import " : $"{lazyStr}import ";
+        var baseModule = IsDynamic ? DynamicModuleExpression?.ToString() ?? ImportString : ImportString;
+        return $"{basePrefix}{baseModule}";
+    }
+
+    /// <summary>
+    /// 处理动态导入
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    /// <exception cref="ImportError">当动态导入失败时抛出</exception>
+    private void HandleDynamicImport(VariateManager manager)
+    {
+        if (DynamicModuleExpression == null)
+        {
+            throw new ImportError(this, ImportString, "Dynamic import expression is null");
+        }
+
+        try
+        {
+            // 运行动态模块表达式来获取模块名
+            var dynamicResult = DynamicModuleExpression.Run(manager);
+
+            if (dynamicResult is StringLangValue stringModuleValue)
+            {
+                var actualModuleName = stringModuleValue.Value;
+
+                // 检查是否启用新的统一工厂
+                if (UseUnifiedFactory)
+                {
+                    // 使用新的统一模块工厂创建模块对象
+                    UnifiedModule unifiedModule;
+
+                    if (IsSelective && ImportSpecifiers.Count > 0)
+                    {
+                        // 选择性导入
+                        var selectedSymbols = ImportSpecifiers.Select(item => item.Alias).ToList();
+                        unifiedModule =
+                            ModuleFactory.CreateSelectiveModule(actualModuleName, selectedSymbols, manager, Position);
+                    }
+                    else
+                    {
+                        // 动态导入创建即时加载模块（因为已经确定要导入）
+                        unifiedModule = ModuleFactory.CreateEagerModule(actualModuleName, manager, Position);
+                    }
+
+                    // 注册模块对象到变量管理器
+                    RegisterModuleValue(unifiedModule, manager);
+                }
+                else
+                {
+                    // 传统方式：执行导入逻辑
+                    // 创建临时的ImportStatement来处理实际导入
+                    var tempImportStatement = new ImportStatement(
+                        actualModuleName,
+                        Position,
+                        ImportSpecifiers,
+                        FromClause,
+                        ModuleAlias,
+                        false, // 动态导入本身不重复懒加载
+                        IsSelective
+                    );
+
+                    // 执行实际导入
+                    tempImportStatement.Run(manager);
+                }
+            }
+            else
+            {
+                throw new ImportError(this, ImportString,
+                    $"Dynamic import expression must evaluate to a string, got {dynamicResult.GetType().Name}", null);
+            }
+        }
+        catch (ImportError)
+        {
+            // 重新抛出导入错误
+            throw;
+        }
+        catch (Exception ex)
+        {
+            // 包装其他异常为导入错误
+            throw new ImportError(this, ImportString, $"Dynamic import failed: {ex.Message}");
+        }
     }
 }

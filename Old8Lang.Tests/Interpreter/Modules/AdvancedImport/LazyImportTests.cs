@@ -104,41 +104,45 @@ public class LazyImportTests(ITestOutputHelper output) : ModuleImportTestBase(ou
     public void Import_LazyHeavyComputation_ShouldNotBlockInitialLoad()
     {
         // Arrange
-        var heavyModuleContent = @"
-// 模拟重型计算模块
-const HEAVY_DATA <- [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]
+        var heavyModuleContent = """
 
-func heavyComputation() -> int {
-    result <- 0
-    i <- 0
-    while i < HEAVY_DATA.Size() {
-        j <- 0
-        while j < HEAVY_DATA.Size() {
-            result <- result + HEAVY_DATA[i] * HEAVY_DATA[j]
-            j <- j + 1
-        }
-        i <- i + 1
-    }
-    return result
-}
+                                 // 模拟重型计算模块
+                                 const HEAVY_DATA <- [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]
 
-func quickFunction() -> string {
-    return ""Quick result""
-}
-";
+                                 func heavyComputation() -> int {
+                                     result <- 0
+                                     i <- 0
+                                     while i < len(HEAVY_DATA) {
+                                         j <- 0
+                                         while j < HEAVY_DATA.Size() {
+                                             result <- result + HEAVY_DATA[i] * HEAVY_DATA[j]
+                                             j <- j + 1
+                                         }
+                                         i <- i + 1
+                                     }
+                                     return result
+                                 }
 
-        var testContent = @"
-lazy import ""heavy_module"" as heavy
-status_before <- ""Not loaded yet""
+                                 func quickFunction() -> string {
+                                     return "Quick result"
+                                 }
 
-// 此时模块还未加载
-quick_result <- heavy.quickFunction()
-status_after_quick <- ""Loaded after quick call""
+                                 """;
 
-// 重型计算会延迟到实际调用时
-heavy_result <- heavy.heavyComputation()
-status_after_heavy <- ""Loaded after heavy call""
-";
+        var testContent = """
+
+                          lazy import "heavy_module" as heavy
+                          status_before <- "Not loaded yet"
+
+                          // 此时模块还未加载
+                          quick_result <- heavy.quickFunction()
+                          status_after_quick <- "Loaded after quick call"
+
+                          // 重型计算会延迟到实际调用时
+                          heavy_result <- heavy.heavyComputation()
+                          status_after_heavy <- "Loaded after heavy call"
+
+                          """;
 
         CreateTempModuleFile("heavy_module.old8", heavyModuleContent);
         CreateTempModuleFile("lazy_heavy_test.old8", testContent);
@@ -163,32 +167,36 @@ status_after_heavy <- ""Loaded after heavy call""
     public void Import_LazyErrorModule_ShouldDelayErrorUntilAccess()
     {
         // Arrange
-        var errorModuleContent = @"
-func goodFunction() -> string {
-    return ""This works""
-}
+        var errorModuleContent = """
 
-func badFunction() -> int {
-    return 1 / 0  // 这会导致运行时错误
-}
-";
+                                 func goodFunction() -> string {
+                                     return "This works"
+                                 }
 
-        var testContent = @"
-lazy import ""error_module"" as error
-status_before_access <- ""Module imported but not accessed""
+                                 func badFunction() -> int {
+                                     return 1 / 0  // 这会导致运行时错误
+                                 }
 
-// 访问正常函数应该工作
-good_result <- error.goodFunction()
-status_after_good <- ""Good function accessed""
+                                 """;
 
-// 访问有问题的函数会延迟错误
-try {
-    bad_result <- error.badFunction()
-    status_after_bad <- ""Bad function succeeded""
-} catch {
-    status_after_bad <- ""Bad function failed as expected""
-}
-";
+        var testContent = """
+
+                          lazy import "error_module" as error
+                          status_before_access <- "Module imported but not accessed"
+
+                          // 访问正常函数应该工作
+                          good_result <- error.goodFunction()
+                          status_after_good <- "Good function accessed"
+
+                          // 访问有问题的函数会延迟错误
+                          try {
+                              bad_result <- error.badFunction()
+                              status_after_bad <- "Bad function succeeded"
+                          } catch {
+                              status_after_bad <- "Bad function failed as expected"
+                          }
+
+                          """;
 
         CreateTempModuleFile("error_module.old8", errorModuleContent);
         CreateTempModuleFile("lazy_error_test.old8", testContent);
@@ -198,6 +206,7 @@ try {
 
         // Assert
         // 初始导入应该成功，错误应该在使用时发生
+        Assert.Null(exception);
         AssertVariableValue(interpreter, "status_before_access", "Module imported but not accessed");
         AssertVariableValue(interpreter, "good_result", "This works");
         AssertVariableValue(interpreter, "status_after_good", "Good function accessed");

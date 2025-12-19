@@ -9,5 +9,5 @@ result1 <- math.CalculateLargeNumber()
 status2 <- "Loaded"
 
 // 再次使用，直接使用缓存的模块
-result2 <- math.PI
+result2 <- math.PI()
 result3 <- math.HeavyOperation()

@@ -18,28 +18,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/AdvancedImport_Fix_Report.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LAZY_IMPORT_IMPLEMENTATION_REPORT.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportSyntaxTest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lazy_import_demo.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lazy_test_module.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_lazy.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_lazy_complete.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_lazy_correct.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_lazy_final.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/AliasImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/AliasImportTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/advanced_module.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/advanced_module.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/complex_conditional_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/complex_conditional_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/conditional_true_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/conditional_true_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/debug_module.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/debug_module.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/runtime_prod_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/runtime_prod_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/runtime_test_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/runtime_test_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/utils.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/utils.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/COW_REDESIGN.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GENERATOR_REFACTOR_PLAN.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_LazyImportEnhanced.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_LazyImportEnhanced.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/lazy_math.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/lazy_math.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang_Functions_Error_Analysis_Plan.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/interpreter_test_results.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lazy_test_module.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_lazy.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_lazy_complete.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_lazy_correct.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_lazy_final.old8" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,6 +80,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
@@ -101,6 +96,9 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
@@ -427,7 +425,7 @@
       <workItem from="1766037121468" duration="28333000" />
       <workItem from="1766082960788" duration="2522000" />
       <workItem from="1766085560295" duration="10610000" />
-      <workItem from="1766098235624" duration="10005000" />
+      <workItem from="1766098235624" duration="10638000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -772,7 +770,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="287" />
+    <option name="localTasksCounter" value="289" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -799,8 +797,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(core): 移除未使用的LangParser引用&#10;&#10;- 删除多个文件中不再需要的Old8Lang.LangParser using声明&#10;- 清理ArrayValueFuncStatic.cs中冗余的错误处理引用&#10;- 简化DictionaryLangValue.cs中的反射相关引用&#10;- 移除测试和基准测试文件中的多余依赖引用&#10;- 统一代码风格，减少不必要的命名空间导入" />
-    <MESSAGE value="refactor(interpreter): 统一使用 init 函数作为构造函数并更新 this 引用&#10;&#10;- 将所有类的构造函数名称从 Init 或类名改为 init&#10;- 更新方法内部的 self 引用为 this&#10;- 修改继承关键字从 &lt; 为 extends，接口实现从 &lt; 为 implements&#10;- 调整部分代码中的语法细节以符合新的语言规范&#10;- 优化测试用例中的字符串字面量表示方式" />
     <MESSAGE value="fix(control-flow): 完善控制流语句的执行逻辑&#10;&#10;- 在 BlockStatement 中增加对 break 和 continue 语句的检查&#10;- 在 SwitchStatement 中正确处理 case 块内的 return、break 和 continue&#10;- 修正 WhileStatement 中条件值对象的池化问题&#10;- 更新 SetStatement 中嵌套索引赋值的处理逻辑&#10;- 修复 JumpStatementsTests 中多个测试用例的预期结果&#10;- 完善 CLAUDE.md 文档中的项目结构描述和文件路径引用" />
     <MESSAGE value="feat(parser): 支持切片操作的步长参数&#10;&#10;- 为数组、列表、字符串和元组的 Slice 方法添加步长参数支持&#10;- 更新解析器以识别带步长的切片语法 [start:end:step]&#10;- 支持正向和反向切片，包括负数索引处理&#10;- 添加对开放式切片（如 [:end] 或 [start:]）的支持&#10;- 完善切片边界检查和错误处理逻辑&#10;- 修复字典类型不支持切片时的错误提示&#10;- 更新相关测试用例以验证新功能" />
     <MESSAGE value="feat(interpreter): 实现切片赋值功能并完善相关类型支持&#10;&#10;- 为 ArrayLangValue 和 ListLangValue 实现 SetSlice 方法，支持切片赋值操作&#10;- 在 ILangList 接口新增 SetSlice 方法定义，统一集合类型切片赋值行为&#10;- 为不支持切片赋值的类型（如 String、Dictionary、Generator 等）添加明确错误提示&#10;- 更新 SetStatement 以处理 SliceLangValue 的赋值逻辑&#10;- 完善 SliceLangValue 类，暴露切片参数属性并优化 toString 表示&#10;- 修复 SliceTests 测试用例中集合字面量语法及预期结果&#10;- 调整 ArrayLangValue 中 RunResult 字段注释，强调其固定大小特性" />
@@ -824,7 +820,9 @@
     <MESSAGE value="feat(modules): 实现标准库导入功能&#10;&#10;- 添加标准库导入测试用例&#10;- 支持 OS、MathLib、Time 等标准库导入&#10;- 实现多库同时导入功能&#10;- 支持标准库别名导入语法&#10;- 添加不存在库导入异常处理&#10;- 验证模块对象正确加载与访问&#10;- 更新模块系统架构以支持标准库&#10;- 完善 LangInfo.json 中标准库定义" />
     <MESSAGE value="feat(modules): 实现统一模块架构并优化测试代码&#10;&#10;- 引入新的统一模块接口架构，支持更灵活的模块导入和管理&#10;- 更新条件导入测试，使用多行字符串字面量提高代码可读性&#10;- 重构配置模块，添加加载和验证函数以增强功能&#10;- 创建多个新测试模块文件，如调试、错误测试、延迟加载等&#10;- 添加统一模块架构测试类，验证新接口的正确性和兼容性&#10;- 优化现有模块文件结构，移除多余空行和调整代码布局&#10;- 确保新旧模块系统之间的向后兼容性，不影响现有功能" />
     <MESSAGE value="refactor(module): 统一模块对象架构设计&#10;&#10;- 删除重复的模块类和工厂类&#10;- 引入 UnifiedModule 作为统一模块实现&#10;- 创建 ModuleFactory 统一管理模块创建&#10;- 简化目录结构，从12个文件减少到6个核心文件&#10;- 保持向后兼容性，现有代码无需大幅修改&#10;- 降低代码复杂度，提高可维护性" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(module): 统一模块对象架构设计&#10;&#10;- 删除重复的模块类和工厂类&#10;- 引入 UnifiedModule 作为统一模块实现&#10;- 创建 ModuleFactory 统一管理模块创建&#10;- 简化目录结构，从12个文件减少到6个核心文件&#10;- 保持向后兼容性，现有代码无需大幅修改&#10;- 降低代码复杂度，提高可维护性" />
+    <MESSAGE value="feat(lang): 实现懒导入功能并修复模块导入问题&#10;&#10;- 添加对 lazy import 语法的支持，包括基本语法和带别名导入&#10;- 修复模块导入路径配置问题，确保测试环境正确加载模块&#10;- 更新模块架构以支持统一的模块加载机制&#10;- 修复条件导入测试中模块版本访问方式&#10;- 完善解析器对懒导入关键字的识别和处理&#10;- 实现懒加载模块的线程安全加载机制&#10;- 添加完整的懒导入功能测试用例&#10;- 优化模块符号提取逻辑以适配新架构&#10;- 更新测试基类中的模块导入路径配置&#10;- 修复高级导入测试中断言类型不匹配问题" />
+    <MESSAGE value="refactor(tests): 简化命名空间引用并更新字符串字面量语法&#10;&#10;- 移除了冗余的命名空间前缀，简化类型引用&#10;- 将多行字符串字面量从 &quot;@&quot; 更新为 &quot;&quot;&quot; 语法&#10;- 统一了错误类型和值类型的引用方式&#10;- 提高了测试代码的一致性和可读性" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(tests): 简化命名空间引用并更新字符串字面量语法&#10;&#10;- 移除了冗余的命名空间前缀，简化类型引用&#10;- 将多行字符串字面量从 &quot;@&quot; 更新为 &quot;&quot;&quot; 语法&#10;- 统一了错误类型和值类型的引用方式&#10;- 提高了测试代码的一致性和可读性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1120,10 +1118,10 @@
           <line>205</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" containingFunctionPresentation="方法 'Import_ConditionalWithComplexExpression_ShouldEvaluateExpression'">
             <startOffsets>
-              <option value="6448" />
+              <option value="6430" />
             </startOffsets>
             <endOffsets>
-              <option value="6544" />
+              <option value="6526" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="594" />
@@ -1133,10 +1131,10 @@
           <line>204</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" containingFunctionPresentation="方法 'Import_ConditionalWithComplexExpression_ShouldEvaluateExpression'">
             <startOffsets>
-              <option value="6416" />
+              <option value="6398" />
             </startOffsets>
             <endOffsets>
-              <option value="6439" />
+              <option value="6421" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="595" />
