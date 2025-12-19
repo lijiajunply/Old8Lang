@@ -1,0 +1,5 @@
+// 测试 CollectionLib 库导入
+import "CollectionLib"
+
+// 验证 CollectionLib 库是否正确导入
+print("CollectionLib 库导入成功")

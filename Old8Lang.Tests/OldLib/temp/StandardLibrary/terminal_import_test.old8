@@ -1,0 +1,5 @@
+// 测试 Terminal 库导入
+import "Terminal"
+
+// 验证 Terminal 库是否正确导入
+print("Terminal 库导入成功")

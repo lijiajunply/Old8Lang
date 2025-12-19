@@ -1,0 +1,5 @@
+// 测试导入不存在的标准库
+import "NonExistentLib"
+
+// 这里应该抛出导入异常
+print("这行不应该被执行")

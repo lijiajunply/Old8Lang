@@ -18,23 +18,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/MigrationReport.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/IModuleInterfaces.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ModuleBases.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ModuleRefactoringGuide.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/UnifiedModuleFactory.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/config.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/config.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/expensive_module.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/expensive_module.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_conditional_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_conditional_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/BaseModuleObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/BaseModuleObject.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/EagerModuleObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/EagerModuleObject.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/IModuleObject.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LangModuleObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LangModuleObject.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazyImportWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazyImportWrapper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazyItemWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazyItemWrapper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/SelectiveModuleObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/SelectiveModuleObject.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/SimpleModuleObjectProxy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/SimpleModuleObjectProxy.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/StandardLibraryImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/collectionlib_import_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/file_import_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/json_import_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/mathlib_import_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/multiple_stdlib_import_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/net_import_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/nonexistent_stdlib_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/os_import_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/stdlib_alias_import_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/terminal_import_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/time_import_test.old8" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -411,7 +406,7 @@
       <workItem from="1766037121468" duration="28333000" />
       <workItem from="1766082960788" duration="2522000" />
       <workItem from="1766085560295" duration="10610000" />
-      <workItem from="1766098235624" duration="5727000" />
+      <workItem from="1766098235624" duration="6106000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -756,7 +751,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="283" />
+    <option name="localTasksCounter" value="284" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -783,7 +778,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(interpreter): 优化函数重载与类型比较逻辑&#10;&#10;- 删除不支持按返回类型重载的测试用例&#10;- 统一构造函数命名规范，使用 init 替代 Init&#10;- 修正字符转整数方法调用，使用 ToInt() 替代 ToInt32()&#10;- 更新高阶函数参数类型声明，function 替代 func&#10;- 移除冗余的 lambda 数组操作测试&#10;- 强化列表与元组的类型比较逻辑，防止互相混淆&#10;- 明确元组类型标识，增强类型安全性&#10;- 修正循环初始化语法，统一使用花括号初始化集合&#10;- 增加类型检查注释，提升代码可维护性" />
     <MESSAGE value="refactor(array): 支持动态类型数组元素&#10;&#10;- 移除数组元素类型一致性检查和自动类型转换逻辑&#10;- 允许数组中存储不同类型元素&#10;- 简化数组元素赋值流程，直接使用新值&#10;- 更新相关测试用例以适应新的数组行为&#10;- 修正测试代码中字符串字面量的写法&#10;- 移除部分冗余或过时的测试方法&#10;- 调整集合初始化语法，统一使用花括号&#10;- 增强类型安全性和代码可维护性注释" />
     <MESSAGE value="feat(array): 实现数组扩展方法和改进点操作支持&#10;&#10;- 添加 ArrayValueFuncStatic 类，提供 Sort、Distinct、Map、Filter 和 Reduce 等扩展方法&#10;- 修改 ArrayLangValue 的 Dot 方法，支持方法调用如 array.Sort()&#10;- 实现快速排序算法及相关辅助函数用于数组排序&#10;- 增强 Instance 类对 dict 构造函数的支持&#10;- 完善扩展方法查找逻辑，增加对 ArrayLangValue 类型的支持&#10;- 更新相关测试用例中的方法调用和期望值&#10;- 修复字符解析逻辑，增强对转义字符的支持&#10;- 添加 TupleValueFuncStatic 类，提供 Join 等元组操作方法&#10;- 改进 DictionaryLangValue 的方法调用和索引访问处理&#10;- 新增 ListValueFuncStatic 中的多种列表操作方法如 Concat、Find、Skip 等" />
     <MESSAGE value="feat(lang): 实现数组和字典方法调用及语法优化&#10;&#10;- 为 ArrayLangValue 添加已知方法白名单检查机制&#10;- 将 ArrayValueFuncStatic 中的实例方法重构为静态扩展方法&#10;- 在 DictionaryLangValue 中实现扩展方法动态调用支持&#10;- 优化 DictionaryValueFuncStatic.Update 方法直接修改原字典&#10;- 新增 ExecutionContext 类管理 VariateManager 的线程局部存储&#10;- 修改 Instance.FromClassToResult 支持传递 VariateManager 参数&#10;- 为 ListLangValue 添加 ClearInternal 方法并标记清空状态&#10;- 统一 FuncLangValue 调用方式，通过参数列表传递变量值&#10;- 更新测试用例中范围表达式语法从 .. 改为 [~]&#10;- 移除 ListValueFuncStatic 中重复定义的 Count 方法&#10;- 实现异步任务语法简化，支持 async/await 关键字&#10;- 添加调试用的多个 .old8 测试文件" />
@@ -808,7 +802,8 @@
     <MESSAGE value="refactor(module): 重构模块对象命名空间和属性访问&#10;&#10;- 统一模块对象相关类到 ModuleObjects 命名空间&#10;- 修复类成员访问使用 this 关键字明确指向&#10;- 修正模块加载锁变量命名一致性&#10;- 更新模块对象工厂和包装器实现&#10;- 优化错误处理中的字符串安全访问&#10;- 简化测试用例验证核心功能正确性" />
     <MESSAGE value="feat(modules): 实现模块别名导入功能&#10;&#10;- 添加模块别名导入语法支持&#10;- 实现不同命名风格的别名导入测试&#10;- 支持函数级别别名访问&#10;- 解决别名与局部变量名称冲突问题&#10;- 实现链式别名访问功能&#10;- 添加多种别名导入场景测试用例" />
     <MESSAGE value="refactor(module): 优化模块加载状态管理&#10;&#10;- 移除了重复的_loadingState字段和LoadException字段&#10;- 简化了LoadingState属性的定义方式&#10;- 统一使用LoadingState属性替代原来的_loadingState字段&#10;- 更新了模块toString方法中的状态显示逻辑&#10;- 优化了模块加载过程中的状态检查逻辑" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(module): 优化模块加载状态管理&#10;&#10;- 移除了重复的_loadingState字段和LoadException字段&#10;- 简化了LoadingState属性的定义方式&#10;- 统一使用LoadingState属性替代原来的_loadingState字段&#10;- 更新了模块toString方法中的状态显示逻辑&#10;- 优化了模块加载过程中的状态检查逻辑" />
+    <MESSAGE value="feat(modules): 实现模块系统统一接口架构&#10;&#10;- 新增统一模块接口定义文件 IModuleInterfaces.cs&#10;- 创建抽象基类 ModuleBase 和 ModuleValueBase&#10;- 实现统一工厂模式 UnifiedModuleFactory&#10;- 迁移现有模块类到新接口架构&#10;- 添加模块包装器接口支持懒加载场景&#10;- 重构 ImportStatement 支持新旧工厂模式切换&#10;- 完善模块符号管理和加载状态跟踪&#10;- 提供向后兼容性支持和渐进式迁移路径" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(modules): 实现模块系统统一接口架构&#10;&#10;- 新增统一模块接口定义文件 IModuleInterfaces.cs&#10;- 创建抽象基类 ModuleBase 和 ModuleValueBase&#10;- 实现统一工厂模式 UnifiedModuleFactory&#10;- 迁移现有模块类到新接口架构&#10;- 添加模块包装器接口支持懒加载场景&#10;- 重构 ImportStatement 支持新旧工厂模式切换&#10;- 完善模块符号管理和加载状态跟踪&#10;- 提供向后兼容性支持和渐进式迁移路径" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

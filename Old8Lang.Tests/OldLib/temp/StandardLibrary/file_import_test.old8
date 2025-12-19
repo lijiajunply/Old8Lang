@@ -1,0 +1,5 @@
+// 测试 File 库导入
+import "File"
+
+// 验证 File 库是否正确导入
+print("File 库导入成功")
