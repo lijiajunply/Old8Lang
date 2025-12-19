@@ -251,7 +251,13 @@ public static class Apis
         get
         {
 #if DEBUG
-            return Path.Combine(Path.GetDirectoryName(CodePath)!, "Old8Lang", "LangInfo.json");
+            var filename = Path.Combine(Path.GetDirectoryName(CodePath)!, "Old8Lang", "LangInfo.json");
+            if (filename.StartsWith("Users/") || filename.StartsWith("Volumes/"))
+            {
+                filename = "/" + filename;
+            }
+
+            return filename;
 #else
             return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "LangInfo.json");
 #endif

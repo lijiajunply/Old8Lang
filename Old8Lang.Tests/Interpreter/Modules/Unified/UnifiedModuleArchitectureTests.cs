@@ -80,9 +80,6 @@ result <- tm.testFunction()
 constant_value <- tm.MODULE_CONSTANT
 ";
 
-        // 确保新工厂模式启用
-        ImportStatement.UseUnifiedFactory = true;
-
         // Act
         CreateTempModuleFile("test_module.old8", moduleContent);
         var (interpreter, exception) = ExecuteCodeFile("main_test.old8", testContent);
@@ -109,16 +106,5 @@ constant_value <- tm.MODULE_CONSTANT
         Assert.Equal("test_module", moduleValue.ModuleName);
         Assert.True(moduleValue.IsLoaded);
         Assert.Equal(ModuleLoadingState.Loaded, moduleValue.LoadingState);
-    }
-
-    [Fact]
-    public void UnifiedFactory_Enabled_ShouldWorkWithExistingWorkingTests()
-    {
-        // 这个测试验证我们的新架构与现有的工作测试兼容
-        // 我们已经知道 StandardLibraryImportTests.Import_OS_Library_ShouldWorkCorrectly 等测试通过了
-        // 这证明新的统一工厂架构是成功的
-
-        // Assert - 新工厂已启用
-        Assert.True(ImportStatement.UseUnifiedFactory);
     }
 }

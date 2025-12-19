@@ -45,7 +45,6 @@ lazy import ""test_lazy_module""
         try
         {
             var interpreter = new LangInterpreter();
-            interpreter.Manager.LangInfo!.ImportPath = tempDir;
 
             // 尝试解析懒导入语法
             var code = File.ReadAllText(testFilePath);
@@ -110,7 +109,6 @@ result <- tm.value
         try
         {
             var interpreter = new LangInterpreter();
-            interpreter.Manager.LangInfo!.ImportPath = tempDir;
 
             var code = File.ReadAllText(testFilePath);
             output.WriteLine($"Testing alias code: {code}");

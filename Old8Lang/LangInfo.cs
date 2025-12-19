@@ -7,7 +7,7 @@ namespace Old8Lang;
 public class LangInfo
 {
     /// <summary>
-    /// 获取或设置模块导入路径
+    /// 获取或设置包管理路径
     /// </summary>
     public string ImportPath { get; set; } = "";
 

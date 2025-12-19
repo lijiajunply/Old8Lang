@@ -1,5 +1,4 @@
 using System.Reflection.Emit;
-using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.ModuleObjects;
 using Old8Lang.Compiler;
@@ -96,11 +95,6 @@ public class ImportStatement(
     private readonly LangExpression? DynamicModuleExpression = dynamicModuleExpression;
 
     /// <summary>
-    /// 是否启用统一工厂模式
-    /// </summary>
-    public static bool UseUnifiedFactory { get; set; } = true; // 启用新的统一工厂模式
-
-    /// <summary>
     /// 在解释模式下执行导入语句
     /// </summary>
     /// <param name="manager">变量管理器，用于管理导入的模块和变量</param>
@@ -116,8 +110,8 @@ public class ImportStatement(
         if (moduleName.StartsWith("http://") || moduleName.StartsWith("https://"))
         {
             // 网络导入警告
-            Console.WriteLine($"[警告] 正在从网络导入模块: {moduleName}");
-            Console.WriteLine("[警告] 网络导入存在安全风险，请确保来源可信");
+            manager.Interpreter.OutputProvider.WriteLine($"[警告] 正在从网络导入模块: {moduleName}");
+            manager.Interpreter.OutputProvider.WriteLine("[警告] 网络导入存在安全风险，请确保来源可信");
 
             // 网络路径特殊处理
             // 由于我们还不支持真正的网络导入，我们可以创建一个简单的模块对象
@@ -156,8 +150,8 @@ public class ImportStatement(
         }
 
         // 尝试解析模块路径 - 使用大小写不敏感的匹配
-        if (manager.LangInfo!.LibInfos.Any(x =>
-                string.Equals(x.LibName, moduleName, StringComparison.OrdinalIgnoreCase)))
+        manager.LangInfo ??= Apis.ReadJson();
+        if (manager.LangInfo.LibInfos.Any(x => moduleName == x.LibName))
         {
             var libInfo = manager.LangInfo.LibInfos.First(x =>
                 string.Equals(x.LibName, moduleName, StringComparison.OrdinalIgnoreCase));
@@ -239,7 +233,9 @@ public class ImportStatement(
             // 修复：正确处理绝对路径和相对路径
             var filePath = Path.IsPathRooted(fileNameLocal)
                 ? fileNameLocal
-                : (dic != null ? Path.Combine(dic, fileNameLocal) : fileNameLocal);
+                : dic != null
+                    ? Path.Combine(dic, fileNameLocal)
+                    : fileNameLocal;
 
             if (filePath.StartsWith("Users/") || filePath.StartsWith("Volumes/"))
             {
@@ -274,23 +270,16 @@ public class ImportStatement(
         if (manager.Interpreter.ModuleCache.TryGetValue(moduleAbsolutePath, out var cachedBlock))
         {
             // 使用缓存的模块
-            if (FromClause)
-            {
-                // 为命名导入创建独立作用域
-                manager.AddChildren();
-                // 对于缓存的模块，我们不需要再次执行它的函数和类定义语句
-                // 我们只需要执行它的变量赋值语句
-                // 函数和类已经在全局作用域中了
-                cachedBlock.ExecuteModule(manager, skipFunctionClassInit: true);
-                // 只导入指定的成员
-                ImportSpecifiedMembers(manager);
-                manager.RemoveChildren();
-            }
-            else
-            {
-                // 对于非命名导入，直接使用缓存的模块
-                // 但不要再次执行它的语句，因为函数和类已经在全局作用域中了
-            }
+            if (!FromClause) return;
+            // 为命名导入创建独立作用域
+            manager.AddChildren();
+            // 对于缓存的模块，我们不需要再次执行它的函数和类定义语句
+            // 我们只需要执行它的变量赋值语句
+            // 函数和类已经在全局作用域中了
+            cachedBlock.ExecuteModule(manager, skipFunctionClassInit: true);
+            // 只导入指定的成员
+            ImportSpecifiedMembers(manager);
+            manager.RemoveChildren();
 
             return;
         }
@@ -332,39 +321,30 @@ public class ImportStatement(
             }
             else
             {
-                // 检查是否启用新的统一工厂
-                if (UseUnifiedFactory)
+                // 使用新的统一模块工厂创建模块对象
+                UnifiedModule moduleValue;
+
+                if (IsSelective && ImportSpecifiers.Count > 0)
                 {
-                    // 使用新的统一模块工厂创建模块对象
-                    UnifiedModule moduleValue;
-
-                    if (IsSelective && ImportSpecifiers.Count > 0)
-                    {
-                        // 选择性导入
-                        var selectedSymbols = ImportSpecifiers.Select(item => item.Alias).ToList();
-                        moduleValue =
-                            ModuleFactory.CreateSelectiveModule(ImportString, selectedSymbols, manager, Position);
-                    }
-                    else
-                    {
-                        // 懒加载模块
-                        moduleValue = ModuleFactory.CreateLazyModule(ImportString, manager, Position);
-                    }
-
-                    // 先执行模块代码来填充符号（如果不是选择性导入）
-                    if (!IsSelective)
-                    {
-                        block.Run(manager);
-                    }
-
-                    // 注册模块对象到变量管理器
-                    RegisterModuleValue(moduleValue, manager);
+                    // 选择性导入
+                    var selectedSymbols = ImportSpecifiers.Select(item => item.Alias).ToList();
+                    moduleValue =
+                        ModuleFactory.CreateSelectiveModule(ImportString, selectedSymbols, manager, Position);
                 }
                 else
                 {
-                    // 旧的行为：直接执行模块代码，不创建模块对象
+                    // 懒加载模块
+                    moduleValue = ModuleFactory.CreateLazyModule(ImportString, manager, Position);
+                }
+
+                // 先执行模块代码来填充符号（如果不是选择性导入）
+                if (!IsSelective)
+                {
                     block.Run(manager);
                 }
+
+                // 注册模块对象到变量管理器
+                RegisterModuleValue(moduleValue, manager);
             }
 
             manager.Path = previousPath;
@@ -545,54 +525,16 @@ public class ImportStatement(
     }
 
     /// <summary>
-    /// 注册模块对象到变量管理器
-    /// </summary>
-    /// <param name="moduleObject">模块对象</param>
-    /// <param name="manager">变量管理器</param>
-    private void RegisterModuleObject(IModuleObject moduleObject, VariateManager manager)
-    {
-        if (ModuleAlias != null)
-        {
-            // 带别名的导入：使用别名注册
-            manager.Scopes[^1][ModuleAlias] = CreateModuleValue(moduleObject, manager);
-        }
-        else if (IsSelective && ImportSpecifiers.Count > 0)
-        {
-            // 选择性导入：将每个符号直接注册到作用域
-            foreach (var specifier in ImportSpecifiers)
-            {
-                var symbolName = specifier.Alias;
-                var symbol = moduleObject.GetSymbol(specifier.Name);
-                if (symbol != null)
-                {
-                    manager.Scopes[^1][symbolName] = symbol;
-                }
-                else
-                {
-                    throw new ImportError(this, specifier.Name,
-                        $"Symbol '{specifier.Name}' not found in module '{moduleObject.ModuleName}'");
-                }
-            }
-        }
-        else
-        {
-            // 普通导入：使用模块名注册
-            var moduleName = Path.GetFileNameWithoutExtension(ImportString.Trim('"'));
-            manager.Scopes[^1][moduleName] = CreateModuleValue(moduleObject, manager);
-        }
-    }
-
-    /// <summary>
     /// 注册模块值对象到变量管理器
     /// </summary>
     /// <param name="moduleValue">模块值对象</param>
     /// <param name="manager">变量管理器</param>
-    private void RegisterModuleValue(IModuleValueType moduleValue, VariateManager manager)
+    private void RegisterModuleValue(UnifiedModule moduleValue, VariateManager manager)
     {
+        ArgumentNullException.ThrowIfNull(moduleValue);
         if (ModuleAlias != null)
         {
-            // 带别名的导入：使用别名注册
-            manager.Scopes[^1][ModuleAlias] = (LangValueType)moduleValue;
+            manager.Scopes[^1][ModuleAlias] = moduleValue; // 带别名的导入：使用别名注册
         }
         else if (IsSelective && ImportSpecifiers.Count > 0)
         {
@@ -616,29 +558,8 @@ public class ImportStatement(
         {
             // 普通导入：使用模块名注册
             var moduleName = Path.GetFileNameWithoutExtension(ImportString.Trim('"'));
-            manager.Scopes[^1][moduleName] = (LangValueType)moduleValue;
+            manager.Scopes[^1][moduleName] = moduleValue;
         }
-    }
-
-    /// <summary>
-    /// 将IModuleObject转换为LangValueType
-    /// </summary>
-    /// <param name="moduleObject">模块对象</param>
-    /// <param name="manager">变量管理器</param>
-    /// <returns>LangValueType</returns>
-    private LangValueType CreateModuleValue(IModuleObject moduleObject, VariateManager manager)
-    {
-        // 如果已经是LangValueType，直接返回
-        if (moduleObject is LangValueType value)
-        {
-            return value;
-        }
-
-        // 否则创建代理对象
-        return (LangValueType)ModuleFactory.CreateModuleProxy(
-            moduleObject.ModuleName,
-            manager,
-            Position);
     }
 
     /// <summary>
@@ -841,50 +762,29 @@ public class ImportStatement(
             {
                 var actualModuleName = stringModuleValue.Value;
 
-                // 检查是否启用新的统一工厂
-                if (UseUnifiedFactory)
+                // 使用新的统一模块工厂创建模块对象
+                UnifiedModule unifiedModule;
+
+                if (IsSelective && ImportSpecifiers.Count > 0)
                 {
-                    // 使用新的统一模块工厂创建模块对象
-                    UnifiedModule unifiedModule;
-
-                    if (IsSelective && ImportSpecifiers.Count > 0)
-                    {
-                        // 选择性导入
-                        var selectedSymbols = ImportSpecifiers.Select(item => item.Alias).ToList();
-                        unifiedModule =
-                            ModuleFactory.CreateSelectiveModule(actualModuleName, selectedSymbols, manager, Position);
-                    }
-                    else
-                    {
-                        // 动态导入创建即时加载模块（因为已经确定要导入）
-                        unifiedModule = ModuleFactory.CreateEagerModule(actualModuleName, manager, Position);
-                    }
-
-                    // 注册模块对象到变量管理器
-                    RegisterModuleValue(unifiedModule, manager);
+                    // 选择性导入
+                    var selectedSymbols = ImportSpecifiers.Select(item => item.Alias).ToList();
+                    unifiedModule =
+                        ModuleFactory.CreateSelectiveModule(actualModuleName, selectedSymbols, manager, Position);
                 }
                 else
                 {
-                    // 传统方式：执行导入逻辑
-                    // 创建临时的ImportStatement来处理实际导入
-                    var tempImportStatement = new ImportStatement(
-                        actualModuleName,
-                        Position,
-                        ImportSpecifiers,
-                        FromClause,
-                        ModuleAlias,
-                        false, // 动态导入本身不重复懒加载
-                        IsSelective
-                    );
-
-                    // 执行实际导入
-                    tempImportStatement.Run(manager);
+                    // 动态导入创建即时加载模块（因为已经确定要导入）
+                    unifiedModule = ModuleFactory.CreateEagerModule(actualModuleName, manager, Position);
                 }
+
+                // 注册模块对象到变量管理器
+                RegisterModuleValue(unifiedModule, manager);
             }
             else
             {
                 throw new ImportError(this, ImportString,
-                    $"Dynamic import expression must evaluate to a string, got {dynamicResult.GetType().Name}", null);
+                    $"Dynamic import expression must evaluate to a string, got {dynamicResult.GetType().Name}");
             }
         }
         catch (ImportError)
@@ -897,5 +797,21 @@ public class ImportStatement(
             // 包装其他异常为导入错误
             throw new ImportError(this, ImportString, $"Dynamic import failed: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// 检查指定的模块是否安装到了
+    /// </summary>
+    /// <param name="moduleName">模块名称</param>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>是否为本地安装库</returns>
+    private static bool IsInLibrary(string moduleName, VariateManager manager)
+    {
+        // 基于LangInfo.json配置来识别标准库
+        if (manager.LangInfo?.LibInfos == null)
+            return false;
+
+        return manager.LangInfo.LibInfos.Any(lib =>
+            string.Equals(lib.LibName, moduleName, StringComparison.OrdinalIgnoreCase));
     }
 }

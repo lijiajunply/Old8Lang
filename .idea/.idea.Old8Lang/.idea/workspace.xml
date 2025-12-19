@@ -18,20 +18,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/baseline_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dynamic_validation_test_module.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/minimal_dynamic_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/simple_dynamic_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_basic_dynamic.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_dynamic_with_more_statements.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_static_import.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/validate_dynamic_import.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/utils.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/utils.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Unified/UnifiedModuleArchitectureTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Unified/UnifiedModuleArchitectureTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/math.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/math.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ModuleBases.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ModuleBases.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ModuleFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ModuleFactory.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,6 +78,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Unified/UnifiedModuleArchitectureTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ModuleObjects/BaseModuleObject.cs" root0="SKIP_HIGHLIGHTING" />
@@ -95,6 +90,11 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
@@ -103,6 +103,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
@@ -137,41 +138,41 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.Old8Lang.Benchmarks.executor&quot;: &quot;Run&quot;,
-    &quot;07d79105-db56-470d-b872-543f396b1133.executor&quot;: &quot;Debug&quot;,
-    &quot;34038497-caa6-4590-9735-a11ac1a57cd0.executor&quot;: &quot;Debug&quot;,
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;e9de5ea7-95aa-45c5-91d2-c46acccab710.executor&quot;: &quot;Debug&quot;,
-    &quot;fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
+    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
+    ".NET 项目.LibTest.executor": "Run",
+    ".NET 项目.Old8Lang.App.executor": "Debug",
+    ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
+    "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
+    "34038497-caa6-4590-9735-a11ac1a57cd0.executor": "Debug",
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHELLCHECK.PATH": "/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck",
+    "WebServerToolWindowFactoryState": "false",
+    "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
+    "fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor": "Debug",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;PLAIN_TEXT&quot;,
-      &quot;Markdown&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "PLAIN_TEXT",
+      "Markdown"
     ]
   }
-}</component>
+}]]></component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
@@ -430,7 +431,7 @@
       <workItem from="1766037121468" duration="28333000" />
       <workItem from="1766082960788" duration="2522000" />
       <workItem from="1766085560295" duration="10610000" />
-      <workItem from="1766098235624" duration="12315000" />
+      <workItem from="1766098235624" duration="16224000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -775,7 +776,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="291" />
+    <option name="localTasksCounter" value="292" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -802,7 +803,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(interpreter): 实现切片赋值功能并完善相关类型支持&#10;&#10;- 为 ArrayLangValue 和 ListLangValue 实现 SetSlice 方法，支持切片赋值操作&#10;- 在 ILangList 接口新增 SetSlice 方法定义，统一集合类型切片赋值行为&#10;- 为不支持切片赋值的类型（如 String、Dictionary、Generator 等）添加明确错误提示&#10;- 更新 SetStatement 以处理 SliceLangValue 的赋值逻辑&#10;- 完善 SliceLangValue 类，暴露切片参数属性并优化 toString 表示&#10;- 修复 SliceTests 测试用例中集合字面量语法及预期结果&#10;- 调整 ArrayLangValue 中 RunResult 字段注释，强调其固定大小特性" />
     <MESSAGE value="fix(interpreter): 修复静态方法中this引用和集合切片逻辑&#10;&#10;- 修复类静态方法中score和highScore变量的this引用问题&#10;- 更新集合聚合测试用例的字符串字面量语法和期望值&#10;- 调整线程测试中原子引用的函数定义语法&#10;- 移除范围测试中无效的空范围测试用例&#10;- 修复IntLangValue中减法运算的double类型处理逻辑&#10;- 更新切片测试中索引计算和集合字面量语法&#10;- 修正字符串模板测试中的插值表达式和期望结果&#10;- 更新元组测试中的函数返回类型声明语法" />
     <MESSAGE value="refactor(parser): 重构嵌套索引访问处理逻辑&#10;&#10;- 引入新的 NestedIndexAccess 类专门处理 array[index1][index2] 场景&#10;- 修改 ExpressionParser 中的索引访问解析逻辑，使用专用表达式节点&#10;- 优化 Instance 类中的方法参数匹配逻辑，支持可选参数处理&#10;- 完善 TupleLangValue 的扁平化访问和直接子元素访问功能&#10;- 更新多个测试用例以适配语法变更，将 .. 范围语法改为 [~] 语法&#10;- 修复部分测试中使用的函数命名大小写问题&#10;- 调整集合方法调用后的赋值方式，确保返回值正确处理" />
     <MESSAGE value="feat(parser): 实现切片语法解析和嵌套切片访问支持&#10;&#10;- 添加对切片语法 [start:end:step] 的完整解析支持&#10;- 引入 NestedSliceAccess 类处理嵌套切片访问场景&#10;- 优化索引访问解析逻辑，区分普通索引和切片操作&#10;- 支持开放式切片和步长参数的解析&#10;- 完善切片相关 AST 节点的类型检查和错误处理&#10;- 更新测试用例以验证新的切片语法功能" />
@@ -827,7 +827,8 @@
     <MESSAGE value="refactor(tests): 简化命名空间引用并更新字符串字面量语法&#10;&#10;- 移除了冗余的命名空间前缀，简化类型引用&#10;- 将多行字符串字面量从 &quot;@&quot; 更新为 &quot;&quot;&quot; 语法&#10;- 统一了错误类型和值类型的引用方式&#10;- 提高了测试代码的一致性和可读性" />
     <MESSAGE value="feat(import): 添加动态导入支持&#10;&#10;- 新增 IsDynamic 和 DynamicModuleExpression 属性以支持运行时模块名解析&#10;- 实现 HandleDynamicImport 方法处理动态导入逻辑&#10;- 更新 ToString 方法以正确显示动态导入语句&#10;- 支持动态导入与选择性导入、懒导入的组合使用&#10;- 添加动态导入的错误处理机制&#10;- 扩展模块工厂以支持动态模块创建&#10;- 保持与现有静态导入语法的兼容性" />
     <MESSAGE value="refactor(parser): 重构导入语句解析逻辑&#10;&#10;- 更新测试文件中的字符串字面量语法为三重引号格式&#10;- 修改常量声明语法从 &quot;const NAME &lt;- value&quot; 为 &quot;NAME:const &lt;- value&quot;&#10;- 调整动态导入语法从 &quot;import dynamic moduleName&quot; 为 &quot;dynamic import moduleName&quot;&#10;- 修改空选择性导入语法从 &quot;from module import&quot; 为 &quot;import {} from module&quot;&#10;- 更新函数调用语法，PI 常量改为 PI() 函数调用&#10;- 修改懒加载通配符导入语法从 &quot;lazy from module import *&quot; 为 &quot;lazy import module&quot;&#10;- 调整选择性导入语法从 &quot;from module import items&quot; 为 &quot;import {items} from module&quot;&#10;- 移除 StatementParser 中不必要的变量和空行&#10;- 优化导入语句解析逻辑，改进令牌匹配检查&#10;- 更新工作空间配置文件中的变更记录和任务计数器" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(parser): 重构导入语句解析逻辑&#10;&#10;- 更新测试文件中的字符串字面量语法为三重引号格式&#10;- 修改常量声明语法从 &quot;const NAME &lt;- value&quot; 为 &quot;NAME:const &lt;- value&quot;&#10;- 调整动态导入语法从 &quot;import dynamic moduleName&quot; 为 &quot;dynamic import moduleName&quot;&#10;- 修改空选择性导入语法从 &quot;from module import&quot; 为 &quot;import {} from module&quot;&#10;- 更新函数调用语法，PI 常量改为 PI() 函数调用&#10;- 修改懒加载通配符导入语法从 &quot;lazy from module import *&quot; 为 &quot;lazy import module&quot;&#10;- 调整选择性导入语法从 &quot;from module import items&quot; 为 &quot;import {items} from module&quot;&#10;- 移除 StatementParser 中不必要的变量和空行&#10;- 优化导入语句解析逻辑，改进令牌匹配检查&#10;- 更新工作空间配置文件中的变更记录和任务计数器" />
+    <MESSAGE value="feat(import): 实现动态导入功能并重构导入语句解析逻辑&#10;&#10;- 添加对 dynamic import 语法的支持，允许在运行时确定模块名&#10;- 重构 StatementParser 中的导入语句解析逻辑，优化关键字处理流程&#10;- 更新 BlockStatement 以正确处理动态导入语句的执行顺序&#10;- 为 ImportStatement 添加 IsDynamicImport 公共属性&#10;- 修改动态导入语法格式从 &quot;import dynamic moduleName&quot; 为 &quot;dynamic import moduleName&quot;&#10;- 支持动态导入与别名结合使用（dynamic import moduleName as alias）&#10;- 修复多个测试文件中的导入语法以适配新格式&#10;- 添加多个动态导入测试用例，覆盖基本、条件和表达式场景&#10;- 调整 workspace.xml 中的变更记录和任务计数器&#10;- 移除旧的切片操作步长参数相关提交信息" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(import): 实现动态导入功能并重构导入语句解析逻辑&#10;&#10;- 添加对 dynamic import 语法的支持，允许在运行时确定模块名&#10;- 重构 StatementParser 中的导入语句解析逻辑，优化关键字处理流程&#10;- 更新 BlockStatement 以正确处理动态导入语句的执行顺序&#10;- 为 ImportStatement 添加 IsDynamicImport 公共属性&#10;- 修改动态导入语法格式从 &quot;import dynamic moduleName&quot; 为 &quot;dynamic import moduleName&quot;&#10;- 支持动态导入与别名结合使用（dynamic import moduleName as alias）&#10;- 修复多个测试文件中的导入语法以适配新格式&#10;- 添加多个动态导入测试用例，覆盖基本、条件和表达式场景&#10;- 调整 workspace.xml 中的变更记录和任务计数器&#10;- 移除旧的切片操作步长参数相关提交信息" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1146,16 +1147,185 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs</url>
-          <line>101</line>
+          <line>90</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" containingFunctionPresentation="方法 'AssertVariableValue'">
             <startOffsets>
-              <option value="2841" />
+              <option value="2464" />
             </startOffsets>
             <endOffsets>
-              <option value="2879" />
+              <option value="2502" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="596" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/StandardLibraryImportTests.cs</url>
+          <line>126</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/StandardLibraryImportTests.cs" containingFunctionPresentation="方法 'Import_CollectionLib_Library_ShouldWorkCorrectly'">
+            <startOffsets>
+              <option value="3741" />
+            </startOffsets>
+            <endOffsets>
+              <option value="3764" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="597" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs</url>
+          <line>160</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" containingFunctionPresentation="方法 'Run'">
+            <startOffsets>
+              <option value="4671" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4702" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="598" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs</url>
+          <line>153</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" containingFunctionPresentation="方法 'Run'">
+            <startOffsets>
+              <option value="4345" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4409" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="599" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/Apis.cs</url>
+          <line>160</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/Apis.cs" containingFunctionPresentation="方法 'ReadJson'">
+            <startOffsets>
+              <option value="4543" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4575" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="600" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/Apis.cs</url>
+          <line>167</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/Apis.cs" containingFunctionPresentation="方法 'ReadJson'">
+            <startOffsets>
+              <option value="4810" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4869" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="601" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/Apis.cs</url>
+          <line>162</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/Apis.cs" containingFunctionPresentation="方法 'ReadJson'">
+            <startOffsets>
+              <option value="4598" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4663" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="602" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/Apis.cs</url>
+          <line>177</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/Apis.cs" containingFunctionPresentation="方法 'ReadJson'">
+            <startOffsets>
+              <option value="5185" />
+            </startOffsets>
+            <endOffsets>
+              <option value="5218" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="603" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/Apis.cs</url>
+          <line>165</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/Apis.cs" containingFunctionPresentation="方法 'ReadJson'">
+            <startOffsets>
+              <option value="4761" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4787" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="604" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/Apis.cs</url>
+          <line>173</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/Apis.cs" containingFunctionPresentation="方法 'ReadJson'">
+            <startOffsets>
+              <option value="5032" />
+            </startOffsets>
+            <endOffsets>
+              <option value="5128" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="605" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs</url>
+          <line>155</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" containingFunctionPresentation="方法 'Run'">
+            <startOffsets>
+              <option value="4432" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4573" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="606" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs</url>
+          <line>157</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" containingFunctionPresentation="方法 'Run'">
+            <startOffsets>
+              <option value="4586" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4614" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="607" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs</url>
+          <line>167</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" containingFunctionPresentation="方法 'Run'">
+            <startOffsets>
+              <option value="4906" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4969" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="608" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/Apis.cs</url>
+          <line>202</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/Apis.cs" containingFunctionPresentation="方法 'ReadJson'">
+            <startOffsets>
+              <option value="6287" />
+            </startOffsets>
+            <endOffsets>
+              <option value="6303" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="609" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
