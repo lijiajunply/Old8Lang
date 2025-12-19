@@ -69,9 +69,8 @@ public class TypeTemplate(
                 // 先递归获取祖父类的成员
                 GetAllParentMembers(manager, parentType, allVariates);
 
-                // 然后添加直接父类的成员
-                foreach (var parentMember in parentType.Variates.Where(parentMember =>
-                             !allVariates.ContainsKey(parentMember.Key)))
+                // 然后添加直接父类的成员，允许子类方法覆盖父类方法
+                foreach (var parentMember in parentType.Variates)
                 {
                     allVariates[parentMember.Key] = parentMember.Value;
                 }
