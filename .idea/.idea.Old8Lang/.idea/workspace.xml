@@ -19,15 +19,8 @@
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ConcurrentPrimitiveTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/SpawnTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/SpawnTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ThreadSynchronizationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ThreadSynchronizationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ArchitectureSimplificationReport.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ModuleRefactoringGuide.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeTemplate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeTemplate.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/InheritanceTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/InheritanceTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,6 +59,12 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/InheritanceTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/InheritanceTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Collections/TupleTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/EdgeCases/EmptyInputTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/EdgeCases/EmptyInputTests.cs" root0="SKIP_HIGHLIGHTING" />
@@ -76,6 +75,8 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
@@ -416,7 +417,7 @@
       <workItem from="1766082960788" duration="2522000" />
       <workItem from="1766085560295" duration="10610000" />
       <workItem from="1766098235624" duration="16792000" />
-      <workItem from="1766146301314" duration="5759000" />
+      <workItem from="1766146301314" duration="6930000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -761,7 +762,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="297" />
+    <option name="localTasksCounter" value="298" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -788,7 +789,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(interpreter): 修复循环控制流和嵌套索引赋值问题&#10;&#10;- 在ForStatement中重置控制流状态以正确处理break/continue&#10;- 修复SetStatement中的嵌套索引访问赋值逻辑&#10;- 调整SwitchStatement中break标志的处理方式&#10;- 更新测试用例中的预期结果和代码格式&#10;- 修正JumpStatementsTests中断言的期望值" />
     <MESSAGE value="feat(lang): 支持从模块导入所有函数&#10;&#10;- 修改 import 语法以支持通配符导入&#10;- 更新测试用例以验证新语法&#10;- 添加 math 模块包含常用数学函数&#10;- 实现 min、max、sqrt 和 pow 函数&#10;- 确保导入语句与新语法兼容" />
     <MESSAGE value="fix(interpreter): 修复函数调用和高阶函数实现问题&#10;&#10;- 修正 closure 测试中的字符串拼接空格问题&#10;- 更新函数参数类型注解和数组字面量语法&#10;- 修复函数调用测试中断言期望值&#10;- 改进高阶函数 groupBy 实现逻辑&#10;- 添加测试和修复原则文档说明&#10;- 调整可选参数默认值语法格式" />
     <MESSAGE value="test(interpreter): 更新函数调用和高阶函数测试用例&#10;&#10;- 修改 processNumbers 函数为两个独立实现以支持不同场景测试&#10;- 使用原始字符串字面量语法重构数组重载测试代码&#10;- 修正 memoize 高阶函数测试逻辑并添加缓存命中统计&#10;- 简化 groupBy 函数实现并修复类型声明错误&#10;- 调整断言逻辑以更准确验证函数行为和结果值&#10;- 移除冗余变量跟踪并优化测试可读性" />
@@ -813,7 +813,8 @@
     <MESSAGE value="feat(config): 重构配置加载与验证逻辑&#10;&#10;- 新增 loadConfig 函数支持多环境配置加载&#10;- 实现 production 和 development 配置映射&#10;- 添加 validateConfig 函数校验必要字段&#10;- 移除旧的 getConfig 实现&#10;- 更新导入语句处理逻辑&#10;- 调整模块路径解析策略&#10;- 修改本地包管理器模块匹配方式&#10;- 移除自动安装依赖功能&#10;- 优化项目内模块解析流程" />
     <MESSAGE value="refactor(net): 重命名 HttpClient 为 HttpWebClient&#10;&#10;- 将 Old8Lang.NetLib 中的 HttpClient 类重命名为 HttpWebClient&#10;- 更新所有引用 HttpClient 的代码，包括 WebApiClient 和相关测试&#10;- 修改 Net.old8 中的原生类型声明，将 HttpClient 替换为 HttpWebClient&#10;- 重命名 HttpClientTests 测试文件为 HttpWebClientTests&#10;- 更新 net_import_test.old8 中的导入语句语法&#10;- 优化 NativeAnyLangValue.cs 中构造函数判空逻辑" />
     <MESSAGE value="refactor(type): 重构类型检查系统并优化函数参数处理&#10;&#10;- 提取类型检查逻辑到独立的 TypeChecker 类&#10;- 统一变量赋值、函数参数和返回值的类型验证&#10;- 优化 FuncLangValue 中的参数处理流程&#10;- 添加类型兼容性检查和错误报告机制&#10;- 修复测试用例中的类型注解和语法错误&#10;- 更新相关 AST 节点以使用新的类型检查接口&#10;- 移除重复的类型检查代码，提高代码复用性&#10;- 增强类型错误提示信息的准确性和可读性" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(type): 重构类型检查系统并优化函数参数处理&#10;&#10;- 提取类型检查逻辑到独立的 TypeChecker 类&#10;- 统一变量赋值、函数参数和返回值的类型验证&#10;- 优化 FuncLangValue 中的参数处理流程&#10;- 添加类型兼容性检查和错误报告机制&#10;- 修复测试用例中的类型注解和语法错误&#10;- 更新相关 AST 节点以使用新的类型检查接口&#10;- 移除重复的类型检查代码，提高代码复用性&#10;- 增强类型错误提示信息的准确性和可读性" />
+    <MESSAGE value="feat(lang): 支持嵌套类的实例化和注册&#10;&#10;- 在AnyLangValue中添加嵌套类访问逻辑&#10;- 实现嵌套类的递归注册机制&#10;- 修改BlockStatement以支持嵌套类的ClassMemberId标识&#10;- 为ClassInit添加公共属性AnyLangValue以便访问类模板&#10;- 移除冗余的模块对象架构文件和并发原语测试文件" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 支持嵌套类的实例化和注册&#10;&#10;- 在AnyLangValue中添加嵌套类访问逻辑&#10;- 实现嵌套类的递归注册机制&#10;- 修改BlockStatement以支持嵌套类的ClassMemberId标识&#10;- 为ClassInit添加公共属性AnyLangValue以便访问类模板&#10;- 移除冗余的模块对象架构文件和并发原语测试文件" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

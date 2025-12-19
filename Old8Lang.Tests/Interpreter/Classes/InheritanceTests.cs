@@ -13,38 +13,39 @@ public class InheritanceTests
     public void ClassInheritance_BasicInheritance_InheritsMethods()
     {
         // Arrange
-        var code = @"
-            class Animal {
-                public name <- """"
+        var code = """
+                               class Animal {
+                                   public name <- ""
 
-                func init(n:string) {
-                    this.name <- n
-                }
+                                   func init(n:string) {
+                                       this.name <- n
+                                   }
 
-                func speak() -> string {
-                    return ""Some sound""
-                }
+                                   func speak() -> string {
+                                       return "Some sound"
+                                   }
 
-                func getName() -> string {
-                    return this.name
-                }
-            }
+                                   func getName() -> string {
+                                       return this.name
+                                   }
+                               }
 
-            class Dog extends Animal {
-                func speak() -> string {
-                    return ""Woof!""
-                }
+                               class Dog extends Animal {
+                                   func speak() -> string {
+                                       return "Woof!"
+                                   }
 
-                func wagTail() -> string {
-                    return ""Wagging tail""
-                }
-            }
+                                   func wagTail() -> string {
+                                       return "Wagging tail"
+                                   }
+                               }
 
-            dog <- Dog(""Buddy"")
-            sound <- dog.speak()
-            tailAction <- dog.wagTail()
-            dogName <- dog.getName()
-        ";
+                               dog <- Dog("Buddy")
+                               sound <- dog.speak()
+                               tailAction <- dog.wagTail()
+                               dogName <- dog.getName()
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -73,54 +74,56 @@ public class InheritanceTests
     public void ClassInheritance_MultipleInheritanceLevels_AccessesAncestorMethods()
     {
         // Arrange
-        var code = @"
-            class Vehicle {
-                public speed <- 0
-                public brand <- """"
+        var code = """
 
-                func init(b:string) {
-                    this.brand <- b
-                }
+                               class Vehicle {
+                                   public speed <- 0
+                                   public brand <- ""
 
-                func accelerate(amount) {
-                    this.speed <- this.speed + amount
-                }
+                                   func init(b:string) {
+                                       this.brand <- b
+                                   }
 
-                func getInfo() -> string {
-                    return this.brand + "" vehicle at "" + this.speed + "" km/h""
-                }
-            }
+                                   func accelerate(amount) {
+                                       this.speed <- this.speed + amount
+                                   }
 
-            class Car extends Vehicle {
-                public doors <- 4
+                                   func getInfo() -> string {
+                                       return this.brand + " vehicle at " + this.speed + " km/h"
+                                   }
+                               }
 
-                func openDoors() -> string {
-                    return ""Opening "" + this.doors + "" doors""
-                }
+                               class Car extends Vehicle {
+                                   public doors <- 4
 
-                func getInfo() -> string {
-                    return this.brand + "" car with "" + this.doors + "" doors at "" + this.speed + "" km/h""
-                }
-            }
+                                   func openDoors() -> string {
+                                       return "Opening " + this.doors + " doors"
+                                   }
 
-            class SportsCar extends Car {
-                func accelerate(amount) {
-                    this.speed <- this.speed + amount * 2  // Sports cars accelerate faster
-                }
+                                   func getInfo() -> string {
+                                       return this.brand + " car with " + this.doors + " doors at " + this.speed + " km/h"
+                                   }
+                               }
 
-                func turboBoost() -> string {
-                    this.speed <- this.speed + 50
-                    return ""Turbo boost activated!""
-                }
-            }
+                               class SportsCar extends Car {
+                                   func accelerate(amount) {
+                                       this.speed <- this.speed + amount * 2  // Sports cars accelerate faster
+                                   }
 
-            sportsCar <- SportsCar(""Ferrari"")
-            sportsCar.doors <- 2
-            sportsCar.accelerate(30)
-            carInfo <- sportsCar.getInfo()
-            turboResult <- sportsCar.turboBoost()
-            finalInfo <- sportsCar.getInfo()
-        ";
+                                   func turboBoost() -> string {
+                                       this.speed <- this.speed + 50
+                                       return "Turbo boost activated!"
+                                   }
+                               }
+
+                               sportsCar <- SportsCar("Ferrari")
+                               sportsCar.doors <- 2
+                               sportsCar.accelerate(30)
+                               carInfo <- sportsCar.getInfo()
+                               turboResult <- sportsCar.turboBoost()
+                               finalInfo <- sportsCar.getInfo()
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -149,74 +152,76 @@ public class InheritanceTests
     public void ClassInheritance_Polymorphism_CallsCorrectMethods()
     {
         // Arrange
-        var code = @"
-            class Shape {
-                func getArea() -> double {
-                    return 0.0
-                }
+        var code = """
 
-                func getPerimeter() -> double {
-                    return 0.0
-                }
+                               class Shape {
+                                   func getArea() -> double {
+                                       return 0.0
+                                   }
 
-                func getType() -> string {
-                    return ""Generic Shape""
-                }
-            }
+                                   func getPerimeter() -> double {
+                                       return 0.0
+                                   }
 
-            class Circle extends Shape {
-                public radius <- 0.0
+                                   func getType() -> string {
+                                       return "Generic Shape"
+                                   }
+                               }
 
-                func init(r) {
-                    this.radius <- r
-                }
+                               class Circle extends Shape {
+                                   public radius <- 0.0
 
-                func getArea() -> double {
-                    return 3.14159 * this.radius * this.radius
-                }
+                                   func init(r) {
+                                       this.radius <- r
+                                   }
 
-                func getPerimeter() -> double {
-                    return 2 * 3.14159 * this.radius
-                }
+                                   func getArea() -> double {
+                                       return 3.14159 * this.radius * this.radius
+                                   }
 
-                func getType() -> string {
-                    return ""Circle""
-                }
-            }
+                                   func getPerimeter() -> double {
+                                       return 2 * 3.14159 * this.radius
+                                   }
 
-            class Rectangle extends Shape {
-                public width <- 0.0
-                public height <- 0.0
+                                   func getType() -> string {
+                                       return "Circle"
+                                   }
+                               }
 
-                func init(w, h) {
-                    this.width <- w
-                    this.height <- h
-                }
+                               class Rectangle extends Shape {
+                                   public width <- 0.0
+                                   public height <- 0.0
 
-                func getArea() -> double {
-                    return this.width * this.height
-                }
+                                   func init(w, h) {
+                                       this.width <- w
+                                       this.height <- h
+                                   }
 
-                func getPerimeter() -> double {
-                    return 2 * (this.width + this.height)
-                }
+                                   func getArea() -> double {
+                                       return this.width * this.height
+                                   }
 
-                func getType() -> string {
-                    return ""Rectangle""
-                }
-            }
+                                   func getPerimeter() -> double {
+                                       return 2 * (this.width + this.height)
+                                   }
 
-            circle <- Circle(5.0)
-            rectangle <- Rectangle(4.0, 6.0)
+                                   func getType() -> string {
+                                       return "Rectangle"
+                                   }
+                               }
 
-            circleArea <- circle.getArea()
-            circlePerimeter <- circle.getPerimeter()
-            circleType <- circle.getType()
+                               circle <- Circle(5.0)
+                               rectangle <- Rectangle(4.0, 6.0)
 
-            rectArea <- rectangle.getArea()
-            rectPerimeter <- rectangle.getPerimeter()
-            rectType <- rectangle.getType()
-        ";
+                               circleArea <- circle.getArea()
+                               circlePerimeter <- circle.getPerimeter()
+                               circleType <- circle.getType()
+
+                               rectArea <- rectangle.getArea()
+                               rectPerimeter <- rectangle.getPerimeter()
+                               rectType <- rectangle.getType()
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -257,46 +262,48 @@ public class InheritanceTests
     public void InterfaceDeclaration_BasicInterface_ImplementsCorrectly()
     {
         // Arrange
-        var code = @"
-            interface IDrawable {
-                func draw() -> string
-                func getArea() -> double
-            }
+        var code = """
 
-            interface IMovable {
-                func move(x, y)
-                func getPosition() -> string
-            }
+                               interface IDrawable {
+                                   func draw() -> string
+                                   func getArea() -> double
+                               }
 
-            class Circle implements IDrawable, IMovable {
-                public radius <- 5.0
-                private x <- 0.0
-                private y <- 0.0
+                               interface IMovable {
+                                   func move(x, y)
+                                   func getPosition() -> string
+                               }
 
-                func draw() -> string {
-                    return ""Drawing circle at ("" + x + "", "" + y + "") with radius "" + radius
-                }
+                               class Circle implements IDrawable, IMovable {
+                                   public radius <- 5.0
+                                   private x <- 0.0
+                                   private y <- 0.0
 
-                func getArea() -> double {
-                    return 3.14159 * radius * radius
-                }
+                                   func draw() -> string {
+                                       return "Drawing circle at (" + x + ", " + y + ") with radius " + radius
+                                   }
 
-                func move(x, y) {
-                    this.x <- x
-                    this.y <- y
-                }
+                                   func getArea() -> double {
+                                       return 3.14159 * radius * radius
+                                   }
 
-                func getPosition() -> string {
-                    return ""("" + x + "", "" + y + "")""
-                }
-            }
+                                   func move(x, y) {
+                                       this.x <- x
+                                       this.y <- y
+                                   }
 
-            circle <- Circle()
-            circle.move(10, 20)
-            drawResult <- circle.draw()
-            areaResult <- circle.getArea()
-            positionResult <- circle.getPosition()
-        ";
+                                   func getPosition() -> string {
+                                       return "(" + x + ", " + y + ")"
+                                   }
+                               }
+
+                               circle <- Circle()
+                               circle.move(10, 20)
+                               drawResult <- circle.draw()
+                               areaResult <- circle.getArea()
+                               positionResult <- circle.getPosition()
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -325,52 +332,54 @@ public class InheritanceTests
     public void ClassInheritance_WithInterface_CombinesFeatures()
     {
         // Arrange
-        var code = @"
-            interface ISerializable {
-                func serialize() -> string
-                func deserialize(data:string)
-            }
+        var code = """
 
-            interface ILoggable {
-                func log(message:string) -> string
-                func getLogs() -> string
-            }
+                               interface ISerializable {
+                                   func serialize() -> string
+                                   func deserialize(data:string)
+                               }
 
-            class Product implements ISerializable, ILoggable {
-                public name <- """"
-                public price <- 0.0
-                private logs <- """"
+                               interface ILoggable {
+                                   func log(message:string) -> string
+                                   func getLogs() -> string
+                               }
 
-                func init(n:string, p:double) {
-                    name <- n
-                    price <- p
-                }
+                               class Product implements ISerializable, ILoggable {
+                                   public name <- ""
+                                   public price <- 0.0
+                                   private logs <- ""
 
-                func serialize() -> string {
-                    return ""{\""name\"":\"""" + name + ""\"", \""price\"":\"""" + price + ""\""}""
-                }
+                                   func init(n:string, p:double) {
+                                       this.name <- n
+                                       this.price <- p
+                                   }
 
-                func deserialize(data:string) {
-                    // Simplified parsing
-                    logs <- logs + ""Deserialized: "" + data + ""\n""
-                }
+                                   func serialize() -> string {
+                                       return "{\"name\":\"" + this.name + "\", \"price\":\"" + this.price + "\"}"
+                                   }
 
-                func log(message:string) -> string {
-                    logs <- logs + ""[LOG] "" + message + ""\n""
-                    return ""Logged: "" + message
-                }
+                                   func deserialize(data:string) {
+                                       // Simplified parsing
+                                       logs <- logs + "Deserialized: " + data + "\n"
+                                   }
 
-                func getLogs() -> string {
-                    return logs
-                }
-            }
+                                   func log(message:string) -> string {
+                                       logs <- logs + "[LOG] " + message + "\n"
+                                       return "Logged: " + message
+                                   }
 
-            product <- Product(""Laptop"", 999.99)
-            logResult <- product.log(""Product created"")
-            serializedData <- product.serialize()
-            product.deserialize(serializedData)
-            allLogs <- product.getLogs()
-        ";
+                                   func getLogs() -> string {
+                                       return logs
+                                   }
+                               }
+
+                               product <- Product("Laptop", 999.99)
+                               logResult <- product.log("Product created")
+                               serializedData <- product.serialize()
+                               product.deserialize(serializedData)
+                               allLogs <- product.getLogs()
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -401,48 +410,50 @@ public class InheritanceTests
     public void ClassInheritance_AbstractMethods_ImplementationRequired()
     {
         // Arrange
-        var code = @"
-            class Animal {
-                public name <- """"
+        var code = """
 
-                func init(n:string) {
-                    name <- n
-                }
+                               class Animal {
+                                   public name <- ""
 
-                func speak() -> string {
-                    return ""Abstract animal sound""
-                }
-            }
+                                   func init(n:string) {
+                                       this.name <- n
+                                   }
 
-            class Dog extends Animal {
-                func speak() -> string {
-                    return ""Woof! My name is "" + name
-                }
+                                   func speak() -> string {
+                                       return "Abstract animal sound"
+                                   }
+                               }
 
-                func fetch() -> string {
-                    return ""Fetching the ball!""
-                }
-            }
+                               class Dog extends Animal {
+                                   func speak() -> string {
+                                       return "Woof! My name is " + this.name
+                                   }
 
-            class Cat extends Animal {
-                func speak() -> string {
-                    return ""Meow! I'm "" + name
-                }
+                                   func fetch() -> string {
+                                       return "Fetching the ball!"
+                                   }
+                               }
 
-                func purr() -> string {
-                    return ""Purring contentedly""
-                }
-            }
+                               class Cat extends Animal {
+                                   func speak() -> string {
+                                       return "Meow! I'm " + this.name
+                                   }
 
-            dog <- Dog(""Rex"")
-            cat <- Cat(""Whiskers"")
+                                   func purr() -> string {
+                                       return "Purring contentedly"
+                                   }
+                               }
 
-            dogSound <- dog.speak()
-            dogAction <- dog.fetch()
+                               dog <- Dog("Rex")
+                               cat <- Cat("Whiskers")
 
-            catSound <- cat.speak()
-            catAction <- cat.purr()
-        ";
+                               dogSound <- dog.speak()
+                               dogAction <- dog.fetch()
+
+                               catSound <- cat.speak()
+                               catAction <- cat.purr()
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -475,54 +486,56 @@ public class InheritanceTests
     public void ClassInheritance_MethodOverriding_CallsChildMethod()
     {
         // Arrange
-        var code = @"
-            class Employee {
-                public name <- """"
-                public salary <- 0.0
+        var code = """
 
-                func init(n:string, s:double) {
-                    this.name <- n
-                    this.salary <- s
-                }
+                               class Employee {
+                                   public name <- ""
+                                   public salary <- 0.0
 
-                func calculateBonus() -> double {
-                    return this.salary * 0.1  // 10% bonus for regular employee
-                }
+                                   func init(n:string, s:double) {
+                                       this.name <- n
+                                       this.salary <- s
+                                   }
 
-                func getInfo() -> string {
-                    return this.name + "" earns "" + this.salary + "" with bonus "" + this.calculateBonus()
-                }
-            }
+                                   func calculateBonus() -> double {
+                                       return this.salary * 0.1  // 10% bonus for regular employee
+                                   }
 
-            class Manager extends Employee {
-                private teamSize <- 0
+                                   func getInfo() -> string {
+                                       return this.name + " earns " + this.salary + " with bonus " + this.calculateBonus()
+                                   }
+                               }
 
-                func init(n:string, s:double, team:int) {
-                    this.name <- n
-                    this.salary <- s
-                    this.teamSize <- team
-                }
+                               class Manager extends Employee {
+                                   private teamSize <- 0
 
-                func calculateBonus() -> double {
-                    return this.salary * 0.2 + this.teamSize * 100  // 20% bonus + team bonus
-                }
+                                   func init(n:string, s:double, team:int) {
+                                       this.name <- n
+                                       this.salary <- s
+                                       this.teamSize <- team
+                                   }
 
-                func getTeamSize() -> int {
-                    return this.teamSize
-                }
+                                   func calculateBonus() -> double {
+                                       return this.salary * 0.2 + this.teamSize * 100  // 20% bonus + team bonus
+                                   }
 
-                func getInfo() -> string {
-                    return this.name + "" (Manager) with team of "" + this.teamSize + "" earns "" + this.salary + "" with bonus "" + this.calculateBonus()
-                }
-            }
+                                   func getTeamSize() -> int {
+                                       return this.teamSize
+                                   }
 
-            employee <- Employee(""John"", 50000)
-            manager <- Manager(""Sarah"", 80000, 5)
+                                   func getInfo() -> string {
+                                       return this.name + " (Manager) with team of " + this.teamSize + " earns " + this.salary + " with bonus " + this.calculateBonus()
+                                   }
+                               }
 
-            employeeInfo <- employee.getInfo()
-            managerInfo <- manager.getInfo()
-            teamSize <- manager.getTeamSize()
-        ";
+                               employee <- Employee("John", 50000)
+                               manager <- Manager("Sarah", 80000, 5)
+
+                               employeeInfo <- employee.getInfo()
+                               managerInfo <- manager.getInfo()
+                               teamSize <- manager.getTeamSize()
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -551,40 +564,43 @@ public class InheritanceTests
     public void ClassInheritance_BaseClassConstructor_CalledCorrectly()
     {
         // Arrange
-        var code = @"
-            class Person {
-                public name <- """"
-                public age <- 0
+        var code = """
 
-                func init(n:string, a:int) {
-                    name <- n
-                    age <- a
-                }
+                               class Person {
+                                   public name <- ""
+                                   public age <- 0
 
-                func getBasicInfo() -> string {
-                    return name + "" is "" + age + "" years old""
-                }
-            }
+                                   func init(n:string, a:int) {
+                                       this.name <- n
+                                       this.age <- a
+                                   }
 
-            class Student extends Person {
-                public studentId <- """"
-                public grade <- 0
+                                   func getBasicInfo() -> string {
+                                       return this.name + " is " + this.age + " years old"
+                                   }
+                               }
 
-                func init(n:string, a:int, id:string, g:int) {
-                    this.init(n, a)  // Call parent constructor
-                    studentId <- id
-                    grade <- g
-                }
+                               class Student extends Person {
+                                   public studentId <- ""
+                                   public grade <- 0
 
-                func getStudentInfo() -> string {
-                    return getBasicInfo() + "", Student ID: "" + studentId + "", Grade: "" + grade
-                }
-            }
+                                   func init(n:string, a:int, id:string, g:int) {
+                                       this.name <- n  // 直接赋值父类字段
+                                       this.age <- a
+                                       this.studentId <- id
+                                       this.grade <- g
+                                   }
 
-            student <- Student(""Alice"", 20, ""S12345"", 10)
-            basicInfo <- student.getBasicInfo()
-            studentInfo <- student.getStudentInfo()
-        ";
+                                   func getStudentInfo() -> string {
+                                       return this.getBasicInfo() + ", Student ID: " + this.studentId + ", Grade: " + this.grade
+                                   }
+                               }
+
+                               student <- Student("Alice", 20, "S12345", 10)
+                               basicInfo <- student.getBasicInfo()
+                               studentInfo <- student.getStudentInfo()
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -609,37 +625,40 @@ public class InheritanceTests
     public void ClassInheritance_ProtectedMembers_AccessibleInChildClass()
     {
         // Arrange
-        var code = @"
-            class Vehicle {
-                public model <- """"
-                protected engineType <- ""unknown""
+        var code = """
 
-                func init(m:string, e:string) {
-                    model <- m
-                    engineType <- e
-                }
+                               class Vehicle {
+                                   public model <- ""
+                                   protected engineType <- "unknown"
 
-                protected func getEngineInfo() -> string {
-                    return ""Engine: "" + engineType
-                }
-            }
+                                   func init(m:string, e:string) {
+                                       model <- m
+                                       engineType <- e
+                                   }
 
-            class Car extends Vehicle {
-                public doors <- 4
+                                   protected func getEngineInfo() -> string {
+                                       return "Engine: " + engineType
+                                   }
+                               }
 
-                func init(m:string, e:string, d:int) {
-                    this.init(m, e)
-                    doors <- d
-                }
+                               class Car extends Vehicle {
+                                   public doors <- 4
 
-                func getFullInfo() -> string {
-                    return model + "" with "" + doors + "" doors, "" + getEngineInfo()
-                }
-            }
+                                   func init(m:string, e:string, d:int) {
+                                       this.model <- m  // 直接赋值父类字段
+                                       this.engineType <- e
+                                       doors <- d
+                                   }
 
-            car <- Car(""Toyota"", ""V6"", 4)
-            fullInfo <- car.getFullInfo()
-        ";
+                                   func getFullInfo() -> string {
+                                       return this.model + " with " + this.doors + " doors, " + this.getEngineInfo()
+                                   }
+                               }
+
+                               car <- Car("Toyota", "V6", 4)
+                               fullInfo <- car.getFullInfo()
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -657,47 +676,49 @@ public class InheritanceTests
     public void ClassInheritance_InterfaceInheritance_CombinesInterfaces()
     {
         // Arrange
-        var code = @"
-            interface IBasicShape {
-                func getName() -> string
-            }
+        var code = """
 
-            interface IAdvancedShape {
-                func getName() -> string
-                func calculateComplexity() -> int
-            }
+                               interface IBasicShape {
+                                   func getName() -> string
+                               }
 
-            interface IRenderable {
-                func render() -> string
-            }
+                               interface IAdvancedShape {
+                                   func getName() -> string
+                                   func calculateComplexity() -> int
+                               }
 
-            class Triangle implements IAdvancedShape, IRenderable {
-                public base <- 0
-                public height <- 0
+                               interface IRenderable {
+                                   func render() -> string
+                               }
 
-                func init(b, h) {
-                    base <- b
-                    height <- h
-                }
+                               class Triangle implements IAdvancedShape, IRenderable {
+                                   public base <- 0
+                                   public height <- 0
 
-                func getName() -> string {
-                    return ""Triangle""
-                }
+                                   func init(b, h) {
+                                       this.base <- b
+                                       this.height <- h
+                                   }
 
-                func calculateComplexity() -> int {
-                    return 3  // 3 sides
-                }
+                                   func getName() -> string {
+                                       return "Triangle"
+                                   }
 
-                func render() -> string {
-                    return ""Rendering triangle with base "" + base + "" and height "" + height
-                }
-            }
+                                   func calculateComplexity() -> int {
+                                       return 3  // 3 sides
+                                   }
 
-            triangle <- Triangle(5, 8)
-            name <- triangle.getName()
-            complexity <- triangle.calculateComplexity()
-            renderResult <- triangle.render()
-        ";
+                                   func render() -> string {
+                                       return "Rendering triangle with base " + this.base + " and height " + this.height
+                                   }
+                               }
+
+                               triangle <- Triangle(5, 8)
+                               name <- triangle.getName()
+                               complexity <- triangle.calculateComplexity()
+                               renderResult <- triangle.render()
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act

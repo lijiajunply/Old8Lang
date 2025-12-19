@@ -180,7 +180,7 @@ public class ClassInstantiationTests
             }
             points <- [Point(0, 0), Point(3, 4), Point(5, 12)]
             distances <- [0.0, 0.0, 0.0]
-            for i in 0..<len(points) {
+            for i in [0~<len(points)] {
                 distances[i] <- points[i].Distance()
             }
             result1 <- distances[1]
@@ -392,7 +392,7 @@ public class ClassInstantiationTests
             }
             car <- Car(""Tesla"", ""Model S"")
             horsepower <- car.engine.horsepower
-            wheelCount <- car.len(wheels)
+            wheelCount <- len(car.wheels)
             wheelBrand <- car.wheels[0].brand
         ";
         var interpreter = new LangInterpreter();
