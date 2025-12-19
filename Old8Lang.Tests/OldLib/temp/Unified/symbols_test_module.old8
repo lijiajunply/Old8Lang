@@ -1,0 +1,10 @@
+
+func exportedFunc() -> string {
+    return "exported"
+}
+
+func anotherFunc() -> string {
+    return "another"
+}
+
+exportedVar <- 123

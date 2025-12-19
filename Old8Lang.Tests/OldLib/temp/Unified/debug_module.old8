@@ -1,0 +1,5 @@
+
+func debugLog(message:string) -> string {
+    return "[DEBUG] " + message
+}
+DEBUG_MODE <- true

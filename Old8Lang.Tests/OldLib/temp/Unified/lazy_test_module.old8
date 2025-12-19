@@ -1,0 +1,5 @@
+
+func lazyFunction() -> string {
+    return "Lazy loaded"
+}
+LAZY_CONSTANT <- "Lazy constant"

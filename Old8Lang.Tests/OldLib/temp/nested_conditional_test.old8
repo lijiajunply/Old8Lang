@@ -1,6 +1,6 @@
-
 user_type <- "premium"
 user_region <- "us"
+result <- ""
 
 if (user_type == "premium") {
     if (user_region == "us") {

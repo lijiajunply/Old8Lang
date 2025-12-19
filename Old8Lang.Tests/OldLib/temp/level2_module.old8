@@ -1,4 +1,3 @@
-
 func level2Feature() -> string {
     return "Level 2 feature"
 }

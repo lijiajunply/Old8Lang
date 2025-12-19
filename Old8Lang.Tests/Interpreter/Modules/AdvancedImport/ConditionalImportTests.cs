@@ -256,36 +256,37 @@ if (environment == ""test"") {
     public void Import_ConditionalNestedIf_ShouldHandleNestedConditions()
     {
         // Arrange
-        var level1Module = @"
-func level1Feature() -> string {
-    return ""Level 1 feature""
-}
-";
+        const string level1Module = """
+                                    func level1Feature() -> string {
+                                        return "Level 1 feature"
+                                    }
+                                    """;
 
-        var level2Module = @"
-func level2Feature() -> string {
-    return ""Level 2 feature""
-}
-";
+        const string level2Module = """
+                                    func level2Feature() -> string {
+                                        return "Level 2 feature"
+                                    }
+                                    """;
 
-        var testContent = @"
-user_type <- ""premium""
-user_region <- ""us""
+        const string testContent = """
+                                   user_type <- "premium"
+                                   user_region <- "us"
+                                   result <- ""
 
-if (user_type == ""premium"") {
-    if (user_region == ""us"") {
-        import ""level1_module"" as l1
-        result <- l1.level1Feature() + "" - US Premium""
-    } else if (user_region == ""eu"") {
-        import ""level2_module"" as l2
-        result <- l2.level2Feature() + "" - EU Premium""
-    } else {
-        result <- ""Premium - Other region""
-    }
-} else {
-    result <- ""Basic user""
-}
-";
+                                   if (user_type == "premium") {
+                                       if (user_region == "us") {
+                                           import "level1_module" as l1
+                                           result <- l1.level1Feature() + " - US Premium"
+                                       } else if (user_region == "eu") {
+                                           import "level2_module" as l2
+                                           result <- l2.level2Feature() + " - EU Premium"
+                                       } else {
+                                           result <- "Premium - Other region"
+                                       }
+                                   } else {
+                                       result <- "Basic user"
+                                   }
+                                   """;
 
         CreateTempModuleFile("level1_module.old8", level1Module);
         CreateTempModuleFile("level2_module.old8", level2Module);

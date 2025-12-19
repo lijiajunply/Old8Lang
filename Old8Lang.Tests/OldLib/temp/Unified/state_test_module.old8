@@ -1,0 +1,4 @@
+
+func stateTest() -> string {
+    return "State test"
+}

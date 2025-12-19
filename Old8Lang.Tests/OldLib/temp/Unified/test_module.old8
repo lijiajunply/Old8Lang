@@ -1,0 +1,6 @@
+
+func testFunction() -> string {
+    return "Module function called"
+}
+
+MODULE_CONSTANT <- "Test constant"
