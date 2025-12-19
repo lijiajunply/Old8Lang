@@ -1,5 +1,8 @@
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
+using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Statement;
@@ -9,7 +12,20 @@ public class ReturnStatement(LangExpression returnExpression, SourcePosition pos
     
     public override void Run(VariateManager manager)
     {
-        manager.Result = returnExpression.Run(manager);
+        var result = returnExpression.Run(manager);
+
+        // 如果当前函数有返回类型注解，进行类型检查
+        if (!string.IsNullOrEmpty(manager.CurrentFunctionReturnType))
+        {
+            var functionName = "anonymous";
+            if (manager.GetValue(new LangId("this")) is AnyLangValue anyValue)
+            {
+                functionName = anyValue.Id?.IdName ?? "anonymous";
+            }
+            TypeChecker.ValidateReturnType(manager.CurrentFunctionReturnType, result, this, functionName);
+        }
+
+        manager.Result = result;
         manager.IsReturn = true;
     }
 

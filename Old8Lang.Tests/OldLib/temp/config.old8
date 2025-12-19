@@ -1,5 +1,25 @@
 
-import "utils"
-func getConfig() -> string {
-    return "Config loaded"
+func loadConfig(filePath:string) -> dict {
+    if filePath == "production.json" {
+        return {
+            "database": "prod_server",
+            "port": 5432,
+            "debug": false,
+            "maxConnections": 100
+        }
+    } else if filePath == "development.json" {
+        return {
+            "database": "dev_server",
+            "port": 5433,
+            "debug": true,
+            "maxConnections": 10
+        }
+    } else {
+        return {}
+    }
+}
+func validateConfig(config:dict) -> bool {
+    hasDb <- config.ContainsKey("database")
+    hasPort <- config.ContainsKey("port")
+    return hasDb && hasPort
 }

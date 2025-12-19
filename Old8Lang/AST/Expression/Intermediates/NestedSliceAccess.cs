@@ -1,10 +1,10 @@
 using System.Reflection.Emit;
-using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.Intermediates;
 
 /// <summary>
 /// 嵌套切片访问表达式，用于处理 matrix[index][start:end] 或 matrix[index][start:end:step] 的情况

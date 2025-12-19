@@ -220,7 +220,7 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
     {
         // Arrange
         var code = @"
-            func findMax(numbers:List) -> int {
+            func findMax(numbers:list) -> int {
                 if len(numbers) == 0 {
                     return 0
                 }

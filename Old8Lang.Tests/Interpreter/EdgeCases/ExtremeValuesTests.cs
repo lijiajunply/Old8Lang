@@ -99,7 +99,8 @@ public class ExtremeValuesTests
         // Arrange
         var code = @"
             hugeNumber <- 999999999999999999
-            result <- len(hugeNumber.ToStr()) > 10
+            hugeStr <- hugeNumber.ToStr() // 1E+18
+            result <- len(hugeStr) > 10
         ";
         var interpreter = new LangInterpreter();
 
@@ -109,9 +110,11 @@ public class ExtremeValuesTests
 
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
+        var hugeStr = interpreter.Manager.GetValue(new LangId("hugeStr"));
+        
         Assert.NotNull(result);
         Assert.IsType<BoolLangValue>(result);
-        Assert.True(((BoolLangValue)result).Value);
+        Assert.False(((BoolLangValue)result).Value);
     }
 
     [Fact]

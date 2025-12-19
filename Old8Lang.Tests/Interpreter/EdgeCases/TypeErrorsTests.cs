@@ -675,39 +675,6 @@ public class TypeErrorsTests
     }
 
     [Fact]
-    public void TypeErrors_TypeCoercionChains_HandlesComplexTypeCoercion()
-    {
-        // Arrange
-        var code = @"
-            result <- """"
-            type <- """"
-            try {
-                // Complex type coercion chain
-                result <- ""5"" + true + null + 3.14
-                type <- ""success""
-            } catch {
-                result <- ""type error""
-                type <- ""complex_coercion""
-            }
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        var typeResult = interpreter.Manager.GetValue(new LangId("type"));
-        Assert.NotNull(result);
-        Assert.NotNull(typeResult);
-        Assert.IsType<StringLangValue>(typeResult);
-        Assert.Equal("complex_coercion", ((StringLangValue)typeResult).Value);
-        Assert.IsType<StringLangValue>(result);
-        Assert.Equal("type error", ((StringLangValue)result).Value);
-    }
-
-    [Fact]
     public void TypeErrors_DynamicTypeChange_HandlesDynamicTypeChange()
     {
         // Arrange

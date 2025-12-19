@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Intermediates;
@@ -63,7 +64,7 @@ public class FuncLangValue : ImportInfo
     {
         if (stmt is YieldStatement)
             return true;
-        
+
         // 检查块语句中的子语句
         for (int i = 0; i < stmt.Count; i++)
         {
@@ -71,7 +72,7 @@ public class FuncLangValue : ImportInfo
             if (child != null && ContainsYieldStatement(child))
                 return true;
         }
-        
+
         return false;
     }
 
@@ -119,7 +120,7 @@ public class FuncLangValue : ImportInfo
         // 原生方法或其他情况直接返回自身
         return this;
     }
-    
+
     /// <summary>
     /// 执行生成器函数，返回下一个值
     /// </summary>
@@ -137,29 +138,24 @@ public class FuncLangValue : ImportInfo
             Interpreter = variateManagerFunc.Interpreter,
             IsFunc = true
         };
-        
+
         // 处理参数
         if (Ids != null && Ids.Count != 0)
         {
-            // 计算所有传入参数的值
-            var paramValues = ids.Select(t => t.Run(variateManagerFunc)).ToList();
-            
+            var paramValues = ProcessAndValidateParameters(ids, variateManagerFunc);
+
             // 设置参数值到生成器的变量管理器
             for (var i = 0; i < Ids.Count; i++)
             {
-                if (i < paramValues.Count)
-                {
-                    generatorManager.SetParameter(Ids[i], paramValues[i]);
-                }
+                generatorManager.SetParameter(Ids[i], paramValues[i]);
             }
         }
-        
+
         // 运行函数体
         BlockStatement.Run(generatorManager);
-        
+
         return generatorManager.Result;
     }
-    
 
 
     public LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> ids, object? obj = null)
@@ -218,6 +214,7 @@ public class FuncLangValue : ImportInfo
                     {
                         array.SetValue(Convert.ChangeType(list[j], elementType), j);
                     }
+
                     adjustedParams[i] = array;
                 }
                 else
@@ -260,7 +257,7 @@ public class FuncLangValue : ImportInfo
 
                 // 获取当前方法的调用栈信息
                 var currentCallStack = new List<CallStackFrame>(Old8Exception.CurrentCallStack);
-                
+
                 // 基础异常信息
                 string errorMessage = innerException.Message;
                 string errorCode = "RUNTIME_ERROR";
@@ -314,30 +311,9 @@ public class FuncLangValue : ImportInfo
             // 对于生成器函数，我们需要特殊处理
             // 生成器函数在调用时，应该返回一个GeneratorLangValue对象
             // 这个对象包含了生成器函数的引用和调用时的参数值
-            
-            // 计算所有传入参数的值，使用外部变量管理器
-            var paramValues = ids.Select(t => t.Run(variateManagerFunc)).ToList();
 
-            // 处理默认参数，补全缺失的参数值
-            if (Ids is { Count: > 0 })
-            {
-                for (var i = paramValues.Count; i < Ids.Count; i++)
-                {
-                    var id = Ids[i];
-                    if (id.DefaultValue != null)
-                    {
-                        // 计算默认值
-                        var defaultValue = id.DefaultValue.Run(variateManagerFunc);
-                        paramValues.Add(defaultValue);
-                    }
-                    else
-                    {
-                        // 没有默认参数且没有传入参数，抛出错误
-                        throw new ArgumentError(Position,
-                            $"函数 '{Id?.IdName}' 的参数 '{id.IdName}' 缺少实参且没有默认值");
-                    }
-                }
-            }
+            // 使用统一的参数处理方法
+            var paramValues = ProcessAndValidateParameters(ids, variateManagerFunc);
 
             // 注意：新架构不再使用 LocalState，而是通过 ParameterValues 传递参数
             // GeneratorLangValue.Run 方法会在创建状态机时处理参数设置
@@ -366,7 +342,7 @@ public class FuncLangValue : ImportInfo
         {
             // 入栈：记录函数调用
             Old8Exception.PushCallStack(Id?.IdName ?? "anonymous", Position);
-            
+
             // 如果有捕获的作用域（闭包），使用捕获的作用域而不是调用时的作用域
             // 这样函数体就能访问定义时的外部变量
             VariateManager executionManager;
@@ -384,7 +360,12 @@ public class FuncLangValue : ImportInfo
             }
 
             executionManager.AddChildren();
+
+            // 保存当前的函数返回类型，避免嵌套调用时被覆盖
+            var originalReturnType = executionManager.CurrentFunctionReturnType;
+
             executionManager.IsFunc = true; // 设置为函数上下文
+            executionManager.CurrentFunctionReturnType = Id?.AssumptionType; // 设置当前函数的返回类型注解（Id.AssumptionType包含了返回类型）
 
             // 将静态成员添加到方法的变量管理器中
             var thisValue = executionManager.GetValue(new LangId("this"));
@@ -411,34 +392,8 @@ public class FuncLangValue : ImportInfo
                     InitializeDefaultValueCache(executionManager);
                 }
 
-                // 先计算所有传入参数的值，使用外部变量管理器
-                var paramValues = ids.Select(t => t.Run(variateManagerFunc)).ToList();
-
-                // 处理默认参数，补全缺失的参数值
-                for (var i = paramValues.Count; i < Ids.Count; i++)
-                {
-                    var id = Ids[i];
-                    if (id.DefaultValue != null)
-                    {
-                        // 优先使用缓存的默认值
-                        if (CachedDefaultValues?.TryGetValue(i, out var cachedValue) == true)
-                        {
-                            paramValues.Add(cachedValue);
-                        }
-                        else
-                        {
-                            // 非常量表达式，需要每次计算
-                            var defaultValue = id.DefaultValue.Run(executionManager);
-                            paramValues.Add(defaultValue);
-                        }
-                    }
-                    else
-                    {
-                        // 没有默认参数且没有传入参数，抛出错误
-                        throw new ArgumentError(Position,
-                            $"函数 '{Id?.IdName}' 的参数 '{id.IdName}' 缺少实参且没有默认值");
-                    }
-                }
+                // 使用统一的参数处理方法
+                var paramValues = ProcessAndValidateParameters(ids, variateManagerFunc, executionManager);
 
                 // 然后将所有参数值（包括默认参数）设置到函数的变量管理器中
                 // 使用SetParameter确保参数在当前作用域中创建新变量，保持递归调用中的独立性
@@ -459,6 +414,9 @@ public class FuncLangValue : ImportInfo
 
             // 重置return标志，确保函数调用不会影响外部上下文
             executionManager.IsReturn = false;
+
+            // 恢复原始的函数返回类型，避免嵌套调用时的类型污染
+            executionManager.CurrentFunctionReturnType = originalReturnType;
 
             // 移除子作用域，但是要注意，在init方法中使用this关键字设置的值已经被保存到实例中了
             // 所以这里移除子作用域不会影响实例的状态
@@ -580,12 +538,12 @@ public class FuncLangValue : ImportInfo
 
         // 获取返回类型
         var returnType = GetItemType(BlockStatement, funcLocal);
-        
+
         // 根据函数类型选择不同的处理方式
         if (IsLambda || Id == null)
         {
             // Lambda表达式处理：编译成Delegate
-            
+
             // 定义新的方法
             var dynamicMethod = new DynamicMethod(
                 methodName,
@@ -655,10 +613,11 @@ public class FuncLangValue : ImportInfo
                         // 引用类型返回null
                         methodIl.Emit(OpCodes.Ldnull);
                     }
+
                     methodIl.Emit(OpCodes.Ret);
                 }
             }
-            
+
             // 注册Lambda表达式到DelegateVar
             var paramTypeNames = string.Join("_", parameterTypes.Select(t => t.Name));
             var delegateKey = $"{methodName}${paramTypeNames}";
@@ -667,7 +626,7 @@ public class FuncLangValue : ImportInfo
         else
         {
             // 普通方法处理：编译成DynamicMethod
-            
+
             // 定义新的方法
             var dynamicMethod = new DynamicMethod(
                 methodName,
@@ -737,10 +696,11 @@ public class FuncLangValue : ImportInfo
                         // 引用类型返回null
                         methodIl.Emit(OpCodes.Ldnull);
                     }
+
                     methodIl.Emit(OpCodes.Ret);
                 }
             }
-            
+
             // 将方法注册到本地变量管理器的DelegateVar中
             var paramTypeNames = string.Join("_", parameterTypes.Select(t => t.Name));
             var delegateKey = $"{methodName}${paramTypeNames}";
@@ -814,17 +774,84 @@ public class FuncLangValue : ImportInfo
                 var param = Ids[i];
                 if (string.IsNullOrEmpty(param.AssumptionType))
                 {
-                    var errorMsg = $"[编译模式错误] Lambda表达式 '{variableName}' 的参数 '{param.IdName}' (第{i + 1}个参数) 缺少类型注解\n\n" +
-                                  $"编译模式下Lambda表达式的所有参数必须显式声明类型注解。\n\n" +
-                                  $"修复示例：\n" +
-                                  $"  {variableName} <- ({param.IdName}:int, ...) -> {{ ... }}\n" +
-                                  $"  {variableName} <- ({param.IdName}:int, ...) -> expression\n\n" +
-                                  $"支持的类型：int, double, string, bool, char, list<T>, array<T>";
+                    var errorMsg =
+                        $"[编译模式错误] Lambda表达式 '{variableName}' 的参数 '{param.IdName}' (第{i + 1}个参数) 缺少类型注解\n\n" +
+                        $"编译模式下Lambda表达式的所有参数必须显式声明类型注解。\n\n" +
+                        $"修复示例：\n" +
+                        $"  {variableName} <- ({param.IdName}:int, ...) -> {{ ... }}\n" +
+                        $"  {variableName} <- ({param.IdName}:int, ...) -> expression\n\n" +
+                        $"支持的类型：int, double, string, bool, char, list<T>, array<T>";
                     local.ReportError(errorMsg, param.Position);
                 }
             }
         }
 
         // 注意：Lambda返回类型允许推断，不需要强制声明
+    }
+
+    /// <summary>
+    /// 验证函数调用时的参数类型匹配
+    /// </summary>
+    /// <param name="argumentExpressions">传入的参数表达式列表</param>
+    /// <param name="argumentValues">计算后的参数值列表</param>
+    private void ValidateParameterTypes(List<LangExpression> argumentExpressions, List<LangValueType> argumentValues)
+    {
+        if (Ids == null) return;
+
+        // 使用全局类型检查器进行验证
+        TypeChecker.ValidateParameterTypes(
+            argumentExpressions.Cast<IOldLangTree>().ToList(),
+            argumentValues,
+            Ids);
+    }
+
+    /// <summary>
+    /// 统一的参数处理方法：计算、验证、处理默认值，并返回最终参数值列表
+    /// </summary>
+    /// <param name="argumentExpressions">传入的参数表达式列表</param>
+    /// <param name="variManager">外部变量管理器，用于计算参数值</param>
+    /// <param name="executionManager">执行管理器，用于获取缓存的默认值</param>
+    /// <returns>处理完成的参数值列表</returns>
+    private List<LangValueType> ProcessAndValidateParameters(
+        List<LangExpression> argumentExpressions,
+        VariateManager variManager,
+        VariateManager? executionManager = null)
+    {
+        if (Ids == null) return new List<LangValueType>();
+
+        // 1. 计算所有传入参数的值
+        var paramValues = argumentExpressions.Select(expr => expr.Run(variManager)).ToList();
+
+        // 2. 验证参数类型匹配（仅在有类型注解时进行检查）
+        ValidateParameterTypes(argumentExpressions, paramValues);
+
+        // 3. 处理默认参数，补全缺失的参数值
+        for (var i = paramValues.Count; i < Ids.Count; i++)
+        {
+            var parameter = Ids[i];
+            if (parameter.DefaultValue != null)
+            {
+                // 优先使用缓存的默认值（如果提供了执行管理器）
+                if (executionManager != null && CachedDefaultValues?.TryGetValue(i, out var cachedValue) == true)
+                {
+                    paramValues.Add(cachedValue);
+                }
+                else
+                {
+                    // 非常量表达式，需要每次计算
+                    var defaultValueManager = executionManager ?? variManager;
+                    var defaultValue = parameter.DefaultValue.Run(defaultValueManager);
+                    paramValues.Add(defaultValue);
+                }
+            }
+            else
+            {
+                // 没有默认参数且没有传入参数，抛出错误
+                throw new ArgumentError(Position,
+                    $"函数 '{Id?.IdName}' 的参数 '{parameter.IdName}' 缺少实参且没有默认值");
+            }
+        }
+
+        return paramValues;
     }
 }

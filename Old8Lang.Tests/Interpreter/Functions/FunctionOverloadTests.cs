@@ -600,19 +600,19 @@ public class FunctionOverloadTests
     {
         // Arrange
         var code = @"
-            func safeGet(value:int, defaultValue:int) -> int {
+            func safeGet(value, defaultValue:int) -> int {
                 if value == null {
                     return defaultValue
                 }
                 return value
             }
-            func safeGet(value:string, defaultValue:string) -> string {
+            func safeGet(value, defaultValue:string) -> string {
                 if value == null {
                     return defaultValue
                 }
                 return value
             }
-            func safeGet(value:bool, defaultValue:bool) -> bool {
+            func safeGet(value, defaultValue:bool) -> bool {
                 if value == null {
                     return defaultValue
                 }

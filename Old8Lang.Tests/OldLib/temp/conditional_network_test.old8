@@ -9,4 +9,4 @@ if (is_debug_mode) {
 }
 
 result_function <- mod.baseFunction()
-const_value <- if is_debug_mode { mod.ENHANCED_CONST } else { mod.BASE_CONST }
+const_value <- if is_debug_mode then { mod.ENHANCED_CONST } else { mod.BASE_CONST }

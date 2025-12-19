@@ -1,9 +1,10 @@
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.Intermediates;
 
 /// <summary>
 /// 嵌套索引访问表达式，用于处理 array[index1][index2] 的情况

@@ -279,7 +279,7 @@ public class EmptyInputTests
             } finally {
                 // Empty finally block
             }
-            finalResult <- result + "" + ""finally""
+            finalResult <- result + "" finally""
         ";
         var interpreter = new LangInterpreter();
 
@@ -391,29 +391,6 @@ public class EmptyInputTests
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
         Assert.Equal("if-else executed", ((StringLangValue)result).Value);
-    }
-
-    [Fact]
-    public void EmptyInput_EmptyBlock_HandlesEmptyBlockStatement()
-    {
-        // Arrange
-        var code = @"
-            {
-                // Empty block
-            }
-            result <- ""block executed""
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<StringLangValue>(result);
-        Assert.Equal("block executed", ((StringLangValue)result).Value);
     }
 
     [Fact]

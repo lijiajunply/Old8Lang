@@ -855,7 +855,7 @@ public class TupleTests
                 return (quotient, remainder)
             }
 
-            nums <- {3, 7, 1, 9, 2, 8}
+            nums <- [3, 7, 1, 9, 2, 8]
             minMax <- GetMinMax(nums)
             divRem <- DivideAndRemainder(17, 5)
 

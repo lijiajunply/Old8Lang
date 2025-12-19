@@ -193,6 +193,11 @@ public class VariateManager
     public bool IsFunc { get; set; }
 
     /// <summary>
+    /// 当前函数的返回类型注解
+    /// </summary>
+    public string? CurrentFunctionReturnType { get; set; }
+
+    /// <summary>
     /// 当前是否处于类内部
     /// </summary>
     public bool IsClass { get; set; }
@@ -701,6 +706,7 @@ public class VariateManager
             Path = Path,
             Interpreter = Interpreter,
             IsFunc = IsFunc,
+            CurrentFunctionReturnType = CurrentFunctionReturnType,
             IsClass = IsClass,
             IsReturn = IsReturn,
             Result = Result

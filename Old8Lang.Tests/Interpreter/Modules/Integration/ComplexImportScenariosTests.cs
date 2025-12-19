@@ -180,7 +180,7 @@ if (is_debug_mode) {
 }
 
 result_function <- mod.baseFunction()
-const_value <- if is_debug_mode { mod.ENHANCED_CONST } else { mod.BASE_CONST }
+const_value <- if is_debug_mode then { mod.ENHANCED_CONST } else { mod.BASE_CONST }
 ";
 
         CreateTempModuleFile("conditional_base.old8", baseModuleContent);
@@ -411,7 +411,7 @@ func lazyFunction() -> string { return ""Lazy"" }
 import ""eager_module"" as eager
 
 // 延迟导入
-lazy import ""lazy_module"" as lazy
+lazy import ""lazy_module"" as laz
 
 // 访问即时导入的模块
 eager_result <- eager.eagerFunction()
@@ -421,8 +421,8 @@ eager_const <- eager.EAGER_VALUE
 status_before_lazy <- ""Lazy not loaded yet""
 
 // 访问延迟导入的模块
-lazy_result <- lazy.lazyFunction()
-lazy_const <- lazy.LAZY_VALUE
+lazy_result <- laz.lazyFunction()
+lazy_const <- laz.LAZY_VALUE
 status_after_lazy <- ""Lazy loaded now""
 ";
 
