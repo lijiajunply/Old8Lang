@@ -18,18 +18,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/StandardLibraryImportTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/collectionlib_import_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/file_import_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/json_import_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/mathlib_import_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/multiple_stdlib_import_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/net_import_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/nonexistent_stdlib_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/os_import_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/stdlib_alias_import_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/terminal_import_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/StandardLibrary/time_import_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/Unified/main_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ModuleFactory.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/StandardLibraryImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/StandardLibraryImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_circular_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_circular_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/utils.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/utils.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/BaseModuleObject.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/EagerModuleObject.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazyImportWrapper.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazyModuleObject.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/SimpleModuleObjectProxy.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,6 +69,10 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ClassDeclarationTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
@@ -406,7 +410,7 @@
       <workItem from="1766037121468" duration="28333000" />
       <workItem from="1766082960788" duration="2522000" />
       <workItem from="1766085560295" duration="10610000" />
-      <workItem from="1766098235624" duration="6106000" />
+      <workItem from="1766098235624" duration="6800000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -751,7 +755,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="284" />
+    <option name="localTasksCounter" value="286" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -778,8 +782,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(array): 支持动态类型数组元素&#10;&#10;- 移除数组元素类型一致性检查和自动类型转换逻辑&#10;- 允许数组中存储不同类型元素&#10;- 简化数组元素赋值流程，直接使用新值&#10;- 更新相关测试用例以适应新的数组行为&#10;- 修正测试代码中字符串字面量的写法&#10;- 移除部分冗余或过时的测试方法&#10;- 调整集合初始化语法，统一使用花括号&#10;- 增强类型安全性和代码可维护性注释" />
-    <MESSAGE value="feat(array): 实现数组扩展方法和改进点操作支持&#10;&#10;- 添加 ArrayValueFuncStatic 类，提供 Sort、Distinct、Map、Filter 和 Reduce 等扩展方法&#10;- 修改 ArrayLangValue 的 Dot 方法，支持方法调用如 array.Sort()&#10;- 实现快速排序算法及相关辅助函数用于数组排序&#10;- 增强 Instance 类对 dict 构造函数的支持&#10;- 完善扩展方法查找逻辑，增加对 ArrayLangValue 类型的支持&#10;- 更新相关测试用例中的方法调用和期望值&#10;- 修复字符解析逻辑，增强对转义字符的支持&#10;- 添加 TupleValueFuncStatic 类，提供 Join 等元组操作方法&#10;- 改进 DictionaryLangValue 的方法调用和索引访问处理&#10;- 新增 ListValueFuncStatic 中的多种列表操作方法如 Concat、Find、Skip 等" />
     <MESSAGE value="feat(lang): 实现数组和字典方法调用及语法优化&#10;&#10;- 为 ArrayLangValue 添加已知方法白名单检查机制&#10;- 将 ArrayValueFuncStatic 中的实例方法重构为静态扩展方法&#10;- 在 DictionaryLangValue 中实现扩展方法动态调用支持&#10;- 优化 DictionaryValueFuncStatic.Update 方法直接修改原字典&#10;- 新增 ExecutionContext 类管理 VariateManager 的线程局部存储&#10;- 修改 Instance.FromClassToResult 支持传递 VariateManager 参数&#10;- 为 ListLangValue 添加 ClearInternal 方法并标记清空状态&#10;- 统一 FuncLangValue 调用方式，通过参数列表传递变量值&#10;- 更新测试用例中范围表达式语法从 .. 改为 [~]&#10;- 移除 ListValueFuncStatic 中重复定义的 Count 方法&#10;- 实现异步任务语法简化，支持 async/await 关键字&#10;- 添加调试用的多个 .old8 测试文件" />
     <MESSAGE value="refactor(core): 移除未使用的LangParser引用&#10;&#10;- 删除多个文件中不再需要的Old8Lang.LangParser using声明&#10;- 清理ArrayValueFuncStatic.cs中冗余的错误处理引用&#10;- 简化DictionaryLangValue.cs中的反射相关引用&#10;- 移除测试和基准测试文件中的多余依赖引用&#10;- 统一代码风格，减少不必要的命名空间导入" />
     <MESSAGE value="refactor(interpreter): 统一使用 init 函数作为构造函数并更新 this 引用&#10;&#10;- 将所有类的构造函数名称从 Init 或类名改为 init&#10;- 更新方法内部的 self 引用为 this&#10;- 修改继承关键字从 &lt; 为 extends，接口实现从 &lt; 为 implements&#10;- 调整部分代码中的语法细节以符合新的语言规范&#10;- 优化测试用例中的字符串字面量表示方式" />
@@ -803,7 +805,9 @@
     <MESSAGE value="feat(modules): 实现模块别名导入功能&#10;&#10;- 添加模块别名导入语法支持&#10;- 实现不同命名风格的别名导入测试&#10;- 支持函数级别别名访问&#10;- 解决别名与局部变量名称冲突问题&#10;- 实现链式别名访问功能&#10;- 添加多种别名导入场景测试用例" />
     <MESSAGE value="refactor(module): 优化模块加载状态管理&#10;&#10;- 移除了重复的_loadingState字段和LoadException字段&#10;- 简化了LoadingState属性的定义方式&#10;- 统一使用LoadingState属性替代原来的_loadingState字段&#10;- 更新了模块toString方法中的状态显示逻辑&#10;- 优化了模块加载过程中的状态检查逻辑" />
     <MESSAGE value="feat(modules): 实现模块系统统一接口架构&#10;&#10;- 新增统一模块接口定义文件 IModuleInterfaces.cs&#10;- 创建抽象基类 ModuleBase 和 ModuleValueBase&#10;- 实现统一工厂模式 UnifiedModuleFactory&#10;- 迁移现有模块类到新接口架构&#10;- 添加模块包装器接口支持懒加载场景&#10;- 重构 ImportStatement 支持新旧工厂模式切换&#10;- 完善模块符号管理和加载状态跟踪&#10;- 提供向后兼容性支持和渐进式迁移路径" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(modules): 实现模块系统统一接口架构&#10;&#10;- 新增统一模块接口定义文件 IModuleInterfaces.cs&#10;- 创建抽象基类 ModuleBase 和 ModuleValueBase&#10;- 实现统一工厂模式 UnifiedModuleFactory&#10;- 迁移现有模块类到新接口架构&#10;- 添加模块包装器接口支持懒加载场景&#10;- 重构 ImportStatement 支持新旧工厂模式切换&#10;- 完善模块符号管理和加载状态跟踪&#10;- 提供向后兼容性支持和渐进式迁移路径" />
+    <MESSAGE value="feat(modules): 实现标准库导入功能&#10;&#10;- 添加标准库导入测试用例&#10;- 支持 OS、MathLib、Time 等标准库导入&#10;- 实现多库同时导入功能&#10;- 支持标准库别名导入语法&#10;- 添加不存在库导入异常处理&#10;- 验证模块对象正确加载与访问&#10;- 更新模块系统架构以支持标准库&#10;- 完善 LangInfo.json 中标准库定义" />
+    <MESSAGE value="feat(modules): 实现统一模块架构并优化测试代码&#10;&#10;- 引入新的统一模块接口架构，支持更灵活的模块导入和管理&#10;- 更新条件导入测试，使用多行字符串字面量提高代码可读性&#10;- 重构配置模块，添加加载和验证函数以增强功能&#10;- 创建多个新测试模块文件，如调试、错误测试、延迟加载等&#10;- 添加统一模块架构测试类，验证新接口的正确性和兼容性&#10;- 优化现有模块文件结构，移除多余空行和调整代码布局&#10;- 确保新旧模块系统之间的向后兼容性，不影响现有功能" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(modules): 实现统一模块架构并优化测试代码&#10;&#10;- 引入新的统一模块接口架构，支持更灵活的模块导入和管理&#10;- 更新条件导入测试，使用多行字符串字面量提高代码可读性&#10;- 重构配置模块，添加加载和验证函数以增强功能&#10;- 创建多个新测试模块文件，如调试、错误测试、延迟加载等&#10;- 添加统一模块架构测试类，验证新接口的正确性和兼容性&#10;- 优化现有模块文件结构，移除多余空行和调整代码布局&#10;- 确保新旧模块系统之间的向后兼容性，不影响现有功能" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

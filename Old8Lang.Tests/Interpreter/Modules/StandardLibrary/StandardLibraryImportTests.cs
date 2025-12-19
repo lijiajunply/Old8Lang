@@ -24,7 +24,7 @@ public class StandardLibraryImportTests(ITestOutputHelper output) : ModuleImport
         // 验证 OS 库的基本功能
         var osInfo = interpreter.Manager.GetValue(new LangId("OS"));
         Assert.NotNull(osInfo);
-        Assert.IsType<LangModuleObject>(osInfo);
+        Assert.IsAssignableFrom<IModuleValueType>(osInfo);
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public class StandardLibraryImportTests(ITestOutputHelper output) : ModuleImport
         // 验证 MathLib 库的基本功能
         var mathLib = interpreter.Manager.GetValue(new LangId("MathLib"));
         Assert.NotNull(mathLib);
-        Assert.IsType<LangModuleObject>(mathLib);
+        Assert.IsAssignableFrom<IModuleValueType>(mathLib);
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public class StandardLibraryImportTests(ITestOutputHelper output) : ModuleImport
         // 验证 Time 库的基本功能
         var timeLib = interpreter.Manager.GetValue(new LangId("Time"));
         Assert.NotNull(timeLib);
-        Assert.IsType<LangModuleObject>(timeLib);
+        Assert.IsAssignableFrom<IModuleValueType>(timeLib);
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class StandardLibraryImportTests(ITestOutputHelper output) : ModuleImport
         // 验证 File 库的基本功能
         var fileLib = interpreter.Manager.GetValue(new LangId("File"));
         Assert.NotNull(fileLib);
-        Assert.IsType<LangModuleObject>(fileLib);
+        Assert.IsAssignableFrom<IModuleValueType>(fileLib);
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public class StandardLibraryImportTests(ITestOutputHelper output) : ModuleImport
         // 验证 Terminal 库的基本功能
         var terminalLib = interpreter.Manager.GetValue(new LangId("Terminal"));
         Assert.NotNull(terminalLib);
-        Assert.IsType<LangModuleObject>(terminalLib);
+        Assert.IsAssignableFrom<IModuleValueType>(terminalLib);
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public class StandardLibraryImportTests(ITestOutputHelper output) : ModuleImport
         // 验证 Net 库的基本功能
         var netLib = interpreter.Manager.GetValue(new LangId("Net"));
         Assert.NotNull(netLib);
-        Assert.IsType<LangModuleObject>(netLib);
+        Assert.IsAssignableFrom<IModuleValueType>(netLib);
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class StandardLibraryImportTests(ITestOutputHelper output) : ModuleImport
         // 验证 JSON 库的基本功能
         var jsonLib = interpreter.Manager.GetValue(new LangId("Json"));
         Assert.NotNull(jsonLib);
-        Assert.IsType<LangModuleObject>(jsonLib);
+        Assert.IsAssignableFrom<IModuleValueType>(jsonLib);
     }
 
     [Fact]
@@ -129,7 +129,7 @@ public class StandardLibraryImportTests(ITestOutputHelper output) : ModuleImport
         // 验证 CollectionLib 库的基本功能
         var collectionLib = interpreter.Manager.GetValue(new LangId("CollectionLib"));
         Assert.NotNull(collectionLib);
-        Assert.IsType<LangModuleObject>(collectionLib);
+        Assert.IsAssignableFrom<IModuleValueType>(collectionLib);
     }
 
     [Fact]
@@ -150,9 +150,9 @@ public class StandardLibraryImportTests(ITestOutputHelper output) : ModuleImport
         Assert.NotNull(mathLib);
         Assert.NotNull(timeLib);
 
-        Assert.IsType<LangModuleObject>(osLib);
-        Assert.IsType<LangModuleObject>(mathLib);
-        Assert.IsType<LangModuleObject>(timeLib);
+        Assert.IsAssignableFrom<IModuleValueType>(osLib);
+        Assert.IsAssignableFrom<IModuleValueType>(mathLib);
+        Assert.IsAssignableFrom<IModuleValueType>(timeLib);
     }
 
     [Fact]
@@ -167,7 +167,7 @@ public class StandardLibraryImportTests(ITestOutputHelper output) : ModuleImport
         // 验证带别名的标准库导入
         var mathAlias = interpreter.Manager.GetValue(new LangId("math"));
         Assert.NotNull(mathAlias);
-        Assert.IsType<LangModuleObject>(mathAlias);
+        Assert.IsAssignableFrom<IModuleValueType>(mathAlias);
 
         // 原始库名应该不存在
         var mathLib = interpreter.Manager.GetValue(new LangId("MathLib"));

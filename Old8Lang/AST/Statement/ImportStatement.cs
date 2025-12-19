@@ -104,8 +104,8 @@ public class ImportStatement(
             // 直接进入执行阶段，跳过文件系统检查
             if (ModuleAlias != null)
             {
-                // 创建一个简单的模块对象，它将直接将方法调用转发到全局作用域
-                var moduleObj = new LangModuleObject(manager);
+                // 创建统一模块对象
+                var moduleObj = ModuleFactory.CreateEagerModule(ImportString, manager, Position);
 
                 // 将模块对象添加到当前作用域
                 manager.Scopes[^1][ModuleAlias] = moduleObj;
@@ -294,11 +294,11 @@ public class ImportStatement(
             }
             else if (ModuleAlias != null)
             {
-                // 对于带别名的导入，我们直接运行模块的所有语句，将模块中的函数导入到当前作用域
-                block.Run(manager);
+                // 对于带别名的导入，创建新的统一模块对象
+                var moduleObj = ModuleFactory.CreateEagerModule(ImportString, manager, Position);
 
-                // 创建一个简单的模块对象，它将直接将方法调用转发到全局作用域
-                var moduleObj = new LangModuleObject(manager);
+                // 先执行模块代码来填充符号
+                block.Run(manager);
 
                 // 将模块对象添加到当前作用域
                 manager.Scopes[^1][ModuleAlias] = moduleObj;
@@ -308,19 +308,26 @@ public class ImportStatement(
                 // 检查是否启用新的统一工厂
                 if (UseUnifiedFactory)
                 {
-                    // 使用新的统一工厂创建模块值对象
-                    var moduleValue = UnifiedModuleFactory.CreateModuleValue(
-                        ImportString,
-                        ImportSpecifiers,
-                        FromClause,
-                        ModuleAlias,
-                        isLazy: false,
-                        IsSelective,
-                        manager,
-                        Position);
+                    // 使用新的统一模块工厂创建模块对象
+                    UnifiedModule moduleValue;
 
-                    // 先执行模块代码来填充符号
-                    block.Run(manager);
+                    if (IsSelective && ImportSpecifiers.Count > 0)
+                    {
+                        // 选择性导入
+                        var selectedSymbols = ImportSpecifiers.Select(item => item.Alias).ToList();
+                        moduleValue = ModuleFactory.CreateSelectiveModule(ImportString, selectedSymbols, manager, Position);
+                    }
+                    else
+                    {
+                        // 懒加载模块
+                        moduleValue = ModuleFactory.CreateLazyModule(ImportString, manager, Position);
+                    }
+
+                    // 先执行模块代码来填充符号（如果不是选择性导入）
+                    if (!IsSelective)
+                    {
+                        block.Run(manager);
+                    }
 
                     // 注册模块对象到变量管理器
                     RegisterModuleValue(moduleValue, manager);
@@ -490,36 +497,23 @@ public class ImportStatement(
     private void HandleLazyImport(VariateManager manager)
     {
         // 检查是否启用新的统一工厂
-        if (UseUnifiedFactory)
-        {
-            // 使用新的统一工厂创建模块值对象
-            var moduleValue = UnifiedModuleFactory.CreateModuleValue(
-                ImportString,
-                ImportSpecifiers,
-                FromClause,
-                ModuleAlias,
-                isLazy: true,
-                IsSelective,
-                manager,
-                Position);
+        // 使用新的统一模块工厂创建模块对象
+        UnifiedModule moduleValue;
 
-            RegisterModuleValue(moduleValue, manager);
+        if (IsSelective && ImportSpecifiers.Count > 0)
+        {
+            // 选择性导入
+            var selectedSymbols = ImportSpecifiers.Select(item => item.Alias).ToList();
+            moduleValue = ModuleFactory.CreateSelectiveModule(ImportString, selectedSymbols, manager, Position);
         }
         else
         {
-            // 使用旧的模块工厂创建合适的模块对象
-            var moduleObject = ModuleObjectFactory.CreateModuleObject(
-                ImportString,
-                ImportSpecifiers,
-                FromClause,
-                ModuleAlias,
-                isLazy: true,
-                IsSelective,
-                manager,
-                Position);
-
-            RegisterModuleObject(moduleObject, manager);
+            // 懒加载模块
+            moduleValue = ModuleFactory.CreateLazyModule(ImportString, manager, Position);
         }
+
+        // 注册模块对象到变量管理器
+        RegisterModuleValue(moduleValue, manager);
     }
 
     /// <summary>
@@ -613,7 +607,7 @@ public class ImportStatement(
         }
 
         // 否则创建代理对象
-        return ModuleObjectFactory.CreateModuleProxy(
+        return (LangValueType)ModuleFactory.CreateModuleProxy(
             moduleObject.ModuleName,
             manager,
             Position);
@@ -712,7 +706,7 @@ public class ImportStatement(
             {
                 if (alias != null)
                 {
-                    var moduleObj = new LangModuleObject(manager);
+                    var moduleObj = ModuleFactory.CreateEagerModule(moduleName, manager, Position);
                     manager.Scopes[^1][alias] = moduleObj;
                 }
             }
@@ -746,7 +740,7 @@ public class ImportStatement(
 
                 if (alias != null)
                 {
-                    var moduleObj = new LangModuleObject(manager);
+                    var moduleObj = ModuleFactory.CreateEagerModule(moduleName, manager, Position);
                     manager.Scopes[^1][alias] = moduleObj;
                 }
             }
