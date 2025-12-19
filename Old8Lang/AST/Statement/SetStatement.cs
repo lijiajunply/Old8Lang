@@ -265,9 +265,9 @@ public class SetStatement : OldStatement
                     {
                         // 将结果添加到实例的Result字典中，覆盖原来的值
                         anyValue.Result[memberName.IdName] = result;
-                        // 同时更新VariateManager中的值，确保后续访问能获取到最新值
+                        // 同时更新实例的Manager中的值，确保后续访问能获取到最新值
                         anyValue.Manager.Set(new LangId(memberName.IdName), result);
-                        // 同时更新当前manager中的值，确保在同一个方法中后续访问能获取到最新值
+                        // 更新当前manager中的值，确保在同一个方法中后续访问能获取到最新值
                         manager.Set(new LangId(memberName.IdName), result);
                         return;
                     }
@@ -280,9 +280,9 @@ public class SetStatement : OldStatement
                                    throw new NameError(this, "this");
                         // 将结果添加到实例的Result字典中，覆盖原来的值
                         anyValue.Result[memberName.IdName] = result;
-                        // 同时更新VariateManager中的值，确保后续访问能获取到最新值
+                        // 同时更新实例的Manager中的值，确保后续访问能获取到最新值
                         anyValue.Manager.Set(new LangId(memberName.IdName), result);
-                        // 同时更新当前manager中的值，确保在同一个方法中后续访问能获取到最新值
+                        // 更新当前manager中的值，确保在同一个方法中后续访问能获取到最新值
                         manager.Set(new LangId(memberName.IdName), result);
                         return;
                     }

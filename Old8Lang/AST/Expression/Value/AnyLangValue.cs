@@ -233,6 +233,32 @@ public class AnyLangValue : LangValueType
                         {
                             // 调用方法时使用当前管理器，这样可以访问外部变量
                             var funcResult = funcValue.Run(currentManager, methodArgs);
+
+                            // 方法调用完成后，将管理器中修改的变量同步回实例的 Result 字典
+                            // 对于直接修改的变量（如logs <- logs + "text"），需要从manager同步回实例
+                            // 但对于通过this.x <- value修改的变量，SetStatement已经直接修改了实例的Result字典
+                            // 我们需要比较并只同步真正需要同步的变量
+                            foreach (var member in Result.Keys.ToList())
+                            {
+                                var updatedValue = currentManager.GetValue(new LangId(member));
+                                if (updatedValue != null)
+                                {
+                                    // 比较字符串表示，如果不同则需要同步
+                                    var currentValueStr = Result[member].ToString();
+                                    var updatedValueStr = updatedValue.ToString();
+
+                                    if (currentValueStr != updatedValueStr)
+                                    {
+                                        // 如果新值包含内容而原值不包含，很可能是直接变量赋值需要同步
+                                        // 特别是对于字符串变量，任何修改都应该同步
+                                        if (currentValueStr != updatedValueStr && !currentValueStr.Contains(updatedValueStr))
+                                        {
+                                            Result[member] = updatedValue;
+                                        }
+                                    }
+                                }
+                            }
+
                             return funcResult;
                         }
                         finally
@@ -276,6 +302,31 @@ public class AnyLangValue : LangValueType
 
                         // 调用方法时使用当前管理器，这样可以访问外部变量
                         var funcResult = funcValue.Run(currentManager, methodArgs);
+
+                        // 方法调用完成后，将管理器中修改的变量同步回实例的 Result 字典
+                        // 对于直接修改的变量（如logs <- logs + "text"），需要从manager同步回实例
+                        // 但对于通过this.x <- value修改的变量，SetStatement已经直接修改了实例的Result字典
+                        foreach (var member in Result.Keys.ToList())
+                        {
+                            var updatedValue = currentManager.GetValue(new LangId(member));
+                            if (updatedValue != null)
+                            {
+                                // 比较字符串表示，如果不同则需要同步
+                                var currentValueStr = Result[member].ToString();
+                                var updatedValueStr = updatedValue.ToString();
+
+                                if (currentValueStr != updatedValueStr)
+                                {
+                                    // 如果新值包含内容而原值不包含，很可能是直接变量赋值需要同步
+                                    // 特别是对于字符串变量，任何修改都应该同步
+                                    if (currentValueStr != updatedValueStr && !currentValueStr.Contains(updatedValueStr))
+                                    {
+                                        Result[member] = updatedValue;
+                                    }
+                                }
+                            }
+                        }
+
                         return funcResult;
                     }
                 }
