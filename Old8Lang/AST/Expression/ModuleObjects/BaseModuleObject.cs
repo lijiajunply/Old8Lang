@@ -7,7 +7,7 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 /// <summary>
 /// 模块对象基类，提供模块对象的通用功能实现
 /// </summary>
-public abstract class BaseModuleObject : LangValueType, IModuleObject
+public abstract class BaseModuleObject : LangValueType, IModuleObject, IModuleValueType
 {
     private readonly Dictionary<string, LangValueType> Symbols = new();
     private readonly Lock LoadLock = new();

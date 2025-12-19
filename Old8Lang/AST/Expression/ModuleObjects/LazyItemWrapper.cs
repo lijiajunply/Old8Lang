@@ -8,10 +8,99 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 /// 懒加载特定项目的包装器，用于选择导入的懒加载
 /// </summary>
 public class LazyItemWrapper(string moduleName, string itemName, VariateManager manager, SourcePosition position)
-    : LangValueType(position)
+    : LangValueType(position), IModuleWrapper
 {
     private bool Loaded;
     private LangValueType? LoadedItem;
+    private readonly string _moduleName = moduleName;
+    private readonly string _itemName = itemName;
+
+    /// <summary>
+    /// 模块名称
+    /// </summary>
+    public string ModuleName => $"{_moduleName}.{_itemName}";
+
+    /// <summary>
+    /// 模块是否已加载
+    /// </summary>
+    public bool IsLoaded => Loaded;
+
+    /// <summary>
+    /// 模块加载状态
+    /// </summary>
+    public ModuleLoadingState LoadingState => Loaded ? ModuleLoadingState.Loaded : ModuleLoadingState.NotLoaded;
+
+    /// <summary>
+    /// 是否已加载（包装器特定）
+    /// </summary>
+    public bool IsWrapperLoaded => Loaded;
+
+    /// <summary>
+    /// 获取被包装的模块对象
+    /// </summary>
+    /// <returns>被包装的模块对象</returns>
+    public IModuleObject? GetWrappedModule()
+    {
+        // LazyItemWrapper 包装的是单个项目，不是完整的模块对象
+        return null;
+    }
+
+    /// <summary>
+    /// 获取模块中的符号（对于项目包装器，返回项目本身）
+    /// </summary>
+    /// <param name="symbolName">符号名称</param>
+    /// <returns>符号值</returns>
+    public LangValueType? GetSymbol(string symbolName)
+    {
+        if (!Loaded)
+        {
+            LoadItem();
+        }
+
+        // 如果请求的符号名称与项目名称匹配，返回加载的项目
+        if (string.Equals(symbolName, _itemName, StringComparison.OrdinalIgnoreCase))
+        {
+            return LoadedItem;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 检查模块是否包含指定符号
+    /// </summary>
+    /// <param name="symbolName">符号名称</param>
+    /// <returns>是否包含符号</returns>
+    public bool HasSymbol(string symbolName)
+    {
+        return string.Equals(symbolName, _itemName, StringComparison.OrdinalIgnoreCase) && GetSymbol(symbolName) != null;
+    }
+
+    /// <summary>
+    /// 获取模块中所有的导出符号名称
+    /// </summary>
+    /// <returns>符号名称列表</returns>
+    public IEnumerable<string> GetExportedSymbols()
+    {
+        if (!Loaded)
+        {
+            LoadItem();
+        }
+
+        return LoadedItem != null ? [_itemName] : [];
+    }
+
+    /// <summary>
+    /// 强制加载模块
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    public void EnsureLoaded(VariateManager manager)
+    {
+        if (!Loaded)
+        {
+            LoadItem();
+        }
+    }
 
     /// <summary>
     /// 当作为函数调用时触发懒加载

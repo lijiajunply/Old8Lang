@@ -2,4 +2,4 @@
 func debugLog(message:string) -> string {
     return "[DEBUG] " + message
 }
-const DEBUG_MODE <- true
+DEBUG_MODE:const <- true

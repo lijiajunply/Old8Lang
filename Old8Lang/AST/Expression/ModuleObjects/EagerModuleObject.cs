@@ -27,7 +27,8 @@ public class EagerModuleObject : BaseModuleObject
     /// <param name="moduleName">模块名称</param>
     /// <param name="symbols">符号字典</param>
     /// <param name="position">源码位置</param>
-    public EagerModuleObject(string moduleName, Dictionary<string, LangValueType> symbols, SourcePosition position = default)
+    public EagerModuleObject(string moduleName, Dictionary<string, LangValueType> symbols,
+        SourcePosition position = default)
         : base(moduleName, position)
     {
         AddSymbols(symbols);
@@ -64,11 +65,8 @@ public class EagerModuleObject : BaseModuleObject
         var moduleBaseName = Path.GetFileNameWithoutExtension(ModuleName);
 
         // 收集所有符号，但排除模块对象本身以避免循环引用
-        foreach (var kvp in currentScope)
+        foreach (var (symbolName, symbolValue) in currentScope)
         {
-            var symbolName = kvp.Key;
-            var symbolValue = kvp.Value;
-
             // 跳过模块自身的引用
             if (string.Equals(symbolName, moduleBaseName, StringComparison.OrdinalIgnoreCase))
                 continue;

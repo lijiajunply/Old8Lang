@@ -57,7 +57,7 @@ public class SelectiveModuleObject : BaseModuleObject
     /// 加载模块
     /// </summary>
     /// <param name="manager">变量管理器</param>
-    protected override void LoadModule(VariateManager manager)
+    protected sealed override void LoadModule(VariateManager manager)
     {
         // 创建新的作用域用于模块加载
         var newScope = new Dictionary<string, LangValueType>();

@@ -8,7 +8,7 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 /// 简单模块代理对象，用于处理带别名的模块导入
 /// 这是SimpleModuleObject的现代化替代品
 /// </summary>
-public class SimpleModuleObjectProxy : LangValueType, IModuleObject
+public class SimpleModuleObjectProxy : LangValueType, IModuleObject, IModuleValueType
 {
     private readonly string _moduleName;
     private readonly VariateManager SourceManager;

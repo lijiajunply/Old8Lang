@@ -3,6 +3,7 @@ func expensiveOperation() -> string {
     // 模拟耗时操作
     return "Expensive operation completed"
 }
-func getSimpleValue() -> int {
-    return 42
+func getDataSize() -> int {
+    HEAVY_DATA:const <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    return HEAVY_DATA.Size()
 }

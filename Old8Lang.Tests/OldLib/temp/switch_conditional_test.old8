@@ -3,19 +3,19 @@ feature_flag <- "B"
 result <- ""
 
 switch (feature_flag) {
-    case "A": {
+    case "A" {
         import "switch_module_a" as mod
         result <- mod.featureA()
     }
-    case "B": {
+    case "B" {
         import "switch_module_b" as mod
         result <- mod.featureB()
     }
-    case "C": {
+    case "C" {
         import "switch_module_c" as mod
         result <- mod.featureC()
     }
-    default: {
+    default {
         result <- "No feature activated"
     }
 }

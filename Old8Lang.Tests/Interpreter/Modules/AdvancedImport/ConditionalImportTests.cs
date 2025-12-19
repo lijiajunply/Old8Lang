@@ -35,7 +35,7 @@ public class ConditionalImportTests : ModuleImportTestBase
 func debugLog(message:string) -> string {
     return ""[DEBUG] "" + message
 }
-const DEBUG_MODE <- true
+DEBUG_MODE:const <- true
 ";
 
         var testContent = @"
@@ -160,7 +160,7 @@ result <- result_list[0]  // 应该只有日志信息
 func advancedFeature() -> string {
     return ""Advanced functionality""
 }
-const VERSION <- ""2.0""
+VERSION:const <- ""2.0""
 ";
 
         var testContent = @"
@@ -326,19 +326,19 @@ feature_flag <- ""B""
 result <- """"
 
 switch (feature_flag) {
-    case ""A"": {
+    case ""A"" {
         import ""switch_module_a"" as mod
         result <- mod.featureA()
     }
-    case ""B"": {
+    case ""B"" {
         import ""switch_module_b"" as mod
         result <- mod.featureB()
     }
-    case ""C"": {
+    case ""C"" {
         import ""switch_module_c"" as mod
         result <- mod.featureC()
     }
-    default: {
+    default {
         result <- ""No feature activated""
     }
 }

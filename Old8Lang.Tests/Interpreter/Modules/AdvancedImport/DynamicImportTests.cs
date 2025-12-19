@@ -38,7 +38,7 @@ func add(a:double, b:double) -> double {
 func multiply(a:double, b:double) -> double {
     return a * b
 }
-const PI <- 3.14159
+PI:const <- 3.14159
 ";
 
         var testContent = @"
