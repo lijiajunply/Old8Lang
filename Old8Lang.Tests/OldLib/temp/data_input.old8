@@ -1,0 +1,9 @@
+
+func readCSV(filePath:string) -> list {
+    // 模拟读取CSV数据
+    return {{1, 2, 3, 4, 5}}
+}
+func readJSON(filePath:string) -> list {
+    // 模拟读取JSON数据
+    return {{10, 20, 30}}
+}

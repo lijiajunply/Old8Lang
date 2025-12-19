@@ -1,0 +1,11 @@
+
+func createLogger(config:dict) -> string {
+    if config["debug"] {
+        return "DEBUG logger created"
+    } else {
+        return "INFO logger created"
+    }
+}
+func log(message:string, level:string) -> string {
+    return "[" + level + "] " + message
+}

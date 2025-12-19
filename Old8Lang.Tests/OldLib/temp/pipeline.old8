@@ -1,0 +1,24 @@
+
+import "data_input" as input
+import "data_transform" as transform
+import "data_output" as output
+
+// 数据处理管道
+func processDataPipeline(inputFile:string) -> dict {
+    // 1. 读取数据
+    rawData <- input.readCSV(inputFile)
+
+    // 2. 转换数据：过滤大于2的值，然后乘以3
+    filteredData <- transform.filter(rawData, 2)
+    transformedData <- transform.map(filteredData, 3)
+
+    // 3. 输出统计信息
+    stats <- output.calculateStats(transformedData)
+
+    // 4. 写入文件（模拟）
+    output.writeCSV(transformedData, "output.csv")
+
+    return stats
+}
+
+result <- processDataPipeline("data.csv")

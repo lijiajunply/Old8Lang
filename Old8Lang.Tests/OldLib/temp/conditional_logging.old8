@@ -1,0 +1,7 @@
+
+func logInfo(message:string) -> string {
+    return "[INFO] " + message
+}
+func logError(message:string) -> string {
+    return "[ERROR] " + message
+}

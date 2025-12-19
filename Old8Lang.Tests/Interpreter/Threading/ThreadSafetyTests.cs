@@ -8,14 +8,9 @@ namespace Old8Lang.Tests.Interpreter.Threading;
 [Trait("Category", "Interpreter")]
 [Trait("Category", "Interpreter-Threading")]
 [Trait("Category", "Interpreter-ThreadSafety")]
-public class ThreadSafetyTests
+public class ThreadSafetyTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public ThreadSafetyTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     private Dictionary<string, object> TestInterpreter(string code)
     {

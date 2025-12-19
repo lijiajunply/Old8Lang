@@ -1,0 +1,3 @@
+
+func baseFunction() -> string { return "Base" }
+const BASE_CONST <- 10

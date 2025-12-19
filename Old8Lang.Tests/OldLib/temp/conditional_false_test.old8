@@ -1,0 +1,11 @@
+
+is_debug <- false
+
+if (is_debug) {
+    import "debug_module" as debug
+    result <- debug.debugLog("Debug message")
+    debug_mode <- debug.DEBUG_MODE
+} else {
+    result <- "Production mode"
+    debug_mode <- false
+}

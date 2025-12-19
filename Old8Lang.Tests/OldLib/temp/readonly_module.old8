@@ -1,0 +1,2 @@
+
+func getValue() -> int { return 42 }

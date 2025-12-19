@@ -1,0 +1,5 @@
+
+import "conditional_circular_a" as a
+import "conditional_circular_b" as b
+result1 <- a.funcA()
+result2 <- b.funcB()

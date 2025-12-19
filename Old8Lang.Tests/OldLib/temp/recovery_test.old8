@@ -1,0 +1,8 @@
+
+try {
+    import "recovery_module_a" as a
+    import "recovery_module_b" as b
+    result <- "No circular dependency detected"
+} catch (error) {
+    result <- "Circular dependency: " + error.Message
+}

@@ -1,2 +1,2 @@
 import "math"
-result <- Sqrt(100)
+result <- sqrt(100)

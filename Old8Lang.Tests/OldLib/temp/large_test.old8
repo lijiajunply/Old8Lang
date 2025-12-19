@@ -1,0 +1,3 @@
+
+import "large_module"
+result <- "loaded"

@@ -1,0 +1,7 @@
+
+func authenticate(token:string) -> bool {
+    return token == "valid_token"
+}
+func getUserInfo(userId:int) -> dict {
+    return {"id": userId, "name": "User " + userId.ToStr()}
+}

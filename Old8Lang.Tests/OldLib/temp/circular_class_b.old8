@@ -1,0 +1,9 @@
+
+import "circular_class_a"
+class ClassB {
+    fieldB <- 20
+
+    public func getValue() -> int {
+        return fieldB
+    }
+}

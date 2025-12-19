@@ -1,2 +1,2 @@
-import "math"
+import "MathLib"
 result <- Ceil(3.14)

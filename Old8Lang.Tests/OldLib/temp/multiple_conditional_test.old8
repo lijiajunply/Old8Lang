@@ -1,0 +1,17 @@
+
+enable_logging <- true
+enable_metrics <- false
+
+result_list <- {}
+
+if (enable_logging) {
+    import "conditional_logging" as logging
+    result_list.Add(logging.logInfo("Application started"))
+}
+
+if (enable_metrics) {
+    import "conditional_metrics" as metrics
+    result_list.Add(metrics.trackEvent("startup"))
+}
+
+result <- result_list[0]  // 应该只有日志信息

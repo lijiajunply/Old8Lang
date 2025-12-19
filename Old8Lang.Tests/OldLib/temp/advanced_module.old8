@@ -1,0 +1,5 @@
+
+func advancedFeature() -> string {
+    return "Advanced functionality"
+}
+const VERSION <- "2.0"

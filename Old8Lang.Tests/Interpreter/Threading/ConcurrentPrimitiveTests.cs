@@ -10,14 +10,9 @@ using System.Collections.Generic;
 [Trait("Category", "Interpreter")]
 [Trait("Category", "Interpreter-Threading")]
 [Trait("Category", "Interpreter-Concurrency")]
-public class ConcurrentPrimitiveTests
+public class ConcurrentPrimitiveTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public ConcurrentPrimitiveTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    private readonly ITestOutputHelper _output = output;
 
     private Dictionary<string, object> TestInterpreter(string code)
     {

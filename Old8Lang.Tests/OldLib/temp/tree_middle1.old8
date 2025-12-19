@@ -1,0 +1,9 @@
+
+import "tree_leaf1"
+import "tree_leaf2"
+func middle1Function() -> string {
+    return "Middle1: " + leaf1Function() + " + " + leaf2Function()
+}
+func getMiddle1Sum() -> int {
+    return LEAF1_CONST + LEAF2_CONST
+}

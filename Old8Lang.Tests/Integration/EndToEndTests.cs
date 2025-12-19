@@ -10,15 +10,8 @@ namespace Old8Lang.Tests.Integration;
 /// 模拟实际使用中的复杂业务逻辑和操作
 /// </summary>
 [Collection("Sequential")]
-public class EndToEndTests
+public class EndToEndTests(ITestOutputHelper testOutputHelper)
 {
-    private readonly ITestOutputHelper TestOutputHelper;
-
-    public EndToEndTests(ITestOutputHelper testOutputHelper)
-    {
-        TestOutputHelper = testOutputHelper;
-    }
-
     #region 数学计算场景 (3 个)
 
     [Fact]
@@ -341,14 +334,14 @@ public class EndToEndTests
         Assert.Equal("D", ((StringLangValue)interpreter.Manager.GetValue(new LangId("grade3"))!).Value);
 
         // 调试AST结构
-        TestOutputHelper.WriteLine($"AST structure: {ast.GetType().Name} with {ast.Count} statements");
+        testOutputHelper.WriteLine($"AST structure: {ast.GetType().Name} with {ast.Count} statements");
         for (int i = 0; i < ast.Count; i++)
         {
-            TestOutputHelper.WriteLine($"  Statement {i}: {ast[i].GetType().Name} - {ast[i]}");
+            testOutputHelper.WriteLine($"  Statement {i}: {ast[i].GetType().Name} - {ast[i]}");
         }
 
         // 检查所有相关变量
-        TestOutputHelper.WriteLine("=== All variables check ===");
+        testOutputHelper.WriteLine("=== All variables check ===");
 
         var allVariables = new[] {
             "order1", "order2", "totalRevenue",
@@ -360,12 +353,12 @@ public class EndToEndTests
         foreach (var varName in allVariables)
         {
             var value = interpreter.Manager.GetValue(new LangId(varName));
-            TestOutputHelper.WriteLine($"{varName}: {value} ({value?.GetType().Name})");
+            testOutputHelper.WriteLine($"{varName}: {value} ({value?.GetType().Name})");
 
             // 检查是否包含"Task"字符串
             if (value?.GetType().Name.Contains("Task") == true)
             {
-                TestOutputHelper.WriteLine($"  ⚠️  WARNING: {varName} appears to be a Task type!");
+                testOutputHelper.WriteLine($"  ⚠️  WARNING: {varName} appears to be a Task type!");
             }
         }
 
@@ -377,14 +370,14 @@ public class EndToEndTests
 
         if (score1Val is IntLangValue s1 && score2Val is IntLangValue s2 && score3Val is IntLangValue s3 && passCountVal is IntLangValue pc)
         {
-            TestOutputHelper.WriteLine($"Score values: score1={s1.Value}, score2={s2.Value}, score3={s3.Value}");
-            TestOutputHelper.WriteLine($"Expected passCount: 2, Actual: {pc.Value}");
+            testOutputHelper.WriteLine($"Score values: score1={s1.Value}, score2={s2.Value}, score3={s3.Value}");
+            testOutputHelper.WriteLine($"Expected passCount: 2, Actual: {pc.Value}");
 
             // 手动验证比较操作
-            TestOutputHelper.WriteLine("Manual comparison checks:");
-            TestOutputHelper.WriteLine($"  score1 >= 70: {s1.Value >= 70}");
-            TestOutputHelper.WriteLine($"  score2 >= 70: {s2.Value >= 70}");
-            TestOutputHelper.WriteLine($"  score3 >= 70: {s3.Value >= 70}");
+            testOutputHelper.WriteLine("Manual comparison checks:");
+            testOutputHelper.WriteLine($"  score1 >= 70: {s1.Value >= 70}");
+            testOutputHelper.WriteLine($"  score2 >= 70: {s2.Value >= 70}");
+            testOutputHelper.WriteLine($"  score3 >= 70: {s3.Value >= 70}");
 
             Assert.Equal(2, pc.Value);
         }

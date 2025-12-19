@@ -1,0 +1,13 @@
+
+func add(a:double, b:double) -> double {
+    return a + b
+}
+func subtract(a:double, b:double) -> double {
+    return a - b
+}
+func multiply(a:double, b:double) -> double {
+    return a * b
+}
+func divide(a:double, b:double) -> double {
+    return a / b
+}

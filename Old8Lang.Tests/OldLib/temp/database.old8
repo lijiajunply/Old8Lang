@@ -1,0 +1,10 @@
+
+func connect(connectionString:string) -> string {
+    return "Connected to: " + connectionString
+}
+func query(sql:string) -> string {
+    return "Query result for: " + sql
+}
+func close() -> string {
+    return "Connection closed"
+}

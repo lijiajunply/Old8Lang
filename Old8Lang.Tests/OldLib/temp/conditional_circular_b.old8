@@ -1,0 +1,7 @@
+
+if (false) {
+    import "conditional_circular_a"
+}
+func funcB() -> string {
+    return "B"
+}

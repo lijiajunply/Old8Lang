@@ -1,2 +1,2 @@
-import "math"
+import "MathLib"
 result <- Abs(-5)

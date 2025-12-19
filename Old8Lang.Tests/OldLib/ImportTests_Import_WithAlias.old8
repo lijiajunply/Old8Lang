@@ -1,2 +1,2 @@
-import "math" as m
+import "MathLib" as m
 result <- m.sqrt(25)

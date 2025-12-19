@@ -1,0 +1,8 @@
+
+func goodFunction() -> string {
+    return "This works"
+}
+
+func badFunction() -> int {
+    return 1 / 0  // 这会导致运行时错误
+}

@@ -18,18 +18,238 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ClassDeclarationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ClassDeclarationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/InheritanceTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/InheritanceTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/BaseModuleObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/BaseModuleObject.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/EagerModuleObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/EagerModuleObject.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/IModuleObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/IModuleObject.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazyImportWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazyImportWrapper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazyItemWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazyItemWrapper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazyModuleObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazyModuleObject.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ModuleObjectFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ModuleObjectFactory.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/SelectiveModuleObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/SelectiveModuleObject.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/SimpleModuleObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/SimpleModuleObject.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/SimpleModuleObjectProxy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/SimpleModuleObjectProxy.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/AliasImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/SelectiveImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/SimpleImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/WildcardImportTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Core/TestFileSystemHelper.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/ErrorHandling/CircularDependencyTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/ErrorHandling/ImportErrorTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Integration/ComplexImportScenariosTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Integration/RealWorldUsageTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/absolute_dynamic.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/advanced_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/alias__private_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/alias_conflict_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/alias_m_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/alias_math_lib_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/alias_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/alias_module123_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/auth.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/calculator_dynamic.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/chained_alias_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/circular_class_a.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/circular_class_b.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/circular_class_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/circular_module_a.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/circular_module_b.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/circular_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/class_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/complex_circular_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/complex_conditional_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/conditional_base.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/conditional_circular_a.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/conditional_circular_b.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/conditional_circular_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/conditional_enhanced.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/conditional_false_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/conditional_logging.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/conditional_metrics.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/conditional_network_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/conditional_true_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/config.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/config_app.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/constants_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/constants_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/core.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/counter_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/data_input.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/data_output.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/data_transform.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/database.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/debug_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/dependency_tree_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/dependent_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/diamond_a.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/diamond_b.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/diamond_c.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/diamond_d.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/diamond_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/dynamic_absolute_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/dynamic_alias.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/dynamic_alias_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/dynamic_config.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/dynamic_config_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/dynamic_error_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/dynamic_expression_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/dynamic_looped_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/dynamic_math.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/dynamic_path_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/dynamic_user_input_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/eager_lazy_mix_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/eager_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/empty_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/empty_path_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/empty_selective_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/empty_selective_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/empty_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/empty_wildcard_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/empty_wildcard_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/error_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/error_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/expensive_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/factory_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/game.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/geometry.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/geometry_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/graphics.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/heavy_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/helpers.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/indirect_circular_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/indirect_module_a.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/indirect_module_b.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/indirect_module_c.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/invalid_syntax_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/large_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/large_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/large_wildcard_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/large_wildcard_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_circular_a.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_circular_b.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_circular_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_conditional_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_error_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_heavy_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_module_a.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_module_b.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_multiple_access_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_wildcard_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_wildcard_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/level1_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/level2_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/logger.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/math.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/math_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/math_wildcard.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/microservice_api_gateway.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/microservice_auth.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/microservice_data.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/microservice_notification.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/microservice_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/missing_dependency_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/mixed_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/mixed_selective_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/module1.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/module2.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/module_factory.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/multi_alias_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/multi_func_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/multi_func_test_multiple_functions.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/multi_func_test_single_function.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/multi_func_test_two_functions.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/multiple_conditional_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/multiple_wildcard_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/nested_conditional_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/nested_functions_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/nested_functions_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/nested_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/null_path_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/parent_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/pipeline.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/plugin1.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/plugin2.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/plugin3.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/plugin_a.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/plugin_architecture_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/plugin_b.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/plugin_interface.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/plugin_loader.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/process_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/readonly_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/readonly_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/recovery_module_a.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/recovery_module_b.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/recovery_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/runtime_advanced.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/runtime_basic.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/runtime_error_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/runtime_error_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/runtime_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/runtime_prod_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/runtime_selection_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/runtime_test_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/selective_alias_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/selective_class_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/selective_error_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/selective_no_conflict_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/self_dependency_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/self_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/simple_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/state_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/state_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/string_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/string_wildcard.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/suspicious_path_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/switch_conditional_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/switch_module_a.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/switch_module_b.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/switch_module_c.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/syntax_error_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/test_error.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/test_math.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/tree_leaf1.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/tree_leaf2.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/tree_leaf3.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/tree_middle1.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/tree_middle2.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/tree_root.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/try_catch_conditional_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/utils.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/versioned1.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/versioned2.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/visibility_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/visibility_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/webapp.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_classes.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_classes_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_conflict_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_constants.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_constants_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_module1.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_module2.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_syntax_all_keyword.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_syntax_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_syntax_star_wildcard.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/working_module.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/run_module_tests.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/ImportTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ConcurrentPrimitiveTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ConcurrentPrimitiveTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ThreadSafetyTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ThreadSafetyTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_AliasFunction.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_AliasFunction.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_CircularDependency.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_CircularDependency.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_ConditionalImport.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_ConditionalImport.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_ConstantImport.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_ConstantImport.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_DynamicImport.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_DynamicImport.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_ImportedInClass.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_ImportedInClass.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_ImportedInFunction.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_ImportedInFunction.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_LazyImport.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_LazyImport.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_MultipleModules.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_MultipleModules.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_NamespaceImport.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_NamespaceImport.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_NestedModule.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_NestedModule.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_ReimportSameModule.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_ReimportSameModule.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_SpecificFunction.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_SpecificFunction.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_VersionedImport.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_VersionedImport.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_WithAlias.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_WithAlias.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_WithWildCard.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_WithWildCard.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -72,6 +292,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ClassDeclarationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/ModuleObjects/BaseModuleObject.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
@@ -401,7 +622,7 @@
       <workItem from="1766037121468" duration="28333000" />
       <workItem from="1766082960788" duration="2522000" />
       <workItem from="1766085560295" duration="10610000" />
-      <workItem from="1766098235624" duration="2173000" />
+      <workItem from="1766098235624" duration="3428000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -746,7 +967,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="280" />
+    <option name="localTasksCounter" value="281" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -773,7 +994,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(interpreter): 支持函数重载和类型检查&#10;&#10;- 修改 Dot 方法签名，添加 VariateManager 参数以支持运行时类型检查&#10;- 更新 ArrayLangValue、DictionaryLangValue、ListLangValue 等类型的 Dot 实现&#10;- 改进 FuncInit 函数定义检查逻辑，增加参数类型和返回类型匹配&#10;- 完善 Instance 类中的函数重载解析机制，支持基于参数类型的精确匹配&#10;- 修复 ControlFlowTests 和 JumpStatementsTests 中的循环语法错误&#10;- 更新 FunctionCallTests 和 FunctionOverloadTests 中的函数声明语法&#10;- 增强 TryStatement 对 return 语句的处理能力&#10;- 移除 PrimaryParser 中对 await 表达式的冗余处理&#10;- 优化 ThreadClassLangValue 和 TaskClassLangValue 的参数执行逻辑&#10;- 补充 VariateManager.GetFunc 方法注释，明确其仅匹配函数名和参数数量" />
     <MESSAGE value="fix(interpreter): 修正算术运算和布尔值测试中的类型检查与预期值&#10;&#10;- 更新 ArithmeticTests 中的断言以使用 IntLangValue 替代 DoubleLangValue&#10;- 修正 AwaitTests 中循环语法从 range 表达式改为数组枚举&#10;- 在 BoolLangValue.ToString() 中明确返回 &quot;true&quot; 或 &quot;false&quot;&#10;- 简化 ClassMemberId 中互斥修饰符检查的 LINQ 查询&#10;- 更新 ControlFlowTests 中字符串比较期望值为大写 &quot;True&quot;&#10;- 修正 FunctionCallTests 和相关测试中的函数声明及调用细节&#10;- 改正 LambdaTests 中闭包和阶乘函数的定义方式&#10;- 优化 Operation 类型处理中的条件判断结构&#10;- 更新 SetStatement 中字典类型的别名为 &quot;dict&quot; 并增加 any/task 类型支持&#10;- 修复 StringTemplateTests 中的断言并调整模板字符串格式&#10;- 统一 ThrowTests 与 TryCatchTests 中布尔值输出为小写形式" />
     <MESSAGE value="test(interpreter): 将布尔断言从 Assert.Equal 改为 Assert.True/False&#10;&#10;- 统一使用 Assert.True 和 Assert.False 来验证布尔值&#10;- 替换所有 Assert.Equal(true, ...) 的调用&#10;- 替换所有 Assert.Equal(false, ...) 的调用&#10;- 提高测试代码的一致性和可读性" />
     <MESSAGE value="refactor(interpreter): 优化函数重载与类型比较逻辑&#10;&#10;- 删除不支持按返回类型重载的测试用例&#10;- 统一构造函数命名规范，使用 init 替代 Init&#10;- 修正字符转整数方法调用，使用 ToInt() 替代 ToInt32()&#10;- 更新高阶函数参数类型声明，function 替代 func&#10;- 移除冗余的 lambda 数组操作测试&#10;- 强化列表与元组的类型比较逻辑，防止互相混淆&#10;- 明确元组类型标识，增强类型安全性&#10;- 修正循环初始化语法，统一使用花括号初始化集合&#10;- 增加类型检查注释，提升代码可维护性" />
@@ -798,7 +1018,8 @@
     <MESSAGE value="fix(tests): 修正逻辑表达式和类型转换测试用例&#10;&#10;- 修正 LogicalTests 中 XOR 表达式的结果断言&#10;- 更新数组比较测试中的数组初始化值&#10;- 移除 TupleToList 和 ListToTuple 的类型转换测试&#10;- 增强 ValueTypeFuncStatic 对 ListLangValue 到 ArrayLangValue 的转换支持" />
     <MESSAGE value="feat(lang): 为数组和列表添加 ToList 和 ToArray 转换方法&#10;&#10;- 在 ArrayLangValue 中添加 &quot;ToList&quot; 方法支持&#10;- 在 ListValueFuncStatic 中实现 ToArray 转换函数&#10;- 更新 IDE 工作区配置和调试设置&#10;- 增加类型转换测试用例以验证新功能&#10;- 修正逻辑表达式测试中断言错误&#10;- 移除过时的元组与列表相互转换测试" />
     <MESSAGE value="feat(modules): 实现增强的模块导入系统&#10;&#10;- 添加对子模块导入的支持，允许使用 module.submodule 语法&#10;- 实现懒导入功能，延迟模块加载直到首次使用&#10;- 支持选择性导入，可从模块中导入特定符号&#10;- 添加模块别名功能，支持 import &quot;module&quot; as alias 语法&#10;- 改进网络模块导入警告机制，提醒用户安全风险&#10;- 优化模块路径解析逻辑，支持大小写不敏感匹配&#10;- 修复 macOS 绝对路径处理问题&#10;- 添加多种导入语法的测试用例，确保功能稳定性&#10;- 更新现有测试断言以匹配新的模块行为&#10;- 完善模块对象基类和即时加载模块对象的实现" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(modules): 实现增强的模块导入系统&#10;&#10;- 添加对子模块导入的支持，允许使用 module.submodule 语法&#10;- 实现懒导入功能，延迟模块加载直到首次使用&#10;- 支持选择性导入，可从模块中导入特定符号&#10;- 添加模块别名功能，支持 import &quot;module&quot; as alias 语法&#10;- 改进网络模块导入警告机制，提醒用户安全风险&#10;- 优化模块路径解析逻辑，支持大小写不敏感匹配&#10;- 修复 macOS 绝对路径处理问题&#10;- 添加多种导入语法的测试用例，确保功能稳定性&#10;- 更新现有测试断言以匹配新的模块行为&#10;- 完善模块对象基类和即时加载模块对象的实现" />
+    <MESSAGE value="refactor(module): 重构模块对象命名空间和属性访问&#10;&#10;- 统一模块对象相关类到 ModuleObjects 命名空间&#10;- 修复类成员访问使用 this 关键字明确指向&#10;- 修正模块加载锁变量命名一致性&#10;- 更新模块对象工厂和包装器实现&#10;- 优化错误处理中的字符串安全访问&#10;- 简化测试用例验证核心功能正确性" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(module): 重构模块对象命名空间和属性访问&#10;&#10;- 统一模块对象相关类到 ModuleObjects 命名空间&#10;- 修复类成员访问使用 this 关键字明确指向&#10;- 修正模块加载锁变量命名一致性&#10;- 更新模块对象工厂和包装器实现&#10;- 优化错误处理中的字符串安全访问&#10;- 简化测试用例验证核心功能正确性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -922,26 +1143,26 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs</url>
-          <line>333</line>
+          <line>326</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs" containingFunctionPresentation="方法 'EndToEnd_ComplexBusinessLogic_WorksCorrectly'">
             <startOffsets>
-              <option value="10848" />
+              <option value="10707" />
             </startOffsets>
             <endOffsets>
-              <option value="10941" />
+              <option value="10800" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="572" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs</url>
-          <line>330</line>
+          <line>323</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs" containingFunctionPresentation="方法 'EndToEnd_ComplexBusinessLogic_WorksCorrectly'">
             <startOffsets>
-              <option value="10791" />
+              <option value="10650" />
             </startOffsets>
             <endOffsets>
-              <option value="10820" />
+              <option value="10679" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="574" />
@@ -1088,19 +1309,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="592" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs</url>
-          <line>130</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" containingFunctionPresentation="方法 'Run'">
-            <startOffsets>
-              <option value="4135" />
-            </startOffsets>
-            <endOffsets>
-              <option value="4448" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="593" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />

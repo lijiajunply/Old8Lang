@@ -1,0 +1,21 @@
+
+plugin_names <- ["plugin1", "plugin2", "plugin3"]
+results <- {}
+total <- 0
+
+i <- 0
+while i < plugin_names.Size() {
+    module_name <- plugin_names[i]
+
+    import dynamic module_name as plugin
+    plugin_name <- plugin.getName()
+    plugin_value <- plugin.getValue()
+
+    results.Add(plugin_name)
+    total <- total + plugin_value
+
+    i <- i + 1
+}
+
+result1 <- results[0]
+result2 <- total

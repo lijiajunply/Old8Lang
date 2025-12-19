@@ -1,0 +1,18 @@
+
+import "database" as db
+import "auth" as auth
+import "utils" as utils
+
+// 模拟Web应用登录流程
+func handleLogin(username:string, password:string) -> string {
+    if auth.authenticate(username, password) {
+        connection <- db.connect("mysql://localhost/myapp")
+        token <- utils.generateToken()
+        db.close()
+        return "Login successful. Token: " + token
+    } else {
+        return "Login failed"
+    }
+}
+
+result <- handleLogin("admin", "secret")

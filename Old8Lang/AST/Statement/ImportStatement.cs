@@ -1,7 +1,6 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.ModuleObjects;
-using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
@@ -19,6 +18,7 @@ public class ImportItem(string name, string? alias = null)
     /// 导入项的原始名称
     /// </summary>
     public readonly string Name = name;
+
     /// <summary>
     /// 导入项的别名，默认与原始名称相同
     /// </summary>
@@ -48,27 +48,32 @@ public class ImportStatement(
     /// <summary>
     /// 导入的模块名称或路径
     /// </summary>
-    private readonly string importString = importString;
+    private readonly string ImportString = importString;
+
     /// <summary>
     /// 是否使用from子句
     /// </summary>
-    private readonly bool fromClause = fromClause;
+    private readonly bool FromClause = fromClause;
+
     /// <summary>
     /// 导入指定符列表，用于命名导入
     /// </summary>
     private readonly List<ImportItem> ImportSpecifiers = importSpecifiers ?? [];
+
     /// <summary>
     /// 模块别名，如import "module" as alias
     /// </summary>
-    private readonly string? moduleAlias = moduleAlias;
+    private readonly string? ModuleAlias = moduleAlias;
+
     /// <summary>
     /// 是否为懒导入，只在首次使用时加载模块
     /// </summary>
-    private readonly bool isLazy = isLazy;
+    private readonly bool IsLazy = isLazy;
+
     /// <summary>
     /// 是否为选择导入，如 from module import a, b, c
     /// </summary>
-    private readonly bool isSelective = isSelective;
+    private readonly bool IsSelective = isSelective;
 
     /// <summary>
     /// 在解释模式下执行导入语句
@@ -77,9 +82,9 @@ public class ImportStatement(
     /// <exception cref="ImportError">当导入失败时抛出</exception>
     public override void Run(VariateManager manager)
     {
-        var moduleName = importString;
+        var moduleName = ImportString;
         var attemptedPaths = new List<string>();
-        string? resolvedPath = null;
+        string? resolvedPath;
         bool isDirectory = false;
 
         // 检查是否为网络路径（URL）
@@ -92,14 +97,15 @@ public class ImportStatement(
             // 网络路径特殊处理
             // 由于我们还不支持真正的网络导入，我们可以创建一个简单的模块对象
             // 直接进入执行阶段，跳过文件系统检查
-            if (moduleAlias != null)
+            if (ModuleAlias != null)
             {
                 // 创建一个简单的模块对象，它将直接将方法调用转发到全局作用域
                 var moduleObj = new SimpleModuleObject(manager);
 
                 // 将模块对象添加到当前作用域
-                manager.Scopes[^1][moduleAlias] = moduleObj;
+                manager.Scopes[^1][ModuleAlias] = moduleObj;
             }
+
             return;
         }
 
@@ -111,37 +117,31 @@ public class ImportStatement(
         }
 
         // 懒导入处理
-        if (isLazy)
+        if (IsLazy)
         {
             HandleLazyImport(manager);
             return;
         }
 
         // 尝试解析模块路径 - 使用大小写不敏感的匹配
-        if (manager.LangInfo!.LibInfos.Any(x => string.Equals(x.LibName, moduleName, StringComparison.OrdinalIgnoreCase)))
+        if (manager.LangInfo!.LibInfos.Any(x =>
+                string.Equals(x.LibName, moduleName, StringComparison.OrdinalIgnoreCase)))
         {
-            var libInfo = manager.LangInfo.LibInfos.First(x => string.Equals(x.LibName, moduleName, StringComparison.OrdinalIgnoreCase));
+            var libInfo = manager.LangInfo.LibInfos.First(x =>
+                string.Equals(x.LibName, moduleName, StringComparison.OrdinalIgnoreCase));
             isDirectory = libInfo.IsDir;
-            
+
             // 使用实际的库名称来构建文件名，而不是用户输入的模块名称
             var fileName = libInfo.LibName;
             var ext = Path.GetExtension(fileName).ToLower();
             if (!isDirectory && ext != ".old8" && ext != ".ol")
             {
-                // 特殊处理：Math -> MathLib.old8，其他直接使用库名称.old8
-                if (string.Equals(fileName, "Math", StringComparison.OrdinalIgnoreCase))
-                {
-                    fileName = "MathLib.old8";
-                }
-                else
-                {
-                    fileName += ".old8";
-                }
+                fileName += ".old8";
             }
 
             var path = Path.Combine(manager.LangInfo.ImportPath, fileName);
             attemptedPaths.Add(path);
-            
+
             // 检查文件或目录是否存在
             // 处理 macOS 上缺少开头斜杠的绝对路径
             if (path.StartsWith("Users/") || path.StartsWith("Volumes/"))
@@ -149,7 +149,7 @@ public class ImportStatement(
                 path = "/" + path;
                 attemptedPaths.Add(path);
             }
-            
+
             if (!File.Exists(path) && !Directory.Exists(path))
             {
                 // 尝试构建绝对路径
@@ -165,6 +165,7 @@ public class ImportStatement(
                         // 所有尝试都失败，抛出导入错误
                         throw new ImportError(Position, moduleName, attemptedPaths);
                     }
+
                     path = appPath;
                 }
                 else
@@ -172,13 +173,14 @@ public class ImportStatement(
                     path = fullPath;
                 }
             }
+
             resolvedPath = path;
         }
         else if (Apis.ImportInstall(moduleName))
         {
             var libInfo = manager.LangInfo.LibInfos.First(x => x.LibName == moduleName);
             isDirectory = libInfo.IsDir;
-            
+
             // 检查文件扩展名，只支持.old8和.ol
             var fileName = moduleName;
             var ext = Path.GetExtension(fileName).ToLower();
@@ -203,20 +205,22 @@ public class ImportStatement(
             }
 
             // 修复：正确处理绝对路径和相对路径
-            var filePath = Path.IsPathRooted(fileNameLocal) ? fileNameLocal : 
-                (dic != null ? Path.Combine(dic, fileNameLocal) : fileNameLocal);
-            
+            var filePath = Path.IsPathRooted(fileNameLocal)
+                ? fileNameLocal
+                : (dic != null ? Path.Combine(dic, fileNameLocal) : fileNameLocal);
+
             if (filePath.StartsWith("Users/") || filePath.StartsWith("Volumes/"))
             {
                 filePath = "/" + filePath;
             }
-            
+
             attemptedPaths.Add(filePath);
-            
+
             if (!File.Exists(filePath))
             {
                 throw new ImportError(Position, moduleName, attemptedPaths);
             }
+
             resolvedPath = filePath;
         }
 
@@ -227,18 +231,18 @@ public class ImportStatement(
 
         // 获取绝对路径作为缓存键
         var moduleAbsolutePath = Path.GetFullPath(resolvedPath);
-        
+
         // 1. 检查循环依赖
         if (manager.ImportStack.Contains(moduleAbsolutePath))
         {
             throw new ImportError(Position, moduleName, manager.ImportStack);
         }
-        
+
         // 2. 检查模块缓存
-        if (manager.Interpreter!.ModuleCache.TryGetValue(moduleAbsolutePath, out var cachedBlock))
+        if (manager.Interpreter.ModuleCache.TryGetValue(moduleAbsolutePath, out var cachedBlock))
         {
             // 使用缓存的模块
-            if (fromClause)
+            if (FromClause)
             {
                 // 为命名导入创建独立作用域
                 manager.AddChildren();
@@ -254,25 +258,25 @@ public class ImportStatement(
             {
                 // 对于非命名导入，直接使用缓存的模块
                 // 但不要再次执行它的语句，因为函数和类已经在全局作用域中了
-                return;
             }
+
             return;
         }
-        
+
         // 3. 执行导入
         manager.ImportStack.Push(moduleAbsolutePath);
         try
         {
             var previousPath = manager.Path;
             manager.Path = moduleAbsolutePath;
-            
+
             var code = isDirectory ? Apis.FromDirectory(moduleAbsolutePath) : Apis.FromFile(moduleAbsolutePath);
             var block = manager.Interpreter.Build(code: code);
-            
+
             // 4. 缓存模块
             manager.Interpreter.ModuleCache[moduleAbsolutePath] = block;
-            
-            if (fromClause)
+
+            if (FromClause)
             {
                 // 为命名导入创建独立作用域
                 manager.AddChildren();
@@ -283,22 +287,22 @@ public class ImportStatement(
                 ImportSpecifiedMembers(manager);
                 manager.RemoveChildren();
             }
-            else if (moduleAlias != null)
+            else if (ModuleAlias != null)
             {
                 // 对于带别名的导入，我们直接运行模块的所有语句，将模块中的函数导入到当前作用域
                 block.Run(manager);
-                
+
                 // 创建一个简单的模块对象，它将直接将方法调用转发到全局作用域
                 var moduleObj = new SimpleModuleObject(manager);
-                
+
                 // 将模块对象添加到当前作用域
-                manager.Scopes[^1][moduleAlias] = moduleObj;
+                manager.Scopes[^1][ModuleAlias] = moduleObj;
             }
             else
             {
                 block.Run(manager);
             }
-            
+
             manager.Path = previousPath;
         }
         finally
@@ -307,7 +311,7 @@ public class ImportStatement(
             manager.ImportStack.Pop();
         }
     }
-    
+
     /// <summary>
     /// 只导入指定的成员到当前作用域
     /// </summary>
@@ -317,7 +321,7 @@ public class ImportStatement(
         // 获取当前作用域的所有变量（模块导出的成员）
         var currentScope = manager.Scopes[^1];
         var parentScope = manager.Scopes[^2];
-        
+
         // 如果没有指定导入成员，则导入所有成员
         if (ImportSpecifiers.Count == 0)
         {
@@ -326,9 +330,10 @@ public class ImportStatement(
             {
                 parentScope[name] = value;
             }
+
             return;
         }
-        
+
         // 只导入指定的成员
         foreach (var specifier in ImportSpecifiers)
         {
@@ -348,7 +353,7 @@ public class ImportStatement(
             else
             {
                 // 成员不存在，抛出错误
-                throw new ImportError(Position, importString, new List<string> { importString });
+                throw new ImportError(Position, ImportString, [ImportString]);
             }
         }
     }
@@ -360,8 +365,8 @@ public class ImportStatement(
     /// <param name="local">局部变量管理器，用于管理导入的模块和变量</param>
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
-        string moduleName = importString;
-        string? resolvedPath = null;
+        string moduleName = ImportString;
+        string? resolvedPath;
         bool isDirectory = false;
 
         var langInfo = Apis.ReadJson();
@@ -369,7 +374,7 @@ public class ImportStatement(
         {
             var libInfo = langInfo.LibInfos.First(x => x.LibName == moduleName);
             isDirectory = libInfo.IsDir;
-            
+
             // 检查文件扩展名，只支持.old8和.ol
             var fileName = moduleName;
             var ext = Path.GetExtension(fileName).ToLower();
@@ -401,14 +406,14 @@ public class ImportStatement(
             if (!File.Exists(resolvedPath)) return;
         }
 
-        if (resolvedPath == null)
+        if (string.IsNullOrEmpty(resolvedPath))
         {
             return;
         }
 
         // 获取绝对路径作为缓存键
         var moduleAbsolutePath = Path.GetFullPath(resolvedPath);
-        
+
         // 检查模块缓存
         if (local.Interpreter?.ModuleCache.TryGetValue(moduleAbsolutePath, out var cachedBlock) == true)
         {
@@ -425,13 +430,13 @@ public class ImportStatement(
         var importOriginalPath = local.FilePath;
         local.FilePath = moduleAbsolutePath;
         var block = local.Interpreter?.Build(code: code);
-        
+
         // 缓存模块
         if (block != null && local.Interpreter != null)
         {
             local.Interpreter.ModuleCache[moduleAbsolutePath] = block;
         }
-        
+
         block?.GenerateImportIl(ilGenerator, local);
         local.FilePath = importOriginalPath;
     }
@@ -457,12 +462,12 @@ public class ImportStatement(
     {
         // 使用模块工厂创建合适的模块对象
         var moduleObject = ModuleObjectFactory.CreateModuleObject(
-            importString,
+            ImportString,
             ImportSpecifiers,
-            fromClause,
-            moduleAlias,
+            FromClause,
+            ModuleAlias,
             isLazy: true,
-            isSelective,
+            IsSelective,
             manager,
             Position);
 
@@ -476,17 +481,17 @@ public class ImportStatement(
     /// <param name="manager">变量管理器</param>
     private void RegisterModuleObject(IModuleObject moduleObject, VariateManager manager)
     {
-        if (moduleAlias != null)
+        if (ModuleAlias != null)
         {
             // 带别名的导入：使用别名注册
-            manager.Scopes[^1][moduleAlias] = CreateModuleValue(moduleObject, manager);
+            manager.Scopes[^1][ModuleAlias] = CreateModuleValue(moduleObject, manager);
         }
-        else if (isSelective && ImportSpecifiers.Count > 0)
+        else if (IsSelective && ImportSpecifiers.Count > 0)
         {
             // 选择性导入：将每个符号直接注册到作用域
             foreach (var specifier in ImportSpecifiers)
             {
-                var symbolName = specifier.Alias ?? specifier.Name;
+                var symbolName = specifier.Alias;
                 var symbol = moduleObject.GetSymbol(specifier.Name);
                 if (symbol != null)
                 {
@@ -494,14 +499,15 @@ public class ImportStatement(
                 }
                 else
                 {
-                    throw new ImportError(this, specifier.Name, $"Symbol '{specifier.Name}' not found in module '{moduleObject.ModuleName}'");
+                    throw new ImportError(this, specifier.Name,
+                        $"Symbol '{specifier.Name}' not found in module '{moduleObject.ModuleName}'");
                 }
             }
         }
         else
         {
             // 普通导入：使用模块名注册
-            var moduleName = Path.GetFileNameWithoutExtension(importString.Trim('"'));
+            var moduleName = Path.GetFileNameWithoutExtension(ImportString.Trim('"'));
             manager.Scopes[^1][moduleName] = CreateModuleValue(moduleObject, manager);
         }
     }
@@ -553,7 +559,7 @@ public class ImportStatement(
                 if (File.Exists(filePath))
                 {
                     // 找到文件，执行导入
-                    ImportModuleFile(filePath, manager, parts[i], moduleAlias);
+                    ImportModuleFile(filePath, manager, parts[i], ModuleAlias);
                     return;
                 }
                 else if (Directory.Exists(dirPath))
@@ -564,12 +570,12 @@ public class ImportStatement(
 
                     if (File.Exists(initFile))
                     {
-                        ImportModuleFile(initFile, manager, parts[i], moduleAlias);
+                        ImportModuleFile(initFile, manager, parts[i], ModuleAlias);
                         return;
                     }
                     else if (File.Exists(indexFile))
                     {
-                        ImportModuleFile(indexFile, manager, parts[i], moduleAlias);
+                        ImportModuleFile(indexFile, manager, parts[i], ModuleAlias);
                         return;
                     }
                 }
@@ -581,7 +587,7 @@ public class ImportStatement(
             }
             else
             {
-                throw new ImportError(Position, moduleName, new List<string> { testPath });
+                throw new ImportError(Position, moduleName, [testPath]);
             }
         }
     }
@@ -604,10 +610,10 @@ public class ImportStatement(
         }
 
         // 检查缓存
-        if (manager.Interpreter!.ModuleCache.TryGetValue(moduleAbsolutePath, out var cachedBlock))
+        if (manager.Interpreter.ModuleCache.TryGetValue(moduleAbsolutePath, out var cachedBlock))
         {
             // 使用缓存的模块
-            if (fromClause)
+            if (FromClause)
             {
                 manager.AddChildren();
                 cachedBlock.ExecuteModule(manager, skipFunctionClassInit: true);
@@ -622,6 +628,7 @@ public class ImportStatement(
                     manager.Scopes[^1][alias] = moduleObj;
                 }
             }
+
             return;
         }
 
@@ -638,7 +645,7 @@ public class ImportStatement(
             // 缓存模块
             manager.Interpreter.ModuleCache[moduleAbsolutePath] = block;
 
-            if (fromClause)
+            if (FromClause)
             {
                 manager.AddChildren();
                 block.ExecuteModule(manager);
@@ -670,27 +677,27 @@ public class ImportStatement(
     /// <returns>导入语句的字符串表示</returns>
     public override string ToString()
     {
-        var lazyStr = isLazy ? "lazy " : "";
+        var lazyStr = IsLazy ? "lazy " : "";
 
-        if (isSelective)
+        if (IsSelective)
         {
             var specifiers = string.Join(", ",
                 ImportSpecifiers.Select(s => s.Name == s.Alias ? s.Name : $"{s.Name} as {s.Alias}"));
-            return $"{lazyStr}import {specifiers} from {importString}";
+            return $"{lazyStr}import {specifiers} from {ImportString}";
         }
 
         if (ImportSpecifiers.Count > 0)
         {
             var specifiers = string.Join(", ",
                 ImportSpecifiers.Select(s => s.Name == s.Alias ? s.Name : $"{s.Name} as {s.Alias}"));
-            return $"{lazyStr}import {{ {specifiers} }} from {importString}";
+            return $"{lazyStr}import {{ {specifiers} }} from {ImportString}";
         }
 
-        if (moduleAlias != null)
+        if (ModuleAlias != null)
         {
-            return $"{lazyStr}import {importString} as {moduleAlias}";
+            return $"{lazyStr}import {ImportString} as {ModuleAlias}";
         }
 
-        return $"{lazyStr}import {importString}";
+        return $"{lazyStr}import {ImportString}";
     }
 }

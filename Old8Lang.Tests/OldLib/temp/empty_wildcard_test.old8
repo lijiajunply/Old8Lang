@@ -1,0 +1,3 @@
+
+from "empty_wildcard_module" import *
+result <- "import completed"

@@ -1,0 +1,13 @@
+
+import "circular_class_b"
+class ClassA {
+    fieldA <- 10
+
+    public func getValue() -> int {
+        return fieldA + getClassBValue()
+    }
+}
+func getClassBValue() -> int {
+    instance <- ClassB()
+    return instance.getValue()
+}

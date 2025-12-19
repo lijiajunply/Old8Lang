@@ -1,0 +1,4 @@
+
+func processData(data:double) -> double {
+    return data * 2
+}

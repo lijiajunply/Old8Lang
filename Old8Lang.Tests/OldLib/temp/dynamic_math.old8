@@ -1,0 +1,8 @@
+
+func add(a:double, b:double) -> double {
+    return a + b
+}
+func multiply(a:double, b:double) -> double {
+    return a * b
+}
+const PI <- 3.14159

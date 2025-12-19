@@ -1,2 +1,2 @@
-import "math"
+import "MathLib"
 result <- 1

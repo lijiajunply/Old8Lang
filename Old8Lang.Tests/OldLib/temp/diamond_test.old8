@@ -1,0 +1,4 @@
+
+import "diamond_a" as a
+result1 <- a.getCombinedValue()
+result2 <- a.getSharedFromBoth()

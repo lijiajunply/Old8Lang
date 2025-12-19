@@ -1,0 +1,4 @@
+
+from "visibility_module" import *
+public_result <- publicFunction()
+public_const_value <- PUBLIC_CONST

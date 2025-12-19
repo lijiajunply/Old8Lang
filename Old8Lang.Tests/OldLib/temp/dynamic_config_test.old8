@@ -1,0 +1,11 @@
+
+// 模拟从配置文件读取
+config_source <- "dynamic_config"
+import dynamic config_source as config
+
+db_config <- config.getDatabaseConfig()
+cache_config <- config.getCacheConfig()
+
+result1 <- db_config["host"]
+result2 <- db_config["port"]
+result3 <- cache_config["ttl"]

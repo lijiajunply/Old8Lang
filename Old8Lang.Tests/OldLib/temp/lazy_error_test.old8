@@ -1,0 +1,15 @@
+
+lazy import "error_module" as error
+status_before_access <- "Module imported but not accessed"
+
+// 访问正常函数应该工作
+good_result <- error.goodFunction()
+status_after_good <- "Good function accessed"
+
+// 访问有问题的函数会延迟错误
+try {
+    bad_result <- error.badFunction()
+    status_after_bad <- "Bad function succeeded"
+} catch {
+    status_after_bad <- "Bad function failed as expected"
+}
