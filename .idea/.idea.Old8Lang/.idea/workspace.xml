@@ -18,12 +18,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueExpression.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_debug.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ClassDeclarationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ClassDeclarationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ConstructorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ConstructorTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -775,7 +770,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="305" />
+    <option name="localTasksCounter" value="307" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -802,8 +797,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 为数组和列表添加 ToList 和 ToArray 转换方法&#10;&#10;- 在 ArrayLangValue 中添加 &quot;ToList&quot; 方法支持&#10;- 在 ListValueFuncStatic 中实现 ToArray 转换函数&#10;- 更新 IDE 工作区配置和调试设置&#10;- 增加类型转换测试用例以验证新功能&#10;- 修正逻辑表达式测试中断言错误&#10;- 移除过时的元组与列表相互转换测试" />
-    <MESSAGE value="feat(modules): 实现增强的模块导入系统&#10;&#10;- 添加对子模块导入的支持，允许使用 module.submodule 语法&#10;- 实现懒导入功能，延迟模块加载直到首次使用&#10;- 支持选择性导入，可从模块中导入特定符号&#10;- 添加模块别名功能，支持 import &quot;module&quot; as alias 语法&#10;- 改进网络模块导入警告机制，提醒用户安全风险&#10;- 优化模块路径解析逻辑，支持大小写不敏感匹配&#10;- 修复 macOS 绝对路径处理问题&#10;- 添加多种导入语法的测试用例，确保功能稳定性&#10;- 更新现有测试断言以匹配新的模块行为&#10;- 完善模块对象基类和即时加载模块对象的实现" />
     <MESSAGE value="refactor(module): 重构模块对象命名空间和属性访问&#10;&#10;- 统一模块对象相关类到 ModuleObjects 命名空间&#10;- 修复类成员访问使用 this 关键字明确指向&#10;- 修正模块加载锁变量命名一致性&#10;- 更新模块对象工厂和包装器实现&#10;- 优化错误处理中的字符串安全访问&#10;- 简化测试用例验证核心功能正确性" />
     <MESSAGE value="feat(modules): 实现模块别名导入功能&#10;&#10;- 添加模块别名导入语法支持&#10;- 实现不同命名风格的别名导入测试&#10;- 支持函数级别别名访问&#10;- 解决别名与局部变量名称冲突问题&#10;- 实现链式别名访问功能&#10;- 添加多种别名导入场景测试用例" />
     <MESSAGE value="refactor(module): 优化模块加载状态管理&#10;&#10;- 移除了重复的_loadingState字段和LoadException字段&#10;- 简化了LoadingState属性的定义方式&#10;- 统一使用LoadingState属性替代原来的_loadingState字段&#10;- 更新了模块toString方法中的状态显示逻辑&#10;- 优化了模块加载过程中的状态检查逻辑" />
@@ -827,7 +820,9 @@
     <MESSAGE value="refactor(ast): 优化类成员查找与缓存逻辑&#10;&#10;- 将_functionLookupCache字段重命名为FunctionLookupCache&#10;- 使用模式匹配简化类型转换逻辑&#10;- 优化成员查找循环中的条件判断&#10;- 完善属性访问时的空值处理&#10;- 统一缓存条目的读取和写入方式&#10;- 增强错误处理机制，明确抛出AttributeError异常&#10;- 调整方法参数列表格式以提高可读性" />
     <MESSAGE value="feat(lang): 实现函数重载和静态变量支持&#10;&#10;- 在 AnyLangValue 中添加方法重载解析机制&#10;- 支持构造函数重载和普通方法重载&#10;- 实现 TypeTemplate 中的静态变量持久化存储&#10;- 更新 BlockStatement 以处理函数重载声明&#10;- 修改类实例化逻辑以支持重载构造函数调用&#10;- 完善测试用例以验证 this 关键字正确使用&#10;- 添加 AGENTS.md 开发指南文档" />
     <MESSAGE value="feat(typesystem): 实现类型假注和多态支持&#10;&#10;- 添加类型假注管理器 TypeAnnotationManager，支持基本类型和类型注册&#10;- 实现类型兼容性检查，包括多态类型和联合类型&#10;- 添加 const 变量支持，防止重复赋值&#10;- 实现类继承体系的类型检查和成员访问&#10;- 添加类型缓存清除机制，确保类型信息实时更新&#10;- 完善类型错误提示和调试信息&#10;- 添加类型系统单元测试，验证多态和类型安全&#10;- 重构类型检查器，分离类型假注逻辑&#10;- 添加类型信息接口和实现类，支持继承和多态&#10;- 实现类型族管理，支持子类型查询和兼容性判断" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(typesystem): 实现类型假注和多态支持&#10;&#10;- 添加类型假注管理器 TypeAnnotationManager，支持基本类型和类型注册&#10;- 实现类型兼容性检查，包括多态类型和联合类型&#10;- 添加 const 变量支持，防止重复赋值&#10;- 实现类继承体系的类型检查和成员访问&#10;- 添加类型缓存清除机制，确保类型信息实时更新&#10;- 完善类型错误提示和调试信息&#10;- 添加类型系统单元测试，验证多态和类型安全&#10;- 重构类型检查器，分离类型假注逻辑&#10;- 添加类型信息接口和实现类，支持继承和多态&#10;- 实现类型族管理，支持子类型查询和兼容性判断" />
+    <MESSAGE value="feat(interpreter): 支持带参数的类构造函数初始化&#10;&#10;- 新增 ValueExpression 类用于包装已求值的表达式&#10;- 修改 Instance.cs 中的构造函数调用逻辑，支持参数在调用者上下文求值&#10;- 调整 ClassDeclarationTests.cs 中字符串分割方式以提高兼容性&#10;- 更新 Rider 配置文件与调试设置" />
+    <MESSAGE value="fix(parser): 修复前缀运算符解析问题&#10;&#10;- 修正 not 运算符右操作数的解析逻辑，确保其能正确处理点运算符&#10;- 修正前缀负号运算符右操作数的解析逻辑，支持点运算符处理&#10;- 调整 ParsePrimary 为 ParsePower 以增强表达式解析能力&#10;- 添加测试用例验证 not 和负号运算符与成员访问的结合使用" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(parser): 修复前缀运算符解析问题&#10;&#10;- 修正 not 运算符右操作数的解析逻辑，确保其能正确处理点运算符&#10;- 修正前缀负号运算符右操作数的解析逻辑，支持点运算符处理&#10;- 调整 ParsePrimary 为 ParsePower 以增强表达式解析能力&#10;- 添加测试用例验证 not 和负号运算符与成员访问的结合使用" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

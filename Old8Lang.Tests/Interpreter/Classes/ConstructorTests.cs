@@ -19,8 +19,8 @@ public class ConstructorTests
                 public age <- 0
 
                 func init() {
-                    name <- ""Unknown""
-                    age <- 0
+                    this.name <- ""Unknown""
+                    this.age <- 0
                 }
             }
             person <- Person()
@@ -80,24 +80,26 @@ public class ConstructorTests
     public void Constructor_WithDefaultValues_InitializesCorrectly()
     {
         // Arrange
-        var code = @"
-            class Settings {
-                public theme <- ""light""
-                public fontSize <- 12
-                public notifications <- true
+        var code = """
 
-                func init(theme: ""dark"", fontSize:int = 14) {
-                    this.theme <- theme
-                    this.fontSize <- fontSize
-                }
-            }
-            settings1 <- Settings()
-            settings2 <- Settings(""light"")
-            settings3 <- Settings(""blue"", 16)
-            theme1 <- settings1.theme
-            theme2 <- settings2.theme
-            theme3 <- settings3.theme
-        ";
+                               class Settings {
+                                   public theme <- "light"
+                                   public fontSize <- 12
+                                   public notifications <- true
+
+                                   func init(theme: "dark", fontSize: 14) {
+                                       this.theme <- theme
+                                       this.fontSize <- fontSize
+                                   }
+                               }
+                               settings1 <- Settings()
+                               settings2 <- Settings("light")
+                               settings3 <- Settings("blue", 16)
+                               theme1 <- settings1.theme
+                               theme2 <- settings2.theme
+                               theme3 <- settings3.theme
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -132,13 +134,13 @@ public class ConstructorTests
                 public height <- 0
 
                 func init() {
-                    width <- 1
-                    height <- 1
+                    this.width <- 1
+                    this.height <- 1
                 }
 
                 func init(side:double) {
-                    width <- side
-                    height <- side
+                    this.width <- side
+                    this.height <- side
                 }
 
                 func init(width:double, height:double) {
@@ -332,7 +334,7 @@ public class ConstructorTests
                 }
 
                 func log(message:string) {
-                    logs.Push(message)
+                    this.logs.Add(message)
                 }
             }
 
@@ -371,7 +373,7 @@ public class ConstructorTests
                 func init(numbers:[int]) {
                     this.numbers <- numbers
                     for n in numbers {
-                        sum <- sum + n
+                        this.sum <- this.sum + n
                     }
                 }
             }
@@ -539,12 +541,12 @@ public class ConstructorTests
                 public id <- 0
 
                 func init() {
-                    count <- count + 1
-                    id <- count
+                    this.count <- count + 1
+                    this.id <- count
                 }
 
                 static func GetCount() -> int {
-                    return count
+                    return this.count
                 }
             }
 
@@ -596,11 +598,11 @@ public class ConstructorTests
 
                 func init(x:int, y:int, operation: ""add"") {
                     if operation == ""add"" {
-                        result <- x + y
+                        this.result <- x + y
                     } else if operation == ""multiply"" {
-                        result <- x * y
+                        this.result <- x * y
                     } else if operation == ""power"" {
-                        result <- x ^ y
+                        this.result <- x ^ y
                     }
                 }
             }
@@ -650,7 +652,7 @@ public class ConstructorTests
                 public level <- 1
                 public experience <- 0
 
-                func init(name:string, level:int = 1) {
+                func init(name:string, level: 1) {
                     this.name <- name
                     this.level <- level
                     this.maxHealth <- 50 + (level * 20)
@@ -660,10 +662,10 @@ public class ConstructorTests
                 }
 
                 func TakeDamage(damage:int) {
-                    health <- health - damage
+                    this.health <- this.health - damage
                     if health <= 0 {
-                        health <- 0
-                        isAlive <- false
+                        this.health <- 0
+                        this.isAlive <- false
                     }
                 }
             }
@@ -771,14 +773,14 @@ public class ConstructorTests
                     this.balance <- initialBalance
 
                     if accountType == ""savings"" {
-                        interestRate <- 0.02
-                        overdraftLimit <- 0
+                        this.interestRate <- 0.02
+                        this.overdraftLimit <- 0
                     } else if accountType == ""checking"" {
-                        interestRate <- 0.001
-                        overdraftLimit <- 500
+                        this.interestRate <- 0.001
+                        this.overdraftLimit <- 500
                     } else if accountType == ""business"" {
-                        interestRate <- 0.015
-                        overdraftLimit <- 10000
+                        this.interestRate <- 0.015
+                        this.overdraftLimit <- 10000
                     }
                 }
             }
