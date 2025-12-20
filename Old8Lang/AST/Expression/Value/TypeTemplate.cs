@@ -171,6 +171,10 @@ public class TypeTemplate(
         // 关键：将类型模板添加到实例的管理器中，这样实例就能查找自己的类型信息
         instance.Manager.AddClassAndFunc(this);
 
+        // 将全局的类型模板（TypeTemplate）和其他ImportInfo添加到实例的Manager中
+        // 这样实例的方法就可以访问全局定义的类（如Engine、Wheel等）
+        instance.Manager.AddImportInfoRange(manager.ImportInfos);
+
         return instance;
     }
 

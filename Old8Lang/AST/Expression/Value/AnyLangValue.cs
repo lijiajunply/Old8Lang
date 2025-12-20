@@ -435,6 +435,61 @@ public class AnyLangValue : LangValueType
                 // 如果没有找到，抛出AttributeError异常
                 throw new AttributeError(this, methodName, Id.IdName);
             }
+            case LangListItem listItem:
+            {
+                // 处理集合索引访问，如: car.wheels[0]
+                // 首先从实例的 Result 字典中获取集合
+                var collectionName = listItem.ListId.IdName;
+                var memberInfo = FindMember(collectionName, manager);
+
+                if (memberInfo.HasValue)
+                {
+                    var (memberId, collectionValue) = memberInfo.Value;
+
+                    // 检查访问权限
+                    bool isPrivate = memberId?.HasModifier(AccessModifierType.Private) ?? false;
+                    bool isProtected = memberId?.HasModifier(AccessModifierType.Protected) ?? false;
+                    bool isInternalAccess = CheckInternalAccess(manager);
+
+                    if ((isPrivate || isProtected) && !isInternalAccess)
+                    {
+                        throw new AttributeError(this, collectionName, Id.IdName);
+                    }
+
+                    // 计算索引值
+                    var indexValue = listItem.Key.Run(manager ?? Manager);
+
+                    // 根据集合类型进行索引访问
+                    if (collectionValue is ListLangValue list)
+                    {
+                        if (indexValue is not IntLangValue intIndex)
+                            throw new TypeError(listItem, "IntValue", indexValue.GetType().Name);
+                        return list.Get(intIndex);
+                    }
+                    else if (collectionValue is ArrayLangValue array)
+                    {
+                        if (indexValue is not IntLangValue intIndex)
+                            throw new TypeError(listItem, "IntValue", indexValue.GetType().Name);
+                        return array.Get(intIndex);
+                    }
+                    else if (collectionValue is DictionaryLangValue dict)
+                    {
+                        return dict.Get(indexValue);
+                    }
+                    else if (collectionValue is StringLangValue str)
+                    {
+                        if (indexValue is not IntLangValue intIndex)
+                            throw new TypeError(listItem, "IntValue", indexValue.GetType().Name);
+                        return str.Get(intIndex);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationError(listItem, $"不支持的集合类型: {collectionValue?.GetType().Name ?? "null"}");
+                    }
+                }
+
+                throw new AttributeError(this, collectionName, Id.IdName);
+            }
             default:
                 // 其他情况，直接运行表达式
                 // 在调用类方法时，将当前实例添加到AnyInfo中，以便this关键字访问

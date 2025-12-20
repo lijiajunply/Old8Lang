@@ -18,7 +18,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ConstructorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ConstructorTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_complex_object.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeTemplate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TypeTemplate.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,10 +72,13 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/MixinTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
@@ -83,6 +89,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/LangListItem.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/ListLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TypeTemplate.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TypeTemplate.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TypeTemplate.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TypeTemplate.cs" root0="SKIP_HIGHLIGHTING" />
@@ -770,7 +777,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="307" />
+    <option name="localTasksCounter" value="308" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -797,7 +804,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(module): 重构模块对象命名空间和属性访问&#10;&#10;- 统一模块对象相关类到 ModuleObjects 命名空间&#10;- 修复类成员访问使用 this 关键字明确指向&#10;- 修正模块加载锁变量命名一致性&#10;- 更新模块对象工厂和包装器实现&#10;- 优化错误处理中的字符串安全访问&#10;- 简化测试用例验证核心功能正确性" />
     <MESSAGE value="feat(modules): 实现模块别名导入功能&#10;&#10;- 添加模块别名导入语法支持&#10;- 实现不同命名风格的别名导入测试&#10;- 支持函数级别别名访问&#10;- 解决别名与局部变量名称冲突问题&#10;- 实现链式别名访问功能&#10;- 添加多种别名导入场景测试用例" />
     <MESSAGE value="refactor(module): 优化模块加载状态管理&#10;&#10;- 移除了重复的_loadingState字段和LoadException字段&#10;- 简化了LoadingState属性的定义方式&#10;- 统一使用LoadingState属性替代原来的_loadingState字段&#10;- 更新了模块toString方法中的状态显示逻辑&#10;- 优化了模块加载过程中的状态检查逻辑" />
     <MESSAGE value="feat(modules): 实现模块系统统一接口架构&#10;&#10;- 新增统一模块接口定义文件 IModuleInterfaces.cs&#10;- 创建抽象基类 ModuleBase 和 ModuleValueBase&#10;- 实现统一工厂模式 UnifiedModuleFactory&#10;- 迁移现有模块类到新接口架构&#10;- 添加模块包装器接口支持懒加载场景&#10;- 重构 ImportStatement 支持新旧工厂模式切换&#10;- 完善模块符号管理和加载状态跟踪&#10;- 提供向后兼容性支持和渐进式迁移路径" />
@@ -822,7 +828,8 @@
     <MESSAGE value="feat(typesystem): 实现类型假注和多态支持&#10;&#10;- 添加类型假注管理器 TypeAnnotationManager，支持基本类型和类型注册&#10;- 实现类型兼容性检查，包括多态类型和联合类型&#10;- 添加 const 变量支持，防止重复赋值&#10;- 实现类继承体系的类型检查和成员访问&#10;- 添加类型缓存清除机制，确保类型信息实时更新&#10;- 完善类型错误提示和调试信息&#10;- 添加类型系统单元测试，验证多态和类型安全&#10;- 重构类型检查器，分离类型假注逻辑&#10;- 添加类型信息接口和实现类，支持继承和多态&#10;- 实现类型族管理，支持子类型查询和兼容性判断" />
     <MESSAGE value="feat(interpreter): 支持带参数的类构造函数初始化&#10;&#10;- 新增 ValueExpression 类用于包装已求值的表达式&#10;- 修改 Instance.cs 中的构造函数调用逻辑，支持参数在调用者上下文求值&#10;- 调整 ClassDeclarationTests.cs 中字符串分割方式以提高兼容性&#10;- 更新 Rider 配置文件与调试设置" />
     <MESSAGE value="fix(parser): 修复前缀运算符解析问题&#10;&#10;- 修正 not 运算符右操作数的解析逻辑，确保其能正确处理点运算符&#10;- 修正前缀负号运算符右操作数的解析逻辑，支持点运算符处理&#10;- 调整 ParsePrimary 为 ParsePower 以增强表达式解析能力&#10;- 添加测试用例验证 not 和负号运算符与成员访问的结合使用" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(parser): 修复前缀运算符解析问题&#10;&#10;- 修正 not 运算符右操作数的解析逻辑，确保其能正确处理点运算符&#10;- 修正前缀负号运算符右操作数的解析逻辑，支持点运算符处理&#10;- 调整 ParsePrimary 为 ParsePower 以增强表达式解析能力&#10;- 添加测试用例验证 not 和负号运算符与成员访问的结合使用" />
+    <MESSAGE value="fix(interpreter): 修正构造函数中成员变量初始化问题&#10;&#10;- 在构造函数中使用 this 关键字明确指向实例成员&#10;- 修复多个类中属性初始化时缺少 this 前缀的问题&#10;- 修正日志记录方法中对实例字段的引用&#10;- 更新数值累加逻辑以正确使用实例变量&#10;- 修复静态计数器访问方式，确保通过 this 引用&#10;- 修正条件赋值语句中对实例属性的设置&#10;- 优化角色伤害处理逻辑，明确区分实例与局部变量&#10;- 改进银行账户初始化代码，统一使用 this 设置属性&#10;- 调整测试用例中的默认参数声明格式&#10;- 清理冗余提交信息并更新工作区配置记录" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(interpreter): 修正构造函数中成员变量初始化问题&#10;&#10;- 在构造函数中使用 this 关键字明确指向实例成员&#10;- 修复多个类中属性初始化时缺少 this 前缀的问题&#10;- 修正日志记录方法中对实例字段的引用&#10;- 更新数值累加逻辑以正确使用实例变量&#10;- 修复静态计数器访问方式，确保通过 this 引用&#10;- 修正条件赋值语句中对实例属性的设置&#10;- 优化角色伤害处理逻辑，明确区分实例与局部变量&#10;- 改进银行账户初始化代码，统一使用 this 设置属性&#10;- 调整测试用例中的默认参数声明格式&#10;- 清理冗余提交信息并更新工作区配置记录" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

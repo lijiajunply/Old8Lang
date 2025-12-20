@@ -380,7 +380,7 @@ public class ClassInstantiationTests
                 public make:string
                 public model:string
                 public engine:Engine
-                public wheels:Wheel
+                public wheels
                 func init(mk:string, mdl:string) {
                     this.make <- mk
                     this.model <- mdl

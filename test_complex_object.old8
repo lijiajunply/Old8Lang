@@ -1,0 +1,36 @@
+class Engine {
+    public horsepower:int
+    public cylinders:int
+    func init(hp:int, cyl:int) {
+        this.horsepower <- hp
+        this.cylinders <- cyl
+    }
+}
+class Wheel {
+    public size:int
+    public brand:string
+    func init(s:int, b:string) {
+        this.size <- s
+        this.brand <- b
+    }
+}
+class Car {
+    public make:string
+    public model:string
+    public engine:Engine
+    public wheels
+    func init(mk:string, mdl:string) {
+        this.make <- mk
+        this.model <- mdl
+        this.engine <- Engine(300, 6)
+        this.wheels <- {}
+        this.wheels.Add(Wheel(18, "Michelin"))
+        this.wheels.Add(Wheel(18, "Michelin"))
+        this.wheels.Add(Wheel(18, "Michelin"))
+        this.wheels.Add(Wheel(18, "Michelin"))
+    }
+}
+car <- Car("Tesla", "Model S")
+PrintLine("Engine horsepower: " + car.engine.horsepower.ToStr())
+PrintLine("Wheels count: " + len(car.wheels).ToStr())
+PrintLine("First wheel brand: " + car.wheels[0].brand)
