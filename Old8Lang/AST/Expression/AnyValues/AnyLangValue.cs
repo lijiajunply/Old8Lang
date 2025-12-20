@@ -336,7 +336,11 @@ public class AnyLangValue : LangValueType
         var compatibleMatches = overloads.Where(m => CanHandleArguments(m, arguments)).ToList();
         if (compatibleMatches.Count > 0)
         {
-            return compatibleMatches[0];
+            // 在兼容的方法中，选择参数数量最接近的
+            return compatibleMatches
+                .OrderBy(m => Math.Abs(m.ParameterCount - argCount))
+                .ThenBy(m => m.ParameterCount)
+                .First();
         }
 
         // 4. 找不到匹配的重载
@@ -406,8 +410,29 @@ public class AnyLangValue : LangValueType
         var expectedParams = method.ParameterCount;
         var actualParams = arguments.Count;
 
-        // 参数数量在可接受范围内
-        return actualParams <= expectedParams;
+        if (actualParams > expectedParams)
+        {
+            return false;
+        }
+
+        // 如果实际参数数量小于期望参数数量，检查缺失的参数是否都有默认值
+        if (actualParams < expectedParams)
+        {
+            var func = method.Implementation;
+            if (func?.Ids != null)
+            {
+                for (int i = actualParams; i < expectedParams; i++)
+                {
+                    var parameter = func.Ids[i];
+                    if (parameter.DefaultValue == null)
+                    {
+                        return false; // 缺失的参数没有默认值
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     /// <summary>

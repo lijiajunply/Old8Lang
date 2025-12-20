@@ -495,6 +495,7 @@ public class TypeTemplate(
             else if (expr is MethodOverloadList overloadList)
             {
                 // 重载方法列表
+                bool isFirst = true;
                 foreach (var overload in overloadList.Overloads)
                 {
                     var methodInfo = new LangMethodInfo(
@@ -507,7 +508,9 @@ public class TypeTemplate(
                         originClassName: type.ClassName
                     );
 
-                    methodTable.AddMethod(methodInfo);
+                    // 第一个重载使用默认的 allowOverride (true)，后续重载使用 false
+                    methodTable.AddMethod(methodInfo, isFirst);
+                    isFirst = false;
                 }
             }
             else
@@ -605,7 +608,16 @@ public class MethodOverloadList : LangValueType
         var compatibleMatches = Overloads.Where(overload =>
             CanHandleArguments(overload, args)).ToList();
 
-        return compatibleMatches.FirstOrDefault();
+        if (compatibleMatches.Count > 0)
+        {
+            // 在兼容的方法中，选择参数数量最接近的
+            return compatibleMatches
+                .OrderBy(overload => Math.Abs((overload.Ids?.Count ?? 0) - argCount))
+                .ThenBy(overload => overload.Ids?.Count ?? 0)
+                .First();
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -666,6 +678,19 @@ public class MethodOverloadList : LangValueType
         if (actualParams > expectedParams)
         {
             return false;
+        }
+
+        // 如果实际参数数量小于期望参数数量，检查缺失的参数是否都有默认值
+        if (actualParams < expectedParams && overload.Ids != null)
+        {
+            for (int i = actualParams; i < expectedParams; i++)
+            {
+                var parameter = overload.Ids[i];
+                if (parameter.DefaultValue == null)
+                {
+                    return false; // 缺失的参数没有默认值
+                }
+            }
         }
 
         return true;
