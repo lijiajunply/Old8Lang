@@ -167,8 +167,8 @@ public class ConstructorTests
         var area3 = interpreter.Manager.GetValue(new LangId("area3"));
 
         Assert.NotNull(area1);
-        Assert.IsType<DoubleLangValue>(area1);
-        Assert.Equal(1.0, ((DoubleLangValue)area1).Value);
+        Assert.IsType<IntLangValue>(area1);
+        Assert.Equal(1, ((IntLangValue)area1).Value);
 
         Assert.NotNull(area2);
         Assert.IsType<DoubleLangValue>(area2);
@@ -776,13 +776,13 @@ public class ConstructorTests
 
                     if accountType == ""savings"" {
                         this.interestRate <- 0.02
-                        this.overdraftLimit <- 0
+                        this.overdraftLimit <- 0.0
                     } else if accountType == ""checking"" {
                         this.interestRate <- 0.001
-                        this.overdraftLimit <- 500
+                        this.overdraftLimit <- 500.0
                     } else if accountType == ""business"" {
                         this.interestRate <- 0.015
-                        this.overdraftLimit <- 10000
+                        this.overdraftLimit <- 10000.0
                     }
                 }
             }
