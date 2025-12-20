@@ -31,7 +31,7 @@ public class FieldDefinitionTable
     /// </summary>
     public FieldDefinition? LookupField(string fieldName)
     {
-        return _fieldMap.TryGetValue(fieldName, out var field) ? field : null;
+        return _fieldMap.GetValueOrDefault(fieldName);
     }
 
     /// <summary>
@@ -78,46 +78,37 @@ public class FieldDefinitionTable
 /// 字段定义
 /// 存储字段的元数据和初始值表达式
 /// </summary>
-public class FieldDefinition
+public class FieldDefinition(
+    string fieldName,
+    LangExpression initialValueExpression,
+    HashSet<AccessModifierType>? modifiers = null,
+    bool isStatic = false,
+    string? originClassName = null)
 {
     /// <summary>
     /// 字段名
     /// </summary>
-    public string FieldName { get; }
+    public string FieldName { get; } = fieldName;
 
     /// <summary>
     /// 初始值表达式
     /// </summary>
-    public LangExpression InitialValueExpression { get; }
+    public LangExpression InitialValueExpression { get; } = initialValueExpression;
 
     /// <summary>
     /// 访问修饰符
     /// </summary>
-    public HashSet<AccessModifierType> Modifiers { get; }
+    public HashSet<AccessModifierType> Modifiers { get; } = modifiers ?? new HashSet<AccessModifierType>();
 
     /// <summary>
     /// 是否为静态字段
     /// </summary>
-    public bool IsStatic { get; }
+    public bool IsStatic { get; } = isStatic;
 
     /// <summary>
     /// 字段来源类名（用于追踪继承）
     /// </summary>
-    public string? OriginClassName { get; }
-
-    public FieldDefinition(
-        string fieldName,
-        LangExpression initialValueExpression,
-        HashSet<AccessModifierType>? modifiers = null,
-        bool isStatic = false,
-        string? originClassName = null)
-    {
-        FieldName = fieldName;
-        InitialValueExpression = initialValueExpression;
-        Modifiers = modifiers ?? new HashSet<AccessModifierType>();
-        IsStatic = isStatic;
-        OriginClassName = originClassName;
-    }
+    public string? OriginClassName { get; } = originClassName;
 
     /// <summary>
     /// 检查是否有指定修饰符

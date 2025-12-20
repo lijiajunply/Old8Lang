@@ -34,7 +34,7 @@ public class TypeTemplate(
     /// <summary>
     /// 存储运行时的静态变量值，支持在静态方法调用之间保持状态
     /// </summary>
-    private readonly Dictionary<string, LangValueType> _staticVariableValues = [];
+    private readonly Dictionary<string, LangValueType> StaticVariableValues = [];
 
     /// <summary>
     /// 获取静态变量的当前值，如果已修改则返回存储的值，否则返回初始值
@@ -44,7 +44,7 @@ public class TypeTemplate(
     /// <returns>静态变量的值</returns>
     private LangValueType GetStaticVariableValue(string variableName, VariateManager manager)
     {
-        if (_staticVariableValues.TryGetValue(variableName, out var storedValue))
+        if (StaticVariableValues.TryGetValue(variableName, out var storedValue))
         {
             return storedValue;
         }
@@ -57,7 +57,7 @@ public class TypeTemplate(
                 // 创建一个临时管理器来初始化静态变量
                 var tempManager = manager.NewManger();
                 var initialValue = value.Run(tempManager);
-                _staticVariableValues[variableName] = initialValue;
+                StaticVariableValues[variableName] = initialValue;
                 return initialValue;
             }
         }
@@ -67,7 +67,9 @@ public class TypeTemplate(
 
     public override string ToString()
     {
-        var baseStr = IsInterface ? $"InterfaceTemplate({ClassName})" : IsMixin ? $"MixinTemplate({ClassName})" : IsAbstract ? $"AbstractTypeTemplate({ClassName})" : $"TypeTemplate({ClassName})";
+        var baseStr = IsInterface ? $"InterfaceTemplate({ClassName})" :
+            IsMixin ? $"MixinTemplate({ClassName})" :
+            IsAbstract ? $"AbstractTypeTemplate({ClassName})" : $"TypeTemplate({ClassName})";
 
         if (ParentClassName != null)
         {
@@ -111,7 +113,7 @@ public class TypeTemplate(
                 }
             }
         }
-        
+
         // 处理所有实现的接口
         foreach (var interfaceName in type.ImplementsNames)
         {
@@ -119,7 +121,7 @@ public class TypeTemplate(
             {
                 // 递归获取接口的成员（接口可以继承其他接口）
                 GetAllParentMembers(manager, interfaceType, allVariates);
-                
+
                 // 添加当前接口的成员
                 foreach (var interfaceMember in interfaceType.Variates.Where(interfaceMember =>
                              !allVariates.ContainsKey(interfaceMember.Key)))
@@ -128,7 +130,7 @@ public class TypeTemplate(
                 }
             }
         }
-        
+
         // 处理所有mixin类
         foreach (var mixinName in type.MixinNames)
         {
@@ -136,7 +138,7 @@ public class TypeTemplate(
             {
                 // 递归获取mixin的父类和mixin成员
                 GetAllParentMembers(manager, mixinType, allVariates);
-                
+
                 // 添加当前mixin的成员
                 foreach (var mixinMember in mixinType.Variates.Where(mixinMember =>
                              !allVariates.ContainsKey(mixinMember.Key)))
@@ -246,7 +248,7 @@ public class TypeTemplate(
 
         // 5. 检查访问权限
         bool isPrivate = actualMemberId.HasModifier(AccessModifierType.Private);
-        
+
         // 直接检查成员是否是私有的，如果是，外部无法访问
         // 静态成员的私有访问控制：只有类内部可以访问
         if (isPrivate)
@@ -300,9 +302,9 @@ public class TypeTemplate(
                     {
                         var variableName = staticKey.IdName;
                         var tempValue = tempManager.GetValue(new LangId(variableName));
-                        if (tempValue is LangValueType updatedValue)
+                        if (tempValue != null)
                         {
-                            _staticVariableValues[variableName] = updatedValue;
+                            StaticVariableValues[variableName] = tempValue;
                         }
                     }
                 }
@@ -342,7 +344,7 @@ public class TypeTemplate(
     private LangValueType TryCreateInstanceOrCallStaticMethod(Instance instance, VariateManager manager)
     {
         // 首先检查是否是嵌套类的实例化
-        if (instance.Ids.Count == 0)  // 没有参数，可能是类实例化
+        if (instance.Ids.Count == 0) // 没有参数，可能是类实例化
         {
             // 查找嵌套类
             foreach (var (memberId, memberExpr) in Variates)
@@ -381,12 +383,12 @@ public class TypeTemplate(
     /// 类型元数据缓存（V2 架构）
     /// 只构建一次，所有实例共享
     /// </summary>
-    private ClassMetadata? _metadataCache;
+    private ClassMetadata? MetadataCache;
 
     /// <summary>
     /// 元数据属性（V2 架构）
     /// </summary>
-    public ClassMetadata? Metadata => _metadataCache;
+    public ClassMetadata? Metadata => MetadataCache;
 
     /// <summary>
     /// 构建类型元数据（V2 架构）
@@ -394,11 +396,11 @@ public class TypeTemplate(
     /// </summary>
     public ClassMetadata BuildMetadata(VariateManager manager)
     {
-        if (_metadataCache != null)
-            return _metadataCache;
+        if (MetadataCache != null)
+            return MetadataCache;
 
         // 创建 ClassMetadata
-        _metadataCache = new ClassMetadata(
+        MetadataCache = new ClassMetadata(
             className: ClassName,
             parentClassName: ParentClassName,
             interfaceNames: ImplementsNames,
@@ -409,7 +411,7 @@ public class TypeTemplate(
         );
 
         // 构建方法表和字段表
-        BuildMethodTableAndFieldTable(manager, this, _metadataCache.MethodTable, _metadataCache.FieldTable);
+        BuildMethodTableAndFieldTable(manager, this, MetadataCache.MethodTable, MetadataCache.FieldTable);
 
         // 初始化静态成员
         foreach (var (memberId, expr) in StaticVariates)
@@ -417,11 +419,11 @@ public class TypeTemplate(
             if (expr is not FuncLangValue)
             {
                 var value = expr.Run(manager);
-                _metadataCache.StaticMembers[memberId.IdName] = value;
+                MetadataCache.StaticMembers[memberId.IdName] = value;
             }
         }
 
-        return _metadataCache;
+        return MetadataCache;
     }
 
     /// <summary>
@@ -438,11 +440,8 @@ public class TypeTemplate(
         {
             if (manager.GetAny(new LangId(type.ParentClassName)) is TypeTemplate parentType)
             {
-                // 递归处理祖父类
+                // 递归处理父类（会添加父类及其祖先的所有成员）
                 BuildMethodTableAndFieldTable(manager, parentType, methodTable, fieldTable);
-
-                // 添加父类的成员
-                AddMembersToTables(parentType, methodTable, fieldTable);
             }
         }
 
@@ -452,7 +451,6 @@ public class TypeTemplate(
             if (manager.GetAny(new LangId(interfaceName)) is TypeTemplate interfaceType)
             {
                 BuildMethodTableAndFieldTable(manager, interfaceType, methodTable, fieldTable);
-                AddMembersToTables(interfaceType, methodTable, fieldTable);
             }
         }
 
@@ -462,7 +460,6 @@ public class TypeTemplate(
             if (manager.GetAny(new LangId(mixinName)) is TypeTemplate mixinType)
             {
                 BuildMethodTableAndFieldTable(manager, mixinType, methodTable, fieldTable);
-                AddMembersToTables(mixinType, methodTable, fieldTable);
             }
         }
 
@@ -565,7 +562,7 @@ public class MethodOverloadList : LangValueType
     /// 构造函数
     /// </summary>
     /// <param name="overloads">重载方法列表</param>
-    public MethodOverloadList(List<FuncLangValue> overloads)
+    public MethodOverloadList(List<FuncLangValue>? overloads)
     {
         Overloads = overloads ?? new List<FuncLangValue>();
     }
@@ -614,7 +611,8 @@ public class MethodOverloadList : LangValueType
     /// <summary>
     /// 通过类型匹配选择最佳的重载
     /// </summary>
-    private FuncLangValue? ResolveByTypeMatching(List<FuncLangValue> candidates, List<LangExpression> args, VariateManager manager)
+    private FuncLangValue? ResolveByTypeMatching(List<FuncLangValue> candidates, List<LangExpression> args,
+        VariateManager manager)
     {
         var scoredCandidates = new List<(FuncLangValue candidate, int score)>();
 
@@ -633,25 +631,23 @@ public class MethodOverloadList : LangValueType
                     else
                     {
                         var argValue = args[i].Run(manager);
-                        if (argValue != null)
+                        string actualTypeName = argValue.GetType().Name;
+                        if (actualTypeName.Equals(paramType, StringComparison.OrdinalIgnoreCase))
                         {
-                            string actualTypeName = argValue.GetType().Name;
-                            if (actualTypeName.Equals(paramType, StringComparison.OrdinalIgnoreCase))
-                            {
-                                score += 3;
-                            }
-                            else if (IsCompatibleType(actualTypeName, paramType))
-                            {
-                                score += 2;
-                            }
-                            else
-                            {
-                                score += 1;
-                            }
+                            score += 3;
+                        }
+                        else if (IsCompatibleType(actualTypeName, paramType))
+                        {
+                            score += 2;
+                        }
+                        else
+                        {
+                            score += 1;
                         }
                     }
                 }
             }
+
             scoredCandidates.Add((candidate, score));
         }
 

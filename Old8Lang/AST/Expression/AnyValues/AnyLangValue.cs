@@ -197,11 +197,22 @@ public class AnyLangValue : LangValueType
     private LangValueType ExecuteMethod(LangMethodInfo methodInfo, List<LangExpression> arguments,
         VariateManager manager)
     {
-        // 清空SetField修改标记（开始新的方法执行）
-        _fieldsModifiedBySetField.Clear();
+        // 注意：不在这里清空 _fieldsModifiedBySetField
+        // 因为这个方法可能被其他方法（如 init）调用
+        // 只在最外层方法（CallInit）中清空和管理 _fieldsModifiedBySetField
 
-        // 为方法执行创建一个新的子作用域（基于 InstanceScope）
-        var executionManager = InstanceScope.NewManger();
+        // 关键修复：参数表达式应该在调用者作用域中求值，而不是在方法执行作用域中
+        // 因为参数可能引用调用者作用域的变量（如 this.x, this.y）
+        // 所以我们先在外部作用域中计算参数值
+        var parameterValues = arguments.Select(arg => arg.Run(manager)).ToList();
+
+        // 然后创建参数值表达式（直接返回这些值，不需要再次求值）
+        var parameterValueExpressions = parameterValues.Select<LangValueType, LangExpression>(val => val).ToList();
+
+        // 为方法执行创建一个混合作用域（与 CallInit 保持一致）：
+        // 1. 基于外部 manager（可以访问外部变量，用于访问类型定义）
+        // 2. 添加实例字段和 this（可以在方法中访问实例成员）
+        var executionManager = manager.NewManger();
 
         // 1. 设置 this 指针
         executionManager.Set(new LangId("this"), this);
@@ -213,22 +224,25 @@ public class AnyLangValue : LangValueType
             executionManager.Set(new LangId(fieldName), fieldValue);
         }
 
-        // 3. 设置函数上下文标志
+        // 3. 将类型信息添加到作用域（从 InstanceScope 继承）
+        executionManager.AddImportInfoRange(InstanceScope.ImportInfos);
+
+        // 4. 设置函数上下文标志
         executionManager.IsFunc = true;
 
-        // 4. 执行方法（参数会在方法内部的子作用域中设置，不会污染实例字段）
+        // 5. 执行方法，传入已经求值的参数表达式
         var funcValue = methodInfo.Implementation;
-        var result = funcValue.Run(executionManager, arguments);
+        var result = funcValue.Run(executionManager, parameterValueExpressions);
 
-        // 5. 恢复函数上下文标志
+        // 6. 恢复函数上下文标志
         executionManager.IsFunc = false;
 
-        // 6. 同步字段修改
+        // 7. 同步字段修改
         //    方法执行完成后，将执行作用域中修改的字段值同步回实例数据
         SyncFieldsFromExecutionScope(executionManager);
 
-        // 7. 清空SetField修改标记（方法执行结束）
-        _fieldsModifiedBySetField.Clear();
+        // 注意：不在这里清空 _fieldsModifiedBySetField
+        // 让调用者（如 CallInit）来管理
 
         return result;
     }
@@ -452,19 +466,6 @@ public class AnyLangValue : LangValueType
     }
 
     /// <summary>
-    /// 获取 init 构造函数方法
-    /// </summary>
-    /// <returns>init 方法，如果不存在则返回 null</returns>
-    public FuncLangValue? GetInitMethod()
-    {
-        var methods = Metadata.MethodTable.LookupMethod("init");
-        if (methods == null || methods.Count == 0)
-            return null;
-
-        return methods[0].Implementation;
-    }
-
-    /// <summary>
     /// 获取 init 构造函数方法（支持重载）
     /// </summary>
     /// <param name="arguments">构造函数参数</param>
@@ -489,7 +490,7 @@ public class AnyLangValue : LangValueType
     /// 调用 init 构造函数
     /// </summary>
     /// <param name="arguments">构造函数参数</param>
-    /// <param name="manager">变量管理器</param>
+    /// <param name="manager">变量管理器（外部作用域，用于计算参数）</param>
     public void CallInit(List<LangExpression> arguments, VariateManager manager)
     {
         // 清空SetField修改标记（开始新的方法执行）
@@ -504,8 +505,18 @@ public class AnyLangValue : LangValueType
             return;
         }
 
-        // 为 init 方法执行创建一个新的子作用域（与 ExecuteMethod 保持一致）
-        var initManager = InstanceScope.NewManger();
+        // 关键修复：参数表达式应该在调用者作用域中求值，而不是在init作用域中
+        // 因为参数可能引用调用者作用域的变量（如 this.x, this.y）
+        // 所以我们先在外部作用域中计算参数值
+        var parameterValues = arguments.Select(arg => arg.Run(manager)).ToList();
+
+        // 然后创建参数值表达式（直接返回这些值，不需要再次求值）
+        var parameterValueExpressions = parameterValues.Select<LangValueType, LangExpression>(val => val).ToList();
+
+        // 为 init 方法执行创建一个混合作用域：
+        // 1. 基于外部 manager（可以访问外部变量，用于访问类型定义）
+        // 2. 添加实例字段和 this（可以在 init 中访问实例成员）
+        var initManager = manager.NewManger();
 
         // 1. 设置 this 指针
         initManager.Set(new LangId("this"), this);
@@ -517,20 +528,24 @@ public class AnyLangValue : LangValueType
             initManager.Set(new LangId(fieldName), fieldValue);
         }
 
-        // 3. 设置函数上下文标志
+        // 3. 将类型信息添加到作用域（从 InstanceScope 继承）
+        initManager.AddImportInfoRange(InstanceScope.ImportInfos);
+
+        // 4. 设置函数上下文标志
         initManager.IsFunc = true;
 
-        // 4. 执行 init 方法（FuncLangValue.Run 会创建子作用域并设置参数）
-        var result = initMethod.Run(initManager, arguments);
+        // 5. 执行 init 方法，传入已经求值的参数表达式
+        //    由于参数已经是值对象，FuncLangValue.Run 只需要直接使用它们
+        initMethod.Run(initManager, parameterValueExpressions);
 
-        // 5. 恢复函数上下文标志
+        // 6. 恢复函数上下文标志
         initManager.IsFunc = false;
 
-        // 6. 同步字段修改
+        // 7. 同步字段修改
         //    init 方法执行完成后，将执行作用域中修改的字段值同步回实例数据
         SyncFieldsFromExecutionScope(initManager);
 
-        // 7. 清空SetField修改标记（方法执行结束）
+        // 8. 清空SetField修改标记（方法执行结束）
         _fieldsModifiedBySetField.Clear();
     }
 

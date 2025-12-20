@@ -23,12 +23,26 @@ public class MethodTable
     /// <summary>
     /// 添加方法到查找表
     /// </summary>
-    public void AddMethod(LangMethodInfo methodInfo)
+    /// <param name="methodInfo">方法信息</param>
+    /// <param name="allowOverride">是否允许覆盖父类方法（默认为true）</param>
+    public void AddMethod(LangMethodInfo methodInfo, bool allowOverride = true)
     {
         if (!MethodMap.TryGetValue(methodInfo.MethodName, out var value))
         {
             value = [];
             MethodMap[methodInfo.MethodName] = value;
+        }
+
+        // 如果允许覆盖，先移除所有同名方法
+        if (allowOverride && value.Count > 0)
+        {
+            // 从 AllMethods 中移除旧方法
+            foreach (var oldMethod in value.ToList())
+            {
+                AllMethods.Remove(oldMethod);
+            }
+            // 清空当前方法列表
+            value.Clear();
         }
 
         value.Add(methodInfo);
@@ -41,7 +55,7 @@ public class MethodTable
     /// </summary>
     public List<LangMethodInfo>? LookupMethod(string methodName)
     {
-        return MethodMap.TryGetValue(methodName, out var methods) ? methods : null;
+        return MethodMap.GetValueOrDefault(methodName);
     }
 
     /// <summary>
