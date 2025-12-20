@@ -22,7 +22,7 @@ public class ReturnStatement(LangExpression returnExpression, SourcePosition pos
             var functionName = "anonymous";
             if (manager.GetValue(new LangId("this")) is AnyLangValue anyValue)
             {
-                functionName = anyValue.Id?.IdName ?? "anonymous";
+                functionName = anyValue.ClassId.IdName;
             }
             TypeChecker.ValidateReturnType(manager.CurrentFunctionReturnType, result, this, functionName);
         }

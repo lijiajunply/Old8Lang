@@ -370,7 +370,7 @@ public class ConstructorTests
                 public numbers <- []
                 public sum <- 0
 
-                func init(numbers:[int]) {
+                func init(numbers:array) {
                     this.numbers <- numbers
                     for n in numbers {
                         this.sum <- this.sum + n

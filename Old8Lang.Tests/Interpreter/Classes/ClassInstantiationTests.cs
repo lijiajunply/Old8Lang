@@ -140,6 +140,7 @@ public class ClassInstantiationTests
                                        this.address <- addr
                                    }
                                }
+                               
                                addr <- Address("123 Main St", "Anytown")
                                person <- Person("John Doe", addr)
                                streetName <- person.address.street

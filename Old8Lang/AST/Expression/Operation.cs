@@ -138,16 +138,8 @@ public class Operation(
             var thisValue = Left.Run(manager);
             if (thisValue is AnyLangValue anyValue)
             {
-                // V1 架构
-                // 设置外部管理器，确保访问控制能够正确识别这是内部访问
-                anyValue.ExternalManager = manager;
+                // V2 架构：直接调用 Dot，访问控制由内部实现
                 return anyValue.Dot(Right, manager);
-            }
-
-            if (thisValue is AnyLangValue anyValueV2)
-            {
-                // V2 架构
-                return anyValueV2.Dot(Right, manager);
             }
 
             throw new NameError(Left, "this");
@@ -192,15 +184,11 @@ public class Operation(
                 {
                     var ids = r1.Ids.Select(x => x.Run(manager)).OfType<LangExpression>().ToList();
                     var newInstance = new Instance(r1.Id, ids, r1.Position);
-                    // 设置外部管理器，确保能访问最新的外部变量
-                    any.ExternalManager = manager;
                     return any.Dot(newInstance, manager);
                 }
 
                 if (Right != null)
                 {
-                    // 设置外部管理器，确保能访问最新的外部变量
-                    any.ExternalManager = manager;
                     return any.Dot(Right, manager);
                 }
             }

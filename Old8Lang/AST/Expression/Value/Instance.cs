@@ -487,19 +487,8 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             }
         }
 
-        // 注意：TypeTemplate.CreateInstance 路径已经处理了构造函数调用
-        // 这里只是为了兼容可能的边缘情况（例如直接创建实例而非通过 TypeTemplate）
-        if (result is AnyLangValue anyValue)
-        {
-            // V2 架构中，方法存储在 Metadata.MethodTable 中，不在 InstanceData 中
-            // 如果有 init 方法且有参数，调用它
-            var initMethod = anyValue.GetInitMethod(Ids, manager);
-            if (initMethod != null && Ids.Count > 0)
-            {
-                // 使用 V2 的 CallInit API
-                anyValue.CallInit(Ids, manager);
-            }
-        }
+        // 注意：TypeTemplate.CreateInstanceV2 路径已经处理了构造函数调用
+        // 移除了这里的重复 init 调用逻辑，避免构造函数被调用两次
 
         if (result is NativeAnyLangValue nativeAnyValue)
         {

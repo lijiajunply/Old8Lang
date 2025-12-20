@@ -174,7 +174,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     {
         return this switch
         {
-            AnyLangValue a => a.Id.IdName,
+            AnyLangValue a => a.ClassId.IdName,
             ArrayLangValue => "Array",
             BoolLangValue => "Bool",
             CharLangValue => "Char",

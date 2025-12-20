@@ -32,15 +32,12 @@ public class SuperExpression(SourcePosition position = default) : LangExpression
             throw new InvalidOperationError(Position, "super只能在类实例方法中使用");
         }
 
-        // 获取父类实例
-        var superInstance = currentInstance.GetSuperInstance();
+        // TODO: 实现继承功能后，需要：
+        // 1. 在 ClassMetadata 中存储父类信息
+        // 2. 在 AnyLangValue 中提供访问父类实例的方法
+        // 3. 返回父类实例以支持 super.method() 调用
 
-        if (superInstance == null)
-        {
-            throw new InvalidOperationError(Position, "当前类没有父类，无法使用super");
-        }
-
-        return superInstance;
+        throw new InvalidOperationError(Position, "当前版本暂不支持继承和super关键字");
     }
 
     public override string ToString()

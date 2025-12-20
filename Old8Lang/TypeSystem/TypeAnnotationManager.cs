@@ -174,7 +174,7 @@ public class TypeAnnotationManager
             StringLangValue => "string",
             BoolLangValue => "bool",
             CharLangValue => "char",
-            AnyLangValue any => any.Id.IdName, // 类实例类型
+            AnyLangValue any => any.ClassId.IdName, // 类实例类型
             ArrayLangValue => "array",
             ListLangValue => "list",
             DictionaryLangValue => "dict",
