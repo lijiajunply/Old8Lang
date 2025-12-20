@@ -65,6 +65,54 @@ public class TypeTemplate(
         throw new NameError(this, variableName);
     }
 
+    /// <summary>
+    /// 设置静态成员的值
+    /// </summary>
+    /// <param name="memberName">成员名称</param>
+    /// <param name="value">新值</param>
+    /// <param name="manager">变量管理器</param>
+    public void SetStaticMember(string memberName, LangValueType value, VariateManager manager)
+    {
+        // 检查静态成员是否存在
+        bool memberExists = false;
+        foreach (var (memberId, memberExpr) in StaticVariates)
+        {
+            if (memberId.IdName == memberName && memberExpr is not FuncLangValue)
+            {
+                memberExists = true;
+                break;
+            }
+        }
+
+        // 检查父类的静态成员
+        if (!memberExists && ParentClassName != null)
+        {
+            if (manager.GetAny(new LangId(ParentClassName)) is TypeTemplate parentType)
+            {
+                parentType.SetStaticMember(memberName, value, manager);
+                return;
+            }
+        }
+
+        if (!memberExists)
+        {
+            throw new NameError(this, memberName);
+        }
+
+        // 设置静态字段值到运行时缓存
+        StaticVariableValues[memberName] = value;
+
+        // 同时更新到元数据缓存中，确保其他访问能获取到最新值
+        if (!MetadataCache.StaticMembers.ContainsKey(memberName))
+        {
+            MetadataCache.StaticMembers[memberName] = value;
+        }
+        else
+        {
+            MetadataCache.StaticMembers[memberName] = value;
+        }
+    }
+
     public override string ToString()
     {
         var baseStr = IsInterface ? $"InterfaceTemplate({ClassName})" :
@@ -261,8 +309,8 @@ public class TypeTemplate(
             }
         }
 
-        // 6. 执行并返回结果
-        return expr.Run(manager);
+        // 6. 优先返回运行时存储的值，如果没有则执行初始化表达式
+        return GetStaticVariableValue(id.IdName, manager);
     }
 
     /// <summary>

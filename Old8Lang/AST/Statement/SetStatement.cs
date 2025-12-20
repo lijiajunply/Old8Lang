@@ -71,11 +71,10 @@ public class SetStatement : OldStatement
         var result = Value.Run(manager);
 
         // 检查是否为首次赋值
-        bool isInitialAssignment = false;
         if (Id != null)
         {
             var existingVariable = manager.GetAny(Id);
-            isInitialAssignment = (existingVariable == null);
+            var isInitialAssignment = existingVariable == null;
 
             // 如果有类型注解，进行类型检查
             if (!string.IsNullOrEmpty(Id.AssumptionType))
@@ -232,8 +231,7 @@ public class SetStatement : OldStatement
             {
                 // 首先检查是否是嵌套索引赋值：matrix[0][1] <- value
                 // 左侧应该是LangListItem（第一层索引），右侧应该是索引表达式
-                if (operation.Left is LangListItem outerListItem &&
-                    operation.Right is LangExpression finalIndex)
+                if (operation is { Left: LangListItem outerListItem, Right: LangExpression finalIndex })
                 {
                     // 获取外层索引的值：matrix[0] 返回内层数组
                     var outerCollectionValue = manager.GetValue(outerListItem.ListId);
@@ -272,6 +270,18 @@ public class SetStatement : OldStatement
                             innerListCollection.Set(finalIndexValue, result);
                             return;
                         }
+                    }
+                }
+ 
+                // 处理 ClassName.staticField <- value 形式的静态字段赋值
+                if (operation is { Left: LangId className, Right: LangId staticMemberName })
+                {
+                    // 获取类类型
+                    if (manager.GetAny(className) is TypeTemplate classType)
+                    {
+                        // 设置静态字段值
+                        classType.SetStaticMember(staticMemberName.IdName, result, manager);
+                        return;
                     }
                 }
 

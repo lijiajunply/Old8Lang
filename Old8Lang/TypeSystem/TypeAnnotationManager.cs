@@ -23,6 +23,11 @@ public class TypeAnnotationManager
     }
 
     /// <summary>
+    /// 获取全局变量管理器
+    /// </summary>
+    public VariateManager GetGlobalManager() => _globalManager;
+
+    /// <summary>
     /// 初始化基本类型
     /// </summary>
     private void InitializeBasicTypes()

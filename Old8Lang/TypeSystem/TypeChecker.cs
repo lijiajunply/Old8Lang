@@ -158,9 +158,62 @@ public static class TypeChecker
         // 严格类型检查：不允许字符串到数字的自动转换
         // 这是测试期望的行为
 
-        // TODO: 可以添加更多的类型兼容性规则，比如子类型关系等
+        // 检查接口实现兼容性
+        // 只在明确知道这是一个类型检查的上下文中才进行接口检查
+        if (_annotationManager != null && expectedType != actualType && IsInterfaceImplementation(expectedType, actualType))
+        {
+            return true;
+        }
 
         return false;
+    }
+
+    /// <summary>
+    /// 检查一个类是否实现了指定的接口
+    /// </summary>
+    /// <param name="interfaceName">接口名称</param>
+    /// <param name="className">类名称</param>
+    /// <returns>是否实现该接口</returns>
+    private static bool IsInterfaceImplementation(string interfaceName, string className)
+    {
+        if (_annotationManager == null) 
+            return false;
+
+        try 
+        {
+            // 获取接口和类的类型模板
+            var interfaceType = _annotationManager.GetGlobalManager().GetAny(new LangId(interfaceName)) as TypeTemplate;
+            var classType = _annotationManager.GetGlobalManager().GetAny(new LangId(className)) as TypeTemplate;
+
+            // 确保接口确实是一个接口，类确实是一个类
+            if (interfaceType == null || !interfaceType.IsInterface || classType == null || classType.IsInterface)
+                return false;
+
+            // 检查类是否直接实现了该接口
+            if (classType.ImplementsNames.Contains(interfaceName))
+                return true;
+
+            // 递归检查父类是否实现了该接口
+            if (!string.IsNullOrEmpty(classType.ParentClassName))
+            {
+                if (IsInterfaceImplementation(interfaceName, classType.ParentClassName))
+                    return true;
+            }
+
+            // 递归检查接口继承（如果接口继承其他接口）
+            foreach (var parentInterfaceName in interfaceType.ImplementsNames)
+            {
+                if (IsInterfaceImplementation(parentInterfaceName, className))
+                    return true;
+            }
+
+            return false;
+        }
+        catch (Exception)
+        {
+            // 如果发生任何异常，则不认为实现了接口
+            return false;
+        }
     }
 
     /// <summary>
