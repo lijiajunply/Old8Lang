@@ -18,7 +18,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AnyLangValue.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AGENTS.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug_counter.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug_counter2.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug_counter3.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_mixin.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,11 +62,12 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/MixinTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
@@ -737,7 +743,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="302" />
+    <option name="localTasksCounter" value="303" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -764,7 +770,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(interpreter): 优化函数调用和类型转换实现&#10;&#10;- 简化闭包测试中的函数创建逻辑，移除不必要的包装函数&#10;- 重构递归计数器测试，改进参数传递和调用方式&#10;- 更新日志记录测试，直接调用函数而非工厂模式&#10;- 修改函数重载测试，为不同类型数组使用独立函数名&#10;- 改进高阶函数测试，优化groupBy实现和类型处理&#10;- 增强类型转换功能，支持布尔值、字符串到整数的灵活转换&#10;- 扩展类型转换方法，新增ToDouble、ToBool、ToChar等转换函数&#10;- 修复类型比较方法命名冲突，将ToBool重命名为EqualsTo&#10;- 更新字符转换逻辑，支持整数和字符串到字符的转换&#10;- 完善列表和数组转换实现，添加空值处理机制" />
     <MESSAGE value="refactor(interpreter): 优化算术运算和字符串模板解析&#10;&#10;- 改进浮点数运算的精度处理，使用容差比较替代直接相等判断&#10;- 在整数溢出时自动转换为双精度浮点数，避免抛出异常&#10;- 增强字符串模板解析逻辑，正确处理嵌套大括号和转义字符&#10;- 修复字符串模板中表达式提取的边界条件问题&#10;- 更新算术测试用例，确保浮点数和整数运算的准确性&#10;- 移除无效的类型转换测试方法，简化测试结构" />
     <MESSAGE value="fix(tests): 修正逻辑表达式和类型转换测试用例&#10;&#10;- 修正 LogicalTests 中 XOR 表达式的结果断言&#10;- 更新数组比较测试中的数组初始化值&#10;- 移除 TupleToList 和 ListToTuple 的类型转换测试&#10;- 增强 ValueTypeFuncStatic 对 ListLangValue 到 ArrayLangValue 的转换支持" />
     <MESSAGE value="feat(lang): 为数组和列表添加 ToList 和 ToArray 转换方法&#10;&#10;- 在 ArrayLangValue 中添加 &quot;ToList&quot; 方法支持&#10;- 在 ListValueFuncStatic 中实现 ToArray 转换函数&#10;- 更新 IDE 工作区配置和调试设置&#10;- 增加类型转换测试用例以验证新功能&#10;- 修正逻辑表达式测试中断言错误&#10;- 移除过时的元组与列表相互转换测试" />
@@ -789,7 +794,8 @@
     <MESSAGE value="test(interpreter): 更新类继承和实例化测试用例&#10;&#10;- 修改测试代码中的字符串字面量语法为原始字符串&#10;- 更新类继承测试中的代码格式和字段访问方式&#10;- 修正实例化测试中的循环语法和方法调用&#10;- 调整类成员访问逻辑以适应新的嵌套类支持&#10;- 优化测试代码结构提高可读性和维护性" />
     <MESSAGE value="feat(lang): 实现super关键字支持&#10;&#10;- 在LangTokenType中添加Super枚举值&#10;- 新增SuperExpression类处理super表达式解析&#10;- 扩展AnyLangValue类，增加GetSuperInstance方法获取父类实例&#10;- 在VariateManager中添加GetCurrentInstance方法获取当前实例&#10;- 更新PrimaryParser以识别和解析super关键字&#10;- 添加SuperTests测试文件验证super关键字功能" />
     <MESSAGE value="feat(lang): 实现类成员继承与访问控制机制&#10;&#10;- 添加函数查找缓存提升类方法查找效率&#10;- 实现递归获取父类和接口成员功能&#10;- 完善内部访问检查逻辑&#10;- 重构成员查找机制支持继承和缓存&#10;- 优化变量同步方法提升性能&#10;- 修复嵌套类查找逻辑&#10;- 更新测试用例适配新实现" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 实现类成员继承与访问控制机制&#10;&#10;- 添加函数查找缓存提升类方法查找效率&#10;- 实现递归获取父类和接口成员功能&#10;- 完善内部访问检查逻辑&#10;- 重构成员查找机制支持继承和缓存&#10;- 优化变量同步方法提升性能&#10;- 修复嵌套类查找逻辑&#10;- 更新测试用例适配新实现" />
+    <MESSAGE value="refactor(ast): 优化类成员查找与缓存逻辑&#10;&#10;- 将_functionLookupCache字段重命名为FunctionLookupCache&#10;- 使用模式匹配简化类型转换逻辑&#10;- 优化成员查找循环中的条件判断&#10;- 完善属性访问时的空值处理&#10;- 统一缓存条目的读取和写入方式&#10;- 增强错误处理机制，明确抛出AttributeError异常&#10;- 调整方法参数列表格式以提高可读性" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 优化类成员查找与缓存逻辑&#10;&#10;- 将_functionLookupCache字段重命名为FunctionLookupCache&#10;- 使用模式匹配简化类型转换逻辑&#10;- 优化成员查找循环中的条件判断&#10;- 完善属性访问时的空值处理&#10;- 统一缓存条目的读取和写入方式&#10;- 增强错误处理机制，明确抛出AttributeError异常&#10;- 调整方法参数列表格式以提高可读性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

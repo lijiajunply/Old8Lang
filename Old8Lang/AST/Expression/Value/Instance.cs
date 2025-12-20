@@ -479,7 +479,27 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 // 保存init方法的引用
                 if (instance.Result.TryGetValue("init", out var initResult))
                 {
-                    if (initResult is not FuncLangValue initFunc) throw new TypeError(this, "FuncValue", "init 不是函数类型");
+                    FuncLangValue initFunc;
+
+                    // 处理构造函数重载
+                    if (initResult is FuncLangValue func)
+                    {
+                        initFunc = func;
+                    }
+                    else if (initResult is MethodOverloadList overloadList)
+                    {
+                        // 解析构造函数重载
+                        var resolvedFunc = overloadList.ResolveOverload(Ids, instance.Manager);
+                        if (resolvedFunc == null)
+                        {
+                            throw new InvalidOperationError(this, "找不到匹配参数的构造函数重载");
+                        }
+                        initFunc = resolvedFunc;
+                    }
+                    else
+                    {
+                        throw new TypeError(this, "FuncValue", "init 不是函数类型");
+                    }
 
                     // 在调用init方法前，将当前实例添加到AnyInfo中，以便this关键字访问
                     instance.Manager.Set(new LangId("this"), instance);
@@ -521,12 +541,29 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
         }
 
         // 原来的AnyLangValue处理逻辑，用于兼容旧代码
-        if (result is AnyLangValue anyValue)
+        // 但是如果已经通过TypeTemplate.CreateInstance创建的实例，则不调用构造函数
+        if (result is AnyLangValue anyValue && anyValue != null)
         {
-            // 保存init方法的引用，避免覆盖result变量
-            if (anyValue.Result.TryGetValue("init", out var initResult))
+            // 只有在没有参数时才调用构造函数，避免重复调用
+            // 构造函数的调用已经在TypeTemplate.CreateInstance路径中处理了
+            if (Ids.Count == 0 && anyValue.Result.TryGetValue("init", out var initResult))
             {
-                if (initResult is not FuncLangValue initFunc) throw new TypeError(this, "FuncValue", "init 不是函数类型");
+                FuncLangValue initFunc;
+
+                // 处理构造函数重载
+                if (initResult is FuncLangValue func)
+                {
+                    initFunc = func;
+                }
+                else if (initResult is MethodOverloadList overloadList)
+                {
+                    // 对于无参数调用，选择第一个可用的重载
+                    initFunc = overloadList.Overloads.FirstOrDefault() ?? throw new InvalidOperationError(this, "没有可用的构造函数重载");
+                }
+                else
+                {
+                    throw new TypeError(this, "FuncValue", "init 不是函数类型");
+                }
 
                 // 在调用init方法前，将当前实例添加到AnyInfo中，以便this关键字访问
                 anyValue.Manager.Set(new LangId("this"), anyValue);
@@ -540,7 +577,8 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             }
             else if (Ids.Count != 0)
             {
-                throw new InvalidOperationError(this, "找不到对应的init函数");
+                // 有参数的情况已经在TypeTemplate.CreateInstance路径中处理
+                // 这里不重复处理
             }
         }
 

@@ -217,6 +217,20 @@ public class AnyLangValue : LangValueType
         {
             IsClass = true
         };
+
+        // 初始化 Result 字典，将 ClassMemberId 转换为 string 键
+        InitializeResultFromVariates();
+    }
+
+    /// <summary>
+    /// 从 Variates 初始化 Result 字典
+    /// </summary>
+    private void InitializeResultFromVariates()
+    {
+        foreach (var member in Variates)
+        {
+            Result[member.Key.IdName] = member.Value.Run(Manager);
+        }
     }
 
     /// <summary>
@@ -371,45 +385,36 @@ public class AnyLangValue : LangValueType
                         throw new AttributeError(this, methodName, Id.IdName);
                     }
 
-                    // 如果找到的是函数类型
+                    // 如果找到的是函数类型或重载列表
                     if (value is FuncLangValue funcValue)
                     {
-                        // 使用外部管理器或内部管理器作为回退
-                        var currentManager = ExternalManager ?? Manager;
+                        // 查找所有同名的方法重载
+                        var allOverloads = FindAllMethodOverloads(methodName);
 
-                        // 在调用类方法时，将当前实例添加到变量储存器中，以便this关键字访问
-                        currentManager.Set(new LangId("this"), this);
-
-                        // 将实例的所有成员变量添加到Manager中，以便方法内部直接访问
-                        foreach (var member in Result)
+                        if (allOverloads.Count > 1)
                         {
-                            currentManager.Set(new LangId(member.Key), member.Value);
+                            // 有重载，进行重载解析
+                            var matchingOverload = ResolveMethodOverload(allOverloads, instance.Ids, manager ?? Manager);
+                            if (matchingOverload != null)
+                            {
+                                return CallOverloadedMethod(matchingOverload, instance, manager ?? Manager);
+                            }
                         }
 
-                        // 临时设置 ExternalManager，使得在方法内部访问字段时能正确判断是内部访问
-                        var originalExternalManager = ExternalManager;
-                        ExternalManager = currentManager;
-
-                        try
+                        // 没有重载或重载解析失败，使用原有逻辑
+                        return CallSingleMethod(funcValue, instance, manager ?? Manager);
+                    }
+                    else if (value is MethodOverloadList overloadList)
+                    {
+                        // 直接是重载列表，进行重载解析
+                        var matchingOverload = ResolveMethodOverload(overloadList.Overloads, instance.Ids, manager ?? Manager);
+                        if (matchingOverload != null)
                         {
-                            // 处理方法参数，先运行参数表达式，这样可以访问外部变量
-                            List<LangExpression> methodArgs = [];
-                            methodArgs.AddRange(instance.Ids);
-
-                            // 调用方法时使用当前管理器，这样可以访问外部变量
-                            var funcResult = funcValue.Run(currentManager, methodArgs);
-
-                            // 方法调用完成后，将管理器中修改的变量同步回实例的 Result 字典
-                            // 对于直接修改的变量（如logs <- logs + "text"），需要从manager同步回实例
-                            SyncVariablesFromManager(currentManager);
-
-                            return funcResult;
+                            return CallOverloadedMethod(matchingOverload, instance, manager ?? Manager);
                         }
-                        finally
-                        {
-                            // 恢复原始的 ExternalManager
-                            ExternalManager = originalExternalManager;
-                        }
+
+                        // 重载解析失败，抛出错误
+                        throw new ArgumentError(Position, $"函数 '{methodName}' 没有找到匹配 {instance.Ids.Count} 个参数的重载版本");
                     }
 
                     // 不是函数类型，直接返回值
@@ -656,5 +661,201 @@ public class AnyLangValue : LangValueType
     public override Type? OutputType(LocalManager local)
     {
         return local.ClassVar.GetValueOrDefault(Id.IdName);
+    }
+
+    /// <summary>
+    /// 查找所有同名的方法重载
+    /// </summary>
+    private List<FuncLangValue> FindAllMethodOverloads(string methodName)
+    {
+        var overloads = new List<FuncLangValue>();
+
+        // 在实例的 Result 字典中查找方法
+        // Result 的键是 string 类型
+        if (Result.TryGetValue(methodName, out var memberValue))
+        {
+            if (memberValue is FuncLangValue funcValue)
+            {
+                // 单个方法，包装成列表
+                overloads.Add(funcValue);
+            }
+            else if (memberValue is MethodOverloadList overloadList)
+            {
+                // 重载方法列表，直接使用
+                overloads.AddRange(overloadList.Overloads);
+            }
+        }
+
+        return overloads;
+    }
+
+    /// <summary>
+    /// 解析方法重载，选择最匹配的版本
+    /// </summary>
+    private FuncLangValue? ResolveMethodOverload(List<FuncLangValue> overloads, List<LangExpression> args, VariateManager manager)
+    {
+        var argCount = args.Count;
+
+        // 首先查找参数数量完全匹配的重载
+        var exactMatches = overloads.Where(overload =>
+            (overload.Ids?.Count ?? 0) == argCount).ToList();
+
+        if (exactMatches.Count == 1)
+        {
+            return exactMatches[0];
+        }
+
+        if (exactMatches.Count > 1)
+        {
+            // 如果有多个精确匹配，进行类型匹配
+            return ResolveByTypeMatching(exactMatches, args, manager);
+        }
+
+        // 如果没有精确匹配，查找可以处理这些参数的重载
+        var compatibleMatches = overloads.Where(overload =>
+            CanHandleArguments(overload, args, manager)).ToList();
+
+        return compatibleMatches.FirstOrDefault();
+    }
+
+    /// <summary>
+    /// 通过类型匹配选择最佳的重载
+    /// </summary>
+    private FuncLangValue? ResolveByTypeMatching(List<FuncLangValue> candidates, List<LangExpression> args, VariateManager manager)
+    {
+        // 计算每个候选的匹配得分
+        var scoredCandidates = new List<(FuncLangValue candidate, int score)>();
+
+        foreach (var candidate in candidates)
+        {
+            int score = 0;
+            if (candidate.Ids != null)
+            {
+                for (int i = 0; i < args.Count && i < candidate.Ids.Count; i++)
+                {
+                    var paramType = candidate.Ids[i].AssumptionType;
+                    if (string.IsNullOrEmpty(paramType))
+                    {
+                        score += 1; // 无类型注解的参数得分较低
+                    }
+                    else
+                    {
+                        // 运行参数表达式获取实际类型
+                        var argValue = args[i].Run(manager);
+                        if (argValue != null)
+                        {
+                            string actualTypeName = argValue.GetType().Name;
+                            if (actualTypeName.Equals(paramType, StringComparison.OrdinalIgnoreCase))
+                            {
+                                score += 3; // 精确类型匹配得分最高
+                            }
+                            else if (IsCompatibleType(actualTypeName, paramType))
+                            {
+                                score += 2; // 兼容类型匹配
+                            }
+                            else
+                            {
+                                score += 1; // 类型不匹配但仍可转换
+                            }
+                        }
+                    }
+                }
+            }
+            scoredCandidates.Add((candidate, score));
+        }
+
+        // 选择得分最高的候选
+        var bestMatch = scoredCandidates.OrderByDescending(x => x.score).FirstOrDefault();
+        return bestMatch.score > 0 ? bestMatch.candidate : null;
+    }
+
+    /// <summary>
+    /// 检查重载是否能处理给定的参数
+    /// </summary>
+    private bool CanHandleArguments(FuncLangValue overload, List<LangExpression> args, VariateManager manager)
+    {
+        var expectedParams = overload.Ids?.Count ?? 0;
+        var actualParams = args.Count;
+
+        // 检查参数数量是否在可接受范围内
+        if (actualParams > expectedParams)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 检查类型是否兼容
+    /// </summary>
+    private bool IsCompatibleType(string actualType, string expectedType)
+    {
+        // 简单的类型兼容性检查
+        return actualType.ToLowerInvariant().Contains(expectedType.ToLowerInvariant()) ||
+               expectedType.ToLowerInvariant().Contains(actualType.ToLowerInvariant());
+    }
+
+    /// <summary>
+    /// 调用重载方法
+    /// </summary>
+    private LangValueType CallOverloadedMethod(FuncLangValue overload, Instance instance, VariateManager manager)
+    {
+        var currentManager = ExternalManager ?? Manager;
+
+        // 设置调用上下文
+        currentManager.Set(new LangId("this"), this);
+        foreach (var member in Result)
+        {
+            currentManager.Set(new LangId(member.Key), member.Value);
+        }
+
+        var originalExternalManager = ExternalManager;
+        ExternalManager = currentManager;
+
+        try
+        {
+            // 调用重载方法
+            var funcResult = overload.Run(currentManager, instance.Ids);
+            SyncVariablesFromManager(currentManager);
+            return funcResult;
+        }
+        finally
+        {
+            ExternalManager = originalExternalManager;
+        }
+    }
+
+    /// <summary>
+    /// 调用单个方法（原有逻辑）
+    /// </summary>
+    private LangValueType CallSingleMethod(FuncLangValue funcValue, Instance instance, VariateManager manager)
+    {
+        var currentManager = ExternalManager ?? Manager;
+
+        // 设置调用上下文
+        currentManager.Set(new LangId("this"), this);
+        foreach (var member in Result)
+        {
+            currentManager.Set(new LangId(member.Key), member.Value);
+        }
+
+        var originalExternalManager = ExternalManager;
+        ExternalManager = currentManager;
+
+        try
+        {
+            // 处理方法参数
+            List<LangExpression> methodArgs = [];
+            methodArgs.AddRange(instance.Ids);
+
+            var funcResult = funcValue.Run(currentManager, methodArgs);
+            SyncVariablesFromManager(currentManager);
+            return funcResult;
+        }
+        finally
+        {
+            ExternalManager = originalExternalManager;
+        }
     }
 }

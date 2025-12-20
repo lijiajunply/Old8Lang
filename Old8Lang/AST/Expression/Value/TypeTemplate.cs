@@ -30,6 +30,40 @@ public class TypeTemplate(
     public readonly bool IsInterface = isInterface;
     public readonly bool IsAbstract = isAbstract;
 
+    /// <summary>
+    /// 存储运行时的静态变量值，支持在静态方法调用之间保持状态
+    /// </summary>
+    private readonly Dictionary<string, LangValueType> _staticVariableValues = [];
+
+    /// <summary>
+    /// 获取静态变量的当前值，如果已修改则返回存储的值，否则返回初始值
+    /// </summary>
+    /// <param name="variableName">变量名</param>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>静态变量的值</returns>
+    private LangValueType GetStaticVariableValue(string variableName, VariateManager manager)
+    {
+        if (_staticVariableValues.TryGetValue(variableName, out var storedValue))
+        {
+            return storedValue;
+        }
+
+        // 如果没有存储的值，查找初始值
+        foreach (var (key, value) in StaticVariates)
+        {
+            if (key.IdName == variableName && value is not FuncLangValue)
+            {
+                // 创建一个临时管理器来初始化静态变量
+                var tempManager = manager.NewManger();
+                var initialValue = value.Run(tempManager);
+                _staticVariableValues[variableName] = initialValue;
+                return initialValue;
+            }
+        }
+
+        throw new NameError(this, variableName);
+    }
+
     public override string ToString()
     {
         var baseStr = IsInterface ? $"InterfaceTemplate({ClassName})" : IsMixin ? $"MixinTemplate({ClassName})" : IsAbstract ? $"AbstractTypeTemplate({ClassName})" : $"TypeTemplate({ClassName})";
@@ -125,7 +159,7 @@ public class TypeTemplate(
         // 递归获取所有父类的成员
         GetAllParentMembers(manager, this, allVariates);
 
-        // 然后添加子类的成员，子类成员会覆盖父类同名成员
+        // 添加子类的成员，重载列表已在解析阶段创建
         foreach (var member in Variates)
         {
             allVariates[member.Key] = member.Value;
@@ -258,7 +292,37 @@ public class TypeTemplate(
         {
             if (key.IdName == instance.Id.IdName && value is FuncLangValue func)
             {
-                return func.Run(manager, instance.Ids);
+                // 创建一个临时的变量管理器来执行静态方法
+                var tempManager = manager.NewManger();
+
+                // 将所有静态变量的当前值添加到临时管理器中
+                foreach (var (staticKey, staticValue) in StaticVariates)
+                {
+                    if (staticValue is not FuncLangValue) // 只添加变量，不添加方法
+                    {
+                        var currentVariableName = staticKey.IdName;
+                        var currentValue = GetStaticVariableValue(currentVariableName, manager);
+                        tempManager.Set(new LangId(currentVariableName), currentValue);
+                    }
+                }
+
+                // 在临时管理器中执行静态方法
+                var result = func.Run(tempManager, instance.Ids);
+
+                // 从临时管理器中提取更新后的静态变量值，并保存到类中
+                foreach (var (staticKey, staticValue) in StaticVariates)
+                {
+                    if (staticValue is not FuncLangValue) // 只处理变量，不处理方法
+                    {
+                        var variableName = staticKey.IdName;
+                        if (tempManager.GetAny(new LangId(variableName)) is LangValueType updatedValue)
+                        {
+                            _staticVariableValues[variableName] = updatedValue;
+                        }
+                    }
+                }
+
+                return result;
             }
         }
 
@@ -320,5 +384,144 @@ public class TypeTemplate(
 
         // 如果不是嵌套类实例化，尝试调用静态方法
         return CallStaticMethod(instance, manager);
+    }
+}
+
+/// <summary>
+/// 类方法重载列表，用于存储一个方法的所有重载版本
+/// </summary>
+public class MethodOverloadList : LangValueType
+{
+    /// <summary>
+    /// 重载方法列表
+    /// </summary>
+    public List<FuncLangValue> Overloads { get; }
+
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="overloads">重载方法列表</param>
+    public MethodOverloadList(List<FuncLangValue> overloads)
+    {
+        Overloads = overloads ?? new List<FuncLangValue>();
+    }
+
+    /// <summary>
+    /// 添加新的重载
+    /// </summary>
+    /// <param name="overload">要添加的重载方法</param>
+    public void AddOverload(FuncLangValue overload)
+    {
+        Overloads.Add(overload);
+    }
+
+    /// <summary>
+    /// 根据参数解析最佳的重载
+    /// </summary>
+    /// <param name="args">参数表达式列表</param>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>匹配的重载方法，如果没有匹配则返回null</returns>
+    public FuncLangValue? ResolveOverload(List<LangExpression> args, VariateManager manager)
+    {
+        var argCount = args.Count;
+
+        // 首先查找参数数量完全匹配的重载
+        var exactMatches = Overloads.Where(overload =>
+            (overload.Ids?.Count ?? 0) == argCount).ToList();
+
+        if (exactMatches.Count == 1)
+        {
+            return exactMatches[0];
+        }
+
+        if (exactMatches.Count > 1)
+        {
+            // 如果有多个精确匹配，进行类型匹配
+            return ResolveByTypeMatching(exactMatches, args, manager);
+        }
+
+        // 如果没有精确匹配，查找可以处理这些参数的重载
+        var compatibleMatches = Overloads.Where(overload =>
+            CanHandleArguments(overload, args)).ToList();
+
+        return compatibleMatches.FirstOrDefault();
+    }
+
+    /// <summary>
+    /// 通过类型匹配选择最佳的重载
+    /// </summary>
+    private FuncLangValue? ResolveByTypeMatching(List<FuncLangValue> candidates, List<LangExpression> args, VariateManager manager)
+    {
+        var scoredCandidates = new List<(FuncLangValue candidate, int score)>();
+
+        foreach (var candidate in candidates)
+        {
+            int score = 0;
+            if (candidate.Ids != null)
+            {
+                for (int i = 0; i < args.Count && i < candidate.Ids.Count; i++)
+                {
+                    var paramType = candidate.Ids[i].AssumptionType;
+                    if (string.IsNullOrEmpty(paramType))
+                    {
+                        score += 1;
+                    }
+                    else
+                    {
+                        var argValue = args[i].Run(manager);
+                        if (argValue != null)
+                        {
+                            string actualTypeName = argValue.GetType().Name;
+                            if (actualTypeName.Equals(paramType, StringComparison.OrdinalIgnoreCase))
+                            {
+                                score += 3;
+                            }
+                            else if (IsCompatibleType(actualTypeName, paramType))
+                            {
+                                score += 2;
+                            }
+                            else
+                            {
+                                score += 1;
+                            }
+                        }
+                    }
+                }
+            }
+            scoredCandidates.Add((candidate, score));
+        }
+
+        var bestMatch = scoredCandidates.OrderByDescending(x => x.score).FirstOrDefault();
+        return bestMatch.score > 0 ? bestMatch.candidate : null;
+    }
+
+    /// <summary>
+    /// 检查重载是否能处理给定的参数
+    /// </summary>
+    private bool CanHandleArguments(FuncLangValue overload, List<LangExpression> args)
+    {
+        var expectedParams = overload.Ids?.Count ?? 0;
+        var actualParams = args.Count;
+
+        if (actualParams > expectedParams)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 检查类型是否兼容
+    /// </summary>
+    private bool IsCompatibleType(string actualType, string expectedType)
+    {
+        return actualType.ToLowerInvariant().Contains(expectedType.ToLowerInvariant()) ||
+               expectedType.ToLowerInvariant().Contains(actualType.ToLowerInvariant());
+    }
+
+    public override string ToString()
+    {
+        return $"MethodOverloadList[{Overloads.Count} overloads]";
     }
 }

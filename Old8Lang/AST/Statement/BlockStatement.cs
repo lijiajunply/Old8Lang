@@ -1,6 +1,7 @@
 using System.Reflection.Emit;
 using System.Text;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Interpreter;
 
@@ -294,7 +295,31 @@ public class BlockStatement : OldStatement
             // 只添加非静态成员
             if (!id.HasModifier(AccessModifierType.Static))
             {
-                c.TryAdd(id, expr);
+                // 如果是函数重载，需要特殊处理
+                if (IsFunction(expr) && c.ContainsKey(id))
+                {
+                    // 已有同名函数，创建函数重载
+                    var existingExpr = c[id];
+                    if (existingExpr is FuncLangValue existingFunc && expr is FuncLangValue currentFunc)
+                    {
+                        // 创建函数重载列表
+                        var overloadList = new MethodOverloadList(new List<FuncLangValue> { existingFunc, currentFunc });
+                        c[id] = overloadList;
+                    }
+                    else if (existingExpr is MethodOverloadList overloadList)
+                    {
+                        // 已有重载列表，添加新重载
+                        if (expr is FuncLangValue funcToAdd)
+                        {
+                            overloadList.AddOverload(funcToAdd);
+                        }
+                    }
+                }
+                else
+                {
+                    // 普通成员或首次定义的函数
+                    c[id] = expr;
+                }
             }
         }
 
@@ -317,7 +342,31 @@ public class BlockStatement : OldStatement
             // 只添加静态成员
             if (id.HasModifier(AccessModifierType.Static))
             {
-                c.TryAdd(id, expr);
+                // 如果是函数重载，需要特殊处理
+                if (IsFunction(expr) && c.ContainsKey(id))
+                {
+                    // 已有同名函数，创建函数重载
+                    var existingExpr = c[id];
+                    if (existingExpr is FuncLangValue existingFunc && expr is FuncLangValue currentFunc)
+                    {
+                        // 创建函数重载列表
+                        var overloadList = new MethodOverloadList(new List<FuncLangValue> { existingFunc, currentFunc });
+                        c[id] = overloadList;
+                    }
+                    else if (existingExpr is MethodOverloadList overloadList)
+                    {
+                        // 已有重载列表，添加新重载
+                        if (expr is FuncLangValue funcToAdd)
+                        {
+                            overloadList.AddOverload(funcToAdd);
+                        }
+                    }
+                }
+                else
+                {
+                    // 普通成员或首次定义的函数
+                    c[id] = expr;
+                }
             }
         }
 
@@ -355,4 +404,14 @@ public class BlockStatement : OldStatement
     }
 
     public override OldStatement this[int index] => OtherStatements[index];
+
+    /// <summary>
+    /// 检查表达式是否是函数
+    /// </summary>
+    /// <param name="expr">要检查的表达式</param>
+    /// <returns>如果是函数返回true，否则返回false</returns>
+    private static bool IsFunction(LangExpression expr)
+    {
+        return expr is FuncLangValue || expr is AsyncFuncLangValue;
+    }
 }

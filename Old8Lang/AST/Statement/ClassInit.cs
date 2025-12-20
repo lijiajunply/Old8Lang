@@ -642,7 +642,13 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
     public override string ToString()
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"class {anyLangValue.ClassName} {{");
+
+        // 根据类型确定前缀
+        var typePrefix = anyLangValue.IsInterface ? "interface" :
+                        anyLangValue.IsMixin ? "mixin" :
+                        anyLangValue.IsAbstract ? "abstract class" : "class";
+
+        sb.AppendLine($"{typePrefix} {anyLangValue.ClassName} {{");
         foreach (var variate in anyLangValue.Variates)
         {
             if (variate.Value is FuncLangValue funcValue)

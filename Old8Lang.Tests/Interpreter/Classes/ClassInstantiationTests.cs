@@ -18,8 +18,8 @@ public class ClassInstantiationTests
                 public name:string
                 public age:int
                 func init() {
-                    name <- ""Unknown""
-                    age <- 0
+                    this.name <- ""Unknown""
+                    this.age <- 0
                 }
             }
             person <- Person()
@@ -45,8 +45,8 @@ public class ClassInstantiationTests
                 public name:string
                 public age:int
                 func init(n:string, a:int) {
-                    name <- n
-                    age <- a
+                    this.name <- n
+                    this.age <- a
                 }
             }
             person <- Person(""Alice"", 30)
@@ -84,10 +84,10 @@ public class ClassInstantiationTests
             class Counter {
                 public value:int
                 func init(v:int) {
-                    value <- v
+                    this.value <- v
                 }
                 func Increment() -> void {
-                    value <- value + 1
+                    this.value <- this.value + 1
                 }
             }
             counter1 <- Counter(10)
@@ -121,28 +121,30 @@ public class ClassInstantiationTests
     public void ClassInstantiation_NestedObjects_CreatesNestedObjectInstances()
     {
         // Arrange
-        var code = @"
-            class Address {
-                public street:string
-                public city:string
-                func init(s:string, c:string) {
-                    street <- s
-                    city <- c
-                }
-            }
-            class Person {
-                public name:string
-                public address:Address
-                func init(n:string, addr:Address) {
-                    name <- n
-                    address <- addr
-                }
-            }
-            addr <- Address(""123 Main St"", ""Anytown"")
-            person <- Person(""John Doe"", addr)
-            streetName <- person.address.street
-            cityName <- person.address.city
-        ";
+        var code = """
+
+                               class Address {
+                                   public street:string
+                                   public city:string
+                                   func init(s:string, c:string) {
+                                       this.street <- s
+                                       this.city <- c
+                                   }
+                               }
+                               class Person {
+                                   public name:string
+                                   public address:Address
+                                   func init(n:string, addr:Address) {
+                                       this.name <- n
+                                       this.address <- addr
+                                   }
+                               }
+                               addr <- Address("123 Main St", "Anytown")
+                               person <- Person("John Doe", addr)
+                               streetName <- person.address.street
+                               cityName <- person.address.city
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -171,11 +173,15 @@ public class ClassInstantiationTests
                 public x:int
                 public y:int
                 func init(xPos:int, yPos:int) {
-                    x <- xPos
-                    y <- yPos
+                    this.x <- xPos
+                    this.y <- yPos
                 }
                 func Distance() -> double {
-                    return (x * x + y * y).ToSqrt()
+                    return (this.x * this.x + this.y * this.y).ToSqrt()
+                }
+            
+                func Distance() -> double {
+                    return (this.x * this.x + this.y * this.y).ToSqrt() // 没有 ToSqrt()
                 }
             }
             points <- [Point(0, 0), Point(3, 4), Point(5, 12)]
@@ -215,9 +221,9 @@ public class ClassInstantiationTests
                 public price:double
                 public category:string
                 func init(n:string, p:double, c:""General"") {
-                    name <- n
-                    price <- p
-                    category <- c
+                    this.name <- n
+                    this.price <- p
+                    this.category <- c
                 }
             }
             product1 <- Product(""Laptop"", 999.99)
@@ -255,10 +261,10 @@ public class ClassInstantiationTests
                 public level:string
                 public isError:bool
                 func init(ts:int, msg:string, lvl:string, err:bool) {
-                    timestamp <- ts
-                    message <- msg
-                    level <- lvl
-                    isError <- err
+                    this.timestamp <- ts
+                    this.message <- msg
+                    this.level <- lvl
+                    this.isError <- err
                 }
             }
             entry1 <- LogEntry(123456, ""System started"", ""INFO"", false)
@@ -306,19 +312,19 @@ public class ClassInstantiationTests
                 public connected:bool
                 public connectionCount:int
                 func init() {
-                    connected <- false
-                    connectionCount <- 0
-                    Connect()
+                    this.connected <- false
+                    this.connectionCount <- 0
+                    this.Connect()
                 }
                 func Connect() -> void {
-                    if not connected {
-                        connected <- true
-                        connectionCount <- connectionCount + 1
+                    if not this.connected {
+                        this.connected <- true
+                        this.connectionCount <- this.connectionCount + 1
                     }
                 }
                 func Disconnect() -> void {
-                    if connected {
-                        connected <- false
+                    if this.connected {
+                        this.connected <- false
                     }
                 }
             }
@@ -362,16 +368,16 @@ public class ClassInstantiationTests
                 public horsepower:int
                 public cylinders:int
                 func init(hp:int, cyl:int) {
-                    horsepower <- hp
-                    cylinders <- cyl
+                    this.horsepower <- hp
+                    this.cylinders <- cyl
                 }
             }
             class Wheel {
                 public size:int
                 public brand:string
                 func init(s:int, b:string) {
-                    size <- s
-                    brand <- b
+                    this.size <- s
+                    this.brand <- b
                 }
             }
             class Car {
@@ -380,14 +386,14 @@ public class ClassInstantiationTests
                 public engine:Engine
                 public wheels:Wheel
                 func init(mk:string, mdl:string) {
-                    make <- mk
-                    model <- mdl
-                    engine <- Engine(300, 6)
-                    wheels <- {}
-                    wheels.Add(Wheel(18, ""Michelin""))
-                    wheels.Add(Wheel(18, ""Michelin""))
-                    wheels.Add(Wheel(18, ""Michelin""))
-                    wheels.Add(Wheel(18, ""Michelin""))
+                    this.make <- mk
+                    this.model <- mdl
+                    this.engine <- Engine(300, 6)
+                    this.wheels <- {}
+                    this.wheels.Add(Wheel(18, ""Michelin""))
+                    this.wheels.Add(Wheel(18, ""Michelin""))
+                    this.wheels.Add(Wheel(18, ""Michelin""))
+                    this.wheels.Add(Wheel(18, ""Michelin""))
                 }
             }
             car <- Car(""Tesla"", ""Model S"")
@@ -429,19 +435,19 @@ public class ClassInstantiationTests
                 public accountNumber:string
                 func init(accNum:string, initialBalance:double) {
                     if len(accNum) < 5 {
-                        accountNumber <- ""INVALID""
+                        this.accountNumber <- ""INVALID""
                     } else {
-                        accountNumber <- accNum
+                        this.accountNumber <- accNum
                     }
 
                     if initialBalance < 0 {
-                        balance <- 0.0
+                        this.balance <- 0.0
                     } else {
-                        balance <- initialBalance
+                        this.balance <- initialBalance
                     }
                 }
                 func IsValid() -> bool {
-                    return accountNumber != ""INVALID"" and balance >= 0
+                    return this.accountNumber != ""INVALID"" and this.balance >= 0
                 }
             }
             account1 <- BankAccount(""12345"", 1000.0)
@@ -489,23 +495,23 @@ public class ClassInstantiationTests
                 public type:string
                 public area:double
                 func init() {
-                    type <- ""Unknown""
-                    area <- 0.0
+                    this.type <- ""Unknown""
+                    this.area <- 0.0
                 }
                 func GetInfo() -> string {
-                    return type + "" with area "" + area.ToStr()
+                    return this.type + "" with area "" + this.area.ToStr()
                 }
             }
             class Circle extends Shape {
                 func init(radius:double) {
-                    type <- ""Circle""
-                    area <- 3.14159 * radius * radius
+                    this.type <- ""Circle""
+                    this.area <- 3.14159 * radius * radius
                 }
             }
             class Rectangle extends Shape {
                 func init(width:double, height:double) {
-                    type <- ""Rectangle""
-                    area <- width * height
+                    this.type <- ""Rectangle""
+                    this.area <- width * height
                 }
             }
             func CreateCircle(radius:double) -> Shape {
@@ -589,12 +595,12 @@ public class ClassInstantiationTests
                 public value:int
                 public next:LinkedList
                 func init(v:int) {
-                    value <- v
-                    next <- null
+                    this.value <- v
+                    this.next <- null
                 }
                 func Add(newValue:int) -> LinkedList {
                     newNode <- LinkedList(newValue)
-                    next <- newNode
+                    this.next <- newNode
                     return newNode
                 }
                 func GetSum() -> int {
@@ -635,9 +641,9 @@ public class ClassInstantiationTests
                 public y:double
                 public label:string
                 func init(xPos:double, yPos:double, lbl:string) {
-                    x <- xPos
-                    y <- yPos
-                    label <- lbl
+                    this.x <- xPos
+                    this.y <- yPos
+                    this.label <- lbl
                 }
                 func Clone() -> DataPoint {
                     return DataPoint(x, y, label)
@@ -690,7 +696,7 @@ public class ClassInstantiationTests
             class Animal {
                 public name:string
                 func init(n:string) {
-                    name <- n
+                   this.name <- n
                 }
                 func MakeSound() -> string {
                     return ""Generic animal sound""
@@ -698,7 +704,7 @@ public class ClassInstantiationTests
             }
             class Dog extends Animal {
                 func init(n:string) {
-                    name <- n
+                    this.name <- n
                 }
                 func MakeSound() -> string {
                     return ""Woof!""
@@ -706,7 +712,7 @@ public class ClassInstantiationTests
             }
             class Cat extends Animal {
                 func init(n:string) {
-                    name <- n
+                    this.name <- n
                 }
                 func MakeSound() -> string {
                     return ""Meow!""
