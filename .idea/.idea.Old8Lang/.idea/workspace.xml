@@ -10,6 +10,8 @@
     <projectFile>Old8Lang.App/Old8Lang.App.csproj</projectFile>
     <projectFile>Old8Lang.Benchmarks/Old8Lang.Benchmarks.csproj</projectFile>
     <projectFile profileName="Old8Lang.Net">Old8Lang.Net/Old8Lang.Net.csproj</projectFile>
+    <projectFile>Old8Lang.PackageManager.Tests/Old8Lang.PackageManager.Tests.csproj</projectFile>
+    <projectFile>Old8Lang.PackageManager/Old8Lang.PackageManager.csproj</projectFile>
     <projectFile>OldLang.App/OldLang.App.csproj</projectFile>
     <projectFile>OldStudio/OldStudio.csproj</projectFile>
   </component>
@@ -18,15 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/test_clone.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_clone2.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_clone3.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_method_call.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/FieldDefinitionTable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/FieldDefinitionTable.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/MethodTable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/MethodTable.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/math.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/math.old8" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,6 +80,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
@@ -253,7 +249,51 @@
         <option name="Build" />
       </method>
     </configuration>
+    <configuration name="Old8Lang.PackageManager" type="DotNetProject" factoryName=".NET Project">
+      <option name="EXE_PATH" value="" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="ENV_FILE_PATHS" value="" />
+      <option name="REDIRECT_INPUT_PATH" value="" />
+      <option name="MIXED_MODE_DEBUG" value="0" />
+      <option name="USE_MONO" value="0" />
+      <option name="RUNTIME_ARGUMENTS" value="" />
+      <option name="AUTO_ATTACH_CHILDREN" value="0" />
+      <option name="PROJECT_PATH" value="$PROJECT_DIR$/Old8Lang.PackageManager/Old8Lang.PackageManager.csproj" />
+      <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
+      <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
+      <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
+      <option name="PROJECT_KIND" value="DotNetCore" />
+      <option name="PROJECT_TFM" value="" />
+      <method v="2">
+        <option name="Build" />
+      </method>
+    </configuration>
+    <configuration name="Old8Lang.PackageManager.Tests" type="DotNetProject" factoryName=".NET Project">
+      <option name="EXE_PATH" value="" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="ENV_FILE_PATHS" value="" />
+      <option name="REDIRECT_INPUT_PATH" value="" />
+      <option name="MIXED_MODE_DEBUG" value="0" />
+      <option name="USE_MONO" value="0" />
+      <option name="RUNTIME_ARGUMENTS" value="" />
+      <option name="AUTO_ATTACH_CHILDREN" value="0" />
+      <option name="PROJECT_PATH" value="$PROJECT_DIR$/Old8Lang.PackageManager.Tests/Old8Lang.PackageManager.Tests.csproj" />
+      <option name="PROJECT_EXE_PATH_TRACKING" value="1" />
+      <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
+      <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
+      <option name="PROJECT_KIND" value="DotNetCore" />
+      <option name="PROJECT_TFM" value="" />
+      <method v="2">
+        <option name="Build" />
+      </method>
+    </configuration>
     <list>
+      <item itemvalue=".NET 项目.Old8Lang.PackageManager" />
+      <item itemvalue=".NET 项目.Old8Lang.PackageManager.Tests" />
       <item itemvalue=".NET 项目.Old8Lang.Benchmarks" />
       <item itemvalue=".NET 项目.LibTest" />
       <item itemvalue=".NET 项目.Old8Lang.App" />
