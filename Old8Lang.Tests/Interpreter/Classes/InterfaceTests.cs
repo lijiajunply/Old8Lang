@@ -258,12 +258,12 @@ public class InterfaceTests
             }
 
             shapes <- {}
-            shapes.Push(Circle(5.0))
-            shapes.Push(Square(3.0))
+            shapes.Add(Circle(5.0))
+            shapes.Add(Square(3.0))
 
             results <- {}
             for shape in shapes {
-                results.Push(shape.Draw())
+                results.Add(shape.Draw())
             }
         ";
         var interpreter = new LangInterpreter();

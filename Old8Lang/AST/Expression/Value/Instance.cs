@@ -1,5 +1,7 @@
 using System.Reflection;
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.AST.Expression.Generators;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.ValueFunctions;
@@ -284,7 +286,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
             foreach (var func in matchingFunctions)
             {
-                if (func is FuncLangValue funcValue && funcValue.Ids != null)
+                if (func is FuncLangValue { Ids: not null } funcValue)
                 {
                     bool isMatch = true;
                     bool isExactMatch = true;
@@ -410,32 +412,14 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                 // 后续处理...
                 if (idResult is TypeTemplate typeTemplate)
                 {
-                    // 创建类的实例
-                    var instance = typeTemplate.CreateInstance(manager);
+                    // 创建类的实例（使用 V2 架构）
+                    var instance = typeTemplate.CreateInstanceV2(manager);
 
                     // 初始化实例，设置Interpreter
                     instance.Init(manager.Interpreter);
 
-                    // 保存init方法的引用
-                    if (instance.Result.TryGetValue("init", out var initResult))
-                    {
-                        if (initResult is not FuncLangValue initFunc)
-                            throw new TypeError(this, "FuncValue", "init 不是函数类型");
-
-                        // 在调用init方法前，将当前实例添加到AnyInfo中，以便this关键字访问
-                        instance.Manager.Set(new LangId("this"), instance);
-                        instance.Manager.IsFunc = true; // 设置为函数上下文
-
-                        // 调用init方法，并将参数传递给它
-                        initFunc.Run(instance.Manager, Ids);
-
-                        // 恢复非函数上下文标志
-                        instance.Manager.IsFunc = false;
-                    }
-                    else if (Ids.Count != 0)
-                    {
-                        throw new InvalidOperationError(this, "找不到对应的init函数");
-                    }
+                    // 调用 init 构造函数
+                    instance.CallInit(Ids, manager);
 
                     result = instance;
                 }
@@ -470,67 +454,14 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             // 如果idResult是TypeTemplate，则创建其实例
             if (idResult is TypeTemplate typeTemplate)
             {
-                // 创建类的实例
-                var instance = typeTemplate.CreateInstance(manager);
+                // 创建类的实例（使用 V2 架构）
+                var instance = typeTemplate.CreateInstanceV2(manager);
 
                 // 初始化实例，设置Interpreter
                 instance.Init(manager.Interpreter);
 
-                // 保存init方法的引用
-                if (instance.Result.TryGetValue("init", out var initResult))
-                {
-                    FuncLangValue initFunc;
-
-                    // 处理构造函数重载
-                    if (initResult is FuncLangValue func)
-                    {
-                        initFunc = func;
-                    }
-                    else if (initResult is MethodOverloadList overloadList)
-                    {
-                        // 解析构造函数重载
-                        var resolvedFunc = overloadList.ResolveOverload(Ids, instance.Manager);
-                        if (resolvedFunc == null)
-                        {
-                            throw new InvalidOperationError(this, "找不到匹配参数的构造函数重载");
-                        }
-                        initFunc = resolvedFunc;
-                    }
-                    else
-                    {
-                        throw new TypeError(this, "FuncValue", "init 不是函数类型");
-                    }
-
-                    // 在调用init方法前，将当前实例添加到AnyInfo中，以便this关键字访问
-                    instance.Manager.Set(new LangId("this"), instance);
-                    instance.Manager.IsFunc = true; // 设置为函数上下文
-
-                    // 调用init方法
-                    // 对于有参数的构造函数，需要特殊处理：
-                    // 参数应该在调用者的上下文中求值，但方法体应该在实例的上下文中执行
-                    if (Ids.Count > 0)
-                    {
-                        // 预先在调用者上下文中求值参数，使用ValueExpression包装避免重复求值
-                        var evaluatedExprs = Ids.Select(expr =>
-                        {
-                            var value = expr.Run(manager);
-                            return new ValueExpression(value, expr.Position) as LangExpression;
-                        }).ToList();
-                        initFunc.Run(instance.Manager, evaluatedExprs);
-                    }
-                    else
-                    {
-                        // 无参数的构造函数，直接使用原始方式
-                        initFunc.Run(instance.Manager, Ids);
-                    }
-
-                    // 恢复非函数上下文标志
-                    instance.Manager.IsFunc = false;
-                }
-                else if (Ids.Count != 0)
-                {
-                    throw new InvalidOperationError(this, "找不到对应的init函数");
-                }
+                // 调用 init 构造函数
+                instance.CallInit(Ids, manager);
 
                 result = instance;
             }
@@ -556,45 +487,17 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             }
         }
 
-        // 原来的AnyLangValue处理逻辑，用于兼容旧代码
-        // 但是如果已经通过TypeTemplate.CreateInstance创建的实例，则不调用构造函数
-        if (result is AnyLangValue anyValue && anyValue != null)
+        // 注意：TypeTemplate.CreateInstance 路径已经处理了构造函数调用
+        // 这里只是为了兼容可能的边缘情况（例如直接创建实例而非通过 TypeTemplate）
+        if (result is AnyLangValue anyValue)
         {
-            // 只有在没有参数时才调用构造函数，避免重复调用
-            // 构造函数的调用已经在TypeTemplate.CreateInstance路径中处理了
-            if (Ids.Count == 0 && anyValue.Result.TryGetValue("init", out var initResult))
+            // V2 架构中，方法存储在 Metadata.MethodTable 中，不在 InstanceData 中
+            // 如果有 init 方法且有参数，调用它
+            var initMethod = anyValue.GetInitMethod(Ids, manager);
+            if (initMethod != null && Ids.Count > 0)
             {
-                FuncLangValue initFunc;
-
-                // 处理构造函数重载
-                if (initResult is FuncLangValue func)
-                {
-                    initFunc = func;
-                }
-                else if (initResult is MethodOverloadList overloadList)
-                {
-                    // 对于无参数调用，选择第一个可用的重载
-                    initFunc = overloadList.Overloads.FirstOrDefault() ?? throw new InvalidOperationError(this, "没有可用的构造函数重载");
-                }
-                else
-                {
-                    throw new TypeError(this, "FuncValue", "init 不是函数类型");
-                }
-
-                // 在调用init方法前，将当前实例添加到AnyInfo中，以便this关键字访问
-                anyValue.Manager.Set(new LangId("this"), anyValue);
-                anyValue.Manager.IsFunc = true; // 设置为函数上下文
-
-                // 调用init方法，并将参数传递给它
-                initFunc.Run(anyValue.Manager, Ids);
-
-                // 恢复非函数上下文标志
-                anyValue.Manager.IsFunc = false;
-            }
-            else if (Ids.Count != 0)
-            {
-                // 有参数的情况已经在TypeTemplate.CreateInstance路径中处理
-                // 这里不重复处理
+                // 使用 V2 的 CallInit API
+                anyValue.CallInit(Ids, manager);
             }
         }
 
@@ -609,12 +512,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
         return result;
     }
 
-    public LangValueType FromClassToResult(LangValueType baseLangValue)
-    {
-        return FromClassToResult(baseLangValue, null);
-    }
-
-    public LangValueType FromClassToResult(LangValueType baseLangValue, VariateManager? manager)
+    public LangValueType FromClassToResult(LangValueType baseLangValue, VariateManager? manager = null)
     {
         var type = baseLangValue.GetType();
         MethodInfo? m = null;
@@ -622,7 +520,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
         // 设置执行上下文，以便扩展方法可以访问当前的 VariateManager
         if (manager != null)
         {
-            Old8Lang.AST.Expression.ValueFunctions.ExecutionContext.SetCurrentManager(manager);
+            ValueFunctions.ExecutionContext.SetCurrentManager(manager);
         }
 
         // 对于具有扩展方法的类型，优先查找扩展方法而不是实例方法
@@ -632,19 +530,19 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
         {
             type = baseLangValue switch
             {
-                DictionaryLangValue => typeof(Old8Lang.AST.Expression.ValueFunctions.DictionaryValueFuncStatic),
-                ListLangValue => typeof(Old8Lang.AST.Expression.ValueFunctions.ListValueFuncStatic),
-                TaskLangValue => typeof(Old8Lang.AST.Expression.ValueFunctions.TaskValueFuncStatic),
-                ThreadLangValue => typeof(Old8Lang.AST.Expression.ValueFunctions.ThreadValueFuncStatic),
-                StringLangValue => typeof(Old8Lang.AST.Expression.ValueFunctions.StringValueFuncStatic),
-                TupleLangValue => typeof(Old8Lang.AST.Expression.ValueFunctions.TupleValueFuncStatic),
-                ArrayLangValue => typeof(Old8Lang.AST.Expression.ValueFunctions.ArrayValueFuncStatic),
+                DictionaryLangValue => typeof(DictionaryValueFuncStatic),
+                ListLangValue => typeof(ListValueFuncStatic),
+                TaskLangValue => typeof(TaskValueFuncStatic),
+                ThreadLangValue => typeof(ThreadValueFuncStatic),
+                StringLangValue => typeof(StringValueFuncStatic),
+                TupleLangValue => typeof(TupleValueFuncStatic),
+                ArrayLangValue => typeof(ArrayValueFuncStatic),
                 _ => null
             };
 
             // 根据参数数量查找正确的重载
             var allMethods = type?.GetMethods().Where(x => x.Name == Id.IdName).ToArray();
-            if (allMethods != null && allMethods.Length > 0)
+            if (allMethods is { Length: > 0 })
             {
                 // 预期参数数量 = 传入参数数量 + 1 (扩展方法的第一个参数是baseLangValue)
                 var expectedParamCount = Ids.Count + 1;
@@ -681,8 +579,8 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
         {
             type = baseLangValue.GetType();
             // 根据参数数量查找正确的重载
-            var allInstanceMethods = type?.GetMethods().Where(x => x.Name == Id.IdName).ToArray();
-            if (allInstanceMethods != null && allInstanceMethods.Length > 0)
+            var allInstanceMethods = type.GetMethods().Where(x => x.Name == Id.IdName).ToArray();
+            if (allInstanceMethods is { Length: > 0 })
             {
                 // 对于实例方法，预期参数数量 = 传入参数数量
                 var expectedParamCount = Ids.Count;
@@ -779,7 +677,7 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
         finally
         {
             // 清理执行上下文
-            Old8Lang.AST.Expression.ValueFunctions.ExecutionContext.ClearCurrentManager();
+            ValueFunctions.ExecutionContext.ClearCurrentManager();
         }
     }
 

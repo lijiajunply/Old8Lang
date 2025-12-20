@@ -1,0 +1,17 @@
+class Student {
+    public name <- ""
+    grade <- 0
+
+    func init(name:string, grade:int) {
+        this.name <- name
+        this.grade <- grade
+    }
+
+    func getInfo() -> string {
+        return name + " is in grade " + grade
+    }
+}
+
+student <- Student("Bob", 10)
+info <- student.getInfo()
+PrintLine(info)

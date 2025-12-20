@@ -1,6 +1,8 @@
 using System.Collections.Concurrent;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.AST.Expression.Generators;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.Value;
@@ -101,7 +103,7 @@ public static class TypeChecker
             AsyncFuncLangValue => "async_func",
             GeneratorLangValue => "generator",
             AsyncGeneratorLangValue => "async_generator",
-            AnyLangValue any => any.Id.IdName,
+            AnyLangValue any => any.ClassId.IdName,
             NullLangValue => "null",
             TupleLangValue => "tuple",
             VoidLangValue => "void",

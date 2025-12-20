@@ -1,0 +1,24 @@
+// 调试 V2 架构的 this 和字段赋值
+
+class Person {
+    public name <- "default"
+    public age <- -1
+
+    func init(n, a) {
+        PrintLine("In init, n = " + n.ToStr() + ", a = " + a.ToStr())
+        PrintLine("Before assignment, this.name = " + this.name)
+        this.name <- n
+        PrintLine("After assignment, this.name = " + this.name)
+        this.age <- a
+    }
+
+    public greet() {
+        PrintLine("In greet, this.name = " + this.name + ", this.age = " + this.age.ToStr())
+    }
+}
+
+// 创建实例
+PrintLine("Creating person...")
+person <- Person("Alice", 25)
+PrintLine("Calling greet...")
+person.greet()

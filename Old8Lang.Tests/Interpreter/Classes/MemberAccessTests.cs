@@ -522,38 +522,40 @@ public class MemberAccessTests
     public void MemberAccess_MethodChaining_CallsMultipleMethods()
     {
         // Arrange
-        var code = @"
-            class StringBuilder {
-                private content <- """"
+        var code = """
 
-                func StringBuilder() {
-                    content <- """"
-                }
+                               class StringBuilder {
+                                   private content <- ""
 
-                func Append(text:string) -> StringBuilder {
-                    content <- content + text
-                    return this
-                }
+                                   func StringBuilder() {
+                                       content <- ""
+                                   }
 
-                func AppendLine(text:string) -> StringBuilder {
-                    content <- content + text + ""\n""
-                    return this
-                }
+                                   func Append(text:string) -> StringBuilder {
+                                       content <- content + text
+                                       return this
+                                   }
 
-                func Clear() -> StringBuilder {
-                    content <- """"
-                    return this
-                }
+                                   func AppendLine(text:string) -> StringBuilder {
+                                       content <- content + text + "\n"
+                                       return this
+                                   }
 
-                func ToString() -> string {
-                    return content
-                }
-            }
+                                   func Clear() -> StringBuilder {
+                                       content <- ""
+                                       return this
+                                   }
 
-            builder <- StringBuilder()
-            result <- builder.Append(""Hello"").AppendLine("" World"").Append(""!"").ToString()
-            length <- len(result)
-        ";
+                                   func ToString() -> string {
+                                       return content
+                                   }
+                               }
+
+                               builder <- StringBuilder()
+                               result <- builder.Append("Hello").AppendLine(" World").Append("!").ToString()
+                               length <- len(result)
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -664,52 +666,54 @@ public class MemberAccessTests
     public void MemberAccess_WithCollections_AccessesCollectionMembers()
     {
         // Arrange
-        var code = @"
-            class Library {
-                public books <- []
-                public members <- []
+        var code = """
 
-                func Library() {
-                    books <- [
-                        {""title"": ""1984"", ""author"": ""Orwell"", ""year"": 1949},
-                        {""title"": ""Brave New World"", ""author"": ""Huxley"", ""year"": 1932},
-                        {""title"": ""Fahrenheit 451"", ""author"": ""Bradbury"", ""year"": 1953}
-                    ]
-                    members <- [""Alice"", ""Bob"", ""Charlie""]
-                }
+                               class Library {
+                                   public books <- []
+                                   public members <- []
 
-                func GetBook(index:int) -> any {
-                    return books[index]
-                }
+                                   func Library() {
+                                       books <- [
+                                           {"title": "1984", "author": "Orwell", "year": 1949},
+                                           {"title": "Brave New World", "author": "Huxley", "year": 1932},
+                                           {"title": "Fahrenheit 451", "author": "Bradbury", "year": 1953}
+                                       ]
+                                       members <- ["Alice", "Bob", "Charlie"]
+                                   }
 
-                func AddBook(title:string, author:string, year:int) {
-                    books.Push({""title"": title, ""author"": author, ""year"": year})
-                }
+                                   func GetBook(index:int) -> any {
+                                       return books[index]
+                                   }
 
-                func GetMemberCount() -> int {
-                    return len(members)
-                }
+                                   func AddBook(title:string, author:string, year:int) {
+                                       books.Push({"title": title, "author": author, "year": year})
+                                   }
 
-                func GetBookTitles() -> [string] {
-                    titles <- []
-                    for book in books {
-                        titles.Push(book[""title""])
-                    }
-                    return titles
-                }
-            }
+                                   func GetMemberCount() -> int {
+                                       return len(members)
+                                   }
 
-            library <- Library()
-            book1 <- library.GetBook(0)
-            title1 <- book1[""title""]
-            author1 <- book1[""author""]
+                                   func GetBookTitles() -> list {
+                                       titles <- {}
+                                       for book in books {
+                                           titles.Add(book["title"])
+                                       }
+                                       return titles
+                                   }
+                               }
 
-            library.AddBook(""Animal Farm"", ""Orwell"", 1945)
-            totalBooks <- library.len(books)
+                               library <- Library()
+                               book1 <- library.GetBook(0)
+                               title1 <- book1["title"]
+                               author1 <- book1["author"]
 
-            memberCount <- library.GetMemberCount()
-            allTitles <- library.GetBookTitles()
-        ";
+                               library.AddBook("Animal Farm", "Orwell", 1945)
+                               totalBooks <- library.len(books)
+
+                               memberCount <- library.GetMemberCount()
+                               allTitles <- library.GetBookTitles()
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -819,22 +823,22 @@ public class MemberAccessTests
                 public data <- {}
                 public isValid <- true
 
-                func SafeAccess() {
-                    data <- {""name"": ""Alice"", ""age"": 25}
-                    isValid <- true
+                func init() {
+                    this.data <- {""name"": ""Alice"", ""age"": 25}
+                    this.isValid <- true
                 }
 
                 func GetSafe(key:string) -> any {
-                    if data.ContainsKey(key) {
-                        return data[key]
+                    if this.data.ContainsKey(key) {
+                        return this.data[key]
                     } else {
                         return null
                     }
                 }
 
                 func SetSafe(key:string, value:any) -> bool {
-                    if isValid {
-                        data[key] <- value
+                    if this.isValid {
+                        this.data[key] <- value
                         return true
                     }
                     return false
@@ -883,10 +887,10 @@ public class MemberAccessTests
         // Arrange
         var code = @"
             class DynamicObject {
-                public properties <- {}
+                public properties
 
-                func DynamicObject() {
-                    properties <- {}
+                func init() {
+                    this.properties <- dict()
                 }
 
                 func SetProperty(name:string, value:any) {
@@ -906,17 +910,17 @@ public class MemberAccessTests
                 }
             }
 
-            dynamic <- DynamicObject()
-            dynamic.SetProperty(""name"", ""Dynamic"")
-            dynamic.SetProperty(""value"", 42)
-            dynamic.SetProperty(""isActive"", true)
+            dynamicObj <- DynamicObject()
+            dynamicObj.SetProperty(""name"", ""Dynamic"")
+            dynamicObj.SetProperty(""value"", 42)
+            dynamicObj.SetProperty(""isActive"", true)
 
-            hasName <- dynamic.HasProperty(""name"")
-            hasMissing <- dynamic.HasProperty(""missing"")
+            hasName <- dynamicObj.HasProperty(""name"")
+            hasMissing <- dynamicObj.HasProperty(""missing"")
 
-            nameValue <- dynamic.GetProperty(""name"")
-            valueValue <- dynamic.GetProperty(""value"")
-            isActiveValue <- dynamic.GetProperty(""isActive"")
+            nameValue <- dynamicObj.GetProperty(""name"")
+            valueValue <- dynamicObj.GetProperty(""value"")
+            isActiveValue <- dynamicObj.GetProperty(""isActive"")
         ";
         var interpreter = new LangInterpreter();
 

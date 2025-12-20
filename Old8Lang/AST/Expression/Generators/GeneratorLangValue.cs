@@ -1,10 +1,11 @@
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
-using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.Generators;
 
 /// <summary>
 /// 生成器对象，用于表示生成器函数的实例，实现ILangList接口以支持迭代

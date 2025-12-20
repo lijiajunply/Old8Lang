@@ -1,0 +1,30 @@
+class Product {
+    public name <- ""
+    public price <- 0.0
+    public category <- ""
+    public discount <- 0.0
+
+    func init(name:string, price:double) {
+        PrintLine("  [2参] 开始")
+        this.category <- "General"
+        PrintLine("  [2参] 结束")
+    }
+
+    func init(name:string, price:double, category:string, discount:double) {
+        PrintLine("[4参] 开始")
+        PrintLine("[4参] 参数 category = " + category)
+        this.init(name, price)
+        PrintLine("[4参] 调用 this.init 后")
+        PrintLine("[4参] 参数 category = " + category)
+        PrintLine("[4参] 设置前，检查变量")
+
+        // 直接访问参数
+        PrintLine("[4参] 参数变量 category = " + category)
+
+        // 通过 this 访问成员
+        c2 <- this.category
+        PrintLine("[4参] this.category = " + c2)
+    }
+}
+
+product2 <- Product("Laptop", 999.99, "Electronics", 0.1)

@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
@@ -43,12 +44,13 @@ public static class AnyValueFuncStatic
     {
         var builder = new StringBuilder();
         builder.Append('{');
-        for (var i = 0; i < type.Variates.Count; i++)
+        var i = 0;
+        foreach (var (key, value) in type.InstanceData)
         {
-            var variable = type.Variates.ElementAt(i);
-            if (variable.Value is FuncLangValue or Instance or NativeAnyLangValue or NativeStaticAny
+            if (value is FuncLangValue or Instance or NativeAnyLangValue or NativeStaticAny
                 or VoidLangValue) continue;
-            builder.Append($"{(i == 0 ? "" : ",")}\"{variable.Key}\":{variable.Value}");
+            builder.Append($"{(i == 0 ? "" : ",")}\"{key}\":{value}");
+            i++;
         }
 
         builder.Append('}');
@@ -64,17 +66,40 @@ public static class AnyValueFuncStatic
     {
         var jsonObject = JsonSerializer.Deserialize<Dictionary<string, object>>(json.Value) ??
                          new Dictionary<string, object>();
-        return new AnyLangValue(jsonObject.ToDictionary<KeyValuePair<string, object>, ClassMemberId, LangExpression>
-        (
-            variable => new ClassMemberId(variable.Key),
-            variable =>
-            {
-                if (variable.Value is JsonElement element)
-                {
-                    return GetJsonElement(element, json);
-                }
 
-                return LangValueType.ObjToValue(variable.Value);
-            }));
+        // 创建一个临时的ClassMetadata用于JSON对象
+        var metadata = new ClassMetadata(
+            className: "__JsonObject__",
+            parentClassName: null,
+            interfaceNames: new List<string>(),
+            mixinNames: new List<string>(),
+            isInterface: false,
+            isAbstract: false,
+            isMixin: false
+        );
+
+        // 创建AnyLangValue实例
+        var anyValue = new AnyLangValue(
+            classId: new LangId("__JsonObject__"),
+            metadata: metadata,
+            position: default
+        );
+
+        // 填充InstanceData
+        foreach (var (key, value) in jsonObject)
+        {
+            LangValueType langValue;
+            if (value is JsonElement element)
+            {
+                langValue = GetJsonElement(element, json);
+            }
+            else
+            {
+                langValue = LangValueType.ObjToValue(value);
+            }
+            anyValue.InstanceData[key] = langValue;
+        }
+
+        return anyValue;
     }
 }

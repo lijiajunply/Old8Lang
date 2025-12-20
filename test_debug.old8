@@ -1,13 +1,39 @@
-class Database {
-    public connected:bool
-    func init() {
-        this.connected <- false
-        this.Connect()
+class Product {
+    public name <- ""
+    public price <- 0.0
+    public category <- ""
+    public discount <- 0.0
+
+    func init(name:string, price:double) {
+        PrintLine("  [2参] 开始")
+        PrintLine("  [2参] 设置 category 为 General")
+        this.category <- "General"
+        PrintLine("  [2参] 结束")
     }
-    func Connect() -> void {
-        if not this.connected {
-            this.connected <- true
-        }
+
+    func init(name:string, price:double, category:string, discount:double) {
+        PrintLine("[4参] 开始, category = " + category)
+
+        // 调用前检查实例的 category 成员
+        c1 <- this.category
+        PrintLine("[4参] 调用前, this.category = " + c1)
+
+        this.init(name, price)
+
+        // 调用后检查参数和实例成员
+        PrintLine("[4参] 调用后, 参数 category = " + category)
+        c2 <- this.category
+        PrintLine("[4参] 调用后, this.category = " + c2)
+
+        // 尝试设置
+        PrintLine("[4参] 尝试设置 this.category 为参数值")
+        this.category <- category
+
+        // 设置后检查
+        c3 <- this.category
+        PrintLine("[4参] 设置后, this.category = " + c3)
     }
 }
-db <- Database()
+
+product2 <- Product("Laptop", 999.99, "Electronics", 0.1)
+PrintLine("最终 product2.category = " + product2.category)

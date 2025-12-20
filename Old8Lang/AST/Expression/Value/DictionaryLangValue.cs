@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
@@ -297,14 +298,15 @@ public class DictionaryLangValue : LangValueType, ILangList
             throw new TypeError(this, "Type", otherLangValueType.GetType().Name);
         }
 
-        var typeAny = typeTemplate.CreateInstance(manager);
+        var typeAny = typeTemplate.CreateInstanceV2(manager);
+        typeAny.Init(manager.Interpreter);
 
         foreach (var a in Value)
         {
             var key = a.Key.Run(manager);
             var value = a.Value.Run(manager);
             if (key is not StringLangValue s) continue;
-            typeAny.Set(new LangId(s.Value), value);
+            typeAny.SetField(s.Value, value, manager);
         }
 
         return typeAny;

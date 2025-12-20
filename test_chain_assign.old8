@@ -1,0 +1,27 @@
+class Product {
+    public name <- ""
+    public price <- 0.0
+    public category <- ""
+    public discount <- 0.0
+
+    func init(name:string, price:double) {
+        PrintLine("  [2参] 开始")
+        this.name <- name
+        this.price <- price
+        this.category <- "General"
+        PrintLine("  [2参] 结束")
+    }
+
+    func init(name:string, price:double, category:string, discount:double) {
+        PrintLine("[4参] 开始")
+        this.init(name, price)
+        PrintLine("[4参] 调用 this.init 后, 参数 category = " + category)
+        this.category <- category
+        PrintLine("[4参] 设置后，检查赋值")
+        cat <- this.category
+        PrintLine("[4参] cat = " + cat)
+    }
+}
+
+product2 <- Product("Laptop", 999.99, "Electronics", 0.1)
+PrintLine("product2.category = " + product2.category)

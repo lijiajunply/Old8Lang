@@ -327,7 +327,7 @@ public class ConstructorTests
         // Arrange
         var code = @"
             class Logger {
-                public logs <- []
+                public logs <- {}
 
                 func init() {
                     this.log(""Logger initialized"")
@@ -405,34 +405,36 @@ public class ConstructorTests
     public void Constructor_WithOptionalParameters_HandlesMissingArguments()
     {
         // Arrange
-        var code = @"
-            class Configuration {
-                public host <- ""localhost""
-                public port <- 8080
-                public timeout <- 30
-                public sslEnabled <- false
+        var code = """
 
-                func init(host:string = ""localhost"", port:int = 8080, timeout:int = 30, sslEnabled:bool = false) {
-                    this.host <- host
-                    this.port <- port
-                    this.timeout <- timeout
-                    this.sslEnabled <- sslEnabled
-                }
-            }
+                               class Configuration {
+                                   public host <- "localhost"
+                                   public port <- 8080
+                                   public timeout <- 30
+                                   public sslEnabled <- false
 
-            config1 <- Configuration()
-            config2 <- Configuration(""example.com"")
-            config3 <- Configuration(""api.test.com"", 443)
-            config4 <- Configuration(""secure.api.com"", 443, 60, true)
+                                   func init(host: "localhost", port: 8080, timeout: 30, sslEnabled: false) {
+                                       this.host <- host
+                                       this.port <- port
+                                       this.timeout <- timeout
+                                       this.sslEnabled <- sslEnabled
+                                   }
+                               }
 
-            host1 <- config1.host
-            port1 <- config1.port
-            host2 <- config2.host
-            port2 <- config2.port
-            host3 <- config3.host
-            port3 <- config3.port
-            ssl4 <- config4.sslEnabled
-        ";
+                               config1 <- Configuration()
+                               config2 <- Configuration("example.com")
+                               config3 <- Configuration("api.test.com", 443)
+                               config4 <- Configuration("secure.api.com", 443, 60, true)
+
+                               host1 <- config1.host
+                               port1 <- config1.port
+                               host2 <- config2.host
+                               port2 <- config2.port
+                               host3 <- config3.host
+                               port3 <- config3.port
+                               ssl4 <- config4.sslEnabled
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act

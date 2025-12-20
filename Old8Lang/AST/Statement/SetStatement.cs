@@ -2,6 +2,7 @@ using Old8Lang.LangParser;
 using System.Reflection;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
@@ -195,7 +196,7 @@ public class SetStatement : OldStatement
                         var aliasName = parts[1].Trim();
 
                         // 获取属性值
-                        if (objectValue.Result.TryGetValue(propName, out var propValue))
+                        if (objectValue.InstanceData.TryGetValue(propName, out var propValue))
                         {
                             // 执行赋值
                             manager.Set(new LangId(aliasName), propValue);
@@ -211,7 +212,7 @@ public class SetStatement : OldStatement
                         var propName = propStrTrimmed;
 
                         // 获取属性值
-                        if (objectValue.Result.TryGetValue(propName, out var propValue))
+                        if (objectValue.InstanceData.TryGetValue(propName, out var propValue))
                         {
                             // 执行赋值
                             manager.Set(new LangId(propName), propValue);
@@ -277,35 +278,28 @@ public class SetStatement : OldStatement
                 // 处理 this.member <- value 形式的赋值
                 if (operation is { Left: LangId { IdName: "this" }, Right: LangId memberName })
                 {
-                    // 查找当前实例
-                    if (manager.GetValue(new LangId("this")) is AnyLangValue anyValue)
+                    // 查找当前实例 - 支持 V1 和 V2
+                    var thisValue = manager.GetValue(new LangId("this"));
+
+                    if (thisValue is AnyLangValue anyValue)
                     {
-                        // 将结果添加到实例的Result字典中，覆盖原来的值
-                        anyValue.Result[memberName.IdName] = result;
-                        // 同时更新实例的Manager中的值，确保后续访问能获取到最新值
-                        anyValue.Manager.Set(new LangId(memberName.IdName), result);
-                        // 更新当前manager中的值，确保在同一个方法中后续访问能获取到最新值
-                        manager.Set(new LangId(memberName.IdName), result);
-                        // 清除函数查找缓存，确保下次访问获取最新值
-                        anyValue.ClearFunctionLookupCache();
+                        // V2 架构：直接使用 SetField
+                        anyValue.SetField(memberName.IdName, result, manager);
                         return;
                     }
 
                     // 如果没有找到，可能是在init方法中，此时需要检查manager.IsFunc标志
                     if (manager.IsFunc)
                     {
-                        // 在init方法中，当前实例应该是manager.AnyInfo中的第一个AnyLangValue
-                        anyValue = manager.GetValue(new LangId("this")) as AnyLangValue ??
-                                   throw new NameError(this, "this");
-                        // 清除缓存，确保下次访问获取最新值
-                        anyValue.ClearFunctionLookupCache();
-                        // 将结果添加到实例的Result字典中，覆盖原来的值
-                        anyValue.Result[memberName.IdName] = result;
-                        // 同时更新实例的Manager中的值，确保后续访问能获取到最新值
-                        anyValue.Manager.Set(new LangId(memberName.IdName), result);
-                        // 更新当前manager中的值，确保在同一个方法中后续访问能获取到最新值
-                        manager.Set(new LangId(memberName.IdName), result);
-                        return;
+                        // 在init方法中，当前实例应该是manager中的 this
+                        if (thisValue is AnyLangValue anyValueInit)
+                        {
+                            // V2 架构
+                            anyValueInit.SetField(memberName.IdName, result, manager);
+                            return;
+                        }
+
+                        throw new NameError(this, "this");
                     }
                 }
                 // 处理普通对象成员访问：person.name <- value
@@ -313,15 +307,9 @@ public class SetStatement : OldStatement
                 {
                     // 获取左侧对象的值
                     var leftValue = leftExpr.Run(manager);
-                    if (leftValue is AnyLangValue anyObj)
+                    if (leftValue is AnyLangValue anyObjV2)
                     {
-                        // 清除缓存，确保下次访问获取最新值
-                        anyObj.ClearFunctionLookupCache();
-
-                        // 将结果添加到实例的Result字典中，覆盖原来的值
-                        anyObj.Result[memberNameObj.IdName] = result;
-                        // 同时更新对象的管理器中的值
-                        anyObj.Manager.Set(new LangId(memberNameObj.IdName), result);
+                        anyObjV2.SetField(memberNameObj.IdName, result, manager);
                         return;
                     }
                 }
@@ -817,6 +805,19 @@ public class SetStatement : OldStatement
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// 检查当前是否在构造函数（init方法）中
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>如果在构造函数中返回true</returns>
+    private static bool IsInInitMethod(VariateManager manager)
+    {
+        // 检查调用栈，看是否有名为 "init" 的函数
+        var callStack = Old8Exception.CurrentCallStack;
+        var initCount = callStack.Count(frame => frame.FunctionName == "init");
+        return initCount > 0; // 只要调用栈中有 init 就返回 true
     }
 
     /// <summary>

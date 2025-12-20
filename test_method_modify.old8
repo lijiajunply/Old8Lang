@@ -1,0 +1,33 @@
+class Calculator {
+    public value <- 0
+
+    func init(initial:int) {
+        PrintLine("Init: setting value to " + initial.ToStr())
+        this.value <- initial
+        PrintLine("Init: after setting, value = " + this.value.ToStr())
+    }
+
+    func Add(amount:int) -> int {
+        PrintLine("Add: before, value = " + value.ToStr() + ", amount = " + amount.ToStr())
+        value <- value + amount
+        PrintLine("Add: after, value = " + value.ToStr())
+        return value
+    }
+
+    func Multiply(factor:int) -> int {
+        PrintLine("Multiply: before, value = " + value.ToStr() + ", factor = " + factor.ToStr())
+        value <- value * factor
+        PrintLine("Multiply: after, value = " + value.ToStr())
+        return value
+    }
+}
+
+PrintLine("Creating calculator with initial value 10")
+calc <- Calculator(10)
+PrintLine("Calling Add(5)")
+result1 <- calc.Add(5)
+PrintLine("result1 = " + result1.ToStr())
+PrintLine("Calling Multiply(2)")
+result2 <- calc.Multiply(2)
+PrintLine("result2 = " + result2.ToStr())
+PrintLine("Final value = " + calc.value.ToStr())

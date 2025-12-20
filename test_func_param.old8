@@ -1,0 +1,11 @@
+func test1(x:string) {
+    PrintLine("test1: x = " + x)
+}
+
+func test2(x:string) {
+    PrintLine("test2 开始: x = " + x)
+    test1("changed")
+    PrintLine("test2 结束: x = " + x)
+}
+
+test2("original")

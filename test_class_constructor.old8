@@ -1,0 +1,26 @@
+class Student {
+    public name <- ""
+    grade <- 0
+
+    func init(name:string, grade:int) {
+        PrintLine("=== Init method started ===")
+        PrintLine("Before assignment: this.name=" + this.name + ", this.grade=" + this.grade.ToStr())
+        PrintLine("Parameters: name=" + name + ", grade=" + grade.ToStr())
+        this.name <- name
+        PrintLine("After this.name assignment: this.name=" + this.name)
+        this.grade <- grade
+        PrintLine("After this.grade assignment: this.grade=" + this.grade.ToStr())
+        PrintLine("=== Init method ended ===")
+    }
+
+    func getInfo() -> string {
+        PrintLine("=== getInfo called ===")
+        PrintLine("name=" + name + ", grade=" + grade.ToStr())
+        return name + " is in grade " + grade.ToStr()
+    }
+}
+
+student <- Student("Bob", 10)
+PrintLine("After construction: student.name=" + student.name + ", student.grade=" + student.grade.ToStr())
+info <- student.getInfo()
+PrintLine("Final result: " + info)

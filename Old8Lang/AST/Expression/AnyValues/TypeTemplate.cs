@@ -1,8 +1,9 @@
 using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.AnyValues;
 
 /// <summary> 
 /// 类型模板类，用于存储类的定义信息 
@@ -147,35 +148,14 @@ public class TypeTemplate(
     }
 
     /// <summary>
-    /// 创建类的实例
+    /// 创建类的实例（V1 兼容接口，内部使用 V2）
     /// </summary>
     /// <param name="manager">变量管理器，用于获取父类信息</param>
-    /// <returns>类的实例</returns>
+    /// <returns>类的实例（V2 版本）</returns>
     public AnyLangValue CreateInstance(VariateManager manager)
     {
-        // 合并所有祖先类和子类的成员
-        var allVariates = new Dictionary<ClassMemberId, LangExpression>();
-
-        // 递归获取所有父类的成员
-        GetAllParentMembers(manager, this, allVariates);
-
-        // 添加子类的成员，重载列表已在解析阶段创建
-        foreach (var member in Variates)
-        {
-            allVariates[member.Key] = member.Value;
-        }
-
-        // 创建一个新的AnyLangValue实例，传递合并后的所有成员变量和方法
-        var instance = new AnyLangValue(new LangId(ClassName), allVariates, Position);
-
-        // 关键：将类型模板添加到实例的管理器中，这样实例就能查找自己的类型信息
-        instance.Manager.AddClassAndFunc(this);
-
-        // 将全局的类型模板（TypeTemplate）和其他ImportInfo添加到实例的Manager中
-        // 这样实例的方法就可以访问全局定义的类（如Engine、Wheel等）
-        instance.Manager.AddImportInfoRange(manager.ImportInfos);
-
-        return instance;
+        // 直接使用 V2 实现
+        return CreateInstanceV2(manager);
     }
 
     public override LangValueType Run(VariateManager manager)
@@ -369,9 +349,11 @@ public class TypeTemplate(
             {
                 if (memberId.IdName == instance.Id.IdName && memberExpr is TypeTemplate)
                 {
-                    // 找到嵌套类，创建实例
+                    // 找到嵌套类，创建实例（使用 V2）
                     var nestedTypeTemplate = (TypeTemplate)memberExpr.Run(manager);
-                    return nestedTypeTemplate.CreateInstance(manager);
+                    var nestedInstance = nestedTypeTemplate.CreateInstanceV2(manager);
+                    nestedInstance.Init(manager.Interpreter);
+                    return nestedInstance;
                 }
             }
 
@@ -380,15 +362,192 @@ public class TypeTemplate(
             {
                 if (memberId.IdName == instance.Id.IdName && memberExpr is TypeTemplate)
                 {
-                    // 找到嵌套类，创建实例
+                    // 找到嵌套类，创建实例（使用 V2）
                     var nestedTypeTemplate = (TypeTemplate)memberExpr.Run(manager);
-                    return nestedTypeTemplate.CreateInstance(manager);
+                    var nestedInstance = nestedTypeTemplate.CreateInstanceV2(manager);
+                    nestedInstance.Init(manager.Interpreter);
+                    return nestedInstance;
                 }
             }
         }
 
         // 如果不是嵌套类实例化，尝试调用静态方法
         return CallStaticMethod(instance, manager);
+    }
+
+    // ==================== V2 架构支持 ====================
+
+    /// <summary>
+    /// 类型元数据缓存（V2 架构）
+    /// 只构建一次，所有实例共享
+    /// </summary>
+    private ClassMetadata? _metadataCache;
+
+    /// <summary>
+    /// 元数据属性（V2 架构）
+    /// </summary>
+    public ClassMetadata? Metadata => _metadataCache;
+
+    /// <summary>
+    /// 构建类型元数据（V2 架构）
+    /// 只在第一次调用时构建，之后直接返回缓存
+    /// </summary>
+    public ClassMetadata BuildMetadata(VariateManager manager)
+    {
+        if (_metadataCache != null)
+            return _metadataCache;
+
+        // 创建 ClassMetadata
+        _metadataCache = new ClassMetadata(
+            className: ClassName,
+            parentClassName: ParentClassName,
+            interfaceNames: ImplementsNames,
+            mixinNames: MixinNames,
+            isInterface: IsInterface,
+            isAbstract: IsAbstract,
+            isMixin: IsMixin
+        );
+
+        // 构建方法表和字段表
+        BuildMethodTableAndFieldTable(manager, this, _metadataCache.MethodTable, _metadataCache.FieldTable);
+
+        // 初始化静态成员
+        foreach (var (memberId, expr) in StaticVariates)
+        {
+            if (expr is not FuncLangValue)
+            {
+                var value = expr.Run(manager);
+                _metadataCache.StaticMembers[memberId.IdName] = value;
+            }
+        }
+
+        return _metadataCache;
+    }
+
+    /// <summary>
+    /// 递归构建方法表和字段表（包括继承的成员）
+    /// </summary>
+    private void BuildMethodTableAndFieldTable(
+        VariateManager manager,
+        TypeTemplate type,
+        MethodTable methodTable,
+        FieldDefinitionTable fieldTable)
+    {
+        // 1. 先递归处理父类
+        if (type.ParentClassName != null)
+        {
+            if (manager.GetAny(new LangId(type.ParentClassName)) is TypeTemplate parentType)
+            {
+                // 递归处理祖父类
+                BuildMethodTableAndFieldTable(manager, parentType, methodTable, fieldTable);
+
+                // 添加父类的成员
+                AddMembersToTables(parentType, methodTable, fieldTable);
+            }
+        }
+
+        // 2. 处理接口
+        foreach (var interfaceName in type.ImplementsNames)
+        {
+            if (manager.GetAny(new LangId(interfaceName)) is TypeTemplate interfaceType)
+            {
+                BuildMethodTableAndFieldTable(manager, interfaceType, methodTable, fieldTable);
+                AddMembersToTables(interfaceType, methodTable, fieldTable);
+            }
+        }
+
+        // 3. 处理 Mixin
+        foreach (var mixinName in type.MixinNames)
+        {
+            if (manager.GetAny(new LangId(mixinName)) is TypeTemplate mixinType)
+            {
+                BuildMethodTableAndFieldTable(manager, mixinType, methodTable, fieldTable);
+                AddMembersToTables(mixinType, methodTable, fieldTable);
+            }
+        }
+
+        // 4. 最后添加当前类的成员（子类成员可以覆盖父类）
+        AddMembersToTables(type, methodTable, fieldTable);
+    }
+
+    /// <summary>
+    /// 将类型的成员添加到方法表和字段表
+    /// </summary>
+    private void AddMembersToTables(
+        TypeTemplate type,
+        MethodTable methodTable,
+        FieldDefinitionTable fieldTable)
+    {
+        foreach (var (memberId, expr) in type.Variates)
+        {
+            if (expr is FuncLangValue funcValue)
+            {
+                // 方法
+                var methodInfo = new LangMethodInfo(
+                    methodName: memberId.IdName,
+                    implementation: funcValue,
+                    modifiers: memberId.Modifiers,
+                    isStatic: memberId.HasModifier(AccessModifierType.Static),
+                    isVirtual: true, // Old8Lang 中所有方法都可以被重写
+                    isAbstract: memberId.HasModifier(AccessModifierType.Abstract),
+                    originClassName: type.ClassName
+                );
+
+                methodTable.AddMethod(methodInfo);
+            }
+            else if (expr is MethodOverloadList overloadList)
+            {
+                // 重载方法列表
+                foreach (var overload in overloadList.Overloads)
+                {
+                    var methodInfo = new LangMethodInfo(
+                        methodName: memberId.IdName,
+                        implementation: overload,
+                        modifiers: memberId.Modifiers,
+                        isStatic: memberId.HasModifier(AccessModifierType.Static),
+                        isVirtual: true,
+                        isAbstract: memberId.HasModifier(AccessModifierType.Abstract),
+                        originClassName: type.ClassName
+                    );
+
+                    methodTable.AddMethod(methodInfo);
+                }
+            }
+            else
+            {
+                // 字段
+                var fieldDef = new FieldDefinition(
+                    fieldName: memberId.IdName,
+                    initialValueExpression: expr,
+                    modifiers: memberId.Modifiers,
+                    isStatic: memberId.HasModifier(AccessModifierType.Static),
+                    originClassName: type.ClassName
+                );
+
+                fieldTable.AddField(fieldDef);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 创建类的实例（V2 架构）
+    /// </summary>
+    public AnyLangValue CreateInstanceV2(VariateManager manager)
+    {
+        // 构建或获取缓存的元数据
+        var metadata = BuildMetadata(manager);
+
+        // 创建实例
+        var instance = new AnyLangValue(
+            classId: new LangId(ClassName),
+            metadata: metadata,
+            position: Position
+        );
+
+        // 初始化字段
+        instance.InitializeFields(manager);
+
+        return instance;
     }
 }
 
