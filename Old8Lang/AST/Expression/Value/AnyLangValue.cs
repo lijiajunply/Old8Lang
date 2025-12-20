@@ -858,4 +858,13 @@ public class AnyLangValue : LangValueType
             ExternalManager = originalExternalManager;
         }
     }
+
+    /// <summary>
+    /// 清除函数查找缓存
+    /// 当实例的属性被修改时调用此方法，确保下次方法查找获取最新值
+    /// </summary>
+    public void ClearFunctionLookupCache()
+    {
+        FunctionLookupCache.Clear();
+    }
 }

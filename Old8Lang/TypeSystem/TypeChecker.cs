@@ -1,17 +1,49 @@
-using System.Linq;
+using System.Collections.Concurrent;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Error;
+using Old8Lang.Interpreter;
 
-namespace Old8Lang.Error;
+namespace Old8Lang.TypeSystem;
 
 /// <summary>
 /// 全局类型检查器，提供统一的类型验证和转换功能
+/// 支持类型假注、多态家族和类名称注解
 /// </summary>
 public static class TypeChecker
 {
+    /// <summary>
+    /// 类型假注管理器实例
+    /// </summary>
+    private static TypeAnnotationManager? _annotationManager;
+
+    /// <summary>
+    /// 跟踪 const 变量的集合
+    /// </summary>
+    private static readonly HashSet<string> _constVariables = new();
+
+    /// <summary>
+    /// 初始化类型检查器
+    /// </summary>
+    /// <param name="globalManager">全局变量管理器</param>
+    public static void Initialize(VariateManager globalManager)
+    {
+        _annotationManager = new TypeAnnotationManager(globalManager);
+    }
+
+    /// <summary>
+    /// 获取类型假注管理器
+    /// </summary>
+    public static TypeAnnotationManager GetAnnotationManager()
+    {
+        if (_annotationManager == null)
+            throw new InvalidOperationException("TypeChecker not initialized. Call Initialize() first.");
+        return _annotationManager;
+    }
+
     /// <summary>
     /// 验证函数调用时的参数类型匹配
     /// </summary>
@@ -53,7 +85,7 @@ public static class TypeChecker
     /// </summary>
     /// <param name="value">Old8Lang 值</param>
     /// <returns>类型名称</returns>
-    private static string GetLangValueType(LangValueType value)
+    public static string GetLangValueType(LangValueType value)
     {
         return value switch
         {
@@ -93,8 +125,20 @@ public static class TypeChecker
     /// <returns>是否兼容</returns>
     public static bool IsTypeCompatible(string expectedType, string actualType)
     {
-        // const 是只读修饰符，不是类型，任何类型都可以与 const 兼容
-        if (expectedType.Equals("const", StringComparison.OrdinalIgnoreCase)) return true;
+        // 处理 const 类型假注
+        if (expectedType.StartsWith("const ", StringComparison.OrdinalIgnoreCase))
+        {
+            // const 类型假注的格式：const <基础类型>
+            var constInnerType = expectedType.Substring(6).Trim(); // 移除 "const " 前缀
+            return IsTypeCompatible(constInnerType, actualType);
+        }
+
+        // 处理单独的 const 修饰符
+        if (expectedType.Equals("const", StringComparison.OrdinalIgnoreCase))
+        {
+            // const 可以接受任何类型
+            return true;
+        }
 
         // 完全匹配
         if (expectedType == actualType) return true;
@@ -124,18 +168,58 @@ public static class TypeChecker
     /// <param name="actualValue">实际的值</param>
     /// <param name="node">AST节点，用于错误报告</param>
     /// <param name="variableName">变量名</param>
+    /// <param name="isInitialAssignment">是否为首次赋值（声明时赋值）</param>
     /// <exception cref="TypeError">当类型不匹配时抛出</exception>
     public static void ValidateVariableAssignment(
         string? expectedType,
         LangValueType actualValue,
         IOldLangTree node,
-        string variableName)
+        string variableName,
+        bool isInitialAssignment = false)
     {
         if (string.IsNullOrEmpty(expectedType)) return; // 没有类型注解，跳过检查
 
         var actualType = GetLangValueType(actualValue);
+        var isConstDeclaration = expectedType.StartsWith("const ", StringComparison.OrdinalIgnoreCase) ||
+                                expectedType.Equals("const", StringComparison.OrdinalIgnoreCase);
 
-        if (!IsTypeCompatible(expectedType, actualType))
+        // 检查 const 变量规则
+        if (isConstDeclaration)
+        {
+            if (!isInitialAssignment)
+            {
+                throw new TypeError(
+                    node,
+                    expectedType,
+                    actualType,
+                    $"const 变量 '{variableName}' 只能初始化赋值，不能修改"
+                );
+            }
+            // 首次声明 const 变量，将其加入 const 集合
+            _constVariables.Add(variableName);
+        }
+        else
+        {
+            // 非 const 声明，检查是否在修改 const 变量
+            if (!isInitialAssignment && _constVariables.Contains(variableName))
+            {
+                throw new TypeError(
+                    node,
+                    expectedType,
+                    actualType,
+                    $"不能修改 const 变量 '{variableName}'"
+                );
+            }
+        }
+
+        // 对于 const 变量，跳过进一步的类型兼容性检查
+        if (isConstDeclaration)
+        {
+            return;
+        }
+
+        // 首先尝试多态兼容性检查，然后回退到基本兼容性检查
+        if (!IsPolymorphicCompatible(actualType, expectedType))
         {
             throw new TypeError(
                 node,
@@ -144,6 +228,24 @@ public static class TypeChecker
                 $"变量 '{variableName}' 赋值类型不匹配"
             );
         }
+    }
+
+    /// <summary>
+    /// 检查变量是否为 const
+    /// </summary>
+    /// <param name="variableName">变量名</param>
+    /// <returns>是否为 const 变量</returns>
+    public static bool IsConstVariable(string variableName)
+    {
+        return _constVariables.Contains(variableName);
+    }
+
+    /// <summary>
+    /// 清除 const 变量记录（用于新作用域等）
+    /// </summary>
+    public static void ClearConstVariables()
+    {
+        _constVariables.Clear();
     }
 
     /// <summary>
@@ -173,5 +275,53 @@ public static class TypeChecker
                 $"函数 '{functionName}' 返回值类型不匹配"
             );
         }
+    }
+
+    /// <summary>
+    /// 注册类类型到类型假注系统
+    /// </summary>
+    /// <param name="className">类名称</param>
+    /// <param name="baseClassName">基类名称（可选）</param>
+    public static void RegisterClassType(string className, string? baseClassName = null)
+    {
+        if (_annotationManager == null)
+            throw new InvalidOperationException("TypeChecker not initialized. Call Initialize() first.");
+
+        _annotationManager.RegisterClassType(className, baseClassName);
+    }
+
+    /// <summary>
+    /// 检查类型是否兼容（支持多态）
+    /// </summary>
+    /// <param name="sourceTypeName">源类型名称</param>
+    /// <param name="targetTypeName">目标类型名称</param>
+    /// <returns>是否兼容</returns>
+    public static bool IsPolymorphicCompatible(string sourceTypeName, string targetTypeName)
+    {
+        // 如果目标类型涉及 const，使用基本兼容性检查
+        if (targetTypeName.StartsWith("const ", StringComparison.OrdinalIgnoreCase) ||
+            targetTypeName.Equals("const", StringComparison.OrdinalIgnoreCase))
+        {
+            return IsTypeCompatible(sourceTypeName, targetTypeName);
+        }
+
+        if (_annotationManager == null)
+            return IsTypeCompatible(sourceTypeName, targetTypeName); // 回退到基本兼容性检查
+
+        return _annotationManager.IsTypeCompatible(sourceTypeName, targetTypeName);
+    }
+
+    /// <summary>
+    /// 获取类型的所有成员
+    /// </summary>
+    /// <param name="typeName">类型名称</param>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>成员字典</returns>
+    public static ConcurrentDictionary<string, LangValueType> GetTypeMembers(string typeName, VariateManager manager)
+    {
+        if (_annotationManager == null)
+            return new ConcurrentDictionary<string, LangValueType>();
+
+        return _annotationManager.GetTypeMembers(typeName, manager);
     }
 }

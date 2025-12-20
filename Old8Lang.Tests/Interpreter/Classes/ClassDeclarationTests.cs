@@ -672,33 +672,35 @@ public class ClassDeclarationTests
     public void ClassDeclaration_WithMethodParameters_HandlesCorrectly()
     {
         // Arrange
-        var code = @"
-            class Greeter {
-                public greeting <- """"
+        var code = """
 
-                func setGreeting(text:string) {
-                    greeting <- text
-                }
+                               class Greeter {
+                                   public greeting <- ""
 
-                func sayHello(name:string, punctuation:string) -> string {
-                    return greeting + "" "" + name + punctuation
-                }
+                                   func setGreeting(text:string) {
+                                       greeting <- text
+                                   }
 
-                func createGreeting(title:string, name:string, isFormal:bool) -> string {
-                    if isFormal {
-                        return title + "" "" + name
-                    } else {
-                        return ""Hi "" + name
-                    }
-                }
-            }
+                                   func sayHello(name:string, punctuation:string) -> string {
+                                       return greeting + " " + name + punctuation
+                                   }
 
-            greeter <- Greeter()
-            greeter.setGreeting(""Good morning"")
-            hello1 <- greeter.sayHello(""Alice"", ""!"")
-            hello2 <- greeter.createGreeting(""Mr."", ""Smith"", true)
-            hello3 <- greeter.createGreeting(""Bob"", false)
-        ";
+                                   func createGreeting(title:string, name:string, isFormal:bool) -> string {
+                                       if isFormal {
+                                           return title + " " + name
+                                       } else {
+                                           return "Hi " + name
+                                       }
+                                   }
+                               }
+
+                               greeter <- Greeter()
+                               greeter.setGreeting("Good morning")
+                               hello1 <- greeter.sayHello("Alice", "!")
+                               hello2 <- greeter.createGreeting("Mr.", "Smith", true)
+                               hello3 <- greeter.createGreeting("Bob", false)
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act

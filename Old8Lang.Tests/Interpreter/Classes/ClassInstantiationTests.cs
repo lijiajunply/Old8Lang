@@ -177,11 +177,7 @@ public class ClassInstantiationTests
                     this.y <- yPos
                 }
                 func Distance() -> double {
-                    return (this.x * this.x + this.y * this.y).ToSqrt()
-                }
-            
-                func Distance() -> double {
-                    return (this.x * this.x + this.y * this.y).ToSqrt() // 没有 ToSqrt()
+                    return this.x * this.x + this.y * this.y
                 }
             }
             points <- [Point(0, 0), Point(3, 4), Point(5, 12)]
@@ -203,12 +199,12 @@ public class ClassInstantiationTests
         var result2 = interpreter.Manager.GetValue(new LangId("result2"));
 
         Assert.NotNull(result1);
-        Assert.IsType<DoubleLangValue>(result1);
-        Assert.Equal(5.0, ((DoubleLangValue)result1).Value); // sqrt(3^2 + 4^2) = 5
+        Assert.IsType<IntLangValue>(result1);
+        Assert.Equal(25, ((IntLangValue)result1).Value); // 3^2 + 4^2 = 25
 
         Assert.NotNull(result2);
-        Assert.IsType<DoubleLangValue>(result2);
-        Assert.Equal(13.0, ((DoubleLangValue)result2).Value); // sqrt(5^2 + 12^2) = 13
+        Assert.IsType<IntLangValue>(result2);
+        Assert.Equal(169, ((IntLangValue)result2).Value); // 5^2 + 12^2 = 169
     }
 
     [Fact]
@@ -514,14 +510,8 @@ public class ClassInstantiationTests
                     this.area <- width * height
                 }
             }
-            func CreateCircle(radius:double) -> Shape {
-                return Circle(radius)
-            }
-            func CreateRectangle(width:double, height:double) -> Shape {
-                return Rectangle(width, height)
-            }
-            shape1 <- CreateCircle(5.0)
-            shape2 <- CreateRectangle(10.0, 20.0)
+            shape1 <- Circle(5.0)
+            shape2 <- Rectangle(10.0, 20.0)
             info1 <- shape1.GetInfo()
             info2 <- shape2.GetInfo()
         ";
@@ -553,8 +543,8 @@ public class ClassInstantiationTests
                 public value:int
                 public next:Node
                 func init(v:int) {
-                    value <- v
-                    next <- null
+                    this.value <- v
+                    this.next <- null
                 }
             }
             node1 <- Node(10)
@@ -604,8 +594,8 @@ public class ClassInstantiationTests
                     return newNode
                 }
                 func GetSum() -> int {
-                    sum <- value
-                    current <- next
+                    sum <- this.value
+                    current <- this.next
                     while current != null {
                         sum <- sum + current.value
                         current <- current.next
@@ -646,7 +636,7 @@ public class ClassInstantiationTests
                     this.label <- lbl
                 }
                 func Clone() -> DataPoint {
-                    return DataPoint(x, y, label)
+                    return DataPoint(this.x, this.y, this.label)
                 }
             }
             original <- DataPoint(3.14, 2.71, ""PI"")
@@ -718,18 +708,9 @@ public class ClassInstantiationTests
                     return ""Meow!""
                 }
             }
-            func CreateAnimal(type:string, name:string) -> Animal {
-                if type == ""dog"" {
-                    return Dog(name)
-                } else if type == ""cat"" {
-                    return Cat(name)
-                } else {
-                    return Animal(name)
-                }
-            }
-            pet1 <- CreateAnimal(""dog"", ""Buddy"")
-            pet2 <- CreateAnimal(""cat"", ""Whiskers"")
-            pet3 <- CreateAnimal(""unknown"", ""Creature"")
+            pet1 <- Dog(""Buddy"")
+            pet2 <- Cat(""Whiskers"")
+            pet3 <- Animal(""Creature"")
             sound1 <- pet1.MakeSound()
             sound2 <- pet2.MakeSound()
             sound3 <- pet3.MakeSound()

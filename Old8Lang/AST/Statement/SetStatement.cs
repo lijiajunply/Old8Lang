@@ -7,6 +7,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.TypeSystem;
 
 namespace Old8Lang.AST.Statement;
 
@@ -68,10 +69,26 @@ public class SetStatement : OldStatement
     {
         var result = Value.Run(manager);
 
-        // 如果有类型注解，进行类型检查
-        if (Id != null && !string.IsNullOrEmpty(Id.AssumptionType))
+        // 检查是否为首次赋值
+        bool isInitialAssignment = false;
+        if (Id != null)
         {
-            TypeChecker.ValidateVariableAssignment(Id.AssumptionType, result, this, Id.IdName);
+            var existingVariable = manager.GetAny(Id);
+            isInitialAssignment = (existingVariable == null);
+
+            // 如果有类型注解，进行类型检查
+            if (!string.IsNullOrEmpty(Id.AssumptionType))
+            {
+                TypeChecker.ValidateVariableAssignment(Id.AssumptionType, result, this, Id.IdName, isInitialAssignment);
+            }
+            else if (!isInitialAssignment)
+            {
+                // 没有类型注解但是修改已存在的变量，检查是否为 const 变量
+                if (TypeChecker.IsConstVariable(Id.IdName))
+                {
+                    throw new Error.TypeError(this, "any", TypeChecker.GetLangValueType(result), $"不能修改 const 变量 '{Id.IdName}'");
+                }
+            }
         }
 
         // 处理嵌套索引访问赋值：array[0][0] <- value
@@ -278,6 +295,8 @@ public class SetStatement : OldStatement
                         // 在init方法中，当前实例应该是manager.AnyInfo中的第一个AnyLangValue
                         anyValue = manager.GetValue(new LangId("this")) as AnyLangValue ??
                                    throw new NameError(this, "this");
+                        // 清除缓存，确保下次访问获取最新值
+                        anyValue.ClearFunctionLookupCache();
                         // 将结果添加到实例的Result字典中，覆盖原来的值
                         anyValue.Result[memberName.IdName] = result;
                         // 同时更新实例的Manager中的值，确保后续访问能获取到最新值
@@ -294,6 +313,9 @@ public class SetStatement : OldStatement
                     var leftValue = leftExpr.Run(manager);
                     if (leftValue is AnyLangValue anyObj)
                     {
+                        // 清除缓存，确保下次访问获取最新值
+                        anyObj.ClearFunctionLookupCache();
+
                         // 将结果添加到实例的Result字典中，覆盖原来的值
                         anyObj.Result[memberNameObj.IdName] = result;
                         // 同时更新对象的管理器中的值

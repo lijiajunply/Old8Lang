@@ -1,0 +1,41 @@
+// 简单类型假注测试
+func main() -> void {
+    PrintLine("=== 开始类型假注测试 ===")
+
+    // 基本类型假注
+    x:int <- 42
+    y:string <- "Hello"
+    z:double <- 3.14
+
+    PrintLine("x: " + x)
+    PrintLine("y: " + y)
+    PrintLine("z: " + z)
+
+    // 类定义
+    class Animal {
+        public name:string
+        func init(n:string) {
+            this.name <- n
+        }
+        func Speak() -> void {
+            PrintLine(this.name + " makes a sound")
+        }
+    }
+
+    class Dog extends Animal {
+        public breed:string
+        func init(n:string, b:string) {
+            this.name <- n  // 需要显式设置父类属性
+            this.breed <- b
+        }
+        func Speak() -> void {
+            PrintLine(this.name + " barks")
+        }
+    }
+
+    // 多态测试
+    pet:Animal <- Dog("Buddy", "Golden Retriever")
+    pet.Speak()
+
+    PrintLine("=== 类型假注测试完成 ===")
+}

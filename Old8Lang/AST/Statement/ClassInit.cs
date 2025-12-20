@@ -6,6 +6,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.TypeSystem;
 
 namespace Old8Lang.AST.Statement;
 
@@ -33,6 +34,9 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
     /// <exception cref="DuplicateNameError">当类名已存在时抛出</exception>
     public override void Run(VariateManager manager)
     {
+        // 注册类型到类型假注系统
+        RegisterTypeToTypeSystem();
+
         // 首先注册所有嵌套类
         RegisterNestedClasses(manager);
 
@@ -46,6 +50,26 @@ public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = defa
 
         // 立即将类添加到ImportInfos中，以便在类定义内部访问
         manager.AddClassAndFunc(anyLangValue);
+    }
+
+    /// <summary>
+    /// 注册类类型到类型假注系统
+    /// </summary>
+    private void RegisterTypeToTypeSystem()
+    {
+        try
+        {
+            // 获取父类名称
+            string? baseClassName = anyLangValue.ParentClassName;
+
+            // 注册类类型到类型假注系统
+            TypeChecker.RegisterClassType(anyLangValue.ClassName, baseClassName);
+        }
+        catch
+        {
+            // 如果类型注册失败，不影响类定义的正常执行
+            // 这是为了向后兼容
+        }
     }
 
     /// <summary>

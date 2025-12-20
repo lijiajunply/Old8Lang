@@ -3,6 +3,7 @@ using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Statement;
 using Old8Lang.Error;
 using Old8Lang.LangParser;
+using Old8Lang.TypeSystem;
 
 namespace Old8Lang.Interpreter;
 
@@ -48,6 +49,9 @@ public class LangInterpreter
     {
         Manager.Interpreter = this;
         Manager.LangInfo ??= Apis.ReadJson();
+
+        // 初始化类型检查器
+        TypeChecker.Initialize(Manager);
 
         // 注册全局 Task 对象
         Manager.Set(new LangId("Task"), TaskClassLangValue.GetInstance());
