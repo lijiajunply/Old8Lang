@@ -505,8 +505,24 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                     instance.Manager.Set(new LangId("this"), instance);
                     instance.Manager.IsFunc = true; // 设置为函数上下文
 
-                    // 调用init方法，并将参数传递给它
-                    initFunc.Run(instance.Manager, Ids);
+                    // 调用init方法
+                    // 对于有参数的构造函数，需要特殊处理：
+                    // 参数应该在调用者的上下文中求值，但方法体应该在实例的上下文中执行
+                    if (Ids.Count > 0)
+                    {
+                        // 预先在调用者上下文中求值参数，使用ValueExpression包装避免重复求值
+                        var evaluatedExprs = Ids.Select(expr =>
+                        {
+                            var value = expr.Run(manager);
+                            return new ValueExpression(value, expr.Position) as LangExpression;
+                        }).ToList();
+                        initFunc.Run(instance.Manager, evaluatedExprs);
+                    }
+                    else
+                    {
+                        // 无参数的构造函数，直接使用原始方式
+                        initFunc.Run(instance.Manager, Ids);
+                    }
 
                     // 恢复非函数上下文标志
                     instance.Manager.IsFunc = false;

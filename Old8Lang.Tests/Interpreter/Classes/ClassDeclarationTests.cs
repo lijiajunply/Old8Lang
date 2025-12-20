@@ -450,7 +450,7 @@ public class ClassDeclarationTests
                                        if text == "" {
                                            return 0
                                        }
-                                       words <- text.Split(' ')
+                                       words <- text.Split(" ")
                                        return len(words)
                                    }
 
