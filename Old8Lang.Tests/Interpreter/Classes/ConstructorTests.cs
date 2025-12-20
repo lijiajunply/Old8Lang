@@ -486,7 +486,7 @@ public class ConstructorTests
 
                 func init(name:string, price:double, category:string, discount:double) {
                     // 先调用基础构造函数
-                    this.Product(name, price)
+                    this.init(name, price)
                     this.category <- category
                     this.discount <- discount
                 }

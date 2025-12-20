@@ -151,7 +151,9 @@ public class PrimaryParser(
             var notToken = CurrentToken;
             var position = new SourcePosition(notToken.Line, notToken.Column, tokenValue: notToken.Value);
             Expect(LangTokenType.Not);
-            var expr = ParsePrimary();
+            // 修复：not 运算符的右操作数应该包含点运算符的处理
+            // 调用 ParsePower() 而不是 ParsePrimary()，确保 not this.connected 被正确解析为 not (this.connected)
+            var expr = expressionParserFactory().ParsePower();
             return new Operation(null, LangTokenType.Exclamation, expr, position);
         }
 
@@ -161,7 +163,8 @@ public class PrimaryParser(
             var minusToken = CurrentToken;
             var position = new SourcePosition(minusToken.Line, minusToken.Column, tokenValue: minusToken.Value);
             Expect(LangTokenType.Minus);
-            var expr = ParsePrimary();
+            // 修复：前缀负号运算符的右操作数也应该包含点运算符的处理
+            var expr = expressionParserFactory().ParsePower();
             return new Operation(null, LangTokenType.Minus, expr, position);
         }
 

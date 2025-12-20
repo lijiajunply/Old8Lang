@@ -1,0 +1,13 @@
+class Database {
+    public connected:bool
+    func init() {
+        this.connected <- false
+        this.Connect()
+    }
+    func Connect() -> void {
+        if not this.connected {
+            this.connected <- true
+        }
+    }
+}
+db <- Database()
