@@ -543,12 +543,12 @@ public class ConstructorTests
                 public id <- 0
 
                 func init() {
-                    this.count <- count + 1
-                    this.id <- count
+                    Counter.count <- Counter.count + 1
+                    this.id <- Counter.count
                 }
 
                 static func GetCount() -> int {
-                    return this.count
+                    return Counter.count
                 }
             }
 
