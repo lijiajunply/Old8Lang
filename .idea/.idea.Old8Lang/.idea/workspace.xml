@@ -20,7 +20,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/debug_complex_logic_test.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ConstructorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ConstructorTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,7 +61,11 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ConstructorTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ConstructorTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ConstructorTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
@@ -439,7 +445,7 @@
       <workItem from="1766098235624" duration="16792000" />
       <workItem from="1766146301314" duration="8804000" />
       <workItem from="1766156569385" duration="1528000" />
-      <workItem from="1766238299964" duration="880000" />
+      <workItem from="1766238299964" duration="1503000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -784,7 +790,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="312" />
+    <option name="localTasksCounter" value="313" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -811,7 +817,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(modules): 实现统一模块架构并优化测试代码&#10;&#10;- 引入新的统一模块接口架构，支持更灵活的模块导入和管理&#10;- 更新条件导入测试，使用多行字符串字面量提高代码可读性&#10;- 重构配置模块，添加加载和验证函数以增强功能&#10;- 创建多个新测试模块文件，如调试、错误测试、延迟加载等&#10;- 添加统一模块架构测试类，验证新接口的正确性和兼容性&#10;- 优化现有模块文件结构，移除多余空行和调整代码布局&#10;- 确保新旧模块系统之间的向后兼容性，不影响现有功能" />
     <MESSAGE value="refactor(module): 统一模块对象架构设计&#10;&#10;- 删除重复的模块类和工厂类&#10;- 引入 UnifiedModule 作为统一模块实现&#10;- 创建 ModuleFactory 统一管理模块创建&#10;- 简化目录结构，从12个文件减少到6个核心文件&#10;- 保持向后兼容性，现有代码无需大幅修改&#10;- 降低代码复杂度，提高可维护性" />
     <MESSAGE value="feat(lang): 实现懒导入功能并修复模块导入问题&#10;&#10;- 添加对 lazy import 语法的支持，包括基本语法和带别名导入&#10;- 修复模块导入路径配置问题，确保测试环境正确加载模块&#10;- 更新模块架构以支持统一的模块加载机制&#10;- 修复条件导入测试中模块版本访问方式&#10;- 完善解析器对懒导入关键字的识别和处理&#10;- 实现懒加载模块的线程安全加载机制&#10;- 添加完整的懒导入功能测试用例&#10;- 优化模块符号提取逻辑以适配新架构&#10;- 更新测试基类中的模块导入路径配置&#10;- 修复高级导入测试中断言类型不匹配问题" />
     <MESSAGE value="refactor(tests): 简化命名空间引用并更新字符串字面量语法&#10;&#10;- 移除了冗余的命名空间前缀，简化类型引用&#10;- 将多行字符串字面量从 &quot;@&quot; 更新为 &quot;&quot;&quot; 语法&#10;- 统一了错误类型和值类型的引用方式&#10;- 提高了测试代码的一致性和可读性" />
@@ -836,7 +841,8 @@
     <MESSAGE value="refactor(core): 移除 V1 兼容接口并优化类实例化逻辑&#10;&#10;- 删除 AnyLangValue 中所有 V1 兼容属性和方法&#10;- 更新引用 Id 的位置从 Id 改为 ClassId&#10;- 移除 Operation 和 ReturnStatement 中的 ExternalManager 设置逻辑&#10;- 简化 Instance 中的构造函数调用逻辑，避免重复执行&#10;- 修改 SuperExpression 以适配未来继承支持&#10;- 调整测试用例中的参数类型声明从 [int] 到 array" />
     <MESSAGE value="chore(project): 更新项目配置和测试文件&#10;&#10;- 移除了旧的向量计算函数（vec2、distance、normalize）&#10;- 添加了新的 getValue 函数返回整数 42&#10;- 在工作区中引入了包管理器相关项目&#10;- 清理了临时测试文件和冗余变更记录&#10;- 配置了 Old8Lang.PackageManager 和其测试项目的运行设置&#10;- 更新了 IDE 的文件高亮设置以跳过特定模拟路径" />
     <MESSAGE value="feat(lang): 优化方法重载解析逻辑&#10;&#10;- 改进方法重载选择策略，优先选择参数数量最接近的重载&#10;- 增强参数匹配检查，支持默认参数的缺失情况处理&#10;- 更新类型模板中的重载解析算法，确保更精确的方法匹配&#10;- 修复重载方法表构建逻辑，防止重复方法覆盖问题&#10;- 清理项目配置文件中的冗余测试会话记录&#10;- 移除IDE工作区中的无效文件高亮设置" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 优化方法重载解析逻辑&#10;&#10;- 改进方法重载选择策略，优先选择参数数量最接近的重载&#10;- 增强参数匹配检查，支持默认参数的缺失情况处理&#10;- 更新类型模板中的重载解析算法，确保更精确的方法匹配&#10;- 修复重载方法表构建逻辑，防止重复方法覆盖问题&#10;- 清理项目配置文件中的冗余测试会话记录&#10;- 移除IDE工作区中的无效文件高亮设置" />
+    <MESSAGE value="fix(tests): 更新构造函数测试中的数值类型断言&#10;&#10;- 将 area1 的期望类型从 DoubleLangValue 改为 IntLangValue&#10;- 修改 area1 的期望值从 1.0 改为 1&#10;- 统一账户 overdraftLimit 初始化值为浮点数格式&#10;- 确保测试用例与实际代码中的数值类型一致" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(tests): 更新构造函数测试中的数值类型断言&#10;&#10;- 将 area1 的期望类型从 DoubleLangValue 改为 IntLangValue&#10;- 修改 area1 的期望值从 1.0 改为 1&#10;- 统一账户 overdraftLimit 初始化值为浮点数格式&#10;- 确保测试用例与实际代码中的数值类型一致" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -293,9 +293,9 @@ public class ConstructorTests
             validUser <- User(""test@example.com"", 25)
             invalidUser1 <- User(""invalid-email"", 25)
             invalidUser2 <- User(""test@example.com"", -5)
-            validResult <- if validUser != null then true else false
-            invalid1Result <- if invalidUser1 != null then true else false
-            invalid2Result <- if invalidUser2 != null then true else false
+            validResult <- validUser != null
+            invalid1Result <- invalidUser1 != null
+            invalid2Result <- invalidUser2 != null
         ";
         var interpreter = new LangInterpreter();
 
@@ -339,7 +339,7 @@ public class ConstructorTests
             }
 
             logger <- Logger()
-            resultCount <- logger.len(logs)
+            resultCount <- len(logger.logs)
             resultMessage <- logger.logs[0]
         ";
         var interpreter = new LangInterpreter();
@@ -380,7 +380,7 @@ public class ConstructorTests
 
             stats <- Statistics([1, 2, 3, 4, 5])
             resultSum <- stats.sum
-            resultCount <- stats.len(numbers)
+            resultCount <- len(stats.numbers)
         ";
         var interpreter = new LangInterpreter();
 

@@ -546,31 +546,36 @@ public class AnyLangValue : LangValueType
         // 1. 设置 this 指针
         initManager.Set(new LangId("this"), this);
 
-        // 2. 将所有实例字段添加到执行作用域
-        //    （init 方法内部可以直接访问字段，不需要 this.field）
+        // 2. 创建基础作用域用于字段
+        initManager.AddChildren();
+
+        // 3. 将所有实例字段添加到基础作用域
+        //    这样参数可以在更高优先级的作用域中覆盖字段
+        var fieldScopeIndex = initManager.Scopes.Count - 1;
         foreach (var (fieldName, fieldValue) in InstanceData)
         {
-            initManager.Set(new LangId(fieldName), fieldValue);
+            // 直接在字段作用域中设置字段
+            initManager.Scopes[fieldScopeIndex][fieldName] = fieldValue;
         }
 
-        // 3. 将类型信息添加到作用域（从 InstanceScope 继承）
+        // 4. 将类型信息添加到字段作用域（从 InstanceScope 继承）
         initManager.AddImportInfoRange(InstanceScope.ImportInfos);
 
-        // 4. 设置函数上下文标志
+        // 6. 设置函数上下文标志
         initManager.IsFunc = true;
 
-        // 5. 执行 init 方法，传入已经求值的参数表达式
+        // 7. 执行 init 方法，传入已经求值的参数表达式
         //    由于参数已经是值对象，FuncLangValue.Run 只需要直接使用它们
         initMethod.Run(initManager, parameterValueExpressions);
 
-        // 6. 恢复函数上下文标志
+        // 8. 恢复函数上下文标志
         initManager.IsFunc = false;
 
-        // 7. 同步字段修改
+        // 9. 同步字段修改
         //    init 方法执行完成后，将执行作用域中修改的字段值同步回实例数据
         SyncFieldsFromExecutionScope(initManager);
 
-        // 8. 清空SetField修改标记（方法执行结束）
+        // 10. 清空SetField修改标记（方法执行结束）
         _fieldsModifiedBySetField.Clear();
     }
 
