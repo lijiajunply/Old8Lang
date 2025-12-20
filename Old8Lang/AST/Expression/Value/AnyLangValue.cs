@@ -20,7 +20,7 @@ public class AnyLangValue : LangValueType
     /// <summary>
     /// 函数查找缓存，用于提高类方法查找效率
     /// </summary>
-    private readonly Dictionary<string, (ClassMemberId memberId, LangValueType value)> _functionLookupCache = [];
+    private readonly Dictionary<string, (ClassMemberId memberId, LangValueType value)> FunctionLookupCache = [];
 
     /// <summary>
     /// 获取所有可用的成员（包括继承的成员）
@@ -32,8 +32,7 @@ public class AnyLangValue : LangValueType
         var allMembers = new Dictionary<ClassMemberId, LangExpression>(Variates);
 
         // 获取当前类的类型模板
-        var currentTypeTemplate = Manager.GetAny(new LangId(Id.IdName)) as TypeTemplate;
-        if (currentTypeTemplate != null)
+        if (Manager.GetAny(new LangId(Id.IdName)) is TypeTemplate currentTypeTemplate)
         {
             // 获取所有父类成员
             GetAllParentMembers(manager, currentTypeTemplate, allMembers);
@@ -48,7 +47,8 @@ public class AnyLangValue : LangValueType
     /// <param name="manager">变量管理器</param>
     /// <param name="type">类型模板</param>
     /// <param name="allMembers">存储所有成员的字典</param>
-    private void GetAllParentMembers(VariateManager manager, TypeTemplate type, Dictionary<ClassMemberId, LangExpression> allMembers)
+    private void GetAllParentMembers(VariateManager manager, TypeTemplate type,
+        Dictionary<ClassMemberId, LangExpression> allMembers)
     {
         // 如果有父类，递归获取父类的所有成员
         if (type.ParentClassName != null)
@@ -168,16 +168,16 @@ public class AnyLangValue : LangValueType
     private (ClassMemberId? memberId, LangValueType? value)? FindMember(string memberName, VariateManager manager)
     {
         // 1. 首先检查缓存
-        if (_functionLookupCache.TryGetValue(memberName, out var cached))
+        if (FunctionLookupCache.TryGetValue(memberName, out var cached))
         {
-            return (cached.Item1, cached.Item2);
+            return (cached.memberId, cached.value);
         }
 
         // 2. 在Result字典中查找已初始化的成员
         if (Result.TryGetValue(memberName, out var resultValue))
         {
             var cacheEntry = (new ClassMemberId(memberName), resultValue);
-            _functionLookupCache[memberName] = cacheEntry;
+            FunctionLookupCache[memberName] = cacheEntry;
             return (cacheEntry.Item1, cacheEntry.Item2);
         }
 
@@ -188,12 +188,10 @@ public class AnyLangValue : LangValueType
 
         foreach (var (memberId, expression) in allMembers)
         {
-            if (memberId.IdName == memberName)
-            {
-                foundMemberId = memberId;
-                foundExpression = expression;
-                break;
-            }
+            if (memberId.IdName != memberName) continue;
+            foundMemberId = memberId;
+            foundExpression = expression;
+            break;
         }
 
         // 4. 如果找到了成员表达式，运行它并缓存结果
@@ -201,7 +199,7 @@ public class AnyLangValue : LangValueType
         {
             var value = foundExpression as LangValueType ?? foundExpression.Run(manager);
             var cacheEntry = (foundMemberId!, value);
-            _functionLookupCache[memberName] = cacheEntry;
+            FunctionLookupCache[memberName] = cacheEntry;
             return (foundMemberId, value);
         }
 
@@ -327,7 +325,7 @@ public class AnyLangValue : LangValueType
                         return funcResult;
                     }
 
-                    return value;
+                    return value ?? throw new AttributeError(this, id.IdName, Id.IdName);
                 }
 
                 // 如果没有找到，抛出AttributeError异常
@@ -413,11 +411,9 @@ public class AnyLangValue : LangValueType
                             ExternalManager = originalExternalManager;
                         }
                     }
-                    else
-                    {
-                        // 不是函数类型，直接返回值
-                        return value;
-                    }
+
+                    // 不是函数类型，直接返回值
+                    return value ?? throw new AttributeError(this, methodName, Id.IdName);
                 }
 
                 // 如果没有找到方法，检查是否是嵌套类访问
@@ -459,6 +455,7 @@ public class AnyLangValue : LangValueType
         {
             return value;
         }
+
         throw new AttributeError(this, propertyName, Id.IdName);
     }
 
@@ -511,8 +508,7 @@ public class AnyLangValue : LangValueType
         }
 
         // 如果当前实例的Variates中没有，尝试从Manager获取类型模板
-        var currentTypeTemplate = Manager.GetAny(new LangId(Id.IdName)) as TypeTemplate;
-        if (currentTypeTemplate != null)
+        if (Manager.GetAny(new LangId(Id.IdName)) is TypeTemplate currentTypeTemplate)
         {
             // 检查该类型是否有嵌套类
             foreach (var (memberId, memberExpr) in currentTypeTemplate.Variates)
