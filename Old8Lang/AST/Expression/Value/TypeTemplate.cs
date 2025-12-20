@@ -315,7 +315,8 @@ public class TypeTemplate(
                     if (staticValue is not FuncLangValue) // 只处理变量，不处理方法
                     {
                         var variableName = staticKey.IdName;
-                        if (tempManager.GetAny(new LangId(variableName)) is LangValueType updatedValue)
+                        var tempValue = tempManager.GetValue(new LangId(variableName));
+                        if (tempValue is LangValueType updatedValue)
                         {
                             _staticVariableValues[variableName] = updatedValue;
                         }

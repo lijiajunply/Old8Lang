@@ -458,7 +458,7 @@ public class ClassDeclarationTests
                                        if text == "" {
                                            return ""
                                        }
-                                       first <- text[0].ToString().ToUpper()
+                                       first <- text[0].ToStr().ToUpper()
                                        rest <- ""
                                        i <- 1
                                        while i < Len(text) {
@@ -698,7 +698,7 @@ public class ClassDeclarationTests
                                greeter.setGreeting("Good morning")
                                hello1 <- greeter.sayHello("Alice", "!")
                                hello2 <- greeter.createGreeting("Mr.", "Smith", true)
-                               hello3 <- greeter.createGreeting("Bob", false)
+                               hello3 <- greeter.createGreeting("", "Bob", false)
                            
                    """;
         var interpreter = new LangInterpreter();

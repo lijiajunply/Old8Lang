@@ -286,6 +286,8 @@ public class SetStatement : OldStatement
                         anyValue.Manager.Set(new LangId(memberName.IdName), result);
                         // 更新当前manager中的值，确保在同一个方法中后续访问能获取到最新值
                         manager.Set(new LangId(memberName.IdName), result);
+                        // 清除函数查找缓存，确保下次访问获取最新值
+                        anyValue.ClearFunctionLookupCache();
                         return;
                     }
 
