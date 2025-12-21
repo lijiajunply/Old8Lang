@@ -1,5 +1,0 @@
-func main() -> void {
-    PrintLine("Hello, Old8Lang!")
-    x <- 42
-    PrintLine("x = " + x)
-}

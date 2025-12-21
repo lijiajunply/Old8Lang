@@ -1,5 +1,0 @@
-// 基准测试 - 不包含动态导入
-PrintLine("开始测试")
-test_var <- "hello"
-PrintLine("变量值: " + test_var)
-PrintLine("测试完成")

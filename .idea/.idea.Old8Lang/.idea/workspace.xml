@@ -19,15 +19,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskFactoryClassLangValue.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskSchedulerClassLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/TaskAPITests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/TaskAPITests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/LangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/LangInterpreter.cs" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -82,6 +74,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Generators/GeneratorStateMachine.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Interpreter/LangInterpreter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Interpreter/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
@@ -803,7 +796,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="331" />
+    <option name="localTasksCounter" value="333" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -830,8 +823,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(interpreter): 修正构造函数中成员变量初始化问题&#10;&#10;- 在构造函数中使用 this 关键字明确指向实例成员&#10;- 修复多个类中属性初始化时缺少 this 前缀的问题&#10;- 修正日志记录方法中对实例字段的引用&#10;- 更新数值累加逻辑以正确使用实例变量&#10;- 修复静态计数器访问方式，确保通过 this 引用&#10;- 修正条件赋值语句中对实例属性的设置&#10;- 优化角色伤害处理逻辑，明确区分实例与局部变量&#10;- 改进银行账户初始化代码，统一使用 this 设置属性&#10;- 调整测试用例中的默认参数声明格式&#10;- 清理冗余提交信息并更新工作区配置记录" />
-    <MESSAGE value="feat(interpreter): 支持类实例成员的集合索引访问&#10;&#10;- 实现了对类成员集合（如列表、数组、字典、字符串）的索引访问语法&#10;- 添加了对 wheels[0] 这类表达式的支持，可在类实例中直接访问集合元素&#10;- 增强了 AnyLangValue 的 MemberGet 方法，以处理 LangListItem 类型的索引访问&#10;- 为集合索引增加了类型检查，确保索引值类型与集合类型匹配&#10;- 支持 ListLangValue、ArrayLangValue、DictionaryLangValue 和 StringLangValue 的索引读取&#10;- 引入了更严格的访问控制检查，防止非法访问私有或受保护的集合成员&#10;- 更新了 TypeTemplate 初始化逻辑，允许实例访问全局导入的类型信息&#10;- 添加了测试用例验证复杂对象结构下的集合索引访问功能&#10;- 修正了 ClassInstantiationTests 中 wheels 成员声明缺失类型的定义问题&#10;- 新增 test_complex_object.old8 示例文件展示完整功能使用方式" />
     <MESSAGE value="refactor(core): 移除 V1 兼容接口并优化类实例化逻辑&#10;&#10;- 删除 AnyLangValue 中所有 V1 兼容属性和方法&#10;- 更新引用 Id 的位置从 Id 改为 ClassId&#10;- 移除 Operation 和 ReturnStatement 中的 ExternalManager 设置逻辑&#10;- 简化 Instance 中的构造函数调用逻辑，避免重复执行&#10;- 修改 SuperExpression 以适配未来继承支持&#10;- 调整测试用例中的参数类型声明从 [int] 到 array" />
     <MESSAGE value="chore(project): 更新项目配置和测试文件&#10;&#10;- 移除了旧的向量计算函数（vec2、distance、normalize）&#10;- 添加了新的 getValue 函数返回整数 42&#10;- 在工作区中引入了包管理器相关项目&#10;- 清理了临时测试文件和冗余变更记录&#10;- 配置了 Old8Lang.PackageManager 和其测试项目的运行设置&#10;- 更新了 IDE 的文件高亮设置以跳过特定模拟路径" />
     <MESSAGE value="feat(lang): 优化方法重载解析逻辑&#10;&#10;- 改进方法重载选择策略，优先选择参数数量最接近的重载&#10;- 增强参数匹配检查，支持默认参数的缺失情况处理&#10;- 更新类型模板中的重载解析算法，确保更精确的方法匹配&#10;- 修复重载方法表构建逻辑，防止重复方法覆盖问题&#10;- 清理项目配置文件中的冗余测试会话记录&#10;- 移除IDE工作区中的无效文件高亮设置" />
@@ -855,7 +846,9 @@
     <MESSAGE value="feat(parser): 支持 this 方法调用解析为 FuncRunStatement&#10;&#10;在 StatementParser 中增加对 this.xxx 形式的方法调用识别，将其正确解析为 FuncRunStatement。  &#10;同时修正了 AnyLangValue 中字段命名及多处逻辑冗余问题，并完善接口与类交互测试代码。&#10;&#10;---&#10;&#10;refactor(ast): 重命名字段并优化方法执行逻辑&#10;&#10;将 `_fieldsModifiedBySetField` 字段重命名为 `FieldsModifiedBySetField` 并调整访问方式；  &#10;移除 ExecuteMethod 和 CallInit 中关于作用域参数求值的重复注释和逻辑，统一处理流程；  &#10;修复 AccessCollectionItem 中类型判断字符串格式化问题。&#10;&#10;---&#10;&#10;test(interpreter): 更新类成员初始化函数名称为 init&#10;&#10;将多个测试用例中的构造函数名（如 DataContainer、Circle、Point 等）更正为标准的 init 函数命名，  &#10;确保符合语言规范并提升一致性。&#10;&#10;---&#10;&#10;test(parser): 升级接口相关测试代码字符串语法&#10;&#10;将 InterfaceAbstractClassInteractionTests.cs 文件中所有多行字符串由旧版 &quot;@&quot; 标记改为 &quot;&quot;&quot; 新语法，  &#10;增强可读性和维护性。&#10;&#10;---&#10;&#10;chore(tests): 更新配置文件和工具库示例内容&#10;&#10;修改 config.old8 示例内容以支持动态加载配置字典，  &#10;并在 utils.old8 中新增日期格式化和 token 生成辅助函数。" />
     <MESSAGE value="refactor(ast): 优化异步流表达式与块语句实现&#10;&#10;- 将 AsyncStreamExpression 中的 Block 字段访问级别从 public 改为 private&#10;- 优化 InvalidOperationException 抛出时的消息字符串格式，避免行过长&#10;- 移除了 BlockStatement 中用于调试的日志输出语句&#10;- 简化了 Operation 类型检查中的条件判断逻辑&#10;- 删除未使用的 using 引用，精简多个类文件的命名空间引用&#10;- 修正 SuperExpression 中父类构造函数查找逻辑并优化错误提示&#10;- 移除了已废弃的 ValueExpression 类定义&#10;- 更新了 IDE 工作区配置和任务计数器状态&#10;&#10;这些更改提升了代码可维护性、减少了冗余信息，并进一步规范化 AST 节点行为。" />
     <MESSAGE value="fix(AsyncStateMachineGenerator): 优化状态机生成器字段初始化与代码结构&#10;&#10;- 将 `LocalVariableFields` 和 `AwaitPositions` 初始化为 `new()` 并添加 `readonly` 修饰符&#10;- 移除不必要的空行和 null 检查，简化表达式遍历逻辑&#10;- 更新方法签名以提高可读性，并调整部分 IL 生成逻辑中的数组语法&#10;- 清理冗余的日志打印语句，保留核心功能实现&#10;&#10;fix(CapturedScope): 重命名哈希码字段并更新相关引用&#10;&#10;- 将 `_hashCode` 字段重命名为 `HashCode` 以符合命名规范&#10;- 更新构造函数、GetHashCode 及 Equals 方法中对该字段的使用&#10;- 调整 LINQ 表达式语法，确保类型转换明确清晰&#10;&#10;refactor(GeneratorAstScanner): 移除调试日志并精简扫描逻辑&#10;&#10;- 删除所有 `Console.WriteLine` 调试输出语句&#10;- 简化对子语句的递归调用逻辑，去除多余的 null 检查&#10;- 修复局部变量记录逻辑，增强空值处理能力&#10;- 优化反射获取 ForInStatement Body 的流程，减少无用判断&#10;&#10;refactor(GeneratorExecutionContext): 简化集合初始化语法&#10;&#10;- 替换 `new Stack&lt;&gt;()` 和 `new Dictionary&lt;,&gt;()` 为简洁形式&#10;- 移除布尔属性默认赋值，保持代码一致性&#10;&#10;refactor(GeneratorStateMachineBuilder): 静态化类并优化执行器结构&#10;&#10;- 将 `GeneratorStateMachineBuilder` 改为静态类&#10;- 使用主构造函数注入依赖项至 `FlatGeneratorExecutor`&#10;- 移除调试日志并清理字段访问方式，改用构造函数参数直接引用&#10;- 重构循环状态恢复逻辑，提高代码可读性和健壮性&#10;&#10;refactor(NewGeneratorStateMachine): 统一私有字段命名风格&#10;&#10;- 将所有下划线前缀私有字段改为 Pascal 命名法（如 `_locals` → `Locals`）&#10;- 更新构造函数及 Execute 方法内的字段引用，保持一致性和可维护性&#10;&#10;refactor(TypeAnnotationManager): 规范字段命名并优化类型兼容性检查&#10;&#10;- 所有私有字段统一使用 Pascal 命名法（如 `_typeFamily` → `TypeFamily`）&#10;- 更新类型解析和兼容性判断逻辑，移除冗余条件判断&#10;- 修正 XML 注释中的泛型符号显示问题&#10;&#10;refactor(TypeInfo): 优化成员缓存机制和类型族管理结构&#10;&#10;- 将 `_cachedMembers` 等字段更名为 `CachedMembers` 等标准名称&#10;- 更新类型族注册和继承关系管理逻辑，改进 lambda 表达式写法&#10;- 优化获取类型信息的方法，提升性能与稳定性" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(AsyncStateMachineGenerator): 优化状态机生成器字段初始化与代码结构&#10;&#10;- 将 `LocalVariableFields` 和 `AwaitPositions` 初始化为 `new()` 并添加 `readonly` 修饰符&#10;- 移除不必要的空行和 null 检查，简化表达式遍历逻辑&#10;- 更新方法签名以提高可读性，并调整部分 IL 生成逻辑中的数组语法&#10;- 清理冗余的日志打印语句，保留核心功能实现&#10;&#10;fix(CapturedScope): 重命名哈希码字段并更新相关引用&#10;&#10;- 将 `_hashCode` 字段重命名为 `HashCode` 以符合命名规范&#10;- 更新构造函数、GetHashCode 及 Equals 方法中对该字段的使用&#10;- 调整 LINQ 表达式语法，确保类型转换明确清晰&#10;&#10;refactor(GeneratorAstScanner): 移除调试日志并精简扫描逻辑&#10;&#10;- 删除所有 `Console.WriteLine` 调试输出语句&#10;- 简化对子语句的递归调用逻辑，去除多余的 null 检查&#10;- 修复局部变量记录逻辑，增强空值处理能力&#10;- 优化反射获取 ForInStatement Body 的流程，减少无用判断&#10;&#10;refactor(GeneratorExecutionContext): 简化集合初始化语法&#10;&#10;- 替换 `new Stack&lt;&gt;()` 和 `new Dictionary&lt;,&gt;()` 为简洁形式&#10;- 移除布尔属性默认赋值，保持代码一致性&#10;&#10;refactor(GeneratorStateMachineBuilder): 静态化类并优化执行器结构&#10;&#10;- 将 `GeneratorStateMachineBuilder` 改为静态类&#10;- 使用主构造函数注入依赖项至 `FlatGeneratorExecutor`&#10;- 移除调试日志并清理字段访问方式，改用构造函数参数直接引用&#10;- 重构循环状态恢复逻辑，提高代码可读性和健壮性&#10;&#10;refactor(NewGeneratorStateMachine): 统一私有字段命名风格&#10;&#10;- 将所有下划线前缀私有字段改为 Pascal 命名法（如 `_locals` → `Locals`）&#10;- 更新构造函数及 Execute 方法内的字段引用，保持一致性和可维护性&#10;&#10;refactor(TypeAnnotationManager): 规范字段命名并优化类型兼容性检查&#10;&#10;- 所有私有字段统一使用 Pascal 命名法（如 `_typeFamily` → `TypeFamily`）&#10;- 更新类型解析和兼容性判断逻辑，移除冗余条件判断&#10;- 修正 XML 注释中的泛型符号显示问题&#10;&#10;refactor(TypeInfo): 优化成员缓存机制和类型族管理结构&#10;&#10;- 将 `_cachedMembers` 等字段更名为 `CachedMembers` 等标准名称&#10;- 更新类型族注册和继承关系管理逻辑，改进 lambda 表达式写法&#10;- 优化获取类型信息的方法，提升性能与稳定性" />
+    <MESSAGE value="feat(Task): 支持 TaskScheduler 和 TaskFactory 全局对象&#10;&#10;新增 TaskScheduler 和 TaskFactory 类的全局对象注册，完善 Task API 的功能支持。  &#10;同时修复了 Task 类中部分成员访问逻辑，并改进异常处理机制，统一将标准异常包装为 Old8Exception。  &#10;此外，更新了相关单元测试代码以适配新的 API 调用方式并启用任务取消测试。" />
+    <MESSAGE value="feat(AsyncLib): 优化资源包装类构造函数并移除冗余字段初始化&#10;&#10;将 `ResourceWrapper` 类改用主构造函数语法，并直接初始化 `Resource` 属性。  &#10;同时删除了 `_readWriteLockIdCounter`、`_countDownLatchIdCounter` 和  &#10;`_cyclicBarrierIdCounter` 的冗余赋值为 0 的字段初始化语句。&#10;&#10;refactor(AsyncLib): 统一使用属性命名风格并提升代码一致性&#10;&#10;将 `CountDownLatch` 和 `CyclicBarrier` 类中的私有字段名称从下划线前缀风格  &#10;改为 PascalCase 命名风格（如 `_count` 改为 `Count`），以提高整体代码可读性和一致性。  &#10;此外，更新相关访问逻辑以匹配新的属性命名。&#10;&#10;refactor(Csv): 简化 CSV 头部行添加方式&#10;&#10;合并声明与初始化操作，通过集合初始化器直接在创建 `csvLines` 列表时添加头部行，  &#10;使代码更简洁且易于理解。" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(AsyncLib): 优化资源包装类构造函数并移除冗余字段初始化&#10;&#10;将 `ResourceWrapper` 类改用主构造函数语法，并直接初始化 `Resource` 属性。  &#10;同时删除了 `_readWriteLockIdCounter`、`_countDownLatchIdCounter` 和  &#10;`_cyclicBarrierIdCounter` 的冗余赋值为 0 的字段初始化语句。&#10;&#10;refactor(AsyncLib): 统一使用属性命名风格并提升代码一致性&#10;&#10;将 `CountDownLatch` 和 `CyclicBarrier` 类中的私有字段名称从下划线前缀风格  &#10;改为 PascalCase 命名风格（如 `_count` 改为 `Count`），以提高整体代码可读性和一致性。  &#10;此外，更新相关访问逻辑以匹配新的属性命名。&#10;&#10;refactor(Csv): 简化 CSV 头部行添加方式&#10;&#10;合并声明与初始化操作，通过集合初始化器直接在创建 `csvLines` 列表时添加头部行，  &#10;使代码更简洁且易于理解。" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1483,19 +1476,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="635" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs</url>
-          <line>487</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs" containingFunctionPresentation="方法 'Run'">
-            <startOffsets>
-              <option value="13713" />
-            </startOffsets>
-            <endOffsets>
-              <option value="13776" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="636" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
