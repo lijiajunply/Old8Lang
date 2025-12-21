@@ -1,10 +1,11 @@
+using System.Reflection.Emit;
+using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
-using System.Reflection.Emit;
 using Old8Lang.Interpreter;
-using Old8Lang.AST.Expression.Intermediates;
 
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.StaticValues;
 
 /// <summary>
 /// TaskCompletionSource 值类型
@@ -12,8 +13,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public class TaskCompletionSourceLangValue : LangValueType
 {
-    private readonly TaskCompletionSource<LangValueType> _tcs;
-    private TaskLangValue? _taskWrapper;
+    private readonly TaskCompletionSource<LangValueType> Tcs;
 
     /// <summary>
     /// 获取关联的 Task
@@ -22,11 +22,9 @@ public class TaskCompletionSourceLangValue : LangValueType
     {
         get
         {
-            if (_taskWrapper == null)
-            {
-                _taskWrapper = new TaskLangValue(_tcs.Task, CancellationToken.None, Position);
-            }
-            return _taskWrapper;
+            field ??= new TaskLangValue(Tcs.Task, CancellationToken.None, Position);
+
+            return field;
         }
     }
 
@@ -36,7 +34,7 @@ public class TaskCompletionSourceLangValue : LangValueType
     public TaskCompletionSourceLangValue(SourcePosition position = default)
         : base(position)
     {
-        _tcs = new TaskCompletionSource<LangValueType>();
+        Tcs = new TaskCompletionSource<LangValueType>();
     }
 
     /// <summary>
@@ -44,7 +42,7 @@ public class TaskCompletionSourceLangValue : LangValueType
     /// </summary>
     public bool SetResult(LangValueType result)
     {
-        return _tcs.TrySetResult(result);
+        return Tcs.TrySetResult(result);
     }
 
     /// <summary>
@@ -52,7 +50,7 @@ public class TaskCompletionSourceLangValue : LangValueType
     /// </summary>
     public bool SetException(Exception exception)
     {
-        return _tcs.TrySetException(exception);
+        return Tcs.TrySetException(exception);
     }
 
     /// <summary>
@@ -60,13 +58,13 @@ public class TaskCompletionSourceLangValue : LangValueType
     /// </summary>
     public bool SetCanceled()
     {
-        return _tcs.TrySetCanceled();
+        return Tcs.TrySetCanceled();
     }
 
     /// <summary>
     /// 获取底层 TaskCompletionSource 对象
     /// </summary>
-    public override object GetValue() => _tcs;
+    public override object GetValue() => Tcs;
 
     /// <summary>
     /// 类型字符串表示
@@ -78,7 +76,7 @@ public class TaskCompletionSourceLangValue : LangValueType
     /// </summary>
     public override string ToString()
     {
-        var taskStatus = _tcs.Task.Status;
+        var taskStatus = Tcs.Task.Status;
         return $"TaskCompletionSource(Task Status: {taskStatus})";
     }
 
@@ -230,7 +228,7 @@ public class TaskCompletionSourceLangValue : LangValueType
     /// <summary>
     /// 获取 .NET 类型
     /// </summary>
-    public override Type? OutputType(LocalManager local)
+    public override Type OutputType(LocalManager local)
     {
         return typeof(TaskCompletionSource<LangValueType>);
     }

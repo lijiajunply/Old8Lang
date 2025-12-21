@@ -1,10 +1,11 @@
+using System.Reflection.Emit;
+using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
-using System.Reflection.Emit;
 using Old8Lang.Interpreter;
-using Old8Lang.AST.Expression.Intermediates;
 
-namespace Old8Lang.AST.Expression.Value;
+namespace Old8Lang.AST.Expression.StaticValues;
 
 /// <summary>
 /// 取消令牌源值类型
@@ -12,12 +13,12 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public class CancellationTokenSourceLangValue : LangValueType
 {
-    private readonly CancellationTokenSource _cts;
+    private readonly CancellationTokenSource Cts;
 
     /// <summary>
     /// 获取取消令牌
     /// </summary>
-    public CancellationTokenLangValue Token => new CancellationTokenLangValue(_cts.Token, Position);
+    public CancellationTokenLangValue Token => new(Cts.Token, Position);
 
     /// <summary>
     /// 构造函数
@@ -25,7 +26,7 @@ public class CancellationTokenSourceLangValue : LangValueType
     public CancellationTokenSourceLangValue(SourcePosition position = default)
         : base(position)
     {
-        _cts = new CancellationTokenSource();
+        Cts = new CancellationTokenSource();
     }
 
     /// <summary>
@@ -33,7 +34,7 @@ public class CancellationTokenSourceLangValue : LangValueType
     /// </summary>
     public void Cancel()
     {
-        _cts.Cancel();
+        Cts.Cancel();
     }
 
     /// <summary>
@@ -41,7 +42,7 @@ public class CancellationTokenSourceLangValue : LangValueType
     /// </summary>
     public void CancelAfter(int delayMs)
     {
-        _cts.CancelAfter(delayMs);
+        Cts.CancelAfter(delayMs);
     }
 
     /// <summary>
@@ -49,13 +50,13 @@ public class CancellationTokenSourceLangValue : LangValueType
     /// </summary>
     public void Dispose()
     {
-        _cts.Dispose();
+        Cts.Dispose();
     }
 
     /// <summary>
     /// 获取底层 CancellationTokenSource 对象
     /// </summary>
-    public override object GetValue() => _cts;
+    public override object GetValue() => Cts;
 
     /// <summary>
     /// 类型字符串表示
@@ -88,7 +89,7 @@ public class CancellationTokenSourceLangValue : LangValueType
             return propertyName switch
             {
                 "Token" => Token,
-                "IsCancellationRequested" => new BoolLangValue(_cts.IsCancellationRequested, Position),
+                "IsCancellationRequested" => new BoolLangValue(Cts.IsCancellationRequested, Position),
                 _ => throw new AttributeError(dotExpression.Position, propertyName, "CancellationTokenSource")
             };
         }
