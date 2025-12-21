@@ -215,7 +215,7 @@ public class TaskAPITests
         Assert.Equal("fast", ((StringLangValue)result).Value);
     }
 
-    [Fact(Skip = "TaskCompletionSource not yet implemented in Old8Lang")]
+    [Fact]
     public void TaskAPI_TaskCompletionSource_HandlesManualTaskCompletion()
     {
         // Arrange
