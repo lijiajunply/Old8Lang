@@ -11,6 +11,7 @@ public class GeneratorExecutionContext
 {
     /// <summary>
     /// 当前执行的语句索引（在BlockStatement中的位置）
+    /// 【旧架构】用于基于索引的状态恢复
     /// </summary>
     public int CurrentStatementIndex { get; set; } = 0;
 
@@ -32,8 +33,23 @@ public class GeneratorExecutionContext
     /// <summary>
     /// 执行栈，用于跟踪嵌套的BlockStatement执行位置
     /// 例如：在if语句或循环内部的BlockStatement
+    /// 【旧架构】基于索引的栈帧
     /// </summary>
     public Stack<BlockExecutionFrame> ExecutionStack { get; set; } = new Stack<BlockExecutionFrame>();
+
+    /// <summary>
+    /// 执行路径（新架构）
+    /// 记录从函数体根节点到当前执行位置的完整路径
+    /// 例如："/block[0]/for-in/block[1]/yield"
+    /// </summary>
+    public string? ExecutionPath { get; set; }
+
+    /// <summary>
+    /// 循环状态字典（新架构）
+    /// Key: 循环路径（如 "/block[0]/for-in"）
+    /// Value: 当前迭代的索引
+    /// </summary>
+    public Dictionary<string, int> LoopStates { get; set; } = new Dictionary<string, int>();
 
     /// <summary>
     /// 重置上下文状态
@@ -45,10 +61,13 @@ public class GeneratorExecutionContext
         CurrentValue = null;
         IsCompleted = false;
         ExecutionStack.Clear();
+        ExecutionPath = null;
+        LoopStates.Clear();
     }
 
     /// <summary>
     /// 块语句执行帧，用于保存嵌套块的执行位置
+    /// 【旧架构】
     /// </summary>
     public class BlockExecutionFrame
     {

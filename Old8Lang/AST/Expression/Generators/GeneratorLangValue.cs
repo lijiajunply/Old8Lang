@@ -28,9 +28,9 @@ public class GeneratorLangValue : LangValueType, ILangList
     private NewGeneratorStateMachine? NewStateMachine { get; set; }
 
     /// <summary>
-    /// 是否使用新状态机（暂时禁用，等完成后再启用）
+    /// 是否使用新状态机（混合方案已优化，准备测试）
     /// </summary>
-    private static bool UseNewStateMachine { get; } = false;
+    private static bool UseNewStateMachine { get; } = true;
 
     /// <summary>
     /// 生成器当前状态
@@ -86,9 +86,11 @@ public class GeneratorLangValue : LangValueType, ILangList
     {
         if (UseNewStateMachine)
         {
+            System.Console.WriteLine($"[GEN] Using new state machine");
             // 使用新状态机
             if (NewStateMachine == null)
             {
+                System.Console.WriteLine($"[GEN] Creating new state machine");
                 // 为生成器创建独立的变量环境
                 var generatorManager = manager.CloneForGenerator();
 
@@ -103,9 +105,11 @@ public class GeneratorLangValue : LangValueType, ILangList
                 try
                 {
                     NewStateMachine = GeneratorStateMachineBuilder.BuildFromFunc(Func, generatorManager);
+                    System.Console.WriteLine($"[GEN] State machine created successfully");
                 }
-                catch (InvalidOperationException)
+                catch (InvalidOperationException ex)
                 {
+                    System.Console.WriteLine($"[GEN] Not a generator function: {ex.Message}");
                     // 不是生成器函数，返回空值
                     State = GeneratorState.Completed;
                     return new VoidLangValue();
@@ -113,14 +117,17 @@ public class GeneratorLangValue : LangValueType, ILangList
             }
 
             // 调用状态机的MoveNext
+            System.Console.WriteLine($"[GEN] Calling MoveNext()");
             if (NewStateMachine.MoveNext())
             {
+                System.Console.WriteLine($"[GEN] MoveNext returned true");
                 // 还有更多值
                 State = GeneratorState.Suspended;
                 NextValue = NewStateMachine.CurrentValue;
                 return NextValue ?? new VoidLangValue();
             }
 
+            System.Console.WriteLine($"[GEN] MoveNext returned false");
             // 生成器完成
             State = GeneratorState.Completed;
             return new VoidLangValue();

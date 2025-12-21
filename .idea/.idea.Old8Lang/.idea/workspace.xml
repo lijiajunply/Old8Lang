@@ -20,20 +20,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/CSharp_Generator_Analysis.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorAstScanner.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorStateMachineBuilder.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Generators/NewGeneratorStateMachine.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_generator_fix.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_new_statemachine.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncGeneratorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncGeneratorTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncFunctionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncFunctionTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Generators/GeneratorLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Generators/GeneratorLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/AsyncStateMachineGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/AsyncStateMachineGenerator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/GeneratorExecutionContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorExecutionContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/GeneratorStateMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorStateMachine.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorAstScanner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorAstScanner.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorExecutionContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorExecutionContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorStateMachineBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorStateMachineBuilder.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,6 +64,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/AsyncFunctionTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/AsyncGeneratorTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/AsyncStreamTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
@@ -454,7 +446,7 @@
       <workItem from="1766156569385" duration="1528000" />
       <workItem from="1766238299964" duration="6160000" />
       <workItem from="1766298953988" duration="5700000" />
-      <workItem from="1766308100500" duration="4612000" />
+      <workItem from="1766308100500" duration="6276000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -799,7 +791,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="323" />
+    <option name="localTasksCounter" value="324" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -826,7 +818,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(interpreter): 更新类继承和实例化测试用例&#10;&#10;- 修改测试代码中的字符串字面量语法为原始字符串&#10;- 更新类继承测试中的代码格式和字段访问方式&#10;- 修正实例化测试中的循环语法和方法调用&#10;- 调整类成员访问逻辑以适应新的嵌套类支持&#10;- 优化测试代码结构提高可读性和维护性" />
     <MESSAGE value="feat(lang): 实现super关键字支持&#10;&#10;- 在LangTokenType中添加Super枚举值&#10;- 新增SuperExpression类处理super表达式解析&#10;- 扩展AnyLangValue类，增加GetSuperInstance方法获取父类实例&#10;- 在VariateManager中添加GetCurrentInstance方法获取当前实例&#10;- 更新PrimaryParser以识别和解析super关键字&#10;- 添加SuperTests测试文件验证super关键字功能" />
     <MESSAGE value="feat(lang): 实现类成员继承与访问控制机制&#10;&#10;- 添加函数查找缓存提升类方法查找效率&#10;- 实现递归获取父类和接口成员功能&#10;- 完善内部访问检查逻辑&#10;- 重构成员查找机制支持继承和缓存&#10;- 优化变量同步方法提升性能&#10;- 修复嵌套类查找逻辑&#10;- 更新测试用例适配新实现" />
     <MESSAGE value="refactor(ast): 优化类成员查找与缓存逻辑&#10;&#10;- 将_functionLookupCache字段重命名为FunctionLookupCache&#10;- 使用模式匹配简化类型转换逻辑&#10;- 优化成员查找循环中的条件判断&#10;- 完善属性访问时的空值处理&#10;- 统一缓存条目的读取和写入方式&#10;- 增强错误处理机制，明确抛出AttributeError异常&#10;- 调整方法参数列表格式以提高可读性" />
@@ -851,7 +842,8 @@
     <MESSAGE value="修复贴一下" />
     <MESSAGE value="修复贴一下" />
     <MESSAGE value="feat(async): 引入异步流(async stream)语法与相关支持&#10;&#10;新增 `async { ... }` 语法用于创建异步流，即异步生成器。  &#10;添加了 `AsyncStreamExpression` 和 `AsyncStreamLangValue` 类型以支持该特性。  &#10;更新 `ForInStatement` 以正确迭代异步生成器和异步流。  &#10;调整测试用例中 range 表达式写法，并修复部分 Task API 调用方式。  &#10;新增多个调试及功能测试文件以验证异步生成器行为。" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(async): 引入异步流(async stream)语法与相关支持&#10;&#10;新增 `async { ... }` 语法用于创建异步流，即异步生成器。  &#10;添加了 `AsyncStreamExpression` 和 `AsyncStreamLangValue` 类型以支持该特性。  &#10;更新 `ForInStatement` 以正确迭代异步生成器和异步流。  &#10;调整测试用例中 range 表达式写法，并修复部分 Task API 调用方式。  &#10;新增多个调试及功能测试文件以验证异步生成器行为。" />
+    <MESSAGE value="feat(generator): 启用新状态机架构并修复生成器测试&#10;&#10;更新生成器实现，引入基于状态机的新架构，并修复多个生成器测试用例。&#10;移除 Skip 标记，启用 AsyncGenerator 相关测试。&#10;新增 GeneratorAstScanner、GeneratorStateMachineBuilder 和 NewGeneratorStateMachine&#10;类，用于构建和执行状态机形式的生成器。&#10;在 BlockStatement 和 ForInStatement 中增加调试日志，辅助状态机执行过程追踪。&#10;新增测试文件 test_generator_fix.old8 和 test_new_statemachine.old8，&#10;验证新状态机的功能与正确性。&#10;目前新状态机默认未启用，仍通过 UseNewStateMachine 配置控制。" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(generator): 启用新状态机架构并修复生成器测试&#10;&#10;更新生成器实现，引入基于状态机的新架构，并修复多个生成器测试用例。&#10;移除 Skip 标记，启用 AsyncGenerator 相关测试。&#10;新增 GeneratorAstScanner、GeneratorStateMachineBuilder 和 NewGeneratorStateMachine&#10;类，用于构建和执行状态机形式的生成器。&#10;在 BlockStatement 和 ForInStatement 中增加调试日志，辅助状态机执行过程追踪。&#10;新增测试文件 test_generator_fix.old8 和 test_new_statemachine.old8，&#10;验证新状态机的功能与正确性。&#10;目前新状态机默认未启用，仍通过 UseNewStateMachine 配置控制。" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

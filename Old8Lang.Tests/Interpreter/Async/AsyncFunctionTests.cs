@@ -259,18 +259,20 @@ public class AsyncFunctionTests
     public async Task AsyncFunction_WithTryCatch_HandlesException()
     {
         // Arrange
-        var code = @"
-            async func safeFunction() -> string {
-                try {
-                    await Task.Delay(10)
-                    throw ""test error""
-                    return ""success""
-                } catch (e) {
-                    return ""caught: "" + e
-                }
-            }
-            task <- safeFunction()
-        ";
+        var code = """
+
+                               async func safeFunction() -> string {
+                                   try {
+                                       await Task.Delay(10)
+                                       throw "test error"
+                                       return "success"
+                                   } catch (e) {
+                                       return "caught: " + e
+                                   }
+                               }
+                               task <- safeFunction()
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
