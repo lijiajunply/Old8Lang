@@ -102,14 +102,18 @@ public class TypeTemplate(
         // 设置静态字段值到运行时缓存
         StaticVariableValues[memberName] = value;
 
-        // 同时更新到元数据缓存中，确保其他访问能获取到最新值
-        if (!MetadataCache.StaticMembers.ContainsKey(memberName))
+        // 同时更新到元数据缓存中，确保其他访问能获取到最新值（如果元数据已构建）
+        if (MetadataCache != null)
         {
             MetadataCache.StaticMembers[memberName] = value;
         }
-        else
+
+        // 同时更新到当前管理器中的局部变量（如果在静态方法执行上下文中）
+        // 这样可以确保静态方法执行完成后，CallStaticMethod 能够获取到正确的更新值
+        var existingValue = manager.GetValue(new LangId(memberName));
+        if (existingValue != null)
         {
-            MetadataCache.StaticMembers[memberName] = value;
+            manager.Set(new LangId(memberName), value);
         }
     }
 
@@ -331,6 +335,9 @@ public class TypeTemplate(
                 // 并且能够正确处理静态变量的赋值操作
                 var tempManager = manager.Interpreter?.Manager?.NewManger() ?? manager.NewManger();
 
+                // 将当前类添加到临时管理器中，这样静态方法内部就能访问到类（用于 ClassName.staticField 形式的赋值）
+                tempManager.AddClassAndFunc(this);
+
                 // 将所有静态变量的当前值添加到临时管理器中
                 foreach (var (staticKey, staticValue) in StaticVariates)
                 {
@@ -346,21 +353,30 @@ public class TypeTemplate(
                 var result = func.Run(tempManager, instance.Ids);
 
                 // 从临时管理器中提取更新后的静态变量值，并保存到类中
+                // 注意:如果静态方法内部通过 ClassName.staticField <- value 进行赋值,
+                // 值已经通过 SetStaticMember 直接更新到 StaticVariableValues 了,
+                // 这里我们只需要同步那些作为局部变量被修改的静态变量
                 foreach (var (staticKey, staticValue) in StaticVariates)
                 {
                     if (staticValue is not FuncLangValue) // 只处理变量，不处理方法
                     {
                         var variableName = staticKey.IdName;
-                        // 尝试从所有作用域中获取最新值
+                        // 尝试从tempManager中获取局部变量形式的更新值
                         var tempValue = tempManager.GetValue(new LangId(variableName));
                         if (tempValue != null)
                         {
-                            // 保存到 StaticVariableValues（TypeTemplate 的实例字段）
-                            StaticVariableValues[variableName] = tempValue;
-                            // 同时保存到元数据缓存（如果存在）
-                            if (MetadataCache != null && MetadataCache.StaticMembers.ContainsKey(variableName))
+                            // 只有当tempManager中的值与StaticVariableValues中的值不同时才更新
+                            // 这样可以避免覆盖通过 SetStaticMember 已经更新的值
+                            var currentStoredValue = StaticVariableValues.GetValueOrDefault(variableName);
+                            if (currentStoredValue == null || !ReferenceEquals(tempValue, currentStoredValue))
                             {
-                                MetadataCache.StaticMembers[variableName] = tempValue;
+                                // 保存到 StaticVariableValues（TypeTemplate 的实例字段）
+                                StaticVariableValues[variableName] = tempValue;
+                                // 同时保存到元数据缓存（如果存在）
+                                if (MetadataCache != null && MetadataCache.StaticMembers.ContainsKey(variableName))
+                                {
+                                    MetadataCache.StaticMembers[variableName] = tempValue;
+                                }
                             }
                         }
                     }

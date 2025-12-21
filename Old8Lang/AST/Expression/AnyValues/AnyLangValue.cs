@@ -509,7 +509,15 @@ public class AnyLangValue : LangValueType
     /// <returns>匹配的 init 方法，如果不存在则返回 null</returns>
     public FuncLangValue? GetInitMethod(List<LangExpression> arguments, VariateManager manager)
     {
+        // 首先查找名为 "init" 的方法
         var methods = Metadata.MethodTable.LookupMethod("init");
+
+        // 如果没有找到 "init" 方法，查找与类名相同的方法（支持 Java/C# 风格的构造函数）
+        if (methods == null || methods.Count == 0)
+        {
+            methods = Metadata.MethodTable.LookupMethod(Metadata.ClassName);
+        }
+
         if (methods == null || methods.Count == 0)
             return null;
 

@@ -16,7 +16,7 @@ public class ReturnStatement(LangExpression returnExpression, SourcePosition pos
     {
         var result = returnExpression.Run(manager);
 
-        // 如果当前函数有返回类型注解，进行类型检查
+        // 如果当前函数有返回类型注解，进行类型检查和转换
         if (!string.IsNullOrEmpty(manager.CurrentFunctionReturnType))
         {
             var functionName = "anonymous";
@@ -24,7 +24,8 @@ public class ReturnStatement(LangExpression returnExpression, SourcePosition pos
             {
                 functionName = anyValue.ClassId.IdName;
             }
-            TypeChecker.ValidateReturnType(manager.CurrentFunctionReturnType, result, this, functionName);
+            // 使用新的带转换的验证方法
+            result = TypeChecker.ValidateAndConvertReturnType(manager.CurrentFunctionReturnType, result, this, functionName);
         }
 
         manager.Result = result;

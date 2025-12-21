@@ -10,12 +10,6 @@ namespace Old8Lang.Tests.Interpreter.Classes;
 /// </summary>
 public class InterfaceTests
 {
-    private readonly ITestOutputHelper TestOutputHelper;
-
-    public InterfaceTests(ITestOutputHelper testOutputHelper)
-    {
-        TestOutputHelper = testOutputHelper;
-    }
 
     [Fact]
     public void Interface_SimpleInterface_DeclaresCorrectly()
@@ -618,7 +612,6 @@ public class InterfaceTests
         // Assert
         var docResult = interpreter.Manager.GetValue(new LangId("docResult"));
         var plainResult = interpreter.Manager.GetValue(new LangId("plainResult"));
-
 
 
         Assert.NotNull(docResult);

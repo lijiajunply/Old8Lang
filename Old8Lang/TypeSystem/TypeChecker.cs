@@ -25,7 +25,7 @@ public static class TypeChecker
     /// <summary>
     /// 跟踪 const 变量的集合
     /// </summary>
-    private static readonly HashSet<string> _constVariables = new();
+    private static readonly HashSet<string> ConstVariables = [];
 
     /// <summary>
     /// 初始化类型检查器
@@ -160,7 +160,8 @@ public static class TypeChecker
 
         // 检查接口实现兼容性
         // 只在明确知道这是一个类型检查的上下文中才进行接口检查
-        if (_annotationManager != null && expectedType != actualType && IsInterfaceImplementation(expectedType, actualType))
+        if (_annotationManager != null && expectedType != actualType &&
+            IsInterfaceImplementation(expectedType, actualType))
         {
             return true;
         }
@@ -176,10 +177,10 @@ public static class TypeChecker
     /// <returns>是否实现该接口</returns>
     private static bool IsInterfaceImplementation(string interfaceName, string className)
     {
-        if (_annotationManager == null) 
+        if (_annotationManager == null)
             return false;
 
-        try 
+        try
         {
             // 获取接口和类的类型模板
             var interfaceType = _annotationManager.GetGlobalManager().GetAny(new LangId(interfaceName)) as TypeTemplate;
@@ -236,7 +237,7 @@ public static class TypeChecker
 
         var actualType = GetLangValueType(actualValue);
         var isConstDeclaration = expectedType.StartsWith("const ", StringComparison.OrdinalIgnoreCase) ||
-                                expectedType.Equals("const", StringComparison.OrdinalIgnoreCase);
+                                 expectedType.Equals("const", StringComparison.OrdinalIgnoreCase);
 
         // 检查 const 变量规则
         if (isConstDeclaration)
@@ -250,13 +251,14 @@ public static class TypeChecker
                     $"const 变量 '{variableName}' 只能初始化赋值，不能修改"
                 );
             }
+
             // 首次声明 const 变量，将其加入 const 集合
-            _constVariables.Add(variableName);
+            ConstVariables.Add(variableName);
         }
         else
         {
             // 非 const 声明，检查是否在修改 const 变量
-            if (!isInitialAssignment && _constVariables.Contains(variableName))
+            if (!isInitialAssignment && ConstVariables.Contains(variableName))
             {
                 throw new TypeError(
                     node,
@@ -292,7 +294,7 @@ public static class TypeChecker
     /// <returns>是否为 const 变量</returns>
     public static bool IsConstVariable(string variableName)
     {
-        return _constVariables.Contains(variableName);
+        return ConstVariables.Contains(variableName);
     }
 
     /// <summary>
@@ -300,11 +302,51 @@ public static class TypeChecker
     /// </summary>
     public static void ClearConstVariables()
     {
-        _constVariables.Clear();
+        ConstVariables.Clear();
     }
 
     /// <summary>
-    /// 验证返回值的类型兼容性
+    /// 验证返回值的类型兼容性，并在需要时进行类型转换
+    /// </summary>
+    /// <param name="expectedReturnType">期望的返回类型（可以为空）</param>
+    /// <param name="actualReturnValue">实际的返回值（可能被转换）</param>
+    /// <param name="returnStatement">return 语句节点，用于错误报告</param>
+    /// <param name="functionName">函数名</param>
+    /// <returns>转换后的返回值（如果需要转换）或原始值</returns>
+    /// <exception cref="TypeError">当类型不匹配且无法转换时抛出</exception>
+    public static LangValueType ValidateAndConvertReturnType(
+        string? expectedReturnType,
+        LangValueType actualReturnValue,
+        IOldLangTree returnStatement,
+        string functionName)
+    {
+        if (string.IsNullOrEmpty(expectedReturnType)) return actualReturnValue; // 没有返回类型注解，跳过检查
+
+        var actualType = GetLangValueType(actualReturnValue);
+
+        if (IsTypeCompatible(expectedReturnType, actualType))
+        {
+            return actualReturnValue; // 类型兼容，无需转换
+        }
+
+        // 尝试类型转换
+        var convertedValue = TryConvertType(actualReturnValue, expectedReturnType);
+        if (convertedValue != null)
+        {
+            return convertedValue; // 转换成功
+        }
+
+        // 无法转换，抛出类型错误
+        throw new TypeError(
+            returnStatement,
+            expectedReturnType,
+            actualType,
+            $"函数 '{functionName}' 返回值类型不匹配"
+        );
+    }
+
+    /// <summary>
+    /// 验证返回值的类型兼容性（保持向后兼容的旧方法）
     /// </summary>
     /// <param name="expectedReturnType">期望的返回类型（可以为空）</param>
     /// <param name="actualReturnValue">实际的返回值</param>
@@ -317,18 +359,70 @@ public static class TypeChecker
         IOldLangTree returnStatement,
         string functionName)
     {
-        if (string.IsNullOrEmpty(expectedReturnType)) return; // 没有返回类型注解，跳过检查
+        // 调用新方法但忽略返回值（仅用于类型检查）
+        ValidateAndConvertReturnType(expectedReturnType, actualReturnValue, returnStatement, functionName);
+    }
 
-        var actualType = GetLangValueType(actualReturnValue);
-
-        if (!IsTypeCompatible(expectedReturnType, actualType))
+    /// <summary>
+    /// 尝试将值转换为目标类型
+    /// </summary>
+    /// <param name="value">要转换的值</param>
+    /// <param name="targetType">目标类型</param>
+    /// <returns>转换后的值，如果无法转换则返回 null</returns>
+    private static LangValueType? TryConvertType(LangValueType value, string targetType)
+    {
+        try
         {
-            throw new TypeError(
-                returnStatement,
-                expectedReturnType,
-                actualType,
-                $"函数 '{functionName}' 返回值类型不匹配"
-            );
+            // 转换为 string 类型
+            if (targetType.Equals("string", StringComparison.OrdinalIgnoreCase))
+            {
+                return StringLangValue.Create(value.ToString());
+            }
+
+            // 转换为 int 类型
+            if (targetType.Equals("int", StringComparison.OrdinalIgnoreCase))
+            {
+                if (value is StringLangValue strValue && int.TryParse(strValue.Value, out var intVal))
+                {
+                    return IntLangValue.Create(intVal);
+                }
+                if (value is DoubleLangValue dblValue)
+                {
+                    return IntLangValue.Create((int)dblValue.Value);
+                }
+            }
+
+            // 转换为 double 类型
+            if (targetType.Equals("double", StringComparison.OrdinalIgnoreCase))
+            {
+                if (value is IntLangValue intValue)
+                {
+                    return DoubleLangValue.Create(intValue.Value);
+                }
+                if (value is StringLangValue strValue && double.TryParse(strValue.Value, out var dblVal))
+                {
+                    return DoubleLangValue.Create(dblVal);
+                }
+            }
+
+            // 转换为 bool 类型
+            if (targetType.Equals("bool", StringComparison.OrdinalIgnoreCase))
+            {
+                if (value is StringLangValue strValue && bool.TryParse(strValue.Value, out var boolVal))
+                {
+                    return BoolLangValue.Create(boolVal);
+                }
+                if (value is IntLangValue intValue)
+                {
+                    return BoolLangValue.Create(intValue.Value != 0);
+                }
+            }
+
+            return null; // 无法转换
+        }
+        catch
+        {
+            return null; // 转换失败
         }
     }
 

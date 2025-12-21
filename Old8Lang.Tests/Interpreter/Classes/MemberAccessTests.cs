@@ -328,25 +328,25 @@ public class MemberAccessTests
         // Arrange
         var code = @"
             class DataContainer {
-                public data <- []
+                public data <- {}
                 public metadata <- {}
 
                 func DataContainer() {
-                    data <- [10, 20, 30, 40, 50]
-                    metadata <- {""count"": 5, ""source"": ""test""}
+                    this.data <- {10, 20, 30, 40, 50}
+                    this.metadata <- {""count"": 5, ""source"": ""test""}
                 }
 
                 func GetData(index:int) -> int {
-                    return data[index]
+                    return this.data[index]
                 }
 
                 func GetMetadata(key:string) -> string {
-                    return metadata[key]
+                    return this.metadata[key]
                 }
 
                 func AddData(value:int) {
-                    data.Push(value)
-                    metadata[""count""] <- len(data)
+                    this.data.Add(value)
+                    this.metadata[""count""] <- len(this.data)
                 }
             }
 
@@ -357,7 +357,7 @@ public class MemberAccessTests
             result4 <- container.GetMetadata(""count"")
 
             container.AddData(60)
-            result5 <- container.len(data)
+            result5 <- len(container.data)
             result6 <- container.GetMetadata(""count"")
         ";
         var interpreter = new LangInterpreter();
@@ -467,9 +467,9 @@ public class MemberAccessTests
                 }
 
                 func DistanceTo(other:Point) -> double {
-                    dx <- x - other.x
-                    dy <- y - other.y
-                    return (dx * dx + dy * y) ^ 0.5
+                    dx <- this.x - other.x
+                    dy <- this.y - other.y
+                    return (dx * dx + dy * dy) ^ 0.5
                 }
             }
 
@@ -483,12 +483,12 @@ public class MemberAccessTests
                 }
 
                 func GetLength() -> double {
-                    return start.DistanceTo(end)
+                    return this.start.DistanceTo(this.end)
                 }
             }
 
-            p1 <- Point(0, 0)
-            p2 <- Point(3, 4)
+            p1 <- Point(0.0, 0.0)
+            p2 <- Point(3.0, 4.0)
             line <- Line(p1, p2)
             length <- line.GetLength()
             startX <- line.start.x
@@ -568,11 +568,11 @@ public class MemberAccessTests
 
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
-        Assert.Equal("Hello World!\n", ((StringLangValue)result).Value);
+        Assert.Equal("Hello World\n!", ((StringLangValue)result).Value);
 
         Assert.NotNull(length);
         Assert.IsType<IntLangValue>(length);
-        Assert.Equal(12, ((IntLangValue)length).Value);
+        Assert.Equal(13, ((IntLangValue)length).Value);
     }
 
     [Fact]
@@ -669,33 +669,33 @@ public class MemberAccessTests
         var code = """
 
                                class Library {
-                                   public books <- []
+                                   public books <- {}
                                    public members <- []
 
                                    func Library() {
-                                       books <- [
+                                       this.books <- {
                                            {"title": "1984", "author": "Orwell", "year": 1949},
                                            {"title": "Brave New World", "author": "Huxley", "year": 1932},
                                            {"title": "Fahrenheit 451", "author": "Bradbury", "year": 1953}
-                                       ]
-                                       members <- ["Alice", "Bob", "Charlie"]
+                                       }
+                                       this.members <- ["Alice", "Bob", "Charlie"]
                                    }
 
                                    func GetBook(index:int) -> any {
-                                       return books[index]
+                                       return this.books[index]
                                    }
 
                                    func AddBook(title:string, author:string, year:int) {
-                                       books.Push({"title": title, "author": author, "year": year})
+                                       this.books.Add({"title": title, "author": author, "year": year})
                                    }
 
                                    func GetMemberCount() -> int {
-                                       return len(members)
+                                       return len(this.members)
                                    }
 
                                    func GetBookTitles() -> list {
                                        titles <- {}
-                                       for book in books {
+                                       for book in this.books {
                                            titles.Add(book["title"])
                                        }
                                        return titles
@@ -708,7 +708,7 @@ public class MemberAccessTests
                                author1 <- book1["author"]
 
                                library.AddBook("Animal Farm", "Orwell", 1945)
-                               totalBooks <- library.len(books)
+                               totalBooks <- len(library.books)
 
                                memberCount <- library.GetMemberCount()
                                allTitles <- library.GetBookTitles()
@@ -764,7 +764,7 @@ public class MemberAccessTests
                 }
             }
 
-            class Car < Vehicle {
+            class Car extends Vehicle {
                 public doors <- 0
                 public fuelType <- """"
 
