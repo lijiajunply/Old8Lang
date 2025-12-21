@@ -76,6 +76,8 @@ public class Operation(
             return "||";
         if (Opera == LangTokenType.As)
             return "as";
+        if (Opera == LangTokenType.Is)
+            return "is";
         if (Opera == LangTokenType.In)
             return "in";
         return "";
@@ -467,6 +469,40 @@ public class Operation(
                 // 安全转换失败，返回 null
                 return NullLangValue.Instance;
             }
+        }
+
+        if (Opera == LangTokenType.Is)
+        {
+            // 处理类型检查操作：left is right
+            // 右侧应该是一个类型标识符或类名
+            string typeName;
+            switch (Right)
+            {
+                case LangId rightLangId:
+                    typeName = rightLangId.IdName;
+                    break;
+                case TypeLangValue rightTypeLangValue:
+                    typeName = rightTypeLangValue.ToString();
+                    break;
+                default:
+                {
+                    // 如果是其他表达式，尝试获取其值作为类型
+                    var rightIsResult = Right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
+
+                    if (rightIsResult is TypeLangValue typeLangValue)
+                    {
+                        typeName = typeLangValue.Value ?? typeLangValue.ToString();
+                    }
+                    else
+                    {
+                        typeName = rightIsResult.ToString();
+                    }
+                    break;
+                }
+            }
+
+            // 检查左侧值是否是指定类型的实例
+            return new BoolLangValue(CheckIsInstance(leftResult, typeName, manager));
         }
 
         var rightResult = Right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
@@ -1710,5 +1746,70 @@ public class Operation(
             default:
                 throw new InvalidOperationError(this, $"不支持的二元运算符: {Opera}");
         }
+    }
+
+    /// <summary>
+    /// 检查值是否是指定类型的实例
+    /// </summary>
+    /// <param name="value">要检查的值</param>
+    /// <param name="typeName">类型名称</param>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>如果值是指定类型的实例则返回true,否则返回false</returns>
+    private bool CheckIsInstance(LangValueType value, string typeName, VariateManager manager)
+    {
+        // 处理基本类型
+        switch (typeName.ToLower())
+        {
+            case "int":
+                return value is IntLangValue;
+            case "double":
+                return value is DoubleLangValue;
+            case "string":
+                return value is StringLangValue;
+            case "bool":
+                return value is BoolLangValue;
+            case "char":
+                return value is CharLangValue;
+            case "list":
+                return value is ListLangValue;
+            case "array":
+                return value is ArrayLangValue;
+            case "dictionary":
+                return value is DictionaryLangValue;
+            case "null":
+                return value is NullLangValue;
+        }
+
+        // 处理类和接口类型
+        if (value is AnyLangValue anyValue)
+        {
+            // 检查是否是该类的实例(类名匹配)
+            if (anyValue.ClassId.IdName == typeName)
+            {
+                return true;
+            }
+
+            // 检查是否实现了指定的接口或继承了指定的类
+            // 通过元数据的 IsAssignableTo 方法进行检查
+            try
+            {
+                var targetType = manager.GetAny(new LangId(typeName));
+                if (targetType is TypeTemplate targetTypeTemplate)
+                {
+                    var targetMetadata = targetTypeTemplate.BuildMetadata(manager);
+                    if (targetMetadata != null)
+                    {
+                        return anyValue.Metadata.IsAssignableTo(targetMetadata, manager);
+                    }
+                }
+            }
+            catch
+            {
+                // 类型不存在,返回false
+                return false;
+            }
+        }
+
+        return false;
     }
 }
