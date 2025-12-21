@@ -136,7 +136,7 @@ public class TaskAPITests
     {
         // Arrange
         var code = @"
-            originalTask <- async Task.Run(() -> {
+            originalTask <- await Task.Run(() -> {
                 return 10
             })
             continuationTask <- originalTask.ContinueWith((result) -> {
@@ -287,6 +287,7 @@ public class TaskAPITests
             })
             timeoutTask <- Task.Delay(50)
             completedTask <- Task.WhenAny([longTask, timeoutTask])
+            result <- """"
             if completedTask.Result == timeoutTask {
                 result <- ""timeout""
             } else {
@@ -384,7 +385,7 @@ public class TaskAPITests
     {
         // Arrange
         var code = @"
-            func asyncOperation() -> async {
+            async func asyncOperation() {
                 await Task.Delay(10)
                 return ""async result""
             }
@@ -431,7 +432,7 @@ public class TaskAPITests
     {
         // Arrange
         var code = @"
-            func processData(numbers) -> async {
+            async func processData(numbers) {
                 results <- {}
                 for num in numbers {
                     await Task.Delay(1) // Simulate async work
@@ -471,7 +472,7 @@ public class TaskAPITests
                 task <- Task.Run(() -> {
                     // Simulate computational work
                     sum <- 0
-                    for j in 1..100 {
+                    for j in [1~100]{
                         sum <- sum + j
                     }
                     return sum
@@ -504,14 +505,14 @@ public class TaskAPITests
         // Arrange
         var code = @"
             attempts <- 0
-            func unreliableOperation() -> async {
+            async func unreliableOperation() {
                 attempts <- attempts + 1
                 if attempts < 3 {
                     throw ""operation failed""
                 }
                 return ""success""
             }
-            func retryOperation() -> async {
+            async func retryOperation() {
                 for i in 1..5 {
                     try {
                         return await unreliableOperation()
@@ -544,7 +545,7 @@ public class TaskAPITests
     {
         // Arrange
         var code = @"
-            func memoryIntensiveTask() -> async {
+            async func memoryIntensiveTask() {
                 largeData <- {}
                 for i in 1..1000 {
                     largeData[i] <- i * i
@@ -607,7 +608,7 @@ public class TaskAPITests
         // Arrange
         var code = @"
             resourceAcquired <- false
-            func operationWithResource() -> async {
+            async func operationWithResource() {
                 resourceAcquired <- true
                 try {
                     await Task.Delay(10)
@@ -638,7 +639,7 @@ public class TaskAPITests
         // Arrange
         var code = @"
             // Simulate external service call
-            func externalServiceCall(param:string) -> async {
+            async func externalServiceCall(param:string) {
                 await Task.Delay(10)
                 return ""response for: "" + param
             }
@@ -663,7 +664,7 @@ public class TaskAPITests
     {
         // Arrange
         var code = @"
-            func complexWorkflow() -> async {
+            async func complexWorkflow() {
                 // Step 1: Initialize
                 await Task.Delay(5)
                 data <- [1, 2, 3, 4, 5]
@@ -712,7 +713,7 @@ public class TaskAPITests
             task <- Task.Run(() -> {
                 // Simulate some work
                 sum <- 0
-                for i in 1..1000 {
+                for i in [1~1000] {
                     sum <- sum + i
                 }
                 return sum
