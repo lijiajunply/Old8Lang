@@ -206,7 +206,7 @@ public class AwaitTests
                 await Task.Delay(30)
                 return ""item "" + item.ToStr() + "" processed""
             }
-            results <- {""""}
+            results <- {}
             for i in [1~3] {
                 result <- await processItem(i)
                 results.Add(result)
@@ -296,26 +296,28 @@ public class AwaitTests
     public void Await_WithDictionaryOperations_ProcessesAsyncDictionaries()
     {
         // Arrange
-        var code = @"
-            async func lookupUser(id:int) -> string {
-                await Task.Delay(50)
-                if id == 1 {
-                    return ""Alice""
-                } else if id == 2 {
-                    return ""Bob""
-                } else {
-                    return ""Unknown""
-                }
-            }
-            userIds <- {""user1"": 1, ""user2"": 2, ""user3"": 3}
-            userNames <- {}
-            for key in userIds.Keys {
-                id <- userIds[key]
-                name <- await lookupUser(id)
-                userNames[key] <- name
-            }
-            result <- userNames[""user1""]
-        ";
+        var code = """
+
+                               async func lookupUser(id:int) -> string {
+                                   await Task.Delay(50)
+                                   if id == 1 {
+                                       return "Alice"
+                                   } else if id == 2 {
+                                       return "Bob"
+                                   } else {
+                                       return "Unknown"
+                                   }
+                               }
+                               userIds <- {"user1": 1, "user2": 2, "user3": 3}
+                               userNames <- dict()
+                               for key in userIds.Keys() {
+                                   id <- userIds[key]
+                                   name <- await lookupUser(id)
+                                   userNames[key] <- name
+                               }
+                               result <- userNames["user1"]
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -599,13 +601,13 @@ public class AwaitTests
         var code = @"
             async func processText(text:string) -> string {
                 await Task.Delay(35)
-                return text.ToUppercase() + ""-PROCESSED""
+                return text.ToUpper() + ""-PROCESSED""
             }
             async func concatenateAsync(a:string, b:string) -> string {
                 processedA <- await processText(a)
                 processedB <- await processText(b)
                 await Task.Delay(25)
-                return processedA + "" + "" + processedB
+                return processedA + "" "" + processedB
             }
             result <- await concatenateAsync(""hello"", ""world"")
         ";
