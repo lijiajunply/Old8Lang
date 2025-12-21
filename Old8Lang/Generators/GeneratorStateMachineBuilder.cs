@@ -1,9 +1,9 @@
-using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
+using Old8Lang.Interpreter;
 
-namespace Old8Lang.Interpreter;
+namespace Old8Lang.Generators;
 
 /// <summary>
 /// 生成器状态机构建器

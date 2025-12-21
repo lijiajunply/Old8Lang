@@ -136,7 +136,7 @@ public class TaskAPITests
     {
         // Arrange
         var code = @"
-            originalTask <- await Task.Run(() -> {
+            originalTask <- Task.Run(() -> {
                 return 10
             })
             continuationTask <- originalTask.ContinueWith((result) -> {
@@ -247,7 +247,7 @@ public class TaskAPITests
             cts <- CancellationTokenSource()
             token <- cts.Token
             task <- Task.Run(() -> {
-                for i in 1..1000 {
+                for i in [1~1000] {
                     if token.IsCancellationRequested {
                         throw ""Task cancelled""
                     }

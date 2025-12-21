@@ -3,6 +3,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
+using Old8Lang.Generators;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression.Generators;
@@ -86,18 +87,16 @@ public class GeneratorLangValue : LangValueType, ILangList
     {
         if (UseNewStateMachine)
         {
-            System.Console.WriteLine($"[GEN] Using new state machine");
             // 使用新状态机
             if (NewStateMachine == null)
             {
-                System.Console.WriteLine($"[GEN] Creating new state machine");
                 // 为生成器创建独立的变量环境
                 var generatorManager = manager.CloneForGenerator();
 
                 // 设置参数值到生成器环境中
                 foreach (var (paramName, paramValue) in ParameterValues)
                 {
-                    var id = new LangId(paramName, "", null, new SourcePosition());
+                    var id = new LangId(paramName);
                     generatorManager.Set(id, paramValue);
                 }
 
@@ -105,11 +104,9 @@ public class GeneratorLangValue : LangValueType, ILangList
                 try
                 {
                     NewStateMachine = GeneratorStateMachineBuilder.BuildFromFunc(Func, generatorManager);
-                    System.Console.WriteLine($"[GEN] State machine created successfully");
                 }
-                catch (InvalidOperationException ex)
+                catch (InvalidOperationException)
                 {
-                    System.Console.WriteLine($"[GEN] Not a generator function: {ex.Message}");
                     // 不是生成器函数，返回空值
                     State = GeneratorState.Completed;
                     return new VoidLangValue();
@@ -117,52 +114,50 @@ public class GeneratorLangValue : LangValueType, ILangList
             }
 
             // 调用状态机的MoveNext
-            System.Console.WriteLine($"[GEN] Calling MoveNext()");
+            Console.WriteLine($"[GEN] Calling MoveNext()");
             if (NewStateMachine.MoveNext())
             {
-                System.Console.WriteLine($"[GEN] MoveNext returned true");
+                Console.WriteLine($"[GEN] MoveNext returned true");
                 // 还有更多值
                 State = GeneratorState.Suspended;
                 NextValue = NewStateMachine.CurrentValue;
                 return NextValue ?? new VoidLangValue();
             }
 
-            System.Console.WriteLine($"[GEN] MoveNext returned false");
+            Console.WriteLine($"[GEN] MoveNext returned false");
             // 生成器完成
             State = GeneratorState.Completed;
             return new VoidLangValue();
         }
-        else
+
+        // 使用旧状态机
+        if (StateMachine == null)
         {
-            // 使用旧状态机
-            if (StateMachine == null)
+            // 为生成器创建独立的变量环境
+            var generatorManager = manager.CloneForGenerator();
+
+            // 设置参数值到生成器环境中
+            foreach (var (paramName, paramValue) in ParameterValues)
             {
-                // 为生成器创建独立的变量环境
-                var generatorManager = manager.CloneForGenerator();
-
-                // 设置参数值到生成器环境中
-                foreach (var (paramName, paramValue) in ParameterValues)
-                {
-                    generatorManager.Set(new LangId(paramName), paramValue);
-                }
-
-                // 创建状态机
-                StateMachine = new GeneratorStateMachine(Func, generatorManager);
+                generatorManager.Set(new LangId(paramName), paramValue);
             }
 
-            // 调用状态机的MoveNext
-            if (StateMachine.MoveNext())
-            {
-                // 还有更多值
-                State = GeneratorState.Suspended;
-                NextValue = StateMachine.Current;
-                return NextValue ?? new VoidLangValue();
-            }
-
-            // 生成器完成
-            State = GeneratorState.Completed;
-            return new VoidLangValue();
+            // 创建状态机
+            StateMachine = new GeneratorStateMachine(Func, generatorManager);
         }
+
+        // 调用状态机的MoveNext
+        if (StateMachine.MoveNext())
+        {
+            // 还有更多值
+            State = GeneratorState.Suspended;
+            NextValue = StateMachine.Current;
+            return NextValue ?? new VoidLangValue();
+        }
+
+        // 生成器完成
+        State = GeneratorState.Completed;
+        return new VoidLangValue();
     }
 
     /// <summary>

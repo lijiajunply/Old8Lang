@@ -1,8 +1,7 @@
 using Old8Lang.AST;
-using Old8Lang.AST.Expression;
 using Old8Lang.AST.Statement;
 
-namespace Old8Lang.Interpreter;
+namespace Old8Lang.Generators;
 
 /// <summary>
 /// 生成器 AST 扫描器

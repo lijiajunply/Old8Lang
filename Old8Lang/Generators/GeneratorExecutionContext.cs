@@ -1,6 +1,6 @@
 using Old8Lang.AST.Expression;
 
-namespace Old8Lang.Interpreter;
+namespace Old8Lang.Generators;
 
 /// <summary>
 /// 生成器执行上下文

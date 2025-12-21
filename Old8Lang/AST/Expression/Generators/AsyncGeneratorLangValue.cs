@@ -260,15 +260,7 @@ public class AsyncGeneratorLangValue : LangValueType, ILangList
     public bool In(LangValueType value)
     {
         // 迭代生成器，检查是否包含指定值
-        foreach (var item in GetItems())
-        {
-            if (item.ToString() == value.ToString())
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return GetItems().Any(item => item.ToString() == value.ToString());
     }
 
     /// <summary>

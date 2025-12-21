@@ -61,7 +61,9 @@ public class TaskClassLangValue : LangValueType
                 "WhenAny" => WhenAny,
                 "Delay" => Delay,
                 "FromResult" => FromResult,
+                "FromException" => FromException,
                 "Run" => Run,
+                "StartNew" => StartNew,
                 _ => null
             };
 
@@ -88,7 +90,9 @@ public class TaskClassLangValue : LangValueType
                 "WhenAny" => new TaskStaticMethodWrapper("WhenAny", WhenAny),
                 "Delay" => new TaskStaticMethodWrapper("Delay", Delay),
                 "FromResult" => new TaskStaticMethodWrapper("FromResult", FromResult),
+                "FromException" => new TaskStaticMethodWrapper("FromException", FromException),
                 "Run" => new TaskStaticMethodWrapper("Run", Run),
+                "StartNew" => new TaskStaticMethodWrapper("StartNew", StartNew),
                 _ => throw new AttributeError(dotExpression.Position, methodName, "Task")
             };
         }
@@ -200,6 +204,54 @@ public class TaskClassLangValue : LangValueType
         return TaskLangValue.FromResult(resultValue, position);
     }
     
+    /// <summary>
+    /// StartNew 静态方法实现
+    /// </summary>
+    private static LangValueType StartNew(List<LangValueType> args, SourcePosition position)
+    {
+        if (args.Count != 1)
+        {
+            throw new ArgumentError(position,
+                $"StartNew 期望 1 个参数,但提供了 {args.Count} 个");
+        }
+
+        if (args[0] is not FuncLangValue funcValue)
+        {
+            var tempNode = new NullLangValue(position);
+            throw new TypeError(tempNode, "function", args[0].TypeToString());
+        }
+
+        return TaskLangValue.Run(funcValue, CancellationToken.None, position);
+    }
+
+    /// <summary>
+    /// FromException 静态方法实现
+    /// </summary>
+    private static LangValueType FromException(List<LangValueType> args, SourcePosition position)
+    {
+        if (args.Count != 1)
+        {
+            throw new ArgumentError(position,
+                $"FromException 期望 1 个参数,但提供了 {args.Count} 个");
+        }
+
+        var exceptionValue = args[0];
+        string exceptionMessage;
+
+        if (exceptionValue is StringLangValue stringValue)
+        {
+            exceptionMessage = stringValue.Value;
+        }
+        else
+        {
+            exceptionMessage = exceptionValue.ToDisplayString();
+        }
+
+        var exception = new Exception(exceptionMessage);
+        var faultedTask = System.Threading.Tasks.Task.FromException<LangValueType>(exception);
+        return new TaskLangValue(faultedTask, CancellationToken.None, position);
+    }
+
     /// <summary>
     /// Run 静态方法实现
     /// </summary>
