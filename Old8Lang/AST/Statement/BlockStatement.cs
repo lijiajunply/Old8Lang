@@ -37,7 +37,7 @@ public class BlockStatement : OldStatement
                         ImportStatements.Add(statement);
                     }
                     break;
-                case NativeStatement or FuncInit or ClassInit:
+                case NativeStatement or FuncInit or ClassInit or AsyncFuncInit:
                     ImportStatements.Add(statement);
                     break;
                 case ReturnStatement:
