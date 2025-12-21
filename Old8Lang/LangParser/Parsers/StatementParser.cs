@@ -383,6 +383,12 @@ public class StatementParser(
                     return new FuncRunStatement(superOperation, expr.Position);
                 }
 
+                // 如果是this方法调用（Operation，且操作符为 Dot，左侧为 LangId { IdName: "this" }，右侧为 Instance），返回 FuncRunStatement
+                if (expr is Operation { Opera: LangTokenType.Dot, Left: LangId { IdName: "this" }, Right: Instance } thisOperation)
+                {
+                    return new FuncRunStatement(thisOperation, expr.Position);
+                }
+
                 // 如果是 await 表达式，允许作为独立语句
                 if (expr is AwaitExpression awaitExpr)
                 {

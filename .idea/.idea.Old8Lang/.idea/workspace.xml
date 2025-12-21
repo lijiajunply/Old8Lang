@@ -20,9 +20,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncFuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncFuncInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/config.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/config.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/utils.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/utils.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Interfaces/InterfaceAbstractClassInteractionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Interfaces/InterfaceAbstractClassInteractionTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/SuperExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/SuperExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -449,7 +452,7 @@
       <workItem from="1766156569385" duration="1528000" />
       <workItem from="1766238299964" duration="6160000" />
       <workItem from="1766298953988" duration="5700000" />
-      <workItem from="1766308100500" duration="8150000" />
+      <workItem from="1766308100500" duration="8678000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -794,7 +797,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="327" />
+    <option name="localTasksCounter" value="328" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -821,7 +824,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 实现函数重载和静态变量支持&#10;&#10;- 在 AnyLangValue 中添加方法重载解析机制&#10;- 支持构造函数重载和普通方法重载&#10;- 实现 TypeTemplate 中的静态变量持久化存储&#10;- 更新 BlockStatement 以处理函数重载声明&#10;- 修改类实例化逻辑以支持重载构造函数调用&#10;- 完善测试用例以验证 this 关键字正确使用&#10;- 添加 AGENTS.md 开发指南文档" />
     <MESSAGE value="feat(typesystem): 实现类型假注和多态支持&#10;&#10;- 添加类型假注管理器 TypeAnnotationManager，支持基本类型和类型注册&#10;- 实现类型兼容性检查，包括多态类型和联合类型&#10;- 添加 const 变量支持，防止重复赋值&#10;- 实现类继承体系的类型检查和成员访问&#10;- 添加类型缓存清除机制，确保类型信息实时更新&#10;- 完善类型错误提示和调试信息&#10;- 添加类型系统单元测试，验证多态和类型安全&#10;- 重构类型检查器，分离类型假注逻辑&#10;- 添加类型信息接口和实现类，支持继承和多态&#10;- 实现类型族管理，支持子类型查询和兼容性判断" />
     <MESSAGE value="feat(interpreter): 支持带参数的类构造函数初始化&#10;&#10;- 新增 ValueExpression 类用于包装已求值的表达式&#10;- 修改 Instance.cs 中的构造函数调用逻辑，支持参数在调用者上下文求值&#10;- 调整 ClassDeclarationTests.cs 中字符串分割方式以提高兼容性&#10;- 更新 Rider 配置文件与调试设置" />
     <MESSAGE value="fix(parser): 修复前缀运算符解析问题&#10;&#10;- 修正 not 运算符右操作数的解析逻辑，确保其能正确处理点运算符&#10;- 修正前缀负号运算符右操作数的解析逻辑，支持点运算符处理&#10;- 调整 ParsePrimary 为 ParsePower 以增强表达式解析能力&#10;- 添加测试用例验证 not 和负号运算符与成员访问的结合使用" />
@@ -846,7 +848,8 @@
     <MESSAGE value="fix(tests): 更新异步任务API测试代码中的语法与逻辑错误&#10;&#10;修复了 `TaskAPITests.cs` 中多处异步函数定义和调用方式的语法问题，&#10;包括将 `func name() -&gt; async` 改为 `async func name()`，&#10;以及修正循环语法 `1..n` 为 `[1~n]`。同时补充了一个变量初始化语句以避免未定义行为。" />
     <MESSAGE value="feat(generator): 重构生成器相关代码结构并优化异步任务支持&#10;&#10;- 将多个生成器相关的类迁移至 `Old8Lang.Generators` 命名空间&#10;- 优化 `AsyncGeneratorLangValue` 中的 `In` 方法实现，使用 LINQ 简化逻辑&#10;- 移除调试用的 `System.Console.WriteLine` 日志输出&#10;- 修复 `LangId` 构造函数参数过多的问题&#10;- 在 `TaskClassLangValue` 中新增 `FromException` 和 `StartNew` 静态方法&#10;- 为 `TaskLangValue` 添加 `Wait` 和 `ContinueWith` 实例方法以增强任务操作能力&#10;- 更新测试文件中对 Task API 的调用方式及语法表达&#10;- 统一命名空间引用和清理无用的 using 指令" />
     <MESSAGE value="feat(async): 优化异步任务 API 支持与测试代码&#10;&#10;- 为 `TaskLangValue` 添加 `ContinueWith` 实例方法以增强任务链式调用能力&#10;- 修正 `TaskAPITests.cs` 中的语法错误，包括异步函数声明和循环表达式&#10;- 更新任务结果获取方式，统一使用 `Result()` 调用替代直接属性访问&#10;- 修复变量初始化和比较运算符使用错误&#10;- 将部分数组初始化语法从 `[]` 改为 `{}` 以适配语言变更&#10;- 迁移 `ContinueWith` 方法实现至 `TaskValueFuncStatic.cs` 并优化其上下文管理&#10;- 调整 `Instance.cs` 中的参数传递逻辑，避免空引用异常" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(async): 优化异步任务 API 支持与测试代码&#10;&#10;- 为 `TaskLangValue` 添加 `ContinueWith` 实例方法以增强任务链式调用能力&#10;- 修正 `TaskAPITests.cs` 中的语法错误，包括异步函数声明和循环表达式&#10;- 更新任务结果获取方式，统一使用 `Result()` 调用替代直接属性访问&#10;- 修复变量初始化和比较运算符使用错误&#10;- 将部分数组初始化语法从 `[]` 改为 `{}` 以适配语言变更&#10;- 迁移 `ContinueWith` 方法实现至 `TaskValueFuncStatic.cs` 并优化其上下文管理&#10;- 调整 `Instance.cs` 中的参数传递逻辑，避免空引用异常" />
+    <MESSAGE value="feat(async): 实现异步函数初始化与状态机生成&#10;&#10;重构 AsyncFuncInit 类以支持异步函数的动态编译和执行，包括：&#10;- 使用 DynamicMethod 动态生成异步方法体&#10;- 集成状态机生成器 AsyncStateMachineGenerator 来处理 await 表达式&#10;- 支持将异步函数注册为委托并携带参数信息&#10;- 优化 IL 生成流程，确保正确的参数加载和返回值处理&#10;&#10;同时更新 BlockStatement 以识别 AsyncFuncInit 语句，使其能正确导入异步函数声明。" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(async): 实现异步函数初始化与状态机生成&#10;&#10;重构 AsyncFuncInit 类以支持异步函数的动态编译和执行，包括：&#10;- 使用 DynamicMethod 动态生成异步方法体&#10;- 集成状态机生成器 AsyncStateMachineGenerator 来处理 await 表达式&#10;- 支持将异步函数注册为委托并携带参数信息&#10;- 优化 IL 生成流程，确保正确的参数加载和返回值处理&#10;&#10;同时更新 BlockStatement 以识别 AsyncFuncInit 语句，使其能正确导入异步函数声明。" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1435,6 +1438,19 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="632" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/SpawnTests.cs</url>
+          <line>553</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/SpawnTests.cs" containingFunctionPresentation="方法 'Spawn_AsyncFunction_SpawnsAsyncFunction'">
+            <startOffsets>
+              <option value="16889" />
+            </startOffsets>
+            <endOffsets>
+              <option value="16953" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="633" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />

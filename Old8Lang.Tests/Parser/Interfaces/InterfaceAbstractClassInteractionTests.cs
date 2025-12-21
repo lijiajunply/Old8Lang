@@ -61,7 +61,7 @@ public class InterfaceAbstractClassInteractionTests
                        private radius
 
                        public func constructor(radius:double) {
-                           super("Circle")
+                           super.init("Circle")
                            this.radius <- radius
                            this.CalculateArea()
                        }
@@ -81,7 +81,7 @@ public class InterfaceAbstractClassInteractionTests
                        private height
 
                        public func constructor(width:double, height:double) {
-                           super("Rectangle")
+                           super.init("Rectangle")
                            this.width <- width
                            this.height <- height
                            this.CalculateArea()
@@ -161,7 +161,7 @@ public class InterfaceAbstractClassInteractionTests
                        protected port
 
                        public func constructor(name:string, address:string, port:int) {
-                           super(name)
+                           super.init(name)
                            this.address <- address
                            this.port <- port
                        }
@@ -184,7 +184,7 @@ public class InterfaceAbstractClassInteractionTests
                        private maxLogSize
 
                        public func constructor(name:string, address:string, port:int) {
-                           super(name, address, port)
+                           super.init(name, address, port)
                            this.logs <- {}
                            this.maxLogSize <- 100
                        }
@@ -238,128 +238,130 @@ public class InterfaceAbstractClassInteractionTests
     public void ParseProgram_InterfaceAsParametersAndReturnValues_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-interface IDrawable {
-    func Draw() -> void
-    func GetArea() -> double
-}
+        var code = """
 
-interface IMovable {
-    func Move(x:double, y:double) -> void
-    func GetPosition() -> dict
-}
+                   interface IDrawable {
+                       func Draw() -> void
+                       func GetArea() -> double
+                   }
 
-abstract class Shape implements IDrawable {
-    protected x
-    protected y
+                   interface IMovable {
+                       func Move(x:double, y:double) -> void
+                       func GetPosition() -> dict
+                   }
 
-    public func constructor(x:double, y:double) {
-        this.x <- x
-        this.y <- y
-    }
+                   abstract class Shape implements IDrawable {
+                       protected x
+                       protected y
 
-    public func GetPosition() -> dict {
-        return {""x"": this.x, ""y"": this.y}
-    }
+                       public func constructor(x:double, y:double) {
+                           this.x <- x
+                           this.y <- y
+                       }
 
-    abstract func Draw() -> void
-    abstract func GetArea() -> double
-}
+                       public func GetPosition() -> dict {
+                           return {"x": this.x, "y": this.y}
+                       }
 
-class Circle extends Shape implements IMovable {
-    private radius
+                       abstract func Draw() -> void
+                       abstract func GetArea() -> double
+                   }
 
-    public func constructor(x:double, y:double, radius:double) {
-        super(x, y)
-        this.radius <- radius
-    }
+                   class Circle extends Shape implements IMovable {
+                       private radius
 
-    public func Draw() -> void {
-        PrintLine(""Drawing circle at ("" + this.x.ToStr() + "", "" + this.y.ToStr() + "") with radius "" + this.radius.ToStr())
-    }
+                       public func constructor(x:double, y:double, radius:double) {
+                           super.init(x, y)
+                           this.radius <- radius
+                       }
 
-    public func GetArea() -> double {
-        return 3.14159 * this.radius * this.radius
-    }
+                       public func Draw() -> void {
+                           PrintLine("Drawing circle at (" + this.x.ToStr() + ", " + this.y.ToStr() + ") with radius " + this.radius.ToStr())
+                       }
 
-    public func Move(x:double, y:double) -> void {
-        this.x <- this.x + x
-        this.y <- this.y + y
-    }
-}
+                       public func GetArea() -> double {
+                           return 3.14159 * this.radius * this.radius
+                       }
 
-class Rectangle extends Shape implements IMovable {
-    private width
-    private height
+                       public func Move(x:double, y:double) -> void {
+                           this.x <- this.x + x
+                           this.y <- this.y + y
+                       }
+                   }
 
-    public func constructor(x:double, y:double, width:double, height:double) {
-        super(x, y)
-        this.width <- width
-        this.height <- height
-    }
+                   class Rectangle extends Shape implements IMovable {
+                       private width
+                       private height
 
-    public func Draw() -> void {
-        PrintLine(""Drawing rectangle at ("" + this.x.ToStr() + "", "" + this.y.ToStr() + "") with size "" + this.width.ToStr() + ""x"" + this.height.ToStr())
-    }
+                       public func constructor(x:double, y:double, width:double, height:double) {
+                           super.init(x, y)
+                           this.width <- width
+                           this.height <- height
+                       }
 
-    public func GetArea() -> double {
-        return this.width * this.height
-    }
+                       public func Draw() -> void {
+                           PrintLine("Drawing rectangle at (" + this.x.ToStr() + ", " + this.y.ToStr() + ") with size " + this.width.ToStr() + "x" + this.height.ToStr())
+                       }
 
-    public func Move(x:double, y:double) -> void {
-        this.x <- this.x + x
-        this.y <- this.y + y
-    }
-}
+                       public func GetArea() -> double {
+                           return this.width * this.height
+                       }
 
-// 使用接口作为参数的函数
-func DrawAllShapes(shapes:list) -> void {
-    for shape in shapes {
-        shape.Draw()
-    }
-}
+                       public func Move(x:double, y:double) -> void {
+                           this.x <- this.x + x
+                           this.y <- this.y + y
+                       }
+                   }
 
-func GetLargestShape(shapes:list) -> IDrawable {
-    largest <- null
-    largestArea <- -1
+                   // 使用接口作为参数的函数
+                   func DrawAllShapes(shapes:list) -> void {
+                       for shape in shapes {
+                           shape.Draw()
+                       }
+                   }
 
-    for shape in shapes {
-        area <- shape.GetArea()
-        if area > largestArea {
-            largestArea <- area
-            largest <- shape
-        }
-    }
+                   func GetLargestShape(shapes:list) -> IDrawable {
+                       largest <- null
+                       largestArea <- -1
 
-    return largest
-}
+                       for shape in shapes {
+                           area <- shape.GetArea()
+                           if area > largestArea {
+                               largestArea <- area
+                               largest <- shape
+                           }
+                       }
 
-func MoveAllMovableShapes(shapes:list, dx:double, dy:double) -> void {
-    for shape in shapes {
-        shape.Move(dx, dy)
-    }
-}
+                       return largest
+                   }
 
-// 创建图形集合
-circle1 <- Circle(0, 0, 5)
-circle2 <- Circle(10, 10, 3)
-rect1 <- Rectangle(20, 20, 4, 6)
-rect2 <- Rectangle(30, 30, 8, 2)
+                   func MoveAllMovableShapes(shapes:list, dx:double, dy:double) -> void {
+                       for shape in shapes {
+                           shape.Move(dx, dy)
+                       }
+                   }
 
-shapes <- {circle1, circle2, rect1, rect2}
+                   // 创建图形集合
+                   circle1 <- Circle(0, 0, 5)
+                   circle2 <- Circle(10, 10, 3)
+                   rect1 <- Rectangle(20, 20, 4, 6)
+                   rect2 <- Rectangle(30, 30, 8, 2)
 
-// 使用这些函数
-PrintLine(""Drawing all shapes:"")
-DrawAllShapes(shapes)
+                   shapes <- {circle1, circle2, rect1, rect2}
 
-largestShape <- GetLargestShape(shapes)
-PrintLine(""Largest shape area: "" + largestShape.GetArea().ToStr())
+                   // 使用这些函数
+                   PrintLine("Drawing all shapes:")
+                   DrawAllShapes(shapes)
 
-PrintLine(""Moving all shapes..."")
-MoveAllMovableShapes(shapes, 5, 5)
+                   largestShape <- GetLargestShape(shapes)
+                   PrintLine("Largest shape area: " + largestShape.GetArea().ToStr())
 
-PrintLine(""Drawing shapes after moving:"")
-DrawAllShapes(shapes)";
+                   PrintLine("Moving all shapes...")
+                   MoveAllMovableShapes(shapes, 5, 5)
+
+                   PrintLine("Drawing shapes after moving:")
+                   DrawAllShapes(shapes)
+                   """;
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -379,101 +381,103 @@ DrawAllShapes(shapes)";
     public void ParseProgram_InterfaceDefaultImplementationInteraction_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-interface ILogger {
-    func Log(message:string) -> void
-    func GetLogLevel() -> string
+        var code = """
 
-    // 默认实现（语法上支持，根据语言特性可能有不同实现方式）
-    func LogError(message:string) -> void {
-        Log(""[ERROR] "" + message)
-    }
+                   interface ILogger {
+                       func Log(message:string) -> void
+                       func GetLogLevel() -> string
 
-    func LogWarning(message:string) -> void {
-        Log(""[WARNING] "" + message)
-    }
-}
+                       // 默认实现（语法上支持，根据语言特性可能有不同实现方式）
+                       func LogError(message:string) -> void {
+                           Log("[ERROR] " + message)
+                       }
 
-abstract class BaseLogger implements ILogger {
-    protected logLevel
+                       func LogWarning(message:string) -> void {
+                           Log("[WARNING] " + message)
+                       }
+                   }
 
-    public func constructor(level:string) {
-        this.logLevel <- level
-    }
+                   abstract class BaseLogger implements ILogger {
+                       protected logLevel
 
-    public func GetLogLevel() -> string {
-        return this.logLevel
-    }
+                       public func constructor(level:string) {
+                           this.logLevel <- level
+                       }
 
-    public func Log(message:string) -> void {
-        PrintLine(""["" + this.logLevel + ""] "" + message)
-    }
+                       public func GetLogLevel() -> string {
+                           return this.logLevel
+                       }
 
-    // 抽象方法，子类必须实现
-    abstract func ClearLogs() -> void
-    abstract func ExportLogs() -> string
-}
+                       public func Log(message:string) -> void {
+                           PrintLine("[" + this.logLevel + "] " + message)
+                       }
 
-class FileLogger extends BaseLogger {
-    private fileName
-    private logs
+                       // 抽象方法，子类必须实现
+                       abstract func ClearLogs() -> void
+                       abstract func ExportLogs() -> string
+                   }
 
-    public func constructor(fileName:string) {
-        super(""FILE"")
-        this.fileName <- fileName
-        this.logs <- {}
-    }
+                   class FileLogger extends BaseLogger {
+                       private fileName
+                       private logs
 
-    public func ClearLogs() -> void {
-        this.logs <- {}
-        PrintLine(""File logs cleared"")
-    }
+                       public func constructor(fileName:string) {
+                           super.init("FILE")
+                           this.fileName <- fileName
+                           this.logs <- {}
+                       }
 
-    public func ExportLogs() -> string {
-        content <- ""File: "" + this.fileName + ""\nLogs:\n""
-        for log in this.logs {
-            content <- content + log + ""\n""
-        }
-        return content
-    }
+                       public func ClearLogs() -> void {
+                           this.logs <- {}
+                           PrintLine("File logs cleared")
+                       }
 
-    public func WriteToFile(data:string) -> void {
-        this.logs.Push(data)
-        Log(""Written to file: "" + this.fileName)
-    }
-}
+                       public func ExportLogs() -> string {
+                           content <- "File: " + this.fileName + "\nLogs:\n"
+                           for log in this.logs {
+                               content <- content + log + "\n"
+                           }
+                           return content
+                       }
 
-class ConsoleLogger extends BaseLogger {
-    private maxMessages
+                       public func WriteToFile(data:string) -> void {
+                           this.logs.Push(data)
+                           Log("Written to file: " + this.fileName)
+                       }
+                   }
 
-    public func constructor(maxMessages:int) {
-        super(""CONSOLE"")
-        this.maxMessages <- maxMessages
-    }
+                   class ConsoleLogger extends BaseLogger {
+                       private maxMessages
 
-    public func ClearLogs() -> void {
-        // Console不需要清除日志
-        PrintLine(""Console does not store logs"")
-    }
+                       public func constructor(maxMessages:int) {
+                           super.init("CONSOLE")
+                           this.maxMessages <- maxMessages
+                       }
 
-    public func ExportLogs() -> string {
-        return ""Console logs cannot be exported""
-    }
-}
+                       public func ClearLogs() -> void {
+                           // Console不需要清除日志
+                           PrintLine("Console does not store logs")
+                       }
 
-fileLogger <- FileLogger(""app.log"")
-consoleLogger <- ConsoleLogger(100)
+                       public func ExportLogs() -> string {
+                           return "Console logs cannot be exported"
+                       }
+                   }
 
-fileLogger.Log(""Application started"")
-fileLogger.LogError(""Something went wrong"")
-fileLogger.LogWarning(""Warning message"")
+                   fileLogger <- FileLogger("app.log")
+                   consoleLogger <- ConsoleLogger(100)
 
-consoleLogger.Log(""Console logging started"")
-consoleLogger.LogError(""Console error"")
+                   fileLogger.Log("Application started")
+                   fileLogger.LogError("Something went wrong")
+                   fileLogger.LogWarning("Warning message")
 
-fileLogger.WriteToFile(""Test data"")
-exported <- fileLogger.ExportLogs()
-fileLogger.ClearLogs()";
+                   consoleLogger.Log("Console logging started")
+                   consoleLogger.LogError("Console error")
+
+                   fileLogger.WriteToFile("Test data")
+                   exported <- fileLogger.ExportLogs()
+                   fileLogger.ClearLogs()
+                   """;
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 
@@ -493,118 +497,120 @@ fileLogger.ClearLogs()";
     public void ParseProgram_RuntimeTypeChecking_ParsesSuccessfully()
     {
         // Arrange
-        var code = @"
-interface IWorker {
-    func Work() -> void
-    func GetSalary() -> double
-}
+        var code = """
 
-interface IDriver {
-    func Drive() -> void
-    func GetLicense() -> string
-}
+                   interface IWorker {
+                       func Work() -> void
+                       func GetSalary() -> double
+                   }
 
-abstract class Person {
-    protected name
-    protected age
+                   interface IDriver {
+                       func Drive() -> void
+                       func GetLicense() -> string
+                   }
 
-    public func constructor(name:string, age:int) {
-        this.name <- name
-        this.age <- age
-    }
+                   abstract class Person {
+                       protected name
+                       protected age
 
-    public func GetName() -> string {
-        return this.name
-    }
+                       public func constructor(name:string, age:int) {
+                           this.name <- name
+                           this.age <- age
+                       }
 
-    public func GetAge() -> int {
-        return this.age
-    }
-}
+                       public func GetName() -> string {
+                           return this.name
+                       }
 
-class Employee extends Person implements IWorker {
-    private salary
-    private position
+                       public func GetAge() -> int {
+                           return this.age
+                       }
+                   }
 
-    public func constructor(name:string, age:int, salary:double, position:string) {
-        super(name, age)
-        this.salary <- salary
-        this.position <- position
-    }
+                   class Employee extends Person implements IWorker {
+                       private salary
+                       private position
 
-    public func Work() -> void {
-        PrintLine(this.name + "" is working as "" + this.position)
-    }
+                       public func constructor(name:string, age:int, salary:double, position:string) {
+                           super.init(name, age)
+                           this.salary <- salary
+                           this.position <- position
+                       }
 
-    public func GetSalary() -> double {
-        return this.salary
-    }
-}
+                       public func Work() -> void {
+                           PrintLine(this.name + " is working as " + this.position)
+                       }
 
-class Driver extends Person implements IDriver {
-    private licenseNumber
-    private vehicleType
+                       public func GetSalary() -> double {
+                           return this.salary
+                       }
+                   }
 
-    public func constructor(name:string, age:int, license:string, vehicle:string) {
-        super(name, age)
-        this.licenseNumber <- license
-        this.vehicleType <- vehicle
-    }
+                   class Driver extends Person implements IDriver {
+                       private licenseNumber
+                       private vehicleType
 
-    public func Drive() -> void {
-        PrintLine(this.name + "" is driving a "" + this.vehicleType)
-    }
+                       public func constructor(name:string, age:int, license:string, vehicle:string) {
+                           super.init(name, age)
+                           this.licenseNumber <- license
+                           this.vehicleType <- vehicle
+                       }
 
-    public func GetLicense() -> string {
-        return this.licenseNumber
-    }
-}
+                       public func Drive() -> void {
+                           PrintLine(this.name + " is driving a " + this.vehicleType)
+                       }
 
-class DeliveryDriver extends Driver implements IWorker {
-    private salary
-    private deliveries
+                       public func GetLicense() -> string {
+                           return this.licenseNumber
+                       }
+                   }
 
-    public func constructor(name:string, age:int, license:string, salary:double) {
-        super(name, age, license, ""Van"")
-        this.salary <- salary
-        this.deliveries <- 0
-    }
+                   class DeliveryDriver extends Driver implements IWorker {
+                       private salary
+                       private deliveries
 
-    public func Work() -> void {
-        this.deliveries <- this.deliveries + 1
-        PrintLine(this.name + "" completed delivery #"" + this.deliveries.ToStr())
-    }
+                       public func constructor(name:string, age:int, license:string, salary:double) {
+                           super.init(name, age, license, "Van")
+                           this.salary <- salary
+                           this.deliveries <- 0
+                       }
 
-    public func GetSalary() -> double {
-        return this.salary
-    }
+                       public func Work() -> void {
+                           this.deliveries <- this.deliveries + 1
+                           PrintLine(this.name + " completed delivery #" + this.deliveries.ToStr())
+                       }
 
-    public func GetDeliveriesCount() -> int {
-        return this.deliveries
-    }
-}
+                       public func GetSalary() -> double {
+                           return this.salary
+                       }
 
-// 类型检查函数
-func ProcessWorker(worker:IWorker) -> void {
-    worker.Work()
-    PrintLine(""Salary: $"" + worker.GetSalary().ToStr())
-}
+                       public func GetDeliveriesCount() -> int {
+                           return this.deliveries
+                       }
+                   }
 
-func ProcessDriver(driver:IDriver) -> void {
-    driver.Drive()
-    PrintLine(""License: "" + driver.GetLicense())
-}
+                   // 类型检查函数
+                   func ProcessWorker(worker:IWorker) -> void {
+                       worker.Work()
+                       PrintLine("Salary: $" + worker.GetSalary().ToStr())
+                   }
 
-// 创建不同类型的对象
-emp <- Employee(""Alice"", 30, 50000.0, ""Software Engineer"")
-driver <- Driver(""Bob"", 35, ""D123456"", ""Car"")
-deliveryDriver <- DeliveryDriver(""Charlie"", 25, ""D789012"", 40000.0)
+                   func ProcessDriver(driver:IDriver) -> void {
+                       driver.Drive()
+                       PrintLine("License: " + driver.GetLicense())
+                   }
 
-// 直接调用方法，不需要运行时类型检查
-ProcessWorker(emp)
-ProcessDriver(driver)
-ProcessWorker(deliveryDriver)
-ProcessDriver(deliveryDriver)";
+                   // 创建不同类型的对象
+                   emp <- Employee("Alice", 30, 50000.0, "Software Engineer")
+                   driver <- Driver("Bob", 35, "D123456", "Car")
+                   deliveryDriver <- DeliveryDriver("Charlie", 25, "D789012", 40000.0)
+
+                   // 直接调用方法，不需要运行时类型检查
+                   ProcessWorker(emp)
+                   ProcessDriver(driver)
+                   ProcessWorker(deliveryDriver)
+                   ProcessDriver(deliveryDriver)
+                   """;
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);
 

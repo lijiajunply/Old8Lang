@@ -233,7 +233,7 @@ public class SuperProxy(AnyLangValue currentInstance, VariateManager manager, So
         foreach (var fieldName in currentInstance.InstanceData.Keys.ToList())
         {
             // 跳过已经通过SetField修改过的字段
-            if (currentInstance._fieldsModifiedBySetField.Contains(fieldName))
+            if (currentInstance.FieldsModifiedBySetField.Contains(fieldName))
             {
                 continue;
             }

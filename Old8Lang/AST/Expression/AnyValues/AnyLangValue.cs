@@ -42,7 +42,7 @@ public class AnyLangValue : LangValueType
     /// 记录在当前方法执行期间通过SetField修改过的字段
     /// 用于避免SyncFieldsFromExecutionScope覆盖这些字段
     /// </summary>
-    public readonly HashSet<string> _fieldsModifiedBySetField = new();
+    public readonly HashSet<string> FieldsModifiedBySetField = new();
 
     /// <summary>
     /// 构造函数
@@ -197,13 +197,6 @@ public class AnyLangValue : LangValueType
     private LangValueType ExecuteMethod(LangMethodInfo methodInfo, List<LangExpression> arguments,
         VariateManager manager)
     {
-        // 注意：不在这里清空 _fieldsModifiedBySetField
-        // 因为这个方法可能被其他方法（如 init）调用
-        // 只在最外层方法（CallInit）中清空和管理 _fieldsModifiedBySetField
-
-        // 关键修复：参数表达式应该在调用者作用域中求值，而不是在方法执行作用域中
-        // 因为参数可能引用调用者作用域的变量（如 this.x, this.y）
-        // 所以我们先在外部作用域中计算参数值
         var parameterValues = arguments.Select(arg => arg.Run(manager)).ToList();
 
         // 然后创建参数值表达式（直接返回这些值，不需要再次求值）
@@ -268,7 +261,7 @@ public class AnyLangValue : LangValueType
         foreach (var fieldName in InstanceData.Keys.ToList())
         {
             // 跳过已经通过SetField修改过的字段
-            if (_fieldsModifiedBySetField.Contains(fieldName))
+            if (FieldsModifiedBySetField.Contains(fieldName))
             {
                 continue;
             }
@@ -288,7 +281,7 @@ public class AnyLangValue : LangValueType
             }
         }
     }
-    /// </summary>
+
     private LangValueType AccessCollectionItem(LangListItem listItem, VariateManager manager)
     {
         var collectionName = listItem.ListId.IdName;
@@ -317,7 +310,7 @@ public class AnyLangValue : LangValueType
             ArrayLangValue array when indexValue is IntLangValue intIndex => array.Get(intIndex),
             DictionaryLangValue dict => dict.Get(indexValue),
             StringLangValue str when indexValue is IntLangValue intIndex => str.Get(intIndex),
-            _ => throw new InvalidOperationError(listItem, $"不支持的集合类型: {collectionValue?.GetType().Name ?? "null"}")
+            _ => throw new InvalidOperationError(listItem, $"不支持的集合类型: {collectionValue.GetType().Name}")
         };
     }
 
@@ -385,21 +378,18 @@ public class AnyLangValue : LangValueType
                     {
                         // 运行参数表达式获取实际类型
                         var argValue = arguments[i].Run(manager);
-                        if (argValue != null)
+                        string actualTypeName = argValue.GetType().Name;
+                        if (actualTypeName.Equals(paramType, StringComparison.OrdinalIgnoreCase))
                         {
-                            string actualTypeName = argValue.GetType().Name;
-                            if (actualTypeName.Equals(paramType, StringComparison.OrdinalIgnoreCase))
-                            {
-                                score += 3; // 精确匹配
-                            }
-                            else if (IsCompatibleType(actualTypeName, paramType))
-                            {
-                                score += 2; // 兼容匹配
-                            }
-                            else
-                            {
-                                score += 1; // 可转换
-                            }
+                            score += 3; // 精确匹配
+                        }
+                        else if (IsCompatibleType(actualTypeName, paramType))
+                        {
+                            score += 2; // 兼容匹配
+                        }
+                        else
+                        {
+                            score += 1; // 可转换
                         }
                     }
                 }
@@ -430,15 +420,13 @@ public class AnyLangValue : LangValueType
         if (actualParams < expectedParams)
         {
             var func = method.Implementation;
-            if (func?.Ids != null)
+            if (func.Ids == null) return true;
+            for (int i = actualParams; i < expectedParams; i++)
             {
-                for (int i = actualParams; i < expectedParams; i++)
+                var parameter = func.Ids[i];
+                if (parameter.DefaultValue == null)
                 {
-                    var parameter = func.Ids[i];
-                    if (parameter.DefaultValue == null)
-                    {
-                        return false; // 缺失的参数没有默认值
-                    }
+                    return false; // 缺失的参数没有默认值
                 }
             }
         }
@@ -451,8 +439,8 @@ public class AnyLangValue : LangValueType
     /// </summary>
     private bool IsCompatibleType(string actualType, string expectedType)
     {
-        return actualType.ToLowerInvariant().Contains(expectedType.ToLowerInvariant()) ||
-               expectedType.ToLowerInvariant().Contains(actualType.ToLowerInvariant());
+        return actualType.Contains(expectedType, StringComparison.InvariantCultureIgnoreCase) ||
+               expectedType.Contains(actualType, StringComparison.InvariantCultureIgnoreCase);
     }
 
     /// <summary>
@@ -507,16 +495,10 @@ public class AnyLangValue : LangValueType
     /// <param name="arguments">构造函数参数</param>
     /// <param name="manager">变量管理器</param>
     /// <returns>匹配的 init 方法，如果不存在则返回 null</returns>
-    public FuncLangValue? GetInitMethod(List<LangExpression> arguments, VariateManager manager)
+    private FuncLangValue? GetInitMethod(List<LangExpression> arguments, VariateManager manager)
     {
         // 首先查找名为 "init" 的方法
         var methods = Metadata.MethodTable.LookupMethod("init");
-
-        // 如果没有找到 "init" 方法，查找与类名相同的方法（支持 Java/C# 风格的构造函数）
-        if (methods == null || methods.Count == 0)
-        {
-            methods = Metadata.MethodTable.LookupMethod(Metadata.ClassName);
-        }
 
         if (methods == null || methods.Count == 0)
             return null;
@@ -538,20 +520,14 @@ public class AnyLangValue : LangValueType
     public void CallInit(List<LangExpression> arguments, VariateManager manager)
     {
         // 清空SetField修改标记（开始新的方法执行）
-        _fieldsModifiedBySetField.Clear();
+        FieldsModifiedBySetField.Clear();
 
         var initMethod = GetInitMethod(arguments, manager);
         if (initMethod == null)
         {
-            // V2 架构：如果没有 init 方法，直接返回
-            // 不抛出异常，允许类没有构造函数（即使传入了参数）
-            // 这符合 Old8Lang 的设计：构造函数是可选的
             return;
         }
 
-        // 关键修复：参数表达式应该在调用者作用域中求值，而不是在init作用域中
-        // 因为参数可能引用调用者作用域的变量（如 this.x, this.y）
-        // 所以我们先在外部作用域中计算参数值
         var parameterValues = arguments.Select(arg => arg.Run(manager)).ToList();
 
         // 然后创建参数值表达式（直接返回这些值，不需要再次求值）
@@ -606,7 +582,7 @@ public class AnyLangValue : LangValueType
         SyncFieldsFromExecutionScope(initManager);
 
         // 9. 清空SetField修改标记（方法执行结束）
-        _fieldsModifiedBySetField.Clear();
+        FieldsModifiedBySetField.Clear();
     }
 
     /// <summary>
@@ -633,7 +609,7 @@ public class AnyLangValue : LangValueType
         InstanceData[fieldName] = value;
 
         // 记录这个字段已经通过SetField修改过
-        _fieldsModifiedBySetField.Add(fieldName);
+        FieldsModifiedBySetField.Add(fieldName);
 
         // 同时更新执行作用域（让 SyncFieldsFromExecutionScope 能够读取到更新后的值）
         manager.Set(new LangId(fieldName), value);
@@ -698,7 +674,6 @@ public class AnyLangValue : LangValueType
         }
 
 
-        
         // 对于接口类型转换，返回当前实例但更新类型标识
         // 保持原始的方法实现和字段数据不变
         if (targetTypeTemplate.Metadata == null)
@@ -709,7 +684,7 @@ public class AnyLangValue : LangValueType
                 className: type.Value ?? "",
                 isInterface: true
             );
-            
+
             // 检查类型是否兼容
             if (!Metadata.IsAssignableTo(tempInterfaceMetadata, manager))
             {
@@ -717,11 +692,11 @@ public class AnyLangValue : LangValueType
                 throw new TypeError(this, type.Value ?? "", ClassId.IdName,
                     $"类型 '{ClassId.IdName}' 不能转换为 '{type.Value}'");
             }
-            
+
 
             return this;
         }
-        
+
         if (targetTypeTemplate.Metadata.IsInterface)
         {
             // 不创建新实例，而是修改当前实例的类型信息

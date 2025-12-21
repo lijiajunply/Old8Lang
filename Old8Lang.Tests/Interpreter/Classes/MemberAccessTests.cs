@@ -331,7 +331,7 @@ public class MemberAccessTests
                 public data <- {}
                 public metadata <- {}
 
-                func DataContainer() {
+                func init() {
                     this.data <- {10, 20, 30, 40, 50}
                     this.metadata <- {""count"": 5, ""source"": ""test""}
                 }
@@ -400,7 +400,7 @@ public class MemberAccessTests
                 public radius <- 0
                 private pi <- 3.14159
 
-                func Circle(radius:double) {
+                func init(radius:double) {
                     this.radius <- radius
                 }
 
@@ -461,7 +461,7 @@ public class MemberAccessTests
                 public x <- 0
                 public y <- 0
 
-                func Point(x:double, y:double) {
+                func init(x:double, y:double) {
                     this.x <- x
                     this.y <- y
                 }
@@ -477,7 +477,7 @@ public class MemberAccessTests
                 public start <- null
                 public end <- null
 
-                func Line(start:Point, end:Point) {
+                func init(start:Point, end:Point) {
                     this.start <- start
                     this.end <- end
                 }
@@ -585,7 +585,7 @@ public class MemberAccessTests
                 public grade <- 0
                 public attendance <- 0
 
-                func Student(name:string, grade:int, attendance:double) {
+                func init(name:string, grade:int, attendance:double) {
                     this.name <- name
                     this.grade <- grade
                     this.attendance <- attendance
@@ -672,7 +672,7 @@ public class MemberAccessTests
                                    public books <- {}
                                    public members <- []
 
-                                   func Library() {
+                                   func init() {
                                        this.books <- {
                                            {"title": "1984", "author": "Orwell", "year": 1949},
                                            {"title": "Brave New World", "author": "Huxley", "year": 1932},
@@ -753,7 +753,7 @@ public class MemberAccessTests
                 public model <- """"
                 public year <- 0
 
-                func Vehicle(brand:string, model:string, year:int) {
+                func init(brand:string, model:string, year:int) {
                     this.brand <- brand
                     this.model <- model
                     this.year <- year
@@ -768,8 +768,8 @@ public class MemberAccessTests
                 public doors <- 0
                 public fuelType <- """"
 
-                func Car(brand:string, model:string, year:int, doors:int, fuelType:string) {
-                    super.Vehicle(brand, model, year)
+                func init(brand:string, model:string, year:int, doors:int, fuelType:string) {
+                    super.init(brand, model, year)
                     this.doors <- doors
                     this.fuelType <- fuelType
                 }
