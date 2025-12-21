@@ -1,4 +1,5 @@
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Value;
 
@@ -94,40 +95,42 @@ public class MixinTests
     public void Mixin_ConflictResolution_HandlesMethodConflicts()
     {
         // Arrange
-        var code = @"
-            mixin Logger {
-                public logLevel <- ""info""
+        var code = """
 
-                func Log(message:string) -> void {
-                    PrintLine(""["" + logLevel + ""] "" + message)
-                }
-            }
+                               mixin Logger {
+                                   public logLevel <- "info"
 
-            mixin VerboseLogger extends Logger {
-                public verbose <- false
+                                   func Log(message:string) -> void {
+                                       PrintLine("[" + logLevel + "] " + message)
+                                   }
+                               }
 
-                func Log(message:string) -> void {
-                    if verbose {
-                        PrintLine(""[VERBOSE] "" + message)
-                    } else {
-                        super.Log(message)
-                    }
-                }
-            }
+                               mixin VerboseLogger extends Logger {
+                                   public verbose <- false
 
-            class Application with VerboseLogger {
-                public name <- """"
+                                   func Log(message:string) -> void {
+                                       if verbose {
+                                           PrintLine("[VERBOSE] " + message)
+                                       } else {
+                                           super.Log(message)
+                                       }
+                                   }
+                               }
 
-                func init(n:string) {
-                    name <- n
-                }
-            }
+                               class Application with VerboseLogger {
+                                   public name <- ""
 
-            app <- Application(""MyApp"")
-            app.verbose <- true
-            app.Log(""Application started"")
-            app.logLevel <- ""debug""
-        ";
+                                   func init(n:string) {
+                                       name <- n
+                                   }
+                               }
+
+                               app <- Application("MyApp")
+                               app.verbose <- true
+                               app.Log("Application started")
+                               app.logLevel <- "debug"
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -135,8 +138,11 @@ public class MixinTests
         ast.Run(interpreter.Manager);
 
         // Assert
-        var appName = interpreter.Manager.GetValue(new LangId("app.name"));
-        var logLevel = interpreter.Manager.GetValue(new LangId("app.logLevel"));
+        var app = interpreter.Manager.GetValue(new LangId("app")) as AnyLangValue;
+        Assert.NotNull(app);
+
+        var appName = app.GetField("name", interpreter.Manager);
+        var logLevel = app.GetField("logLevel", interpreter.Manager);
 
         Assert.NotNull(appName);
         Assert.IsType<StringLangValue>(appName);
@@ -345,7 +351,7 @@ public class MixinTests
                 }
 
                 func GetInfo() -> string {
-                    return GetName() + "" (color: "" + GetColor() + "", radius: "" + radius.ToStr() + "")""
+                    return GetName() + "" (color: "" + GetColor() + "", radius: "" + radius.ToString() + "")""
                 }
             }
 
@@ -363,7 +369,7 @@ public class MixinTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<StringLangValue>(result);
-        Assert.Equal("MyCircle (color: red, radius: 5.0)", ((StringLangValue)result).Value);
+        Assert.Equal("MyCircle (color: red, radius: 5)", ((StringLangValue)result).Value);
     }
 
     [Fact]
@@ -522,7 +528,7 @@ public class MixinTests
                     if not events.ContainsKey(eventName) {
                         events[eventName] <- {}
                     }
-                    events[eventName].Push(handler)
+                    events[eventName].Add(handler)
                 }
 
                 func TriggerEvent(eventName:string, data:any) -> void {
@@ -570,7 +576,7 @@ public class MixinTests
 
             player <- Player(1)
             player.AddEventListener(""moved"", (data) -> {
-                PrintLine(""Player moved from "" + data[""oldX""].ToStr() + "","" + data[""oldY""].ToStr() + "" to "" + data[""newX""].ToStr() + "","" + data[""newY""].ToStr())
+                PrintLine(""Player moved from "" + data[""oldX""].ToString() + "","" + data[""oldY""].ToString() + "" to "" + data[""newX""].ToString() + "","" + data[""newY""].ToString())
             })
 
             player.MoveWithEvent(10, 20)
@@ -630,7 +636,7 @@ public class MixinTests
 
                 func IncrementVersion() -> void {
                     version <- version + 1
-                    history.Add(""version "" + version.ToStr())
+                    history.Add(""version "" + version.ToString())
                 }
             }
 
@@ -650,7 +656,7 @@ public class MixinTests
                 }
 
                 func GetInfo() -> string {
-                    return ""Doc v"" + version.ToStr() + "" (age: "" + GetAge().ToStr() + "")""
+                    return ""Doc v"" + version.ToString() + "" (age: "" + GetAge().ToString() + "")""
                 }
             }
 

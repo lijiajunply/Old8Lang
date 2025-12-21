@@ -327,7 +327,9 @@ public class TypeTemplate(
             if (key.IdName == instance.Id.IdName && value is FuncLangValue func)
             {
                 // 创建一个临时的变量管理器来执行静态方法
-                var tempManager = manager.NewManger();
+                // 关键修复：使用全局 manager 而不是调用者的 manager，这样可以确保访问到全局注册的类型
+                // 并且能够正确处理静态变量的赋值操作
+                var tempManager = manager.Interpreter?.Manager?.NewManger() ?? manager.NewManger();
 
                 // 将所有静态变量的当前值添加到临时管理器中
                 foreach (var (staticKey, staticValue) in StaticVariates)
@@ -349,10 +351,17 @@ public class TypeTemplate(
                     if (staticValue is not FuncLangValue) // 只处理变量，不处理方法
                     {
                         var variableName = staticKey.IdName;
+                        // 尝试从所有作用域中获取最新值
                         var tempValue = tempManager.GetValue(new LangId(variableName));
                         if (tempValue != null)
                         {
+                            // 保存到 StaticVariableValues（TypeTemplate 的实例字段）
                             StaticVariableValues[variableName] = tempValue;
+                            // 同时保存到元数据缓存（如果存在）
+                            if (MetadataCache != null && MetadataCache.StaticMembers.ContainsKey(variableName))
+                            {
+                                MetadataCache.StaticMembers[variableName] = tempValue;
+                            }
                         }
                     }
                 }

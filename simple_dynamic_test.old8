@@ -1,2 +1,0 @@
-module_name <- "dynamic_validation_test_module"
-dynamic import module_name as dyn_mod
