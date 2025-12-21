@@ -132,16 +132,46 @@ public class ClassParser(
         {
             throw new InvalidOperationException("Expected interface keyword");
         }
-        
+
         var interfaceName = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
 
+        List<string> extendsNames = new List<string>();
+
+        // 处理 extends 子句：interface Name extends Interface1, Interface2 {
+        // 接口可以继承多个父接口
+        if (CurrentToken is { Type: LangTokenType.Extends })
+        {
+            // 跳过 extends 关键字
+            Expect(LangTokenType.Extends);
+
+            // 解析多个父接口，用逗号分隔
+            while (true)
+            {
+                if (CurrentToken.Type == LangTokenType.Identifier)
+                {
+                    extendsNames.Add(CurrentToken.Value);
+                    CurrentIndex++;
+                }
+
+                // 检查是否还有更多父接口
+                if (CurrentToken.Type == LangTokenType.Comma)
+                {
+                    CurrentIndex++;
+                    continue;
+                }
+
+                break;
+            }
+        }
+
         // 解析接口块
         var interfaceBlock = ParseClassBlock();
-        
+
         // 接口作为特殊的类处理，isInterface 标志为 true
+        // 接口的父接口通过 implementsNames 参数传递（复用implements机制）
         return new ClassInit(new TypeTemplate(interfaceName, interfaceBlock.ToAnyData(), interfaceBlock.ToStaticData(),
-            null, false, new List<string>(), new List<string>(), true));
+            null, false, new List<string>(), extendsNames, true));
     }
 
     /// <summary>

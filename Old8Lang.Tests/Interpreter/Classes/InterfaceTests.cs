@@ -1,4 +1,5 @@
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Value;
 using Xunit.Abstractions;
@@ -214,13 +215,21 @@ public class InterfaceTests
         ast.Run(interpreter.Manager);
 
         // Assert - The test mainly checks that the interface declarations compile and work
-        var userName = interpreter.Manager.GetValue(new LangId("user.name"));
-        var productId = interpreter.Manager.GetValue(new LangId("product.id"));
+        var user = interpreter.Manager.GetValue(new LangId("user"));
+        var product = interpreter.Manager.GetValue(new LangId("product"));
 
+        Assert.NotNull(user);
+        Assert.IsType<AnyLangValue>(user);
+        var userInstance = (AnyLangValue)user;
+        var userName = userInstance.InstanceData["name"];
         Assert.NotNull(userName);
         Assert.IsType<StringLangValue>(userName);
         Assert.Equal("Alice", ((StringLangValue)userName).Value);
 
+        Assert.NotNull(product);
+        Assert.IsType<AnyLangValue>(product);
+        var productInstance = (AnyLangValue)product;
+        var productId = productInstance.InstanceData["id"];
         Assert.NotNull(productId);
         Assert.IsType<IntLangValue>(productId);
         Assert.Equal(123, ((IntLangValue)productId).Value);
@@ -520,9 +529,11 @@ public class InterfaceTests
 
             class Machine implements Runnable {
                 public name <- """"
+                public value <- 0
 
                 func init(n:string) {
                     name <- n
+                    value <- 100
                 }
 
                 func Run() -> void {
