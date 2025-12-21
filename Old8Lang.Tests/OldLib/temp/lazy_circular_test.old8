@@ -1,5 +1,5 @@
 
-import "lazy_module_a" as a
-import "lazy_module_b" as b
+import "lazy_circular_a" as a
+import "lazy_circular_b" as b
 result1 <- a.standaloneA()
 result2 <- b.standaloneB()

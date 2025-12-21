@@ -334,7 +334,6 @@ public class Old8Exception : Exception
         // 彩色输出 - 使用ANSI颜色代码
         const string reset = "\u001b[0m";
         const string red = "\u001b[31m";
-        const string yellow = "\u001b[33m";
         const string blue = "\u001b[34m";
         const string green = "\u001b[32m";
         const string cyan = "\u001b[36m";

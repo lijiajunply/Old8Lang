@@ -9,12 +9,14 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 /// 统一模块对象 - 集成所有模块功能的单一实现
 /// 支持懒加载、即时加载、选择性导入等多种模式
 /// </summary>
+#pragma warning disable CS9113 // 参数未读
 public class UnifiedModule(
     string moduleName,
     VariateManager manager,
     ModuleLoadMode loadMode = ModuleLoadMode.Lazy,
     SourcePosition position = default
 ) : LangValueType(position), IModuleValueType
+#pragma warning restore CS9113
 {
     private readonly Dictionary<string, LangValueType> _symbols = new();
     private readonly object _loadLock = new();

@@ -370,23 +370,29 @@ public static class DictionaryValueFuncStatic
                             manager.IsFunc = true;
 
                             // 将参数添加到当前作用域
-                            if (action.Ids.Count >= 2)
+                            if (action.Ids?.Count >= 2)
                             {
                                 // 两个参数：键和值
                                 var keyId = action.Ids[0];
                                 var valueId = action.Ids[1];
-                                manager.Set(keyId, key);
-                                manager.Set(valueId, value);
+                                if (keyId != null && valueId != null)
+                                {
+                                    manager.Set(keyId, key);
+                                    manager.Set(valueId, value);
+                                }
                             }
-                            else if (action.Ids.Count == 1)
+                            else if (action.Ids?.Count == 1)
                             {
                                 // 一个参数：只传递值
                                 var valueId = action.Ids[0];
-                                manager.Set(valueId, value);
+                                if (valueId != null)
+                                {
+                                    manager.Set(valueId, value);
+                                }
                             }
 
                             // 执行 lambda 主体
-                            action.BlockStatement.Run(manager);
+                            action.BlockStatement?.Run(manager);
                         }
                         finally
                         {
@@ -395,7 +401,7 @@ public static class DictionaryValueFuncStatic
                             manager.Scopes.AddRange(savedScopes);
                             manager.IsFunc = false;
                             manager.IsReturn = false;
-                            manager.Result = null;
+                            manager.Result = new VoidLangValue();
                         }
                     }
                     catch

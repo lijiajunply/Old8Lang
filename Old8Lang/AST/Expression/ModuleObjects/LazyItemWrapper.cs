@@ -12,8 +12,10 @@ public class LazyItemWrapper(string moduleName, string itemName, VariateManager 
 {
     private bool Loaded;
     private LangValueType? LoadedItem;
+#pragma warning disable CS9124 // 参数被捕获到封闭类型的状态
     private readonly string _moduleName = moduleName;
     private readonly string _itemName = itemName;
+#pragma warning restore CS9124
 
     /// <summary>
     /// 模块名称

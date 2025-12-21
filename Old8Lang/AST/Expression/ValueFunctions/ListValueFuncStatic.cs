@@ -375,20 +375,26 @@ public static class ListValueFuncStatic
                         manager.IsFunc = true;
 
                         // 将参数添加到当前作用域
-                        if (action.Ids.Count == 1)
+                        if (action.Ids?.Count == 1)
                         {
                             var paramId = action.Ids[0];
-                            manager.Set(paramId, item);
+                            if (paramId != null)
+                            {
+                                manager.Set(paramId, item);
+                            }
                         }
-                        else if (action.Ids.Count > 0)
+                        else if (action.Ids?.Count > 0)
                         {
                             // 如果有多个参数，将 item 作为第一个参数
                             var firstParamId = action.Ids[0];
-                            manager.Set(firstParamId, item);
+                            if (firstParamId != null)
+                            {
+                                manager.Set(firstParamId, item);
+                            }
                         }
 
                         // 执行 lambda 主体
-                        action.BlockStatement.Run(manager);
+                        action.BlockStatement?.Run(manager);
                     }
                     finally
                     {
@@ -397,7 +403,7 @@ public static class ListValueFuncStatic
                         manager.Scopes.AddRange(savedScopes);
                         manager.IsFunc = false;
                         manager.IsReturn = false;
-                        manager.Result = null;
+                        manager.Result = new VoidLangValue();
                     }
                 }
             }

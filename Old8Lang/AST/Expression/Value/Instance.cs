@@ -302,7 +302,6 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
             // 查找最匹配的函数
             object? bestMatch = null;
-            bool foundExactMatch = false;
 
             foreach (var func in matchingFunctions)
             {
@@ -342,7 +341,6 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                         {
                             // 找到精确匹配，直接使用
                             bestMatch = funcValue;
-                            foundExactMatch = true;
                             break;
                         }
                         else if (bestMatch == null)
