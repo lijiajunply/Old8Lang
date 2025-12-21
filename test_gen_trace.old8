@@ -1,0 +1,21 @@
+func makeGen() {
+    PrintLine("Gen: start")
+    for i in [1~3] {
+        PrintLine("Gen: before yield " + i.ToStr())
+        yield i
+        PrintLine("Gen: after yield " + i.ToStr())
+    }
+    PrintLine("Gen: end")
+}
+
+PrintLine("=== Creating generator ===")
+gen <- makeGen()
+
+PrintLine("\n=== Iterating with for-in ===")
+count <- 0
+for item in gen {
+    count <- count + 1
+    PrintLine("Main: iteration " + count.ToStr() + ", got " + item.ToStr())
+}
+PrintLine("\n=== Done ===")
+PrintLine("Total iterations: " + count.ToStr())

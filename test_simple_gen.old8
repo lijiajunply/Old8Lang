@@ -1,0 +1,17 @@
+func makeGen() {
+    PrintLine("Gen: before loop")
+    for i in [1~3] {
+        PrintLine("Gen: i=" + i.ToStr() + ", about to yield")
+        yield i
+        PrintLine("Gen: after yield i=" + i.ToStr())
+    }
+    PrintLine("Gen: after loop")
+}
+
+PrintLine("Creating generator")
+gen <- makeGen()
+PrintLine("Iterating")
+for item in gen {
+    PrintLine("Main: got " + item.ToStr())
+}
+PrintLine("Done")

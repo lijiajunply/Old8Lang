@@ -1,0 +1,15 @@
+func makeGen() {
+    i <- 1
+    while i <= 3 {
+        PrintLine("Gen: i=" + i.ToStr() + ", about to yield")
+        yield i
+        PrintLine("Gen: after yield i=" + i.ToStr())
+        i <- i + 1
+    }
+}
+
+gen <- makeGen()
+for item in gen {
+    PrintLine("Main: got " + item.ToStr())
+}
+PrintLine("Done")

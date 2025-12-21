@@ -20,7 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AwaitTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AwaitTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/TaskAPITests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/TaskAPITests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskLangValue.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,6 +60,8 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/AwaitTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/TaskAPITests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/InterfaceTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/InterfaceTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/InterfaceTests.cs" root0="SKIP_HIGHLIGHTING" />
@@ -459,7 +462,7 @@
       <workItem from="1766146301314" duration="8804000" />
       <workItem from="1766156569385" duration="1528000" />
       <workItem from="1766238299964" duration="6160000" />
-      <workItem from="1766298953988" duration="4455000" />
+      <workItem from="1766298953988" duration="5700000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -804,7 +807,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="321" />
+    <option name="localTasksCounter" value="322" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -831,9 +834,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(config): 重构配置加载与验证逻辑&#10;&#10;- 新增 loadConfig 函数支持多环境配置加载&#10;- 实现 production 和 development 配置映射&#10;- 添加 validateConfig 函数校验必要字段&#10;- 移除旧的 getConfig 实现&#10;- 更新导入语句处理逻辑&#10;- 调整模块路径解析策略&#10;- 修改本地包管理器模块匹配方式&#10;- 移除自动安装依赖功能&#10;- 优化项目内模块解析流程" />
-    <MESSAGE value="refactor(net): 重命名 HttpClient 为 HttpWebClient&#10;&#10;- 将 Old8Lang.NetLib 中的 HttpClient 类重命名为 HttpWebClient&#10;- 更新所有引用 HttpClient 的代码，包括 WebApiClient 和相关测试&#10;- 修改 Net.old8 中的原生类型声明，将 HttpClient 替换为 HttpWebClient&#10;- 重命名 HttpClientTests 测试文件为 HttpWebClientTests&#10;- 更新 net_import_test.old8 中的导入语句语法&#10;- 优化 NativeAnyLangValue.cs 中构造函数判空逻辑" />
-    <MESSAGE value="refactor(type): 重构类型检查系统并优化函数参数处理&#10;&#10;- 提取类型检查逻辑到独立的 TypeChecker 类&#10;- 统一变量赋值、函数参数和返回值的类型验证&#10;- 优化 FuncLangValue 中的参数处理流程&#10;- 添加类型兼容性检查和错误报告机制&#10;- 修复测试用例中的类型注解和语法错误&#10;- 更新相关 AST 节点以使用新的类型检查接口&#10;- 移除重复的类型检查代码，提高代码复用性&#10;- 增强类型错误提示信息的准确性和可读性" />
     <MESSAGE value="feat(lang): 支持嵌套类的实例化和注册&#10;&#10;- 在AnyLangValue中添加嵌套类访问逻辑&#10;- 实现嵌套类的递归注册机制&#10;- 修改BlockStatement以支持嵌套类的ClassMemberId标识&#10;- 为ClassInit添加公共属性AnyLangValue以便访问类模板&#10;- 移除冗余的模块对象架构文件和并发原语测试文件" />
     <MESSAGE value="test(interpreter): 更新类继承和实例化测试用例&#10;&#10;- 修改测试代码中的字符串字面量语法为原始字符串&#10;- 更新类继承测试中的代码格式和字段访问方式&#10;- 修正实例化测试中的循环语法和方法调用&#10;- 调整类成员访问逻辑以适应新的嵌套类支持&#10;- 优化测试代码结构提高可读性和维护性" />
     <MESSAGE value="feat(lang): 实现super关键字支持&#10;&#10;- 在LangTokenType中添加Super枚举值&#10;- 新增SuperExpression类处理super表达式解析&#10;- 扩展AnyLangValue类，增加GetSuperInstance方法获取父类实例&#10;- 在VariateManager中添加GetCurrentInstance方法获取当前实例&#10;- 更新PrimaryParser以识别和解析super关键字&#10;- 添加SuperTests测试文件验证super关键字功能" />
@@ -856,7 +856,10 @@
     <MESSAGE value="feat(lang): 实现接口继承和extends关键字支持&#10;&#10;- 在ClassParser中添加对接口extends子句的解析逻辑&#10;- 支持接口继承多个父接口的语法解析&#10;- 更新接口声明的AST节点以存储继承关系&#10;- 复用implements机制处理接口继承&#10;- 添加相关测试用例验证接口继承功能&#10;- 更新数学库函数实现向量相关操作&#10;- 优化接口测试中的值获取和类型断言逻辑" />
     <MESSAGE value="feat(parser): 添加 'is' 类型检查操作符支持&#10;&#10;- 在 LangTokenType 枚举中添加 Is 类型标记&#10;- 更新 ExpressionParser 以识别和解析 is 操作符&#10;- 扩展 Operation 类以处理 is 类型检查逻辑&#10;- 实现 CheckIsInstance 方法用于运行时类型验证&#10;- 支持基本类型和自定义类/接口的类型检查&#10;- 添加对继承关系和接口实现的类型兼容性判断" />
     <MESSAGE value="feat(threading): 增强线程功能与安全性&#10;&#10;- 支持实例方法在线程中的正确调用&#10;- 改进线程结果处理逻辑，保留原始返回值类型&#10;- 线程Result属性支持自动等待完成&#10;- 添加Wait方法作为Join的别名&#10;- 增加Status和Id方法用于查询线程状态&#10;- 移除无效的线程安全和同步测试文件&#10;- 修复super表达式在无构造函数时的返回值问题&#10;- 更新spawn测试用例以反映新的行为变更" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(threading): 增强线程功能与安全性&#10;&#10;- 支持实例方法在线程中的正确调用&#10;- 改进线程结果处理逻辑，保留原始返回值类型&#10;- 线程Result属性支持自动等待完成&#10;- 添加Wait方法作为Join的别名&#10;- 增加Status和Id方法用于查询线程状态&#10;- 移除无效的线程安全和同步测试文件&#10;- 修复super表达式在无构造函数时的返回值问题&#10;- 更新spawn测试用例以反映新的行为变更" />
+    <MESSAGE value="扶的基本公共服务体系&#10;- 添加提高保障和改善民生水平加强和创新社会治理的系统工程&#10;- 支持坚决打赢脱贫攻坚战全面建成小康社会的历史伟业&#10;- 实现乡村振兴战略和农业农村现代化的美好前景&#10;- 添加区域协调发展战略和新型城镇化战略的重大决策&#10;- 支持创新驱动test(async发展战略和科教兴): 优化异步国战略的核心支撑&#10;- 实现军民融合发展战略和测试代码并修复可持续发展战略的统筹推进&#10;- 添加人才字符串处理逻辑&#10;&#10;-强国战略和健康 将空字符串字中国战略的关键环节&#10;- 支持文化面量初始化改为强国战略和体育显式调用强国战略的全面推进 dict() 函数&#10;- 实现制造&#10;- 使用多" />
+    <MESSAGE value="修复贴一下" />
+    <MESSAGE value="修复贴一下" />
+    <option name="LAST_COMMIT_MESSAGE" value="修复贴一下" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

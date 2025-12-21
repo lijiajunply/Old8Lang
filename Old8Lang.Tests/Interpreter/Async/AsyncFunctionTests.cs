@@ -238,14 +238,14 @@ public class AsyncFunctionTests
     public async Task AsyncFunction_WithException_ThrowsCorrectly()
     {
         // Arrange
-        var code = @"
-            async func failingFunction() -> int {
-                await Task.Delay(10)
-                throw ""Async error occurred""
-                return 42
-            }
-            task <- failingFunction()
-        ";
+        var code = """
+                               async func failingFunction() -> int {
+                                   await Task.Delay(10)
+                                   throw "Async error occurred"
+                                   return 42
+                               }
+                               task <- failingFunction()
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act & Assert

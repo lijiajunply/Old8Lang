@@ -40,7 +40,7 @@ public class AsyncStreamTests
         // Arrange
         var code = @"
             stream <- async {
-                for i in 1..5 {
+                for i in [1~5] {
                     yield i * 2
                 }
             }
@@ -100,7 +100,7 @@ public class AsyncStreamTests
         // Arrange
         var code = @"
             stream <- async {
-                for i in 1..10 {
+                for i in [1~10] {
                     if i % 2 = 0 {
                         yield i
                     }
@@ -198,7 +198,7 @@ public class AsyncStreamTests
         // Arrange
         var code = @"
             numberStream <- async {
-                for i in 1..5 {
+                for i in [1~5] {
                     yield i
                 }
             }
@@ -232,7 +232,7 @@ public class AsyncStreamTests
         // Arrange
         var code = @"
             allNumbers <- async {
-                for i in 1..20 {
+                for i in [1~20] {
                     yield i
                 }
             }
@@ -423,7 +423,7 @@ public class AsyncStreamTests
         var code = @"
             statefulStream <- async {
                 state <- 0
-                for i in 1..5 {
+                for i in [1~5] {
                     state <- state + i
                     yield state
                 }
@@ -457,7 +457,7 @@ public class AsyncStreamTests
                 b <- 1
                 yield a
                 yield b
-                for i in 3..10 {
+                for i in [3~10] {
                     c <- a + b
                     yield c
                     a <- b
@@ -491,7 +491,7 @@ public class AsyncStreamTests
         var code = @"
             bufferedStream <- async {
                 buffer <- {}
-                for i in 1..5 {
+                for i in [1~5] {
                     buffer.Add(i)
                     if buffer.Count = 3 {
                         for item in buffer {
@@ -530,7 +530,7 @@ public class AsyncStreamTests
         // Arrange
         var code = @"
             longStream <- async {
-                for i in 1..100 {
+                for i in [1~10]0 {
                     yield i
                     if i = 10 {
                         break
@@ -598,13 +598,13 @@ public class AsyncStreamTests
         // Arrange
         var code = @"
             parallelStream1 <- async {
-                for i in 1..3 {
+                for i in [1~3] {
                     await async.Sleep(10)
                     yield i * 2
                 }
             }
             parallelStream2 <- async {
-                for i in 1..3 {
+                for i in [1~3] {
                     await async.Sleep(10)
                     yield i * 3
                 }
@@ -639,7 +639,7 @@ public class AsyncStreamTests
         var code = @"
             timedStream <- async {
                 startTime <- async.Now()
-                for i in 1..3 {
+                for i in [1~3] {
                     await async.Sleep(50)
                     yield i
                 }
@@ -670,7 +670,7 @@ public class AsyncStreamTests
         var code = @"
             dependencyStream <- async {
                 baseValues <- async {
-                    for i in 1..3 {
+                    for i in [1~3] {
                         yield i * 10
                     }
                 }
@@ -710,7 +710,7 @@ public class AsyncStreamTests
         var code = @"
             cachedStream <- async {
                 cache <- {}
-                for i in 1..5 {
+                for i in [1~5] {
                     if not cache.ContainsKey(i) {
                         cache[i] <- i * i
                     }

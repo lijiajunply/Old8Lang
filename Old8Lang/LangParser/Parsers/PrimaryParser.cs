@@ -49,6 +49,20 @@ public class PrimaryParser(
             return new AwaitExpression(expr, position);
         }
 
+        // 处理异步流：async { block }
+        if (CurrentToken.Type == LangTokenType.Async && Peek().Type == LangTokenType.LeftBrace)
+        {
+            var asyncToken = CurrentToken;
+            var position = new SourcePosition(asyncToken.Line, asyncToken.Column, tokenValue: asyncToken.Value);
+            Expect(LangTokenType.Async);
+
+            // 解析块语句
+            var block = statementParserFactory().ParseBlock();
+
+            // 创建异步流表达式
+            return new AsyncStreamExpression(block, position);
+        }
+
         // 处理异步Lambda表达式 - 无参数情况
         if (CurrentToken.Type == LangTokenType.Async && Peek().Type == LangTokenType.LeftParen)
         {

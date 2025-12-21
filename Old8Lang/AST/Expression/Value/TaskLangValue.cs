@@ -362,6 +362,7 @@ public class TaskLangValue : LangValueType
             {
                 "IsCompleted" => new BoolLangValue(IsCompleted, Position),
                 "Status" => new StringLangValue(Status.ToString(), Position),
+                "Result" => Await(), // 访问 Result 属性时会阻塞等待任务完成
                 _ => throw new AttributeError(dotExpression.Position, propertyName, "Task")
             };
         }
@@ -458,7 +459,7 @@ public class TaskLangValue : LangValueType
     {
         // 创建一个新的变量管理器，用于函数执行
         var manager = new VariateManager();
-        
+
         // 在线程池上执行函数
         var runTask = System.Threading.Tasks.Task.Run(() => func.Run(manager), cancellationToken);
         return new TaskLangValue(runTask, cancellationToken, position);
