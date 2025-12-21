@@ -45,7 +45,7 @@ public class AsyncStreamTests
                 }
             }
             sum <- 0
-            for item in stream {
+            async for item in stream {
                 sum <- sum + item
             }
             result <- sum
@@ -76,7 +76,7 @@ public class AsyncStreamTests
                 yield ""end""
             }
             count <- 0
-            for item in stream {
+            async for item in stream {
                 count <- count + 1
             }
             result <- count
@@ -107,7 +107,7 @@ public class AsyncStreamTests
                 }
             }
             resultList <- {}
-            for item in stream {
+            async for item in stream {
                 resultList.Add(item)
             }
             result <- len(resultList)
@@ -139,7 +139,7 @@ public class AsyncStreamTests
             }
             stream <- generateNumbers(5, 8)
             sum <- 0
-            for item in stream {
+            async for item in stream {
                 sum <- sum + item
             }
             result <- sum
@@ -168,13 +168,13 @@ public class AsyncStreamTests
                     yield ""inner 1""
                     yield ""inner 2""
                 }
-                for item in innerStream {
+                async for item in innerStream {
                     yield item
                 }
                 yield ""outer end""
             }
             count <- 0
-            for item in outerStream {
+            async for item in outerStream {
                 count <- count + 1
             }
             result <- count
@@ -203,12 +203,12 @@ public class AsyncStreamTests
                 }
             }
             squaredStream <- async {
-                for num in numberStream {
+                async for num in numberStream {
                     yield num * num
                 }
             }
             sum <- 0
-            for squared in squaredStream {
+            async for squared in squaredStream {
                 sum <- sum + squared
             }
             result <- sum
@@ -237,7 +237,7 @@ public class AsyncStreamTests
                 }
             }
             primes <- async {
-                for num in allNumbers {
+                async for num in allNumbers {
                     if num > 1 and num <= 3 {
                         yield num
                     } else if num > 3 and (num % 2 != 0) and (num % 3 != 0) {
@@ -246,7 +246,7 @@ public class AsyncStreamTests
                 }
             }
             count <- 0
-            for prime in primes {
+            async for prime in primes {
                 count <- count + 1
             }
             result <- count
@@ -280,7 +280,7 @@ public class AsyncStreamTests
             count <- 0
             sum <- 0
             max <- 0
-            for value in dataStream {
+            async for value in dataStream {
                 count <- count + 1
                 sum <- sum + value
                 if value > max {
@@ -320,7 +320,7 @@ public class AsyncStreamTests
                 yield 3
             }
             results <- {}
-            for item in errorStream {
+            async for item in errorStream {
                 results.Add(item)
             }
             result <- len(results)
@@ -352,7 +352,7 @@ public class AsyncStreamTests
             }
             sum <- 0
             count <- 0
-            for num in counterStream {
+            async for num in counterStream {
                 sum <- sum + num
                 count <- count + 1
                 if count >= 5 {
@@ -390,15 +390,15 @@ public class AsyncStreamTests
                 yield 6
             }
             combinedStream <- async {
-                for item in stream1 {
+                async for item in stream1 {
                     yield item
                 }
-                for item in stream2 {
+                async for item in stream2 {
                     yield item
                 }
             }
             sum <- 0
-            for item in combinedStream {
+            async for item in combinedStream {
                 sum <- sum + item
             }
             result <- sum
@@ -429,7 +429,7 @@ public class AsyncStreamTests
                 }
             }
             results <- {}
-            for value in statefulStream {
+            async for value in statefulStream {
                 results.Add(value)
             }
             result <- results[-1]
@@ -465,7 +465,7 @@ public class AsyncStreamTests
                 }
             }
             numbers <- {}
-            for num in fibonacciStream {
+            async for num in fibonacciStream {
                 numbers.Add(num)
             }
             result <- numbers[-1]
@@ -506,7 +506,7 @@ public class AsyncStreamTests
                 }
             }
             sum <- 0
-            for item in bufferedStream {
+            async for item in bufferedStream {
                 sum <- sum + item
             }
             result <- sum
@@ -538,7 +538,7 @@ public class AsyncStreamTests
                 }
             }
             count <- 0
-            for item in longStream {
+            async for item in longStream {
                 count <- count + 1
             }
             result <- count
@@ -573,7 +573,7 @@ public class AsyncStreamTests
                 yield ""end""
             }
             results <- {}
-            for item in exceptionStream {
+            async for item in exceptionStream {
                 results.Add(item)
             }
             result <- len(results)
@@ -611,10 +611,10 @@ public class AsyncStreamTests
             }
             results <- {}
             // Process streams concurrently
-            for item1 in parallelStream1 {
+            async for item1 in parallelStream1 {
                 results.Add(item1)
             }
-            for item2 in parallelStream2 {
+            async for item2 in parallelStream2 {
                 results.Add(item2)
             }
             result <- len(results)
@@ -644,7 +644,7 @@ public class AsyncStreamTests
                 }
             }
             count <- 0
-            for item in timedStream {
+            async for item in timedStream {
                 count <- count + 1
             }
             result <- count
@@ -675,17 +675,17 @@ public class AsyncStreamTests
                 }
                 dependentValues <- async {
                     sum <- 0
-                    for base in baseValues {
+                    async for base in baseValues {
                         sum <- sum + base
                     }
                     yield sum
                 }
-                for value in dependentValues {
+                async for value in dependentValues {
                     yield value
                 }
             }
             result <- 0
-            for value in dependencyStream {
+            async for value in dependencyStream {
                 result <- value
             }
         ";
@@ -717,7 +717,7 @@ public class AsyncStreamTests
                 }
             }
             sum <- 0
-            for value in cachedStream {
+            async for value in cachedStream {
                 sum <- sum + value
             }
             result <- sum
@@ -760,7 +760,7 @@ public class AsyncStreamTests
                 }
             }
             result <- """"
-            for message in retryStream {
+            async for message in retryStream {
                 result <- message
             }
         ";

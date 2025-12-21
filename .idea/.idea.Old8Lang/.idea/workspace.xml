@@ -20,8 +20,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/CancellationTokenSourceLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/CancellationTokenSourceLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/TaskCompletionSourceLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskCompletionSourceLangValue.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_async_for_in.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_nested_async_stream.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_nested_detailed.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_simple_async_stream.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncStreamTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncStreamTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Generators/AsyncGeneratorLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Generators/AsyncGeneratorLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncForInStatement.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,25 +67,15 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/AsyncFunctionTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/AsyncGeneratorTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/AsyncStreamTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/TaskAPITests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/TaskAPITests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/AwaitExpression.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Generators/AsyncGeneratorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TaskLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Expression/Value/TaskLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/AST/Statement/AsyncFuncInit.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/AsyncForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Generators/GeneratorStateMachine.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Interpreter/LangInterpreter.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8Lang/Interpreter/VariateManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
@@ -455,7 +452,7 @@
       <workItem from="1766238299964" duration="6160000" />
       <workItem from="1766298953988" duration="5700000" />
       <workItem from="1766308100500" duration="10097000" />
-      <workItem from="1766330641326" duration="5284000" />
+      <workItem from="1766330641326" duration="6519000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -800,7 +797,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="333" />
+    <option name="localTasksCounter" value="334" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -827,7 +824,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(core): 移除 V1 兼容接口并优化类实例化逻辑&#10;&#10;- 删除 AnyLangValue 中所有 V1 兼容属性和方法&#10;- 更新引用 Id 的位置从 Id 改为 ClassId&#10;- 移除 Operation 和 ReturnStatement 中的 ExternalManager 设置逻辑&#10;- 简化 Instance 中的构造函数调用逻辑，避免重复执行&#10;- 修改 SuperExpression 以适配未来继承支持&#10;- 调整测试用例中的参数类型声明从 [int] 到 array" />
     <MESSAGE value="chore(project): 更新项目配置和测试文件&#10;&#10;- 移除了旧的向量计算函数（vec2、distance、normalize）&#10;- 添加了新的 getValue 函数返回整数 42&#10;- 在工作区中引入了包管理器相关项目&#10;- 清理了临时测试文件和冗余变更记录&#10;- 配置了 Old8Lang.PackageManager 和其测试项目的运行设置&#10;- 更新了 IDE 的文件高亮设置以跳过特定模拟路径" />
     <MESSAGE value="feat(lang): 优化方法重载解析逻辑&#10;&#10;- 改进方法重载选择策略，优先选择参数数量最接近的重载&#10;- 增强参数匹配检查，支持默认参数的缺失情况处理&#10;- 更新类型模板中的重载解析算法，确保更精确的方法匹配&#10;- 修复重载方法表构建逻辑，防止重复方法覆盖问题&#10;- 清理项目配置文件中的冗余测试会话记录&#10;- 移除IDE工作区中的无效文件高亮设置" />
     <MESSAGE value="fix(tests): 更新构造函数测试中的数值类型断言&#10;&#10;- 将 area1 的期望类型从 DoubleLangValue 改为 IntLangValue&#10;- 修改 area1 的期望值从 1.0 改为 1&#10;- 统一账户 overdraftLimit 初始化值为浮点数格式&#10;- 确保测试用例与实际代码中的数值类型一致" />
@@ -852,7 +848,8 @@
     <MESSAGE value="fix(AsyncStateMachineGenerator): 优化状态机生成器字段初始化与代码结构&#10;&#10;- 将 `LocalVariableFields` 和 `AwaitPositions` 初始化为 `new()` 并添加 `readonly` 修饰符&#10;- 移除不必要的空行和 null 检查，简化表达式遍历逻辑&#10;- 更新方法签名以提高可读性，并调整部分 IL 生成逻辑中的数组语法&#10;- 清理冗余的日志打印语句，保留核心功能实现&#10;&#10;fix(CapturedScope): 重命名哈希码字段并更新相关引用&#10;&#10;- 将 `_hashCode` 字段重命名为 `HashCode` 以符合命名规范&#10;- 更新构造函数、GetHashCode 及 Equals 方法中对该字段的使用&#10;- 调整 LINQ 表达式语法，确保类型转换明确清晰&#10;&#10;refactor(GeneratorAstScanner): 移除调试日志并精简扫描逻辑&#10;&#10;- 删除所有 `Console.WriteLine` 调试输出语句&#10;- 简化对子语句的递归调用逻辑，去除多余的 null 检查&#10;- 修复局部变量记录逻辑，增强空值处理能力&#10;- 优化反射获取 ForInStatement Body 的流程，减少无用判断&#10;&#10;refactor(GeneratorExecutionContext): 简化集合初始化语法&#10;&#10;- 替换 `new Stack&lt;&gt;()` 和 `new Dictionary&lt;,&gt;()` 为简洁形式&#10;- 移除布尔属性默认赋值，保持代码一致性&#10;&#10;refactor(GeneratorStateMachineBuilder): 静态化类并优化执行器结构&#10;&#10;- 将 `GeneratorStateMachineBuilder` 改为静态类&#10;- 使用主构造函数注入依赖项至 `FlatGeneratorExecutor`&#10;- 移除调试日志并清理字段访问方式，改用构造函数参数直接引用&#10;- 重构循环状态恢复逻辑，提高代码可读性和健壮性&#10;&#10;refactor(NewGeneratorStateMachine): 统一私有字段命名风格&#10;&#10;- 将所有下划线前缀私有字段改为 Pascal 命名法（如 `_locals` → `Locals`）&#10;- 更新构造函数及 Execute 方法内的字段引用，保持一致性和可维护性&#10;&#10;refactor(TypeAnnotationManager): 规范字段命名并优化类型兼容性检查&#10;&#10;- 所有私有字段统一使用 Pascal 命名法（如 `_typeFamily` → `TypeFamily`）&#10;- 更新类型解析和兼容性判断逻辑，移除冗余条件判断&#10;- 修正 XML 注释中的泛型符号显示问题&#10;&#10;refactor(TypeInfo): 优化成员缓存机制和类型族管理结构&#10;&#10;- 将 `_cachedMembers` 等字段更名为 `CachedMembers` 等标准名称&#10;- 更新类型族注册和继承关系管理逻辑，改进 lambda 表达式写法&#10;- 优化获取类型信息的方法，提升性能与稳定性" />
     <MESSAGE value="feat(Task): 支持 TaskScheduler 和 TaskFactory 全局对象&#10;&#10;新增 TaskScheduler 和 TaskFactory 类的全局对象注册，完善 Task API 的功能支持。  &#10;同时修复了 Task 类中部分成员访问逻辑，并改进异常处理机制，统一将标准异常包装为 Old8Exception。  &#10;此外，更新了相关单元测试代码以适配新的 API 调用方式并启用任务取消测试。" />
     <MESSAGE value="feat(AsyncLib): 优化资源包装类构造函数并移除冗余字段初始化&#10;&#10;将 `ResourceWrapper` 类改用主构造函数语法，并直接初始化 `Resource` 属性。  &#10;同时删除了 `_readWriteLockIdCounter`、`_countDownLatchIdCounter` 和  &#10;`_cyclicBarrierIdCounter` 的冗余赋值为 0 的字段初始化语句。&#10;&#10;refactor(AsyncLib): 统一使用属性命名风格并提升代码一致性&#10;&#10;将 `CountDownLatch` 和 `CyclicBarrier` 类中的私有字段名称从下划线前缀风格  &#10;改为 PascalCase 命名风格（如 `_count` 改为 `Count`），以提高整体代码可读性和一致性。  &#10;此外，更新相关访问逻辑以匹配新的属性命名。&#10;&#10;refactor(Csv): 简化 CSV 头部行添加方式&#10;&#10;合并声明与初始化操作，通过集合初始化器直接在创建 `csvLines` 列表时添加头部行，  &#10;使代码更简洁且易于理解。" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(AsyncLib): 优化资源包装类构造函数并移除冗余字段初始化&#10;&#10;将 `ResourceWrapper` 类改用主构造函数语法，并直接初始化 `Resource` 属性。  &#10;同时删除了 `_readWriteLockIdCounter`、`_countDownLatchIdCounter` 和  &#10;`_cyclicBarrierIdCounter` 的冗余赋值为 0 的字段初始化语句。&#10;&#10;refactor(AsyncLib): 统一使用属性命名风格并提升代码一致性&#10;&#10;将 `CountDownLatch` 和 `CyclicBarrier` 类中的私有字段名称从下划线前缀风格  &#10;改为 PascalCase 命名风格（如 `_count` 改为 `Count`），以提高整体代码可读性和一致性。  &#10;此外，更新相关访问逻辑以匹配新的属性命名。&#10;&#10;refactor(Csv): 简化 CSV 头部行添加方式&#10;&#10;合并声明与初始化操作，通过集合初始化器直接在创建 `csvLines` 列表时添加头部行，  &#10;使代码更简洁且易于理解。" />
+    <MESSAGE value="refactor(ast): 重构 CancellationTokenSource 和 TaskCompletionSource 类&#10;&#10;- 将 CancellationTokenSourceLangValue 和 TaskCompletionSourceLangValue 移至 StaticValues 命名空间&#10;- 重命名私有字段 _cts 和 _tcs 为 Cts 和 Tcs&#10;- 使用新的语法初始化只读属性&#10;- 简化 TaskWrapper 的惰性初始化逻辑&#10;- 更新所有引用以使用新命名的字段&#10;- 调整类成员顺序并优化命名空间导入顺序&#10;- 修复 OutputType 方法返回类型声明&#10;- 更新工作区 XML 配置文件中的变更记录和持续时间统计" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 重构 CancellationTokenSource 和 TaskCompletionSource 类&#10;&#10;- 将 CancellationTokenSourceLangValue 和 TaskCompletionSourceLangValue 移至 StaticValues 命名空间&#10;- 重命名私有字段 _cts 和 _tcs 为 Cts 和 Tcs&#10;- 使用新的语法初始化只读属性&#10;- 简化 TaskWrapper 的惰性初始化逻辑&#10;- 更新所有引用以使用新命名的字段&#10;- 调整类成员顺序并优化命名空间导入顺序&#10;- 修复 OutputType 方法返回类型声明&#10;- 更新工作区 XML 配置文件中的变更记录和持续时间统计" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

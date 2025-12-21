@@ -118,7 +118,6 @@ public class BlockStatement : OldStatement
         }
 
         // 从保存的位置开始执行
-        System.Console.WriteLine($"[DEBUG BLOCK] Starting execution from index {startIndex}, total statements: {OtherStatements.Count}");
         for (int i = startIndex; i < OtherStatements.Count; i++)
         {
             var statement = OtherStatements[i];
@@ -133,7 +132,7 @@ public class BlockStatement : OldStatement
                     // 对于直接yield语句，保存下一个语句的位置
                     context.CurrentStatementIndex = i + 1;
                 }
-                else if (statement is WhileStatement || statement is ForStatement || statement is ForInStatement)
+                else if (statement is WhileStatement || statement is ForStatement || statement is ForInStatement || statement is AsyncForInStatement)
                 {
                     // 对于循环语句中的yield，将循环位置压栈
                     context.ExecutionStack.Push(new GeneratorExecutionContext.BlockExecutionFrame

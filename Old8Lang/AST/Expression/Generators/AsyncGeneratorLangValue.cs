@@ -83,8 +83,11 @@ public class AsyncGeneratorLangValue : LangValueType, ILangList
         // 如果状态机还未初始化，则创建它
         if (StateMachine == null)
         {
+            // 优先使用AsyncFunc捕获的闭包，如果没有则使用传入的manager
+            var baseManager = AsyncFunc.CapturedScope ?? manager;
+
             // 为生成器创建独立的变量环境
-            var generatorManager = manager.CloneForGenerator();
+            var generatorManager = baseManager.CloneForGenerator();
 
             // 设置参数值到生成器环境中
             foreach (var (paramName, paramValue) in ParameterValues)
