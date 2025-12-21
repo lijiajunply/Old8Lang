@@ -16,16 +16,12 @@ public static class AsyncLib
     private const int MaxIdleTimeMinutes = 30;
     
     // 资源包装类，用于跟踪资源的最后访问时间
-    private class ResourceWrapper<T> where T : class
+    private class ResourceWrapper<T>(T resource)
+        where T : class
     {
-        public T Resource { get; }
+        public T Resource { get; } = resource;
         public long LastAccessTimeTicks { get; private set; } = DateTime.Now.Ticks;
-        
-        public ResourceWrapper(T resource)
-        {
-            Resource = resource;
-        }
-        
+
         public void UpdateLastAccessTime()
         {
             LastAccessTimeTicks = DateTime.Now.Ticks;
@@ -700,7 +696,7 @@ public static class AsyncLib
 
     // 读写锁存储 - 允许多个读者或单个写者访问资源
     private static readonly ConcurrentDictionary<int, ResourceWrapper<ReaderWriterLockSlim>> ReadWriteLocks = new();
-    private static int _readWriteLockIdCounter = 0;
+    private static int _readWriteLockIdCounter;
 
     /// <summary>
     /// 创建读写锁
@@ -838,61 +834,61 @@ public static class AsyncLib
     /// </summary>
     private class CountDownLatch : IDisposable
     {
-        private int _count;
-        private readonly ManualResetEventSlim _event = new(false);
+        private int Count;
+        private readonly ManualResetEventSlim Event = new(false);
 
         public CountDownLatch(int initialCount)
         {
             if (initialCount < 0)
                 throw new ArgumentOutOfRangeException(nameof(initialCount), "计数不能为负数");
 
-            _count = initialCount;
+            Count = initialCount;
 
             // 如果初始计数为0，立即设置信号
-            if (_count == 0)
+            if (Count == 0)
             {
-                _event.Set();
+                Event.Set();
             }
         }
 
         public void CountDown()
         {
             // 使用 Interlocked 确保线程安全的递减
-            int newCount = Interlocked.Decrement(ref _count);
+            int newCount = Interlocked.Decrement(ref Count);
 
             // 如果计数达到0，设置信号
             if (newCount == 0)
             {
-                _event.Set();
+                Event.Set();
             }
         }
 
         public void Wait()
         {
-            _event.Wait();
+            Event.Wait();
         }
 
         public bool Wait(int timeoutMs)
         {
-            return _event.Wait(timeoutMs);
+            return Event.Wait(timeoutMs);
         }
 
         public int GetCount()
         {
             // 返回当前计数，但不允许小于0
-            int currentCount = Volatile.Read(ref _count);
+            int currentCount = Volatile.Read(ref Count);
             return Math.Max(0, currentCount);
         }
 
         public void Dispose()
         {
-            _event.Dispose();
+            Event.Dispose();
         }
     }
 
     // 倒计时锁存储
     private static readonly ConcurrentDictionary<int, ResourceWrapper<CountDownLatch>> CountDownLatches = new();
-    private static int _countDownLatchIdCounter = 0;
+    private static int _countDownLatchIdCounter;
 
     /// <summary>
     /// 创建倒计时锁
@@ -995,66 +991,66 @@ public static class AsyncLib
     /// </summary>
     private class CyclicBarrier : IDisposable
     {
-        private readonly int _participantCount;
-        private int _waitingCount = 0;
-        private readonly ManualResetEventSlim _event = new(false);
-        private readonly object _lock = new();
+        private readonly int ParticipantCount;
+        private int WaitingCount;
+        private readonly ManualResetEventSlim Event = new(false);
+        private readonly Lock Lock = new();
 
         public CyclicBarrier(int participantCount)
         {
             if (participantCount <= 0)
                 throw new ArgumentOutOfRangeException(nameof(participantCount), "参与者数量必须大于0");
 
-            _participantCount = participantCount;
+            ParticipantCount = participantCount;
         }
 
         public void Await()
         {
-            lock (_lock)
+            lock (Lock)
             {
-                _waitingCount++;
+                WaitingCount++;
 
                 // 如果所有参与者都到达了
-                if (_waitingCount >= _participantCount)
+                if (WaitingCount >= ParticipantCount)
                 {
                     // 重置计数器并发出信号
-                    _waitingCount = 0;
-                    _event.Set();
-                    _event.Reset();
+                    WaitingCount = 0;
+                    Event.Set();
+                    Event.Reset();
                     return;
                 }
             }
 
             // 等待其他参与者
-            _event.Wait();
+            Event.Wait();
         }
 
         public bool Await(int timeoutMs)
         {
-            lock (_lock)
+            lock (Lock)
             {
-                _waitingCount++;
+                WaitingCount++;
 
                 // 如果所有参与者都到达了
-                if (_waitingCount >= _participantCount)
+                if (WaitingCount >= ParticipantCount)
                 {
                     // 重置计数器并发出信号
-                    _waitingCount = 0;
-                    _event.Set();
-                    _event.Reset();
+                    WaitingCount = 0;
+                    Event.Set();
+                    Event.Reset();
                     return true;
                 }
             }
 
             // 等待其他参与者（带超时）
-            bool success = _event.Wait(timeoutMs);
+            bool success = Event.Wait(timeoutMs);
 
             // 如果超时，需要减少等待计数
             if (!success)
             {
-                lock (_lock)
+                lock (Lock)
                 {
-                    _waitingCount--;
+                    WaitingCount--;
                 }
             }
 
@@ -1063,26 +1059,26 @@ public static class AsyncLib
 
         public int GetParticipantCount()
         {
-            return _participantCount;
+            return ParticipantCount;
         }
 
         public int GetWaitingCount()
         {
-            lock (_lock)
+            lock (Lock)
             {
-                return _waitingCount;
+                return WaitingCount;
             }
         }
 
         public void Dispose()
         {
-            _event.Dispose();
+            Event.Dispose();
         }
     }
 
     // 循环栅栏存储
     private static readonly ConcurrentDictionary<int, ResourceWrapper<CyclicBarrier>> CyclicBarriers = new();
-    private static int _cyclicBarrierIdCounter = 0;
+    private static int _cyclicBarrierIdCounter;
 
     /// <summary>
     /// 创建循环栅栏

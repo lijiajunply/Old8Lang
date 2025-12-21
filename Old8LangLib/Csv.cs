@@ -430,8 +430,7 @@ public static class Csv
             }
 
             var headerArray = headers.ToArray();
-            var csvLines = new List<string>();
-            csvLines.Add(FormatCsvLine(headerArray, delimiter, quoteChar));
+            var csvLines = new List<string> { FormatCsvLine(headerArray, delimiter, quoteChar) };
 
             // 生成数据行
             foreach (var row in rows)
