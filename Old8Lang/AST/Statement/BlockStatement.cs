@@ -94,7 +94,7 @@ public class BlockStatement : OldStatement
     }
 
     /// <summary>
-    /// 使用新的生成器上下文运行（新架构）
+    /// 使用新架构运行（基于路径的状态恢复）
     /// </summary>
     /// <param name="manager">变量管理器</param>
     private void RunWithGeneratorContext(VariateManager manager)
@@ -104,106 +104,83 @@ public class BlockStatement : OldStatement
         // 先执行导入语句
         ImportRun(manager);
 
-        // 检查执行栈，如果栈不为空，说明需要跳转到栈顶指定的语句
-        int startIndex = context.CurrentStatementIndex;
-        if (context.ExecutionStack.Count > 0)
-        {
-            var frame = context.ExecutionStack.Peek();  // 查看栈顶，不弹出
-            // 如果 StatementIndex 不是 -1，说明是真正的位置，需要跳转
-            // 如果是 -1，说明是标志（如循环体标志），使用 CurrentStatementIndex
-            if (frame.StatementIndex >= 0)
-            {
-                startIndex = frame.StatementIndex;
-            }
-        }
+        // 检查是否需要恢复执行
+        bool isResuming = !string.IsNullOrEmpty(context.ExecutionPath);
 
-        // 从保存的位置开始执行
-        for (int i = startIndex; i < OtherStatements.Count; i++)
+        // 从头开始执行，使用路径匹配决定是否跳过语句
+        for (int i = 0; i < OtherStatements.Count; i++)
         {
             var statement = OtherStatements[i];
-            statement.Run(manager);
 
-            // 检查是否遇到yield（通过生成器上下文而非全局标志）
-            if (context.HasYielded)
+            // 构建当前语句的路径
+            var statementPath = $"/block[{i}]";
+            context.PathStack.Push(statementPath);
+
+            try
             {
-                // 检查栈中是否有循环标记（说明是嵌套的循环 yield）
-                bool hasLoopMarker = false;
-                if (context.ExecutionStack.Count > 0)
+                var currentPath = context.GetCurrentPath();
+
+                // 如果正在恢复执行，检查是否应该跳过当前语句
+                if (isResuming)
                 {
-                    // 遍历栈，查找是否有循环标记
-                    foreach (var frame in context.ExecutionStack)
+                    // 如果执行路径等于当前路径+"/yield"，说明这是上次yield的位置
+                    // 应该跳过这个语句，从下一个语句开始执行
+                    if (context.ExecutionPath == currentPath + "/yield")
                     {
-                        if (frame.BlockId == "loop" || frame.BlockId == "for_in_loop_position" || frame.BlockId == "async_for_in_stream_position" || frame.BlockId == "async_for_in_generator_position")
-                        {
-                            hasLoopMarker = true;
-                            break;
-                        }
+                        // 清除恢复标志，从下一个语句开始正常执行
+                        isResuming = false;
+                        continue;
+                    }
+
+                    // 如果执行路径不以当前路径开头，说明这个语句在恢复点之前，跳过
+                    if (!context.ExecutionPath!.StartsWith(currentPath))
+                    {
+                        continue;
                     }
                 }
 
-                // 保存当前位置，以便下次恢复
-                if (statement is YieldStatement)
+                // 执行语句
+                statement.Run(manager);
+
+                // 检查是否遇到yield
+                if (context.HasYielded)
                 {
-                    // 对于直接yield语句，保存下一个语句的位置
-                    context.CurrentStatementIndex = i + 1;
+                    return;
                 }
-                else if (statement is WhileStatement || statement is ForStatement || statement is ForInStatement || statement is AsyncForInStatement)
+
+                // 执行完语句后，如果 ExecutionPath 被清除，说明该语句已完成（比如循环结束）
+                // 此时应该取消恢复模式，继续正常执行后续语句
+                if (isResuming && string.IsNullOrEmpty(context.ExecutionPath))
                 {
-                    // 对于循环语句中的yield，将循环位置压栈
-                    context.ExecutionStack.Push(new GeneratorExecutionContext.BlockExecutionFrame
-                    {
-                        StatementIndex = i,  // 保存循环语句的索引
-                        BlockId = "loop"
-                    });
+                    isResuming = false;
                 }
-                else
+
+                // 检查是否遇到return或其他控制流
+                if (manager.IsReturn || context.IsCompleted)
                 {
-                    // 对于其他语句中的yield
-                    if (hasLoopMarker)
-                    {
-                        // 如果栈中有循环标记，说明是嵌套结构中的循环 yield
-                        // 不更新 CurrentStatementIndex，让循环自己处理
-                    }
-                    else
-                    {
-                        // 否则，保存下一个语句的位置
-                        context.CurrentStatementIndex = i + 1;
-                    }
+                    context.IsCompleted = true;
+                    return;
                 }
-                return;
+
+                // 检查 break 和 continue 语句
+                if (manager.ControlFlowManager.BreakFlag || manager.ControlFlowManager.ContinueFlag)
+                {
+                    return;
+                }
             }
-
-            // 检查是否遇到return或其他控制流
-            if (manager.IsReturn || context.IsCompleted)
+            finally
             {
-                // 标记生成器完成
-                context.IsCompleted = true;
-                context.CurrentStatementIndex = 0;
-                return;
-            }
-
-            // 检查 break 和 continue 语句
-            // 如果在块内遇到 break 或 continue，应该立即停止执行后续语句
-            if (manager.ControlFlowManager.BreakFlag || manager.ControlFlowManager.ContinueFlag)
-            {
-                return;
+                // 弹出当前路径
+                context.PathStack.Pop();
             }
         }
 
-        // 执行完毕
-        // 只有顶层的 BlockStatement 才标记为完成
-        // 嵌套的 BlockStatement（如循环体）执行完毕不应该设置 IsCompleted
-        if (context.ExecutionStack.Count == 0)
+        // 执行完毕，只有主函数体的 BlockStatement 才设置 IsCompleted
+        // 循环体等嵌套的 BlockStatement 不应该设置 IsCompleted
+        // 通过检查路径栈来判断：如果栈为空，说明是主函数体
+        if (context.PathStack.Count == 0)
         {
-            // 顶层 BlockStatement 执行完毕，标记为完成
             context.IsCompleted = true;
-            context.CurrentStatementIndex = 0;
-        }
-        else
-        {
-            // 嵌套 BlockStatement 执行完毕，不设置 IsCompleted
-            // 只重置 CurrentStatementIndex，准备下一次迭代
-            context.CurrentStatementIndex = 0;
         }
     }
 

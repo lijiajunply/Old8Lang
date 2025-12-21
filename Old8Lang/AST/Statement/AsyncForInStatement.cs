@@ -360,108 +360,35 @@ public class AsyncForInStatement(
 
     /// <summary>
     /// 在生成器上下文中迭代异步流
-    /// 注意：不创建子作用域，循环变量在当前作用域中设置
+    /// 异步流自己管理状态，简化处理
     /// </summary>
     private void RunGeneratorContextAsyncStream(VariateManager manager, AsyncStreamLangValue asyncStream, Old8Lang.Generators.GeneratorExecutionContext context)
     {
-        // 使用计数器跟踪迭代位置
-        int iterationIndex = 0;
-        bool wasResumingFromYield = false;
-
-        // 检查是否从 yield 恢复（需要先处理可能的 "loop" 标记）
-        if (context.ExecutionStack.Count > 0)
-        {
-            var topFrame = context.ExecutionStack.Peek();
-            if (topFrame.BlockId == "loop")
-            {
-                context.ExecutionStack.Pop();
-            }
-        }
-
-        if (context.ExecutionStack.Count > 0)
-        {
-            var frame = context.ExecutionStack.Peek();
-            if (frame.BlockId == "async_for_in_stream_position" && frame.LoopIteration.HasValue)
-            {
-                context.ExecutionStack.Pop();
-                iterationIndex = frame.LoopIteration.Value;
-                wasResumingFromYield = true;
-            }
-        }
-
-        // 关键：暂时清除 GeneratorContext，让内层异步流在非生成器模式下运行
+        // 临时清除 GeneratorContext，让异步流在非生成器模式下运行
         var outerContext = manager.GeneratorContext;
+        manager.GeneratorContext = null;
+
         try
         {
-            manager.GeneratorContext = null;
-
-            // 如果从 yield 恢复，先执行循环体的剩余部分，然后再获取下一个值
-            if (wasResumingFromYield)
-            {
-                // 恢复 GeneratorContext 以执行循环体
-                manager.GeneratorContext = outerContext;
-
-                // 执行循环体的剩余部分
-                body.Run(manager);
-
-                // 检查是否再次 yield
-                if (context.HasYielded)
-                {
-                    context.ExecutionStack.Push(new Old8Lang.Generators.GeneratorExecutionContext.BlockExecutionFrame
-                    {
-                        StatementIndex = -1,
-                        BlockId = "async_for_in_stream_position",
-                        LoopIteration = iterationIndex
-                    });
-                    return;
-                }
-
-                // 重置状态
-                context.CurrentStatementIndex = 0;
-                context.IsCompleted = false;
-
-                // 处理 break
-                if (manager.ControlFlowManager.BreakFlag)
-                {
-                    manager.ControlFlowManager.BreakFlag = false;
-                    return;
-                }
-
-                // 处理 continue
-                if (manager.ControlFlowManager.ContinueFlag)
-                {
-                    manager.ControlFlowManager.ContinueFlag = false;
-                }
-
-                // 循环体执行完毕，继续下一次迭代
-                iterationIndex++;
-                wasResumingFromYield = false;
-
-                // 清除 GeneratorContext 以继续迭代
-                manager.GeneratorContext = null;
-            }
-
+            // 标准异步流迭代
             while (true)
             {
                 manager.ControlFlowManager.ResetCurrentState();
 
-                // 运行异步流，获取下一个值
                 var nextValue = asyncStream.Run(manager);
 
-                // 检查异步流是否已完成
                 if (asyncStream.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
                 {
                     break;
                 }
 
-                // 检查异步流是否处于Suspended状态
                 if (asyncStream.State == AsyncGeneratorLangValue.AsyncGeneratorState.Suspended)
                 {
                     var currentValue = asyncStream.NextValue;
 
                     if (currentValue != null && !(currentValue is VoidLangValue))
                     {
-                        // 恢复外层GeneratorContext，准备执行循环体
+                        // 恢复 GeneratorContext 以执行循环体
                         manager.GeneratorContext = outerContext;
 
                         try
@@ -473,12 +400,10 @@ public class AsyncForInStatement(
                             }
                             else
                             {
-                                // 多个标识符的情况，处理键值对
                                 if (currentValue is TupleLangValue tupleValue)
                                 {
                                     tupleValue.Run(manager);
                                     var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
-
                                     for (int i = 0; i < AllIds.Count && i < values.Count; i++)
                                     {
                                         manager.Set(AllIds[i], values[i]);
@@ -490,54 +415,27 @@ public class AsyncForInStatement(
                                 }
                             }
 
-                            // 弹出可能存在的 "loop" 标记
-                            if (context.ExecutionStack.Count > 0 && context.ExecutionStack.Peek().BlockId == "loop")
-                            {
-                                context.ExecutionStack.Pop();
-                            }
-
-                            // 重置 CurrentStatementIndex，开始执行循环体
-                            context.CurrentStatementIndex = 0;
-
-                            // 执行循环体
                             body.Run(manager);
 
-                            // 检查是否遇到 yield
                             if (context.HasYielded)
                             {
-                                // 保存当前迭代索引
-                                context.ExecutionStack.Push(new Old8Lang.Generators.GeneratorExecutionContext.BlockExecutionFrame
-                                {
-                                    StatementIndex = -1,
-                                    BlockId = "async_for_in_stream_position",
-                                    LoopIteration = iterationIndex
-                                });
                                 return;
                             }
 
-                            // 重置状态，准备下一次迭代
-                            context.CurrentStatementIndex = 0;
-                            context.IsCompleted = false;
-
-                            // 处理 break
                             if (manager.ControlFlowManager.BreakFlag)
                             {
                                 manager.ControlFlowManager.BreakFlag = false;
                                 break;
                             }
 
-                            // 处理 continue
                             if (manager.ControlFlowManager.ContinueFlag)
                             {
                                 manager.ControlFlowManager.ContinueFlag = false;
                                 continue;
                             }
-
-                            iterationIndex++;
                         }
                         finally
                         {
-                            // 清除GeneratorContext，继续迭代内层流
                             manager.GeneratorContext = null;
                         }
                     }
@@ -546,7 +444,6 @@ public class AsyncForInStatement(
         }
         finally
         {
-            // 恢复外层的 GeneratorContext
             manager.GeneratorContext = outerContext;
         }
     }
@@ -556,21 +453,6 @@ public class AsyncForInStatement(
     /// </summary>
     private void RunGeneratorContextAsyncGenerator(VariateManager manager, AsyncGeneratorLangValue asyncGenerator, Old8Lang.Generators.GeneratorExecutionContext context)
     {
-        // 类似 AsyncStream 的逻辑
-        int iterationIndex = 0;
-        bool wasResumingFromYield = false;
-
-        if (context.ExecutionStack.Count > 0)
-        {
-            var topFrame = context.ExecutionStack.Peek();
-            if (topFrame.BlockId == "async_for_in_generator_position" && topFrame.LoopIteration.HasValue)
-            {
-                context.ExecutionStack.Pop();
-                iterationIndex = topFrame.LoopIteration.Value;
-                wasResumingFromYield = true;
-            }
-        }
-
         // 保存外层的 GeneratorContext，暂时清除以避免嵌套冲突
         var outerContext = manager.GeneratorContext;
         try
@@ -601,35 +483,34 @@ public class AsyncForInStatement(
 
                         try
                         {
-                            bool resumingFromYield = wasResumingFromYield && (iterationIndex == 0);
-                            bool shouldSetVariable = (context.CurrentStatementIndex == 0);
-
-                            if (shouldSetVariable)
+                            // 设置循环变量
+                            if (AllIds.Count == 1)
                             {
                                 manager.Set(id, currentValue);
                             }
-
-                            if (!resumingFromYield)
+                            else
                             {
-                                context.CurrentStatementIndex = 0;
+                                if (currentValue is TupleLangValue tupleValue)
+                                {
+                                    tupleValue.Run(manager);
+                                    var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+                                    for (int i = 0; i < AllIds.Count && i < values.Count; i++)
+                                    {
+                                        manager.Set(AllIds[i], values[i]);
+                                    }
+                                }
+                                else
+                                {
+                                    manager.Set(id, currentValue);
+                                }
                             }
 
                             body.Run(manager);
 
                             if (context.HasYielded)
                             {
-                                context.ExecutionStack.Push(new Old8Lang.Generators.GeneratorExecutionContext.BlockExecutionFrame
-                                {
-                                    StatementIndex = -1,
-                                    BlockId = "async_for_in_generator_position",
-                                    LoopIteration = iterationIndex
-                                });
                                 return;
                             }
-
-                            context.CurrentStatementIndex = 0;
-                            context.IsCompleted = false;
-                            wasResumingFromYield = false;
 
                             if (manager.ControlFlowManager.BreakFlag)
                             {
@@ -642,8 +523,6 @@ public class AsyncForInStatement(
                                 manager.ControlFlowManager.ContinueFlag = false;
                                 continue;
                             }
-
-                            iterationIndex++;
                         }
                         finally
                         {
@@ -662,45 +541,34 @@ public class AsyncForInStatement(
     }
 
     /// <summary>
-    /// 在生成器上下文中迭代普通列表
+    /// 在生成器上下文中迭代普通列表（新架构）
     /// </summary>
     private void RunGeneratorContextList(VariateManager manager, ILangList oldList, Old8Lang.Generators.GeneratorExecutionContext context)
     {
         var items = oldList.GetItems().ToList();
+
+        // 获取当前循环路径
+        var loopPath = context.GetCurrentPath() + "/async-for-in";
+
+        // 从循环状态中恢复起始索引
         int startIndex = 0;
-        bool wasResumingFromYield = false;
-
-        // 检查是否从 yield 恢复
-        if (context.ExecutionStack.Count > 0)
+        if (context.LoopStates.TryGetValue(loopPath, out var savedIndex))
         {
-            var topFrame = context.ExecutionStack.Peek();
-            if (topFrame.BlockId == "loop")
-            {
-                context.ExecutionStack.Pop();
-            }
+            startIndex = savedIndex;
         }
 
-        if (context.ExecutionStack.Count > 0)
+        // 将循环路径压栈
+        context.PathStack.Push("/async-for-in");
+
+        try
         {
-            var frame = context.ExecutionStack.Peek();
-            if (frame.BlockId == "async_for_in_loop_position" && frame.LoopIteration.HasValue)
+            for (int i = startIndex; i < items.Count; i++)
             {
-                context.ExecutionStack.Pop();
-                startIndex = frame.LoopIteration.Value;
-                wasResumingFromYield = true;
-            }
-        }
+                manager.ControlFlowManager.ResetCurrentState();
 
-        for (int i = startIndex; i < items.Count; i++)
-        {
-            bool resumingFromYield = wasResumingFromYield && (i == startIndex);
-            manager.ControlFlowManager.ResetCurrentState();
+                var idValue = items[i];
 
-            var idValue = items[i];
-            bool shouldSetVariable = (context.CurrentStatementIndex == 0);
-
-            if (shouldSetVariable)
-            {
+                // 设置循环变量
                 if (AllIds.Count == 1)
                 {
                     manager.Set(id, idValue);
@@ -721,46 +589,40 @@ public class AsyncForInStatement(
                         manager.Set(id, idValue);
                     }
                 }
-            }
 
-            // 弹出可能存在的 "loop" 标记
-            if (context.ExecutionStack.Count > 0 && context.ExecutionStack.Peek().BlockId == "loop")
-            {
-                context.ExecutionStack.Pop();
-            }
+                // 执行循环体
+                body.Run(manager);
 
-            if (!resumingFromYield)
-            {
-                context.CurrentStatementIndex = 0;
-            }
-
-            body.Run(manager);
-
-            if (context.HasYielded)
-            {
-                context.ExecutionStack.Push(new Old8Lang.Generators.GeneratorExecutionContext.BlockExecutionFrame
+                // 检查是否遇到 yield
+                if (context.HasYielded)
                 {
-                    StatementIndex = -1,
-                    BlockId = "async_for_in_loop_position",
-                    LoopIteration = i
-                });
-                return;
+                    // 保存当前循环位置（下次从下一个元素开始）
+                    context.LoopStates[loopPath] = i + 1;
+                    return;
+                }
+
+                // 处理 break
+                if (manager.ControlFlowManager.BreakFlag)
+                {
+                    manager.ControlFlowManager.BreakFlag = false;
+                    break;
+                }
+
+                // 处理 continue
+                if (manager.ControlFlowManager.ContinueFlag)
+                {
+                    manager.ControlFlowManager.ContinueFlag = false;
+                    continue;
+                }
             }
 
-            context.CurrentStatementIndex = 0;
-            context.IsCompleted = false;
-
-            if (manager.ControlFlowManager.BreakFlag)
-            {
-                manager.ControlFlowManager.BreakFlag = false;
-                break;
-            }
-
-            if (manager.ControlFlowManager.ContinueFlag)
-            {
-                manager.ControlFlowManager.ContinueFlag = false;
-                continue;
-            }
+            // 循环完成，清除循环状态
+            context.LoopStates.Remove(loopPath);
+        }
+        finally
+        {
+            // 弹出循环路径
+            context.PathStack.Pop();
         }
     }
 

@@ -195,6 +195,16 @@ public class ForInStatement(
                                 continue;
                             }
                         }
+                        else
+                        {
+                            // 如果返回 VoidLangValue，生成器已完成
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        // 如果既不是Completed也不是Suspended，则退出循环
+                        break;
                     }
                 }
             }
@@ -263,12 +273,11 @@ public class ForInStatement(
     }
 
     /// <summary>
-    /// 生成器上下文中的 for-in 循环
+    /// 生成器上下文中的 for-in 循环（新架构）
     /// </summary>
     private void RunWithGeneratorContext(VariateManager manager)
     {
-        // 注意：在生成器上下文中不调用 AddChildren()！
-        // 生成器需要跨 yield 保持所有变量状态，子作用域机制不适用
+        // 不要在这里调用 AddChildren()，生成器需要跨yield保持所有变量状态
         manager.ControlFlowManager.PushState();
 
         var context = manager.GeneratorContext!;
@@ -277,7 +286,7 @@ public class ForInStatement(
         {
             var value = expression.Run(manager);
 
-            // 对于生成器和异步生成器，保持原有逻辑（因为它们自己管理状态）
+            // 对于生成器和异步生成器，保持原有逻辑（它们自己管理状态）
             if (value is AsyncGeneratorLangValue asyncGenerator)
             {
                 RunStandardAsyncGenerator(manager, asyncGenerator);
@@ -300,131 +309,128 @@ public class ForInStatement(
             if (value is ILangList oldList)
             {
                 var items = oldList.GetItems().ToList();
+
+                // 获取当前循环路径
+                var loopPath = context.GetCurrentPath() + "/for-in";
+
+                // 从循环状态中恢复起始索引
                 int startIndex = 0;
-                int? savedStatementIndex = null;  // 保存循环语句在父 BlockStatement 中的索引
-                bool wasResumingFromYield = false;
-
-                // 检查是否从 yield 恢复
-                // BlockStatement 可能会压入一个 "loop" 标志，需要先弹出并保存其 StatementIndex
-                if (context.ExecutionStack.Count > 0)
+                if (context.LoopStates.TryGetValue(loopPath, out var savedIndex))
                 {
-                    var topFrame = context.ExecutionStack.Peek();
-                    if (topFrame.BlockId == "loop")
-                    {
-                        var loopFrame = context.ExecutionStack.Pop();
-                        savedStatementIndex = loopFrame.StatementIndex;
-                    }
+                    startIndex = savedIndex;
                 }
 
-                // 然后检查是否有保存的循环位置
-                if (context.ExecutionStack.Count > 0)
+                // 将循环路径压栈
+                context.PathStack.Push("/for-in");
+
+                try
                 {
-                    var frame = context.ExecutionStack.Peek();
-                    if (frame.BlockId == "for_in_loop_position" && frame.LoopIteration.HasValue)
+                    // 从 startIndex 开始迭代
+                    for (int i = startIndex; i < items.Count; i++)
                     {
-                        context.ExecutionStack.Pop();
-                        startIndex = frame.LoopIteration.Value;
-                        wasResumingFromYield = true;
+                        manager.ControlFlowManager.ResetCurrentState();
 
-                        // 如果帧中有 StatementIndex，使用它
-                        if (frame.StatementIndex >= 0)
+                        // 检查是否有子循环状态存在
+                        var childLoopPrefix = loopPath + "/";
+                        var hasChildLoopState = context.LoopStates.Keys.Any(k => k.StartsWith(childLoopPrefix));
+
+                        // 如果没有子循环状态，说明这是新的迭代，清除之前可能残留的子循环状态
+                        // 如果有子循环状态，说明是从子循环恢复，保持状态
+                        if (!hasChildLoopState)
                         {
-                            savedStatementIndex = frame.StatementIndex;
-                        }
-                    }
-                }
-
-                // 从 startIndex 开始迭代
-                //  - 如果是首次运行,从 0 开始
-                //  - 如果从 yield 恢复,从保存的索引开始
-                for (int i = startIndex; i < items.Count; i++)
-                {
-                    manager.ControlFlowManager.ResetCurrentState();
-
-                    var idValue = items[i];
-
-                    // 设置循环变量
-                    if (AllIds.Count == 1)
-                    {
-                        manager.Set(id, idValue);
-                    }
-                    else
-                    {
-                        if (idValue is TupleLangValue tupleValue)
-                        {
-                            tupleValue.Run(manager);
-                            var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
-                            for (var j = 0; j < AllIds.Count && j < values.Count; j++)
+                            var childKeysToRemove = context.LoopStates.Keys.Where(k => k.StartsWith(childLoopPrefix)).ToList();
+                            foreach (var key in childKeysToRemove)
                             {
-                                manager.Set(AllIds[j], values[j]);
+                                context.LoopStates.Remove(key);
                             }
                         }
-                        else
+
+                        var idValue = items[i];
+
+                        // 设置循环变量
+                        if (AllIds.Count == 1)
                         {
                             manager.Set(id, idValue);
                         }
-                    }
-
-                    // 执行循环体前，弹出可能存在的 "loop" 标记并保存 StatementIndex
-                    if (context.ExecutionStack.Count > 0 && context.ExecutionStack.Peek().BlockId == "loop")
-                    {
-                        var loopFrame = context.ExecutionStack.Pop();
-                        // 更新 savedStatementIndex（用于下次 yield 保存）
-                        savedStatementIndex = loopFrame.StatementIndex;
-                    }
-
-                    // 重置 CurrentStatementIndex，从头开始执行循环体
-                    context.CurrentStatementIndex = 0;
-
-                    // 执行循环体
-                    body.Run(manager);
-
-                    // 检查是否遇到 yield
-                    if (context.HasYielded)
-                    {
-                        // 检查是否是嵌套 yield（栈中有其他循环的标记）
-                        bool isNestedYield = false;
-                        if (context.ExecutionStack.Count > 0)
+                        else
                         {
-                            var topFrame = context.ExecutionStack.Peek();
-                            if (topFrame.BlockId == "for_in_loop_position")
+                            if (idValue is TupleLangValue tupleValue)
                             {
-                                isNestedYield = true;
+                                tupleValue.Run(manager);
+                                var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+                                for (var j = 0; j < AllIds.Count && j < values.Count; j++)
+                                {
+                                    manager.Set(AllIds[j], values[j]);
+                                }
+                            }
+                            else
+                            {
+                                manager.Set(id, idValue);
                             }
                         }
 
-                        // 决定保存哪个索引:
-                        //  - 如果是嵌套 yield (内层循环 yield 了),外层保存当前索引(继续当前迭代的剩余部分)
-                        //  - 如果是直接 yield (本循环直接 yield),保存下一个索引(进入下一次迭代)
-                        int nextIndex = isNestedYield ? i : (i + 1);
-                        context.ExecutionStack.Push(new GeneratorExecutionContext.BlockExecutionFrame
+                        // 如果是从保存位置恢复的第一次迭代，并且没有子循环状态，清除 ExecutionPath
+                        // 因为我们已经移到了新的迭代，不需要跳过任何语句
+                        // 但如果有子循环状态，说明我们是从子循环恢复，应该保持 ExecutionPath
+                        if (i == startIndex && startIndex > 0 && !hasChildLoopState)
                         {
-                            StatementIndex = savedStatementIndex ?? -1,  // 保存语句索引
-                            BlockId = "for_in_loop_position",
-                            LoopIteration = nextIndex
-                        });
-                        return;
+                            context.ExecutionPath = "";
+                        }
+
+                        // 执行循环体
+                        body.Run(manager);
+
+                        // 检查是否遇到 yield
+                        if (context.HasYielded)
+                        {
+                            // 检查 yield 是否来自当前循环的直接子语句还是嵌套循环
+                            var currentPath = context.GetCurrentPath();
+
+                            // 如果 ExecutionPath 包含嵌套的 /for-in，说明是子循环 yield
+                            // 这种情况下应该保持当前迭代位置，以便子循环完成后继续
+                            var pathAfterCurrent = context.ExecutionPath!.Substring(currentPath.Length);
+                            if (pathAfterCurrent.Count(c => c == '/') > 2 && pathAfterCurrent.Contains("/for-in"))
+                            {
+                                // 子循环 yield，保持当前位置
+                                context.LoopStates[loopPath] = i;
+                            }
+                            else
+                            {
+                                // 当前循环直接 yield，保存下一个位置
+                                context.LoopStates[loopPath] = i + 1;
+                            }
+                            return;
+                        }
+
+                        // 处理 break
+                        if (manager.ControlFlowManager.BreakFlag)
+                        {
+                            manager.ControlFlowManager.BreakFlag = false;
+                            break;
+                        }
+
+                        // 处理 continue
+                        if (manager.ControlFlowManager.ContinueFlag)
+                        {
+                            manager.ControlFlowManager.ContinueFlag = false;
+                            continue;
+                        }
                     }
 
-                    // 重置状态，准备下一次迭代
-                    context.CurrentStatementIndex = 0;
-                    context.IsCompleted = false;
-
-                    // 处理 break
-                    if (manager.ControlFlowManager.BreakFlag)
+                    // 循环完成，清除当前循环及其所有子循环的状态
+                    var keysToRemove = context.LoopStates.Keys.Where(k => k == loopPath || k.StartsWith(loopPath + "/")).ToList();
+                    foreach (var key in keysToRemove)
                     {
-                        manager.ControlFlowManager.BreakFlag = false;
-                        break;
+                        context.LoopStates.Remove(key);
                     }
 
-                    // 处理 continue
-                    if (manager.ControlFlowManager.ContinueFlag)
-                    {
-                        manager.ControlFlowManager.ContinueFlag = false;
-                        continue;
-                    }
-
-                    // 没有 yield，继续下一次迭代
+                    // 循环正常完成，清除 ExecutionPath，以便外层 BlockStatement 能继续执行后续语句
+                    context.ExecutionPath = "";
+                }
+                finally
+                {
+                    // 弹出循环路径
+                    context.PathStack.Pop();
                 }
             }
             else
@@ -435,7 +441,6 @@ public class ForInStatement(
         finally
         {
             manager.ControlFlowManager.PopState();
-            // 注意：不调用 RemoveChildren()，因为没有调用 AddChildren()
         }
     }
 
@@ -555,6 +560,16 @@ public class ForInStatement(
                         continue;
                     }
                 }
+                else
+                {
+                    // 如果返回 VoidLangValue，生成器已完成
+                    break;
+                }
+            }
+            else
+            {
+                // 如果既不是Completed也不是Suspended，则退出循环
+                break;
             }
         }
     }

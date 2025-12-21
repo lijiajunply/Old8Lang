@@ -86,33 +86,32 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
     }
 
     /// <summary>
-    /// 使用新架构运行（标准 while 循环）
+    /// 使用新架构运行（基于路径的状态恢复）
     /// </summary>
     /// <param name="manager">变量管理器</param>
-    /// <remarks>
-    /// 新架构下，生成器的断点恢复完全由 BlockStatement 的 GeneratorContext 处理
-    /// WhileStatement 只需要实现标准的 while 循环逻辑即可
-    /// </remarks>
     private void RunWithGeneratorContext(VariateManager manager)
     {
-        // 压入新的控制流状态
         manager.ControlFlowManager.PushState();
-
         var context = manager.GeneratorContext!;
 
-        // 检查是否从 yield 恢复（栈中有保存的循环位置）
-        if (context.ExecutionStack.Count > 0)
+        // 获取当前循环路径
+        var loopPath = context.GetCurrentPath() + "/while";
+
+        // 从循环状态中恢复起始迭代次数（仅用于跟踪）
+        int iterationCount = 0;
+        if (context.LoopStates.TryGetValue(loopPath, out var savedIteration))
         {
-            // 从栈中弹出循环位置
-            context.ExecutionStack.Pop();
+            iterationCount = savedIteration;
         }
+
+        // 将循环路径压栈
+        context.PathStack.Push("/while");
 
         try
         {
             // 标准 while 循环
             while (true)
             {
-
                 // 获取条件表达式的值
                 var value = expression.Run(manager);
                 if (value is not BoolLangValue varBool)
@@ -121,8 +120,6 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
                 }
 
                 bool conditionResult = varBool.Value;
-                // 注意：不要在这里调用 ReturnToPool()，因为表达式可能会重用这个对象
-                // 如果在这里归还到池并重置，下次迭代时可能会得到错误的值
 
                 // 如果条件为 false，退出循环
                 if (!conditionResult)
@@ -130,31 +127,16 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
                     break;
                 }
 
-                // 执行循环体前，压栈一个标志，让循环体知道自己是嵌套的
-                context.ExecutionStack.Push(new GeneratorExecutionContext.BlockExecutionFrame
-                {
-                    StatementIndex = -1,  // -1 表示这只是一个标志，不是真正的位置
-                    BlockId = "loop_body_marker"
-                });
-
                 // 执行循环体
                 blockStatement.Run(manager);
 
-                // 循环体执行完毕后，弹出标志
-                if (context.ExecutionStack.Count > 0 && context.ExecutionStack.Peek().BlockId == "loop_body_marker")
-                {
-                    context.ExecutionStack.Pop();
-                }
-
-                // 检查是否遇到 yield（通过 GeneratorContext）
+                // 检查是否遇到 yield
                 if (context.HasYielded)
                 {
-                    // 遇到 yield，立即返回以暂停执行
+                    // 保存当前迭代次数
+                    context.LoopStates[loopPath] = iterationCount;
                     return;
                 }
-
-                // 循环体执行完毕，重置索引为 0，准备下一次迭代
-                context.CurrentStatementIndex = 0;
 
                 // 处理 break
                 if (manager.ControlFlowManager.BreakFlag)
@@ -170,13 +152,16 @@ public class WhileStatement(LangExpression expression, OldStatement blockStateme
                     continue;
                 }
 
-                // 循环体执行完毕，重置索引为 0，准备下一次迭代
-                context.CurrentStatementIndex = 0;
+                iterationCount++;
             }
+
+            // 循环完成，清除循环状态
+            context.LoopStates.Remove(loopPath);
         }
         finally
         {
-            // 弹出当前控制流状态
+            // 弹出循环路径
+            context.PathStack.Pop();
             manager.ControlFlowManager.PopState();
         }
     }

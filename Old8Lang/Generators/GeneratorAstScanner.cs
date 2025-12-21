@@ -1,4 +1,5 @@
 using Old8Lang.AST;
+using Old8Lang.AST.Expression;
 using Old8Lang.AST.Statement;
 
 namespace Old8Lang.Generators;
@@ -99,6 +100,32 @@ public class GeneratorAstScanner
                 break;
 
             case ForInStatement forIn:
+                // 记录循环变量
+                var idField = typeof(ForInStatement).GetFields(
+                    System.Reflection.BindingFlags.NonPublic |
+                    System.Reflection.BindingFlags.Instance)
+                    .FirstOrDefault(f => f.Name.Contains("id", StringComparison.OrdinalIgnoreCase) &&
+                                       f.FieldType == typeof(LangId));
+
+                if (idField != null && idField.GetValue(forIn) is LangId loopVar)
+                {
+                    result.LocalVariables.Add(loopVar.IdName);
+                }
+
+                // 记录附加变量（用于字典遍历的键值对）
+                var additionalIdsField = typeof(ForInStatement).GetFields(
+                    System.Reflection.BindingFlags.NonPublic |
+                    System.Reflection.BindingFlags.Instance)
+                    .FirstOrDefault(f => f.Name.Contains("additionalIds", StringComparison.OrdinalIgnoreCase));
+
+                if (additionalIdsField != null && additionalIdsField.GetValue(forIn) is List<LangId> additionalIds)
+                {
+                    foreach (var additionalId in additionalIds)
+                    {
+                        result.LocalVariables.Add(additionalId.IdName);
+                    }
+                }
+
                 // ForInStatement 的循环体需要通过反射访问
                 // C# 12 主构造函数参数被编译为私有字段，但字段名不同
 

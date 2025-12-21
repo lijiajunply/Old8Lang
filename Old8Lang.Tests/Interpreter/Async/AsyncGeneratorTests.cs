@@ -279,12 +279,12 @@ public class AsyncGeneratorTests
                 if n <= 3 {
                     return true
                 }
-                if n % 2 = 0 or n % 3 = 0 {
+                if n % 2 == 0 or n % 3 == 0 {
                     return false
                 }
                 i <- 5
                 while i * i <= n {
-                    if n % i = 0 or n % (i + 2) = 0 {
+                    if n % i == 0 or n % (i + 2) == 0 {
                         return false
                     }
                     i <- i + 6
@@ -495,7 +495,7 @@ public class AsyncGeneratorTests
     {
         // Arrange
         var code = @"
-            cache <- {}
+            cache <- dict()
             func expensiveComputation(n:int) -> int {
                 if cache.ContainsKey(n) {
                     return cache[n]
@@ -646,9 +646,9 @@ public class AsyncGeneratorTests
         // Arrange
         var code = @"
             func resilientGenerator() {
-                for i in 1..5 {
+                for i in [1~5] {
                     try {
-                        if i = 3 {
+                        if i == 3 {
                             // Simulate an error
                             invalid <- null + 1
                         }

@@ -29,6 +29,9 @@ public class YieldStatement(LangExpression yieldExpression, SourcePosition posit
         {
             genContext.CurrentValue = yieldValue;
             genContext.HasYielded = true;
+
+            // 保存当前执行路径，以便下次从这里恢复
+            genContext.ExecutionPath = genContext.GetCurrentPath() + "/yield";
         }
         else
         {

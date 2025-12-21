@@ -20,10 +20,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/test_nested_for_in_debug.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_async_buffer_debug.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_async_forin_yield.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_async_generator.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_async_simple_loop.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_nested_async_debug.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_nested_async_generator.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_nested_forin_simple.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncGeneratorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncGeneratorTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Generators/GeneratorLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Generators/GeneratorLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncForInStatement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/YieldStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/YieldStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorAstScanner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorAstScanner.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorExecutionContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorExecutionContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorStateMachine.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorStateMachineBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorStateMachineBuilder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/AsyncGeneratorStateMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/AsyncGeneratorStateMachine.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_nested_for_in_debug.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_simple_nested.old8" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,13 +82,20 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Generators/AsyncGeneratorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Generators/GeneratorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/AsyncForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/AsyncForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Generators/GeneratorStateMachineBuilder.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Interpreter/AsyncGeneratorStateMachine.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
@@ -447,7 +472,7 @@
       <workItem from="1766238299964" duration="6160000" />
       <workItem from="1766298953988" duration="5700000" />
       <workItem from="1766308100500" duration="10097000" />
-      <workItem from="1766330641326" duration="7732000" />
+      <workItem from="1766330641326" duration="11211000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -792,7 +817,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="335" />
+    <option name="localTasksCounter" value="336" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -819,7 +844,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 优化方法重载解析逻辑&#10;&#10;- 改进方法重载选择策略，优先选择参数数量最接近的重载&#10;- 增强参数匹配检查，支持默认参数的缺失情况处理&#10;- 更新类型模板中的重载解析算法，确保更精确的方法匹配&#10;- 修复重载方法表构建逻辑，防止重复方法覆盖问题&#10;- 清理项目配置文件中的冗余测试会话记录&#10;- 移除IDE工作区中的无效文件高亮设置" />
     <MESSAGE value="fix(tests): 更新构造函数测试中的数值类型断言&#10;&#10;- 将 area1 的期望类型从 DoubleLangValue 改为 IntLangValue&#10;- 修改 area1 的期望值从 1.0 改为 1&#10;- 统一账户 overdraftLimit 初始化值为浮点数格式&#10;- 确保测试用例与实际代码中的数值类型一致" />
     <MESSAGE value="fix(lang): 优化构造函数字段初始化作用域逻辑&#10;&#10;- 创建独立字段作用域以避免参数与字段名称冲突&#10;- 调整字段设置优先级，确保参数可以正确覆盖同名字段&#10;- 更新字段同步机制，保证 init 方法执行后数据一致性&#10;- 修复字段修改标记清理时机，防止状态残留影响后续操作" />
     <MESSAGE value="feat(interpreter): 支持静态字段赋值和接口实现检查&#10;&#10;- 在 SetStatement 中添加对 ClassName.staticField &lt;- value 形式的静态字段赋值支持&#10;- 实现 TypeTemplate 的 SetStaticMember 方法用于设置静态成员值&#10;- 更新 TypeChecker 的 IsCompatibleType 方法以支持接口实现兼容性检查&#10;- 优化 SetStatement 中的嵌套索引赋值判断逻辑&#10;- 修复 InterfaceTests 中的类型断言错误，将 DoubleLangValue 改为 IntLangValue&#10;- 在 TypeAnnotationManager 中添加 GetGlobalManager 方法以便获取全局变量管理器&#10;- 修改 TypeTemplate 中静态成员获取逻辑，优先返回运行时存储的值" />
@@ -844,7 +868,8 @@
     <MESSAGE value="feat(AsyncLib): 优化资源包装类构造函数并移除冗余字段初始化&#10;&#10;将 `ResourceWrapper` 类改用主构造函数语法，并直接初始化 `Resource` 属性。  &#10;同时删除了 `_readWriteLockIdCounter`、`_countDownLatchIdCounter` 和  &#10;`_cyclicBarrierIdCounter` 的冗余赋值为 0 的字段初始化语句。&#10;&#10;refactor(AsyncLib): 统一使用属性命名风格并提升代码一致性&#10;&#10;将 `CountDownLatch` 和 `CyclicBarrier` 类中的私有字段名称从下划线前缀风格  &#10;改为 PascalCase 命名风格（如 `_count` 改为 `Count`），以提高整体代码可读性和一致性。  &#10;此外，更新相关访问逻辑以匹配新的属性命名。&#10;&#10;refactor(Csv): 简化 CSV 头部行添加方式&#10;&#10;合并声明与初始化操作，通过集合初始化器直接在创建 `csvLines` 列表时添加头部行，  &#10;使代码更简洁且易于理解。" />
     <MESSAGE value="refactor(ast): 重构 CancellationTokenSource 和 TaskCompletionSource 类&#10;&#10;- 将 CancellationTokenSourceLangValue 和 TaskCompletionSourceLangValue 移至 StaticValues 命名空间&#10;- 重命名私有字段 _cts 和 _tcs 为 Cts 和 Tcs&#10;- 使用新的语法初始化只读属性&#10;- 简化 TaskWrapper 的惰性初始化逻辑&#10;- 更新所有引用以使用新命名的字段&#10;- 调整类成员顺序并优化命名空间导入顺序&#10;- 修复 OutputType 方法返回类型声明&#10;- 更新工作区 XML 配置文件中的变更记录和持续时间统计" />
     <MESSAGE value="feat(ast): 实现异步流和生成器上下文中的异步 for-in 循环&#10;&#10;- 添加对 AsyncStreamLangValue 的异步迭代支持&#10;- 实现生成器上下文中的异步 for-in 循环逻辑&#10;- 支持在异步流中正确处理 yield 和恢复执行&#10;- 添加对 TaskLangValue 的 await 处理&#10;- 完善异常类型检查，增加 AsyncStreamLangValue 和 TaskLangValue&#10;- 重构 Run 方法，区分标准模式和生成器上下文模式&#10;- 添加详细的控制流管理，支持 break 和 continue 语句&#10;- 实现异步流、异步生成器和普通列表在生成器中的迭代逻辑&#10;- 更新测试用例，将 for 替换为 async for 以支持异步流&#10;- 修复 CapturedScope 属性访问权限问题&#10;- 优化异步生成器的状态机初始化逻辑&#10;- 更新 BlockStatement 以识别 AsyncForInStatement 中的 yield&#10;- 添加多个异步流测试用例文件" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(ast): 实现异步流和生成器上下文中的异步 for-in 循环&#10;&#10;- 添加对 AsyncStreamLangValue 的异步迭代支持&#10;- 实现生成器上下文中的异步 for-in 循环逻辑&#10;- 支持在异步流中正确处理 yield 和恢复执行&#10;- 添加对 TaskLangValue 的 await 处理&#10;- 完善异常类型检查，增加 AsyncStreamLangValue 和 TaskLangValue&#10;- 重构 Run 方法，区分标准模式和生成器上下文模式&#10;- 添加详细的控制流管理，支持 break 和 continue 语句&#10;- 实现异步流、异步生成器和普通列表在生成器中的迭代逻辑&#10;- 更新测试用例，将 for 替换为 async for 以支持异步流&#10;- 修复 CapturedScope 属性访问权限问题&#10;- 优化异步生成器的状态机初始化逻辑&#10;- 更新 BlockStatement 以识别 AsyncForInStatement 中的 yield&#10;- 添加多个异步流测试用例文件" />
+    <MESSAGE value="fix(ast): 修复嵌套 for-in 循环中的 yield 恢复逻辑&#10;&#10;- 改进 BlockStatement 中的循环标记检查逻辑，正确识别嵌套循环中的 yield&#10;- 优化 ForInStatement 的生成器上下文处理，避免变量作用域丢失&#10;- 调整循环体执行前后的状态重置逻辑，确保迭代正确恢复&#10;- 修复 yield 时的索引保存策略，区分嵌套 yield 和直接 yield&#10;- 移除调试日志输出，清理冗余代码&#10;- 添加嵌套 for-in 循环测试用例，验证修复效果" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(ast): 修复嵌套 for-in 循环中的 yield 恢复逻辑&#10;&#10;- 改进 BlockStatement 中的循环标记检查逻辑，正确识别嵌套循环中的 yield&#10;- 优化 ForInStatement 的生成器上下文处理，避免变量作用域丢失&#10;- 调整循环体执行前后的状态重置逻辑，确保迭代正确恢复&#10;- 修复 yield 时的索引保存策略，区分嵌套 yield 和直接 yield&#10;- 移除调试日志输出，清理冗余代码&#10;- 添加嵌套 for-in 循环测试用例，验证修复效果" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
