@@ -219,68 +219,70 @@ public class MixinTests
     public void Mixin_ConstructorChain_CallsMixinConstructors()
     {
         // Arrange
-        var code = @"
-            mixin Configurable {
-                public settings <- {}
+        var code = """
 
-                func Configurable() {
-                    settings <- {""theme"": ""default"", ""debug"": false}
-                }
+                               mixin Configurable {
+                                   public settings <- dict()
 
-                func SetConfig(key:string, value:any) -> void {
-                    settings[key] <- value
-                }
+                                   func Configurable() {
+                                       settings <- {"theme": "default", "debug": false}
+                                   }
 
-                func GetConfig(key:string) -> any {
-                    return settings[key]
-                }
-            }
+                                   func SetConfig(key:string, value:any) -> void {
+                                       settings[key] <- value
+                                   }
 
-            mixin Validatable {
-                public errors <- {}
+                                   func GetConfig(key:string) -> any {
+                                       return settings[key]
+                                   }
+                               }
 
-                func Validatable() {
-                    errors <- {}
-                }
+                               mixin Validatable {
+                                   public errors <- {}
 
-                func AddError(error:string) -> void {
-                    errors.Add(error)
-                }
+                                   func Validatable() {
+                                       errors <- {}
+                                   }
 
-                func HasErrors() -> bool {
-                    return len(errors) > 0
-                }
-            }
+                                   func AddError(error:string) -> void {
+                                       errors.Add(error)
+                                   }
 
-            class FormComponent with Configurable, Validatable {
-                public value <- """"
+                                   func HasErrors() -> bool {
+                                       return len(errors) > 0
+                                   }
+                               }
 
-                func init() {
-                    this.Configurable()
-                    this.Validatable()
-                }
+                               class FormComponent with Configurable, Validatable {
+                                   public value <- ""
 
-                func Validate() -> bool {
-                    if len(value) == 0 {
-                        AddError(""Value cannot be empty"")
-                        return false
-                    }
-                    return true
-                }
+                                   func init() {
+                                       this.Configurable()
+                                       this.Validatable()
+                                   }
 
-                func SetValue(v:string) -> void {
-                    value <- v
-                    Validate()
-                }
-            }
+                                   func Validate() -> bool {
+                                       if len(value) == 0 {
+                                           AddError("Value cannot be empty")
+                                           return false
+                                       }
+                                       return true
+                                   }
 
-            component <- FormComponent()
-            component.SetConfig(""required"", true)
-            component.SetValue("""")
-            isValid <- component.Validate()
-            hasErrors <- component.HasErrors()
-            configValue <- component.GetConfig(""required"")
-        ";
+                                   func SetValue(v:string) -> void {
+                                       value <- v
+                                       Validate()
+                                   }
+                               }
+
+                               component <- FormComponent()
+                               component.SetConfig("required", true)
+                               component.SetValue("")
+                               isValid <- component.Validate()
+                               hasErrors <- component.HasErrors()
+                               configValue <- component.GetConfig("required")
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -338,7 +340,7 @@ public class MixinTests
                 public radius <- 0
 
                 func init(n:string, r:double) {
-                    this.Shape(n)
+                    this.name <- n
                     radius <- r
                 }
 
@@ -510,8 +512,8 @@ public class MixinTests
         // Arrange
         var code = @"
             mixin EventSystem {
-                private events <- {}
-
+                private events <- dict()
+ 
                 func EventSystem() {
                     events <- {}
                 }
@@ -553,7 +555,9 @@ public class MixinTests
             // For this test, we'll create a class that includes the mixin
             class Player extends GameObject with EventSystem {
                 func init(id:int) {
-                    this.GameObject(id)
+                    this.id <- id
+                    this.x <- 0
+                    this.y <- 0
                 }
 
                 func MoveWithEvent(newX:int, newY:int) -> void {

@@ -421,7 +421,7 @@ public class Operation(
 
         if (Opera == LangTokenType.As)
         {
-            // 处理类型转换操作：left as right
+            // 处理安全类型转换操作：left as right
             // 右侧应该是一个类型标识符，如 int, double, string 等
             // 直接从 Right 表达式获取类型名称，而不是从运行结果
             string typeName;
@@ -440,7 +440,15 @@ public class Operation(
 
                     if (rightAsResult is TypeLangValue typeLangValue)
                     {
-                        return leftResult.Converse(typeLangValue, manager);
+                        try
+                        {
+                            return leftResult.Converse(typeLangValue, manager);
+                        }
+                        catch (TypeError)
+                        {
+                            // 安全转换失败，返回 null
+                            return NullLangValue.Instance;
+                        }
                     }
 
                     typeName = rightAsResult.ToString();
@@ -450,7 +458,15 @@ public class Operation(
 
             // 创建或获取类型对象
             var type = new TypeLangValue(typeName);
-            return leftResult.Converse(type, manager);
+            try
+            {
+                return leftResult.Converse(type, manager);
+            }
+            catch (TypeError)
+            {
+                // 安全转换失败，返回 null
+                return NullLangValue.Instance;
+            }
         }
 
         var rightResult = Right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");

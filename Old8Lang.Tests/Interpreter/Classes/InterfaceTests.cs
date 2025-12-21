@@ -1,6 +1,7 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.Interpreter;
 using Old8Lang.AST.Expression.Value;
+using Xunit.Abstractions;
 
 namespace Old8Lang.Tests.Interpreter.Classes;
 
@@ -9,6 +10,13 @@ namespace Old8Lang.Tests.Interpreter.Classes;
 /// </summary>
 public class InterfaceTests
 {
+    private readonly ITestOutputHelper TestOutputHelper;
+
+    public InterfaceTests(ITestOutputHelper testOutputHelper)
+    {
+        TestOutputHelper = testOutputHelper;
+    }
+
     [Fact]
     public void Interface_SimpleInterface_DeclaresCorrectly()
     {
@@ -340,7 +348,7 @@ public class InterfaceTests
                 private items <- {}
 
                 func Add(item:any) -> void {
-                    items.Push(item)
+                    items.Add(item)
                 }
 
                 func Get(index:int) -> any {
@@ -567,38 +575,40 @@ public class InterfaceTests
     public void Interface_Casting_SafeCastingToInterface()
     {
         // Arrange
-        var code = @"
-            interface Printable {
-                func Print() -> string
-            }
+        var code = """
 
-            class Document implements Printable {
-                public content <- """"
+                               interface Printable {
+                                   func Print() -> string
+                               }
 
-                func init(text:string) {
-                    content <- text
-                }
+                               class Document implements Printable {
+                                   public content <- ""
 
-                func Print() -> string {
-                    return content
-                }
-            }
+                                   func init(text:string) {
+                                       this.content <- text
+                                   }
 
-            class PlainObject {
-                public data <- """"
-            }
+                                   func Print() -> string {
+                                       return this.content
+                                   }
+                               }
 
-            doc <- Document(""Hello World"")
-            plain <- PlainObject()
-            plain.data <- ""Not printable""
+                               class PlainObject {
+                                   public data <- ""
+                               }
 
-            // Safe casting
-            printableDoc <- doc as Printable
-            printablePlain <- plain as Printable
+                               doc <- Document("Hello World")
+                               plain <- PlainObject()
+                               plain.data <- "Not printable"
 
-            docResult <- if printableDoc != null then printableDoc.Print() else ""null""
-            plainResult <- if printablePlain != null then printablePlain.Print() else ""null""
-        ";
+                               // Safe casting
+                               printableDoc <- doc as Printable
+                               printablePlain <- plain as Printable
+
+                               docResult <- if printableDoc != null then printableDoc.Print() else "null"
+                               plainResult <- if printablePlain != null then printablePlain.Print() else "null"
+                           
+                   """;
         var interpreter = new LangInterpreter();
 
         // Act
@@ -608,6 +618,8 @@ public class InterfaceTests
         // Assert
         var docResult = interpreter.Manager.GetValue(new LangId("docResult"));
         var plainResult = interpreter.Manager.GetValue(new LangId("plainResult"));
+
+
 
         Assert.NotNull(docResult);
         Assert.IsType<StringLangValue>(docResult);

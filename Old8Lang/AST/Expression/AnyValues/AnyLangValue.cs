@@ -667,21 +667,56 @@ public class AnyLangValue : LangValueType
                 $"类型 '{ClassId.IdName}' 不能转换为 '{type.Value}'");
         }
 
-        // 创建目标类型的实例并复制字段
-        var targetInstance = targetTypeTemplate.CreateInstanceV2(manager);
-        foreach (var (fieldName, fieldValue) in InstanceData)
-        {
-            try
-            {
-                targetInstance.SetField(fieldName, fieldValue, manager);
-            }
-            catch
-            {
-                // 如果目标类型没有这个字段，跳过
-            }
-        }
 
-        return targetInstance;
+        
+        // 对于接口类型转换，返回当前实例但更新类型标识
+        // 保持原始的方法实现和字段数据不变
+        if (targetTypeTemplate.Metadata == null)
+        {
+            // 如果元数据为空，很可能是接口类型
+            // 创建一个临时的接口元数据进行兼容性检查
+            var tempInterfaceMetadata = new ClassMetadata(
+                className: type.Value ?? "",
+                isInterface: true
+            );
+            
+            // 检查类型是否兼容
+            if (!Metadata.IsAssignableTo(tempInterfaceMetadata, manager))
+            {
+                // 不兼容，转换失败，抛出TypeError（会被Operation.cs捕获并返回null）
+                throw new TypeError(this, type.Value ?? "", ClassId.IdName,
+                    $"类型 '{ClassId.IdName}' 不能转换为 '{type.Value}'");
+            }
+            
+
+            return this;
+        }
+        
+        if (targetTypeTemplate.Metadata.IsInterface)
+        {
+            // 不创建新实例，而是修改当前实例的类型信息
+            // 这样可以完全保持原始的方法实现和数据
+
+            return this;
+        }
+        else
+        {
+            // 普通类类型转换，创建目标类型的实例并复制字段
+            var targetInstance = targetTypeTemplate.CreateInstanceV2(manager);
+            foreach (var (fieldName, fieldValue) in InstanceData)
+            {
+                try
+                {
+                    targetInstance.SetField(fieldName, fieldValue, manager);
+                }
+                catch
+                {
+                    // 如果目标类型没有这个字段，跳过
+                }
+            }
+
+            return targetInstance;
+        }
     }
 
     public override string ToString()

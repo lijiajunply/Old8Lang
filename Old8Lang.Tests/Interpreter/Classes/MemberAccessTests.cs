@@ -270,16 +270,16 @@ public class MemberAccessTests
                 public instanceId <- 0
 
                 func init() {
-                    count <- count + 1
-                    instanceId <- count
+                    Counter.count <- Counter.count + 1
+                    this.instanceId <- count
                 }
 
                 static func GetCount() -> int {
-                    return count
+                    return Counter.count
                 }
 
                 static func Reset() {
-                    count <- 0
+                    Counter.count <- 0
                 }
             }
 
@@ -405,16 +405,16 @@ public class MemberAccessTests
                 }
 
                 func GetArea() -> double {
-                    return pi * radius * radius
+                    return this.pi * this.radius * this.radius
                 }
 
                 func GetCircumference() -> double {
-                    return 2 * pi * radius
+                    return 2 * this.pi * this.radius
                 }
 
                 func SetRadius(newRadius:double) {
                     if newRadius > 0 {
-                        radius <- newRadius
+                        this.radius <- newRadius
                     }
                 }
             }
