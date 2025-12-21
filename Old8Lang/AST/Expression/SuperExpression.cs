@@ -91,8 +91,8 @@ public class SuperProxy(AnyLangValue currentInstance, VariateManager manager, So
 
         if (initMethods == null || initMethods.Count == 0)
         {
-            // 如果父类没有构造函数，直接返回
-            return new VoidLangValue();
+            // 如果父类没有构造函数，返回 null（不返回 VoidLangValue）
+            return new NullLangValue();
         }
 
         // 选择匹配的构造函数

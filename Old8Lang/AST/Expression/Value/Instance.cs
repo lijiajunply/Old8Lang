@@ -8,6 +8,7 @@ using Old8Lang.AST.Expression.ValueFunctions;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.LangParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -196,6 +197,19 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
                 // 获取第一个参数，应该是一个函数
                 var funcExpr = Ids[0];
+
+                // 检查是否是成员方法访问（obj.method）
+                AnyLangValue? instanceContext = null;
+                if (funcExpr is Operation { Opera: LangTokenType.Dot } dotOp)
+                {
+                    // 获取实例（左操作数）
+                    var instanceValue = dotOp.Left?.Run(manager);
+                    if (instanceValue is AnyLangValue anyInstance)
+                    {
+                        instanceContext = anyInstance;
+                    }
+                }
+
                 var funcValue = funcExpr.Run(manager);
 
                 if (funcValue is not FuncLangValue spawnFunc)
@@ -208,6 +222,12 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
 
                 // 创建新的变量管理器，复制当前管理器的状态
                 var threadManager = manager.Clone();
+
+                // 如果有实例上下文，需要在线程管理器中设置this
+                if (instanceContext != null)
+                {
+                    threadManager.Set(new LangId("this"), instanceContext);
+                }
 
                 // 使用临时变量来存储线程对象，避免闭包引用问题
                 ThreadLangValue? tempThread = null;
@@ -235,11 +255,11 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
                     try
                     {
                         // 调用函数
-                        var funcResult = spawnFunc.Run(threadManager, threadArgs);
+                        var funcResult = spawnFunc.Run(threadManager, threadArgs, instanceContext);
 
                         // 设置线程结果
-                        // 如果函数返回 VoidLangValue，则设置 null 作为结果
-                        tempThread?.SetResult(funcResult is VoidLangValue ? null! : funcResult.GetValue());
+                        // 直接保存 funcResult 对象，不进行转换
+                        tempThread?.SetResult(funcResult);
                     }
                     catch (Exception ex)
                     {

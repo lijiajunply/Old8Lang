@@ -24,7 +24,35 @@ public class ThreadLangValue : LangValueType
     /// <summary>
     /// 线程执行结果
     /// </summary>
-    private object? Result;
+    private object? _result;
+
+    /// <summary>
+    /// 获取线程执行结果（等同于Join但不阻塞）
+    /// </summary>
+    public LangValueType Result
+    {
+        get
+        {
+            // 等待线程完成
+            Join();
+
+            lock (Lock)
+            {
+                if (Exception != null)
+                {
+                    throw new InvalidOperationError(this, "线程执行异常: " + Exception);
+                }
+
+                // 如果 _result 为 null，返回 VoidLangValue
+                if (_result == null)
+                {
+                    return new VoidLangValue();
+                }
+
+                return ObjToValue(_result);
+            }
+        }
+    }
 
     /// <summary>
     /// 线程执行是否完成
@@ -176,13 +204,13 @@ public class ThreadLangValue : LangValueType
                 throw new InvalidOperationError(this, "线程执行异常: " + Exception);
             }
 
-            // 如果 Result 为 null，返回 VoidLangValue
-            if (Result == null)
+            // 如果 _result 为 null，返回 VoidLangValue
+            if (_result == null)
             {
                 return new VoidLangValue();
             }
 
-            return ObjToValue(Result);
+            return ObjToValue(_result);
         }
     }
 
@@ -194,7 +222,7 @@ public class ThreadLangValue : LangValueType
     {
         lock (Lock)
         {
-            Result = result;
+            _result = result;
             _isCompleted = true;
         }
     }
@@ -238,6 +266,12 @@ public class ThreadLangValue : LangValueType
     /// <returns>转换后的语言值类型</returns>
     private new static LangValueType ObjToValue(object obj)
     {
+        // 如果已经是 LangValueType，直接返回
+        if (obj is LangValueType langValue)
+        {
+            return langValue;
+        }
+
         return obj switch
         {
             int i => new IntLangValue(i),
@@ -294,6 +328,15 @@ public class ThreadLangValue : LangValueType
                 : Join();
         }
 
+        // 处理 Wait 方法调用（等同于Join）
+        if (dotExpression is Instance { Id.IdName: "Wait" } waitInstance)
+        {
+            // 直接调用 Join 方法，避免反射
+            return waitInstance.Ids.Count > 0
+                ? Join(waitInstance.Ids[0] as IntLangValue) // 如果有参数，则调用带参数的 Join 方法
+                : Join();
+        }
+
         if (dotExpression is Instance { Id.IdName: "State" })
         {
             // 直接返回 State 属性值，避免反射
@@ -306,6 +349,18 @@ public class ThreadLangValue : LangValueType
             return new BoolLangValue(IsCompleted);
         }
 
+        // 处理 Status() 方法调用（返回线程状态字符串）
+        if (dotExpression is Instance { Id.IdName: "Status" })
+        {
+            return new StringLangValue(State.ToString());
+        }
+
+        // 处理 Id() 方法调用（返回线程ID）
+        if (dotExpression is Instance { Id.IdName: "Id" })
+        {
+            return new IntLangValue(Thread.ManagedThreadId);
+        }
+
         // 处理属性访问（LangId 类型）
         if (dotExpression is LangId langId)
         {
@@ -315,6 +370,10 @@ public class ThreadLangValue : LangValueType
                     return new StringLangValue(State.ToString());
                 case "IsCompleted":
                     return new BoolLangValue(IsCompleted);
+                case "Result":
+                    return Result; // 访问Result属性，会自动等待线程完成
+                case "Id":
+                    return new IntLangValue(Thread.ManagedThreadId);
             }
         }
 
