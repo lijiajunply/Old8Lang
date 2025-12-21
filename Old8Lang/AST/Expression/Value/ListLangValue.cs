@@ -119,6 +119,17 @@ public class ListLangValue : LangValueType, ILangList
             return Get(intValue);
         }
 
+        // 处理属性访问：obj.property
+        if (dotExpression is LangId langId)
+        {
+            // 特殊处理 Count 属性
+            if (langId.IdName == "Count")
+            {
+                // 返回列表的元素数量
+                return new IntLangValue(Values.Count);
+            }
+        }
+
         // 如果是其他类型的表达式，尝试将其作为索引
         if (dotExpression is not Instance)
         {

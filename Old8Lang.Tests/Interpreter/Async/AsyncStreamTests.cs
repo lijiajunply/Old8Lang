@@ -70,9 +70,9 @@ public class AsyncStreamTests
         var code = @"
             stream <- async {
                 yield ""start""
-                await async.Sleep(100)
+                await Task.Delay(100)
                 yield ""middle""
-                await async.Sleep(100)
+                await Task.Delay(100)
                 yield ""end""
             }
             count <- 0
@@ -101,7 +101,7 @@ public class AsyncStreamTests
         var code = @"
             stream <- async {
                 for i in [1~10] {
-                    if i % 2 = 0 {
+                    if i % 2 == 0 {
                         yield i
                     }
                 }
@@ -110,7 +110,7 @@ public class AsyncStreamTests
             for item in stream {
                 resultList.Add(item)
             }
-            result <- resultList.Count
+            result <- len(resultList)
         ";
         var interpreter = new LangInterpreter();
 
@@ -130,9 +130,9 @@ public class AsyncStreamTests
     {
         // Arrange
         var code = @"
-            func generateNumbers(start:int, end:int) -> async {
+            async func generateNumbers(start:int, end:int) {
                 return async {
-                    for i in start..end {
+                    for i in [start~end] {
                         yield i
                     }
                 }
@@ -323,7 +323,7 @@ public class AsyncStreamTests
             for item in errorStream {
                 results.Add(item)
             }
-            result <- results.Count
+            result <- len(results)
         ";
         var interpreter = new LangInterpreter();
 
@@ -432,7 +432,7 @@ public class AsyncStreamTests
             for value in statefulStream {
                 results.Add(value)
             }
-            result <- results[results.Count - 1]
+            result <- results[-1]
         ";
         var interpreter = new LangInterpreter();
 
@@ -468,7 +468,7 @@ public class AsyncStreamTests
             for num in fibonacciStream {
                 numbers.Add(num)
             }
-            result <- numbers[numbers.Count - 1]
+            result <- numbers[-1]
         ";
         var interpreter = new LangInterpreter();
 
@@ -493,7 +493,7 @@ public class AsyncStreamTests
                 buffer <- {}
                 for i in [1~5] {
                     buffer.Add(i)
-                    if buffer.Count = 3 {
+                    if len(buffer) == 3 {
                         for item in buffer {
                             yield item
                         }
@@ -530,9 +530,9 @@ public class AsyncStreamTests
         // Arrange
         var code = @"
             longStream <- async {
-                for i in [1~10]0 {
+                for i in [1~100] {
                     yield i
-                    if i = 10 {
+                    if i == 10 {
                         break
                     }
                 }
@@ -576,7 +576,7 @@ public class AsyncStreamTests
             for item in exceptionStream {
                 results.Add(item)
             }
-            result <- results.Count
+            result <- len(results)
         ";
         var interpreter = new LangInterpreter();
 
@@ -599,13 +599,13 @@ public class AsyncStreamTests
         var code = @"
             parallelStream1 <- async {
                 for i in [1~3] {
-                    await async.Sleep(10)
+                    await Task.Delay(10)
                     yield i * 2
                 }
             }
             parallelStream2 <- async {
                 for i in [1~3] {
-                    await async.Sleep(10)
+                    await Task.Delay(10)
                     yield i * 3
                 }
             }
@@ -617,7 +617,7 @@ public class AsyncStreamTests
             for item2 in parallelStream2 {
                 results.Add(item2)
             }
-            result <- results.Count
+            result <- len(results)
         ";
         var interpreter = new LangInterpreter();
 
@@ -638,9 +638,8 @@ public class AsyncStreamTests
         // Arrange
         var code = @"
             timedStream <- async {
-                startTime <- async.Now()
                 for i in [1~3] {
-                    await async.Sleep(50)
+                    await Task.Delay(50)
                     yield i
                 }
             }
@@ -709,7 +708,7 @@ public class AsyncStreamTests
         // Arrange
         var code = @"
             cachedStream <- async {
-                cache <- {}
+                cache <- dict()
                 for i in [1~5] {
                     if not cache.ContainsKey(i) {
                         cache[i] <- i * i
@@ -754,7 +753,7 @@ public class AsyncStreamTests
                         yield ""success after "" + attempts.ToStr() + "" attempts""
                         break
                     } catch {
-                        if attempts = maxAttempts {
+                        if attempts == maxAttempts {
                             yield ""failed after "" + maxAttempts.ToStr() + "" attempts""
                         }
                     }

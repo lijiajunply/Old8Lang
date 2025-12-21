@@ -205,15 +205,22 @@ public class Operation(
 
                 if (Right != null)
                 {
-                    // 检查是否是索引访问
-                    var listIndexResult = Right.Run(manager);
-                    if (listIndexResult is IntLangValue intValue)
+                    // 先尝试将 Right 作为属性或方法调用传递给 Dot 方法
+                    // 这样可以处理像 .Count 这样的属性访问
+                    try
                     {
-                        return list.Get(intValue);
+                        return list.Dot(Right, manager);
                     }
-
-                    // 如果不是整数索引，则作为方法调用处理
-                    return list.Dot(Right, manager);
+                    catch (InvalidOperationError)
+                    {
+                        // 如果 Dot 方法无法处理，则尝试作为索引访问
+                        var listIndexResult = Right.Run(manager);
+                        if (listIndexResult is IntLangValue intValue)
+                        {
+                            return list.Get(intValue);
+                        }
+                        throw;
+                    }
                 }
             }
             else if (dotLeftResult is NativeStaticAny native)
