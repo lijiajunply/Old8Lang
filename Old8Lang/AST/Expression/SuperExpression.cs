@@ -1,6 +1,5 @@
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.AnyValues;
-using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
@@ -47,7 +46,7 @@ public class SuperExpression(SourcePosition position = default) : LangExpression
 /// <summary>
 /// Super代理类，用于延迟解析父类成员访问
 /// </summary>
-public class SuperProxy(AnyLangValue currentInstance, VariateManager manager, SourcePosition position = default)
+public class SuperProxy(AnyLangValue currentInstance, VariateManager variateManager, SourcePosition position = default)
     : LangValueType(position)
 {
     /// <summary>
@@ -73,20 +72,18 @@ public class SuperProxy(AnyLangValue currentInstance, VariateManager manager, So
     /// </summary>
     private LangValueType CallParentConstructor(Instance instance, VariateManager manager)
     {
-        var parentClassName = instance.Id.IdName;
-
-        // 获取父类元数据
-        var parentMetadata = GetParentMetadata(parentClassName, manager);
+        // 获取父类元数据（使用当前实例的直接父类）
+        var parentMetadata = GetDirectParentMetadata();
         if (parentMetadata == null)
         {
-            throw new InvalidOperationError(this, $"找不到父类 '{parentClassName}'");
+            throw new InvalidOperationError(this, "当前类没有父类");
         }
 
         // 查找父类的构造函数（init 或与类名相同的方法）
         var initMethods = parentMetadata.MethodTable.LookupMethod("init");
         if (initMethods == null || initMethods.Count == 0)
         {
-            initMethods = parentMetadata.MethodTable.LookupMethod(parentClassName);
+            initMethods = parentMetadata.MethodTable.LookupMethod(parentMetadata.ClassName);
         }
 
         if (initMethods == null || initMethods.Count == 0)
@@ -117,7 +114,7 @@ public class SuperProxy(AnyLangValue currentInstance, VariateManager manager, So
 
         // 查找父类方法
         var methods = parentMetadata.MethodTable.LookupMethod(memberName);
-        if (methods != null && methods.Count > 0)
+        if (methods is { Count: > 0 })
         {
             // 返回第一个方法（如果有重载,在调用时解析）
             return methods[0].Implementation;
@@ -161,7 +158,7 @@ public class SuperProxy(AnyLangValue currentInstance, VariateManager manager, So
             return null;
         }
 
-        return GetParentMetadata(parentClassName, manager);
+        return GetParentMetadata(parentClassName, variateManager);
     }
 
     /// <summary>

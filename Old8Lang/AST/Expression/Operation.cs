@@ -497,6 +497,7 @@ public class Operation(
                     {
                         typeName = rightIsResult.ToString();
                     }
+
                     break;
                 }
             }
@@ -1797,10 +1798,7 @@ public class Operation(
                 if (targetType is TypeTemplate targetTypeTemplate)
                 {
                     var targetMetadata = targetTypeTemplate.BuildMetadata(manager);
-                    if (targetMetadata != null)
-                    {
-                        return anyValue.Metadata.IsAssignableTo(targetMetadata, manager);
-                    }
+                    return anyValue.Metadata.IsAssignableTo(targetMetadata, manager);
                 }
             }
             catch

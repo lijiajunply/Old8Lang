@@ -68,7 +68,7 @@ public class AwaitExpression : LangExpression
     /// <summary>
     /// 生成 IL 代码（编译器模式）
     /// 实现真正的异步等待，使用 .NET 的 await 模式
-    /// 支持 Task 和 Task<object> 两种类型
+    /// 支持 Task 和 Task&lt;object&gt; 两种类型
     /// </summary>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {

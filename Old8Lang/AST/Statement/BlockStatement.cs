@@ -122,9 +122,7 @@ public class BlockStatement : OldStatement
         for (int i = startIndex; i < OtherStatements.Count; i++)
         {
             var statement = OtherStatements[i];
-            System.Console.WriteLine($"[DEBUG BLOCK] Executing statement {i}: {statement.GetType().Name}");
             statement.Run(manager);
-            System.Console.WriteLine($"[DEBUG BLOCK] After statement {i}, HasYielded={context.HasYielded}");
 
             // 检查是否遇到yield（通过生成器上下文而非全局标志）
             if (context.HasYielded)
@@ -149,14 +147,12 @@ public class BlockStatement : OldStatement
                     // 对于其他语句中的yield，保存下一个语句的位置
                     context.CurrentStatementIndex = i + 1;
                 }
-                System.Console.WriteLine($"[DEBUG BLOCK] Returning after yield, CurrentStatementIndex={context.CurrentStatementIndex}");
                 return;
             }
 
             // 检查是否遇到return或其他控制流
             if (manager.IsReturn || context.IsCompleted)
             {
-                System.Console.WriteLine($"[DEBUG BLOCK] Early exit: IsReturn={manager.IsReturn}, IsCompleted={context.IsCompleted}");
                 // 标记生成器完成
                 context.IsCompleted = true;
                 context.CurrentStatementIndex = 0;
@@ -167,7 +163,6 @@ public class BlockStatement : OldStatement
             // 如果在块内遇到 break 或 continue，应该立即停止执行后续语句
             if (manager.ControlFlowManager.BreakFlag || manager.ControlFlowManager.ContinueFlag)
             {
-                System.Console.WriteLine($"[DEBUG BLOCK] Early exit: BreakFlag={manager.ControlFlowManager.BreakFlag}, ContinueFlag={manager.ControlFlowManager.ContinueFlag}");
                 return;
             }
         }

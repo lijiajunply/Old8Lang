@@ -13,7 +13,7 @@ namespace Old8Lang.AST.Expression;
 /// </summary>
 public class AsyncStreamExpression : LangExpression
 {
-    public readonly BlockStatement Block;
+    private readonly BlockStatement Block;
 
     /// <summary>
     /// 构造函数
@@ -58,7 +58,8 @@ public class AsyncStreamExpression : LangExpression
         }
 
         // 不应该到达这里
-        throw new InvalidOperationException($"Unexpected result type from AsyncFuncLangValue.Run(): {result.GetType().Name}");
+        throw new InvalidOperationException(
+            $"Unexpected result type from AsyncFuncLangValue.Run(): {result.GetType().Name}");
     }
 
     /// <summary>
