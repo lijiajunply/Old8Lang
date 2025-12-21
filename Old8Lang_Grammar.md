@@ -1,245 +1,334 @@
 # Old8Lang 语法文档
 
-## 1. 概述
+**最后更新**: 2025年12月
 
-Old8Lang 是一种动态类型的编程语言，具有类似 C#/Java 的语法结构，同时支持解释执行和编译执行。本文档详细介绍了 Old8Lang 的语法规则，包括词法、语法和语义。
+## 1. 简介
+
+Old8Lang（老八语言）是一种动态类型编程语言，具有类似 C#/Java 的语法。它支持两种执行模式：
+
+- **解释模式** (`-f`): 直接执行代码，无需编译
+- **编译模式** (`-c`): 先编译为中间代码再执行，性能更高
 
 ## 2. 词法规则
 
-### 2.1 标识符
+### 2.1 注释
 
-标识符用于表示变量名、函数名、类名等，规则如下：
-- 必须以字母或下划线开头
+Old8Lang 仅支持单行注释，使用 `//` 开头：
+
+```old8
+// 这是一个注释
+a <- 123  // 行尾注释也支持
+```
+
+### 2.2 标识符
+
+标识符用于表示变量、函数、类等名称，规则如下：
+
+- 必须以字母或下划线 `_` 开头
 - 可以包含字母、数字和下划线
 - 区分大小写
+- 不能是关键字
 
-### 2.2 关键字
+示例：`myVar`, `_private`, `MyClass123`
 
-以下是 Old8Lang 的关键字：
+### 2.3 关键字
+
+Old8Lang 有以下关键字（不可作为标识符使用）：
 
 ```
-if elif else for while switch case default func class interface implements return try catch finally import and or xor not true false in as throw async await mixin
+if elif else for while switch case default
+func async class mixin interface extends implements with
+return break continue throw yield
+try catch finally
+import from as native
+true false null
+and or xor not in
+public private static
+this super
+await spawn
 ```
 
-### 2.3 字面量
+### 2.4 字面量
 
-#### 2.3.1 整数字面量
+#### 2.4.1 整数字面量
 
-整数字面量用于表示整数值，例如：
-```
+表示整数的值：
+
+```old8
 123
 -456
 0
+999_999_999  // 数字分隔符（可选）
 ```
 
-#### 2.3.2 浮点数字面量
+#### 2.4.2 浮点数字面量
 
-浮点数字面量用于表示浮点数值，例如：
-```
+表示浮点数值，支持科学计数法：
+
+```old8
 3.14
 -0.5
 1.0
+1.23e3      // 1230
+1.23E-4     // 0.000123
+2e10        // 20000000000
 ```
 
-#### 2.3.3 字符串字面量
+#### 2.4.3 字符串字面量
 
-字符串字面量用于表示字符串，使用双引号包围，例如：
-```
+使用双引号 `"` 包围，支持转义序列：
+
+```old8
 "hello world"
-""
+"line1\nline2"
+"quote: \"hello\""
+""  // 空字符串
 ```
 
-#### 2.3.4 字符字面量
+支持的转义序列：`\n`, `\t`, `\r`, `\\`, `\"`
 
-字符字面量用于表示单个字符，使用单引号包围，例如：
-```
+#### 2.4.4 字符字面量
+
+使用单引号 `'` 包围，表示单个字符：
+
+```old8
 'a'
 '1'
 '\n'
+'\\'
 ```
 
-#### 2.3.5 布尔字面量
+#### 2.4.5 布尔字面量
 
-布尔字面量用于表示布尔值，只有两个值：
-```
+```old8
 true
 false
 ```
 
+#### 2.4.6 空值字面量
+
+```old8
+null
+```
+
+### 2.5 运算符和分隔符
+
+#### 算术运算符
+
+| 运算符 | 含义 | 示例 | 结果 |
+|-------|------|------|------|
+| `+` | 加法 | `5 + 3` | `8` |
+| `-` | 减法 | `5 - 3` | `2` |
+| `*` | 乘法 | `5 * 3` | `15` |
+| `/` | 除法 | `6 / 2` | `3` |
+| `%` | 取模 | `7 % 3` | `1` |
+| `^` | 幂运算 | `2 ^ 3` | `8` |
+
+#### 比较运算符
+
+| 运算符 | 含义 | 示例 |
+|-------|------|------|
+| `==` | 等于 | `5 == 5` → `true` |
+| `!=` | 不等于 | `5 != 3` → `true` |
+| `<` | 小于 | `3 < 5` → `true` |
+| `>` | 大于 | `5 > 3` → `true` |
+| `<=` | 小于等于 | `3 <= 5` → `true` |
+| `>=` | 大于等于 | `5 >= 5` → `true` |
+
+#### 逻辑运算符
+
+| 运算符 | 含义 | 示例 |
+|-------|------|------|
+| `and` 或 `&&` | 逻辑与 | `true and false` → `false` |
+| `or` 或 `\|\|` | 逻辑或 | `true or false` → `true` |
+| `xor` | 逻辑异或 | `true xor false` → `true` |
+| `not` | 逻辑非 | `not true` → `false` |
+
+#### 赋值和成员访问
+
+| 运算符 | 含义 |
+|-------|------|
+| `<-` | 赋值 |
+| `.` | 成员访问 |
+| `:` | 类型注解 |
+| `->` | 函数返回类型注解 |
+| `?` | 三元条件 |
+
 ## 3. 数据类型
+
+Old8Lang 是动态类型语言，变量在运行时可以改变类型。但支持可选的类型注解进行静态检查。
 
 ### 3.1 基本数据类型
 
-| 类型名   | 描述           | 示例               |
-|---------|---------------|-------------------|
-| int     | 整数类型       | `123`             |
-| double  | 浮点数类型     | `3.14`            |
-| string  | 字符串类型     | `"hello"`         |
-| bool    | 布尔类型       | `true`            |
-| char    | 字符类型       | `'a'`             |
+| 类型名 | 描述 | 示例 |
+|--------|------|------|
+| `int` | 整数 | `123`, `-456` |
+| `double` | 浮点数 | `3.14`, `1.23e-4` |
+| `string` | 字符串 | `"hello"` |
+| `char` | 字符 | `'a'` |
+| `bool` | 布尔值 | `true`, `false` |
+| `null` | 空值 | `null` |
 
 ### 3.2 复合数据类型
 
-#### 3.2.1 数组
+#### 3.2.1 数组（Array）
 
-数组是一种有序集合，可以包含任意类型的元素，使用方括号表示：
+有序集合，使用方括号 `[]`，长度固定：
 
-```
-[1, 2, 3, 4, 5]
-["a", "b", "c"]
-```
-
-#### 3.2.2 列表
-
-列表是一种动态数组，可以随时添加或删除元素。使用花括号 `{}` 表示：
-
-```
-{1, 2, 3}
-{"a", "b", "c"}
-{}  // 空列表
+```old8
+arr <- [1, 2, 3, 4, 5]
+arr <- [1, "two", 3.0]  // 元素可以是不同类型
+arr[0]  // 访问第一个元素，结果为 1
+arr[1]  // 访问第二个元素，结果为 "two"
 ```
 
-#### 3.2.3 字典
+#### 3.2.2 列表（List）
 
-字典是一种键值对集合，使用花括号和冒号表示。通过第一个元素是否包含冒号来区分列表和字典：
+动态数组，使用花括号 `{}`，长度可变：
 
-```
-{"name": "Alice", "age": 30}
-{1: "one", 2: "two"}
-```
-
-#### 3.2.4 元组
-
-元组是一种固定长度的有序集合，可以包含不同类型的元素：
-
-```
-(1, "a", true) // 会被解析成嵌套元组 (1, ("a", true))
-("hello", 3.14)
-// 不支持 (1,) 这种
+```old8
+list <- {1, 2, 3}
+list <- {"apple", "banana", "cherry"}
+list.Add(4)          // 添加元素
+list.Remove(2)       // 删除元素
+list[0]              // 访问元素
 ```
 
-#### 3.2.5 范围
+#### 3.2.3 字典（Dictionary）
 
-范围用于表示一个数值范围，使用波浪号表示：
+键值对集合，使用花括号 `{}` 和冒号 `:`：
 
+```old8
+dict <- {"name": "Alice", "age": 30}
+dict <- {1: "one", 2: "two", 3: "three"}
+dict["name"]  // 访问值，结果为 "Alice"
+dict["city"] <- "New York"  // 添加或更新
 ```
-[1~10]
-[0~5]
+
+**列表和字典的区分**：
+- 列表：`{1, 2, 3}` 或 `{}`（空列表）
+- 字典：`{"key": value, ...}`（包含冒号）
+
+#### 3.2.4 元组（Tuple）
+
+固定长度的有序集合，使用圆括号 `()`：
+
+```old8
+tuple <- (1, "hello")
+tuple <- (10, 20, 30)
+// 访问方式：通过结构化模式或索引
+```
+
+注意：Old8Lang 中元组可以嵌套，如 `(1, ("a", true))`
+
+#### 3.2.5 范围（Range）
+
+表示数值范围，使用方括号和波浪号：
+
+```old8
+range <- [1~10]      // 从 1 到 10（包含两端）
+range <- [1~<10]     // 从 1 到 10（不包含 10）
+range <- [1>~10]     // 从 1 到 10（不包含 1）
+range <- [1>~<10]    // 从 1 到 10（两端都不包含）
 ```
 
 ## 4. 表达式
 
-### 4.1 算术表达式
+### 4.1 运算符优先级（从高到低）
 
-Old8Lang 支持以下算术运算符：
+1. 后缀运算符：`++`, `--`
+2. 一元运算符：`-`, `not`
+3. 幂运算：`^`
+4. 乘除模：`*`, `/`, `%`
+5. 加减：`+`, `-`
+6. 比较：`<`, `>`, `<=`, `>=`
+7. 相等：`==`, `!=`
+8. 逻辑与：`and`, `&&`
+9. 逻辑异或：`xor`
+10. 逻辑或：`or`, `||`
+11. 三元运算符：`?` `:`
+12. 赋值：`<-`
 
-| 运算符 | 描述 | 示例 |
-|-------|------|------|
-| +     | 加法 | `a + b` |
-| -     | 减法 | `a - b` |
-| *     | 乘法 | `a * b` |
-| /     | 除法 | `a / b` |
-| %     | 取模 | `a % b` |
-| ^     | 幂运算 | `a ^ b` |
+### 4.2 基本表达式
 
-### 4.2 比较表达式
-
-Old8Lang 支持以下比较运算符：
-
-| 运算符 | 描述 | 示例 |
-|-------|------|------|
-| ==    | 等于 | `a == b` |
-| !=    | 不等于 | `a != b` |
-| <     | 小于 | `a < b` |
-| >     | 大于 | `a > b` |
-| <=    | 小于等于 | `a <= b` |
-| >=    | 大于等于 | `a >= b` |
-
-### 4.3 逻辑表达式
-
-Old8Lang 支持以下逻辑运算符：
-
-| 运算符 | 描述 | 示例 |
-|-------|------|------|
-| and   | 逻辑与 | `a and b` |
-| or    | 逻辑或 | `a or b` |
-| xor   | 逻辑异或 | `a xor b` |
-| not   | 逻辑非 | `not a` |
-
-### 4.5 成员访问表达式
-
-使用点号 `.` 访问对象的成员：
-
-```
-obj.field
-obj.method()
-```
-
-### 4.6 索引表达式
-
-使用方括号 `[]` 访问数组、列表或字典的元素：
-
-```
-array[0]
-myList[1]  // 访问列表元素
-dict["key"]
-```
-
-### 4.7 函数调用表达式
-
-使用圆括号 `()` 调用函数：
-
-```
-func()
-func(a, b)
-```
-
-### 4.8 成员访问表达式
-
-使用点号 `.` 访问对象的成员：
-
-```
-obj.field
-obj.method()
-```
-
-### 4.9 三元表达式
-
-使用问号 `?` 和冒号 `:` 表示条件表达式：
-
-```
+```old8
 a <- 10
 b <- 20
-c <- a > b ? a : b
+c <- a + b
+d <- a > b ? "a is greater" : "b is greater"
+```
+
+### 4.3 成员访问
+
+使用点号 `.` 访问对象成员和方法：
+
+```old8
+obj.field              // 访问字段
+obj.method()           // 调用方法
+obj.method(arg1, arg2) // 带参数的方法调用
+```
+
+### 4.4 索引访问
+
+使用方括号 `[]` 访问数组、列表、字典元素：
+
+```old8
+arr[0]       // 数组访问
+list[1]      // 列表访问
+dict["key"]  // 字典访问
+dict[1]      // 字典也可以用数字作为键
+```
+
+### 4.5 切片（Slice）
+
+对数组或列表进行切片操作：
+
+```old8
+arr <- [1, 2, 3, 4, 5]
+slice <- arr[1:3]  // 从索引 1 到 3（不包含 3）
+```
+
+### 4.6 类型转换
+
+使用 `as` 关键字进行显式类型转换：
+
+```old8
+a <- 123
+b <- a as double      // 转换为 double
+c <- b as int         // 转换为 int
+d <- a as string      // 转换为 string
+```
+
+### 4.7 三元表达式
+
+条件表达式：
+
+```old8
+max <- a > b ? a : b
+message <- x == 0 ? "zero" : "non-zero"
+```
+
+### 4.8 String Templates（字符串模板）
+
+使用 C# 风格的字符串模板，`$"..."` 中使用 `{}` 嵌入表达式：
+
+```old8
+name <- "Alice"
+age <- 30
+message <- $"My name is {name}, I'm {age} years old."
+
+// 转义大括号
+escaped <- $"This is {{escaped}} bracket"
+mixed <- $"Value: {x + 1}, Literal: {{5}}"
 ```
 
 ## 5. 语句
 
-### 5.0 赋值语句
-
-使用 `<-` 运算符进行赋值：
-
-```
-a <- 123
-b <- a + 1
-```
-
-同时也支持给数组、列表、字典和类属性赋值：
-
-```
-array[0] <- 100
-myList[1] <- "new item"
-dict["key"] <- 42
-obj.field <- "new value"
-```
-
-Old8Lang **不支持链式赋值语句**（如 `a <- b <- 1`） 也不支持 **赋值表达式**。
-
 ### 5.1 块语句
 
-块语句由一对花括号 `{}` 包围，包含多个语句：
+用花括号 `{}` 包围多个语句：
 
-```
+```old8
 {
     a <- 1
     b <- 2
@@ -247,1244 +336,837 @@ Old8Lang **不支持链式赋值语句**（如 `a <- b <- 1`） 也不支持 **�
 }
 ```
 
-### 5.2 变量声明与赋值
+### 5.2 变量声明
 
-变量声明使用 `:` 语法指定类型（类型假注），赋值使用 `<-` 运算符：
+使用赋值运算符 `<-` 声明和初始化变量：
 
+```old8
+a <- 123              // 声明并赋值
+b <- 3.14             // 类型自动推断为 double
+name <- "Alice"       // 类型自动推断为 string
 ```
-a <- 123
-b <- 3.14
-c:string <- "hello" // 类型假注
+
+### 5.3 类型注解
+
+使用冒号 `:` 为变量添加类型注解：
+
+```old8
+a:int <- 123          // 明确指定为 int 类型
+b:double <- 3.14      // 明确指定为 double 类型
+c:string <- "hello"   // 明确指定为 string 类型
+
+// 类型不匹配会导致错误
+x:int <- 123
+x <- "hello"  // ❌ 错误：不能将 string 赋值给 int 类型的变量
 ```
 
-### 5.3 控制流语句
+### 5.4 控制流语句
 
-#### 5.3.1 if-elif-else 语句
+#### 5.4.1 if-elif-else 语句
 
-```
-if condition {
-    // 条件为真时执行
-} elif condition2 {
-    // 条件2为真时执行
+```old8
+if x > 10 {
+    PrintLine("x is greater than 10")
+} elif x > 5 {
+    PrintLine("x is greater than 5")
 } else {
-    // 所有条件都为假时执行
+    PrintLine("x is less than or equal to 5")
 }
 ```
 
-#### 5.3.2 for 语句
+#### 5.4.2 for 循环
 
-```
+基于条件的循环：
+
+```old8
 for i <- 0, i < 10, i++ {
-    // 循环体
+    PrintLine("i = " + i)
+}
+
+// 也可以使用 -- 递减
+for i <- 10, i > 0, i-- {
+    PrintLine("i = " + i)
 }
 ```
 
-#### 5.3.3 while 语句
+#### 5.4.3 while 循环
 
-```
-while condition {
-    // 循环体
+```old8
+while x < 100 {
+    x <- x * 2
 }
 ```
 
-#### 5.3.4 for-in 语句
+#### 5.4.4 for-in 循环
 
-```
-for item in collection {
-    // 循环体
+遍历集合的元素：
+
+```old8
+items <- [1, 2, 3, 4, 5]
+for item in items {
+    PrintLine(item)
+}
+
+// 遍历字典（键值对）
+dict <- {"a": 1, "b": 2}
+for key, value in dict {
+    PrintLine(key + " = " + value)
+}
+
+// ⚠️ 注意：不能在 for-in 循环中修改循环变量
+for x in list {
+    x <- x + 1  // ❌ 错误
 }
 ```
 
-在 for in 中，禁止更改循环变量的值。
+#### 5.4.5 switch 语句
 
-#### 5.3.5 switch 语句
-
-```
-switch expression {
-    case value1 {
-        // 匹配 value1 时执行
+```old8
+switch x {
+    case 1 {
+        PrintLine("x is 1")
     }
-    case value2 {
-        // 匹配 value2 时执行
+    case 2 {
+        PrintLine("x is 2")
     }
     default {
-        // 无匹配时执行
+        PrintLine("x is something else")
     }
 }
 ```
 
-### 5.4 函数声明与调用
+### 5.5 函数声明
 
-#### 5.4.1 函数声明
-
-```
-func add(a:int, b:int) {
-    return a + b
-}
-// 或者这样
-add(a:int, b:int) -> {
-    return a + b
-}
-
-// 也可以给 func 添加返回值类型假注
-func add(a:int, b:int) -> int {
-    return a + b
-}
-
-add:int (a:int, b:int) -> {
-    return a + b
-}
-```
-
-#### 5.4.2 编译模式类型注解要求
-
-在编译模式下（使用 `-c` 选项），函数声明有额外要求：
-
-1. **参数类型要求**：所有函数参数必须满足以下之一
-   - 显式声明类型注解：`param:int`
-   - 提供默认值以推断类型：`param: 123`
-2. **返回类型注解是强制的**：函数返回类型必须显式声明，不能通过return推断
-3. **Lambda参数类型注解是强制的**：Lambda表达式的参数必须有类型注解（不支持默认参数）
-4. **Lambda返回类型可以推断**：Lambda的返回类型可以从表达式或return语句推断
-
-| 特性 | 解释器模式 | 编译模式 |
-|------|----------|---------|
-| 函数参数类型注解 | 可选 | **必须**（或有默认值） |
-| 函数参数默认值推断 | 支持 | **支持** |
-| 函数返回类型注解 | 可选（可推断） | **必须** |
-| Lambda参数类型注解 | 可选 | **必须** |
-| Lambda返回类型注解 | 可选（可推断） | 可选（可推断） |
-
-正确示例（编译模式）：
+#### 5.5.1 基本函数声明
 
 ```old8
-// 方式1：完整类型注解的函数
-func add(a:int, b:int) -> int {
+// 方式1：使用 func 关键字
+func add(a, b) {
     return a + b
 }
 
-// 方式2：使用默认值推断参数类型
-func greet(name:string, message: "Hello") -> void {
-    PrintLine(message + ", " + name)
+// 方式2：省略 func 关键字
+add(a, b) {
+    return a + b
 }
 
-// 方式3：混合使用类型注解和默认值
-func calculate(x:int, y: 0, operation: "add") -> int {
-    if operation == "add" {
-        return x + y
-    } else {
-        return x * y
-    }
-}
-
-// void返回类型
-func printMessage(msg:string) -> void {
-    PrintLine(msg)
-}
-
-// Lambda参数有类型，返回类型可推断
-multiply <- (a:int, b:int) -> a * b
-```
-
-错误示例（编译模式）：
-
-```old8
-// 错误：缺少返回类型
-func calculate(x:int, y:int) {
-    return x + y
-}
-
-// 错误：参数既没有类型也没有默认值
+// 方式3：使用 -> 指定返回类型
 func add(a, b) -> int {
     return a + b
 }
 
-// 错误：Lambda参数缺少类型
+// 方式4：函数签名完整
+func add(a:int, b:int) -> int {
+    return a + b
+}
+```
+
+#### 5.5.2 参数和默认值
+
+```old8
+// 有类型注解
+func greet(name:string, age:int) {
+    PrintLine("Hello, " + name)
+}
+
+// 有默认值
+func greet(name:string, greeting: "Hello") {
+    PrintLine(greeting + ", " + name)
+}
+
+// 混合使用
+func configure(host:string, port: 8080, debug: false) {
+    // ...
+}
+```
+
+#### 5.5.3 编译模式类型要求
+
+在编译模式下 (`-c`)，函数声明有以下额外要求：
+
+**必须满足的规则**：
+
+1. **所有参数必须有类型信息**
+   - 显式类型注解：`param:int`
+   - 或提供默认值用于类型推断：`param: 123`
+
+2. **返回类型必须显式声明**
+   - 使用 `->` 指定返回类型
+   - 或使用返回类型注解语法：`func name:int(...)`
+
+3. **Lambda 参数类型必须显式声明**
+   - Lambda 不支持默认值推断
+
+**正确示例**（编译模式）：
+
+```old8
+// ✅ 完整类型注解
+func calculate(x:int, y:int) -> int {
+    return x + y
+}
+
+// ✅ 使用默认值推断参数类型
+func process(value: 0, name: "default") -> string {
+    return name
+}
+
+// ✅ Lambda 参数需要类型注解
+multiply <- (a:int, b:int) -> a * b
+
+// ✅ void 返回类型
+func printMsg(msg:string) -> void {
+    PrintLine(msg)
+}
+```
+
+**错误示例**（编译模式）：
+
+```old8
+// ❌ 缺少返回类型
+func add(a:int, b:int) {
+    return a + b
+}
+
+// ❌ 参数既没有类型也没有默认值
+func process(a, b) -> int {
+    return a + b
+}
+
+// ❌ Lambda 参数缺少类型
 transform <- (x) -> x * 2
 ```
 
-**默认参数类型推断说明**：
+#### 5.5.4 Lambda 表达式
 
-当参数提供默认值时，编译器会从默认值自动推断参数类型：
+匿名函数，用于简洁表达：
 
 ```old8
-func example(
-    intParam: 123,           // 推断为 int
-    doubleParam: 3.14,       // 推断为 double
-    stringParam: "text",     // 推断为 string
-    boolParam: true          // 推断为 bool
-) -> void {
-    // 函数体
-}
-```
-
-注意：
-- 默认参数推断在**验证阶段**生效，能通过编译模式的类型检查
-- 由于编译器IL生成的已知限制，带默认参数的函数在编译模式下可能遇到运行时问题
-- 解释器模式下默认参数完全正常工作
-
-#### 5.4.3 函数调用
-
-```
-result <- add(1, 2)
-```
-
-#### 5.4.4 Lambda 表达式
-
-```
+// 表达式形式
+square <- (x:int) -> x * x
 add <- (a:int, b:int) -> a + b
+
+// 块形式
+greet <- (name:string) -> {
+    PrintLine("Hello, " + name)
+}
 ```
 
-#### 5.4.5 异步函数
+#### 5.5.5 访问修饰符
 
-异步函数允许在不阻塞主线程的情况下执行耗时操作，使用 `async func` 关键字定义：
+可以为函数添加访问修饰符：
 
 ```old8
-// 基本异步函数定义
-async func asyncAdd(a:int, b:int) -> int {
-    return a + b
+public func publicFunc() {
+    // 公开函数
 }
 
-// 异步函数另一种语法
-async asyncAdd2(a:int, b:int) -> int {
-    return a + b
+private func privateFunc() {
+    // 私有函数
 }
 
-// 带有延迟的异步函数
-async func delayedHello() -> string {
-    await Task.Delay(1000)
-    return "Hello after delay"
+static func staticFunc() {
+    // 静态函数
 }
 ```
 
-异步函数的特点：
-- 内部可以使用 `await` 关键字等待其他异步操作
-- 返回值会自动包装为 `Task` 对象
-- 调用异步函数会立即返回 `Task` 对象，不会阻塞当前线程
-- 通过 `await` 可以获取异步函数的返回结果
+### 5.6 类声明
 
-#### 5.4.6 await 表达式
-
-`await` 关键字用于等待异步操作完成，只能在异步函数内部使用：
+#### 5.6.1 基本类声明
 
 ```old8
-async func asyncOperation() {
-    // 等待一个异步函数完成
-    result <- await asyncAdd(1, 2)
-    
-    // 等待 Task.Delay 完成
-    await Task.Delay(500)
-    
-    // 等待多个任务完成
-    results <- await Task.WhenAll([asyncAdd(1, 2), asyncAdd(3, 4), asyncAdd(5, 6)])
-    
-    // 等待第一个完成的任务
-    firstResult <- await Task.WhenAny([asyncAdd(1, 2), delayedHello()])
-}
-```
-
-#### 5.4.7 异步流与异步迭代
-
-Old8Lang 支持异步流（Async Stream）和异步迭代，类似于 C# 的 `IAsyncEnumerable<T>`。异步流允许以异步方式生成和遍历数据序列。
-
-**异步生成器函数**
-
-使用 `async func` 和 `yield` 关键字创建异步生成器：
-
-```old8
-// 创建异步流生成器
-async func createAsyncStream() {
-    i <- 1
-    while i <= 5 {
-        await Task.Delay(100)  // 模拟异步操作
-        yield i                 // 生成值
-        i <- i + 1
-    }
-}
-
-// 带参数的异步生成器
-async func rangeAsync(start:int, end:int) {
-    i <- start
-    while i <= end {
-        await Task.Delay(50)
-        yield i
-        i <- i + 1
-    }
-}
-```
-
-**async for-in 循环**
-
-使用 `async for-in` 语法遍历异步流：
-
-```old8
-// 遍历异步流
-async func processStream() {
-    stream <- createAsyncStream()
-
-    async for item in stream {
-        PrintLine("Received: " + item.ToStr())
-    }
-}
-
-// 带参数的异步流
-stream <- rangeAsync(1, 10)
-async for num in stream {
-    PrintLine(num.ToStr())
-}
-```
-
-**异步流的特点**：
-- 异步生成器函数使用 `async func` 声明，内部包含 `yield` 语句
-- 调用异步生成器函数会返回 `AsyncGeneratorLangValue` 对象
-- 使用 `async for-in` 循环遍历异步流
-- 支持 `break` 和 `continue` 语句
-- 每次迭代会异步等待下一个值的产生
-- 可以在异步生成器中使用 `await` 执行其他异步操作
-
-**键值对迭代**：
-
-```old8
-async func keyValueStream() {
-    yield ("key1", "value1")
-    yield ("key2", "value2")
-    yield ("key3", "value3")
-}
-
-stream <- keyValueStream()
-async for key, value in stream {
-    PrintLine(key + " = " + value)
-}
-```
-
-### 5.5 类声明与实例化
-
-#### 5.5.1 类声明
-
-```
 class Person {
-    public name:string <- ""
-    age:int <- 0
+    public name <- ""
+    age <- 0
     
-    func init(name:string, age:int) {
-        this.name <- name
-        this.age <- age
+    func init(n:string, a:int) {
+        name <- n
+        age <- a
     }
     
-    public func sayHello() {
-        PrintLine("Hello, my name is " + name)
+    func sayHello() {
+        PrintLine("Hello, I'm " + name)
     }
+}
+
+// 实例化
+p <- Person("Alice", 30)
+p.sayHello()
+```
+
+#### 5.6.2 访问修饰符
+
+```old8
+class Example {
+    public publicField <- 1      // 公开字段
+    private privateField <- 2    // 私有字段
+    static staticField <- 3      // 静态字段
+    
+    public func publicMethod() { }
+    private func privateMethod() { }
+    static func staticMethod() { }
 }
 ```
 
-标识符分别为 public、private、protected、static
+#### 5.6.3 类继承
 
-#### 5.5.2 Mixin 声明
+```old8
+class Animal {
+    public name <- ""
+    
+    func speak() {
+        PrintLine("Some sound")
+    }
+}
 
-Mixin 是一种特殊的类，用于提供可重用的功能模块，可以被多个类使用。
+class Dog extends Animal {
+    func speak() {
+        PrintLine("Woof!")
+    }
+}
 
+dog <- Dog()
+dog.speak()  // 输出：Woof!
 ```
+
+#### 5.6.4 Mixin（混入）
+
+Mixin 提供可重用的功能模块：
+
+```old8
 mixin Logger {
-    public func log(message) {
+    public func log(message:string) {
         PrintLine("[LOG] " + message)
     }
 }
 
 mixin Serializable {
     public func serialize() {
-        return "Serialized object"
-    }
-}
-```
-
-#### 5.5.3 使用 Mixin
-
-类可以通过 `with` 关键字应用一个或多个 mixin：
-
-```
-// 应用单个 mixin
-class User extends BaseClass with Logger {
-    func init(name) {
-        this.name <- name
-        log("User created: " + name)
+        return "Serialized"
     }
 }
 
-// 应用多个 mixin
-class Product extends BaseClass with Logger, Serializable {
-    public price <- 0.0
+class User extends BaseClass with Logger, Serializable {
+    public name <- ""
     
-    func init(name, price) {
-        this.name <- name
-        this.price <- price
-        log("Product created: " + name)
+    func init(n:string) {
+        name <- n
+        this.log("User created")
     }
 }
+
+user <- User("Bob")
+user.log("Doing something")
 ```
 
-#### 5.5.4 接口声明
+#### 5.6.5 接口声明
 
-接口是一种抽象类型，定义了类必须实现的方法签名，但不包含方法实现。使用 `interface` 关键字声明接口：
+接口定义方法签名但不实现方法体：
 
-```
-interface IDrawable {
+```old8
+interface Drawable {
     func draw() -> void
 }
 
-interface IResizable {
+interface Resizable {
     func resize(width:int, height:int) -> void
 }
-```
 
-#### 5.5.5 实现接口
-
-类可以通过 `implements` 关键字实现一个或多个接口：
-
-```
-// 实现单个接口
-class Circle implements IDrawable {
-    func draw() -> void {
-        PrintLine("Drawing circle")
-    }
-}
-
-// 实现多个接口
-class Rectangle implements IDrawable, IResizable {
+class Rectangle implements Drawable, Resizable {
     func draw() -> void {
         PrintLine("Drawing rectangle")
     }
     
     func resize(width:int, height:int) -> void {
-        PrintLine("Resizing rectangle to " + width + "x" + height)
+        PrintLine("Resizing to " + width.ToStr() + "x" + height.ToStr())
     }
 }
 ```
 
-接口实现要求：
-- 实现类必须实现接口中声明的所有方法
-- 方法签名（参数类型、返回类型）必须与接口中声明的完全一致
-- 接口方法默认为 public，实现类中的对应方法也必须是 public
+### 5.7 异步编程
 
-#### 5.5.6 继承与接口结合
-
-类可以同时继承一个父类和实现多个接口：
-
-```
-class AdvancedShape extends BaseShape implements IDrawable, IResizable, IColorable {
-    func draw() -> void {
-        PrintLine("Drawing advanced shape")
-    }
-    
-    func resize(width:int, height:int) -> void {
-        PrintLine("Resizing advanced shape")
-    }
-    
-    func setColor(color:string) -> void {
-        PrintLine("Setting color to " + color)
-    }
-}
-```
-
-#### 5.5.7 类实例化
-
-```
-p <- Person("Alice", 30)
-p.sayHello()
-
-t <- Test(1, 2)  // 调用带有参数的构造函数
-
-// 接口类型的使用
-drawable:IDrawable <- Circle()
-drawable.draw()  // 调用接口方法
-```
-
-### 5.6 多线程
-
-Old8Lang 支持多线程编程，允许创建和管理线程执行并行任务：
-
-#### 5.6.1 创建和启动线程
-
-使用 `spawn` 函数创建并启动新线程：
+#### 5.7.1 async/await 基础
 
 ```old8
-// 定义线程函数
-func threadMain() {
-    PrintLine("Thread is running")
+// 定义异步函数
+async func fetchData() -> string {
+    return "Data from server"
+}
+
+// 在异步函数中使用 await
+async func main() {
+    data <- await fetchData()
+    PrintLine(data)
+}
+```
+
+#### 5.7.2 异步生成器（Async Generator）
+
+结合 `yield` 和 `async` 创建异步流：
+
+```old8
+async func countAsync() {
+    i <- 1
+    while i <= 5 {
+        await Task.Delay(100)
+        yield i
+        i <- i + 1
+    }
+}
+
+// 使用 async for-in 消费异步流
+async func processStream() {
+    stream <- countAsync()
+    async for num in stream {
+        PrintLine(num.ToStr())
+    }
+}
+```
+
+#### 5.7.3 Task API
+
+```old8
+// 延迟执行
+await Task.Delay(1000)  // 延迟 1 秒
+
+// 等待多个任务
+results <- await Task.WhenAll([
+    asyncAdd(1, 2),
+    asyncAdd(3, 4),
+    asyncAdd(5, 6)
+])
+
+// 等待第一个完成
+first <- await Task.WhenAny([asyncFunc1(), asyncFunc2()])
+```
+
+### 5.8 多线程编程
+
+#### 5.8.1 创建线程
+
+使用 `spawn` 函数：
+
+```old8
+func worker(id:int) {
+    PrintLine("Worker " + id.ToStr() + " started")
+    // 执行工作
 }
 
 // 创建并启动线程
-thread <- spawn(threadMain)
+t <- spawn(worker(1))
 
 // 等待线程完成
-thread.Join()
-
-// 使用带参数的线程函数
-func printNumber(num) {
-    PrintLine("Number: " + num)
-}
-
-// 传递参数给线程函数
-thread2 <- spawn(printNumber(42))
-thread2.Join()
+t.Join()
 ```
 
-#### 5.6.2 线程的其他操作
+#### 5.8.2 线程管理
 
 ```old8
-// 获取当前线程
+// 当前线程
 currentThread <- Thread.CurrentThread()
 
 // 线程休眠
-Thread.Sleep(1000)  // 休眠 1 秒
+Thread.Sleep(1000)
 
-// 线程状态查询
-if thread.IsAlive() {
-    PrintLine("Thread is still running")
-} else {
-    PrintLine("Thread has completed")
+// 检查线程状态
+if t.IsAlive() {
+    PrintLine("Thread is running")
 }
 ```
 
-#### 5.6.3 多线程同步
+### 5.9 异常处理
+
+#### 5.9.1 try-catch-finally
 
 ```old8
-// 使用锁进行线程同步
-lockObject <- Object()
-
-counter <- 0
-
-func incrementCounter() {
-    for i <- 0, i < 1000, i++ {
-        // 锁保证同一时刻只有一个线程执行锁内代码
-        lock(lockObject) {
-            counter <- counter + 1
-        }
-    }
-}
-
-// 创建多个线程执行增量操作
-threads <- []
-for i <- 0, i < 10, i++ {
-    thread <- spawn(incrementCounter)
-    threads.Add(thread)
-}
-
-// 等待所有线程完成
-for thread in threads {
-    thread.Join()
-}
-
-PrintLine("Final counter: " + counter)  // 应该输出 10000
-```
-
-#### 5.6.4 spawn 函数的特点
-
-- `spawn` 函数用于创建并立即启动新线程
-- 可以接受带参数的函数调用
-- 返回值是一个 `Thread` 对象，可用于后续的线程管理
-- 支持传递多个参数给线程函数
-- 线程函数执行完后，线程自动终止
-
-#### 5.6.5 多线程与异步的区别
-
-| 特性 | 多线程 (spawn) | 异步 (async/await) |
-|------|---------------|-------------------|
-| 资源消耗 | 较高（创建线程开销） | 较低（基于任务调度） |
-| 并发模型 | 并行执行 | 异步非阻塞 |
-| 适用场景 | CPU密集型任务 | I/O密集型任务 |
-| 调度 | 操作系统线程调度 | 任务调度器 |
-| 上下文切换 | 较高开销 | 较低开销 |
-| 编程复杂度 | 较高（需要手动同步） | 较低（编译器处理异步流程） |
-
-#### 5.6.6 高级并发原语
-
-Old8Lang 提供了高级并发原语，帮助处理复杂的多线程同步场景。这些原语通过 `Async` 库提供。
-
-##### ReadWriteLock（读写锁）
-
-读写锁允许多个读者同时访问资源，或单个写者独占访问资源，适用于读多写少的场景：
-
-```old8
-import Async
-
-// 创建读写锁
-rwLock <- ReadWriteLockCreate()
-
-// 读者线程 - 多个读者可以同时读取
-func reader(id:int) -> void {
-    ReadLockAcquire(rwLock)
-    PrintLine("读者 " + id.ToStr() + " 正在读取")
-    Thread.Sleep(100)
-    ReadLockRelease(rwLock)
-}
-
-// 写者线程 - 写者独占访问
-func writer(id:int) -> void {
-    WriteLockAcquire(rwLock)
-    PrintLine("写者 " + id.ToStr() + " 正在写入")
-    Thread.Sleep(100)
-    WriteLockRelease(rwLock)
-}
-
-// 启动多个读者
-for i <- 0, i < 3, i++ {
-    spawn(reader, i)
-}
-
-// 尝试获取锁（带超时）
-success <- ReadLockTryAcquire(rwLock, 1000)
-if success {
-    ReadLockRelease(rwLock)
-}
-
-// 清理资源
-ReadWriteLockDispose(rwLock)
-```
-
-**ReadWriteLock 方法：**
-- `ReadWriteLockCreate()` - 创建读写锁
-- `ReadLockAcquire(lockId)` - 获取读锁
-- `ReadLockRelease(lockId)` - 释放读锁
-- `WriteLockAcquire(lockId)` - 获取写锁
-- `WriteLockRelease(lockId)` - 释放写锁
-- `ReadLockTryAcquire(lockId, timeoutMs)` - 尝试获取读锁（带超时）
-- `WriteLockTryAcquire(lockId, timeoutMs)` - 尝试获取写锁（带超时）
-- `ReadWriteLockDispose(lockId)` - 释放读写锁资源
-
-##### CountDownLatch（倒计时锁）
-
-倒计时锁用于等待一组操作完成，计数器归零后所有等待的线程都会继续执行：
-
-```old8
-import Async
-
-// 创建倒计时锁，初始计数为3
-latch <- CountDownLatchCreate(3)
-
-// 工作线程
-func worker(id:int) -> void {
-    PrintLine("工作线程 " + id.ToStr() + " 开始工作")
-    Thread.Sleep(1000)
-    PrintLine("工作线程 " + id.ToStr() + " 完成工作")
-
-    // 完成工作后倒计时
-    CountDownLatchCountDown(latch)
-}
-
-// 启动3个工作线程
-for i <- 0, i < 3, i++ {
-    spawn(worker, i)
-}
-
-PrintLine("主线程等待所有工作线程完成...")
-
-// 等待计数归零
-CountDownLatchWait(latch)
-
-PrintLine("所有工作线程已完成，主线程继续执行")
-
-// 清理资源
-CountDownLatchDispose(latch)
-```
-
-**CountDownLatch 方法：**
-- `CountDownLatchCreate(count)` - 创建倒计时锁
-- `CountDownLatchCountDown(latchId)` - 倒计时减1
-- `CountDownLatchWait(latchId)` - 等待计数归零
-- `CountDownLatchWaitTimeout(latchId, timeoutMs)` - 等待计数归零（带超时）
-- `CountDownLatchGetCount(latchId)` - 获取当前计数
-- `CountDownLatchDispose(latchId)` - 释放倒计时锁资源
-
-##### CyclicBarrier（循环栅栏）
-
-循环栅栏是一个同步点，所有参与者线程都到达栅栏后才能继续执行。与 CountDownLatch 不同，CyclicBarrier 可以重复使用：
-
-```old8
-import Async
-
-// 创建循环栅栏，3个参与者
-barrier <- CyclicBarrierCreate(3)
-
-// 参与者线程
-func participant(id:int) -> void {
-    // 第一阶段工作
-    PrintLine("参与者 " + id.ToStr() + " 完成第一阶段")
-    CyclicBarrierAwait(barrier)  // 等待其他参与者
-
-    // 第二阶段工作
-    PrintLine("参与者 " + id.ToStr() + " 完成第二阶段")
-    CyclicBarrierAwait(barrier)  // 再次等待（循环使用）
-
-    PrintLine("参与者 " + id.ToStr() + " 全部完成")
-}
-
-// 启动3个参与者
-threads <- {}
-for i <- 0, i < 3, i++ {
-    t <- spawn(participant, i)
-    threads.Add(t)
-}
-
-// 等待所有参与者完成
-for t in threads {
-    t.Join()
-}
-
-// 清理资源
-CyclicBarrierDispose(barrier)
-```
-
-**CyclicBarrier 方法：**
-- `CyclicBarrierCreate(participantCount)` - 创建循环栅栏
-- `CyclicBarrierAwait(barrierId)` - 等待所有参与者到达
-- `CyclicBarrierAwaitTimeout(barrierId, timeoutMs)` - 等待所有参与者到达（带超时）
-- `CyclicBarrierGetParticipantCount(barrierId)` - 获取参与者数量
-- `CyclicBarrierGetWaitingCount(barrierId)` - 获取当前等待的线程数
-- `CyclicBarrierDispose(barrierId)` - 释放循环栅栏资源
-
-**使用场景：**
-
-| 并发原语 | 适用场景 | 特点 |
-|---------|---------|------|
-| ReadWriteLock | 读多写少的共享数据访问 | 允许多个读者或单个写者 |
-| CountDownLatch | 等待一组操作完成 | 一次性使用，计数归零后不可重置 |
-| CyclicBarrier | 多线程协同分阶段执行 | 可重复使用，所有线程同步 |
-
-### 5.7 异常处理
-
-#### 5.7.1 try-catch-finally 语句
-
-```
 try {
-    // 可能抛出异常的代码
+    result <- 10 / 0
 } catch (e) {
-    // 捕获所有类型的异常
+    PrintLine("Caught error: " + e)
 } finally {
-    // 无论是否异常都执行
+    PrintLine("Cleanup")
 }
 ```
 
-#### 5.6.2 throw 语句
+#### 5.9.2 throw 语句
 
-throw 语句用于显式抛出异常，可以抛出任意类型的表达式作为异常信息：
-
-```
-// 抛出字符串异常
-throw "错误信息"
-
-// 抛出数字异常
-throw 123
-
-// 抛出布尔值异常
-throw true
-
-// 抛出数组异常
+```old8
+throw "Something went wrong"
+throw 42
 throw [1, 2, 3]
 
-// 抛出函数调用结果
-throw getError()
-```
-
-throw 语句可以在任何地方使用，包括函数、循环、条件语句等。当执行到 throw 语句时，程序会立即停止当前执行路径，并将异常传递给最近的 try-catch 块处理：
-
-```
-try {
-    throw "异常信息"
-} catch (e) {
-    PrintLine("捕获到异常: " + e)
+// 在函数中
+func divide(a:int, b:int) {
+    if b == 0 {
+        throw "Division by zero"
+    }
+    return a / b
 }
 ```
 
-### 5.7 导入语句
+### 5.10 其他语句
 
-Old8Lang 支持多种导入语法，包括传统导入、命名导入和重命名导入：
+#### 5.10.1 return 语句
 
-#### 5.7.1 传统导入
+```old8
+func getValue() {
+    return 42
+}
 
-```
-import "module"
-import module
-```
-
-#### 5.7.2 命名导入
-
-从模块中导入指定的函数或变量：
-
-```
-import { func1, var1 } from "module"
-import { func2, var2 } from module
+func noReturn() {
+    return  // 无返回值
+}
 ```
 
-#### 5.7.3 重命名导入
-
-将导入的项重命名为指定名称：
-
-```
-import { A as B, C as D } from "module"
-import { oldName as newName } from module
-```
-
-#### 5.7.4 混合导入
-
-同时使用命名导入和重命名导入：
-
-```
-import { func3, var3 as v3 } from "module"
-```
-
-### 5.8 原生库导入语句
-
-Old8Lang 支持导入原生 DLL 库中的类和方法，以便调用外部功能。原生库导入语句使用 `native` 关键字，支持以下几种形式：
-
-#### 5.8.1 单个方法导入 (nativeStatement)
-
-**语法规则**：`native "dllName" className methodName alias?`
-
-**描述**：导入原生 DLL 中的特定方法，并可选地指定别名。
-
-**示例**：
-
-```
-native "console.dll" console Write print
-native "console.dll" console WriteLine printline
-```
-
-#### 5.8.2 批量导入所有方法
-
-**语法规则**：`native "dllName" className *`
-
-**描述**：导入原生 DLL 中某个类的所有公共静态方法。大大简化了标准库的引入。
-
-**示例**：
-
-```
-// 导入 MathLib 的所有方法（53个方法只需1行）
-native "Old8LangLib" MathLib *
-
-// 导入后可直接使用所有方法
-result <- Sqrt(16)     // 调用 Sqrt 方法
-pi <- GetPi()          // 调用 GetPi 方法
-sinVal <- Sin(1.57)    // 调用 Sin 方法
-```
-
-**优势**：
-- 从 53 行导入语句减少到 1 行
-- 自动导入类中的所有公共静态方法
-- 避免遗漏方法
-- 代码更简洁易读
-
-#### 5.8.3 选择性导入多个方法
-
-**语法规则**：`native "dllName" className { method1, method2, method3 }`
-
-**描述**：按需导入原生 DLL 中某个类的特定方法，用逗号分隔多个方法名。
-
-**示例**：
-
-```
-// 只导入 Time 类的两个方法
-native "Old8LangLib" Time { GetTimeNow, TimeStamp }
-
-// 导入后可以使用这两个方法
-timeStr <- GetTimeNow("yyyy-MM-dd HH:mm:ss")
-stamp <- TimeStamp()
-```
-
-**优势**：
-- 按需导入，避免命名冲突
-- 代码更明确，容易理解使用了哪些方法
-- 减少不必要的方法导入
-
-#### 5.8.4 静态类导入 (nativeStatic)
-
-**语法规则**：`native "dllName" className -> alias`
-
-**描述**：导入原生 DLL 中的静态类或静态方法集，并指定别名。
-
-**示例**：
-
-```
-native "Math.dll" Math -> Math
-```
-
-#### 5.8.5 完整类导入 (nativeClass)
-
-**语法规则**：`native "dllName" className`
-
-**描述**：导入原生 DLL 中的完整类，包括所有方法和属性。
-
-**示例**：
-
-```
-native "Person.dll" Person
-```
-
-#### 5.8.6 带别名的类导入 (nativeClass with alias)
-
-**语法规则**：`native "dllName" className as alias`
-
-**描述**：导入原生 DLL 中的完整类，并使用指定的别名进行注册。这使得类导入更加明确，并且可以避免命名冲突。
-
-**示例**：
-
-```
-// 导入 Old8LangLib.Csv 类，并命名为 CsvUtil
-native "Old8LangLib" Csv as CsvUtil
-
-// 使用别名创建实例或访问类
-csv <- CsvUtil
-```
-
-**优势**：
-
-- 提高代码可读性，明确类的来源和用途
-- 避免类名冲突（例如，当不同库中有同名类时）
-- 使代码重构更容易（只需修改别名，不影响使用代码）
-- 支持为长类名创建简短别名
-
-**注意事项**：
-
-- 使用别名后，只能通过别名访问该类，原始类名不可用
-- 别名必须是有效的标识符
-- 建议将所有导入语句（包括别名导入）放在文件开头
-
-#### 原生库导入的作用
-
-- 允许 Old8Lang 代码调用外部 C# DLL 中的功能
-- 支持调用静态方法和实例方法
-- 支持导入整个类或特定方法
-- 支持批量导入和选择性导入
-- 可用于扩展 Old8Lang 的功能，如访问系统 API、使用第三方库等
-
-#### 使用建议
-
-1. **批量导入** (`*`)：适用于需要使用类中大部分方法的场景，如标准库
-2. **选择性导入** (`{ }`)：适用于只需要使用少数几个方法的场景，避免命名冲突
-3. **单个方法导入**：适用于需要为方法指定别名的场景
-4. **别名类导入** (`as`)：适用于避免类名冲突、提高代码可读性或为长类名创建简短别名的场景
-5. **导入位置**：建议将所有导入语句放在文件开头，避免解析歧义
-
-## 6. 类型系统
-
-### 6.1 动态类型
-
-Old8Lang 为动态类型语言，变量的类型可以在运行时改变：
-
-```
-a <- 123  // a 为 int 类型
-a <- "hello"  // a 变为 string 类型
-```
-
-### 6.2 类型假注
-
-可以使用 `:` 语法为变量添加类型假注，指定变量的预期类型：
-
-```
-a:int <- 123  // a 被标记为 int 类型
-```
-
-### 6.3 类型检查
-
-如果进行了类型假注，就需要保持类型不变，否则会产生报错：
-
-```
-a:int <- 123  // 正确，a 为 int 类型
-a <- 456  // 正确，仍然是 int 类型
-a <- "hello"  // 错误，不能将 string 类型赋值给标记为 int 类型的变量
-```
-
-### 6.4 类型转换
-
-使用 `as` 关键字进行类型转换：
-
-```
-a:int <- 123
-b:double <- a as double
-```
-
-### 6.5 类型转换规则
-
-Old8Lang 支持以下类型转换规则：
-
-| 源类型 | 目标类型 | 规则 |
-|--------|----------|------|
-| int    | double   | 直接转换 |
-| double | int      | 取整 |
-| string | int/double | 解析数值 |
-| int/double | string | 转换为字符串 |
-
-## 7. 特殊语法
-
-### 7.1 字符串模板
-
-使用 `$""` 语法来创建字符串模板（C# 风格），在字符串内部支持 `{}` 占位符和 `{{}}` 转义：
-
-```
-name <- "Alice"
-age <- 30
-message <- $"My name is {name}, I'm {age} years old."
-PrintLine(message)
-```
-
-1. `$(".")` - 基本字符串模板
-2. `$"This is {10}"` - 在模板中嵌入表达式
-3. `{{` - 转义 `{` 字符
-4. `}}` - 转义 `}` 字符
-
-例如：
-```
-// 基本使用
-name <- "Alice"
-result <- $"Hello, {name}"
-
-// 转义大括号
-escaped <- $"This is {{escaped}} bracket"
-
-// 混合使用
-mixed <- $"Name: {name}, Escaped: {{escaped}}"
-```
-
-### 7.2 列表推导式
-
-```
-numbers <- [1, 2, 3, 4, 5]
-squares <- [x * x for x in numbers]
-```
-
-### 7.3 范围表达式
-
-```
-// 创建一个从 1 到 10 的范围
-range <- [1~10]
-
-// 使用范围进行循环
-for i in range {
+#### 5.10.2 break 和 continue
+
+```old8
+for i <- 0, i < 10, i++ {
+    if i == 5 {
+        break  // 跳出循环
+    }
+    if i % 2 == 0 {
+        continue  // 跳过当前迭代
+    }
     PrintLine(i)
 }
 ```
 
-## 8. 示例代码
+#### 5.10.3 yield 语句
 
-### 8.1 基本类型和表达式
-
-```old8
-// 整数类型
-a:int <- 123
-
-// 浮点数类型
-b:double <- 3.14
-
-// 字符串类型
-c:string <- "hello world"
-
-// 布尔类型
-d:bool <- true
-e:bool <- false
-
-// 字符类型
-f:char <- 'a'
-
-// 数组类型
-g:array <- [1, 2, 3, 4, 5]
-
-// 字典类型
-h:dictionary <- {"name": "Alice", "age": 30}
-
-// 表达式
-i <- a + 1
-j <- b * 2
-k <- c + "!"
-l <- d and e
-m <- a > b
-```
-
-### 8.2 控制流
+在生成器函数中产生值：
 
 ```old8
-// if-elif-else
-if a > 100 {
-    PrintLine("a 大于 100")
-} elif a > 50 {
-    PrintLine("a 大于 50 小于等于 100")
-} else {
-    PrintLine("a 小于等于 50")
+func generateNumbers() {
+    yield 1
+    yield 2
+    yield 3
 }
 
-// for 循环
-for i <- 0, i < 10, i++ {
-    PrintLine("i = " + i)
-}
-
-// while 循环
-j <- 0
-while j < 5 {
-    PrintLine("j = " + j)
-    j <- j + 1
-}
-
-// for-in 循环
-for item in g {
-    PrintLine("item = " + item)
+for num in generateNumbers() {
+    PrintLine(num)
 }
 ```
 
-### 8.3 函数和类
+### 5.11 导入语句
+
+#### 5.11.1 简单导入
 
 ```old8
-// 函数声明
-func add(x:int, y:int) -> {
-    return x + y
-}
-
-// 函数调用
-result <- add(1, 2)
-PrintLine("1 + 2 = " + result)
-
-// 类声明
-class Calculator {
-    func multiply(x:int, y:int) -> {
-        return x * y
-    }
-    
-    func divide(x:double, y:double) -> {
-        if y == 0 {
-            PrintLine("除数不能为零")
-            return 0.0
-        }
-        return x / y
-    }
-}
-
-// 类实例化和方法调用
-calc <- Calculator()
-product <- calc.multiply(3, 4)
-PrintLine("3 * 4 = " + product)
-
-quotient <- calc.divide(10.0, 2.0)
-PrintLine("10.0 / 2.0 = " + quotient)
+import "math"
+import math
 ```
 
-### 8.4 异常处理
+#### 5.11.2 命名导入
 
 ```old8
-try {
-    // 可能抛出异常的代码
-    result <- 10 / 0
-} catch (e) {
-    PrintLine("捕获到异常: " + e)
-} finally {
-    PrintLine("无论是否异常，都会执行这里")
-}
+import { sqrt, pow } from "math"
+import { sin, cos } from math
 ```
 
-### 8.5 异步编程示例
+#### 5.11.3 带别名的导入
 
 ```old8
-// 基本异步函数
-async func asyncAdd(a:int, b:int) -> int {
+import { sqrt as square_root } from "math"
+import { MyClass as MC } from "utils"
+```
+
+### 5.12 原生库导入
+
+导入 C# DLL 中的功能：
+
+#### 5.12.1 单个方法导入
+
+```old8
+native "Math.dll" MathLib Sqrt sqrt
+```
+
+#### 5.12.2 批量导入所有方法
+
+```old8
+native "Old8LangLib" MathLib *
+
+// 之后可以直接使用所有方法
+result <- Sqrt(16)
+pi <- GetPi()
+```
+
+#### 5.12.3 选择性导入
+
+```old8
+native "Old8LangLib" Time { GetTimeNow, TimeStamp }
+```
+
+#### 5.12.4 类导入
+
+```old8
+native "Math.dll" MathLib -> MathLib
+native "Data.dll" DataClass as DC
+```
+
+## 6. 集合操作
+
+### 6.1 列表方法
+
+```old8
+list <- {1, 2, 3}
+
+list.Add(4)           // 添加元素
+list.Remove(2)        // 删除元素
+list.Clear()          // 清空列表
+list.Count()          // 获取元素数量
+list.Contains(2)      // 检查是否包含元素
+list.Join(",")        // 使用分隔符连接元素
+```
+
+### 6.2 数组方法
+
+```old8
+arr <- [1, 2, 3, 4, 5]
+
+arr.Length        // 获取长度
+arr.Reverse()     // 反转
+arr.Sort()        // 排序
+```
+
+### 6.3 字典方法
+
+```old8
+dict <- {"a": 1, "b": 2}
+
+dict.Add("c", 3)        // 添加
+dict.Remove("a")        // 删除
+dict.Clear()            // 清空
+dict.ContainsKey("a")   // 检查键
+dict.GetOrElse("x", 0)  // 获取或返回默认值
+```
+
+### 6.4 字符串方法
+
+```old8
+str <- "Hello, World"
+
+str.Length              // 长度
+str.ToUpper()           // 转大写
+str.ToLower()           // 转小写
+str.Substring(0, 5)     // 截取
+str.Contains("World")   // 检查包含
+str.Split(",")          // 分割
+str.Replace("World", "Old8")  // 替换
+```
+
+## 7. 类型系统
+
+### 7.1 动态类型
+
+```old8
+x <- 10      // 推断为 int
+x <- "hello" // 改变为 string，推断为 string
+x <- 3.14    // 改变为 double
+```
+
+### 7.2 类型注解
+
+```old8
+// 变量类型注解
+x:int <- 10
+
+// 函数参数类型注解
+func add(a:int, b:int) -> int {
     return a + b
 }
 
-// 带有 await 的异步函数
-async func fetchData() -> string {
-    PrintLine("开始获取数据...")
-    await Task.Delay(1500)
-    PrintLine("数据获取完成")
-    return "Hello, Async!"
-}
-
-// 主异步函数
-async func main() {
-    // 调用并等待异步函数
-    result <- await asyncAdd(5, 3)
-    PrintLine("5 + 3 = " + result)
-    
-    // 等待获取数据
-    data <- await fetchData()
-    PrintLine("获取到的数据: " + data)
-    
-    // 并行执行多个异步操作
-    tasks <- [
-        Task.Delay(1000).ThenTask(() -> "Task 1 done"),
-        Task.Delay(500).ThenTask(() -> "Task 2 done"),
-        Task.Delay(1500).ThenTask(() -> "Task 3 done")
-    ]
-    
-    results <- await Task.WhenAll(tasks)
-    PrintLine("并行任务结果: " + results)
-}
-
-// 调用主异步函数
-mainTask <- main()
-mainTask.Join()
+// 无效的赋值会抛出错误
+x <- "hello"  // ❌ 类型不匹配
 ```
 
-### 8.6 多线程示例
+### 7.3 类型转换
 
 ```old8
-// 线程函数
-func workerThread(threadId:int) {
-    for i <- 0, i < 5, i++ {
-        PrintLine("Thread " + threadId + ": " + i)
-        Thread.Sleep(100)
-    }
-}
+a <- 123
+b <- a as double      // int → double
+c <- b as string      // double → string
+d <- c as int         // string → int
 
-// 主函数
-func main() {
-    // 使用 spawn 函数创建并启动多个线程
-    threads <- []
-    for i <- 0, i < 3, i++ {
-        // 创建并启动线程，传递参数
-        thread <- spawn workerThread(i)
-        threads.Add(thread)
-    }
-    
-    // 等待所有线程完成
-    for thread in threads {
-        thread.Join()
-    }
-    
-    PrintLine("All threads completed")
-}
-
-// 执行主函数
-main()
+// 类型转换规则
+// int ↔ double (直接转换)
+// 数值 ↔ string (通过 ToStr()/解析)
+// bool ↔ string ("true"/"false")
 ```
 
-## 9. 编译与执行
+## 8. 常用内置函数
 
-### 9.1 解释模式
+### 8.1 输出函数
 
-解释模式下，Old8Lang 代码会逐条解释执行，无需编译。
+```old8
+Print("Hello")      // 输出文本，无换行
+PrintLine("Hello")  // 输出文本，有换行
+```
 
-**异步和多线程支持**：
-- 完全支持异步函数 (`async func`)
-- 完全支持 `await` 表达式
-- 完全支持 `spawn` 函数创建多线程
-- 支持 Task API 和异步流
+### 8.2 类型转换函数
 
-### 9.2 编译模式
+```old8
+value.ToStr()       // 转换为字符串
+value.ToInt()       // 转换为整数
+value.ToDouble()    // 转换为浮点数
+value.ToBool()      // 转换为布尔值
+```
 
-编译模式下，Old8Lang 代码会先被编译成中间代码，然后再执行。
+### 8.3 数学函数（需导入 MathLib）
 
-**异步和多线程支持**：
-- 当前编译模式下异步功能暂未完全支持
-- 多线程功能 (`spawn` 函数) 已支持
-- 建议在解释模式下开发和测试异步代码
-- 编译模式下使用异步功能可能会遇到运行时错误
+```old8
+native "Old8LangLib" MathLib *
 
-## 10. 总结
+result <- Sqrt(16)          // 平方根
+result <- Pow(2, 3)         // 幂运算
+result <- Sin(1.57)         // 正弦
+result <- Abs(-42)          // 绝对值
+result <- Floor(3.7)        // 向下取整
+result <- Ceil(3.2)         // 向上取整
+```
 
-Old8Lang 是一种功能丰富的动态类型编程语言，具有清晰的语法结构和强大的表达能力。本文档详细介绍了 Old8Lang 的语法规则，包括词法、语法和语义，特别是新增的异步编程和多线程功能。
+## 9. 执行模式对比
 
-通过学习本文档，您应该能够理解和编写 Old8Lang 代码，包括：
-- 基本语法和数据类型
-- 控制流语句和函数
-- 类、继承和 mixin
-- 异常处理和导入机制
-- 异步编程模型（async/await）
-- Task API 和异步流
-- 多线程编程（spawn 函数）
+### 9.1 解释模式 (`-f`)
 
-Old8Lang 支持解释模式和编译模式，为不同场景提供了灵活的选择。在解释模式下，您可以快速开发和测试代码，而编译模式则提供了更高的执行效率。
+- 无需编译，直接执行
+- 支持完整的类型推断
+- 完整支持异步/多线程
+- 性能较低，适合开发调试
+
+```bash
+dotnet run --project Old8Lang.App -- -f program.old8
+```
+
+### 9.2 编译模式 (`-c`)
+
+- 编译为中间代码再执行
+- 需要完整的类型注解
+- 多线程支持良好
+- 异步功能部分支持
+- 性能较高，适合生产环境
+
+```bash
+dotnet run --project Old8Lang.App -- -c program.old8
+```
+
+### 9.3 语法检查模式 (`-s`)
+
+仅检查语法，不执行代码：
+
+```bash
+dotnet run --project Old8Lang.App -- -s program.old8
+```
+
+## 10. 示例代码
+
+### 10.1 斐波那契数列
+
+```old8
+func fibonacci(n:int) -> int {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+result <- fibonacci(10)
+PrintLine("F(10) = " + result.ToStr())
+```
+
+### 10.2 类和继承
+
+```old8
+class Shape {
+    public name <- ""
+    
+    func init(n:string) {
+        name <- n
+    }
+    
+    func getArea() {
+        return 0
+    }
+}
+
+class Circle extends Shape {
+    public radius <- 0.0
+    
+    func init(n:string, r:double) {
+        name <- n
+        radius <- r
+    }
+    
+    func getArea() {
+        return 3.14 * radius * radius
+    }
+}
+
+circle <- Circle("MyCircle", 5.0)
+PrintLine("Area: " + circle.getArea().ToStr())
+```
+
+### 10.3 异步编程
+
+```old8
+async func downloadData() -> string {
+    await Task.Delay(1000)
+    return "Downloaded data"
+}
+
+async func main() {
+    PrintLine("Starting download...")
+    data <- await downloadData()
+    PrintLine("Received: " + data)
+}
+
+task <- main()
+await task
+```
+
+### 10.4 异常处理
+
+```old8
+func divide(a:int, b:int) {
+    if b == 0 {
+        throw "Cannot divide by zero"
+    }
+    return a / b
+}
+
+try {
+    result <- divide(10, 2)
+    PrintLine("Result: " + result.ToStr())
+} catch (e) {
+    PrintLine("Error: " + e)
+} finally {
+    PrintLine("Done")
+}
+```
+
+## 11. 兼容性和局限
+
+### 11.1 已知限制
+
+- 带默认参数的函数在编译模式下可能有运行时问题
+- 某些异步特性在编译模式下支持不完整
+- 不支持泛型
+- 不支持操作符重载
+
+### 11.2 平台支持
+
+- 基于 .NET 10.0 开发
+- 跨平台支持（Windows, Linux, macOS）
+- 与 C# 代码互操作
+
+## 12. 总结
+
+Old8Lang 是一个功能完整的动态类型语言，结合了脚本语言的灵活性和系统语言的性能。通过支持两种执行模式，它既适合快速开发也适合生产环境。
+
+关键特性总结：
+- ✅ 动态类型与可选类型注解
+- ✅ 完整的面向对象支持（类、继承、Mixin、接口）
+- ✅ 异步/等待模式
+- ✅ 多线程支持
+- ✅ 异常处理
+- ✅ 函数式编程（Lambda、高阶函数）
+- ✅ 丰富的集合操作

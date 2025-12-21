@@ -1,0 +1,340 @@
+(* Old8Lang EBNF Grammar
+ * A dynamic programming language with C#/Java-like syntax
+ * Supporting both interpreter and compiler modes
+ *)
+
+root = statement* EOF ;
+
+(* ============== Statements ============== *)
+
+statement = blockStatement
+          | declarationStatement
+          | assignmentStatement
+          | expressionStatement
+          | ifStatement
+          | forStatement
+          | whileStatement
+          | forInStatement
+          | asyncForInStatement
+          | switchStatement
+          | functionDeclaration
+          | asyncFunctionDeclaration
+          | classDeclaration
+          | mixinDeclaration
+          | interfaceDeclaration
+          | functionCallStatement
+          | classMemberAccessStatement
+          | importStatement
+          | nativeStatement
+          | returnStatement
+          | breakStatement
+          | continueStatement
+          | tryStatement
+          | throwStatement
+          | yieldStatement
+          | incrementStatement
+          | decrementStatement ;
+
+blockStatement = "{" statement* "}" ;
+
+declarationStatement = identifier ( ":" type )? "<-" expression ;
+
+assignmentStatement = expression ( ":" type )? "<-" expression
+                   | indexAssignment
+                   | classMemberAssignment ;
+
+indexAssignment = identifier "[" expression "]" "<-" expression ;
+
+classMemberAssignment = expression "." identifier "<-" expression ;
+
+expressionStatement = expression ;
+
+(* Control Flow Statements *)
+
+ifStatement = "if" expression blockStatement 
+              ( "elif" expression blockStatement )* 
+              ( "else" blockStatement )? ;
+
+forStatement = "for" declarationStatement "," expression "," statement blockStatement ;
+
+whileStatement = "while" expression blockStatement ;
+
+forInStatement = "for" identifier ( "," identifier )* "in" expression blockStatement ;
+
+asyncForInStatement = "async" "for" identifier ( "," identifier )* "in" expression blockStatement ;
+
+switchStatement = "switch" expression "{" switchCase* switchDefault? "}" ;
+
+switchCase = "case" expression blockStatement ;
+
+switchDefault = "default" blockStatement ;
+
+(* Function Declarations *)
+
+functionDeclaration = accessModifier* 
+                     ( "func" identifier | identifier )
+                     "(" parameterList? ")"
+                     ( "->" type )?
+                     blockStatement ;
+
+asyncFunctionDeclaration = accessModifier*
+                          "async" "func" identifier
+                          "(" parameterList? ")"
+                          ( "->" type )?
+                          blockStatement ;
+
+parameterList = parameter ( "," parameter )* ;
+
+parameter = identifier ( ":" type )? ( "<-" expression )? ;
+
+(* Class & Mixin Declarations *)
+
+classDeclaration = accessModifier* 
+                  "class" identifier
+                  ( "extends" identifier )?
+                  ( "implements" identifierList )?
+                  classBlock ;
+
+mixinDeclaration = accessModifier*
+                  "mixin" identifier
+                  ( "extends" identifier )?
+                  classBlock ;
+
+classBlock = "{" classMember* "}" ;
+
+classMember = accessModifier* ( declarationStatement | functionDeclaration | importStatement ) ;
+
+(* Interface Declarations *)
+
+interfaceDeclaration = accessModifier*
+                      "interface" identifier
+                      interfaceBlock ;
+
+interfaceBlock = "{" interfaceMember* "}" ;
+
+interfaceMember = accessModifier* functionDeclaration ;
+
+(* Function & Class Member Access *)
+
+functionCallStatement = identifier "(" argumentList? ")" ;
+
+classMemberAccessStatement = identifier "." identifier "(" argumentList? ")" ;
+
+(* Import & Native Statements *)
+
+importStatement = "import" ( importSpecifier "from" )? ( identifier | STRING ) ;
+
+importSpecifier = "{" importItem ( "," importItem )* "}" ;
+
+importItem = identifier ( "as" identifier )? ;
+
+nativeStatement = "native" STRING identifier identifier identifier?
+                | "native" STRING identifier "*"
+                | "native" STRING identifier "{" identifierList "}"
+                | "native" STRING identifier "->" identifier
+                | "native" STRING identifier ( "as" identifier )? ;
+
+(* Control Flow & Exception Handling *)
+
+returnStatement = "return" expression? ;
+
+breakStatement = "break" ;
+
+continueStatement = "continue" ;
+
+tryStatement = "try" blockStatement catchBlock* ( "finally" blockStatement )? ;
+
+catchBlock = "catch" ( "(" identifier? ")" )? blockStatement ;
+
+throwStatement = "throw" expression ;
+
+yieldStatement = "yield" expression ;
+
+incrementStatement = identifier "++" ;
+
+decrementStatement = identifier "--" ;
+
+(* ============== Expressions ============== *)
+
+expression = ternaryExpression ;
+
+ternaryExpression = logicalOrExpression ( "?" expression ":" expression )? ;
+
+logicalOrExpression = logicalXorExpression ( ( "or" | "||" ) logicalXorExpression )* ;
+
+logicalXorExpression = logicalAndExpression ( "xor" logicalAndExpression )* ;
+
+logicalAndExpression = equalityExpression ( ( "and" | "&&" ) equalityExpression )* ;
+
+equalityExpression = comparisonExpression ( ( "==" | "!=" ) comparisonExpression )* ;
+
+comparisonExpression = rangeExpression ( ( "<" | ">" | "<=" | ">=" ) rangeExpression )* ;
+
+rangeExpression = additiveExpression ( ( "~" | "~<" | ">~" | ">~<" ) additiveExpression )? ;
+
+additiveExpression = multiplicativeExpression ( ( "+" | "-" ) multiplicativeExpression )* ;
+
+multiplicativeExpression = exponentialExpression ( ( "*" | "/" | "%" ) exponentialExpression )* ;
+
+exponentialExpression = unaryExpression ( "^" unaryExpression )* ;
+
+unaryExpression = ( "not" | "-" ) unaryExpression
+                | postfixExpression ;
+
+postfixExpression = memberAccessExpression ( ( "++" | "--" ) )? ;
+
+memberAccessExpression = primaryExpression ( "." identifier )* ;
+
+primaryExpression = literal
+                  | identifier
+                  | functionCall
+                  | classInstantiation
+                  | listLiteral
+                  | dictionaryLiteral
+                  | arrayLiteral
+                  | tupleLiteral
+                  | rangeLiteral
+                  | sliceLiteral
+                  | stringTemplate
+                  | lambdaExpression
+                  | typeConversion
+                  | parenthesizedExpression
+                  | thisExpression
+                  | awaitExpression
+                  | spawnExpression
+                  | indexAccess ;
+
+literal = integerLiteral
+        | doubleLiteral
+        | stringLiteral
+        | charLiteral
+        | booleanLiteral
+        | nullLiteral ;
+
+integerLiteral = INT ;
+
+doubleLiteral = DOUBLE ;
+
+stringLiteral = STRING ;
+
+charLiteral = CHAR ;
+
+booleanLiteral = "true" | "false" ;
+
+nullLiteral = "null" ;
+
+functionCall = identifier "(" argumentList? ")" ;
+
+classInstantiation = identifier "(" argumentList? ")" ;
+
+listLiteral = "{" ( expression ( "," expression )* )? "}" ;
+
+dictionaryLiteral = "{" keyValuePair ( "," keyValuePair )* "}" ;
+
+keyValuePair = expression ":" expression ;
+
+arrayLiteral = "[" expression ( "," expression )* "]" ;
+
+tupleLiteral = "(" expression "," expression ( "," expression )* ")" ;
+
+rangeLiteral = "[" expression "~" expression "]" ;
+
+sliceLiteral = identifier "[" expression ":" expression "]" ;
+
+stringTemplate = "$\"" templateContent "\"" ;
+
+templateContent = ( templatePart | "{" expression "}" )* ;
+
+templatePart = ~("{" | "}" | "\\")* | "\\\\" | "\\\{" | "\\\}" ;
+
+lambdaExpression = "(" parameterList? ")" "->" ( expression | blockStatement ) ;
+
+typeConversion = expression "as" type ;
+
+parenthesizedExpression = "(" expression ")" ;
+
+thisExpression = "this" ;
+
+awaitExpression = "await" expression ;
+
+spawnExpression = "spawn" "(" expression ( "," argumentList )? ")" ;
+
+indexAccess = identifier "[" expression "]" ;
+
+(* ============== Helpers ============== *)
+
+argumentList = expression ( "," expression )* ;
+
+identifierList = identifier ( "," identifier )* ;
+
+type = identifier ;
+
+accessModifier = "public" | "private" | "static" ;
+
+(* ============== Terminals ============== *)
+
+identifier = IDENTIFIER ;
+
+INT = /[0-9]+/ | /[0-9]*\.[0-9]+/ ;
+
+DOUBLE = /[0-9]*\.[0-9]+([eE][+-]?[0-9]+)?/ ;
+
+STRING = /"([^"\\]|\\.)*"/ ;
+
+CHAR = /'([^'\\]|\\.)'/ ;
+
+IDENTIFIER = /[a-zA-Z_][a-zA-Z0-9_]*/ ;
+
+EOF = End of input ;
+
+(* ============== Keywords ============== *)
+
+KEYWORDS = "if" | "elif" | "else" | "for" | "while" | "switch" | "case" | "default"
+         | "func" | "class" | "mixin" | "interface" | "extends" | "implements"
+         | "return" | "break" | "continue" | "throw" | "yield"
+         | "try" | "catch" | "finally"
+         | "import" | "from" | "as" | "native" | "with"
+         | "true" | "false" | "null"
+         | "and" | "or" | "xor" | "not" | "in"
+         | "async" | "await"
+         | "public" | "private" | "static"
+         | "this" | "super"
+         | "spawn" ;
+
+(* ============== Operators ============== *)
+
+OPERATORS = "<-"   (* assignment *)
+          | "=="   (* equality *)
+          | "!="   (* not equals *)
+          | "<="   (* less than equals *)
+          | ">="   (* greater than equals *)
+          | "&&"   (* logical and *)
+          | "||"   (* logical or *)
+          | "++"   (* increment *)
+          | "--"   (* decrement *)
+          | "->"   (* function return type *)
+          | "~"    (* range *)
+          | "~<"   (* range exclude right *)
+          | ">~"   (* range exclude left *)
+          | ">~<"  (* range exclude both *)
+          | "+"    (* addition *)
+          | "-"    (* subtraction *)
+          | "*"    (* multiplication *)
+          | "/"    (* division *)
+          | "%"    (* modulo *)
+          | "^"    (* exponentiation *)
+          | "."    (* member access *)
+          | "?"    (* ternary *)
+          | ":"    (* type annotation, dict key *)
+          | "!"    (* not *)
+          | "<"    (* less than *)
+          | ">"    (* greater than *) ;
+
+(* Notes:
+ * 1. The language supports both interpreter and compiler modes
+ * 2. Type annotations are optional in interpreter mode but required for function parameters in compiler mode
+ * 3. Lists and dictionaries both use braces {}, distinguished by presence of colons
+ * 4. Comments are single-line (//) style, not supported in this grammar
+ * 5. Async/await and generator functions (with yield) are supported
+ * 6. String templates use C# style with ${} replaced by {}
+ *)
