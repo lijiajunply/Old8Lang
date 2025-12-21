@@ -389,6 +389,14 @@ public class ForInStatement(
                         System.Console.WriteLine($"[DEBUG] Popped 'loop' marker before body.Run()");
                     }
 
+                    // 如果不是从 yield 恢复，重置 CurrentStatementIndex
+                    // 这样循环体就会从头开始执行
+                    if (!resumingFromYield)
+                    {
+                        context.CurrentStatementIndex = 0;
+                        System.Console.WriteLine($"[DEBUG] Reset CurrentStatementIndex to 0 for new iteration");
+                    }
+
                     // 执行循环体
                     System.Console.WriteLine($"[DEBUG] About to run body for i={i}, body.Count={body.Count}");
                     body.Run(manager);
@@ -409,8 +417,11 @@ public class ForInStatement(
                         return;
                     }
 
-                    // 重置 CurrentStatementIndex,准备下一次迭代
+                    // 重置 CurrentStatementIndex 和 IsCompleted，准备下一次迭代
+                    // 关键修复：在完成当前迭代后，必须重置这些标志
+                    // 否则 BlockStatement 可能会因为 IsCompleted=true 而提前退出
                     context.CurrentStatementIndex = 0;
+                    context.IsCompleted = false;
 
                     // 处理 break
                     if (manager.ControlFlowManager.BreakFlag)

@@ -18,9 +18,19 @@ public class GeneratorLangValue : LangValueType, ILangList
     public FuncLangValue Func { get; init; }
 
     /// <summary>
-    /// 生成器状态机（新架构）
+    /// 生成器状态机（旧架构）
     /// </summary>
     private GeneratorStateMachine? StateMachine { get; set; }
+
+    /// <summary>
+    /// 新生成器状态机（新架构）
+    /// </summary>
+    private NewGeneratorStateMachine? NewStateMachine { get; set; }
+
+    /// <summary>
+    /// 是否使用新状态机（暂时禁用，等完成后再启用）
+    /// </summary>
+    private static bool UseNewStateMachine { get; } = false;
 
     /// <summary>
     /// 生成器当前状态
@@ -74,34 +84,78 @@ public class GeneratorLangValue : LangValueType, ILangList
     /// <returns>生成器的下一个值</returns>
     public override LangValueType Run(VariateManager manager)
     {
-        // 如果状态机还未初始化，则创建它
-        if (StateMachine == null)
+        if (UseNewStateMachine)
         {
-            // 为生成器创建独立的变量环境
-            var generatorManager = manager.CloneForGenerator();
-
-            // 设置参数值到生成器环境中
-            foreach (var (paramName, paramValue) in ParameterValues)
+            // 使用新状态机
+            if (NewStateMachine == null)
             {
-                generatorManager.Set(new LangId(paramName), paramValue);
+                // 为生成器创建独立的变量环境
+                var generatorManager = manager.CloneForGenerator();
+
+                // 设置参数值到生成器环境中
+                foreach (var (paramName, paramValue) in ParameterValues)
+                {
+                    var id = new LangId(paramName, "", null, new SourcePosition());
+                    generatorManager.Set(id, paramValue);
+                }
+
+                // 创建新状态机
+                try
+                {
+                    NewStateMachine = GeneratorStateMachineBuilder.BuildFromFunc(Func, generatorManager);
+                }
+                catch (InvalidOperationException)
+                {
+                    // 不是生成器函数，返回空值
+                    State = GeneratorState.Completed;
+                    return new VoidLangValue();
+                }
             }
 
-            // 创建状态机
-            StateMachine = new GeneratorStateMachine(Func, generatorManager);
-        }
+            // 调用状态机的MoveNext
+            if (NewStateMachine.MoveNext())
+            {
+                // 还有更多值
+                State = GeneratorState.Suspended;
+                NextValue = NewStateMachine.CurrentValue;
+                return NextValue ?? new VoidLangValue();
+            }
 
-        // 调用状态机的MoveNext
-        if (StateMachine.MoveNext())
+            // 生成器完成
+            State = GeneratorState.Completed;
+            return new VoidLangValue();
+        }
+        else
         {
-            // 还有更多值
-            State = GeneratorState.Suspended;
-            NextValue = StateMachine.Current;
-            return NextValue ?? new VoidLangValue();
-        }
+            // 使用旧状态机
+            if (StateMachine == null)
+            {
+                // 为生成器创建独立的变量环境
+                var generatorManager = manager.CloneForGenerator();
 
-        // 生成器完成
-        State = GeneratorState.Completed;
-        return new VoidLangValue();
+                // 设置参数值到生成器环境中
+                foreach (var (paramName, paramValue) in ParameterValues)
+                {
+                    generatorManager.Set(new LangId(paramName), paramValue);
+                }
+
+                // 创建状态机
+                StateMachine = new GeneratorStateMachine(Func, generatorManager);
+            }
+
+            // 调用状态机的MoveNext
+            if (StateMachine.MoveNext())
+            {
+                // 还有更多值
+                State = GeneratorState.Suspended;
+                NextValue = StateMachine.Current;
+                return NextValue ?? new VoidLangValue();
+            }
+
+            // 生成器完成
+            State = GeneratorState.Completed;
+            return new VoidLangValue();
+        }
     }
 
     /// <summary>

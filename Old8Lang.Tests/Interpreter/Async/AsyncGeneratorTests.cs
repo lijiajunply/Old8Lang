@@ -38,7 +38,7 @@ public class AsyncGeneratorTests
         Assert.Equal(6, ((IntLangValue)result).Value); // 1+2+3 = 6
     }
 
-    [Fact(Skip = "先忽略一下，当需要修复这里的时候再开启")]
+    [Fact]
     public void AsyncGenerator_GeneratorWithParameters_AcceptsParameters()
     {
         // Arrange
@@ -166,7 +166,7 @@ public class AsyncGeneratorTests
         Assert.Equal(5, ((IntLangValue)result).Value);
     }
 
-    [Fact(Skip = "先忽略一下，当需要修复这里的时候再开启")]
+    [Fact]
     public void AsyncGenerator_ConditionalGenerator_YieldsConditionally()
     {
         // Arrange
@@ -320,7 +320,7 @@ public class AsyncGeneratorTests
         Assert.Equal("10-129", ((StringLangValue)result).Value);
     }
 
-    [Fact(Skip = "先忽略一下，当需要修复这里的时候再开启")]
+    [Fact]
     public void AsyncGenerator_FactorialGenerator_GeneratesFactorials()
     {
         // Arrange
@@ -597,7 +597,7 @@ public class AsyncGeneratorTests
         Assert.Equal(3, ((IntLangValue)result).Value);
     }
 
-    [Fact(Skip = "先忽略一下，当需要修复这里的时候再开启")]
+    [Fact]
     public void AsyncGenerator_GeneratorWithPipeline_PipelinesGenerators()
     {
         // Arrange

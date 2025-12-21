@@ -1,0 +1,20 @@
+// 测试新状态机
+func testNewStateMachine() {
+    PrintLine("=== Testing New State Machine ===")
+
+    // 简单生成器：只有 yield，没有前置语句
+    func simpleGen() {
+        yield 1
+        yield 2
+        yield 3
+    }
+
+    PrintLine("Test 1: Simple generator")
+    for x in simpleGen() {
+        PrintLine("Got: " + x.ToStr())
+    }
+
+    PrintLine()
+}
+
+testNewStateMachine()
