@@ -68,5 +68,45 @@ public static class TaskValueFuncStatic
 
             return task.RetryTask(retryCount.Value, delayMs?.Value ?? 0);
         }
+        
+        /// <summary>
+        /// 任务完成后执行下一个任务
+        /// </summary>
+        /// <param name="continuation">接收前一个任务结果并返回新任务的函数</param>
+        /// <returns>新的 TaskLangValue</returns>
+        public TaskLangValue ContinueWith(FuncLangValue continuation)
+        {
+            if (task.ExternalManager == null)
+            {
+                throw new InvalidOperationError(task.Position, "ContinueWith 方法需要有效的执行上下文（ExternalManager）");
+            }
+
+            var manager = task.ExternalManager;
+
+            var continueTask = task.Task.ContinueWith(async t =>
+            {
+                if (t.IsFaulted)
+                {
+                    throw (t.Exception?.InnerException ?? t.Exception)!;
+                }
+
+                // 调用延续函数
+                var args = new List<LangExpression> { t.Result };
+                var result = continuation.Run(manager, args);
+
+                if (result is TaskLangValue taskValue)
+                {
+                    return await taskValue.AwaitAsync();
+                }
+
+                // 如果返回的不是 Task，直接返回结果
+                return result;
+            },task.CancellationToken).Unwrap();
+
+            return new TaskLangValue(continueTask, task.CancellationToken, task.Position)
+            {
+                ExternalManager = manager
+            };
+        }
     }
 }

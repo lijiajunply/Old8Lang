@@ -647,10 +647,14 @@ public class Instance(LangId langId, List<LangExpression> ids, SourcePosition po
             {
                 argValue = Ids[i].Run(threadLangValue.ExternalManager);
             }
+            else if (baseLangValue is FuncLangValue funcLangValue)
+            {
+                argValue = funcLangValue;
+            }
             else
             {
                 // 使用传入的 manager 参数来运行表达式，而不是 null
-                argValue = Ids[i].Run(manager);
+                argValue = Ids[i].Run(manager ?? new VariateManager());
             }
 
             os.Add(argValue);

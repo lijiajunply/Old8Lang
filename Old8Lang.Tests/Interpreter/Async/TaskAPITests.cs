@@ -65,7 +65,7 @@ public class TaskAPITests
             task2 <- Task.StartNew(() -> {
                 return 200
             })
-            result <- task1.Result + task2.Result
+            result <- task1.Result() + task2.Result()
         ";
         var interpreter = new LangInterpreter();
 
@@ -113,7 +113,7 @@ public class TaskAPITests
                 throw ""Task failed""
             })
             try {
-                result <- task.Result
+                result <- task.Result()
             } catch {
                 result <- ""exception caught""
             }
@@ -140,7 +140,7 @@ public class TaskAPITests
                 return 10
             })
             continuationTask <- originalTask.ContinueWith((result) -> {
-                return result * 5
+                return result() * 5
             })
             result <- continuationTask.Result
         ";
@@ -169,7 +169,7 @@ public class TaskAPITests
             results <- allTasks.Result
             sum <- 0
             for value in results {
-                sum <- sum + value
+                sum <- sum + value()
             }
             result <- sum
         ";
@@ -467,8 +467,8 @@ public class TaskAPITests
     {
         // Arrange
         var code = @"
-            tasks <- []
-            for i in 1..5 {
+            tasks <- {}
+            for i in [1~5] {
                 task <- Task.Run(() -> {
                     // Simulate computational work
                     sum <- 0
@@ -482,7 +482,7 @@ public class TaskAPITests
             allResults <- Task.WhenAll(tasks)
             totalSum <- 0
             for taskResult in allResults.Result {
-                totalSum <- totalSum + taskResult
+                totalSum <- totalSum + taskResult()
             }
             result <- totalSum
         ";
@@ -513,11 +513,11 @@ public class TaskAPITests
                 return ""success""
             }
             async func retryOperation() {
-                for i in 1..5 {
+                for i in [1~5] {
                     try {
                         return await unreliableOperation()
                     } catch {
-                        if i = 5 {
+                        if i == 5 {
                             throw ""all attempts failed""
                         }
                         await Task.Delay(10)
@@ -547,7 +547,7 @@ public class TaskAPITests
         var code = @"
             async func memoryIntensiveTask() {
                 largeData <- {}
-                for i in 1..1000 {
+                for i in [1~1000] {
                     largeData[i] <- i * i
                 }
                 sum <- 0
@@ -670,7 +670,7 @@ public class TaskAPITests
                 data <- [1, 2, 3, 4, 5]
 
                 // Step 2: Process in parallel
-                tasks <- []
+                tasks <- {}
                 for item in data {
                     task <- Task.Run(() -> {
                         return item * item
@@ -682,7 +682,7 @@ public class TaskAPITests
                 results <- Task.WhenAll(tasks)
                 sum <- 0
                 for result in results.Result {
-                    sum <- sum + result
+                    sum <- sum + result()
                 }
 
                 // Step 4: Final validation
