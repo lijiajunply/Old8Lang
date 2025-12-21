@@ -158,14 +158,11 @@ public class ForInStatement(
                     manager.ControlFlowManager.ResetCurrentState();
 
                     // 运行生成器，获取下一个值
-                    System.Console.WriteLine($"[DEBUG OUTER] Calling generator.Run()");
                     var nextValue = generator.Run(manager);
-                    System.Console.WriteLine($"[DEBUG OUTER] generator.State={generator.State}, NextValue={generator.NextValue}");
 
                     // 检查生成器是否已完成
                     if (generator.State == GeneratorLangValue.GeneratorState.Completed)
                     {
-                        System.Console.WriteLine($"[DEBUG OUTER] Generator completed, breaking");
                         break;
                     }
 
@@ -197,10 +194,6 @@ public class ForInStatement(
                                 manager.ControlFlowManager.ContinueFlag = false;
                                 continue;
                             }
-                        }
-                        else
-                        {
-                            System.Console.WriteLine($"[DEBUG OUTER] currentValue is null or VoidLangValue");
                         }
                     }
                 }
@@ -274,8 +267,8 @@ public class ForInStatement(
     /// </summary>
     private void RunWithGeneratorContext(VariateManager manager)
     {
-        // 注意：不要在这里调用 AddChildren()！
-        // for-in 循环的变量应该在外层作用域中，否则从 yield 恢复时会创建新的子作用域导致变量丢失
+        // 注意：在生成器上下文中不调用 AddChildren()！
+        // 生成器需要跨 yield 保持所有变量状态，子作用域机制不适用
         manager.ControlFlowManager.PushState();
 
         var context = manager.GeneratorContext!;
@@ -308,16 +301,18 @@ public class ForInStatement(
             {
                 var items = oldList.GetItems().ToList();
                 int startIndex = 0;
-                bool wasResumingFromYield = false;  // 标记最初是否从 yield 恢复
+                int? savedStatementIndex = null;  // 保存循环语句在父 BlockStatement 中的索引
+                bool wasResumingFromYield = false;
 
                 // 检查是否从 yield 恢复
-                // BlockStatement 可能会压入一个 "loop" 标志，需要先弹出
+                // BlockStatement 可能会压入一个 "loop" 标志，需要先弹出并保存其 StatementIndex
                 if (context.ExecutionStack.Count > 0)
                 {
                     var topFrame = context.ExecutionStack.Peek();
                     if (topFrame.BlockId == "loop")
                     {
-                        context.ExecutionStack.Pop();
+                        var loopFrame = context.ExecutionStack.Pop();
+                        savedStatementIndex = loopFrame.StatementIndex;
                     }
                 }
 
@@ -330,97 +325,88 @@ public class ForInStatement(
                         context.ExecutionStack.Pop();
                         startIndex = frame.LoopIteration.Value;
                         wasResumingFromYield = true;
-                        System.Console.WriteLine($"[DEBUG] Resuming from yield, startIndex={startIndex}");
+
+                        // 如果帧中有 StatementIndex，使用它
+                        if (frame.StatementIndex >= 0)
+                        {
+                            savedStatementIndex = frame.StatementIndex;
+                        }
                     }
                 }
 
                 // 从 startIndex 开始迭代
-                // 注意：这里使用 for 循环，每次迭代后检查 HasYielded
-                // 如果遇到 yield，保存位置并返回；否则继续下一次迭代
+                //  - 如果是首次运行,从 0 开始
+                //  - 如果从 yield 恢复,从保存的索引开始
                 for (int i = startIndex; i < items.Count; i++)
                 {
-                    // 判断当前迭代是否是从 yield 恢复的
-                    // 只有第一次迭代(i == startIndex)且最初从 yield 恢复时才是 true
-                    bool resumingFromYield = wasResumingFromYield && (i == startIndex);
-                    System.Console.WriteLine($"[DEBUG] ForInStatement: iteration i={i}, startIndex={startIndex}, resumingFromYield={resumingFromYield}");
                     manager.ControlFlowManager.ResetCurrentState();
 
                     var idValue = items[i];
 
-                    // 检查是否从 yield 恢复（通过 CurrentStatementIndex 判断）
-                    // 如果 CurrentStatementIndex > 0，说明循环体正在执行中（从 yield 恢复）
-                    // 此时不应该重新设置循环变量
-                    bool shouldSetVariable = (context.CurrentStatementIndex == 0);
-                    System.Console.WriteLine($"[DEBUG] CurrentStatementIndex={context.CurrentStatementIndex}, shouldSetVariable={shouldSetVariable}");
-
-                    if (shouldSetVariable)
+                    // 设置循环变量
+                    if (AllIds.Count == 1)
                     {
-                        if (AllIds.Count == 1)
-                        {
-                            manager.Set(id, idValue);
-                            System.Console.WriteLine($"[DEBUG] Set {id.IdName} = {idValue}");
-                        }
-                        else
-                        {
-                            if (idValue is TupleLangValue tupleValue)
-                            {
-                                tupleValue.Run(manager);
-                                var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
-                                for (var j = 0; j < AllIds.Count && j < values.Count; j++)
-                                {
-                                    manager.Set(AllIds[j], values[j]);
-                                }
-                            }
-                            else
-                            {
-                                manager.Set(id, idValue);
-                            }
-                        }
+                        manager.Set(id, idValue);
                     }
                     else
                     {
-                        System.Console.WriteLine($"[DEBUG] Skipping Set (CurrentStatementIndex > 0, resuming from yield)");
+                        if (idValue is TupleLangValue tupleValue)
+                        {
+                            tupleValue.Run(manager);
+                            var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+                            for (var j = 0; j < AllIds.Count && j < values.Count; j++)
+                            {
+                                manager.Set(AllIds[j], values[j]);
+                            }
+                        }
+                        else
+                        {
+                            manager.Set(id, idValue);
+                        }
                     }
 
-                    // 执行循环体前，弹出可能存在的 "loop" 标记
-                    // 这是外层 BlockStatement 在上一次 yield 时压入的
+                    // 执行循环体前，弹出可能存在的 "loop" 标记并保存 StatementIndex
                     if (context.ExecutionStack.Count > 0 && context.ExecutionStack.Peek().BlockId == "loop")
                     {
-                        context.ExecutionStack.Pop();
-                        System.Console.WriteLine($"[DEBUG] Popped 'loop' marker before body.Run()");
+                        var loopFrame = context.ExecutionStack.Pop();
+                        // 更新 savedStatementIndex（用于下次 yield 保存）
+                        savedStatementIndex = loopFrame.StatementIndex;
                     }
 
-                    // 如果不是从 yield 恢复，重置 CurrentStatementIndex
-                    // 这样循环体就会从头开始执行
-                    if (!resumingFromYield)
-                    {
-                        context.CurrentStatementIndex = 0;
-                        System.Console.WriteLine($"[DEBUG] Reset CurrentStatementIndex to 0 for new iteration");
-                    }
+                    // 重置 CurrentStatementIndex，从头开始执行循环体
+                    context.CurrentStatementIndex = 0;
 
                     // 执行循环体
-                    System.Console.WriteLine($"[DEBUG] About to run body for i={i}, body.Count={body.Count}");
                     body.Run(manager);
-                    System.Console.WriteLine($"[DEBUG] After body.Run(), HasYielded={context.HasYielded}");
 
                     // 检查是否遇到 yield
                     if (context.HasYielded)
                     {
-                        // 保存当前迭代的索引（i）
-                        // BlockStatement 会负责从 yield 之后的语句继续执行
-                        System.Console.WriteLine($"[DEBUG] Yielded at i={i}, saving i={i}");
+                        // 检查是否是嵌套 yield（栈中有其他循环的标记）
+                        bool isNestedYield = false;
+                        if (context.ExecutionStack.Count > 0)
+                        {
+                            var topFrame = context.ExecutionStack.Peek();
+                            if (topFrame.BlockId == "for_in_loop_position")
+                            {
+                                isNestedYield = true;
+                            }
+                        }
+
+                        // 决定保存哪个索引:
+                        //  - 如果是嵌套 yield (内层循环 yield 了),外层保存当前索引(继续当前迭代的剩余部分)
+                        //  - 如果是直接 yield (本循环直接 yield),保存下一个索引(进入下一次迭代)
+                        int nextIndex = isNestedYield ? i : (i + 1);
                         context.ExecutionStack.Push(new GeneratorExecutionContext.BlockExecutionFrame
                         {
-                            StatementIndex = -1,
+                            StatementIndex = savedStatementIndex ?? -1,  // 保存语句索引
                             BlockId = "for_in_loop_position",
-                            LoopIteration = i  // 保存当前迭代的索引
+                            LoopIteration = nextIndex
                         });
                         return;
                     }
 
-                    // 重置 CurrentStatementIndex 和 IsCompleted，准备下一次迭代
-                    // 关键修复：在完成当前迭代后，必须重置这些标志
-                    // 否则 BlockStatement 可能会因为 IsCompleted=true 而提前退出
+                    // 重置状态，准备下一次迭代
                     context.CurrentStatementIndex = 0;
                     context.IsCompleted = false;
 
@@ -449,7 +435,7 @@ public class ForInStatement(
         finally
         {
             manager.ControlFlowManager.PopState();
-            // 注意：不要调用 RemoveChildren()，因为我们没有调用 AddChildren()
+            // 注意：不调用 RemoveChildren()，因为没有调用 AddChildren()
         }
     }
 

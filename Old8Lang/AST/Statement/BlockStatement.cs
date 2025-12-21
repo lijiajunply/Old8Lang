@@ -126,6 +126,21 @@ public class BlockStatement : OldStatement
             // 检查是否遇到yield（通过生成器上下文而非全局标志）
             if (context.HasYielded)
             {
+                // 检查栈中是否有循环标记（说明是嵌套的循环 yield）
+                bool hasLoopMarker = false;
+                if (context.ExecutionStack.Count > 0)
+                {
+                    // 遍历栈，查找是否有循环标记
+                    foreach (var frame in context.ExecutionStack)
+                    {
+                        if (frame.BlockId == "loop" || frame.BlockId == "for_in_loop_position" || frame.BlockId == "async_for_in_stream_position" || frame.BlockId == "async_for_in_generator_position")
+                        {
+                            hasLoopMarker = true;
+                            break;
+                        }
+                    }
+                }
+
                 // 保存当前位置，以便下次恢复
                 if (statement is YieldStatement)
                 {
@@ -143,8 +158,17 @@ public class BlockStatement : OldStatement
                 }
                 else
                 {
-                    // 对于其他语句中的yield，保存下一个语句的位置
-                    context.CurrentStatementIndex = i + 1;
+                    // 对于其他语句中的yield
+                    if (hasLoopMarker)
+                    {
+                        // 如果栈中有循环标记，说明是嵌套结构中的循环 yield
+                        // 不更新 CurrentStatementIndex，让循环自己处理
+                    }
+                    else
+                    {
+                        // 否则，保存下一个语句的位置
+                        context.CurrentStatementIndex = i + 1;
+                    }
                 }
                 return;
             }
