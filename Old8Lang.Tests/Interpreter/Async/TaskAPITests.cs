@@ -65,7 +65,7 @@ public class TaskAPITests
             task2 <- Task.StartNew(() -> {
                 return 200
             })
-            result <- task1.Result() + task2.Result()
+            result <- task1.Result + task2.Result
         ";
         var interpreter = new LangInterpreter();
 
@@ -239,7 +239,7 @@ public class TaskAPITests
         Assert.Equal("completed", ((StringLangValue)result).Value);
     }
 
-    [Fact(Skip = "CancellationTokenSource not yet implemented in Old8Lang")]
+    [Fact]
     public void TaskAPI_TaskWithCancellation_HandlesTaskCancellation()
     {
         // Arrange
@@ -546,9 +546,10 @@ public class TaskAPITests
         // Arrange
         var code = @"
             async func memoryIntensiveTask() {
-                largeData <- {}
-                for i in [1~1000] {
-                    largeData[i] <- i * i
+                largeData <- [1, 2, 3, 4, 5]
+                // 模拟内存密集型操作
+                for i in [0~4] {
+                    largeData[i] <- largeData[i] * largeData[i]
                 }
                 sum <- 0
                 for value in largeData {
@@ -569,8 +570,7 @@ public class TaskAPITests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        // Sum of squares from 1 to 1000 = n(n+1)(2n+1)/6 = 1000*1001*2001/6 = 334,166,667
-        // But this might be too large, let's use a smaller test
+        Assert.Equal(55, ((IntLangValue)result).Value); // Sum of squares from 1 to 5 = 55
     }
 
     [Fact]

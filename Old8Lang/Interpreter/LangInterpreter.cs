@@ -53,9 +53,10 @@ public class LangInterpreter
         // 初始化类型检查器
         TypeChecker.Initialize(Manager);
 
-        // 注册全局 Task 对象
+        // 注册全局对象
         Manager.Set(new LangId("Task"), TaskClassLangValue.GetInstance());
         Manager.Set(new LangId("Thread"), ThreadClassLangValue.GetInstance());
+        Manager.Set(new LangId("TaskScheduler"), TaskSchedulerClassLangValue.GetInstance());
     }
 
     /// <summary>

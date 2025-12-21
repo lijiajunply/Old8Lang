@@ -156,7 +156,13 @@ public class TaskLangValue : LangValueType
                 _result = null;
             }
 
-            throw innerException;
+            // 将标准异常包装为Old8Exception
+            if (innerException is Old8Exception old8Ex)
+            {
+                throw old8Ex;
+            }
+
+            throw new CustomError(this, innerException.Message);
         }
         catch (Exception ex)
         {
@@ -167,7 +173,15 @@ public class TaskLangValue : LangValueType
                 _result = null;
             }
 
-            throw;
+            // 将标准异常包装为Old8Exception
+            if (ex is Old8Exception old8Ex)
+            {
+                throw old8Ex;
+            }
+            else
+            {
+                throw new CustomError(this, ex.Message);
+            }
         }
     }
 

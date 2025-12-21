@@ -79,7 +79,7 @@ public class TaskClassLangValue : LangValueType
         }
 
         // 处理 Task.WhenAll 形式的访问（不带调用）
-        if (dotExpression is ClassMemberId memberId)
+        if (dotExpression is LangId memberId)
         {
             var methodName = memberId.IdName;
 
@@ -93,6 +93,7 @@ public class TaskClassLangValue : LangValueType
                 "FromException" => new TaskStaticMethodWrapper("FromException", FromException),
                 "Run" => new TaskStaticMethodWrapper("Run", Run),
                 "StartNew" => new TaskStaticMethodWrapper("StartNew", StartNew),
+                "Factory" => new TaskFactoryClassLangValue(),
                 _ => throw new AttributeError(dotExpression.Position, methodName, "Task")
             };
         }
@@ -248,7 +249,7 @@ public class TaskClassLangValue : LangValueType
         }
 
         var exception = new Exception(exceptionMessage);
-        var faultedTask = System.Threading.Tasks.Task.FromException<LangValueType>(exception);
+        var faultedTask = Task.FromException<LangValueType>(exception);
         return new TaskLangValue(faultedTask, CancellationToken.None, position);
     }
 
