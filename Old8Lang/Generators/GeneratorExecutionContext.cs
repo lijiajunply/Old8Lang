@@ -18,7 +18,7 @@ public class GeneratorExecutionContext
     /// <summary>
     /// 是否遇到了yield语句
     /// </summary>
-    public bool HasYielded { get; set; } = false;
+    public bool HasYielded { get; set; }
 
     /// <summary>
     /// 当前yield的值
@@ -35,7 +35,7 @@ public class GeneratorExecutionContext
     /// 例如：在if语句或循环内部的BlockStatement
     /// 【旧架构】基于索引的栈帧
     /// </summary>
-    public Stack<BlockExecutionFrame> ExecutionStack { get; set; } = new Stack<BlockExecutionFrame>();
+    public Stack<BlockExecutionFrame> ExecutionStack { get; set; } = new();
 
     /// <summary>
     /// 执行路径（新架构）
@@ -49,7 +49,7 @@ public class GeneratorExecutionContext
     /// Key: 循环路径（如 "/block[0]/for-in"）
     /// Value: 当前迭代的索引
     /// </summary>
-    public Dictionary<string, int> LoopStates { get; set; } = new Dictionary<string, int>();
+    public Dictionary<string, int> LoopStates { get; set; } = new();
 
     /// <summary>
     /// 重置上下文状态

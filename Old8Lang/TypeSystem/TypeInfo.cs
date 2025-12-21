@@ -70,7 +70,7 @@ public class ClassTypeInfo(string name, ITypeInfo? baseType = null) : ITypeInfo
     public bool IsClassType => true;
     public ITypeInfo? BaseType { get; } = baseType;
 
-    private readonly ConcurrentDictionary<string, LangValueType> _cachedMembers = [];
+    private readonly ConcurrentDictionary<string, LangValueType> CachedMembers = [];
 
     public bool IsCompatibleWith(ITypeInfo other)
     {
@@ -91,7 +91,7 @@ public class ClassTypeInfo(string name, ITypeInfo? baseType = null) : ITypeInfo
     public ConcurrentDictionary<string, LangValueType> GetMembers(VariateManager manager)
     {
         // 如果有缓存，直接返回
-        if (_cachedMembers.Count > 0) return _cachedMembers;
+        if (CachedMembers.Count > 0) return CachedMembers;
 
         var members = new ConcurrentDictionary<string, LangValueType>();
 
@@ -119,10 +119,10 @@ public class ClassTypeInfo(string name, ITypeInfo? baseType = null) : ITypeInfo
         // 缓存结果
         foreach (var member in members)
         {
-            _cachedMembers.TryAdd(member.Key, member.Value);
+            CachedMembers.TryAdd(member.Key, member.Value);
         }
 
-        return _cachedMembers;
+        return CachedMembers;
     }
 
     /// <summary>
@@ -130,7 +130,7 @@ public class ClassTypeInfo(string name, ITypeInfo? baseType = null) : ITypeInfo
     /// </summary>
     public void ClearCache()
     {
-        _cachedMembers.Clear();
+        CachedMembers.Clear();
     }
 }
 
@@ -139,23 +139,23 @@ public class ClassTypeInfo(string name, ITypeInfo? baseType = null) : ITypeInfo
 /// </summary>
 public class TypeFamily
 {
-    private readonly ConcurrentDictionary<string, ITypeInfo> _types = [];
-    private readonly ConcurrentDictionary<string, List<ITypeInfo>> _inheritanceRelations = [];
+    private readonly ConcurrentDictionary<string, ITypeInfo> Types = [];
+    private readonly ConcurrentDictionary<string, List<ITypeInfo>> InheritanceRelations = [];
 
     /// <summary>
     /// 注册类型
     /// </summary>
     public void RegisterType(ITypeInfo typeInfo)
     {
-        _types.TryAdd(typeInfo.Name, typeInfo);
+        Types.TryAdd(typeInfo.Name, typeInfo);
 
         // 记录继承关系
-        if (typeInfo is ClassTypeInfo classType && classType.BaseType != null)
+        if (typeInfo is ClassTypeInfo { BaseType: not null } classType)
         {
-            _inheritanceRelations.AddOrUpdate(
+            InheritanceRelations.AddOrUpdate(
                 classType.BaseType.Name,
                 [classType],
-                (key, existing) =>
+                (_, existing) =>
                 {
                     existing.Add(classType);
                     return existing;
@@ -168,7 +168,7 @@ public class TypeFamily
     /// </summary>
     public ITypeInfo? GetType(string typeName)
     {
-        return _types.TryGetValue(typeName, out var type) ? type : null;
+        return Types.GetValueOrDefault(typeName);
     }
 
     /// <summary>
@@ -189,7 +189,7 @@ public class TypeFamily
     /// </summary>
     public List<ITypeInfo> GetSubTypes(string typeName)
     {
-        return _inheritanceRelations.TryGetValue(typeName, out var subTypes) ? subTypes : [];
+        return InheritanceRelations.TryGetValue(typeName, out var subTypes) ? subTypes : [];
     }
 
     /// <summary>

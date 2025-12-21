@@ -40,22 +40,22 @@ public class NewGeneratorStateMachine
     /// 局部变量存储（提升的局部变量）
     /// Key: 变量名, Value: 变量值
     /// </summary>
-    private readonly Dictionary<string, LangValueType> _locals = new();
+    private readonly Dictionary<string, LangValueType> Locals = new();
 
     /// <summary>
     /// 环境管理器（用于执行表达式）
     /// </summary>
-    private readonly VariateManager _manager;
+    private readonly VariateManager Manager;
 
     /// <summary>
     /// 生成器函数定义
     /// </summary>
-    private readonly FuncInit _function;
+    private readonly FuncInit Function;
 
     /// <summary>
     /// 状态机执行器（由构建器生成）
     /// </summary>
-    private readonly StateExecutor _executor;
+    private readonly StateExecutor Executor;
 
     /// <summary>
     /// 构造函数
@@ -65,9 +65,9 @@ public class NewGeneratorStateMachine
     /// <param name="executor">状态机执行器</param>
     public NewGeneratorStateMachine(FuncInit function, VariateManager manager, StateExecutor executor)
     {
-        _function = function;
-        _manager = manager;
-        _executor = executor;
+        Function = function;
+        Manager = manager;
+        Executor = executor;
     }
 
     /// <summary>
@@ -88,7 +88,7 @@ public class NewGeneratorStateMachine
             CurrentState = MachineState.Running;
 
             // 执行状态机
-            var result = _executor.Execute(_statePoint, _locals, _manager);
+            var result = Executor.Execute(_statePoint, Locals, Manager);
 
             if (result.HasValue)
             {
@@ -98,12 +98,10 @@ public class NewGeneratorStateMachine
                 CurrentState = MachineState.Suspended;
                 return true;
             }
-            else
-            {
-                // 执行完毕
-                CurrentState = MachineState.Completed;
-                return false;
-            }
+
+            // 执行完毕
+            CurrentState = MachineState.Completed;
+            return false;
         }
         catch
         {

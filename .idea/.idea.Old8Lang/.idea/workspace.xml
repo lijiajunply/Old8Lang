@@ -20,7 +20,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/debug_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Generators/AsyncStateMachineGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/AsyncStateMachineGenerator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorAstScanner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorAstScanner.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorExecutionContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorExecutionContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorStateMachineBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorStateMachineBuilder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Generators/NewGeneratorStateMachine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/NewGeneratorStateMachine.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/CapturedScope.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/CapturedScope.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeAnnotationManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeAnnotationManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeInfo.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -447,7 +454,7 @@
       <workItem from="1766156569385" duration="1528000" />
       <workItem from="1766238299964" duration="6160000" />
       <workItem from="1766298953988" duration="5700000" />
-      <workItem from="1766308100500" duration="8994000" />
+      <workItem from="1766308100500" duration="9647000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -792,7 +799,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="329" />
+    <option name="localTasksCounter" value="330" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -819,7 +826,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(interpreter): 支持带参数的类构造函数初始化&#10;&#10;- 新增 ValueExpression 类用于包装已求值的表达式&#10;- 修改 Instance.cs 中的构造函数调用逻辑，支持参数在调用者上下文求值&#10;- 调整 ClassDeclarationTests.cs 中字符串分割方式以提高兼容性&#10;- 更新 Rider 配置文件与调试设置" />
     <MESSAGE value="fix(parser): 修复前缀运算符解析问题&#10;&#10;- 修正 not 运算符右操作数的解析逻辑，确保其能正确处理点运算符&#10;- 修正前缀负号运算符右操作数的解析逻辑，支持点运算符处理&#10;- 调整 ParsePrimary 为 ParsePower 以增强表达式解析能力&#10;- 添加测试用例验证 not 和负号运算符与成员访问的结合使用" />
     <MESSAGE value="fix(interpreter): 修正构造函数中成员变量初始化问题&#10;&#10;- 在构造函数中使用 this 关键字明确指向实例成员&#10;- 修复多个类中属性初始化时缺少 this 前缀的问题&#10;- 修正日志记录方法中对实例字段的引用&#10;- 更新数值累加逻辑以正确使用实例变量&#10;- 修复静态计数器访问方式，确保通过 this 引用&#10;- 修正条件赋值语句中对实例属性的设置&#10;- 优化角色伤害处理逻辑，明确区分实例与局部变量&#10;- 改进银行账户初始化代码，统一使用 this 设置属性&#10;- 调整测试用例中的默认参数声明格式&#10;- 清理冗余提交信息并更新工作区配置记录" />
     <MESSAGE value="feat(interpreter): 支持类实例成员的集合索引访问&#10;&#10;- 实现了对类成员集合（如列表、数组、字典、字符串）的索引访问语法&#10;- 添加了对 wheels[0] 这类表达式的支持，可在类实例中直接访问集合元素&#10;- 增强了 AnyLangValue 的 MemberGet 方法，以处理 LangListItem 类型的索引访问&#10;- 为集合索引增加了类型检查，确保索引值类型与集合类型匹配&#10;- 支持 ListLangValue、ArrayLangValue、DictionaryLangValue 和 StringLangValue 的索引读取&#10;- 引入了更严格的访问控制检查，防止非法访问私有或受保护的集合成员&#10;- 更新了 TypeTemplate 初始化逻辑，允许实例访问全局导入的类型信息&#10;- 添加了测试用例验证复杂对象结构下的集合索引访问功能&#10;- 修正了 ClassInstantiationTests 中 wheels 成员声明缺失类型的定义问题&#10;- 新增 test_complex_object.old8 示例文件展示完整功能使用方式" />
@@ -844,7 +850,8 @@
     <MESSAGE value="feat(async): 优化异步任务 API 支持与测试代码&#10;&#10;- 为 `TaskLangValue` 添加 `ContinueWith` 实例方法以增强任务链式调用能力&#10;- 修正 `TaskAPITests.cs` 中的语法错误，包括异步函数声明和循环表达式&#10;- 更新任务结果获取方式，统一使用 `Result()` 调用替代直接属性访问&#10;- 修复变量初始化和比较运算符使用错误&#10;- 将部分数组初始化语法从 `[]` 改为 `{}` 以适配语言变更&#10;- 迁移 `ContinueWith` 方法实现至 `TaskValueFuncStatic.cs` 并优化其上下文管理&#10;- 调整 `Instance.cs` 中的参数传递逻辑，避免空引用异常" />
     <MESSAGE value="feat(async): 实现异步函数初始化与状态机生成&#10;&#10;重构 AsyncFuncInit 类以支持异步函数的动态编译和执行，包括：&#10;- 使用 DynamicMethod 动态生成异步方法体&#10;- 集成状态机生成器 AsyncStateMachineGenerator 来处理 await 表达式&#10;- 支持将异步函数注册为委托并携带参数信息&#10;- 优化 IL 生成流程，确保正确的参数加载和返回值处理&#10;&#10;同时更新 BlockStatement 以识别 AsyncFuncInit 语句，使其能正确导入异步函数声明。" />
     <MESSAGE value="feat(parser): 支持 this 方法调用解析为 FuncRunStatement&#10;&#10;在 StatementParser 中增加对 this.xxx 形式的方法调用识别，将其正确解析为 FuncRunStatement。  &#10;同时修正了 AnyLangValue 中字段命名及多处逻辑冗余问题，并完善接口与类交互测试代码。&#10;&#10;---&#10;&#10;refactor(ast): 重命名字段并优化方法执行逻辑&#10;&#10;将 `_fieldsModifiedBySetField` 字段重命名为 `FieldsModifiedBySetField` 并调整访问方式；  &#10;移除 ExecuteMethod 和 CallInit 中关于作用域参数求值的重复注释和逻辑，统一处理流程；  &#10;修复 AccessCollectionItem 中类型判断字符串格式化问题。&#10;&#10;---&#10;&#10;test(interpreter): 更新类成员初始化函数名称为 init&#10;&#10;将多个测试用例中的构造函数名（如 DataContainer、Circle、Point 等）更正为标准的 init 函数命名，  &#10;确保符合语言规范并提升一致性。&#10;&#10;---&#10;&#10;test(parser): 升级接口相关测试代码字符串语法&#10;&#10;将 InterfaceAbstractClassInteractionTests.cs 文件中所有多行字符串由旧版 &quot;@&quot; 标记改为 &quot;&quot;&quot; 新语法，  &#10;增强可读性和维护性。&#10;&#10;---&#10;&#10;chore(tests): 更新配置文件和工具库示例内容&#10;&#10;修改 config.old8 示例内容以支持动态加载配置字典，  &#10;并在 utils.old8 中新增日期格式化和 token 生成辅助函数。" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 支持 this 方法调用解析为 FuncRunStatement&#10;&#10;在 StatementParser 中增加对 this.xxx 形式的方法调用识别，将其正确解析为 FuncRunStatement。  &#10;同时修正了 AnyLangValue 中字段命名及多处逻辑冗余问题，并完善接口与类交互测试代码。&#10;&#10;---&#10;&#10;refactor(ast): 重命名字段并优化方法执行逻辑&#10;&#10;将 `_fieldsModifiedBySetField` 字段重命名为 `FieldsModifiedBySetField` 并调整访问方式；  &#10;移除 ExecuteMethod 和 CallInit 中关于作用域参数求值的重复注释和逻辑，统一处理流程；  &#10;修复 AccessCollectionItem 中类型判断字符串格式化问题。&#10;&#10;---&#10;&#10;test(interpreter): 更新类成员初始化函数名称为 init&#10;&#10;将多个测试用例中的构造函数名（如 DataContainer、Circle、Point 等）更正为标准的 init 函数命名，  &#10;确保符合语言规范并提升一致性。&#10;&#10;---&#10;&#10;test(parser): 升级接口相关测试代码字符串语法&#10;&#10;将 InterfaceAbstractClassInteractionTests.cs 文件中所有多行字符串由旧版 &quot;@&quot; 标记改为 &quot;&quot;&quot; 新语法，  &#10;增强可读性和维护性。&#10;&#10;---&#10;&#10;chore(tests): 更新配置文件和工具库示例内容&#10;&#10;修改 config.old8 示例内容以支持动态加载配置字典，  &#10;并在 utils.old8 中新增日期格式化和 token 生成辅助函数。" />
+    <MESSAGE value="refactor(ast): 优化异步流表达式与块语句实现&#10;&#10;- 将 AsyncStreamExpression 中的 Block 字段访问级别从 public 改为 private&#10;- 优化 InvalidOperationException 抛出时的消息字符串格式，避免行过长&#10;- 移除了 BlockStatement 中用于调试的日志输出语句&#10;- 简化了 Operation 类型检查中的条件判断逻辑&#10;- 删除未使用的 using 引用，精简多个类文件的命名空间引用&#10;- 修正 SuperExpression 中父类构造函数查找逻辑并优化错误提示&#10;- 移除了已废弃的 ValueExpression 类定义&#10;- 更新了 IDE 工作区配置和任务计数器状态&#10;&#10;这些更改提升了代码可维护性、减少了冗余信息，并进一步规范化 AST 节点行为。" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 优化异步流表达式与块语句实现&#10;&#10;- 将 AsyncStreamExpression 中的 Block 字段访问级别从 public 改为 private&#10;- 优化 InvalidOperationException 抛出时的消息字符串格式，避免行过长&#10;- 移除了 BlockStatement 中用于调试的日志输出语句&#10;- 简化了 Operation 类型检查中的条件判断逻辑&#10;- 删除未使用的 using 引用，精简多个类文件的命名空间引用&#10;- 修正 SuperExpression 中父类构造函数查找逻辑并优化错误提示&#10;- 移除了已废弃的 ValueExpression 类定义&#10;- 更新了 IDE 工作区配置和任务计数器状态&#10;&#10;这些更改提升了代码可维护性、减少了冗余信息，并进一步规范化 AST 节点行为。" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

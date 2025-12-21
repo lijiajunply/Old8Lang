@@ -21,14 +21,14 @@ public class AsyncStateMachineGenerator
     private FieldBuilder? StateField;
     private FieldBuilder? BuilderField;
     private FieldBuilder? AwaiterField;
-    private List<FieldBuilder> LocalVariableFields = new();
+    private List<FieldBuilder> LocalVariableFields = [];
 
     // 状态常量
     private const int StateNotStarted = -1;
     private const int StateCompleted = -2;
 
     // await表达式位置列表，用于生成状态转换
-    private List<int> AwaitPositions = new();
+    private readonly List<int> AwaitPositions = [];
 
     /// <summary>
     /// 构造函数
@@ -41,7 +41,7 @@ public class AsyncStateMachineGenerator
         IlGenerator = ilGenerator;
         LocalManager = localManager;
         BlockStatement = blockStatement;
-        
+
         // 初始化：识别await表达式位置
         IdentifyAwaitExpressions(blockStatement);
     }
@@ -58,10 +58,7 @@ public class AsyncStateMachineGenerator
             for (int i = 0; i < block.Count; i++)
             {
                 var child = block[i];
-                if (child != null)
-                {
-                    IdentifyAwaitExpressions(child, position + i);
-                }
+                IdentifyAwaitExpressions(child, position + i);
             }
         }
         // 简化实现，只处理BlockStatement
@@ -86,6 +83,7 @@ public class AsyncStateMachineGenerator
             {
                 IdentifyAwaitInExpression(op.Left, position);
             }
+
             if (op.Right != null)
             {
                 IdentifyAwaitInExpression(op.Right, position);
@@ -214,17 +212,18 @@ public class AsyncStateMachineGenerator
     /// <summary>
     /// 生成指定状态的代码
     /// </summary>
-    private void GenerateStateCode(ILGenerator il, int state, Dictionary<int, Label> stateLabels, Label stateCompletedLabel)
+    private void GenerateStateCode(ILGenerator il, int state, Dictionary<int, Label> stateLabels,
+        Label stateCompletedLabel)
     {
         // 检查是否有更多语句需要处理
         if (state < BlockStatement.Count)
         {
             // 获取当前状态对应的语句
             var statement = BlockStatement[state];
-            
+
             // 检查当前语句是否包含await表达式
             bool hasAwait = AwaitPositions.Contains(state);
-            
+
             if (hasAwait)
             {
                 // 处理包含await表达式的语句
@@ -251,7 +250,7 @@ public class AsyncStateMachineGenerator
             il.Emit(OpCodes.Br, stateCompletedLabel);
         }
     }
-    
+
     /// <summary>
     /// 生成包含await表达式的状态代码
     /// </summary>
@@ -259,31 +258,31 @@ public class AsyncStateMachineGenerator
     {
         // 获取当前状态对应的语句
         var statement = BlockStatement[state];
-        
+
         // 生成语句的IL代码，直到遇到await表达式
         // 注意：这里简化处理，实际实现需要更复杂的逻辑来处理语句中的await表达式
         statement.GenerateIl(il, LocalManager);
-        
+
         // 对于await表达式，生成状态保存和恢复逻辑
         // 这里简化处理，生成基本的状态转换逻辑
-        
+
         // 1. 保存当前状态
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldc_I4, state + 1);
         il.Emit(OpCodes.Stfld, StateField!);
-        
+
         // 2. 调用异步方法构建器的Start方法
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldfld, BuilderField!);
         il.Emit(OpCodes.Ldarg_0);
-        var startMethod = typeof(AsyncTaskMethodBuilder<object>).GetMethod("Start", new[] { typeof(object) })!;
+        var startMethod = typeof(AsyncTaskMethodBuilder<object>).GetMethod("Start", [typeof(object)])!;
         il.Emit(OpCodes.Call, startMethod);
-        
+
         // 3. 设置下一个状态
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldc_I4, state + 1);
         il.Emit(OpCodes.Stfld, StateField!);
-        
+
         // 4. 跳转到下一个状态
         il.Emit(OpCodes.Br, stateLabels[Math.Min(state + 1, stateLabels.Count - 1)]);
     }
@@ -317,34 +316,34 @@ public class AsyncStateMachineGenerator
         // 检查异常类型，特殊处理OperationCanceledException
         var catchEndLabel = il.DefineLabel();
         var canceledLabel = il.DefineLabel();
-        
+
         // 检查是否为OperationCanceledException
         il.Emit(OpCodes.Ldarg_1); // 加载异常对象
         il.Emit(OpCodes.Isinst, typeof(OperationCanceledException));
         il.Emit(OpCodes.Brtrue, canceledLabel);
-        
+
         // 常规异常处理
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldfld, BuilderField!);
         il.Emit(OpCodes.Ldarg_1); // 异常对象
         il.Emit(OpCodes.Call, typeof(AsyncTaskMethodBuilder<object>).GetMethod("SetException")!);
         il.Emit(OpCodes.Br, catchEndLabel);
-        
+
         // 取消操作处理
         il.MarkLabel(canceledLabel);
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldfld, BuilderField!);
         il.Emit(OpCodes.Ldarg_1); // 异常对象
         il.Emit(OpCodes.Call, typeof(AsyncTaskMethodBuilder<object>).GetMethod("SetException")!);
-        
+
         // 处理完成
         il.MarkLabel(catchEndLabel);
-        
+
         // 设置状态为已完成
         il.Emit(OpCodes.Ldarg_0);
         il.Emit(OpCodes.Ldc_I4, StateCompleted);
         il.Emit(OpCodes.Stfld, StateField!);
-        
+
         // 返回
         il.Emit(OpCodes.Ret);
     }

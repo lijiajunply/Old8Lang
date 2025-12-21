@@ -37,7 +37,7 @@ public class CapturedScope
     /// <summary>
     /// 缓存的哈希码（用于快速比较）
     /// </summary>
-    private readonly int _hashCode;
+    private readonly int HashCode;
 
     /// <summary>
     /// 构造函数
@@ -55,14 +55,14 @@ public class CapturedScope
         bool isImmutable = false)
     {
         // 创建作用域的只读包装
-        Scopes = scopes.Select(s => (IReadOnlyDictionary<string, LangValueType>)s.AsReadOnly()).ToList();
+        Scopes = scopes.Select(IReadOnlyDictionary<string, LangValueType> (s) => s.AsReadOnly()).ToList();
         ImportInfos = importInfos.AsReadOnly();
         LangInfo = langInfo;
         Path = path;
         IsImmutable = isImmutable;
 
         // 预计算哈希码用于快速比较
-        _hashCode = ComputeHashCode();
+        HashCode = ComputeHashCode();
     }
 
     /// <summary>
@@ -144,7 +144,7 @@ public class CapturedScope
         return hash.ToHashCode();
     }
 
-    public override int GetHashCode() => _hashCode;
+    public override int GetHashCode() => HashCode;
 
     /// <summary>
     /// 判断两个捕获的作用域是否相等（用于缓存键比较）
@@ -153,7 +153,7 @@ public class CapturedScope
     {
         if (obj is not CapturedScope other) return false;
         if (ReferenceEquals(this, other)) return true;
-        if (_hashCode != other._hashCode) return false;
+        if (HashCode != other.HashCode) return false;
 
         // 快速检查：路径和作用域数量
         if (Path != other.Path || Scopes.Count != other.Scopes.Count)

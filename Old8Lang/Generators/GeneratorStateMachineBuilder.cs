@@ -9,21 +9,13 @@ namespace Old8Lang.Generators;
 /// 生成器状态机构建器
 /// 将 AST 转换为可执行的状态机
 /// </summary>
-public class GeneratorStateMachineBuilder
+public static class GeneratorStateMachineBuilder
 {
     /// <summary>
     /// 从函数构建状态机（使用 FuncLangValue）
     /// </summary>
     public static NewGeneratorStateMachine BuildFromFunc(FuncLangValue function, VariateManager manager)
     {
-        System.Console.WriteLine($"[BUILD] Building state machine from FuncLangValue");
-        System.Console.WriteLine($"[BUILD] Function has BlockStatement: {function.BlockStatement != null}");
-        if (function.BlockStatement != null)
-        {
-            System.Console.WriteLine($"[BUILD] BlockStatement type: {function.BlockStatement.GetType().Name}");
-            System.Console.WriteLine($"[BUILD] BlockStatement count: {function.BlockStatement.Count}");
-        }
-
         // 1. 扫描 AST
         var scanner = new GeneratorAstScanner();
         var scanResult = scanner.Scan(function.BlockStatement);
@@ -43,7 +35,8 @@ public class GeneratorStateMachineBuilder
     /// <summary>
     /// 从函数定义构建状态机（使用 FuncInit）
     /// </summary>
-    public static NewGeneratorStateMachine Build(FuncInit function, VariateManager manager, List<LangValueType>? arguments = null)
+    public static NewGeneratorStateMachine Build(FuncInit function, VariateManager manager,
+        List<LangValueType>? arguments = null)
     {
         // 1. 扫描 AST
         var scanner = new GeneratorAstScanner();
@@ -66,21 +59,12 @@ public class GeneratorStateMachineBuilder
 /// 扁平化的生成器执行器（优化版）
 /// 采用基于路径的状态恢复机制，避免依赖全局 CurrentStatementIndex
 /// </summary>
-public class FlatGeneratorExecutor : StateExecutor
+public class FlatGeneratorExecutor(FuncLangValue function, GeneratorAstScanner.ScanResult scanResult)
+    : StateExecutor
 {
-    private readonly FuncLangValue _function;
-    private readonly GeneratorAstScanner.ScanResult _scanResult;
-
-    public FlatGeneratorExecutor(FuncLangValue function, GeneratorAstScanner.ScanResult scanResult)
+    public override ExecutionResult Execute(int statePoint, Dictionary<string, LangValueType> locals,
+        VariateManager manager)
     {
-        _function = function;
-        _scanResult = scanResult;
-    }
-
-    public override ExecutionResult Execute(int statePoint, Dictionary<string, LangValueType> locals, VariateManager manager)
-    {
-        System.Console.WriteLine($"[NEW SM] Execute called: statePoint={statePoint}, totalYieldPoints={_scanResult.YieldPoints.Count}");
-
         // 创建子作用域
         manager.AddChildren();
         try
@@ -98,10 +82,8 @@ public class FlatGeneratorExecutor : StateExecutor
                 // statePoint 是执行次数，不是 yield 点索引
                 // 对于循环中的 yield，可能多次执行同一个 yield 点
                 // 我们使用 (statePoint - 1) % YieldPoints.Count 来获取上一个 yield 点
-                var lastYieldIndex = (statePoint - 1) % _scanResult.YieldPoints.Count;
-                var lastYieldPoint = _scanResult.YieldPoints[lastYieldIndex];
-
-                System.Console.WriteLine($"[NEW SM] Resuming from yield point {lastYieldIndex}, path={lastYieldPoint.Path}");
+                var lastYieldIndex = (statePoint - 1) % scanResult.YieldPoints.Count;
+                var lastYieldPoint = scanResult.YieldPoints[lastYieldIndex];
 
                 // 设置执行路径和循环状态（新架构）
                 context.ExecutionPath = lastYieldPoint.Path;
@@ -133,13 +115,12 @@ public class FlatGeneratorExecutor : StateExecutor
                 // CurrentStatementIndex 设置为 yield 语句之后的索引
                 // 这会被循环体的 BlockStatement 使用
                 context.CurrentStatementIndex = yieldStatementIndex + 1;
-                System.Console.WriteLine($"[NEW SM] Set CurrentStatementIndex={context.CurrentStatementIndex} (yield was at index {yieldStatementIndex})");
             }
 
             try
             {
                 // 执行函数体直到下一个 yield
-                _function.BlockStatement.Run(manager);
+                function.BlockStatement.Run(manager);
 
                 // 检查是否 yield
                 if (context.HasYielded)
@@ -181,7 +162,7 @@ public class FlatGeneratorExecutor : StateExecutor
             if (kvp.Key.StartsWith("__loop__"))
                 continue;
 
-            var id = new LangId(kvp.Key, "", null, new SourcePosition());
+            var id = new LangId(kvp.Key);
             manager.Set(id, kvp.Value);
         }
     }
@@ -200,9 +181,9 @@ public class FlatGeneratorExecutor : StateExecutor
         }
 
         // 保存所有扫描到的局部变量
-        foreach (var varName in _scanResult.LocalVariables)
+        foreach (var varName in scanResult.LocalVariables)
         {
-            var value = manager.GetAny(new LangId(varName, "", null, new SourcePosition()));
+            var value = manager.GetAny(new LangId(varName));
             if (value != null)
             {
                 locals[varName] = value;
@@ -236,11 +217,9 @@ public class FlatGeneratorExecutor : StateExecutor
 
                 context.ExecutionStack.Push(new GeneratorExecutionContext.BlockExecutionFrame
                 {
-                    StatementIndex = 0,  // ForInStatement 在外层 BlockStatement 的索引 0
+                    StatementIndex = 0, // ForInStatement 在外层 BlockStatement 的索引 0
                     BlockId = "loop"
                 });
-
-                System.Console.WriteLine($"[NEW SM] Restored loop state: path={loopPath}, iteration={intValue.Value}");
             }
         }
     }
@@ -255,19 +234,18 @@ public class FlatGeneratorExecutor : StateExecutor
         foreach (var kvp in context.LoopStates)
         {
             locals["__loop__" + kvp.Key] = new IntLangValue(kvp.Value);
-            System.Console.WriteLine($"[NEW SM] Saved loop state from LoopStates: path={kvp.Key}, iteration={kvp.Value}");
         }
 
         // 兼容旧架构：从 ExecutionStack 提取循环位置并保存
         // ForInStatement 会压入 BlockExecutionFrame 到 ExecutionStack
-        var loopFrames = context.ExecutionStack.Where(f => f.BlockId == "for_in_loop_position" && f.LoopIteration.HasValue).ToList();
+        var loopFrames = context.ExecutionStack
+            .Where(f => f is { BlockId: "for_in_loop_position", LoopIteration: not null }).ToList();
 
         int loopIndex = 0;
         foreach (var frame in loopFrames)
         {
             var key = $"__loop__/for-in-{loopIndex}";
             locals[key] = new IntLangValue(frame.LoopIteration!.Value);
-            System.Console.WriteLine($"[NEW SM] Saved loop state from ExecutionStack: key={key}, iteration={frame.LoopIteration.Value}");
             loopIndex++;
         }
     }

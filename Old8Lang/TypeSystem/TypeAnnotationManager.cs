@@ -13,19 +13,19 @@ namespace Old8Lang.TypeSystem;
 /// </summary>
 public class TypeAnnotationManager
 {
-    private readonly TypeFamily _typeFamily = new();
-    private readonly VariateManager _globalManager;
+    private readonly TypeFamily TypeFamily = new();
+    private readonly VariateManager GlobalManager;
 
     public TypeAnnotationManager(VariateManager globalManager)
     {
-        _globalManager = globalManager;
+        GlobalManager = globalManager;
         InitializeBasicTypes();
     }
 
     /// <summary>
     /// 获取全局变量管理器
     /// </summary>
-    public VariateManager GetGlobalManager() => _globalManager;
+    public VariateManager GetGlobalManager() => GlobalManager;
 
     /// <summary>
     /// 初始化基本类型
@@ -33,18 +33,18 @@ public class TypeAnnotationManager
     private void InitializeBasicTypes()
     {
         // 注册基本类型
-        _typeFamily.RegisterType(new PrimitiveTypeInfo("int"));
-        _typeFamily.RegisterType(new PrimitiveTypeInfo("double"));
-        _typeFamily.RegisterType(new PrimitiveTypeInfo("string"));
-        _typeFamily.RegisterType(new PrimitiveTypeInfo("bool"));
-        _typeFamily.RegisterType(new PrimitiveTypeInfo("char"));
-        _typeFamily.RegisterType(new PrimitiveTypeInfo("void"));
-        _typeFamily.RegisterType(new PrimitiveTypeInfo("any"));
-        _typeFamily.RegisterType(new PrimitiveTypeInfo("null"));
-        _typeFamily.RegisterType(new PrimitiveTypeInfo("array"));
-        _typeFamily.RegisterType(new PrimitiveTypeInfo("list"));
-        _typeFamily.RegisterType(new PrimitiveTypeInfo("dict"));
-        _typeFamily.RegisterType(new PrimitiveTypeInfo("function"));
+        TypeFamily.RegisterType(new PrimitiveTypeInfo("int"));
+        TypeFamily.RegisterType(new PrimitiveTypeInfo("double"));
+        TypeFamily.RegisterType(new PrimitiveTypeInfo("string"));
+        TypeFamily.RegisterType(new PrimitiveTypeInfo("bool"));
+        TypeFamily.RegisterType(new PrimitiveTypeInfo("char"));
+        TypeFamily.RegisterType(new PrimitiveTypeInfo("void"));
+        TypeFamily.RegisterType(new PrimitiveTypeInfo("any"));
+        TypeFamily.RegisterType(new PrimitiveTypeInfo("null"));
+        TypeFamily.RegisterType(new PrimitiveTypeInfo("array"));
+        TypeFamily.RegisterType(new PrimitiveTypeInfo("list"));
+        TypeFamily.RegisterType(new PrimitiveTypeInfo("dict"));
+        TypeFamily.RegisterType(new PrimitiveTypeInfo("function"));
     }
 
     /// <summary>
@@ -55,22 +55,22 @@ public class TypeAnnotationManager
         ITypeInfo? baseType = null;
         if (!string.IsNullOrEmpty(baseClassName))
         {
-            baseType = _typeFamily.GetType(baseClassName);
+            baseType = TypeFamily.GetType(baseClassName);
             if (baseType == null)
             {
                 // 如果父类还没有注册，先创建一个占位符
                 baseType = new ClassTypeInfo(baseClassName);
-                _typeFamily.RegisterType(baseType);
+                TypeFamily.RegisterType(baseType);
             }
         }
 
         var classType = new ClassTypeInfo(className, baseType);
-        _typeFamily.RegisterType(classType);
+        TypeFamily.RegisterType(classType);
     }
 
     /// <summary>
     /// 解析类型假注表达式
-    /// 支持复杂类型表达式如 "List<int>", "Map<string, Person>", "Shape|Circle"
+    /// 支持复杂类型表达式如 "List&lt;int&gt;", "Map&lt;string, Person&gt;", "Shape|Circle"
     /// </summary>
     public ParsedTypeAnnotation ParseTypeAnnotation(string typeAnnotation)
     {
@@ -132,17 +132,17 @@ public class TypeAnnotationManager
         if (expected.BaseType == "union")
         {
             return expected.TypeParameters!.Any(type =>
-                _typeFamily.IsCompatible(actual.BaseType, type));
+                TypeFamily.IsCompatible(actual.BaseType, type));
         }
 
         if (actual.BaseType == "union")
         {
             return actual.TypeParameters!.Any(type =>
-                _typeFamily.IsCompatible(type, expected.BaseType));
+                TypeFamily.IsCompatible(type, expected.BaseType));
         }
 
         // 处理多态类型
-        return _typeFamily.IsCompatible(actual.BaseType, expected.BaseType);
+        return TypeFamily.IsCompatible(actual.BaseType, expected.BaseType);
     }
 
     /// <summary>
@@ -196,7 +196,7 @@ public class TypeAnnotationManager
     /// </summary>
     public bool IsPolymorphicType(string typeName)
     {
-        return _typeFamily.IsPolymorphicType(typeName);
+        return TypeFamily.IsPolymorphicType(typeName);
     }
 
     /// <summary>
@@ -204,7 +204,7 @@ public class TypeAnnotationManager
     /// </summary>
     public List<string> GetSubTypes(string typeName)
     {
-        return _typeFamily.GetSubTypes(typeName)
+        return TypeFamily.GetSubTypes(typeName)
             .Select(t => t.Name)
             .ToList();
     }
@@ -212,14 +212,14 @@ public class TypeAnnotationManager
     /// <summary>
     /// 获取类型族信息
     /// </summary>
-    public TypeFamily GetTypeFamily() => _typeFamily;
+    public TypeFamily GetTypeFamily() => TypeFamily;
 
     /// <summary>
     /// 检查类型是否兼容（支持多态）
     /// </summary>
     public bool IsTypeCompatible(string sourceTypeName, string targetTypeName)
     {
-        return _typeFamily.IsCompatible(sourceTypeName, targetTypeName);
+        return TypeFamily.IsCompatible(sourceTypeName, targetTypeName);
     }
 
     /// <summary>
@@ -227,7 +227,7 @@ public class TypeAnnotationManager
     /// </summary>
     public ConcurrentDictionary<string, LangValueType> GetTypeMembers(string typeName, VariateManager manager)
     {
-        var typeInfo = _typeFamily.GetType(typeName);
+        var typeInfo = TypeFamily.GetType(typeName);
         if (typeInfo == null)
             return new ConcurrentDictionary<string, LangValueType>();
 
@@ -242,6 +242,6 @@ public class ParsedTypeAnnotation
 {
     public string BaseType { get; set; } = "";
     public List<string>? TypeParameters { get; set; }
-    public bool IsGeneric => TypeParameters != null && TypeParameters.Count > 0;
+    public bool IsGeneric => TypeParameters is { Count: > 0 };
     public bool IsUnion => BaseType == "union";
 }
