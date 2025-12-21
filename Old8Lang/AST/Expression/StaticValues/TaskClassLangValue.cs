@@ -258,10 +258,10 @@ public class TaskClassLangValue : LangValueType
     /// </summary>
     private static LangValueType Run(List<LangValueType> args, SourcePosition position)
     {
-        if (args.Count != 1)
+        if (args.Count is < 1 or > 2)
         {
             throw new ArgumentError(position,
-                $"Run 期望 1 个参数,但提供了 {args.Count} 个");
+                $"Run 期望 1-2 个参数,但提供了 {args.Count} 个");
         }
 
         if (args[0] is not FuncLangValue funcValue)
@@ -270,7 +270,22 @@ public class TaskClassLangValue : LangValueType
             throw new TypeError(tempNode, "function", args[0].TypeToString());
         }
 
-        return TaskLangValue.Run(funcValue, CancellationToken.None, position);
+        // 第二个参数是可选的 CancellationToken
+        CancellationToken cancellationToken = CancellationToken.None;
+        if (args.Count == 2)
+        {
+            if (args[1] is CancellationTokenLangValue tokenValue)
+            {
+                cancellationToken = tokenValue.Token;
+            }
+            else
+            {
+                var tempNode = new NullLangValue(position);
+                throw new TypeError(tempNode, "CancellationToken", args[1].TypeToString());
+            }
+        }
+
+        return TaskLangValue.Run(funcValue, cancellationToken, position);
     }
 }
 

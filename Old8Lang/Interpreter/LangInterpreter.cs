@@ -57,6 +57,8 @@ public class LangInterpreter
         Manager.Set(new LangId("Task"), TaskClassLangValue.GetInstance());
         Manager.Set(new LangId("Thread"), ThreadClassLangValue.GetInstance());
         Manager.Set(new LangId("TaskScheduler"), TaskSchedulerClassLangValue.GetInstance());
+        Manager.Set(new LangId("CancellationTokenSource"), CancellationTokenSourceConstructor.GetInstance());
+        Manager.Set(new LangId("TaskCompletionSource"), TaskCompletionSourceConstructor.GetInstance());
     }
 
     /// <summary>

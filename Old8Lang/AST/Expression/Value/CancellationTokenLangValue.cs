@@ -2,6 +2,7 @@ using Old8Lang.Compiler;
 using Old8Lang.Error;
 using System.Reflection.Emit;
 using Old8Lang.Interpreter;
+using Old8Lang.AST.Expression.Intermediates;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -70,6 +71,50 @@ public class CancellationTokenLangValue : LangValueType
     /// Run 方法：返回自身
     /// </summary>
     public override LangValueType Run(VariateManager manager) => this;
+
+    /// <summary>
+    /// Dot 方法：支持属性访问和方法调用
+    /// </summary>
+    public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
+    {
+        // 处理属性访问
+        if (dotExpression is LangId id)
+        {
+            var propertyName = id.IdName;
+
+            return propertyName switch
+            {
+                "IsCancellationRequested" => new BoolLangValue(IsCancellationRequested, Position),
+                "CanBeCanceled" => new BoolLangValue(_token.CanBeCanceled, Position),
+                _ => throw new AttributeError(dotExpression.Position, propertyName, "CancellationToken")
+            };
+        }
+
+        // 处理方法调用
+        if (dotExpression is Instance instance)
+        {
+            var methodName = instance.Id.IdName;
+
+            return methodName switch
+            {
+                "ThrowIfCancellationRequested" => CallThrowIfCancellationRequested(instance.Ids, manager),
+                _ => throw new AttributeError(instance.Position, methodName, "CancellationToken")
+            };
+        }
+
+        return base.Dot(dotExpression, manager);
+    }
+
+    private LangValueType CallThrowIfCancellationRequested(List<LangExpression> args, VariateManager manager)
+    {
+        if (args.Count != 0)
+        {
+            throw new ArgumentError(Position, $"ThrowIfCancellationRequested 期望 0 个参数，但提供了 {args.Count} 个");
+        }
+
+        ThrowIfCancellationRequested();
+        return new VoidLangValue(Position);
+    }
 
     /// <summary>
     /// 生成 IL 代码（编译器模式暂不支持）

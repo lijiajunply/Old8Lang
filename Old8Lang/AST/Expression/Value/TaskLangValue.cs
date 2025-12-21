@@ -480,11 +480,18 @@ public class TaskLangValue : LangValueType
     public static TaskLangValue Run(FuncLangValue func, CancellationToken cancellationToken = default,
         SourcePosition position = default)
     {
-        // 创建一个新的变量管理器，用于函数执行
-        var manager = new VariateManager();
-
         // 在线程池上执行函数
-        var runTask = System.Threading.Tasks.Task.Run(() => func.Run(manager), cancellationToken);
+        // func 已经是一个包含 CapturedScope 的闭包函数
+        // 我们直接调用 func.Run(manager, []) 来执行它
+        var runTask = System.Threading.Tasks.Task.Run(() =>
+        {
+            // 创建一个临时的 VariateManager，用于函数调用
+            // func 内部会使用它自己的 CapturedScope
+            var tempManager = new VariateManager();
+
+            // 调用函数，传入空参数列表
+            return func.Run(tempManager, []);
+        }, cancellationToken);
         return new TaskLangValue(runTask, cancellationToken, position);
     }
 

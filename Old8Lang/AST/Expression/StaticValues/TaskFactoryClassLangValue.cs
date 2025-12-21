@@ -62,16 +62,28 @@ public class TaskFactoryClassLangValue : LangValueType
     /// </summary>
     private static LangValueType StartNew(List<LangValueType> args, SourcePosition position)
     {
-        if (args.Count != 1)
+        if (args.Count is < 1 or > 2)
         {
             throw new ArgumentError(position,
-                $"StartNew 期望 1 个参数,但提供了 {args.Count} 个");
+                $"StartNew 期望 1-2 个参数,但提供了 {args.Count} 个");
         }
 
         if (args[0] is not FuncLangValue funcValue)
         {
             var tempNode = new NullLangValue(position);
             throw new TypeError(tempNode, "function", args[0].TypeToString());
+        }
+
+        // 第二个参数是可选的 TaskScheduler (当前实现忽略，因为 TaskLangValue.Run 不支持)
+        if (args.Count == 2)
+        {
+            if (args[1] is not TaskSchedulerLangValue)
+            {
+                var tempNode = new NullLangValue(position);
+                throw new TypeError(tempNode, "TaskScheduler", args[1].TypeToString());
+            }
+            // 注意：当前实现忽略 TaskScheduler 参数，因为 TaskLangValue.Run 使用 Task.Run
+            // 如果需要真正支持 TaskScheduler，需要使用 Task.Factory.StartNew
         }
 
         return TaskLangValue.Run(funcValue, System.Threading.CancellationToken.None, position);
