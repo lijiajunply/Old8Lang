@@ -11,7 +11,7 @@ using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Statement;
 
-public class ForInStatement(
+public partial class ForInStatement(
     LangId id,
     LangExpression expression,
     OldStatement body,

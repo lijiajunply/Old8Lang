@@ -1,4 +1,5 @@
 using System.Reflection.Emit;
+using Old8Lang.AST.Visitor;
 using Old8Lang.Compiler;
 using Old8Lang.Interpreter;
 
@@ -8,7 +9,7 @@ public abstract class OldStatement : IOldLangTree
 {
     /// <inheritdoc />
     public SourcePosition Position { get; }
-    
+
     /// <summary>
     /// 构造函数
     /// </summary>
@@ -17,11 +18,14 @@ public abstract class OldStatement : IOldLangTree
     {
         Position = position;
     }
-    
+
     public abstract void Run(VariateManager manager);
 
     public abstract void GenerateIl(ILGenerator ilGenerator, LocalManager local);
 
     public abstract OldStatement? this[int index] { get; }
     public abstract int Count { get; }
+
+    /// <inheritdoc />
+    public abstract TResult Accept<TResult>(IVisitor<TResult> visitor);
 }

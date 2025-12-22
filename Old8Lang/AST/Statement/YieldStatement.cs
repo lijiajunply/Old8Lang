@@ -7,7 +7,7 @@ namespace Old8Lang.AST.Statement;
 /// <summary>
 /// yield语句，用于生成器函数中暂停执行并返回值
 /// </summary>
-public class YieldStatement(LangExpression yieldExpression, SourcePosition position = default) : OldStatement(position)
+public partial class YieldStatement(LangExpression yieldExpression, SourcePosition position = default) : OldStatement(position)
 {
     /// <summary>
     /// yield表达式

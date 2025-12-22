@@ -8,7 +8,7 @@ namespace Old8Lang.AST.Statement;
 /// <summary>
 /// continue语句
 /// </summary>
-public class ContinueStatement(SourcePosition position = default) : OldStatement(position)
+public partial class ContinueStatement(SourcePosition position = default) : OldStatement(position)
 {
     public override void Run(VariateManager manager)
     {

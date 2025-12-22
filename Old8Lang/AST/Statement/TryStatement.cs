@@ -14,7 +14,7 @@ namespace Old8Lang.AST.Statement;
 /// <param name="catchBlocks">catch块列表，每个catch块包含异常类型和处理语句</param>
 /// <param name="finallyBlock">finally块中的语句</param>
 /// <param name="position">位置信息</param>
-public class TryStatement(
+public partial class TryStatement(
     BlockStatement tryBlock,
     List<(string? exceptionType, LangId? exceptionVar, BlockStatement catchBlock)> catchBlocks,
     BlockStatement? finallyBlock = null,

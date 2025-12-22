@@ -8,7 +8,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// <summary>
 /// 类型值
 /// </summary>
-public class TypeLangValue : LangValueType
+public partial class TypeLangValue : LangValueType
 {
     private readonly LangExpression? Expression;
     public string? Value { get; private set; }

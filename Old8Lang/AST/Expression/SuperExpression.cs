@@ -15,7 +15,7 @@ namespace Old8Lang.AST.Expression;
 /// - super.method(params) - 调用父类方法
 /// - super.property - 访问父类属性
 /// </remarks>
-public class SuperExpression(SourcePosition position = default) : LangExpression(position)
+public partial class SuperExpression(SourcePosition position = default) : LangExpression(position)
 {
     /// <summary>
     /// 在当前上下文中解析super表达式
@@ -46,7 +46,7 @@ public class SuperExpression(SourcePosition position = default) : LangExpression
 /// <summary>
 /// Super代理类，用于延迟解析父类成员访问
 /// </summary>
-public class SuperProxy(AnyLangValue currentInstance, VariateManager variateManager, SourcePosition position = default)
+public partial class SuperProxy(AnyLangValue currentInstance, VariateManager variateManager, SourcePosition position = default)
     : LangValueType(position)
 {
     /// <summary>

@@ -15,7 +15,7 @@ namespace Old8Lang.AST.Statement;
 /// 支持语法：async for item in asyncStream { ... }
 /// 类似于 C# 的 await foreach
 /// </summary>
-public class AsyncForInStatement(
+public partial class AsyncForInStatement(
     LangId id,
     LangExpression expression,
     OldStatement body,

@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="listId">列表 ID</param>
 /// <param name="key">关键词或索引</param>
 /// <param name="position">位置</param>
-public class LangListItem(LangId listId, LangExpression key, SourcePosition position = default)
+public partial class LangListItem(LangId listId, LangExpression key, SourcePosition position = default)
     : LangValueType(position)
 {
     public readonly LangId ListId = listId;

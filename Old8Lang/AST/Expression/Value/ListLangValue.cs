@@ -10,7 +10,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// <summary>
 /// 列表
 /// </summary>
-public class ListLangValue : LangValueType, ILangList
+public partial class ListLangValue : LangValueType, ILangList
 {
     private readonly List<LangExpression> Value;
 

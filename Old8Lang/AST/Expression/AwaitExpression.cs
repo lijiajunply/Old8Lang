@@ -10,7 +10,7 @@ namespace Old8Lang.AST.Expression;
 /// await 表达式
 /// 用于等待异步操作完成并获取结果
 /// </summary>
-public class AwaitExpression : LangExpression
+public partial class AwaitExpression : LangExpression
 {
     public readonly LangExpression Expression;
 

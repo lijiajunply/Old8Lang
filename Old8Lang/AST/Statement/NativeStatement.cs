@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Statement;
 /// 原生语句类，用于处理Old8Lang中的native导入语句
 /// 支持导入原生DLL、类和方法
 /// </summary>
-public class NativeStatement : OldStatement
+public partial class NativeStatement : OldStatement
 {
     /// <summary>
     /// DLL名称

@@ -17,7 +17,7 @@ namespace Old8Lang.AST.Expression;
 /// 该类是Old8Lang表达式系统的基础组件，用于表示各种标识符。
 /// 支持类型注解、默认值、"this"关键字处理等功能。
 /// </remarks>
-public class LangId(
+public partial class LangId(
     string name,
     string assumptionType = "",
     LangExpression? defaultValue = null,

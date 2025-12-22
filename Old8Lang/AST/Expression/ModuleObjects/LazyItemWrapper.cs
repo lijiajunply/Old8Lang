@@ -169,4 +169,9 @@ public class LazyItemWrapper(string moduleName, string itemName, VariateManager 
 
     public override string ToString() =>
         Loaded ? LoadedItem?.ToString() ?? "Loaded" : $"LazyItem({itemName} from {moduleName})";
+
+    public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)
+    {
+        throw new NotSupportedException("LazyItemWrapper 暂不支持 Visitor 模式访问");
+    }
 }

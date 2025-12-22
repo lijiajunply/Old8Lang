@@ -10,7 +10,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// 错误类
 /// </summary>
 /// <param name="value"></param>
-public class ErrorLangValue(Old8Exception value) : LangValueType
+public partial class ErrorLangValue(Old8Exception value) : LangValueType
 {
     /// <summary>
     /// 错误异常对象

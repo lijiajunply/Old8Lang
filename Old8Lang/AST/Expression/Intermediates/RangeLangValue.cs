@@ -14,7 +14,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <param name="position"></param>
 /// <param name="includeStart">是否包含起始值</param>
 /// <param name="includeEnd">是否包含结束值</param>
-public class RangeLangValue(
+public partial class RangeLangValue(
     LangExpression? start,
     LangExpression? end,
     SourcePosition position = default,

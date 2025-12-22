@@ -16,7 +16,7 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 /// <param name="anyLangValue">类模板信息，包含类名、父类、成员变量和方法等</param>
 /// <param name="position">源代码位置信息，用于错误报告</param>
-public class ClassInit(TypeTemplate anyLangValue, SourcePosition position = default) : OldStatement(position)
+public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition position = default) : OldStatement(position)
 {
     /// <summary>
     /// 类模板信息，包含类的完整定义

@@ -8,7 +8,7 @@ namespace Old8Lang.AST.Statement;
 /// <summary>
 /// break语句
 /// </summary>
-public class BreakStatement(SourcePosition position = default) : OldStatement(position)
+public partial class BreakStatement(SourcePosition position = default) : OldStatement(position)
 {
     
     public override void Run(VariateManager manager)

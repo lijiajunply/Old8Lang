@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression.Generators;
 /// <summary>
 /// 生成器对象，用于表示生成器函数的实例，实现ILangList接口以支持迭代
 /// </summary>
-public class GeneratorLangValue : LangValueType, ILangList
+public partial class GeneratorLangValue : LangValueType, ILangList
 {
     /// <summary>
     /// 生成器函数引用

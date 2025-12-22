@@ -2,6 +2,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
+using Old8Lang.AST.Visitor;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Generators;
 using Old8Lang.Interpreter;
@@ -283,5 +284,10 @@ public class AsyncFuncLangValue : ImportInfo
     public override Type OutputType(LocalManager local)
     {
         return typeof(Task<object>);
+    }
+
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
+    {
+        throw new NotSupportedException("AsyncFuncLangValue 暂不支持 Visitor 模式访问");
     }
 }

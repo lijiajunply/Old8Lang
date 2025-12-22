@@ -6,7 +6,7 @@ using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Statement;
 
-public class SwitchStatement(
+public partial class SwitchStatement(
     LangExpression switchExpression,
     List<CaseStatement> switchCaseList,
     BlockStatement? defaultBlockStatement = null,
@@ -205,7 +205,7 @@ public class SwitchStatement(
     public override int Count => switchCaseList.Count;
 }
 
-public class CaseStatement(LangExpression expression, BlockStatement blockStatement, SourcePosition position = default)
+public partial class CaseStatement(LangExpression expression, BlockStatement blockStatement, SourcePosition position = default)
     : OldStatement(position)
 {
     public LangExpression expression { get; } = expression;

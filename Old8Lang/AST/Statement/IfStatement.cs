@@ -9,7 +9,7 @@ namespace Old8Lang.AST.Statement;
 /// <summary>
 /// if语句
 /// </summary>
-public class IfStatement(
+public partial class IfStatement(
     IfChild ifChildBlock,
     List<IfChild?> elifBlock,
     BlockStatement? elseBlockStatement,

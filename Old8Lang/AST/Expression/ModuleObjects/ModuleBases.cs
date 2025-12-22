@@ -111,6 +111,8 @@ public abstract class ModuleBase(string moduleName) : IModuleObject, IOldLangTre
     {
         return $"<module {ModuleName} ({LoadingState})>";
     }
+
+    public abstract TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor);
 }
 
 /// <summary>
@@ -152,5 +154,10 @@ public abstract class ModuleValueBase(IModuleObject moduleObject, SourcePosition
     public override string ToString()
     {
         return moduleObject.ToString() ?? "";
+    }
+
+    public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)
+    {
+        throw new NotSupportedException("ModuleBase 暂不支持 Visitor 模式访问");
     }
 }

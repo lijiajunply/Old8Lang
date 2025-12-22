@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <param name="baseIndex">基础索引访问，如 array[index1]</param>
 /// <param name="nestedIndex">嵌套索引，如 [index2]</param>
 /// <param name="position">源代码位置</param>
-public class NestedIndexAccess(LangListItem baseIndex, LangExpression nestedIndex, SourcePosition position = default)
+public partial class NestedIndexAccess(LangListItem baseIndex, LangExpression nestedIndex, SourcePosition position = default)
     : LangValueType(position)
 {
     public readonly LangListItem BaseIndex = baseIndex;

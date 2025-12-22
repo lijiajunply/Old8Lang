@@ -10,7 +10,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// 取消令牌值类型
 /// 表示一个用于取消异步操作的令牌
 /// </summary>
-public class CancellationTokenLangValue : LangValueType
+public partial class CancellationTokenLangValue : LangValueType
 {
     private readonly CancellationToken _token;
 

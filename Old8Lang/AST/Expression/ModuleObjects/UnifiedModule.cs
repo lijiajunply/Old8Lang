@@ -316,6 +316,11 @@ public class UnifiedModule(
         throw new AttributeError(this, functionName, ModuleName);
     }
 
+    public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)
+    {
+        throw new NotSupportedException("UnifiedModule 暂不支持 Visitor 模式访问");
+    }
+
     #endregion
 }
 

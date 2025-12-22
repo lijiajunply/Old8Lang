@@ -9,7 +9,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <summary>
 /// 列表推导式
 /// </summary>
-public class ListComprehension : LangValueType
+public partial class ListComprehension : LangValueType
 {
     
     /// <summary>

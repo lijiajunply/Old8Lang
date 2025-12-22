@@ -6,7 +6,7 @@ using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Statement;
 
-public class ThrowStatement(LangExpression expression, SourcePosition position = default) : OldStatement(position)
+public partial class ThrowStatement(LangExpression expression, SourcePosition position = default) : OldStatement(position)
 {
     
     public override void Run(VariateManager manager)

@@ -41,4 +41,9 @@ public class NativeStaticAny(string className, Type classType) : ImportInfo
 
         throw new InvalidOperationError(this, "不支持的点操作表达式类型");
     }
+
+    public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)
+    {
+        throw new NotSupportedException("NativeStaticAny 暂不支持 Visitor 模式访问");
+    }
 }

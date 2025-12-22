@@ -10,7 +10,7 @@ namespace Old8Lang.AST.Expression;
 /// 三元表达式
 /// 语法：expression if condition else expression
 /// </summary>
-public class TernaryExpression(
+public partial class TernaryExpression(
     LangExpression condition,
     LangExpression trueExpression,
     LangExpression falseExpression,

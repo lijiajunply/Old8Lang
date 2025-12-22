@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 /// <param name="intValue">int数据</param>
 /// <param name="position">位置</param>
-public class IntLangValue(int intValue = 0, SourcePosition position = default) : LangValueType(position), IPoolable
+public partial class IntLangValue(int intValue = 0, SourcePosition position = default) : LangValueType(position), IPoolable
 {
     public int Value = intValue;
 

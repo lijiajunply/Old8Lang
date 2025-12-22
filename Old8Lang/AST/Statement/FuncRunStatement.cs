@@ -1,3 +1,4 @@
+using Old8Lang.AST.Visitor;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
@@ -69,4 +70,9 @@ public class FuncRunStatement : OldStatement
     public override string? ToString() =>
         AwaitExpr != null ? AwaitExpr.ToString() :
         Instance == null ? Operation == null ? "" : Operation.ToString() : Instance.ToString();
+
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
+    {
+        throw new NotSupportedException("FuncRunStatement 暂不支持 Visitor 模式访问");
+    }
 }

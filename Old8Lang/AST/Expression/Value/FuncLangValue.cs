@@ -856,4 +856,9 @@ public class FuncLangValue : ImportInfo
 
         return paramValues;
     }
+
+    public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)
+    {
+        throw new NotSupportedException("FuncLangValue 暂不支持 Visitor 模式访问");
+    }
 }

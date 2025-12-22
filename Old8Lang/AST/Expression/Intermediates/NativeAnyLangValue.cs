@@ -1,3 +1,4 @@
+using Old8Lang.AST.Visitor;
 using System.Reflection;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
@@ -63,5 +64,10 @@ public class NativeAnyLangValue(string dllName, string className, string path, s
     public void New(object[] pa)
     {
         InstanceObj = Constructor != null ? Constructor.Invoke(pa) : Activator.CreateInstance(ClassType!)!;
+    }
+
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
+    {
+        throw new NotSupportedException("NativeAnyLangValue 暂不支持 Visitor 模式访问");
     }
 }

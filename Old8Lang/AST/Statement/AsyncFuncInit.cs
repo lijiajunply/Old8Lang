@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Statement;
 /// 异步函数声明语句
 /// 表示 async func 定义
 /// </summary>
-public class AsyncFuncInit : OldStatement
+public partial class AsyncFuncInit : OldStatement
 {
     public readonly AsyncFuncLangValue AsyncFuncValue;
 

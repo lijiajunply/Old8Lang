@@ -10,7 +10,7 @@ namespace Old8Lang.AST.Statement;
 /// <summary>
 /// while语句
 /// </summary>
-public class WhileStatement(LangExpression expression, OldStatement blockStatement, SourcePosition position = default)
+public partial class WhileStatement(LangExpression expression, OldStatement blockStatement, SourcePosition position = default)
     : OldStatement(position)
 {
     public override void Run(VariateManager manager)

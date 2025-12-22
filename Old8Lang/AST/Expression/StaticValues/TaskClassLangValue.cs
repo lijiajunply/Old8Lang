@@ -10,7 +10,7 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// <summary>
 /// Task 类的全局对象,提供静态方法访问
 /// </summary>
-public class TaskClassLangValue : LangValueType
+public partial class TaskClassLangValue : LangValueType
 {
     private static readonly TaskClassLangValue Instance = new();
 
@@ -292,7 +292,7 @@ public class TaskClassLangValue : LangValueType
 /// <summary>
 /// Task 静态方法的包装器
 /// </summary>
-public class TaskStaticMethodWrapper(
+public partial class TaskStaticMethodWrapper(
     string methodName,
     Func<List<LangValueType>, SourcePosition, LangValueType> method)
     : LangValueType

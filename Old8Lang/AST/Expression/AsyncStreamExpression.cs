@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression;
 /// 异步流表达式
 /// 表示 async { block } 语法，创建一个异步流（异步生成器）
 /// </summary>
-public class AsyncStreamExpression : LangExpression
+public partial class AsyncStreamExpression : LangExpression
 {
     private readonly BlockStatement Block;
 

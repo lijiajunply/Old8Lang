@@ -31,7 +31,7 @@ public enum TaskStatus
 /// Task 值类型，表示异步操作
 /// 包装 .NET Task&lt;LangValueType&gt;，支持异步执行和 await 等待
 /// </summary>
-public class TaskLangValue : LangValueType
+public partial class TaskLangValue : LangValueType
 {
     public readonly Task<LangValueType> Task;
     private readonly CancellationToken _cancellationToken;

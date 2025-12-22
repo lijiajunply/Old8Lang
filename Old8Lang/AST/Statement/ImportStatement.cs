@@ -37,7 +37,7 @@ public class ImportItem(string name, string? alias = null)
 /// <param name="isSelective">是否为选择导入，如 from module import a, b, c</param>
 /// <param name="isDynamic">是否为动态导入，模块名在运行时计算</param>
 /// <param name="dynamicModuleExpression">动态模块表达式</param>
-public class ImportStatement(
+public partial class ImportStatement(
     string importString,
     SourcePosition position = default,
     List<ImportItem>? importSpecifiers = null,

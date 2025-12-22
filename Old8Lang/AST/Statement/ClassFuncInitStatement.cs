@@ -1,3 +1,4 @@
+using Old8Lang.AST.Visitor;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
@@ -44,4 +45,9 @@ public class ClassFuncInitStatement : OldStatement
     public override int Count => 0;
 
     public override string ToString() => $"{Id} {FuncValue}";
+
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
+    {
+        throw new NotSupportedException("ClassFuncInitStatement 暂不支持 Visitor 模式访问");
+    }
 }

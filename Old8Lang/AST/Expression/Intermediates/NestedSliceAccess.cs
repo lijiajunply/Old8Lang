@@ -14,7 +14,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <param name="sliceEnd">切片结束索引（可选）</param>
 /// <param name="sliceStep">切片步长（可选）</param>
 /// <param name="position">源代码位置</param>
-public class NestedSliceAccess(
+public partial class NestedSliceAccess(
     LangListItem baseIndex,
     LangExpression sliceStart,
     LangExpression? sliceEnd = null,

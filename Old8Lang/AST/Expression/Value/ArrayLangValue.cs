@@ -9,7 +9,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// <summary>
 /// 数列
 /// </summary>
-public class ArrayLangValue : LangValueType, ILangList
+public partial class ArrayLangValue : LangValueType, ILangList
 {
     private readonly LangValueType[] RunResult; // 保持固定大小数组
     private readonly List<LangExpression> Values = [];

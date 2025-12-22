@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="v1"></param>
 /// <param name="v2"></param>
 /// <param name="position"></param>
-public class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition position = default)
+public partial class TupleLangValue(LangExpression v1, LangExpression v2, SourcePosition position = default)
     : LangValueType(position), ILangList
 {
     public readonly LangExpression V1 = v1;

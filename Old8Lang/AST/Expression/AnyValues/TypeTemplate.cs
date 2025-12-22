@@ -622,12 +622,17 @@ public class TypeTemplate(
 
         return instance;
     }
+
+    public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)
+    {
+        throw new NotSupportedException("TypeTemplate 暂不支持 Visitor 模式访问");
+    }
 }
 
 /// <summary>
 /// 类方法重载列表，用于存储一个方法的所有重载版本
 /// </summary>
-public class MethodOverloadList : LangValueType
+public partial class MethodOverloadList : LangValueType
 {
     /// <summary>
     /// 重载方法列表
@@ -781,5 +786,10 @@ public class MethodOverloadList : LangValueType
     public override string ToString()
     {
         return $"MethodOverloadList[{Overloads.Count} overloads]";
+    }
+
+    public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)
+    {
+        throw new NotSupportedException("TypeTemplate 暂不支持 Visitor 模式访问");
     }
 }

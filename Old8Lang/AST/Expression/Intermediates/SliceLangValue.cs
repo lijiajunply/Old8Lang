@@ -10,7 +10,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <param name="start"></param>
 /// <param name="end"></param>
 /// <param name="step"></param>
-public class SliceLangValue(LangId id, LangExpression? start = null, LangExpression? end = null, LangExpression? step = null) : LangValueType
+public partial class SliceLangValue(LangId id, LangExpression? start = null, LangExpression? end = null, LangExpression? step = null) : LangValueType
 {
     /// <summary>
     /// 集合标识符

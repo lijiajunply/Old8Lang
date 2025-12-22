@@ -7,7 +7,7 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// <summary>
 /// TaskScheduler 类的全局对象
 /// </summary>
-public class TaskSchedulerClassLangValue : LangValueType
+public partial class TaskSchedulerClassLangValue : LangValueType
 {
     private static readonly TaskSchedulerClassLangValue Instance = new();
 
@@ -46,7 +46,7 @@ public class TaskSchedulerClassLangValue : LangValueType
 /// <summary>
 /// TaskScheduler 实例值类型
 /// </summary>
-public class TaskSchedulerLangValue : LangValueType
+public partial class TaskSchedulerLangValue : LangValueType
 {
     private readonly System.Threading.Tasks.TaskScheduler _scheduler;
 

@@ -5,7 +5,7 @@ using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Expression.StaticValues;
 
-public class ThreadClassLangValue : LangValueType
+public partial class ThreadClassLangValue : LangValueType
 {
     private static readonly ThreadClassLangValue Instance = new();
 
@@ -195,7 +195,7 @@ public class ThreadClassLangValue : LangValueType
 /// <summary>
 /// Task 静态方法的包装器
 /// </summary>
-public class ThreadStaticMethodWrapper(
+public partial class ThreadStaticMethodWrapper(
     string methodName,
     Func<List<LangValueType>, SourcePosition, LangValueType> method)
     : LangValueType

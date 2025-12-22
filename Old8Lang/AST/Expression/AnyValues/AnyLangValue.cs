@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression.AnyValues;
 /// 类实例（重新设计版本）
 /// 职责明确：只存储实例数据和指向类型元数据的引用
 /// </summary>
-public class AnyLangValue : LangValueType
+public partial class AnyLangValue : LangValueType
 {
     /// <summary>
     /// 类型元数据引用（指向 ClassMetadata）

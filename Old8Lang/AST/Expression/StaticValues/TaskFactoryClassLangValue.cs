@@ -7,7 +7,7 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// <summary>
 /// TaskFactory 类的全局对象
 /// </summary>
-public class TaskFactoryClassLangValue : LangValueType
+public partial class TaskFactoryClassLangValue : LangValueType
 {
     public override string TypeToString() => "TaskFactoryClass";
 
@@ -93,7 +93,7 @@ public class TaskFactoryClassLangValue : LangValueType
 /// <summary>
 /// TaskFactory 静态方法的包装器
 /// </summary>
-public class TaskFactoryStaticMethodWrapper(
+public partial class TaskFactoryStaticMethodWrapper(
     string methodName,
     Func<List<LangValueType>, SourcePosition, LangValueType> method)
     : LangValueType

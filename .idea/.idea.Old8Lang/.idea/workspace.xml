@@ -9,6 +9,7 @@
     <projectFile>LibTest/LibTest.csproj</projectFile>
     <projectFile>Old8Lang.App/Old8Lang.App.csproj</projectFile>
     <projectFile>Old8Lang.Benchmarks/Old8Lang.Benchmarks.csproj</projectFile>
+    <projectFile>Old8Lang.CodeGen/Old8Lang.CodeGen.csproj</projectFile>
     <projectFile profileName="Old8Lang.Net">Old8Lang.Net/Old8Lang.Net.csproj</projectFile>
     <projectFile>Old8Lang.PackageManager.Tests/Old8Lang.PackageManager.Tests.csproj</projectFile>
     <projectFile>Old8Lang.PackageManager/Old8Lang.PackageManager.csproj</projectFile>
@@ -19,7 +20,88 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Configuration/CodeGenConfig.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Generator/AcceptMethodGenerator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Generator/VisitorInterfaceGenerator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Old8Lang.CodeGen.csproj" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Program.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Scanner/AstNodeInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Scanner/AstNodeScanner.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Utils/PartialClassConverter.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/visitor-codegen.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/AnyLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ArrayLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/AsyncForInStatement.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/AsyncFuncInit.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/AsyncGeneratorLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/AsyncStreamExpression.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/AsyncStreamLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/AwaitExpression.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/BlockStatement.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/BoolLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/BreakStatement.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/CancellationTokenLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/CancellationTokenSourceLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/CaseStatement.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/CharLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ClassInit.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ContinueStatement.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/DictionaryLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/DoubleLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ErrorLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ForInStatement.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ForStatement.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/FuncInit.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/FunctionCallExpression.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/GeneratorLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/IVisitor.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/IfStatement.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ImportStatement.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/Instance.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/IntLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/LangId.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/LangListItem.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ListComprehension.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ListLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/MethodOverloadList.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/NativeStatement.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/NestedIndexAccess.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/NestedSliceAccess.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/NullLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/Operation.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/RangeLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ReturnStatement.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/SetStatement.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/SliceLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/StringLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/StringTemplateValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/SuperExpression.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/SuperProxy.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/SwitchStatement.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TaskClassLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TaskCompletionSourceLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TaskFactoryClassLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TaskFactoryStaticMethodWrapper.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TaskLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TaskSchedulerClassLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TaskSchedulerLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TaskStaticMethodWrapper.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TernaryExpression.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ThreadClassLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ThreadLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ThreadStaticMethodWrapper.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ThrowStatement.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TryStatement.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TupleLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TypeLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/VoidLangValue.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/WhileStatement.Accept.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/YieldStatement.Accept.generated.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/OldLangTree.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/OldLangTree.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -451,6 +533,7 @@
       <workItem from="1766298953988" duration="5700000" />
       <workItem from="1766308100500" duration="10097000" />
       <workItem from="1766330641326" duration="12155000" />
+      <workItem from="1766385211009" duration="1338000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>

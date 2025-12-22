@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// TaskCompletionSource 值类型
 /// 表示一个可以手动控制完成的 Task
 /// </summary>
-public class TaskCompletionSourceLangValue : LangValueType
+public partial class TaskCompletionSourceLangValue : LangValueType
 {
     private readonly TaskCompletionSource<LangValueType> Tcs;
 

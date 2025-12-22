@@ -18,7 +18,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// <param name="langId"></param>
 /// <param name="ids"></param>
 /// <param name="position"></param>
-public class Instance(LangId langId, List<LangExpression> ids, SourcePosition position = default)
+public partial class Instance(LangId langId, List<LangExpression> ids, SourcePosition position = default)
     : LangValueType(position)
 {
     public readonly List<LangExpression> Ids = ids;

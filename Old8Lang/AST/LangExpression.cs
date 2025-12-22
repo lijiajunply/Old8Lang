@@ -1,5 +1,6 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Visitor;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
@@ -74,4 +75,7 @@ public abstract class LangExpression : IOldLangTree
     {
         throw new InvalidOperationError(this, "表达式未实现OutputType方法", "请在子类中实现OutputType方法");
     }
+
+    /// <inheritdoc />
+    public abstract TResult Accept<TResult>(IVisitor<TResult> visitor);
 }

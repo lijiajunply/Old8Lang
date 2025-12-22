@@ -1,5 +1,6 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Visitor;
 using Old8Lang.Compiler;
 using Old8Lang.Interpreter;
 
@@ -8,7 +9,7 @@ namespace Old8Lang.AST.Statement;
 public class IfChild(LangExpression expression, BlockStatement blockStatement, SourcePosition position = default)
     : OldStatement(position)
 {
-    
+
     public void Run(VariateManager manager, ref bool r)
     {
         if (!r) return;
@@ -38,4 +39,9 @@ public class IfChild(LangExpression expression, BlockStatement blockStatement, S
     public override OldStatement this[int index] => blockStatement[index];
 
     public override int Count => blockStatement.Count;
+
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
+    {
+        throw new NotSupportedException("IfChild 是内部辅助类，不支持 Visitor 模式访问");
+    }
 }

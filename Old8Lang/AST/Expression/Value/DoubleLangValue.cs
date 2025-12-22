@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 /// <param name="doubleValue"></param>
 /// <param name="position"></param>
-public class DoubleLangValue(double doubleValue = 0, SourcePosition position = default)
+public partial class DoubleLangValue(double doubleValue = 0, SourcePosition position = default)
     : LangValueType(position), IPoolable
 {
     public double Value = doubleValue;

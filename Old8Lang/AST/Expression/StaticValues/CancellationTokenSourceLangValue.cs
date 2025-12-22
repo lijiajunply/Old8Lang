@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression.StaticValues;
 /// 取消令牌源值类型
 /// 表示一个可以生成取消令牌的源，用于取消异步操作
 /// </summary>
-public class CancellationTokenSourceLangValue : LangValueType
+public partial class CancellationTokenSourceLangValue : LangValueType
 {
     private readonly CancellationTokenSource Cts;
 

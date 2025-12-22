@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Statement;
 /// <summary>
 /// 块
 /// </summary>
-public class BlockStatement : OldStatement
+public partial class BlockStatement : OldStatement
 {
     private readonly List<OldStatement> ImportStatements = [];
     private readonly List<OldStatement> OtherStatements = [];

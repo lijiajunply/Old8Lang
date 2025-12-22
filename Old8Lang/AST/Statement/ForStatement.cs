@@ -7,7 +7,7 @@ using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Statement;
 
-public class ForStatement(
+public partial class ForStatement(
     SetStatement setStatement,
     LangExpression expression,
     OldStatement statement,

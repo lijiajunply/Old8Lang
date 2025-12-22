@@ -10,7 +10,7 @@ namespace Old8Lang.AST.Expression.Generators;
 /// 异步生成器对象，用于表示异步生成器函数的实例，实现ILangList接口以支持异步迭代
 /// 类似于 C# 的 IAsyncEnumerable&lt;T&gt;
 /// </summary>
-public class AsyncGeneratorLangValue : LangValueType, ILangList
+public partial class AsyncGeneratorLangValue : LangValueType, ILangList
 {
     /// <summary>
     /// 异步函数引用

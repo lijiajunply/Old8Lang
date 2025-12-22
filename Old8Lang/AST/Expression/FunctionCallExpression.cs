@@ -10,7 +10,7 @@ namespace Old8Lang.AST.Expression;
 /// 函数调用表达式，用于处理 expression(arguments) 语法
 /// 例如：cla[0]("World"), obj.method()(args)
 /// </summary>
-public class FunctionCallExpression : LangExpression
+public partial class FunctionCallExpression : LangExpression
 {
     /// <summary>
     /// 要调用的函数表达式

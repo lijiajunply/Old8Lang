@@ -10,7 +10,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// </summary>
 /// <param name="list"></param>
 /// <param name="position"></param>
-public class StringTemplateValue(List<LangExpression> list, SourcePosition position = default) : LangValueType(position)
+public partial class StringTemplateValue(List<LangExpression> list, SourcePosition position = default) : LangValueType(position)
 {
 
     public override LangValueType Run(VariateManager manager)

@@ -29,7 +29,7 @@ namespace Old8Lang.AST.Expression;
 /// - 索引访问
 /// - 一元运算符：!, -
 /// </remarks>
-public class Operation(
+public partial class Operation(
     LangExpression? left,
     LangTokenType opera,
     LangExpression? right,

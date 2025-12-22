@@ -1,3 +1,4 @@
+using Old8Lang.AST.Visitor;
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
 using Old8Lang.Compiler;
@@ -50,4 +51,9 @@ public class ClassFieldSetStatement : OldStatement
     public override int Count => 0;
 
     public override string ToString() => $"{Id} <- {Value}";
+
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
+    {
+        throw new NotSupportedException("ClassFieldSetStatement 暂不支持 Visitor 模式访问");
+    }
 }

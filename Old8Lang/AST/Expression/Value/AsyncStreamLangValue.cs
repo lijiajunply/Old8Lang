@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// 表示 async { } 语法创建的异步流（异步生成器）
 /// 这是 AsyncGeneratorLangValue 的包装类，专门用于 async { } 语法
 /// </summary>
-public class AsyncStreamLangValue : LangValueType, ILangList
+public partial class AsyncStreamLangValue : LangValueType, ILangList
 {
     /// <summary>
     /// 内部的异步生成器

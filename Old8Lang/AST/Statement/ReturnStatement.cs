@@ -7,7 +7,7 @@ using Old8Lang.TypeSystem;
 
 namespace Old8Lang.AST.Statement;
 
-public class ReturnStatement(LangExpression returnExpression, SourcePosition position = default) : OldStatement(position)
+public partial class ReturnStatement(LangExpression returnExpression, SourcePosition position = default) : OldStatement(position)
 {
     
     public override void Run(VariateManager manager)

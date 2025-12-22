@@ -16,7 +16,7 @@ namespace Old8Lang.AST.Statement;
 /// 赋值语句类，用于处理Old8Lang中的赋值操作
 /// 支持普通变量赋值、成员访问赋值和索引访问赋值
 /// </summary>
-public class SetStatement : OldStatement
+public partial class SetStatement : OldStatement
 {
     /// <summary>
     /// 变量标识符（用于普通变量赋值）

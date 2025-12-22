@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// <summary>
 /// 字典 键对值
 /// </summary>
-public class DictionaryLangValue : LangValueType, ILangList
+public partial class DictionaryLangValue : LangValueType, ILangList
 {
     private readonly List<TupleLangValue> Tuples;
     public readonly List<(LangValueType Key, LangValueType Value)> Value = [];

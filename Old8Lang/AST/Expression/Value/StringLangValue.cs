@@ -12,7 +12,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 /// <param name="context"></param>
 /// <param name="position"></param>
-public class StringLangValue(string context = "", SourcePosition position = default)
+public partial class StringLangValue(string context = "", SourcePosition position = default)
     : LangValueType(position), ILangList, IPoolable
 {
     public string Value { get; private set; } = context.Replace("\\n", "\n").Replace("\\t", "\t").Replace("\\r", "\r")

@@ -9,7 +9,7 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// 静态值，不可访问
 /// </summary>
 /// <param name="position">位置信息</param>
-public class VoidLangValue(SourcePosition position = default) : LangValueType(position)
+public partial class VoidLangValue(SourcePosition position = default) : LangValueType(position)
 {
 
     public override object GetValue() => throw new InvalidOperationError(this, "尝试访问无效值（VoidValue）");

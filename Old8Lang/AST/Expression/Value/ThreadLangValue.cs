@@ -9,7 +9,7 @@ namespace Old8Lang.AST.Expression.Value;
 /// <summary>
 /// 线程值类型，用于表示和管理线程
 /// </summary>
-public class ThreadLangValue : LangValueType
+public partial class ThreadLangValue : LangValueType
 {
     /// <summary>
     /// 线程对象
