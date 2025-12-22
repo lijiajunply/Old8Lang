@@ -16,9 +16,17 @@ class Program
         Console.WriteLine();
 
         // 检查命令
-        if (args.Length > 0 && args[0] == "make-partial")
+        if (args.Length > 0)
         {
-            return await MakePartialCommand(args.Skip(1).ToArray());
+            switch (args[0])
+            {
+                case "make-partial":
+                    return await MakePartialCommand(args.Skip(1).ToArray());
+                case "generate-stubs":
+                    return await GenerateStubsCommand(args.Skip(1).ToArray());
+                default:
+                    break; // 继续执行默认的 generate-visitor 命令
+            }
         }
 
         // 解析命令行参数
@@ -78,6 +86,7 @@ class Program
         Console.WriteLine("命令:");
         Console.WriteLine("  (无)                生成 Visitor 模式代码（默认）");
         Console.WriteLine("  make-partial        将 AST 节点类标记为 partial class");
+        Console.WriteLine("  generate-stubs      生成 Visitor 实现骨架");
         Console.WriteLine();
         Console.WriteLine("选项:");
         Console.WriteLine("  --config <路径>     指定配置文件路径 (默认: visitor-codegen.json)");
@@ -273,6 +282,110 @@ class Program
             Console.WriteLine("1. 将所有 AST 节点类标记为 partial class");
             Console.WriteLine("2. 在 IOldLangTree 接口中添加 Accept 方法声明");
             Console.WriteLine("3. 编译项目验证生成的代码");
+        }
+    }
+
+    static async Task<int> GenerateStubsCommand(string[] args)
+    {
+        Console.WriteLine("[INFO] 开始 generate-stubs 命令...");
+        Console.WriteLine();
+
+        var configPath = "visitor-codegen.json";
+        var preview = false;
+
+        for (int i = 0; i < args.Length; i++)
+        {
+            switch (args[i])
+            {
+                case "--config":
+                    if (i + 1 < args.Length)
+                    {
+                        configPath = args[++i];
+                    }
+                    break;
+                case "--preview":
+                    preview = true;
+                    break;
+            }
+        }
+
+        try
+        {
+            // 1. 加载配置
+            var config = CodeGenConfig.Load(configPath);
+            Console.WriteLine($"[INFO] 扫描目录: {config.ScanDirectory}");
+            Console.WriteLine($"[INFO] 输出目录: {config.OutputDirectory}");
+            Console.WriteLine();
+
+            // 2. 扫描节点
+            Console.WriteLine("[STEP 1/4] 扫描 AST 节点...");
+            var scanner = new AstNodeScanner(
+                config.ScanDirectory,
+                new HashSet<string>(config.ExcludeClasses),
+                config.ExcludePatterns
+            );
+            var nodes = scanner.ScanNodes();
+            Console.WriteLine($"[SUCCESS] 发现 {nodes.Count} 个 AST 节点");
+            Console.WriteLine();
+
+            // 3. 生成 InterpreterVisitor 骨架
+            Console.WriteLine("[STEP 2/4] 生成 InterpreterVisitor 骨架...");
+            var implGen = new VisitorImplementationGenerator(nodes);
+            var interpreterStubs = implGen.GenerateInterpreterStubs();
+            var interpreterPath = Path.Combine(config.OutputDirectory, "InterpreterVisitor.Stubs.generated.cs");
+
+            if (!preview)
+            {
+                await File.WriteAllTextAsync(interpreterPath, interpreterStubs);
+                Console.WriteLine($"[SUCCESS] 生成 InterpreterVisitor.Stubs.generated.cs");
+            }
+
+            // 4. 生成 CompilerVisitor 骨架
+            Console.WriteLine("[STEP 3/4] 生成 CompilerVisitor 骨架...");
+            var compilerStubs = implGen.GenerateCompilerStubs();
+            var compilerPath = Path.Combine(config.OutputDirectory, "CompilerVisitor.Stubs.generated.cs");
+
+            if (!preview)
+            {
+                await File.WriteAllTextAsync(compilerPath, compilerStubs);
+                Console.WriteLine($"[SUCCESS] 生成 CompilerVisitor.Stubs.generated.cs");
+            }
+
+            // 5. 生成 TypeInferenceVisitor 骨架
+            Console.WriteLine("[STEP 4/4] 生成 TypeInferenceVisitor 骨架...");
+            var typeInferenceStubs = implGen.GenerateTypeInferenceStubs();
+            var typeInferencePath = Path.Combine(config.OutputDirectory, "TypeInferenceVisitor.Stubs.generated.cs");
+
+            if (!preview)
+            {
+                await File.WriteAllTextAsync(typeInferencePath, typeInferenceStubs);
+                Console.WriteLine($"[SUCCESS] 生成 TypeInferenceVisitor.Stubs.generated.cs");
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("╔════════════════════════════════════════════════════════════╗");
+            Console.WriteLine("║                  🎉 骨架生成成功！                         ║");
+            Console.WriteLine("╚════════════════════════════════════════════════════════════╝");
+            Console.WriteLine();
+            Console.WriteLine("生成的文件:");
+            Console.WriteLine($"  - {interpreterPath}");
+            Console.WriteLine($"  - {compilerPath}");
+            Console.WriteLine($"  - {typeInferencePath}");
+            Console.WriteLine();
+            Console.WriteLine("下一步:");
+            Console.WriteLine("1. 查看生成的骨架文件");
+            Console.WriteLine("2. 将实现好的方法迁移到手动维护的 partial class 文件");
+            Console.WriteLine("3. 删除已实现方法的骨架代码");
+
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine();
+            Console.WriteLine("[ERROR] generate-stubs 命令失败！");
+            Console.WriteLine($"错误信息: {ex.Message}");
+            Console.WriteLine($"堆栈跟踪: {ex.StackTrace}");
+            return 1;
         }
     }
 }

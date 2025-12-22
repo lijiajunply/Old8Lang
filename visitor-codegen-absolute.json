@@ -1,0 +1,22 @@
+{
+  "scanDirectory": "/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST",
+  "outputDirectory": "/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Visitor/Generated",
+  "excludePatterns": [
+    "**/ValueFunctions/**",
+    "**/ModuleObjects/**",
+    "**/*Helper.cs"
+  ],
+  "excludeClasses": [
+    "IOldLangTree",
+    "OldStatement",
+    "LangExpression",
+    "LangValueType",
+    "IfChild",
+    "DllPathResolver",
+    "FuncRunStatement",
+    "ClassFieldSetStatement",
+    "ClassFuncInitStatement"
+  ],
+  "generatePartialClasses": true,
+  "addGeneratedCodeAttribute": true
+}
