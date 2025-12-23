@@ -20,87 +20,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Configuration/CodeGenConfig.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Generator/AcceptMethodGenerator.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Generator/VisitorInterfaceGenerator.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Old8Lang.CodeGen.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Program.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Scanner/AstNodeInfo.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Scanner/AstNodeScanner.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/Utils/PartialClassConverter.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.CodeGen/visitor-codegen.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/AnyLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ArrayLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/AsyncForInStatement.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/AsyncFuncInit.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/AsyncGeneratorLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/AsyncStreamExpression.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/AsyncStreamLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/AwaitExpression.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/BlockStatement.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/BoolLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/BreakStatement.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/CancellationTokenLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/CancellationTokenSourceLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/CaseStatement.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/CharLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ClassInit.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ContinueStatement.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/DictionaryLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/DoubleLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ErrorLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ForInStatement.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ForStatement.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/FuncInit.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/FunctionCallExpression.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/GeneratorLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/IVisitor.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/IfStatement.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ImportStatement.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/Instance.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/IntLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/LangId.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/LangListItem.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ListComprehension.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ListLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/MethodOverloadList.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/NativeStatement.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/NestedIndexAccess.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/NestedSliceAccess.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/NullLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/Operation.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/RangeLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ReturnStatement.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/SetStatement.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/SliceLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/StringLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/StringTemplateValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/SuperExpression.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/SuperProxy.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/SwitchStatement.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TaskClassLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TaskCompletionSourceLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TaskFactoryClassLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TaskFactoryStaticMethodWrapper.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TaskLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TaskSchedulerClassLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TaskSchedulerLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TaskStaticMethodWrapper.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TernaryExpression.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ThreadClassLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ThreadLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ThreadStaticMethodWrapper.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/ThrowStatement.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TryStatement.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TupleLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/TypeLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/VoidLangValue.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/WhileStatement.Accept.generated.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/YieldStatement.Accept.generated.cs" afterDir="false" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Changes">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/PackageManagement/PackageManager.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryLoader.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/OldLangTree.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/OldLangTree.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_circular_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_circular_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/DllPathResolver.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/DllPathResolver.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/__init__.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/Terminal.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Terminal.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -534,6 +468,7 @@
       <workItem from="1766308100500" duration="10097000" />
       <workItem from="1766330641326" duration="12155000" />
       <workItem from="1766385211009" duration="1338000" />
+      <workItem from="1766441034395" duration="1692000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -1187,10 +1122,10 @@
           <line>49</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/RangeLangValue.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="1505" />
+              <option value="1513" />
             </startOffsets>
             <endOffsets>
-              <option value="1545" />
+              <option value="1553" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="586" />
@@ -1304,10 +1239,10 @@
           <line>56</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="1934" />
+              <option value="1906" />
             </startOffsets>
             <endOffsets>
-              <option value="1970" />
+              <option value="1953" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="612" />
@@ -1317,10 +1252,10 @@
           <line>55</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="1878" />
+              <option value="1841" />
             </startOffsets>
             <endOffsets>
-              <option value="1925" />
+              <option value="1897" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="613" />
@@ -1343,10 +1278,10 @@
           <line>116</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="3130" />
+              <option value="3138" />
             </startOffsets>
             <endOffsets>
-              <option value="3169" />
+              <option value="3177" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="617" />
@@ -1356,10 +1291,10 @@
           <line>534</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="19634" />
+              <option value="19642" />
             </startOffsets>
             <endOffsets>
-              <option value="19795" />
+              <option value="19803" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="618" />
@@ -1369,10 +1304,10 @@
           <line>527</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="19422" />
+              <option value="19430" />
             </startOffsets>
             <endOffsets>
-              <option value="19442" />
+              <option value="19450" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="619" />
@@ -1382,10 +1317,10 @@
           <line>550</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="20401" />
+              <option value="20409" />
             </startOffsets>
             <endOffsets>
-              <option value="20479" />
+              <option value="20487" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="620" />
@@ -1395,10 +1330,10 @@
           <line>551</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="20492" />
+              <option value="20500" />
             </startOffsets>
             <endOffsets>
-              <option value="20526" />
+              <option value="20534" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="621" />
@@ -1408,10 +1343,10 @@
           <line>584</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="21665" />
+              <option value="21673" />
             </startOffsets>
             <endOffsets>
-              <option value="21679" />
+              <option value="21687" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="622" />
@@ -1421,10 +1356,10 @@
           <line>588</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="21775" />
+              <option value="21783" />
             </startOffsets>
             <endOffsets>
-              <option value="21860" />
+              <option value="21868" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="623" />
@@ -1434,10 +1369,10 @@
           <line>589</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="21873" />
+              <option value="21881" />
             </startOffsets>
             <endOffsets>
-              <option value="21915" />
+              <option value="21923" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="624" />
@@ -1447,10 +1382,10 @@
           <line>593</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="22040" />
+              <option value="22048" />
             </startOffsets>
             <endOffsets>
-              <option value="22176" />
+              <option value="22184" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="625" />
@@ -1460,10 +1395,10 @@
           <line>614</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="22657" />
+              <option value="22665" />
             </startOffsets>
             <endOffsets>
-              <option value="22725" />
+              <option value="22733" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="626" />
@@ -1473,10 +1408,10 @@
           <line>623</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="22921" />
+              <option value="22929" />
             </startOffsets>
             <endOffsets>
-              <option value="22988" />
+              <option value="22996" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="627" />
@@ -1486,10 +1421,10 @@
           <line>626</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="23051" />
+              <option value="23059" />
             </startOffsets>
             <endOffsets>
-              <option value="23111" />
+              <option value="23119" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="628" />
@@ -1512,10 +1447,10 @@
           <line>56</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncFuncInit.cs" containingFunctionPresentation="方法 'Run'">
             <startOffsets>
-              <option value="1438" />
+              <option value="1446" />
             </startOffsets>
             <endOffsets>
-              <option value="1478" />
+              <option value="1486" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="632" />
@@ -1538,10 +1473,10 @@
           <line>81</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" containingFunctionPresentation="方法 'Dot'">
             <startOffsets>
-              <option value="2440" />
+              <option value="2448" />
             </startOffsets>
             <endOffsets>
-              <option value="2477" />
+              <option value="2485" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="634" />
@@ -1551,10 +1486,10 @@
           <line>52</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" containingFunctionPresentation="方法 'Dot'">
             <startOffsets>
-              <option value="1427" />
+              <option value="1435" />
             </startOffsets>
             <endOffsets>
-              <option value="1466" />
+              <option value="1474" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="635" />

@@ -20,12 +20,6 @@ public static class Terminal
     public static int ReadAscii() => Console.Read();
     
     /// <summary>
-    /// 读取一行输入
-    /// </summary>
-    /// <returns>读取到的行内容，若用户输入为空则返回空字符串</returns>
-    public static string ReadLine() => Console.ReadLine() ?? "";
-    
-    /// <summary>
     /// 读取单个按键
     /// </summary>
     /// <returns>读取到的按键的字符串表示</returns>

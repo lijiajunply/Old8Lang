@@ -141,17 +141,21 @@ public static class Apis
     }
 
     /// <summary>
-    /// 读取语言配置信息
+    /// 读取语言配置信息（已弃用，保留用于向后兼容）
     /// </summary>
     /// <returns>语言信息对象</returns>
     /// <remarks>
+    /// ⚠️ 已弃用：此方法用于向后兼容，新代码应使用 StandardLibraryRegistry
+    ///
     /// 配置文件查找顺序：
     /// 1. 当前目录下的 Old8Lang/LangInfo.json
     /// 2. 默认的 JsonPath 位置
-    /// 3. 如果文件不存在，创建默认配置
-    /// 
-    /// 默认库信息包括：OS、File、Terminal、Net、Time、Math
+    /// 3. 如果文件不存在，创建默认配置（空 LibInfos）
+    ///
+    /// 注意：标准库（OS、File、Terminal 等）现在通过 StandardLibraryRegistry 管理，
+    /// 不再需要 LangInfo.json 配置
     /// </remarks>
+    [Obsolete("LangInfo.json 已弃用，标准库现在通过 StandardLibraryRegistry 管理。此方法保留用于向后兼容。")]
     public static LangInfo ReadJson()
     {
         LangInfo langInfo;
@@ -170,23 +174,13 @@ public static class Apis
         }
         else
         {
-            // 如果文件不存在，创建一个默认的 LangInfo 对象
+            // 如果文件不存在，创建一个空的 LangInfo 对象
+            // 不再自动填充默认库，因为标准库现在由 StandardLibraryRegistry 管理
             langInfo = new LangInfo { LibInfos = [], Var = "1.0.0", Url = "https://downland.old8lang.com" };
         }
 
-        // 如果LibInfos为空，尝试直接加载默认的库信息
-        if (langInfo.LibInfos.Count == 0)
-        {
-            // 手动添加默认库信息
-            langInfo.LibInfos.AddRange([
-                new LibInfo { LibName = "OS", Var = 0.8, IsDir = false },
-                new LibInfo { LibName = "File", Var = 0.8, IsDir = false },
-                new LibInfo { LibName = "Terminal", Var = 0.8, IsDir = false },
-                new LibInfo { LibName = "Net", Var = 0.8, IsDir = true },
-                new LibInfo { LibName = "Time", Var = 0.8, IsDir = false },
-                new LibInfo { LibName = "Math", Var = 0.8, IsDir = false }
-            ]);
-        }
+        // 不再自动添加默认库信息，标准库由 StandardLibraryRegistry 管理
+        // 保留空的 LibInfos 用于用户自定义库（向后兼容）
 
         if (Directory.Exists(langInfo.ImportPath)) return langInfo;
         var s = Path.GetDirectoryName(CodePath);

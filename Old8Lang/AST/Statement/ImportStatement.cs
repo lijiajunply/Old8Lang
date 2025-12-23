@@ -1,9 +1,11 @@
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.ModuleObjects;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.StandardLibrary;
 
 namespace Old8Lang.AST.Statement;
 
@@ -149,7 +151,26 @@ public partial class ImportStatement(
             return;
         }
 
-        // 看一下是否为本地包管理器下的模块
+        // **新的导入解析顺序**
+        // 优先级 1: 标准库（Old8LangLib 和 Old8Lang.NetLib）
+        if (StandardLibraryRegistry.IsStandardLibrary(moduleName))
+        {
+            if (StandardLibraryLoader.TryLoadStandardLibrary(moduleName, manager, out var stdModule))
+            {
+                RegisterModule(manager, moduleName, stdModule);
+                return;
+            }
+        }
+
+        // 优先级 2: 第三方包（通过 PackageManager）
+        var packageManager = manager.GetPackageManager();
+        if (packageManager.TryLoadPackage(moduleName, manager, out var pkgModule))
+        {
+            RegisterModule(manager, moduleName, pkgModule);
+            return;
+        }
+
+        // 优先级 3: LangInfo.json 中定义的库（向后兼容，将逐步废弃）
         manager.LangInfo ??= Apis.ReadJson();
         if (manager.LangInfo.LibInfos.Any(x => moduleName == x.LibName))
         {
@@ -202,7 +223,7 @@ public partial class ImportStatement(
 
             resolvedPath = path;
         }
-        else // 看一下是否为本项目/本地原始库（非安装在包管理下的）
+        else // 优先级 4: 本地文件导入（相对于当前文件的路径）
         {
             var dic = Path.GetDirectoryName(manager.Path);
             // 检查文件扩展名，只支持.old8和.ol
@@ -382,6 +403,52 @@ public partial class ImportStatement(
                 // 成员不存在，抛出错误
                 throw new ImportError(Position, ImportString, [ImportString]);
             }
+        }
+    }
+
+    /// <summary>
+    /// 注册模块到当前作用域
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    /// <param name="moduleName">模块名称</param>
+    /// <param name="module">模块对象</param>
+    private void RegisterModule(VariateManager manager, string moduleName, LangValueType? module)
+    {
+        if (module == null)
+            return;
+
+        if (FromClause)
+        {
+            // 命名导入：导入模块中的指定成员
+            if (module is IModuleValueType moduleValue)
+            {
+                manager.AddChildren();
+                var symbolNames = moduleValue.GetExportedSymbols();
+
+                // 将符号添加到当前作用域
+                foreach (var symbolName in symbolNames)
+                {
+                    var symbolValue = moduleValue.GetSymbol(symbolName);
+                    if (symbolValue != null)
+                    {
+                        manager.Scopes[^1][symbolName] = symbolValue;
+                    }
+                }
+
+                // 导入指定的成员到父作用域
+                ImportSpecifiedMembers(manager);
+                manager.RemoveChildren();
+            }
+        }
+        else if (ModuleAlias != null)
+        {
+            // 带别名的导入：import Module as Alias
+            manager.Scopes[^1][ModuleAlias] = module;
+        }
+        else
+        {
+            // 默认导入：import Module
+            manager.Scopes[^1][moduleName] = module;
         }
     }
 

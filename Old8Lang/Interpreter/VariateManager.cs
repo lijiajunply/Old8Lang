@@ -6,6 +6,7 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.Generators;
+using Old8Lang.PackageManagement;
 
 namespace Old8Lang.Interpreter;
 
@@ -39,6 +40,19 @@ public class VariateManager
     /// </summary>
     [NotNull]
     public LangInterpreter? Interpreter { get; set; }
+
+    /// <summary>
+    /// 第三方包管理器实例（延迟初始化）
+    /// </summary>
+    private PackageManager? _packageManager;
+
+    /// <summary>
+    /// 获取包管理器实例
+    /// </summary>
+    public PackageManager GetPackageManager()
+    {
+        return _packageManager ??= new PackageManager();
+    }
 
     #endregion
 

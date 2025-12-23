@@ -13,4 +13,9 @@
         <PackageReference Include="dnlib" Version="4.5.0" />
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\Old8LangLib\Old8LangLib.csproj" />
+        <ProjectReference Include="..\Old8Lang.NetLib\Old8Lang.NetLib.csproj" />
+    </ItemGroup>
+
 </Project>
