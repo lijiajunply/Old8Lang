@@ -20,25 +20,44 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Changes">
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/Async/LockDebugTest.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/Async/LockThreadTest.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/Async/LockVariableTests.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.GlobalFunctions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/LockedVariableLangValue.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/BaseGlobalFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionRegistry.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/IGlobalFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/IOFunctions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/PrintLineFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/UtilityFunctions.cs" afterDir="false" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/test_break_after_yield.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_break_in_async.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_complex_fibonacci.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_exact_failing.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_exception_in_async.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_fib_count.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_fib_detailed.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_fib_simple2.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_fibonacci_debug.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_for_in_with_prior_yield.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_for_in_yield_behavior.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_full_with_outer_yields.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_if_after_yield_no_loop.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_if_before_and_after_yield.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_if_in_async.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_infinite_stream.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_inner_creation.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_loop_count.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_multiple_yields.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_nested_stream_check.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_nested_stream_exact.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_prior_yield.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_range.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_range_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_simple_for.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_simple_for_in.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_ultra_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_var_restore.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_variable_comparison.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_while_yield.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_yield_sequence.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/TaskAPITests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/TaskAPITests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/JsonLib.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/JsonLib.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/Terminal.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Terminal.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncForInStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/WhileStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorAstScanner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Generators/GeneratorAstScanner.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,22 +97,12 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Generators/AsyncGeneratorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Generators/GeneratorLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/AsyncForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/AsyncForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/ForInStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Generators/GeneratorStateMachineBuilder.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Generators/GeneratorStateMachineBuilder.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Interpreter/AsyncGeneratorStateMachine.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/global.json" root0="FORCE_HIGHLIGHTING" />
@@ -818,7 +827,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="338" />
+    <option name="localTasksCounter" value="340" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -845,8 +854,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(lang): 优化构造函数字段初始化作用域逻辑&#10;&#10;- 创建独立字段作用域以避免参数与字段名称冲突&#10;- 调整字段设置优先级，确保参数可以正确覆盖同名字段&#10;- 更新字段同步机制，保证 init 方法执行后数据一致性&#10;- 修复字段修改标记清理时机，防止状态残留影响后续操作" />
-    <MESSAGE value="feat(interpreter): 支持静态字段赋值和接口实现检查&#10;&#10;- 在 SetStatement 中添加对 ClassName.staticField &lt;- value 形式的静态字段赋值支持&#10;- 实现 TypeTemplate 的 SetStaticMember 方法用于设置静态成员值&#10;- 更新 TypeChecker 的 IsCompatibleType 方法以支持接口实现兼容性检查&#10;- 优化 SetStatement 中的嵌套索引赋值判断逻辑&#10;- 修复 InterfaceTests 中的类型断言错误，将 DoubleLangValue 改为 IntLangValue&#10;- 在 TypeAnnotationManager 中添加 GetGlobalManager 方法以便获取全局变量管理器&#10;- 修改 TypeTemplate 中静态成员获取逻辑，优先返回运行时存储的值" />
     <MESSAGE value="feat(lang): 实现接口类型安全转换和字段访问优化&#10;&#10;- 支持接口类型的安全转换，保持原始实例数据和方法实现&#10;- 优化字段访问逻辑，明确使用 this 关键字引用实例字段&#10;- 改进类型转换操作符 as 的行为，转换失败时返回 null 而非抛出异常&#10;- 修复构造函数中静态字段和实例字段的初始化顺序问题&#10;- 更新测试用例以适配新的字段访问语法和类型转换行为&#10;- 添加对静态成员赋值的支持，完善类成员访问控制&#10;- 优化混入(Mixin)构造函数调用链，确保正确初始化所有混入组件" />
     <MESSAGE value="feat(lang): 实现继承和super关键字支持&#10;&#10;- 在AnyLangValue中增强GetInitMethod逻辑，支持Java/C#风格构造函数&#10;- 为ArrayLangValue添加Add方法支持&#10;- 重构测试文件config.old8、math.old8和utils.old8，简化内容&#10;- 移除InterfaceTests中不必要的ITestOutputHelper依赖&#10;- 更新MemberAccessTests中的this引用和类继承语法&#10;- 修复DistanceTo方法中的计算错误&#10;- 调整测试断言值以匹配实际输出&#10;- 更新ReturnStatement以支持类型转换验证&#10;- 完全重新实现SuperExpression及其代理类SuperProxy&#10;- 增强TypeChecker支持返回值类型转换和const变量管理&#10;- 优化TypeTemplate静态成员处理逻辑&#10;- 添加多个测试相关的新旧八文件&#10;- 更新IDE配置和工作区设置" />
     <MESSAGE value="feat(lang): 实现接口继承和extends关键字支持&#10;&#10;- 在ClassParser中添加对接口extends子句的解析逻辑&#10;- 支持接口继承多个父接口的语法解析&#10;- 更新接口声明的AST节点以存储继承关系&#10;- 复用implements机制处理接口继承&#10;- 添加相关测试用例验证接口继承功能&#10;- 更新数学库函数实现向量相关操作&#10;- 优化接口测试中的值获取和类型断言逻辑" />
@@ -870,7 +877,9 @@
     <MESSAGE value="feat(ast): 实现异步流和生成器上下文中的异步 for-in 循环&#10;&#10;- 添加对 AsyncStreamLangValue 的异步迭代支持&#10;- 实现生成器上下文中的异步 for-in 循环逻辑&#10;- 支持在异步流中正确处理 yield 和恢复执行&#10;- 添加对 TaskLangValue 的 await 处理&#10;- 完善异常类型检查，增加 AsyncStreamLangValue 和 TaskLangValue&#10;- 重构 Run 方法，区分标准模式和生成器上下文模式&#10;- 添加详细的控制流管理，支持 break 和 continue 语句&#10;- 实现异步流、异步生成器和普通列表在生成器中的迭代逻辑&#10;- 更新测试用例，将 for 替换为 async for 以支持异步流&#10;- 修复 CapturedScope 属性访问权限问题&#10;- 优化异步生成器的状态机初始化逻辑&#10;- 更新 BlockStatement 以识别 AsyncForInStatement 中的 yield&#10;- 添加多个异步流测试用例文件" />
     <MESSAGE value="fix(ast): 修复嵌套 for-in 循环中的 yield 恢复逻辑&#10;&#10;- 改进 BlockStatement 中的循环标记检查逻辑，正确识别嵌套循环中的 yield&#10;- 优化 ForInStatement 的生成器上下文处理，避免变量作用域丢失&#10;- 调整循环体执行前后的状态重置逻辑，确保迭代正确恢复&#10;- 修复 yield 时的索引保存策略，区分嵌套 yield 和直接 yield&#10;- 移除调试日志输出，清理冗余代码&#10;- 添加嵌套 for-in 循环测试用例，验证修复效果" />
     <MESSAGE value="refactor(generator): 重构生成器状态管理机制&#10;&#10;- 移除基于索引的旧状态恢复机制&#10;- 引入基于路径的新状态恢复架构&#10;- 优化异步生成器状态机实现&#10;- 改进循环状态的保存与恢复逻辑&#10;- 完善生成器上下文中的变量管理&#10;- 更新相关测试用例以适应新架构" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(generator): 重构生成器状态管理机制&#10;&#10;- 移除基于索引的旧状态恢复机制&#10;- 引入基于路径的新状态恢复架构&#10;- 优化异步生成器状态机实现&#10;- 改进循环状态的保存与恢复逻辑&#10;- 完善生成器上下文中的变量管理&#10;- 更新相关测试用例以适应新架构" />
+    <MESSAGE value="feat(lang): 实现全局函数系统和锁定变量功能&#10;&#10;- 添加 BaseGlobalFunction 抽象基类提供参数验证和错误处理&#10;- 创建 GlobalFunctionRegistry 单例注册器管理全局函数&#10;- 实现 GlobalFunctionInitializer 初始化内置函数&#10;- 定义 IGlobalFunction 接口规范全局函数行为&#10;- 迁移 PrintLine、Print、ReadLine、Error、Clear 等 IO 函数到新系统&#10;- 实现 lock() 函数创建线程安全的锁定变量&#10;- 添加 LockedVariableLangValue 类支持原子操作和线程安全访问&#10;- 支持 .Value 读取、.Set() 设置、.Update() 更新等操作&#10;- 添加 .Increment()、.Decrement()、.Add() 等原子方法&#10;- 更新 Instance 类集成全局函数执行和 IL 生成&#10;- 移除旧的硬编码函数实现，统一使用全局函数系统&#10;- 添加锁定变量的单元测试和异步测试用例" />
+    <MESSAGE value="feat(ast): 优化异步流在生成器上下文中的处理&#10;&#10;- 实现异步流实例缓存机制，避免重复创建&#10;- 添加循环状态管理支持跨yield保持状态&#10;- 更新异步流和异步生成器的执行逻辑&#10;- 修复生成器状态机中异步流缓存的保存和恢复&#10;- 优化循环变量设置和控制流处理逻辑&#10;- 添加测试文件验证异步流功能正确性" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(ast): 优化异步流在生成器上下文中的处理&#10;&#10;- 实现异步流实例缓存机制，避免重复创建&#10;- 添加循环状态管理支持跨yield保持状态&#10;- 更新异步流和异步生成器的执行逻辑&#10;- 修复生成器状态机中异步流缓存的保存和恢复&#10;- 优化循环变量设置和控制流处理逻辑&#10;- 添加测试文件验证异步流功能正确性" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

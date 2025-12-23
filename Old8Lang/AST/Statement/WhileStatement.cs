@@ -112,6 +112,9 @@ public partial class WhileStatement(LangExpression expression, OldStatement bloc
             // 标准 while 循环
             while (true)
             {
+                // 重置控制流状态
+                manager.ControlFlowManager.ResetCurrentState();
+
                 // 获取条件表达式的值
                 var value = expression.Run(manager);
                 if (value is not BoolLangValue varBool)
@@ -152,6 +155,9 @@ public partial class WhileStatement(LangExpression expression, OldStatement bloc
                     continue;
                 }
 
+                // 循环体执行完毕，进入下一次迭代前清除ExecutionPath
+                // 这确保下一次迭代能够完整执行
+                context.ExecutionPath = "";
                 iterationCount++;
             }
 

@@ -157,6 +157,61 @@ public class GeneratorAstScanner
 
                 break;
 
+            case AsyncForInStatement asyncForIn:
+                // 记录循环变量
+                var asyncIdField = typeof(AsyncForInStatement).GetFields(
+                    System.Reflection.BindingFlags.NonPublic |
+                    System.Reflection.BindingFlags.Instance)
+                    .FirstOrDefault(f => f.Name.Contains("id", StringComparison.OrdinalIgnoreCase) &&
+                                       f.FieldType == typeof(LangId));
+
+                if (asyncIdField != null && asyncIdField.GetValue(asyncForIn) is LangId asyncLoopVar)
+                {
+                    result.LocalVariables.Add(asyncLoopVar.IdName);
+                }
+
+                // 记录附加变量（用于字典遍历的键值对）
+                var asyncAdditionalIdsField = typeof(AsyncForInStatement).GetFields(
+                    System.Reflection.BindingFlags.NonPublic |
+                    System.Reflection.BindingFlags.Instance)
+                    .FirstOrDefault(f => f.Name.Contains("additionalIds", StringComparison.OrdinalIgnoreCase));
+
+                if (asyncAdditionalIdsField != null && asyncAdditionalIdsField.GetValue(asyncForIn) is List<LangId> asyncAdditionalIds)
+                {
+                    foreach (var additionalId in asyncAdditionalIds)
+                    {
+                        result.LocalVariables.Add(additionalId.IdName);
+                    }
+                }
+
+                // AsyncForInStatement 的循环体需要通过反射访问
+                var asyncAllFields = typeof(AsyncForInStatement).GetFields(
+                    System.Reflection.BindingFlags.NonPublic |
+                    System.Reflection.BindingFlags.Instance);
+
+                // 尝试查找包含 "body" 的字段
+                var asyncBodyField = asyncAllFields.FirstOrDefault(f =>
+                    f.Name.Contains("body", StringComparison.OrdinalIgnoreCase) &&
+                    f.FieldType == typeof(OldStatement));
+
+                if (asyncBodyField != null)
+                {
+                    if (asyncBodyField.GetValue(asyncForIn) is OldStatement asyncBody)
+                    {
+                        ScanStatement(asyncBody, result, ref yieldCounter, $"{path}/async-for-in");
+                    }
+                }
+                else
+                {
+                    // 回退到索引访问（可能不正确，但保持兼容性）
+                    if (asyncForIn.Count > 0)
+                    {
+                        ScanStatement(asyncForIn[0], result, ref yieldCounter, $"{path}/async-for-in");
+                    }
+                }
+
+                break;
+
             case ForStatement forStmt:
                 // 扫描初始化、条件、迭代、循环体（使用索引访问）
                 for (int i = 0; i < forStmt.Count; i++)

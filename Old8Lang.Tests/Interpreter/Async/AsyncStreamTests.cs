@@ -335,7 +335,8 @@ public class AsyncStreamTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(3, ((IntLangValue)result).Value);
+        // Should yield: 1, 2, -1 (from catch), 3
+        Assert.Equal(4, ((IntLangValue)result).Value);
     }
 
     [Fact]

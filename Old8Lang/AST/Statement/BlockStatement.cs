@@ -127,7 +127,8 @@ public partial class BlockStatement : OldStatement
                     // 应该跳过这个语句，从下一个语句开始执行
                     if (context.ExecutionPath == currentPath + "/yield")
                     {
-                        // 清除恢复标志，从下一个语句开始正常执行
+                        // 清除 ExecutionPath 和恢复标志，从下一个语句开始正常执行
+                        context.ExecutionPath = "";
                         isResuming = false;
                         continue;
                     }

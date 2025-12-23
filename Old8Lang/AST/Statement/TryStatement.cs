@@ -23,6 +23,22 @@ public partial class TryStatement(
     
     public override void Run(VariateManager manager)
     {
+        // 检查是否在生成器上下文中
+        if (manager.GeneratorContext != null)
+        {
+            RunWithGeneratorContext(manager);
+        }
+        else
+        {
+            RunStandard(manager);
+        }
+    }
+
+    /// <summary>
+    /// 标准模式执行（非生成器）
+    /// </summary>
+    private void RunStandard(VariateManager manager)
+    {
         try
         {
             tryBlock.Run(manager);
@@ -72,6 +88,158 @@ public partial class TryStatement(
         {
             // 执行finally块（如果存在）
             finallyBlock?.Run(manager);
+        }
+    }
+
+    /// <summary>
+    /// 生成器上下文模式执行
+    /// </summary>
+    private void RunWithGeneratorContext(VariateManager manager)
+    {
+        var context = manager.GeneratorContext!;
+
+        // 检查是否从 catch 块恢复
+        bool isResumingFromCatch = !string.IsNullOrEmpty(context.ExecutionPath) &&
+                                    context.ExecutionPath.Contains("/catch");
+
+        // 如果从 catch 块恢复，直接执行 catch 块，跳过 try 块
+        if (isResumingFromCatch)
+        {
+            // 执行第一个 catch 块（简化处理，假设只有一个 catch）
+            if (catchBlocks.Count > 0)
+            {
+                var (_, exceptionVar, catchBlock) = catchBlocks[0];
+
+                // 压入 catch 路径
+                context.PathStack.Push("/catch");
+                try
+                {
+                    catchBlock.Run(manager);
+
+                    // 检查是否 yield
+                    if (context.HasYielded)
+                    {
+                        return;
+                    }
+
+                    // 检查是否 return
+                    if (manager.IsReturn)
+                    {
+                        return;
+                    }
+                }
+                finally
+                {
+                    context.PathStack.Pop();
+                }
+            }
+        }
+        else
+        {
+            // 正常���行 try 块
+            context.PathStack.Push("/try");
+            try
+            {
+                tryBlock.Run(manager);
+
+                // 检查是否 yield
+                if (context.HasYielded)
+                {
+                    return;
+                }
+
+                // 检查try块是否执行了return语句
+                if (manager.IsReturn)
+                {
+                    return;
+                }
+            }
+            catch (Old8Exception ex)
+            {
+                // 弹出 try 路径，压入 catch 路径
+                context.PathStack.Pop();
+                context.PathStack.Push("/catch");
+
+                try
+                {
+                    // 遍历所有catch块，查找匹配的异常类型
+                    foreach (var (exceptionType, exceptionVar, catchBlock) in catchBlocks)
+                    {
+                        // 如果异常类型为null，则匹配所有异常
+                        if (exceptionType == null || IsMatch(ex, exceptionType))
+                        {
+                            // 如果有异常变量，则将异常赋值给该变量
+                            if (exceptionVar != null && !string.IsNullOrEmpty(exceptionVar.IdName))
+                            {
+                                manager.Set(exceptionVar, new ErrorLangValue(ex));
+                            }
+                            else
+                            {
+                                var defaultExceptionVar = new LangId("exception");
+                                manager.Set(defaultExceptionVar, new ErrorLangValue(ex));
+                            }
+
+                            // 执行catch块
+                            catchBlock.Run(manager);
+
+                            // 检查是否 yield
+                            if (context.HasYielded)
+                            {
+                                return;
+                            }
+
+                            // 检查catch块是否执行了return语句
+                            if (manager.IsReturn)
+                            {
+                                return;
+                            }
+
+                            // 弹出 catch 路径
+                            context.PathStack.Pop();
+                            return; // 只执行第一个匹配的catch块
+                        }
+                    }
+
+                    // 如果没有匹配的catch块，则重新抛出异常
+                    throw;
+                }
+                finally
+                {
+                    // 确保 catch 路径被弹出（如果还没有弹出）
+                    if (context.PathStack.Count > 0 && context.PathStack.Peek() == "/catch")
+                    {
+                        context.PathStack.Pop();
+                    }
+                }
+            }
+            finally
+            {
+                // 确保 try 路径被弹出（如果还没有弹出）
+                if (context.PathStack.Count > 0 && context.PathStack.Peek() == "/try")
+                {
+                    context.PathStack.Pop();
+                }
+            }
+        }
+
+        // 执行 finally 块（如果存在）
+        if (finallyBlock != null)
+        {
+            context.PathStack.Push("/finally");
+            try
+            {
+                finallyBlock.Run(manager);
+
+                // 检查是否 yield（finally 中也可以 yield）
+                if (context.HasYielded)
+                {
+                    return;
+                }
+            }
+            finally
+            {
+                context.PathStack.Pop();
+            }
         }
     }
 

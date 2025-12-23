@@ -381,18 +381,33 @@ public partial class AsyncForInStatement(
     /// <summary>
     /// 在生成器上下文中迭代异步流
     /// 异步流自己管理状态，可以跨yield保持状态
+    ///
+    /// 关键设计：当循环体yield时，我们保存当前的执行路径，
+    /// 但将ExecutionPath修改为指向async-for语句本身，
+    /// 这样下次恢复时会重新进入这个方法继续循环
     /// </summary>
     private void RunGeneratorContextAsyncStream(VariateManager manager, AsyncStreamLangValue asyncStream, Old8Lang.Generators.GeneratorExecutionContext context, string loopPath)
     {
         // 使用 LoopStates 来追踪循环状态
-        // -1: 未开始或已完成
-        // 0+: 循环正在进行中(值本身没有特殊意义，只是标记)
+        // 0: 循环正在进行中
+        // 1: 循环从yield恢复，需要继续下一次迭代
         var loopStateKey = loopPath + "/state";
+
+        // 检查是否从yield恢复
+        bool resumingFromYield = context.LoopStates.TryGetValue(loopStateKey, out var state) && state == 1;
 
         if (!context.LoopStates.ContainsKey(loopStateKey))
         {
-            // 首次进入循环
+            // 首次进入循环，清除ExecutionPath避免干扰
             context.LoopStates[loopStateKey] = 0;
+            context.ExecutionPath = "";
+        }
+        else if (resumingFromYield)
+        {
+            // 从yield恢复，重置状态为正常迭代
+            context.LoopStates[loopStateKey] = 0;
+            // 清除ExecutionPath，让循环体能够正常执行
+            context.ExecutionPath = "";
         }
 
         // 将循环路径压栈
@@ -445,11 +460,17 @@ public partial class AsyncForInStatement(
 
                         body.Run(manager);
 
-                        // 如果循环体中发生了yield，我们应该返回
-                        // 异步流的状态已经保存在缓存中，循环状态也已保存
-                        // 下次调用时会继续循环
+                        // 如果循环体中发生了yield，我们需要：
+                        // 1. 标记循环状态为"从yield恢复"
+                        // 2. 修改ExecutionPath指向async-for语句，而不是循环体内部
+                        // 这样下次恢复时会重新进入这个方法继续循环
                         if (context.HasYielded)
                         {
+                            // 标记为从yield恢复状态
+                            context.LoopStates[loopStateKey] = 1;
+                            // 将ExecutionPath设置为async-for-in语句的路径
+                            // 这样下次恢复时会重新调用RunWithGeneratorContext -> RunGeneratorContextAsyncStream
+                            context.ExecutionPath = loopPath;
                             return;
                         }
 
@@ -470,6 +491,9 @@ public partial class AsyncForInStatement(
                     }
                 }
             }
+
+            // 循环正常完成，清除ExecutionPath
+            context.ExecutionPath = "";
         }
         finally
         {
@@ -480,9 +504,35 @@ public partial class AsyncForInStatement(
 
     /// <summary>
     /// 在生成器上下文中迭代异步生成器
+    /// 与异步流类似，需要在 yield 后能够恢复执行
     /// </summary>
     private void RunGeneratorContextAsyncGenerator(VariateManager manager, AsyncGeneratorLangValue asyncGenerator, Old8Lang.Generators.GeneratorExecutionContext context, string loopPath)
     {
+        // 使用 LoopStates 来追踪循环状态
+        // 0: 循环正在进行中
+        // 1: 循环从yield恢复，需要继续下一次迭代
+        var loopStateKey = loopPath + "/state";
+
+        // 检查是否从yield恢复
+        bool resumingFromYield = context.LoopStates.TryGetValue(loopStateKey, out var state) && state == 1;
+
+        if (!context.LoopStates.ContainsKey(loopStateKey))
+        {
+            // 首次进入循环，清除ExecutionPath避免干扰
+            context.LoopStates[loopStateKey] = 0;
+            context.ExecutionPath = "";
+        }
+        else if (resumingFromYield)
+        {
+            // 从yield恢复，重置状态为正常迭代
+            context.LoopStates[loopStateKey] = 0;
+            // 清除ExecutionPath，让循环体能够正常执行
+            context.ExecutionPath = "";
+        }
+
+        // 将循环路径压栈
+        context.PathStack.Push("/async-for-in");
+
         // 保存外层的 GeneratorContext，暂时清除以避免嵌套冲突
         var outerContext = manager.GeneratorContext;
         try
@@ -499,8 +549,9 @@ public partial class AsyncForInStatement(
 
                 if (asyncGenerator.State == AsyncGeneratorLangValue.AsyncGeneratorState.Completed)
                 {
-                    // 异步生成器完成，清除缓存
+                    // 异步生成器完成，清除缓存和状态
                     context.AsyncStreamCache.Remove(loopPath);
+                    context.LoopStates.Remove(loopStateKey);
                     break;
                 }
 
@@ -539,16 +590,26 @@ public partial class AsyncForInStatement(
 
                             body.Run(manager);
 
+                            // 如果循环体中发生了yield，我们需要：
+                            // 1. 标记循环状态为"从yield恢复"
+                            // 2. 修改ExecutionPath指向async-for语句，而不是循环体内部
+                            // 这样下次恢复时会重新进入这个方法继续循环
                             if (context.HasYielded)
                             {
+                                // 标记为从yield恢复状态
+                                context.LoopStates[loopStateKey] = 1;
+                                // 将ExecutionPath设置为async-for-in语句的路径
+                                // 这样下次恢复时会重新调用RunWithGeneratorContext -> RunGeneratorContextAsyncGenerator
+                                context.ExecutionPath = loopPath;
                                 return;
                             }
 
                             if (manager.ControlFlowManager.BreakFlag)
                             {
                                 manager.ControlFlowManager.BreakFlag = false;
-                                // 清除缓存
+                                // 清除缓存和状态
                                 context.AsyncStreamCache.Remove(loopPath);
+                                context.LoopStates.Remove(loopStateKey);
                                 break;
                             }
 
@@ -566,11 +627,16 @@ public partial class AsyncForInStatement(
                     }
                 }
             }
+
+            // 循环正常完成，清除ExecutionPath
+            context.ExecutionPath = "";
         }
         finally
         {
             // 恢复外层的 GeneratorContext
             manager.GeneratorContext = outerContext;
+            // 弹出循环路径
+            context.PathStack.Pop();
         }
     }
 

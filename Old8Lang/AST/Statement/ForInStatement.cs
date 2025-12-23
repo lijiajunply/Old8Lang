@@ -315,9 +315,11 @@ public partial class ForInStatement(
 
                 // 从循环状态中恢复起始索引
                 int startIndex = 0;
+                bool isResumingLoop = false;
                 if (context.LoopStates.TryGetValue(loopPath, out var savedIndex))
                 {
                     startIndex = savedIndex;
+                    isResumingLoop = true;
                 }
 
                 // 将循环路径压栈
@@ -369,13 +371,21 @@ public partial class ForInStatement(
                             }
                         }
 
-                        // 如果是从保存位置恢复的第一次迭代，并且没有子循环状态，清除 ExecutionPath
-                        // 因为我们已经移到了新的迭代，不需要跳过任何语句
-                        // 但如果有子循环状态，说明我们是从子循环恢复，应该保持 ExecutionPath
-                        if (i == startIndex && startIndex > 0 && !hasChildLoopState)
+                        // 清除 ExecutionPath，让新的迭代能够完整执行
+                        // 关键修复：只有在从当前迭代内部的 yield 恢复时才保持 ExecutionPath
+                        // 如果 ExecutionPath 指向上一次迭代的语句，必须清除，否则会导致语句被错误跳过
+                        bool isResumingFromCurrentIteration = isResumingLoop && i == startIndex && !string.IsNullOrEmpty(context.ExecutionPath);
+
+                        if (!isResumingFromCurrentIteration)
                         {
-                            context.ExecutionPath = "";
+                            // 新迭代或首次进入：清除 ExecutionPath，让所有语句正常执行
+                            // 但如果有子循环状态，保持 ExecutionPath 以便子循环恢复
+                            if (!hasChildLoopState)
+                            {
+                                context.ExecutionPath = "";
+                            }
                         }
+                        // else: 从当前迭代内部的 yield 恢复，保持 ExecutionPath
 
                         // 执行循环体
                         body.Run(manager);
@@ -383,22 +393,8 @@ public partial class ForInStatement(
                         // 检查是否遇到 yield
                         if (context.HasYielded)
                         {
-                            // 检查 yield 是否来自当前循环的直接子语句还是嵌套循环
-                            var currentPath = context.GetCurrentPath();
-
-                            // 如果 ExecutionPath 包含嵌套的 /for-in，说明是子循环 yield
-                            // 这种情况下应该保持当前迭代位置，以便子循环完成后继续
-                            var pathAfterCurrent = context.ExecutionPath!.Substring(currentPath.Length);
-                            if (pathAfterCurrent.Count(c => c == '/') > 2 && pathAfterCurrent.Contains("/for-in"))
-                            {
-                                // 子循环 yield，保持当前位置
-                                context.LoopStates[loopPath] = i;
-                            }
-                            else
-                            {
-                                // 当前循环直接 yield，保存下一个位置
-                                context.LoopStates[loopPath] = i + 1;
-                            }
+                            // 保存当前迭代位置，以便从 yield 后继续执行
+                            context.LoopStates[loopPath] = i;
                             return;
                         }
 
