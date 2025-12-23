@@ -1,0 +1,32 @@
+// 简单的调试测试
+PrintLine("=== 调试测试：验证 lock 变量共享 ===")
+
+counter <- 0
+lockedCounter <- lock(counter)
+
+PrintLine("主线程中的 lockedCounter: " + Type(lockedCounter))
+PrintLine("初始值: " + lockedCounter.Value.ToStr())
+
+// 测试 1：直接修改
+lockedCounter.Set(5)
+PrintLine("直接修改后: " + lockedCounter.Value.ToStr())
+
+// 测试 2：在普通函数中使用（应该可以访问）
+func testFunc() -> void {
+    PrintLine("普通函数中读取: " + lockedCounter.Value.ToStr())
+    lockedCounter.Set(10)
+    PrintLine("普通函数中修改后: " + lockedCounter.Value.ToStr())
+}
+testFunc()
+PrintLine("普通函数调用后主线程读取: " + lockedCounter.Value.ToStr())
+
+// 测试 3：在异步函数中使用
+async func asyncTest() -> void {
+    PrintLine("异步函数中读取: " + lockedCounter.Value.ToStr())
+    lockedCounter.Set(20)
+    PrintLine("异步函数中修改后: " + lockedCounter.Value.ToStr())
+}
+
+task <- asyncTest()
+task.Await()
+PrintLine("异步函数调用后主线程读取: " + lockedCounter.Value.ToStr())

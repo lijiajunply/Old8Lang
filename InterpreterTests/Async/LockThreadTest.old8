@@ -1,0 +1,24 @@
+// 测试线程中的锁定变量
+PrintLine("=== 线程锁定变量测试 ===")
+
+counter <- 0
+lockedCounter <- lock(counter)
+
+func threadFunc() -> void {
+    PrintLine("线程开始，当前值: " + lockedCounter.Value.ToStr())
+    for i <- 0, i < 3, i <- i + 1 {
+        oldValue <- lockedCounter.Value
+        PrintLine("  循环 " + i.ToStr() + ": 读取 " + oldValue.ToStr())
+        lockedCounter.Set(oldValue + 1)
+        PrintLine("  循环 " + i.ToStr() + ": 写入 " + (oldValue + 1).ToStr())
+    }
+    PrintLine("线程结束，最终值: " + lockedCounter.Value.ToStr())
+}
+
+thread1 <- spawn(threadFunc)
+thread2 <- spawn(threadFunc)
+
+thread1.Wait()
+thread2.Wait()
+
+PrintLine("所有线程结束，主线程读取: " + lockedCounter.Value.ToStr())

@@ -396,12 +396,12 @@ public static class JsonLib
     }
 
     /// <summary>
-/// 根据路径获取JSON值
-/// </summary>
-/// <param name="json">JSON字符串</param>
-/// <param name="path">JSON路径，例如: "user.name" 或 "items[0].id"</param>
-/// <returns>JSON值</returns>
-public static string GetJsonValue(string json, string path)
+    /// 根据路径获取JSON值
+    /// </summary>
+    /// <param name="json">JSON字符串</param>
+    /// <param name="path">JSON路径，例如: "user.name" 或 "items[0].id"</param>
+    /// <returns>JSON值</returns>
+    public static string GetJsonValue(string json, string path)
     {
         if (string.IsNullOrEmpty(json))
         {

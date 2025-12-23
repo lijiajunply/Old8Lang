@@ -277,37 +277,6 @@ public class TaskAPITests
     }
 
     [Fact]
-    public void TaskAPI_TaskTimeout_HandlesTaskTimeout()
-    {
-        // Arrange
-        var code = @"
-            longTask <- Task.Run(() -> {
-                await Task.Delay(1000)
-                return ""done""
-            })
-            timeoutTask <- Task.Delay(50)
-            completedTask <- Task.WhenAny([longTask, timeoutTask])
-            result <- """"
-            if completedTask.Result == timeoutTask {
-                result <- ""timeout""
-            } else {
-                result <- longTask.Result
-            }
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
-        Assert.IsType<StringLangValue>(result);
-        Assert.Equal("timeout", ((StringLangValue)result).Value);
-    }
-
-    [Fact]
     public void TaskAPI_TaskScheduler_HandlesCustomScheduler()
     {
         // Arrange

@@ -1,0 +1,78 @@
+using System.Reflection.Emit;
+using Old8Lang.AST;
+using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Value;
+using Old8Lang.Compiler;
+using Old8Lang.GlobalFunctions.Core;
+using Old8Lang.Interpreter;
+
+namespace Old8Lang.GlobalFunctions.Implementations;
+
+/// <summary>
+/// PrintLine 函数 - 打印一行文本到输出
+/// </summary>
+public sealed class PrintLineFunction : BaseGlobalFunction
+{
+    public override string[] Names => new[] { "PrintLine", "printLine" };
+
+    public override int MinParameterCount => 0;
+
+    public override int MaxParameterCount => -1; // 不限制参数数量
+
+    protected override LangValueType ExecuteInternal(List<LangExpression> parameters, VariateManager manager, SourcePosition position)
+    {
+        if (parameters.Count == 0)
+        {
+            manager.Interpreter.OutputProvider.WriteLine("");
+            return new VoidLangValue();
+        }
+
+        var results = EvaluateParameters(parameters, manager);
+        var value = results[0].ToDisplayString();
+        for (var i = 1; i < results.Count; i++)
+        {
+            value += results[i].ToDisplayString();
+        }
+
+        manager.Interpreter.OutputProvider.WriteLine(value);
+        return new VoidLangValue();
+    }
+
+    protected override void GenerateILInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    {
+        if (parameters.Count == 0)
+        {
+            // 没有参数，调用 Console.WriteLine()
+            var writeLineNoArg = typeof(Console).GetMethod("WriteLine", Type.EmptyTypes);
+            if (writeLineNoArg != null)
+            {
+                ilGenerator.Emit(OpCodes.Call, writeLineNoArg);
+            }
+            return;
+        }
+
+        // 简化实现：只处理第一个参数，将其转换为字符串
+        var printLineExpr = parameters[0];
+        printLineExpr.LoadIlValue(ilGenerator, local);
+        var printLineType = printLineExpr.OutputType(local);
+
+        // 直接调用Console.WriteLine(object)方法，让CLR处理类型转换
+        var writeLineObject = typeof(Console).GetMethod("WriteLine", new[] { typeof(object) });
+        if (writeLineObject != null)
+        {
+            // 如果是值类型，先装箱
+            if (printLineType is { IsValueType: true })
+            {
+                ilGenerator.Emit(OpCodes.Box, printLineType);
+            }
+
+            ilGenerator.Emit(OpCodes.Call, writeLineObject);
+        }
+    }
+
+    protected override Type GetReturnTypeInternal(List<LangExpression> parameters, LocalManager local)
+    {
+        return typeof(void);
+    }
+}

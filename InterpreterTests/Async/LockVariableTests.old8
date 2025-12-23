@@ -1,0 +1,86 @@
+// 测试 lock() 机制的线程安全变量访问
+
+// 测试 1: 基本的 lock() 功能
+PrintLine("=== 测试 1: 基本 lock() 功能 ===")
+counter <- 0
+lockedCounter <- lock(counter)
+PrintLine("原始 counter: " + counter.ToStr())
+PrintLine("锁定变量类型: " + Type(lockedCounter))
+PrintLine("读取锁定变量: " + lockedCounter.Value.ToStr())
+lockedCounter.Set(42)
+PrintLine("设置后读取: " + lockedCounter.Value.ToStr())
+PrintLine()
+
+// 测试 2: 在异步函数中使用锁定变量（使用原子操作）
+PrintLine("=== 测试 2: 异步函数中使用锁定变量 ===")
+sharedCount <- 0
+lockedSharedCount <- lock(sharedCount)
+
+async func increment() -> int {
+    // 使用原子递增方法，避免竞态条件
+    return lockedSharedCount.Increment()
+}
+
+// 创建多个异步任务并发执行
+task1 <- increment()
+task2 <- increment()
+task3 <- increment()
+
+// 等待所有任务完成
+result1 <- task1.Await()
+result2 <- task2.Await()
+result3 <- task3.Await()
+
+PrintLine("任务 1 结果: " + result1.ToStr())
+PrintLine("任务 2 结果: " + result2.ToStr())
+PrintLine("任务 3 结果: " + result3.ToStr())
+PrintLine("最终 count: " + lockedSharedCount.Value.ToStr())
+Assert(lockedSharedCount.Value, 3)
+PrintLine()
+
+// 测试 3: 在线程中使用锁定变量
+PrintLine("=== 测试 3: 线程中使用锁定变量 ===")
+threadCount <- 0
+lockedThreadCount <- lock(threadCount)
+
+func threadIncrement() -> void {
+    for i <- 0, i < 10, i <- i + 1 {
+        lockedThreadCount.Increment()
+    }
+}
+
+// 创建多个线程
+thread1 <- spawn(threadIncrement)
+thread2 <- spawn(threadIncrement)
+thread3 <- spawn(threadIncrement)
+
+// 等待所有线程完成
+thread1.Wait()
+thread2.Wait()
+thread3.Wait()
+
+PrintLine("线程执行后 count: " + lockedThreadCount.Value.ToStr())
+Assert(lockedThreadCount.Value, 30)
+PrintLine()
+
+// 测试 4: 锁定变量与不同数据类型
+PrintLine("=== 测试 4: 锁定不同类型的数据 ===")
+
+// 锁定字符串
+str <- "Hello"
+lockedStr <- lock(str)
+PrintLine("锁定字符串: " + lockedStr.Value)
+lockedStr.Set("World")
+PrintLine("修改后: " + lockedStr.Value)
+
+// 锁定列表
+list <- {1, 2, 3}
+lockedList <- lock(list)
+PrintLine("锁定列表长度: " + Len(lockedList.Value).ToStr())
+currentList <- lockedList.Value
+currentList.Add(4)
+lockedList.Set(currentList)
+PrintLine("添加元素后长度: " + Len(lockedList.Value).ToStr())
+
+PrintLine()
+PrintLine("=== 所有测试完成 ===")

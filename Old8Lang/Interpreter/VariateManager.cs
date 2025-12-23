@@ -156,6 +156,13 @@ public class VariateManager
     private readonly Dictionary<string, int> ReadonlyVariables = new();
 
     /// <summary>
+    /// 锁定变量集合，记录哪些变量是通过 lock() 创建的
+    /// 键为变量名，值为 LockedVariableLangValue 实例
+    /// 在 Clone 时这些变量会被共享引用而非拷贝
+    /// </summary>
+    private readonly Dictionary<string, LockedVariableLangValue> LockedVariables = new();
+
+    /// <summary>
     /// 导入信息列表，包含导入的函数、类和原生类型
     /// 使用内部 List 和锁来保证线程安全
     /// </summary>
@@ -756,11 +763,24 @@ public class VariateManager
             newManager.IsYield = IsYield;
         }
 
-        // 深拷贝作用域栈
+        // 深拷贝作用域栈，但锁定变量共享引用
         newManager.Scopes.Clear(); // 清除构造函数创建的初始作用域
         foreach (var scope in Scopes)
         {
-            var newScope = new Dictionary<string, LangValueType>(scope);
+            var newScope = new Dictionary<string, LangValueType>();
+            foreach (var (varName, varValue) in scope)
+            {
+                // 如果是锁定变量，直接共享引用而非拷贝
+                if (varValue is LockedVariableLangValue lockedVar)
+                {
+                    newScope[varName] = lockedVar; // 共享同一个 LockedVariable 实例
+                    newManager.LockedVariables[varName] = lockedVar; // 在新管理器中也记录
+                }
+                else
+                {
+                    newScope[varName] = varValue; // 普通变量正常拷贝
+                }
+            }
             newManager.Scopes.Add(newScope);
         }
 
@@ -801,6 +821,40 @@ public class VariateManager
 
         return variableStates;
     }
+
+    #region 锁定变量管理
+
+    /// <summary>
+    /// 注册一个锁定变量
+    /// </summary>
+    /// <param name="varName">变量名</param>
+    /// <param name="lockedVar">锁定变量实例</param>
+    public void RegisterLockedVariable(string varName, LockedVariableLangValue lockedVar)
+    {
+        LockedVariables[varName] = lockedVar;
+    }
+
+    /// <summary>
+    /// 检查变量是否为锁定变量
+    /// </summary>
+    /// <param name="varName">变量名</param>
+    /// <returns>如果是锁定变量返回true，否则返回false</returns>
+    public bool IsLockedVariable(string varName)
+    {
+        return LockedVariables.ContainsKey(varName);
+    }
+
+    /// <summary>
+    /// 获取锁定变量实例
+    /// </summary>
+    /// <param name="varName">变量名</param>
+    /// <returns>锁定变量实例，如果不存在返回null</returns>
+    public LockedVariableLangValue? GetLockedVariable(string varName)
+    {
+        return LockedVariables.TryGetValue(varName, out var lockedVar) ? lockedVar : null;
+    }
+
+    #endregion
 
     /// <summary>
     /// 从池中获取临时VariateManager，用于点操作等临时场景

@@ -26,26 +26,60 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
 
     public override LangValueType Run(VariateManager manager)
     {
+        // 首先尝试通过全局函数注册器执行
+        if (TryExecuteGlobalFunction(manager, out var globalFuncResult))
+        {
+            return globalFuncResult!;
+        }
+
         LangValueType result;
         var results = Ids.Select(t => t.Run(manager)).ToList();
 
         switch (Id.IdName)
         {
-            case "Type" or "type":
-                return new TypeLangValue(results[0]).Run(manager);
+            case "Lock" or "lock":
+            {
+                // lock() 函数：创建锁定变量以实现线程安全访问
+                if (Ids.Count != 1)
+                    throw new InvalidOperationError(this, "lock() 函数需要且只需要一个参数");
+
+                var expr = Ids[0];
+
+                // 获取变量名（用于标识和调试）
+                string varName;
+                if (expr is LangId id)
+                {
+                    varName = id.IdName;
+                }
+                else if (expr is ClassMemberId memberId)
+                {
+                    varName = memberId.ToString();
+                }
+                else
+                {
+                    varName = "anonymous";
+                }
+
+                // 获取变量的值
+                var value = results[0];
+
+                // 创建锁定变量
+                var lockedVar = new LockedVariableLangValue(value, varName, Position);
+
+                // 如果是变量引用，在管理器中注册
+                if (expr is LangId idRef)
+                {
+                    manager.RegisterLockedVariable(idRef.IdName, lockedVar);
+                }
+
+                return lockedVar;
+            }
             case "Exec" or "exec":
             {
                 if (results[0] is not StringLangValue execStringValue)
                     throw new TypeError(this, "StringValue", results[0].GetType().Name);
                 var a = manager.Interpreter.Build(code: execStringValue.Value);
                 a.Run(manager);
-                return new VoidLangValue();
-            }
-            case "ShowValues" or "showValues":
-            {
-#if DEBUG
-                manager.Interpreter.OutputProvider.WriteLine(manager.ToString());
-#endif
                 return new VoidLangValue();
             }
             case "Json" or "json":
@@ -95,54 +129,6 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
                 if (results[0] is not StringLangValue stringValue)
                     throw new TypeError(this, "StringValue", results[0].GetType().Name);
                 return stringValue.ToObj();
-            case "PrintLine" or "printLine":
-            {
-                if (results.Count == 0)
-                {
-                    manager.Interpreter.OutputProvider.WriteLine("");
-                    return new VoidLangValue();
-                }
-
-                var value = results[0].ToDisplayString();
-                for (var i = 1; i < results.Count; i++) value += results[i].ToDisplayString();
-
-                manager.Interpreter.OutputProvider.WriteLine(value);
-                return new VoidLangValue();
-            }
-            case "Print" or "print":
-            {
-                if (results.Count == 0) return new VoidLangValue();
-
-                var value = results[0].ToDisplayString();
-                for (var i = 1; i < results.Count; i++) value += results[i].ToDisplayString();
-
-                manager.Interpreter.OutputProvider.Write(value);
-                return new VoidLangValue();
-            }
-            case "Error" or "error":
-            {
-                if (results.Count == 0)
-                {
-                    manager.Interpreter.OutputProvider.WriteLine("");
-                    return new VoidLangValue();
-                }
-
-                var value = results[0].ToDisplayString();
-                for (var i = 1; i < results.Count; i++) value += results[i].ToDisplayString();
-
-                manager.Interpreter.OutputProvider.Error(value);
-                return new VoidLangValue();
-            }
-            case "ReadLine" or "readLine":
-            {
-                var res = manager.Interpreter.OutputProvider.ReadLine();
-                return new StringLangValue(res);
-            }
-            case "Clear" or "clear":
-            {
-                manager.Interpreter.OutputProvider.Clear();
-                return new VoidLangValue();
-            }
             case "Compiler" or "compiler":
             {
                 if (results.Count == 0) return new VoidLangValue();
@@ -168,24 +154,6 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
                 }
 
                 return new VoidLangValue();
-            }
-            case "Len" or "len":
-            {
-                var value = results[0].Run(manager);
-                if (value is ILangList list) return new IntLangValue(list.GetLength());
-                throw new InvalidOperationError(this, $"{results[0]} 不是列表类型");
-            }
-            case "Assert" or "assert":
-            {
-                var value = results[0].Run(manager);
-                var value1 = results[1].Run(manager);
-                if (!value.Equal(value1))
-                {
-                    var message = $"断言失败: 期望 {value1}，但得到 {value}";
-                    throw new AssertionError(this, message);
-                }
-
-                return new BoolLangValue(true);
             }
             case "Spawn" or "spawn":
             {
@@ -699,129 +667,17 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
+        // 首先尝试通过全局函数注册器生成 IL 代码
+        if (TryGenerateGlobalFunctionIL(ilGenerator, local))
+        {
+            return;
+        }
+
         switch (Id.IdName)
         {
-            case "PrintLine" or "printLine":
-                // 处理多个参数，将它们转换为字符串并拼接
-                if (Ids.Count == 0)
-                {
-                    // 没有参数，调用 Console.WriteLine()
-                    var writeLineNoArg = typeof(Console).GetMethod("WriteLine", Type.EmptyTypes);
-                    if (writeLineNoArg != null)
-                    {
-                        ilGenerator.Emit(OpCodes.Call, writeLineNoArg);
-                    }
-
-                    return;
-                }
-
-                // 简化实现：只处理第一个参数，将其转换为字符串
-                var printLineExpr = Ids[0];
-                printLineExpr.LoadIlValue(ilGenerator, local);
-                var printLineType = printLineExpr.OutputType(local);
-
-                // 直接调用Console.WriteLine(object)方法，让CLR处理类型转换
-                var writeLineObject = typeof(Console).GetMethod("WriteLine", [typeof(object)]);
-                if (writeLineObject != null)
-                {
-                    // 如果是值类型，先装箱
-                    if (printLineType is { IsValueType: true })
-                    {
-                        ilGenerator.Emit(OpCodes.Box, printLineType);
-                    }
-
-                    ilGenerator.Emit(OpCodes.Call, writeLineObject);
-                }
-
-                return;
-            case "Print" or "print":
-                // 处理多个参数，将它们转换为字符串并拼接
-                if (Ids.Count == 0)
-                {
-                    // 没有参数，直接返回
-                    return;
-                }
-
-                // 简化实现：只处理第一个参数，将其转换为字符串
-                var printExpr = Ids[0];
-                printExpr.LoadIlValue(ilGenerator, local);
-                var printType = printExpr.OutputType(local);
-
-                // 如果参数不是字符串类型，调用 ToString() 方法转换为字符串
-                if (printType != typeof(string))
-                {
-                    // 获取 ToString() 方法
-                    var toStringMethod = typeof(object).GetMethod("ToString", Type.EmptyTypes)!;
-                    // 如果是值类型，先装箱
-                    if (printType is { IsValueType: true })
-                    {
-                        ilGenerator.Emit(OpCodes.Box, printType);
-                    }
-
-                    // 调用 ToString() 方法
-                    ilGenerator.Emit(OpCodes.Callvirt, toStringMethod);
-                }
-
-                // 调用 Console.Write(string)
-                ilGenerator.Emit(OpCodes.Call, typeof(Console).GetMethod("Write", [typeof(string)])!);
-                return;
             case "Json" or "json":
                 return;
             case "ToObj" or "toObj":
-                return;
-            case "Len" or "len":
-                var lenId = Ids[0];
-                lenId.LoadIlValue(ilGenerator, local);
-                var lenType = lenId.OutputType(local)!;
-
-                // 尝试获取Length属性，适用于数组、字符串等
-                var lengthProp = lenType.GetProperty("Length");
-                if (lengthProp != null)
-                {
-                    ilGenerator.Emit(OpCodes.Call, lengthProp.GetGetMethod()!);
-                    return;
-                }
-
-                // 尝试获取Count属性，适用于集合类
-                var countProp = lenType.GetProperty("Count");
-                if (countProp != null)
-                {
-                    ilGenerator.Emit(OpCodes.Call, countProp.GetGetMethod()!);
-                    return;
-                }
-
-                // 尝试获取Length字段，适用于某些自定义类型
-                var lengthField = lenType.GetField("Length");
-                if (lengthField != null)
-                {
-                    ilGenerator.Emit(OpCodes.Ldfld, lengthField);
-                    return;
-                }
-
-                // 尝试获取Count字段，适用于某些自定义类型
-                var countField = lenType.GetField("Count");
-                if (countField != null)
-                {
-                    ilGenerator.Emit(OpCodes.Ldfld, countField);
-                    return;
-                }
-
-                // 如果是object类型，说明类型推断失败，使用默认值0
-                if (lenType == typeof(object))
-                {
-                    ilGenerator.Emit(OpCodes.Ldc_I4_0);
-                    return;
-                }
-
-                // 所有尝试都失败，抛出错误
-                throw new InvalidOperationError(this, $"类型 {lenType.Name} 没有 Length 或 Count 属性");
-            case "Type" or "type":
-                // 编译模式下type()函数返回类型名称字符串
-                var typeId = Ids[0];
-                var typeIdType = typeId.OutputType(local);
-                // 直接返回类型名称字符串，不调用GetType()
-                ilGenerator.Emit(OpCodes.Ldstr, typeIdType != null ? typeIdType.Name : "object");
-
                 return;
             case "Compiler" or "compiler":
                 ilGenerator.Emit(OpCodes.Ldstr, "编译环境不需要使用Compiler方法");
@@ -1094,6 +950,13 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
 
     public override Type OutputType(LocalManager local)
     {
+        // 首先尝试通过全局函数注册器获取返回类型
+        var globalFuncReturnType = TryGetGlobalFunctionReturnType(local);
+        if (globalFuncReturnType != null)
+        {
+            return globalFuncReturnType;
+        }
+
         switch (Id.IdName)
         {
             case "PrintLine":

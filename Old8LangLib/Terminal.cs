@@ -29,11 +29,6 @@ public static class Terminal
     /// 发出默认蜂鸣声
     /// </summary>
     public static void Beep() => Console.Beep();
-    
-    /// <summary>
-    /// 清屏
-    /// </summary>
-    public static void Clear() => Console.Clear();
 
     /// <summary>
     /// 在Windows平台上发出特定频率和时长的蜂鸣声
