@@ -1,0 +1,35 @@
+// 测试生成器是否正确保存异步流实例
+PrintLine("=== Test saving async stream state ===")
+
+outer <- async {
+    PrintLine("[outer] Creating inner stream")
+    inner <- async {
+        PrintLine("  [inner] yielding A")
+        yield "A"
+        PrintLine("  [inner] yielding B")
+        yield "B"
+        PrintLine("  [inner] yielding C")
+        yield "C"
+        PrintLine("  [inner] done")
+    }
+
+    PrintLine("[outer] Before async for loop")
+    counter <- 0
+    async for item in inner {
+        counter <- counter + 1
+        PrintLine("[outer] got " + item + " (counter=" + counter.ToStr() + "), yielding")
+        yield "item-" + counter.ToStr()
+        PrintLine("[outer] resumed after yield")
+    }
+    PrintLine("[outer] done")
+}
+
+PrintLine("Starting iteration...")
+results <- {}
+async for val in outer {
+    PrintLine("[main] got: " + val)
+    results.Add(val)
+}
+
+PrintLine("Results: " + results.ToStr())
+PrintLine("Expected: [item-1, item-2, item-3]")

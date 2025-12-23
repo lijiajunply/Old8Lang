@@ -28,6 +28,14 @@ public class GeneratorExecutionContext
     public Dictionary<string, int> LoopStates { get; set; } = new();
 
     /// <summary>
+    /// 异步流缓存字典
+    /// Key: 循环路径（如 "/block[0]/async-for-in"）
+    /// Value: 缓存的异步流实例
+    /// 用于在生成器上下文中保存异步流实例，避免重复创建
+    /// </summary>
+    public Dictionary<string, object> AsyncStreamCache { get; set; } = new();
+
+    /// <summary>
     /// 是否遇到了yield语句
     /// </summary>
     public bool HasYielded { get; set; }
@@ -59,6 +67,7 @@ public class GeneratorExecutionContext
         IsCompleted = false;
         ExecutionPath = null;
         LoopStates.Clear();
+        AsyncStreamCache.Clear();
         PathStack.Clear();
     }
 

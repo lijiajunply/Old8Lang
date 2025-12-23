@@ -139,6 +139,10 @@ public class AsyncGeneratorStateMachine
             if (kvp.Key.StartsWith("__loop__"))
                 continue;
 
+            // 跳过异步流缓存变量（以 __stream__ 开头）
+            if (kvp.Key.StartsWith("__stream__"))
+                continue;
+
             // 跳过执行路径变量
             if (kvp.Key == "__last_yield_path__")
                 continue;
@@ -153,8 +157,9 @@ public class AsyncGeneratorStateMachine
     /// </summary>
     private void SaveLocals()
     {
-        // 清除旧的局部变量（但保留循环状态和执行路径）
+        // 清除旧的局部变量（但保留循环状态、异步流缓存和执行路径）
         var loopStates = _locals.Where(kvp => kvp.Key.StartsWith("__loop__")).ToList();
+        var streamCache = _locals.Where(kvp => kvp.Key.StartsWith("__stream__")).ToList();
         var yieldPath = _locals.ContainsKey("__last_yield_path__") ? _locals["__last_yield_path__"] : null;
 
         _locals.Clear();
@@ -162,6 +167,11 @@ public class AsyncGeneratorStateMachine
         foreach (var loopState in loopStates)
         {
             _locals[loopState.Key] = loopState.Value;
+        }
+
+        foreach (var stream in streamCache)
+        {
+            _locals[stream.Key] = stream.Value;
         }
 
         if (yieldPath != null)
@@ -181,7 +191,7 @@ public class AsyncGeneratorStateMachine
     }
 
     /// <summary>
-    /// 从 locals 恢复循环状态到 context.LoopStates
+    /// 从 locals 恢复循环状态到 context.LoopStates 和 AsyncStreamCache
     /// </summary>
     private void RestoreLoopStates(GeneratorExecutionContext context)
     {
@@ -193,11 +203,17 @@ public class AsyncGeneratorStateMachine
                 var loopPath = kvp.Key.Substring("__loop__".Length);
                 context.LoopStates[loopPath] = intValue.Value;
             }
+            else if (kvp.Key.StartsWith("__stream__"))
+            {
+                // 恢复异步流缓存：__stream__/block[0]/async-for-in -> /block[0]/async-for-in
+                var streamPath = kvp.Key.Substring("__stream__".Length);
+                context.AsyncStreamCache[streamPath] = kvp.Value;
+            }
         }
     }
 
     /// <summary>
-    /// 保存循环状态从 context.LoopStates 到 locals
+    /// 保存循环状态从 context.LoopStates 和 AsyncStreamCache 到 locals
     /// </summary>
     private void SaveLoopStates(GeneratorExecutionContext context)
     {
@@ -206,6 +222,16 @@ public class AsyncGeneratorStateMachine
         {
             var key = "__loop__" + kvp.Key;
             _locals[key] = new IntLangValue(kvp.Value);
+        }
+
+        // 从 AsyncStreamCache 保存所有异步流实例
+        foreach (var kvp in context.AsyncStreamCache)
+        {
+            var key = "__stream__" + kvp.Key;
+            if (kvp.Value is LangValueType langValue)
+            {
+                _locals[key] = langValue;
+            }
         }
     }
 

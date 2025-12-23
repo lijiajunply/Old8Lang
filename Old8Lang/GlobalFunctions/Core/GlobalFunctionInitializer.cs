@@ -7,8 +7,8 @@ namespace Old8Lang.GlobalFunctions.Core;
 /// </summary>
 public static class GlobalFunctionInitializer
 {
-    private static bool _initialized = false;
-    private static readonly object _initLock = new();
+    private static bool _initialized;
+    private static readonly Lock InitLock = new();
 
     /// <summary>
     /// 初始化并注册所有内置全局函数
@@ -17,7 +17,7 @@ public static class GlobalFunctionInitializer
     {
         if (_initialized) return;
 
-        lock (_initLock)
+        lock (InitLock)
         {
             if (_initialized) return;
 
@@ -56,7 +56,7 @@ public static class GlobalFunctionInitializer
     /// </summary>
     public static void Reset()
     {
-        lock (_initLock)
+        lock (InitLock)
         {
             GlobalFunctionRegistry.Instance.Clear();
             _initialized = false;
