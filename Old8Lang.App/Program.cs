@@ -10,7 +10,7 @@ if (args.Length == 0)
 {
     args =
     [
-        "-f", "/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/InterpreterTests/test_thread_basic.old8"
+        "-f", "/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/InterpreterTests/test_thread_basic.old8"
     ];
 }
 #endif

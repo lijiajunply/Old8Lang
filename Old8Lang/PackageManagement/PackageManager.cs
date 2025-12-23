@@ -11,19 +11,14 @@ namespace Old8Lang.PackageManagement;
 public class PackageManager
 {
     /// <summary>
-    /// 默认包安装目录
-    /// </summary>
-    private readonly string _packagesDirectory;
-
-    /// <summary>
     /// 包缓存（已加载的包）
     /// </summary>
-    private readonly Dictionary<string, LangValueType> _packageCache = new();
+    private readonly Dictionary<string, LangValueType> PackageCache = new();
 
     /// <summary>
     /// 包查找路径列表
     /// </summary>
-    private readonly List<string> _packageSearchPaths = [];
+    private readonly List<string> PackageSearchPaths = [];
 
     /// <summary>
     /// 包加载锁
@@ -36,10 +31,10 @@ public class PackageManager
     /// <param name="packagesDir">包目录路径，null 则使用默认路径</param>
     public PackageManager(string? packagesDir = null)
     {
-        _packagesDirectory = packagesDir ?? GetDefaultPackagesDirectory();
+        var packagesDirectory = packagesDir ?? GetDefaultPackagesDirectory();
 
         // 添加默认查找路径
-        AddSearchPath(_packagesDirectory);
+        AddSearchPath(packagesDirectory);
 
         // 添加当前目录的 packages 子目录
         var localPackages = Path.Combine(Directory.GetCurrentDirectory(), "packages");
@@ -63,9 +58,9 @@ public class PackageManager
     /// </summary>
     public void AddSearchPath(string path)
     {
-        if (!_packageSearchPaths.Contains(path))
+        if (!PackageSearchPaths.Contains(path))
         {
-            _packageSearchPaths.Add(path);
+            PackageSearchPaths.Add(path);
         }
     }
 
@@ -84,21 +79,17 @@ public class PackageManager
         lock (LoadLock)
         {
             // 检查缓存
-            if (_packageCache.TryGetValue(packageName, out module))
+            if (PackageCache.TryGetValue(packageName, out module))
             {
                 return true;
             }
 
             // 在所有查找路径中搜索包
-            foreach (var searchPath in _packageSearchPaths)
+            foreach (var packagePath in PackageSearchPaths.Select(searchPath => Path.Combine(searchPath, packageName)))
             {
-                var packagePath = Path.Combine(searchPath, packageName);
-
-                if (TryLoadPackageFromPath(packagePath, packageName, manager, out module))
-                {
-                    _packageCache[packageName] = module;
-                    return true;
-                }
+                if (!TryLoadPackageFromPath(packagePath, packageName, manager, out module) || module is null) continue;
+                PackageCache[packageName] = module;
+                return true;
             }
 
             module = null;
@@ -241,7 +232,7 @@ public class PackageManager
     /// </summary>
     public bool IsPackageInstalled(string packageName)
     {
-        return _packageSearchPaths.Any(searchPath =>
+        return PackageSearchPaths.Any(searchPath =>
         {
             var packagePath = Path.Combine(searchPath, packageName);
             return Directory.Exists(packagePath);
@@ -255,7 +246,7 @@ public class PackageManager
     {
         var packages = new HashSet<string>();
 
-        foreach (var searchPath in _packageSearchPaths)
+        foreach (var searchPath in PackageSearchPaths)
         {
             if (!Directory.Exists(searchPath))
                 continue;
@@ -278,7 +269,7 @@ public class PackageManager
     {
         lock (LoadLock)
         {
-            _packageCache.Clear();
+            PackageCache.Clear();
         }
     }
 
@@ -287,22 +278,20 @@ public class PackageManager
     /// </summary>
     public PackageInfo? GetPackageInfo(string packageName)
     {
-        foreach (var searchPath in _packageSearchPaths)
+        foreach (var searchPath in PackageSearchPaths)
         {
             var packagePath = Path.Combine(searchPath, packageName);
             var packageJsonPath = Path.Combine(packagePath, "package.json");
 
-            if (File.Exists(packageJsonPath))
+            if (!File.Exists(packageJsonPath)) continue;
+            try
             {
-                try
-                {
-                    var json = File.ReadAllText(packageJsonPath);
-                    return PackageInfo.FromJson(json, packagePath);
-                }
-                catch
-                {
-                    continue;
-                }
+                var json = File.ReadAllText(packageJsonPath);
+                return PackageInfo.FromJson(json, packagePath);
+            }
+            catch
+            {
+                //
             }
         }
 

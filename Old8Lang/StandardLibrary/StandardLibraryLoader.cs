@@ -10,7 +10,7 @@ namespace Old8Lang.StandardLibrary;
 /// <summary>
 /// 标准库加载器，负责加载内置的标准库
 /// </summary>
-public class StandardLibraryLoader
+public static class StandardLibraryLoader
 {
     /// <summary>
     /// 已加载的程序集缓存
@@ -20,7 +20,7 @@ public class StandardLibraryLoader
     /// <summary>
     /// 程序集加载锁
     /// </summary>
-    private static readonly object AssemblyLock = new();
+    private static readonly Lock AssemblyLock = new();
 
     /// <summary>
     /// 尝试加载标准库

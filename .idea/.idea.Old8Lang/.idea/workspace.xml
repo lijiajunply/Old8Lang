@@ -21,20 +21,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Changes">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/PackageManagement/PackageManager.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryInfo.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryLoader.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_circular_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/lazy_circular_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/DllPathResolver.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/DllPathResolver.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/OldLib/__init__.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/Terminal.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Terminal.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/PackageManagement/PackageManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/PackageManagement/PackageManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryLoader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryLoader.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -123,41 +113,41 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Debug&quot;,
-    &quot;.NET 项目.Old8Lang.Benchmarks.executor&quot;: &quot;Run&quot;,
-    &quot;07d79105-db56-470d-b872-543f396b1133.executor&quot;: &quot;Debug&quot;,
-    &quot;34038497-caa6-4590-9735-a11ac1a57cd0.executor&quot;: &quot;Debug&quot;,
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;e9de5ea7-95aa-45c5-91d2-c46acccab710.executor&quot;: &quot;Debug&quot;,
-    &quot;fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
+    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
+    ".NET 项目.LibTest.executor": "Run",
+    ".NET 项目.Old8Lang.App.executor": "Run",
+    ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
+    "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
+    "34038497-caa6-4590-9735-a11ac1a57cd0.executor": "Debug",
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHELLCHECK.PATH": "/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck",
+    "WebServerToolWindowFactoryState": "false",
+    "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
+    "fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor": "Debug",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;PLAIN_TEXT&quot;,
-      &quot;Markdown&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "PLAIN_TEXT",
+      "Markdown"
     ]
   }
-}</component>
+}]]></component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
@@ -469,6 +459,7 @@
       <workItem from="1766330641326" duration="12155000" />
       <workItem from="1766385211009" duration="1338000" />
       <workItem from="1766441034395" duration="1692000" />
+      <workItem from="1766461431015" duration="981000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
