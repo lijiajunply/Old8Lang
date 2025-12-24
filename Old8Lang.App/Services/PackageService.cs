@@ -10,7 +10,7 @@ namespace Old8Lang.App.Services;
 /// </summary>
 public class PackageService
 {
-    private readonly string _projectRoot;
+    private readonly string ProjectRoot;
     private readonly string PackagesDir;
     private readonly PackageSourceManager SourceManager;
     private readonly IPackageResolver Resolver;
@@ -19,7 +19,7 @@ public class PackageService
 
     public PackageService(string projectRoot, ProjectConfig? projectConfig = null)
     {
-        _projectRoot = projectRoot;
+        ProjectRoot = projectRoot;
 
         // 确定包目录
         PackagesDir = projectConfig != null
@@ -33,13 +33,13 @@ public class PackageService
         ConfigManager = new DefaultPackageConfigurationManager();
 
         // 配置包源
-        ConfigurePackageSources(projectConfig);
+        ConfigurePackageSources();
     }
 
     /// <summary>
     /// 配置包源
     /// </summary>
-    private void ConfigurePackageSources(ProjectConfig? projectConfig)
+    private void ConfigurePackageSources()
     {
         // 添加本地包源（项目本地）
         var localPackageSource = new LocalPackageSource(
@@ -62,12 +62,16 @@ public class PackageService
 
         // TODO: 从项目配置中读取自定义包源
         // TODO: 添加远程包源支持
+        SourceManager.AddSource(new LocalPackageSource(
+            name: "NuGet",
+            sourcePath: "https://api.nuget.org/v3/index.json"
+        ));
     }
 
     /// <summary>
     /// 安装包
     /// </summary>
-    public async Task<InstallPackageResult> InstallPackageAsync(
+    private async Task<InstallPackageResult> InstallPackageAsync(
         string packageId,
         string versionRange,
         bool isDevelopmentDependency = false)
@@ -138,10 +142,10 @@ public class PackageService
         {
             // 加载锁文件（如果存在）
             LockFile? lockFile = null;
-            var lockFilePath = Path.Combine(_projectRoot, LockFile.FileName);
+            var lockFilePath = Path.Combine(ProjectRoot, LockFile.FileName);
             if (frozenLockfile && File.Exists(lockFilePath))
             {
-                lockFile = LockFile.LoadFromDirectory(_projectRoot);
+                lockFile = LockFile.LoadFromDirectory(ProjectRoot);
             }
 
             // 安装生产依赖
@@ -151,7 +155,7 @@ public class PackageService
                     ? lockInfo.Version
                     : ResolveVersion(versionRange);
 
-                var installResult = await InstallPackageAsync(packageId, version, false);
+                var installResult = await InstallPackageAsync(packageId, version);
 
                 if (installResult.Success)
                 {
@@ -269,16 +273,12 @@ public class PackageService
     /// 包目录路径
     /// </summary>
     public string PackagesDirectory => PackagesDir;
-
-    /// <summary>
-    /// 项目根目录
-    /// </summary>
-    public string ProjectRoot => _projectRoot;
 }
 
 /// <summary>
 /// 安装包结果
 /// </summary>
+[Serializable]
 public class InstallPackageResult
 {
     public bool Success { get; set; }
@@ -291,12 +291,13 @@ public class InstallPackageResult
 /// <summary>
 /// 恢复结果
 /// </summary>
+[Serializable]
 public class RestoreResult
 {
     public bool Success { get; set; }
     public int InstalledCount { get; set; }
     public int SkippedCount { get; set; }
     public int FailedCount { get; set; }
-    public List<string> FailedPackages { get; set; } = new();
+    public List<string> FailedPackages { get; set; } = [];
     public string? ErrorMessage { get; set; }
 }
