@@ -21,12 +21,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/test_simple.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_reflection.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/TemplateEngineTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncGeneratorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncGeneratorTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/TryStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/TryStatement.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,6 +67,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/AsyncGeneratorTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
@@ -85,6 +83,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/ProjectManagement/VirtualEnvironment.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/TestProjects/PackageIntegrationTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/378b2b72dcfd47c7a335f353306873123e00/5d/0b33afd1/02000002pdb1.il" root0="FORCE_HIGHLIGHTING" />
@@ -812,7 +811,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="352" />
+    <option name="localTasksCounter" value="353" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -839,7 +838,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(generator): 重构生成器相关代码结构并优化异步任务支持&#10;&#10;- 将多个生成器相关的类迁移至 `Old8Lang.Generators` 命名空间&#10;- 优化 `AsyncGeneratorLangValue` 中的 `In` 方法实现，使用 LINQ 简化逻辑&#10;- 移除调试用的 `System.Console.WriteLine` 日志输出&#10;- 修复 `LangId` 构造函数参数过多的问题&#10;- 在 `TaskClassLangValue` 中新增 `FromException` 和 `StartNew` 静态方法&#10;- 为 `TaskLangValue` 添加 `Wait` 和 `ContinueWith` 实例方法以增强任务操作能力&#10;- 更新测试文件中对 Task API 的调用方式及语法表达&#10;- 统一命名空间引用和清理无用的 using 指令" />
     <MESSAGE value="feat(async): 优化异步任务 API 支持与测试代码&#10;&#10;- 为 `TaskLangValue` 添加 `ContinueWith` 实例方法以增强任务链式调用能力&#10;- 修正 `TaskAPITests.cs` 中的语法错误，包括异步函数声明和循环表达式&#10;- 更新任务结果获取方式，统一使用 `Result()` 调用替代直接属性访问&#10;- 修复变量初始化和比较运算符使用错误&#10;- 将部分数组初始化语法从 `[]` 改为 `{}` 以适配语言变更&#10;- 迁移 `ContinueWith` 方法实现至 `TaskValueFuncStatic.cs` 并优化其上下文管理&#10;- 调整 `Instance.cs` 中的参数传递逻辑，避免空引用异常" />
     <MESSAGE value="feat(async): 实现异步函数初始化与状态机生成&#10;&#10;重构 AsyncFuncInit 类以支持异步函数的动态编译和执行，包括：&#10;- 使用 DynamicMethod 动态生成异步方法体&#10;- 集成状态机生成器 AsyncStateMachineGenerator 来处理 await 表达式&#10;- 支持将异步函数注册为委托并携带参数信息&#10;- 优化 IL 生成流程，确保正确的参数加载和返回值处理&#10;&#10;同时更新 BlockStatement 以识别 AsyncFuncInit 语句，使其能正确导入异步函数声明。" />
     <MESSAGE value="feat(parser): 支持 this 方法调用解析为 FuncRunStatement&#10;&#10;在 StatementParser 中增加对 this.xxx 形式的方法调用识别，将其正确解析为 FuncRunStatement。  &#10;同时修正了 AnyLangValue 中字段命名及多处逻辑冗余问题，并完善接口与类交互测试代码。&#10;&#10;---&#10;&#10;refactor(ast): 重命名字段并优化方法执行逻辑&#10;&#10;将 `_fieldsModifiedBySetField` 字段重命名为 `FieldsModifiedBySetField` 并调整访问方式；  &#10;移除 ExecuteMethod 和 CallInit 中关于作用域参数求值的重复注释和逻辑，统一处理流程；  &#10;修复 AccessCollectionItem 中类型判断字符串格式化问题。&#10;&#10;---&#10;&#10;test(interpreter): 更新类成员初始化函数名称为 init&#10;&#10;将多个测试用例中的构造函数名（如 DataContainer、Circle、Point 等）更正为标准的 init 函数命名，  &#10;确保符合语言规范并提升一致性。&#10;&#10;---&#10;&#10;test(parser): 升级接口相关测试代码字符串语法&#10;&#10;将 InterfaceAbstractClassInteractionTests.cs 文件中所有多行字符串由旧版 &quot;@&quot; 标记改为 &quot;&quot;&quot; 新语法，  &#10;增强可读性和维护性。&#10;&#10;---&#10;&#10;chore(tests): 更新配置文件和工具库示例内容&#10;&#10;修改 config.old8 示例内容以支持动态加载配置字典，  &#10;并在 utils.old8 中新增日期格式化和 token 生成辅助函数。" />
@@ -864,7 +862,8 @@
     <MESSAGE value="feat(package): 实现非项目模式下的全局包自动检测与加载&#10;&#10;- 添加非项目模式自动检测机制，当无o8packages.json时使用全局包&#10;- 更新包加载优先级：标准库 → 项目本地包 → 全局第三方包 → 相对路径文件&#10;- 添加全局包目录结构说明和配置文档&#10;- 创建non_project_test.old8测试文件验证非项目模式功能&#10;- 优化PackageManager构造函数，支持自动检测项目根目录&#10;- 更新虚拟环境检测逻辑，添加非项目模式运行日志&#10;- 修复包管理器在无项目配置时的全局包加载流程" />
     <MESSAGE value="refactor(code): 清理无用using引用并更新代码风格&#10;&#10;- 移除多个文件中的无用using语句，包括AST、GlobalFunctions、Commands等模块&#10;- 将数组初始化语法从new[]替换为集合字面量语法[]&#10;- 简化类型引用，移除冗余的命名空间前缀&#10;- 更新IDE配置文件中的变更记录和断点位置&#10;- 修复包管理器相关提交信息的历史记录" />
     <MESSAGE value="feat(import): 改进模块导入功能并修复路径处理&#10;&#10;- 更新ImportStatement.cs添加函数和类的导入查找逻辑&#10;- 修复模块导入时的路径创建问题，确保父目录存在&#10;- 添加嵌套模块和选择性导入测试用例&#10;- 更新常量声明语法从const BASE_CONST &lt;- 10到BASE_CONST:const &lt;- 10&#10;- 修改别名模块中函数声明为变量赋值语法&#10;- 调整选择性导入测试中的模块路径处理方式&#10;- 添加nested/submodule/module.old8测试文件&#10;- 更新IDE配置文件中的变更记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(import): 改进模块导入功能并修复路径处理&#10;&#10;- 更新ImportStatement.cs添加函数和类的导入查找逻辑&#10;- 修复模块导入时的路径创建问题，确保父目录存在&#10;- 添加嵌套模块和选择性导入测试用例&#10;- 更新常量声明语法从const BASE_CONST &lt;- 10到BASE_CONST:const &lt;- 10&#10;- 修改别名模块中函数声明为变量赋值语法&#10;- 调整选择性导入测试中的模块路径处理方式&#10;- 添加nested/submodule/module.old8测试文件&#10;- 更新IDE配置文件中的变更记录" />
+    <MESSAGE value="test(interpreter): 更新异步函数和生成器测试&#10;&#10;- 将AsyncFunction_WithoutImmediateAwait_CreatesTask测试方法从async Task改为void&#10;- 修改异步函数测试的执行逻辑，等待异步任务完成后再进行断言&#10;- 添加对任务状态和异常的检查断言&#10;- 在异步生成器测试中跳过PrimeGenerator测试用例" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(interpreter): 更新异步函数和生成器测试&#10;&#10;- 将AsyncFunction_WithoutImmediateAwait_CreatesTask测试方法从async Task改为void&#10;- 修改异步函数测试的执行逻辑，等待异步任务完成后再进行断言&#10;- 添加对任务状态和异常的检查断言&#10;- 在异步生成器测试中跳过PrimeGenerator测试用例" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
