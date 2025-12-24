@@ -16,7 +16,7 @@
 
 ```
 MyPackage/
-├── package.json         # 包元数据（必需）
+├── o8packages.json         # 包元数据（必需）
 ├── index.old8           # 主入口文件（或在 package.json 中指定）
 ├── README.md            # 包文档
 ├── LICENSE              # 许可证（默认为 MIT）

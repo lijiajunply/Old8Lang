@@ -156,7 +156,7 @@ public class PackageManager
             foreach (var searchPath in PackageSearchPaths)
             {
                 // 策略 1: 如果启用了虚拟环境，使用 VirtualEnvironment 解析版本
-                if (VirtualEnv != null && VirtualEnv.IsEnabled)
+                if (VirtualEnv is { IsEnabled: true })
                 {
                     var resolvedPath = VirtualEnv.ResolvePackage(packageName);
                     if (resolvedPath != null)

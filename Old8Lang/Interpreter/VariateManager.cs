@@ -44,24 +44,24 @@ public class VariateManager
     /// <summary>
     /// 第三方包管理器实例（延迟初始化）
     /// </summary>
-    private PackageManagement.PackageManager? _packageManager;
+    private PackageManagement.PackageManager? PackageManager;
 
     /// <summary>
     /// 获取包管理器实例
     /// </summary>
     public PackageManagement.PackageManager GetPackageManager()
     {
-        if (_packageManager == null)
+        if (PackageManager == null)
         {
             // 尝试从当前执行文件路径检测项目根目录
             var projectRoot = !string.IsNullOrEmpty(Path)
                 ? System.IO.Path.GetDirectoryName(Path)
                 : Directory.GetCurrentDirectory();
 
-            _packageManager = new PackageManagement.PackageManager(projectRoot: projectRoot);
+            PackageManager = new PackageManagement.PackageManager(projectRoot: projectRoot);
         }
 
-        return _packageManager;
+        return PackageManager;
     }
 
     #endregion
@@ -648,6 +648,7 @@ public class VariateManager
             {
                 return anyValue;
             }
+
             return null;
         }
         catch
@@ -791,6 +792,7 @@ public class VariateManager
                     newScope[varName] = varValue; // 普通变量正常拷贝
                 }
             }
+
             newManager.Scopes.Add(newScope);
         }
 

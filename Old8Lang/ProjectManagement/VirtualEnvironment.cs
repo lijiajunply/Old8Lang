@@ -53,7 +53,7 @@ public class VirtualEnvironment
             PackagesDirectory = Path.GetFullPath(Path.Combine(projectRoot, packagesDir));
         }
 
-        LogDebug($"Virtual environment detected:");
+        LogDebug("Virtual environment detected:");
         LogDebug($"  Project root: {ProjectRoot}");
         LogDebug($"  Project name: {Config.Name} v{Config.Version}");
         LogDebug($"  Packages dir: {PackagesDirectory}");
