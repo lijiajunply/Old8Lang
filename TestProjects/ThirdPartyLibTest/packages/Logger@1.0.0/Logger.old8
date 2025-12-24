@@ -1,0 +1,2 @@
+// Logger v1.0.0
+PrintLine("Logger loaded")

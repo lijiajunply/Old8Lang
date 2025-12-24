@@ -31,7 +31,7 @@ public class InitCommand : ICommand
         if (projectRoot != null)
         {
             CommandHelper.PrintError($"当前目录已存在 Old8Lang 项目: {projectRoot}");
-            CommandHelper.PrintInfo("如果要重新初始化，请先删除 old8.project.json");
+            CommandHelper.PrintInfo("如果要重新初始化，请先删除 o8packages.json");
             return Task.FromResult(1);
         }
 

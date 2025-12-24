@@ -1,0 +1,18 @@
+// 符号检查测试
+
+print("=== 符号检查测试 ===")
+
+import "Logger"
+
+print("Logger 导入成功！")
+print("尝试使用 Logger 类...")
+
+try {
+    logger <- Logger("TestLogger")
+    logger.Info("Logger 测试成功！")
+    print("Logger 功能正常")
+} catch {
+    print("Logger 功能测试失败")
+}
+
+print("\n测试完成！")

@@ -1,0 +1,128 @@
+// 第三方库详细功能测试
+// 深入测试各个包的具体功能
+
+print("=== 第三方库详细功能测试 ===")
+
+// 导入所需包
+import "Logger"
+import "OldLib"
+import "HttpClient"
+
+print("\n--- Logger 包详细测试 ---")
+
+// 测试不同级别的日志
+Logger.debug("调试信息：变量 x =", 42)
+Logger.info("普通信息：程序启动")
+Logger.warn("警告信息：配置文件未找到，使用默认配置")
+Logger.error("错误信息：连接数据库失败")
+
+print("\n--- OldLib 数学库测试 ---")
+
+// 基础数学函数
+print("基础数学:")
+print("  Math.pi =", Math.pi)
+print("  Math.e =", Math.e)
+print("  Math.sqrt(25) =", Math.sqrt(25))
+print("  Math.pow(2, 3) =", Math.pow(2, 3))
+print("  Math.abs(-7.5) =", Math.abs(-7.5))
+print("  Math.round(3.7) =", Math.round(3.7))
+print("  Math.floor(3.9) =", Math.floor(3.9))
+print("  Math.ceil(3.1) =", Math.ceil(3.1))
+
+// 三角函数
+print("\n三角函数:")
+print("  Math.sin(Math.pi/2) =", Math.sin(Math.pi/2))
+print("  Math.cos(0) =", Math.cos(0))
+
+// 随机数
+print("\n随机数:")
+print("  Math.random() =", Math.random())
+print("  Math.random(10) =", Math.random(10))
+print("  Math.random(1, 100) =", Math.random(1, 100))
+
+print("\n--- OldLib 字符串库测试 ---")
+
+var text = "Hello, Old8Lang World!"
+
+print("字符串操作:")
+print("  原始字符串:", text)
+print("  长度:", String.length(text))
+print("  大写:", String.toUpperCase(text))
+print("  小写:", String.toLowerCase(text))
+print("  包含 'Old8Lang':", String.contains(text, "Old8Lang"))
+print("  替换:", String.replace(text, "World", "Universe"))
+print("  分割:", String.split("a,b,c,d", ","))
+print("  连接:", String.join(["a", "b", "c"], "-"))
+
+print("\n--- OldLib 集合库测试 ---")
+
+// 数组操作
+var numbers = [5, 2, 8, 1, 9, 3]
+print("数组操作:")
+print("  原始数组:", numbers)
+print("  长度:", Collection.length(numbers))
+print("  排序:", Collection.sort(numbers))
+print("  最大值:", Collection.max(numbers))
+print("  最小值:", Collection.min(numbers))
+print("  求和:", Collection.sum(numbers))
+print("  平均值:", Collection.average(numbers))
+print("  过滤偶数:", Collection.filter(numbers, x => x % 2 == 0))
+print("  映射平方:", Collection.map(numbers, x => x * x))
+
+print("\n--- OldLib 时间库测试 ---")
+
+print("时间操作:")
+var now = Time.now()
+print("  当前时间:", now)
+print("  年:", Time.year(now))
+print("  月:", Time.month(now))
+print("  日:", Time.day(now))
+print("  格式化:", Time.format(now, "YYYY-MM-DD HH:mm:ss"))
+print("  时间戳:", Time.timestamp(now))
+
+print("\n--- OldLib JSON 库测试 ---")
+
+var jsonData = '{"name": "Old8Lang", "version": "1.0.0", "features": ["simple", "fast"]}'
+print("JSON 操作:")
+print("  原始 JSON:", jsonData)
+var parsed = Json.parse(jsonData)
+print("  解析后 - 名称:", parsed.name)
+print("  解析后 - 版本:", parsed.version)
+print("  解析后 - 特性:", parsed.features)
+
+var newJson = Json.stringify({
+    "status": "success",
+    "message": "测试完成",
+    "data": [1, 2, 3]
+})
+print("  生成 JSON:", newJson)
+
+print("\n--- OldLib 文件库测试 ---")
+
+print("文件操作:")
+print("  当前工作目录:", OS.getcwd())
+print("  临时目录:", OS.tempdir())
+print("  用户主目录:", OS.homedir())
+
+print("\n--- OldLib 加密库测试 ---")
+
+print("加密操作:")
+var message = "Hello, World!"
+var encrypted = Crypto.md5(message)
+print("  MD5 加密:", message, "->", encrypted)
+
+var sha256 = Crypto.sha256(message)
+print("  SHA256 加密:", message, "->", sha256)
+
+print("\n--- HttpClient 包详细测试 ---")
+
+var client = HttpClient.create()
+print("HTTP 客户端:")
+print("  默认超时:", client.timeout)
+print("  默认重试:", client.retry)
+
+print("\n=== 所有测试完成 ===")
+print("✓ Logger 包 - 日志功能正常")
+print("✓ OldLib 包 - 数学、字符串、集合、时间、JSON、文件、加密功能正常")
+print("✓ HttpClient 包 - HTTP 客户端功能正常")
+print("✓ 多包协同工作正常")

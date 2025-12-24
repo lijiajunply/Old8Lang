@@ -84,7 +84,7 @@ public class ProjectConfig
     /// <summary>
     /// 配置文件名
     /// </summary>
-    public const string FileName = "old8.project.json";
+    public const string FileName = "o8packages.json";
 
     /// <summary>
     /// 从目录加载项目配置
@@ -154,7 +154,7 @@ public class ProjectConfig
     }
 
     /// <summary>
-    /// 向上查找项目根目录（包含 old8.project.json）
+    /// 向上查找项目根目录（包含 o8packages.json）
     /// </summary>
     public static string? FindProjectRoot(string startPath, int maxDepth = 10)
     {
@@ -228,5 +228,5 @@ public class PackageManagerConfig
     /// 是否严格模式（版本必须与锁文件完全匹配）
     /// </summary>
     [JsonPropertyName("strict")]
-    public bool Strict { get; set; } = false;
+    public bool Strict { get; set; }
 }

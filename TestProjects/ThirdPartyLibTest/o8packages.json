@@ -1,32 +1,29 @@
 {
-  "name": "virtual-env-test",
+  "name": "thirdpartylibtest",
   "version": "1.0.0",
-  "description": "Test project for Old8Lang virtual environment",
+  "description": "Test project for third-party library integration",
   "author": "Old8Lang Team",
   "license": "MIT",
-
   "old8lang": {
     "version": "^1.0.0",
     "runtime": "interpreter"
   },
-
   "main": "src/main.old8",
-
   "dependencies": {
-    "Logger": "^1.2.0"
+    "Logger": "1.0.0",
+    "HttpClient": "1.0.0",
+    "OldLib": "*"
   },
-
-  "devDependencies": {},
-
+  "devDependencies": {
+    "--dev": "*"
+  },
   "scripts": {
     "start": "old8lang run src/main.old8",
-    "test": "old8lang run tests/test_main.old8"
+    "test": "old8lang run tests/test_thirdparty.old8"
   },
-
   "repositories": [
     "https://packages.old8lang.org"
   ],
-
   "packageManager": {
     "useVirtualEnv": true,
     "packagesDir": "./packages",

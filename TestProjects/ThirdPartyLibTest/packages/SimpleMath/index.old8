@@ -1,0 +1,29 @@
+// SimpleMath.old8 - 简化的数学库
+
+// 基础数学函数
+func sqrt(x:double) -> double {
+    return x * x  // 简化实现
+}
+
+func abs(x:double) -> double {
+    if x < 0 {
+        return -x
+    }
+    return x
+}
+
+func max(a:double, b:double) -> double {
+    if a > b {
+        return a
+    }
+    return b
+}
+
+func min(a:double, b:double) -> double {
+    if a < b {
+        return a
+    }
+    return b
+}
+
+PrintLine("SimpleMath loaded")

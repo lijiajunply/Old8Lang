@@ -1,0 +1,59 @@
+// 第三方库集成测试
+// 测试 Logger、OldLib 等包的调用
+
+import "OldLib"
+
+print("=== 第三方库集成测试 ===")
+print("项目名称:", "thirdpartylibtest")
+
+print("\n--- 1. 测试 Logger 包 ---")
+import "Logger"
+
+// 使用 Logger 包的功能
+logger <- LoggerClass("TestLogger")
+logger.Info("这是一条信息日志")
+logger.Warn("这是一条警告日志") 
+logger.Error("这是一条错误日志")
+logger.Debug("这是一条调试日志")
+
+print("\n--- 2. 测试 OldLib 包 ---")
+
+// 测试数学函数
+print("数学函数测试:")
+print("  sqrt(16) =", Math.sqrt(16))
+print("  abs(-5) =", Math.abs(-5))
+print("  max(3, 7) =", Math.max(3, 7))
+
+// 测试字符串函数
+print("\n字符串函数测试:")
+text <- "Hello, Old8Lang!"
+print("  原始字符串:", text)
+print("  长度:", String.length(text))
+
+// 测试数组/集合函数
+print("\n集合函数测试:")
+numbers <- [1, 2, 3, 4, 5]
+print("  原始数组:", numbers)
+print("  数组长度:", Collection.length(numbers))
+
+// 测试文件操作
+print("\n文件操作测试:")
+currentDir <- OS.getcwd()
+print("  当前目录:", currentDir)
+
+print("\n--- 3. 测试包别名功能 ---")
+import "Logger" as log
+
+log.info("使用别名的Logger调用")
+
+print("\n--- 4. 测试多包协同工作 ---")
+
+// 多个包协同使用
+Logger.info("开始数据处理")
+print("  读取数据...")
+print("  处理数据...")
+print("  保存结果...")
+Logger.info("数据处理完成")
+
+print("\n=== 测试完成 ===")
+print("所有第三方库都正常工作！")

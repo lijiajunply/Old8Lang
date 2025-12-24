@@ -1,0 +1,12 @@
+// 简单的包加载测试
+
+print("=== 包加载测试 ===")
+
+print("尝试导入 Logger...")
+import "Logger"
+
+print("Logger 导入完成！")
+print("检查可用符号...")
+
+// 简单测试 - 使用 PrintLine
+PrintLine("测试完成")

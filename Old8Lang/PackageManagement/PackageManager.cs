@@ -3,11 +3,18 @@ using Old8Lang.AST.Expression.ModuleObjects;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using Old8Lang.ProjectManagement;
+using Old8Lang.PackageManager.Core.Models;
 
 namespace Old8Lang.PackageManagement;
 
 /// <summary>
-/// 第三方包管理器，负责加载和管理第三方 Old8Lang 包
+/// Old8Lang 运行时包加载器
+/// 负责：
+/// 1. 运行时包加载和执行
+/// 2. 包路径解析和缓存管理
+/// 3. 虚拟环境支持
+/// 
+/// 注意：包安装功能委托给 Old8Lang.PackageManager.Core
 /// </summary>
 public class PackageManager
 {
@@ -66,16 +73,6 @@ public class PackageManager
         var packagesDirectory = packagesDir ?? GetDefaultPackagesDirectory();
         AddSearchPath(packagesDirectory);
 
-        // 添加当前目录的 packages 子目录（兼容模式）
-        if (VirtualEnv == null)
-        {
-            var localPackages = Path.Combine(Directory.GetCurrentDirectory(), "packages");
-            if (Directory.Exists(localPackages))
-            {
-                AddSearchPath(localPackages);
-            }
-        }
-
         LogDebug($"PackageManager initialized with {PackageSearchPaths.Count} search paths:");
         foreach (var path in PackageSearchPaths)
         {
@@ -97,16 +94,14 @@ public class PackageManager
     /// </summary>
     public void AddSearchPath(string path)
     {
-        if (!PackageSearchPaths.Contains(path))
-        {
-            PackageSearchPaths.Add(path);
-            LogDebug($"Added search path: {path}");
-        }
+        if (PackageSearchPaths.Contains(path)) return;
+        PackageSearchPaths.Add(path);
+        LogDebug($"Added search path: {path}");
     }
 
     /// <summary>
     /// 根据源文件路径添加包查找路径
-    /// 会添加源文件所在目录及其父目录的 packages 子目录
+    /// 只添加源文件所在目录的 packages 子目录
     /// </summary>
     public void AddSearchPathsFromSourceFile(string? sourceFilePath)
     {
@@ -124,23 +119,6 @@ public class PackageManager
             if (Directory.Exists(localPackages))
             {
                 AddSearchPath(localPackages);
-            }
-
-            // 向上查找项目根目录（包含 packages 目录的父目录）
-            var currentDir = sourceDir;
-            for (int i = 0; i < 5; i++) // 最多向上查找5层
-            {
-                var parentDir = Directory.GetParent(currentDir)?.FullName;
-                if (string.IsNullOrEmpty(parentDir))
-                    break;
-
-                var packagesDir = Path.Combine(parentDir, "packages");
-                if (Directory.Exists(packagesDir))
-                {
-                    AddSearchPath(packagesDir);
-                }
-
-                currentDir = parentDir;
             }
         }
         catch (Exception ex)
@@ -205,23 +183,18 @@ public class PackageManager
                 }
 
                 // 策略 3: 尝试版本化目录（PackageName@*）
-                if (Directory.Exists(searchPath))
-                {
-                    var versionedDirs = Directory.GetDirectories(searchPath, $"{packageName}@*");
-                    if (versionedDirs.Length > 0)
-                    {
-                        // 选择第一个匹配的版本（未来可以改进为选择最新版本）
-                        var versionedPath = versionedDirs[0];
-                        LogDebug($"  Found versioned directory: {versionedPath}");
+                if (!Directory.Exists(searchPath)) continue;
+                var versionedDirs = Directory.GetDirectories(searchPath, $"{packageName}@*");
+                if (versionedDirs.Length <= 0) continue;
+                // 选择第一个匹配的版本（未来可以改进为选择最新版本）
+                var versionedPath = versionedDirs[0];
+                LogDebug($"  Found versioned directory: {versionedPath}");
 
-                        if (TryLoadPackageFromPath(versionedPath, packageName, manager, out module) && module != null)
-                        {
-                            LogDebug($"  ✓ Package '{packageName}' loaded successfully from: {versionedPath}");
-                            PackageCache[packageName] = module;
-                            return true;
-                        }
-                    }
-                }
+                if (!TryLoadPackageFromPath(versionedPath, packageName, manager, out module) ||
+                    module == null) continue;
+                LogDebug($"  ✓ Package '{packageName}' loaded successfully from: {versionedPath}");
+                PackageCache[packageName] = module;
+                return true;
             }
 
             LogDebug($"Package '{packageName}' not found in any search path");
@@ -313,8 +286,9 @@ public class PackageManager
         }
         catch (Exception ex)
         {
-            throw new Old8Exception("PACKAGE_LOAD_ERROR", $"加载包 '{packageName}' 时出错: {ex.Message}",
-                new SourcePosition(), null, null, null, null, ex);
+            LogDebug($"    Error loading package '{packageName}': {ex.Message}");
+            module = null;
+            return false;
         }
     }
 
@@ -324,38 +298,10 @@ public class PackageManager
     private string? FindPackageEntryFile(string packagePath, string packageName)
     {
         // 优先级顺序：
-        // 1. package.json 中指定的 main 字段
-        // 2. index.old8
-        // 3. {packageName}.old8
-        // 4. main.old8
+        // 1. index.old8
+        // 2. {packageName}.old8
+        // 3. main.old8
 
-        // 尝试读取 package.json
-        var packageJsonPath = Path.Combine(packagePath, "package.json");
-        if (File.Exists(packageJsonPath))
-        {
-            try
-            {
-                var json = File.ReadAllText(packageJsonPath);
-                // 简单的 JSON 解析查找 "main" 字段
-                var mainMatch = System.Text.RegularExpressions.Regex.Match(
-                    json,
-                    @"""main""\s*:\s*""([^""]+)"""
-                );
-
-                if (mainMatch.Success)
-                {
-                    var mainFile = Path.Combine(packagePath, mainMatch.Groups[1].Value);
-                    if (File.Exists(mainFile))
-                        return mainFile;
-                }
-            }
-            catch
-            {
-                // 解析失败，继续尝试其他方式
-            }
-        }
-
-        // 尝试常见的入口文件名
         var candidates = new[]
         {
             Path.Combine(packagePath, "index.old8"),
@@ -367,7 +313,7 @@ public class PackageManager
     }
 
     /// <summary>
-    /// 检查包是否已安装
+    /// 检查包是否已安装（委托给 Core 库）
     /// </summary>
     public bool IsPackageInstalled(string packageName)
     {
@@ -376,29 +322,6 @@ public class PackageManager
             var packagePath = Path.Combine(searchPath, packageName);
             return Directory.Exists(packagePath);
         });
-    }
-
-    /// <summary>
-    /// 获取已安装的包列表
-    /// </summary>
-    public IEnumerable<string> GetInstalledPackages()
-    {
-        var packages = new HashSet<string>();
-
-        foreach (var searchPath in PackageSearchPaths)
-        {
-            if (!Directory.Exists(searchPath))
-                continue;
-
-            var directories = Directory.GetDirectories(searchPath);
-            foreach (var dir in directories)
-            {
-                var packageName = Path.GetFileName(dir);
-                packages.Add(packageName);
-            }
-        }
-
-        return packages;
     }
 
     /// <summary>
@@ -426,62 +349,26 @@ public class PackageManager
     /// <summary>
     /// 获取包信息
     /// </summary>
-    public PackageInfo? GetPackageInfo(string packageName)
+    public Package? GetPackageInfo(string packageName)
     {
         foreach (var searchPath in PackageSearchPaths)
         {
             var packagePath = Path.Combine(searchPath, packageName);
-            var packageJsonPath = Path.Combine(packagePath, "package.json");
 
-            if (!File.Exists(packageJsonPath)) continue;
-            try
+            if (!Directory.Exists(packagePath)) continue;
+
+            // 创建基本的包信息
+            var package = new Package
             {
-                var json = File.ReadAllText(packageJsonPath);
-                return PackageInfo.FromJson(json, packagePath);
-            }
-            catch
-            {
-                //
-            }
+                Id = packageName,
+                FilePath = packagePath,
+                Version = "1.0.0", // 默认版本
+                Description = $"Package {packageName}"
+            };
+
+            return package;
         }
 
         return null;
-    }
-}
-
-/// <summary>
-/// 包信息
-/// </summary>
-[Serializable]
-public class PackageInfo
-{
-    public string Name { get; set; } = "";
-    public string Version { get; set; } = "";
-    public string Description { get; set; } = "";
-    public string? Main { get; set; }
-    public string Path { get; set; } = "";
-
-    public static PackageInfo FromJson(string json, string packagePath)
-    {
-        // 简单的 JSON 解析
-        var info = new PackageInfo { Path = packagePath };
-
-        var nameMatch = System.Text.RegularExpressions.Regex.Match(json, @"""name""\s*:\s*""([^""]+)""");
-        if (nameMatch.Success)
-            info.Name = nameMatch.Groups[1].Value;
-
-        var versionMatch = System.Text.RegularExpressions.Regex.Match(json, @"""version""\s*:\s*""([^""]+)""");
-        if (versionMatch.Success)
-            info.Version = versionMatch.Groups[1].Value;
-
-        var descMatch = System.Text.RegularExpressions.Regex.Match(json, @"""description""\s*:\s*""([^""]+)""");
-        if (descMatch.Success)
-            info.Description = descMatch.Groups[1].Value;
-
-        var mainMatch = System.Text.RegularExpressions.Regex.Match(json, @"""main""\s*:\s*""([^""]+)""");
-        if (mainMatch.Success)
-            info.Main = mainMatch.Groups[1].Value;
-
-        return info;
     }
 }

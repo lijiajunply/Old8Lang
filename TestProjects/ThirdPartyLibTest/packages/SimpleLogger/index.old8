@@ -1,0 +1,20 @@
+// SimpleLogger.old8 - 简化的日志库
+
+// 简单的日志函数
+func Info(message:string) -> void {
+    PrintLine($"[INFO] {message}")
+}
+
+func Warn(message:string) -> void {
+    PrintLine($"[WARN] {message}")
+}
+
+func Error(message:string) -> void {
+    PrintLine($"[ERROR] {message}")
+}
+
+func Debug(message:string) -> void {
+    PrintLine($"[DEBUG] {message}")
+}
+
+PrintLine("SimpleLogger loaded")

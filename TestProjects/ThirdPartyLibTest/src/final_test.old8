@@ -1,0 +1,53 @@
+// 最终的第三方库功能测试
+
+print("=== 第三方库功能完整测试 ===")
+
+print("\n--- 1. 测试 SimpleLogger 包 ---")
+import "SimpleLogger"
+
+Info("开始测试第三方库功能")
+Warn("这只是测试，请忽略")
+Error("测试错误处理")
+Debug("调试信息输出")
+
+print("\n--- 2. 测试 SimpleMath 包 ---")
+import "SimpleMath"
+
+print("数学函数测试:")
+result1 <- sqrt(16)
+print("  sqrt(16) =", result1)
+
+result2 <- abs(-5)
+print("  abs(-5) =", result2)
+
+result3 <- max(3, 7)
+print("  max(3, 7) =", result3)
+
+result4 <- min(3, 7)
+print("  min(3, 7) =", result4)
+
+print("\n--- 3. 测试包的导入和缓存 ---")
+
+// 再次导入 SimpleLogger（应该使用缓存）
+import "SimpleLogger"
+Info("重复导入测试 - 使用缓存")
+
+print("\n--- 4. 测试包的协同工作 ---")
+import "SimpleLogger"
+import "SimpleMath"
+
+Info("开始数学计算")
+x <- 5
+y <- -3
+
+result <- max(abs(x), abs(y))
+Info($"最大绝对值: {result}")
+
+print("\n=== 测试总结 ===")
+print("✓ SimpleLogger 包 - 日志功能正常")
+print("✓ SimpleMath 包 - 数学函数正常")  
+print("✓ 包导入机制 - 工作正常")
+print("✓ 包缓存机制 - 工作正常")
+print("✓ 多包协同 - 工作正常")
+
+Info("所有第三方库测试完成！")

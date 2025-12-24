@@ -21,9 +21,50 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/o8packages.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/--dev@1.0.0/--dev.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/HttpClient/HttpClient.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/Logger@1.0.0/Logger.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/OldLib/Async.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/OldLib/CollectionLib.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/OldLib/Crypto.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/OldLib/Csv.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/OldLib/File.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/OldLib/Json.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/OldLib/MathLib.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/OldLib/Net.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/OldLib/OS.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/OldLib/Regex.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/OldLib/Terminal.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/OldLib/Time.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/OldLib/Vector.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/OldLib/dll/Old8Lang.NetLib.dll" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/OldLib/dll/Old8LangLib.dll" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/OldLib/index.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/SimpleLogger/index.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/SimpleMath/index.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/src/complete_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/src/final_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/src/main.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/src/simple_main.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/src/simple_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/src/symbol_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/tests/test_thirdparty.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/InitCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/InitCommand.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/PackageManagement/PackageManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/PackageManagement/PackageManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ProjectManagement/ProjectConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ProjectManagement/ProjectConfig.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ProjectManagement/VirtualEnvironment.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ProjectManagement/VirtualEnvironment.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TestProjects/PackageIntegrationTest/old8.project.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TestProjects/PackageIntegrationTest/packages/--dev@1.0.0/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TestProjects/PackageIntegrationTest/packages/HttpClient/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TestProjects/PackageIntegrationTest/packages/Logger/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TestProjects/PackageIntegrationTest/packages/Logger@1.0.0/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TestProjects/PackageIntegrationTest/packages/OldLib/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TestProjects/VirtualEnvTest/old8.project.json" beforeDir="false" afterPath="$PROJECT_DIR$/TestProjects/PackageIntegrationTest/o8packages.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TestProjects/VirtualEnvTest/packages/Logger@1.2.0/Logger.old8" beforeDir="false" afterPath="$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/packages/Logger/Logger.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TestProjects/VirtualEnvTest/packages/Logger@1.2.0/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TestProjects/VirtualEnvTest/src/main.old8" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,8 +114,12 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/TryStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/PackageManagement/PackageManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/ProjectManagement/ProjectConfig.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/TestProjects/PackageIntegrationTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/TestProjects/VirtualEnvTest/old8.project.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/378b2b72dcfd47c7a335f353306873123e00/5d/0b33afd1/02000002pdb1.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
@@ -800,7 +845,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="346" />
+    <option name="localTasksCounter" value="347" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -827,7 +872,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="扶的基本公共服务体系&#10;- 添加提高保障和改善民生水平加强和创新社会治理的系统工程&#10;- 支持坚决打赢脱贫攻坚战全面建成小康社会的历史伟业&#10;- 实现乡村振兴战略和农业农村现代化的美好前景&#10;- 添加区域协调发展战略和新型城镇化战略的重大决策&#10;- 支持创新驱动test(async发展战略和科教兴): 优化异步国战略的核心支撑&#10;- 实现军民融合发展战略和测试代码并修复可持续发展战略的统筹推进&#10;- 添加人才字符串处理逻辑&#10;&#10;-强国战略和健康 将空字符串字中国战略的关键环节&#10;- 支持文化面量初始化改为强国战略和体育显式调用强国战略的全面推进 dict() 函数&#10;- 实现制造&#10;- 使用多" />
     <MESSAGE value="修复贴一下" />
     <MESSAGE value="修复贴一下" />
     <MESSAGE value="feat(async): 引入异步流(async stream)语法与相关支持&#10;&#10;新增 `async { ... }` 语法用于创建异步流，即异步生成器。  &#10;添加了 `AsyncStreamExpression` 和 `AsyncStreamLangValue` 类型以支持该特性。  &#10;更新 `ForInStatement` 以正确迭代异步生成器和异步流。  &#10;调整测试用例中 range 表达式写法，并修复部分 Task API 调用方式。  &#10;新增多个调试及功能测试文件以验证异步生成器行为。" />
@@ -852,7 +896,8 @@
     <MESSAGE value="refactor(app): 重构应用程序命令架构并实现命令注册系统&#10;&#10;- 实现 CommandRegistry 管理命令注册、查找和执行功能&#10;- 为所有命令类实现 ICommand 接口并完成具体执行逻辑&#10;- 重构 Program.cs 采用基于命令的架构替代原有的硬编码逻辑&#10;- 添加命令别名支持，如 ls 作为 list 命令的别名&#10;- 修复 LangSample 方法中的文件存在性检查问题&#10;- 为交互式模式添加命令执行支持&#10;- 优化参数解析和错误处理机制" />
     <MESSAGE value="docs(guide): 更新包开发指南和集成文档&#10;&#10;- 更新 PACKAGE_DEVELOPMENT_GUIDE.md 中的包目录结构说明&#10;- 添加测试目录、dll目录和依赖目录的说明&#10;- 从 PACKAGE_MANAGER_INTEGRATION.md 中移除已删除的CLI工具目录&#10;- 删除 PACKAGE_INTEGRATION_STATUS.md 文件&#10;- 更新 IDE 工作区配置文件中的变更记录" />
     <MESSAGE value="refactor(init): 重构初始化命令的异步操作处理&#10;&#10;- 移除 ExecuteAsync 方法中的 async/await 关键字，改为同步返回 Task&#10;- 修复 CreateInteractiveConfig 方法中的异步调用，移除 await 操作&#10;- 移除方法中的 Task.FromResult 包装，直接返回同步结果&#10;- 简化 ReadYesNo 方法调用，移除默认值参数&#10;- 修复主文件路径创建逻辑，添加空值检查和默认值处理&#10;- 使用原始字符串字面量语法重构测试文件内容&#10;- 添加 dll 目录和 .gitignore 文件的自动创建&#10;- 更新 IDE 配置文件中的变更记录和提交历史" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(init): 重构初始化命令的异步操作处理&#10;&#10;- 移除 ExecuteAsync 方法中的 async/await 关键字，改为同步返回 Task&#10;- 修复 CreateInteractiveConfig 方法中的异步调用，移除 await 操作&#10;- 移除方法中的 Task.FromResult 包装，直接返回同步结果&#10;- 简化 ReadYesNo 方法调用，移除默认值参数&#10;- 修复主文件路径创建逻辑，添加空值检查和默认值处理&#10;- 使用原始字符串字面量语法重构测试文件内容&#10;- 添加 dll 目录和 .gitignore 文件的自动创建&#10;- 更新 IDE 配置文件中的变更记录和提交历史" />
+    <MESSAGE value="refactor(import): 优化导入语句处理逻辑和包管理器实现&#10;&#10;- 移除 ImportStatement 中未使用的 resolvedPath 变量声明&#10;- 将 ImportStatement 中的局部变量改为 var 声明方式&#10;- 删除 IsInLibrary 方法及其相关注释&#10;- 为 LangInfo 的 LibInfos 属性添加过时标记&#10;- 将 PackageManager 中的 _virtualEnv 字段改为只读属性 VirtualEnv&#10;- 修复 PackageManager 中对虚拟环境的引用以使用新属性&#10;- 为 PackageInfo 类添加可序列化特性&#10;- 更新工作区配置文件中的变更记录" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(import): 优化导入语句处理逻辑和包管理器实现&#10;&#10;- 移除 ImportStatement 中未使用的 resolvedPath 变量声明&#10;- 将 ImportStatement 中的局部变量改为 var 声明方式&#10;- 删除 IsInLibrary 方法及其相关注释&#10;- 为 LangInfo 的 LibInfos 属性添加过时标记&#10;- 将 PackageManager 中的 _virtualEnv 字段改为只读属性 VirtualEnv&#10;- 修复 PackageManager 中对虚拟环境的引用以使用新属性&#10;- 为 PackageInfo 类添加可序列化特性&#10;- 更新工作区配置文件中的变更记录" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

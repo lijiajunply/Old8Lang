@@ -83,7 +83,7 @@ public class VirtualEnvironment
         var projectRoot = ProjectConfig.FindProjectRoot(searchDir);
         if (projectRoot == null)
         {
-            LogDebug("No project root found (no old8.project.json)");
+            LogDebug("No project root found (no o8packages.json)");
             return null;
         }
 
@@ -142,22 +142,20 @@ public class VirtualEnvironment
                 LogDebug($"Resolved {packageName} to locked version {lockedVersion}: {lockedPath}");
                 return lockedPath;
             }
-            else
-            {
-                LogDebug($"Warning: Locked version {lockedVersion} not found for {packageName}");
 
-                if (Config.PackageManager.Strict)
-                {
-                    throw new InvalidOperationException(
-                        $"Strict mode: Package '{packageName}' version {lockedVersion} not found. " +
-                        $"Run 'old8lang install' to fix.");
-                }
+            LogDebug($"Warning: Locked version {lockedVersion} not found for {packageName}");
+
+            if (Config.PackageManager.Strict)
+            {
+                throw new InvalidOperationException(
+                    $"Strict mode: Package '{packageName}' version {lockedVersion} not found. " +
+                    $"Run 'old8lang install' to fix.");
             }
         }
 
         // 如果有配置的版本要求，尝试匹配
-        var versionRange = Config.Dependencies.ContainsKey(packageName)
-            ? Config.Dependencies[packageName]
+        var versionRange = Config.Dependencies.TryGetValue(packageName, out var dependency)
+            ? dependency
             : Config.DevDependencies.GetValueOrDefault(packageName);
 
         if (versionRange != null)
@@ -248,43 +246,6 @@ public class VirtualEnvironment
         }
 
         return false;
-    }
-
-    /// <summary>
-    /// 检查包是否存在于虚拟环境中
-    /// </summary>
-    public bool HasPackage(string packageName)
-    {
-        return ResolvePackage(packageName) != null;
-    }
-
-    /// <summary>
-    /// 获取已安装的包列表
-    /// </summary>
-    public List<InstalledPackageInfo> GetInstalledPackages()
-    {
-        var packages = new List<InstalledPackageInfo>();
-
-        if (!Directory.Exists(PackagesDirectory))
-            return packages;
-
-        foreach (var packageDir in Directory.GetDirectories(PackagesDirectory))
-        {
-            var dirName = Path.GetFileName(packageDir);
-            var parts = dirName.Split('@');
-
-            if (parts.Length == 2)
-            {
-                packages.Add(new InstalledPackageInfo
-                {
-                    Name = parts[0],
-                    Version = parts[1],
-                    Path = packageDir
-                });
-            }
-        }
-
-        return packages;
     }
 
     /// <summary>

@@ -1,0 +1,2 @@
+// Old8Lang 操作系统库 - 使用批量导入功能
+native "Old8LangLib" OS *

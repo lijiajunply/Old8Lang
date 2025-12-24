@@ -1,0 +1,15 @@
+// Old8Lang 异步和多线程库
+// 从 Old8LangLib.AsyncLib 导入所有公共静态方法
+// 包括：
+// - Mutex 互斥锁：MutexCreate, MutexLock, MutexUnlock, MutexTryLock, MutexDispose
+// - Semaphore 信号量：SemaphoreCreate, SemaphoreAcquire, SemaphoreRelease, SemaphoreTryAcquire, SemaphoreDispose
+// - 原子操作：AtomicIntCreate, AtomicIntGet, AtomicIntSet, AtomicIntIncrement, AtomicIntDecrement, AtomicIntAdd, AtomicIntCompareAndSet
+// - ReadWriteLock 读写锁：ReadWriteLockCreate, ReadLockAcquire, ReadLockRelease, WriteLockAcquire, WriteLockRelease,
+//                        ReadLockTryAcquire, WriteLockTryAcquire, ReadWriteLockDispose
+// - CountDownLatch 倒计时锁：CountDownLatchCreate, CountDownLatchCountDown, CountDownLatchWait, CountDownLatchWaitTimeout,
+//                           CountDownLatchGetCount, CountDownLatchDispose
+// - CyclicBarrier 循环栅栏：CyclicBarrierCreate, CyclicBarrierAwait, CyclicBarrierAwaitTimeout,
+//                          CyclicBarrierGetParticipantCount, CyclicBarrierGetWaitingCount, CyclicBarrierDispose
+// - 工具函数：Sleep, GetCurrentThreadId, GetProcessorCount
+native "Old8LangLib" AsyncLib *
+
