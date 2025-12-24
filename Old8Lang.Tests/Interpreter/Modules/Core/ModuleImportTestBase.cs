@@ -126,6 +126,15 @@ public abstract class ModuleImportTestBase(ITestOutputHelper output)
         Directory.CreateDirectory(tempDir);
 
         var filePath = Path.Combine(tempDir, fileName);
+        
+        // 确保所有父目录存在
+        var currentDir = Path.GetDirectoryName(filePath);
+        while (!string.IsNullOrEmpty(currentDir))
+        {
+            Directory.CreateDirectory(currentDir);
+            currentDir = Path.GetDirectoryName(currentDir);
+        }
+        
         File.WriteAllText(filePath, content);
         return filePath;
     }

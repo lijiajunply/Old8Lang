@@ -346,6 +346,12 @@ public partial class ImportStatement(
                 // 将指定成员添加到父作用域，支持重命名
                 parentScope[specifier.Alias] = value;
             }
+            // 尝试从导入信息中查找函数和类
+            else if ((value = manager.GetValue(new LangId(specifier.Name))) != null)
+            {
+                // 将指定成员添加到父作用域，支持重命名
+                parentScope[specifier.Alias] = value;
+            }
             // 如果仍然找不到，抛出错误
             else
             {

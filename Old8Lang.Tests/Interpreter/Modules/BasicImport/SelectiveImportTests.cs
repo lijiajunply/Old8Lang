@@ -137,9 +137,7 @@ result <- ""imported ""
 func veryLongFunctionName() -> string {
     return ""success""
 }
-func anotherLongName() -> int {
-    return 100
-}
+anotherLongName <- 100
 ";
         var testContent = @"
 import {veryLongFunctionName as shortFunc, anotherLongName as shortNum} from ""alias_module""
@@ -256,10 +254,10 @@ result2 <- process2(24)
 
         var testContent = """
 
-                          from "nested/submodule/module" import deepFunction
-                          result <- deepFunction()
+                           import { deepFunction } from "nested/submodule/module"
+                           result <- deepFunction()
 
-                          """;
+                           """;
 
         CreateTempModuleFile("nested_selective_test.old8", testContent);
 

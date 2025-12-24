@@ -160,13 +160,13 @@ result2 <- a.getSharedFromBoth()
         // Arrange - 创建条件导入网络
         var baseModuleContent = @"
 func baseFunction() -> string { return ""Base"" }
-const BASE_CONST <- 10
+BASE_CONST:const <- 10
 ";
 
         var enhancedModuleContent = @"
 import ""conditional_base""
 func enhancedFunction() -> string { return ""Enhanced: "" + baseFunction() }
-const ENHANCED_CONST <- 100
+ENHANCED_CONST:const <- 100
 ";
 
         var testContent = @"

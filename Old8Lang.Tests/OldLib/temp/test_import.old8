@@ -1,0 +1,4 @@
+import {testFunction, testVar} from "test_module"
+
+result1 <- testFunction()
+result2 <- testVar

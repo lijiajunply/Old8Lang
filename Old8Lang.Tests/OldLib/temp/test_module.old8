@@ -1,0 +1,5 @@
+func testFunction() -> string {
+    return "Hello from module"
+}
+
+testVar <- 42
