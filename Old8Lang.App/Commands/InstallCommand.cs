@@ -188,11 +188,11 @@ public class InstallCommand : ICommand
                   "description": "{{packageName}} package"
                 }
                 """;
-            File.WriteAllText(packageJsonPath, packageJson);
+            await File.WriteAllTextAsync(packageJsonPath, packageJson);
 
             var packageFilePath = Path.Combine(packageDir, $"{packageName}.old8");
             var packageContent = $"// {packageName} v{version}\nPrintLine(\"{packageName} loaded\")";
-            File.WriteAllText(packageFilePath, packageContent);
+            await File.WriteAllTextAsync(packageFilePath, packageContent);
 
             Console.WriteLine(" 完成");
 

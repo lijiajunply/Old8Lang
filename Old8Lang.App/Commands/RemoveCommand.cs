@@ -77,7 +77,7 @@ public class RemoveCommand : ICommand
         }
 
         // 确认移除
-        var confirm = CommandHelper.ReadYesNo($"确定要移除 {packageName}", true);
+        var confirm = CommandHelper.ReadYesNo($"确定要移除 {packageName}");
         if (!confirm)
         {
             CommandHelper.PrintInfo("已取消");
@@ -130,7 +130,7 @@ public class RemoveCommand : ICommand
             return 1;
         }
 
-        var confirm = CommandHelper.ReadYesNo($"确定要从全局移除 {packageName}", true);
+        var confirm = CommandHelper.ReadYesNo($"确定要从全局移除 {packageName}");
         if (!confirm)
         {
             CommandHelper.PrintInfo("已取消");

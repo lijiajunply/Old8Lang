@@ -132,7 +132,7 @@ public class InitCommand : ICommand
         var license = CommandHelper.ReadLine("License", "MIT") ?? "MIT";
         var main = CommandHelper.ReadLine("入口文件", "src/main.old8") ?? "src/main.old8";
         var useVirtualEnv = CommandHelper.ReadYesNo("使用虚拟环境", true);
-        var old8langVersion = CommandHelper.ReadLine("Old8Lang 版本", "^1.0.0") ?? "^1.0.0";
+        var old8LangVersion = CommandHelper.ReadLine("Old8Lang 版本", "^1.0.0") ?? "^1.0.0";
 
         Console.WriteLine();
 
@@ -146,7 +146,7 @@ public class InitCommand : ICommand
             Main = main,
             Old8Lang = new Old8LangConfig
             {
-                Version = old8langVersion,
+                Version = old8LangVersion,
                 Runtime = "interpreter"
             },
             Dependencies = new Dictionary<string, string>(),

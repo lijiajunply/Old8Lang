@@ -80,7 +80,7 @@ public class AddCommand : ICommand
         if (dependencies.ContainsKey(packageName))
         {
             CommandHelper.PrintWarning($"包 '{packageName}' 已存在于{(isDev ? "开发" : "")}依赖中");
-            var shouldUpdate = CommandHelper.ReadYesNo("是否更新版本", true);
+            var shouldUpdate = CommandHelper.ReadYesNo("是否更新版本");
             if (!shouldUpdate)
             {
                 return 0;
@@ -110,14 +110,7 @@ public class AddCommand : ICommand
 
         CommandHelper.PrintSuccess($"已添加 {packageName}@{version}");
 
-        if (isDev)
-        {
-            CommandHelper.PrintInfo($"已保存到 devDependencies");
-        }
-        else
-        {
-            CommandHelper.PrintInfo($"已保存到 dependencies");
-        }
+        CommandHelper.PrintInfo(isDev ? "已保存到 devDependencies" : "已保存到 dependencies");
 
         return 0;
     }
@@ -133,7 +126,8 @@ public class AddCommand : ICommand
         return (parts[0], "*");
     }
 
-    private async Task<bool> InstallPackage(string projectRoot, ProjectConfig config, string packageName, string version)
+    private async Task<bool> InstallPackage(string projectRoot, ProjectConfig config, string packageName,
+        string version)
     {
         try
         {
@@ -168,19 +162,19 @@ public class AddCommand : ICommand
             // 创建占位包文件
             var packageJsonPath = Path.Combine(packageDir, "package.json");
             var packageJson = $$"""
-                {
-                  "name": "{{packageName}}",
-                  "version": "{{resolvedVersion}}",
-                  "description": "{{packageName}} package"
-                }
-                """;
-            File.WriteAllText(packageJsonPath, packageJson);
+                                {
+                                  "name": "{{packageName}}",
+                                  "version": "{{resolvedVersion}}",
+                                  "description": "{{packageName}} package"
+                                }
+                                """;
+            await File.WriteAllTextAsync(packageJsonPath, packageJson);
 
             var packageFilePath = Path.Combine(packageDir, $"{packageName}.old8");
             var packageContent = $"// {packageName} v{resolvedVersion}\nPrintLine(\"{packageName} loaded\")";
-            File.WriteAllText(packageFilePath, packageContent);
+            await File.WriteAllTextAsync(packageFilePath, packageContent);
 
-            Console.WriteLine($"  安装完成");
+            Console.WriteLine("  安装完成");
 
             return true;
         }
@@ -205,7 +199,7 @@ public class AddCommand : ICommand
         if (Directory.Exists(globalDir))
         {
             CommandHelper.PrintWarning($"全局包 '{packageName}' 已存在");
-            var shouldUpdate = CommandHelper.ReadYesNo("是否更新", true);
+            var shouldUpdate = CommandHelper.ReadYesNo("是否更新");
             if (!shouldUpdate)
             {
                 return 0;
@@ -221,13 +215,13 @@ public class AddCommand : ICommand
         var packageJsonPath = Path.Combine(globalDir, "package.json");
         var resolvedVersion = version == "*" ? "1.0.0" : version.TrimStart('^', '~', '>');
         var packageJson = $$"""
-            {
-              "name": "{{packageName}}",
-              "version": "{{resolvedVersion}}",
-              "description": "{{packageName}} package"
-            }
-            """;
-        File.WriteAllText(packageJsonPath, packageJson);
+                            {
+                              "name": "{{packageName}}",
+                              "version": "{{resolvedVersion}}",
+                              "description": "{{packageName}} package"
+                            }
+                            """;
+        await File.WriteAllTextAsync(packageJsonPath, packageJson);
 
         CommandHelper.PrintSuccess($"已全局安装 {packageName}");
 

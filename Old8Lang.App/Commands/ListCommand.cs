@@ -160,7 +160,7 @@ public class ListCommand : ICommand
             {
                 try
                 {
-                    var json = File.ReadAllText(packageJsonPath);
+                    var json = await File.ReadAllTextAsync(packageJsonPath);
                     var match = System.Text.RegularExpressions.Regex.Match(json, @"""version""\s*:\s*""([^""]+)""");
                     if (match.Success)
                     {
