@@ -1,0 +1,10 @@
+// 简单测试 - 直接打印信息以调试包导入
+
+PrintLine("Current directory: " + GetCurrentDirectory())
+PrintLine("Test starting...")
+
+// 尝试导入 Logger
+import "Logger"
+
+PrintLine("Logger imported successfully!")
+PrintLine("Test complete!")

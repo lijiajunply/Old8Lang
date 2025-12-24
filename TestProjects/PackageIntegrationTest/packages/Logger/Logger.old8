@@ -1,0 +1,55 @@
+// Logger.old8 - 简单的日志库
+
+class Logger {
+    private loggerName:string <- ""
+    private level:string <- "INFO"
+
+    func init(nm:string) -> void {
+        this.loggerName <- nm
+        this.level <- "INFO"
+    }
+
+    public func SetLevel(lvl:string) -> void {
+        this.level <- lvl
+    }
+
+    public func Info(message:string) -> void {
+        if this.level == "INFO" || this.level == "DEBUG" {
+            timestamp <- GetTimestamp()
+            PrintLine($"[INFO] [{timestamp}] {this.loggerName}: {message}")
+        }
+    }
+
+    public func Error(message:string) -> void {
+        timestamp <- GetTimestamp()
+        PrintLine($"[ERROR] [{timestamp}] {this.loggerName}: {message}")
+    }
+
+    public func Warn(message:string) -> void {
+        if this.level != "ERROR" {
+            timestamp <- GetTimestamp()
+            PrintLine($"[WARN] [{timestamp}] {this.loggerName}: {message}")
+        }
+    }
+
+    public func Debug(message:string) -> void {
+        if this.level == "DEBUG" {
+            timestamp <- GetTimestamp()
+            PrintLine($"[DEBUG] [{timestamp}] {this.loggerName}: {message}")
+        }
+    }
+}
+
+// 辅助函数：获取时间戳
+func GetTimestamp() -> string {
+    // 简化的时间戳实现
+    return "2025-12-24 12:00:00"
+}
+
+// 导出工厂函数
+Create <- (nm:string) -> {
+    return Logger(nm)
+}
+
+// 导出类本身
+LoggerClass <- Logger

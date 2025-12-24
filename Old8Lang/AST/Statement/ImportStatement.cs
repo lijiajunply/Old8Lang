@@ -164,6 +164,10 @@ public partial class ImportStatement(
 
         // 优先级 2: 第三方包（通过 PackageManager）
         var packageManager = manager.GetPackageManager();
+
+        // 根据当前执行文件添加包查找路径
+        packageManager.AddSearchPathsFromSourceFile(manager.Path);
+
         if (packageManager.TryLoadPackage(moduleName, manager, out var pkgModule))
         {
             RegisterModule(manager, moduleName, pkgModule);

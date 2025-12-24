@@ -1,0 +1,16 @@
+// 测试构造函数中使用参数名赋值
+
+class Test {
+    private value:string <- ""
+
+    constructor(value:string) {
+        this.value <- value
+    }
+
+    public func GetValue() -> string {
+        return this.value
+    }
+}
+
+t <- Test("hello")
+PrintLine(t.GetValue())

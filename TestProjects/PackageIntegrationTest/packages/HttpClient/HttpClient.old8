@@ -1,0 +1,65 @@
+// HttpClient.old8 - HTTP 客户端库
+
+// 注意：这里演示包依赖，实际的 HTTP 功能需要使用标准库
+import "Logger"
+
+class HttpClient {
+    private baseUrl:string <- ""
+    private logger:object <- null
+
+    func init(url:string) -> void {
+        this.baseUrl <- url
+        this.logger <- Logger.Create("HttpClient")
+        this.logger.Info($"Initialized HTTP client with base URL: {url}")
+    }
+
+    public func Get(path:string) -> dict {
+        fullUrl <- this.baseUrl + path
+        this.logger.Info($"GET request to: {fullUrl}")
+
+        // 模拟 HTTP 响应
+        response <- {
+            "Status": 200,
+            "StatusText": "OK",
+            "Body": $"Response from {fullUrl}",
+            "Headers": {
+                "Content-Type": "application/json"
+            }
+        }
+
+        status <- response["Status"]
+        this.logger.Info($"Received response: Status {status}")
+        return response
+    }
+
+    public func Post(path:string, data:dict) -> dict {
+        fullUrl <- this.baseUrl + path
+        this.logger.Info($"POST request to: {fullUrl}")
+
+        // 模拟 HTTP 响应
+        response <- {
+            "Status": 201,
+            "StatusText": "Created",
+            "Body": $"Created resource at {fullUrl}",
+            "Headers": {
+                "Content-Type": "application/json"
+            }
+        }
+
+        status <- response["Status"]
+        this.logger.Info($"Received response: Status {status}")
+        return response
+    }
+
+    public func SetLogLevel(level:string) -> void {
+        this.logger.SetLevel(level)
+    }
+}
+
+// 导出工厂函数
+Create <- (url:string) -> {
+    return HttpClient(url)
+}
+
+// 导出类
+HttpClientClass <- HttpClient

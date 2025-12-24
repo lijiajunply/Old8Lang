@@ -1,0 +1,13 @@
+// 启用调试日志的测试
+PrintLine("=== 测试包导入（调试模式）===")
+
+// 导入 Logger
+import "Logger"
+
+PrintLine("Logger 导入成功！")
+
+// 创建 Logger 实例
+logger <- Logger.Create("TestLogger")
+logger.Info("这是一条信息日志")
+
+PrintLine("=== 测试完成 ===")

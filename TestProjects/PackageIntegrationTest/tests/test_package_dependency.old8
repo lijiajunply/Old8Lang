@@ -1,0 +1,36 @@
+// test_package_dependency.old8
+// 测试包依赖功能（HttpClient 依赖 Logger）
+
+PrintLine("=== 测试包依赖 ===")
+
+// 导入 HttpClient（会自动加载其依赖的 Logger）
+import "HttpClient"
+
+// 创建 HTTP 客户端
+client <- HttpClient.Create("https://api.example.com")
+
+// 发送 GET 请求
+PrintLine("\n发送 GET 请求...")
+response <- client.Get("/users")
+status <- response["Status"]
+body <- response["Body"]
+PrintLine($"状态码: {status}")
+PrintLine($"响应体: {body}")
+
+// 发送 POST 请求
+PrintLine("\n发送 POST 请求...")
+postData <- {"name": "John", "age": 30}
+response2 <- client.Post("/users", postData)
+status2 <- response2["Status"]
+body2 <- response2["Body"]
+PrintLine($"状态码: {status2}")
+PrintLine($"响应体: {body2}")
+
+// 设置日志级别
+PrintLine("\n设置日志级别为 ERROR...")
+client.SetLogLevel("ERROR")
+
+// 再次发送请求（不会显示 INFO 日志）
+response3 <- client.Get("/posts")
+
+PrintLine("\n=== 包依赖测试完成 ===")

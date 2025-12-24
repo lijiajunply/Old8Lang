@@ -26,6 +26,11 @@ public class PackageManager
     private readonly Lock LoadLock = new();
 
     /// <summary>
+    /// 是否启用调试日志
+    /// </summary>
+    public static bool DebugEnabled { get; set; } = false;
+
+    /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="packagesDir">包目录路径，null 则使用默认路径</param>
@@ -41,6 +46,12 @@ public class PackageManager
         if (Directory.Exists(localPackages))
         {
             AddSearchPath(localPackages);
+        }
+
+        LogDebug($"PackageManager initialized with {PackageSearchPaths.Count} search paths:");
+        foreach (var path in PackageSearchPaths)
+        {
+            LogDebug($"  - {path} (exists: {Directory.Exists(path)})");
         }
     }
 
@@ -61,6 +72,52 @@ public class PackageManager
         if (!PackageSearchPaths.Contains(path))
         {
             PackageSearchPaths.Add(path);
+            LogDebug($"Added search path: {path}");
+        }
+    }
+
+    /// <summary>
+    /// 根据源文件路径添加包查找路径
+    /// 会添加源文件所在目录及其父目录的 packages 子目录
+    /// </summary>
+    public void AddSearchPathsFromSourceFile(string? sourceFilePath)
+    {
+        if (string.IsNullOrEmpty(sourceFilePath))
+            return;
+
+        try
+        {
+            var sourceDir = Path.GetDirectoryName(Path.GetFullPath(sourceFilePath));
+            if (string.IsNullOrEmpty(sourceDir))
+                return;
+
+            // 添加源文件所在目录的 packages 子目录
+            var localPackages = Path.Combine(sourceDir, "packages");
+            if (Directory.Exists(localPackages))
+            {
+                AddSearchPath(localPackages);
+            }
+
+            // 向上查找项目根目录（包含 packages 目录的父目录）
+            var currentDir = sourceDir;
+            for (int i = 0; i < 5; i++) // 最多向上查找5层
+            {
+                var parentDir = Directory.GetParent(currentDir)?.FullName;
+                if (string.IsNullOrEmpty(parentDir))
+                    break;
+
+                var packagesDir = Path.Combine(parentDir, "packages");
+                if (Directory.Exists(packagesDir))
+                {
+                    AddSearchPath(packagesDir);
+                }
+
+                currentDir = parentDir;
+            }
+        }
+        catch (Exception ex)
+        {
+            LogDebug($"Error adding search paths from source file: {ex.Message}");
         }
     }
 
@@ -78,20 +135,31 @@ public class PackageManager
     {
         lock (LoadLock)
         {
+            LogDebug($"Attempting to load package: {packageName}");
+
             // 检查缓存
             if (PackageCache.TryGetValue(packageName, out module))
             {
+                LogDebug($"Package '{packageName}' found in cache");
                 return true;
             }
 
+            LogDebug($"Package '{packageName}' not in cache, searching in {PackageSearchPaths.Count} paths:");
+
             // 在所有查找路径中搜索包
-            foreach (var packagePath in PackageSearchPaths.Select(searchPath => Path.Combine(searchPath, packageName)))
+            foreach (var searchPath in PackageSearchPaths)
             {
+                var packagePath = Path.Combine(searchPath, packageName);
+                LogDebug($"  Checking: {packagePath}");
+
                 if (!TryLoadPackageFromPath(packagePath, packageName, manager, out module) || module is null) continue;
+
+                LogDebug($"  ✓ Package '{packageName}' loaded successfully from: {packagePath}");
                 PackageCache[packageName] = module;
                 return true;
             }
 
+            LogDebug($"Package '{packageName}' not found in any search path");
             module = null;
             return false;
         }
@@ -108,9 +176,12 @@ public class PackageManager
     {
         if (!Directory.Exists(packagePath))
         {
+            LogDebug($"    Directory does not exist: {packagePath}");
             module = null;
             return false;
         }
+
+        LogDebug($"    Found directory: {packagePath}");
 
         try
         {
@@ -119,9 +190,12 @@ public class PackageManager
 
             if (entryFile == null)
             {
+                LogDebug($"    No entry file found in: {packagePath}");
                 module = null;
                 return false;
             }
+
+            LogDebug($"    Entry file: {entryFile}");
 
             // 直接加载包文件并提取符号
             var previousPath = manager.Path;
@@ -270,6 +344,17 @@ public class PackageManager
         lock (LoadLock)
         {
             PackageCache.Clear();
+        }
+    }
+
+    /// <summary>
+    /// 输出调试日志
+    /// </summary>
+    private static void LogDebug(string message)
+    {
+        if (DebugEnabled)
+        {
+            Console.WriteLine($"[PackageManager] {message}");
         }
     }
 

@@ -78,6 +78,9 @@ for (int i = 0; i < args.Length; i++)
 Compiler.DebugOutputEnabled = debugEnabled;
 Compiler.CurrentLogLevel = logLevel;
 
+// 设置 PackageManager 的调试日志
+Old8Lang.PackageManagement.PackageManager.DebugEnabled = debugEnabled;
+
 // 读取语言配置信息
 var langInfo = Apis.ReadJson();
 

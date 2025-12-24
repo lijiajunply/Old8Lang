@@ -1,0 +1,21 @@
+// test_basic_package_import.old8
+// 测试基本包导入功能
+
+PrintLine("=== 测试基本包导入 ===")
+
+// 导入 Logger 包
+import "Logger"
+
+// 创建 logger 实例
+logger <- Logger.Create("TestApp")
+
+// 测试不同级别的日志
+logger.Info("这是一条信息日志")
+logger.Warn("这是一条警告日志")
+logger.Error("这是一条错误日志")
+
+// 设置日志级别为 DEBUG
+logger.SetLevel("DEBUG")
+logger.Debug("这是一条调试日志")
+
+PrintLine("=== 基本包导入测试完成 ===")

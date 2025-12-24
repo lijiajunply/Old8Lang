@@ -44,14 +44,14 @@ public class VariateManager
     /// <summary>
     /// 第三方包管理器实例（延迟初始化）
     /// </summary>
-    private PackageManager? _packageManager;
+    private PackageManagement.PackageManager? _packageManager;
 
     /// <summary>
     /// 获取包管理器实例
     /// </summary>
-    public PackageManager GetPackageManager()
+    public PackageManagement.PackageManager GetPackageManager()
     {
-        return _packageManager ??= new PackageManager();
+        return _packageManager ??= new PackageManagement.PackageManager();
     }
 
     #endregion

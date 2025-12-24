@@ -1,0 +1,14 @@
+// test_package_alias.old8
+// 测试包别名导入
+
+PrintLine("=== 测试包别名导入 ===")
+
+// 使用别名导入
+import "Logger" as log
+
+// 使用别名创建实例
+myLogger <- log.Create("AliasTest")
+myLogger.Info("使用别名导入的 Logger")
+myLogger.Warn("这是一条警告")
+
+PrintLine("=== 包别名导入测试完成 ===")

@@ -1,0 +1,9 @@
+{
+  "name": "Logger",
+  "version": "1.2.0",
+  "description": "Simple logging library for Old8Lang",
+  "author": "Old8Lang Team",
+  "license": "MIT",
+  "main": "Logger.old8",
+  "keywords": ["logging", "utility", "old8lang"]
+}
