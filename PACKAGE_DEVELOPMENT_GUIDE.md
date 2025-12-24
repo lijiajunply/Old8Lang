@@ -16,13 +16,18 @@
 
 ```
 MyPackage/
-├── package.json          # 包元数据（必需）
+├── package.json         # 包元数据（必需）
 ├── index.old8           # 主入口文件（或在 package.json 中指定）
 ├── README.md            # 包文档
-├── LICENSE              # 许可证
-└── src/                 # 源代码目录（可选）
-    ├── utils.old8
-    └── helper.old8
+├── LICENSE              # 许可证（默认为 MIT）
+├── src/                 # 源代码目录（可选）
+│   ├── utils.old8
+│   └── helper.old8
+├── test/                # 测试目录（可选）
+├── dll/                 # 预编译文件目录/需要的 C# 原生dll文件（可选）
+└── packages/            # 依赖目录
+    └── Logger.1.2.0/    # 示例
+        └── Logger.o8
 ```
 
 ## 🚀 创建包

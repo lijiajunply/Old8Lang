@@ -37,7 +37,6 @@ Old8Lang.PackageManager/
 │   └── Models/
 │       ├── Package.cs
 │       └── PackageConfiguration.cs       # o8packages.json
-├── Old8Lang.PackageManager/             # CLI 工具
 └── Old8Lang.PackageManager.Server/      # 服务端
 ```
 
