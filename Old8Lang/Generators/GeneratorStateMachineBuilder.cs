@@ -65,6 +65,9 @@ public class FlatGeneratorExecutor(FuncLangValue function, GeneratorAstScanner.S
     public override ExecutionResult Execute(int statePoint, Dictionary<string, LangValueType> locals,
         VariateManager manager)
     {
+        // 保存外部生成器上下文（如果有）
+        var outerContext = manager.GeneratorContext;
+
         // 创建子作用域
         manager.AddChildren();
         try
@@ -88,6 +91,9 @@ public class FlatGeneratorExecutor(FuncLangValue function, GeneratorAstScanner.S
 
                 // 从 locals 中恢复循环状态到 LoopStates
                 RestoreLoopStates(context, locals);
+
+                // 从 locals 中恢复 AsyncStreamCache（包括缓存的生成器）
+                RestoreAsyncStreamCache(context, locals);
             }
 
             try
@@ -110,6 +116,9 @@ public class FlatGeneratorExecutor(FuncLangValue function, GeneratorAstScanner.S
                     // 保存循环状态
                     SaveLoopStates(context, locals);
 
+                    // 保存 AsyncStreamCache（包括缓存的生成器）
+                    SaveAsyncStreamCache(context, locals);
+
                     // 返回 yield 的值
                     return ExecutionResult.Yield(context.CurrentValue!, statePoint + 1);
                 }
@@ -121,7 +130,8 @@ public class FlatGeneratorExecutor(FuncLangValue function, GeneratorAstScanner.S
             }
             finally
             {
-                manager.GeneratorContext = null;
+                // 恢复外部生成器上下文（如果有）
+                manager.GeneratorContext = outerContext;
             }
         }
         finally
@@ -151,8 +161,9 @@ public class FlatGeneratorExecutor(FuncLangValue function, GeneratorAstScanner.S
     /// </summary>
     private void SaveLocals(VariateManager manager, Dictionary<string, LangValueType> locals)
     {
-        // 清除旧的局部变量（但保留循环状态和执行路径）
+        // 清除旧的局部变量（但保留循环状态、执行路径和缓存）
         var loopStates = locals.Where(kvp => kvp.Key.StartsWith("__loop__")).ToList();
+        var cacheEntries = locals.Where(kvp => kvp.Key.StartsWith("__cache__")).ToList();
         var yieldPath = locals.ContainsKey("__last_yield_path__") ? locals["__last_yield_path__"] : null;
 
         locals.Clear();
@@ -160,6 +171,11 @@ public class FlatGeneratorExecutor(FuncLangValue function, GeneratorAstScanner.S
         foreach (var loopState in loopStates)
         {
             locals[loopState.Key] = loopState.Value;
+        }
+
+        foreach (var cacheEntry in cacheEntries)
+        {
+            locals[cacheEntry.Key] = cacheEntry.Value;
         }
 
         if (yieldPath != null)
@@ -170,7 +186,7 @@ public class FlatGeneratorExecutor(FuncLangValue function, GeneratorAstScanner.S
         // 保存所有扫描到的局部变量
         foreach (var varName in scanResult.LocalVariables)
         {
-            var value = manager.GetAny(new LangId(varName));
+            var value = manager.GetValue(new LangId(varName));
             if (value != null)
             {
                 locals[varName] = value;
@@ -204,6 +220,51 @@ public class FlatGeneratorExecutor(FuncLangValue function, GeneratorAstScanner.S
         {
             var key = "__loop__" + kvp.Key;
             locals[key] = new IntLangValue(kvp.Value);
+        }
+    }
+
+    /// <summary>
+    /// 从 locals 恢复 AsyncStreamCache 到 context.AsyncStreamCache
+    /// 注意：缓存的对象不能序列化为 LangValueType，所以使用特殊的键来标记
+    /// </summary>
+    private void RestoreAsyncStreamCache(GeneratorExecutionContext context, Dictionary<string, LangValueType> locals)
+    {
+        // AsyncStreamCache 中的对象（如 GeneratorLangValue）无法存储在 locals 中
+        // 因为 locals 只能存储 LangValueType
+        // 我们需要一个不同的策略...
+
+        // 实际上，GeneratorLangValue 本身就是 LangValueType！
+        // 所以我们可以直接存储
+        foreach (var kvp in locals)
+        {
+            if (kvp.Key.StartsWith("__cache__"))
+            {
+                var cacheKey = kvp.Key.Substring("__cache__".Length);
+                context.AsyncStreamCache[cacheKey] = kvp.Value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 保存 AsyncStreamCache 从 context.AsyncStreamCache 到 locals
+    /// </summary>
+    private void SaveAsyncStreamCache(GeneratorExecutionContext context, Dictionary<string, LangValueType> locals)
+    {
+        // 清除旧的缓存条目
+        var oldCacheKeys = locals.Keys.Where(k => k.StartsWith("__cache__")).ToList();
+        foreach (var key in oldCacheKeys)
+        {
+            locals.Remove(key);
+        }
+
+        // 保存新的缓存条目
+        foreach (var kvp in context.AsyncStreamCache)
+        {
+            if (kvp.Value is LangValueType langValue)
+            {
+                var key = "__cache__" + kvp.Key;
+                locals[key] = langValue;
+            }
         }
     }
 }

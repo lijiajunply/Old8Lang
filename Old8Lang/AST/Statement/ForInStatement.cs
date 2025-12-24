@@ -284,6 +284,19 @@ public partial class ForInStatement(
 
         try
         {
+            // 检查是否有缓存的生成器（从 yield 恢复）
+            {
+                var loopPath = context.GetCurrentPath() + "/for-in";
+                var cacheKey = loopPath + "/generator";
+                if (context.AsyncStreamCache.TryGetValue(cacheKey, out var cachedObj) && cachedObj is GeneratorLangValue cachedGenerator)
+                {
+                    // 从缓存恢复，直接使用缓存的生成器，不重新执行 expression
+                    RunStandardGenerator(manager, cachedGenerator, context);
+                    return;
+                }
+            }
+
+            // 首次执行，运行表达式获取值
             var value = expression.Run(manager);
 
             // 对于生成器和异步生成器，保持原有逻辑（它们自己管理状态）
@@ -301,7 +314,7 @@ public partial class ForInStatement(
 
             if (value is GeneratorLangValue generator)
             {
-                RunStandardGenerator(manager, generator);
+                RunStandardGenerator(manager, generator, context);
                 return;
             }
 
@@ -521,52 +534,104 @@ public partial class ForInStatement(
     }
 
     /// <summary>
-    /// 在生成器上下文中处理同步生成器（保持原有逻辑）
+    /// 在生成器上下文中处理同步生成器（新架构：支持嵌套生成器状态保存）
     /// </summary>
-    private void RunStandardGenerator(VariateManager manager, GeneratorLangValue generator)
+    private void RunStandardGenerator(VariateManager manager, GeneratorLangValue generatorValue, GeneratorExecutionContext context)
     {
-        while (true)
+        // 获取当前循环路径
+        var loopPath = context.GetCurrentPath() + "/for-in";
+
+        // 尝试从缓存中恢复生成器（如果是从 yield 恢复）
+        GeneratorLangValue generator;
+        var cacheKey = loopPath + "/generator";
+        if (context.AsyncStreamCache.TryGetValue(cacheKey, out var cachedObj) && cachedObj is GeneratorLangValue cachedGenerator)
         {
-            manager.ControlFlowManager.ResetCurrentState();
-            var nextValue = generator.Run(manager);
+            // 使用缓存的生成器实例
+            generator = cachedGenerator;
+        }
+        else
+        {
+            // 第一次执行，使用传入的生成器并缓存
+            generator = generatorValue;
+            context.AsyncStreamCache[cacheKey] = generator;
+        }
 
-            if (generator.State == GeneratorLangValue.GeneratorState.Completed)
+        // 将循环路径压栈
+        context.PathStack.Push("/for-in");
+
+        try
+        {
+            while (true)
             {
-                break;
-            }
+                manager.ControlFlowManager.ResetCurrentState();
 
-            if (generator.State == GeneratorLangValue.GeneratorState.Suspended)
-            {
-                var currentValue = generator.NextValue;
-
-                if (currentValue != null && currentValue is not VoidLangValue)
+                // 关键修复：在每次迭代开始时，如果上一次迭代完成了 yield，清除 ExecutionPath
+                // 这样新的迭代可以完整执行，不会被 BlockStatement 的恢复逻辑跳过
+                if (!string.IsNullOrEmpty(context.ExecutionPath) && !context.HasYielded)
                 {
-                    manager.Set(id, currentValue);
-                    body.Run(manager);
+                    context.ExecutionPath = "";
+                }
 
-                    if (manager.ControlFlowManager.BreakFlag)
+                // 调用生成器的 Run 方法获取下一个值
+                var nextValue = generator.Run(manager);
+
+                if (generator.State == GeneratorLangValue.GeneratorState.Completed)
+                {
+                    // 生成器完成，从缓存中移除
+                    context.AsyncStreamCache.Remove(cacheKey);
+                    break;
+                }
+
+                if (generator.State == GeneratorLangValue.GeneratorState.Suspended)
+                {
+                    var currentValue = generator.NextValue;
+
+                    if (currentValue != null && currentValue is not VoidLangValue)
                     {
-                        manager.ControlFlowManager.BreakFlag = false;
-                        break;
+                        manager.Set(id, currentValue);
+                        body.Run(manager);
+
+                        // 检查外部生成器是否 yield
+                        if (context.HasYielded)
+                        {
+                            // 外部生成器 yield 了，需要保存当前状态并退出
+                            // 生成器已经在缓存中，下次恢复时会继续
+                            return;
+                        }
+
+                        if (manager.ControlFlowManager.BreakFlag)
+                        {
+                            manager.ControlFlowManager.BreakFlag = false;
+                            // Break 时也要清除缓存
+                            context.AsyncStreamCache.Remove(cacheKey);
+                            break;
+                        }
+
+                        if (manager.ControlFlowManager.ContinueFlag)
+                        {
+                            manager.ControlFlowManager.ContinueFlag = false;
+                            continue;
+                        }
                     }
-
-                    if (manager.ControlFlowManager.ContinueFlag)
+                    else
                     {
-                        manager.ControlFlowManager.ContinueFlag = false;
-                        continue;
+                        // 如果返回 VoidLangValue，生成器已完成
+                        context.AsyncStreamCache.Remove(cacheKey);
+                        break;
                     }
                 }
                 else
                 {
-                    // 如果返回 VoidLangValue，生成器已完成
+                    // 如果既不是Completed也不是Suspended，则退出循环
+                    context.AsyncStreamCache.Remove(cacheKey);
                     break;
                 }
             }
-            else
-            {
-                // 如果既不是Completed也不是Suspended，则退出循环
-                break;
-            }
+        }
+        finally
+        {
+            // 弹出循环路径
+            context.PathStack.Pop();
         }
     }
 

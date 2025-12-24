@@ -87,6 +87,9 @@ public class GeneratorAstScanner
             case SetStatement setStmt:
                 // 记录局部变量
                 result.LocalVariables.Add(setStmt.Id?.IdName ?? "");
+
+                // 递归扫描 SetStatement 的值表达式中可能包含的子语句（如 lambda）
+                // 注意：SetStatement 本身不继承 OldStatement 的子语句访问接口
                 break;
 
             case BlockStatement block:

@@ -38,6 +38,11 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=58c56b00_002Df81e_002D48fd_002Da74f_002Dc8e84271fcf4/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Continuous Testing" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Project Location="/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests" Presentation="&amp;lt;Old8Lang.Tests&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=660fb5e6_002D217c_002D4a54_002D9b69_002D60ba92bbcfad/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="AsyncGenerator_InfiniteGenerator_HandlesInfiniteGeneration" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;xUnit::1DEC2AB8-D29B-4551-81BC-142BBB09C294::net10.0::Old8Lang.Tests.Interpreter.Async.AsyncGeneratorTests.AsyncGenerator_InfiniteGenerator_HandlesInfiniteGeneration&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
 	
 	
 	
