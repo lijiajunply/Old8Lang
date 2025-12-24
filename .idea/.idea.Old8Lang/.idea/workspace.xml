@@ -21,15 +21,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/ChangeImportCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/CommandRegistry.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/CompilerCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/FromFileCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/HelpCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/ImportInfoCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/InfoCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/SyntaxTestCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/VersionCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Program.Original.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/ChangeImportCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/ChangeImportCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/CommandRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/CommandRegistry.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/CompilerCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/CompilerCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/HelpCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/HelpCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/ImportInfoCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/ImportInfoCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/InfoCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/InfoCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/SyntaxTestCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/SyntaxTestCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/VersionCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/VersionCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

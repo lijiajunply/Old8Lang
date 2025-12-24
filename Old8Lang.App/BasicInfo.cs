@@ -87,8 +87,13 @@ public static class BasicInfo
     /// 从文件中读取 Old8Lang 示例代码
     /// </summary>
     /// <returns>示例代码字符串</returns>
-    private static string LangSample() =>
-        File.ReadAllText(Path.Combine(Path.GetDirectoryName(Apis.CodePath)! , "Old8Lang", "LangSample.txt"));
+    private static string LangSample()
+    {
+        var samplePath = Path.Combine(Path.GetDirectoryName(Apis.CodePath)!, "Old8Lang", "LangSample.txt");
+        return File.Exists(samplePath) 
+            ? File.ReadAllText(samplePath) 
+            : "// LangSample.txt not found\nPrintLine(\"Hello, Old8Lang!\")";
+    }
 
     /// <summary>
     /// Old8Lang 语言的关键字列表

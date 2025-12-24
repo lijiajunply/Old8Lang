@@ -1,3 +1,5 @@
+using Old8Lang.App;
+
 namespace Old8Lang.App.Commands;
 
 /// <summary>
@@ -11,6 +13,7 @@ public class HelpCommand : ICommand
 
     public Task<int> ExecuteAsync(string[] args)
     {
-        throw new NotImplementedException();
+        Console.WriteLine(BasicInfo.Help);
+        return Task.FromResult(0);
     }
 }

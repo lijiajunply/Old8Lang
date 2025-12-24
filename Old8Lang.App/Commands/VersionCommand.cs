@@ -1,3 +1,5 @@
+using Old8Lang;
+
 namespace Old8Lang.App.Commands;
 
 /// <summary>
@@ -11,6 +13,8 @@ public class VersionCommand : ICommand
 
     public Task<int> ExecuteAsync(string[] args)
     {
-        throw new NotImplementedException();
+        var langInfo = Apis.ReadJson();
+        Console.WriteLine($"Old8Lang 版本: {langInfo.Var}");
+        return Task.FromResult(0);
     }
 }

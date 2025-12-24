@@ -1,387 +1,285 @@
-using System.Diagnostics;
-using Old8Lang;
-using Old8Lang.App;
 using Old8Lang.App.Commands;
-using Old8Lang.Compiler;
 using Old8Lang.Interpreter;
 
-// 调试模式下的默认参数设置
-#if DEBUG
-if (args.Length == 0)
+namespace Old8Lang.App;
+
+/// <summary>
+/// 应用程序入口点，使用基于 ICommand 的命令架构
+/// </summary>
+public abstract class Program
 {
-    args =
-    [
-        "-f", "/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/InterpreterTests/test_thread_basic.old8"
-    ];
-}
+    private static readonly CommandRegistry CommandRegistry = new();
+
+    /// <summary>
+    /// 应用程序主入口点
+    /// </summary>
+    /// <param name="args">命令行参数</param>
+    /// <returns>应用程序退出码</returns>
+    public static async Task<int> Main(string[] args)
+    {
+        // 注册所有命令
+        RegisterCommands();
+
+        // 调试模式下的默认参数设置
+#if DEBUG
+        if (args.Length == 0)
+        {
+            args =
+            [
+                "-f",
+                "/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/InterpreterTests/test_thread_basic.old8"
+            ];
+        }
 #endif
 
-// 如果没有提供命令行参数，从控制台读取输入
-if (args.Length == 0)
-{
-    Console.Write("请输入命令 (输入 -h 获取帮助): ");
-    var input = Console.ReadLine();
-    if (!string.IsNullOrEmpty(input))
-    {
-        args = input.Split([' ', '\t'], StringSplitOptions.RemoveEmptyEntries);
-    }
-}
-
-// 初始化调试和日志设置
-var debugEnabled = false;
-var logLevel = Compiler.LogLevel.Info;
-
-// 解析调试和日志级别参数
-for (int i = 0; i < args.Length; i++)
-{
-    if (args[i] == "-d" || args[i] == "--debug")
-    {
-        debugEnabled = true;
-        logLevel = Compiler.LogLevel.Debug;
-        // 移除调试参数，避免影响后续命令解析
-        var newArgs = new List<string>(args);
-        newArgs.RemoveAt(i);
-        args = newArgs.ToArray();
-        i--;
-    }
-    else if (args[i] == "-l" || args[i] == "--log-level")
-    {
-        if (i + 1 < args.Length)
+        // 如果没有提供命令行参数，从控制台读取输入
+        if (args.Length == 0)
         {
-            var levelStr = args[i + 1].ToLower();
-            switch (levelStr)
+            Console.Write("请输入命令 (输入 -h 获取帮助): ");
+            var input = Console.ReadLine();
+            if (!string.IsNullOrEmpty(input))
             {
-                case "error":
-                    logLevel = Compiler.LogLevel.Error;
-                    break;
-                case "warning":
-                    logLevel = Compiler.LogLevel.Warning;
-                    break;
-                case "info":
-                    logLevel = Compiler.LogLevel.Info;
-                    break;
-                case "debug":
-                    logLevel = Compiler.LogLevel.Debug;
-                    debugEnabled = true;
-                    break;
+                args = input.Split([' ', '\t'], StringSplitOptions.RemoveEmptyEntries);
+            }
+        }
+
+        // 初始化调试和日志设置
+        var debugEnabled = false;
+        var logLevel = Compiler.Compiler.LogLevel.Info;
+        args = ParseDebugAndLogOptions(args, ref debugEnabled, ref logLevel);
+
+        // 设置编译器的调试输出开关和日志级别
+        Compiler.Compiler.DebugOutputEnabled = debugEnabled;
+        Compiler.Compiler.CurrentLogLevel = logLevel;
+
+        // 设置 PackageManager 的调试日志
+        PackageManagement.PackageManager.DebugEnabled = debugEnabled;
+
+        // 交互式命令行模式
+        if (args.Length == 0)
+        {
+            return await RunInteractiveMode();
+        }
+
+        // 验证命令行参数
+        if (args.Length < 1)
+        {
+            Console.WriteLine("错误: 缺少命令参数");
+            Console.WriteLine("使用 -h 获取帮助");
+            return 1;
+        }
+
+        // 获取命令名称
+        var commandName = args[0];
+        var commandArgs = args.Skip(1).ToArray();
+
+        // 查找并执行命令
+        var command = CommandRegistry.GetCommand(commandName);
+        if (command != null)
+        {
+            try
+            {
+                return await command.ExecuteAsync(commandArgs);
+            }
+            catch (Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"命令执行错误: {e.Message}");
+                Console.WriteLine($"错误类型: {e.GetType().Name}");
+#if DEBUG
+                Console.WriteLine($"堆栈跟踪: {e.StackTrace}");
+#endif
+                Console.ResetColor();
+                return 1;
+            }
+        }
+
+        // 如果命令未找到，显示错误和帮助
+        Console.WriteLine($"错误: 未知命令 '{commandName}'");
+        Console.WriteLine("使用 -h 获取可用命令列表");
+        return 1;
+    }
+
+    /// <summary>
+    /// 注册所有可用命令
+    /// </summary>
+    private static void RegisterCommands()
+    {
+        // 执行命令
+        CommandRegistry.Register(new FromFileCommand());
+        CommandRegistry.Register(new CompilerCommand());
+        CommandRegistry.Register(new SyntaxTestCommand());
+
+        // 信息命令
+        CommandRegistry.Register(new HelpCommand());
+        CommandRegistry.Register(new VersionCommand());
+        CommandRegistry.Register(new InfoCommand());
+        CommandRegistry.Register(new ImportInfoCommand());
+        CommandRegistry.Register(new ChangeImportCommand());
+
+        // 项目管理命令
+        CommandRegistry.Register(new InitCommand());
+        CommandRegistry.Register(new AddCommand());
+        CommandRegistry.Register(new RemoveCommand());
+        CommandRegistry.Register(new InstallCommand());
+        CommandRegistry.Register(new RestoreCommand());
+        CommandRegistry.Register(new ListCommand());
+        CommandRegistry.Register(new VenvCommand());
+
+        // 别名支持 - 直接注册别名指向相同命令实例
+        var listCommand = new ListCommand();
+        CommandRegistry.Register(listCommand);
+        CommandRegistry.Register(new CommandAlias("ls", listCommand, "list 命令的别名"));
+    }
+
+    /// <summary>
+    /// 解析调试和日志选项
+    /// </summary>
+    /// <param name="args">原始参数数组</param>
+    /// <param name="debugEnabled">调试启用标志</param>
+    /// <param name="logLevel">日志级别</param>
+    /// <returns>处理后的参数数组</returns>
+    private static string[] ParseDebugAndLogOptions(string[] args, ref bool debugEnabled,
+        ref Old8Lang.Compiler.Compiler.LogLevel logLevel)
+    {
+        var processedArgs = new List<string>(args);
+
+        for (int i = 0; i < processedArgs.Count; i++)
+        {
+            if (processedArgs[i] == "-d" || processedArgs[i] == "--debug")
+            {
+                debugEnabled = true;
+                logLevel = Compiler.Compiler.LogLevel.Debug;
+                processedArgs.RemoveAt(i);
+                i--;
+            }
+            else if (processedArgs[i] == "-l" || processedArgs[i] == "--log-level")
+            {
+                if (i + 1 < processedArgs.Count)
+                {
+                    var levelStr = processedArgs[i + 1].ToLower();
+                    switch (levelStr)
+                    {
+                        case "error":
+                            logLevel = Compiler.Compiler.LogLevel.Error;
+                            break;
+                        case "warning":
+                            logLevel = Compiler.Compiler.LogLevel.Warning;
+                            break;
+                        case "info":
+                            logLevel = Compiler.Compiler.LogLevel.Info;
+                            break;
+                        case "debug":
+                            logLevel = Compiler.Compiler.LogLevel.Debug;
+                            debugEnabled = true;
+                            break;
+                    }
+
+                    processedArgs.RemoveRange(i, 2);
+                    i--;
+                }
+            }
+        }
+
+        return processedArgs.ToArray();
+    }
+
+    /// <summary>
+    /// 运行交互式命令行模式
+    /// </summary>
+    /// <returns>退出码</returns>
+    private static async Task<int> RunInteractiveMode()
+    {
+        Console.WriteLine("\n========================================");
+        Console.WriteLine("    Old8Lang 交互式命令行模式");
+        Console.WriteLine("========================================");
+        Console.WriteLine("输入 'exit' 退出");
+        Console.WriteLine("输入 '-h' 获取帮助");
+        Console.WriteLine("========================================\n");
+
+        var interpreter = new LangInterpreter();
+
+        while (true)
+        {
+            Console.Write("> ");
+            var code = Console.ReadLine();
+            if (string.IsNullOrEmpty(code)) continue;
+
+            if (code == "exit")
+            {
+                Console.WriteLine("\n感谢使用 Old8Lang！");
+                return 0;
             }
 
-            // 移除日志级别参数
-            var newArgs = new List<string>(args);
-            newArgs.RemoveRange(i, 2);
-            args = newArgs.ToArray();
-            i--;
-        }
-    }
-}
+            if (code == "-h")
+            {
+                var helpCommand = CommandRegistry.GetCommand("-h");
+                if (helpCommand != null)
+                {
+                    await helpCommand.ExecuteAsync([]);
+                }
 
-// 设置编译器的调试输出开关和日志级别
-Compiler.DebugOutputEnabled = debugEnabled;
-Compiler.CurrentLogLevel = logLevel;
+                continue;
+            }
 
-// 设置 PackageManager 的调试日志
-Old8Lang.PackageManagement.PackageManager.DebugEnabled = debugEnabled;
+            // 检查是否为命令
+            var parts = code.Split([' ', '\t'], StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length > 0)
+            {
+                var command = CommandRegistry.GetCommand(parts[0]);
+                if (command != null)
+                {
+                    var commandArgs = parts.Skip(1).ToArray();
+                    try
+                    {
+                        await command.ExecuteAsync(commandArgs);
+                        continue;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"命令执行错误: {e.Message}");
+                        Console.ResetColor();
+                        continue;
+                    }
+                }
+            }
 
-// 读取语言配置信息
-var langInfo = Apis.ReadJson();
-
-// 交互式命令行模式
-if (args.Length == 0)
-{
-    Console.WriteLine("\n========================================");
-    Console.WriteLine("    Old8Lang 交互式命令行模式");
-    Console.WriteLine("========================================");
-    Console.WriteLine("输入 'exit' 退出");
-    Console.WriteLine("输入 '-h' 获取帮助");
-    Console.WriteLine("========================================\n");
-
-    var interpreter = new LangInterpreter();
-
-    while (true)
-    {
-        Console.Write("> ");
-        var code = Console.ReadLine();
-        if (string.IsNullOrEmpty(code)) continue;
-        if (code == "exit")
-        {
-            Console.WriteLine("\n感谢使用 Old8Lang！");
-            return;
-        }
-
-        if (code == "-h")
-        {
-            Console.WriteLine(BasicInfo.Help);
-            continue;
-        }
-
-        try
-        {
-            Console.ForegroundColor = ConsoleColor.Gray;
-            var ast = interpreter.Build(code: code);
-            ast.Run(interpreter.Manager);
-        }
-        catch (Exception e)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"执行错误: {e.Message}");
-            Console.WriteLine($"错误类型: {e.GetType().Name}");
+            // 否则作为代码执行
+            try
+            {
+                Console.ForegroundColor = ConsoleColor.Gray;
+                var ast = interpreter.Build(code: code);
+                ast.Run(interpreter.Manager);
+            }
+            catch (Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"执行错误: {e.Message}");
+                Console.WriteLine($"错误类型: {e.GetType().Name}");
 #if DEBUG
-            Console.WriteLine($"堆栈跟踪: {e.StackTrace}");
+                Console.WriteLine($"堆栈跟踪: {e.StackTrace}");
 #endif
+            }
+            finally
+            {
+                Console.ResetColor();
+            }
         }
-        finally
-        {
-            Console.ResetColor();
-        }
     }
 }
 
-// 验证命令行参数
-if (args.Length < 1)
+/// <summary>
+/// 命令别名实现，用于支持命令的短名称
+/// </summary>
+internal class CommandAlias(string name, ICommand targetCommand, string description) : ICommand
 {
-    Console.WriteLine("错误: 缺少命令参数");
-    Console.WriteLine("使用 -h 获取帮助");
-    return;
-}
+    public string Name { get; } = name;
+    public string Description { get; } = description;
+    public string Help { get; } = $"别名命令，等价于 '{targetCommand.Name}'";
 
-// 获取命令名称
-var command = args[0];
-
-// 处理新的项目管理命令
-var projectCommands = new Dictionary<string, ICommand>
-{
-    ["init"] = new InitCommand(),
-    ["add"] = new AddCommand(),
-    ["remove"] = new RemoveCommand(),
-    ["install"] = new InstallCommand(),
-    ["restore"] = new RestoreCommand(), // 恢复依赖命令
-    ["list"] = new ListCommand(),
-    ["ls"] = new ListCommand(), // list 的别名
-    ["venv"] = new VenvCommand()
-};
-
-if (projectCommands.TryGetValue(command, out var projectCommand))
-{
-    var commandArgs = args.Skip(1).ToArray();
-    var exitCode = await projectCommand.ExecuteAsync(commandArgs);
-    Environment.Exit(exitCode);
-    return;
-}
-
-// 处理传统命令
-var fromFileCmd = BasicInfo.Order["FromFile"]; // 解释执行文件命令
-var compilerCmd = BasicInfo.Order["Compiler"]; // 编译执行文件命令
-var syntaxTestCmd = BasicInfo.Order["SyntaxTest"]; // 语法测试命令
-var helpCmd = BasicInfo.Order["Help"]; // 帮助命令
-var varCmd = BasicInfo.Order["Var"]; // 版本信息命令
-var infoCmd = BasicInfo.Order["Info"]; // 语言信息命令
-var importCmd = BasicInfo.Order["Import"]; // 导入库信息命令
-var changeImportCmd = BasicInfo.Order["ChangeImport"]; // 修改导入路径命令
-var installCmd = BasicInfo.Order["Install"]; // 安装库命令
-var removeCmd = BasicInfo.Order["Remove"]; // 移除库命令
-
-// 处理帮助命令
-if (command == helpCmd)
-{
-    Console.WriteLine(BasicInfo.Help);
-    return;
-}
-
-// 处理版本信息命令
-if (command == varCmd)
-{
-    Console.WriteLine($"Old8Lang 版本: {langInfo.Var}");
-    return;
-}
-
-// 处理语言信息命令
-if (command == infoCmd)
-{
-    Console.WriteLine("========================================");
-    Console.WriteLine(BasicInfo.Info());
-    Console.WriteLine("========================================");
-    return;
-}
-
-// 处理导入库信息命令
-if (command == importCmd)
-{
-    Console.WriteLine("========================================");
-    Console.WriteLine("导入库信息:");
-    Console.WriteLine("========================================");
-    foreach (var libInfo in langInfo.LibInfos)
+    public async Task<int> ExecuteAsync(string[] args)
     {
-        Console.WriteLine(
-            $"库名: {libInfo.LibName} | 版本: {libInfo.Var} | 类型: {(libInfo.IsDir ? "目录" : "文件")}");
-    }
-
-    Console.WriteLine($"\n导入路径: {langInfo.ImportPath}");
-    Console.WriteLine("========================================");
-    return;
-}
-
-// 处理修改导入路径命令
-if (command == changeImportCmd)
-{
-    if (args.Length < 2)
-    {
-        Console.WriteLine("错误: 缺少导入路径参数");
-        Console.WriteLine("使用: Old8Lang.App -change <路径>");
-        return;
-    }
-
-    var newPath = args[1];
-    var updatedInfo = Apis.ChangeBasicInfo(newPath, langInfo.Var);
-    Console.WriteLine($"\n导入路径已更新为: {updatedInfo.ImportPath}");
-    return;
-}
-
-// 处理安装命令（占位，尚未实现）
-if (command == installCmd)
-{
-    if (args.Length < 2)
-    {
-        Console.WriteLine("错误: 缺少安装包参数");
-        Console.WriteLine("使用: Old8Lang.App -i <包名>");
-        return;
-    }
-
-    Console.WriteLine($"安装命令已接收，包名: {args[1]}");
-}
-
-// 处理移除命令（占位，尚未实现）
-if (command == removeCmd)
-{
-    if (args.Length < 2)
-    {
-        Console.WriteLine("错误: 缺少库名参数");
-        Console.WriteLine("使用: Old8Lang.App -r <库名>");
-        return;
-    }
-
-    Console.WriteLine($"删除命令已接收，库名: {args[1]}");
-}
-
-// 处理解释执行文件命令
-if (command == fromFileCmd)
-{
-    if (args.Length < 2)
-    {
-        Console.WriteLine("错误: 缺少文件参数");
-        Console.WriteLine("使用: Old8Lang.App -f <文件名>");
-        return;
-    }
-
-    var langInterpreter = new LangInterpreter();
-
-    try
-    {
-        var code = Apis.FromFile(args[1]);
-        var ast = langInterpreter.Build(code, args[1]);
-        ast.Run(langInterpreter.Manager);
-    }
-    catch (Exception e)
-    {
-#if DEBUG
-        throw;
-#endif
-        Console.WriteLine(e.Message);
-    }
-
-    return;
-}
-
-// 处理编译执行文件命令
-if (command == compilerCmd)
-{
-    if (args.Length < 2)
-    {
-        Console.WriteLine("错误: 缺少文件参数");
-        Console.WriteLine("使用: Old8Lang.App -c <文件名>");
-        return;
-    }
-
-    // 验证文件扩展名
-    var ext = Path.GetExtension(args[1]).ToLower();
-    if (ext != ".old8" && ext != ".ol")
-    {
-        Console.WriteLine($"不支持的文件扩展名: {ext}，仅支持 .old8 和 .ol 文件");
-        return;
-    }
-
-    var interpreter = new LangInterpreter();
-    var stopwatch = new Stopwatch();
-
-    // 测量解析时间
-    stopwatch.Start();
-    var ast = interpreter.Build(Apis.FromFile(args[1]), args[1]);
-    stopwatch.Stop();
-    var parseTime = stopwatch.Elapsed.TotalMilliseconds;
-    var timeInfo = $"------------------\nParser Build Time : {parseTime}ms\n";
-    var totalTime = parseTime;
-
-    // 编译代码
-    var compiledAction = Compiler.Compile(ast, args[1], interpreter);
-
-    // 测量执行时间
-    stopwatch.Restart();
-    try
-    {
-        compiledAction();
-    }
-    catch (Exception e)
-    {
-#if DEBUG
-        throw;
-#endif
-        Console.WriteLine(e.Message);
-    }
-
-    stopwatch.Stop();
-    var executionTime = stopwatch.Elapsed.TotalMilliseconds;
-    timeInfo += $"Process Run Time : {executionTime}ms\n";
-    totalTime += executionTime;
-    timeInfo += $"Total : {totalTime}ms";
-    Console.WriteLine(timeInfo);
-}
-
-// 处理语法测试命令
-if (command == syntaxTestCmd)
-{
-    if (args.Length < 2)
-    {
-        Console.WriteLine("错误: 缺少文件参数");
-        Console.WriteLine("使用: Old8Lang.App -s <文件名>");
-        return;
-    }
-
-    // 验证文件扩展名
-    var ext = Path.GetExtension(args[1]).ToLower();
-    if (ext != ".old8" && ext != ".ol")
-    {
-        Console.WriteLine($"不支持的文件扩展名: {ext}，仅支持 .old8 和 .ol 文件");
-        return;
-    }
-
-    try
-    {
-        var interpreter = new LangInterpreter();
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-        var code = Apis.FromFile(args[1]);
-        var ast = interpreter.Build(code, args[1]);
-        stopwatch.Stop();
-        var parseTime = stopwatch.Elapsed.TotalMilliseconds;
-
-        Console.WriteLine(
-            $"------------------\nSyntax Test Result\nParser Build Time : {parseTime}ms\n------------------");
-        Console.WriteLine(ast.ToCode());
-    }
-    catch (Exception e)
-    {
-#if DEBUG
-        throw;
-#endif
-        Console.WriteLine(e.Message);
+        return await targetCommand.ExecuteAsync(args);
     }
 }

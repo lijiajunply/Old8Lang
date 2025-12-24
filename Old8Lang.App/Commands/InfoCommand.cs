@@ -1,3 +1,5 @@
+using Old8Lang.App;
+
 namespace Old8Lang.App.Commands;
 
 /// <summary>
@@ -11,6 +13,9 @@ public class InfoCommand : ICommand
 
     public Task<int> ExecuteAsync(string[] args)
     {
-        throw new NotImplementedException();
+        Console.WriteLine("========================================");
+        Console.WriteLine(BasicInfo.Info());
+        Console.WriteLine("========================================");
+        return Task.FromResult(0);
     }
 }

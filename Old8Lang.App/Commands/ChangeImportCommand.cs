@@ -1,3 +1,5 @@
+using Old8Lang;
+
 namespace Old8Lang.App.Commands;
 
 /// <summary>
@@ -11,6 +13,18 @@ public class ChangeImportCommand : ICommand
 
     public Task<int> ExecuteAsync(string[] args)
     {
-        throw new NotImplementedException();
+        if (args.Length < 1)
+        {
+            Console.WriteLine("错误: 缺少导入路径参数");
+            Console.WriteLine(Help);
+            return Task.FromResult(1);
+        }
+
+        var newPath = args[0];
+        var langInfo = Apis.ReadJson();
+        var updatedInfo = Apis.ChangeBasicInfo(newPath, langInfo.Var);
+        Console.WriteLine($"\n导入路径已更新为: {updatedInfo.ImportPath}");
+
+        return Task.FromResult(0);
     }
 }
