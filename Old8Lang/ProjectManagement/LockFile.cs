@@ -6,6 +6,7 @@ namespace Old8Lang.ProjectManagement;
 /// <summary>
 /// 锁文件（类似 package-lock.json）
 /// </summary>
+[Serializable]
 public class LockFile
 {
     /// <summary>
@@ -178,6 +179,7 @@ public class LockFile
 /// <summary>
 /// Old8Lang 锁定信息
 /// </summary>
+[Serializable]
 public class Old8LangLockInfo
 {
     /// <summary>
@@ -196,6 +198,7 @@ public class Old8LangLockInfo
 /// <summary>
 /// 包锁定信息
 /// </summary>
+[Serializable]
 public class PackageLockInfo
 {
     /// <summary>

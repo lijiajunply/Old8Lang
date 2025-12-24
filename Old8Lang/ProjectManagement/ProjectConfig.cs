@@ -6,6 +6,7 @@ namespace Old8Lang.ProjectManagement;
 /// <summary>
 /// Old8Lang 项目配置（类似 package.json）
 /// </summary>
+[Serializable]
 public class ProjectConfig
 {
     /// <summary>
@@ -183,6 +184,7 @@ public class ProjectConfig
 /// <summary>
 /// Old8Lang 运行时配置
 /// </summary>
+[Serializable]
 public class Old8LangConfig
 {
     /// <summary>
@@ -201,6 +203,7 @@ public class Old8LangConfig
 /// <summary>
 /// 包管理器配置
 /// </summary>
+[Serializable]
 public class PackageManagerConfig
 {
     /// <summary>

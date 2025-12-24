@@ -49,7 +49,7 @@ public class PackageManager
             VirtualEnv = VirtualEnvironment.Detect(projectRoot);
             VirtualEnvironment.DebugEnabled = DebugEnabled;
 
-            if (VirtualEnv != null && VirtualEnv.IsEnabled)
+            if (VirtualEnv is { IsEnabled: true })
             {
                 // 虚拟环境模式：优先使用项目本地包
                 var venvPaths = VirtualEnv.GetPackageSearchPaths();

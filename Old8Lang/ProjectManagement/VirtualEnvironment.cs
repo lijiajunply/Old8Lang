@@ -34,7 +34,7 @@ public class VirtualEnvironment
     /// <summary>
     /// 调试日志开关
     /// </summary>
-    public static bool DebugEnabled { get; set; } = false;
+    public static bool DebugEnabled { get; set; }
 
     private VirtualEnvironment(string projectRoot, ProjectConfig config, LockFile? lockFile)
     {
@@ -320,6 +320,7 @@ public class VirtualEnvironment
 /// <summary>
 /// 已安装包的信息
 /// </summary>
+[Serializable]
 public class InstalledPackageInfo
 {
     public string Name { get; set; } = "";
