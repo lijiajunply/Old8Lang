@@ -154,6 +154,7 @@ var projectCommands = new Dictionary<string, ICommand>
     ["add"] = new AddCommand(),
     ["remove"] = new RemoveCommand(),
     ["install"] = new InstallCommand(),
+    ["restore"] = new RestoreCommand(), // 恢复依赖命令
     ["list"] = new ListCommand(),
     ["ls"] = new ListCommand(), // list 的别名
     ["venv"] = new VenvCommand()
