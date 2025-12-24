@@ -24,7 +24,7 @@ public class InitCommand : ICommand
   old8lang init --template library  # 使用库模板
 ";
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public Task<int> ExecuteAsync(string[] args)
     {
         // 检查是否已存在项目配置
         var projectRoot = CommandHelper.FindProjectRoot();
@@ -32,7 +32,7 @@ public class InitCommand : ICommand
         {
             CommandHelper.PrintError($"当前目录已存在 Old8Lang 项目: {projectRoot}");
             CommandHelper.PrintInfo("如果要重新初始化，请先删除 old8.project.json");
-            return 1;
+            return Task.FromResult(1);
         }
 
         var useDefaults = args.Contains("-y") || args.Contains("--yes");
@@ -47,7 +47,7 @@ public class InitCommand : ICommand
         }
         else
         {
-            config = await CreateInteractiveConfig();
+            config = CreateInteractiveConfig();
         }
 
         // 应用模板
@@ -76,7 +76,7 @@ public class InitCommand : ICommand
         Console.WriteLine("  2. old8lang install        - 安装所有依赖");
         Console.WriteLine($"  3. old8lang run {config.Main}  - 运行主文件");
 
-        return 0;
+        return Task.FromResult(0);
     }
 
     private ProjectConfig CreateDefaultConfig()
@@ -114,7 +114,7 @@ public class InitCommand : ICommand
         };
     }
 
-    private async Task<ProjectConfig> CreateInteractiveConfig()
+    private ProjectConfig CreateInteractiveConfig()
     {
         Console.WriteLine();
         Console.WriteLine("========================================");
@@ -131,7 +131,7 @@ public class InitCommand : ICommand
         var author = CommandHelper.ReadLine("作者", "");
         var license = CommandHelper.ReadLine("License", "MIT") ?? "MIT";
         var main = CommandHelper.ReadLine("入口文件", "src/main.old8") ?? "src/main.old8";
-        var useVirtualEnv = CommandHelper.ReadYesNo("使用虚拟环境", true);
+        var useVirtualEnv = CommandHelper.ReadYesNo("使用虚拟环境");
         var old8LangVersion = CommandHelper.ReadLine("Old8Lang 版本", "^1.0.0") ?? "^1.0.0";
 
         Console.WriteLine();
@@ -181,7 +181,7 @@ public class InitCommand : ICommand
         }
 
         // 创建 src 目录和主文件
-        var mainFilePath = Path.Combine(projectRoot, config.Main);
+        var mainFilePath = Path.Combine(projectRoot, config.Main ?? "src/main.old8");
         var mainDir = Path.GetDirectoryName(mainFilePath);
 
         if (!string.IsNullOrEmpty(mainDir) && !Directory.Exists(mainDir))
@@ -192,7 +192,7 @@ public class InitCommand : ICommand
 
         if (!File.Exists(mainFilePath))
         {
-            var mainContent = @"// " + config.Name + @" - 主程序入口
+            var mainContent = "// " + config.Name + @" - 主程序入口
 
 PrintLine(""Hello, Old8Lang!"")
 PrintLine($""项目名称: " + config.Name + @""")
@@ -214,11 +214,11 @@ PrintLine($""版本: " + config.Version + @""")
         var testFilePath = Path.Combine(testsDir, "test_main.old8");
         if (!File.Exists(testFilePath))
         {
-            var testContent = @"// 测试文件
-
-PrintLine(""运行测试..."")
-PrintLine(""✓ 所有测试通过"")
-";
+            var testContent = """
+                              // 测试文件
+                              PrintLine("运行测试...")
+                              PrintLine("✓ 所有测试通过")
+                              """;
             File.WriteAllText(testFilePath, testContent);
             CommandHelper.PrintSuccess("创建文件: tests/test_main.old8");
         }
@@ -255,6 +255,31 @@ old8lang run tests/test_main.old8
 ";
             File.WriteAllText(readmePath, readmeContent);
             CommandHelper.PrintSuccess("创建文件: README.md");
+        }
+
+        // 创建 dll 目录
+        var dllDir = Path.Combine(projectRoot, "dll");
+        if (!Directory.Exists(dllDir))
+        {
+            Directory.CreateDirectory(dllDir);
+            CommandHelper.PrintSuccess("创建目录: dll");
+        }
+
+        // 创建 gitignore 文件
+        var gitignorePath = Path.Combine(projectRoot, ".gitignore");
+        if (!File.Exists(gitignorePath))
+        {
+            var gitignoreContent = """
+                                   # 忽略 packages 目录
+                                   packages/
+                                                                      
+                                   # 忽略 dll 目录
+                                   dll/
+                                                                      
+                                   # 忽略 dist 目录
+                                   dist/
+                                   """;
+            File.WriteAllText(gitignorePath, gitignoreContent);
         }
     }
 
