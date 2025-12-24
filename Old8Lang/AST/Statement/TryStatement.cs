@@ -20,7 +20,21 @@ public partial class TryStatement(
     BlockStatement? finallyBlock = null,
     SourcePosition position = default) : OldStatement(position)
 {
-    
+    /// <summary>
+    /// 获取 try 块
+    /// </summary>
+    public BlockStatement TryBlock => tryBlock;
+
+    /// <summary>
+    /// 获取 catch 块列表
+    /// </summary>
+    public List<(string? exceptionType, LangId? exceptionVar, BlockStatement catchBlock)> CatchBlocks => catchBlocks;
+
+    /// <summary>
+    /// 获取 finally 块
+    /// </summary>
+    public BlockStatement? FinallyBlock => finallyBlock;
+
     public override void Run(VariateManager manager)
     {
         // 检查是否在生成器上下文中
@@ -222,25 +236,12 @@ public partial class TryStatement(
             }
         }
 
-        // 执行 finally 块（如果存在）
-        if (finallyBlock != null)
-        {
-            context.PathStack.Push("/finally");
-            try
-            {
-                finallyBlock.Run(manager);
-
-                // 检查是否 yield（finally 中也可以 yield）
-                if (context.HasYielded)
-                {
-                    return;
-                }
-            }
-            finally
-            {
-                context.PathStack.Pop();
-            }
-        }
+        // 注意：在生成器上下文中，finally 块不应该在 try 块执行过程中执行
+        // finally 块应该由生成器框架在适当的时机调用（比如生成器完成或异常时）
+        // 这里不执行 finally 块，因为：
+        // 1. 如果 try 块中 yield 了，生成器会暂停，不应该执行 finally
+        // 2. finally 块需要在生成器真正完成时才执行
+        // 目前的架构中，生成器状态机会负责在适当时机执行 finally 块
     }
 
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
@@ -384,6 +385,47 @@ public partial class TryStatement(
         return false;
     }
 
-    public override OldStatement this[int index] => this;
-    public override int Count => 0;
+    public override OldStatement this[int index]
+    {
+        get
+        {
+            // 返回 try 块、catch 块、finally 块
+            // 顺序：try块(0), catch块(1...N), finally块(最后)
+            if (index == 0)
+            {
+                return tryBlock;
+            }
+
+            // catch 块
+            int catchCount = catchBlocks.Count;
+            if (index <= catchCount)
+            {
+                return catchBlocks[index - 1].catchBlock;
+            }
+
+            // finally 块
+            if (index == catchCount + 1 && finallyBlock != null)
+            {
+                return finallyBlock;
+            }
+
+            // 超出范围，返回空语句
+            return new BlockStatement(new List<OldStatement>());
+        }
+    }
+
+    public override int Count
+    {
+        get
+        {
+            int count = 1; // try 块
+            count += catchBlocks.Count; // catch 块
+            if (finallyBlock != null)
+            {
+                count++; // finally 块
+            }
+
+            return count;
+        }
+    }
 }

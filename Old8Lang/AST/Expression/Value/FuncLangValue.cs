@@ -67,6 +67,28 @@ public class FuncLangValue : ImportInfo
         if (stmt is YieldStatement)
             return true;
 
+        // 特殊处理 TryStatement，因为它的 Count 返回 0
+        if (stmt is TryStatement tryStmt)
+        {
+            // 使用公开属性访问块
+            // 检查 try 块
+            if (ContainsYieldStatement(tryStmt.TryBlock))
+                return true;
+
+            // 检查 catch 块
+            foreach (var (_, _, catchBlock) in tryStmt.CatchBlocks)
+            {
+                if (ContainsYieldStatement(catchBlock))
+                    return true;
+            }
+
+            // 检查 finally 块
+            if (tryStmt.FinallyBlock != null && ContainsYieldStatement(tryStmt.FinallyBlock))
+                return true;
+
+            return false;
+        }
+
         // 检查块语句中的子语句
         for (int i = 0; i < stmt.Count; i++)
         {

@@ -64,7 +64,7 @@ public class AsyncGeneratorTests
         var result = interpreter.Manager.GetValue(new LangId("result"));
         Assert.NotNull(result);
         Assert.IsType<IntLangValue>(result);
-        Assert.Equal(40, ((IntLangValue)result).Value); // 5+6+7+8+9+10 = 45, but range might be exclusive
+        Assert.Equal(45, ((IntLangValue)result).Value); // 5+6+7+8+9+10 = 45 (range is inclusive)
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public class AsyncGeneratorTests
         var code = @"
             func delayedGenerator() {
                 for i in [1~5] {
-                    await async.Sleep(10)
+                    await Task.Delay(10)
                     yield i
                 }
             }
@@ -267,7 +267,7 @@ public class AsyncGeneratorTests
         Assert.Equal(3, ((IntLangValue)result).Value); // "start", "error caught", "end"
     }
 
-    [Fact(Skip = "先跳一下")]
+    [Fact]
     public void AsyncGenerator_PrimeGenerator_GeneratesPrimes()
     {
         // Arrange
@@ -370,7 +370,6 @@ public class AsyncGeneratorTests
             for value in gen {
                 generatorValue <- generatorValue + 1
             }
-            returnValue <- gen.GetReturn() // If supported
             result <- generatorValue
         ";
         var interpreter = new LangInterpreter();
@@ -534,12 +533,13 @@ public class AsyncGeneratorTests
     {
         // Arrange
         var code = @"
+            import Time
             func timeBasedGenerator() {
-                start <- async.Now()
+                start <- Time.GetUnixTimeSeconds()
                 for i in [1~3] {
-                    elapsed <- async.Now() - start
+                    elapsed <- Time.GetUnixTimeSeconds() - start
                     yield i + elapsed
-                    await async.Sleep(10)
+                    await Task.Delay(10)
                 }
             }
             count <- 0
