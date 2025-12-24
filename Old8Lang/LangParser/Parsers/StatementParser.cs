@@ -965,8 +965,32 @@ public class StatementParser(
         // 消耗 "import"
         Expect(LangTokenType.Import); // 消耗 "import"
 
+        // 检查是否是通配符导入：import * from "module"
+        if (CurrentToken.Type == LangTokenType.Star)
+        {
+            Expect(LangTokenType.Star); // 消耗 "*"
+
+            // 必须有 from 子句
+            fromClause = true;
+            Expect(LangTokenType.From);
+
+            // 解析模块名
+            if (CurrentToken.Type == LangTokenType.String)
+            {
+                moduleName = CurrentToken.Value;
+                Expect(LangTokenType.String);
+            }
+            else
+            {
+                moduleName = CurrentToken.Value;
+                Expect(LangTokenType.Identifier);
+            }
+
+            // 通配符导入：importSpecifiers 为空列表表示导入所有
+            importSpecifiers = new List<ImportItem>();
+        }
         // 检查是否有导入指定项
-        if (CurrentToken.Type == LangTokenType.LeftBrace)
+        else if (CurrentToken.Type == LangTokenType.LeftBrace)
         {
             // 解析命名导入：{ item1, item2 as alias2, ... }
             importSpecifiers = new List<ImportItem>();

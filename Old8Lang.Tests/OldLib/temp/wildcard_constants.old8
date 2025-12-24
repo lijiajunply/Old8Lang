@@ -1,7 +1,7 @@
 
-const PI <- 3.14159
-const E <- 2.71828
-const GRAVITY <- 9.81
+PI <- 3.14159
+E <- 2.71828
+GRAVITY <- 9.81
 
 func calculateArea(radius:double) -> double {
     return PI * radius * radius

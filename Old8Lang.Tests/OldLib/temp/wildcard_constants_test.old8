@@ -1,5 +1,5 @@
 
-from "wildcard_constants" import *
+import * from "wildcard_constants"
 area <- calculateArea(5.0)
 force <- calculateForce(10.0, GRAVITY)
 pi_value <- PI

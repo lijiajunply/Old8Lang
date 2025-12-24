@@ -1,5 +1,5 @@
 
-const VALUE <- 100
-func getValue() -> int {
-    return VALUE
+VALUE1 <- 100
+func getValue1() -> int {
+    return VALUE1
 }

@@ -3,9 +3,9 @@ public func publicFunction() -> string {
     return "Public"
 }
 
-private func privateFunction() -> string {
+func privateFunction() -> string {
     return "Private"
 }
 
-public const PUBLIC_CONST <- 100
-private const PRIVATE_CONST <- 200
+PUBLIC_CONST <- 100
+PRIVATE_CONST <- 200

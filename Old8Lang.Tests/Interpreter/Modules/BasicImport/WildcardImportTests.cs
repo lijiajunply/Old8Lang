@@ -29,9 +29,9 @@ public class WildcardImportTests(ITestOutputHelper output) : ModuleImportTestBas
     {
         // Arrange
         var moduleContent = @"
-const PI <- 3.14159
-const E <- 2.71828
-const GRAVITY <- 9.81
+PI <- 3.14159
+E <- 2.71828
+GRAVITY <- 9.81
 
 func calculateArea(radius:double) -> double {
     return PI * radius * radius
@@ -42,7 +42,7 @@ func calculateForce(mass:double, acceleration:double) -> double {
 }
 ";
         var testContent = @"
-from ""wildcard_constants"" import *
+import * from ""wildcard_constants""
 area <- calculateArea(5.0)
 force <- calculateForce(10.0, GRAVITY)
 pi_value <- PI
@@ -85,7 +85,7 @@ func helperFunction() -> string {
 }
 ";
         var testContent = @"
-from ""wildcard_classes"" import *
+import * from ""wildcard_classes""
 result1 <- MathUtils.add(3, 4)
 result2 <- StringUtils.concat(""Hello"", ""World"")
 result3 <- helperFunction()
@@ -110,7 +110,7 @@ result3 <- helperFunction()
         // Arrange
         var moduleContent = "// Empty module with just comments";
         var testContent = @"
-from ""empty_wildcard_module"" import *
+import * from ""empty_wildcard_module""
 result <- ""import completed""
 ";
 
@@ -130,27 +130,27 @@ result <- ""import completed""
     {
         // Arrange
         var module1Content = @"
-const VALUE <- 100
-func getValue() -> int {
-    return VALUE
+VALUE1 <- 100
+func getValue1() -> int {
+    return VALUE1
 }
 ";
 
         var module2Content = @"
-const VALUE <- 200
-func getValue() -> int {
-    return VALUE
+VALUE2 <- 200
+func getValue2() -> int {
+    return VALUE2
 }
 ";
 
         var testContent = @"
-from ""wildcard_module1"" import *
-local_value1 <- getValue()
-local_module1_value <- VALUE
+import * from ""wildcard_module1""
+local_value1 <- getValue1()
+local_module1_value <- VALUE1
 
-from ""wildcard_module2"" import *
-local_value2 <- getValue()
-local_module2_value <- VALUE
+import * from ""wildcard_module2""
+local_value2 <- getValue2()
+local_module2_value <- VALUE2
 ";
 
         CreateTempModuleFile("wildcard_module1.old8", module1Content);
@@ -179,12 +179,12 @@ local_module2_value <- VALUE
         for (int i = 0; i < 100; i++)
         {
             functions.Add($"func func{i}() -> int {{ return {i} }}");
-            constants.Add($"const CONST{i} <- {i * 10}");
+            constants.Add($"CONST{i} <- {i * 10}");
         }
 
         var moduleContent = string.Join("\n", functions.Concat(constants));
         var testContent = @"
-from ""large_wildcard_module"" import *
+import * from ""large_wildcard_module""
 result0 <- func0()
 result99 <- func99()
 const0 <- CONST0
@@ -227,7 +227,7 @@ func standaloneFunction() -> string {
 }
 ";
         var testContent = @"
-from ""nested_functions_module"" import *
+import * from ""nested_functions_module""
 result1 <- outerFunction()
 result2 <- standaloneFunction()
 ";
@@ -253,15 +253,15 @@ public func publicFunction() -> string {
     return ""Public""
 }
 
-private func privateFunction() -> string {
+func privateFunction() -> string {
     return ""Private""
 }
 
-public const PUBLIC_CONST <- 100
-private const PRIVATE_CONST <- 200
+PUBLIC_CONST <- 100
+PRIVATE_CONST <- 200
 ";
         var testContent = @"
-from ""visibility_module"" import *
+import * from ""visibility_module""
 public_result <- publicFunction()
 public_const_value <- PUBLIC_CONST
 ";
@@ -290,7 +290,7 @@ func testFunction() -> string {
 }
 ";
         var testContent = $@"
-from ""wildcard_syntax_module"" import {wildcardSyntax}
+import {wildcardSyntax} from ""wildcard_syntax_module""
 result <- testFunction()
 ";
 
@@ -334,8 +334,8 @@ func repeat(str:string, n:int) -> string {
 ";
 
         var testContent = @"
-from ""math_wildcard"" import *
-from ""string_wildcard"" import *
+import * from ""math_wildcard""
+import * from ""string_wildcard""
 math_result <- add(5, 3)
 string_result <- repeat(""Hi"", 3)
 ";

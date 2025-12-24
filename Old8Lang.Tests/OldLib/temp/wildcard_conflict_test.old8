@@ -1,8 +1,8 @@
 
-from "wildcard_module1" import *
-local_value1 <- getValue()
-local_module1_value <- VALUE
+import * from "wildcard_module1"
+local_value1 <- getValue1()
+local_module1_value <- VALUE1
 
-from "wildcard_module2" import *
-local_value2 <- getValue()
-local_module2_value <- VALUE
+import * from "wildcard_module2"
+local_value2 <- getValue2()
+local_module2_value <- VALUE2

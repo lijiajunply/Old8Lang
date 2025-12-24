@@ -1,3 +1,3 @@
 
-from "empty_wildcard_module" import *
+import * from "empty_wildcard_module"
 result <- "import completed"

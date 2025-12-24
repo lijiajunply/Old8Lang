@@ -1,5 +1,5 @@
 
-from "math_wildcard" import *
-from "string_wildcard" import *
+import * from "math_wildcard"
+import * from "string_wildcard"
 math_result <- add(5, 3)
 string_result <- repeat("Hi", 3)

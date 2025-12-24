@@ -73,10 +73,10 @@ result2 <- test_math.multiply(4.0, 5.0)
     public void Import_NonExistentModule_ShouldThrowException(string moduleName, string importStatement)
     {
         // Arrange
-        var testContent = $@"
-{importStatement}
-result <- 42
-";
+        var testContent = $"""
+                           {importStatement}
+                           result <- 42
+                           """;
         CreateTempModuleFile("test_error.old8", testContent);
 
         // Act & Assert
