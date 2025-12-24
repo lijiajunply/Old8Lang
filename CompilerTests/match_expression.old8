@@ -1,0 +1,89 @@
+// Match 表达式测试 - 编译器模式
+// 简化版，移除了复杂的测试
+
+PrintLine("=== Match 表达式测试（编译器模式）===")
+
+// 测试 1: 基本值匹配
+PrintLine("\n1. 基本值匹配:")
+result1 <- match 2 {
+    case 0 -> "zero"
+    case 1 -> "one"
+    case 2 -> "two"
+    case 3 -> "three"
+    case _ -> "other"
+}
+PrintLine("match 2 = " + result1)
+
+// 测试 2: 字符串匹配
+PrintLine("\n2. 字符串匹配:")
+name <- "Bob"
+greeting <- match name {
+    case "Alice" -> "Hello Alice!"
+    case "Bob" -> "Hi Bob!"
+    case "Charlie" -> "Hey Charlie!"
+    case _ -> "Hello stranger!"
+}
+PrintLine("Greeting for " + name + ": " + greeting)
+
+// 测试 3: 通配符
+PrintLine("\n3. 通配符:")
+unknownValue <- 999
+result3 <- match unknownValue {
+    case 1 -> "one"
+    case 2 -> "two"
+    case _ -> "unknown number"
+}
+PrintLine("match 999 = " + result3)
+
+// 测试 4: 变量绑定
+PrintLine("\n4. 变量绑定:")
+value <- 42
+result4 <- match value {
+    case 0 -> "zero"
+    case x -> "The value is " + x.ToStr()
+}
+PrintLine(result4)
+
+// 测试 5: 布尔值匹配
+PrintLine("\n5. 布尔值匹配:")
+flag <- true
+status <- match flag {
+    case true -> "enabled"
+    case false -> "disabled"
+}
+PrintLine("Status: " + status)
+
+// 测试 6: 浮点数匹配
+PrintLine("\n6. 浮点数匹配:")
+pi <- 3.14
+result6 <- match pi {
+    case 2.71 -> "Euler's number"
+    case 3.14 -> "Pi"
+    case 1.41 -> "Square root of 2"
+    case _ -> "Unknown constant"
+}
+PrintLine(result6)
+
+// 测试 7: 返回数值
+PrintLine("\n7. 返回数值:")
+input <- 3
+result8 <- match input {
+    case 1 -> 10
+    case 2 -> 20
+    case 3 -> 30
+    case _ -> -1
+}
+PrintLine("Result: " + result8.ToStr())
+
+// 测试 8: 字符类型匹配
+PrintLine("\n8. 字符类型匹配:")
+grade <- 'A'
+description <- match grade {
+    case 'A' -> "Excellent"
+    case 'B' -> "Good"
+    case 'C' -> "Average"
+    case _ -> "Invalid"
+}
+PrintLine("Grade " + grade + ": " + description)
+
+PrintLine("\n=== 所有测试完成 ===")

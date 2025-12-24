@@ -204,6 +204,12 @@ public class PrimaryParser(
             return new Operation(expr, LangTokenType.Minus, new IntLangValue(1), position);
         }
 
+        // 处理 match 表达式
+        if (CurrentToken.Type == LangTokenType.Match)
+        {
+            return ParseMatchExpression();
+        }
+
         // 处理 if-then-else 三元表达式
         if (CurrentToken.Type == LangTokenType.If)
         {
@@ -1505,6 +1511,79 @@ public class PrimaryParser(
         }
 
         return new LangId(value, typeAnnotation, null, position);
+    }
+
+    /// <summary>
+    /// 解析 match 表达式
+    /// 语法: match expression { case pattern -> expression ... }
+    /// 支持三种模式：
+    /// 1. 值匹配: case 0 -> "zero"
+    /// 2. 变量绑定: case x -> "value is " + x
+    /// 3. 通配符: case _ -> "default"
+    /// </summary>
+    private LangExpression ParseMatchExpression()
+    {
+        var matchToken = CurrentToken;
+        var position = new SourcePosition(matchToken.Line, matchToken.Column, tokenValue: matchToken.Value);
+        Expect(LangTokenType.Match);
+
+        // 解析被匹配的表达式
+        var matchValue = expressionParserFactory().ParseExpression();
+
+        // 期望左花括号
+        Expect(LangTokenType.LeftBrace);
+
+        // 解析所有 case 分支
+        var cases = new List<MatchCase>();
+        while (CurrentToken.Type == LangTokenType.Case)
+        {
+            Expect(LangTokenType.Case);
+
+            // 检查模式类型
+            // 1. 通配符: case _ -> expression
+            if (CurrentToken.Type == LangTokenType.Identifier && CurrentToken.Value == "_")
+            {
+                Expect(LangTokenType.Identifier); // 消费 _
+                Expect(LangTokenType.Arrow);
+
+                // 解析结果表达式
+                var resultExpr = expressionParserFactory().ParseExpression();
+                cases.Add(new MatchCase("_", resultExpr, isWildcard: true));
+            }
+            // 2. 变量绑定: case identifier -> expression
+            // 需要检查 identifier 后面是否直接跟着箭头
+            else if (CurrentToken.Type == LangTokenType.Identifier && Peek().Type == LangTokenType.Arrow)
+            {
+                var varName = CurrentToken.Value;
+                Expect(LangTokenType.Identifier);
+                Expect(LangTokenType.Arrow);
+
+                // 解析结果表达式
+                var resultExpr = expressionParserFactory().ParseExpression();
+                cases.Add(new MatchCase(varName, resultExpr));
+            }
+            // 3. 值匹配: case expression -> expression
+            else
+            {
+                var pattern = expressionParserFactory().ParseExpression();
+                Expect(LangTokenType.Arrow);
+
+                // 解析结果表达式
+                var resultExpr = expressionParserFactory().ParseExpression();
+                cases.Add(new MatchCase(pattern, resultExpr));
+            }
+        }
+
+        // 期望右花括号
+        Expect(LangTokenType.RightBrace);
+
+        // 检查是否至少有一个 case
+        if (cases.Count == 0)
+        {
+            throw CreateSyntaxError("Match 表达式至少需要一个 case 分支");
+        }
+
+        return new MatchExpression(matchValue, cases, position);
     }
 
     #endregion

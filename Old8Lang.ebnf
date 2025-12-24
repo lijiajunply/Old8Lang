@@ -197,6 +197,7 @@ primaryExpression = literal
                   | sliceLiteral
                   | stringTemplate
                   | lambdaExpression
+                  | matchExpression
                   | typeConversion
                   | parenthesizedExpression
                   | thisExpression
@@ -249,6 +250,10 @@ templatePart = ~("{" | "}" | "\\")* | "\\\\" | "\\\{" | "\\\}" ;
 
 lambdaExpression = "(" parameterList? ")" "->" ( expression | blockStatement ) ;
 
+matchExpression = "match" expression "{" matchCase+ "}" ;
+
+matchCase = "case" ( "_" | identifier | expression ) "->" expression ;
+
 typeConversion = expression "as" type ;
 
 parenthesizedExpression = "(" expression ")" ;
@@ -299,7 +304,7 @@ KEYWORDS = "if" | "elif" | "else" | "for" | "while" | "switch" | "case" | "defau
          | "async" | "await"
          | "public" | "private" | "static"
          | "this" | "super"
-         | "spawn" ;
+         | "spawn" | "match" ;
 
 (* ============== Operators ============== *)
 

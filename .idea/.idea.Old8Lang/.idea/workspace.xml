@@ -21,24 +21,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/SimpleImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/SimpleImportTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/WildcardImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/WildcardImportTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/empty_wildcard_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/empty_wildcard_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/large_wildcard_module.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/large_wildcard_module.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/large_wildcard_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/large_wildcard_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/multiple_wildcard_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/multiple_wildcard_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/nested_functions_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/nested_functions_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/visibility_module.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/visibility_module.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/visibility_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/visibility_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_classes_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_classes_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_conflict_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_conflict_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_constants.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_constants.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_constants_test.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_constants_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_module1.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_module1.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_module2.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_module2.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_syntax_all_keyword.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_syntax_all_keyword.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_syntax_star_wildcard.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/wildcard_syntax_star_wildcard.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/test_match.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/MatchCase.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/MatchExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/test_error.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/temp/test_error.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -827,7 +815,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="354" />
+    <option name="localTasksCounter" value="355" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -854,7 +842,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(async): 实现异步函数初始化与状态机生成&#10;&#10;重构 AsyncFuncInit 类以支持异步函数的动态编译和执行，包括：&#10;- 使用 DynamicMethod 动态生成异步方法体&#10;- 集成状态机生成器 AsyncStateMachineGenerator 来处理 await 表达式&#10;- 支持将异步函数注册为委托并携带参数信息&#10;- 优化 IL 生成流程，确保正确的参数加载和返回值处理&#10;&#10;同时更新 BlockStatement 以识别 AsyncFuncInit 语句，使其能正确导入异步函数声明。" />
     <MESSAGE value="feat(parser): 支持 this 方法调用解析为 FuncRunStatement&#10;&#10;在 StatementParser 中增加对 this.xxx 形式的方法调用识别，将其正确解析为 FuncRunStatement。  &#10;同时修正了 AnyLangValue 中字段命名及多处逻辑冗余问题，并完善接口与类交互测试代码。&#10;&#10;---&#10;&#10;refactor(ast): 重命名字段并优化方法执行逻辑&#10;&#10;将 `_fieldsModifiedBySetField` 字段重命名为 `FieldsModifiedBySetField` 并调整访问方式；  &#10;移除 ExecuteMethod 和 CallInit 中关于作用域参数求值的重复注释和逻辑，统一处理流程；  &#10;修复 AccessCollectionItem 中类型判断字符串格式化问题。&#10;&#10;---&#10;&#10;test(interpreter): 更新类成员初始化函数名称为 init&#10;&#10;将多个测试用例中的构造函数名（如 DataContainer、Circle、Point 等）更正为标准的 init 函数命名，  &#10;确保符合语言规范并提升一致性。&#10;&#10;---&#10;&#10;test(parser): 升级接口相关测试代码字符串语法&#10;&#10;将 InterfaceAbstractClassInteractionTests.cs 文件中所有多行字符串由旧版 &quot;@&quot; 标记改为 &quot;&quot;&quot; 新语法，  &#10;增强可读性和维护性。&#10;&#10;---&#10;&#10;chore(tests): 更新配置文件和工具库示例内容&#10;&#10;修改 config.old8 示例内容以支持动态加载配置字典，  &#10;并在 utils.old8 中新增日期格式化和 token 生成辅助函数。" />
     <MESSAGE value="refactor(ast): 优化异步流表达式与块语句实现&#10;&#10;- 将 AsyncStreamExpression 中的 Block 字段访问级别从 public 改为 private&#10;- 优化 InvalidOperationException 抛出时的消息字符串格式，避免行过长&#10;- 移除了 BlockStatement 中用于调试的日志输出语句&#10;- 简化了 Operation 类型检查中的条件判断逻辑&#10;- 删除未使用的 using 引用，精简多个类文件的命名空间引用&#10;- 修正 SuperExpression 中父类构造函数查找逻辑并优化错误提示&#10;- 移除了已废弃的 ValueExpression 类定义&#10;- 更新了 IDE 工作区配置和任务计数器状态&#10;&#10;这些更改提升了代码可维护性、减少了冗余信息，并进一步规范化 AST 节点行为。" />
     <MESSAGE value="fix(AsyncStateMachineGenerator): 优化状态机生成器字段初始化与代码结构&#10;&#10;- 将 `LocalVariableFields` 和 `AwaitPositions` 初始化为 `new()` 并添加 `readonly` 修饰符&#10;- 移除不必要的空行和 null 检查，简化表达式遍历逻辑&#10;- 更新方法签名以提高可读性，并调整部分 IL 生成逻辑中的数组语法&#10;- 清理冗余的日志打印语句，保留核心功能实现&#10;&#10;fix(CapturedScope): 重命名哈希码字段并更新相关引用&#10;&#10;- 将 `_hashCode` 字段重命名为 `HashCode` 以符合命名规范&#10;- 更新构造函数、GetHashCode 及 Equals 方法中对该字段的使用&#10;- 调整 LINQ 表达式语法，确保类型转换明确清晰&#10;&#10;refactor(GeneratorAstScanner): 移除调试日志并精简扫描逻辑&#10;&#10;- 删除所有 `Console.WriteLine` 调试输出语句&#10;- 简化对子语句的递归调用逻辑，去除多余的 null 检查&#10;- 修复局部变量记录逻辑，增强空值处理能力&#10;- 优化反射获取 ForInStatement Body 的流程，减少无用判断&#10;&#10;refactor(GeneratorExecutionContext): 简化集合初始化语法&#10;&#10;- 替换 `new Stack&lt;&gt;()` 和 `new Dictionary&lt;,&gt;()` 为简洁形式&#10;- 移除布尔属性默认赋值，保持代码一致性&#10;&#10;refactor(GeneratorStateMachineBuilder): 静态化类并优化执行器结构&#10;&#10;- 将 `GeneratorStateMachineBuilder` 改为静态类&#10;- 使用主构造函数注入依赖项至 `FlatGeneratorExecutor`&#10;- 移除调试日志并清理字段访问方式，改用构造函数参数直接引用&#10;- 重构循环状态恢复逻辑，提高代码可读性和健壮性&#10;&#10;refactor(NewGeneratorStateMachine): 统一私有字段命名风格&#10;&#10;- 将所有下划线前缀私有字段改为 Pascal 命名法（如 `_locals` → `Locals`）&#10;- 更新构造函数及 Execute 方法内的字段引用，保持一致性和可维护性&#10;&#10;refactor(TypeAnnotationManager): 规范字段命名并优化类型兼容性检查&#10;&#10;- 所有私有字段统一使用 Pascal 命名法（如 `_typeFamily` → `TypeFamily`）&#10;- 更新类型解析和兼容性判断逻辑，移除冗余条件判断&#10;- 修正 XML 注释中的泛型符号显示问题&#10;&#10;refactor(TypeInfo): 优化成员缓存机制和类型族管理结构&#10;&#10;- 将 `_cachedMembers` 等字段更名为 `CachedMembers` 等标准名称&#10;- 更新类型族注册和继承关系管理逻辑，改进 lambda 表达式写法&#10;- 优化获取类型信息的方法，提升性能与稳定性" />
@@ -879,7 +866,8 @@
     <MESSAGE value="feat(import): 改进模块导入功能并修复路径处理&#10;&#10;- 更新ImportStatement.cs添加函数和类的导入查找逻辑&#10;- 修复模块导入时的路径创建问题，确保父目录存在&#10;- 添加嵌套模块和选择性导入测试用例&#10;- 更新常量声明语法从const BASE_CONST &lt;- 10到BASE_CONST:const &lt;- 10&#10;- 修改别名模块中函数声明为变量赋值语法&#10;- 调整选择性导入测试中的模块路径处理方式&#10;- 添加nested/submodule/module.old8测试文件&#10;- 更新IDE配置文件中的变更记录" />
     <MESSAGE value="test(interpreter): 更新异步函数和生成器测试&#10;&#10;- 将AsyncFunction_WithoutImmediateAwait_CreatesTask测试方法从async Task改为void&#10;- 修改异步函数测试的执行逻辑，等待异步任务完成后再进行断言&#10;- 添加对任务状态和异常的检查断言&#10;- 在异步生成器测试中跳过PrimeGenerator测试用例" />
     <MESSAGE value="feat(template): 添加模板引擎功能&#10;&#10;- 实现 TemplateEngine 类支持变量替换、条件语句、循环等基本模板功能&#10;- 添加全局变量和局部变量管理机制&#10;- 支持从字符串和文件加载模板&#10;- 实现 HTML 和配置文件渲染的便捷方法&#10;- 添加正则表达式处理变量、条件、循环和注释语法&#10;- 支持对象属性访问和嵌套模板处理&#10;- 添加完整的单元测试覆盖各种" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(template): 添加模板引擎功能&#10;&#10;- 实现 TemplateEngine 类支持变量替换、条件语句、循环等基本模板功能&#10;- 添加全局变量和局部变量管理机制&#10;- 支持从字符串和文件加载模板&#10;- 实现 HTML 和配置文件渲染的便捷方法&#10;- 添加正则表达式处理变量、条件、循环和注释语法&#10;- 支持对象属性访问和嵌套模板处理&#10;- 添加完整的单元测试覆盖各种" />
+    <MESSAGE value="feat(parser): 实现通配符导入语法支持&#10;&#10;- 添加 import * from &quot;module&quot; 语法解析功能&#10;- 支持通配符导入时导入所有模块成员&#10;- 更新测试文件中的导入语法格式&#10;- 修正模块常量声明语法，移除 const 关键字&#10;- 更新 IDE 配置文件中的变更记录" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 实现通配符导入语法支持&#10;&#10;- 添加 import * from &quot;module&quot; 语法解析功能&#10;- 支持通配符导入时导入所有模块成员&#10;- 更新测试文件中的导入语法格式&#10;- 修正模块常量声明语法，移除 const 关键字&#10;- 更新 IDE 配置文件中的变更记录" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

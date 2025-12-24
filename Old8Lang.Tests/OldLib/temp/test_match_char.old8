@@ -1,0 +1,11 @@
+// 测试字符类型匹配
+
+PrintLine("Test: Char matching")
+grade <- 'A'
+description <- match grade {
+    case 'A' -> "Excellent"
+    case 'B' -> "Good"
+    case 'C' -> "Average"
+    case _ -> "Invalid"
+}
+PrintLine("Grade " + grade + ": " + description)

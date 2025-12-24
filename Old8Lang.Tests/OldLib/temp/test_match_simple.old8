@@ -1,0 +1,9 @@
+// 简单的 match 表达式测试 - 调试 IL 生成
+
+PrintLine("Test 1: Simple match")
+result1 <- match 1 {
+    case 0 -> "zero"
+    case 1 -> "one"
+    case _ -> "other"
+}
+PrintLine(result1)

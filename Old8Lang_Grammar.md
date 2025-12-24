@@ -46,6 +46,7 @@ and or xor not in
 public private static
 this super
 await spawn
+match
 ```
 
 ### 2.4 字面量
@@ -320,6 +321,187 @@ message <- $"My name is {name}, I'm {age} years old."
 // 转义大括号
 escaped <- $"This is {{escaped}} bracket"
 mixed <- $"Value: {x + 1}, Literal: {{5}}"
+```
+
+### 4.9 Match 表达式
+
+Match 表达式提供了模式匹配功能，是一种返回值的表达式（类似三元表达式）。
+
+#### 4.9.1 基本语法
+
+```old8
+result <- match value {
+    case pattern1 -> expression1
+    case pattern2 -> expression2
+    case _ -> defaultExpression
+}
+```
+
+#### 4.9.2 模式类型
+
+Match 表达式支持三种模式：
+
+1. **值匹配**：匹配特定的值
+
+```old8
+result <- match 2 {
+    case 0 -> "zero"
+    case 1 -> "one"
+    case 2 -> "two"
+    case _ -> "other"
+}
+// result 为 "two"
+```
+
+2. **变量绑定**：将匹配的值绑定到一个变量
+
+```old8
+value <- 42
+result <- match value {
+    case 0 -> "zero"
+    case x -> "The value is " + x.ToStr()
+}
+// result 为 "The value is 42"
+// 变量 x 在表达式中可用，作用域仅限于该 case
+```
+
+3. **通配符**：使用 `_` 匹配任何值（通常用作默认分支）
+
+```old8
+result <- match 999 {
+    case 1 -> "one"
+    case 2 -> "two"
+    case _ -> "unknown"
+}
+// result 为 "unknown"
+```
+
+#### 4.9.3 支持的类型
+
+Match 表达式支持所有基本类型的匹配：
+
+```old8
+// 整数匹配
+int_result <- match 2 {
+    case 1 -> "one"
+    case 2 -> "two"
+    case _ -> "other"
+}
+
+// 字符串匹配
+name <- "Alice"
+greeting <- match name {
+    case "Bob" -> "Hello Bob!"
+    case "Alice" -> "Hi Alice!"
+    case _ -> "Hello stranger!"
+}
+
+// 布尔值匹配
+flag <- true
+status <- match flag {
+    case true -> "enabled"
+    case false -> "disabled"
+}
+
+// 字符匹配
+grade <- 'A'
+description <- match grade {
+    case 'A' -> "Excellent"
+    case 'B' -> "Good"
+    case 'C' -> "Average"
+    case _ -> "Invalid"
+}
+
+// 浮点数匹配
+pi <- 3.14
+constant <- match pi {
+    case 2.71 -> "Euler's number"
+    case 3.14 -> "Pi"
+    case _ -> "Unknown"
+}
+```
+
+#### 4.9.4 返回值
+
+Match 表达式可以返回任何类型的值：
+
+```old8
+// 返回字符串
+message <- match status {
+    case 0 -> "OK"
+    case 1 -> "Error"
+    case _ -> "Unknown"
+}
+
+// 返回数值
+multiplier <- match level {
+    case 1 -> 10
+    case 2 -> 20
+    case 3 -> 30
+    case _ -> 1
+}
+
+// 返回复杂表达式的结果
+result <- match x {
+    case 0 -> calculate(0)
+    case n -> calculate(n * 2)
+}
+```
+
+#### 4.9.5 匹配规则
+
+- **顺序匹配**：从上到下依次检查每个 case，执行第一个匹配的分支
+- **必须有匹配**：如果没有任何 case 匹配，会抛出 `InvalidOperationError` 异常
+- **建议使用通配符**：建议在最后添加 `case _ ->` 作为默认分支，避免运行时错误
+
+```old8
+// 不推荐：可能抛出异常
+result <- match value {
+    case 1 -> "one"
+    case 2 -> "two"
+}
+
+// 推荐：添加默认分支
+result <- match value {
+    case 1 -> "one"
+    case 2 -> "two"
+    case _ -> "other"
+}
+```
+
+#### 4.9.6 变量作用域
+
+变量绑定模式中的变量作用域仅限于该 case 的表达式：
+
+```old8
+outer_x <- 100
+
+result <- match 42 {
+    case x -> "matched: " + x.ToStr()  // x = 42，仅在此表达式中有效
+}
+
+// outer_x 仍然是 100，不受影响
+PrintLine(outer_x.ToStr())  // 输出: 100
+```
+
+#### 4.9.7 嵌套 Match
+
+Match 表达式可以嵌套使用：
+
+```old8
+result <- match category {
+    case "A" -> match level {
+        case 1 -> "A1"
+        case 2 -> "A2"
+        case _ -> "A-other"
+    }
+    case "B" -> match level {
+        case 1 -> "B1"
+        case 2 -> "B2"
+        case _ -> "B-other"
+    }
+    case _ -> "unknown"
+}
 ```
 
 ## 5. 语句

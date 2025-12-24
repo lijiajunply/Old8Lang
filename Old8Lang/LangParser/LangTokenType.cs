@@ -188,7 +188,7 @@ public enum LangTokenType
     Wavy,
 
     /// <summary>
-    /// ~< (范围表达式排除右边界)
+    /// ~&lt; (范围表达式排除右边界)
     /// </summary>
     WavyLessThan,
 
@@ -198,7 +198,7 @@ public enum LangTokenType
     GreaterThanWavy,
 
     /// <summary>
-    /// >~< (范围表达式排除两边边界)
+    /// &gt;~&lt; (范围表达式排除两边边界)
     /// </summary>
     GreaterThanWavyLessThan,
 
@@ -314,7 +314,12 @@ public enum LangTokenType
     /// <summary>
     /// dynamic
     /// </summary>
-    Dynamic
+    Dynamic,
+
+    /// <summary>
+    /// match
+    /// </summary>
+    Match
 }
 
 public enum KeywordType
@@ -366,5 +371,6 @@ public enum KeywordType
     Abstract,
     Lazy,
     Dynamic,
-    Super
+    Super,
+    Match
 }
