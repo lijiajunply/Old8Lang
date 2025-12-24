@@ -1,0 +1,9 @@
+{
+  "name": "OldLib",
+  "version": "1.2.0",
+  "description": "Simple library for Old8Lang",
+  "author": "Old8Lang Team",
+  "license": "MIT",
+  "main": "index.old8",
+  "keywords": ["library", "utility", "old8lang"]
+}

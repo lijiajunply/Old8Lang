@@ -151,7 +151,6 @@ public partial class ImportStatement(
             return;
         }
 
-        // **新的导入解析顺序**
         // 优先级 1: 标准库（Old8LangLib 和 Old8Lang.NetLib）
         if (StandardLibraryRegistry.IsStandardLibrary(moduleName))
         {
@@ -174,91 +173,38 @@ public partial class ImportStatement(
             return;
         }
 
-        // 优先级 3: LangInfo.json 中定义的库（向后兼容，将逐步废弃）
-        manager.LangInfo ??= Apis.ReadJson();
-        if (manager.LangInfo.LibInfos.Any(x => moduleName == x.LibName))
+        // 优先级 3: 本地文件导入（相对于当前文件的路径）
+
+        var dic = Path.GetDirectoryName(manager.Path);
+        // 检查文件扩展名，只支持.old8和.ol
+        var fileNameLocal = moduleName;
+        var extLocal = Path.GetExtension(fileNameLocal).ToLower();
+        if (extLocal != ".old8" && extLocal != ".ol")
         {
-            var libInfo = manager.LangInfo.LibInfos.First(x =>
-                string.Equals(x.LibName, moduleName));
-            isDirectory = libInfo.IsDir;
-
-            // 使用实际的库名称来构建文件名，而不是用户输入的模块名称
-            var fileName = libInfo.LibName;
-            var ext = Path.GetExtension(fileName).ToLower();
-            if (!isDirectory && ext != ".old8" && ext != ".ol")
-            {
-                fileName += ".old8";
-            }
-
-            var path = Path.Combine(manager.LangInfo.ImportPath, fileName);
-            attemptedPaths.Add(path);
-
-            // 检查文件或目录是否存在
-            // 处理 macOS 上缺少开头斜杠的绝对路径
-            if (path.StartsWith("Users/") || path.StartsWith("Volumes/"))
-            {
-                path = "/" + path;
-                attemptedPaths.Add(path);
-            }
-
-            if (!File.Exists(path) && !Directory.Exists(path))
-            {
-                // 尝试构建绝对路径
-                var fullPath = Path.GetFullPath(path);
-                attemptedPaths.Add(fullPath);
-                if (!File.Exists(fullPath) && !Directory.Exists(fullPath))
-                {
-                    // 尝试从应用程序基目录查找
-                    var appPath = Path.Combine(AppContext.BaseDirectory, path);
-                    attemptedPaths.Add(appPath);
-                    if (!File.Exists(appPath) && !Directory.Exists(appPath))
-                    {
-                        // 所有尝试都失败，抛出导入错误
-                        throw new ImportError(Position, moduleName, attemptedPaths);
-                    }
-
-                    path = appPath;
-                }
-                else
-                {
-                    path = fullPath;
-                }
-            }
-
-            resolvedPath = path;
+            fileNameLocal += ".old8"; // 默认使用.old8扩展名
         }
-        else // 优先级 4: 本地文件导入（相对于当前文件的路径）
+
+        // 修复：正确处理绝对路径和相对路径
+        var filePath = Path.IsPathRooted(fileNameLocal)
+            ? fileNameLocal
+            : dic != null
+                ? Path.Combine(dic, fileNameLocal)
+                : fileNameLocal;
+
+        if (filePath.StartsWith("Users/") || filePath.StartsWith("Volumes/"))
         {
-            var dic = Path.GetDirectoryName(manager.Path);
-            // 检查文件扩展名，只支持.old8和.ol
-            var fileNameLocal = moduleName;
-            var extLocal = Path.GetExtension(fileNameLocal).ToLower();
-            if (extLocal != ".old8" && extLocal != ".ol")
-            {
-                fileNameLocal += ".old8"; // 默认使用.old8扩展名
-            }
-
-            // 修复：正确处理绝对路径和相对路径
-            var filePath = Path.IsPathRooted(fileNameLocal)
-                ? fileNameLocal
-                : dic != null
-                    ? Path.Combine(dic, fileNameLocal)
-                    : fileNameLocal;
-
-            if (filePath.StartsWith("Users/") || filePath.StartsWith("Volumes/"))
-            {
-                filePath = "/" + filePath;
-            }
-
-            attemptedPaths.Add(filePath);
-
-            if (!File.Exists(filePath))
-            {
-                throw new ImportError(Position, moduleName, attemptedPaths);
-            }
-
-            resolvedPath = filePath;
+            filePath = "/" + filePath;
         }
+
+        attemptedPaths.Add(filePath);
+
+        if (!File.Exists(filePath))
+        {
+            throw new ImportError(Position, moduleName, attemptedPaths);
+        }
+
+        resolvedPath = filePath;
+
 
         if (resolvedPath == null)
         {
