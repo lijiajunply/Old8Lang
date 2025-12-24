@@ -1,5 +1,4 @@
 using Old8Lang.AST.Expression.Intermediates;
-using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 

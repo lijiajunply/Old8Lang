@@ -1,5 +1,5 @@
 // Utils/PartialClassConverter.cs
-using System.Text;
+
 using System.Text.RegularExpressions;
 using Old8Lang.CodeGen.Scanner;
 

@@ -14,7 +14,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 /// </summary>
 public sealed class PrintFunction : BaseGlobalFunction
 {
-    public override string[] Names => new[] { "Print", "print" };
+    public override string[] Names => ["Print", "print"];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => -1;
 
@@ -65,7 +65,7 @@ public sealed class PrintFunction : BaseGlobalFunction
 /// </summary>
 public sealed class ReadLineFunction : BaseGlobalFunction
 {
-    public override string[] Names => new[] { "ReadLine", "readLine" };
+    public override string[] Names => ["ReadLine", "readLine"];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 
@@ -92,7 +92,7 @@ public sealed class ReadLineFunction : BaseGlobalFunction
 /// </summary>
 public sealed class ErrorFunction : BaseGlobalFunction
 {
-    public override string[] Names => new[] { "Error", "error" };
+    public override string[] Names => ["Error", "error"];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => -1;
 
@@ -122,7 +122,7 @@ public sealed class ErrorFunction : BaseGlobalFunction
         {
             var errorProp = typeof(Console).GetProperty("Error")!;
             ilGenerator.Emit(OpCodes.Call, errorProp.GetGetMethod()!);
-            var writeLineMethod = typeof(System.IO.TextWriter).GetMethod("WriteLine", Type.EmptyTypes)!;
+            var writeLineMethod = typeof(TextWriter).GetMethod("WriteLine", Type.EmptyTypes)!;
             ilGenerator.Emit(OpCodes.Callvirt, writeLineMethod);
             return;
         }
@@ -159,7 +159,7 @@ public sealed class ErrorFunction : BaseGlobalFunction
 /// </summary>
 public sealed class ClearFunction : BaseGlobalFunction
 {
-    public override string[] Names => new[] { "Clear", "clear" };
+    public override string[] Names => ["Clear", "clear"];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 

@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Old8Lang;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.App.Commands;

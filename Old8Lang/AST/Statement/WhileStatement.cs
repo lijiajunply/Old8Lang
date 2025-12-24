@@ -2,7 +2,6 @@ using System.Reflection.Emit;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
-using Old8Lang.Generators;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Statement;

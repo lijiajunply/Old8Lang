@@ -2,7 +2,6 @@ using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
-using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.GlobalFunctions.Core;
 using Old8Lang.Interpreter;
@@ -14,7 +13,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 /// </summary>
 public sealed class PrintLineFunction : BaseGlobalFunction
 {
-    public override string[] Names => new[] { "PrintLine", "printLine" };
+    public override string[] Names => ["PrintLine", "printLine"];
 
     public override int MinParameterCount => 0;
 
@@ -58,7 +57,7 @@ public sealed class PrintLineFunction : BaseGlobalFunction
         var printLineType = printLineExpr.OutputType(local);
 
         // 直接调用Console.WriteLine(object)方法，让CLR处理类型转换
-        var writeLineObject = typeof(Console).GetMethod("WriteLine", new[] { typeof(object) });
+        var writeLineObject = typeof(Console).GetMethod("WriteLine", [typeof(object)]);
         if (writeLineObject != null)
         {
             // 如果是值类型，先装箱

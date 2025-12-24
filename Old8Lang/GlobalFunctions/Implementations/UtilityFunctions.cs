@@ -2,7 +2,6 @@ using System.Reflection.Emit;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
-using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
@@ -16,7 +15,7 @@ namespace Old8Lang.GlobalFunctions.Implementations;
 /// </summary>
 public sealed class LenFunction : BaseGlobalFunction
 {
-    public override string[] Names => new[] { "Len", "len" };
+    public override string[] Names => ["Len", "len"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -89,7 +88,7 @@ public sealed class LenFunction : BaseGlobalFunction
 /// </summary>
 public sealed class TypeFunction : BaseGlobalFunction
 {
-    public override string[] Names => new[] { "Type", "type" };
+    public override string[] Names => ["Type", "type"];
     public override int MinParameterCount => 1;
     public override int MaxParameterCount => 1;
 
@@ -118,7 +117,7 @@ public sealed class TypeFunction : BaseGlobalFunction
 /// </summary>
 public sealed class AssertFunction : BaseGlobalFunction
 {
-    public override string[] Names => new[] { "Assert", "assert" };
+    public override string[] Names => ["Assert", "assert"];
     public override int MinParameterCount => 2;
     public override int MaxParameterCount => 2;
 
@@ -153,7 +152,7 @@ public sealed class AssertFunction : BaseGlobalFunction
 /// </summary>
 public sealed class ShowValuesFunction : BaseGlobalFunction
 {
-    public override string[] Names => new[] { "ShowValues", "showValues" };
+    public override string[] Names => ["ShowValues", "showValues"];
     public override int MinParameterCount => 0;
     public override int MaxParameterCount => 0;
 
