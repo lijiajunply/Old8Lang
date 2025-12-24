@@ -105,7 +105,6 @@ public partial class ImportStatement(
     {
         var moduleName = ImportString;
         var attemptedPaths = new List<string>();
-        string? resolvedPath;
         bool isDirectory = false;
 
         // 检查是否为网络路径（URL）
@@ -203,7 +202,7 @@ public partial class ImportStatement(
             throw new ImportError(Position, moduleName, attemptedPaths);
         }
 
-        resolvedPath = filePath;
+        var resolvedPath = filePath;
 
 
         if (resolvedPath == null)
@@ -797,21 +796,5 @@ public partial class ImportStatement(
             // 包装其他异常为导入错误
             throw new ImportError(this, ImportString, $"Dynamic import failed: {ex.Message}");
         }
-    }
-
-    /// <summary>
-    /// 检查指定的模块是否安装到了
-    /// </summary>
-    /// <param name="moduleName">模块名称</param>
-    /// <param name="manager">变量管理器</param>
-    /// <returns>是否为本地安装库</returns>
-    private static bool IsInLibrary(string moduleName, VariateManager manager)
-    {
-        // 基于LangInfo.json配置来识别标准库
-        if (manager.LangInfo?.LibInfos == null)
-            return false;
-
-        return manager.LangInfo.LibInfos.Any(lib =>
-            string.Equals(lib.LibName, moduleName, StringComparison.OrdinalIgnoreCase));
     }
 }

@@ -29,12 +29,12 @@ public class PackageManager
     /// <summary>
     /// 虚拟环境（如果存在）
     /// </summary>
-    private VirtualEnvironment? _virtualEnv;
+    private readonly VirtualEnvironment? VirtualEnv;
 
     /// <summary>
     /// 是否启用调试日志
     /// </summary>
-    public static bool DebugEnabled { get; set; } = false;
+    public static bool DebugEnabled { get; set; }
 
     /// <summary>
     /// 构造函数
@@ -46,19 +46,19 @@ public class PackageManager
         // 尝试检测虚拟环境
         if (projectRoot != null)
         {
-            _virtualEnv = VirtualEnvironment.Detect(projectRoot);
+            VirtualEnv = VirtualEnvironment.Detect(projectRoot);
             VirtualEnvironment.DebugEnabled = DebugEnabled;
 
-            if (_virtualEnv != null && _virtualEnv.IsEnabled)
+            if (VirtualEnv != null && VirtualEnv.IsEnabled)
             {
                 // 虚拟环境模式：优先使用项目本地包
-                var venvPaths = _virtualEnv.GetPackageSearchPaths();
+                var venvPaths = VirtualEnv.GetPackageSearchPaths();
                 foreach (var path in venvPaths)
                 {
                     AddSearchPath(path);
                 }
 
-                LogDebug($"Virtual environment enabled for project: {_virtualEnv.Config.Name}");
+                LogDebug($"Virtual environment enabled for project: {VirtualEnv.Config.Name}");
             }
         }
 
@@ -67,7 +67,7 @@ public class PackageManager
         AddSearchPath(packagesDirectory);
 
         // 添加当前目录的 packages 子目录（兼容模式）
-        if (_virtualEnv == null)
+        if (VirtualEnv == null)
         {
             var localPackages = Path.Combine(Directory.GetCurrentDirectory(), "packages");
             if (Directory.Exists(localPackages))
@@ -178,9 +178,9 @@ public class PackageManager
             foreach (var searchPath in PackageSearchPaths)
             {
                 // 策略 1: 如果启用了虚拟环境，使用 VirtualEnvironment 解析版本
-                if (_virtualEnv != null && _virtualEnv.IsEnabled)
+                if (VirtualEnv != null && VirtualEnv.IsEnabled)
                 {
-                    var resolvedPath = _virtualEnv.ResolvePackage(packageName);
+                    var resolvedPath = VirtualEnv.ResolvePackage(packageName);
                     if (resolvedPath != null)
                     {
                         LogDebug($"  Virtual env resolved: {resolvedPath}");
@@ -452,6 +452,7 @@ public class PackageManager
 /// <summary>
 /// 包信息
 /// </summary>
+[Serializable]
 public class PackageInfo
 {
     public string Name { get; set; } = "";
