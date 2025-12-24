@@ -21,37 +21,51 @@ public static class BasicInfo
   编译模式：将 Old8Lang 代码编译为中间代码后执行
 
 可用命令：
-  -f <文件路径>          解释执行指定的 .old8 或 .ol 文件
-  -c <文件路径>          编译并执行指定的 .old8 或 .ol 文件
-  -s <文件路径>          对指定的 .old8 或 .ol 文件进行语法测试
-  info                   显示 Old8Lang 语言信息
-  -var                   显示当前版本号
-  import                 显示导入库信息
-  -change <路径>         修改导入路径
-  -h                     显示此帮助信息
-  -d, --debug            启用调试输出，显示详细的编译过程信息
-  -l, --log-level <级别> 设置日志输出级别 (error, warning, info, debug)
+  执行命令：
+    -f <文件路径>          解释执行指定的 .old8 或 .ol 文件
+    -c <文件路径>          编译并执行指定的 .old8 或 .ol 文件
+    -s <文件路径>          对指定的 .old8 或 .ol 文件进行语法测试
+
+  项目管理命令：
+    init                   初始化 Old8Lang 项目
+    add <包名>             添加依赖包到项目
+    remove <包名>          从项目移除依赖包
+    install                安装项目的所有依赖
+    list, ls               列出已安装的依赖包
+    venv <子命令>          管理虚拟环境
+
+  信息命令：
+    info                   显示 Old8Lang 语言信息
+    -var                   显示当前版本号
+    import                 显示导入库信息
+    -change <路径>         修改导入路径
+    -h                     显示此帮助信息
+
+  调试选项：
+    -d, --debug            启用调试输出，显示详细的编译过程信息
+    -l, --log-level <级别> 设置日志输出级别 (error, warning, info, debug)
 
 使用示例：
-  解释执行文件：
+  执行文件：
     Old8Lang.App -f example.old8
-  
-  编译执行文件：
     Old8Lang.App -c example.old8
-  
-  语法测试：
-    Old8Lang.App -s example.old8
-  
-  查看语言信息：
+
+  项目管理：
+    Old8Lang.App init                    # 初始化项目
+    Old8Lang.App add Logger              # 添加包
+    Old8Lang.App install                 # 安装依赖
+    Old8Lang.App list                    # 列出已安装包
+    Old8Lang.App venv status             # 查看虚拟环境状态
+
+  查看信息：
     Old8Lang.App info
-  
-  查看帮助：
     Old8Lang.App -h
 
 注意事项：
   - 仅支持 .old8 和 .ol 扩展名的文件
   - 编译模式会显示执行时间统计
-  - 语法测试会显示解析时间和生成的代码结构";
+  - 语法测试会显示解析时间和生成的代码结构
+  - 项目管理命令需要在项目目录中执行（init 除外）";
 
     /// <summary>
     /// 获取 Old8Lang 语言的详细信息，包括关键字和示例代码

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Old8Lang;
 using Old8Lang.App;
+using Old8Lang.App.Commands;
 using Old8Lang.Compiler;
 using Old8Lang.Interpreter;
 
@@ -145,6 +146,28 @@ if (args.Length < 1)
 
 // 获取命令名称
 var command = args[0];
+
+// 处理新的项目管理命令
+var projectCommands = new Dictionary<string, ICommand>
+{
+    ["init"] = new InitCommand(),
+    ["add"] = new AddCommand(),
+    ["remove"] = new RemoveCommand(),
+    ["install"] = new InstallCommand(),
+    ["list"] = new ListCommand(),
+    ["ls"] = new ListCommand(), // list 的别名
+    ["venv"] = new VenvCommand()
+};
+
+if (projectCommands.TryGetValue(command, out var projectCommand))
+{
+    var commandArgs = args.Skip(1).ToArray();
+    var exitCode = await projectCommand.ExecuteAsync(commandArgs);
+    Environment.Exit(exitCode);
+    return;
+}
+
+// 处理传统命令
 var fromFileCmd = BasicInfo.Order["FromFile"]; // 解释执行文件命令
 var compilerCmd = BasicInfo.Order["Compiler"]; // 编译执行文件命令
 var syntaxTestCmd = BasicInfo.Order["SyntaxTest"]; // 语法测试命令

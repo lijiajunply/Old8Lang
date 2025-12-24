@@ -51,7 +51,17 @@ public class VariateManager
     /// </summary>
     public PackageManagement.PackageManager GetPackageManager()
     {
-        return _packageManager ??= new PackageManagement.PackageManager();
+        if (_packageManager == null)
+        {
+            // 尝试从当前执行文件路径检测项目根目录
+            var projectRoot = !string.IsNullOrEmpty(Path)
+                ? System.IO.Path.GetDirectoryName(Path)
+                : Directory.GetCurrentDirectory();
+
+            _packageManager = new PackageManagement.PackageManager(projectRoot: projectRoot);
+        }
+
+        return _packageManager;
     }
 
     #endregion

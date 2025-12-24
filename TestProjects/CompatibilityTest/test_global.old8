@@ -1,0 +1,20 @@
+// test_global.old8 - 测试兼容模式（无虚拟环境，使用全局包）
+
+PrintLine("=== 兼容模式测试 ===")
+PrintLine("")
+
+// 导入全局 Logger 包
+import "Logger"
+
+PrintLine("✓ 从全局目录加载了 Logger 包")
+PrintLine("")
+
+// 创建 Logger 实例
+logger <- Logger.Create("CompatTest")
+
+logger.Info("这是兼容模式测试")
+logger.Warn("应该使用全局 Logger 1.0.0")
+logger.Error("因为没有项目配置文件")
+
+PrintLine("")
+PrintLine("=== 测试完成 ===")

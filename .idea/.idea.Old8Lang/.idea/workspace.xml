@@ -21,14 +21,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/global.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_module_tests.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_async_stream_debug.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_async_stream_debug2.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_async_stream_debug3.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_async_stream_debug4.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_constructor_param.old8" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/IMPLEMENTATION_REPORT.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/AddCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/CommandHelper.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/ICommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/InitCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/InstallCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/ListCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/RemoveCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/VenvCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/ProjectManagement/LockFile.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/ProjectManagement/ProjectConfig.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/ProjectManagement/VirtualEnvironment.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/CompatibilityTest/test_global.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/VirtualEnvTest/old8.project.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/VirtualEnvTest/packages/Logger@1.2.0/Logger.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/VirtualEnvTest/packages/Logger@1.2.0/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestProjects/VirtualEnvTest/src/main.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/VIRTUAL_ENVIRONMENT_DESIGN.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/BasicInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/BasicInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/PackageManagement/PackageManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/PackageManagement/PackageManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

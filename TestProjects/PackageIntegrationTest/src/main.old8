@@ -1,0 +1,5 @@
+// packageintegrationtest - 主程序入口
+
+PrintLine("Hello, Old8Lang!")
+PrintLine($"项目名称: packageintegrationtest")
+PrintLine($"版本: 1.0.0")

@@ -2,6 +2,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.ModuleObjects;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.ProjectManagement;
 
 namespace Old8Lang.PackageManagement;
 
@@ -26,6 +27,11 @@ public class PackageManager
     private readonly Lock LoadLock = new();
 
     /// <summary>
+    /// 虚拟环境（如果存在）
+    /// </summary>
+    private VirtualEnvironment? _virtualEnv;
+
+    /// <summary>
     /// 是否启用调试日志
     /// </summary>
     public static bool DebugEnabled { get; set; } = false;
@@ -34,18 +40,40 @@ public class PackageManager
     /// 构造函数
     /// </summary>
     /// <param name="packagesDir">包目录路径，null 则使用默认路径</param>
-    public PackageManager(string? packagesDir = null)
+    /// <param name="projectRoot">项目根目录，用于检测虚拟环境</param>
+    public PackageManager(string? packagesDir = null, string? projectRoot = null)
     {
-        var packagesDirectory = packagesDir ?? GetDefaultPackagesDirectory();
+        // 尝试检测虚拟环境
+        if (projectRoot != null)
+        {
+            _virtualEnv = VirtualEnvironment.Detect(projectRoot);
+            VirtualEnvironment.DebugEnabled = DebugEnabled;
 
-        // 添加默认查找路径
+            if (_virtualEnv != null && _virtualEnv.IsEnabled)
+            {
+                // 虚拟环境模式：优先使用项目本地包
+                var venvPaths = _virtualEnv.GetPackageSearchPaths();
+                foreach (var path in venvPaths)
+                {
+                    AddSearchPath(path);
+                }
+
+                LogDebug($"Virtual environment enabled for project: {_virtualEnv.Config.Name}");
+            }
+        }
+
+        // 添加全局包目录
+        var packagesDirectory = packagesDir ?? GetDefaultPackagesDirectory();
         AddSearchPath(packagesDirectory);
 
-        // 添加当前目录的 packages 子目录
-        var localPackages = Path.Combine(Directory.GetCurrentDirectory(), "packages");
-        if (Directory.Exists(localPackages))
+        // 添加当前目录的 packages 子目录（兼容模式）
+        if (_virtualEnv == null)
         {
-            AddSearchPath(localPackages);
+            var localPackages = Path.Combine(Directory.GetCurrentDirectory(), "packages");
+            if (Directory.Exists(localPackages))
+            {
+                AddSearchPath(localPackages);
+            }
         }
 
         LogDebug($"PackageManager initialized with {PackageSearchPaths.Count} search paths:");
@@ -149,14 +177,51 @@ public class PackageManager
             // 在所有查找路径中搜索包
             foreach (var searchPath in PackageSearchPaths)
             {
+                // 策略 1: 如果启用了虚拟环境，使用 VirtualEnvironment 解析版本
+                if (_virtualEnv != null && _virtualEnv.IsEnabled)
+                {
+                    var resolvedPath = _virtualEnv.ResolvePackage(packageName);
+                    if (resolvedPath != null)
+                    {
+                        LogDebug($"  Virtual env resolved: {resolvedPath}");
+                        if (TryLoadPackageFromPath(resolvedPath, packageName, manager, out module) && module != null)
+                        {
+                            LogDebug($"  ✓ Package '{packageName}' loaded successfully from: {resolvedPath}");
+                            PackageCache[packageName] = module;
+                            return true;
+                        }
+                    }
+                }
+
+                // 策略 2: 尝试精确目录名（向后兼容）
                 var packagePath = Path.Combine(searchPath, packageName);
-                LogDebug($"  Checking: {packagePath}");
+                LogDebug($"  Checking exact match: {packagePath}");
 
-                if (!TryLoadPackageFromPath(packagePath, packageName, manager, out module) || module is null) continue;
+                if (TryLoadPackageFromPath(packagePath, packageName, manager, out module) && module != null)
+                {
+                    LogDebug($"  ✓ Package '{packageName}' loaded successfully from: {packagePath}");
+                    PackageCache[packageName] = module;
+                    return true;
+                }
 
-                LogDebug($"  ✓ Package '{packageName}' loaded successfully from: {packagePath}");
-                PackageCache[packageName] = module;
-                return true;
+                // 策略 3: 尝试版本化目录（PackageName@*）
+                if (Directory.Exists(searchPath))
+                {
+                    var versionedDirs = Directory.GetDirectories(searchPath, $"{packageName}@*");
+                    if (versionedDirs.Length > 0)
+                    {
+                        // 选择第一个匹配的版本（未来可以改进为选择最新版本）
+                        var versionedPath = versionedDirs[0];
+                        LogDebug($"  Found versioned directory: {versionedPath}");
+
+                        if (TryLoadPackageFromPath(versionedPath, packageName, manager, out module) && module != null)
+                        {
+                            LogDebug($"  ✓ Package '{packageName}' loaded successfully from: {versionedPath}");
+                            PackageCache[packageName] = module;
+                            return true;
+                        }
+                    }
+                }
             }
 
             LogDebug($"Package '{packageName}' not found in any search path");

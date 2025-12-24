@@ -1,0 +1,22 @@
+{
+  "lockfileVersion": 1,
+  "generated": "2025-12-24T08:25:01.924594Z",
+  "old8lang": {
+    "version": "^1.0.0",
+    "hash": null
+  },
+  "packages": {
+    "Logger": {
+      "version": "1.0.0",
+      "resolved": "local:/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/TestProjects/PackageIntegrationTest/./packages/Logger@1.0.0",
+      "integrity": null,
+      "dependencies": {}
+    },
+    "--dev": {
+      "version": "1.0.0",
+      "resolved": "local:/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/TestProjects/PackageIntegrationTest/./packages/--dev@1.0.0",
+      "integrity": null,
+      "dependencies": {}
+    }
+  }
+}
