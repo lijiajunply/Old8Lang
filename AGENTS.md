@@ -62,3 +62,26 @@ dotnet run --project Old8Lang.Benchmarks --configuration Release
 - 期望错误的文件末尾标记 "error"
 - 测试报告保存到 `Reports/` 目录
 - 遵循语法测试 → 解释模式测试 → 编译模式测试的顺序
+
+## 包管理说明
+
+### 运行模式
+- **项目模式**: 检测到 `o8packages.json` 时自动启用虚拟环境
+- **非项目模式**: 没有项目配置时自动使用全局包（`~/.old8lang/packages`）
+
+### 包加载优先级
+1. 标准库（MathLib, OS, File 等）
+2. 项目本地包（如果启用虚拟环境）
+3. 全局第三方包
+4. 相对路径文件
+
+### 全局包目录
+默认位置：`~/.old8lang/packages/`
+包结构：
+```
+~/.old8lang/packages/
+├── TestGlobalLib/
+│   └── index.old8
+└── SomeOtherLib/
+    └── main.old8
+```

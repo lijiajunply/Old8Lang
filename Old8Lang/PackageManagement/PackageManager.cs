@@ -46,16 +46,23 @@ public class PackageManager
     /// 构造函数
     /// </summary>
     /// <param name="packagesDir">包目录路径，null 则使用默认路径</param>
-    /// <param name="projectRoot">项目根目录，用于检测虚拟环境</param>
+    /// <param name="projectRoot">项目根目录，用于检测虚拟环境。如果为 null 将自动检测</param>
     public PackageManager(string? packagesDir = null, string? projectRoot = null)
     {
-        // 尝试检测虚拟环境
-        if (projectRoot != null)
+        // 如果没有指定项目根目录，尝试从当前目录检测
+        if (projectRoot == null)
         {
-            VirtualEnv = VirtualEnvironment.Detect(projectRoot);
-            VirtualEnvironment.DebugEnabled = DebugEnabled;
+            projectRoot = Directory.GetCurrentDirectory();
+        }
 
-            if (VirtualEnv is { IsEnabled: true })
+        // 尝试检测虚拟环境
+        VirtualEnv = VirtualEnvironment.Detect(projectRoot);
+        VirtualEnvironment.DebugEnabled = DebugEnabled;
+
+        if (VirtualEnv != null)
+        {
+            // 找到项目配置
+            if (VirtualEnv.IsEnabled)
             {
                 // 虚拟环境模式：优先使用项目本地包
                 var venvPaths = VirtualEnv.GetPackageSearchPaths();
@@ -66,9 +73,19 @@ public class PackageManager
 
                 LogDebug($"Virtual environment enabled for project: {VirtualEnv.Config.Name}");
             }
+            else
+            {
+                // 项目存在但虚拟环境被禁用
+                LogDebug($"Project detected but virtual environment disabled: {VirtualEnv.Config.Name}");
+            }
+        }
+        else
+        {
+            // 没有检测到项目配置，使用全局包模式
+            LogDebug("No Old8Lang project detected, using global packages only");
         }
 
-        // 添加全局包目录
+        // 添加全局包目录（总是添加，作为后备选项）
         var packagesDirectory = packagesDir ?? GetDefaultPackagesDirectory();
         AddSearchPath(packagesDirectory);
 

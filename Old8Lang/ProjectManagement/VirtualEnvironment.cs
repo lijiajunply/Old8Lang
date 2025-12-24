@@ -83,7 +83,7 @@ public class VirtualEnvironment
         var projectRoot = ProjectConfig.FindProjectRoot(searchDir);
         if (projectRoot == null)
         {
-            LogDebug("No project root found (no o8packages.json)");
+            LogDebug("No project root found (no o8packages.json) - running in non-project mode");
             return null;
         }
 
@@ -91,7 +91,7 @@ public class VirtualEnvironment
         var config = ProjectConfig.LoadFromDirectory(projectRoot);
         if (config == null)
         {
-            LogDebug($"Failed to load project config from {projectRoot}");
+            LogDebug($"Failed to load project config from {projectRoot} - falling back to global packages");
             return null;
         }
 
