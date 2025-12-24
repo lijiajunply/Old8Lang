@@ -67,7 +67,7 @@ public class AsyncFunctionTests
     }
 
     [Fact]
-    public async Task AsyncFunction_WithoutImmediateAwait_CreatesTask()
+    public void AsyncFunction_WithoutImmediateAwait_CreatesTask()
     {
         // Arrange
         var code = @"
@@ -248,11 +248,25 @@ public class AsyncFunctionTests
                    """;
         var interpreter = new LangInterpreter();
 
-        // Act & Assert
+        // Act
         var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
 
-        // 应该能够解析和开始执行，但异步任务会抛出异常
-        Assert.ThrowsAny<Old8Exception>(() => ast.Run(interpreter.Manager));
+        // 等待异步任务完成
+        await Task.Delay(100);
+
+        // Assert - 获取任务并检查其状态
+        var taskValue = interpreter.Manager.GetValue(new LangId("task")) as AST.Expression.Value.TaskLangValue;
+        Assert.NotNull(taskValue);
+
+        // 任务应该处于Failed状态
+        Assert.Equal(AST.Expression.Value.TaskStatus.Failed, taskValue.Status);
+
+        // 异常应该被捕获在任务中
+        Assert.NotNull(taskValue.Exception);
+
+        // 访问Result属性应该抛出异常
+        Assert.ThrowsAny<Old8Exception>(() => taskValue.Await());
     }
 
     [Fact]
