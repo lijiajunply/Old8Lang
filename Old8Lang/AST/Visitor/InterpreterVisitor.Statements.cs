@@ -1,0 +1,250 @@
+using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Statement;
+using Old8Lang.Error;
+using Old8Lang.Interpreter;
+
+namespace Old8Lang.AST.Visitor;
+
+/// <summary>
+/// InterpreterVisitor - Statement 节点的 Visit 方法实现
+/// </summary>
+public partial class InterpreterVisitor
+{
+    /// <summary>
+    /// 访问 BreakStatement 节点
+    /// </summary>
+    public LangValueType VisitBreakStatement(BreakStatement node)
+    {
+        // 迁移自 BreakStatement.Run()
+        _manager.ControlFlowManager.BreakFlag = true;
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 ContinueStatement 节点
+    /// </summary>
+    public LangValueType VisitContinueStatement(ContinueStatement node)
+    {
+        // 迁移自 ContinueStatement.Run()
+        _manager.ControlFlowManager.ContinueFlag = true;
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 IfStatement 节点
+    /// </summary>
+    public LangValueType VisitIfStatement(IfStatement node)
+    {
+        // 迁移自 IfStatement.Run()
+        var r = true;
+
+        // 保存原始的 IsFunc 状态
+        var originalIsFunc = _manager.IsFunc;
+
+        // 处理 if 块
+        _manager.AddChildren();
+        // 在 if 语句块中，临时禁用函数上下文，允许修改外部变量
+        _manager.IsFunc = false;
+
+        // 访问 ifChildBlock（直接调用其逻辑，因为 IfChild 不支持 Visitor）
+        var ifChild = node[0] as IfChild;
+        if (ifChild != null)
+        {
+            ifChild.Run(_manager, ref r);
+        }
+
+        _manager.RemoveChildren();
+
+        // 处理 elif 块
+        for (int i = 1; i < node.Count; i++)
+        {
+            var elifChild = node[i] as IfChild;
+            if (elifChild != null)
+            {
+                _manager.AddChildren();
+                // 在 elif 语句块中，临时禁用函数上下文，允许修改外部变量
+                _manager.IsFunc = false;
+                elifChild.Run(_manager, ref r);
+                _manager.RemoveChildren();
+            }
+            else if (node[i] is BlockStatement elseBlock)
+            {
+                // else 块
+                if (r)
+                {
+                    elseBlock.Accept(this);
+                }
+            }
+        }
+
+        // 恢复原始的 IsFunc 状态
+        _manager.IsFunc = originalIsFunc;
+
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 BlockStatement 节点
+    /// </summary>
+    public LangValueType VisitBlockStatement(BlockStatement node)
+    {
+        // 迁移自 BlockStatement.Run()
+        // 检查是否有生成器上下文，决定执行模式
+        if (_manager.GeneratorContext != null)
+        {
+            // 生成器模式需要调用原方法（暂不迁移复杂逻辑）
+            node.Run(_manager);
+        }
+        else
+        {
+            // 标准执行模式（非生成器）
+            // 先执行导入语句
+            node.ImportRun(_manager);
+
+            // 顺序执行所有语句
+            for (int i = 0; i < node.Count; i++)
+            {
+                var statement = node[i];
+                if (statement != null)
+                {
+                    statement.Accept(this);
+
+                    // 检查 return 语句
+                    if (_manager.IsReturn)
+                    {
+                        return new VoidLangValue();
+                    }
+
+                    // 检查 break 和 continue 语句
+                    if (_manager.ControlFlowManager.BreakFlag || _manager.ControlFlowManager.ContinueFlag)
+                    {
+                        return new VoidLangValue();
+                    }
+                }
+            }
+        }
+
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 WhileStatement 节点
+    /// </summary>
+    public LangValueType VisitWhileStatement(WhileStatement node)
+    {
+        // 迁移自 WhileStatement.Run()
+        if (_manager.GeneratorContext != null)
+        {
+            // 生成器模式：调用原方法（暂不迁移复杂逻辑）
+            node.Run(_manager);
+        }
+        else
+        {
+            // 标准 while 循环（非生成器）
+            _manager.ControlFlowManager.PushState();
+
+            try
+            {
+                while (true)
+                {
+                    // 获取条件表达式的值
+                    var value = node[0].Accept(this); // expression
+
+                    if (value is not BoolLangValue varBool)
+                    {
+                        throw new TypeError(node, "期望布尔类型", $"实际得到了 {value.GetType().Name}");
+                    }
+
+                    bool conditionResult = varBool.Value;
+
+                    // 如果条件为 false，退出循环
+                    if (!conditionResult)
+                    {
+                        break;
+                    }
+
+                    // 执行循环体（blockStatement）
+                    // 注意：WhileStatement 没有索引访问来获取 blockStatement，需要直接调用原方法
+                    node.Run(_manager);
+                    return new VoidLangValue();
+                }
+            }
+            finally
+            {
+                _manager.ControlFlowManager.PopState();
+            }
+        }
+
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 ForStatement 节点
+    /// </summary>
+    public LangValueType VisitForStatement(ForStatement node)
+    {
+        // 迁移自 ForStatement.Run()
+        _manager.AddChildren();
+        _manager.ControlFlowManager.PushState();
+
+        try
+        {
+            // 执行初始化语句（通过访问 setStatement 字段）
+            // 注意：ForStatement 没有通过索引访问子节点，需要调用原方法
+            node.Run(_manager);
+            return new VoidLangValue();
+        }
+        finally
+        {
+            _manager.ControlFlowManager.PopState();
+            _manager.RemoveChildren();
+        }
+    }
+
+    /// <summary>
+    /// 访问 ForInStatement 节点
+    /// </summary>
+    public LangValueType VisitForInStatement(ForInStatement node)
+    {
+        // 迁移自 ForInStatement.Run()
+        // ForInStatement 逻辑非常复杂（815行），包含生成器、异步流等特殊处理
+        // 暂时调用原方法，后续再详细迁移
+        node.Run(_manager);
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 SetStatement 节点
+    /// </summary>
+    public LangValueType VisitSetStatement(SetStatement node)
+    {
+        // 迁移自 SetStatement.Run()
+        // SetStatement 的逻辑已经封装在其 Run 方法中，直接调用
+        node.Run(_manager);
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 ReturnStatement 节点
+    /// </summary>
+    public LangValueType VisitReturnStatement(ReturnStatement node)
+    {
+        // 迁移自 ReturnStatement.Run()
+        // ReturnStatement 的逻辑已经封装在其 Run 方法中，直接调用
+        node.Run(_manager);
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 ThrowStatement 节点
+    /// </summary>
+    public LangValueType VisitThrowStatement(ThrowStatement node)
+    {
+        // 迁移自 ThrowStatement.Run()
+        // ThrowStatement 的逻辑已经封装在其 Run 方法中，直接调用
+        node.Run(_manager);
+        return new VoidLangValue();
+    }
+}

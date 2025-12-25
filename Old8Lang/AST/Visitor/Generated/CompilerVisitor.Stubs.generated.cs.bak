@@ -37,7 +37,23 @@ public partial class CompilerVisitor
         throw new NotImplementedException("VisitAsyncFuncInit 尚未实现");
     }
 
+    /// <summary>
+    /// 访问 BlockStatement 节点（编译器）
+    /// </summary>
+    public object? VisitBlockStatement(BlockStatement node)
+    {
+        // TODO: 迁移自 BlockStatement.GenerateIl()
+        throw new NotImplementedException("VisitBlockStatement 尚未实现");
+    }
 
+    /// <summary>
+    /// 访问 BreakStatement 节点（编译器）
+    /// </summary>
+    public object? VisitBreakStatement(BreakStatement node)
+    {
+        // TODO: 迁移自 BreakStatement.GenerateIl()
+        throw new NotImplementedException("VisitBreakStatement 尚未实现");
+    }
 
     /// <summary>
     /// 访问 CaseStatement 节点（编译器）
@@ -58,6 +74,33 @@ public partial class CompilerVisitor
     }
 
     /// <summary>
+    /// 访问 ContinueStatement 节点（编译器）
+    /// </summary>
+    public object? VisitContinueStatement(ContinueStatement node)
+    {
+        // TODO: 迁移自 ContinueStatement.GenerateIl()
+        throw new NotImplementedException("VisitContinueStatement 尚未实现");
+    }
+
+    /// <summary>
+    /// 访问 ForInStatement 节点（编译器）
+    /// </summary>
+    public object? VisitForInStatement(ForInStatement node)
+    {
+        // TODO: 迁移自 ForInStatement.GenerateIl()
+        throw new NotImplementedException("VisitForInStatement 尚未实现");
+    }
+
+    /// <summary>
+    /// 访问 ForStatement 节点（编译器）
+    /// </summary>
+    public object? VisitForStatement(ForStatement node)
+    {
+        // TODO: 迁移自 ForStatement.GenerateIl()
+        throw new NotImplementedException("VisitForStatement 尚未实现");
+    }
+
+    /// <summary>
     /// 访问 FuncInit 节点（编译器）
     /// </summary>
     public object? VisitFuncInit(FuncInit node)
@@ -66,6 +109,14 @@ public partial class CompilerVisitor
         throw new NotImplementedException("VisitFuncInit 尚未实现");
     }
 
+    /// <summary>
+    /// 访问 IfStatement 节点（编译器）
+    /// </summary>
+    public object? VisitIfStatement(IfStatement node)
+    {
+        // TODO: 迁移自 IfStatement.GenerateIl()
+        throw new NotImplementedException("VisitIfStatement 尚未实现");
+    }
 
     /// <summary>
     /// 访问 ImportStatement 节点（编译器）
@@ -84,6 +135,25 @@ public partial class CompilerVisitor
         // TODO: 迁移自 NativeStatement.GenerateIl()
         throw new NotImplementedException("VisitNativeStatement 尚未实现");
     }
+
+    /// <summary>
+    /// 访问 ReturnStatement 节点（编译器）
+    /// </summary>
+    public object? VisitReturnStatement(ReturnStatement node)
+    {
+        // TODO: 迁移自 ReturnStatement.GenerateIl()
+        throw new NotImplementedException("VisitReturnStatement 尚未实现");
+    }
+
+    /// <summary>
+    /// 访问 SetStatement 节点（编译器）
+    /// </summary>
+    public object? VisitSetStatement(SetStatement node)
+    {
+        // TODO: 迁移自 SetStatement.GenerateIl()
+        throw new NotImplementedException("VisitSetStatement 尚未实现");
+    }
+
     /// <summary>
     /// 访问 SwitchStatement 节点（编译器）
     /// </summary>
@@ -92,6 +162,16 @@ public partial class CompilerVisitor
         // TODO: 迁移自 SwitchStatement.GenerateIl()
         throw new NotImplementedException("VisitSwitchStatement 尚未实现");
     }
+
+    /// <summary>
+    /// 访问 ThrowStatement 节点（编译器）
+    /// </summary>
+    public object? VisitThrowStatement(ThrowStatement node)
+    {
+        // TODO: 迁移自 ThrowStatement.GenerateIl()
+        throw new NotImplementedException("VisitThrowStatement 尚未实现");
+    }
+
     /// <summary>
     /// 访问 TryStatement 节点（编译器）
     /// </summary>
@@ -99,6 +179,15 @@ public partial class CompilerVisitor
     {
         // TODO: 迁移自 TryStatement.GenerateIl()
         throw new NotImplementedException("VisitTryStatement 尚未实现");
+    }
+
+    /// <summary>
+    /// 访问 WhileStatement 节点（编译器）
+    /// </summary>
+    public object? VisitWhileStatement(WhileStatement node)
+    {
+        // TODO: 迁移自 WhileStatement.GenerateIl()
+        throw new NotImplementedException("VisitWhileStatement 尚未实现");
     }
 
     /// <summary>
@@ -137,6 +226,14 @@ public partial class CompilerVisitor
         throw new NotImplementedException("VisitFunctionCallExpression 尚未实现");
     }
 
+    /// <summary>
+    /// 访问 LangId 节点（编译器）
+    /// </summary>
+    public object? VisitLangId(LangId node)
+    {
+        // TODO: 迁移自 LangId.GenerateIl()
+        throw new NotImplementedException("VisitLangId 尚未实现");
+    }
 
     /// <summary>
     /// 访问 Operation 节点（编译器）
@@ -201,6 +298,14 @@ public partial class CompilerVisitor
         throw new NotImplementedException("VisitAsyncStreamLangValue 尚未实现");
     }
 
+    /// <summary>
+    /// 访问 BoolLangValue 节点（编译器）
+    /// </summary>
+    public object? VisitBoolLangValue(BoolLangValue node)
+    {
+        // TODO: 迁移自 BoolLangValue.GenerateIl()
+        throw new NotImplementedException("VisitBoolLangValue 尚未实现");
+    }
 
     /// <summary>
     /// 访问 CancellationTokenLangValue 节点（编译器）
@@ -220,6 +325,14 @@ public partial class CompilerVisitor
         throw new NotImplementedException("VisitCancellationTokenSourceLangValue 尚未实现");
     }
 
+    /// <summary>
+    /// 访问 CharLangValue 节点（编译器）
+    /// </summary>
+    public object? VisitCharLangValue(CharLangValue node)
+    {
+        // TODO: 迁移自 CharLangValue.GenerateIl()
+        throw new NotImplementedException("VisitCharLangValue 尚未实现");
+    }
 
     /// <summary>
     /// 访问 DictionaryLangValue 节点（编译器）
@@ -230,6 +343,14 @@ public partial class CompilerVisitor
         throw new NotImplementedException("VisitDictionaryLangValue 尚未实现");
     }
 
+    /// <summary>
+    /// 访问 DoubleLangValue 节点（编译器）
+    /// </summary>
+    public object? VisitDoubleLangValue(DoubleLangValue node)
+    {
+        // TODO: 迁移自 DoubleLangValue.GenerateIl()
+        throw new NotImplementedException("VisitDoubleLangValue 尚未实现");
+    }
 
     /// <summary>
     /// 访问 ErrorLangValue 节点（编译器）
@@ -267,6 +388,14 @@ public partial class CompilerVisitor
         throw new NotImplementedException("VisitInterpreterVisitor 尚未实现");
     }
 
+    /// <summary>
+    /// 访问 IntLangValue 节点（编译器）
+    /// </summary>
+    public object? VisitIntLangValue(IntLangValue node)
+    {
+        // TODO: 迁移自 IntLangValue.GenerateIl()
+        throw new NotImplementedException("VisitIntLangValue 尚未实现");
+    }
 
     /// <summary>
     /// 访问 LangListItem 节点（编译器）
@@ -322,6 +451,14 @@ public partial class CompilerVisitor
         throw new NotImplementedException("VisitNestedSliceAccess 尚未实现");
     }
 
+    /// <summary>
+    /// 访问 NullLangValue 节点（编译器）
+    /// </summary>
+    public object? VisitNullLangValue(NullLangValue node)
+    {
+        // TODO: 迁移自 NullLangValue.GenerateIl()
+        throw new NotImplementedException("VisitNullLangValue 尚未实现");
+    }
 
     /// <summary>
     /// 访问 RangeLangValue 节点（编译器）
@@ -341,6 +478,14 @@ public partial class CompilerVisitor
         throw new NotImplementedException("VisitSliceLangValue 尚未实现");
     }
 
+    /// <summary>
+    /// 访问 StringLangValue 节点（编译器）
+    /// </summary>
+    public object? VisitStringLangValue(StringLangValue node)
+    {
+        // TODO: 迁移自 StringLangValue.GenerateIl()
+        throw new NotImplementedException("VisitStringLangValue 尚未实现");
+    }
 
     /// <summary>
     /// 访问 StringTemplateValue 节点（编译器）
@@ -477,5 +622,13 @@ public partial class CompilerVisitor
         throw new NotImplementedException("VisitTypeLangValue 尚未实现");
     }
 
+    /// <summary>
+    /// 访问 VoidLangValue 节点（编译器）
+    /// </summary>
+    public object? VisitVoidLangValue(VoidLangValue node)
+    {
+        // TODO: 迁移自 VoidLangValue.GenerateIl()
+        throw new NotImplementedException("VisitVoidLangValue 尚未实现");
+    }
 
 }
