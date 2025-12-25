@@ -124,6 +124,7 @@ public class AsyncFuncLangValue : ImportInfo
 
             // 克隆 baseManager 创建独立的执行作用域
             // 这确保每个异步任务有独立的参数作用域，避免并发冲突
+            // 如果需要在异步函数中修改外部变量，应使用锁定变量（lock）机制
             var executionManager = baseManager.Clone();
 
             // 重置返回状态，确保异步函数体能够正常执行

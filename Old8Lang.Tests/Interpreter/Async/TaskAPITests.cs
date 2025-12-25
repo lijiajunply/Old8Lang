@@ -473,10 +473,10 @@ public class TaskAPITests
     {
         // Arrange
         var code = @"
-            attempts <- 0
+            attempts <- lock(0)
             async func unreliableOperation() {
-                attempts <- attempts + 1
-                if attempts < 3 {
+                attempts.Set(attempts.Value + 1)
+                if attempts.Value < 3 {
                     throw ""operation failed""
                 }
                 return ""success""
@@ -547,16 +547,16 @@ public class TaskAPITests
     {
         // Arrange
         var code = @"
-            progress <- 0
+            progress <- lock(0)
             async func operationWithProgress()  {
                 for i in [1~10] {
                     await Task.Delay(5)
-                    progress <- i * 10
+                    progress.Set(i * 10)
                 }
                 return ""completed""
             }
             task <- operationWithProgress()
-            result <- task.Result + "" with progress: "" + progress.ToStr()
+            result <- task.Result + "" with progress: "" + progress.Value.ToStr()
         ";
         var interpreter = new LangInterpreter();
 
