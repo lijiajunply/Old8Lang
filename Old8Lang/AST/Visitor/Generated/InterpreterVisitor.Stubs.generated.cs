@@ -57,6 +57,9 @@ public partial class InterpreterVisitor
         throw new NotImplementedException("VisitClassInit 尚未实现");
     }
 
+
+
+
     /// <summary>
     /// 访问 FuncInit 节点（解释器）
     /// </summary>
@@ -84,6 +87,9 @@ public partial class InterpreterVisitor
         // TODO: 迁移自 NativeStatement.Run()
         throw new NotImplementedException("VisitNativeStatement 尚未实现");
     }
+
+
+
     /// <summary>
     /// 访问 SwitchStatement 节点（解释器）
     /// </summary>
@@ -92,6 +98,8 @@ public partial class InterpreterVisitor
         // TODO: 迁移自 SwitchStatement.Run()
         throw new NotImplementedException("VisitSwitchStatement 尚未实现");
     }
+
+
     /// <summary>
     /// 访问 TryStatement 节点（解释器）
     /// </summary>
@@ -100,6 +108,7 @@ public partial class InterpreterVisitor
         // TODO: 迁移自 TryStatement.Run()
         throw new NotImplementedException("VisitTryStatement 尚未实现");
     }
+
 
     /// <summary>
     /// 访问 YieldStatement 节点（解释器）
@@ -110,60 +119,12 @@ public partial class InterpreterVisitor
         throw new NotImplementedException("VisitYieldStatement 尚未实现");
     }
 
-    /// <summary>
-    /// 访问 AsyncStreamExpression 节点（解释器）
-    /// </summary>
-    public LangValueType VisitAsyncStreamExpression(AsyncStreamExpression node)
-    {
-        // TODO: 迁移自 AsyncStreamExpression.Run()
-        throw new NotImplementedException("VisitAsyncStreamExpression 尚未实现");
-    }
-
-    /// <summary>
-    /// 访问 AwaitExpression 节点（解释器）
-    /// </summary>
-    public LangValueType VisitAwaitExpression(AwaitExpression node)
-    {
-        // TODO: 迁移自 AwaitExpression.Run()
-        throw new NotImplementedException("VisitAwaitExpression 尚未实现");
-    }
-
-    /// <summary>
-    /// 访问 FunctionCallExpression 节点（解释器）
-    /// </summary>
-    public LangValueType VisitFunctionCallExpression(FunctionCallExpression node)
-    {
-        // TODO: 迁移自 FunctionCallExpression.Run()
-        throw new NotImplementedException("VisitFunctionCallExpression 尚未实现");
-    }
 
 
-    /// <summary>
-    /// 访问 Operation 节点（解释器）
-    /// </summary>
-    public LangValueType VisitOperation(Operation node)
-    {
-        // TODO: 迁移自 Operation.Run()
-        throw new NotImplementedException("VisitOperation 尚未实现");
-    }
 
-    /// <summary>
-    /// 访问 SuperExpression 节点（解释器）
-    /// </summary>
-    public LangValueType VisitSuperExpression(SuperExpression node)
-    {
-        // TODO: 迁移自 SuperExpression.Run()
-        throw new NotImplementedException("VisitSuperExpression 尚未实现");
-    }
 
-    /// <summary>
-    /// 访问 TernaryExpression 节点（解释器）
-    /// </summary>
-    public LangValueType VisitTernaryExpression(TernaryExpression node)
-    {
-        // TODO: 迁移自 TernaryExpression.Run()
-        throw new NotImplementedException("VisitTernaryExpression 尚未实现");
-    }
+
+
 
     /// <summary>
     /// 访问 AnyLangValue 节点（解释器）
@@ -174,14 +135,6 @@ public partial class InterpreterVisitor
         throw new NotImplementedException("VisitAnyLangValue 尚未实现");
     }
 
-    /// <summary>
-    /// 访问 ArrayLangValue 节点（解释器）
-    /// </summary>
-    public LangValueType VisitArrayLangValue(ArrayLangValue node)
-    {
-        // TODO: 迁移自 ArrayLangValue.Run()
-        throw new NotImplementedException("VisitArrayLangValue 尚未实现");
-    }
 
     /// <summary>
     /// 访问 AsyncGeneratorLangValue 节点（解释器）
@@ -221,14 +174,6 @@ public partial class InterpreterVisitor
     }
 
 
-    /// <summary>
-    /// 访问 DictionaryLangValue 节点（解释器）
-    /// </summary>
-    public LangValueType VisitDictionaryLangValue(DictionaryLangValue node)
-    {
-        // TODO: 迁移自 DictionaryLangValue.Run()
-        throw new NotImplementedException("VisitDictionaryLangValue 尚未实现");
-    }
 
 
     /// <summary>
@@ -286,14 +231,6 @@ public partial class InterpreterVisitor
         throw new NotImplementedException("VisitListComprehension 尚未实现");
     }
 
-    /// <summary>
-    /// 访问 ListLangValue 节点（解释器）
-    /// </summary>
-    public LangValueType VisitListLangValue(ListLangValue node)
-    {
-        // TODO: 迁移自 ListLangValue.Run()
-        throw new NotImplementedException("VisitListLangValue 尚未实现");
-    }
 
     /// <summary>
     /// 访问 MethodOverloadList 节点（解释器）
@@ -323,23 +260,7 @@ public partial class InterpreterVisitor
     }
 
 
-    /// <summary>
-    /// 访问 RangeLangValue 节点（解释器）
-    /// </summary>
-    public LangValueType VisitRangeLangValue(RangeLangValue node)
-    {
-        // TODO: 迁移自 RangeLangValue.Run()
-        throw new NotImplementedException("VisitRangeLangValue 尚未实现");
-    }
 
-    /// <summary>
-    /// 访问 SliceLangValue 节点（解释器）
-    /// </summary>
-    public LangValueType VisitSliceLangValue(SliceLangValue node)
-    {
-        // TODO: 迁移自 SliceLangValue.Run()
-        throw new NotImplementedException("VisitSliceLangValue 尚未实现");
-    }
 
 
     /// <summary>
@@ -459,14 +380,6 @@ public partial class InterpreterVisitor
         throw new NotImplementedException("VisitThreadStaticMethodWrapper 尚未实现");
     }
 
-    /// <summary>
-    /// 访问 TupleLangValue 节点（解释器）
-    /// </summary>
-    public LangValueType VisitTupleLangValue(TupleLangValue node)
-    {
-        // TODO: 迁移自 TupleLangValue.Run()
-        throw new NotImplementedException("VisitTupleLangValue 尚未实现");
-    }
 
     /// <summary>
     /// 访问 TypeLangValue 节点（解释器）

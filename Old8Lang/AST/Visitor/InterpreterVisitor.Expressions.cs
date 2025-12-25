@@ -61,4 +61,66 @@ public partial class InterpreterVisitor
 
         throw new NameError(node.Position, node.IdName);
     }
+
+    /// <summary>
+    /// 访问 Operation 节点
+    /// </summary>
+    public LangValueType VisitOperation(Operation node)
+    {
+        // 迁移自 Operation.Run()
+        // Operation 逻辑非常复杂（900+行），包含所有运算符的处理
+        // 暂时调用原方法，后续再详细迁移
+        return node.Run(_manager);
+    }
+
+    /// <summary>
+    /// 访问 FunctionCallExpression 节点
+    /// </summary>
+    public LangValueType VisitFunctionCallExpression(FunctionCallExpression node)
+    {
+        // 迁移自 FunctionCallExpression.Run()
+        // FunctionCallExpression 逻辑非常复杂，包含函数调用、方法重载等
+        // 暂时调用原方法，后续再详细迁移
+        return node.Run(_manager);
+    }
+
+    /// <summary>
+    /// 访问 TernaryExpression 节点
+    /// </summary>
+    public LangValueType VisitTernaryExpression(TernaryExpression node)
+    {
+        // 迁移自 TernaryExpression.Run()
+        // 暂时调用原方法
+        return node.Run(_manager);
+    }
+
+    /// <summary>
+    /// 访问 AwaitExpression 节点
+    /// </summary>
+    public LangValueType VisitAwaitExpression(AwaitExpression node)
+    {
+        // 迁移自 AwaitExpression.Run()
+        // 暂时调用原方法
+        return node.Run(_manager);
+    }
+
+    /// <summary>
+    /// 访问 AsyncStreamExpression 节点
+    /// </summary>
+    public LangValueType VisitAsyncStreamExpression(AsyncStreamExpression node)
+    {
+        // 迁移自 AsyncStreamExpression.Run()
+        // 暂时调用原方法
+        return node.Run(_manager);
+    }
+
+    /// <summary>
+    /// 访问 SuperExpression 节点
+    /// </summary>
+    public LangValueType VisitSuperExpression(SuperExpression node)
+    {
+        // 迁移自 SuperExpression.Run()
+        // 暂时调用原方法
+        return node.Run(_manager);
+    }
 }
