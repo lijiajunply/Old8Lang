@@ -21,8 +21,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/IModuleInterfaces.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/IModuleInterfaces.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazyItemWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazyItemWrapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazySymbolProxy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazySymbolProxy.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ModuleBases.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/ModuleBases.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,9 +67,13 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/ImportStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
@@ -456,7 +463,7 @@
       <workItem from="1766385211009" duration="1338000" />
       <workItem from="1766441034395" duration="1692000" />
       <workItem from="1766461431015" duration="981000" />
-      <workItem from="1766746850670" duration="8241000" />
+      <workItem from="1766746850670" duration="11933000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -801,7 +808,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="363" />
+    <option name="localTasksCounter" value="368" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -828,11 +835,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(generator): 重构生成器状态管理机制&#10;&#10;- 移除基于索引的旧状态恢复机制&#10;- 引入基于路径的新状态恢复架构&#10;- 优化异步生成器状态机实现&#10;- 改进循环状态的保存与恢复逻辑&#10;- 完善生成器上下文中的变量管理&#10;- 更新相关测试用例以适应新架构" />
-    <MESSAGE value="feat(lang): 实现全局函数系统和锁定变量功能&#10;&#10;- 添加 BaseGlobalFunction 抽象基类提供参数验证和错误处理&#10;- 创建 GlobalFunctionRegistry 单例注册器管理全局函数&#10;- 实现 GlobalFunctionInitializer 初始化内置函数&#10;- 定义 IGlobalFunction 接口规范全局函数行为&#10;- 迁移 PrintLine、Print、ReadLine、Error、Clear 等 IO 函数到新系统&#10;- 实现 lock() 函数创建线程安全的锁定变量&#10;- 添加 LockedVariableLangValue 类支持原子操作和线程安全访问&#10;- 支持 .Value 读取、.Set() 设置、.Update() 更新等操作&#10;- 添加 .Increment()、.Decrement()、.Add() 等原子方法&#10;- 更新 Instance 类集成全局函数执行和 IL 生成&#10;- 移除旧的硬编码函数实现，统一使用全局函数系统&#10;- 添加锁定变量的单元测试和异步测试用例" />
-    <MESSAGE value="feat(ast): 优化异步流在生成器上下文中的处理&#10;&#10;- 实现异步流实例缓存机制，避免重复创建&#10;- 添加循环状态管理支持跨yield保持状态&#10;- 更新异步流和异步生成器的执行逻辑&#10;- 修复生成器状态机中异步流缓存的保存和恢复&#10;- 优化循环变量设置和控制流处理逻辑&#10;- 添加测试文件验证异步流功能正确性" />
-    <MESSAGE value="fix(generator): 修复生成器上下文中的异步循环和异常处理&#10;&#10;- 实现异步for-in循环中yield恢复机制，正确管理ExecutionPath和循环状态&#10;- 添加对异步流和异步生成器的生成器上下文支持，修复状态保存和恢复逻辑&#10;- 实现TryStatement的生成器上下文模式，支持在异常处理中正确处理yield&#10;- 修复ForInStatement中从yield恢复时的ExecutionPath管理，避免语句被错误跳过&#10;- 更新BlockStatement和WhileStatement中的ExecutionPath清理逻辑&#10;- 添加AsyncForInStatement到GeneratorAstScanner的变量扫描支持&#10;- 修正测试断言以匹配修复后的异步流行为" />
-    <MESSAGE value="refactor(commands): 优化命令处理逻辑和文件操作&#10;&#10;- 移除 ReadYesNo 方法中的默认值参数&#10;- 简化条件判断的打印逻辑&#10;- 修复变量命名不一致问题&#10;- 将文件同步操作改为异步操作&#10;- 更新项目配置中的版本字段名称&#10;- 清理工作区配置文件中的冗余变更记录" />
     <MESSAGE value="refactor(app): 重构应用程序命令架构并实现命令注册系统&#10;&#10;- 实现 CommandRegistry 管理命令注册、查找和执行功能&#10;- 为所有命令类实现 ICommand 接口并完成具体执行逻辑&#10;- 重构 Program.cs 采用基于命令的架构替代原有的硬编码逻辑&#10;- 添加命令别名支持，如 ls 作为 list 命令的别名&#10;- 修复 LangSample 方法中的文件存在性检查问题&#10;- 为交互式模式添加命令执行支持&#10;- 优化参数解析和错误处理机制" />
     <MESSAGE value="docs(guide): 更新包开发指南和集成文档&#10;&#10;- 更新 PACKAGE_DEVELOPMENT_GUIDE.md 中的包目录结构说明&#10;- 添加测试目录、dll目录和依赖目录的说明&#10;- 从 PACKAGE_MANAGER_INTEGRATION.md 中移除已删除的CLI工具目录&#10;- 删除 PACKAGE_INTEGRATION_STATUS.md 文件&#10;- 更新 IDE 工作区配置文件中的变更记录" />
     <MESSAGE value="refactor(init): 重构初始化命令的异步操作处理&#10;&#10;- 移除 ExecuteAsync 方法中的 async/await 关键字，改为同步返回 Task&#10;- 修复 CreateInteractiveConfig 方法中的异步调用，移除 await 操作&#10;- 移除方法中的 Task.FromResult 包装，直接返回同步结果&#10;- 简化 ReadYesNo 方法调用，移除默认值参数&#10;- 修复主文件路径创建逻辑，添加空值检查和默认值处理&#10;- 使用原始字符串字面量语法重构测试文件内容&#10;- 添加 dll 目录和 .gitignore 文件的自动创建&#10;- 更新 IDE 配置文件中的变更记录和提交历史" />
@@ -853,7 +855,12 @@
     <MESSAGE value="refactor(PackageService): 移除未使用的配置管理器并改进包源配置&#10;&#10;- 移除了未使用的 IPackageConfigurationManager 字段&#10;- 修改 ConfigurePackageSources 方法以接受 projectConfig 参数&#10;- 实现了从项目配置中读取自定义包源的功能&#10;- 添加了对远程包源的配置支持&#10;- 移除了 TODO 注释并实现了相应的功能" />
     <MESSAGE value="refactor(ast): 重构导入和原生库路径解析逻辑&#10;&#10;- 移除了 ImportInfoCommand 命令及其相关注册&#10;- 更新 DllPathResolver 使用项目根目录查找策略，标记 importPath 参数为已弃用&#10;- 重构 ImportStatement 支持标准库、包管理和本地文件的优先级查找&#10;- 为编译模式添加 FindPackagePathForCompiler 方法实现包路径查找&#10;- 修改 NativeStatement 不再使用 importPath 参数，更新错误处理机制&#10;- 优化 MethodList 空值检查使用模式匹配语法" />
     <MESSAGE value="refactor(lang): 移除废弃的库信息管理功能&#10;&#10;- 移除了 LangInfo 类中的 LibInfos 属性及其废弃标记&#10;- 修改 ChangeBasicInfo 方法不再设置 LibInfos 字段&#10;- 删除 ReadJson 方法上的 Obsolete 标记&#10;- 移除读取 JSON 时的默认库信息填充逻辑&#10;- 更新方法注释移除向后兼容说明&#10;- 简化 LangInfo 对象创建逻辑" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(lang): 移除废弃的库信息管理功能&#10;&#10;- 移除了 LangInfo 类中的 LibInfos 属性及其废弃标记&#10;- 修改 ChangeBasicInfo 方法不再设置 LibInfos 字段&#10;- 删除 ReadJson 方法上的 Obsolete 标记&#10;- 移除读取 JSON 时的默认库信息填充逻辑&#10;- 更新方法注释移除向后兼容说明&#10;- 简化 LangInfo 对象创建逻辑" />
+    <MESSAGE value="refactor(ast): 重构模块导入机制和符号提取逻辑&#10;&#10;- 重构 ImportStatement 中的模块导入逻辑，使用临时作用域执行模块代码&#10;- 实现从执行结果中提取符号并创建统一模块对象的功能&#10;- 添加对函数、类、变量等不同类型符号的识别和提取&#10;- 重构 UnifiedModule 中的符号存储和访问机制&#10;- 优化模块加载过程中的作用域管理和符号提取&#10;- 更新常量定义语法从 &quot;const NAME &lt;- value&quot; 到 &quot;NAME:const &lt;- value&quot;&#10;- 修复循环依赖测试中的模块导入问题&#10;- 优化模块对象的创建和符号管理流程" />
+    <MESSAGE value="fix(import): 修复本地文件导入路径解析问题&#10;&#10;- 添加了对空目录路径的处理逻辑&#10;- 当manager.Path不为空时使用当前文件的完整路径目录&#10;- 当目录路径仍为空时回退到当前工作目录&#10;- 确保本地文件导入能够正确解析相对路径" />
+    <MESSAGE value="fix(import): 解决模块导入中的函数重复定义和子模块路径处理问题&#10;&#10;- 修复了不同模块中同名函数的重复定义检查逻辑，允许来自不同模块的函数共存&#10;- 改进了子模块导入路径处理，排除相对路径和文件扩展名的干扰&#10;- 优化了包管理器导入逻辑，跳过相对路径和绝对路径的处理&#10;- 增强了命名导入功能，通过跟踪新增ImportInfos确保正确导入指定成员&#10;- 添加了TryFindInImportInfos辅助方法用于在导入信息列表中查找成员&#10;- 修复了子模块导入的基础路径确定逻辑，区分相对路径和绝对路径处理&#10;- 完善了子模块查找失败时的错误抛出机制" />
+    <MESSAGE value="refactor(config): 重构配置加载和验证功能&#10;&#10;- 移除旧的配置加载函数，实现新的 loadConfig 函数支持不同环境配置&#10;- 添加配置验证功能，确保配置包含必需的数据库和端口字段&#10;- 移除动态导入别名测试，简化测试代码&#10;- 将 PI 常量从函数改为常量声明，优化性能" />
+    <MESSAGE value="feat(import): 实现懒加载导入功能支持&#10;&#10;- 添加 LazySymbolProxy 类用于延迟加载模块符号&#10;- 实现选择性懒导入：lazy import { symbol } from &quot;module&quot;&#10;- 实现通配符懒导入：lazy import &quot;module&quot; 语法支持&#10;- 在 VariateManager 中添加懒加载模块查找机制&#10;- 添加懒加载通配符模块列表和相关查找逻辑&#10;- 更新导入语句解析器以识别懒加载语法&#10;- 添加懒加载导入的测试用例" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(import): 实现懒加载导入功能支持&#10;&#10;- 添加 LazySymbolProxy 类用于延迟加载模块符号&#10;- 实现选择性懒导入：lazy import { symbol } from &quot;module&quot;&#10;- 实现通配符懒导入：lazy import &quot;module&quot; 语法支持&#10;- 在 VariateManager 中添加懒加载模块查找机制&#10;- 添加懒加载通配符模块列表和相关查找逻辑&#10;- 更新导入语句解析器以识别懒加载语法&#10;- 添加懒加载导入的测试用例" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

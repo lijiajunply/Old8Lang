@@ -11,14 +11,12 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 /// 统一模块对象 - 集成所有模块功能的单一实现
 /// 支持懒加载、即时加载、选择性导入等多种模式
 /// </summary>
-#pragma warning disable CS9113 // 参数未读
 public class UnifiedModule(
     string moduleName,
     VariateManager manager,
     ModuleLoadMode loadMode = ModuleLoadMode.Lazy,
     SourcePosition position = default
 ) : LangValueType(position), IModuleValueType
-#pragma warning restore CS9113
 {
     private readonly Dictionary<string, LangValueType> Symbols = new();
     private readonly Lock LoadLock = new();
@@ -89,8 +87,8 @@ public class UnifiedModule(
     /// <summary>
     /// 强制加载模块
     /// </summary>
-    /// <param name="manager">变量管理器</param>
-    public void EnsureLoaded(VariateManager? manager = null)
+    /// <param name="variateManager">变量管理器</param>
+    public void EnsureLoaded(VariateManager? variateManager = null)
     {
         if (!_isLoaded)
         {
@@ -98,7 +96,7 @@ public class UnifiedModule(
             {
                 if (!_isLoaded)
                 {
-                    LoadModuleInternal(manager);
+                    LoadModuleInternal(variateManager);
                 }
             }
         }
@@ -114,15 +112,12 @@ public class UnifiedModule(
     {
         EnsureLoaded(currentManager);
 
-        switch (dotExpression)
+        return dotExpression switch
         {
-            case LangId langId:
-                return HandleSymbolAccess(langId, currentManager);
-            case Instance instance when instance.Id != null:
-                return HandleFunctionCall(instance, currentManager);
-            default:
-                throw new AttributeError(this, dotExpression.ToString() ?? "", ModuleName);
-        }
+            LangId langId => HandleSymbolAccess(langId, currentManager),
+            Instance instance => HandleFunctionCall(instance, currentManager),
+            _ => throw new AttributeError(this, dotExpression.ToString() ?? "", ModuleName)
+        };
     }
 
     /// <summary>
@@ -148,7 +143,8 @@ public class UnifiedModule(
     /// <summary>
     /// 创建即时加载模块
     /// </summary>
-    public static UnifiedModule CreateEager(string moduleName, VariateManager manager, SourcePosition position = default)
+    public static UnifiedModule CreateEager(string moduleName, VariateManager manager,
+        SourcePosition position = default)
     {
         return new UnifiedModule(moduleName, manager, ModuleLoadMode.Eager, position);
     }
@@ -189,6 +185,7 @@ public class UnifiedModule(
         {
             module.Symbols[kvp.Key] = kvp.Value;
         }
+
         module._isLoaded = true;
         return module;
     }
@@ -199,7 +196,8 @@ public class UnifiedModule(
     {
         try
         {
-            if (LoadMode == ModuleLoadMode.Eager || LoadMode == ModuleLoadMode.Selective || LoadMode == ModuleLoadMode.Lazy)
+            if (LoadMode == ModuleLoadMode.Eager || LoadMode == ModuleLoadMode.Selective ||
+                LoadMode == ModuleLoadMode.Lazy)
             {
                 LoadModuleFromImport(manager);
             }
@@ -227,19 +225,12 @@ public class UnifiedModule(
         // 保存原始的 ImportInfosList，避免被模块导入污染
         var originalImportInfos = manager.ImportInfos.ToList();
 
-        try
-        {
-            // 执行导入到临时 manager
-            var importStatement = new ImportStatement(ModuleName, Position);
-            importStatement.Run(tempManager);
+        // 执行导入到临时 manager
+        var importStatement = new ImportStatement(ModuleName, Position);
+        importStatement.Run(tempManager);
 
-            // 从临时 manager 提取符号（函数、类、变量等）
-            ExtractSymbolsFromManager(tempManager);
-        }
-        finally
-        {
-            // 不需要清理，因为使用的是独立的 tempManager
-        }
+        // 从临时 manager 提取符号（函数、类、变量等）
+        ExtractSymbolsFromManager(tempManager);
     }
 
     /// <summary>

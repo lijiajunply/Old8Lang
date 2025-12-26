@@ -83,8 +83,8 @@ public interface ILoadable
     /// <summary>
     /// 强制加载模块（如果是懒加载）
     /// </summary>
-    /// <param name="manager">变量管理器</param>
-    void EnsureLoaded(VariateManager manager);
+    /// <param name="variateManager">变量管理器</param>
+    void EnsureLoaded(VariateManager variateManager);
 }
 
 /// <summary>

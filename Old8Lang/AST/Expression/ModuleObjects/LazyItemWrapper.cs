@@ -7,20 +7,16 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 /// <summary>
 /// 懒加载特定项目的包装器，用于选择导入的懒加载
 /// </summary>
-public class LazyItemWrapper(string moduleName, string itemName, VariateManager manager, SourcePosition position)
+public class LazyItemWrapper(string moduleNameItem, string itemName, VariateManager manager, SourcePosition position)
     : LangValueType(position), IModuleWrapper
 {
     private bool Loaded;
     private LangValueType? LoadedItem;
-#pragma warning disable CS9124 // 参数被捕获到封闭类型的状态
-    private readonly string _moduleName = moduleName;
-    private readonly string _itemName = itemName;
-#pragma warning restore CS9124
 
     /// <summary>
     /// 模块名称
     /// </summary>
-    public string ModuleName => $"{_moduleName}.{_itemName}";
+    public string ModuleName => $"{moduleNameItem}.{itemName}";
 
     /// <summary>
     /// 模块是否已加载
@@ -60,7 +56,7 @@ public class LazyItemWrapper(string moduleName, string itemName, VariateManager 
         }
 
         // 如果请求的符号名称与项目名称匹配，返回加载的项目
-        if (string.Equals(symbolName, _itemName, StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(symbolName, itemName, StringComparison.OrdinalIgnoreCase))
         {
             return LoadedItem;
         }
@@ -75,7 +71,7 @@ public class LazyItemWrapper(string moduleName, string itemName, VariateManager 
     /// <returns>是否包含符号</returns>
     public bool HasSymbol(string symbolName)
     {
-        return string.Equals(symbolName, _itemName, StringComparison.OrdinalIgnoreCase) && GetSymbol(symbolName) != null;
+        return string.Equals(symbolName, itemName, StringComparison.OrdinalIgnoreCase) && GetSymbol(symbolName) != null;
     }
 
     /// <summary>
@@ -89,14 +85,14 @@ public class LazyItemWrapper(string moduleName, string itemName, VariateManager 
             LoadItem();
         }
 
-        return LoadedItem != null ? [_itemName] : [];
+        return LoadedItem != null ? [itemName] : [];
     }
 
     /// <summary>
     /// 强制加载模块
     /// </summary>
-    /// <param name="manager">变量管理器</param>
-    public void EnsureLoaded(VariateManager manager)
+    /// <param name="variateManager">变量管理器</param>
+    public void EnsureLoaded(VariateManager variateManager)
     {
         if (!Loaded)
         {
@@ -146,7 +142,7 @@ public class LazyItemWrapper(string moduleName, string itemName, VariateManager 
         {
             // 执行实际的导入
             var importItems = new List<ImportItem> { new(itemName) };
-            var importStatement = new ImportStatement(moduleName, Position, importItems, fromClause: true);
+            var importStatement = new ImportStatement(moduleNameItem, Position, importItems, fromClause: true);
             importStatement.Run(manager);
 
             // 查找导入的项目
@@ -156,19 +152,19 @@ public class LazyItemWrapper(string moduleName, string itemName, VariateManager 
             }
             else
             {
-                throw new ImportError(this, $"{moduleName}.{itemName}", $"Item {itemName} not found");
+                throw new ImportError(this, $"{moduleNameItem}.{itemName}", $"Item {itemName} not found");
             }
 
             Loaded = true;
         }
         catch (Exception ex)
         {
-            throw new ImportError(this, $"{moduleName}.{itemName}", ex.Message);
+            throw new ImportError(this, $"{moduleNameItem}.{itemName}", ex.Message);
         }
     }
 
     public override string ToString() =>
-        Loaded ? LoadedItem?.ToString() ?? "Loaded" : $"LazyItem({itemName} from {moduleName})";
+        Loaded ? LoadedItem?.ToString() ?? "Loaded" : $"LazyItem({itemName} from {moduleNameItem})";
 
     public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)
     {

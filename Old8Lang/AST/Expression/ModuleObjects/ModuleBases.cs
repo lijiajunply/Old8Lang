@@ -14,7 +14,7 @@ public abstract class ModuleBase(string moduleName) : IModuleObject, IOldLangTre
     /// <summary>
     /// 源码位置
     /// </summary>
-    public virtual SourcePosition Position { get; } = default;
+    public virtual SourcePosition Position => default;
 
     #region IModuleObject Implementation
 
@@ -41,7 +41,7 @@ public abstract class ModuleBase(string moduleName) : IModuleObject, IOldLangTre
         return Symbols.Keys;
     }
 
-    public virtual void EnsureLoaded(VariateManager manager)
+    public virtual void EnsureLoaded(VariateManager variateManager)
     {
         if (!IsLoaded)
         {
@@ -49,7 +49,7 @@ public abstract class ModuleBase(string moduleName) : IModuleObject, IOldLangTre
             {
                 if (!IsLoaded && LoadingState != ModuleLoadingState.Loading)
                 {
-                    PerformModuleLoad(manager);
+                    PerformModuleLoad(variateManager);
                 }
             }
         }
@@ -131,7 +131,7 @@ public abstract class ModuleValueBase(IModuleObject moduleObject, SourcePosition
     public virtual bool HasSymbol(string symbolName) => moduleObject.HasSymbol(symbolName);
     public virtual IEnumerable<string> GetExportedSymbols() => moduleObject.GetExportedSymbols();
 
-    public virtual void EnsureLoaded(VariateManager manager) => moduleObject.EnsureLoaded(manager);
+    public virtual void EnsureLoaded(VariateManager variateManager) => moduleObject.EnsureLoaded(variateManager);
 
     public override abstract LangValueType Dot(LangExpression dotExpression, VariateManager currentManager);
 

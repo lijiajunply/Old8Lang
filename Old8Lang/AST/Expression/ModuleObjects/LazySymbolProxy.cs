@@ -15,11 +15,9 @@ public class LazySymbolProxy(
     SourcePosition position = default
 ) : LangValueType(position)
 {
-    private readonly UnifiedModule _module = module;
-    private readonly string _symbolName = symbolName;
-    private LangValueType? _cachedSymbol;
-    private bool _isResolved;
-    private readonly object _resolveLock = new();
+    private LangValueType? CachedSymbol;
+    private bool IsResolved;
+    private readonly Lock ResolveLock = new();
 
     /// <summary>
     /// 解析并获取真实符号
@@ -27,22 +25,20 @@ public class LazySymbolProxy(
     /// <returns>真实符号值</returns>
     private LangValueType ResolveSymbol()
     {
-        if (!_isResolved)
+        if (IsResolved) return CachedSymbol!;
+        lock (ResolveLock)
         {
-            lock (_resolveLock)
+            if (IsResolved) return CachedSymbol!;
+            CachedSymbol = module.GetSymbol(symbolName);
+            if (CachedSymbol == null)
             {
-                if (!_isResolved)
-                {
-                    _cachedSymbol = _module.GetSymbol(_symbolName);
-                    if (_cachedSymbol == null)
-                    {
-                        throw new AttributeError(this, _symbolName, _module.ModuleName);
-                    }
-                    _isResolved = true;
-                }
+                throw new AttributeError(this, symbolName, module.ModuleName);
             }
+
+            IsResolved = true;
         }
-        return _cachedSymbol!;
+
+        return CachedSymbol!;
     }
 
     /// <summary>
@@ -67,11 +63,12 @@ public class LazySymbolProxy(
     /// </summary>
     public override string ToString()
     {
-        if (_isResolved && _cachedSymbol != null)
+        if (IsResolved && CachedSymbol != null)
         {
-            return _cachedSymbol.ToString() ?? $"<lazy symbol proxy: {_symbolName} (resolved)>";
+            return CachedSymbol.ToString();
         }
-        return $"<lazy symbol proxy: {_symbolName} from {_module.ModuleName}>";
+
+        return $"<lazy symbol proxy: {symbolName} from {module.ModuleName}>";
     }
 
     /// <summary>
