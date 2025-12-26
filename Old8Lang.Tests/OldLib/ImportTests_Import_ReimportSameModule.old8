@@ -1,3 +1,0 @@
-import "MathLib"
-result1 <- Sqrt(9)
-result2 <- Sqrt(16)

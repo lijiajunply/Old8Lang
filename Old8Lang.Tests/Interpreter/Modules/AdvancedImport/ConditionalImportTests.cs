@@ -16,16 +16,16 @@ public class ConditionalImportTests : ModuleImportTestBase
     [Fact]
     public void Import_ConditionalImport_ShouldImportBasedOnCondition()
     {
+        // Arrange
         var testContent = """
+            import "MathLib"
+            useDebug <- true
+            result <- "logging imported"
+            """;
+        CreateTempModuleFile("conditional_import_test.old8", testContent);
 
-                          import "MathLib"
-                          useDebug <- true
-                          result <- "logging imported"
-
-                          """;
-        CreateTempModuleFile("ImportTests_Import_ConditionalImport.old8", testContent);
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_ConditionalImport.old8");
+        var (interpreter, exception) = ExecuteCodeFile("conditional_import_test.old8");
 
         // Assert
         Assert.Null(exception);

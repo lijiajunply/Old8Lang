@@ -13,8 +13,28 @@ public class SelectiveImportTests(ITestOutputHelper output) : ModuleImportTestBa
     [Fact]
     public void Import_SelectiveFunctions_ShouldImportOnlySpecifiedFunctions()
     {
+        // Arrange
+        var testContent = """
+            // 选择导入测试 - 从模块中导入特定功能
+            import { CalculateLargeNumber, PI } from "lazy_math"
+
+            // 直接使用导入的函数，不需要模块前缀
+            result1 <- CalculateLargeNumber()
+            result2 <- PI
+
+            // 测试未导入的函数应该不可用（会报错）
+            try {
+                result3 <- HeavyOperation()
+                error_occurred <- false
+            } catch {
+                error_occurred <- true
+                error_message <- "Function not imported"
+            }
+            """;
+        CreateTempModuleFile("selective_import_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_SelectiveImport.old8");
+        var (interpreter, exception) = ExecuteCodeFile("selective_import_test.old8");
 
         // Assert
         Assert.Null(exception);
@@ -30,8 +50,28 @@ public class SelectiveImportTests(ITestOutputHelper output) : ModuleImportTestBa
     [Fact]
     public void Import_SelectiveFromModule_ShouldImportSpecificItems()
     {
+        // Arrange
+        var testContent = """
+            // 从模块选择导入测试
+            import CalculateLargeNumber, HeavyOperation from "lazy_math"
+
+            // 直接使用导入的函数，无需模块前缀
+            result1 <- CalculateLargeNumber()
+            result2 <- HeavyOperation()
+
+            // 测试未导入的常量应该不可用
+            try {
+                result3 <- PI
+                error_occurred <- false
+            } catch {
+                error_occurred <- true
+                error_message <- "Constant not imported"
+            }
+            """;
+        CreateTempModuleFile("selective_from_module_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_SelectiveFromModule.new.old8");
+        var (interpreter, exception) = ExecuteCodeFile("selective_from_module_test.old8");
 
         // Assert
         Assert.Null(exception);

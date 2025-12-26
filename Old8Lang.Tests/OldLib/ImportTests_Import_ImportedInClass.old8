@@ -1,8 +1,0 @@
-import "MathLib"
-class Calculator {
-    func distance(x1:double, y1:double, x2:double, y2:double) -> double {
-        return Sqrt(Pow(x2 - x1, 2) + Pow(y2 - y1, 2))
-    }
-}
-calc <- Calculator()
-result <- calc.distance(0, 0, 3, 4)

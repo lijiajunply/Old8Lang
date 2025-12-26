@@ -73,14 +73,14 @@ public abstract class ModuleImportTestBase(ITestOutputHelper output) : IDisposab
 
         if (!File.Exists(fullPath))
         {
-            // 如果文件不存在，创建一个占位文件或跳过测试
+            string? content = null;
+
             // 对于 StandardLibrary 下的测试文件，创建基本的导入语句
             if (relativeFilePath.StartsWith("StandardLibrary/"))
             {
                 var fileName = Path.GetFileNameWithoutExtension(relativeFilePath);
 
                 // 从文件名中提取库名和生成文件内容
-                string content;
                 if (fileName == "multiple_stdlib_import_test")
                 {
                     content = "import \"OS\"\nimport \"MathLib\"\nimport \"Time\"\nOS <- OS\nMathLib <- MathLib\nTime <- Time";
@@ -137,10 +137,20 @@ public abstract class ModuleImportTestBase(ITestOutputHelper output) : IDisposab
                     content = $"import \"{libraryName}\"\n{libraryName} <- {libraryName}";
                 }
 
-                // 创建 StandardLibrary 目录和测试文件
+                // 创建 StandardLibrary 目录
                 var stdLibDir = Path.Combine(TestFilesDirectory, "StandardLibrary");
                 Directory.CreateDirectory(stdLibDir);
+            }
+
+            // 如果生成了内容，写入文件
+            if (content != null)
+            {
                 fullPath = Path.Combine(TestFilesDirectory, relativeFilePath);
+                var directory = Path.GetDirectoryName(fullPath);
+                if (!string.IsNullOrEmpty(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
                 File.WriteAllText(fullPath, content);
             }
             else

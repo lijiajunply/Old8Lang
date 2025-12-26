@@ -1,2 +1,0 @@
-import "math"
-result <- Round(3.14159)

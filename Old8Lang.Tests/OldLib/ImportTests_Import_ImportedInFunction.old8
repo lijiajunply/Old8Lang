@@ -1,5 +1,0 @@
-func calculateCircleArea(radius:double) -> double {
-    import "MathLib"
-    return GetPi() * Pow(radius, 2)
-}
-result <- calculateCircleArea(5.0)

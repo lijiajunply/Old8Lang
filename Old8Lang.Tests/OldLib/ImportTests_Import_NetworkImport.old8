@@ -1,2 +1,0 @@
-import "https://api.example.com/utils" as apiUtils
-result <- apiUtils.Sqrt(25)

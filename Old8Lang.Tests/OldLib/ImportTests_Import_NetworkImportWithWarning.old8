@@ -1,7 +1,0 @@
-// 网络导入测试 - 会显示安全警告
-import "https://api.example.com/utils" as api
-
-// 使用网络导入的工具
-result1 <- api.Sqrt(25)
-result2 <- api.FetchData("https://data.example.com/info")
-result3 <- api.API_VERSION

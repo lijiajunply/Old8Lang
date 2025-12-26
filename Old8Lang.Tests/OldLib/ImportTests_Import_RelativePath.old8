@@ -1,2 +1,0 @@
-import "./simple_math"
-result <- square(5)

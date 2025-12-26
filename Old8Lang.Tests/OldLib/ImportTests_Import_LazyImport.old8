@@ -1,3 +1,0 @@
-import "MathLib"
-result1 <- "Not loaded"
-result2 <- 123

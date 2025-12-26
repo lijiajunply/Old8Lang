@@ -1,3 +1,0 @@
-import "module.main"
-// main module imports submodules
-result <- module.main.getCombinedData()

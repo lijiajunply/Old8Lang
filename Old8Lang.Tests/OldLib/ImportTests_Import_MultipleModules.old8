@@ -1,4 +1,0 @@
-import "MathLib"
-import "OS"
-result1 <- Abs(-5)
-result2 <- Abs(5)

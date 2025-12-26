@@ -13,8 +13,15 @@ public class AliasImportTests(ITestOutputHelper output) : ModuleImportTestBase(o
     [Fact]
     public void Import_ModuleWithAlias_ShouldUseAliasCorrectly()
     {
+        // Arrange
+        var testContent = """
+            import "MathLib" as m
+            result <- m.sqrt(25)
+            """;
+        CreateTempModuleFile("with_alias_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_WithAlias.old8");
+        var (interpreter, exception) = ExecuteCodeFile("with_alias_test.old8");
 
         // Assert
         Assert.Null(exception);
@@ -96,8 +103,16 @@ string_result <- s.repeat(""Hello"", 3)
     [Fact]
     public void Import_FunctionAlias_ShouldCreateFunctionAlias()
     {
+        // Arrange
+        var testContent = """
+            import "MathLib"
+            angle <- GetPi() / 4
+            result <- Sin(angle) / Cos(angle)
+            """;
+        CreateTempModuleFile("alias_function_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_AliasFunction.old8");
+        var (interpreter, exception) = ExecuteCodeFile("alias_function_test.old8");
 
         // Assert
         Assert.Null(exception);

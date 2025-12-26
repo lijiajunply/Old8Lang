@@ -13,8 +13,15 @@ public class WildcardImportTests(ITestOutputHelper output) : ModuleImportTestBas
     [Fact]
     public void Import_Wildcard_ShouldImportAllFunctions()
     {
+        // Arrange
+        var testContent = """
+            import "MathLib"
+            result <- Sqrt(100)
+            """;
+        CreateTempModuleFile("wildcard_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_WithWildCard.old8");
+        var (interpreter, exception) = ExecuteCodeFile("wildcard_test.old8");
 
         // Assert
         Assert.Null(exception);

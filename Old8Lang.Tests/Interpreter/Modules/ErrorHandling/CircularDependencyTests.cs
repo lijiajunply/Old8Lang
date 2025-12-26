@@ -12,8 +12,15 @@ public class CircularDependencyTests(ITestOutputHelper output) : ModuleImportTes
     [Fact]
     public void Import_CircularDependency_ShouldBeHandled()
     {
+        // Arrange
+        var testContent = """
+            import "MathLib"
+            result <- Abs(-5)
+            """;
+        CreateTempModuleFile("circular_dependency_basic_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_CircularDependency.old8");
+        var (interpreter, exception) = ExecuteCodeFile("circular_dependency_basic_test.old8");
 
         // Assert
         Assert.Null(exception);

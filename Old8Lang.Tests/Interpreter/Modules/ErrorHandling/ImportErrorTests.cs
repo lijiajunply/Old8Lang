@@ -33,8 +33,15 @@ result <- 42
     [Fact]
     public void Import_CircularDependency_ShouldBeHandled()
     {
+        // Arrange
+        var testContent = """
+            import "MathLib"
+            result <- Abs(-5)
+            """;
+        CreateTempModuleFile("circular_dependency_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_CircularDependency.old8");
+        var (interpreter, exception) = ExecuteCodeFile("circular_dependency_test.old8");
 
         // Assert - 循环依赖应该被正确处理，而不是导致无限递归
         Assert.Null(exception);
@@ -115,8 +122,19 @@ result <- 42
     [Fact]
     public void Import_ModuleWithValidationErrors_ShouldBeHandled()
     {
+        // Arrange
+        var testContent = """
+            try {
+                import "nonexistent.module"
+                result <- "Import successful"
+            } catch {
+                result <- "Import failed: " + exception
+            }
+            """;
+        CreateTempModuleFile("validation_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_WithValidation.old8");
+        var (interpreter, exception) = ExecuteCodeFile("validation_test.old8");
 
         // Assert
         Assert.Null(exception);

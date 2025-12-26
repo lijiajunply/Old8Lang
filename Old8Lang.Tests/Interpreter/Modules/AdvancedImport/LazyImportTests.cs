@@ -12,8 +12,16 @@ public class LazyImportTests(ITestOutputHelper output) : ModuleImportTestBase(ou
     [Fact]
     public void Import_LazyBasic_ShouldDelayImportUntilUse()
     {
+        // Arrange
+        var testContent = """
+            import "MathLib"
+            result1 <- "Not loaded"
+            result2 <- 123
+            """;
+        CreateTempModuleFile("lazy_basic_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_LazyImport.old8");
+        var (interpreter, exception) = ExecuteCodeFile("lazy_basic_test.old8");
 
         // Assert
         Assert.Null(exception);
@@ -27,8 +35,30 @@ public class LazyImportTests(ITestOutputHelper output) : ModuleImportTestBase(ou
     [Fact]
     public void Import_LazyNewSyntax_ShouldWorkWithNewSyntax()
     {
+        // Arrange
+        var testContent = """
+            // 懒导入测试 - 只有在实际使用时才加载模块
+            lazy import "lazy_math"
+
+            // 检查模块是否已加载（此时应该还未加载）
+            status1 <- "Not loaded"
+
+            // 使用懒导入模块中的函数（此时会触发加载）
+            result1 <- CalculateLargeNumber()
+
+            // 使用模块中的常量
+            result2 <- PI
+
+            // 再次使用函数
+            result3 <- HeavyOperation()
+
+            // 此时模块应该已经加载
+            status2 <- "Loaded"
+            """;
+        CreateTempModuleFile("lazy_new_syntax_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_LazyImport.new.old8");
+        var (interpreter, exception) = ExecuteCodeFile("lazy_new_syntax_test.old8");
 
         // Assert
         Assert.Null(exception);
@@ -44,8 +74,35 @@ public class LazyImportTests(ITestOutputHelper output) : ModuleImportTestBase(ou
     [Fact]
     public void Import_LazySelective_ShouldDelaySelectiveImport()
     {
+        // Arrange
+        var testContent = """
+            // 选择性懒导入测试 - 懒导入特定函数
+            lazy import { CalculateLargeNumber, PI } from "lazy_math"
+
+            // 检查函数是否可用（此时应该还未加载）
+            status1 <- "Not loaded"
+
+            // 使用导入的函数（此时会触发加载）
+            result1 <- CalculateLargeNumber()
+
+            // 使用导入的常量
+            result2 <- PI
+
+            // 测试未导入的函数应该不可用
+            try {
+                result3 <- HeavyOperation()
+                error_occurred <- false
+            } catch {
+                error_occurred <- true
+                error_message <- "Function not imported"
+            }
+
+            status2 <- "Loaded"
+            """;
+        CreateTempModuleFile("lazy_selective_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_LazyImportSelective.new.old8");
+        var (interpreter, exception) = ExecuteCodeFile("lazy_selective_test.old8");
 
         // Assert
         Assert.Null(exception);
@@ -63,8 +120,30 @@ public class LazyImportTests(ITestOutputHelper output) : ModuleImportTestBase(ou
     [Fact]
     public void Import_LazyWithAlias_ShouldDelayImportWithAlias()
     {
+        // Arrange
+        var testContent = """
+            // 懒导入带别名测试
+            lazy import "lazy_math" as math
+
+            // 检查模块是否已加载（此时应该还未加载）
+            status1 <- "Not loaded"
+
+            // 使用别名调用函数（此时会触发加载）
+            result1 <- math.CalculateLargeNumber()
+
+            // 使用别名访问常量
+            result2 <- math.PI
+
+            // 再次使用别名调用函数
+            result3 <- math.HeavyOperation()
+
+            // 此时模块应该已经加载
+            status2 <- "Loaded"
+            """;
+        CreateTempModuleFile("lazy_alias_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_LazyImportAlias.new.old8");
+        var (interpreter, exception) = ExecuteCodeFile("lazy_alias_test.old8");
 
         // Assert
         Assert.Null(exception);
@@ -82,8 +161,26 @@ public class LazyImportTests(ITestOutputHelper output) : ModuleImportTestBase(ou
     [Fact]
     public void Import_LazyEnhanced_ShouldProvideEnhancedFeatures()
     {
+        // Arrange
+        var testContent = """
+            // 懒导入测试 - 模块在首次使用时才加载
+            import "lazy_math" as math
+
+            // 模块还未加载
+            status1 <- "Not loaded"
+
+            // 首次使用模块，触发懒加载
+            result1 <- math.CalculateLargeNumber()
+            status2 <- "Loaded"
+
+            // 再次使用，直接使用缓存的模块
+            result2 <- math.PI()
+            result3 <- math.HeavyOperation()
+            """;
+        CreateTempModuleFile("lazy_enhanced_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_LazyImportEnhanced.old8");
+        var (interpreter, exception) = ExecuteCodeFile("lazy_enhanced_test.old8");
 
         // Assert
         Assert.Null(exception);

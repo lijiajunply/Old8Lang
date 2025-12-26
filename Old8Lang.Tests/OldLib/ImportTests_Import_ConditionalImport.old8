@@ -1,3 +1,0 @@
-import "MathLib"
-useDebug <- true
-result <- "logging imported"

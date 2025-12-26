@@ -1,3 +1,0 @@
-import "plugin.imageProcessor" as imgProc
-processor <- imgProc.create("jpeg")
-result <- processor.process("image.jpg")

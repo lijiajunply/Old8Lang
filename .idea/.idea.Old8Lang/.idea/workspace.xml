@@ -24,12 +24,17 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/AliasImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/AliasImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/SelectiveImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/SelectiveImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/SimpleImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/SimpleImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/WildcardImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/WildcardImportTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/mymodule/__init__.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/mymodule/core/__init__.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/mymodule/submodule/__init__.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/mymodule/submodule/deep/nested/__init__.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/mymodule/submodule/utils.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/ErrorHandling/CircularDependencyTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/ErrorHandling/CircularDependencyTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/ErrorHandling/ImportErrorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/ErrorHandling/ImportErrorTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Integration/ComplexImportScenariosTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Integration/ComplexImportScenariosTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_MultipleModules.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/MathLib.old8" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,6 +75,12 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/BasicImport/SimpleImportTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
@@ -464,7 +475,7 @@
       <workItem from="1766441034395" duration="1692000" />
       <workItem from="1766461431015" duration="981000" />
       <workItem from="1766746850670" duration="17415000" />
-      <workItem from="1766771063664" duration="4200000" />
+      <workItem from="1766771063664" duration="5375000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -809,7 +820,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="371" />
+    <option name="localTasksCounter" value="372" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -836,7 +847,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(import): 优化导入语句处理逻辑和包管理器实现&#10;&#10;- 移除 ImportStatement 中未使用的 resolvedPath 变量声明&#10;- 将 ImportStatement 中的局部变量改为 var 声明方式&#10;- 删除 IsInLibrary 方法及其相关注释&#10;- 为 LangInfo 的 LibInfos 属性添加过时标记&#10;- 将 PackageManager 中的 _virtualEnv 字段改为只读属性 VirtualEnv&#10;- 修复 PackageManager 中对虚拟环境的引用以使用新属性&#10;- 为 PackageInfo 类添加可序列化特性&#10;- 更新工作区配置文件中的变更记录" />
     <MESSAGE value="feat(package): 实现第三方包管理与加载功能&#10;&#10;- 添加包搜索路径管理和缓存机制&#10;- 实现包版本化目录查找和加载逻辑&#10;- 创建包入口文件自动发现机制&#10;- 添加包依赖解析和虚拟环境支持&#10;- 实现包加载错误处理和调试日志&#10;- 创建完整的包管理器运行时加载器&#10;- 添加 o8packages.json 配置文件支持&#10;- 实现包符号导入和模块缓存管理&#10;- 添加包别名功能和多包协同测试&#10;- 创建简化的包测试和完整流程测试&#10;- 实现运行时包信息获取和缓存清理&#10;- 重构包解析逻辑和搜索路径添加机制" />
     <MESSAGE value="refactor(package): 重构包管理服务实现&#10;&#10;- 移除未使用的导入语句 Old8Lang.Error 和 Old8Lang.ProjectManagement&#10;- 将私有字段 _projectRoot 重命名为 ProjectRoot 并调整访问修饰符&#10;- 移除 ConfigurePackageSources 方法中的 projectConfig 参数&#10;- 添加 NuGet 远程包源配置&#10;- 将 InstallPackageAsync 方法设为私有并移除 isDevelopmentDependency 参数&#10;- 更新项目根目录路径引用从 _projectRoot 到 ProjectRoot&#10;- 添加 Serializable 特性到 InstallPackageResult 和 RestoreResult 类&#10;- 初始化 FailedPackages 为集合字面量&#10;- 更新 IDE 配置文件以包含 Package.cs 文件的高亮设置" />
     <MESSAGE value="feat(package): 实现非项目模式下的全局包自动检测与加载&#10;&#10;- 添加非项目模式自动检测机制，当无o8packages.json时使用全局包&#10;- 更新包加载优先级：标准库 → 项目本地包 → 全局第三方包 → 相对路径文件&#10;- 添加全局包目录结构说明和配置文档&#10;- 创建non_project_test.old8测试文件验证非项目模式功能&#10;- 优化PackageManager构造函数，支持自动检测项目根目录&#10;- 更新虚拟环境检测逻辑，添加非项目模式运行日志&#10;- 修复包管理器在无项目配置时的全局包加载流程" />
@@ -861,7 +871,8 @@
     <MESSAGE value="refactor(ast): 重构模块对象中的懒加载实现和参数命名&#10;&#10;- 重命名 LazyItemWrapper 构造函数参数 moduleName 为 moduleNameItem&#10;- 移除 LazyItemWrapper 中不必要的字段声明，直接使用构造函数参数&#10;- 重命名所有模块对象中 manager 参数为 variateManager 以保持一致性&#10;- 重构 LazySymbolProxy 中的符号解析逻辑，优化线程安全机制&#10;- 修复 UnifiedModule 中的代码结构，使用 switch 表达式替代条件判断&#10;- 更新模块加载内部逻辑中的参数传递，确保参数名一致性&#10;- 优化 UnifiedModule 中的模块导入流程，移除不必要的 try-finally 块&#10;- 更新接口文档中的参数名称说明，保持与实现一致" />
     <MESSAGE value="feat(module): 实现新的模块系统架构&#10;&#10;- 添加 CacheManager 负责模块缓存管理&#10;- 添加 ExportController 管理模块导出规则&#10;- 添加 ModuleLoader 实现模块加载和解析功能&#10;- 添加 ModuleResolver 实现模块路径解析逻辑&#10;- 重构 ImportStatement 使用新的模块系统服务&#10;- 更新循环依赖测试验证模块系统异常处理&#10;- 添加 ModuleImportTestBase 的资源清理机制&#10;- 创建模块系统迁移指南文档" />
     <MESSAGE value="chore(build): 更新 .gitignore 配置&#10;&#10;- 添加 .DS_Store 到忽略列表&#10;- 添加 Old8Lang.Tests/OldLib 到忽略列表" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore(build): 更新 .gitignore 配置&#10;&#10;- 添加 .DS_Store 到忽略列表&#10;- 添加 Old8Lang.Tests/OldLib 到忽略列表" />
+    <MESSAGE value="test(module): 添加条件导入和动态导入测试用例&#10;&#10;- 在 ConditionalImportTests 中添加条件导入测试内容&#10;- 在 DynamicImportTests 中添加动态导入测试内容&#10;- 重构 ModuleImportTestBase 中的测试文件目录获取逻辑&#10;- 为 StandardLibrary 测试文件添加自动生成内容功能&#10;- 移除临时文件清理方法调用&#10;- 更新 IDE 配置文件中的变更列表和高亮设置" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(module): 添加条件导入和动态导入测试用例&#10;&#10;- 在 ConditionalImportTests 中添加条件导入测试内容&#10;- 在 DynamicImportTests 中添加动态导入测试内容&#10;- 重构 ModuleImportTestBase 中的测试文件目录获取逻辑&#10;- 为 StandardLibrary 测试文件添加自动生成内容功能&#10;- 移除临时文件清理方法调用&#10;- 更新 IDE 配置文件中的变更列表和高亮设置" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1157,10 +1168,10 @@
           <line>213</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" containingFunctionPresentation="方法 'Import_ConditionalWithComplexExpression_ShouldEvaluateExpression'">
             <startOffsets>
-              <option value="6722" />
+              <option value="6658" />
             </startOffsets>
             <endOffsets>
-              <option value="6818" />
+              <option value="6754" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="594" />
@@ -1170,10 +1181,10 @@
           <line>212</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" containingFunctionPresentation="方法 'Import_ConditionalWithComplexExpression_ShouldEvaluateExpression'">
             <startOffsets>
-              <option value="6690" />
+              <option value="6626" />
             </startOffsets>
             <endOffsets>
-              <option value="6713" />
+              <option value="6649" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="595" />

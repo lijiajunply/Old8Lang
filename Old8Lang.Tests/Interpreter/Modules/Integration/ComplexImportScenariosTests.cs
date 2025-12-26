@@ -12,8 +12,16 @@ public class ComplexImportScenariosTests(ITestOutputHelper output) : ModuleImpor
     [Fact]
     public void Import_ImportChain_ShouldHandleImportChains()
     {
+        // Arrange
+        var testContent = """
+            import "module.main"
+            // main module imports submodules
+            result <- module.main.getCombinedData()
+            """;
+        CreateTempModuleFile("import_chain_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_ImportChain.old8");
+        var (interpreter, exception) = ExecuteCodeFile("import_chain_test.old8");
 
         // Assert
         Assert.Null(exception);
@@ -29,17 +37,17 @@ public class ComplexImportScenariosTests(ITestOutputHelper output) : ModuleImpor
         // Arrange - 创建多级依赖树
         var leaf1Content = @"
 func leaf1Function() -> string { return ""Leaf1"" }
-const LEAF1_CONST <- 100
+LEAF1_CONST:const <- 100
 ";
 
         var leaf2Content = @"
 func leaf2Function() -> string { return ""Leaf2"" }
-const LEAF2_CONST <- 200
+LEAF2_CONST:const <- 200
 ";
 
         var leaf3Content = @"
 func leaf3Function() -> string { return ""Leaf3"" }
-const LEAF3_CONST <- 300
+LEAF3_CONST:const <- 300
 ";
 
         var middle1Content = @"

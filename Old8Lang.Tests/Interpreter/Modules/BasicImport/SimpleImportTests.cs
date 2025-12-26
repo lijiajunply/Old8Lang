@@ -1,5 +1,6 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Error;
 using Old8Lang.Tests.Interpreter.Modules.Core;
 using Xunit.Abstractions;
 
@@ -44,8 +45,15 @@ result2 <- test_math.multiply(4.0, 5.0)
     [Fact]
     public void Import_ExistingMathModule_ShouldWorkCorrectly()
     {
+        // Arrange
+        var testContent = """
+            import "MathLib" as m
+            result <- m.sqrt(25)
+            """;
+        CreateTempModuleFile("alias_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_WithAlias.old8");
+        var (interpreter, exception) = ExecuteCodeFile("alias_test.old8");
 
         // Assert
         Assert.Null(exception);
@@ -58,8 +66,16 @@ result2 <- test_math.multiply(4.0, 5.0)
     [Fact]
     public void Import_MultipleFunctions_ShouldImportAllFunctions()
     {
+        // Arrange
+        var testContent = """
+            import "MathLib"
+            result1 <- Sqrt(25)
+            result2 <- Pow(2, 3)
+            """;
+        CreateTempModuleFile("specific_func_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_SpecificFunction.old8");
+        var (interpreter, exception) = ExecuteCodeFile("specific_func_test.old8");
 
         // Assert
         Assert.Null(exception);
@@ -80,14 +96,22 @@ result2 <- test_math.multiply(4.0, 5.0)
         CreateTempModuleFile("test_error.old8", testContent);
 
         // Act & Assert
-        AssertExecutionThrows("test_error.old8", typeof(Exception));
+        AssertExecutionThrows("test_error.old8", typeof(ImportError));
     }
 
     [Fact]
     public void Import_ImportSameModuleTwice_ShouldNotDuplicate()
     {
+        // Arrange
+        var testContent = """
+            import "MathLib"
+            result1 <- Sqrt(9)
+            result2 <- Sqrt(16)
+            """;
+        CreateTempModuleFile("reimport_test.old8", testContent);
+
         // Act
-        var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_ReimportSameModule.old8");
+        var (interpreter, exception) = ExecuteCodeFile("reimport_test.old8");
 
         // Assert
         Assert.Null(exception);

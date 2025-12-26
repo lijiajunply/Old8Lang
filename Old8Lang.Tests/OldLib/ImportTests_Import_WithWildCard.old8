@@ -1,2 +1,0 @@
-import "math"
-result <- sqrt(100)

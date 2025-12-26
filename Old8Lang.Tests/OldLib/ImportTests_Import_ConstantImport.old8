@@ -1,4 +1,0 @@
-import { SPEED_OF_LIGHT, GRAVITY } from "physics"
-energy <- 42.0 * SPEED_OF_LIGHT * SPEED_OF_LIGHT
-force <- 10.0 * GRAVITY
-result <- "Energy: " + energy.ToStr() + ", Force: " + force.ToStr()
