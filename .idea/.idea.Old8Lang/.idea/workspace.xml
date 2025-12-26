@@ -21,20 +21,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/AliasImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/AliasImportTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/SelectiveImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/SelectiveImportTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/SimpleImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/SimpleImportTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/WildcardImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/WildcardImportTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/ErrorHandling/CircularDependencyTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/ErrorHandling/CircularDependencyTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/ErrorHandling/ImportErrorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/ErrorHandling/ImportErrorTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Integration/ComplexImportScenariosTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Integration/ComplexImportScenariosTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/ImportTests_Import_MultipleModules.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/OldLib/MathLib.old8" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,6 +63,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/BasicImport/AliasImportTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/BasicImport/SimpleImportTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
@@ -475,7 +463,7 @@
       <workItem from="1766441034395" duration="1692000" />
       <workItem from="1766461431015" duration="981000" />
       <workItem from="1766746850670" duration="17415000" />
-      <workItem from="1766771063664" duration="5375000" />
+      <workItem from="1766771063664" duration="5840000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -820,7 +808,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="372" />
+    <option name="localTasksCounter" value="374" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -847,8 +835,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(package): 实现第三方包管理与加载功能&#10;&#10;- 添加包搜索路径管理和缓存机制&#10;- 实现包版本化目录查找和加载逻辑&#10;- 创建包入口文件自动发现机制&#10;- 添加包依赖解析和虚拟环境支持&#10;- 实现包加载错误处理和调试日志&#10;- 创建完整的包管理器运行时加载器&#10;- 添加 o8packages.json 配置文件支持&#10;- 实现包符号导入和模块缓存管理&#10;- 添加包别名功能和多包协同测试&#10;- 创建简化的包测试和完整流程测试&#10;- 实现运行时包信息获取和缓存清理&#10;- 重构包解析逻辑和搜索路径添加机制" />
-    <MESSAGE value="refactor(package): 重构包管理服务实现&#10;&#10;- 移除未使用的导入语句 Old8Lang.Error 和 Old8Lang.ProjectManagement&#10;- 将私有字段 _projectRoot 重命名为 ProjectRoot 并调整访问修饰符&#10;- 移除 ConfigurePackageSources 方法中的 projectConfig 参数&#10;- 添加 NuGet 远程包源配置&#10;- 将 InstallPackageAsync 方法设为私有并移除 isDevelopmentDependency 参数&#10;- 更新项目根目录路径引用从 _projectRoot 到 ProjectRoot&#10;- 添加 Serializable 特性到 InstallPackageResult 和 RestoreResult 类&#10;- 初始化 FailedPackages 为集合字面量&#10;- 更新 IDE 配置文件以包含 Package.cs 文件的高亮设置" />
     <MESSAGE value="feat(package): 实现非项目模式下的全局包自动检测与加载&#10;&#10;- 添加非项目模式自动检测机制，当无o8packages.json时使用全局包&#10;- 更新包加载优先级：标准库 → 项目本地包 → 全局第三方包 → 相对路径文件&#10;- 添加全局包目录结构说明和配置文档&#10;- 创建non_project_test.old8测试文件验证非项目模式功能&#10;- 优化PackageManager构造函数，支持自动检测项目根目录&#10;- 更新虚拟环境检测逻辑，添加非项目模式运行日志&#10;- 修复包管理器在无项目配置时的全局包加载流程" />
     <MESSAGE value="refactor(code): 清理无用using引用并更新代码风格&#10;&#10;- 移除多个文件中的无用using语句，包括AST、GlobalFunctions、Commands等模块&#10;- 将数组初始化语法从new[]替换为集合字面量语法[]&#10;- 简化类型引用，移除冗余的命名空间前缀&#10;- 更新IDE配置文件中的变更记录和断点位置&#10;- 修复包管理器相关提交信息的历史记录" />
     <MESSAGE value="feat(import): 改进模块导入功能并修复路径处理&#10;&#10;- 更新ImportStatement.cs添加函数和类的导入查找逻辑&#10;- 修复模块导入时的路径创建问题，确保父目录存在&#10;- 添加嵌套模块和选择性导入测试用例&#10;- 更新常量声明语法从const BASE_CONST &lt;- 10到BASE_CONST:const &lt;- 10&#10;- 修改别名模块中函数声明为变量赋值语法&#10;- 调整选择性导入测试中的模块路径处理方式&#10;- 添加nested/submodule/module.old8测试文件&#10;- 更新IDE配置文件中的变更记录" />
@@ -872,7 +858,9 @@
     <MESSAGE value="feat(module): 实现新的模块系统架构&#10;&#10;- 添加 CacheManager 负责模块缓存管理&#10;- 添加 ExportController 管理模块导出规则&#10;- 添加 ModuleLoader 实现模块加载和解析功能&#10;- 添加 ModuleResolver 实现模块路径解析逻辑&#10;- 重构 ImportStatement 使用新的模块系统服务&#10;- 更新循环依赖测试验证模块系统异常处理&#10;- 添加 ModuleImportTestBase 的资源清理机制&#10;- 创建模块系统迁移指南文档" />
     <MESSAGE value="chore(build): 更新 .gitignore 配置&#10;&#10;- 添加 .DS_Store 到忽略列表&#10;- 添加 Old8Lang.Tests/OldLib 到忽略列表" />
     <MESSAGE value="test(module): 添加条件导入和动态导入测试用例&#10;&#10;- 在 ConditionalImportTests 中添加条件导入测试内容&#10;- 在 DynamicImportTests 中添加动态导入测试内容&#10;- 重构 ModuleImportTestBase 中的测试文件目录获取逻辑&#10;- 为 StandardLibrary 测试文件添加自动生成内容功能&#10;- 移除临时文件清理方法调用&#10;- 更新 IDE 配置文件中的变更列表和高亮设置" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(module): 添加条件导入和动态导入测试用例&#10;&#10;- 在 ConditionalImportTests 中添加条件导入测试内容&#10;- 在 DynamicImportTests 中添加动态导入测试内容&#10;- 重构 ModuleImportTestBase 中的测试文件目录获取逻辑&#10;- 为 StandardLibrary 测试文件添加自动生成内容功能&#10;- 移除临时文件清理方法调用&#10;- 更新 IDE 配置文件中的变更列表和高亮设置" />
+    <MESSAGE value="test(module): 更新导入测试用例和模块系统测试基础&#10;&#10;- 为别名导入测试添加临时文件创建和测试内容&#10;- 为函数别名导入测试添加临时文件创建和测试内容&#10;- 为循环依赖测试添加临时文件创建和测试内容&#10;- 为导入链测试添加临时文件创建和测试内容&#10;- 为条件导入测试添加临时文件创建和测试内容&#10;- 为动态导入测试添加临时文件创建和测试内容&#10;- 为懒加载基本功能测试添加临时文件创建和测试内容&#10;- 为懒加载新语法测试添加临时文件创建和测试内容&#10;- 为选择性懒加载测试添加临时文件创建和测试内容&#10;- 为带别名懒加载测试添加临时文件创建和测试内容&#10;- 为增强懒加载功能测试添加临时文件创建和测试内容&#10;- 为选择性函数导入测试添加临时文件创建和测试内容&#10;- 为模块选择性导入测试添加临时文件创建和测试内容&#10;- 重构模块导入测试基类中的文件内容处理逻辑&#10;- 更新IDE配置文件中的变更记录和工作项计数器" />
+    <MESSAGE value="refactor(tests): 移除标准库测试文件的条件逻辑&#10;&#10;- 移除了 StandardLibrary 测试文件的动态内容生成逻辑&#10;- 删除了基于文件名的标准库导入语句创建功能&#10;- 移除了 OS、MathLib、Time 等标准库的条件判断分支&#10;- 移除了标准库别名导入和多库导入的测试内容生成&#10;- 简化了测试文件创建流程，移除了标准库目录创建逻辑" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(tests): 移除标准库测试文件的条件逻辑&#10;&#10;- 移除了 StandardLibrary 测试文件的动态内容生成逻辑&#10;- 删除了基于文件名的标准库导入语句创建功能&#10;- 移除了 OS、MathLib、Time 等标准库的条件判断分支&#10;- 移除了标准库别名导入和多库导入的测试内容生成&#10;- 简化了测试文件创建流程，移除了标准库目录创建逻辑" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

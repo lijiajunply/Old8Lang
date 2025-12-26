@@ -158,10 +158,10 @@ string_result <- s.repeat(""Hello"", 3)
     }
 
     [Theory]
-    [InlineData("m", "import \"math\" as m")]
-    [InlineData("math_lib", "import \"math\" as math_lib")]
-    [InlineData("_private", "import \"math\" as _private")]
-    [InlineData("module123", "import \"math\" as module123")]
+    [InlineData("m", "import \"math1\" as m")]
+    [InlineData("math_lib", "import \"math1\" as math_lib")]
+    [InlineData("_private", "import \"math1\" as _private")]
+    [InlineData("module123", "import \"math1\" as module123")]
     public void Import_DifferentAliasNames_ShouldWork(string aliasName, string importStatement)
     {
         // Arrange
@@ -173,7 +173,7 @@ func getValue() -> int { return 42 }
 result <- {aliasName}.getValue()
 ";
 
-        CreateTempModuleFile("math.old8", moduleContent);
+        CreateTempModuleFile("math1.old8", moduleContent);
         CreateTempModuleFile($"alias_{aliasName}_test.old8", testContent);
 
         // Act

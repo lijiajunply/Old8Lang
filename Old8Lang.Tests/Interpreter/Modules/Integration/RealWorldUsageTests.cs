@@ -214,7 +214,7 @@ func render(sprite:dict) -> string {
 ";
 
         var gameModule = @"
-import ""math"" as math
+import ""math2"" as math
 import ""graphics"" as gfx
 
 player <- gfx.createSprite(""player.png"")
@@ -239,7 +239,7 @@ func updateGame() -> string {
 result <- updateGame()
 ";
 
-        CreateTempModuleFile("math.old8", mathModule);
+        CreateTempModuleFile("math2.old8", mathModule);
         CreateTempModuleFile("graphics.old8", graphicsModule);
         CreateTempModuleFile("game.old8", gameModule);
 
