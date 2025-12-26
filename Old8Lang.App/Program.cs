@@ -124,6 +124,14 @@ public abstract class Program
         CommandRegistry.Register(new RestoreCommand());
         CommandRegistry.Register(new ListCommand());
 
+        // 包打包和签名命令
+        CommandRegistry.Register(new PackCommand());
+        CommandRegistry.Register(new UnpackCommand());
+        CommandRegistry.Register(new SignCommand());
+        CommandRegistry.Register(new VerifyCommand());
+        CommandRegistry.Register(new CertCommand());
+        CommandRegistry.Register(new PublishCommand());
+
         // 别名支持 - 直接注册别名指向相同命令实例
         var listCommand = new ListCommand();
         CommandRegistry.Register(listCommand);

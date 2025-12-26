@@ -2,6 +2,7 @@ using Old8Lang.PackageManager.Core.Interfaces;
 using Old8Lang.PackageManager.Core.Models;
 using Old8Lang.PackageManager.Core.Services;
 using Old8Lang.ProjectManagement;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Old8Lang.App.Services;
 
@@ -16,6 +17,8 @@ public class PackageService
     private readonly IPackageResolver Resolver;
     private readonly IPackageInstaller Installer;
     private readonly IPackageConfigurationManager ConfigManager;
+    private readonly IPackageArchiveService ArchiveService;
+    private readonly IPackageSignatureService SignatureService;
 
     /// <summary>
     /// 包目录路径
@@ -38,6 +41,8 @@ public class PackageService
         Resolver = new DefaultPackageResolver();
         Installer = new DefaultPackageInstaller(SourceManager, Resolver);
         ConfigManager = new DefaultPackageConfigurationManager();
+        ArchiveService = new PackageArchiveService(){PackageMetadataFileName = "o8package.json"};
+        SignatureService = new PackageSignatureService();
 
         // 配置包源
         ConfigurePackageSources();
@@ -264,6 +269,163 @@ public class PackageService
 
         return cleanVersion;
     }
+
+    #region 打包功能
+
+    /// <summary>
+    /// 打包包文件夹为 .o8pkg 文件
+    /// </summary>
+    /// <param name="sourcePath">包文件夹路径</param>
+    /// <param name="outputPath">输出文件路径（可选）</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns>生成的包文件路径</returns>
+    public async Task<string> PackAsync(
+        string sourcePath,
+        string? outputPath = null,
+        CancellationToken cancellationToken = default)
+    {
+        return await ArchiveService.PackAsync(sourcePath, outputPath, cancellationToken);
+    }
+
+    /// <summary>
+    /// 解包 .o8pkg 文件
+    /// </summary>
+    /// <param name="packagePath">包文件路径</param>
+    /// <param name="destinationPath">目标文件夹路径</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    public async Task UnpackAsync(
+        string packagePath,
+        string destinationPath,
+        CancellationToken cancellationToken = default)
+    {
+        await ArchiveService.UnpackAsync(packagePath, destinationPath, cancellationToken);
+    }
+
+    /// <summary>
+    /// 验证包文件夹结构
+    /// </summary>
+    /// <param name="sourcePath">包文件夹路径</param>
+    /// <returns>验证结果（是否有效，错误消息）</returns>
+    public async Task<(bool IsValid, string Message)> ValidatePackageStructureAsync(string sourcePath)
+    {
+        return await ArchiveService.ValidatePackageStructureAsync(sourcePath);
+    }
+
+    /// <summary>
+    /// 从包文件夹读取包元数据
+    /// </summary>
+    /// <param name="sourcePath">包文件夹路径</param>
+    /// <returns>包元数据</returns>
+    public async Task<Package?> ReadPackageMetadataAsync(string sourcePath)
+    {
+        return await ArchiveService.ReadPackageMetadataAsync(sourcePath);
+    }
+
+    #endregion
+
+    #region 签名功能
+
+    /// <summary>
+    /// 签名包文件
+    /// </summary>
+    /// <param name="packagePath">包文件路径</param>
+    /// <param name="certificate">用于签名的证书</param>
+    /// <returns>包签名信息</returns>
+    public async Task<PackageSignature> SignPackageAsync(
+        string packagePath,
+        X509Certificate2 certificate)
+    {
+        return await SignatureService.SignPackageAsync(packagePath, certificate);
+    }
+
+    /// <summary>
+    /// 验证包签名
+    /// </summary>
+    /// <param name="packagePath">包文件路径</param>
+    /// <param name="signature">签名信息</param>
+    /// <returns>签名是否有效</returns>
+    public async Task<bool> VerifySignatureAsync(
+        string packagePath,
+        PackageSignature signature)
+    {
+        return await SignatureService.VerifySignatureAsync(packagePath, signature);
+    }
+
+    /// <summary>
+    /// 从文件读取签名
+    /// </summary>
+    /// <param name="signatureFilePath">签名文件路径</param>
+    /// <returns>包签名信息</returns>
+    public async Task<PackageSignature?> ReadSignatureAsync(string signatureFilePath)
+    {
+        return await SignatureService.ReadSignatureAsync(signatureFilePath);
+    }
+
+    /// <summary>
+    /// 将签名写入文件
+    /// </summary>
+    /// <param name="signature">签名信息</param>
+    /// <param name="signatureFilePath">签名文件路径</param>
+    public async Task WriteSignatureAsync(
+        PackageSignature signature,
+        string signatureFilePath)
+    {
+        await SignatureService.WriteSignatureAsync(signature, signatureFilePath);
+    }
+
+    /// <summary>
+    /// 生成自签名证书
+    /// </summary>
+    /// <param name="subjectName">证书主题名称</param>
+    /// <param name="email">电子邮件（可选）</param>
+    /// <param name="validityYears">有效期（年）</param>
+    /// <returns>生成的证书</returns>
+    public X509Certificate2 GenerateSelfSignedCertificate(
+        string subjectName,
+        string? email = null,
+        int validityYears = 5)
+    {
+        return SignatureService.GenerateSelfSignedCertificate(subjectName, email, validityYears);
+    }
+
+    /// <summary>
+    /// 从文件加载证书
+    /// </summary>
+    /// <param name="certPath">证书文件路径</param>
+    /// <param name="password">证书密码（可选）</param>
+    /// <returns>证书</returns>
+    public async Task<X509Certificate2> LoadCertificateAsync(
+        string certPath,
+        string? password = null)
+    {
+        return await SignatureService.LoadCertificateAsync(certPath, password);
+    }
+
+    /// <summary>
+    /// 导出证书到文件
+    /// </summary>
+    /// <param name="certificate">证书</param>
+    /// <param name="outputPath">输出文件路径</param>
+    /// <param name="password">密码（可选）</param>
+    public async Task ExportCertificateAsync(
+        X509Certificate2 certificate,
+        string outputPath,
+        string? password = null)
+    {
+        await SignatureService.ExportCertificateAsync(certificate, outputPath, password);
+    }
+
+    /// <summary>
+    /// 获取证书信息
+    /// </summary>
+    /// <param name="certificate">证书</param>
+    /// <returns>证书信息字符串</returns>
+    public string GetCertificateInfo(X509Certificate2 certificate)
+    {
+        return SignatureService.GetCertificateInfo(certificate);
+    }
+
+    #endregion
 }
 
 /// <summary>
