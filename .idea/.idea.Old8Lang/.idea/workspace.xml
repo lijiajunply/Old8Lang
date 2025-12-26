@@ -21,9 +21,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ImageLibExample.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ImageLib_README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/ImageLib.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -475,7 +478,7 @@
       <workItem from="1766441034395" duration="1692000" />
       <workItem from="1766461431015" duration="981000" />
       <workItem from="1766746850670" duration="17415000" />
-      <workItem from="1766771063664" duration="9796000" />
+      <workItem from="1766771063664" duration="11099000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -820,7 +823,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="379" />
+    <option name="localTasksCounter" value="380" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -847,7 +850,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(parser): 实现通配符导入语法支持&#10;&#10;- 添加 import * from &quot;module&quot; 语法解析功能&#10;- 支持通配符导入时导入所有模块成员&#10;- 更新测试文件中的导入语法格式&#10;- 修正模块常量声明语法，移除 const 关键字&#10;- 更新 IDE 配置文件中的变更记录" />
     <MESSAGE value="docs(reports): 移除过时的测试报告文件&#10;&#10;- 删除了旧的模块系统测试报告&#10;- 移除了全面评估报告&#10;- 清理了线程测试修复实施报告&#10;- 删除多个包管理集成测试报告&#10;- 移除了语法测试实施报告&#10;- 保持代码库整洁，移除不再需要的文档文件" />
     <MESSAGE value="refactor(interpreter): 迁移表达式和值类型访问方法到解释器访问者&#10;&#10;- 将 Operation、FunctionCallExpression、TernaryExpression 等表达式节点的访问方法迁移到 InterpreterVisitor&#10;- 将 ArrayLangValue、ListLangValue、DictionaryLangValue 等值类型节点的访问方法迁移到 InterpreterVisitor&#10;- 从生成的存根文件中移除已实现的访问方法&#10;- 更新工作区配置以反映文件变更状态" />
     <MESSAGE value="feat(cli): 合并 install 和 add 命令并移除虚拟环境支持&#10;&#10;- 将原 add 命令功能合并到 install 命令中，统一依赖管理&#10;- 移除虚拟环境相关代码和配置选项&#10;- 更新项目配置模型，使用 References 替代 Dependencies 和 DevDependencies&#10;- 修改包安装路径为全局 ~/.old8lang/packages 目录&#10;- 移除锁文件生成和管理功能&#10;- 更新 init 命令中的项目初始化逻辑和默认配置&#10;- 移除 list 命令中的全局包列表功能&#10;- 升级 Old8Lang.PackageManager.Core 依赖版本到 1.1.1" />
@@ -872,7 +874,8 @@
     <MESSAGE value="feat(module): 增强模块导入错误处理和符号提取功能&#10;&#10;- 添加ImportError构造函数支持自定义错误消息&#10;- 优化模块服务中的符号提取逻辑，支持限定范围的ImportInfos&#10;- 更新测试用例以使用更具体的异常类型&#10;- 修改集成测试中的数据结构和函数实现&#10;- 改进符号提取器的错误处理机制，当符号不存在时抛出ImportError" />
     <MESSAGE value="fix(parser): 修复动态导入解析器中的语法错误&#10;&#10;- 修正动态导入中字符串字面量的解析逻辑&#10;- 移除动态导入函数调用末尾的多余括号&#10;- 修复解析器中动态模块表达式的处理顺序&#10;- 优化IDE配置文件中的变更记录和历史提交信息" />
     <MESSAGE value="feat(ast): 添加嵌套类实例化支持&#10;&#10;- 在 AnyLangValue 中添加 TryInstantiateNestedClass 方法来处理嵌套类实例化&#10;- 支持 Level1().Level2() 这样的链式调用语法&#10;- 通过变量管理器查找嵌套类模板并创建新实例&#10;- 移除构造函数验证测试用例以优化测试结构" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(ast): 添加嵌套类实例化支持&#10;&#10;- 在 AnyLangValue 中添加 TryInstantiateNestedClass 方法来处理嵌套类实例化&#10;- 支持 Level1().Level2() 这样的链式调用语法&#10;- 通过变量管理器查找嵌套类模板并创建新实例&#10;- 移除构造函数验证测试用例以优化测试结构" />
+    <MESSAGE value="refactor(standard-library): 移除标准库版本信息并添加模板引擎支持&#10;&#10;- 从 StandardLibraryInfo 记录中移除 Version 属性&#10;- 从 StandardLibraryRegistry 中移除所有标准库的版本参数&#10;- 移除 GetAllLibraryNames 和 GetVersion 静态方法&#10;- 添加 TemplateEngine 标准库注册项&#10;- 修正 TemplateEngine 正则表达式以支持点号属性访问&#10;- 调整模板处理顺序为先循环后条件最后变量替换" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(standard-library): 移除标准库版本信息并添加模板引擎支持&#10;&#10;- 从 StandardLibraryInfo 记录中移除 Version 属性&#10;- 从 StandardLibraryRegistry 中移除所有标准库的版本参数&#10;- 移除 GetAllLibraryNames 和 GetVersion 静态方法&#10;- 添加 TemplateEngine 标准库注册项&#10;- 修正 TemplateEngine 正则表达式以支持点号属性访问&#10;- 调整模板处理顺序为先循环后条件最后变量替换" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -80,7 +80,9 @@ public static class StandardLibraryRegistry
             ]
         ),
         ["TemplateEngine"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "TemplateEngine")
+            ClassName: "TemplateEngine"),
+        ["ImageLib"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
+            ClassName: "ImageLib")
     };
 
     /// <summary>
