@@ -12,109 +12,64 @@ public static class StandardLibraryRegistry
     public static readonly Dictionary<string, StandardLibraryInfo> Libraries = new()
     {
         // 来自 Old8LangLib 的标准库
-        ["OS"] = new StandardLibraryInfo(
-            Name: "OS",
-            Version: "1.0",
-            AssemblyName: "Old8LangLib",
+        ["OS"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "OS"
         ),
 
-        ["File"] = new StandardLibraryInfo(
-            Name: "File",
-            Version: "1.0",
-            AssemblyName: "Old8LangLib",
+        ["File"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "FileLib"
         ),
 
-        ["Terminal"] = new StandardLibraryInfo(
-            Name: "Terminal",
-            Version: "1.0",
-            AssemblyName: "Old8LangLib",
+        ["Terminal"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "Terminal"
         ),
 
-        ["Time"] = new StandardLibraryInfo(
-            Name: "Time",
-            Version: "1.0",
-            AssemblyName: "Old8LangLib",
+        ["Time"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "Time"
         ),
 
-        ["MathLib"] = new StandardLibraryInfo(
-            Name: "MathLib",
-            Version: "1.0",
-            AssemblyName: "Old8LangLib",
+        ["MathLib"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "MathLib"
         ),
 
-        ["Async"] = new StandardLibraryInfo(
-            Name: "Async",
-            Version: "1.0",
-            AssemblyName: "Old8LangLib",
+        ["Async"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "AsyncLib"
         ),
 
-        ["Crypto"] = new StandardLibraryInfo(
-            Name: "Crypto",
-            Version: "1.0",
-            AssemblyName: "Old8LangLib",
+        ["Crypto"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "CryptoLib"
         ),
 
-        ["CollectionLib"] = new StandardLibraryInfo(
-            Name: "CollectionLib",
-            Version: "1.0",
-            AssemblyName: "Old8LangLib",
+        ["CollectionLib"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "CollectionLib"
         ),
 
-        ["Json"] = new StandardLibraryInfo(
-            Name: "Json",
-            Version: "1.0",
-            AssemblyName: "Old8LangLib",
+        ["Json"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "JsonLib"
         ),
 
-        ["Csv"] = new StandardLibraryInfo(
-            Name: "Csv",
-            Version: "1.0",
-            AssemblyName: "Old8LangLib",
+        ["Csv"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "Csv"
         ),
 
-        ["Vector"] = new StandardLibraryInfo(
-            Name: "Vector",
-            Version: "1.0",
-            AssemblyName: "Old8LangLib",
+        ["Vector"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "VectorLib"
         ),
 
-        ["Regex"] = new StandardLibraryInfo(
-            Name: "Regex",
-            Version: "1.0",
-            AssemblyName: "Old8LangLib",
+        ["Regex"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "RegexLib"
         ),
 
-        ["Sort"] = new StandardLibraryInfo(
-            Name: "Sort",
-            Version: "1.0",
-            AssemblyName: "Old8LangLib",
+        ["Sort"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "SortLib"
         ),
 
-        ["ColorfulTerminal"] = new StandardLibraryInfo(
-            Name: "ColorfulTerminal",
-            Version: "1.0",
-            AssemblyName: "Old8LangLib",
+        ["ColorfulTerminal"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "ColorfulTerminal"
         ),
 
         // 来自 Old8Lang.NetLib 的网络库（多类库）
-        ["Net"] = new StandardLibraryInfo(
-            Name: "Net",
-            Version: "1.0",
-            AssemblyName: "Old8Lang.NetLib",
+        ["Net"] = new StandardLibraryInfo(AssemblyName: "Old8Lang.NetLib",
             ClassNames:
             [
                 "SocketClient",
@@ -123,7 +78,9 @@ public static class StandardLibraryRegistry
                 "WebSocketClient",
                 "WebApiClient"
             ]
-        )
+        ),
+        ["TemplateEngine"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
+            ClassName: "TemplateEngine")
     };
 
     /// <summary>
@@ -137,18 +94,5 @@ public static class StandardLibraryRegistry
     public static StandardLibraryInfo? GetLibraryInfo(string name)
     {
         return Libraries.GetValueOrDefault(name);
-    }
-
-    /// <summary>
-    /// 获取所有标准库名称
-    /// </summary>
-    public static IEnumerable<string> GetAllLibraryNames() => Libraries.Keys;
-
-    /// <summary>
-    /// 获取标准库版本信息
-    /// </summary>
-    public static string GetVersion(string libraryName)
-    {
-        return Libraries.TryGetValue(libraryName, out var info) ? info.Version : "未知";
     }
 }

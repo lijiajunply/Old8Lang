@@ -26,8 +26,8 @@ public class TemplateEngine
     public TemplateEngine()
     {
         _globalVariables = new Dictionary<string, object>();
-        // 匹配 {{variable}} 格式的变量
-        _variableRegex = new Regex(@"\{\{\s*(\w+)\s*\}\}", RegexOptions.Compiled);
+        // 匹配 {{variable}} 或 {{object.property}} 格式的变量(支持点号属性访问)
+        _variableRegex = new Regex(@"\{\{\s*([\w.]+)\s*\}\}", RegexOptions.Compiled);
         // 匹配 {% if condition %}...{% endif %} 格式的条件语句
         _ifRegex = new Regex(@"\{\%\s*if\s+([^\%]+?)\s*\%\}(.*?)\{\%\s*endif\s*\%\}", RegexOptions.Singleline | RegexOptions.Compiled);
         // 匹配 {% for item in collection %}...{% endfor %} 格式的循环语句
@@ -108,13 +108,13 @@ public class TemplateEngine
         // 处理注释
         result = _commentRegex.Replace(result, "");
 
-        // 处理条件语句
-        result = ProcessIfStatements(result, context);
-
-        // 处理循环语句
+        // 先处理循环语句(因为循环内部可能包含条件语句和变量)
         result = ProcessForLoops(result, context);
 
-        // 处理变量替换
+        // 再处理条件语句(处理循环外部的条件语句)
+        result = ProcessIfStatements(result, context);
+
+        // 最后处理变量替换
         result = ProcessVariables(result, context);
 
         return result;
