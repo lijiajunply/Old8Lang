@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.Benchmarks", "Old8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.CodeGen", "Old8Lang.CodeGen\Old8Lang.CodeGen.csproj", "{22EA44B7-D159-4FE3-88CA-0FDADBF383F7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.SerializationLib", "Old8Lang.SerializationLib\Old8Lang.SerializationLib.csproj", "{D5910E51-60A7-4567-9361-EEC77B10A3F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -108,6 +110,18 @@ Global
 		{22EA44B7-D159-4FE3-88CA-0FDADBF383F7}.Release|x64.Build.0 = Release|Any CPU
 		{22EA44B7-D159-4FE3-88CA-0FDADBF383F7}.Release|x86.ActiveCfg = Release|Any CPU
 		{22EA44B7-D159-4FE3-88CA-0FDADBF383F7}.Release|x86.Build.0 = Release|Any CPU
+		{D5910E51-60A7-4567-9361-EEC77B10A3F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5910E51-60A7-4567-9361-EEC77B10A3F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5910E51-60A7-4567-9361-EEC77B10A3F1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D5910E51-60A7-4567-9361-EEC77B10A3F1}.Debug|x64.Build.0 = Debug|Any CPU
+		{D5910E51-60A7-4567-9361-EEC77B10A3F1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D5910E51-60A7-4567-9361-EEC77B10A3F1}.Debug|x86.Build.0 = Debug|Any CPU
+		{D5910E51-60A7-4567-9361-EEC77B10A3F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5910E51-60A7-4567-9361-EEC77B10A3F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5910E51-60A7-4567-9361-EEC77B10A3F1}.Release|x64.ActiveCfg = Release|Any CPU
+		{D5910E51-60A7-4567-9361-EEC77B10A3F1}.Release|x64.Build.0 = Release|Any CPU
+		{D5910E51-60A7-4567-9361-EEC77B10A3F1}.Release|x86.ActiveCfg = Release|Any CPU
+		{D5910E51-60A7-4567-9361-EEC77B10A3F1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
