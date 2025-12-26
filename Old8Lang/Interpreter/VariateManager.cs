@@ -626,6 +626,7 @@ public class VariateManager
             return x switch
             {
                 FuncLangValue func => func.Id!.IdName == id.IdName,
+                AsyncFuncLangValue asyncFunc => asyncFunc.Id!.IdName == id.IdName,
                 TypeTemplate template => template.ClassName == id.IdName,
                 NativeAnyLangValue na => na.RegisterName == id.IdName, // 使用 RegisterName 而不是 ClassName
                 NativeStaticAny staticAny => staticAny.ClassName == id.IdName,

@@ -180,9 +180,21 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
 
                 var funcValue = funcExpr.Run(manager);
 
-                if (funcValue is not FuncLangValue spawnFunc)
+                // 检查函数类型
+                FuncLangValue? spawnFunc = null;
+                AsyncFuncLangValue? asyncSpawnFunc = null;
+
+                if (funcValue is FuncLangValue func)
                 {
-                    throw new TypeError(this, "FuncValue", funcValue.GetType().Name);
+                    spawnFunc = func;
+                }
+                else if (funcValue is AsyncFuncLangValue asyncFunc)
+                {
+                    asyncSpawnFunc = asyncFunc;
+                }
+                else
+                {
+                    throw new TypeError(this, "FuncValue or AsyncFuncValue", funcValue.GetType().Name);
                 }
 
                 // 创建线程参数列表（跳过第一个函数参数）
@@ -203,7 +215,7 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
                 // 创建取消令牌源
                 var cts = new CancellationTokenSource();
 
-                // 调用函数
+                // 统一创建 ThreadLangValue，内部根据函数类型调用不同的执行方法
                 // 无参数情况
                 tempThread = threadArgs.Count == 0
                     ? new ThreadLangValue(ThreadCallback, Position, cts.Token)
@@ -222,8 +234,24 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
                 {
                     try
                     {
-                        // 调用函数
-                        var funcResult = spawnFunc.Run(threadManager, threadArgs, instanceContext);
+                        LangValueType funcResult;
+
+                        if (asyncSpawnFunc != null)
+                        {
+                            // 异步函数：调用 RunAsync 并等待完成
+                            var taskValue = asyncSpawnFunc.RunAsync(threadManager, threadArgs, cts.Token);
+                            // 等待任务完成并获取结果
+                            funcResult = taskValue.Await();
+                        }
+                        else if (spawnFunc != null)
+                        {
+                            // 普通函数：直接调用
+                            funcResult = spawnFunc.Run(threadManager, threadArgs, instanceContext);
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException("未知的函数类型");
+                        }
 
                         // 设置线程结果
                         // 直接保存 funcResult 对象，不进行转换
