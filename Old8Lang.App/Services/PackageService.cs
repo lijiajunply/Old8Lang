@@ -19,11 +19,7 @@ public class PackageService
     private readonly IPackageConfigurationManager ConfigManager;
     private readonly IPackageArchiveService ArchiveService;
     private readonly IPackageSignatureService SignatureService;
-
-    /// <summary>
-    /// 包目录路径
-    /// </summary>
-    public string PackagesDirectory => PackagesDir;
+    private readonly VersionManager VersionManager;
 
     public PackageService(string projectRoot, ProjectConfig? projectConfig = null)
     {
@@ -41,8 +37,9 @@ public class PackageService
         Resolver = new DefaultPackageResolver();
         Installer = new DefaultPackageInstaller(SourceManager, Resolver);
         ConfigManager = new DefaultPackageConfigurationManager();
-        ArchiveService = new PackageArchiveService(){PackageMetadataFileName = "o8package.json"};
+        ArchiveService = new PackageArchiveService() { PackageMetadataFileName = "o8package.json" };
         SignatureService = new PackageSignatureService();
+        VersionManager = new VersionManager();
 
         // 配置包源
         ConfigurePackageSources();
@@ -53,13 +50,6 @@ public class PackageService
     /// </summary>
     private void ConfigurePackageSources()
     {
-        // 添加本地包源（项目本地）
-        var localPackageSource = new LocalPackageSource(
-            name: "Local Packages",
-            sourcePath: PackagesDir
-        );
-        SourceManager.AddSource(localPackageSource);
-
         // 添加全局包源
         var globalPackagesDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
@@ -75,8 +65,8 @@ public class PackageService
         // TODO: 从项目配置中读取自定义包源
         // TODO: 添加远程包源支持
         SourceManager.AddSource(new LocalPackageSource(
-            name: "NuGet",
-            sourcePath: "https://api.nuget.org/v3/index.json"
+            name: "Old8Lang Web",
+            sourcePath: "https://package.old8lang.site/v3"
         ));
     }
 
@@ -256,18 +246,92 @@ public class PackageService
     /// <summary>
     /// 解析版本范围为具体版本
     /// </summary>
+    /// <param name="versionRange">版本范围字符串（支持 ^, ~, *, >, &lt;, >=, &lt;=, 精确版本, 范围）</param>
+    /// <returns>解析后的版本字符串</returns>
     private string ResolveVersion(string versionRange)
     {
-        // 简单的版本解析逻辑
-        // TODO: 实现完整的语义化版本解析
-        var cleanVersion = versionRange.TrimStart('^', '~', '>', '<', '=').Trim();
-
-        if (cleanVersion == "*" || string.IsNullOrWhiteSpace(cleanVersion))
+        if (string.IsNullOrWhiteSpace(versionRange))
         {
             return "1.0.0"; // 默认版本
         }
 
-        return cleanVersion;
+        versionRange = versionRange.Trim();
+
+        // 处理通配符 * - 返回默认版本
+        if (versionRange == "*")
+        {
+            return "1.0.0";
+        }
+
+        // 处理 npm 风格的版本范围
+        // ^1.2.3 - 兼容 1.x.x 版本（主版本相同）
+        if (versionRange.StartsWith("^"))
+        {
+            var baseVersion = versionRange[1..].Trim();
+            var parsed = VersionManager.ParseVersion(baseVersion);
+            // 对于 ^ 语义，返回基准版本
+            return parsed.ToString();
+        }
+
+        // ~1.2.3 - 兼容 1.2.x 版本（主版本和次版本相同）
+        if (versionRange.StartsWith("~"))
+        {
+            var baseVersion = versionRange[1..].Trim();
+            var parsed = VersionManager.ParseVersion(baseVersion);
+            // 对于 ~ 语义，返回基准版本
+            return parsed.ToString();
+        }
+
+        // 处理比较运算符版本范围 (>=, <=, >, <)
+        if (versionRange.StartsWith(">=") || versionRange.StartsWith("<=") ||
+            versionRange.StartsWith(">") || versionRange.StartsWith("<"))
+        {
+            var range = VersionManager.ParseVersionRange(versionRange);
+            // 如果有最小版本，返回最小版本；否则返回最大版本
+            if (!string.IsNullOrEmpty(range.MinVersion))
+            {
+                return range.MinVersion;
+            }
+
+            if (!string.IsNullOrEmpty(range.MaxVersion))
+            {
+                return range.MaxVersion;
+            }
+
+            return "1.0.0";
+        }
+
+        // 处理范围版本 (1.0.0-2.0.0)
+        if (versionRange.Contains('-') && !versionRange.StartsWith("-"))
+        {
+            var parts = versionRange.Split('-', 2);
+            if (parts.Length == 2)
+            {
+                var first = parts[0].Trim();
+                var second = parts[1].Trim();
+
+                // 检查是否是版本范围（两部分都是版本号）
+                var firstParsed = VersionManager.ParseVersion(first);
+                var secondParsed = VersionManager.ParseVersion(second);
+
+                if (firstParsed.Major > 0 || firstParsed.Minor > 0 || firstParsed.Patch > 0)
+                {
+                    // 返回范围的最小版本
+                    return firstParsed.ToString();
+                }
+            }
+        }
+
+        // 处理通配符版本 (1.2.*)
+        if (versionRange.Contains("*"))
+        {
+            var range = VersionManager.ParseVersionRange(versionRange);
+            return range.MinVersion;
+        }
+
+        // 精确版本 - 直接解析并返回
+        var version = VersionManager.ParseVersion(versionRange);
+        return version.ToString();
     }
 
     #region 打包功能

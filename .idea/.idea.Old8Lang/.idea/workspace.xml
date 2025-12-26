@@ -21,16 +21,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/CLI_COMMANDS_GUIDE.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/CertCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/PackCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/SignCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/UnpackCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/VerifyCommand.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PACKAGE_SERVICE_USAGE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/VERSION_RESOLUTION_IMPLEMENTATION.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.App/Services/PackageService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Services/PackageService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -464,7 +456,7 @@
       <workItem from="1766385211009" duration="1338000" />
       <workItem from="1766441034395" duration="1692000" />
       <workItem from="1766461431015" duration="981000" />
-      <workItem from="1766746850670" duration="5342000" />
+      <workItem from="1766746850670" duration="5707000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -809,7 +801,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="358" />
+    <option name="localTasksCounter" value="359" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -836,7 +828,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(Task): 支持 TaskScheduler 和 TaskFactory 全局对象&#10;&#10;新增 TaskScheduler 和 TaskFactory 类的全局对象注册，完善 Task API 的功能支持。  &#10;同时修复了 Task 类中部分成员访问逻辑，并改进异常处理机制，统一将标准异常包装为 Old8Exception。  &#10;此外，更新了相关单元测试代码以适配新的 API 调用方式并启用任务取消测试。" />
     <MESSAGE value="feat(AsyncLib): 优化资源包装类构造函数并移除冗余字段初始化&#10;&#10;将 `ResourceWrapper` 类改用主构造函数语法，并直接初始化 `Resource` 属性。  &#10;同时删除了 `_readWriteLockIdCounter`、`_countDownLatchIdCounter` 和  &#10;`_cyclicBarrierIdCounter` 的冗余赋值为 0 的字段初始化语句。&#10;&#10;refactor(AsyncLib): 统一使用属性命名风格并提升代码一致性&#10;&#10;将 `CountDownLatch` 和 `CyclicBarrier` 类中的私有字段名称从下划线前缀风格  &#10;改为 PascalCase 命名风格（如 `_count` 改为 `Count`），以提高整体代码可读性和一致性。  &#10;此外，更新相关访问逻辑以匹配新的属性命名。&#10;&#10;refactor(Csv): 简化 CSV 头部行添加方式&#10;&#10;合并声明与初始化操作，通过集合初始化器直接在创建 `csvLines` 列表时添加头部行，  &#10;使代码更简洁且易于理解。" />
     <MESSAGE value="refactor(ast): 重构 CancellationTokenSource 和 TaskCompletionSource 类&#10;&#10;- 将 CancellationTokenSourceLangValue 和 TaskCompletionSourceLangValue 移至 StaticValues 命名空间&#10;- 重命名私有字段 _cts 和 _tcs 为 Cts 和 Tcs&#10;- 使用新的语法初始化只读属性&#10;- 简化 TaskWrapper 的惰性初始化逻辑&#10;- 更新所有引用以使用新命名的字段&#10;- 调整类成员顺序并优化命名空间导入顺序&#10;- 修复 OutputType 方法返回类型声明&#10;- 更新工作区 XML 配置文件中的变更记录和持续时间统计" />
     <MESSAGE value="feat(ast): 实现异步流和生成器上下文中的异步 for-in 循环&#10;&#10;- 添加对 AsyncStreamLangValue 的异步迭代支持&#10;- 实现生成器上下文中的异步 for-in 循环逻辑&#10;- 支持在异步流中正确处理 yield 和恢复执行&#10;- 添加对 TaskLangValue 的 await 处理&#10;- 完善异常类型检查，增加 AsyncStreamLangValue 和 TaskLangValue&#10;- 重构 Run 方法，区分标准模式和生成器上下文模式&#10;- 添加详细的控制流管理，支持 break 和 continue 语句&#10;- 实现异步流、异步生成器和普通列表在生成器中的迭代逻辑&#10;- 更新测试用例，将 for 替换为 async for 以支持异步流&#10;- 修复 CapturedScope 属性访问权限问题&#10;- 优化异步生成器的状态机初始化逻辑&#10;- 更新 BlockStatement 以识别 AsyncForInStatement 中的 yield&#10;- 添加多个异步流测试用例文件" />
@@ -861,7 +852,8 @@
     <MESSAGE value="docs(reports): 移除过时的测试报告文件&#10;&#10;- 删除了旧的模块系统测试报告&#10;- 移除了全面评估报告&#10;- 清理了线程测试修复实施报告&#10;- 删除多个包管理集成测试报告&#10;- 移除了语法测试实施报告&#10;- 保持代码库整洁，移除不再需要的文档文件" />
     <MESSAGE value="refactor(interpreter): 迁移表达式和值类型访问方法到解释器访问者&#10;&#10;- 将 Operation、FunctionCallExpression、TernaryExpression 等表达式节点的访问方法迁移到 InterpreterVisitor&#10;- 将 ArrayLangValue、ListLangValue、DictionaryLangValue 等值类型节点的访问方法迁移到 InterpreterVisitor&#10;- 从生成的存根文件中移除已实现的访问方法&#10;- 更新工作区配置以反映文件变更状态" />
     <MESSAGE value="feat(cli): 合并 install 和 add 命令并移除虚拟环境支持&#10;&#10;- 将原 add 命令功能合并到 install 命令中，统一依赖管理&#10;- 移除虚拟环境相关代码和配置选项&#10;- 更新项目配置模型，使用 References 替代 Dependencies 和 DevDependencies&#10;- 修改包安装路径为全局 ~/.old8lang/packages 目录&#10;- 移除锁文件生成和管理功能&#10;- 更新 init 命令中的项目初始化逻辑和默认配置&#10;- 移除 list 命令中的全局包列表功能&#10;- 升级 Old8Lang.PackageManager.Core 依赖版本到 1.1.1" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(cli): 合并 install 和 add 命令并移除虚拟环境支持&#10;&#10;- 将原 add 命令功能合并到 install 命令中，统一依赖管理&#10;- 移除虚拟环境相关代码和配置选项&#10;- 更新项目配置模型，使用 References 替代 Dependencies 和 DevDependencies&#10;- 修改包安装路径为全局 ~/.old8lang/packages 目录&#10;- 移除锁文件生成和管理功能&#10;- 更新 init 命令中的项目初始化逻辑和默认配置&#10;- 移除 list 命令中的全局包列表功能&#10;- 升级 Old8Lang.PackageManager.Core 依赖版本到 1.1.1" />
+    <MESSAGE value="feat(cert): 添加证书管理命令和包签名功能&#10;&#10;- 新增 cert 命令支持生成、查看和导出证书&#10;- 集成 PackageArchiveService 提供打包解包功能&#10;- 集成 PackageSignatureService 提供数字签名验证功能&#10;- 更新 PackageService 添加完整的包管理 API&#10;- 添加详细的 CLI 命令使用指南文档&#10;- 添加 PackageService 使用文档和示例代码&#10;- 升级 Old8Lang.PackageManager.Core 版本至 1.1.2&#10;- 实现证书密码安全输入功能&#10;- 添加包结构验证和元数据读取功能&#10;- 提供一键发布命令支持自动证书生成" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(cert): 添加证书管理命令和包签名功能&#10;&#10;- 新增 cert 命令支持生成、查看和导出证书&#10;- 集成 PackageArchiveService 提供打包解包功能&#10;- 集成 PackageSignatureService 提供数字签名验证功能&#10;- 更新 PackageService 添加完整的包管理 API&#10;- 添加详细的 CLI 命令使用指南文档&#10;- 添加 PackageService 使用文档和示例代码&#10;- 升级 Old8Lang.PackageManager.Core 版本至 1.1.2&#10;- 实现证书密码安全输入功能&#10;- 添加包结构验证和元数据读取功能&#10;- 提供一键发布命令支持自动证书生成" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
