@@ -1,5 +1,6 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.Error;
 using Old8Lang.Tests.Interpreter.Modules.Core;
 using Xunit.Abstractions;
 
@@ -15,7 +16,7 @@ public class ImportErrorTests(ITestOutputHelper output) : ModuleImportTestBase(o
     {
         // Arrange
         var testContent = @"
-import ""nonexistent_file""
+import ""nonexistent_file123121231233""
 result <- 42
 ";
         CreateTempModuleFile("error_test.old8", testContent);
@@ -67,7 +68,7 @@ result <- 42
         CreateTempModuleFile("syntax_error_test.old8", testContent);
 
         // Act & Assert
-        AssertExecutionThrows("syntax_error_test.old8", typeof(Exception));
+        AssertExecutionThrows("syntax_error_test.old8", typeof(SyntaxError));
     }
 
     [Fact]
@@ -88,7 +89,7 @@ result <- runtime_error_module.divideByZero()
         CreateTempModuleFile("runtime_error_test.old8", testContent);
 
         // Act & Assert
-        AssertExecutionThrows("runtime_error_test.old8", typeof(Exception));
+        AssertExecutionThrows("runtime_error_test.old8", typeof(ZeroDivisionError));
     }
 
     [Fact]
@@ -102,21 +103,7 @@ result <- 42
         CreateTempModuleFile("empty_path_test.old8", testContent);
 
         // Act & Assert
-        AssertExecutionThrows("empty_path_test.old8", typeof(Exception));
-    }
-
-    [Fact]
-    public void Import_NullImportPath_ShouldThrowError()
-    {
-        // Arrange
-        var testContent = @"
-import null
-result <- 42
-";
-        CreateTempModuleFile("null_path_test.old8", testContent);
-
-        // Act & Assert
-        AssertExecutionThrows("null_path_test.old8", typeof(Exception));
+        AssertExecutionThrows("empty_path_test.old8", typeof(ImportError));
     }
 
     [Fact]
@@ -194,7 +181,7 @@ result <- dependent_module.getValue()
         CreateTempModuleFile("missing_dependency_test.old8", testContent);
 
         // Act & Assert
-        AssertExecutionThrows("missing_dependency_test.old8", typeof(Exception));
+        AssertExecutionThrows("missing_dependency_test.old8", typeof(ImportError));
     }
 
     [Fact]

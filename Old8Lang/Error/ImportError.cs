@@ -63,15 +63,32 @@ public class ImportError : RuntimeError
     /// <param name="position">源代码位置信息</param>
     /// <param name="moduleName">无法导入的模块名称</param>
     /// <param name="attemptedPaths">尝试的文件路径列表</param>
-    public ImportError(SourcePosition position, string moduleName, List<string>? attemptedPaths = null) 
+    public ImportError(SourcePosition position, string moduleName, List<string>? attemptedPaths = null)
         : base(
-            position, 
+            position,
             ErrorCode,
             BuildErrorMessage(moduleName, attemptedPaths ?? []),
             "请检查模块名称是否正确，或者模块是否存在")
     {
         ModuleName = moduleName;
         AttemptedPaths = attemptedPaths ?? [];
+    }
+
+    /// <summary>
+    /// 构造函数，使用位置信息和自定义错误消息
+    /// </summary>
+    /// <param name="position">源代码位置信息</param>
+    /// <param name="moduleName">无法导入的模块名称</param>
+    /// <param name="message">详细错误信息</param>
+    public ImportError(SourcePosition position, string moduleName, string message)
+        : base(
+            position,
+            ErrorCode,
+            message,
+            "请检查模块名称和导入的符号是否正确")
+    {
+        ModuleName = moduleName;
+        AttemptedPaths = [];
     }
     
     /// <summary>

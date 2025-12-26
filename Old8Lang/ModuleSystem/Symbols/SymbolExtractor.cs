@@ -138,13 +138,22 @@ public class SymbolExtractor
     /// </summary>
     /// <param name="manager">变量管理器</param>
     /// <param name="symbolNames">要提取的符号名称列表</param>
+    /// <param name="moduleName">模块名称（用于错误提示）</param>
+    /// <param name="scopedImportInfos">限定范围的 ImportInfos（如果为 null 则使用全局 ImportInfos）</param>
     /// <returns>符号字典</returns>
+    /// <exception cref="Error.ImportError">当指定的符号不存在时抛出</exception>
     public Dictionary<string, LangValueType> ExtractSpecificSymbols(
         VariateManager manager,
-        IEnumerable<string> symbolNames)
+        IEnumerable<string> symbolNames,
+        string? moduleName = null,
+        IEnumerable<ImportInfo>? scopedImportInfos = null)
     {
         var symbols = new Dictionary<string, LangValueType>();
         var currentScope = manager.Scopes.Count > 0 ? manager.Scopes[^1] : null;
+        var notFoundSymbols = new List<string>();
+
+        // 使用限定范围的 ImportInfos（如果提供），否则使用全局的
+        var importInfosToSearch = scopedImportInfos ?? manager.ImportInfos;
 
         foreach (var symbolName in symbolNames)
         {
@@ -155,8 +164,8 @@ public class SymbolExtractor
                 continue;
             }
 
-            // 2. 从 ImportInfos 查找
-            var importInfo = manager.ImportInfos.FirstOrDefault(info =>
+            // 2. 从限定范围的 ImportInfos 查找
+            var importInfo = importInfosToSearch.FirstOrDefault(info =>
             {
                 var name = GetSymbolName(info);
                 return name == symbolName;
@@ -168,12 +177,31 @@ public class SymbolExtractor
                 continue;
             }
 
-            // 3. 从全局作用域查找
-            var globalValue = manager.GetValue(new LangId(symbolName));
-            if (globalValue != null)
+            // 3. 仅在没有提供 scopedImportInfos 时才从全局作用域查找
+            // 如果提供了 scopedImportInfos，说明我们要限定在特定模块的符号中查找
+            if (scopedImportInfos == null)
             {
-                symbols[symbolName] = globalValue;
+                var globalValue = manager.GetValue(new LangId(symbolName));
+                if (globalValue != null)
+                {
+                    symbols[symbolName] = globalValue;
+                    continue;
+                }
             }
+
+            // 如果所有地方都找不到，记录下来
+            notFoundSymbols.Add(symbolName);
+        }
+
+        // 如果有符号找不到，抛出 ImportError
+        if (notFoundSymbols.Count > 0)
+        {
+            var missingSymbolsStr = string.Join(", ", notFoundSymbols);
+            var moduleInfo = string.IsNullOrEmpty(moduleName) ? "module" : $"module '{moduleName}'";
+            throw new Error.ImportError(
+                default,
+                moduleName ?? "unknown",
+                $"Cannot import symbols [{missingSymbolsStr}] from {moduleInfo}: symbols do not exist");
         }
 
         return symbols;

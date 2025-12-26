@@ -180,11 +180,18 @@ public class ModuleSystemService
                 manager.AddChildren();
                 try
                 {
+                    // 记录执行前的 ImportInfos
+                    var importInfosBefore = manager.ImportInfos.ToList();
+
                     loadResult.Block.Run(manager);
 
-                    // 提取符号
+                    // 找出新增的 ImportInfos（只属于当前模块的）
+                    var newImportInfos = manager.ImportInfos.Except(importInfosBefore).ToList();
+
+                    // 提取符号 - 使用限定范围的 ImportInfos
+                    var moduleName = Path.GetFileNameWithoutExtension(modulePath);
                     var symbols = options.ImportSpecifiers != null && options.ImportSpecifiers.Count > 0
-                        ? _symbolExtractor.ExtractSpecificSymbols(manager, options.ImportSpecifiers)
+                        ? _symbolExtractor.ExtractSpecificSymbols(manager, options.ImportSpecifiers, moduleName, newImportInfos)
                         : _symbolExtractor.ExtractSymbols(manager);
 
                     result.ExtractedSymbols = symbols;

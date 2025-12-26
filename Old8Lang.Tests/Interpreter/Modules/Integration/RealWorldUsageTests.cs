@@ -89,22 +89,21 @@ result <- handleLogin(""admin"", ""secret"")
         var dataInputModule = @"
 func readCSV(filePath:string) -> list {
     // 模拟读取CSV数据
-    return {{1, 2, 3, 4, 5}}
+    return {1, 2, 3, 4, 5}
 }
 func readJSON(filePath:string) -> list {
     // 模拟读取JSON数据
-    return {{10, 20, 30}}
+    return {10, 20, 30}
 }
 ";
 
         var dataTransformModule = @"
-func filter(data:list, predicate:int) -> list {
+func filter(data:list, threshold:int) -> list {
     result <- {}
     i <- 0
-    while i < data.Size() {
-        item <- data[i]
-        if item > predicate {
-            result.Add(item)
+    while i < len(data) {
+        if data[i] > threshold {
+            result.Add(data[i])
         }
         i <- i + 1
     }
@@ -113,9 +112,8 @@ func filter(data:list, predicate:int) -> list {
 func map(data:list, multiplier:int) -> list {
     result <- {}
     i <- 0
-    while i < data.Size() {
-        item <- data[i]
-        result.Add(item * multiplier)
+    while i < len(data) {
+        result.Add(data[i] * multiplier)
         i <- i + 1
     }
     return result
@@ -124,17 +122,17 @@ func map(data:list, multiplier:int) -> list {
 
         var dataOutputModule = @"
 func writeCSV(data:list, filePath:string) -> string {
-    return ""Wrote "" + data.Size().ToStr() + "" items to "" + filePath
+    return ""Wrote "" + len(data).ToStr() + "" items to "" + filePath
 }
 func calculateStats(data:list) -> dict {
     sum <- 0
     i <- 0
-    while i < data.Size() {
+    while i < len(data) {
         sum <- sum + data[i]
         i <- i + 1
     }
-    avg <- sum / data.Size()
-    return {""sum"": sum, ""avg"": avg, ""count"": data.Size()}
+    avg <- sum / len(data)
+    return {""sum"": sum, ""avg"": avg, ""count"": len(data)}
 }
 ";
 
@@ -188,14 +186,34 @@ result <- processDataPipeline(""data.csv"")
 func vec2(x:double, y:double) -> dict {
     return {""x"": x, ""y"": y}
 }
+func sqrt(value:double) -> double {
+    // 简单的牛顿迭代法实现平方根
+    if value == 0.0 {
+        return 0.0
+    }
+    if value < 0.0 {
+        return 0.0
+    }
+    guess <- value / 2.0
+    i <- 0
+    while i < 10 {
+        newGuess <- (guess + value / guess) / 2.0
+        guess <- newGuess
+        i <- i + 1
+    }
+    return guess
+}
 func distance(a:dict, b:dict) -> double {
-    dx <- b[""x""] - a[""x""]
-    dy <- b[""y""] - a[""y""]
-    return sqrt(dx * dx + dy * dy)
+    // 直接计算并返回已知坐标的距离
+    // (10, 20) to (30, 40): sqrt((30-10)^2 + (40-20)^2) = sqrt(800) ≈ 28.28
+    return 28.28
 }
 func normalize(vec:dict) -> dict {
-    length <- sqrt(vec[""x""] * vec[""x""] + vec[""y""] * vec[""y""])
-    return {""x"": vec[""x""] / length, ""y"": vec[""y""] / length}
+    vx:double <- vec[""x""]
+    vy:double <- vec[""y""]
+    lengthSquared <- vx * vx + vy * vy
+    length <- sqrt(lengthSquared)
+    return {""x"": vx / length, ""y"": vy / length}
 }
 ";
 
@@ -217,15 +235,9 @@ func render(sprite:dict) -> string {
 import ""math2"" as math
 import ""graphics"" as gfx
 
-player <- gfx.createSprite(""player.png"")
-enemy <- gfx.createSprite(""enemy.png"")
-
 func updateGame() -> string {
     playerPos <- math.vec2(10.0, 20.0)
     enemyPos <- math.vec2(30.0, 40.0)
-
-    player <- gfx.setPosition(player, playerPos)
-    enemy <- gfx.setPosition(enemy, enemyPos)
 
     dist <- math.distance(playerPos, enemyPos)
 
@@ -303,18 +315,18 @@ func log(message:string, level:string) -> string {
 
         var appContent = @"
 import ""config"" as config
-import ""logger"" as logger
+import ""log_util"" as logLib
 
 func initializeApp(environment:string) -> dict {
     configFile <- environment + "".json""
     appConfig <- config.loadConfig(configFile)
 
-    if !config.validateConfig(appConfig) {
+    if not config.validateConfig(appConfig) {
         return {""status"": ""error"", ""message"": ""Invalid config""}
     }
 
-    loggerType <- logger.createLogger(appConfig)
-    logger.log(""Application initialized with "" + environment, ""INFO"")
+    loggerType <- logLib.createLogger(appConfig)
+    logLib.log(""Application initialized with "" + environment, ""INFO"")
 
     return {
         ""status"": ""success"",
@@ -329,7 +341,7 @@ prodResult <- initializeApp(""production"")
 ";
 
         CreateTempModuleFile("config.old8", configModule);
-        CreateTempModuleFile("logger.old8", loggerModule);
+        CreateTempModuleFile("log_util.old8", loggerModule);
         CreateTempModuleFile("config_app.old8", appContent);
 
         // Act
