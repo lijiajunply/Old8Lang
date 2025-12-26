@@ -16,7 +16,6 @@ public class PackageService
     private readonly PackageSourceManager SourceManager;
     private readonly IPackageResolver Resolver;
     private readonly IPackageInstaller Installer;
-    private readonly IPackageConfigurationManager ConfigManager;
     private readonly IPackageArchiveService ArchiveService;
     private readonly IPackageSignatureService SignatureService;
     private readonly VersionManager VersionManager;
@@ -24,7 +23,6 @@ public class PackageService
     public PackageService(string projectRoot, ProjectConfig? projectConfig = null)
     {
         ProjectRoot = projectRoot;
-
         // 使用全局包目录
         PackagesDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
@@ -36,19 +34,19 @@ public class PackageService
         SourceManager = new PackageSourceManager();
         Resolver = new DefaultPackageResolver();
         Installer = new DefaultPackageInstaller(SourceManager, Resolver);
-        ConfigManager = new DefaultPackageConfigurationManager();
+        new DefaultPackageConfigurationManager();
         ArchiveService = new PackageArchiveService() { PackageMetadataFileName = "o8package.json" };
         SignatureService = new PackageSignatureService();
         VersionManager = new VersionManager();
 
         // 配置包源
-        ConfigurePackageSources();
+        ConfigurePackageSources(projectConfig);
     }
 
     /// <summary>
     /// 配置包源
     /// </summary>
-    private void ConfigurePackageSources()
+    private void ConfigurePackageSources(ProjectConfig? projectConfig)
     {
         // 添加全局包源
         var globalPackagesDir = Path.Combine(
@@ -62,8 +60,10 @@ public class PackageService
         );
         SourceManager.AddSource(globalSource);
 
-        // TODO: 从项目配置中读取自定义包源
-        // TODO: 添加远程包源支持
+        // 从项目配置中读取自定义包源
+        projectConfig?.Sources.ForEach(x => SourceManager.AddSource(new RemotePackageSource(x.Name, source: x.Source)));
+
+        // 添加远程包源支持
         SourceManager.AddSource(new LocalPackageSource(
             name: "Old8Lang Web",
             sourcePath: "https://package.old8lang.site/v3"
