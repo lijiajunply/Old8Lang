@@ -1,3 +1,0 @@
-
-import {func1} from "multi_func_module"
-result <- "imported "

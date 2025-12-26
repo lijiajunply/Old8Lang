@@ -1,5 +1,0 @@
-// 测试 MathLib 库导入
-import "MathLib"
-
-// 验证 MathLib 库是否正确导入
-print("MathLib 库导入成功")

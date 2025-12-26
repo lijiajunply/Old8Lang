@@ -1,5 +1,0 @@
-// 测试懒导入
-lazy import { TestFunc, TESTCONST } from "test_module"
-
-result1 <- TestFunc()
-result2 <- TESTCONST

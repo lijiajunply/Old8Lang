@@ -1,4 +1,0 @@
-
-import "test_module" as tm
-result <- tm.testFunction()
-constant_value <- tm.MODULE_CONSTANT

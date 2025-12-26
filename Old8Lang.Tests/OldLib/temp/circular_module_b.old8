@@ -1,8 +1,0 @@
-
-import "circular_module_a"
-func funcB() -> int {
-    return 20 + getValueA()
-}
-func getValueB() -> int {
-    return 15
-}

@@ -1,4 +1,0 @@
-
-import * from "visibility_module"
-public_result <- publicFunction()
-public_const_value <- PUBLIC_CONST

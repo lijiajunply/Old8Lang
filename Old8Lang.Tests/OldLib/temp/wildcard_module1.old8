@@ -1,5 +1,0 @@
-
-VALUE1 <- 100
-func getValue1() -> int {
-    return VALUE1
-}

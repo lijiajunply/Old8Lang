@@ -1,4 +1,0 @@
-
-import "circular_module_a" as a
-import "circular_module_b" as b
-result <- a.funcA() + b.funcB()

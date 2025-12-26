@@ -1,3 +1,0 @@
-
-import "microservice_api_gateway" as gateway
-result <- gateway.getUserDashboard("valid_token", 123)

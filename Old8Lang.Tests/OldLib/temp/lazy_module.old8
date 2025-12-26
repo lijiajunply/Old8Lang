@@ -1,3 +1,0 @@
-
-LAZY_VALUE:const <- 200
-func lazyFunction() -> string { return "Lazy" }

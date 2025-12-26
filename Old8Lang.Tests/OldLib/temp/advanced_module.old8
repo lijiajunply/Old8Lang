@@ -1,8 +1,0 @@
-
-func advancedFeature() -> string {
-    return "Advanced functionality"
-}
-
-func version() {
-   return "2.0"
-}

@@ -1,6 +1,0 @@
-
-import "state_module"
-initial_counter <- state_module.getCounter()
-result1 <- state_module.increment()
-result2 <- state_module.increment()
-final_counter <- state_module.getCounter()

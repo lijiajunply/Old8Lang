@@ -1,7 +1,0 @@
-
-func add(a:double, b:double) -> double {
-    return a + b
-}
-func multiply(a:double, b:double) -> double {
-    return a * b
-}

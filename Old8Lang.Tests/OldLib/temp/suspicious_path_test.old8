@@ -1,3 +1,0 @@
-
-import "./current/module"
-result <- 42

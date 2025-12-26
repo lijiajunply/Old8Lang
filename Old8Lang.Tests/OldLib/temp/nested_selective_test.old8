@@ -1,3 +1,0 @@
-
-import { deepFunction } from "./nested/submodule/module"
-result <- deepFunction()

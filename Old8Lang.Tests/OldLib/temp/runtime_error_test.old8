@@ -1,3 +1,0 @@
-
-import "runtime_error_module"
-result <- runtime_error_module.divideByZero()

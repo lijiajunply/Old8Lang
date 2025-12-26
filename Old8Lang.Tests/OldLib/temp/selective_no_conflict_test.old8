@@ -1,5 +1,0 @@
-
-import {process as process1} from "module1"
-import {process as process2} from "module2"
-result1 <- process1(42)
-result2 <- process2(24)

@@ -1,7 +1,0 @@
-
-func authenticate(username:string, password:string) -> bool {
-    return username == "admin" && password == "secret"
-}
-func hasPermission(user:string, permission:string) -> bool {
-    return user == "admin"
-}

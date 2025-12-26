@@ -1,4 +1,0 @@
-
-func divideByZero() -> double {
-    return 1.0 / 0.0
-}

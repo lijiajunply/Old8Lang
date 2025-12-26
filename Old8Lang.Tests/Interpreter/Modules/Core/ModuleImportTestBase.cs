@@ -8,7 +8,7 @@ namespace Old8Lang.Tests.Interpreter.Modules.Core;
 /// <summary>
 /// 模块导入测试的基础类，提供通用的测试功能
 /// </summary>
-public abstract class ModuleImportTestBase(ITestOutputHelper output)
+public abstract class ModuleImportTestBase(ITestOutputHelper output) : IDisposable
 {
     protected readonly ITestOutputHelper Output = output;
 
@@ -126,15 +126,14 @@ public abstract class ModuleImportTestBase(ITestOutputHelper output)
         Directory.CreateDirectory(tempDir);
 
         var filePath = Path.Combine(tempDir, fileName);
-        
-        // 确保所有父目录存在
-        var currentDir = Path.GetDirectoryName(filePath);
-        while (!string.IsNullOrEmpty(currentDir))
+
+        // 确保父目录存在
+        var directory = Path.GetDirectoryName(filePath);
+        if (!string.IsNullOrEmpty(directory))
         {
-            Directory.CreateDirectory(currentDir);
-            currentDir = Path.GetDirectoryName(currentDir);
+            Directory.CreateDirectory(directory);
         }
-        
+
         File.WriteAllText(filePath, content);
         return filePath;
     }
@@ -161,8 +160,9 @@ public abstract class ModuleImportTestBase(ITestOutputHelper output)
     /// <summary>
     /// 测试完成后清理
     /// </summary>
-    public virtual void Dispose()
+    public void Dispose()
     {
         CleanupTempFiles();
+        GC.SuppressFinalize(this);
     }
 }

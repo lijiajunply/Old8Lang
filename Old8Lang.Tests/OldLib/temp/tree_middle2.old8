@@ -1,8 +1,0 @@
-
-import "tree_leaf3"
-func middle2Function() -> string {
-    return "Middle2: " + leaf3Function()
-}
-func getMiddle2Value() -> int {
-    return LEAF3_CONST
-}

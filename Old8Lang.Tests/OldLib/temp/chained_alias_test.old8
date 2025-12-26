@@ -1,3 +1,0 @@
-
-import "parent_module" as parent
-result <- parent.getNestedValue()

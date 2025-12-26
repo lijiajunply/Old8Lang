@@ -1,3 +1,0 @@
-
-func baseFunction() -> string { return "Base" }
-BASE_CONST:const <- 10

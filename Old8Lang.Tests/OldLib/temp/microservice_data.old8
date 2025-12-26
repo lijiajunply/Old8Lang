@@ -1,7 +1,0 @@
-
-func getData(userId:int) -> list {
-    return {{"item1"}, {"item2"}, {"item3"}}
-}
-func saveData(userId:int, data:list) -> bool {
-    return true
-}

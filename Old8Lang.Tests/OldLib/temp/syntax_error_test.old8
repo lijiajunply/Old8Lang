@@ -1,3 +1,0 @@
-
-import "invalid_syntax_module"
-result <- 42

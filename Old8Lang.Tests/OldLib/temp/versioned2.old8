@@ -1,7 +1,0 @@
-
-func getVersion() -> string {
-    return "Version 2.0"
-}
-func process(data:string) -> string {
-    return "Processed by v2: " + data.ToUpper()
-}

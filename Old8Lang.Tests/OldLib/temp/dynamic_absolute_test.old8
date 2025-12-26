@@ -1,9 +1,0 @@
-
-// 构建绝对路径（这里使用相对路径模拟）
-base_path <- ""
-module_file_name <- "absolute_dynamic"
-full_path <- base_path + module_file_name
-
-import dynamic full_path as abs_module
-result1 <- abs_module.getModuleInfo()
-result2 <- abs_module.ABSOLUTE_CONST

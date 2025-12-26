@@ -1,15 +1,18 @@
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.AST.Statement;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.ModuleSystem.Loading;
+using Old8Lang.ModuleSystem.Resolution;
+using Old8Lang.ModuleSystem.Symbols;
 
 namespace Old8Lang.AST.Expression.ModuleObjects;
 
 /// <summary>
-/// 统一模块对象 - 集成所有模块功能的单一实现
+/// 统一模块对象（重构版本）- 集成所有模块功能的单一实现
 /// 支持懒加载、即时加载、选择性导入等多种模式
+/// 性能优化：使用双字典提升符号查找效率，使用新的模块服务架构
 /// </summary>
 public class UnifiedModule(
     string moduleName,
@@ -18,10 +21,19 @@ public class UnifiedModule(
     SourcePosition position = default
 ) : LangValueType(position), IModuleValueType
 {
+    // 符号存储 - 使用双字典优化查找性能
     private readonly Dictionary<string, LangValueType> Symbols = new();
+    private readonly Dictionary<string, LangValueType> CaseInsensitiveSymbols =
+        new(StringComparer.OrdinalIgnoreCase);
+
     private readonly Lock LoadLock = new();
     private readonly List<string> SelectedSymbols = [];
-    private bool _isLoaded;
+    private ModuleLoadingState _loadingState = ModuleLoadingState.NotLoaded;
+    private Exception? _loadException;
+
+    // 服务依赖
+    private static readonly ModuleLoader ModuleLoaderInstance = new();
+    private static readonly SymbolExtractor SymbolExtractorInstance = new();
 
     /// <summary>
     /// 模块加载模式
@@ -36,12 +48,17 @@ public class UnifiedModule(
     /// <summary>
     /// 模块是否已加载
     /// </summary>
-    public bool IsLoaded => _isLoaded;
+    public bool IsLoaded => _loadingState == ModuleLoadingState.Loaded;
 
     /// <summary>
     /// 模块加载状态
     /// </summary>
-    public ModuleLoadingState LoadingState => _isLoaded ? ModuleLoadingState.Loaded : ModuleLoadingState.NotLoaded;
+    public ModuleLoadingState LoadingState => _loadingState;
+
+    /// <summary>
+    /// 加载异常（如果有）
+    /// </summary>
+    public Exception? LoadException => _loadException;
 
     /// <summary>
     /// 设置选择性导入的符号列表
@@ -53,15 +70,27 @@ public class UnifiedModule(
     }
 
     /// <summary>
-    /// 获取模块中的符号
+    /// 获取模块中的符号（优化版本 - O(1) 查找）
     /// </summary>
     /// <param name="symbolName">符号名称</param>
     /// <returns>符号值，如果不存在返回null</returns>
     public LangValueType? GetSymbol(string symbolName)
     {
         EnsureLoaded();
-        Symbols.TryGetValue(symbolName, out var symbol);
-        return symbol;
+
+        // O(1) 精确查找
+        if (Symbols.TryGetValue(symbolName, out var symbol))
+        {
+            return symbol;
+        }
+
+        // O(1) 大小写不敏感查找
+        if (CaseInsensitiveSymbols.TryGetValue(symbolName, out symbol))
+        {
+            return symbol;
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -85,25 +114,55 @@ public class UnifiedModule(
     }
 
     /// <summary>
-    /// 强制加载模块
+    /// 强制加载模块（包含完整的状态管理）
     /// </summary>
     /// <param name="variateManager">变量管理器</param>
     public void EnsureLoaded(VariateManager? variateManager = null)
     {
-        if (!_isLoaded)
+        if (_loadingState == ModuleLoadingState.Loaded)
         {
-            lock (LoadLock)
+            return;
+        }
+
+        // 如果已经失败，抛出之前的异常
+        if (_loadingState == ModuleLoadingState.LoadFailed && _loadException != null)
+        {
+            throw new ImportError(this, ModuleName, $"模块之前加载失败: {_loadException.Message}");
+        }
+
+        lock (LoadLock)
+        {
+            // 双重检查锁定
+            if (_loadingState == ModuleLoadingState.Loaded)
             {
-                if (!_isLoaded)
-                {
-                    LoadModuleInternal(variateManager);
-                }
+                return;
+            }
+
+            if (_loadingState == ModuleLoadingState.Loading)
+            {
+                // 防止循环加载
+                throw new ImportError(this, ModuleName, "检测到循环加载");
+            }
+
+            // 设置加载中状态
+            _loadingState = ModuleLoadingState.Loading;
+
+            try
+            {
+                LoadModuleInternal(variateManager);
+                _loadingState = ModuleLoadingState.Loaded;
+            }
+            catch (Exception ex)
+            {
+                _loadingState = ModuleLoadingState.LoadFailed;
+                _loadException = ex;
+                throw;
             }
         }
     }
 
     /// <summary>
-    /// 处理模块成员访问
+    /// 处理模块成员访问（性能优化版本）
     /// </summary>
     /// <param name="dotExpression">点表达式</param>
     /// <param name="currentManager">当前变量管理器</param>
@@ -114,7 +173,7 @@ public class UnifiedModule(
 
         return dotExpression switch
         {
-            LangId langId => HandleSymbolAccess(langId, currentManager),
+            LangId langId => HandleSymbolAccess(langId),
             Instance instance => HandleFunctionCall(instance, currentManager),
             _ => throw new AttributeError(this, dotExpression.ToString() ?? "", ModuleName)
         };
@@ -136,7 +195,14 @@ public class UnifiedModule(
             _ => "unknown"
         };
 
-        var status = _isLoaded ? $"{Symbols.Count} symbols" : "unloaded";
+        var status = _loadingState switch
+        {
+            ModuleLoadingState.Loaded => $"{Symbols.Count} symbols",
+            ModuleLoadingState.Loading => "loading...",
+            ModuleLoadingState.LoadFailed => "load failed",
+            _ => "unloaded"
+        };
+
         return $"<module {ModuleName} ({mode}, {status})>";
     }
 
@@ -146,7 +212,10 @@ public class UnifiedModule(
     public static UnifiedModule CreateEager(string moduleName, VariateManager manager,
         SourcePosition position = default)
     {
-        return new UnifiedModule(moduleName, manager, ModuleLoadMode.Eager, position);
+        var module = new UnifiedModule(moduleName, manager, ModuleLoadMode.Eager, position);
+        // 即时加载
+        module.EnsureLoaded(manager);
+        return module;
     }
 
     /// <summary>
@@ -180,187 +249,101 @@ public class UnifiedModule(
         SourcePosition position = default)
     {
         var module = new UnifiedModule(moduleName, new VariateManager(), ModuleLoadMode.Eager, position);
-        module.Symbols.Clear();
-        foreach (var kvp in symbols)
+
+        // 填充符号字典
+        foreach (var (name, value) in symbols)
         {
-            module.Symbols[kvp.Key] = kvp.Value;
+            module.Symbols[name] = value;
+            module.CaseInsensitiveSymbols[name] = value;
         }
 
-        module._isLoaded = true;
+        module._loadingState = ModuleLoadingState.Loaded;
         return module;
     }
 
     #region Private Methods
 
+    /// <summary>
+    /// 内部加载逻辑（使用新的服务架构）
+    /// </summary>
     private void LoadModuleInternal(VariateManager? manager)
-    {
-        try
-        {
-            if (LoadMode == ModuleLoadMode.Eager || LoadMode == ModuleLoadMode.Selective ||
-                LoadMode == ModuleLoadMode.Lazy)
-            {
-                LoadModuleFromImport(manager);
-            }
-
-            _isLoaded = true;
-        }
-        catch (Exception ex)
-        {
-            throw new ImportError(this, ModuleName, ex.Message);
-        }
-    }
-
-    private void LoadModuleFromImport(VariateManager? manager)
     {
         manager ??= new VariateManager();
 
-        // 创建一个独立的临时 manager 来加载模块，避免污染当前作用域
-        var tempManager = new VariateManager
+        // 1. 解析模块路径
+        var resolver = new ModuleResolver();
+        var resolutionResult = resolver.ResolveModule(ModuleName, manager.Path, manager);
+
+        if (!resolutionResult.IsSuccess || resolutionResult.ResolvedPath == null)
         {
-            LangInfo = manager.LangInfo,
-            Path = manager.Path,
-            Interpreter = manager.Interpreter
-        };
+            throw new ImportError(this, ModuleName, resolutionResult.AttemptedPaths);
+        }
 
-        // 保存原始的 ImportInfosList，避免被模块导入污染
-        var originalImportInfos = manager.ImportInfos.ToList();
+        // 2. 加载模块
+        var loadResult = ModuleLoaderInstance.LoadModule(resolutionResult.ResolvedPath, manager);
 
-        // 执行导入到临时 manager
-        var importStatement = new ImportStatement(ModuleName, Position);
-        importStatement.Run(tempManager);
+        if (!loadResult.IsSuccess || loadResult.Block == null)
+        {
+            throw new ImportError(this, ModuleName,
+                loadResult.Error?.Message ?? "模块加载失败");
+        }
 
-        // 从临时 manager 提取符号（函数、类、变量等）
-        ExtractSymbolsFromManager(tempManager);
+        // 3. 执行模块代码（直接在当前作用域执行，不创建临时作用域）
+        // 这样函数可以访问模块中的变量
+        loadResult.Block.Run(manager);
+
+        // 4. 提取符号
+        var moduleBaseName = Path.GetFileNameWithoutExtension(ModuleName);
+        var selectedSymbolList = LoadMode == ModuleLoadMode.Selective && SelectedSymbols.Count > 0
+            ? SelectedSymbols
+            : null;
+
+        var extractedSymbols = SymbolExtractorInstance.ExtractSymbols(
+            manager,
+            moduleBaseName,
+            selectedSymbolList
+        );
+
+        // 5. 填充符号字典（双字典优化）
+        foreach (var (name, value) in extractedSymbols)
+        {
+            Symbols[name] = value;
+            CaseInsensitiveSymbols[name] = value;
+        }
     }
 
     /// <summary>
-    /// 从变量管理器中提取所有符号
+    /// 处理符号访问（优化版本 - O(1) 查找，不回退到全局作用域）
     /// </summary>
-    /// <param name="manager">变量管理器</param>
-    private void ExtractSymbolsFromManager(VariateManager manager)
-    {
-        var moduleBaseName = Path.GetFileNameWithoutExtension(ModuleName);
-
-        // 1. 从作用域中提取变量和常量
-        foreach (var scope in manager.Scopes)
-        {
-            foreach (var (symbolName, symbolValue) in scope)
-            {
-                // 跳过模块自身引用
-                if (string.Equals(symbolName, moduleBaseName, StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                // 跳过其他模块对象
-                if (symbolValue is IModuleObject)
-                    continue;
-
-                // 如果是选择性导入，只添加指定的符号
-                if (LoadMode == ModuleLoadMode.Selective && SelectedSymbols.Count > 0)
-                {
-                    if (SelectedSymbols.Contains(symbolName))
-                    {
-                        Symbols[symbolName] = symbolValue;
-                    }
-                }
-                else
-                {
-                    Symbols[symbolName] = symbolValue;
-                }
-            }
-        }
-
-        // 2. 从 ImportInfos 中提取函数和类
-        foreach (var importInfo in manager.ImportInfos)
-        {
-            string? symbolName = null;
-
-            switch (importInfo)
-            {
-                case FuncLangValue { Id: not null } func:
-                    symbolName = func.Id.IdName;
-                    break;
-                case AsyncFuncLangValue { Id: not null } asyncFunc:
-                    symbolName = asyncFunc.Id.IdName;
-                    break;
-                case TypeTemplate template:
-                    symbolName = template.ClassName;
-                    break;
-                case NativeAnyLangValue nativeAny:
-                    symbolName = nativeAny.RegisterName;
-                    break;
-                case NativeStaticAny staticAny:
-                    symbolName = staticAny.ClassName;
-                    break;
-            }
-
-            if (symbolName != null)
-            {
-                // 跳过模块自身引用
-                if (string.Equals(symbolName, moduleBaseName, StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                // 如果是选择性导入，只添加指定的符号
-                if (LoadMode == ModuleLoadMode.Selective && SelectedSymbols.Count > 0)
-                {
-                    if (SelectedSymbols.Contains(symbolName))
-                    {
-                        Symbols[symbolName] = importInfo;
-                    }
-                }
-                else
-                {
-                    Symbols[symbolName] = importInfo;
-                }
-            }
-        }
-    }
-
-
-    private LangValueType HandleSymbolAccess(LangId langId, VariateManager currentManager)
+    private LangValueType HandleSymbolAccess(LangId langId)
     {
         var symbolName = langId.IdName;
+        var symbol = GetSymbol(symbolName);
 
-        // 1. 尝试从模块符号中获取
-        if (Symbols.TryGetValue(symbolName, out var symbol))
+        if (symbol == null)
         {
-            return symbol;
+            throw new AttributeError(this, symbolName, ModuleName);
         }
 
-        // 2. 大小写不敏感查找
-        var caseInsensitiveMatch = Symbols.FirstOrDefault(kvp =>
-            string.Equals(kvp.Key, symbolName, StringComparison.OrdinalIgnoreCase));
-        if (caseInsensitiveMatch.Value != null)
-        {
-            return caseInsensitiveMatch.Value;
-        }
-
-        // 3. 代理到全局作用域（保持兼容性）
-        var globalSymbol = currentManager.GetValue(langId);
-        if (globalSymbol != null)
-        {
-            return globalSymbol;
-        }
-
-        throw new AttributeError(this, symbolName, ModuleName);
+        return symbol;
     }
 
+    /// <summary>
+    /// 处理函数调用
+    /// </summary>
     private LangValueType HandleFunctionCall(Instance instance, VariateManager currentManager)
     {
         var functionName = instance.Id.IdName;
-        var func = GetSymbol(functionName) ??
-                   Symbols.FirstOrDefault(kvp =>
-                       string.Equals(kvp.Key, functionName, StringComparison.OrdinalIgnoreCase)).Value;
+        var func = GetSymbol(functionName);
 
         if (func is FuncLangValue funcValue)
         {
             return funcValue.Run(currentManager, instance.Ids);
         }
 
-        // 代理到全局作用域查找函数
-        var globalFunc = currentManager.GetValue(new LangId(functionName));
-        if (globalFunc is FuncLangValue globalFuncValue)
+        if (func is AsyncFuncLangValue asyncFuncValue)
         {
-            return globalFuncValue.Run(currentManager, instance.Ids);
+            return asyncFuncValue.RunAsync(currentManager, instance.Ids);
         }
 
         throw new AttributeError(this, functionName, ModuleName);

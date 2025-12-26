@@ -1,5 +1,0 @@
-
-lazy import "counter_module" as counter
-result1 <- counter.incrementAndGet()
-result2 <- counter.incrementAndGet()
-result3 <- counter.incrementAndGet()

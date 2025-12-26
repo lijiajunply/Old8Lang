@@ -1,5 +1,0 @@
-
-// 插件接口定义
-func initialize() -> string { return "Plugin initialized" }
-func execute(input:string) -> string { return "Processed: " + input }
-func cleanup() -> string { return "Plugin cleaned up" }

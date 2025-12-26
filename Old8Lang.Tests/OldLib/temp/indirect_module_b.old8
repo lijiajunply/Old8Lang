@@ -1,5 +1,0 @@
-
-import "indirect_module_c"
-func getB() -> int {
-    return 2 + getC()
-}

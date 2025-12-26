@@ -1,7 +1,0 @@
-
-
-                          import {add, multiply} from "mixed_module"
-                          result1 <- add(2.0, 3.0)
-                          result2 <- multiply(4.0, 5.0)
-
-                          

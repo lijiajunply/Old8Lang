@@ -1,3 +1,0 @@
-
-import "math" as _private
-result <- _private.getValue()

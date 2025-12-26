@@ -1,4 +1,0 @@
-
-func existingFunc() -> string {
-    return "Exists"
-}

@@ -1,7 +1,0 @@
-
-func calculate(x:double, y:double) -> double {
-    return x * y + 10.0
-}
-func getName() -> string {
-    return "Advanced Math"
-}

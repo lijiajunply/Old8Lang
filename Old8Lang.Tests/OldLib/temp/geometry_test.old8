@@ -1,4 +1,0 @@
-
-import "geometry" as geo
-area <- geo.calculateArea(5.0)
-perimeter <- geo.calculatePerimeter(5.0)

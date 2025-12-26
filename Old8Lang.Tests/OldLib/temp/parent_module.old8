@@ -1,5 +1,0 @@
-
-import "nested_module" as nested
-func getNestedValue() -> int {
-    return nested.getValue()
-}

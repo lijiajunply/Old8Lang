@@ -100,12 +100,7 @@ func getC() -> int {
 
         var testContent = @"
 import ""indirect_module_a"" as a
-result <- """"
-try {
-    result <- a.getA()
-} catch {
-    result <- -1  // 表示检测到循环依赖
-}
+result <- a.getA()
 ";
 
         CreateTempModuleFile("indirect_module_a.old8", moduleAContent);
@@ -117,9 +112,10 @@ try {
         var (interpreter, exception) = ExecuteCodeFile("indirect_circular_test.old8");
 
         // Assert
-        // 间接循环依赖应该被检测
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
+        // 间接循环依赖应该被检测到并抛出异常
+        Assert.NotNull(exception);
+        Assert.True(exception.Message.Contains("circular", StringComparison.OrdinalIgnoreCase) ||
+                   exception.Message.Contains("循环依赖"));
     }
 
     [Fact]
@@ -292,12 +288,7 @@ import ""core"" as core
 import ""utils"" as utils
 import ""config"" as config
 import ""helpers"" as helpers
-result <- """"
-try {
-    result <- core.initialize()
-} catch {
-    result <- ""Circular dependency detected""
-}
+result <- core.initialize()
 ";
 
         // 创建所有模块
@@ -311,9 +302,10 @@ try {
         var (interpreter, exception) = ExecuteCodeFile("complex_circular_test.old8");
 
         // Assert
-        // 复杂的循环依赖网络应该被处理
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
+        // 复杂的循环依赖网络应该被检测到并抛出异常
+        Assert.NotNull(exception);
+        Assert.True(exception.Message.Contains("circular", StringComparison.OrdinalIgnoreCase) ||
+                   exception.Message.Contains("循环依赖"));
     }
 
     [Fact]
@@ -348,13 +340,7 @@ class ClassB {
 
         var testContent = @"
 import ""circular_class_a"" as a
-result <- """"
-try {
-    instanceA <- a.ClassA()
-    result <- instanceA.getValue()
-} catch {
-    result <- -1
-}
+result <- a.ClassA()
 ";
 
         CreateTempModuleFile("circular_class_a.old8", moduleAContent);
@@ -365,8 +351,10 @@ try {
         var (interpreter, exception) = ExecuteCodeFile("circular_class_test.old8");
 
         // Assert
-        var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.NotNull(result);
+        // 类相关的循环依赖应该被检测到并抛出异常
+        Assert.NotNull(exception);
+        Assert.True(exception.Message.Contains("circular", StringComparison.OrdinalIgnoreCase) ||
+                   exception.Message.Contains("循环依赖"));
     }
 
     [Fact]

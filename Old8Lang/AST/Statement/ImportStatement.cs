@@ -8,6 +8,7 @@ using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using Old8Lang.StandardLibrary;
+using Old8Lang.ModuleSystem.Core;
 
 namespace Old8Lang.AST.Statement;
 
@@ -53,6 +54,9 @@ public partial class ImportStatement(
     LangExpression? dynamicModuleExpression = null
 ) : OldStatement(position)
 {
+    // 静态模块系统服务实例
+    private static readonly ModuleSystemService ModuleService = new();
+
     /// <summary>
     /// 导入的模块名称或路径
     /// </summary>
@@ -106,41 +110,6 @@ public partial class ImportStatement(
     public override void Run(VariateManager manager)
     {
         var moduleName = ImportString;
-        var attemptedPaths = new List<string>();
-        bool isDirectory = false;
-
-        // 检查是否为网络路径（URL）
-        if (moduleName.StartsWith("http://") || moduleName.StartsWith("https://"))
-        {
-            // 网络导入警告
-            manager.Interpreter.OutputProvider.WriteLine($"[警告] 正在从网络导入模块: {moduleName}");
-            manager.Interpreter.OutputProvider.WriteLine("[警告] 网络导入存在安全风险，请确保来源可信");
-
-            // 网络路径特殊处理
-            // 由于我们还不支持真正的网络导入，我们可以创建一个简单的模块对象
-            // 直接进入执行阶段，跳过文件系统检查
-            if (ModuleAlias != null)
-            {
-                // 创建统一模块对象
-                var moduleObj = ModuleFactory.CreateEagerModule(ImportString, manager, Position);
-
-                // 将模块对象添加到当前作用域
-                manager.Scopes[^1][ModuleAlias] = moduleObj;
-            }
-
-            return;
-        }
-
-        // 处理 module.submodule 语法（排除相对路径和文件扩展名）
-        if (moduleName.Contains('.') &&
-            !moduleName.StartsWith("./") &&
-            !moduleName.StartsWith("../") &&
-            !moduleName.EndsWith(".old8") &&
-            !moduleName.EndsWith(".ol"))
-        {
-            HandleSubmoduleImport(moduleName, manager);
-            return;
-        }
 
         // 动态导入处理
         if (IsDynamic)
@@ -156,254 +125,33 @@ public partial class ImportStatement(
             return;
         }
 
-        // 优先级 1: 标准库（Old8LangLib 和 Old8Lang.NetLib）
-        if (StandardLibraryRegistry.IsStandardLibrary(moduleName))
+        // 使用新的模块系统服务
+        var symbolAliases = ImportSpecifiers
+            .Where(item => item.Name != item.Alias)
+            .ToDictionary(item => item.Name, item => item.Alias);
+
+        var options = new ImportOptions
         {
-            if (StandardLibraryLoader.TryLoadStandardLibrary(moduleName, manager, out var stdModule))
+            IsFromClause = FromClause,
+            ModuleAlias = ModuleAlias,
+            ImportSpecifiers = ImportSpecifiers.Select(item => item.Name).ToList(),
+            SymbolAliases = symbolAliases.Count > 0 ? symbolAliases : null,
+            IsLazy = IsLazy,
+            IsSelective = IsSelective
+        };
+
+        var result = ModuleService.ImportModule(moduleName, manager, options);
+
+        if (!result.IsSuccess)
+        {
+            if (result.Error != null)
             {
-                RegisterModule(manager, moduleName, stdModule);
-                return;
+                throw result.Error;
             }
-        }
-
-        // 优先级 2: 第三方包（通过 PackageManager）
-        // 跳过相对路径和绝对路径，它们应该由本地文件导入处理
-        if (!moduleName.StartsWith("./") && !moduleName.StartsWith("../") && !Path.IsPathRooted(moduleName))
-        {
-            var packageManager = manager.GetPackageManager();
-
-            // 根据当前执行文件添加包查找路径
-            packageManager.AddSearchPathsFromSourceFile(manager.Path);
-
-            if (packageManager.TryLoadPackage(moduleName, manager, out var pkgModule))
-            {
-                RegisterModule(manager, moduleName, pkgModule);
-                return;
-            }
-        }
-
-        // 优先级 3: 本地文件导入（相对于当前文件的路径）
-
-        var dic = Path.GetDirectoryName(manager.Path);
-        // 如果 dic 是空字符串，使用当前文件的目录（如果 Path 非空）或当前工作目录
-        if (string.IsNullOrEmpty(dic) && !string.IsNullOrEmpty(manager.Path))
-        {
-            dic = Path.GetDirectoryName(Path.GetFullPath(manager.Path));
-        }
-        if (string.IsNullOrEmpty(dic))
-        {
-            dic = Directory.GetCurrentDirectory();
-        }
-
-        // 检查文件扩展名，只支持.old8和.ol
-        var fileNameLocal = moduleName;
-        var extLocal = Path.GetExtension(fileNameLocal).ToLower();
-        if (extLocal != ".old8" && extLocal != ".ol")
-        {
-            fileNameLocal += ".old8"; // 默认使用.old8扩展名
-        }
-
-        // 修复：正确处理绝对路径和相对路径
-        var filePath = Path.IsPathRooted(fileNameLocal)
-            ? fileNameLocal
-            : dic != null
-                ? Path.Combine(dic, fileNameLocal)
-                : fileNameLocal;
-
-        if (filePath.StartsWith("Users/") || filePath.StartsWith("Volumes/"))
-        {
-            filePath = "/" + filePath;
-        }
-
-        attemptedPaths.Add(filePath);
-
-        if (!File.Exists(filePath))
-        {
-            throw new ImportError(Position, moduleName, attemptedPaths);
-        }
-
-        var resolvedPath = filePath;
-
-
-        if (resolvedPath == null)
-        {
-            throw new ImportError(Position, moduleName, attemptedPaths);
-        }
-
-        // 获取绝对路径作为缓存键
-        var moduleAbsolutePath = Path.GetFullPath(resolvedPath);
-
-        // 1. 检查循环依赖
-        if (manager.ImportStack.Contains(moduleAbsolutePath))
-        {
-            throw new ImportError(Position, moduleName, manager.ImportStack);
-        }
-
-        // 2. 检查模块缓存
-        if (manager.Interpreter.ModuleCache.TryGetValue(moduleAbsolutePath, out var cachedBlock))
-        {
-            // 使用缓存的模块
-            if (!FromClause) return;
-            // 为命名导入创建独立作用域
-            manager.AddChildren();
-
-            // 记录执行前的 ImportInfos
-            var importInfosBefore = manager.ImportInfos.ToList();
-
-            // 对于缓存的模块，我们不需要再次执行它的函数和类定义语句
-            // 我们只需要执行它的变量赋值语句
-            // 函数和类已经在全局作用域中了
-            cachedBlock.ExecuteModule(manager, skipFunctionClassInit: true);
-
-            // 找出新增的 ImportInfos
-            var newImportInfos = manager.ImportInfos.Except(importInfosBefore).ToList();
-
-            // 只导入指定的成员
-            ImportSpecifiedMembers(manager, newImportInfos);
-            manager.RemoveChildren();
-
-            return;
-        }
-
-        // 3. 执行导入
-        manager.ImportStack.Push(moduleAbsolutePath);
-        try
-        {
-            var previousPath = manager.Path;
-            manager.Path = moduleAbsolutePath;
-
-            var code = isDirectory ? Apis.FromDirectory(moduleAbsolutePath) : Apis.FromFile(moduleAbsolutePath);
-            var block = manager.Interpreter.Build(code: code);
-
-            // 4. 缓存模块
-            manager.Interpreter.ModuleCache[moduleAbsolutePath] = block;
-
-            if (FromClause)
-            {
-                // 为命名导入创建独立作用域
-                manager.AddChildren();
-
-                // 记录执行前的 ImportInfos
-                var importInfosBefore = manager.ImportInfos.ToList();
-
-                // 执行模块的非导入语句，包括函数定义、类定义和变量赋值
-                // 但跳过导入语句，避免递归导入
-                block.ExecuteModule(manager);
-
-                // 找出新增的 ImportInfos
-                var newImportInfos = manager.ImportInfos.Except(importInfosBefore).ToList();
-
-                // 只导入指定的成员到父作用域
-                ImportSpecifiedMembers(manager, newImportInfos);
-
-                manager.RemoveChildren();
-            }
-            else if (ModuleAlias != null)
-            {
-                // 对于带别名的导入，先执行模块代码，然后创建模块对象
-                // 创建一个临时作用域来执行模块代码
-                manager.AddChildren();
-
-                // 记录执行前的 ImportInfos 数量
-                var importInfosBefore = manager.ImportInfos.ToList();
-
-                try
-                {
-                    // 执行模块代码
-                    block.Run(manager);
-
-                    // 从执行结果中提取符号并创建模块对象
-                    var moduleSymbols = new Dictionary<string, LangValueType>();
-
-                    // 从当前作用域提取变量
-                    foreach (var (name, value) in manager.Scopes[^1])
-                    {
-                        // 跳过模块对象本身
-                        if (value is IModuleObject)
-                            continue;
-                        moduleSymbols[name] = value;
-                    }
-
-                    // 从 ImportInfos 提取函数和类（只提取新增的）
-                    var importInfosAfter = manager.ImportInfos.ToList();
-                    var newImportInfos = importInfosAfter.Except(importInfosBefore).ToList();
-
-                    foreach (var importInfo in newImportInfos)
-                    {
-                        string? symbolName = null;
-                        switch (importInfo)
-                        {
-                            case FuncLangValue func when func.Id != null:
-                                symbolName = func.Id.IdName;
-                                break;
-                            case AsyncFuncLangValue asyncFunc when asyncFunc.Id != null:
-                                symbolName = asyncFunc.Id.IdName;
-                                break;
-                            case TypeTemplate template:
-                                symbolName = template.ClassName;
-                                break;
-                            case NativeAnyLangValue nativeAny:
-                                symbolName = nativeAny.RegisterName;
-                                break;
-                            case NativeStaticAny staticAny:
-                                symbolName = staticAny.ClassName;
-                                break;
-                        }
-
-                        if (symbolName != null && !moduleSymbols.ContainsKey(symbolName))
-                        {
-                            moduleSymbols[symbolName] = importInfo;
-                        }
-                    }
-
-                    // 创建模块对象
-                    var moduleObj = UnifiedModule.FromSymbols(moduleName, moduleSymbols, Position);
-
-                    // 将模块对象添加到父作用域
-                    manager.Scopes[^2][ModuleAlias] = moduleObj;
-                }
-                finally
-                {
-                    // 清理临时作用域
-                    manager.RemoveChildren();
-                }
-            }
-            else
-            {
-                // 使用新的统一模块工厂创建模块对象
-                UnifiedModule moduleValue;
-
-                if (IsSelective && ImportSpecifiers.Count > 0)
-                {
-                    // 选择性导入
-                    var selectedSymbols = ImportSpecifiers.Select(item => item.Alias).ToList();
-                    moduleValue =
-                        ModuleFactory.CreateSelectiveModule(ImportString, selectedSymbols, manager, Position);
-                }
-                else
-                {
-                    // 懒加载模块
-                    moduleValue = ModuleFactory.CreateLazyModule(ImportString, manager, Position);
-                }
-
-                // 先执行模块代码来填充符号（如果不是选择性导入）
-                if (!IsSelective)
-                {
-                    block.Run(manager);
-                }
-
-                // 注册模块对象到变量管理器
-                RegisterModuleValue(moduleValue, manager);
-            }
-
-            manager.Path = previousPath;
-        }
-        finally
-        {
-            // 确保无论导入成功与否，都从导入栈中移除
-            manager.ImportStack.Pop();
+            throw new ImportError(this, moduleName, "模块导入失败");
         }
     }
+
 
     /// <summary>
     /// 只导入指定的成员到当前作用域

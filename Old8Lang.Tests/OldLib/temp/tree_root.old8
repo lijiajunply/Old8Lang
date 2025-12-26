@@ -1,9 +1,0 @@
-
-import "tree_middle1"
-import "tree_middle2"
-func rootFunction() -> string {
-    return "Root: " + middle1Function() + " + " + middle2Function()
-}
-func getTotalSum() -> int {
-    return getMiddle1Sum() + getMiddle2Value()
-}

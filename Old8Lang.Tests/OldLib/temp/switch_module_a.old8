@@ -1,4 +1,0 @@
-
-func featureA() -> string {
-    return "Feature A activated"
-}

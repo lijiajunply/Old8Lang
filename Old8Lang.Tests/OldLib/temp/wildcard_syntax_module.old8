@@ -1,4 +1,0 @@
-
-func testFunction() -> string {
-    return "Wildcard import successful"
-}

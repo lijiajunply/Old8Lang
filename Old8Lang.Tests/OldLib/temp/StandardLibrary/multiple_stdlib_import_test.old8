@@ -1,7 +1,0 @@
-// 测试多个标准库导入
-import "OS"
-import "MathLib"
-import "Time"
-
-// 验证多个标准库是否正确导入
-print("多个标准库导入成功")

@@ -1,3 +1,0 @@
-
-import {} from "empty_selective_module"
-result <- "no imports"

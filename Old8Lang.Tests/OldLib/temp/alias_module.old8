@@ -1,5 +1,0 @@
-
-func veryLongFunctionName() -> string {
-    return "success"
-}
-anotherLongName <- 100

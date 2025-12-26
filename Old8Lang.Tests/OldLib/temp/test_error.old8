@@ -1,2 +1,0 @@
-import "invalid/path/module"
-result <- 42

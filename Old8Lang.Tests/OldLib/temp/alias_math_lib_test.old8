@@ -1,3 +1,0 @@
-
-import "math" as math_lib
-result <- math_lib.getValue()

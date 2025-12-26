@@ -1,3 +1,0 @@
-
-import {nonExistentFunction} from "module"
-result <- nonExistentFunction()

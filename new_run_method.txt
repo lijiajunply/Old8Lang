@@ -1,0 +1,55 @@
+    /// <summary>
+    /// 在解释模式下执行导入语句
+    /// </summary>
+    /// <param name="manager">变量管理器，用于管理导入的模块和变量</param>
+    /// <exception cref="ImportError">当导入失败时抛出</exception>
+    public override void Run(VariateManager manager)
+    {
+        var moduleName = ImportString;
+
+        // 处理 module.submodule 语法（排除相对路径和文件扩展名）
+        if (moduleName.Contains('.') &&
+            !moduleName.StartsWith("./") &&
+            !moduleName.StartsWith("../") &&
+            !moduleName.EndsWith(".old8") &&
+            !moduleName.EndsWith(".ol"))
+        {
+            HandleSubmoduleImport(moduleName, manager);
+            return;
+        }
+
+        // 动态导入处理
+        if (IsDynamic)
+        {
+            HandleDynamicImport(manager);
+            return;
+        }
+
+        // 懒导入处理
+        if (IsLazy)
+        {
+            HandleLazyImport(manager);
+            return;
+        }
+
+        // 使用新的模块系统服务
+        var options = new ImportOptions
+        {
+            IsFromClause = FromClause,
+            ModuleAlias = ModuleAlias,
+            ImportSpecifiers = ImportSpecifiers.Select(item => item.Alias).ToList(),
+            IsLazy = IsLazy,
+            IsSelective = IsSelective
+        };
+
+        var result = ModuleService.ImportModule(moduleName, manager, options);
+
+        if (!result.IsSuccess)
+        {
+            if (result.Error != null)
+            {
+                throw result.Error;
+            }
+            throw new ImportError(Position, moduleName, "模块导入失败");
+        }
+    }

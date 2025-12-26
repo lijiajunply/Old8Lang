@@ -1,6 +1,0 @@
-// 简单的懒导入测试
-func TestFunc() -> string {
-    return "Test"
-}
-
-TESTCONST:const <- 123

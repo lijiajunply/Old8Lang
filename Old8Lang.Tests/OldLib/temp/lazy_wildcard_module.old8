@@ -1,9 +1,0 @@
-
-func lazyFunction() -> string {
-    return "Lazy function called"
-}
-class LazyClass {
-    public func getValue() -> int {
-        return 100
-    }
-}

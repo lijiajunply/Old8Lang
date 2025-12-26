@@ -1,9 +1,0 @@
-// 测试变量绑定
-
-PrintLine("Test: Variable binding")
-value <- 42
-result <- match value {
-    case 0 -> "zero"
-    case x -> "value is " + x.ToStr()
-}
-PrintLine(result)

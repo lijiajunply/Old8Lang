@@ -1,4 +1,0 @@
-
-import "tree_root" as root
-result1 <- root.rootFunction()
-result2 <- root.getTotalSum()

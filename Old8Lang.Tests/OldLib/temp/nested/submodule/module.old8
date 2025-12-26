@@ -1,4 +1,0 @@
-
-func deepFunction() -> string {
-    return "Deep import successful"
-}

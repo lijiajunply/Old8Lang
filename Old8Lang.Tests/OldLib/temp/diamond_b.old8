@@ -1,5 +1,0 @@
-
-import "diamond_d"
-func getBValue() -> int {
-    return getSharedValue() + 100
-}

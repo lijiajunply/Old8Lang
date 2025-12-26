@@ -1,7 +1,0 @@
-
-func processData(data:string) -> string {
-    return "Processed: " + data
-}
-func getVersion() -> string {
-    return "1.0.0"
-}
