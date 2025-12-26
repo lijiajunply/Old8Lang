@@ -83,13 +83,11 @@ public static class StandardLibraryRegistry
             ClassName: "TemplateEngine"),
         ["ImageLib"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "ImageLib"),
-        ["AssertLib"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib"),
-        ["MockLib"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib"),
-        ["TestRunner"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib"),
-        ["SerializationLib"] = new StandardLibraryInfo(
-            AssemblyName: "Old8Lang.SerializationLib",
-            ClassNames: ["MessagePackSerializer", "ProtobufSerializer", "SerializationLibBinding"]
-        ),
+        ["AssertLib"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib", ClassName: "AssertLib"),
+        ["MockLib"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib", ClassName: "MockLib"),
+        ["TestRunner"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib", "TestRunner"),
+        ["SerializationLib"] = new StandardLibraryInfo(AssemblyName: "Old8Lang.SerializationLib",
+            ClassName: "SerializationLibBinding"),
     };
 
     /// <summary>

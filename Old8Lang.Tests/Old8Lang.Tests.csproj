@@ -26,6 +26,7 @@
     <ProjectReference Include="..\Old8Lang\Old8Lang.csproj" />
     <ProjectReference Include="..\Old8LangLib\Old8LangLib.csproj" />
     <ProjectReference Include="..\Old8Lang.NetLib\Old8Lang.NetLib.csproj" />
+    <ProjectReference Include="..\Old8Lang.MachineLearningLib\Old8Lang.MachineLearningLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>
