@@ -254,7 +254,7 @@ result2 <- process2(24)
 
         var testContent = """
 
-                           import { deepFunction } from "nested/submodule/module"
+                           import { deepFunction } from "./nested/submodule/module"
                            result <- deepFunction()
 
                            """;

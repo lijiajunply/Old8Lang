@@ -1,9 +1,2 @@
-// 测试浮点数匹配
-
-pi <- 3.14
-result <- match pi {
-    case 2.71 -> "e"
-    case 3.14 -> "pi"
-    case _ -> "unknown"
-}
-PrintLine("Result: " + result)
+import "invalid/path/module"
+result <- 42

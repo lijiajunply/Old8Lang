@@ -397,12 +397,12 @@ result4 <- scientific_calc[""power""](2, 3)
     {
         // Arrange - 混合使用即时导入和延迟导入
         var eagerModuleContent = @"
-const EAGER_VALUE <- 100
+EAGER_VALUE:const <- 100
 func eagerFunction() -> string { return ""Eager"" }
 ";
 
         var lazyModuleContent = @"
-const LAZY_VALUE <- 200
+LAZY_VALUE:const <- 200
 func lazyFunction() -> string { return ""Lazy"" }
 ";
 

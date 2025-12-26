@@ -100,6 +100,7 @@ func getC() -> int {
 
         var testContent = @"
 import ""indirect_module_a"" as a
+result <- """"
 try {
     result <- a.getA()
 } catch {
@@ -291,6 +292,7 @@ import ""core"" as core
 import ""utils"" as utils
 import ""config"" as config
 import ""helpers"" as helpers
+result <- """"
 try {
     result <- core.initialize()
 } catch {
@@ -346,6 +348,7 @@ class ClassB {
 
         var testContent = @"
 import ""circular_class_a"" as a
+result <- """"
 try {
     instanceA <- a.ClassA()
     result <- instanceA.getValue()

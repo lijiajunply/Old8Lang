@@ -1,5 +1,6 @@
 
 import "circular_class_a" as a
+result <- ""
 try {
     instanceA <- a.ClassA()
     result <- instanceA.getValue()

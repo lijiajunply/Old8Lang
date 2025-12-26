@@ -1,6 +1,6 @@
 
-const PI <- 3.14159
-const E <- 2.71828
+PI:const <- 3.14159
+E:const <- 2.71828
 func getPi() -> double {
     return PI
 }

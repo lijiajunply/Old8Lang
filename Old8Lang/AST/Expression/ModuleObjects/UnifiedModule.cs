@@ -1,3 +1,5 @@
+using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Error;
@@ -18,9 +20,9 @@ public class UnifiedModule(
 ) : LangValueType(position), IModuleValueType
 #pragma warning restore CS9113
 {
-    private readonly Dictionary<string, LangValueType> _symbols = new();
-    private readonly object _loadLock = new();
-    private readonly List<string> _selectedSymbols = new();
+    private readonly Dictionary<string, LangValueType> Symbols = new();
+    private readonly Lock LoadLock = new();
+    private readonly List<string> SelectedSymbols = [];
     private bool _isLoaded;
 
     /// <summary>
@@ -49,7 +51,7 @@ public class UnifiedModule(
     /// <param name="symbolNames">要导入的符号名称列表</param>
     public void SetSelectedSymbols(IEnumerable<string> symbolNames)
     {
-        _selectedSymbols.AddRange(symbolNames);
+        SelectedSymbols.AddRange(symbolNames);
     }
 
     /// <summary>
@@ -60,7 +62,7 @@ public class UnifiedModule(
     public LangValueType? GetSymbol(string symbolName)
     {
         EnsureLoaded();
-        _symbols.TryGetValue(symbolName, out var symbol);
+        Symbols.TryGetValue(symbolName, out var symbol);
         return symbol;
     }
 
@@ -81,7 +83,7 @@ public class UnifiedModule(
     public IEnumerable<string> GetExportedSymbols()
     {
         EnsureLoaded();
-        return _symbols.Keys;
+        return Symbols.Keys;
     }
 
     /// <summary>
@@ -92,7 +94,7 @@ public class UnifiedModule(
     {
         if (!_isLoaded)
         {
-            lock (_loadLock)
+            lock (LoadLock)
             {
                 if (!_isLoaded)
                 {
@@ -133,13 +135,13 @@ public class UnifiedModule(
         {
             ModuleLoadMode.Eager => "eager",
             ModuleLoadMode.Lazy => "lazy",
-            ModuleLoadMode.Selective => _selectedSymbols.Count > 0
-                ? $"selective({_selectedSymbols.Count})"
+            ModuleLoadMode.Selective => SelectedSymbols.Count > 0
+                ? $"selective({SelectedSymbols.Count})"
                 : "selective",
             _ => "unknown"
         };
 
-        var status = _isLoaded ? $"{_symbols.Count} symbols" : "unloaded";
+        var status = _isLoaded ? $"{Symbols.Count} symbols" : "unloaded";
         return $"<module {ModuleName} ({mode}, {status})>";
     }
 
@@ -182,10 +184,10 @@ public class UnifiedModule(
         SourcePosition position = default)
     {
         var module = new UnifiedModule(moduleName, new VariateManager(), ModuleLoadMode.Eager, position);
-        module._symbols.Clear();
+        module.Symbols.Clear();
         foreach (var kvp in symbols)
         {
-            module._symbols[kvp.Key] = kvp.Value;
+            module.Symbols[kvp.Key] = kvp.Value;
         }
         module._isLoaded = true;
         return module;
@@ -214,70 +216,127 @@ public class UnifiedModule(
     {
         manager ??= new VariateManager();
 
-        // 创建临时作用域
-        var tempScope = new Dictionary<string, LangValueType>();
-        manager.Scopes.Add(tempScope);
+        // 创建一个独立的临时 manager 来加载模块，避免污染当前作用域
+        var tempManager = new VariateManager
+        {
+            LangInfo = manager.LangInfo,
+            Path = manager.Path,
+            Interpreter = manager.Interpreter
+        };
+
+        // 保存原始的 ImportInfosList，避免被模块导入污染
+        var originalImportInfos = manager.ImportInfos.ToList();
 
         try
         {
-            // 执行导入
+            // 执行导入到临时 manager
             var importStatement = new ImportStatement(ModuleName, Position);
-            importStatement.Run(manager);
+            importStatement.Run(tempManager);
 
-            // 提取符号
-            ExtractSymbolsFromScope(tempScope);
+            // 从临时 manager 提取符号（函数、类、变量等）
+            ExtractSymbolsFromManager(tempManager);
         }
         finally
         {
-            // 清理临时作用域
-            if (manager.Scopes.Count > 1)
-            {
-                manager.Scopes.RemoveAt(manager.Scopes.Count - 1);
-            }
+            // 不需要清理，因为使用的是独立的 tempManager
         }
     }
 
-    private void ExtractSymbolsFromScope(Dictionary<string, LangValueType> scope)
+    /// <summary>
+    /// 从变量管理器中提取所有符号
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    private void ExtractSymbolsFromManager(VariateManager manager)
     {
         var moduleBaseName = Path.GetFileNameWithoutExtension(ModuleName);
 
-        foreach (var (symbolName, symbolValue) in scope)
+        // 1. 从作用域中提取变量和常量
+        foreach (var scope in manager.Scopes)
         {
-            // 跳过模块自身引用
-            if (string.Equals(symbolName, moduleBaseName, StringComparison.OrdinalIgnoreCase))
-                continue;
-
-            // 跳过其他模块对象
-            if (symbolValue is IModuleObject)
-                continue;
-
-            // 如果是选择性导入，只添加指定的符号
-            if (LoadMode == ModuleLoadMode.Selective && _selectedSymbols.Count > 0)
+            foreach (var (symbolName, symbolValue) in scope)
             {
-                if (_selectedSymbols.Contains(symbolName))
+                // 跳过模块自身引用
+                if (string.Equals(symbolName, moduleBaseName, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                // 跳过其他模块对象
+                if (symbolValue is IModuleObject)
+                    continue;
+
+                // 如果是选择性导入，只添加指定的符号
+                if (LoadMode == ModuleLoadMode.Selective && SelectedSymbols.Count > 0)
                 {
-                    _symbols[symbolName] = symbolValue;
+                    if (SelectedSymbols.Contains(symbolName))
+                    {
+                        Symbols[symbolName] = symbolValue;
+                    }
+                }
+                else
+                {
+                    Symbols[symbolName] = symbolValue;
                 }
             }
-            else
+        }
+
+        // 2. 从 ImportInfos 中提取函数和类
+        foreach (var importInfo in manager.ImportInfos)
+        {
+            string? symbolName = null;
+
+            switch (importInfo)
             {
-                _symbols[symbolName] = symbolValue;
+                case FuncLangValue { Id: not null } func:
+                    symbolName = func.Id.IdName;
+                    break;
+                case AsyncFuncLangValue { Id: not null } asyncFunc:
+                    symbolName = asyncFunc.Id.IdName;
+                    break;
+                case TypeTemplate template:
+                    symbolName = template.ClassName;
+                    break;
+                case NativeAnyLangValue nativeAny:
+                    symbolName = nativeAny.RegisterName;
+                    break;
+                case NativeStaticAny staticAny:
+                    symbolName = staticAny.ClassName;
+                    break;
+            }
+
+            if (symbolName != null)
+            {
+                // 跳过模块自身引用
+                if (string.Equals(symbolName, moduleBaseName, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                // 如果是选择性导入，只添加指定的符号
+                if (LoadMode == ModuleLoadMode.Selective && SelectedSymbols.Count > 0)
+                {
+                    if (SelectedSymbols.Contains(symbolName))
+                    {
+                        Symbols[symbolName] = importInfo;
+                    }
+                }
+                else
+                {
+                    Symbols[symbolName] = importInfo;
+                }
             }
         }
     }
+
 
     private LangValueType HandleSymbolAccess(LangId langId, VariateManager currentManager)
     {
         var symbolName = langId.IdName;
 
         // 1. 尝试从模块符号中获取
-        if (_symbols.TryGetValue(symbolName, out var symbol))
+        if (Symbols.TryGetValue(symbolName, out var symbol))
         {
             return symbol;
         }
 
         // 2. 大小写不敏感查找
-        var caseInsensitiveMatch = _symbols.FirstOrDefault(kvp =>
+        var caseInsensitiveMatch = Symbols.FirstOrDefault(kvp =>
             string.Equals(kvp.Key, symbolName, StringComparison.OrdinalIgnoreCase));
         if (caseInsensitiveMatch.Value != null)
         {
@@ -298,7 +357,7 @@ public class UnifiedModule(
     {
         var functionName = instance.Id.IdName;
         var func = GetSymbol(functionName) ??
-                   _symbols.FirstOrDefault(kvp =>
+                   Symbols.FirstOrDefault(kvp =>
                        string.Equals(kvp.Key, functionName, StringComparison.OrdinalIgnoreCase)).Value;
 
         if (func is FuncLangValue funcValue)

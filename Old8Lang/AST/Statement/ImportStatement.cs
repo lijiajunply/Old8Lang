@@ -1,5 +1,7 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Expression.ModuleObjects;
 using Old8Lang.Compiler;
@@ -263,14 +265,73 @@ public partial class ImportStatement(
             }
             else if (ModuleAlias != null)
             {
-                // 对于带别名的导入，创建新的统一模块对象
-                var moduleObj = ModuleFactory.CreateEagerModule(ImportString, manager, Position);
+                // 对于带别名的导入，先执行模块代码，然后创建模块对象
+                // 创建一个临时作用域来执行模块代码
+                manager.AddChildren();
 
-                // 先执行模块代码来填充符号
-                block.Run(manager);
+                // 记录执行前的 ImportInfos 数量
+                var importInfosBefore = manager.ImportInfos.ToList();
 
-                // 将模块对象添加到当前作用域
-                manager.Scopes[^1][ModuleAlias] = moduleObj;
+                try
+                {
+                    // 执行模块代码
+                    block.Run(manager);
+
+                    // 从执行结果中提取符号并创建模块对象
+                    var moduleSymbols = new Dictionary<string, LangValueType>();
+
+                    // 从当前作用域提取变量
+                    foreach (var (name, value) in manager.Scopes[^1])
+                    {
+                        // 跳过模块对象本身
+                        if (value is IModuleObject)
+                            continue;
+                        moduleSymbols[name] = value;
+                    }
+
+                    // 从 ImportInfos 提取函数和类（只提取新增的）
+                    var importInfosAfter = manager.ImportInfos.ToList();
+                    var newImportInfos = importInfosAfter.Except(importInfosBefore).ToList();
+
+                    foreach (var importInfo in newImportInfos)
+                    {
+                        string? symbolName = null;
+                        switch (importInfo)
+                        {
+                            case FuncLangValue func when func.Id != null:
+                                symbolName = func.Id.IdName;
+                                break;
+                            case AsyncFuncLangValue asyncFunc when asyncFunc.Id != null:
+                                symbolName = asyncFunc.Id.IdName;
+                                break;
+                            case TypeTemplate template:
+                                symbolName = template.ClassName;
+                                break;
+                            case NativeAnyLangValue nativeAny:
+                                symbolName = nativeAny.RegisterName;
+                                break;
+                            case NativeStaticAny staticAny:
+                                symbolName = staticAny.ClassName;
+                                break;
+                        }
+
+                        if (symbolName != null && !moduleSymbols.ContainsKey(symbolName))
+                        {
+                            moduleSymbols[symbolName] = importInfo;
+                        }
+                    }
+
+                    // 创建模块对象
+                    var moduleObj = UnifiedModule.FromSymbols(moduleName, moduleSymbols, Position);
+
+                    // 将模块对象添加到父作用域
+                    manager.Scopes[^2][ModuleAlias] = moduleObj;
+                }
+                finally
+                {
+                    // 清理临时作用域
+                    manager.RemoveChildren();
+                }
             }
             else
             {
