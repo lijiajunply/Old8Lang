@@ -177,6 +177,16 @@ public partial class ImportStatement(
         // 优先级 3: 本地文件导入（相对于当前文件的路径）
 
         var dic = Path.GetDirectoryName(manager.Path);
+        // 如果 dic 是空字符串，使用当前文件的目录（如果 Path 非空）或当前工作目录
+        if (string.IsNullOrEmpty(dic) && !string.IsNullOrEmpty(manager.Path))
+        {
+            dic = Path.GetDirectoryName(Path.GetFullPath(manager.Path));
+        }
+        if (string.IsNullOrEmpty(dic))
+        {
+            dic = Directory.GetCurrentDirectory();
+        }
+
         // 检查文件扩展名，只支持.old8和.ol
         var fileNameLocal = moduleName;
         var extLocal = Path.GetExtension(fileNameLocal).ToLower();
