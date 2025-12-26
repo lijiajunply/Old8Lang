@@ -7,3 +7,5 @@ riderModule.iml
 *.asm
 
 .DS_Store
+
+Old8Lang.Tests/OldLib
