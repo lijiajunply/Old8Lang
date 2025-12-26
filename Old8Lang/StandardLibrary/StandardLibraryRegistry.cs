@@ -86,6 +86,10 @@ public static class StandardLibraryRegistry
         ["AssertLib"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib"),
         ["MockLib"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib"),
         ["TestRunner"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib"),
+        ["SerializationLib"] = new StandardLibraryInfo(
+            AssemblyName: "Old8Lang.SerializationLib",
+            ClassNames: ["MessagePackSerializer", "ProtobufSerializer", "SerializationLibBinding"]
+        ),
     };
 
     /// <summary>

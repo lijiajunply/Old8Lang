@@ -8,14 +8,14 @@ namespace Old8Lang.SerializationLib;
 /// </summary>
 public class MessagePackSerializer : ISerializer
 {
-    private readonly MessagePackSerializerOptions _options;
+    private readonly MessagePackSerializerOptions Options;
 
     /// <summary>
     /// 默认构造函数，使用标准解析器
     /// </summary>
     public MessagePackSerializer()
     {
-        _options = MessagePackSerializerOptions.Standard
+        Options = MessagePackSerializerOptions.Standard
             .WithResolver(ContractlessStandardResolver.Instance);
     }
 
@@ -24,7 +24,7 @@ public class MessagePackSerializer : ISerializer
     /// </summary>
     public MessagePackSerializer(MessagePackSerializerOptions options)
     {
-        _options = options;
+        Options = options;
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public class MessagePackSerializer : ISerializer
     /// </summary>
     public byte[] Serialize<T>(T obj)
     {
-        return global::MessagePack.MessagePackSerializer.Serialize(obj, _options);
+        return global::MessagePack.MessagePackSerializer.Serialize(obj, Options);
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ public class MessagePackSerializer : ISerializer
     /// </summary>
     public T Deserialize<T>(byte[] data)
     {
-        return global::MessagePack.MessagePackSerializer.Deserialize<T>(data, _options);
+        return global::MessagePack.MessagePackSerializer.Deserialize<T>(data, Options);
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ public class MessagePackSerializer : ISerializer
     /// </summary>
     public void SerializeToStream<T>(T obj, Stream stream)
     {
-        global::MessagePack.MessagePackSerializer.Serialize(stream, obj, _options);
+        global::MessagePack.MessagePackSerializer.Serialize(stream, obj, Options);
     }
 
     /// <summary>
@@ -74,7 +74,7 @@ public class MessagePackSerializer : ISerializer
     /// </summary>
     public T DeserializeFromStream<T>(Stream stream)
     {
-        return global::MessagePack.MessagePackSerializer.Deserialize<T>(stream, _options);
+        return global::MessagePack.MessagePackSerializer.Deserialize<T>(stream, Options);
     }
 
     /// <summary>

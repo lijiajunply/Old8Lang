@@ -1,5 +1,3 @@
-using Old8Lang.AST.Expression;
-
 namespace Old8Lang.SerializationLib;
 
 /// <summary>
@@ -26,7 +24,7 @@ public static class SerializationLibBinding
         var method = typeof(MessagePackSerializer)
             .GetMethod(nameof(ISerializer.Deserialize))!
             .MakeGenericMethod(targetType);
-        return method.Invoke(serializer, new object[] { data })!;
+        return method.Invoke(serializer, [data])!;
     }
 
     /// <summary>
@@ -47,7 +45,7 @@ public static class SerializationLibBinding
         var method = typeof(MessagePackSerializer)
             .GetMethod(nameof(ISerializer.DeserializeFromFile))!
             .MakeGenericMethod(targetType);
-        return method.Invoke(serializer, new object[] { filePath })!;
+        return method.Invoke(serializer, [filePath])!;
     }
 
     /// <summary>
@@ -77,7 +75,7 @@ public static class SerializationLibBinding
         var method = typeof(ProtobufSerializer)
             .GetMethod(nameof(ISerializer.Deserialize))!
             .MakeGenericMethod(targetType);
-        return method.Invoke(serializer, new object[] { data })!;
+        return method.Invoke(serializer, [data])!;
     }
 
     /// <summary>
@@ -98,7 +96,7 @@ public static class SerializationLibBinding
         var method = typeof(ProtobufSerializer)
             .GetMethod(nameof(ISerializer.DeserializeFromFile))!
             .MakeGenericMethod(targetType);
-        return method.Invoke(serializer, new object[] { filePath })!;
+        return method.Invoke(serializer, [filePath])!;
     }
 
     /// <summary>
@@ -121,6 +119,6 @@ public static class SerializationLibBinding
         var method = typeof(MessagePackSerializer)
             .GetMethod(nameof(ISerializer.Deserialize))!
             .MakeGenericMethod(targetType);
-        return method.Invoke(serializer, new object[] { data })!;
+        return method.Invoke(serializer, [data])!;
     }
 }
