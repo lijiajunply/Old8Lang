@@ -1015,6 +1015,9 @@ public class StatementParser(
 
             Expect(LangTokenType.RightBrace);
 
+            // 这是选择性导入
+            isSelective = true;
+
             // 解析 from 子句
             fromClause = true;
             Expect(LangTokenType.From);

@@ -1,5 +1,6 @@
-func testFunction() -> string {
-    return "Hello from module"
+// 简单的懒导入测试
+func TestFunc() -> string {
+    return "Test"
 }
 
-testVar <- 42
+TESTCONST:const <- 123

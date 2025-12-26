@@ -775,21 +775,46 @@ public partial class ImportStatement(
         }
         else if (IsSelective && ImportSpecifiers.Count > 0)
         {
-            // 选择性导入：将每个符号直接注册到作用域
-            foreach (var specifier in ImportSpecifiers)
+            // 选择性懒导入：创建符号代理，延迟加载到实际访问时
+            if (IsLazy)
             {
-                var symbolName = specifier.Alias;
-                var symbol = moduleValue.GetSymbol(specifier.Name);
-                if (symbol != null)
+                // 懒加载选择性导入：创建代理符号
+                foreach (var specifier in ImportSpecifiers)
                 {
-                    manager.Scopes[^1][symbolName] = symbol;
-                }
-                else
-                {
-                    throw new ImportError(this, specifier.Name,
-                        $"Symbol '{specifier.Name}' not found in module '{moduleValue.ModuleName}'");
+                    var symbolName = specifier.Alias;
+                    var originalName = specifier.Name;
+
+                    // 创建懒加载代理：使用 LazySymbolProxy
+                    var proxy = new LazySymbolProxy(moduleValue, originalName, Position);
+                    manager.Scopes[^1][symbolName] = proxy;
                 }
             }
+            else
+            {
+                // 即时加载选择性导入：直接获取符号
+                foreach (var specifier in ImportSpecifiers)
+                {
+                    var symbolName = specifier.Alias;
+                    var symbol = moduleValue.GetSymbol(specifier.Name);
+                    if (symbol != null)
+                    {
+                        manager.Scopes[^1][symbolName] = symbol;
+                    }
+                    else
+                    {
+                        throw new ImportError(this, specifier.Name,
+                            $"Symbol '{specifier.Name}' not found in module '{moduleValue.ModuleName}'");
+                    }
+                }
+            }
+        }
+        else if (!FromClause && ModuleAlias == null && IsLazy)
+        {
+            // 通配符懒导入：lazy import "module" (无别名、无 from 子句)
+            // 将所有符号以代理形式注册到当前作用域
+            // 由于无法在不加载模块的情况下知道有哪些符号，我们采用延迟策略：
+            // 注册一个特殊的标记，当符号查找失败时，尝试从懒加载模块中查找
+            manager.AddLazyWildcardModule(moduleValue);
         }
         else
         {

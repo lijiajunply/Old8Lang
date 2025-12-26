@@ -87,6 +87,12 @@ public class VariateManager
     private readonly List<bool> ScopeSharedFlags = [false];
 
     /// <summary>
+    /// 懒加载通配符模块列表
+    /// 用于 lazy import "module" 语法，当符号查找失败时，从这些模块中查找
+    /// </summary>
+    private readonly List<AST.Expression.ModuleObjects.UnifiedModule> LazyWildcardModules = [];
+
+    /// <summary>
     /// 获取当前作用域的所有变量
     /// </summary>
     /// <returns>当前作用域的变量字典</returns>
@@ -593,6 +599,18 @@ public class VariateManager
             }
         }
 
+        // 尝试从懒加载通配符模块中查找
+        foreach (var lazyModule in LazyWildcardModules)
+        {
+            var symbol = lazyModule.GetSymbol(id.IdName);
+            if (symbol != null)
+            {
+                // 将符号缓存到当前作用域，避免下次再查找
+                Scopes[^1][id.IdName] = symbol;
+                return symbol;
+            }
+        }
+
         // 如果还是没有找到，尝试查找导入的函数或类
         return GetAny(id);
     }
@@ -680,6 +698,16 @@ public class VariateManager
         {
             ImportInfosList.AddRange(items);
         }
+    }
+
+    /// <summary>
+    /// 添加懒加载通配符模块
+    /// 用于 lazy import "module" 语法
+    /// </summary>
+    /// <param name="module">懒加载模块对象</param>
+    public void AddLazyWildcardModule(AST.Expression.ModuleObjects.UnifiedModule module)
+    {
+        LazyWildcardModules.Add(module);
     }
 
     /// <summary>
