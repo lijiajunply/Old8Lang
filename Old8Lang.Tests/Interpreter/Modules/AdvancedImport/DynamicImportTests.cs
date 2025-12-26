@@ -16,6 +16,13 @@ public class DynamicImportTests : ModuleImportTestBase
     [Fact]
     public void Import_DynamicImport_ShouldImportModuleDynamically()
     {
+        var testContent = """
+
+                         import "MathLib"
+                         result <- Ceil(3.14)
+
+                         """;
+        CreateTempModuleFile("ImportTests_Import_DynamicImport.old8", testContent);
         // Act
         var (interpreter, exception) = ExecuteCodeFile("ImportTests_Import_DynamicImport.old8");
 

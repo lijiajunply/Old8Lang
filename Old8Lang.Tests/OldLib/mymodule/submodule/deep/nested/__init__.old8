@@ -1,6 +1,0 @@
-// mymodule.submodule.deep.nested 深层嵌套模块
-func process(data: string) -> string {
-    return "Processed: " + data
-}
-
-const NESTED_CONSTANT <- "Deep nested value"
