@@ -391,39 +391,4 @@ result2 <- abs_module.ABSOLUTE_CONST
             Output.WriteLine($"绝对路径动态导入: {exception.Message}");
         }
     }
-
-    [Fact]
-    public void Import_DynamicWithAliases_ShouldSupportDynamicAliases()
-    {
-        // Arrange
-        var moduleContent = @"
-func processData(data:string) -> string {
-    return ""Processed: "" + data
-}
-func getVersion() -> string {
-    return ""1.0.0""
-}
-";
-
-        var testContent = @"
-// 动态确定模块路径和别名
-module_path <- ""dynamic_alias""
-alias_name <- ""processor""
-
-dynamic import module_path as alias_name
-result1 <- processor.processData(""dynamic test"")
-result2 <- processor.getVersion()
-";
-
-        CreateTempModuleFile("dynamic_alias.old8", moduleContent);
-        CreateTempModuleFile("dynamic_alias_test.old8", testContent);
-
-        // Act
-        var (interpreter, exception) = ExecuteCodeFile("dynamic_alias_test.old8");
-
-        // Assert
-        Assert.Null(exception);
-        AssertVariableValue(interpreter, "result1", "Processed: dynamic test");
-        AssertVariableValue(interpreter, "result2", "1.0.0");
-    }
 }

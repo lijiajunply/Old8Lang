@@ -8,9 +8,7 @@ func CalculateLargeNumber() -> double {
     return result
 }
 
-func PI (){
-    return 3.14159265359
-}
+PI:const <- 3.14159265359
 
 func HeavyOperation() -> string {
     return "Heavy computation completed"
