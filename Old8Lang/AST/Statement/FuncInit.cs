@@ -32,6 +32,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     public override void Run(VariateManager manager)
     {
         // 检查函数是否已存在（只有当函数名、参数数量、参数类型和返回类型都相同时才视为重复）
+        // 但对于来自不同模块的函数，允许重复（它们可能通过别名导入）
         if (FuncLangValue.Id != null)
         {
             var existingFunc = manager.ImportInfos.FirstOrDefault(info =>
@@ -41,7 +42,9 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
                 func.Ids?.Zip(FuncLangValue.Ids!, (a, b) => a.AssumptionType == b.AssumptionType).All(x => x) == true &&
                 func.Id?.AssumptionType == FuncLangValue.Id?.AssumptionType);
 
-            if (existingFunc != null)
+            // 只有当存在完全相同的函数，并且正在导入栈为空时（即在主文件中重复定义），才报错
+            // 如果导入栈不为空，说明是在导入的模块中定义函数，允许不同模块的同名函数共存
+            if (existingFunc != null && manager.ImportStack.Count == 0)
             {
                 throw new DuplicateNameError(this, FuncLangValue.Id.IdName, "函数");
             }

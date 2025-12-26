@@ -131,8 +131,12 @@ public partial class ImportStatement(
             return;
         }
 
-        // 处理 module.submodule 语法
-        if (moduleName.Contains('.'))
+        // 处理 module.submodule 语法（排除相对路径和文件扩展名）
+        if (moduleName.Contains('.') &&
+            !moduleName.StartsWith("./") &&
+            !moduleName.StartsWith("../") &&
+            !moduleName.EndsWith(".old8") &&
+            !moduleName.EndsWith(".ol"))
         {
             HandleSubmoduleImport(moduleName, manager);
             return;
@@ -163,15 +167,19 @@ public partial class ImportStatement(
         }
 
         // 优先级 2: 第三方包（通过 PackageManager）
-        var packageManager = manager.GetPackageManager();
-
-        // 根据当前执行文件添加包查找路径
-        packageManager.AddSearchPathsFromSourceFile(manager.Path);
-
-        if (packageManager.TryLoadPackage(moduleName, manager, out var pkgModule))
+        // 跳过相对路径和绝对路径，它们应该由本地文件导入处理
+        if (!moduleName.StartsWith("./") && !moduleName.StartsWith("../") && !Path.IsPathRooted(moduleName))
         {
-            RegisterModule(manager, moduleName, pkgModule);
-            return;
+            var packageManager = manager.GetPackageManager();
+
+            // 根据当前执行文件添加包查找路径
+            packageManager.AddSearchPathsFromSourceFile(manager.Path);
+
+            if (packageManager.TryLoadPackage(moduleName, manager, out var pkgModule))
+            {
+                RegisterModule(manager, moduleName, pkgModule);
+                return;
+            }
         }
 
         // 优先级 3: 本地文件导入（相对于当前文件的路径）
@@ -238,12 +246,20 @@ public partial class ImportStatement(
             if (!FromClause) return;
             // 为命名导入创建独立作用域
             manager.AddChildren();
+
+            // 记录执行前的 ImportInfos
+            var importInfosBefore = manager.ImportInfos.ToList();
+
             // 对于缓存的模块，我们不需要再次执行它的函数和类定义语句
             // 我们只需要执行它的变量赋值语句
             // 函数和类已经在全局作用域中了
             cachedBlock.ExecuteModule(manager, skipFunctionClassInit: true);
+
+            // 找出新增的 ImportInfos
+            var newImportInfos = manager.ImportInfos.Except(importInfosBefore).ToList();
+
             // 只导入指定的成员
-            ImportSpecifiedMembers(manager);
+            ImportSpecifiedMembers(manager, newImportInfos);
             manager.RemoveChildren();
 
             return;
@@ -266,11 +282,20 @@ public partial class ImportStatement(
             {
                 // 为命名导入创建独立作用域
                 manager.AddChildren();
+
+                // 记录执行前的 ImportInfos
+                var importInfosBefore = manager.ImportInfos.ToList();
+
                 // 执行模块的非导入语句，包括函数定义、类定义和变量赋值
                 // 但跳过导入语句，避免递归导入
                 block.ExecuteModule(manager);
-                // 只导入指定的成员
-                ImportSpecifiedMembers(manager);
+
+                // 找出新增的 ImportInfos
+                var newImportInfos = manager.ImportInfos.Except(importInfosBefore).ToList();
+
+                // 只导入指定的成员到父作用域
+                ImportSpecifiedMembers(manager, newImportInfos);
+
                 manager.RemoveChildren();
             }
             else if (ModuleAlias != null)
@@ -384,7 +409,8 @@ public partial class ImportStatement(
     /// 只导入指定的成员到当前作用域
     /// </summary>
     /// <param name="manager">变量管理器</param>
-    private void ImportSpecifiedMembers(VariateManager manager)
+    /// <param name="moduleImportInfos">当前模块新增的导入信息列表（可选）</param>
+    private void ImportSpecifiedMembers(VariateManager manager, List<ImportInfo>? moduleImportInfos = null)
     {
         // 获取当前作用域的所有变量（模块导出的成员）
         var currentScope = manager.Scopes[^1];
@@ -417,7 +443,13 @@ public partial class ImportStatement(
                 // 将指定成员添加到父作用域，支持重命名
                 parentScope[specifier.Alias] = value;
             }
-            // 尝试从导入信息中查找函数和类
+            // 尝试从模块的导入信息中查找函数和类（优先使用）
+            else if (moduleImportInfos != null && TryFindInImportInfos(moduleImportInfos, specifier.Name, out value))
+            {
+                // 将指定成员添加到父作用域，支持重命名
+                parentScope[specifier.Alias] = value;
+            }
+            // 最后从全局导入信息中查找
             else if ((value = manager.GetValue(new LangId(specifier.Name))) != null)
             {
                 // 将指定成员添加到父作用域，支持重命名
@@ -430,6 +462,30 @@ public partial class ImportStatement(
                 throw new ImportError(Position, ImportString, [ImportString]);
             }
         }
+    }
+
+    /// <summary>
+    /// 在导入信息列表中查找指定名称的成员
+    /// </summary>
+    /// <param name="importInfos">导入信息列表</param>
+    /// <param name="name">要查找的成员名称</param>
+    /// <param name="value">找到的成员值</param>
+    /// <returns>如果找到返回true,否则返回false</returns>
+    private static bool TryFindInImportInfos(List<ImportInfo> importInfos, string name, out LangValueType? value)
+    {
+        value = importInfos.FirstOrDefault(x =>
+        {
+            return x switch
+            {
+                FuncLangValue func => func.Id!.IdName == name,
+                AsyncFuncLangValue asyncFunc => asyncFunc.Id!.IdName == name,
+                TypeTemplate template => template.ClassName == name,
+                NativeAnyLangValue na => na.RegisterName == name,
+                NativeStaticAny staticAny => staticAny.ClassName == name,
+                _ => false
+            };
+        });
+        return value != null;
     }
 
     /// <summary>
@@ -751,7 +807,23 @@ public partial class ImportStatement(
     private void HandleSubmoduleImport(string moduleName, VariateManager manager)
     {
         var parts = moduleName.Split('.');
-        var basePath = manager.LangInfo!.ImportPath;
+
+        // 确定基础路径：对于相对路径导入，使用当前文件所在目录
+        string basePath;
+        if (moduleName.StartsWith("./") || moduleName.StartsWith("../"))
+        {
+            // 相对路径：使用当前文件所在目录
+            var currentFileDir = Path.GetDirectoryName(manager.Path);
+            basePath = string.IsNullOrEmpty(currentFileDir)
+                ? Directory.GetCurrentDirectory()
+                : currentFileDir;
+        }
+        else
+        {
+            // 绝对路径或包名：使用 ImportPath
+            basePath = manager.LangInfo?.ImportPath ?? Directory.GetCurrentDirectory();
+        }
+
         var currentPath = basePath;
 
         // 逐级查找子模块
@@ -802,6 +874,9 @@ public partial class ImportStatement(
                 throw new ImportError(Position, moduleName, [testPath]);
             }
         }
+
+        // 如果所有路径都没找到，抛出错误
+        throw new ImportError(Position, moduleName, [currentPath]);
     }
 
     /// <summary>
@@ -828,8 +903,16 @@ public partial class ImportStatement(
             if (FromClause)
             {
                 manager.AddChildren();
+
+                // 记录执行前的 ImportInfos
+                var importInfosBefore = manager.ImportInfos.ToList();
+
                 cachedBlock.ExecuteModule(manager, skipFunctionClassInit: true);
-                ImportSpecifiedMembers(manager);
+
+                // 找出新增的 ImportInfos
+                var newImportInfos = manager.ImportInfos.Except(importInfosBefore).ToList();
+
+                ImportSpecifiedMembers(manager, newImportInfos);
                 manager.RemoveChildren();
             }
             else
@@ -860,8 +943,16 @@ public partial class ImportStatement(
             if (FromClause)
             {
                 manager.AddChildren();
+
+                // 记录执行前的 ImportInfos
+                var importInfosBefore = manager.ImportInfos.ToList();
+
                 block.ExecuteModule(manager);
-                ImportSpecifiedMembers(manager);
+
+                // 找出新增的 ImportInfos
+                var newImportInfos = manager.ImportInfos.Except(importInfosBefore).ToList();
+
+                ImportSpecifiedMembers(manager, newImportInfos);
                 manager.RemoveChildren();
             }
             else
