@@ -21,6 +21,16 @@ public partial class RangeLangValue(
     bool includeStart = true,
     bool includeEnd = true) : LangValueType(position)
 {
+    /// <summary>
+    /// 起始表达式
+    /// </summary>
+    public LangExpression? Start { get; } = start;
+
+    /// <summary>
+    /// 结束表达式
+    /// </summary>
+    public LangExpression? End { get; } = end;
+
     public bool IncludeStart { get; } = includeStart;
     public bool IncludeEnd { get; } = includeEnd;
 

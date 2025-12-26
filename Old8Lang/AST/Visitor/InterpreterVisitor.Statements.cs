@@ -247,4 +247,114 @@ public partial class InterpreterVisitor
         node.Run(_manager);
         return new VoidLangValue();
     }
+
+    /// <summary>
+    /// 访问 FuncInit 节点
+    /// </summary>
+    public LangValueType VisitFuncInit(FuncInit node)
+    {
+        // 迁移自 FuncInit.Run()
+        // 函数声明逻辑已封装在 Run 方法中，直接调用
+        node.Run(_manager);
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 AsyncFuncInit 节点
+    /// </summary>
+    public LangValueType VisitAsyncFuncInit(AsyncFuncInit node)
+    {
+        // 迁移自 AsyncFuncInit.Run()
+        // 异步函数声明逻辑已封装在 Run 方法中，直接调用
+        node.Run(_manager);
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 ClassInit 节点
+    /// </summary>
+    public LangValueType VisitClassInit(ClassInit node)
+    {
+        // 迁移自 ClassInit.Run()
+        // 类声明逻辑已封装在 Run 方法中，直接调用
+        node.Run(_manager);
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 SwitchStatement 节点
+    /// </summary>
+    public LangValueType VisitSwitchStatement(SwitchStatement node)
+    {
+        // 迁移自 SwitchStatement.Run()
+        // Switch 语句逻辑已封装在 Run 方法中，直接调用
+        node.Run(_manager);
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 CaseStatement 节点
+    /// </summary>
+    public LangValueType VisitCaseStatement(CaseStatement node)
+    {
+        // 迁移自 CaseStatement.Run()
+        // Case 语句逻辑已封装在 Run 方法中，直接调用
+        node.Run(_manager);
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 TryStatement 节点
+    /// </summary>
+    public LangValueType VisitTryStatement(TryStatement node)
+    {
+        // 迁移自 TryStatement.Run()
+        // Try-Catch-Finally 逻辑已封装在 Run 方法中，直接调用
+        node.Run(_manager);
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 YieldStatement 节点
+    /// </summary>
+    public LangValueType VisitYieldStatement(YieldStatement node)
+    {
+        // 迁移自 YieldStatement.Run()
+        // Yield 语句逻辑（生成器支持）已封装在 Run 方法中，直接调用
+        node.Run(_manager);
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 ImportStatement 节点
+    /// </summary>
+    public LangValueType VisitImportStatement(ImportStatement node)
+    {
+        // 迁移自 ImportStatement.Run()
+        // Import 语句逻辑已封装在 Run 方法中，直接调用
+        node.Run(_manager);
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 NativeStatement 节点
+    /// </summary>
+    public LangValueType VisitNativeStatement(NativeStatement node)
+    {
+        // 迁移自 NativeStatement.Run()
+        // Native 方法绑定逻辑已封装在 Run 方法中，直接调用
+        node.Run(_manager);
+        return new VoidLangValue();
+    }
+
+    /// <summary>
+    /// 访问 AsyncForInStatement 节点
+    /// </summary>
+    public LangValueType VisitAsyncForInStatement(AsyncForInStatement node)
+    {
+        // 迁移自 AsyncForInStatement.Run()
+        // 异步 for-in 循环逻辑已封装在 Run 方法中，直接调用
+        node.Run(_manager);
+        return new VoidLangValue();
+    }
 }

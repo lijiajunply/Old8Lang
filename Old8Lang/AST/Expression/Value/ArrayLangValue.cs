@@ -11,8 +11,15 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public partial class ArrayLangValue : LangValueType, ILangList
 {
-    private readonly LangValueType[] RunResult; // 保持固定大小数组
-    private readonly List<LangExpression> Values = [];
+    /// <summary>
+    /// 数组运行结果（固定大小）
+    /// </summary>
+    public LangValueType[] RunResult { get; }
+
+    /// <summary>
+    /// 数组元素表达式列表
+    /// </summary>
+    public List<LangExpression> Values { get; } = [];
 
     public ArrayLangValue(IEnumerable<LangExpression> valuesList, SourcePosition position = default) : base(position)
     {

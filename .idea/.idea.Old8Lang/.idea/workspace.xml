@@ -21,8 +21,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/InterpreterVisitor.Stubs.generated.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/InterpreterVisitor.Stubs.generated.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/InterpreterVisitor.Stubs.generated.cs.completed" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/Generated/InterpreterVisitor.Stubs.generated.cs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Expressions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Expressions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Statements.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Values.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -812,7 +815,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="356" />
+    <option name="localTasksCounter" value="357" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -839,7 +842,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(ast): 优化异步流表达式与块语句实现&#10;&#10;- 将 AsyncStreamExpression 中的 Block 字段访问级别从 public 改为 private&#10;- 优化 InvalidOperationException 抛出时的消息字符串格式，避免行过长&#10;- 移除了 BlockStatement 中用于调试的日志输出语句&#10;- 简化了 Operation 类型检查中的条件判断逻辑&#10;- 删除未使用的 using 引用，精简多个类文件的命名空间引用&#10;- 修正 SuperExpression 中父类构造函数查找逻辑并优化错误提示&#10;- 移除了已废弃的 ValueExpression 类定义&#10;- 更新了 IDE 工作区配置和任务计数器状态&#10;&#10;这些更改提升了代码可维护性、减少了冗余信息，并进一步规范化 AST 节点行为。" />
     <MESSAGE value="fix(AsyncStateMachineGenerator): 优化状态机生成器字段初始化与代码结构&#10;&#10;- 将 `LocalVariableFields` 和 `AwaitPositions` 初始化为 `new()` 并添加 `readonly` 修饰符&#10;- 移除不必要的空行和 null 检查，简化表达式遍历逻辑&#10;- 更新方法签名以提高可读性，并调整部分 IL 生成逻辑中的数组语法&#10;- 清理冗余的日志打印语句，保留核心功能实现&#10;&#10;fix(CapturedScope): 重命名哈希码字段并更新相关引用&#10;&#10;- 将 `_hashCode` 字段重命名为 `HashCode` 以符合命名规范&#10;- 更新构造函数、GetHashCode 及 Equals 方法中对该字段的使用&#10;- 调整 LINQ 表达式语法，确保类型转换明确清晰&#10;&#10;refactor(GeneratorAstScanner): 移除调试日志并精简扫描逻辑&#10;&#10;- 删除所有 `Console.WriteLine` 调试输出语句&#10;- 简化对子语句的递归调用逻辑，去除多余的 null 检查&#10;- 修复局部变量记录逻辑，增强空值处理能力&#10;- 优化反射获取 ForInStatement Body 的流程，减少无用判断&#10;&#10;refactor(GeneratorExecutionContext): 简化集合初始化语法&#10;&#10;- 替换 `new Stack&lt;&gt;()` 和 `new Dictionary&lt;,&gt;()` 为简洁形式&#10;- 移除布尔属性默认赋值，保持代码一致性&#10;&#10;refactor(GeneratorStateMachineBuilder): 静态化类并优化执行器结构&#10;&#10;- 将 `GeneratorStateMachineBuilder` 改为静态类&#10;- 使用主构造函数注入依赖项至 `FlatGeneratorExecutor`&#10;- 移除调试日志并清理字段访问方式，改用构造函数参数直接引用&#10;- 重构循环状态恢复逻辑，提高代码可读性和健壮性&#10;&#10;refactor(NewGeneratorStateMachine): 统一私有字段命名风格&#10;&#10;- 将所有下划线前缀私有字段改为 Pascal 命名法（如 `_locals` → `Locals`）&#10;- 更新构造函数及 Execute 方法内的字段引用，保持一致性和可维护性&#10;&#10;refactor(TypeAnnotationManager): 规范字段命名并优化类型兼容性检查&#10;&#10;- 所有私有字段统一使用 Pascal 命名法（如 `_typeFamily` → `TypeFamily`）&#10;- 更新类型解析和兼容性判断逻辑，移除冗余条件判断&#10;- 修正 XML 注释中的泛型符号显示问题&#10;&#10;refactor(TypeInfo): 优化成员缓存机制和类型族管理结构&#10;&#10;- 将 `_cachedMembers` 等字段更名为 `CachedMembers` 等标准名称&#10;- 更新类型族注册和继承关系管理逻辑，改进 lambda 表达式写法&#10;- 优化获取类型信息的方法，提升性能与稳定性" />
     <MESSAGE value="feat(Task): 支持 TaskScheduler 和 TaskFactory 全局对象&#10;&#10;新增 TaskScheduler 和 TaskFactory 类的全局对象注册，完善 Task API 的功能支持。  &#10;同时修复了 Task 类中部分成员访问逻辑，并改进异常处理机制，统一将标准异常包装为 Old8Exception。  &#10;此外，更新了相关单元测试代码以适配新的 API 调用方式并启用任务取消测试。" />
     <MESSAGE value="feat(AsyncLib): 优化资源包装类构造函数并移除冗余字段初始化&#10;&#10;将 `ResourceWrapper` 类改用主构造函数语法，并直接初始化 `Resource` 属性。  &#10;同时删除了 `_readWriteLockIdCounter`、`_countDownLatchIdCounter` 和  &#10;`_cyclicBarrierIdCounter` 的冗余赋值为 0 的字段初始化语句。&#10;&#10;refactor(AsyncLib): 统一使用属性命名风格并提升代码一致性&#10;&#10;将 `CountDownLatch` 和 `CyclicBarrier` 类中的私有字段名称从下划线前缀风格  &#10;改为 PascalCase 命名风格（如 `_count` 改为 `Count`），以提高整体代码可读性和一致性。  &#10;此外，更新相关访问逻辑以匹配新的属性命名。&#10;&#10;refactor(Csv): 简化 CSV 头部行添加方式&#10;&#10;合并声明与初始化操作，通过集合初始化器直接在创建 `csvLines` 列表时添加头部行，  &#10;使代码更简洁且易于理解。" />
@@ -864,7 +866,8 @@
     <MESSAGE value="feat(template): 添加模板引擎功能&#10;&#10;- 实现 TemplateEngine 类支持变量替换、条件语句、循环等基本模板功能&#10;- 添加全局变量和局部变量管理机制&#10;- 支持从字符串和文件加载模板&#10;- 实现 HTML 和配置文件渲染的便捷方法&#10;- 添加正则表达式处理变量、条件、循环和注释语法&#10;- 支持对象属性访问和嵌套模板处理&#10;- 添加完整的单元测试覆盖各种" />
     <MESSAGE value="feat(parser): 实现通配符导入语法支持&#10;&#10;- 添加 import * from &quot;module&quot; 语法解析功能&#10;- 支持通配符导入时导入所有模块成员&#10;- 更新测试文件中的导入语法格式&#10;- 修正模块常量声明语法，移除 const 关键字&#10;- 更新 IDE 配置文件中的变更记录" />
     <MESSAGE value="docs(reports): 移除过时的测试报告文件&#10;&#10;- 删除了旧的模块系统测试报告&#10;- 移除了全面评估报告&#10;- 清理了线程测试修复实施报告&#10;- 删除多个包管理集成测试报告&#10;- 移除了语法测试实施报告&#10;- 保持代码库整洁，移除不再需要的文档文件" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(reports): 移除过时的测试报告文件&#10;&#10;- 删除了旧的模块系统测试报告&#10;- 移除了全面评估报告&#10;- 清理了线程测试修复实施报告&#10;- 删除多个包管理集成测试报告&#10;- 移除了语法测试实施报告&#10;- 保持代码库整洁，移除不再需要的文档文件" />
+    <MESSAGE value="refactor(interpreter): 迁移表达式和值类型访问方法到解释器访问者&#10;&#10;- 将 Operation、FunctionCallExpression、TernaryExpression 等表达式节点的访问方法迁移到 InterpreterVisitor&#10;- 将 ArrayLangValue、ListLangValue、DictionaryLangValue 等值类型节点的访问方法迁移到 InterpreterVisitor&#10;- 从生成的存根文件中移除已实现的访问方法&#10;- 更新工作区配置以反映文件变更状态" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(interpreter): 迁移表达式和值类型访问方法到解释器访问者&#10;&#10;- 将 Operation、FunctionCallExpression、TernaryExpression 等表达式节点的访问方法迁移到 InterpreterVisitor&#10;- 将 ArrayLangValue、ListLangValue、DictionaryLangValue 等值类型节点的访问方法迁移到 InterpreterVisitor&#10;- 从生成的存根文件中移除已实现的访问方法&#10;- 更新工作区配置以反映文件变更状态" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

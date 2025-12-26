@@ -12,7 +12,10 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 public partial class ListLangValue : LangValueType, ILangList
 {
-    private readonly List<LangExpression> Value;
+    /// <summary>
+    /// 列表元素表达式
+    /// </summary>
+    public List<LangExpression> Value { get; }
 
     public readonly List<LangValueType> Values = [];
 

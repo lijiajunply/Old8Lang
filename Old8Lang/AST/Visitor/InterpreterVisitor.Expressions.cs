@@ -89,9 +89,18 @@ public partial class InterpreterVisitor
     /// </summary>
     public LangValueType VisitTernaryExpression(TernaryExpression node)
     {
-        // 迁移自 TernaryExpression.Run()
-        // 暂时调用原方法
-        return node.Run(_manager);
+        // 完整迁移自 TernaryExpression.Run()
+        // 执行条件判断
+        var condition = node.Condition.Accept(this);
+        if (condition is not BoolLangValue boolValue)
+        {
+            throw new InvalidOperationError(node, "三元条件表达式的条件必须是Bool类型");
+        }
+
+        // 根据条件结果返回相应的表达式值
+        return boolValue.Value
+            ? node.TrueExpression.Accept(this)
+            : node.FalseExpression.Accept(this);
     }
 
     /// <summary>
