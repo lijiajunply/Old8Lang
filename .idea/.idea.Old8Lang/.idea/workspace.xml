@@ -21,7 +21,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/AliasImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/AliasImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,6 +70,8 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Core/ModuleImportTestBase.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/ErrorHandling/ImportErrorTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Integration/RealWorldUsageTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
@@ -463,7 +466,7 @@
       <workItem from="1766441034395" duration="1692000" />
       <workItem from="1766461431015" duration="981000" />
       <workItem from="1766746850670" duration="17415000" />
-      <workItem from="1766771063664" duration="5840000" />
+      <workItem from="1766771063664" duration="8389000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -808,7 +811,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="374" />
+    <option name="localTasksCounter" value="377" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -835,9 +838,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(package): 实现非项目模式下的全局包自动检测与加载&#10;&#10;- 添加非项目模式自动检测机制，当无o8packages.json时使用全局包&#10;- 更新包加载优先级：标准库 → 项目本地包 → 全局第三方包 → 相对路径文件&#10;- 添加全局包目录结构说明和配置文档&#10;- 创建non_project_test.old8测试文件验证非项目模式功能&#10;- 优化PackageManager构造函数，支持自动检测项目根目录&#10;- 更新虚拟环境检测逻辑，添加非项目模式运行日志&#10;- 修复包管理器在无项目配置时的全局包加载流程" />
-    <MESSAGE value="refactor(code): 清理无用using引用并更新代码风格&#10;&#10;- 移除多个文件中的无用using语句，包括AST、GlobalFunctions、Commands等模块&#10;- 将数组初始化语法从new[]替换为集合字面量语法[]&#10;- 简化类型引用，移除冗余的命名空间前缀&#10;- 更新IDE配置文件中的变更记录和断点位置&#10;- 修复包管理器相关提交信息的历史记录" />
-    <MESSAGE value="feat(import): 改进模块导入功能并修复路径处理&#10;&#10;- 更新ImportStatement.cs添加函数和类的导入查找逻辑&#10;- 修复模块导入时的路径创建问题，确保父目录存在&#10;- 添加嵌套模块和选择性导入测试用例&#10;- 更新常量声明语法从const BASE_CONST &lt;- 10到BASE_CONST:const &lt;- 10&#10;- 修改别名模块中函数声明为变量赋值语法&#10;- 调整选择性导入测试中的模块路径处理方式&#10;- 添加nested/submodule/module.old8测试文件&#10;- 更新IDE配置文件中的变更记录" />
     <MESSAGE value="test(interpreter): 更新异步函数和生成器测试&#10;&#10;- 将AsyncFunction_WithoutImmediateAwait_CreatesTask测试方法从async Task改为void&#10;- 修改异步函数测试的执行逻辑，等待异步任务完成后再进行断言&#10;- 添加对任务状态和异常的检查断言&#10;- 在异步生成器测试中跳过PrimeGenerator测试用例" />
     <MESSAGE value="feat(template): 添加模板引擎功能&#10;&#10;- 实现 TemplateEngine 类支持变量替换、条件语句、循环等基本模板功能&#10;- 添加全局变量和局部变量管理机制&#10;- 支持从字符串和文件加载模板&#10;- 实现 HTML 和配置文件渲染的便捷方法&#10;- 添加正则表达式处理变量、条件、循环和注释语法&#10;- 支持对象属性访问和嵌套模板处理&#10;- 添加完整的单元测试覆盖各种" />
     <MESSAGE value="feat(parser): 实现通配符导入语法支持&#10;&#10;- 添加 import * from &quot;module&quot; 语法解析功能&#10;- 支持通配符导入时导入所有模块成员&#10;- 更新测试文件中的导入语法格式&#10;- 修正模块常量声明语法，移除 const 关键字&#10;- 更新 IDE 配置文件中的变更记录" />
@@ -860,7 +860,10 @@
     <MESSAGE value="test(module): 添加条件导入和动态导入测试用例&#10;&#10;- 在 ConditionalImportTests 中添加条件导入测试内容&#10;- 在 DynamicImportTests 中添加动态导入测试内容&#10;- 重构 ModuleImportTestBase 中的测试文件目录获取逻辑&#10;- 为 StandardLibrary 测试文件添加自动生成内容功能&#10;- 移除临时文件清理方法调用&#10;- 更新 IDE 配置文件中的变更列表和高亮设置" />
     <MESSAGE value="test(module): 更新导入测试用例和模块系统测试基础&#10;&#10;- 为别名导入测试添加临时文件创建和测试内容&#10;- 为函数别名导入测试添加临时文件创建和测试内容&#10;- 为循环依赖测试添加临时文件创建和测试内容&#10;- 为导入链测试添加临时文件创建和测试内容&#10;- 为条件导入测试添加临时文件创建和测试内容&#10;- 为动态导入测试添加临时文件创建和测试内容&#10;- 为懒加载基本功能测试添加临时文件创建和测试内容&#10;- 为懒加载新语法测试添加临时文件创建和测试内容&#10;- 为选择性懒加载测试添加临时文件创建和测试内容&#10;- 为带别名懒加载测试添加临时文件创建和测试内容&#10;- 为增强懒加载功能测试添加临时文件创建和测试内容&#10;- 为选择性函数导入测试添加临时文件创建和测试内容&#10;- 为模块选择性导入测试添加临时文件创建和测试内容&#10;- 重构模块导入测试基类中的文件内容处理逻辑&#10;- 更新IDE配置文件中的变更记录和工作项计数器" />
     <MESSAGE value="refactor(tests): 移除标准库测试文件的条件逻辑&#10;&#10;- 移除了 StandardLibrary 测试文件的动态内容生成逻辑&#10;- 删除了基于文件名的标准库导入语句创建功能&#10;- 移除了 OS、MathLib、Time 等标准库的条件判断分支&#10;- 移除了标准库别名导入和多库导入的测试内容生成&#10;- 简化了测试文件创建流程，移除了标准库目录创建逻辑" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(tests): 移除标准库测试文件的条件逻辑&#10;&#10;- 移除了 StandardLibrary 测试文件的动态内容生成逻辑&#10;- 删除了基于文件名的标准库导入语句创建功能&#10;- 移除了 OS、MathLib、Time 等标准库的条件判断分支&#10;- 移除了标准库别名导入和多库导入的测试内容生成&#10;- 简化了测试文件创建流程，移除了标准库目录创建逻辑" />
+    <MESSAGE value="test(interpreter): 更新模块导入测试用例中的文件引用&#10;&#10;- 将AliasImportTests中的模块文件引用从math.old8更新为math1.old8&#10;- 将RealWorldUsageTests中的模块文件引用从math.old8更新为math2.old8&#10;- 清理workspace.xml中的变更列表记录&#10;- 更新IDE配置文件中的工作项时长和任务计数器&#10;- 移除多余的提交历史记录和消息配置" />
+    <MESSAGE value="test(interpreter): 更新复杂导入场景测试用例&#10;&#10;- 添加子模块内容创建逻辑，支持导入链测试&#10;- 修复模块文件路径命名，将 module.main 改为 module_main&#10;- 创建临时模块文件用于导入链功能测试&#10;- 修正断言中的字符串值，更新叶子节点连接符&#10;- 修改钻石依赖测试中的常量定义方式，避免多次导入冲突&#10;- 重构钻石依赖测试中的模块引用，使用别名导入&#10;- 更新条件导入测试中的变量初始化逻辑&#10;- 修复认证检查的布尔比较语法&#10;- 调整科学计算模块中的数值类型，确保浮点数运算正确&#10;- 添加测试结果的注释说明，提高可读性" />
+    <MESSAGE value="feat(module): 增强模块导入错误处理和符号提取功能&#10;&#10;- 添加ImportError构造函数支持自定义错误消息&#10;- 优化模块服务中的符号提取逻辑，支持限定范围的ImportInfos&#10;- 更新测试用例以使用更具体的异常类型&#10;- 修改集成测试中的数据结构和函数实现&#10;- 改进符号提取器的错误处理机制，当符号不存在时抛出ImportError" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(module): 增强模块导入错误处理和符号提取功能&#10;&#10;- 添加ImportError构造函数支持自定义错误消息&#10;- 优化模块服务中的符号提取逻辑，支持限定范围的ImportInfos&#10;- 更新测试用例以使用更具体的异常类型&#10;- 修改集成测试中的数据结构和函数实现&#10;- 改进符号提取器的错误处理机制，当符号不存在时抛出ImportError" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -174,7 +174,7 @@ public class LazyImportTests(ITestOutputHelper output) : ModuleImportTestBase(ou
             status2 <- "Loaded"
 
             // 再次使用，直接使用缓存的模块
-            result2 <- math.PI()
+            result2 <- math.PI
             result3 <- math.HeavyOperation()
             """;
         CreateTempModuleFile("lazy_enhanced_test.old8", testContent);

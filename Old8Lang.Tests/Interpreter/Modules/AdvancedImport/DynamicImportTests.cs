@@ -7,12 +7,8 @@ namespace Old8Lang.Tests.Interpreter.Modules.AdvancedImport;
 /// <summary>
 /// 动态导入功能测试
 /// </summary>
-public class DynamicImportTests : ModuleImportTestBase
+public class DynamicImportTests(ITestOutputHelper output) : ModuleImportTestBase(output)
 {
-    public DynamicImportTests(ITestOutputHelper output) : base(output)
-    {
-    }
-
     [Fact]
     public void Import_DynamicImport_ShouldImportModuleDynamically()
     {
@@ -52,10 +48,10 @@ public class DynamicImportTests : ModuleImportTestBase
 
         var testContent = """
                           dynamic import "dynamic_math" as math
-                          
+
                           result1 <- math.add(2.5, 3.5)
                           result2 <- math.multiply(4.0, 2.5)
-                          result3 <- math.PI()
+                          result3 <- math.PI
 
                           """;
 
@@ -97,6 +93,7 @@ func getName() -> string {
         var testContent = @"
 // 运行时选择模块
 math_level <- ""advanced""
+module_path <- """"
 
 if (math_level == ""basic"") {
     module_path <- ""runtime_basic""

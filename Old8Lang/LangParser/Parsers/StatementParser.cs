@@ -1034,11 +1034,24 @@ public class StatementParser(
                 Expect(LangTokenType.Identifier);
             }
         }
+        else if (isDynamic && CurrentToken.Type == LangTokenType.String)
+        {
+            // 动态导入：字符串字面量应该创建为动态表达式
+            dynamicModuleExpression = new StringLangValue(CurrentToken.Value, new SourcePosition(CurrentToken.Line, CurrentToken.Column));
+            Expect(LangTokenType.String);  // 消耗字符串
+            moduleName = "__dynamic_module__";
+        }
         else if (isDynamic && CurrentToken.Type == LangTokenType.Identifier)
         {
             // 动态导入：创建标识符表达式，避免在解析阶段调用表达式解析器
             dynamicModuleExpression = new LangId(CurrentToken.Value, "", null, new SourcePosition(CurrentToken.Line, CurrentToken.Column));
             Expect(LangTokenType.Identifier);  // 消耗标识符
+            moduleName = "__dynamic_module__";
+        }
+        else if (isDynamic)
+        {
+            // 动态导入：解析模块名表达式（复杂表达式）
+            dynamicModuleExpression ??= expressionParser.ParseExpression();
             moduleName = "__dynamic_module__";
         }
         else if (CurrentToken.Type == LangTokenType.Identifier)
@@ -1113,13 +1126,6 @@ public class StatementParser(
             // 传统导入：import "module"
             moduleName = CurrentToken.Value;
             Expect(LangTokenType.String);
-        }
-        else if (isDynamic)
-        {
-            // 动态导入：解析模块名表达式
-            dynamicModuleExpression ??= expressionParser.ParseExpression();
-
-            moduleName = "__dynamic_module__";
         }
         else
         {
