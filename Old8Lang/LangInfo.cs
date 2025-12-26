@@ -12,12 +12,6 @@ public class LangInfo
     public string ImportPath { get; set; } = "";
 
     /// <summary>
-    /// 获取或设置库信息列表
-    /// </summary>
-    [Obsolete("这个之后就不用了")]
-    public List<LibInfo> LibInfos { get; set; } = [];
-
-    /// <summary>
     /// 获取或设置语言版本
     /// </summary>
     public string Var { get; set; } = "";

@@ -1,4 +1,5 @@
 // ReSharper disable once RedundantUsingDirective
+
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -134,18 +135,17 @@ public static class Apis
     /// <returns>更新后的语言信息对象</returns>
     public static LangInfo ChangeBasicInfo(string import, string ver, string uri = "https://downland.old8lang.com")
     {
-        var langInfo = new LangInfo { LibInfos = ReadJson().LibInfos, ImportPath = import, Var = ver, Url = uri };
+        var langInfo = new LangInfo { ImportPath = import, Var = ver, Url = uri };
         var jsonString = JsonSerializer.Serialize(langInfo);
         File.WriteAllText(JsonPath, jsonString);
         return langInfo;
     }
 
     /// <summary>
-    /// 读取语言配置信息（已弃用，保留用于向后兼容）
+    /// 读取语言配置信息
     /// </summary>
     /// <returns>语言信息对象</returns>
     /// <remarks>
-    /// ⚠️ 已弃用：此方法用于向后兼容，新代码应使用 StandardLibraryRegistry
     ///
     /// 配置文件查找顺序：
     /// 1. 当前目录下的 Old8Lang/LangInfo.json
@@ -155,7 +155,6 @@ public static class Apis
     /// 注意：标准库（OS、File、Terminal 等）现在通过 StandardLibraryRegistry 管理，
     /// 不再需要 LangInfo.json 配置
     /// </remarks>
-    [Obsolete("LangInfo.json 已弃用，标准库现在通过 StandardLibraryRegistry 管理。此方法保留用于向后兼容。")]
     public static LangInfo ReadJson()
     {
         LangInfo langInfo;
@@ -176,7 +175,7 @@ public static class Apis
         {
             // 如果文件不存在，创建一个空的 LangInfo 对象
             // 不再自动填充默认库，因为标准库现在由 StandardLibraryRegistry 管理
-            langInfo = new LangInfo { LibInfos = [], Var = "1.0.0", Url = "https://downland.old8lang.com" };
+            langInfo = new LangInfo { Var = "1.0.0", Url = "https://downland.old8lang.com" };
         }
 
         // 不再自动添加默认库信息，标准库由 StandardLibraryRegistry 管理
