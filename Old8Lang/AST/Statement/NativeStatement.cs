@@ -18,34 +18,42 @@ public partial class NativeStatement : OldStatement
     /// DLL名称
     /// </summary>
     private readonly string DllName;
+
     /// <summary>
     /// 类名称
     /// </summary>
     private readonly string ClassName;
+
     /// <summary>
     /// 方法名称（可选）
     /// </summary>
     private readonly string? MethodName;
+
     /// <summary>
     /// 原生方法名称别名（可选）
     /// </summary>
     private string? NativeName { get; set; }
+
     /// <summary>
     /// 导入名称（可选）
     /// </summary>
     private readonly string? Name;
+
     /// <summary>
     /// 函数值（可选）
     /// </summary>
     private readonly FuncLangValue? FuncValue;
+
     /// <summary>
     /// 是否导入所有方法 (*)
     /// </summary>
-    private readonly bool ImportAll;  
+    private readonly bool ImportAll;
+
     /// <summary>
     /// 选择性导入的方法列表
     /// </summary>
-    private readonly List<string>? MethodList;  
+    private readonly List<string>? MethodList;
+
     /// <summary>
     /// 类导入别名
     /// </summary>
@@ -161,13 +169,13 @@ public partial class NativeStatement : OldStatement
         {
             path = DllPathResolver.ResolveDllPath(
                 DllName,
-                manager.LangInfo?.ImportPath,
+                null, // 不再使用 importPath
                 manager.Path);
         }
         catch (FileNotFoundException ex)
         {
             // 包装异常，添加源代码位置信息
-            throw new Error.ImportError(Position, $"导入原生库失败：\n{ex.Message}");
+            throw new ImportError(Position, $"导入原生库失败：\n{ex.Message}");
         }
 
         // 加载程序集并获取类型
@@ -178,7 +186,7 @@ public partial class NativeStatement : OldStatement
         }
         catch (Exception ex)
         {
-            throw new Error.ImportError(Position, $"加载 DLL 文件失败：{path}\n错误：{ex.Message}");
+            throw new ImportError(Position, $"加载 DLL 文件失败：{path}\n错误：{ex.Message}");
         }
 
         var type = assembly.GetType($"{DllName}.{ClassName}");
@@ -223,14 +231,15 @@ public partial class NativeStatement : OldStatement
                 if (method.DeclaringType == typeof(object))
                     continue;
 
-                var func = new FuncLangValue(method.Name, method, null);
+                var func = new FuncLangValue(method.Name, method);
                 manager.AddClassAndFunc(func);
             }
+
             return;
         }
 
         // 处理选择性导入多个方法：native "DllName" ClassName { Method1, Method2 }
-        if (MethodList != null && MethodList.Count > 0)
+        if (MethodList is { Count: > 0 })
         {
             foreach (var methodName in MethodList)
             {
@@ -240,9 +249,10 @@ public partial class NativeStatement : OldStatement
                     throw new InvalidOperationError(this, $"找不到方法 {methodName} 在 {ClassName} 类中");
                 }
 
-                var func = new FuncLangValue(methodName, methodInfo, null);
+                var func = new FuncLangValue(methodName, methodInfo);
                 manager.AddClassAndFunc(func);
             }
+
             return;
         }
 
@@ -267,16 +277,14 @@ public partial class NativeStatement : OldStatement
         string path;
         try
         {
-            // 对于编译模式，尝试从 Apis.ReadJson 获取导入路径
-            var langInfo = Apis.ReadJson();
             path = DllPathResolver.ResolveDllPath(
                 DllName,
-                langInfo.ImportPath,
+                null, // 不再使用 importPath
                 local.FilePath);
         }
         catch (FileNotFoundException ex)
         {
-            throw new Error.ImportError(new SourcePosition(0, 0), $"编译模式：导入原生库失败：\n{ex.Message}");
+            throw new ImportError(new SourcePosition(0, 0), $"编译模式：导入原生库失败：\n{ex.Message}");
         }
 
         // 加载程序集并获取类型
@@ -287,7 +295,7 @@ public partial class NativeStatement : OldStatement
         }
         catch (Exception ex)
         {
-            throw new Error.ImportError(new SourcePosition(0, 0), $"编译模式：加载 DLL 文件失败：{path}\n错误：{ex.Message}");
+            throw new ImportError(new SourcePosition(0, 0), $"编译模式：加载 DLL 文件失败：{path}\n错误：{ex.Message}");
         }
 
         var type = assembly.GetType($"{DllName}.{ClassName}");
@@ -332,11 +340,12 @@ public partial class NativeStatement : OldStatement
 
                 local.DelegateVar.Add(method.Name, method);
             }
+
             return;
         }
 
         // 处理选择性导入多个方法：native "DllName" ClassName { Method1, Method2 }
-        if (MethodList != null && MethodList.Count > 0)
+        if (MethodList is { Count: > 0 })
         {
             foreach (var methodName in MethodList)
             {
@@ -388,7 +397,7 @@ public partial class NativeStatement : OldStatement
         }
 
         // 选择性导入多个方法
-        if (MethodList != null && MethodList.Count > 0)
+        if (MethodList is { Count: > 0 })
         {
             var methods = string.Join(", ", MethodList);
             return $"native \"{DllName}\" {ClassName} {{ {methods} }}";

@@ -415,28 +415,26 @@ public partial class ImportStatement(
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         string moduleName = ImportString;
-        string? resolvedPath;
+        string? resolvedPath = null;
         bool isDirectory = false;
 
-        var langInfo = Apis.ReadJson();
-        if (langInfo.LibInfos.Any(x => moduleName == x.LibName))
+        // 优先级 1: 标准库（Old8LangLib 和 Old8Lang.NetLib）
+        // 注意：编译模式下标准库由 C# 直接提供，不需要加载 .old8 文件
+        if (StandardLibraryRegistry.IsStandardLibrary(moduleName))
         {
-            var libInfo = langInfo.LibInfos.First(x => x.LibName == moduleName);
-            isDirectory = libInfo.IsDir;
-
-            // 检查文件扩展名，只支持.old8和.ol
-            var fileName = moduleName;
-            var ext = Path.GetExtension(fileName).ToLower();
-            if (!isDirectory && ext != ".old8" && ext != ".ol")
-            {
-                fileName += ".old8"; // 默认使用.old8扩展名
-            }
-
-            resolvedPath = Path.Combine(langInfo.ImportPath, fileName);
+            // 标准库在编译模式下不需要生成 IL，直接返回
+            return;
         }
-        else
+
+        // 优先级 2: 第三方包（通过 PackageManager）
+        // 在编译模式下，我们需要手动查找包路径
+        resolvedPath = FindPackagePathForCompiler(moduleName, local.FilePath);
+
+        // 优先级 3: 本地文件导入（相对于当前文件的路径）
+        if (resolvedPath == null)
         {
-            var dic = Path.GetDirectoryName(local.FilePath)!;
+            var dic = Path.GetDirectoryName(local.FilePath);
+
             // 检查文件扩展名，只支持.old8和.ol
             var fileNameLocal = moduleName;
             var extLocal = Path.GetExtension(fileNameLocal).ToLower();
@@ -446,15 +444,24 @@ public partial class ImportStatement(
             }
 
             // 修复：正确处理绝对路径和相对路径
-            resolvedPath = Path.IsPathRooted(fileNameLocal) ? fileNameLocal : Path.Combine(dic, fileNameLocal);
-            if (resolvedPath.StartsWith("Users/") || resolvedPath.StartsWith("Volumes/"))
+            var filePath = Path.IsPathRooted(fileNameLocal)
+                ? fileNameLocal
+                : dic != null
+                    ? Path.Combine(dic, fileNameLocal)
+                    : fileNameLocal;
+
+            if (filePath.StartsWith("Users/") || filePath.StartsWith("Volumes/"))
             {
-                resolvedPath = "/" + resolvedPath;
+                filePath = "/" + filePath;
             }
 
-            if (!File.Exists(resolvedPath)) return;
+            if (File.Exists(filePath))
+            {
+                resolvedPath = filePath;
+            }
         }
 
+        // 如果所有查找都失败，直接返回（编译模式下不抛出错误）
         if (string.IsNullOrEmpty(resolvedPath))
         {
             return;
@@ -488,6 +495,104 @@ public partial class ImportStatement(
 
         block?.GenerateImportIl(ilGenerator, local);
         local.FilePath = importOriginalPath;
+    }
+
+    /// <summary>
+    /// 为编译模式查找包路径
+    /// </summary>
+    /// <param name="packageName">包名称</param>
+    /// <param name="sourceFilePath">源文件路径</param>
+    /// <returns>包入口文件路径，如果未找到则返回 null</returns>
+    private static string? FindPackagePathForCompiler(string packageName, string sourceFilePath)
+    {
+        var searchPaths = new List<string>();
+
+        // 添加全局包目录
+        var homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        var globalPackagesDir = Path.Combine(homeDir, ".old8lang", "packages");
+        searchPaths.Add(globalPackagesDir);
+
+        // 添加源文件所在目录的 packages 子目录
+        if (!string.IsNullOrEmpty(sourceFilePath))
+        {
+            try
+            {
+                var sourceDir = Path.GetDirectoryName(Path.GetFullPath(sourceFilePath));
+                if (!string.IsNullOrEmpty(sourceDir))
+                {
+                    var localPackages = Path.Combine(sourceDir, "packages");
+                    if (Directory.Exists(localPackages))
+                    {
+                        searchPaths.Add(localPackages);
+                    }
+                }
+            }
+            catch
+            {
+                // 忽略路径解析错误
+            }
+        }
+
+        // 在所有查找路径中搜索包
+        foreach (var searchPath in searchPaths)
+        {
+            // 策略 1: 尝试精确目录名
+            var packagePath = Path.Combine(searchPath, packageName);
+            var entryFile = FindPackageEntryFile(packagePath, packageName);
+            if (entryFile != null)
+            {
+                return entryFile;
+            }
+
+            // 策略 2: 尝试版本化目录（PackageName@*）
+            if (!Directory.Exists(searchPath)) continue;
+            try
+            {
+                var versionedDirs = Directory.GetDirectories(searchPath, $"{packageName}@*");
+                if (versionedDirs.Length > 0)
+                {
+                    // 选择第一个匹配的版本
+                    var versionedPath = versionedDirs[0];
+                    entryFile = FindPackageEntryFile(versionedPath, packageName);
+                    if (entryFile != null)
+                    {
+                        return entryFile;
+                    }
+                }
+            }
+            catch
+            {
+                // 忽略目录枚举错误
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 查找包的入口文件
+    /// </summary>
+    /// <param name="packagePath">包目录路径</param>
+    /// <param name="packageName">包名称</param>
+    /// <returns>入口文件路径，如果未找到则返回 null</returns>
+    private static string? FindPackageEntryFile(string packagePath, string packageName)
+    {
+        if (!Directory.Exists(packagePath))
+            return null;
+
+        // 优先级顺序：
+        // 1. index.old8
+        // 2. {packageName}.old8
+        // 3. main.old8
+
+        var candidates = new[]
+        {
+            Path.Combine(packagePath, "index.old8"),
+            Path.Combine(packagePath, $"{packageName}.old8"),
+            Path.Combine(packagePath, "main.old8")
+        };
+
+        return candidates.FirstOrDefault(File.Exists);
     }
 
     /// <summary>

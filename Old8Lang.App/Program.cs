@@ -114,7 +114,6 @@ public abstract class Program
         CommandRegistry.Register(new HelpCommand());
         CommandRegistry.Register(new VersionCommand());
         CommandRegistry.Register(new InfoCommand());
-        CommandRegistry.Register(new ImportInfoCommand());
         CommandRegistry.Register(new ChangeImportCommand());
 
         // 项目管理命令

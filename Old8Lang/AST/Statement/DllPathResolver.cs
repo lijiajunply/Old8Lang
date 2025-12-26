@@ -1,5 +1,6 @@
 using System.Text;
 using Old8Lang.StandardLibrary;
+using Old8Lang.ProjectManagement;
 
 namespace Old8Lang.AST.Statement;
 
@@ -77,7 +78,7 @@ public static class DllPathResolver
     /// 解析 DLL 文件路径
     /// </summary>
     /// <param name="dllName">DLL 名称（不包含 .dll 扩展名）</param>
-    /// <param name="importPath">导入路径（来自 LangInfo，可选）</param>
+    /// <param name="importPath">导入路径（来自 LangInfo，可选，已弃用）</param>
     /// <param name="currentFilePath">当前文件路径（可选）</param>
     /// <returns>找到的 DLL 完整路径</returns>
     /// <exception cref="FileNotFoundException">找不到 DLL 文件时抛出</exception>
@@ -85,7 +86,37 @@ public static class DllPathResolver
     {
         var attemptedPaths = new List<string>();
 
-        // 按优先级尝试所有搜索策略
+        // 优先级 1: 如果提供了当前文件路径，首先查找项目根目录的 dll 文件夹
+        if (!string.IsNullOrEmpty(currentFilePath))
+        {
+            var currentDir = Path.GetDirectoryName(currentFilePath);
+            if (!string.IsNullOrEmpty(currentDir))
+            {
+                // 查找项目根目录
+                var projectRoot = ProjectConfig.FindProjectRoot(currentDir);
+                if (!string.IsNullOrEmpty(projectRoot))
+                {
+                    var projectDllPath = Path.Combine(projectRoot, "dll", $"{dllName}.dll");
+                    attemptedPaths.Add(projectDllPath);
+
+                    if (File.Exists(projectDllPath))
+                    {
+                        return Path.GetFullPath(projectDllPath);
+                    }
+                }
+
+                // 查找当前文件所在目录的 dll 文件夹
+                var localDllPath = Path.Combine(currentDir, "dll", $"{dllName}.dll");
+                attemptedPaths.Add(localDllPath);
+
+                if (File.Exists(localDllPath))
+                {
+                    return Path.GetFullPath(localDllPath);
+                }
+            }
+        }
+
+        // 优先级 2-N: 按原有策略尝试所有搜索策略
         foreach (var strategy in SearchStrategies)
         {
             var path = strategy(dllName, importPath ?? "");
@@ -96,22 +127,6 @@ public static class DllPathResolver
             if (File.Exists(path))
             {
                 return Path.GetFullPath(path);
-            }
-        }
-
-        // 如果提供了当前文件路径，尝试在当前文件目录的 dll 子目录查找
-        if (!string.IsNullOrEmpty(currentFilePath))
-        {
-            var currentDir = Path.GetDirectoryName(currentFilePath);
-            if (!string.IsNullOrEmpty(currentDir))
-            {
-                var localDllPath = Path.Combine(currentDir, "dll", $"{dllName}.dll");
-                attemptedPaths.Add(localDllPath);
-
-                if (File.Exists(localDllPath))
-                {
-                    return Path.GetFullPath(localDllPath);
-                }
             }
         }
 
