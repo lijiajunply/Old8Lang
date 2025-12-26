@@ -17,14 +17,21 @@ public class PackageService
     private readonly IPackageInstaller Installer;
     private readonly IPackageConfigurationManager ConfigManager;
 
+    /// <summary>
+    /// 包目录路径
+    /// </summary>
+    public string PackagesDirectory => PackagesDir;
+
     public PackageService(string projectRoot, ProjectConfig? projectConfig = null)
     {
         ProjectRoot = projectRoot;
 
-        // 确定包目录
-        PackagesDir = projectConfig != null
-            ? Path.Combine(projectRoot, projectConfig.PackageManager.PackagesDir)
-            : Path.Combine(projectRoot, "packages");
+        // 使用全局包目录
+        PackagesDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            ".old8lang",
+            "packages"
+        );
 
         // 初始化 Core 库的服务
         SourceManager = new PackageSourceManager();
@@ -133,29 +140,19 @@ public class PackageService
     /// </summary>
     public async Task<RestoreResult> RestorePackagesAsync(
         ProjectConfig projectConfig,
-        bool productionOnly = false,
-        bool frozenLockfile = false)
+        bool productionOnly = false)
     {
         var result = new RestoreResult();
 
         try
         {
-            // 加载锁文件（如果存在）
-            LockFile? lockFile = null;
-            var lockFilePath = Path.Combine(ProjectRoot, LockFile.FileName);
-            if (frozenLockfile && File.Exists(lockFilePath))
-            {
-                lockFile = LockFile.LoadFromDirectory(ProjectRoot);
-            }
-
             // 安装生产依赖
-            foreach (var (packageId, versionRange) in projectConfig.Dependencies)
+            var prodDeps = projectConfig.References.Where(r => !r.IsDevDependency).ToList();
+            foreach (var dep in prodDeps)
             {
-                var version = lockFile?.Packages.TryGetValue(packageId, out var lockInfo) == true
-                    ? lockInfo.Version
-                    : ResolveVersion(versionRange);
+                var version = ResolveVersion(dep.Version);
 
-                var installResult = await InstallPackageAsync(packageId, version);
+                var installResult = await InstallPackageAsync(dep.PackageId, version);
 
                 if (installResult.Success)
                 {
@@ -166,7 +163,7 @@ public class PackageService
                 }
                 else
                 {
-                    result.FailedPackages.Add(packageId);
+                    result.FailedPackages.Add(dep.PackageId);
                     result.FailedCount++;
                 }
             }
@@ -174,13 +171,12 @@ public class PackageService
             // 安装开发依赖
             if (!productionOnly)
             {
-                foreach (var (packageId, versionRange) in projectConfig.DevDependencies)
+                var devDeps = projectConfig.References.Where(r => r.IsDevDependency).ToList();
+                foreach (var dep in devDeps)
                 {
-                    var version = lockFile?.Packages.TryGetValue(packageId, out var lockInfo) == true
-                        ? lockInfo.Version
-                        : ResolveVersion(versionRange);
+                    var version = ResolveVersion(dep.Version);
 
-                    var installResult = await InstallPackageAsync(packageId, version, true);
+                    var installResult = await InstallPackageAsync(dep.PackageId, version, true);
 
                     if (installResult.Success)
                     {
@@ -191,7 +187,7 @@ public class PackageService
                     }
                     else
                     {
-                        result.FailedPackages.Add(packageId);
+                        result.FailedPackages.Add(dep.PackageId);
                         result.FailedCount++;
                     }
                 }
@@ -268,11 +264,6 @@ public class PackageService
 
         return cleanVersion;
     }
-
-    /// <summary>
-    /// 包目录路径
-    /// </summary>
-    public string PackagesDirectory => PackagesDir;
 }
 
 /// <summary>

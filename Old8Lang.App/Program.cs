@@ -119,12 +119,10 @@ public abstract class Program
 
         // 项目管理命令
         CommandRegistry.Register(new InitCommand());
-        CommandRegistry.Register(new AddCommand());
-        CommandRegistry.Register(new RemoveCommand());
         CommandRegistry.Register(new InstallCommand());
+        CommandRegistry.Register(new RemoveCommand());
         CommandRegistry.Register(new RestoreCommand());
         CommandRegistry.Register(new ListCommand());
-        CommandRegistry.Register(new VenvCommand());
 
         // 别名支持 - 直接注册别名指向相同命令实例
         var listCommand = new ListCommand();

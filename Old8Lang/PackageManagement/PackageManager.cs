@@ -11,8 +11,7 @@ namespace Old8Lang.PackageManagement;
 /// 负责：
 /// 1. 运行时包加载和执行
 /// 2. 包路径解析和缓存管理
-/// 3. 虚拟环境支持
-/// 
+///
 /// 注意：包安装功能委托给 Old8Lang.PackageManager.Core
 /// </summary>
 public class PackageManager
@@ -33,11 +32,6 @@ public class PackageManager
     private readonly Lock LoadLock = new();
 
     /// <summary>
-    /// 虚拟环境（如果存在）
-    /// </summary>
-    private readonly VirtualEnvironment? VirtualEnv;
-
-    /// <summary>
     /// 是否启用调试日志
     /// </summary>
     public static bool DebugEnabled { get; set; }
@@ -46,46 +40,10 @@ public class PackageManager
     /// 构造函数
     /// </summary>
     /// <param name="packagesDir">包目录路径，null 则使用默认路径</param>
-    /// <param name="projectRoot">项目根目录，用于检测虚拟环境。如果为 null 将自动检测</param>
+    /// <param name="projectRoot">项目根目录（保留参数以兼容现有调用，但不再使用）</param>
     public PackageManager(string? packagesDir = null, string? projectRoot = null)
     {
-        // 如果没有指定项目根目录，尝试从当前目录检测
-        if (projectRoot == null)
-        {
-            projectRoot = Directory.GetCurrentDirectory();
-        }
-
-        // 尝试检测虚拟环境
-        VirtualEnv = VirtualEnvironment.Detect(projectRoot);
-        VirtualEnvironment.DebugEnabled = DebugEnabled;
-
-        if (VirtualEnv != null)
-        {
-            // 找到项目配置
-            if (VirtualEnv.IsEnabled)
-            {
-                // 虚拟环境模式：优先使用项目本地包
-                var venvPaths = VirtualEnv.GetPackageSearchPaths();
-                foreach (var path in venvPaths)
-                {
-                    AddSearchPath(path);
-                }
-
-                LogDebug($"Virtual environment enabled for project: {VirtualEnv.Config.Name}");
-            }
-            else
-            {
-                // 项目存在但虚拟环境被禁用
-                LogDebug($"Project detected but virtual environment disabled: {VirtualEnv.Config.Name}");
-            }
-        }
-        else
-        {
-            // 没有检测到项目配置，使用全局包模式
-            LogDebug("No Old8Lang project detected, using global packages only");
-        }
-
-        // 添加全局包目录（总是添加，作为后备选项）
+        // 添加全局包目录
         var packagesDirectory = packagesDir ?? GetDefaultPackagesDirectory();
         AddSearchPath(packagesDirectory);
 
@@ -171,23 +129,7 @@ public class PackageManager
             // 在所有查找路径中搜索包
             foreach (var searchPath in PackageSearchPaths)
             {
-                // 策略 1: 如果启用了虚拟环境，使用 VirtualEnvironment 解析版本
-                if (VirtualEnv is { IsEnabled: true })
-                {
-                    var resolvedPath = VirtualEnv.ResolvePackage(packageName);
-                    if (resolvedPath != null)
-                    {
-                        LogDebug($"  Virtual env resolved: {resolvedPath}");
-                        if (TryLoadPackageFromPath(resolvedPath, packageName, manager, out module) && module != null)
-                        {
-                            LogDebug($"  ✓ Package '{packageName}' loaded successfully from: {resolvedPath}");
-                            PackageCache[packageName] = module;
-                            return true;
-                        }
-                    }
-                }
-
-                // 策略 2: 尝试精确目录名（向后兼容）
+                // 策略 1: 尝试精确目录名
                 var packagePath = Path.Combine(searchPath, packageName);
                 LogDebug($"  Checking exact match: {packagePath}");
 
@@ -198,7 +140,7 @@ public class PackageManager
                     return true;
                 }
 
-                // 策略 3: 尝试版本化目录（PackageName@*）
+                // 策略 2: 尝试版本化目录（PackageName@*）
                 if (!Directory.Exists(searchPath)) continue;
                 var versionedDirs = Directory.GetDirectories(searchPath, $"{packageName}@*");
                 if (versionedDirs.Length <= 0) continue;
@@ -360,31 +302,5 @@ public class PackageManager
         {
             Console.WriteLine($"[PackageManager] {message}");
         }
-    }
-
-    /// <summary>
-    /// 获取包信息
-    /// </summary>
-    public Package? GetPackageInfo(string packageName)
-    {
-        foreach (var searchPath in PackageSearchPaths)
-        {
-            var packagePath = Path.Combine(searchPath, packageName);
-
-            if (!Directory.Exists(packagePath)) continue;
-
-            // 创建基本的包信息
-            var package = new Package
-            {
-                Id = packageName,
-                FilePath = packagePath,
-                Version = "1.0.0", // 默认版本
-                Description = $"Package {packageName}"
-            };
-
-            return package;
-        }
-
-        return null;
     }
 }

@@ -32,7 +32,6 @@ public static class BasicInfo
     remove <包名>          从项目移除依赖包
     install                安装项目的所有依赖
     list, ls               列出已安装的依赖包
-    venv <子命令>          管理虚拟环境
 
   信息命令：
     info                   显示 Old8Lang 语言信息
@@ -55,7 +54,6 @@ public static class BasicInfo
     Old8Lang.App add Logger              # 添加包
     Old8Lang.App install                 # 安装依赖
     Old8Lang.App list                    # 列出已安装包
-    Old8Lang.App venv status             # 查看虚拟环境状态
 
   查看信息：
     Old8Lang.App info

@@ -23,13 +23,11 @@ public class RestoreCommand : ICommand
 
 选项:
   --production           只恢复生产依赖（跳过 devDependencies）
-  --frozen-lockfile      使用精确的锁文件版本，不更新
   -h, --help             显示帮助信息
 
 示例:
   old8lang restore                   # 恢复所有依赖
   old8lang restore --production      # 只恢复生产依赖
-  old8lang restore --frozen-lockfile # 使用锁文件精确版本
 ";
 
     public async Task<int> ExecuteAsync(string[] args)
@@ -58,31 +56,17 @@ public class RestoreCommand : ICommand
         }
 
         var productionOnly = args.Contains("--production");
-        var frozenLockfile = args.Contains("--frozen-lockfile");
 
-        Console.WriteLine($"正在恢复 {config.Name}@{config.Version} 的依赖...");
+        Console.WriteLine($"正在恢复 {config.ProjectName}@{config.Version} 的依赖...");
         Console.WriteLine();
 
         // 创建包服务
         var packageService = new PackageService(projectRoot, config);
 
-        // 加载锁文件提示
-        if (frozenLockfile)
-        {
-            var lockFilePath = Path.Combine(projectRoot, LockFile.FileName);
-            if (File.Exists(lockFilePath))
-            {
-                CommandHelper.PrintInfo("使用锁文件中的精确版本");
-            }
-            else
-            {
-                CommandHelper.PrintWarning("锁文件不存在，将使用 o8packages.json 中的版本范围");
-            }
-        }
-
         // 显示要安装的包
-        var totalDeps = config.Dependencies.Count +
-                       (productionOnly ? 0 : config.DevDependencies.Count);
+        var totalDeps = productionOnly
+            ? config.References.Count(r => !r.IsDevDependency)
+            : config.References.Count;
 
         if (totalDeps == 0)
         {
@@ -93,7 +77,7 @@ public class RestoreCommand : ICommand
         Console.WriteLine($"将恢复 {totalDeps} 个依赖包...\n");
 
         // 恢复依赖
-        var result = await packageService.RestorePackagesAsync(config, productionOnly, frozenLockfile);
+        var result = await packageService.RestorePackagesAsync(config, productionOnly);
 
         // 显示结果
         Console.WriteLine();
@@ -127,21 +111,6 @@ public class RestoreCommand : ICommand
                 {
                     Console.WriteLine($"  - {pkg}");
                 }
-            }
-        }
-
-        // 更新锁文件
-        if (result.Success && !frozenLockfile)
-        {
-            try
-            {
-                var lockFile = LockFile.Generate(config, packageService.PackagesDirectory);
-                lockFile.SaveToDirectory(projectRoot);
-                CommandHelper.PrintInfo("已更新锁文件");
-            }
-            catch (Exception ex)
-            {
-                CommandHelper.PrintWarning($"更新锁文件失败: {ex.Message}");
             }
         }
 

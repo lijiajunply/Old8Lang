@@ -1,3 +1,4 @@
+using Old8Lang.PackageManager.Core.Models;
 using Old8Lang.ProjectManagement;
 
 namespace Old8Lang.App.Commands;
@@ -66,14 +67,13 @@ public class InitCommand : ICommand
         CommandHelper.PrintSuccess("项目初始化完成！");
         Console.WriteLine();
         Console.WriteLine("项目信息:");
-        Console.WriteLine($"  名称: {config.Name}");
+        Console.WriteLine($"  名称: {config.ProjectName}");
         Console.WriteLine($"  版本: {config.Version}");
         Console.WriteLine($"  描述: {config.Description}");
-        Console.WriteLine($"  虚拟环境: {(config.PackageManager.UseVirtualEnv ? "已启用" : "未启用")}");
         Console.WriteLine();
         Console.WriteLine("下一步:");
-        Console.WriteLine("  1. old8lang add <包名>     - 添加依赖包");
-        Console.WriteLine("  2. old8lang install        - 安装所有依赖");
+        Console.WriteLine("  1. old8lang install <包名>  - 添加依赖包");
+        Console.WriteLine("  2. old8lang install         - 安装所有依赖");
         Console.WriteLine($"  3. old8lang run {config.Main}  - 运行主文件");
 
         return Task.FromResult(0);
@@ -85,7 +85,7 @@ public class InitCommand : ICommand
 
         return new ProjectConfig
         {
-            Name = dirName.ToLower().Replace(" ", "-"),
+            ProjectName = dirName.ToLower().Replace(" ", "-"),
             Version = "1.0.0",
             Description = $"{dirName} project",
             Author = "",
@@ -96,20 +96,12 @@ public class InitCommand : ICommand
                 Version = "^1.0.0",
                 Runtime = "interpreter"
             },
-            Dependencies = new Dictionary<string, string>(),
-            DevDependencies = new Dictionary<string, string>(),
+            Framework = "interpreter",
+            References = new List<PackageReference>(),
             Scripts = new Dictionary<string, string>
             {
                 ["start"] = "old8lang run src/main.old8",
                 ["test"] = "old8lang run tests/test_main.old8"
-            },
-            Repositories = ["https://packages.old8lang.org"],
-            PackageManager = new PackageManagerConfig
-            {
-                UseVirtualEnv = true,
-                PackagesDir = "./packages",
-                AutoLock = true,
-                Strict = false
             }
         };
     }
@@ -131,14 +123,13 @@ public class InitCommand : ICommand
         var author = CommandHelper.ReadLine("作者", "");
         var license = CommandHelper.ReadLine("License", "MIT") ?? "MIT";
         var main = CommandHelper.ReadLine("入口文件", "src/main.old8") ?? "src/main.old8";
-        var useVirtualEnv = CommandHelper.ReadYesNo("使用虚拟环境");
         var old8LangVersion = CommandHelper.ReadLine("Old8Lang 版本", "^1.0.0") ?? "^1.0.0";
 
         Console.WriteLine();
 
         return new ProjectConfig
         {
-            Name = name,
+            ProjectName = name,
             Version = version,
             Description = description,
             Author = author,
@@ -149,37 +140,17 @@ public class InitCommand : ICommand
                 Version = old8LangVersion,
                 Runtime = "interpreter"
             },
-            Dependencies = new Dictionary<string, string>(),
-            DevDependencies = new Dictionary<string, string>(),
+            References = new List<PackageReference>(),
             Scripts = new Dictionary<string, string>
             {
                 ["start"] = $"old8lang run {main}",
                 ["test"] = "old8lang run tests/test_main.old8"
-            },
-            Repositories = ["https://packages.old8lang.org"],
-            PackageManager = new PackageManagerConfig
-            {
-                UseVirtualEnv = useVirtualEnv,
-                PackagesDir = "./packages",
-                AutoLock = true,
-                Strict = false
             }
         };
     }
 
     private void CreateProjectStructure(string projectRoot, ProjectConfig config)
     {
-        // 创建 packages 目录
-        if (config.PackageManager.UseVirtualEnv)
-        {
-            var packagesDir = Path.Combine(projectRoot, config.PackageManager.PackagesDir);
-            if (!Directory.Exists(packagesDir))
-            {
-                Directory.CreateDirectory(packagesDir);
-                CommandHelper.PrintSuccess($"创建目录: {config.PackageManager.PackagesDir}");
-            }
-        }
-
         // 创建 src 目录和主文件
         var mainFilePath = Path.Combine(projectRoot, config.Main ?? "src/main.old8");
         var mainDir = Path.GetDirectoryName(mainFilePath);
@@ -192,10 +163,10 @@ public class InitCommand : ICommand
 
         if (!File.Exists(mainFilePath))
         {
-            var mainContent = "// " + config.Name + @" - 主程序入口
+            var mainContent = "// " + config.ProjectName + @" - 主程序入口
 
 PrintLine(""Hello, Old8Lang!"")
-PrintLine($""项目名称: " + config.Name + @""")
+PrintLine($""项目名称: " + config.ProjectName + @""")
 PrintLine($""版本: " + config.Version + @""")
 ";
             File.WriteAllText(mainFilePath, mainContent);
@@ -227,7 +198,7 @@ PrintLine($""版本: " + config.Version + @""")
         var readmePath = Path.Combine(projectRoot, "README.md");
         if (!File.Exists(readmePath))
         {
-            var readmeContent = $@"# {config.Name}
+            var readmeContent = $@"# {config.ProjectName}
 
 {config.Description}
 
@@ -270,12 +241,9 @@ old8lang run tests/test_main.old8
         if (!File.Exists(gitignorePath))
         {
             var gitignoreContent = """
-                                   # 忽略 packages 目录
-                                   packages/
-                                                                      
                                    # 忽略 dll 目录
                                    dll/
-                                                                      
+
                                    # 忽略 dist 目录
                                    dist/
                                    """;

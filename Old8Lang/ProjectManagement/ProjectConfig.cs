@@ -1,26 +1,16 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Old8Lang.PackageManager.Core.Models;
 
 namespace Old8Lang.ProjectManagement;
 
 /// <summary>
 /// Old8Lang 项目配置（类似 package.json）
+/// 合并了 PackageConfiguration 的功能
 /// </summary>
 [Serializable]
-public class ProjectConfig
+public class ProjectConfig : PackageConfiguration
 {
-    /// <summary>
-    /// 项目名称
-    /// </summary>
-    [JsonPropertyName("name")]
-    public string Name { get; set; } = "";
-
-    /// <summary>
-    /// 项目版本
-    /// </summary>
-    [JsonPropertyName("version")]
-    public string Version { get; set; } = "1.0.0";
-
     /// <summary>
     /// 项目描述
     /// </summary>
@@ -52,38 +42,15 @@ public class ProjectConfig
     public string? Main { get; set; }
 
     /// <summary>
-    /// 运行时依赖
-    /// </summary>
-    [JsonPropertyName("dependencies")]
-    public Dictionary<string, string> Dependencies { get; set; } = new();
-
-    /// <summary>
-    /// 开发依赖
-    /// </summary>
-    [JsonPropertyName("devDependencies")]
-    public Dictionary<string, string> DevDependencies { get; set; } = new();
-
-    /// <summary>
     /// 脚本命令
     /// </summary>
     [JsonPropertyName("scripts")]
     public Dictionary<string, string> Scripts { get; set; } = new();
-
-    /// <summary>
-    /// 包仓库地址
-    /// </summary>
-    [JsonPropertyName("repositories")]
-    public List<string> Repositories { get; set; } = new() { "https://packages.old8lang.org" };
-
-    /// <summary>
-    /// 包管理器配置
-    /// </summary>
-    [JsonPropertyName("packageManager")]
-    public PackageManagerConfig PackageManager { get; set; } = new();
-
+    
     /// <summary>
     /// 配置文件名
     /// </summary>
+    [JsonIgnore]
     public const string FileName = "o8packages.json";
 
     /// <summary>
@@ -198,35 +165,4 @@ public class Old8LangConfig
     /// </summary>
     [JsonPropertyName("runtime")]
     public string Runtime { get; set; } = "interpreter";
-}
-
-/// <summary>
-/// 包管理器配置
-/// </summary>
-[Serializable]
-public class PackageManagerConfig
-{
-    /// <summary>
-    /// 是否启用虚拟环境
-    /// </summary>
-    [JsonPropertyName("useVirtualEnv")]
-    public bool UseVirtualEnv { get; set; } = true;
-
-    /// <summary>
-    /// 包目录路径（相对于项目根目录）
-    /// </summary>
-    [JsonPropertyName("packagesDir")]
-    public string PackagesDir { get; set; } = "./packages";
-
-    /// <summary>
-    /// 是否在未找到锁文件时自动生成
-    /// </summary>
-    [JsonPropertyName("autoLock")]
-    public bool AutoLock { get; set; } = true;
-
-    /// <summary>
-    /// 是否严格模式（版本必须与锁文件完全匹配）
-    /// </summary>
-    [JsonPropertyName("strict")]
-    public bool Strict { get; set; }
 }
