@@ -1,0 +1,52 @@
+// Old8Lang Mock 测试示例
+
+// 导入测试框架
+native "Old8LangLib" MockLib *
+native "Old8LangLib" AssertLib *
+
+PrintLine("=== Mock 测试示例 ===")
+
+// ===== 测试 1: 创建 Mock 对象 =====
+PrintLine("\n测试 1: 创建 Mock 对象")
+mock <- CreateMock("TestMock")
+PrintLine($"创建 Mock: {mock.Name}")
+PrintLine("✓ Mock 创建成功")
+
+// ===== 测试 2: 设置和获取返回值 =====
+PrintLine("\n测试 2: 设置和获取返回值")
+mock.SetReturnValue("GetValue", 42)
+result <- mock.GetReturnValue("GetValue")
+PrintLine($"获取返回值: {result}")
+AssertEqual(42, result)
+PrintLine("✓ 返回值测试通过")
+
+// ===== 测试 3: 调用 Mock 方法 =====
+PrintLine("\n测试 3: 调用 Mock 方法")
+mock.SetReturnValue("Add", 15)
+result <- mock.Call("Add", 10, 5)
+PrintLine($"调用 Add(10, 5) = {result}")
+AssertEqual(15, result)
+PrintLine("✓ Mock 方法调用成功")
+
+// ===== 测试 4: 检查调用次数 =====
+PrintLine("\n测试 4: 检查调用次数")
+count <- mock.GetCallCount("Add")
+PrintLine($"Add 方法调用次数: {count}")
+AssertEqual(1, count)
+PrintLine("✓ 调用次数正确")
+
+// ===== 测试 5: 验证方法被调用 =====
+PrintLine("\n测试 5: 验证方法被调用")
+VerifyCalled(mock, "Add")
+VerifyCalledOnce(mock, "Add")
+PrintLine("✓ 方法调用验证通过")
+
+// ===== 测试 6: 重置 Mock =====
+PrintLine("\n测试 6: 重置 Mock")
+mock.Reset()
+count <- mock.GetCallCount("Add")
+PrintLine($"重置后调用次数: {count}")
+AssertEqual(0, count)
+PrintLine("✓ Mock 重置成功")
+
+PrintLine("\n=== 所有 Mock 测试完成! ===")

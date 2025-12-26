@@ -21,12 +21,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/ImageLibExample.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ImageLib_README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8LangLib/ImageLib.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/AssertLib.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/MockLib.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8LangLib/TestRunner.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TEST_FRAMEWORK.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/basic_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mock_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simple_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_example.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/MatchCase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/MatchCase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/MatchExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/MatchExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazySymbolProxy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/LazySymbolProxy.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.Expressions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.Expressions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.Statements.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/CompilerVisitor.Values.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Expressions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Expressions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Statements.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Statements.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Values.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Values.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Loading/CacheManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Loading/CacheManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Loading/ModuleLoader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Loading/ModuleLoader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Loading/NetworkModuleLoader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Loading/NetworkModuleLoader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Resolution/ModuleResolver.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Resolution/ModuleResolver.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/PackageManagement/PackageManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/PackageManagement/PackageManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -478,7 +497,7 @@
       <workItem from="1766441034395" duration="1692000" />
       <workItem from="1766461431015" duration="981000" />
       <workItem from="1766746850670" duration="17415000" />
-      <workItem from="1766771063664" duration="11099000" />
+      <workItem from="1766771063664" duration="11776000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -823,7 +842,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="380" />
+    <option name="localTasksCounter" value="381" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -850,7 +869,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="docs(reports): 移除过时的测试报告文件&#10;&#10;- 删除了旧的模块系统测试报告&#10;- 移除了全面评估报告&#10;- 清理了线程测试修复实施报告&#10;- 删除多个包管理集成测试报告&#10;- 移除了语法测试实施报告&#10;- 保持代码库整洁，移除不再需要的文档文件" />
     <MESSAGE value="refactor(interpreter): 迁移表达式和值类型访问方法到解释器访问者&#10;&#10;- 将 Operation、FunctionCallExpression、TernaryExpression 等表达式节点的访问方法迁移到 InterpreterVisitor&#10;- 将 ArrayLangValue、ListLangValue、DictionaryLangValue 等值类型节点的访问方法迁移到 InterpreterVisitor&#10;- 从生成的存根文件中移除已实现的访问方法&#10;- 更新工作区配置以反映文件变更状态" />
     <MESSAGE value="feat(cli): 合并 install 和 add 命令并移除虚拟环境支持&#10;&#10;- 将原 add 命令功能合并到 install 命令中，统一依赖管理&#10;- 移除虚拟环境相关代码和配置选项&#10;- 更新项目配置模型，使用 References 替代 Dependencies 和 DevDependencies&#10;- 修改包安装路径为全局 ~/.old8lang/packages 目录&#10;- 移除锁文件生成和管理功能&#10;- 更新 init 命令中的项目初始化逻辑和默认配置&#10;- 移除 list 命令中的全局包列表功能&#10;- 升级 Old8Lang.PackageManager.Core 依赖版本到 1.1.1" />
     <MESSAGE value="feat(cert): 添加证书管理命令和包签名功能&#10;&#10;- 新增 cert 命令支持生成、查看和导出证书&#10;- 集成 PackageArchiveService 提供打包解包功能&#10;- 集成 PackageSignatureService 提供数字签名验证功能&#10;- 更新 PackageService 添加完整的包管理 API&#10;- 添加详细的 CLI 命令使用指南文档&#10;- 添加 PackageService 使用文档和示例代码&#10;- 升级 Old8Lang.PackageManager.Core 版本至 1.1.2&#10;- 实现证书密码安全输入功能&#10;- 添加包结构验证和元数据读取功能&#10;- 提供一键发布命令支持自动证书生成" />
@@ -875,7 +893,8 @@
     <MESSAGE value="fix(parser): 修复动态导入解析器中的语法错误&#10;&#10;- 修正动态导入中字符串字面量的解析逻辑&#10;- 移除动态导入函数调用末尾的多余括号&#10;- 修复解析器中动态模块表达式的处理顺序&#10;- 优化IDE配置文件中的变更记录和历史提交信息" />
     <MESSAGE value="feat(ast): 添加嵌套类实例化支持&#10;&#10;- 在 AnyLangValue 中添加 TryInstantiateNestedClass 方法来处理嵌套类实例化&#10;- 支持 Level1().Level2() 这样的链式调用语法&#10;- 通过变量管理器查找嵌套类模板并创建新实例&#10;- 移除构造函数验证测试用例以优化测试结构" />
     <MESSAGE value="refactor(standard-library): 移除标准库版本信息并添加模板引擎支持&#10;&#10;- 从 StandardLibraryInfo 记录中移除 Version 属性&#10;- 从 StandardLibraryRegistry 中移除所有标准库的版本参数&#10;- 移除 GetAllLibraryNames 和 GetVersion 静态方法&#10;- 添加 TemplateEngine 标准库注册项&#10;- 修正 TemplateEngine 正则表达式以支持点号属性访问&#10;- 调整模板处理顺序为先循环后条件最后变量替换" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(standard-library): 移除标准库版本信息并添加模板引擎支持&#10;&#10;- 从 StandardLibraryInfo 记录中移除 Version 属性&#10;- 从 StandardLibraryRegistry 中移除所有标准库的版本参数&#10;- 移除 GetAllLibraryNames 和 GetVersion 静态方法&#10;- 添加 TemplateEngine 标准库注册项&#10;- 修正 TemplateEngine 正则表达式以支持点号属性访问&#10;- 调整模板处理顺序为先循环后条件最后变量替换" />
+    <MESSAGE value="feat(image): 添加基于SkiaSharp的图像处理库&#10;&#10;- 实现图像加载、保存、创建和克隆功能&#10;- 提供图像信息获取包括尺寸、像素颜色、格式等&#10;- 支持图像变换如缩放、旋转、裁剪、翻转操作&#10;- 实现图像调整功能包括亮度、对比度、饱和度、色调控制&#10;- 添加多种图像滤镜如灰度、反色、模糊、锐化、边缘检测&#10;- 提供图像绘制功能支持矩形、圆形、直线、文本、多边形绘制&#10;- 包含颜色值验证和HSB到RGB转换辅助方法&#10;- 实现图像格式转换和图像合并功能" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(image): 添加基于SkiaSharp的图像处理库&#10;&#10;- 实现图像加载、保存、创建和克隆功能&#10;- 提供图像信息获取包括尺寸、像素颜色、格式等&#10;- 支持图像变换如缩放、旋转、裁剪、翻转操作&#10;- 实现图像调整功能包括亮度、对比度、饱和度、色调控制&#10;- 添加多种图像滤镜如灰度、反色、模糊、锐化、边缘检测&#10;- 提供图像绘制功能支持矩形、圆形、直线、文本、多边形绘制&#10;- 包含颜色值验证和HSB到RGB转换辅助方法&#10;- 实现图像格式转换和图像合并功能" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

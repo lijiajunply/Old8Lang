@@ -1,0 +1,44 @@
+// Old8Lang 测试框架简单示例
+// 测试断言库的基础功能
+
+// 导入测试框架
+native "Old8LangLib" AssertLib *
+
+PrintLine("=== Old8Lang 测试框架示例 ===")
+
+// ===== 测试 1: 基础断言 =====
+PrintLine("\n测试 1: 基础相等断言")
+AssertEqual(5, 5, "数字相等测试")
+AssertEqual("hello", "hello", "字符串相等测试")
+AssertNotEqual(5, 10, "数字不相等测试")
+PrintLine("✓ 基础断言测试通过")
+
+// ===== 测试 2: 布尔断言 =====
+PrintLine("\n测试 2: 布尔断言")
+AssertTrue(true, "True 测试")
+AssertFalse(false, "False 测试")
+PrintLine("✓ 布尔断言测试通过")
+
+// ===== 测试 3: Null 检查 =====
+PrintLine("\n测试 3: Null 检查")
+value <- null
+AssertNull(value, "Null 检查测试")
+value <- 123
+AssertNotNull(value, "非 Null 检查测试")
+PrintLine("✓ Null 检查测试通过")
+
+// ===== 测试 4: 数值比较 =====
+PrintLine("\n测试 4: 数值比较")
+AssertGreater(10, 5, "大于测试")
+AssertLess(5, 10, "小于测试")
+PrintLine("✓ 数值比较测试通过")
+
+// ===== 测试 5: 字符串断言 =====
+PrintLine("\n测试 5: 字符串断言")
+text <- "Hello, World!"
+AssertContains(text, "World", "包含测试")
+AssertStartsWith(text, "Hello", "以...开头测试")
+AssertEndsWith(text, "!", "以...结尾测试")
+PrintLine("✓ 字符串断言测试通过")
+
+PrintLine("\n=== 所有测试完成! ===")

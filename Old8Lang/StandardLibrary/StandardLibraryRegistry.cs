@@ -82,7 +82,10 @@ public static class StandardLibraryRegistry
         ["TemplateEngine"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "TemplateEngine"),
         ["ImageLib"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "ImageLib")
+            ClassName: "ImageLib"),
+        ["AssertLib"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib"),
+        ["MockLib"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib"),
+        ["TestRunner"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib"),
     };
 
     /// <summary>

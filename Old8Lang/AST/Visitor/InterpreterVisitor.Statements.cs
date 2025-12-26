@@ -3,7 +3,6 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Error;
-using Old8Lang.Interpreter;
 
 namespace Old8Lang.AST.Visitor;
 

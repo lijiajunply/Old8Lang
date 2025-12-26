@@ -1,5 +1,4 @@
 using Old8Lang.AST.Statement;
-using Old8Lang.Interpreter;
 
 namespace Old8Lang.ModuleSystem.Loading;
 
