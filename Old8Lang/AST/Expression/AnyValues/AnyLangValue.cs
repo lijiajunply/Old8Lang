@@ -171,6 +171,14 @@ public partial class AnyLangValue : LangValueType
         var methods = Metadata.MethodTable.LookupMethod(methodName);
         if (methods == null || methods.Count == 0)
         {
+            // 如果找不到方法，检查是否是嵌套类的实例化
+            // 这支持 Level1().Level2() 这样的语法
+            var nestedClassInstance = TryInstantiateNestedClass(instance, manager);
+            if (nestedClassInstance != null)
+            {
+                return nestedClassInstance;
+            }
+
             throw new AttributeError(this, methodName, ClassId.IdName);
         }
 
@@ -189,6 +197,37 @@ public partial class AnyLangValue : LangValueType
 
         // 执行方法
         return ExecuteMethod(selectedMethod, instance.Ids, manager);
+    }
+
+    /// <summary>
+    /// 尝试实例化嵌套类
+    /// 支持 Level1().Level2() 这样的语法
+    /// </summary>
+    /// <param name="instance">实例调用表达式</param>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>如果找到嵌套类则返回新实例，否则返回 null</returns>
+    private LangValueType? TryInstantiateNestedClass(Instance instance, VariateManager manager)
+    {
+        var className = instance.Id.IdName;
+
+        // 检查是否只是实例化调用（没有参数）
+        if (instance.Ids.Count > 0)
+        {
+            return null; // 嵌套类实例化不支持参数
+        }
+
+        // 尝试从全局管理器中查找嵌套类
+        // 因为嵌套类在注册时会被添加到全局作用域
+        var nestedClassTemplate = manager.GetAny(new LangId(className));
+        if (nestedClassTemplate is TypeTemplate typeTemplate)
+        {
+            // 创建嵌套类实例
+            var nestedInstance = typeTemplate.CreateInstanceV2(manager);
+            nestedInstance.Init(manager.Interpreter);
+            return nestedInstance;
+        }
+
+        return null;
     }
 
     /// <summary>

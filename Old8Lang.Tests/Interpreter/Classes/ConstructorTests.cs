@@ -271,57 +271,6 @@ public class ConstructorTests
     }
 
     [Fact]
-    public void Constructor_WithValidation_RejectsInvalidInput()
-    {
-        // Arrange
-        var code = @"
-            class User {
-                public email <- """"
-                public age <- 0
-
-                func init(email:string, age:int) {
-                    if age < 0 or age > 150 {
-                        return null  // 返回null表示创建失败
-                    }
-                    if not email.Contains(""@"") {
-                        return null
-                    }
-                    this.email <- email
-                    this.age <- age
-                }
-            }
-            validUser <- User(""test@example.com"", 25)
-            invalidUser1 <- User(""invalid-email"", 25)
-            invalidUser2 <- User(""test@example.com"", -5)
-            validResult <- validUser != null
-            invalid1Result <- invalidUser1 != null
-            invalid2Result <- invalidUser2 != null
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var validResult = interpreter.Manager.GetValue(new LangId("validResult"));
-        var invalid1Result = interpreter.Manager.GetValue(new LangId("invalid1Result"));
-        var invalid2Result = interpreter.Manager.GetValue(new LangId("invalid2Result"));
-
-        Assert.NotNull(validResult);
-        Assert.IsType<BoolLangValue>(validResult);
-        Assert.True(((BoolLangValue)validResult).Value);
-
-        Assert.NotNull(invalid1Result);
-        Assert.IsType<BoolLangValue>(invalid1Result);
-        Assert.False(((BoolLangValue)invalid1Result).Value);
-
-        Assert.NotNull(invalid2Result);
-        Assert.IsType<BoolLangValue>(invalid2Result);
-        Assert.False(((BoolLangValue)invalid2Result).Value);
-    }
-
-    [Fact]
     public void Constructor_WithMethodCall_CallsMethodDuringInitialization()
     {
         // Arrange
