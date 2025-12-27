@@ -1,0 +1,26 @@
+// 测试函数调用栈
+function level1() {
+    a = 10
+    PrintLine("进入level1函数")
+    level2(a)
+    PrintLine("退出level1函数")
+}
+
+function level2(param) {
+    b = param * 2
+    PrintLine("进入level2函数, param=" + param)
+    level3(b)
+    PrintLine("退出level2函数")
+}
+
+function level3(param) {
+    result = param + 5
+    PrintLine("进入level3函数, param=" + param)
+    PrintLine("最终结果: " + result)
+    PrintLine("退出level3函数")
+}
+
+// 开始调用链
+PrintLine("开始测试调用栈")
+level1()
+PrintLine("结束测试调用栈")

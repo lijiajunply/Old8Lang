@@ -22,8 +22,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/BasicInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/BasicInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Docs/DEBUGGER_GUIDE.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/Debug/DebugCommands.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.App/Services/DebugService.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Debugger/BreakpointManagerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Debugger/CallStackTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Debugger/VariableWatcherTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Debugger/BreakpointManager.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Debugger/DebuggableInterpreter.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Debugger/Debugger.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Debugger/VariableWatcher.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/DebuggerTests/simple_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/DebuggerTests/test_breakpoints.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/DebuggerTests/test_callstack.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/DebuggerTests/test_variables.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -860,7 +872,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="394" />
+    <option name="localTasksCounter" value="395" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -887,7 +899,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(module): 实现新的模块系统架构&#10;&#10;- 添加 CacheManager 负责模块缓存管理&#10;- 添加 ExportController 管理模块导出规则&#10;- 添加 ModuleLoader 实现模块加载和解析功能&#10;- 添加 ModuleResolver 实现模块路径解析逻辑&#10;- 重构 ImportStatement 使用新的模块系统服务&#10;- 更新循环依赖测试验证模块系统异常处理&#10;- 添加 ModuleImportTestBase 的资源清理机制&#10;- 创建模块系统迁移指南文档" />
     <MESSAGE value="chore(build): 更新 .gitignore 配置&#10;&#10;- 添加 .DS_Store 到忽略列表&#10;- 添加 Old8Lang.Tests/OldLib 到忽略列表" />
     <MESSAGE value="test(module): 添加条件导入和动态导入测试用例&#10;&#10;- 在 ConditionalImportTests 中添加条件导入测试内容&#10;- 在 DynamicImportTests 中添加动态导入测试内容&#10;- 重构 ModuleImportTestBase 中的测试文件目录获取逻辑&#10;- 为 StandardLibrary 测试文件添加自动生成内容功能&#10;- 移除临时文件清理方法调用&#10;- 更新 IDE 配置文件中的变更列表和高亮设置" />
     <MESSAGE value="test(module): 更新导入测试用例和模块系统测试基础&#10;&#10;- 为别名导入测试添加临时文件创建和测试内容&#10;- 为函数别名导入测试添加临时文件创建和测试内容&#10;- 为循环依赖测试添加临时文件创建和测试内容&#10;- 为导入链测试添加临时文件创建和测试内容&#10;- 为条件导入测试添加临时文件创建和测试内容&#10;- 为动态导入测试添加临时文件创建和测试内容&#10;- 为懒加载基本功能测试添加临时文件创建和测试内容&#10;- 为懒加载新语法测试添加临时文件创建和测试内容&#10;- 为选择性懒加载测试添加临时文件创建和测试内容&#10;- 为带别名懒加载测试添加临时文件创建和测试内容&#10;- 为增强懒加载功能测试添加临时文件创建和测试内容&#10;- 为选择性函数导入测试添加临时文件创建和测试内容&#10;- 为模块选择性导入测试添加临时文件创建和测试内容&#10;- 重构模块导入测试基类中的文件内容处理逻辑&#10;- 更新IDE配置文件中的变更记录和工作项计数器" />
@@ -912,7 +923,8 @@
     <MESSAGE value="feat(database): 添加数据库库绑定和连接包装器&#10;&#10;- 实现 DatabaseLibBinding 类提供 SQLite、MySQL、PostgreSQL 数据库连接功能&#10;- 添加 MySqlConnectionWrapper 和 MySqlTransactionWrapper 支持 MySQL 操作&#10;- 创建 PostgresConnectionWrapper 和相关事务包装器支持 PostgreSQL 操作&#10;- 实现 OrmWrapper 提供轻量级对象关系映射功能&#10;- 添加实体示例和使用示例包括基本操作、事务处理和 ORM 操作&#10;- 配置项目文件包含必要的数据库驱动和 Dapper ORM 依赖" />
     <MESSAGE value="refactor(database): 更新数据库库实现和测试结构&#10;&#10;- 将异常类型从 Old8LangException 更改为 InvalidOperationException&#10;- 简化数据库库测试文件，移除复杂的数据库操作测试&#10;- 添加数据库库项目到解决方案文件中&#10;- 更新项目引用以包含数据库库&#10;- 修改示例代码以适配新的数据库操作方式&#10;- 更新项目规则文档中的测试目录结构说明" />
     <MESSAGE value="refactor(tests): 重构同步迭代器测试文件结构&#10;&#10;- 将 SyncIteratorTests.cs 从 Iterator 目录移动到 Collections 目录&#10;- 更新命名空间从 Old8Lang.Tests.Integration 到 Old8Lang.Tests.Interpreter.Collections&#10;- 保持测试功能不变，仅调整文件组织结构" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(tests): 重构同步迭代器测试文件结构&#10;&#10;- 将 SyncIteratorTests.cs 从 Iterator 目录移动到 Collections 目录&#10;- 更新命名空间从 Old8Lang.Tests.Integration 到 Old8Lang.Tests.Interpreter.Collections&#10;- 保持测试功能不变，仅调整文件组织结构" />
+    <MESSAGE value="feat(cli): 添加智能运行命令支持项目和文件模式&#10;&#10;- 实现 RunCommand 支持智能运行文件或项目&#10;- 添加项目模式支持自动检测项目配置并执行脚本&#10;- 实现文件模式支持解释、编译和语法测试三种运行方式&#10;- 集成到命令注册系统中&#10;- 更新帮助信息和使用示例说明新命令用法&#10;- 添加参数解析和错误处理机制" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(cli): 添加智能运行命令支持项目和文件模式&#10;&#10;- 实现 RunCommand 支持智能运行文件或项目&#10;- 添加项目模式支持自动检测项目配置并执行脚本&#10;- 实现文件模式支持解释、编译和语法测试三种运行方式&#10;- 集成到命令注册系统中&#10;- 更新帮助信息和使用示例说明新命令用法&#10;- 添加参数解析和错误处理机制" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

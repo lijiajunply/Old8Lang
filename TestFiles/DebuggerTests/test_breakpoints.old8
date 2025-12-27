@@ -1,0 +1,17 @@
+// 测试断点功能
+x <- 10
+y <- 20
+
+// 这里设置断点测试
+z <- x + y
+
+PrintLine("z = " + z)
+
+// 测试函数断点
+func test(a, b) {
+    result <- a * b
+    PrintLine("test: " + result)
+    return result
+}
+
+test(x, y)

@@ -1,0 +1,12 @@
+x <- 10
+y <- 20
+z <- x + y
+PrintLine("计算完成: " + z)
+
+func multiply(a, b) {
+    result <- a * b
+    return result
+}
+
+product <- multiply(x, y)
+PrintLine("乘积: " + product)

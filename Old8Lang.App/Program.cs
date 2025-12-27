@@ -1,4 +1,5 @@
 using Old8Lang.App.Commands;
+using Old8Lang.App.Commands.Debug;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.App;
@@ -131,6 +132,11 @@ public abstract class Program
         CommandRegistry.Register(new VerifyCommand());
         CommandRegistry.Register(new CertCommand());
         CommandRegistry.Register(new PublishCommand());
+
+        // 调试命令
+        CommandRegistry.Register(new DebugStartCommand());
+        CommandRegistry.Register(new DebugBreakpointCommand());
+        CommandRegistry.Register(new DebugControlCommand());
 
         // 别名支持 - 直接注册别名指向相同命令实例
         var listCommand = new ListCommand();
