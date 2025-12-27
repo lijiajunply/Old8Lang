@@ -42,8 +42,8 @@ public class DataLoaderTests
         var mlContext = new MLContextWrapper(seed: 0);
         var data = new List<TestData>
         {
-            new TestData { Feature1 = 1.0f, Feature2 = 2.0f, Feature3 = 3.0f, Feature4 = 4.0f, Label = 0 },
-            new TestData { Feature1 = 5.0f, Feature2 = 6.0f, Feature3 = 7.0f, Feature4 = 8.0f, Label = 1 }
+            new TestData { Feature1 = 1.0f, Feature2 = 2.0f, Feature3 = 3.0f, Feature4 = 4.0f, Label = false },
+            new TestData { Feature1 = 5.0f, Feature2 = 6.0f, Feature3 = 7.0f, Feature4 = 8.0f, Label = true }
         };
 
         // Act
@@ -98,7 +98,7 @@ public class DataLoaderTests
                 Feature2 = (float)random.NextDouble() * 10,
                 Feature3 = (float)random.NextDouble() * 10,
                 Feature4 = (float)random.NextDouble() * 10,
-                Label = random.Next(0, 2)
+                Label = random.Next(0, 2) == 1
             });
         }
 
@@ -178,15 +178,15 @@ public class ClassificationTrainerTests
         {
             var feature1 = (float)random.NextDouble() * 10;
             var feature2 = (float)random.NextDouble() * 10;
-            var label = (feature1 + feature2) > 10 ? 1 : 0;
+            var label = (feature1 + feature2) > 10;
 
             data.Add(new TestData
             {
-                Feature1 = feature1,
-                Feature2 = feature2,
+                Feature1 = (float)random.NextDouble() * 10,
+                Feature2 = (float)random.NextDouble() * 10,
                 Feature3 = (float)random.NextDouble() * 10,
                 Feature4 = (float)random.NextDouble() * 10,
-                Label = label
+                Label = random.Next(0, 2) == 1
             });
         }
 
@@ -392,7 +392,7 @@ public class ModelPredictorTests
                 Feature2 = (float)random.NextDouble() * 10,
                 Feature3 = (float)random.NextDouble() * 10,
                 Feature4 = (float)random.NextDouble() * 10,
-                Label = random.Next(0, 2)
+                Label = random.Next(0, 2) == 1
             });
         }
 
@@ -417,7 +417,7 @@ public class TestData
     public float Feature4 { get; set; }
 
     [LoadColumn(4)]
-    public float Label { get; set; }
+    public bool Label { get; set; }
 }
 
 [Serializable]
