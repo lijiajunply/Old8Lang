@@ -22,17 +22,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/AssignmentTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/ExpressionTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/InExpressionCompilerTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Functions/FunctionDeclarationTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Integration/CompilerIntegrationTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Integration/EndToEndCompileTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Statements/ControlFlowTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/BoundaryConditionTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/ErrorHandlingTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/PerformanceTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/TypeSystemTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/ArithmeticTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/ComparisonTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndCompileTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,6 +68,8 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Functions/FunctionDeclarationTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Statements/ControlFlowTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ConstructorTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" root0="SKIP_HIGHLIGHTING" />
@@ -137,42 +135,42 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
-    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
-    ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Run",
-    ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
-    ".NET 项目.Old8Lang.LanguageServer.executor": "Run",
-    "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
-    "34038497-caa6-4590-9735-a11ac1a57cd0.executor": "Debug",
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHELLCHECK.PATH": "/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck",
-    "WebServerToolWindowFactoryState": "false",
-    "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
-    "fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor": "Debug",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.Benchmarks.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.LanguageServer.executor&quot;: &quot;Run&quot;,
+    &quot;07d79105-db56-470d-b872-543f396b1133.executor&quot;: &quot;Debug&quot;,
+    &quot;34038497-caa6-4590-9735-a11ac1a57cd0.executor&quot;: &quot;Debug&quot;,
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;e9de5ea7-95aa-45c5-91d2-c46acccab710.executor&quot;: &quot;Debug&quot;,
+    &quot;fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "PLAIN_TEXT",
-      "Markdown"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;PLAIN_TEXT&quot;,
+      &quot;Markdown&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
@@ -952,27 +950,13 @@
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs</url>
           <line>73</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" containingFunctionPresentation="方法 'InExpression_Dictionary_ShouldReturnTrueWhenKeyExists'">
-            <startOffsets>
-              <option value="2064" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2097" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" containingFunctionPresentation="方法 'InExpression_Dictionary_ShouldReturnTrueWhenKeyExists'" />
           <option name="timeStamp" value="562" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs</url>
           <line>74</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" containingFunctionPresentation="方法 'InExpression_Dictionary_ShouldReturnTrueWhenKeyExists'">
-            <startOffsets>
-              <option value="2106" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2140" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" containingFunctionPresentation="方法 'InExpression_Dictionary_ShouldReturnTrueWhenKeyExists'" />
           <option name="timeStamp" value="563" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
@@ -991,14 +975,7 @@
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs</url>
           <line>31</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" containingFunctionPresentation="方法 'InExpression_Array_ShouldReturnTrueWhenExists'">
-            <startOffsets>
-              <option value="826" />
-            </startOffsets>
-            <endOffsets>
-              <option value="841" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" containingFunctionPresentation="方法 'InExpression_Array_ShouldReturnTrueWhenExists'" />
           <option name="timeStamp" value="565" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
@@ -1017,27 +994,13 @@
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs</url>
           <line>326</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs" containingFunctionPresentation="方法 'EndToEnd_ComplexBusinessLogic_WorksCorrectly'">
-            <startOffsets>
-              <option value="10707" />
-            </startOffsets>
-            <endOffsets>
-              <option value="10800" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs" containingFunctionPresentation="方法 'EndToEnd_ComplexBusinessLogic_WorksCorrectly'" />
           <option name="timeStamp" value="572" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs</url>
           <line>323</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs" containingFunctionPresentation="方法 'EndToEnd_ComplexBusinessLogic_WorksCorrectly'">
-            <startOffsets>
-              <option value="10650" />
-            </startOffsets>
-            <endOffsets>
-              <option value="10679" />
-            </endOffsets>
-          </properties>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndTests.cs" containingFunctionPresentation="方法 'EndToEnd_ComplexBusinessLogic_WorksCorrectly'" />
           <option name="timeStamp" value="574" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
