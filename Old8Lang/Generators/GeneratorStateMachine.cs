@@ -8,7 +8,7 @@ namespace Old8Lang.Generators;
 /// 新的生成器状态机实现
 /// 基于 C# 迭代器的设计原理：将生成器函数编译为状态机
 /// </summary>
-public class NewGeneratorStateMachine
+public class GeneratorStateMachine
 {
     /// <summary>
     /// 状态机状态
@@ -29,7 +29,7 @@ public class NewGeneratorStateMachine
     /// <summary>
     /// 当前执行到的状态点（每个 yield 对应一个状态点）
     /// </summary>
-    private int _statePoint = 0;
+    private int StatePoint;
 
     /// <summary>
     /// 当前 yield 的值
@@ -63,7 +63,7 @@ public class NewGeneratorStateMachine
     /// <param name="function">生成器函数定义</param>
     /// <param name="manager">环境管理器</param>
     /// <param name="executor">状态机执行器</param>
-    public NewGeneratorStateMachine(FuncInit function, VariateManager manager, StateExecutor executor)
+    public GeneratorStateMachine(FuncInit function, VariateManager manager, StateExecutor executor)
     {
         Function = function;
         Manager = manager;
@@ -88,13 +88,13 @@ public class NewGeneratorStateMachine
             CurrentState = MachineState.Running;
 
             // 执行状态机
-            var result = Executor.Execute(_statePoint, Locals, Manager);
+            var result = Executor.Execute(StatePoint, Locals, Manager);
 
             if (result.HasValue)
             {
                 // 遇到 yield
                 CurrentValue = result.YieldValue;
-                _statePoint = result.NextState;
+                StatePoint = result.NextState;
                 CurrentState = MachineState.Suspended;
                 return true;
             }

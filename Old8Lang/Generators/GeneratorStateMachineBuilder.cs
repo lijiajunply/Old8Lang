@@ -14,7 +14,7 @@ public static class GeneratorStateMachineBuilder
     /// <summary>
     /// 从函数构建状态机（使用 FuncLangValue）
     /// </summary>
-    public static NewGeneratorStateMachine BuildFromFunc(FuncLangValue function, VariateManager manager)
+    public static GeneratorStateMachine BuildFromFunc(FuncLangValue function, VariateManager manager)
     {
         // 1. 扫描 AST
         var scanner = new GeneratorAstScanner();
@@ -29,13 +29,13 @@ public static class GeneratorStateMachineBuilder
         var executor = new FlatGeneratorExecutor(function, scanResult);
 
         // 3. 创建并返回状态机（传入 null 作为 FuncInit）
-        return new NewGeneratorStateMachine(null!, manager, executor);
+        return new GeneratorStateMachine(null!, manager, executor);
     }
 
     /// <summary>
     /// 从函数定义构建状态机（使用 FuncInit）
     /// </summary>
-    public static NewGeneratorStateMachine Build(FuncInit function, VariateManager manager,
+    public static GeneratorStateMachine Build(FuncInit function, VariateManager manager,
         List<LangValueType>? arguments = null)
     {
         // 1. 扫描 AST
@@ -51,7 +51,7 @@ public static class GeneratorStateMachineBuilder
         var executor = new FlatGeneratorExecutor(function.FuncLangValue, scanResult);
 
         // 3. 创建并返回状态机
-        return new NewGeneratorStateMachine(function, manager, executor);
+        return new GeneratorStateMachine(function, manager, executor);
     }
 }
 

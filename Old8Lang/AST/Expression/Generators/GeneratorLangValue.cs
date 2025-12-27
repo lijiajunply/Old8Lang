@@ -21,7 +21,7 @@ public partial class GeneratorLangValue : LangValueType, ILangList
     /// <summary>
     /// 新生成器状态机
     /// </summary>
-    private NewGeneratorStateMachine? StateMachine { get; set; }
+    private GeneratorStateMachine? StateMachine { get; set; }
 
     /// <summary>
     /// 生成器当前状态
