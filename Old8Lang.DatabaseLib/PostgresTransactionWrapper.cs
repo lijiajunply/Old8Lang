@@ -7,8 +7,8 @@ namespace Old8Lang.DatabaseLib;
 /// </summary>
 public class PostgresTransactionWrapper : IDisposable
 {
-    private readonly NpgsqlTransaction _transaction;
-    private bool _disposed;
+    private readonly NpgsqlTransaction Transaction;
+    private bool Disposed;
 
     /// <summary>
     /// 构造函数
@@ -16,7 +16,7 @@ public class PostgresTransactionWrapper : IDisposable
     /// <param name="transaction">PostgreSQL 事务</param>
     public PostgresTransactionWrapper(NpgsqlTransaction transaction)
     {
-        _transaction = transaction;
+        Transaction = transaction;
     }
 
     /// <summary>
@@ -24,7 +24,7 @@ public class PostgresTransactionWrapper : IDisposable
     /// </summary>
     public void Commit()
     {
-        _transaction.Commit();
+        Transaction.Commit();
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public class PostgresTransactionWrapper : IDisposable
     /// </summary>
     public void Rollback()
     {
-        _transaction.Rollback();
+        Transaction.Rollback();
     }
 
     /// <summary>
@@ -40,10 +40,10 @@ public class PostgresTransactionWrapper : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (!_disposed)
+        if (!Disposed)
         {
-            _transaction?.Dispose();
-            _disposed = true;
+            Transaction?.Dispose();
+            Disposed = true;
         }
     }
 }

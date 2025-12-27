@@ -7,6 +7,7 @@ Old8Lang 数据库库提供统一的数据库访问接口，支持多种数据�
 - **SQLite** - 轻量级文件数据库
 - **MySQL** - 流行的关系型数据库
 - **PostgreSQL** - 高级关系型数据库
+- **内存数据库** - 基于SQLite的内存数据库，适合测试和临时操作
 
 ## 主要功能
 
@@ -60,6 +61,17 @@ var connection = DatabaseLibBinding.CreateMySqlConnection("Server=localhost;Data
 var connection = DatabaseLibBinding.CreatePostgresConnection("Host=localhost;Database=test;Username=postgres;Password=password;");
 
 // 操作方式与 SQLite 相同
+```
+
+#### 内存数据库
+```csharp
+// 创建内存数据库
+var connection = DatabaseLibBinding.CreateInMemoryConnection("test_db");
+
+// 内存数据库特有操作
+DatabaseLibBinding.ClearMemoryDatabase(connection);  // 清空所有表数据
+DatabaseLibBinding.ResetMemoryDatabase(connection);   // 重置数据库（删除所有表）
+var stats = DatabaseLibBinding.GetMemoryDatabaseStatistics(connection); // 获取统计信息
 ```
 
 ### 事务操作

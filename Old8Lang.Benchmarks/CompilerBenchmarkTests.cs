@@ -210,7 +210,7 @@ result <- obj.calculate()
     {
         var interpreter = new LangInterpreter();
         // 启用IL验证
-        Compiler.Compiler.ilVerificationEnabled = true;
+        Compiler.Compiler.IlVerificationEnabled = true;
 
         var ast = interpreter.Build(MediumCode);
         var compiledAction = Compiler.Compiler.Compile(ast, "il_verification_test", interpreter);
@@ -225,13 +225,13 @@ result <- obj.calculate()
     {
         var interpreter = new LangInterpreter();
         // 禁用IL验证
-        Compiler.Compiler.ilVerificationEnabled = false;
+        Compiler.Compiler.IlVerificationEnabled = false;
 
         var ast = interpreter.Build(MediumCode);
         var compiledAction = Compiler.Compiler.Compile(ast, "no_il_verification_test", interpreter);
         compiledAction();
 
         // 恢复IL验证设置
-        Compiler.Compiler.ilVerificationEnabled = true;
+        Compiler.Compiler.IlVerificationEnabled = true;
     }
 }

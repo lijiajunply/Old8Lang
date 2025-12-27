@@ -9,9 +9,9 @@ namespace Old8Lang.DatabaseLib;
 /// </summary>
 public class OrmWrapper : IDisposable
 {
-    private readonly object _connection;
-    private readonly Type _connectionType;
-    private bool _disposed;
+    private readonly object Connection;
+    private readonly Type ConnectionType;
+    private bool Disposed;
 
     /// <summary>
     /// 构造函数
@@ -19,8 +19,8 @@ public class OrmWrapper : IDisposable
     /// <param name="connection">数据库连接对象</param>
     public OrmWrapper(object connection)
     {
-        _connection = connection ?? throw new ArgumentNullException(nameof(connection));
-        _connectionType = connection.GetType();
+        Connection = connection ?? throw new ArgumentNullException(nameof(connection));
+        ConnectionType = connection.GetType();
     }
 
     /// <summary>
@@ -33,8 +33,9 @@ public class OrmWrapper : IDisposable
     {
         var tableName = GetTableName<T>();
         var properties = GetProperties<T>();
-        var columns = string.Join(", ", properties.Select(p => p.Name));
-        var values = string.Join(", ", properties.Select(p => $"@{p.Name}"));
+        var propertyInfos = properties as PropertyInfo[] ?? properties.ToArray();
+        var columns = string.Join(", ", propertyInfos.Select(p => p.Name));
+        var values = string.Join(", ", propertyInfos.Select(p => $"@{p.Name}"));
 
         var sql = $"INSERT INTO {tableName} ({columns}) VALUES ({values})";
         return ExecuteScalar<int>(sql, entity);
@@ -147,8 +148,9 @@ public class OrmWrapper : IDisposable
     {
         var tableName = GetTableName<T>();
         var properties = GetProperties<T>();
-        var columns = string.Join(", ", properties.Select(p => p.Name));
-        var values = string.Join(", ", properties.Select(p => $"@{p.Name}"));
+        var propertyInfos = properties as PropertyInfo[] ?? properties.ToArray();
+        var columns = string.Join(", ", propertyInfos.Select(p => p.Name));
+        var values = string.Join(", ", propertyInfos.Select(p => $"@{p.Name}"));
 
         var sql = $"INSERT INTO {tableName} ({columns}) VALUES ({values})";
         return Execute(sql, entities);
@@ -159,12 +161,13 @@ public class OrmWrapper : IDisposable
     /// </summary>
     private IEnumerable<dynamic> Query(string sql, object? parameters = null)
     {
-        return _connection switch
+        return Connection switch
         {
             SqliteConnectionWrapper sqlite => sqlite.Query(sql, parameters),
             MySqlConnectionWrapper mysql => mysql.Query(sql, parameters),
             PostgresConnectionWrapper postgres => postgres.Query(sql, parameters),
-            _ => throw new InvalidOperationException("不支持的数据库连接类型")
+            InMemoryConnectionWrapper memory => memory.Query(sql, parameters),
+            _ => throw new InvalidOperationException("连接类型无效")
         };
     }
 
@@ -173,11 +176,12 @@ public class OrmWrapper : IDisposable
     /// </summary>
     private IEnumerable<T> Query<T>(string sql, object? parameters = null)
     {
-        return _connection switch
+        return Connection switch
         {
             SqliteConnectionWrapper sqlite => sqlite.Query<T>(sql, parameters),
             MySqlConnectionWrapper mysql => mysql.Query<T>(sql, parameters),
             PostgresConnectionWrapper postgres => postgres.Query<T>(sql, parameters),
+            InMemoryConnectionWrapper memory => memory.Query<T>(sql, parameters),
             _ => throw new InvalidOperationException("不支持的数据库连接类型")
         };
     }
@@ -187,12 +191,13 @@ public class OrmWrapper : IDisposable
     /// </summary>
     private T? QueryFirstOrDefault<T>(string sql, object? parameters = null)
     {
-        return _connection switch
+        return Connection switch
         {
             SqliteConnectionWrapper sqlite => sqlite.QueryFirstOrDefault<T>(sql, parameters),
             MySqlConnectionWrapper mysql => mysql.QueryFirstOrDefault<T>(sql, parameters),
             PostgresConnectionWrapper postgres => postgres.QueryFirstOrDefault<T>(sql, parameters),
-            _ => throw new InvalidOperationException("不支持的数据库连接类型")
+            InMemoryConnectionWrapper memory => memory.QueryFirstOrDefault<T>(sql, parameters),
+            _ => throw new InvalidOperationException("连接类型无效")
         };
     }
 
@@ -201,12 +206,13 @@ public class OrmWrapper : IDisposable
     /// </summary>
     private int Execute(string sql, object? parameters = null)
     {
-        return _connection switch
+        return Connection switch
         {
             SqliteConnectionWrapper sqlite => sqlite.Execute(sql, parameters),
             MySqlConnectionWrapper mysql => mysql.Execute(sql, parameters),
             PostgresConnectionWrapper postgres => postgres.Execute(sql, parameters),
-            _ => throw new InvalidOperationException("不支持的数据库连接类型")
+            InMemoryConnectionWrapper memory => memory.Execute(sql, parameters),
+            _ => throw new InvalidOperationException("连接类型无效")
         };
     }
 
@@ -215,11 +221,12 @@ public class OrmWrapper : IDisposable
     /// </summary>
     private T ExecuteScalar<T>(string sql, object? parameters = null)
     {
-        return _connection switch
+        return Connection switch
         {
             SqliteConnectionWrapper sqlite => sqlite.ExecuteScalar<T>(sql, parameters),
             MySqlConnectionWrapper mysql => mysql.ExecuteScalar<T>(sql, parameters),
             PostgresConnectionWrapper postgres => postgres.ExecuteScalar<T>(sql, parameters),
+            InMemoryConnectionWrapper memory => memory.ExecuteScalar<T>(sql, parameters),
             _ => throw new InvalidOperationException("不支持的数据库连接类型")
         };
     }
@@ -269,13 +276,13 @@ public class OrmWrapper : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (!_disposed)
+        if (!Disposed)
         {
-            if (_connection is IDisposable disposable)
+            if (Connection is IDisposable disposable)
             {
                 disposable.Dispose();
             }
-            _disposed = true;
+            Disposed = true;
         }
     }
 }

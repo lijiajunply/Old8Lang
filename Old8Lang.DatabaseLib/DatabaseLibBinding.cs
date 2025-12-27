@@ -31,6 +31,15 @@ public static class DatabaseLibBinding
     }
 
     /// <summary>
+    /// 创建内存数据库连接
+    /// </summary>
+    /// <param name="databaseName">数据库名称，用于区分不同的内存数据库实例</param>
+    public static object CreateInMemoryConnection(string databaseName = "default")
+    {
+        return new InMemoryConnectionWrapper(databaseName);
+    }
+
+    /// <summary>
     /// 创建 ORM 实例
     /// </summary>
     public static object CreateOrm(object connection)
@@ -48,6 +57,7 @@ public static class DatabaseLibBinding
             SqliteConnectionWrapper sqlite => sqlite.Query(sql, parameters),
             MySqlConnectionWrapper mysql => mysql.Query(sql, parameters),
             PostgresConnectionWrapper postgres => postgres.Query(sql, parameters),
+            InMemoryConnectionWrapper memory => memory.Query(sql, parameters),
             _ => throw new InvalidOperationException("不支持的数据库连接类型")
         };
     }
@@ -62,6 +72,7 @@ public static class DatabaseLibBinding
             SqliteConnectionWrapper sqlite => sqlite.Execute(sql, parameters),
             MySqlConnectionWrapper mysql => mysql.Execute(sql, parameters),
             PostgresConnectionWrapper postgres => postgres.Execute(sql, parameters),
+            InMemoryConnectionWrapper memory => memory.Execute(sql, parameters),
             _ => throw new InvalidOperationException("不支持的数据库连接类型")
         };
     }
@@ -76,6 +87,7 @@ public static class DatabaseLibBinding
             SqliteConnectionWrapper sqlite => sqlite.ExecuteScalar(sql, parameters),
             MySqlConnectionWrapper mysql => mysql.ExecuteScalar(sql, parameters),
             PostgresConnectionWrapper postgres => postgres.ExecuteScalar(sql, parameters),
+            InMemoryConnectionWrapper memory => memory.ExecuteScalar(sql, parameters),
             _ => throw new InvalidOperationException("不支持的数据库连接类型")
         };
     }
@@ -90,6 +102,7 @@ public static class DatabaseLibBinding
             SqliteConnectionWrapper sqlite => sqlite.BeginTransaction(),
             MySqlConnectionWrapper mysql => mysql.BeginTransaction(),
             PostgresConnectionWrapper postgres => postgres.BeginTransaction(),
+            InMemoryConnectionWrapper memory => memory.BeginTransaction(),
             _ => throw new InvalidOperationException("不支持的数据库连接类型")
         };
     }
@@ -109,6 +122,9 @@ public static class DatabaseLibBinding
                 break;
             case PostgresTransactionWrapper postgres:
                 postgres.Commit();
+                break;
+            case InMemoryTransactionWrapper memory:
+                memory.Commit();
                 break;
             default:
                 throw new InvalidOperationException("不支持的事务类型");
@@ -130,6 +146,9 @@ public static class DatabaseLibBinding
                 break;
             case PostgresTransactionWrapper postgres:
                 postgres.Rollback();
+                break;
+            case InMemoryTransactionWrapper memory:
+                memory.Rollback();
                 break;
             default:
                 throw new InvalidOperationException("不支持的事务类型");
@@ -218,6 +237,9 @@ public static class DatabaseLibBinding
             case PostgresConnectionWrapper postgres:
                 postgres.Open();
                 break;
+            case InMemoryConnectionWrapper memory:
+                memory.Open();
+                break;
             default:
                 throw new InvalidOperationException("不支持的数据库连接类型");
         }
@@ -239,8 +261,60 @@ public static class DatabaseLibBinding
             case PostgresConnectionWrapper postgres:
                 postgres.Close();
                 break;
+            case InMemoryConnectionWrapper memory:
+                memory.Close();
+                break;
             default:
                 throw new InvalidOperationException("不支持的数据库连接类型");
+        }
+    }
+
+    /// <summary>
+    /// 清空内存数据库所有表数据（保留表结构）
+    /// </summary>
+    /// <param name="connection">内存数据库连接</param>
+    public static void ClearMemoryDatabase(object connection)
+    {
+        if (connection is InMemoryConnectionWrapper memory)
+        {
+            memory.ClearAllTables();
+        }
+        else
+        {
+            throw new InvalidOperationException("只支持内存数据库的清空操作");
+        }
+    }
+
+    /// <summary>
+    /// 重置内存数据库（删除所有表）
+    /// </summary>
+    /// <param name="connection">内存数据库连接</param>
+    public static void ResetMemoryDatabase(object connection)
+    {
+        if (connection is InMemoryConnectionWrapper memory)
+        {
+            memory.ResetDatabase();
+        }
+        else
+        {
+            throw new InvalidOperationException("只支持内存数据库的重置操作");
+        }
+    }
+
+    /// <summary>
+    /// 获取内存数据库统计信息
+    /// </summary>
+    /// <param name="connection">内存数据库连接</param>
+    /// <returns>统计信息</returns>
+    public static DatabaseStatistics GetMemoryDatabaseStatistics(object connection)
+    {
+        if (connection is InMemoryConnectionWrapper memory)
+        {
+            return memory.GetStatistics();
+        }
+        else
+        {
+            throw new InvalidOperationException("只支持内存数据库的统计操作");
         }
     }
 }

@@ -40,7 +40,7 @@ public class ILVerificationTests
     public void Verify_ILVerificationCanBeDisabled()
     {
         // 禁用IL验证
-        Old8Lang.Compiler.Compiler.ilVerificationEnabled = false;
+        Old8Lang.Compiler.Compiler.IlVerificationEnabled = false;
         
         try
         {
@@ -65,7 +65,7 @@ public class ILVerificationTests
         finally
         {
             // 恢复IL验证开关
-            Old8Lang.Compiler.Compiler.ilVerificationEnabled = true;
+            Old8Lang.Compiler.Compiler.IlVerificationEnabled = true;
         }
     }
     

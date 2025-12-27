@@ -26,7 +26,7 @@ public static class Compiler
     /// <summary>
     /// IL代码验证开关，默认为开启
     /// </summary>
-    public static bool ilVerificationEnabled { get; set; } = true;
+    public static bool IlVerificationEnabled { get; set; } = true;
 
     /// <summary>
     /// 日志级别枚举，用于控制编译过程中的日志输出
@@ -154,7 +154,7 @@ public static class Compiler
             ilGenerator.Emit(OpCodes.Ret);
 
             // 执行IL代码验证（如果启用）
-            if (ilVerificationEnabled)
+            if (IlVerificationEnabled)
             {
                 Log("开始验证IL代码", LogLevel.Debug);
                 var verificationResult = IlVerifier.Verify(dynamicMethod, "OldLangRun");

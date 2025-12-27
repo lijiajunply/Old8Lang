@@ -32,6 +32,10 @@ public static class StandardLibraryRegistry
             ClassName: "MathLib"
         ),
 
+        ["Math"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
+            ClassName: "MathLib"
+        ),
+
         ["Async"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
             ClassName: "AsyncLib"
         ),
@@ -85,8 +89,10 @@ public static class StandardLibraryRegistry
             ClassName: "ImageLib"),
         ["MachineLearning"] =
             new StandardLibraryInfo(AssemblyName: "Old8Lang.MachineLearningLib", "MachineLearningLibBinding"),
-        ["SerializationLib"] = new StandardLibraryInfo(AssemblyName: "Old8Lang.SerializationLib",
-            ClassName: "SerializationLibBinding")
+        ["Serialization"] = new StandardLibraryInfo(AssemblyName: "Old8Lang.SerializationLib",
+            ClassName: "SerializationLibBinding"),
+        ["Database"] = new StandardLibraryInfo(AssemblyName: "Old8Lang.DatabaseLib",
+            ClassName: "DatabaseLibBinding")
     };
 
     /// <summary>

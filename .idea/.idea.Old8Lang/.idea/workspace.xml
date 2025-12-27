@@ -22,11 +22,33 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.trae/rules/project_rules.md" beforeDir="false" afterPath="$PROJECT_DIR$/.trae/rules/project_rules.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/InMemoryConnectionWrapper.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/DatabaseLib/InMemoryDatabaseTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestInMemoryDatabase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/DatabaseLibBinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/DatabaseLibBinding.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/Examples.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/Examples.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Old8Lang.Tests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Old8Lang.Tests.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/MySqlConnectionWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/MySqlConnectionWrapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/MySqlTransactionWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/MySqlTransactionWrapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/OrmWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/OrmWrapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/PostgresConnectionWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/PostgresConnectionWrapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/PostgresTransactionWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/PostgresTransactionWrapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/SqliteConnectionWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/SqliteConnectionWrapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/SqliteTransactionWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/SqliteTransactionWrapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/ErrorHandlingTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/ErrorHandlingTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/PerformanceTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/PerformanceTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/TypeSystemTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/TypeSystemTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/ArrayTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/ArrayTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/ArithmeticTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/ArithmeticTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/ComparisonTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/ComparisonTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/LogicalTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/LogicalTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/StringTemplateTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/StringTemplateTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/TernaryTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/TernaryTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/DatabaseLib/DatabaseLibTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,6 +85,12 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.DatabaseLib/DatabaseLibBinding.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.DatabaseLib/DatabaseLibBinding.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.DatabaseLib/DatabaseLibBinding.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.DatabaseLib/OrmWrapper.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.DatabaseLib/OrmWrapper.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.DatabaseLib/OrmWrapper.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
@@ -84,9 +112,11 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/Integration/RealWorldUsageTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/MachineLearningLib/MachineLearningLibTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/MachineLearningLib/MachineLearningLibTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/StaticValues/AssertClassLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Visitor/Generated/CompilerVisitor.Stubs.generated.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Visitor/Generated/LangListItem.Accept.generated.cs" root0="SKIP_HIGHLIGHTING" />
@@ -99,8 +129,8 @@
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/TestProjects/PackageIntegrationTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/TestFiles/TestProjects/PackageIntegrationTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/TestFiles/TestProjects/ThirdPartyLibTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/visitor-codegen-absolute.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/vscode-old8lang/package-lock.json" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/378b2b72dcfd47c7a335f353306873123e00/5d/0b33afd1/02000002pdb1.il" root0="FORCE_HIGHLIGHTING" />
@@ -854,7 +884,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="392" />
+    <option name="localTasksCounter" value="394" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -881,8 +911,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(import): 实现懒加载导入功能支持&#10;&#10;- 添加 LazySymbolProxy 类用于延迟加载模块符号&#10;- 实现选择性懒导入：lazy import { symbol } from &quot;module&quot;&#10;- 实现通配符懒导入：lazy import &quot;module&quot; 语法支持&#10;- 在 VariateManager 中添加懒加载模块查找机制&#10;- 添加懒加载通配符模块列表和相关查找逻辑&#10;- 更新导入语句解析器以识别懒加载语法&#10;- 添加懒加载导入的测试用例" />
-    <MESSAGE value="refactor(ast): 重构模块对象中的懒加载实现和参数命名&#10;&#10;- 重命名 LazyItemWrapper 构造函数参数 moduleName 为 moduleNameItem&#10;- 移除 LazyItemWrapper 中不必要的字段声明，直接使用构造函数参数&#10;- 重命名所有模块对象中 manager 参数为 variateManager 以保持一致性&#10;- 重构 LazySymbolProxy 中的符号解析逻辑，优化线程安全机制&#10;- 修复 UnifiedModule 中的代码结构，使用 switch 表达式替代条件判断&#10;- 更新模块加载内部逻辑中的参数传递，确保参数名一致性&#10;- 优化 UnifiedModule 中的模块导入流程，移除不必要的 try-finally 块&#10;- 更新接口文档中的参数名称说明，保持与实现一致" />
     <MESSAGE value="feat(module): 实现新的模块系统架构&#10;&#10;- 添加 CacheManager 负责模块缓存管理&#10;- 添加 ExportController 管理模块导出规则&#10;- 添加 ModuleLoader 实现模块加载和解析功能&#10;- 添加 ModuleResolver 实现模块路径解析逻辑&#10;- 重构 ImportStatement 使用新的模块系统服务&#10;- 更新循环依赖测试验证模块系统异常处理&#10;- 添加 ModuleImportTestBase 的资源清理机制&#10;- 创建模块系统迁移指南文档" />
     <MESSAGE value="chore(build): 更新 .gitignore 配置&#10;&#10;- 添加 .DS_Store 到忽略列表&#10;- 添加 Old8Lang.Tests/OldLib 到忽略列表" />
     <MESSAGE value="test(module): 添加条件导入和动态导入测试用例&#10;&#10;- 在 ConditionalImportTests 中添加条件导入测试内容&#10;- 在 DynamicImportTests 中添加动态导入测试内容&#10;- 重构 ModuleImportTestBase 中的测试文件目录获取逻辑&#10;- 为 StandardLibrary 测试文件添加自动生成内容功能&#10;- 移除临时文件清理方法调用&#10;- 更新 IDE 配置文件中的变更列表和高亮设置" />
@@ -906,7 +934,9 @@
     <MESSAGE value="refactor(visitor): 将编译器和解释器访问者重构为主构造函数依赖注入&#10;&#10;- 将 CompilerVisitor、InterpreterVisitor 和 TypeInferenceVisitor 从字段注入改为主构造函数注入&#10;- 移除私有只读字段 _ilGenerator、_local 和 _manager&#10;- 更新所有访问方法中的字段引用为构造函数参数引用&#10;- 简化类初始化逻辑，提高代码可读性和依赖关系清晰度" />
     <MESSAGE value="feat(interpreter): 添加测试运行器和模拟库支持并重构全局函数注册器&#10;&#10;- 重命名 GenerateIL 方法为 GenerateIl 以符合命名规范&#10;- 重构 GlobalFunctionRegistry 为线程安全实现，使用 lock 保护操作&#10;- 将私有字段 _functions 和 _registerLock 重命名为 Functions 和 RegisterLock&#10;- 优化 Register 方法中的重复检查逻辑，使用 Any 替代 foreach 循环&#10;- 为 TryGetFunction、HasFunction、GetAllFunctionNames 和 Unregister 方法添加线程安全锁&#10;- 重命名 TryGenerateGlobalFunctionIL 为 TryGenerateGlobalFunctionIl&#10;- 更新 IOFunctions 中的 WriteLine 方法调用以使用简化语法&#10;- 在 LangInterpreter 中注册新的 TestRunner 和 Mock 全局对象&#10;- 添加 MockLibClassLangValue 类以提供模拟库的静态方法访问&#10;- 添加 TestRunnerClassLangValue 类以提供测试运行器的静态方法访问&#10;- 重命名标准库注册表中的 ImageLib 为 Image 并添加机器学习库支持&#10;- 移除旧的 AssertLib 和 MockLib 注册项，整合到新的实现中" />
     <MESSAGE value="feat(database): 添加数据库库绑定和连接包装器&#10;&#10;- 实现 DatabaseLibBinding 类提供 SQLite、MySQL、PostgreSQL 数据库连接功能&#10;- 添加 MySqlConnectionWrapper 和 MySqlTransactionWrapper 支持 MySQL 操作&#10;- 创建 PostgresConnectionWrapper 和相关事务包装器支持 PostgreSQL 操作&#10;- 实现 OrmWrapper 提供轻量级对象关系映射功能&#10;- 添加实体示例和使用示例包括基本操作、事务处理和 ORM 操作&#10;- 配置项目文件包含必要的数据库驱动和 Dapper ORM 依赖" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(database): 添加数据库库绑定和连接包装器&#10;&#10;- 实现 DatabaseLibBinding 类提供 SQLite、MySQL、PostgreSQL 数据库连接功能&#10;- 添加 MySqlConnectionWrapper 和 MySqlTransactionWrapper 支持 MySQL 操作&#10;- 创建 PostgresConnectionWrapper 和相关事务包装器支持 PostgreSQL 操作&#10;- 实现 OrmWrapper 提供轻量级对象关系映射功能&#10;- 添加实体示例和使用示例包括基本操作、事务处理和 ORM 操作&#10;- 配置项目文件包含必要的数据库驱动和 Dapper ORM 依赖" />
+    <MESSAGE value="refactor(database): 更新数据库库实现和测试结构&#10;&#10;- 将异常类型从 Old8LangException 更改为 InvalidOperationException&#10;- 简化数据库库测试文件，移除复杂的数据库操作测试&#10;- 添加数据库库项目到解决方案文件中&#10;- 更新项目引用以包含数据库库&#10;- 修改示例代码以适配新的数据库操作方式&#10;- 更新项目规则文档中的测试目录结构说明" />
+    <MESSAGE value="refactor(tests): 重构同步迭代器测试文件结构&#10;&#10;- 将 SyncIteratorTests.cs 从 Iterator 目录移动到 Collections 目录&#10;- 更新命名空间从 Old8Lang.Tests.Integration 到 Old8Lang.Tests.Interpreter.Collections&#10;- 保持测试功能不变，仅调整文件组织结构" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(tests): 重构同步迭代器测试文件结构&#10;&#10;- 将 SyncIteratorTests.cs 从 Iterator 目录移动到 Collections 目录&#10;- 更新命名空间从 Old8Lang.Tests.Integration 到 Old8Lang.Tests.Interpreter.Collections&#10;- 保持测试功能不变，仅调整文件组织结构" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
