@@ -2,7 +2,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.Tests.Integration;
+namespace Old8Lang.Tests.Interpreter.Collections;
 
 /// <summary>
 /// 同步迭代器测试 - 验证数组和生成器的迭代功能
