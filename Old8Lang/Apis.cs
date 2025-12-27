@@ -131,11 +131,10 @@ public static class Apis
     /// </summary>
     /// <param name="import">导入路径</param>
     /// <param name="ver">语言版本</param>
-    /// <param name="uri">语言官方网站URL，默认为 https://downland.old8lang.com</param>
     /// <returns>更新后的语言信息对象</returns>
-    public static LangInfo ChangeBasicInfo(string import, string ver, string uri = "https://downland.old8lang.com")
+    public static LangInfo ChangeBasicInfo(string import, string ver)
     {
-        var langInfo = new LangInfo { ImportPath = import, Var = ver, Url = uri };
+        var langInfo = new LangInfo { ImportPath = import, Var = ver };
         var jsonString = JsonSerializer.Serialize(langInfo);
         File.WriteAllText(JsonPath, jsonString);
         return langInfo;
@@ -175,7 +174,7 @@ public static class Apis
         {
             // 如果文件不存在，创建一个空的 LangInfo 对象
             // 不再自动填充默认库，因为标准库现在由 StandardLibraryRegistry 管理
-            langInfo = new LangInfo { Var = "1.0.0", Url = "https://downland.old8lang.com" };
+            langInfo = new LangInfo { Var = "1.0.0" };
         }
 
         // 不再自动添加默认库信息，标准库由 StandardLibraryRegistry 管理

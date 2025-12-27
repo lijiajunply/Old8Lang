@@ -15,11 +15,6 @@ public class LangInfo
     /// 获取或设置语言版本
     /// </summary>
     public string Var { get; set; } = "";
-
-    /// <summary>
-    /// 获取或设置语言官方网站URL
-    /// </summary>
-    public string Url { get; set; } = "";
 }
 
 /// <summary>

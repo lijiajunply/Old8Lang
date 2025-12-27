@@ -22,11 +22,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/InitCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/InitCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/PublishCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/PublishCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/RestoreCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/RestoreCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ProjectManagement/ProjectConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ProjectManagement/ProjectConfig.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PACKAGE_DEVELOPMENT_GUIDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/PACKAGE_DEVELOPMENT_GUIDE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Apis.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Apis.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangInfo.json" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangInfo.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,9 +86,11 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Visitor/Generated/CompilerVisitor.Stubs.generated.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Visitor/Generated/LangListItem.Accept.generated.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" root0="SKIP_HIGHLIGHTING" />
@@ -99,6 +100,7 @@
     <setting file="file://$PROJECT_DIR$/TestProjects/PackageIntegrationTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/TestProjects/ThirdPartyLibTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/visitor-codegen-absolute.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/vscode-old8lang/package-lock.json" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/378b2b72dcfd47c7a335f353306873123e00/5d/0b33afd1/02000002pdb1.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/04eab530f3e74fe4bf9a74715ecc3f0d17e00/6c/4b1e0e94/IPackageConfigurationManager.cs" root0="SKIP_HIGHLIGHTING" />
