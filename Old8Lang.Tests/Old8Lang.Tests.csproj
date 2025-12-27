@@ -29,8 +29,4 @@
     <ProjectReference Include="..\Old8Lang.MachineLearningLib\Old8Lang.MachineLearningLib.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Compiler\" />
-  </ItemGroup>
-
 </Project>
