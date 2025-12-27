@@ -1,4 +1,3 @@
-using MediatR;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
@@ -9,15 +8,8 @@ namespace Old8Lang.LanguageServer.Handlers;
 /// <summary>
 /// 跳转定义处理器
 /// </summary>
-public class DefinitionHandler : IDefinitionHandler
+public class DefinitionHandler(DocumentManager documentManager) : IDefinitionHandler
 {
-    private readonly DocumentManager _documentManager;
-
-    public DefinitionHandler(DocumentManager documentManager)
-    {
-        _documentManager = documentManager;
-    }
-
     public DefinitionRegistrationOptions GetRegistrationOptions(
         DefinitionCapability capability,
         ClientCapabilities clientCapabilities)
@@ -31,7 +23,7 @@ public class DefinitionHandler : IDefinitionHandler
     public Task<LocationOrLocationLinks?> Handle(DefinitionParams request, CancellationToken cancellationToken)
     {
         var uri = request.TextDocument.Uri.ToString();
-        var document = _documentManager.GetDocument(uri);
+        var document = documentManager.GetDocument(uri);
 
         if (document?.SymbolTable == null)
         {

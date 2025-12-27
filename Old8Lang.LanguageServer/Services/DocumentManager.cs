@@ -11,7 +11,7 @@ namespace Old8Lang.LanguageServer.Services;
 /// </summary>
 public class DocumentManager
 {
-    private readonly ConcurrentDictionary<string, DocumentParseResult> _documents = new();
+    private readonly ConcurrentDictionary<string, DocumentParseResult> Documents = new();
 
     /// <summary>
     /// 打开或更新文档
@@ -19,7 +19,7 @@ public class DocumentManager
     public DocumentParseResult UpdateDocument(string uri, string text)
     {
         var result = ParseDocument(uri, text);
-        _documents[uri] = result;
+        Documents[uri] = result;
         return result;
     }
 
@@ -28,7 +28,7 @@ public class DocumentManager
     /// </summary>
     public DocumentParseResult? GetDocument(string uri)
     {
-        _documents.TryGetValue(uri, out var result);
+        Documents.TryGetValue(uri, out var result);
         return result;
     }
 
@@ -37,7 +37,7 @@ public class DocumentManager
     /// </summary>
     public void CloseDocument(string uri)
     {
-        _documents.TryRemove(uri, out _);
+        Documents.TryRemove(uri, out _);
     }
 
     /// <summary>

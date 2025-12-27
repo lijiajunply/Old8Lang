@@ -1,4 +1,3 @@
-using MediatR;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
@@ -9,15 +8,8 @@ namespace Old8Lang.LanguageServer.Handlers;
 /// <summary>
 /// 悬停提示处理器
 /// </summary>
-public class HoverHandler : IHoverHandler
+public class HoverHandler(DocumentManager documentManager) : IHoverHandler
 {
-    private readonly DocumentManager _documentManager;
-
-    public HoverHandler(DocumentManager documentManager)
-    {
-        _documentManager = documentManager;
-    }
-
     public HoverRegistrationOptions GetRegistrationOptions(
         HoverCapability capability,
         ClientCapabilities clientCapabilities)
@@ -31,7 +23,7 @@ public class HoverHandler : IHoverHandler
     public Task<Hover?> Handle(HoverParams request, CancellationToken cancellationToken)
     {
         var uri = request.TextDocument.Uri.ToString();
-        var document = _documentManager.GetDocument(uri);
+        var document = documentManager.GetDocument(uri);
 
         if (document?.SymbolTable == null)
         {

@@ -13,17 +13,9 @@ namespace Old8Lang.LanguageServer.Handlers;
 /// <summary>
 /// 文档同步处理器
 /// </summary>
-public class TextDocumentSyncHandler : ITextDocumentSyncHandler
+public class TextDocumentSyncHandler(DocumentManager documentManager, ILanguageServerFacade languageServer)
+    : ITextDocumentSyncHandler
 {
-    private readonly DocumentManager _documentManager;
-    private readonly ILanguageServerFacade _languageServer;
-
-    public TextDocumentSyncHandler(DocumentManager documentManager, ILanguageServerFacade languageServer)
-    {
-        _documentManager = documentManager;
-        _languageServer = languageServer;
-    }
-
     public TextDocumentSyncKind Change => TextDocumentSyncKind.Full;
 
     public TextDocumentChangeRegistrationOptions GetRegistrationOptions(
@@ -37,9 +29,10 @@ public class TextDocumentSyncHandler : ITextDocumentSyncHandler
         };
     }
 
-    TextDocumentOpenRegistrationOptions IRegistration<TextDocumentOpenRegistrationOptions, TextSynchronizationCapability>.GetRegistrationOptions(
-        TextSynchronizationCapability capability,
-        ClientCapabilities clientCapabilities)
+    TextDocumentOpenRegistrationOptions
+        IRegistration<TextDocumentOpenRegistrationOptions, TextSynchronizationCapability>.GetRegistrationOptions(
+            TextSynchronizationCapability capability,
+            ClientCapabilities clientCapabilities)
     {
         return new TextDocumentOpenRegistrationOptions()
         {
@@ -47,9 +40,10 @@ public class TextDocumentSyncHandler : ITextDocumentSyncHandler
         };
     }
 
-    TextDocumentCloseRegistrationOptions IRegistration<TextDocumentCloseRegistrationOptions, TextSynchronizationCapability>.GetRegistrationOptions(
-        TextSynchronizationCapability capability,
-        ClientCapabilities clientCapabilities)
+    TextDocumentCloseRegistrationOptions
+        IRegistration<TextDocumentCloseRegistrationOptions, TextSynchronizationCapability>.GetRegistrationOptions(
+            TextSynchronizationCapability capability,
+            ClientCapabilities clientCapabilities)
     {
         return new TextDocumentCloseRegistrationOptions()
         {
@@ -57,9 +51,10 @@ public class TextDocumentSyncHandler : ITextDocumentSyncHandler
         };
     }
 
-    TextDocumentSaveRegistrationOptions IRegistration<TextDocumentSaveRegistrationOptions, TextSynchronizationCapability>.GetRegistrationOptions(
-        TextSynchronizationCapability capability,
-        ClientCapabilities clientCapabilities)
+    TextDocumentSaveRegistrationOptions
+        IRegistration<TextDocumentSaveRegistrationOptions, TextSynchronizationCapability>.GetRegistrationOptions(
+            TextSynchronizationCapability capability,
+            ClientCapabilities clientCapabilities)
     {
         return new TextDocumentSaveRegistrationOptions()
         {
@@ -77,7 +72,7 @@ public class TextDocumentSyncHandler : ITextDocumentSyncHandler
         var uri = request.TextDocument.Uri.ToString();
         var text = request.TextDocument.Text;
 
-        var result = _documentManager.UpdateDocument(uri, text);
+        var result = documentManager.UpdateDocument(uri, text);
         PublishDiagnostics(uri, result);
 
         return Unit.Task;
@@ -88,7 +83,7 @@ public class TextDocumentSyncHandler : ITextDocumentSyncHandler
         var uri = request.TextDocument.Uri.ToString();
         var text = request.ContentChanges.FirstOrDefault()?.Text ?? "";
 
-        var result = _documentManager.UpdateDocument(uri, text);
+        var result = documentManager.UpdateDocument(uri, text);
         PublishDiagnostics(uri, result);
 
         return Unit.Task;
@@ -102,7 +97,7 @@ public class TextDocumentSyncHandler : ITextDocumentSyncHandler
     public Task<Unit> Handle(DidCloseTextDocumentParams request, CancellationToken cancellationToken)
     {
         var uri = request.TextDocument.Uri.ToString();
-        _documentManager.CloseDocument(uri);
+        documentManager.CloseDocument(uri);
         return Unit.Task;
     }
 
@@ -119,7 +114,7 @@ public class TextDocumentSyncHandler : ITextDocumentSyncHandler
             Source = d.Source
         }).ToArray();
 
-        _languageServer.TextDocument.PublishDiagnostics(new PublishDiagnosticsParams
+        languageServer.TextDocument.PublishDiagnostics(new PublishDiagnosticsParams
         {
             Uri = DocumentUri.From(uri),
             Diagnostics = new Container<Diagnostic>(diagnostics)

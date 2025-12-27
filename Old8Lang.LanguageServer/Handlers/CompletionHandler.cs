@@ -1,4 +1,3 @@
-using MediatR;
 using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
@@ -9,15 +8,8 @@ namespace Old8Lang.LanguageServer.Handlers;
 /// <summary>
 /// 自动补全处理器
 /// </summary>
-public class CompletionHandler : ICompletionHandler
+public class CompletionHandler(DocumentManager documentManager) : ICompletionHandler
 {
-    private readonly DocumentManager _documentManager;
-
-    public CompletionHandler(DocumentManager documentManager)
-    {
-        _documentManager = documentManager;
-    }
-
     public CompletionRegistrationOptions GetRegistrationOptions(
         CompletionCapability capability,
         ClientCapabilities clientCapabilities)
@@ -33,7 +25,7 @@ public class CompletionHandler : ICompletionHandler
     public Task<CompletionList> Handle(CompletionParams request, CancellationToken cancellationToken)
     {
         var uri = request.TextDocument.Uri.ToString();
-        var document = _documentManager.GetDocument(uri);
+        var document = documentManager.GetDocument(uri);
 
         var completionItems = new List<CompletionItem>();
 
