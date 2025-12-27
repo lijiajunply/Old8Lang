@@ -16,13 +16,13 @@ public sealed class GlobalFunctionRegistry
     /// <summary>
     /// 函数名称到函数实现的映射（不区分大小写）
     /// </summary>
-    private readonly Dictionary<string, IGlobalFunction> _functions =
+    private readonly Dictionary<string, IGlobalFunction> Functions =
         new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// 注册锁，确保线程安全
     /// </summary>
-    private readonly object _registerLock = new();
+    private readonly Lock RegisterLock = new();
 
     /// <summary>
     /// 私有构造函数，防止外部实例化
@@ -38,22 +38,18 @@ public sealed class GlobalFunctionRegistry
     /// <param name="function">要注册的函数</param>
     public void Register(IGlobalFunction function)
     {
-        lock (_registerLock)
+        lock (RegisterLock)
         {
             // 检查是否已经注册过这个函数对象
-            foreach (var existingFunc in _functions.Values.Distinct())
+            if (Functions.Values.Distinct().Any(existingFunc => ReferenceEquals(existingFunc, function)))
             {
-                if (ReferenceEquals(existingFunc, function))
-                {
-                    // 函数已经注册过，跳过
-                    return;
-                }
+                return;
             }
 
             // 注册所有别名
             foreach (var name in function.Names)
             {
-                _functions[name] = function;
+                Functions[name] = function;
             }
         }
     }
@@ -77,8 +73,11 @@ public sealed class GlobalFunctionRegistry
     /// <returns>找到的函数，如果不存在返回 null</returns>
     public IGlobalFunction? TryGetFunction(string name)
     {
-        _functions.TryGetValue(name, out var function);
-        return function;
+        lock (RegisterLock)
+        {
+            Functions.TryGetValue(name, out var function);
+            return function;
+        }
     }
 
     /// <summary>
@@ -88,7 +87,10 @@ public sealed class GlobalFunctionRegistry
     /// <returns>如果存在返回 true，否则返回 false</returns>
     public bool HasFunction(string name)
     {
-        return _functions.ContainsKey(name);
+        lock (RegisterLock)
+        {
+            return Functions.ContainsKey(name);
+        }
     }
 
     /// <summary>
@@ -97,7 +99,10 @@ public sealed class GlobalFunctionRegistry
     /// <returns>函数名称列表</returns>
     public IEnumerable<string> GetAllFunctionNames()
     {
-        return _functions.Keys.Distinct();
+        lock (RegisterLock)
+        {
+            return Functions.Keys.Distinct();
+        }
     }
 
     /// <summary>
@@ -105,9 +110,9 @@ public sealed class GlobalFunctionRegistry
     /// </summary>
     public void Clear()
     {
-        lock (_registerLock)
+        lock (RegisterLock)
         {
-            _functions.Clear();
+            Functions.Clear();
         }
     }
 
@@ -118,18 +123,16 @@ public sealed class GlobalFunctionRegistry
     /// <returns>如果成功注销返回 true，否则返回 false</returns>
     public bool Unregister(string name)
     {
-        lock (_registerLock)
+        lock (RegisterLock)
         {
-            if (_functions.TryGetValue(name, out var function))
+            if (!Functions.TryGetValue(name, out var function)) return false;
+            // 移除该函数的所有别名
+            foreach (var alias in function.Names)
             {
-                // 移除该函数的所有别名
-                foreach (var alias in function.Names)
-                {
-                    _functions.Remove(alias);
-                }
-                return true;
+                Functions.Remove(alias);
             }
-            return false;
+
+            return true;
         }
     }
 }

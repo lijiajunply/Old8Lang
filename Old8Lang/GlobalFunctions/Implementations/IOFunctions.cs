@@ -144,7 +144,7 @@ public sealed class ErrorFunction : BaseGlobalFunction
         var errorProperty = typeof(Console).GetProperty("Error")!;
         ilGenerator.Emit(OpCodes.Call, errorProperty.GetGetMethod()!);
         ilGenerator.Emit(OpCodes.Ldarg_0); // 交换栈顶两个元素的顺序
-        var writeLineStringMethod = typeof(System.IO.TextWriter).GetMethod("WriteLine", new[] { typeof(string) })!;
+        var writeLineStringMethod = typeof(TextWriter).GetMethod("WriteLine", [typeof(string)])!;
         ilGenerator.Emit(OpCodes.Callvirt, writeLineStringMethod);
     }
 

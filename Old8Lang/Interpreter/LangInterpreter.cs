@@ -60,6 +60,8 @@ public class LangInterpreter
         Manager.Set(new LangId("CancellationTokenSource"), CancellationTokenSourceConstructor.GetInstance());
         Manager.Set(new LangId("TaskCompletionSource"), TaskCompletionSourceConstructor.GetInstance());
         Manager.Set(new LangId("Assert"), AssertClassLangValue.GetInstance());
+        Manager.Set(new LangId("TestRunner"), TestRunnerClassLangValue.GetInstance());
+        Manager.Set(new LangId("Mock"), MockLibClassLangValue.GetInstance());
     }
 
     /// <summary>

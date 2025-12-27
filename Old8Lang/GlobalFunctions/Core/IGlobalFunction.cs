@@ -42,7 +42,7 @@ public interface IGlobalFunction
     /// <param name="ilGenerator">IL 生成器</param>
     /// <param name="local">局部变量管理器</param>
     /// <param name="position">源代码位置</param>
-    void GenerateIL(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position);
+    void GenerateIl(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position);
 
     /// <summary>
     /// 编译器模式获取返回类型

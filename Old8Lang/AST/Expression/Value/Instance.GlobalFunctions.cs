@@ -35,7 +35,7 @@ public partial class Instance
     /// 尝试通过全局函数注册器生成 IL 代码（编译器模式）
     /// </summary>
     /// <returns>如果找到并生成了 IL 代码返回 true，否则返回 false</returns>
-    private bool TryGenerateGlobalFunctionIL(ILGenerator ilGenerator, LocalManager local)
+    private bool TryGenerateGlobalFunctionIl(ILGenerator ilGenerator, LocalManager local)
     {
         // 确保全局函数已初始化
         GlobalFunctionInitializer.EnsureInitialized();
@@ -44,7 +44,7 @@ public partial class Instance
         var globalFunc = GlobalFunctionRegistry.Instance.TryGetFunction(Id.IdName);
         if (globalFunc != null)
         {
-            globalFunc.GenerateIL(Ids, ilGenerator, local, Position);
+            globalFunc.GenerateIl(Ids, ilGenerator, local, Position);
             return true;
         }
 

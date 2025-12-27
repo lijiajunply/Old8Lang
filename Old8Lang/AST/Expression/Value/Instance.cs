@@ -696,7 +696,7 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 首先尝试通过全局函数注册器生成 IL 代码
-        if (TryGenerateGlobalFunctionIL(ilGenerator, local))
+        if (TryGenerateGlobalFunctionIl(ilGenerator, local))
         {
             return;
         }

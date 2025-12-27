@@ -39,7 +39,7 @@ public abstract class BaseGlobalFunction : IGlobalFunction
     /// <summary>
     /// 编译器模式生成 IL 代码
     /// </summary>
-    public void GenerateIL(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    public void GenerateIl(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         ValidateParameterCount(parameters.Count, position);
         GenerateILInternal(parameters, ilGenerator, local, position);
