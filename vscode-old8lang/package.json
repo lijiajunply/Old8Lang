@@ -1,0 +1,80 @@
+{
+  "name": "old8lang",
+  "displayName": "Old8Lang",
+  "description": "Old8Lang 语言支持",
+  "version": "0.1.0",
+  "publisher": "old8lang",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "old8lang",
+    "老八语言"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "old8lang",
+        "aliases": [
+          "Old8Lang",
+          "old8lang"
+        ],
+        "extensions": [
+          ".old8"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "old8lang",
+        "scopeName": "source.old8lang",
+        "path": "./syntaxes/old8lang.tmLanguage.json"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Old8Lang",
+      "properties": {
+        "old8lang.languageServer.path": {
+          "type": "string",
+          "default": "",
+          "description": "Language Server 可执行文件路径（留空则使用默认路径）"
+        },
+        "old8lang.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "跟踪 Language Server 与客户端之间的通信"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.75.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^8.1.0"
+  }
+}
