@@ -22,33 +22,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/InMemoryConnectionWrapper.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/DatabaseLib/InMemoryDatabaseTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestInMemoryDatabase.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/DatabaseLibBinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/DatabaseLibBinding.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/MySqlConnectionWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/MySqlConnectionWrapper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/MySqlTransactionWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/MySqlTransactionWrapper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/OrmWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/OrmWrapper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/PostgresConnectionWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/PostgresConnectionWrapper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/PostgresTransactionWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/PostgresTransactionWrapper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/SqliteConnectionWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/SqliteConnectionWrapper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/SqliteTransactionWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/SqliteTransactionWrapper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/ErrorHandlingTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/ErrorHandlingTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/PerformanceTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/PerformanceTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/TypeSystemTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/TypeSystemTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/ArrayTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/ArrayTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/ArithmeticTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/ArithmeticTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/ComparisonTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/ComparisonTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/LogicalTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/LogicalTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/StringTemplateTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/StringTemplateTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/TernaryTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/TernaryTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/DatabaseLib/DatabaseLibTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/BasicInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/BasicInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

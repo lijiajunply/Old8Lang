@@ -109,6 +109,7 @@ public abstract class Program
         CommandRegistry.Register(new FromFileCommand());
         CommandRegistry.Register(new CompilerCommand());
         CommandRegistry.Register(new SyntaxTestCommand());
+        CommandRegistry.Register(new RunCommand());
 
         // 信息命令
         CommandRegistry.Register(new HelpCommand());
