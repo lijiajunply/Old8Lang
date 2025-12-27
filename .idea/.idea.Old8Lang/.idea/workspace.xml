@@ -22,9 +22,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/CompilerTestPlan.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/LogicalTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/TernaryTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/InitCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/InitCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/PublishCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/PublishCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/RestoreCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/RestoreCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ProjectManagement/ProjectConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ProjectManagement/ProjectConfig.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PACKAGE_DEVELOPMENT_GUIDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/PACKAGE_DEVELOPMENT_GUIDE.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,6 +87,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Visitor/Generated/LangListItem.Accept.generated.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
@@ -847,7 +850,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="387" />
+    <option name="localTasksCounter" value="388" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -874,7 +877,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(lang): 移除废弃的库信息管理功能&#10;&#10;- 移除了 LangInfo 类中的 LibInfos 属性及其废弃标记&#10;- 修改 ChangeBasicInfo 方法不再设置 LibInfos 字段&#10;- 删除 ReadJson 方法上的 Obsolete 标记&#10;- 移除读取 JSON 时的默认库信息填充逻辑&#10;- 更新方法注释移除向后兼容说明&#10;- 简化 LangInfo 对象创建逻辑" />
     <MESSAGE value="refactor(ast): 重构模块导入机制和符号提取逻辑&#10;&#10;- 重构 ImportStatement 中的模块导入逻辑，使用临时作用域执行模块代码&#10;- 实现从执行结果中提取符号并创建统一模块对象的功能&#10;- 添加对函数、类、变量等不同类型符号的识别和提取&#10;- 重构 UnifiedModule 中的符号存储和访问机制&#10;- 优化模块加载过程中的作用域管理和符号提取&#10;- 更新常量定义语法从 &quot;const NAME &lt;- value&quot; 到 &quot;NAME:const &lt;- value&quot;&#10;- 修复循环依赖测试中的模块导入问题&#10;- 优化模块对象的创建和符号管理流程" />
     <MESSAGE value="fix(import): 修复本地文件导入路径解析问题&#10;&#10;- 添加了对空目录路径的处理逻辑&#10;- 当manager.Path不为空时使用当前文件的完整路径目录&#10;- 当目录路径仍为空时回退到当前工作目录&#10;- 确保本地文件导入能够正确解析相对路径" />
     <MESSAGE value="fix(import): 解决模块导入中的函数重复定义和子模块路径处理问题&#10;&#10;- 修复了不同模块中同名函数的重复定义检查逻辑，允许来自不同模块的函数共存&#10;- 改进了子模块导入路径处理，排除相对路径和文件扩展名的干扰&#10;- 优化了包管理器导入逻辑，跳过相对路径和绝对路径的处理&#10;- 增强了命名导入功能，通过跟踪新增ImportInfos确保正确导入指定成员&#10;- 添加了TryFindInImportInfos辅助方法用于在导入信息列表中查找成员&#10;- 修复了子模块导入的基础路径确定逻辑，区分相对路径和绝对路径处理&#10;- 完善了子模块查找失败时的错误抛出机制" />
@@ -899,7 +901,8 @@
     <MESSAGE value="feat(ml): 添加机器学习库核心功能&#10;&#10;- 实现了分类训练器，支持逻辑回归、快速树和LightGBM等算法&#10;- 实现了回归训练器，支持SDCA、快速树和LightGBM等算法&#10;- 实现了聚类训练器，支持K-Means算法&#10;- 添加了数据加载器，支持CSV和内存数据加载&#10;- 实现了模型预测器，支持单个和批量预测&#10;- 添加了ML上下文包装器，提供统一的API入口&#10;- 实现了机器学习库绑定类，供Old8Lang调用&#10;- 添加了完整的单元测试覆盖所有核心功能&#10;- 提供了详细的使用示例，包含分类、回归和聚类场景" />
     <MESSAGE value="refactor(language-server): 重构语言服务器依赖注入和字段命名&#10;&#10;- 移除 MediatR 相关引用&#10;- 使用主构造函数注入 DocumentManager 服务&#10;- 将私有字段从 _documentManager 重命名为 documentManager&#10;- 更新 DocumentManager 中的字段命名从 _documents 到 Documents&#10;- 更新所有使用字段的地方为新的命名规范&#10;- 更新 workspace.xml 配置文件中的项目引用和运行配置" />
     <MESSAGE value="test(compiler): 添加算术表达式、数组操作和边界条件的编译测试&#10;&#10;- 实现算术表达式编译测试，覆盖加减乘除模运算和复杂表达式&#10;- 添加数组操作编译测试，包括数组创建、访问、赋值和连接功能&#10;- 创建边界条件编译测试，验证各种数据类型的边界值处理&#10;- 补充比较表达式编译测试，验证大小比较运算的正确性&#10;- 增加数值、字符串、集合等各类边界情况的编译验证&#10;- 添加嵌套结构和特殊变量名的编译边界测试" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(compiler): 添加算术表达式、数组操作和边界条件的编译测试&#10;&#10;- 实现算术表达式编译测试，覆盖加减乘除模运算和复杂表达式&#10;- 添加数组操作编译测试，包括数组创建、访问、赋值和连接功能&#10;- 创建边界条件编译测试，验证各种数据类型的边界值处理&#10;- 补充比较表达式编译测试，验证大小比较运算的正确性&#10;- 增加数值、字符串、集合等各类边界情况的编译验证&#10;- 添加嵌套结构和特殊变量名的编译边界测试" />
+    <MESSAGE value="feat(interpreter): 添加Assert类支持断言功能&#10;&#10;- 实现Assert类的全局单例实例&#10;- 添加AssertEqual、AssertNotEqual等20多个断言方法&#10;- 支持数值、字符串、布尔值和集合的断言比较&#10;- 实现异常抛出和类型检查断言功能&#10;- 添加IL代码生成支持断言方法调用&#10;- 在解释器中注册Assert全局对象" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(interpreter): 添加Assert类支持断言功能&#10;&#10;- 实现Assert类的全局单例实例&#10;- 添加AssertEqual、AssertNotEqual等20多个断言方法&#10;- 支持数值、字符串、布尔值和集合的断言比较&#10;- 实现异常抛出和类型检查断言功能&#10;- 添加IL代码生成支持断言方法调用&#10;- 在解释器中注册Assert全局对象" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -76,7 +76,7 @@ public class PublishCommand : ICommand
             var projectRoot = CommandHelper.FindProjectRoot();
             if (projectRoot == null)
             {
-                CommandHelper.PrintError("错误: 未找到 Old8Lang 项目（o8packages.json）");
+                CommandHelper.PrintError("错误: 未找到 Old8Lang 项目（o8package.json）");
                 CommandHelper.PrintInfo("请在项目根目录下运行此命令，或先运行 'old8lang init' 初始化项目");
                 return 1;
             }

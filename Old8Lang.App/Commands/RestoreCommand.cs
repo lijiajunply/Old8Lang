@@ -9,13 +9,13 @@ namespace Old8Lang.App.Commands;
 public class RestoreCommand : ICommand
 {
     public string Name => "restore";
-    public string Description => "恢复项目的所有依赖（基于 o8packages.json）";
+    public string Description => "恢复项目的所有依赖（基于 o8package.json）";
 
     public string Help => @"
 用法: old8lang restore [选项]
 
 说明:
-  restore 命令会读取 o8packages.json 中的依赖配置，
+  restore 命令会读取 o8package.json 中的依赖配置，
   自动解析依赖关系并安装所有必需的包。
 
   这个命令集成了 Old8Lang.PackageManager.Core 库，

@@ -51,7 +51,7 @@ public class ProjectConfig : PackageConfiguration
     /// 配置文件名
     /// </summary>
     [JsonIgnore]
-    public const string FileName = "o8packages.json";
+    public const string FileName = "o8package.json";
 
     /// <summary>
     /// 从目录加载项目配置
@@ -121,7 +121,7 @@ public class ProjectConfig : PackageConfiguration
     }
 
     /// <summary>
-    /// 向上查找项目根目录（包含 o8packages.json）
+    /// 向上查找项目根目录（包含 o8package.json）
     /// </summary>
     public static string? FindProjectRoot(string startPath, int maxDepth = 10)
     {

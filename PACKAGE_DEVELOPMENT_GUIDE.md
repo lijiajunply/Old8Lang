@@ -16,7 +16,7 @@
 
 ```
 MyPackage/
-├── o8packages.json         # 包元数据（必需）
+├── o8package.json         # 包元数据（必需）
 ├── index.old8           # 主入口文件（或在 package.json 中指定）
 ├── README.md            # 包文档
 ├── LICENSE              # 许可证（默认为 MIT）
@@ -24,10 +24,7 @@ MyPackage/
 │   ├── utils.old8
 │   └── helper.old8
 ├── test/                # 测试目录（可选）
-├── dll/                 # 预编译文件目录/需要的 C# 原生dll文件（可选）
-└── packages/            # 依赖目录
-    └── Logger.1.2.0/    # 示例
-        └── Logger.o8
+└── dll/                 # 预编译文件目录/需要的 C# 原生dll文件（可选）
 ```
 
 ## 🚀 创建包
@@ -50,22 +47,22 @@ old8lang package init
 // MyPackage/index.old8
 
 // 导出函数
-public func greet(name:string) -> string {
+func greet(name:string) -> string {
     return "Hello, " + name + "!"
 }
 
 // 导出常量
-public version <- "1.0.0"
+version:const <- "1.0.0"
 
 // 导出类
-public class Helper {
+class Helper {
     public func calculate(a:int, b:int) -> int {
         return a + b
     }
 }
 
 // 包初始化代码（可选）
-PrintLine("MyPackage loaded successfully")
+PrintLine("MyPackage loaded successfully") //不会显示
 ```
 
 ## 📝 package.json 配置
