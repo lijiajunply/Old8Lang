@@ -1,10 +1,3 @@
-using Old8Lang;
-using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.StaticValues;
-using Old8Lang.Error;
-using Old8Lang.TypeSystem;
-using Old8Lang.AST;
-
 namespace Old8Lang.DatabaseLib;
 
 /// <summary>
@@ -55,7 +48,7 @@ public static class DatabaseLibBinding
             SqliteConnectionWrapper sqlite => sqlite.Query(sql, parameters),
             MySqlConnectionWrapper mysql => mysql.Query(sql, parameters),
             PostgresConnectionWrapper postgres => postgres.Query(sql, parameters),
-            _ => throw new Old8LangException("不支持的数据库连接类型", SourcePosition.Default)
+            _ => throw new InvalidOperationException("不支持的数据库连接类型")
         };
     }
 
@@ -69,7 +62,7 @@ public static class DatabaseLibBinding
             SqliteConnectionWrapper sqlite => sqlite.Execute(sql, parameters),
             MySqlConnectionWrapper mysql => mysql.Execute(sql, parameters),
             PostgresConnectionWrapper postgres => postgres.Execute(sql, parameters),
-            _ => throw new Old8LangException("不支持的数据库连接类型", SourcePosition.Default)
+            _ => throw new InvalidOperationException("不支持的数据库连接类型")
         };
     }
 
@@ -83,7 +76,7 @@ public static class DatabaseLibBinding
             SqliteConnectionWrapper sqlite => sqlite.ExecuteScalar(sql, parameters),
             MySqlConnectionWrapper mysql => mysql.ExecuteScalar(sql, parameters),
             PostgresConnectionWrapper postgres => postgres.ExecuteScalar(sql, parameters),
-            _ => throw new Old8LangException("不支持的数据库连接类型", SourcePosition.Default)
+            _ => throw new InvalidOperationException("不支持的数据库连接类型")
         };
     }
 
@@ -97,7 +90,7 @@ public static class DatabaseLibBinding
             SqliteConnectionWrapper sqlite => sqlite.BeginTransaction(),
             MySqlConnectionWrapper mysql => mysql.BeginTransaction(),
             PostgresConnectionWrapper postgres => postgres.BeginTransaction(),
-            _ => throw new Old8LangException("不支持的数据库连接类型", SourcePosition.Default)
+            _ => throw new InvalidOperationException("不支持的数据库连接类型")
         };
     }
 
@@ -118,7 +111,7 @@ public static class DatabaseLibBinding
                 postgres.Commit();
                 break;
             default:
-                throw new Old8LangException("不支持的事务类型", SourcePosition.Default);
+                throw new InvalidOperationException("不支持的事务类型");
         }
     }
 
@@ -139,7 +132,7 @@ public static class DatabaseLibBinding
                 postgres.Rollback();
                 break;
             default:
-                throw new Old8LangException("不支持的事务类型", SourcePosition.Default);
+                throw new InvalidOperationException("不支持的事务类型");
         }
     }
 
@@ -152,7 +145,7 @@ public static class DatabaseLibBinding
         {
             return ormWrapper.Insert(entity);
         }
-        throw new Old8LangException("ORM 实例无效", SourcePosition.Default);
+        throw new InvalidOperationException("ORM 实例无效");
     }
 
     /// <summary>
@@ -164,7 +157,7 @@ public static class DatabaseLibBinding
         {
             return ormWrapper.Update(entity);
         }
-        throw new Old8LangException("ORM 实例无效", SourcePosition.Default);
+        throw new InvalidOperationException("ORM 实例无效");
     }
 
     /// <summary>
@@ -176,7 +169,7 @@ public static class DatabaseLibBinding
         {
             return ormWrapper.Delete(entity);
         }
-        throw new Old8LangException("ORM 实例无效", SourcePosition.Default);
+        throw new InvalidOperationException("ORM 实例无效");
     }
 
     /// <summary>
@@ -191,7 +184,7 @@ public static class DatabaseLibBinding
                 .MakeGenericMethod(entityType);
             return method.Invoke(ormWrapper, [id])!;
         }
-        throw new Old8LangException("ORM 实例无效", SourcePosition.Default);
+        throw new InvalidOperationException("ORM 实例无效");
     }
 
     /// <summary>
@@ -206,7 +199,7 @@ public static class DatabaseLibBinding
                 .MakeGenericMethod(entityType);
             return method.Invoke(ormWrapper, [])!;
         }
-        throw new Old8LangException("ORM 实例无效", SourcePosition.Default);
+        throw new InvalidOperationException("ORM 实例无效");
     }
 
     /// <summary>
@@ -226,7 +219,7 @@ public static class DatabaseLibBinding
                 postgres.Open();
                 break;
             default:
-                throw new Old8LangException("不支持的数据库连接类型", SourcePosition.Default);
+                throw new InvalidOperationException("不支持的数据库连接类型");
         }
     }
 
@@ -247,7 +240,7 @@ public static class DatabaseLibBinding
                 postgres.Close();
                 break;
             default:
-                throw new Old8LangException("不支持的数据库连接类型", SourcePosition.Default);
+                throw new InvalidOperationException("不支持的数据库连接类型");
         }
     }
 }

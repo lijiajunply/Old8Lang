@@ -15,9 +15,9 @@ Old8Lang 有两种运行模式：解释模式和编译模式。
 生成的 测试用代码文件 必须要符合 Old8Lang 语法规范。详情请看 /Old8Lang/Old8Lang.ebnf
 测试时可使用 PrintLine 函数打印结果，方便查看。 注释为 // 而非 #
 
-编译模式测试时，请放在 CompilerTests 目录下。
-解释模式测试时，请放在 InterpreterTests 目录下。
-语法测试时，请放在 SyntaxTests 目录下。
+编译模式测试时，请写到 Old8Lang.Test/Compiler 目录下。
+解释模式测试时，请写到 Old8Lang.Test/Interpreter 目录下。
+语法测试时，请放在 Old8Lang.Test/Parser 目录下。
 
 在测试时，也可以使用 Old8Lang.App 来编译测试用代码文件：
 

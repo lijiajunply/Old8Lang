@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -27,6 +27,7 @@
     <ProjectReference Include="..\Old8LangLib\Old8LangLib.csproj" />
     <ProjectReference Include="..\Old8Lang.NetLib\Old8Lang.NetLib.csproj" />
     <ProjectReference Include="..\Old8Lang.MachineLearningLib\Old8Lang.MachineLearningLib.csproj" />
+    <ProjectReference Include="..\Old8Lang.DatabaseLib\Old8Lang.DatabaseLib.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Old8Lang.DatabaseLib;
 
@@ -18,53 +19,6 @@ public class User
     
     [MaxLength(255)]
     public string Email { get; set; } = string.Empty;
-    
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
-}
-
-/// <summary>
-/// 订单实体示例
-/// </summary>
-[Table("orders")]
-public class Order
-{
-    [Key]
-    public int Id { get; set; }
-    
-    [Required]
-    public int UserId { get; set; }
-    
-    [Required]
-    [Column(TypeName = "decimal(10,2)")]
-    public decimal Amount { get; set; }
-    
-    public DateTime OrderDate { get; set; } = DateTime.Now;
-    
-    [MaxLength(50)]
-    public string Status { get; set; } = "Pending";
-}
-
-/// <summary>
-/// 产品实体示例
-/// </summary>
-[Table("products")]
-public class Product
-{
-    [Key]
-    public int Id { get; set; }
-    
-    [Required]
-    [MaxLength(200)]
-    public string Name { get; set; } = string.Empty;
-    
-    [MaxLength(500)]
-    public string? Description { get; set; }
-    
-    [Required]
-    [Column(TypeName = "decimal(10,2)")]
-    public decimal Price { get; set; }
-    
-    public int Stock { get; set; }
     
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 }
@@ -101,7 +55,7 @@ public class Examples
 
             // 查询数据
             var users = DatabaseLibBinding.ExecuteQuery(connection, "SELECT * FROM users");
-            foreach (var user in users)
+            foreach (dynamic user in (IEnumerable<dynamic>)users)
             {
                 Console.WriteLine($"User: {user.Name} - {user.Email}");
             }
@@ -124,14 +78,14 @@ public class Examples
         try
         {
             // 插入用户
-            var userId = DatabaseLibBinding.ExecuteScalar(connection, 
-                "INSERT INTO users (Name, Email) VALUES (@name, @email); SELECT last_insert_rowid();",
+            DatabaseLibBinding.ExecuteNonQuery(connection, 
+                "INSERT INTO users (Name, Email) VALUES (@name, @email)", 
                 new { name = "Alice", email = "alice@example.com" });
 
             // 插入订单
             DatabaseLibBinding.ExecuteNonQuery(connection,
                 "INSERT INTO orders (UserId, Amount, Status) VALUES (@userId, @amount, @status)",
-                new { userId, amount = 99.99m, status = "Pending" });
+                new { userId = 1, amount = 99.99m, status = "Pending" });
 
             // 提交事务
             DatabaseLibBinding.CommitTransaction(transaction);
@@ -211,7 +165,10 @@ public class Examples
 
             // 操作方式与 SQLite 相同
             var users = DatabaseLibBinding.ExecuteQuery(connection, "SELECT COUNT(*) as UserCount FROM users");
-            Console.WriteLine($"MySQL 用户数量: {users.First().UserCount}");
+            foreach (dynamic user in (IEnumerable<dynamic>)users)
+            {
+                Console.WriteLine($"MySQL 用户数量: {user.UserCount}");
+            }
         }
         finally
         {
@@ -241,61 +198,9 @@ public class Examples
 
             // 操作方式与其他数据库相同
             var users = DatabaseLibBinding.ExecuteQuery(connection, "SELECT COUNT(*) as UserCount FROM users");
-            Console.WriteLine($"PostgreSQL 用户数量: {users.First().UserCount}");
-        }
-        finally
-        {
-            DatabaseLibBinding.CloseConnection(connection);
-        }
-    }
-
-    /// <summary>
-    /// 复杂 ORM 操作示例
-    /// </summary>
-    public static void AdvancedOrmExample()
-    {
-        var connection = DatabaseLibBinding.CreateSqliteConnection("Data Source=example.db");
-        DatabaseLibBinding.OpenConnection(connection);
-
-        try
-        {
-            var orm = DatabaseLibBinding.CreateOrm(connection);
-
-            // 创建表
-            DatabaseLibBinding.ExecuteNonQuery(connection, @"
-                CREATE TABLE IF NOT EXISTS products (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Name TEXT NOT NULL,
-                    Description TEXT,
-                    Price DECIMAL(10,2),
-                    Stock INTEGER DEFAULT 0,
-                    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-                )");
-
-            // 批量插入产品
-            var products = new[]
+            foreach (dynamic user in (IEnumerable<dynamic>)users)
             {
-                new Product { Name = "Laptop", Description = "High performance laptop", Price = 999.99m, Stock = 50 },
-                new Product { Name = "Mouse", Description = "Wireless mouse", Price = 29.99m, Stock = 200 },
-                new Product { Name = "Keyboard", Description = "Mechanical keyboard", Price = 79.99m, Stock = 100 }
-            };
-
-            foreach (var product in products)
-            {
-                DatabaseLibBinding.Insert(orm, product);
-            }
-
-            // 查询所有产品
-            var allProducts = DatabaseLibBinding.QueryAll(orm, typeof(Product)) as IEnumerable<Product>;
-            Console.WriteLine($"产品数量: {allProducts?.Count()}");
-
-            // 更新产品价格
-            if (allProducts?.Any() == true)
-            {
-                var firstProduct = allProducts.First();
-                firstProduct.Price *= 0.9m; // 降价10%
-                DatabaseLibBinding.Update(orm, firstProduct);
-                Console.WriteLine($"产品 {firstProduct.Name} 已降价");
+                Console.WriteLine($"PostgreSQL 用户数量: {user.UserCount}");
             }
         }
         finally

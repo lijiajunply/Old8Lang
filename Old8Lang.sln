@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.MachineLearningLib
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.LanguageServer", "Old8Lang.LanguageServer\Old8Lang.LanguageServer.csproj", "{73C78A6D-A581-4C72-8C24-BC17126407D3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.DatabaseLib", "Old8Lang.DatabaseLib\Old8Lang.DatabaseLib.csproj", "{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -150,6 +152,18 @@ Global
 		{73C78A6D-A581-4C72-8C24-BC17126407D3}.Release|x64.Build.0 = Release|Any CPU
 		{73C78A6D-A581-4C72-8C24-BC17126407D3}.Release|x86.ActiveCfg = Release|Any CPU
 		{73C78A6D-A581-4C72-8C24-BC17126407D3}.Release|x86.Build.0 = Release|Any CPU
+		{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}.Debug|x64.Build.0 = Debug|Any CPU
+		{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}.Debug|x86.Build.0 = Debug|Any CPU
+		{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}.Release|x64.ActiveCfg = Release|Any CPU
+		{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}.Release|x64.Build.0 = Release|Any CPU
+		{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}.Release|x86.ActiveCfg = Release|Any CPU
+		{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
