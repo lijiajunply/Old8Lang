@@ -6,15 +6,8 @@ namespace Old8Lang.AST.Visitor;
 /// <summary>
 /// 解释器 Visitor - 替代原有的 Run() 方法
 /// </summary>
-public partial class InterpreterVisitor : IVisitor<LangValueType>
+public partial class InterpreterVisitor(VariateManager manager) : IVisitor<LangValueType>
 {
-    private readonly VariateManager _manager;
-
-    public InterpreterVisitor(VariateManager manager)
-    {
-        _manager = manager;
-    }
-
     // Statement 访问方法将在后续实现
     // Expression 访问方法将在后续实现
     // Value 访问方法将在后续实现

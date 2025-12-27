@@ -246,7 +246,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 Instance.Run()
         // Instance 表示类实例化，逻辑复杂，包含全局函数注册、Lock、Task等特殊处理
-        return node.Run(_manager);
+        return node.Run(manager);
     }
 
     /// <summary>
@@ -256,7 +256,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 TypeLangValue.Run()
         // TypeLangValue 表示类型值，需要对表达式求值来确定类型
-        return node.Run(_manager);
+        return node.Run(manager);
     }
 
     /// <summary>
@@ -279,7 +279,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 ListComprehension.Run()
         // 列表推导式逻辑
-        return node.Run(_manager);
+        return node.Run(manager);
     }
 
     /// <summary>
@@ -289,7 +289,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 NestedIndexAccess.Run()
         // 嵌套索引访问逻辑
-        return node.Run(_manager);
+        return node.Run(manager);
     }
 
     /// <summary>
@@ -299,7 +299,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 NestedSliceAccess.Run()
         // 嵌套切片访问逻辑
-        return node.Run(_manager);
+        return node.Run(manager);
     }
 
     /// <summary>
@@ -309,7 +309,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 MethodOverloadList.Run()
         // 方法重载列表，通常在方法重载解析时使用
-        return node.Run(_manager);
+        return node.Run(manager);
     }
 
     /// <summary>
@@ -319,7 +319,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 SuperProxy.Run()
         // Super 代理，用于访问父类成员
-        return node.Run(_manager);
+        return node.Run(manager);
     }
 
     /// <summary>
@@ -349,7 +349,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 LangListItem.Run()
         // 列表项节点
-        return node.Run(_manager);
+        return node.Run(manager);
     }
 
     // ==================== 异步和生成器相关节点 ====================

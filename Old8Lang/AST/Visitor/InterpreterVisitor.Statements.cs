@@ -17,7 +17,7 @@ public partial class InterpreterVisitor
     public LangValueType VisitBreakStatement(BreakStatement node)
     {
         // 迁移自 BreakStatement.Run()
-        _manager.ControlFlowManager.BreakFlag = true;
+        manager.ControlFlowManager.BreakFlag = true;
         return new VoidLangValue();
     }
 
@@ -27,7 +27,7 @@ public partial class InterpreterVisitor
     public LangValueType VisitContinueStatement(ContinueStatement node)
     {
         // 迁移自 ContinueStatement.Run()
-        _manager.ControlFlowManager.ContinueFlag = true;
+        manager.ControlFlowManager.ContinueFlag = true;
         return new VoidLangValue();
     }
 
@@ -40,21 +40,21 @@ public partial class InterpreterVisitor
         var r = true;
 
         // 保存原始的 IsFunc 状态
-        var originalIsFunc = _manager.IsFunc;
+        var originalIsFunc = manager.IsFunc;
 
         // 处理 if 块
-        _manager.AddChildren();
+        manager.AddChildren();
         // 在 if 语句块中，临时禁用函数上下文，允许修改外部变量
-        _manager.IsFunc = false;
+        manager.IsFunc = false;
 
         // 访问 ifChildBlock（直接调用其逻辑，因为 IfChild 不支持 Visitor）
         var ifChild = node[0] as IfChild;
         if (ifChild != null)
         {
-            ifChild.Run(_manager, ref r);
+            ifChild.Run(manager, ref r);
         }
 
-        _manager.RemoveChildren();
+        manager.RemoveChildren();
 
         // 处理 elif 块
         for (int i = 1; i < node.Count; i++)
@@ -62,11 +62,11 @@ public partial class InterpreterVisitor
             var elifChild = node[i] as IfChild;
             if (elifChild != null)
             {
-                _manager.AddChildren();
+                manager.AddChildren();
                 // 在 elif 语句块中，临时禁用函数上下文，允许修改外部变量
-                _manager.IsFunc = false;
-                elifChild.Run(_manager, ref r);
-                _manager.RemoveChildren();
+                manager.IsFunc = false;
+                elifChild.Run(manager, ref r);
+                manager.RemoveChildren();
             }
             else if (node[i] is BlockStatement elseBlock)
             {
@@ -79,7 +79,7 @@ public partial class InterpreterVisitor
         }
 
         // 恢复原始的 IsFunc 状态
-        _manager.IsFunc = originalIsFunc;
+        manager.IsFunc = originalIsFunc;
 
         return new VoidLangValue();
     }
@@ -91,16 +91,16 @@ public partial class InterpreterVisitor
     {
         // 迁移自 BlockStatement.Run()
         // 检查是否有生成器上下文，决定执行模式
-        if (_manager.GeneratorContext != null)
+        if (manager.GeneratorContext != null)
         {
             // 生成器模式需要调用原方法（暂不迁移复杂逻辑）
-            node.Run(_manager);
+            node.Run(manager);
         }
         else
         {
             // 标准执行模式（非生成器）
             // 先执行导入语句
-            node.ImportRun(_manager);
+            node.ImportRun(manager);
 
             // 顺序执行所有语句
             for (int i = 0; i < node.Count; i++)
@@ -111,13 +111,13 @@ public partial class InterpreterVisitor
                     statement.Accept(this);
 
                     // 检查 return 语句
-                    if (_manager.IsReturn)
+                    if (manager.IsReturn)
                     {
                         return new VoidLangValue();
                     }
 
                     // 检查 break 和 continue 语句
-                    if (_manager.ControlFlowManager.BreakFlag || _manager.ControlFlowManager.ContinueFlag)
+                    if (manager.ControlFlowManager.BreakFlag || manager.ControlFlowManager.ContinueFlag)
                     {
                         return new VoidLangValue();
                     }
@@ -134,15 +134,15 @@ public partial class InterpreterVisitor
     public LangValueType VisitWhileStatement(WhileStatement node)
     {
         // 迁移自 WhileStatement.Run()
-        if (_manager.GeneratorContext != null)
+        if (manager.GeneratorContext != null)
         {
             // 生成器模式：调用原方法（暂不迁移复杂逻辑）
-            node.Run(_manager);
+            node.Run(manager);
         }
         else
         {
             // 标准 while 循环（非生成器）
-            _manager.ControlFlowManager.PushState();
+            manager.ControlFlowManager.PushState();
 
             try
             {
@@ -166,13 +166,13 @@ public partial class InterpreterVisitor
 
                     // 执行循环体（blockStatement）
                     // 注意：WhileStatement 没有索引访问来获取 blockStatement，需要直接调用原方法
-                    node.Run(_manager);
+                    node.Run(manager);
                     return new VoidLangValue();
                 }
             }
             finally
             {
-                _manager.ControlFlowManager.PopState();
+                manager.ControlFlowManager.PopState();
             }
         }
 
@@ -185,20 +185,20 @@ public partial class InterpreterVisitor
     public LangValueType VisitForStatement(ForStatement node)
     {
         // 迁移自 ForStatement.Run()
-        _manager.AddChildren();
-        _manager.ControlFlowManager.PushState();
+        manager.AddChildren();
+        manager.ControlFlowManager.PushState();
 
         try
         {
             // 执行初始化语句（通过访问 setStatement 字段）
             // 注意：ForStatement 没有通过索引访问子节点，需要调用原方法
-            node.Run(_manager);
+            node.Run(manager);
             return new VoidLangValue();
         }
         finally
         {
-            _manager.ControlFlowManager.PopState();
-            _manager.RemoveChildren();
+            manager.ControlFlowManager.PopState();
+            manager.RemoveChildren();
         }
     }
 
@@ -210,7 +210,7 @@ public partial class InterpreterVisitor
         // 迁移自 ForInStatement.Run()
         // ForInStatement 逻辑非常复杂（815行），包含生成器、异步流等特殊处理
         // 暂时调用原方法，后续再详细迁移
-        node.Run(_manager);
+        node.Run(manager);
         return new VoidLangValue();
     }
 
@@ -221,7 +221,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 SetStatement.Run()
         // SetStatement 的逻辑已经封装在其 Run 方法中，直接调用
-        node.Run(_manager);
+        node.Run(manager);
         return new VoidLangValue();
     }
 
@@ -232,7 +232,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 ReturnStatement.Run()
         // ReturnStatement 的逻辑已经封装在其 Run 方法中，直接调用
-        node.Run(_manager);
+        node.Run(manager);
         return new VoidLangValue();
     }
 
@@ -243,7 +243,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 ThrowStatement.Run()
         // ThrowStatement 的逻辑已经封装在其 Run 方法中，直接调用
-        node.Run(_manager);
+        node.Run(manager);
         return new VoidLangValue();
     }
 
@@ -254,7 +254,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 FuncInit.Run()
         // 函数声明逻辑已封装在 Run 方法中，直接调用
-        node.Run(_manager);
+        node.Run(manager);
         return new VoidLangValue();
     }
 
@@ -265,7 +265,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 AsyncFuncInit.Run()
         // 异步函数声明逻辑已封装在 Run 方法中，直接调用
-        node.Run(_manager);
+        node.Run(manager);
         return new VoidLangValue();
     }
 
@@ -276,7 +276,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 ClassInit.Run()
         // 类声明逻辑已封装在 Run 方法中，直接调用
-        node.Run(_manager);
+        node.Run(manager);
         return new VoidLangValue();
     }
 
@@ -287,7 +287,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 SwitchStatement.Run()
         // Switch 语句逻辑已封装在 Run 方法中，直接调用
-        node.Run(_manager);
+        node.Run(manager);
         return new VoidLangValue();
     }
 
@@ -298,7 +298,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 CaseStatement.Run()
         // Case 语句逻辑已封装在 Run 方法中，直接调用
-        node.Run(_manager);
+        node.Run(manager);
         return new VoidLangValue();
     }
 
@@ -309,7 +309,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 TryStatement.Run()
         // Try-Catch-Finally 逻辑已封装在 Run 方法中，直接调用
-        node.Run(_manager);
+        node.Run(manager);
         return new VoidLangValue();
     }
 
@@ -320,7 +320,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 YieldStatement.Run()
         // Yield 语句逻辑（生成器支持）已封装在 Run 方法中，直接调用
-        node.Run(_manager);
+        node.Run(manager);
         return new VoidLangValue();
     }
 
@@ -331,7 +331,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 ImportStatement.Run()
         // Import 语句逻辑已封装在 Run 方法中，直接调用
-        node.Run(_manager);
+        node.Run(manager);
         return new VoidLangValue();
     }
 
@@ -342,7 +342,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 NativeStatement.Run()
         // Native 方法绑定逻辑已封装在 Run 方法中，直接调用
-        node.Run(_manager);
+        node.Run(manager);
         return new VoidLangValue();
     }
 
@@ -353,7 +353,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 AsyncForInStatement.Run()
         // 异步 for-in 循环逻辑已封装在 Run 方法中，直接调用
-        node.Run(_manager);
+        node.Run(manager);
         return new VoidLangValue();
     }
 }

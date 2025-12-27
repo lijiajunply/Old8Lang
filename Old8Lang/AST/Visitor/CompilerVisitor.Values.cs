@@ -15,7 +15,7 @@ public partial class CompilerVisitor
     public object? VisitIntLangValue(IntLangValue node)
     {
         // 迁移自 IntLangValue.LoadIlValue()
-        _ilGenerator.Emit(OpCodes.Ldc_I4, node.Value);
+        ilGenerator.Emit(OpCodes.Ldc_I4, node.Value);
         return null;
     }
 
@@ -25,7 +25,7 @@ public partial class CompilerVisitor
     public object? VisitDoubleLangValue(DoubleLangValue node)
     {
         // 迁移自 DoubleLangValue.LoadIlValue()
-        _ilGenerator.Emit(OpCodes.Ldc_R8, node.Value);
+        ilGenerator.Emit(OpCodes.Ldc_R8, node.Value);
         return null;
     }
 
@@ -35,7 +35,7 @@ public partial class CompilerVisitor
     public object? VisitStringLangValue(StringLangValue node)
     {
         // 迁移自 StringLangValue.LoadIlValue()
-        _ilGenerator.Emit(OpCodes.Ldstr, node.Value);
+        ilGenerator.Emit(OpCodes.Ldstr, node.Value);
         return null;
     }
 
@@ -45,7 +45,7 @@ public partial class CompilerVisitor
     public object? VisitBoolLangValue(BoolLangValue node)
     {
         // 迁移自 BoolLangValue.LoadIlValue()
-        _ilGenerator.Emit(node.Value ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
+        ilGenerator.Emit(node.Value ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
         return null;
     }
 
@@ -55,7 +55,7 @@ public partial class CompilerVisitor
     public object? VisitCharLangValue(CharLangValue node)
     {
         // 迁移自 CharLangValue.LoadIlValue()
-        _ilGenerator.Emit(OpCodes.Ldc_I4, (int)node.Value);
+        ilGenerator.Emit(OpCodes.Ldc_I4, (int)node.Value);
         return null;
     }
 
@@ -65,7 +65,7 @@ public partial class CompilerVisitor
     public object? VisitNullLangValue(NullLangValue node)
     {
         // 迁移自 NullLangValue.LoadIlValue()
-        _ilGenerator.Emit(OpCodes.Ldnull);
+        ilGenerator.Emit(OpCodes.Ldnull);
         return null;
     }
 

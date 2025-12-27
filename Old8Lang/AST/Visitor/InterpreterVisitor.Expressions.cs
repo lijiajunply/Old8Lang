@@ -18,12 +18,12 @@ public partial class InterpreterVisitor
         if (node.IdName == "this")
         {
             // 直接从变量储存器中获取名为"this"的变量
-            if (_manager == null)
+            if (manager == null)
             {
                 throw new NameError(node.Position, "this");
             }
 
-            var thisValue = _manager.GetValue(new LangId("this"));
+            var thisValue = manager.GetValue(new LangId("this"));
             if (thisValue != null)
             {
                 return thisValue;
@@ -34,16 +34,16 @@ public partial class InterpreterVisitor
         }
 
         // 先尝试获取普通变量
-        if (_manager != null!)
+        if (manager != null!)
         {
-            var value = _manager.GetValue(node);
+            var value = manager.GetValue(node);
             if (value != null)
             {
                 return value;
             }
 
             // 如果不是普通变量，尝试获取类或函数
-            var anyValue = _manager.GetAny(node);
+            var anyValue = manager.GetAny(node);
             if (anyValue != null)
             {
                 return anyValue as LangValueType ?? throw new NameError(node.Position, node.IdName);
@@ -69,7 +69,7 @@ public partial class InterpreterVisitor
         // 迁移自 Operation.Run()
         // Operation 逻辑非常复杂（900+行），包含所有运算符的处理
         // 暂时调用原方法，后续再详细迁移
-        return node.Run(_manager);
+        return node.Run(manager);
     }
 
     /// <summary>
@@ -80,7 +80,7 @@ public partial class InterpreterVisitor
         // 迁移自 FunctionCallExpression.Run()
         // FunctionCallExpression 逻辑非常复杂，包含函数调用、方法重载等
         // 暂时调用原方法，后续再详细迁移
-        return node.Run(_manager);
+        return node.Run(manager);
     }
 
     /// <summary>
@@ -109,7 +109,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 AwaitExpression.Run()
         // 暂时调用原方法
-        return node.Run(_manager);
+        return node.Run(manager);
     }
 
     /// <summary>
@@ -119,7 +119,7 @@ public partial class InterpreterVisitor
     {
         // 迁移自 AsyncStreamExpression.Run()
         // 暂时调用原方法
-        return node.Run(_manager);
+        return node.Run(manager);
     }
 
     /// <summary>
@@ -129,6 +129,6 @@ public partial class InterpreterVisitor
     {
         // 迁移自 SuperExpression.Run()
         // 暂时调用原方法
-        return node.Run(_manager);
+        return node.Run(manager);
     }
 }
