@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0" />
+        <PackageReference Include="MySql.Data" Version="9.0.0" />
+        <PackageReference Include="Npgsql" Version="9.0.0" />
+        <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
+        <PackageReference Include="Dapper" Version="2.1.39" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Old8Lang\Old8Lang.csproj" />
+    </ItemGroup>
+
+</Project>
