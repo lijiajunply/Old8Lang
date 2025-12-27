@@ -3,7 +3,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.Tests.Integration;
+namespace Old8Lang.Tests.Interpreter.Integration;
 
 /// <summary>
 /// 解释器集成测试 - 完整的 Tokenize → Parse → Interpret 流程测试

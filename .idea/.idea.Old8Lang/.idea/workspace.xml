@@ -22,12 +22,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DefinitionHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DefinitionHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/HoverHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/HoverHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/TextDocumentSyncHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/TextDocumentSyncHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Models/DocumentParseResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Models/DocumentParseResult.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/DocumentManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/DocumentManager.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/AssignmentTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/ExpressionTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/InExpressionCompilerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Functions/FunctionDeclarationTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Integration/CompilerIntegrationTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Integration/EndToEndCompileTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Statements/ControlFlowTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/CompilerIntegrationTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/EndToEndCompileTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -503,7 +508,7 @@
       <workItem from="1766441034395" duration="1692000" />
       <workItem from="1766461431015" duration="981000" />
       <workItem from="1766746850670" duration="17415000" />
-      <workItem from="1766771063664" duration="15229000" />
+      <workItem from="1766771063664" duration="16661000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -848,7 +853,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="385" />
+    <option name="localTasksCounter" value="386" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -875,7 +880,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(PackageService): 移除未使用的配置管理器并改进包源配置&#10;&#10;- 移除了未使用的 IPackageConfigurationManager 字段&#10;- 修改 ConfigurePackageSources 方法以接受 projectConfig 参数&#10;- 实现了从项目配置中读取自定义包源的功能&#10;- 添加了对远程包源的配置支持&#10;- 移除了 TODO 注释并实现了相应的功能" />
     <MESSAGE value="refactor(ast): 重构导入和原生库路径解析逻辑&#10;&#10;- 移除了 ImportInfoCommand 命令及其相关注册&#10;- 更新 DllPathResolver 使用项目根目录查找策略，标记 importPath 参数为已弃用&#10;- 重构 ImportStatement 支持标准库、包管理和本地文件的优先级查找&#10;- 为编译模式添加 FindPackagePathForCompiler 方法实现包路径查找&#10;- 修改 NativeStatement 不再使用 importPath 参数，更新错误处理机制&#10;- 优化 MethodList 空值检查使用模式匹配语法" />
     <MESSAGE value="refactor(lang): 移除废弃的库信息管理功能&#10;&#10;- 移除了 LangInfo 类中的 LibInfos 属性及其废弃标记&#10;- 修改 ChangeBasicInfo 方法不再设置 LibInfos 字段&#10;- 删除 ReadJson 方法上的 Obsolete 标记&#10;- 移除读取 JSON 时的默认库信息填充逻辑&#10;- 更新方法注释移除向后兼容说明&#10;- 简化 LangInfo 对象创建逻辑" />
     <MESSAGE value="refactor(ast): 重构模块导入机制和符号提取逻辑&#10;&#10;- 重构 ImportStatement 中的模块导入逻辑，使用临时作用域执行模块代码&#10;- 实现从执行结果中提取符号并创建统一模块对象的功能&#10;- 添加对函数、类、变量等不同类型符号的识别和提取&#10;- 重构 UnifiedModule 中的符号存储和访问机制&#10;- 优化模块加载过程中的作用域管理和符号提取&#10;- 更新常量定义语法从 &quot;const NAME &lt;- value&quot; 到 &quot;NAME:const &lt;- value&quot;&#10;- 修复循环依赖测试中的模块导入问题&#10;- 优化模块对象的创建和符号管理流程" />
@@ -900,7 +904,8 @@
     <MESSAGE value="feat(serialization): 添加序列化库实现&#10;&#10;- 实现 MessagePack 序列化器和 Protobuf 序列化器&#10;- 创建统一的 ISerializer 接口和序列化工厂&#10;- 添加序列化扩展方法和深度克隆功能&#10;- 创建序列化库使用示例和绑定类&#10;- 添加单元测试验证序列化功能&#10;- 更新解决方案文件和项目引用&#10;- 添加序列化库 README 文档" />
     <MESSAGE value="refactor(serialization): 重构MessagePackSerializer字段命名并更新StandardLibraryRegistry&#10;&#10;- 将MessagePackSerializer中的私有字段从_options重命名为Options以符合命名规范&#10;- 更新所有使用_options字段的地方为Options&#10;- 将数组创建语法从new object[]替换为集合表达式[]&#10;- 在StandardLibraryRegistry中注册SerializationLib标准库及其相关类名" />
     <MESSAGE value="feat(ml): 添加机器学习库核心功能&#10;&#10;- 实现了分类训练器，支持逻辑回归、快速树和LightGBM等算法&#10;- 实现了回归训练器，支持SDCA、快速树和LightGBM等算法&#10;- 实现了聚类训练器，支持K-Means算法&#10;- 添加了数据加载器，支持CSV和内存数据加载&#10;- 实现了模型预测器，支持单个和批量预测&#10;- 添加了ML上下文包装器，提供统一的API入口&#10;- 实现了机器学习库绑定类，供Old8Lang调用&#10;- 添加了完整的单元测试覆盖所有核心功能&#10;- 提供了详细的使用示例，包含分类、回归和聚类场景" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(ml): 添加机器学习库核心功能&#10;&#10;- 实现了分类训练器，支持逻辑回归、快速树和LightGBM等算法&#10;- 实现了回归训练器，支持SDCA、快速树和LightGBM等算法&#10;- 实现了聚类训练器，支持K-Means算法&#10;- 添加了数据加载器，支持CSV和内存数据加载&#10;- 实现了模型预测器，支持单个和批量预测&#10;- 添加了ML上下文包装器，提供统一的API入口&#10;- 实现了机器学习库绑定类，供Old8Lang调用&#10;- 添加了完整的单元测试覆盖所有核心功能&#10;- 提供了详细的使用示例，包含分类、回归和聚类场景" />
+    <MESSAGE value="refactor(language-server): 重构语言服务器依赖注入和字段命名&#10;&#10;- 移除 MediatR 相关引用&#10;- 使用主构造函数注入 DocumentManager 服务&#10;- 将私有字段从 _documentManager 重命名为 documentManager&#10;- 更新 DocumentManager 中的字段命名从 _documents 到 Documents&#10;- 更新所有使用字段的地方为新的命名规范&#10;- 更新 workspace.xml 配置文件中的项目引用和运行配置" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(language-server): 重构语言服务器依赖注入和字段命名&#10;&#10;- 移除 MediatR 相关引用&#10;- 使用主构造函数注入 DocumentManager 服务&#10;- 将私有字段从 _documentManager 重命名为 documentManager&#10;- 更新 DocumentManager 中的字段命名从 _documents 到 Documents&#10;- 更新所有使用字段的地方为新的命名规范&#10;- 更新 workspace.xml 配置文件中的项目引用和运行配置" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -995,19 +1000,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="565" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs</url>
-          <line>163</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Integration/InExpressionIntegrationTests.cs" containingFunctionPresentation="方法 'CompileMode_InExpression_ShouldWork'">
-            <startOffsets>
-              <option value="4437" />
-            </startOffsets>
-            <endOffsets>
-              <option value="4509" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="570" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILGenerationTests.cs</url>

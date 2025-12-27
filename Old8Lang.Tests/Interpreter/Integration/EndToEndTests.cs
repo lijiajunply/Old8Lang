@@ -3,7 +3,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Interpreter;
 using Xunit.Abstractions;
 
-namespace Old8Lang.Tests.Integration;
+namespace Old8Lang.Tests.Interpreter.Integration;
 
 /// <summary>
 /// 端到端测试 - 验证完整的真实场景

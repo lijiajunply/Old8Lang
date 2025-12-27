@@ -1,7 +1,7 @@
 using Old8Lang.AST.Statement;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.Tests.Integration;
+namespace Old8Lang.Tests.Interpreter.Integration;
 
 public class InterpreterTests
 {

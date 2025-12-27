@@ -1,14 +1,14 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.Tests.Integration;
+namespace Old8Lang.Tests.Interpreter.Expressions;
 
 /// <summary>
 /// In表达式集成测试
 /// 测试in表达式和for-in循环的实际运行效果
 /// </summary>
 [Collection("Sequential")]
-public class InExpressionIntegrationTests
+public class InExpressionTests
 {
     #region in表达式运行测试
 
@@ -143,42 +143,6 @@ public class InExpressionIntegrationTests
         // Assert
         var sum = interpreter.Manager.GetValue(new LangId("evenCount"));
         Assert.Equal(2, sum?.GetValue<int>());
-    }
-
-    #endregion
-
-    #region 编译模式测试
-
-    /// <summary>
-    /// 测试in表达式在编译模式下的运行效果
-    /// </summary>
-    [Fact]
-    public void CompileMode_InExpression_ShouldWork()
-    {
-        // Arrange
-        var interpreter = new LangInterpreter();
-        var code = "a <- 1 in [1, 2, 3]";
-
-        // Act
-        var ast = interpreter.Build(code);
-        var compiled = Compiler.Compiler.Compile(ast, "test.old8", interpreter);
-        Assert.NotNull(compiled);
-    }
-
-    /// <summary>
-    /// 测试for-in循环在编译模式下的运行效果
-    /// </summary>
-    [Fact]
-    public void CompileMode_ForInLoop_ShouldWork()
-    {
-        // Arrange
-        var interpreter = new LangInterpreter();
-        var code = "sum <- 0; for item in [1, 2, 3] { sum <- sum + item }";
-
-        // Act
-        var ast = interpreter.Build(code);
-        var compiled = Compiler.Compiler.Compile(ast, "test.old8", interpreter);
-        Assert.NotNull(compiled);
     }
 
     #endregion

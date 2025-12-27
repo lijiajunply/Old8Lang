@@ -1,6 +1,6 @@
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.Tests.Integration;
+namespace Old8Lang.Tests.Compiler.Integration;
 
 /// <summary>
 /// 编译模式端到端测试 - 验证从源代码到目标代码输出的全过程
@@ -34,7 +34,7 @@ public class EndToEndCompileTests
         {
             // Act
             var interpreter = new LangInterpreter();
-            var compiledAction = Compiler.Compiler.Compile(testFile, interpreter);
+            var compiledAction = Old8Lang.Compiler.Compiler.Compile(testFile, interpreter);
 
             // Assert
             Assert.NotNull(compiledAction);
@@ -109,7 +109,7 @@ public class EndToEndCompileTests
 
         // Act
         var ast = interpreter.Build(code);
-        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
         // Assert
         Assert.NotNull(compiledAction);
@@ -173,7 +173,7 @@ public class EndToEndCompileTests
 
         // Act
         var ast = interpreter.Build(code);
-        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
         // Assert
         Assert.NotNull(compiledAction);
@@ -214,7 +214,7 @@ public class EndToEndCompileTests
 
         // Act
         var ast = interpreter.Build(code);
-        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
         // Assert
         Assert.NotNull(compiledAction);
@@ -261,7 +261,7 @@ public class EndToEndCompileTests
 
         // Act
         var ast = interpreter.Build(code);
-        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
         // Assert
         Assert.NotNull(compiledAction);
@@ -332,7 +332,7 @@ public class EndToEndCompileTests
 
         // Act
         var ast = interpreter.Build(code);
-        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
         // Assert
         Assert.NotNull(compiledAction);
@@ -377,7 +377,7 @@ public class EndToEndCompileTests
 
         // Act
         var ast = interpreter.Build(code);
-        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
         // Assert
         Assert.NotNull(compiledAction);
@@ -422,7 +422,7 @@ public class EndToEndCompileTests
 
         // Act
         var ast = interpreter.Build(code);
-        var compiledAction = Compiler.Compiler.Compile(ast, "test", interpreter);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
         // Assert
         Assert.NotNull(compiledAction);
