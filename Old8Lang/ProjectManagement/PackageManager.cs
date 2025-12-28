@@ -2,7 +2,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.ModuleObjects;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.PackageManagement;
+namespace Old8Lang.ProjectManagement;
 
 /// <summary>
 /// Old8Lang 运行时包加载器

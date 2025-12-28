@@ -43,12 +43,12 @@ public class VariateManager
     /// <summary>
     /// 第三方包管理器实例（延迟初始化）
     /// </summary>
-    private PackageManagement.PackageManager? PackageManager;
+    private ProjectManagement.PackageManager? PackageManager;
 
     /// <summary>
     /// 获取包管理器实例
     /// </summary>
-    public PackageManagement.PackageManager GetPackageManager()
+    public ProjectManagement.PackageManager GetPackageManager()
     {
         if (PackageManager == null)
         {
@@ -57,7 +57,7 @@ public class VariateManager
                 ? System.IO.Path.GetDirectoryName(Path)
                 : Directory.GetCurrentDirectory();
 
-            PackageManager = new PackageManagement.PackageManager(projectRoot: projectRoot);
+            PackageManager = new ProjectManagement.PackageManager(projectRoot: projectRoot);
         }
 
         return PackageManager;

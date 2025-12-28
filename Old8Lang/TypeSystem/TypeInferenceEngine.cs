@@ -76,7 +76,7 @@ public class TypeInferenceEngine
     /// <summary>
     /// 收集所有函数声明
     /// </summary>
-    private void CollectFunctionDeclarations(IOldLangTree tree)
+    private void CollectFunctionDeclarations(IOldLangTree? tree)
     {
         if (tree is FuncInit funcInit)
         {
@@ -117,7 +117,7 @@ public class TypeInferenceEngine
     /// <summary>
     /// 分析单个AST节点
     /// </summary>
-    private void AnalyzeNode(IOldLangTree node)
+    private void AnalyzeNode(IOldLangTree? node)
     {
         switch (node)
         {
@@ -131,10 +131,7 @@ public class TypeInferenceEngine
 
             case FuncInit funcInit:
                 // 在函数体内递归分析
-                if (funcInit.FuncLangValue != null)
-                {
-                    AnalyzeNode(funcInit.FuncLangValue);
-                }
+                AnalyzeNode(funcInit.FuncLangValue);
 
                 break;
         }
@@ -226,7 +223,7 @@ public class TypeInferenceEngine
         // 查找函数并更新参数类型
         if (FunctionRegistry.TryGetValue(funcName, out var funcInit))
         {
-            if (funcInit.FuncLangValue?.Ids != null &&
+            if (funcInit.FuncLangValue.Ids != null &&
                 paramIndex < funcInit.FuncLangValue.Ids.Count)
             {
                 var param = funcInit.FuncLangValue.Ids[paramIndex];
@@ -257,8 +254,7 @@ public class TypeInferenceEngine
 
         if (FunctionRegistry.TryGetValue(funcName, out var funcInit))
         {
-            if (funcInit.FuncLangValue != null &&
-                string.IsNullOrEmpty(funcInit.FuncLangValue.Id?.AssumptionType))
+            if (string.IsNullOrEmpty(funcInit.FuncLangValue.Id?.AssumptionType))
             {
                 // 存储推断的返回类型
                 var returnTypeKey = $"{funcName}_return_type";
@@ -277,7 +273,7 @@ public class TypeInferenceEngine
     /// </summary>
     public bool InferFunctionTypes(FuncInit funcInit)
     {
-        if (!Config.EnableTypeInference || funcInit.FuncLangValue == null)
+        if (!Config.EnableTypeInference)
             return true;
 
         try
@@ -326,7 +322,7 @@ public class TypeInferenceEngine
     /// </summary>
     public bool NeedsTypeInference(FuncInit funcInit)
     {
-        if (!Config.EnableTypeInference || funcInit.FuncLangValue == null)
+        if (!Config.EnableTypeInference)
             return false;
 
         // 检查是否有参数缺少类型注解

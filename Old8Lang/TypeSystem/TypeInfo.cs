@@ -106,7 +106,7 @@ public class ClassTypeInfo(string name, ITypeInfo? baseType = null) : ITypeInfo
             }
 
             // 递归获取父类成员
-            if (BaseType != null && BaseType is ClassTypeInfo baseClassInfo)
+            if (BaseType is ClassTypeInfo baseClassInfo)
             {
                 var baseMembers = baseClassInfo.GetMembers(manager);
                 foreach (var member in baseMembers)
@@ -250,9 +250,9 @@ public class GenericTypeInfo : ITypeInfo
             {
                 newTypeArguments[paramName] = genericParam.SubstituteTypeParameters(substitutions);
             }
-            else if (substitutions.ContainsKey(paramType.Name))
+            else if (substitutions.TryGetValue(paramType.Name, out var substitution))
             {
-                newTypeArguments[paramName] = substitutions[paramType.Name];
+                newTypeArguments[paramName] = substitution;
             }
             else
             {
@@ -287,8 +287,6 @@ public class GenericTypeInfo : ITypeInfo
                         return false;
                     }
                 }
-
-                return true;
             }
 
             return true;

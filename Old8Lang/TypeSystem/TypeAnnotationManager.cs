@@ -432,8 +432,8 @@ public class ParsedTypeAnnotation
 
     /// <summary>
     /// 泛型类型参数（递归结构，支持嵌套泛型）
-    /// 例如: List<int> → GenericArguments = [ParsedTypeAnnotation{BaseType="int"}]
-    /// 例如: Map<string, List<int>> → GenericArguments = [ParsedTypeAnnotation{BaseType="string"}, ParsedTypeAnnotation{BaseType="List", GenericArguments=[...]}]
+    /// 例如: List&lt;int> → GenericArguments = [ParsedTypeAnnotation{BaseType="int"}]
+    /// 例如: Map&lt;string, List&lt;int>> → GenericArguments = [ParsedTypeAnnotation{BaseType="string"}, ParsedTypeAnnotation{BaseType="List", GenericArguments=[...]}]
     /// </summary>
     public List<ParsedTypeAnnotation>? GenericArguments { get; set; }
 

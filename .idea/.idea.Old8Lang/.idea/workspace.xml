@@ -22,21 +22,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/generic_class_basic.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/generic_function_basic.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/generic_multi_params.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericInstanceExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericInstanceExpression.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/LangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/LangInterpreter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.DatabaseLib/Old8Lang.DatabaseLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.DatabaseLib/Old8Lang.DatabaseLib.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Old8Lang.LanguageServer.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Old8Lang.LanguageServer.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.MachineLearningLib/Old8Lang.MachineLearningLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.MachineLearningLib/Old8Lang.MachineLearningLib.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.NetLib/Old8Lang.NetLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.NetLib/Old8Lang.NetLib.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ImportStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeAnnotationManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeAnnotationManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeChecker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeChecker.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeConstraint.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeConstraint.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeConstraintCollector.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeConstraintCollector.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeConstraintSolver.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeConstraintSolver.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeInferenceEngine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeInferenceEngine.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/Old8LangLib.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -922,7 +920,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="411" />
+    <option name="localTasksCounter" value="413" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -949,8 +947,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(compiler): 添加算术表达式、数组操作和边界条件的编译测试&#10;&#10;- 实现算术表达式编译测试，覆盖加减乘除模运算和复杂表达式&#10;- 添加数组操作编译测试，包括数组创建、访问、赋值和连接功能&#10;- 创建边界条件编译测试，验证各种数据类型的边界值处理&#10;- 补充比较表达式编译测试，验证大小比较运算的正确性&#10;- 增加数值、字符串、集合等各类边界情况的编译验证&#10;- 添加嵌套结构和特殊变量名的编译边界测试" />
-    <MESSAGE value="feat(interpreter): 添加Assert类支持断言功能&#10;&#10;- 实现Assert类的全局单例实例&#10;- 添加AssertEqual、AssertNotEqual等20多个断言方法&#10;- 支持数值、字符串、布尔值和集合的断言比较&#10;- 实现异常抛出和类型检查断言功能&#10;- 添加IL代码生成支持断言方法调用&#10;- 在解释器中注册Assert全局对象" />
     <MESSAGE value="refactor(generators): 重命名生成器状态机类&#10;&#10;- 将 NewGeneratorStateMachine 重命名为 GeneratorStateMachine&#10;- 更新 GeneratorLangValue 中的状态机类型引用&#10;- 更新 GeneratorStateMachineBuilder 中的构造函数调用&#10;- 重命名相关方法参数类型以保持一致性" />
     <MESSAGE value="refactor(visitor): 将编译器和解释器访问者重构为主构造函数依赖注入&#10;&#10;- 将 CompilerVisitor、InterpreterVisitor 和 TypeInferenceVisitor 从字段注入改为主构造函数注入&#10;- 移除私有只读字段 _ilGenerator、_local 和 _manager&#10;- 更新所有访问方法中的字段引用为构造函数参数引用&#10;- 简化类初始化逻辑，提高代码可读性和依赖关系清晰度" />
     <MESSAGE value="feat(interpreter): 添加测试运行器和模拟库支持并重构全局函数注册器&#10;&#10;- 重命名 GenerateIL 方法为 GenerateIl 以符合命名规范&#10;- 重构 GlobalFunctionRegistry 为线程安全实现，使用 lock 保护操作&#10;- 将私有字段 _functions 和 _registerLock 重命名为 Functions 和 RegisterLock&#10;- 优化 Register 方法中的重复检查逻辑，使用 Any 替代 foreach 循环&#10;- 为 TryGetFunction、HasFunction、GetAllFunctionNames 和 Unregister 方法添加线程安全锁&#10;- 重命名 TryGenerateGlobalFunctionIL 为 TryGenerateGlobalFunctionIl&#10;- 更新 IOFunctions 中的 WriteLine 方法调用以使用简化语法&#10;- 在 LangInterpreter 中注册新的 TestRunner 和 Mock 全局对象&#10;- 添加 MockLibClassLangValue 类以提供模拟库的静态方法访问&#10;- 添加 TestRunnerClassLangValue 类以提供测试运行器的静态方法访问&#10;- 重命名标准库注册表中的 ImageLib 为 Image 并添加机器学习库支持&#10;- 移除旧的 AssertLib 和 MockLib 注册项，整合到新的实现中" />
@@ -974,7 +970,9 @@
     <MESSAGE value="refactor(module-system): 重构模块系统内部字段命名和构造函数&#10;&#10;- 将 CacheManager 中的私有字段从 _moduleCache 和 _cacheLock 重命名为 ModuleCache 和 CacheLock&#10;- 将 ModuleLoader 的构造函数改为主构造函数形式，移除字段赋值语句&#10;- 将 ModuleResolver 中的私有字段从 _pathResolver 和 _versionResolver 重命名为 PathResolver 和 VersionResolver&#10;- 将 NetworkModuleLoader 中的私有字段从 _cacheDirectory 重命名为 CacheDirectory&#10;- 使用集合表达式替换 HashSet 初始化语法&#10;- 优化条件判断语法，使用属性模式匹配替代 Count 检查&#10;- 使用 GetValueOrDefault 方法替代 TryGetValue 检查&#10;- 为 ImportOptions 和 ModuleImportResult 类添加 Serializable 特性&#10;- 更新 workspace.xml 中的文件变更列表和任务计数器" />
     <MESSAGE value="feat(parser): 添加泛型语法支持&#10;&#10;- 实现泛型类解析支持，包括单个和多个类型参数&#10;- 实现泛型函数解析支持，包含泛型参数和返回类型&#10;- 添加泛型约束语法解析，支持单个和多个约束&#10;- 实现嵌套泛型类型解析，支持任意深度嵌套&#10;- 添加泛型实例化语法支持，包括类和函数实例化&#10;- 扩展访问修饰符与泛型结合使用的解析逻辑&#10;- 创建GenericInstanceExpression处理泛型实例化表达式&#10;- 添加GenericParameter类定义泛型参数结构&#10;- 更新FuncLangValue支持泛型函数实例化功能&#10;- 修改ClassParser和FunctionParser集成泛型语法解析&#10;- 添加泛型语法测试用例覆盖各种泛型场景" />
     <MESSAGE value="feat(parser): 添加泛型语法支持&#10;&#10;- 实现泛型类解析支持，包括单个和多个类型参数&#10;- 实现泛型函数解析支持，包含泛型参数和返回类型&#10;- 添加泛型约束语法解析，支持单个和多个约束&#10;- 实现嵌套泛型类型解析，支持任意深度嵌套&#10;- 添加泛型实例化语法支持，包括类和函数实例化&#10;- 扩展访问修饰符与泛型结合使用的解析逻辑&#10;- 创建GenericInstanceExpression处理泛型实例化表达式&#10;- 添加GenericParameter类定义泛型参数结构&#10;- 更新FuncLangValue支持泛型函数实例化功能&#10;- 修改ClassParser和FunctionParser集成泛型语法解析&#10;- 添加泛型语法测试用例覆盖各种泛型场景&#10;- 实现启发式方法判断泛型实例化避免误解析比较运算符&#10;- 支持小写自定义类型名称作为泛型参数的解析&#10;- 添加内置类型名称判断方法IsBuiltInTypeName&#10;- 优化字符串模板中转义字符的处理逻辑" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 添加泛型语法支持&#10;&#10;- 实现泛型类解析支持，包括单个和多个类型参数&#10;- 实现泛型函数解析支持，包含泛型参数和返回类型&#10;- 添加泛型约束语法解析，支持单个和多个约束&#10;- 实现嵌套泛型类型解析，支持任意深度嵌套&#10;- 添加泛型实例化语法支持，包括类和函数实例化&#10;- 扩展访问修饰符与泛型结合使用的解析逻辑&#10;- 创建GenericInstanceExpression处理泛型实例化表达式&#10;- 添加GenericParameter类定义泛型参数结构&#10;- 更新FuncLangValue支持泛型函数实例化功能&#10;- 修改ClassParser和FunctionParser集成泛型语法解析&#10;- 添加泛型语法测试用例覆盖各种泛型场景&#10;- 实现启发式方法判断泛型实例化避免误解析比较运算符&#10;- 支持小写自定义类型名称作为泛型参数的解析&#10;- 添加内置类型名称判断方法IsBuiltInTypeName&#10;- 优化字符串模板中转义字符的处理逻辑" />
+    <MESSAGE value="feat(interpreter): 实现泛型类型参数映射和约束验证功能&#10;&#10;- 添加 TypeArgumentMapping 属性到 AnyLangValue 和 FuncLangValue 类&#10;- 在函数执行时传递泛型类型参数映射到执行管理器&#10;- 实现泛型函数和泛型类方法的类型参数验证逻辑&#10;- 添加类型注解管理器到解释器并传递给泛型实例化过程&#10;- 实现泛型约束验证功能，检查类型参数是否满足约束条件&#10;- 添加多类型参数泛型类和函数的测试用例&#10;- 修复泛型实例化表达式的解析和执行逻辑&#10;- 优化类型检查器支持泛型类型参数映射解析" />
+    <MESSAGE value="refactor(ast): 优化导入语句和标准库加载逻辑&#10;&#10;- 移除未使用的注释和变量声明&#10;- 简化 ImportStatement 中的模块导入处理逻辑&#10;- 调整标准库加载器中的返回值处理&#10;- 添加必要的命名空间引用&#10;- 优化代码结构和错误处理机制" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 优化导入语句和标准库加载逻辑&#10;&#10;- 移除未使用的注释和变量声明&#10;- 简化 ImportStatement 中的模块导入处理逻辑&#10;- 调整标准库加载器中的返回值处理&#10;- 添加必要的命名空间引用&#10;- 优化代码结构和错误处理机制" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

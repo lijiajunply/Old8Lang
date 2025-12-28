@@ -11,7 +11,7 @@ public enum TypeConstraintKind
     Equality,
 
     /// <summary>
-    /// 子类型约束：T <: SomeType
+    /// 子类型约束：T &lt;: SomeType
     /// </summary>
     Subtype,
 

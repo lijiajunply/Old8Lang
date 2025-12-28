@@ -55,7 +55,7 @@ public abstract class Program
         Compiler.Compiler.CurrentLogLevel = logLevel;
 
         // 设置 PackageManager 的调试日志
-        PackageManagement.PackageManager.DebugEnabled = debugEnabled;
+        ProjectManagement.PackageManager.DebugEnabled = debugEnabled;
 
         // 交互式命令行模式
         if (args.Length == 0)

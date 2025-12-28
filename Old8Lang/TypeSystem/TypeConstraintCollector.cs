@@ -16,7 +16,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
     /// </summary>
     public void CollectFromFunction(FuncInit funcInit)
     {
-        if (funcInit.FuncLangValue?.Ids == null)
+        if (funcInit.FuncLangValue.Ids == null)
             return;
 
         var funcName = funcInit.FuncLangValue.Id?.IdName ?? "anonymous";
@@ -143,12 +143,12 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
     /// <summary>
     /// 递归收集所有return语句的类型
     /// </summary>
-    private void CollectReturnTypes(IOldLangTree tree, List<Type> returnTypes)
+    private void CollectReturnTypes(IOldLangTree? tree, List<Type> returnTypes)
     {
         if (tree is ReturnStatement returnStmt)
         {
             var returnType = returnStmt.OutputType(localManager);
-            if (returnType != null && returnType != typeof(void))
+            if (returnType != typeof(void))
             {
                 returnTypes.Add(returnType);
             }
@@ -169,7 +169,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
     /// </summary>
     public void CollectFromFunctionCall(FunctionCallExpression callExpr, string targetFuncName)
     {
-        if (callExpr.Arguments == null)
+        if (callExpr.Arguments == null!)
             return;
 
         // 记录调用信息，用于反向推断参数类型
@@ -208,20 +208,20 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
     /// </summary>
     public void CollectFromAssignment(SetStatement setStmt)
     {
-        var varName = setStmt.Id.IdName;
+        var varName = setStmt.Id?.IdName;
         var valueType = setStmt.Value.OutputType(localManager);
 
         if (valueType != null)
         {
             // 如果变量有显式类型注解，验证兼容性
-            if (!string.IsNullOrEmpty(setStmt.Id.AssumptionType))
+            if (!string.IsNullOrEmpty(setStmt.Id?.AssumptionType))
             {
                 var declaredType = ParseTypeAnnotation(setStmt.Id.AssumptionType);
                 if (declaredType != null)
                 {
                     context.AddConstraint(new TypeConstraint(
                         TypeConstraintKind.Equality,
-                        varName,
+                        varName ?? "",
                         declaredType,
                         setStmt.Position,
                         confidence: 1.0
@@ -233,7 +233,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
                 // 从赋值推断变量类型
                 context.AddConstraint(new TypeConstraint(
                     TypeConstraintKind.Assignment,
-                    varName,
+                    varName ?? "",
                     valueType,
                     setStmt.Position,
                     confidence: 0.85
@@ -337,7 +337,7 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
         if (types.All(t => !t.IsValueType))
         {
             // 查找公共基类
-            Type? commonBase = types[0];
+            Type commonBase = types[0];
             foreach (var type in types.Skip(1))
             {
                 commonBase = FindCommonBaseClass(commonBase, type);
@@ -345,14 +345,14 @@ public class TypeConstraintCollector(TypeInferenceContext context, LocalManager 
                     break;
             }
 
-            return commonBase ?? typeof(object);
+            return commonBase;
         }
 
         // 默认返回object
         return typeof(object);
     }
 
-    private Type? FindCommonBaseClass(Type? type1, Type type2)
+    private Type FindCommonBaseClass(Type? type1, Type type2)
     {
         if (type1 == null)
             return type2;

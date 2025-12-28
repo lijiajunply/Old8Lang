@@ -124,7 +124,7 @@ public partial class ImportStatement(
             HandleLazyImport(manager);
             return;
         }
-        
+
         var symbolAliases = ImportSpecifiers
             .Where(item => item.Name != item.Alias)
             .ToDictionary(item => item.Name, item => item.Alias);
@@ -195,7 +195,7 @@ public partial class ImportStatement(
             else if (moduleImportInfos != null && TryFindInImportInfos(moduleImportInfos, specifier.Name, out value))
             {
                 // 将指定成员添加到父作用域，支持重命名
-                parentScope[specifier.Alias] = value;
+                parentScope[specifier.Alias] = value!;
             }
             // 最后从全局导入信息中查找
             else if ((value = manager.GetValue(new LangId(specifier.Name))) != null)

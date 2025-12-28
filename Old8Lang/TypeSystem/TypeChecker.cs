@@ -71,9 +71,9 @@ public static class TypeChecker
                 var expectedType = parameter.AssumptionType;
 
                 // 如果是泛型类型参数，尝试解析为实际类型
-                if (typeArgumentMapping != null && typeArgumentMapping.ContainsKey(expectedType))
+                if (typeArgumentMapping != null && typeArgumentMapping.TryGetValue(expectedType, out var value))
                 {
-                    expectedType = typeArgumentMapping[expectedType].Name;
+                    expectedType = value.Name;
                 }
 
                 var actualType = GetLangValueType(argumentValue);
@@ -334,9 +334,9 @@ public static class TypeChecker
         if (string.IsNullOrEmpty(expectedReturnType)) return actualReturnValue; // 没有返回类型注解，跳过检查
 
         // 如果是泛型类型参数，尝试解析为实际类型
-        if (typeArgumentMapping != null && typeArgumentMapping.ContainsKey(expectedReturnType))
+        if (typeArgumentMapping != null && typeArgumentMapping.TryGetValue(expectedReturnType, out var value))
         {
-            expectedReturnType = typeArgumentMapping[expectedReturnType].Name;
+            expectedReturnType = value.Name;
         }
 
         var actualType = GetLangValueType(actualReturnValue);
@@ -403,6 +403,7 @@ public static class TypeChecker
                 {
                     return IntLangValue.Create(intVal);
                 }
+
                 if (value is DoubleLangValue dblValue)
                 {
                     return IntLangValue.Create((int)dblValue.Value);
@@ -416,6 +417,7 @@ public static class TypeChecker
                 {
                     return DoubleLangValue.Create(intValue.Value);
                 }
+
                 if (value is StringLangValue strValue && double.TryParse(strValue.Value, out var dblVal))
                 {
                     return DoubleLangValue.Create(dblVal);
@@ -429,6 +431,7 @@ public static class TypeChecker
                 {
                     return BoolLangValue.Create(boolVal);
                 }
+
                 if (value is IntLangValue intValue)
                 {
                     return BoolLangValue.Create(intValue.Value != 0);

@@ -306,7 +306,7 @@ public class TypeConstraintSolver(TypeInferenceContext context, TypeInferenceCon
         if (types.Count == 1)
             return types[0];
 
-        Type? mostSpecific = types[0];
+        Type mostSpecific = types[0];
         foreach (var type in types.Skip(1))
         {
             if (mostSpecific.IsAssignableFrom(type))
@@ -349,7 +349,7 @@ public class TypeConstraintSolver(TypeInferenceContext context, TypeInferenceCon
             return typeof(int);
 
         // 查找公共基类
-        Type? commonType = types[0];
+        Type commonType = types[0];
         foreach (var type in types.Skip(1))
         {
             commonType = FindCommonBaseClass(commonType, type);
@@ -357,10 +357,10 @@ public class TypeConstraintSolver(TypeInferenceContext context, TypeInferenceCon
                 break;
         }
 
-        return commonType ?? typeof(object);
+        return commonType;
     }
 
-    private Type? FindCommonBaseClass(Type? type1, Type type2)
+    private Type FindCommonBaseClass(Type? type1, Type type2)
     {
         if (type1 == null)
             return type2;
