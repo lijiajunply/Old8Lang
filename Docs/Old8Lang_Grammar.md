@@ -810,7 +810,73 @@ func process(a, b) -> int {
 transform <- (x) -> x * 2
 ```
 
-#### 5.5.4 Lambda 表达式
+#### 5.5.4 泛型函数
+
+泛型函数允许定义可以处理多种类型的函数，通过类型参数实现代码复用。
+
+**语法格式**：
+
+```old8
+func functionName<TypeParam1, TypeParam2, ...>(params) -> ReturnType {
+    // 函数体
+}
+```
+
+**单个类型参数示例**：
+
+```old8
+// 泛型函数：返回传入的值
+func identity<T>(value:T) -> T {
+    return value
+}
+
+// 使用泛型函数
+intResult <- identity<int>(42)           // 返回 42 (int)
+stringResult <- identity<string>("hello")  // 返回 "hello" (string)
+doubleResult <- identity<double>(3.14)    // 返回 3.14 (double)
+```
+
+**多个类型参数示例**：
+
+```old8
+// 泛型函数：创建键值对字符串
+func makePair<K, V>(key:K, value:V) -> string {
+    return key.ToStr() + ":" + value.ToStr()
+}
+
+result1 <- makePair<string, int>("age", 25)      // "age:25"
+result2 <- makePair<int, string>(1, "first")     // "1:first"
+```
+
+**泛型函数特点**：
+
+- 类型参数在调用时必须显式指定：`funcName<Type>(...)`
+- 函数体内可以使用类型参数作为参数类型或返回类型
+- 每次调用都会根据指定的类型参数创建类型化的函数实例
+- 类型参数在函数作用域内有效
+
+**使用场景**：
+
+```old8
+// 获取第一个元素
+func getFirst<T>(a:T, b:T) -> T {
+    return a
+}
+
+// 包装值并转换为字符串
+func wrap<T>(value:T) -> string {
+    return "[" + value.ToStr() + "]"
+}
+
+// 组合多个类型参数
+func combine<A, B, C>(a:A, b:B, c:C) -> string {
+    return a.ToStr() + "-" + b.ToStr() + "-" + c.ToStr()
+}
+
+result <- combine<int, string, double>(1, "two", 3.0)  // "1-two-3"
+```
+
+#### 5.5.5 Lambda 表达式
 
 匿名函数，用于简洁表达：
 
@@ -902,7 +968,138 @@ dog <- Dog()
 dog.speak()  // 输出：Woof!
 ```
 
-#### 5.6.4 Mixin（混入）
+#### 5.6.4 泛型类
+
+泛型类允许定义可以处理多种类型的类，通过类型参数实现代码复用。
+
+**语法格式**：
+
+```old8
+class ClassName<TypeParam1, TypeParam2, ...> {
+    // 类体
+}
+```
+
+**单个类型参数示例**：
+
+```old8
+// 定义泛型类 Box<T>
+class Box<T> {
+    private value:T
+
+    func set(v:T) -> void {
+        this.value <- v
+    }
+
+    func get() -> T {
+        return this.value
+    }
+}
+
+// 使用泛型类
+box <- Box<int>()
+box.set(42)
+result <- box.get()  // result = 42
+
+// 不同类型的实例
+stringBox <- Box<string>()
+stringBox.set("hello")
+text <- stringBox.get()  // text = "hello"
+```
+
+**多个类型参数示例**：
+
+```old8
+// 定义泛型键值对类
+class Pair<K, V> {
+    private key:K
+    private value:V
+
+    func set(k:K, v:V) -> void {
+        this.key <- k
+        this.value <- v
+    }
+
+    func getKey() -> K {
+        return this.key
+    }
+
+    func getValue() -> V {
+        return this.value
+    }
+}
+
+// 使用多个类型参数
+pair <- Pair<string, int>()
+pair.set("age", 25)
+k <- pair.getKey()      // k = "age"
+v <- pair.getValue()    // v = 25
+```
+
+**带构造函数的泛型类**：
+
+```old8
+class Wrapper<T> {
+    private wrapped:T
+
+    func init(w:T) {
+        this.wrapped <- w
+    }
+
+    func unwrap() -> T {
+        return this.wrapped
+    }
+}
+
+// 创建实例时传入构造参数
+wrapper <- Wrapper<int>(123)
+result <- wrapper.unwrap()  // result = 123
+```
+
+**泛型类特点**：
+
+- 类型参数在实例化时必须显式指定：`ClassName<Type>()`
+- 类体内可以使用类型参数作为字段类型、参数类型或返回类型
+- 每个实例都有独立的类型参数绑定
+- 不同类型参数的实例是不同的类型
+
+**实用示例 - 泛型栈**：
+
+```old8
+class Stack<T> {
+    private items:list
+
+    func init() {
+        this.items <- {}
+    }
+
+    func push(item:T) -> void {
+        this.items <- this.items.Add(item)
+    }
+
+    func pop() -> T {
+        lastIndex <- this.items.Count() - 1
+        item <- this.items[lastIndex]
+        this.items.RemoveAt(lastIndex)
+        return item
+    }
+
+    func peek() -> T {
+        return this.items[-1]
+    }
+}
+
+// 使用泛型栈
+stack <- Stack<string>()
+stack.push("first")
+stack.push("second")
+stack.push("third")
+
+top <- stack.peek()    // top = "third"
+popped <- stack.pop()  // popped = "third"
+```
+
+#### 5.6.5 Mixin（混入）
 
 Mixin 提供可重用的功能模块：
 
@@ -932,7 +1129,7 @@ user <- User("Bob")
 user.log("Doing something")
 ```
 
-#### 5.6.5 接口声明
+#### 5.6.6 接口声明
 
 接口定义方法签名但不实现方法体：
 
@@ -1423,7 +1620,7 @@ try {
 
 - 带默认参数的函数在编译模式下可能有运行时问题
 - 某些异步特性在编译模式下支持不完整
-- 不支持泛型
+- 泛型支持（仅解释器模式支持，编译模式暂不支持）
 - 不支持操作符重载
 
 ### 11.2 平台支持
@@ -1439,6 +1636,7 @@ Old8Lang 是一个功能完整的动态类型语言，结合了脚本语言的�
 关键特性总结：
 - ✅ 动态类型与可选类型注解
 - ✅ 完整的面向对象支持（类、继承、Mixin、接口）
+- ✅ 泛型支持（泛型函数、泛型类）
 - ✅ 异步/等待模式
 - ✅ 多线程支持
 - ✅ 异常处理

@@ -77,14 +77,16 @@ switchDefault = "default" blockStatement ;
 
 (* Function Declarations *)
 
-functionDeclaration = accessModifier* 
+functionDeclaration = accessModifier*
                      ( "func" identifier | identifier )
+                     genericTypeParameters?
                      "(" parameterList? ")"
                      ( "->" type )?
                      blockStatement ;
 
 asyncFunctionDeclaration = accessModifier*
                           "async" "func" identifier
+                          genericTypeParameters?
                           "(" parameterList? ")"
                           ( "->" type )?
                           blockStatement ;
@@ -93,16 +95,24 @@ parameterList = parameter ( "," parameter )* ;
 
 parameter = identifier ( ":" type )? ( "<-" expression )? ;
 
+(* Generic Type Parameters *)
+
+genericTypeParameters = "<" identifier ( "," identifier )* ">" ;
+
+genericTypeArguments = "<" type ( "," type )* ">" ;
+
 (* Class & Mixin Declarations *)
 
-classDeclaration = accessModifier* 
+classDeclaration = accessModifier*
                   "class" identifier
+                  genericTypeParameters?
                   ( "extends" identifier )?
                   ( "implements" identifierList )?
                   classBlock ;
 
 mixinDeclaration = accessModifier*
                   "mixin" identifier
+                  genericTypeParameters?
                   ( "extends" identifier )?
                   classBlock ;
 
@@ -193,6 +203,7 @@ memberAccessExpression = primaryExpression ( "." identifier )* ;
 
 primaryExpression = literal
                   | identifier
+                  | genericInstantiation
                   | functionCall
                   | classInstantiation
                   | listLiteral
@@ -231,6 +242,8 @@ booleanLiteral = "true" | "false" ;
 nullLiteral = "null" ;
 
 functionCall = identifier "(" argumentList? ")" ;
+
+genericInstantiation = identifier genericTypeArguments ( "(" argumentList? ")" )? ;
 
 classInstantiation = identifier "(" argumentList? ")" ;
 
@@ -278,7 +291,7 @@ argumentList = expression ( "," expression )* ;
 
 identifierList = identifier ( "," identifier )* ;
 
-type = identifier ;
+type = identifier "?"? ;
 
 accessModifier = "public" | "private" | "static" ;
 
@@ -348,4 +361,6 @@ OPERATORS = "<-"   (* assignment *)
  * 4. Comments are single-line (//) style, not supported in this grammar
  * 5. Async/await and generator functions (with yield) are supported
  * 6. String templates use C# style with ${} replaced by {}
+ * 7. Generics are supported for both functions and classes (interpreter mode only)
+ * 8. Nullable types are supported with ? suffix (e.g., int?, string?)
  *)

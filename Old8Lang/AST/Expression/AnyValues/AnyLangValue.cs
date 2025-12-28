@@ -622,6 +622,13 @@ public partial class AnyLangValue : LangValueType
         // 5. 设置函数上下文标志
         initManager.IsFunc = true;
 
+        // 5.5 设置泛型类型参数映射（如果是泛型类实例）
+        //     这样 init 方法在验证参数类型时可以正确解析泛型类型参数
+        if (TypeArgumentMapping != null)
+        {
+            initManager.CurrentFunctionTypeArgumentMapping = TypeArgumentMapping;
+        }
+
         // 6. 执行 init 方法，传入已经求值的参数表达式
         //    由于参数已经是值对象，FuncLangValue.Run 只需要直接使用它们
         initMethod.Run(initManager, parameterValueExpressions);

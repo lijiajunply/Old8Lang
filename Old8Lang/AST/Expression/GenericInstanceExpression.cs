@@ -11,7 +11,7 @@ namespace Old8Lang.AST.Expression;
 
 /// <summary>
 /// 泛型实例化表达式
-/// 例如: Box<int>(), map<string>(arr, func)
+/// 例如: Box&lt;int>(), map&lt;string>(arr, func)
 /// </summary>
 public class GenericInstanceExpression : LangExpression
 {
@@ -29,14 +29,9 @@ public class GenericInstanceExpression : LangExpression
 
     /// <summary>
     /// 调用参数（如果是函数调用）
-    /// 例如: Box<int>() 时为空列表，map<string>(arr, func) 时为 [arr, func]
+    /// 例如: Box&lt;int>() 时为空列表，map&lt;string>(arr, func) 时为 [arr, func]
     /// </summary>
     public List<LangExpression>? CallArguments { get; }
-
-    /// <summary>
-    /// 源代码位置
-    /// </summary>
-    public SourcePosition Position { get; }
 
     /// <summary>
     /// 构造函数（泛型类实例化）
@@ -124,7 +119,11 @@ public class GenericInstanceExpression : LangExpression
             if (IsFunctionCall)
             {
                 var instance = instantiatedTemplate.CreateInstanceV2(manager);
-                instance.Init(manager.Interpreter!);
+                instance.Init(manager.Interpreter);
+
+                // 调用用户定义的 init 构造函数
+                instance.CallInit(CallArguments!, manager);
+
                 return instance;
             }
 
@@ -192,6 +191,7 @@ public class GenericInstanceExpression : LangExpression
             var argsStr = string.Join(", ", CallArguments!.Select(a => a.ToString()));
             return $"{BaseExpression}<{typeArgsStr}>({argsStr})";
         }
+
         return $"{BaseExpression}<{typeArgsStr}>";
     }
 }
