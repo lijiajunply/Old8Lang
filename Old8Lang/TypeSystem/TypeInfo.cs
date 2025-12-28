@@ -135,6 +135,211 @@ public class ClassTypeInfo(string name, ITypeInfo? baseType = null) : ITypeInfo
 }
 
 /// <summary>
+/// 泛型类型信息，支持类型参数
+/// </summary>
+public class GenericTypeInfo : ITypeInfo
+{
+    public string Name { get; }
+    public List<string> TypeParameters { get; }
+    public Dictionary<string, ITypeInfo>? TypeArguments { get; }
+    public Dictionary<string, List<ITypeInfo>>? Constraints { get; }
+    public ITypeInfo? BaseType { get; }
+    public bool IsClassType => true;
+
+    /// <summary>
+    /// 判断是否为泛型定义（未实例化）
+    /// </summary>
+    public bool IsGenericDefinition => TypeArguments == null;
+
+    /// <summary>
+    /// 判断是否为泛型实例（已实例化）
+    /// </summary>
+    public bool IsGenericInstance => TypeArguments != null;
+
+    private readonly ConcurrentDictionary<string, LangValueType> CachedMembers = [];
+
+    /// <summary>
+    /// 构造泛型定义
+    /// </summary>
+    public GenericTypeInfo(
+        string name,
+        List<string> typeParameters,
+        Dictionary<string, List<ITypeInfo>>? constraints = null,
+        ITypeInfo? baseType = null)
+    {
+        Name = name;
+        TypeParameters = typeParameters;
+        Constraints = constraints;
+        BaseType = baseType;
+        TypeArguments = null;
+    }
+
+    /// <summary>
+    /// 构造泛型实例（私有，通过 Instantiate 方法创建）
+    /// </summary>
+    private GenericTypeInfo(
+        string name,
+        List<string> typeParameters,
+        Dictionary<string, ITypeInfo> typeArguments,
+        Dictionary<string, List<ITypeInfo>>? constraints,
+        ITypeInfo? baseType)
+    {
+        Name = name;
+        TypeParameters = typeParameters;
+        TypeArguments = typeArguments;
+        Constraints = constraints;
+        BaseType = baseType;
+    }
+
+    /// <summary>
+    /// 实例化泛型类型
+    /// </summary>
+    public GenericTypeInfo Instantiate(Dictionary<string, ITypeInfo> typeArguments)
+    {
+        if (!IsGenericDefinition)
+        {
+            throw new InvalidOperationException($"类型 {Name} 已经是实例化的泛型类型");
+        }
+
+        // 验证类型参数数量
+        if (typeArguments.Count != TypeParameters.Count)
+        {
+            throw new ArgumentException(
+                $"类型参数数量不匹配：期望 {TypeParameters.Count} 个，实际 {typeArguments.Count} 个");
+        }
+
+        // 验证类型参数约束
+        if (Constraints != null)
+        {
+            foreach (var (paramName, constraintTypes) in Constraints)
+            {
+                if (typeArguments.TryGetValue(paramName, out var actualType))
+                {
+                    foreach (var constraintType in constraintTypes)
+                    {
+                        if (!actualType.IsCompatibleWith(constraintType))
+                        {
+                            throw new ArgumentException(
+                                $"类型 {actualType.Name} 不满足约束 {constraintType.Name}");
+                        }
+                    }
+                }
+            }
+        }
+
+        // 创建新的泛型实例
+        return new GenericTypeInfo(Name, TypeParameters, typeArguments, Constraints, BaseType);
+    }
+
+    /// <summary>
+    /// 替换类型参数
+    /// </summary>
+    public ITypeInfo SubstituteTypeParameters(Dictionary<string, ITypeInfo> substitutions)
+    {
+        if (IsGenericDefinition)
+        {
+            // 如果是泛型定义，执行实例化
+            return Instantiate(substitutions);
+        }
+
+        // 如果是泛型实例，替换类型参数
+        var newTypeArguments = new Dictionary<string, ITypeInfo>();
+        foreach (var (paramName, paramType) in TypeArguments!)
+        {
+            if (paramType is GenericTypeInfo genericParam)
+            {
+                newTypeArguments[paramName] = genericParam.SubstituteTypeParameters(substitutions);
+            }
+            else if (substitutions.ContainsKey(paramType.Name))
+            {
+                newTypeArguments[paramName] = substitutions[paramType.Name];
+            }
+            else
+            {
+                newTypeArguments[paramName] = paramType;
+            }
+        }
+
+        return new GenericTypeInfo(Name, TypeParameters, newTypeArguments, Constraints, BaseType);
+    }
+
+    public bool IsCompatibleWith(ITypeInfo other)
+    {
+        // 泛型类型兼容性检查
+        if (Name == other.Name)
+        {
+            // 如果都是泛型实例，检查类型参数是否兼容
+            if (other is GenericTypeInfo otherGeneric &&
+                IsGenericInstance && otherGeneric.IsGenericInstance)
+            {
+                if (TypeArguments!.Count != otherGeneric.TypeArguments!.Count)
+                    return false;
+
+                foreach (var (paramName, thisType) in TypeArguments)
+                {
+                    if (otherGeneric.TypeArguments.TryGetValue(paramName, out var otherType))
+                    {
+                        if (!thisType.IsCompatibleWith(otherType))
+                            return false;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            return true;
+        }
+
+        if (other.Name == "any") return true;
+
+        // 支持继承多态
+        var current = this;
+        while (current.BaseType != null)
+        {
+            if (current.BaseType.Name == other.Name) return true;
+            if (current.BaseType is GenericTypeInfo genericBase)
+                current = genericBase;
+            else
+                break;
+        }
+
+        return false;
+    }
+
+    public ConcurrentDictionary<string, LangValueType> GetMembers(VariateManager manager)
+    {
+        if (CachedMembers.Count > 0) return CachedMembers;
+
+        // 泛型类型的成员获取需要考虑类型参数替换
+        // 这部分将在后续集成 TypeTemplate 时实现
+        return CachedMembers;
+    }
+
+    /// <summary>
+    /// 获取完整的泛型类型名称
+    /// </summary>
+    public string GetFullName()
+    {
+        if (IsGenericDefinition)
+        {
+            return $"{Name}<{string.Join(", ", TypeParameters)}>";
+        }
+
+        var typeArgNames = TypeArguments!.Select(kv => kv.Value.Name);
+        return $"{Name}<{string.Join(", ", typeArgNames)}>";
+    }
+
+    public override string ToString()
+    {
+        return GetFullName();
+    }
+}
+
+/// <summary>
 /// 多态类型家族，支持类型族和关联类型
 /// </summary>
 public class TypeFamily

@@ -1,0 +1,28 @@
+// 基本泛型函数语法测试
+
+// 单个类型参数的泛型函数
+func identity<T>(x:T) -> T {
+    return x
+}
+
+// 多个类型参数的泛型函数
+func swap<T, U>(a:T, b:U) -> tuple {
+    return (b, a)
+}
+
+// 泛型函数返回泛型类型
+func createBox<T>(value:T) -> Box<T> {
+    box <- Box<T>()
+    box.set(value)
+    return box
+}
+
+// 泛型函数处理列表
+func getFirst<T>(list:List<T>) -> T {
+    return list[0]
+}
+
+// 泛型函数使用约束（但不验证约束）
+func maximum<T>(a:T, b:T) -> T {
+    return a
+}

@@ -34,7 +34,28 @@ public class FuncLangValue : ImportInfo
     // 默认参数值缓存：缓存常量表达式的默认值，避免重复求值
     private Dictionary<int, LangValueType>? CachedDefaultValues { get; set; }
 
-    public FuncLangValue(LangId? id, List<LangId> ids, BlockStatement blockStatement,
+    /// <summary>
+    /// 泛型参数列表
+    /// 例如: func map<T, U>(...) 中的 [T, U]
+    /// </summary>
+    public readonly List<GenericParameter>? GenericParameters;
+
+    /// <summary>
+    /// 是否为泛型函数
+    /// </summary>
+    public bool IsGeneric => GenericParameters is { Count: > 0 };
+
+    /// <summary>
+    /// 当前实例的类型参数映射（用于泛型实例化）
+    /// 例如: map<int, string> 时为 {"T": int, "U": string}
+    /// </summary>
+    public Dictionary<string, ITypeInfo>? TypeArgumentMapping { get; private set; }
+
+    public FuncLangValue(
+        LangId? id,
+        List<LangId> ids,
+        BlockStatement blockStatement,
+        List<GenericParameter>? genericParameters = null,
         SourcePosition position = default,
         bool isLambda = false) :
         base(position)
@@ -42,6 +63,7 @@ public class FuncLangValue : ImportInfo
         Id = id;
         Ids = ids;
         BlockStatement = blockStatement;
+        GenericParameters = genericParameters;
         IsLambda = isLambda;
     }
 
@@ -52,6 +74,7 @@ public class FuncLangValue : ImportInfo
         Method = methodInfo;
         Func = func;
         IsLambda = false; // 原生方法不是Lambda表达式
+        GenericParameters = null; // 原生方法暂不支持泛型
     }
 
     /// <summary>
@@ -112,7 +135,7 @@ public class FuncLangValue : ImportInfo
                 if (Ids.Count > 0)
                 {
                     // 对于生成器函数，我们需要创建一个闭包，捕获当前作用域
-                    var generatorClosure = new FuncLangValue(Id, Ids, BlockStatement, Position, IsLambda)
+                    var generatorClosure = new FuncLangValue(Id, Ids, BlockStatement, GenericParameters, Position, IsLambda)
                     {
                         // 生成器需要独立的作用域副本，使用深拷贝
                         CapturedScope = manager.Clone()
@@ -122,7 +145,7 @@ public class FuncLangValue : ImportInfo
                 }
 
                 // 没有参数的生成器函数
-                var noParamClosure = new FuncLangValue(Id, Ids, BlockStatement, Position, IsLambda)
+                var noParamClosure = new FuncLangValue(Id, Ids, BlockStatement, GenericParameters, Position, IsLambda)
                 {
                     // 生成器需要独立的作用域副本，使用深拷贝
                     CapturedScope = manager.Clone()
@@ -131,7 +154,7 @@ public class FuncLangValue : ImportInfo
                 return new GeneratorLangValue(noParamClosure, Position);
             }
 
-            var closureFunc = new FuncLangValue(Id, Ids, BlockStatement, Position, IsLambda)
+            var closureFunc = new FuncLangValue(Id, Ids, BlockStatement, GenericParameters, Position, IsLambda)
             {
                 // 使用深拷贝创建独立的作用域副本
                 // 这样即使外层函数返回，lambda 仍然可以访问捕获的变量
@@ -877,6 +900,57 @@ public class FuncLangValue : ImportInfo
         }
 
         return paramValues;
+    }
+
+    /// <summary>
+    /// 实例化泛型函数
+    /// </summary>
+    public FuncLangValue InstantiateGeneric(Dictionary<string, ITypeInfo> typeArguments)
+    {
+        if (!IsGeneric)
+        {
+            throw new InvalidOperationException($"函数 {Id?.IdName} 不是泛型函数");
+        }
+
+        // 验证类型参数数量
+        if (typeArguments.Count != GenericParameters!.Count)
+        {
+            throw new ArgumentException(
+                $"类型参数数量不匹配：期望 {GenericParameters.Count} 个，实际 {typeArguments.Count} 个");
+        }
+
+        // 验证约束（如果有）
+        foreach (var genericParam in GenericParameters)
+        {
+            if (genericParam.HasConstraints && typeArguments.TryGetValue(genericParam.Name, out var actualType))
+            {
+                // TODO: 添加约束验证逻辑
+                // 这需要访问 TypeAnnotationManager，可能需要传入 VariateManager
+            }
+        }
+
+        // 创建实例化的FuncLangValue（复制所有字段）
+        var instantiated = new FuncLangValue(
+            id: Id,
+            ids: Ids!,
+            blockStatement: BlockStatement,
+            genericParameters: GenericParameters,
+            position: Position,
+            isLambda: IsLambda
+        );
+
+        // 设置类型参数映射
+        instantiated.TypeArgumentMapping = typeArguments;
+
+        // 复制闭包环境（如果有）
+        if (CapturedScope != null)
+        {
+            typeof(FuncLangValue)
+                .GetProperty("CapturedScope", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?
+                .SetValue(instantiated, CapturedScope);
+        }
+
+        return instantiated;
     }
 
     public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)

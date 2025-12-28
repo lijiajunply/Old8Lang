@@ -46,6 +46,13 @@ public class ClassParser(
         var className = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
 
+        // 解析泛型参数（如果有）
+        List<GenericParameter>? genericParameters = null;
+        if (CurrentToken.Type == LangTokenType.LessThan)
+        {
+            genericParameters = ParseGenericParameters();
+        }
+
         string? parentClassName = null;
         List<string> mixinNames = new List<string>();
         List<string> implementsNames = new List<string>();
@@ -118,7 +125,8 @@ public class ClassParser(
 
         var classBlock = ParseClassBlock();
         return new ClassInit(new TypeTemplate(className, classBlock.ToAnyData(), classBlock.ToStaticData(),
-            parentClassName, isMixin, mixinNames, implementsNames, isInterface: false, isAbstract: isAbstract));
+            parentClassName, isMixin, mixinNames, implementsNames, isInterface: false, isAbstract: isAbstract,
+            genericParameters: genericParameters));
     }
     
     public ClassInit ParseInterfaceDeclaration()
@@ -135,6 +143,13 @@ public class ClassParser(
 
         var interfaceName = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
+
+        // 解析泛型参数（如果有）
+        List<GenericParameter>? genericParameters = null;
+        if (CurrentToken.Type == LangTokenType.LessThan)
+        {
+            genericParameters = ParseGenericParameters();
+        }
 
         List<string> extendsNames = new List<string>();
 
@@ -171,7 +186,7 @@ public class ClassParser(
         // 接口作为特殊的类处理，isInterface 标志为 true
         // 接口的父接口通过 implementsNames 参数传递（复用implements机制）
         return new ClassInit(new TypeTemplate(interfaceName, interfaceBlock.ToAnyData(), interfaceBlock.ToStaticData(),
-            null, false, new List<string>(), extendsNames, true));
+            null, false, new List<string>(), extendsNames, true, genericParameters: genericParameters));
     }
 
     /// <summary>
@@ -400,8 +415,13 @@ public class ClassParser(
                     typeAnnotation = CurrentToken.Value;
                     CurrentIndex++;
 
+                    // 检查是否为泛型类型（例如 "List<int>"）
+                    if (CurrentToken.Type == LangTokenType.LessThan)
+                    {
+                        typeAnnotation += ParseGenericTypeAnnotation();
+                    }
                     // 检查是否为可空类型（例如 "int?"）
-                    if (CurrentToken.Type == LangTokenType.Question)
+                    else if (CurrentToken.Type == LangTokenType.Question)
                     {
                         typeAnnotation += "?";
                         CurrentIndex++;
@@ -553,12 +573,141 @@ public class ClassParser(
 
         // 创建抽象方法的FuncLangValue（没有方法体）
         var methodId = new LangId(methodName, returnType, position: position);
-        var funcLangValue = new FuncLangValue(methodId, parameters, new BlockStatement([]), position, isLambda: false);
+        var funcLangValue = new FuncLangValue(methodId, parameters, new BlockStatement([]), null, position, isLambda: false);
 
         // 创建类成员ID
         var memberId = new ClassMemberId(methodName, returnType, modifiers, position);
 
         // 创建抽象方法声明
         return new ClassFuncInitStatement(memberId, funcLangValue, position);
+    }
+
+    /// <summary>
+    /// 解析泛型参数列表
+    /// 语法：<T, U, V> 或 <T: IComparable, U>
+    /// </summary>
+    /// <returns>泛型参数列表</returns>
+    private List<GenericParameter> ParseGenericParameters()
+    {
+        Expect(LangTokenType.LessThan);
+        var parameters = new List<GenericParameter>();
+
+        while (CurrentToken.Type != LangTokenType.GreaterThan)
+        {
+            if (CurrentToken.Type == LangTokenType.EndOfFile)
+            {
+                throw CreateSyntaxError("意外的文件结束符，期望 '>'");
+            }
+
+            var position = CreateSourcePosition(CurrentToken);
+            var paramName = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+
+            List<string>? constraints = null;
+            if (CurrentToken.Type == LangTokenType.Colon)
+            {
+                Expect(LangTokenType.Colon);
+                constraints = ParseGenericConstraints();
+            }
+
+            parameters.Add(new GenericParameter(paramName, constraints, position));
+
+            if (CurrentToken.Type == LangTokenType.Comma)
+            {
+                Expect(LangTokenType.Comma);
+                continue;
+            }
+
+            break;
+        }
+
+        Expect(LangTokenType.GreaterThan);
+        return parameters;
+    }
+
+    /// <summary>
+    /// 解析泛型约束列表
+    /// 语法：IComparable | ICloneable
+    /// </summary>
+    /// <returns>约束名称列表</returns>
+    private List<string> ParseGenericConstraints()
+    {
+        var constraints = new List<string>();
+
+        if (CurrentToken.Type != LangTokenType.Identifier)
+        {
+            throw CreateSyntaxError($"期望约束类型名称，但得到 {CurrentToken.Type}");
+        }
+
+        constraints.Add(CurrentToken.Value);
+        Expect(LangTokenType.Identifier);
+
+        while (CurrentToken.Type == LangTokenType.Pipe)
+        {
+            Expect(LangTokenType.Pipe);
+
+            if (CurrentToken.Type != LangTokenType.Identifier)
+            {
+                throw CreateSyntaxError($"期望约束类型名称，但得到 {CurrentToken.Type}");
+            }
+
+            constraints.Add(CurrentToken.Value);
+            Expect(LangTokenType.Identifier);
+        }
+
+        return constraints;
+    }
+
+    /// <summary>
+    /// 解析泛型类型注解
+    /// 语法：<int>, <T>, <List<int>>
+    /// </summary>
+    /// <returns>泛型类型注解字符串（包括 < 和 >）</returns>
+    private string ParseGenericTypeAnnotation()
+    {
+        var result = "<";
+        Expect(LangTokenType.LessThan);
+
+        while (CurrentToken.Type != LangTokenType.GreaterThan)
+        {
+            if (CurrentToken.Type == LangTokenType.EndOfFile)
+            {
+                throw CreateSyntaxError("意外的文件结束符，期望 '>'");
+            }
+
+            if (CurrentToken.Type != LangTokenType.Identifier)
+            {
+                throw CreateSyntaxError($"期望类型参数名称，但得到 {CurrentToken.Type}");
+            }
+
+            result += CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+
+            // 递归处理嵌套泛型
+            if (CurrentToken.Type == LangTokenType.LessThan)
+            {
+                result += ParseGenericTypeAnnotation();
+            }
+
+            // 可空类型标记
+            if (CurrentToken.Type == LangTokenType.Question)
+            {
+                result += "?";
+                Expect(LangTokenType.Question);
+            }
+
+            if (CurrentToken.Type == LangTokenType.Comma)
+            {
+                result += ", ";
+                Expect(LangTokenType.Comma);
+                continue;
+            }
+
+            break;
+        }
+
+        result += ">";
+        Expect(LangTokenType.GreaterThan);
+        return result;
     }
 }

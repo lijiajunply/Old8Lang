@@ -326,12 +326,46 @@ public class StatementParser(
                             CurrentIndex = savedIndex;
                             return ParseSet();
                         }
+                        // 检查是否是泛型类型（例如 "items:List<T>"）
+                        else if (thirdToken.Type == LangTokenType.LessThan)
+                        {
+                            // 跳过泛型类型注解，找到泛型结束位置
+                            var tokenIndex = SkipGenericTypeAnnotation(2); // 从 < 开始
+                            var tokenAfterGeneric = Peek(tokenIndex);
+
+                            // 检查泛型类型后面是否有赋值符号或左括号
+                            if (tokenAfterGeneric.Type == LangTokenType.Assignment)
+                            {
+                                // 这是带有泛型类型注解的赋值语句：items:List<T> <- value
+                                CurrentIndex = savedIndex;
+                                return ParseSet();
+                            }
+                            else if (tokenAfterGeneric.Type == LangTokenType.LeftParen)
+                            {
+                                // 这是带有泛型返回类型的函数声明：func<T>() -> List<T>
+                                CurrentIndex = savedIndex;
+                                return functionParser.ParseFuncDeclaration();
+                            }
+                            else
+                            {
+                                // 只有类型注解，没有赋值，这是类字段声明（会初始化为 Null）
+                                CurrentIndex = savedIndex;
+                                return ParseSet();
+                            }
+                        }
                         // 检查是否是函数声明：identifier:returnType (params) -> { ... }
                         else if (thirdToken.Type == LangTokenType.LeftParen)
                         {
                             // 这是带有返回类型注解的函数声明
                             CurrentIndex = savedIndex;
                             return functionParser.ParseFuncDeclaration();
+                        }
+                        else
+                        {
+                            // 其他情况，可能是只有类型注解没有赋值的字段声明
+                            // 例如：private items:int 或 private value:T
+                            CurrentIndex = savedIndex;
+                            return ParseSet();
                         }
                     }
                 }
@@ -589,14 +623,25 @@ public class StatementParser(
     // declaration = identifier ":" type "<-" expression | identifier "<-" expression | memberAccess ":" type "<-" expression | memberAccess "<-" expression ;
     public SetStatement ParseSet()
     {
-        // 特殊处理带有类型注解的赋值语句：a:int <- value
+        // 特殊处理带有类型注解的赋值语句：a:int <- value 或 a:int (只有类型注解)
         if (CurrentToken.Type == LangTokenType.Identifier && Peek().Type == LangTokenType.Colon)
         {
             // 带有类型注解的赋值语句
             var id = functionParser.ParseTypedIdentifier(false); // 使用 ParseTypedIdentifier 处理类型注解
-            Expect(LangTokenType.Assignment);
-            var expr = expressionParser.ParseExpression();
-            return new SetStatement(id, expr, id.Position);
+
+            // 检查是否有赋值符号
+            if (CurrentToken.Type == LangTokenType.Assignment)
+            {
+                Expect(LangTokenType.Assignment);
+                var expr = expressionParser.ParseExpression();
+                return new SetStatement(id, expr, id.Position);
+            }
+            else
+            {
+                // 只有类型注解，没有赋值，创建赋值 Null 的语句
+                var nullExpr = new NullLangValue(id.Position);
+                return new SetStatement(id, nullExpr, id.Position);
+            }
         }
 
         // 解析左值表达式 - 只能是标识符、this或复杂左值（如a.b或a[b]），不能是解构模式
@@ -613,11 +658,32 @@ public class StatementParser(
             assumptionType = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
 
+            // 检查是否为泛型类型（例如 "List<int>"）
+            if (CurrentToken.Type == LangTokenType.LessThan)
+            {
+                assumptionType += "<" + SkipAndParseGenericTypeAnnotation() + ">";
+            }
             // 检查是否为可空类型（例如 "int?"）
-            if (CurrentToken.Type == LangTokenType.Question)
+            else if (CurrentToken.Type == LangTokenType.Question)
             {
                 assumptionType += "?";
                 Expect(LangTokenType.Question);
+            }
+        }
+
+        // 检查是否有赋值符号
+        // 如果没有赋值符号，说明这是一个只有类型注解的字段声明（会初始化为 Null）
+        if (CurrentToken.Type != LangTokenType.Assignment)
+        {
+            // 只有类型注解，没有赋值，创建一个赋值 Null 的语句
+            if (leftExpr is LangId leftLangId)
+            {
+                var nullExpr = new NullLangValue(leftLangId.Position);
+                return new SetStatement(new LangId(leftLangId.IdName, assumptionType, null, leftLangId.Position), nullExpr, leftLangId.Position);
+            }
+            else
+            {
+                throw CreateSyntaxError("只有类型注解没有赋值时，左值必须是标识符");
             }
         }
 
@@ -1473,6 +1539,104 @@ public class StatementParser(
 
         // 创建TryStatement对象
         return new TryStatement(tryBlock, catchBlocks, finallyBlock, CreateSourcePosition(CurrentToken));
+    }
+
+    /// <summary>
+    /// 跳过泛型类型注解，返回泛型结束后的token索引偏移量
+    /// 例如：对于 "List<T>"，从 < 开始跳过，返回 > 后的token位置
+    /// 支持嵌套泛型：List<List<int>>
+    /// </summary>
+    /// <param name="startOffset">起始偏移量（相对于当前位置）</param>
+    /// <returns>泛型结束后的token索引偏移量</returns>
+    private int SkipGenericTypeAnnotation(int startOffset)
+    {
+        var offset = startOffset;
+        var depth = 0;
+        var started = false;
+
+        while (offset < 100) // 防止无限循环
+        {
+            var token = Peek(offset);
+
+            if (token.Type == LangTokenType.EndOfFile)
+            {
+                break;
+            }
+
+            if (token.Type == LangTokenType.LessThan)
+            {
+                depth++;
+                started = true;
+            }
+            else if (token.Type == LangTokenType.GreaterThan)
+            {
+                depth--;
+                if (depth == 0 && started)
+                {
+                    // 找到匹配的右尖括号，返回下一个位置
+                    return offset + 1;
+                }
+            }
+
+            offset++;
+        }
+
+        // 如果没找到匹配的右尖括号，返回当前偏移量
+        return offset;
+    }
+
+    /// <summary>
+    /// 解析并消费泛型类型注解，返回类型字符串（不包括 < 和 >）
+    /// 例如：对于 "<int>"，返回 "int"
+    /// 支持嵌套泛型：<List<int>> 返回 "List<int>"
+    /// </summary>
+    /// <returns>泛型类型字符串</returns>
+    private string SkipAndParseGenericTypeAnnotation()
+    {
+        var result = "";
+        Expect(LangTokenType.LessThan);
+        var depth = 1;
+
+        while (depth > 0)
+        {
+            if (CurrentToken.Type == LangTokenType.EndOfFile)
+            {
+                throw CreateSyntaxError("意外的文件结束符，期望 '>'");
+            }
+
+            if (CurrentToken.Type == LangTokenType.LessThan)
+            {
+                result += "<";
+                depth++;
+                CurrentIndex++;
+            }
+            else if (CurrentToken.Type == LangTokenType.GreaterThan)
+            {
+                depth--;
+                if (depth > 0)
+                {
+                    result += ">";
+                }
+                CurrentIndex++;
+            }
+            else if (CurrentToken.Type == LangTokenType.Comma)
+            {
+                result += ", ";
+                CurrentIndex++;
+            }
+            else if (CurrentToken.Type == LangTokenType.Question)
+            {
+                result += "?";
+                CurrentIndex++;
+            }
+            else
+            {
+                result += CurrentToken.Value;
+                CurrentIndex++;
+            }
+        }
+
+        return result;
     }
 
     #endregion

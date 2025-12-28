@@ -1,0 +1,4 @@
+// 简单测试：类字段with泛型类型
+class Test {
+    private items:List<int>
+}

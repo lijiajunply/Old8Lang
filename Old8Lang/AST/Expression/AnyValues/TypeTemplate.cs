@@ -2,12 +2,13 @@ using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.TypeSystem;
 
 namespace Old8Lang.AST.Expression.AnyValues;
 
-/// <summary> 
-/// 类型模板类，用于存储类的定义信息 
-/// </summary> 
+/// <summary>
+/// 类型模板类，用于存储类的定义信息
+/// </summary>
 public class TypeTemplate(
     string className,
     Dictionary<ClassMemberId, LangExpression> variates,
@@ -18,6 +19,7 @@ public class TypeTemplate(
     List<string>? implementsNames = null,
     bool isInterface = false,
     bool isAbstract = false,
+    List<GenericParameter>? genericParameters = null,
     SourcePosition position = default)
     : ImportInfo(position)
 {
@@ -30,6 +32,23 @@ public class TypeTemplate(
     public readonly List<string> ImplementsNames = implementsNames ?? [];
     public readonly bool IsInterface = isInterface;
     public readonly bool IsAbstract = isAbstract;
+
+    /// <summary>
+    /// 泛型参数列表
+    /// 例如: class Box<T, U> 中的 [T, U]
+    /// </summary>
+    public readonly List<GenericParameter>? GenericParameters = genericParameters;
+
+    /// <summary>
+    /// 是否为泛型类
+    /// </summary>
+    public bool IsGeneric => GenericParameters is { Count: > 0 };
+
+    /// <summary>
+    /// 当前实例的类型参数映射（用于泛型实例化）
+    /// 例如: Box<int, string> 时为 {"T": int, "U": string}
+    /// </summary>
+    public Dictionary<string, TypeSystem.ITypeInfo>? TypeArgumentMapping { get; private set; }
 
     /// <summary>
     /// 存储运行时的静态变量值，支持在静态方法调用之间保持状态
@@ -600,6 +619,68 @@ public class TypeTemplate(
                 fieldTable.AddField(fieldDef);
             }
         }
+    }
+
+    /// <summary>
+    /// 实例化泛型类
+    /// </summary>
+    public TypeTemplate InstantiateGeneric(
+        Dictionary<string, TypeSystem.ITypeInfo> typeArguments,
+        VariateManager manager)
+    {
+        if (!IsGeneric)
+        {
+            throw new InvalidOperationException($"类型 {ClassName} 不是泛型类");
+        }
+
+        // 验证类型参数数量
+        if (typeArguments.Count != GenericParameters!.Count)
+        {
+            throw new ArgumentException(
+                $"类型参数数量不匹配：期望 {GenericParameters.Count} 个，实际 {typeArguments.Count} 个");
+        }
+
+        // 验证约束（如果有）
+        foreach (var genericParam in GenericParameters)
+        {
+            if (genericParam.HasConstraints && typeArguments.TryGetValue(genericParam.Name, out var actualType))
+            {
+                // TODO: 需要添加 TypeAnnotationManager 到 LangInterpreter 或 VariateManager
+                // 暂时创建临时实例用于类型解析
+                var tempGlobalManager = new VariateManager();
+                var typeAnnotationManager = new TypeAnnotationManager(tempGlobalManager);
+
+                foreach (var constraintName in genericParam.Constraints!)
+                {
+                    var constraintType = typeAnnotationManager.GetTypeFamily().GetType(constraintName);
+                    if (constraintType != null && !actualType.IsCompatibleWith(constraintType))
+                    {
+                        throw new ArgumentException(
+                            $"类型 {actualType.Name} 不满足约束 {constraintName}");
+                    }
+                }
+            }
+        }
+
+        // 创建实例化的TypeTemplate（复制所有字段）
+        var instantiated = new TypeTemplate(
+            className: ClassName,
+            variates: Variates,
+            staticVariates: StaticVariates,
+            parentClassName: ParentClassName,
+            isMixin: IsMixin,
+            mixinNames: MixinNames,
+            implementsNames: ImplementsNames,
+            isInterface: IsInterface,
+            isAbstract: IsAbstract,
+            genericParameters: GenericParameters,
+            position: Position
+        );
+
+        // 设置类型参数映射
+        instantiated.TypeArgumentMapping = typeArguments;
+
+        return instantiated;
     }
 
     /// <summary>

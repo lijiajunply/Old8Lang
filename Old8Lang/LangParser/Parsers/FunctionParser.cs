@@ -30,6 +30,13 @@ public class FunctionParser(
         var funcName = ParseIdentifier();
         var returnType = string.Empty;
 
+        // 解析泛型参数（如果有）
+        List<GenericParameter>? genericParameters = null;
+        if (CurrentToken.Type == LangTokenType.LessThan)
+        {
+            genericParameters = ParseGenericParameters();
+        }
+
         // 检查是否有类型注解语法：identifier:returnType
         if (CurrentToken.Type == LangTokenType.Colon)
         {
@@ -69,8 +76,13 @@ public class FunctionParser(
                 returnType = CurrentToken.Value;
                 Expect(LangTokenType.Identifier);
 
+                // 检查是否为泛型类型（例如 "Box<T>"）
+                if (CurrentToken.Type == LangTokenType.LessThan)
+                {
+                    returnType += ParseGenericTypeAnnotation();
+                }
                 // 检查是否为可空类型（例如 "int?"）
-                if (CurrentToken.Type == LangTokenType.Question)
+                else if (CurrentToken.Type == LangTokenType.Question)
                 {
                     returnType += "?";
                     Expect(LangTokenType.Question);
@@ -102,7 +114,7 @@ public class FunctionParser(
         }
 
         // 普通函数声明,生成 FuncInit，设置 IsLambda 为 false
-        return new FuncInit(new FuncLangValue(updatedFuncName, parameters, block, isLambda: false));
+        return new FuncInit(new FuncLangValue(updatedFuncName, parameters, block, genericParameters, isLambda: false));
     }
 
     /// <summary>
@@ -114,6 +126,13 @@ public class FunctionParser(
         // 这里假设 async 和 func 关键字已经被消费了
         var funcName = ParseIdentifier();
         var returnType = string.Empty;
+
+        // 解析泛型参数（如果有）
+        List<GenericParameter>? genericParameters = null;
+        if (CurrentToken.Type == LangTokenType.LessThan)
+        {
+            genericParameters = ParseGenericParameters();
+        }
 
         // 检查是否有类型注解语法：identifier:returnType
         if (CurrentToken.Type == LangTokenType.Colon)
@@ -283,8 +302,13 @@ public class FunctionParser(
 
                 Expect(LangTokenType.Identifier);
 
+                // 检查是否为泛型类型（例如 "List<int>"）
+                if (CurrentToken.Type == LangTokenType.LessThan)
+                {
+                    typeAnnotation += ParseGenericTypeAnnotation();
+                }
                 // 检查是否为可空类型（例如 "int?"）
-                if (CurrentToken.Type == LangTokenType.Question)
+                else if (CurrentToken.Type == LangTokenType.Question)
                 {
                     typeAnnotation += "?";
                     Expect(LangTokenType.Question);
@@ -325,5 +349,134 @@ public class FunctionParser(
 
         // 默认不处理类型注解
         return new LangId(value, position: position);
+    }
+
+    /// <summary>
+    /// 解析泛型参数列表
+    /// 语法：<T, U, V> 或 <T: IComparable, U>
+    /// </summary>
+    /// <returns>泛型参数列表</returns>
+    private List<GenericParameter> ParseGenericParameters()
+    {
+        Expect(LangTokenType.LessThan);
+        var parameters = new List<GenericParameter>();
+
+        while (CurrentToken.Type != LangTokenType.GreaterThan)
+        {
+            if (CurrentToken.Type == LangTokenType.EndOfFile)
+            {
+                throw CreateSyntaxError("意外的文件结束符，期望 '>'");
+            }
+
+            var position = CreateSourcePosition(CurrentToken);
+            var paramName = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+
+            List<string>? constraints = null;
+            if (CurrentToken.Type == LangTokenType.Colon)
+            {
+                Expect(LangTokenType.Colon);
+                constraints = ParseGenericConstraints();
+            }
+
+            parameters.Add(new GenericParameter(paramName, constraints, position));
+
+            if (CurrentToken.Type == LangTokenType.Comma)
+            {
+                Expect(LangTokenType.Comma);
+                continue;
+            }
+
+            break;
+        }
+
+        Expect(LangTokenType.GreaterThan);
+        return parameters;
+    }
+
+    /// <summary>
+    /// 解析泛型约束列表
+    /// 语法：IComparable | ICloneable
+    /// </summary>
+    /// <returns>约束名称列表</returns>
+    private List<string> ParseGenericConstraints()
+    {
+        var constraints = new List<string>();
+
+        if (CurrentToken.Type != LangTokenType.Identifier)
+        {
+            throw CreateSyntaxError($"期望约束类型名称，但得到 {CurrentToken.Type}");
+        }
+
+        constraints.Add(CurrentToken.Value);
+        Expect(LangTokenType.Identifier);
+
+        while (CurrentToken.Type == LangTokenType.Pipe)
+        {
+            Expect(LangTokenType.Pipe);
+
+            if (CurrentToken.Type != LangTokenType.Identifier)
+            {
+                throw CreateSyntaxError($"期望约束类型名称，但得到 {CurrentToken.Type}");
+            }
+
+            constraints.Add(CurrentToken.Value);
+            Expect(LangTokenType.Identifier);
+        }
+
+        return constraints;
+    }
+
+    /// <summary>
+    /// 解析泛型类型注解
+    /// 语法：<int>, <T>, <List<int>>
+    /// </summary>
+    /// <returns>泛型类型注解字符串（包括 < 和 >）</returns>
+    private string ParseGenericTypeAnnotation()
+    {
+        var result = "<";
+        Expect(LangTokenType.LessThan);
+
+        while (CurrentToken.Type != LangTokenType.GreaterThan)
+        {
+            if (CurrentToken.Type == LangTokenType.EndOfFile)
+            {
+                throw CreateSyntaxError("意外的文件结束符，期望 '>'");
+            }
+
+            if (CurrentToken.Type != LangTokenType.Identifier)
+            {
+                throw CreateSyntaxError($"期望类型参数名称，但得到 {CurrentToken.Type}");
+            }
+
+            result += CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+
+            // 递归处理嵌套泛型
+            if (CurrentToken.Type == LangTokenType.LessThan)
+            {
+                result += ParseGenericTypeAnnotation();
+            }
+
+            // 可空类型标记
+            if (CurrentToken.Type == LangTokenType.Question)
+            {
+                result += "?";
+                Expect(LangTokenType.Question);
+            }
+
+            if (CurrentToken.Type == LangTokenType.Comma)
+            {
+                result += ", ";
+                Expect(LangTokenType.Comma);
+                continue;
+            }
+
+            break;
+        }
+
+        result += ">";
+        Expect(LangTokenType.GreaterThan);
+        return result;
     }
 }

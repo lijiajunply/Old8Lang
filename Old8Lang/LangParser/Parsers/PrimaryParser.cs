@@ -269,6 +269,12 @@ public class PrimaryParser(
                 return ParseListInitOrSlice();
             }
 
+            // 检查是否是泛型实例化：Class<T>(...) 或 func<T>(...)
+            if (Peek().Type == LangTokenType.LessThan)
+            {
+                return ParseGenericInstantiation();
+            }
+
             // 检查是否是函数调用：func(...)
             if (Peek().Type == LangTokenType.LeftParen)
             {
@@ -310,6 +316,7 @@ public class PrimaryParser(
             LangTokenType.LeftBrace => ParseListOrDictionary(),
             LangTokenType.Dollar => ParseStringTemplate(), // 处理字符串模板：$"string", ${expression}, $($"string")
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftBracket => ParseListInitOrSlice(),
+            LangTokenType.Identifier when Peek().Type == LangTokenType.LessThan => ParseGenericInstantiation(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseInstantiate(),
             LangTokenType.Identifier => ParseIdentifier(),
             LangTokenType.True or LangTokenType.False => ParseBoolLiteral(),
@@ -757,7 +764,7 @@ public class PrimaryParser(
                 }
                 else
                 {
-                    return new FuncLangValue(returnTypeAnnotation, [], block, position, true);
+                    return new FuncLangValue(returnTypeAnnotation, [], block, null, position, true);
                 }
             }
         }
@@ -859,7 +866,7 @@ public class PrimaryParser(
                     }
                     else
                     {
-                        return new FuncLangValue(returnTypeAnnotation, ids, block, position, true);
+                        return new FuncLangValue(returnTypeAnnotation, ids, block, null, position, true);
                     }
                 }
             }
@@ -1584,6 +1591,113 @@ public class PrimaryParser(
         }
 
         return new MatchExpression(matchValue, cases, position);
+    }
+
+    /// <summary>
+    /// 解析泛型实例化表达式
+    /// 语法：Box<int>() 或 map<string>(arr, func) 或 Box<int> (不调用构造)
+    /// </summary>
+    /// <returns>泛型实例化表达式</returns>
+    private LangExpression ParseGenericInstantiation()
+    {
+        // 解析基础表达式（类名或函数名）
+        var baseExpression = ParseIdentifier();
+        var position = CreateSourcePosition(CurrentToken);
+
+        // 解析类型参数列表（支持嵌套泛型）
+        var typeArgumentsString = ParseGenericTypeArguments();
+
+        // 将字符串形式的类型参数列表拆分（简化处理，暂时以整体字符串存储）
+        var typeArguments = new List<string> { typeArgumentsString };
+
+        // 检查是否有调用参数
+        if (CurrentToken.Type == LangTokenType.LeftParen)
+        {
+            // 有调用参数：Box<int>(...) 或 map<string>(...)
+            Expect(LangTokenType.LeftParen);
+            var callArguments = new List<LangExpression>();
+
+            while (CurrentToken.Type != LangTokenType.RightParen)
+            {
+                if (CurrentToken.Type == LangTokenType.EndOfFile)
+                {
+                    throw CreateSyntaxError("意外的文件结束符，期望 ')'");
+                }
+
+                var arg = expressionParserFactory().ParseExpression();
+                callArguments.Add(arg);
+
+                if (CurrentToken.Type == LangTokenType.Comma)
+                {
+                    Expect(LangTokenType.Comma);
+                    continue;
+                }
+
+                break;
+            }
+
+            Expect(LangTokenType.RightParen);
+
+            // 返回泛型函数调用或类实例化
+            return new GenericInstanceExpression(baseExpression, typeArguments, callArguments, position);
+        }
+        else
+        {
+            // 没有调用参数：Box<int> (只是类型引用，不调用构造)
+            return new GenericInstanceExpression(baseExpression, typeArguments, position);
+        }
+    }
+
+    /// <summary>
+    /// 解析泛型类型参数，支持嵌套泛型
+    /// 语法：<int>, <T>, <List<int>>, <List<List<string>>>
+    /// </summary>
+    /// <returns>类型参数字符串（不包括外层 < 和 >）</returns>
+    private string ParseGenericTypeArguments()
+    {
+        var result = "";
+        Expect(LangTokenType.LessThan);
+
+        while (CurrentToken.Type != LangTokenType.GreaterThan)
+        {
+            if (CurrentToken.Type == LangTokenType.EndOfFile)
+            {
+                throw CreateSyntaxError("意外的文件结束符，期望 '>'");
+            }
+
+            if (CurrentToken.Type != LangTokenType.Identifier)
+            {
+                throw CreateSyntaxError($"期望类型参数名称，但得到 {CurrentToken.Type}");
+            }
+
+            result += CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+
+            // 递归处理嵌套泛型
+            if (CurrentToken.Type == LangTokenType.LessThan)
+            {
+                result += "<" + ParseGenericTypeArguments() + ">";
+            }
+
+            // 可空类型标记
+            if (CurrentToken.Type == LangTokenType.Question)
+            {
+                result += "?";
+                Expect(LangTokenType.Question);
+            }
+
+            if (CurrentToken.Type == LangTokenType.Comma)
+            {
+                result += ", ";
+                Expect(LangTokenType.Comma);
+                continue;
+            }
+
+            break;
+        }
+
+        Expect(LangTokenType.GreaterThan);
+        return result;
     }
 
     #endregion

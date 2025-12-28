@@ -1,0 +1,40 @@
+// 泛型约束语法测试
+
+// 单个约束
+class SortedList<T: IComparable> {
+    private items:List<T>
+
+    func add(item:T) -> void {
+        // 实现省略
+    }
+}
+
+// 多个约束（使用 | 分隔）
+class Container<T: IComparable | ICloneable> {
+    private data:T
+
+    func getData() -> T {
+        return this.data
+    }
+}
+
+// 泛型函数带约束
+func compare<T: IComparable>(a:T, b:T) -> int {
+    return 0  // 简化实现
+}
+
+// 多类型参数，部分有约束
+class Dictionary<K: IComparable, V> {
+    private keys:List<K>
+    private values:List<V>
+
+    func add(key:K, value:V) -> void {
+        // 实现省略
+    }
+}
+
+// 接口继承与约束
+interface IRepository<T: IEntity> {
+    func save(entity:T) -> void
+    func findById(id:int) -> T
+}

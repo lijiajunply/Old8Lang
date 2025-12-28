@@ -207,7 +207,9 @@ public partial class GeneratorLangValue : LangValueType, ILangList
             null,
             [],
             new BlockStatement(new List<OldStatement>()),
-            Position
+            null,
+            Position,
+            false
         );
 
         return new GeneratorLangValue(slicedFunc, Position);

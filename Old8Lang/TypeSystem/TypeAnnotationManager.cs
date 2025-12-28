@@ -69,8 +69,8 @@ public class TypeAnnotationManager
     }
 
     /// <summary>
-    /// 解析类型假注表达式
-    /// 支持复杂类型表达式如 "List&lt;int&gt;", "Map&lt;string, Person&gt;", "Shape|Circle", "int?"
+    /// 解析类型假注表达式（递归支持嵌套泛型）
+    /// 支持复杂类型表达式如 "List&lt;int&gt;", "Map&lt;string, List&lt;Person&gt;&gt;", "Shape|Circle", "int?"
     /// </summary>
     public ParsedTypeAnnotation ParseTypeAnnotation(string typeAnnotation)
     {
@@ -79,48 +79,137 @@ public class TypeAnnotationManager
             return new ParsedTypeAnnotation { BaseType = "any" };
         }
 
+        return ParseTypeAnnotationRecursive(typeAnnotation.Trim());
+    }
+
+    /// <summary>
+    /// 递归解析类型假注（内部方法）
+    /// </summary>
+    private ParsedTypeAnnotation ParseTypeAnnotationRecursive(string typeAnnotation)
+    {
         // 处理可空类型（例如 "int?", "string?"）
         if (typeAnnotation.EndsWith('?'))
         {
-            var innerType = typeAnnotation.Substring(0, typeAnnotation.Length - 1).Trim();
-            return new ParsedTypeAnnotation
-            {
-                BaseType = innerType,
-                IsNullable = true
-            };
+            var innerTypeStr = typeAnnotation.Substring(0, typeAnnotation.Length - 1).Trim();
+            var innerType = ParseTypeAnnotationRecursive(innerTypeStr);
+            innerType.IsNullable = true;
+            return innerType;
         }
 
-        // 处理联合类型
-        if (typeAnnotation.Contains('|'))
+        // 处理联合类型（检查顶层的 |，不检查泛型内部的）
+        var unionIndex = FindTopLevelSeparator(typeAnnotation, '|');
+        if (unionIndex >= 0)
         {
-            var types = typeAnnotation.Split('|', StringSplitOptions.RemoveEmptyEntries);
+            var types = SplitTopLevel(typeAnnotation, '|');
             return new ParsedTypeAnnotation
             {
                 BaseType = "union",
-                TypeParameters = types.Select(t => t.Trim()).ToList()
+                GenericArguments = types.Select(t => ParseTypeAnnotationRecursive(t.Trim())).ToList()
             };
         }
 
         // 处理泛型类型
-        if (typeAnnotation.Contains('<') && typeAnnotation.Contains('>'))
+        var genericStart = typeAnnotation.IndexOf('<');
+        if (genericStart > 0)
         {
-            var mainType = typeAnnotation[..typeAnnotation.IndexOf('<')].Trim();
-            var paramsPart = typeAnnotation.Substring(
-                typeAnnotation.IndexOf('<') + 1,
-                typeAnnotation.LastIndexOf('>') - typeAnnotation.IndexOf('<') - 1);
+            var mainType = typeAnnotation[..genericStart].Trim();
+            var genericEnd = FindMatchingBracket(typeAnnotation, genericStart);
 
-            var parameters = paramsPart.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(p => p.Trim()).ToList();
+            if (genericEnd < 0)
+            {
+                throw new ArgumentException($"泛型类型语法错误：缺少匹配的 '>'：{typeAnnotation}");
+            }
 
-            return new ParsedTypeAnnotation
+            var paramsPart = typeAnnotation.Substring(genericStart + 1, genericEnd - genericStart - 1).Trim();
+
+            // 递归解析泛型参数
+            var parameters = SplitTopLevel(paramsPart, ',')
+                .Select(p => ParseTypeAnnotationRecursive(p.Trim()))
+                .ToList();
+
+            var result = new ParsedTypeAnnotation
             {
                 BaseType = mainType,
-                TypeParameters = parameters
+                GenericArguments = parameters
             };
+
+            // 检查是否还有可空标记
+            if (genericEnd + 1 < typeAnnotation.Length && typeAnnotation[genericEnd + 1] == '?')
+            {
+                result.IsNullable = true;
+            }
+
+            return result;
         }
 
         // 简单类型
         return new ParsedTypeAnnotation { BaseType = typeAnnotation.Trim() };
+    }
+
+    /// <summary>
+    /// 查找顶层（不在泛型括号内）的分隔符
+    /// </summary>
+    private int FindTopLevelSeparator(string text, char separator)
+    {
+        int depth = 0;
+        for (int i = 0; i < text.Length; i++)
+        {
+            if (text[i] == '<') depth++;
+            else if (text[i] == '>') depth--;
+            else if (text[i] == separator && depth == 0)
+                return i;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// 按顶层分隔符分割（不分割泛型括号内的内容）
+    /// </summary>
+    private List<string> SplitTopLevel(string text, char separator)
+    {
+        var result = new List<string>();
+        var current = new System.Text.StringBuilder();
+        int depth = 0;
+
+        foreach (var ch in text)
+        {
+            if (ch == '<') depth++;
+            else if (ch == '>') depth--;
+
+            if (ch == separator && depth == 0)
+            {
+                result.Add(current.ToString());
+                current.Clear();
+            }
+            else
+            {
+                current.Append(ch);
+            }
+        }
+
+        if (current.Length > 0)
+        {
+            result.Add(current.ToString());
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 查找匹配的右括号
+    /// </summary>
+    private int FindMatchingBracket(string text, int openIndex)
+    {
+        int depth = 1;
+        for (int i = openIndex + 1; i < text.Length; i++)
+        {
+            if (text[i] == '<') depth++;
+            else if (text[i] == '>') depth--;
+
+            if (depth == 0)
+                return i;
+        }
+        return -1;
     }
 
     /// <summary>
@@ -244,6 +333,94 @@ public class TypeAnnotationManager
 
         return typeInfo.GetMembers(manager);
     }
+
+    /// <summary>
+    /// 注册泛型类型定义
+    /// </summary>
+    public void RegisterGenericType(
+        string name,
+        List<string> typeParameters,
+        Dictionary<string, List<ITypeInfo>>? constraints = null,
+        string? baseClassName = null)
+    {
+        ITypeInfo? baseType = null;
+        if (!string.IsNullOrEmpty(baseClassName))
+        {
+            baseType = TypeFamily.GetType(baseClassName);
+        }
+
+        var genericType = new GenericTypeInfo(name, typeParameters, constraints, baseType);
+        TypeFamily.RegisterType(genericType);
+    }
+
+    /// <summary>
+    /// 实例化泛型类型
+    /// </summary>
+    public GenericTypeInfo? InstantiateGenericType(string name, Dictionary<string, ITypeInfo> typeArguments)
+    {
+        var genericDefinition = TypeFamily.GetType(name);
+        if (genericDefinition is not GenericTypeInfo genericType)
+        {
+            return null;
+        }
+
+        return genericType.Instantiate(typeArguments);
+    }
+
+    /// <summary>
+    /// 将 ParsedTypeAnnotation 转换为 ITypeInfo
+    /// </summary>
+    public ITypeInfo? ResolveTypeAnnotation(ParsedTypeAnnotation annotation)
+    {
+        // 处理泛型类型
+        if (annotation.IsGeneric && annotation.GenericArguments != null)
+        {
+            var baseTypeInfo = TypeFamily.GetType(annotation.BaseType);
+            if (baseTypeInfo is GenericTypeInfo genericType)
+            {
+                // 解析泛型参数
+                var typeArgs = new Dictionary<string, ITypeInfo>();
+                for (int i = 0; i < annotation.GenericArguments.Count && i < genericType.TypeParameters.Count; i++)
+                {
+                    var argAnnotation = annotation.GenericArguments[i];
+                    var argType = ResolveTypeAnnotation(argAnnotation);
+                    if (argType != null)
+                    {
+                        typeArgs[genericType.TypeParameters[i]] = argType;
+                    }
+                }
+
+                return genericType.Instantiate(typeArgs);
+            }
+        }
+
+        // 处理简单类型
+        return TypeFamily.GetType(annotation.BaseType);
+    }
+
+    /// <summary>
+    /// 验证泛型约束
+    /// </summary>
+    public bool ValidateGenericConstraints(GenericTypeInfo genericType, Dictionary<string, ITypeInfo> typeArguments)
+    {
+        if (genericType.Constraints == null) return true;
+
+        foreach (var (paramName, constraintTypes) in genericType.Constraints)
+        {
+            if (typeArguments.TryGetValue(paramName, out var actualType))
+            {
+                foreach (var constraintType in constraintTypes)
+                {
+                    if (!actualType.IsCompatibleWith(constraintType))
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
 }
 
 /// <summary>
@@ -252,8 +429,66 @@ public class TypeAnnotationManager
 public class ParsedTypeAnnotation
 {
     public string BaseType { get; set; } = "";
+
+    /// <summary>
+    /// 泛型类型参数（递归结构，支持嵌套泛型）
+    /// 例如: List<int> → GenericArguments = [ParsedTypeAnnotation{BaseType="int"}]
+    /// 例如: Map<string, List<int>> → GenericArguments = [ParsedTypeAnnotation{BaseType="string"}, ParsedTypeAnnotation{BaseType="List", GenericArguments=[...]}]
+    /// </summary>
+    public List<ParsedTypeAnnotation>? GenericArguments { get; set; }
+
+    /// <summary>
+    /// 旧的类型参数（为保持兼容性保留，但推荐使用 GenericArguments）
+    /// </summary>
+    [Obsolete("请使用 GenericArguments 代替")]
     public List<string>? TypeParameters { get; set; }
+
+    /// <summary>
+    /// 类型约束（用于泛型定义时的约束）
+    /// 例如: T: IComparable → Constraints = [ParsedTypeAnnotation{BaseType="IComparable"}]
+    /// </summary>
+    public List<ParsedTypeAnnotation>? Constraints { get; set; }
+
     public bool IsNullable { get; set; } = false;
-    public bool IsGeneric => TypeParameters is { Count: > 0 };
+
+    /// <summary>
+    /// 是否为泛型类型
+    /// </summary>
+    public bool IsGeneric => GenericArguments is { Count: > 0 } || TypeParameters is { Count: > 0 };
+
+    /// <summary>
+    /// 是否为联合类型
+    /// </summary>
     public bool IsUnion => BaseType == "union";
+
+    /// <summary>
+    /// 获取完整的类型名称（包括泛型参数）
+    /// </summary>
+    public string GetFullName()
+    {
+        if (IsUnion && GenericArguments != null)
+        {
+            return string.Join("|", GenericArguments.Select(arg => arg.GetFullName()));
+        }
+
+        if (!IsGeneric)
+        {
+            return BaseType + (IsNullable ? "?" : "");
+        }
+
+        if (GenericArguments != null)
+        {
+            var args = string.Join(", ", GenericArguments.Select(arg => arg.GetFullName()));
+            return $"{BaseType}<{args}>" + (IsNullable ? "?" : "");
+        }
+
+        // 兼容旧格式
+        if (TypeParameters != null)
+        {
+            var args = string.Join(", ", TypeParameters);
+            return $"{BaseType}<{args}>" + (IsNullable ? "?" : "");
+        }
+
+        return BaseType + (IsNullable ? "?" : "");
+    }
 }

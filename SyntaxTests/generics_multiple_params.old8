@@ -1,0 +1,64 @@
+// 多类型参数泛型测试
+
+// 两个类型参数
+class KeyValuePair<K, V> {
+    private key:K
+    private value:V
+
+    func init(k:K, v:V) -> void {
+        this.key <- k
+        this.value <- v
+    }
+
+    func getKey() -> K {
+        return this.key
+    }
+
+    func getValue() -> V {
+        return this.value
+    }
+}
+
+// 三个类型参数
+class Triple<T1, T2, T3> {
+    private first:T1
+    private second:T2
+    private third:T3
+
+    func getFirst() -> T1 {
+        return this.first
+    }
+
+    func getSecond() -> T2 {
+        return this.second
+    }
+
+    func getThird() -> T3 {
+        return this.third
+    }
+}
+
+// 多类型参数泛型函数
+func combine<A, B, C>(a:A, b:B, c:C) -> Triple<A, B, C> {
+    result <- Triple<A, B, C>()
+    return result
+}
+
+// 四个类型参数
+class Quad<T1, T2, T3, T4> {
+    private a:T1
+    private b:T2
+    private c:T3
+    private d:T4
+}
+
+// 混合类型参数和约束
+class MixedConstraints<T: IComparable, U, V: ICloneable> {
+    private first:T
+    private second:U
+    private third:V
+
+    func getFirst() -> T {
+        return this.first
+    }
+}

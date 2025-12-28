@@ -1,0 +1,48 @@
+// 嵌套泛型语法测试
+
+// 嵌套泛型类型
+class Matrix<T> {
+    private data:List<List<T>>
+
+    func get(i:int, j:int) -> T {
+        return this.data[i][j]
+    }
+
+    func set(i:int, j:int, value:T) -> void {
+        this.data[i][j] <- value
+    }
+}
+
+// 泛型类包含泛型字段
+class Container<T> {
+    private inner:Box<T>
+    private list:List<T>
+
+    func getInner() -> Box<T> {
+        return this.inner
+    }
+}
+
+// 三层嵌套
+class DeepNested<T> {
+    private data:List<List<List<T>>>
+
+    func getData() -> List<List<List<T>>> {
+        return this.data
+    }
+}
+
+// 泛型函数返回嵌套泛型
+func createMatrix<T>() -> List<List<T>> {
+    matrix <- {{}}
+    return matrix
+}
+
+// 复杂嵌套：泛型类中的泛型字典
+class ComplexContainer<K, V> {
+    private map:Dictionary<K, List<V>>
+
+    func get(key:K) -> List<V> {
+        return this.map[key]
+    }
+}

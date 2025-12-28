@@ -22,16 +22,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Core/ModuleSystemService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Core/ModuleSystemService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Loading/CacheManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Loading/CacheManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Loading/ModuleLoader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Loading/ModuleLoader.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Loading/NetworkModuleLoader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Loading/NetworkModuleLoader.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Resolution/ModuleResolver.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Resolution/ModuleResolver.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Resolution/VersionResolver.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Resolution/VersionResolver.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Symbols/ExportController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Symbols/ExportController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Symbols/SymbolExtractor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Symbols/SymbolExtractor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Symbols/SymbolRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ModuleSystem/Symbols/SymbolRegistry.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/PackageManagement/PackageManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ProjectManagement/PackageManager.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Generics/GenericsParserTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericInstanceExpression.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericParameter.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251228-2014-泛型语法测试.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/generics_class_basic.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/generics_constraints.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/generics_function_basic.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/generics_instantiation.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/generics_multiple_params.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/generics_nested.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_generic_field.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/test_generic_field2.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Generators/GeneratorLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Generators/GeneratorLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeAnnotationManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeAnnotationManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeInfo.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -152,6 +164,8 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Profiler/PerformanceAnalyzer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/TypeSystem/TypeAnnotationManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/TypeSystem/TypeInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" root0="FORCE_HIGHLIGHTING" />
@@ -910,7 +924,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="408" />
+    <option name="localTasksCounter" value="409" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -937,7 +951,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(serialization): 重构MessagePackSerializer字段命名并更新StandardLibraryRegistry&#10;&#10;- 将MessagePackSerializer中的私有字段从_options重命名为Options以符合命名规范&#10;- 更新所有使用_options字段的地方为Options&#10;- 将数组创建语法从new object[]替换为集合表达式[]&#10;- 在StandardLibraryRegistry中注册SerializationLib标准库及其相关类名" />
     <MESSAGE value="feat(ml): 添加机器学习库核心功能&#10;&#10;- 实现了分类训练器，支持逻辑回归、快速树和LightGBM等算法&#10;- 实现了回归训练器，支持SDCA、快速树和LightGBM等算法&#10;- 实现了聚类训练器，支持K-Means算法&#10;- 添加了数据加载器，支持CSV和内存数据加载&#10;- 实现了模型预测器，支持单个和批量预测&#10;- 添加了ML上下文包装器，提供统一的API入口&#10;- 实现了机器学习库绑定类，供Old8Lang调用&#10;- 添加了完整的单元测试覆盖所有核心功能&#10;- 提供了详细的使用示例，包含分类、回归和聚类场景" />
     <MESSAGE value="refactor(language-server): 重构语言服务器依赖注入和字段命名&#10;&#10;- 移除 MediatR 相关引用&#10;- 使用主构造函数注入 DocumentManager 服务&#10;- 将私有字段从 _documentManager 重命名为 documentManager&#10;- 更新 DocumentManager 中的字段命名从 _documents 到 Documents&#10;- 更新所有使用字段的地方为新的命名规范&#10;- 更新 workspace.xml 配置文件中的项目引用和运行配置" />
     <MESSAGE value="test(compiler): 添加算术表达式、数组操作和边界条件的编译测试&#10;&#10;- 实现算术表达式编译测试，覆盖加减乘除模运算和复杂表达式&#10;- 添加数组操作编译测试，包括数组创建、访问、赋值和连接功能&#10;- 创建边界条件编译测试，验证各种数据类型的边界值处理&#10;- 补充比较表达式编译测试，验证大小比较运算的正确性&#10;- 增加数值、字符串、集合等各类边界情况的编译验证&#10;- 添加嵌套结构和特殊变量名的编译边界测试" />
@@ -962,7 +975,8 @@
     <MESSAGE value="fix(compiler): 修复void函数IL生成问题&#10;&#10;- 移除ReturnStatement中错误的Task&lt;object&gt;包装逻辑&#10;- 同步函数（包括void函数）直接返回值，不进行Task包装&#10;- 修复函数返回值处理机制，解决InvalidProgramException异常&#10;- void函数测试通过，编译器生成的IL代码验证通过&#10;- 更新测试计划文档状态为已修复&#10;- 新增void函数测试用例和修复说明文档" />
     <MESSAGE value="feat(parser): 添加文件头指令支持&#10;&#10;- 实现文件头指令的词法分析和语法解析功能&#10;- 添加 FileHeaderDirective AST 节点类型&#10;- 在编译器和解释器中应用文件头指令配置&#10;- 支持元数据指令如 encoding、author、version 等&#10;- 支持编译器配置指令如 debug、verify-il、type-inference 等&#10;- 更新文档说明文件头指令的语法和用法&#10;- 添加相关测试文件验证功能正确性" />
     <MESSAGE value="feat(parser): 添加可空类型支持&#10;&#10;- 在 ClassParser 中添加可空类型注解解析逻辑&#10;- 在 FunctionParser 中实现返回值可空类型处理&#10;- 在 StatementParser 中支持可空类型变量声明&#10;- 扩展 TypeAnnotationManager 支持可空类型解析&#10;- 更新 LangId AST 节点处理可空类型注解&#10;- 添加可空类型测试文件和语法验证&#10;- 更新文档说明可空类型语法和使用方法&#10;- 在 ParsedTypeAnnotation 中添加 IsNullable 属性" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 添加可空类型支持&#10;&#10;- 在 ClassParser 中添加可空类型注解解析逻辑&#10;- 在 FunctionParser 中实现返回值可空类型处理&#10;- 在 StatementParser 中支持可空类型变量声明&#10;- 扩展 TypeAnnotationManager 支持可空类型解析&#10;- 更新 LangId AST 节点处理可空类型注解&#10;- 添加可空类型测试文件和语法验证&#10;- 更新文档说明可空类型语法和使用方法&#10;- 在 ParsedTypeAnnotation 中添加 IsNullable 属性" />
+    <MESSAGE value="refactor(module-system): 重构模块系统内部字段命名和构造函数&#10;&#10;- 将 CacheManager 中的私有字段从 _moduleCache 和 _cacheLock 重命名为 ModuleCache 和 CacheLock&#10;- 将 ModuleLoader 的构造函数改为主构造函数形式，移除字段赋值语句&#10;- 将 ModuleResolver 中的私有字段从 _pathResolver 和 _versionResolver 重命名为 PathResolver 和 VersionResolver&#10;- 将 NetworkModuleLoader 中的私有字段从 _cacheDirectory 重命名为 CacheDirectory&#10;- 使用集合表达式替换 HashSet 初始化语法&#10;- 优化条件判断语法，使用属性模式匹配替代 Count 检查&#10;- 使用 GetValueOrDefault 方法替代 TryGetValue 检查&#10;- 为 ImportOptions 和 ModuleImportResult 类添加 Serializable 特性&#10;- 更新 workspace.xml 中的文件变更列表和任务计数器" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(module-system): 重构模块系统内部字段命名和构造函数&#10;&#10;- 将 CacheManager 中的私有字段从 _moduleCache 和 _cacheLock 重命名为 ModuleCache 和 CacheLock&#10;- 将 ModuleLoader 的构造函数改为主构造函数形式，移除字段赋值语句&#10;- 将 ModuleResolver 中的私有字段从 _pathResolver 和 _versionResolver 重命名为 PathResolver 和 VersionResolver&#10;- 将 NetworkModuleLoader 中的私有字段从 _cacheDirectory 重命名为 CacheDirectory&#10;- 使用集合表达式替换 HashSet 初始化语法&#10;- 优化条件判断语法，使用属性模式匹配替代 Count 检查&#10;- 使用 GetValueOrDefault 方法替代 TryGetValue 检查&#10;- 为 ImportOptions 和 ModuleImportResult 类添加 Serializable 特性&#10;- 更新 workspace.xml 中的文件变更列表和任务计数器" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
