@@ -1,4 +1,5 @@
 using System.Reflection.Emit;
+using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Statement;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
@@ -119,6 +120,31 @@ public static class Compiler
     }
 
     /// <summary>
+    /// 注册全局静态类到LocalManager中
+    /// </summary>
+    /// <param name="local">局部变量管理器</param>
+    /// <remarks>
+    /// 该方法将所有全局静态类实例注册到LocalManager的GlobalStaticClasses字典中，
+    /// 使得在编译模式下可以像解释模式一样访问这些静态类
+    /// </remarks>
+    private static void RegisterGlobalStaticClasses(LocalManager local)
+    {
+        // 注册异步任务相关静态类
+        local.GlobalStaticClasses["Task"] = TaskClassLangValue.GetInstance();
+        local.GlobalStaticClasses["Thread"] = ThreadClassLangValue.GetInstance();
+        local.GlobalStaticClasses["TaskScheduler"] = TaskSchedulerClassLangValue.GetInstance();
+        local.GlobalStaticClasses["CancellationTokenSource"] = CancellationTokenSourceConstructor.GetInstance();
+        local.GlobalStaticClasses["TaskCompletionSource"] = TaskCompletionSourceConstructor.GetInstance();
+
+        // 注册测试相关静态类
+        local.GlobalStaticClasses["Assert"] = AssertClassLangValue.GetInstance();
+        local.GlobalStaticClasses["TestRunner"] = TestRunnerClassLangValue.GetInstance();
+        local.GlobalStaticClasses["Mock"] = MockLibClassLangValue.GetInstance();
+
+        Log("全局静态类注册完成", LogLevel.Debug);
+    }
+
+    /// <summary>
     /// 将抽象语法树编译为可执行的委托
     /// </summary>
     /// <param name="statement">表示整个程序的块语句</param>
@@ -142,6 +168,9 @@ public static class Compiler
         var dynamicMethod = new DynamicMethod("OldLangRun", null, null, true);
         var ilGenerator = dynamicMethod.GetILGenerator();
         var local = new LocalManager() { FilePath = path, Interpreter = i };
+
+        // 注册全局静态类
+        RegisterGlobalStaticClasses(local);
 
         try
         {

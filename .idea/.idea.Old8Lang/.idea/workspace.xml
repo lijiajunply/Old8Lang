@@ -22,18 +22,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/CompilerFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/DictFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/ExecFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/JsonFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/LockFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/SpawnFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/ToObjFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Implementations/TupleFunction.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Compiler/AssertHelper.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Compiler/StaticClassCompiler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_assert_compiler.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompilerTestPlan.md" beforeDir="false" afterPath="$PROJECT_DIR$/CompilerTestPlan.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,13 +101,29 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/MachineLearningLib/MachineLearningLibTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/LangId.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/LangId.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/LangId.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Operation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/StaticValues/AssertClassLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Visitor/Generated/CompilerVisitor.Stubs.generated.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Visitor/Generated/LangListItem.Accept.generated.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/Compiler.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/Compiler.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/Compiler.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/Compiler.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/Compiler.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/LocalManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/LocalManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/LocalManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/Parsers/StatementParser.cs" root0="SKIP_HIGHLIGHTING" />

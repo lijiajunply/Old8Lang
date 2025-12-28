@@ -1,0 +1,70 @@
+// 直接在main中测试
+
+func main() -> void {
+    PrintLine("开始测试...")
+    PrintLine("=== 测试基础断言 ===")
+
+    Assert.AssertEqual(1, 1)
+    PrintLine("✓ AssertEqual 通过")
+
+    Assert.AssertNotEqual(1, 2)
+    PrintLine("✓ AssertNotEqual 通过")
+
+    Assert.AssertTrue(true)
+    PrintLine("✓ AssertTrue 通过")
+
+    Assert.AssertFalse(false)
+    PrintLine("✓ AssertFalse 通过")
+
+    PrintLine("")
+    PrintLine("=== 测试比较断言 ===")
+
+    Assert.AssertGreater(10, 5)
+    PrintLine("✓ AssertGreater 通过")
+
+    Assert.AssertGreaterOrEqual(10, 10)
+    PrintLine("✓ AssertGreaterOrEqual(10, 10) 通过")
+
+    Assert.AssertGreaterOrEqual(10, 5)
+    PrintLine("✓ AssertGreaterOrEqual(10, 5) 通过")
+
+    Assert.AssertLess(5, 10)
+    PrintLine("✓ AssertLess 通过")
+
+    Assert.AssertLessOrEqual(5, 5)
+    PrintLine("✓ AssertLessOrEqual(5, 5) 通过")
+
+    Assert.AssertLessOrEqual(5, 10)
+    PrintLine("✓ AssertLessOrEqual(5, 10) 通过")
+
+    PrintLine("")
+    PrintLine("=== 测试字符串断言 ===")
+
+    Assert.AssertContains("Hello World", "World")
+    PrintLine("✓ AssertContains 通过")
+
+    Assert.AssertNotContains("Hello World", "Python")
+    PrintLine("✓ AssertNotContains 通过")
+
+    Assert.AssertStartsWith("Hello World", "Hello")
+    PrintLine("✓ AssertStartsWith 通过")
+
+    Assert.AssertEndsWith("Hello World", "World")
+    PrintLine("✓ AssertEndsWith 通过")
+
+    PrintLine("")
+    PrintLine("=== 测试Null断言 ===")
+
+    nullValue:object <- null
+    Assert.AssertNull(nullValue)
+    PrintLine("✓ AssertNull 通过")
+
+    notNullValue:int <- 123
+    Assert.AssertNotNull(notNullValue)
+    PrintLine("✓ AssertNotNull 通过")
+
+    PrintLine("")
+    PrintLine("所有测试通过！🎉")
+}
+
+main()

@@ -1383,6 +1383,18 @@ public partial class Operation(
 
                 if (Right is Instance instance)
                 {
+                    // 尝试使用StaticClassCompiler处理全局静态类方法调用
+                    if (Left is LangId leftId && StaticClassCompiler.IsSupportedStaticClass(leftId.IdName))
+                    {
+                        var methodName = instance.Id.IdName;
+                        if (StaticClassCompiler.TryCompileStaticMethodCall(
+                                leftId.IdName, methodName, instance, ilGenerator, local, out var returnType))
+                        {
+                            return returnType!;
+                        }
+                        // 如果StaticClassCompiler无法处理，继续使用原有逻辑
+                    }
+
                     // 特殊处理Task静态方法调用
                     if (Left is LangId { IdName: "Task" })
                     {

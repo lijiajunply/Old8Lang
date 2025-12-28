@@ -136,6 +136,14 @@ public partial class LangId(
     /// </remarks>
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
+        // 首先检查是否是全局静态类
+        if (local.GlobalStaticClasses.TryGetValue(IdName, out var staticClassInstance))
+        {
+            // 将静态类实例加载到栈上
+            staticClassInstance.LoadIlValue(ilGenerator, local);
+            return;
+        }
+
         var value = local.GetLocalVar(IdName);
         if (value is null)
         {

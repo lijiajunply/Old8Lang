@@ -50,7 +50,12 @@ public class LocalManager
     /// 存储函数的参数列表信息（用于支持默认参数）
     /// </summary>
     public readonly Dictionary<string, List<LangId>> FuncParameters = [];
-    
+
+    /// <summary>
+    /// 全局静态类实例字典，键为类名，值为静态类实例
+    /// </summary>
+    public readonly Dictionary<string, LangValueType> GlobalStaticClasses = [];
+
     /// <summary>
     /// 当前所在的类环境类型
     /// </summary>
@@ -335,6 +340,12 @@ public class LocalManager
             cloned.FuncParameters[name] = @params;
         }
 
+        // 克隆全局静态类
+        foreach (var (name, instance) in GlobalStaticClasses)
+        {
+            cloned.GlobalStaticClasses[name] = instance;
+        }
+
         return cloned;
     }
 
@@ -387,6 +398,13 @@ public class LocalManager
         FilePath = cloned.FilePath;
         BreakLabel = cloned.BreakLabel;
         ContinueLabel = cloned.ContinueLabel;
+
+        // 清空并恢复全局静态类
+        GlobalStaticClasses.Clear();
+        foreach (var (name, instance) in cloned.GlobalStaticClasses)
+        {
+            GlobalStaticClasses[name] = instance;
+        }
     }
 
     /// <summary>
