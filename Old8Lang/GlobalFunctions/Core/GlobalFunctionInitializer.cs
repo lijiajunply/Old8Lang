@@ -36,6 +36,16 @@ public static class GlobalFunctionInitializer
             registry.Register(new AssertFunction());
             registry.Register(new ShowValuesFunction());
 
+            // 注册系统函数（从 Instance.cs 迁移）
+            registry.Register(new LockFunction());
+            registry.Register(new ExecFunction());
+            registry.Register(new JsonFunction());
+            registry.Register(new ToObjFunction());
+            registry.Register(new CompilerFunction());
+            registry.Register(new SpawnFunction());
+            registry.Register(new DictFunction());
+            registry.Register(new TupleFunction());
+
             _initialized = true;
         }
     }
