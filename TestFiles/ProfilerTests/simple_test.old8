@@ -1,0 +1,24 @@
+// 简单的性能测试
+fib <- 0
+total <- 0
+
+// 斐波那契计算
+func fibonacci(n) {
+    if (n <= 1) {
+        return n
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+// 测试函数
+fib <- fibonacci(10)
+total <- fib + fib
+
+PrintLine("Fibonacci(10) = " + fib)
+
+// 再计算一次
+fib <- fibonacci(15)
+total <- total + fib
+
+PrintLine("Fibonacci(15) = " + fib)
+PrintLine("Total = " + total)

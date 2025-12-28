@@ -1,0 +1,79 @@
+// 性能分析示例 - 计算密集型任务
+x <- 0
+total <- 0
+
+// 模拟一些计算密集型函数
+func computeHeavyTask(iterations) {
+    result <- 0
+    i <- 0
+    
+    while (i < iterations) {
+        // 模拟复杂计算
+        j <- 0
+        while (j < 1000) {
+            result <- result + i * j
+            j <- j + 1
+        }
+        i <- i + 1
+    }
+    
+    return result
+}
+
+// 快速函数
+func quickTask(value) {
+    return value * 2
+}
+
+// 中等复杂度函数
+func mediumTask(count) {
+    result <- 0
+    i <- 0
+    while (i < count) {
+        result <- result + i
+        i <- i + 1
+    }
+    return result
+}
+
+// 大量函数调用示例
+func testManyCalls() {
+    i <- 0
+    while (i < 10000) {
+        quickTask(i)
+        i <- i + 1
+    }
+}
+
+// 混度嵌套函数调用示例
+func deepRecursion(depth) {
+    if (depth <= 1) {
+        return 1
+    }
+    return deepRecursion(depth - 1) + 1
+}
+
+// 主要性能测试
+PrintLine("=== 开始性能分析示例 ===")
+
+// 执行快速任务
+quickTask(5)
+quickTask(10)
+quickTask(15)
+
+// 执行中等任务
+mediumTask(100)
+mediumTask(200)
+mediumTask(300)
+
+// 执行重任务 - 这里会产生性能瓶颈
+result1 <- computeHeavyTask(100)
+result2 <- computeHeavyTask(50)
+
+// 大量函数调用
+testManyCalls()
+
+// 递归调用
+recursionResult <- deepRecursion(10)
+
+PrintLine("=== 性能分析示例完成 ===")
