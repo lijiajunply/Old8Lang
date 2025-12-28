@@ -264,7 +264,7 @@ public class ErrorHandlingTests
     {
         // Arrange
         var code = @"
-            func test(a:int, b:int):int {
+            func test(a:int, b:int) -> int {
                 return a + b
             }
             result <- test(1)
@@ -285,7 +285,7 @@ public class ErrorHandlingTests
     {
         // Arrange
         var code = @"
-            func test(a:int):int {
+            func test(a:int) -> int {
                 return a * 2
             }
             result <- test(""hello"")
@@ -306,7 +306,7 @@ public class ErrorHandlingTests
     {
         // Arrange
         var code = @"
-            func test():int {
+            func test() -> int {
                 return ""hello""
             }
             result <- test()
@@ -331,7 +331,7 @@ public class ErrorHandlingTests
     {
         // Arrange
         var code = @"
-            func infinite():int {
+            func infinite() -> int {
                 return infinite()
             }
             result <- infinite()

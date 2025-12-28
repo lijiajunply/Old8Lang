@@ -18,12 +18,12 @@ public class ClassDeclarationTests
                 public name
                 public age
 
-                public constructor(name:string, age:int) {
+                func init(name:string, age:int) {
                     this.name <- name
                     this.age <- age
                 }
 
-                public getName() -> string {
+                func getName() -> string {
                     return this.name
                 }
             }
@@ -53,11 +53,11 @@ public class ClassDeclarationTests
         // Arrange
         var code = @"
             class Calculator {
-                public add(a:int, b:int) -> int {
+                public func add(a:int, b:int) -> int {
                     return a + b
                 }
 
-                public multiply(a:int, b:int) -> int {
+                public func multiply(a:int, b:int) -> int {
                     return a * b
                 }
             }
@@ -89,15 +89,15 @@ public class ClassDeclarationTests
             class Counter {
                 private count
 
-                public constructor() {
+                func init() {
                     this.count <- 0
                 }
 
-                public increment() -> void {
+                func increment() -> void {
                     this.count <- this.count + 1
                 }
 
-                public getCount() -> int {
+                func getCount() -> int {
                     return this.count
                 }
             }
@@ -131,7 +131,7 @@ public class ClassDeclarationTests
             class MathUtil {
                 public static pi <- 3.14
 
-                public static double(x:int) -> int {
+                public static func double(x:int) -> int {
                     return x * 2
                 }
             }

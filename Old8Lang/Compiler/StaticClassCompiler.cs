@@ -121,6 +121,12 @@ public static class StaticClassCompiler
 
         if (assertEqualMethod == null)
         {
+            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
+            assertEqualMethod = assertHelperType.GetMethod("AssertEqual");
+        }
+
+        if (assertEqualMethod == null)
+        {
             return false;
         }
 
@@ -145,6 +151,12 @@ public static class StaticClassCompiler
             instance.Ids.Count == 2
                 ? [typeof(object), typeof(object)]
                 : [typeof(object), typeof(object), typeof(string)]);
+
+        if (method == null)
+        {
+            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
+            method = assertHelperType.GetMethod("AssertNotEqual");
+        }
 
         if (method == null) return false;
 
@@ -177,6 +189,12 @@ public static class StaticClassCompiler
                 ? [typeof(bool)]
                 : [typeof(bool), typeof(string)]);
 
+        if (method == null)
+        {
+            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
+            method = assertHelperType.GetMethod("AssertTrue");
+        }
+
         if (method == null) return false;
 
         ilGenerator.Emit(OpCodes.Call, method);
@@ -208,6 +226,12 @@ public static class StaticClassCompiler
                 ? [typeof(bool)]
                 : [typeof(bool), typeof(string)]);
 
+        if (method == null)
+        {
+            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
+            method = assertHelperType.GetMethod("AssertFalse");
+        }
+
         if (method == null) return false;
 
         ilGenerator.Emit(OpCodes.Call, method);
@@ -231,6 +255,12 @@ public static class StaticClassCompiler
             instance.Ids.Count == 1
                 ? [typeof(object)]
                 : [typeof(object), typeof(string)]);
+
+        if (method == null)
+        {
+            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
+            method = assertHelperType.GetMethod("AssertNull");
+        }
 
         if (method == null) return false;
 
@@ -256,6 +286,12 @@ public static class StaticClassCompiler
                 ? [typeof(object)]
                 : [typeof(object), typeof(string)]);
 
+        if (method == null)
+        {
+            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
+            method = assertHelperType.GetMethod("AssertNotNull");
+        }
+
         if (method == null) return false;
 
         ilGenerator.Emit(OpCodes.Call, method);
@@ -279,6 +315,12 @@ public static class StaticClassCompiler
             instance.Ids.Count == 2
                 ? [typeof(object), typeof(object)]
                 : [typeof(object), typeof(object), typeof(string)]);
+
+        if (method == null)
+        {
+            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
+            method = assertHelperType.GetMethod("AssertGreater");
+        }
 
         if (method == null) return false;
 
@@ -304,6 +346,12 @@ public static class StaticClassCompiler
                 ? [typeof(object), typeof(object)]
                 : [typeof(object), typeof(object), typeof(string)]);
 
+        if (method == null)
+        {
+            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
+            method = assertHelperType.GetMethod("AssertGreaterOrEqual");
+        }
+
         if (method == null) return false;
 
         ilGenerator.Emit(OpCodes.Call, method);
@@ -328,6 +376,12 @@ public static class StaticClassCompiler
                 ? [typeof(object), typeof(object)]
                 : [typeof(object), typeof(object), typeof(string)]);
 
+        if (method == null)
+        {
+            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
+            method = assertHelperType.GetMethod("AssertLess");
+        }
+
         if (method == null) return false;
 
         ilGenerator.Emit(OpCodes.Call, method);
@@ -351,6 +405,12 @@ public static class StaticClassCompiler
             instance.Ids.Count == 2
                 ? [typeof(object), typeof(object)]
                 : [typeof(object), typeof(object), typeof(string)]);
+
+        if (method == null)
+        {
+            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
+            method = assertHelperType.GetMethod("AssertLessOrEqual");
+        }
 
         if (method == null) return false;
 
@@ -384,6 +444,12 @@ public static class StaticClassCompiler
                 ? [typeof(string), typeof(string)]
                 : [typeof(string), typeof(string), typeof(string)]);
 
+        if (method == null)
+        {
+            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
+            method = assertHelperType.GetMethod("AssertContains");
+        }
+
         if (method == null) return false;
 
         ilGenerator.Emit(OpCodes.Call, method);
@@ -415,6 +481,12 @@ public static class StaticClassCompiler
             instance.Ids.Count == 2
                 ? [typeof(string), typeof(string)]
                 : [typeof(string), typeof(string), typeof(string)]);
+
+        if (method == null)
+        {
+            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
+            method = assertHelperType.GetMethod("AssertNotContains");
+        }
 
         if (method == null) return false;
 
@@ -448,6 +520,12 @@ public static class StaticClassCompiler
                 ? [typeof(string), typeof(string)]
                 : [typeof(string), typeof(string), typeof(string)]);
 
+        if (method == null)
+        {
+            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
+            method = assertHelperType.GetMethod("AssertStartsWith");
+        }
+
         if (method == null) return false;
 
         ilGenerator.Emit(OpCodes.Call, method);
@@ -479,6 +557,12 @@ public static class StaticClassCompiler
             instance.Ids.Count == 2
                 ? [typeof(string), typeof(string)]
                 : [typeof(string), typeof(string), typeof(string)]);
+
+        if (method == null)
+        {
+            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
+            method = assertHelperType.GetMethod("AssertEndsWith");
+        }
 
         if (method == null) return false;
 

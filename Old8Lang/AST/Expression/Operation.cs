@@ -1403,7 +1403,9 @@ public partial class Operation(
                         {
                             return returnType!;
                         }
-                        // 如果StaticClassCompiler无法处理，继续使用原有逻辑
+                        // 如果StaticClassCompiler无法处理这个方法，抛出更有用的错误
+                        throw new InvalidOperationError(this, $"方法 '{methodName}' 不支持",
+                            $"静态类 '{leftId.IdName}' 不支持方法 '{methodName}'。请检查方法名是否正确。");
                     }
 
                     // 特殊处理Task静态方法调用

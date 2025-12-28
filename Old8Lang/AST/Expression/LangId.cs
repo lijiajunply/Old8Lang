@@ -259,6 +259,19 @@ public partial class LangId(
             return varType;
         }
 
+        // 检查是否是全局静态类（Assert, Task, Thread等）
+        if (local.GlobalStaticClasses.ContainsKey(IdName))
+        {
+            // 返回对应静态类的实际类型
+            return IdName switch
+            {
+                "Assert" => typeof(AssertHelper),
+                "Task" => typeof(Task),
+                "Thread" => typeof(Thread),
+                _ => typeof(object)
+            };
+        }
+
         return typeof(object);
     }
 }
