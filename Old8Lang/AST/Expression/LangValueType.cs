@@ -293,7 +293,357 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
             }).ToList()),
             Tuple<object, object> a => new TupleLangValue(ObjToValue(a.Item1), ObjToValue(a.Item2)),
             ValueTuple<object, object> a => new TupleLangValue(ObjToValue(a.Item1), ObjToValue(a.Item2)),
-            _ => throw new InvalidOperationError(new SourcePosition(), $"不支持将类型 '{value.GetType().Name}' 转换为Old8Lang值")
+            _ => TryEnhancedConversion(value, new SourcePosition())
         };
+    }
+
+    /// <summary>
+    /// 将 .NET 对象转换为 Old8Lang 值（增强版本，带位置信息）
+    /// </summary>
+    /// <param name="value">要转换的 .NET 对象</param>
+    /// <param name="position">源代码位置，用于错误报告</param>
+    /// <returns>转换后的 Old8Lang 值</returns>
+    public static LangValueType ObjToValue(object? value, SourcePosition position)
+    {
+        if (value == null)
+        {
+            return NullLangValue.Instance;
+        }
+
+        var valueType = value.GetType();
+
+        // 处理可空类型
+        if (Nullable.GetUnderlyingType(valueType) != null)
+        {
+            return value switch
+            {
+                null => NullLangValue.Instance,
+                _ => ObjToValue(Convert.ChangeType(value, Nullable.GetUnderlyingType(valueType)!), position)
+            };
+        }
+
+        // 处理 Task 和 Task<T> 类型
+        if (valueType.Name is "Task`1" or "Task")
+        {
+            return HandleTaskConversionEnhanced(value, position);
+        }
+
+        // 处理数组
+        if (valueType.IsArray)
+        {
+            return HandleArrayConversionEnhanced(value, position);
+        }
+
+        // 处理枚举
+        if (valueType.IsEnum)
+        {
+            return StringLangValue.Create(value.ToString());
+        }
+
+        // 处理集合类型
+        if (IsGenericCollectionTypeEnhanced(valueType, out var elementType))
+        {
+            return HandleCollectionConversionEnhanced(value, elementType, position);
+        }
+
+        // 处理字典类型
+        if (IsDictionaryTypeEnhanced(valueType, out var keyType, out var valueTypeArg))
+        {
+            return HandleDictionaryConversionEnhanced(value, keyType, valueTypeArg, position);
+        }
+
+        // 处理元组
+        if (IsTupleTypeEnhanced(valueType))
+        {
+            return HandleTupleConversionEnhanced(value, position);
+        }
+
+        // 处理增强的基本类型
+        return value switch
+        {
+            int a => IntLangValue.Create(a),
+            long a => HandleLongConversionEnhanced(a, position),
+            short a => IntLangValue.Create(a),
+            byte a => IntLangValue.Create(a),
+            float a => DoubleLangValue.Create(Math.Round(a, 10)),
+            double a => DoubleLangValue.Create(a),
+            decimal a => DoubleLangValue.Create(Math.Round((double)a, 15)),
+            string a => StringLangValue.Create(a),
+            char a => CharLangValue.Create(a),
+            bool a => BoolLangValue.Create(a),
+            DateTime a => StringLangValue.Create(a.ToString("O")),
+            DateTimeOffset a => StringLangValue.Create(a.ToString("O")),
+            Guid a => StringLangValue.Create(a.ToString()),
+            byte[] a => new ListLangValue(a.Cast<object>().ToList()),
+            List<object> a => new ListLangValue(a),
+            List<string> a => new ListLangValue(a.Cast<object>().ToList()),
+            List<int> a => new ListLangValue(a.Cast<object>().ToList()),
+            List<double> a => new ListLangValue(a.Cast<object>().ToList()),
+            object[] a => new ArrayLangValue(a.ToList()),
+            Dictionary<object, object> a => HandleDictionaryConversion(a, position),
+            Tuple<object, object> a => new TupleLangValue(ObjToValue(a.Item1, position), ObjToValue(a.Item2, position)),
+            ValueTuple<object, object> a => new TupleLangValue(ObjToValue(a.Item1, position), ObjToValue(a.Item2, position)),
+            _ => TryCustomConversionEnhanced(value, position)
+        };
+    }
+
+    /// <summary>
+    /// 处理 long 类型转换，避免溢出
+    /// </summary>
+    private static LangValueType HandleLongConversionEnhanced(long value, SourcePosition position)
+    {
+        if (value >= int.MinValue && value <= int.MaxValue)
+        {
+            return IntLangValue.Create((int)value);
+        }
+        
+        // 如果超出 int 范围，转换为字符串
+        return StringLangValue.Create(value.ToString());
+    }
+
+    /// <summary>
+    /// 处理 Task 类型转换
+    /// </summary>
+    private static LangValueType HandleTaskConversionEnhanced(object task, SourcePosition position)
+    {
+        try
+        {
+            var taskType = task.GetType();
+            var resultProperty = taskType.GetProperty("Result");
+            
+            if (resultProperty != null)
+            {
+                var taskResult = resultProperty.GetValue(task);
+                return ObjToValue(taskResult, position);
+            }
+
+            return new VoidLangValue();
+        }
+        catch (Exception ex)
+        {
+            // Task 转换失败，返回包含错误信息的字符串
+            return StringLangValue.Create($"Task转换失败: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 处理数组转换
+    /// </summary>
+    private static LangValueType HandleArrayConversionEnhanced(object array, SourcePosition position)
+    {
+        try
+        {
+            var list = new List<object>();
+            foreach (var item in (System.Collections.IEnumerable)array)
+            {
+                list.Add(item);
+            }
+
+            return new ArrayLangValue(list);
+        }
+        catch (Exception ex)
+        {
+            return StringLangValue.Create($"数组转换失败: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 处理集合类型转换
+    /// </summary>
+    private static LangValueType HandleCollectionConversionEnhanced(object collection, Type elementType, SourcePosition position)
+    {
+        try
+        {
+            var list = new List<object>();
+            foreach (var item in (System.Collections.IEnumerable)collection)
+            {
+                list.Add(item);
+            }
+
+            return new ListLangValue(list);
+        }
+        catch (Exception ex)
+        {
+            return StringLangValue.Create($"集合转换失败: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 处理字典类型转换
+    /// </summary>
+    private static LangValueType HandleDictionaryConversionEnhanced(object dictionary, Type keyType, Type valueTypeArg, SourcePosition position)
+    {
+        try
+        {
+            var pairs = new List<KeyValuePair<LangExpression, LangExpression>>();
+            
+            foreach (var item in (System.Collections.IDictionary)dictionary)
+            {
+                var entry = (System.Collections.DictionaryEntry)item;
+                var key = ObjToValue(entry.Key, position);
+                var value = ObjToValue(entry.Value, position);
+                pairs.Add(new KeyValuePair<LangExpression, LangExpression>(key, value));
+            }
+
+            return new DictionaryLangValue(pairs);
+        }
+        catch (Exception ex)
+        {
+            return StringLangValue.Create($"字典转换失败: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 处理字典转换（向后兼容）
+    /// </summary>
+    private static LangValueType HandleDictionaryConversion(Dictionary<object, object> dict, SourcePosition position)
+    {
+        return new DictionaryLangValue(dict.Select(x =>
+        {
+            var key = ObjToValue(x.Key, position);
+            var val = ObjToValue(x.Value, position);
+            return new KeyValuePair<LangExpression, LangExpression>(key, val);
+        }).ToList());
+    }
+
+    /// <summary>
+    /// 处理元组类型转换
+    /// </summary>
+    private static LangValueType HandleTupleConversionEnhanced(object tuple, SourcePosition position)
+    {
+        try
+        {
+            var tupleType = tuple.GetType();
+            
+            // 处理 ValueTuple
+            if (tupleType.FullName?.StartsWith("System.ValueTuple") == true)
+            {
+                var fields = tupleType.GetFields();
+                if (fields.Length >= 2)
+                {
+                    var item1 = fields[0].GetValue(tuple);
+                    var item2 = fields[1].GetValue(tuple);
+                    return new TupleLangValue(ObjToValue(item1, position), ObjToValue(item2, position));
+                }
+            }
+            
+            // 处理 Tuple
+            if (tupleType.FullName?.StartsWith("System.Tuple") == true)
+            {
+                var properties = tupleType.GetProperties();
+                if (properties.Length >= 2)
+                {
+                    var item1 = properties[0].GetValue(tuple);
+                    var item2 = properties[1].GetValue(tuple);
+                    return new TupleLangValue(ObjToValue(item1, position), ObjToValue(item2, position));
+                }
+            }
+
+            return StringLangValue.Create($"不支持的元组类型: {tupleType.Name}");
+        }
+        catch (Exception ex)
+        {
+            return StringLangValue.Create($"元组转换失败: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 尝试自定义类型转换
+    /// </summary>
+    private static LangValueType TryCustomConversionEnhanced(object value, SourcePosition position)
+    {
+        try
+        {
+            // 尝试调用 ToString() 方法
+            var stringValue = value.ToString();
+            return StringLangValue.Create(stringValue ?? "null");
+        }
+        catch (Exception ex)
+        {
+            // 最后的备选方案
+            return StringLangValue.Create($"[{value.GetType().Name} 转换失败: {ex.Message}]");
+        }
+    }
+
+    /// <summary>
+    /// 尝试增强的类型转换（用于原方法的 fallback）
+    /// </summary>
+    private static LangValueType TryEnhancedConversion(object value, SourcePosition position)
+    {
+        try
+        {
+            // 尝试新的转换逻辑
+            return ObjToValue(value, position);
+        }
+        catch
+        {
+            // 如果新方法也失败，返回字符串表示
+            try
+            {
+                return StringLangValue.Create(value.ToString() ?? "null");
+            }
+            catch
+            {
+                return StringLangValue.Create($"[{value.GetType().Name}]");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 检查是否为泛型集合类型
+    /// </summary>
+    private static bool IsGenericCollectionTypeEnhanced(Type type, out Type elementType)
+    {
+        elementType = null!;
+        
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+        {
+            elementType = type.GetGenericArguments()[0];
+            return true;
+        }
+
+        if (type.GetInterface("System.Collections.Generic.IEnumerable`1") != null)
+        {
+            elementType = type.GetGenericArguments()[0];
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 检查是否为字典类型
+    /// </summary>
+    private static bool IsDictionaryTypeEnhanced(Type type, out Type keyType, out Type valueType)
+    {
+        keyType = null!;
+        valueType = null!;
+
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+        {
+            var args = type.GetGenericArguments();
+            keyType = args[0];
+            valueType = args[1];
+            return true;
+        }
+
+        if (type.GetInterface("System.Collections.Generic.IDictionary`2") != null)
+        {
+            var args = type.GetGenericArguments();
+            keyType = args[0];
+            valueType = args[1];
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 检查是否为元组类型
+    /// </summary>
+    private static bool IsTupleTypeEnhanced(Type type)
+    {
+        return type.FullName?.StartsWith("System.Tuple") == true || 
+               type.FullName?.StartsWith("System.ValueTuple") == true;
     }
 }
