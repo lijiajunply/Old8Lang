@@ -84,7 +84,7 @@ Old8Lang 有以下关键字（不可作为标识符使用）：
 
 ```
 if elif else for while switch case default
-func async class mixin interface extends implements with
+func async class enum mixin interface extends implements with
 return break continue throw yield
 try catch finally
 import from as native
@@ -1153,9 +1153,225 @@ class Rectangle implements Drawable, Resizable {
 }
 ```
 
-### 5.7 异步编程
+### 5.7 枚举声明
 
-#### 5.7.1 async/await 基础
+#### 5.7.1 基本枚举声明
+
+枚举（Enum）用于定义一组命名的整数常量，提供更好的代码可读性和类型安全。
+
+**语法格式**：
+
+```old8
+enum EnumName {
+    Member1,
+    Member2,
+    Member3
+}
+```
+
+**基本示例**：
+
+```old8
+// 定义颜色枚举
+enum Color {
+    Red,      // 自动赋值为 0
+    Green,    // 自动赋值为 1
+    Blue      // 自动赋值为 2
+}
+
+// 访问枚举成员
+colorCode <- Color.Red
+PrintLine(colorCode.ToStr())  // 输出: 0
+```
+
+**枚举特点**：
+
+- 枚举成员自动从 0 开始递增赋值
+- 枚举成员的值是整数类型
+- 使用点号 `.` 访问枚举成员
+- 枚举成员可以用于比较和算术运算
+
+#### 5.7.2 显式值枚举
+
+可以为枚举成员显式指定整数值：
+
+```old8
+// HTTP 状态码
+enum HttpStatus {
+    OK <- 200,
+    Created <- 201,
+    BadRequest <- 400,
+    NotFound <- 404,
+    InternalServerError <- 500
+}
+
+status <- HttpStatus.OK
+if status == 200 {
+    PrintLine("请求成功")
+}
+```
+
+#### 5.7.3 混合自动和显式值
+
+可以混合使用自动值和显式值，未指定值的成员会在前一个成员值的基础上递增：
+
+```old8
+enum Priority {
+    Low,          // 0（自动）
+    Medium <- 5,  // 5（显式）
+    High,         // 6（自动，基于上一个值 +1）
+    Critical <- 10 // 10（显式）
+}
+
+PrintLine(Priority.Low.ToStr())      // 输出: 0
+PrintLine(Priority.Medium.ToStr())   // 输出: 5
+PrintLine(Priority.High.ToStr())     // 输出: 6
+PrintLine(Priority.Critical.ToStr()) // 输出: 10
+```
+
+#### 5.7.4 枚举值的使用
+
+**在条件语句中使用**：
+
+```old8
+enum Status {
+    Success,
+    Pending,
+    Failed
+}
+
+currentStatus <- Status.Success
+
+if currentStatus == 0 {
+    PrintLine("操作成功")
+} elif currentStatus == 1 {
+    PrintLine("等待中")
+} else {
+    PrintLine("操作失败")
+}
+```
+
+**在 switch 语句中使用**：
+
+```old8
+enum Direction {
+    North,
+    South,
+    East,
+    West
+}
+
+direction <- Direction.North
+
+switch direction {
+    case 0 {
+        PrintLine("向北")
+    }
+    case 1 {
+        PrintLine("向南")
+    }
+    case 2 {
+        PrintLine("向东")
+    }
+    case 3 {
+        PrintLine("向西")
+    }
+}
+```
+
+**在函数参数中使用**：
+
+```old8
+enum LogLevel {
+    Debug,
+    Info,
+    Warning,
+    Error
+}
+
+func log(level:int, message:string) -> void {
+    levelName <- match level {
+        case 0 -> "DEBUG"
+        case 1 -> "INFO"
+        case 2 -> "WARNING"
+        case 3 -> "ERROR"
+        case _ -> "UNKNOWN"
+    }
+    PrintLine("[" + levelName + "] " + message)
+}
+
+log(LogLevel.Info, "应用程序启动")
+log(LogLevel.Error, "发生错误")
+```
+
+#### 5.7.5 空枚举和单成员枚举
+
+```old8
+// 空枚举（语法合法）
+enum Empty {}
+
+// 单成员枚举
+enum SingleValue {
+    OnlyOne
+}
+
+value <- SingleValue.OnlyOne  // 值为 0
+```
+
+#### 5.7.6 枚举的特性
+
+**访问修饰符**：
+
+枚举支持访问修饰符（`public`、`private`）：
+
+```old8
+public enum PublicEnum {
+    Value1,
+    Value2
+}
+
+private enum PrivateEnum {
+    Value1,
+    Value2
+}
+```
+
+**枚举作用域**：
+
+- 枚举在当前模块作用域中定义
+- 枚举成员通过 `EnumName.MemberName` 访问
+- 枚举值是不可变的整数常量
+
+**类型兼容性**：
+
+```old8
+enum ErrorCode {
+    Success <- 0,
+    FileNotFound <- 1,
+    AccessDenied <- 2
+}
+
+// 枚举值可以与整数进行比较和运算
+code <- ErrorCode.FileNotFound
+if code > 0 {
+    PrintLine("发生错误")
+}
+
+// 枚举值可以参与算术运算
+nextCode <- code + 1
+PrintLine(nextCode.ToStr())  // 输出: 2
+```
+
+#### 5.7.7 枚举的局限性
+
+- 枚举成员的值必须是整数常量（不支持字符串或其他类型）
+- 枚举不支持方法定义
+- 枚举成员在定义后不可修改
+- 枚举没有命名空间隔离，所有成员必须唯一
+
+### 5.8 异步编程
+
+#### 5.8.1 async/await 基础
 
 ```old8
 // 定义异步函数
@@ -1170,7 +1386,7 @@ async func main() {
 }
 ```
 
-#### 5.7.2 异步生成器（Async Generator）
+#### 5.8.2 异步生成器（Async Generator）
 
 结合 `yield` 和 `async` 创建异步流：
 
@@ -1193,7 +1409,7 @@ async func processStream() {
 }
 ```
 
-#### 5.7.3 Task API
+#### 5.8.3 Task API
 
 ```old8
 // 延迟执行
@@ -1210,9 +1426,9 @@ results <- await Task.WhenAll([
 first <- await Task.WhenAny([asyncFunc1(), asyncFunc2()])
 ```
 
-### 5.8 多线程编程
+### 5.9 多线程编程
 
-#### 5.8.1 创建线程
+#### 5.9.1 创建线程
 
 使用 `spawn` 函数：
 
@@ -1229,7 +1445,7 @@ t <- spawn(worker(1))
 t.Join()
 ```
 
-#### 5.8.2 线程管理
+#### 5.9.2 线程管理
 
 ```old8
 // 当前线程
@@ -1244,9 +1460,9 @@ if t.IsAlive() {
 }
 ```
 
-### 5.9 异常处理
+### 5.10 异常处理
 
-#### 5.9.1 try-catch-finally
+#### 5.10.1 try-catch-finally
 
 ```old8
 try {
@@ -1258,7 +1474,7 @@ try {
 }
 ```
 
-#### 5.9.2 throw 语句
+#### 5.10.2 throw 语句
 
 ```old8
 throw "Something went wrong"
@@ -1274,9 +1490,9 @@ func divide(a:int, b:int) {
 }
 ```
 
-### 5.10 其他语句
+### 5.11 其他语句
 
-#### 5.10.1 return 语句
+#### 5.11.1 return 语句
 
 ```old8
 func getValue() {
@@ -1288,7 +1504,7 @@ func noReturn() {
 }
 ```
 
-#### 5.10.2 break 和 continue
+#### 5.11.2 break 和 continue
 
 ```old8
 for i <- 0, i < 10, i++ {
@@ -1302,7 +1518,7 @@ for i <- 0, i < 10, i++ {
 }
 ```
 
-#### 5.10.3 yield 语句
+#### 5.11.3 yield 语句
 
 在生成器函数中产生值：
 
@@ -1318,40 +1534,40 @@ for num in generateNumbers() {
 }
 ```
 
-### 5.11 导入语句
+### 5.12 导入语句
 
-#### 5.11.1 简单导入
+#### 5.12.1 简单导入
 
 ```old8
 import "math"
 import math
 ```
 
-#### 5.11.2 命名导入
+#### 5.12.2 命名导入
 
 ```old8
 import { sqrt, pow } from "math"
 import { sin, cos } from math
 ```
 
-#### 5.11.3 带别名的导入
+#### 5.12.3 带别名的导入
 
 ```old8
 import { sqrt as square_root } from "math"
 import { MyClass as MC } from "utils"
 ```
 
-### 5.12 原生库导入
+### 5.13 原生库导入
 
 导入 C# DLL 中的功能：
 
-#### 5.12.1 单个方法导入
+#### 5.13.1 单个方法导入
 
 ```old8
 native "Math.dll" MathLib Sqrt sqrt
 ```
 
-#### 5.12.2 批量导入所有方法
+#### 5.13.2 批量导入所有方法
 
 ```old8
 native "Old8LangLib" MathLib *
@@ -1361,13 +1577,13 @@ result <- Sqrt(16)
 pi <- GetPi()
 ```
 
-#### 5.12.3 选择性导入
+#### 5.13.3 选择性导入
 
 ```old8
 native "Old8LangLib" Time { GetTimeNow, TimeStamp }
 ```
 
-#### 5.12.4 类导入
+#### 5.13.4 类导入
 
 ```old8
 native "Math.dll" MathLib -> MathLib

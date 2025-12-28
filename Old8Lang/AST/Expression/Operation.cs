@@ -245,6 +245,17 @@ public partial class Operation(
                     return typeTemplate.Dot(Right, manager);
                 }
             }
+            // 处理枚举成员访问：EnumName.MemberName
+            else if (dotLeftResult is EnumTemplate enumTemplate)
+            {
+                if (Right is LangId memberId)
+                {
+                    // 访问枚举成员
+                    return enumTemplate.GetMemberValue(memberId.IdName);
+                }
+
+                throw new InvalidOperationError(this, $"枚举 '{enumTemplate.EnumName}' 只支持成员访问");
+            }
             else if (dotLeftResult is ArrayLangValue array)
             {
                 // 处理数组方法调用

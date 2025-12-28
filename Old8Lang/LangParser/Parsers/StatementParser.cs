@@ -258,6 +258,12 @@ public class StatementParser(
             return classParser.ParseInterfaceDeclaration();
         }
 
+        // 处理enum定义：enum identifier { member1, member2 = value, ... }
+        if (CurrentToken.Type == LangTokenType.Enum)
+        {
+            return ParseEnumDeclaration();
+        }
+
         // 处理import语句：import module, lazy import module, 或 dynamic import module
         if (CurrentToken.Type == LangTokenType.Import ||
             CurrentToken.Type == LangTokenType.Lazy ||
@@ -1643,6 +1649,84 @@ public class StatementParser(
         }
 
         return result;
+    }
+
+    #endregion
+
+    #region Enum Declaration
+
+    // enumDeclaration = "enum" identifier "{" enumMember ("," enumMember)* "}" ;
+    // enumMember = identifier ("=" expression)? ;
+    private EnumInit ParseEnumDeclaration()
+    {
+        var startToken = CurrentToken;
+        var startPos = CreateSourcePosition(startToken);
+
+        // 消费 "enum" 关键字
+        Expect(LangTokenType.Enum);
+
+        // 解析枚举名称
+        if (CurrentToken.Type != LangTokenType.Identifier)
+        {
+            throw CreateSyntaxError($"枚举定义需要枚举名称，但得到 {CurrentToken.Type}");
+        }
+        var enumName = CurrentToken.Value;
+        CurrentIndex++;
+
+        // 消费左花括号
+        Expect(LangTokenType.LeftBrace);
+
+        // 解析枚举成员
+        var members = new List<(string name, LangExpression? value)>();
+
+        // 处理空枚举
+        if (CurrentToken.Type == LangTokenType.RightBrace)
+        {
+            CurrentIndex++;
+            return new EnumInit(enumName, members, startPos);
+        }
+
+        // 解析第一个成员
+        while (true)
+        {
+            // 解析成员名称
+            if (CurrentToken.Type != LangTokenType.Identifier)
+            {
+                throw CreateSyntaxError($"枚举成员需要标识符，但得到 {CurrentToken.Type}");
+            }
+            var memberName = CurrentToken.Value;
+            CurrentIndex++;
+
+            // 检查是否有显式赋值
+            LangExpression? memberValue = null;
+            if (CurrentToken.Type == LangTokenType.Assignment)
+            {
+                CurrentIndex++;
+                // 解析值表达式（必须是常量表达式，通常是整数字面量）
+                memberValue = expressionParser.ParseExpression();
+            }
+
+            members.Add((memberName, memberValue));
+
+            // 检查是否有更多成员
+            if (CurrentToken.Type == LangTokenType.Comma)
+            {
+                CurrentIndex++;
+                // 允许尾随逗号
+                if (CurrentToken.Type == LangTokenType.RightBrace)
+                {
+                    break;
+                }
+                continue;
+            }
+
+            break;
+        }
+
+        // 消费右花括号
+        Expect(LangTokenType.RightBrace);
+
+        return new EnumInit(enumName, members, startPos);
     }
 
     #endregion

@@ -1,0 +1,48 @@
+// 枚举语法测试 - 基本枚举定义
+
+// 测试 1: 空枚举
+enum Empty {}
+
+// 测试 2: 简单枚举（自动值）
+enum Color {
+    Red,
+    Green,
+    Blue
+}
+
+// 测试 3: 带显式值的枚举
+enum HttpStatus {
+    OK <- 200,
+    Created <- 201,
+    BadRequest <- 400,
+    NotFound <- 404,
+    InternalServerError <- 500
+}
+
+// 测试 4: 混合自动和显式值
+enum Priority {
+    Low,
+    Medium <- 5,
+    High,
+    Critical <- 10
+}
+
+// 测试 5: 尾随逗号
+enum Direction {
+    North,
+    South,
+    East,
+    West,
+}
+
+// 测试 6: 单成员枚举
+enum SingleValue {
+    OnlyOne
+}
+
+// 测试 7: 从非零开始
+enum ErrorCode {
+    Success <- 0,
+    Warning <- 100,
+    Error <- 200
+}

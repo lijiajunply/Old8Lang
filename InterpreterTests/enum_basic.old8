@@ -1,0 +1,50 @@
+// 枚举解释器测试 - 基本功能
+
+// 定义枚举
+enum Color {
+    Red,
+    Green,
+    Blue
+}
+
+// 测试枚举成员访问
+PrintLine(Color.Red)
+PrintLine(Color.Green)
+PrintLine(Color.Blue)
+
+// 定义带显式值的枚举
+enum HttpStatus {
+    OK <- 200,
+    NotFound <- 404,
+    InternalServerError <- 500
+}
+
+// 测试显式值枚举
+PrintLine(HttpStatus.OK)
+PrintLine(HttpStatus.NotFound)
+PrintLine(HttpStatus.InternalServerError)
+
+// 测试枚举值在表达式中的使用
+status <- HttpStatus.OK
+if status == 200 {
+    PrintLine("Status is OK")
+}
+
+// 测试枚举值比较
+code <- Color.Red
+if code == 0 {
+    PrintLine("Color is Red")
+}
+
+// 测试混合自动和显式值
+enum Priority {
+    Low,
+    Medium <- 5,
+    High,
+    Critical <- 10
+}
+
+PrintLine(Priority.Low)
+PrintLine(Priority.Medium)
+PrintLine(Priority.High)
+PrintLine(Priority.Critical)

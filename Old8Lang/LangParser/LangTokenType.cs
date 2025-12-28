@@ -322,6 +322,11 @@ public enum LangTokenType
     Match,
 
     /// <summary>
+    /// enum
+    /// </summary>
+    Enum,
+
+    /// <summary>
     /// 文件头指令 (#!...)
     /// </summary>
     FileHeaderDirective
@@ -377,5 +382,6 @@ public enum KeywordType
     Lazy,
     Dynamic,
     Super,
-    Match
+    Match,
+    Enum
 }
