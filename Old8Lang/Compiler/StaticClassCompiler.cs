@@ -1,4 +1,5 @@
 using System.Reflection.Emit;
+using System.Reflection;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
@@ -28,7 +29,6 @@ public static class StaticClassCompiler
             "Assert" => true,
             "Task" => true,
             "Thread" => true,
-            "TaskScheduler" => true,
             _ => false
         };
     }
@@ -56,7 +56,8 @@ public static class StaticClassCompiler
         return className switch
         {
             "Assert" => TryCompileAssertMethod(methodName, instance, ilGenerator, local, out returnType),
-            // 其他静态类可以在这里添加
+            "Task" => TryCompileTaskMethod(methodName, instance, ilGenerator, local, out returnType),
+            "Thread" => TryCompileThreadMethod(methodName, instance, ilGenerator, local, out returnType),
             _ => false
         };
     }
@@ -483,6 +484,349 @@ public static class StaticClassCompiler
         if (method == null) return false;
 
         ilGenerator.Emit(OpCodes.Call, method);
+        return true;
+    }
+
+    #endregion
+
+    #region Task方法实现
+
+    /// <summary>
+    /// 尝试为Task类的方法生成IL代码
+    /// </summary>
+    private static bool TryCompileTaskMethod(
+        string methodName,
+        Instance instance,
+        ILGenerator ilGenerator,
+        LocalManager local,
+        out Type? returnType)
+    {
+        returnType = typeof(Task<object>);
+
+        // 根据方法名分发到具体的编译方法
+        return methodName switch
+        {
+            "Delay" => CompileTaskDelay(instance, ilGenerator, local, out returnType),
+            "FromResult" => CompileTaskFromResult(instance, ilGenerator, local, out returnType),
+            "Run" => CompileTaskRun(instance, ilGenerator, local, out returnType),
+            "WhenAll" => CompileTaskWhenAll(instance, ilGenerator, local, out returnType),
+            "WhenAny" => CompileTaskWhenAny(instance, ilGenerator, local, out returnType),
+            _ => false
+        };
+    }
+
+    /// <summary>
+    /// 编译 Task.Delay(milliseconds)
+    /// </summary>
+    private static bool CompileTaskDelay(Instance instance, ILGenerator ilGenerator, LocalManager local, out Type? returnType)
+    {
+        returnType = typeof(Task<object>);
+
+        if (instance.Ids.Count != 1)
+        {
+            return false;
+        }
+
+        // 加载延迟时间参数
+        instance.Ids[0].LoadIlValue(ilGenerator, local);
+
+        // 调用 Task.Delay(int)
+        var delayMethod = typeof(Task).GetMethod("Delay", [typeof(int)])!;
+        ilGenerator.Emit(OpCodes.Call, delayMethod);
+
+        // Task.Delay 返回 Task，我们需要将其转换为 Task<object>
+        // 使用 ContinueWith 创建一个返回 object 的延续任务
+        // 查找泛型版本的 ContinueWith<TResult>(Func<Task, TResult>)
+        var continueWithMethod = typeof(Task)
+            .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            .FirstOrDefault(m =>
+                m.Name == "ContinueWith" &&
+                m.IsGenericMethodDefinition &&
+                m.GetParameters().Length == 1 &&
+                m.GetParameters()[0].ParameterType.GetGenericTypeDefinition() == typeof(Func<,>));
+
+        if (continueWithMethod == null)
+        {
+            return false;
+        }
+
+        // 将泛型方法实例化为 ContinueWith<object>(Func<Task, object>)
+        continueWithMethod = continueWithMethod.MakeGenericMethod(typeof(object));
+
+        // 创建一个返回null的lambda委托
+        // 使用静态辅助方法
+        var helperMethod = typeof(TaskHelper).GetMethod("ReturnNull")!;
+        ilGenerator.Emit(OpCodes.Ldnull);
+        ilGenerator.Emit(OpCodes.Ldftn, helperMethod);
+        var funcConstructor = typeof(Func<Task, object>).GetConstructor([typeof(object), typeof(IntPtr)])!;
+        ilGenerator.Emit(OpCodes.Newobj, funcConstructor);
+
+        ilGenerator.Emit(OpCodes.Callvirt, continueWithMethod);
+
+        return true;
+    }
+
+    /// <summary>
+    /// 编译 Task.FromResult(value)
+    /// </summary>
+    private static bool CompileTaskFromResult(Instance instance, ILGenerator ilGenerator, LocalManager local, out Type? returnType)
+    {
+        returnType = typeof(Task<object>);
+
+        if (instance.Ids.Count != 1)
+        {
+            return false;
+        }
+
+        // 加载参数
+        instance.Ids[0].LoadIlValue(ilGenerator, local);
+        var paramType = instance.Ids[0].OutputType(local);
+
+        // 如果是值类型，装箱为object
+        if (paramType != null && paramType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, paramType);
+        }
+
+        // 调用 Task.FromResult<object>(object)
+        var fromResultMethod = typeof(Task)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .First(m => m is { Name: "FromResult", IsGenericMethodDefinition: true });
+        fromResultMethod = fromResultMethod.MakeGenericMethod(typeof(object));
+        ilGenerator.Emit(OpCodes.Call, fromResultMethod);
+
+        return true;
+    }
+
+    /// <summary>
+    /// 编译 Task.Run(action)
+    /// </summary>
+    private static bool CompileTaskRun(Instance instance, ILGenerator ilGenerator, LocalManager local, out Type? returnType)
+    {
+        returnType = typeof(Task<object>);
+
+        if (instance.Ids.Count != 1)
+        {
+            return false;
+        }
+
+        // 加载委托参数
+        instance.Ids[0].LoadIlValue(ilGenerator, local);
+        var paramType = instance.Ids[0].OutputType(local);
+
+        // 检查参数类型，应该是 Func<object> 或 Action
+        if (paramType == typeof(Func<object>))
+        {
+            // 调用 Task.Run<object>(Func<object>)
+            var runMethod = typeof(Task)
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .First(m => m.Name == "Run" &&
+                           m.IsGenericMethodDefinition &&
+                           m.GetParameters().Length == 1 &&
+                           m.GetParameters()[0].ParameterType.GetGenericTypeDefinition() == typeof(Func<>));
+            runMethod = runMethod.MakeGenericMethod(typeof(object));
+            ilGenerator.Emit(OpCodes.Call, runMethod);
+            return true;
+        }
+        else if (paramType == typeof(Action))
+        {
+            // 调用 Task.Run(Action)，然后转换为 Task<object>
+            var runMethod = typeof(Task)
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .First(m => m.Name == "Run" &&
+                           !m.IsGenericMethodDefinition &&
+                           m.GetParameters().Length == 1 &&
+                           m.GetParameters()[0].ParameterType == typeof(Action));
+            ilGenerator.Emit(OpCodes.Call, runMethod);
+
+            // 将 Task 转换为 Task<object>，使用 ContinueWith
+            var continueWithMethod = typeof(Task)
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .FirstOrDefault(m =>
+                    m.Name == "ContinueWith" &&
+                    m.IsGenericMethodDefinition &&
+                    m.GetParameters().Length == 1 &&
+                    m.GetParameters()[0].ParameterType.GetGenericTypeDefinition() == typeof(Func<,>));
+
+            if (continueWithMethod != null)
+            {
+                continueWithMethod = continueWithMethod.MakeGenericMethod(typeof(object));
+
+                // 创建返回 null 的委托
+                var helperMethod = typeof(TaskHelper).GetMethod("ReturnNull")!;
+                ilGenerator.Emit(OpCodes.Ldnull);
+                ilGenerator.Emit(OpCodes.Ldftn, helperMethod);
+                var funcConstructor = typeof(Func<Task, object>).GetConstructor([typeof(object), typeof(IntPtr)])!;
+                ilGenerator.Emit(OpCodes.Newobj, funcConstructor);
+
+                ilGenerator.Emit(OpCodes.Callvirt, continueWithMethod);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 编译 Task.WhenAll(tasks)
+    /// </summary>
+    private static bool CompileTaskWhenAll(Instance instance, ILGenerator ilGenerator, LocalManager local, out Type? returnType)
+    {
+        returnType = typeof(Task<object[]>);
+
+        if (instance.Ids.Count != 1)
+        {
+            return false;
+        }
+
+        // 加载任务列表/数组参数
+        var listExpr = instance.Ids[0];
+        listExpr.LoadIlValue(ilGenerator, local);
+
+        // 获取列表/数组类型
+        var listType = listExpr.OutputType(local);
+
+        if (listType == typeof(List<object>))
+        {
+            // 对于 List<object>，转换为数组
+            var toArrayMethod = typeof(List<object>).GetMethod("ToArray")!;
+            ilGenerator.Emit(OpCodes.Callvirt, toArrayMethod);
+
+            // 调用 Task.WhenAll，假设数组元素是 Task<object>
+            // 实际运行时需要转换，这里简化处理
+            var whenAllMethod = typeof(Task)
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .FirstOrDefault(m => m.Name == "WhenAll" &&
+                                    m.GetParameters()[0].ParameterType == typeof(Task<object>[]));
+
+            if (whenAllMethod != null)
+            {
+                ilGenerator.Emit(OpCodes.Call, whenAllMethod);
+                return true;
+            }
+        }
+        else if (listType == typeof(object[]))
+        {
+            // 对于 object[]，假设元素是 Task，调用 Task.WhenAll
+            var whenAllMethod = typeof(Task)
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .FirstOrDefault(m => m.Name == "WhenAll" &&
+                                    m.GetParameters().Length == 1 &&
+                                    m.GetParameters()[0].ParameterType.IsArray);
+
+            if (whenAllMethod != null)
+            {
+                ilGenerator.Emit(OpCodes.Call, whenAllMethod);
+                returnType = typeof(Task);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 编译 Task.WhenAny(tasks)
+    /// </summary>
+    private static bool CompileTaskWhenAny(Instance instance, ILGenerator ilGenerator, LocalManager local, out Type? returnType)
+    {
+        returnType = typeof(Task<object>);
+
+        if (instance.Ids.Count != 1)
+        {
+            return false;
+        }
+
+        // 加载任务列表/数组参数
+        var listExpr = instance.Ids[0];
+        listExpr.LoadIlValue(ilGenerator, local);
+
+        // 获取列表/数组类型
+        var listType = listExpr.OutputType(local);
+
+        if (listType == typeof(List<object>))
+        {
+            // 对于 List<object>，转换为数组
+            var toArrayMethod = typeof(List<object>).GetMethod("ToArray")!;
+            ilGenerator.Emit(OpCodes.Callvirt, toArrayMethod);
+
+            // 调用 Task.WhenAny
+            var whenAnyMethod = typeof(Task)
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .FirstOrDefault(m => m.Name == "WhenAny" &&
+                                    m.GetParameters()[0].ParameterType == typeof(Task<object>[]));
+
+            if (whenAnyMethod != null)
+            {
+                ilGenerator.Emit(OpCodes.Call, whenAnyMethod);
+                returnType = typeof(Task<Task<object>>);
+                return true;
+            }
+        }
+        else if (listType == typeof(object[]))
+        {
+            // 对于 object[]，假设元素是 Task
+            var whenAnyMethod = typeof(Task)
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .FirstOrDefault(m => m.Name == "WhenAny" &&
+                                    m.GetParameters().Length == 1 &&
+                                    m.GetParameters()[0].ParameterType.IsArray);
+
+            if (whenAnyMethod != null)
+            {
+                ilGenerator.Emit(OpCodes.Call, whenAnyMethod);
+                returnType = typeof(Task<Task>);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    #endregion
+
+    #region Thread方法实现
+
+    /// <summary>
+    /// 尝试为Thread类的方法生成IL代码
+    /// </summary>
+    private static bool TryCompileThreadMethod(
+        string methodName,
+        Instance instance,
+        ILGenerator ilGenerator,
+        LocalManager local,
+        out Type? returnType)
+    {
+        returnType = typeof(void);
+
+        // 根据方法名分发到具体的编译方法
+        return methodName switch
+        {
+            "Sleep" => CompileThreadSleep(instance, ilGenerator, local, out returnType),
+            _ => false
+        };
+    }
+
+    /// <summary>
+    /// 编译 Thread.Sleep(milliseconds)
+    /// </summary>
+    private static bool CompileThreadSleep(Instance instance, ILGenerator ilGenerator, LocalManager local, out Type? returnType)
+    {
+        returnType = typeof(void);
+
+        if (instance.Ids.Count != 1)
+        {
+            return false;
+        }
+
+        // 加载延迟时间参数
+        instance.Ids[0].LoadIlValue(ilGenerator, local);
+
+        // 调用 System.Threading.Thread.Sleep(int)
+        var sleepMethod = typeof(System.Threading.Thread).GetMethod("Sleep", [typeof(int)])!;
+        ilGenerator.Emit(OpCodes.Call, sleepMethod);
+
         return true;
     }
 
