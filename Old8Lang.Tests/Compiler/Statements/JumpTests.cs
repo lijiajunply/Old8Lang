@@ -18,7 +18,7 @@ public class JumpTests
         var code = @"
             func testBreak() -> int {
                 sum <- 0
-                for i <- 0; i < 10; i <- i + 1 {
+                for i <- 0, i < 10, i <- i + 1 {
                     if i == 5 {
                         break
                     }
@@ -78,8 +78,8 @@ public class JumpTests
         var code = @"
             func testNestedBreak() -> int {
                 count <- 0
-                for i <- 0; i < 3; i <- i + 1 {
-                    for j <- 0; j < 5; j <- j + 1 {
+                for i <- 0, i < 3, i <- i + 1 {
+                    for j <- 0, j < 5, j <- j + 1 {
                         count <- count + 1
                         if j == 2 {
                             break
@@ -145,7 +145,7 @@ public class JumpTests
         var code = @"
             func testContinue() -> int {
                 sum <- 0
-                for i <- 0; i < 10; i <- i + 1 {
+                for i <- 0, i < 10, i <- i + 1 {
                     if i % 2 == 0 {
                         continue
                     }
@@ -238,8 +238,8 @@ public class JumpTests
         var code = @"
             func testNestedContinue() -> int {
                 count <- 0
-                for i <- 0; i < 3; i <- i + 1 {
-                    for j <- 0; j < 5; j <- j + 1 {
+                for i <- 0, i < 3, i <- i + 1 {
+                    for j <- 0, j < 5, j <- j + 1 {
                         if j == 2 {
                             continue
                         }
@@ -327,7 +327,7 @@ public class JumpTests
         // Arrange
         var code = @"
             func findFirst(target:int) -> int {
-                for i <- 0; i < 10; i <- i + 1 {
+                for i <- 0, i < 10, i <- i + 1 {
                     if i == target {
                         return i
                     }
@@ -408,7 +408,7 @@ public class JumpTests
         var code = @"
             func mixed() -> int {
                 sum <- 0
-                for i <- 0; i < 20; i <- i + 1 {
+                for i <- 0, i < 20, i <- i + 1 {
                     if i >= 10 {
                         break
                     }
@@ -440,7 +440,7 @@ public class JumpTests
         // Arrange
         var code = @"
             func precedence(x:int) -> int {
-                for i <- 0; i < 10; i <- i + 1 {
+                for i <- 0, i < 10, i <- i + 1 {
                     if i == x {
                         return i * 10
                     }
@@ -472,8 +472,8 @@ public class JumpTests
         var code = @"
             func complex(threshold:int) -> int {
                 result <- 0
-                for i <- 0; i < 5; i <- i + 1 {
-                    for j <- 0; j < 5; j <- j + 1 {
+                for i <- 0, i < 5, i <- i + 1 {
+                    for j <- 0, j < 5, j <- j + 1 {
                         value <- i * 10 + j
 
                         if value == threshold {

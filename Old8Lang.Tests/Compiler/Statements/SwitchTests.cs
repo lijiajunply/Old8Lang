@@ -584,7 +584,7 @@ public class SwitchTests
         var code = @"
             func test() -> string {
                 result <- """"
-                for i <- 1; i <= 3; i <- i + 1 {
+                for i <- 1, i <= 3, i <- i + 1 {
                     switch i {
                         case 1 { result <- result + ""A"" }
                         case 2 { result <- result + ""B"" }

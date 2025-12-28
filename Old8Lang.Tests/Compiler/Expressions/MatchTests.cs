@@ -403,7 +403,7 @@ public class MatchTests
         var code = @"
             func getDayNames() -> string {
                 result <- """"
-                for i <- 1; i <= 3; i <- i + 1 {
+                for i <- 1, i <= 3, i <- i + 1 {
                     dayName <- match i {
                         case 1 -> ""Monday""
                         case 2 -> ""Tuesday""
