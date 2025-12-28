@@ -236,6 +236,11 @@ public class VariateManager
     public string? CurrentFunctionReturnType { get; set; }
 
     /// <summary>
+    /// 当前函数的泛型类型参数映射（用于泛型函数和泛型类方法）
+    /// </summary>
+    public Dictionary<string, TypeSystem.ITypeInfo>? CurrentFunctionTypeArgumentMapping { get; set; }
+
+    /// <summary>
     /// 当前是否处于类内部
     /// </summary>
     public bool IsClass { get; set; }
@@ -791,6 +796,7 @@ public class VariateManager
             Interpreter = Interpreter,
             IsFunc = IsFunc,
             CurrentFunctionReturnType = CurrentFunctionReturnType,
+            CurrentFunctionTypeArgumentMapping = CurrentFunctionTypeArgumentMapping,
             IsClass = IsClass,
             IsReturn = IsReturn,
             Result = Result

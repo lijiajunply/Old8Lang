@@ -1,0 +1,33 @@
+// 解释器模式：泛型函数测试
+
+// 定义泛型identity函数
+func identity<T>(value:T) -> T {
+    return value
+}
+
+// 测试int类型
+result1 <- identity<int>(42)
+PrintLine("Identity<int>(42) = " + result1.ToStr())
+
+// 测试string类型
+result2 <- identity<string>("Hello")
+PrintLine("Identity<string>(\"Hello\") = " + result2)
+
+// 测试double类型
+result3 <- identity<double>(3.14)
+PrintLine("Identity<double>(3.14) = " + result3.ToStr())
+
+// 定义泛型swap函数
+func swap<T>(a:T, b:T) -> void {
+    PrintLine("Before swap: a = " + a.ToStr() + ", b = " + b.ToStr())
+    temp <- a
+    a <- b
+    b <- temp
+    PrintLine("After swap: a = " + a.ToStr() + ", b = " + b.ToStr())
+}
+
+// 测试swap
+PrintLine("\nTesting swap<int>:")
+swap<int>(10, 20)
+
+PrintLine("\nAll generic function tests passed!")

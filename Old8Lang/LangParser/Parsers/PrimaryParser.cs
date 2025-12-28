@@ -1612,8 +1612,9 @@ public class PrimaryParser(
         // 解析类型参数列表（支持嵌套泛型）
         var typeArgumentsString = ParseGenericTypeArguments();
 
-        // 将字符串形式的类型参数列表拆分（简化处理，暂时以整体字符串存储）
-        var typeArguments = new List<string> { typeArgumentsString };
+        // 拆分类型参数（处理逗号分隔的多个类型参数）
+        // 注意：需要小心处理嵌套泛型，比如 "List<int>, Dict<string, int>"
+        var typeArguments = SplitTypeArguments(typeArgumentsString);
 
         // 检查是否有调用参数
         if (CurrentToken.Type == LangTokenType.LeftParen)
@@ -1845,6 +1846,54 @@ public class PrimaryParser(
         }
 
         Expect(LangTokenType.GreaterThan);
+        return result;
+    }
+
+    /// <summary>
+    /// 拆分类型参数字符串为独立的类型参数列表
+    /// 例如: "string, int" -> ["string", "int"]
+    ///       "List<int>, Dict<string, int>" -> ["List<int>", "Dict<string, int>"]
+    /// </summary>
+    /// <param name="typeArgumentsString">类型参数字符串</param>
+    /// <returns>类型参数列表</returns>
+    private List<string> SplitTypeArguments(string typeArgumentsString)
+    {
+        var result = new List<string>();
+        var current = "";
+        var depth = 0; // 嵌套深度（用于处理嵌套泛型）
+
+        for (int i = 0; i < typeArgumentsString.Length; i++)
+        {
+            char c = typeArgumentsString[i];
+
+            if (c == '<')
+            {
+                depth++;
+                current += c;
+            }
+            else if (c == '>')
+            {
+                depth--;
+                current += c;
+            }
+            else if (c == ',' && depth == 0)
+            {
+                // 顶层逗号，分隔类型参数
+                result.Add(current.Trim());
+                current = "";
+            }
+            else
+            {
+                current += c;
+            }
+        }
+
+        // 添加最后一个参数
+        if (!string.IsNullOrWhiteSpace(current))
+        {
+            result.Add(current.Trim());
+        }
+
         return result;
     }
 

@@ -45,6 +45,12 @@ public partial class AnyLangValue : LangValueType
     public readonly HashSet<string> FieldsModifiedBySetField = new();
 
     /// <summary>
+    /// 泛型类型参数映射（用于泛型类实例）
+    /// 例如：Box&lt;int&gt; 时为 {"T": IntTypeInfo}
+    /// </summary>
+    public Dictionary<string, TypeSystem.ITypeInfo>? TypeArgumentMapping { get; set; }
+
+    /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="classId">类名标识</param>
@@ -272,6 +278,13 @@ public partial class AnyLangValue : LangValueType
 
         // 5. 设置函数上下文标志
         executionManager.IsFunc = true;
+
+        // 5.1 如果这是泛型类的方法，将类型参数映射设置到执行管理器中
+        //     这样函数在验证参数类型和返回值类型时可以正确解析泛型类型参数
+        if (TypeArgumentMapping != null)
+        {
+            executionManager.CurrentFunctionTypeArgumentMapping = TypeArgumentMapping;
+        }
 
         // 6. 执行方法，传入已经求值的参数表达式
         var funcValue = methodInfo.Implementation;

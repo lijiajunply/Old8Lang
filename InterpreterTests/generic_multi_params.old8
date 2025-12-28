@@ -1,0 +1,37 @@
+// 解释器模式：多类型参数泛型类测试
+
+// 定义Pair类
+class Pair<K, V> {
+    private key:K
+    private value:V
+
+    func set(k:K, v:V) -> void {
+        this.key <- k
+        this.value <- v
+    }
+
+    func getKey() -> K {
+        return this.key
+    }
+
+    func getValue() -> V {
+        return this.value
+    }
+}
+
+// 测试<string, int>
+pair1 <- Pair<string, int>()
+pair1.set("age", 25)
+PrintLine("Pair<string, int>: key = " + pair1.getKey() + ", value = " + pair1.getValue().ToStr())
+
+// 测试<int, string>
+pair2 <- Pair<int, string>()
+pair2.set(1, "first")
+PrintLine("Pair<int, string>: key = " + pair2.getKey().ToStr() + ", value = " + pair2.getValue())
+
+// 测试<string, string>
+pair3 <- Pair<string, string>()
+pair3.set("name", "Alice")
+PrintLine("Pair<string, string>: key = " + pair3.getKey() + ", value = " + pair3.getValue())
+
+PrintLine("\nAll multi-type parameter generic tests passed!")

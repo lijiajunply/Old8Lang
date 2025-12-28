@@ -77,11 +77,13 @@ public class GenericInstanceExpression : LangExpression
         // 获取基础类型或函数
         var baseValue = BaseExpression.Run(manager);
 
-        // 解析类型参数
-        // TODO: 需要添加 TypeAnnotationManager 到 LangInterpreter 或 VariateManager
-        // 暂时创建临时实例用于类型解析
-        var tempGlobalManager = new VariateManager();
-        var typeAnnotationManager = new TypeAnnotationManager(tempGlobalManager);
+        // 从解释器获取类型注解管理器
+        if (manager.Interpreter == null)
+        {
+            throw new InvalidOperationError(this, "无法获取 TypeAnnotationManager：解释器未初始化");
+        }
+
+        var typeAnnotationManager = manager.Interpreter.TypeAnnotationManager;
 
         var resolvedTypeArgs = new Dictionary<string, ITypeInfo>();
 
@@ -116,7 +118,7 @@ public class GenericInstanceExpression : LangExpression
             }
 
             // 实例化泛型类
-            var instantiatedTemplate = typeTemplate.InstantiateGeneric(resolvedTypeArgs, manager);
+            var instantiatedTemplate = typeTemplate.InstantiateGeneric(resolvedTypeArgs, typeAnnotationManager);
 
             // 如果后面跟着调用参数，创建实例
             if (IsFunctionCall)
@@ -161,7 +163,7 @@ public class GenericInstanceExpression : LangExpression
             }
 
             // 实例化泛型函数
-            var instantiatedFunc = funcValue.InstantiateGeneric(resolvedTypeArgs);
+            var instantiatedFunc = funcValue.InstantiateGeneric(resolvedTypeArgs, typeAnnotationManager);
 
             // 调用实例化后的函数
             if (IsFunctionCall)

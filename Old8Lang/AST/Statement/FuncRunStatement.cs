@@ -12,6 +12,7 @@ public class FuncRunStatement : OldStatement
     private readonly Instance? Instance;
     private readonly Operation? Operation;
     private readonly AwaitExpression? AwaitExpr;
+    private readonly GenericInstanceExpression? GenericInstance;
 
     public FuncRunStatement(Instance instance, SourcePosition position = default) : base(position) =>
         Instance = instance;
@@ -22,11 +23,20 @@ public class FuncRunStatement : OldStatement
     public FuncRunStatement(AwaitExpression awaitExpr, SourcePosition position = default) : base(position) =>
         AwaitExpr = awaitExpr;
 
+    public FuncRunStatement(GenericInstanceExpression genericInstance, SourcePosition position = default) : base(position) =>
+        GenericInstance = genericInstance;
+
     public override void Run(VariateManager manager)
     {
         if (AwaitExpr != null)
         {
             AwaitExpr.Run(manager);
+            return;
+        }
+
+        if (GenericInstance != null)
+        {
+            GenericInstance.Run(manager);
             return;
         }
 
@@ -69,6 +79,7 @@ public class FuncRunStatement : OldStatement
 
     public override string? ToString() =>
         AwaitExpr != null ? AwaitExpr.ToString() :
+        GenericInstance != null ? GenericInstance.ToString() :
         Instance == null ? Operation == null ? "" : Operation.ToString() : Instance.ToString();
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)

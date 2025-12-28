@@ -22,6 +22,11 @@ public class LangInterpreter
     public readonly VariateManager Manager = new();
 
     /// <summary>
+    /// 类型注解管理器，负责类型注解的解析和验证
+    /// </summary>
+    public readonly TypeAnnotationManager TypeAnnotationManager;
+
+    /// <summary>
     /// 源代码
     /// </summary>
     private string? SourceCode { get; set; }
@@ -49,6 +54,9 @@ public class LangInterpreter
     {
         Manager.Interpreter = this;
         Manager.LangInfo ??= Apis.ReadJson();
+
+        // 初始化类型注解管理器
+        TypeAnnotationManager = new TypeAnnotationManager(Manager);
 
         // 初始化类型检查器
         TypeChecker.Initialize(Manager);

@@ -52,11 +52,13 @@ public static class TypeChecker
     /// <param name="argumentExpressions">传入的参数表达式列表</param>
     /// <param name="argumentValues">计算后的参数值列表</param>
     /// <param name="parameters">函数参数定义列表</param>
+    /// <param name="typeArgumentMapping">泛型类型参数映射（可选）</param>
     /// <exception cref="TypeError">当参数类型不匹配时抛出</exception>
     public static void ValidateParameterTypes(
         List<IOldLangTree> argumentExpressions,
         List<LangValueType> argumentValues,
-        List<LangId> parameters)
+        List<LangId> parameters,
+        Dictionary<string, ITypeInfo>? typeArgumentMapping = null)
     {
         for (int i = 0; i < Math.Min(argumentValues.Count, parameters.Count); i++)
         {
@@ -67,6 +69,13 @@ public static class TypeChecker
             if (!string.IsNullOrEmpty(parameter.AssumptionType))
             {
                 var expectedType = parameter.AssumptionType;
+
+                // 如果是泛型类型参数，尝试解析为实际类型
+                if (typeArgumentMapping != null && typeArgumentMapping.ContainsKey(expectedType))
+                {
+                    expectedType = typeArgumentMapping[expectedType].Name;
+                }
+
                 var actualType = GetLangValueType(argumentValue);
 
                 if (!IsTypeCompatible(expectedType, actualType))
@@ -312,15 +321,23 @@ public static class TypeChecker
     /// <param name="actualReturnValue">实际的返回值（可能被转换）</param>
     /// <param name="returnStatement">return 语句节点，用于错误报告</param>
     /// <param name="functionName">函数名</param>
+    /// <param name="typeArgumentMapping">泛型类型参数映射（可选）</param>
     /// <returns>转换后的返回值（如果需要转换）或原始值</returns>
     /// <exception cref="TypeError">当类型不匹配且无法转换时抛出</exception>
     public static LangValueType ValidateAndConvertReturnType(
         string? expectedReturnType,
         LangValueType actualReturnValue,
         IOldLangTree returnStatement,
-        string functionName)
+        string functionName,
+        Dictionary<string, ITypeInfo>? typeArgumentMapping = null)
     {
         if (string.IsNullOrEmpty(expectedReturnType)) return actualReturnValue; // 没有返回类型注解，跳过检查
+
+        // 如果是泛型类型参数，尝试解析为实际类型
+        if (typeArgumentMapping != null && typeArgumentMapping.ContainsKey(expectedReturnType))
+        {
+            expectedReturnType = typeArgumentMapping[expectedReturnType].Name;
+        }
 
         var actualType = GetLangValueType(actualReturnValue);
 

@@ -49,7 +49,7 @@ public class FuncLangValue : ImportInfo
     /// 当前实例的类型参数映射（用于泛型实例化）
     /// 例如: map<int, string> 时为 {"T": int, "U": string}
     /// </summary>
-    public Dictionary<string, ITypeInfo>? TypeArgumentMapping { get; private set; }
+    public Dictionary<string, ITypeInfo>? TypeArgumentMapping { get; set; }
 
     public FuncLangValue(
         LangId? id,
@@ -410,9 +410,17 @@ public class FuncLangValue : ImportInfo
 
             // 保存当前的函数返回类型，避免嵌套调用时被覆盖
             var originalReturnType = executionManager.CurrentFunctionReturnType;
+            var originalTypeArgumentMapping = executionManager.CurrentFunctionTypeArgumentMapping;
 
             executionManager.IsFunc = true; // 设置为函数上下文
             executionManager.CurrentFunctionReturnType = Id?.AssumptionType; // 设置当前函数的返回类型注解（Id.AssumptionType包含了返回类型）
+
+            // 设置当前函数的泛型类型参数映射
+            // 优先使用已有的映射（从泛型类实例传递过来），否则使用函数自己的泛型参数映射（泛型函数）
+            if (originalTypeArgumentMapping == null && TypeArgumentMapping != null)
+            {
+                executionManager.CurrentFunctionTypeArgumentMapping = TypeArgumentMapping;
+            }
 
             // 将静态成员添加到方法的变量管理器中
             var thisValue = executionManager.GetValue(new LangId("this"));
@@ -464,6 +472,7 @@ public class FuncLangValue : ImportInfo
 
             // 恢复原始的函数返回类型，避免嵌套调用时的类型污染
             executionManager.CurrentFunctionReturnType = originalReturnType;
+            executionManager.CurrentFunctionTypeArgumentMapping = originalTypeArgumentMapping;
 
             // 移除子作用域，但是要注意，在init方法中使用this关键字设置的值已经被保存到实例中了
             // 所以这里移除子作用域不会影响实例的状态
@@ -841,15 +850,24 @@ public class FuncLangValue : ImportInfo
     /// </summary>
     /// <param name="argumentExpressions">传入的参数表达式列表</param>
     /// <param name="argumentValues">计算后的参数值列表</param>
-    private void ValidateParameterTypes(List<LangExpression> argumentExpressions, List<LangValueType> argumentValues)
+    /// <param name="executionManager">执行管理器，用于获取泛型类型参数映射</param>
+    private void ValidateParameterTypes(
+        List<LangExpression> argumentExpressions,
+        List<LangValueType> argumentValues,
+        VariateManager? executionManager = null)
     {
         if (Ids == null) return;
+
+        // 从执行管理器获取泛型类型映射（泛型类的方法）
+        // 如果没有，则使用函数自身的泛型映射（泛型函数）
+        var typeMapping = executionManager?.CurrentFunctionTypeArgumentMapping ?? TypeArgumentMapping;
 
         // 使用全局类型检查器进行验证
         TypeChecker.ValidateParameterTypes(
             argumentExpressions.Cast<IOldLangTree>().ToList(),
             argumentValues,
-            Ids);
+            Ids,
+            typeMapping);
     }
 
     /// <summary>
@@ -870,7 +888,7 @@ public class FuncLangValue : ImportInfo
         var paramValues = argumentExpressions.Select(expr => expr.Run(variManager)).ToList();
 
         // 2. 验证参数类型匹配（仅在有类型注解时进行检查）
-        ValidateParameterTypes(argumentExpressions, paramValues);
+        ValidateParameterTypes(argumentExpressions, paramValues, executionManager);
 
         // 3. 处理默认参数，补全缺失的参数值
         for (var i = paramValues.Count; i < Ids.Count; i++)
@@ -905,7 +923,9 @@ public class FuncLangValue : ImportInfo
     /// <summary>
     /// 实例化泛型函数
     /// </summary>
-    public FuncLangValue InstantiateGeneric(Dictionary<string, ITypeInfo> typeArguments)
+    public FuncLangValue InstantiateGeneric(
+        Dictionary<string, ITypeInfo> typeArguments,
+        TypeAnnotationManager typeAnnotationManager)
     {
         if (!IsGeneric)
         {
@@ -924,8 +944,15 @@ public class FuncLangValue : ImportInfo
         {
             if (genericParam.HasConstraints && typeArguments.TryGetValue(genericParam.Name, out var actualType))
             {
-                // TODO: 添加约束验证逻辑
-                // 这需要访问 TypeAnnotationManager，可能需要传入 VariateManager
+                foreach (var constraintName in genericParam.Constraints!)
+                {
+                    var constraintType = typeAnnotationManager.GetTypeFamily().GetType(constraintName);
+                    if (constraintType != null && !actualType.IsCompatibleWith(constraintType))
+                    {
+                        throw new ArgumentException(
+                            $"类型 {actualType.Name} 不满足约束 {constraintName}");
+                    }
+                }
             }
         }
 

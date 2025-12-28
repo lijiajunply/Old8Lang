@@ -626,7 +626,7 @@ public class TypeTemplate(
     /// </summary>
     public TypeTemplate InstantiateGeneric(
         Dictionary<string, TypeSystem.ITypeInfo> typeArguments,
-        VariateManager manager)
+        TypeAnnotationManager typeAnnotationManager)
     {
         if (!IsGeneric)
         {
@@ -645,11 +645,6 @@ public class TypeTemplate(
         {
             if (genericParam.HasConstraints && typeArguments.TryGetValue(genericParam.Name, out var actualType))
             {
-                // TODO: 需要添加 TypeAnnotationManager 到 LangInterpreter 或 VariateManager
-                // 暂时创建临时实例用于类型解析
-                var tempGlobalManager = new VariateManager();
-                var typeAnnotationManager = new TypeAnnotationManager(tempGlobalManager);
-
                 foreach (var constraintName in genericParam.Constraints!)
                 {
                     var constraintType = typeAnnotationManager.GetTypeFamily().GetType(constraintName);
@@ -697,6 +692,12 @@ public class TypeTemplate(
             metadata: metadata,
             position: Position
         );
+
+        // 如果是泛型实例，传递类型参数映射
+        if (TypeArgumentMapping != null)
+        {
+            instance.TypeArgumentMapping = TypeArgumentMapping;
+        }
 
         // 初始化字段
         instance.InitializeFields(manager);

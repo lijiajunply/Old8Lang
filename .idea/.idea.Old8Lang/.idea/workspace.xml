@@ -22,9 +22,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/generic_class_basic.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/generic_function_basic.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/generic_multi_params.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Generics/GenericsParserTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Generics/GenericsParserTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericInstanceExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericInstanceExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncRunStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/LangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/LangInterpreter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeChecker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeChecker.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,6 +109,8 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/MachineLearningLib/MachineLearningLibTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/MachineLearningLib/MachineLearningLibTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Parser/Generics/GenericsParserTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/LangId.cs" root0="SKIP_HIGHLIGHTING" />
@@ -111,6 +125,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/StaticValues/AssertClassLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/StaticValues/AssertClassLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
@@ -136,6 +151,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Interpreter/LangInterpreter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/Core/ParserContext.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/LangToken.cs" root0="SKIP_HIGHLIGHTING" />
@@ -906,7 +922,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="410" />
+    <option name="localTasksCounter" value="411" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -933,7 +949,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(language-server): 重构语言服务器依赖注入和字段命名&#10;&#10;- 移除 MediatR 相关引用&#10;- 使用主构造函数注入 DocumentManager 服务&#10;- 将私有字段从 _documentManager 重命名为 documentManager&#10;- 更新 DocumentManager 中的字段命名从 _documents 到 Documents&#10;- 更新所有使用字段的地方为新的命名规范&#10;- 更新 workspace.xml 配置文件中的项目引用和运行配置" />
     <MESSAGE value="test(compiler): 添加算术表达式、数组操作和边界条件的编译测试&#10;&#10;- 实现算术表达式编译测试，覆盖加减乘除模运算和复杂表达式&#10;- 添加数组操作编译测试，包括数组创建、访问、赋值和连接功能&#10;- 创建边界条件编译测试，验证各种数据类型的边界值处理&#10;- 补充比较表达式编译测试，验证大小比较运算的正确性&#10;- 增加数值、字符串、集合等各类边界情况的编译验证&#10;- 添加嵌套结构和特殊变量名的编译边界测试" />
     <MESSAGE value="feat(interpreter): 添加Assert类支持断言功能&#10;&#10;- 实现Assert类的全局单例实例&#10;- 添加AssertEqual、AssertNotEqual等20多个断言方法&#10;- 支持数值、字符串、布尔值和集合的断言比较&#10;- 实现异常抛出和类型检查断言功能&#10;- 添加IL代码生成支持断言方法调用&#10;- 在解释器中注册Assert全局对象" />
     <MESSAGE value="refactor(generators): 重命名生成器状态机类&#10;&#10;- 将 NewGeneratorStateMachine 重命名为 GeneratorStateMachine&#10;- 更新 GeneratorLangValue 中的状态机类型引用&#10;- 更新 GeneratorStateMachineBuilder 中的构造函数调用&#10;- 重命名相关方法参数类型以保持一致性" />
@@ -958,7 +973,8 @@
     <MESSAGE value="feat(parser): 添加可空类型支持&#10;&#10;- 在 ClassParser 中添加可空类型注解解析逻辑&#10;- 在 FunctionParser 中实现返回值可空类型处理&#10;- 在 StatementParser 中支持可空类型变量声明&#10;- 扩展 TypeAnnotationManager 支持可空类型解析&#10;- 更新 LangId AST 节点处理可空类型注解&#10;- 添加可空类型测试文件和语法验证&#10;- 更新文档说明可空类型语法和使用方法&#10;- 在 ParsedTypeAnnotation 中添加 IsNullable 属性" />
     <MESSAGE value="refactor(module-system): 重构模块系统内部字段命名和构造函数&#10;&#10;- 将 CacheManager 中的私有字段从 _moduleCache 和 _cacheLock 重命名为 ModuleCache 和 CacheLock&#10;- 将 ModuleLoader 的构造函数改为主构造函数形式，移除字段赋值语句&#10;- 将 ModuleResolver 中的私有字段从 _pathResolver 和 _versionResolver 重命名为 PathResolver 和 VersionResolver&#10;- 将 NetworkModuleLoader 中的私有字段从 _cacheDirectory 重命名为 CacheDirectory&#10;- 使用集合表达式替换 HashSet 初始化语法&#10;- 优化条件判断语法，使用属性模式匹配替代 Count 检查&#10;- 使用 GetValueOrDefault 方法替代 TryGetValue 检查&#10;- 为 ImportOptions 和 ModuleImportResult 类添加 Serializable 特性&#10;- 更新 workspace.xml 中的文件变更列表和任务计数器" />
     <MESSAGE value="feat(parser): 添加泛型语法支持&#10;&#10;- 实现泛型类解析支持，包括单个和多个类型参数&#10;- 实现泛型函数解析支持，包含泛型参数和返回类型&#10;- 添加泛型约束语法解析，支持单个和多个约束&#10;- 实现嵌套泛型类型解析，支持任意深度嵌套&#10;- 添加泛型实例化语法支持，包括类和函数实例化&#10;- 扩展访问修饰符与泛型结合使用的解析逻辑&#10;- 创建GenericInstanceExpression处理泛型实例化表达式&#10;- 添加GenericParameter类定义泛型参数结构&#10;- 更新FuncLangValue支持泛型函数实例化功能&#10;- 修改ClassParser和FunctionParser集成泛型语法解析&#10;- 添加泛型语法测试用例覆盖各种泛型场景" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 添加泛型语法支持&#10;&#10;- 实现泛型类解析支持，包括单个和多个类型参数&#10;- 实现泛型函数解析支持，包含泛型参数和返回类型&#10;- 添加泛型约束语法解析，支持单个和多个约束&#10;- 实现嵌套泛型类型解析，支持任意深度嵌套&#10;- 添加泛型实例化语法支持，包括类和函数实例化&#10;- 扩展访问修饰符与泛型结合使用的解析逻辑&#10;- 创建GenericInstanceExpression处理泛型实例化表达式&#10;- 添加GenericParameter类定义泛型参数结构&#10;- 更新FuncLangValue支持泛型函数实例化功能&#10;- 修改ClassParser和FunctionParser集成泛型语法解析&#10;- 添加泛型语法测试用例覆盖各种泛型场景" />
+    <MESSAGE value="feat(parser): 添加泛型语法支持&#10;&#10;- 实现泛型类解析支持，包括单个和多个类型参数&#10;- 实现泛型函数解析支持，包含泛型参数和返回类型&#10;- 添加泛型约束语法解析，支持单个和多个约束&#10;- 实现嵌套泛型类型解析，支持任意深度嵌套&#10;- 添加泛型实例化语法支持，包括类和函数实例化&#10;- 扩展访问修饰符与泛型结合使用的解析逻辑&#10;- 创建GenericInstanceExpression处理泛型实例化表达式&#10;- 添加GenericParameter类定义泛型参数结构&#10;- 更新FuncLangValue支持泛型函数实例化功能&#10;- 修改ClassParser和FunctionParser集成泛型语法解析&#10;- 添加泛型语法测试用例覆盖各种泛型场景&#10;- 实现启发式方法判断泛型实例化避免误解析比较运算符&#10;- 支持小写自定义类型名称作为泛型参数的解析&#10;- 添加内置类型名称判断方法IsBuiltInTypeName&#10;- 优化字符串模板中转义字符的处理逻辑" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 添加泛型语法支持&#10;&#10;- 实现泛型类解析支持，包括单个和多个类型参数&#10;- 实现泛型函数解析支持，包含泛型参数和返回类型&#10;- 添加泛型约束语法解析，支持单个和多个约束&#10;- 实现嵌套泛型类型解析，支持任意深度嵌套&#10;- 添加泛型实例化语法支持，包括类和函数实例化&#10;- 扩展访问修饰符与泛型结合使用的解析逻辑&#10;- 创建GenericInstanceExpression处理泛型实例化表达式&#10;- 添加GenericParameter类定义泛型参数结构&#10;- 更新FuncLangValue支持泛型函数实例化功能&#10;- 修改ClassParser和FunctionParser集成泛型语法解析&#10;- 添加泛型语法测试用例覆盖各种泛型场景&#10;- 实现启发式方法判断泛型实例化避免误解析比较运算符&#10;- 支持小写自定义类型名称作为泛型参数的解析&#10;- 添加内置类型名称判断方法IsBuiltInTypeName&#10;- 优化字符串模板中转义字符的处理逻辑" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

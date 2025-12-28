@@ -22,8 +22,13 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
             {
                 functionName = anyValue.ClassId.IdName;
             }
-            // 使用新的带转换的验证方法
-            result = TypeChecker.ValidateAndConvertReturnType(manager.CurrentFunctionReturnType, result, this, functionName);
+            // 使用新的带转换的验证方法，传递泛型类型参数映射
+            result = TypeChecker.ValidateAndConvertReturnType(
+                manager.CurrentFunctionReturnType,
+                result,
+                this,
+                functionName,
+                manager.CurrentFunctionTypeArgumentMapping);
         }
 
         manager.Result = result;
