@@ -33,7 +33,7 @@ echo ""
 
 # 步骤 1: 构建 Language Server
 echo "步骤 1/4: 构建 Language Server..."
-cd Old8Lang.LanguageServer
+cd ./Old8Lang.LanguageServer
 dotnet build -c Release
 echo "✓ Language Server 构建完成"
 echo ""

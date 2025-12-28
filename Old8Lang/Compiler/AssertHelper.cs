@@ -10,17 +10,9 @@ namespace Old8Lang.Compiler;
 public static class AssertHelper
 {
     /// <summary>
-    /// 断言两个值相等
-    /// </summary>
-    public static void AssertEqual(object expected, object actual)
-    {
-        AssertEqual(expected, actual, null);
-    }
-
-    /// <summary>
     /// 断言两个值相等（带消息）
     /// </summary>
-    public static void AssertEqual(object expected, object actual, string? message)
+    public static void AssertEqual(object expected, object actual, string? message = null)
     {
         if (!AreEqual(expected, actual))
         {
@@ -30,17 +22,9 @@ public static class AssertHelper
     }
 
     /// <summary>
-    /// 断言两个值不相等
-    /// </summary>
-    public static void AssertNotEqual(object notExpected, object actual)
-    {
-        AssertNotEqual(notExpected, actual, null);
-    }
-
-    /// <summary>
     /// 断言两个值不相等（带消息）
     /// </summary>
-    public static void AssertNotEqual(object notExpected, object actual, string? message)
+    public static void AssertNotEqual(object notExpected, object actual, string? message = null)
     {
         if (AreEqual(notExpected, actual))
         {
@@ -50,17 +34,9 @@ public static class AssertHelper
     }
 
     /// <summary>
-    /// 断言条件为真
-    /// </summary>
-    public static void AssertTrue(bool condition)
-    {
-        AssertTrue(condition, null);
-    }
-
-    /// <summary>
     /// 断言条件为真（带消息）
     /// </summary>
-    public static void AssertTrue(bool condition, string? message)
+    public static void AssertTrue(bool condition, string? message = null)
     {
         if (!condition)
         {
@@ -70,17 +46,9 @@ public static class AssertHelper
     }
 
     /// <summary>
-    /// 断言条件为假
-    /// </summary>
-    public static void AssertFalse(bool condition)
-    {
-        AssertFalse(condition, null);
-    }
-
-    /// <summary>
     /// 断言条件为假（带消息）
     /// </summary>
-    public static void AssertFalse(bool condition, string? message)
+    public static void AssertFalse(bool condition, string? message = null)
     {
         if (condition)
         {
@@ -90,17 +58,9 @@ public static class AssertHelper
     }
 
     /// <summary>
-    /// 断言值为null
-    /// </summary>
-    public static void AssertNull(object? value)
-    {
-        AssertNull(value, null);
-    }
-
-    /// <summary>
     /// 断言值为null（带消息）
     /// </summary>
-    public static void AssertNull(object? value, string? message)
+    public static void AssertNull(object? value, string? message = null)
     {
         if (value != null)
         {
@@ -110,17 +70,9 @@ public static class AssertHelper
     }
 
     /// <summary>
-    /// 断言值不为null
-    /// </summary>
-    public static void AssertNotNull(object? value)
-    {
-        AssertNotNull(value, null);
-    }
-
-    /// <summary>
     /// 断言值不为null（带消息）
     /// </summary>
-    public static void AssertNotNull(object? value, string? message)
+    public static void AssertNotNull(object? value, string? message = null)
     {
         if (value == null)
         {
@@ -130,17 +82,9 @@ public static class AssertHelper
     }
 
     /// <summary>
-    /// 断言第一个值大于第二个值
-    /// </summary>
-    public static void AssertGreater(object value, object other)
-    {
-        AssertGreater(value, other, null);
-    }
-
-    /// <summary>
     /// 断言第一个值大于第二个值（带消息）
     /// </summary>
-    public static void AssertGreater(object value, object other, string? message)
+    public static void AssertGreater(object value, object other, string? message = null)
     {
         if (!TryCompare(value, other, out var compareResult) || compareResult <= 0)
         {
@@ -150,17 +94,9 @@ public static class AssertHelper
     }
 
     /// <summary>
-    /// 断言第一个值大于等于第二个值
-    /// </summary>
-    public static void AssertGreaterOrEqual(object value, object other)
-    {
-        AssertGreaterOrEqual(value, other, null);
-    }
-
-    /// <summary>
     /// 断言第一个值大于等于第二个值（带消息）
     /// </summary>
-    public static void AssertGreaterOrEqual(object value, object other, string? message)
+    public static void AssertGreaterOrEqual(object value, object other, string? message = null)
     {
         if (!TryCompare(value, other, out var compareResult) || compareResult < 0)
         {
@@ -170,17 +106,9 @@ public static class AssertHelper
     }
 
     /// <summary>
-    /// 断言第一个值小于第二个值
-    /// </summary>
-    public static void AssertLess(object value, object other)
-    {
-        AssertLess(value, other, null);
-    }
-
-    /// <summary>
     /// 断言第一个值小于第二个值（带消息）
     /// </summary>
-    public static void AssertLess(object value, object other, string? message)
+    public static void AssertLess(object value, object other, string? message = null)
     {
         if (!TryCompare(value, other, out var compareResult) || compareResult >= 0)
         {
@@ -190,17 +118,9 @@ public static class AssertHelper
     }
 
     /// <summary>
-    /// 断言第一个值小于等于第二个值
-    /// </summary>
-    public static void AssertLessOrEqual(object value, object other)
-    {
-        AssertLessOrEqual(value, other, null);
-    }
-
-    /// <summary>
     /// 断言第一个值小于等于第二个值（带消息）
     /// </summary>
-    public static void AssertLessOrEqual(object value, object other, string? message)
+    public static void AssertLessOrEqual(object value, object other, string? message = null)
     {
         if (!TryCompare(value, other, out var compareResult) || compareResult > 0)
         {
@@ -210,17 +130,9 @@ public static class AssertHelper
     }
 
     /// <summary>
-    /// 断言字符串包含子串
-    /// </summary>
-    public static void AssertContains(string text, string substring)
-    {
-        AssertContains(text, substring, null);
-    }
-
-    /// <summary>
     /// 断言字符串包含子串（带消息）
     /// </summary>
-    public static void AssertContains(string text, string substring, string? message)
+    public static void AssertContains(string text, string substring, string? message = null)
     {
         if (!text.Contains(substring))
         {
@@ -230,17 +142,9 @@ public static class AssertHelper
     }
 
     /// <summary>
-    /// 断言字符串不包含子串
-    /// </summary>
-    public static void AssertNotContains(string text, string substring)
-    {
-        AssertNotContains(text, substring, null);
-    }
-
-    /// <summary>
     /// 断言字符串不包含子串（带消息）
     /// </summary>
-    public static void AssertNotContains(string text, string substring, string? message)
+    public static void AssertNotContains(string text, string substring, string? message = null)
     {
         if (text.Contains(substring))
         {
@@ -250,17 +154,9 @@ public static class AssertHelper
     }
 
     /// <summary>
-    /// 断言字符串以指定前缀开头
-    /// </summary>
-    public static void AssertStartsWith(string text, string prefix)
-    {
-        AssertStartsWith(text, prefix, null);
-    }
-
-    /// <summary>
     /// 断言字符串以指定前缀开头（带消息）
     /// </summary>
-    public static void AssertStartsWith(string text, string prefix, string? message)
+    public static void AssertStartsWith(string text, string prefix, string? message = null)
     {
         if (!text.StartsWith(prefix))
         {
@@ -270,17 +166,9 @@ public static class AssertHelper
     }
 
     /// <summary>
-    /// 断言字符串以指定后缀结尾
-    /// </summary>
-    public static void AssertEndsWith(string text, string suffix)
-    {
-        AssertEndsWith(text, suffix, null);
-    }
-
-    /// <summary>
     /// 断言字符串以指定后缀结尾（带消息）
     /// </summary>
-    public static void AssertEndsWith(string text, string suffix, string? message)
+    public static void AssertEndsWith(string text, string suffix, string? message = null)
     {
         if (!text.EndsWith(suffix))
         {
