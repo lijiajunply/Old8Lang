@@ -1,0 +1,12 @@
+// 简单的类型推断测试
+
+// 启用类型推断（默认已启用）
+// TypeInferenceConfig.Instance.EnableTypeInference = true;
+
+// 测试：从函数调用推断参数类型
+func add(a, b) -> int {
+    return a + b
+}
+
+result <- add(10, 20)
+PrintLine("10 + 20 = " + result.ToStr())

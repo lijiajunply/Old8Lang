@@ -1,0 +1,20 @@
+// 测试类型推断功能
+
+// 测试1：从默认值推断参数类型
+func greet(name, greeting: "Hello") -> void {
+    PrintLine(greeting + ", " + name + "!")
+}
+
+// 测试2：从return语句推断返回类型（但函数声明还需要返回类型）
+func add(x:int, y:int) -> int {
+    return x + y
+}
+
+// 测试3：使用推断的函数
+greet("Old8")
+greet("World", "Hi")
+
+result <- add(10, 20)
+PrintLine("10 + 20 = " + result.ToStr())
+
+PrintLine("All tests passed!")

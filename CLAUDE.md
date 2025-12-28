@@ -123,6 +123,25 @@ Located in `Old8Lang/Compiler/`:
 - `TypeConversion.cs`: Handles type conversions
 - `AsyncStateMachineGenerator.cs`: Generates async state machines
 
+### Type System
+
+Located in `Old8Lang/TypeSystem/`:
+
+- `TypeInferenceEngine.cs`: Progressive type inference engine (TypeScript-style)
+- `TypeConstraintCollector.cs`: Collects type constraints from AST
+- `TypeConstraintSolver.cs`: Solves type constraints using iterative algorithm
+- `TypeInferenceConfig.cs`: Configuration for type inference behavior
+- `TypeChecker.cs`: Global type validation
+- `TypeAnnotationManager.cs`: Type annotation parsing and management
+
+**Note**: Type inference is **enabled by default**. To disable if needed:
+```csharp
+Compiler.EnableTypeInference = false;
+TypeInferenceConfig.Instance.EnableTypeInference = false;
+```
+
+See `Docs/TypeInference.md` for detailed documentation.
+
 ### Compiler Configuration
 
 The compiler provides several configuration options in `Compiler.cs`:

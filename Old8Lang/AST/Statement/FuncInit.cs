@@ -4,6 +4,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.TypeSystem;
 
 namespace Old8Lang.AST.Statement;
 
@@ -60,6 +61,23 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     /// <param name="local">局部变量管理器，用于管理函数的声明和访问</param>
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
+        // 尝试使用类型推断（如果启用）
+        if (TypeInferenceConfig.Instance.EnableTypeInference)
+        {
+            var inferenceEngine = new TypeInferenceEngine(local);
+            if (inferenceEngine.NeedsTypeInference(this))
+            {
+                // 执行类型推断
+                if (inferenceEngine.InferFunctionTypes(this))
+                {
+                    if (TypeInferenceConfig.Instance.DebugOutput)
+                    {
+                        Console.WriteLine($"✓ 函数 {FuncLangValue.Id?.IdName} 类型推断成功");
+                    }
+                }
+            }
+        }
+
         // 验证函数类型注解完整性（编译模式要求）
         ValidateTypeAnnotations(local);
 
@@ -222,6 +240,8 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     /// <param name="local">局部变量管理器，用于报告错误</param>
     private void ValidateTypeAnnotations(LocalManager local)
     {
+        var inferenceEnabled = TypeInferenceConfig.Instance.EnableTypeInference;
+
         // 1. 验证所有参数的类型注解
         if (FuncLangValue.Ids != null)
         {
@@ -248,11 +268,22 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
                         continue;
                     }
 
-                    // 既没有类型注解也没有默认值，报错
+                    // 如果启用了类型推断，允许缺少类型注解
+                    if (inferenceEnabled)
+                    {
+                        if (TypeInferenceConfig.Instance.DebugOutput)
+                        {
+                            Console.WriteLine($"  ℹ️  参数 {param.IdName} 缺少类型注解，将尝试推断");
+                        }
+                        continue;
+                    }
+
+                    // 既没有类型注解也没有默认值，且未启用类型推断，报错
                     var errorMsg = $"[编译模式错误] 函数 '{FuncLangValue.Id?.IdName}' 的参数 '{param.IdName}' (第{i + 1}个参数) 缺少类型注解\n\n" +
                                   $"编译模式下所有函数参数必须满足以下之一：\n" +
                                   $"  1. 显式声明类型注解：{param.IdName}:int\n" +
-                                  $"  2. 提供默认值以推断类型：{param.IdName}: 123\n\n" +
+                                  $"  2. 提供默认值以推断类型：{param.IdName}: 123\n" +
+                                  $"  3. 启用类型推断功能（通过 TypeInferenceConfig）\n\n" +
                                   $"修复示例：\n" +
                                   $"  func {FuncLangValue.Id?.IdName}(..., {param.IdName}:int, ...) -> returnType {{ ... }}\n" +
                                   $"  func {FuncLangValue.Id?.IdName}(..., {param.IdName}: 0, ...) -> returnType {{ ... }}\n\n" +
@@ -268,13 +299,24 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
             // 对于Lambda表达式，如果没有显式的返回类型注解，尝试从函数体推断
             if (!IsLambda)
             {
+                // 如果启用了类型推断，允许缺少返回类型注解
+                if (inferenceEnabled && TypeInferenceConfig.Instance.InferReturnTypesFromBody)
+                {
+                    if (TypeInferenceConfig.Instance.DebugOutput)
+                    {
+                        Console.WriteLine($"  ℹ️  函数 {FuncLangValue.Id.IdName} 缺少返回类型注解，将尝试推断");
+                    }
+                    return;
+                }
+
                 // 普通函数必须显式声明返回类型
                 var errorMsg = $"[编译模式错误] 函数 '{FuncLangValue.Id.IdName}' 缺少返回值类型注解\n\n" +
-                              $"编译模式下所有函数必须显式声明返回类型，不能通过return语句推断。\n\n" +
+                              $"编译模式下所有函数必须显式声明返回类型，或启用类型推断功能。\n\n" +
                               $"修复示例：\n" +
                               $"  方式1：func {FuncLangValue.Id.IdName}(...) -> int {{ return ... }}\n" +
                               $"  方式2：func {FuncLangValue.Id.IdName}(...) -> void {{ ... }}\n" +
-                              $"  方式3：{FuncLangValue.Id.IdName}:int(...) -> {{ return ... }}";
+                              $"  方式3：{FuncLangValue.Id.IdName}:int(...) -> {{ return ... }}\n" +
+                              $"  方式4：启用类型推断 (TypeInferenceConfig.Instance.EnableTypeInference = true)";
                 local.ReportError(errorMsg, FuncLangValue.Id.Position);
             }
         }

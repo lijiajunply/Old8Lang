@@ -4,6 +4,7 @@ using System.Text;
 using Old8Lang.AST.Expression;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.TypeSystem;
 
 namespace Old8Lang.Compiler;
 
@@ -479,10 +480,82 @@ public class LocalManager
         {
             return localVar;
         }
-        
+
         // 创建新的局部变量
         localVar = ilGenerator.DeclareLocal(type);
         LocalVar[name] = localVar;
         return localVar;
+    }
+
+    /// <summary>
+    /// 尝试推断变量的类型
+    /// </summary>
+    /// <param name="variableName">变量名</param>
+    /// <returns>推断出的类型，如果无法推断则返回null</returns>
+    public Type? TryInferVariableType(string variableName)
+    {
+        // 首先检查 LocalVarTypes 中是否已有类型记录
+        if (LocalVarTypes.TryGetValue(variableName, out var type))
+        {
+            return type;
+        }
+
+        // 检查是否为函数参数
+        foreach (var (funcKey, paramList) in FuncParameters)
+        {
+            var param = paramList.FirstOrDefault(p => p.IdName == variableName);
+            if (param != null)
+            {
+                return param.OutputType(this);
+            }
+        }
+
+        // 检查是否为字段
+        if (FieldVar.TryGetValue(variableName, out var fieldInfo))
+        {
+            return fieldInfo.FieldType;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 记录推断出的变量类型
+    /// </summary>
+    /// <param name="variableName">变量名</param>
+    /// <param name="inferredType">推断出的类型</param>
+    public void RecordInferredType(string variableName, Type inferredType)
+    {
+        if (!LocalVarTypes.ContainsKey(variableName))
+        {
+            LocalVarTypes[variableName] = inferredType;
+
+            if (TypeInferenceConfig.Instance.DebugOutput)
+            {
+                Console.WriteLine($"  ✓ 记录推断类型: {variableName} = {inferredType.Name}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 批量记录推断出的类型
+    /// </summary>
+    /// <param name="inferredTypes">变量名到类型的映射</param>
+    public void RecordInferredTypes(Dictionary<string, Type> inferredTypes)
+    {
+        foreach (var (varName, type) in inferredTypes)
+        {
+            RecordInferredType(varName, type);
+        }
+    }
+
+    /// <summary>
+    /// 获取变量的类型（优先使用已推断的类型）
+    /// </summary>
+    /// <param name="variableName">变量名</param>
+    /// <returns>变量类型，如果不存在则返回null</returns>
+    public Type? GetVarType(string variableName)
+    {
+        return TryInferVariableType(variableName);
     }
 }

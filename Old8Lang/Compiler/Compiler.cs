@@ -3,6 +3,7 @@ using Old8Lang.AST.Expression.StaticValues;
 using Old8Lang.AST.Statement;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.TypeSystem;
 
 namespace Old8Lang.Compiler;
 
@@ -59,6 +60,29 @@ public static class Compiler
     /// 当前日志级别，默认为 Info
     /// </summary>
     public static LogLevel CurrentLogLevel { get; set; } = LogLevel.Info;
+
+    /// <summary>
+    /// 获取或设置类型推断配置
+    /// </summary>
+    public static TypeInferenceConfig TypeInferenceConfig => TypeInferenceConfig.Instance;
+
+    /// <summary>
+    /// 启用或禁用渐进式类型推断（默认：true）
+    /// </summary>
+    public static bool EnableTypeInference
+    {
+        get => TypeInferenceConfig.EnableTypeInference;
+        set => TypeInferenceConfig.EnableTypeInference = value;
+    }
+
+    /// <summary>
+    /// 启用或禁用类型推断调试输出（默认：禁用）
+    /// </summary>
+    public static bool TypeInferenceDebugOutput
+    {
+        get => TypeInferenceConfig.DebugOutput;
+        set => TypeInferenceConfig.DebugOutput = value;
+    }
 
     /// <summary>
     /// 条件输出调试信息

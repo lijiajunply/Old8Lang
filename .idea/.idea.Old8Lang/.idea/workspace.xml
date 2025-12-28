@@ -22,10 +22,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Reports/2025-12-28-void函数修复说明.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_void_function.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CompilerTestPlan.md" beforeDir="false" afterPath="$PROJECT_DIR$/CompilerTestPlan.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Reports/2025-12-28-函数返回值修复报告.md" beforeDir="false" afterPath="$PROJECT_DIR$/Reports/2025-12-28-函数返回值修复报告.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_type_inference.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/test_type_inference_enabled.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/type_inference_basic.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/type_inference_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Docs/TypeInference.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Integration/TypeInferenceTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeConstraint.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeConstraintCollector.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeConstraintSolver.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeInferenceConfig.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeInferenceContext.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeInferenceEngine.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -112,6 +125,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/StaticValues/AssertClassLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/ReturnStatement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Visitor/Generated/CompilerVisitor.Stubs.generated.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Visitor/Generated/LangListItem.Accept.generated.cs" root0="SKIP_HIGHLIGHTING" />
@@ -120,6 +134,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/Compiler.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/Compiler.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/Compiler.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/LocalManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/LocalManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/LocalManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/LocalManager.cs" root0="SKIP_HIGHLIGHTING" />
@@ -894,7 +909,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="405" />
+    <option name="localTasksCounter" value="406" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -921,7 +936,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(image): 添加基于SkiaSharp的图像处理库&#10;&#10;- 实现图像加载、保存、创建和克隆功能&#10;- 提供图像信息获取包括尺寸、像素颜色、格式等&#10;- 支持图像变换如缩放、旋转、裁剪、翻转操作&#10;- 实现图像调整功能包括亮度、对比度、饱和度、色调控制&#10;- 添加多种图像滤镜如灰度、反色、模糊、锐化、边缘检测&#10;- 提供图像绘制功能支持矩形、圆形、直线、文本、多边形绘制&#10;- 包含颜色值验证和HSB到RGB转换辅助方法&#10;- 实现图像格式转换和图像合并功能" />
     <MESSAGE value="feat(test): 添加完整的测试框架和断言库&#10;&#10;- 新增 AssertLib 断言库，提供相等性、布尔、数值、字符串、集合和异常断言功能&#10;- 新增 MockLib Mock 工具库，支持创建 Mock 对象、设置返回值、验证调用次数等功能&#10;- 新增测试示例文件 basic_test.old8、mock_test.old8、simple_test.old8 和 test_example.old8&#10;- 添加 TEST_FRAMEWORK.md 文档，详细说明测试框架使用方法&#10;- 在标准库注册表中注册 AssertLib、MockLib 和 TestRunner 组件&#10;- 移除模块加载器和解析器中不必要的依赖项以优化结构" />
     <MESSAGE value="feat(serialization): 添加序列化库实现&#10;&#10;- 实现 MessagePack 序列化器和 Protobuf 序列化器&#10;- 创建统一的 ISerializer 接口和序列化工厂&#10;- 添加序列化扩展方法和深度克隆功能&#10;- 创建序列化库使用示例和绑定类&#10;- 添加单元测试验证序列化功能&#10;- 更新解决方案文件和项目引用&#10;- 添加序列化库 README 文档" />
     <MESSAGE value="refactor(serialization): 重构MessagePackSerializer字段命名并更新StandardLibraryRegistry&#10;&#10;- 将MessagePackSerializer中的私有字段从_options重命名为Options以符合命名规范&#10;- 更新所有使用_options字段的地方为Options&#10;- 将数组创建语法从new object[]替换为集合表达式[]&#10;- 在StandardLibraryRegistry中注册SerializationLib标准库及其相关类名" />
@@ -946,7 +960,8 @@
     <MESSAGE value="refactor(debugger): 重构断点管理器并优化性能分析&#10;&#10;- 为Breakpoint类添加[Serializable]特性支持序列化&#10;- 重命名私有字段_breakpoints为Breakpoints，_nextId为NextId&#10;- 统一断点管理器中的字段访问方式，使用新命名的字段&#10;- 修复性能分析器中不稳定函数检测的阈值比较逻辑&#10;- 更新性能分析器中严重级别计算算法，使用指数增长公式&#10;- 修正执行时间标准差计算方法，从样本标准差改为总体标准差&#10;- 更新IDE工作区配置文件中的变更记录和任务计数器" />
     <MESSAGE value="feat(debugger): 添加调试和性能分析功能支持&#10;&#10;- 重构BreakpointManager中字符串截取使用切片语法&#10;- 将DebuggableInterpreter改为依赖注入构造函数方式&#10;- 优化Debugger类中的字段命名和访问修饰符&#10;- 添加Serializable属性到DebuggerEventArgs类&#10;- 实现DebugProfilerService统一管理调试和性能分析会话&#10;- 添加DebugProfilerHandler处理调试和性能分析相关请求&#10;- 扩展DocumentManager支持调试和性能分析模式&#10;- 创建ProfilerModels定义性能分析相关数据模型&#10;- 实现性能分析报告生成功能和调试控制命令" />
     <MESSAGE value="fix(compiler): 修复函数调用返回值错误问题&#10;&#10;- 移除 ReturnStatement 中错误的 Task&lt;object&gt; 包装逻辑，同步函数直接返回值&#10;- 在 FuncInit 中复制 DelegateVar、ClassVar 等全局信息到函数的 LocalManager&#10;- 解决函数在嵌套调用时返回垃圾值或 0 的问题&#10;- 修复函数内部无法找到其他已定义函数的问题&#10;- 函数调用测试通过率从 42.1% 提升至 51.7%&#10;- 新增 46 个通过的测试用例" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(compiler): 修复函数调用返回值错误问题&#10;&#10;- 移除 ReturnStatement 中错误的 Task&lt;object&gt; 包装逻辑，同步函数直接返回值&#10;- 在 FuncInit 中复制 DelegateVar、ClassVar 等全局信息到函数的 LocalManager&#10;- 解决函数在嵌套调用时返回垃圾值或 0 的问题&#10;- 修复函数内部无法找到其他已定义函数的问题&#10;- 函数调用测试通过率从 42.1% 提升至 51.7%&#10;- 新增 46 个通过的测试用例" />
+    <MESSAGE value="fix(compiler): 修复void函数IL生成问题&#10;&#10;- 移除ReturnStatement中错误的Task&lt;object&gt;包装逻辑&#10;- 同步函数（包括void函数）直接返回值，不进行Task包装&#10;- 修复函数返回值处理机制，解决InvalidProgramException异常&#10;- void函数测试通过，编译器生成的IL代码验证通过&#10;- 更新测试计划文档状态为已修复&#10;- 新增void函数测试用例和修复说明文档" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(compiler): 修复void函数IL生成问题&#10;&#10;- 移除ReturnStatement中错误的Task&lt;object&gt;包装逻辑&#10;- 同步函数（包括void函数）直接返回值，不进行Task包装&#10;- 修复函数返回值处理机制，解决InvalidProgramException异常&#10;- void函数测试通过，编译器生成的IL代码验证通过&#10;- 更新测试计划文档状态为已修复&#10;- 新增void函数测试用例和修复说明文档" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

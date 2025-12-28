@@ -1,0 +1,67 @@
+// 测试1：从函数调用推断参数类型
+func add(a, b) -> int {
+    return a + b
+}
+
+func test1() -> void {
+    result:int <- add(10, 20)
+    PrintLine("Test 1: " + result.ToStr())
+}
+
+// 测试2：从默认值推断参数类型
+func greet(name, message: "Hello") -> void {
+    PrintLine(message + ", " + name)
+}
+
+func test2() -> void {
+    greet("World")
+    greet("Old8", "Hi")
+}
+
+// 测试3：从return语句推断返回类型
+func multiply(x:int, y:int) {
+    return x * y
+}
+
+func test3() -> void {
+    result:int <- multiply(5, 6)
+    PrintLine("Test 3: " + result.ToStr())
+}
+
+// 测试4：多个return语句的类型推断
+func max(a:int, b:int) {
+    if a > b {
+        return a
+    } else {
+        return b
+    }
+}
+
+func test4() -> void {
+    result:int <- max(10, 20)
+    PrintLine("Test 4: " + result.ToStr())
+}
+
+// 测试5：混合类型推断
+func calculate(x, y:int, operation:"add") {
+    if operation == "add" {
+        return x + y
+    } elif operation == "multiply" {
+        return x * y
+    } else {
+        return 0
+    }
+}
+
+func test5() -> void {
+    result1:int <- calculate(10, 20)
+    result2:int <- calculate(10, 20, "multiply")
+    PrintLine("Test 5: " + result1.ToStr() + ", " + result2.ToStr())
+}
+
+// 运行所有测试
+test1()
+test2()
+test3()
+test4()
+test5()
