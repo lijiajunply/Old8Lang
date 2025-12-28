@@ -270,7 +270,8 @@ public class PrimaryParser(
             }
 
             // 检查是否是泛型实例化：Class<T>(...) 或 func<T>(...)
-            if (Peek().Type == LangTokenType.LessThan)
+            // 使用启发式方法判断，避免误将比较运算符当作泛型
+            if (Peek().Type == LangTokenType.LessThan && IsLikelyGenericInstantiation())
             {
                 return ParseGenericInstantiation();
             }
@@ -316,7 +317,8 @@ public class PrimaryParser(
             LangTokenType.LeftBrace => ParseListOrDictionary(),
             LangTokenType.Dollar => ParseStringTemplate(), // 处理字符串模板：$"string", ${expression}, $($"string")
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftBracket => ParseListInitOrSlice(),
-            LangTokenType.Identifier when Peek().Type == LangTokenType.LessThan => ParseGenericInstantiation(),
+            LangTokenType.Identifier when Peek().Type == LangTokenType.LessThan && IsLikelyGenericInstantiation() =>
+                ParseGenericInstantiation(),
             LangTokenType.Identifier when Peek().Type == LangTokenType.LeftParen => ParseInstantiate(),
             LangTokenType.Identifier => ParseIdentifier(),
             LangTokenType.True or LangTokenType.False => ParseBoolLiteral(),
@@ -1051,7 +1053,6 @@ public class PrimaryParser(
                                     if (c == stringChar)
                                     {
                                         // 检查是否是转义引号
-                                        var isEscaped = false;
                                         var backslashCount = 0;
                                         var j = i - 1;
                                         while (j >= 0 && stringValue[j] == '\\')
@@ -1059,7 +1060,8 @@ public class PrimaryParser(
                                             backslashCount++;
                                             j--;
                                         }
-                                        isEscaped = (backslashCount % 2) == 1;
+
+                                        var isEscaped = backslashCount % 2 == 1;
 
                                         if (!isEscaped)
                                         {
@@ -1067,6 +1069,7 @@ public class PrimaryParser(
                                             stringChar = '\0';
                                         }
                                     }
+
                                     i++;
                                     continue;
                                 }
@@ -1269,6 +1272,7 @@ public class PrimaryParser(
                                 return (char)code;
                             }
                         }
+
                         // 处理十六进制转义序列 \xXX
                         if (content.StartsWith("\\x") && content.Length >= 3)
                         {
@@ -1278,6 +1282,7 @@ public class PrimaryParser(
                                 return (char)code;
                             }
                         }
+
                         break;
                 }
             }
@@ -1548,7 +1553,7 @@ public class PrimaryParser(
 
             // 检查模式类型
             // 1. 通配符: case _ -> expression
-            if (CurrentToken.Type == LangTokenType.Identifier && CurrentToken.Value == "_")
+            if (CurrentToken is { Type: LangTokenType.Identifier, Value: "_" })
             {
                 Expect(LangTokenType.Identifier); // 消费 _
                 Expect(LangTokenType.Arrow);
@@ -1595,7 +1600,7 @@ public class PrimaryParser(
 
     /// <summary>
     /// 解析泛型实例化表达式
-    /// 语法：Box<int>() 或 map<string>(arr, func) 或 Box<int> (不调用构造)
+    /// 语法：Box&lt;int>() 或 map&lt;string>(arr, func) 或 Box&lt;int> (不调用构造)
     /// </summary>
     /// <returns>泛型实例化表达式</returns>
     private LangExpression ParseGenericInstantiation()
@@ -1649,10 +1654,153 @@ public class PrimaryParser(
     }
 
     /// <summary>
-    /// 解析泛型类型参数，支持嵌套泛型
-    /// 语法：<int>, <T>, <List<int>>, <List<List<string>>>
+    /// 启发式判断 &lt; 是否为泛型的开始（而非比较运算符）
+    ///
+    /// 泛型特征：identifier &lt; TypeName [, TypeName]* > (
+    ///
+    /// 比较运算符特征：identifier &lt; number/identifier/expression
     /// </summary>
-    /// <returns>类型参数字符串（不包括外层 < 和 >）</returns>
+    /// <returns>如果可能是泛型返回 true</returns>
+    private bool IsLikelyGenericInstantiation()
+    {
+        // 保存当前位置
+        var savedIndex = CurrentIndex;
+
+        try
+        {
+            // CurrentToken 是标识符（如 Box），Peek() 是 <
+            // 记录外层标识符（调用者），用于上下文判断
+            string? outerIdentifier = null;
+            if (CurrentToken.Type == LangTokenType.Identifier)
+            {
+                outerIdentifier = CurrentToken.Value;
+                CurrentIndex++;
+            }
+
+            // 现在 CurrentToken 应该是 <
+            if (CurrentToken.Type != LangTokenType.LessThan)
+                return false;
+
+            CurrentIndex++;
+
+            // 检查 < 后面的 token
+            // 泛型：应该是类型名（标识符，且通常首字母大写或已知类型）
+            // 比较：可能是数字、小写标识符、运算符等
+
+            if (CurrentToken.Type != LangTokenType.Identifier)
+                return false;
+
+            // 记住内层标识符（类型参数）
+            var innerIdentifier = CurrentToken.Value;
+            CurrentIndex++;
+
+            // 检查标识符后面的 token
+            var nextTokenType = CurrentToken.Type;
+
+            // 检查外层标识符是否是明确的类型名
+            var outerIsTypeName = outerIdentifier != null &&
+                                  (char.IsUpper(outerIdentifier[0]) || IsBuiltInTypeName(outerIdentifier));
+
+            // 强泛型证据：这些模式只能是泛型，不可能是比较运算符
+            // 1. Type> - 泛型结束符
+            // 2. Type, - 多个类型参数
+            // 3. Type? - 可空类型
+            if (nextTokenType == LangTokenType.GreaterThan ||
+                nextTokenType == LangTokenType.Comma ||
+                nextTokenType == LangTokenType.Question)
+            {
+                // 如果外层是明确的类型名（如 List, Box, int），那么即使内层是小写也是泛型
+                // 例如：List<a> - List是类型名，a是自定义类型参数
+                if (outerIsTypeName)
+                {
+                    return true;
+                }
+
+                // 如果外层不是类型名，再检查内层
+                // 例如：int> 或 Box> 肯定是泛型，但 a < b > c 可能是比较链
+                if (char.IsUpper(innerIdentifier[0]) || IsBuiltInTypeName(innerIdentifier))
+                {
+                    return true;
+                }
+
+                // 两者都不是类型名，保守返回 false
+                return false;
+            }
+
+            // 强比较证据：这些模式只能是比较运算符
+            if (nextTokenType == LangTokenType.Plus ||
+                nextTokenType == LangTokenType.Minus ||
+                nextTokenType == LangTokenType.Star ||
+                nextTokenType == LangTokenType.Slash ||
+                nextTokenType == LangTokenType.And ||
+                nextTokenType == LangTokenType.Or ||
+                nextTokenType == LangTokenType.RightParen ||
+                nextTokenType == LangTokenType.LeftParen ||
+                nextTokenType == LangTokenType.EndOfFile)
+            {
+                return false;
+            }
+
+            // 嵌套泛型的情况：Type< - 需要进一步检查
+            if (nextTokenType == LangTokenType.LessThan)
+            {
+                // 如果外层是类型名（如 List<List<a>>），那么即使内层是小写也是泛型
+                if (outerIsTypeName)
+                {
+                    return true;
+                }
+
+                // 只有类型名（首字母大写或内置类型）才可能是嵌套泛型
+                if (char.IsUpper(innerIdentifier[0]) || IsBuiltInTypeName(innerIdentifier))
+                {
+                    return true;
+                }
+
+                // 小写变量名 + < 很可能是链式比较：a < b < c
+                return false;
+            }
+
+            // 默认：只有明确的类型名才当作泛型
+            // 如果外层是类型名，那么即使内层是小写也是泛型
+            if (outerIsTypeName)
+            {
+                return true;
+            }
+
+            if (char.IsUpper(innerIdentifier[0]) || IsBuiltInTypeName(innerIdentifier))
+            {
+                return true;
+            }
+
+            // 所有其他情况：保守策略，当作比较运算符
+            return false;
+        }
+        finally
+        {
+            // 恢复位置
+            CurrentIndex = savedIndex;
+        }
+    }
+
+    /// <summary>
+    /// 判断是否为内置类型名称
+    /// </summary>
+    private bool IsBuiltInTypeName(string name)
+    {
+        return name switch
+        {
+            "int" or "string" or "double" or "bool" or "char" or
+                "long" or "float" or "byte" or "short" or "decimal" or
+                "void" or "object" or "dynamic" => true,
+            _ => false
+        };
+    }
+
+    /// <summary>
+    /// 解析泛型类型参数，支持嵌套泛型
+    /// 语法：&lt;int>, &lt;T>, &lt;List&lt;int>>, &lt;List&lt;List&lt;string>>>
+    /// </summary>
+    /// <returns>类型参数字符串（不包括外层 &lt; 和 >）</returns>
     private string ParseGenericTypeArguments()
     {
         var result = "";

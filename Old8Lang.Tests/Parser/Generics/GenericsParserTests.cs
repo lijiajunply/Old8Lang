@@ -638,6 +638,58 @@ interface IMapper<TSource, TTarget> {
 
     #endregion
 
+    #region 自定义小写类型名称
+
+    /// <summary>
+    /// 测试自定义小写类型名称作为泛型参数
+    /// </summary>
+    [Fact]
+    public void ParseProgram_CustomLowercaseTypeName_ParsesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+// 自定义小写类型名称
+class a {
+    private value:int
+}
+
+// 使用自定义类型作为泛型参数
+box <- List<a>()
+";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act & Assert
+        var program = parser.ParseProgram();
+        Assert.NotNull(program);
+    }
+
+    /// <summary>
+    /// 测试嵌套泛型中使用小写自定义类型名称
+    /// </summary>
+    [Fact]
+    public void ParseProgram_NestedGenericWithLowercaseTypeName_ParsesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+class item {
+    private data:string
+}
+
+// 嵌套泛型使用小写类型名称
+matrix <- List<List<item>>()
+boxList <- Box<List<item>>()
+";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act & Assert
+        var program = parser.ParseProgram();
+        Assert.NotNull(program);
+    }
+
+    #endregion
+
     #region 错误的泛型语法
 
     /// <summary>
