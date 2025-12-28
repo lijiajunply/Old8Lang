@@ -21,12 +21,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/EnumTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Statement/EnumDeclarationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CHANGELOG.md" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -924,7 +919,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="418" />
+    <option name="localTasksCounter" value="420" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -951,7 +946,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(tests): 重构同步迭代器测试文件结构&#10;&#10;- 将 SyncIteratorTests.cs 从 Iterator 目录移动到 Collections 目录&#10;- 更新命名空间从 Old8Lang.Tests.Integration 到 Old8Lang.Tests.Interpreter.Collections&#10;- 保持测试功能不变，仅调整文件组织结构" />
     <MESSAGE value="feat(cli): 添加智能运行命令支持项目和文件模式&#10;&#10;- 实现 RunCommand 支持智能运行文件或项目&#10;- 添加项目模式支持自动检测项目配置并执行脚本&#10;- 实现文件模式支持解释、编译和语法测试三种运行方式&#10;- 集成到命令注册系统中&#10;- 更新帮助信息和使用示例说明新命令用法&#10;- 添加参数解析和错误处理机制" />
     <MESSAGE value="feat(debugger): 添加调试器功能实现&#10;&#10;- 实现断点管理器，支持行断点、函数断点和条件断点&#10;- 添加调用栈管理功能，支持函数进入和退出操作&#10;- 实现调试器核心引擎，包含状态管理和事件系统&#10;- 创建可调试的解释器包装器&#10;- 添加断点管理、调试控制等命令行接口&#10;- 实现变量监视和上下文跟踪功能&#10;- 添加调试相关的单元测试覆盖" />
     <MESSAGE value="feat(compiler): 添加编译模式下的全局静态类支持和断言功能&#10;&#10;- 实现了AssertHelper类提供编译模式下的断言方法&#10;- 添加了StaticClassCompiler类处理全局静态类方法调用的IL生成&#10;- 在Compiler中注册全局静态类到LocalManager的GlobalStaticClasses字典&#10;- 修改LangId.LoadIlValue方法支持全局静态类实例查找&#10;- 扩展LocalManager添加GlobalStaticClasses字典和克隆功能&#10;- 在Operation类中添加StaticClassCompiler处理静态方法调用&#10;- 更新编译测试计划文档添加断言测试说明&#10;- 添加test_assert_compiler.old8测试文件验证断言功能" />
@@ -976,7 +970,8 @@
     <MESSAGE value="refactor(ast): 扩展 LangValueType 的对象转换功能&#10;&#10;- 添加支持 Task 和 Task&lt;T&gt; 类型转换&#10;- 实现数组和集合类型的转换支持&#10;- 添加字典和枚举类型转换功能&#10;- 增强元组类型转换处理&#10;- 改进 long 类型转换避免溢出问题&#10;- 添加可空类型处理逻辑&#10;- 优化错误处理和异常捕获机制&#10;- 改进类型检测和转换算法&#10;- 添加源代码位置信息支持&#10;- 重构原转换方法为增强版本" />
     <MESSAGE value="feat(interpreter): 添加泛型支持和相关测试&#10;&#10;- 在 AnyLangValue 中添加泛型类型参数映射设置逻辑&#10;- 实现 GenericClassTests 测试泛型类基本功能&#10;- 实现 GenericFunctionTests 测试泛型函数基本功能&#10;- 更新 GenericInstanceExpression 支持泛型实例化表达式&#10;- 修改 EBNF 语法定义添加泛型类型参数和参数语法&#10;- 更新语法文档添加泛型函数和泛型类说明&#10;- 添加 nullable 类型支持和泛型相关语法说明" />
     <MESSAGE value="feat(lang): 添加枚举类型支持&#10;&#10;- 实现枚举定义语法 enum Name { Member1, Member2 &lt;- value }&#10;- 添加枚举成员访问功能 EnumName.MemberName&#10;- 支持自动值和显式值的枚举定义&#10;- 实现枚举在解释器和编译器中的处理&#10;- 添加枚举语法测试和解释器测试用例&#10;- 更新语言文档和EBNF语法定义&#10;- 在AST中添加EnumInit和EnumTemplate节点类型&#10;- 实现枚举成员值计算和作用域管理" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加枚举类型支持&#10;&#10;- 实现枚举定义语法 enum Name { Member1, Member2 &lt;- value }&#10;- 添加枚举成员访问功能 EnumName.MemberName&#10;- 支持自动值和显式值的枚举定义&#10;- 实现枚举在解释器和编译器中的处理&#10;- 添加枚举语法测试和解释器测试用例&#10;- 更新语言文档和EBNF语法定义&#10;- 在AST中添加EnumInit和EnumTemplate节点类型&#10;- 实现枚举成员值计算和作用域管理" />
+    <MESSAGE value="docs(changelog): 更新版本更新日志格式和内容&#10;&#10;- 重构语言特性部分，按功能分类整理枚举、类型系统、表达式等特性&#10;- 重新组织标准库扩展内容，添加详细的库功能说明&#10;- 整理异步与并发特性，明确生成器和多线程功能描述&#10;- 优化系统优化部分，突出模块系统改进要点&#10;- 添加开发工具改进和测试质量相关更新&#10;- 使用更清晰的 Markdown 格式组织版本更新内容" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(changelog): 更新版本更新日志格式和内容&#10;&#10;- 重构语言特性部分，按功能分类整理枚举、类型系统、表达式等特性&#10;- 重新组织标准库扩展内容，添加详细的库功能说明&#10;- 整理异步与并发特性，明确生成器和多线程功能描述&#10;- 优化系统优化部分，突出模块系统改进要点&#10;- 添加开发工具改进和测试质量相关更新&#10;- 使用更清晰的 Markdown 格式组织版本更新内容" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
