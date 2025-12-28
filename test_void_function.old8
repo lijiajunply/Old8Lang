@@ -1,0 +1,8 @@
+func voidFunc() -> void {
+    PrintLine("voidFunc called")
+    return
+}
+
+PrintLine("Before calling voidFunc")
+voidFunc()
+PrintLine("After calling voidFunc")
