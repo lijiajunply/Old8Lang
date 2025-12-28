@@ -1,0 +1,13 @@
+#!encoding utf-8
+#!author 老八
+#!version 1.0.0
+#!date 2025-12-28
+#!description 测试文件头指令功能
+
+// 这是一个测试文件头指令的示例
+func main() -> void {
+    PrintLine("Hello, Old8Lang!")
+    PrintLine("这是文件头指令测试")
+}
+
+main()

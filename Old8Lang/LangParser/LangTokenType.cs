@@ -319,7 +319,12 @@ public enum LangTokenType
     /// <summary>
     /// match
     /// </summary>
-    Match
+    Match,
+
+    /// <summary>
+    /// 文件头指令 (#!...)
+    /// </summary>
+    FileHeaderDirective
 }
 
 public enum KeywordType

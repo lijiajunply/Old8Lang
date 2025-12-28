@@ -1,0 +1,33 @@
+#!encoding utf-8
+#!author 张三
+#!version 2.0
+#!date 2025-12-28
+#!description 文件头指令综合测试 - 测试元数据和编译器配置
+#!debug false
+#!verify-il true
+#!type-inference true
+
+// 测试文件头指令功能
+// 包含元数据和编译器配置
+
+func greet(name:string) -> void {
+    PrintLine("Hello, " + name + "!")
+}
+
+func calculate(x:int, y:int) -> int {
+    return x * y + 10
+}
+
+// 主程序
+greet("Old8Lang")
+
+result:int <- calculate(5, 3)
+PrintLine("计算结果: " + result.ToStr())
+
+// 测试类型推断
+nums <- {1, 2, 3, 4, 5}
+sum <- 0
+for num in nums {
+    sum <- sum + num
+}
+PrintLine("数组求和: " + sum.ToStr())

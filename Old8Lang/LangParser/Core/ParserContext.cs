@@ -1,5 +1,7 @@
 namespace Old8Lang.LangParser.Core;
 
+using Old8Lang.AST.Statement;
+
 /// <summary>
 /// 解析器共享上下文，管理 tokens、索引、源代码等状态
 /// </summary>
@@ -22,6 +24,11 @@ public class ParserContext
     /// 当前令牌索引
     /// </summary>
     public int CurrentIndex { get; set; }
+
+    /// <summary>
+    /// 文件头指令集合
+    /// </summary>
+    public FileHeaderDirectives HeaderDirectives { get; } = new();
 
     /// <summary>
     /// 获取缓存的源代码行（延迟初始化，避免在无错误时分割）

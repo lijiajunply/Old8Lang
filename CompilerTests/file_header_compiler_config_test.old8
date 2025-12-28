@@ -1,0 +1,12 @@
+#!encoding utf-8
+#!debug true
+#!verify-il false
+#!type-inference true
+
+// 测试编译器配置指令
+func add(a:int, b:int) -> int {
+    return a + b
+}
+
+result:int <- add(10, 20)
+PrintLine("Result: " + result.ToStr())

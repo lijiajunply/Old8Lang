@@ -365,4 +365,43 @@ public static class Compiler
             throw;
         }
     }
+
+    /// <summary>
+    /// 应用文件头指令到编译器配置
+    /// </summary>
+    /// <param name="directives">文件头指令集合</param>
+    public static void ApplyHeaderDirectives(FileHeaderDirectives directives)
+    {
+        // 处理 debug 指令
+        if (directives.HasDirective("debug"))
+        {
+            DebugOutputEnabled = directives.GetBoolDirective("debug", false);
+        }
+
+        // 处理 verify-il 指令
+        if (directives.HasDirective("verify-il"))
+        {
+            IlVerificationEnabled = directives.GetBoolDirective("verify-il", true);
+        }
+
+        // 处理 optimize 指令 (保留用于将来)
+        if (directives.HasDirective("optimize"))
+        {
+            var optimizeLevel = directives.GetIntDirective("optimize", 0);
+            // 优化级别处理逻辑将来实现
+            LogFormat("优化级别设置为: {0}", LogLevel.Info, optimizeLevel);
+        }
+
+        // 处理 type-inference 指令
+        if (directives.HasDirective("type-inference"))
+        {
+            EnableTypeInference = directives.GetBoolDirective("type-inference", true);
+        }
+
+        // 处理 type-inference-debug 指令
+        if (directives.HasDirective("type-inference-debug"))
+        {
+            TypeInferenceDebugOutput = directives.GetBoolDirective("type-inference-debug", false);
+        }
+    }
 }

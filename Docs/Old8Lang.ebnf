@@ -3,7 +3,13 @@
  * Supporting both interpreter and compiler modes
  *)
 
-root = statement* EOF ;
+root = fileHeaderDirective* statement* EOF ;
+
+(* ============== File Header Directives ============== *)
+
+fileHeaderDirective = "#!" identifier WS+ directiveValue NEWLINE ;
+
+directiveValue = ( CHAR - NEWLINE )* ;
 
 (* ============== Statements ============== *)
 

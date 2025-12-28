@@ -79,12 +79,17 @@ public class LangInterpreter
         // 设置当前解释器，以便在错误处理中使用
         Old8Exception.CurrentInterpreter = this;
 
-        // 词法分析：将代码转换为标记流
-        var parser = LangTokenizer.Tokenize(code);
-        if (parser == null) throw new SyntaxError(new SourcePosition(1, 1), "语法出错");
+        // 词法分析：将代码转换为标记流和文件头指令
+        var (tokens, headerDirectives) = LangTokenizer.TokenizeWithDirectives(code);
+        if (tokens == null) throw new SyntaxError(new SourcePosition(1, 1), "语法出错");
 
         // 语法分析：将标记流转换为抽象语法树
-        var result = new LangParser.LangParser(parser, code, fileName).ParseProgram();
+        var langParser = new LangParser.LangParser(tokens, headerDirectives, code, fileName);
+        var result = langParser.ParseProgram();
+
+        // 获取文件头指令并应用配置
+        var directives = langParser.GetHeaderDirectives();
+        ApplyHeaderDirectives(directives);
 
         return result;
     }
@@ -129,5 +134,25 @@ public class LangInterpreter
         }
 
         return contextLines.ToArray();
+    }
+
+    /// <summary>
+    /// 应用文件头指令到解释器配置
+    /// </summary>
+    /// <param name="directives">文件头指令集合</param>
+    private void ApplyHeaderDirectives(FileHeaderDirectives directives)
+    {
+        // 应用到编译器配置
+        Old8Lang.Compiler.Compiler.ApplyHeaderDirectives(directives);
+
+        // 注意：编码指令（encoding）在词法分析阶段已经处理
+        // 这里主要处理影响解释器行为的指令
+
+        // 处理解释器特定的指令
+        // 将来可以根据需要添加更多配置选项的处理
+        // 例如：
+        // - 启用/禁用特定语言特性
+        // - 设置运行时优化级别
+        // 等等
     }
 }

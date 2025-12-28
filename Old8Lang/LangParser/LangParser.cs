@@ -57,9 +57,36 @@ public class LangParser
     /// <param name="sourceCode">原始源代码（用于错误信息生成）</param>
     /// <param name="fileName">源代码文件名（用于错误信息生成）</param>
     public LangParser(List<LangToken> tokens, string? sourceCode = null, string? fileName = null)
+        : this(tokens, new List<LangToken>(), sourceCode, fileName)
+    {
+    }
+
+    /// <summary>
+    /// 构造函数（带文件头指令），初始化所有解析器并解决它们之间的循环依赖
+    /// </summary>
+    /// <param name="tokens">词法分析生成的标记列表</param>
+    /// <param name="headerDirectiveTokens">文件头指令 token 列表</param>
+    /// <param name="sourceCode">原始源代码（用于错误信息生成）</param>
+    /// <param name="fileName">源代码文件名（用于错误信息生成）</param>
+    public LangParser(List<LangToken> tokens, List<LangToken> headerDirectiveTokens, string? sourceCode = null, string? fileName = null)
     {
         // 1. 创建共享上下文，供所有解析器使用
         Context = new ParserContext(tokens, sourceCode, fileName);
+
+        // 解析文件头指令
+        foreach (var directiveToken in headerDirectiveTokens)
+        {
+            if (directiveToken.Type == LangTokenType.FileHeaderDirective)
+            {
+                // Token的Value格式为 "directiveName:directiveValue"
+                var parts = directiveToken.Value.Split(':', 2);
+                if (parts.Length == 2)
+                {
+                    var directive = new FileHeaderDirective(parts[0], parts[1], directiveToken.Line);
+                    Context.HeaderDirectives.AddDirective(directive);
+                }
+            }
+        }
 
         // 2. 按特定顺序创建各个解析器，解决它们之间的循环依赖
         // 解析器之间的依赖关系：
@@ -228,5 +255,14 @@ public class LangParser
         }
 
         return contextLines.ToArray();
+    }
+
+    /// <summary>
+    /// 获取文件头指令集合
+    /// </summary>
+    /// <returns>文件头指令集合</returns>
+    public FileHeaderDirectives GetHeaderDirectives()
+    {
+        return Context.HeaderDirectives;
     }
 }

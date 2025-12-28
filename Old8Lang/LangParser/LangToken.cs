@@ -79,21 +79,23 @@ public static class LangTokenizer
     /// 将Old8Lang源代码转换为标记流
     /// </summary>
     /// <param name="code">要分析的Old8Lang源代码</param>
-    /// <returns>包含所有标记的列表</returns>
+    /// <returns>包含所有标记的列表和文件头指令的元组</returns>
     /// <exception cref="Error.SyntaxError">当遇到无法识别的字符时抛出</exception>
     /// <remarks>
     /// 该方法执行以下步骤：
-    /// 1. 过滤掉源代码中的注释
+    /// 1. 过滤掉源代码中的注释，同时提取文件头指令
     /// 2. 逐字符扫描源代码
     /// 3. 识别并生成各种类型的标记
-    /// 4. 返回完整的标记列表
+    /// 4. 返回完整的标记列表和文件头指令
     /// </remarks>
-    public static List<LangToken> Tokenize(string code)
+    public static (List<LangToken> tokens, List<LangToken> headerDirectives) TokenizeWithDirectives(string code)
     {
         var tokens = new List<LangToken>();
 
-        // 先过滤掉源代码中的注释
-        code = new FilteringCommentsTokenizer(code).FilteringComments();
+        // 先过滤掉源代码中的注释，同时提取文件头指令
+        var filter = new FilteringCommentsTokenizer(code);
+        code = filter.FilteringComments();
+        var headerDirectives = filter.HeaderDirectives;
 
         // 初始化行号和列号信息
         var line = 1;
@@ -703,7 +705,17 @@ public static class LangTokenizer
             #endregion
         }
 
-        return tokens;
+        return (tokens, headerDirectives);
+    }
+
+    /// <summary>
+    /// 将Old8Lang源代码转换为标记流（向后兼容版本）
+    /// </summary>
+    /// <param name="code">要分析的Old8Lang源代码</param>
+    /// <returns>包含所有标记的列表</returns>
+    public static List<LangToken> Tokenize(string code)
+    {
+        return TokenizeWithDirectives(code).tokens;
     }
 }
 
@@ -715,6 +727,7 @@ public static class LangTokenizer
 /// 该结构体用于在词法分析之前过滤掉源代码中的注释，支持：
 /// - 单行注释 (// ...)
 /// - 多行注释 (/* ... */)
+/// - 文件头指令 (#!...) - 会被保留用于后续解析
 /// 过滤过程中会保留换行符，以确保后续词法分析时行号的准确性。
 /// 重要：字符串字面量中的 // 和 /* */ 不会被误认为注释。
 /// </remarks>
@@ -726,6 +739,11 @@ public struct FilteringCommentsTokenizer(string input)
     private int CurrentIndex = 0;
 
     /// <summary>
+    /// 文件头指令列表
+    /// </summary>
+    public List<LangToken> HeaderDirectives = new();
+
+    /// <summary>
     /// 过滤源代码中的注释
     /// </summary>
     /// <returns>过滤掉注释后的源代码</returns>
@@ -735,11 +753,77 @@ public struct FilteringCommentsTokenizer(string input)
         bool inDoubleQuoteString = false;
         bool inSingleQuoteString = false;
         bool escapeNext = false;
+        int line = 1;
+        int lineStartIndex = 0;
+        bool isFileHeader = true; // 是否还在文件头部分
 
         // 扫描整个输入字符串
         while (CurrentIndex < input.Length)
         {
             var currentChar = input[CurrentIndex];
+
+            // 处理换行符 - 更新行号
+            if (currentChar == '\n')
+            {
+                line++;
+                lineStartIndex = CurrentIndex + 1;
+            }
+
+            // 在文件头部分且不在字符串中，检查文件头指令
+            if (isFileHeader && !inDoubleQuoteString && !inSingleQuoteString)
+            {
+                // 检查是否是文件头指令 (#!)
+                if (currentChar == '#' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '!')
+                {
+                    Advance(); // 跳过 '#'
+                    Advance(); // 跳过 '!'
+
+                    // 读取指令名和值
+                    var directiveStart = CurrentIndex;
+                    var directiveLineStart = lineStartIndex;
+
+                    // 读取整行
+                    while (CurrentIndex < input.Length && input[CurrentIndex] != '\n')
+                    {
+                        Advance();
+                    }
+
+                    var directiveContent = input.Substring(directiveStart, CurrentIndex - directiveStart).Trim();
+
+                    // 解析指令名和值
+                    var spaceIndex = directiveContent.IndexOf(' ');
+                    if (spaceIndex > 0)
+                    {
+                        var directiveName = directiveContent.Substring(0, spaceIndex).Trim();
+                        var directiveValue = directiveContent.Substring(spaceIndex + 1).Trim();
+
+                        // 创建 token 并添加到列表
+                        HeaderDirectives.Add(new LangToken(
+                            $"{directiveName}:{directiveValue}",
+                            LangTokenType.FileHeaderDirective,
+                            line,
+                            directiveStart - directiveLineStart
+                        ));
+                    }
+
+                    // 保留换行符
+                    if (CurrentIndex < input.Length && input[CurrentIndex] == '\n')
+                    {
+                        result.Append('\n');
+                        Advance();
+                    }
+
+                    continue;
+                }
+
+                // 如果遇到非空白、非注释、非文件头指令的内容，则标记文件头结束
+                if (currentChar != ' ' && currentChar != '\t' && currentChar != '\n' && currentChar != '\r' &&
+                    !(currentChar == '/' && CurrentIndex + 1 < input.Length &&
+                      (input[CurrentIndex + 1] == '/' || input[CurrentIndex + 1] == '*')))
+                {
+                    isFileHeader = false;
+                }
+            }
 
             // 处理转义字符
             if (escapeNext)
