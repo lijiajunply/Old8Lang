@@ -33,7 +33,7 @@ public sealed class PrintFunction : BaseGlobalFunction
         return new VoidLangValue();
     }
 
-    protected override void GenerateILInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         if (parameters.Count == 0) return;
 
@@ -75,7 +75,7 @@ public sealed class ReadLineFunction : BaseGlobalFunction
         return new StringLangValue(res);
     }
 
-    protected override void GenerateILInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 编译模式暂不支持
         ilGenerator.Emit(OpCodes.Ldstr, "");
@@ -115,7 +115,7 @@ public sealed class ErrorFunction : BaseGlobalFunction
         return new VoidLangValue();
     }
 
-    protected override void GenerateILInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 编译模式使用 Console.Error.WriteLine
         if (parameters.Count == 0)
@@ -169,7 +169,7 @@ public sealed class ClearFunction : BaseGlobalFunction
         return new VoidLangValue();
     }
 
-    protected override void GenerateILInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         var clearMethod = typeof(Console).GetMethod("Clear", Type.EmptyTypes);
         if (clearMethod != null)

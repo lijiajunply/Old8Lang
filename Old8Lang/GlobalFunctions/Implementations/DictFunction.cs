@@ -22,7 +22,7 @@ public sealed class DictFunction : BaseGlobalFunction
         return new DictionaryLangValue();
     }
 
-    protected override void GenerateILInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 创建新的 DictionaryLangValue
         var dictConstructor = typeof(DictionaryLangValue).GetConstructor(Type.EmptyTypes);

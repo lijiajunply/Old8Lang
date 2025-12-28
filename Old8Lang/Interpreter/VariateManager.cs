@@ -897,7 +897,7 @@ public class VariateManager
     /// <returns>锁定变量实例，如果不存在返回null</returns>
     public LockedVariableLangValue? GetLockedVariable(string varName)
     {
-        return LockedVariables.TryGetValue(varName, out var lockedVar) ? lockedVar : null;
+        return LockedVariables.GetValueOrDefault(varName);
     }
 
     #endregion

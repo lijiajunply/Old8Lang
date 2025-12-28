@@ -38,7 +38,7 @@ public sealed class PrintLineFunction : BaseGlobalFunction
         return new VoidLangValue();
     }
 
-    protected override void GenerateILInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         if (parameters.Count == 0)
         {

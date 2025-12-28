@@ -29,7 +29,7 @@ public sealed class LenFunction : BaseGlobalFunction
         throw new InvalidOperationError(position, $"{value} 不是列表类型");
     }
 
-    protected override void GenerateILInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         var lenId = parameters[0];
         lenId.LoadIlValue(ilGenerator, local);
@@ -97,7 +97,7 @@ public sealed class TypeFunction : BaseGlobalFunction
         return new TypeLangValue(parameters[0].Run(manager)).Run(manager);
     }
 
-    protected override void GenerateILInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 编译模式下type()函数返回类型名称字符串
         var typeId = parameters[0];
@@ -135,7 +135,7 @@ public sealed class AssertFunction : BaseGlobalFunction
         return new BoolLangValue(true);
     }
 
-    protected override void GenerateILInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 编译模式暂不支持断言，返回 true
         ilGenerator.Emit(OpCodes.Ldc_I4_1);
@@ -164,7 +164,7 @@ public sealed class ShowValuesFunction : BaseGlobalFunction
         return new VoidLangValue();
     }
 
-    protected override void GenerateILInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 编译模式不做任何操作
     }

@@ -42,7 +42,7 @@ public abstract class BaseGlobalFunction : IGlobalFunction
     public void GenerateIl(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         ValidateParameterCount(parameters.Count, position);
-        GenerateILInternal(parameters, ilGenerator, local, position);
+        GenerateIlInternal(parameters, ilGenerator, local, position);
     }
 
     /// <summary>
@@ -61,7 +61,7 @@ public abstract class BaseGlobalFunction : IGlobalFunction
     /// <summary>
     /// 编译器模式生成 IL 代码的内部实现
     /// </summary>
-    protected abstract void GenerateILInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position);
+    protected abstract void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position);
 
     /// <summary>
     /// 编译器模式获取返回类型的内部实现

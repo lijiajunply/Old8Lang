@@ -66,7 +66,7 @@ public sealed class JsonFunction : BaseGlobalFunction
         }
     }
 
-    protected override void GenerateILInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 编译模式暂不支持 JSON 序列化
         ilGenerator.Emit(OpCodes.Ldstr, "");

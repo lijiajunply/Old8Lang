@@ -102,7 +102,8 @@ public partial class AsyncForInStatement(
                                     tupleValue.Run(manager);
 
                                     // 字典键值对，赋值给多个标识符
-                                    var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+                                    var values = new List<LangValueType>
+                                        { tupleValue.Value.Item1, tupleValue.Value.Item2 };
 
                                     for (int i = 0; i < AllIds.Count && i < values.Count; i++)
                                     {
@@ -179,7 +180,8 @@ public partial class AsyncForInStatement(
                                     tupleValue.Run(manager);
 
                                     // 字典键值对，赋值给多个标识符
-                                    var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+                                    var values = new List<LangValueType>
+                                        { tupleValue.Value.Item1, tupleValue.Value.Item2 };
 
                                     for (int i = 0; i < AllIds.Count && i < values.Count; i++)
                                     {
@@ -235,7 +237,8 @@ public partial class AsyncForInStatement(
                                 if (currentValue is TupleLangValue tupleValue)
                                 {
                                     tupleValue.Run(manager);
-                                    var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+                                    var values = new List<LangValueType>
+                                        { tupleValue.Value.Item1, tupleValue.Value.Item2 };
 
                                     for (int i = 0; i < AllIds.Count && i < values.Count; i++)
                                     {
@@ -297,7 +300,9 @@ public partial class AsyncForInStatement(
             }
             else
             {
-                throw new TypeError(this, "ILangList、GeneratorLangValue、AsyncGeneratorLangValue、AsyncStreamLangValue 或 TaskLangValue", value.GetType().Name);
+                throw new TypeError(this,
+                    "ILangList、GeneratorLangValue、AsyncGeneratorLangValue、AsyncStreamLangValue 或 TaskLangValue",
+                    value.GetType().Name);
             }
         }
         finally
@@ -370,7 +375,9 @@ public partial class AsyncForInStatement(
                 return;
             }
 
-            throw new TypeError(this, "ILangList、GeneratorLangValue、AsyncGeneratorLangValue、AsyncStreamLangValue 或 TaskLangValue", value.GetType().Name);
+            throw new TypeError(this,
+                "ILangList、GeneratorLangValue、AsyncGeneratorLangValue、AsyncStreamLangValue 或 TaskLangValue",
+                value.GetType().Name);
         }
         finally
         {
@@ -386,7 +393,8 @@ public partial class AsyncForInStatement(
     /// 但将ExecutionPath修改为指向async-for语句本身，
     /// 这样下次恢复时会重新进入这个方法继续循环
     /// </summary>
-    private void RunGeneratorContextAsyncStream(VariateManager manager, AsyncStreamLangValue asyncStream, Old8Lang.Generators.GeneratorExecutionContext context, string loopPath)
+    private void RunGeneratorContextAsyncStream(VariateManager manager, AsyncStreamLangValue asyncStream,
+        Old8Lang.Generators.GeneratorExecutionContext context, string loopPath)
     {
         // 使用 LoopStates 来追踪循环状态
         // 0: 循环正在进行中
@@ -396,10 +404,9 @@ public partial class AsyncForInStatement(
         // 检查是否从yield恢复
         bool resumingFromYield = context.LoopStates.TryGetValue(loopStateKey, out var state) && state == 1;
 
-        if (!context.LoopStates.ContainsKey(loopStateKey))
+        if (context.LoopStates.TryAdd(loopStateKey, 0))
         {
             // 首次进入循环，清除ExecutionPath避免干扰
-            context.LoopStates[loopStateKey] = 0;
             context.ExecutionPath = "";
         }
         else if (resumingFromYield)
@@ -506,7 +513,8 @@ public partial class AsyncForInStatement(
     /// 在生成器上下文中迭代异步生成器
     /// 与异步流类似，需要在 yield 后能够恢复执行
     /// </summary>
-    private void RunGeneratorContextAsyncGenerator(VariateManager manager, AsyncGeneratorLangValue asyncGenerator, Old8Lang.Generators.GeneratorExecutionContext context, string loopPath)
+    private void RunGeneratorContextAsyncGenerator(VariateManager manager, AsyncGeneratorLangValue asyncGenerator,
+        Old8Lang.Generators.GeneratorExecutionContext context, string loopPath)
     {
         // 使用 LoopStates 来追踪循环状态
         // 0: 循环正在进行中
@@ -516,10 +524,9 @@ public partial class AsyncForInStatement(
         // 检查是否从yield恢复
         bool resumingFromYield = context.LoopStates.TryGetValue(loopStateKey, out var state) && state == 1;
 
-        if (!context.LoopStates.ContainsKey(loopStateKey))
+        if (context.LoopStates.TryAdd(loopStateKey, 0))
         {
             // 首次进入循环，清除ExecutionPath避免干扰
-            context.LoopStates[loopStateKey] = 0;
             context.ExecutionPath = "";
         }
         else if (resumingFromYield)
@@ -576,7 +583,8 @@ public partial class AsyncForInStatement(
                                 if (currentValue is TupleLangValue tupleValue)
                                 {
                                     tupleValue.Run(manager);
-                                    var values = new List<LangValueType> { tupleValue.Value.Item1, tupleValue.Value.Item2 };
+                                    var values = new List<LangValueType>
+                                        { tupleValue.Value.Item1, tupleValue.Value.Item2 };
                                     for (int i = 0; i < AllIds.Count && i < values.Count; i++)
                                     {
                                         manager.Set(AllIds[i], values[i]);
@@ -643,7 +651,8 @@ public partial class AsyncForInStatement(
     /// <summary>
     /// 在生成器上下文中迭代普通列表（新架构）
     /// </summary>
-    private void RunGeneratorContextList(VariateManager manager, ILangList oldList, Old8Lang.Generators.GeneratorExecutionContext context)
+    private void RunGeneratorContextList(VariateManager manager, ILangList oldList,
+        Old8Lang.Generators.GeneratorExecutionContext context)
     {
         var items = oldList.GetItems().ToList();
 

@@ -47,7 +47,7 @@ public sealed class CompilerFunction : BaseGlobalFunction
         return new VoidLangValue();
     }
 
-    protected override void GenerateILInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         ilGenerator.Emit(OpCodes.Ldstr, "编译环境不需要使用Compiler方法");
         ilGenerator.Emit(OpCodes.Call,

@@ -8,9 +8,9 @@ namespace Old8Lang.Interpreter;
 /// <typeparam name="T">池化对象类型，必须实现IPoolable接口</typeparam>
 public class ObjectPool<T> where T : class, IPoolable
 {
-    private readonly ConcurrentBag<T> _objectPool = [];
-    private readonly int _maxSize;
-    private readonly Func<T> _factory;
+    private readonly ConcurrentBag<T> ObjectPoolables = [];
+    private readonly int MaxSize;
+    private readonly Func<T> Factory;
 
     /// <summary>
     /// 初始化对象池
@@ -19,8 +19,8 @@ public class ObjectPool<T> where T : class, IPoolable
     /// <param name="maxSize">对象池最大容量</param>
     public ObjectPool(Func<T> factory, int maxSize = 1000)
     {
-        _factory = factory;
-        _maxSize = maxSize;
+        Factory = factory;
+        MaxSize = maxSize;
     }
 
     /// <summary>
@@ -29,11 +29,7 @@ public class ObjectPool<T> where T : class, IPoolable
     /// <returns>对象实例</returns>
     public T Get()
     {
-        if (_objectPool.TryTake(out var item))
-        {
-            return item;
-        }
-        return _factory();
+        return ObjectPoolables.TryTake(out var item) ? item : Factory();
     }
 
     /// <summary>
@@ -42,10 +38,10 @@ public class ObjectPool<T> where T : class, IPoolable
     /// <param name="item">要归还的对象</param>
     public void Return(T item)
     {
-        if (_objectPool.Count < _maxSize)
+        if (ObjectPoolables.Count < MaxSize)
         {
             item.Reset();
-            _objectPool.Add(item);
+            ObjectPoolables.Add(item);
         }
     }
 }

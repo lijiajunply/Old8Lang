@@ -10,13 +10,13 @@ namespace Old8Lang.Interpreter;
 /// </summary>
 public class AsyncGeneratorStateMachine
 {
-    private readonly AsyncFuncLangValue _asyncFunc;
-    private readonly VariateManager _manager;
-    private readonly CancellationToken _cancellationToken;
-    private readonly GeneratorAstScanner.ScanResult _scanResult;
+    private readonly AsyncFuncLangValue AsyncFunc;
+    private readonly VariateManager Manager;
+    private readonly CancellationToken CancellationToken;
+    private readonly GeneratorAstScanner.ScanResult ScanResult;
 
-    private int _statePoint = 0;
-    private readonly Dictionary<string, LangValueType> _locals = new();
+    private int StatePoint;
+    private readonly Dictionary<string, LangValueType> Locals = new();
 
     /// <summary>
     /// 当前值
@@ -34,13 +34,13 @@ public class AsyncGeneratorStateMachine
         VariateManager manager,
         CancellationToken cancellationToken)
     {
-        _asyncFunc = asyncFunc;
-        _manager = manager;
-        _cancellationToken = cancellationToken;
+        AsyncFunc = asyncFunc;
+        Manager = manager;
+        CancellationToken = cancellationToken;
 
         // 扫描 AST 获取生成器信息
         var scanner = new GeneratorAstScanner();
-        _scanResult = scanner.Scan(asyncFunc.BlockStatement);
+        ScanResult = scanner.Scan(asyncFunc.BlockStatement);
     }
 
     /// <summary>
@@ -49,15 +49,15 @@ public class AsyncGeneratorStateMachine
     /// <returns>如果还有下一个值返回 true，否则返回 false</returns>
     public async Task<bool> MoveNextAsync()
     {
-        _cancellationToken.ThrowIfCancellationRequested();
+        CancellationToken.ThrowIfCancellationRequested();
 
         // 在异步任务中执行生成器逻辑
-        var result = await Task.Run(() => ExecuteStep(), _cancellationToken);
+        var result = await Task.Run(() => ExecuteStep(), CancellationToken);
 
         if (result.HasValue)
         {
             Current = result.YieldValue;
-            _statePoint = result.NextState;
+            StatePoint = result.NextState;
             return true;
         }
 
@@ -77,13 +77,13 @@ public class AsyncGeneratorStateMachine
 
         // 创建生成器上下文
         var context = new GeneratorExecutionContext();
-        _manager.GeneratorContext = context;
+        Manager.GeneratorContext = context;
 
         // 如果不是首次执行，设置恢复信息
-        if (_statePoint > 0)
+        if (StatePoint > 0)
         {
             // 从 locals 中恢复上一次 yield 的路径
-            if (_locals.TryGetValue("__last_yield_path__", out var pathValue) && pathValue is StringLangValue strValue)
+            if (Locals.TryGetValue("__last_yield_path__", out var pathValue) && pathValue is StringLangValue strValue)
             {
                 context.ExecutionPath = strValue.Value;
             }
@@ -95,7 +95,7 @@ public class AsyncGeneratorStateMachine
         try
         {
             // 执行函数体直到下一个 yield
-            _asyncFunc.BlockStatement.Run(_manager);
+            AsyncFunc.BlockStatement.Run(Manager);
 
             // 检查是否 yield
             if (context.HasYielded)
@@ -103,7 +103,7 @@ public class AsyncGeneratorStateMachine
                 // 保存当前 yield 的路径
                 if (!string.IsNullOrEmpty(context.ExecutionPath))
                 {
-                    _locals["__last_yield_path__"] = new StringLangValue(context.ExecutionPath);
+                    Locals["__last_yield_path__"] = new StringLangValue(context.ExecutionPath);
                 }
 
                 // 保存局部变量
@@ -113,7 +113,7 @@ public class AsyncGeneratorStateMachine
                 SaveLoopStates(context);
 
                 // 返回 yield 的值
-                return StateExecutor.ExecutionResult.Yield(context.CurrentValue!, _statePoint + 1);
+                return StateExecutor.ExecutionResult.Yield(context.CurrentValue!, StatePoint + 1);
             }
             else
             {
@@ -123,7 +123,7 @@ public class AsyncGeneratorStateMachine
         }
         finally
         {
-            _manager.GeneratorContext = null;
+            Manager.GeneratorContext = null;
         }
     }
 
@@ -132,7 +132,7 @@ public class AsyncGeneratorStateMachine
     /// </summary>
     private void RestoreLocals()
     {
-        foreach (var kvp in _locals)
+        foreach (var kvp in Locals)
         {
             // 跳过循环状态变量（以 __loop__ 开头）
             if (kvp.Key.StartsWith("__loop__"))
@@ -147,7 +147,7 @@ public class AsyncGeneratorStateMachine
                 continue;
 
             var id = new LangId(kvp.Key);
-            _manager.Set(id, kvp.Value);
+            Manager.Set(id, kvp.Value);
         }
     }
 
@@ -157,34 +157,34 @@ public class AsyncGeneratorStateMachine
     private void SaveLocals()
     {
         // 清除旧的局部变量（但保留循环状态、异步流缓存和执行路径）
-        var loopStates = _locals.Where(kvp => kvp.Key.StartsWith("__loop__")).ToList();
-        var streamCache = _locals.Where(kvp => kvp.Key.StartsWith("__stream__")).ToList();
-        var yieldPath = _locals.ContainsKey("__last_yield_path__") ? _locals["__last_yield_path__"] : null;
+        var loopStates = Locals.Where(kvp => kvp.Key.StartsWith("__loop__")).ToList();
+        var streamCache = Locals.Where(kvp => kvp.Key.StartsWith("__stream__")).ToList();
+        var yieldPath = Locals.ContainsKey("__last_yield_path__") ? Locals["__last_yield_path__"] : null;
 
-        _locals.Clear();
+        Locals.Clear();
 
         foreach (var loopState in loopStates)
         {
-            _locals[loopState.Key] = loopState.Value;
+            Locals[loopState.Key] = loopState.Value;
         }
 
         foreach (var stream in streamCache)
         {
-            _locals[stream.Key] = stream.Value;
+            Locals[stream.Key] = stream.Value;
         }
 
         if (yieldPath != null)
         {
-            _locals["__last_yield_path__"] = yieldPath;
+            Locals["__last_yield_path__"] = yieldPath;
         }
 
         // 保存所有扫描到的局部变量
-        foreach (var varName in _scanResult.LocalVariables)
+        foreach (var varName in ScanResult.LocalVariables)
         {
-            var value = _manager.GetAny(new LangId(varName));
+            var value = Manager.GetAny(new LangId(varName));
             if (value != null)
             {
-                _locals[varName] = value;
+                Locals[varName] = value;
             }
         }
     }
@@ -194,7 +194,7 @@ public class AsyncGeneratorStateMachine
     /// </summary>
     private void RestoreLoopStates(GeneratorExecutionContext context)
     {
-        foreach (var kvp in _locals)
+        foreach (var kvp in Locals)
         {
             if (kvp.Key.StartsWith("__loop__") && kvp.Value is IntLangValue intValue)
             {
@@ -220,7 +220,7 @@ public class AsyncGeneratorStateMachine
         foreach (var kvp in context.LoopStates)
         {
             var key = "__loop__" + kvp.Key;
-            _locals[key] = new IntLangValue(kvp.Value);
+            Locals[key] = new IntLangValue(kvp.Value);
         }
 
         // 从 AsyncStreamCache 保存所有异步流实例
@@ -229,7 +229,7 @@ public class AsyncGeneratorStateMachine
             var key = "__stream__" + kvp.Key;
             if (kvp.Value is LangValueType langValue)
             {
-                _locals[key] = langValue;
+                Locals[key] = langValue;
             }
         }
     }
@@ -239,8 +239,8 @@ public class AsyncGeneratorStateMachine
     /// </summary>
     public void Reset()
     {
-        _statePoint = 0;
-        _locals.Clear();
+        StatePoint = 0;
+        Locals.Clear();
         Current = null;
     }
 }

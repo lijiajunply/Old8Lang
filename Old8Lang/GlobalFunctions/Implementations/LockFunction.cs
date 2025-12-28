@@ -49,7 +49,7 @@ public sealed class LockFunction : BaseGlobalFunction
         return lockedVar;
     }
 
-    protected override void GenerateILInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 编译模式暂不支持锁定变量
         ilGenerator.Emit(OpCodes.Ldnull);

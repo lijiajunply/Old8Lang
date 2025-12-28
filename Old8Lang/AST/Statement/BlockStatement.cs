@@ -35,6 +35,7 @@ public partial class BlockStatement : OldStatement
                     {
                         ImportStatements.Add(statement);
                     }
+
                     break;
                 case NativeStatement or FuncInit or ClassInit or AsyncFuncInit:
                     ImportStatements.Add(statement);
@@ -215,7 +216,7 @@ public partial class BlockStatement : OldStatement
             // if (manager.IsReturn) return;
         }
     }
-    
+
     /// <summary>
     /// 执行模块的非导入语句，包括函数定义、类定义和变量赋值
     /// 但跳过导入语句，避免递归导入
@@ -246,12 +247,12 @@ public partial class BlockStatement : OldStatement
                 }
             }
         }
-        
+
         // 执行所有OtherStatements（变量赋值等）
         foreach (var statement in OtherStatements)
         {
             statement.Run(manager);
-            
+
             if (manager.IsReturn)
             {
                 return;
@@ -306,7 +307,7 @@ public partial class BlockStatement : OldStatement
                     if (existingExpr is FuncLangValue existingFunc && expr is FuncLangValue currentFunc)
                     {
                         // 创建函数重载列表
-                        var overloadList = new MethodOverloadList(new List<FuncLangValue> { existingFunc, currentFunc });
+                        var overloadList = new MethodOverloadList([existingFunc, currentFunc]);
                         c[id] = overloadList;
                     }
                     else if (existingExpr is MethodOverloadList overloadList)
@@ -353,7 +354,7 @@ public partial class BlockStatement : OldStatement
                     if (existingExpr is FuncLangValue existingFunc && expr is FuncLangValue currentFunc)
                     {
                         // 创建函数重载列表
-                        var overloadList = new MethodOverloadList(new List<FuncLangValue> { existingFunc, currentFunc });
+                        var overloadList = new MethodOverloadList([existingFunc, currentFunc]);
                         c[id] = overloadList;
                     }
                     else if (existingExpr is MethodOverloadList overloadList)
@@ -415,6 +416,6 @@ public partial class BlockStatement : OldStatement
     /// <returns>如果是函数返回true，否则返回false</returns>
     private static bool IsFunction(LangExpression expr)
     {
-        return expr is FuncLangValue || expr is AsyncFuncLangValue;
+        return expr is FuncLangValue or AsyncFuncLangValue;
     }
 }

@@ -397,7 +397,7 @@ public class Debugger
     /// 引发状态变化事件
     /// </summary>
     /// <param name="message">消息</param>
-    /// <param name="detail">详细信息</param>
+    /// <param name="eventType">事件类型</param>
     private void RaiseStateChanged(string eventType, string message)
     {
         StateChanged?.Invoke(this, new DebuggerEventArgs

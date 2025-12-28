@@ -22,7 +22,7 @@ public sealed class TupleFunction : BaseGlobalFunction
         return new TupleLangValue(true, position);
     }
 
-    protected override void GenerateILInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
+    protected override void GenerateIlInternal(List<LangExpression> parameters, ILGenerator ilGenerator, LocalManager local, SourcePosition position)
     {
         // 编译模式暂不支持元组创建
         ilGenerator.Emit(OpCodes.Ldnull);
