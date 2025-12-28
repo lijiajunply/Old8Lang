@@ -7,8 +7,8 @@ namespace Old8Lang.ModuleSystem.Loading;
 /// </summary>
 public class CacheManager
 {
-    private readonly Dictionary<string, BlockStatement> _moduleCache = new();
-    private readonly Lock _cacheLock = new();
+    private readonly Dictionary<string, BlockStatement> ModuleCache = new();
+    private readonly Lock CacheLock = new();
 
     /// <summary>
     /// 尝试从缓存获取模块
@@ -18,9 +18,9 @@ public class CacheManager
     /// <returns>是否存在缓存</returns>
     public bool TryGetCached(string modulePath, out BlockStatement? cachedBlock)
     {
-        lock (_cacheLock)
+        lock (CacheLock)
         {
-            return _moduleCache.TryGetValue(modulePath, out cachedBlock);
+            return ModuleCache.TryGetValue(modulePath, out cachedBlock);
         }
     }
 
@@ -31,9 +31,9 @@ public class CacheManager
     /// <param name="block">模块代码块</param>
     public void AddToCache(string modulePath, BlockStatement block)
     {
-        lock (_cacheLock)
+        lock (CacheLock)
         {
-            _moduleCache[modulePath] = block;
+            ModuleCache[modulePath] = block;
         }
     }
 
@@ -44,9 +44,9 @@ public class CacheManager
     /// <returns>是否成功清除</returns>
     public bool ClearCache(string modulePath)
     {
-        lock (_cacheLock)
+        lock (CacheLock)
         {
-            return _moduleCache.Remove(modulePath);
+            return ModuleCache.Remove(modulePath);
         }
     }
 
@@ -55,9 +55,9 @@ public class CacheManager
     /// </summary>
     public void ClearAllCaches()
     {
-        lock (_cacheLock)
+        lock (CacheLock)
         {
-            _moduleCache.Clear();
+            ModuleCache.Clear();
         }
     }
 
@@ -68,9 +68,9 @@ public class CacheManager
     {
         get
         {
-            lock (_cacheLock)
+            lock (CacheLock)
             {
-                return _moduleCache.Count;
+                return ModuleCache.Count;
             }
         }
     }
@@ -82,9 +82,9 @@ public class CacheManager
     /// <returns>是否已缓存</returns>
     public bool IsCached(string modulePath)
     {
-        lock (_cacheLock)
+        lock (CacheLock)
         {
-            return _moduleCache.ContainsKey(modulePath);
+            return ModuleCache.ContainsKey(modulePath);
         }
     }
 
@@ -94,9 +94,9 @@ public class CacheManager
     /// <returns>模块路径列表</returns>
     public IEnumerable<string> GetCachedModulePaths()
     {
-        lock (_cacheLock)
+        lock (CacheLock)
         {
-            return _moduleCache.Keys.ToList();
+            return ModuleCache.Keys.ToList();
         }
     }
 }

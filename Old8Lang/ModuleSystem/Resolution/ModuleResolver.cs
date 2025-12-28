@@ -86,14 +86,8 @@ public class PackageInfo
 /// </summary>
 public class ModuleResolver
 {
-    private readonly PathResolver _pathResolver;
-    private readonly VersionResolver _versionResolver;
-
-    public ModuleResolver()
-    {
-        _pathResolver = new PathResolver();
-        _versionResolver = new VersionResolver();
-    }
+    private readonly PathResolver PathResolver = new();
+    private readonly VersionResolver VersionResolver = new();
 
     /// <summary>
     /// 解析模块
@@ -102,12 +96,13 @@ public class ModuleResolver
     /// <param name="currentFilePath">当前文件路径</param>
     /// <param name="manager">变量管理器（可选）</param>
     /// <returns>模块解析结果</returns>
-    public ModuleResolutionResult ResolveModule(string moduleName, string? currentFilePath, VariateManager? manager = null)
+    public ModuleResolutionResult ResolveModule(string moduleName, string? currentFilePath,
+        VariateManager? manager = null)
     {
         var result = new ModuleResolutionResult();
 
         // 1. 检查是否为网络路径
-        if (_pathResolver.IsUrl(moduleName))
+        if (PathResolver.IsUrl(moduleName))
         {
             result.ModuleType = ModuleType.NetworkModule;
             result.ResolvedPath = moduleName;
@@ -124,6 +119,7 @@ public class ModuleResolver
             {
                 result.AttemptedPaths.Add(submodulePath);
             }
+
             return result;
         }
 
@@ -140,7 +136,7 @@ public class ModuleResolver
         if (!moduleName.StartsWith("./") && !moduleName.StartsWith("../") && !Path.IsPathRooted(moduleName))
         {
             // 解析版本
-            _versionResolver.ParsePackageSpec(moduleName, out var packageName, out var versionSpec);
+            VersionResolver.ParsePackageSpec(moduleName, out var packageName, out var versionSpec);
 
             var packagePath = ResolvePackage(packageName, versionSpec, currentFilePath);
             if (packagePath != null)
@@ -278,7 +274,7 @@ public class ModuleResolver
                 if (versionedDirs.Length > 0)
                 {
                     // 选择最佳匹配版本
-                    var bestMatch = _versionResolver.SelectBestVersion(
+                    var bestMatch = VersionResolver.SelectBestVersion(
                         versionedDirs.Select(Path.GetFileName).Where(x => x != null).Cast<string>(),
                         versionSpec
                     );
@@ -366,10 +362,10 @@ public class ModuleResolver
     private string? ResolveLocalFile(string moduleName, string? currentFilePath, List<string> attemptedPaths)
     {
         // 添加扩展名（如果需要）
-        var fileName = _pathResolver.EnsureExtension(moduleName);
+        var fileName = PathResolver.EnsureExtension(moduleName);
 
         // 解析路径
-        var filePath = _pathResolver.ResolvePath(fileName, currentFilePath);
+        var filePath = PathResolver.ResolvePath(fileName, currentFilePath);
 
         attemptedPaths.Add(filePath);
 

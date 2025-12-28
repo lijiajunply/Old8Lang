@@ -91,7 +91,7 @@ public class SymbolRegistry
         foreach (var (originalName, value) in symbols)
         {
             // 如果有别名，使用别名；否则使用原名
-            var name = aliases.TryGetValue(originalName, out var alias) ? alias : originalName;
+            var name = aliases.GetValueOrDefault(originalName, originalName);
             currentScope[name] = value;
         }
     }

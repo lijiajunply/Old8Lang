@@ -37,14 +37,9 @@ public class ModuleLoadResult
 /// <summary>
 /// 模块加载器 - 负责加载和解析模块代码
 /// </summary>
-public class ModuleLoader
+public class ModuleLoader(CacheManager? cacheManager = null)
 {
-    private readonly CacheManager _cacheManager;
-
-    public ModuleLoader(CacheManager? cacheManager = null)
-    {
-        _cacheManager = cacheManager ?? new CacheManager();
-    }
+    private readonly CacheManager _cacheManager = cacheManager ?? new CacheManager();
 
     /// <summary>
     /// 加载模块

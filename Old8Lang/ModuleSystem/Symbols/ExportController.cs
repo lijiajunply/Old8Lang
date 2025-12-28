@@ -8,7 +8,7 @@ namespace Old8Lang.ModuleSystem.Symbols;
 /// </summary>
 public class ExportController
 {
-    private readonly HashSet<string> _exportedSymbols = new();
+    private readonly HashSet<string> _exportedSymbols = [];
     private bool _exportAll = true; // 默认导出所有符号
 
     /// <summary>

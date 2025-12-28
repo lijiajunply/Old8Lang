@@ -24,7 +24,7 @@ public class SymbolExtractor
         List<string>? selectedSymbols = null)
     {
         var symbols = new Dictionary<string, LangValueType>();
-        var isSelective = selectedSymbols != null && selectedSymbols.Count > 0;
+        var isSelective = selectedSymbols is { Count: > 0 };
 
         // 1. 从作用域中提取变量和常量
         ExtractFromScopes(manager, symbols, moduleBaseName, selectedSymbols, isSelective);

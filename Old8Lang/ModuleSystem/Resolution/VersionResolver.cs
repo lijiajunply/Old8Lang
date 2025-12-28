@@ -173,18 +173,12 @@ public partial class VersionResolver
 /// <summary>
 /// 语义版本类
 /// </summary>
-public class SemanticVersion : IComparable<SemanticVersion>, IEquatable<SemanticVersion>
+public class SemanticVersion(int major, int minor, int patch)
+    : IComparable<SemanticVersion>, IEquatable<SemanticVersion>
 {
-    public int Major { get; }
-    public int Minor { get; }
-    public int Patch { get; }
-
-    public SemanticVersion(int major, int minor, int patch)
-    {
-        Major = major;
-        Minor = minor;
-        Patch = patch;
-    }
+    public int Major { get; } = major;
+    public int Minor { get; } = minor;
+    public int Patch { get; } = patch;
 
     public int CompareTo(SemanticVersion? other)
     {

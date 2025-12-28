@@ -166,6 +166,7 @@ public class ModuleSystemService
                 result.ModuleObject = moduleObj;
                 result.IsSuccess = true;
             }
+
             return result;
         }
 
@@ -191,19 +192,20 @@ public class ModuleSystemService
                     // 提取符号 - 使用限定范围的 ImportInfos
                     var moduleName = Path.GetFileNameWithoutExtension(modulePath);
                     var symbols = options.ImportSpecifiers != null && options.ImportSpecifiers.Count > 0
-                        ? _symbolExtractor.ExtractSpecificSymbols(manager, options.ImportSpecifiers, moduleName, newImportInfos)
+                        ? _symbolExtractor.ExtractSpecificSymbols(manager, options.ImportSpecifiers, moduleName,
+                            newImportInfos)
                         : _symbolExtractor.ExtractSymbols(manager);
 
                     result.ExtractedSymbols = symbols;
 
                     // 注册到父作用域 - 使用别名（如果有）
-                    if (options.SymbolAliases != null && options.SymbolAliases.Count > 0)
+                    if (options.SymbolAliases is { Count: > 0 })
                     {
                         // 直接注册到父作用域并应用别名
                         var parentScope = manager.Scopes[^2];
                         foreach (var (originalName, value) in symbols)
                         {
-                            var name = options.SymbolAliases.TryGetValue(originalName, out var alias) ? alias : originalName;
+                            var name = options.SymbolAliases.GetValueOrDefault(originalName, originalName);
                             parentScope[name] = value;
                         }
                     }
@@ -211,6 +213,7 @@ public class ModuleSystemService
                     {
                         _symbolRegistry.RegisterSymbolsToParentScope(manager, symbols);
                     }
+
                     result.IsSuccess = true;
                 }
                 finally
@@ -279,6 +282,7 @@ public class ModuleSystemService
 /// <summary>
 /// 导入选项
 /// </summary>
+[Serializable]
 public class ImportOptions
 {
     /// <summary>
@@ -315,6 +319,7 @@ public class ImportOptions
 /// <summary>
 /// 模块导入结果
 /// </summary>
+[Serializable]
 public class ModuleImportResult
 {
     /// <summary>

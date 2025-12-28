@@ -9,15 +9,15 @@ namespace Old8Lang.ModuleSystem.Loading;
 public class NetworkModuleLoader
 {
     private static readonly HttpClient HttpClient = new();
-    private readonly string _cacheDirectory;
+    private readonly string CacheDirectory;
 
     public NetworkModuleLoader()
     {
         var homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        _cacheDirectory = Path.Combine(homeDir, ".old8lang", "cache", "network");
+        CacheDirectory = Path.Combine(homeDir, ".old8lang", "cache", "network");
 
         // 确保缓存目录存在
-        Directory.CreateDirectory(_cacheDirectory);
+        Directory.CreateDirectory(CacheDirectory);
     }
 
     /// <summary>
@@ -50,7 +50,7 @@ public class NetworkModuleLoader
         {
             // 1. 计算 URL 哈希作为缓存键
             var urlHash = ComputeHash(url);
-            var cachePath = Path.Combine(_cacheDirectory, urlHash);
+            var cachePath = Path.Combine(CacheDirectory, urlHash);
             var cacheFile = Path.Combine(cachePath, "module.old8");
             var metadataFile = Path.Combine(cachePath, "metadata.json");
 
@@ -139,7 +139,7 @@ public class NetworkModuleLoader
     public void ClearCache(string url)
     {
         var urlHash = ComputeHash(url);
-        var cachePath = Path.Combine(_cacheDirectory, urlHash);
+        var cachePath = Path.Combine(CacheDirectory, urlHash);
 
         if (Directory.Exists(cachePath))
         {
@@ -152,10 +152,10 @@ public class NetworkModuleLoader
     /// </summary>
     public void ClearAllCaches()
     {
-        if (Directory.Exists(_cacheDirectory))
+        if (Directory.Exists(CacheDirectory))
         {
-            Directory.Delete(_cacheDirectory, true);
-            Directory.CreateDirectory(_cacheDirectory);
+            Directory.Delete(CacheDirectory, true);
+            Directory.CreateDirectory(CacheDirectory);
         }
     }
 
@@ -164,11 +164,11 @@ public class NetworkModuleLoader
     /// </summary>
     public int GetCachedModuleCount()
     {
-        if (!Directory.Exists(_cacheDirectory))
+        if (!Directory.Exists(CacheDirectory))
         {
             return 0;
         }
 
-        return Directory.GetDirectories(_cacheDirectory).Length;
+        return Directory.GetDirectories(CacheDirectory).Length;
     }
 }
