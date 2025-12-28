@@ -8,12 +8,7 @@ namespace Old8Lang.Tests.Debugger;
 /// </summary>
 public class CallStackTests
 {
-    private readonly CallStack _callStack;
-
-    public CallStackTests()
-    {
-        _callStack = new CallStack();
-    }
+    private readonly CallStack CallStack = new();
 
     [Fact]
     public void PushFrame_ShouldAddFrameToStack()
@@ -28,11 +23,11 @@ public class CallStackTests
         };
 
         // Act
-        _callStack.PushFrame(frame);
+        CallStack.PushFrame(frame);
 
         // Assert
-        Assert.Equal(1, _callStack.Depth);
-        Assert.Equal(frame, _callStack.CurrentFrame);
+        Assert.Equal(1, CallStack.Depth);
+        Assert.Equal(frame, CallStack.CurrentFrame);
     }
 
     [Fact]
@@ -46,22 +41,22 @@ public class CallStackTests
             Line = 10,
             Column = 5
         };
-        _callStack.PushFrame(frame);
+        CallStack.PushFrame(frame);
 
         // Act
-        var poppedFrame = _callStack.PopFrame();
+        var poppedFrame = CallStack.PopFrame();
 
         // Assert
-        Assert.Equal(0, _callStack.Depth);
+        Assert.Equal(0, CallStack.Depth);
         Assert.Equal(frame, poppedFrame);
-        Assert.Null(_callStack.CurrentFrame);
+        Assert.Null(CallStack.CurrentFrame);
     }
 
     [Fact]
     public void PopFrame_ShouldReturnNullForEmptyStack()
     {
         // Act
-        var result = _callStack.PopFrame();
+        var result = CallStack.PopFrame();
 
         // Assert
         Assert.Null(result);
@@ -76,11 +71,11 @@ public class CallStackTests
         var frame3 = new StackFrame { FunctionName = "func2" };
 
         // Act
-        _callStack.PushFrame(frame1);
-        _callStack.PushFrame(frame2);
-        _callStack.PushFrame(frame3);
+        CallStack.PushFrame(frame1);
+        CallStack.PushFrame(frame2);
+        CallStack.PushFrame(frame3);
 
-        var frames = _callStack.GetAllFrames();
+        var frames = CallStack.GetAllFrames();
 
         // Assert
         Assert.Equal(3, frames.Count);
@@ -93,16 +88,16 @@ public class CallStackTests
     public void Clear_ShouldRemoveAllFrames()
     {
         // Arrange
-        _callStack.PushFrame(new StackFrame { FunctionName = "main" });
-        _callStack.PushFrame(new StackFrame { FunctionName = "func1" });
+        CallStack.PushFrame(new StackFrame { FunctionName = "main" });
+        CallStack.PushFrame(new StackFrame { FunctionName = "func1" });
 
         // Act
-        _callStack.Clear();
+        CallStack.Clear();
 
         // Assert
-        Assert.Equal(0, _callStack.Depth);
-        Assert.Null(_callStack.CurrentFrame);
-        Assert.Empty(_callStack.GetAllFrames());
+        Assert.Equal(0, CallStack.Depth);
+        Assert.Null(CallStack.CurrentFrame);
+        Assert.Empty(CallStack.GetAllFrames());
     }
 
     [Fact]
@@ -113,10 +108,10 @@ public class CallStackTests
         var frame2 = new StackFrame { FunctionName = "func1" };
 
         // Act & Assert
-        _callStack.PushFrame(frame1);
-        Assert.Equal(frame1, _callStack.CurrentFrame);
+        CallStack.PushFrame(frame1);
+        Assert.Equal(frame1, CallStack.CurrentFrame);
 
-        _callStack.PushFrame(frame2);
-        Assert.Equal(frame2, _callStack.CurrentFrame);
+        CallStack.PushFrame(frame2);
+        Assert.Equal(frame2, CallStack.CurrentFrame);
     }
 }

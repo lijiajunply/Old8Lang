@@ -75,22 +75,23 @@ public static class StaticClassCompiler
         returnType = typeof(void);
 
         // 根据方法名分发到具体的编译方法
+        // 支持简短名称（True, False等）和完整名称（AssertTrue, AssertFalse等）
         return methodName switch
         {
-            "AssertEqual" => CompileAssertEqual(instance, ilGenerator, local),
-            "AssertNotEqual" => CompileAssertNotEqual(instance, ilGenerator, local),
-            "AssertTrue" => CompileAssertTrue(instance, ilGenerator, local),
-            "AssertFalse" => CompileAssertFalse(instance, ilGenerator, local),
-            "AssertNull" => CompileAssertNull(instance, ilGenerator, local),
-            "AssertNotNull" => CompileAssertNotNull(instance, ilGenerator, local),
-            "AssertGreater" => CompileAssertGreater(instance, ilGenerator, local),
-            "AssertGreaterOrEqual" => CompileAssertGreaterOrEqual(instance, ilGenerator, local),
-            "AssertLess" => CompileAssertLess(instance, ilGenerator, local),
-            "AssertLessOrEqual" => CompileAssertLessOrEqual(instance, ilGenerator, local),
-            "AssertContains" => CompileAssertContains(instance, ilGenerator, local),
-            "AssertNotContains" => CompileAssertNotContains(instance, ilGenerator, local),
-            "AssertStartsWith" => CompileAssertStartsWith(instance, ilGenerator, local),
-            "AssertEndsWith" => CompileAssertEndsWith(instance, ilGenerator, local),
+            "AssertEqual" or "Equal" => CompileAssertEqual(instance, ilGenerator, local),
+            "AssertNotEqual" or "NotEqual" => CompileAssertNotEqual(instance, ilGenerator, local),
+            "AssertTrue" or "True" => CompileAssertTrue(instance, ilGenerator, local),
+            "AssertFalse" or "False" => CompileAssertFalse(instance, ilGenerator, local),
+            "AssertNull" or "Null" => CompileAssertNull(instance, ilGenerator, local),
+            "AssertNotNull" or "NotNull" => CompileAssertNotNull(instance, ilGenerator, local),
+            "AssertGreater" or "Greater" => CompileAssertGreater(instance, ilGenerator, local),
+            "AssertGreaterOrEqual" or "GreaterOrEqual" => CompileAssertGreaterOrEqual(instance, ilGenerator, local),
+            "AssertLess" or "Less" => CompileAssertLess(instance, ilGenerator, local),
+            "AssertLessOrEqual" or "LessOrEqual" => CompileAssertLessOrEqual(instance, ilGenerator, local),
+            "AssertContains" or "Contains" => CompileAssertContains(instance, ilGenerator, local),
+            "AssertNotContains" or "NotContains" => CompileAssertNotContains(instance, ilGenerator, local),
+            "AssertStartsWith" or "StartsWith" => CompileAssertStartsWith(instance, ilGenerator, local),
+            "AssertEndsWith" or "EndsWith" => CompileAssertEndsWith(instance, ilGenerator, local),
             _ => false
         };
     }

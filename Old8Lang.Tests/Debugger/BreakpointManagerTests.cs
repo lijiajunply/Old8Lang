@@ -11,14 +11,8 @@ namespace Old8Lang.Tests.Debugger;
 /// </summary>
 public class BreakpointManagerTests
 {
-    private readonly BreakpointManager _manager;
-    private readonly VariateManager _variableManager;
-
-    public BreakpointManagerTests()
-    {
-        _manager = new BreakpointManager();
-        _variableManager = new VariateManager();
-    }
+    private readonly BreakpointManager Manager = new();
+    private readonly VariateManager VariableManager = new();
 
     [Fact]
     public void AddLineBreakpoint_ShouldCreateBreakpoint()
@@ -28,11 +22,11 @@ public class BreakpointManagerTests
         var line = 10;
 
         // Act
-        var bpId = _manager.AddLineBreakpoint(filePath, line);
+        var bpId = Manager.AddLineBreakpoint(filePath, line);
 
         // Assert
         Assert.True(bpId > 0);
-        var breakpoints = _manager.GetAllBreakpoints();
+        var breakpoints = Manager.GetAllBreakpoints();
         Assert.Single(breakpoints);
         Assert.Equal(BreakpointType.Line, breakpoints[0].Type);
         Assert.Equal(filePath, breakpoints[0].FilePath);
@@ -48,11 +42,11 @@ public class BreakpointManagerTests
         var condition = "x > 5";
 
         // Act
-        var bpId = _manager.AddLineBreakpoint(filePath, line, condition);
+        var bpId = Manager.AddLineBreakpoint(filePath, line, condition);
 
         // Assert
         Assert.True(bpId > 0);
-        var breakpoints = _manager.GetAllBreakpoints();
+        var breakpoints = Manager.GetAllBreakpoints();
         Assert.Single(breakpoints);
         Assert.Equal(BreakpointType.Conditional, breakpoints[0].Type);
         Assert.Equal(condition, breakpoints[0].Condition);
@@ -65,11 +59,11 @@ public class BreakpointManagerTests
         var functionName = "testFunction";
 
         // Act
-        var bpId = _manager.AddFunctionBreakpoint(functionName);
+        var bpId = Manager.AddFunctionBreakpoint(functionName);
 
         // Assert
         Assert.True(bpId > 0);
-        var breakpoints = _manager.GetAllBreakpoints();
+        var breakpoints = Manager.GetAllBreakpoints();
         Assert.Single(breakpoints);
         Assert.Equal(BreakpointType.Function, breakpoints[0].Type);
         Assert.Equal(functionName, breakpoints[0].FunctionName);
@@ -79,21 +73,21 @@ public class BreakpointManagerTests
     public void RemoveBreakpoint_ShouldRemoveExistingBreakpoint()
     {
         // Arrange
-        var bpId = _manager.AddLineBreakpoint("test.old8", 10);
+        var bpId = Manager.AddLineBreakpoint("test.old8", 10);
 
         // Act
-        var result = _manager.RemoveBreakpoint(bpId);
+        var result = Manager.RemoveBreakpoint(bpId);
 
         // Assert
         Assert.True(result);
-        Assert.Empty(_manager.GetAllBreakpoints());
+        Assert.Empty(Manager.GetAllBreakpoints());
     }
 
     [Fact]
     public void RemoveBreakpoint_ShouldReturnFalseForNonExistentBreakpoint()
     {
         // Act
-        var result = _manager.RemoveBreakpoint(999);
+        var result = Manager.RemoveBreakpoint(999);
 
         // Assert
         Assert.False(result);
@@ -105,11 +99,11 @@ public class BreakpointManagerTests
         // Arrange
         var filePath = "test.old8";
         var line = 10;
-        _manager.AddLineBreakpoint(filePath, line);
+        Manager.AddLineBreakpoint(filePath, line);
         var position = new SourcePosition(line, 1);
 
         // Act
-        var hitBreakpoint = _manager.CheckBreakpoint(position, filePath, null, _variableManager);
+        var hitBreakpoint = Manager.CheckBreakpoint(position, filePath, null, VariableManager);
 
         // Assert
         Assert.NotNull(hitBreakpoint);
@@ -123,11 +117,11 @@ public class BreakpointManagerTests
     {
         // Arrange
         var functionName = "testFunction";
-        _manager.AddFunctionBreakpoint(functionName);
+        Manager.AddFunctionBreakpoint(functionName);
         var position = new SourcePosition(5, 1);
 
         // Act
-        var hitBreakpoint = _manager.CheckBreakpoint(position, "test.old8", functionName, _variableManager);
+        var hitBreakpoint = Manager.CheckBreakpoint(position, "test.old8", functionName, VariableManager);
 
         // Assert
         Assert.NotNull(hitBreakpoint);
@@ -139,17 +133,17 @@ public class BreakpointManagerTests
     public void SetBreakpointEnabled_ShouldToggleBreakpointState()
     {
         // Arrange
-        var bpId = _manager.AddLineBreakpoint("test.old8", 10);
+        var bpId = Manager.AddLineBreakpoint("test.old8", 10);
 
         // Act
-        var disableResult = _manager.SetBreakpointEnabled(bpId, false);
-        var enableResult = _manager.SetBreakpointEnabled(bpId, true);
+        var disableResult = Manager.SetBreakpointEnabled(bpId, false);
+        var enableResult = Manager.SetBreakpointEnabled(bpId, true);
 
         // Assert
         Assert.True(disableResult);
         Assert.True(enableResult);
         
-        var breakpoint = _manager.GetAllBreakpoints().First();
+        var breakpoint = Manager.GetAllBreakpoints().First();
         Assert.True(breakpoint.IsEnabled);
     }
 
@@ -157,14 +151,14 @@ public class BreakpointManagerTests
     public void ClearAllBreakpoints_ShouldRemoveAllBreakpoints()
     {
         // Arrange
-        _manager.AddLineBreakpoint("test1.old8", 10);
-        _manager.AddLineBreakpoint("test2.old8", 20);
-        _manager.AddFunctionBreakpoint("func1");
+        Manager.AddLineBreakpoint("test1.old8", 10);
+        Manager.AddLineBreakpoint("test2.old8", 20);
+        Manager.AddFunctionBreakpoint("func1");
 
         // Act
-        _manager.ClearAllBreakpoints();
+        Manager.ClearAllBreakpoints();
 
         // Assert
-        Assert.Empty(_manager.GetAllBreakpoints());
+        Assert.Empty(Manager.GetAllBreakpoints());
     }
 }

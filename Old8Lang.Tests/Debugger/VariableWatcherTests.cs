@@ -11,24 +11,24 @@ namespace Old8Lang.Tests.Debugger;
 /// </summary>
 public class VariableWatcherTests
 {
-    private readonly VariableWatcher _watcher;
-    private readonly VariateManager _variableManager;
+    private readonly VariableWatcher Watcher;
+    private readonly VariateManager VariableManager;
 
     public VariableWatcherTests()
     {
-        _watcher = new VariableWatcher();
-        _variableManager = new VariateManager();
+        Watcher = new VariableWatcher();
+        VariableManager = new VariateManager();
         
         // 添加一些测试变量
-        _variableManager.Set(new LangId("x"), new AST.Expression.Value.IntLangValue(10));
-        _variableManager.Set(new LangId("name"), new AST.Expression.Value.StringLangValue("test"));
+        VariableManager.Set(new LangId("x"), new IntLangValue(10));
+        VariableManager.Set(new LangId("name"), new StringLangValue("test"));
     }
 
     [Fact]
     public void AddWatch_ShouldCreateWatchedVariable()
     {
         // Arrange & Act
-        var watch = _watcher.AddWatch("x", _variableManager);
+        var watch = Watcher.AddWatch("x", VariableManager);
 
         // Assert
         Assert.NotNull(watch);
@@ -42,11 +42,11 @@ public class VariableWatcherTests
     public void GetAllWatches_ShouldReturnAllWatches()
     {
         // Arrange
-        _watcher.AddWatch("x", _variableManager);
-        _watcher.AddWatch("name", _variableManager);
+        Watcher.AddWatch("x", VariableManager);
+        Watcher.AddWatch("name", VariableManager);
 
         // Act
-        var watches = _watcher.GetAllWatches();
+        var watches = Watcher.GetAllWatches();
 
         // Assert
         Assert.Equal(2, watches.Count);
@@ -58,21 +58,21 @@ public class VariableWatcherTests
     public void RemoveWatch_ShouldRemoveExistingWatch()
     {
         // Arrange
-        _watcher.AddWatch("x", _variableManager);
+        Watcher.AddWatch("x", VariableManager);
 
         // Act
-        var result = _watcher.RemoveWatch("x");
+        var result = Watcher.RemoveWatch("x");
 
         // Assert
         Assert.True(result);
-        Assert.Empty(_watcher.GetAllWatches());
+        Assert.Empty(Watcher.GetAllWatches());
     }
 
     [Fact]
     public void RemoveWatch_ShouldReturnFalseForNonExistentWatch()
     {
         // Act
-        var result = _watcher.RemoveWatch("nonexistent");
+        var result = Watcher.RemoveWatch("nonexistent");
 
         // Assert
         Assert.False(result);
@@ -82,17 +82,17 @@ public class VariableWatcherTests
     public void UpdateAllWatches_ShouldUpdateValues()
     {
         // Arrange
-        var watch = _watcher.AddWatch("x", _variableManager);
+        var watch = Watcher.AddWatch("x", VariableManager);
         var originalValue = watch.CurrentValue;
 
         // 修改变量值
-        _variableManager.Set(new LangId("x"), new AST.Expression.Value.IntLangValue(20));
+        VariableManager.Set(new LangId("x"), new IntLangValue(20));
 
         // Act
-        _watcher.UpdateAllWatches(_variableManager);
+        Watcher.UpdateAllWatches(VariableManager);
 
         // Assert
-        var updatedWatch = _watcher.GetAllWatches().First();
+        var updatedWatch = Watcher.GetAllWatches().First();
         Assert.Equal("20", updatedWatch.CurrentValue);
         Assert.NotEqual(originalValue, updatedWatch.CurrentValue);
     }
@@ -101,17 +101,17 @@ public class VariableWatcherTests
     public void SetWatchEnabled_ShouldToggleWatchState()
     {
         // Arrange
-        _watcher.AddWatch("x", _variableManager);
+        Watcher.AddWatch("x", VariableManager);
 
         // Act
-        var disableResult = _watcher.SetWatchEnabled("x", false);
-        var enableResult = _watcher.SetWatchEnabled("x", true);
+        var disableResult = Watcher.SetWatchEnabled("x", false);
+        var enableResult = Watcher.SetWatchEnabled("x", true);
 
         // Assert
         Assert.True(disableResult);
         Assert.True(enableResult);
         
-        var watch = _watcher.GetAllWatches().First();
+        var watch = Watcher.GetAllWatches().First();
         Assert.True(watch.IsEnabled);
     }
 
@@ -119,13 +119,13 @@ public class VariableWatcherTests
     public void ClearAllWatches_ShouldRemoveAllWatches()
     {
         // Arrange
-        _watcher.AddWatch("x", _variableManager);
-        _watcher.AddWatch("name", _variableManager);
+        Watcher.AddWatch("x", VariableManager);
+        Watcher.AddWatch("name", VariableManager);
 
         // Act
-        _watcher.ClearAllWatches();
+        Watcher.ClearAllWatches();
 
         // Assert
-        Assert.Empty(_watcher.GetAllWatches());
+        Assert.Empty(Watcher.GetAllWatches());
     }
 }

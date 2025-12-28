@@ -187,10 +187,20 @@ Key syntax elements:
 
 When adding new language features:
 
-1. **Syntax testing**: Add test to `SyntaxTests/`, ensure parsing works
-2. **Interpreter testing**: Add test to `InterpreterTests/`, verify interpreter execution
-3. **Compiler testing**: Add test to `CompilerTests/`, verify compiler execution
+1. **Syntax testing**: Add test to `SyntaxTests/` (or `Old8Lang.Tests/Parser/`), ensure parsing works
+2. **Interpreter testing**: Add test to `InterpreterTests/` (or `Old8Lang.Tests/Interpreter/`), verify interpreter execution
+3. **Compiler testing**: Add test to `CompilerTests/` (or `Old8Lang.Tests/Compiler/`), verify compiler execution
 4. **Documentation**: Update `Old8Lang/Old8Lang.ebnf` and `Old8Lang_Grammar.md`
+
+### Changelog Guidelines
+
+When updating CHANGELOG (both `CHANGELOG.en-US.md` and `CHANGELOG.zh-CN.md`):
+
+- **Write from developer perspective**: Describe problems and their impact on developers, not implementation details
+- **Describe original user problems**: Focus on what issue users experienced, not how you solved it
+- **Skip minor changes**: Don't mention documentation fixes, minor style optimizations, or code refactoring that users won't notice
+- **Mark non-syntax changes**: Use "-" prefix for tooling/infrastructure changes (e.g., build tools, development workflow)
+- **Keep it meaningful**: Only include changes that affect user experience or API usage
 
 ### Testing and Bug Fixing Principles
 

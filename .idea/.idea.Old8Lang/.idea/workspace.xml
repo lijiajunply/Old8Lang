@@ -22,9 +22,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Compiler/TaskHelper.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_task_thread.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/StaticClassCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/StaticClassCompiler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/VariableTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Classes/ClassDeclarationTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/DictionaryTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/ListTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/SliceTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/TupleTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/MatchTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Functions/FunctionCallTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Functions/LambdaTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Statements/JumpTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Statements/SwitchTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/TestResults/NewCompilerTests.trx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/2025-12-28-15-39-编译模式测试补充报告.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Debugger/BreakpointManagerTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Debugger/BreakpointManagerTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Debugger/CallStackTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Debugger/CallStackTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Debugger/VariableWatcherTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Debugger/VariableWatcherTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,6 +91,8 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Expressions/ArithmeticTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Functions/FunctionDeclarationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Statements/ControlFlowTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Debugger/BreakpointManagerTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Debugger/CallStackTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ConstructorTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" root0="SKIP_HIGHLIGHTING" />
@@ -881,7 +898,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="397" />
+    <option name="localTasksCounter" value="398" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -908,7 +925,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(module): 更新导入测试用例和模块系统测试基础&#10;&#10;- 为别名导入测试添加临时文件创建和测试内容&#10;- 为函数别名导入测试添加临时文件创建和测试内容&#10;- 为循环依赖测试添加临时文件创建和测试内容&#10;- 为导入链测试添加临时文件创建和测试内容&#10;- 为条件导入测试添加临时文件创建和测试内容&#10;- 为动态导入测试添加临时文件创建和测试内容&#10;- 为懒加载基本功能测试添加临时文件创建和测试内容&#10;- 为懒加载新语法测试添加临时文件创建和测试内容&#10;- 为选择性懒加载测试添加临时文件创建和测试内容&#10;- 为带别名懒加载测试添加临时文件创建和测试内容&#10;- 为增强懒加载功能测试添加临时文件创建和测试内容&#10;- 为选择性函数导入测试添加临时文件创建和测试内容&#10;- 为模块选择性导入测试添加临时文件创建和测试内容&#10;- 重构模块导入测试基类中的文件内容处理逻辑&#10;- 更新IDE配置文件中的变更记录和工作项计数器" />
     <MESSAGE value="refactor(tests): 移除标准库测试文件的条件逻辑&#10;&#10;- 移除了 StandardLibrary 测试文件的动态内容生成逻辑&#10;- 删除了基于文件名的标准库导入语句创建功能&#10;- 移除了 OS、MathLib、Time 等标准库的条件判断分支&#10;- 移除了标准库别名导入和多库导入的测试内容生成&#10;- 简化了测试文件创建流程，移除了标准库目录创建逻辑" />
     <MESSAGE value="test(interpreter): 更新模块导入测试用例中的文件引用&#10;&#10;- 将AliasImportTests中的模块文件引用从math.old8更新为math1.old8&#10;- 将RealWorldUsageTests中的模块文件引用从math.old8更新为math2.old8&#10;- 清理workspace.xml中的变更列表记录&#10;- 更新IDE配置文件中的工作项时长和任务计数器&#10;- 移除多余的提交历史记录和消息配置" />
     <MESSAGE value="test(interpreter): 更新复杂导入场景测试用例&#10;&#10;- 添加子模块内容创建逻辑，支持导入链测试&#10;- 修复模块文件路径命名，将 module.main 改为 module_main&#10;- 创建临时模块文件用于导入链功能测试&#10;- 修正断言中的字符串值，更新叶子节点连接符&#10;- 修改钻石依赖测试中的常量定义方式，避免多次导入冲突&#10;- 重构钻石依赖测试中的模块引用，使用别名导入&#10;- 更新条件导入测试中的变量初始化逻辑&#10;- 修复认证检查的布尔比较语法&#10;- 调整科学计算模块中的数值类型，确保浮点数运算正确&#10;- 添加测试结果的注释说明，提高可读性" />
@@ -933,7 +949,8 @@
     <MESSAGE value="feat(cli): 添加智能运行命令支持项目和文件模式&#10;&#10;- 实现 RunCommand 支持智能运行文件或项目&#10;- 添加项目模式支持自动检测项目配置并执行脚本&#10;- 实现文件模式支持解释、编译和语法测试三种运行方式&#10;- 集成到命令注册系统中&#10;- 更新帮助信息和使用示例说明新命令用法&#10;- 添加参数解析和错误处理机制" />
     <MESSAGE value="feat(debugger): 添加调试器功能实现&#10;&#10;- 实现断点管理器，支持行断点、函数断点和条件断点&#10;- 添加调用栈管理功能，支持函数进入和退出操作&#10;- 实现调试器核心引擎，包含状态管理和事件系统&#10;- 创建可调试的解释器包装器&#10;- 添加断点管理、调试控制等命令行接口&#10;- 实现变量监视和上下文跟踪功能&#10;- 添加调试相关的单元测试覆盖" />
     <MESSAGE value="feat(compiler): 添加编译模式下的全局静态类支持和断言功能&#10;&#10;- 实现了AssertHelper类提供编译模式下的断言方法&#10;- 添加了StaticClassCompiler类处理全局静态类方法调用的IL生成&#10;- 在Compiler中注册全局静态类到LocalManager的GlobalStaticClasses字典&#10;- 修改LangId.LoadIlValue方法支持全局静态类实例查找&#10;- 扩展LocalManager添加GlobalStaticClasses字典和克隆功能&#10;- 在Operation类中添加StaticClassCompiler处理静态方法调用&#10;- 更新编译测试计划文档添加断言测试说明&#10;- 添加test_assert_compiler.old8测试文件验证断言功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 添加编译模式下的全局静态类支持和断言功能&#10;&#10;- 实现了AssertHelper类提供编译模式下的断言方法&#10;- 添加了StaticClassCompiler类处理全局静态类方法调用的IL生成&#10;- 在Compiler中注册全局静态类到LocalManager的GlobalStaticClasses字典&#10;- 修改LangId.LoadIlValue方法支持全局静态类实例查找&#10;- 扩展LocalManager添加GlobalStaticClasses字典和克隆功能&#10;- 在Operation类中添加StaticClassCompiler处理静态方法调用&#10;- 更新编译测试计划文档添加断言测试说明&#10;- 添加test_assert_compiler.old8测试文件验证断言功能" />
+    <MESSAGE value="feat(compiler): 添加Task和Thread静态类编译支持&#10;&#10;- 在StaticClassCompiler中添加System.Reflection命名空间引用&#10;- 移除TaskScheduler类的静态方法支持&#10;- 实现TryCompileTaskMethod方法支持Task.Delay、FromResult、Run、WhenAll、WhenAny方法&#10;- 实现TryCompileThreadMethod方法支持Thread.Sleep方法&#10;- 添加TaskHelper辅助类提供ReturnNull方法用于Task操作&#10;- 创建test_task_thread.old8测试文件验证Task和Thread功能&#10;- 更新IDE工作区配置文件中的变更列表和任务计数器" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 添加Task和Thread静态类编译支持&#10;&#10;- 在StaticClassCompiler中添加System.Reflection命名空间引用&#10;- 移除TaskScheduler类的静态方法支持&#10;- 实现TryCompileTaskMethod方法支持Task.Delay、FromResult、Run、WhenAll、WhenAny方法&#10;- 实现TryCompileThreadMethod方法支持Thread.Sleep方法&#10;- 添加TaskHelper辅助类提供ReturnNull方法用于Task操作&#10;- 创建test_task_thread.old8测试文件验证Task和Thread功能&#10;- 更新IDE工作区配置文件中的变更列表和任务计数器" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

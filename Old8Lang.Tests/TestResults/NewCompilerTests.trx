@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="20beb9ce-8adc-4fa1-bcf2-c2b7384d93b5" name="@lijiajundeMac-mini 2025-12-28 15:38:30" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2025-12-28T15:38:30.1238790+08:00" queuing="2025-12-28T15:38:30.1238790+08:00" start="2025-12-28T15:38:29.3712730+08:00" finish="2025-12-28T15:38:30.1240690+08:00" />
+  <TestSettings name="default" id="6a44fd36-5726-4571-847e-2fbe0e74626e">
+    <Deployment runDeploymentRoot="_lijiajundeMac-mini_2025-12-28_15_38_30" />
+  </TestSettings>
+  <TestLists>
+    <TestList name="列表中未列出的结果" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="所有已加载的结果" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="0" executed="0" passed="0" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.5+1b188a7b0a (64-bit .NET 10.0.0)
+[xUnit.net 00:00:00.04]   Discovering: Old8Lang.Tests
+[xUnit.net 00:00:00.15]   Discovered:  Old8Lang.Tests
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="lijiajundeMac-mini" outcome="Warning" timestamp="2025-12-28T15:38:29.9517450+08:00">
+        <Text>[xUnit.net 00:00:00.15] Old8Lang.Tests: Exception filtering tests: TestCaseFilter 错误: 无效条件“FullyQualifiedName~Old8Lang.Tests.Compiler.Basic.VariableTests or FullyQualifiedName~Old8Lang.Tests.Compiler.Expressions.MatchTests or FullyQualifiedName~Old8Lang.Tests.Compiler.Statements.JumpTests or FullyQualifiedName~Old8Lang.Tests.Compiler.Statements.SwitchTests or FullyQualifiedName~Old8Lang.Tests.Compiler.Collections.DictionaryTests or FullyQualifiedName~Old8Lang.Tests.Compiler.Collections.ListTests or FullyQualifiedName~Old8Lang.Tests.Compiler.Collections.SliceTests or FullyQualifiedName~Old8Lang.Tests.Compiler.Collections.TupleTests or FullyQualifiedName~Old8Lang.Tests.Compiler.Functions.FunctionCallTests or FullyQualifiedName~Old8Lang.Tests.Compiler.Functions.LambdaTests or FullyQualifiedName~Old8Lang.Tests.Compiler.Classes.ClassDeclarationTests” 的格式不正确。请指定正确的格式并重试。请注意，格式不正确会导致不执行任何测试。</Text>
+      </RunInfo>
+      <RunInfo computerName="lijiajundeMac-mini" outcome="Warning" timestamp="2025-12-28T15:38:29.9545860+08:00">
+        <Text>没有测试匹配 /Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/bin/Debug/net10.0/Old8Lang.Tests.dll 中的给定用例测试筛选器“FullyQualifiedName~Old8Lang.Tests.Compiler.Basic.VariableTests or FullyQualifiedName~Old8Lang.Tests.Compiler.Expressions.MatchTests or FullyQualifiedName~Old8Lang.Tests.Compiler.Statements.JumpTests or FullyQualifiedName~Old8Lang.Tests.Compiler.Statements....”</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>
