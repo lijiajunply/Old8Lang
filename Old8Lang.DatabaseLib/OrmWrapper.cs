@@ -1,5 +1,3 @@
-using Dapper;
-using System.Data;
 using System.Reflection;
 
 namespace Old8Lang.DatabaseLib;

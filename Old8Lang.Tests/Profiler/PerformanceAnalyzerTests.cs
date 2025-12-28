@@ -1,4 +1,3 @@
-using Xunit;
 using Old8Lang.Profiler;
 
 namespace Old8Lang.Tests.Profiler;
@@ -8,7 +7,7 @@ namespace Old8Lang.Tests.Profiler;
 /// </summary>
 public class PerformanceAnalyzerTests
 {
-    private readonly PerformanceAnalyzer _analyzer = new();
+    private readonly PerformanceAnalyzer Analyzer = new();
 
     [Fact]
     public void AnalyzeSession_WithNoFunctions_ShouldReturnEmptyBottlenecks()
@@ -17,7 +16,7 @@ public class PerformanceAnalyzerTests
         var session = new ProfilingSession();
 
         // Act
-        var bottlenecks = _analyzer.AnalyzeSession(session);
+        var bottlenecks = Analyzer.AnalyzeSession(session);
 
         // Assert
         Assert.Empty(bottlenecks);
@@ -31,7 +30,7 @@ public class PerformanceAnalyzerTests
         session.RecordFunctionExecution("slowFunction", 200.0); // 超过阈值
 
         // Act
-        var bottlenecks = _analyzer.AnalyzeSession(session);
+        var bottlenecks = Analyzer.AnalyzeSession(session);
 
         // Assert
         Assert.Single(bottlenecks);
@@ -46,7 +45,7 @@ public class PerformanceAnalyzerTests
         // Arrange
         var session = new ProfilingSession();
         session.RecordMemoryUsage();
-        
+
         // 模拟高内存使用
         var highMemoryStats = new MemoryUsageStats
         {
@@ -55,7 +54,7 @@ public class PerformanceAnalyzerTests
         session.MemoryHistory.Add(highMemoryStats);
 
         // Act
-        var bottlenecks = _analyzer.AnalyzeSession(session);
+        var bottlenecks = Analyzer.AnalyzeSession(session);
 
         // Assert
         Assert.Single(bottlenecks);
@@ -70,7 +69,7 @@ public class PerformanceAnalyzerTests
     {
         // Arrange
         var session = new ProfilingSession();
-        
+
         // 模拟频繁GC
         var startStats = new MemoryUsageStats
         {
@@ -85,7 +84,7 @@ public class PerformanceAnalyzerTests
         session.MemoryHistory.Add(endStats);
 
         // Act
-        var bottlenecks = _analyzer.AnalyzeSession(session);
+        var bottlenecks = Analyzer.AnalyzeSession(session);
 
         // Assert
         Assert.Single(bottlenecks);
@@ -104,7 +103,7 @@ public class PerformanceAnalyzerTests
         }
 
         // Act
-        var bottlenecks = _analyzer.AnalyzeSession(session);
+        var bottlenecks = Analyzer.AnalyzeSession(session);
 
         // Assert
         Assert.Single(bottlenecks);
@@ -118,17 +117,18 @@ public class PerformanceAnalyzerTests
         // Arrange
         var session = new ProfilingSession();
         var func = new FunctionPerformanceStats { FunctionName = "unstableFunction" };
-        
+
         // 添加变化的执行时间
         for (int i = 0; i < 10; i++)
         {
             var executionTime = 10.0 + (i % 2 == 0 ? 0 : 20); // 10 或 30
             func.AddExecutionTime(executionTime);
         }
+
         session.FunctionStats["unstableFunction"] = func;
 
         // Act
-        var bottlenecks = _analyzer.AnalyzeSession(session);
+        var bottlenecks = Analyzer.AnalyzeSession(session);
 
         // Assert
         Assert.Single(bottlenecks);
@@ -144,13 +144,13 @@ public class PerformanceAnalyzerTests
         {
             Name = "testSession"
         };
-        
+
         session.RecordFunctionExecution("function1", 50.0);
         session.RecordFunctionExecution("function2", 25.0);
         session.RecordFunctionExecution("function1", 75.0);
 
         // Act
-        var summary = _analyzer.GenerateSummary(session);
+        var summary = Analyzer.GenerateSummary(session);
 
         // Assert
         Assert.NotNull(summary);
@@ -166,9 +166,9 @@ public class PerformanceAnalyzerTests
         // Arrange
         var session = new ProfilingSession();
         session.RecordFunctionExecution("verySlowFunction", 1000.0); // 严重超时
-        
+
         // Act
-        var summary = _analyzer.GenerateSummary(session);
+        var summary = Analyzer.GenerateSummary(session);
 
         // Assert
         Assert.True(summary.OverallScore < 50); // 严重瓶颈，分数应该很低
@@ -180,20 +180,23 @@ public class PerformanceAnalyzerTests
     public void CalculateSeverity_ShouldReturnCorrectValue()
     {
         // Test low threshold
-        var severity1 = _analyzer.GetType()
-            .GetMethod("CalculateSeverity", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+        var severity1 = Analyzer.GetType()
+            .GetMethod("CalculateSeverity",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
             ?.Invoke(null, [50.0, 100.0]);
         Assert.Equal(1, severity1);
 
         // Test high threshold
-        var severity2 = _analyzer.GetType()
-            .GetMethod("CalculateSeverity", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+        var severity2 = Analyzer.GetType()
+            .GetMethod("CalculateSeverity",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
             ?.Invoke(null, [200.0, 100.0]);
         Assert.Equal(10, severity2); // 超过10倍，应该返回最大值10
 
         // Test equal threshold
-        var severity3 = _analyzer.GetType()
-            .GetMethod("CalculateSeverity", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+        var severity3 = Analyzer.GetType()
+            .GetMethod("CalculateSeverity",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
             ?.Invoke(null, [100.0, 100.0]);
         Assert.Equal(1, severity3);
     }
@@ -203,9 +206,9 @@ public class PerformanceAnalyzerTests
     {
         // Test with insufficient data
         var session = new ProfilingSession();
-        
+
         // 由于是私有方法，我们通过测试结果来验证逻辑
-        var summary = _analyzer.GenerateSummary(session);
+        var summary = Analyzer.GenerateSummary(session);
         Assert.NotNull(summary);
     }
 }

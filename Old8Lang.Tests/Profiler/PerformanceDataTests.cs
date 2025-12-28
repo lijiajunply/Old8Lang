@@ -1,4 +1,3 @@
-using Xunit;
 using Old8Lang.Profiler;
 
 namespace Old8Lang.Tests.Profiler;
@@ -135,7 +134,7 @@ public class PerformanceDataTests
         var stdDev = stats.GetStandardDeviation();
 
         // Assert
-        Assert.True(stdDev > 14 && stdDev < 15); // 标准差约为 14.14
+        Assert.True(stdDev is > 14 and < 15); // 标准差约为 14.14
     }
 
     [Fact]

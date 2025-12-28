@@ -1,7 +1,5 @@
 using Microsoft.ML;
 using Microsoft.ML.Data;
-using Microsoft.ML.Trainers.FastTree;
-using Microsoft.ML.Trainers.LightGbm;
 
 namespace Old8Lang.MachineLearningLib;
 

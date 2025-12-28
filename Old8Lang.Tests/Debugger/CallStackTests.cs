@@ -1,4 +1,3 @@
-using Xunit;
 using Old8Lang.Debugger;
 
 namespace Old8Lang.Tests.Debugger;

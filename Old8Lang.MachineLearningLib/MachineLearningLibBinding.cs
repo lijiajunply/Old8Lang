@@ -1,7 +1,4 @@
 using Microsoft.ML;
-using Microsoft.ML.Data;
-using Old8Lang.AST.Expression.Value;
-using Old8Lang.LangParser;
 
 namespace Old8Lang.MachineLearningLib;
 

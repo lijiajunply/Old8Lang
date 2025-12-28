@@ -1,4 +1,3 @@
-using Xunit;
 using Old8Lang.Profiler;
 
 namespace Old8Lang.Tests.Profiler;
