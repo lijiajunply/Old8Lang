@@ -6,17 +6,8 @@ namespace Old8Lang.Debugger;
 /// <summary>
 /// 可调试的解释器包装器 - 简化版本
 /// </summary>
-public class DebuggableInterpreter
+public class DebuggableInterpreter(LangInterpreter interpreter, Debugger debugger)
 {
-    private readonly LangInterpreter _interpreter;
-    private readonly Debugger _debugger;
-
-    public DebuggableInterpreter(LangInterpreter interpreter, Debugger debugger)
-    {
-        _interpreter = interpreter;
-        _debugger = debugger;
-    }
-
     /// <summary>
     /// 执行带有调试功能的AST
     /// </summary>
@@ -26,17 +17,17 @@ public class DebuggableInterpreter
         try
         {
             // 进入主函数
-            _debugger.EnterFunction("main", _interpreter.Manager.Path, statement.Position, _interpreter.Manager);
-            
+            debugger.EnterFunction("main", interpreter.Manager.Path, statement.Position, interpreter.Manager);
+
             // 执行整个块（简化版本）
-            statement.Run(_interpreter.Manager);
-            
+            statement.Run(interpreter.Manager);
+
             // 离开主函数
-            _debugger.ExitFunction();
+            debugger.ExitFunction();
         }
         catch (Exception ex)
         {
-            _debugger.HandleError(ex, statement.Position, "main");
+            debugger.HandleError(ex, statement.Position, "main");
         }
     }
 

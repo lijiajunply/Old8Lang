@@ -12,27 +12,27 @@ public enum DebuggerState
     /// 未启动
     /// </summary>
     NotStarted,
-    
+
     /// <summary>
     /// 运行中
     /// </summary>
     Running,
-    
+
     /// <summary>
     /// 暂停（命中断点或单步执行）
     /// </summary>
     Paused,
-    
+
     /// <summary>
     /// 单步执行中
     /// </summary>
     Stepping,
-    
+
     /// <summary>
     /// 已完成
     /// </summary>
     Completed,
-    
+
     /// <summary>
     /// 出错
     /// </summary>
@@ -48,12 +48,12 @@ public enum StepType
     /// 单步执行（进入函数）
     /// </summary>
     StepInto,
-    
+
     /// <summary>
     /// 单步执行（跳过函数）
     /// </summary>
     StepOver,
-    
+
     /// <summary>
     /// 单步执行（跳出函数）
     /// </summary>
@@ -63,33 +63,34 @@ public enum StepType
 /// <summary>
 /// 调试器事件参数
 /// </summary>
+[Serializable]
 public class DebuggerEventArgs : EventArgs
 {
     /// <summary>
     /// 事件类型
     /// </summary>
     public string EventType { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// 消息
     /// </summary>
     public string Message { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// 位置信息
     /// </summary>
     public SourcePosition Position { get; set; }
-    
+
     /// <summary>
     /// 当前函数名
     /// </summary>
     public string? CurrentFunction { get; set; }
-    
+
     /// <summary>
     /// 断点信息（如果是断点事件）
     /// </summary>
     public Breakpoint? Breakpoint { get; set; }
-    
+
     /// <summary>
     /// 错误信息（如果是错误事件）
     /// </summary>
@@ -104,27 +105,27 @@ public class Debugger
     private readonly BreakpointManager _breakpointManager = new();
     private readonly VariableWatcher _variableWatcher = new();
     private readonly CallStack _callStack = new();
-    
+
     private DebuggerState _state = DebuggerState.NotStarted;
-    private StepType? _pendingStep;
-    private int _initialCallStackDepth;
-    private readonly object _stateLock = new();
-    
+    private StepType? PendingStep;
+    private int InitialCallStackDepth;
+    private readonly Lock StateLock = new();
+
     /// <summary>
     /// 调试状态变化事件
     /// </summary>
     public event EventHandler<DebuggerEventArgs>? StateChanged;
-    
+
     /// <summary>
     /// 断点命中事件
     /// </summary>
     public event EventHandler<DebuggerEventArgs>? BreakpointHit;
-    
+
     /// <summary>
     /// 错误事件
     /// </summary>
     public event EventHandler<DebuggerEventArgs>? ErrorOccurred;
-    
+
     /// <summary>
     /// 当前调试状态
     /// </summary>
@@ -132,35 +133,35 @@ public class Debugger
     {
         get
         {
-            lock (_stateLock)
+            lock (StateLock)
             {
                 return _state;
             }
         }
         private set
         {
-            lock (_stateLock)
+            lock (StateLock)
             {
                 _state = value;
             }
         }
     }
-    
+
     /// <summary>
     /// 断点管理器
     /// </summary>
     public BreakpointManager BreakpointManager => _breakpointManager;
-    
+
     /// <summary>
     /// 变量监视器
     /// </summary>
     public VariableWatcher VariableWatcher => _variableWatcher;
-    
+
     /// <summary>
     /// 调用栈
     /// </summary>
     public CallStack CallStack => _callStack;
-    
+
     /// <summary>
     /// 启动调试
     /// </summary>
@@ -170,7 +171,7 @@ public class Debugger
         State = DebuggerState.Running;
         RaiseStateChanged("调试开始", $"开始调试文件: {filePath}");
     }
-    
+
     /// <summary>
     /// 停止调试
     /// </summary>
@@ -180,7 +181,7 @@ public class Debugger
         _callStack.Clear();
         RaiseStateChanged("调试结束", "调试会话已结束");
     }
-    
+
     /// <summary>
     /// 暂停执行
     /// </summary>
@@ -189,29 +190,29 @@ public class Debugger
         State = DebuggerState.Paused;
         RaiseStateChanged("暂停执行", "程序已暂停");
     }
-    
+
     /// <summary>
     /// 继续执行
     /// </summary>
     public void Continue()
     {
-        _pendingStep = null;
+        PendingStep = null;
         State = DebuggerState.Running;
         RaiseStateChanged("继续执行", "程序继续运行");
     }
-    
+
     /// <summary>
     /// 单步执行
     /// </summary>
     /// <param name="stepType">单步类型</param>
     public void Step(StepType stepType)
     {
-        _pendingStep = stepType;
-        _initialCallStackDepth = _callStack.Depth;
+        PendingStep = stepType;
+        InitialCallStackDepth = _callStack.Depth;
         State = DebuggerState.Stepping;
         RaiseStateChanged("单步执行", $"开始单步执行: {stepType}");
     }
-    
+
     /// <summary>
     /// 在语句执行前检查调试点
     /// </summary>
@@ -220,43 +221,42 @@ public class Debugger
     /// <param name="filePath">文件路径</param>
     /// <param name="currentFunction">当前函数名</param>
     /// <returns>是否应该暂停执行</returns>
-    public bool CheckStatementExecution(OldStatement statement, VariateManager manager, string filePath, string? currentFunction = null)
+    public bool CheckStatementExecution(OldStatement statement, VariateManager manager, string filePath,
+        string? currentFunction = null)
     {
         // 如果调试器未运行，不进行检查
-        if (State == DebuggerState.NotStarted || State == DebuggerState.Completed)
+        if (State is DebuggerState.NotStarted or DebuggerState.Completed)
             return false;
-        
+
         var position = statement.Position;
         var shouldPause = false;
-        Breakpoint? hitBreakpoint = null;
-        
-        // 检查断点
-        hitBreakpoint = _breakpointManager.CheckBreakpoint(position, filePath, currentFunction, manager);
+
+        var hitBreakpoint = _breakpointManager.CheckBreakpoint(position, filePath, currentFunction, manager); // 检查断点
         if (hitBreakpoint != null)
         {
             shouldPause = true;
             RaiseBreakpointHit(hitBreakpoint, position, currentFunction);
         }
-        
+
         // 检查单步执行
-        if (!shouldPause && _pendingStep.HasValue)
+        if (!shouldPause && PendingStep.HasValue)
         {
-            shouldPause = CheckStepping(_pendingStep.Value, position, currentFunction);
+            shouldPause = CheckStepping(PendingStep.Value, position, currentFunction);
         }
-        
+
         // 如果需要暂停
         if (shouldPause)
         {
             State = DebuggerState.Paused;
             UpdateCurrentContext(manager, filePath, currentFunction);
-            
+
             // 等待用户命令（这里需要与调试器UI集成）
             WaitForUserCommand();
         }
-        
+
         return shouldPause;
     }
-    
+
     /// <summary>
     /// 检查函数调用
     /// </summary>
@@ -277,10 +277,10 @@ public class Debugger
             WaitForUserCommand();
             return true;
         }
-        
+
         return false;
     }
-    
+
     /// <summary>
     /// 进入函数
     /// </summary>
@@ -298,10 +298,10 @@ public class Debugger
             Column = position.Column,
             LocalVariables = GetLocalVariables(manager)
         };
-        
+
         _callStack.PushFrame(frame);
     }
-    
+
     /// <summary>
     /// 离开函数
     /// </summary>
@@ -310,7 +310,7 @@ public class Debugger
     {
         return _callStack.PopFrame();
     }
-    
+
     /// <summary>
     /// 处理错误
     /// </summary>
@@ -322,7 +322,7 @@ public class Debugger
         State = DebuggerState.Error;
         RaiseErrorOccurred(exception, position, currentFunction);
     }
-    
+
     /// <summary>
     /// 检查单步执行条件
     /// </summary>
@@ -337,20 +337,20 @@ public class Debugger
             case StepType.StepInto:
                 // StepInto: 在每个语句处暂停
                 return true;
-                
+
             case StepType.StepOver:
                 // StepOver: 在当前层级的每个语句处暂停
-                return _callStack.Depth <= _initialCallStackDepth;
-                
+                return _callStack.Depth <= InitialCallStackDepth;
+
             case StepType.StepOut:
                 // StepOut: 在调用栈变浅时暂停
-                return _callStack.Depth < _initialCallStackDepth;
-                
+                return _callStack.Depth < InitialCallStackDepth;
+
             default:
                 return false;
         }
     }
-    
+
     /// <summary>
     /// 获取当前作用域的局部变量
     /// </summary>
@@ -364,7 +364,7 @@ public class Debugger
             kvp => kvp.Value
         );
     }
-    
+
     /// <summary>
     /// 更新当前上下文信息
     /// </summary>
@@ -375,14 +375,14 @@ public class Debugger
     {
         // 更新监视变量
         _variableWatcher.UpdateAllWatches(manager);
-        
+
         // 更新当前栈帧的变量信息
         if (_callStack.CurrentFrame != null)
         {
             _callStack.CurrentFrame.LocalVariables = GetLocalVariables(manager);
         }
     }
-    
+
     /// <summary>
     /// 等待用户命令（这里需要与UI集成）
     /// </summary>
@@ -392,7 +392,7 @@ public class Debugger
         // 当前的实现是一个简化的版本
         // 在实际应用中，这里应该阻塞执行直到用户输入继续命令
     }
-    
+
     /// <summary>
     /// 引发状态变化事件
     /// </summary>
@@ -406,7 +406,7 @@ public class Debugger
             Message = message
         });
     }
-    
+
     /// <summary>
     /// 引发断点命中事件
     /// </summary>
@@ -424,7 +424,7 @@ public class Debugger
             Breakpoint = breakpoint
         });
     }
-    
+
     /// <summary>
     /// 引发错误事件
     /// </summary>

@@ -229,7 +229,7 @@ public class BreakpointManager
             // 目前简单实现：检查变量是否存在且不为空/false
             if (condition.StartsWith("!"))
             {
-                var varName = condition.Substring(1).Trim();
+                var varName = condition[1..].Trim();
                 var value = manager.GetValue(new LangId(varName));
                 return value == null || value.ToString() == "false" || value.ToString() == "";
             }

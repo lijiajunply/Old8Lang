@@ -2,6 +2,8 @@ using Old8Lang.LangParser;
 using Old8Lang.AST.Statement;
 using Old8Lang.Error;
 using Old8Lang.LanguageServer.Models;
+using Old8Lang.Debugger;
+using Old8Lang.Profiler;
 using System.Collections.Concurrent;
 
 namespace Old8Lang.LanguageServer.Services;
@@ -12,6 +14,16 @@ namespace Old8Lang.LanguageServer.Services;
 public class DocumentManager
 {
     private readonly ConcurrentDictionary<string, DocumentParseResult> Documents = new();
+
+    /// <summary>
+    /// 是否启用调试模式
+    /// </summary>
+    public bool DebugModeEnabled { get; set; } = false;
+
+    /// <summary>
+    /// 是否启用性能分析
+    /// </summary>
+    public bool ProfilingEnabled { get; set; } = false;
 
     /// <summary>
     /// 打开或更新文档
@@ -65,6 +77,19 @@ public class DocumentManager
 
             // 构建符号表
             result.SymbolTable = BuildSymbolTable(ast);
+
+            // 如果启用调试模式或性能分析，添加提示
+            if (DebugModeEnabled || ProfilingEnabled)
+            {
+                result.Diagnostics.Add(new DiagnosticInfo
+                {
+                    Severity = DiagnosticSeverity.Information,
+                    Message = BuildDebugProfilingMessage(),
+                    Line = 0,
+                    Column = 0,
+                    Source = "Old8Lang"
+                });
+            }
         }
         catch (SyntaxError ex)
         {
@@ -90,6 +115,23 @@ public class DocumentManager
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// 构建调试/性能分析提示消息
+    /// </summary>
+    private string BuildDebugProfilingMessage()
+    {
+        var messages = new List<string>();
+        if (DebugModeEnabled)
+        {
+            messages.Add("调试模式已启用");
+        }
+        if (ProfilingEnabled)
+        {
+            messages.Add("性能分析已启用");
+        }
+        return string.Join(", ", messages);
     }
 
     /// <summary>

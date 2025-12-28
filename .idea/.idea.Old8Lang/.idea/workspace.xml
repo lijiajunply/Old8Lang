@@ -22,9 +22,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DebugProfilerHandler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Models/ProfilerModels.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/DebugProfilerService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/DocumentManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/DocumentManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/Debugger/BreakpointManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Debugger/BreakpointManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Profiler/PerformanceAnalyzer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Profiler/PerformanceAnalyzer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Profiler/PerformanceData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Profiler/PerformanceData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Debugger/DebuggableInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Debugger/DebuggableInterpreter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Debugger/Debugger.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Debugger/Debugger.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Debugger/VariableWatcher.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Debugger/VariableWatcher.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -122,6 +129,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/LocalManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Compiler/StaticClassCompiler.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Debugger/BreakpointManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" root0="SKIP_HIGHLIGHTING" />
@@ -889,7 +897,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="402" />
+    <option name="localTasksCounter" value="403" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -916,7 +924,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(parser): 修复动态导入解析器中的语法错误&#10;&#10;- 修正动态导入中字符串字面量的解析逻辑&#10;- 移除动态导入函数调用末尾的多余括号&#10;- 修复解析器中动态模块表达式的处理顺序&#10;- 优化IDE配置文件中的变更记录和历史提交信息" />
     <MESSAGE value="feat(ast): 添加嵌套类实例化支持&#10;&#10;- 在 AnyLangValue 中添加 TryInstantiateNestedClass 方法来处理嵌套类实例化&#10;- 支持 Level1().Level2() 这样的链式调用语法&#10;- 通过变量管理器查找嵌套类模板并创建新实例&#10;- 移除构造函数验证测试用例以优化测试结构" />
     <MESSAGE value="refactor(standard-library): 移除标准库版本信息并添加模板引擎支持&#10;&#10;- 从 StandardLibraryInfo 记录中移除 Version 属性&#10;- 从 StandardLibraryRegistry 中移除所有标准库的版本参数&#10;- 移除 GetAllLibraryNames 和 GetVersion 静态方法&#10;- 添加 TemplateEngine 标准库注册项&#10;- 修正 TemplateEngine 正则表达式以支持点号属性访问&#10;- 调整模板处理顺序为先循环后条件最后变量替换" />
     <MESSAGE value="feat(image): 添加基于SkiaSharp的图像处理库&#10;&#10;- 实现图像加载、保存、创建和克隆功能&#10;- 提供图像信息获取包括尺寸、像素颜色、格式等&#10;- 支持图像变换如缩放、旋转、裁剪、翻转操作&#10;- 实现图像调整功能包括亮度、对比度、饱和度、色调控制&#10;- 添加多种图像滤镜如灰度、反色、模糊、锐化、边缘检测&#10;- 提供图像绘制功能支持矩形、圆形、直线、文本、多边形绘制&#10;- 包含颜色值验证和HSB到RGB转换辅助方法&#10;- 实现图像格式转换和图像合并功能" />
@@ -941,7 +948,8 @@
     <MESSAGE value="refactor(lang): 为断言方法添加简写别名支持并更新测试代码&#10;&#10;- 为AssertClassLangValue中的断言方法添加简写别名，如&quot;Equal&quot;对应&quot;AssertEqual&quot;&#10;- 将测试代码中的for循环语法从分号分隔改为逗号分隔格式&#10;- 更新JumpTests、MatchTests、SwitchTests和VariableTests中的循环语法&#10;- 移除IDE工作区中的变更列表记录并更新任务计数器&#10;- 修正工作区配置文件中的提交历史记录和消息配置" />
     <MESSAGE value="refactor(core): 移除不必要的命名空间引用和字段命名优化&#10;&#10;- 移除了多个文件中未使用的命名空间引用，包括Error、Interpreter、AST相关类型&#10;- 优化了性能分析器测试中的字段命名，从_analyzer改为Analyzer&#10;- 更新了性能分析器测试中反射调用的方法访问方式&#10;- 简化了条件判断语法，使用范围操作符替代传统比较操作" />
     <MESSAGE value="refactor(compiler): 修复编译器关键问题并更新测试计划文档&#10;&#10;- 为Assert静态类方法添加简写别名支持，如True/AssertTrue、False/AssertFalse等14个方法&#10;- 修复for循环语法问题，将测试文件中的分号语法改为逗号语法格式&#10;- 更新CompilerTestPlan.md文档，记录修复进展和测试结果对比数据&#10;- 移除IDE工作区中的变更列表记录并更新任务计数器&#10;- 修正工作区配置文件中的提交历史记录和消息配置&#10;- 更新断点位置信息以匹配代码行号变化" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(compiler): 修复编译器关键问题并更新测试计划文档&#10;&#10;- 为Assert静态类方法添加简写别名支持，如True/AssertTrue、False/AssertFalse等14个方法&#10;- 修复for循环语法问题，将测试文件中的分号语法改为逗号语法格式&#10;- 更新CompilerTestPlan.md文档，记录修复进展和测试结果对比数据&#10;- 移除IDE工作区中的变更列表记录并更新任务计数器&#10;- 修正工作区配置文件中的提交历史记录和消息配置&#10;- 更新断点位置信息以匹配代码行号变化" />
+    <MESSAGE value="refactor(debugger): 重构断点管理器并优化性能分析&#10;&#10;- 为Breakpoint类添加[Serializable]特性支持序列化&#10;- 重命名私有字段_breakpoints为Breakpoints，_nextId为NextId&#10;- 统一断点管理器中的字段访问方式，使用新命名的字段&#10;- 修复性能分析器中不稳定函数检测的阈值比较逻辑&#10;- 更新性能分析器中严重级别计算算法，使用指数增长公式&#10;- 修正执行时间标准差计算方法，从样本标准差改为总体标准差&#10;- 更新IDE工作区配置文件中的变更记录和任务计数器" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(debugger): 重构断点管理器并优化性能分析&#10;&#10;- 为Breakpoint类添加[Serializable]特性支持序列化&#10;- 重命名私有字段_breakpoints为Breakpoints，_nextId为NextId&#10;- 统一断点管理器中的字段访问方式，使用新命名的字段&#10;- 修复性能分析器中不稳定函数检测的阈值比较逻辑&#10;- 更新性能分析器中严重级别计算算法，使用指数增长公式&#10;- 修正执行时间标准差计算方法，从样本标准差改为总体标准差&#10;- 更新IDE工作区配置文件中的变更记录和任务计数器" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

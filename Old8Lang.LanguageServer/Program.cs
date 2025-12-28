@@ -23,6 +23,15 @@ class Program
                 .WithHandler<DefinitionHandler>()
                 .WithHandler<ReferencesHandler>()
                 .WithHandler<HoverHandler>()
+                // Debug and Profiler Handlers
+                .WithHandler<StartProfilingHandler>()
+                .WithHandler<StopProfilingHandler>()
+                .WithHandler<GetProfilingStatusHandler>()
+                .WithHandler<StartDebuggingHandler>()
+                .WithHandler<StopDebuggingHandler>()
+                .WithHandler<AddBreakpointHandler>()
+                .WithHandler<RemoveBreakpointHandler>()
+                .WithHandler<DebugControlHandler>()
         );
 
         await server.WaitForExit;
@@ -31,5 +40,6 @@ class Program
     private static void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<DocumentManager>();
+        services.AddSingleton<DebugProfilerService>();
     }
 }
