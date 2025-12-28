@@ -153,15 +153,15 @@ public class FunctionPerformanceStats
     }
     
     /// <summary>
-    /// 获取执行时间标准差
+    /// 获取执行时间标准差（使用总体标准差）
     /// </summary>
     public double GetStandardDeviation()
     {
         if (ExecutionTimes.Count < 2) return 0;
-        
+
         var mean = AverageExecutionTimeMs;
         var sumOfSquares = ExecutionTimes.Sum(t => Math.Pow(t - mean, 2));
-        return Math.Sqrt(sumOfSquares / (ExecutionTimes.Count - 1));
+        return Math.Sqrt(sumOfSquares / ExecutionTimes.Count);
     }
     
     /// <summary>

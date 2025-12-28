@@ -299,7 +299,7 @@ public class PerformanceAnalyzer
         
         // 找出执行时间不稳定的函数
         var unstableFunctions = session.FunctionStats.Values
-            .Where(f => f.ExecutionTimes.Count > 5 && CalculateCoefficicientOfVariation(f) > UnstableExecutionTimeThreshold)
+            .Where(f => f.ExecutionTimes.Count > 5 && CalculateCoefficicientOfVariation(f) >= UnstableExecutionTimeThreshold)
             .OrderByDescending(f => CalculateCoefficicientOfVariation(f))
             .ToList();
         
@@ -336,9 +336,12 @@ public class PerformanceAnalyzer
     {
         if (actualValue <= threshold)
             return 1;
-        
+
         var ratio = actualValue / threshold;
-        return Math.Min(10, (int)Math.Ceiling(ratio));
+        // 使用指数增长：当比值为2时达到最大值10
+        // 公式：severity = 1 + 9 * (ratio - 1)
+        var severity = 1 + 9 * (ratio - 1);
+        return Math.Min(10, (int)Math.Ceiling(severity));
     }
     
     /// <summary>

@@ -11,12 +11,12 @@ public enum BreakpointType
     /// 行断点
     /// </summary>
     Line,
-    
+
     /// <summary>
     /// 函数断点
     /// </summary>
     Function,
-    
+
     /// <summary>
     /// 条件断点
     /// </summary>
@@ -26,53 +26,54 @@ public enum BreakpointType
 /// <summary>
 /// 断点信息
 /// </summary>
+[Serializable]
 public class Breakpoint
 {
     /// <summary>
     /// 断点ID
     /// </summary>
     public int Id { get; set; }
-    
+
     /// <summary>
     /// 断点类型
     /// </summary>
     public BreakpointType Type { get; set; }
-    
+
     /// <summary>
     /// 源文件路径
     /// </summary>
     public string FilePath { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// 行号（仅对行断点有效）
     /// </summary>
     public int Line { get; set; }
-    
+
     /// <summary>
     /// 函数名（仅对函数断点有效）
     /// </summary>
     public string FunctionName { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// 条件表达式（仅对条件断点有效）
     /// </summary>
     public string? Condition { get; set; }
-    
+
     /// <summary>
     /// 是否启用
     /// </summary>
     public bool IsEnabled { get; set; } = true;
-    
+
     /// <summary>
     /// 命中次数
     /// </summary>
     public int HitCount { get; set; }
-    
+
     /// <summary>
     /// 创建时间
     /// </summary>
     public DateTime CreatedAt { get; set; } = DateTime.Now;
-    
+
     public override string ToString()
     {
         return Type switch
@@ -90,9 +91,9 @@ public class Breakpoint
 /// </summary>
 public class BreakpointManager
 {
-    private readonly Dictionary<int, Breakpoint> _breakpoints = new();
-    private int _nextId = 1;
-    
+    private readonly Dictionary<int, Breakpoint> Breakpoints = new();
+    private int NextId = 1;
+
     /// <summary>
     /// 添加行断点
     /// </summary>
@@ -104,17 +105,17 @@ public class BreakpointManager
     {
         var breakpoint = new Breakpoint
         {
-            Id = _nextId++,
+            Id = NextId++,
             Type = string.IsNullOrEmpty(condition) ? BreakpointType.Line : BreakpointType.Conditional,
             FilePath = filePath,
             Line = line,
             Condition = condition
         };
-        
-        _breakpoints[breakpoint.Id] = breakpoint;
+
+        Breakpoints[breakpoint.Id] = breakpoint;
         return breakpoint.Id;
     }
-    
+
     /// <summary>
     /// 添加函数断点
     /// </summary>
@@ -124,15 +125,15 @@ public class BreakpointManager
     {
         var breakpoint = new Breakpoint
         {
-            Id = _nextId++,
+            Id = NextId++,
             Type = BreakpointType.Function,
             FunctionName = functionName
         };
-        
-        _breakpoints[breakpoint.Id] = breakpoint;
+
+        Breakpoints[breakpoint.Id] = breakpoint;
         return breakpoint.Id;
     }
-    
+
     /// <summary>
     /// 移除断点
     /// </summary>
@@ -140,9 +141,9 @@ public class BreakpointManager
     /// <returns>是否成功移除</returns>
     public bool RemoveBreakpoint(int id)
     {
-        return _breakpoints.Remove(id);
+        return Breakpoints.Remove(id);
     }
-    
+
     /// <summary>
     /// 启用/禁用断点
     /// </summary>
@@ -151,14 +152,15 @@ public class BreakpointManager
     /// <returns>是否成功设置</returns>
     public bool SetBreakpointEnabled(int id, bool enabled)
     {
-        if (_breakpoints.TryGetValue(id, out var breakpoint))
+        if (Breakpoints.TryGetValue(id, out var breakpoint))
         {
             breakpoint.IsEnabled = enabled;
             return true;
         }
+
         return false;
     }
-    
+
     /// <summary>
     /// 检查是否命中断点
     /// </summary>
@@ -167,10 +169,11 @@ public class BreakpointManager
     /// <param name="currentFunction">当前函数名</param>
     /// <param name="manager">变量管理器（用于条件断点）</param>
     /// <returns>命中的断点，如果没有命中则返回null</returns>
-    public Breakpoint? CheckBreakpoint(SourcePosition position, string filePath, string? currentFunction = null, Interpreter.VariateManager? manager = null)
+    public Breakpoint? CheckBreakpoint(SourcePosition position, string filePath, string? currentFunction = null,
+        Interpreter.VariateManager? manager = null)
     {
         // 检查行断点
-        foreach (var breakpoint in _breakpoints.Values.Where(b => b.IsEnabled))
+        foreach (var breakpoint in Breakpoints.Values.Where(b => b.IsEnabled))
         {
             switch (breakpoint.Type)
             {
@@ -179,7 +182,8 @@ public class BreakpointManager
                     if (breakpoint.FilePath == filePath && breakpoint.Line == position.Line)
                     {
                         // 检查条件断点
-                        if (breakpoint.Type == BreakpointType.Conditional && !string.IsNullOrEmpty(breakpoint.Condition))
+                        if (breakpoint.Type == BreakpointType.Conditional &&
+                            !string.IsNullOrEmpty(breakpoint.Condition))
                         {
                             if (manager != null && EvaluateCondition(breakpoint.Condition, manager))
                             {
@@ -193,22 +197,24 @@ public class BreakpointManager
                             return breakpoint;
                         }
                     }
+
                     break;
-                    
+
                 case BreakpointType.Function:
-                    if (!string.IsNullOrEmpty(currentFunction) && 
+                    if (!string.IsNullOrEmpty(currentFunction) &&
                         breakpoint.FunctionName == currentFunction)
                     {
                         breakpoint.HitCount++;
                         return breakpoint;
                     }
+
                     break;
             }
         }
-        
+
         return null;
     }
-    
+
     /// <summary>
     /// 评估条件表达式
     /// </summary>
@@ -239,16 +245,16 @@ public class BreakpointManager
             return false;
         }
     }
-    
+
     /// <summary>
     /// 获取所有断点
     /// </summary>
     /// <returns>断点列表</returns>
     public List<Breakpoint> GetAllBreakpoints()
     {
-        return _breakpoints.Values.ToList();
+        return Breakpoints.Values.ToList();
     }
-    
+
     /// <summary>
     /// 获取指定文件的所有断点
     /// </summary>
@@ -256,17 +262,17 @@ public class BreakpointManager
     /// <returns>断点列表</returns>
     public List<Breakpoint> GetBreakpointsInFile(string filePath)
     {
-        return _breakpoints.Values
+        return Breakpoints.Values
             .Where(b => b.FilePath == filePath)
             .ToList();
     }
-    
+
     /// <summary>
     /// 清除所有断点
     /// </summary>
     public void ClearAllBreakpoints()
     {
-        _breakpoints.Clear();
-        _nextId = 1;
+        Breakpoints.Clear();
+        NextId = 1;
     }
 }
