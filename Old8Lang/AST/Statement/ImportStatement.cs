@@ -124,8 +124,7 @@ public partial class ImportStatement(
             HandleLazyImport(manager);
             return;
         }
-
-        // 使用新的模块系统服务
+        
         var symbolAliases = ImportSpecifiers
             .Where(item => item.Name != item.Alias)
             .ToDictionary(item => item.Name, item => item.Alias);
@@ -148,6 +147,7 @@ public partial class ImportStatement(
             {
                 throw result.Error;
             }
+
             throw new ImportError(this, moduleName, "模块导入失败");
         }
     }
@@ -290,7 +290,6 @@ public partial class ImportStatement(
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
         string moduleName = ImportString;
-        string? resolvedPath = null;
         bool isDirectory = false;
 
         // 优先级 1: 标准库（Old8LangLib 和 Old8Lang.NetLib）
@@ -303,7 +302,7 @@ public partial class ImportStatement(
 
         // 优先级 2: 第三方包（通过 PackageManager）
         // 在编译模式下，我们需要手动查找包路径
-        resolvedPath = FindPackagePathForCompiler(moduleName, local.FilePath);
+        var resolvedPath = FindPackagePathForCompiler(moduleName, local.FilePath);
 
         // 优先级 3: 本地文件导入（相对于当前文件的路径）
         if (resolvedPath == null)

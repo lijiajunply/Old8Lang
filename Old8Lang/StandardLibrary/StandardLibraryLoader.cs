@@ -1,5 +1,6 @@
 using System.Reflection;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.ModuleObjects;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
@@ -32,11 +33,11 @@ public static class StandardLibraryLoader
     public static bool TryLoadStandardLibrary(
         string libraryName,
         VariateManager manager,
-        out LangValueType? module)
+        out LangValueType module)
     {
         if (!StandardLibraryRegistry.IsStandardLibrary(libraryName))
         {
-            module = null;
+            module = new VoidLangValue();
             return false;
         }
 
