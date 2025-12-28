@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using Old8Lang.AST;
-
 namespace Old8Lang.TypeSystem;
 
 /// <summary>
@@ -38,46 +34,37 @@ public enum TypeConstraintKind
 /// <summary>
 /// 类型约束：表示类型推断过程中的一个约束条件
 /// </summary>
-public class TypeConstraint
+public class TypeConstraint(
+    TypeConstraintKind kind,
+    string typeVariable,
+    Type? targetType,
+    SourcePosition position,
+    double confidence = 1.0)
 {
     /// <summary>
     /// 约束类型
     /// </summary>
-    public TypeConstraintKind Kind { get; }
+    public TypeConstraintKind Kind { get; } = kind;
 
     /// <summary>
     /// 被约束的类型变量名
     /// </summary>
-    public string TypeVariable { get; }
+    public string TypeVariable { get; } = typeVariable;
 
     /// <summary>
     /// 约束目标类型（可能为null，表示需要推断）
     /// </summary>
-    public Type? TargetType { get; set; }
+    public Type? TargetType { get; set; } = targetType;
 
     /// <summary>
     /// 约束来源位置
     /// </summary>
-    public SourcePosition Position { get; }
+    public SourcePosition Position { get; } = position;
 
     /// <summary>
     /// 置信度（0.0-1.0）：表示此约束的可靠程度
     /// </summary>
-    public double Confidence { get; set; }
-
-    public TypeConstraint(
-        TypeConstraintKind kind,
-        string typeVariable,
-        Type? targetType,
-        SourcePosition position,
-        double confidence = 1.0)
-    {
-        Kind = kind;
-        TypeVariable = typeVariable;
-        TargetType = targetType;
-        Position = position;
-        Confidence = confidence;
-    }
+    public double Confidence { get; set; } = confidence;
 
     public override string ToString()
     {

@@ -1,29 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Old8Lang.TypeSystem;
 
 /// <summary>
 /// 类型约束求解器：基于收集到的约束求解类型变量的实际类型
 /// </summary>
-public class TypeConstraintSolver
+public class TypeConstraintSolver(TypeInferenceContext context, TypeInferenceConfig config)
 {
-    private readonly TypeInferenceContext _context;
-    private readonly TypeInferenceConfig _config;
-
-    public TypeConstraintSolver(TypeInferenceContext context, TypeInferenceConfig config)
-    {
-        _context = context;
-        _config = config;
-    }
-
     /// <summary>
     /// 求解所有约束
     /// </summary>
     public bool Solve()
     {
-        if (_context.Constraints.Count == 0)
+        if (context.Constraints.Count == 0)
             return true;
 
         // 多轮求解，直到收敛
@@ -36,13 +23,13 @@ public class TypeConstraintSolver
             changed = false;
             iteration++;
 
-            if (_config.DebugOutput)
+            if (config.DebugOutput)
             {
                 Console.WriteLine($"\n=== 类型推断迭代 {iteration} ===");
             }
 
             // 按优先级排序约束（置信度高的优先）
-            var sortedConstraints = _context.Constraints
+            var sortedConstraints = context.Constraints
                 .OrderByDescending(c => c.Confidence)
                 .ThenBy(c => c.Kind)
                 .ToList();
@@ -63,7 +50,7 @@ public class TypeConstraintSolver
 
         } while (changed && iteration < maxIterations);
 
-        if (_config.DebugOutput)
+        if (config.DebugOutput)
         {
             PrintSolutionSummary();
         }
@@ -80,7 +67,7 @@ public class TypeConstraintSolver
         var typeVar = constraint.TypeVariable;
 
         // 如果已经有绑定，检查是否一致
-        var existingBinding = _context.GetTypeBinding(typeVar);
+        var existingBinding = context.GetTypeBinding(typeVar);
 
         if (existingBinding != null)
         {
@@ -89,7 +76,7 @@ public class TypeConstraintSolver
             {
                 if (!AreTypesCompatible(existingBinding, constraint.TargetType, constraint.Kind))
                 {
-                    if (_config.DebugOutput)
+                    if (config.DebugOutput)
                     {
                         Console.WriteLine($"  ⚠️  约束冲突: {typeVar} 已绑定为 {existingBinding.Name}，新约束要求 {constraint.TargetType.Name}");
                     }
@@ -100,8 +87,8 @@ public class TypeConstraintSolver
                 var refinedType = RefineType(existingBinding, constraint.TargetType, constraint.Confidence);
                 if (refinedType != existingBinding)
                 {
-                    _context.BindTypeVariable(typeVar, refinedType);
-                    if (_config.DebugOutput)
+                    context.BindTypeVariable(typeVar, refinedType);
+                    if (config.DebugOutput)
                     {
                         Console.WriteLine($"  ✓ 精化类型: {typeVar} = {refinedType.Name}");
                     }
@@ -115,19 +102,19 @@ public class TypeConstraintSolver
         if (constraint.TargetType != null)
         {
             // 检查置信度阈值
-            if (constraint.Confidence >= _config.MinimumConfidence)
+            if (constraint.Confidence >= config.MinimumConfidence)
             {
-                _context.BindTypeVariable(typeVar, constraint.TargetType);
+                context.BindTypeVariable(typeVar, constraint.TargetType);
 
-                if (_config.DebugOutput)
+                if (config.DebugOutput)
                 {
                     Console.WriteLine($"  ✓ 绑定类型: {typeVar} = {constraint.TargetType.Name} (置信度: {constraint.Confidence:F2})");
                 }
                 return true;
             }
-            else if (_config.DebugOutput)
+            else if (config.DebugOutput)
             {
-                Console.WriteLine($"  ⚠️  置信度过低: {typeVar} = {constraint.TargetType.Name} (置信度: {constraint.Confidence:F2} < {_config.MinimumConfidence:F2})");
+                Console.WriteLine($"  ⚠️  置信度过低: {typeVar} = {constraint.TargetType.Name} (置信度: {constraint.Confidence:F2} < {config.MinimumConfidence:F2})");
             }
         }
 
@@ -142,7 +129,7 @@ public class TypeConstraintSolver
         bool changed = false;
 
         // 按类型变量分组约束
-        var constraintsByVar = _context.Constraints
+        var constraintsByVar = context.Constraints
             .Where(c => c.TargetType != null)
             .GroupBy(c => c.TypeVariable)
             .ToList();
@@ -153,16 +140,16 @@ public class TypeConstraintSolver
             var constraints = group.ToList();
 
             // 如果该变量还没有绑定
-            if (_context.GetTypeBinding(typeVar) == null)
+            if (context.GetTypeBinding(typeVar) == null)
             {
                 // 尝试从多个约束推断
                 var inferredType = InferFromMultipleConstraints(constraints);
                 if (inferredType != null)
                 {
-                    _context.BindTypeVariable(typeVar, inferredType);
+                    context.BindTypeVariable(typeVar, inferredType);
                     changed = true;
 
-                    if (_config.DebugOutput)
+                    if (config.DebugOutput)
                     {
                         Console.WriteLine($"  ✓ 多约束推断: {typeVar} = {inferredType.Name}");
                     }
@@ -183,7 +170,7 @@ public class TypeConstraintSolver
 
         // 1. 优先选择 Equality 约束
         var equalityConstraints = constraints
-            .Where(c => c.Kind == TypeConstraintKind.Equality && c.TargetType != null)
+            .Where(c => c is { Kind: TypeConstraintKind.Equality, TargetType: not null })
             .OrderByDescending(c => c.Confidence)
             .ToList();
 
@@ -202,7 +189,7 @@ public class TypeConstraintSolver
 
         // 2. 处理子类型约束
         var subtypeConstraints = constraints
-            .Where(c => c.Kind == TypeConstraintKind.Subtype && c.TargetType != null)
+            .Where(c => c is { Kind: TypeConstraintKind.Subtype, TargetType: not null })
             .ToList();
 
         if (subtypeConstraints.Count > 0)
@@ -290,7 +277,7 @@ public class TypeConstraintSolver
             return existingType;
 
         // object 可以被任何类型精化
-        if (existingType == typeof(object) && confidence >= _config.MinimumConfidence)
+        if (existingType == typeof(object) && confidence >= config.MinimumConfidence)
             return newType;
 
         // int 可以被 double 精化（如果需要）
@@ -353,7 +340,7 @@ public class TypeConstraintSolver
 
         // 处理数值类型
         var hasDouble = types.Any(t => t == typeof(double));
-        var allNumeric = types.All(t => IsNumericType(t));
+        var allNumeric = types.All(IsNumericType);
 
         if (allNumeric && hasDouble)
             return typeof(double);
@@ -414,13 +401,13 @@ public class TypeConstraintSolver
     /// </summary>
     private bool ValidateSolution()
     {
-        var unresolvedConstraints = _context.Constraints
-            .Where(c => c.TargetType == null || _context.GetTypeBinding(c.TypeVariable) == null)
+        var unresolvedConstraints = context.Constraints
+            .Where(c => c.TargetType == null || context.GetTypeBinding(c.TypeVariable) == null)
             .ToList();
 
         if (unresolvedConstraints.Count > 0)
         {
-            if (_config.DebugOutput)
+            if (config.DebugOutput)
             {
                 Console.WriteLine($"\n⚠️  {unresolvedConstraints.Count} 个约束未解决:");
                 foreach (var constraint in unresolvedConstraints)
@@ -430,14 +417,14 @@ public class TypeConstraintSolver
             }
 
             // 如果允许回退到动态类型
-            if (_config.FallbackToDynamic)
+            if (config.FallbackToDynamic)
             {
                 foreach (var constraint in unresolvedConstraints)
                 {
-                    if (_context.GetTypeBinding(constraint.TypeVariable) == null)
+                    if (context.GetTypeBinding(constraint.TypeVariable) == null)
                     {
-                        _context.BindTypeVariable(constraint.TypeVariable, typeof(object));
-                        if (_config.DebugOutput)
+                        context.BindTypeVariable(constraint.TypeVariable, typeof(object));
+                        if (config.DebugOutput)
                         {
                             Console.WriteLine($"  ✓ 回退到动态类型: {constraint.TypeVariable} = object");
                         }
@@ -458,11 +445,11 @@ public class TypeConstraintSolver
     private void PrintSolutionSummary()
     {
         Console.WriteLine("\n=== 类型推断结果 ===");
-        Console.WriteLine($"总约束数: {_context.Constraints.Count}");
-        Console.WriteLine($"已解决类型变量数: {_context.TypeVariableBindings.Count}");
+        Console.WriteLine($"总约束数: {context.Constraints.Count}");
+        Console.WriteLine($"已解决类型变量数: {context.TypeVariableBindings.Count}");
 
         Console.WriteLine("\n类型绑定:");
-        foreach (var (varName, type) in _context.TypeVariableBindings.OrderBy(kv => kv.Key))
+        foreach (var (varName, type) in context.TypeVariableBindings.OrderBy(kv => kv.Key))
         {
             Console.WriteLine($"  {varName} = {type.Name}");
         }

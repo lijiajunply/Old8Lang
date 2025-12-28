@@ -1,5 +1,3 @@
-using System;
-
 namespace Old8Lang.TypeSystem;
 
 /// <summary>
@@ -42,5 +40,5 @@ public class TypeInferenceConfig
     /// <summary>
     /// 是否输出推断过程的调试信息（默认：false）
     /// </summary>
-    public bool DebugOutput { get; set; } = false;
+    public bool DebugOutput { get; set; }
 }

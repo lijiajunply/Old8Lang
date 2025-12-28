@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
@@ -12,17 +9,8 @@ namespace Old8Lang.TypeSystem;
 /// <summary>
 /// 类型约束收集器：遍历AST收集类型约束
 /// </summary>
-public class TypeConstraintCollector
+public class TypeConstraintCollector(TypeInferenceContext context, LocalManager localManager)
 {
-    private readonly TypeInferenceContext _context;
-    private readonly LocalManager _localManager;
-
-    public TypeConstraintCollector(TypeInferenceContext context, LocalManager localManager)
-    {
-        _context = context;
-        _localManager = localManager;
-    }
-
     /// <summary>
     /// 从函数声明收集约束
     /// </summary>
@@ -46,7 +34,7 @@ public class TypeConstraintCollector
                 var paramType = ParseTypeAnnotation(param.AssumptionType);
                 if (paramType != null)
                 {
-                    _context.AddConstraint(new TypeConstraint(
+                    context.AddConstraint(new TypeConstraint(
                         TypeConstraintKind.Equality,
                         paramName,
                         paramType,
@@ -58,10 +46,10 @@ public class TypeConstraintCollector
             // 情况2：默认值推断
             else if (param.DefaultValue != null)
             {
-                var defaultType = param.DefaultValue.OutputType(_localManager);
+                var defaultType = param.DefaultValue.OutputType(localManager);
                 if (defaultType != null && defaultType != typeof(object))
                 {
-                    _context.AddConstraint(new TypeConstraint(
+                    context.AddConstraint(new TypeConstraint(
                         TypeConstraintKind.Equality,
                         paramName,
                         defaultType,
@@ -73,10 +61,10 @@ public class TypeConstraintCollector
             // 情况3：无约束，等待从调用处推断
             else
             {
-                _context.AddConstraint(new TypeConstraint(
+                context.AddConstraint(new TypeConstraint(
                     TypeConstraintKind.Equality,
                     paramName,
-                    null,  // 待推断
+                    null, // 待推断
                     param.Position,
                     confidence: 0.0
                 ));
@@ -92,7 +80,7 @@ public class TypeConstraintCollector
             var returnType = ParseTypeAnnotation(funcInit.FuncLangValue.Id.AssumptionType);
             if (returnType != null)
             {
-                _context.AddConstraint(new TypeConstraint(
+                context.AddConstraint(new TypeConstraint(
                     TypeConstraintKind.Equality,
                     returnTypeName,
                     returnType,
@@ -119,7 +107,7 @@ public class TypeConstraintCollector
         if (returnTypes.Count == 0)
         {
             // 无return语句，推断为void
-            _context.AddConstraint(new TypeConstraint(
+            context.AddConstraint(new TypeConstraint(
                 TypeConstraintKind.Return,
                 returnTypeName,
                 typeof(void),
@@ -130,7 +118,7 @@ public class TypeConstraintCollector
         else if (returnTypes.Count == 1)
         {
             // 单一返回类型
-            _context.AddConstraint(new TypeConstraint(
+            context.AddConstraint(new TypeConstraint(
                 TypeConstraintKind.Return,
                 returnTypeName,
                 returnTypes[0],
@@ -142,7 +130,7 @@ public class TypeConstraintCollector
         {
             // 多个返回类型，尝试找到公共基类型
             var commonType = FindCommonType(returnTypes);
-            _context.AddConstraint(new TypeConstraint(
+            context.AddConstraint(new TypeConstraint(
                 TypeConstraintKind.Return,
                 returnTypeName,
                 commonType,
@@ -159,7 +147,7 @@ public class TypeConstraintCollector
     {
         if (tree is ReturnStatement returnStmt)
         {
-            var returnType = returnStmt.OutputType(_localManager);
+            var returnType = returnStmt.OutputType(localManager);
             if (returnType != null && returnType != typeof(void))
             {
                 returnTypes.Add(returnType);
@@ -190,7 +178,7 @@ public class TypeConstraintCollector
         for (int i = 0; i < callExpr.Arguments.Count; i++)
         {
             var arg = callExpr.Arguments[i];
-            var argType = arg.OutputType(_localManager);
+            var argType = arg.OutputType(localManager);
 
             if (argType != null)
             {
@@ -198,7 +186,7 @@ public class TypeConstraintCollector
 
                 // 创建约束：函数的第i个参数应该兼容这个类型
                 var paramName = $"{targetFuncName}$param${i}";
-                _context.AddConstraint(new TypeConstraint(
+                context.AddConstraint(new TypeConstraint(
                     TypeConstraintKind.Call,
                     paramName,
                     argType,
@@ -209,9 +197,9 @@ public class TypeConstraintCollector
         }
 
         // 记录函数调用信息
-        if (!_context.FunctionCallInfo.ContainsKey(targetFuncName))
+        if (!context.FunctionCallInfo.ContainsKey(targetFuncName))
         {
-            _context.FunctionCallInfo[targetFuncName] = (argTypes, typeof(object));
+            context.FunctionCallInfo[targetFuncName] = (argTypes, typeof(object));
         }
     }
 
@@ -221,7 +209,7 @@ public class TypeConstraintCollector
     public void CollectFromAssignment(SetStatement setStmt)
     {
         var varName = setStmt.Id.IdName;
-        var valueType = setStmt.Value.OutputType(_localManager);
+        var valueType = setStmt.Value.OutputType(localManager);
 
         if (valueType != null)
         {
@@ -231,7 +219,7 @@ public class TypeConstraintCollector
                 var declaredType = ParseTypeAnnotation(setStmt.Id.AssumptionType);
                 if (declaredType != null)
                 {
-                    _context.AddConstraint(new TypeConstraint(
+                    context.AddConstraint(new TypeConstraint(
                         TypeConstraintKind.Equality,
                         varName,
                         declaredType,
@@ -243,7 +231,7 @@ public class TypeConstraintCollector
             else
             {
                 // 从赋值推断变量类型
-                _context.AddConstraint(new TypeConstraint(
+                context.AddConstraint(new TypeConstraint(
                     TypeConstraintKind.Assignment,
                     varName,
                     valueType,
@@ -275,7 +263,8 @@ public class TypeConstraintCollector
                 "object" => typeof(object),
                 _ when typeAnnotation.StartsWith("list<") => ParseGenericType(typeAnnotation, typeof(List<>)),
                 _ when typeAnnotation.StartsWith("array<") => ParseArrayType(typeAnnotation),
-                _ when typeAnnotation.StartsWith("dictionary<") => ParseGenericType(typeAnnotation, typeof(Dictionary<,>)),
+                _ when typeAnnotation.StartsWith("dictionary<") => ParseGenericType(typeAnnotation,
+                    typeof(Dictionary<,>)),
                 _ => typeof(object)
             };
         }
@@ -355,6 +344,7 @@ public class TypeConstraintCollector
                 if (commonBase == typeof(object))
                     break;
             }
+
             return commonBase ?? typeof(object);
         }
 

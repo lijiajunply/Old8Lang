@@ -324,7 +324,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         {
             // 验证返回类型注解的有效性
             var returnType = FuncLangValue.Id.OutputType(local);
-            if (returnType == null)
+            if (returnType == null!)
             {
                 var errorMsg = $"[编译模式错误] 函数 '{FuncLangValue.Id.IdName}' 的返回类型注解 '{FuncLangValue.Id.AssumptionType}' 无效\n\n" +
                               $"请使用有效的类型注解，如：int, double, string, bool, char, void, list<T>, array<T>, dictionary<K,V>\n\n" +
