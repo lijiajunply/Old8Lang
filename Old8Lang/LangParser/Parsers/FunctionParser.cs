@@ -41,6 +41,13 @@ public class FunctionParser(
 
             returnType = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
+
+            // 检查是否为可空类型（例如 "int?"）
+            if (CurrentToken.Type == LangTokenType.Question)
+            {
+                returnType += "?";
+                Expect(LangTokenType.Question);
+            }
         }
 
         Expect(LangTokenType.LeftParen);
@@ -61,6 +68,13 @@ public class FunctionParser(
 
                 returnType = CurrentToken.Value;
                 Expect(LangTokenType.Identifier);
+
+                // 检查是否为可空类型（例如 "int?"）
+                if (CurrentToken.Type == LangTokenType.Question)
+                {
+                    returnType += "?";
+                    Expect(LangTokenType.Question);
+                }
             }
         }
 
@@ -112,6 +126,13 @@ public class FunctionParser(
 
             returnType = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
+
+            // 检查是否为可空类型（例如 "int?"）
+            if (CurrentToken.Type == LangTokenType.Question)
+            {
+                returnType += "?";
+                Expect(LangTokenType.Question);
+            }
         }
 
         Expect(LangTokenType.LeftParen);
@@ -253,7 +274,7 @@ public class FunctionParser(
             // 检查下一个token类型，判断是类型注解还是默认参数
             if (CurrentToken.Type is LangTokenType.Identifier)
             {
-                // 类型注解：identifier:type
+                // 类型注解：identifier:type 或 identifier:type?
                 typeAnnotation = CurrentToken.Value;
                 if (typeAnnotation == "")
                 {
@@ -261,6 +282,13 @@ public class FunctionParser(
                 }
 
                 Expect(LangTokenType.Identifier);
+
+                // 检查是否为可空类型（例如 "int?"）
+                if (CurrentToken.Type == LangTokenType.Question)
+                {
+                    typeAnnotation += "?";
+                    Expect(LangTokenType.Question);
+                }
             }
             else if (isNeedDefaultValue)
             {

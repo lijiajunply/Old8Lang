@@ -301,7 +301,26 @@ public class StatementParser(
                     if (nextToken.Type == LangTokenType.Identifier)
                     {
                         var thirdToken = Peek(2);
-                        if (thirdToken.Type == LangTokenType.Assignment)
+
+                        // 检查是否为可空类型（例如 "a:int? <- value"）
+                        if (thirdToken.Type == LangTokenType.Question)
+                        {
+                            var fourthToken = Peek(3);
+                            if (fourthToken.Type == LangTokenType.Assignment)
+                            {
+                                // 这是带有可空类型注解的赋值语句
+                                CurrentIndex = savedIndex;
+                                return ParseSet();
+                            }
+                            // 检查是否是可空返回类型的函数声明：identifier:returnType? (params) -> { ... }
+                            else if (fourthToken.Type == LangTokenType.LeftParen)
+                            {
+                                // 这是带有可空返回类型注解的函数声明
+                                CurrentIndex = savedIndex;
+                                return functionParser.ParseFuncDeclaration();
+                            }
+                        }
+                        else if (thirdToken.Type == LangTokenType.Assignment)
                         {
                             // 这是带有类型注解的赋值语句
                             CurrentIndex = savedIndex;
@@ -593,6 +612,13 @@ public class StatementParser(
             Expect(LangTokenType.Colon);
             assumptionType = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
+
+            // 检查是否为可空类型（例如 "int?"）
+            if (CurrentToken.Type == LangTokenType.Question)
+            {
+                assumptionType += "?";
+                Expect(LangTokenType.Question);
+            }
         }
 
         Expect(LangTokenType.Assignment);
@@ -656,6 +682,13 @@ public class StatementParser(
             Expect(LangTokenType.Colon);
             assumptionType = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
+
+            // 检查是否为可空类型（例如 "int?"）
+            if (CurrentToken.Type == LangTokenType.Question)
+            {
+                assumptionType += "?";
+                Expect(LangTokenType.Question);
+            }
         }
 
         Expect(LangTokenType.Assignment);

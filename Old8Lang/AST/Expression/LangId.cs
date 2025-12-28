@@ -181,6 +181,13 @@ public partial class LangId(
             // 解析泛型类型注解，如 "list<int>" 或 "array<string>"
             var typeName = AssumptionType.Trim().ToLower();
 
+            // 处理可空类型（例如 "int?", "string?"）
+            // 在编译器中，可空类型被视为其基础类型（因为.NET的可空类型会自动处理null）
+            if (typeName.EndsWith('?'))
+            {
+                typeName = typeName.Substring(0, typeName.Length - 1).Trim();
+            }
+
             // 检查是否为泛型类型
             if (typeName.Contains('<') && typeName.EndsWith('>'))
             {

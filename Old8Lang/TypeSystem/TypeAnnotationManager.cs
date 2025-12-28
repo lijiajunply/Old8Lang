@@ -70,13 +70,24 @@ public class TypeAnnotationManager
 
     /// <summary>
     /// 解析类型假注表达式
-    /// 支持复杂类型表达式如 "List&lt;int&gt;", "Map&lt;string, Person&gt;", "Shape|Circle"
+    /// 支持复杂类型表达式如 "List&lt;int&gt;", "Map&lt;string, Person&gt;", "Shape|Circle", "int?"
     /// </summary>
     public ParsedTypeAnnotation ParseTypeAnnotation(string typeAnnotation)
     {
         if (string.IsNullOrEmpty(typeAnnotation))
         {
             return new ParsedTypeAnnotation { BaseType = "any" };
+        }
+
+        // 处理可空类型（例如 "int?", "string?"）
+        if (typeAnnotation.EndsWith('?'))
+        {
+            var innerType = typeAnnotation.Substring(0, typeAnnotation.Length - 1).Trim();
+            return new ParsedTypeAnnotation
+            {
+                BaseType = innerType,
+                IsNullable = true
+            };
         }
 
         // 处理联合类型
@@ -93,7 +104,7 @@ public class TypeAnnotationManager
         // 处理泛型类型
         if (typeAnnotation.Contains('<') && typeAnnotation.Contains('>'))
         {
-            var mainType = typeAnnotation.Substring(0, typeAnnotation.IndexOf('<')).Trim();
+            var mainType = typeAnnotation[..typeAnnotation.IndexOf('<')].Trim();
             var paramsPart = typeAnnotation.Substring(
                 typeAnnotation.IndexOf('<') + 1,
                 typeAnnotation.LastIndexOf('>') - typeAnnotation.IndexOf('<') - 1);
@@ -242,6 +253,7 @@ public class ParsedTypeAnnotation
 {
     public string BaseType { get; set; } = "";
     public List<string>? TypeParameters { get; set; }
+    public bool IsNullable { get; set; } = false;
     public bool IsGeneric => TypeParameters is { Count: > 0 };
     public bool IsUnion => BaseType == "union";
 }

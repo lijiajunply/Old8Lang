@@ -1,0 +1,31 @@
+// 可空类型注解测试
+// 测试 int?, string?, any? 等可空类型语法
+
+// 基本可空类型
+a:int? <- 123
+b:int? <- null
+
+c:string? <- "hello"
+d:string? <- null
+
+e:double? <- 3.14
+f:double? <- null
+
+g:bool? <- true
+h:bool? <- null
+
+i:char? <- 'A'
+j:char? <- null
+
+k:any? <- {1, 2, 3}
+l:any? <- null
+
+// 函数参数中的可空类型
+func processValue(value:int?) -> void {
+    PrintLine("测试")
+}
+
+// 函数返回值的可空类型
+func findValue(arr:list, target:int) -> int? {
+    return null
+}

@@ -399,6 +399,13 @@ public class ClassParser(
                 {
                     typeAnnotation = CurrentToken.Value;
                     CurrentIndex++;
+
+                    // 检查是否为可空类型（例如 "int?"）
+                    if (CurrentToken.Type == LangTokenType.Question)
+                    {
+                        typeAnnotation += "?";
+                        CurrentIndex++;
+                    }
                 }
                 else
                 {

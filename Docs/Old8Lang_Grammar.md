@@ -200,7 +200,7 @@ null
 | `.` | 成员访问 |
 | `:` | 类型注解 |
 | `->` | 函数返回类型注解 |
-| `?` | 三元条件 |
+| `?` | 三元条件 / 可空类型后缀 |
 
 ## 3. 数据类型
 
@@ -588,6 +588,51 @@ c:string <- "hello"   // 明确指定为 string 类型
 x:int <- 123
 x <- "hello"  // ❌ 错误：不能将 string 赋值给 int 类型的变量
 ```
+
+#### 5.3.1 可空类型
+
+可空类型注解使用问号 `?` 后缀，表示变量可以存储指定类型的值或 `null`：
+
+```old8
+// 可空类型注解
+a:int? <- 123         // 可以是 int 或 null
+b:int? <- null        // 赋值为 null
+
+c:string? <- "hello"  // 可以是 string 或 null
+d:string? <- null
+
+// 函数参数中的可空类型
+func processValue(value:int?) -> void {
+    if value == null {
+        PrintLine("值为空")
+    } else {
+        PrintLine("值: " + value.ToStr())
+    }
+}
+
+// 函数返回值的可空类型
+func findValue(arr:list, target:int) -> int? {
+    for i <- 0, i < arr.Length(), i <- i + 1 {
+        if arr[i] == target {
+            return i
+        }
+    }
+    return null  // 没有找到，返回 null
+}
+```
+
+**可空类型的特点：**
+- 可空类型的变量既可以存储指定类型的值，也可以存储 `null`
+- 非可空类型（如 `int`）不能被赋值为 `null`
+- 可空类型在运行时会进行类型检查，确保类型安全
+
+**支持的可空类型：**
+- `int?` - 可空整数
+- `double?` - 可空双精度浮点数
+- `string?` - 可空字符串
+- `bool?` - 可空布尔值
+- `char?` - 可空字符
+- `any?` - 可空任意类型
 
 ### 5.4 控制流语句
 
