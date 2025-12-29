@@ -38,17 +38,20 @@ public partial class MatchExpression(
         foreach (var matchCase in Cases)
         {
             // 检查是否匹配
-            if (matchCase.IsMatch(matchValue, manager, out var boundValue))
+            if (matchCase.IsMatch(matchValue, manager, out var boundValues))
             {
                 // 如果有变量绑定，将值绑定到新的作用域
-                if (matchCase.BindingVariable != null && boundValue != null)
+                if (boundValues != null && boundValues.Count > 0)
                 {
                     // 添加新的子作用域
                     manager.AddChildren();
 
-                    // 在新作用域中设置绑定变量
-                    var tempId = new LangId(matchCase.BindingVariable);
-                    manager.Set(tempId, boundValue);
+                    // 直接在当前作用域中创建绑定变量，避免修改父作用域的同名变量
+                    var currentScope = manager.Scopes[^1];
+                    foreach (var (varName, varValue) in boundValues)
+                    {
+                        currentScope[varName] = varValue;
+                    }
                 }
 
                 try
@@ -59,7 +62,7 @@ public partial class MatchExpression(
                 finally
                 {
                     // 清理变量绑定的作用域
-                    if (matchCase.BindingVariable != null)
+                    if (boundValues != null && boundValues.Count > 0)
                     {
                         manager.RemoveChildren();
                     }

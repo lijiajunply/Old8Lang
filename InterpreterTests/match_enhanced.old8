@@ -1,0 +1,167 @@
+// Old8Lang 模式匹配增强功能测试
+// 测试元组解构、类型匹配、守卫条件和范围匹配
+
+// ===== 测试 1: 元组解构匹配 =====
+PrintLine("=== 测试 1: 元组解构匹配 ===")
+
+point1 <- (0, 0)
+result1 <- match point1 {
+    case (0, 0) -> "Origin"
+    case (x, 0) -> $"On X-axis: {x}"
+    case (0, y) -> $"On Y-axis: {y}"
+    case (x, y) -> $"Point: ({x}, {y})"
+}
+PrintLine($"point1 (0, 0): {result1}")  // 期望: Origin
+
+point2 <- (5, 0)
+result2 <- match point2 {
+    case (0, 0) -> "Origin"
+    case (x, 0) -> $"On X-axis: {x}"
+    case (0, y) -> $"On Y-axis: {y}"
+    case (x, y) -> $"Point: ({x}, {y})"
+}
+PrintLine($"point2 (5, 0): {result2}")  // 期望: On X-axis: 5
+
+point3 <- (0, 3)
+result3 <- match point3 {
+    case (0, 0) -> "Origin"
+    case (x, 0) -> $"On X-axis: {x}"
+    case (0, y) -> $"On Y-axis: {y}"
+    case (x, y) -> $"Point: ({x}, {y})"
+}
+PrintLine($"point3 (0, 3): {result3}")  // 期望: On Y-axis: 3
+
+point4 <- (2, 4)
+result4 <- match point4 {
+    case (0, 0) -> "Origin"
+    case (x, 0) -> $"On X-axis: {x}"
+    case (0, y) -> $"On Y-axis: {y}"
+    case (x, y) -> $"Point: ({x}, {y})"
+}
+PrintLine($"point4 (2, 4): {result4}")  // 期望: Point: (2, 4)
+
+// ===== 测试 2: 类型匹配 + 守卫条件 =====
+PrintLine("\n=== 测试 2: 类型匹配 + 守卫条件 ===")
+
+value1:int <- 42
+result5 <- match value1 {
+    case x:int if x > 0 -> "Positive int"
+    case x:int if x < 0 -> "Negative int"
+    case x:int -> "Zero"
+    case _ -> "Other"
+}
+PrintLine($"value1 (42): {result5}")  // 期望: Positive int
+
+value2:int <- -10
+result6 <- match value2 {
+    case x:int if x > 0 -> "Positive int"
+    case x:int if x < 0 -> "Negative int"
+    case x:int -> "Zero"
+    case _ -> "Other"
+}
+PrintLine($"value2 (-10): {result6}")  // 期望: Negative int
+
+value3:int <- 0
+result7 <- match value3 {
+    case x:int if x > 0 -> "Positive int"
+    case x:int if x < 0 -> "Negative int"
+    case x:int -> "Zero"
+    case _ -> "Other"
+}
+PrintLine($"value3 (0): {result7}")  // 期望: Zero
+
+value4 <- "hello"
+result8 <- match value4 {
+    case x:int if x > 0 -> "Positive int"
+    case x:int if x < 0 -> "Negative int"
+    case s:string -> $"String: {s}"
+    case _ -> "Other"
+}
+PrintLine($"value4 ('hello'): {result8}")  // 期望: String: hello
+
+// ===== 测试 3: 范围匹配 =====
+PrintLine("\n=== 测试 3: 范围匹配 ===")
+
+age1 <- 8
+result9 <- match age1 {
+    case [0~12] -> "Child"
+    case [13~19] -> "Teen"
+    case [20~64] -> "Adult"
+    case [65~90] -> "Senior"
+    default -> "Invalid age"
+}
+PrintLine($"age1 (8): {result9}")  // 期望: Child
+
+age2 <- 16
+result10 <- match age2 {
+    case [0~12] -> "Child"
+    case [13~19] -> "Teen"
+    case [20~64] -> "Adult"
+    case [65~90] -> "Senior"
+    default -> "Invalid age"
+}
+PrintLine($"age2 (16): {result10}")  // 期望: Teen
+
+age3 <- 35
+result11 <- match age3 {
+    case [0~12] -> "Child"
+    case [13~19] -> "Teen"
+    case [20~64] -> "Adult"
+    case [65~90] -> "Senior"
+    default -> "Invalid age"
+}
+PrintLine($"age3 (35): {result11}")  // 期望: Adult
+
+age4 <- 70
+result12 <- match age4 {
+    case [0~12] -> "Child"
+    case [13~19] -> "Teen"
+    case [20~64] -> "Adult"
+    case [65~90] -> "Senior"
+    default -> "Invalid age"
+}
+PrintLine($"age4 (70): {result12}")  // 期望: Senior
+
+age5 <- 100
+result13 <- match age5 {
+    case [0~12] -> "Child"
+    case [13~19] -> "Teen"
+    case [20~64] -> "Adult"
+    case [65~90] -> "Senior"
+    default -> "Invalid age"
+}
+PrintLine($"age5 (100): {result13}")  // 期望: Invalid age
+
+// ===== 测试 4: 混合使用 =====
+PrintLine("\n=== 测试 4: 混合使用 ===")
+
+// 类型匹配 + 守卫条件 + 范围 (嵌套)
+input1 <- 15
+result14 <- match input1 {
+    case x:int if x >= 0 and x <= 10 -> "Low"
+    case x:int if x >= 11 and x <= 20 -> "Medium"
+    case x:int if x >= 21 and x <= 30 -> "High"
+    case _ -> "Out of range"
+}
+PrintLine($"input1 (15): {result14}")  // 期望: Medium
+
+// 元组解构 + 通配符
+point5 <- (10, 20)
+result15 <- match point5 {
+    case (0, 0) -> "Origin"
+    case (_, 0) -> "On X-axis"
+    case (0, _) -> "On Y-axis"
+    case (x, y) -> $"Point: ({x}, {y})"
+}
+PrintLine($"point5 (10, 20): {result15}")  // 期望: Point: (10, 20)
+
+point6 <- (100, 0)
+result16 <- match point6 {
+    case (0, 0) -> "Origin"
+    case (_, 0) -> "On X-axis"
+    case (0, _) -> "On Y-axis"
+    case (x, y) -> $"Point: ({x}, {y})"
+}
+PrintLine($"point6 (100, 0): {result16}")  // 期望: On X-axis
+
+PrintLine("\n=== 所有测试完成 ===")
