@@ -654,6 +654,8 @@ public class VariateManager
                 EnumTemplate enumTemplate => enumTemplate.EnumName == id.IdName,
                 NativeAnyLangValue na => na.RegisterName == id.IdName, // 使用 RegisterName 而不是 ClassName
                 NativeStaticAny staticAny => staticAny.ClassName == id.IdName,
+                ConstantLangValue constant => constant.Name == id.IdName,
+                AST.Expression.ModuleObjects.UnifiedModule module => module.ModuleName == id.IdName,
                 _ => false
             };
         });

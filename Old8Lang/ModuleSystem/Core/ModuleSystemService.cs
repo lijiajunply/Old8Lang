@@ -189,6 +189,15 @@ public class ModuleSystemService
                     // 找出新增的 ImportInfos（只属于当前模块的）
                     var newImportInfos = manager.ImportInfos.Except(importInfosBefore).ToList();
 
+                    // 判断是否是通配符导入（没有指定导入符号列表）
+                    var isWildcardImport = options.ImportSpecifiers == null || options.ImportSpecifiers.Count == 0;
+
+                    // 如果是通配符导入，将作用域中的常量包装为 ConstantLangValue 并添加到 ImportInfos
+                    if (isWildcardImport)
+                    {
+                        _symbolExtractor.WrapConstantsAsImportInfo(manager, newImportInfos);
+                    }
+
                     // 提取符号 - 使用限定范围的 ImportInfos
                     var moduleName = Path.GetFileNameWithoutExtension(modulePath);
                     var symbols = options.ImportSpecifiers != null && options.ImportSpecifiers.Count > 0

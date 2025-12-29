@@ -1,3 +1,4 @@
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
@@ -11,13 +12,14 @@ namespace Old8Lang.AST.Expression.ModuleObjects;
 /// 统一模块对象（重构版本）- 集成所有模块功能的单一实现
 /// 支持懒加载、即时加载、选择性导入等多种模式
 /// 性能优化：使用双字典提升符号查找效率，使用新的模块服务架构
+/// 现在继承自 ImportInfo，可以被存储到 ImportInfos 列表中
 /// </summary>
 public class UnifiedModule(
     string moduleName,
     VariateManager manager,
     ModuleLoadMode loadMode = ModuleLoadMode.Lazy,
     SourcePosition position = default
-) : LangValueType(position), IModuleValueType
+) : ImportInfo(position), IModuleValueType
 {
     // 符号存储 - 使用双字典优化查找性能
     private readonly Dictionary<string, LangValueType> Symbols = new();

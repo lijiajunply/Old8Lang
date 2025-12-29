@@ -129,6 +129,8 @@ public class SymbolExtractor
             TypeTemplate template => template.ClassName,
             NativeAnyLangValue nativeAny => nativeAny.RegisterName,
             NativeStaticAny staticAny => staticAny.ClassName,
+            ConstantLangValue constant => constant.Name,
+            AST.Expression.ModuleObjects.UnifiedModule module => module.ModuleName,
             _ => null
         };
     }
@@ -205,5 +207,37 @@ public class SymbolExtractor
         }
 
         return symbols;
+    }
+
+    /// <summary>
+    /// 将作用域中的常量包装为 ConstantLangValue 并添加到 ImportInfos
+    /// 用于通配符导入，将所有可导出内容（包括常量）添加到 ImportInfos 中
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    /// <param name="newImportInfos">新增的 ImportInfo 列表（输出参数）</param>
+    public void WrapConstantsAsImportInfo(VariateManager manager, List<ImportInfo> newImportInfos)
+    {
+        var currentScope = manager.Scopes.Count > 0 ? manager.Scopes[^1] : null;
+        if (currentScope == null) return;
+
+        foreach (var (symbolName, symbolValue) in currentScope)
+        {
+            // 跳过已经是 ImportInfo 的项（函数、类等）
+            if (symbolValue is ImportInfo)
+            {
+                continue;
+            }
+
+            // 跳过模块对象
+            if (symbolValue is AST.Expression.ModuleObjects.IModuleObject)
+            {
+                continue;
+            }
+
+            // 将常量包装为 ConstantLangValue 并添加到 ImportInfos
+            var constantValue = new ConstantLangValue(symbolName, symbolValue);
+            manager.AddClassAndFunc(constantValue);
+            newImportInfos.Add(constantValue);
+        }
     }
 }

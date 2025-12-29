@@ -1,4 +1,5 @@
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Tests.Interpreter.Modules.Core;
 using Xunit.Abstractions;
@@ -358,5 +359,95 @@ string_result <- repeat(""Hi"", 3)
         Assert.Null(exception);
         AssertVariableValue(interpreter, "math_result", 8);
         AssertVariableValue(interpreter, "string_result", "HiHiHi");
+    }
+
+    [Fact]
+    public void Import_WildcardConstants_ShouldAddToImportInfos()
+    {
+        // Arrange - 测试常量是否被正确添加到 ImportInfos 中
+        var moduleContent = @"
+// 导出常量
+PI <- 3.14159
+MAX_SIZE <- 100
+APP_NAME <- ""Old8Lang""
+
+// 导出函数
+func add(a, b) {
+    return a + b
+}
+
+func greet(name) {
+    return ""Hello, "" + name
+}
+
+// 导出类
+class Person {
+    public name
+    public age
+
+    public func init(n, a) {
+        this.name <- n
+        this.age <- a
+    }
+
+    public func toString() {
+        return this.name + "" ("" + this.age.ToStr() + "")""
+    }
+}
+";
+
+        var testContent = @"
+import * from ""constants_module""
+
+// 测试访问导入的常量
+pi_value <- PI
+max_size_value <- MAX_SIZE
+app_name_value <- APP_NAME
+
+// 测试调用导入的函数
+result <- add(10, 20)
+greeting <- greet(""老八"")
+
+// 测试使用导入的类
+person <- Person(""张三"", 25)
+person_str <- person.toString()
+";
+
+        CreateTempModuleFile("constants_module.old8", moduleContent);
+        CreateTempModuleFile("constants_test.old8", testContent);
+
+        // Act
+        var (interpreter, exception) = ExecuteCodeFile("constants_test.old8");
+
+        // Assert
+        Assert.Null(exception);
+
+        // 验证常量值被正确导入
+        AssertVariableValue(interpreter, "pi_value", 3.14159);
+        AssertVariableValue(interpreter, "max_size_value", 100);
+        AssertVariableValue(interpreter, "app_name_value", "Old8Lang");
+
+        // 验证函数调用正常
+        AssertVariableValue(interpreter, "result", 30);
+        AssertVariableValue(interpreter, "greeting", "Hello, 老八");
+
+        // 验证类实例化正常
+        AssertVariableValue(interpreter, "person_str", "张三 (25)");
+
+        // 验证 ImportInfos 中包含了常量的包装对象
+        var importInfos = interpreter.Manager.ImportInfos.ToList();
+
+        // 检查是否有 ConstantLangValue 类型的对象
+        var constantInfos = importInfos.OfType<ConstantLangValue>().ToList();
+        Output.WriteLine($"ImportInfos 中包含 {constantInfos.Count} 个 ConstantLangValue 对象");
+
+        // 验证常量已被正确包装并添加到 ImportInfos
+        Assert.True(constantInfos.Count >= 3,
+            $"应该至少有 3 个常量被添加到 ImportInfos，实际有 {constantInfos.Count} 个");
+
+        // 验证具体的常量是否存在
+        Assert.Contains(constantInfos, c => c.Name == "PI");
+        Assert.Contains(constantInfos, c => c.Name == "MAX_SIZE");
+        Assert.Contains(constantInfos, c => c.Name == "APP_NAME");
     }
 }

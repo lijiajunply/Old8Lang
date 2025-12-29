@@ -1,4 +1,5 @@
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.ModuleSystem.Symbols;
@@ -61,7 +62,20 @@ public class SymbolRegistry
             throw new InvalidOperationException("当前作用域没有父作用域");
         }
 
-        RegisterSymbolsToScope(manager, symbols, -2);
+        var parentScope = manager.Scopes[^2];
+
+        foreach (var (name, value) in symbols)
+        {
+            // 如果是 ConstantLangValue，解包为实际值
+            if (value is ConstantLangValue constantValue)
+            {
+                parentScope[name] = constantValue.Value;
+            }
+            else
+            {
+                parentScope[name] = value;
+            }
+        }
     }
 
     /// <summary>

@@ -230,6 +230,8 @@ public partial class ImportStatement(
                 TypeTemplate template => template.ClassName == name,
                 NativeAnyLangValue na => na.RegisterName == name,
                 NativeStaticAny staticAny => staticAny.ClassName == name,
+                ConstantLangValue constant => constant.Name == name,
+                UnifiedModule module => module.ModuleName == name,
                 _ => false
             };
         });
