@@ -903,6 +903,81 @@ func complexFunc<T: IComparable>(value: T) -> T where T: ICloneable {
 - **where 子句**：`where T: IInterface` 用于函数级别的约束
 - **多个类型参数约束**：`where T: IInterface1, U: IInterface2`
 
+**泛型可空类型参数**：
+
+泛型类型参数可以标记为可空类型，使用 `?` 后缀表示该类型参数可以接受 `null` 值。
+
+```old8
+// 定义可空类型参数的泛型类
+class Box<T?> {
+    value: T?
+
+    func init(v: T?) {
+        this.value <- v
+    }
+
+    func getValue() -> T? {
+        return this.value
+    }
+
+    func hasValue() -> bool {
+        return this.value != null
+    }
+}
+
+// 使用可空泛型类
+box1 <- new Box(123)      // T? 推断为 int?
+box2 <- new Box(null)     // T? 允许 null 值
+
+// 定义可空类型参数的泛型函数
+func identity<T?>(value: T?) -> T? {
+    return value
+}
+
+result1 <- identity<int>(456)    // 返回 456
+result2 <- identity<int>(null)   // 返回 null
+
+// 混合可空和非可空类型参数
+class Container<T, U?> {
+    required: T    // 非可空类型
+    optional: U?   // 可空类型
+
+    func init(r: T, o: U?) {
+        this.required <- r
+        this.optional <- o
+    }
+}
+
+container <- new Container(100, "text")
+container2 <- new Container(200, null)  // U? 可以是 null
+
+// 可空类型参数也可以带约束
+class OptionalValue<T?: IComparable> {
+    data: T?
+
+    func init(d: T?) {
+        this.data <- d
+    }
+
+    func hasValue() -> bool {
+        return this.data != null
+    }
+}
+
+// 可空类型参数与 where 子句结合
+func process<T?>(value: T?) -> T? where T: IValue {
+    return value
+}
+```
+
+**可空类型参数特点**：
+
+- 使用 `?` 后缀标记类型参数为可空类型
+- 可空类型参数可以接受 `null` 值作为实参
+- 可以与约束语法组合使用
+- 支持在函数和类中使用
+- 可以与非可空类型参数混合使用
+
 **使用场景**：
 
 ```old8

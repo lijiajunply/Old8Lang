@@ -22,18 +22,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/generic_constraints_comprehensive.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/generic_constraints_simple.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/generic_constraints_syntax.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/generic_constraints_ampersand.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/generic_where_clause.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/generic_nullable_runtime.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/generic_nullable_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Generics/NullableGenericsParserTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251230-0739-泛型可空类型实现总结.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/20251230-0740-可空泛型类型单元测试报告.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/generic_nullable_types.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericParameter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/GenericParameter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/GenericTypeInference.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/GenericTypeInference.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,6 +83,8 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/Parsers/ClassParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/Parsers/ClassParser.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/Parsers/FunctionParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/Parsers/FunctionParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/Parsers/FunctionParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/ModuleSystem/Resolution/ModuleResolver.cs" root0="SKIP_HIGHLIGHTING" />
@@ -506,7 +506,7 @@
       <workItem from="1766461431015" duration="981000" />
       <workItem from="1766746850670" duration="17415000" />
       <workItem from="1766771063664" duration="16661000" />
-      <workItem from="1766997021901" duration="9365000" />
+      <workItem from="1766997021901" duration="9983000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -851,7 +851,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="435" />
+    <option name="localTasksCounter" value="436" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -878,7 +878,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(parser): 添加泛型语法支持&#10;&#10;- 实现泛型类解析支持，包括单个和多个类型参数&#10;- 实现泛型函数解析支持，包含泛型参数和返回类型&#10;- 添加泛型约束语法解析，支持单个和多个约束&#10;- 实现嵌套泛型类型解析，支持任意深度嵌套&#10;- 添加泛型实例化语法支持，包括类和函数实例化&#10;- 扩展访问修饰符与泛型结合使用的解析逻辑&#10;- 创建GenericInstanceExpression处理泛型实例化表达式&#10;- 添加GenericParameter类定义泛型参数结构&#10;- 更新FuncLangValue支持泛型函数实例化功能&#10;- 修改ClassParser和FunctionParser集成泛型语法解析&#10;- 添加泛型语法测试用例覆盖各种泛型场景" />
     <MESSAGE value="feat(parser): 添加泛型语法支持&#10;&#10;- 实现泛型类解析支持，包括单个和多个类型参数&#10;- 实现泛型函数解析支持，包含泛型参数和返回类型&#10;- 添加泛型约束语法解析，支持单个和多个约束&#10;- 实现嵌套泛型类型解析，支持任意深度嵌套&#10;- 添加泛型实例化语法支持，包括类和函数实例化&#10;- 扩展访问修饰符与泛型结合使用的解析逻辑&#10;- 创建GenericInstanceExpression处理泛型实例化表达式&#10;- 添加GenericParameter类定义泛型参数结构&#10;- 更新FuncLangValue支持泛型函数实例化功能&#10;- 修改ClassParser和FunctionParser集成泛型语法解析&#10;- 添加泛型语法测试用例覆盖各种泛型场景&#10;- 实现启发式方法判断泛型实例化避免误解析比较运算符&#10;- 支持小写自定义类型名称作为泛型参数的解析&#10;- 添加内置类型名称判断方法IsBuiltInTypeName&#10;- 优化字符串模板中转义字符的处理逻辑" />
     <MESSAGE value="feat(interpreter): 实现泛型类型参数映射和约束验证功能&#10;&#10;- 添加 TypeArgumentMapping 属性到 AnyLangValue 和 FuncLangValue 类&#10;- 在函数执行时传递泛型类型参数映射到执行管理器&#10;- 实现泛型函数和泛型类方法的类型参数验证逻辑&#10;- 添加类型注解管理器到解释器并传递给泛型实例化过程&#10;- 实现泛型约束验证功能，检查类型参数是否满足约束条件&#10;- 添加多类型参数泛型类和函数的测试用例&#10;- 修复泛型实例化表达式的解析和执行逻辑&#10;- 优化类型检查器支持泛型类型参数映射解析" />
     <MESSAGE value="refactor(ast): 优化导入语句和标准库加载逻辑&#10;&#10;- 移除未使用的注释和变量声明&#10;- 简化 ImportStatement 中的模块导入处理逻辑&#10;- 调整标准库加载器中的返回值处理&#10;- 添加必要的命名空间引用&#10;- 优化代码结构和错误处理机制" />
@@ -903,7 +902,8 @@
     <MESSAGE value="docs(project): 添加项目待办事项文档并更新IDE配置&#10;&#10;- 创建 TODO.md 文档记录 Old8Lang 项目开发计划和待办事项&#10;- 添加工具改进部分包括错误提示增强和调试器改进计划&#10;- 记录语言特性开发状态包括已实现和计划中的功能&#10;- 添加性能优化、文档完善和测试覆盖的待办事项&#10;- 更新项目状态包括最新成就和健康度指标&#10;- 修复 IDE 工作区配置中的文件变更列表和任务计数器&#10;- 更新最后提交消息为 CI/CD 流水线配置信息" />
     <MESSAGE value="docs(project): 删除项目待办事项文档并更新IDE配置&#10;&#10;- 移除 TODO.md 文档中记录的 Old8Lang 项目开发计划和待办事项&#10;- 清理 IDE 工作区配置中的相关文件变更记录&#10;- 更新本地任务计数器和工作时间统计信息&#10;- 移除旧的 VCS 提交消息记录&#10;- 修复 IDE 工作区 XML 配置文件中的 mock 路径设置" />
     <MESSAGE value="feat(generic): 实现泛型类型推断功能&#10;&#10;- 在 FunctionCallExpression.cs 中添加泛型类型推断逻辑&#10;- 创建 TypeSystem/GenericTypeInference.cs 实现类型推断引擎&#10;- 在 Instance.cs 的三个函数调用位置添加类型推断支持&#10;- 添加泛型类型推断测试文件和相关测试用例&#10;- 更新文档说明泛型类型推断的实现和使用方法&#10;- 支持从字面量、变量和嵌套调用中自动推断泛型类型&#10;- 保持显式类型参数调用方式的向后兼容性" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(generic): 实现泛型类型推断功能&#10;&#10;- 在 FunctionCallExpression.cs 中添加泛型类型推断逻辑&#10;- 创建 TypeSystem/GenericTypeInference.cs 实现类型推断引擎&#10;- 在 Instance.cs 的三个函数调用位置添加类型推断支持&#10;- 添加泛型类型推断测试文件和相关测试用例&#10;- 更新文档说明泛型类型推断的实现和使用方法&#10;- 支持从字面量、变量和嵌套调用中自动推断泛型类型&#10;- 保持显式类型参数调用方式的向后兼容性" />
+    <MESSAGE value="feat(generic): 实现泛型约束语法和类型推断功能&#10;&#10;- 支持泛型类型推断，自动从函数调用参数推断泛型类型&#10;- 支持泛型约束的 &amp; 符号语法（例如 class Box&lt;T: IComparable &amp; ICloneable&gt;）&#10;- 支持 where 子句语法用于函数级别的约束（例如 func sort&lt;T&gt;(items: List&lt;T&gt;) -&gt; List&lt;T&gt; where T: IComparable）&#10;- 支持混合约束语法（在泛型参数声明中使用约束 + where 子句组合）&#10;- 扩展 ClassParser 和 FunctionParser 支持 where 子句解析&#10;- 添加泛型约束语法测试用例和综合功能测试&#10;- 更新文档说明泛型约束和类型推断的使用方法&#10;- 重构 GenericTypeInference 类构造函数注入依赖" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(generic): 实现泛型约束语法和类型推断功能&#10;&#10;- 支持泛型类型推断，自动从函数调用参数推断泛型类型&#10;- 支持泛型约束的 &amp; 符号语法（例如 class Box&lt;T: IComparable &amp; ICloneable&gt;）&#10;- 支持 where 子句语法用于函数级别的约束（例如 func sort&lt;T&gt;(items: List&lt;T&gt;) -&gt; List&lt;T&gt; where T: IComparable）&#10;- 支持混合约束语法（在泛型参数声明中使用约束 + where 子句组合）&#10;- 扩展 ClassParser 和 FunctionParser 支持 where 子句解析&#10;- 添加泛型约束语法测试用例和综合功能测试&#10;- 更新文档说明泛型约束和类型推断的使用方法&#10;- 重构 GenericTypeInference 类构造函数注入依赖" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -1,0 +1,114 @@
+// 测试泛型与可空类型集成
+// 测试可空类型参数的各种语法形式
+
+// 1. 测试单个可空类型参数
+class Box<T?> {
+    value: T?
+
+    func init(v: T?) {
+        this.value <- v
+    }
+
+    func getValue() -> T? {
+        return this.value
+    }
+}
+
+PrintLine("测试1: 单个可空类型参数 - 通过")
+
+// 2. 测试多个可空类型参数
+class Pair<K?, V?> {
+    key: K?
+    value: V?
+
+    func init(k: K?, v: V?) {
+        this.key <- k
+        this.value <- v
+    }
+}
+
+PrintLine("测试2: 多个可空类型参数 - 通过")
+
+// 3. 测试混合可空和非可空类型参数
+class MixedContainer<T, U?> {
+    required: T
+    optional: U?
+
+    func init(r: T, o: U?) {
+        this.required <- r
+        this.optional <- o
+    }
+}
+
+PrintLine("测试3: 混合可空/非可空参数 - 通过")
+
+// 4. 测试可空类型参数带约束
+interface IValue {
+    func getValue() -> any
+}
+
+class OptionalValue<T?: IValue> {
+    data: T?
+
+    func init(d: T?) {
+        this.data <- d
+    }
+
+    func hasValue() -> bool {
+        return this.data != null
+    }
+}
+
+PrintLine("测试4: 可空类型参数带约束 - 通过")
+
+// 5. 测试泛型函数的可空类型参数
+func identity<T?>(value: T?) -> T? {
+    return value
+}
+
+PrintLine("测试5: 泛型函数可空参数 - 通过")
+
+// 6. 测试可空类型参数与 where 子句
+func process<T?>(value: T?) -> T? where T: IValue {
+    return value
+}
+
+PrintLine("测试6: 可空参数 + where 子句 - 通过")
+
+// 7. 测试多个可空类型参数的 where 子句
+func combine<K?, V?>(key: K?, value: V?) -> any where K: IValue, V: IValue {
+    return null
+}
+
+PrintLine("测试7: 多可空参数 where 子句 - 通过")
+
+// 8. 测试 Optional 类型模式
+class Optional<T?> {
+    private value: T?
+    private hasVal: bool
+
+    func init(v: T?) {
+        this.value <- v
+        this.hasVal <- v != null
+    }
+
+    func hasValue() -> bool {
+        return this.hasVal
+    }
+
+    func getValue() -> T? {
+        return this.value
+    }
+
+    func getOrDefault(defaultValue: T?) -> T? {
+        if this.hasVal {
+            return this.value
+        }
+        return defaultValue
+    }
+}
+
+PrintLine("测试8: Optional 类型模式 - 通过")
+
+PrintLine("")
+PrintLine("所有可空泛型类型测试通过！✓")

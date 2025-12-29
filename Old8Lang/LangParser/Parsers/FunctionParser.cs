@@ -365,7 +365,7 @@ public class FunctionParser(
 
     /// <summary>
     /// 解析泛型参数列表
-    /// 语法：<T, U, V> 或 <T: IComparable, U>
+    /// 语法：<T, U, V> 或 <T: IComparable, U> 或 <T?, U?>
     /// </summary>
     /// <returns>泛型参数列表</returns>
     private List<GenericParameter> ParseGenericParameters()
@@ -384,6 +384,14 @@ public class FunctionParser(
             var paramName = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
 
+            // 检查是否为可空类型参数 T?
+            bool isNullable = false;
+            if (CurrentToken.Type == LangTokenType.Question)
+            {
+                isNullable = true;
+                Expect(LangTokenType.Question);
+            }
+
             List<string>? constraints = null;
             if (CurrentToken.Type == LangTokenType.Colon)
             {
@@ -391,7 +399,7 @@ public class FunctionParser(
                 constraints = ParseGenericConstraints();
             }
 
-            parameters.Add(new GenericParameter(paramName, constraints, position));
+            parameters.Add(new GenericParameter(paramName, constraints, position, isNullable));
 
             if (CurrentToken.Type == LangTokenType.Comma)
             {
@@ -550,12 +558,13 @@ public class FunctionParser(
             var existingConstraints = genericParam.Constraints ?? new List<string>();
             existingConstraints.AddRange(constraints);
 
-            // 创建新的 GenericParameter 对象替换旧的
+            // 创建新的 GenericParameter 对象替换旧的，保留原有的 IsNullable 属性
             var index = genericParameters.IndexOf(genericParam);
             genericParameters[index] = new GenericParameter(
                 genericParam.Name,
                 existingConstraints,
-                genericParam.Position
+                genericParam.Position,
+                genericParam.IsNullable  // 保留可空标记
             );
 
             // 检查是否有更多约束（逗号分隔）

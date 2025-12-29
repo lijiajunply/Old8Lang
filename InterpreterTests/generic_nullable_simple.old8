@@ -1,0 +1,50 @@
+// 简单的泛型可空类型测试
+
+// 定义 Box 类
+class Box<T?> {
+    value: T?
+
+    func init(v: T?) {
+        this.value <- v
+    }
+
+    func getValue() -> T? {
+        return this.value
+    }
+
+    func hasValue() -> bool {
+        return this.value != null
+    }
+}
+
+// 测试1：有值的情况
+box1 <- new Box(123)
+val1 <- box1.getValue()
+has1 <- box1.hasValue()
+PrintLine("测试1 - Box有值:")
+PrintLine($"  value: {val1.ToStr()}")
+PrintLine($"  hasValue: {has1.ToStr()}")
+
+// 测试2：null 的情况
+box2 <- new Box(null)
+val2 <- box2.getValue()
+has2 <- box2.hasValue()
+PrintLine("")
+PrintLine("测试2 - Box为null:")
+PrintLine($"  value: {val2.ToStr()}")
+PrintLine($"  hasValue: {has2.ToStr()}")
+
+// 测试3：泛型函数
+func identity<T?>(v: T?) -> T? {
+    return v
+}
+
+res1 <- identity<int>(456)
+res2 <- identity<int>(null)
+PrintLine("")
+PrintLine("测试3 - 泛型函数:")
+PrintLine($"  有值: {res1.ToStr()}")
+PrintLine($"  null: {res2.ToStr()}")
+
+PrintLine("")
+PrintLine("所有测试通过！")

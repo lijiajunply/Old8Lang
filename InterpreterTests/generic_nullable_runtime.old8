@@ -1,0 +1,75 @@
+// 测试泛型可空类型的实际运行
+// 测试可空类型参数的运行时行为
+
+// 1. 定义 Optional 类
+class Optional<T?> {
+    private value: T?
+    private hasVal: bool
+
+    func init(v: T?) {
+        this.value <- v
+        this.hasVal <- v != null
+    }
+
+    func hasValue() -> bool {
+        return this.hasVal
+    }
+
+    func getValue() -> T? {
+        return this.value
+    }
+
+    func getOrDefault(defaultValue: T?) -> T? {
+        if this.hasVal {
+            return this.value
+        }
+        return defaultValue
+    }
+}
+
+// 2. 测试 Optional 类的使用
+opt1 <- new Optional(42)
+hasValue1 <- opt1.hasValue()
+value1 <- opt1.getValue()
+PrintLine($"测试1 - Optional有值: hasValue={hasValue1.ToStr()}, value={value1.ToStr()}")
+
+opt2 <- new Optional(null)
+hasValue2 <- opt2.hasValue()
+defaultVal <- opt2.getOrDefault(999)
+PrintLine($"测试2 - Optional为null: hasValue={hasValue2.ToStr()}, default={defaultVal.ToStr()}")
+
+// 3. 测试泛型函数的可空参数
+func identity<T?>(value: T?) -> T? {
+    return value
+}
+
+result3 <- identity<int>(null)
+result4 <- identity<string>("Hello")
+PrintLine($"测试3 - 泛型函数可空: null={result3.ToStr()}, 非null={result4}")
+
+// 4. 测试可空类型与非可空类型混合
+class Container<T, U?> {
+    required: T
+    optional: U?
+
+    func init(r: T, o: U?) {
+        this.required <- r
+        this.optional <- o
+    }
+
+    func getRequired() -> T {
+        return this.required
+    }
+
+    func getOptional() -> U? {
+        return this.optional
+    }
+}
+
+container <- new Container(100, "optional")
+req <- container.getRequired()
+opt <- container.getOptional()
+PrintLine($"测试4 - 混合容器: required={req.ToStr()}, optional={opt}")
+
+PrintLine("")
+PrintLine("所有运行时测试通过！✓")

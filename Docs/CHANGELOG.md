@@ -18,6 +18,7 @@
   - 支持泛型约束的 `&` 符号语法（例如 `class Box<T: IComparable & ICloneable>`）
   - 支持 `where` 子句语法用于函数级别的约束（例如 `func sort<T>(items: List<T>) -> List<T> where T: IComparable`）
   - 支持混合约束语法（在泛型参数声明中使用约束 + where 子句组合）
+  - 支持可空泛型类型参数（例如 `class Optional<T?>` 或 `func identity<T?>(value: T?) -> T?`）
 - 添加多态支持，增强面向对象编程能力
 - 加入 `this` 和 `super` 关键字，支持父类方法调用
 - 重构类型系统，引入类型模板机制

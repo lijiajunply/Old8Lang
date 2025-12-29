@@ -584,7 +584,7 @@ public class ClassParser(
 
     /// <summary>
     /// 解析泛型参数列表
-    /// 语法：<T, U, V> 或 <T: IComparable, U>
+    /// 语法：<T, U, V> 或 <T: IComparable, U> 或 <T?, U?>
     /// </summary>
     /// <returns>泛型参数列表</returns>
     private List<GenericParameter> ParseGenericParameters()
@@ -603,6 +603,14 @@ public class ClassParser(
             var paramName = CurrentToken.Value;
             Expect(LangTokenType.Identifier);
 
+            // 检查是否为可空类型参数 T?
+            bool isNullable = false;
+            if (CurrentToken.Type == LangTokenType.Question)
+            {
+                isNullable = true;
+                Expect(LangTokenType.Question);
+            }
+
             List<string>? constraints = null;
             if (CurrentToken.Type == LangTokenType.Colon)
             {
@@ -610,7 +618,7 @@ public class ClassParser(
                 constraints = ParseGenericConstraints();
             }
 
-            parameters.Add(new GenericParameter(paramName, constraints, position));
+            parameters.Add(new GenericParameter(paramName, constraints, position, isNullable));
 
             if (CurrentToken.Type == LangTokenType.Comma)
             {
