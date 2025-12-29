@@ -221,80 +221,19 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// </summary>
     /// <param name="value">要转换的.NET对象</param>
     /// <returns>对应的Old8Lang值类型</returns>
-    /// <exception cref="InvalidOperationError">当不支持转换的类型时抛出</exception>
     /// <remarks>
     /// 支持的转换类型包括：
-    /// - int → IntLangValue
-    /// - string → StringLangValue
-    /// - double → DoubleLangValue
-    /// - char → CharLangValue
-    /// - List&lt;object&gt; → ListLangValue
-    /// - List&lt;string&gt; → ListLangValue
-    /// - List&lt;int&gt; → ListLangValue
-    /// - List&lt;double&gt; → ListLangValue
-    /// - object[] → ArrayLangValue
-    /// - long → IntLangValue
-    /// - bool → BoolLangValue
-    /// - Dictionary&lt;object, object&gt; → DictionaryLangValue
-    /// - Tuple&lt;object, object&gt; → TupleLangValue
-    /// - ValueTuple&lt;object, object&gt; → TupleLangValue
-    /// - Task 或 Task&lt;T&gt; → 等待结果后递归转换
+    /// - 基本类型：int, long, short, byte, float, double, decimal, string, char, bool
+    /// - 集合类型：List&lt;T&gt;, Array, Dictionary&lt;K,V&gt;, Tuple, ValueTuple
+    /// - 特殊类型：Task, DateTime, DateTimeOffset, Guid, Enum
+    /// - 自定义类型：通过 NativeAnyLangValue 包装
+    ///
+    /// 此方法是 <see cref="ObjToValue(object?, SourcePosition)"/> 的简化版本，
+    /// 直接调用增强版本并传入默认位置信息。
     /// </remarks>
     public static LangValueType ObjToValue(object? value)
     {
-        if (value == null)
-        {
-            return NullLangValue.Instance;
-        }
-
-        // 处理 Task 和 Task<T> 类型
-        var valueType = value.GetType();
-        if (valueType.Name is "Task`1" or "Task")
-        {
-            try
-            {
-                // 使用反射获取 Result 属性或等待 Task
-                var resultProperty = valueType.GetProperty("Result");
-                if (resultProperty != null)
-                {
-                    // 对于 Task<T>，获取 Result 属性
-                    var taskResult = resultProperty.GetValue(value);
-                    return ObjToValue(taskResult);
-                }
-
-                // 对于 Task (无返回值)，返回 VoidLangValue
-                return new VoidLangValue();
-            }
-            catch
-            {
-                // 如果无法获取 Task 结果，返回 VoidLangValue
-                return new VoidLangValue();
-            }
-        }
-
-        return value switch
-        {
-            int a => IntLangValue.Create(a),
-            string a => StringLangValue.Create(a),
-            double a => DoubleLangValue.Create(a),
-            char a => CharLangValue.Create(a),
-            List<object> a => new ListLangValue(a),
-            List<string> a => new ListLangValue(a.Cast<object>().ToList()),
-            List<int> a => new ListLangValue(a.Cast<object>().ToList()),
-            List<double> a => new ListLangValue(a.Cast<object>().ToList()),
-            object[] a => new ArrayLangValue(a.ToList()),
-            long a => IntLangValue.Create((int)a),
-            bool a => BoolLangValue.Create(a),
-            Dictionary<object, object> a => new DictionaryLangValue(a.Select(x =>
-            {
-                var key = ObjToValue(x.Key);
-                var val = ObjToValue(x.Value);
-                return new KeyValuePair<LangExpression, LangExpression>(key, val);
-            }).ToList()),
-            Tuple<object, object> a => new TupleLangValue(ObjToValue(a.Item1), ObjToValue(a.Item2)),
-            ValueTuple<object, object> a => new TupleLangValue(ObjToValue(a.Item1), ObjToValue(a.Item2)),
-            _ => TryEnhancedConversion(value, new SourcePosition())
-        };
+        return ObjToValue(value, default);
     }
 
     /// <summary>
@@ -325,44 +264,44 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
         // 处理 Task 和 Task<T> 类型
         if (valueType.Name is "Task`1" or "Task")
         {
-            return HandleTaskConversionEnhanced(value, position);
+            return HandleTaskConversion(value, position);
         }
 
         // 处理数组
         if (valueType.IsArray)
         {
-            return HandleArrayConversionEnhanced(value, position);
+            return HandleArrayConversion(value);
         }
 
         // 处理枚举
         if (valueType.IsEnum)
         {
-            return StringLangValue.Create(value.ToString());
+            return StringLangValue.Create(value.ToString()!);
+        }
+
+        // 处理字典类型（必须在集合类型之前检查，因为字典也实现了 IEnumerable）
+        if (IsDictionaryType(valueType, out _, out _))
+        {
+            return HandleDictionaryConversionGeneric(value, position);
         }
 
         // 处理集合类型
-        if (IsGenericCollectionTypeEnhanced(valueType, out var elementType))
+        if (IsGenericCollectionType(valueType, out _))
         {
-            return HandleCollectionConversionEnhanced(value, elementType, position);
-        }
-
-        // 处理字典类型
-        if (IsDictionaryTypeEnhanced(valueType, out var keyType, out var valueTypeArg))
-        {
-            return HandleDictionaryConversionEnhanced(value, keyType, valueTypeArg, position);
+            return HandleCollectionConversion(value);
         }
 
         // 处理元组
-        if (IsTupleTypeEnhanced(valueType))
+        if (IsTupleType(valueType))
         {
-            return HandleTupleConversionEnhanced(value, position);
+            return HandleTupleConversion(value, position);
         }
 
         // 处理增强的基本类型
         return value switch
         {
             int a => IntLangValue.Create(a),
-            long a => HandleLongConversionEnhanced(a, position),
+            long a => HandleLongConversion(a),
             short a => IntLangValue.Create(a),
             byte a => IntLangValue.Create(a),
             float a => DoubleLangValue.Create(Math.Round(a, 10)),
@@ -384,16 +323,16 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
             Tuple<object, object> a => new TupleLangValue(ObjToValue(a.Item1, position), ObjToValue(a.Item2, position)),
             ValueTuple<object, object> a => new TupleLangValue(ObjToValue(a.Item1, position),
                 ObjToValue(a.Item2, position)),
-            _ => TryCustomConversionEnhanced(value, position)
+            _ => TryCustomConversion(value, position)
         };
     }
 
     /// <summary>
     /// 处理 long 类型转换，避免溢出
     /// </summary>
-    private static LangValueType HandleLongConversionEnhanced(long value, SourcePosition position)
+    private static LangValueType HandleLongConversion(long value)
     {
-        if (value >= int.MinValue && value <= int.MaxValue)
+        if (value is >= int.MinValue and <= int.MaxValue)
         {
             return IntLangValue.Create((int)value);
         }
@@ -405,7 +344,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 处理 Task 类型转换
     /// </summary>
-    private static LangValueType HandleTaskConversionEnhanced(object task, SourcePosition position)
+    private static LangValueType HandleTaskConversion(object task, SourcePosition position)
     {
         try
         {
@@ -430,7 +369,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 处理数组转换
     /// </summary>
-    private static LangValueType HandleArrayConversionEnhanced(object array, SourcePosition position)
+    private static LangValueType HandleArrayConversion(object array)
     {
         try
         {
@@ -451,8 +390,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 处理集合类型转换
     /// </summary>
-    private static LangValueType HandleCollectionConversionEnhanced(object collection, Type elementType,
-        SourcePosition position)
+    private static LangValueType HandleCollectionConversion(object collection)
     {
         try
         {
@@ -471,9 +409,9 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     }
 
     /// <summary>
-    /// 处理字典类型转换
+    /// 处理字典类型转换（泛型版本）
     /// </summary>
-    private static LangValueType HandleDictionaryConversionEnhanced(object dictionary, Type keyType, Type valueTypeArg,
+    private static LangValueType HandleDictionaryConversionGeneric(object dictionary,
         SourcePosition position)
     {
         try
@@ -512,7 +450,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 处理元组类型转换
     /// </summary>
-    private static LangValueType HandleTupleConversionEnhanced(object tuple, SourcePosition position)
+    private static LangValueType HandleTupleConversion(object tuple, SourcePosition position)
     {
         try
         {
@@ -554,7 +492,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// 尝试自定义类型转换
     /// 对于 C# 自定义类和未识别的类型，使用 NativeAnyLangValue 包装
     /// </summary>
-    private static LangValueType TryCustomConversionEnhanced(object value, SourcePosition position)
+    private static LangValueType TryCustomConversion(object value, SourcePosition position)
     {
         try
         {
@@ -570,7 +508,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
 
             // 对于自定义类型，使用 NativeAnyLangValue 包装
             // 这保留了类型信息，允许访问成员和调用方法
-            return new Intermediates.NativeAnyLangValue(value, position);
+            return new NativeAnyLangValue(value, position);
         }
         catch (Exception ex)
         {
@@ -580,35 +518,17 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     }
 
     /// <summary>
-    /// 尝试增强的类型转换（用于原方法的 fallback）
+    /// 检查是否为泛型集合类型（排除 string）
     /// </summary>
-    private static LangValueType TryEnhancedConversion(object value, SourcePosition position)
-    {
-        try
-        {
-            // 尝试新的转换逻辑
-            return ObjToValue(value, position);
-        }
-        catch
-        {
-            // 如果新方法也失败，返回字符串表示
-            try
-            {
-                return StringLangValue.Create(value.ToString() ?? "null");
-            }
-            catch
-            {
-                return StringLangValue.Create($"[{value.GetType().Name}]");
-            }
-        }
-    }
-
-    /// <summary>
-    /// 检查是否为泛型集合类型
-    /// </summary>
-    private static bool IsGenericCollectionTypeEnhanced(Type type, out Type elementType)
+    private static bool IsGenericCollectionType(Type type, out Type elementType)
     {
         elementType = null!;
+
+        // 排除 string 类型，虽然它实现了 IEnumerable<char>
+        if (type == typeof(string))
+        {
+            return false;
+        }
 
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
         {
@@ -616,10 +536,15 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
             return true;
         }
 
-        if (type.GetInterface("System.Collections.Generic.IEnumerable`1") != null)
+        var enumerableInterface = type.GetInterface("System.Collections.Generic.IEnumerable`1");
+        if (enumerableInterface != null)
         {
-            elementType = type.GetGenericArguments()[0];
-            return true;
+            var args = enumerableInterface.GetGenericArguments();
+            if (args.Length > 0)
+            {
+                elementType = args[0];
+                return true;
+            }
         }
 
         return false;
@@ -628,7 +553,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 检查是否为字典类型
     /// </summary>
-    private static bool IsDictionaryTypeEnhanced(Type type, out Type keyType, out Type valueType)
+    private static bool IsDictionaryType(Type type, out Type keyType, out Type valueType)
     {
         keyType = null!;
         valueType = null!;
@@ -641,12 +566,16 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
             return true;
         }
 
-        if (type.GetInterface("System.Collections.Generic.IDictionary`2") != null)
+        var dictionaryInterface = type.GetInterface("System.Collections.Generic.IDictionary`2");
+        if (dictionaryInterface != null)
         {
-            var args = type.GetGenericArguments();
-            keyType = args[0];
-            valueType = args[1];
-            return true;
+            var args = dictionaryInterface.GetGenericArguments();
+            if (args.Length >= 2)
+            {
+                keyType = args[0];
+                valueType = args[1];
+                return true;
+            }
         }
 
         return false;
@@ -655,7 +584,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 检查是否为元组类型
     /// </summary>
-    private static bool IsTupleTypeEnhanced(Type type)
+    private static bool IsTupleType(Type type)
     {
         return type.FullName?.StartsWith("System.Tuple") == true ||
                type.FullName?.StartsWith("System.ValueTuple") == true;
@@ -719,8 +648,8 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
             AnyLangValue anyVal => anyVal,
 
             // Native 类型包装
-            Intermediates.NativeAnyLangValue nativeAny => nativeAny.GetNativeObject() ?? nativeAny,
-            Intermediates.NativeStaticAny nativeStatic => nativeStatic,
+            NativeAnyLangValue nativeAny => nativeAny.GetNativeObject() ?? nativeAny,
+            NativeStaticAny nativeStatic => nativeStatic,
 
             // 类型值
             TypeLangValue typeVal => typeVal,
@@ -760,7 +689,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     private static object[] ValueToObjArray(ArrayLangValue arrayVal)
     {
         var runResult = arrayVal.RunResult;
-        if (runResult == null || runResult.Length == 0)
+        if (runResult.Length == 0)
         {
             return [];
         }
@@ -801,12 +730,12 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
 
         // 检查 Value 是否已初始化（Run() 是否已被调用）
         // 如果 Value.Item1 或 Item2 为 null，尝试从 V1, V2 字段获取值
-        if (key == null && tupleVal.V1 is LangValueType v1)
+        if (key == null! && tupleVal.V1 is LangValueType v1)
         {
             key = v1;
         }
 
-        if (value == null && tupleVal.V2 is LangValueType v2)
+        if (value == null! && tupleVal.V2 is LangValueType v2)
         {
             value = v2;
         }
