@@ -1,0 +1,294 @@
+name: Old8Lang CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  DOTNET_VERSION: '10.0.100'
+  SOLUTION_FILE: 'Old8Lang.sln'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+          
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION_FILE }}
+      
+    - name: Build solution
+      run: dotnet build ${{ env.SOLUTION_FILE }} --configuration Release --no-restore
+      
+    - name: Run unit tests
+      run: dotnet test Old8Lang.Tests --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test_results.trx"
+      
+    - name: Run syntax tests
+      run: |
+        cd TestFiles
+        chmod +x run_syntax_tests.sh
+        ./run_syntax_tests.sh
+        
+    - name: Run interpreter tests
+      run: |
+        cd TestFiles
+        chmod +x run_interpreter_tests.sh
+        ./run_interpreter_tests.sh
+        
+    - name: Run compiler tests
+      run: |
+        cd TestFiles
+        chmod +x run_compiler_tests.sh
+        ./run_compiler_tests.sh
+        
+    - name: Run comprehensive tests
+      run: |
+        cd TestFiles
+        chmod +x run_comprehensive_compiler_tests.sh
+        ./run_comprehensive_compiler_tests.sh
+        
+    - name: Publish test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: |
+          Old8Lang.Tests/TestResults/**/*.trx
+          Reports/**/*.md
+          
+  performance-benchmarks:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION_FILE }}
+      
+    - name: Build benchmarks
+      run: dotnet build Old8Lang.Benchmarks --configuration Release
+      
+    - name: Run performance benchmarks
+      run: dotnet run --project Old8Lang.Benchmarks --configuration Release
+      
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchmark-results
+        path: BenchmarkDotNet.Artifacts/results/
+        
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Install .NET format tool
+      run: dotnet tool install -g dotnet-format
+      
+    - name: Check code formatting
+      run: |
+        dotnet format ${{ env.SOLUTION_FILE }} --verify-no-changes
+        
+    - name: Install Roslyn analyzers
+      run: dotnet add Old8Lang.sln package Microsoft.CodeAnalysis.NetAnalyzers
+      
+    - name: Run code analysis
+      run: |
+        dotnet build ${{ env.SOLUTION_FILE }} --configuration Release -p:EnableNETAnalyzers=true -p:AnalysisMode=All
+        
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+        
+  build-language-server:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Build Language Server
+      run: |
+        dotnet build Old8Lang.LanguageServer --configuration Release
+        
+    - name: Package Language Server
+      run: |
+        mkdir -p dist/old8lang-lsp
+        cp Old8Lang.LanguageServer/bin/Release/net10.0/* dist/old8lang-lsp/
+        
+    - name: Upload Language Server artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: old8lang-language-server
+        path: dist/old8lang-lsp/
+        
+  build-vscode-extension:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      working-directory: ./vscode-old8lang
+      run: npm ci
+      
+    - name: Build extension
+      working-directory: ./vscode-old8lang
+      run: npm run compile
+      
+    - name: Package extension
+      working-directory: ./vscode-old8lang
+      run: npm run vsce package
+      
+    - name: Upload VS Code extension
+      uses: actions/upload-artifact@v4
+      with:
+        name: vscode-old8lang-extension
+        path: vscode-old8lang/*.vsix
+        
+  deploy-docs:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./Docs
+        destination_dir: docs
+        
+  release:
+    runs-on: ubuntu-latest
+    needs: [build-and-test, performance-benchmarks, code-quality, security-scan]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Build release binaries
+      run: |
+        dotnet publish Old8Lang.App --configuration Release --runtime linux-x64 --output dist/linux-x64
+        dotnet publish Old8Lang.App --configuration Release --runtime win-x64 --output dist/win-x64
+        dotnet publish Old8Lang.App --configuration Release --runtime osx-x64 --output dist/osx-x64
+        
+    - name: Create release package
+      run: |
+        tar -czf old8lang-linux-x64.tar.gz -C dist/linux-x64 .
+        tar -czf old8lang-win-x64.tar.gz -C dist/win-x64 .
+        tar -czf old8lang-osx-x64.tar.gz -C dist/osx-x64 .
+        
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Old8Lang ${{ github.ref }}
+        draft: false
+        prerelease: false
+        asset_path: .
+        asset_name: old8lang-linux-x64.tar.gz
+        asset_content_type: application/gzip
+        
+    - name: Upload release assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: old8lang-linux-x64.tar.gz
+        asset_name: old8lang-linux-x64.tar.gz
+        asset_content_type: application/gzip
+        
+  notify:
+    runs-on: ubuntu-latest
+    needs: [build-and-test, performance-benchmarks, code-quality, security-scan]
+    if: always()
+    
+    steps:
+    - name: Notify build status
+      uses: 8398a7/action-slack@v3
+      if: always()
+      with:
+        status: ${{ job.status }}
+        channel: '#ci-cd'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
