@@ -2,9 +2,9 @@ name: Old8Lang CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, master ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, master ]
 
 env:
   DOTNET_VERSION: '10.0.100'
