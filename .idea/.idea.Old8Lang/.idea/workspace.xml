@@ -22,12 +22,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/GenericTypeInferenceTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/GenericTypeInference.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TODO.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_assert.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_assert_direct.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_comparison.old8" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_simple.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/FunctionCallExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/FunctionCallExpression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,10 +68,15 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/FunctionCallExpression.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/ModuleSystem/Resolution/ModuleResolver.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/ModuleSystem/Resolution/ModuleResolver.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/TypeSystem/TypeAnnotationManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
@@ -489,7 +493,7 @@
       <workItem from="1766461431015" duration="981000" />
       <workItem from="1766746850670" duration="17415000" />
       <workItem from="1766771063664" duration="16661000" />
-      <workItem from="1766997021901" duration="7182000" />
+      <workItem from="1766997021901" duration="8751000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -834,7 +838,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="433" />
+    <option name="localTasksCounter" value="434" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -861,7 +865,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(parser): 添加可空类型支持&#10;&#10;- 在 ClassParser 中添加可空类型注解解析逻辑&#10;- 在 FunctionParser 中实现返回值可空类型处理&#10;- 在 StatementParser 中支持可空类型变量声明&#10;- 扩展 TypeAnnotationManager 支持可空类型解析&#10;- 更新 LangId AST 节点处理可空类型注解&#10;- 添加可空类型测试文件和语法验证&#10;- 更新文档说明可空类型语法和使用方法&#10;- 在 ParsedTypeAnnotation 中添加 IsNullable 属性" />
     <MESSAGE value="refactor(module-system): 重构模块系统内部字段命名和构造函数&#10;&#10;- 将 CacheManager 中的私有字段从 _moduleCache 和 _cacheLock 重命名为 ModuleCache 和 CacheLock&#10;- 将 ModuleLoader 的构造函数改为主构造函数形式，移除字段赋值语句&#10;- 将 ModuleResolver 中的私有字段从 _pathResolver 和 _versionResolver 重命名为 PathResolver 和 VersionResolver&#10;- 将 NetworkModuleLoader 中的私有字段从 _cacheDirectory 重命名为 CacheDirectory&#10;- 使用集合表达式替换 HashSet 初始化语法&#10;- 优化条件判断语法，使用属性模式匹配替代 Count 检查&#10;- 使用 GetValueOrDefault 方法替代 TryGetValue 检查&#10;- 为 ImportOptions 和 ModuleImportResult 类添加 Serializable 特性&#10;- 更新 workspace.xml 中的文件变更列表和任务计数器" />
     <MESSAGE value="feat(parser): 添加泛型语法支持&#10;&#10;- 实现泛型类解析支持，包括单个和多个类型参数&#10;- 实现泛型函数解析支持，包含泛型参数和返回类型&#10;- 添加泛型约束语法解析，支持单个和多个约束&#10;- 实现嵌套泛型类型解析，支持任意深度嵌套&#10;- 添加泛型实例化语法支持，包括类和函数实例化&#10;- 扩展访问修饰符与泛型结合使用的解析逻辑&#10;- 创建GenericInstanceExpression处理泛型实例化表达式&#10;- 添加GenericParameter类定义泛型参数结构&#10;- 更新FuncLangValue支持泛型函数实例化功能&#10;- 修改ClassParser和FunctionParser集成泛型语法解析&#10;- 添加泛型语法测试用例覆盖各种泛型场景" />
     <MESSAGE value="feat(parser): 添加泛型语法支持&#10;&#10;- 实现泛型类解析支持，包括单个和多个类型参数&#10;- 实现泛型函数解析支持，包含泛型参数和返回类型&#10;- 添加泛型约束语法解析，支持单个和多个约束&#10;- 实现嵌套泛型类型解析，支持任意深度嵌套&#10;- 添加泛型实例化语法支持，包括类和函数实例化&#10;- 扩展访问修饰符与泛型结合使用的解析逻辑&#10;- 创建GenericInstanceExpression处理泛型实例化表达式&#10;- 添加GenericParameter类定义泛型参数结构&#10;- 更新FuncLangValue支持泛型函数实例化功能&#10;- 修改ClassParser和FunctionParser集成泛型语法解析&#10;- 添加泛型语法测试用例覆盖各种泛型场景&#10;- 实现启发式方法判断泛型实例化避免误解析比较运算符&#10;- 支持小写自定义类型名称作为泛型参数的解析&#10;- 添加内置类型名称判断方法IsBuiltInTypeName&#10;- 优化字符串模板中转义字符的处理逻辑" />
@@ -886,7 +889,8 @@
     <MESSAGE value="feat(ci): 添加完整的CI/CD流水线配置&#10;&#10;- 配置GitHub Actions工作流支持push和pull request触发&#10;- 实现构建和测试作业包括单元测试、语法测试、解释器测试和编译器测试&#10;- 添加性能基准测试作业使用BenchmarkDotNet进行性能监控&#10;- 集成代码质量检查包括代码格式化和Roslyn分析器&#10;- 配置安全扫描使用Trivy进行漏洞检测&#10;- 实现语言服务器构建和VSCode扩展打包发布&#10;- 添加文档自动部署到GitHub Pages功能&#10;- 配置发布作业支持多平台二进制文件构建和GitHub Release创建&#10;- 集成Slack通知功能及时反馈构建状态&#10;- 优化工作流依赖关系确保各阶段正确执行顺序" />
     <MESSAGE value="chore(ci): 更新CI/CD配置和IDE工作区设置&#10;&#10;- 在GitHub Actions配置中添加master分支触发条件&#10;- 清理IDE工作区XML配置文件中的mock路径设置&#10;- 更新本地任务计数器和工作时间统计信息&#10;- 移除旧的VCS提交消息记录&#10;- 更新最后提交消息为CI/CD流水线配置信息" />
     <MESSAGE value="docs(project): 添加项目待办事项文档并更新IDE配置&#10;&#10;- 创建 TODO.md 文档记录 Old8Lang 项目开发计划和待办事项&#10;- 添加工具改进部分包括错误提示增强和调试器改进计划&#10;- 记录语言特性开发状态包括已实现和计划中的功能&#10;- 添加性能优化、文档完善和测试覆盖的待办事项&#10;- 更新项目状态包括最新成就和健康度指标&#10;- 修复 IDE 工作区配置中的文件变更列表和任务计数器&#10;- 更新最后提交消息为 CI/CD 流水线配置信息" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(project): 添加项目待办事项文档并更新IDE配置&#10;&#10;- 创建 TODO.md 文档记录 Old8Lang 项目开发计划和待办事项&#10;- 添加工具改进部分包括错误提示增强和调试器改进计划&#10;- 记录语言特性开发状态包括已实现和计划中的功能&#10;- 添加性能优化、文档完善和测试覆盖的待办事项&#10;- 更新项目状态包括最新成就和健康度指标&#10;- 修复 IDE 工作区配置中的文件变更列表和任务计数器&#10;- 更新最后提交消息为 CI/CD 流水线配置信息" />
+    <MESSAGE value="docs(project): 删除项目待办事项文档并更新IDE配置&#10;&#10;- 移除 TODO.md 文档中记录的 Old8Lang 项目开发计划和待办事项&#10;- 清理 IDE 工作区配置中的相关文件变更记录&#10;- 更新本地任务计数器和工作时间统计信息&#10;- 移除旧的 VCS 提交消息记录&#10;- 修复 IDE 工作区 XML 配置文件中的 mock 路径设置" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(project): 删除项目待办事项文档并更新IDE配置&#10;&#10;- 移除 TODO.md 文档中记录的 Old8Lang 项目开发计划和待办事项&#10;- 清理 IDE 工作区配置中的相关文件变更记录&#10;- 更新本地任务计数器和工作时间统计信息&#10;- 移除旧的 VCS 提交消息记录&#10;- 修复 IDE 工作区 XML 配置文件中的 mock 路径设置" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1222,143 +1226,143 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>279</line>
+          <line>363</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="10101" />
+              <option value="14254" />
             </startOffsets>
             <endOffsets>
-              <option value="10262" />
+              <option value="14415" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="618" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>272</line>
+          <line>356</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="9889" />
+              <option value="14042" />
             </startOffsets>
             <endOffsets>
-              <option value="9909" />
+              <option value="14062" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="619" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>295</line>
+          <line>379</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="10868" />
+              <option value="15021" />
             </startOffsets>
             <endOffsets>
-              <option value="10946" />
+              <option value="15099" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="620" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>296</line>
+          <line>380</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="10959" />
+              <option value="15112" />
             </startOffsets>
             <endOffsets>
-              <option value="10993" />
+              <option value="15146" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="621" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>329</line>
+          <line>413</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="12132" />
+              <option value="16285" />
             </startOffsets>
             <endOffsets>
-              <option value="12146" />
+              <option value="16299" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="622" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>333</line>
+          <line>417</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="12242" />
+              <option value="16395" />
             </startOffsets>
             <endOffsets>
-              <option value="12327" />
+              <option value="16480" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="623" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>334</line>
+          <line>418</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="12340" />
+              <option value="16493" />
             </startOffsets>
             <endOffsets>
-              <option value="12382" />
+              <option value="16535" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="624" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>338</line>
+          <line>422</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="12507" />
+              <option value="16660" />
             </startOffsets>
             <endOffsets>
-              <option value="12643" />
+              <option value="16796" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="625" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>359</line>
+          <line>443</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="13124" />
+              <option value="17277" />
             </startOffsets>
             <endOffsets>
-              <option value="13192" />
+              <option value="17345" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="626" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>368</line>
+          <line>452</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="13388" />
+              <option value="17541" />
             </startOffsets>
             <endOffsets>
-              <option value="13455" />
+              <option value="17608" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="627" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>371</line>
+          <line>455</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="13518" />
+              <option value="17671" />
             </startOffsets>
             <endOffsets>
-              <option value="13578" />
+              <option value="17731" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="628" />

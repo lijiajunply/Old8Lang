@@ -157,8 +157,36 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
                 }
                 else if (bestMatch is FuncLangValue funcValue)
                 {
-                    // 找到匹配的重载函数，直接调用
-                    result = funcValue.Run(manager, Ids);
+                    // 如果是泛型函数且未实例化，尝试自动推断类型参数
+                    if (funcValue.IsGeneric && funcValue.TypeArgumentMapping == null)
+                    {
+                        if (manager.Interpreter == null)
+                        {
+                            throw new InvalidOperationError(this, "无法执行泛型类型推断：解释器未初始化");
+                        }
+
+                        var typeAnnotationManager = manager.Interpreter.TypeAnnotationManager;
+                        var inference = new TypeSystem.GenericTypeInference(typeAnnotationManager);
+                        var inferredTypes = inference.InferFunctionTypeArguments(funcValue, Ids, manager, Position);
+
+                        if (inferredTypes != null)
+                        {
+                            // 使用推断出的类型实例化泛型函数
+                            var instantiatedFunc = funcValue.InstantiateGeneric(inferredTypes, typeAnnotationManager);
+                            result = instantiatedFunc.Run(manager, Ids);
+                        }
+                        else
+                        {
+                            // 无法推断类型，抛出错误
+                            throw new InvalidOperationError(this,
+                                $"无法推断泛型函数 '{funcValue.Id?.IdName}' 的类型参数，请使用显式类型参数调用：{funcValue.Id?.IdName}<类型>(...)");
+                        }
+                    }
+                    else
+                    {
+                        // 找到匹配的重载函数，直接调用
+                        result = funcValue.Run(manager, Ids);
+                    }
                 }
                 else
                 {
@@ -189,8 +217,36 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
                 // 如果idResult是FuncLangValue，则调用它
                 else if (idResult is FuncLangValue funcValue)
                 {
-                    // 直接调用函数，参数表达式会在函数体内执行
-                    result = funcValue.Run(manager, Ids);
+                    // 如果是泛型函数且未实例化，尝试自动推断类型参数
+                    if (funcValue.IsGeneric && funcValue.TypeArgumentMapping == null)
+                    {
+                        if (manager.Interpreter == null)
+                        {
+                            throw new InvalidOperationError(this, "无法执行泛型类型推断：解释器未初始化");
+                        }
+
+                        var typeAnnotationManager = manager.Interpreter.TypeAnnotationManager;
+                        var inference = new TypeSystem.GenericTypeInference(typeAnnotationManager);
+                        var inferredTypes = inference.InferFunctionTypeArguments(funcValue, Ids, manager, Position);
+
+                        if (inferredTypes != null)
+                        {
+                            // 使用推断出的类型实例化泛型函数
+                            var instantiatedFunc = funcValue.InstantiateGeneric(inferredTypes, typeAnnotationManager);
+                            result = instantiatedFunc.Run(manager, Ids);
+                        }
+                        else
+                        {
+                            // 无法推断类型，抛出错误
+                            throw new InvalidOperationError(this,
+                                $"无法推断泛型函数 '{funcValue.Id?.IdName}' 的类型参数，请使用显式类型参数调用：{funcValue.Id?.IdName}<类型>(...)");
+                        }
+                    }
+                    else
+                    {
+                        // 直接调用函数，参数表达式会在函数体内执行
+                        result = funcValue.Run(manager, Ids);
+                    }
                 }
                 // 如果idResult是AsyncFuncLangValue，则调用它
                 else if (idResult is AsyncFuncLangValue asyncFuncValue)
@@ -231,8 +287,36 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
             // 如果idResult是FuncLangValue，则调用它
             else if (idResult is FuncLangValue funcValue)
             {
-                // 直接调用函数，参数表达式会在函数体内执行
-                result = funcValue.Run(manager, Ids);
+                // 如果是泛型函数且未实例化，尝试自动推断类型参数
+                if (funcValue.IsGeneric && funcValue.TypeArgumentMapping == null)
+                {
+                    if (manager.Interpreter == null)
+                    {
+                        throw new InvalidOperationError(this, "无法执行泛型类型推断：解释器未初始化");
+                    }
+
+                    var typeAnnotationManager = manager.Interpreter.TypeAnnotationManager;
+                    var inference = new TypeSystem.GenericTypeInference(typeAnnotationManager);
+                    var inferredTypes = inference.InferFunctionTypeArguments(funcValue, Ids, manager, Position);
+
+                    if (inferredTypes != null)
+                    {
+                        // 使用推断出的类型实例化泛型函数
+                        var instantiatedFunc = funcValue.InstantiateGeneric(inferredTypes, typeAnnotationManager);
+                        result = instantiatedFunc.Run(manager, Ids);
+                    }
+                    else
+                    {
+                        // 无法推断类型，抛出错误
+                        throw new InvalidOperationError(this,
+                            $"无法推断泛型函数 '{funcValue.Id?.IdName}' 的类型参数，请使用显式类型参数调用：{funcValue.Id?.IdName}<类型>(...)");
+                    }
+                }
+                else
+                {
+                    // 直接调用函数，参数表达式会在函数体内执行
+                    result = funcValue.Run(manager, Ids);
+                }
             }
             // 如果idResult是AsyncFuncLangValue，则调用它
             else if (idResult is AsyncFuncLangValue asyncFuncValue)

@@ -47,7 +47,36 @@ public partial class FunctionCallExpression : LangExpression
             throw new InvalidOperationError(this, $"表达式 '{FunctionExpression}' 的结果不是函数，无法调用");
         }
 
-        // 3. 调用函数，传入表达式列表而不是值列表
+        // 3. 如果是泛型函数且未实例化，尝试自动推断类型参数
+        if (func.IsGeneric && func.TypeArgumentMapping == null)
+        {
+            // 尝试从参数推断类型
+            if (manager.Interpreter == null)
+            {
+                throw new InvalidOperationError(this, "无法执行泛型类型推断：解释器未初始化");
+            }
+
+            var typeAnnotationManager = manager.Interpreter.TypeAnnotationManager;
+            var inference = new TypeSystem.GenericTypeInference(typeAnnotationManager);
+            var inferredTypes = inference.InferFunctionTypeArguments(func, Arguments, manager, Position);
+
+            if (inferredTypes != null)
+            {
+                // 使用推断出的类型实例化泛型函数
+                var instantiatedFunc = func.InstantiateGeneric(inferredTypes, typeAnnotationManager);
+
+                // 调用实例化后的函数
+                return instantiatedFunc.Run(manager, Arguments);
+            }
+            else
+            {
+                // 无法推断类型，抛出错误
+                throw new InvalidOperationError(this,
+                    $"无法推断泛型函数 '{func.Id?.IdName}' 的类型参数，请使用显式类型参数调用：{func.Id?.IdName}<类型>(...)");
+            }
+        }
+
+        // 4. 调用函数，传入表达式列表而不是值列表
         return func.Run(manager, Arguments);
     }
 

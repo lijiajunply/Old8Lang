@@ -1,0 +1,61 @@
+// 泛型类型推断测试
+// 测试从函数调用参数自动推断泛型类型参数
+
+// 1. 单个类型参数推断
+func identity<T>(value:T) -> T {
+    return value
+}
+
+// 推断 T=int
+result1 <- identity(42)
+PrintLine("identity(42) = " + result1.ToStr())
+
+// 推断 T=string
+result2 <- identity("hello")
+PrintLine("identity(\"hello\") = " + result2)
+
+// 推断 T=double
+result3 <- identity(3.14)
+PrintLine("identity(3.14) = " + result3.ToStr())
+
+// 2. 多个类型参数推断
+func makePair<K, V>(key:K, value:V) -> string {
+    return key.ToStr() + ":" + value.ToStr()
+}
+
+// 推断 K=string, V=int
+pair1 <- makePair("age", 25)
+PrintLine("makePair(\"age\", 25) = " + pair1)
+
+// 推断 K=int, V=string
+pair2 <- makePair(1, "first")
+PrintLine("makePair(1, \"first\") = " + pair2)
+
+// 3. 同一类型参数在多个位置
+func add<T>(a:T, b:T) -> string {
+    return a.ToStr() + "+" + b.ToStr()
+}
+
+// 推断 T=int
+sum <- add(10, 20)
+PrintLine("add(10, 20) = " + sum)
+
+// 4. 从变量推断类型
+x <- 100
+result4 <- identity(x)
+PrintLine("identity(x) where x=100: " + result4.ToStr())
+
+// 5. 嵌套调用
+func wrap<T>(value:T) -> string {
+    return "[" + value.ToStr() + "]"
+}
+
+// 推断内层和外层的类型
+nested <- wrap(identity(42))
+PrintLine("wrap(identity(42)) = " + nested)
+
+// 6. 显式类型参数仍然有效
+explicit <- identity<string>("explicit type")
+PrintLine("identity<string>(\"explicit type\") = " + explicit)
+
+PrintLine("\n所有测试通过！✓")
