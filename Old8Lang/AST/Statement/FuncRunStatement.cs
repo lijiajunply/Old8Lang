@@ -71,6 +71,9 @@ public class FuncRunStatement : OldStatement
         }
 
         Operation.LoadIlValue(ilGenerator, local);
+        // 销毁栈上的值
+        var opOutputType = Operation.OutputType(local);
+        if (opOutputType != typeof(void)) ilGenerator.Emit(OpCodes.Pop);
     }
 
     public override OldStatement this[int index] => this;

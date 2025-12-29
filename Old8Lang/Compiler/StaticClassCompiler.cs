@@ -107,23 +107,37 @@ public static class StaticClassCompiler
             return false;
         }
 
-        // 生成参数加载代码
-        var paramTypes = LoadParameters(instance.Ids, ilGenerator, local);
+        // 加载第一个参数并装箱为 object
+        instance.Ids[0].LoadIlValue(ilGenerator, local);
+        var param1Type = instance.Ids[0].OutputType(local);
+        if (param1Type != null && param1Type.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, param1Type);
+        }
+
+        // 加载第二个参数并装箱为 object
+        instance.Ids[1].LoadIlValue(ilGenerator, local);
+        var param2Type = instance.Ids[1].OutputType(local);
+        if (param2Type != null && param2Type.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, param2Type);
+        }
+
+        // 如果有第三个参数（message），加载它；否则加载null
+        if (instance.Ids.Count == 3)
+        {
+            instance.Ids[2].LoadIlValue(ilGenerator, local);
+        }
+        else
+        {
+            // 对于可选参数，加载null
+            ilGenerator.Emit(OpCodes.Ldnull);
+        }
 
         // 获取AssertEqual方法
-        // 我们需要调用一个辅助方法来执行断言
-        // 由于Assert方法较为复杂（需要比较不同类型），我们生成调用到辅助类的代码
         var assertHelperType = typeof(AssertHelper);
         var assertEqualMethod = assertHelperType.GetMethod("AssertEqual",
-            instance.Ids.Count == 2
-                ? [typeof(object), typeof(object)]
-                : [typeof(object), typeof(object), typeof(string)]);
-
-        if (assertEqualMethod == null)
-        {
-            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
-            assertEqualMethod = assertHelperType.GetMethod("AssertEqual");
-        }
+            [typeof(object), typeof(object), typeof(string)]);
 
         if (assertEqualMethod == null)
         {
@@ -144,19 +158,36 @@ public static class StaticClassCompiler
             return false;
         }
 
-        LoadParameters(instance.Ids, ilGenerator, local);
+        // 加载第一个参数并装箱为 object
+        instance.Ids[0].LoadIlValue(ilGenerator, local);
+        var param1Type = instance.Ids[0].OutputType(local);
+        if (param1Type != null && param1Type.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, param1Type);
+        }
+
+        // 加载第二个参数并装箱为 object
+        instance.Ids[1].LoadIlValue(ilGenerator, local);
+        var param2Type = instance.Ids[1].OutputType(local);
+        if (param2Type != null && param2Type.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, param2Type);
+        }
+
+        // 如果有第三个参数（message），加载它；否则加载null
+        if (instance.Ids.Count == 3)
+        {
+            instance.Ids[2].LoadIlValue(ilGenerator, local);
+        }
+        else
+        {
+            // 对于可选参数，加载null
+            ilGenerator.Emit(OpCodes.Ldnull);
+        }
 
         var assertHelperType = typeof(AssertHelper);
         var method = assertHelperType.GetMethod("AssertNotEqual",
-            instance.Ids.Count == 2
-                ? [typeof(object), typeof(object)]
-                : [typeof(object), typeof(object), typeof(string)]);
-
-        if (method == null)
-        {
-            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
-            method = assertHelperType.GetMethod("AssertNotEqual");
-        }
+            [typeof(object), typeof(object), typeof(string)]);
 
         if (method == null) return false;
 
@@ -177,23 +208,20 @@ public static class StaticClassCompiler
         // 加载第一个参数（bool类型，不装箱）
         instance.Ids[0].LoadIlValue(ilGenerator, local);
 
-        // 如果有第二个参数（message），加载它
+        // 如果有第二个参数（message），加载它；否则加载null
         if (instance.Ids.Count == 2)
         {
             instance.Ids[1].LoadIlValue(ilGenerator, local);
         }
+        else
+        {
+            // 对于可选参数，加载null
+            ilGenerator.Emit(OpCodes.Ldnull);
+        }
 
         var assertHelperType = typeof(AssertHelper);
-        var method = assertHelperType.GetMethod("AssertTrue",
-            instance.Ids.Count == 1
-                ? [typeof(bool)]
-                : [typeof(bool), typeof(string)]);
-
-        if (method == null)
-        {
-            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
-            method = assertHelperType.GetMethod("AssertTrue");
-        }
+        // 始终查找带两个参数的方法签名
+        var method = assertHelperType.GetMethod("AssertTrue", [typeof(bool), typeof(string)]);
 
         if (method == null) return false;
 
@@ -214,23 +242,20 @@ public static class StaticClassCompiler
         // 加载第一个参数（bool类型，不装箱）
         instance.Ids[0].LoadIlValue(ilGenerator, local);
 
-        // 如果有第二个参数（message），加载它
+        // 如果有第二个参数（message），加载它；否则加载null
         if (instance.Ids.Count == 2)
         {
             instance.Ids[1].LoadIlValue(ilGenerator, local);
         }
+        else
+        {
+            // 对于可选参数，加载null
+            ilGenerator.Emit(OpCodes.Ldnull);
+        }
 
         var assertHelperType = typeof(AssertHelper);
-        var method = assertHelperType.GetMethod("AssertFalse",
-            instance.Ids.Count == 1
-                ? [typeof(bool)]
-                : [typeof(bool), typeof(string)]);
-
-        if (method == null)
-        {
-            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
-            method = assertHelperType.GetMethod("AssertFalse");
-        }
+        // 始终查找带两个参数的方法签名
+        var method = assertHelperType.GetMethod("AssertFalse", [typeof(bool), typeof(string)]);
 
         if (method == null) return false;
 
@@ -248,19 +273,28 @@ public static class StaticClassCompiler
             return false;
         }
 
-        LoadParameters(instance.Ids, ilGenerator, local);
+        // 加载第一个参数并装箱为 object
+        instance.Ids[0].LoadIlValue(ilGenerator, local);
+        var paramType = instance.Ids[0].OutputType(local);
+        if (paramType != null && paramType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, paramType);
+        }
+
+        // 如果有第二个参数（message），加载它；否则加载null
+        if (instance.Ids.Count == 2)
+        {
+            instance.Ids[1].LoadIlValue(ilGenerator, local);
+        }
+        else
+        {
+            // 对于可选参数，加载null
+            ilGenerator.Emit(OpCodes.Ldnull);
+        }
 
         var assertHelperType = typeof(AssertHelper);
-        var method = assertHelperType.GetMethod("AssertNull",
-            instance.Ids.Count == 1
-                ? [typeof(object)]
-                : [typeof(object), typeof(string)]);
-
-        if (method == null)
-        {
-            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
-            method = assertHelperType.GetMethod("AssertNull");
-        }
+        // 始终查找带两个参数的方法签名
+        var method = assertHelperType.GetMethod("AssertNull", [typeof(object), typeof(string)]);
 
         if (method == null) return false;
 
@@ -278,19 +312,28 @@ public static class StaticClassCompiler
             return false;
         }
 
-        LoadParameters(instance.Ids, ilGenerator, local);
+        // 加载第一个参数并装箱为 object
+        instance.Ids[0].LoadIlValue(ilGenerator, local);
+        var paramType = instance.Ids[0].OutputType(local);
+        if (paramType != null && paramType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, paramType);
+        }
+
+        // 如果有第二个参数（message），加载它；否则加载null
+        if (instance.Ids.Count == 2)
+        {
+            instance.Ids[1].LoadIlValue(ilGenerator, local);
+        }
+        else
+        {
+            // 对于可选参数，加载null
+            ilGenerator.Emit(OpCodes.Ldnull);
+        }
 
         var assertHelperType = typeof(AssertHelper);
-        var method = assertHelperType.GetMethod("AssertNotNull",
-            instance.Ids.Count == 1
-                ? [typeof(object)]
-                : [typeof(object), typeof(string)]);
-
-        if (method == null)
-        {
-            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
-            method = assertHelperType.GetMethod("AssertNotNull");
-        }
+        // 始终查找带两个参数的方法签名
+        var method = assertHelperType.GetMethod("AssertNotNull", [typeof(object), typeof(string)]);
 
         if (method == null) return false;
 
@@ -308,19 +351,36 @@ public static class StaticClassCompiler
             return false;
         }
 
-        LoadParameters(instance.Ids, ilGenerator, local);
+        // 加载第一个参数并装箱为 object
+        instance.Ids[0].LoadIlValue(ilGenerator, local);
+        var param1Type = instance.Ids[0].OutputType(local);
+        if (param1Type != null && param1Type.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, param1Type);
+        }
+
+        // 加载第二个参数并装箱为 object
+        instance.Ids[1].LoadIlValue(ilGenerator, local);
+        var param2Type = instance.Ids[1].OutputType(local);
+        if (param2Type != null && param2Type.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, param2Type);
+        }
+
+        // 如果有第三个参数（message），加载它；否则加载null
+        if (instance.Ids.Count == 3)
+        {
+            instance.Ids[2].LoadIlValue(ilGenerator, local);
+        }
+        else
+        {
+            // 对于可选参数，加载null
+            ilGenerator.Emit(OpCodes.Ldnull);
+        }
 
         var assertHelperType = typeof(AssertHelper);
         var method = assertHelperType.GetMethod("AssertGreater",
-            instance.Ids.Count == 2
-                ? [typeof(object), typeof(object)]
-                : [typeof(object), typeof(object), typeof(string)]);
-
-        if (method == null)
-        {
-            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
-            method = assertHelperType.GetMethod("AssertGreater");
-        }
+            [typeof(object), typeof(object), typeof(string)]);
 
         if (method == null) return false;
 
@@ -338,19 +398,36 @@ public static class StaticClassCompiler
             return false;
         }
 
-        LoadParameters(instance.Ids, ilGenerator, local);
+        // 加载第一个参数并装箱为 object
+        instance.Ids[0].LoadIlValue(ilGenerator, local);
+        var param1Type = instance.Ids[0].OutputType(local);
+        if (param1Type != null && param1Type.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, param1Type);
+        }
+
+        // 加载第二个参数并装箱为 object
+        instance.Ids[1].LoadIlValue(ilGenerator, local);
+        var param2Type = instance.Ids[1].OutputType(local);
+        if (param2Type != null && param2Type.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, param2Type);
+        }
+
+        // 如果有第三个参数（message），加载它；否则加载null
+        if (instance.Ids.Count == 3)
+        {
+            instance.Ids[2].LoadIlValue(ilGenerator, local);
+        }
+        else
+        {
+            // 对于可选参数，加载null
+            ilGenerator.Emit(OpCodes.Ldnull);
+        }
 
         var assertHelperType = typeof(AssertHelper);
         var method = assertHelperType.GetMethod("AssertGreaterOrEqual",
-            instance.Ids.Count == 2
-                ? [typeof(object), typeof(object)]
-                : [typeof(object), typeof(object), typeof(string)]);
-
-        if (method == null)
-        {
-            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
-            method = assertHelperType.GetMethod("AssertGreaterOrEqual");
-        }
+            [typeof(object), typeof(object), typeof(string)]);
 
         if (method == null) return false;
 
@@ -368,19 +445,36 @@ public static class StaticClassCompiler
             return false;
         }
 
-        LoadParameters(instance.Ids, ilGenerator, local);
+        // 加载第一个参数并装箱为 object
+        instance.Ids[0].LoadIlValue(ilGenerator, local);
+        var param1Type = instance.Ids[0].OutputType(local);
+        if (param1Type != null && param1Type.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, param1Type);
+        }
+
+        // 加载第二个参数并装箱为 object
+        instance.Ids[1].LoadIlValue(ilGenerator, local);
+        var param2Type = instance.Ids[1].OutputType(local);
+        if (param2Type != null && param2Type.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, param2Type);
+        }
+
+        // 如果有第三个参数（message），加载它；否则加载null
+        if (instance.Ids.Count == 3)
+        {
+            instance.Ids[2].LoadIlValue(ilGenerator, local);
+        }
+        else
+        {
+            // 对于可选参数，加载null
+            ilGenerator.Emit(OpCodes.Ldnull);
+        }
 
         var assertHelperType = typeof(AssertHelper);
         var method = assertHelperType.GetMethod("AssertLess",
-            instance.Ids.Count == 2
-                ? [typeof(object), typeof(object)]
-                : [typeof(object), typeof(object), typeof(string)]);
-
-        if (method == null)
-        {
-            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
-            method = assertHelperType.GetMethod("AssertLess");
-        }
+            [typeof(object), typeof(object), typeof(string)]);
 
         if (method == null) return false;
 
@@ -398,19 +492,36 @@ public static class StaticClassCompiler
             return false;
         }
 
-        LoadParameters(instance.Ids, ilGenerator, local);
+        // 加载第一个参数并装箱为 object
+        instance.Ids[0].LoadIlValue(ilGenerator, local);
+        var param1Type = instance.Ids[0].OutputType(local);
+        if (param1Type != null && param1Type.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, param1Type);
+        }
+
+        // 加载第二个参数并装箱为 object
+        instance.Ids[1].LoadIlValue(ilGenerator, local);
+        var param2Type = instance.Ids[1].OutputType(local);
+        if (param2Type != null && param2Type.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, param2Type);
+        }
+
+        // 如果有第三个参数（message），加载它；否则加载null
+        if (instance.Ids.Count == 3)
+        {
+            instance.Ids[2].LoadIlValue(ilGenerator, local);
+        }
+        else
+        {
+            // 对于可选参数，加载null
+            ilGenerator.Emit(OpCodes.Ldnull);
+        }
 
         var assertHelperType = typeof(AssertHelper);
         var method = assertHelperType.GetMethod("AssertLessOrEqual",
-            instance.Ids.Count == 2
-                ? [typeof(object), typeof(object)]
-                : [typeof(object), typeof(object), typeof(string)]);
-
-        if (method == null)
-        {
-            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
-            method = assertHelperType.GetMethod("AssertLessOrEqual");
-        }
+            [typeof(object), typeof(object), typeof(string)]);
 
         if (method == null) return false;
 
@@ -432,23 +543,20 @@ public static class StaticClassCompiler
         instance.Ids[0].LoadIlValue(ilGenerator, local);
         instance.Ids[1].LoadIlValue(ilGenerator, local);
 
-        // 如果有第三个参数（message），加载它
+        // 如果有第三个参数（message），加载它；否则加载null
         if (instance.Ids.Count == 3)
         {
             instance.Ids[2].LoadIlValue(ilGenerator, local);
         }
+        else
+        {
+            // 对于可选参数，加载null
+            ilGenerator.Emit(OpCodes.Ldnull);
+        }
 
         var assertHelperType = typeof(AssertHelper);
         var method = assertHelperType.GetMethod("AssertContains",
-            instance.Ids.Count == 2
-                ? [typeof(string), typeof(string)]
-                : [typeof(string), typeof(string), typeof(string)]);
-
-        if (method == null)
-        {
-            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
-            method = assertHelperType.GetMethod("AssertContains");
-        }
+            [typeof(string), typeof(string), typeof(string)]);
 
         if (method == null) return false;
 
@@ -470,23 +578,20 @@ public static class StaticClassCompiler
         instance.Ids[0].LoadIlValue(ilGenerator, local);
         instance.Ids[1].LoadIlValue(ilGenerator, local);
 
-        // 如果有第三个参数（message），加载它
+        // 如果有第三个参数（message），加载它；否则加载null
         if (instance.Ids.Count == 3)
         {
             instance.Ids[2].LoadIlValue(ilGenerator, local);
         }
+        else
+        {
+            // 对于可选参数，加载null
+            ilGenerator.Emit(OpCodes.Ldnull);
+        }
 
         var assertHelperType = typeof(AssertHelper);
         var method = assertHelperType.GetMethod("AssertNotContains",
-            instance.Ids.Count == 2
-                ? [typeof(string), typeof(string)]
-                : [typeof(string), typeof(string), typeof(string)]);
-
-        if (method == null)
-        {
-            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
-            method = assertHelperType.GetMethod("AssertNotContains");
-        }
+            [typeof(string), typeof(string), typeof(string)]);
 
         if (method == null) return false;
 
@@ -508,23 +613,20 @@ public static class StaticClassCompiler
         instance.Ids[0].LoadIlValue(ilGenerator, local);
         instance.Ids[1].LoadIlValue(ilGenerator, local);
 
-        // 如果有第三个参数（message），加载它
+        // 如果有第三个参数（message），加载它；否则加载null
         if (instance.Ids.Count == 3)
         {
             instance.Ids[2].LoadIlValue(ilGenerator, local);
         }
+        else
+        {
+            // 对于可选参数，加载null
+            ilGenerator.Emit(OpCodes.Ldnull);
+        }
 
         var assertHelperType = typeof(AssertHelper);
         var method = assertHelperType.GetMethod("AssertStartsWith",
-            instance.Ids.Count == 2
-                ? [typeof(string), typeof(string)]
-                : [typeof(string), typeof(string), typeof(string)]);
-
-        if (method == null)
-        {
-            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
-            method = assertHelperType.GetMethod("AssertStartsWith");
-        }
+            [typeof(string), typeof(string), typeof(string)]);
 
         if (method == null) return false;
 
@@ -546,23 +648,20 @@ public static class StaticClassCompiler
         instance.Ids[0].LoadIlValue(ilGenerator, local);
         instance.Ids[1].LoadIlValue(ilGenerator, local);
 
-        // 如果有第三个参数（message），加载它
+        // 如果有第三个参数（message），加载它；否则加载null
         if (instance.Ids.Count == 3)
         {
             instance.Ids[2].LoadIlValue(ilGenerator, local);
         }
+        else
+        {
+            // 对于可选参数，加载null
+            ilGenerator.Emit(OpCodes.Ldnull);
+        }
 
         var assertHelperType = typeof(AssertHelper);
         var method = assertHelperType.GetMethod("AssertEndsWith",
-            instance.Ids.Count == 2
-                ? [typeof(string), typeof(string)]
-                : [typeof(string), typeof(string), typeof(string)]);
-
-        if (method == null)
-        {
-            // Fallback: C# GetMethod 无法匹配带可选参数的方法，使用不带类型参数的重载
-            method = assertHelperType.GetMethod("AssertEndsWith");
-        }
+            [typeof(string), typeof(string), typeof(string)]);
 
         if (method == null) return false;
 

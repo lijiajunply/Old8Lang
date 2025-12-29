@@ -713,6 +713,12 @@ public partial class Operation(
                 return typeof(string);
             }
 
+            // 特殊处理Assert静态方法调用，返回void类型
+            if (Left is LangId { IdName: "Assert" })
+            {
+                return typeof(void);
+            }
+
             // 对于其他方法调用，尝试查找方法并返回其返回类型
             if (leftType != null)
             {
@@ -1485,6 +1491,10 @@ public partial class Operation(
                             }
 
                             ilGenerator.Emit(OpCodes.Call, assertMethod);
+
+                            // 处理 void 返回类型
+                            // void 方法不会在栈上留下任何值，直接返回 void 类型
+                            // IL 验证器会正确处理这种情况
                             return assertMethod.ReturnType;
                         }
 
