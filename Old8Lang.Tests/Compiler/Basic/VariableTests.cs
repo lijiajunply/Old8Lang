@@ -274,8 +274,8 @@ public class VariableTests
     {
         // Arrange
         var code = @"
-            arr:int[] <- [1, 2, 3]
-            list:int{} <- {1, 2, 3}
+            arr:array <- [1, 2, 3]
+            list:list <- {1, 2, 3}
             dict:dict <- {""a"": 1, ""b"": 2}
         ";
         var interpreter = new LangInterpreter();

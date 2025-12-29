@@ -37,7 +37,14 @@ public abstract class LangExpression : IOldLangTree
         if (local.LocalVarTypes.TryGetValue(idName, out var existingType))
         {
             // 验证新值的类型与现有类型注解匹配
-            local.ValidateType(existingType, valueType, Position);
+            if (local.ValidateType(existingType, valueType, Position))
+            {
+                // 如果类型兼容但不完全相同（非严格模式），更新类型记录
+                if (existingType != valueType && !local.StrictTypeChecking)
+                {
+                    local.LocalVarTypes[idName] = valueType;
+                }
+            }
         }
         else
         {

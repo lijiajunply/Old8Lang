@@ -112,7 +112,7 @@ public class PerformanceTests
     {
         // Arrange
         var code = @"
-            func calculate(x:int, y:int):int {
+            func calculate(x:int, y:int) -> int {
                 return x * y + x - y
             }
             
@@ -224,7 +224,7 @@ public class PerformanceTests
     {
         // Arrange
         var code = @"
-            func factorial(n:int):int {
+            func factorial(n:int) -> int {
                 if n <= 1 {
                     return 1
                 }
@@ -398,7 +398,7 @@ public class PerformanceTests
                 }
             }
             
-            func calculateSum(arr):int {
+            func calculateSum(arr) -> int {
                 sum <- 0
                 for item in arr {
                     sum <- sum + item

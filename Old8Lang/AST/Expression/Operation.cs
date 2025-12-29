@@ -1408,6 +1408,90 @@ public partial class Operation(
                             $"静态类 '{leftId.IdName}' 不支持方法 '{methodName}'。请检查方法名是否正确。");
                     }
 
+                    // 特殊处理Assert静态方法调用
+                    if (Left is LangId { IdName: "Assert" })
+                    {
+                        // Assert静态方法调用，如Assert.True(condition)
+                        var methodName = instance.Id.IdName;
+
+                        // 映射方法名：支持 "True" 和 "AssertTrue" 两种形式
+                        var actualMethodName = methodName switch
+                        {
+                            "True" => "AssertTrue",
+                            "False" => "AssertFalse",
+                            "Equal" => "AssertEqual",
+                            "NotEqual" => "AssertNotEqual",
+                            "Null" => "AssertNull",
+                            "NotNull" => "AssertNotNull",
+                            "Greater" => "AssertGreater",
+                            "GreaterOrEqual" => "AssertGreaterOrEqual",
+                            "Less" => "AssertLess",
+                            "LessOrEqual" => "AssertLessOrEqual",
+                            "Contains" => "AssertContains",
+                            "NotContains" => "AssertNotContains",
+                            "StartsWith" => "AssertStartsWith",
+                            "EndsWith" => "AssertEndsWith",
+                            _ => methodName // 如果已经是 AssertXxx 形式，直接使用
+                        };
+
+                        // 收集参数类型
+                        var paramTypes = instance.Ids.Select(id => id.OutputType(local) ?? typeof(object)).ToList();
+
+                        // 从 AssertHelper 类中查找匹配的方法
+                        var assertMethod = typeof(AssertHelper).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                            .Where(m => m.Name == actualMethodName)
+                            .FirstOrDefault(m =>
+                            {
+                                var parameters = m.GetParameters();
+                                // 跳过可选参数
+                                var requiredParamCount = parameters.Count(p => !p.IsOptional);
+                                if (paramTypes.Count < requiredParamCount || paramTypes.Count > parameters.Length)
+                                    return false;
+
+                                // 检查参数类型是否兼容
+                                for (int i = 0; i < paramTypes.Count; i++)
+                                {
+                                    var expectedType = parameters[i].ParameterType;
+                                    var actualType = paramTypes[i];
+
+                                    // 如果期望的是 object 类型,任何类型都可以
+                                    if (expectedType == typeof(object))
+                                        continue;
+
+                                    // 如果类型完全匹配或者可以赋值
+                                    if (expectedType.IsAssignableFrom(actualType))
+                                        continue;
+
+                                    return false;
+                                }
+                                return true;
+                            });
+
+                        if (assertMethod != null)
+                        {
+                            // 加载参数,根据方法签名决定是否装箱
+                            var parameters = assertMethod.GetParameters();
+                            for (int i = 0; i < instance.Ids.Count; i++)
+                            {
+                                instance.Ids[i].LoadIlValue(ilGenerator, local);
+                                var idType = instance.Ids[i].OutputType(local);
+                                var paramType = parameters[i].ParameterType;
+
+                                // 如果参数类型是 object,且值是值类型,需要装箱
+                                if (paramType == typeof(object) && idType != null && idType.IsValueType)
+                                {
+                                    ilGenerator.Emit(OpCodes.Box, idType);
+                                }
+                            }
+
+                            ilGenerator.Emit(OpCodes.Call, assertMethod);
+                            return assertMethod.ReturnType;
+                        }
+
+                        throw new InvalidOperationError(this, $"Assert方法 '{methodName}' 未找到",
+                            $"无法在 AssertHelper 类中找到方法 '{actualMethodName}'，参数类型: {string.Join(", ", paramTypes.Select(t => t.Name))}");
+                    }
+
                     // 特殊处理Task静态方法调用
                     if (Left is LangId { IdName: "Task" })
                     {

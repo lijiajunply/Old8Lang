@@ -98,6 +98,15 @@ public class LocalManager
     public bool IsInFinallyBlock { get; set; }
 
     /// <summary>
+    /// 是否启用严格类型检查
+    /// </summary>
+    /// <remarks>
+    /// 当设置为 false (默认值) 时，编译器允许变量类型改变（动态类型行为）。
+    /// 当设置为 true 时，编译器强制要求变量类型在整个生命周期内保持不变（静态类型行为）。
+    /// </remarks>
+    public bool StrictTypeChecking { get; set; } = false;
+
+    /// <summary>
     /// 记录调试信息
     /// </summary>
     /// <param name="message">调试信息内容</param>
@@ -165,6 +174,12 @@ public class LocalManager
         // 类型完全匹配
         if (expected == actual)
             return true;
+
+        // 如果不是严格类型检查模式，允许任何类型改变（动态类型行为）
+        if (!StrictTypeChecking)
+            return true;
+
+        // 严格模式下进行详细的类型兼容性检查
 
         // 可赋值类型检查
         if (expected.IsAssignableFrom(actual))

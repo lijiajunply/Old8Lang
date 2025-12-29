@@ -127,7 +127,7 @@ public class TypeSystemTests
     {
         // Arrange
         var code = @"
-            func add(a:int, b:int):int {
+            func add(a:int, b:int) -> int {
                 return a + b
             }
             
@@ -150,7 +150,7 @@ public class TypeSystemTests
     {
         // Arrange
         var code = @"
-            func createMessage(name:string, age:int):string {
+            func createMessage(name:string, age:int) -> string {
                 return ""Name: "" + name + "", Age: "" + age.ToStr()
             }
             
@@ -173,7 +173,7 @@ public class TypeSystemTests
     {
         // Arrange
         var code = @"
-            func calculateArea(radius:double):double {
+            func calculateArea(radius:double) -> double {
                 return 3.14159 * radius * radius
             }
             
@@ -196,7 +196,7 @@ public class TypeSystemTests
     {
         // Arrange
         var code = @"
-            func isEven(number:int):bool {
+            func isEven(number:int) -> bool {
                 return number % 2 == 0
             }
             
@@ -409,8 +409,8 @@ public class TypeSystemTests
     {
         // Arrange
         var code = @"
-            matrix:int[][] <- [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-            firstRow:int[] <- matrix[0]
+            matrix:array <- [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+            firstRow:array <- matrix[0]
             firstElement:int <- firstRow[0]
         ";
         var interpreter = new LangInterpreter();
@@ -521,7 +521,7 @@ public class TypeSystemTests
     {
         // Arrange
         var code = @"
-            func add(a:int, b:int):int {
+            func add(a:int, b:int) -> int {
                 return a + b
             }
             
@@ -543,7 +543,7 @@ public class TypeSystemTests
     {
         // Arrange
         var code = @"
-            func getNumber():int {
+            func getNumber() -> int {
                 return ""hello""  // 返回类型错误
             }
             
