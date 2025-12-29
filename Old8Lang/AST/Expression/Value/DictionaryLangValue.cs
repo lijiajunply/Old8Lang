@@ -353,4 +353,23 @@ public partial class DictionaryLangValue : LangValueType, ILangList
 
         ilGenerator.Emit(OpCodes.Ldloc, l.LocalIndex);
     }
+
+    /// <summary>
+    /// 获取值的实际.NET对象
+    /// </summary>
+    /// <returns>Dictionary&lt;object, object&gt; 对象</returns>
+    public override object GetValue()
+    {
+        var result = new Dictionary<object, object>();
+
+        // 使用 Value 字段（已运行的键值对）
+        foreach (var (key, value) in Value)
+        {
+            var objKey = LangValueType.ValueToObj(key) ?? new object();
+            var objValue = LangValueType.ValueToObj(value) ?? new object();
+            result[objKey] = objValue;
+        }
+
+        return result;
+    }
 }

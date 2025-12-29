@@ -50,7 +50,16 @@ public partial class TupleLangValue(LangExpression v1, LangExpression v2, Source
     /// <returns>返回 "Tuple" 作为类型标识</returns>
     public override string TypeToString() => "Tuple";
 
-    public override object GetValue() => (Value.Item1.GetValue(), Value.Item2.GetValue());
+    /// <summary>
+    /// 获取值的实际.NET对象
+    /// </summary>
+    /// <returns>Tuple&lt;object, object&gt; 对象</returns>
+    public override object GetValue()
+    {
+        var item1 = LangValueType.ValueToObj(Value.Item1);
+        var item2 = LangValueType.ValueToObj(Value.Item2);
+        return new Tuple<object, object>(item1 ?? new object(), item2 ?? new object());
+    }
 
     // 支持多元元组的构造函数
     public TupleLangValue(List<LangExpression> elements, SourcePosition position = default) : this(elements[0],

@@ -382,7 +382,8 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
             object[] a => new ArrayLangValue(a.ToList()),
             Dictionary<object, object> a => HandleDictionaryConversion(a, position),
             Tuple<object, object> a => new TupleLangValue(ObjToValue(a.Item1, position), ObjToValue(a.Item2, position)),
-            ValueTuple<object, object> a => new TupleLangValue(ObjToValue(a.Item1, position), ObjToValue(a.Item2, position)),
+            ValueTuple<object, object> a => new TupleLangValue(ObjToValue(a.Item1, position),
+                ObjToValue(a.Item2, position)),
             _ => TryCustomConversionEnhanced(value, position)
         };
     }
@@ -396,7 +397,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
         {
             return IntLangValue.Create((int)value);
         }
-        
+
         // 如果超出 int 范围，转换为字符串
         return StringLangValue.Create(value.ToString());
     }
@@ -410,7 +411,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
         {
             var taskType = task.GetType();
             var resultProperty = taskType.GetProperty("Result");
-            
+
             if (resultProperty != null)
             {
                 var taskResult = resultProperty.GetValue(task);
@@ -450,7 +451,8 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 处理集合类型转换
     /// </summary>
-    private static LangValueType HandleCollectionConversionEnhanced(object collection, Type elementType, SourcePosition position)
+    private static LangValueType HandleCollectionConversionEnhanced(object collection, Type elementType,
+        SourcePosition position)
     {
         try
         {
@@ -471,12 +473,13 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// <summary>
     /// 处理字典类型转换
     /// </summary>
-    private static LangValueType HandleDictionaryConversionEnhanced(object dictionary, Type keyType, Type valueTypeArg, SourcePosition position)
+    private static LangValueType HandleDictionaryConversionEnhanced(object dictionary, Type keyType, Type valueTypeArg,
+        SourcePosition position)
     {
         try
         {
             var pairs = new List<KeyValuePair<LangExpression, LangExpression>>();
-            
+
             foreach (var item in (System.Collections.IDictionary)dictionary)
             {
                 var entry = (System.Collections.DictionaryEntry)item;
@@ -514,7 +517,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
         try
         {
             var tupleType = tuple.GetType();
-            
+
             // 处理 ValueTuple
             if (tupleType.FullName?.StartsWith("System.ValueTuple") == true)
             {
@@ -526,7 +529,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
                     return new TupleLangValue(ObjToValue(item1, position), ObjToValue(item2, position));
                 }
             }
-            
+
             // 处理 Tuple
             if (tupleType.FullName?.StartsWith("System.Tuple") == true)
             {
@@ -549,18 +552,29 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
 
     /// <summary>
     /// 尝试自定义类型转换
+    /// 对于 C# 自定义类和未识别的类型，使用 NativeObjectLangValue 包装
     /// </summary>
     private static LangValueType TryCustomConversionEnhanced(object value, SourcePosition position)
     {
         try
         {
-            // 尝试调用 ToString() 方法
-            var stringValue = value.ToString();
-            return StringLangValue.Create(stringValue ?? "null");
+            var valueType = value.GetType();
+
+            // 跳过 .NET 基础类型和常见系统类型
+            if (valueType.Namespace?.StartsWith("System") == true &&
+                !valueType.IsClass || valueType.IsPrimitive)
+            {
+                // 对于系统类型，尝试转换为字符串
+                return StringLangValue.Create(value.ToString() ?? "null");
+            }
+
+            // 对于自定义类型，使用 NativeObjectLangValue 包装
+            // 这保留了类型信息，允许访问成员和调用方法
+            return new Intermediates.NativeObjectLangValue(value, position);
         }
         catch (Exception ex)
         {
-            // 最后的备选方案
+            // 最后的备选方案：转换为字符串
             return StringLangValue.Create($"[{value.GetType().Name} 转换失败: {ex.Message}]");
         }
     }
@@ -595,7 +609,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     private static bool IsGenericCollectionTypeEnhanced(Type type, out Type elementType)
     {
         elementType = null!;
-        
+
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
         {
             elementType = type.GetGenericArguments()[0];
@@ -643,7 +657,191 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
     /// </summary>
     private static bool IsTupleTypeEnhanced(Type type)
     {
-        return type.FullName?.StartsWith("System.Tuple") == true || 
+        return type.FullName?.StartsWith("System.Tuple") == true ||
                type.FullName?.StartsWith("System.ValueTuple") == true;
     }
+
+    #region ValueToObj - Old8Lang 值到 .NET 对象的统一转换
+
+    /// <summary>
+    /// 将 Old8Lang 值类型转换为 .NET 对象（统一转换方法）
+    /// </summary>
+    /// <param name="value">要转换的 Old8Lang 值</param>
+    /// <returns>对应的 .NET 对象</returns>
+    /// <remarks>
+    /// 这是 ObjToValue 的镜像方法，确保双向转换的对称性。
+    /// 支持的转换类型包括：
+    /// - IntLangValue → int
+    /// - DoubleLangValue → double
+    /// - StringLangValue → string
+    /// - CharLangValue → char
+    /// - BoolLangValue → bool
+    /// - NullLangValue → null
+    /// - ListLangValue → List&lt;object&gt;
+    /// - ArrayLangValue → object[]
+    /// - DictionaryLangValue → Dictionary&lt;object, object&gt;
+    /// - TupleLangValue → Tuple&lt;object, object&gt;
+    /// - VoidLangValue → null
+    /// - FuncLangValue → Delegate (保留引用)
+    /// - Instance → 保留实例引用
+    /// - 其他类型 → 调用 GetValue() 或返回字符串表示
+    /// </remarks>
+    public static object? ValueToObj(LangValueType? value)
+    {
+        if (value == null)
+        {
+            return null;
+        }
+
+        return value switch
+        {
+            // 基本类型
+            NullLangValue => null,
+            VoidLangValue => null,
+            IntLangValue intVal => intVal.Value,
+            DoubleLangValue doubleVal => doubleVal.Value,
+            StringLangValue strVal => strVal.Value,
+            CharLangValue charVal => charVal.Value,
+            BoolLangValue boolVal => boolVal.Value,
+
+            // 集合类型
+            ListLangValue listVal => ValueToObjList(listVal),
+            ArrayLangValue arrayVal => ValueToObjArray(arrayVal),
+            DictionaryLangValue dictVal => ValueToObjDictionary(dictVal),
+            TupleLangValue tupleVal => ValueToObjTuple(tupleVal),
+
+            // 函数和实例类型（保留引用）
+            FuncLangValue funcVal => funcVal,
+            AsyncFuncLangValue asyncFuncVal => asyncFuncVal,
+            Instance instance => instance,
+
+            // 任意类型（自定义类实例）
+            AnyLangValue anyVal => anyVal,
+
+            // Native 类型包装
+            NativeObjectLangValue nativeObj => nativeObj.NativeObject,
+            NativeAnyLangValue nativeAny => nativeAny,
+            NativeStaticAny nativeStatic => nativeStatic,
+
+            // 类型值
+            TypeLangValue typeVal => typeVal,
+
+            // 异步类型
+            TaskLangValue taskVal => taskVal,
+            ThreadLangValue threadVal => threadVal,
+            CancellationTokenLangValue tokenVal => tokenVal,
+
+            // 其他类型，尝试使用 GetValue() 或返回自身
+            _ => ValueToObjFallback(value)
+        };
+    }
+
+    /// <summary>
+    /// 将 ListLangValue 转换为 List&lt;object&gt;
+    /// </summary>
+    private static List<object> ValueToObjList(ListLangValue listVal)
+    {
+        var result = new List<object>();
+
+        // 优先使用 Values 字段（已运行的结果）
+        if (listVal.Values is { Count: > 0 })
+        {
+            foreach (var item in listVal.Values)
+            {
+                result.Add(ValueToObj(item) ?? new object());
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 将 ArrayLangValue 转换为 object[]
+    /// </summary>
+    private static object[] ValueToObjArray(ArrayLangValue arrayVal)
+    {
+        var runResult = arrayVal.RunResult;
+        if (runResult == null || runResult.Length == 0)
+        {
+            return [];
+        }
+
+        var result = new object[runResult.Length];
+        for (int i = 0; i < runResult.Length; i++)
+        {
+            result[i] = ValueToObj(runResult[i]) ?? new object();
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 将 DictionaryLangValue 转换为 Dictionary&lt;object, object&gt;
+    /// </summary>
+    private static Dictionary<object, object> ValueToObjDictionary(DictionaryLangValue dictVal)
+    {
+        var result = new Dictionary<object, object>();
+
+        // 使用 Value 字段（已运行的键值对）
+        foreach (var (key, value) in dictVal.Value)
+        {
+            var objKey = ValueToObj(key) ?? new object();
+            var objValue = ValueToObj(value) ?? new object();
+            result[objKey] = objValue;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 将 TupleLangValue 转换为 Tuple&lt;object, object&gt;
+    /// </summary>
+    private static Tuple<object, object> ValueToObjTuple(TupleLangValue tupleVal)
+    {
+        var (key, value) = tupleVal.Value;
+
+        // 检查 Value 是否已初始化（Run() 是否已被调用）
+        // 如果 Value.Item1 或 Item2 为 null，尝试从 V1, V2 字段获取值
+        if (key == null && tupleVal.V1 is LangValueType v1)
+        {
+            key = v1;
+        }
+
+        if (value == null && tupleVal.V2 is LangValueType v2)
+        {
+            value = v2;
+        }
+
+        var objKey = ValueToObj(key) ?? new object();
+        var objValue = ValueToObj(value) ?? new object();
+
+        return new Tuple<object, object>(objKey, objValue);
+    }
+
+    /// <summary>
+    /// 回退转换方法，用于处理无法直接转换的类型
+    /// </summary>
+    private static object ValueToObjFallback(LangValueType value)
+    {
+        try
+        {
+            // 尝试调用 GetValue() 方法
+            var result = value.GetValue();
+
+            // 如果返回的是默认的空 object，尝试返回字符串表示
+            if (result.GetType() == typeof(object) && result.Equals(new object()))
+            {
+                return value.ToDisplayString();
+            }
+
+            return result;
+        }
+        catch
+        {
+            // 如果失败，返回字符串表示
+            return value.ToDisplayString();
+        }
+    }
+
+    #endregion
 }
