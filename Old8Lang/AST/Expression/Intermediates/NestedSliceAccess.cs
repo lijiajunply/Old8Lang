@@ -9,28 +9,28 @@ namespace Old8Lang.AST.Expression.Intermediates;
 /// <summary>
 /// 嵌套切片访问表达式，用于处理 matrix[index][start:end] 或 matrix[index][start:end:step] 的情况
 /// </summary>
-/// <param name="baseIndex">基础索引访问，如 matrix[index]</param>
+/// <param name="baseExpression">基础表达式，可以是任何返回集合的表达式</param>
 /// <param name="sliceStart">切片起始索引</param>
 /// <param name="sliceEnd">切片结束索引（可选）</param>
 /// <param name="sliceStep">切片步长（可选）</param>
 /// <param name="position">源代码位置</param>
 public partial class NestedSliceAccess(
-    LangListItem baseIndex,
+    LangExpression baseExpression,
     LangExpression sliceStart,
     LangExpression? sliceEnd = null,
     LangExpression? sliceStep = null,
     SourcePosition position = default)
     : LangValueType(position)
 {
-    public readonly LangListItem BaseIndex = baseIndex;
+    public readonly LangExpression BaseExpression = baseExpression;
     public readonly LangExpression SliceStart = sliceStart;
     public readonly LangExpression? SliceEnd = sliceEnd;
     public readonly LangExpression? SliceStep = sliceStep;
 
     public override LangValueType Run(VariateManager manager)
     {
-        // 首先运行基础索引访问，获取结果
-        var baseResult = BaseIndex.Run(manager);
+        // 首先运行基础表达式，获取结果
+        var baseResult = BaseExpression.Run(manager);
 
         // 将切片参数转换为值
         var startValue = SliceStart.Run(manager);
@@ -55,13 +55,13 @@ public partial class NestedSliceAccess(
         var sliceStr = SliceEnd != null
             ? (SliceStep != null ? $"{SliceStart}:{SliceEnd}:{SliceStep}" : $"{SliceStart}:{SliceEnd}")
             : (SliceStep != null ? $"{SliceStart}::{SliceStep}" : $"{SliceStart}:");
-        return $"{BaseIndex}[{sliceStr}]";
+        return $"{BaseExpression}[{sliceStr}]";
     }
 
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        // 首先加载基础索引访问的结果
-        BaseIndex.LoadIlValue(ilGenerator, local);
+        // 首先加载基础表达式的结果
+        BaseExpression.LoadIlValue(ilGenerator, local);
 
         // 加载切片参数
         SliceStart.LoadIlValue(ilGenerator, local);
@@ -70,7 +70,7 @@ public partial class NestedSliceAccess(
 
         // 这里需要根据基础结果的类型调用相应的切片方法
         // 具体实现取决于各种类型的 GetSlice 方法签名
-        var baseType = BaseIndex.OutputType(local);
+        var baseType = BaseExpression.OutputType(local);
 
         // 调用适当的切片方法
         // 注意：这里需要根据实际的 IL 实现进行调整
@@ -79,7 +79,7 @@ public partial class NestedSliceAccess(
 
     public override Type OutputType(LocalManager local)
     {
-        var baseType = BaseIndex.OutputType(local);
+        var baseType = BaseExpression.OutputType(local);
 
         // 切片操作通常返回与基础类型相同的类型
         return baseType;

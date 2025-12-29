@@ -1,0 +1,31 @@
+// 嵌套切片访问功能测试
+
+PrintLine("=== 嵌套切片访问测试 ===")
+
+// 测试1: 多维数组切片
+matrix <- [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+PrintLine("原始矩阵: " + matrix)
+
+// 测试索引后切片
+row <- matrix[0]
+PrintLine("matrix[0]: " + row)
+sliced <- matrix[0][1:3]
+PrintLine("matrix[0][1:3]: " + sliced)
+
+// 测试中间行
+middle <- matrix[1][0:2]
+PrintLine("matrix[1][0:2]: " + middle)
+
+// 测试最后一行
+last <- matrix[2][1:3]
+PrintLine("matrix[2][1:3]: " + last)
+
+// 测试2: 嵌套列表切片
+nestedList <- {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}}
+PrintLine("\n=== 嵌套列表切片 ===")
+PrintLine("原始嵌套列表: " + nestedList)
+PrintLine("nestedList[0][1:3]: " + nestedList[0][1:3])
+PrintLine("nestedList[1][0:2]: " + nestedList[1][0:2])
+PrintLine("nestedList[2][2:4]: " + nestedList[2][2:4])
+
+PrintLine("\n✅ 嵌套切片访问测试完成")

@@ -22,13 +22,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/TestFiles/InterpreterTests/nested_slice_advanced_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/InterpreterTests/nested_slice_test.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Docs/first.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Docs/first.ws" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Docs/second.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Docs/second.ws" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Docs/third.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Docs/third.ws" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NestedSliceAccess.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NestedSliceAccess.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ExpressionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ExpressionParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,12 +51,12 @@
     &quot;state&quot;: &quot;OPEN&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/lijiajunply/Old8Lang",
-    "accountId": "da116cf9-9d16-491a-a1f8-9fb79401482c"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/lijiajunply/Old8Lang&quot;,
+    &quot;accountId&quot;: &quot;da116cf9-9d16-491a-a1f8-9fb79401482c&quot;
   }
-}]]></component>
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$USER_HOME$/.nuget/NuGet/NuGet.Config" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/.claude/settings.local.json" root0="FORCE_HIGHLIGHTING" />
@@ -249,43 +247,43 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
-    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
-    ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Run",
-    ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
-    ".NET 项目.Old8Lang.LanguageServer.executor": "Run",
-    "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
-    "34038497-caa6-4590-9735-a11ac1a57cd0.executor": "Debug",
-    "58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor": "Debug",
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHELLCHECK.PATH": "/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck",
-    "WebServerToolWindowFactoryState": "false",
-    "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
-    "fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor": "Debug",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.Benchmarks.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.LanguageServer.executor&quot;: &quot;Run&quot;,
+    &quot;07d79105-db56-470d-b872-543f396b1133.executor&quot;: &quot;Debug&quot;,
+    &quot;34038497-caa6-4590-9735-a11ac1a57cd0.executor&quot;: &quot;Debug&quot;,
+    &quot;58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor&quot;: &quot;Debug&quot;,
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;e9de5ea7-95aa-45c5-91d2-c46acccab710.executor&quot;: &quot;Debug&quot;,
+    &quot;fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "PLAIN_TEXT",
-      "Markdown"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;PLAIN_TEXT&quot;,
+      &quot;Markdown&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
@@ -622,6 +620,7 @@
       <workItem from="1766461431015" duration="981000" />
       <workItem from="1766746850670" duration="17415000" />
       <workItem from="1766771063664" duration="16661000" />
+      <workItem from="1766997021901" duration="347000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -966,7 +965,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="427" />
+    <option name="localTasksCounter" value="429" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -993,8 +992,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(compiler): 修复编译器关键问题并更新测试计划文档&#10;&#10;- 为Assert静态类方法添加简写别名支持，如True/AssertTrue、False/AssertFalse等14个方法&#10;- 修复for循环语法问题，将测试文件中的分号语法改为逗号语法格式&#10;- 更新CompilerTestPlan.md文档，记录修复进展和测试结果对比数据&#10;- 移除IDE工作区中的变更列表记录并更新任务计数器&#10;- 修正工作区配置文件中的提交历史记录和消息配置&#10;- 更新断点位置信息以匹配代码行号变化" />
-    <MESSAGE value="refactor(debugger): 重构断点管理器并优化性能分析&#10;&#10;- 为Breakpoint类添加[Serializable]特性支持序列化&#10;- 重命名私有字段_breakpoints为Breakpoints，_nextId为NextId&#10;- 统一断点管理器中的字段访问方式，使用新命名的字段&#10;- 修复性能分析器中不稳定函数检测的阈值比较逻辑&#10;- 更新性能分析器中严重级别计算算法，使用指数增长公式&#10;- 修正执行时间标准差计算方法，从样本标准差改为总体标准差&#10;- 更新IDE工作区配置文件中的变更记录和任务计数器" />
     <MESSAGE value="feat(debugger): 添加调试和性能分析功能支持&#10;&#10;- 重构BreakpointManager中字符串截取使用切片语法&#10;- 将DebuggableInterpreter改为依赖注入构造函数方式&#10;- 优化Debugger类中的字段命名和访问修饰符&#10;- 添加Serializable属性到DebuggerEventArgs类&#10;- 实现DebugProfilerService统一管理调试和性能分析会话&#10;- 添加DebugProfilerHandler处理调试和性能分析相关请求&#10;- 扩展DocumentManager支持调试和性能分析模式&#10;- 创建ProfilerModels定义性能分析相关数据模型&#10;- 实现性能分析报告生成功能和调试控制命令" />
     <MESSAGE value="fix(compiler): 修复函数调用返回值错误问题&#10;&#10;- 移除 ReturnStatement 中错误的 Task&lt;object&gt; 包装逻辑，同步函数直接返回值&#10;- 在 FuncInit 中复制 DelegateVar、ClassVar 等全局信息到函数的 LocalManager&#10;- 解决函数在嵌套调用时返回垃圾值或 0 的问题&#10;- 修复函数内部无法找到其他已定义函数的问题&#10;- 函数调用测试通过率从 42.1% 提升至 51.7%&#10;- 新增 46 个通过的测试用例" />
     <MESSAGE value="fix(compiler): 修复void函数IL生成问题&#10;&#10;- 移除ReturnStatement中错误的Task&lt;object&gt;包装逻辑&#10;- 同步函数（包括void函数）直接返回值，不进行Task包装&#10;- 修复函数返回值处理机制，解决InvalidProgramException异常&#10;- void函数测试通过，编译器生成的IL代码验证通过&#10;- 更新测试计划文档状态为已修复&#10;- 新增void函数测试用例和修复说明文档" />
@@ -1018,7 +1015,9 @@
     <MESSAGE value="feat(compiler): 添加严格类型检查模式和Assert方法调用支持&#10;&#10;- 实现StrictTypeChecking属性控制类型检查严格程度&#10;- 添加函数返回类型箭头语法支持 func() -&gt; type&#10;- 实现Assert静态方法调用的类型检查和IL生成&#10;- 支持Assert方法别名映射如True到AssertTrue&#10;- 添加类型兼容性检查的动态类型行为&#10;- 创建多个测试文件验证Assert和类型系统功能" />
     <MESSAGE value="fix(compiler): 修复Assert方法调用的栈值处理和参数装箱问题&#10;&#10;- 在FuncRunStatement中添加栈值销毁逻辑，处理非void类型的返回值&#10;- 为Operation的OutputType方法添加Assert静态方法的void类型特殊处理&#10;- 重构StaticClassCompiler中所有Assert方法的参数加载逻辑，统一装箱处理&#10;- 修正Assert方法调用的可选参数处理，统一使用null作为默认值&#10;- 移除过时的方法重载查找逻辑，统一使用固定参数签名&#10;- 更新工作区配置文件中的变更列表和提交历史记录" />
     <MESSAGE value="feat(interpreter): 实现模式匹配增强功能&#10;&#10;- 添加元组解构匹配支持，可解构元组并匹配元素&#10;- 实现类型匹配功能，支持根据值类型进行匹配&#10;- 增加守卫条件支持，为类型匹配添加条件约束&#10;- 添加范围匹配功能，支持数值范围匹配和边界控制&#10;- 实现作用域隔离机制，防止匹配变量泄漏到外部作用域&#10;- 添加完整的单元测试套件，覆盖所有新增匹配模式&#10;- 更新文档说明所有新的模式匹配特性" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(interpreter): 实现模式匹配增强功能&#10;&#10;- 添加元组解构匹配支持，可解构元组并匹配元素&#10;- 实现类型匹配功能，支持根据值类型进行匹配&#10;- 增加守卫条件支持，为类型匹配添加条件约束&#10;- 添加范围匹配功能，支持数值范围匹配和边界控制&#10;- 实现作用域隔离机制，防止匹配变量泄漏到外部作用域&#10;- 添加完整的单元测试套件，覆盖所有新增匹配模式&#10;- 更新文档说明所有新的模式匹配特性" />
+    <MESSAGE value="docs: 移除旧的文档文件并更新IDE配置&#10;&#10;- 移除了 Old8Lang/Docs/first.md 文档文件&#10;- 更新了 IDE 工作区配置文件中的变更列表记录&#10;- 修正了 GitHub 拉取请求 UI 设置的 JSON 格式&#10;- 更新了属性组件配置和本地任务计数器&#10;- 移除了 VCS 管理器中的旧提交消息记录&#10;- 更新了最后提交消息为模式匹配增强功能" />
+    <MESSAGE value="refactor(BasicInfo): 移除语言信息功能和相关命令&#10;&#10;- 删除了 BasicInfo.Info() 方法和 LangSample 相关代码&#10;- 移除了 Old8Lang 语言关键字列表定义&#10;- 删除了命令名称与参数映射字典 Order&#10;- 移除了 InfoCommand 类定义&#10;- 从命令注册表中移除了信息命令注册&#10;- 清理了相关注释和未使用的命名空间引用" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(BasicInfo): 移除语言信息功能和相关命令&#10;&#10;- 删除了 BasicInfo.Info() 方法和 LangSample 相关代码&#10;- 移除了 Old8Lang 语言关键字列表定义&#10;- 删除了命令名称与参数映射字典 Order&#10;- 移除了 InfoCommand 类定义&#10;- 从命令注册表中移除了信息命令注册&#10;- 清理了相关注释和未使用的命名空间引用" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -296,14 +296,15 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
                     {
                         left = new SliceLangValue(leftId, start, end, step);
                     }
-                    else if (left is LangListItem nestedItem)
+                    else if (left is LangListItem or NestedIndexAccess or NestedSliceAccess)
                     {
-                        left = new NestedSliceAccess(nestedItem, start, end, step, position);
+                        // 任何可以返回集合的表达式都可以进行切片
+                        left = new NestedSliceAccess(left, start, end, step, position);
                     }
                     else
                     {
-                        // 其他类型的切片访问
-                        left = new SliceLangValue(new LangId(""), start, end, step); // 临时处理
+                        // 其他类型的表达式也可能返回集合，统一使用 NestedSliceAccess
+                        left = new NestedSliceAccess(left, start, end, step, position);
                     }
                 }
                 else
