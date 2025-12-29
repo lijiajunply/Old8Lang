@@ -22,10 +22,9 @@ result <- 42
         CreateTempModuleFile("error_test.old8", testContent);
 
         // Act & Assert
-        var exception = Assert.ThrowsAny<Exception>(() =>
-        {
-            var (interpreter, _) = ExecuteCodeFile("error_test.old8");
-        });
+        var (_, exception) = ExecuteCodeFile("error_test.old8");
+        Assert.NotNull(exception);
+        Assert.IsType<ImportError>(exception);
 
         Output.WriteLine($"预期的异常类型: {exception.GetType().Name}");
         Output.WriteLine($"异常消息: {exception.Message}");
@@ -36,9 +35,9 @@ result <- 42
     {
         // Arrange
         var testContent = """
-            import "MathLib"
-            result <- Abs(-5)
-            """;
+                          import "MathLib"
+                          result <- Abs(-5)
+                          """;
         CreateTempModuleFile("circular_dependency_test.old8", testContent);
 
         // Act
@@ -111,13 +110,13 @@ result <- 42
     {
         // Arrange
         var testContent = """
-            try {
-                import "nonexistent.module"
-                result <- "Import successful"
-            } catch {
-                result <- "Import failed: " + exception
-            }
-            """;
+                          try {
+                              import "nonexistent.module"
+                              result <- "Import successful"
+                          } catch {
+                              result <- "Import failed: " + exception
+                          }
+                          """;
         CreateTempModuleFile("validation_test.old8", testContent);
 
         // Act
