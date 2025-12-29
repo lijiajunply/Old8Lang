@@ -20,7 +20,7 @@ public class AsyncFuncLangValue : ImportInfo
     internal readonly BlockStatement BlockStatement;
 
     // 闭包环境：捕获的作用域
-    public VariateManager? CapturedScope { get; internal init; }
+    public VariateManager? CapturedScope { get; private init; }
 
     // 默认参数值缓存
     private Dictionary<int, LangValueType>? CachedDefaultValues { get; set; }
@@ -262,18 +262,18 @@ public class AsyncFuncLangValue : ImportInfo
     {
         // 创建一个委托，当调用时执行异步函数逻辑
         // 目前实现一个简化版本，返回一个包装了RunAsync方法的委托
-        
+
         // 加载当前实例（this）
         ilGenerator.Emit(OpCodes.Ldarg_0);
-        
+
         // 创建一个闭包，捕获当前异步函数实例
         // 使用Delegate.CreateDelegate创建Func<Task<object>>委托
-        
+
         // 对于异步函数，我们需要生成一个委托，该委托在调用时会：
         // 1. 创建VariateManager实例
         // 2. 调用RunAsync方法
         // 3. 将返回的TaskLangValue转换为Task<object>
-        
+
         // 目前实现一个简化版本，直接返回null
         // 完整实现需要结合AsyncStateMachineGenerator生成状态机代码
         ilGenerator.Emit(OpCodes.Ldnull);

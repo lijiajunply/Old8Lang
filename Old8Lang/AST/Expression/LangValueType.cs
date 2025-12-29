@@ -552,7 +552,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
 
     /// <summary>
     /// 尝试自定义类型转换
-    /// 对于 C# 自定义类和未识别的类型，使用 NativeObjectLangValue 包装
+    /// 对于 C# 自定义类和未识别的类型，使用 NativeAnyLangValue 包装
     /// </summary>
     private static LangValueType TryCustomConversionEnhanced(object value, SourcePosition position)
     {
@@ -568,9 +568,9 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
                 return StringLangValue.Create(value.ToString() ?? "null");
             }
 
-            // 对于自定义类型，使用 NativeObjectLangValue 包装
+            // 对于自定义类型，使用 NativeAnyLangValue 包装
             // 这保留了类型信息，允许访问成员和调用方法
-            return new Intermediates.NativeObjectLangValue(value, position);
+            return new Intermediates.NativeAnyLangValue(value, position);
         }
         catch (Exception ex)
         {
@@ -719,9 +719,8 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
             AnyLangValue anyVal => anyVal,
 
             // Native 类型包装
-            NativeObjectLangValue nativeObj => nativeObj.NativeObject,
-            NativeAnyLangValue nativeAny => nativeAny,
-            NativeStaticAny nativeStatic => nativeStatic,
+            Intermediates.NativeAnyLangValue nativeAny => nativeAny.GetNativeObject() ?? nativeAny,
+            Intermediates.NativeStaticAny nativeStatic => nativeStatic,
 
             // 类型值
             TypeLangValue typeVal => typeVal,

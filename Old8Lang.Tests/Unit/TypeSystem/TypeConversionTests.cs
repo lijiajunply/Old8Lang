@@ -625,7 +625,7 @@ public class TypeConversionTests
     }
 
     [Fact]
-    public void ObjToValue_CustomClass_ReturnsNativeObjectLangValue()
+    public void ObjToValue_CustomClass_ReturnsNativeAnyLangValue()
     {
         // Arrange
         var customObj = new TestCustomClass
@@ -640,11 +640,11 @@ public class TypeConversionTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.IsType<Old8Lang.AST.Expression.Intermediates.NativeObjectLangValue>(result);
+        Assert.IsType<Old8Lang.AST.Expression.Intermediates.NativeAnyLangValue>(result);
 
-        var nativeValue = (Old8Lang.AST.Expression.Intermediates.NativeObjectLangValue)result;
-        Assert.Same(customObj, nativeValue.NativeObject);
-        Assert.Equal(typeof(TestCustomClass), nativeValue.NativeType);
+        var nativeValue = (Old8Lang.AST.Expression.Intermediates.NativeAnyLangValue)result;
+        Assert.Same(customObj, nativeValue.GetNativeObject());
+        Assert.Equal(typeof(TestCustomClass), nativeValue.GetNativeType());
     }
 
     [Fact]
@@ -677,7 +677,7 @@ public class TypeConversionTests
     }
 
     [Fact]
-    public void NativeObjectLangValue_AccessProperty_ReturnsCorrectValue()
+    public void NativeAnyLangValue_AccessProperty_ReturnsCorrectValue()
     {
         // Arrange
         var customObj = new TestCustomClass
@@ -686,14 +686,14 @@ public class TypeConversionTests
             Name = "PropertyTest",
             Value = 1.23
         };
-        var langValue = LangValueType.ObjToValue(customObj) as Old8Lang.AST.Expression.Intermediates.NativeObjectLangValue;
+        var langValue = LangValueType.ObjToValue(customObj) as Old8Lang.AST.Expression.Intermediates.NativeAnyLangValue;
 
         Assert.NotNull(langValue);
 
         // Act - 访问属性
-        var idValue = langValue.Dot(new LangId("Id"), new VariateManager());
-        var nameValue = langValue.Dot(new LangId("Name"), new VariateManager());
-        var valueValue = langValue.Dot(new LangId("Value"), new VariateManager());
+        var idValue = langValue.Dot(new LangId("Id"), new Old8Lang.Interpreter.VariateManager());
+        var nameValue = langValue.Dot(new LangId("Name"), new Old8Lang.Interpreter.VariateManager());
+        var valueValue = langValue.Dot(new LangId("Value"), new Old8Lang.Interpreter.VariateManager());
 
         // Assert
         Assert.IsType<IntLangValue>(idValue);
@@ -707,11 +707,11 @@ public class TypeConversionTests
     }
 
     [Fact]
-    public void NativeObjectLangValue_CallMethod_ReturnsCorrectResult()
+    public void NativeAnyLangValue_CallMethod_ReturnsCorrectResult()
     {
         // Arrange
         var customObj = new TestCustomClass { Id = 1, Name = "Test", Value = 1.0 };
-        var langValue = LangValueType.ObjToValue(customObj) as Old8Lang.AST.Expression.Intermediates.NativeObjectLangValue;
+        var langValue = LangValueType.ObjToValue(customObj) as Old8Lang.AST.Expression.Intermediates.NativeAnyLangValue;
 
         Assert.NotNull(langValue);
 
@@ -760,8 +760,8 @@ public class TypeConversionTests
         var listVal = (ListLangValue)langValue;
         Assert.Equal(2, listVal.Values.Count);
 
-        Assert.IsType<Old8Lang.AST.Expression.Intermediates.NativeObjectLangValue>(listVal.Values[0]);
-        Assert.IsType<Old8Lang.AST.Expression.Intermediates.NativeObjectLangValue>(listVal.Values[1]);
+        Assert.IsType<Old8Lang.AST.Expression.Intermediates.NativeAnyLangValue>(listVal.Values[0]);
+        Assert.IsType<Old8Lang.AST.Expression.Intermediates.NativeAnyLangValue>(listVal.Values[1]);
     }
 
     #endregion

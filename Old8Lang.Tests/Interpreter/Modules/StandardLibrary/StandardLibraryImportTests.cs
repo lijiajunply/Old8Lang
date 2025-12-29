@@ -6,8 +6,7 @@ using Xunit.Abstractions;
 namespace Old8Lang.Tests.Interpreter.Modules.StandardLibrary;
 
 /// <summary>
-/// 标准库导入功能测试
-/// 测试基于 LangInfo.json 中定义的标准库的导入功能
+/// 标准库测试
 /// </summary>
 public class StandardLibraryImportTests(ITestOutputHelper output) : ModuleImportTestBase(output)
 {
