@@ -21,7 +21,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/EnhancedErrorSystem.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Error/ErrorRecoverySystem.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TODO.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -481,7 +486,7 @@
       <workItem from="1766461431015" duration="981000" />
       <workItem from="1766746850670" duration="17415000" />
       <workItem from="1766771063664" duration="16661000" />
-      <workItem from="1766997021901" duration="960000" />
+      <workItem from="1766997021901" duration="3661000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -826,7 +831,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="431" />
+    <option name="localTasksCounter" value="432" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -853,7 +858,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(compiler): 修复void函数IL生成问题&#10;&#10;- 移除ReturnStatement中错误的Task&lt;object&gt;包装逻辑&#10;- 同步函数（包括void函数）直接返回值，不进行Task包装&#10;- 修复函数返回值处理机制，解决InvalidProgramException异常&#10;- void函数测试通过，编译器生成的IL代码验证通过&#10;- 更新测试计划文档状态为已修复&#10;- 新增void函数测试用例和修复说明文档" />
     <MESSAGE value="feat(parser): 添加文件头指令支持&#10;&#10;- 实现文件头指令的词法分析和语法解析功能&#10;- 添加 FileHeaderDirective AST 节点类型&#10;- 在编译器和解释器中应用文件头指令配置&#10;- 支持元数据指令如 encoding、author、version 等&#10;- 支持编译器配置指令如 debug、verify-il、type-inference 等&#10;- 更新文档说明文件头指令的语法和用法&#10;- 添加相关测试文件验证功能正确性" />
     <MESSAGE value="feat(parser): 添加可空类型支持&#10;&#10;- 在 ClassParser 中添加可空类型注解解析逻辑&#10;- 在 FunctionParser 中实现返回值可空类型处理&#10;- 在 StatementParser 中支持可空类型变量声明&#10;- 扩展 TypeAnnotationManager 支持可空类型解析&#10;- 更新 LangId AST 节点处理可空类型注解&#10;- 添加可空类型测试文件和语法验证&#10;- 更新文档说明可空类型语法和使用方法&#10;- 在 ParsedTypeAnnotation 中添加 IsNullable 属性" />
     <MESSAGE value="refactor(module-system): 重构模块系统内部字段命名和构造函数&#10;&#10;- 将 CacheManager 中的私有字段从 _moduleCache 和 _cacheLock 重命名为 ModuleCache 和 CacheLock&#10;- 将 ModuleLoader 的构造函数改为主构造函数形式，移除字段赋值语句&#10;- 将 ModuleResolver 中的私有字段从 _pathResolver 和 _versionResolver 重命名为 PathResolver 和 VersionResolver&#10;- 将 NetworkModuleLoader 中的私有字段从 _cacheDirectory 重命名为 CacheDirectory&#10;- 使用集合表达式替换 HashSet 初始化语法&#10;- 优化条件判断语法，使用属性模式匹配替代 Count 检查&#10;- 使用 GetValueOrDefault 方法替代 TryGetValue 检查&#10;- 为 ImportOptions 和 ModuleImportResult 类添加 Serializable 特性&#10;- 更新 workspace.xml 中的文件变更列表和任务计数器" />
@@ -878,7 +882,8 @@
     <MESSAGE value="refactor(BasicInfo): 移除语言信息功能和相关命令&#10;&#10;- 删除了 BasicInfo.Info() 方法和 LangSample 相关代码&#10;- 移除了 Old8Lang 语言关键字列表定义&#10;- 删除了命令名称与参数映射字典 Order&#10;- 移除了 InfoCommand 类定义&#10;- 从命令注册表中移除了信息命令注册&#10;- 清理了相关注释和未使用的命名空间引用" />
     <MESSAGE value="feat(interpreter): 实现嵌套切片访问功能&#10;&#10;- 添加 NestedSliceAccess AST 节点支持任意 LangExpression 类型的基础表达式&#10;- 修改 ExpressionParser 支持多层嵌套切片语法解析&#10;- 实现三维数组、嵌套列表、嵌套字典等多种数据结构的切片访问&#10;- 添加 comprehensive 测试用例验证嵌套切片功能正确性&#10;- 生成详细的嵌套切片访问功能验证报告&#10;- 保持向后兼容性，不破坏现有数组和切片操作" />
     <MESSAGE value="feat(ci): 添加完整的CI/CD流水线配置&#10;&#10;- 配置GitHub Actions工作流支持push和pull request触发&#10;- 实现构建和测试作业包括单元测试、语法测试、解释器测试和编译器测试&#10;- 添加性能基准测试作业使用BenchmarkDotNet进行性能监控&#10;- 集成代码质量检查包括代码格式化和Roslyn分析器&#10;- 配置安全扫描使用Trivy进行漏洞检测&#10;- 实现语言服务器构建和VSCode扩展打包发布&#10;- 添加文档自动部署到GitHub Pages功能&#10;- 配置发布作业支持多平台二进制文件构建和GitHub Release创建&#10;- 集成Slack通知功能及时反馈构建状态&#10;- 优化工作流依赖关系确保各阶段正确执行顺序" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(ci): 添加完整的CI/CD流水线配置&#10;&#10;- 配置GitHub Actions工作流支持push和pull request触发&#10;- 实现构建和测试作业包括单元测试、语法测试、解释器测试和编译器测试&#10;- 添加性能基准测试作业使用BenchmarkDotNet进行性能监控&#10;- 集成代码质量检查包括代码格式化和Roslyn分析器&#10;- 配置安全扫描使用Trivy进行漏洞检测&#10;- 实现语言服务器构建和VSCode扩展打包发布&#10;- 添加文档自动部署到GitHub Pages功能&#10;- 配置发布作业支持多平台二进制文件构建和GitHub Release创建&#10;- 集成Slack通知功能及时反馈构建状态&#10;- 优化工作流依赖关系确保各阶段正确执行顺序" />
+    <MESSAGE value="chore(ci): 更新CI/CD配置和IDE工作区设置&#10;&#10;- 在GitHub Actions配置中添加master分支触发条件&#10;- 清理IDE工作区XML配置文件中的mock路径设置&#10;- 更新本地任务计数器和工作时间统计信息&#10;- 移除旧的VCS提交消息记录&#10;- 更新最后提交消息为CI/CD流水线配置信息" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore(ci): 更新CI/CD配置和IDE工作区设置&#10;&#10;- 在GitHub Actions配置中添加master分支触发条件&#10;- 清理IDE工作区XML配置文件中的mock路径设置&#10;- 更新本地任务计数器和工作时间统计信息&#10;- 移除旧的VCS提交消息记录&#10;- 更新最后提交消息为CI/CD流水线配置信息" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
