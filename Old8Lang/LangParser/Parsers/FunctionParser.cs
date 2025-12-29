@@ -90,6 +90,12 @@ public class FunctionParser(
             }
         }
 
+        // 解析 where 子句（如果有）
+        if (CurrentToken.Type == LangTokenType.Where)
+        {
+            ParseWhereClause(ref genericParameters);
+        }
+
         // 如果有返回类型注解，创建新的LangId并设置AssumptionType
         var updatedFuncName = funcName;
         if (!string.IsNullOrEmpty(returnType))
@@ -173,6 +179,12 @@ public class FunctionParser(
                 returnType = CurrentToken.Value;
                 Expect(LangTokenType.Identifier);
             }
+        }
+
+        // 解析 where 子句（如果有）
+        if (CurrentToken.Type == LangTokenType.Where)
+        {
+            ParseWhereClause(ref genericParameters);
         }
 
         // 如果有返回类型注解，创建新的LangId并设置AssumptionType
@@ -396,7 +408,8 @@ public class FunctionParser(
 
     /// <summary>
     /// 解析泛型约束列表
-    /// 语法：IComparable | ICloneable
+    /// 语法：IComparable | ICloneable 或 IComparable & ICloneable
+    /// 支持使用 | 或 & 作为分隔符
     /// </summary>
     /// <returns>约束名称列表</returns>
     private List<string> ParseGenericConstraints()
@@ -411,9 +424,17 @@ public class FunctionParser(
         constraints.Add(CurrentToken.Value);
         Expect(LangTokenType.Identifier);
 
-        while (CurrentToken.Type == LangTokenType.Pipe)
+        // 支持 | 或 & 作为分隔符
+        while (CurrentToken.Type == LangTokenType.Pipe || CurrentToken.Type == LangTokenType.Ampersand)
         {
-            Expect(LangTokenType.Pipe);
+            if (CurrentToken.Type == LangTokenType.Pipe)
+            {
+                Expect(LangTokenType.Pipe);
+            }
+            else
+            {
+                Expect(LangTokenType.Ampersand);
+            }
 
             if (CurrentToken.Type != LangTokenType.Identifier)
             {
@@ -478,5 +499,74 @@ public class FunctionParser(
         result += ">";
         Expect(LangTokenType.GreaterThan);
         return result;
+    }
+
+    /// <summary>
+    /// 解析 where 子句
+    /// 语法：where T: IComparable | where T: IComparable & ICloneable | where T: IComparable, U: ICloneable
+    /// </summary>
+    /// <param name="genericParameters">泛型参数列表的引用，将在其中更新约束</param>
+    private void ParseWhereClause(ref List<GenericParameter>? genericParameters)
+    {
+        if (genericParameters == null || genericParameters.Count == 0)
+        {
+            throw CreateSyntaxError("where 子句只能用于泛型函数");
+        }
+
+        Expect(LangTokenType.Where);
+
+        // 解析一个或多个约束，用逗号分隔
+        // 例如: where T: IComparable, U: ICloneable
+        while (true)
+        {
+            // 解析类型参数名称
+            if (CurrentToken.Type != LangTokenType.Identifier)
+            {
+                throw CreateSyntaxError($"期望类型参数名称，但得到 {CurrentToken.Type}");
+            }
+
+            var typeParamName = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+
+            // 查找对应的泛型参数
+            var genericParam = genericParameters.FirstOrDefault(p => p.Name == typeParamName);
+            if (genericParam == null)
+            {
+                throw CreateSyntaxError($"未定义的类型参数 '{typeParamName}'");
+            }
+
+            // 期望冒号
+            if (CurrentToken.Type != LangTokenType.Colon)
+            {
+                throw CreateSyntaxError($"期望 ':', 但得到 {CurrentToken.Type}");
+            }
+            Expect(LangTokenType.Colon);
+
+            // 解析约束列表
+            var constraints = ParseGenericConstraints();
+
+            // 更新泛型参数的约束
+            // 如果已有约束，则合并
+            var existingConstraints = genericParam.Constraints ?? new List<string>();
+            existingConstraints.AddRange(constraints);
+
+            // 创建新的 GenericParameter 对象替换旧的
+            var index = genericParameters.IndexOf(genericParam);
+            genericParameters[index] = new GenericParameter(
+                genericParam.Name,
+                existingConstraints,
+                genericParam.Position
+            );
+
+            // 检查是否有更多约束（逗号分隔）
+            if (CurrentToken.Type == LangTokenType.Comma)
+            {
+                Expect(LangTokenType.Comma);
+                continue;
+            }
+
+            // 没有更多约束，退出循环
+            break;
+        }
     }
 }

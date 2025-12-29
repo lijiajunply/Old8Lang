@@ -1,0 +1,97 @@
+// 测试泛型约束的 & 符号支持
+// 测试多个约束的组合
+
+// 定义一些接口用于测试
+interface IComparable {
+    func compareTo(other: any) -> int { return 0 }
+}
+
+interface ICloneable {
+    func clone() -> any { return this }
+}
+
+interface ISerializable {
+    func serialize() -> string { return "serialized" }
+}
+
+// 1. 测试单个约束（使用冒号语法）
+class Box1<T: IComparable> {
+    value: T
+
+    func init(v: T) {
+        this.value <- v
+    }
+
+    func getValue() -> T {
+        return this.value
+    }
+}
+
+PrintLine("测试1: 单个约束 - 通过")
+
+// 2. 测试多个约束（使用 | 分隔符）
+class Box2<T: IComparable | ICloneable> {
+    value: T
+
+    func init(v: T) {
+        this.value <- v
+    }
+
+    func getValue() -> T {
+        return this.value
+    }
+}
+
+PrintLine("测试2: 多约束(|分隔) - 通过")
+
+// 3. 测试多个约束（使用 & 分隔符）
+class Box3<T: IComparable & ICloneable> {
+    value: T
+
+    func init(v: T) {
+        this.value <- v
+    }
+
+    func getValue() -> T {
+        return this.value
+    }
+}
+
+PrintLine("测试3: 多约束(&分隔) - 通过")
+
+// 4. 测试三个约束（使用 & 分隔符）
+class Box4<T: IComparable & ICloneable & ISerializable> {
+    value: T
+
+    func init(v: T) {
+        this.value <- v
+    }
+
+    func getValue() -> T {
+        return this.value
+    }
+}
+
+PrintLine("测试4: 三约束(&分隔) - 通过")
+
+// 5. 测试泛型函数的约束
+func processValue<T: IComparable & ICloneable>(value: T) -> T {
+    return value
+}
+
+PrintLine("测试5: 泛型函数约束 - 通过")
+
+// 6. 测试多个泛型参数，每个都有约束
+class Pair<K: IComparable, V: ICloneable & ISerializable> {
+    key: K
+    value: V
+
+    func init(k: K, v: V) {
+        this.key <- k
+        this.value <- v
+    }
+}
+
+PrintLine("测试6: 多泛型参数约束 - 通过")
+
+PrintLine("\n所有语法测试通过！✓")

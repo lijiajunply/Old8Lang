@@ -1,0 +1,66 @@
+// 测试泛型 where 子句支持
+// 测试 where 子句的各种语法形式
+
+// 定义一些接口用于测试
+interface IComparable {
+    func compareTo(other: any) -> int { return 0 }
+}
+
+interface ICloneable {
+    func clone() -> any { return this }
+}
+
+interface ISerializable {
+    func serialize() -> string { return "serialized" }
+}
+
+// 1. 测试单个类型参数的 where 子句
+func sort<T>(items: List<T>) -> List<T> where T: IComparable {
+    return items
+}
+
+PrintLine("测试1: 单类型参数 where 子句 - 通过")
+
+// 2. 测试多约束的 where 子句（使用 | 分隔符）
+func process<T>(value: T) -> T where T: IComparable | ICloneable {
+    return value
+}
+
+PrintLine("测试2: where 子句多约束(|分隔) - 通过")
+
+// 3. 测试多约束的 where 子句（使用 & 分隔符）
+func transform<T>(value: T) -> T where T: IComparable & ICloneable {
+    return value
+}
+
+PrintLine("测试3: where 子句多约束(&分隔) - 通过")
+
+// 4. 测试三个约束的 where 子句
+func serialize<T>(value: T) -> string where T: IComparable & ICloneable & ISerializable {
+    return "serialized"
+}
+
+PrintLine("测试4: where 子句三约束 - 通过")
+
+// 5. 测试多个类型参数的 where 子句
+func merge<K, V>(key: K, value: V) -> any where K: IComparable, V: ISerializable {
+    return null
+}
+
+PrintLine("测试5: 多类型参数 where 子句 - 通过")
+
+// 6. 测试混合语法：泛型参数声明中的约束 + where 子句
+func complexFunc<T: IComparable>(value: T) -> T where T: ICloneable {
+    return value
+}
+
+PrintLine("测试6: 混合约束语法 - 通过")
+
+// 7. 测试 where 子句用于多个类型参数，每个都有多个约束
+func complexMerge<K, V>(key: K, value: V) -> any where K: IComparable & ICloneable, V: ISerializable & ICloneable {
+    return null
+}
+
+PrintLine("测试7: 多类型参数多约束 where 子句 - 通过")
+
+PrintLine("\n所有 where 子句语法测试通过！✓")

@@ -5,6 +5,7 @@ namespace Old8Lang.AST.Expression;
 /// <summary>
 /// 泛型参数定义
 /// 例如: <T: IComparable> 中的 T
+/// 或: <T?: IComparable> 中的可空类型参数 T?
 /// </summary>
 public class GenericParameter
 {
@@ -20,6 +21,12 @@ public class GenericParameter
     public List<string>? Constraints { get; }
 
     /// <summary>
+    /// 是否为可空类型参数
+    /// 例如: T? → true, T → false
+    /// </summary>
+    public bool IsNullable { get; }
+
+    /// <summary>
     /// 源代码位置
     /// </summary>
     public SourcePosition Position { get; }
@@ -27,11 +34,12 @@ public class GenericParameter
     /// <summary>
     /// 构造函数
     /// </summary>
-    public GenericParameter(string name, List<string>? constraints = null, SourcePosition position = default)
+    public GenericParameter(string name, List<string>? constraints = null, SourcePosition position = default, bool isNullable = false)
     {
         Name = name;
         Constraints = constraints;
         Position = position;
+        IsNullable = isNullable;
     }
 
     /// <summary>
@@ -42,18 +50,21 @@ public class GenericParameter
     /// <summary>
     /// 获取约束的可读字符串
     /// </summary>
-    public string GetConstraintsString()
+    /// <param name="usePipe">是否使用 | 分隔符（默认），false 则使用 &</param>
+    public string GetConstraintsString(bool usePipe = true)
     {
         if (!HasConstraints) return "";
-        return string.Join(" | ", Constraints!);
+        string separator = usePipe ? " | " : " & ";
+        return string.Join(separator, Constraints!);
     }
 
     public override string ToString()
     {
+        var nullableMarker = IsNullable ? "?" : "";
         if (HasConstraints)
         {
-            return $"{Name}: {GetConstraintsString()}";
+            return $"{Name}{nullableMarker}: {GetConstraintsString()}";
         }
-        return Name;
+        return Name + nullableMarker;
     }
 }

@@ -9,15 +9,8 @@ namespace Old8Lang.TypeSystem;
 /// 泛型类型推断引擎
 /// 从函数调用参数自动推断泛型类型参数
 /// </summary>
-public class GenericTypeInference
+public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
 {
-    private readonly TypeAnnotationManager TypeAnnotationManager;
-
-    public GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
-    {
-        TypeAnnotationManager = typeAnnotationManager;
-    }
-
     /// <summary>
     /// 从函数调用参数推断泛型类型
     /// </summary>
@@ -98,7 +91,7 @@ public class GenericTypeInference
 
     /// <summary>
     /// 从类型注解字符串中提取泛型参数名称
-    /// 例如: "List<T>" -> ["T"], "Dictionary<K, V>" -> ["K", "V"]
+    /// 例如: "List&lt;T>" -> ["T"], "Dictionary&lt;K, V>" -> ["K", "V"]
     /// </summary>
     private HashSet<string> ExtractGenericParametersFromType(string typeAnnotation)
     {
@@ -115,6 +108,7 @@ public class GenericTypeInference
             {
                 result.Add(typeAnnotation);
             }
+
             return result;
         }
 
@@ -140,7 +134,7 @@ public class GenericTypeInference
 
     /// <summary>
     /// 分割泛型参数（考虑嵌套）
-    /// 例如: "T, List<U>" -> ["T", "List<U>"]
+    /// 例如: "T, List&lt;U>" -> ["T", "List&lt;U>"]
     /// </summary>
     private List<string> SplitGenericArguments(string args)
     {
@@ -190,19 +184,19 @@ public class GenericTypeInference
             switch (expr)
             {
                 case IntLangValue:
-                    return TypeAnnotationManager.GetTypeFamily().GetType("int");
+                    return typeAnnotationManager.GetTypeFamily().GetType("int");
 
                 case DoubleLangValue:
-                    return TypeAnnotationManager.GetTypeFamily().GetType("double");
+                    return typeAnnotationManager.GetTypeFamily().GetType("double");
 
                 case StringLangValue:
-                    return TypeAnnotationManager.GetTypeFamily().GetType("string");
+                    return typeAnnotationManager.GetTypeFamily().GetType("string");
 
                 case BoolLangValue:
-                    return TypeAnnotationManager.GetTypeFamily().GetType("bool");
+                    return typeAnnotationManager.GetTypeFamily().GetType("bool");
 
                 case CharLangValue:
-                    return TypeAnnotationManager.GetTypeFamily().GetType("char");
+                    return typeAnnotationManager.GetTypeFamily().GetType("char");
 
                 case NullLangValue:
                     // null 可以匹配任何引用类型
@@ -215,9 +209,10 @@ public class GenericTypeInference
                     {
                         return GetTypeInfoFromValue(value);
                     }
+
                     return null;
 
-                case AST.Expression.Value.Instance instance:
+                case Instance instance:
                     // 对于函数调用，尝试执行并获取结果类型
                     // 注意：这可能有副作用，但对于推断泛型类型来说是必要的
                     try
@@ -236,11 +231,11 @@ public class GenericTypeInference
                             if (!string.IsNullOrEmpty(returnTypeAnnotation))
                             {
                                 // 解析返回类型（可能包含 -> 符号）
-                                var arrowIndex = returnTypeAnnotation.IndexOf("->");
+                                var arrowIndex = returnTypeAnnotation.IndexOf("->", StringComparison.Ordinal);
                                 if (arrowIndex != -1)
                                 {
                                     var returnTypePart = returnTypeAnnotation.Substring(arrowIndex + 2).Trim();
-                                    var returnType = TypeAnnotationManager.GetTypeFamily().GetType(returnTypePart);
+                                    var returnType = typeAnnotationManager.GetTypeFamily().GetType(returnTypePart);
                                     if (returnType != null)
                                     {
                                         return returnType;
@@ -248,6 +243,7 @@ public class GenericTypeInference
                                 }
                             }
                         }
+
                         return null;
                     }
 
@@ -270,11 +266,11 @@ public class GenericTypeInference
     {
         return value switch
         {
-            IntLangValue => TypeAnnotationManager.GetTypeFamily().GetType("int"),
-            DoubleLangValue => TypeAnnotationManager.GetTypeFamily().GetType("double"),
-            StringLangValue => TypeAnnotationManager.GetTypeFamily().GetType("string"),
-            BoolLangValue => TypeAnnotationManager.GetTypeFamily().GetType("bool"),
-            CharLangValue => TypeAnnotationManager.GetTypeFamily().GetType("char"),
+            IntLangValue => typeAnnotationManager.GetTypeFamily().GetType("int"),
+            DoubleLangValue => typeAnnotationManager.GetTypeFamily().GetType("double"),
+            StringLangValue => typeAnnotationManager.GetTypeFamily().GetType("string"),
+            BoolLangValue => typeAnnotationManager.GetTypeFamily().GetType("bool"),
+            CharLangValue => typeAnnotationManager.GetTypeFamily().GetType("char"),
             _ => null
         };
     }
@@ -282,7 +278,7 @@ public class GenericTypeInference
     /// <summary>
     /// 匹配类型模式
     /// 例如: 模式 "T" 匹配 "int" -> {T: int}
-    ///       模式 "List<T>" 匹配 "List<int>" -> {T: int}
+    ///       模式 "List&lt;T>" 匹配 "List&lt;int>" -> {T: int}
     /// </summary>
     private bool MatchTypePattern(
         string pattern,

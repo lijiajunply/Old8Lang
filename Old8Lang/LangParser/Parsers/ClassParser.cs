@@ -627,7 +627,8 @@ public class ClassParser(
 
     /// <summary>
     /// 解析泛型约束列表
-    /// 语法：IComparable | ICloneable
+    /// 语法：IComparable | ICloneable 或 IComparable & ICloneable
+    /// 支持使用 | 或 & 作为分隔符
     /// </summary>
     /// <returns>约束名称列表</returns>
     private List<string> ParseGenericConstraints()
@@ -642,9 +643,17 @@ public class ClassParser(
         constraints.Add(CurrentToken.Value);
         Expect(LangTokenType.Identifier);
 
-        while (CurrentToken.Type == LangTokenType.Pipe)
+        // 支持 | 或 & 作为分隔符
+        while (CurrentToken.Type == LangTokenType.Pipe || CurrentToken.Type == LangTokenType.Ampersand)
         {
-            Expect(LangTokenType.Pipe);
+            if (CurrentToken.Type == LangTokenType.Pipe)
+            {
+                Expect(LangTokenType.Pipe);
+            }
+            else
+            {
+                Expect(LangTokenType.Ampersand);
+            }
 
             if (CurrentToken.Type != LangTokenType.Identifier)
             {

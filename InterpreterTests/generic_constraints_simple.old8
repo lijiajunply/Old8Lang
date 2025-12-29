@@ -1,0 +1,48 @@
+// 简单的泛型约束测试
+// 测试基本功能
+
+// 定义接口
+interface ISerializable {
+    func serialize() -> string {
+        return "serialized"
+    }
+}
+
+// 实现接口的类
+class SerializableData implements ISerializable {
+    data: any
+
+    func init(d: any) {
+        this.data <- d
+    }
+
+    func serialize() -> string {
+        return $"Data: {this.data.ToStr()}"
+    }
+}
+
+// 使用约束的泛型类
+class Container<T: ISerializable> {
+    value: T
+
+    func init(v: T) {
+        this.value <- v
+    }
+
+    func getSerialize() -> string {
+        return this.value.serialize()
+    }
+}
+
+// 测试：创建实例并使用
+data <- new SerializableData(123)
+result1 <- data.serialize()
+PrintLine($"测试1 - 接口实现: {result1}")
+
+// 测试：使用泛型类（暂时不使用泛型参数）
+container <- new Container(data)
+result2 <- container.getSerialize()
+PrintLine($"测试2 - 泛型容器: {result2}")
+
+PrintLine("")
+PrintLine("泛型约束基本测试完成！✓")

@@ -239,6 +239,11 @@ public enum LangTokenType
     Throw,
 
     /// <summary>
+    /// where (泛型约束子句关键字)
+    /// </summary>
+    Where,
+
+    /// <summary>
     /// mixin
     /// </summary>
     Mixin,
@@ -365,6 +370,7 @@ public enum KeywordType
     Xor,
     This,
     Extends,
+    Where,
     Mixin,
     With,
     Static,

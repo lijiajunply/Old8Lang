@@ -854,6 +854,54 @@ result2 <- makePair<int, string>(1, "first")     // "1:first"
 - 函数体内可以使用类型参数作为参数类型或返回类型
 - 每次调用都会根据指定的类型参数创建类型化的函数实例
 - 类型参数在函数作用域内有效
+- 支持泛型类型推断，编译器可以从函数调用参数自动推断类型参数
+
+**泛型约束**：
+
+泛型函数和类可以使用约束来限制类型参数必须满足的条件。
+
+```old8
+// 使用冒号语法指定约束
+func process<T: IComparable>(value: T) -> T {
+    // T 必须实现 IComparable 接口
+    return value
+}
+
+// 使用 & 符号组合多个约束
+class Container<T: ISerializable & ICloneable> {
+    value: T
+
+    func init(v: T) {
+        this.value <- v
+    }
+}
+
+// 使用 where 子句语法
+func sort<T>(items: List<T>) -> List<T> where T: IComparable {
+    // T 必须实现 IComparable 接口
+    return items
+}
+
+// 多个类型参数的 where 约束
+func merge<K, V>(key: K, value: V) -> any where K: IComparable, V: ISerializable {
+    // K 必须实现 IComparable，V 必须实现 ISerializable
+    return null
+}
+
+// 混合约束语法
+func complexFunc<T: IComparable>(value: T) -> T where T: ICloneable {
+    // T 必须同时实现 IComparable 和 ICloneable
+    return value
+}
+```
+
+**约束语法**：
+
+- **单个约束**：`<T: IInterface>` 或 `where T: IInterface`
+- **多个约束（| 分隔）**：`<T: IInterface1 | IInterface2>`（类型满足任一接口即可）
+- **多个约束（& 分隔）**：`<T: IInterface1 & IInterface2>`（类型必须同时满足所有接口）
+- **where 子句**：`where T: IInterface` 用于函数级别的约束
+- **多个类型参数约束**：`where T: IInterface1, U: IInterface2`
 
 **使用场景**：
 
@@ -1062,6 +1110,34 @@ result <- wrapper.unwrap()  // result = 123
 - 类体内可以使用类型参数作为字段类型、参数类型或返回类型
 - 每个实例都有独立的类型参数绑定
 - 不同类型参数的实例是不同的类型
+- 支持泛型约束（使用 `:` 和 `&` 符号），约束类型参数必须满足特定接口
+
+**泛型类约束示例**：
+
+```old8
+// 单个约束
+class SortedList<T: IComparable> {
+    private items: list
+
+    func add(item: T) {
+        // T 必须实现 IComparable 接口
+        this.items.Add(item)
+    }
+}
+
+// 多个约束（& 分隔）
+class Cache<T: ISerializable & ICloneable> {
+    private data: T
+
+    func store(value: T) {
+        this.data <- value.clone()
+    }
+
+    func serialize() -> string {
+        return this.data.serialize()
+    }
+}
+```
 
 **实用示例 - 泛型栈**：
 
