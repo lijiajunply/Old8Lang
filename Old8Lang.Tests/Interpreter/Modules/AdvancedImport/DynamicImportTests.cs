@@ -7,6 +7,7 @@ namespace Old8Lang.Tests.Interpreter.Modules.AdvancedImport;
 /// <summary>
 /// 动态导入功能测试
 /// </summary>
+[Collection("Sequential")]
 public class DynamicImportTests(ITestOutputHelper output) : ModuleImportTestBase(output)
 {
     [Fact]

@@ -9,6 +9,7 @@ namespace Old8Lang.Tests.Interpreter.Modules.BasicImport;
 /// <summary>
 /// 基础导入功能测试
 /// </summary>
+[Collection("Sequential")]
 public class SimpleImportTests(ITestOutputHelper output) : ModuleImportTestBase(output)
 {
     [Fact]
@@ -47,9 +48,9 @@ result2 <- test_math.multiply(4.0, 5.0)
     {
         // Arrange
         var testContent = """
-            import "MathLib" as m
-            result <- m.sqrt(25)
-            """;
+                          import "MathLib" as m
+                          result <- m.sqrt(25)
+                          """;
         CreateTempModuleFile("alias_test.old8", testContent);
 
         // Act
@@ -68,10 +69,10 @@ result2 <- test_math.multiply(4.0, 5.0)
     {
         // Arrange
         var testContent = """
-            import "MathLib"
-            result1 <- Sqrt(25)
-            result2 <- Pow(2, 3)
-            """;
+                          import "MathLib"
+                          result1 <- Sqrt(25)
+                          result2 <- Pow(2, 3)
+                          """;
         CreateTempModuleFile("specific_func_test.old8", testContent);
 
         // Act
@@ -104,10 +105,10 @@ result2 <- test_math.multiply(4.0, 5.0)
     {
         // Arrange
         var testContent = """
-            import "MathLib"
-            result1 <- Sqrt(9)
-            result2 <- Sqrt(16)
-            """;
+                          import "MathLib"
+                          result1 <- Sqrt(9)
+                          result2 <- Sqrt(16)
+                          """;
         CreateTempModuleFile("reimport_test.old8", testContent);
 
         // Act

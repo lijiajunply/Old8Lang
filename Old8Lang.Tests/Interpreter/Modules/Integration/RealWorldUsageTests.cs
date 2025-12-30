@@ -8,6 +8,7 @@ namespace Old8Lang.Tests.Interpreter.Modules.Integration;
 /// <summary>
 /// 真实使用场景集成测试
 /// </summary>
+[Collection("Sequential")]
 public class RealWorldUsageTests(ITestOutputHelper output) : ModuleImportTestBase(output)
 {
     [Fact]
