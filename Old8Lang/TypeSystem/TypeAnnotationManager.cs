@@ -50,7 +50,7 @@ public class TypeAnnotationManager
     /// <summary>
     /// 注册类类型
     /// </summary>
-    public void RegisterClassType(string className, string? baseClassName = null)
+    public void RegisterClassType(string className, string? baseClassName = null, List<string>? interfaceNames = null)
     {
         ITypeInfo? baseType = null;
         if (!string.IsNullOrEmpty(baseClassName))
@@ -64,8 +64,17 @@ public class TypeAnnotationManager
             }
         }
 
-        var classType = new ClassTypeInfo(className, baseType);
+        var classType = new ClassTypeInfo(className, baseType, interfaceNames);
         TypeFamily.RegisterType(classType);
+    }
+
+    /// <summary>
+    /// 注册接口类型
+    /// </summary>
+    public void RegisterInterfaceType(string interfaceName, List<string>? parentInterfaceNames = null)
+    {
+        var interfaceType = new InterfaceTypeInfo(interfaceName, parentInterfaceNames);
+        TypeFamily.RegisterType(interfaceType);
     }
 
     /// <summary>

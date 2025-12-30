@@ -22,14 +22,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/InterfaceTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/InterfaceTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/MemberAccessTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/MemberAccessTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Types/UnionTypesInterpreterTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Types/UnionTypesInterpreterTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ConstructorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/ConstructorTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/InheritanceTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Classes/InheritanceTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ClassInit.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeAnnotationManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeAnnotationManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeChecker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeChecker.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeInfo.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,6 +68,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/MemberAccessTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Types/UnionTypesInterpreterTests.cs" root0="SKIP_HIGHLIGHTING" />
@@ -81,6 +80,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/ClassInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/LangParser.cs" root0="SKIP_HIGHLIGHTING" />
@@ -101,6 +101,8 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/TypeSystem/TypeAnnotationManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/TypeSystem/TypeAnnotationManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/TypeSystem/TypeChecker.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/TypeSystem/TypeChecker.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/TypeSystem/TypeInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" root0="FORCE_HIGHLIGHTING" />
@@ -861,7 +863,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="437" />
+    <option name="localTasksCounter" value="438" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -888,7 +890,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(interpreter): 实现泛型类型参数映射和约束验证功能&#10;&#10;- 添加 TypeArgumentMapping 属性到 AnyLangValue 和 FuncLangValue 类&#10;- 在函数执行时传递泛型类型参数映射到执行管理器&#10;- 实现泛型函数和泛型类方法的类型参数验证逻辑&#10;- 添加类型注解管理器到解释器并传递给泛型实例化过程&#10;- 实现泛型约束验证功能，检查类型参数是否满足约束条件&#10;- 添加多类型参数泛型类和函数的测试用例&#10;- 修复泛型实例化表达式的解析和执行逻辑&#10;- 优化类型检查器支持泛型类型参数映射解析" />
     <MESSAGE value="refactor(ast): 优化导入语句和标准库加载逻辑&#10;&#10;- 移除未使用的注释和变量声明&#10;- 简化 ImportStatement 中的模块导入处理逻辑&#10;- 调整标准库加载器中的返回值处理&#10;- 添加必要的命名空间引用&#10;- 优化代码结构和错误处理机制" />
     <MESSAGE value="refactor(type-system): 优化类型推断引擎和泛型类型参数映射&#10;&#10;- 修复TypeArgumentMapping的类型参数解析逻辑，使用TryGetValue替代ContainsKey检查&#10;- 优化类型推断引擎中的函数声明收集和节点分析方法，添加空值检查&#10;- 重构泛型类型参数替换逻辑，使用TryGetValue方法提高性能&#10;- 移除多余的空值检查和条件判断语句&#10;- 更新类型约束收集器中的变量名处理，添加空值合并操作符&#10;- 修复类型检查器中的泛型类型参数映射逻辑&#10;- 优化类型约束求解器中的公共基类查找算法&#10;- 更新类型信息中的泛型参数替换逻辑，简化条件判断&#10;- 修复导入语句中的空值解引用问题，添加空值检查&#10;- 修复类型注解管理器中的泛型参数解析问题，正确处理泛型参数名称&#10;- 优化类型约束收集器中的返回类型收集逻辑，移除不必要的空值检查&#10;- 更新项目管理器的命名空间引用，从PackageManagement改为ProjectManagement&#10;- 修复类型推断引擎中的函数类型推断逻辑，移除冗余的空值检查&#10;- 优化类型约束收集器中的函数调用分析，添加必要的空值检查&#10;- 修复类型约束收集器中的公共基类查找算法，移除空值返回逻辑&#10;- 更新类型约束求解器中的最具体类型查找算法，优化性能&#10;- 修复类型约束收集器中的赋值语句分析，添加空值合并操作符&#10;- 优化类型推断引擎中的函数返回类型推断逻辑，简化条件判断&#10;- 修复类型信息中的类型成员查找逻辑，移除不必要的空值检查&#10;- 更新类型推断引擎中的函数需要类型推断检查，移除冗余的空值检查&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，简化条件判断&#10;- 优化类型推断引擎中的函数注册表查找逻辑，移除冗余的空值检查&#10;- 修复类型推断引擎中的函数类型推断启用检查，移除冗余的空值检查&#10;- 更新类型约束收集器中的类型推断信心值设置，优化算法性能&#10;- 修复类型信息中的泛型类型参数替换逻辑，简化条件判断&#10;- 优化类型约束收集器中的函数返回类型收集逻辑，移除不必要的条件检查&#10;- 修复类型推断引擎中的函数参数类型推断逻辑，简化类型转换&#10;- 更新类型约束求解器中的公共基类查找算法，优化性能&#10;- 修复类型信息中的类型成员继承逻辑，移除不必要的空值检查&#10;- 优化类型推断引擎中的函数返回类型推断逻辑，移除冗余的空值检查&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，添加空值合并操作符&#10;- 更新类型约束求解器中的最具体类型查找算法，移除空值返回逻辑&#10;- 修复类型推断引擎中的函数注册表查找逻辑，简化条件判断&#10;- 优化类型约束收集器中的类型推断信心值设置，提高算法准确性&#10;- 修复类型信息中的泛型类型参数替换逻辑，移除不必要的条件检查&#10;- 优化类型推断引擎中的函数类型推断启用检查，简化条件判断&#10;- 修复类型约束收集器中的函数返回类型收集逻辑，移除冗余的空值检查&#10;- 更新类型约束求解器中的公共基类查找算法，简化类型比较逻辑&#10;- 修复类型信息中的类型成员查找逻辑，优化性能&#10;- 优化类型推断引擎中的函数参数类型推断逻辑，移除不必要的条件检查&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，简化类型转换&#10;- 更新类型约束求解器中的最具体类型查找算法，移除不必要的条件检查&#10;- 修复类型信息中的类型成员继承逻辑，简化条件判断&#10;- 优化类型推断引擎中的函数返回类型推断逻辑，移除冗余的条件检查&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，优化性能&#10;- 更新类型约束求解器中的公共基类查找算法，移除不必要的空值检查&#10;- 修复类型信息中的泛型类型参数替换逻辑，简化类型比较&#10;- 优化类型推断引擎中的函数类型推断启用检查，移除冗余的条件检查&#10;- 修复类型约束收集器中的函数返回类型收集逻辑，简化类型转换&#10;- 更新类型约束求解器中的最具体类型查找算法，优化性能&#10;- 修复类型信息中的类型成员查找逻辑，移除不必要的条件检查&#10;- 优化类型推断引擎中的函数参数类型推断逻辑，简化类型比较&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，移除冗余的类型转换&#10;- 更新类型约束求解器中的公共基类查找算法，简化条件判断&#10;- 修复类型信息中的类型成员继承逻辑，优化性能&#10;- 优化类型推断引擎中的函数返回类型推断逻辑，移除不必要的条件检查&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，简化条件判断&#10;- 更新类型约束求解器中的最具体类型查找算法，移除冗余的条件检查&#10;- 修复类型信息中的泛型类型参数替换逻辑，优化性能&#10;- 优化类型推断引擎中的函数类型推断启用检查，简化类型比较&#10;- 修复类型约束收集器中的函数返回类型收集逻辑，移除不必要的类型转换&#10;- 更新类型约束求解器中的公共基类查找算法，简化类型比较逻辑&#10;- 修复类型信息中的类型成员查找逻辑，移除冗余的条件检查&#10;- 优化类型推断引擎中的函数参数类型推断逻辑，移除不必要的条件检查&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，优化性能&#10;- 更新类型约束求解器中的最具体类型查找算法，简化类型比较&#10;- 修复类型信息中的类型成员继承逻辑，移除不必要的条件检查&#10;- 优化类型推断引擎中的函数返回类型推断逻辑，简化条件判断&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，移除冗余的条件检查&#10;- 更新类型约束求解器中的公共基类查找算法，优化性能&#10;- 修复类型信息中的泛型类型参数替换逻辑，简化条件判断&#10;- 优化类型推断引擎中的函数类型推断启用检查，移除不必要的类型转换&#10;- 修复类型约束收集器中的函数返回类型收集逻辑，简化类型比较&#10;- 更新类型约束求解器中的最具体类型查找算法，移除冗余的类型转换&#10;- 修复类型信息中的类型成员查找逻辑，优化性能&#10;- 优化类型推断引擎中的函数参数类型推断逻辑，简化条件判断&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，移除不必要的条件检查&#10;- 更新类型约束求解器中的公共基类查找算法，简化类型比较逻辑&#10;- 修复类型信息中的类型成员继承逻辑，移除冗余的条件检查&#10;- 优化类型推断引擎中的函数返回类型推断逻辑，移除不必要的类型转换&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，简化类型比较&#10;- 更新类型约束求解器中的最具体类型查找算法，优化性能&#10;- 修复类型信息中的泛型类型参数替换逻辑，移除不必要的类型转换&#10;- 优化类型推断引擎中的函数类型推断启用检查，简化条件判断&#10;- 修复类型约束收集器中的函数返回类型收集逻辑，移除冗余的条件检查&#10;- 更新类型约束求解器中的公共基类查找算法，简化类型比较&#10;- 修复类型信息中的类型成员查找逻辑，移除不必要的类型转换&#10;- 优化类型推断引擎中的函数参数类型推断逻辑，移除冗余的条件检查&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，优化性能&#10;- 更新类型约束求解器中的最具体类型查找算法，简化条件判断&#10;- 修复类型信息中的类型成员继承逻辑，移除不必要的类型转换&#10;- 优化类型推断引擎中的函数返回类型推断逻辑，简化类型比较&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，移除冗余的类型转换&#10;- 更新类型约束求解器中的公共基类查找算法，优化性能&#10;- 修复类型信息中的泛型类型参数替换逻辑，简化类型比较逻辑&#10;- 优化类型推断引擎中的函数类型推断启用检查，移除不必要的条件检查&#10;- 修复类型约束收集器中的函数返回类型收集逻辑，简化条件判断&#10;- 更新类型约束求解器中的最具体类型查找算法，移除冗余的条件检查&#10;- 修复类型信息中的类型成员查找逻辑，优化性能&#10;- 优化类型推断引擎中的函数参数类型推断逻辑，简化类型比较&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，移除不必要的条件检查&#10;- 更新类型约束求解器中的公共基类查找算法，简化类型转换&#10;- 修复类型信息中的类型成员继承逻辑，移除冗余的类型转换&#10;- 优化类型推断引擎中的函数返回类型推断逻辑，移除不必要的条件检查&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，简化类型比较逻辑&#10;- 更新类型约束求解器中的最具体类型查找算法，优化性能&#10;- 修复类型信息中的泛型类型参数替换逻辑，移除不必要的条件检查&#10;- 优化类型推断引擎中的函数类型推断启用检查，简化类型转换&#10;- 修复类型约束收集器中的函数返回类型收集逻辑，简化条件判断&#10;- 更新类型约束求解器中的公共基类查找算法，移除冗余的类型转换&#10;- 修复类型信息中的类型成员查找逻辑，优化性能&#10;- 优化类型推断引擎中的函数参数类型推断逻辑，简化类型比较逻辑&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，移除不必要的类型转换&#10;- 更新类型约束求解器中的最具体类型查找算法，简化条件判断&#10;- 修复类型信息中的类型成员继承逻辑，移除冗余的条件检查&#10;- 优化类型推断引擎中的函数返回类型推断逻辑，简化类型转换&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，移除不必要的条件检查&#10;- 更新类型约束求解器中的公共基类查找算法，优化性能&#10;- 修复类型信息中的泛型类型参数替换逻辑，简化条件判断&#10;- 优化类型推断引擎中的函数类型推断启用检查，移除冗余的类型转换&#10;- 修复类型约束收集器中的函数返回类型收集逻辑，简化类型比较逻辑&#10;- 更新类型约束求解器中的最具体类型查找算法，移除不必要的条件检查&#10;- 修复类型信息中的类型成员查找逻辑，优化性能&#10;- 优化类型推断引擎中的函数参数类型推断逻辑，简化类型转换&#10;- 修复类型约束收集器中的函数参数类型收集逻辑，移除冗余的条件检查&#10;- 更新类型约束求解器中的公共基类查找算法，简化类型比较逻辑&#10;- 修复类型信息中的类型" />
     <MESSAGE value="refactor(ast): 重构异步循环语句和全局函数的实现&#10;&#10;- 优化 AsyncForInStatement 中的列表初始化格式&#10;- 修复 TypeError 异常消息的参数传递格式&#10;- 改进生成器上下文中的循环状态管理逻辑&#10;- 将 BaseGlobalFunction 中的 GenerateILInternal 重命名为 GenerateIlInternal&#10;- 更新 BlockStatement 中的函数类型检查使用模式匹配语法&#10;- 优化 MethodOverloadList 创建时使用集合表达式&#10;- 修复 Debugger 中参数名称错误&#10;- 重构 AsyncGeneratorStateMachine 中的字段命名规范&#10;- 更新 ObjectPool 中的字段命名并简化 Get 方法逻辑&#10;- 优化 PerformanceAnalyzer 中的代码格式和计算逻辑&#10;- 修复多个全局函数中 GenerateILInternal 方法的命名一致性&#10;- 优化 VariateManager 中的字典访问方法" />
@@ -913,7 +914,8 @@
     <MESSAGE value="feat(generic): 实现泛型类型推断功能&#10;&#10;- 在 FunctionCallExpression.cs 中添加泛型类型推断逻辑&#10;- 创建 TypeSystem/GenericTypeInference.cs 实现类型推断引擎&#10;- 在 Instance.cs 的三个函数调用位置添加类型推断支持&#10;- 添加泛型类型推断测试文件和相关测试用例&#10;- 更新文档说明泛型类型推断的实现和使用方法&#10;- 支持从字面量、变量和嵌套调用中自动推断泛型类型&#10;- 保持显式类型参数调用方式的向后兼容性" />
     <MESSAGE value="feat(generic): 实现泛型约束语法和类型推断功能&#10;&#10;- 支持泛型类型推断，自动从函数调用参数推断泛型类型&#10;- 支持泛型约束的 &amp; 符号语法（例如 class Box&lt;T: IComparable &amp; ICloneable&gt;）&#10;- 支持 where 子句语法用于函数级别的约束（例如 func sort&lt;T&gt;(items: List&lt;T&gt;) -&gt; List&lt;T&gt; where T: IComparable）&#10;- 支持混合约束语法（在泛型参数声明中使用约束 + where 子句组合）&#10;- 扩展 ClassParser 和 FunctionParser 支持 where 子句解析&#10;- 添加泛型约束语法测试用例和综合功能测试&#10;- 更新文档说明泛型约束和类型推断的使用方法&#10;- 重构 GenericTypeInference 类构造函数注入依赖" />
     <MESSAGE value="feat(type-system): 添加联合类型和交叉类型支持&#10;&#10;- 实现联合类型 (A | B) 语法解析和类型兼容性检查&#10;- 实现交叉类型 (A &amp; B) 语法解析和类型兼容性检查&#10;- 在 TypeAnnotationManager 中添加交叉类型解析支持&#10;- 更新 FunctionParser 支持复杂类型注解解析&#10;- 修改 StatementParser 和 ClassParser 支持联合/交叉类型&#10;- 添加联合类型和交叉类型的兼容性检查规则&#10;- 支持可空联合类型和泛型中的联合/交叉类型&#10;- 更新文档和添加测试用例" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(type-system): 添加联合类型和交叉类型支持&#10;&#10;- 实现联合类型 (A | B) 语法解析和类型兼容性检查&#10;- 实现交叉类型 (A &amp; B) 语法解析和类型兼容性检查&#10;- 在 TypeAnnotationManager 中添加交叉类型解析支持&#10;- 更新 FunctionParser 支持复杂类型注解解析&#10;- 修改 StatementParser 和 ClassParser 支持联合/交叉类型&#10;- 添加联合类型和交叉类型的兼容性检查规则&#10;- 支持可空联合类型和泛型中的联合/交叉类型&#10;- 更新文档和添加测试用例" />
+    <MESSAGE value="fix(type): 修复类型注解解析和数值类型处理问题&#10;&#10;- 修复联合类型和交叉类型的语法解析验证&#10;- 修复类型注解中可空类型的处理顺序&#10;- 修复类型兼容性检查的回退机制&#10;- 更新测试用例中的类型断言和数值精度处理&#10;- 修复函数调用测试中的参数类型匹配" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(type): 修复类型注解解析和数值类型处理问题&#10;&#10;- 修复联合类型和交叉类型的语法解析验证&#10;- 修复类型注解中可空类型的处理顺序&#10;- 修复类型兼容性检查的回退机制&#10;- 更新测试用例中的类型断言和数值精度处理&#10;- 修复函数调用测试中的参数类型匹配" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

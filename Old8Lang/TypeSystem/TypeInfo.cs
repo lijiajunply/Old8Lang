@@ -62,13 +62,41 @@ public class PrimitiveTypeInfo(string name) : ITypeInfo
 }
 
 /// <summary>
+/// 接口类型信息
+/// </summary>
+public class InterfaceTypeInfo(string name, List<string>? parentInterfaceNames = null) : ITypeInfo
+{
+    public string Name { get; } = name;
+    public bool IsClassType => false;
+    public ITypeInfo? BaseType => null;
+    public List<string> ParentInterfaceNames { get; } = parentInterfaceNames ?? [];
+
+    public bool IsCompatibleWith(ITypeInfo other)
+    {
+        if (Name == other.Name) return true;
+        if (other.Name == "any") return true;
+
+        // 接口继承：子接口可以赋值给父接口类型
+        if (ParentInterfaceNames.Contains(other.Name))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public ConcurrentDictionary<string, LangValueType> GetMembers(VariateManager manager) => [];
+}
+
+/// <summary>
 /// 类类型信息，支持继承和多态
 /// </summary>
-public class ClassTypeInfo(string name, ITypeInfo? baseType = null) : ITypeInfo
+public class ClassTypeInfo(string name, ITypeInfo? baseType = null, List<string>? interfaceNames = null) : ITypeInfo
 {
     public string Name { get; } = name;
     public bool IsClassType => true;
     public ITypeInfo? BaseType { get; } = baseType;
+    public List<string> InterfaceNames { get; } = interfaceNames ?? [];
 
     private readonly ConcurrentDictionary<string, LangValueType> CachedMembers = [];
 
@@ -83,6 +111,12 @@ public class ClassTypeInfo(string name, ITypeInfo? baseType = null) : ITypeInfo
         {
             if (current.BaseType.Name == other.Name) return true;
             current = (ClassTypeInfo)current.BaseType;
+        }
+
+        // 支持接口多态：实现接口的类可以赋值给接口类型
+        if (InterfaceNames.Contains(other.Name))
+        {
+            return true;
         }
 
         return false;

@@ -455,12 +455,26 @@ public static class TypeChecker
     /// </summary>
     /// <param name="className">类名称</param>
     /// <param name="baseClassName">基类名称（可选）</param>
-    public static void RegisterClassType(string className, string? baseClassName = null)
+    /// <param name="interfaceNames">实现的接口列表（可选）</param>
+    public static void RegisterClassType(string className, string? baseClassName = null, List<string>? interfaceNames = null)
     {
         if (_annotationManager == null)
             throw new InvalidOperationException("TypeChecker not initialized. Call Initialize() first.");
 
-        _annotationManager.RegisterClassType(className, baseClassName);
+        _annotationManager.RegisterClassType(className, baseClassName, interfaceNames);
+    }
+
+    /// <summary>
+    /// 注册接口类型到类型假注系统
+    /// </summary>
+    /// <param name="interfaceName">接口名称</param>
+    /// <param name="parentInterfaceNames">父接口列表（可选）</param>
+    public static void RegisterInterfaceType(string interfaceName, List<string>? parentInterfaceNames = null)
+    {
+        if (_annotationManager == null)
+            throw new InvalidOperationException("TypeChecker not initialized. Call Initialize() first.");
+
+        _annotationManager.RegisterInterfaceType(interfaceName, parentInterfaceNames);
     }
 
     /// <summary>

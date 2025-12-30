@@ -60,11 +60,25 @@ public partial class ClassInit(TypeTemplate anyLangValue, SourcePosition positio
     {
         try
         {
-            // 获取父类名称
-            string? baseClassName = anyLangValue.ParentClassName;
+            if (anyLangValue.IsInterface)
+            {
+                // 注册接口类型
+                // 接口的父接口存储在 ImplementsNames 中（见 ClassParser.ParseInterfaceDeclaration）
+                List<string> parentInterfaceNames = anyLangValue.ImplementsNames;
+                TypeChecker.RegisterInterfaceType(anyLangValue.ClassName, parentInterfaceNames);
+            }
+            else
+            {
+                // 注册类类型
+                // 获取父类名称
+                string? baseClassName = anyLangValue.ParentClassName;
 
-            // 注册类类型到类型假注系统
-            TypeChecker.RegisterClassType(anyLangValue.ClassName, baseClassName);
+                // 获取实现的接口列表
+                List<string> implementsNames = anyLangValue.ImplementsNames;
+
+                // 注册类类型到类型假注系统
+                TypeChecker.RegisterClassType(anyLangValue.ClassName, baseClassName, implementsNames);
+            }
         }
         catch
         {

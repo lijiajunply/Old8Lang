@@ -528,8 +528,8 @@ public class InheritanceTests
                                    }
                                }
 
-                               employee <- Employee("John", 50000)
-                               manager <- Manager("Sarah", 80000, 5)
+                               employee <- Employee("John", 50000.0)
+                               manager <- Manager("Sarah", 80000.0, 5)
 
                                employeeInfo <- employee.getInfo()
                                managerInfo <- manager.getInfo()

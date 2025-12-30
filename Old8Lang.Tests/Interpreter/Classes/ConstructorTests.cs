@@ -736,9 +736,9 @@ public class ConstructorTests
                 }
             }
 
-            savings <- Account(""savings"", 1000)
-            checking <- Account(""checking"", 500)
-            business <- Account(""business"", 5000)
+            savings <- Account(""savings"", 1000.0)
+            checking <- Account(""checking"", 500.0)
+            business <- Account(""business"", 5000.0)
 
             savingsRate <- savings.interestRate
             checkingOverdraft <- checking.overdraftLimit
