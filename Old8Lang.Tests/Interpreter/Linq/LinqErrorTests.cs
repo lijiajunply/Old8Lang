@@ -66,7 +66,7 @@ public class LinqErrorTests
 
         // Act & Assert
         var ast = interpreter.Build(code);
-        Assert.Throws<RuntimeError>(() => ast.Run(interpreter.Manager));
+        Assert.Throws<ZeroDivisionError>(() => ast.Run(interpreter.Manager));
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public class LinqErrorTests
 
         // Act & Assert
         var ast = interpreter.Build(code);
-        Assert.Throws<RuntimeError>(() => ast.Run(interpreter.Manager));
+        Assert.Throws<ZeroDivisionError>(() => ast.Run(interpreter.Manager));
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class LinqErrorTests
 
         // Act & Assert
         var ast = interpreter.Build(code);
-        Assert.Throws<RuntimeError>(() => ast.Run(interpreter.Manager));
+        Assert.Throws<ZeroDivisionError>(() => ast.Run(interpreter.Manager));
     }
 
     [Fact]
@@ -186,7 +186,7 @@ public class LinqErrorTests
 
         // Act & Assert
         var ast = interpreter.Build(code);
-        Assert.Throws<InvalidOperationError>(() => ast.Run(interpreter.Manager));
+        Assert.Throws<AttributeError>(() => ast.Run(interpreter.Manager));
     }
 
     [Fact]
@@ -195,12 +195,12 @@ public class LinqErrorTests
         // Arrange
         var code = @"
             numbers <- [1, 2, 0, 3]
-            result <- from x in numbers where x > 0 where 10 / x > 5 select x
+            result <- from x in numbers where x >= 0 where 10 / x > 5 select x
         ";
         var interpreter = new LangInterpreter();
 
-        // Act & Assert - 第二个 where 会遇到除零错误
+        // Act & Assert - 第二个 where 会遇到除零错误（因为 0 通过了第一个 where）
         var ast = interpreter.Build(code);
-        Assert.Throws<RuntimeError>(() => ast.Run(interpreter.Manager));
+        Assert.Throws<ZeroDivisionError>(() => ast.Run(interpreter.Manager));
     }
 }

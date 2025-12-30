@@ -236,7 +236,7 @@ public class LinqLetOrderByTests
         // Arrange
         var code = @"
             numbers <- [3, 1, 4, 2]
-            result <- from x in numbers let neg <- -x orderby neg select x
+            result <- from x in numbers let neg <- -x orderby neg select -neg
         ";
         var interpreter = new LangInterpreter();
 

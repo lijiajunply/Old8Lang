@@ -22,35 +22,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Linq/LinqBasicExecutionTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Linq/LinqEdgeCasesTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Linq/LinqErrorTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Linq/LinqLetOrderByTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Linq/LinqAdvancedParsingTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Linq/LinqBasicParsingTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/FromClause.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/GroupByClause.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/JoinClause.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LetClause.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LinqClause.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LinqExpression.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/LinqQueryExecutor.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/OrderByClause.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/QueryContinuation.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/SelectClause.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Linq/WhereClause.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/LinqParser.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/linq_basic.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/linq_basic_oneline.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/linq_let.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/linq_orderby.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/linq_select_projection.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Generics/GenericsParserTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Generics/GenericsParserTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Linq/LinqErrorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Linq/LinqErrorTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Linq/LinqLetOrderByTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Linq/LinqLetOrderByTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/IntLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/IntLangValue.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,6 +84,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/IntLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/ClassInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/ClassInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
@@ -894,7 +870,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="442" />
+    <option name="localTasksCounter" value="443" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -921,7 +897,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(interpreter): 添加泛型支持和相关测试&#10;&#10;- 在 AnyLangValue 中添加泛型类型参数映射设置逻辑&#10;- 实现 GenericClassTests 测试泛型类基本功能&#10;- 实现 GenericFunctionTests 测试泛型函数基本功能&#10;- 更新 GenericInstanceExpression 支持泛型实例化表达式&#10;- 修改 EBNF 语法定义添加泛型类型参数和参数语法&#10;- 更新语法文档添加泛型函数和泛型类说明&#10;- 添加 nullable 类型支持和泛型相关语法说明" />
     <MESSAGE value="feat(lang): 添加枚举类型支持&#10;&#10;- 实现枚举定义语法 enum Name { Member1, Member2 &lt;- value }&#10;- 添加枚举成员访问功能 EnumName.MemberName&#10;- 支持自动值和显式值的枚举定义&#10;- 实现枚举在解释器和编译器中的处理&#10;- 添加枚举语法测试和解释器测试用例&#10;- 更新语言文档和EBNF语法定义&#10;- 在AST中添加EnumInit和EnumTemplate节点类型&#10;- 实现枚举成员值计算和作用域管理" />
     <MESSAGE value="docs(changelog): 更新版本更新日志格式和内容&#10;&#10;- 重构语言特性部分，按功能分类整理枚举、类型系统、表达式等特性&#10;- 重新组织标准库扩展内容，添加详细的库功能说明&#10;- 整理异步与并发特性，明确生成器和多线程功能描述&#10;- 优化系统优化部分，突出模块系统改进要点&#10;- 添加开发工具改进和测试质量相关更新&#10;- 使用更清晰的 Markdown 格式组织版本更新内容" />
     <MESSAGE value="feat(lang): 添加NativeObjectLangValue支持C#对象包装和实现ValueToObj转换&#10;&#10;- 添加NativeObjectLangValue类用于包装任意.NET对象&#10;- 实现ValueToObj统一转换方法支持双向类型转换&#10;- 为DictionaryLangValue和TupleLangValue添加GetValue方法&#10;- 增强ObjToValue方法处理自定义类型和值元组&#10;- 添加全面的类型转换测试用例验证往返转换&#10;- 支持属性访问、字段访问和方法调用操作&#10;- 优化集合类型转换处理逻辑" />
@@ -946,7 +921,8 @@
     <MESSAGE value="test(classes): 为类测试添加顺序集合标记并重命名处理器类&#10;&#10;- 为 ClassDeclarationTests、ClassInstantiationTests、ConstructorTests、GenericClassTests、&#10;  InheritanceTests、InterfaceTests、MemberAccessTests 和 MixinTests 添加 [Collection(&quot;Sequential&quot;)] 标记&#10;- 将 ConstructorTests 中的 Processor 类重命名为 FunctionProcessor 以提高语义清晰度&#10;- 更新 ConstructorTests 中的实例化代码以使用新的 FunctionProcessor 类名&#10;- 从 workspace.xml 中移除过时的变更记录并更新本地任务计数器&#10;- 清理 workspace.xml 中的提交消息历史记录" />
     <MESSAGE value="test(interpreter): 为模块导入测试添加顺序集合标记并修复代码格式&#10;&#10;- 为 DynamicImportTests、LazyImportTests、RealWorldUsageTests 和 SimpleImportTests 添加 [Collection(&quot;Sequential&quot;)] 标记&#10;- 修复 SimpleImportTests 中多行字符串字面量的缩进格式问题&#10;- 更新 workspace.xml 中的变更记录和本地任务计数器&#10;- 清理 workspace.xml 中的过时提交消息历史记录&#10;- 修复断点位置因代码格式调整而产生的偏移" />
     <MESSAGE value="feat(module): 实现模块函数作用域捕获机制&#10;&#10;- 在 FuncLangValue 中添加 CreateWithCapturedScope 方法用于创建带捕获作用域的函数副本&#10;- 重构 UnifiedModule 实现模块隔离作用域，避免符号污染父作用域&#10;- 为导入的函数设置捕获作用域，确保模块内函数可访问模块变量&#10;- 保存初始 VariateManager 用于懒加载时的上下文恢复&#10;- 修复 SpawnTests 中的断点位置偏移问题&#10;- 更新 IDE 配置和测试会话设置" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(module): 实现模块函数作用域捕获机制&#10;&#10;- 在 FuncLangValue 中添加 CreateWithCapturedScope 方法用于创建带捕获作用域的函数副本&#10;- 重构 UnifiedModule 实现模块隔离作用域，避免符号污染父作用域&#10;- 为导入的函数设置捕获作用域，确保模块内函数可访问模块变量&#10;- 保存初始 VariateManager 用于懒加载时的上下文恢复&#10;- 修复 SpawnTests 中的断点位置偏移问题&#10;- 更新 IDE 配置和测试会话设置" />
+    <MESSAGE value="feat(parser): 添加LINQ查询表达式支持&#10;&#10;- 实现了FromClause、WhereClause、SelectClause等LINQ子句AST节点&#10;- 添加了OrderByClause、GroupByClause、JoinClause、LetClause等高级子句&#10;- 扩展LangTokenType枚举以支持LINQ相关关键字（select、orderby、group等）&#10;- 更新词法分析器以正确识别LINQ关键字并建立关键字到TokenType的映射&#10;- 集成LinqParser到主解析器中处理LINQ查询表达式解析&#10;- 创建LINQ基础语法和高级功能的测试用例文件&#10;- 实现LINQ查询的基础执行和边界情况处理测试" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 添加LINQ查询表达式支持&#10;&#10;- 实现了FromClause、WhereClause、SelectClause等LINQ子句AST节点&#10;- 添加了OrderByClause、GroupByClause、JoinClause、LetClause等高级子句&#10;- 扩展LangTokenType枚举以支持LINQ相关关键字（select、orderby、group等）&#10;- 更新词法分析器以正确识别LINQ关键字并建立关键字到TokenType的映射&#10;- 集成LinqParser到主解析器中处理LINQ查询表达式解析&#10;- 创建LINQ基础语法和高级功能的测试用例文件&#10;- 实现LINQ查询的基础执行和边界情况处理测试" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1487,6 +1463,19 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="636" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Linq/LinqLetOrderByTests.cs</url>
+          <line>254</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Linq/LinqLetOrderByTests.cs" containingFunctionPresentation="方法 'LinqQuery_LetOrderBy_UsesLetVariableForSorting'">
+            <startOffsets>
+              <option value="8655" />
+            </startOffsets>
+            <endOffsets>
+              <option value="8709" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="637" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />

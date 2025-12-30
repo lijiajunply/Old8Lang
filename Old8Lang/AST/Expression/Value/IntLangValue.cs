@@ -183,7 +183,7 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
             return Value < i.Value;
         if (otherValue is CharLangValue c)
             return Value < c.Value;
-        throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
+        throw new TypeError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
     public override bool Greater(LangValueType? otherValue)
@@ -194,7 +194,7 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
             return Value > i.Value;
         if (otherValue is CharLangValue c)
             return Value > c.Value;
-        throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
+        throw new TypeError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
     public override bool LessEqual(LangValueType? otherValue)
@@ -205,7 +205,7 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
             return Value <= i.Value;
         if (otherValue is CharLangValue c)
             return Value <= c.Value;
-        throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
+        throw new TypeError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
     public override bool GreaterEqual(LangValueType? otherValue)
@@ -216,7 +216,7 @@ public partial class IntLangValue(int intValue = 0, SourcePosition position = de
             return Value >= i.Value;
         if (otherValue is CharLangValue c)
             return Value >= c.Value;
-        throw new InvalidOperationError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
+        throw new TypeError(this, $"不支持与 {otherValue?.TypeToString()} 类型进行比较");
     }
 
     public override bool Equal(LangValueType? otherValueType)
