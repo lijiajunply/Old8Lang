@@ -22,8 +22,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/ArrayTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/ArrayTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/PerformanceTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/StringTemplateTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/StringTemplateTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -876,7 +877,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="446" />
+    <option name="localTasksCounter" value="447" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -903,7 +904,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(lang): 重构NativeAnyLangValue支持对象包装和类型转换&#10;&#10;- 移除NativeObjectLangValue类，功能合并到NativeAnyLangValue&#10;- 重命名类型转换注释，使用NativeAnyLangValue替换NativeObjectLangValue&#10;- 更新测试用例，将NativeObjectLangValue断言改为NativeAnyLangValue&#10;- 修改Capt" />
     <MESSAGE value="test(interpreter): 更新导入错误处理测试&#10;&#10;- 重构异常断言逻辑，直接验证ImportError类型&#10;- 修正多行字符串缩进格式以保持一致性&#10;- 移除不必要的嵌套代码块结构" />
     <MESSAGE value="feat(module): 实现常量导入和通配符导入功能&#10;&#10;- 添加 ConstantLangValue 类包装常量值并继承 ImportInfo&#10;- 修改 ImportStatement 支持 ConstantLangValue 和 UnifiedModule 的导入匹配&#10;- 在 ModuleSystemService 中实现通配符导入时将作用域常量包装为 ConstantLangValue&#10;- 扩展 SymbolExtractor 支持常量包装和符号提取功能&#10;- 更新 SymbolRegistry 实现 ConstantLangValue 解包到父作用域逻辑&#10;- 修改 UnifiedModule 继承 ImportInfo 以支持导入系统&#10;- 扩展 VariateManager 支持常量和模块对象的标识符查找&#10;- 添加通配符导入常量的单元测试验证功能正确性&#10;- 移除版本解析实现文档，优化模块系统架构设计" />
     <MESSAGE value="feat(compiler): 添加严格类型检查模式和Assert方法调用支持&#10;&#10;- 实现StrictTypeChecking属性控制类型检查严格程度&#10;- 添加函数返回类型箭头语法支持 func() -&gt; type&#10;- 实现Assert静态方法调用的类型检查和IL生成&#10;- 支持Assert方法别名映射如True到AssertTrue&#10;- 添加类型兼容性检查的动态类型行为&#10;- 创建多个测试文件验证Assert和类型系统功能" />
@@ -928,7 +928,8 @@
     <MESSAGE value="fix(ast): 修正类型错误异常处理&#10;&#10;- 将 IntLangValue 比较操作中的 InvalidOperationError 替换为 TypeError&#10;- 更新 LinqErrorTests 中的异常类型断言从 RuntimeError 到 ZeroDivisionError&#10;- 修正 LinqErrorTests 中的测试代码逻辑和注释说明&#10;- 调整 LinqLetOrderByTests 中的测试查询表达式&#10;- 更新 IDE 配置文件中的断点设置和任务计数器" />
     <MESSAGE value="test(compiler): 重构算术表达式测试以使用内联断言&#10;&#10;- 移除未使用的 AST 和错误处理程序引用&#10;- 将测试代码重构为使用 Old8Lang 内置断言语句&#10;- 更新除法和取模运算测试以返回双精度浮点数类型&#10;- 简化断言逻辑，使用 Record.Exception 捕获异常&#10;- 添加复杂算术表达式的预期值计算和断言&#10;- 为整数溢出测试添加内联断言验证&#10;- 更新 IDE 工作区配置文件以包含类解析器" />
     <MESSAGE value="test(compiler): 更新表达式测试以使用内置断言并改进数值类型处理&#10;&#10;- 将算术测试中的整数字面量改为双精度字面量以提高精度&#10;- 用内置 Old8Lang 断言替换 C# 断言进行测试验证&#10;- 重构比较测试以使用内联断言并简化测试结构&#10;- 从逻辑测试中移除未使用的 AST 导入语句&#10;- 更新字符串模板测试以使用内置断言验证结果&#10;- 简化复合表达式测试的验证方法" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(compiler): 更新表达式测试以使用内置断言并改进数值类型处理&#10;&#10;- 将算术测试中的整数字面量改为双精度字面量以提高精度&#10;- 用内置 Old8Lang 断言替换 C# 断言进行测试验证&#10;- 重构比较测试以使用内联断言并简化测试结构&#10;- 从逻辑测试中移除未使用的 AST 导入语句&#10;- 更新字符串模板测试以使用内置断言验证结果&#10;- 简化复合表达式测试的验证方法" />
+    <MESSAGE value="test(compiler): 更新数组测试以使用内置断言并简化验证逻辑&#10;&#10;- 移除未使用的 AST 表达式导入语句&#10;- 用内置 Old8Lang 断言替换 C# 断言进行数组操作测试&#10;- 重构数组创建和访问测试以使用内联断言验证&#10;- 简化数组长度和元素访问的测试验证方法&#10;- 更新大型数组测试以避免过大的代码生成&#10;- 添加 IDE 配置文件中的异常类型处理设置" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(compiler): 更新数组测试以使用内置断言并简化验证逻辑&#10;&#10;- 移除未使用的 AST 表达式导入语句&#10;- 用内置 Old8Lang 断言替换 C# 断言进行数组操作测试&#10;- 重构数组创建和访问测试以使用内联断言验证&#10;- 简化数组长度和元素访问的测试验证方法&#10;- 更新大型数组测试以避免过大的代码生成&#10;- 添加 IDE 配置文件中的异常类型处理设置" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
