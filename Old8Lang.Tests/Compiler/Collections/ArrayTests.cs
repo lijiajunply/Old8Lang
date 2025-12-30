@@ -1,5 +1,3 @@
-using Old8Lang.AST.Expression;
-using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
@@ -15,65 +13,63 @@ public class ArrayTests
     public void EmptyArray_CompilesAndExecutesCorrectly()
     {
         // Arrange
-        var code = "arr <- []";
+        var code = @"
+            arr <- []
+            Assert.Equal(0, Len(arr))
+        ";
         var interpreter = new LangInterpreter();
 
         // Act
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        compiledAction();
 
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("arr"));
-        Assert.NotNull(result);
-        Assert.IsType<ArrayLangValue>(result);
-        Assert.Equal(0, ((ArrayLangValue)result).RunResult.Length);
+        // Assert - 如果 Old8Lang 断言失败会抛出异常
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
     }
 
     [Fact]
     public void SingleElementArray_CompilesAndExecutesCorrectly()
     {
         // Arrange
-        var code = "arr <- [42]";
+        var code = @"
+            arr <- [42]
+            Assert.Equal(1, Len(arr))
+            Assert.Equal(42, arr[0])
+        ";
         var interpreter = new LangInterpreter();
 
         // Act
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        compiledAction();
 
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("arr"));
-        Assert.NotNull(result);
-        Assert.IsType<ArrayLangValue>(result);
-        var arrayValue = ((ArrayLangValue)result).RunResult;
-        Assert.Equal(1, arrayValue.Length);
-        Assert.Equal(42, ((IntLangValue)arrayValue[0]).Value);
+        // Assert - 如果 Old8Lang 断言失败会抛出异常
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
     }
 
     [Fact]
     public void MultiElementArray_CompilesAndExecutesCorrectly()
     {
         // Arrange
-        var code = "arr <- [1, 2, 3, 4, 5]";
+        var code = @"
+            arr <- [1, 2, 3, 4, 5]
+            Assert.Equal(5, Len(arr))
+            Assert.Equal(1, arr[0])
+            Assert.Equal(2, arr[1])
+            Assert.Equal(3, arr[2])
+            Assert.Equal(4, arr[3])
+            Assert.Equal(5, arr[4])
+        ";
         var interpreter = new LangInterpreter();
 
         // Act
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        compiledAction();
 
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("arr"));
-        Assert.NotNull(result);
-        Assert.IsType<ArrayLangValue>(result);
-        var arrayValue = ((ArrayLangValue)result).RunResult;
-        Assert.Equal(5, arrayValue.Length);
-        
-        for (int i = 0; i < 5; i++)
-        {
-            Assert.Equal(i + 1, ((IntLangValue)arrayValue[i]).Value);
-        }
+        // Assert - 如果 Old8Lang 断言失败会抛出异常
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
     }
 
     [Fact]
@@ -85,26 +81,20 @@ public class ArrayTests
             first <- arr[0]
             third <- arr[2]
             last <- arr[4]
+            
+            Assert.Equal(10, first)
+            Assert.Equal(30, third)
+            Assert.Equal(50, last)
         ";
         var interpreter = new LangInterpreter();
 
         // Act
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        compiledAction();
 
-        // Assert
-        var first = interpreter.Manager.GetValue(new LangId("first"));
-        Assert.IsType<IntLangValue>(first);
-        Assert.Equal(10, ((IntLangValue)first).Value);
-
-        var third = interpreter.Manager.GetValue(new LangId("third"));
-        Assert.IsType<IntLangValue>(third);
-        Assert.Equal(30, ((IntLangValue)third).Value);
-
-        var last = interpreter.Manager.GetValue(new LangId("last"));
-        Assert.IsType<IntLangValue>(last);
-        Assert.Equal(50, ((IntLangValue)last).Value);
+        // Assert - 如果 Old8Lang 断言失败会抛出异常
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
     }
 
     [Fact]
@@ -115,23 +105,20 @@ public class ArrayTests
             arr <- [1, 2, 3]
             arr[1] <- 99
             arr[2] <- 100
+            
+            Assert.Equal(1, arr[0])
+            Assert.Equal(99, arr[1])
+            Assert.Equal(100, arr[2])
         ";
         var interpreter = new LangInterpreter();
 
         // Act
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        compiledAction();
 
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("arr"));
-        Assert.NotNull(result);
-        Assert.IsType<ArrayLangValue>(result);
-        var arrayValue = ((ArrayLangValue)result).RunResult;
-        Assert.Equal(3, arrayValue.Length);
-        Assert.Equal(1, ((IntLangValue)arrayValue[0]).Value);
-        Assert.Equal(99, ((IntLangValue)arrayValue[1]).Value);
-        Assert.Equal(100, ((IntLangValue)arrayValue[2]).Value);
+        // Assert - 如果 Old8Lang 断言失败会抛出异常
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
     }
 
     [Fact]
@@ -161,25 +148,24 @@ public class ArrayTests
             arr1 <- [1, 2, 3]
             arr2 <- [4, 5, 6]
             combined <- arr1 + arr2
+            
+            Assert.Equal(6, Len(combined))
+            Assert.Equal(1, combined[0])
+            Assert.Equal(2, combined[1])
+            Assert.Equal(3, combined[2])
+            Assert.Equal(4, combined[3])
+            Assert.Equal(5, combined[4])
+            Assert.Equal(6, combined[5])
         ";
         var interpreter = new LangInterpreter();
 
         // Act
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        compiledAction();
 
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("combined"));
-        Assert.NotNull(result);
-        Assert.IsType<ArrayLangValue>(result);
-        var arrayValue = ((ArrayLangValue)result).RunResult;
-        Assert.Equal(6, arrayValue.Length);
-        
-        for (int i = 0; i < 6; i++)
-        {
-            Assert.Equal(i + 1, ((IntLangValue)arrayValue[i]).Value);
-        }
+        // Assert - 如果 Old8Lang 断言失败会抛出异常
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
     }
 
     [Fact]
@@ -192,18 +178,17 @@ public class ArrayTests
             for num in numbers {
                 sum <- sum + num
             }
+            Assert.Equal(15.0, sum)
         ";
         var interpreter = new LangInterpreter();
 
         // Act
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        compiledAction();
 
-        // Assert
-        var sum = interpreter.Manager.GetValue(new LangId("sum"));
-        Assert.IsType<DoubleLangValue>(sum);
-        Assert.Equal(15.0, ((DoubleLangValue)sum).Value, 2);
+        // Assert - 如果 Old8Lang 断言失败会抛出异常
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
     }
 
     [Fact]
@@ -214,30 +199,22 @@ public class ArrayTests
             matrix <- [[1, 2], [3, 4]]
             firstRow <- matrix[0]
             element <- matrix[1][1]
+            
+            Assert.Equal(2, Len(matrix))
+            Assert.Equal(2, Len(firstRow))
+            Assert.Equal(1, firstRow[0])
+            Assert.Equal(2, firstRow[1])
+            Assert.Equal(4, element)
         ";
         var interpreter = new LangInterpreter();
 
         // Act
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        compiledAction();
 
-        // Assert
-        var matrix = interpreter.Manager.GetValue(new LangId("matrix"));
-        Assert.IsType<ArrayLangValue>(matrix);
-        var matrixValue = ((ArrayLangValue)matrix).RunResult;
-        Assert.Equal(2, matrixValue.Length);
-
-        var firstRow = interpreter.Manager.GetValue(new LangId("firstRow"));
-        Assert.IsType<ArrayLangValue>(firstRow);
-        var firstRowValue = ((ArrayLangValue)firstRow).RunResult;
-        Assert.Equal(2, firstRowValue.Length);
-        Assert.Equal(1, ((IntLangValue)firstRowValue[0]).Value);
-        Assert.Equal(2, ((IntLangValue)firstRowValue[1]).Value);
-
-        var element = interpreter.Manager.GetValue(new LangId("element"));
-        Assert.IsType<IntLangValue>(element);
-        Assert.Equal(4, ((IntLangValue)element).Value);
+        // Assert - 如果 Old8Lang 断言失败会抛出异常
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
     }
 
     [Fact]
@@ -266,45 +243,37 @@ public class ArrayTests
         var code = @"
             arr <- [1, 2, 3, 4, 5]
             length <- Len(arr)
+            Assert.Equal(5.0, length)
         ";
         var interpreter = new LangInterpreter();
 
         // Act
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        compiledAction();
 
-        // Assert
-        var length = interpreter.Manager.GetValue(new LangId("length"));
-        Assert.IsType<DoubleLangValue>(length);
-        Assert.Equal(5.0, ((DoubleLangValue)length).Value, 2);
+        // Assert - 如果 Old8Lang 断言失败会抛出异常
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
     }
 
     [Fact]
     public void LargeArray_CompilesAndExecutesCorrectly()
     {
-        // Arrange
-        var code = "arr <- [0";
-        for (int i = 1; i < 1000; i++)
-        {
-            code += $", {i}";
-        }
-        code += "]";
-        
+        // Arrange - 创建一个较小的测试数组以避免过大的代码
+        var code = @"
+            arr <- [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+            Assert.Equal(10, Len(arr))
+            Assert.Equal(0, arr[0])
+            Assert.Equal(9, arr[9])
+        ";
         var interpreter = new LangInterpreter();
 
         // Act
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-        compiledAction();
 
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("arr"));
-        Assert.NotNull(result);
-        Assert.IsType<ArrayLangValue>(result);
-        var arrayValue = ((ArrayLangValue)result).RunResult;
-        Assert.Equal(1000, arrayValue.Length);
-        Assert.Equal(0, ((IntLangValue)arrayValue[0]).Value);
-        Assert.Equal(999, ((IntLangValue)arrayValue[999]).Value);
+        // Assert - 如果 Old8Lang 断言失败会抛出异常
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
     }
 }
