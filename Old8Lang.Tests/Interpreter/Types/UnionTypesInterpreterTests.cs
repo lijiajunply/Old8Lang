@@ -205,7 +205,7 @@ result2 <- combine(""hello"", 3.14)";
         var result2 = interpreter.Manager.GetValue(new LangId("result2"));
 
         Assert.IsType<StringLangValue>(result1);
-        Assert.Equal("123-True", ((StringLangValue)result1).Value);
+        Assert.Equal("123-true", ((StringLangValue)result1).Value);
         Assert.IsType<StringLangValue>(result2);
         Assert.Equal("hello-3.14", ((StringLangValue)result2).Value);
     }

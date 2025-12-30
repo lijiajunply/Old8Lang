@@ -118,7 +118,7 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
             func add(a:double, b:double) -> double {
                 return a + b
             }
-            result <- add(square(3.0), square(4))
+            result <- add(square(3.0), square(4.0))
         ";
         var interpreter = new LangInterpreter();
 

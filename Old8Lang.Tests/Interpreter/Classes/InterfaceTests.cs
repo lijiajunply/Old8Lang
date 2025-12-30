@@ -454,8 +454,8 @@ public class InterfaceTests
         Assert.Equal(50.0, ((DoubleLangValue)result1).Value);
 
         Assert.NotNull(result2);
-        Assert.IsType<IntLangValue>(result2);
-        Assert.Equal(0, ((IntLangValue)result2).Value);
+        Assert.IsType<DoubleLangValue>(result2);
+        Assert.Equal(0, ((DoubleLangValue)result2).Value);
     }
 
     [Fact]

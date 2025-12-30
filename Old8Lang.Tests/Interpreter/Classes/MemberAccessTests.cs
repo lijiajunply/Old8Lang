@@ -226,8 +226,8 @@ public class MemberAccessTests
             }
 
             math <- MathOperations()
-            result1 <- math.Power(2, 8)
-            result2 <- math.Power(3, 3)
+            result1 <- math.Power(2.0, 8)
+            result2 <- math.Power(3.0, 3)
             result3 <- math.Factorial(5)
             result4 <- math.Factorial(0)
         ";

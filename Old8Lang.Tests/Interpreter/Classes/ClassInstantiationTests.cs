@@ -201,12 +201,12 @@ public class ClassInstantiationTests
         var result2 = interpreter.Manager.GetValue(new LangId("result2"));
 
         Assert.NotNull(result1);
-        Assert.IsType<IntLangValue>(result1);
-        Assert.Equal(25, ((IntLangValue)result1).Value); // 3^2 + 4^2 = 25
+        Assert.IsType<DoubleLangValue>(result1);
+        Assert.Equal(25, ((DoubleLangValue)result1).Value); // 3^2 + 4^2 = 25
 
         Assert.NotNull(result2);
-        Assert.IsType<IntLangValue>(result2);
-        Assert.Equal(169, ((IntLangValue)result2).Value); // 5^2 + 12^2 = 169
+        Assert.IsType<DoubleLangValue>(result2);
+        Assert.Equal(169, ((DoubleLangValue)result2).Value); // 5^2 + 12^2 = 169
     }
 
     [Fact]

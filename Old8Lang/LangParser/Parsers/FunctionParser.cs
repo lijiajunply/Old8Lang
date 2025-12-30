@@ -445,19 +445,19 @@ public class FunctionParser(
                 break;
             }
 
-            // 读取标识符（类型名）
-            if (CurrentToken.Type == LangTokenType.Identifier)
+            // 读取标识符（类型名）或 null 关键字
+            if (CurrentToken.Type == LangTokenType.Identifier || CurrentToken.Type == LangTokenType.Null)
             {
                 result += CurrentToken.Value;
-                Expect(LangTokenType.Identifier);
+                CurrentIndex++; // 跳过当前 token
 
-                // 处理泛型类型（例如 List<int>）
+                // 处理泛型类型（例如 List<int>）- 仅对标识符有效
                 if (CurrentToken.Type == LangTokenType.LessThan)
                 {
                     result += ParseGenericTypeAnnotation();
                 }
 
-                // 处理可空类型（例如 int?）
+                // 处理可空类型（例如 int?）- 仅对标识符有效
                 if (CurrentToken.Type == LangTokenType.Question)
                 {
                     result += "?";
@@ -469,12 +469,24 @@ public class FunctionParser(
             {
                 result += "|";
                 Expect(LangTokenType.Pipe);
+
+                // 验证 | 后面必须有类型标识符或 null 关键字
+                if (CurrentToken.Type != LangTokenType.Identifier && CurrentToken.Type != LangTokenType.Null)
+                {
+                    throw CreateSyntaxError($"联合类型操作符 '|' 后必须跟随类型标识符或 null，但得到 {CurrentToken.Type}");
+                }
             }
             // 读取交叉类型分隔符 &
             else if (CurrentToken.Type == LangTokenType.Ampersand)
             {
                 result += "&";
                 Expect(LangTokenType.Ampersand);
+
+                // 验证 & 后面必须有类型标识符
+                if (CurrentToken.Type != LangTokenType.Identifier)
+                {
+                    throw CreateSyntaxError($"交叉类型操作符 '&' 后必须跟随类型标识符，但得到 {CurrentToken.Type}");
+                }
             }
             else
             {

@@ -74,7 +74,7 @@ public class TypeAnnotationManager
     /// </summary>
     public ParsedTypeAnnotation ParseTypeAnnotation(string typeAnnotation)
     {
-        if (string.IsNullOrEmpty(typeAnnotation))
+        if (string.IsNullOrWhiteSpace(typeAnnotation))
         {
             return new ParsedTypeAnnotation { BaseType = "any" };
         }
@@ -87,16 +87,8 @@ public class TypeAnnotationManager
     /// </summary>
     private ParsedTypeAnnotation ParseTypeAnnotationRecursive(string typeAnnotation)
     {
-        // 处理可空类型（例如 "int?", "string?"）
-        if (typeAnnotation.EndsWith('?'))
-        {
-            var innerTypeStr = typeAnnotation.Substring(0, typeAnnotation.Length - 1).Trim();
-            var innerType = ParseTypeAnnotationRecursive(innerTypeStr);
-            innerType.IsNullable = true;
-            return innerType;
-        }
-
         // 处理联合类型（检查顶层的 |，不检查泛型内部的）
+        // 优先处理联合类型，因为 "int? | string?" 中的 ? 是属于各个成员的
         var unionIndex = FindTopLevelSeparator(typeAnnotation, '|');
         if (unionIndex >= 0)
         {
@@ -118,6 +110,16 @@ public class TypeAnnotationManager
                 BaseType = "intersection",
                 GenericArguments = types.Select(t => ParseTypeAnnotationRecursive(t.Trim())).ToList()
             };
+        }
+
+        // 处理可空类型（例如 "int?", "string?"）
+        // 在联合类型和交叉类型之后处理，确保不会误处理 "int? | string?" 的末尾 ?
+        if (typeAnnotation.EndsWith('?'))
+        {
+            var innerTypeStr = typeAnnotation.Substring(0, typeAnnotation.Length - 1).Trim();
+            var innerType = ParseTypeAnnotationRecursive(innerTypeStr);
+            innerType.IsNullable = true;
+            return innerType;
         }
 
         // 处理泛型类型
@@ -287,8 +289,22 @@ public class TypeAnnotationManager
             return true;
         }
 
-        // 处理普通类型：使用 TypeFamily 进行兼容性检查
-        return TypeFamily.IsCompatible(actual.BaseType, expected.BaseType);
+        // 处理普通类型：先尝试使用 TypeFamily 进行兼容性检查
+        // 如果类型未注册（GetType 返回 null），则使用名称匹配作为后备方案
+        var expectedTypeInfo = TypeFamily.GetType(expected.BaseType);
+        var actualTypeInfo = TypeFamily.GetType(actual.BaseType);
+
+        if (expectedTypeInfo != null && actualTypeInfo != null)
+        {
+            // 两个类型都已注册，使用 TypeFamily 的兼容性检查
+            return TypeFamily.IsCompatible(actual.BaseType, expected.BaseType);
+        }
+
+        // 如果有类型未注册，使用名称匹配作为后备方案
+        // 这允许对未注册的接口类型（如 IComparable）进行基本的类型检查
+        return expected.BaseType == actual.BaseType ||
+               expected.BaseType == "any" ||
+               actual.BaseType == "any";
     }
 
     /// <summary>
@@ -372,8 +388,18 @@ public class TypeAnnotationManager
             return ValidateTypeCompatibility(targetTypeName, sourceTypeName);
         }
 
-        // 否则使用 TypeFamily 的基本兼容性检查
-        return TypeFamily.IsCompatible(sourceTypeName, targetTypeName);
+        // 尝试使用 TypeFamily 的基本兼容性检查
+        // 如果 TypeFamily 中未注册某个类型（如 tuple），则回退到基本类型兼容性检查
+        var sourceType = TypeFamily.GetType(sourceTypeName);
+        var targetType = TypeFamily.GetType(targetTypeName);
+
+        if (sourceType != null && targetType != null)
+        {
+            return TypeFamily.IsCompatible(sourceTypeName, targetTypeName);
+        }
+
+        // 回退到基本类型兼容性检查（用于处理内置类型如 tuple、array 等）
+        return TypeChecker.IsTypeCompatible(targetTypeName, sourceTypeName);
     }
 
     /// <summary>
