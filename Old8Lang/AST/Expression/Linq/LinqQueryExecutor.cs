@@ -21,7 +21,11 @@ public class LinqQueryExecutor(VariateManager manager)
         var sourceValue = linqExpr.FromClause.DataSource.Run(manager);
         var dataSource = ConvertToEnumerable(sourceValue);
 
+        // 检查是否有 OrderBy 子句
+        var hasOrderBy = linqExpr.BodyClauses.Any(c => c is OrderByClause);
+
         // 使用统一的迭代器处理所有子句
+        var intermediateResults = new List<(object? item, Dictionary<string, LangValueType> letVariables)>();
         var result = new List<object?>();
         var rangeLangId = new LangId(linqExpr.FromClause.RangeVariable);
 
@@ -35,6 +39,7 @@ public class LinqQueryExecutor(VariateManager manager)
             {
                 // 按顺序执行所有查询体子句，如果任何 where 条件失败则跳过该元素
                 var shouldInclude = true;
+                var letVariables = new Dictionary<string, LangValueType>();
 
                 // 处理所有 let 和 where 子句
                 foreach (var clause in linqExpr.BodyClauses)
@@ -45,6 +50,7 @@ public class LinqQueryExecutor(VariateManager manager)
                         var letValue = letClause.Expression.Run(manager);
                         var letId = new LangId(letClause.Variable);
                         manager.Set(letId, letValue);
+                        letVariables[letClause.Variable] = letValue;
                     }
                     else if (clause is WhereClause whereClause)
                     {
@@ -63,18 +69,27 @@ public class LinqQueryExecutor(VariateManager manager)
                     }
                 }
 
-                // 如果通过了所有 where 条件，执行终止子句
+                // 如果通过了所有 where 条件
                 if (shouldInclude)
                 {
-                    if (linqExpr.TerminationClause is SelectClause selectClause)
+                    if (hasOrderBy)
                     {
-                        var projectedValue = selectClause.Projection.Run(manager);
-                        result.Add(ConvertFromLangValue(projectedValue));
+                        // 如果有 OrderBy，先保存中间结果（原始元素和 let 变量）
+                        intermediateResults.Add((item, letVariables));
                     }
-                    else if (linqExpr.TerminationClause is GroupByClause)
+                    else
                     {
-                        // GroupBy 需要特殊处理，稍后实现
-                        result.Add(item);
+                        // 如果没有 OrderBy，直接执行 select
+                        if (linqExpr.TerminationClause is SelectClause selectClause)
+                        {
+                            var projectedValue = selectClause.Projection.Run(manager);
+                            result.Add(ConvertFromLangValue(projectedValue));
+                        }
+                        else if (linqExpr.TerminationClause is GroupByClause)
+                        {
+                            // GroupBy 需要特殊处理，稍后实现
+                            result.Add(item);
+                        }
                     }
                 }
             }
@@ -90,7 +105,44 @@ public class LinqQueryExecutor(VariateManager manager)
         var orderByClause = linqExpr.BodyClauses.OfType<OrderByClause>().FirstOrDefault();
         if (orderByClause != null)
         {
-            result = ExecuteOrderByOnResult(orderByClause, result, linqExpr.FromClause.RangeVariable);
+            // 在排序后执行 select
+            var sortedResults = ExecuteOrderByOnIntermediateResults(
+                orderByClause,
+                intermediateResults,
+                linqExpr.FromClause.RangeVariable);
+
+            // 对排序后的结果执行 select
+            foreach (var (item, letVariables) in sortedResults)
+            {
+                var oldRangeValue = manager.GetValue(rangeLangId);
+                manager.Set(rangeLangId, ConvertToLangValue(item));
+
+                try
+                {
+                    // 恢复 let 变量
+                    foreach (var (varName, varValue) in letVariables)
+                    {
+                        manager.Set(new LangId(varName), varValue);
+                    }
+
+                    // 执行 select
+                    if (linqExpr.TerminationClause is SelectClause selectClause)
+                    {
+                        var projectedValue = selectClause.Projection.Run(manager);
+                        result.Add(ConvertFromLangValue(projectedValue));
+                    }
+                    else if (linqExpr.TerminationClause is GroupByClause)
+                    {
+                        // GroupBy 需要特殊处理，稍后实现
+                        result.Add(item);
+                    }
+                }
+                finally
+                {
+                    if (oldRangeValue != null)
+                        manager.Set(rangeLangId, oldRangeValue);
+                }
+            }
         }
 
         // 处理查询延续（into）
@@ -104,7 +156,134 @@ public class LinqQueryExecutor(VariateManager manager)
     }
 
     /// <summary>
-    /// 在结果集上执行 OrderBy
+    /// 在中间结果上执行 OrderBy（包含 let 变量）
+    /// </summary>
+    private List<(object? item, Dictionary<string, LangValueType> letVariables)> ExecuteOrderByOnIntermediateResults(
+        OrderByClause orderByClause,
+        List<(object? item, Dictionary<string, LangValueType> letVariables)> intermediateResults,
+        string rangeVariable)
+    {
+        var rangeLangId = new LangId(rangeVariable);
+
+        if (orderByClause.Orderings.Count == 0)
+            return intermediateResults;
+
+        // 第一个排序键
+        var firstOrdering = orderByClause.Orderings[0];
+        IOrderedEnumerable<(object? item, Dictionary<string, LangValueType> letVariables)> orderedList;
+
+        if (firstOrdering.IsAscending)
+        {
+            orderedList = intermediateResults.OrderBy(entry =>
+            {
+                var (item, letVariables) = entry;
+                var oldValue = manager.GetValue(rangeLangId);
+                manager.Set(rangeLangId, ConvertToLangValue(item));
+                try
+                {
+                    // 恢复 let 变量
+                    foreach (var (varName, varValue) in letVariables)
+                    {
+                        manager.Set(new LangId(varName), varValue);
+                    }
+
+                    var keyValue = firstOrdering.KeyExpression.Run(manager);
+                    return ConvertFromLangValue(keyValue);
+                }
+                finally
+                {
+                    if (oldValue != null)
+                        manager.Set(rangeLangId, oldValue);
+                }
+            });
+        }
+        else
+        {
+            orderedList = intermediateResults.OrderByDescending(entry =>
+            {
+                var (item, letVariables) = entry;
+                var oldValue = manager.GetValue(rangeLangId);
+                manager.Set(rangeLangId, ConvertToLangValue(item));
+                try
+                {
+                    // 恢复 let 变量
+                    foreach (var (varName, varValue) in letVariables)
+                    {
+                        manager.Set(new LangId(varName), varValue);
+                    }
+
+                    var keyValue = firstOrdering.KeyExpression.Run(manager);
+                    return ConvertFromLangValue(keyValue);
+                }
+                finally
+                {
+                    if (oldValue != null)
+                        manager.Set(rangeLangId, oldValue);
+                }
+            });
+        }
+
+        // 后续排序键
+        for (int i = 1; i < orderByClause.Orderings.Count; i++)
+        {
+            var ordering = orderByClause.Orderings[i];
+            if (ordering.IsAscending)
+            {
+                orderedList = orderedList.ThenBy(entry =>
+                {
+                    var (item, letVariables) = entry;
+                    var oldValue = manager.GetValue(rangeLangId);
+                    manager.Set(rangeLangId, ConvertToLangValue(item));
+                    try
+                    {
+                        // 恢复 let 变量
+                        foreach (var (varName, varValue) in letVariables)
+                        {
+                            manager.Set(new LangId(varName), varValue);
+                        }
+
+                        var keyValue = ordering.KeyExpression.Run(manager);
+                        return ConvertFromLangValue(keyValue);
+                    }
+                    finally
+                    {
+                        if (oldValue != null)
+                            manager.Set(rangeLangId, oldValue);
+                    }
+                });
+            }
+            else
+            {
+                orderedList = orderedList.ThenByDescending(entry =>
+                {
+                    var (item, letVariables) = entry;
+                    var oldValue = manager.GetValue(rangeLangId);
+                    manager.Set(rangeLangId, ConvertToLangValue(item));
+                    try
+                    {
+                        // 恢复 let 变量
+                        foreach (var (varName, varValue) in letVariables)
+                        {
+                            manager.Set(new LangId(varName), varValue);
+                        }
+
+                        var keyValue = ordering.KeyExpression.Run(manager);
+                        return ConvertFromLangValue(keyValue);
+                    }
+                    finally
+                    {
+                        if (oldValue != null)
+                            manager.Set(rangeLangId, oldValue);
+                    }
+                });
+            }
+        }
+
+        return orderedList.ToList();
+    }
+
+    /// <summary>
+    /// 在结果集上执行 OrderBy（已废弃，保留用于兼容）
     /// </summary>
     private List<object?> ExecuteOrderByOnResult(OrderByClause orderByClause, List<object?> result, string rangeVariable)
     {
