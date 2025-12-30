@@ -1,0 +1,47 @@
+// LINQ 基础语法测试
+
+// 测试1: 基本的 from-where-select 查询
+numbers <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+result1 <- from x in numbers
+           where x > 5
+           select x
+
+PrintLine(result1.ToStr())
+
+// 测试2: 带排序的查询
+result2 <- from x in numbers
+           where x % 2 == 0
+           orderby x descending
+           select x * 2
+
+PrintLine(result2.ToStr())
+
+// 测试3: let 子句
+result3 <- from x in numbers
+           let squared <- x * x
+           where squared > 10
+           select squared
+
+PrintLine(result3.ToStr())
+
+// 测试4: group by 查询
+result4 <- from x in numbers
+           group x by x % 2
+
+PrintLine(result4.ToStr())
+
+// 测试5: 带类型注解的 from 子句
+items:List <- [1, 2, 3, 4, 5]
+result5 <- from int x in items
+           where x > 2
+           select x
+
+PrintLine(result5.ToStr())
+
+// 测试6: 多个排序键
+result6 <- from x in numbers
+           orderby x % 3, x descending
+           select x
+
+PrintLine(result6.ToStr())

@@ -94,8 +94,8 @@ class Test {
     {
         // Arrange
         var code = @"
-items:List<int>
-map:Dictionary<string, List<int>>
+items:List<int> <- {}
+map:Dictionary<string, List<int>> <- {}
 ";
         var tokens = LangInterpreter.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code);

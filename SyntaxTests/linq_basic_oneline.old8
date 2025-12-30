@@ -1,0 +1,8 @@
+// LINQ 基础语法测试 - 单行版本
+
+numbers <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+// 测试1: 基本的 from-where-select 查询（单行）
+result1 <- from x in numbers where x > 5 select x
+
+PrintLine(result1.ToStr())

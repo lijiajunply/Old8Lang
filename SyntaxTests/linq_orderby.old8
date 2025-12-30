@@ -1,0 +1,13 @@
+// LINQ OrderBy 测试
+
+numbers <- [5, 2, 8, 1, 9, 3, 7]
+
+// 测试1: 升序排序
+result1 <- from x in numbers orderby x select x
+PrintLine($"升序: {result1.ToStr()}")
+
+// 测试2: 降序排序
+result2 <- from x in numbers orderby x descending select x
+PrintLine($"降序: {result2.ToStr()}")
+
+// 测试3: 多个排序键（暂时只用单个数字，多键需要对象支持）

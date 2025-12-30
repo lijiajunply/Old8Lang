@@ -62,15 +62,24 @@ public static class LangTokenizer
     /// <summary>
     /// 静态缓存关键字集合，避免每次Tokenize时重新创建，提高性能
     /// </summary>
-    private static readonly FrozenSet<string> KeywordSet = 
+    private static readonly FrozenSet<string> KeywordSet =
         Enum.GetNames<KeywordType>()
             .Select(x => x.ToLower())
             .ToFrozenSet();
 
     /// <summary>
+    /// 关键字到 TokenType 的映射表（处理驼峰命名等特殊情况）
+    /// </summary>
+    private static readonly FrozenDictionary<string, LangTokenType> KeywordToTokenType =
+        Enum.GetValues<KeywordType>()
+            .ToFrozenDictionary(
+                k => k.ToString().ToLower(),
+                k => Enum.Parse<LangTokenType>(k.ToString()));
+
+    /// <summary>
     /// 按首字母索引的关键字列表，按长度降序排列以优先匹配最长关键字
     /// </summary>
-    private static readonly Dictionary<char, List<string>> KeywordsByFirstChar = 
+    private static readonly Dictionary<char, List<string>> KeywordsByFirstChar =
         KeywordSet
             .GroupBy(k => k[0])
             .ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.Length).ToList());
@@ -637,7 +646,7 @@ public static class LangTokenizer
             {
                 // 添加关键字标记
                 tokens.Add(new LangToken(matchedKeyword,
-                    Enum.Parse<LangTokenType>(char.ToUpper(matchedKeyword[0]) + matchedKeyword[1..]),
+                    KeywordToTokenType[matchedKeyword],
                     line, i - column));
                 i += matchedKeyword.Length - 1;
                 continue;

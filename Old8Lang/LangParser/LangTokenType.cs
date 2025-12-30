@@ -239,7 +239,7 @@ public enum LangTokenType
     Throw,
 
     /// <summary>
-    /// where (泛型约束子句关键字)
+    /// where
     /// </summary>
     Where,
 
@@ -332,6 +332,56 @@ public enum LangTokenType
     Enum,
 
     /// <summary>
+    /// select (LINQ 查询关键字)
+    /// </summary>
+    Select,
+
+    /// <summary>
+    /// orderby (LINQ 排序关键字)
+    /// </summary>
+    OrderBy,
+
+    /// <summary>
+    /// ascending (LINQ 升序关键字)
+    /// </summary>
+    Ascending,
+
+    /// <summary>
+    /// descending (LINQ 降序关键字)
+    /// </summary>
+    Descending,
+
+    /// <summary>
+    /// group (LINQ 分组关键字)
+    /// </summary>
+    Group,
+
+    /// <summary>
+    /// by (LINQ by 关键字)
+    /// </summary>
+    By,
+
+    /// <summary>
+    /// join (LINQ 连接关键字)
+    /// </summary>
+    Join,
+
+    /// <summary>
+    /// on (LINQ 连接条件关键字)
+    /// </summary>
+    On,
+
+    /// <summary>
+    /// into (LINQ 延续关键字)
+    /// </summary>
+    Into,
+
+    /// <summary>
+    /// let (LINQ 赋值关键字)
+    /// </summary>
+    Let,
+
+    /// <summary>
     /// 文件头指令 (#!...)
     /// </summary>
     FileHeaderDirective
@@ -389,5 +439,15 @@ public enum KeywordType
     Dynamic,
     Super,
     Match,
-    Enum
+    Enum,
+    Select,
+    OrderBy,
+    Ascending,
+    Descending,
+    Group,
+    By,
+    Join,
+    On,
+    Into,
+    Let
 }

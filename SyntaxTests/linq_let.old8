@@ -1,0 +1,11 @@
+// LINQ Let 测试
+
+numbers <- [1, 2, 3, 4, 5]
+
+// 测试1: let 子句创建中间变量
+result1 <- from x in numbers let square <- x * x where square > 10 select square
+PrintLine($"平方大于10: {result1.ToStr()}")
+
+// 测试2: let 创建多个变量（顺序执行）
+result2 <- from x in numbers let doubled <- x * 2 let squared <- doubled * doubled where squared > 20 select squared
+PrintLine($"(x*2)^2 > 20: {result2.ToStr()}")

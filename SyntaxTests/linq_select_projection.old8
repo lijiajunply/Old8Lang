@@ -1,0 +1,15 @@
+// LINQ Select 投影测试
+
+numbers <- [1, 2, 3, 4, 5]
+
+// 测试1: 选择平方值
+result1 <- from x in numbers select x * x
+PrintLine($"平方: {result1.ToStr()}")
+
+// 测试2: 选择双倍值
+result2 <- from x in numbers select x * 2
+PrintLine($"双倍: {result2.ToStr()}")
+
+// 测试3: 组合 where 和 select
+result3 <- from x in numbers where x > 2 select x * 10
+PrintLine($"大于2的10倍: {result3.ToStr()}")

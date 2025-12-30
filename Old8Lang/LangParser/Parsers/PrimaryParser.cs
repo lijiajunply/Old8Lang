@@ -15,7 +15,8 @@ public class PrimaryParser(
     ParserContext context,
     Func<StatementParser> statementParserFactory,
     Func<ExpressionParser> expressionParserFactory,
-    FunctionParser functionParser)
+    FunctionParser functionParser,
+    LinqParser linqParser)
     : ParserBase(context)
 {
     #region Primary
@@ -39,6 +40,12 @@ public class PrimaryParser(
     //         | asStatement
     public LangExpression ParsePrimary()
     {
+        // 处理 LINQ 查询表达式（from ... select/group）
+        if (CurrentToken.Type == LangTokenType.From)
+        {
+            return linqParser.ParseLinqExpression();
+        }
+
         // 处理 await 表达式
         if (CurrentToken.Type == LangTokenType.Await)
         {

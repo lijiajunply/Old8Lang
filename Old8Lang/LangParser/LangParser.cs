@@ -51,6 +51,11 @@ public class LangParser
     private readonly ClassParser ClassParser;
 
     /// <summary>
+    /// LINQ 解析器，负责解析 LINQ 查询表达式
+    /// </summary>
+    private readonly LinqParser LinqParser;
+
+    /// <summary>
     /// 构造函数，初始化所有解析器并解决它们之间的循环依赖
     /// </summary>
     /// <param name="tokens">词法分析生成的标记列表</param>
@@ -104,12 +109,18 @@ public class LangParser
             () => StatementParser!,
             () => ExpressionParser!);
 
+        // 创建LinqParser（需要延迟加载ExpressionParser）
+        LinqParser = new LinqParser(
+            Context,
+            () => ExpressionParser!);
+
         // 创建PrimaryParser（需要延迟加载StatementParser和ExpressionParser）
         PrimaryParser = new PrimaryParser(
             Context,
             () => StatementParser!,
             () => ExpressionParser!,
-            FunctionParser);
+            FunctionParser,
+            LinqParser);
 
         // 创建ExpressionParser（仅依赖PrimaryParser）
         ExpressionParser = new ExpressionParser(Context, PrimaryParser, FunctionParser);
