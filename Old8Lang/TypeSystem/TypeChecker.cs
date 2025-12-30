@@ -78,7 +78,9 @@ public static class TypeChecker
 
                 var actualType = GetLangValueType(argumentValue);
 
-                if (!IsTypeCompatible(expectedType, actualType))
+                // 使用 IsPolymorphicCompatible 检查类型兼容性（支持联合类型和交叉类型）
+                // 参数顺序：actualType 在前，expectedType 在后
+                if (!IsPolymorphicCompatible(actualType, expectedType))
                 {
                     throw new TypeError(
                         argumentExpressions[i],
@@ -341,7 +343,9 @@ public static class TypeChecker
 
         var actualType = GetLangValueType(actualReturnValue);
 
-        if (IsTypeCompatible(expectedReturnType, actualType))
+        // 使用 IsPolymorphicCompatible 检查类型兼容性（支持联合类型和交叉类型）
+        // 参数顺序：actualType 在前，expectedReturnType 在后
+        if (IsPolymorphicCompatible(actualType, expectedReturnType))
         {
             return actualReturnValue; // 类型兼容，无需转换
         }
