@@ -7,6 +7,7 @@ namespace Old8Lang.Tests.Interpreter.Classes;
 /// <summary>
 /// 成员访问解释模式测试
 /// </summary>
+[Collection("Sequential")]
 public class MemberAccessTests
 {
     [Fact]

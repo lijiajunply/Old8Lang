@@ -7,6 +7,7 @@ namespace Old8Lang.Tests.Interpreter.Classes;
 /// <summary>
 /// 继承和接口解释模式测试
 /// </summary>
+[Collection("Sequential")]
 public class InheritanceTests
 {
     [Fact]

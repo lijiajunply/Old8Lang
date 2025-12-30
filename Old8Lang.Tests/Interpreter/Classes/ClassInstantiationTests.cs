@@ -8,6 +8,7 @@ namespace Old8Lang.Tests.Interpreter.Classes;
 /// <summary>
 /// 类实例化测试
 /// </summary>
+[Collection("Sequential")]
 public class ClassInstantiationTests
 {
     [Fact]

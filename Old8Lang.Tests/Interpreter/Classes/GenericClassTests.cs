@@ -9,6 +9,7 @@ namespace Old8Lang.Tests.Interpreter.Classes;
 /// 泛型类测试
 /// 测试泛型类的基本功能，包括实例化、方法调用、字段访问等
 /// </summary>
+[Collection("Sequential")]
 public class GenericClassTests
 {
     [Fact]

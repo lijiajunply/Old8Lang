@@ -7,6 +7,7 @@ namespace Old8Lang.Tests.Interpreter.Classes;
 /// <summary>
 /// 构造函数解释模式测试
 /// </summary>
+[Collection("Sequential")]
 public class ConstructorTests
 {
     [Fact]
@@ -663,7 +664,7 @@ public class ConstructorTests
     {
         // Arrange
         var code = @"
-            class Processor {
+            class FunctionProcessor {
                 public processFunc <- null
                 public validator <- null
 
@@ -681,7 +682,7 @@ public class ConstructorTests
                 }
             }
 
-            processor <- Processor(
+            processor <- FunctionProcessor(
                 (x:int) -> PrintLine(""Processing: "" + x.ToStr()),
                 (x:int) -> x > 0
             )

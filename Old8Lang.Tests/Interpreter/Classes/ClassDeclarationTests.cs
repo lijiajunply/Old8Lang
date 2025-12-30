@@ -7,6 +7,7 @@ namespace Old8Lang.Tests.Interpreter.Classes;
 /// <summary>
 /// 类声明解释模式测试
 /// </summary>
+[Collection("Sequential")]
 public class ClassDeclarationTests
 {
     [Fact]

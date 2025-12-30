@@ -8,6 +8,7 @@ namespace Old8Lang.Tests.Interpreter.Classes;
 /// <summary>
 /// 接口解释模式测试
 /// </summary>
+[Collection("Sequential")]
 public class InterfaceTests
 {
 
