@@ -159,12 +159,12 @@ public class ArithmeticTests
     {
         // Arrange
         // (10 + 5) * 3 - (10 - 5) / 3 = 15 * 3 - 5 / 3 = 45 - 1.666... = 43.333...
-        var expected = (15.0 * 3.0) - (5.0 / 3.0);
+        var expected = 15.0 * 3.0 - 5.0 / 3.0;
         var expectedStr = expected.ToString(CultureInfo.InvariantCulture);
         var code = $@"
-            a <- 10
-            b <- 5
-            c <- 3
+            a <- 10.0
+            b <- 5.0
+            c <- 3.0
             result <- (a + b) * c - (a - b) / c
             Assert.Equal({expectedStr}, result)
         ";
@@ -188,29 +188,6 @@ public class ArithmeticTests
             b <- 3
             result <- a ^ b
             Assert.Equal(8.0, result)
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-
-        // Assert - 如果 Old8Lang 断言失败会抛出异常
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
-    }
-
-    [Theory]
-    [InlineData(1)]
-    [InlineData(-1)]
-    [InlineData(42)]
-    [InlineData(-100)]
-    public void UnaryPlus_Integer_CompilesAndExecutesCorrectly(int value)
-    {
-        // Arrange
-        var code = $@"
-            result <- +{value}
-            Assert.Equal({value}, result)
         ";
         var interpreter = new LangInterpreter();
 

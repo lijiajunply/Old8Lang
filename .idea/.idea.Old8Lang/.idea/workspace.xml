@@ -21,7 +21,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/ArithmeticTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/ArithmeticTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/ComparisonTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/ComparisonTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/LogicalTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/LogicalTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/StringTemplateTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/StringTemplateTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/TernaryTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/TernaryTests.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -61,6 +68,10 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Expressions/ArithmeticTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Expressions/ComparisonTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Expressions/LogicalTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Expressions/LogicalTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ConstructorTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/InterfaceTests.cs" root0="SKIP_HIGHLIGHTING" />
@@ -868,7 +879,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="444" />
+    <option name="localTasksCounter" value="445" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -895,7 +906,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="docs(changelog): 更新版本更新日志格式和内容&#10;&#10;- 重构语言特性部分，按功能分类整理枚举、类型系统、表达式等特性&#10;- 重新组织标准库扩展内容，添加详细的库功能说明&#10;- 整理异步与并发特性，明确生成器和多线程功能描述&#10;- 优化系统优化部分，突出模块系统改进要点&#10;- 添加开发工具改进和测试质量相关更新&#10;- 使用更清晰的 Markdown 格式组织版本更新内容" />
     <MESSAGE value="feat(lang): 添加NativeObjectLangValue支持C#对象包装和实现ValueToObj转换&#10;&#10;- 添加NativeObjectLangValue类用于包装任意.NET对象&#10;- 实现ValueToObj统一转换方法支持双向类型转换&#10;- 为DictionaryLangValue和TupleLangValue添加GetValue方法&#10;- 增强ObjToValue方法处理自定义类型和值元组&#10;- 添加全面的类型转换测试用例验证往返转换&#10;- 支持属性访问、字段访问和方法调用操作&#10;- 优化集合类型转换处理逻辑" />
     <MESSAGE value="refactor(lang): 重构NativeAnyLangValue支持对象包装和类型转换&#10;&#10;- 移除NativeObjectLangValue类，功能合并到NativeAnyLangValue&#10;- 重命名类型转换注释，使用NativeAnyLangValue替换NativeObjectLangValue&#10;- 更新测试用例，将NativeObjectLangValue断言改为NativeAnyLangValue&#10;- 修改Capt" />
     <MESSAGE value="test(interpreter): 更新导入错误处理测试&#10;&#10;- 重构异常断言逻辑，直接验证ImportError类型&#10;- 修正多行字符串缩进格式以保持一致性&#10;- 移除不必要的嵌套代码块结构" />
@@ -920,7 +930,8 @@
     <MESSAGE value="feat(module): 实现模块函数作用域捕获机制&#10;&#10;- 在 FuncLangValue 中添加 CreateWithCapturedScope 方法用于创建带捕获作用域的函数副本&#10;- 重构 UnifiedModule 实现模块隔离作用域，避免符号污染父作用域&#10;- 为导入的函数设置捕获作用域，确保模块内函数可访问模块变量&#10;- 保存初始 VariateManager 用于懒加载时的上下文恢复&#10;- 修复 SpawnTests 中的断点位置偏移问题&#10;- 更新 IDE 配置和测试会话设置" />
     <MESSAGE value="feat(parser): 添加LINQ查询表达式支持&#10;&#10;- 实现了FromClause、WhereClause、SelectClause等LINQ子句AST节点&#10;- 添加了OrderByClause、GroupByClause、JoinClause、LetClause等高级子句&#10;- 扩展LangTokenType枚举以支持LINQ相关关键字（select、orderby、group等）&#10;- 更新词法分析器以正确识别LINQ关键字并建立关键字到TokenType的映射&#10;- 集成LinqParser到主解析器中处理LINQ查询表达式解析&#10;- 创建LINQ基础语法和高级功能的测试用例文件&#10;- 实现LINQ查询的基础执行和边界情况处理测试" />
     <MESSAGE value="fix(ast): 修正类型错误异常处理&#10;&#10;- 将 IntLangValue 比较操作中的 InvalidOperationError 替换为 TypeError&#10;- 更新 LinqErrorTests 中的异常类型断言从 RuntimeError 到 ZeroDivisionError&#10;- 修正 LinqErrorTests 中的测试代码逻辑和注释说明&#10;- 调整 LinqLetOrderByTests 中的测试查询表达式&#10;- 更新 IDE 配置文件中的断点设置和任务计数器" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(ast): 修正类型错误异常处理&#10;&#10;- 将 IntLangValue 比较操作中的 InvalidOperationError 替换为 TypeError&#10;- 更新 LinqErrorTests 中的异常类型断言从 RuntimeError 到 ZeroDivisionError&#10;- 修正 LinqErrorTests 中的测试代码逻辑和注释说明&#10;- 调整 LinqLetOrderByTests 中的测试查询表达式&#10;- 更新 IDE 配置文件中的断点设置和任务计数器" />
+    <MESSAGE value="test(compiler): 重构算术表达式测试以使用内联断言&#10;&#10;- 移除未使用的 AST 和错误处理程序引用&#10;- 将测试代码重构为使用 Old8Lang 内置断言语句&#10;- 更新除法和取模运算测试以返回双精度浮点数类型&#10;- 简化断言逻辑，使用 Record.Exception 捕获异常&#10;- 添加复杂算术表达式的预期值计算和断言&#10;- 为整数溢出测试添加内联断言验证&#10;- 更新 IDE 工作区配置文件以包含类解析器" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(compiler): 重构算术表达式测试以使用内联断言&#10;&#10;- 移除未使用的 AST 和错误处理程序引用&#10;- 将测试代码重构为使用 Old8Lang 内置断言语句&#10;- 更新除法和取模运算测试以返回双精度浮点数类型&#10;- 简化断言逻辑，使用 Record.Exception 捕获异常&#10;- 添加复杂算术表达式的预期值计算和断言&#10;- 为整数溢出测试添加内联断言验证&#10;- 更新 IDE 工作区配置文件以包含类解析器" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
