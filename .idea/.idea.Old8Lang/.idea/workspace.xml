@@ -23,8 +23,6 @@
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/PerformanceTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/StringTemplateTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Expressions/StringTemplateTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,6 +67,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Expressions/ComparisonTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Expressions/LogicalTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Expressions/LogicalTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Expressions/StringTemplateTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ClassInstantiationTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/ConstructorTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Classes/InterfaceTests.cs" root0="SKIP_HIGHLIGHTING" />
