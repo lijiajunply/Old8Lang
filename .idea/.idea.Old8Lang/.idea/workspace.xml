@@ -22,16 +22,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/generic_nullable_runtime.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/generic_nullable_simple.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Generics/NullableGenericsParserTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/20251230-0739-泛型可空类型实现总结.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Reports/20251230-0740-可空泛型类型单元测试报告.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SyntaxTests/generic_nullable_types.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/union_type_assignment.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/union_intersection_types.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/union_type_nullable.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/union_type_simple.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeAnnotationManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/TypeSystem/TypeAnnotationManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -506,7 +506,7 @@
       <workItem from="1766461431015" duration="981000" />
       <workItem from="1766746850670" duration="17415000" />
       <workItem from="1766771063664" duration="16661000" />
-      <workItem from="1766997021901" duration="9983000" />
+      <workItem from="1766997021901" duration="11323000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>

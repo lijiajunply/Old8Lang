@@ -1,0 +1,5 @@
+// 简单的联合类型测试
+
+// 1. 基本联合类型
+a: int | string <- 123
+b: int | string | bool <- "test"

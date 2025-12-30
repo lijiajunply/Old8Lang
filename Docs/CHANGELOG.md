@@ -19,6 +19,19 @@
   - 支持 `where` 子句语法用于函数级别的约束（例如 `func sort<T>(items: List<T>) -> List<T> where T: IComparable`）
   - 支持混合约束语法（在泛型参数声明中使用约束 + where 子句组合）
   - 支持可空泛型类型参数（例如 `class Optional<T?>` 或 `func identity<T?>(value: T?) -> T?`）
+- 添加联合类型和交叉类型注解支持
+  - **联合类型** (`A | B`): 值可以是多个类型之一，用于编译时类型检查
+    - 支持变量声明：`value: int | string <- 123`
+    - 支持函数参数：`func process(x: int | string) -> void`
+    - 支持函数返回值：`func getValue() -> int | string`
+    - 支持类字段：`public data: int | string | bool`
+    - 支持泛型参数：`List<int | string>`
+    - 支持可空联合类型：`value: int? | string? <- null`
+  - **交叉类型** (`A & B`): 类型必须同时满足所有约束，主要用于接口组合
+    - 支持泛型约束：`where T: IComparable & ICloneable`
+    - 支持函数参数：`func process(x: Interface1 & Interface2)`
+    - 支持变量声明：`value: A & B`
+  - 类型兼容性：实现完整的联合/交叉类型兼容性检查规则
 - 添加多态支持，增强面向对象编程能力
 - 加入 `this` 和 `super` 关键字，支持父类方法调用
 - 重构类型系统，引入类型模板机制

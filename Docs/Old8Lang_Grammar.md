@@ -1817,7 +1817,132 @@ func add(a:int, b:int) -> int {
 x <- "hello"  // ❌ 类型不匹配
 ```
 
-### 7.3 类型转换
+### 7.3 联合类型 (Union Types)
+
+联合类型使用 `|` 符号，表示值可以是多个类型之一。主要用于编译时类型检查。
+
+**语法**: `A | B | C`
+
+**使用场景**:
+
+1. **变量声明**：
+```old8
+// 基本联合类型
+value: int | string <- 123
+value <- "hello"  // ✅ 可以重新赋值为另一个联合类型成员
+
+// 多类型联合
+data: int | string | bool <- true
+data <- 456        // ✅ 可以是 int
+data <- "text"     // ✅ 可以是 string
+```
+
+2. **可空联合类型**：
+```old8
+// 可空类型的联合
+nullable: int? | string? <- null  // ✅ null 兼容于可空类型
+nullable <- 123                    // ✅ int 赋值给 int?
+nullable <- "test"                 // ✅ string 赋值给 string?
+```
+
+3. **函数参数和返回值**：
+```old8
+// 函数参数支持联合类型
+func process(x: int | string) -> void {
+    PrintLine(x.ToStr())
+}
+
+process(123)      // ✅ 传入 int
+process("hello")  // ✅ 传入 string
+
+// 函数返回值支持联合类型
+func getValue(flag: bool) -> int | string {
+    if flag {
+        return 123
+    } else {
+        return "hello"
+    }
+}
+```
+
+4. **类字段**：
+```old8
+class Container {
+    public data: int | string | bool
+
+    func init(value: int | string | bool) {
+        data <- value
+    }
+}
+
+container <- Container(123)
+container.data <- "text"  // ✅ 可以改变为另一个联合类型成员
+```
+
+5. **泛型联合类型**：
+```old8
+// 泛型参数中的联合类型
+list: List<int | string> <- {1, "hello", 2, "world"}
+
+// 嵌套泛型联合类型
+map: Map<string, int | string> <- {"age": 25, "name": "Alice"}
+```
+
+**兼容性规则**:
+- `A | B` 兼容于 `A`（联合类型可以赋值给任一成员类型）
+- `A` 兼容于 `A | B`（任一成员类型可以赋值给联合类型）
+- `null` 兼容于任何包含可空类型的联合类型（如 `int? | string?`）
+
+### 7.4 交叉类型 (Intersection Types)
+
+交叉类型使用 `&` 符号，表示类型必须同时满足所有约束。主要用于接口组合和泛型约束。
+
+**语法**: `A & B & C`
+
+**使用场景**:
+
+1. **泛型约束**（最常用）：
+```old8
+// 泛型类型必须同时实现多个接口
+func sort<T>(items: List<T>) -> List<T> where T: IComparable & ICloneable {
+    // T 必须同时实现 IComparable 和 ICloneable
+    // 实现排序逻辑...
+}
+
+// 在泛型类中使用交叉约束
+class Box<T: ISerializable & IDisposable> {
+    private value: T
+
+    func init(v: T) {
+        value <- v
+    }
+}
+```
+
+2. **函数参数**：
+```old8
+// 参数必须满足多个接口
+func process(obj: IReadable & IWritable) -> void {
+    // obj 必须同时实现 IReadable 和 IWritable
+}
+```
+
+3. **变量声明**：
+```old8
+// 变量类型必须满足所有接口
+handler: ILogger & IMetrics <- MyHandler()
+```
+
+**兼容性规则**:
+- `A & B` 兼容于 `A`（交叉类型满足所有成员，可以赋值给任一成员）
+- `A & B` 兼容于 `B`
+- `A` 不兼容于 `A & B`（单个类型不满足所有约束）
+
+**注意事项**:
+- 交叉类型主要用于接口组合，不能对基础类型（如 `int & string`）使用
+- 在泛型约束中，`&` 和 `|` 都表示"且"关系（历史原因），但在类型注解中有明确区分
+
+### 7.5 类型转换
 
 ```old8
 a <- 123

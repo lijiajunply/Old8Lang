@@ -1,0 +1,3 @@
+// 可空联合类型测试
+
+d: int? | string? <- null

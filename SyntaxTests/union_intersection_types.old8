@@ -1,0 +1,37 @@
+// 测试联合类型和交叉类型的语法解析
+
+// 1. 基本联合类型
+a: int | string <- 123
+b: int | string | bool <- true
+
+// 2. 可空联合类型
+d: int? | string? <- null
+
+// 3. 函数参数联合类型
+func process(x: int | string) -> void {
+    PrintLine(x.ToStr())
+}
+
+// 4. 函数返回值联合类型
+func getValue(flag: bool) -> int | string {
+    if flag {
+        return 123
+    } else {
+        return "hello"
+    }
+}
+
+// 5. 泛型联合类型
+list: List<int | string> <- {1, "hello"}
+
+// 6. 嵌套泛型联合类型
+map: Map<string, int | string> <- {"key": 123}
+
+// 7. 类字段联合类型
+class Container {
+    public data: int | string | bool
+
+    public func init(value: int | string | bool) {
+        data <- value
+    }
+}

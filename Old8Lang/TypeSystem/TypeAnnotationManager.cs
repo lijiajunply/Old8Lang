@@ -108,6 +108,18 @@ public class TypeAnnotationManager
             };
         }
 
+        // 处理交叉类型（检查顶层的 &，不检查泛型内部的）
+        var intersectionIndex = FindTopLevelSeparator(typeAnnotation, '&');
+        if (intersectionIndex >= 0)
+        {
+            var types = SplitTopLevel(typeAnnotation, '&');
+            return new ParsedTypeAnnotation
+            {
+                BaseType = "intersection",
+                GenericArguments = types.Select(t => ParseTypeAnnotationRecursive(t.Trim())).ToList()
+            };
+        }
+
         // 处理泛型类型
         var genericStart = typeAnnotation.IndexOf('<');
         if (genericStart > 0)
@@ -225,23 +237,57 @@ public class TypeAnnotationManager
 
     /// <summary>
     /// 验证解析后的类型兼容性
+    ///
+    /// 联合类型兼容性规则：
+    /// - A|B 兼容于 A（联合类型可以赋值给任一成员类型）
+    /// - A 兼容于 A|B（任一成员类型可以赋值给联合类型）
+    ///
+    /// 交叉类型兼容性规则：
+    /// - A&B 兼容于 A（交叉类型满足所有成员，可以赋值给任一成员）
+    /// - A&B 兼容于 B
+    /// - A 不兼容于 A&B（单个类型不满足所有约束）
     /// </summary>
     private bool ValidateParsedTypeCompatibility(ParsedTypeAnnotation expected, ParsedTypeAnnotation actual)
     {
-        // 处理联合类型
+        // 处理期望类型是联合类型的情况：A|B
+        // 实际类型只需要匹配联合类型的任一成员即可
         if (expected.BaseType == "union")
         {
-            return expected.TypeParameters!.Any(type =>
-                TypeFamily.IsCompatible(actual.BaseType, type));
+            return expected.GenericArguments!.Any(expectedMember =>
+                ValidateParsedTypeCompatibility(expectedMember, actual));
         }
 
+        // 处理实际类型是联合类型的情况：值为 A|B
+        // 联合类型的任一成员都应该兼容于期望类型
         if (actual.BaseType == "union")
         {
-            return actual.TypeParameters!.Any(type =>
-                TypeFamily.IsCompatible(type, expected.BaseType));
+            return actual.GenericArguments!.Any(actualMember =>
+                ValidateParsedTypeCompatibility(expected, actualMember));
         }
 
-        // 处理多态类型
+        // 处理期望类型是交叉类型的情况：A&B
+        // 实际类型必须满足所有成员约束
+        if (expected.BaseType == "intersection")
+        {
+            return expected.GenericArguments!.All(expectedMember =>
+                ValidateParsedTypeCompatibility(expectedMember, actual));
+        }
+
+        // 处理实际类型是交叉类型的情况：值为 A&B
+        // 交叉类型满足所有成员，可以赋值给任一成员
+        if (actual.BaseType == "intersection")
+        {
+            return actual.GenericArguments!.Any(actualMember =>
+                ValidateParsedTypeCompatibility(expected, actualMember));
+        }
+
+        // 特殊处理：null 可以赋值给任何可空类型
+        if (actual.BaseType == "null" && expected.IsNullable)
+        {
+            return true;
+        }
+
+        // 处理普通类型：使用 TypeFamily 进行兼容性检查
         return TypeFamily.IsCompatible(actual.BaseType, expected.BaseType);
     }
 
@@ -319,6 +365,14 @@ public class TypeAnnotationManager
     /// </summary>
     public bool IsTypeCompatible(string sourceTypeName, string targetTypeName)
     {
+        // 如果任一类型包含联合或交叉类型符号，使用类型注解验证
+        if (sourceTypeName.Contains('|') || sourceTypeName.Contains('&') ||
+            targetTypeName.Contains('|') || targetTypeName.Contains('&'))
+        {
+            return ValidateTypeCompatibility(targetTypeName, sourceTypeName);
+        }
+
+        // 否则使用 TypeFamily 的基本兼容性检查
         return TypeFamily.IsCompatible(sourceTypeName, targetTypeName);
     }
 
@@ -462,13 +516,23 @@ public class ParsedTypeAnnotation
     public bool IsUnion => BaseType == "union";
 
     /// <summary>
+    /// 是否为交叉类型
+    /// </summary>
+    public bool IsIntersection => BaseType == "intersection";
+
+    /// <summary>
     /// 获取完整的类型名称（包括泛型参数）
     /// </summary>
     public string GetFullName()
     {
         if (IsUnion && GenericArguments != null)
         {
-            return string.Join("|", GenericArguments.Select(arg => arg.GetFullName()));
+            return string.Join(" | ", GenericArguments.Select(arg => arg.GetFullName()));
+        }
+
+        if (IsIntersection && GenericArguments != null)
+        {
+            return string.Join(" & ", GenericArguments.Select(arg => arg.GetFullName()));
         }
 
         if (!IsGeneric)

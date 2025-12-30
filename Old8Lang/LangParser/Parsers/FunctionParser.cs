@@ -46,15 +46,8 @@ public class FunctionParser(
                 throw CreateSyntaxError("请返回类型标识符");
             }
 
-            returnType = CurrentToken.Value;
-            Expect(LangTokenType.Identifier);
-
-            // 检查是否为可空类型（例如 "int?"）
-            if (CurrentToken.Type == LangTokenType.Question)
-            {
-                returnType += "?";
-                Expect(LangTokenType.Question);
-            }
+            // 使用 ParseComplexTypeAnnotation 处理复杂类型注解（包括联合类型和交叉类型）
+            returnType = ParseComplexTypeAnnotation();
         }
 
         Expect(LangTokenType.LeftParen);
@@ -73,20 +66,8 @@ public class FunctionParser(
                     throw CreateSyntaxError("函数返回类型重复声明");
                 }
 
-                returnType = CurrentToken.Value;
-                Expect(LangTokenType.Identifier);
-
-                // 检查是否为泛型类型（例如 "Box<T>"）
-                if (CurrentToken.Type == LangTokenType.LessThan)
-                {
-                    returnType += ParseGenericTypeAnnotation();
-                }
-                // 检查是否为可空类型（例如 "int?"）
-                else if (CurrentToken.Type == LangTokenType.Question)
-                {
-                    returnType += "?";
-                    Expect(LangTokenType.Question);
-                }
+                // 使用 ParseComplexTypeAnnotation 处理复杂类型注解（包括联合类型和交叉类型）
+                returnType = ParseComplexTypeAnnotation();
             }
         }
 
@@ -149,15 +130,8 @@ public class FunctionParser(
                 throw CreateSyntaxError("请返回类型标识符");
             }
 
-            returnType = CurrentToken.Value;
-            Expect(LangTokenType.Identifier);
-
-            // 检查是否为可空类型（例如 "int?"）
-            if (CurrentToken.Type == LangTokenType.Question)
-            {
-                returnType += "?";
-                Expect(LangTokenType.Question);
-            }
+            // 使用 ParseComplexTypeAnnotation 处理复杂类型注解（包括联合类型和交叉类型）
+            returnType = ParseComplexTypeAnnotation();
         }
 
         Expect(LangTokenType.LeftParen);
@@ -305,25 +279,11 @@ public class FunctionParser(
             // 检查下一个token类型，判断是类型注解还是默认参数
             if (CurrentToken.Type is LangTokenType.Identifier)
             {
-                // 类型注解：identifier:type 或 identifier:type?
-                typeAnnotation = CurrentToken.Value;
+                // 类型注解：支持联合类型 (A | B) 和交叉类型 (A & B)
+                typeAnnotation = ParseComplexTypeAnnotation();
                 if (typeAnnotation == "")
                 {
                     throw CreateSyntaxError("类型注解不能为空");
-                }
-
-                Expect(LangTokenType.Identifier);
-
-                // 检查是否为泛型类型（例如 "List<int>"）
-                if (CurrentToken.Type == LangTokenType.LessThan)
-                {
-                    typeAnnotation += ParseGenericTypeAnnotation();
-                }
-                // 检查是否为可空类型（例如 "int?"）
-                else if (CurrentToken.Type == LangTokenType.Question)
-                {
-                    typeAnnotation += "?";
-                    Expect(LangTokenType.Question);
                 }
             }
             else if (isNeedDefaultValue)
@@ -458,9 +418,74 @@ public class FunctionParser(
 
     /// <summary>
     /// 解析泛型类型注解
-    /// 语法：<int>, <T>, <List<int>>
+    /// 语法：&lt;int>, &lt;T>, &lt;List&lt;int>>
     /// </summary>
-    /// <returns>泛型类型注解字符串（包括 < 和 >）</returns>
+    /// <returns>泛型类型注解字符串（包括 &lt; 和 >）</returns>
+    /// <summary>
+    /// 解析复杂类型注解（支持联合类型 A | B 和交叉类型 A & B）
+    /// 停止条件：遇到 &lt;-, ,, ), }, where, {, ; 等终止符
+    /// </summary>
+    public string ParseComplexTypeAnnotation()
+    {
+        var result = "";
+
+        // 持续读取类型注解，直到遇到终止符
+        while (true)
+        {
+            // 检查是否遇到终止符
+            if (CurrentToken.Type is LangTokenType.Assignment      // <-
+                or LangTokenType.Comma                             // ,
+                or LangTokenType.RightParen                        // )
+                or LangTokenType.RightBrace                        // }
+                or LangTokenType.Where                             // where
+                or LangTokenType.LeftBrace                         // {
+                or LangTokenType.Semicolon                         // ;
+                or LangTokenType.EndOfFile)                        // EOF
+            {
+                break;
+            }
+
+            // 读取标识符（类型名）
+            if (CurrentToken.Type == LangTokenType.Identifier)
+            {
+                result += CurrentToken.Value;
+                Expect(LangTokenType.Identifier);
+
+                // 处理泛型类型（例如 List<int>）
+                if (CurrentToken.Type == LangTokenType.LessThan)
+                {
+                    result += ParseGenericTypeAnnotation();
+                }
+
+                // 处理可空类型（例如 int?）
+                if (CurrentToken.Type == LangTokenType.Question)
+                {
+                    result += "?";
+                    Expect(LangTokenType.Question);
+                }
+            }
+            // 读取联合类型分隔符 |
+            else if (CurrentToken.Type == LangTokenType.Pipe)
+            {
+                result += "|";
+                Expect(LangTokenType.Pipe);
+            }
+            // 读取交叉类型分隔符 &
+            else if (CurrentToken.Type == LangTokenType.Ampersand)
+            {
+                result += "&";
+                Expect(LangTokenType.Ampersand);
+            }
+            else
+            {
+                // 遇到未知token，停止解析
+                break;
+            }
+        }
+
+        return result.Trim();
+    }
+
     private string ParseGenericTypeAnnotation()
     {
         var result = "<";
@@ -473,27 +498,47 @@ public class FunctionParser(
                 throw CreateSyntaxError("意外的文件结束符，期望 '>'");
             }
 
-            if (CurrentToken.Type != LangTokenType.Identifier)
+            // 读取一个完整的类型参数（可能包含 | 或 &）
+            // 持续读取直到遇到 , 或 >
+            while (CurrentToken.Type != LangTokenType.Comma && CurrentToken.Type != LangTokenType.GreaterThan)
             {
-                throw CreateSyntaxError($"期望类型参数名称，但得到 {CurrentToken.Type}");
+                if (CurrentToken.Type == LangTokenType.Identifier)
+                {
+                    result += CurrentToken.Value;
+                    Expect(LangTokenType.Identifier);
+
+                    // 递归处理嵌套泛型
+                    if (CurrentToken.Type == LangTokenType.LessThan)
+                    {
+                        result += ParseGenericTypeAnnotation();
+                    }
+
+                    // 可空类型标记
+                    if (CurrentToken.Type == LangTokenType.Question)
+                    {
+                        result += "?";
+                        Expect(LangTokenType.Question);
+                    }
+                }
+                // 处理联合类型 |
+                else if (CurrentToken.Type == LangTokenType.Pipe)
+                {
+                    result += "|";
+                    Expect(LangTokenType.Pipe);
+                }
+                // 处理交叉类型 &
+                else if (CurrentToken.Type == LangTokenType.Ampersand)
+                {
+                    result += "&";
+                    Expect(LangTokenType.Ampersand);
+                }
+                else
+                {
+                    break;
+                }
             }
 
-            result += CurrentToken.Value;
-            Expect(LangTokenType.Identifier);
-
-            // 递归处理嵌套泛型
-            if (CurrentToken.Type == LangTokenType.LessThan)
-            {
-                result += ParseGenericTypeAnnotation();
-            }
-
-            // 可空类型标记
-            if (CurrentToken.Type == LangTokenType.Question)
-            {
-                result += "?";
-                Expect(LangTokenType.Question);
-            }
-
+            // 处理参数分隔符
             if (CurrentToken.Type == LangTokenType.Comma)
             {
                 result += ", ";

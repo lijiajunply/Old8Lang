@@ -13,7 +13,8 @@ namespace Old8Lang.LangParser.Parsers;
 public class ClassParser(
     ParserContext context,
     Func<StatementParser> statementParserFactory,
-    Func<ExpressionParser> expressionParserFactory)
+    Func<ExpressionParser> expressionParserFactory,
+    Func<FunctionParser> functionParserFactory)
     : ParserBase(context)
 {
     public ClassInit ParseClassDeclaration()
@@ -278,7 +279,9 @@ public class ClassParser(
                         // 检查是否是类型假注（identifier:type）而非函数调用（identifier:default_value）
                         // 继续查看冒号后面的token
                         var tokenAfterColon = Peek(2);
-                        if (tokenAfterColon.Type == LangTokenType.Identifier)
+                        if (tokenAfterColon.Type == LangTokenType.Identifier ||
+                            tokenAfterColon.Type == LangTokenType.LeftBracket ||
+                            tokenAfterColon.Type == LangTokenType.LeftBrace)
                         {
                             // 这是类型假注，解析字段声明列表
                             var fieldDeclarations = ParseFieldDeclarationList(modifiers);
@@ -409,27 +412,13 @@ public class ClassParser(
             {
                 CurrentIndex++; // 跳过冒号
 
-                // 解析类型
-                if (CurrentToken.Type == LangTokenType.Identifier)
-                {
-                    typeAnnotation = CurrentToken.Value;
-                    CurrentIndex++;
+                // 使用 FunctionParser 的 ParseComplexTypeAnnotation 处理复杂类型注解（包括联合类型和交叉类型）
+                var funcParser = functionParserFactory();
+                typeAnnotation = funcParser.ParseComplexTypeAnnotation();
 
-                    // 检查是否为泛型类型（例如 "List<int>"）
-                    if (CurrentToken.Type == LangTokenType.LessThan)
-                    {
-                        typeAnnotation += ParseGenericTypeAnnotation();
-                    }
-                    // 检查是否为可空类型（例如 "int?"）
-                    else if (CurrentToken.Type == LangTokenType.Question)
-                    {
-                        typeAnnotation += "?";
-                        CurrentIndex++;
-                    }
-                }
-                else
+                if (string.IsNullOrEmpty(typeAnnotation))
                 {
-                    throw CreateSyntaxError($"期望类型标识符，但得到 {CurrentToken.Type}");
+                    throw CreateSyntaxError("类型注解不能为空");
                 }
             }
 

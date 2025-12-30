@@ -1,0 +1,28 @@
+// 联合类型赋值兼容性测试
+
+// 1. 简单联合类型赋值
+a: int | string <- 123
+PrintLine(a.ToStr())
+
+a <- "hello"  // 重新赋值为另一个联合类型成员
+PrintLine(a.ToStr())
+
+// 2. 可空联合类型赋值
+b: int? | string? <- null
+PrintLine(b.ToStr())
+
+b <- 456
+PrintLine(b.ToStr())
+
+b <- "world"
+PrintLine(b.ToStr())
+
+// 3. 多类型联合
+c: int | string | bool <- true
+PrintLine(c.ToStr())
+
+c <- 789
+PrintLine(c.ToStr())
+
+c <- "test"
+PrintLine(c.ToStr())

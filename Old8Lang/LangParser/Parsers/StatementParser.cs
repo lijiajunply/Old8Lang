@@ -318,6 +318,13 @@ public class StatementParser(
                                 CurrentIndex = savedIndex;
                                 return ParseSet();
                             }
+                            // 检查是否是可空联合类型或可空交叉类型（例如 "a:int? | string" 或 "a:T? & U"）
+                            else if (fourthToken.Type == LangTokenType.Pipe || fourthToken.Type == LangTokenType.Ampersand)
+                            {
+                                // 这是带有联合类型或交叉类型注解的赋值语句
+                                CurrentIndex = savedIndex;
+                                return ParseSet();
+                            }
                             // 检查是否是可空返回类型的函数声明：identifier:returnType? (params) -> { ... }
                             else if (fourthToken.Type == LangTokenType.LeftParen)
                             {
@@ -329,6 +336,13 @@ public class StatementParser(
                         else if (thirdToken.Type == LangTokenType.Assignment)
                         {
                             // 这是带有类型注解的赋值语句
+                            CurrentIndex = savedIndex;
+                            return ParseSet();
+                        }
+                        // 检查是否是联合类型或交叉类型（例如 "a:int | string" 或 "a:A & B"）
+                        else if (thirdToken.Type == LangTokenType.Pipe || thirdToken.Type == LangTokenType.Ampersand)
+                        {
+                            // 这是带有联合类型或交叉类型注解的赋值语句
                             CurrentIndex = savedIndex;
                             return ParseSet();
                         }
@@ -667,20 +681,9 @@ public class StatementParser(
         if (CurrentToken.Type == LangTokenType.Colon)
         {
             Expect(LangTokenType.Colon);
-            assumptionType = CurrentToken.Value;
-            Expect(LangTokenType.Identifier);
 
-            // 检查是否为泛型类型（例如 "List<int>"）
-            if (CurrentToken.Type == LangTokenType.LessThan)
-            {
-                assumptionType += "<" + SkipAndParseGenericTypeAnnotation() + ">";
-            }
-            // 检查是否为可空类型（例如 "int?"）
-            else if (CurrentToken.Type == LangTokenType.Question)
-            {
-                assumptionType += "?";
-                Expect(LangTokenType.Question);
-            }
+            // 使用 FunctionParser 的 ParseComplexTypeAnnotation 处理复杂类型注解
+            assumptionType = functionParser.ParseComplexTypeAnnotation();
         }
 
         // 检查是否有赋值符号
