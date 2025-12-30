@@ -169,6 +169,27 @@ public class FuncLangValue : ImportInfo
     }
 
     /// <summary>
+    /// 创建一个带有捕获作用域的函数副本
+    /// 用于模块导入时，确保函数可以访问模块作用域中的变量
+    /// </summary>
+    /// <param name="manager">要捕获的作用域</param>
+    /// <returns>带有捕获作用域的函数副本</returns>
+    public FuncLangValue CreateWithCapturedScope(VariateManager manager)
+    {
+        // 如果是原生方法，直接返回自身（原生方法不需要捕获作用域）
+        if (Method != null)
+        {
+            return this;
+        }
+
+        // 创建带有捕获作用域的函数副本
+        return new FuncLangValue(Id, Ids ?? new List<LangId>(), BlockStatement, GenericParameters, Position, IsLambda)
+        {
+            CapturedScope = manager.Clone()
+        };
+    }
+
+    /// <summary>
     /// 执行生成器函数，返回下一个值
     /// </summary>
     /// <param name="variateManagerFunc">变量管理器</param>

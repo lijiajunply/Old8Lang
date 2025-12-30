@@ -7,6 +7,7 @@ namespace Old8Lang.Tests.Interpreter.Threading;
 /// <summary>
 /// Spawn函数测试
 /// </summary>
+[Collection("Sequential")]
 public class SpawnTests
 {
     [Fact]

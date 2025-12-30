@@ -31,6 +31,9 @@ public class UnifiedModule(
     private ModuleLoadingState _loadingState = ModuleLoadingState.NotLoaded;
     private Exception? _loadException;
 
+    // 保存初始的 VariateManager，用于懒加载时的上下文
+    private readonly VariateManager InitialManager = manager;
+
     // 服务依赖
     private static readonly ModuleLoader ModuleLoaderInstance = new();
     private static readonly SymbolExtractor SymbolExtractorInstance = new();
@@ -268,7 +271,8 @@ public class UnifiedModule(
     /// </summary>
     private void LoadModuleInternal(VariateManager? manager)
     {
-        manager ??= new VariateManager();
+        // 使用初始的 manager 或传入的 manager
+        manager = manager ?? InitialManager;
 
         // 1. 解析模块路径
         var resolver = new ModuleResolver();
@@ -288,27 +292,47 @@ public class UnifiedModule(
                 loadResult.Error?.Message ?? "模块加载失败");
         }
 
-        // 3. 执行模块代码（直接在当前作用域执行，不创建临时作用域）
-        // 这样函数可以访问模块中的变量
-        loadResult.Block.Run(manager);
+        // 3. 为模块创建隔离的作用域，避免符号污染父作用域
+        // 创建一个新的 VariateManager，继承必要的信息，但拥有独立的作用域
+        var moduleManager = new VariateManager
+        {
+            Path = resolutionResult.ResolvedPath, // 使用已解析的模块路径，而不是父文件路径
+            LangInfo = manager.LangInfo,
+            Interpreter = manager.Interpreter
+        };
 
-        // 4. 提取符号
+        // 4. 在隔离作用域中执行模块代码
+        loadResult.Block.Run(moduleManager);
+
+        // 5. 提取符号
         var moduleBaseName = Path.GetFileNameWithoutExtension(ModuleName);
         var selectedSymbolList = LoadMode == ModuleLoadMode.Selective && SelectedSymbols.Count > 0
             ? SelectedSymbols
             : null;
 
         var extractedSymbols = SymbolExtractorInstance.ExtractSymbols(
-            manager,
+            moduleManager,
             moduleBaseName,
             selectedSymbolList
         );
 
-        // 5. 填充符号字典（双字典优化）
+        // 6. 填充符号字典（双字典优化）
+        // 同时为函数设置捕获作用域，确保它们可以访问模块中的变量
         foreach (var (name, value) in extractedSymbols)
         {
-            Symbols[name] = value;
-            CaseInsensitiveSymbols[name] = value;
+            // 如果符号是函数，为其设置捕获的模块作用域
+            if (value is FuncLangValue funcValue)
+            {
+                // 创建带有捕获作用域的函数副本
+                var funcWithClosure = funcValue.CreateWithCapturedScope(moduleManager);
+                Symbols[name] = funcWithClosure;
+                CaseInsensitiveSymbols[name] = funcWithClosure;
+            }
+            else
+            {
+                Symbols[name] = value;
+                CaseInsensitiveSymbols[name] = value;
+            }
         }
     }
 

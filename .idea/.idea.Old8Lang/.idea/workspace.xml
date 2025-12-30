@@ -22,8 +22,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/SpawnTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/SpawnTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,6 +78,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/FunctionCallExpression.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/GenericParameter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/Instance.cs" root0="SKIP_HIGHLIGHTING" />
@@ -863,7 +866,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="440" />
+    <option name="localTasksCounter" value="441" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -890,7 +893,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(ast): 重构异步循环语句和全局函数的实现&#10;&#10;- 优化 AsyncForInStatement 中的列表初始化格式&#10;- 修复 TypeError 异常消息的参数传递格式&#10;- 改进生成器上下文中的循环状态管理逻辑&#10;- 将 BaseGlobalFunction 中的 GenerateILInternal 重命名为 GenerateIlInternal&#10;- 更新 BlockStatement 中的函数类型检查使用模式匹配语法&#10;- 优化 MethodOverloadList 创建时使用集合表达式&#10;- 修复 Debugger 中参数名称错误&#10;- 重构 AsyncGeneratorStateMachine 中的字段命名规范&#10;- 更新 ObjectPool 中的字段命名并简化 Get 方法逻辑&#10;- 优化 PerformanceAnalyzer 中的代码格式和计算逻辑&#10;- 修复多个全局函数中 GenerateILInternal 方法的命名一致性&#10;- 优化 VariateManager 中的字典访问方法" />
     <MESSAGE value="refactor(ast): 扩展 LangValueType 的对象转换功能&#10;&#10;- 添加支持 Task 和 Task&lt;T&gt; 类型转换&#10;- 实现数组和集合类型的转换支持&#10;- 添加字典和枚举类型转换功能&#10;- 增强元组类型转换处理&#10;- 改进 long 类型转换避免溢出问题&#10;- 添加可空类型处理逻辑&#10;- 优化错误处理和异常捕获机制&#10;- 改进类型检测和转换算法&#10;- 添加源代码位置信息支持&#10;- 重构原转换方法为增强版本" />
     <MESSAGE value="feat(interpreter): 添加泛型支持和相关测试&#10;&#10;- 在 AnyLangValue 中添加泛型类型参数映射设置逻辑&#10;- 实现 GenericClassTests 测试泛型类基本功能&#10;- 实现 GenericFunctionTests 测试泛型函数基本功能&#10;- 更新 GenericInstanceExpression 支持泛型实例化表达式&#10;- 修改 EBNF 语法定义添加泛型类型参数和参数语法&#10;- 更新语法文档添加泛型函数和泛型类说明&#10;- 添加 nullable 类型支持和泛型相关语法说明" />
     <MESSAGE value="feat(lang): 添加枚举类型支持&#10;&#10;- 实现枚举定义语法 enum Name { Member1, Member2 &lt;- value }&#10;- 添加枚举成员访问功能 EnumName.MemberName&#10;- 支持自动值和显式值的枚举定义&#10;- 实现枚举在解释器和编译器中的处理&#10;- 添加枚举语法测试和解释器测试用例&#10;- 更新语言文档和EBNF语法定义&#10;- 在AST中添加EnumInit和EnumTemplate节点类型&#10;- 实现枚举成员值计算和作用域管理" />
@@ -915,7 +917,8 @@
     <MESSAGE value="fix(type): 修复类型注解解析和数值类型处理问题&#10;&#10;- 修复联合类型和交叉类型的语法解析验证&#10;- 修复类型注解中可空类型的处理顺序&#10;- 修复类型兼容性检查的回退机制&#10;- 更新测试用例中的类型断言和数值精度处理&#10;- 修复函数调用测试中的参数类型匹配" />
     <MESSAGE value="feat(type-system): 添加接口类型支持和类实现接口功能&#10;&#10;- 添加 InterfaceTypeInfo 类支持接口类型信息存储&#10;- 扩展 ClassTypeInfo 支持类实现接口的类型兼容性检查&#10;- 修改 TypeAnnotationManager 和 TypeChecker 支持接口类型注册&#10;- 在 ClassInit.cs 中实现接口和类类型的区分处理逻辑&#10;- 添加接口继承和类实现接口的类型验证机制&#10;- 更新测试用例中的数值类型处理确保精度正确" />
     <MESSAGE value="test(classes): 为类测试添加顺序集合标记并重命名处理器类&#10;&#10;- 为 ClassDeclarationTests、ClassInstantiationTests、ConstructorTests、GenericClassTests、&#10;  InheritanceTests、InterfaceTests、MemberAccessTests 和 MixinTests 添加 [Collection(&quot;Sequential&quot;)] 标记&#10;- 将 ConstructorTests 中的 Processor 类重命名为 FunctionProcessor 以提高语义清晰度&#10;- 更新 ConstructorTests 中的实例化代码以使用新的 FunctionProcessor 类名&#10;- 从 workspace.xml 中移除过时的变更记录并更新本地任务计数器&#10;- 清理 workspace.xml 中的提交消息历史记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(classes): 为类测试添加顺序集合标记并重命名处理器类&#10;&#10;- 为 ClassDeclarationTests、ClassInstantiationTests、ConstructorTests、GenericClassTests、&#10;  InheritanceTests、InterfaceTests、MemberAccessTests 和 MixinTests 添加 [Collection(&quot;Sequential&quot;)] 标记&#10;- 将 ConstructorTests 中的 Processor 类重命名为 FunctionProcessor 以提高语义清晰度&#10;- 更新 ConstructorTests 中的实例化代码以使用新的 FunctionProcessor 类名&#10;- 从 workspace.xml 中移除过时的变更记录并更新本地任务计数器&#10;- 清理 workspace.xml 中的提交消息历史记录" />
+    <MESSAGE value="test(interpreter): 为模块导入测试添加顺序集合标记并修复代码格式&#10;&#10;- 为 DynamicImportTests、LazyImportTests、RealWorldUsageTests 和 SimpleImportTests 添加 [Collection(&quot;Sequential&quot;)] 标记&#10;- 修复 SimpleImportTests 中多行字符串字面量的缩进格式问题&#10;- 更新 workspace.xml 中的变更记录和本地任务计数器&#10;- 清理 workspace.xml 中的过时提交消息历史记录&#10;- 修复断点位置因代码格式调整而产生的偏移" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(interpreter): 为模块导入测试添加顺序集合标记并修复代码格式&#10;&#10;- 为 DynamicImportTests、LazyImportTests、RealWorldUsageTests 和 SimpleImportTests 添加 [Collection(&quot;Sequential&quot;)] 标记&#10;- 修复 SimpleImportTests 中多行字符串字面量的缩进格式问题&#10;- 更新 workspace.xml 中的变更记录和本地任务计数器&#10;- 清理 workspace.xml 中的过时提交消息历史记录&#10;- 修复断点位置因代码格式调整而产生的偏移" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1381,13 +1384,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/SpawnTests.cs</url>
-          <line>550</line>
+          <line>551</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/SpawnTests.cs" containingFunctionPresentation="方法 'Spawn_AsyncFunction_SpawnsAsyncFunction'">
             <startOffsets>
-              <option value="16832" />
+              <option value="16859" />
             </startOffsets>
             <endOffsets>
-              <option value="16861" />
+              <option value="16888" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="631" />
@@ -1407,13 +1410,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/SpawnTests.cs</url>
-          <line>553</line>
+          <line>554</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/SpawnTests.cs" containingFunctionPresentation="方法 'Spawn_AsyncFunction_SpawnsAsyncFunction'">
             <startOffsets>
-              <option value="16889" />
+              <option value="16916" />
             </startOffsets>
             <endOffsets>
-              <option value="16953" />
+              <option value="16980" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="633" />
