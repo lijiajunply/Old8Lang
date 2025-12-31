@@ -146,15 +146,16 @@
 - [x] 实现 `Computed` 计算属性
   - 基于其他状态派生新状态
 
-### 4.2 动画系统 ⏳
-- [ ] `Animation` 动画基类
-  - 支持: 时长、缓动函数、循环
-- [ ] `Transition` 过渡动画
-  - 淡入淡出、滑动、缩放
-- [ ] `AnimatedContainer` 动画容器
-  - 属性变化自动过渡
-- [ ] 预设动画效果库
-  - 常用动画曲线 (easeIn, easeOut, spring 等)
+### 4.2 动画系统 ✅
+- [x] `Animation` 动画基类
+  - 支持: 时长、缓动函数、循环、反向播放、延迟
+- [x] 缓动函数库 (`Easing`)
+  - 30+ 预设缓动函数（Linear, Quad, Cubic, Sine, Expo, Elastic, Bounce, Spring 等）
+- [x] `Transition` 过渡动画
+  - 淡入淡出（Fade）、滑动（Slide）、缩放（Scale）、旋转（Rotate）
+  - 颜色过渡、弹跳、弹性、脉冲、摇晃等效果
+- [x] `AnimatedContainer` 动画容器
+  - 属性变化自动过渡（宽度、高度、不透明度、背景色）
 
 ### 4.3 手势与交互 ⏳
 - [ ] `GestureDetector` 手势检测
