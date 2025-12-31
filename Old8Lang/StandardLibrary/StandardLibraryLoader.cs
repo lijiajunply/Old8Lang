@@ -282,11 +282,14 @@ public static class StandardLibraryLoader
             else
             {
                 // 普通类：导入为 NativeAnyLangValue
-                // 使用类型的 Assembly.Location 和实际的命名空间
+                // 使用类型的 Assembly.Location 和完整的类型名（包括命名空间）
                 var assemblyLocation = type.Assembly.Location;
                 var assemblyName = type.Assembly.GetName().Name ?? "Unknown";
 
-                var nativeAny = new NativeAnyLangValue(assemblyName, type.Name,
+                // 使用完整的类型名（Namespace.ClassName）而不仅仅是 ClassName
+                var fullTypeName = type.FullName ?? type.Name;
+
+                var nativeAny = new NativeAnyLangValue(assemblyName, fullTypeName,
                     assemblyLocation, type.Name);
 
                 // 执行初始化
@@ -315,7 +318,10 @@ public static class StandardLibraryLoader
             var assemblyLocation = type.Assembly.Location;
             var assemblyName = type.Assembly.GetName().Name ?? "Unknown";
 
-            var nativeAny = new NativeAnyLangValue(assemblyName, type.Name,
+            // 使用完整的类型名（Namespace.ClassName）而不仅仅是 ClassName
+            var fullTypeName = type.FullName ?? type.Name;
+
+            var nativeAny = new NativeAnyLangValue(assemblyName, fullTypeName,
                 assemblyLocation, type.Name);
 
             // 执行初始化

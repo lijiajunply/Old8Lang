@@ -92,7 +92,7 @@ public class ExtendedRangeTests
         // Arrange
         var code = @"
             // 字符范围，步长为1 ['a'..'f':1]
-            range <- ['a'..'f':1]
+            range <- ['a'~'f':1]
             
             // 检查基本属性
             Assert.Equal(6, range.Length())

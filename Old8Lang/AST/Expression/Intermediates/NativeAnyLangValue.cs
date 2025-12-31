@@ -170,7 +170,22 @@ public class NativeAnyLangValue : ImportInfo
         }
 
         var assembly = Assembly.LoadFile(Path);
-        ClassType = assembly.GetType($"{DllName}.{ClassName}")!;
+
+        // ClassName 可能是简单类名（如 "Container"）或完整类型名（如 "Old8Lang.FirstUI.Layout.Container"）
+        // 先尝试使用 ClassName 直接获取类型
+        ClassType = assembly.GetType(ClassName);
+
+        // 如果失败，尝试拼接 DllName 和 ClassName
+        if (ClassType == null && DllName != null)
+        {
+            ClassType = assembly.GetType($"{DllName}.{ClassName}");
+        }
+
+        if (ClassType == null)
+        {
+            throw new InvalidOperationError(this, $"无法加载类型：在程序集中找不到类型 '{ClassName}' 或 '{DllName}.{ClassName}'");
+        }
+
         var constructors = ClassType.GetConstructors();
         if (constructors is { Length: > 0 })
             Constructor = constructors[0];

@@ -22,14 +22,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Computed.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/GlobalState.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/IState.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/ObservableState.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/State.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Core/WidgetBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Core/WidgetBase.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/TODO.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/TODO.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/Advanced/ExtendedRangeTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/Advanced/ExtendedRangeTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryLoader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryLoader.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,6 +64,8 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Benchmarks/SimpleReflectionBenchmark.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
@@ -119,6 +117,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/35/58ca714a/RuntimeType.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/49/7dcb0981/ThrowHelper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/4f/81203e97/CastHelpers.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/c3/68e5367e/String.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/d3/7ed6bf18/FileNotFoundException.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/ec/ce83ccf2/ArgumentNullException.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a840692e98b74557bc005b38213a22c72dad0/c8/58c2e0c9/Assert.cs" root0="FORCE_HIGHLIGHTING" />
@@ -128,7 +127,7 @@
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
+    <option name="selectedTabId" value="SWEA" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -517,7 +516,7 @@
       <workItem from="1766771063664" duration="16661000" />
       <workItem from="1766997021901" duration="12927000" />
       <workItem from="1767123773418" duration="15798000" />
-      <workItem from="1767204141752" duration="7193000" />
+      <workItem from="1767204141752" duration="9898000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -862,7 +861,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="482" />
+    <option name="localTasksCounter" value="485" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -889,9 +888,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(ast): 添加 CancellationTokenSource 构造函数超时参数支持&#10;&#10;- 实现 CancellationTokenSource 带超时时间的构造函数功能&#10;- 添加对 CancellationTokenSource(timeout) 语法的支持&#10;- 验证超时参数类型为整数类型的错误处理&#10;- 更新 LangValue 类型系统以支持带参数的构造函数&#10;- 移除过时的 NativeMethodBindingTests 测试类&#10;- 更新 IDE 工作区配置和任务计数器统计&#10;- 修改 VCS 提交历史记录和最后提交消息" />
-    <MESSAGE value="test(interpreter): 更新异步任务测试实现&#10;&#10;- 替换 Thread.Start() 为 spawn() 和 Join() 等待机制&#10;- 修改失败任务测试函数返回 bool 类型并使用 Join() 获取结果&#10;- 简化取消令牌测试逻辑直接检查 IsCancellationRequested 属性&#10;- 重构多任务异常处理测试" />
-    <MESSAGE value="feat(thread): 实现线程安全的锁变量和线程管理功能&#10;&#10;- 添加 LockedVariableLangValue 类型支持线程安全的变量访问&#10;- 实现 ThreadLangValue 的属性访问和修改功能（IsBackground、Name、Priority）&#10;- 添加 Thread.Start()、Join()、IsAlive() 等线程控制方法&#10;- 实现 Thread.CurrentThread 静态方法获取当前线程信息&#10;- 支持 ThreadStaticMethodWrapper 调用静态线程相关方法&#10;- 更新异步并发测试使用锁变量替代原始 lock 语句&#10;- 修改线程测试使用 Spawn 函数创建线程实例&#10;- 添加线程属性设置和获取的完整实现" />
     <MESSAGE value="test(threading): 更新线程测试以修复spawn任务启动问题&#10;&#10;- 将接口继承语法从 implements 更改为 extends&#10;- 为所有spawn任务添加显式的.Start()调用&#10;- 重构流水线测试中的任务启动顺序&#10;- 更新依赖任务的执行流程&#10;- 移除过时的断点配置&#10;- 添加新的文件高亮设置" />
     <MESSAGE value="fix(ast): 修复数值类型转换逻辑&#10;&#10;- 修正了超出 int 范围时的类型转换行为，从字符串改为 double 类型" />
     <MESSAGE value="feat(char): 添加字符类型扩展方法支持&#10;&#10;- 实现 CharValueFuncStatic 类提供字符大小写转换功能&#10;- 添加 ToUpper() 方法将字符转换为大写&#10;- 添加 ToLower() 方法将字符转换为小写&#10;- 在 Instance.cs 中为 CharLangValue 类型注册扩展方法&#10;- 修复 LangValueType.cs 中数值类型转换问题&#10;- 移除过时的 NativeMethodBindingTests 测试文件&#10;- 更新 TaskAdvancedTests 中线程启动逻辑&#10;- 移除过时的 ThreadSynchronizationTests 测试文件&#10;- 更新 IDE 工作区配置和断点位置信息" />
@@ -914,7 +910,10 @@
     <MESSAGE value="feat(components): 添加按钮组件和组件工厂方法&#10;&#10;- 实现 Button 组件，支持标签、点击事件、图标、样式变体、禁用状态等功能&#10;- 添加 Container 容器组件，支持内边距、外边距、背景色、边框、圆角等样式&#10;- 创建 Row 和 Column 布局组件，支持主轴和交叉轴对齐方式&#10;- 添加 Stack 层叠布局组件，支持子组件层叠放置&#10;- 实现 Image 图片组件，支持本地路径和 URL 图片加载&#10;- 添加 CallbackBridge 回调函数桥接器，管理 Old8Lang 函数和 C# 委托之间的桥接&#10;- 创建组件工厂方法，支持从 Old8Lang 字典配置创建各种组件&#10;- 添加 LayoutHelper 布局辅助工具，统一处理样式应用逻辑&#10;- 重构 FirstUIBinding 类，提供完整的组件创建和主题切换功能&#10;- 优化错误处理，添加堆栈跟踪信息和 UI 线程安全的 Toast 显示" />
     <MESSAGE value="feat(components): 添加高级UI组件实现&#10;&#10;- 实现Card卡片组件，支持标题、副标题、圆角、边框、阴影等属性&#10;- 实现Dialog对话框组件，支持多种类型和自定义内容&#10;- 实现ListView列表视图组件，支持虚拟化滚动和分隔线&#10;- 实现ScrollView滚动容器组件，支持多方向滚动&#10;- 实现TabView选项卡视图组件，支持动态选项卡切换&#10;- 实现Toast消息提示组件，支持多种类型和位置&#10;- 移除旧的组件创建工厂方法和相关依赖引用" />
     <MESSAGE value="feat(ui): 添加面包屑、复选框、网格视图、菜单、分页和弹出框组件&#10;&#10;- 实现 Breadcrumb 面包屑导航组件，支持自定义分隔符、颜色和点击事件&#10;- 实现 Checkbox 复选框组件，支持三态模式和链式调用配置&#10;- 实现 GridView 网格视图组件，支持自定义列数、间距和项构建器&#10;- 实现 Menu 菜单组件，支持垂直/水平方向、子菜单和选中状态&#10;- 实现 Pagination 分页组件，支持首页末页按钮、页码范围和总数显示&#10;- 实现 Popover 弹出框组件，支持多种触发方式和定位选项&#10;- 移除 benchmarks 项目中的冗余文件夹引用" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(ui): 添加面包屑、复选框、网格视图、菜单、分页和弹出框组件&#10;&#10;- 实现 Breadcrumb 面包屑导航组件，支持自定义分隔符、颜色和点击事件&#10;- 实现 Checkbox 复选框组件，支持三态模式和链式调用配置&#10;- 实现 GridView 网格视图组件，支持自定义列数、间距和项构建器&#10;- 实现 Menu 菜单组件，支持垂直/水平方向、子菜单和选中状态&#10;- 实现 Pagination 分页组件，支持首页末页按钮、页码范围和总数显示&#10;- 实现 Popover 弹出框组件，支持多种触发方式和定位选项&#10;- 移除 benchmarks 项目中的冗余文件夹引用" />
+    <MESSAGE value="feat(state): 添加完整状态管理系统&#10;&#10;- 实现 State 类提供局部状态管理功能&#10;- 实现 ObservableState 类支持响应式状态自动触发 UI 更新&#10;- 实现 GlobalState 类提供全局状态管理类似 Provider 模式&#10;- 实现 Computed 类支持计算属性基于依赖状态派生新状态&#10;- 添加 IState 接口统一状态管理抽象&#10;- 扩展 WidgetBase 添加 Rebuild 方法支持状态变化重建&#10;- 更新文档添加状态管理使用示例和功能说明&#10;- 修改项目进度标记状态管理阶段完成" />
+    <MESSAGE value="feat(animation): 添加动画系统和缓动函数库&#10;&#10;- 实现了基础动画类Animation，支持启动、暂停、恢复、停止和重置功能&#10;- 添加了泛型动画类Animation&lt;T&gt;，支持自定义插值函数&#10;- 实现了完整的缓动函数库，包含线性、四次方、三次方、正弦、指数、圆形、回弹、弹性、弹跳和弹簧效果&#10;- 创建了AnimatedContainer动画容器组件，支持宽度、高度、不透明度和背景色的自动过渡动画&#10;- 添加了动画接口IAnimation和动画状态枚举AnimationStatus&#10;- 实现了动画事件系统，包括更新事件和完成事件&#10;- 提供了链式调用API用于动画配置和事件绑定" />
+    <MESSAGE value="feat(theme): 实现主题系统和样式管理功能&#10;&#10;- 添加 ColorScheme 类用于定义颜色主题，包含浅色、深色、Material Design 和 Fluent Design 颜色方案&#10;- 添加 SpacingScheme 类用于定义间距系统，支持不同倍数的间距单位&#10;- 添加 StyleSheet、Style 和 StyleBuilder 类用于管理样式定义和构建&#10;- 添加 ThemeData 类用于存储完整的主题配置，包含颜色、字体、间距、阴影和圆角方案&#10;- 添加 Theme 类提供预定义主题创建方法，支持 light、dark、material、fluent 等主题&#10;- 在 FirstUIBinding 中实现主题切换功能，支持 SetTheme、GetCurrentTheme、ToggleTheme 等 API&#10;- 添加主题变化监听器支持，允许注册回调函数监听主题变化&#10;- 添加主题系统使用示例文档，展示基础主题切换和主题监听功能" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(theme): 实现主题系统和样式管理功能&#10;&#10;- 添加 ColorScheme 类用于定义颜色主题，包含浅色、深色、Material Design 和 Fluent Design 颜色方案&#10;- 添加 SpacingScheme 类用于定义间距系统，支持不同倍数的间距单位&#10;- 添加 StyleSheet、Style 和 StyleBuilder 类用于管理样式定义和构建&#10;- 添加 ThemeData 类用于存储完整的主题配置，包含颜色、字体、间距、阴影和圆角方案&#10;- 添加 Theme 类提供预定义主题创建方法，支持 light、dark、material、fluent 等主题&#10;- 在 FirstUIBinding 中实现主题切换功能，支持 SetTheme、GetCurrentTheme、ToggleTheme 等 API&#10;- 添加主题变化监听器支持，允许注册回调函数监听主题变化&#10;- 添加主题系统使用示例文档，展示基础主题切换和主题监听功能" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
