@@ -82,19 +82,32 @@ app.Run(() -> CounterView())
 FirstUI 的界面由组件构建。组件可以是简单的文本、按钮，也可以是复杂的布局容器。
 
 **布局组件**:
+- `Container`: 容器组件（支持内边距、外边距、背景色、边框、圆角）
 - `Column` / `VStack`: 垂直布局
 - `Row` / `HStack`: 水平布局
 - `Stack` / `ZStack`: 层叠布局
-- `Grid`: 网格布局
-- `Container`: 容器组件
+- `ScrollView`: 滚动容器
 
 **基础组件**:
 - `Text`: 文本显示
-- `Button`: 按钮
-- `Image`: 图片
-- `TextInput`: 文本输入框
-- `Checkbox`: 复选框
-- `Slider`: 滑块
+- `Button`: 按钮（多种样式变体）
+- `Image`: 图片（支持本地文件和URL）
+- `TextInput`: 文本输入框（支持密码模式、多行）
+- `Checkbox`: 复选框（支持三态）
+- `RadioButton` & `RadioGroup`: 单选按钮
+
+**高级组件**:
+- `Card`: 卡片组件（Material Design 风格）
+- `Dialog`: 对话框（支持多种类型）
+- `Toast`: 消息提示
+- `Tooltip`: 工具提示
+- `TabView`: 选项卡视图
+- `ListView`: 列表视图（支持虚拟化）
+- `GridView`: 网格视图
+- `Menu`: 菜单（支持子菜单）
+- `Pagination`: 分页组件
+- `Popover`: 弹出框
+- `Breadcrumb`: 面包屑导航
 
 ### 状态管理
 
@@ -198,20 +211,48 @@ ui.Column({
 
 ## 开发状态
 
-🚧 **此项目目前处于规划阶段**
+🚀 **此项目目前处于活跃开发阶段**
 
 完整的开发计划请查看 [TODO.md](./TODO.md)
 
+### 已完成的功能
+
+✅ **阶段一：项目搭建与基础架构**
+- ✅ 项目结构创建（基于 Avalonia UI 11.2.2）
+- ✅ 核心抽象层（WidgetBase、BuildContext）
+- ✅ 工具类库（LayoutHelper、TypeConverter 等）
+
+✅ **阶段二：基础组件库**
+- ✅ 布局组件：Container, Row/HStack, Column/VStack, Stack/ZStack
+- ✅ 基础控件：Text, Button, Image, TextInput
+- ✅ 表单组件：Checkbox, RadioButton/RadioGroup
+
+✅ **阶段三：高级组件（已完成）**
+- ✅ 容器组件：ScrollView, Card, ListView, GridView
+- ✅ 导航组件：TabView, Breadcrumb, Pagination, Menu
+- ✅ 反馈组件：Dialog, Toast, Tooltip, Popover
+
+### 开发中
+
+🔨 **阶段四：状态管理与动画**
+- ⏳ 响应式状态管理系统
+- ⏳ 动画与过渡效果
+- ⏳ 手势与交互
+
+🔨 **阶段五：主题与样式系统**
+- ⏳ 主题系统（Light/Dark）
+- ⏳ 自定义样式支持
+
 预计开发周期：**13周**
-- 阶段一 (第1-2周): 项目搭建与基础架构
-- 阶段二 (第3-4周): 基础组件库
-- 阶段三 (第5-6周): 高级组件与交互
-- 阶段四 (第7-8周): 状态管理与动画
-- 阶段五 (第9周): 主题与样式系统
-- 阶段六 (第10周): Old8Lang API 设计
-- 阶段七 (第11周): 示例与文档
-- 阶段八 (第12周): 测试与优化
-- 阶段九 (第13周): 发布准备
+- 阶段一 (第1-2周): 项目搭建与基础架构 ✅
+- 阶段二 (第3-4周): 基础组件库 ✅
+- 阶段三 (第5-6周): 高级组件与交互 ✅
+- 阶段四 (第7-8周): 状态管理与动画 🔨
+- 阶段五 (第9周): 主题与样式系统 ⏳
+- 阶段六 (第10周): Old8Lang API 设计 ⏳
+- 阶段七 (第11周): 示例与文档 ⏳
+- 阶段八 (第12周): 测试与优化 ⏳
+- 阶段九 (第13周): 发布准备 ⏳
 
 ## 技术栈
 
@@ -243,4 +284,4 @@ ui.Column({
 
 ---
 
-*最后更新: 2025-12-31*
+*最后更新: 2026-01-01*
