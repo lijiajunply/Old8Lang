@@ -9,6 +9,7 @@ using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using Old8Lang.StandardLibrary;
 using Old8Lang.ModuleSystem.Core;
+using Old8Lang.ModuleSystem.Resolution;
 
 namespace Old8Lang.AST.Statement;
 
@@ -301,52 +302,47 @@ public partial class ImportStatement(
         bool isDirectory = false;
 
         // 优先级 1: 标准库（Old8LangLib 和 Old8Lang.NetLib）
-        // 注意：编译模式下标准库由 C# 直接提供，不需要加载 .old8 文件
+        // 在编译模式下，标准库由 C# 运行时提供，但我们需要验证其是否可用
         if (StandardLibraryRegistry.IsStandardLibrary(moduleName))
         {
-            // 标准库在编译模式下不需要生成 IL，直接返回
+            // 验证标准库是否可用（程序集和类是否存在）
+            if (!StandardLibraryLoader.ValidateStandardLibrary(moduleName, out var errorMessage))
+            {
+                throw new ImportError(Position, moduleName,
+                    $"编译时验证失败: {errorMessage}\n\n" +
+                    "请确保标准库程序集已正确部署到运行时目录。");
+            }
+
+            // 标准库在编译模式下不需要生成 IL（运行时会处理）
+            // 但已经过验证，确保编译后能正常运行
             return;
         }
 
-        // 优先级 2: 第三方包（通过 PackageManager）
-        // 在编译模式下，我们需要手动查找包路径
-        var resolvedPath = FindPackagePathForCompiler(moduleName, local.FilePath);
+        // 使用 ModuleResolver 进行统一的模块解析
+        var resolver = new ModuleResolver();
+        var resolution = resolver.ResolveModule(moduleName, local.FilePath);
 
-        // 优先级 3: 本地文件导入（相对于当前文件的路径）
-        if (resolvedPath == null)
+        // 如果解析失败，抛出详细错误
+        if (!resolution.IsSuccess)
         {
-            var dic = Path.GetDirectoryName(local.FilePath);
-
-            // 检查文件扩展名，只支持.old8和.ol
-            var fileNameLocal = moduleName;
-            var extLocal = Path.GetExtension(fileNameLocal).ToLower();
-            if (extLocal != ".old8" && extLocal != ".ol")
-            {
-                fileNameLocal += ".old8"; // 默认使用.old8扩展名
-            }
-
-            // 修复：正确处理绝对路径和相对路径
-            var filePath = Path.IsPathRooted(fileNameLocal)
-                ? fileNameLocal
-                : dic != null
-                    ? Path.Combine(dic, fileNameLocal)
-                    : fileNameLocal;
-
-            if (filePath.StartsWith("Users/") || filePath.StartsWith("Volumes/"))
-            {
-                filePath = "/" + filePath;
-            }
-
-            if (File.Exists(filePath))
-            {
-                resolvedPath = filePath;
-            }
+            throw new ImportError(Position, moduleName, resolution);
         }
 
-        // 如果所有查找都失败，直接返回（编译模式下不抛出错误）
+        // 处理不同类型的模块
+        string? resolvedPath = resolution.ResolvedPath;
+
+        // 如果是网络模块，编译模式暂不支持
+        if (resolution.ModuleType == ModuleType.NetworkModule)
+        {
+            throw new ImportError(Position, moduleName,
+                "编译模式暂不支持从网络URL导入模块。请使用解释模式 (-f) 或将模块下载到本地。");
+        }
+
+        // 对于本地文件、第三方包和子模块，继续处理
         if (string.IsNullOrEmpty(resolvedPath))
         {
-            return;
+            // 这种情况不应该发生，因为 IsSuccess 为 false 时已经抛出异常
+            throw new ImportError(Position, moduleName, "模块解析失败，但未提供详细信息");
         }
 
         // 获取绝对路径作为缓存键
@@ -377,104 +373,6 @@ public partial class ImportStatement(
 
         block?.GenerateImportIl(ilGenerator, local);
         local.FilePath = importOriginalPath;
-    }
-
-    /// <summary>
-    /// 为编译模式查找包路径
-    /// </summary>
-    /// <param name="packageName">包名称</param>
-    /// <param name="sourceFilePath">源文件路径</param>
-    /// <returns>包入口文件路径，如果未找到则返回 null</returns>
-    private static string? FindPackagePathForCompiler(string packageName, string sourceFilePath)
-    {
-        var searchPaths = new List<string>();
-
-        // 添加全局包目录
-        var homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        var globalPackagesDir = Path.Combine(homeDir, ".old8lang", "packages");
-        searchPaths.Add(globalPackagesDir);
-
-        // 添加源文件所在目录的 packages 子目录
-        if (!string.IsNullOrEmpty(sourceFilePath))
-        {
-            try
-            {
-                var sourceDir = Path.GetDirectoryName(Path.GetFullPath(sourceFilePath));
-                if (!string.IsNullOrEmpty(sourceDir))
-                {
-                    var localPackages = Path.Combine(sourceDir, "packages");
-                    if (Directory.Exists(localPackages))
-                    {
-                        searchPaths.Add(localPackages);
-                    }
-                }
-            }
-            catch
-            {
-                // 忽略路径解析错误
-            }
-        }
-
-        // 在所有查找路径中搜索包
-        foreach (var searchPath in searchPaths)
-        {
-            // 策略 1: 尝试精确目录名
-            var packagePath = Path.Combine(searchPath, packageName);
-            var entryFile = FindPackageEntryFile(packagePath, packageName);
-            if (entryFile != null)
-            {
-                return entryFile;
-            }
-
-            // 策略 2: 尝试版本化目录（PackageName@*）
-            if (!Directory.Exists(searchPath)) continue;
-            try
-            {
-                var versionedDirs = Directory.GetDirectories(searchPath, $"{packageName}@*");
-                if (versionedDirs.Length > 0)
-                {
-                    // 选择第一个匹配的版本
-                    var versionedPath = versionedDirs[0];
-                    entryFile = FindPackageEntryFile(versionedPath, packageName);
-                    if (entryFile != null)
-                    {
-                        return entryFile;
-                    }
-                }
-            }
-            catch
-            {
-                // 忽略目录枚举错误
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// 查找包的入口文件
-    /// </summary>
-    /// <param name="packagePath">包目录路径</param>
-    /// <param name="packageName">包名称</param>
-    /// <returns>入口文件路径，如果未找到则返回 null</returns>
-    private static string? FindPackageEntryFile(string packagePath, string packageName)
-    {
-        if (!Directory.Exists(packagePath))
-            return null;
-
-        // 优先级顺序：
-        // 1. index.old8
-        // 2. {packageName}.old8
-        // 3. main.old8
-
-        var candidates = new[]
-        {
-            Path.Combine(packagePath, "index.old8"),
-            Path.Combine(packagePath, $"{packageName}.old8"),
-            Path.Combine(packagePath, "main.old8")
-        };
-
-        return candidates.FirstOrDefault(File.Exists);
     }
 
     /// <summary>

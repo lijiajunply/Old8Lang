@@ -60,6 +60,72 @@ public static class StandardLibraryLoader
     }
 
     /// <summary>
+    /// 验证标准库是否可用（用于编译时检查）
+    /// 不会实际加载符号，只检查程序集和类是否存在
+    /// </summary>
+    /// <param name="libraryName">库名称</param>
+    /// <param name="errorMessage">如果验证失败，返回错误信息</param>
+    /// <returns>是否验证成功</returns>
+    public static bool ValidateStandardLibrary(string libraryName, out string? errorMessage)
+    {
+        errorMessage = null;
+
+        // 检查是否为标准库
+        if (!StandardLibraryRegistry.IsStandardLibrary(libraryName))
+        {
+            errorMessage = $"'{libraryName}' 不是已注册的标准库";
+            return false;
+        }
+
+        try
+        {
+            var libInfo = StandardLibraryRegistry.GetLibraryInfo(libraryName)!;
+
+            // 尝试加载程序集（不抛出异常，只验证）
+            var assembly = GetOrLoadAssembly(libInfo.AssemblyName);
+
+            // 验证类是否存在
+            if (libInfo.IsMultiClass)
+            {
+                // 多类库：验证所有类
+                foreach (var className in libInfo.ClassNames!)
+                {
+                    var fullTypeName = $"{libInfo.AssemblyName}.{className}";
+                    var type = assembly.GetType(fullTypeName);
+                    if (type == null)
+                    {
+                        errorMessage = $"标准库 '{libraryName}' 中找不到类 '{className}'（程序集: {libInfo.AssemblyName}）";
+                        return false;
+                    }
+                }
+            }
+            else if (libInfo.ClassName != null)
+            {
+                // 单类库：验证单个类
+                var fullTypeName = $"{libInfo.AssemblyName}.{libInfo.ClassName}";
+                var type = assembly.GetType(fullTypeName);
+                if (type == null)
+                {
+                    errorMessage = $"标准库 '{libraryName}' 中找不到类 '{libInfo.ClassName}'（程序集: {libInfo.AssemblyName}）";
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        catch (FileNotFoundException ex)
+        {
+            errorMessage = $"标准库 '{libraryName}' 的程序集不存在: {ex.Message}";
+            return false;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"验证标准库 '{libraryName}' 时发生错误: {ex.Message}";
+            return false;
+        }
+    }
+
+    /// <summary>
     /// 获取或加载程序集
     /// </summary>
     private static Assembly GetOrLoadAssembly(string assemblyName)
