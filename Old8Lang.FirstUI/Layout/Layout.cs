@@ -1,10 +1,8 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Old8Lang.FirstUI.Core;
 
-namespace Old8Lang.FirstUI.Layout;
+namespace Old8Lang.FirstUI;
 
 /// <summary>
 /// 容器组件

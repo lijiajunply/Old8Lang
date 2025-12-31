@@ -1,4 +1,4 @@
-namespace Old8Lang.FirstUI.Core;
+namespace Old8Lang.FirstUI;
 
 /// <summary>
 /// 构建上下文
@@ -41,6 +41,7 @@ public class BuildContext
         {
             return typedValue;
         }
+
         return default;
     }
 

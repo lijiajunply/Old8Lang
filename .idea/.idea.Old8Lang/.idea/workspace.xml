@@ -22,10 +22,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/DatabaseLibTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/MachineLearningLibTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/NetLibTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/SerializationLibTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -874,7 +872,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="467" />
+    <option name="localTasksCounter" value="468" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -901,7 +899,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(module): 实现模块函数作用域捕获机制&#10;&#10;- 在 FuncLangValue 中添加 CreateWithCapturedScope 方法用于创建带捕获作用域的函数副本&#10;- 重构 UnifiedModule 实现模块隔离作用域，避免符号污染父作用域&#10;- 为导入的函数设置捕获作用域，确保模块内函数可访问模块变量&#10;- 保存初始 VariateManager 用于懒加载时的上下文恢复&#10;- 修复 SpawnTests 中的断点位置偏移问题&#10;- 更新 IDE 配置和测试会话设置" />
     <MESSAGE value="feat(parser): 添加LINQ查询表达式支持&#10;&#10;- 实现了FromClause、WhereClause、SelectClause等LINQ子句AST节点&#10;- 添加了OrderByClause、GroupByClause、JoinClause、LetClause等高级子句&#10;- 扩展LangTokenType枚举以支持LINQ相关关键字（select、orderby、group等）&#10;- 更新词法分析器以正确识别LINQ关键字并建立关键字到TokenType的映射&#10;- 集成LinqParser到主解析器中处理LINQ查询表达式解析&#10;- 创建LINQ基础语法和高级功能的测试用例文件&#10;- 实现LINQ查询的基础执行和边界情况处理测试" />
     <MESSAGE value="fix(ast): 修正类型错误异常处理&#10;&#10;- 将 IntLangValue 比较操作中的 InvalidOperationError 替换为 TypeError&#10;- 更新 LinqErrorTests 中的异常类型断言从 RuntimeError 到 ZeroDivisionError&#10;- 修正 LinqErrorTests 中的测试代码逻辑和注释说明&#10;- 调整 LinqLetOrderByTests 中的测试查询表达式&#10;- 更新 IDE 配置文件中的断点设置和任务计数器" />
     <MESSAGE value="test(compiler): 重构算术表达式测试以使用内联断言&#10;&#10;- 移除未使用的 AST 和错误处理程序引用&#10;- 将测试代码重构为使用 Old8Lang 内置断言语句&#10;- 更新除法和取模运算测试以返回双精度浮点数类型&#10;- 简化断言逻辑，使用 Record.Exception 捕获异常&#10;- 添加复杂算术表达式的预期值计算和断言&#10;- 为整数溢出测试添加内联断言验证&#10;- 更新 IDE 工作区配置文件以包含类解析器" />
@@ -926,7 +923,8 @@
     <MESSAGE value="feat(firstui): 初始化 Old8Lang.FirstUI 项目架构&#10;&#10;- 添加架构设计文档，定义三层架构（绑定层、核心层、组件层）&#10;- 实现 BuildContext 上下文类，提供主题、状态管理等功能&#10;- 创建 FirstUIBinding 绑定类，提供 Old8Lang 语言调用入口点&#10;- 添加 StateManager 状态管理器和 ObservableState 响应式状态类&#10;- 创建 HelloWorld 和 Counter 示例应用展示基本功能&#10;- 配置项目文件和解决方案，集成 Avalonia UI 框架&#10;- 添加 README.md 项目说明文档和 TODO 开发计划&#10;- 实现基本的主题系统和组件构建上下文环境" />
     <MESSAGE value="feat(firstui): 实现 FirstUI 基础组件和应用框架&#10;&#10;- 添加 Text 和 Button 基础组件，支持文本显示和按钮点击功能&#10;- 实现 Container 和 Column 布局组件，提供容器和垂直布局支持&#10;- 添加全局状态管理功能，支持状态监听和计算属性&#10;- 重构 FirstUIBinding 绑定类，实现组件创建和应用运行逻辑&#10;- 更新示例应用使用新的组件创建方式，替换原有的链式调用&#10;- 添加项目引用和标准库注册，集成 FirstUI 到主应用程序&#10;- 扩展 WidgetBase 基类，添加边距、内边距和可见性设置功能" />
     <MESSAGE value="test(standard-library): 添加标准库模块的全面测试覆盖&#10;&#10;- 添加 AsyncLibTests 测试异步和多线程功能&#10;- 添加 CryptoLibTests 测试加密和哈希功能&#10;- 添加 CsvTests 测试 CSV 文件处理功能&#10;- 添加 FileLibTests 测试文件和目录操作功能&#10;- 添加 JsonLibTests 测试 JSON 序列化和反序列化功能&#10;- 添加 MathLibTests 测试数学函数功能&#10;- 添加 OSTests 测试操作系统相关功能&#10;- 添加 RegexLibTests 测试正则表达式功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(standard-library): 添加标准库模块的全面测试覆盖&#10;&#10;- 添加 AsyncLibTests 测试异步和多线程功能&#10;- 添加 CryptoLibTests 测试加密和哈希功能&#10;- 添加 CsvTests 测试 CSV 文件处理功能&#10;- 添加 FileLibTests 测试文件和目录操作功能&#10;- 添加 JsonLibTests 测试 JSON 序列化和反序列化功能&#10;- 添加 MathLibTests 测试数学函数功能&#10;- 添加 OSTests 测试操作系统相关功能&#10;- 添加 RegexLibTests 测试正则表达式功能" />
+    <MESSAGE value="test(standard-library): 添加标准库模块的全面测试覆盖&#10;&#10;- 添加 DatabaseLibTests 测试数据库操作功能&#10;- 添加 MachineLearningLibTests 测试机器学习功能&#10;- 添加 NetLibTests 测试网络功能（HTTP、MQTT、WebSocket 等）&#10;- 添加 SerializationLibTests 测试序列化功能（MessagePack 和 Protobuf）&#10;- 更新 IDE 工作区配置文件中的变更记录和任务计数器&#10;- 清理过时的提交消息历史记录并更新最后提交信息" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(standard-library): 添加标准库模块的全面测试覆盖&#10;&#10;- 添加 DatabaseLibTests 测试数据库操作功能&#10;- 添加 MachineLearningLibTests 测试机器学习功能&#10;- 添加 NetLibTests 测试网络功能（HTTP、MQTT、WebSocket 等）&#10;- 添加 SerializationLibTests 测试序列化功能（MessagePack 和 Protobuf）&#10;- 更新 IDE 工作区配置文件中的变更记录和任务计数器&#10;- 清理过时的提交消息历史记录并更新最后提交信息" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

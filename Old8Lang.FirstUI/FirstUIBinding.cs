@@ -1,8 +1,5 @@
-using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Threading;
-using Old8Lang.FirstUI.Core;
 
 namespace Old8Lang.FirstUI;
 
@@ -35,24 +32,6 @@ public static class FirstUIBinding
     {
         Initialize();
         return new FirstUIApplication();
-    }
-
-    /// <summary>
-    /// 创建组件
-    /// </summary>
-    public static object CreateWidget(string widgetType, object? config = null)
-    {
-        Initialize();
-        
-        return widgetType.ToLower() switch
-        {
-            "text" => new Basic.Text(),
-            "button" => new Basic.Button(),
-            "container" => new Layout.Container(),
-            "column" => new Layout.Column(),
-            "vstack" => new Layout.Column(), // SwiftUI 风格别名
-            _ => throw new NotImplementedException($"Widget type '{widgetType}' is not supported")
-        };
     }
 
     /// <summary>

@@ -7,7 +7,7 @@ app <- ui.CreateApp()
 
 // 定义主视图
 HelloWorldView() -> {
-    return ui.CreateWidget("Column", null)
+    return Column()
 }
 
 // 运行应用程序

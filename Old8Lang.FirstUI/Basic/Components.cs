@@ -1,10 +1,7 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Layout;
 using Avalonia.Media;
-using Old8Lang.FirstUI.Core;
 
-namespace Old8Lang.FirstUI.Basic;
+namespace Old8Lang.FirstUI;
 
 /// <summary>
 /// 文本组件

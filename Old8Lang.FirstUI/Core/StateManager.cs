@@ -1,4 +1,4 @@
-namespace Old8Lang.FirstUI.Core;
+namespace Old8Lang.FirstUI;
 
 /// <summary>
 /// 状态管理器
