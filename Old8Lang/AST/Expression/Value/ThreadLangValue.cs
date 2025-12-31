@@ -22,6 +22,16 @@ public partial class ThreadLangValue : LangValueType
     private readonly Lock Lock = new();
 
     /// <summary>
+    /// 线程入口点委托（ThreadStart）
+    /// </summary>
+    private readonly ThreadStart? _threadStart;
+
+    /// <summary>
+    /// 线程入口点委托（ParameterizedThreadStart）
+    /// </summary>
+    private readonly ParameterizedThreadStart? _parameterizedThreadStart;
+
+    /// <summary>
     /// 线程执行结果
     /// </summary>
     private object? _result;
@@ -103,6 +113,7 @@ public partial class ThreadLangValue : LangValueType
         CancellationToken cancellationToken = default) : base(position)
     {
         _cancellationToken = cancellationToken;
+        _threadStart = threadStart;
         Thread = new Thread(() =>
         {
             try
@@ -119,7 +130,6 @@ public partial class ThreadLangValue : LangValueType
                 SetException(ex);
             }
         });
-        Thread.Start();
     }
 
     /// <summary>
@@ -133,6 +143,7 @@ public partial class ThreadLangValue : LangValueType
         SourcePosition position = default, CancellationToken cancellationToken = default) : base(position)
     {
         _cancellationToken = cancellationToken;
+        _parameterizedThreadStart = parameterizedThreadStart;
         Thread = new Thread((param) =>
         {
             try
@@ -149,7 +160,6 @@ public partial class ThreadLangValue : LangValueType
                 SetException(ex);
             }
         });
-        Thread.Start(parameter);
     }
 
     /// <summary>
@@ -163,6 +173,7 @@ public partial class ThreadLangValue : LangValueType
     {
         _cancellationTokenSource = cancellationTokenSource;
         _cancellationToken = cancellationTokenSource.Token;
+        _threadStart = threadStart;
         Thread = new Thread(() =>
         {
             try
@@ -179,7 +190,6 @@ public partial class ThreadLangValue : LangValueType
                 SetException(ex);
             }
         });
-        Thread.Start();
     }
 
     /// <summary>
@@ -188,9 +198,11 @@ public partial class ThreadLangValue : LangValueType
     /// <returns>线程执行结果</returns>
     public LangValueType Join(IntLangValue? timeout = null)
     {
+        bool joined;
         if (timeout != null)
         {
-            Thread.Join(timeout.GetValue<int>());
+            joined = Thread.Join(timeout.GetValue<int>());
+            return new BoolLangValue(joined);
         }
         else
         {
@@ -213,6 +225,62 @@ public partial class ThreadLangValue : LangValueType
             return ObjToValue(_result);
         }
     }
+
+    /// <summary>
+    /// 启动线程
+    /// </summary>
+    /// <param name="parameter">可选的线程参数</param>
+    public void Start(object? parameter = null)
+    {
+        if (_parameterizedThreadStart != null && parameter != null)
+        {
+            Thread.Start(parameter);
+        }
+        else
+        {
+            Thread.Start();
+        }
+    }
+
+    /// <summary>
+    /// 检查线程是否正在运行
+    /// </summary>
+    public bool IsAlive()
+    {
+        return Thread.IsAlive;
+    }
+
+    /// <summary>
+    /// 获取或设置线程是否为后台线程
+    /// </summary>
+    public bool IsBackground
+    {
+        get => Thread.IsBackground;
+        set => Thread.IsBackground = value;
+    }
+
+    /// <summary>
+    /// 获取或设置线程名称
+    /// </summary>
+    public string? Name
+    {
+        get => Thread.Name;
+        set => Thread.Name = value;
+    }
+
+    /// <summary>
+    /// 获取或设置线程优先级
+    /// </summary>
+    public int Priority
+    {
+        get => (int)Thread.Priority;
+        set => Thread.Priority = (ThreadPriority)value;
+    }
+
+    /// <summary>
+    /// 获取线程的托管线程ID
+    /// </summary>
+    public int ManagedThreadId => Thread.ManagedThreadId;
 
     /// <summary>
     /// 设置线程执行结果
@@ -319,46 +387,67 @@ public partial class ThreadLangValue : LangValueType
     /// <returns>方法调用结果</returns>
     public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
-        // 处理 Join 方法调用
-        if (dotExpression is Instance { Id.IdName: "Join" } instance)
+        // 处理方法调用（Instance 类型）
+        if (dotExpression is Instance instance)
         {
-            // 直接调用 Join 方法，避免反射
-            return instance.Ids.Count > 0
-                ? Join(instance.Ids[0] as IntLangValue) // 如果有参数，则调用带参数的 Join 方法
-                : Join();
-        }
+            switch (instance.Id.IdName)
+            {
+                case "Join":
+                    // 直接调用 Join 方法，避免反射
+                    if (instance.Ids.Count > 0)
+                    {
+                        var timeoutValue = instance.Ids[0].Run(manager);
+                        return Join(timeoutValue as IntLangValue);
+                    }
+                    return Join();
 
-        // 处理 Wait 方法调用（等同于Join）
-        if (dotExpression is Instance { Id.IdName: "Wait" } waitInstance)
-        {
-            // 直接调用 Join 方法，避免反射
-            return waitInstance.Ids.Count > 0
-                ? Join(waitInstance.Ids[0] as IntLangValue) // 如果有参数，则调用带参数的 Join 方法
-                : Join();
-        }
+                case "Wait":
+                    // 直接调用 Join 方法（Wait 等同于 Join）
+                    if (instance.Ids.Count > 0)
+                    {
+                        var timeoutValue = instance.Ids[0].Run(manager);
+                        return Join(timeoutValue as IntLangValue);
+                    }
+                    return Join();
 
-        if (dotExpression is Instance { Id.IdName: "State" })
-        {
-            // 直接返回 State 属性值，避免反射
-            return new StringLangValue(State.ToString());
-        }
+                case "Start":
+                    // 启动线程
+                    if (instance.Ids.Count > 0)
+                    {
+                        var param = instance.Ids[0].Run(manager);
+                        Start(param.GetValue());
+                    }
+                    else
+                    {
+                        Start();
+                    }
+                    return new VoidLangValue(Position);
 
-        if (dotExpression is Instance { Id.IdName: "IsCompleted" })
-        {
-            // 直接返回 IsCompleted 属性值，避免反射
-            return new BoolLangValue(IsCompleted);
-        }
+                case "IsAlive":
+                    // 检查线程是否存活
+                    return new BoolLangValue(IsAlive());
 
-        // 处理 Status() 方法调用（返回线程状态字符串）
-        if (dotExpression is Instance { Id.IdName: "Status" })
-        {
-            return new StringLangValue(State.ToString());
-        }
+                case "State":
+                    // 返回线程状态
+                    return new StringLangValue(State.ToString());
 
-        // 处理 Id() 方法调用（返回线程ID）
-        if (dotExpression is Instance { Id.IdName: "Id" })
-        {
-            return new IntLangValue(Thread.ManagedThreadId);
+                case "IsCompleted":
+                    // 返回是否完成
+                    return new BoolLangValue(IsCompleted);
+
+                case "Status":
+                    // 返回线程状态字符串
+                    return new StringLangValue(State.ToString());
+
+                case "Id":
+                    // 返回线程ID
+                    return new IntLangValue(ManagedThreadId);
+
+                case "Cancel":
+                    // 取消线程
+                    Cancel();
+                    return new VoidLangValue(Position);
+            }
         }
 
         // 处理属性访问（LangId 类型）
@@ -373,15 +462,30 @@ public partial class ThreadLangValue : LangValueType
                 case "Result":
                     return Result; // 访问Result属性，会自动等待线程完成
                 case "Id":
-                    return new IntLangValue(Thread.ManagedThreadId);
+                    return new IntLangValue(ManagedThreadId);
+                case "ManagedThreadId":
+                    return new IntLangValue(ManagedThreadId);
+                case "IsBackground":
+                    return new BoolLangValue(IsBackground);
+                case "Name":
+                    return Name != null ? new StringLangValue(Name) : new NullLangValue(Position);
+                case "Priority":
+                    return new IntLangValue(Priority);
             }
         }
 
-        if (dotExpression is Instance { Id.IdName: "Cancel" })
+        // 处理属性设置（ClassMemberId 类型）
+        if (dotExpression is ClassMemberId memberId)
         {
-            // 直接调用 Cancel 方法
-            Cancel();
-            return new VoidLangValue(Position);
+            switch (memberId.IdName)
+            {
+                case "IsBackground":
+                    return new BoolLangValue(IsBackground);
+                case "Name":
+                    return Name != null ? new StringLangValue(Name) : new NullLangValue(Position);
+                case "Priority":
+                    return new IntLangValue(Priority);
+            }
         }
 
         // 其他情况（包括扩展方法如 Then、WithTimeout、Retry）调用基类方法

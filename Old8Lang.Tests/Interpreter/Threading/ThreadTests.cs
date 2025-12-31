@@ -121,13 +121,14 @@ result <- threadId > 0";
     {
         // Arrange
         var code = @"
-counter <- 0
+counter <- Lock(0)
 
 func threadFunc() -> void {
-    counter <- counter + 1
+    val <- counter.Value
+    counter.Set(val + 1)
 }
 
-thread <- Thread(threadFunc)
+thread <- Spawn(threadFunc)
 thread.Start()";
         var interpreter = new LangInterpreter();
 
@@ -140,8 +141,10 @@ thread.Start()";
 
         // Assert
         var counter = interpreter.Manager.GetValue(new LangId("counter"));
-        Assert.IsType<IntLangValue>(counter);
-        Assert.Equal(1, ((IntLangValue)counter).Value);
+        Assert.IsType<LockedVariableLangValue>(counter);
+        var counterValue = ((LockedVariableLangValue)counter).GetLockedValue();
+        Assert.IsType<IntLangValue>(counterValue);
+        Assert.Equal(1, ((IntLangValue)counterValue).Value);
     }
 
     /// <summary>
@@ -158,7 +161,7 @@ func threadFunc(value: int) -> void {
     result <- value * 2
 }
 
-thread <- Thread(threadFunc)
+thread <- Spawn(threadFunc)
 thread.Start(21)";
         var interpreter = new LangInterpreter();
 
@@ -191,7 +194,7 @@ func longRunningTask() -> void {
     Thread.Sleep(200)
 }
 
-thread <- Thread(longRunningTask)
+thread <- Spawn(longRunningTask)
 beforeStart <- thread.IsAlive()
 thread.Start()
 afterStart <- thread.IsAlive()";
@@ -234,7 +237,7 @@ func threadFunc() -> void {
     value <- 42
 }
 
-thread <- Thread(threadFunc)
+thread <- Spawn(threadFunc)
 thread.Start()
 thread.Join()
 result <- value";
@@ -262,7 +265,7 @@ func longTask() -> void {
     Thread.Sleep(500)
 }
 
-thread <- Thread(longTask)
+thread <- Spawn(longTask)
 thread.Start()
 joinResult <- thread.Join(100)
 result <- not joinResult";
@@ -297,9 +300,9 @@ func addToSum(value: int) -> void {
     sum <- sum + value
 }
 
-t1 <- Thread(addToSum)
-t2 <- Thread(addToSum)
-t3 <- Thread(addToSum)
+t1 <- Spawn(addToSum)
+t2 <- Spawn(addToSum)
+t3 <- Spawn(addToSum)
 
 t1.Start(10)
 t2.Start(20)
@@ -334,9 +337,9 @@ func appendResult(id: int) -> void {
     results.Add(id)
 }
 
-t1 <- Thread(appendResult)
-t2 <- Thread(appendResult)
-t3 <- Thread(appendResult)
+t1 <- Spawn(appendResult)
+t2 <- Spawn(appendResult)
+t3 <- Spawn(appendResult)
 
 t1.Start(1)
 t2.Start(2)
@@ -373,7 +376,7 @@ func simpleTask() -> void {
     Thread.Sleep(10)
 }
 
-thread <- Thread(simpleTask)
+thread <- Spawn(simpleTask)
 thread.Name <- ""WorkerThread""
 threadName <- thread.Name";
         var interpreter = new LangInterpreter();
@@ -404,7 +407,7 @@ func task() -> void {
     Thread.Sleep(10)
 }
 
-thread <- Thread(task)
+thread <- Spawn(task)
 thread.Priority <- 2
 priority <- thread.Priority";
         var interpreter = new LangInterpreter();
@@ -435,7 +438,7 @@ func backgroundTask() -> void {
     Thread.Sleep(1000)
 }
 
-thread <- Thread(backgroundTask)
+thread <- Spawn(backgroundTask)
 thread.IsBackground <- true
 isBackground <- thread.IsBackground";
         var interpreter = new LangInterpreter();

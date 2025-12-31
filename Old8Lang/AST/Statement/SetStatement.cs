@@ -322,6 +322,36 @@ public partial class SetStatement : OldStatement
                         anyObjV2.SetField(memberNameObj.IdName, result, manager);
                         return;
                     }
+                    // 处理内置类型（ThreadLangValue 等）的属性设置
+                    else if (leftValue is ThreadLangValue threadValue)
+                    {
+                        switch (memberNameObj.IdName)
+                        {
+                            case "IsBackground":
+                                if (result is BoolLangValue boolValue)
+                                {
+                                    threadValue.IsBackground = boolValue.Value;
+                                    return;
+                                }
+                                throw new Error.TypeError(this, "bool", result.TypeToString());
+                            case "Name":
+                                if (result is StringLangValue stringValue)
+                                {
+                                    threadValue.Name = stringValue.Value;
+                                    return;
+                                }
+                                throw new Error.TypeError(this, "string", result.TypeToString());
+                            case "Priority":
+                                if (result is IntLangValue intValue)
+                                {
+                                    threadValue.Priority = intValue.Value;
+                                    return;
+                                }
+                                throw new Error.TypeError(this, "int", result.TypeToString());
+                            default:
+                                throw new AttributeError(leftValue, memberNameObj.IdName, "Thread");
+                        }
+                    }
                 }
             }
         }

@@ -262,6 +262,13 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
                     var args = Ids.Select(id => id.Run(manager)).ToList();
                     result = taskMethodWrapper.Invoke(args, Position);
                 }
+                // 如果idResult是ThreadStaticMethodWrapper，则调用它
+                else if (idResult is ThreadStaticMethodWrapper threadMethodWrapper)
+                {
+                    // 执行静态方法
+                    var args = Ids.Select(id => id.Run(manager)).ToList();
+                    result = threadMethodWrapper.Invoke(args, Position);
+                }
             }
         }
         else
@@ -331,6 +338,13 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
                 // 执行静态方法
                 var args = Ids.Select(id => id.Run(manager)).ToList();
                 result = taskMethodWrapper.Invoke(args, Position);
+            }
+            // 如果idResult是ThreadStaticMethodWrapper，则调用它
+            else if (idResult is ThreadStaticMethodWrapper threadMethodWrapper)
+            {
+                // 执行静态方法
+                var args = Ids.Select(id => id.Run(manager)).ToList();
+                result = threadMethodWrapper.Invoke(args, Position);
             }
         }
 

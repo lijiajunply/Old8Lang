@@ -1,5 +1,6 @@
 using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Visitor;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
@@ -25,7 +26,7 @@ public partial class ThreadClassLangValue : LangValueType
 
     public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
-        // 处理 Task.WhenAll(...) 形式的调用
+        // 处理 Thread.WhenAll(...) 形式的调用
         if (dotExpression is Instance instance)
         {
             var methodName = instance.Id.IdName;
@@ -37,6 +38,7 @@ public partial class ThreadClassLangValue : LangValueType
                 "WhenAny" => WhenAny,
                 "Delay" => Delay,
                 "Sleep" => Sleep,
+                "CurrentThread" => CurrentThread,
                 _ => null
             };
 
@@ -57,6 +59,7 @@ public partial class ThreadClassLangValue : LangValueType
                 // 对于简单的静态方法（如 Sleep），直接执行参数
                 args = instance.Ids.Select(id => id.Run(manager)).ToList();
             }
+
             return method(args, instance.Position);
         }
 
@@ -72,12 +75,13 @@ public partial class ThreadClassLangValue : LangValueType
                 "WhenAny" => new ThreadStaticMethodWrapper("WhenAny", WhenAny),
                 "Delay" => new ThreadStaticMethodWrapper("Delay", Delay),
                 "Sleep" => new ThreadStaticMethodWrapper("Sleep", Sleep),
+                "CurrentThread" => new ThreadStaticMethodWrapper("CurrentThread", CurrentThread),
                 _ => throw new AttributeError(dotExpression.Position, methodName, "Thread")
             };
         }
 
         throw new AttributeError(dotExpression.Position,
-            dotExpression.ToString() ?? "unknown", "Task");
+            dotExpression.ToString() ?? "unknown", "Thread");
     }
 
     /// <summary>
@@ -167,7 +171,7 @@ public partial class ThreadClassLangValue : LangValueType
 
         return ThreadLangValue.Delay(delayMs.Value, CancellationToken.None, position);
     }
-    
+
     /// <summary>
     /// Sleep 静态方法实现
     /// </summary>
@@ -187,13 +191,39 @@ public partial class ThreadClassLangValue : LangValueType
 
         // 直接调用 .NET Thread.Sleep
         System.Threading.Thread.Sleep(delayMs.Value);
-        
+
         return new VoidLangValue(position);
+    }
+
+    /// <summary>
+    /// CurrentThread 静态方法实现 - 返回当前线程的 ThreadLangValue 包装
+    /// </summary>
+    private static LangValueType CurrentThread(List<LangValueType> args, SourcePosition position)
+    {
+        if (args.Count != 0)
+        {
+            throw new ArgumentError(position,
+                $"CurrentThread 不需要参数,但提供了 {args.Count} 个");
+        }
+
+        // 获取当前 .NET 线程
+        var currentThread = System.Threading.Thread.CurrentThread;
+
+        // 创建一个特殊的 ThreadLangValue，包装当前线程
+        // 注意：由于 ThreadLangValue 构造函数需要 ThreadStart，我们需要提供一个空操作
+        var threadValue = new ThreadLangValue(() => { }, position);
+
+        // 使用反射设置内部的 Thread 字段为当前线程
+        var threadField = typeof(ThreadLangValue).GetField("Thread",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        threadField?.SetValue(threadValue, currentThread);
+
+        return threadValue;
     }
 }
 
 /// <summary>
-/// Task 静态方法的包装器
+/// Thread 静态方法的包装器
 /// </summary>
 public partial class ThreadStaticMethodWrapper(
     string methodName,

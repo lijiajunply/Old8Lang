@@ -107,10 +107,11 @@ result <- main()";
         // Arrange
         var code = @"
 counter <- 0
+lockedCounter <- lock(counter)
 
 async func increment() -> void {
-    lock(counter)
-    counter <- counter + 1
+    value <- lockedCounter.Value
+    lockedCounter.Set(value + 1)
 }
 
 async func main() -> void {
@@ -130,9 +131,11 @@ task <- main()";
         await Task.Delay(200);
 
         // Assert
-        var counter = interpreter.Manager.GetValue(new LangId("counter"));
-        Assert.IsType<IntLangValue>(counter);
-        Assert.Equal(3, ((IntLangValue)counter).Value);
+        var lockedCounter = interpreter.Manager.GetValue(new LangId("lockedCounter"));
+        Assert.IsType<LockedVariableLangValue>(lockedCounter);
+        var finalValue = ((LockedVariableLangValue)lockedCounter).GetLockedValue();
+        Assert.IsType<IntLangValue>(finalValue);
+        Assert.Equal(3, ((IntLangValue)finalValue).Value);
     }
 
     /// <summary>
@@ -233,10 +236,11 @@ task <- main()";
         // Arrange
         var code = @"
 shared <- 0
+lockedShared <- lock(shared)
 
 async func addToShared(value: int) -> void {
-    lock(shared)
-    shared <- shared + value
+    current <- lockedShared.Value
+    lockedShared.Set(current + value)
 }
 
 async func main() -> void {
@@ -256,9 +260,11 @@ task <- main()";
         await Task.Delay(300);
 
         // Assert
-        var shared = interpreter.Manager.GetValue(new LangId("shared"));
-        Assert.IsType<IntLangValue>(shared);
-        Assert.Equal(60, ((IntLangValue)shared).Value);
+        var lockedShared = interpreter.Manager.GetValue(new LangId("lockedShared"));
+        Assert.IsType<LockedVariableLangValue>(lockedShared);
+        var finalValue = ((LockedVariableLangValue)lockedShared).GetLockedValue();
+        Assert.IsType<IntLangValue>(finalValue);
+        Assert.Equal(60, ((IntLangValue)finalValue).Value);
     }
 
     #endregion
