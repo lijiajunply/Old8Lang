@@ -417,6 +417,18 @@ public partial class SetStatement : OldStatement
     {
         if (Id != null && !string.IsNullOrEmpty(Id.IdName))
         {
+            // 如果有类型注解,进行编译时类型检查
+            if (!string.IsNullOrEmpty(Id.AssumptionType))
+            {
+                CollectionTypeValidator.ValidateCollectionTypeAnnotation(
+                    Id.AssumptionType,
+                    Value,
+                    local,
+                    Id.IdName,
+                    Position
+                );
+            }
+
             // 普通变量赋值: name <- value
             Value.SetValueToIl(ilGenerator, local, Id.IdName);
         }

@@ -21,21 +21,31 @@ public partial class ArrayLangValue : LangValueType, ILangList
     /// </summary>
     public List<LangExpression> Values { get; } = [];
 
-    public ArrayLangValue(IEnumerable<LangExpression> valuesList, SourcePosition position = default) : base(position)
+    /// <summary>
+    /// 元素类型（泛型参数），null 表示非泛型或未推断
+    /// </summary>
+    public string? ElementType { get; set; }
+
+    public ArrayLangValue(IEnumerable<LangExpression> valuesList, string? elementType = null, SourcePosition position = default) : base(position)
     {
         var oldExpr = valuesList as LangExpression[] ?? [.. valuesList];
         RunResult = new LangValueType[oldExpr.Length];
         Values.AddRange(oldExpr);
+        ElementType = elementType;
     }
 
-    public ArrayLangValue(List<LangValueType> re, SourcePosition position = default) : base(position)
+    public ArrayLangValue(List<LangValueType> re, string? elementType = null, SourcePosition position = default) : base(position)
     {
         RunResult = [.. re];
         Values = []; // 初始化空列表，因为我们已经有了RunResult
+        ElementType = elementType;
     }
 
-    public ArrayLangValue(List<object> a, SourcePosition position = default) : base(position) =>
+    public ArrayLangValue(List<object> a, string? elementType = null, SourcePosition position = default) : base(position)
+    {
         RunResult = [.. a.Select(ObjToValue)];
+        ElementType = elementType;
+    }
 
     public override LangValueType Run(VariateManager manager)
     {
@@ -185,7 +195,7 @@ public partial class ArrayLangValue : LangValueType, ILangList
             throw new InvalidOperationError(this, "切片步长不能为0");
         }
 
-        return new ArrayLangValue(result, Position);
+        return new ArrayLangValue(result, ElementType, Position);
     }
 
     /// <summary>
@@ -281,7 +291,7 @@ public partial class ArrayLangValue : LangValueType, ILangList
         {
             case "List" or "list":
                 // 数组转换为列表
-                return new ListLangValue(RunResult.ToList(), Position);
+                return new ListLangValue(RunResult.ToList(), ElementType, Position);
             case "Array" or "array":
                 // 已经是数组，直接返回
                 return this;

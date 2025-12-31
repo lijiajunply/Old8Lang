@@ -21,22 +21,30 @@ public partial class ListLangValue : LangValueType, ILangList
 
     private bool HasBeenCleared;
 
+    /// <summary>
+    /// 元素类型（泛型参数），null 表示非泛型或未推断
+    /// </summary>
+    public string? ElementType { get; set; }
 
-    public ListLangValue(List<LangExpression> value, SourcePosition position = default) : base(position)
+
+    public ListLangValue(List<LangExpression> value, string? elementType = null, SourcePosition position = default) : base(position)
     {
         Value = value;
+        ElementType = elementType;
     }
 
-    public ListLangValue(List<object> value, SourcePosition position = default) : base(position)
+    public ListLangValue(List<object> value, string? elementType = null, SourcePosition position = default) : base(position)
     {
         Values.AddRange(value.Select(ObjToValue));
         Value = [];
+        ElementType = elementType;
     }
 
-    public ListLangValue(List<LangValueType> value, SourcePosition position = default) : base(position)
+    public ListLangValue(List<LangValueType> value, string? elementType = null, SourcePosition position = default) : base(position)
     {
         Values.AddRange(value);
         Value = [];
+        ElementType = elementType;
     }
 
     public override LangValueType Run(VariateManager manager)
@@ -234,7 +242,7 @@ public partial class ListLangValue : LangValueType, ILangList
             throw new InvalidOperationError(this, "切片步长不能为0");
         }
 
-        return new ListLangValue(result, Position);
+        return new ListLangValue(result, ElementType, Position);
     }
 
     /// <summary>
@@ -371,7 +379,7 @@ public partial class ListLangValue : LangValueType, ILangList
                 return this;
             case "Array" or "array":
                 // 列表转换为数组
-                return new ArrayLangValue(Values, Position);
+                return new ArrayLangValue(Values, ElementType, Position);
             case "String" or "string":
                 // 列表转换为字符串，用逗号分隔
                 return new StringLangValue(string.Join(", ", Values.Select(v => v.ToDisplayString())));

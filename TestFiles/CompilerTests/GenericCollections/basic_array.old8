@@ -1,0 +1,36 @@
+// 基本泛型数组测试
+// 测试 array<T> 的类型注解和验证
+
+// 测试 1: 显式类型注解 - array<int>
+arr:array<int> <- [1, 2, 3]
+assert(arr.Length == 3, "array<int> Length should be 3")
+assert(arr[0] == 1, "array<int>[0] should be 1")
+assert(arr[1] == 2, "array<int>[1] should be 2")
+assert(arr[2] == 3, "array<int>[2] should be 3")
+
+// 测试 2: 显式类型注解 - array<string>
+names:array<string> <- ["Alice", "Bob", "Charlie"]
+assert(names.Length == 3, "array<string> Length should be 3")
+assert(names[0] == "Alice", "array<string>[0] should be Alice")
+assert(names[1] == "Bob", "array<string>[1] should be Bob")
+assert(names[2] == "Charlie", "array<string>[2] should be Charlie")
+
+// 测试 3: 显式类型注解 - array<double>
+prices:array<double> <- [1.5, 2.5, 3.5]
+assert(prices.Length == 3, "array<double> Length should be 3")
+assert(prices[0] == 1.5, "array<double>[0] should be 1.5")
+assert(prices[1] == 2.5, "array<double>[1] should be 2.5")
+assert(prices[2] == 3.5, "array<double>[2] should be 3.5")
+
+// 测试 4: 显式类型注解 - array<bool>
+flags:array<bool> <- [true, false, true]
+assert(flags.Length == 3, "array<bool> Length should be 3")
+assert(flags[0] == true, "array<bool>[0] should be true")
+assert(flags[1] == false, "array<bool>[1] should be false")
+assert(flags[2] == true, "array<bool>[2] should be true")
+
+// 测试 5: 空数组
+empty:array<int> <- []
+assert(empty.Length == 0, "empty array<int> Length should be 0")
+
+PrintLine("✓ 所有基本泛型数组测试通过")

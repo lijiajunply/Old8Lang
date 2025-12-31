@@ -1,0 +1,8 @@
+// 类型错误检测测试 - 字典
+// 测试编译器是否能正确检测字典类型错误
+
+// 测试: dict<string,int> 中值类型错误 - 应该报错
+ages:dict<string,int> <- {"Alice": 30, "Bob": "twenty-five"}
+
+// 预期错误: 字典值类型不匹配
+// error

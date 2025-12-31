@@ -1,5 +1,6 @@
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
 
@@ -360,5 +361,81 @@ public class TypeInferenceEngine
             .Count();
 
         return (totalConstraints, resolvedTypes, unresolvedTypes);
+    }
+
+    /// <summary>
+    /// 推断表达式的类型名称
+    /// </summary>
+    public string InferExpressionType(LangExpression expr, LocalManager localManager)
+    {
+        return expr switch
+        {
+            IntLangValue => "int",
+            DoubleLangValue => "double",
+            StringLangValue => "string",
+            BoolLangValue => "bool",
+            CharLangValue => "char",
+            ListLangValue list => list.ElementType != null ? $"list<{list.ElementType}>" : "list",
+            ArrayLangValue array => array.ElementType != null ? $"array<{array.ElementType}>" : "array",
+            DictionaryLangValue dict => dict.KeyType != null && dict.ValueType != null
+                ? $"dict<{dict.KeyType},{dict.ValueType}>"
+                : "dict",
+            _ => "any"
+        };
+    }
+
+    /// <summary>
+    /// 推断集合字面量的泛型类型
+    /// </summary>
+    public string InferCollectionElementType(List<LangExpression> elements, LocalManager localManager)
+    {
+        if (elements.Count == 0)
+        {
+            return "any";  // 空集合默认为 any
+        }
+
+        // 收集所有元素的类型
+        var elementTypes = new HashSet<string>();
+        foreach (var expr in elements)
+        {
+            var type = InferExpressionType(expr, localManager);
+            elementTypes.Add(type);
+        }
+
+        // 如果所有元素类型一致，返回该类型
+        if (elementTypes.Count == 1)
+        {
+            return elementTypes.First();
+        }
+
+        // 混合类型：默认返回 any
+        return "any";
+    }
+
+    /// <summary>
+    /// 推断字典键值类型
+    /// </summary>
+    public (string KeyType, string ValueType) InferDictTypes(
+        List<KeyValuePair<LangExpression, LangExpression>> dict,
+        LocalManager localManager)
+    {
+        if (dict.Count == 0)
+        {
+            return ("any", "any");
+        }
+
+        var keyTypes = new HashSet<string>();
+        var valueTypes = new HashSet<string>();
+
+        foreach (var (key, value) in dict)
+        {
+            keyTypes.Add(InferExpressionType(key, localManager));
+            valueTypes.Add(InferExpressionType(value, localManager));
+        }
+
+        var keyType = keyTypes.Count == 1 ? keyTypes.First() : "any";
+        var valueType = valueTypes.Count == 1 ? valueTypes.First() : "any";
+
+        return (keyType, valueType);
     }
 }

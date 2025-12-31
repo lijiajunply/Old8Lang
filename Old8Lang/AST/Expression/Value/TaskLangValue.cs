@@ -438,7 +438,7 @@ public partial class TaskLangValue : LangValueType
                     throw (t.Exception?.InnerException ?? t.Exception)!;
                 }
 
-                return new ListLangValue(t.Result.ToList(), position) as LangValueType;
+                return new ListLangValue(t.Result.ToList(), position: position) as LangValueType;
             });
         return new TaskLangValue(whenAllTask, CancellationToken.None, position);
     }

@@ -1,0 +1,37 @@
+// 嵌套泛型类型测试
+// 测试 list<list<T>>, dict<string, list<T>> 等嵌套泛型
+
+// 测试 1: list<list<int>> - 二维列表
+matrix:list<list<int>> <- {{1, 2}, {3, 4}, {5, 6}}
+assert(matrix.Count == 3, "matrix Count should be 3")
+assert(matrix[0].Count == 2, "matrix[0] Count should be 2")
+assert(matrix[0][0] == 1, "matrix[0][0] should be 1")
+assert(matrix[0][1] == 2, "matrix[0][1] should be 2")
+assert(matrix[1][0] == 3, "matrix[1][0] should be 3")
+assert(matrix[1][1] == 4, "matrix[1][1] should be 4")
+assert(matrix[2][0] == 5, "matrix[2][0] should be 5")
+assert(matrix[2][1] == 6, "matrix[2][1] should be 6")
+
+// 测试 2: dict<string, list<int>> - 字典值为列表
+data:dict<string, list<int>> <- {"a": {1, 2, 3}, "b": {4, 5, 6}}
+assert(data.Count == 2, "data Count should be 2")
+assert(data["a"].Count == 3, "data[a] Count should be 3")
+assert(data["a"][0] == 1, "data[a][0] should be 1")
+assert(data["a"][1] == 2, "data[a][1] should be 2")
+assert(data["a"][2] == 3, "data[a][2] should be 3")
+assert(data["b"].Count == 3, "data[b] Count should be 3")
+assert(data["b"][0] == 4, "data[b][0] should be 4")
+assert(data["b"][1] == 5, "data[b][1] should be 5")
+assert(data["b"][2] == 6, "data[b][2] should be 6")
+
+// 测试 3: list<array<int>> - 列表包含数组
+arrays:list<array<int>> <- {[1, 2], [3, 4]}
+assert(arrays.Count == 2, "arrays Count should be 2")
+assert(arrays[0].Length == 2, "arrays[0] Length should be 2")
+assert(arrays[0][0] == 1, "arrays[0][0] should be 1")
+assert(arrays[0][1] == 2, "arrays[0][1] should be 2")
+assert(arrays[1].Length == 2, "arrays[1] Length should be 2")
+assert(arrays[1][0] == 3, "arrays[1][0] should be 3")
+assert(arrays[1][1] == 4, "arrays[1][1] should be 4")
+
+PrintLine("✓ 所有嵌套泛型类型测试通过")

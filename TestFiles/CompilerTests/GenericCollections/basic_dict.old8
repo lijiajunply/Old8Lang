@@ -1,0 +1,35 @@
+// 基本泛型字典测试
+// 测试 dict<K,V> 的类型注解和验证
+
+// 测试 1: 显式类型注解 - dict<string,int>
+ages:dict<string,int> <- {"Alice": 30, "Bob": 25, "Charlie": 35}
+assert(ages.Count == 3, "dict<string,int> Count should be 3")
+assert(ages["Alice"] == 30, "ages[Alice] should be 30")
+assert(ages["Bob"] == 25, "ages[Bob] should be 25")
+assert(ages["Charlie"] == 35, "ages[Charlie] should be 35")
+
+// 测试 2: 显式类型注解 - dict<int,string>
+names:dict<int,string> <- {1: "Alice", 2: "Bob", 3: "Charlie"}
+assert(names.Count == 3, "dict<int,string> Count should be 3")
+assert(names[1] == "Alice", "names[1] should be Alice")
+assert(names[2] == "Bob", "names[2] should be Bob")
+assert(names[3] == "Charlie", "names[3] should be Charlie")
+
+// 测试 3: 显式类型注解 - dict<string,double>
+prices:dict<string,double> <- {"apple": 1.5, "banana": 2.5, "orange": 3.5}
+assert(prices.Count == 3, "dict<string,double> Count should be 3")
+assert(prices["apple"] == 1.5, "prices[apple] should be 1.5")
+assert(prices["banana"] == 2.5, "prices[banana] should be 2.5")
+assert(prices["orange"] == 3.5, "prices[orange] should be 3.5")
+
+// 测试 4: 显式类型注解 - dict<string,bool>
+flags:dict<string,bool> <- {"a": true, "b": false, "c": true}
+assert(flags.Count == 3, "dict<string,bool> Count should be 3")
+assert(flags["a"] == true, "flags[a] should be true")
+assert(flags["b"] == false, "flags[b] should be false")
+assert(flags["c"] == true, "flags[c] should be true")
+
+// 测试 5: 空字典（需要显式指定为字典格式）
+// 注意: 空 {} 默认被解析为列表,所以这里跳过空字典测试
+
+PrintLine("✓ 所有基本泛型字典测试通过")

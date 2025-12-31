@@ -356,7 +356,7 @@ public class PrimaryParser(
         if (CurrentToken.Type == LangTokenType.RightBrace)
         {
             Expect(LangTokenType.RightBrace);
-            return new ListLangValue(new List<LangExpression>(), position);
+            return new ListLangValue(new List<LangExpression>(), position: position);
         }
 
         // 保存当前位置，用于判断是列表还是字典
@@ -394,7 +394,7 @@ public class PrimaryParser(
             }
 
             Expect(LangTokenType.RightBrace);
-            return new DictionaryLangValue(elements, position);
+            return new DictionaryLangValue(elements, null, null, position);
         }
         else
         {
@@ -416,93 +416,9 @@ public class PrimaryParser(
             }
 
             Expect(LangTokenType.RightBrace);
-            return new ListLangValue(elements, position);
+            return new ListLangValue(elements, position: position);
         }
     }
-
-
-    /// <summary>
-    /// 已废弃：此方法不再使用，因为 list 关键词已被删除
-    /// list = "list" "[" expression ( "," expression )* "]" ;
-    /// </summary>
-    /// <returns>列表初始化</returns>
-    [Obsolete("此方法已废弃，请使用 ParseListOrDictionary 方法")]
-    public LangValueType ParseList()
-    {
-        // list关键字已经被跳过，所以使用当前token的位置（即左括号）
-        var listToken = CurrentToken;
-        var position = new SourcePosition(listToken.Line, listToken.Column, tokenValue: "list");
-        Expect(LangTokenType.LeftBracket);
-        var elements = new List<LangExpression>();
-
-        if (CurrentToken.Type == LangTokenType.RightBracket)
-        {
-            Expect(LangTokenType.RightBracket);
-            // 空列表，返回ListValue
-            return new ListLangValue(elements, position);
-        }
-
-        elements.Add(expressionParserFactory().ParseExpression());
-        while (CurrentToken.Type == LangTokenType.Comma)
-        {
-            Expect(LangTokenType.Comma);
-            elements.Add(expressionParserFactory().ParseExpression());
-        }
-
-        Expect(LangTokenType.RightBracket);
-        // 返回ListValue表示列表
-        return new ListLangValue(elements, position);
-    }
-
-
-    /// <summary>
-    /// 已废弃：此方法不再使用，已被 ParseListOrDictionary 方法替代
-    /// dictionary = "{" dicTuple ( "," dicTuple )* "}" ;
-    /// dicTuple = expression ":" expression ;
-    /// </summary>
-    /// <returns>返回字典</returns>
-    [Obsolete("此方法已废弃，请使用 ParseListOrDictionary 方法")]
-    public LangValueType ParseDictionary()
-    {
-        // 处理左括号，只支持 {}
-        var leftBraceToken = CurrentToken;
-        var dictPosition =
-            new SourcePosition(leftBraceToken.Line, leftBraceToken.Column, tokenValue: leftBraceToken.Value);
-        Expect(LangTokenType.LeftBrace);
-
-        var rightType = LangTokenType.RightBrace;
-
-        var elements = new List<TupleLangValue>();
-
-        if (CurrentToken.Type == rightType)
-        {
-            Expect(rightType);
-            return new DictionaryLangValue(elements, dictPosition);
-        }
-
-        // 解析字典元素
-        while (true)
-        {
-            var key = expressionParserFactory().ParseExpression();
-            var colonToken = CurrentToken;
-            var tuplePosition = new SourcePosition(colonToken.Line, colonToken.Column, tokenValue: colonToken.Value);
-            Expect(LangTokenType.Colon);
-            var value = expressionParserFactory().ParseExpression();
-            elements.Add(new TupleLangValue(key, value, tuplePosition));
-
-            if (CurrentToken.Type != LangTokenType.Comma)
-            {
-                break;
-            }
-
-            Expect(LangTokenType.Comma);
-        }
-
-        Expect(rightType);
-
-        return new DictionaryLangValue(elements, dictPosition);
-    }
-
 
     /// <summary>
     /// array = "[" expression ( "," expression )* "]" ;
@@ -522,7 +438,7 @@ public class PrimaryParser(
         {
             Expect(LangTokenType.RightBracket);
             // 空数组，返回ArrayValue
-            return new ArrayLangValue(elements, position);
+            return new ArrayLangValue(elements, null, position);
         }
 
         // 保存当前位置，用于回退
@@ -613,7 +529,7 @@ public class PrimaryParser(
 
         Expect(LangTokenType.RightBracket);
         // 返回ArrayValue表示数组
-        return new ArrayLangValue(elements, position);
+        return new ArrayLangValue(elements, null, position);
     }
 
     /// <summary>

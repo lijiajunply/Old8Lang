@@ -1817,7 +1817,86 @@ func add(a:int, b:int) -> int {
 x <- "hello"  // ❌ 类型不匹配
 ```
 
-### 7.3 联合类型 (Union Types)
+### 7.3 泛型集合类型 (Generic Collection Types)
+
+Old8Lang 支持泛型集合类型注解，提供编译时类型检查。
+
+**支持的泛型集合类型**：
+- `list<T>`：列表，单类型参数
+- `array<T>`：数组，单类型参数
+- `dict<K,V>`：字典，双类型参数（键类型和值类型）
+
+#### 7.3.1 基本用法
+
+```old8
+// 列表：list<T>
+items:list<int> <- {1, 2, 3}
+names:list<string> <- {"Alice", "Bob", "Charlie"}
+
+// 数组：array<T>
+arr:array<int> <- [1, 2, 3]
+prices:array<double> <- [1.5, 2.5, 3.5]
+
+// 字典：dict<K,V>
+ages:dict<string, int> <- {"Alice": 30, "Bob": 25}
+mapping:dict<int, string> <- {1: "one", 2: "two"}
+```
+
+#### 7.3.2 嵌套泛型类型
+
+```old8
+// 嵌套列表：list<list<T>>
+matrix:list<list<int>> <- {{1, 2}, {3, 4}, {5, 6}}
+
+// 字典的值为列表：dict<K, list<T>>
+groups:dict<string, list<int>> <- {
+    "a": {1, 2, 3},
+    "b": {4, 5, 6}
+}
+
+// 列表的元素为数组：list<array<T>>
+arrays:list<array<int>> <- {[1, 2], [3, 4]}
+```
+
+#### 7.3.3 编译时类型检查
+
+在**编译器模式** (`-c`) 下，泛型集合类型会进行严格的类型检查：
+
+```old8
+// ✅ 正确：所有元素类型一致
+items:list<int> <- {1, 2, 3}
+
+// ❌ 错误：类型不匹配
+items:list<int> <- {1, "hello", 3}
+// 编译错误：变量 'items' 列表元素类型不匹配: 第 1 个元素期望类型 int,实际类型 string
+
+// ✅ 正确：字典类型匹配
+ages:dict<string, int> <- {"Alice": 30, "Bob": 25}
+
+// ❌ 错误：字典值类型不匹配
+ages:dict<string, int> <- {"Alice": 30, "Bob": "twenty-five"}
+// 编译错误：变量 'ages' 字典值类型不匹配: 第 1 个值期望类型 int,实际类型 string
+```
+
+#### 7.3.4 向后兼容性
+
+在**解释器模式** (`-f`) 下，泛型类型注解是可选的：
+
+```old8
+// 不带类型注解：支持混合类型（向后兼容）
+mixed <- {1, "hello", 3.14, true}  // ✅ 正常工作
+arr <- [1, "world", false]          // ✅ 正常工作
+
+// 带类型注解：编译器模式下会进行类型检查
+items:list<int> <- {1, 2, 3}       // ✅ 两种模式都支持
+```
+
+**兼容性保证**：
+- 所有不带类型注解的现有代码继续正常工作
+- 泛型类型注解是可选特性，不强制使用
+- 编译器模式提供更严格的类型安全，解释器模式保持灵活性
+
+### 7.4 联合类型 (Union Types)
 
 联合类型使用 `|` 符号，表示值可以是多个类型之一。主要用于编译时类型检查。
 
@@ -1893,7 +1972,7 @@ map: Map<string, int | string> <- {"age": 25, "name": "Alice"}
 - `A` 兼容于 `A | B`（任一成员类型可以赋值给联合类型）
 - `null` 兼容于任何包含可空类型的联合类型（如 `int? | string?`）
 
-### 7.4 交叉类型 (Intersection Types)
+### 7.5 交叉类型 (Intersection Types)
 
 交叉类型使用 `&` 符号，表示类型必须同时满足所有约束。主要用于接口组合和泛型约束。
 
@@ -1942,7 +2021,7 @@ handler: ILogger & IMetrics <- MyHandler()
 - 交叉类型主要用于接口组合，不能对基础类型（如 `int & string`）使用
 - 在泛型约束中，`&` 和 `|` 都表示"且"关系（历史原因），但在类型注解中有明确区分
 
-### 7.5 类型转换
+### 7.6 类型转换
 
 ```old8
 a <- 123

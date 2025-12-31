@@ -1,0 +1,6 @@
+// 简单测试：不带类型注解的混合类型列表
+items <- {1, "hello", 3.14}
+PrintLine("items[0] = " + items[0].ToStr())
+PrintLine("items[1] = " + items[1].ToStr())
+PrintLine("items[2] = " + items[2].ToStr())
+PrintLine("items.Count = " + items.Count.ToStr())

@@ -1,0 +1,34 @@
+// 向后兼容性测试
+// 测试不带类型注解的旧代码是否仍然工作
+
+// 测试 1: 不带类型注解的列表（混合类型）
+items <- {1, "hello", 3, true}
+assert(items.Count, 4)
+assert(items[0], 1)
+assert(items[1], "hello")
+assert(items[2], 3)
+assert(items[3], true)
+
+// 测试 2: 不带类型注解的数组（混合类型）
+arr <- [1, "world", 2, false]
+assert(arr.Count(), 4)
+assert(arr[0], 1)
+assert(arr[1], "world")
+assert(arr[2], 2)
+assert(arr[3], false)
+
+// 测试 3: 不带类型注解的字典（混合类型）
+data <- {"a": 1, "b": "text", "c": 3}
+assert(data.Count, 3)
+assert(data["a"], 1)
+assert(data["b"], "text")
+assert(data["c"], 3)
+
+// 测试 4: 空集合不带类型注解
+empty_list <- {}
+assert(empty_list.Count, 0)
+
+empty_array <- []
+assert(empty_array.Count(), 0)
+
+PrintLine("✓ 所有向后兼容性测试通过")

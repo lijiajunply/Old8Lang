@@ -1,0 +1,36 @@
+// 基本泛型列表测试
+// 测试 list<T> 的类型注解和验证
+
+// 测试 1: 显式类型注解 - list<int>
+items:list<int> <- {1, 2, 3}
+assert(items.Count == 3, "list<int> Count should be 3")
+assert(items[0] == 1, "list<int>[0] should be 1")
+assert(items[1] == 2, "list<int>[1] should be 2")
+assert(items[2] == 3, "list<int>[2] should be 3")
+
+// 测试 2: 显式类型注解 - list<string>
+names:list<string> <- {"Alice", "Bob", "Charlie"}
+assert(names.Count == 3, "list<string> Count should be 3")
+assert(names[0] == "Alice", "list<string>[0] should be Alice")
+assert(names[1] == "Bob", "list<string>[1] should be Bob")
+assert(names[2] == "Charlie", "list<string>[2] should be Charlie")
+
+// 测试 3: 显式类型注解 - list<double>
+prices:list<double> <- {1.5, 2.5, 3.5}
+assert(prices.Count == 3, "list<double> Count should be 3")
+assert(prices[0] == 1.5, "list<double>[0] should be 1.5")
+assert(prices[1] == 2.5, "list<double>[1] should be 2.5")
+assert(prices[2] == 3.5, "list<double>[2] should be 3.5")
+
+// 测试 4: 显式类型注解 - list<bool>
+flags:list<bool> <- {true, false, true}
+assert(flags.Count == 3, "list<bool> Count should be 3")
+assert(flags[0] == true, "list<bool>[0] should be true")
+assert(flags[1] == false, "list<bool>[1] should be false")
+assert(flags[2] == true, "list<bool>[2] should be true")
+
+// 测试 5: 空列表
+empty:list<int> <- {}
+assert(empty.Count == 0, "empty list<int> Count should be 0")
+
+PrintLine("✓ 所有基本泛型列表测试通过")

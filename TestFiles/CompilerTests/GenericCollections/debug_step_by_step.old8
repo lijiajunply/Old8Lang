@@ -1,0 +1,22 @@
+// 逐步测试解释器模式
+items <- {1, "hello", 3, true}
+PrintLine("Test 1: Create list")
+PrintLine("items.Count = " + items.Count.ToStr())
+
+// 检查Count
+if items.Count == 4 {
+    PrintLine("✓ Count is 4")
+} else {
+    PrintLine("✗ Count is not 4, it is: " + items.Count.ToStr())
+}
+
+// 检查第一个元素
+PrintLine("items[0] = " + items[0].ToStr())
+
+if items[0] == 1 {
+    PrintLine("✓ items[0] == 1")
+} else {
+    PrintLine("✗ items[0] != 1")
+}
+
+PrintLine("✓ 所有测试完成")

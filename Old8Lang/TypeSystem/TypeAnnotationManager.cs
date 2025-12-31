@@ -41,10 +41,37 @@ public class TypeAnnotationManager
         TypeFamily.RegisterType(new PrimitiveTypeInfo("void"));
         TypeFamily.RegisterType(new PrimitiveTypeInfo("any"));
         TypeFamily.RegisterType(new PrimitiveTypeInfo("null"));
-        TypeFamily.RegisterType(new PrimitiveTypeInfo("array"));
-        TypeFamily.RegisterType(new PrimitiveTypeInfo("list"));
-        TypeFamily.RegisterType(new PrimitiveTypeInfo("dict"));
         TypeFamily.RegisterType(new PrimitiveTypeInfo("function"));
+
+        // 注册泛型集合类型
+        RegisterGenericCollectionTypes();
+    }
+
+    /// <summary>
+    /// 注册泛型集合类型（list<T>, array<T>, dict<K,V>）
+    /// </summary>
+    private void RegisterGenericCollectionTypes()
+    {
+        // list<T>: 单类型参数
+        var listType = new GenericTypeInfo(
+            name: "list",
+            typeParameters: new List<string> { "T" }
+        );
+        TypeFamily.RegisterType(listType);
+
+        // array<T>: 单类型参数
+        var arrayType = new GenericTypeInfo(
+            name: "array",
+            typeParameters: new List<string> { "T" }
+        );
+        TypeFamily.RegisterType(arrayType);
+
+        // dict<K, V>: 两个类型参数（键和值）
+        var dictType = new GenericTypeInfo(
+            name: "dict",
+            typeParameters: new List<string> { "K", "V" }
+        );
+        TypeFamily.RegisterType(dictType);
     }
 
     /// <summary>

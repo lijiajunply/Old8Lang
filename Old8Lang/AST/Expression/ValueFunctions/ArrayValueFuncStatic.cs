@@ -22,6 +22,15 @@ public static class ArrayValueFuncStatic
         }
 
         /// <summary>
+        /// 获取数组的长度（Length 属性，与 Count 等效，用于向后兼容和类型一致性）
+        /// </summary>
+        /// <returns>数组长度</returns>
+        public IntLangValue Length()
+        {
+            return new IntLangValue(arrayValue.GetLength());
+        }
+
+        /// <summary>
         /// 对数组进行排序
         /// </summary>
         /// <returns>排序后的数组（返回新数组）</returns>

@@ -403,7 +403,7 @@ public partial class ThreadLangValue : LangValueType
             results.Add(task.Join());
         }
 
-        return new ListLangValue(results, position);
+        return new ListLangValue(results, position: position);
     }
 
     /// <summary>

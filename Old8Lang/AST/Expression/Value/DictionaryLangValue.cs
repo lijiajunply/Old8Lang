@@ -21,21 +21,39 @@ public partial class DictionaryLangValue : LangValueType, ILangList
 
     public readonly List<(LangValueType Key, LangValueType Value)> Value = [];
 
-    public DictionaryLangValue(List<TupleLangValue> tuples, SourcePosition position = default) : base(position)
+    /// <summary>
+    /// 键类型（泛型参数），null 表示非泛型或未推断
+    /// </summary>
+    public string? KeyType { get; set; }
+
+    /// <summary>
+    /// 值类型（泛型参数），null 表示非泛型或未推断
+    /// </summary>
+    public string? ValueType { get; set; }
+
+    public DictionaryLangValue(List<TupleLangValue> tuples, string? keyType = null, string? valueType = null, SourcePosition position = default) : base(position)
     {
         Tuples = tuples;
+        KeyType = keyType;
+        ValueType = valueType;
     }
 
-    public DictionaryLangValue(SourcePosition position = default) : base(position)
+    public DictionaryLangValue(string? keyType = null, string? valueType = null, SourcePosition position = default) : base(position)
     {
         Tuples = [];
+        KeyType = keyType;
+        ValueType = valueType;
     }
 
     public DictionaryLangValue(List<KeyValuePair<LangExpression, LangExpression>> list,
+        string? keyType = null,
+        string? valueType = null,
         SourcePosition position = default) :
         base(position)
     {
         Tuples = list.Select(x => new TupleLangValue(x.Key, x.Value)).ToList();
+        KeyType = keyType;
+        ValueType = valueType;
     }
 
     public override LangValueType Run(VariateManager manager)

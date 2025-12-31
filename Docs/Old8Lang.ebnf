@@ -302,7 +302,16 @@ argumentList = expression ( "," expression )* ;
 
 identifierList = identifier ( "," identifier )* ;
 
-type = identifier "?"? ;
+(* Type annotations support basic types, nullable types, union types, intersection types, and generic types *)
+type = unionType ;
+
+unionType = intersectionType ( "|" intersectionType )* ;
+
+intersectionType = baseType ( "&" baseType )* ;
+
+baseType = identifier genericTypeArguments? "?"? ;
+
+genericTypeArguments = "<" type ( "," type )* ">" ;
 
 accessModifier = "public" | "private" | "static" ;
 

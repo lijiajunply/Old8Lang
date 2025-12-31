@@ -147,7 +147,7 @@ public partial class ListComprehension : LangValueType
 
         // 返回生成的列表
         // 创建一个新的ListLangValue，使用对象列表构造函数
-        return new ListLangValue(resultList.Select(v => v.GetValue()).ToList(), Position);
+        return new ListLangValue(resultList.Select(v => v.GetValue()).ToList(), position: Position);
     }
 
     /// <summary>

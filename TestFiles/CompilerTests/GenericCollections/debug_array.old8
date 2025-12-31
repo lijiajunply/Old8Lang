@@ -1,0 +1,6 @@
+// 测试数组 Length 方法
+arr <- [1, "world", 2, false]
+PrintLine("arr.Length() = " + arr.Length().ToStr())
+PrintLine("arr.Count() = " + arr.Count().ToStr())
+PrintLine("arr[0] = " + arr[0].ToStr())
+PrintLine("arr[1] = " + arr[1].ToStr())
