@@ -337,7 +337,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
             return IntLangValue.Create((int)value);
         }
 
-        // 如果超出 int 范围，转换为字符串
+        // 如果超出 int 范围，转换为 double
         return DoubleLangValue.Create(value);
     }
 
