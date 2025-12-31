@@ -30,6 +30,7 @@ func completeTask() -> void {
 }
 
 thread <- spawn(completeTask)
+thread.Start()
 thread.Join()  // 等待线程完成";
         var interpreter = new LangInterpreter();
 
@@ -63,6 +64,7 @@ func failTask() -> bool {
 }
 
 thread <- spawn(failTask)
+thread.Start()
 errorSet <- thread.Join()";
         var interpreter = new LangInterpreter();
 

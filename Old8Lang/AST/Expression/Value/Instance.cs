@@ -376,7 +376,7 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
         // 对于具有扩展方法的类型，优先查找扩展方法而不是实例方法
         // 这样可以避免找到 TaskLangValue.Then 实例方法而不是扩展方法
         if (baseLangValue is DictionaryLangValue or ListLangValue or TaskLangValue or ThreadLangValue or StringLangValue
-            or TupleLangValue or ArrayLangValue)
+            or TupleLangValue or ArrayLangValue or CharLangValue)
         {
             type = baseLangValue switch
             {
@@ -387,6 +387,7 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
                 StringLangValue => typeof(StringValueFuncStatic),
                 TupleLangValue => typeof(TupleValueFuncStatic),
                 ArrayLangValue => typeof(ArrayValueFuncStatic),
+                CharLangValue => typeof(CharValueFuncStatic),
                 _ => null
             };
 
