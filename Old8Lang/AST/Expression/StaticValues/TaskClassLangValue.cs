@@ -187,7 +187,22 @@ public partial class TaskClassLangValue : LangValueType
             throw new TypeError(tempNode, "int", args[0].TypeToString());
         }
 
-        return TaskLangValue.Delay(delayMs.Value, CancellationToken.None, position);
+        // 处理第二个参数 CancellationToken
+        CancellationToken cancellationToken = CancellationToken.None;
+        if (args.Count == 2)
+        {
+            if (args[1] is CancellationTokenLangValue tokenValue)
+            {
+                cancellationToken = tokenValue.Token;
+            }
+            else
+            {
+                var tempNode = new NullLangValue(position);
+                throw new TypeError(tempNode, "CancellationToken", args[1].TypeToString());
+            }
+        }
+
+        return TaskLangValue.Delay(delayMs.Value, cancellationToken, position);
     }
     
     /// <summary>

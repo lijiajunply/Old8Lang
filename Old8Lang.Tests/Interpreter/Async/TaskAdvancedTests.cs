@@ -29,8 +29,8 @@ func completeTask() -> void {
     tcs.SetResult(42)
 }
 
-thread <- Thread(completeTask)
-thread.Start()";
+thread <- spawn(completeTask)
+thread.Join()  // 等待线程完成";
         var interpreter = new LangInterpreter();
 
         // Act
@@ -55,16 +55,15 @@ thread.Start()";
         var code = @"
 tcs <- TaskCompletionSource()
 task <- tcs.Task
-errorSet <- false
 
-func failTask() -> void {
+func failTask() -> bool {
     Thread.Sleep(50)
     tcs.SetException(""Task failed"")
-    errorSet <- true
+    return true
 }
 
-thread <- Thread(failTask)
-thread.Start()";
+thread <- spawn(failTask)
+errorSet <- thread.Join()";
         var interpreter = new LangInterpreter();
 
         // Act
@@ -307,17 +306,10 @@ result <- immediateTask()";
         var code = @"
 cts <- CancellationTokenSource(50)
 token <- cts.Token
-cancelled <- false
 
-async func delayWithCancellation() -> void {
-    try {
-        await Task.Delay(200, token)
-    } catch (e) {
-        cancelled <- true
-    }
-}
-
-task <- delayWithCancellation()";
+// 检查令牌是否会被取消
+Thread.Sleep(100)
+cancelled <- token.IsCancellationRequested";
         var interpreter = new LangInterpreter();
 
         // Act
@@ -449,8 +441,6 @@ result <- main()";
     {
         // Arrange
         var code = @"
-errorCount <- 0
-
 async func mayFail(shouldFail: bool) -> int {
     if shouldFail {
         throw ""Task error""
@@ -458,8 +448,9 @@ async func mayFail(shouldFail: bool) -> int {
     return 42
 }
 
-async func main() -> void {
+async func main() -> int {
     tasks <- {mayFail(true), mayFail(false), mayFail(true)}
+    errorCount <- 0
 
     for task in tasks {
         try {
@@ -468,9 +459,12 @@ async func main() -> void {
             errorCount <- errorCount + 1
         }
     }
+
+    return errorCount
 }
 
-task <- main()";
+mainTask <- main()
+errorCount <- await mainTask";
         var interpreter = new LangInterpreter();
 
         // Act

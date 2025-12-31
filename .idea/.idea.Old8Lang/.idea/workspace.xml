@@ -21,7 +21,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/TaskAdvancedTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/TaskAdvancedTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -64,12 +68,18 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Async/AsyncGeneratorTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Types/GenericCollectionTypesCompilerTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/EdgeCases/GenericCollectionTypesEdgeCaseTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Advanced/NativeMethodBindingTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Advanced/NativeMethodBindingTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/TaskAdvancedTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Collections/ListComprehensionTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Types/GenericCollectionTypesInterpreterTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Parser/Types/GenericCollectionTypesParserTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Unit/Compiler/LocalManagerTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/StaticValues/CancellationTokenSourceConstructor.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/StaticValues/CancellationTokenSourceLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" root0="SKIP_HIGHLIGHTING" />
@@ -496,7 +506,7 @@
       <workItem from="1766746850670" duration="17415000" />
       <workItem from="1766771063664" duration="16661000" />
       <workItem from="1766997021901" duration="12927000" />
-      <workItem from="1767123773418" duration="12371000" />
+      <workItem from="1767123773418" duration="13386000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -841,7 +851,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="456" />
+    <option name="localTasksCounter" value="457" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -868,7 +878,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="chore(ci): 更新CI/CD配置和IDE工作区设置&#10;&#10;- 在GitHub Actions配置中添加master分支触发条件&#10;- 清理IDE工作区XML配置文件中的mock路径设置&#10;- 更新本地任务计数器和工作时间统计信息&#10;- 移除旧的VCS提交消息记录&#10;- 更新最后提交消息为CI/CD流水线配置信息" />
     <MESSAGE value="docs(project): 添加项目待办事项文档并更新IDE配置&#10;&#10;- 创建 TODO.md 文档记录 Old8Lang 项目开发计划和待办事项&#10;- 添加工具改进部分包括错误提示增强和调试器改进计划&#10;- 记录语言特性开发状态包括已实现和计划中的功能&#10;- 添加性能优化、文档完善和测试覆盖的待办事项&#10;- 更新项目状态包括最新成就和健康度指标&#10;- 修复 IDE 工作区配置中的文件变更列表和任务计数器&#10;- 更新最后提交消息为 CI/CD 流水线配置信息" />
     <MESSAGE value="docs(project): 删除项目待办事项文档并更新IDE配置&#10;&#10;- 移除 TODO.md 文档中记录的 Old8Lang 项目开发计划和待办事项&#10;- 清理 IDE 工作区配置中的相关文件变更记录&#10;- 更新本地任务计数器和工作时间统计信息&#10;- 移除旧的 VCS 提交消息记录&#10;- 修复 IDE 工作区 XML 配置文件中的 mock 路径设置" />
     <MESSAGE value="feat(generic): 实现泛型类型推断功能&#10;&#10;- 在 FunctionCallExpression.cs 中添加泛型类型推断逻辑&#10;- 创建 TypeSystem/GenericTypeInference.cs 实现类型推断引擎&#10;- 在 Instance.cs 的三个函数调用位置添加类型推断支持&#10;- 添加泛型类型推断测试文件和相关测试用例&#10;- 更新文档说明泛型类型推断的实现和使用方法&#10;- 支持从字面量、变量和嵌套调用中自动推断泛型类型&#10;- 保持显式类型参数调用方式的向后兼容性" />
@@ -893,7 +902,8 @@
     <MESSAGE value="feat(tests): 添加编译器模式测试报告和异步功能测试&#10;&#10;- 创建2025-12-31编译器测试完成报告，记录测试创建阶段完成情况&#10;- 添加15个新的编译器模式测试文件，覆盖异常处理、边界条件、高级函数等7个类别&#10;- 实现异步函数编译器测试，包括基础异步函数、返回值、多调用等场景&#10;- 新增异步生成器测试，涵盖字符串生成、条件生成、嵌套生成等功能&#10;- 完善异步编程测试覆盖，包含错误处理、循环、条件执行等多种情况&#10;- 建立全面的编译器模式测试套件，显著提升测试覆盖率" />
     <MESSAGE value="test(interpreter): 添加异步并发、文件头配置和交叉类型测试&#10;&#10;- 实现异步并发测试，验证多任务并发执行和同步协调&#10;- 添加文件头配置指令测试，覆盖debug、verify-il、type-inference等指令&#10;- 创建文件头元数据指令测试，验证encoding、author、version等指令&#10;- 编写交叉类型测试，测试泛型约束和接口组合功能&#10;- 覆盖异步异常处理、嵌套调用和并发数据访问场景&#10;- 包含配置指令边界情况和特殊值处理测试&#10;- 实现接口继承和复杂交叉类型组合测试" />
     <MESSAGE value="test(interpreter): 添加异步和集合相关功能的单元测试&#10;&#10;- 新增 CancellationTokenTests 测试异步任务取消功能&#10;- 扩展 ListComprehensionTests 实现完整的列表推导式测试用例&#10;- 添加 NativeMethodBindingTests 测试本地方法绑定功能&#10;- 新增 TaskAdvancedTests 测试 TaskCompletionSource 和高级异步功能&#10;- 覆盖异步编程、列表推导式、本地方法绑定等核心功能的测试场景&#10;- 包含边界情况、错误处理和性能相关测试用例" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(interpreter): 添加异步和集合相关功能的单元测试&#10;&#10;- 新增 CancellationTokenTests 测试异步任务取消功能&#10;- 扩展 ListComprehensionTests 实现完整的列表推导式测试用例&#10;- 添加 NativeMethodBindingTests 测试本地方法绑定功能&#10;- 新增 TaskAdvancedTests 测试 TaskCompletionSource 和高级异步功能&#10;- 覆盖异步编程、列表推导式、本地方法绑定等核心功能的测试场景&#10;- 包含边界情况、错误处理和性能相关测试用例" />
+    <MESSAGE value="feat(ast): 添加 CancellationTokenSource 构造函数超时参数支持&#10;&#10;- 实现 CancellationTokenSource 带超时时间的构造函数功能&#10;- 添加对 CancellationTokenSource(timeout) 语法的支持&#10;- 验证超时参数类型为整数类型的错误处理&#10;- 更新 LangValue 类型系统以支持带参数的构造函数&#10;- 移除过时的 NativeMethodBindingTests 测试类&#10;- 更新 IDE 工作区配置和任务计数器统计&#10;- 修改 VCS 提交历史记录和最后提交消息" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(ast): 添加 CancellationTokenSource 构造函数超时参数支持&#10;&#10;- 实现 CancellationTokenSource 带超时时间的构造函数功能&#10;- 添加对 CancellationTokenSource(timeout) 语法的支持&#10;- 验证超时参数类型为整数类型的错误处理&#10;- 更新 LangValue 类型系统以支持带参数的构造函数&#10;- 移除过时的 NativeMethodBindingTests 测试类&#10;- 更新 IDE 工作区配置和任务计数器统计&#10;- 修改 VCS 提交历史记录和最后提交消息" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
