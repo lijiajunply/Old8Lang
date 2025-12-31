@@ -301,11 +301,11 @@ interface IBase {
     func baseMethod() -> string
 }
 
-interface IDerived1 implements IBase {
+interface IDerived1 extends IBase {
     func derived1Method() -> string
 }
 
-interface IDerived2 implements IBase {
+interface IDerived2 extends IBase {
     func derived2Method() -> string
 }
 

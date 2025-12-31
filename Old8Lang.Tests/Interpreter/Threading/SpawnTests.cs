@@ -19,6 +19,7 @@ public class SpawnTests
                 return 42
             }
             task <- spawn(simpleTask)
+            task.Start()
             result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
@@ -43,6 +44,7 @@ public class SpawnTests
                 return x * y
             }
             task <- spawn(calculate, 6, 7)
+            task.Start()
             result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
@@ -67,8 +69,11 @@ public class SpawnTests
                 return n * n
             }
             task1 <- spawn(getSquare, 5)
+            task1.Start()
             task2 <- spawn(getSquare, 10)
+            task2.Start()
             task3 <- spawn(getSquare, 15)
+            task3.Start()
             result1 <- task1.Join()
             result2 <- task2.Join()
             result3 <- task3.Join()
@@ -104,6 +109,7 @@ public class SpawnTests
         var code = @"
             operation <- (x:int) -> x * 10
             task <- spawn(operation, 8)
+            task.Start()
             result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
@@ -131,6 +137,7 @@ public class SpawnTests
                 return fibonacci(n - 1) + fibonacci(n - 2)
             }
             task <- spawn(fibonacci, 10)
+            task.Start()
             result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
@@ -160,6 +167,7 @@ public class SpawnTests
             }
             numbers <- [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
             task <- spawn(sumArray, numbers)
+            task.Start()
             result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
@@ -188,6 +196,7 @@ public class SpawnTests
                 return result
             }
             task <- spawn(reverseString, ""hello world"")
+            task.Start()
             result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
@@ -216,8 +225,11 @@ public class SpawnTests
                 return ""Task "" + id.ToStr() + "" completed""
             }
             task1 <- spawn(processData, 1, 1000)
+            task1.Start()
             task2 <- spawn(processData, 2, 1000)
+            task2.Start()
             task3 <- spawn(processData, 3, 1000)
+            task3.Start()
             result1 <- task1.Join()
             result2 <- task2.Join()
             result3 <- task3.Join()
@@ -265,6 +277,7 @@ public class SpawnTests
             }
             calc <- Calculator()
             task <- spawn(calc.compute, 15, 27)
+            task.Start()
             task.Join()
             // Wait for task completion
             finalResult <- calc.getResult()
@@ -292,11 +305,15 @@ public class SpawnTests
             }
             func coordinatorTask() -> int {
                 task1 <- spawn(workerTask, 3)
+            task1.Start()
                 task2 <- spawn(workerTask, 4)
+            task2.Start()
                 task3 <- spawn(workerTask, 5)
+            task3.Start()
                 return task1.Join() + task2.Join() + task3.Join()
             }
             task <- spawn(coordinatorTask)
+            task.Start()
             result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
@@ -323,6 +340,7 @@ public class SpawnTests
             result <- 0
             try {
                 task <- spawn(riskyTask)
+            task.Start()
                 result <- task.Join()
             } catch {
                 result <- -1
@@ -373,10 +391,17 @@ public class SpawnTests
                 return sum
             }
             // Pipeline stages
-            loadTask <- spawn(loadData).Join()
-            evenTask <- spawn(filterEven, loadTask).Join()
-            squareTask <- spawn(squareNumbers, evenTask).Join()
-            sumTask <- spawn(sumNumbers, squareTask)
+            loadTask <- spawn(loadData)
+            loadTask.Start()
+            loadResult <- loadTask.Join()
+            evenTask <- spawn(filterEven, loadResult)
+            evenTask.Start()
+            evenResult <- evenTask.Join()
+            squareTask <- spawn(squareNumbers, evenResult)
+            squareTask.Start()
+            squareResult <- squareTask.Join()
+            sumTask <- spawn(sumNumbers, squareResult)
+            sumTask.Start()
             result <- sumTask.Join()
         ";
         var interpreter = new LangInterpreter();
@@ -413,8 +438,10 @@ public class SpawnTests
             }
             input <- {1, 2, 3, 4, 5}
             mapTask <- spawn(mapSquare, input)
+            mapTask.Start()
             map <- mapTask.Join()
             reduceTask <- spawn(reduceSum, map)
+            reduceTask.Start()
             result <- reduceTask.Join()
         ";
         var interpreter = new LangInterpreter();
@@ -444,9 +471,13 @@ public class SpawnTests
             func taskC(dependency:int) -> int {
                 return dependency + 5
             }
-            taskA_handle <- spawn(taskA).Join()
-            taskB_handle <- spawn(taskB, taskA_handle)
-            taskC_handle <- spawn(taskC, taskA_handle)
+            taskA_handle <- spawn(taskA)
+            taskA_handle.Start()
+            taskA_result <- taskA_handle.Join()
+            taskB_handle <- spawn(taskB, taskA_result)
+            taskB_handle.Start()
+            taskC_handle <- spawn(taskC, taskA_result)
+            taskC_handle.Start()
             resultB <- taskB_handle.Join()
             resultC <- taskC_handle.Join()
         ";
@@ -483,6 +514,7 @@ public class SpawnTests
             result <- """"
             try {
                 task <- spawn(longTask)
+            task.Start()
                 result <- task.Join()
             } catch {
                 result <- ""timeout""
@@ -515,9 +547,13 @@ public class SpawnTests
             }
             // Divide work among tasks
             task1 <- spawn(computePartial, 1, 25)
+            task1.Start()
             task2 <- spawn(computePartial, 26, 50)
+            task2.Start()
             task3 <- spawn(computePartial, 51, 75)
+            task3.Start()
             task4 <- spawn(computePartial, 76, 100)
+            task4.Start()
             result <- task1.Join() + task2.Join() + task3.Join() + task4.Join()
         ";
         var interpreter = new LangInterpreter();
@@ -543,6 +579,7 @@ public class SpawnTests
                 return ""Async completed""
             }
             task <- spawn(asyncTask)
+            task.Start()
             result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
@@ -568,9 +605,11 @@ public class SpawnTests
                     return 1
                 }
                 subTask <- spawn(recursiveTask, depth + 1, maxDepth)
+            subTask.Start()
                 return 1 + subTask.Join()
             }
             task <- spawn(recursiveTask, 0, 5)
+            task.Start()
             result <- task.Join()
         ";
         var interpreter = new LangInterpreter();
@@ -595,8 +634,11 @@ public class SpawnTests
                 return ""Task completed""
             }
             task1 <- spawn(simpleTask)
+            task1.Start()
             task2 <- spawn(simpleTask)
+            task2.Start()
             task3 <- spawn(simpleTask)
+            task3.Start()
             id1 <- task1.Id()
             id2 <- task2.Id()
             id3 <- task3.Id()
@@ -630,7 +672,9 @@ public class SpawnTests
                 return ""Done""
             }
             quickTask_handle <- spawn(quickTask)
+            quickTask_handle.Start()
             slowTask_handle <- spawn(slowTask)
+            slowTask_handle.Start()
             quickStatus <- quickTask_handle.Status()
             slowStatus <- slowTask_handle.Status()
             // Wait and check final status
