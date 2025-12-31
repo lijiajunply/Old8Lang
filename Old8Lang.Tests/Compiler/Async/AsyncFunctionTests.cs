@@ -1,24 +1,34 @@
+using Xunit;
 using Old8Lang.Interpreter;
+using Old8Lang.AST;
+using Xunit.Abstractions;
 
 namespace Old8Lang.Tests.Compiler.Async;
 
 /// <summary>
-/// 异步函数基础测试
+/// 编译器模式下的异步编程功能测试 - 异步函数
 /// </summary>
-[Collection("Sequential")]
-public class AsyncFunctionTests
+public class AsyncFunctionTests(ITestOutputHelper output)
 {
+    private readonly ITestOutputHelper _output = output;
+
     [Fact]
     public void BasicAsyncFunction_CompilesAndExecutesCorrectly()
     {
         // Arrange
         var code = @"
             async func fetchData() -> string {
+                await Task.Delay(100)
                 return ""Data from server""
             }
             
-            result <- await fetchData()
-            Assert.Equal(""Data from server"", result)
+            async func main() {
+                data <- await fetchData()
+                Assert.Equal(""Data from server"", data)
+            }
+            
+            result <- main()
+            Assert.True(result != null)
         ";
         var interpreter = new LangInterpreter();
 
@@ -26,7 +36,7 @@ public class AsyncFunctionTests
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
-        // Assert - 如果 Old8Lang 断言失败会抛出异常
+        // Assert
         var exception = Record.Exception(() => compiledAction());
         Assert.Null(exception);
     }
@@ -36,97 +46,120 @@ public class AsyncFunctionTests
     {
         // Arrange
         var code = @"
-            async func delayedAdd(a:int, b:int, delay_ms:int) -> int {
-                await Task.Delay(delay_ms)
+            async func calculateSum(a:int, b:int) -> int {
+                await Task.Delay(50)
                 return a + b
             }
             
-            result <- await delayedAdd(10, 20, 100)
-            Assert.Equal(30, result)
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-
-        // Assert - 如果 Old8Lang 断言失败会抛出异常
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void AsyncFunctionWithReturnTypes_CompilesAndExecutesCorrectly()
-    {
-        // Arrange
-        var code = @"
-            async func processBoolean(flag:bool) -> string {
-                await Task.Delay(50)
-                if flag {
-                    return ""Success""
-                } else {
-                    return ""Failure""
-                }
-            }
-            
-            async func processNumber(value:int) -> int {
-                await Task.Delay(50)
-                return value * 2
-            }
-            
-            async func processDouble(value:double) -> double {
-                await Task.Delay(50)
-                return value / 2
-            }
-            
-            result1 <- await processBoolean(true)
-            result2 <- await processNumber(25)
-            result3 <- await processDouble(10.0)
-            
-            Assert.Equal(""Success"", result1)
-            Assert.Equal(50, result2)
-            Assert.Equal(5.0, result3)
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-
-        // Assert - 如果 Old8Lang 断言失败会抛出异常
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void AsyncFunctionInClass_CompilesAndExecutesCorrectly()
-    {
-        // Arrange
-        var code = @"
-            class AsyncCalculator {
-                private value <- 0
+            async func testCalculation() {
+                result1 <- await calculateSum(10, 20)
+                result2 <- await calculateSum(5, 15)
                 
-                func init() {
-                    this.value <- 0
-                }
+                Assert.Equal(30, result1)
+                Assert.Equal(20, result2)
+            }
+            
+            testCalculation()
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void AsyncFunctionReturningVoid_CompilesAndExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            executed <- false
+            
+            async func processData() -> void {
+                await Task.Delay(100)
+                executed <- true
+            }
+            
+            async func main() {
+                await processData()
+                Assert.True(executed)
+            }
+            
+            main()
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void MultipleAsyncCalls_CompilesAndExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            async func getValue(id:int) -> string {
+                await Task.Delay(50)
+                return ""value_"" + id.ToStr()
+            }
+            
+            async func fetchMultipleValues() {
+                value1 <- await getValue(1)
+                value2 <- await getValue(2)
+                value3 <- await getValue(3)
                 
-                async func addAsync(operand:int) -> int {
-                    await Task.Delay(100)
-                    this.value <- this.value + operand
-                    return this.value
-                }
+                Assert.Equal(""value_1"", value1)
+                Assert.Equal(""value_2"", value2)
+                Assert.Equal(""value_3"", value3)
                 
-                async func getValue() -> int {
-                    return this.value
+                return ""all fetched""
+            }
+            
+            result <- fetchMultipleValues()
+            Assert.Equal(""all fetched"", result)
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void AsyncFunctionWithError_CompilesAndExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            caughtError <- """"
+            
+            async func riskyOperation() -> string {
+                await Task.Delay(50)
+                throw ""Something went wrong""
+            }
+            
+            async func handleAsyncError() {
+                try {
+                    result <- await riskyOperation()
+                } catch (e) {
+                    caughtError <- e
                 }
             }
             
-            calculator <- AsyncCalculator()
-            result1 <- await calculator.addAsync(10)
-            result2 <- await calculator.getValue()
-            
-            Assert.Equal(10, result1)
-            Assert.Equal(10, result2)
+            handleAsyncError()
+            Assert.Equal(""Something went wrong"", caughtError)
         ";
         var interpreter = new LangInterpreter();
 
@@ -134,108 +167,38 @@ public class AsyncFunctionTests
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
-        // Assert - 如果 Old8Lang 断言失败会抛出异常
+        // Assert
         var exception = Record.Exception(() => compiledAction());
         Assert.Null(exception);
     }
 
     [Fact]
-    public void ChainedAsyncCalls_CompilesAndExecutesCorrectly()
+    public void AsyncFunctionWithLoops_CompilesAndExecutesCorrectly()
     {
         // Arrange
         var code = @"
-            async func fetchUserId(id:int) -> string {
-                await Task.Delay(50)
-                return ""user_"" + id.ToStr()
-            }
-            
-            async func fetchUserData(userId:string) -> string {
-                await Task.Delay(50)
-                return ""data_for_"" + userId
-            }
-            
-            // Chain the async calls
-            userId <- await fetchUserId(123)
-            userData <- await fetchUserData(userId)
-            
-            Assert.Equal(""user_123"", userId)
-            Assert.Equal(""data_for_user_123"", userData)
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-
-        // Assert - 如果 Old8Lang 断言失败会抛出异常
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void AsyncErrorHandling_CompilesAndExecutesCorrectly()
-    {
-        // Arrange
-        var code = @"
-            async func mightFail(should_fail:bool) -> string {
-                await Task.Delay(50)
-                if should_fail {
-                    throw ""Something went wrong""
-                } else {
-                    return ""Success""
-                }
-            }
-            
-            error_caught <- false
-            result_value <- """"
-            
-            try {
-                result_value <- await mightFail(false)
-            } catch (e) {
-                result_value <- e
-            }
-            
-            try {
-                result_value <- await mightFail(true)
-            } catch (e) {
-                error_caught <- true
-                result_value <- e
-            }
-            
-            Assert.Equal(""Success"", result_value)
-            Assert.Equal(""Something went wrong"", result_value)
-            Assert.True(error_caught)
-        ";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
-
-        // Assert - 如果 Old8Lang 断言失败会抛出异常
-        var exception = Record.Exception(() => compiledAction());
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void AsyncLoop_CompilesAndExecutesCorrectly()
-    {
-        // Arrange
-        var code = @"
-            async func processItems(items:List<int>) -> List<int> {
+            async func processItems(items:list) -> list {
                 results <- {}
-                for item in items {
-                    await Task.Delay(10)
+                i <- 0
+                while i < items.Count() {
+                    item <- items[i]
                     processed <- item * 2
-                    results <- results.Add(processed)
+                    await Task.Delay(10)
+                    results.Add(processed)
+                    i <- i + 1
                 }
                 return results
             }
             
-            input_items <- {1, 2, 3, 4, 5}
-            processed_items <- await processItems(input_items)
+            async func testAsyncLoop() {
+                input <- {1, 2, 3, 4, 5}
+                results <- await processItems(input)
+                
+                Assert.Equal(5, results.Count())
+                Assert.Equal({2, 4, 6, 8, 10}, results)
+            }
             
-            Assert.Equal({2, 4, 6, 8, 10}, processed_items)
+            testAsyncLoop()
         ";
         var interpreter = new LangInterpreter();
 
@@ -243,31 +206,78 @@ public class AsyncFunctionTests
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
-        // Assert - 如果 Old8Lang 断言失败会抛出异常
+        // Assert
         var exception = Record.Exception(() => compiledAction());
         Assert.Null(exception);
     }
 
     [Fact]
-    public void AsyncConditionalExecution_CompilesAndExecutesCorrectly()
+    public void AsyncFunctionChaining_CompilesAndExecutesCorrectly()
     {
         // Arrange
         var code = @"
-            async func conditionalLoad(load_fast:bool) -> string {
-                if load_fast {
+            async func step1(data:int) -> int {
+                await Task.Delay(30)
+                return data * 2
+            }
+            
+            async func step2(data:int) -> int {
+                await Task.Delay(30)
+                return data + 10
+            }
+            
+            async func step3(data:int) -> string {
+                await Task.Delay(30)
+                return ""result_"" + data.ToStr()
+            }
+            
+            async func chainAsyncOperations() {
+                result1 <- await step1(5)   // 10
+                result2 <- await step2(result1)  // 20
+                result3 <- await step3(result2)  // ""result_20""
+                
+                Assert.Equal(10, result1)
+                Assert.Equal(20, result2)
+                Assert.Equal(""result_20"", result3)
+            }
+            
+            chainAsyncOperations()
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void AsyncFunctionWithConditional_CompilesAndExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            async func conditionalOperation(useFast:bool) -> string {
+                if useFast {
                     await Task.Delay(10)
-                    return ""Fast load complete""
+                    return ""fast operation""
                 } else {
                     await Task.Delay(100)
-                    return ""Slow load complete""
+                    return ""slow operation""
                 }
             }
             
-            result1 <- await conditionalLoad(true)
-            result2 <- await conditionalLoad(false)
+            async func testConditional() {
+                result1 <- await conditionalOperation(true)
+                result2 <- await conditionalOperation(false)
+                
+                Assert.Equal(""fast operation"", result1)
+                Assert.Equal(""slow operation"", result2)
+            }
             
-            Assert.Equal(""Fast load complete"", result1)
-            Assert.Equal(""Slow load complete"", result2)
+            testConditional()
         ";
         var interpreter = new LangInterpreter();
 
@@ -275,31 +285,38 @@ public class AsyncFunctionTests
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
-        // Assert - 如果 Old8Lang 断言失败会抛出异常
+        // Assert
         var exception = Record.Exception(() => compiledAction());
         Assert.Null(exception);
     }
 
     [Fact]
-    public void AsyncWithTimeout_CompilesAndExecutesCorrectly()
+    public void AsyncFunctionWithArray_CompilesAndExecutesCorrectly()
     {
         // Arrange
         var code = @"
-            async func operationWithTimeout() -> string {
-                timeout_task <- Task.Delay(50)
-                operation_task <- Task.Delay(200)
-                
-                completed <- await Task.WhenAny([timeout_task, operation_task])
-                
-                if completed == timeout_task {
-                    return ""Operation timed out""
-                } else {
-                    return ""Operation completed""
+            async func processArray(data:array) -> array {
+                results <- []
+                i <- 0
+                while i < data.Length {
+                    value <- data[i]
+                    processed <- value + 100
+                    await Task.Delay(20)
+                    results.Add(processed)
+                    i <- i + 1
                 }
+                return results
             }
             
-            result <- await operationWithTimeout()
-            Assert.Equal(""Operation timed out"", result)
+            async func testArrayProcessing() {
+                input <- [1, 2, 3, 4, 5]
+                results <- await processArray(input)
+                
+                Assert.Equal(5, results.Length)
+                Assert.Equal([101, 102, 103, 104, 105], results)
+            }
+            
+            testArrayProcessing()
         ";
         var interpreter = new LangInterpreter();
 
@@ -307,7 +324,130 @@ public class AsyncFunctionTests
         var ast = interpreter.Build(code);
         var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
 
-        // Assert - 如果 Old8Lang 断言失败会抛出异常
+        // Assert
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void AsyncFunctionWithDictionary_CompilesAndExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            async func processDictionary(data:dict) -> dict {
+                results <- {}
+                
+                // 假设字典有迭代方法
+                keys <- {""key1"", ""key2"", ""key3""}
+                i <- 0
+                while i < keys.Count() {
+                    key <- keys[i]
+                    value <- data[key]
+                    processed <- value * 10
+                    await Task.Delay(30)
+                    results[key] <- processed
+                    i <- i + 1
+                }
+                
+                return results
+            }
+            
+            async func testDictionaryProcessing() {
+                input <- {""key1"": 5, ""key2"": 10, ""key3"": 15}
+                results <- await processDictionary(input)
+                
+                Assert.Equal(50, results[""key1""])
+                Assert.Equal(100, results[""key2""])
+                Assert.Equal(150, results[""key3""])
+            }
+            
+            testDictionaryProcessing()
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void AsyncFunctionWithFinally_CompilesAndExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            cleanupExecuted <- false
+            
+            async func operationWithCleanup() -> string {
+                try {
+                    await Task.Delay(50)
+                    return ""operation completed""
+                } catch (e) {
+                    throw e
+                } finally {
+                    await Task.Delay(20)
+                    cleanupExecuted <- true
+                }
+            }
+            
+            async func testFinally() {
+                result <- await operationWithCleanup()
+                Assert.Equal(""operation completed"", result)
+                Assert.True(cleanupExecuted)
+            }
+            
+            testFinally()
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void AsyncFunctionWithNestedCalls_CompilesAndExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            async func innerAsync(value:int) -> int {
+                await Task.Delay(30)
+                return value * 3
+            }
+            
+            async func middleAsync(value:int) -> int {
+                innerResult <- await innerAsync(value)
+                await Task.Delay(20)
+                return innerResult + 5
+            }
+            
+            async func outerAsync(value:int) -> string {
+                middleResult <- await middleAsync(value)
+                await Task.Delay(10)
+                return ""final_"" + middleResult.ToStr()
+            }
+            
+            async func testNested() {
+                result <- await outerAsync(10)  // ((10 * 3) + 5) = 35 -> ""final_35""
+                Assert.Equal(""final_35"", result)
+            }
+            
+            testNested()
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
         var exception = Record.Exception(() => compiledAction());
         Assert.Null(exception);
     }

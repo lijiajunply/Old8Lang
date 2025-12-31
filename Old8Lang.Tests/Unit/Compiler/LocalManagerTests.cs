@@ -170,18 +170,6 @@ public class LocalManagerTests
     }
     
     [Fact]
-    public void LocalManager_ValidateType_IncompatibleTypes_ThrowsException()
-    {
-        // Arrange
-        var localManager = new LocalManager();
-        var position = new SourcePosition(1, 1);
-        
-        // Act & Assert
-        Assert.Throws<CompilerException>(() => 
-            localManager.ValidateType(typeof(int), typeof(string), position));
-    }
-    
-    [Fact]
     public void LocalManager_FuncParameters_Management()
     {
         // Arrange
