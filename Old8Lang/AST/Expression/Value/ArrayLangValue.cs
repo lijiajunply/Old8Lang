@@ -100,7 +100,7 @@ public partial class ArrayLangValue : LangValueType, ILangList
             var methodName = instance.Id.IdName;
 
             // 检查是否是已知的 Array 方法，如果找到就调用 FromClassToResult
-            var knownMethods = new[] { "Count", "Sort", "Distinct", "Map", "Filter", "Reduce", "Get", "Set", "Length", "ToList" };
+            var knownMethods = new[] { "Count", "Sort", "QuickSort", "MergeSort", "BubbleSort", "SelectionSort", "InsertionSort", "HeapSort", "IsSorted", "Distinct", "Map", "Filter", "Reduce", "Get", "Set", "Length", "ToList" };
             if (knownMethods.Contains(methodName))
             {
                 return instance.FromClassToResult(this);

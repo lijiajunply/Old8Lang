@@ -1,0 +1,143 @@
+// 排序算法测试
+
+PrintLine("===== 数组排序测试 =====")
+
+// 测试数组快速排序
+arr1 <- [5, 2, 8, 1, 9, 3]
+PrintLine("原始数组: ")
+PrintLine(arr1)
+sorted1 <- arr1.QuickSort()
+PrintLine("快速排序后: ")
+PrintLine(sorted1)
+PrintLine("是否已排序: ")
+PrintLine(sorted1.IsSorted())
+
+// 测试数组归并排序
+arr2 <- [64, 34, 25, 12, 22, 11, 90]
+PrintLine("\n原始数组: ")
+PrintLine(arr2)
+sorted2 <- arr2.MergeSort()
+PrintLine("归并排序后: ")
+PrintLine(sorted2)
+PrintLine("是否已排序: ")
+PrintLine(sorted2.IsSorted())
+
+// 测试数组冒泡排序
+arr3 <- [9, 7, 5, 3, 1]
+PrintLine("\n原始数组: ")
+PrintLine(arr3)
+sorted3 <- arr3.BubbleSort()
+PrintLine("冒泡排序后: ")
+PrintLine(sorted3)
+PrintLine("是否已排序: ")
+PrintLine(sorted3.IsSorted())
+
+// 测试数组选择排序
+arr4 <- [29, 10, 14, 37, 13]
+PrintLine("\n原始数组: ")
+PrintLine(arr4)
+sorted4 <- arr4.SelectionSort()
+PrintLine("选择排序后: ")
+PrintLine(sorted4)
+PrintLine("是否已排序: ")
+PrintLine(sorted4.IsSorted())
+
+// 测试数组插入排序
+arr5 <- [12, 11, 13, 5, 6]
+PrintLine("\n原始数组: ")
+PrintLine(arr5)
+sorted5 <- arr5.InsertionSort()
+PrintLine("插入排序后: ")
+PrintLine(sorted5)
+PrintLine("是否已排序: ")
+PrintLine(sorted5.IsSorted())
+
+// 测试数组堆排序
+arr6 <- [4, 10, 3, 5, 1]
+PrintLine("\n原始数组: ")
+PrintLine(arr6)
+sorted6 <- arr6.HeapSort()
+PrintLine("堆排序后: ")
+PrintLine(sorted6)
+PrintLine("是否已排序: ")
+PrintLine(sorted6.IsSorted())
+
+PrintLine("\n===== 列表排序测试 =====")
+
+// 测试列表快速排序
+list1 <- {5, 2, 8, 1, 9, 3}
+PrintLine("\n原始列表: ")
+PrintLine(list1)
+sortedList1 <- list1.QuickSort()
+PrintLine("快速排序后: ")
+PrintLine(sortedList1)
+PrintLine("是否已排序: ")
+PrintLine(sortedList1.IsSorted())
+
+// 测试列表归并排序
+list2 <- {64, 34, 25, 12, 22, 11, 90}
+PrintLine("\n原始列表: ")
+PrintLine(list2)
+sortedList2 <- list2.MergeSort()
+PrintLine("归并排序后: ")
+PrintLine(sortedList2)
+PrintLine("是否已排序: ")
+PrintLine(sortedList2.IsSorted())
+
+// 测试列表冒泡排序
+list3 <- {9, 7, 5, 3, 1}
+PrintLine("\n原始列表: ")
+PrintLine(list3)
+sortedList3 <- list3.BubbleSort()
+PrintLine("冒泡排序后: ")
+PrintLine(sortedList3)
+PrintLine("是否已排序: ")
+PrintLine(sortedList3.IsSorted())
+
+// 测试列表选择排序
+list4 <- {29, 10, 14, 37, 13}
+PrintLine("\n原始列表: ")
+PrintLine(list4)
+sortedList4 <- list4.SelectionSort()
+PrintLine("选择排序后: ")
+PrintLine(sortedList4)
+PrintLine("是否已排序: ")
+PrintLine(sortedList4.IsSorted())
+
+// 测试列表插入排序
+list5 <- {12, 11, 13, 5, 6}
+PrintLine("\n原始列表: ")
+PrintLine(list5)
+sortedList5 <- list5.InsertionSort()
+PrintLine("插入排序后: ")
+PrintLine(sortedList5)
+PrintLine("是否已排序: ")
+PrintLine(sortedList5.IsSorted())
+
+// 测试列表堆排序
+list6 <- {4, 10, 3, 5, 1}
+PrintLine("\n原始列表: ")
+PrintLine(list6)
+sortedList6 <- list6.HeapSort()
+PrintLine("堆排序后: ")
+PrintLine(sortedList6)
+PrintLine("是否已排序: ")
+PrintLine(sortedList6.IsSorted())
+
+// 测试 Sort() 默认方法
+PrintLine("\n===== 测试 Sort() 默认方法 =====")
+arr7 <- [3, 1, 4, 1, 5, 9, 2, 6]
+PrintLine("原始数组: ")
+PrintLine(arr7)
+sorted7 <- arr7.Sort()
+PrintLine("Sort()排序后: ")
+PrintLine(sorted7)
+
+list7 <- {3, 1, 4, 1, 5, 9, 2, 6}
+PrintLine("\n原始列表: ")
+PrintLine(list7)
+sortedList7 <- list7.Sort()
+PrintLine("Sort()排序后: ")
+PrintLine(sortedList7)
+
+PrintLine("\n===== 所有排序测试完成 =====")

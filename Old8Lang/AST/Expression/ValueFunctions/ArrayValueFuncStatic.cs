@@ -31,7 +31,7 @@ public static class ArrayValueFuncStatic
         }
 
         /// <summary>
-        /// 对数组进行排序
+        /// 对数组进行排序（默认使用快速排序）
         /// </summary>
         /// <returns>排序后的数组（返回新数组）</returns>
         public ArrayLangValue Sort()
@@ -40,6 +40,95 @@ public static class ArrayValueFuncStatic
             var itemsArray = items.ToArray();
             QuickSort(itemsArray, 0, itemsArray.Length - 1);
             return new ArrayLangValue(itemsArray.ToList());
+        }
+
+        /// <summary>
+        /// 使用快速排序算法对数组进行排序
+        /// </summary>
+        /// <returns>排序后的数组（返回新数组）</returns>
+        public ArrayLangValue QuickSort()
+        {
+            var items = arrayValue.GetItems().ToList();
+            var itemsArray = items.ToArray();
+            QuickSort(itemsArray, 0, itemsArray.Length - 1);
+            return new ArrayLangValue(itemsArray.ToList());
+        }
+
+        /// <summary>
+        /// 使用归并排序算法对数组进行排序
+        /// </summary>
+        /// <returns>排序后的数组（返回新数组）</returns>
+        public ArrayLangValue MergeSort()
+        {
+            var items = arrayValue.GetItems().ToList();
+            var itemsArray = items.ToArray();
+            MergeSortImpl(itemsArray, 0, itemsArray.Length - 1);
+            return new ArrayLangValue(itemsArray.ToList());
+        }
+
+        /// <summary>
+        /// 使用冒泡排序算法对数组进行排序
+        /// </summary>
+        /// <returns>排序后的数组（返回新数组）</returns>
+        public ArrayLangValue BubbleSort()
+        {
+            var items = arrayValue.GetItems().ToList();
+            var itemsArray = items.ToArray();
+            BubbleSortImpl(itemsArray);
+            return new ArrayLangValue(itemsArray.ToList());
+        }
+
+        /// <summary>
+        /// 使用选择排序算法对数组进行排序
+        /// </summary>
+        /// <returns>排序后的数组（返回新数组）</returns>
+        public ArrayLangValue SelectionSort()
+        {
+            var items = arrayValue.GetItems().ToList();
+            var itemsArray = items.ToArray();
+            SelectionSortImpl(itemsArray);
+            return new ArrayLangValue(itemsArray.ToList());
+        }
+
+        /// <summary>
+        /// 使用插入排序算法对数组进行排序
+        /// </summary>
+        /// <returns>排序后的数组（返回新数组）</returns>
+        public ArrayLangValue InsertionSort()
+        {
+            var items = arrayValue.GetItems().ToList();
+            var itemsArray = items.ToArray();
+            InsertionSortImpl(itemsArray);
+            return new ArrayLangValue(itemsArray.ToList());
+        }
+
+        /// <summary>
+        /// 使用堆排序算法对数组进行排序
+        /// </summary>
+        /// <returns>排序后的数组（返回新数组）</returns>
+        public ArrayLangValue HeapSort()
+        {
+            var items = arrayValue.GetItems().ToList();
+            var itemsArray = items.ToArray();
+            HeapSortImpl(itemsArray);
+            return new ArrayLangValue(itemsArray.ToList());
+        }
+
+        /// <summary>
+        /// 检查数组是否已排序
+        /// </summary>
+        /// <returns>如果数组已排序返回true，否则返回false</returns>
+        public BoolLangValue IsSorted()
+        {
+            var items = arrayValue.GetItems().ToArray();
+            for (int i = 1; i < items.Length; i++)
+            {
+                if (items[i].Less(items[i - 1]))
+                {
+                    return new BoolLangValue(false);
+                }
+            }
+            return new BoolLangValue(true);
         }
 
         /// <summary>
@@ -196,6 +285,192 @@ public static class ArrayValueFuncStatic
 
         Swap(nums, i + 1, right);
         return i + 1;
+    }
+
+    /// <summary>
+    /// 归并排序的递归实现
+    /// </summary>
+    /// <param name="nums">要排序的数组</param>
+    /// <param name="left">排序范围的左边界</param>
+    /// <param name="right">排序范围的右边界</param>
+    private static void MergeSortImpl(LangValueType[] nums, int left, int right)
+    {
+        if (left < right)
+        {
+            int mid = left + (right - left) / 2;
+            MergeSortImpl(nums, left, mid);
+            MergeSortImpl(nums, mid + 1, right);
+            Merge(nums, left, mid, right);
+        }
+    }
+
+    /// <summary>
+    /// 归并排序的合并操作
+    /// </summary>
+    /// <param name="nums">要合并的数组</param>
+    /// <param name="left">左子数组的起始索引</param>
+    /// <param name="mid">左子数组的结束索引</param>
+    /// <param name="right">右子数组的结束索引</param>
+    private static void Merge(LangValueType[] nums, int left, int mid, int right)
+    {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+
+        var leftArray = new LangValueType[n1];
+        var rightArray = new LangValueType[n2];
+
+        Array.Copy(nums, left, leftArray, 0, n1);
+        Array.Copy(nums, mid + 1, rightArray, 0, n2);
+
+        int i = 0, j = 0, k = left;
+
+        while (i < n1 && j < n2)
+        {
+            if (!rightArray[j].Less(leftArray[i]))
+            {
+                nums[k] = leftArray[i];
+                i++;
+            }
+            else
+            {
+                nums[k] = rightArray[j];
+                j++;
+            }
+            k++;
+        }
+
+        while (i < n1)
+        {
+            nums[k] = leftArray[i];
+            i++;
+            k++;
+        }
+
+        while (j < n2)
+        {
+            nums[k] = rightArray[j];
+            j++;
+            k++;
+        }
+    }
+
+    /// <summary>
+    /// 冒泡排序实现
+    /// </summary>
+    /// <param name="nums">要排序的数组</param>
+    private static void BubbleSortImpl(LangValueType[] nums)
+    {
+        int n = nums.Length;
+        for (int i = 0; i < n - 1; i++)
+        {
+            bool swapped = false;
+            for (int j = 0; j < n - i - 1; j++)
+            {
+                if (nums[j + 1].Less(nums[j]))
+                {
+                    Swap(nums, j, j + 1);
+                    swapped = true;
+                }
+            }
+            // 如果这一轮没有发生交换，说明数组已排序
+            if (!swapped) break;
+        }
+    }
+
+    /// <summary>
+    /// 选择排序实现
+    /// </summary>
+    /// <param name="nums">要排序的数组</param>
+    private static void SelectionSortImpl(LangValueType[] nums)
+    {
+        int n = nums.Length;
+        for (int i = 0; i < n - 1; i++)
+        {
+            int minIndex = i;
+            for (int j = i + 1; j < n; j++)
+            {
+                if (nums[j].Less(nums[minIndex]))
+                {
+                    minIndex = j;
+                }
+            }
+            if (minIndex != i)
+            {
+                Swap(nums, i, minIndex);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 插入排序实现
+    /// </summary>
+    /// <param name="nums">要排序的数组</param>
+    private static void InsertionSortImpl(LangValueType[] nums)
+    {
+        int n = nums.Length;
+        for (int i = 1; i < n; i++)
+        {
+            var key = nums[i];
+            int j = i - 1;
+
+            while (j >= 0 && key.Less(nums[j]))
+            {
+                nums[j + 1] = nums[j];
+                j--;
+            }
+            nums[j + 1] = key;
+        }
+    }
+
+    /// <summary>
+    /// 堆排序实现
+    /// </summary>
+    /// <param name="nums">要排序的数组</param>
+    private static void HeapSortImpl(LangValueType[] nums)
+    {
+        int n = nums.Length;
+
+        // 构建最大堆
+        for (int i = n / 2 - 1; i >= 0; i--)
+        {
+            Heapify(nums, n, i);
+        }
+
+        // 逐个提取元素
+        for (int i = n - 1; i > 0; i--)
+        {
+            Swap(nums, 0, i);
+            Heapify(nums, i, 0);
+        }
+    }
+
+    /// <summary>
+    /// 堆排序的堆化操作
+    /// </summary>
+    /// <param name="nums">要堆化的数组</param>
+    /// <param name="n">堆的大小</param>
+    /// <param name="i">当前需要堆化的节点索引</param>
+    private static void Heapify(LangValueType[] nums, int n, int i)
+    {
+        int largest = i;
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+
+        if (left < n && nums[largest].Less(nums[left]))
+        {
+            largest = left;
+        }
+
+        if (right < n && nums[largest].Less(nums[right]))
+        {
+            largest = right;
+        }
+
+        if (largest != i)
+        {
+            Swap(nums, i, largest);
+            Heapify(nums, n, largest);
+        }
     }
 
     /// <summary>

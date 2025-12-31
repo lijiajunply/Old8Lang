@@ -63,14 +63,12 @@ public static class FirstUIBinding
 
         try
         {
-            // 调用 Old8Lang 函数构建根组件
             var invokeMethod = buildFunction.GetType().GetMethod("Invoke");
             var rootWidget = invokeMethod?.Invoke(buildFunction, null);
 
             if (rootWidget is WidgetBase widget && _context != null)
             {
-                var control = widget.Build(_context) as Control;
-                if (control != null)
+                if (widget.Build(_context) is Control control)
                 {
                     _mainWindow.Content = control;
                 }

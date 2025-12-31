@@ -12,8 +12,6 @@ public class Container : WidgetBase
 {
     public WidgetBase? Child { get; set; }
 
-    public Container() { }
-
     public override object Build(BuildContext context)
     {
         var panel = new Panel
@@ -36,7 +34,7 @@ public class Container : WidgetBase
             {
                 if (BackgroundColor.StartsWith("#"))
                 {
-                    panel.Background = new SolidColorBrush(Avalonia.Media.Color.Parse(BackgroundColor));
+                    panel.Background = new SolidColorBrush(Color.Parse(BackgroundColor));
                 }
                 else
                 {
@@ -53,8 +51,7 @@ public class Container : WidgetBase
         // 添加子组件
         if (Child != null)
         {
-            var childControl = Child.Build(context) as Control;
-            if (childControl != null)
+            if (Child.Build(context) is Control childControl)
             {
                 panel.Children.Add(childControl);
             }
@@ -69,10 +66,8 @@ public class Container : WidgetBase
 /// </summary>
 public class Column : WidgetBase
 {
-    public List<WidgetBase> Children { get; set; } = new();
+    public List<WidgetBase> Children { get; set; } = [];
     public double Spacing { get; set; }
-
-    public Column() { }
 
     public override object Build(BuildContext context)
     {
@@ -113,8 +108,7 @@ public class Column : WidgetBase
         // 添加子组件
         foreach (var child in Children)
         {
-            var childControl = child.Build(context) as Control;
-            if (childControl != null)
+            if (child.Build(context) is Control childControl)
             {
                 // 设置间距
                 if (Spacing > 0 && Children.IndexOf(child) > 0)

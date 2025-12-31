@@ -77,7 +77,7 @@ public static class ListValueFuncStatic
         }
 
         /// <summary>
-        /// 对列表进行排序
+        /// 对列表进行排序（默认使用快速排序）
         /// </summary>
         /// <returns>排序后的新列表</returns>
         public ListLangValue Sort()
@@ -99,6 +99,88 @@ public static class ListValueFuncStatic
             var sortedValues = new List<LangValueType>(langValue.Values);
             QuickSortWithComparer(sortedValues, 0, sortedValues.Count - 1, comparer);
             return new ListLangValue(sortedValues);
+        }
+
+        /// <summary>
+        /// 使用快速排序算法对列表进行排序
+        /// </summary>
+        /// <returns>排序后的新列表</returns>
+        public ListLangValue QuickSort()
+        {
+            var sortedValues = new List<LangValueType>(langValue.Values);
+            QuickSort(sortedValues, 0, sortedValues.Count - 1);
+            return new ListLangValue(sortedValues);
+        }
+
+        /// <summary>
+        /// 使用归并排序算法对列表进行排序
+        /// </summary>
+        /// <returns>排序后的新列表</returns>
+        public ListLangValue MergeSort()
+        {
+            var sortedValues = new List<LangValueType>(langValue.Values);
+            MergeSortImpl(sortedValues, 0, sortedValues.Count - 1);
+            return new ListLangValue(sortedValues);
+        }
+
+        /// <summary>
+        /// 使用冒泡排序算法对列表进行排序
+        /// </summary>
+        /// <returns>排序后的新列表</returns>
+        public ListLangValue BubbleSort()
+        {
+            var sortedValues = new List<LangValueType>(langValue.Values);
+            BubbleSortImpl(sortedValues);
+            return new ListLangValue(sortedValues);
+        }
+
+        /// <summary>
+        /// 使用选择排序算法对列表进行排序
+        /// </summary>
+        /// <returns>排序后的新列表</returns>
+        public ListLangValue SelectionSort()
+        {
+            var sortedValues = new List<LangValueType>(langValue.Values);
+            SelectionSortImpl(sortedValues);
+            return new ListLangValue(sortedValues);
+        }
+
+        /// <summary>
+        /// 使用插入排序算法对列表进行排序
+        /// </summary>
+        /// <returns>排序后的新列表</returns>
+        public ListLangValue InsertionSort()
+        {
+            var sortedValues = new List<LangValueType>(langValue.Values);
+            InsertionSortImpl(sortedValues);
+            return new ListLangValue(sortedValues);
+        }
+
+        /// <summary>
+        /// 使用堆排序算法对列表进行排序
+        /// </summary>
+        /// <returns>排序后的新列表</returns>
+        public ListLangValue HeapSort()
+        {
+            var sortedValues = new List<LangValueType>(langValue.Values);
+            HeapSortImpl(sortedValues);
+            return new ListLangValue(sortedValues);
+        }
+
+        /// <summary>
+        /// 检查列表是否已排序
+        /// </summary>
+        /// <returns>如果列表已排序返回true，否则返回false</returns>
+        public BoolLangValue IsSorted()
+        {
+            for (int i = 1; i < langValue.Values.Count; i++)
+            {
+                if (langValue.Values[i].Less(langValue.Values[i - 1]))
+                {
+                    return new BoolLangValue(false);
+                }
+            }
+            return new BoolLangValue(true);
         }
 
         /// <summary>
@@ -612,6 +694,194 @@ public static class ListValueFuncStatic
 
         Swap(nums, i + 1, right);
         return i + 1;
+    }
+
+    /// <summary>
+    /// 归并排序的递归实现
+    /// </summary>
+    /// <param name="nums">要排序的列表</param>
+    /// <param name="left">排序范围的左边界</param>
+    /// <param name="right">排序范围的右边界</param>
+    private static void MergeSortImpl(List<LangValueType> nums, int left, int right)
+    {
+        if (left < right)
+        {
+            int mid = left + (right - left) / 2;
+            MergeSortImpl(nums, left, mid);
+            MergeSortImpl(nums, mid + 1, right);
+            MergeList(nums, left, mid, right);
+        }
+    }
+
+    /// <summary>
+    /// 归并排序的合并操作
+    /// </summary>
+    /// <param name="nums">要合并的列表</param>
+    /// <param name="left">左子列表的起始索引</param>
+    /// <param name="mid">左子列表的结束索引</param>
+    /// <param name="right">右子列表的结束索引</param>
+    private static void MergeList(List<LangValueType> nums, int left, int mid, int right)
+    {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+
+        var leftArray = new List<LangValueType>(n1);
+        var rightArray = new List<LangValueType>(n2);
+
+        for (int x = 0; x < n1; x++)
+            leftArray.Add(nums[left + x]);
+        for (int x = 0; x < n2; x++)
+            rightArray.Add(nums[mid + 1 + x]);
+
+        int i = 0, j = 0, k = left;
+
+        while (i < n1 && j < n2)
+        {
+            if (!rightArray[j].Less(leftArray[i]))
+            {
+                nums[k] = leftArray[i];
+                i++;
+            }
+            else
+            {
+                nums[k] = rightArray[j];
+                j++;
+            }
+            k++;
+        }
+
+        while (i < n1)
+        {
+            nums[k] = leftArray[i];
+            i++;
+            k++;
+        }
+
+        while (j < n2)
+        {
+            nums[k] = rightArray[j];
+            j++;
+            k++;
+        }
+    }
+
+    /// <summary>
+    /// 冒泡排序实现
+    /// </summary>
+    /// <param name="nums">要排序的列表</param>
+    private static void BubbleSortImpl(List<LangValueType> nums)
+    {
+        int n = nums.Count;
+        for (int i = 0; i < n - 1; i++)
+        {
+            bool swapped = false;
+            for (int j = 0; j < n - i - 1; j++)
+            {
+                if (nums[j + 1].Less(nums[j]))
+                {
+                    Swap(nums, j, j + 1);
+                    swapped = true;
+                }
+            }
+            // 如果这一轮没有发生交换，说明列表已排序
+            if (!swapped) break;
+        }
+    }
+
+    /// <summary>
+    /// 选择排序实现
+    /// </summary>
+    /// <param name="nums">要排序的列表</param>
+    private static void SelectionSortImpl(List<LangValueType> nums)
+    {
+        int n = nums.Count;
+        for (int i = 0; i < n - 1; i++)
+        {
+            int minIndex = i;
+            for (int j = i + 1; j < n; j++)
+            {
+                if (nums[j].Less(nums[minIndex]))
+                {
+                    minIndex = j;
+                }
+            }
+            if (minIndex != i)
+            {
+                Swap(nums, i, minIndex);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 插入排序实现
+    /// </summary>
+    /// <param name="nums">要排序的列表</param>
+    private static void InsertionSortImpl(List<LangValueType> nums)
+    {
+        int n = nums.Count;
+        for (int i = 1; i < n; i++)
+        {
+            var key = nums[i];
+            int j = i - 1;
+
+            while (j >= 0 && key.Less(nums[j]))
+            {
+                nums[j + 1] = nums[j];
+                j--;
+            }
+            nums[j + 1] = key;
+        }
+    }
+
+    /// <summary>
+    /// 堆排序实现
+    /// </summary>
+    /// <param name="nums">要排序的列表</param>
+    private static void HeapSortImpl(List<LangValueType> nums)
+    {
+        int n = nums.Count;
+
+        // 构建最大堆
+        for (int i = n / 2 - 1; i >= 0; i--)
+        {
+            HeapifyList(nums, n, i);
+        }
+
+        // 逐个提取元素
+        for (int i = n - 1; i > 0; i--)
+        {
+            Swap(nums, 0, i);
+            HeapifyList(nums, i, 0);
+        }
+    }
+
+    /// <summary>
+    /// 堆排序的堆化操作
+    /// </summary>
+    /// <param name="nums">要堆化的列表</param>
+    /// <param name="n">堆的大小</param>
+    /// <param name="i">当前需要堆化的节点索引</param>
+    private static void HeapifyList(List<LangValueType> nums, int n, int i)
+    {
+        int largest = i;
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+
+        if (left < n && nums[largest].Less(nums[left]))
+        {
+            largest = left;
+        }
+
+        if (right < n && nums[largest].Less(nums[right]))
+        {
+            largest = right;
+        }
+
+        if (largest != i)
+        {
+            Swap(nums, i, largest);
+            HeapifyList(nums, n, largest);
+        }
     }
 
     /// <summary>
