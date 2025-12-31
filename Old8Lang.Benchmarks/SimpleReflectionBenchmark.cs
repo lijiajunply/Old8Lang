@@ -118,6 +118,14 @@ public class SimpleReflectionBenchmark
         }
         sw6.Stop();
 
+        // 使用委托缓存
+        var sw6b = Stopwatch.StartNew();
+        for (int i = 0; i < 500000; i++)
+        {
+            var value = (int)PropertyAccessorCache.GetValue(prop, obj)!;
+        }
+        sw6b.Stop();
+
         // 直接访问
         var sw7 = Stopwatch.StartNew();
         for (int i = 0; i < 500000; i++)
@@ -126,22 +134,27 @@ public class SimpleReflectionBenchmark
         }
         sw7.Stop();
 
-        var improvement4 = (double)sw6.ElapsedMilliseconds / Math.Max(sw7.ElapsedMilliseconds, 1);
+        var improvement4a = (double)sw6.ElapsedMilliseconds / Math.Max(sw6b.ElapsedMilliseconds, 1);
+        var improvement4b = (double)sw6.ElapsedMilliseconds / Math.Max(sw7.ElapsedMilliseconds, 1);
 
-        Console.WriteLine($"  反射访问:          {sw6.ElapsedMilliseconds,6} ms");
-        Console.WriteLine($"  直接访问:          {sw7.ElapsedMilliseconds,6} ms  [{improvement4:F1}x 提速]\n");
+        Console.WriteLine($"  原始反射:          {sw6.ElapsedMilliseconds,6} ms");
+        Console.WriteLine($"  优化后 (委托缓存):  {sw6b.ElapsedMilliseconds,6} ms  [{improvement4a:F1}x 提速]");
+        Console.WriteLine($"  直接访问:          {sw7.ElapsedMilliseconds,6} ms  [{improvement4b:F1}x 提速]\n");
 
         // 总结
         Console.WriteLine("=== 性能优化总结 ===\n");
         Console.WriteLine($"✅ 方法调用性能提升:     {improvement1:F1}x (从 {sw1.ElapsedMilliseconds}ms 降至 {sw2.ElapsedMilliseconds}ms)");
         Console.WriteLine($"✅ 成员查询性能提升:     {improvement3:F1}x (从 {sw4.ElapsedMilliseconds}ms 降至 {sw5.ElapsedMilliseconds}ms)");
-        Console.WriteLine($"✅ 委托缓存接近直接调用:  仅 {(double)sw2.ElapsedMilliseconds / Math.Max(sw3.ElapsedMilliseconds, 1):F1}x 差距");
+        Console.WriteLine($"✅ 委托缓存接近直接调用:  方法调用仅 {(double)sw2.ElapsedMilliseconds / Math.Max(sw3.ElapsedMilliseconds, 1):F1}x 差距");
         Console.WriteLine("\n性能优化技术:");
         Console.WriteLine("  - Expression.Lambda 编译 MethodInfo → 委托");
         Console.WriteLine("  - ConcurrentDictionary 缓存委托和成员信息");
         Console.WriteLine("  - 线程安全的缓存机制");
         Console.WriteLine($"\n缓存统计:");
-        Console.WriteLine($"  - 委托缓存数量: {MethodInvokerCache.CacheCount}");
+        Console.WriteLine($"  - 方法委托缓存数量: {MethodInvokerCache.CacheCount}");
+        Console.WriteLine($"\n注意:");
+        Console.WriteLine($"  - PropertyInfo.GetValue 已经足够快 (4ms/500k)，委托编译反而增加开销");
+        Console.WriteLine($"  - 仅对高频方法调用 (MethodInfo.Invoke) 使用委托缓存优化");
     }
 }
 

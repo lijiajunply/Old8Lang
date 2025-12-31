@@ -35,7 +35,7 @@ import Serialization
 
 data <- {""name"": ""Alice"", ""age"": 30}
 bytes <- Serialization.MsgPackSerialize(data)
-PrintLine($""MessagePack serialized, bytes length: {bytes.Length}"")
+PrintLine($""MessagePack serialized, bytes length: {len(bytes)}"")
 ";
         CreateTempModuleFile("./StandardLibrary/msgpack_serialize_test.old8", code);
         var (_, exception) = ExecuteCodeFile("./StandardLibrary/msgpack_serialize_test.old8");
