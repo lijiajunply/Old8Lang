@@ -47,16 +47,17 @@ PrintLine($""Parsed: {parsed}"")
     [Fact]
     public void ParseCsvLine_ShouldParseLineWithQuotes()
     {
-        var code = """"
+        var code = """
+import Csv
 
-                   import Csv
-
-                   line <- "\"a\","\"b\","\"c\""
-                   parsed <- Csv.ParseCsvLine(line)
-                   PrintLine($"Line: {line}")
-                   PrintLine($"Parsed: {parsed}")
-
-                   """";
+line <- "\"a\",\"b\",\"c\""
+parsed <- Csv.ParseCsvLine(line)
+count <- len(parsed)
+PrintLine("Parsed array length: " + count.ToStr())
+for i <- 0, i < count, i <- i + 1 {
+    PrintLine("  [" + i.ToStr() + "]: " + parsed[i])
+}
+""";
         CreateTempModuleFile("./StandardLibrary/csv_parseline_quotes_test.old8", code);
         var (_, exception) = ExecuteCodeFile("./StandardLibrary/csv_parseline_quotes_test.old8");
 
