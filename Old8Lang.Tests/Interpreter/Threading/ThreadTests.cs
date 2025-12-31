@@ -21,9 +21,10 @@ public class ThreadTests
     {
         // Arrange
         var code = @"
-before <- GetMilliseconds()
+import Time
+before <- Time.GetUnixTimeMilliseconds()
 Thread.Sleep(100)
-after <- GetMilliseconds()
+after <- Time.GetUnixTimeMilliseconds()
 elapsed <- after - before
 result <- elapsed >= 100";
         var interpreter = new LangInterpreter();
@@ -155,14 +156,14 @@ thread.Start()";
     {
         // Arrange
         var code = @"
-result <- 0
+result <- Lock(0)
 
 func threadFunc(value: int) -> void {
-    result <- value * 2
+    result.Set(value * 2)
 }
 
-thread <- Spawn(threadFunc)
-thread.Start(21)";
+thread <- Spawn(threadFunc, 21)
+thread.Start()";
         var interpreter = new LangInterpreter();
 
         // Act
@@ -174,8 +175,10 @@ thread.Start(21)";
 
         // Assert
         var result = interpreter.Manager.GetValue(new LangId("result"));
-        Assert.IsType<IntLangValue>(result);
-        Assert.Equal(42, ((IntLangValue)result).Value);
+        Assert.IsType<LockedVariableLangValue>(result);
+        var resultValue = ((LockedVariableLangValue)result).GetLockedValue();
+        Assert.IsType<IntLangValue>(resultValue);
+        Assert.Equal(42, ((IntLangValue)resultValue).Value);
     }
 
     #endregion
@@ -230,17 +233,17 @@ afterStart <- thread.IsAlive()";
     {
         // Arrange
         var code = @"
-value <- 0
+value <- Lock(0)
 
 func threadFunc() -> void {
     Thread.Sleep(100)
-    value <- 42
+    value.Set(42)
 }
 
 thread <- Spawn(threadFunc)
 thread.Start()
 thread.Join()
-result <- value";
+result <- value.Value";
         var interpreter = new LangInterpreter();
 
         // Act
@@ -293,20 +296,20 @@ result <- not joinResult";
     {
         // Arrange
         var code = @"
-sum <- 0
+sum <- Lock(0)
 
 func addToSum(value: int) -> void {
     Thread.Sleep(50)
-    sum <- sum + value
+    sum.Add(value)
 }
 
-t1 <- Spawn(addToSum)
-t2 <- Spawn(addToSum)
-t3 <- Spawn(addToSum)
+t1 <- Spawn(addToSum, 10)
+t2 <- Spawn(addToSum, 20)
+t3 <- Spawn(addToSum, 30)
 
-t1.Start(10)
-t2.Start(20)
-t3.Start(30)";
+t1.Start()
+t2.Start()
+t3.Start()";
         var interpreter = new LangInterpreter();
 
         // Act
@@ -318,8 +321,10 @@ t3.Start(30)";
 
         // Assert
         var sum = interpreter.Manager.GetValue(new LangId("sum"));
-        Assert.IsType<IntLangValue>(sum);
-        Assert.Equal(60, ((IntLangValue)sum).Value);
+        Assert.IsType<LockedVariableLangValue>(sum);
+        var sumValue = ((LockedVariableLangValue)sum).GetLockedValue();
+        Assert.IsType<IntLangValue>(sumValue);
+        Assert.Equal(60, ((IntLangValue)sumValue).Value);
     }
 
     /// <summary>
@@ -337,13 +342,13 @@ func appendResult(id: int) -> void {
     results.Add(id)
 }
 
-t1 <- Spawn(appendResult)
-t2 <- Spawn(appendResult)
-t3 <- Spawn(appendResult)
+t1 <- Spawn(appendResult, 1)
+t2 <- Spawn(appendResult, 2)
+t3 <- Spawn(appendResult, 3)
 
-t1.Start(1)
-t2.Start(2)
-t3.Start(3)";
+t1.Start()
+t2.Start()
+t3.Start()";
         var interpreter = new LangInterpreter();
 
         // Act

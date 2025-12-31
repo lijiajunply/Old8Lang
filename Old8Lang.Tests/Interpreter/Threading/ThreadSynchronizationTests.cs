@@ -32,9 +32,9 @@ func increment() -> void {
     }
 }
 
-t1 <- Thread(increment)
-t2 <- Thread(increment)
-t3 <- Thread(increment)
+t1 <- Spawn(increment)
+t2 <- Spawn(increment)
+t3 <- Spawn(increment)
 
 t1.Start()
 t2.Start()
@@ -76,8 +76,8 @@ func updateResources() -> void {
     }
 }
 
-t1 <- Thread(updateResources)
-t2 <- Thread(updateResources)
+t1 <- Spawn(updateResources)
+t2 <- Spawn(updateResources)
 
 t1.Start()
 t2.Start()";
@@ -118,8 +118,8 @@ func incrementWithoutLock() -> void {
     }
 }
 
-t1 <- Thread(incrementWithoutLock)
-t2 <- Thread(incrementWithoutLock)
+t1 <- Spawn(incrementWithoutLock)
+t2 <- Spawn(incrementWithoutLock)
 
 t1.Start()
 t2.Start()";
@@ -165,8 +165,8 @@ func safeIncrement() -> void {
     }
 }
 
-t1 <- Thread(safeIncrement)
-t2 <- Thread(safeIncrement)
+t1 <- Spawn(safeIncrement)
+t2 <- Spawn(safeIncrement)
 
 t1.Start()
 t2.Start()";
@@ -208,8 +208,8 @@ func tryIncrement() -> void {
     }
 }
 
-t1 <- Thread(tryIncrement)
-t2 <- Thread(tryIncrement)
+t1 <- Spawn(tryIncrement)
+t2 <- Spawn(tryIncrement)
 
 t1.Start()
 t2.Start()";
@@ -257,8 +257,8 @@ func consumer() -> void {
     }
 }
 
-producerThread <- Thread(producer)
-consumerThread <- Thread(consumer)
+producerThread <- Spawn(producer)
+consumerThread <- Spawn(consumer)
 
 consumerThread.Start()
 Thread.Sleep(50)
@@ -304,9 +304,9 @@ func incrementWithMutex() -> void {
     }
 }
 
-t1 <- Thread(incrementWithMutex)
-t2 <- Thread(incrementWithMutex)
-t3 <- Thread(incrementWithMutex)
+t1 <- Spawn(incrementWithMutex)
+t2 <- Spawn(incrementWithMutex)
+t3 <- Spawn(incrementWithMutex)
 
 t1.Start()
 t2.Start()
@@ -349,8 +349,8 @@ func tryAcquireMutex() -> void {
     }
 }
 
-t1 <- Thread(tryAcquireMutex)
-t2 <- Thread(tryAcquireMutex)
+t1 <- Spawn(tryAcquireMutex)
+t2 <- Spawn(tryAcquireMutex)
 
 t1.Start()
 t2.Start()";
@@ -400,10 +400,10 @@ func accessResource() -> void {
     }
 }
 
-t1 <- Thread(accessResource)
-t2 <- Thread(accessResource)
-t3 <- Thread(accessResource)
-t4 <- Thread(accessResource)
+t1 <- Spawn(accessResource)
+t2 <- Spawn(accessResource)
+t3 <- Spawn(accessResource)
+t4 <- Spawn(accessResource)
 
 t1.Start()
 t2.Start()
@@ -451,9 +451,9 @@ func tryAccessResource() -> void {
     }
 }
 
-t1 <- Thread(tryAccessResource)
-t2 <- Thread(tryAccessResource)
-t3 <- Thread(tryAccessResource)
+t1 <- Spawn(tryAccessResource)
+t2 <- Spawn(tryAccessResource)
+t3 <- Spawn(tryAccessResource)
 
 t1.Start()
 t2.Start()
@@ -499,8 +499,8 @@ func tryAccess() -> void {
 // Release to allow threads to proceed
 semaphore.Release(2)
 
-t1 <- Thread(tryAccess)
-t2 <- Thread(tryAccess)
+t1 <- Spawn(tryAccess)
+t2 <- Spawn(tryAccess)
 
 t1.Start()
 t2.Start()";
@@ -559,8 +559,8 @@ func transfer2To1() -> void {
 resource1 <- 100
 resource2 <- 100
 
-t1 <- Thread(transfer1To2)
-t2 <- Thread(transfer2To1)
+t1 <- Spawn(transfer1To2)
+t2 <- Spawn(transfer2To1)
 
 t1.Start()
 t2.Start()";
@@ -616,8 +616,8 @@ func safeOperation() -> void {
     }
 }
 
-t1 <- Thread(safeOperation)
-t2 <- Thread(safeOperation)
+t1 <- Spawn(safeOperation)
+t2 <- Spawn(safeOperation)
 
 t1.Start()
 t2.Start()";

@@ -22,13 +22,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncConcurrencyTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncConcurrencyTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ThreadSynchronizationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ThreadSynchronizationTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ThreadTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ThreadTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ThreadLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/ThreadLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Visitor/InterpreterVisitor.Statements.Missing.cs.bak" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,9 +72,11 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Advanced/NativeMethodBindingTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/AsyncConcurrencyTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/AsyncConcurrencyTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/AsyncConcurrencyTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/TaskAdvancedTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Async/TaskAdvancedTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Collections/ListComprehensionTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Threading/ThreadTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Types/GenericCollectionTypesInterpreterTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Parser/Types/GenericCollectionTypesParserTests.cs" root0="SKIP_HIGHLIGHTING" />
@@ -519,7 +517,7 @@
       <workItem from="1766746850670" duration="17415000" />
       <workItem from="1766771063664" duration="16661000" />
       <workItem from="1766997021901" duration="12927000" />
-      <workItem from="1767123773418" duration="15053000" />
+      <workItem from="1767123773418" duration="15798000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -864,7 +862,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="458" />
+    <option name="localTasksCounter" value="459" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -891,7 +889,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="docs(project): 删除项目待办事项文档并更新IDE配置&#10;&#10;- 移除 TODO.md 文档中记录的 Old8Lang 项目开发计划和待办事项&#10;- 清理 IDE 工作区配置中的相关文件变更记录&#10;- 更新本地任务计数器和工作时间统计信息&#10;- 移除旧的 VCS 提交消息记录&#10;- 修复 IDE 工作区 XML 配置文件中的 mock 路径设置" />
     <MESSAGE value="feat(generic): 实现泛型类型推断功能&#10;&#10;- 在 FunctionCallExpression.cs 中添加泛型类型推断逻辑&#10;- 创建 TypeSystem/GenericTypeInference.cs 实现类型推断引擎&#10;- 在 Instance.cs 的三个函数调用位置添加类型推断支持&#10;- 添加泛型类型推断测试文件和相关测试用例&#10;- 更新文档说明泛型类型推断的实现和使用方法&#10;- 支持从字面量、变量和嵌套调用中自动推断泛型类型&#10;- 保持显式类型参数调用方式的向后兼容性" />
     <MESSAGE value="feat(generic): 实现泛型约束语法和类型推断功能&#10;&#10;- 支持泛型类型推断，自动从函数调用参数推断泛型类型&#10;- 支持泛型约束的 &amp; 符号语法（例如 class Box&lt;T: IComparable &amp; ICloneable&gt;）&#10;- 支持 where 子句语法用于函数级别的约束（例如 func sort&lt;T&gt;(items: List&lt;T&gt;) -&gt; List&lt;T&gt; where T: IComparable）&#10;- 支持混合约束语法（在泛型参数声明中使用约束 + where 子句组合）&#10;- 扩展 ClassParser 和 FunctionParser 支持 where 子句解析&#10;- 添加泛型约束语法测试用例和综合功能测试&#10;- 更新文档说明泛型约束和类型推断的使用方法&#10;- 重构 GenericTypeInference 类构造函数注入依赖" />
     <MESSAGE value="feat(type-system): 添加联合类型和交叉类型支持&#10;&#10;- 实现联合类型 (A | B) 语法解析和类型兼容性检查&#10;- 实现交叉类型 (A &amp; B) 语法解析和类型兼容性检查&#10;- 在 TypeAnnotationManager 中添加交叉类型解析支持&#10;- 更新 FunctionParser 支持复杂类型注解解析&#10;- 修改 StatementParser 和 ClassParser 支持联合/交叉类型&#10;- 添加联合类型和交叉类型的兼容性检查规则&#10;- 支持可空联合类型和泛型中的联合/交叉类型&#10;- 更新文档和添加测试用例" />
@@ -916,7 +913,8 @@
     <MESSAGE value="test(interpreter): 添加异步和集合相关功能的单元测试&#10;&#10;- 新增 CancellationTokenTests 测试异步任务取消功能&#10;- 扩展 ListComprehensionTests 实现完整的列表推导式测试用例&#10;- 添加 NativeMethodBindingTests 测试本地方法绑定功能&#10;- 新增 TaskAdvancedTests 测试 TaskCompletionSource 和高级异步功能&#10;- 覆盖异步编程、列表推导式、本地方法绑定等核心功能的测试场景&#10;- 包含边界情况、错误处理和性能相关测试用例" />
     <MESSAGE value="feat(ast): 添加 CancellationTokenSource 构造函数超时参数支持&#10;&#10;- 实现 CancellationTokenSource 带超时时间的构造函数功能&#10;- 添加对 CancellationTokenSource(timeout) 语法的支持&#10;- 验证超时参数类型为整数类型的错误处理&#10;- 更新 LangValue 类型系统以支持带参数的构造函数&#10;- 移除过时的 NativeMethodBindingTests 测试类&#10;- 更新 IDE 工作区配置和任务计数器统计&#10;- 修改 VCS 提交历史记录和最后提交消息" />
     <MESSAGE value="test(interpreter): 更新异步任务测试实现&#10;&#10;- 替换 Thread.Start() 为 spawn() 和 Join() 等待机制&#10;- 修改失败任务测试函数返回 bool 类型并使用 Join() 获取结果&#10;- 简化取消令牌测试逻辑直接检查 IsCancellationRequested 属性&#10;- 重构多任务异常处理测试" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(interpreter): 更新异步任务测试实现&#10;&#10;- 替换 Thread.Start() 为 spawn() 和 Join() 等待机制&#10;- 修改失败任务测试函数返回 bool 类型并使用 Join() 获取结果&#10;- 简化取消令牌测试逻辑直接检查 IsCancellationRequested 属性&#10;- 重构多任务异常处理测试" />
+    <MESSAGE value="feat(thread): 实现线程安全的锁变量和线程管理功能&#10;&#10;- 添加 LockedVariableLangValue 类型支持线程安全的变量访问&#10;- 实现 ThreadLangValue 的属性访问和修改功能（IsBackground、Name、Priority）&#10;- 添加 Thread.Start()、Join()、IsAlive() 等线程控制方法&#10;- 实现 Thread.CurrentThread 静态方法获取当前线程信息&#10;- 支持 ThreadStaticMethodWrapper 调用静态线程相关方法&#10;- 更新异步并发测试使用锁变量替代原始 lock 语句&#10;- 修改线程测试使用 Spawn 函数创建线程实例&#10;- 添加线程属性设置和获取的完整实现" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(thread): 实现线程安全的锁变量和线程管理功能&#10;&#10;- 添加 LockedVariableLangValue 类型支持线程安全的变量访问&#10;- 实现 ThreadLangValue 的属性访问和修改功能（IsBackground、Name、Priority）&#10;- 添加 Thread.Start()、Join()、IsAlive() 等线程控制方法&#10;- 实现 Thread.CurrentThread 静态方法获取当前线程信息&#10;- 支持 ThreadStaticMethodWrapper 调用静态线程相关方法&#10;- 更新异步并发测试使用锁变量替代原始 lock 语句&#10;- 修改线程测试使用 Spawn 函数创建线程实例&#10;- 添加线程属性设置和获取的完整实现" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1457,6 +1455,19 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="637" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs</url>
+          <line>334</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" containingFunctionPresentation="方法 'HandleLongConversion'">
+            <startOffsets>
+              <option value="11961" />
+            </startOffsets>
+            <endOffsets>
+              <option value="12010" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="638" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
