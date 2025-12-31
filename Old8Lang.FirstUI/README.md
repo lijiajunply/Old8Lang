@@ -120,8 +120,21 @@ state <- ui.State(0)
 // 更新状态
 state.Set(state.Get() + 1)
 
+// 可观察状态（自动触发 UI 更新）
+observableState <- ui.ObservableState(0)
+observableState.BindTo(myWidget)  // 绑定到组件
+
 // 全局状态
 globalCounter <- ui.GlobalState("counter", 0)
+// 在任何地方访问
+counter <- ui.GlobalState.Get("counter")
+
+// 计算属性（依赖其他状态）
+firstName <- ui.State("张")
+lastName <- ui.State("三")
+fullName <- ui.Computed(() -> {
+    return firstName.Get() + lastName.Get()
+}, firstName, lastName)
 ```
 
 ### 样式与主题
@@ -232,11 +245,16 @@ ui.Column({
 - ✅ 导航组件：TabView, Breadcrumb, Pagination, Menu
 - ✅ 反馈组件：Dialog, Toast, Tooltip, Popover
 
+✅ **阶段四：状态管理系统（已完成）**
+- ✅ State 类：局部状态管理
+- ✅ ObservableState 类：响应式状态（自动触发 UI 更新）
+- ✅ GlobalState 类：全局状态管理
+- ✅ Computed 类：计算属性（依赖派生）
+
 ### 开发中
 
-🔨 **阶段四：状态管理与动画**
-- ⏳ 响应式状态管理系统
-- ⏳ 动画与过渡效果
+🔨 **阶段四：动画系统**
+- ⏳ 动画基类和过渡效果
 - ⏳ 手势与交互
 
 🔨 **阶段五：主题与样式系统**
@@ -247,7 +265,7 @@ ui.Column({
 - 阶段一 (第1-2周): 项目搭建与基础架构 ✅
 - 阶段二 (第3-4周): 基础组件库 ✅
 - 阶段三 (第5-6周): 高级组件与交互 ✅
-- 阶段四 (第7-8周): 状态管理与动画 🔨
+- 阶段四 (第7-8周): 状态管理与动画 ✅ (状态管理完成，动画待实现)
 - 阶段五 (第9周): 主题与样式系统 ⏳
 - 阶段六 (第10周): Old8Lang API 设计 ⏳
 - 阶段七 (第11周): 示例与文档 ⏳

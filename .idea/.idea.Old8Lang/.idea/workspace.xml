@@ -22,14 +22,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Card.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Dialog.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/ListView.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/ScrollView.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/TabView.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Toast.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Tooltip.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/Computed.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/GlobalState.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/IState.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/ObservableState.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/State/State.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Core/WidgetBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Core/WidgetBase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/TODO.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/TODO.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -517,7 +517,7 @@
       <workItem from="1766771063664" duration="16661000" />
       <workItem from="1766997021901" duration="12927000" />
       <workItem from="1767123773418" duration="15798000" />
-      <workItem from="1767204141752" duration="6512000" />
+      <workItem from="1767204141752" duration="7193000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -862,7 +862,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="480" />
+    <option name="localTasksCounter" value="482" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -889,8 +889,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(interpreter): 添加异步并发、文件头配置和交叉类型测试&#10;&#10;- 实现异步并发测试，验证多任务并发执行和同步协调&#10;- 添加文件头配置指令测试，覆盖debug、verify-il、type-inference等指令&#10;- 创建文件头元数据指令测试，验证encoding、author、version等指令&#10;- 编写交叉类型测试，测试泛型约束和接口组合功能&#10;- 覆盖异步异常处理、嵌套调用和并发数据访问场景&#10;- 包含配置指令边界情况和特殊值处理测试&#10;- 实现接口继承和复杂交叉类型组合测试" />
-    <MESSAGE value="test(interpreter): 添加异步和集合相关功能的单元测试&#10;&#10;- 新增 CancellationTokenTests 测试异步任务取消功能&#10;- 扩展 ListComprehensionTests 实现完整的列表推导式测试用例&#10;- 添加 NativeMethodBindingTests 测试本地方法绑定功能&#10;- 新增 TaskAdvancedTests 测试 TaskCompletionSource 和高级异步功能&#10;- 覆盖异步编程、列表推导式、本地方法绑定等核心功能的测试场景&#10;- 包含边界情况、错误处理和性能相关测试用例" />
     <MESSAGE value="feat(ast): 添加 CancellationTokenSource 构造函数超时参数支持&#10;&#10;- 实现 CancellationTokenSource 带超时时间的构造函数功能&#10;- 添加对 CancellationTokenSource(timeout) 语法的支持&#10;- 验证超时参数类型为整数类型的错误处理&#10;- 更新 LangValue 类型系统以支持带参数的构造函数&#10;- 移除过时的 NativeMethodBindingTests 测试类&#10;- 更新 IDE 工作区配置和任务计数器统计&#10;- 修改 VCS 提交历史记录和最后提交消息" />
     <MESSAGE value="test(interpreter): 更新异步任务测试实现&#10;&#10;- 替换 Thread.Start() 为 spawn() 和 Join() 等待机制&#10;- 修改失败任务测试函数返回 bool 类型并使用 Join() 获取结果&#10;- 简化取消令牌测试逻辑直接检查 IsCancellationRequested 属性&#10;- 重构多任务异常处理测试" />
     <MESSAGE value="feat(thread): 实现线程安全的锁变量和线程管理功能&#10;&#10;- 添加 LockedVariableLangValue 类型支持线程安全的变量访问&#10;- 实现 ThreadLangValue 的属性访问和修改功能（IsBackground、Name、Priority）&#10;- 添加 Thread.Start()、Join()、IsAlive() 等线程控制方法&#10;- 实现 Thread.CurrentThread 静态方法获取当前线程信息&#10;- 支持 ThreadStaticMethodWrapper 调用静态线程相关方法&#10;- 更新异步并发测试使用锁变量替代原始 lock 语句&#10;- 修改线程测试使用 Spawn 函数创建线程实例&#10;- 添加线程属性设置和获取的完整实现" />
@@ -914,7 +912,9 @@
     <MESSAGE value="test(StandardLibrary): 更新 CSV 解析测试以验证带引号的行解析&#10;&#10;- 修改测试代码以正确处理带引号的 CSV 行&#10;- 添加数组长度验证和遍历输出解析结果&#10;- 改进测试输出格式以显示每个解析项的索引和值&#10;- 确保 CSV 模块导入和解析逻辑正确执行" />
     <MESSAGE value="fix(runtime): 修复反射调用中的类型转换问题&#10;&#10;- 在 FuncLangValue 中添加类型转换逻辑处理可空类型和类型不匹配情况&#10;- 为 MethodInvokerCache 添加可选参数和可空类型特殊处理支持&#10;- 更新 NetLibTests 中的网络库测试用例和文件路径&#10;- 移除 SerializationLibTests 中的 Protobuf 相关测试&#10;- 在 UnifiedModule 中添加原生类实例化处理逻辑&#10;- 优化 LangValueType 中的 Task 类型检测方法&#10;- 更新 IDE 配置文件中的变更跟踪和任务统计信息" />
     <MESSAGE value="feat(components): 添加按钮组件和组件工厂方法&#10;&#10;- 实现 Button 组件，支持标签、点击事件、图标、样式变体、禁用状态等功能&#10;- 添加 Container 容器组件，支持内边距、外边距、背景色、边框、圆角等样式&#10;- 创建 Row 和 Column 布局组件，支持主轴和交叉轴对齐方式&#10;- 添加 Stack 层叠布局组件，支持子组件层叠放置&#10;- 实现 Image 图片组件，支持本地路径和 URL 图片加载&#10;- 添加 CallbackBridge 回调函数桥接器，管理 Old8Lang 函数和 C# 委托之间的桥接&#10;- 创建组件工厂方法，支持从 Old8Lang 字典配置创建各种组件&#10;- 添加 LayoutHelper 布局辅助工具，统一处理样式应用逻辑&#10;- 重构 FirstUIBinding 类，提供完整的组件创建和主题切换功能&#10;- 优化错误处理，添加堆栈跟踪信息和 UI 线程安全的 Toast 显示" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(components): 添加按钮组件和组件工厂方法&#10;&#10;- 实现 Button 组件，支持标签、点击事件、图标、样式变体、禁用状态等功能&#10;- 添加 Container 容器组件，支持内边距、外边距、背景色、边框、圆角等样式&#10;- 创建 Row 和 Column 布局组件，支持主轴和交叉轴对齐方式&#10;- 添加 Stack 层叠布局组件，支持子组件层叠放置&#10;- 实现 Image 图片组件，支持本地路径和 URL 图片加载&#10;- 添加 CallbackBridge 回调函数桥接器，管理 Old8Lang 函数和 C# 委托之间的桥接&#10;- 创建组件工厂方法，支持从 Old8Lang 字典配置创建各种组件&#10;- 添加 LayoutHelper 布局辅助工具，统一处理样式应用逻辑&#10;- 重构 FirstUIBinding 类，提供完整的组件创建和主题切换功能&#10;- 优化错误处理，添加堆栈跟踪信息和 UI 线程安全的 Toast 显示" />
+    <MESSAGE value="feat(components): 添加高级UI组件实现&#10;&#10;- 实现Card卡片组件，支持标题、副标题、圆角、边框、阴影等属性&#10;- 实现Dialog对话框组件，支持多种类型和自定义内容&#10;- 实现ListView列表视图组件，支持虚拟化滚动和分隔线&#10;- 实现ScrollView滚动容器组件，支持多方向滚动&#10;- 实现TabView选项卡视图组件，支持动态选项卡切换&#10;- 实现Toast消息提示组件，支持多种类型和位置&#10;- 移除旧的组件创建工厂方法和相关依赖引用" />
+    <MESSAGE value="feat(ui): 添加面包屑、复选框、网格视图、菜单、分页和弹出框组件&#10;&#10;- 实现 Breadcrumb 面包屑导航组件，支持自定义分隔符、颜色和点击事件&#10;- 实现 Checkbox 复选框组件，支持三态模式和链式调用配置&#10;- 实现 GridView 网格视图组件，支持自定义列数、间距和项构建器&#10;- 实现 Menu 菜单组件，支持垂直/水平方向、子菜单和选中状态&#10;- 实现 Pagination 分页组件，支持首页末页按钮、页码范围和总数显示&#10;- 实现 Popover 弹出框组件，支持多种触发方式和定位选项&#10;- 移除 benchmarks 项目中的冗余文件夹引用" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(ui): 添加面包屑、复选框、网格视图、菜单、分页和弹出框组件&#10;&#10;- 实现 Breadcrumb 面包屑导航组件，支持自定义分隔符、颜色和点击事件&#10;- 实现 Checkbox 复选框组件，支持三态模式和链式调用配置&#10;- 实现 GridView 网格视图组件，支持自定义列数、间距和项构建器&#10;- 实现 Menu 菜单组件，支持垂直/水平方向、子菜单和选中状态&#10;- 实现 Pagination 分页组件，支持首页末页按钮、页码范围和总数显示&#10;- 实现 Popover 弹出框组件，支持多种触发方式和定位选项&#10;- 移除 benchmarks 项目中的冗余文件夹引用" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

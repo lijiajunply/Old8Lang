@@ -69,6 +69,15 @@ public abstract class WidgetBase
     }
 
     /// <summary>
+    /// 重建组件（用于状态变化时触发）
+    /// </summary>
+    public virtual void Rebuild()
+    {
+        // 子类可以覆盖此方法实现重建逻辑
+        Update();
+    }
+
+    /// <summary>
     /// 链式调用：设置宽度
     /// </summary>
     public WidgetBase SetWidth(double width)

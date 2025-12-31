@@ -134,19 +134,19 @@
 
 ---
 
-## 阶段四：状态管理与动画 (第7-8周)
+## 阶段四：状态管理与动画 (第7-8周) ✅
 
-### 4.1 状态管理
-- [ ] 实现 `State` 类
+### 4.1 状态管理 ✅
+- [x] 实现 `State` 类
   - 管理组件局部状态
-- [ ] 实现 `ObservableState` 可观察状态
+- [x] 实现 `ObservableState` 可观察状态
   - 自动触发 UI 更新
-- [ ] 实现 `GlobalState` 全局状态管理
+- [x] 实现 `GlobalState` 全局状态管理
   - 类似 Flutter Provider / SwiftUI EnvironmentObject
-- [ ] 实现 `Computed` 计算属性
+- [x] 实现 `Computed` 计算属性
   - 基于其他状态派生新状态
 
-### 4.2 动画系统
+### 4.2 动画系统 ⏳
 - [ ] `Animation` 动画基类
   - 支持: 时长、缓动函数、循环
 - [ ] `Transition` 过渡动画
@@ -156,7 +156,7 @@
 - [ ] 预设动画效果库
   - 常用动画曲线 (easeIn, easeOut, spring 等)
 
-### 4.3 手势与交互
+### 4.3 手势与交互 ⏳
 - [ ] `GestureDetector` 手势检测
   - 支持: 点击、双击、长按、拖动、滑动
 - [ ] `Draggable` 可拖动组件
