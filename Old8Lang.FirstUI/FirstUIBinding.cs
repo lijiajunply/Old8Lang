@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using Old8Lang.FirstUI.Core;
+using Old8Lang.FirstUI.Theme;
 
 namespace Old8Lang.FirstUI;
 
@@ -23,7 +24,10 @@ public static class FirstUIBinding
         if (_app == null)
         {
             _app = new Application();
-            _context = new BuildContext();
+            _context = new BuildContext
+            {
+                Theme = ThemeManager.Instance.CurrentTheme
+            };
             Console.WriteLine("[FirstUI] Initialized");
         }
     }
@@ -54,8 +58,76 @@ public static class FirstUIBinding
     /// </summary>
     public static void SetTheme(string themeName)
     {
-        Console.WriteLine($"[FirstUI] Switching to theme: {themeName}");
-        // TODO: 实现主题切换逻辑
+        Dispatcher.UIThread.Post(() =>
+        {
+            Console.WriteLine($"[FirstUI] Switching to theme: {themeName}");
+            ThemeManager.Instance.SetTheme(themeName);
+
+            // 更新上下文中的主题
+            if (_context != null)
+            {
+                _context.Theme = ThemeManager.Instance.CurrentTheme;
+            }
+
+            // TODO: 触发 UI 重建
+        });
+    }
+
+    /// <summary>
+    /// 获取当前主题名称
+    /// </summary>
+    public static string GetCurrentTheme()
+    {
+        return ThemeManager.Instance.CurrentTheme.Name;
+    }
+
+    /// <summary>
+    /// 获取所有可用主题
+    /// </summary>
+    public static string[] GetAvailableThemes()
+    {
+        return ThemeManager.GetAvailableThemes();
+    }
+
+    /// <summary>
+    /// 切换浅色/深色主题
+    /// </summary>
+    public static void ToggleTheme()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            ThemeManager.Instance.ToggleTheme();
+
+            // 更新上下文中的主题
+            if (_context != null)
+            {
+                _context.Theme = ThemeManager.Instance.CurrentTheme;
+            }
+
+            Console.WriteLine($"[FirstUI] Theme toggled to: {ThemeManager.Instance.CurrentTheme.Name}");
+        });
+    }
+
+    /// <summary>
+    /// 注册主题变化监听器
+    /// </summary>
+    public static void OnThemeChanged(object callback)
+    {
+        if (callback != null)
+        {
+            ThemeManager.Instance.OnThemeChanged(theme =>
+            {
+                try
+                {
+                    var invokeMethod = callback.GetType().GetMethod("Invoke");
+                    invokeMethod?.Invoke(callback, new object[] { theme.Name });
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"[FirstUI] Error in theme change callback: {ex.Message}");
+                }
+            });
+        }
     }
 
     /// <summary>

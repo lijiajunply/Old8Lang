@@ -1,3 +1,5 @@
+using Old8Lang.FirstUI.Theme;
+
 namespace Old8Lang.FirstUI.Core;
 
 /// <summary>
@@ -60,64 +62,4 @@ public class BuildContext
     {
         _globalState.Remove(key);
     }
-}
-
-/// <summary>
-/// 主题数据
-/// </summary>
-public class ThemeData
-{
-    public string Name { get; set; } = "light";
-    public ColorScheme Colors { get; set; } = new();
-    public TypographyScheme Typography { get; set; } = new();
-    public SpacingScheme Spacing { get; set; } = new();
-}
-
-/// <summary>
-/// 颜色方案
-/// </summary>
-public class ColorScheme
-{
-    public string Primary { get; set; } = "#007AFF";
-    public string Secondary { get; set; } = "#5856D6";
-    public string Background { get; set; } = "#FFFFFF";
-    public string Surface { get; set; } = "#F2F2F7";
-    public string Error { get; set; } = "#FF3B30";
-    public string OnPrimary { get; set; } = "#FFFFFF";
-    public string OnBackground { get; set; } = "#000000";
-    public string OnSurface { get; set; } = "#000000";
-}
-
-/// <summary>
-/// 字体方案
-/// </summary>
-public class TypographyScheme
-{
-    public FontStyle H1 { get; set; } = new() { Size = 32, Weight = "bold" };
-    public FontStyle H2 { get; set; } = new() { Size = 28, Weight = "bold" };
-    public FontStyle H3 { get; set; } = new() { Size = 24, Weight = "bold" };
-    public FontStyle Body { get; set; } = new() { Size = 16, Weight = "normal" };
-    public FontStyle Caption { get; set; } = new() { Size = 12, Weight = "normal" };
-}
-
-/// <summary>
-/// 字体样式
-/// </summary>
-public class FontStyle
-{
-    public double Size { get; set; }
-    public string Weight { get; set; } = "normal";
-    public string Family { get; set; } = "sans-serif";
-}
-
-/// <summary>
-/// 间距方案
-/// </summary>
-public class SpacingScheme
-{
-    public double XSmall { get; set; } = 4;
-    public double Small { get; set; } = 8;
-    public double Medium { get; set; } = 16;
-    public double Large { get; set; } = 24;
-    public double XLarge { get; set; } = 32;
 }
