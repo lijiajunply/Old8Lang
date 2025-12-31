@@ -41,6 +41,8 @@ public partial class NullLangValue(SourcePosition position = default) : LangValu
         };
     }
 
+    public override object? GetValue() => null;
+
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         ilGenerator.Emit(OpCodes.Ldnull);

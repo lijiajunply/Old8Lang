@@ -34,7 +34,7 @@ PrintLine(""Database library imported"")
         var code = @"
 import Database
 
-conn <- Database.CreateInMemoryConnection(""testdb"")
+conn <- Database.CreateInMemoryConnection(""testdb_inmemory"")
 PrintLine($""In-memory database connection created"")
 ";
         CreateTempModuleFile("./StandardLibrary/database_inmemory_test.old8", code);
@@ -49,7 +49,7 @@ PrintLine($""In-memory database connection created"")
         var code = @"
 import Database
 
-conn <- Database.CreateInMemoryConnection(""testdb"")
+conn <- Database.CreateInMemoryConnection(""testdb_createtable"")
 Database.OpenConnection(conn)
 
 createTableSql <- ""CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)""
@@ -70,7 +70,7 @@ Database.CloseConnection(conn)
         var code = @"
 import Database
 
-conn <- Database.CreateInMemoryConnection(""testdb"")
+conn <- Database.CreateInMemoryConnection(""testdb_insert"")
 Database.OpenConnection(conn)
 
 // Create table
@@ -95,7 +95,7 @@ Database.CloseConnection(conn)
         var code = @"
 import Database
 
-conn <- Database.CreateInMemoryConnection(""testdb"")
+conn <- Database.CreateInMemoryConnection(""testdb_query"")
 Database.OpenConnection(conn)
 
 // Create and populate table
@@ -122,7 +122,7 @@ Database.CloseConnection(conn)
         var code = @"
 import Database
 
-conn <- Database.CreateInMemoryConnection(""testdb"")
+conn <- Database.CreateInMemoryConnection(""testdb_scalar"")
 Database.OpenConnection(conn)
 
 // Create and populate table
@@ -149,7 +149,7 @@ Database.CloseConnection(conn)
         var code = @"
 import Database
 
-conn <- Database.CreateInMemoryConnection(""testdb"")
+conn <- Database.CreateInMemoryConnection(""testdb_commit"")
 Database.OpenConnection(conn)
 
 // Create table
@@ -177,7 +177,7 @@ Database.CloseConnection(conn)
         var code = @"
 import Database
 
-conn <- Database.CreateInMemoryConnection(""testdb"")
+conn <- Database.CreateInMemoryConnection(""testdb_rollback"")
 Database.OpenConnection(conn)
 
 // Create table
@@ -204,7 +204,7 @@ Database.CloseConnection(conn)
         var code = @"
 import Database
 
-conn <- Database.CreateInMemoryConnection(""testdb"")
+conn <- Database.CreateInMemoryConnection(""testdb_clear"")
 Database.OpenConnection(conn)
 
 // Create and populate table
@@ -229,7 +229,7 @@ Database.CloseConnection(conn)
         var code = @"
 import Database
 
-conn <- Database.CreateInMemoryConnection(""testdb"")
+conn <- Database.CreateInMemoryConnection(""testdb_reset"")
 Database.OpenConnection(conn)
 
 // Create table
@@ -253,7 +253,7 @@ Database.CloseConnection(conn)
         var code = @"
 import Database
 
-conn <- Database.CreateInMemoryConnection(""testdb"")
+conn <- Database.CreateInMemoryConnection(""testdb_stats"")
 Database.OpenConnection(conn)
 
 // Create and populate table
@@ -278,7 +278,7 @@ Database.CloseConnection(conn)
         var code = @"
 import Database
 
-conn <- Database.CreateInMemoryConnection(""testdb"")
+conn <- Database.CreateInMemoryConnection(""testdb_orm"")
 Database.OpenConnection(conn)
 
 orm <- Database.CreateOrm(conn)

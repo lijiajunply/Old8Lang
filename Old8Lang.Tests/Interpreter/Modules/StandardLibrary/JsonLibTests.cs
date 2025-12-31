@@ -51,7 +51,7 @@ PrintLine($""JSON: {json}"")
 import Json
 
 json <- ""{\""name\"":\""Bob\"",\""age\"":25}""
-data <- Json.Deserialize(json)
+data <- Json.DeserializeDynamic(json)
 PrintLine($""JSON: {json}"")
 PrintLine($""Data: {data}"")
 ";
@@ -69,7 +69,7 @@ import Json
 
 original <- {""product"": ""Laptop"", ""price"": 999.99, ""inStock"": true}
 json <- Json.Serialize(original)
-restored <- Json.Deserialize(json)
+restored <- Json.DeserializeDynamic(json)
 PrintLine($""Original: {original}"")
 PrintLine($""JSON: {json}"")
 PrintLine($""Restored: {restored}"")

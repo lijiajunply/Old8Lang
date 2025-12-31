@@ -286,6 +286,11 @@ public class FuncLangValue : ImportInfo
 
                     adjustedParams[i] = array;
                 }
+                // 如果值为 null 且目标是可空类型，直接赋 null
+                else if (value == null && targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
+                    adjustedParams[i] = null;
+                }
                 // 如果值不为 null 且类型不匹配，尝试类型转换
                 else if (value != null && !targetType.IsAssignableFrom(value.GetType()))
                 {

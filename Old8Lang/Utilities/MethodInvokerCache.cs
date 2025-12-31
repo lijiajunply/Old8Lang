@@ -43,8 +43,30 @@ public static class MethodInvokerCache
             var paramType = methodParams[i].ParameterType;
             // args[i]
             var argAccess = Expression.ArrayIndex(argsParam, Expression.Constant(i));
-            // 类型转换 (TParam)args[i]
-            argExpressions[i] = Expression.Convert(argAccess, paramType);
+
+            // 对可空类型进行特殊处理
+            if (paramType.IsGenericType && paramType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                // 可空类型：使用 ConvertChecked 并添加 null 检查
+                // argAccess == null ? default(T?) : new T?((T)argAccess)
+                var underlyingType = Nullable.GetUnderlyingType(paramType)!;
+                var nullCheck = Expression.Equal(argAccess, Expression.Constant(null, typeof(object)));
+
+                // 为 null 的情况：返回 default(T?)
+                var nullValue = Expression.Constant(null, paramType);
+
+                // 不为 null 的情况：先转换到 underlying type，再构造可空类型
+                // 使用 UnboxOrCastOrBox 来处理类型转换
+                Expression unboxed = Expression.Convert(argAccess, underlyingType);
+                Expression convertValue = Expression.Convert(unboxed, paramType);
+
+                argExpressions[i] = Expression.Condition(nullCheck, nullValue, convertValue);
+            }
+            else
+            {
+                // 普通类型转换 (TParam)args[i]
+                argExpressions[i] = Expression.Convert(argAccess, paramType);
+            }
         }
 
         // 方法调用表达式
