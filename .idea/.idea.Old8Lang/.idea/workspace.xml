@@ -22,18 +22,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/Components.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Core/GlobalState.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Examples/SimpleHelloWorld.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Layout/Layout.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/AsyncLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/CryptoLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/CsvTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/FileLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/JsonLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/MathLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/OSTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/RegexLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/SortLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/TerminalTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/TimeTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Core/WidgetBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Core/WidgetBase.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Examples/Counter.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Examples/Counter.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Examples/HelloWorld.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Examples/HelloWorld.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/StandardLibraryImportTests.cs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -882,7 +883,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="465" />
+    <option name="localTasksCounter" value="466" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -909,7 +910,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(classes): 为类测试添加顺序集合标记并重命名处理器类&#10;&#10;- 为 ClassDeclarationTests、ClassInstantiationTests、ConstructorTests、GenericClassTests、&#10;  InheritanceTests、InterfaceTests、MemberAccessTests 和 MixinTests 添加 [Collection(&quot;Sequential&quot;)] 标记&#10;- 将 ConstructorTests 中的 Processor 类重命名为 FunctionProcessor 以提高语义清晰度&#10;- 更新 ConstructorTests 中的实例化代码以使用新的 FunctionProcessor 类名&#10;- 从 workspace.xml 中移除过时的变更记录并更新本地任务计数器&#10;- 清理 workspace.xml 中的提交消息历史记录" />
     <MESSAGE value="test(interpreter): 为模块导入测试添加顺序集合标记并修复代码格式&#10;&#10;- 为 DynamicImportTests、LazyImportTests、RealWorldUsageTests 和 SimpleImportTests 添加 [Collection(&quot;Sequential&quot;)] 标记&#10;- 修复 SimpleImportTests 中多行字符串字面量的缩进格式问题&#10;- 更新 workspace.xml 中的变更记录和本地任务计数器&#10;- 清理 workspace.xml 中的过时提交消息历史记录&#10;- 修复断点位置因代码格式调整而产生的偏移" />
     <MESSAGE value="feat(module): 实现模块函数作用域捕获机制&#10;&#10;- 在 FuncLangValue 中添加 CreateWithCapturedScope 方法用于创建带捕获作用域的函数副本&#10;- 重构 UnifiedModule 实现模块隔离作用域，避免符号污染父作用域&#10;- 为导入的函数设置捕获作用域，确保模块内函数可访问模块变量&#10;- 保存初始 VariateManager 用于懒加载时的上下文恢复&#10;- 修复 SpawnTests 中的断点位置偏移问题&#10;- 更新 IDE 配置和测试会话设置" />
     <MESSAGE value="feat(parser): 添加LINQ查询表达式支持&#10;&#10;- 实现了FromClause、WhereClause、SelectClause等LINQ子句AST节点&#10;- 添加了OrderByClause、GroupByClause、JoinClause、LetClause等高级子句&#10;- 扩展LangTokenType枚举以支持LINQ相关关键字（select、orderby、group等）&#10;- 更新词法分析器以正确识别LINQ关键字并建立关键字到TokenType的映射&#10;- 集成LinqParser到主解析器中处理LINQ查询表达式解析&#10;- 创建LINQ基础语法和高级功能的测试用例文件&#10;- 实现LINQ查询的基础执行和边界情况处理测试" />
@@ -934,7 +934,8 @@
     <MESSAGE value="feat(char): 添加字符类型扩展方法支持&#10;&#10;- 实现 CharValueFuncStatic 类提供字符大小写转换功能&#10;- 添加 ToUpper() 方法将字符转换为大写&#10;- 添加 ToLower() 方法将字符转换为小写&#10;- 在 Instance.cs 中为 CharLangValue 类型注册扩展方法&#10;- 修复 LangValueType.cs 中数值类型转换问题&#10;- 移除过时的 NativeMethodBindingTests 测试文件&#10;- 更新 TaskAdvancedTests 中线程启动逻辑&#10;- 移除过时的 ThreadSynchronizationTests 测试文件&#10;- 更新 IDE 工作区配置和断点位置信息" />
     <MESSAGE value="feat(database): 扩展ORM包装器功能支持非泛型操作和自增主键处理&#10;&#10;- 修改Insert方法排除主键字段并添加自增主键值回填功能&#10;- 添加非泛型Insert、Update、Delete方法支持运行时类型处理&#10;- 实现自增主键检测和最后插入ID获取机制&#10;- 修复批量插入操作排除主键字段的问题&#10;- 更新IDE工作区配置和项目元数据" />
     <MESSAGE value="feat(firstui): 初始化 Old8Lang.FirstUI 项目架构&#10;&#10;- 添加架构设计文档，定义三层架构（绑定层、核心层、组件层）&#10;- 实现 BuildContext 上下文类，提供主题、状态管理等功能&#10;- 创建 FirstUIBinding 绑定类，提供 Old8Lang 语言调用入口点&#10;- 添加 StateManager 状态管理器和 ObservableState 响应式状态类&#10;- 创建 HelloWorld 和 Counter 示例应用展示基本功能&#10;- 配置项目文件和解决方案，集成 Avalonia UI 框架&#10;- 添加 README.md 项目说明文档和 TODO 开发计划&#10;- 实现基本的主题系统和组件构建上下文环境" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(firstui): 初始化 Old8Lang.FirstUI 项目架构&#10;&#10;- 添加架构设计文档，定义三层架构（绑定层、核心层、组件层）&#10;- 实现 BuildContext 上下文类，提供主题、状态管理等功能&#10;- 创建 FirstUIBinding 绑定类，提供 Old8Lang 语言调用入口点&#10;- 添加 StateManager 状态管理器和 ObservableState 响应式状态类&#10;- 创建 HelloWorld 和 Counter 示例应用展示基本功能&#10;- 配置项目文件和解决方案，集成 Avalonia UI 框架&#10;- 添加 README.md 项目说明文档和 TODO 开发计划&#10;- 实现基本的主题系统和组件构建上下文环境" />
+    <MESSAGE value="feat(firstui): 实现 FirstUI 基础组件和应用框架&#10;&#10;- 添加 Text 和 Button 基础组件，支持文本显示和按钮点击功能&#10;- 实现 Container 和 Column 布局组件，提供容器和垂直布局支持&#10;- 添加全局状态管理功能，支持状态监听和计算属性&#10;- 重构 FirstUIBinding 绑定类，实现组件创建和应用运行逻辑&#10;- 更新示例应用使用新的组件创建方式，替换原有的链式调用&#10;- 添加项目引用和标准库注册，集成 FirstUI 到主应用程序&#10;- 扩展 WidgetBase 基类，添加边距、内边距和可见性设置功能" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(firstui): 实现 FirstUI 基础组件和应用框架&#10;&#10;- 添加 Text 和 Button 基础组件，支持文本显示和按钮点击功能&#10;- 实现 Container 和 Column 布局组件，提供容器和垂直布局支持&#10;- 添加全局状态管理功能，支持状态监听和计算属性&#10;- 重构 FirstUIBinding 绑定类，实现组件创建和应用运行逻辑&#10;- 更新示例应用使用新的组件创建方式，替换原有的链式调用&#10;- 添加项目引用和标准库注册，集成 FirstUI 到主应用程序&#10;- 扩展 WidgetBase 基类，添加边距、内边距和可见性设置功能" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1189,45 +1190,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="595" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/StandardLibraryImportTests.cs</url>
-          <line>124</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/StandardLibraryImportTests.cs" containingFunctionPresentation="方法 'Import_CollectionLib_Library_ShouldWorkCorrectly'">
-            <startOffsets>
-              <option value="3664" />
-            </startOffsets>
-            <endOffsets>
-              <option value="3687" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="597" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/StandardLibraryImportTests.cs</url>
-          <line>112</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/StandardLibraryImportTests.cs" containingFunctionPresentation="方法 'Import_Json_Library_ShouldWorkCorrectly'">
-            <startOffsets>
-              <option value="3268" />
-            </startOffsets>
-            <endOffsets>
-              <option value="3331" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="610" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/StandardLibraryImportTests.cs</url>
-          <line>113</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/StandardLibraryImportTests.cs" containingFunctionPresentation="方法 'Import_Json_Library_ShouldWorkCorrectly'">
-            <startOffsets>
-              <option value="3340" />
-            </startOffsets>
-            <endOffsets>
-              <option value="3364" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="611" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/EdgeCases/ExtremeValuesTests.cs</url>
