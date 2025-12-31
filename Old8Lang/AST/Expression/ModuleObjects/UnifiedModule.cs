@@ -370,6 +370,15 @@ public class UnifiedModule(
             return asyncFuncValue.RunAsync(currentManager, instance.Ids);
         }
 
+        if (func is NativeAnyLangValue nativeAnyValue)
+        {
+            // Handle native class instantiation
+            List<LangValueType> args = [];
+            args.AddRange(instance.Ids.Select(id => id.Run(currentManager)));
+            nativeAnyValue.New([.. Apis.ListToObjects(args)]);
+            return nativeAnyValue;
+        }
+
         throw new AttributeError(this, functionName, ModuleName);
     }
 

@@ -262,7 +262,8 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
         }
 
         // 处理 Task 和 Task<T> 类型
-        if (valueType.Name is "Task`1" or "Task")
+        // 使用更可靠的方法检测 Task 类型（包括 Task 的内部实现类型）
+        if (typeof(Task).IsAssignableFrom(valueType))
         {
             return HandleTaskConversion(value, position);
         }

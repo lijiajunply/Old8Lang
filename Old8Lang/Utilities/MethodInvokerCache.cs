@@ -40,32 +40,90 @@ public static class MethodInvokerCache
         // 构建参数访问表达式
         for (int i = 0; i < methodParams.Length; i++)
         {
-            var paramType = methodParams[i].ParameterType;
-            // args[i]
-            var argAccess = Expression.ArrayIndex(argsParam, Expression.Constant(i));
+            var paramInfo = methodParams[i];
+            var paramType = paramInfo.ParameterType;
 
-            // 对可空类型进行特殊处理
-            if (paramType.IsGenericType && paramType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            // 检查参数是否是可选的
+            bool isOptional = paramInfo.IsOptional || paramInfo.HasDefaultValue;
+
+            // 检查参数索引是否在 args 数组范围内
+            // 如果参数是可选的且 args 数组不够长，使用默认值
+            if (isOptional)
             {
-                // 可空类型：使用 ConvertChecked 并添加 null 检查
-                // argAccess == null ? default(T?) : new T?((T)argAccess)
-                var underlyingType = Nullable.GetUnderlyingType(paramType)!;
-                var nullCheck = Expression.Equal(argAccess, Expression.Constant(null, typeof(object)));
+                // args != null && args.Length > i ? args[i] : defaultValue
+                var argsNotNull = Expression.NotEqual(argsParam, Expression.Constant(null, typeof(object?[])));
+                var argsLength = Expression.Property(argsParam, "Length");
+                var indexInBounds = Expression.GreaterThan(argsLength, Expression.Constant(i));
+                var canAccessArg = Expression.AndAlso(argsNotNull, indexInBounds);
 
-                // 为 null 的情况：返回 default(T?)
-                var nullValue = Expression.Constant(null, paramType);
+                // 获取参数的默认值
+                var defaultValue = paramInfo.HasDefaultValue ? paramInfo.DefaultValue : null;
+                var defaultExpr = Expression.Constant(defaultValue, typeof(object));
 
-                // 不为 null 的情况：先转换到 underlying type，再构造可空类型
-                // 使用 UnboxOrCastOrBox 来处理类型转换
-                Expression unboxed = Expression.Convert(argAccess, underlyingType);
-                Expression convertValue = Expression.Convert(unboxed, paramType);
+                // args[i]
+                var argAccess = Expression.ArrayIndex(argsParam, Expression.Constant(i));
 
-                argExpressions[i] = Expression.Condition(nullCheck, nullValue, convertValue);
+                // 如果可以访问参数，使用 args[i]，否则使用默认值
+                var valueExpr = Expression.Condition(canAccessArg, argAccess, defaultExpr);
+
+                // 对可空类型进行特殊处理
+                if (paramType.IsGenericType && paramType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
+                    // 可空类型：使用 ConvertChecked 并添加 null 检查
+                    var underlyingType = Nullable.GetUnderlyingType(paramType)!;
+                    var nullCheck = Expression.Equal(valueExpr, Expression.Constant(null, typeof(object)));
+
+                    // 为 null 的情况：返回 default(T?)
+                    var nullValue = Expression.Constant(null, paramType);
+
+                    // 不为 null 的情况：先转换到 underlying type，再构造可空类型
+                    Expression unboxed = Expression.Convert(valueExpr, underlyingType);
+                    Expression convertValue = Expression.Convert(unboxed, paramType);
+
+                    argExpressions[i] = Expression.Condition(nullCheck, nullValue, convertValue);
+                }
+                else if (paramType.IsValueType)
+                {
+                    // 值类型：需要特殊处理 null 到默认值的转换
+                    var nullCheck = Expression.Equal(valueExpr, Expression.Constant(null, typeof(object)));
+                    var defaultValueExpr = Expression.Default(paramType);
+                    var convertedExpr = Expression.Convert(valueExpr, paramType);
+                    argExpressions[i] = Expression.Condition(nullCheck, defaultValueExpr, convertedExpr);
+                }
+                else
+                {
+                    // 普通引用类型转换
+                    argExpressions[i] = Expression.Convert(valueExpr, paramType);
+                }
             }
             else
             {
-                // 普通类型转换 (TParam)args[i]
-                argExpressions[i] = Expression.Convert(argAccess, paramType);
+                // 非可选参数，直接访问 args[i]
+                var argAccess = Expression.ArrayIndex(argsParam, Expression.Constant(i));
+
+                // 对可空类型进行特殊处理
+                if (paramType.IsGenericType && paramType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
+                    // 可空类型：使用 ConvertChecked 并添加 null 检查
+                    // argAccess == null ? default(T?) : new T?((T)argAccess)
+                    var underlyingType = Nullable.GetUnderlyingType(paramType)!;
+                    var nullCheck = Expression.Equal(argAccess, Expression.Constant(null, typeof(object)));
+
+                    // 为 null 的情况：返回 default(T?)
+                    var nullValue = Expression.Constant(null, paramType);
+
+                    // 不为 null 的情况：先转换到 underlying type，再构造可空类型
+                    // 使用 UnboxOrCastOrBox 来处理类型转换
+                    Expression unboxed = Expression.Convert(argAccess, underlyingType);
+                    Expression convertValue = Expression.Convert(unboxed, paramType);
+
+                    argExpressions[i] = Expression.Condition(nullCheck, nullValue, convertValue);
+                }
+                else
+                {
+                    // 普通类型转换 (TParam)args[i]
+                    argExpressions[i] = Expression.Convert(argAccess, paramType);
+                }
             }
         }
 

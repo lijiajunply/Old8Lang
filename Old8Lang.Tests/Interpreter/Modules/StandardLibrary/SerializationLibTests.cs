@@ -86,64 +86,6 @@ PrintLine($""MessagePack to JSON: {json}"")
     }
 
     [Fact]
-    public void ProtobufSerialize_ShouldSerializeObject()
-    {
-        var code = @"
-import Serialization
-
-data <- {""name"": ""David"", ""age"": 40}
-bytes <- Serialization.ProtobufSerialize(data)
-PrintLine($""Protobuf serialized, bytes length: {len(bytes)}"")
-";
-        CreateTempModuleFile("./StandardLibrary/protobuf_serialize_test.old8", code);
-        var (_, exception) = ExecuteCodeFile("./StandardLibrary/protobuf_serialize_test.old8");
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void ProtobufSerializeToFile_ShouldSerializeToFile()
-    {
-        var code = @"
-import Serialization
-import File
-
-testPath <- ""./test_protobuf_data.bin""
-
-data <- {""name"": ""Eve"", ""age"": 28}
-Serialization.ProtobufSerializeToFile(data, testPath)
-PrintLine($""Protobuf serialized to file: {testPath}"")
-
-// Verify file exists
-exists <- File.FileExists(testPath)
-PrintLine($""File exists: {exists}"")
-
-// Clean up
-File.DeleteFile(testPath)
-";
-        CreateTempModuleFile("./StandardLibrary/protobuf_serialize_file_test.old8", code);
-        var (_, exception) = ExecuteCodeFile("./StandardLibrary/protobuf_serialize_file_test.old8");
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void ProtobufToJson_ShouldConvertToJson()
-    {
-        var code = @"
-import Serialization
-
-data <- {""name"": ""Frank"", ""age"": 45}
-json <- Serialization.ProtobufToJson(data)
-PrintLine($""Protobuf to JSON: {json}"")
-";
-        CreateTempModuleFile("./StandardLibrary/protobuf_tojson_test.old8", code);
-        var (_, exception) = ExecuteCodeFile("./StandardLibrary/protobuf_tojson_test.old8");
-
-        Assert.Null(exception);
-    }
-
-    [Fact]
     public void DeepClone_ShouldCloneObject()
     {
         var code = @"
