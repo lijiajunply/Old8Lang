@@ -268,18 +268,20 @@ ui.Column({
 - ✅ StyleSheet 样式表：预定义和自定义样式支持
 - ✅ FirstUIBinding API 集成：SetTheme, GetCurrentTheme, ToggleTheme 等
 
-### 开发中
+✅ **手势与交互系统（已完成）**
+- ✅ GestureDetector 手势检测器：支持单击、双击、长按、拖动、滑动
+- ✅ Draggable 可拖动组件：支持轴限制、拖动反馈、数据传递
+- ✅ DropTarget 拖放目标：支持数据类型过滤、悬停高亮
+- ✅ 完整的手势事件数据（GestureEventData, DragDropData）
+- ✅ FirstUIBinding 集成：CreateGestureDetector, CreateDraggable, CreateDropTarget
 
-🔨 **阶段五：手势与交互**
-- ⏳ 手势检测（GestureDetector）
-- ⏳ 可拖动组件（Draggable）
-- ⏳ 拖放目标（DropTarget）
+### 开发中
 
 预计开发周期：**13周**
 - 阶段一 (第1-2周): 项目搭建与基础架构 ✅
 - 阶段二 (第3-4周): 基础组件库 ✅
 - 阶段三 (第5-6周): 高级组件与交互 ✅
-- 阶段四 (第7-8周): 状态管理与动画 ✅
+- 阶段四 (第7-8周): 状态管理与动画 + 手势系统 ✅
 - 阶段五 (第9周): 主题与样式系统 ✅
 - 阶段六 (第10周): Old8Lang API 设计 ⏳
 - 阶段七 (第11周): 示例与文档 ⏳

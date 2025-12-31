@@ -23,34 +23,34 @@
 ## 阶段一：项目搭建与基础架构 (第1-2周)
 
 ### 1.1 创建项目结构
-- [ ] 创建 `Old8Lang.FirstUI` C# 类库项目
-- [ ] 配置项目文件 (.csproj)
+- [x] 创建 `Old8Lang.FirstUI` C# 类库项目
+- [x] 配置项目文件 (.csproj)
   - 添加 Avalonia.Desktop NuGet 包 (11.x)
   - 添加 Avalonia.Themes.Fluent
   - 引用 Old8Lang 核心项目
-- [ ] 更新 Old8Lang.sln 解决方案文件
-- [ ] 设置项目输出目录配置
+- [x] 更新 Old8Lang.sln 解决方案文件
+- [x] 设置项目输出目录配置
 
 ### 1.2 核心抽象层设计
-- [ ] 设计 `WidgetBase` 抽象基类
+- [x] 设计 `WidgetBase` 抽象基类
   - 封装 Avalonia Control 的通用属性
   - 提供统一的构建接口
-- [ ] 设计 `BuildContext` 上下文类
+- [x] 设计 `BuildContext` 上下文类
   - 管理构建时的状态和环境信息
-- [ ] 设计 `StateManager` 状态管理器
+- [x] 设计 `StateManager` 状态管理器
   - 实现响应式状态绑定机制
   - 提供状态变化通知
-- [ ] 设计 `WidgetTree` 组件树管理
+- [x] 设计 `WidgetTree` 组件树管理
   - 管理组件层次结构
   - 处理组件更新和重建
 
 ### 1.3 Old8Lang 绑定层
-- [ ] 创建 `FirstUIBinding` 静态类
+- [x] 创建 `FirstUIBinding` 静态类
   - 提供给 Old8Lang 调用的公共 API
-- [ ] 实现类型转换辅助函数
+- [x] 实现类型转换辅助函数
   - Old8Lang 对象 ↔ C# 对象映射
   - 处理字典、列表等集合类型
-- [ ] 设计回调函数桥接机制
+- [x] 设计回调函数桥接机制
   - Old8Lang 函数 → C# 委托转换
 
 ---
@@ -157,11 +157,27 @@
 - [x] `AnimatedContainer` 动画容器
   - 属性变化自动过渡（宽度、高度、不透明度、背景色）
 
-### 4.3 手势与交互 ⏳
-- [ ] `GestureDetector` 手势检测
+### 4.3 手势与交互 ✅
+- [x] `GestureDetector` 手势检测
   - 支持: 点击、双击、长按、拖动、滑动
-- [ ] `Draggable` 可拖动组件
-- [ ] `DropTarget` 拖放目标
+  - 可自定义阈值和延迟参数
+- [x] `Draggable` 可拖动组件
+  - 支持轴限制（水平/垂直/无限制）
+  - 拖动反馈效果（半透明、阴影）
+  - 数据传递
+- [x] `DropTarget` 拖放目标
+  - 支持数据类型过滤
+  - 悬停高亮效果
+  - 完整的拖放事件回调
+- [x] 手势数据结构
+  - GestureEventData: 手势事件数据
+  - DragDropData: 拖放数据
+  - GestureType, SwipeDirection 等枚举
+- [x] FirstUIBinding 集成
+  - CreateGestureDetector, CreateDraggable, CreateDropTarget
+  - 回调包装方法
+- [x] 示例文档
+  - Examples/GestureExample.md
 
 ---
 

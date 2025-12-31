@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using Old8Lang.FirstUI.Core;
 using Old8Lang.FirstUI.Theme;
+using Old8Lang.FirstUI.Gesture;
 
 namespace Old8Lang.FirstUI;
 
@@ -128,6 +129,89 @@ public static class FirstUIBinding
                 }
             });
         }
+    }
+
+    // ======== 手势相关 API ========
+
+    /// <summary>
+    /// 创建手势检测器
+    /// </summary>
+    public static GestureDetector CreateGestureDetector(WidgetBase child)
+    {
+        return new GestureDetector { Child = child };
+    }
+
+    /// <summary>
+    /// 创建可拖动组件
+    /// </summary>
+    public static Draggable CreateDraggable(WidgetBase child)
+    {
+        return new Draggable { Child = child };
+    }
+
+    /// <summary>
+    /// 创建拖放目标
+    /// </summary>
+    public static DropTarget CreateDropTarget(WidgetBase child)
+    {
+        return new DropTarget { Child = child };
+    }
+
+    /// <summary>
+    /// 包装 Old8Lang 回调为 GestureEventData 回调
+    /// </summary>
+    public static Action<GestureEventData> WrapGestureCallback(object callback)
+    {
+        return (data) =>
+        {
+            try
+            {
+                var invokeMethod = callback.GetType().GetMethod("Invoke");
+                invokeMethod?.Invoke(callback, new object[] { data });
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[FirstUI] Error in gesture callback: {ex.Message}");
+            }
+        };
+    }
+
+    /// <summary>
+    /// 包装 Old8Lang 回调为 DragDropData 回调
+    /// </summary>
+    public static Action<DragDropData> WrapDragDropCallback(object callback)
+    {
+        return (data) =>
+        {
+            try
+            {
+                var invokeMethod = callback.GetType().GetMethod("Invoke");
+                invokeMethod?.Invoke(callback, new object[] { data });
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[FirstUI] Error in drag-drop callback: {ex.Message}");
+            }
+        };
+    }
+
+    /// <summary>
+    /// 包装 Old8Lang 简单回调
+    /// </summary>
+    public static Action WrapSimpleCallback(object callback)
+    {
+        return () =>
+        {
+            try
+            {
+                var invokeMethod = callback.GetType().GetMethod("Invoke");
+                invokeMethod?.Invoke(callback, null);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[FirstUI] Error in callback: {ex.Message}");
+            }
+        };
     }
 
     /// <summary>
