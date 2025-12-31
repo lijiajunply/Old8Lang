@@ -22,8 +22,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/NetLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/NetLibTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/SerializationLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/SerializationLibTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/Button.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/Image.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/Text.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/TextInput.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Layout/Container.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Layout/RowColumn.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Layout/Stack.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Utils/CallbackBridge.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Utils/LayoutHelper.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Utils/TypeConverter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/Components.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Layout/Layout.cs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,10 +82,15 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/DatabaseLibTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/JsonLibTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/NetLibTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/NetLibTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/SerializationLibTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/SerializationLibTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/SerializationLibTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/SerializationLibTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/LangValueType.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
@@ -84,6 +101,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/CharValueFuncStatic.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Utilities/MethodInvokerCache.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Utilities/MethodInvokerCache.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Utilities/MethodInvokerCache.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
@@ -504,7 +522,7 @@
       <workItem from="1766771063664" duration="16661000" />
       <workItem from="1766997021901" duration="12927000" />
       <workItem from="1767123773418" duration="15798000" />
-      <workItem from="1767204141752" duration="4725000" />
+      <workItem from="1767204141752" duration="6052000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -849,7 +867,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="478" />
+    <option name="localTasksCounter" value="479" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -876,7 +894,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(compiler): 添加异步函数和边界情况测试&#10;&#10;- 实现异步函数基础测试，验证基本异步功能编译和执行&#10;- 添加异步生成器测试，验证 async/await 语法正确性&#10;- 创建 await 关键字测试，覆盖各种异步场景&#10;- 添加边界测试用例，包括空输入、极大值、深度嵌套等场景&#10;- 实现错误处理测试，验证零除法、异常捕获等边界情况&#10;- 添加复杂布尔表达式和递归测试用例" />
     <MESSAGE value="feat(tests): 添加编译器模式测试报告和异步功能测试&#10;&#10;- 创建2025-12-31编译器测试完成报告，记录测试创建阶段完成情况&#10;- 添加15个新的编译器模式测试文件，覆盖异常处理、边界条件、高级函数等7个类别&#10;- 实现异步函数编译器测试，包括基础异步函数、返回值、多调用等场景&#10;- 新增异步生成器测试，涵盖字符串生成、条件生成、嵌套生成等功能&#10;- 完善异步编程测试覆盖，包含错误处理、循环、条件执行等多种情况&#10;- 建立全面的编译器模式测试套件，显著提升测试覆盖率" />
     <MESSAGE value="test(interpreter): 添加异步并发、文件头配置和交叉类型测试&#10;&#10;- 实现异步并发测试，验证多任务并发执行和同步协调&#10;- 添加文件头配置指令测试，覆盖debug、verify-il、type-inference等指令&#10;- 创建文件头元数据指令测试，验证encoding、author、version等指令&#10;- 编写交叉类型测试，测试泛型约束和接口组合功能&#10;- 覆盖异步异常处理、嵌套调用和并发数据访问场景&#10;- 包含配置指令边界情况和特殊值处理测试&#10;- 实现接口继承和复杂交叉类型组合测试" />
     <MESSAGE value="test(interpreter): 添加异步和集合相关功能的单元测试&#10;&#10;- 新增 CancellationTokenTests 测试异步任务取消功能&#10;- 扩展 ListComprehensionTests 实现完整的列表推导式测试用例&#10;- 添加 NativeMethodBindingTests 测试本地方法绑定功能&#10;- 新增 TaskAdvancedTests 测试 TaskCompletionSource 和高级异步功能&#10;- 覆盖异步编程、列表推导式、本地方法绑定等核心功能的测试场景&#10;- 包含边界情况、错误处理和性能相关测试用例" />
@@ -901,7 +918,8 @@
     <MESSAGE value="fix(runtime): 修复反射调用中的类型转换问题&#10;&#10;- 在 FuncLangValue 中添加类型转换逻辑处理可空类型和类型不匹配情况&#10;- 为 DatabaseLibTests 添加顺序集合属性确保测试执行顺序&#10;- 更新 SerializationLibTests 中的数组长度获取语法从 Length 属性改为 len 函数&#10;- 简化 ConditionalImportTests 的构造函数实现&#10;- 优化 IDE 配置文件中的文件高亮设置和任务计数统计" />
     <MESSAGE value="fix(runtime): 修复反射调用中的类型转换问题&#10;&#10;- 在 FuncLangValue 中添加类型转换逻辑处理可空类型和类型不匹配情况&#10;- 为 MethodInvokerCache 添加可空类型特殊处理支持&#10;- 更新 DatabaseLibTests 中的数据库连接字符串参数&#10;- 将 JsonLibTests 中的 Deserialize 方法替换为 DeserializeDynamic&#10;- 为 NullLangValue 添加 GetValue 方法实现&#10;- 更新 IDE 配置文件中的变更跟踪和任务统计信息" />
     <MESSAGE value="test(StandardLibrary): 更新 CSV 解析测试以验证带引号的行解析&#10;&#10;- 修改测试代码以正确处理带引号的 CSV 行&#10;- 添加数组长度验证和遍历输出解析结果&#10;- 改进测试输出格式以显示每个解析项的索引和值&#10;- 确保 CSV 模块导入和解析逻辑正确执行" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(StandardLibrary): 更新 CSV 解析测试以验证带引号的行解析&#10;&#10;- 修改测试代码以正确处理带引号的 CSV 行&#10;- 添加数组长度验证和遍历输出解析结果&#10;- 改进测试输出格式以显示每个解析项的索引和值&#10;- 确保 CSV 模块导入和解析逻辑正确执行" />
+    <MESSAGE value="fix(runtime): 修复反射调用中的类型转换问题&#10;&#10;- 在 FuncLangValue 中添加类型转换逻辑处理可空类型和类型不匹配情况&#10;- 为 MethodInvokerCache 添加可选参数和可空类型特殊处理支持&#10;- 更新 NetLibTests 中的网络库测试用例和文件路径&#10;- 移除 SerializationLibTests 中的 Protobuf 相关测试&#10;- 在 UnifiedModule 中添加原生类实例化处理逻辑&#10;- 优化 LangValueType 中的 Task 类型检测方法&#10;- 更新 IDE 配置文件中的变更跟踪和任务统计信息" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(runtime): 修复反射调用中的类型转换问题&#10;&#10;- 在 FuncLangValue 中添加类型转换逻辑处理可空类型和类型不匹配情况&#10;- 为 MethodInvokerCache 添加可选参数和可空类型特殊处理支持&#10;- 更新 NetLibTests 中的网络库测试用例和文件路径&#10;- 移除 SerializationLibTests 中的 Protobuf 相关测试&#10;- 在 UnifiedModule 中添加原生类实例化处理逻辑&#10;- 优化 LangValueType 中的 Task 类型检测方法&#10;- 更新 IDE 配置文件中的变更跟踪和任务统计信息" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
