@@ -1,0 +1,88 @@
+// Old8Lang FirstUI - 计数器应用示例
+// 展示状态管理和事件处理
+
+import "firstui" as ui
+
+// 创建应用程序
+app <- ui.App()
+
+// 计数器状态
+counter <- 0
+
+// 计数器视图
+CounterView() -> {
+    return ui.VStack({
+        // 标题
+        ui.Text("计数器应用")
+            .fontSize(28)
+            .fontWeight("bold")
+            .color("#000000"),
+
+        // 空白间隔
+        ui.Spacer(height: 20),
+
+        // 显示计数值
+        ui.Text(counter.ToStr())
+            .fontSize(72)
+            .fontWeight("bold")
+            .color("#007AFF"),
+
+        // 空白间隔
+        ui.Spacer(height: 30),
+
+        // 按钮行
+        ui.HStack({
+            // 减少按钮
+            ui.Button("➖ 减少", {
+                backgroundColor: "#FF3B30",
+                textColor: "#FFFFFF",
+                onClick: () -> {
+                    counter <- counter - 1
+                    PrintLine("计数器: " + counter.ToStr())
+                }
+            }),
+
+            // 间隔
+            ui.Spacer(width: 20),
+
+            // 重置按钮
+            ui.Button("🔄 重置", {
+                backgroundColor: "#8E8E93",
+                textColor: "#FFFFFF",
+                onClick: () -> {
+                    counter <- 0
+                    ui.ShowToast("已重置计数器")
+                }
+            }),
+
+            // 间隔
+            ui.Spacer(width: 20),
+
+            // 增加按钮
+            ui.Button("➕ 增加", {
+                backgroundColor: "#34C759",
+                textColor: "#FFFFFF",
+                onClick: () -> {
+                    counter <- counter + 1
+                    PrintLine("计数器: " + counter.ToStr())
+                }
+            })
+        })
+        .spacing(10)
+        .align("center"),
+
+        // 空白间隔
+        ui.Spacer(height: 40),
+
+        // 说明文本
+        ui.Text("点击按钮改变计数值", {
+            fontSize: 14,
+            color: "#8E8E93"
+        })
+    })
+    .padding(40)
+    .align("center")
+}
+
+// 运行应用
+app.Run(() -> CounterView())

@@ -1,0 +1,150 @@
+namespace Old8Lang.FirstUI.Core;
+
+/// <summary>
+/// 组件基类
+/// 所有 FirstUI 组件都继承此类
+/// </summary>
+public abstract class WidgetBase
+{
+    /// <summary>
+    /// 组件唯一标识符
+    /// </summary>
+    public string Id { get; protected set; }
+
+    /// <summary>
+    /// 组件宽度
+    /// </summary>
+    public double? Width { get; set; }
+
+    /// <summary>
+    /// 组件高度
+    /// </summary>
+    public double? Height { get; set; }
+
+    /// <summary>
+    /// 内边距
+    /// </summary>
+    public Thickness Padding { get; set; }
+
+    /// <summary>
+    /// 外边距
+    /// </summary>
+    public Thickness Margin { get; set; }
+
+    /// <summary>
+    /// 背景色
+    /// </summary>
+    public string? BackgroundColor { get; set; }
+
+    /// <summary>
+    /// 是否可见
+    /// </summary>
+    public bool IsVisible { get; set; } = true;
+
+    /// <summary>
+    /// 不透明度 (0.0 - 1.0)
+    /// </summary>
+    public double Opacity { get; set; } = 1.0;
+
+    protected WidgetBase()
+    {
+        Id = Guid.NewGuid().ToString();
+        Padding = new Thickness(0);
+        Margin = new Thickness(0);
+    }
+
+    /// <summary>
+    /// 构建组件对应的 Avalonia 控件
+    /// </summary>
+    /// <param name="context">构建上下文</param>
+    /// <returns>Avalonia 控件实例</returns>
+    public abstract object Build(BuildContext context);
+
+    /// <summary>
+    /// 更新组件状态
+    /// </summary>
+    public virtual void Update()
+    {
+        // 子类可以覆盖此方法实现自定义更新逻辑
+    }
+
+    /// <summary>
+    /// 链式调用：设置宽度
+    /// </summary>
+    public WidgetBase SetWidth(double width)
+    {
+        Width = width;
+        return this;
+    }
+
+    /// <summary>
+    /// 链式调用：设置高度
+    /// </summary>
+    public WidgetBase SetHeight(double height)
+    {
+        Height = height;
+        return this;
+    }
+
+    /// <summary>
+    /// 链式调用：设置内边距
+    /// </summary>
+    public WidgetBase SetPadding(double padding)
+    {
+        Padding = new Thickness(padding);
+        return this;
+    }
+
+    /// <summary>
+    /// 链式调用：设置背景色
+    /// </summary>
+    public WidgetBase SetBackgroundColor(string color)
+    {
+        BackgroundColor = color;
+        return this;
+    }
+
+    /// <summary>
+    /// 链式调用：设置不透明度
+    /// </summary>
+    public WidgetBase SetOpacity(double opacity)
+    {
+        Opacity = Math.Clamp(opacity, 0.0, 1.0);
+        return this;
+    }
+}
+
+/// <summary>
+/// 边距/内距结构
+/// </summary>
+public struct Thickness
+{
+    public double Left { get; set; }
+    public double Top { get; set; }
+    public double Right { get; set; }
+    public double Bottom { get; set; }
+
+    public Thickness(double uniformSize)
+    {
+        Left = Top = Right = Bottom = uniformSize;
+    }
+
+    public Thickness(double horizontal, double vertical)
+    {
+        Left = Right = horizontal;
+        Top = Bottom = vertical;
+    }
+
+    public Thickness(double left, double top, double right, double bottom)
+    {
+        Left = left;
+        Top = top;
+        Right = right;
+        Bottom = bottom;
+    }
+
+    public override string ToString()
+    {
+        return $"({Left}, {Top}, {Right}, {Bottom})";
+    }
+}

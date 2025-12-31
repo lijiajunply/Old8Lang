@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.LanguageServer", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.DatabaseLib", "Old8Lang.DatabaseLib\Old8Lang.DatabaseLib.csproj", "{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Old8Lang.FirstUI", "Old8Lang.FirstUI\Old8Lang.FirstUI.csproj", "{7D3D3E70-A65F-4F8E-AB57-B359DFF93C7E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -164,6 +166,18 @@ Global
 		{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}.Release|x64.Build.0 = Release|Any CPU
 		{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}.Release|x86.ActiveCfg = Release|Any CPU
 		{9FCA71BB-9C9F-49E5-9E24-356E17AE5960}.Release|x86.Build.0 = Release|Any CPU
+		{7D3D3E70-A65F-4F8E-AB57-B359DFF93C7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D3D3E70-A65F-4F8E-AB57-B359DFF93C7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D3D3E70-A65F-4F8E-AB57-B359DFF93C7E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7D3D3E70-A65F-4F8E-AB57-B359DFF93C7E}.Debug|x64.Build.0 = Debug|Any CPU
+		{7D3D3E70-A65F-4F8E-AB57-B359DFF93C7E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7D3D3E70-A65F-4F8E-AB57-B359DFF93C7E}.Debug|x86.Build.0 = Debug|Any CPU
+		{7D3D3E70-A65F-4F8E-AB57-B359DFF93C7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D3D3E70-A65F-4F8E-AB57-B359DFF93C7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D3D3E70-A65F-4F8E-AB57-B359DFF93C7E}.Release|x64.ActiveCfg = Release|Any CPU
+		{7D3D3E70-A65F-4F8E-AB57-B359DFF93C7E}.Release|x64.Build.0 = Release|Any CPU
+		{7D3D3E70-A65F-4F8E-AB57-B359DFF93C7E}.Release|x86.ActiveCfg = Release|Any CPU
+		{7D3D3E70-A65F-4F8E-AB57-B359DFF93C7E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
