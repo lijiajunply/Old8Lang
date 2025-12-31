@@ -13,11 +13,22 @@ public abstract class Program
     private static readonly CommandRegistry CommandRegistry = new();
 
     /// <summary>
-    /// 应用程序主入口点
+    /// 应用程序主入口点（同步包装器，用于 GUI 支持）
     /// </summary>
     /// <param name="args">命令行参数</param>
     /// <returns>应用程序退出码</returns>
-    public static async Task<int> Main(string[] args)
+    [STAThread]
+    public static int Main(string[] args)
+    {
+        return MainAsync(args).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// 异步主入口点
+    /// </summary>
+    /// <param name="args">命令行参数</param>
+    /// <returns>应用程序退出码</returns>
+    private static async Task<int> MainAsync(string[] args)
     {
         // 注册所有命令
         RegisterCommands();

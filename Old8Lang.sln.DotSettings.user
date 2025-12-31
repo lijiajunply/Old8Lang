@@ -39,6 +39,7 @@
   &lt;Assembly Path="/Users/luckyfish/Documents/Project/RiderProjects/Old8Lang/Old8LangLib/OldLib/dll/Old8LangLib.dll" /&gt;
   &lt;Assembly Path="/usr/local/share/dotnet/shared/Microsoft.NETCore.App/10.0.0/System.Runtime.dll" /&gt;
   &lt;Assembly Path="/Users/luckyfish/.nuget/packages/old8lang.packagemanager.core/1.0.0/lib/net10.0/Old8Lang.PackageManager.Core.dll" /&gt;
+  &lt;Assembly Path="/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/publish/Npgsql.dll" /&gt;
 &lt;/AssemblyExplorer&gt;</s:String>
 	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=58c56b00_002Df81e_002D48fd_002Da74f_002Dc8e84271fcf4/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Continuous Testing" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;

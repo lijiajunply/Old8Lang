@@ -113,7 +113,7 @@ public static class FirstUIBinding
     /// <summary>
     /// 注册主题变化监听器
     /// </summary>
-    public static void OnThemeChanged(object callback)
+    public static void OnThemeChanged(object? callback)
     {
         if (callback != null)
         {
@@ -122,7 +122,7 @@ public static class FirstUIBinding
                 try
                 {
                     var invokeMethod = callback.GetType().GetMethod("Invoke");
-                    invokeMethod?.Invoke(callback, new object[] { theme.Name });
+                    invokeMethod?.Invoke(callback, [theme.Name]);
                 }
                 catch (Exception ex)
                 {
@@ -168,7 +168,7 @@ public static class FirstUIBinding
             try
             {
                 var invokeMethod = callback.GetType().GetMethod("Invoke");
-                invokeMethod?.Invoke(callback, new object[] { data });
+                invokeMethod?.Invoke(callback, [data]);
             }
             catch (Exception ex)
             {
@@ -187,7 +187,7 @@ public static class FirstUIBinding
             try
             {
                 var invokeMethod = callback.GetType().GetMethod("Invoke");
-                invokeMethod?.Invoke(callback, new object[] { data });
+                invokeMethod?.Invoke(callback, [data]);
             }
             catch (Exception ex)
             {
@@ -222,28 +222,61 @@ public static class FirstUIBinding
     {
         try
         {
-            // 使用 AppBuilder 正确初始化 Avalonia 应用
-            var lifetime = new ClassicDesktopStyleApplicationLifetime
+            // 创建一个简单的 Avalonia 应用类
+            var app = new FirstUIAvaloniaApp(buildFunction);
+
+            // 使用 AppBuilder 启动应用
+            // 使用 [STAThread] 属性并调用 BuildAvaloniaApp().StartWithClassicDesktopLifetime
+            var builder = BuildAvaloniaApp(app);
+            builder.StartWithClassicDesktopLifetime(Array.Empty<string>());
+        }
+        catch (PlatformNotSupportedException ex)
+        {
+            throw new InvalidOperationException(
+                "无法在当前环境中启动 GUI 应用。FirstUI 需要图形界面支持。\n" +
+                "请确保您在支持 GUI 的环境中运行（例如：macOS 的桌面环境、Windows 或 Linux 的 X11/Wayland）。\n" +
+                $"详细错误: {ex.Message}",
+                ex);
+        }
+        catch (Exception ex) when (ex.Message.Contains("not supported on this platform"))
+        {
+            throw new InvalidOperationException(
+                "无法在当前环境中启动 GUI 应用。FirstUI 需要图形界面支持。\n" +
+                "请确保您在支持 GUI 的环境中运行（例如：macOS 的桌面环境、Windows 或 Linux 的 X11/Wayland）。\n" +
+                $"详细错误: {ex.Message}",
+                ex);
+        }
+    }
+
+    /// <summary>
+    /// 构建 Avalonia 应用
+    /// </summary>
+    private static AppBuilder BuildAvaloniaApp(Application app)
+    {
+        return AppBuilder.Configure(() => app)
+            .UsePlatformDetect()
+            .LogToTrace();
+    }
+}
+
+/// <summary>
+/// FirstUI Avalonia 应用类
+/// </summary>
+internal class FirstUIAvaloniaApp(object buildFunction) : Application
+{
+    private static Window? _mainWindow;
+    private static BuildContext? _context;
+
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            // 初始化上下文
+            _context = new BuildContext
             {
-                Args = Array.Empty<string>(),
-                ShutdownMode = ShutdownMode.OnMainWindowClose
+                Theme = ThemeManager.Instance.CurrentTheme
             };
-
-            var builder = AppBuilder.Configure<Application>()
-                .UsePlatformDetect()
-                .LogToTrace()
-                .SetupWithLifetime(lifetime);
-
-            // 初始化应用上下文
-            if (_app == null)
-            {
-                _app = Application.Current ?? builder.Instance ?? new Application();
-                _context = new BuildContext
-                {
-                    Theme = ThemeManager.Instance.CurrentTheme
-                };
-                Console.WriteLine("[FirstUI] Initialized via AppBuilder");
-            }
+            Console.WriteLine("[FirstUI] Initialized Avalonia Application");
 
             // 创建主窗口
             _mainWindow = new Window
@@ -279,26 +312,10 @@ public static class FirstUIBinding
                 };
             }
 
-            // 设置主窗口并启动应用
-            lifetime.MainWindow = _mainWindow;
-            lifetime.Start(Array.Empty<string>());
+            desktop.MainWindow = _mainWindow;
         }
-        catch (PlatformNotSupportedException ex)
-        {
-            throw new InvalidOperationException(
-                "无法在当前环境中启动 GUI 应用。FirstUI 需要图形界面支持。\n" +
-                "请确保您在支持 GUI 的环境中运行（例如：macOS 的桌面环境、Windows 或 Linux 的 X11/Wayland）。\n" +
-                $"详细错误: {ex.Message}",
-                ex);
-        }
-        catch (Exception ex) when (ex.Message.Contains("not supported on this platform"))
-        {
-            throw new InvalidOperationException(
-                "无法在当前环境中启动 GUI 应用。FirstUI 需要图形界面支持。\n" +
-                "请确保您在支持 GUI 的环境中运行（例如：macOS 的桌面环境、Windows 或 Linux 的 X11/Wayland）。\n" +
-                $"详细错误: {ex.Message}",
-                ex);
-        }
+
+        base.OnFrameworkInitializationCompleted();
     }
 }
 
