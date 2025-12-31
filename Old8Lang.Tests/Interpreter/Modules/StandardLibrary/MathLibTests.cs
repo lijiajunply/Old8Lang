@@ -48,7 +48,7 @@ PrintLine(result)
         var code = @"
 import Math
 
-result <- Math.Sqrt(16)
+result <- Math.Sqrt(16.0)
 PrintLine(result)
 ";
         CreateTempModuleFile("./StandardLibrary/math_sqrt_test.old8", code);
@@ -230,7 +230,7 @@ PrintLine(result)
         var code = @"
 import Math
 
-result <- Math.DegreesToRadians(180)
+result <- Math.DegreesToRadians(180.0)
 pi <- Math.GetPi()
 PrintLine($""180 degrees = {result} radians"")
 PrintLine($""PI = {pi}"")

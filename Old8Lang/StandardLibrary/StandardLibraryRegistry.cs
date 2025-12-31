@@ -87,11 +87,6 @@ public static class StandardLibraryRegistry
             TypeImportConfig.StaticClass(typeof(RegexLib))
         ),
 
-        ["Sort"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(SortLib))
-        ),
-
         ["ColorfulTerminal"] = StandardLibraryInfo.FromTypes(
             "Old8LangLib",
             TypeImportConfig.StaticClass(typeof(ColorfulTerminal))

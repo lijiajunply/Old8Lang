@@ -8,6 +8,7 @@ using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
+using Old8Lang.Utilities;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -316,7 +317,16 @@ public class FuncLangValue : ImportInfo
             {
                 // 入栈：记录函数调用
                 Old8Exception.PushCallStack(Method?.Name ?? "Unknown", Position);
-                invoke = Method?.Invoke(obj, finalParams);
+
+                // 使用委托缓存优化反射调用性能
+                if (Method != null)
+                {
+                    invoke = MethodInvokerCache.Invoke(Method, obj, finalParams);
+                }
+                else
+                {
+                    invoke = null;
+                }
             }
             catch (TargetInvocationException ex) when (ex.InnerException != null)
             {

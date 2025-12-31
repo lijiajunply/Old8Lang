@@ -3,6 +3,8 @@ using System.Reflection;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
+using Old8Lang.Utilities;
+using System.Collections.Concurrent;
 
 namespace Old8Lang.AST.Expression.Intermediates;
 
@@ -25,6 +27,34 @@ public class NativeAnyLangValue : ImportInfo
     private object? InstanceObj { get; set; }
 
     private VariateManager Manager = new();
+
+    // 成员信息缓存 - 按类型缓存，所有同类型实例共享
+    private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, MemberInfo?>> MemberCache = new();
+
+    /// <summary>
+    /// 获取缓存的成员信息（属性、字段或方法）
+    /// </summary>
+    private MemberInfo? GetCachedMember(string memberName)
+    {
+        if (ClassType == null) return null;
+
+        // 获取或创建该类型的缓存字典
+        var typeCache = MemberCache.GetOrAdd(ClassType, _ => new ConcurrentDictionary<string, MemberInfo?>());
+
+        // 从缓存中获取或查询成员
+        return typeCache.GetOrAdd(memberName, name =>
+        {
+            // 依次尝试：属性 -> 字段 -> 方法
+            MemberInfo? member = ClassType.GetProperty(name);
+            if (member != null) return member;
+
+            member = ClassType.GetField(name);
+            if (member != null) return member;
+
+            member = ClassType.GetMethod(name);
+            return member; // 如果都找不到，返回 null
+        });
+    }
 
     /// <summary>
     /// 从 DLL 导入类型的构造函数
@@ -54,9 +84,11 @@ public class NativeAnyLangValue : ImportInfo
     {
         if (dotExpression is LangId id)
         {
+            // 使用缓存获取成员
+            var member = GetCachedMember(id.IdName);
+
             // 尝试访问属性
-            var prop = ClassType?.GetProperty(id.IdName);
-            if (prop != null)
+            if (member is PropertyInfo prop)
             {
                 try
                 {
@@ -71,8 +103,7 @@ public class NativeAnyLangValue : ImportInfo
             }
 
             // 尝试访问字段
-            var field = ClassType?.GetField(id.IdName);
-            if (field != null)
+            if (member is FieldInfo field)
             {
                 try
                 {
@@ -91,8 +122,9 @@ public class NativeAnyLangValue : ImportInfo
 
         if (dotExpression is Instance instance)
         {
-            var method = ClassType?.GetMethod(instance.Id.IdName);
-            if (method == null)
+            // 使用缓存获取方法
+            var member = GetCachedMember(instance.Id.IdName);
+            if (member is not MethodInfo method)
                 throw new AttributeError(this, instance.Id.IdName, ClassName);
 
             try
@@ -103,8 +135,8 @@ public class NativeAnyLangValue : ImportInfo
                 // 将 Old8Lang 值转换为 .NET 对象
                 var nativeArguments = arguments.Select(ValueToObj).ToArray();
 
-                // 直接调用方法，避免 FuncLangValue 的参数计数bug
-                var result = method.Invoke(InstanceObj, nativeArguments);
+                // 使用委托缓存优化方法调用
+                var result = MethodInvokerCache.Invoke(method, InstanceObj, nativeArguments);
 
                 // 将结果转换为 Old8Lang 值
                 return ObjToValue(result);

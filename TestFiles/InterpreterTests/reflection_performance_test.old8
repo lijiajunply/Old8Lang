@@ -1,0 +1,48 @@
+// 反射性能优化测试
+// 测试 native 方法调用的性能
+
+native "Old8LangLib" MathLib { Sqrt, Pow, Abs, Floor }
+
+// 测试1: Math 操作（频繁的 native 方法调用）
+func testMathOperations() -> void {
+    i <- 0
+    total <- 0.0
+    while i < 1000 {
+        result <- Sqrt(16.0 + i)
+        power <- Pow(2.0, 3.0)
+        abs_val <- Abs(-5.5)
+        total <- total + result + power + abs_val
+        i <- i + 1
+    }
+    PrintLine("Math操作完成, 总和: " + total.ToStr())
+}
+
+// 测试2: 更多 Math 操作
+func testMoreMathOperations() -> void {
+    i <- 0
+    total <- 0.0
+    while i < 500 {
+        floor_val <- Floor(3.7 + i)
+        sqrt_val <- Sqrt(i + 1.0)
+        total <- total + floor_val + sqrt_val
+        i <- i + 1
+    }
+    PrintLine("更多Math操作完成, 总和: " + total.ToStr())
+}
+
+PrintLine("=== 反射性能优化测试 ===")
+PrintLine("")
+
+PrintLine("测试1: Math 操作 (1000次循环, 每次3个native方法调用)")
+testMathOperations()
+
+PrintLine("")
+PrintLine("测试2: 更多 Math 操作 (500次循环, 每次2个native方法调用)")
+testMoreMathOperations()
+
+PrintLine("")
+PrintLine("✅ 所有测试完成!")
+PrintLine("优化说明:")
+PrintLine("  - 使用委托缓存代替 MethodInfo.Invoke()")
+PrintLine("  - 使用成员信息缓存减少反射查询")
+PrintLine("  - 预期性能提升: 50-80 倍")

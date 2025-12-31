@@ -48,7 +48,7 @@ PrintLine(""HTTP client created"")
         var code = @"
 import Net
 
-client <- Net.CreateHttpClient()
+client <- Net.HttpClient()
 Net.HttpSetTimeout(client, 30000)
 PrintLine(""HTTP client timeout set to 30 seconds"")
 ";
