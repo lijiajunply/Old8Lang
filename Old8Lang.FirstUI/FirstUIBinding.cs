@@ -1,73 +1,121 @@
+using System.Reflection;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Threading;
+using Old8Lang.FirstUI.Core;
+
 namespace Old8Lang.FirstUI;
 
 /// <summary>
 /// Old8Lang FirstUI 绑定类
-/// 提供给 Old8Lang 语言使用的 GUI 功能入口点
 /// </summary>
 public static class FirstUIBinding
 {
+    private static Application? _app;
+    private static Window? _mainWindow;
+    private static BuildContext? _context;
 
     /// <summary>
     /// 初始化 FirstUI 库
     /// </summary>
     public static void Initialize()
     {
-        // TODO: 初始化 Avalonia 应用程序
-        Console.WriteLine("[FirstUI] Initializing Old8Lang.FirstUI");
+        if (_app == null)
+        {
+            _app = new Application();
+            _context = new BuildContext();
+            Console.WriteLine("[FirstUI] Initialized");
+        }
     }
 
     /// <summary>
     /// 创建应用程序实例
     /// </summary>
-    /// <returns>应用程序对象</returns>
     public static object CreateApp()
     {
-        // TODO: 实现应用程序创建逻辑
-        throw new NotImplementedException("CreateApp is not yet implemented");
+        Initialize();
+        return new FirstUIApplication();
     }
 
     /// <summary>
     /// 创建组件
     /// </summary>
-    /// <param name="widgetType">组件类型名称（如 "Text", "Button" 等）</param>
-    /// <param name="config">配置字典（Old8Lang 对象）</param>
-    /// <returns>组件实例</returns>
     public static object CreateWidget(string widgetType, object? config = null)
     {
-        // TODO: 根据类型创建对应的组件
-        throw new NotImplementedException($"Widget type '{widgetType}' is not yet implemented");
+        Initialize();
+        
+        return widgetType.ToLower() switch
+        {
+            "text" => new Basic.Text(),
+            "button" => new Basic.Button(),
+            "container" => new Layout.Container(),
+            "column" => new Layout.Column(),
+            "vstack" => new Layout.Column(), // SwiftUI 风格别名
+            _ => throw new NotImplementedException($"Widget type '{widgetType}' is not supported")
+        };
     }
 
     /// <summary>
     /// 显示 Toast 消息
     /// </summary>
-    /// <param name="message">消息内容</param>
-    /// <param name="duration">显示时长（毫秒）</param>
     public static void ShowToast(string message, int duration = 3000)
     {
-        // TODO: 实现 Toast 显示逻辑
-        Console.WriteLine($"[FirstUI Toast] {message} (duration: {duration}ms)");
+        Console.WriteLine($"[FirstUI Toast] {message}");
     }
 
     /// <summary>
-    /// 显示对话框
+    /// 运行应用程序
     /// </summary>
-    /// <param name="title">标题</param>
-    /// <param name="content">内容</param>
-    /// <returns>用户操作结果</returns>
-    public static object ShowDialog(string title, string content)
+    public static void RunApp(object buildFunction)
     {
-        // TODO: 实现对话框显示逻辑
-        throw new NotImplementedException("ShowDialog is not yet implemented");
-    }
+        if (_app == null)
+        {
+            Initialize();
+        }
 
+        _mainWindow = new Window
+        {
+            Title = "Old8Lang FirstUI Application",
+            Width = 800,
+            Height = 600,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen
+        };
+
+        try
+        {
+            // 调用 Old8Lang 函数构建根组件
+            var invokeMethod = buildFunction.GetType().GetMethod("Invoke");
+            var rootWidget = invokeMethod?.Invoke(buildFunction, null);
+
+            if (rootWidget is WidgetBase widget && _context != null)
+            {
+                var control = widget.Build(_context) as Control;
+                if (control != null)
+                {
+                    _mainWindow.Content = control;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"[FirstUI] Error building UI: {ex.Message}");
+            _mainWindow.Content = new TextBlock { Text = $"Error: {ex.Message}" };
+        }
+
+        _mainWindow.Show();
+    }
+}
+
+/// <summary>
+/// FirstUI 应用程序类
+/// </summary>
+public class FirstUIApplication
+{
     /// <summary>
-    /// 设置应用主题
+    /// 运行应用程序
     /// </summary>
-    /// <param name="themeName">主题名称（"light" 或 "dark"）</param>
-    public static void SetTheme(string themeName)
+    public void Run(object buildFunction)
     {
-        // TODO: 实现主题切换逻辑
-        Console.WriteLine($"[FirstUI] Setting theme to: {themeName}");
+        FirstUIBinding.RunApp(buildFunction);
     }
 }

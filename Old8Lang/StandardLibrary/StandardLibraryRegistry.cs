@@ -92,7 +92,8 @@ public static class StandardLibraryRegistry
         ["Serialization"] = new StandardLibraryInfo(AssemblyName: "Old8Lang.SerializationLib",
             ClassName: "SerializationLibBinding"),
         ["Database"] = new StandardLibraryInfo(AssemblyName: "Old8Lang.DatabaseLib",
-            ClassName: "DatabaseLibBinding")
+            ClassName: "DatabaseLibBinding"),
+        ["FirstUI"] = new StandardLibraryInfo(AssemblyName: "Old8Lang.FirstUI", ClassName: "FirstUIBinding")
     };
 
     /// <summary>

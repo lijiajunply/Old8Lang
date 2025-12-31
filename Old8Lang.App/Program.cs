@@ -29,7 +29,7 @@ public abstract class Program
             args =
             [
                 "-f",
-                "/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/InterpreterTests/test_thread_basic.old8"
+                "/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/Examples/SimpleHelloWorld.old8"
             ];
         }
 #endif

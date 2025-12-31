@@ -1,3 +1,6 @@
+using Avalonia;
+using Avalonia.Controls;
+
 namespace Old8Lang.FirstUI.Core;
 
 /// <summary>
@@ -105,11 +108,47 @@ public abstract class WidgetBase
     }
 
     /// <summary>
+    /// 链式调用：设置外边距
+    /// </summary>
+    public WidgetBase SetMargin(double margin)
+    {
+        Margin = new Thickness(margin);
+        return this;
+    }
+
+    /// <summary>
+    /// 链式调用：设置内边距
+    /// </summary>
+    public WidgetBase SetPadding(double left, double top, double right, double bottom)
+    {
+        Padding = new Thickness(left, top, right, bottom);
+        return this;
+    }
+
+    /// <summary>
+    /// 链式调用：设置外边距
+    /// </summary>
+    public WidgetBase SetMargin(double left, double top, double right, double bottom)
+    {
+        Margin = new Thickness(left, top, right, bottom);
+        return this;
+    }
+
+    /// <summary>
     /// 链式调用：设置不透明度
     /// </summary>
     public WidgetBase SetOpacity(double opacity)
     {
         Opacity = Math.Clamp(opacity, 0.0, 1.0);
+        return this;
+    }
+
+    /// <summary>
+    /// 链式调用：设置可见性
+    /// </summary>
+    public WidgetBase SetVisible(bool visible)
+    {
+        IsVisible = visible;
         return this;
     }
 }
