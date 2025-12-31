@@ -15,13 +15,14 @@
 
     <ItemGroup>
         <!-- Avalonia UI 核心包 -->
-        <PackageReference Include="Avalonia" Version="11.2.2"/>
-        <PackageReference Include="Avalonia.Desktop" Version="11.2.2"/>
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.2"/>
+        <PackageReference Include="Avalonia" Version="11.3.10"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.10"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.10"/>
 
         <!-- 可选：Avalonia 扩展 -->
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.2"/>
-        <PackageReference Include="Avalonia.Diagnostics" Version="11.2.2" Condition="'$(Configuration)' == 'Debug'"/>
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.10"/>
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.10" Condition="'$(Configuration)' == 'Debug'"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.10" />
     </ItemGroup>
 
     <ItemGroup>

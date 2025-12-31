@@ -22,15 +22,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/FIRSTUI_FIX_SUMMARY.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/create_app_bundle.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/diagnose_firstui.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/launch_firstui.command" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_firstui.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.App/app.manifest" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Old8Lang.App.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Old8Lang.App.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Old8Lang.FirstUI.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Old8Lang.FirstUI.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,10 +61,21 @@
     <setting file="file://$USER_HOME$/.jetbrains/acp.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/.nuget/NuGet/NuGet.Config" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/.claude/settings.local.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Benchmarks/SimpleReflectionBenchmark.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
@@ -164,7 +171,7 @@
     ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
     ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
     ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Run",
+    ".NET 项目.Old8Lang.App.executor": "Debug",
     ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
     ".NET 项目.Old8Lang.LanguageServer.executor": "Run",
     "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
@@ -559,7 +566,7 @@
       <workItem from="1766771063664" duration="16661000" />
       <workItem from="1766997021901" duration="12927000" />
       <workItem from="1767123773418" duration="15798000" />
-      <workItem from="1767204141752" duration="11383000" />
+      <workItem from="1767204141752" duration="12277000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -904,7 +911,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="487" />
+    <option name="localTasksCounter" value="488" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -931,7 +938,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(char): 添加字符类型扩展方法支持&#10;&#10;- 实现 CharValueFuncStatic 类提供字符大小写转换功能&#10;- 添加 ToUpper() 方法将字符转换为大写&#10;- 添加 ToLower() 方法将字符转换为小写&#10;- 在 Instance.cs 中为 CharLangValue 类型注册扩展方法&#10;- 修复 LangValueType.cs 中数值类型转换问题&#10;- 移除过时的 NativeMethodBindingTests 测试文件&#10;- 更新 TaskAdvancedTests 中线程启动逻辑&#10;- 移除过时的 ThreadSynchronizationTests 测试文件&#10;- 更新 IDE 工作区配置和断点位置信息" />
     <MESSAGE value="feat(database): 扩展ORM包装器功能支持非泛型操作和自增主键处理&#10;&#10;- 修改Insert方法排除主键字段并添加自增主键值回填功能&#10;- 添加非泛型Insert、Update、Delete方法支持运行时类型处理&#10;- 实现自增主键检测和最后插入ID获取机制&#10;- 修复批量插入操作排除主键字段的问题&#10;- 更新IDE工作区配置和项目元数据" />
     <MESSAGE value="feat(firstui): 初始化 Old8Lang.FirstUI 项目架构&#10;&#10;- 添加架构设计文档，定义三层架构（绑定层、核心层、组件层）&#10;- 实现 BuildContext 上下文类，提供主题、状态管理等功能&#10;- 创建 FirstUIBinding 绑定类，提供 Old8Lang 语言调用入口点&#10;- 添加 StateManager 状态管理器和 ObservableState 响应式状态类&#10;- 创建 HelloWorld 和 Counter 示例应用展示基本功能&#10;- 配置项目文件和解决方案，集成 Avalonia UI 框架&#10;- 添加 README.md 项目说明文档和 TODO 开发计划&#10;- 实现基本的主题系统和组件构建上下文环境" />
     <MESSAGE value="feat(firstui): 实现 FirstUI 基础组件和应用框架&#10;&#10;- 添加 Text 和 Button 基础组件，支持文本显示和按钮点击功能&#10;- 实现 Container 和 Column 布局组件，提供容器和垂直布局支持&#10;- 添加全局状态管理功能，支持状态监听和计算属性&#10;- 重构 FirstUIBinding 绑定类，实现组件创建和应用运行逻辑&#10;- 更新示例应用使用新的组件创建方式，替换原有的链式调用&#10;- 添加项目引用和标准库注册，集成 FirstUI 到主应用程序&#10;- 扩展 WidgetBase 基类，添加边距、内边距和可见性设置功能" />
@@ -956,7 +962,8 @@
     <MESSAGE value="feat(theme): 实现主题系统和样式管理功能&#10;&#10;- 添加 ColorScheme 类用于定义颜色主题，包含浅色、深色、Material Design 和 Fluent Design 颜色方案&#10;- 添加 SpacingScheme 类用于定义间距系统，支持不同倍数的间距单位&#10;- 添加 StyleSheet、Style 和 StyleBuilder 类用于管理样式定义和构建&#10;- 添加 ThemeData 类用于存储完整的主题配置，包含颜色、字体、间距、阴影和圆角方案&#10;- 添加 Theme 类提供预定义主题创建方法，支持 light、dark、material、fluent 等主题&#10;- 在 FirstUIBinding 中实现主题切换功能，支持 SetTheme、GetCurrentTheme、ToggleTheme 等 API&#10;- 添加主题变化监听器支持，允许注册回调函数监听主题变化&#10;- 添加主题系统使用示例文档，展示基础主题切换和主题监听功能" />
     <MESSAGE value="fix(ast): 修复类型加载和范围语法问题&#10;&#10;- 修复 NativeAnyLangValue 中类型加载逻辑，支持简单类名和完整类型名&#10;- 修正标准库加载器使用完整类型名而非仅类名&#10;- 修复字符范围语法从 '..' 改为 '~' 的测试用例&#10;- 更新 IDE 配置文件中的任务计数和提交历史记录" />
     <MESSAGE value="refactor(FirstUI): 重构Avalonia应用初始化逻辑&#10;&#10;- 使用AppBuilder正确初始化Avalonia应用生命周期&#10;- 添加ClassicDesktopStyleApplicationLifetime支持桌面应用启动&#10;- 实现图形界面环境检测和平台不支持异常处理&#10;- 重构UI构建逻辑并保持错误处理机制&#10;- 更新应用上下文初始化流程&#10;- 移除旧的初始化检查逻辑并优化窗口创建过程" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(FirstUI): 重构Avalonia应用初始化逻辑&#10;&#10;- 使用AppBuilder正确初始化Avalonia应用生命周期&#10;- 添加ClassicDesktopStyleApplicationLifetime支持桌面应用启动&#10;- 实现图形界面环境检测和平台不支持异常处理&#10;- 重构UI构建逻辑并保持错误处理机制&#10;- 更新应用上下文初始化流程&#10;- 移除旧的初始化检查逻辑并优化窗口创建过程" />
+    <MESSAGE value="refactor(FirstUI): 重构Avalonia应用初始化逻辑&#10;&#10;- 使用AppBuilder正确初始化Avalonia应用生命周期&#10;- 添加ClassicDesktopStyleApplicationLifetime支持桌面应用启动&#10;- 实现图形界面环境检测和平台不支持异常处理&#10;- 重构UI构建逻辑并保持错误处理机制&#10;- 更新应用上下文初始化流程&#10;- 移除旧的初始化检查逻辑并优化窗口创建过程&#10;- 添加nullable注解支持并优化Invoke方法调用&#10;- 创建FirstUIAvaloniaApp应用类处理框架初始化&#10;- 重构Program.cs主入口点实现GUI支持的同步包装器" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(FirstUI): 重构Avalonia应用初始化逻辑&#10;&#10;- 使用AppBuilder正确初始化Avalonia应用生命周期&#10;- 添加ClassicDesktopStyleApplicationLifetime支持桌面应用启动&#10;- 实现图形界面环境检测和平台不支持异常处理&#10;- 重构UI构建逻辑并保持错误处理机制&#10;- 更新应用上下文初始化流程&#10;- 移除旧的初始化检查逻辑并优化窗口创建过程&#10;- 添加nullable注解支持并优化Invoke方法调用&#10;- 创建FirstUIAvaloniaApp应用类处理框架初始化&#10;- 重构Program.cs主入口点实现GUI支持的同步包装器" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

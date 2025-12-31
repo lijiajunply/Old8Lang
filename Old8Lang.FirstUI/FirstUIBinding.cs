@@ -15,7 +15,6 @@ namespace Old8Lang.FirstUI;
 public static class FirstUIBinding
 {
     private static Application? _app;
-    private static Window? _mainWindow;
     private static BuildContext? _context;
 
     /// <summary>
@@ -228,7 +227,7 @@ public static class FirstUIBinding
             // 使用 AppBuilder 启动应用
             // 使用 [STAThread] 属性并调用 BuildAvaloniaApp().StartWithClassicDesktopLifetime
             var builder = BuildAvaloniaApp(app);
-            builder.StartWithClassicDesktopLifetime(Array.Empty<string>());
+            builder.StartWithClassicDesktopLifetime([]);
         }
         catch (PlatformNotSupportedException ex)
         {
@@ -255,6 +254,7 @@ public static class FirstUIBinding
     {
         return AppBuilder.Configure(() => app)
             .UsePlatformDetect()
+            .WithInterFont()
             .LogToTrace();
     }
 }
@@ -293,7 +293,7 @@ internal class FirstUIAvaloniaApp(object buildFunction) : Application
                 var invokeMethod = buildFunction.GetType().GetMethod("Invoke");
                 var rootWidget = invokeMethod?.Invoke(buildFunction, null);
 
-                if (rootWidget is WidgetBase widget && _context != null)
+                if (rootWidget is WidgetBase widget)
                 {
                     if (widget.Build(_context) is Control control)
                     {

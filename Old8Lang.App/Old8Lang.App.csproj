@@ -11,8 +11,4 @@
       <ProjectReference Include="..\Old8Lang\Old8Lang.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Colorful.Console" Version="1.2.15" />
-    </ItemGroup>
-
 </Project>
