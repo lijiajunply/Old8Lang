@@ -22,18 +22,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Utilities/MethodInvokerCache.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/InterpreterTests/reflection_performance_test.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/MathLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/MathLibTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/NetLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/NetLibTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/SortLibTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/SortLibTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeStaticAny.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeStaticAny.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/DatabaseLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/DatabaseLibTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/SerializationLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/SerializationLibTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/SortLib.cs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,13 +63,16 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Benchmarks/SimpleReflectionBenchmark.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/SerializationLibTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/ValueFunctions/ArrayValueFuncStatic.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/CharValueFuncStatic.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
@@ -500,7 +495,7 @@
       <workItem from="1766771063664" duration="16661000" />
       <workItem from="1766997021901" duration="12927000" />
       <workItem from="1767123773418" duration="15798000" />
-      <workItem from="1767204141752" duration="1733000" />
+      <workItem from="1767204141752" duration="3148000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -845,7 +840,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="472" />
+    <option name="localTasksCounter" value="475" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -872,9 +867,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(compiler): 更新数组测试以使用内置断言并简化验证逻辑&#10;&#10;- 移除未使用的 AST 表达式导入语句&#10;- 用内置 Old8Lang 断言替换 C# 断言进行数组操作测试&#10;- 重构数组创建和访问测试以使用内联断言验证&#10;- 简化数组长度和元素访问的测试验证方法&#10;- 更新大型数组测试以避免过大的代码生成&#10;- 添加 IDE 配置文件中的异常类型处理设置" />
-    <MESSAGE value="docs(project): 更新项目优化建议文档&#10;&#10;- 更新项目状态统计信息，测试通过率从89.1%提升至96.7%&#10;- 修复编译器核心问题，编译器测试通过率从43.6%提升至83.6%&#10;- 解决动态导入功能问题，导入测试从289个失败改善至仅2个失败&#10;- 默认启用类型推断系统，提升编译器和解释器行为一致性&#10;- 新增LINQ查询表达式支持，已在解释器模式下可用&#10;- 完成项目第一阶段核心问题修复，更新行动计划和发布路线图&#10;- 改善项目成熟度评分，从3.7/5提升至4.4/5&#10;- 清理IDE配置文件中的测试会话信息" />
-    <MESSAGE value="feat(ast): 添加泛型集合类型支持和类型验证功能&#10;&#10;- 为 ArrayLangValue、ListLangValue 和 DictionaryLangValue 添加 ElementType、KeyType 和 ValueType 属性&#10;- 修改构造函数以支持类型参数传递&#10;- 在数组切片和转换操作中保持类型信息传递&#10;- 添加 CollectionTypeValidator 类用于编译时集合类型验证&#10;- 实现对 list&lt;T&gt;、array&lt;T&gt; 和 dict&lt;K,V&gt; 的类型注解解析和验证&#10;- 添加 Length() 方法为数组类型提供向后兼容性&#10;- 创建完整的泛型集合功能测试套件&#10;- 更新文档说明泛型集合类型使用指南和最佳实践" />
     <MESSAGE value="test(lang): 添加泛型集合类型编译和解释器测试&#10;&#10;- 实现 GenericCollectionTypesCompilerTests 测试类&#10;- 实现 GenericCollectionTypesEdgeCaseTests 边界测试类&#10;- 实现 GenericCollectionTypesInterpreterTests 解释器测试类&#10;- 覆盖 list&lt;T&gt; array&lt;T&gt; dict&lt;K,V&gt; 基本功能测试&#10;- 包含嵌套泛型类型和类型错误检测测试&#10;- 添加大型集合和特殊字符值边界测试&#10;- 实现编译器与解释器模式差异测试" />
     <MESSAGE value="test(lang): 添加自定义类型泛型功能的全面测试覆盖&#10;&#10;- 为编译器添加自定义类型泛型列表、数组和嵌套泛型的测试用例&#10;- 为解释器添加自定义类型泛型字典和函数参数泛型的执行测试&#10;- 为解析器添加自定义类型泛型语法解析的单元测试&#10;- 为边界情况添加空集合、单元素和大型集合的测试用例&#10;- 验证自定义类型泛型在不同场景下的正确编译和执行&#10;- 确保嵌套泛型和复杂泛型结构的正确处理" />
     <MESSAGE value="refactor(tests): 更新集合类型和长度函数的测试用例&#10;&#10;- 将字典长度获取从 Count() 方法改为 len() 函数&#10;- 更新数组长度获取从 Length 属性改为 len() 函数&#10;- 修改循环语法从 1..50 改为 [1~50]&#10;- 添加编译模式测试待办事项文档，规划缺失的测试类别" />
@@ -897,7 +889,10 @@
     <MESSAGE value="feat(error): 改进模块导入错误处理和错误信息展示&#10;&#10;- 添加 ModuleResolutionResult 构造函数到 ImportError 类&#10;- 在 ImportStatement 中使用 ModuleResolutionResult 提供详细错误信息&#10;- 扩展 ModuleResolutionResult 类添加失败原因和解析尝试记录功能&#10;- 实现友好的错误信息生成功能包含解析步骤和建议&#10;- 添加解析尝试记录类用于跟踪模块解析过程&#10;- 在 ModuleResolver 中记录每个解析步骤的详细信息&#10;- 实现针对性建议生成功能帮助用户解决导入问题&#10;- 添加标准库名称相似度检测功能&#10;- 更新 ModuleSystemService 使用新的错误构造函数&#10;- 添加获取所有标准库名称的方法到 StandardLibraryRegistry" />
     <MESSAGE value="refactor(standard-library): 重构标准库加载机制和命名空间结构&#10;&#10;- 将StandardLibraryInfo从record改为class，支持延迟加载和类型导入配置&#10;- 添加StandardLibraryImportMode枚举支持程序集和类型两种导入模式&#10;- 实现LoadFromAssembly和LoadFromTypes方法支持不同的导入方式&#10;- 更新StandardLibraryRegistry使用新的类型导入配置方式&#10;- 移除各模块间的循环项目引用，统一在主项目中引用&#10;- 重构LockedVariableLangValue的内部字段命名，提升代码可读性&#10;- 更新FirstUI模块的命名空间结构，统一到Core子命名空间&#10;- 将MachineLearningLibBinding改为静态类，符合其作为绑定类的用途" />
     <MESSAGE value="feat(array): 添加多种排序算法支持&#10;&#10;- 实现了快速排序、归并排序、冒泡排序、选择排序、插入排序和堆排序算法&#10;- 添加了数组和列表的 IsSorted 验证方法&#10;- 更新 Sort() 方法默认使用快速排序算法&#10;- 扩展了数组和列表的已知方法列表以包含新的排序方法&#10;- 添加了完整的排序算法测试文件，覆盖各种排序场景" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(array): 添加多种排序算法支持&#10;&#10;- 实现了快速排序、归并排序、冒泡排序、选择排序、插入排序和堆排序算法&#10;- 添加了数组和列表的 IsSorted 验证方法&#10;- 更新 Sort() 方法默认使用快速排序算法&#10;- 扩展了数组和列表的已知方法列表以包含新的排序方法&#10;- 添加了完整的排序算法测试文件，覆盖各种排序场景" />
+    <MESSAGE value="perf(interpreter): 优化反射调用性能&#10;&#10;- 添加 MethodInvokerCache 类使用委托缓存替代 MethodInfo.Invoke&#10;- 在 FuncLangValue 中使用缓存的委托调用方法提升性能&#10;- 为 NativeAnyLangValue 和 NativeStaticAny 添加成员信息缓存&#10;- 更新 Math 库测试用例使用浮点数参数&#10;- 移除已废弃的 SortLib 相关代码和测试&#10;- 修改 NetLib 测试使用新的 HttpClient 创建方法" />
+    <MESSAGE value="perf(interpreter): 优化反射调用性能&#10;&#10;- 引入 MethodInvokerCache 使用 Expression.Lambda 编译 MethodInfo 为强类型委托&#10;- 实现线程安全的 ConcurrentDictionary 缓存机制避免重复反射开销&#10;- 优化 FuncLangValue、NativeAnyLangValue 和 NativeStaticAny 类的反射调用&#10;- 添加反射性能基准测试验证优化效果&#10;- 生成详细的反射性能优化报告包含测试数据和实现细节&#10;- 方法调用性能提升 1.9x 从 38ms 降至 20ms" />
+    <MESSAGE value="perf(runtime): 添加属性访问委托缓存优化反射性能&#10;&#10;- 实现 PropertyAccessorCache 类使用 Expression.Lambda 编译属性访问委托&#10;- 添加线程安全的 Getter 和 Setter 缓存机制&#10;- 在性能测试中集成新的委托缓存基准测试&#10;- 更新性能报告输出格式和缓存统计信息&#10;- 优化序列化测试中的数组长度获取语法" />
+    <option name="LAST_COMMIT_MESSAGE" value="perf(runtime): 添加属性访问委托缓存优化反射性能&#10;&#10;- 实现 PropertyAccessorCache 类使用 Expression.Lambda 编译属性访问委托&#10;- 添加线程安全的 Getter 和 Setter 缓存机制&#10;- 在性能测试中集成新的委托缓存基准测试&#10;- 更新性能报告输出格式和缓存统计信息&#10;- 优化序列化测试中的数组长度获取语法" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1129,26 +1124,26 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs</url>
-          <line>213</line>
+          <line>209</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" containingFunctionPresentation="方法 'Import_ConditionalWithComplexExpression_ShouldEvaluateExpression'">
             <startOffsets>
-              <option value="6658" />
+              <option value="6604" />
             </startOffsets>
             <endOffsets>
-              <option value="6754" />
+              <option value="6700" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="594" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs</url>
-          <line>212</line>
+          <line>208</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" containingFunctionPresentation="方法 'Import_ConditionalWithComplexExpression_ShouldEvaluateExpression'">
             <startOffsets>
-              <option value="6626" />
+              <option value="6572" />
             </startOffsets>
             <endOffsets>
-              <option value="6649" />
+              <option value="6595" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="595" />

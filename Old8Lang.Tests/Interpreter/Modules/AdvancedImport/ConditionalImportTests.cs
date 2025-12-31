@@ -7,12 +7,8 @@ namespace Old8Lang.Tests.Interpreter.Modules.AdvancedImport;
 /// <summary>
 /// 条件导入功能测试
 /// </summary>
-public class ConditionalImportTests : ModuleImportTestBase
+public class ConditionalImportTests(ITestOutputHelper output) : ModuleImportTestBase(output)
 {
-    public ConditionalImportTests(ITestOutputHelper output) : base(output)
-    {
-    }
-
     [Fact]
     public void Import_ConditionalImport_ShouldImportBasedOnCondition()
     {

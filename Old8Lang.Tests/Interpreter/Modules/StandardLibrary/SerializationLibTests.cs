@@ -93,7 +93,7 @@ import Serialization
 
 data <- {""name"": ""David"", ""age"": 40}
 bytes <- Serialization.ProtobufSerialize(data)
-PrintLine($""Protobuf serialized, bytes length: {bytes.Length}"")
+PrintLine($""Protobuf serialized, bytes length: {len(bytes)}"")
 ";
         CreateTempModuleFile("./StandardLibrary/protobuf_serialize_test.old8", code);
         var (_, exception) = ExecuteCodeFile("./StandardLibrary/protobuf_serialize_test.old8");

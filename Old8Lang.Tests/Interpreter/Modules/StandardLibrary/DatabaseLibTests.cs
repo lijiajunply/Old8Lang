@@ -8,6 +8,7 @@ namespace Old8Lang.Tests.Interpreter.Modules.StandardLibrary;
 /// <summary>
 /// DatabaseLib 库测试 - 测试数据库操作功能
 /// </summary>
+[Collection("Sequential")]
 public class DatabaseLibTests(ITestOutputHelper output) : ModuleImportTestBase(output)
 {
     [Fact]

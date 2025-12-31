@@ -286,6 +286,21 @@ public class FuncLangValue : ImportInfo
 
                     adjustedParams[i] = array;
                 }
+                // 如果值不为 null 且类型不匹配，尝试类型转换
+                else if (value != null && !targetType.IsAssignableFrom(value.GetType()))
+                {
+                    try
+                    {
+                        // 处理可空类型
+                        var underlyingType = Nullable.GetUnderlyingType(targetType) ?? targetType;
+                        adjustedParams[i] = Convert.ChangeType(value, underlyingType);
+                    }
+                    catch (InvalidCastException)
+                    {
+                        // 如果转换失败，保持原值，让反射调用时报错
+                        adjustedParams[i] = value;
+                    }
+                }
                 else
                 {
                     adjustedParams[i] = value;
