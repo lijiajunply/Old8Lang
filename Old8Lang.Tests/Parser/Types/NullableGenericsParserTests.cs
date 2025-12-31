@@ -1,7 +1,7 @@
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.Tests.Parser.Generics;
+namespace Old8Lang.Tests.Parser.Types;
 
 /// <summary>
 /// 可空泛型类型解析测试

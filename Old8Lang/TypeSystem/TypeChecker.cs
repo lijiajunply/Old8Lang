@@ -107,9 +107,11 @@ public static class TypeChecker
             StringLangValue => "string",
             BoolLangValue => "bool",
             CharLangValue => "char",
-            ArrayLangValue => "array",
-            ListLangValue => "list",
-            DictionaryLangValue => "dict",
+            ArrayLangValue array => array.ElementType != null ? $"array<{array.ElementType}>" : "array",
+            ListLangValue list => list.ElementType != null ? $"list<{list.ElementType}>" : "list",
+            DictionaryLangValue dict => (dict.KeyType != null && dict.ValueType != null)
+                ? $"dict<{dict.KeyType}, {dict.ValueType}>"
+                : "dict",
             FuncLangValue => "function",
             AsyncFuncLangValue => "async_func",
             GeneratorLangValue => "generator",
@@ -166,6 +168,13 @@ public static class TypeChecker
         // 数值类型的兼容性（int 可以隐式转换为 double，但反之不行）
         if (expectedType == "double" && actualType == "int") return true; // int 可以隐式转换为 double
 
+        // 泛型集合类型兼容性（解释器模式下）
+        // 允许非泛型集合（如 "list"）匹配泛型集合类型注解（如 "list<int>"）
+        if (IsGenericCollectionCompatible(expectedType, actualType))
+        {
+            return true;
+        }
+
         // 严格类型检查：不允许字符串到数字的自动转换
         // 这是测试期望的行为
 
@@ -178,6 +187,63 @@ public static class TypeChecker
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// 检查泛型集合类型兼容性
+    /// </summary>
+    /// <param name="expectedType">期望类型（如 "list&lt;int&gt;"）</param>
+    /// <param name="actualType">实际类型（如 "list" 或 "list&lt;int&gt;"）</param>
+    /// <returns>是否兼容</returns>
+    private static bool IsGenericCollectionCompatible(string expectedType, string actualType)
+    {
+        // 提取基础类型名（不含泛型参数）
+        var expectedBase = GetBaseTypeName(expectedType);
+        var actualBase = GetBaseTypeName(actualType);
+
+        // 如果基础类型不匹配，不兼容
+        if (expectedBase != actualBase)
+        {
+            return false;
+        }
+
+        // 如果期望类型不是泛型（如 "list"），而实际类型是泛型（如 "list<int>"），也允许
+        if (!IsGenericType(expectedType) && IsGenericType(actualType))
+        {
+            return true;
+        }
+
+        // 如果期望类型是泛型（如 "list<int>"），而实际类型不是泛型（如 "list"）
+        // 在解释器模式下允许（因为解释器模式不强制类型检查）
+        if (IsGenericType(expectedType) && !IsGenericType(actualType))
+        {
+            // 只检查基础类型是否匹配，已在上面检查过
+            return true;
+        }
+
+        // 如果两者都是泛型，需要完全匹配（在 IsTypeCompatible 的完全匹配中处理）
+        return false;
+    }
+
+    /// <summary>
+    /// 获取类型的基础名称（不含泛型参数）
+    /// </summary>
+    /// <param name="typeName">类型名称</param>
+    /// <returns>基础类型名称</returns>
+    private static string GetBaseTypeName(string typeName)
+    {
+        var genericStart = typeName.IndexOf('<');
+        return genericStart > 0 ? typeName.Substring(0, genericStart) : typeName;
+    }
+
+    /// <summary>
+    /// 检查是否为泛型类型
+    /// </summary>
+    /// <param name="typeName">类型名称</param>
+    /// <returns>是否为泛型类型</returns>
+    private static bool IsGenericType(string typeName)
+    {
+        return typeName.Contains('<') && typeName.Contains('>');
     }
 
     /// <summary>
