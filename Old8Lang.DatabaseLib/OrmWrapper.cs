@@ -30,13 +30,50 @@ public class OrmWrapper : IDisposable
     public int Insert<T>(T entity)
     {
         var tableName = GetTableName<T>();
-        var properties = GetProperties<T>();
-        var propertyInfos = properties as PropertyInfo[] ?? properties.ToArray();
-        var columns = string.Join(", ", propertyInfos.Select(p => p.Name));
-        var values = string.Join(", ", propertyInfos.Select(p => $"@{p.Name}"));
+        var properties = GetProperties<T>().Where(p => !IsPrimaryKey(p)).ToList();
+
+        if (properties.Count == 0)
+        {
+            throw new InvalidOperationException($"实体 {typeof(T).Name} 没有非主键属性可插入");
+        }
+
+        var columns = string.Join(", ", properties.Select(p => p.Name));
+        var values = string.Join(", ", properties.Select(p => $"@{p.Name}"));
 
         var sql = $"INSERT INTO {tableName} ({columns}) VALUES ({values})";
-        return ExecuteScalar<int>(sql, entity);
+        var result = Execute(sql, entity);
+
+        // 获取并设置自增主键
+        var primaryKey = GetPrimaryKey<T>();
+        if (primaryKey != null && IsAutoIncrementKey(primaryKey))
+        {
+            var lastIdSql = "SELECT last_insert_rowid()";
+            var lastId = ExecuteScalar<long>(lastIdSql, null);
+            primaryKey.SetValue(entity, Convert.ChangeType(lastId, primaryKey.PropertyType));
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 插入实体（非泛型版本）
+    /// </summary>
+    /// <param name="entity">实体对象</param>
+    /// <returns>影响的行数</returns>
+    public int Insert(object entity)
+    {
+        if (entity == null)
+            throw new ArgumentNullException(nameof(entity));
+
+        var entityType = entity.GetType();
+
+        // 使用反射调用泛型方法
+        var method = GetType()
+            .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            .First(m => m.Name == nameof(Insert) && m.IsGenericMethod)
+            .MakeGenericMethod(entityType);
+
+        return (int)method.Invoke(this, new[] { entity })!;
     }
 
     /// <summary>
@@ -61,6 +98,25 @@ public class OrmWrapper : IDisposable
     }
 
     /// <summary>
+    /// 更新实体（非泛型版本）
+    /// </summary>
+    /// <param name="entity">实体对象</param>
+    /// <returns>影响的行数</returns>
+    public int Update(object entity)
+    {
+        if (entity == null)
+            throw new ArgumentNullException(nameof(entity));
+
+        var entityType = entity.GetType();
+        var method = GetType()
+            .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            .First(m => m.Name == nameof(Update) && m.IsGenericMethod)
+            .MakeGenericMethod(entityType);
+
+        return (int)method.Invoke(this, new[] { entity })!;
+    }
+
+    /// <summary>
     /// 删除实体
     /// </summary>
     /// <typeparam name="T">实体类型</typeparam>
@@ -76,6 +132,25 @@ public class OrmWrapper : IDisposable
 
         var sql = $"DELETE FROM {tableName} WHERE {primaryKey.Name} = @{primaryKey.Name}";
         return Execute(sql, entity);
+    }
+
+    /// <summary>
+    /// 删除实体（非泛型版本）
+    /// </summary>
+    /// <param name="entity">实体对象</param>
+    /// <returns>影响的行数</returns>
+    public int Delete(object entity)
+    {
+        if (entity == null)
+            throw new ArgumentNullException(nameof(entity));
+
+        var entityType = entity.GetType();
+        var method = GetType()
+            .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            .First(m => m.Name == nameof(Delete) && m.IsGenericMethod)
+            .MakeGenericMethod(entityType);
+
+        return (int)method.Invoke(this, new[] { entity })!;
     }
 
     /// <summary>
@@ -145,10 +220,9 @@ public class OrmWrapper : IDisposable
     public int BulkInsert<T>(IEnumerable<T> entities)
     {
         var tableName = GetTableName<T>();
-        var properties = GetProperties<T>();
-        var propertyInfos = properties as PropertyInfo[] ?? properties.ToArray();
-        var columns = string.Join(", ", propertyInfos.Select(p => p.Name));
-        var values = string.Join(", ", propertyInfos.Select(p => $"@{p.Name}"));
+        var properties = GetProperties<T>().Where(p => !IsPrimaryKey(p)).ToList();
+        var columns = string.Join(", ", properties.Select(p => p.Name));
+        var values = string.Join(", ", properties.Select(p => $"@{p.Name}"));
 
         var sql = $"INSERT INTO {tableName} ({columns}) VALUES ({values})";
         return Execute(sql, entities);
@@ -265,8 +339,19 @@ public class OrmWrapper : IDisposable
     private static bool IsPrimaryKey(PropertyInfo property)
     {
         return property.GetCustomAttributes()
-            .Any(a => a is System.ComponentModel.DataAnnotations.KeyAttribute || 
+            .Any(a => a is System.ComponentModel.DataAnnotations.KeyAttribute ||
                       a is System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedAttribute);
+    }
+
+    /// <summary>
+    /// 检查主键是否为自增
+    /// </summary>
+    private static bool IsAutoIncrementKey(PropertyInfo property)
+    {
+        var dbGeneratedAttr = property.GetCustomAttribute<System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedAttribute>();
+        return dbGeneratedAttr?.DatabaseGeneratedOption ==
+               System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity ||
+               property.GetCustomAttribute<System.ComponentModel.DataAnnotations.KeyAttribute>() != null;
     }
 
     /// <summary>
