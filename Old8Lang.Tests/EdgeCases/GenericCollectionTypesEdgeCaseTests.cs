@@ -184,7 +184,7 @@ count <- single.Count()
         var code = @"
 single:dict<string, int> <- {""key"": 123}
 result <- single[""key""]
-count <- single.Count()
+count <- len(single)
 ";
         var interpreter = new LangInterpreter();
 
@@ -690,7 +690,7 @@ class Item {
 }
 
 items:list<Item> <- {}
-for i in 1..50 {
+for i in [1~50] {
     item <- Item()
     item.id <- i
     item.value <- $""Item {i}""
@@ -768,7 +768,7 @@ class Product {
 
 // 空数组
 emptyArray:array<Product> <- []
-result1 <- emptyArray.Length
+result1 <- len(emptyArray)
 
 // 单元素数组
 apple <- Product()
@@ -776,7 +776,7 @@ apple.name <- ""Apple""
 apple.price <- 1.5
 
 singleArray:array<Product> <- [apple]
-result2 <- singleArray.Length
+result2 <- len(singleArray)
 ";
         var interpreter = new LangInterpreter();
 
