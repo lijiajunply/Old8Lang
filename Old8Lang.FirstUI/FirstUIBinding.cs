@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using Old8Lang.FirstUI.Core;
 using Old8Lang.FirstUI.Theme;
@@ -219,44 +220,85 @@ public static class FirstUIBinding
     /// </summary>
     public static void RunApp(object buildFunction)
     {
-        if (_app == null)
-        {
-            Initialize();
-        }
-
-        _mainWindow = new Window
-        {
-            Title = "Old8Lang FirstUI Application",
-            Width = 800,
-            Height = 600,
-            WindowStartupLocation = WindowStartupLocation.CenterScreen
-        };
-
         try
         {
-            var invokeMethod = buildFunction.GetType().GetMethod("Invoke");
-            var rootWidget = invokeMethod?.Invoke(buildFunction, null);
-
-            if (rootWidget is WidgetBase widget && _context != null)
+            // 使用 AppBuilder 正确初始化 Avalonia 应用
+            var lifetime = new ClassicDesktopStyleApplicationLifetime
             {
-                if (widget.Build(_context) is Control control)
+                Args = Array.Empty<string>(),
+                ShutdownMode = ShutdownMode.OnMainWindowClose
+            };
+
+            var builder = AppBuilder.Configure<Application>()
+                .UsePlatformDetect()
+                .LogToTrace()
+                .SetupWithLifetime(lifetime);
+
+            // 初始化应用上下文
+            if (_app == null)
+            {
+                _app = Application.Current ?? builder.Instance ?? new Application();
+                _context = new BuildContext
                 {
-                    _mainWindow.Content = control;
+                    Theme = ThemeManager.Instance.CurrentTheme
+                };
+                Console.WriteLine("[FirstUI] Initialized via AppBuilder");
+            }
+
+            // 创建主窗口
+            _mainWindow = new Window
+            {
+                Title = "Old8Lang FirstUI Application",
+                Width = 800,
+                Height = 600,
+                WindowStartupLocation = WindowStartupLocation.CenterScreen
+            };
+
+            // 构建 UI
+            try
+            {
+                var invokeMethod = buildFunction.GetType().GetMethod("Invoke");
+                var rootWidget = invokeMethod?.Invoke(buildFunction, null);
+
+                if (rootWidget is WidgetBase widget && _context != null)
+                {
+                    if (widget.Build(_context) is Control control)
+                    {
+                        _mainWindow.Content = control;
+                    }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"[FirstUI] Error building UI: {ex.Message}");
-            Console.Error.WriteLine($"[FirstUI] Stack trace: {ex.StackTrace}");
-            _mainWindow.Content = new TextBlock
+            catch (Exception ex)
             {
-                Text = $"Error: {ex.Message}\n\nStack trace:\n{ex.StackTrace}",
-                TextWrapping = Avalonia.Media.TextWrapping.Wrap
-            };
-        }
+                Console.Error.WriteLine($"[FirstUI] Error building UI: {ex.Message}");
+                Console.Error.WriteLine($"[FirstUI] Stack trace: {ex.StackTrace}");
+                _mainWindow.Content = new TextBlock
+                {
+                    Text = $"Error: {ex.Message}\n\nStack trace:\n{ex.StackTrace}",
+                    TextWrapping = Avalonia.Media.TextWrapping.Wrap
+                };
+            }
 
-        _mainWindow.Show();
+            // 设置主窗口并启动应用
+            lifetime.MainWindow = _mainWindow;
+            lifetime.Start(Array.Empty<string>());
+        }
+        catch (PlatformNotSupportedException ex)
+        {
+            throw new InvalidOperationException(
+                "无法在当前环境中启动 GUI 应用。FirstUI 需要图形界面支持。\n" +
+                "请确保您在支持 GUI 的环境中运行（例如：macOS 的桌面环境、Windows 或 Linux 的 X11/Wayland）。\n" +
+                $"详细错误: {ex.Message}",
+                ex);
+        }
+        catch (Exception ex) when (ex.Message.Contains("not supported on this platform"))
+        {
+            throw new InvalidOperationException(
+                "无法在当前环境中启动 GUI 应用。FirstUI 需要图形界面支持。\n" +
+                "请确保您在支持 GUI 的环境中运行（例如：macOS 的桌面环境、Windows 或 Linux 的 X11/Wayland）。\n" +
+                $"详细错误: {ex.Message}",
+                ex);
+        }
     }
 }
 

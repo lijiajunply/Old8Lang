@@ -22,10 +22,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/Advanced/ExtendedRangeTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/Advanced/ExtendedRangeTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryLoader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryLoader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,9 +64,13 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Collections/Advanced/ExtendedRangeTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/CsvTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/DatabaseLibTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/DatabaseLibTests.cs" root0="SKIP_HIGHLIGHTING" />
@@ -82,6 +83,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/SerializationLibTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Intermediates/NativeAnyLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/LangValueType.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/ModuleObjects/UnifiedModule.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
@@ -94,6 +96,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/CharValueFuncStatic.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/StandardLibrary/StandardLibraryLoader.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Utilities/MethodInvokerCache.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Utilities/MethodInvokerCache.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/Utilities/MethodInvokerCache.cs" root0="SKIP_HIGHLIGHTING" />
@@ -516,7 +519,7 @@
       <workItem from="1766771063664" duration="16661000" />
       <workItem from="1766997021901" duration="12927000" />
       <workItem from="1767123773418" duration="15798000" />
-      <workItem from="1767204141752" duration="9898000" />
+      <workItem from="1767204141752" duration="10237000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -861,7 +864,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="485" />
+    <option name="localTasksCounter" value="486" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -888,7 +891,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(threading): 更新线程测试以修复spawn任务启动问题&#10;&#10;- 将接口继承语法从 implements 更改为 extends&#10;- 为所有spawn任务添加显式的.Start()调用&#10;- 重构流水线测试中的任务启动顺序&#10;- 更新依赖任务的执行流程&#10;- 移除过时的断点配置&#10;- 添加新的文件高亮设置" />
     <MESSAGE value="fix(ast): 修复数值类型转换逻辑&#10;&#10;- 修正了超出 int 范围时的类型转换行为，从字符串改为 double 类型" />
     <MESSAGE value="feat(char): 添加字符类型扩展方法支持&#10;&#10;- 实现 CharValueFuncStatic 类提供字符大小写转换功能&#10;- 添加 ToUpper() 方法将字符转换为大写&#10;- 添加 ToLower() 方法将字符转换为小写&#10;- 在 Instance.cs 中为 CharLangValue 类型注册扩展方法&#10;- 修复 LangValueType.cs 中数值类型转换问题&#10;- 移除过时的 NativeMethodBindingTests 测试文件&#10;- 更新 TaskAdvancedTests 中线程启动逻辑&#10;- 移除过时的 ThreadSynchronizationTests 测试文件&#10;- 更新 IDE 工作区配置和断点位置信息" />
     <MESSAGE value="feat(database): 扩展ORM包装器功能支持非泛型操作和自增主键处理&#10;&#10;- 修改Insert方法排除主键字段并添加自增主键值回填功能&#10;- 添加非泛型Insert、Update、Delete方法支持运行时类型处理&#10;- 实现自增主键检测和最后插入ID获取机制&#10;- 修复批量插入操作排除主键字段的问题&#10;- 更新IDE工作区配置和项目元数据" />
@@ -913,7 +915,8 @@
     <MESSAGE value="feat(state): 添加完整状态管理系统&#10;&#10;- 实现 State 类提供局部状态管理功能&#10;- 实现 ObservableState 类支持响应式状态自动触发 UI 更新&#10;- 实现 GlobalState 类提供全局状态管理类似 Provider 模式&#10;- 实现 Computed 类支持计算属性基于依赖状态派生新状态&#10;- 添加 IState 接口统一状态管理抽象&#10;- 扩展 WidgetBase 添加 Rebuild 方法支持状态变化重建&#10;- 更新文档添加状态管理使用示例和功能说明&#10;- 修改项目进度标记状态管理阶段完成" />
     <MESSAGE value="feat(animation): 添加动画系统和缓动函数库&#10;&#10;- 实现了基础动画类Animation，支持启动、暂停、恢复、停止和重置功能&#10;- 添加了泛型动画类Animation&lt;T&gt;，支持自定义插值函数&#10;- 实现了完整的缓动函数库，包含线性、四次方、三次方、正弦、指数、圆形、回弹、弹性、弹跳和弹簧效果&#10;- 创建了AnimatedContainer动画容器组件，支持宽度、高度、不透明度和背景色的自动过渡动画&#10;- 添加了动画接口IAnimation和动画状态枚举AnimationStatus&#10;- 实现了动画事件系统，包括更新事件和完成事件&#10;- 提供了链式调用API用于动画配置和事件绑定" />
     <MESSAGE value="feat(theme): 实现主题系统和样式管理功能&#10;&#10;- 添加 ColorScheme 类用于定义颜色主题，包含浅色、深色、Material Design 和 Fluent Design 颜色方案&#10;- 添加 SpacingScheme 类用于定义间距系统，支持不同倍数的间距单位&#10;- 添加 StyleSheet、Style 和 StyleBuilder 类用于管理样式定义和构建&#10;- 添加 ThemeData 类用于存储完整的主题配置，包含颜色、字体、间距、阴影和圆角方案&#10;- 添加 Theme 类提供预定义主题创建方法，支持 light、dark、material、fluent 等主题&#10;- 在 FirstUIBinding 中实现主题切换功能，支持 SetTheme、GetCurrentTheme、ToggleTheme 等 API&#10;- 添加主题变化监听器支持，允许注册回调函数监听主题变化&#10;- 添加主题系统使用示例文档，展示基础主题切换和主题监听功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(theme): 实现主题系统和样式管理功能&#10;&#10;- 添加 ColorScheme 类用于定义颜色主题，包含浅色、深色、Material Design 和 Fluent Design 颜色方案&#10;- 添加 SpacingScheme 类用于定义间距系统，支持不同倍数的间距单位&#10;- 添加 StyleSheet、Style 和 StyleBuilder 类用于管理样式定义和构建&#10;- 添加 ThemeData 类用于存储完整的主题配置，包含颜色、字体、间距、阴影和圆角方案&#10;- 添加 Theme 类提供预定义主题创建方法，支持 light、dark、material、fluent 等主题&#10;- 在 FirstUIBinding 中实现主题切换功能，支持 SetTheme、GetCurrentTheme、ToggleTheme 等 API&#10;- 添加主题变化监听器支持，允许注册回调函数监听主题变化&#10;- 添加主题系统使用示例文档，展示基础主题切换和主题监听功能" />
+    <MESSAGE value="fix(ast): 修复类型加载和范围语法问题&#10;&#10;- 修复 NativeAnyLangValue 中类型加载逻辑，支持简单类名和完整类型名&#10;- 修正标准库加载器使用完整类型名而非仅类名&#10;- 修复字符范围语法从 '..' 改为 '~' 的测试用例&#10;- 更新 IDE 配置文件中的任务计数和提交历史记录" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(ast): 修复类型加载和范围语法问题&#10;&#10;- 修复 NativeAnyLangValue 中类型加载逻辑，支持简单类名和完整类型名&#10;- 修正标准库加载器使用完整类型名而非仅类名&#10;- 修复字符范围语法从 '..' 改为 '~' 的测试用例&#10;- 更新 IDE 配置文件中的任务计数和提交历史记录" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
