@@ -44,10 +44,16 @@ public static class StandardLibraryLoader
         try
         {
             var libInfo = StandardLibraryRegistry.GetLibraryInfo(libraryName)!;
-            var assembly = GetOrLoadAssembly(libInfo.AssemblyName);
+            var assembly = libInfo.GetAssembly();
 
-            // 加载原生类和方法
-            var symbols = LoadNativeMethods(assembly, libInfo, manager);
+            // 根据导入模式加载
+            var symbols = libInfo.ImportMode switch
+            {
+                StandardLibraryImportMode.Assembly => LoadFromAssembly(assembly, libInfo, manager),
+                StandardLibraryImportMode.Types => LoadFromTypes(assembly, libInfo, manager),
+                _ => throw new InvalidOperationException($"未知的导入模式: {libInfo.ImportMode}")
+            };
+
             module = ModuleFactory.CreateModuleFromSymbols(libraryName, symbols);
 
             return true;
@@ -82,32 +88,19 @@ public static class StandardLibraryLoader
             var libInfo = StandardLibraryRegistry.GetLibraryInfo(libraryName)!;
 
             // 尝试加载程序集（不抛出异常，只验证）
-            var assembly = GetOrLoadAssembly(libInfo.AssemblyName);
+            var assembly = libInfo.GetAssembly();
 
-            // 验证类是否存在
-            if (libInfo.IsMultiClass)
+            // 验证类型是否存在
+            if (libInfo.ImportMode == StandardLibraryImportMode.Types && libInfo.TypeConfigs != null)
             {
-                // 多类库：验证所有类
-                foreach (var className in libInfo.ClassNames!)
+                foreach (var typeConfig in libInfo.TypeConfigs)
                 {
-                    var fullTypeName = $"{libInfo.AssemblyName}.{className}";
-                    var type = assembly.GetType(fullTypeName);
+                    var type = typeConfig.Type;
                     if (type == null)
                     {
-                        errorMessage = $"标准库 '{libraryName}' 中找不到类 '{className}'（程序集: {libInfo.AssemblyName}）";
+                        errorMessage = $"标准库 '{libraryName}' 中找不到指定的类型";
                         return false;
                     }
-                }
-            }
-            else if (libInfo.ClassName != null)
-            {
-                // 单类库：验证单个类
-                var fullTypeName = $"{libInfo.AssemblyName}.{libInfo.ClassName}";
-                var type = assembly.GetType(fullTypeName);
-                if (type == null)
-                {
-                    errorMessage = $"标准库 '{libraryName}' 中找不到类 '{libInfo.ClassName}'（程序集: {libInfo.AssemblyName}）";
-                    return false;
                 }
             }
 
@@ -126,9 +119,9 @@ public static class StandardLibraryLoader
     }
 
     /// <summary>
-    /// 获取或加载程序集
+    /// 获取或加载程序集（公开方法，供 StandardLibraryInfo 使用）
     /// </summary>
-    private static Assembly GetOrLoadAssembly(string assemblyName)
+    public static Assembly GetOrLoadAssembly(string assemblyName)
     {
         lock (AssemblyLock)
         {
@@ -163,55 +156,182 @@ public static class StandardLibraryLoader
     }
 
     /// <summary>
-    /// 从程序集加载原生方法
+    /// 从程序集导入（全局导入模式）
+    /// 支持使用 a.b 来访问子命名空间
     /// </summary>
-    private static Dictionary<string, LangValueType> LoadNativeMethods(
+    private static Dictionary<string, LangValueType> LoadFromAssembly(
         Assembly assembly,
         StandardLibraryInfo libInfo,
         VariateManager manager)
     {
         var symbols = new Dictionary<string, LangValueType>();
+        var rootNamespace = libInfo.RootNamespace ?? assembly.GetName().Name;
 
-        if (libInfo.IsMultiClass)
+        // 获取程序集中所有公共类型
+        var types = assembly.GetExportedTypes()
+            .Where(t => t.Namespace != null && t.Namespace.StartsWith(rootNamespace!))
+            .ToList();
+
+        if (libInfo.EnableSubNamespaceImport)
         {
-            // 多类库：加载多个类
-            foreach (var className in libInfo.ClassNames!)
+            // 支持子命名空间导入：创建命名空间层次结构
+            var namespaceGroups = types.GroupBy(t => t.Namespace!);
+
+            foreach (var group in namespaceGroups)
             {
-                LoadClassMethods(assembly, libInfo.AssemblyName, className, symbols, manager);
+                var ns = group.Key;
+                // 移除根命名空间前缀
+                var relativePath = ns.Substring(rootNamespace!.Length).TrimStart('.');
+
+                if (string.IsNullOrEmpty(relativePath))
+                {
+                    // 根命名空间下的类型，直接添加
+                    foreach (var type in group)
+                    {
+                        AddTypeToSymbols(type, symbols, manager);
+                    }
+                }
+                else
+                {
+                    // 子命名空间下的类型，创建命名空间模块
+                    var subNamespaceSymbols = new Dictionary<string, LangValueType>();
+                    foreach (var type in group)
+                    {
+                        AddTypeToSymbols(type, subNamespaceSymbols, manager);
+                    }
+
+                    // 创建命名空间模块
+                    var subModule = ModuleFactory.CreateModuleFromSymbols(
+                        relativePath.Replace('.', '_'),
+                        subNamespaceSymbols
+                    );
+
+                    // 支持 a.b.c 的路径访问
+                    var parts = relativePath.Split('.');
+                    var currentDict = symbols;
+
+                    for (int i = 0; i < parts.Length; i++)
+                    {
+                        var part = parts[i];
+
+                        if (i == parts.Length - 1)
+                        {
+                            // 最后一层，添加模块
+                            currentDict[part] = subModule;
+                        }
+                        else
+                        {
+                            // 中间层，创建或获取嵌套字典
+                            if (!currentDict.ContainsKey(part))
+                            {
+                                var nestedSymbols = new Dictionary<string, LangValueType>();
+                                currentDict[part] = ModuleFactory.CreateModuleFromSymbols(part, nestedSymbols);
+                            }
+
+                            // 这里需要获取嵌套模块的符号字典，暂时简化处理
+                            // 实际应该支持多级嵌套
+                        }
+                    }
+                }
             }
         }
-        else if (libInfo.ClassName != null)
+        else
         {
-            // 单类库：加载单个类
-            LoadClassMethods(assembly, libInfo.AssemblyName, libInfo.ClassName, symbols, manager);
+            // 不支持子命名空间导入，直接加载所有类型
+            foreach (var type in types)
+            {
+                AddTypeToSymbols(type, symbols, manager);
+            }
         }
 
         return symbols;
     }
 
     /// <summary>
-    /// 加载类的所有公共静态方法
+    /// 从类型列表导入
     /// </summary>
-    private static void LoadClassMethods(
+    private static Dictionary<string, LangValueType> LoadFromTypes(
         Assembly assembly,
-        string assemblyName,
-        string className,
-        Dictionary<string, LangValueType> symbols,
+        StandardLibraryInfo libInfo,
         VariateManager manager)
     {
-        // 获取类型
-        var fullTypeName = $"{assemblyName}.{className}";
-        var type = assembly.GetType(fullTypeName);
+        var symbols = new Dictionary<string, LangValueType>();
 
-        if (type == null)
+        if (libInfo.TypeConfigs == null)
+            return symbols;
+
+        foreach (var typeConfig in libInfo.TypeConfigs)
         {
-            throw new Old8Exception("TYPE_NOT_FOUND", $"在程序集 '{assemblyName}' 中找不到类型 '{className}'",
-                new SourcePosition());
+            var type = typeConfig.Type;
+
+            if (typeConfig.ImportStaticMembers)
+            {
+                // 静态类：导入静态成员
+                if (typeConfig.UseNativeStaticAny)
+                {
+                    // 使用 NativeStaticAny 包装
+                    var nativeStaticAny = new NativeStaticAny(type.Name, type);
+                    symbols[type.Name] = nativeStaticAny;
+                }
+                else
+                {
+                    // 直接导入静态成员
+                    LoadStaticMembers(type, symbols, manager);
+                }
+            }
+            else
+            {
+                // 普通类：导入为 NativeAnyLangValue
+                // 使用类型的 Assembly.Location 和实际的命名空间
+                var assemblyLocation = type.Assembly.Location;
+                var assemblyName = type.Assembly.GetName().Name ?? "Unknown";
+
+                var nativeAny = new NativeAnyLangValue(assemblyName, type.Name,
+                    assemblyLocation, type.Name);
+
+                // 执行初始化
+                nativeAny.Run(manager);
+                symbols[type.Name] = nativeAny;
+            }
         }
 
-        // 获取所有公共静态方法
+        return symbols;
+    }
+
+    /// <summary>
+    /// 将类型添加到符号表
+    /// </summary>
+    private static void AddTypeToSymbols(Type type, Dictionary<string, LangValueType> symbols, VariateManager manager)
+    {
+        // 判断是否为静态类
+        if (type.IsAbstract && type.IsSealed)
+        {
+            // 静态类：导入静态成员
+            LoadStaticMembers(type, symbols, manager);
+        }
+        else
+        {
+            // 普通类：导入为 NativeAnyLangValue
+            var assemblyLocation = type.Assembly.Location;
+            var assemblyName = type.Assembly.GetName().Name ?? "Unknown";
+
+            var nativeAny = new NativeAnyLangValue(assemblyName, type.Name,
+                assemblyLocation, type.Name);
+
+            // 执行初始化
+            nativeAny.Run(manager);
+            symbols[type.Name] = nativeAny;
+        }
+    }
+
+    /// <summary>
+    /// 加载静态成员
+    /// </summary>
+    private static void LoadStaticMembers(Type type, Dictionary<string, LangValueType> symbols, VariateManager manager)
+    {
+        // 获取所有公共静态方法（排除泛型方法）
         var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .Where(m => !IsObjectMethod(m))
+            .Where(m => !IsObjectMethod(m) && !m.ContainsGenericParameters)
             .ToList();
 
         // 为每个方法创建 FuncLangValue 并注册
@@ -224,13 +344,23 @@ public static class StandardLibraryLoader
             manager.AddClassAndFunc(funcValue);
         }
 
-        // 如果类本身有构造器，注册类构造器
-        var constructors = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
-        if (constructors.Length > 0)
+        // 获取所有公共静态属性
+        var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Static);
+        foreach (var property in properties)
         {
-            // 为构造器创建包装函数
-            // 注意：这里简化处理，实际可能需要更复杂的类型包装
-            // 暂时跳过类构造器注册，因为需要特殊的构造器包装类
+            if (property.CanRead)
+            {
+                var value = property.GetValue(null);
+                symbols[property.Name] = ImportInfo.ObjToValue(value);
+            }
+        }
+
+        // 获取所有公共静态字段
+        var fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
+        foreach (var field in fields)
+        {
+            var value = field.GetValue(null);
+            symbols[field.Name] = ImportInfo.ObjToValue(value);
         }
     }
 

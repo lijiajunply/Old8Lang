@@ -16,7 +16,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Old8Lang.DatabaseLib\Old8Lang.DatabaseLib.csproj" />
         <ProjectReference Include="..\Old8Lang.FirstUI\Old8Lang.FirstUI.csproj" />
+        <ProjectReference Include="..\Old8Lang.MachineLearningLib\Old8Lang.MachineLearningLib.csproj" />
+        <ProjectReference Include="..\Old8Lang.SerializationLib\Old8Lang.SerializationLib.csproj" />
         <ProjectReference Include="..\Old8LangLib\Old8LangLib.csproj" />
         <ProjectReference Include="..\Old8Lang.NetLib\Old8Lang.NetLib.csproj" />
     </ItemGroup>

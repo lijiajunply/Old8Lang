@@ -1,3 +1,13 @@
+using Old8Lang.DatabaseLib;
+using Old8Lang.FirstUI;
+using Old8Lang.FirstUI.Basic;
+using Old8Lang.FirstUI.Core;
+using Old8Lang.FirstUI.Layout;
+using Old8Lang.MachineLearningLib;
+using Old8Lang.NetLib;
+using Old8Lang.SerializationLib;
+using Old8LangLib;
+
 namespace Old8Lang.StandardLibrary;
 
 /// <summary>
@@ -11,99 +21,151 @@ public static class StandardLibraryRegistry
     /// </summary>
     public static readonly Dictionary<string, StandardLibraryInfo> Libraries = new()
     {
-        // 来自 Old8LangLib 的标准库
-        ["OS"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "OS"
+        // 来自 Old8LangLib 的标准库（使用延迟加载）
+        ["OS"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(OS))
         ),
 
-        ["File"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "FileLib"
+        ["File"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(FileLib))
         ),
 
-        ["Terminal"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "Terminal"
+        ["Terminal"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(Terminal))
         ),
 
-        ["Time"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "Time"
+        ["Time"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(Time))
         ),
 
-        ["MathLib"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "MathLib"
+        ["MathLib"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(MathLib))
         ),
 
-        ["Math"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "MathLib"
+        ["Math"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(MathLib))
         ),
 
-        ["Async"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "AsyncLib"
+        ["Async"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(AsyncLib))
         ),
 
-        ["Crypto"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "CryptoLib"
+        ["Crypto"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(CryptoLib))
         ),
 
-        ["CollectionLib"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "CollectionLib"
+        ["CollectionLib"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(CollectionLib))
         ),
 
-        ["Json"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "JsonLib"
+        ["Json"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(JsonLib))
         ),
 
-        ["Csv"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "Csv"
+        ["Csv"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(Csv))
         ),
 
-        ["Vector"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "VectorLib"
+        ["Vector"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(VectorLib))
         ),
 
-        ["Regex"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "RegexLib"
+        ["Regex"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(RegexLib))
         ),
 
-        ["Sort"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "SortLib"
+        ["Sort"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(SortLib))
         ),
 
-        ["ColorfulTerminal"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "ColorfulTerminal"
+        ["ColorfulTerminal"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(ColorfulTerminal))
+        ),
+
+        ["TemplateEngine"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(TemplateEngine))
+        ),
+
+        ["Image"] = StandardLibraryInfo.FromTypes(
+            "Old8LangLib",
+            TypeImportConfig.StaticClass(typeof(ImageLib))
         ),
 
         // 来自 Old8Lang.NetLib 的网络库（多类库）
-        ["Net"] = new StandardLibraryInfo(AssemblyName: "Old8Lang.NetLib",
-            ClassNames:
-            [
-                "SocketClient",
-                "HttpWebClient",
-                "MqttClientWrapper",
-                "WebSocketClient",
-                "WebApiClient"
-            ]
+        ["Net"] = StandardLibraryInfo.FromTypes(
+            "Old8Lang.NetLib",
+            TypeImportConfig.NormalClass(typeof(SocketClient)),
+            TypeImportConfig.NormalClass(typeof(HttpWebClient)),
+            TypeImportConfig.NormalClass(typeof(MqttClientWrapper)),
+            TypeImportConfig.NormalClass(typeof(WebSocketClient)),
+            TypeImportConfig.NormalClass(typeof(WebApiClient))
         ),
-        ["TemplateEngine"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "TemplateEngine"),
-        ["Image"] = new StandardLibraryInfo(AssemblyName: "Old8LangLib",
-            ClassName: "ImageLib"),
-        ["MachineLearning"] =
-            new StandardLibraryInfo(AssemblyName: "Old8Lang.MachineLearningLib", "MachineLearningLibBinding"),
-        ["Serialization"] = new StandardLibraryInfo(AssemblyName: "Old8Lang.SerializationLib",
-            ClassName: "SerializationLibBinding"),
-        ["Database"] = new StandardLibraryInfo(AssemblyName: "Old8Lang.DatabaseLib",
-            ClassName: "DatabaseLibBinding"),
-        ["FirstUI"] = new StandardLibraryInfo(AssemblyName: "Old8Lang.FirstUI", ClassNames:
-        [
-            "FirstUIBinding", 
-            "Container",
-            "Column",
-            "BuildContext",
-            "StateManager",
-            "Thickness",
-            "Text",
-            "Button"
-        ])
+
+        // 其他扩展库（延迟加载）
+        ["MachineLearning"] = StandardLibraryInfo.FromTypes(
+            "Old8Lang.MachineLearningLib",
+            TypeImportConfig.StaticClass(
+                typeof(MachineLearningLibBinding)
+            )
+        ),
+
+        ["Serialization"] = StandardLibraryInfo.FromTypes(
+            "Old8Lang.SerializationLib",
+            TypeImportConfig.StaticClass(
+                typeof(SerializationLibBinding)
+            )
+        ),
+
+        ["Database"] = StandardLibraryInfo.FromTypes(
+            "Old8Lang.DatabaseLib",
+            TypeImportConfig.StaticClass(
+                typeof(DatabaseLibBinding)
+            )
+        ),
+
+        ["FirstUI"] = StandardLibraryInfo.FromTypes(
+            "Old8Lang.FirstUI",
+            TypeImportConfig.StaticClass(
+                typeof(FirstUIBinding)
+            ),
+            TypeImportConfig.NormalClass(
+                typeof(Container)
+            ),
+            TypeImportConfig.NormalClass(
+                typeof(Column)
+            ),
+            TypeImportConfig.NormalClass(
+                typeof(BuildContext)
+            ),
+            TypeImportConfig.NormalClass(
+                typeof(StateManager)
+            ),
+            TypeImportConfig.NormalClass(
+                typeof(Thickness)
+            ),
+            TypeImportConfig.NormalClass(
+                typeof(Text)
+            ),
+            TypeImportConfig.NormalClass(
+                typeof(Button)
+            )
+        )
     };
 
     /// <summary>

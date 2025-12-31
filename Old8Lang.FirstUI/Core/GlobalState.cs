@@ -1,8 +1,4 @@
-using System.Collections.Immutable;
-using Avalonia;
-using Avalonia.Controls;
-
-namespace Old8Lang.FirstUI;
+namespace Old8Lang.FirstUI.Core;
 
 /// <summary>
 /// 可观察状态基类

@@ -1,4 +1,4 @@
-namespace Old8Lang.FirstUI;
+namespace Old8Lang.FirstUI.Core;
 
 /// <summary>
 /// 构建上下文

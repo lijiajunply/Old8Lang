@@ -1,7 +1,4 @@
-using Avalonia;
-using Avalonia.Controls;
-
-namespace Old8Lang.FirstUI;
+namespace Old8Lang.FirstUI.Core;
 
 /// <summary>
 /// 组件基类

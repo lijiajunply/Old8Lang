@@ -5,7 +5,7 @@ namespace Old8Lang.MachineLearningLib;
 /// <summary>
 /// Old8Lang 机器学习库绑定类
 /// </summary>
-public class MachineLearningLibBinding
+public static class MachineLearningLibBinding
 {
     private static MLContextWrapper? _mlContext;
 

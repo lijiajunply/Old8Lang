@@ -14,8 +14,4 @@
         <PackageReference Include="Dapper" Version="2.1.66" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Old8Lang\Old8Lang.csproj" />
-    </ItemGroup>
-
 </Project>

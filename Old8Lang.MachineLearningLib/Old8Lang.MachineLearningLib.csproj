@@ -13,8 +13,4 @@
         <PackageReference Include="Microsoft.ML.ImageAnalytics" Version="5.0.0" />
     </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="../Old8Lang/Old8Lang.csproj" />
-    </ItemGroup>
-
 </Project>
