@@ -32,6 +32,153 @@ public class ModuleResolutionResult
     /// 包信息（如果是第三方包）
     /// </summary>
     public PackageInfo? PackageInfo { get; set; }
+
+    /// <summary>
+    /// 失败原因（当 IsSuccess 为 false 时）
+    /// </summary>
+    public string? FailureReason { get; set; }
+
+    /// <summary>
+    /// 失败详情列表（记录每个尝试步骤的详细信息）
+    /// </summary>
+    public List<ResolutionAttempt> ResolutionAttempts { get; set; } = new();
+
+    /// <summary>
+    /// 获取友好的错误信息
+    /// </summary>
+    public string GetFriendlyErrorMessage(string moduleName)
+    {
+        var lines = new List<string>
+        {
+            $"无法导入模块 '{moduleName}'"
+        };
+
+        if (!string.IsNullOrEmpty(FailureReason))
+        {
+            lines.Add("");
+            lines.Add($"原因: {FailureReason}");
+        }
+
+        if (ResolutionAttempts.Count > 0)
+        {
+            lines.Add("");
+            lines.Add("尝试的解析步骤:");
+            foreach (var attempt in ResolutionAttempts)
+            {
+                lines.Add($"  [{attempt.StepNumber}] {attempt.Description}");
+                if (!string.IsNullOrEmpty(attempt.SearchPath))
+                {
+                    lines.Add($"      路径: {attempt.SearchPath}");
+                }
+                if (!string.IsNullOrEmpty(attempt.Result))
+                {
+                    lines.Add($"      结果: {attempt.Result}");
+                }
+            }
+        }
+        else if (AttemptedPaths.Count > 0)
+        {
+            lines.Add("");
+            lines.Add("尝试的路径:");
+            foreach (var path in AttemptedPaths)
+            {
+                lines.Add($"  - {path}");
+            }
+        }
+
+        // 添加建议
+        lines.Add("");
+        lines.Add("建议:");
+        lines.AddRange(GenerateSuggestions(moduleName));
+
+        return string.Join(Environment.NewLine, lines);
+    }
+
+    /// <summary>
+    /// 生成针对性建议
+    /// </summary>
+    private List<string> GenerateSuggestions(string moduleName)
+    {
+        var suggestions = new List<string>();
+
+        // 根据模块名称和解析过程提供建议
+        if (moduleName.Contains('.') && !moduleName.EndsWith(".old8"))
+        {
+            suggestions.Add("  - 如果这是子模块导入，请确认父模块目录包含 __init__.old8 或 index.old8");
+        }
+
+        if (!moduleName.StartsWith("./") && !moduleName.StartsWith("../") && !Path.IsPathRooted(moduleName))
+        {
+            suggestions.Add("  - 如果这是第三方包，请确认已安装该包到 ~/.old8lang/packages/ 或当前目录的 packages/");
+            suggestions.Add("  - 如果这是本地文件，请使用相对路径 (如 './module' 或 '../module')");
+        }
+
+        suggestions.Add("  - 检查模块名称拼写是否正确");
+        suggestions.Add("  - 确认模块文件扩展名为 .old8");
+
+        // 检查是否可能是标准库名称拼写错误
+        var similarStandardLibs = FindSimilarStandardLibraries(moduleName);
+        if (similarStandardLibs.Any())
+        {
+            suggestions.Add($"  - 您是否想导入以下标准库之一: {string.Join(", ", similarStandardLibs)}");
+        }
+
+        return suggestions;
+    }
+
+    /// <summary>
+    /// 查找相似的标准库名称
+    /// </summary>
+    private List<string> FindSimilarStandardLibraries(string moduleName)
+    {
+        var allLibs = StandardLibraryRegistry.GetAllLibraryNames();
+        var similar = new List<string>();
+
+        var lowerModuleName = moduleName.ToLowerInvariant();
+        foreach (var lib in allLibs)
+        {
+            var lowerLib = lib.ToLowerInvariant();
+            // 简单的相似度检测：包含关系或前缀匹配
+            if (lowerLib.Contains(lowerModuleName) || lowerModuleName.Contains(lowerLib) ||
+                lowerLib.StartsWith(lowerModuleName.Substring(0, Math.Min(3, lowerModuleName.Length))))
+            {
+                similar.Add(lib);
+            }
+        }
+
+        return similar.Take(3).ToList(); // 最多返回3个建议
+    }
+}
+
+/// <summary>
+/// 解析尝试记录
+/// </summary>
+public class ResolutionAttempt
+{
+    /// <summary>
+    /// 步骤编号
+    /// </summary>
+    public int StepNumber { get; set; }
+
+    /// <summary>
+    /// 步骤描述
+    /// </summary>
+    public string Description { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 搜索路径
+    /// </summary>
+    public string? SearchPath { get; set; }
+
+    /// <summary>
+    /// 结果描述
+    /// </summary>
+    public string? Result { get; set; }
+
+    /// <summary>
+    /// 是否成功
+    /// </summary>
+    public bool Success { get; set; }
 }
 
 /// <summary>
@@ -100,8 +247,19 @@ public class ModuleResolver
         VariateManager? manager = null)
     {
         var result = new ModuleResolutionResult();
+        int stepNumber = 0;
 
         // 1. 检查是否为网络路径
+        stepNumber++;
+        result.ResolutionAttempts.Add(new ResolutionAttempt
+        {
+            StepNumber = stepNumber,
+            Description = "检查是否为网络路径 (http:// 或 https://)",
+            SearchPath = moduleName,
+            Result = PathResolver.IsUrl(moduleName) ? "是网络路径" : "不是网络路径",
+            Success = PathResolver.IsUrl(moduleName)
+        });
+
         if (PathResolver.IsUrl(moduleName))
         {
             result.ModuleType = ModuleType.NetworkModule;
@@ -110,7 +268,18 @@ public class ModuleResolver
         }
 
         // 2. 检查是否为子模块语法（module.submodule）
-        if (IsSubmoduleSyntax(moduleName))
+        stepNumber++;
+        var isSubmodule = IsSubmoduleSyntax(moduleName);
+        result.ResolutionAttempts.Add(new ResolutionAttempt
+        {
+            StepNumber = stepNumber,
+            Description = "检查是否为子模块语法 (module.submodule)",
+            SearchPath = moduleName,
+            Result = isSubmodule ? "是子模块语法，尝试解析" : "不是子模块语法",
+            Success = false
+        });
+
+        if (isSubmodule)
         {
             result.ModuleType = ModuleType.Submodule;
             var submodulePath = ResolveSubmodule(moduleName, currentFilePath, manager);
@@ -118,13 +287,31 @@ public class ModuleResolver
             if (submodulePath != null)
             {
                 result.AttemptedPaths.Add(submodulePath);
+                result.ResolutionAttempts[^1].Result = $"找到子模块: {submodulePath}";
+                result.ResolutionAttempts[^1].Success = true;
+            }
+            else
+            {
+                result.ResolutionAttempts[^1].Result = "子模块解析失败";
+                result.FailureReason = "子模块路径不存在或缺少 __init__.old8 / index.old8 文件";
             }
 
             return result;
         }
 
         // 3. 优先级 1: 标准库
-        if (StandardLibraryRegistry.IsStandardLibrary(moduleName))
+        stepNumber++;
+        var isStandardLib = StandardLibraryRegistry.IsStandardLibrary(moduleName);
+        result.ResolutionAttempts.Add(new ResolutionAttempt
+        {
+            StepNumber = stepNumber,
+            Description = "检查是否为标准库",
+            SearchPath = moduleName,
+            Result = isStandardLib ? $"找到标准库: {moduleName}" : "不是标准库",
+            Success = isStandardLib
+        });
+
+        if (isStandardLib)
         {
             result.ModuleType = ModuleType.StandardLibrary;
             result.ResolvedPath = moduleName; // 标准库使用名称作为标识
@@ -135,8 +322,20 @@ public class ModuleResolver
         // 跳过相对路径和绝对路径
         if (!moduleName.StartsWith("./") && !moduleName.StartsWith("../") && !Path.IsPathRooted(moduleName))
         {
+            stepNumber++;
             // 解析版本
             VersionResolver.ParsePackageSpec(moduleName, out var packageName, out var versionSpec);
+
+            var packageSearchPaths = GetPackageSearchPaths(currentFilePath);
+            result.ResolutionAttempts.Add(new ResolutionAttempt
+            {
+                StepNumber = stepNumber,
+                Description = $"在包目录中搜索第三方包 '{packageName}'" +
+                             (versionSpec != null ? $" (版本: {versionSpec})" : ""),
+                SearchPath = string.Join(", ", packageSearchPaths),
+                Result = "正在搜索...",
+                Success = false
+            });
 
             var packagePath = ResolvePackage(packageName, versionSpec, currentFilePath);
             if (packagePath != null)
@@ -150,16 +349,41 @@ public class ModuleResolver
                     PackagePath = packagePath
                 };
                 result.AttemptedPaths.Add(packagePath);
+                result.ResolutionAttempts[^1].Result = $"找到包: {packagePath}";
+                result.ResolutionAttempts[^1].Success = true;
                 return result;
+            }
+            else
+            {
+                result.ResolutionAttempts[^1].Result = "未找到匹配的包";
             }
         }
 
         // 5. 优先级 3: 本地文件
+        stepNumber++;
+        result.ResolutionAttempts.Add(new ResolutionAttempt
+        {
+            StepNumber = stepNumber,
+            Description = "尝试解析为本地文件",
+            SearchPath = currentFilePath != null
+                ? $"相对于: {Path.GetDirectoryName(currentFilePath) ?? "当前目录"}"
+                : "相对于: 当前工作目录",
+            Result = "正在搜索...",
+            Success = false
+        });
+
         var localPath = ResolveLocalFile(moduleName, currentFilePath, result.AttemptedPaths);
         if (localPath != null)
         {
             result.ModuleType = ModuleType.LocalFile;
             result.ResolvedPath = localPath;
+            result.ResolutionAttempts[^1].Result = $"找到文件: {localPath}";
+            result.ResolutionAttempts[^1].Success = true;
+        }
+        else
+        {
+            result.ResolutionAttempts[^1].Result = $"文件不存在: {result.AttemptedPaths.LastOrDefault() ?? moduleName}";
+            result.FailureReason = "模块文件不存在";
         }
 
         return result;

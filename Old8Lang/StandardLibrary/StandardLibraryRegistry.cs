@@ -118,4 +118,9 @@ public static class StandardLibraryRegistry
     {
         return Libraries.GetValueOrDefault(name);
     }
+
+    /// <summary>
+    /// 获取所有标准库名称列表
+    /// </summary>
+    public static IEnumerable<string> GetAllLibraryNames() => Libraries.Keys;
 }

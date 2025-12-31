@@ -40,7 +40,8 @@ public class ModuleSystemService
 
             if (!resolution.IsSuccess)
             {
-                result.Error = new ImportError(default(SourcePosition), moduleName, resolution.AttemptedPaths);
+                // 使用新的构造函数，提供详细的错误信息
+                result.Error = new ImportError(default(SourcePosition), moduleName, resolution);
                 return result;
             }
 

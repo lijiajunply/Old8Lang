@@ -148,6 +148,12 @@ public partial class ImportStatement(
                 throw result.Error;
             }
 
+            // 使用 ModuleResolutionResult 提供详细错误信息
+            if (result.ResolutionResult != null)
+            {
+                throw new ImportError(this, moduleName, result.ResolutionResult);
+            }
+
             throw new ImportError(this, moduleName, "模块导入失败");
         }
     }

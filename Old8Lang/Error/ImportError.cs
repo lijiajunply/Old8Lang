@@ -1,4 +1,5 @@
 using Old8Lang.AST;
+using Old8Lang.ModuleSystem.Resolution;
 
 namespace Old8Lang.Error;
 
@@ -89,6 +90,40 @@ public class ImportError : RuntimeError
     {
         ModuleName = moduleName;
         AttemptedPaths = [];
+    }
+
+    /// <summary>
+    /// 构造函数，使用 ModuleResolutionResult（推荐）
+    /// </summary>
+    /// <param name="position">源代码位置信息</param>
+    /// <param name="moduleName">无法导入的模块名称</param>
+    /// <param name="resolutionResult">模块解析结果</param>
+    public ImportError(SourcePosition position, string moduleName, ModuleResolutionResult resolutionResult)
+        : base(
+            position,
+            ErrorCode,
+            resolutionResult.GetFriendlyErrorMessage(moduleName),
+            "请检查模块名称和路径是否正确")
+    {
+        ModuleName = moduleName;
+        AttemptedPaths = resolutionResult.AttemptedPaths;
+    }
+
+    /// <summary>
+    /// 构造函数，使用 IOldLangTree 和 ModuleResolutionResult
+    /// </summary>
+    /// <param name="node">AST节点</param>
+    /// <param name="moduleName">无法导入的模块名称</param>
+    /// <param name="resolutionResult">模块解析结果</param>
+    public ImportError(IOldLangTree node, string moduleName, ModuleResolutionResult resolutionResult)
+        : base(
+            node,
+            ErrorCode,
+            resolutionResult.GetFriendlyErrorMessage(moduleName),
+            "请检查模块名称和路径是否正确")
+    {
+        ModuleName = moduleName;
+        AttemptedPaths = resolutionResult.AttemptedPaths;
     }
     
     /// <summary>
