@@ -22,9 +22,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Classes/ClassInstantiationTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Classes/ConstructorTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Classes/MemberAccessTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/FileHeader/FileHeaderConfigTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/FileHeader/FileHeaderDirectiveTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/TODO.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Types/IntersectionTypesInterpreterTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,10 +66,13 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Async/AsyncGeneratorTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Types/GenericCollectionTypesCompilerTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/EdgeCases/GenericCollectionTypesEdgeCaseTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Types/GenericCollectionTypesInterpreterTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Parser/Types/GenericCollectionTypesParserTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Unit/Compiler/LocalManagerTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/ArrayLangValue.cs" root0="SKIP_HIGHLIGHTING" />
@@ -496,7 +500,7 @@
       <workItem from="1766746850670" duration="17415000" />
       <workItem from="1766771063664" duration="16661000" />
       <workItem from="1766997021901" duration="12927000" />
-      <workItem from="1767123773418" duration="9522000" />
+      <workItem from="1767123773418" duration="11068000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -841,7 +845,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="453" />
+    <option name="localTasksCounter" value="454" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -868,7 +872,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(BasicInfo): 移除语言信息功能和相关命令&#10;&#10;- 删除了 BasicInfo.Info() 方法和 LangSample 相关代码&#10;- 移除了 Old8Lang 语言关键字列表定义&#10;- 删除了命令名称与参数映射字典 Order&#10;- 移除了 InfoCommand 类定义&#10;- 从命令注册表中移除了信息命令注册&#10;- 清理了相关注释和未使用的命名空间引用" />
     <MESSAGE value="feat(interpreter): 实现嵌套切片访问功能&#10;&#10;- 添加 NestedSliceAccess AST 节点支持任意 LangExpression 类型的基础表达式&#10;- 修改 ExpressionParser 支持多层嵌套切片语法解析&#10;- 实现三维数组、嵌套列表、嵌套字典等多种数据结构的切片访问&#10;- 添加 comprehensive 测试用例验证嵌套切片功能正确性&#10;- 生成详细的嵌套切片访问功能验证报告&#10;- 保持向后兼容性，不破坏现有数组和切片操作" />
     <MESSAGE value="feat(ci): 添加完整的CI/CD流水线配置&#10;&#10;- 配置GitHub Actions工作流支持push和pull request触发&#10;- 实现构建和测试作业包括单元测试、语法测试、解释器测试和编译器测试&#10;- 添加性能基准测试作业使用BenchmarkDotNet进行性能监控&#10;- 集成代码质量检查包括代码格式化和Roslyn分析器&#10;- 配置安全扫描使用Trivy进行漏洞检测&#10;- 实现语言服务器构建和VSCode扩展打包发布&#10;- 添加文档自动部署到GitHub Pages功能&#10;- 配置发布作业支持多平台二进制文件构建和GitHub Release创建&#10;- 集成Slack通知功能及时反馈构建状态&#10;- 优化工作流依赖关系确保各阶段正确执行顺序" />
     <MESSAGE value="chore(ci): 更新CI/CD配置和IDE工作区设置&#10;&#10;- 在GitHub Actions配置中添加master分支触发条件&#10;- 清理IDE工作区XML配置文件中的mock路径设置&#10;- 更新本地任务计数器和工作时间统计信息&#10;- 移除旧的VCS提交消息记录&#10;- 更新最后提交消息为CI/CD流水线配置信息" />
@@ -893,7 +896,8 @@
     <MESSAGE value="test(lang): 添加自定义类型泛型功能的全面测试覆盖&#10;&#10;- 为编译器添加自定义类型泛型列表、数组和嵌套泛型的测试用例&#10;- 为解释器添加自定义类型泛型字典和函数参数泛型的执行测试&#10;- 为解析器添加自定义类型泛型语法解析的单元测试&#10;- 为边界情况添加空集合、单元素和大型集合的测试用例&#10;- 验证自定义类型泛型在不同场景下的正确编译和执行&#10;- 确保嵌套泛型和复杂泛型结构的正确处理" />
     <MESSAGE value="refactor(tests): 更新集合类型和长度函数的测试用例&#10;&#10;- 将字典长度获取从 Count() 方法改为 len() 函数&#10;- 更新数组长度获取从 Length 属性改为 len() 函数&#10;- 修改循环语法从 1..50 改为 [1~50]&#10;- 添加编译模式测试待办事项文档，规划缺失的测试类别" />
     <MESSAGE value="test(compiler): 添加异步函数和边界情况测试&#10;&#10;- 实现异步函数基础测试，验证基本异步功能编译和执行&#10;- 添加异步生成器测试，验证 async/await 语法正确性&#10;- 创建 await 关键字测试，覆盖各种异步场景&#10;- 添加边界测试用例，包括空输入、极大值、深度嵌套等场景&#10;- 实现错误处理测试，验证零除法、异常捕获等边界情况&#10;- 添加复杂布尔表达式和递归测试用例" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(compiler): 添加异步函数和边界情况测试&#10;&#10;- 实现异步函数基础测试，验证基本异步功能编译和执行&#10;- 添加异步生成器测试，验证 async/await 语法正确性&#10;- 创建 await 关键字测试，覆盖各种异步场景&#10;- 添加边界测试用例，包括空输入、极大值、深度嵌套等场景&#10;- 实现错误处理测试，验证零除法、异常捕获等边界情况&#10;- 添加复杂布尔表达式和递归测试用例" />
+    <MESSAGE value="feat(tests): 添加编译器模式测试报告和异步功能测试&#10;&#10;- 创建2025-12-31编译器测试完成报告，记录测试创建阶段完成情况&#10;- 添加15个新的编译器模式测试文件，覆盖异常处理、边界条件、高级函数等7个类别&#10;- 实现异步函数编译器测试，包括基础异步函数、返回值、多调用等场景&#10;- 新增异步生成器测试，涵盖字符串生成、条件生成、嵌套生成等功能&#10;- 完善异步编程测试覆盖，包含错误处理、循环、条件执行等多种情况&#10;- 建立全面的编译器模式测试套件，显著提升测试覆盖率" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(tests): 添加编译器模式测试报告和异步功能测试&#10;&#10;- 创建2025-12-31编译器测试完成报告，记录测试创建阶段完成情况&#10;- 添加15个新的编译器模式测试文件，覆盖异常处理、边界条件、高级函数等7个类别&#10;- 实现异步函数编译器测试，包括基础异步函数、返回值、多调用等场景&#10;- 新增异步生成器测试，涵盖字符串生成、条件生成、嵌套生成等功能&#10;- 完善异步编程测试覆盖，包含错误处理、循环、条件执行等多种情况&#10;- 建立全面的编译器模式测试套件，显著提升测试覆盖率" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
