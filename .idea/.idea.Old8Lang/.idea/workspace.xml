@@ -21,14 +21,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/CharValueFuncStatic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Advanced/NativeMethodBindingTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/TaskAdvancedTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/TaskAdvancedTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ThreadSynchronizationTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -872,7 +865,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="460" />
+    <option name="localTasksCounter" value="462" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -899,8 +892,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(generic): 实现泛型约束语法和类型推断功能&#10;&#10;- 支持泛型类型推断，自动从函数调用参数推断泛型类型&#10;- 支持泛型约束的 &amp; 符号语法（例如 class Box&lt;T: IComparable &amp; ICloneable&gt;）&#10;- 支持 where 子句语法用于函数级别的约束（例如 func sort&lt;T&gt;(items: List&lt;T&gt;) -&gt; List&lt;T&gt; where T: IComparable）&#10;- 支持混合约束语法（在泛型参数声明中使用约束 + where 子句组合）&#10;- 扩展 ClassParser 和 FunctionParser 支持 where 子句解析&#10;- 添加泛型约束语法测试用例和综合功能测试&#10;- 更新文档说明泛型约束和类型推断的使用方法&#10;- 重构 GenericTypeInference 类构造函数注入依赖" />
-    <MESSAGE value="feat(type-system): 添加联合类型和交叉类型支持&#10;&#10;- 实现联合类型 (A | B) 语法解析和类型兼容性检查&#10;- 实现交叉类型 (A &amp; B) 语法解析和类型兼容性检查&#10;- 在 TypeAnnotationManager 中添加交叉类型解析支持&#10;- 更新 FunctionParser 支持复杂类型注解解析&#10;- 修改 StatementParser 和 ClassParser 支持联合/交叉类型&#10;- 添加联合类型和交叉类型的兼容性检查规则&#10;- 支持可空联合类型和泛型中的联合/交叉类型&#10;- 更新文档和添加测试用例" />
     <MESSAGE value="fix(type): 修复类型注解解析和数值类型处理问题&#10;&#10;- 修复联合类型和交叉类型的语法解析验证&#10;- 修复类型注解中可空类型的处理顺序&#10;- 修复类型兼容性检查的回退机制&#10;- 更新测试用例中的类型断言和数值精度处理&#10;- 修复函数调用测试中的参数类型匹配" />
     <MESSAGE value="feat(type-system): 添加接口类型支持和类实现接口功能&#10;&#10;- 添加 InterfaceTypeInfo 类支持接口类型信息存储&#10;- 扩展 ClassTypeInfo 支持类实现接口的类型兼容性检查&#10;- 修改 TypeAnnotationManager 和 TypeChecker 支持接口类型注册&#10;- 在 ClassInit.cs 中实现接口和类类型的区分处理逻辑&#10;- 添加接口继承和类实现接口的类型验证机制&#10;- 更新测试用例中的数值类型处理确保精度正确" />
     <MESSAGE value="test(classes): 为类测试添加顺序集合标记并重命名处理器类&#10;&#10;- 为 ClassDeclarationTests、ClassInstantiationTests、ConstructorTests、GenericClassTests、&#10;  InheritanceTests、InterfaceTests、MemberAccessTests 和 MixinTests 添加 [Collection(&quot;Sequential&quot;)] 标记&#10;- 将 ConstructorTests 中的 Processor 类重命名为 FunctionProcessor 以提高语义清晰度&#10;- 更新 ConstructorTests 中的实例化代码以使用新的 FunctionProcessor 类名&#10;- 从 workspace.xml 中移除过时的变更记录并更新本地任务计数器&#10;- 清理 workspace.xml 中的提交消息历史记录" />
@@ -924,7 +915,9 @@
     <MESSAGE value="test(interpreter): 更新异步任务测试实现&#10;&#10;- 替换 Thread.Start() 为 spawn() 和 Join() 等待机制&#10;- 修改失败任务测试函数返回 bool 类型并使用 Join() 获取结果&#10;- 简化取消令牌测试逻辑直接检查 IsCancellationRequested 属性&#10;- 重构多任务异常处理测试" />
     <MESSAGE value="feat(thread): 实现线程安全的锁变量和线程管理功能&#10;&#10;- 添加 LockedVariableLangValue 类型支持线程安全的变量访问&#10;- 实现 ThreadLangValue 的属性访问和修改功能（IsBackground、Name、Priority）&#10;- 添加 Thread.Start()、Join()、IsAlive() 等线程控制方法&#10;- 实现 Thread.CurrentThread 静态方法获取当前线程信息&#10;- 支持 ThreadStaticMethodWrapper 调用静态线程相关方法&#10;- 更新异步并发测试使用锁变量替代原始 lock 语句&#10;- 修改线程测试使用 Spawn 函数创建线程实例&#10;- 添加线程属性设置和获取的完整实现" />
     <MESSAGE value="test(threading): 更新线程测试以修复spawn任务启动问题&#10;&#10;- 将接口继承语法从 implements 更改为 extends&#10;- 为所有spawn任务添加显式的.Start()调用&#10;- 重构流水线测试中的任务启动顺序&#10;- 更新依赖任务的执行流程&#10;- 移除过时的断点配置&#10;- 添加新的文件高亮设置" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(threading): 更新线程测试以修复spawn任务启动问题&#10;&#10;- 将接口继承语法从 implements 更改为 extends&#10;- 为所有spawn任务添加显式的.Start()调用&#10;- 重构流水线测试中的任务启动顺序&#10;- 更新依赖任务的执行流程&#10;- 移除过时的断点配置&#10;- 添加新的文件高亮设置" />
+    <MESSAGE value="feat(char): 添加字符类型扩展方法支持&#10;&#10;- 实现 CharValueFuncStatic 类提供字符大小写转换功能&#10;- 添加 ToUpper() 方法将字符转换为大写&#10;- 添加 ToLower() 方法将字符转换为小写&#10;- 在 Instance.cs 中为 CharLangValue 类型注册扩展方法&#10;- 修复 LangValueType.cs 中数值类型转换问题&#10;- 移除过时的 NativeMethodBindingTests 测试文件&#10;- 更新 TaskAdvancedTests 中线程启动逻辑&#10;- 移除过时的 ThreadSynchronizationTests 测试文件&#10;- 更新 IDE 工作区配置和断点位置信息" />
+    <MESSAGE value="fix(ast): 修复数值类型转换逻辑&#10;&#10;- 修正了超出 int 范围时的类型转换行为，从字符串改为 double 类型" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(ast): 修复数值类型转换逻辑&#10;&#10;- 修正了超出 int 范围时的类型转换行为，从字符串改为 double 类型" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1439,19 +1432,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="637" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs</url>
-          <line>334</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" containingFunctionPresentation="方法 'HandleLongConversion'">
-            <startOffsets>
-              <option value="11961" />
-            </startOffsets>
-            <endOffsets>
-              <option value="12010" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="638" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
