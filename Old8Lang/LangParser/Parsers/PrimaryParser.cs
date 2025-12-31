@@ -1432,11 +1432,11 @@ public class PrimaryParser(
                 Expect(LangTokenType.Identifier);
 
                 // 验证是否为支持的类型
-                var supportedTypes = new[] { "int", "double", "string", "bool", "char", "void", "list", "dict" };
+                var supportedTypes = new[] { "int", "double", "string", "bool", "char", "void", "list", "dict", "any" };
                 if (!supportedTypes.Contains(typeAnnotation))
                 {
                     throw CreateSyntaxError(
-                        $"不支持的类型注解: {typeAnnotation}。支持的类型: int, double, string, bool, char, void, list, dict");
+                        $"不支持的类型注解: {typeAnnotation}。支持的类型: int, double, string, bool, char, void, list, dict, any");
                 }
             }
             else
