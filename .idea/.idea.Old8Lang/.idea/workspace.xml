@@ -21,13 +21,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Advanced/NativeMethodBindingTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/CancellationTokenTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/TaskAdvancedTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ThreadSynchronizationTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Threading/ThreadTests.cs" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -70,6 +64,7 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Async/AsyncGeneratorTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Compiler/Types/GenericCollectionTypesCompilerTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/EdgeCases/GenericCollectionTypesEdgeCaseTests.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Collections/ListComprehensionTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Interpreter/Types/GenericCollectionTypesInterpreterTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Parser/Types/GenericCollectionTypesParserTests.cs" root0="SKIP_HIGHLIGHTING" />
@@ -501,7 +496,7 @@
       <workItem from="1766746850670" duration="17415000" />
       <workItem from="1766771063664" duration="16661000" />
       <workItem from="1766997021901" duration="12927000" />
-      <workItem from="1767123773418" duration="12040000" />
+      <workItem from="1767123773418" duration="12371000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -846,7 +841,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="455" />
+    <option name="localTasksCounter" value="456" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -873,7 +868,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(ci): 添加完整的CI/CD流水线配置&#10;&#10;- 配置GitHub Actions工作流支持push和pull request触发&#10;- 实现构建和测试作业包括单元测试、语法测试、解释器测试和编译器测试&#10;- 添加性能基准测试作业使用BenchmarkDotNet进行性能监控&#10;- 集成代码质量检查包括代码格式化和Roslyn分析器&#10;- 配置安全扫描使用Trivy进行漏洞检测&#10;- 实现语言服务器构建和VSCode扩展打包发布&#10;- 添加文档自动部署到GitHub Pages功能&#10;- 配置发布作业支持多平台二进制文件构建和GitHub Release创建&#10;- 集成Slack通知功能及时反馈构建状态&#10;- 优化工作流依赖关系确保各阶段正确执行顺序" />
     <MESSAGE value="chore(ci): 更新CI/CD配置和IDE工作区设置&#10;&#10;- 在GitHub Actions配置中添加master分支触发条件&#10;- 清理IDE工作区XML配置文件中的mock路径设置&#10;- 更新本地任务计数器和工作时间统计信息&#10;- 移除旧的VCS提交消息记录&#10;- 更新最后提交消息为CI/CD流水线配置信息" />
     <MESSAGE value="docs(project): 添加项目待办事项文档并更新IDE配置&#10;&#10;- 创建 TODO.md 文档记录 Old8Lang 项目开发计划和待办事项&#10;- 添加工具改进部分包括错误提示增强和调试器改进计划&#10;- 记录语言特性开发状态包括已实现和计划中的功能&#10;- 添加性能优化、文档完善和测试覆盖的待办事项&#10;- 更新项目状态包括最新成就和健康度指标&#10;- 修复 IDE 工作区配置中的文件变更列表和任务计数器&#10;- 更新最后提交消息为 CI/CD 流水线配置信息" />
     <MESSAGE value="docs(project): 删除项目待办事项文档并更新IDE配置&#10;&#10;- 移除 TODO.md 文档中记录的 Old8Lang 项目开发计划和待办事项&#10;- 清理 IDE 工作区配置中的相关文件变更记录&#10;- 更新本地任务计数器和工作时间统计信息&#10;- 移除旧的 VCS 提交消息记录&#10;- 修复 IDE 工作区 XML 配置文件中的 mock 路径设置" />
@@ -898,7 +892,8 @@
     <MESSAGE value="test(compiler): 添加异步函数和边界情况测试&#10;&#10;- 实现异步函数基础测试，验证基本异步功能编译和执行&#10;- 添加异步生成器测试，验证 async/await 语法正确性&#10;- 创建 await 关键字测试，覆盖各种异步场景&#10;- 添加边界测试用例，包括空输入、极大值、深度嵌套等场景&#10;- 实现错误处理测试，验证零除法、异常捕获等边界情况&#10;- 添加复杂布尔表达式和递归测试用例" />
     <MESSAGE value="feat(tests): 添加编译器模式测试报告和异步功能测试&#10;&#10;- 创建2025-12-31编译器测试完成报告，记录测试创建阶段完成情况&#10;- 添加15个新的编译器模式测试文件，覆盖异常处理、边界条件、高级函数等7个类别&#10;- 实现异步函数编译器测试，包括基础异步函数、返回值、多调用等场景&#10;- 新增异步生成器测试，涵盖字符串生成、条件生成、嵌套生成等功能&#10;- 完善异步编程测试覆盖，包含错误处理、循环、条件执行等多种情况&#10;- 建立全面的编译器模式测试套件，显著提升测试覆盖率" />
     <MESSAGE value="test(interpreter): 添加异步并发、文件头配置和交叉类型测试&#10;&#10;- 实现异步并发测试，验证多任务并发执行和同步协调&#10;- 添加文件头配置指令测试，覆盖debug、verify-il、type-inference等指令&#10;- 创建文件头元数据指令测试，验证encoding、author、version等指令&#10;- 编写交叉类型测试，测试泛型约束和接口组合功能&#10;- 覆盖异步异常处理、嵌套调用和并发数据访问场景&#10;- 包含配置指令边界情况和特殊值处理测试&#10;- 实现接口继承和复杂交叉类型组合测试" />
-    <option name="LAST_COMMIT_MESSAGE" value="test(interpreter): 添加异步并发、文件头配置和交叉类型测试&#10;&#10;- 实现异步并发测试，验证多任务并发执行和同步协调&#10;- 添加文件头配置指令测试，覆盖debug、verify-il、type-inference等指令&#10;- 创建文件头元数据指令测试，验证encoding、author、version等指令&#10;- 编写交叉类型测试，测试泛型约束和接口组合功能&#10;- 覆盖异步异常处理、嵌套调用和并发数据访问场景&#10;- 包含配置指令边界情况和特殊值处理测试&#10;- 实现接口继承和复杂交叉类型组合测试" />
+    <MESSAGE value="test(interpreter): 添加异步和集合相关功能的单元测试&#10;&#10;- 新增 CancellationTokenTests 测试异步任务取消功能&#10;- 扩展 ListComprehensionTests 实现完整的列表推导式测试用例&#10;- 添加 NativeMethodBindingTests 测试本地方法绑定功能&#10;- 新增 TaskAdvancedTests 测试 TaskCompletionSource 和高级异步功能&#10;- 覆盖异步编程、列表推导式、本地方法绑定等核心功能的测试场景&#10;- 包含边界情况、错误处理和性能相关测试用例" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(interpreter): 添加异步和集合相关功能的单元测试&#10;&#10;- 新增 CancellationTokenTests 测试异步任务取消功能&#10;- 扩展 ListComprehensionTests 实现完整的列表推导式测试用例&#10;- 添加 NativeMethodBindingTests 测试本地方法绑定功能&#10;- 新增 TaskAdvancedTests 测试 TaskCompletionSource 和高级异步功能&#10;- 覆盖异步编程、列表推导式、本地方法绑定等核心功能的测试场景&#10;- 包含边界情况、错误处理和性能相关测试用例" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

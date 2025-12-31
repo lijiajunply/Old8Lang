@@ -21,12 +21,23 @@ public partial class CancellationTokenSourceLangValue : LangValueType
     public CancellationTokenLangValue Token => new(Cts.Token, Position);
 
     /// <summary>
-    /// 构造函数
+    /// 构造函数（无参）
     /// </summary>
     public CancellationTokenSourceLangValue(SourcePosition position = default)
         : base(position)
     {
         Cts = new CancellationTokenSource();
+    }
+
+    /// <summary>
+    /// 构造函数（带超时时间）
+    /// </summary>
+    /// <param name="position">源代码位置</param>
+    /// <param name="millisecondsDelay">超时时间（毫秒）</param>
+    public CancellationTokenSourceLangValue(SourcePosition position, int millisecondsDelay)
+        : base(position)
+    {
+        Cts = new CancellationTokenSource(millisecondsDelay);
     }
 
     /// <summary>
