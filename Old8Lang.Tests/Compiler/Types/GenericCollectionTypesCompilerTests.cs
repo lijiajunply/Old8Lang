@@ -560,4 +560,176 @@ Assert.True(test() == 32)
     }
 
     #endregion
+
+    #region 自定义类型泛型测试
+
+    /// <summary>
+    /// 测试自定义类型的泛型列表
+    /// </summary>
+    [Fact]
+    public void Compile_GenericListWithCustomType_CompilesAndExecutes()
+    {
+        // Arrange
+        var code = @"
+class Person {
+    public name:string
+    public age:int
+}
+
+func test() -> int {
+    alice <- Person()
+    alice.name <- ""Alice""
+    alice.age <- 30
+
+    bob <- Person()
+    bob.name <- ""Bob""
+    bob.age <- 25
+
+    people:list<Person> <- {alice, bob}
+    return people.Count()
+}
+
+Assert.True(test() == 2)
+";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        Assert.NotNull(compiledAction);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    /// <summary>
+    /// 测试自定义类型的泛型数组
+    /// </summary>
+    [Fact]
+    public void Compile_GenericArrayWithCustomType_CompilesAndExecutes()
+    {
+        // Arrange
+        var code = @"
+class Product {
+    public name:string
+    public price:double
+}
+
+func test() -> int {
+    apple <- Product()
+    apple.name <- ""Apple""
+    apple.price <- 1.5
+
+    banana <- Product()
+    banana.name <- ""Banana""
+    banana.price <- 2.0
+
+    products:array<Product> <- [apple, banana]
+    return products.Length
+}
+
+Assert.True(test() == 2)
+";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        Assert.NotNull(compiledAction);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    /// <summary>
+    /// 测试嵌套的自定义类型泛型
+    /// </summary>
+    [Fact]
+    public void Compile_NestedGenericWithCustomType_CompilesAndExecutes()
+    {
+        // Arrange
+        var code = @"
+class TaskClass {
+    public id:int
+    public title:string
+}
+
+func test() -> int {
+    task1 <- TaskClass()
+    task1.id <- 1
+    task1.title <- ""Task 1""
+
+    task2 <- TaskClass()
+    task2.id <- 2
+    task2.title <- ""Task 2""
+
+    groups:dict<string, list<TaskClass>> <- {
+        ""todo"": {task1, task2}
+    }
+
+    todoTasks <- groups[""todo""]
+    return todoTasks.Count()
+}
+
+Assert.True(test() == 2)
+";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        Assert.NotNull(compiledAction);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    /// <summary>
+    /// 测试函数参数中的自定义类型泛型
+    /// </summary>
+    [Fact]
+    public void Compile_FunctionWithCustomTypeGeneric_CompilesAndExecutes()
+    {
+        // Arrange
+        var code = @"
+class Student {
+    public name:string
+    public score:int
+}
+
+func countStudents(students:list<Student>) -> int {
+    return students.Count()
+}
+
+func test() -> int {
+    alice <- Student()
+    alice.name <- ""Alice""
+    alice.score <- 95
+
+    bob <- Student()
+    bob.name <- ""Bob""
+    bob.score <- 88
+
+    students:list<Student> <- {alice, bob}
+    return countStudents(students)
+}
+
+Assert.True(test() == 2)
+";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        Assert.NotNull(compiledAction);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    #endregion
 }

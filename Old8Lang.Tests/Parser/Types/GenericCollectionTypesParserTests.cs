@@ -416,4 +416,125 @@ mixed:list<int | string> <- {1, ""hello"", 2}
     }
 
     #endregion
+
+    #region 自定义类型泛型测试
+
+    /// <summary>
+    /// 测试自定义类型的泛型列表
+    /// </summary>
+    [Fact]
+    public void ParseProgram_GenericListWithCustomType_ParsesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+class Person {
+    public name:string
+    public age:int
+}
+
+people:list<Person> <- {}
+";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act & Assert
+        var program = parser.ParseProgram();
+        Assert.NotNull(program);
+    }
+
+    /// <summary>
+    /// 测试自定义类型的泛型数组
+    /// </summary>
+    [Fact]
+    public void ParseProgram_GenericArrayWithCustomType_ParsesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+class User {
+    public id:int
+    public email:string
+}
+
+users:array<User> <- []
+";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act & Assert
+        var program = parser.ParseProgram();
+        Assert.NotNull(program);
+    }
+
+    /// <summary>
+    /// 测试自定义类型的泛型字典
+    /// </summary>
+    [Fact]
+    public void ParseProgram_GenericDictionaryWithCustomType_ParsesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+class Product {
+    public name:string
+    public price:double
+}
+
+products:dict<string, Product> <- {}
+";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act & Assert
+        var program = parser.ParseProgram();
+        Assert.NotNull(program);
+    }
+
+    /// <summary>
+    /// 测试嵌套的自定义类型泛型
+    /// </summary>
+    [Fact]
+    public void ParseProgram_NestedGenericWithCustomType_ParsesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+class Item {
+    public id:int
+    public value:string
+}
+
+groups:dict<string, list<Item>> <- {}
+";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act & Assert
+        var program = parser.ParseProgram();
+        Assert.NotNull(program);
+    }
+
+    /// <summary>
+    /// 测试函数参数中的自定义类型泛型
+    /// </summary>
+    [Fact]
+    public void ParseProgram_FunctionWithCustomTypeGeneric_ParsesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+class Student {
+    public name:string
+    public score:int
+}
+
+func processStudents(students:list<Student>) -> int {
+    return students.Count()
+}
+";
+        var tokens = LangInterpreter.Tokenize(code);
+        var parser = new LangParser.LangParser(tokens, code);
+
+        // Act & Assert
+        var program = parser.ParseProgram();
+        Assert.NotNull(program);
+    }
+
+    #endregion
 }

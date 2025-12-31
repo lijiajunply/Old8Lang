@@ -608,4 +608,189 @@ result <- complex[""group1""][0][0]
     }
 
     #endregion
+
+    #region 自定义类型泛型边界测试
+
+    /// <summary>
+    /// 测试空的自定义类型泛型列表
+    /// </summary>
+    [Fact]
+    public void Empty_GenericListWithCustomType_HandledCorrectly()
+    {
+        // Arrange
+        var code = @"
+class Person {
+    public name:string
+    public age:int
+}
+
+people:list<Person> <- {}
+result <- len(people)
+";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(0, ((IntLangValue)result).Value);
+    }
+
+    /// <summary>
+    /// 测试单个自定义类型元素的列表
+    /// </summary>
+    [Fact]
+    public void SingleElement_GenericListWithCustomType_HandledCorrectly()
+    {
+        // Arrange
+        var code = @"
+class User {
+    public id:int
+    public email:string
+}
+
+user <- User()
+user.id <- 1
+user.email <- ""test@example.com""
+
+users:list<User> <- {user}
+result <- len(users)
+firstUser <- users[0]
+userId <- firstUser.id
+";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        var userId = interpreter.Manager.GetValue(new LangId("userId"));
+
+        Assert.Equal(1, ((IntLangValue)result).Value);
+        Assert.Equal(1, ((IntLangValue)userId).Value);
+    }
+
+    /// <summary>
+    /// 测试大型自定义类型集合
+    /// </summary>
+    [Fact]
+    public void Large_GenericListWithCustomType_HandledCorrectly()
+    {
+        // Arrange
+        var code = @"
+class Item {
+    public id:int
+    public value:string
+}
+
+items:list<Item> <- {}
+for i in 1..50 {
+    item <- Item()
+    item.id <- i
+    item.value <- $""Item {i}""
+    items.Add(item)
+}
+
+result <- len(items)
+firstItem <- items[0]
+lastItem <- items[49]
+";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        var firstItem = interpreter.Manager.GetValue(new LangId("firstItem"));
+        var lastItem = interpreter.Manager.GetValue(new LangId("lastItem"));
+
+        Assert.NotNull(result);
+        Assert.Equal(50, ((IntLangValue)result).Value);
+        Assert.NotNull(firstItem);
+        Assert.NotNull(lastItem);
+    }
+
+    /// <summary>
+    /// 测试嵌套自定义类型的边界情况
+    /// </summary>
+    [Fact]
+    public void Nested_GenericListWithCustomType_EmptyInnerLists_HandledCorrectly()
+    {
+        // Arrange
+        var code = @"
+class TaskClass {
+    public id:int
+    public title:string
+}
+
+groups:dict<string, list<TaskClass>> <- {
+    ""todo"": {},
+    ""done"": {}
+}
+
+result1 <- len(groups[""todo""])
+result2 <- len(groups[""done""])
+";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result1 = interpreter.Manager.GetValue(new LangId("result1"));
+        var result2 = interpreter.Manager.GetValue(new LangId("result2"));
+
+        Assert.Equal(0, ((IntLangValue)result1).Value);
+        Assert.Equal(0, ((IntLangValue)result2).Value);
+    }
+
+    /// <summary>
+    /// 测试自定义类型数组边界情况
+    /// </summary>
+    [Fact]
+    public void CustomType_GenericArray_BoundaryConditions_HandledCorrectly()
+    {
+        // Arrange
+        var code = @"
+class Product {
+    public name:string
+    public price:double
+}
+
+// 空数组
+emptyArray:array<Product> <- []
+result1 <- emptyArray.Length
+
+// 单元素数组
+apple <- Product()
+apple.name <- ""Apple""
+apple.price <- 1.5
+
+singleArray:array<Product> <- [apple]
+result2 <- singleArray.Length
+";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result1 = interpreter.Manager.GetValue(new LangId("result1"));
+        var result2 = interpreter.Manager.GetValue(new LangId("result2"));
+
+        Assert.Equal(0, ((IntLangValue)result1).Value);
+        Assert.Equal(1, ((IntLangValue)result2).Value);
+    }
+
+    #endregion
 }
