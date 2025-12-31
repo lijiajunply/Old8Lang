@@ -417,34 +417,313 @@ public static void ShowToast(string message, int duration)
 
 ## 主题系统
 
-### 主题结构
+### 主题架构概述
 
+主题系统采用单例模式 + 观察者模式设计，提供灵活的主题管理和样式定制能力。
+
+```
+┌─────────────────────────────────────────────────────┐
+│              ThemeManager (Singleton)               │
+│  • CurrentTheme: ThemeData                          │
+│  • StyleSheet: StyleSheet                           │
+│  • Listeners: List<Action<ThemeData>>               │
+│  ├─ SetTheme(ThemeData)                            │
+│  ├─ SetTheme(string name)                          │
+│  ├─ ToggleTheme()                                  │
+│  └─ OnThemeChanged(callback)                       │
+└────────────────┬────────────────────────────────────┘
+                 │
+                 ├──► ThemeData
+                 │    ├─ Name: string
+                 │    ├─ IsDark: bool
+                 │    ├─ Colors: ColorScheme
+                 │    ├─ Typography: TypographyScheme
+                 │    ├─ Spacing: SpacingScheme
+                 │    ├─ Shadows: ShadowScheme
+                 │    └─ BorderRadius: BorderRadiusScheme
+                 │
+                 └──► StyleSheet
+                      ├─ Register(name, style)
+                      ├─ Get(name): Style?
+                      └─ DefaultStyles (button.*, text.*, card, input)
+```
+
+### 主题数据结构
+
+**ThemeData**：完整的主题配置
 ```csharp
 public class ThemeData
 {
+    public string Name { get; set; }
+    public bool IsDark { get; set; }
     public ColorScheme Colors { get; set; }
     public TypographyScheme Typography { get; set; }
     public SpacingScheme Spacing { get; set; }
+    public ShadowScheme Shadows { get; set; }
+    public BorderRadiusScheme BorderRadius { get; set; }
 }
 ```
 
-### 主题切换
+**ColorScheme**：颜色方案
+```csharp
+public class ColorScheme
+{
+    // 主要颜色
+    public string Primary { get; set; }
+    public string OnPrimary { get; set; }
+
+    // 次要颜色
+    public string Secondary { get; set; }
+    public string OnSecondary { get; set; }
+
+    // 背景和表面
+    public string Background { get; set; }
+    public string Surface { get; set; }
+
+    // 状态颜色
+    public string Error { get; set; }
+    public string Success { get; set; }
+    public string Warning { get; set; }
+    public string Info { get; set; }
+
+    // 文本颜色
+    public string TextPrimary { get; set; }
+    public string TextSecondary { get; set; }
+    public string TextDisabled { get; set; }
+}
+```
+
+**TypographyScheme**：字体方案
+```csharp
+public class TypographyScheme
+{
+    public FontStyle H1 { get; set; }  // 标题 1-6
+    public FontStyle H2 { get; set; }
+    // ...
+    public FontStyle Body1 { get; set; }  // 正文
+    public FontStyle Button { get; set; }  // 按钮
+    public FontStyle Caption { get; set; }  // 说明
+}
+
+public class FontStyle
+{
+    public double Size { get; set; }
+    public string Weight { get; set; }
+    public string Family { get; set; }
+    public double LineHeight { get; set; }
+    public double LetterSpacing { get; set; }
+}
+```
+
+### 内置主题
+
+| 主题 | 描述 | 字体 | 间距基准 | 适用平台 |
+|------|------|------|---------|---------|
+| **Light** | 浅色主题 | sans-serif | 4dp | 通用 |
+| **Dark** | 深色主题 | sans-serif | 4dp | 通用 |
+| **Material** | Material Design 浅色 | Roboto | 8dp | Android |
+| **Material Dark** | Material Design 深色 | Roboto | 8dp | Android |
+| **Fluent** | Fluent Design 浅色 | Segoe UI | 4dp | Windows |
+| **Fluent Dark** | Fluent Design 深色 | Segoe UI | 4dp | Windows |
+
+### 主题工厂
+
+Theme 类提供静态工厂方法创建预定义主题：
 
 ```csharp
-// 内置主题
-var lightTheme = Theme.Light();
-var darkTheme = Theme.Dark();
+public static class Theme
+{
+    public static ThemeData Light() => new() { ... };
+    public static ThemeData Dark() => new() { ... };
+    public static ThemeData Material() => new() { ... };
+    public static ThemeData MaterialDark() => new() { ... };
+    public static ThemeData Fluent() => new() { ... };
+    public static ThemeData FluentDark() => new() { ... };
 
-// 应用主题
-App.SetTheme(darkTheme);
+    public static ThemeData FromName(string name) { ... }
+    public static string[] GetAvailableThemes() { ... }
+}
+```
 
-// 组件访问主题
-var primaryColor = context.Theme.Colors.Primary;
+### 主题管理器
+
+ThemeManager 使用单例模式管理应用主题：
+
+```csharp
+public class ThemeManager
+{
+    // 单例实例
+    public static ThemeManager Instance { get; }
+
+    // 当前主题和样式表
+    public ThemeData CurrentTheme { get; }
+    public StyleSheet StyleSheet { get; }
+
+    // 主题切换
+    public void SetTheme(ThemeData theme);
+    public void SetTheme(string themeName);
+    public void SetLightTheme();
+    public void SetDarkTheme();
+    public void ToggleTheme();
+
+    // 主题监听
+    public void OnThemeChanged(Action<ThemeData> listener);
+    public void RemoveThemeChangeListener(Action<ThemeData> listener);
+
+    // 样式管理
+    public void RegisterStyle(string name, Style style);
+    public Style? GetStyle(string name);
+}
+```
+
+### 样式表系统
+
+**StyleSheet**：管理预定义和自定义样式
+
+```csharp
+public class StyleSheet
+{
+    private readonly Dictionary<string, Style> _styles;
+    private readonly ThemeData _theme;
+
+    // 注册样式
+    public void Register(string name, Style style);
+
+    // 获取样式
+    public Style? Get(string name);
+
+    // 初始化默认样式
+    private void InitializeDefaultStyles()
+    {
+        // button.primary, button.secondary, button.outlined
+        // text.h1, text.h2, text.body, text.caption
+        // card, input
+    }
+}
+```
+
+**Style**：样式类，支持键值对存储和合并
+
+```csharp
+public class Style
+{
+    private readonly Dictionary<string, object> _properties;
+
+    public void Set(string key, object value);
+    public T? Get<T>(string key, T? defaultValue = default);
+    public Style Merge(Style other);  // 样式合并
+}
+```
+
+**StyleBuilder**：链式构建样式
+
+```csharp
+var style = StyleSheet.Create()
+    .Set("backgroundColor", "#FF5722")
+    .Set("textColor", "#FFFFFF")
+    .Set("borderRadius", 8)
+    .Build();
+```
+
+### 主题切换流程
+
+```
+用户调用 SetTheme
+       ↓
+ThemeManager 更新 CurrentTheme
+       ↓
+创建新的 StyleSheet
+       ↓
+通知所有监听器 (OnThemeChanged)
+       ↓
+更新 BuildContext.Theme
+       ↓
+组件访问新主题并重建 UI
+```
+
+### 主题访问
+
+**在组件中访问主题**：
+
+```csharp
+public override object Build(BuildContext context)
+{
+    var theme = context.Theme;
+
+    // 访问颜色
+    var primaryColor = theme.Colors.Primary;
+    var bgColor = theme.Colors.Background;
+
+    // 访问字体
+    var h1Size = theme.Typography.H1.Size;
+
+    // 访问间距
+    var spacing = theme.Spacing.Medium;
+
+    // 访问阴影
+    var shadow = theme.Shadows.Small;
+
+    // 根据深色/浅色调整
+    if (theme.IsDark) {
+        // 深色主题特定逻辑
+    }
+}
+```
+
+### FirstUIBinding 集成
+
+主题 API 已集成到 FirstUIBinding：
+
+```csharp
+public static class FirstUIBinding
+{
+    // 切换主题
+    public static void SetTheme(string themeName);
+
+    // 获取当前主题
+    public static string GetCurrentTheme();
+
+    // 获取所有主题
+    public static string[] GetAvailableThemes();
+
+    // 快速切换
+    public static void ToggleTheme();
+
+    // 监听变化
+    public static void OnThemeChanged(object callback);
+}
 ```
 
 ### 响应式主题
 
-当主题切换时，所有组件自动重建以应用新样式。
+当主题切换时：
+1. ThemeManager 通知所有监听器
+2. BuildContext 中的 Theme 自动更新
+3. 监听器可以触发 UI 重建（待实现自动重建）
+
+### 自定义主题示例
+
+```csharp
+var customTheme = new ThemeData
+{
+    Name = "custom",
+    IsDark = false,
+    Colors = new ColorScheme
+    {
+        Primary = "#FF6B6B",
+        Secondary = "#4ECDC4",
+        // ...
+    },
+    Typography = new TypographyScheme
+    {
+        H1 = new FontStyle { Size = 36, Weight = "bold" },
+        // ...
+    },
+    // ...
+};
+
+ThemeManager.Instance.SetTheme(customTheme);
+```
 
 ---
 
@@ -469,15 +748,75 @@ ui.Text("标题")
 state.Subscribe(value => UpdateUI());
 ```
 
-### 3. 工厂模式（Factory Pattern）
-
-用于组件创建：
+**主题系统中的应用**：
 
 ```csharp
-FirstUIBinding.CreateWidget("Text", config);
+// 注册主题变化监听器
+ThemeManager.Instance.OnThemeChanged(theme =>
+{
+    Console.WriteLine($"Theme changed: {theme.Name}");
+    // 触发 UI 更新
+});
 ```
 
-### 4. 组合模式（Composite Pattern）
+### 3. 单例模式（Singleton Pattern）
+
+**主题系统中的应用**：
+
+```csharp
+public class ThemeManager
+{
+    private static ThemeManager? _instance;
+    private static readonly object _lock = new();
+
+    public static ThemeManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                lock (_lock)
+                {
+                    _instance ??= new ThemeManager();
+                }
+            }
+            return _instance;
+        }
+    }
+}
+```
+
+确保整个应用只有一个主题管理器实例。
+
+### 4. 工厂模式（Factory Pattern）
+
+用于组件创建和主题创建：
+
+```csharp
+// 组件工厂
+FirstUIBinding.CreateWidget("Text", config);
+
+// 主题工厂
+var lightTheme = Theme.Light();
+var darkTheme = Theme.Dark();
+var materialTheme = Theme.Material();
+```
+
+### 5. 构建者模式（Builder Pattern）
+
+**主题系统中的应用**：
+
+```csharp
+// 样式构建器
+var style = StyleSheet.Create()
+    .Set("backgroundColor", "#FF5722")
+    .Set("textColor", "#FFFFFF")
+    .Set("fontSize", 18)
+    .Set("padding", 16)
+    .Build();
+```
+
+### 6. 组合模式（Composite Pattern）
 
 用于组件树的构建：
 
@@ -492,7 +831,7 @@ ui.Column({
 })
 ```
 
-### 5. 桥接模式（Bridge Pattern）
+### 7. 桥接模式（Bridge Pattern）
 
 用于 Old8Lang 和 C# 之间的桥接：
 
@@ -580,4 +919,4 @@ public class MyCustomWidget : WidgetBase
 
 ---
 
-*最后更新: 2025-12-31*
+*最后更新: 2026-01-01*

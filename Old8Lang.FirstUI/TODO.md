@@ -165,28 +165,86 @@
 
 ---
 
-## 阶段五：主题与样式系统 (第9周)
+## 阶段五：主题与样式系统 (第9周) ✅
 
-### 5.1 主题系统
-- [ ] `Theme` 主题类
-  - 颜色方案、字体、间距规范
-- [ ] 内置主题
-  - Light Theme (浅色主题)
-  - Dark Theme (深色主题)
-- [ ] 自定义主题支持
+### 5.1 主题系统 ✅
+- [x] `Theme` 主题工厂类
+  - 颜色方案、字体、间距、阴影、圆角规范
+- [x] 内置主题
+  - Light Theme (浅色主题 - iOS 风格)
+  - Dark Theme (深色主题 - iOS 风格)
+  - Material Theme (Material Design 浅色主题)
+  - Material Dark Theme (Material Design 深色主题)
+  - Fluent Theme (Fluent Design 浅色主题)
+  - Fluent Dark Theme (Fluent Design 深色主题)
+- [x] `ThemeData` 主题数据类
+  - 包含完整主题配置
+- [x] `ThemeManager` 主题管理器
+  - 单例模式管理应用主题
+  - 支持主题切换和监听
+- [x] 自定义主题支持
   - 允许用户定义完整主题
 
-### 5.2 样式系统
-- [ ] `StyleSheet` 样式表
+### 5.2 样式系统 ✅
+- [x] `StyleSheet` 样式表
   - 类似 CSS 的样式定义
-- [ ] 样式继承与覆盖
-- [ ] 响应式样式
-  - 根据窗口大小调整布局
+  - 预定义样式（按钮、文本、卡片、输入框）
+- [x] `Style` 样式类
+  - 键值对存储
+  - 样式合并功能
+- [x] `StyleBuilder` 样式构建器
+  - 链式调用构建样式
+- [x] 样式扩展方法
+  - ApplyStyle, ApplyStyleFrom
 
-### 5.3 Material Design / Fluent Design
-- [ ] 提供 Material Design 风格组件变体
-- [ ] 提供 Fluent Design 风格组件变体
-- [ ] 样式切换机制
+### 5.3 颜色与字体方案 ✅
+- [x] `ColorScheme` 颜色方案
+  - Primary, Secondary, Background, Surface, Error 等
+  - 支持颜色透明度（WithOpacity）
+- [x] `TypographyScheme` 字体方案
+  - H1-H6 标题样式
+  - Body1, Body2 正文样式
+  - Button, Caption, Label 样式
+- [x] `SpacingScheme` 间距方案
+  - 统一的间距系统（8dp/4dp 基准）
+- [x] `ShadowScheme` 阴影方案
+  - 5 级阴影效果
+- [x] `BorderRadiusScheme` 圆角方案
+  - 统一的圆角规范
+
+### 5.4 Material Design / Fluent Design ✅
+- [x] Material Design 风格主题
+  - 使用 Roboto 字体
+  - 8dp 基准间距
+  - Material 颜色规范
+- [x] Fluent Design 风格主题
+  - 使用 Segoe UI 字体
+  - Windows 11 风格
+  - Fluent 颜色规范
+- [x] 主题切换机制
+  - ThemeManager.SetTheme()
+  - FirstUIBinding.SetTheme() API
+
+### 5.5 API 集成 ✅
+- [x] FirstUIBinding 主题 API
+  - SetTheme(themeName): 切换主题
+  - GetCurrentTheme(): 获取当前主题
+  - GetAvailableThemes(): 获取所有主题
+  - ToggleTheme(): 快速切换浅色/深色
+  - OnThemeChanged(callback): 监听主题变化
+- [x] BuildContext 主题集成
+  - context.Theme 访问当前主题
+  - 主题切换时自动更新
+
+### 5.6 测试与文档 ✅
+- [x] 创建测试项目 Old8Lang.FirstUI.ThemeTest
+  - 主题创建测试
+  - 主题管理器测试
+  - 颜色方案测试
+  - 样式表测试
+  - 主题监听测试
+- [x] 示例文档
+  - Examples/ThemeExample.md
 
 ---
 
@@ -507,10 +565,11 @@ Old8Lang.FirstUI/
 - **M1 (2周)**: 完成基础架构和项目搭建 ✅
 - **M2 (4周)**: 完成基础组件库 (布局 + 基础控件) ✅
 - **M3 (6周)**: 完成高级组件和交互功能 ✅
-- **M4 (8周)**: 完成状态管理和动画系统 🔨
-- **M5 (10周)**: 完成 Old8Lang API 设计和绑定 ⏳
-- **M6 (11周)**: 完成示例和文档 ⏳
-- **M7 (13周)**: 发布 v0.1.0-alpha ⏳
+- **M4 (8周)**: 完成状态管理和动画系统 ✅
+- **M5 (9周)**: 完成主题与样式系统 ✅
+- **M6 (10周)**: 完成 Old8Lang API 设计和绑定 ⏳
+- **M7 (11周)**: 完成示例和文档 ⏳
+- **M8 (13周)**: 发布 v0.1.0-alpha ⏳
 
 ---
 
