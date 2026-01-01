@@ -605,20 +605,20 @@ public class FunctionCallTests(ITestOutputHelper testOutputHelper)
     {
         // Arrange
         var code = @"
-                               func buildUrl(base:string, path: """", params: {}) -> string {
+                               func buildUrl(base:string, path: """", param: {}) -> string {
                                    url <- base
                                    if len(path) > 0 {
                                        url <- url + ""/"" + path
                                    }
 
-                                   if len(params) > 0 {
+                                   if len(param) > 0 {
                                        url <- url + ""?""
                                        first <- true
-                                       for key in params.Keys {
+                                       for key in param.Keys {
                                            if not first {
                                                url <- url + ""&""
                                            }
-                                           url <- url + key + ""="" + params[key].ToStr()
+                                           url <- url + key + ""="" + param[key].ToStr()
                                            first <- false
                                        }
                                    }

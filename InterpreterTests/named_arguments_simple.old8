@@ -1,0 +1,14 @@
+// 命名参数功能测试 - 简化版本
+
+// 测试1：基本命名参数
+func greet(name:string, age:int, message:string) -> void {
+    PrintLine(message + ", " + name + "! Age: " + age.ToStr())
+}
+
+PrintLine("Test 1: 完全位置参数")
+greet("Alice", 25, "Hello")
+
+PrintLine("Test 2: 完全命名参数")
+greet(name: "Bob", age: 30, message: "Hi")
+
+PrintLine("测试完成!")

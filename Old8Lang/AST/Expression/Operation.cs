@@ -185,7 +185,7 @@ public partial class Operation(
                 if (Right is Instance r1)
                 {
                     var ids = r1.Ids.Select(x => x.Run(manager)).OfType<LangExpression>().ToList();
-                    var newInstance = new Instance(r1.Id, ids, r1.Position);
+                    var newInstance = new Instance(r1.Id, ids, r1.NamedArgs, r1.Position);
                     return any.Dot(newInstance, manager);
                 }
 
@@ -199,7 +199,7 @@ public partial class Operation(
                 if (Right is Instance instance)
                 {
                     var ids = instance.Ids.Select(x => x.Run(manager)).OfType<LangExpression>().ToList();
-                    var newInstance = new Instance(instance.Id, ids);
+                    var newInstance = new Instance(instance.Id, ids, instance.NamedArgs);
                     return list.Dot(newInstance, manager);
                 }
 
@@ -226,7 +226,7 @@ public partial class Operation(
             else if (dotLeftResult is NativeStaticAny native)
             {
                 if (Right is not Instance r1) throw new InvalidOperationError(this, "原生静态类型操作需要实例");
-                var newInstance = new Instance(r1.Id, r1.Ids);
+                var newInstance = new Instance(r1.Id, r1.Ids, r1.NamedArgs);
                 return native.Dot(newInstance, manager);
             }
             // 处理静态成员访问：ClassName.staticMember
@@ -235,7 +235,7 @@ public partial class Operation(
                 if (Right is Instance r1)
                 {
                     // 处理静态方法调用
-                    var newInstance = new Instance(r1.Id, r1.Ids, r1.Position);
+                    var newInstance = new Instance(r1.Id, r1.Ids, r1.NamedArgs, r1.Position);
                     return typeTemplate.Dot(newInstance, manager);
                 }
 
@@ -262,7 +262,7 @@ public partial class Operation(
                 if (Right is Instance instance)
                 {
                     var ids = instance.Ids.Select(x => x.Run(manager)).OfType<LangExpression>().ToList();
-                    var newInstance = new Instance(instance.Id, ids);
+                    var newInstance = new Instance(instance.Id, ids, instance.NamedArgs);
                     return array.Dot(newInstance, manager);
                 }
 
@@ -285,7 +285,7 @@ public partial class Operation(
                 if (Right is Instance instance)
                 {
                     var ids = instance.Ids.Select(x => x.Run(manager)).OfType<LangExpression>().ToList();
-                    var newInstance = new Instance(instance.Id, ids);
+                    var newInstance = new Instance(instance.Id, ids, instance.NamedArgs);
                     return dict.Dot(newInstance, manager);
                 }
 

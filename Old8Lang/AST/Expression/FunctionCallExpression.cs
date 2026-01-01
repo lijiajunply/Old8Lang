@@ -9,6 +9,7 @@ namespace Old8Lang.AST.Expression;
 /// <summary>
 /// 函数调用表达式，用于处理 expression(arguments) 语法
 /// 例如：cla[0]("World"), obj.method()(args)
+/// 支持命名参数：func(a: 1, b: 2) 或混合使用：func(1, b: 2)
 /// </summary>
 public partial class FunctionCallExpression : LangExpression
 {
@@ -18,9 +19,14 @@ public partial class FunctionCallExpression : LangExpression
     public readonly LangExpression FunctionExpression;
 
     /// <summary>
-    /// 函数调用参数列表
+    /// 函数调用参数列表（位置参数）
     /// </summary>
     public readonly List<LangExpression> Arguments;
+
+    /// <summary>
+    /// 命名参数列表
+    /// </summary>
+    public readonly List<NamedArgument> NamedArguments;
 
     /// <summary>
     /// 构造函数
@@ -34,6 +40,23 @@ public partial class FunctionCallExpression : LangExpression
     {
         FunctionExpression = functionExpression;
         Arguments = arguments;
+        NamedArguments = new List<NamedArgument>();
+    }
+
+    /// <summary>
+    /// 构造函数（支持命名参数）
+    /// </summary>
+    /// <param name="functionExpression">要调用的函数表达式</param>
+    /// <param name="arguments">位置参数列表</param>
+    /// <param name="namedArguments">命名参数列表</param>
+    /// <param name="position">位置信息</param>
+    public FunctionCallExpression(LangExpression functionExpression, List<LangExpression> arguments,
+        List<NamedArgument> namedArguments, SourcePosition position = default)
+        : base(position)
+    {
+        FunctionExpression = functionExpression;
+        Arguments = arguments;
+        NamedArguments = namedArguments;
     }
 
     public override LangValueType Run(VariateManager manager)
@@ -65,8 +88,8 @@ public partial class FunctionCallExpression : LangExpression
                 // 使用推断出的类型实例化泛型函数
                 var instantiatedFunc = func.InstantiateGeneric(inferredTypes, typeAnnotationManager);
 
-                // 调用实例化后的函数
-                return instantiatedFunc.Run(manager, Arguments);
+                // 调用实例化后的函数（需要处理命名参数）
+                return instantiatedFunc.Run(manager, Arguments, NamedArguments, Position);
             }
             else
             {
@@ -76,13 +99,16 @@ public partial class FunctionCallExpression : LangExpression
             }
         }
 
-        // 4. 调用函数，传入表达式列表而不是值列表
-        return func.Run(manager, Arguments);
+        // 4. 调用函数，传入位置参数和命名参数
+        return func.Run(manager, Arguments, NamedArguments, Position);
     }
 
     public override string ToString()
     {
-        var argsStr = string.Join(", ", Arguments.Select(arg => arg.ToString()));
+        var args = new List<string>();
+        args.AddRange(Arguments.Select(arg => arg.ToString()));
+        args.AddRange(NamedArguments.Select(na => na.ToString()));
+        var argsStr = string.Join(", ", args);
         return $"{FunctionExpression}({argsStr})";
     }
 

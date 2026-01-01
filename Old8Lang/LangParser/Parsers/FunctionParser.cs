@@ -3,6 +3,7 @@ using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.LangParser.Core;
+using Old8Lang.Error;
 
 namespace Old8Lang.LangParser.Parsers;
 
@@ -225,26 +226,100 @@ public class FunctionParser(
     }
 
     /// <summary>
-    /// 解析参数列表（函数调用）
+    /// 解析参数列表（函数调用），支持命名参数
     /// </summary>
-    public List<LangExpression> ParseArgList()
+    /// <param name="positionalArgs">输出的位置参数列表</param>
+    /// <param name="namedArgs">输出的命名参数列表</param>
+    public void ParseArgList(out List<LangExpression> positionalArgs, out List<NamedArgument> namedArgs)
     {
-        var args = new List<LangExpression>();
+        positionalArgs = new List<LangExpression>();
+        namedArgs = new List<NamedArgument>();
 
         if (CurrentToken.Type == LangTokenType.RightParen)
         {
-            return args;
+            return;
         }
 
         var exprParser = expressionParserFactory();
-        args.Add(exprParser.ParseExpression());
-        while (CurrentToken.Type == LangTokenType.Comma)
+        bool hasSeenNamedArg = false;
+
+        while (true)
         {
-            Expect(LangTokenType.Comma);
-            args.Add(exprParser.ParseExpression());
+            var startPosition = new SourcePosition(CurrentToken.Line, CurrentToken.Column);
+
+            // 检查是否是命名参数：identifier: expression
+            // 我们需要预读来判断是否是命名参数
+            if (CurrentToken.Type == LangTokenType.Identifier)
+            {
+                var savedIndex = CurrentIndex;
+                var identifierName = CurrentToken.Value;
+                CurrentIndex++; // 移到下一个 token
+
+                // 检查下一个 token 是否是冒号
+                if (CurrentToken.Type == LangTokenType.Colon)
+                {
+                    // 这是一个命名参数
+                    hasSeenNamedArg = true;
+                    Expect(LangTokenType.Colon);
+                    var valueExpr = exprParser.ParseExpression();
+                    namedArgs.Add(new NamedArgument(identifierName, valueExpr, startPosition));
+                }
+                else
+                {
+                    // 不是命名参数，恢复位置并按普通表达式解析
+                    CurrentIndex = savedIndex;
+
+                    // 如果之前已经出现过命名参数，现在又出现位置参数，报错
+                    if (hasSeenNamedArg)
+                    {
+                        throw new SyntaxError(startPosition,
+                            "位置参数必须出现在所有命名参数之前");
+                    }
+
+                    var expr = exprParser.ParseExpression();
+                    positionalArgs.Add(expr);
+                }
+            }
+            else
+            {
+                // 不是标识符开头，按普通表达式解析
+                if (hasSeenNamedArg)
+                {
+                    throw new SyntaxError(startPosition,
+                        "位置参数必须出现在所有命名参数之前");
+                }
+
+                var expr = exprParser.ParseExpression();
+                positionalArgs.Add(expr);
+            }
+
+            // 检查是否还有更多参数
+            if (CurrentToken.Type == LangTokenType.Comma)
+            {
+                Expect(LangTokenType.Comma);
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 解析参数列表（函数调用）- 向后兼容的方法
+    /// </summary>
+    public List<LangExpression> ParseArgList()
+    {
+        ParseArgList(out var positionalArgs, out var namedArgs);
+
+        // 如果有命名参数，抛出错误（这个方法不支持命名参数）
+        if (namedArgs.Count > 0)
+        {
+            throw new SyntaxError(new SourcePosition(CurrentToken.Line, CurrentToken.Column),
+                "此上下文不支持命名参数");
         }
 
-        return args;
+        return positionalArgs;
     }
 
     /// <summary>

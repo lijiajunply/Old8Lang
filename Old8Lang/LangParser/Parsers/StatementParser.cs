@@ -1036,9 +1036,9 @@ public class StatementParser(
         var funcName = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
         Expect(LangTokenType.LeftParen);
-        var arguments = functionParser.ParseArgList();
+        functionParser.ParseArgList(out var positionalArgs, out var namedArgs);
         Expect(LangTokenType.RightParen);
-        return new FuncRunStatement(new Instance(new LangId(funcName), arguments));
+        return new FuncRunStatement(new Instance(new LangId(funcName), positionalArgs, namedArgs));
     }
 
     /// <summary>

@@ -227,6 +227,181 @@ public class FuncLangValue : ImportInfo
     }
 
 
+    /// <summary>
+    /// 执行函数调用，支持命名参数
+    /// </summary>
+    /// <param name="variateManagerFunc">调用时的变量管理器</param>
+    /// <param name="positionalArgs">位置参数表达式列表</param>
+    /// <param name="namedArgs">命名参数列表</param>
+    /// <param name="callPosition">调用位置信息</param>
+    /// <param name="obj">对象实例（方法调用时使用）</param>
+    /// <returns>函数执行结果</returns>
+    public LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> positionalArgs,
+        List<NamedArgument> namedArgs, SourcePosition callPosition, object? obj = null)
+    {
+        // 如果没有命名参数，使用原有的逻辑
+        if (namedArgs == null || namedArgs.Count == 0)
+        {
+            return Run(variateManagerFunc, positionalArgs, obj);
+        }
+
+        // 将命名参数转换为位置参数
+        var reorderedArgs = ReorderArgumentsWithNamedParameters(positionalArgs, namedArgs, callPosition, variateManagerFunc);
+
+        // 使用重新排序后的参数调用原有方法
+        return Run(variateManagerFunc, reorderedArgs, obj);
+    }
+
+    /// <summary>
+    /// 将位置参数和命名参数重新排序为完整的位置参数列表
+    /// </summary>
+    /// <param name="positionalArgs">位置参数列表</param>
+    /// <param name="namedArgs">命名参数列表</param>
+    /// <param name="callPosition">调用位置</param>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>重新排序后的参数列表</returns>
+    private List<LangExpression> ReorderArgumentsWithNamedParameters(
+        List<LangExpression> positionalArgs,
+        List<NamedArgument> namedArgs,
+        SourcePosition callPosition,
+        VariateManager manager)
+    {
+        if (Ids == null || Ids.Count == 0)
+        {
+            if (namedArgs.Count > 0)
+            {
+                throw new ArgumentError(callPosition,
+                    $"函数 '{Id?.IdName ?? "匿名函数"}' 不接受任何参数，但提供了命名参数");
+            }
+            return positionalArgs;
+        }
+
+        // 1. 验证命名参数的合法性
+        ValidateNamedArguments(namedArgs, callPosition);
+
+        // 2. 创建参数槽位数组
+        var paramSlots = new LangExpression?[Ids.Count];
+        var parameterFilled = new bool[Ids.Count];
+
+        // 3. 填充位置参数
+        for (int i = 0; i < positionalArgs.Count; i++)
+        {
+            if (i >= Ids.Count)
+            {
+                throw new ArgumentError(callPosition,
+                    $"函数 '{Id?.IdName}' 期望最多 {Ids.Count} 个参数，但位置参数提供了 {positionalArgs.Count} 个");
+            }
+            paramSlots[i] = positionalArgs[i];
+            parameterFilled[i] = true;
+        }
+
+        // 4. 填充命名参数
+        foreach (var namedArg in namedArgs)
+        {
+            // 查找参数索引
+            int paramIndex = -1;
+            for (int i = 0; i < Ids.Count; i++)
+            {
+                if (Ids[i].IdName == namedArg.Name)
+                {
+                    paramIndex = i;
+                    break;
+                }
+            }
+
+            if (paramIndex == -1)
+            {
+                throw new ArgumentError(namedArg.Position,
+                    $"函数 '{Id?.IdName}' 没有名为 '{namedArg.Name}' 的参数");
+            }
+
+            // 检查是否已经通过位置参数提供
+            if (parameterFilled[paramIndex])
+            {
+                throw new ArgumentError(namedArg.Position,
+                    $"参数 '{namedArg.Name}' 已经通过位置参数提供，不能重复指定");
+            }
+
+            paramSlots[paramIndex] = namedArg.Value;
+            parameterFilled[paramIndex] = true;
+        }
+
+        // 5. 填充默认参数值或验证必需参数
+        for (int i = 0; i < Ids.Count; i++)
+        {
+            if (!parameterFilled[i])
+            {
+                // 检查是否有默认值
+                if (Ids[i].DefaultValue != null)
+                {
+                    // 使用默认值
+                    paramSlots[i] = Ids[i].DefaultValue;
+                }
+                else if (Ids[i].IsParams)
+                {
+                    // params 参数，创建空数组
+                    paramSlots[i] = new ArrayLangValue(new List<LangExpression>(), elementType: null, Ids[i].Position);
+                }
+                else
+                {
+                    throw new ArgumentError(callPosition,
+                        $"函数 '{Id?.IdName}' 的必需参数 '{Ids[i].IdName}' (第{i + 1}个参数) 未提供值");
+                }
+            }
+        }
+
+        // 6. 转换为列表并返回
+        // 所有槽位都应该已经被填充，不应该有 null
+        var result = new List<LangExpression>(paramSlots.Length);
+        for (int i = 0; i < paramSlots.Length; i++)
+        {
+            if (paramSlots[i] == null)
+            {
+                throw new ArgumentError(callPosition,
+                    $"内部错误：函数 '{Id?.IdName}' 的参数槽位 {i} 未被填充");
+            }
+            result.Add(paramSlots[i]!);
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 验证命名参数的合法性
+    /// </summary>
+    /// <param name="namedArgs">命名参数列表</param>
+    /// <param name="callPosition">调用位置</param>
+    private void ValidateNamedArguments(List<NamedArgument> namedArgs, SourcePosition callPosition)
+    {
+        // 检查命名参数是否重复
+        var seenNames = new HashSet<string>();
+        foreach (var namedArg in namedArgs)
+        {
+            if (seenNames.Contains(namedArg.Name))
+            {
+                throw new ArgumentError(namedArg.Position,
+                    $"命名参数 '{namedArg.Name}' 重复指定");
+            }
+            seenNames.Add(namedArg.Name);
+        }
+
+        // 检查是否尝试对 params 参数使用命名参数
+        if (Ids != null)
+        {
+            for (int i = 0; i < Ids.Count; i++)
+            {
+                if (Ids[i].IsParams)
+                {
+                    var paramsName = Ids[i].IdName;
+                    if (namedArgs.Any(na => na.Name == paramsName))
+                    {
+                        throw new ArgumentError(callPosition,
+                            $"不支持对 params 参数 '{paramsName}' 使用命名参数");
+                    }
+                }
+            }
+        }
+    }
+
     public LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> ids, object? obj = null)
     {
         if (Method != null)

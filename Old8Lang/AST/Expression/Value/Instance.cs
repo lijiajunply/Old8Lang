@@ -12,16 +12,29 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
-/// 实例，a(b,c)
+/// 实例，a(b,c)，支持命名参数
 /// </summary>
-/// <param name="langId"></param>
-/// <param name="ids"></param>
-/// <param name="position"></param>
-public partial class Instance(LangId langId, List<LangExpression> ids, SourcePosition position = default)
-    : LangValueType(position)
+public partial class Instance : LangValueType
 {
-    public readonly List<LangExpression> Ids = ids;
-    public readonly LangId Id = langId;
+    public readonly List<LangExpression> Ids;
+    public readonly LangId Id;
+    public readonly List<NamedArgument> NamedArgs;
+
+    public Instance(LangId langId, List<LangExpression> ids, SourcePosition position = default)
+        : base(position)
+    {
+        Id = langId;
+        Ids = ids;
+        NamedArgs = new List<NamedArgument>();
+    }
+
+    public Instance(LangId langId, List<LangExpression> ids, List<NamedArgument> namedArgs, SourcePosition position = default)
+        : base(position)
+    {
+        Id = langId;
+        Ids = ids;
+        NamedArgs = namedArgs;
+    }
 
     public override LangValueType Run(VariateManager manager)
     {
@@ -33,74 +46,98 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
 
         LangValueType result;
 
+        // 计算总参数数量（位置参数 + 命名参数）
+        var totalArgCount = Ids.Count + (NamedArgs?.Count ?? 0);
+
         // 获取所有可能的匹配函数（函数名和参数数量匹配）
         var matchingFunctions = manager.ImportInfos
-            .Where(x => (x is FuncLangValue func && func.Id!.IdName == Id.IdName && func.Ids?.Count == Ids.Count)
+            .Where(x => (x is FuncLangValue func && func.Id!.IdName == Id.IdName && func.Ids?.Count == totalArgCount)
                         || (x is AsyncFuncLangValue asyncFunc && asyncFunc.Id!.IdName == Id.IdName &&
-                            asyncFunc.Ids?.Count == Ids.Count))
+                            asyncFunc.Ids?.Count == totalArgCount))
             .ToList();
 
         if (matchingFunctions.Count > 0)
         {
-            // 计算参数的实际值和类型
-            var paramValues = Ids.Select(t => t.Run(manager)).ToList();
-
             // 查找最匹配的函数
             object? bestMatch = null;
 
-            foreach (var func in matchingFunctions)
+            // 如果有多个重载，选择第一个（参数数量已经匹配）
+            // 命名参数的类型检查将在FuncLangValue.Run中进行
+            if (matchingFunctions.Count == 1)
             {
-                if (func is FuncLangValue { Ids: not null } funcValue)
+                bestMatch = matchingFunctions[0];
+            }
+            else if (matchingFunctions.Count > 1 && Ids.Count > 0)
+            {
+                // 有多个重载且有位置参数时，进行类型匹配
+                // 计算位置参数的实际值和类型
+                var paramValues = Ids.Select(t => t.Run(manager)).ToList();
+
+                foreach (var func in matchingFunctions)
                 {
-                    bool isMatch = true;
-                    bool isExactMatch = true;
-
-                    // 检查每个参数的类型是否匹配
-                    for (int i = 0; i < funcValue.Ids.Count; i++)
+                    if (func is FuncLangValue { Ids: not null } funcValue)
                     {
-                        var paramType = funcValue.Ids[i].AssumptionType;
-                        var argValue = paramValues[i];
+                        bool isMatch = true;
+                        bool isExactMatch = true;
 
-                        // 如果参数没有类型注解，视为匹配
-                        if (string.IsNullOrEmpty(paramType))
+                        // 只检查位置参数的类型是否匹配
+                        for (int i = 0; i < Ids.Count && i < funcValue.Ids.Count; i++)
                         {
-                            isExactMatch = false;
-                            continue;
-                        }
+                            var paramType = funcValue.Ids[i].AssumptionType;
+                            var argValue = paramValues[i];
 
-                        // 检查参数类型是否匹配
-                        string argTypeName = argValue.GetType().Name;
-                        if (argTypeName.StartsWith(paramType, StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
+                            // 如果参数没有类型注解，视为匹配
+                            if (string.IsNullOrEmpty(paramType))
+                            {
+                                isExactMatch = false;
+                                continue;
+                            }
 
-                        // 类型不匹配
-                        isMatch = false;
-                        break;
-                    }
+                            // 检查参数类型是否匹配
+                            string argTypeName = argValue.GetType().Name;
+                            if (argTypeName.StartsWith(paramType, StringComparison.OrdinalIgnoreCase))
+                            {
+                                continue;
+                            }
 
-                    if (isMatch)
-                    {
-                        if (isExactMatch)
-                        {
-                            // 找到精确匹配，直接使用
-                            bestMatch = funcValue;
+                            // 类型不匹配
+                            isMatch = false;
                             break;
                         }
-                        else if (bestMatch == null)
+
+                        if (isMatch)
                         {
-                            // 记录第一个匹配的函数
-                            bestMatch = funcValue;
+                            if (isExactMatch)
+                            {
+                                // 找到精确匹配，直接使用
+                                bestMatch = funcValue;
+                                break;
+                            }
+                            else if (bestMatch == null)
+                            {
+                                // 记录第一个匹配的函数
+                                bestMatch = funcValue;
+                            }
                         }
                     }
+                    else if (func is AsyncFuncLangValue asyncFuncValue)
+                    {
+                        // 异步函数暂时只检查数量
+                        bestMatch = asyncFuncValue;
+                        break;
+                    }
                 }
-                else if (func is AsyncFuncLangValue asyncFuncValue)
+
+                // 如果没有找到匹配的，使用第一个
+                if (bestMatch == null && matchingFunctions.Count > 0)
                 {
-                    // 异步函数暂时只检查数量
-                    bestMatch = asyncFuncValue;
-                    break;
+                    bestMatch = matchingFunctions[0];
                 }
+            }
+            else
+            {
+                // 只有命名参数或者只有一个匹配的函数，直接使用第一个
+                bestMatch = matchingFunctions[0];
             }
 
             // 如果找到匹配的函数，调用它
@@ -173,7 +210,7 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
                         {
                             // 使用推断出的类型实例化泛型函数
                             var instantiatedFunc = funcValue.InstantiateGeneric(inferredTypes, typeAnnotationManager);
-                            result = instantiatedFunc.Run(manager, Ids);
+                            result = instantiatedFunc.Run(manager, Ids, NamedArgs, Position);
                         }
                         else
                         {
@@ -185,7 +222,7 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
                     else
                     {
                         // 找到匹配的重载函数，直接调用
-                        result = funcValue.Run(manager, Ids);
+                        result = funcValue.Run(manager, Ids, NamedArgs, Position);
                     }
                 }
                 else
@@ -233,7 +270,7 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
                         {
                             // 使用推断出的类型实例化泛型函数
                             var instantiatedFunc = funcValue.InstantiateGeneric(inferredTypes, typeAnnotationManager);
-                            result = instantiatedFunc.Run(manager, Ids);
+                            result = instantiatedFunc.Run(manager, Ids, NamedArgs, Position);
                         }
                         else
                         {
@@ -245,7 +282,7 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
                     else
                     {
                         // 直接调用函数，参数表达式会在函数体内执行
-                        result = funcValue.Run(manager, Ids);
+                        result = funcValue.Run(manager, Ids, NamedArgs, Position);
                     }
                 }
                 // 如果idResult是AsyncFuncLangValue，则调用它
@@ -310,7 +347,7 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
                     {
                         // 使用推断出的类型实例化泛型函数
                         var instantiatedFunc = funcValue.InstantiateGeneric(inferredTypes, typeAnnotationManager);
-                        result = instantiatedFunc.Run(manager, Ids);
+                        result = instantiatedFunc.Run(manager, Ids, NamedArgs, Position);
                     }
                     else
                     {
@@ -322,7 +359,7 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
                 else
                 {
                     // 直接调用函数，参数表达式会在函数体内执行
-                    result = funcValue.Run(manager, Ids);
+                    result = funcValue.Run(manager, Ids, NamedArgs, Position);
                 }
             }
             // 如果idResult是AsyncFuncLangValue，则调用它

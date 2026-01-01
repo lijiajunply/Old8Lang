@@ -1391,9 +1391,9 @@ public class PrimaryParser(
     {
         var identifier = ParseIdentifier();
         Expect(LangTokenType.LeftParen);
-        var args = functionParser.ParseArgList();
+        functionParser.ParseArgList(out var positionalArgs, out var namedArgs);
         Expect(LangTokenType.RightParen);
-        return new Instance(identifier, args);
+        return new Instance(identifier, positionalArgs, namedArgs);
     }
 
     /// <summary>

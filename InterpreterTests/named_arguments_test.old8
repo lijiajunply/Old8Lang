@@ -1,0 +1,68 @@
+// 命名参数功能测试
+
+// 测试1：基本命名参数
+func greet(name:string, age:int, message:string) -> void {
+    PrintLine(message + ", " + name + "! Age: " + age.ToStr())
+}
+
+// 完全位置参数
+greet("Alice", 25, "Hello")
+
+// 完全命名参数
+greet(name: "Bob", age: 30, message: "Hi")
+
+// 混合使用（位置参数在前）
+greet("Charlie", age: 35, message: "Good morning")
+
+// 命名参数改变顺序
+greet(age: 28, name: "David", message: "Welcome")
+
+PrintLine("---")
+
+// 测试2：带默认值的命名参数
+func display(title:string, width: 800, height: 600) -> void {
+    PrintLine("Title: " + title + ", Width: " + width.ToStr() + ", Height: " + height.ToStr())
+}
+
+// 只提供必需参数和一个命名参数
+display("Window", height: 1080)
+
+// 只提供必需参数
+display("Small Window")
+
+// 提供所有参数，但顺序不同
+display(height: 720, width: 1280, title: "HD Window")
+
+PrintLine("---")
+
+// 测试3：返回值的函数
+func calculate(x:int, y:int, operation:string) -> int {
+    if operation == "add" {
+        return x + y
+    } elif operation == "sub" {
+        return x - y
+    } elif operation == "mul" {
+        return x * y
+    } else {
+        return x / y
+    }
+}
+
+result1 <- calculate(10, 5, "add")
+PrintLine("10 + 5 = " + result1.ToStr())
+
+result2 <- calculate(operation: "mul", y: 3, x: 7)
+PrintLine("7 * 3 = " + result2.ToStr())
+
+PrintLine("---")
+
+// 测试4：带默认值和命名参数结合
+func createPerson(name:string, age: 0, city: "Unknown") -> void {
+    PrintLine("Name: " + name + ", Age: " + age.ToStr() + ", City: " + city)
+}
+
+createPerson("Eve")
+createPerson(name: "Frank", city: "Beijing")
+createPerson("Grace", city: "Shanghai", age: 22)
+
+PrintLine("命名参数测试完成!")

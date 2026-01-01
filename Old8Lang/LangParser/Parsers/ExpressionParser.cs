@@ -339,11 +339,11 @@ public class ExpressionParser(ParserContext context, PrimaryParser primaryParser
                 var position = new SourcePosition(leftParenToken.Line, leftParenToken.Column,
                     tokenValue: leftParenToken.Value);
                 Expect(LangTokenType.LeftParen);
-                var args = functionParser.ParseArgList();
+                functionParser.ParseArgList(out var positionalArgs, out var namedArgs);
                 Expect(LangTokenType.RightParen);
 
-                // 创建函数调用表达式
-                left = new FunctionCallExpression(left, args, position);
+                // 创建函数调用表达式（支持命名参数）
+                left = new FunctionCallExpression(left, positionalArgs, namedArgs, position);
             }
             else
             {

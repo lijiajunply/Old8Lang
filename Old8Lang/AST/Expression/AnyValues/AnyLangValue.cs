@@ -198,11 +198,11 @@ public partial class AnyLangValue : LangValueType
         // 如果有多个重载，进行重载解析
         if (methods.Count > 1)
         {
-            selectedMethod = ResolveMethodOverload(methods, instance.Ids, manager);
+            selectedMethod = ResolveMethodOverload(methods, instance.Ids, instance.NamedArgs, manager);
         }
 
-        // 执行方法
-        return ExecuteMethod(selectedMethod, instance.Ids, manager);
+        // 执行方法，传递命名参数（确保不传递 null）
+        return ExecuteMethod(selectedMethod, instance.Ids, instance.NamedArgs ?? new List<NamedArgument>(), manager);
     }
 
     /// <summary>
@@ -240,13 +240,8 @@ public partial class AnyLangValue : LangValueType
     /// 执行方法
     /// </summary>
     private LangValueType ExecuteMethod(LangMethodInfo methodInfo, List<LangExpression> arguments,
-        VariateManager manager)
+        List<NamedArgument> namedArgs, VariateManager manager)
     {
-        var parameterValues = arguments.Select(arg => arg.Run(manager)).ToList();
-
-        // 然后创建参数值表达式（直接返回这些值，不需要再次求值）
-        var parameterValueExpressions = parameterValues.Select<LangValueType, LangExpression>(val => val).ToList();
-
         // 为方法执行创建一个混合作用域（与 CallInit 保持一致）：
         // 1. 基于外部 manager（可以访问外部变量，用于访问类型定义）
         // 2. 添加实例字段和 this（可以在方法中访问实例成员）
@@ -286,9 +281,9 @@ public partial class AnyLangValue : LangValueType
             executionManager.CurrentFunctionTypeArgumentMapping = TypeArgumentMapping;
         }
 
-        // 6. 执行方法，传入已经求值的参数表达式
+        // 6. 执行方法，传入参数表达式和命名参数（确保不传递 null）
         var funcValue = methodInfo.Implementation;
-        var result = funcValue.Run(executionManager, parameterValueExpressions);
+        var result = funcValue.Run(executionManager, arguments, namedArgs ?? new List<NamedArgument>(), Position);
 
         // 7. 恢复函数上下文标志
         executionManager.IsFunc = false;
@@ -370,13 +365,14 @@ public partial class AnyLangValue : LangValueType
     /// 方法重载解析
     /// 根据参数数量和类型选择最匹配的方法
     /// </summary>
-    private LangMethodInfo ResolveMethodOverload(List<LangMethodInfo> overloads, List<LangExpression> arguments,
-        VariateManager manager)
+    private LangMethodInfo ResolveMethodOverload(List<LangMethodInfo> overloads, List<LangExpression> positionalArgs,
+        List<NamedArgument> namedArgs, VariateManager manager)
     {
-        var argCount = arguments.Count;
+        // 计算总参数数量（位置参数 + 命名参数）
+        var totalArgCount = positionalArgs.Count + (namedArgs?.Count ?? 0);
 
         // 1. 参数数量精确匹配
-        var exactMatches = overloads.Where(m => m.ParameterCount == argCount).ToList();
+        var exactMatches = overloads.Where(m => m.ParameterCount == totalArgCount).ToList();
         if (exactMatches.Count == 1)
         {
             return exactMatches[0];
@@ -385,29 +381,29 @@ public partial class AnyLangValue : LangValueType
         // 2. 类型匹配（如果有类型注解）
         if (exactMatches.Count > 1)
         {
-            return ResolveByTypeMatching(exactMatches, arguments, manager);
+            return ResolveByTypeMatching(exactMatches, positionalArgs, namedArgs, manager);
         }
 
         // 3. 兼容性匹配（允许参数数量不完全匹配，如默认参数）
-        var compatibleMatches = overloads.Where(m => CanHandleArguments(m, arguments)).ToList();
+        var compatibleMatches = overloads.Where(m => CanHandleArguments(m, positionalArgs, namedArgs)).ToList();
         if (compatibleMatches.Count > 0)
         {
             // 在兼容的方法中，选择参数数量最接近的
             return compatibleMatches
-                .OrderBy(m => Math.Abs(m.ParameterCount - argCount))
+                .OrderBy(m => Math.Abs(m.ParameterCount - totalArgCount))
                 .ThenBy(m => m.ParameterCount)
                 .First();
         }
 
         // 4. 找不到匹配的重载
-        throw new ArgumentError(Position, $"函数 '{overloads[0].MethodName}' 没有找到匹配 {argCount} 个参数的重载版本");
+        throw new ArgumentError(Position, $"函数 '{overloads[0].MethodName}' 没有找到匹配 {totalArgCount} 个参数的重载版本");
     }
 
     /// <summary>
     /// 通过类型匹配选择最佳重载
     /// </summary>
-    private LangMethodInfo ResolveByTypeMatching(List<LangMethodInfo> candidates, List<LangExpression> arguments,
-        VariateManager manager)
+    private LangMethodInfo ResolveByTypeMatching(List<LangMethodInfo> candidates, List<LangExpression> positionalArgs,
+        List<NamedArgument> namedArgs, VariateManager manager)
     {
         // 计算每个候选的匹配得分
         var scoredCandidates = new List<(LangMethodInfo method, int score)>();
@@ -419,7 +415,8 @@ public partial class AnyLangValue : LangValueType
 
             if (funcValue.Ids != null)
             {
-                for (int i = 0; i < arguments.Count && i < funcValue.Ids.Count; i++)
+                // 只对位置参数进行类型匹配评分（命名参数会被重新排序，所以暂时不评分）
+                for (int i = 0; i < positionalArgs.Count && i < funcValue.Ids.Count; i++)
                 {
                     var paramType = funcValue.Ids[i].AssumptionType;
                     if (string.IsNullOrEmpty(paramType))
@@ -429,7 +426,7 @@ public partial class AnyLangValue : LangValueType
                     else
                     {
                         // 运行参数表达式获取实际类型
-                        var argValue = arguments[i].Run(manager);
+                        var argValue = positionalArgs[i].Run(manager);
                         string actualTypeName = argValue.GetType().Name;
                         if (actualTypeName.Equals(paramType, StringComparison.OrdinalIgnoreCase))
                         {
@@ -458,10 +455,10 @@ public partial class AnyLangValue : LangValueType
     /// <summary>
     /// 检查方法是否能处理给定的参数
     /// </summary>
-    private bool CanHandleArguments(LangMethodInfo method, List<LangExpression> arguments)
+    private bool CanHandleArguments(LangMethodInfo method, List<LangExpression> positionalArgs, List<NamedArgument> namedArgs)
     {
         var expectedParams = method.ParameterCount;
-        var actualParams = arguments.Count;
+        var actualParams = positionalArgs.Count + (namedArgs?.Count ?? 0);
 
         if (actualParams > expectedParams)
         {
@@ -473,10 +470,29 @@ public partial class AnyLangValue : LangValueType
         {
             var func = method.Implementation;
             if (func.Ids == null) return true;
-            for (int i = actualParams; i < expectedParams; i++)
+
+            // 检查哪些参数已经通过位置参数或命名参数提供
+            var providedParams = new HashSet<string>();
+
+            // 位置参数覆盖前N个参数
+            for (int i = 0; i < positionalArgs.Count && i < func.Ids.Count; i++)
             {
-                var parameter = func.Ids[i];
-                if (parameter.DefaultValue == null)
+                providedParams.Add(func.Ids[i].IdName);
+            }
+
+            // 命名参数覆盖指定的参数
+            if (namedArgs != null)
+            {
+                foreach (var namedArg in namedArgs)
+                {
+                    providedParams.Add(namedArg.Name);
+                }
+            }
+
+            // 检查未提供的参数是否都有默认值
+            for (int i = 0; i < func.Ids.Count; i++)
+            {
+                if (!providedParams.Contains(func.Ids[i].IdName) && func.Ids[i].DefaultValue == null)
                 {
                     return false; // 缺失的参数没有默认值
                 }
@@ -560,7 +576,8 @@ public partial class AnyLangValue : LangValueType
             return methods[0].Implementation;
 
         // 如果有多个 init 方法，进行重载解析
-        var selectedMethod = ResolveMethodOverload(methods, arguments, manager);
+        // init 方法目前不支持命名参数，所以传递空列表
+        var selectedMethod = ResolveMethodOverload(methods, arguments, new List<NamedArgument>(), manager);
         return selectedMethod.Implementation;
     }
 
