@@ -52,6 +52,12 @@ public class FuncLangValue : ImportInfo
     /// </summary>
     public Dictionary<string, ITypeInfo>? TypeArgumentMapping { get; set; }
 
+    /// <summary>
+    /// 文档注释内容
+    /// 存储通过 /// 语法编写的函数文档注释（结构化）
+    /// </summary>
+    public DocCommentInfo? DocComment { get; set; }
+
     public FuncLangValue(
         LangId? id,
         List<LangId> ids,

@@ -166,7 +166,14 @@ public class LangParser
                     Context.CurrentIndex++;
                 }
 
-                // 如果跳过分号后到达文件末尾，退出循环
+                // 跳过文档注释 tokens（它们会在 CollectPrecedingDocComments 中被处理）
+                while (Context.CurrentIndex < Context.Tokens.Count &&
+                       Context.CurrentToken.Type == LangTokenType.DocComment)
+                {
+                    Context.CurrentIndex++;
+                }
+
+                // 如果跳过分号和文档注释后到达文件末尾，退出循环
                 if (Context.CurrentIndex >= Context.Tokens.Count)
                 {
                     break;

@@ -134,6 +134,9 @@ public class StatementParser(
         // 处理异步函数定义和异步 for-in 循环：async func / async for
         if (CurrentToken.Type == LangTokenType.Async)
         {
+            // 在消费 async token 之前收集文档注释
+            var docComment = CollectPrecedingDocComments();
+
             Expect(LangTokenType.Async);
 
             // 检查是否是 async for-in
@@ -144,7 +147,7 @@ public class StatementParser(
 
             // 否则是 async func
             Expect(LangTokenType.Func);
-            return functionParser.ParseAsyncFuncDeclaration();
+            return functionParser.ParseAsyncFuncDeclaration(docComment);
         }
 
         // 处理函数定义（包括带有修饰符的函数定义）

@@ -1,0 +1,42 @@
+/// 这是一个简单的加法函数
+/// 用于计算两个整数的和
+/// 参数 a: 第一个整数
+/// 参数 b: 第二个整数
+/// 返回: 两个整数的和
+func add(a:int, b:int) -> int {
+    return a + b
+}
+
+/// 这是一个异步函数
+/// 用于异步执行操作
+async func asyncTask() {
+    PrintLine("异步任务执行")
+}
+
+/// 这是一个测试类
+/// 用于演示类的文档注释功能
+class Calculator {
+    /// 私有字段
+    private value:int <- 0
+
+    /// 构造函数
+    func init() -> void {
+        this.value <- 0
+    }
+
+    /// 加法方法
+    /// 将给定值加到当前值上
+    func add(n:int) -> int {
+        this.value <- this.value + n
+        return this.value
+    }
+}
+
+/// 测试接口
+/// 用于演示接口的文档注释功能
+interface ICalculator {
+    /// 加法方法签名
+    func add(a:int, b:int) -> int
+}
+
+PrintLine("文档注释测试通过")

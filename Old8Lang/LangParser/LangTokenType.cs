@@ -389,7 +389,12 @@ public enum LangTokenType
     /// <summary>
     /// 文件头指令 (#!...)
     /// </summary>
-    FileHeaderDirective
+    FileHeaderDirective,
+
+    /// <summary>
+    /// 文档注释 (///...)
+    /// </summary>
+    DocComment
 }
 
 public enum KeywordType

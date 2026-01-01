@@ -1,0 +1,137 @@
+/// 结构化文档注释测试
+/// 测试所有支持的文档注释风格：Google, NumPy, Sphinx, JavaDoc, 中文
+
+// ==================== Google Style ====================
+
+/// Calculate the sum of two numbers
+///
+/// Args:
+///     a (int): The first number
+///     b (int): The second number
+///
+/// Returns:
+///     int: The sum of a and b
+///
+/// Example:
+///     result <- add(10, 20)
+func add(a:int, b:int) -> int {
+    return a + b
+}
+
+// ==================== NumPy Style ====================
+
+/// Multiply two numbers
+///
+/// Parameters
+/// ----------
+/// x : int
+///     The first number to multiply
+/// y : int
+///     The second number to multiply
+///
+/// Returns
+/// -------
+/// int
+///     The product of x and y
+func multiply(x:int, y:int) -> int {
+    return x * y
+}
+
+// ==================== Sphinx Style ====================
+
+/// Divide two numbers with error handling
+///
+/// :param numerator: The number to be divided
+/// :type numerator: double
+/// :param denominator: The number to divide by
+/// :type denominator: double
+/// :return: The division result
+/// :rtype: double
+func divide(numerator:double, denominator:double) -> double {
+    if denominator == 0.0 {
+        throw "DivisionByZeroError: Cannot divide by zero"
+    }
+    return numerator / denominator
+}
+
+// ==================== JavaDoc Style ====================
+
+/// Concatenate two strings
+///
+/// @param str1 The first string
+/// @param str2 The second string
+/// @return The concatenated string
+func concat(str1:string, str2:string) -> string {
+    return str1 + str2
+}
+
+// ==================== Chinese Style ====================
+
+/// 计算圆的面积
+///
+/// 参数:
+///   - radius (double): 圆的半径
+///
+/// 返回:
+///   圆的面积值
+///
+/// 异常:
+///   - ValueError: 当半径为负数时抛出
+func calculateCircleArea(radius:double) -> double {
+    if radius < 0.0 {
+        throw "ValueError: 半径不能为负数"
+    }
+    return 3.14159 * radius * radius
+}
+
+// ==================== 异步函数文档注释 ====================
+
+/// Asynchronous delay function
+///
+/// @param milliseconds The delay duration in milliseconds
+/// @return A task that completes after the specified delay
+async func delay(milliseconds:int) {
+    // 模拟异步延迟
+    return milliseconds
+}
+
+// ==================== Mixed Style (多种风格混合) ====================
+
+/// Convert temperature from Celsius to Fahrenheit
+///
+/// Args:
+///     celsius (double): Temperature in Celsius
+///
+/// Returns:
+///     double: Temperature in Fahrenheit
+///
+/// Example:
+///     f <- celsiusToFahrenheit(100.0)
+func celsiusToFahrenheit(celsius:double) -> double {
+    return celsius * 9.0 / 5.0 + 32.0
+}
+
+// ==================== 测试执行 ====================
+
+PrintLine("=== 测试结构化文档注释解析 ===")
+
+// 测试普通函数
+result1 <- add(10, 20)
+PrintLine($"add(10, 20) = {result1}")
+
+result2 <- multiply(5, 6)
+PrintLine($"multiply(5, 6) = {result2}")
+
+result3 <- divide(10.0, 2.0)
+PrintLine($"divide(10.0, 2.0) = {result3}")
+
+result4 <- concat("Hello", "World")
+PrintLine($"concat('Hello', 'World') = {result4}")
+
+result5 <- calculateCircleArea(5.0)
+PrintLine($"calculateCircleArea(5.0) = {result5}")
+
+result6 <- celsiusToFahrenheit(100.0)
+PrintLine($"celsiusToFahrenheit(100.0) = {result6}")
+
+PrintLine("=== 所有测试完成 ===")

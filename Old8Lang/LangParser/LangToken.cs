@@ -20,17 +20,17 @@ public readonly struct LangToken(string value, LangTokenType type, int line = 0,
     /// 标记的字符串值
     /// </summary>
     public readonly string Value = value;
-    
+
     /// <summary>
     /// 标记的类型
     /// </summary>
     public readonly LangTokenType Type = type;
-    
+
     /// <summary>
     /// 标记在源代码中的行号（从1开始）
     /// </summary>
     public readonly int Line = line;
-    
+
     /// <summary>
     /// 标记在源代码中的列号（从1开始）
     /// </summary>
@@ -88,23 +88,26 @@ public static class LangTokenizer
     /// 将Old8Lang源代码转换为标记流
     /// </summary>
     /// <param name="code">要分析的Old8Lang源代码</param>
-    /// <returns>包含所有标记的列表和文件头指令的元组</returns>
+    /// <returns>包含所有标记的列表、文件头指令和文档注释的元组</returns>
     /// <exception cref="Error.SyntaxError">当遇到无法识别的字符时抛出</exception>
     /// <remarks>
     /// 该方法执行以下步骤：
-    /// 1. 过滤掉源代码中的注释，同时提取文件头指令
+    /// 1. 过滤掉源代码中的注释，同时提取文件头指令和文档注释
     /// 2. 逐字符扫描源代码
     /// 3. 识别并生成各种类型的标记
-    /// 4. 返回完整的标记列表和文件头指令
+    /// 4. 将文档注释 Token 插入到标记流的合适位置
+    /// 5. 返回完整的标记列表、文件头指令和文档注释
     /// </remarks>
-    public static (List<LangToken> tokens, List<LangToken> headerDirectives) TokenizeWithDirectives(string code)
+    public static (List<LangToken> tokens, List<LangToken> headerDirectives, List<LangToken> docComments)
+        TokenizeWithDirectivesAndDocs(string code)
     {
         var tokens = new List<LangToken>();
 
-        // 先过滤掉源代码中的注释，同时提取文件头指令
+        // 先过滤掉源代码中的注释，同时提取文件头指令和文档注释
         var filter = new FilteringCommentsTokenizer(code);
         code = filter.FilteringComments();
         var headerDirectives = filter.HeaderDirectives;
+        var docComments = filter.DocComments;
 
         // 初始化行号和列号信息
         var line = 1;
@@ -173,15 +176,15 @@ public static class LangTokenizer
                 if (i + 1 < code.Length && char.IsDigit(code[i + 1]) &&
                     (tokens.Count == 0 ||
                      tokens[^1].Type is LangTokenType.Assignment or LangTokenType.LeftParen or
-                                        LangTokenType.Comma or LangTokenType.LeftBracket or
-                                        LangTokenType.Plus or LangTokenType.Minus or
-                                        LangTokenType.Star or LangTokenType.Slash or
-                                        LangTokenType.Percent or LangTokenType.Caret or
-                                        LangTokenType.GreaterThan or LangTokenType.LessThan or
-                                        LangTokenType.Equals or LangTokenType.NotEquals or
-                                        LangTokenType.GreaterThanEquals or LangTokenType.LessThanEquals or
-                                        LangTokenType.And or LangTokenType.Or or LangTokenType.Xor or
-                                        LangTokenType.Return or LangTokenType.Colon))
+                         LangTokenType.Comma or LangTokenType.LeftBracket or
+                         LangTokenType.Plus or LangTokenType.Minus or
+                         LangTokenType.Star or LangTokenType.Slash or
+                         LangTokenType.Percent or LangTokenType.Caret or
+                         LangTokenType.GreaterThan or LangTokenType.LessThan or
+                         LangTokenType.Equals or LangTokenType.NotEquals or
+                         LangTokenType.GreaterThanEquals or LangTokenType.LessThanEquals or
+                         LangTokenType.And or LangTokenType.Or or LangTokenType.Xor or
+                         LangTokenType.Return or LangTokenType.Colon))
                 {
                     // 解析负数
                     var sb = new StringBuilder("-");
@@ -358,7 +361,8 @@ public static class LangTokenizer
                                     if (i + 4 < code.Length)
                                     {
                                         var hexStr = code.Substring(i + 1, 4);
-                                        if (int.TryParse(hexStr, System.Globalization.NumberStyles.HexNumber, null, out var unicodeCode))
+                                        if (int.TryParse(hexStr, System.Globalization.NumberStyles.HexNumber, null,
+                                                out var unicodeCode))
                                         {
                                             sb.Append((char)unicodeCode);
                                             i += 4; // 跳过4位十六进制数
@@ -375,13 +379,15 @@ public static class LangTokenizer
                                         // Unicode序列不完整，追加原始字符
                                         sb.Append("\\u");
                                     }
+
                                     break;
                                 case 'x':
                                     // 处理十六进制转义序列 \xXX
                                     if (i + 2 < code.Length)
                                     {
                                         var hexStr = code.Substring(i + 1, 2);
-                                        if (int.TryParse(hexStr, System.Globalization.NumberStyles.HexNumber, null, out var hexCode))
+                                        if (int.TryParse(hexStr, System.Globalization.NumberStyles.HexNumber, null,
+                                                out var hexCode))
                                         {
                                             sb.Append((char)hexCode);
                                             i += 2; // 跳过2位十六进制数
@@ -398,6 +404,7 @@ public static class LangTokenizer
                                         // 十六进制序列不完整，追加原始字符
                                         sb.Append("\\x");
                                     }
+
                                     break;
                                 default:
                                     // 未知的转义字符，追加原始字符
@@ -426,7 +433,7 @@ public static class LangTokenizer
                 }
 
                 // 为字符token添加单引号以保持格式一致性
-                tokens.Add(new LangToken("'" + sb.ToString() + "'", LangTokenType.Char, line, i - column));
+                tokens.Add(new LangToken($"'{sb}'", LangTokenType.Char, line, i - column));
                 continue;
             }
 
@@ -511,6 +518,7 @@ public static class LangTokenizer
                     i++;
                     continue;
                 }
+
                 tokens.Add(new LangToken("?", LangTokenType.Question, line, i - column));
                 continue;
             }
@@ -714,6 +722,90 @@ public static class LangTokenizer
             #endregion
         }
 
+        // 将文档注释插入到 tokens 中适当的位置
+        // 文档注释应该出现在函数/类声明之前
+        var mergedTokens = MergeDocCommentsWithTokens(tokens, docComments);
+
+        return (mergedTokens, headerDirectives, docComments);
+    }
+
+    /// <summary>
+    /// 将文档注释合并到 tokens 流中
+    /// </summary>
+    /// <param name="tokens">原始 token 列表</param>
+    /// <param name="docComments">文档注释列表</param>
+    /// <returns>合并后的 token 列表</returns>
+    private static List<LangToken> MergeDocCommentsWithTokens(List<LangToken> tokens, List<LangToken> docComments)
+    {
+        if (docComments.Count == 0)
+        {
+            return tokens;
+        }
+
+        var result = new List<LangToken>();
+        int tokenIndex = 0;
+        int docCommentIndex = 0;
+
+        // 创建一个文档注释组的字典，key 是注释所在行号，value 是该位置的所有注释
+        var docCommentGroups = new Dictionary<int, List<LangToken>>();
+        foreach (var doc in docComments)
+        {
+            if (!docCommentGroups.ContainsKey(doc.Line))
+            {
+                docCommentGroups[doc.Line] = new List<LangToken>();
+            }
+
+            docCommentGroups[doc.Line].Add(doc);
+        }
+
+        // 合并 tokens 和 doc comments
+        while (tokenIndex < tokens.Count)
+        {
+            var token = tokens[tokenIndex];
+
+            // 查找在当前 token 之前的文档注释
+            // 文档注释应该出现在它所描述的声明之前
+            var relevantDocs = new List<LangToken>();
+            for (int line = token.Line - 1; line > 0 && docCommentGroups.ContainsKey(line); line--)
+            {
+                // 只收集连续的文档注释行
+                if (docCommentGroups.TryGetValue(line, out var group))
+                {
+                    relevantDocs.InsertRange(0, group);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            // 添加相关的文档注释
+            foreach (var doc in relevantDocs)
+            {
+                // 避免重复添加
+                if (docCommentIndex < docComments.Count && docComments[docCommentIndex].Equals(doc))
+                {
+                    result.Add(doc);
+                    docCommentIndex++;
+                }
+            }
+
+            // 添加当前 token
+            result.Add(token);
+            tokenIndex++;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 将Old8Lang源代码转换为标记流（向后兼容版本）
+    /// </summary>
+    /// <param name="code">要分析的Old8Lang源代码</param>
+    /// <returns>包含所有标记的列表和文件头指令的元组</returns>
+    public static (List<LangToken> tokens, List<LangToken> headerDirectives) TokenizeWithDirectives(string code)
+    {
+        var (tokens, headerDirectives, _) = TokenizeWithDirectivesAndDocs(code);
         return (tokens, headerDirectives);
     }
 
@@ -751,6 +843,11 @@ public struct FilteringCommentsTokenizer(string input)
     /// 文件头指令列表
     /// </summary>
     public List<LangToken> HeaderDirectives = new();
+
+    /// <summary>
+    /// 文档注释列表（按行号索引，用于后续解析时关联）
+    /// </summary>
+    public List<LangToken> DocComments = new();
 
     /// <summary>
     /// 过滤源代码中的注释
@@ -872,8 +969,49 @@ public struct FilteringCommentsTokenizer(string input)
             // 只有在字符串外部才处理注释
             if (!inDoubleQuoteString && !inSingleQuoteString)
             {
+                // 处理文档注释（优先级最高，必须在单行注释之前检查）
+                if (currentChar == '/' && CurrentIndex + 2 < input.Length &&
+                    input[CurrentIndex + 1] == '/' && input[CurrentIndex + 2] == '/')
+                {
+                    // 文档注释：///
+                    Advance(); // 跳过第一个 '/'
+                    Advance(); // 跳过第二个 '/'
+                    Advance(); // 跳过第三个 '/'
+
+                    var docCommentStart = CurrentIndex;
+                    var docCommentLineStart = lineStartIndex;
+                    var sb = new StringBuilder();
+
+                    // 读取文档注释内容直到换行符
+                    while (CurrentIndex < input.Length && input[CurrentIndex] != '\n')
+                    {
+                        sb.Append(input[CurrentIndex]);
+                        Advance();
+                    }
+
+                    // 创建文档注释 token
+                    // 保留前导空格（用于 NumPy Style 的缩进），只去除尾随空格
+                    var docCommentContent = sb.ToString().TrimEnd();
+                    DocComments.Add(new LangToken(
+                        docCommentContent,
+                        LangTokenType.DocComment,
+                        line,
+                        docCommentStart - docCommentLineStart
+                    ));
+
+                    // 保留换行符并更新行号
+                    if (CurrentIndex < input.Length && input[CurrentIndex] == '\n')
+                    {
+                        result.Append('\n');
+                        line++; // 更新行号
+                        lineStartIndex = CurrentIndex + 1; // 更新行起始索引
+                        Advance();
+                    }
+
+                    continue;
+                }
                 // 处理单行注释
-                if (currentChar == '/' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '/')
+                else if (currentChar == '/' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '/')
                 {
                     // 跳过单行注释，但保留换行符
                     Advance(); // 跳过 '/'
@@ -891,6 +1029,7 @@ public struct FilteringCommentsTokenizer(string input)
                         result.Append('\n');
                         Advance();
                     }
+
                     continue;
                 }
                 // 处理多行注释
@@ -904,7 +1043,8 @@ public struct FilteringCommentsTokenizer(string input)
                     while (CurrentIndex < input.Length)
                     {
                         // 检查是否到达注释结束标记 */
-                        if (input[CurrentIndex] == '*' && CurrentIndex + 1 < input.Length && input[CurrentIndex + 1] == '/')
+                        if (input[CurrentIndex] == '*' && CurrentIndex + 1 < input.Length &&
+                            input[CurrentIndex + 1] == '/')
                         {
                             Advance(); // 跳过 '*'
                             Advance(); // 跳过 '/'
@@ -919,6 +1059,7 @@ public struct FilteringCommentsTokenizer(string input)
 
                         Advance();
                     }
+
                     continue;
                 }
             }

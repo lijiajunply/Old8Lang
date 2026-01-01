@@ -1,0 +1,108 @@
+/// Google Style 风格的参数注释
+///
+/// 计算两个数的和
+///
+/// Args:
+///     a (int): 第一个整数
+///     b (int): 第二个整数
+///
+/// Returns:
+///     int: 两个整数的和
+func addGoogleStyle(a:int, b:int) -> int {
+    return a + b
+}
+
+/// NumPy/SciPy Style 风格
+///
+/// 计算两个数的乘积
+///
+/// Parameters
+/// ----------
+/// a : int
+///     第一个整数
+/// b : int
+///     第二个整数
+///
+/// Returns
+/// -------
+/// int
+///     两个整数的乘积
+func multiplyNumpyStyle(a:int, b:int) -> int {
+    return a * b
+}
+
+/// reStructuredText (Sphinx) Style 风格
+///
+/// 计算两个数的差
+///
+/// :param a: 第一个整数
+/// :type a: int
+/// :param b: 第二个整数
+/// :type b: int
+/// :return: 两个整数的差
+/// :rtype: int
+func subtractSphinxStyle(a:int, b:int) -> int {
+    return a - b
+}
+
+/// JavaDoc/JSDoc Style 风格
+///
+/// 计算两个数的商
+///
+/// @param a 第一个整数（被除数）
+/// @param b 第二个整数（除数）
+/// @return 两个整数的商
+/// @throws 当 b 为 0 时抛出除零错误
+func divideJavaDocStyle(a:int, b:int) -> int {
+    return a / b
+}
+
+/// 简洁中文风格
+///
+/// 计算矩形面积
+///
+/// 参数:
+///   - width: 矩形宽度
+///   - height: 矩形高度
+///
+/// 返回:
+///   矩形的面积
+func calculateArea(width:int, height:int) -> int {
+    return width * height
+}
+
+/// 类的文档注释也支持参数说明
+///
+/// 计算器类，提供基本算术运算
+///
+/// 属性:
+///   - value: 当前存储的值
+///
+/// 方法:
+///   - add(n): 加法运算
+///   - subtract(n): 减法运算
+class Calculator {
+    private value:int <- 0
+
+    /// 构造函数
+    ///
+    /// 参数:
+    ///   无参数
+    func init() -> void {
+        this.value <- 0
+    }
+
+    /// 加法方法
+    ///
+    /// Args:
+    ///     n (int): 要加的数值
+    ///
+    /// Returns:
+    ///     int: 运算后的结果
+    func add(n:int) -> int {
+        this.value <- this.value + n
+        return this.value
+    }
+}
+
+PrintLine("参数注释测试通过")

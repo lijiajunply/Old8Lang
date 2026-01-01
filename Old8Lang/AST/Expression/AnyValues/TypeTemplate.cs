@@ -51,6 +51,12 @@ public class TypeTemplate(
     public Dictionary<string, TypeSystem.ITypeInfo>? TypeArgumentMapping { get; private set; }
 
     /// <summary>
+    /// 文档注释内容
+    /// 存储通过 /// 语法编写的类/接口文档注释（结构化）
+    /// </summary>
+    public DocCommentInfo? DocComment { get; set; }
+
+    /// <summary>
     /// 存储运行时的静态变量值，支持在静态方法调用之间保持状态
     /// </summary>
     private readonly Dictionary<string, LangValueType> StaticVariableValues = [];

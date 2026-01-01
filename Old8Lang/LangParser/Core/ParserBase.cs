@@ -1,3 +1,4 @@
+using Old8Lang.AST;
 using Old8Lang.Error;
 using Old8Lang.LangParser.ParserHelpers;
 
@@ -129,5 +130,47 @@ public abstract class ParserBase(ParserContext context)
         {
             CurrentIndex++;
         }
+    }
+
+    /// <summary>
+    /// 收集当前位置之前的文档注释
+    /// 向前查找连续的文档注释 Token，并将它们合并后解析为结构化文档注释
+    /// </summary>
+    /// <returns>结构化的文档注释信息，如果没有则返回 null</returns>
+    protected DocCommentInfo? CollectPrecedingDocComments()
+    {
+        var docCommentTokens = new List<LangToken>();
+
+        // 向前查找连续的文档注释
+        var searchIndex = CurrentIndex - 1;
+        while (searchIndex >= 0)
+        {
+            var token = Tokens[searchIndex];
+
+            // 如果找到文档注释，添加到列表
+            if (token.Type == LangTokenType.DocComment)
+            {
+                docCommentTokens.Insert(0, token);
+                searchIndex--;
+            }
+            // 如果遇到非文档注释的 token，停止搜索
+            else
+            {
+                break;
+            }
+        }
+
+        // 如果没有找到文档注释，返回 null
+        if (docCommentTokens.Count == 0)
+        {
+            return null;
+        }
+
+        // 将所有文档注释合并为一个字符串
+        var docCommentLines = docCommentTokens.Select(t => t.Value).ToArray();
+        var rawComment = string.Join("\n", docCommentLines);
+
+        // 使用 DocCommentParser 解析为结构化文档注释
+        return DocCommentParser.Parse(rawComment);
     }
 }

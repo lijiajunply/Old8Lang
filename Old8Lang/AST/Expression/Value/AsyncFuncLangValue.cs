@@ -26,6 +26,12 @@ public class AsyncFuncLangValue : ImportInfo
     private Dictionary<int, LangValueType>? CachedDefaultValues { get; set; }
 
     /// <summary>
+    /// 文档注释内容
+    /// 存储通过 /// 语法编写的异步函数文档注释（结构化）
+    /// </summary>
+    public DocCommentInfo? DocComment { get; set; }
+
+    /// <summary>
     /// 构造函数
     /// </summary>
     public AsyncFuncLangValue(

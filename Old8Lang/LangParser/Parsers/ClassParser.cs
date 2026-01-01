@@ -19,6 +19,9 @@ public class ClassParser(
 {
     public ClassInit ParseClassDeclaration()
     {
+        // 收集前置的文档注释
+        var docComment = CollectPrecedingDocComments();
+
         bool isAbstract = false;
         bool isMixin = false;
 
@@ -125,13 +128,24 @@ public class ClassParser(
         }
 
         var classBlock = ParseClassBlock();
-        return new ClassInit(new TypeTemplate(className, classBlock.ToAnyData(), classBlock.ToStaticData(),
+        var typeTemplate = new TypeTemplate(className, classBlock.ToAnyData(), classBlock.ToStaticData(),
             parentClassName, isMixin, mixinNames, implementsNames, isInterface: false, isAbstract: isAbstract,
-            genericParameters: genericParameters));
+            genericParameters: genericParameters);
+
+        // 设置文档注释
+        if (docComment != null)
+        {
+            typeTemplate.DocComment = docComment;
+        }
+
+        return new ClassInit(typeTemplate);
     }
 
     public ClassInit ParseInterfaceDeclaration()
     {
+        // 收集前置的文档注释
+        var docComment = CollectPrecedingDocComments();
+
         // 检查是 interface
         if (CurrentToken.Type == LangTokenType.Interface)
         {
@@ -186,8 +200,16 @@ public class ClassParser(
 
         // 接口作为特殊的类处理，isInterface 标志为 true
         // 接口的父接口通过 implementsNames 参数传递（复用implements机制）
-        return new ClassInit(new TypeTemplate(interfaceName, interfaceBlock.ToAnyData(), interfaceBlock.ToStaticData(),
-            null, false, new List<string>(), extendsNames, true, genericParameters: genericParameters));
+        var typeTemplate = new TypeTemplate(interfaceName, interfaceBlock.ToAnyData(), interfaceBlock.ToStaticData(),
+            null, false, new List<string>(), extendsNames, true, genericParameters: genericParameters);
+
+        // 设置文档注释
+        if (docComment != null)
+        {
+            typeTemplate.DocComment = docComment;
+        }
+
+        return new ClassInit(typeTemplate);
     }
 
     /// <summary>

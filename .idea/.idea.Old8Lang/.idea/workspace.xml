@@ -23,23 +23,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Docs/NamedArguments.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/named_arguments_simple.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/named_arguments_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/NamedArgumentsErrorTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/NamedArgumentsTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Functions/NamedArgumentsParserTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/NamedArgument.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/StructuredDocCommentTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/DocCommentInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/DocCommentParser.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/DocCommentParamsTest.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/DocCommentTest.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/StructuredDocCommentTest.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/FunctionCallTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/AnyLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/FunctionCallExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/FunctionCallExpression.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/AnyValues/TypeTemplate.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ExpressionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ExpressionParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Core/ParserBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Core/ParserBase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -84,6 +84,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/CharValueFuncStatic.cs" root0="FORCE_HIGHLIGHTING" />
@@ -91,8 +92,12 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/LangToken.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/Parsers/ExpressionParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
@@ -119,13 +124,20 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/ec/ce83ccf2/ArgumentNullException.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/1c28eab5c675457986910a93422c074b108000/13/c04ed676/ClassicDesktopStyleApplicationLifetimeExtensions.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a840692e98b74557bc005b38213a22c72dad0/c8/58c2e0c9/Assert.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="Toolset" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -564,7 +576,7 @@
       <workItem from="1766997021901" duration="12927000" />
       <workItem from="1767123773418" duration="15798000" />
       <workItem from="1767204141752" duration="12710000" />
-      <workItem from="1767284902325" duration="5609000" />
+      <workItem from="1767284902325" duration="8858000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -909,7 +921,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="499" />
+    <option name="localTasksCounter" value="500" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -936,7 +948,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="perf(runtime): 添加属性访问委托缓存优化反射性能&#10;&#10;- 实现 PropertyAccessorCache 类使用 Expression.Lambda 编译属性访问委托&#10;- 添加线程安全的 Getter 和 Setter 缓存机制&#10;- 在性能测试中集成新的委托缓存基准测试&#10;- 更新性能报告输出格式和缓存统计信息&#10;- 优化序列化测试中的数组长度获取语法" />
     <MESSAGE value="fix(runtime): 修复反射调用中的类型转换问题&#10;&#10;- 在 FuncLangValue 中添加类型转换逻辑处理可空类型和类型不匹配情况&#10;- 为 DatabaseLibTests 添加顺序集合属性确保测试执行顺序&#10;- 更新 SerializationLibTests 中的数组长度获取语法从 Length 属性改为 len 函数&#10;- 简化 ConditionalImportTests 的构造函数实现&#10;- 优化 IDE 配置文件中的文件高亮设置和任务计数统计" />
     <MESSAGE value="fix(runtime): 修复反射调用中的类型转换问题&#10;&#10;- 在 FuncLangValue 中添加类型转换逻辑处理可空类型和类型不匹配情况&#10;- 为 MethodInvokerCache 添加可空类型特殊处理支持&#10;- 更新 DatabaseLibTests 中的数据库连接字符串参数&#10;- 将 JsonLibTests 中的 Deserialize 方法替换为 DeserializeDynamic&#10;- 为 NullLangValue 添加 GetValue 方法实现&#10;- 更新 IDE 配置文件中的变更跟踪和任务统计信息" />
     <MESSAGE value="test(StandardLibrary): 更新 CSV 解析测试以验证带引号的行解析&#10;&#10;- 修改测试代码以正确处理带引号的 CSV 行&#10;- 添加数组长度验证和遍历输出解析结果&#10;- 改进测试输出格式以显示每个解析项的索引和值&#10;- 确保 CSV 模块导入和解析逻辑正确执行" />
@@ -961,7 +972,8 @@
     <MESSAGE value="feat(compiler): 支持泛型实例化表达式的基础实现&#10;&#10;- 为 GenericInstanceExpression 添加 OutputType 方法实现类型推断&#10;- 为 GenericInstanceExpression 添加 LoadIlValue 方法并抛出未支持异常&#10;- 实现 Old8Lang 的 Count() 方法特殊处理以支持泛型集合和数组&#10;- 修改类型注解解析允许单个大写字母作为泛型类型参数&#10;- 临时跳过所有泛型函数测试直到编译器模式完全支持" />
     <MESSAGE value="feat(lang): 添加 params 可变参数支持&#10;&#10;- 在 LangId 中添加 isParams 属性用于标识可变参数&#10;- 在 LangTokenType 中添加 Params 关键字类型&#10;- 在 FunctionParser 中解析 params 修饰符并正确传递给 LangId&#10;- 在 FuncInit 中添加 params 参数合法性验证逻辑&#10;- 在 FuncLangValue 中实现 params 参数的参数数量检查和类型处理&#10;- 更新示例代码以使用新的 UI 组件语法&#10;- 添加测试项目 FirstUI.TestApp&#10;- 移除 FirstUIBinding 中废弃的组件创建 API&#10;- 修复多处代码格式化问题&#10;- 添加 params 可变参数的解析和解释器测试用例" />
     <MESSAGE value="feat(lang): 添加可变参数(params)功能支持&#10;&#10;- 实现 params 关键字支持函数接受任意数量的参数&#10;- 添加编译器模式下可变参数的 IL 代码生成和运行时处理&#10;- 实现解释器模式下参数列表到数组的转换机制&#10;- 添加完整的编译器和解释器模式测试套件&#10;- 更新语法文档和语法规则定义&#10;- 修复编译器中指令解析的默认值处理问题" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加可变参数(params)功能支持&#10;&#10;- 实现 params 关键字支持函数接受任意数量的参数&#10;- 添加编译器模式下可变参数的 IL 代码生成和运行时处理&#10;- 实现解释器模式下参数列表到数组的转换机制&#10;- 添加完整的编译器和解释器模式测试套件&#10;- 更新语法文档和语法规则定义&#10;- 修复编译器中指令解析的默认值处理问题" />
+    <MESSAGE value="feat(interpreter): 实现命名参数功能&#10;&#10;- 在FunctionCallExpression中添加NamedArguments属性支持命名参数&#10;- 修改FuncLangValue.Run方法以处理位置参数和命名参数的混合调用&#10;- 更新方法重载解析逻辑以支持命名参数的数量和类型匹配&#10;- 实现参数重排序机制将命名参数转换为正确的位置参数顺序&#10;- 添加NamedArgument类用于表示命名参数的名称和值&#10;- 修改解析器以支持函数调用中的命名参数语法解析&#10;- 增加对位置参数和命名参数混合使用的语法支持&#10;- 实现命名参数的验证机制包括重复参数和无效参数检查&#10;- 添加对默认参数与命名参数结合使用的支持&#10;- 为Instance类添加命名参数支持以处理对象方法调用" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(interpreter): 实现命名参数功能&#10;&#10;- 在FunctionCallExpression中添加NamedArguments属性支持命名参数&#10;- 修改FuncLangValue.Run方法以处理位置参数和命名参数的混合调用&#10;- 更新方法重载解析逻辑以支持命名参数的数量和类型匹配&#10;- 实现参数重排序机制将命名参数转换为正确的位置参数顺序&#10;- 添加NamedArgument类用于表示命名参数的名称和值&#10;- 修改解析器以支持函数调用中的命名参数语法解析&#10;- 增加对位置参数和命名参数混合使用的语法支持&#10;- 实现命名参数的验证机制包括重复参数和无效参数检查&#10;- 添加对默认参数与命名参数结合使用的支持&#10;- 为Instance类添加命名参数支持以处理对象方法调用" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1437,6 +1449,19 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="637" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Parser/StructuredDocCommentTests.cs</url>
+          <line>224</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/StructuredDocCommentTests.cs" containingFunctionPresentation="方法 'TestAsyncFunctionDocComment'">
+            <startOffsets>
+              <option value="6821" />
+            </startOffsets>
+            <endOffsets>
+              <option value="6848" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="638" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />

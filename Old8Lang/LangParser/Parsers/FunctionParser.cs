@@ -22,6 +22,9 @@ public class FunctionParser(
     /// </summary>
     public FuncInit ParseFuncDeclaration()
     {
+        // 收集前置的文档注释
+        var docComment = CollectPrecedingDocComments();
+
         var isUseFunc = CurrentToken.Type == LangTokenType.Func;
         if (isUseFunc)
         {
@@ -102,15 +105,26 @@ public class FunctionParser(
         }
 
         // 普通函数声明,生成 FuncInit，设置 IsLambda 为 false
-        return new FuncInit(new FuncLangValue(updatedFuncName, parameters, block, genericParameters, isLambda: false));
+        var funcLangValue = new FuncLangValue(updatedFuncName, parameters, block, genericParameters, isLambda: false);
+
+        // 设置文档注释
+        if (docComment != null)
+        {
+            funcLangValue.DocComment = docComment;
+        }
+
+        return new FuncInit(funcLangValue);
     }
 
     /// <summary>
     /// 解析异步函数声明
     /// asyncFuncDeclaration = "async" "func" identifier "(" idList? ")" ( "->" returnType )? block
     /// </summary>
-    public AsyncFuncInit ParseAsyncFuncDeclaration()
+    public AsyncFuncInit ParseAsyncFuncDeclaration(DocCommentInfo? providedDocComment = null)
     {
+        // 如果提供了文档注释则使用提供的，否则收集前置的文档注释
+        var docComment = providedDocComment ?? CollectPrecedingDocComments();
+
         // 这里假设 async 和 func 关键字已经被消费了
         var funcName = ParseIdentifier();
         var returnType = string.Empty;
@@ -173,9 +187,15 @@ public class FunctionParser(
         var block = stmtParser.ParseBlock();
 
         // 异步函数声明，生成 AsyncFuncInit
-        return new AsyncFuncInit(
-            new AsyncFuncLangValue(updatedFuncName, parameters, block, updatedFuncName.Position),
-            updatedFuncName.Position);
+        var asyncFuncLangValue = new AsyncFuncLangValue(updatedFuncName, parameters, block, updatedFuncName.Position);
+
+        // 设置文档注释
+        if (docComment != null)
+        {
+            asyncFuncLangValue.DocComment = docComment;
+        }
+
+        return new AsyncFuncInit(asyncFuncLangValue, updatedFuncName.Position);
     }
 
     /// <summary>
