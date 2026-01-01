@@ -683,6 +683,26 @@ public partial class ForInStatement(
         var getCurrentMethod = currentProperty.GetGetMethod()!;
         ilGenerator.Emit(OpCodes.Ldloc, enumerator);
         ilGenerator.Emit(OpCodes.Callvirt, getCurrentMethod);
+        
+        // 尝试确定元素类型并进行类型转换
+        var exprType = expression.OutputType(local);
+        if (exprType != null)
+        {
+            // 如果是数组类型
+            if (exprType.IsArray && exprType.GetElementType() == typeof(int))
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+                ilGenerator.Emit(OpCodes.Box, typeof(int)); // 重新装箱以保持统一性
+            }
+            // 如果是泛型集合且元素类型是 int
+            else if (exprType.IsGenericType && exprType.GetGenericArguments().Length > 0 
+                     && exprType.GetGenericArguments()[0] == typeof(int))
+            {
+                ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+                ilGenerator.Emit(OpCodes.Box, typeof(int)); // 重新装箱以保持统一性
+            }
+        }
+        
         ilGenerator.Emit(OpCodes.Stloc, current);
 
         // 处理标识符赋值

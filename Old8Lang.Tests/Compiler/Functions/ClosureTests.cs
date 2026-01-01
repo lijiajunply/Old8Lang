@@ -22,7 +22,7 @@ public class ClosureTests
     {
         // Arrange
         var code = @"
-            func makeAdder(n:int) -> (int) -> int {
+            func makeAdder(n:int) -> function {
                 return (x:int) -> x + n
             }
             
@@ -48,7 +48,7 @@ public class ClosureTests
         var code = @"
             multiplier <- 3
             
-            func createMultiplier() -> (int) -> int {
+            func createMultiplier() -> function {
                 // 捕获外部变量 multiplier
                 return (x:int) -> x * multiplier
             }
@@ -73,7 +73,7 @@ public class ClosureTests
     {
         // Arrange
         var code = @"
-            func makeCounter() -> () -> int {
+            func makeCounter() -> function {
                 count <- 0
                 return () -> {
                     count <- count + 1
@@ -112,11 +112,11 @@ public class ClosureTests
     {
         // Arrange
         var code = @"
-            func applyOperation(x:int, operation:(int) -> int) -> int {
+            func applyOperation(x:int, operation:function) -> int {
                 return operation(x)
             }
             
-            func makeDoubler() -> (int) -> int {
+            func makeDoubler() -> function {
                 return (x:int) -> x * 2
             }
             
@@ -140,7 +140,7 @@ public class ClosureTests
     {
         // Arrange
         var code = @"
-            func createAccumulator(initial:int) -> (int) -> int {
+            func createAccumulator(initial:int) -> function {
                 sum <- initial
                 return (value:int) -> {
                     sum <- sum + value
@@ -212,7 +212,7 @@ public class ClosureTests
     {
         // Arrange
         var code = @"
-            func makeMultiplierFactory(factor:int) -> () -> (int) -> int {
+            func makeMultiplierFactory(factor:int) -> function {
                 return () -> {
                     // 内层闭包捕获 factor
                     return (x:int) -> x * factor
@@ -243,7 +243,7 @@ public class ClosureTests
             base_value <- 10
             multiplier <- 3
             
-            func createComplexOperation() -> (int) -> int {
+            func createComplexOperation() -> function {
                 offset <- 5
                 return (x:int) -> (x + offset) * multiplier + base_value
             }
@@ -268,7 +268,7 @@ public class ClosureTests
     {
         // Arrange
         var code = @"
-            func createToggle() -> () -> bool {
+            func createToggle() -> function {
                 state <- false
                 return () -> {
                     state <- !state
@@ -307,7 +307,7 @@ public class ClosureTests
     {
         // Arrange
         var code = @"
-            func createArrayProcessor() -> (array) -> array {
+            func createArrayProcessor() -> function {
                 return (input:array) -> {
                     result <- {}
                     i <- 0
@@ -352,7 +352,7 @@ public class ClosureTests
                     this.count <- 0
                 }
                 
-                func createIncrementer() -> () -> int {
+                func createIncrementer() -> function {
                     return () -> {
                         this.count <- this.count + 1
                         return this.count
@@ -391,7 +391,7 @@ public class ClosureTests
     {
         // Arrange
         var code = @"
-            func map(list:list, transform:(int) -> int) -> list {
+            func map(list:list, transform:function) -> list {
                 result <- {}
                 i <- 0
                 while i < list.Count() {
@@ -402,7 +402,7 @@ public class ClosureTests
                 return result
             }
             
-            func createMapper(factor:int) -> (list) -> list {
+            func createMapper(factor:int) -> function {
                 return (input:list) -> map(input, (x:int) -> x * factor)
             }
             

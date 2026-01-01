@@ -998,15 +998,37 @@ public partial class Operation(
             case LangTokenType.Percent:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
-                if (leftType == typeof(double) || rightType == typeof(double))
+                
+                // 获取操作数类型
+                var modLeftType = Left?.OutputType(local);
+                var modRightType = Right?.OutputType(local);
+                
+                // 处理 ForIn 循环中变量的特殊情况（object vs int）
+                if ((modLeftType == typeof(object) && modRightType == typeof(int)) ||
+                    (modLeftType == typeof(int) && modRightType == typeof(object)))
+                {
+                    // 对于 object vs int，拆箱 object 到 int
+                    if (modLeftType == typeof(object))
+                    {
+                        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+                    }
+                    if (modRightType == typeof(object))
+                    {
+                        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+                    }
+                    ilGenerator.Emit(OpCodes.Rem);
+                    return typeof(int);
+                }
+                
+                if (modLeftType == typeof(double) || modRightType == typeof(double))
                 {
                     // 确保两个操作数都是double类型
-                    if (leftType == typeof(int))
+                    if (modLeftType == typeof(int))
                     {
                         ilGenerator.Emit(OpCodes.Conv_R8);
                     }
 
-                    if (rightType == typeof(int))
+                    if (modRightType == typeof(int))
                     {
                         ilGenerator.Emit(OpCodes.Conv_R8);
                     }
@@ -1046,17 +1068,106 @@ public partial class Operation(
             case LangTokenType.GreaterThan:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
-                ilGenerator.Emit(OpCodes.Cgt);
+                
+                // 获取操作数类型以进行特殊处理
+                var gtLeftType = Left?.OutputType(local);
+                var gtRightType = Right?.OutputType(local);
+                
+                // 处理 ForIn 循环中变量的特殊情况（object vs int）
+                if ((gtLeftType == typeof(object) && gtRightType == typeof(int)) ||
+                    (gtLeftType == typeof(int) && gtRightType == typeof(object)))
+                {
+                    // 对于 object vs int 的比较，将 int 装箱然后使用 object.CompareTo
+                    if (gtLeftType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Box, typeof(int));
+                    }
+                    if (gtRightType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Box, typeof(int));
+                    }
+                    
+                    // 使用 IComparable.CompareTo 方法进行比较
+                    var compareToMethod = typeof(IComparable).GetMethod("CompareTo", [typeof(object)])!;
+                    ilGenerator.Emit(OpCodes.Callvirt, compareToMethod);
+                    ilGenerator.Emit(OpCodes.Ldc_I4_0);
+                    ilGenerator.Emit(OpCodes.Cgt);
+                }
+                else
+                {
+                    ilGenerator.Emit(OpCodes.Cgt);
+                }
                 return typeof(bool);
             case LangTokenType.LessThan:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
-                ilGenerator.Emit(OpCodes.Clt);
+                
+                // 获取操作数类型以进行特殊处理
+                var ltLeftType = Left?.OutputType(local);
+                var ltRightType = Right?.OutputType(local);
+                
+                // 处理 ForIn 循环中变量的特殊情况（object vs int）
+                if ((ltLeftType == typeof(object) && ltRightType == typeof(int)) ||
+                    (ltLeftType == typeof(int) && ltRightType == typeof(object)))
+                {
+                    // 对于 object vs int 的比较，将 int 装箱然后使用 IComparable.CompareTo
+                    if (ltLeftType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Box, typeof(int));
+                    }
+                    if (ltRightType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Box, typeof(int));
+                    }
+                    
+                    // 使用 IComparable.CompareTo 方法进行比较
+                    var compareToMethod = typeof(IComparable).GetMethod("CompareTo", [typeof(object)])!;
+                    ilGenerator.Emit(OpCodes.Callvirt, compareToMethod);
+                    ilGenerator.Emit(OpCodes.Ldc_I4_0);
+                    ilGenerator.Emit(OpCodes.Clt);
+                }
+                else
+                {
+                    ilGenerator.Emit(OpCodes.Clt);
+                }
                 return typeof(bool);
             case LangTokenType.Equals:
                 Left?.LoadIlValue(ilGenerator, local);
                 Right?.LoadIlValue(ilGenerator, local);
-                ilGenerator.Emit(OpCodes.Ceq);
+                
+                // 获取操作数类型以进行特殊处理
+                var leftOpType = Left?.OutputType(local);
+                var rightOpType = Right?.OutputType(local);
+                
+                // 如果都是字符串，使用字符串比较
+                if (leftOpType == typeof(string) && rightOpType == typeof(string))
+                {
+                    var equalsMethod = typeof(string).GetMethod("Equals", [typeof(string), typeof(string)])!;
+                    ilGenerator.Emit(OpCodes.Call, equalsMethod);
+                }
+                // 处理 ForIn 循环中变量的特殊情况（object vs int）
+                else if ((leftOpType == typeof(object) && rightOpType == typeof(int)) ||
+                         (leftOpType == typeof(int) && rightOpType == typeof(object)))
+                {
+                    // 对于 object vs int 的比较，将 int 装箱然后使用 object.Equals
+                    if (leftOpType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Box, typeof(int));
+                    }
+                    if (rightOpType == typeof(int))
+                    {
+                        ilGenerator.Emit(OpCodes.Box, typeof(int));
+                    }
+                    
+                    // 使用 object.Equals 方法进行比较
+                    var equalsMethod = typeof(object).GetMethod("Equals", [typeof(object), typeof(object)])!;
+                    ilGenerator.Emit(OpCodes.Call, equalsMethod);
+                }
+                else
+                {
+                    // 其他类型使用 Ceq 指令
+                    ilGenerator.Emit(OpCodes.Ceq);
+                }
                 return typeof(bool);
             case LangTokenType.NotEquals:
                 Left?.LoadIlValue(ilGenerator, local);

@@ -8,14 +8,9 @@ namespace Old8Lang.Tests.Compiler.Functions;
 /// <summary>
 /// 编译器模式下的高级函数功能测试 - 泛型函数
 /// </summary>
-public class GenericFunctionTests
+public class GenericFunctionTests(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public GenericFunctionTests(ITestOutputHelper output)
-    {
-        _output = output;
-    }
+    public ITestOutputHelper Output { get; } = output;
 
     [Fact]
     public void BasicGenericFunction_CompilesAndExecutesCorrectly()

@@ -122,9 +122,14 @@ public partial class SwitchStatement(
                 oldCase.expression.LoadIlValue(ilGenerator, local);
 
                 // 比较操作
-                if (switchValueType == typeof(int) || switchValueType == typeof(bool))
+                if (switchValueType == typeof(int) || switchValueType == typeof(bool) || switchValueType == typeof(char))
                 {
-                    // 整数和布尔值使用Ceq指令比较
+                    // 整数、布尔值和字符使用Ceq指令比较
+                    ilGenerator.Emit(OpCodes.Ceq);
+                }
+                else if (switchValueType == typeof(double))
+                {
+                    // double 类型使用 Ceq 进行直接比较（虽然可能不精确，但与解释器行为一致）
                     ilGenerator.Emit(OpCodes.Ceq);
                 }
                 else if (switchValueType == typeof(string))
