@@ -43,7 +43,7 @@ public class ClassParser(
         {
             throw new InvalidOperationException("Expected class or mixin keyword");
         }
-        
+
         var className = CurrentToken.Value;
         Expect(LangTokenType.Identifier);
 
@@ -57,7 +57,7 @@ public class ClassParser(
         string? parentClassName = null;
         List<string> mixinNames = new List<string>();
         List<string> implementsNames = new List<string>();
-        
+
         // 处理继承语法：class Name extends ParentClass {
         if (CurrentToken is { Type: LangTokenType.Extends })
         {
@@ -71,13 +71,13 @@ public class ClassParser(
                 CurrentIndex++;
             }
         }
-        
+
         // 处理 implements 子句：class Name implements Interface1, Interface2 {
         if (CurrentToken is { Type: LangTokenType.Implements })
         {
             // 跳过 implements 关键字
             Expect(LangTokenType.Implements);
-            
+
             // 解析多个接口，用逗号分隔
             while (true)
             {
@@ -86,24 +86,24 @@ public class ClassParser(
                     implementsNames.Add(CurrentToken.Value);
                     CurrentIndex++;
                 }
-                
+
                 // 检查是否还有更多接口
                 if (CurrentToken.Type == LangTokenType.Comma)
                 {
                     CurrentIndex++;
                     continue;
                 }
-                
+
                 break;
             }
         }
-        
+
         // 处理 with 子句：class Name extends ParentClass with Mixin1, Mixin2 {
         if (CurrentToken is { Type: LangTokenType.With })
         {
             // 跳过 with 关键字
             Expect(LangTokenType.With);
-            
+
             // 解析多个 mixin 类，用逗号分隔
             while (true)
             {
@@ -112,14 +112,14 @@ public class ClassParser(
                     mixinNames.Add(CurrentToken.Value);
                     CurrentIndex++;
                 }
-                
+
                 // 检查是否还有更多 mixin
                 if (CurrentToken.Type == LangTokenType.Comma)
                 {
                     CurrentIndex++;
                     continue;
                 }
-                
+
                 break;
             }
         }
@@ -129,7 +129,7 @@ public class ClassParser(
             parentClassName, isMixin, mixinNames, implementsNames, isInterface: false, isAbstract: isAbstract,
             genericParameters: genericParameters));
     }
-    
+
     public ClassInit ParseInterfaceDeclaration()
     {
         // 检查是 interface
@@ -254,7 +254,8 @@ public class ClassParser(
 
                 // 尝试解析修饰符
                 List<AccessModifierType> modifiers = [];
-                if (CurrentToken.Type is LangTokenType.Public or LangTokenType.Private or LangTokenType.Protected or LangTokenType.Static or LangTokenType.Abstract)
+                if (CurrentToken.Type is LangTokenType.Public or LangTokenType.Private or LangTokenType.Protected
+                    or LangTokenType.Static or LangTokenType.Abstract)
                 {
                     modifiers = ParseAccessModifiers();
                 }
@@ -309,7 +310,8 @@ public class ClassParser(
                         continue;
                     }
                     // 4. 无修饰符且后面不是赋值或函数调用，很可能是未初始化字段（但这种情况较少见）
-                    else if (modifiers.Count == 0 && nextToken.Type != LangTokenType.Assignment && nextToken.Type != LangTokenType.LeftParen)
+                    else if (modifiers.Count == 0 && nextToken.Type != LangTokenType.Assignment &&
+                             nextToken.Type != LangTokenType.LeftParen)
                     {
                         // 未初始化的字段（无修饰符、无类型假注）
                         var fieldName = CurrentToken.Value;
@@ -523,7 +525,7 @@ public class ClassParser(
                 defaultValue = exprParser.ParseExpression();
             }
 
-            var paramId = new LangId(paramName, paramType, defaultValue, paramPosition);
+            var paramId = new LangId(paramName, paramType, defaultValue, position: paramPosition);
             parameters.Add(paramId);
 
             // 检查是否有更多参数
@@ -562,7 +564,8 @@ public class ClassParser(
 
         // 创建抽象方法的FuncLangValue（没有方法体）
         var methodId = new LangId(methodName, returnType, position: position);
-        var funcLangValue = new FuncLangValue(methodId, parameters, new BlockStatement([]), null, position, isLambda: false);
+        var funcLangValue =
+            new FuncLangValue(methodId, parameters, new BlockStatement([]), null, position, isLambda: false);
 
         // 创建类成员ID
         var memberId = new ClassMemberId(methodName, returnType, modifiers, position);

@@ -11,10 +11,10 @@ counter <- 0
 
 // 计数器视图
 CounterView() -> {
-    return ui.CreateWidget("Column", {
-        children: {
+    return Column(
+        {
             // 标题
-            ui.CreateWidget("Text", {
+            Text({
                 content: "计数器应用",
                 fontSize: 28,
                 fontWeight: "bold",
@@ -22,7 +22,7 @@ CounterView() -> {
             }),
 
             // 显示计数值
-            ui.CreateWidget("Text", {
+            Text(
                 content: counter.ToStr(),
                 fontSize: 72,
                 fontWeight: "bold",
@@ -30,10 +30,10 @@ CounterView() -> {
             }).SetMargin(20, 0, 30, 0),
 
             // 按钮行
-            ui.CreateWidget("Row", {
+            Row(
                 children: {
                     // 减少按钮
-                    ui.CreateWidget("Button", {
+                    Button(
                         label: "➖ 减少",
                         onClick: () -> {
                             counter <- counter - 1
@@ -42,7 +42,7 @@ CounterView() -> {
                     }),
 
                     // 重置按钮
-                    ui.CreateWidget("Button", {
+                    Button(
                         label: "🔄 重置",
                         onClick: () -> {
                             counter <- 0
@@ -51,7 +51,7 @@ CounterView() -> {
                     }).SetMargin(20, 0, 0, 0),
 
                     // 增加按钮
-                    ui.CreateWidget("Button", {
+                    Button(
                         label: "➕ 增加",
                         onClick: () -> {
                             counter <- counter + 1
@@ -62,7 +62,7 @@ CounterView() -> {
             }).SetSpacing(20),
 
             // 说明文本
-            ui.CreateWidget("Text", {
+            Text(
                 content: "点击按钮改变计数值",
                 fontSize: 14,
                 color: "#8E8E93"

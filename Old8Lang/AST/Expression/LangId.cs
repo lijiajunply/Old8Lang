@@ -12,15 +12,17 @@ namespace Old8Lang.AST.Expression;
 /// <param name="name">标识符名称</param>
 /// <param name="assumptionType">类型注解，用于类型检查和推断</param>
 /// <param name="defaultValue">默认值表达式</param>
+/// <param name="isParams">是否为 params 可变参数</param>
 /// <param name="position">源代码位置信息，用于错误报告</param>
 /// <remarks>
 /// 该类是Old8Lang表达式系统的基础组件，用于表示各种标识符。
-/// 支持类型注解、默认值、"this"关键字处理等功能。
+/// 支持类型注解、默认值、params 可变参数、"this"关键字处理等功能。
 /// </remarks>
 public partial class LangId(
     string name,
     string assumptionType = "",
     LangExpression? defaultValue = null,
+    bool isParams = false,
     SourcePosition position = default) : LangExpression(position)
 {
     /// <summary>
@@ -37,6 +39,11 @@ public partial class LangId(
     /// 默认值表达式
     /// </summary>
     public LangExpression? DefaultValue { get; } = defaultValue;
+
+    /// <summary>
+    /// 是否为 params 可变参数
+    /// </summary>
+    public bool IsParams { get; } = isParams;
 
     /// <summary>
     /// 将标识符转换为字符串表示

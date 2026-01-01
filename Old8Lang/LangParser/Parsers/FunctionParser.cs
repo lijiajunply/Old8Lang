@@ -187,9 +187,10 @@ public class FunctionParser(
         // 检查当前token是否是标识符或关键字
         if (CurrentToken.Type is LangTokenType.Identifier or LangTokenType.Func or LangTokenType.Class
             or LangTokenType.If or LangTokenType.Else or LangTokenType.While or LangTokenType.For
-            or LangTokenType.Return or LangTokenType.Import or LangTokenType.True or LangTokenType.False)
+            or LangTokenType.Return or LangTokenType.Import or LangTokenType.True or LangTokenType.False
+            or LangTokenType.Params) // 支持 params 关键字
         {
-            // 解析第一个参数，允许类型注解
+            // 解析第一个参数，允许类型注解和 params 修饰符
             ids.Add(ParseTypedIdentifier(true));
 
             // 跳过默认参数值（如果有）
@@ -202,7 +203,7 @@ public class FunctionParser(
                 }
             }
 
-            // 解析更多参数，允许类型注解
+            // 解析更多参数，允许类型注解和 params 修饰符
             while (CurrentToken.Type == LangTokenType.Comma)
             {
                 Expect(LangTokenType.Comma);
@@ -251,6 +252,14 @@ public class FunctionParser(
     /// </summary>
     public LangId ParseTypedIdentifier(bool isNeedDefaultValue)
     {
+        // 检查是否有 params 修饰符
+        bool isParams = false;
+        if (CurrentToken.Type == LangTokenType.Params)
+        {
+            isParams = true;
+            Expect(LangTokenType.Params);
+        }
+
         var identifierToken = CurrentToken;
         var position = new SourcePosition(identifierToken.Line, identifierToken.Column,
             tokenValue: identifierToken.Value);
@@ -294,7 +303,7 @@ public class FunctionParser(
             }
         }
 
-        return new LangId(value, typeAnnotation, defaultValue, position);
+        return new LangId(value, typeAnnotation, defaultValue, isParams, position);
     }
 
     /// <summary>

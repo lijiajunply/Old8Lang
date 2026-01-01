@@ -395,8 +395,12 @@ public class FuncLangValue : ImportInfo
             var expectedParams = Ids.Count;
             var actualParams = ids.Count;
 
-            // 只检查最大参数数量，允许实际参数少于期望参数（如果有默认参数）
-            if (actualParams > expectedParams)
+            // 检查是否有 params 参数
+            var hasParamsParameter = Ids.Any(id => id.IsParams);
+
+            // 如果有 params 参数，允许传入任意数量的参数（大于等于普通参数的数量）
+            // 如果没有 params 参数，只检查最大参数数量，允许实际参数少于期望参数（如果有默认参数）
+            if (!hasParamsParameter && actualParams > expectedParams)
             {
                 throw new ArgumentError(Position,
                     $"函数 '{Id?.IdName}' 期望最多 {expectedParams} 个参数，但实际提供了 {actualParams} 个参数");
@@ -922,7 +926,7 @@ public class FuncLangValue : ImportInfo
     }
 
     /// <summary>
-    /// 统一的参数处理方法：计算、验证、处理默认值，并返回最终参数值列表
+    /// 统一的参数处理方法：计算、验证、处理默认值和 params 参数，并返回最终参数值列表
     /// </summary>
     /// <param name="argumentExpressions">传入的参数表达式列表</param>
     /// <param name="variManager">外部变量管理器，用于计算参数值</param>
@@ -938,6 +942,52 @@ public class FuncLangValue : ImportInfo
         // 1. 计算所有传入参数的值
         var paramValues = argumentExpressions.Select(expr => expr.Run(variManager)).ToList();
 
+        // 检查是否有 params 参数
+        var paramsIndex = -1;
+        for (int i = 0; i < Ids.Count; i++)
+        {
+            if (Ids[i].IsParams)
+            {
+                paramsIndex = i;
+                break;
+            }
+        }
+
+        // 如果有 params 参数，需要特殊处理
+        if (paramsIndex >= 0)
+        {
+            // params 参数之前的普通参数数量
+            var regularParamCount = paramsIndex;
+
+            // 检查是否提供了足够的参数
+            if (paramValues.Count < regularParamCount)
+            {
+                throw new ArgumentError(Position,
+                    $"函数 '{Id?.IdName}' 至少需要 {regularParamCount} 个参数，但实际提供了 {paramValues.Count} 个参数");
+            }
+
+            // 2. 验证普通参数的类型匹配（仅在有类型注解时进行检查）
+            if (regularParamCount > 0)
+            {
+                var regularArgExpressions = argumentExpressions.Take(regularParamCount).ToList();
+                var regularParamValues = paramValues.Take(regularParamCount).ToList();
+                ValidateParameterTypes(regularArgExpressions, regularParamValues, executionManager);
+            }
+
+            // 3. 处理 params 参数：将剩余的参数打包成数组
+            var paramsValues = paramValues.Skip(regularParamCount).ToList();
+
+            // 创建 ArrayLangValue
+            var paramsArrayValue = new ArrayLangValue(paramsValues.ToArray());
+
+            // 替换 paramValues：保留普通参数 + params 数组
+            var finalParamValues = paramValues.Take(regularParamCount).ToList();
+            finalParamValues.Add(paramsArrayValue);
+
+            return finalParamValues;
+        }
+
+        // 没有 params 参数，使用原有逻辑
         // 2. 验证参数类型匹配（仅在有类型注解时进行检查）
         ValidateParameterTypes(argumentExpressions, paramValues, executionManager);
 

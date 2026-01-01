@@ -32,6 +32,9 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     /// <exception cref="DuplicateNameError">当函数已存在时抛出</exception>
     public override void Run(VariateManager manager)
     {
+        // 验证 params 参数的合法性
+        ValidateParamsParameter();
+
         // 检查函数是否已存在（只有当函数名、参数数量、参数类型和返回类型都相同时才视为重复）
         // 但对于来自不同模块的函数，允许重复（它们可能通过别名导入）
         if (FuncLangValue.Id != null)
@@ -61,6 +64,9 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
     /// <param name="local">局部变量管理器，用于管理函数的声明和访问</param>
     public override void GenerateIl(ILGenerator ilGenerator, LocalManager local)
     {
+        // 验证 params 参数的合法性
+        ValidateParamsParameter();
+
         // 尝试使用类型推断（如果启用）
         if (TypeInferenceConfig.Instance.EnableTypeInference)
         {
@@ -404,5 +410,78 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         sb.AppendLine($"func {FuncLangValue.Id}({paramList})");
         sb.AppendLine($"{{ {FuncLangValue.BlockStatement} }}");
         return sb.ToString();
+    }
+
+    /// <summary>
+    /// 验证 params 参数的合法性
+    /// </summary>
+    /// <exception cref="SyntaxError">当 params 参数使用不当时抛出</exception>
+    private void ValidateParamsParameter()
+    {
+        if (FuncLangValue.Ids == null || FuncLangValue.Ids.Count == 0)
+        {
+            return;
+        }
+
+        // 查找所有 params 参数
+        var paramsIndices = new List<int>();
+        for (int i = 0; i < FuncLangValue.Ids.Count; i++)
+        {
+            if (FuncLangValue.Ids[i].IsParams)
+            {
+                paramsIndices.Add(i);
+            }
+        }
+
+        // 如果没有 params 参数，直接返回
+        if (paramsIndices.Count == 0)
+        {
+            return;
+        }
+
+        // 规则1: 只能有一个 params 参数
+        if (paramsIndices.Count > 1)
+        {
+            var paramsParam = FuncLangValue.Ids[paramsIndices[1]];
+            throw new SyntaxError(
+                paramsParam.Position,
+                $"函数 '{FuncLangValue.Id?.IdName}' 只能有一个 params 参数，但发现了 {paramsIndices.Count} 个");
+        }
+
+        var paramsIndex = paramsIndices[0];
+        var paramsId = FuncLangValue.Ids[paramsIndex];
+
+        // 规则2: params 参数必须是最后一个参数
+        if (paramsIndex != FuncLangValue.Ids.Count - 1)
+        {
+            throw new SyntaxError(
+                paramsId.Position,
+                $"函数 '{FuncLangValue.Id?.IdName}' 的 params 参数 '{paramsId.IdName}' 必须是参数列表的最后一个参数");
+        }
+
+        // 规则3: params 参数必须有类型注解，且必须是数组类型
+        if (string.IsNullOrEmpty(paramsId.AssumptionType))
+        {
+            throw new SyntaxError(
+                paramsId.Position,
+                $"函数 '{FuncLangValue.Id?.IdName}' 的 params 参数 '{paramsId.IdName}' 必须有类型注解，且必须是数组类型（例如 array<int>）");
+        }
+
+        // 检查是否是数组类型
+        var typeAnnotation = paramsId.AssumptionType.ToLower().Trim();
+        if (!typeAnnotation.StartsWith("array<") || !typeAnnotation.EndsWith(">"))
+        {
+            throw new SyntaxError(
+                paramsId.Position,
+                $"函数 '{FuncLangValue.Id?.IdName}' 的 params 参数 '{paramsId.IdName}' 的类型必须是数组类型（例如 array<int>），但当前类型为 '{paramsId.AssumptionType}'");
+        }
+
+        // 规则4: params 参数不能有默认值
+        if (paramsId.DefaultValue != null)
+        {
+            throw new SyntaxError(
+                paramsId.Position,
+                $"函数 '{FuncLangValue.Id?.IdName}' 的 params 参数 '{paramsId.IdName}' 不能有默认值，params 参数会自动处理为空数组");
+        }
     }
 }

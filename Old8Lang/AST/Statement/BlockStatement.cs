@@ -16,6 +16,7 @@ public partial class BlockStatement : OldStatement
     private readonly List<OldStatement> ImportStatements = [];
     private readonly List<OldStatement> OtherStatements = [];
     public override int Count => OtherStatements.Count;
+    public int Total => ImportStatements.Count + OtherStatements.Count;
 
     public BlockStatement(IEnumerable<IOldLangTree> statements, SourcePosition position = default) : base(position)
     {
@@ -408,6 +409,8 @@ public partial class BlockStatement : OldStatement
     }
 
     public override OldStatement this[int index] => OtherStatements[index];
+    
+    public IOldLangTree GetImportStatement(int index) => ImportStatements[index];
 
     /// <summary>
     /// 检查表达式是否是函数

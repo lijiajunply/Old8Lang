@@ -319,7 +319,8 @@ public class StatementParser(
                                 return ParseSet();
                             }
                             // 检查是否是可空联合类型或可空交叉类型（例如 "a:int? | string" 或 "a:T? & U"）
-                            else if (fourthToken.Type == LangTokenType.Pipe || fourthToken.Type == LangTokenType.Ampersand)
+                            else if (fourthToken.Type == LangTokenType.Pipe ||
+                                     fourthToken.Type == LangTokenType.Ampersand)
                             {
                                 // 这是带有联合类型或交叉类型注解的赋值语句
                                 CurrentIndex = savedIndex;
@@ -451,13 +452,19 @@ public class StatementParser(
                 }
 
                 // 如果是super方法调用（Operation，且操作符为 Dot，左侧为 SuperExpression，右侧为 Instance），返回 FuncRunStatement
-                if (expr is Operation { Opera: LangTokenType.Dot, Left: SuperExpression, Right: Instance } superOperation)
+                if (expr is Operation
+                    {
+                        Opera: LangTokenType.Dot, Left: SuperExpression, Right: Instance
+                    } superOperation)
                 {
                     return new FuncRunStatement(superOperation, expr.Position);
                 }
 
                 // 如果是this方法调用（Operation，且操作符为 Dot，左侧为 LangId { IdName: "this" }，右侧为 Instance），返回 FuncRunStatement
-                if (expr is Operation { Opera: LangTokenType.Dot, Left: LangId { IdName: "this" }, Right: Instance } thisOperation)
+                if (expr is Operation
+                    {
+                        Opera: LangTokenType.Dot, Left: LangId { IdName: "this" }, Right: Instance
+                    } thisOperation)
                 {
                     return new FuncRunStatement(thisOperation, expr.Position);
                 }
@@ -694,7 +701,9 @@ public class StatementParser(
             if (leftExpr is LangId leftLangId)
             {
                 var nullExpr = new NullLangValue(leftLangId.Position);
-                return new SetStatement(new LangId(leftLangId.IdName, assumptionType, null, leftLangId.Position), nullExpr, leftLangId.Position);
+                return new SetStatement(
+                    new LangId(leftLangId.IdName, assumptionType, null, position: leftLangId.Position), nullExpr,
+                    leftLangId.Position);
             }
             else
             {
@@ -1151,15 +1160,17 @@ public class StatementParser(
         else if (isDynamic && CurrentToken.Type == LangTokenType.String)
         {
             // 动态导入：字符串字面量应该创建为动态表达式
-            dynamicModuleExpression = new StringLangValue(CurrentToken.Value, new SourcePosition(CurrentToken.Line, CurrentToken.Column));
-            Expect(LangTokenType.String);  // 消耗字符串
+            dynamicModuleExpression = new StringLangValue(CurrentToken.Value,
+                new SourcePosition(CurrentToken.Line, CurrentToken.Column));
+            Expect(LangTokenType.String); // 消耗字符串
             moduleName = "__dynamic_module__";
         }
         else if (isDynamic && CurrentToken.Type == LangTokenType.Identifier)
         {
             // 动态导入：创建标识符表达式，避免在解析阶段调用表达式解析器
-            dynamicModuleExpression = new LangId(CurrentToken.Value, "", null, new SourcePosition(CurrentToken.Line, CurrentToken.Column));
-            Expect(LangTokenType.Identifier);  // 消耗标识符
+            dynamicModuleExpression = new LangId(CurrentToken.Value, "", null,
+                position: new SourcePosition(CurrentToken.Line, CurrentToken.Column));
+            Expect(LangTokenType.Identifier); // 消耗标识符
             moduleName = "__dynamic_module__";
         }
         else if (isDynamic)
@@ -1632,6 +1643,7 @@ public class StatementParser(
                 {
                     result += ">";
                 }
+
                 CurrentIndex++;
             }
             else if (CurrentToken.Type == LangTokenType.Comma)
@@ -1673,6 +1685,7 @@ public class StatementParser(
         {
             throw CreateSyntaxError($"枚举定义需要枚举名称，但得到 {CurrentToken.Type}");
         }
+
         var enumName = CurrentToken.Value;
         CurrentIndex++;
 
@@ -1697,6 +1710,7 @@ public class StatementParser(
             {
                 throw CreateSyntaxError($"枚举成员需要标识符，但得到 {CurrentToken.Type}");
             }
+
             var memberName = CurrentToken.Value;
             CurrentIndex++;
 
@@ -1720,6 +1734,7 @@ public class StatementParser(
                 {
                     break;
                 }
+
                 continue;
             }
 

@@ -657,7 +657,7 @@ public class PrimaryParser(
                 Expect(LangTokenType.Colon);
                 var returnTypeName = CurrentToken.Value;
                 Expect(LangTokenType.Identifier);
-                returnTypeAnnotation = new LangId("", returnTypeName, null, position);
+                returnTypeAnnotation = new LangId("", returnTypeName, null, position: position);
             }
 
             // 检查箭头符号
@@ -754,7 +754,7 @@ public class PrimaryParser(
                                 $"不支持的返回类型注解: {returnTypeName}。支持的类型: int, double, string, bool, char, void, list, dict");
                         }
 
-                        returnTypeAnnotation = new LangId("", returnTypeName, null, position);
+                        returnTypeAnnotation = new LangId("", returnTypeName, null, position: position);
                     }
                     else
                     {
@@ -1435,7 +1435,7 @@ public class PrimaryParser(
                 var supportedTypes = new[] { "int", "double", "string", "bool", "char", "void", "list", "dict", "any" };
                 // 允许单个大写字母作为泛型类型参数（如 T, U, V）
                 var isGenericTypeParameter = typeAnnotation.Length == 1 && char.IsUpper(typeAnnotation[0]);
-                
+
                 if (!supportedTypes.Contains(typeAnnotation) && !isGenericTypeParameter)
                 {
                     throw CreateSyntaxError(
@@ -1448,7 +1448,7 @@ public class PrimaryParser(
             }
         }
 
-        return new LangId(value, typeAnnotation, null, position);
+        return new LangId(value, typeAnnotation, null, position: position);
     }
 
     /// <summary>

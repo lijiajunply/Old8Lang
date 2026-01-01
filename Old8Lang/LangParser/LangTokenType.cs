@@ -382,6 +382,11 @@ public enum LangTokenType
     Let,
 
     /// <summary>
+    /// params (可变参数关键字)
+    /// </summary>
+    Params,
+
+    /// <summary>
     /// 文件头指令 (#!...)
     /// </summary>
     FileHeaderDirective
@@ -449,5 +454,6 @@ public enum KeywordType
     Join,
     On,
     Into,
-    Let
+    Let,
+    Params
 }
