@@ -22,9 +22,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/Button.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/Button.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Table.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Advanced/Tree.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/DatePicker.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/FilePicker.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Basic/TimePicker.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/2026-01-01-Old8Lang.FirstUI最终开发完成报告.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,13 +66,16 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.App/Program.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Benchmarks/SimpleReflectionBenchmark.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/Basic/Button.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
@@ -917,7 +924,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="490" />
+    <option name="localTasksCounter" value="491" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -944,7 +951,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(firstui): 实现 FirstUI 基础组件和应用框架&#10;&#10;- 添加 Text 和 Button 基础组件，支持文本显示和按钮点击功能&#10;- 实现 Container 和 Column 布局组件，提供容器和垂直布局支持&#10;- 添加全局状态管理功能，支持状态监听和计算属性&#10;- 重构 FirstUIBinding 绑定类，实现组件创建和应用运行逻辑&#10;- 更新示例应用使用新的组件创建方式，替换原有的链式调用&#10;- 添加项目引用和标准库注册，集成 FirstUI 到主应用程序&#10;- 扩展 WidgetBase 基类，添加边距、内边距和可见性设置功能" />
     <MESSAGE value="test(standard-library): 添加标准库模块的全面测试覆盖&#10;&#10;- 添加 AsyncLibTests 测试异步和多线程功能&#10;- 添加 CryptoLibTests 测试加密和哈希功能&#10;- 添加 CsvTests 测试 CSV 文件处理功能&#10;- 添加 FileLibTests 测试文件和目录操作功能&#10;- 添加 JsonLibTests 测试 JSON 序列化和反序列化功能&#10;- 添加 MathLibTests 测试数学函数功能&#10;- 添加 OSTests 测试操作系统相关功能&#10;- 添加 RegexLibTests 测试正则表达式功能" />
     <MESSAGE value="test(standard-library): 添加标准库模块的全面测试覆盖&#10;&#10;- 添加 DatabaseLibTests 测试数据库操作功能&#10;- 添加 MachineLearningLibTests 测试机器学习功能&#10;- 添加 NetLibTests 测试网络功能（HTTP、MQTT、WebSocket 等）&#10;- 添加 SerializationLibTests 测试序列化功能（MessagePack 和 Protobuf）&#10;- 更新 IDE 工作区配置文件中的变更记录和任务计数器&#10;- 清理过时的提交消息历史记录并更新最后提交信息" />
     <MESSAGE value="refactor(firstui): 重构 FirstUI 命名空间和组件注册机制&#10;&#10;- 移除 Core 子命名空间，将所有类移到 Old8Lang.FirstUI 主命名空间&#10;- 删除不再需要的 using 语句，简化文件头部引用&#10;- 从 FirstUIBinding 中移除 CreateWidget 方法，改用直接组件构造函数&#10;- 更新 HelloWorld 示例使用新的 Column 组件构造方式&#10;- 在标准库注册表中添加 FirstUI 的所有组件类名到 ClassNames 数组&#10;- 调整 IDE 配置文件中的变更记录和任务计数器" />
@@ -969,7 +975,8 @@
     <MESSAGE value="refactor(FirstUI): 重构Avalonia应用初始化逻辑&#10;&#10;- 使用AppBuilder正确初始化Avalonia应用生命周期&#10;- 添加ClassicDesktopStyleApplicationLifetime支持桌面应用启动&#10;- 实现图形界面环境检测和平台不支持异常处理&#10;- 重构UI构建逻辑并保持错误处理机制&#10;- 更新应用上下文初始化流程&#10;- 移除旧的初始化检查逻辑并优化窗口创建过程&#10;- 添加nullable注解支持并优化Invoke方法调用&#10;- 创建FirstUIAvaloniaApp应用类处理框架初始化&#10;- 重构Program.cs主入口点实现GUI支持的同步包装器" />
     <MESSAGE value="refactor(firstui): 重构FirstUI应用初始化和依赖配置&#10;&#10;- 移除未使用的_mainWindow字段&#10;- 使用数组字面量语法替换Array.Empty&lt;string&gt;()&#10;- 添加Inter字体支持并更新Avalonia配置&#10;- 移除不必要的上下文空值检查&#10;- 移除Colorful.Console包依赖&#10;- 升级Avalonia框架到1.3.10版本&#10;- 添加Avalonia.Fonts.Inter字体包依赖&#10;- 更新IDE工作区配置和调试设置" />
     <MESSAGE value="refactor(app): 移除修改导入路径命令并优化程序入口点&#10;&#10;- 移除 ChangeImportCommand 命令类文件&#10;- 从命令注册表中移除修改导入路径命令&#10;- 重构 Program.cs 主入口点，移除同步包装器方法&#10;- 调整命令注册顺序，保持性能分析命令注册&#10;- 更新 IDE 配置文件中的 JSON 格式转义字符" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(app): 移除修改导入路径命令并优化程序入口点&#10;&#10;- 移除 ChangeImportCommand 命令类文件&#10;- 从命令注册表中移除修改导入路径命令&#10;- 重构 Program.cs 主入口点，移除同步包装器方法&#10;- 调整命令注册顺序，保持性能分析命令注册&#10;- 更新 IDE 配置文件中的 JSON 格式转义字符" />
+    <MESSAGE value="feat(components): 添加新组件并完善绑定API&#10;&#10;- 新增 Wrap 布局组件支持自动换行/换列&#10;- 新增 Icon 图标组件，支持 Material Icons、Font Awesome、Unicode 等多种图标库&#10;- 新增 Switch 开关组件提供布尔值选择功能&#10;- 新增 Slider 滑块组件支持范围选择&#10;- 新增 ProgressBar 进度条组件，支持线性和圆形样式&#10;- 新增 TextArea 多行文本输入组件&#10;- 新增 Select 下拉选择组件&#10;- 新增 NavigationView 导航视图组件，支持侧边栏导航&#10;- 新增 Panel 面板组件，支持标题栏和边框&#10;- 完善 FirstUIBinding 绑定层，添加新组件的创建API&#10;- 更新 Button 组件构造函数支持参数注入&#10;- 添加 Svg.Controls.Avalonia 包支持SVG图标渲染" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(components): 添加新组件并完善绑定API&#10;&#10;- 新增 Wrap 布局组件支持自动换行/换列&#10;- 新增 Icon 图标组件，支持 Material Icons、Font Awesome、Unicode 等多种图标库&#10;- 新增 Switch 开关组件提供布尔值选择功能&#10;- 新增 Slider 滑块组件支持范围选择&#10;- 新增 ProgressBar 进度条组件，支持线性和圆形样式&#10;- 新增 TextArea 多行文本输入组件&#10;- 新增 Select 下拉选择组件&#10;- 新增 NavigationView 导航视图组件，支持侧边栏导航&#10;- 新增 Panel 面板组件，支持标题栏和边框&#10;- 完善 FirstUIBinding 绑定层，添加新组件的创建API&#10;- 更新 Button 组件构造函数支持参数注入&#10;- 添加 Svg.Controls.Avalonia 包支持SVG图标渲染" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
