@@ -13,8 +13,8 @@ namespace Old8Lang.AST.Statement;
 /// </summary>
 public partial class BlockStatement : OldStatement
 {
-    private readonly List<OldStatement> ImportStatements = [];
-    private readonly List<OldStatement> OtherStatements = [];
+    public readonly List<OldStatement> ImportStatements = [];
+    public readonly List<OldStatement> OtherStatements = [];
     public override int Count => OtherStatements.Count;
     public int Total => ImportStatements.Count + OtherStatements.Count;
 

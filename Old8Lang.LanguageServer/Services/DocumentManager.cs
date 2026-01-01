@@ -76,7 +76,7 @@ public class DocumentManager
             result.Ast = ast;
 
             // 构建符号表
-            result.SymbolTable = BuildSymbolTable(ast);
+            result.SymbolTable = BuildSymbolTable(ast, uri);
 
             // 如果启用调试模式或性能分析，添加提示
             if (DebugModeEnabled || ProfilingEnabled)
@@ -137,10 +137,9 @@ public class DocumentManager
     /// <summary>
     /// 构建符号表
     /// </summary>
-    private Dictionary<string, SymbolInfo> BuildSymbolTable(BlockStatement ast)
+    private Dictionary<string, SymbolInfo> BuildSymbolTable(BlockStatement ast, string uri)
     {
-        var symbolTable = new Dictionary<string, SymbolInfo>();
-        // TODO: 实现符号表构建逻辑
-        return symbolTable;
+        var builder = new SymbolTableBuilder(uri);
+        return builder.Build(ast);
     }
 }
