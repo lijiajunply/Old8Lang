@@ -2,15 +2,17 @@ using Old8Lang.AST;
 using Old8Lang.AST.Statement;
 using Old8Lang.AST.Expression;
 using Old8Lang.LanguageServer.Models;
+using Old8Lang.LangParser;
 
 namespace Old8Lang.LanguageServer.Services;
 
 /// <summary>
 /// 符号表构建器 - 遍历AST构建符号表
 /// </summary>
-public class SymbolTableBuilder(string uri)
+public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null)
 {
     private readonly Dictionary<string, SymbolInfo> _symbolTable = new();
+    private readonly List<LangToken>? _tokens = tokens;
 
     /// <summary>
     /// 构建符号表
@@ -71,13 +73,16 @@ public class SymbolTableBuilder(string uri)
         if (funcValue.Id == null) return; // 跳过Lambda
 
         var funcName = funcValue.Id.IdName;
-        var location = new SourceLocation
+
+        // 尝试从 token 列表中查找位置
+        var tokenLocation = FindSymbolLocationFromTokens(funcName, LangTokenType.Func);
+        var location = tokenLocation ?? new SourceLocation
         {
             Uri = uri,
-            Line = funcValue.Position.Line,
-            Column = funcValue.Position.Column,
-            EndLine = funcValue.Position.Line,
-            EndColumn = funcValue.Position.Column
+            Line = funcInit.Position.Line,
+            Column = funcInit.Position.Column,
+            EndLine = funcInit.Position.Line,
+            EndColumn = funcInit.Position.Column + funcName.Length
         };
 
         // 构建函数签名
@@ -118,13 +123,16 @@ public class SymbolTableBuilder(string uri)
         if (funcValue.Id == null) return;
 
         var funcName = funcValue.Id.IdName;
-        var location = new SourceLocation
+
+        // 尝试从 token 列表中查找位置
+        var tokenLocation = FindSymbolLocationFromTokens(funcName, LangTokenType.Func);
+        var location = tokenLocation ?? new SourceLocation
         {
             Uri = uri,
-            Line = funcValue.Position.Line,
-            Column = funcValue.Position.Column,
-            EndLine = funcValue.Position.Line,
-            EndColumn = funcValue.Position.Column
+            Line = asyncFuncInit.Position.Line,
+            Column = asyncFuncInit.Position.Column,
+            EndLine = asyncFuncInit.Position.Line,
+            EndColumn = asyncFuncInit.Position.Column + funcName.Length
         };
 
         var paramList = funcValue.Ids != null
@@ -161,13 +169,16 @@ public class SymbolTableBuilder(string uri)
     {
         var typeTemplate = classInit.AnyLangValue;
         var className = typeTemplate.ClassName;
-        var location = new SourceLocation
+
+        // 尝试从 token 列表中查找位置
+        var tokenLocation = FindSymbolLocationFromTokens(className, LangTokenType.Class);
+        var location = tokenLocation ?? new SourceLocation
         {
             Uri = uri,
-            Line = typeTemplate.Position.Line,
-            Column = typeTemplate.Position.Column,
-            EndLine = typeTemplate.Position.Line,
-            EndColumn = typeTemplate.Position.Column
+            Line = classInit.Position.Line,
+            Column = classInit.Position.Column,
+            EndLine = classInit.Position.Line,
+            EndColumn = classInit.Position.Column + className.Length
         };
 
         // 提取类文档注释
@@ -303,5 +314,62 @@ public class SymbolTableBuilder(string uri)
         }
 
         return string.Join("\n", lines);
+    }
+
+    /// <summary>
+    /// 从 token 列表中查找符号的定义位置
+    /// </summary>
+    private SourceLocation? FindSymbolLocationFromTokens(string symbolName, LangTokenType expectedTokenType)
+    {
+        if (_tokens == null) return null;
+
+        // 查找符号对应的 token
+        // 对于函数和类，我们查找 func/class/async 关键字后面的标识符
+        for (int i = 0; i < _tokens.Count; i++)
+        {
+            var token = _tokens[i];
+
+            // 检查是否是我们要找的标识符
+            if (token.Type == LangTokenType.Identifier && token.Value == symbolName)
+            {
+                // 向前查看是否有 func/class/async 关键字
+                if (i > 0)
+                {
+                    var prevToken = _tokens[i - 1];
+                    bool isDefinition = false;
+
+                    // 检查是否是函数定义
+                    if (expectedTokenType == LangTokenType.Func && prevToken.Type == LangTokenType.Func)
+                    {
+                        isDefinition = true;
+                    }
+                    // 检查是否是异步函数定义
+                    else if (expectedTokenType == LangTokenType.Func && prevToken.Type == LangTokenType.Async)
+                    {
+                        // async func 的情况，需要再向前查找
+                        isDefinition = true;
+                    }
+                    // 检查是否是类定义
+                    else if (expectedTokenType == LangTokenType.Class && prevToken.Type == LangTokenType.Class)
+                    {
+                        isDefinition = true;
+                    }
+
+                    if (isDefinition)
+                    {
+                        return new SourceLocation
+                        {
+                            Uri = uri,
+                            Line = token.Line - 1, // Token 从 1 开始，LSP 从 0 开始
+                            Column = token.Column - 1,
+                            EndLine = token.Line - 1,
+                            EndColumn = token.Column - 1 + symbolName.Length
+                        };
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

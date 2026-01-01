@@ -30,8 +30,30 @@ public class DefinitionHandler(DocumentManager documentManager) : IDefinitionHan
             return Task.FromResult<LocationOrLocationLinks?>(new LocationOrLocationLinks());
         }
 
-        // TODO: 实现根据位置查找符号定义的逻辑
-        var locations = new List<LocationOrLocationLink>();
+        // 获取光标位置
+        var line = request.Position.Line;
+        var column = request.Position.Character;
+
+        // 查找光标位置的符号
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, line, column);
+
+        if (symbol == null)
+        {
+            return Task.FromResult<LocationOrLocationLinks?>(new LocationOrLocationLinks());
+        }
+
+        // 构建定义位置
+        var location = new Location
+        {
+            Uri = symbol.Location.Uri,
+            Range = new OmniSharp.Extensions.LanguageServer.Protocol.Models.Range
+            {
+                Start = new Position(symbol.Location.Line, symbol.Location.Column),
+                End = new Position(symbol.Location.EndLine, symbol.Location.EndColumn)
+            }
+        };
+
+        var locations = new List<LocationOrLocationLink> { location };
 
         return Task.FromResult<LocationOrLocationLinks?>(new LocationOrLocationLinks(locations));
     }
