@@ -5,6 +5,9 @@ using Avalonia.Threading;
 using Old8Lang.FirstUI.Core;
 using Old8Lang.FirstUI.Theme;
 using Old8Lang.FirstUI.Gesture;
+using Old8Lang.FirstUI.Layout;
+using Old8Lang.FirstUI.Basic;
+using Old8Lang.FirstUI.Advanced;
 
 namespace Old8Lang.FirstUI;
 
@@ -129,6 +132,80 @@ public static class FirstUIBinding
                 }
             });
         }
+    }
+
+    // ======== 组件创建 API ========
+
+    /// <summary>
+    /// 创建 Wrap 布局组件
+    /// </summary>
+    public static Wrap CreateWrap()
+    {
+        return new Wrap();
+    }
+
+    /// <summary>
+    /// 创建 Icon 图标组件
+    /// </summary>
+    public static Old8Lang.FirstUI.Basic.Icon CreateIcon(string name, Old8Lang.FirstUI.Basic.IconType type = Old8Lang.FirstUI.Basic.IconType.Material)
+    {
+        return new Old8Lang.FirstUI.Basic.Icon { Name = name, Type = type };
+    }
+
+    /// <summary>
+    /// 创建 Switch 开关组件
+    /// </summary>
+    public static Old8Lang.FirstUI.Basic.Switch CreateSwitch(bool value = false)
+    {
+        return new Old8Lang.FirstUI.Basic.Switch(value);
+    }
+
+    /// <summary>
+    /// 创建 Slider 滑块组件
+    /// </summary>
+    public static Old8Lang.FirstUI.Basic.Slider CreateSlider()
+    {
+        return new Old8Lang.FirstUI.Basic.Slider();
+    }
+
+    /// <summary>
+    /// 创建 ProgressBar 进度条组件
+    /// </summary>
+    public static Old8Lang.FirstUI.Basic.ProgressBar CreateProgressBar()
+    {
+        return new Old8Lang.FirstUI.Basic.ProgressBar();
+    }
+
+    /// <summary>
+    /// 创建 TextArea 多行文本输入组件
+    /// </summary>
+    public static Old8Lang.FirstUI.Basic.TextArea CreateTextArea()
+    {
+        return new Old8Lang.FirstUI.Basic.TextArea();
+    }
+
+    /// <summary>
+    /// 创建 Select 下拉选择组件
+    /// </summary>
+    public static Old8Lang.FirstUI.Basic.Select CreateSelect()
+    {
+        return new Old8Lang.FirstUI.Basic.Select();
+    }
+
+    /// <summary>
+    /// 创建 NavigationView 导航视图组件
+    /// </summary>
+    public static Old8Lang.FirstUI.Advanced.NavigationView CreateNavigationView()
+    {
+        return new Old8Lang.FirstUI.Advanced.NavigationView();
+    }
+
+    /// <summary>
+    /// 创建 Panel 面板组件
+    /// </summary>
+    public static Old8Lang.FirstUI.Advanced.Panel CreatePanel()
+    {
+        return new Old8Lang.FirstUI.Advanced.Panel();
     }
 
     // ======== 手势相关 API ========

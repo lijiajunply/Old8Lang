@@ -1,46 +1,179 @@
 # Old8Lang.FirstUI
 
-> Old8Lang 的现代化跨平台 GUI 标准库
+> 基于 Avalonia UI 的声明式 GUI 框架，专为 Old8Lang 语言设计
 
-## 简介
+[![Status](https://img.shields.io/badge/Status-Alpha%20Ready-orange)](https://github.com/old8lang/firstui)
+[![Framework](https://img.shields.io/badge/Framework-Avalonia%2011.x-blue)](https://avaloniaui.net/)
+[![Language](https://img.shields.io/badge/Language-Old8Lang%20%2B%20C%23-purple)](https://old8lang.org/)
 
-Old8Lang.FirstUI 是为 Old8Lang 语言设计的声明式 GUI 框架，基于 Avalonia UI，借鉴了 Flutter 和 SwiftUI 的设计理念。它让你能够用简洁直观的代码构建跨平台桌面应用程序。
+## 概述
 
-## 特性
+Old8Lang.FirstUI 是一个现代化的跨平台 GUI 框架，采用声明式设计理念，借鉴 Flutter 和 SwiftUI 的优秀实践，让开发者能够用简洁直观的代码构建美观的用户界面。
 
-- 🎨 **声明式 UI**: 用数据驱动 UI，代码简洁易懂
-- 🔄 **响应式**: 状态变化自动触发界面更新
-- 🧩 **组件化**: 通过组合小部件构建复杂界面
-- 🌐 **跨平台**: 支持 Windows、macOS、Linux
-- ⚡ **高性能**: 基于 Avalonia UI 的高效渲染引擎
-- 🎭 **主题系统**: 内置浅色/深色主题，支持自定义
+### ✨ 核心特性
 
-## 快速开始
+- 🎨 **声明式 UI** - 通过组合 Widget 构建界面，类似 Flutter/SwiftUI
+- 🌈 **主题系统** - 内置 6 种主题，支持浅色/深色模式切换
+- 🎭 **动画系统** - 30+ 缓动函数，流畅的过渡动画
+- 👆 **手势支持** - 点击、拖动、滑动等自然交互
+- 📱 **响应式** - 状态驱动，自动 UI 更新
+- 🎯 **类型安全** - C# 层保证类型安全，减少运行时错误
+- 🚀 **高性能** - 虚拟化列表，延迟加载，优化的渲染
+
+## 📦 已实现功能
+
+### ✅ 核心架构 (100%)
+- [x] WidgetBase 抽象基类
+- [x] BuildContext 构建上下文
+- [x] StateManager 状态管理器
+- [x] FirstUIBinding Old8Lang 绑定层
+
+### ✅ 布局组件 (100%)
+- [x] **Container** - 通用容器，支持边距、背景、边框、圆角
+- [x] **Row** - 水平布局，支持主轴/交叉轴对齐
+- [x] **Column** - 垂直布局，支持主轴/交叉轴对齐
+- [x] **Stack** - 层叠布局，支持子组件堆叠定位
+- [x] **Grid** - 网格布局，支持行列定义和跨行跨列
+
+### ✅ 基础组件 (85%)
+- [x] **Text** - 文本显示，支持字体、大小、颜色、粗细
+- [x] **Button** - 按钮，支持文本、图标、点击事件
+- [x] **Image** - 图片显示，支持本地路径和 URL
+- [x] **Checkbox** - 复选框
+- [x] **RadioButton** - 单选按钮
+- [ ] **Icon** - 图标 (计划中)
+- [ ] **Switch** - 开关 (计划中)
+- [ ] **Slider** - 滑块 (计划中)
+- [ ] **ProgressBar** - 进度条 (计划中)
+
+### ✅ 输入组件 (33%)
+- [x] **TextInput** - 文本输入框，支持占位符、密码模式
+- [ ] **TextArea** - 多行文本输入
+- [ ] **Select** - 下拉选择框
+- [ ] **DatePicker** - 日期选择器
+- [ ] **TimePicker** - 时间选择器
+- [ ] **FilePicker** - 文件选择器
+
+### ✅ 高级组件 (75%)
+- [x] **ScrollView** - 滚动容器
+- [x] **ListView** - 列表视图，支持虚拟化
+- [x] **GridView** - 网格视图
+- [x] **Card** - 卡片组件
+- [x] **TabView** - 选项卡视图
+- [x] **Dialog** - 对话框
+- [x] **Toast** - 消息提示
+- [x] **Menu** - 菜单
+- [x] **Popover** - 弹出框
+- [x] **Tooltip** - 工具提示
+- [x] **Breadcrumb** - 面包屑导航
+- [x] **Pagination** - 分页组件
+- [ ] **Panel** - 面板 (计划中)
+
+### ✅ 状态管理 (100%)
+- [x] **State** - 组件局部状态
+- [x] **ObservableState** - 响应式状态
+- [x] **GlobalState** - 全局状态管理
+- [x] **Computed** - 计算属性
+
+### ✅ 动画系统 (100%)
+- [x] **Animation** - 动画基类，支持时长、缓动、循环
+- [x] **Easing** - 30+ 缓动函数库
+- [x] **Transition** - 过渡动画（淡入淡出、滑动、缩放、旋转）
+- [x] **AnimatedContainer** - 动画容器
+
+### ✅ 手势交互 (100%)
+- [x] **GestureDetector** - 手势检测（点击、双击、长按、拖动、滑动）
+- [x] **Draggable** - 可拖动组件
+- [x] **DropTarget** - 拖放目标
+- [x] 完整的拖放事件回调
+
+### ✅ 主题系统 (100%)
+- [x] **ThemeManager** - 单例主题管理器
+- [x] **内置主题**：
+  - Light/Dark (iOS 风格)
+  - Material/Material Dark (Material Design)
+  - Fluent/Fluent Dark (Fluent Design)
+- [x] **颜色方案** - Primary, Secondary, Background, Surface, Error
+- [x] **字体方案** - H1-H6 标题，Body1, Body2, Button, Caption
+- [x] **间距方案** - 统一的间距系统
+- [x] **阴影方案** - 5 级阴影效果
+- [x] **圆角方案** - 统一的圆角规范
+- [x] **样式表** - 类似 CSS 的样式定义
+- [x] **主题切换** - 运行时动态切换主题
+
+### ⏳ Old8Lang API 设计 (进行中)
+- [x] FirstUIBinding 基础方法
+- [ ] 链式调用 API
+- [ ] 字典参数配置
+- [ ] Lambda 回调支持
+- [ ] 组件别名 (VStack, HStack)
+
+## 🚀 快速开始
+
+### 环境要求
+
+- .NET 10.0 或更高版本
+- Old8Lang 解释器/编译器
+- 支持 Windows 10/11, macOS, Linux
+
+### 安装
+
+1. 克隆项目：
+```bash
+git clone https://github.com/old8lang/firstui.git
+cd Old8Lang.FirstUI
+```
+
+2. 构建项目：
+```bash
+dotnet build Old8Lang.FirstUI.csproj
+```
+
+3. 确保项目已添加到 Old8Lang.sln 解决方案中
 
 ### Hello World
 
+创建 `HelloWorld.old8` 文件：
+
 ```old8
+// 引入 FirstUI 库
 import "firstui" as ui
 
-app <- ui.App()
+// 创建应用
+app <- ui.CreateApp()
 
+// 定义主界面
 MainView() -> {
     return ui.Column({
         children: {
             ui.Text("Hello, Old8Lang FirstUI!", {
-                fontSize: 28,
-                fontWeight: "bold"
+                fontSize: 24,
+                fontWeight: "bold",
+                color: "#333333"
             }),
-            ui.Button("点击我", {
-                onClick: () -> {
-                    ui.ShowToast("你好，世界！")
-                }
+            
+            ui.Container({
+                padding: 20,
+                margin: 10,
+                backgroundColor: "#f0f0f0",
+                borderRadius: 10,
+                child: ui.Button("点击我", {
+                    onClick: () -> {
+                        ui.ShowToast("欢迎使用 Old8Lang FirstUI!")
+                    }
+                })
             })
         }
     })
 }
 
+// 运行应用
 app.Run(() -> MainView())
+```
+
+运行应用：
+```bash
+old8lang -f HelloWorld.old8
 ```
 
 ### 计数器应用
@@ -48,274 +181,360 @@ app.Run(() -> MainView())
 ```old8
 import "firstui" as ui
 
-counter <- 0
+// 创建可观察状态
+counter <- ui.CreateObservableState(0)
 
 CounterView() -> {
-    return ui.VStack({
-        ui.Text("计数器")
-            .fontSize(24)
-            .fontWeight("bold"),
-
-        ui.Text(counter.ToStr())
-            .fontSize(48)
-            .color("#007AFF"),
-
-        ui.HStack({
-            ui.Button("-")
-                .onClick(() -> { counter <- counter - 1 }),
-            ui.Button("+")
-                .onClick(() -> { counter <- counter + 1 })
-        })
-        .spacing(20)
+    return ui.Column({
+        children: {
+            ui.Text("计数器应用", {
+                fontSize: 24,
+                fontWeight: "bold"
+            }),
+            
+            ui.Text(counter.Value.ToStr(), {
+                fontSize: 48,
+                color: "#007AFF"
+            }),
+            
+            ui.Container({
+                child: ui.Row({
+                    children: {
+                        ui.Button("减少", {
+                            onClick: () -> {
+                                counter.Value <- counter.Value - 1
+                            }
+                        }),
+                        ui.Button("增加", {
+                            onClick: () -> {
+                                counter.Value <- counter.Value + 1
+                            }
+                        })
+                    },
+                    spacing: 20
+                })
+            })
+        },
+        spacing: 20
     })
-    .padding(40)
 }
 
-app <- ui.App()
+app <- ui.CreateApp()
 app.Run(() -> CounterView())
 ```
 
-## 核心概念
+## 📖 API 文档
 
-### 组件 (Widget)
+### 组件创建
 
-FirstUI 的界面由组件构建。组件可以是简单的文本、按钮，也可以是复杂的布局容器。
-
-**布局组件**:
-- `Container`: 容器组件（支持内边距、外边距、背景色、边框、圆角）
-- `Column` / `VStack`: 垂直布局
-- `Row` / `HStack`: 水平布局
-- `Stack` / `ZStack`: 层叠布局
-- `ScrollView`: 滚动容器
-
-**基础组件**:
-- `Text`: 文本显示
-- `Button`: 按钮（多种样式变体）
-- `Image`: 图片（支持本地文件和URL）
-- `TextInput`: 文本输入框（支持密码模式、多行）
-- `Checkbox`: 复选框（支持三态）
-- `RadioButton` & `RadioGroup`: 单选按钮
-
-**高级组件**:
-- `Card`: 卡片组件（Material Design 风格）
-- `Dialog`: 对话框（支持多种类型）
-- `Toast`: 消息提示
-- `Tooltip`: 工具提示
-- `TabView`: 选项卡视图
-- `ListView`: 列表视图（支持虚拟化）
-- `GridView`: 网格视图
-- `Menu`: 菜单（支持子菜单）
-- `Pagination`: 分页组件
-- `Popover`: 弹出框
-- `Breadcrumb`: 面包屑导航
-
-### 状态管理
-
-使用响应式状态管理，当状态变化时自动更新 UI：
+所有组件都通过 `FirstUIBinding.CreateWidget` 方法创建：
 
 ```old8
-// 局部状态
-state <- ui.State(0)
+// 基础语法
+widget <- ui.CreateWidget("组件类型", 配置字典)
 
-// 更新状态
-state.Set(state.Get() + 1)
-
-// 可观察状态（自动触发 UI 更新）
-observableState <- ui.ObservableState(0)
-observableState.BindTo(myWidget)  // 绑定到组件
-
-// 全局状态
-globalCounter <- ui.GlobalState("counter", 0)
-// 在任何地方访问
-counter <- ui.GlobalState.Get("counter")
-
-// 计算属性（依赖其他状态）
-firstName <- ui.State("张")
-lastName <- ui.State("三")
-fullName <- ui.Computed(() -> {
-    return firstName.Get() + lastName.Get()
-}, firstName, lastName)
-```
-
-### 样式与主题
-
-支持灵活的样式定制：
-
-```old8
-// 链式调用设置样式
-ui.Text("标题")
-    .fontSize(24)
-    .fontWeight("bold")
-    .color("#333333")
-    .align("center")
-
-// 使用配置字典
-ui.Button("按钮", {
-    backgroundColor: "#007AFF",
-    textColor: "#FFFFFF",
-    borderRadius: 8,
-    padding: {top: 10, bottom: 10, left: 20, right: 20}
+// 示例：创建文本
+text <- ui.CreateWidget("Text", {
+    content: "Hello World",
+    fontSize: 16,
+    color: "#333333"
 })
 
-// 切换主题
-ui.SetTheme("dark")  // 或 "light"
-```
-
-## 设计理念
-
-### 声明式 vs 命令式
-
-**传统命令式** (❌ 不推荐):
-```csharp
-var button = new Button();
-button.Content = "点击我";
-button.Click += (s, e) => { ShowMessage("被点击了"); };
-panel.Children.Add(button);
-```
-
-**FirstUI 声明式** (✅ 推荐):
-```old8
-ui.Button("点击我", {
-    onClick: () -> { ui.ShowToast("被点击了") }
-})
-```
-
-### 组合优于继承
-
-通过组合小组件构建复杂界面，而不是继承大型基类：
-
-```old8
-// 自定义组合组件
-UserCard(name, avatar) -> {
-    return ui.Card({
-        child: ui.Row({
-            children: {
-                ui.Image(avatar, {width: 50, height: 50}),
-                ui.Column({
-                    children: {
-                        ui.Text(name).fontWeight("bold"),
-                        ui.Text("在线").color("#00AA00")
-                    }
-                })
-            }
-        })
-    })
-}
-
-// 使用自定义组件
-ui.Column({
-    children: {
-        UserCard("张三", "avatar1.png"),
-        UserCard("李四", "avatar2.png")
+// 示例：创建按钮
+button <- ui.CreateWidget("Button", {
+    label: "Click Me",
+    onClick: () -> {
+        PrintLine("Button clicked!")
     }
 })
 ```
 
-## 示例程序
+### 主题切换
 
-查看 `Examples/` 目录了解更多示例：
+```old8
+// 切换到深色主题
+ui.SetTheme("dark")
 
-- `HelloWorld.old8` - 最简单的入门示例
-- `Counter.old8` - 计数器应用（状态管理）
-- `TodoList.old8` - 待办事项列表（列表渲染）
-- `Form.old8` - 表单验证示例
-- `Theme.old8` - 主题切换示例
-- `Navigation.old8` - 多页面导航
+// 获取当前主题
+current <- ui.GetCurrentTheme()
 
-## 开发状态
+// 获取所有可用主题
+themes <- ui.GetAvailableThemes()
 
-🚀 **此项目目前处于活跃开发阶段**
+// 快速切换浅色/深色
+ui.ToggleTheme()
+```
 
-完整的开发计划请查看 [TODO.md](./TODO.md)
+### 状态管理
 
-### 已完成的功能
+```old8
+// 创建可观察状态
+counter <- ui.CreateObservableState(0)
 
-✅ **阶段一：项目搭建与基础架构**
-- ✅ 项目结构创建（基于 Avalonia UI 11.2.2）
-- ✅ 核心抽象层（WidgetBase、BuildContext）
-- ✅ 工具类库（LayoutHelper、TypeConverter 等）
+// 监听状态变化
+counter.Subscribe((value) -> {
+    PrintLine("Counter changed: " + value.ToStr())
+})
 
-✅ **阶段二：基础组件库**
-- ✅ 布局组件：Container, Row/HStack, Column/VStack, Stack/ZStack
-- ✅ 基础控件：Text, Button, Image, TextInput
-- ✅ 表单组件：Checkbox, RadioButton/RadioGroup
+// 更新状态
+counter.Value <- counter.Value + 1
+```
 
-✅ **阶段三：高级组件（已完成）**
-- ✅ 容器组件：ScrollView, Card, ListView, GridView
-- ✅ 导航组件：TabView, Breadcrumb, Pagination, Menu
-- ✅ 反馈组件：Dialog, Toast, Tooltip, Popover
+### 动画使用
 
-✅ **阶段四：状态管理系统（已完成）**
-- ✅ State 类：局部状态管理
-- ✅ ObservableState 类：响应式状态（自动触发 UI 更新）
-- ✅ GlobalState 类：全局状态管理
-- ✅ Computed 类：计算属性（依赖派生）
+```old8
+// 创建动画容器
+animatedBox <- ui.CreateWidget("AnimatedContainer", {
+    width: 100,
+    height: 100,
+    backgroundColor: "#007AFF",
+    transition: ui.CreateTransition({
+        type: "slide",
+        direction: "right",
+        duration: 300,
+        easing: "easeOut"
+    })
+})
 
-✅ **阶段四：动画系统（已完成）**
-- ✅ Animation 动画基类：支持时长、缓动函数、循环、反向播放、延迟
-- ✅ 30+ 缓动函数库（Linear, Quad, Cubic, Sine, Expo, Elastic, Bounce, Spring 等）
-- ✅ Transition 过渡动画：淡入淡出、滑动、缩放、旋转、颜色过渡等
-- ✅ AnimatedContainer 动画容器：属性变化自动过渡
+// 更新属性会自动触发动画
+animatedBox.width <- 200
+```
 
-✅ **阶段五：主题与样式系统（已完成）**
-- ✅ Theme 主题系统：支持 6 种内置主题（Light/Dark/Material/Material Dark/Fluent/Fluent Dark）
-- ✅ ThemeManager 主题管理器：单例模式，支持主题切换和监听
-- ✅ ColorScheme 颜色方案：完整的颜色系统
-- ✅ TypographyScheme 字体方案：H1-H6, Body, Button 等
-- ✅ SpacingScheme 间距方案：统一的间距系统
-- ✅ ShadowScheme 阴影方案：5 级阴影效果
-- ✅ BorderRadiusScheme 圆角方案：统一的圆角规范
-- ✅ StyleSheet 样式表：预定义和自定义样式支持
-- ✅ FirstUIBinding API 集成：SetTheme, GetCurrentTheme, ToggleTheme 等
+## 🎨 主题系统
 
-✅ **手势与交互系统（已完成）**
-- ✅ GestureDetector 手势检测器：支持单击、双击、长按、拖动、滑动
-- ✅ Draggable 可拖动组件：支持轴限制、拖动反馈、数据传递
-- ✅ DropTarget 拖放目标：支持数据类型过滤、悬停高亮
-- ✅ 完整的手势事件数据（GestureEventData, DragDropData）
-- ✅ FirstUIBinding 集成：CreateGestureDetector, CreateDraggable, CreateDropTarget
+### 内置主题
 
-### 开发中
+| 主题名称 | 描述 | 风格 |
+|---------|------|------|
+| `light` | 浅色主题 | iOS 风格 |
+| `dark` | 深色主题 | iOS 风格 |
+| `material` | Material Design 浅色 | Material Design |
+| `material-dark` | Material Design 深色 | Material Design |
+| `fluent` | Fluent Design 浅色 | Windows 11 |
+| `fluent-dark` | Fluent Design 深色 | Windows 11 |
 
-预计开发周期：**13周**
-- 阶段一 (第1-2周): 项目搭建与基础架构 ✅
-- 阶段二 (第3-4周): 基础组件库 ✅
-- 阶段三 (第5-6周): 高级组件与交互 ✅
-- 阶段四 (第7-8周): 状态管理与动画 + 手势系统 ✅
-- 阶段五 (第9周): 主题与样式系统 ✅
-- 阶段六 (第10周): Old8Lang API 设计 ⏳
-- 阶段七 (第11周): 示例与文档 ⏳
-- 阶段八 (第12周): 测试与优化 ⏳
-- 阶段九 (第13周): 发布准备 ⏳
+### 自定义主题
 
-## 技术栈
+```old8
+// 创建自定义主题
+customTheme <- ui.CreateTheme({
+    name: "custom",
+    isDark: false,
+    colors: {
+        primary: "#FF6B6B",
+        secondary: "#4ECDC4",
+        background: "#FFFFFF",
+        surface: "#F5F5F5"
+    },
+    typography: {
+        h1: { size: 36, weight: "bold" },
+        body: { size: 16, weight: "normal" }
+    }
+})
 
-- **基础框架**: [Avalonia UI](https://avaloniaui.net/) 11.x
-- **目标平台**: Windows 10/11, macOS 10.15+, Linux
-- **语言支持**: Old8Lang (通过 C# 绑定层)
-- **.NET 版本**: .NET 10.0
+// 应用自定义主题
+ui.SetTheme(customTheme)
+```
 
-## 贡献
+## 🎭 动画效果
 
-欢迎参与 Old8Lang.FirstUI 的开发！
+### 缓动函数
 
-1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'feat: 添加某个很棒的特性'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 提交 Pull Request
+支持 30+ 缓动函数：
+- `linear`, `easeIn`, `easeOut`, `easeInOut`
+- `easeInQuad`, `easeOutQuad`, `easeInOutQuad`
+- `easeInCubic`, `easeOutCubic`, `easeInOutCubic`
+- `easeInElastic`, `easeOutElastic`, `easeInOutElastic`
+- `easeInBounce`, `easeOutBounce`, `easeInOutBounce`
+- `easeInSpring`, `easeOutSpring`, `easeInOutSpring`
 
-## 参考资源
+### 过渡动画
 
-- [Flutter 文档](https://flutter.dev/docs) - 组件设计灵感来源
-- [SwiftUI 文档](https://developer.apple.com/documentation/swiftui) - 声明式 API 设计参考
-- [Avalonia 文档](https://docs.avaloniaui.net/) - 底层 UI 框架文档
-- [Old8Lang 文档](../README.md) - Old8Lang 语言文档
+```old8
+// 淡入淡出
+fadeTransition <- ui.CreateTransition({
+    type: "fade",
+    duration: 300,
+    easing: "easeInOut"
+})
 
-## 许可证
+// 滑动动画
+slideTransition <- ui.CreateTransition({
+    type: "slide",
+    direction: "up",
+    duration: 400,
+    easing: "easeOutCubic"
+})
 
-与 Old8Lang 项目保持一致
+// 缩放动画
+scaleTransition <- ui.CreateTransition({
+    type: "scale",
+    scale: 1.2,
+    duration: 250,
+    easing: "easeOutBack"
+})
+```
+
+## 👆 手势交互
+
+### 手势检测
+
+```old8
+// 创建手势检测器
+gestureArea <- ui.CreateGestureDetector({
+    onTap: () -> {
+        PrintLine("Tapped!")
+    },
+    onDoubleTap: () -> {
+        PrintLine("Double tapped!")
+    },
+    onLongPress: () -> {
+        PrintLine("Long pressed!")
+    },
+    onSwipe: (direction) -> {
+        if direction == "left" {
+            PrintLine("Swiped left!")
+        }
+    },
+    onDrag: (delta) -> {
+        PrintLine("Dragging: " + delta.x.ToStr() + ", " + delta.y.ToStr())
+    }
+})
+```
+
+### 拖放功能
+
+```old8
+// 可拖动组件
+draggableItem <- ui.CreateDraggable({
+    data: "item-data",
+    axis: "both",  // "x", "y", "both"
+    onDragStart: () -> {
+        PrintLine("Drag started")
+    },
+    onDragEnd: () -> {
+        PrintLine("Drag ended")
+    }
+})
+
+// 拖放目标
+dropTarget <- ui.CreateDropTarget({
+    acceptedTypes: ["item-data"],
+    onDrop: (data) -> {
+        PrintLine("Dropped: " + data.ToStr())
+    },
+    onHover: () -> {
+        PrintLine("Hovering over drop target")
+    }
+})
+```
+
+## 📁 项目结构
+
+```
+Old8Lang.FirstUI/
+├── Core/                    # 核心抽象层
+│   ├── WidgetBase.cs       # 组件基类
+│   ├── BuildContext.cs     # 构建上下文
+│   ├── StateManager.cs     # 状态管理器
+│   └── GlobalState.cs      # 全局状态
+├── Widgets/                # 组件实现
+│   ├── Layout/             # 布局组件
+│   ├── Basic/              # 基础组件
+│   ├── Input/              # 输入组件
+│   └── Advanced/           # 高级组件
+├── State/                  # 状态管理
+├── Animation/              # 动画系统
+├── Gesture/                # 手势交互
+├── Theme/                  # 主题系统
+├── Utils/                  # 工具类
+├── Examples/               # 示例代码
+├── FirstUIBinding.cs       # Old8Lang 绑定层
+└── README.md              # 项目文档
+```
+
+## 🧪 示例项目
+
+查看 `Examples/` 目录中的示例：
+
+- **HelloWorld.old8** - 基础应用示例
+- **Counter.old8** - 计数器应用，展示状态管理
+- **GestureExample.md** - 手势交互示例
+- **ThemeExample.md** - 主题切换示例
+
+## 🛠️ 开发指南
+
+### 添加新组件
+
+1. 继承 `WidgetBase` 基类
+2. 实现 `Build(BuildContext)` 方法
+3. 添加链式调用方法
+
+### 调试技巧
+
+- 使用 Old8Lang 的 `PrintLine()` 函数调试
+- 在 C# 代码中使用 `Debug.WriteLine()`
+- 检查 `BuildContext` 中的状态信息
+
+## 🤝 贡献指南
+
+我们欢迎所有形式的贡献！
+
+### 如何贡献
+
+1. Fork 项目
+2. 创建功能分支 (`git checkout -b feature/amazing-feature`)
+3. 提交更改 (`git commit -m 'Add amazing feature'`)
+4. 推送到分支 (`git push origin feature/amazing-feature`)
+5. 创建 Pull Request
+
+### 开发规范
+
+- 遵循 C# 命名规范
+- 每个公共 API 必须有 XML 文档注释
+- 使用 nullable reference types
+- 编写单元测试
+
+## 📋 路线图
+
+### v0.1.0 (当前 Alpha)
+- [x] 核心架构
+- [x] 基础组件
+- [x] 主题系统
+- [x] 动画系统
+- [x] 手势交互
+- [ ] Old8Lang API 完善
+
+### v0.2.0 (计划中)
+- [ ] 更多输入组件 (Select, DatePicker, FilePicker)
+- [ ] 图表组件 (集成 LiveCharts2)
+- [ ] 热重载支持
+- [ ] 可视化设计器
+
+### v1.0.0 (长期)
+- [ ] 移动端支持 (iOS/Android)
+- [ ] 3D 渲染支持
+- [ ] 插件系统
+- [ ] WebAssembly 支持
+
+## 📄 许可证
+
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+## 🙏 致谢
+
+- [Avalonia UI](https://avaloniaui.net/) - 优秀的跨平台 UI 框架
+- [Flutter](https://flutter.dev/) - 声明式 UI 设计灵感
+- [SwiftUI](https://developer.apple.com/documentation/swiftui) - 现代 UI 设计理念
+- [Material Design](https://material.io/) - 设计规范参考
+- [Fluent Design](https://www.microsoft.com/design/fluent/) - 设计规范参考
+
+## 📞 联系我们
+
+- **GitHub Issues**: [提交问题](https://github.com/old8lang/firstui/issues)
+- **讨论区**: [GitHub Discussions](https://github.com/old8lang/firstui/discussions)
+- **社区论坛**: [Old8Lang 社区](https://old8lang.org/community)
 
 ---
 
-*最后更新: 2026-01-01*
+*Old8Lang.FirstUI - 让 GUI 开发变得简单而优雅 ✨*

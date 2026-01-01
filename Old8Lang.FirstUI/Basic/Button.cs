@@ -10,17 +10,17 @@ namespace Old8Lang.FirstUI.Basic;
 /// <summary>
 /// Button 按钮组件
 /// </summary>
-public class Button : WidgetBase
+public class Button(string label, Action? onClick = null) : WidgetBase
 {
     /// <summary>
     /// 按钮文本标签
     /// </summary>
-    public string Label { get; set; } = "";
+    public string Label { get; set; } = label;
 
     /// <summary>
     /// 点击事件回调
     /// </summary>
-    public Action? OnClick { get; set; }
+    public Action? OnClick { get; set; } = onClick;
 
     /// <summary>
     /// 按钮图标（可选）
@@ -51,12 +51,6 @@ public class Button : WidgetBase
     /// 圆角
     /// </summary>
     public double BorderRadius { get; set; } = 4;
-
-    public Button(string label, Action? onClick = null)
-    {
-        Label = label;
-        OnClick = onClick;
-    }
 
     public override object Build(BuildContext context)
     {

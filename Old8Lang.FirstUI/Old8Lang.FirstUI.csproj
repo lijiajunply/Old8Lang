@@ -23,6 +23,7 @@
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.10"/>
         <PackageReference Include="Avalonia.Diagnostics" Version="11.3.10" Condition="'$(Configuration)' == 'Debug'"/>
         <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.10" />
+        <PackageReference Include="Svg.Controls.Avalonia" Version="11.3.6.2" />
     </ItemGroup>
 
     <ItemGroup>
