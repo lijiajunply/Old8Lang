@@ -36,7 +36,7 @@ public class SignCommand : ICommand
   old8lang sign package.o8pkg -c my-cert.pfx -o custom.sig
 ";
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         // 解析参数
         if (args.Contains("-h") || args.Contains("--help"))
@@ -74,7 +74,7 @@ public class SignCommand : ICommand
             var service = new PackageService(Directory.GetCurrentDirectory());
 
             // 获取或生成证书
-            var certificate = await GetOrGenerateCertificate(service, args);
+            var certificate = GetOrGenerateCertificate(service, args);
             if (certificate == null)
             {
                 return 1;
@@ -99,11 +99,11 @@ public class SignCommand : ICommand
 
             // 签名包
             CommandHelper.PrintInfo($"\n正在签名 {Path.GetFileName(packagePath)}...");
-            var signature = await service.SignPackageAsync(packagePath, certificate);
+            var signature = service.SignPackageAsync(packagePath, certificate).GetAwaiter().GetResult();
 
             // 保存签名文件
             var signaturePath = GetSignaturePath(args, packagePath);
-            await service.WriteSignatureAsync(signature, signaturePath);
+            service.WriteSignatureAsync(signature, signaturePath).GetAwaiter().GetResult();
 
             // 显示结果
             CommandHelper.PrintSuccess("\n✓ 签名完成!");
@@ -127,7 +127,7 @@ public class SignCommand : ICommand
         }
     }
 
-    private async Task<System.Security.Cryptography.X509Certificates.X509Certificate2?> GetOrGenerateCertificate(
+    private System.Security.Cryptography.X509Certificates.X509Certificate2? GetOrGenerateCertificate(
         PackageService service, string[] args)
     {
         var autoCert = args.Contains("--auto-cert");
@@ -158,7 +158,7 @@ public class SignCommand : ICommand
                 Console.Write("证书密码（按回车跳过）: ");
                 var password = ReadPassword();
 
-                await service.ExportCertificateAsync(certificate, savePath, password);
+                service.ExportCertificateAsync(certificate, savePath, password).GetAwaiter().GetResult();
                 CommandHelper.PrintSuccess($"✓ 证书已保存到: {savePath}");
             }
 
@@ -184,7 +184,7 @@ public class SignCommand : ICommand
             }
 
             CommandHelper.PrintInfo($"正在加载证书: {certPath}");
-            return await service.LoadCertificateAsync(certPath, password);
+            return service.LoadCertificateAsync(certPath, password).GetAwaiter().GetResult();
         }
 
         // 没有指定证书

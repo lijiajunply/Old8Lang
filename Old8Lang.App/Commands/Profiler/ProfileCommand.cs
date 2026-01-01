@@ -21,7 +21,7 @@ public class ProfileCommand : ICommand
 
     private static ProfilerManager Profiler => ProfilerService.GetProfiler();
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         if (args.Length == 0)
         {

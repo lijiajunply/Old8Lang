@@ -12,13 +12,13 @@ public class SyntaxTestCommand : ICommand
     public string Description => "对指定的 .old8 或 .ol 文件进行语法测试";
     public string Help => "使用: Old8Lang.App -s <文件名>";
 
-    public Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         if (args.Length < 1)
         {
             Console.WriteLine("错误: 缺少文件参数");
             Console.WriteLine(Help);
-            return Task.FromResult(1);
+            return 1;
         }
 
         // 验证文件扩展名
@@ -26,7 +26,7 @@ public class SyntaxTestCommand : ICommand
         if (ext != ".old8" && ext != ".ol")
         {
             Console.WriteLine($"不支持的文件扩展名: {ext}，仅支持 .old8 和 .ol 文件");
-            return Task.FromResult(1);
+            return 1;
         }
 
         try
@@ -43,7 +43,7 @@ public class SyntaxTestCommand : ICommand
                 $"------------------\nSyntax Test Result\nParser Build Time : {parseTime}ms\n------------------");
             Console.WriteLine(ast.ToCode());
 
-            return Task.FromResult(0);
+            return 0;
         }
         catch (Exception e)
         {
@@ -51,7 +51,7 @@ public class SyntaxTestCommand : ICommand
             throw;
 #endif
             Console.WriteLine(e.Message);
-            return Task.FromResult(1);
+            return 1;
         }
     }
 }

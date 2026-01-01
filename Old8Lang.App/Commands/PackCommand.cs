@@ -27,7 +27,7 @@ public class PackCommand : ICommand
   old8lang pack ./my-package -v                     # 仅验证包结构
 ";
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         // 解析参数
         if (args.Contains("-h") || args.Contains("--help"))
@@ -64,7 +64,7 @@ public class PackCommand : ICommand
 
             // 1. 验证包结构
             CommandHelper.PrintInfo("正在验证包结构...");
-            var (isValid, message) = await service.ValidatePackageStructureAsync(sourcePath);
+            var (isValid, message) = service.ValidatePackageStructureAsync(sourcePath).GetAwaiter().GetResult();
 
             if (!isValid)
             {
@@ -75,7 +75,7 @@ public class PackCommand : ICommand
             CommandHelper.PrintSuccess("✓ 包结构验证通过");
 
             // 2. 读取包信息
-            var package = await service.ReadPackageMetadataAsync(sourcePath);
+            var package = service.ReadPackageMetadataAsync(sourcePath).GetAwaiter().GetResult();
             if (package == null)
             {
                 CommandHelper.PrintError("错误: 无法读取包元数据");
@@ -96,7 +96,7 @@ public class PackCommand : ICommand
 
             // 3. 执行打包
             CommandHelper.PrintInfo("\n正在打包...");
-            var resultPath = await service.PackAsync(sourcePath, outputPath);
+            var resultPath = service.PackAsync(sourcePath, outputPath).GetAwaiter().GetResult();
 
             // 4. 显示结果
             var fileInfo = new FileInfo(resultPath);

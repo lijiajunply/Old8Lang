@@ -25,5 +25,5 @@ public interface ICommand
     /// </summary>
     /// <param name="args">命令参数</param>
     /// <returns>执行结果（0 表示成功，非 0 表示失败）</returns>
-    Task<int> ExecuteAsync(string[] args);
+    int Execute(string[] args);
 }

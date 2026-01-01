@@ -27,7 +27,7 @@ public class VerifyCommand : ICommand
   old8lang verify package.o8pkg -v                  # 显示详细信息
 ";
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         // 解析参数
         if (args.Contains("-h") || args.Contains("--help"))
@@ -79,7 +79,7 @@ public class VerifyCommand : ICommand
             CommandHelper.PrintInfo($"正在验证 {Path.GetFileName(packagePath)} 的签名...");
 
             // 读取签名
-            var signature = await service.ReadSignatureAsync(signaturePath);
+            var signature = service.ReadSignatureAsync(signaturePath).GetAwaiter().GetResult();
             if (signature == null)
             {
                 CommandHelper.PrintError("✗ 无法读取签名文件");
@@ -112,7 +112,7 @@ public class VerifyCommand : ICommand
 
             // 验证签名
             Console.WriteLine("\n正在验证签名...");
-            bool isValid = await service.VerifySignatureAsync(packagePath, signature);
+            bool isValid = service.VerifySignatureAsync(packagePath, signature).GetAwaiter().GetResult();
 
             if (isValid)
             {

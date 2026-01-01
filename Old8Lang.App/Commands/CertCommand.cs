@@ -49,7 +49,7 @@ export 子命令选项:
   old8lang cert export -c my-cert.pfx -p mypassword -o public-cert.cer
 ";
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         // 解析参数
         if (args.Length == 0 || args.Contains("-h") || args.Contains("--help"))
@@ -63,14 +63,14 @@ export 子命令选项:
 
         return subCommand switch
         {
-            "generate" or "gen" => await ExecuteGenerateAsync(subArgs),
-            "info" => await ExecuteInfoAsync(subArgs),
-            "export" => await ExecuteExportAsync(subArgs),
+            "generate" or "gen" => ExecuteGenerateAsync(subArgs),
+            "info" => ExecuteInfoAsync(subArgs),
+            "export" => ExecuteExportAsync(subArgs),
             _ => HandleUnknownSubCommand(subCommand)
         };
     }
 
-    private async Task<int> ExecuteGenerateAsync(string[] args)
+    private int ExecuteGenerateAsync(string[] args)
     {
         try
         {
@@ -105,7 +105,7 @@ export 子命令选项:
             var certificate = service.GenerateSelfSignedCertificate(name, email, years);
 
             CommandHelper.PrintInfo($"正在保存证书到: {outputPath}");
-            await service.ExportCertificateAsync(certificate, outputPath, password);
+            service.ExportCertificateAsync(certificate, outputPath, password).GetAwaiter().GetResult();
 
             CommandHelper.PrintSuccess("\n✓ 证书生成成功!");
             Console.WriteLine($"证书文件: {Path.GetFullPath(outputPath)}");
@@ -124,7 +124,7 @@ export 子命令选项:
         }
     }
 
-    private async Task<int> ExecuteInfoAsync(string[] args)
+    private int ExecuteInfoAsync(string[] args)
     {
         try
         {
@@ -153,7 +153,7 @@ export 子命令选项:
             var service = new PackageService(Directory.GetCurrentDirectory());
 
             CommandHelper.PrintInfo($"正在读取证书: {certPath}");
-            var certificate = await service.LoadCertificateAsync(certPath, password);
+            var certificate = service.LoadCertificateAsync(certPath, password).GetAwaiter().GetResult();
 
             Console.WriteLine("\n" + service.GetCertificateInfo(certificate));
 
@@ -169,7 +169,7 @@ export 子命令选项:
         }
     }
 
-    private async Task<int> ExecuteExportAsync(string[] args)
+    private int ExecuteExportAsync(string[] args)
     {
         try
         {
@@ -212,10 +212,10 @@ export 子命令选项:
             var service = new PackageService(Directory.GetCurrentDirectory());
 
             CommandHelper.PrintInfo($"正在加载证书: {certPath}");
-            var certificate = await service.LoadCertificateAsync(certPath, password);
+            var certificate = service.LoadCertificateAsync(certPath, password).GetAwaiter().GetResult();
 
             CommandHelper.PrintInfo($"正在导出证书到: {outputPath}");
-            await service.ExportCertificateAsync(certificate, outputPath, outPassword);
+            service.ExportCertificateAsync(certificate, outputPath, outPassword).GetAwaiter().GetResult();
 
             CommandHelper.PrintSuccess("\n✓ 证书导出成功!");
             Console.WriteLine($"输出文件: {Path.GetFullPath(outputPath)}");

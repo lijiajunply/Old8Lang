@@ -52,7 +52,7 @@ public class PublishCommand : ICommand
   - 发布前请确保项目配置正确
 ";
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         // 解析参数
         if (args.Contains("-h") || args.Contains("--help"))
@@ -106,7 +106,7 @@ public class PublishCommand : ICommand
             {
                 CommandHelper.PrintInfo("\n[步骤 2/5] 验证包结构...");
                 var service = new PackageService(projectRoot, projectConfig);
-                var (isValid, message) = await service.ValidatePackageStructureAsync(projectRoot);
+                var (isValid, message) = service.ValidatePackageStructureAsync(projectRoot).GetAwaiter().GetResult();
 
                 if (!isValid)
                 {
@@ -150,7 +150,7 @@ public class PublishCommand : ICommand
                 File.Delete(packagePath);
             }
 
-            await service2.PackAsync(projectRoot, packagePath);
+            service2.PackAsync(projectRoot, packagePath).GetAwaiter().GetResult();
             var packageInfo = new FileInfo(packagePath);
             Console.WriteLine($"  包文件: {packageFileName}");
             Console.WriteLine($"  文件大小: {FormatFileSize(packageInfo.Length)}");
@@ -166,7 +166,7 @@ public class PublishCommand : ICommand
                 CommandHelper.PrintInfo("\n[步骤 5/5] 签名包文件...");
 
                 // 获取或生成证书
-                var certificate = await GetOrGenerateCertificate(
+                var certificate = GetOrGenerateCertificate(
                     service2,
                     autoCert,
                     certPath,
@@ -195,9 +195,9 @@ public class PublishCommand : ICommand
                 }
 
                 // 签名
-                var signature = await service2.SignPackageAsync(packagePath, certificate);
+                var signature = service2.SignPackageAsync(packagePath, certificate).GetAwaiter().GetResult();
                 var signaturePath = packagePath + ".sig";
-                await service2.WriteSignatureAsync(signature, signaturePath);
+                service2.WriteSignatureAsync(signature, signaturePath).GetAwaiter().GetResult();
 
                 Console.WriteLine($"  签名者: {signature.Signer.Name}");
                 Console.WriteLine($"  签名时间: {signature.Timestamp:yyyy-MM-dd HH:mm:ss} UTC");
@@ -240,7 +240,7 @@ public class PublishCommand : ICommand
         }
     }
 
-    private async Task<System.Security.Cryptography.X509Certificates.X509Certificate2?> GetOrGenerateCertificate(
+    private System.Security.Cryptography.X509Certificates.X509Certificate2? GetOrGenerateCertificate(
         PackageService service,
         bool autoCert,
         string? certPath,
@@ -277,7 +277,7 @@ public class PublishCommand : ICommand
                 Console.Write("  证书密码（按回车跳过）: ");
                 var savePassword = ReadPassword();
 
-                await service.ExportCertificateAsync(certificate, savePath, savePassword);
+                service.ExportCertificateAsync(certificate, savePath, savePassword).GetAwaiter().GetResult();
                 CommandHelper.PrintSuccess($"  ✓ 证书已保存到: {savePath}");
                 CommandHelper.PrintInfo($"  下次发布可使用: old8lang publish -c {savePath}");
             }
@@ -302,7 +302,7 @@ public class PublishCommand : ICommand
             }
 
             CommandHelper.PrintInfo($"  正在加载证书: {certPath}");
-            var certificate = await service.LoadCertificateAsync(certPath, password);
+            var certificate = service.LoadCertificateAsync(certPath, password).GetAwaiter().GetResult();
             Console.WriteLine($"  证书主题: {certificate.Subject}");
             CommandHelper.PrintSuccess("  ✓ 证书加载完成");
             return certificate;

@@ -27,7 +27,7 @@ public class UnpackCommand : ICommand
   old8lang unpack package.o8pkg -f                  # 强制覆盖已存在的目录
 ";
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         // 解析参数
         if (args.Contains("-h") || args.Contains("--help"))
@@ -83,10 +83,10 @@ public class UnpackCommand : ICommand
 
             // 解包
             CommandHelper.PrintInfo($"正在解包 {Path.GetFileName(packagePath)}...");
-            await service.UnpackAsync(packagePath, outputPath);
+            service.UnpackAsync(packagePath, outputPath).GetAwaiter().GetResult();
 
             // 读取包信息
-            var package = await service.ReadPackageMetadataAsync(outputPath);
+            var package = service.ReadPackageMetadataAsync(outputPath).GetAwaiter().GetResult();
 
             CommandHelper.PrintSuccess("\n✓ 解包完成!");
             Console.WriteLine($"输出目录: {outputPath}");

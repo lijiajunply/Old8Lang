@@ -25,7 +25,7 @@ public class InitCommand : ICommand
   old8lang init --template library  # 使用库模板
 ";
 
-    public Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         // 检查是否已存在项目配置
         var projectRoot = CommandHelper.FindProjectRoot();
@@ -33,7 +33,7 @@ public class InitCommand : ICommand
         {
             CommandHelper.PrintError($"当前目录已存在 Old8Lang 项目: {projectRoot}");
             CommandHelper.PrintInfo("如果要重新初始化，请先删除 o8package.json");
-            return Task.FromResult(1);
+            return 1;
         }
 
         var useDefaults = args.Contains("-y") || args.Contains("--yes");
@@ -76,7 +76,7 @@ public class InitCommand : ICommand
         Console.WriteLine("  2. old8lang install         - 安装所有依赖");
         Console.WriteLine($"  3. old8lang run {config.Main}  - 运行主文件");
 
-        return Task.FromResult(0);
+        return 0;
     }
 
     private ProjectConfig CreateDefaultConfig()

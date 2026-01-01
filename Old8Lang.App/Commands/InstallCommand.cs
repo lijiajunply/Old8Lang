@@ -32,7 +32,7 @@ public class InstallCommand : ICommand
   old8lang install --production        # 只安装生产依赖
 ";
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         // 过滤选项，获取包名
         var isDev = args.Contains("--dev");
@@ -43,17 +43,17 @@ public class InstallCommand : ICommand
         // 如果指定了包名，执行添加包的逻辑
         if (!string.IsNullOrEmpty(packageSpec))
         {
-            return await InstallSinglePackage(packageSpec, isDev);
+            return InstallSinglePackage(packageSpec, isDev);
         }
 
         // 否则，执行安装所有依赖的逻辑
-        return await InstallAllDependencies(productionOnly);
+        return InstallAllDependencies(productionOnly);
     }
 
     /// <summary>
     /// 安装单个包（原 add 命令的功能）
     /// </summary>
-    private async Task<int> InstallSinglePackage(string packageSpec, bool isDev)
+    private int InstallSinglePackage(string packageSpec, bool isDev)
     {
         // 解析包名和版本
         var (packageName, version) = ParsePackageSpec(packageSpec);
@@ -91,7 +91,7 @@ public class InstallCommand : ICommand
         // 安装包
         Console.WriteLine($"正在安装 {packageName}@{version}...");
 
-        var success = await InstallPackageToDirectory(projectRoot, config, packageName, version);
+        var success = InstallPackageToDirectory(projectRoot, config, packageName, version);
 
         if (!success)
         {
@@ -112,7 +112,7 @@ public class InstallCommand : ICommand
     /// <summary>
     /// 安装所有依赖（原 install 命令的功能）
     /// </summary>
-    private async Task<int> InstallAllDependencies(bool productionOnly)
+    private int InstallAllDependencies(bool productionOnly)
     {
         // 检查项目配置
         var projectRoot = CommandHelper.FindProjectRoot();
@@ -144,7 +144,7 @@ public class InstallCommand : ICommand
         var prodDeps = config.References.Where(r => !r.IsDevDependency).ToList();
         foreach (var dep in prodDeps)
         {
-            var result = await InstallPackage(packagesDir, dep.PackageId, dep.Version);
+            var result = InstallPackage(packagesDir, dep.PackageId, dep.Version);
             switch (result)
             {
                 case InstallResult.Success:
@@ -168,7 +168,7 @@ public class InstallCommand : ICommand
 
             foreach (var dep in devDeps)
             {
-                var result = await InstallPackage(packagesDir, dep.PackageId, dep.Version);
+                var result = InstallPackage(packagesDir, dep.PackageId, dep.Version);
                 switch (result)
                 {
                     case InstallResult.Success:
@@ -217,7 +217,7 @@ public class InstallCommand : ICommand
     /// <summary>
     /// 安装包到指定目录
     /// </summary>
-    private async Task<bool> InstallPackageToDirectory(string projectRoot, ProjectConfig config, string packageName, string version)
+    private bool InstallPackageToDirectory(string projectRoot, ProjectConfig config, string packageName, string version)
     {
         try
         {
@@ -238,7 +238,7 @@ public class InstallCommand : ICommand
 
             // 模拟下载过程
             Console.WriteLine($"  下载 {packageName}@{resolvedVersion}...");
-            await Task.Delay(500); // 模拟网络延迟
+            Thread.Sleep(500); // 模拟网络延迟
 
             // TODO: 实现实际的包下载逻辑
             // 1. 从包注册表获取包信息
@@ -258,11 +258,11 @@ public class InstallCommand : ICommand
                                   "description": "{{packageName}} package"
                                 }
                                 """;
-            await File.WriteAllTextAsync(packageJsonPath, packageJson);
+            File.WriteAllText(packageJsonPath, packageJson);
 
             var packageFilePath = Path.Combine(packageDir, $"{packageName}.old8");
             var packageContent = $"// {packageName} v{resolvedVersion}\nPrintLine(\"{packageName} loaded\")";
-            await File.WriteAllTextAsync(packageFilePath, packageContent);
+            File.WriteAllText(packageFilePath, packageContent);
 
             Console.WriteLine("  安装完成");
 
@@ -282,7 +282,7 @@ public class InstallCommand : ICommand
         Failed
     }
 
-    private async Task<InstallResult> InstallPackage(
+    private InstallResult InstallPackage(
         string packagesDir,
         string packageName,
         string versionRange)
@@ -308,7 +308,7 @@ public class InstallCommand : ICommand
             Console.Write($"  安装 {packageName}@{version}...");
 
             // TODO: 实现实际的包下载逻辑
-            await Task.Delay(200); // 模拟下载
+            Thread.Sleep(200); // 模拟下载
 
             Directory.CreateDirectory(packageDir);
 
@@ -321,11 +321,11 @@ public class InstallCommand : ICommand
                   "description": "{{packageName}} package"
                 }
                 """;
-            await File.WriteAllTextAsync(packageJsonPath, packageJson);
+            File.WriteAllText(packageJsonPath, packageJson);
 
             var packageFilePath = Path.Combine(packageDir, $"{packageName}.old8");
             var packageContent = $"// {packageName} v{version}\nPrintLine(\"{packageName} loaded\")";
-            await File.WriteAllTextAsync(packageFilePath, packageContent);
+            File.WriteAllText(packageFilePath, packageContent);
 
             Console.WriteLine(" 完成");
 

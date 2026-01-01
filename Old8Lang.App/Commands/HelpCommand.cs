@@ -9,9 +9,9 @@ public class HelpCommand : ICommand
     public string Description => "显示帮助信息";
     public string Help => "使用: Old8Lang.App -h";
 
-    public Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         Console.WriteLine(BasicInfo.Help);
-        return Task.FromResult(0);
+        return 0;
     }
 }

@@ -21,7 +21,7 @@ public class ListCommand : ICommand
   old8lang list          # 列出项目依赖
 ";
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         // 检查项目配置
         var projectRoot = CommandHelper.FindProjectRoot();
@@ -116,7 +116,7 @@ public class ListCommand : ICommand
         var langInfo = Apis.ReadJson();
         Console.WriteLine($"Old8Lang: {langInfo.Var}");
 
-        return await Task.FromResult(0);
+        return 0;
     }
 
     private List<(string name, string version)> GetInstalledPackages(string packagesDir)

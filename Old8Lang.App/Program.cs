@@ -13,11 +13,12 @@ public abstract class Program
     private static readonly CommandRegistry CommandRegistry = new();
 
     /// <summary>
-    /// 异步主入口点
+    /// 主入口点
     /// </summary>
     /// <param name="args">命令行参数</param>
     /// <returns>应用程序退出码</returns>
-    private static async Task<int> Main(string[] args)
+    [STAThread]
+    private static int Main(string[] args)
     {
         // 注册所有命令
         RegisterCommands();
@@ -60,7 +61,7 @@ public abstract class Program
         // 交互式命令行模式
         if (args.Length == 0)
         {
-            return await RunInteractiveMode();
+            return RunInteractiveMode();
         }
 
         // 验证命令行参数
@@ -81,7 +82,7 @@ public abstract class Program
         {
             try
             {
-                return await command.ExecuteAsync(commandArgs);
+                return command.Execute(commandArgs);
             }
             catch (Exception e)
             {
@@ -202,7 +203,7 @@ public abstract class Program
     /// 运行交互式命令行模式
     /// </summary>
     /// <returns>退出码</returns>
-    private static async Task<int> RunInteractiveMode()
+    private static int RunInteractiveMode()
     {
         Console.WriteLine("\n========================================");
         Console.WriteLine("    Old8Lang 交互式命令行模式");
@@ -230,7 +231,7 @@ public abstract class Program
                 var helpCommand = CommandRegistry.GetCommand("-h");
                 if (helpCommand != null)
                 {
-                    await helpCommand.ExecuteAsync([]);
+                    helpCommand.Execute([]);
                 }
 
                 continue;
@@ -246,7 +247,7 @@ public abstract class Program
                     var commandArgs = parts.Skip(1).ToArray();
                     try
                     {
-                        await command.ExecuteAsync(commandArgs);
+                        command.Execute(commandArgs);
                         continue;
                     }
                     catch (Exception e)
@@ -292,8 +293,8 @@ internal class CommandAlias(string name, ICommand targetCommand, string descript
     public string Description { get; } = description;
     public string Help { get; } = $"别名命令，等价于 '{targetCommand.Name}'";
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
-        return await targetCommand.ExecuteAsync(args);
+        return targetCommand.Execute(args);
     }
 }

@@ -12,13 +12,13 @@ public class CompilerCommand : ICommand
     public string Description => "编译并执行指定的 .old8 或 .ol 文件";
     public string Help => "使用: Old8Lang.App -c <文件名>";
 
-    public Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         if (args.Length < 1)
         {
             Console.WriteLine("错误: 缺少文件参数");
             Console.WriteLine(Help);
-            return Task.FromResult(1);
+            return 1;
         }
 
         // 验证文件扩展名
@@ -26,7 +26,7 @@ public class CompilerCommand : ICommand
         if (ext != ".old8" && ext != ".ol")
         {
             Console.WriteLine($"不支持的文件扩展名: {ext}，仅支持 .old8 和 .ol 文件");
-            return Task.FromResult(1);
+            return 1;
         }
 
         var interpreter = new LangInterpreter();
@@ -55,7 +55,7 @@ public class CompilerCommand : ICommand
             timeInfo += $"Total : {totalTime}ms";
             Console.WriteLine(timeInfo);
 
-            return Task.FromResult(0);
+            return 0;
         }
         catch (Exception e)
         {
@@ -63,7 +63,7 @@ public class CompilerCommand : ICommand
             throw;
 #endif
             Console.WriteLine(e.Message);
-            return Task.FromResult(1);
+            return 1;
         }
     }
 }

@@ -9,10 +9,10 @@ public class VersionCommand : ICommand
     public string Description => "显示当前版本号";
     public string Help => "使用: Old8Lang.App -var";
 
-    public Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         var langInfo = Apis.ReadJson();
         Console.WriteLine($"Old8Lang 版本: {langInfo.Var}");
-        return Task.FromResult(0);
+        return 0;
     }
 }

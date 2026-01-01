@@ -26,7 +26,7 @@ public class RunCommand : ICommand
   - 根据项目配置中的 runtime 设置选择运行模式
   - 支持项目脚本定义";
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         // 检查帮助参数
         if (args.Length >= 1 && (args[0] == "--help" || args[0] == "-h"))
@@ -58,12 +58,12 @@ public class RunCommand : ICommand
             if (isProject && !isFilePath && args.Length >= 1)
             {
                 // 项目模式 - 第一个参数是脚本名称
-                return await RunProjectMode(projectRoot!, args);
+                return RunProjectMode(projectRoot!, args);
             }
             else
             {
                 // 文件模式或项目中的文件运行
-                return await RunFileMode(args);
+                return RunFileMode(args);
             }
         }
         catch (Exception e)
@@ -79,7 +79,7 @@ public class RunCommand : ICommand
     /// <summary>
     /// 项目模式运行
     /// </summary>
-    private async Task<int> RunProjectMode(string projectRoot, string[] args)
+    private int RunProjectMode(string projectRoot, string[] args)
     {
         var config = ProjectConfig.LoadFromDirectory(projectRoot);
         if (config == null)
@@ -95,7 +95,7 @@ public class RunCommand : ICommand
         if (scriptName.StartsWith("-"))
         {
             // 这是文件模式，不是脚本名称
-            return await RunFileMode(args);
+            return RunFileMode(args);
         }
 
         // 检查是否有该脚本
@@ -133,13 +133,13 @@ public class RunCommand : ICommand
             return 1;
         }
 
-        return await command.ExecuteAsync(commandArgs);
+        return command.Execute(commandArgs);
     }
 
     /// <summary>
     /// 文件模式运行
     /// </summary>
-    private async Task<int> RunFileMode(string[] args)
+    private int RunFileMode(string[] args)
     {
         string mode;
         string filePath;
@@ -219,7 +219,7 @@ public class RunCommand : ICommand
         }
 
         var commandArgs = new[] { filePath };
-        return await command.ExecuteAsync(commandArgs);
+        return command.Execute(commandArgs);
     }
 
     /// <summary>

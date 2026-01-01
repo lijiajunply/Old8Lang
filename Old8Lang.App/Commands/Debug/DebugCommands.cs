@@ -13,7 +13,7 @@ public class DebugStartCommand : ICommand
     public string Description => "启动调试会话";
     public string Help => "用法: debug-start <文件路径>\n启动对指定Old8Lang文件的调试";
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         if (args.Length < 1)
         {
@@ -34,16 +34,16 @@ public class DebugStartCommand : ICommand
             // 创建调试器实例
             var debugger = new Old8Lang.Debugger.Debugger();
             DebugService.SetDebugger(debugger);
-            
+
             debugger.StartDebugging(filePath);
             Console.WriteLine($"已启动调试会话: {filePath}");
-            
+
             // 设置事件处理器
             SetupEventHandlers(debugger);
-            
+
             // 创建并启动调试解释器
-            await RunDebuggedProgram(filePath, debugger);
-            
+            RunDebuggedProgram(filePath, debugger);
+
             return 0;
         }
         catch (Exception ex)
@@ -78,11 +78,11 @@ public class DebugStartCommand : ICommand
         };
     }
 
-    private static async Task RunDebuggedProgram(string filePath, Old8Lang.Debugger.Debugger debugger)
+    private static void RunDebuggedProgram(string filePath, Old8Lang.Debugger.Debugger debugger)
     {
         var interpreter = new LangInterpreter();
         var debugInterpreter = new DebuggableInterpreter(interpreter, debugger);
-        
+
         try
         {
             var ast = interpreter.Build(Apis.FromFile(filePath));
@@ -97,12 +97,12 @@ public class DebugStartCommand : ICommand
     private static void ShowContext(SourcePosition position, CallStack callStack)
     {
         Console.WriteLine($"位置: 行 {position.Line}, 列 {position.Column}");
-        
+
         var currentFrame = callStack.CurrentFrame;
         if (currentFrame != null)
         {
             Console.WriteLine($"当前函数: {currentFrame.FunctionName}");
-            
+
             if (currentFrame.LocalVariables.Count > 0)
             {
                 Console.WriteLine("局部变量:");
@@ -122,6 +122,7 @@ public class DebugBreakpointCommand : ICommand
 {
     public string Name => "debug-bp";
     public string Description => "断点管理";
+
     public string Help => "用法: debug-bp <子命令> [参数]\n" +
                           "子命令:\n" +
                           "  add <文件> <行号> [条件] - 添加断点\n" +
@@ -130,7 +131,7 @@ public class DebugBreakpointCommand : ICommand
                           "  remove <断点ID> - 移除断点\n" +
                           "  clear - 清除所有断点";
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         var debugger = DebugService.GetDebugger();
         if (debugger == null)
@@ -261,6 +262,7 @@ public class DebugControlCommand : ICommand
 {
     public string Name => "debug";
     public string Description => "调试控制";
+
     public string Help => "用法: debug <命令>\n" +
                           "命令:\n" +
                           "  continue - 继续执行\n" +
@@ -273,7 +275,7 @@ public class DebugControlCommand : ICommand
                           "  stack - 显示调用栈\n" +
                           "  vars - 显示变量";
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         var debugger = DebugService.GetDebugger();
         if (debugger == null)

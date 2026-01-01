@@ -30,7 +30,7 @@ public class RestoreCommand : ICommand
   old8lang restore --production      # 只恢复生产依赖
 ";
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         // 检查帮助
         if (args.Contains("-h") || args.Contains("--help"))
@@ -77,7 +77,7 @@ public class RestoreCommand : ICommand
         Console.WriteLine($"将恢复 {totalDeps} 个依赖包...\n");
 
         // 恢复依赖
-        var result = await packageService.RestorePackagesAsync(config, productionOnly);
+        var result = packageService.RestorePackagesAsync(config, productionOnly).GetAwaiter().GetResult();
 
         // 显示结果
         Console.WriteLine();

@@ -25,7 +25,7 @@ public class RemoveCommand : ICommand
   old8lang remove --dev TestFramework # 移除开发依赖
 ";
 
-    public async Task<int> ExecuteAsync(string[] args)
+    public int Execute(string[] args)
     {
         if (args.Length == 0)
         {
@@ -100,7 +100,7 @@ public class RemoveCommand : ICommand
 
         CommandHelper.PrintSuccess($"已移除 {packageName}@{version}");
 
-        return await Task.FromResult(0);
+        return 0;
     }
 
     private static string GetPackagesDirectory()
