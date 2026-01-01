@@ -375,7 +375,7 @@ public static class Compiler
         // 处理 debug 指令
         if (directives.HasDirective("debug"))
         {
-            DebugOutputEnabled = directives.GetBoolDirective("debug", false);
+            DebugOutputEnabled = directives.GetBoolDirective("debug");
         }
 
         // 处理 verify-il 指令
@@ -387,7 +387,7 @@ public static class Compiler
         // 处理 optimize 指令 (保留用于将来)
         if (directives.HasDirective("optimize"))
         {
-            var optimizeLevel = directives.GetIntDirective("optimize", 0);
+            var optimizeLevel = directives.GetIntDirective("optimize");
             // 优化级别处理逻辑将来实现
             LogFormat("优化级别设置为: {0}", LogLevel.Info, optimizeLevel);
         }
@@ -401,7 +401,7 @@ public static class Compiler
         // 处理 type-inference-debug 指令
         if (directives.HasDirective("type-inference-debug"))
         {
-            TypeInferenceDebugOutput = directives.GetBoolDirective("type-inference-debug", false);
+            TypeInferenceDebugOutput = directives.GetBoolDirective("type-inference-debug");
         }
     }
 }

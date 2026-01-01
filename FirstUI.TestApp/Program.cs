@@ -4,6 +4,15 @@ using Old8Lang.FirstUI;
 using Old8Lang.FirstUI.Basic;
 using Old8Lang.FirstUI.Layout;
 
-var app = FirstUIBinding.CreateApp();
+namespace FirstUI.TestApp;
 
-app.Run(() => new Column(children: [new Text("asdf")]));
+public class Program
+{
+    [STAThread]
+    public static void Main(string[] args)
+    {
+        var app = FirstUIBinding.CreateApp();
+
+        app.Run(() => new Column(children: [new Text("asdf")]));
+    }
+}

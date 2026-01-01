@@ -23,23 +23,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/FirstUI.TestApp/FirstUI.TestApp.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FirstUI.TestApp/Program.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/ParamsInterpreterTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/ParamsTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/ParamsCompilerTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Examples/Counter.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Examples/Counter.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/Old8Lang.ebnf" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Old8Lang.ebnf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FirstUI.TestApp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FirstUI.TestApp/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/ParamsInterpreterTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/ParamsInterpreterTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/ParamsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Functions/ParamsTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/Compiler.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,7 +77,9 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/CharValueFuncStatic.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
@@ -559,7 +555,7 @@
       <workItem from="1766997021901" duration="12927000" />
       <workItem from="1767123773418" duration="15798000" />
       <workItem from="1767204141752" duration="12710000" />
-      <workItem from="1767284902325" duration="1874000" />
+      <workItem from="1767284902325" duration="2953000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -904,7 +900,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="497" />
+    <option name="localTasksCounter" value="498" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -931,7 +927,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="perf(interpreter): 优化反射调用性能&#10;&#10;- 添加 MethodInvokerCache 类使用委托缓存替代 MethodInfo.Invoke&#10;- 在 FuncLangValue 中使用缓存的委托调用方法提升性能&#10;- 为 NativeAnyLangValue 和 NativeStaticAny 添加成员信息缓存&#10;- 更新 Math 库测试用例使用浮点数参数&#10;- 移除已废弃的 SortLib 相关代码和测试&#10;- 修改 NetLib 测试使用新的 HttpClient 创建方法" />
     <MESSAGE value="perf(interpreter): 优化反射调用性能&#10;&#10;- 引入 MethodInvokerCache 使用 Expression.Lambda 编译 MethodInfo 为强类型委托&#10;- 实现线程安全的 ConcurrentDictionary 缓存机制避免重复反射开销&#10;- 优化 FuncLangValue、NativeAnyLangValue 和 NativeStaticAny 类的反射调用&#10;- 添加反射性能基准测试验证优化效果&#10;- 生成详细的反射性能优化报告包含测试数据和实现细节&#10;- 方法调用性能提升 1.9x 从 38ms 降至 20ms" />
     <MESSAGE value="perf(runtime): 添加属性访问委托缓存优化反射性能&#10;&#10;- 实现 PropertyAccessorCache 类使用 Expression.Lambda 编译属性访问委托&#10;- 添加线程安全的 Getter 和 Setter 缓存机制&#10;- 在性能测试中集成新的委托缓存基准测试&#10;- 更新性能报告输出格式和缓存统计信息&#10;- 优化序列化测试中的数组长度获取语法" />
     <MESSAGE value="fix(runtime): 修复反射调用中的类型转换问题&#10;&#10;- 在 FuncLangValue 中添加类型转换逻辑处理可空类型和类型不匹配情况&#10;- 为 DatabaseLibTests 添加顺序集合属性确保测试执行顺序&#10;- 更新 SerializationLibTests 中的数组长度获取语法从 Length 属性改为 len 函数&#10;- 简化 ConditionalImportTests 的构造函数实现&#10;- 优化 IDE 配置文件中的文件高亮设置和任务计数统计" />
@@ -956,7 +951,8 @@
     <MESSAGE value="docs: 移除调试器演示脚本和Visitor模式迁移进度文档&#10;&#10;- 移除debug_demo.sh调试器功能演示脚本&#10;- 移除Visitor_Migration_Progress.md迁移进度报告文档&#10;- 清理相关的调试器演示和Visitor模式开发文档&#10;- 删除不再需要的调试功能说明和迁移状态跟踪文件" />
     <MESSAGE value="fix(compiler): 修复编译器中的类型转换和函数声明问题&#10;&#10;- 修复 switch 语句中 case _ 语法的默认分支处理&#10;- 统一闭包函数声明中的返回类型标注为 function 关键字&#10;- 添加 ForIn 循环中数组元素类型的类型转换和装箱处理&#10;- 重构 GenericFunctionTests 类中的依赖注入构造函数&#10;- 修复 Operation 表达式中 object 与 int 比较的操作数类型转换&#10;- 扩展 SwitchStatement 中对字符类型的支持&#10;- 更新 IDE 工作空间配置和变更跟踪设置" />
     <MESSAGE value="feat(compiler): 支持泛型实例化表达式的基础实现&#10;&#10;- 为 GenericInstanceExpression 添加 OutputType 方法实现类型推断&#10;- 为 GenericInstanceExpression 添加 LoadIlValue 方法并抛出未支持异常&#10;- 实现 Old8Lang 的 Count() 方法特殊处理以支持泛型集合和数组&#10;- 修改类型注解解析允许单个大写字母作为泛型类型参数&#10;- 临时跳过所有泛型函数测试直到编译器模式完全支持" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(compiler): 支持泛型实例化表达式的基础实现&#10;&#10;- 为 GenericInstanceExpression 添加 OutputType 方法实现类型推断&#10;- 为 GenericInstanceExpression 添加 LoadIlValue 方法并抛出未支持异常&#10;- 实现 Old8Lang 的 Count() 方法特殊处理以支持泛型集合和数组&#10;- 修改类型注解解析允许单个大写字母作为泛型类型参数&#10;- 临时跳过所有泛型函数测试直到编译器模式完全支持" />
+    <MESSAGE value="feat(lang): 添加 params 可变参数支持&#10;&#10;- 在 LangId 中添加 isParams 属性用于标识可变参数&#10;- 在 LangTokenType 中添加 Params 关键字类型&#10;- 在 FunctionParser 中解析 params 修饰符并正确传递给 LangId&#10;- 在 FuncInit 中添加 params 参数合法性验证逻辑&#10;- 在 FuncLangValue 中实现 params 参数的参数数量检查和类型处理&#10;- 更新示例代码以使用新的 UI 组件语法&#10;- 添加测试项目 FirstUI.TestApp&#10;- 移除 FirstUIBinding 中废弃的组件创建 API&#10;- 修复多处代码格式化问题&#10;- 添加 params 可变参数的解析和解释器测试用例" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加 params 可变参数支持&#10;&#10;- 在 LangId 中添加 isParams 属性用于标识可变参数&#10;- 在 LangTokenType 中添加 Params 关键字类型&#10;- 在 FunctionParser 中解析 params 修饰符并正确传递给 LangId&#10;- 在 FuncInit 中添加 params 参数合法性验证逻辑&#10;- 在 FuncLangValue 中实现 params 参数的参数数量检查和类型处理&#10;- 更新示例代码以使用新的 UI 组件语法&#10;- 添加测试项目 FirstUI.TestApp&#10;- 移除 FirstUIBinding 中废弃的组件创建 API&#10;- 修复多处代码格式化问题&#10;- 添加 params 可变参数的解析和解释器测试用例" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

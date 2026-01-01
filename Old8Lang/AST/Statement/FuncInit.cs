@@ -96,6 +96,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         }
 
         // 使用参数的类型注解来确定参数类型
+        // 对于 params 参数，类型应该是数组类型（已经是 array<T>）
         var parameterTypes = FuncLangValue.Ids!.Select(item => item.OutputType(local)).ToArray();
 
         // 创建一个新的LocalManager实例，专门用于函数体的IL生成

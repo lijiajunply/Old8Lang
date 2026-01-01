@@ -690,58 +690,116 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
         // 处理所有类型的方法调用，包括DynamicMethod和MethodBuilder
         var matchingParams = matchingMethod.GetParameters();
 
-        // 加载实际传递的参数
-        for (var i = 0; i < Ids.Count; i++)
+        // 检查是否有 params 参数
+        int paramsIndex = -1;
+        if (funcParams != null)
         {
-            var id = Ids[i];
-            id.LoadIlValue(ilGenerator, local);
-
-            // 确保参数类型匹配
-            if (i < matchingParams.Length)
+            for (int i = 0; i < funcParams.Count; i++)
             {
-                var paramType = matchingParams[i].ParameterType;
-                var idType = id.OutputType(local);
-
-                // 使用LocalManager的ValidateType方法验证参数类型
-                if (idType != null)
+                if (funcParams[i].IsParams)
                 {
-                    // 执行类型验证，确保参数类型与方法期望的类型兼容
-                    local.ValidateType(paramType, idType, id.Position);
+                    paramsIndex = i;
+                    break;
                 }
+            }
+        }
 
-                // 处理必要的类型转换
-                if (idType != null && paramType != idType)
+        // 如果有 params 参数，需要特殊处理
+        if (paramsIndex >= 0)
+        {
+            // 加载 params 之前的普通参数
+            for (var i = 0; i < paramsIndex; i++)
+            {
+                if (i < Ids.Count)
                 {
-                    if (paramType == typeof(object) && idType.IsValueType)
+                    var id = Ids[i];
+                    id.LoadIlValue(ilGenerator, local);
+
+                    // 参数类型匹配和转换
+                    if (i < matchingParams.Length)
                     {
-                        // 从值类型转换为object，需要装箱
+                        var paramType = matchingParams[i].ParameterType;
+                        var idType = id.OutputType(local);
+                        LoadParameterWithConversion(ilGenerator, local, id, idType, paramType);
+                    }
+                }
+            }
+
+            // 处理 params 参数：创建数组
+            var paramsParam = matchingParams[paramsIndex];
+            var arrayElementType = paramsParam.ParameterType.GetElementType()!;
+            var paramsArgsCount = Math.Max(0, Ids.Count - paramsIndex);
+
+            // 创建数组：ldc.i4 <count>; newarr <elementType>
+            ilGenerator.Emit(OpCodes.Ldc_I4, paramsArgsCount);
+            ilGenerator.Emit(OpCodes.Newarr, arrayElementType);
+
+            // 填充数组元素
+            for (var i = 0; i < paramsArgsCount; i++)
+            {
+                var argIndex = paramsIndex + i;
+                var id = Ids[argIndex];
+
+                // dup 数组引用
+                ilGenerator.Emit(OpCodes.Dup);
+                // 加载索引
+                ilGenerator.Emit(OpCodes.Ldc_I4, i);
+                // 加载参数值
+                id.LoadIlValue(ilGenerator, local);
+
+                // 类型转换
+                var idType = id.OutputType(local);
+                if (idType != null && arrayElementType != idType)
+                {
+                    if (arrayElementType == typeof(object) && idType.IsValueType)
+                    {
                         ilGenerator.Emit(OpCodes.Box, idType);
                     }
-                    else if (paramType == typeof(int) && idType == typeof(object))
+                    else if (arrayElementType == typeof(int) && idType == typeof(double))
                     {
-                        // 从object转换为int
-                        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
-                    }
-                    else if (paramType == typeof(double) && idType == typeof(object))
-                    {
-                        // 从object转换为double
-                        ilGenerator.Emit(OpCodes.Unbox_Any, typeof(double));
-                    }
-                    else if (paramType == typeof(int) && idType == typeof(double))
-                    {
-                        // 从double转换为int
                         ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToInt32", [typeof(double)])!);
                     }
-                    else if (paramType == typeof(double) && idType == typeof(int))
+                    else if (arrayElementType == typeof(double) && idType == typeof(int))
                     {
-                        // 从int转换为double
                         ilGenerator.Emit(OpCodes.Conv_R8);
                     }
-                    else if (paramType == typeof(string) && idType != typeof(string))
-                    {
-                        // 从其他类型转换为string
-                        ilGenerator.Emit(OpCodes.Call, idType.GetMethod("ToString", Type.EmptyTypes)!);
-                    }
+                }
+
+                // 存储到数组：stelem <elementType>
+                if (arrayElementType == typeof(object))
+                {
+                    ilGenerator.Emit(OpCodes.Stelem_Ref);
+                }
+                else if (arrayElementType == typeof(int))
+                {
+                    ilGenerator.Emit(OpCodes.Stelem_I4);
+                }
+                else if (arrayElementType == typeof(double))
+                {
+                    ilGenerator.Emit(OpCodes.Stelem_R8);
+                }
+                else
+                {
+                    ilGenerator.Emit(OpCodes.Stelem, arrayElementType);
+                }
+            }
+            // 此时栈顶是填充好的数组，作为 params 参数传递
+        }
+        else
+        {
+            // 没有 params 参数，使用原有逻辑
+            // 加载实际传递的参数
+            for (var i = 0; i < Ids.Count; i++)
+            {
+                var id = Ids[i];
+                id.LoadIlValue(ilGenerator, local);
+
+                // 确保参数类型匹配
+                if (i < matchingParams.Length)
+                {
+                    var paramType = matchingParams[i].ParameterType;
+                    var idType = id.OutputType(local);
+                    LoadParameterWithConversion(ilGenerator, local, id, idType, paramType);
                 }
             }
         }
@@ -880,5 +938,53 @@ public partial class Instance(LangId langId, List<LangExpression> ids, SourcePos
         }
 
         return classType ?? typeof(object);
+    }
+
+    /// <summary>
+    /// 加载参数并进行必要的类型转换
+    /// </summary>
+    private void LoadParameterWithConversion(ILGenerator ilGenerator, LocalManager local, LangExpression id, Type? idType, Type paramType)
+    {
+        // 使用LocalManager的ValidateType方法验证参数类型
+        if (idType != null)
+        {
+            // 执行类型验证，确保参数类型与方法期望的类型兼容
+            local.ValidateType(paramType, idType, id.Position);
+        }
+
+        // 处理必要的类型转换
+        if (idType != null && paramType != idType)
+        {
+            if (paramType == typeof(object) && idType.IsValueType)
+            {
+                // 从值类型转换为object，需要装箱
+                ilGenerator.Emit(OpCodes.Box, idType);
+            }
+            else if (paramType == typeof(int) && idType == typeof(object))
+            {
+                // 从object转换为int
+                ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
+            }
+            else if (paramType == typeof(double) && idType == typeof(object))
+            {
+                // 从object转换为double
+                ilGenerator.Emit(OpCodes.Unbox_Any, typeof(double));
+            }
+            else if (paramType == typeof(int) && idType == typeof(double))
+            {
+                // 从double转换为int
+                ilGenerator.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToInt32", [typeof(double)])!);
+            }
+            else if (paramType == typeof(double) && idType == typeof(int))
+            {
+                // 从int转换为double
+                ilGenerator.Emit(OpCodes.Conv_R8);
+            }
+            else if (paramType == typeof(string) && idType != typeof(string))
+            {
+                // 从其他类型转换为string
+                ilGenerator.Emit(OpCodes.Call, idType.GetMethod("ToString", Type.EmptyTypes)!);
+            }
+        }
     }
 }

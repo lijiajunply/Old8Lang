@@ -94,7 +94,7 @@ asyncFunctionDeclaration = accessModifier*
 
 parameterList = parameter ( "," parameter )* ;
 
-parameter = identifier ( ":" type )? ( "<-" expression )? ;
+parameter = "params"? identifier ( ":" type )? ( "<-" expression )? ;
 
 (* Generic Type Parameters *)
 

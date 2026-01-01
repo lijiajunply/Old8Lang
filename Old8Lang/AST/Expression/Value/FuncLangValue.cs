@@ -978,7 +978,7 @@ public class FuncLangValue : ImportInfo
             var paramsValues = paramValues.Skip(regularParamCount).ToList();
 
             // 创建 ArrayLangValue
-            var paramsArrayValue = new ArrayLangValue(paramsValues.ToArray());
+            var paramsArrayValue = new ArrayLangValue(paramsValues);
 
             // 替换 paramValues：保留普通参数 + params 数组
             var finalParamValues = paramValues.Take(regularParamCount).ToList();

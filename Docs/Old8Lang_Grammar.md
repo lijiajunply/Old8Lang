@@ -754,6 +754,135 @@ func configure(host:string, port: 8080, debug: false) {
 }
 ```
 
+#### 5.5.2.5 可变参数（Params）
+
+Old8Lang 支持使用 `params` 关键字声明可变参数，允许函数接受任意数量的参数。
+
+**语法规则**：
+
+```old8
+func functionName(params paramName:array<T>) -> returnType {
+    // 函数体
+}
+```
+
+**规则说明**：
+
+1. **位置限制**：`params` 参数必须是参数列表的最后一个参数
+2. **数量限制**：一个函数只能有一个 `params` 参数
+3. **类型要求**：`params` 参数必须声明为数组类型（`array<T>`）
+4. **不能有默认值**：`params` 参数不能有默认值，会自动处理为空数组
+5. **模式支持**：解释器模式和编译器模式都完全支持
+
+**基本示例**：
+
+```old8
+// 定义可变参数函数
+func sum(params args:array<int>) -> int {
+    result:int <- 0
+    for arg in args {
+        result <- result + arg
+    }
+    return result
+}
+
+// 使用可变参数
+total1 <- sum()                    // 传入 0 个参数，result = 0
+total2 <- sum(1, 2, 3)             // 传入 3 个参数，result = 6
+total3 <- sum(10, 20, 30, 40, 50)  // 传入 5 个参数，result = 150
+```
+
+**结合普通参数使用**：
+
+```old8
+// params 参数必须在最后
+func format(prefix:string, params items:array<string>) -> string {
+    result:string <- prefix
+    for item in items {
+        result <- result + "_" + item
+    }
+    return result
+}
+
+// 使用示例
+str1 <- format("start")                      // "start"
+str2 <- format("start", "a", "b", "c")       // "start_a_b_c"
+str3 <- format("prefix", "item1", "item2")   // "prefix_item1_item2"
+```
+
+**访问 params 数组**：
+
+```old8
+func describe(params values:array<int>) -> void {
+    count <- len(values)  // 获取参数数量
+    PrintLine("收到 " + count.ToStr() + " 个参数")
+
+    for i <- 0, i < count, i++ {
+        PrintLine("参数 " + i.ToStr() + ": " + values[i].ToStr())
+    }
+}
+
+describe(10, 20, 30)
+// 输出:
+// 收到 3 个参数
+// 参数 0: 10
+// 参数 1: 20
+// 参数 2: 30
+```
+
+**支持不同类型的 params**：
+
+```old8
+// 字符串类型的可变参数
+func concat(separator:string, params words:array<string>) -> string {
+    if len(words) == 0 {
+        return ""
+    }
+    result <- words[0]
+    for i <- 1, i < len(words), i++ {
+        result <- result + separator + words[i]
+    }
+    return result
+}
+
+text <- concat(", ", "apple", "banana", "cherry")  // "apple, banana, cherry"
+
+// 双精度类型的可变参数
+func average(params numbers:array<double>) -> double {
+    if len(numbers) == 0 {
+        return 0.0
+    }
+    sum:double <- 0.0
+    for num in numbers {
+        sum <- sum + num
+    }
+    return sum / len(numbers)
+}
+
+avg <- average(1.5, 2.5, 3.5, 4.5)  // 3.0
+```
+
+**编译模式注意事项**：
+
+在编译模式下，`params` 参数的类型注解是必须的，且必须是数组类型：
+
+```old8
+// ✅ 正确：显式声明为数组类型
+func sum(params args:array<int>) -> int {
+    // ...
+}
+
+// ❌ 错误：缺少类型注解
+func sum(params args) -> int {
+    // ...
+}
+
+// ❌ 错误：类型不是数组
+func sum(params args:list<int>) -> int {
+    // ...
+}
+```
+
 #### 5.5.3 编译模式类型要求
 
 在编译模式下 (`-c`)，函数声明有以下额外要求：
