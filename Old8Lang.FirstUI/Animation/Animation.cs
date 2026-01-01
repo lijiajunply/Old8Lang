@@ -8,10 +8,10 @@ namespace Old8Lang.FirstUI.Animation;
 /// </summary>
 public class Animation : IAnimation
 {
-    private readonly Stopwatch _stopwatch = new();
-    private DispatcherTimer? _timer;
-    private double _pausedProgress = 0;
-    private int _currentIteration = 0;
+    private readonly Stopwatch Stopwatch = new();
+    private DispatcherTimer? Timer;
+    private double PausedProgress;
+    private int CurrentIteration;
 
     /// <summary>
     /// 动画时长（毫秒）
@@ -82,9 +82,9 @@ public class Animation : IAnimation
             return;
 
         Status = AnimationStatus.Running;
-        _stopwatch.Restart();
-        _pausedProgress = 0;
-        _currentIteration = 0;
+        Stopwatch.Restart();
+        PausedProgress = 0;
+        CurrentIteration = 0;
 
         StartTimer();
         Started?.Invoke(this, EventArgs.Empty);
@@ -99,8 +99,8 @@ public class Animation : IAnimation
             return;
 
         Status = AnimationStatus.Paused;
-        _pausedProgress = Progress;
-        _stopwatch.Stop();
+        PausedProgress = Progress;
+        Stopwatch.Stop();
         StopTimer();
     }
 
@@ -113,7 +113,7 @@ public class Animation : IAnimation
             return;
 
         Status = AnimationStatus.Running;
-        _stopwatch.Restart();
+        Stopwatch.Restart();
         StartTimer();
     }
 
@@ -123,10 +123,10 @@ public class Animation : IAnimation
     public virtual void Stop()
     {
         Status = AnimationStatus.Stopped;
-        _stopwatch.Stop();
+        Stopwatch.Stop();
         StopTimer();
         Progress = 0;
-        _pausedProgress = 0;
+        PausedProgress = 0;
 
         Completed?.Invoke(this, new AnimationCompletedEventArgs { IsCancelled = true });
     }
@@ -139,7 +139,7 @@ public class Animation : IAnimation
         Stop();
         Status = AnimationStatus.Idle;
         Progress = 0;
-        _currentIteration = 0;
+        CurrentIteration = 0;
     }
 
     /// <summary>
@@ -147,12 +147,12 @@ public class Animation : IAnimation
     /// </summary>
     private void StartTimer()
     {
-        _timer = new DispatcherTimer
+        Timer = new DispatcherTimer
         {
             Interval = TimeSpan.FromMilliseconds(1000.0 / FrameRate)
         };
-        _timer.Tick += OnTimerTick;
-        _timer.Start();
+        Timer.Tick += OnTimerTick;
+        Timer.Start();
     }
 
     /// <summary>
@@ -160,11 +160,11 @@ public class Animation : IAnimation
     /// </summary>
     private void StopTimer()
     {
-        if (_timer != null)
+        if (Timer != null)
         {
-            _timer.Tick -= OnTimerTick;
-            _timer.Stop();
-            _timer = null;
+            Timer.Tick -= OnTimerTick;
+            Timer.Stop();
+            Timer = null;
         }
     }
 
@@ -176,7 +176,7 @@ public class Animation : IAnimation
         if (Status != AnimationStatus.Running)
             return;
 
-        var elapsed = _stopwatch.ElapsedMilliseconds;
+        var elapsed = Stopwatch.ElapsedMilliseconds;
         var totalDuration = Duration + Delay;
 
         // 处理延迟
@@ -192,16 +192,16 @@ public class Animation : IAnimation
         var rawProgress = Math.Min((double)animationElapsed / Duration, 1.0);
 
         // 应用暂停偏移
-        if (_pausedProgress > 0)
+        if (PausedProgress > 0)
         {
-            rawProgress = Math.Min(_pausedProgress + rawProgress, 1.0);
+            rawProgress = Math.Min(PausedProgress + rawProgress, 1.0);
         }
 
         // 应用缓动
         var easedProgress = EasingFunc(rawProgress);
 
         // 处理反向播放
-        if (AutoReverse && _currentIteration % 2 == 1)
+        if (AutoReverse && CurrentIteration % 2 == 1)
         {
             easedProgress = 1.0 - easedProgress;
         }
@@ -212,14 +212,14 @@ public class Animation : IAnimation
         // 检查是否完成
         if (rawProgress >= 1.0)
         {
-            _currentIteration++;
+            CurrentIteration++;
 
             // 检查循环
-            if (Loop && (LoopCount == -1 || _currentIteration < LoopCount))
+            if (Loop && (LoopCount == -1 || CurrentIteration < LoopCount))
             {
                 // 继续下一次循环
-                _stopwatch.Restart();
-                _pausedProgress = 0;
+                Stopwatch.Restart();
+                PausedProgress = 0;
             }
             else
             {

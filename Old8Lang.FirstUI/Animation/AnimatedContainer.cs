@@ -16,8 +16,8 @@ public class AnimatedContainer : WidgetBase
     private double _currentHeight;
     private double _currentOpacity;
     private string? _currentBackgroundColor;
-    private Core.Thickness _currentPadding;
-    private Core.Thickness _currentMargin;
+    private Thickness _currentPadding;
+    private Thickness _currentMargin;
 
     // 动画实例
     private Animation<double>? _widthAnimation;
@@ -52,6 +52,7 @@ public class AnimatedContainer : WidgetBase
             {
                 AnimateWidth(value.Value);
             }
+
             base.Width = value;
         }
     }
@@ -68,6 +69,7 @@ public class AnimatedContainer : WidgetBase
             {
                 AnimateHeight(value.Value);
             }
+
             base.Height = value;
         }
     }
@@ -84,6 +86,7 @@ public class AnimatedContainer : WidgetBase
             {
                 AnimateOpacity(value);
             }
+
             base.Opacity = value;
         }
     }
@@ -100,6 +103,7 @@ public class AnimatedContainer : WidgetBase
             {
                 AnimateBackgroundColor(value);
             }
+
             base.BackgroundColor = value;
         }
     }
@@ -217,7 +221,7 @@ public class AnimatedContainer : WidgetBase
         _colorAnimation?.Stop();
 
         _colorAnimation = new Animation<string>(_currentBackgroundColor ?? "#FFFFFF", targetColor,
-            (from, to, progress) => Transition.InterpolateColor(from, to, progress))
+            Transition.InterpolateColor)
         {
             Duration = AnimationDuration,
             EasingFunc = AnimationEasing

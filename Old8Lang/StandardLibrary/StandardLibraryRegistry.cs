@@ -134,33 +134,7 @@ public static class StandardLibraryRegistry
             )
         ),
 
-        ["FirstUI"] = StandardLibraryInfo.FromTypes(
-            "Old8Lang.FirstUI",
-            TypeImportConfig.StaticClass(
-                typeof(FirstUIBinding)
-            ),
-            TypeImportConfig.NormalClass(
-                typeof(Container)
-            ),
-            TypeImportConfig.NormalClass(
-                typeof(Column)
-            ),
-            TypeImportConfig.NormalClass(
-                typeof(BuildContext)
-            ),
-            TypeImportConfig.NormalClass(
-                typeof(StateManager)
-            ),
-            TypeImportConfig.NormalClass(
-                typeof(Thickness)
-            ),
-            TypeImportConfig.NormalClass(
-                typeof(Text)
-            ),
-            TypeImportConfig.NormalClass(
-                typeof(Button)
-            )
-        )
+        ["FirstUI"] = StandardLibraryInfo.FromAssembly(assembly: new FirstUIApplication().GetType().Assembly)
     };
 
     /// <summary>

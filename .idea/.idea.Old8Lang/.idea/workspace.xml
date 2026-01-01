@@ -22,32 +22,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/test_project/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_project/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_project/o8package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_project/src/main.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_project/tests/test_main.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/CertCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/CertCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/CompilerCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/CompilerCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/Debug/DebugCommands.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/Debug/DebugCommands.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/FromFileCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/FromFileCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/HelpCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/HelpCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/ICommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/ICommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/InitCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/InitCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/InstallCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/InstallCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/ListCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/ListCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/PackCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/PackCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/Profiler/ProfileCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/Profiler/ProfileCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/PublishCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/PublishCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/RemoveCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/RemoveCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/RestoreCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/RestoreCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/RunCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/RunCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/SignCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/SignCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/SyntaxTestCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/SyntaxTestCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/UnpackCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/UnpackCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/VerifyCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/VerifyCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/VersionCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/VersionCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Animation/AnimatedContainer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Animation/AnimatedContainer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Animation/Animation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Animation/Animation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,6 +59,7 @@
     <setting file="file://$USER_HOME$/.jetbrains/acp.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/.nuget/NuGet/NuGet.Config" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/.claude/settings.local.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.App/Commands/CertCommand.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.App/Program.cs" root0="SKIP_HIGHLIGHTING" />
@@ -92,7 +70,9 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Benchmarks/SimpleReflectionBenchmark.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/Animation/AnimatedContainer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/Basic/Button.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/FirstUIBinding.cs" root0="SKIP_HIGHLIGHTING" />
@@ -943,7 +923,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="492" />
+    <option name="localTasksCounter" value="493" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -970,7 +950,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(standard-library): 添加标准库模块的全面测试覆盖&#10;&#10;- 添加 DatabaseLibTests 测试数据库操作功能&#10;- 添加 MachineLearningLibTests 测试机器学习功能&#10;- 添加 NetLibTests 测试网络功能（HTTP、MQTT、WebSocket 等）&#10;- 添加 SerializationLibTests 测试序列化功能（MessagePack 和 Protobuf）&#10;- 更新 IDE 工作区配置文件中的变更记录和任务计数器&#10;- 清理过时的提交消息历史记录并更新最后提交信息" />
     <MESSAGE value="refactor(firstui): 重构 FirstUI 命名空间和组件注册机制&#10;&#10;- 移除 Core 子命名空间，将所有类移到 Old8Lang.FirstUI 主命名空间&#10;- 删除不再需要的 using 语句，简化文件头部引用&#10;- 从 FirstUIBinding 中移除 CreateWidget 方法，改用直接组件构造函数&#10;- 更新 HelloWorld 示例使用新的 Column 组件构造方式&#10;- 在标准库注册表中添加 FirstUI 的所有组件类名到 ClassNames 数组&#10;- 调整 IDE 配置文件中的变更记录和任务计数器" />
     <MESSAGE value="feat(error): 改进模块导入错误处理和错误信息展示&#10;&#10;- 添加 ModuleResolutionResult 构造函数到 ImportError 类&#10;- 在 ImportStatement 中使用 ModuleResolutionResult 提供详细错误信息&#10;- 扩展 ModuleResolutionResult 类添加失败原因和解析尝试记录功能&#10;- 实现友好的错误信息生成功能包含解析步骤和建议&#10;- 添加解析尝试记录类用于跟踪模块解析过程&#10;- 在 ModuleResolver 中记录每个解析步骤的详细信息&#10;- 实现针对性建议生成功能帮助用户解决导入问题&#10;- 添加标准库名称相似度检测功能&#10;- 更新 ModuleSystemService 使用新的错误构造函数&#10;- 添加获取所有标准库名称的方法到 StandardLibraryRegistry" />
     <MESSAGE value="refactor(standard-library): 重构标准库加载机制和命名空间结构&#10;&#10;- 将StandardLibraryInfo从record改为class，支持延迟加载和类型导入配置&#10;- 添加StandardLibraryImportMode枚举支持程序集和类型两种导入模式&#10;- 实现LoadFromAssembly和LoadFromTypes方法支持不同的导入方式&#10;- 更新StandardLibraryRegistry使用新的类型导入配置方式&#10;- 移除各模块间的循环项目引用，统一在主项目中引用&#10;- 重构LockedVariableLangValue的内部字段命名，提升代码可读性&#10;- 更新FirstUI模块的命名空间结构，统一到Core子命名空间&#10;- 将MachineLearningLibBinding改为静态类，符合其作为绑定类的用途" />
@@ -995,7 +974,8 @@
     <MESSAGE value="refactor(app): 移除修改导入路径命令并优化程序入口点&#10;&#10;- 移除 ChangeImportCommand 命令类文件&#10;- 从命令注册表中移除修改导入路径命令&#10;- 重构 Program.cs 主入口点，移除同步包装器方法&#10;- 调整命令注册顺序，保持性能分析命令注册&#10;- 更新 IDE 配置文件中的 JSON 格式转义字符" />
     <MESSAGE value="feat(components): 添加新组件并完善绑定API&#10;&#10;- 新增 Wrap 布局组件支持自动换行/换列&#10;- 新增 Icon 图标组件，支持 Material Icons、Font Awesome、Unicode 等多种图标库&#10;- 新增 Switch 开关组件提供布尔值选择功能&#10;- 新增 Slider 滑块组件支持范围选择&#10;- 新增 ProgressBar 进度条组件，支持线性和圆形样式&#10;- 新增 TextArea 多行文本输入组件&#10;- 新增 Select 下拉选择组件&#10;- 新增 NavigationView 导航视图组件，支持侧边栏导航&#10;- 新增 Panel 面板组件，支持标题栏和边框&#10;- 完善 FirstUIBinding 绑定层，添加新组件的创建API&#10;- 更新 Button 组件构造函数支持参数注入&#10;- 添加 Svg.Controls.Avalonia 包支持SVG图标渲染" />
     <MESSAGE value="feat(components): 添加 DatePicker、FilePicker 和 Table 组件&#10;&#10;- 实现 DatePicker 日期选择器，支持多种显示模式和日期范围限制&#10;- 添加 FilePicker 文件选择器，提供文件和文件夹选择功能&#10;- 创建 Table 表格组件，支持排序、筛选、分页和行选择功能&#10;- 为新组件提供完整的链式调用 API&#10;- 实现表格的斑马纹、悬停效果和选中行样式&#10;- 添加日期选择器的文化信息和格式化支持&#10;- 实现文件选择器的路径显示和文件信息获取功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(components): 添加 DatePicker、FilePicker 和 Table 组件&#10;&#10;- 实现 DatePicker 日期选择器，支持多种显示模式和日期范围限制&#10;- 添加 FilePicker 文件选择器，提供文件和文件夹选择功能&#10;- 创建 Table 表格组件，支持排序、筛选、分页和行选择功能&#10;- 为新组件提供完整的链式调用 API&#10;- 实现表格的斑马纹、悬停效果和选中行样式&#10;- 添加日期选择器的文化信息和格式化支持&#10;- 实现文件选择器的路径显示和文件信息获取功能" />
+    <MESSAGE value="refactor(cli): 将命令执行方法从异步改为同步&#10;&#10;- 将 CertCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 CompilerCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 DebugCommands 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 FromFileCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 HelpCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 ICommand 接口中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 InitCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 InstallCommand 中的所有异步方法改为同步方法&#10;- 将 ListCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 PackCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 ProfileCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 Program.cs 中的 Main 方法改为同步方法&#10;- 将 PublishCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 RemoveCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 RestoreCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 RunCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 SignCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 SyntaxTestCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 UnpackCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 VerifyCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 VersionCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 在需要的地方使用 GetAwaiter().GetResult() 替代异步等待&#10;- 将 Task.Delay 替换为 Thread.Sleep 以保持延迟功能" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(cli): 将命令执行方法从异步改为同步&#10;&#10;- 将 CertCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 CompilerCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 DebugCommands 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 FromFileCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 HelpCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 ICommand 接口中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 InitCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 InstallCommand 中的所有异步方法改为同步方法&#10;- 将 ListCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 PackCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 ProfileCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 Program.cs 中的 Main 方法改为同步方法&#10;- 将 PublishCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 RemoveCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 RestoreCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 RunCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 SignCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 SyntaxTestCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 UnpackCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 VerifyCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 VersionCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 在需要的地方使用 GetAwaiter().GetResult() 替代异步等待&#10;- 将 Task.Delay 替换为 Thread.Sleep 以保持延迟功能" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
