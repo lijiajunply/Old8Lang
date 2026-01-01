@@ -1433,10 +1433,13 @@ public class PrimaryParser(
 
                 // 验证是否为支持的类型
                 var supportedTypes = new[] { "int", "double", "string", "bool", "char", "void", "list", "dict", "any" };
-                if (!supportedTypes.Contains(typeAnnotation))
+                // 允许单个大写字母作为泛型类型参数（如 T, U, V）
+                var isGenericTypeParameter = typeAnnotation.Length == 1 && char.IsUpper(typeAnnotation[0]);
+                
+                if (!supportedTypes.Contains(typeAnnotation) && !isGenericTypeParameter)
                 {
                     throw CreateSyntaxError(
-                        $"不支持的类型注解: {typeAnnotation}。支持的类型: int, double, string, bool, char, void, list, dict, any");
+                        $"不支持的类型注解: {typeAnnotation}。支持的类型: int, double, string, bool, char, void, list, dict, any 或单个大写字母作为泛型类型参数");
                 }
             }
             else

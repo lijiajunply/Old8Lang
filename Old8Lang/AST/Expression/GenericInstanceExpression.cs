@@ -177,6 +177,40 @@ public class GenericInstanceExpression : LangExpression
         throw new InvalidOperationError(this, $"表达式 {BaseExpression} 不是泛型类型或泛型函数");
     }
 
+    public override Type? OutputType(LocalManager local)
+    {
+        // 编译器模式下的类型推断
+        // 对于泛型实例，需要根据基础表达式和类型参数推断最终类型
+        
+        // 获取基础表达式的类型
+        var baseType = BaseExpression.OutputType(local);
+        
+        // 如果是函数调用，返回函数的返回类型
+        if (IsFunctionCall)
+        {
+            // 简化处理：暂时返回 object 类型
+            // 实际实现需要分析泛型函数的返回类型和类型参数
+            return typeof(object);
+        }
+        
+        // 否则返回实例化后的类型
+        // 简化处理：暂时返回 object 类型
+        // 实际实现需要根据类型参数确定具体类型
+        return typeof(object);
+    }
+
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
+    {
+        // 编译器模式下的IL生成
+        // 这是一个复杂的过程，需要：
+        // 1. 处理泛型类型的实例化
+        // 2. 处理泛型函数的调用
+        // 3. 处理类型参数的传递
+        
+        // 暂时抛出异常，提示需要实现
+        throw new InvalidOperationError(this, "编译器模式下暂时不支持泛型实例化表达式，请使用解释器模式");
+    }
+
     public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)
     {
         // TODO: Visitor 模式支持

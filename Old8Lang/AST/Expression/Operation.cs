@@ -1819,6 +1819,29 @@ public partial class Operation(
                         return typeof(string);
                     }
 
+                    // 特殊处理Old8Lang的Count()方法
+                    // Count()在Old8Lang中是方法，但在.NET的List<T>和T[]中是属性
+                    if (instance.Id.IdName == "Count" && instance.Ids.Count == 0)
+                    {
+                        // 如果是泛型集合类型，使用Count属性
+                        if (leftType!.IsGenericType && leftType.GetGenericTypeDefinition() == typeof(List<>))
+                        {
+                            // 获取Count属性
+                            var countProperty = leftType.GetProperty("Count")!;
+                            ilGenerator.Emit(OpCodes.Callvirt, countProperty.GetGetMethod()!);
+                            return typeof(int);
+                        }
+                        
+                        // 如果是数组类型，使用Length属性
+                        if (leftType.IsArray)
+                        {
+                            // 获取Length属性
+                            var lengthProperty = leftType.GetProperty("Length")!;
+                            ilGenerator.Emit(OpCodes.Callvirt, lengthProperty.GetGetMethod()!);
+                            return typeof(int);
+                        }
+                    }
+
                     // 尝试查找精确匹配的方法
                     var m = leftType!.GetMethod(instance.Id.IdName, [.. types]);
 
