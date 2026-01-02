@@ -23,13 +23,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CompletionHandlerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/DebugProfilerServiceTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/DefinitionHandlerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/DocumentManagerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/DocumentParseResultTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/HoverHandlerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/LanguageServerIntegrationTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/README_TestCoverage.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/RenameHandlerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/SymbolFinderTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/SymbolInfoTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/SymbolTableBuilderTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/TextDocumentSyncHandlerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.Tests/LanguageServer/TextDocumentSyncHandlerTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/SemanticAnalyzerTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/SemanticAnalyzerTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/StructuredDocCommentTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/StructuredDocCommentTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Old8Lang.Tests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Old8Lang.Tests.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,6 +95,7 @@
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/LanguageServer/SemanticAnalyzerTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Parser/StructuredDocCommentTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Parser/StructuredDocCommentTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
@@ -586,7 +595,7 @@
       <workItem from="1766997021901" duration="12927000" />
       <workItem from="1767123773418" duration="15798000" />
       <workItem from="1767204141752" duration="12710000" />
-      <workItem from="1767284902325" duration="16143000" />
+      <workItem from="1767284902325" duration="19770000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -931,7 +940,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="506" />
+    <option name="localTasksCounter" value="507" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -958,7 +967,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(components): 添加高级UI组件实现&#10;&#10;- 实现Card卡片组件，支持标题、副标题、圆角、边框、阴影等属性&#10;- 实现Dialog对话框组件，支持多种类型和自定义内容&#10;- 实现ListView列表视图组件，支持虚拟化滚动和分隔线&#10;- 实现ScrollView滚动容器组件，支持多方向滚动&#10;- 实现TabView选项卡视图组件，支持动态选项卡切换&#10;- 实现Toast消息提示组件，支持多种类型和位置&#10;- 移除旧的组件创建工厂方法和相关依赖引用" />
     <MESSAGE value="feat(ui): 添加面包屑、复选框、网格视图、菜单、分页和弹出框组件&#10;&#10;- 实现 Breadcrumb 面包屑导航组件，支持自定义分隔符、颜色和点击事件&#10;- 实现 Checkbox 复选框组件，支持三态模式和链式调用配置&#10;- 实现 GridView 网格视图组件，支持自定义列数、间距和项构建器&#10;- 实现 Menu 菜单组件，支持垂直/水平方向、子菜单和选中状态&#10;- 实现 Pagination 分页组件，支持首页末页按钮、页码范围和总数显示&#10;- 实现 Popover 弹出框组件，支持多种触发方式和定位选项&#10;- 移除 benchmarks 项目中的冗余文件夹引用" />
     <MESSAGE value="feat(state): 添加完整状态管理系统&#10;&#10;- 实现 State 类提供局部状态管理功能&#10;- 实现 ObservableState 类支持响应式状态自动触发 UI 更新&#10;- 实现 GlobalState 类提供全局状态管理类似 Provider 模式&#10;- 实现 Computed 类支持计算属性基于依赖状态派生新状态&#10;- 添加 IState 接口统一状态管理抽象&#10;- 扩展 WidgetBase 添加 Rebuild 方法支持状态变化重建&#10;- 更新文档添加状态管理使用示例和功能说明&#10;- 修改项目进度标记状态管理阶段完成" />
     <MESSAGE value="feat(animation): 添加动画系统和缓动函数库&#10;&#10;- 实现了基础动画类Animation，支持启动、暂停、恢复、停止和重置功能&#10;- 添加了泛型动画类Animation&lt;T&gt;，支持自定义插值函数&#10;- 实现了完整的缓动函数库，包含线性、四次方、三次方、正弦、指数、圆形、回弹、弹性、弹跳和弹簧效果&#10;- 创建了AnimatedContainer动画容器组件，支持宽度、高度、不透明度和背景色的自动过渡动画&#10;- 添加了动画接口IAnimation和动画状态枚举AnimationStatus&#10;- 实现了动画事件系统，包括更新事件和完成事件&#10;- 提供了链式调用API用于动画配置和事件绑定" />
@@ -983,7 +991,8 @@
     <MESSAGE value="feat(languageserver): 实现跳转到定义功能&#10;&#10;- 在 DefinitionHandler 中实现符号定义查找逻辑&#10;- 添加光标位置获取和符号查找功能&#10;- 构建准确的定义位置信息并返回&#10;- 更新 SymbolTableBuilder 构造函数以接收 tokens 参数&#10;- 实现基于 token 的符号位置查找机制&#10;- 添加 FindSymbolLocationFromTokens 方法支持函数和类定义定位&#10;- 创建 TODO.md 文档记录后续开发计划和功能状态&#10;- 更新项目配置文件中的变更跟踪信息" />
     <MESSAGE value="feat(langserver): 添加查找引用和重命名符号功能&#10;&#10;- 实现 ReferencesHandler 支持查找符号的所有引用位置&#10;- 实现 RenameHandler 支持重命名符号并自动更新所有引用&#10;- 在 SymbolFinder 中添加 FindReferences 方法用于符号引用查找&#10;- 更新 TODO.md 文档标记已完成的功能项&#10;- 添加 CHANGELOG.md 记录版本更新内容&#10;- 更新 README.md 添加新功能说明和快捷键信息&#10;- 项目版本从 0.1.0 升级至 0.2.0" />
     <MESSAGE value="feat(languageserver): 添加类成员支持和实时语义分析功能&#10;&#10;- 实现类成员（方法和属性）的符号表构建和查找功能&#10;- 添加语义分析器支持未定义符号和重复定义检测&#10;- 更新悬停提示显示成员访问修饰符和所属类信息&#10;- 实现成员访问补全（obj.）支持类成员自动提示&#10;- 扩展符号模型支持成员列表、访问修饰符和静态标识&#10;- 添加语义分析单元测试验证符号检测功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(languageserver): 添加类成员支持和实时语义分析功能&#10;&#10;- 实现类成员（方法和属性）的符号表构建和查找功能&#10;- 添加语义分析器支持未定义符号和重复定义检测&#10;- 更新悬停提示显示成员访问修饰符和所属类信息&#10;- 实现成员访问补全（obj.）支持类成员自动提示&#10;- 扩展符号模型支持成员列表、访问修饰符和静态标识&#10;- 添加语义分析单元测试验证符号检测功能" />
+    <MESSAGE value="feat(completion): 实现智能补全功能并添加测试&#10;&#10;- 实现成员访问补全（obj.）功能，支持类成员和变量类型推导&#10;- 添加关键字补全和代码片段补全功能&#10;- 实现符号补全，区分函数、类、变量等不同类型&#10;- 添加智能排序功能，设置补全项优先级&#10;- 为函数和方法补全添加参数占位符支持&#10;- 添加详细的单元测试验证补全功能&#10;- 修复 for-in 关键字拼写错误（from for-in to in）&#10;- 添加调试日志输出便于问题排查" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(completion): 实现智能补全功能并添加测试&#10;&#10;- 实现成员访问补全（obj.）功能，支持类成员和变量类型推导&#10;- 添加关键字补全和代码片段补全功能&#10;- 实现符号补全，区分函数、类、变量等不同类型&#10;- 添加智能排序功能，设置补全项优先级&#10;- 为函数和方法补全添加参数占位符支持&#10;- 添加详细的单元测试验证补全功能&#10;- 修复 for-in 关键字拼写错误（from for-in to in）&#10;- 添加调试日志输出便于问题排查" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
