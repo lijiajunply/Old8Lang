@@ -34,6 +34,13 @@ public class HoverHandler(DocumentManager documentManager) : IHoverHandler
         var line = request.Position.Line;
         var column = request.Position.Character;
         var symbol = Services.SymbolFinder.FindSymbolAtPosition(document, line, column);
+        
+        // Debug: 调试悬停查找
+        System.Diagnostics.Debug.WriteLine($"Hover请求: Line={line}, Column={column}");
+        if (symbol != null)
+        {
+            System.Diagnostics.Debug.WriteLine($"找到符号: Name={symbol.Name}, Type={symbol.Type}, Kind={symbol.Kind}");
+        }
 
         if (symbol == null)
         {
@@ -73,18 +80,35 @@ public class HoverHandler(DocumentManager documentManager) : IHoverHandler
             modifiers.Add("static");
         }
 
-        // 添加类型签名
+        // 构建显示类型 - 优先使用符号名称和类型信息
+        string displayType;
         if (!string.IsNullOrEmpty(symbol.Type))
         {
-            lines.Add("```old8lang");
-            if (modifiers.Count > 0)
+            // 如果没有类型信息，使用符号名称和类型
+            displayType = symbol.Kind switch
             {
-                lines.Add($"// {string.Join(" ", modifiers)}");
-            }
-            lines.Add(symbol.Type);
-            lines.Add("```");
-            lines.Add("");
+                Models.SymbolKind.Variable => $"var {symbol.Name}",
+                Models.SymbolKind.Function => $"func {symbol.Name}",
+                Models.SymbolKind.Class => $"class {symbol.Name}",
+                Models.SymbolKind.Method => $"func {symbol.Name}",
+                Models.SymbolKind.Property => $"{symbol.Name}",
+                _ => symbol.Name
+            };
         }
+        else
+        {
+            displayType = symbol.Type;
+        }
+
+        // 添加类型签名
+        lines.Add("```old8lang");
+        if (modifiers.Count > 0)
+        {
+            lines.Add($"// {string.Join(" ", modifiers)}");
+        }
+        lines.Add(displayType);
+        lines.Add("```");
+        lines.Add("");
 
         // 如果是成员，显示所属类
         if (symbol.Parent != null)

@@ -31,6 +31,9 @@ public class SymbolFinder
 
         var symbolName = tokenAtPosition.Value.Value;
         var tokenIndex = document.Tokens.IndexOf(tokenAtPosition.Value);
+        
+        // Debug: 调试信息
+        System.Diagnostics.Debug.WriteLine($"Hover查找: Line={line}, Column={column}, FoundToken='{symbolName}', TokenType={tokenAtPosition.Value.Type}");
 
         // 2. 检查是否是成员访问（obj.member）
         if (tokenIndex > 1 && document.Tokens[tokenIndex - 1].Type == LangTokenType.Dot)
@@ -46,6 +49,32 @@ public class SymbolFinder
                     if (objectSymbol.Kind == SymbolKind.Class)
                     {
                         if (objectSymbol.Members.TryGetValue(symbolName, out var memberSymbol))
+                        {
+                            return memberSymbol;
+                        }
+                    }
+                    
+                    // 如果对象是变量，尝试推断其类型并查找对应类的成员
+                    if (objectSymbol.Kind == SymbolKind.Variable && !string.IsNullOrEmpty(objectSymbol.Type))
+                    {
+                        // 如果变量的类型是类名，查找该类
+                        if (document.SymbolTable.TryGetValue(objectSymbol.Type, out var classSymbol))
+                        {
+                            if (classSymbol.Members.TryGetValue(symbolName, out var memberSymbol))
+                            {
+                                return memberSymbol;
+                            }
+                        }
+                    }
+                }
+                
+                // 也可能是静态方法调用 MathUtil.add
+                if (objectToken.Type == LangTokenType.Identifier)
+                {
+                    var className = objectToken.Value;
+                    if (document.SymbolTable.TryGetValue(className, out var classSymbol))
+                    {
+                        if (classSymbol.Members.TryGetValue(symbolName, out var memberSymbol))
                         {
                             return memberSymbol;
                         }

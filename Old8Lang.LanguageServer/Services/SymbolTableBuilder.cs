@@ -384,22 +384,47 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null)
     /// </summary>
     private string? InferTypeFromExpression(LangExpression expr)
     {
-        // 函数调用表达式 User()
-        if (expr is FunctionCallExpression funcCall)
+        switch (expr)
         {
-            // 检查函数表达式是否是一个标识符
-            if (funcCall.FunctionExpression is LangId funcId)
-            {
-                var funcName = funcId.IdName;
-                // 如果函数名首字母大写，很可能是类构造函数调用
-                if (!string.IsNullOrEmpty(funcName) && char.IsUpper(funcName[0]))
+            // 函数调用表达式 User()
+            case FunctionCallExpression funcCall:
+                // 检查函数表达式是否是一个标识符
+                if (funcCall.FunctionExpression is LangId funcId)
                 {
-                    return funcName;
+                    var funcName = funcId.IdName;
+                    // 如果函数名首字母大写，很可能是类构造函数调用
+                    if (!string.IsNullOrEmpty(funcName) && char.IsUpper(funcName[0]))
+                    {
+                        return funcName;
+                    }
                 }
-            }
+                break;
+            
+            // 字符串字面量
+            case StringLangValue:
+                return "string";
+            
+            // 整数字面量
+            case IntLangValue:
+                return "int";
+            
+            // 浮点数字面量
+            case DoubleLangValue:
+                return "double";
+            
+            // 布尔字面量
+            case BoolLangValue:
+                return "bool";
+                
+            // 标识符 - 从符号表查找
+            case LangId langId:
+                if (_symbolTable.TryGetValue(langId.IdName, out var refSymbol))
+                {
+                    return refSymbol.Type;
+                }
+                break;
         }
 
-        // 其他情况暂不处理
         return null;
     }
 
