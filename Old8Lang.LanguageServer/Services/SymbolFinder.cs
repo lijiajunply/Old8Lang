@@ -68,7 +68,7 @@ public class SymbolFinder
     /// </summary>
     private static LangToken? FindTokenAtPosition(List<LangToken> tokens, int line, int column)
     {
-        // LSP的行列号从0开始，LangToken的从1开始
+        // LSP的行列号从0开始，LangToken的Line从1开始，Column从1开始
         var targetLine = line + 1;
         var targetColumn = column + 1;
 
@@ -77,8 +77,8 @@ public class SymbolFinder
             // 检查token是否在目标位置
             if (token.Line == targetLine)
             {
-                // 计算token的结束列
-                var tokenEndColumn = token.Column + token.Value.Length;
+                // 计算token的结束列（Column已经是1-based）
+                var tokenEndColumn = token.Column + token.Value.Length - 1;
 
                 if (targetColumn >= token.Column && targetColumn <= tokenEndColumn)
                 {
@@ -113,7 +113,7 @@ public class SymbolFinder
                     Line = token.Line - 1, // 转换为从0开始
                     Column = token.Column - 1, // 转换为从0开始
                     EndLine = token.Line - 1,
-                    EndColumn = token.Column + token.Value.Length - 1
+                    EndColumn = token.Column + token.Value.Length - 2 // 修正结束列计算
                 });
             }
         }

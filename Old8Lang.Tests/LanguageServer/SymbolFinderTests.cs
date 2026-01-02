@@ -37,7 +37,7 @@ result <- testFunction(1, 2)
         };
 
         // Act - Find symbol at function definition
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, 1, 5); // Line 2, column 6 (testFunction)
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, 1, 17); // Line 2, column 18 (testFunction)
 
         // Assert
         Assert.NotNull(symbol);
@@ -74,7 +74,7 @@ result <- testFunction(1, 2)
         };
 
         // Act - Find symbol at function call
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, 5, 9); // Line 6, column 10 (testFunction call)
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, 5, 22); // Line 6, column 23 (testFunction call)
 
         // Assert
         Assert.NotNull(symbol);
@@ -108,7 +108,7 @@ result <- myVariable + 10
         };
 
         // Act - Find symbol at variable definition
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, 1, 0); // Line 2, column 1 (myVariable)
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, 1, 10); // Line 2, column 11 (myVariable)
 
         // Assert
         Assert.NotNull(symbol);
@@ -142,7 +142,7 @@ result <- myVariable + 10
         };
 
         // Act - Find symbol at variable usage
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, 2, 9); // Line 3, column 10 (myVariable usage)
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, 2, 20); // Line 3, column 21 (myVariable usage)
 
         // Assert
         Assert.NotNull(symbol);
@@ -179,7 +179,7 @@ instance <- TestClass()
         };
 
         // Act - Find symbol at class definition
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, 1, 6); // Line 2, column 7 (TestClass)
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, 1, 7); // Line 2, column 8 (TestClass)
 
         // Assert
         Assert.NotNull(symbol);
@@ -314,7 +314,7 @@ result <- undefinedVar + 10
         };
 
         // Act - Try to find undefined symbol
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, 1, 9); // Line 2, column 10 (undefinedVar)
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, 1, 17); // Line 2, column 18 (undefinedVar)
 
         // Assert
         Assert.Null(symbol);
@@ -486,6 +486,33 @@ result <- 42
 
         // Assert
         Assert.Empty(references);
+    }
+
+    [Fact]
+    public void TestDebugTokenPositions()
+    {
+        // Temporary test to understand token positions
+        var code = @"
+func testFunction(a:int, b:int) -> int {
+    return a + b
+}
+
+result <- testFunction(1, 2)
+";
+        var tokens = LangTokenizer.Tokenize(code);
+        
+        testOutputHelper.WriteLine("Code lines:");
+        var lines = code.Split('\n');
+        for (int i = 0; i < lines.Length; i++)
+        {
+            testOutputHelper.WriteLine($"Line {i}: '{lines[i]}'");
+        }
+        
+        testOutputHelper.WriteLine("\nTokens:");
+        foreach (var token in tokens)
+        {
+            testOutputHelper.WriteLine($"Line: {token.Line}, Column: {token.Column}-{token.Column + token.Value.Length - 1}, Type: {token.Type}, Value: '{token.Value}'");
+        }
     }
 
     [Fact]
