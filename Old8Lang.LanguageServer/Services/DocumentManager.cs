@@ -78,6 +78,9 @@ public class DocumentManager
             // 构建符号表
             result.SymbolTable = BuildSymbolTable(ast, uri, tokens);
 
+            // 语义分析
+            PerformSemanticAnalysis(result);
+
             // 如果启用调试模式或性能分析，添加提示
             if (DebugModeEnabled || ProfilingEnabled)
             {
@@ -115,6 +118,26 @@ public class DocumentManager
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// 执行语义分析
+    /// </summary>
+    private void PerformSemanticAnalysis(DocumentParseResult result)
+    {
+        try
+        {
+            var analyzer = new SemanticAnalyzer(result);
+            var semanticDiagnostics = analyzer.Analyze();
+            result.Diagnostics.AddRange(semanticDiagnostics);
+
+            // 检查重复定义
+            analyzer.CheckDuplicateDefinitions();
+        }
+        catch
+        {
+            // 语义分析失败不影响基本功能
+        }
     }
 
     /// <summary>

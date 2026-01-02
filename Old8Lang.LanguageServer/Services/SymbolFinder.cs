@@ -29,8 +29,32 @@ public class SymbolFinder
             return null;
         }
 
-        // 2. 在符号表中查找该标识符
         var symbolName = tokenAtPosition.Value.Value;
+        var tokenIndex = document.Tokens.IndexOf(tokenAtPosition.Value);
+
+        // 2. 检查是否是成员访问（obj.member）
+        if (tokenIndex > 1 && document.Tokens[tokenIndex - 1].Type == LangTokenType.Dot)
+        {
+            // 这是成员访问，查找所属类
+            var objectToken = document.Tokens[tokenIndex - 2];
+            if (objectToken.Type == LangTokenType.Identifier)
+            {
+                // 先查找对象的类型
+                if (document.SymbolTable.TryGetValue(objectToken.Value, out var objectSymbol))
+                {
+                    // 如果对象是一个类，查找其成员
+                    if (objectSymbol.Kind == SymbolKind.Class)
+                    {
+                        if (objectSymbol.Members.TryGetValue(symbolName, out var memberSymbol))
+                        {
+                            return memberSymbol;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 3. 在符号表中查找该标识符（全局符号）
         if (document.SymbolTable.TryGetValue(symbolName, out var symbol))
         {
             return symbol;

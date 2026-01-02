@@ -23,9 +23,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/RenameHandler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SemanticAnalyzer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/HoverHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/HoverHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Models/SymbolInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Models/SymbolInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolFinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolFinder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/TODO.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/TODO.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -69,7 +73,12 @@
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Handlers/DefinitionHandler.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Handlers/DefinitionHandler.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Handlers/DefinitionHandler.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Models/SymbolInfo.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Models/SymbolInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Services/DocumentManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
@@ -573,7 +582,7 @@
       <workItem from="1766997021901" duration="12927000" />
       <workItem from="1767123773418" duration="15798000" />
       <workItem from="1767204141752" duration="12710000" />
-      <workItem from="1767284902325" duration="12925000" />
+      <workItem from="1767284902325" duration="13609000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -918,7 +927,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="504" />
+    <option name="localTasksCounter" value="505" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -945,7 +954,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(runtime): 修复反射调用中的类型转换问题&#10;&#10;- 在 FuncLangValue 中添加类型转换逻辑处理可空类型和类型不匹配情况&#10;- 为 MethodInvokerCache 添加可选参数和可空类型特殊处理支持&#10;- 更新 NetLibTests 中的网络库测试用例和文件路径&#10;- 移除 SerializationLibTests 中的 Protobuf 相关测试&#10;- 在 UnifiedModule 中添加原生类实例化处理逻辑&#10;- 优化 LangValueType 中的 Task 类型检测方法&#10;- 更新 IDE 配置文件中的变更跟踪和任务统计信息" />
     <MESSAGE value="feat(components): 添加按钮组件和组件工厂方法&#10;&#10;- 实现 Button 组件，支持标签、点击事件、图标、样式变体、禁用状态等功能&#10;- 添加 Container 容器组件，支持内边距、外边距、背景色、边框、圆角等样式&#10;- 创建 Row 和 Column 布局组件，支持主轴和交叉轴对齐方式&#10;- 添加 Stack 层叠布局组件，支持子组件层叠放置&#10;- 实现 Image 图片组件，支持本地路径和 URL 图片加载&#10;- 添加 CallbackBridge 回调函数桥接器，管理 Old8Lang 函数和 C# 委托之间的桥接&#10;- 创建组件工厂方法，支持从 Old8Lang 字典配置创建各种组件&#10;- 添加 LayoutHelper 布局辅助工具，统一处理样式应用逻辑&#10;- 重构 FirstUIBinding 类，提供完整的组件创建和主题切换功能&#10;- 优化错误处理，添加堆栈跟踪信息和 UI 线程安全的 Toast 显示" />
     <MESSAGE value="feat(components): 添加高级UI组件实现&#10;&#10;- 实现Card卡片组件，支持标题、副标题、圆角、边框、阴影等属性&#10;- 实现Dialog对话框组件，支持多种类型和自定义内容&#10;- 实现ListView列表视图组件，支持虚拟化滚动和分隔线&#10;- 实现ScrollView滚动容器组件，支持多方向滚动&#10;- 实现TabView选项卡视图组件，支持动态选项卡切换&#10;- 实现Toast消息提示组件，支持多种类型和位置&#10;- 移除旧的组件创建工厂方法和相关依赖引用" />
     <MESSAGE value="feat(ui): 添加面包屑、复选框、网格视图、菜单、分页和弹出框组件&#10;&#10;- 实现 Breadcrumb 面包屑导航组件，支持自定义分隔符、颜色和点击事件&#10;- 实现 Checkbox 复选框组件，支持三态模式和链式调用配置&#10;- 实现 GridView 网格视图组件，支持自定义列数、间距和项构建器&#10;- 实现 Menu 菜单组件，支持垂直/水平方向、子菜单和选中状态&#10;- 实现 Pagination 分页组件，支持首页末页按钮、页码范围和总数显示&#10;- 实现 Popover 弹出框组件，支持多种触发方式和定位选项&#10;- 移除 benchmarks 项目中的冗余文件夹引用" />
@@ -970,7 +978,8 @@
     <MESSAGE value="feat(parser): 添加结构化文档注释解析功能&#10;&#10;- 新增 DocCommentInfo 类用于存储结构化文档注释信息&#10;- 实现多种文档注释风格解析（Google, Sphinx, JavaDoc, 中文等）&#10;- 在函数、异步函数和类中添加文档注释存储属性&#10;- 实现文档注释收集和解析机制&#10;- 支持参数、返回值、异常等结构化信息提取&#10;- 添加文档注释测试用例和示例代码" />
     <MESSAGE value="feat(languageserver): 实现符号表构建和悬停提示功能&#10;&#10;- 将 BlockStatement 中的 ImportStatements 和 OtherStatements 改为公共只读列表&#10;- 修改 DocumentManager 中的 BuildSymbolTable 方法以支持 URI 参数并使用 SymbolTableBuilder&#10;- 实现 SymbolTableBuilder 类用于遍历 AST 构建符号表，支持函数、异步函数、类和变量&#10;- 创建 SymbolFinder 服务用于根据位置查找符号和引用位置&#10;- 完善 HoverHandler 实现符号悬停提示，包括类型签名和文档注释显示&#10;- 添加符号表构建和查找功能的完整实现，支持文档注释格式化为 Markdown" />
     <MESSAGE value="feat(languageserver): 实现跳转到定义功能&#10;&#10;- 在 DefinitionHandler 中实现符号定义查找逻辑&#10;- 添加光标位置获取和符号查找功能&#10;- 构建准确的定义位置信息并返回&#10;- 更新 SymbolTableBuilder 构造函数以接收 tokens 参数&#10;- 实现基于 token 的符号位置查找机制&#10;- 添加 FindSymbolLocationFromTokens 方法支持函数和类定义定位&#10;- 创建 TODO.md 文档记录后续开发计划和功能状态&#10;- 更新项目配置文件中的变更跟踪信息" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(languageserver): 实现跳转到定义功能&#10;&#10;- 在 DefinitionHandler 中实现符号定义查找逻辑&#10;- 添加光标位置获取和符号查找功能&#10;- 构建准确的定义位置信息并返回&#10;- 更新 SymbolTableBuilder 构造函数以接收 tokens 参数&#10;- 实现基于 token 的符号位置查找机制&#10;- 添加 FindSymbolLocationFromTokens 方法支持函数和类定义定位&#10;- 创建 TODO.md 文档记录后续开发计划和功能状态&#10;- 更新项目配置文件中的变更跟踪信息" />
+    <MESSAGE value="feat(langserver): 添加查找引用和重命名符号功能&#10;&#10;- 实现 ReferencesHandler 支持查找符号的所有引用位置&#10;- 实现 RenameHandler 支持重命名符号并自动更新所有引用&#10;- 在 SymbolFinder 中添加 FindReferences 方法用于符号引用查找&#10;- 更新 TODO.md 文档标记已完成的功能项&#10;- 添加 CHANGELOG.md 记录版本更新内容&#10;- 更新 README.md 添加新功能说明和快捷键信息&#10;- 项目版本从 0.1.0 升级至 0.2.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(langserver): 添加查找引用和重命名符号功能&#10;&#10;- 实现 ReferencesHandler 支持查找符号的所有引用位置&#10;- 实现 RenameHandler 支持重命名符号并自动更新所有引用&#10;- 在 SymbolFinder 中添加 FindReferences 方法用于符号引用查找&#10;- 更新 TODO.md 文档标记已完成的功能项&#10;- 添加 CHANGELOG.md 记录版本更新内容&#10;- 更新 README.md 添加新功能说明和快捷键信息&#10;- 项目版本从 0.1.0 升级至 0.2.0" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

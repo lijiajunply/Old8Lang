@@ -1,6 +1,8 @@
 using Old8Lang.AST;
 using Old8Lang.AST.Statement;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.AnyValues;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.LanguageServer.Models;
 using Old8Lang.LangParser;
 
@@ -188,7 +190,7 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null)
             documentation = FormatDocComment(typeTemplate.DocComment);
         }
 
-        _symbolTable[className] = new SymbolInfo
+        var classSymbol = new SymbolInfo
         {
             Name = className,
             Kind = SymbolKind.Class,
@@ -197,7 +199,145 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null)
             Documentation = documentation
         };
 
-        // TODO: 访问类的成员（方法、属性）
+        _symbolTable[className] = classSymbol;
+
+        // 访问类的成员（方法、属性）
+        VisitClassMembers(classSymbol, typeTemplate);
+    }
+
+    /// <summary>
+    /// 访问类的成员（方法和属性）
+    /// </summary>
+    private void VisitClassMembers(SymbolInfo classSymbol, TypeTemplate typeTemplate)
+    {
+        // 访问实例成员
+        foreach (var (memberId, memberExpr) in typeTemplate.Variates)
+        {
+            if (memberExpr is FuncLangValue funcValue)
+            {
+                // 方法
+                var memberSymbol = CreateMethodSymbol(memberId, funcValue, isStatic: false);
+                memberSymbol.Parent = classSymbol;
+                classSymbol.Members[memberId.IdName] = memberSymbol;
+            }
+            else
+            {
+                // 属性/字段
+                var memberSymbol = CreatePropertySymbol(memberId, memberExpr, isStatic: false);
+                memberSymbol.Parent = classSymbol;
+                classSymbol.Members[memberId.IdName] = memberSymbol;
+            }
+        }
+
+        // 访问静态成员
+        foreach (var (memberId, memberExpr) in typeTemplate.StaticVariates)
+        {
+            if (memberExpr is FuncLangValue funcValue)
+            {
+                // 静态方法
+                var memberSymbol = CreateMethodSymbol(memberId, funcValue, isStatic: true);
+                memberSymbol.Parent = classSymbol;
+                classSymbol.Members[memberId.IdName] = memberSymbol;
+            }
+            else
+            {
+                // 静态属性/字段
+                var memberSymbol = CreatePropertySymbol(memberId, memberExpr, isStatic: true);
+                memberSymbol.Parent = classSymbol;
+                classSymbol.Members[memberId.IdName] = memberSymbol;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 创建方法符号信息
+    /// </summary>
+    private SymbolInfo CreateMethodSymbol(ClassMemberId memberId, FuncLangValue funcValue, bool isStatic)
+    {
+        var methodName = memberId.IdName;
+
+        // 查找方法定义位置
+        var tokenLocation = FindSymbolLocationFromTokens(methodName, LangTokenType.Func);
+        var location = tokenLocation ?? new SourceLocation
+        {
+            Uri = uri,
+            Line = funcValue.Position.Line,
+            Column = funcValue.Position.Column,
+            EndLine = funcValue.Position.Line,
+            EndColumn = funcValue.Position.Column + methodName.Length
+        };
+
+        // 构建方法签名
+        var paramList = funcValue.Ids != null
+            ? string.Join(", ",
+                funcValue.Ids.Select(p =>
+                    $"{p.IdName}{(string.IsNullOrEmpty(p.AssumptionType) ? "" : ":" + p.AssumptionType)}"))
+            : "";
+        var returnType = funcValue.Id?.AssumptionType ?? "void";
+        var staticKeyword = isStatic ? "static " : "";
+        var methodSignature = $"{staticKeyword}func {methodName}({paramList}) -> {returnType}";
+
+        // 提取方法文档注释
+        string? documentation = null;
+        if (funcValue.DocComment != null)
+        {
+            documentation = FormatDocComment(funcValue.DocComment);
+        }
+
+        // 确定访问修饰符
+        var accessModifier = AccessModifier.Public;
+        if (memberId.HasModifier(AccessModifierType.Private))
+            accessModifier = AccessModifier.Private;
+        else if (memberId.HasModifier(AccessModifierType.Protected))
+            accessModifier = AccessModifier.Protected;
+
+        return new SymbolInfo
+        {
+            Name = methodName,
+            Kind = SymbolKind.Method,
+            Type = methodSignature,
+            Location = location,
+            Documentation = documentation,
+            AccessModifier = accessModifier,
+            IsStatic = isStatic
+        };
+    }
+
+    /// <summary>
+    /// 创建属性符号信息
+    /// </summary>
+    private SymbolInfo CreatePropertySymbol(ClassMemberId memberId, LangExpression memberExpr, bool isStatic)
+    {
+        var propertyName = memberId.IdName;
+
+        var location = new SourceLocation
+        {
+            Uri = uri,
+            Line = memberExpr.Position.Line,
+            Column = memberExpr.Position.Column,
+            EndLine = memberExpr.Position.Line,
+            EndColumn = memberExpr.Position.Column + propertyName.Length
+        };
+
+        var propertyType = memberId.AssumptionType ?? "var";
+        var staticKeyword = isStatic ? "static " : "";
+
+        // 确定访问修饰符
+        var accessModifier = AccessModifier.Public;
+        if (memberId.HasModifier(AccessModifierType.Private))
+            accessModifier = AccessModifier.Private;
+        else if (memberId.HasModifier(AccessModifierType.Protected))
+            accessModifier = AccessModifier.Protected;
+
+        return new SymbolInfo
+        {
+            Name = propertyName,
+            Kind = SymbolKind.Property,
+            Type = $"{staticKeyword}{propertyType}",
+            Location = location,
+            AccessModifier = accessModifier,
+            IsStatic = isStatic
+        };
     }
 
     /// <summary>

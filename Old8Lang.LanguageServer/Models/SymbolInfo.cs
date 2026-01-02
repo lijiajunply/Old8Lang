@@ -34,6 +34,27 @@ public class SymbolInfo
     /// 符号的引用位置列表
     /// </summary>
     public List<SourceLocation> References { get; set; } = new();
+
+    /// <summary>
+    /// 成员列表（仅对类有效）
+    /// 存储类的方法和属性
+    /// </summary>
+    public Dictionary<string, SymbolInfo> Members { get; set; } = new();
+
+    /// <summary>
+    /// 父符号（用于成员追溯到所属类）
+    /// </summary>
+    public SymbolInfo? Parent { get; set; }
+
+    /// <summary>
+    /// 访问修饰符
+    /// </summary>
+    public AccessModifier AccessModifier { get; set; } = AccessModifier.Public;
+
+    /// <summary>
+    /// 是否为静态成员
+    /// </summary>
+    public bool IsStatic { get; set; }
 }
 
 /// <summary>
@@ -60,4 +81,14 @@ public class SourceLocation
     public required int Column { get; set; }
     public int EndLine { get; set; }
     public int EndColumn { get; set; }
+}
+
+/// <summary>
+/// 访问修饰符
+/// </summary>
+public enum AccessModifier
+{
+    Public,
+    Private,
+    Protected
 }

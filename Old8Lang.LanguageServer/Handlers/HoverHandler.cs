@@ -62,12 +62,34 @@ public class HoverHandler(DocumentManager documentManager) : IHoverHandler
     {
         var lines = new List<string>();
 
+        // 添加访问修饰符和static标记
+        var modifiers = new List<string>();
+        if (symbol.AccessModifier != Models.AccessModifier.Public)
+        {
+            modifiers.Add(symbol.AccessModifier.ToString().ToLower());
+        }
+        if (symbol.IsStatic)
+        {
+            modifiers.Add("static");
+        }
+
         // 添加类型签名
         if (!string.IsNullOrEmpty(symbol.Type))
         {
             lines.Add("```old8lang");
+            if (modifiers.Count > 0)
+            {
+                lines.Add($"// {string.Join(" ", modifiers)}");
+            }
             lines.Add(symbol.Type);
             lines.Add("```");
+            lines.Add("");
+        }
+
+        // 如果是成员，显示所属类
+        if (symbol.Parent != null)
+        {
+            lines.Add($"*属于类: `{symbol.Parent.Name}`*");
             lines.Add("");
         }
 
