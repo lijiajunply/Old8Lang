@@ -86,13 +86,50 @@ public class ReferencesHandler : IReferencesHandler
         var uri = request.TextDocument.Uri.ToString();
         var document = _documentManager.GetDocument(uri);
 
-        if (document?.SymbolTable == null)
+        if (document?.SymbolTable == null || document.Tokens == null)
         {
             return Task.FromResult<LocationContainer?>(null);
         }
 
-        // TODO: 实现根据位置查找符号引用的逻辑
+        // 获取光标位置
+        var line = request.Position.Line;
+        var column = request.Position.Character;
+
+        // 查找光标位置的符号
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, line, column);
+
+        if (symbol == null)
+        {
+            return Task.FromResult<LocationContainer?>(null);
+        }
+
+        // 查找该符号的所有引用
+        var references = SymbolFinder.FindReferences(document, symbol.Name);
+
+        // 转换为 LSP Location 格式
         var locations = new List<Location>();
+
+        foreach (var reference in references)
+        {
+            // 根据 request.Context.IncludeDeclaration 决定是否包含定义位置
+            bool isDefinition = reference.Line == symbol.Location.Line &&
+                               reference.Column == symbol.Location.Column;
+
+            if (isDefinition && !request.Context.IncludeDeclaration)
+            {
+                continue; // 跳过定义位置
+            }
+
+            locations.Add(new Location
+            {
+                Uri = reference.Uri,
+                Range = new OmniSharp.Extensions.LanguageServer.Protocol.Models.Range
+                {
+                    Start = new Position(reference.Line, reference.Column),
+                    End = new Position(reference.EndLine, reference.EndColumn)
+                }
+            });
+        }
 
         return Task.FromResult<LocationContainer?>(new LocationContainer(locations));
     }
