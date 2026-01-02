@@ -33,7 +33,7 @@ result2 <- testFunction()
         var request = new RenameParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(1, 5), // testFunction 定义位置
+            Position = new Position(1, 17), // testFunction 定义位置 (based on symbol table)
             NewName = "newFunctionName"
         };
 
@@ -56,9 +56,9 @@ result2 <- testFunction()
 
         // 验证编辑位置覆盖了所有的 testFunction
         var positions = textEdits.Select(e => (e.Range.Start.Line, e.Range.Start.Character)).ToList();
-        Assert.Contains((1, 5), positions); // 定义位置
-        Assert.Contains((5, 10), positions); // 第一个调用
-        Assert.Contains((6, 10), positions); // 第二个调用
+        Assert.Contains((1, 17), positions); // 定义位置
+        Assert.Contains((5, 23), positions); // 第一个调用
+        Assert.Contains((6, 23), positions); // 第二个调用
     }
 
     [Fact]
@@ -80,7 +80,7 @@ result2 <- myVariable * 2
         var request = new RenameParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(1, 0), // myVariable 定义位置
+            Position = new Position(2, 11), // myVariable 定义位置
             NewName = "newVariableName"
         };
 
