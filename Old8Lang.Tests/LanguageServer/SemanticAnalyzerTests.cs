@@ -3,10 +3,11 @@ using Old8Lang.LangParser;
 using Old8Lang.LanguageServer.Services;
 using Old8Lang.LanguageServer.Models;
 using System.Collections.Generic;
+using Xunit.Abstractions;
 
 namespace Old8Lang.Tests.LanguageServer;
 
-public class SemanticAnalyzerTests
+public class SemanticAnalyzerTests(ITestOutputHelper testOutputHelper)
 {
     [Fact]
     public void TestUndefinedSymbolDetection()
@@ -101,10 +102,11 @@ func foo() -> int {
         var symbolTable = symbolTableBuilder.Build(ast);
 
         // Debug: 打印符号表内容
-        System.Console.WriteLine($"Symbol Table Count: {symbolTable.Count}");
+        testOutputHelper.WriteLine($"Symbol Table Count: {symbolTable.Count}");
         foreach (var (name, symbol) in symbolTable)
         {
-            System.Console.WriteLine($"  {name}: {symbol.Kind} at Line {symbol.Location.Line}, Col {symbol.Location.Column}");
+            testOutputHelper.WriteLine(
+                $"  {name}: {symbol.Kind} at Line {symbol.Location.Line}, Col {symbol.Location.Column}");
         }
 
         var document = new DocumentParseResult
@@ -124,10 +126,10 @@ func foo() -> int {
         analyzer.CheckDuplicateDefinitions();
 
         // Debug: 打印诊断信息
-        System.Console.WriteLine($"Diagnostics Count: {document.Diagnostics.Count}");
+        testOutputHelper.WriteLine($"Diagnostics Count: {document.Diagnostics.Count}");
         foreach (var diag in document.Diagnostics)
         {
-            System.Console.WriteLine($"  {diag.Message}");
+            testOutputHelper.WriteLine($"  {diag.Message}");
         }
 
         // Assert
@@ -135,7 +137,7 @@ func foo() -> int {
         // 所以重复定义检测可能无法工作
         // 让我们先检查符号表的行为
         var fooCount = symbolTable.Count(s => s.Key == "foo");
-        System.Console.WriteLine($"foo count in symbol table: {fooCount}");
+        testOutputHelper.WriteLine($"foo count in symbol table: {fooCount}");
 
         if (fooCount > 1)
         {

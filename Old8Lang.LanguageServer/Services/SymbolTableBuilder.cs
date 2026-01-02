@@ -3,6 +3,7 @@ using Old8Lang.AST.Statement;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.LanguageServer.Models;
 using Old8Lang.LangParser;
 
@@ -357,7 +358,17 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null)
             EndColumn = setStatement.Position.Column
         };
 
-        var varType = setStatement.Id.AssumptionType ?? "var";
+        // 尝试推断类型
+        var varType = setStatement.Id.AssumptionType;
+
+        // 如果没有显式类型标注，尝试从赋值表达式推断
+        if (string.IsNullOrEmpty(varType))
+        {
+            varType = InferTypeFromExpression(setStatement.Value);
+        }
+
+        // 如果仍然无法推断，使用 "var"
+        varType ??= "var";
 
         _symbolTable[varName] = new SymbolInfo
         {
@@ -366,6 +377,30 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null)
             Type = varType,
             Location = location
         };
+    }
+
+    /// <summary>
+    /// 从表达式推断类型
+    /// </summary>
+    private string? InferTypeFromExpression(LangExpression expr)
+    {
+        // 函数调用表达式 User()
+        if (expr is FunctionCallExpression funcCall)
+        {
+            // 检查函数表达式是否是一个标识符
+            if (funcCall.FunctionExpression is LangId funcId)
+            {
+                var funcName = funcId.IdName;
+                // 如果函数名首字母大写，很可能是类构造函数调用
+                if (!string.IsNullOrEmpty(funcName) && char.IsUpper(funcName[0]))
+                {
+                    return funcName;
+                }
+            }
+        }
+
+        // 其他情况暂不处理
+        return null;
     }
 
     /// <summary>

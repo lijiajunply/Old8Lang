@@ -39,12 +39,12 @@ func add(a:int, b:int) -> int {
         // 获取函数定义
         var funcInit = program.GetImportStatement(0) as FuncInit;
         Assert.NotNull(funcInit);
-        Assert.NotNull(funcInit!.FuncLangValue);
+        Assert.NotNull(funcInit.FuncLangValue);
 
         // 验证文档注释
         var docComment = funcInit.FuncLangValue.DocComment;
         Assert.NotNull(docComment);
-        Assert.Equal("Calculate the sum of two numbers", docComment!.Summary);
+        Assert.Equal("Calculate the sum of two numbers", docComment.Summary);
 
         // 验证参数文档
         Assert.Equal(2, docComment.Parameters.Count);
@@ -88,11 +88,11 @@ func divide(numerator:double, denominator:double) -> double {
 
         var funcInit = program.GetImportStatement(0) as FuncInit;
         Assert.NotNull(funcInit);
-        Assert.NotNull(funcInit!.FuncLangValue);
+        Assert.NotNull(funcInit.FuncLangValue);
 
         var docComment = funcInit.FuncLangValue.DocComment;
         Assert.NotNull(docComment);
-        Assert.Equal("Divide two numbers", docComment!.Summary);
+        Assert.Equal("Divide two numbers", docComment.Summary);
 
         // 验证参数文档
         Assert.Equal(2, docComment.Parameters.Count);
@@ -133,11 +133,11 @@ func concat(str1:string, str2:string) -> string {
 
         var funcInit = program.GetImportStatement(0) as FuncInit;
         Assert.NotNull(funcInit);
-        Assert.NotNull(funcInit!.FuncLangValue);
+        Assert.NotNull(funcInit.FuncLangValue);
 
         var docComment = funcInit.FuncLangValue.DocComment;
         Assert.NotNull(docComment);
-        Assert.Equal("Concatenate two strings", docComment!.Summary);
+        Assert.Equal("Concatenate two strings", docComment.Summary);
 
         // 验证参数文档
         Assert.Equal(2, docComment.Parameters.Count);
@@ -177,11 +177,11 @@ func calculateCircleArea(radius:double) -> double {
 
         var funcInit = program.GetImportStatement(0) as FuncInit;
         Assert.NotNull(funcInit);
-        Assert.NotNull(funcInit!.FuncLangValue);
+        Assert.NotNull(funcInit.FuncLangValue);
 
         var docComment = funcInit.FuncLangValue.DocComment;
         Assert.NotNull(docComment);
-        Assert.Equal("计算圆的面积", docComment!.Summary);
+        Assert.Equal("计算圆的面积", docComment.Summary);
 
         // 验证参数文档
         Assert.Single(docComment.Parameters);
@@ -216,14 +216,14 @@ async func delay(milliseconds:int) {
 
         var asyncFuncInit = program.GetImportStatement(0) as AsyncFuncInit;
         Assert.NotNull(asyncFuncInit);
-        Assert.NotNull(asyncFuncInit!.AsyncFuncValue);
+        Assert.NotNull(asyncFuncInit.AsyncFuncValue);
 
         var asyncFunc = asyncFuncInit.AsyncFuncValue;
         Assert.NotNull(asyncFunc);
 
         var docComment = asyncFunc.DocComment;
         Assert.NotNull(docComment);
-        Assert.Equal("Asynchronous delay function", docComment!.Summary);
+        Assert.Equal("Asynchronous delay function", docComment.Summary);
 
         // 验证参数文档
         Assert.Single(docComment.Parameters);
@@ -257,14 +257,14 @@ class Calculator {
 
         var classInit = program.GetImportStatement(0) as ClassInit;
         Assert.NotNull(classInit);
-        Assert.NotNull(classInit!.AnyLangValue);
+        Assert.NotNull(classInit.AnyLangValue);
 
         var typeTemplate = classInit.AnyLangValue;
         Assert.NotNull(typeTemplate);
 
         var docComment = typeTemplate.DocComment;
         Assert.NotNull(docComment);
-        Assert.Equal("A simple calculator class", docComment!.Summary);
+        Assert.Equal("A simple calculator class", docComment.Summary);
 
         // 验证参数文档（虽然类不应该有参数，但我们测试解析器能否处理）
         Assert.Single(docComment.Parameters);
@@ -290,7 +290,7 @@ func add(a:int, b:int) -> int {
 
         var funcInit = program.GetImportStatement(0) as FuncInit;
         Assert.NotNull(funcInit);
-        Assert.NotNull(funcInit!.FuncLangValue);
+        Assert.NotNull(funcInit.FuncLangValue);
 
         // 验证没有文档注释时返回 null
         var docComment = funcInit.FuncLangValue.DocComment;
@@ -318,13 +318,13 @@ func add(a:int, b:int) -> int {
 
         var funcInit = program.GetImportStatement(0) as FuncInit;
         Assert.NotNull(funcInit);
-        Assert.NotNull(funcInit!.FuncLangValue);
+        Assert.NotNull(funcInit.FuncLangValue);
 
         var docComment = funcInit.FuncLangValue.DocComment;
         Assert.NotNull(docComment);
 
         // 默认风格应该将所有内容作为摘要
-        Assert.Contains("simple function", docComment!.Summary);
+        Assert.Contains("simple function", docComment.Summary);
         Assert.Contains("adds two numbers", docComment.Summary);
 
         // 没有结构化的参数和返回值信息
