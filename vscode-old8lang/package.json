@@ -2,7 +2,7 @@
   "name": "old8lang",
   "displayName": "Old8Lang",
   "description": "Old8Lang 语言支持",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "old8lang",
   "engines": {
     "vscode": "^1.75.0"

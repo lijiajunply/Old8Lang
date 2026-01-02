@@ -22,6 +22,7 @@ class Program
                 .WithHandler<CompletionHandler>()
                 .WithHandler<DefinitionHandler>()
                 .WithHandler<ReferencesHandler>()
+                .WithHandler<RenameHandler>()
                 .WithHandler<HoverHandler>()
                 // Debug and Profiler Handlers
                 .WithHandler<StartProfilingHandler>()

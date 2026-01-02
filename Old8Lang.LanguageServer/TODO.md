@@ -11,20 +11,21 @@
 - **文档同步（TextDocumentSyncHandler）**: 文件打开、编辑、关闭事件处理
 - **悬停提示（HoverHandler）**: 鼠标悬停显示符号信息和文档注释
 - **跳转到定义（DefinitionHandler）**: 从符号使用位置跳转到定义位置
+- **查找引用（ReferencesHandler）**: 查找符号的所有引用位置，支持包含/排除定义
+- **重命名符号（RenameHandler）**: 重命名符号并自动更新所有引用位置
 - **自动补全（CompletionHandler）**: 关键字和符号补全（基础实现）
 - **符号表构建（SymbolTableBuilder）**: 支持函数、异步函数、类、变量
-- **符号查找（SymbolFinder）**: 基于位置的符号查找
+- **符号查找（SymbolFinder）**: 基于位置的符号查找和引用查找
 - **文档管理（DocumentManager）**: 文档解析、缓存、诊断信息管理
 - **调试和性能分析（DebugProfilerHandler）**: 启用/禁用调试模式和性能分析
 - **Token-Based Location Finding**: 通过token列表获取准确的符号位置（解决AST Position不准确问题）
 
 ### 🔧 部分实现功能
 
-- **查找引用（ReferencesHandler）**: Handler已创建，但逻辑未实现（DefinitionHandler.cs:94-98）
+（无）
 
 ### ❌ 未实现功能
 
-- 重命名符号（Rename）
 - 代码格式化（Formatting）
 - 代码操作（Code Actions）
 - 文档符号（Document Symbols）
@@ -43,32 +44,46 @@
 
 ### P0 - 核心功能（高优先级）
 
-#### 1. 实现查找引用功能（Find All References）
-**文件**: `Old8Lang.LanguageServer/Handlers/DefinitionHandler.cs:84-98`
+#### ~~1. 实现查找引用功能（Find All References）~~ ✅ 已完成
+**文件**: `Old8Lang.LanguageServer/Handlers/DefinitionHandler.cs:84-135`
 
-**当前状态**:
-```csharp
-public Task<LocationContainer?> Handle(ReferenceParams request, CancellationToken cancellationToken)
-{
-    // TODO: 实现根据位置查找符号引用的逻辑
-    var locations = new List<Location>();
-    return Task.FromResult<LocationContainer?>(new LocationContainer(locations));
-}
-```
+**完成状态**:
+- [x] 在 `SymbolFinder` 中实现 `FindReferences(document, symbolName)` 方法
+- [x] 遍历所有 tokens，查找指定符号名的所有使用位置
+- [x] 区分定义位置和引用位置（支持 `IncludeDeclaration` 参数）
+- [x] 实现 `ReferencesHandler.Handle` 方法
+- [x] 添加测试程序验证功能
 
-**实现任务**:
-- [ ] 在 `SymbolFinder` 中实现 `FindAllReferences(document, symbolName)` 方法
-- [ ] 遍历所有 tokens，查找指定符号名的所有使用位置
-- [ ] 区分定义位置和引用位置（可选：是否包含定义）
-- [ ] 支持跨文件查找引用（需要 WorkspaceManager）
-- [ ] 处理同名符号的作用域问题（当前符号表是全局的，需要考虑局部变量）
-- [ ] 添加单元测试
+**已知限制**:
+- 不支持跨文件查找引用（需要 WorkspaceManager）
+- 不支持作用域区分（局部变量与全局变量同名问题）
+- 类成员（属性、方法）暂不支持（符号表未索引类成员）
 
-**预期效果**: 用户可以右键点击符号，选择"查找所有引用"，看到该符号在代码中的所有使用位置。
+**测试结果**: 所有测试场景通过（函数、类、变量引用查找）
 
 ---
 
-#### 2. 完善符号表 - 支持类成员（Methods & Properties）
+#### ~~2. 实现重命名（Rename Symbol）~~ ✅ 已完成
+**文件**: `Old8Lang.LanguageServer/Handlers/RenameHandler.cs`
+
+**完成状态**:
+- [x] 实现 `IRenameHandler` 接口
+- [x] 调用 `SymbolFinder.FindReferences()` 查找所有引用
+- [x] 生成 `WorkspaceEdit`，包含所有需要修改的位置
+- [x] 注册到 Language Server
+- [x] 添加测试程序验证功能
+
+**已知限制**:
+- 不支持跨文件重命名（需要 WorkspaceManager）
+- 不验证新名称的合法性（可能与其他符号冲突）
+- 不支持预览重命名（Prepare Rename）
+- 类成员（属性、方法）暂不支持
+
+**测试结果**: 所有测试场景通过（函数、类、变量重命名）
+
+---
+
+#### 3. 完善符号表 - 支持类成员（Methods & Properties）
 **文件**: `Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs:197`
 
 **当前状态**:
@@ -89,7 +104,7 @@ public Task<LocationContainer?> Handle(ReferenceParams request, CancellationToke
 
 ---
 
-#### 3. 实现实时诊断（Diagnostics）
+#### 4. 实现实时诊断（Diagnostics）
 **文件**: 新建 `Old8Lang.LanguageServer/Handlers/DiagnosticHandler.cs`
 
 **当前状态**:
@@ -112,7 +127,7 @@ public Task<LocationContainer?> Handle(ReferenceParams request, CancellationToke
 
 ---
 
-#### 4. 改进自动补全（Code Completion）
+#### 5. 改进自动补全（Code Completion）
 **文件**: `Old8Lang.LanguageServer/Handlers/CompletionHandler.cs`
 
 **当前状态**: 仅支持关键字和全局符号补全
@@ -134,22 +149,6 @@ public Task<LocationContainer?> Handle(ReferenceParams request, CancellationToke
 - [ ] 添加单元测试
 
 **预期效果**: 智能、上下文感知的代码补全，提升开发效率。
-
----
-
-#### 5. 实现重命名（Rename Symbol）
-**文件**: 新建 `Old8Lang.LanguageServer/Handlers/RenameHandler.cs`
-
-**实现任务**:
-- [ ] 实现 `IRenameHandler` 接口
-- [ ] 调用 `SymbolFinder.FindAllReferences()` 查找所有引用
-- [ ] 生成 `WorkspaceEdit`，包含所有需要修改的位置
-- [ ] 支持跨文件重命名（需要 WorkspaceManager）
-- [ ] 验证新名称的合法性（不与其他符号冲突）
-- [ ] 支持预览重命名（Prepare Rename）
-- [ ] 添加单元测试
-
-**预期效果**: 用户可以右键点击符号，选择"重命名"，所有引用位置会同时更新。
 
 ---
 
@@ -528,5 +527,5 @@ func bar() -> void {
 
 ---
 
-**最后更新**: 2026-01-02
+**最后更新**: 2026-01-02 (已完成查找引用和重命名功能)
 **维护者**: Old8Lang Team
