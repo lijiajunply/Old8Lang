@@ -1,0 +1,73 @@
+// 测试自定义可释放类
+
+class FileHandle {
+    path <- ""
+    isOpen <- true
+
+    func init(path) {
+        this.path <- path
+        PrintLine("打开文件: " + path)
+    }
+
+    func write(content) {
+        if this.isOpen == false {
+            throw "文件已关闭"
+        }
+        PrintLine("写入内容: " + content)
+    }
+
+    func dispose() {
+        if this.isOpen {
+            this.isOpen <- false
+            PrintLine("关闭文件: " + this.path)
+        }
+    }
+}
+
+// 测试 1: 基本用法
+PrintLine("=== 测试 1: 基本用法 ===")
+using handle <- FileHandle("/tmp/test.txt") {
+    handle.write("Hello, World!")
+    if handle.isOpen {
+        PrintLine("文件状态: 打开")
+    } else {
+        PrintLine("文件状态: 关闭")
+    }
+}
+PrintLine("离开 using 块后，文件应该已关闭")
+PrintLine("")
+
+// 测试 2: 异常情况下也会调用 dispose
+PrintLine("=== 测试 2: 异常情况 ===")
+try {
+    using handle <- FileHandle("/tmp/test2.txt") {
+        handle.write("Some content")
+        throw "模拟错误"
+    }
+} catch (e) {
+    PrintLine("捕获异常: " + e.ToStr())
+}
+PrintLine("即使发生异常，dispose 也应该被调用")
+PrintLine("")
+
+// 测试 3: 嵌套 using
+PrintLine("=== 测试 3: 嵌套 using ===")
+using handle1 <- FileHandle("/tmp/file1.txt") {
+    using handle2 <- FileHandle("/tmp/file2.txt") {
+        PrintLine("两个文件都已打开")
+    }
+    PrintLine("file2 已关闭，file1 仍然打开")
+}
+PrintLine("所有文件都已关闭")
+PrintLine("")
+
+// 测试 4: 没有 dispose 方法的类
+PrintLine("=== 测试 4: 没有 dispose 方法的类 ===")
+class SimpleClass {
+    value <- 123
+}
+
+using obj <- SimpleClass() {
+    PrintLine("Value: " + obj.value.ToStr())
+}
+PrintLine("没有 dispose 方法的类也可以在 using 中使用（不会报错）")

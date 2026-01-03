@@ -111,7 +111,7 @@ public static class CharValueFuncStatic
         /// <returns>字符的整数值</returns>
         public IntLangValue ToInt()
         {
-            return IntLangValue.Create((int)charValue.Value);
+            return IntLangValue.Create(charValue.Value);
         }
 
         /// <summary>

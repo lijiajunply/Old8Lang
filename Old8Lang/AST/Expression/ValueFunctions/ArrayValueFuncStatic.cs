@@ -125,7 +125,7 @@ public static class ArrayValueFuncStatic
             {
                 if (items[i].Less(items[i - 1]))
                 {
-                    return new BoolLangValue(false);
+                    return new BoolLangValue();
                 }
             }
             return new BoolLangValue(true);

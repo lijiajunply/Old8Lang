@@ -91,7 +91,7 @@ public static class ListValueFuncStatic
         /// <summary>
         /// 使用自定义比较函数对列表进行排序
         /// </summary>
-        /// <param name="comparer">比较函数，接受两个元素，返回负数（a<b）、0（a==b）或正数（a>b）</param>
+        /// <param name="comparer">比较函数，接受两个元素，返回负数（a&lt;b）、0（a==b）或正数（a>b）</param>
         /// <returns>排序后的新列表</returns>
         public ListLangValue Sort(FuncLangValue comparer)
         {
@@ -180,6 +180,7 @@ public static class ListValueFuncStatic
                     return new BoolLangValue(false);
                 }
             }
+
             return new BoolLangValue(true);
         }
 
@@ -197,7 +198,7 @@ public static class ListValueFuncStatic
                 var manager = new VariateManager();
 
                 // 执行谓词函数
-                var result = predicate.Run(manager, new List<LangExpression> { item });
+                var result = predicate.Run(manager, [item]);
 
                 // 如果结果为真，则保留该元素
                 if (result is BoolLangValue { Value: true })
@@ -223,7 +224,7 @@ public static class ListValueFuncStatic
                 var manager = new VariateManager();
 
                 // 执行转换函数
-                var result = transform.Run(manager, new List<LangExpression> { item });
+                var result = transform.Run(manager, [item]);
                 mapped.Add(result);
             }
 
@@ -245,7 +246,7 @@ public static class ListValueFuncStatic
                 var manager = new VariateManager();
 
                 // 执行归约函数
-                accumulator = reducer.Run(manager, new List<LangExpression> { accumulator, item });
+                accumulator = reducer.Run(manager, [accumulator, item]);
             }
 
             return accumulator;
@@ -320,7 +321,7 @@ public static class ListValueFuncStatic
             {
                 var manager = new VariateManager();
 
-                result = accumulator.Run(manager, new List<LangExpression> { result, langValue.Values[i] });
+                result = accumulator.Run(manager, [result, langValue.Values[i]]);
             }
 
             return result;
@@ -335,11 +336,11 @@ public static class ListValueFuncStatic
         public LangValueType Aggregate(FuncLangValue accumulator, LangValueType seed)
         {
             var result = seed;
-            for (var i = 0; i < langValue.Values.Count; i++)
+            foreach (var t in langValue.Values)
             {
                 var manager = new VariateManager();
 
-                result = accumulator.Run(manager, new List<LangExpression> { result, langValue.Values[i] });
+                result = accumulator.Run(manager, [result, t]);
             }
 
             return result;
@@ -356,7 +357,7 @@ public static class ListValueFuncStatic
             {
                 var manager = new VariateManager();
 
-                var result = predicate.Run(manager, new List<LangExpression> { item });
+                var result = predicate.Run(manager, [item]);
                 if (result is BoolLangValue { Value: true })
                 {
                     return item;
@@ -389,7 +390,7 @@ public static class ListValueFuncStatic
             {
                 var manager = new VariateManager();
 
-                var result = predicate.Run(manager, new List<LangExpression> { item });
+                var result = predicate.Run(manager, [item]);
                 if (result is BoolLangValue { Value: true })
                 {
                     return new BoolLangValue(true);
@@ -430,15 +431,11 @@ public static class ListValueFuncStatic
         public VoidLangValue ForEach(FuncLangValue action)
         {
             // 获取当前的 VariateManager
-            var manager = ExecutionContext.GetCurrentManager();
-            if (manager == null)
-            {
-                // 如果没有找到外部 manager，创建新的
-                manager = new VariateManager();
-            }
+            // 如果没有找到外部 manager，创建新的
+            var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
             // 检查 action 是否是 lambda（lambda 通常 Id 为 null 且没有 Method）
-            bool isLambda = action.Id == null && action.Method == null;
+            var isLambda = action.Id == null && action.Method == null;
 
             if (isLambda)
             {
@@ -494,7 +491,7 @@ public static class ListValueFuncStatic
                 // 对于非 lambda（原生方法），使用正常的 Run 调用
                 foreach (var item in langValue.Values)
                 {
-                    action.Run(manager, new List<LangExpression> { item });
+                    action.Run(manager, [item]);
                 }
             }
 
@@ -522,10 +519,10 @@ public static class ListValueFuncStatic
             {
                 var manager = new VariateManager();
 
-                var result = predicate.Run(manager, new List<LangExpression> { item });
+                var result = predicate.Run(manager, [item]);
                 if (result is BoolLangValue { Value: false })
                 {
-                    return new BoolLangValue(false);
+                    return new BoolLangValue();
                 }
             }
 
@@ -684,8 +681,8 @@ public static class ListValueFuncStatic
         {
             // 调用比较函数：comparer(nums[j], pivot)
             // 如果返回负数，表示 nums[j] < pivot
-            var result = comparer.Run(manager, new List<LangExpression> { nums[j], pivot });
-            if (result is IntLangValue intResult && intResult.Value < 0)
+            var result = comparer.Run(manager, [nums[j], pivot]);
+            if (result is IntLangValue { Value: < 0 })
             {
                 i++;
                 Swap(nums, i, j);
@@ -747,6 +744,7 @@ public static class ListValueFuncStatic
                 nums[k] = rightArray[j];
                 j++;
             }
+
             k++;
         }
 
@@ -783,6 +781,7 @@ public static class ListValueFuncStatic
                     swapped = true;
                 }
             }
+
             // 如果这一轮没有发生交换，说明列表已排序
             if (!swapped) break;
         }
@@ -805,6 +804,7 @@ public static class ListValueFuncStatic
                     minIndex = j;
                 }
             }
+
             if (minIndex != i)
             {
                 Swap(nums, i, minIndex);
@@ -829,6 +829,7 @@ public static class ListValueFuncStatic
                 nums[j + 1] = nums[j];
                 j--;
             }
+
             nums[j + 1] = key;
         }
     }

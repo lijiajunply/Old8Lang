@@ -48,10 +48,10 @@ public static class DictionaryValueFuncStatic
                 return new BoolLangValue(true);
             }
 
-            return new BoolLangValue(false);
+            return new BoolLangValue();
         }
 
-    
+
         /// <summary>
         /// 检查字典是否包含指定的键
         /// </summary>
@@ -83,6 +83,7 @@ public static class DictionaryValueFuncStatic
             {
                 keys.Add(key);
             }
+
             return new ListLangValue(keys);
         }
 
@@ -97,6 +98,7 @@ public static class DictionaryValueFuncStatic
             {
                 values.Add(value);
             }
+
             return new ListLangValue(values);
         }
 
@@ -115,6 +117,7 @@ public static class DictionaryValueFuncStatic
                     return v;
                 }
             }
+
             return defaultValue;
         }
 
@@ -241,6 +244,7 @@ public static class DictionaryValueFuncStatic
             {
                 newDict.Value.Add((key, value));
             }
+
             return newDict;
         }
 
@@ -259,6 +263,7 @@ public static class DictionaryValueFuncStatic
                     return v;
                 }
             }
+
             return defaultValue;
         }
 
@@ -272,18 +277,14 @@ public static class DictionaryValueFuncStatic
             var newDict = new DictionaryLangValue();
 
             // 尝试获取当前的 VariateManager，如果没有则创建新的
-            var manager = ExecutionContext.GetCurrentManager();
-            if (manager == null)
-            {
-                // 如果没有找到外部 manager，创建新的
-                manager = new VariateManager();
-            }
+            // 如果没有找到外部 manager，创建新的
+            var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
             foreach (var (key, value) in langValue.Value)
             {
                 try
                 {
-                    var result = func.Run(manager, new List<LangExpression> { value });
+                    var result = func.Run(manager, [value]);
                     newDict.Value.Add((key, result));
                 }
                 catch
@@ -306,19 +307,15 @@ public static class DictionaryValueFuncStatic
             var newDict = new DictionaryLangValue();
 
             // 尝试获取当前的 VariateManager，如果没有则创建新的
-            var manager = ExecutionContext.GetCurrentManager();
-            if (manager == null)
-            {
-                // 如果没有找到外部 manager，创建新的
-                manager = new VariateManager();
-            }
+            // 如果没有找到外部 manager，创建新的
+            var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
             foreach (var (key, value) in langValue.Value)
             {
                 try
                 {
-                    var result = predicate.Run(manager, new List<LangExpression> { key, value });
-                    if (result is BoolLangValue boolResult && boolResult.Value)
+                    var result = predicate.Run(manager, [key, value]);
+                    if (result is BoolLangValue { Value: true })
                     {
                         newDict.Value.Add((key, value));
                     }
@@ -341,12 +338,8 @@ public static class DictionaryValueFuncStatic
         public VoidLangValue ForEach(FuncLangValue action)
         {
             // 获取当前的 VariateManager
-            var manager = ExecutionContext.GetCurrentManager();
-            if (manager == null)
-            {
-                // 如果没有找到外部 manager，创建新的
-                manager = new VariateManager();
-            }
+            // 如果没有找到外部 manager，创建新的
+            var manager = ExecutionContext.GetCurrentManager() ?? new VariateManager();
 
             // 检查 action 是否是 lambda（lambda 通常 Id 为 null 且没有 Method）
             bool isLambda = action.Id == null && action.Method == null;
@@ -375,7 +368,7 @@ public static class DictionaryValueFuncStatic
                                 // 两个参数：键和值
                                 var keyId = action.Ids[0];
                                 var valueId = action.Ids[1];
-                                if (keyId != null && valueId != null)
+                                if (keyId != null! && valueId != null!)
                                 {
                                     manager.Set(keyId, key);
                                     manager.Set(valueId, value);
@@ -385,7 +378,7 @@ public static class DictionaryValueFuncStatic
                             {
                                 // 一个参数：只传递值
                                 var valueId = action.Ids[0];
-                                if (valueId != null)
+                                if (valueId != null!)
                                 {
                                     manager.Set(valueId, value);
                                 }
@@ -417,7 +410,7 @@ public static class DictionaryValueFuncStatic
                 {
                     try
                     {
-                        action.Run(manager, new List<LangExpression> { key, value });
+                        action.Run(manager, [key, value]);
                     }
                     catch
                     {

@@ -52,7 +52,7 @@ public static class ValueTypeFuncStatic
                 }
                 if (str.Equals("false", StringComparison.OrdinalIgnoreCase))
                 {
-                    return new IntLangValue(0);
+                    return new IntLangValue();
                 }
 
                 // Try to parse as integer
@@ -72,7 +72,7 @@ public static class ValueTypeFuncStatic
 
             if (type is NullLangValue)
             {
-                return new IntLangValue(0);
+                return new IntLangValue();
             }
 
             throw new FormatException($"Cannot convert {type.GetType().Name} to integer");
@@ -110,7 +110,7 @@ public static class ValueTypeFuncStatic
                 }
                 if (str.Equals("false", StringComparison.OrdinalIgnoreCase))
                 {
-                    return new DoubleLangValue(0.0);
+                    return new DoubleLangValue();
                 }
 
                 // Try to parse as double
@@ -129,7 +129,7 @@ public static class ValueTypeFuncStatic
 
             if (type is NullLangValue)
             {
-                return new DoubleLangValue(0.0);
+                return new DoubleLangValue();
             }
 
             throw new FormatException($"Cannot convert {type.GetType().Name} to double");
@@ -172,7 +172,7 @@ public static class ValueTypeFuncStatic
                 }
                 if (str.Equals("false", StringComparison.OrdinalIgnoreCase))
                 {
-                    return new BoolLangValue(false);
+                    return new BoolLangValue();
                 }
 
                 // Handle numeric strings
@@ -192,7 +192,7 @@ public static class ValueTypeFuncStatic
 
             if (type is NullLangValue)
             {
-                return new BoolLangValue(false);
+                return new BoolLangValue();
             }
 
             throw new FormatException($"Cannot convert {type.GetType().Name} to bool");
@@ -211,7 +211,7 @@ public static class ValueTypeFuncStatic
 
             if (type is IntLangValue intValue)
             {
-                if (intValue.Value >= 0 && intValue.Value <= 65535)
+                if (intValue.Value is >= 0 and <= 65535)
                 {
                     return new CharLangValue(Convert.ToChar(intValue.Value));
                 }
@@ -236,7 +236,7 @@ public static class ValueTypeFuncStatic
 
             if (type is NullLangValue)
             {
-                return new CharLangValue('\0');
+                return new CharLangValue();
             }
 
             throw new FormatException($"Cannot convert {type.GetType().Name} to char");

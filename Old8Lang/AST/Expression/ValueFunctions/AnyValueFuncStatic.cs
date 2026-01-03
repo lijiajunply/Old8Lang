@@ -30,7 +30,7 @@ public static class AnyValueFuncStatic
             JsonValueKind.Array => new ArrayLangValue(
                 element.EnumerateArray().Select(x => GetJsonElement(x, node)).ToList()),
             JsonValueKind.Undefined => new VoidLangValue(),
-            JsonValueKind.Object => ToObj(new StringLangValue(element.ToString())),
+            JsonValueKind.Object => new StringLangValue(element.ToString()).ToObj(),
             _ => throw new InvalidOperationError(node, "不支持的JSON值类型")
         };
     }
@@ -97,6 +97,7 @@ public static class AnyValueFuncStatic
             {
                 langValue = LangValueType.ObjToValue(value);
             }
+
             anyValue.InstanceData[key] = langValue;
         }
 

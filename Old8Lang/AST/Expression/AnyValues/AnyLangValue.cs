@@ -51,6 +51,12 @@ public partial class AnyLangValue : LangValueType
     public Dictionary<string, TypeSystem.ITypeInfo>? TypeArgumentMapping { get; set; }
 
     /// <summary>
+    /// 标记对象是否已被 dispose
+    /// 用于防止重复调用 dispose 方法
+    /// </summary>
+    private bool _isDisposed = false;
+
+    /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="classId">类名标识</param>
@@ -849,5 +855,72 @@ public partial class AnyLangValue : LangValueType
     public override Type? OutputType(LocalManager local)
     {
         return local.ClassVar.GetValueOrDefault(ClassId.IdName);
+    }
+
+    /// <summary>
+    /// 尝试调用对象的 dispose 方法（如果存在）
+    /// 实现重复调用保护，多次调用只执行一次
+    /// </summary>
+    public void TryDispose()
+    {
+        // 1. 重复调用保护
+        if (_isDisposed)
+            return;
+
+        _isDisposed = true;
+
+        // 2. 查找 dispose 方法
+        var disposeMethods = Metadata.MethodTable.LookupMethod("dispose");
+        if (disposeMethods == null || disposeMethods.Count == 0)
+            return;
+
+        var disposeMethod = disposeMethods[0];
+
+        // 3. 验证签名：dispose 方法不能有参数
+        if (disposeMethod.Implementation.Ids != null && disposeMethod.Implementation.Ids.Count > 0)
+        {
+            throw new InvalidOperationError(
+                this,
+                $"类 {ClassId.IdName} 的 dispose 方法不能有参数。");
+        }
+
+        // 4. 使用 InstanceScope 执行 dispose 方法
+        try
+        {
+            // 设置 this 上下文
+            InstanceScope.Set(new LangId("this"), this);
+
+            // 同步字段到作用域
+            foreach (var kvp in InstanceData)
+            {
+                InstanceScope.Set(new LangId(kvp.Key), kvp.Value);
+            }
+
+            // 执行 dispose 方法
+            disposeMethod.Implementation.BlockStatement.Run(InstanceScope);
+
+            // 同步字段修改回实例数据
+            foreach (var fieldName in InstanceData.Keys.ToList())
+            {
+                try
+                {
+                    var updatedValue = InstanceScope.GetValue(new LangId(fieldName));
+                    if (updatedValue != null)
+                    {
+                        InstanceData[fieldName] = updatedValue;
+                    }
+                }
+                catch
+                {
+                    // 如果字段在作用域中不存在，跳过
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationError(
+                this,
+                $"执行 {ClassId.IdName}.dispose() 时发生错误: {ex.Message}");
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System.Reflection.Emit;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Visitor;
 using Old8Lang.Compiler;
@@ -137,12 +138,17 @@ public partial class UsingStatement(
     /// </summary>
     private void DisposeResource(LangValueType resource)
     {
-        // 如果是整数值（资源ID），尝试通过ResourceManager释放
+        // 1. 如果是整数值（资源ID），尝试通过ResourceManager释放
         if (resource is IntLangValue intVal)
         {
             ResourceManager.TryDispose(intVal.Value);
         }
-        // 如果实现了IDisposable接口，直接调用Dispose
+        // 2. 如果是 AnyLangValue（用户自定义类实例），尝试调用 dispose 方法
+        else if (resource is AnyLangValue anyValue)
+        {
+            anyValue.TryDispose();
+        }
+        // 3. 如果实现了IDisposable接口，直接调用Dispose
         else if (resource is IDisposable disposable)
         {
             disposable.Dispose();
@@ -173,18 +179,34 @@ public partial class UsingStatement(
         // finally块
         ilGenerator.BeginFinallyBlock();
 
-        // 调用ResourceManager.TryDispose(id)
+        // 加载资源
         ilGenerator.Emit(OpCodes.Ldloc, resourceLocal);
 
-        // 如果资源类型不是int，需要进行转换或跳过Dispose调用
+        // 根据资源类型调用不同的 Dispose 方法
         if (resourceType == typeof(int))
         {
+            // 1. 整数资源：调用 ResourceManager.TryDispose(id)
             var disposeMethod = typeof(ResourceManager).GetMethod(nameof(ResourceManager.TryDispose));
             ilGenerator.Emit(OpCodes.Call, disposeMethod);
         }
+        else if (typeof(AnyLangValue).IsAssignableFrom(resourceType))
+        {
+            // 2. AnyLangValue 资源：调用 AnyLangValue.TryDispose()
+            var tryDisposeMethod = typeof(AnyLangValue).GetMethod(
+                nameof(AnyLangValue.TryDispose),
+                Type.EmptyTypes);
+            if (tryDisposeMethod != null)
+            {
+                ilGenerator.Emit(OpCodes.Callvirt, tryDisposeMethod);
+            }
+            else
+            {
+                ilGenerator.Emit(OpCodes.Pop);
+            }
+        }
         else
         {
-            // 对于非int类型，尝试调用IDisposable.Dispose
+            // 3. IDisposable 资源：调用 IDisposable.Dispose
             var disposableType = typeof(IDisposable);
             if (disposableType.IsAssignableFrom(resourceType))
             {
@@ -200,7 +222,7 @@ public partial class UsingStatement(
             }
             else
             {
-                // 不支持Dispose的类型，不生成任何清理代码
+                // 不支持Dispose的类型，丢弃栈顶值
                 ilGenerator.Emit(OpCodes.Pop);
             }
         }

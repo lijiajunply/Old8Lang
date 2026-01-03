@@ -44,7 +44,7 @@ public static class TaskValueFuncStatic
                 }
 
                 // 如果返回的不是 Task，则将结果包装成一个立即完成的 Task
-                return new TaskLangValue(Task.FromResult<LangValueType>(nextTaskResult), default, task.Position)
+                return new TaskLangValue(Task.FromResult(nextTaskResult), CancellationToken.None, task.Position)
                 {
                     ExternalManager = manager
                 };
