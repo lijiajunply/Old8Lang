@@ -48,7 +48,7 @@ result2 <- test_math.multiply(4.0, 5.0)
     {
         // Arrange
         var testContent = """
-                          import "MathLib" as m
+                          import "Math" as m
                           result <- m.sqrt(25)
                           """;
         CreateTempModuleFile("alias_test.old8", testContent);
@@ -69,8 +69,8 @@ result2 <- test_math.multiply(4.0, 5.0)
     {
         // Arrange
         var testContent = """
-                          import "MathLib"
-                          result1 <- Sqrt(25)
+                          import "Math"
+                          result1 <- Math.Sqrt(25)
                           result2 <- Pow(2, 3)
                           """;
         CreateTempModuleFile("specific_func_test.old8", testContent);
@@ -105,7 +105,7 @@ result2 <- test_math.multiply(4.0, 5.0)
     {
         // Arrange
         var testContent = """
-                          import "MathLib"
+                          import "Math"
                           result1 <- Sqrt(9)
                           result2 <- Sqrt(16)
                           """;

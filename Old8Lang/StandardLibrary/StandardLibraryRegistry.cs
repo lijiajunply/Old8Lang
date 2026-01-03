@@ -42,7 +42,7 @@ public static class StandardLibraryRegistry
             TypeImportConfig.StaticClass(typeof(Time))
         ),
 
-        ["MathLib"] = StandardLibraryInfo.FromTypes(
+        ["Math"] = StandardLibraryInfo.FromTypes(
             "Old8LangLib",
             TypeImportConfig.StaticClass(typeof(MathLib))
         ),

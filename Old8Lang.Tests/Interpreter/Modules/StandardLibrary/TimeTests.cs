@@ -138,10 +138,9 @@ PrintLine($""Common formats count: {len(formats)}"")
     {
         var code = @"
 import Time
-import Async
 
 Time.StartTimer()
-Async.Sleep(50)
+Sleep(50)
 elapsed <- Time.StopTimer()
 PrintLine($""Elapsed time: {elapsed} ms"")
 ";
@@ -156,14 +155,13 @@ PrintLine($""Elapsed time: {elapsed} ms"")
     {
         var code = @"
 import Time
-import Async
 
 Time.StartTimer()
-Async.Sleep(30)
+Sleep(30)
 elapsed1 <- Time.GetElapsedMilliseconds()
 PrintLine($""Elapsed time 1: {elapsed1} ms"")
 
-Async.Sleep(20)
+Sleep(20)
 elapsed2 <- Time.GetElapsedMilliseconds()
 PrintLine($""Elapsed time 2: {elapsed2} ms"")
 ";
@@ -178,11 +176,10 @@ PrintLine($""Elapsed time 2: {elapsed2} ms"")
     {
         var code = @"
 import Time
-import Async
 
 Time.StartTimer()
-Async.Sleep(30)
-Time.ResetTimer()
+Sleep(30)
+ResetTimer()
 elapsed <- Time.GetElapsedMilliseconds()
 PrintLine($""Elapsed after reset: {elapsed} ms"")
 ";
@@ -227,10 +224,9 @@ PrintLine($""Formats (compatibility): {len(formats)}"")
     {
         var code = @"
 import Time
-import Async
 
 Time.TimeStart()
-Async.Sleep(40)
+Sleep(40)
 elapsed <- Time.TimeStop()
 PrintLine($""Elapsed (compatibility): {elapsed} ms"")
 ";
