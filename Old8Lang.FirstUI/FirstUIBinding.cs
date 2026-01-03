@@ -191,7 +191,7 @@ public static class FirstUIBinding
     /// <summary>
     /// 运行应用程序
     /// </summary>
-    public static void RunApp(object buildFunction, string? s = null)
+    public static void RunApp(WidgetBase buildFunction, string? s = null)
     {
         try
         {
@@ -234,7 +234,7 @@ public static class FirstUIBinding
     /// <summary>
     /// 构建 Avalonia 应用
     /// </summary>
-    private static AppBuilder BuildAvaloniaApp(object buildFunction, string? s = null)
+    private static AppBuilder BuildAvaloniaApp(WidgetBase buildFunction, string? s = null)
     {
         return AppBuilder.Configure(() => new FirstUIAvaloniaApp(buildFunction, s))
             .UsePlatformDetect()
@@ -246,7 +246,7 @@ public static class FirstUIBinding
 /// <summary>
 /// FirstUI Avalonia 应用类
 /// </summary>
-internal class FirstUIAvaloniaApp(object buildFunction, string? title = null) : Application
+internal class FirstUIAvaloniaApp(WidgetBase buildFunction, string? title = null) : Application
 {
     private Window? _mainWindow;
     private BuildContext? _context;
@@ -273,17 +273,11 @@ internal class FirstUIAvaloniaApp(object buildFunction, string? title = null) : 
             // 构建 UI
             try
             {
-                var invokeMethod = buildFunction.GetType().GetMethod("Invoke");
-                var rootWidget = invokeMethod?.Invoke(buildFunction, null);
+                var control = buildFunction.Build(_context);
 
-                if (rootWidget is WidgetBase widget)
+                if (control is Control c)
                 {
-                    var control = widget.Build(_context);
-
-                    if (control is Control c)
-                    {
-                        _mainWindow.Content = c;
-                    }
+                    _mainWindow.Content = c;
                 }
             }
             catch (Exception ex)
@@ -312,7 +306,7 @@ public class FirstUIApplication
     /// <summary>
     /// 运行应用程序
     /// </summary>
-    public void Run(object buildFunction, string? s = null)
+    public void Run(WidgetBase buildFunction, string? s = null)
     {
         FirstUIBinding.RunApp(buildFunction, s);
     }

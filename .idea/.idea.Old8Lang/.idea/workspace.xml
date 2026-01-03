@@ -23,28 +23,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_collection_extensions.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FirstUI.TestApp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FirstUI.TestApp/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Examples/Counter.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Examples/Counter.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/Advanced/CollectionMethodsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/Advanced/CollectionMethodsTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/Advanced/ExtendedRangeTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/Advanced/ExtendedRangeTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/InExpression/InExpressionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/InExpression/InExpressionTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Functions/ParamsCompilerTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Functions/ParamsCompilerTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/ParamsInterpreterTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/ParamsInterpreterTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Language/AsyncNativeTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Language/BracketMatchingTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/BracketMatchingTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Language/EdgeCaseTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/EdgeCaseTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Language/ExpressionStatementTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/ExpressionStatementTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/CollectionLibTests.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/VectorLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/VectorLibTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Functions/ParamsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Functions/ParamsTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Statement/SemicolonTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Statement/SemicolonTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/ErrorHandlingTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/ErrorHandlingTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -185,7 +168,7 @@
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
-  <component name="RunManager" selected=".NET 项目.FirstUI.TestApp">
+  <component name="RunManager" selected=".NET 项目.Old8Lang.App">
     <configuration name="FirstUI.TestApp" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -917,7 +900,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="520" />
+    <option name="localTasksCounter" value="521" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -944,7 +927,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="docs: 移除调试器演示脚本和Visitor模式迁移进度文档&#10;&#10;- 移除debug_demo.sh调试器功能演示脚本&#10;- 移除Visitor_Migration_Progress.md迁移进度报告文档&#10;- 清理相关的调试器演示和Visitor模式开发文档&#10;- 删除不再需要的调试功能说明和迁移状态跟踪文件" />
     <MESSAGE value="fix(compiler): 修复编译器中的类型转换和函数声明问题&#10;&#10;- 修复 switch 语句中 case _ 语法的默认分支处理&#10;- 统一闭包函数声明中的返回类型标注为 function 关键字&#10;- 添加 ForIn 循环中数组元素类型的类型转换和装箱处理&#10;- 重构 GenericFunctionTests 类中的依赖注入构造函数&#10;- 修复 Operation 表达式中 object 与 int 比较的操作数类型转换&#10;- 扩展 SwitchStatement 中对字符类型的支持&#10;- 更新 IDE 工作空间配置和变更跟踪设置" />
     <MESSAGE value="feat(compiler): 支持泛型实例化表达式的基础实现&#10;&#10;- 为 GenericInstanceExpression 添加 OutputType 方法实现类型推断&#10;- 为 GenericInstanceExpression 添加 LoadIlValue 方法并抛出未支持异常&#10;- 实现 Old8Lang 的 Count() 方法特殊处理以支持泛型集合和数组&#10;- 修改类型注解解析允许单个大写字母作为泛型类型参数&#10;- 临时跳过所有泛型函数测试直到编译器模式完全支持" />
     <MESSAGE value="feat(lang): 添加 params 可变参数支持&#10;&#10;- 在 LangId 中添加 isParams 属性用于标识可变参数&#10;- 在 LangTokenType 中添加 Params 关键字类型&#10;- 在 FunctionParser 中解析 params 修饰符并正确传递给 LangId&#10;- 在 FuncInit 中添加 params 参数合法性验证逻辑&#10;- 在 FuncLangValue 中实现 params 参数的参数数量检查和类型处理&#10;- 更新示例代码以使用新的 UI 组件语法&#10;- 添加测试项目 FirstUI.TestApp&#10;- 移除 FirstUIBinding 中废弃的组件创建 API&#10;- 修复多处代码格式化问题&#10;- 添加 params 可变参数的解析和解释器测试用例" />
@@ -969,7 +951,8 @@
     <MESSAGE value="test(interpreter): 添加 using 语句自定义类 dispose 方法测试&#10;&#10;- 测试带有 dispose 方法的自定义类在 using 语句中的行为&#10;- 验证 dispose 方法修改实例字段的功能&#10;- 测试异常情况下 dispose 方法仍能正确调用&#10;- 验证嵌套自定义 dispose 类按逆序释放资源&#10;- 测试没有 dispose 方法的类不会报错&#10;- 验证 dispose 方法多次调用只执行一次&#10;- 测试 dispose 方法访问实例成员的功能&#10;- 验证混合使用内置资源和自定义 dispose 类的场景" />
     <MESSAGE value="feat(type): 实现枚举类型注册功能&#10;&#10;- 在EnumInit中移除TODO注释并激活枚举类型注册逻辑&#10;- 向TypeAnnotationManager添加RegisterEnumType方法&#10;- 在TypeChecker中实现静态RegisterEnumType方法用于枚举注册&#10;- 创建EnumTypeInfo类定义枚举类型信息及其兼容性规则&#10;- 更新workspace.xml中的文件变更记录&#10;- 修复IDEA配置文件中的JSON格式问题" />
     <MESSAGE value="feat(ast): 添加枚举值类型支持&#10;&#10;- 实现 EnumLangValue 类型，支持枚举成员的值表示和类型信息&#10;- 添加枚举值的算术运算和比较运算逻辑&#10;- 实现枚举值与整数的类型转换和比较操作&#10;- 更新 EnumTemplate 中的 GetMemberValue 方法返回 EnumLangValue&#10;- 优化 LangValueType 中的模式匹配语法&#10;- 在类型检查器中添加对 EnumLangValue 的类型识别&#10;- 修复 TypeTemplate 中的泛型参数映射设置逻辑" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(ast): 添加枚举值类型支持&#10;&#10;- 实现 EnumLangValue 类型，支持枚举成员的值表示和类型信息&#10;- 添加枚举值的算术运算和比较运算逻辑&#10;- 实现枚举值与整数的类型转换和比较操作&#10;- 更新 EnumTemplate 中的 GetMemberValue 方法返回 EnumLangValue&#10;- 优化 LangValueType 中的模式匹配语法&#10;- 在类型检查器中添加对 EnumLangValue 的类型识别&#10;- 修复 TypeTemplate 中的泛型参数映射设置逻辑" />
+    <MESSAGE value="refactor(tests): 重构测试文件结构并移除集合库测试&#10;&#10;- 将 BracketMatchingTests.cs 从 Language 目录移动到 Parser 目录&#10;- 将 EdgeCaseTests.cs 从 Language 目录移动到 EdgeCases 目录&#10;- 将 ExpressionStatementTests.cs 从 Language 目录移动到 Parser 目录&#10;- 将 SemicolonTests.cs 从 Language 目录移动到 Parser/Statement 目录&#10;- 将 CollectionMethodsTests.cs 从 Compiler/Collections 移动到 Compiler/Collections/Advanced&#10;- 将 ExtendedRangeTests.cs 从 Compiler/Collections 移动到 Compiler/Collections/Advanced&#10;- 将 InExpressionTests.cs 从 Compiler/Collections.Advanced 移动到 Compiler/Collections/InExpression&#10;- 将 ParamsCompilerTests.cs 从 Compiler 目录移动到 Compiler/Functions 目录&#10;- 将 ParamsInterpreterTests.cs 从 Interpreter 目录移动到 Interpreter/Functions 目录&#10;- 将 ParamsTests.cs 从 Parser 目录移动到 Parser/Functions 目录&#10;- 移除 AsyncNativeTests.cs 文件&#10;- 移除 CollectionLibTests.cs 文件&#10;- 从 StandardLibraryRegistry.cs 中移除 CollectionLib 的注册&#10;- 更新 ErrorHandlingTests.cs 中的断言检查&#10;- 在 FirstUIBinding.cs 中添加可选参数支持&#10;- 在 TemplateEngine.cs 中改进代码格式和文档注释&#10;- 添加新的集合扩展方法测试文件 test_collection_extensions.old8" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(tests): 重构测试文件结构并移除集合库测试&#10;&#10;- 将 BracketMatchingTests.cs 从 Language 目录移动到 Parser 目录&#10;- 将 EdgeCaseTests.cs 从 Language 目录移动到 EdgeCases 目录&#10;- 将 ExpressionStatementTests.cs 从 Language 目录移动到 Parser 目录&#10;- 将 SemicolonTests.cs 从 Language 目录移动到 Parser/Statement 目录&#10;- 将 CollectionMethodsTests.cs 从 Compiler/Collections 移动到 Compiler/Collections/Advanced&#10;- 将 ExtendedRangeTests.cs 从 Compiler/Collections 移动到 Compiler/Collections/Advanced&#10;- 将 InExpressionTests.cs 从 Compiler/Collections.Advanced 移动到 Compiler/Collections/InExpression&#10;- 将 ParamsCompilerTests.cs 从 Compiler 目录移动到 Compiler/Functions 目录&#10;- 将 ParamsInterpreterTests.cs 从 Interpreter 目录移动到 Interpreter/Functions 目录&#10;- 将 ParamsTests.cs 从 Parser 目录移动到 Parser/Functions 目录&#10;- 移除 AsyncNativeTests.cs 文件&#10;- 移除 CollectionLibTests.cs 文件&#10;- 从 StandardLibraryRegistry.cs 中移除 CollectionLib 的注册&#10;- 更新 ErrorHandlingTests.cs 中的断言检查&#10;- 在 FirstUIBinding.cs 中添加可选参数支持&#10;- 在 TemplateEngine.cs 中改进代码格式和文档注释&#10;- 添加新的集合扩展方法测试文件 test_collection_extensions.old8" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1458,19 +1441,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="638" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs</url>
-          <line>264</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" containingFunctionPresentation="方法 'OnFrameworkInitializationCompleted'">
-            <startOffsets>
-              <option value="7291" />
-            </startOffsets>
-            <endOffsets>
-              <option value="7543" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="639" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />

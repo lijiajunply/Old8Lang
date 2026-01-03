@@ -11,65 +11,48 @@ counter <- 0
 
 // 计数器视图
 CounterView() -> {
-    return Column(
-        {
-            // 标题
-            Text({
-                content: "计数器应用",
-                fontSize: 28,
-                fontWeight: "bold",
-                color: "#000000"
-            }),
-
-            // 显示计数值
-            Text(
-                content: counter.ToStr(),
-                fontSize: 72,
-                fontWeight: "bold",
-                color: "#007AFF"
-            }).SetMargin(20, 0, 30, 0),
-
-            // 按钮行
-            Row(
-                children: {
-                    // 减少按钮
-                    Button(
-                        label: "➖ 减少",
-                        onClick: () -> {
-                            counter <- counter - 1
-                            PrintLine("计数器: " + counter.ToStr())
-                        }
-                    }),
-
-                    // 重置按钮
-                    Button(
-                        label: "🔄 重置",
-                        onClick: () -> {
-                            counter <- 0
-                            ui.ShowToast("已重置计数器")
-                        }
-                    }).SetMargin(20, 0, 0, 0),
-
-                    // 增加按钮
-                    Button(
-                        label: "➕ 增加",
-                        onClick: () -> {
-                            counter <- counter + 1
-                            PrintLine("计数器: " + counter.ToStr())
-                        }
-                    }).SetMargin(20, 0, 0, 0)
-                }
-            }).SetSpacing(20),
-
-            // 说明文本
-            Text(
-                content: "点击按钮改变计数值",
-                fontSize: 14,
-                color: "#8E8E93"
-            }).SetMargin(40, 0, 0, 0)
-        }
-    }).SetPadding(40)
+            return ui.Layout.Column([
+                ui.Basic.Text("计数器应用")
+                    .SetFontSize(28.0)
+                    .SetFontWeight("bold")
+                    .SetColor("#000000"),
+                ui.Basic.Text(counter.ToStr())
+                    .SetFontSize(72.0)
+                    .SetFontWeight("bold")
+                    .SetColor("#007AFF")
+                    .SetMargin(20.0, 0.0, 30.0, 0.0),
+                ui.Layout.Row(
+                    children:
+                    {
+                        // 减少按钮
+                        ui.Basic.Button(
+                            label: "➖ 减少",
+                            onClick: () -> { counter <- counter - 1; }
+                        ),
+    
+                        // 重置按钮
+                        ui.Basic.Button(
+                            label: "🔄 重置",
+                            onClick: () ->
+                            {
+                                counter <- 0;
+                                ui.ShowToast("已重置计数器")
+                            }
+                        ).SetMargin(20.0, 0.0, 0.0, 0.0),
+    
+                        // 增加按钮
+                        ui.Basic.Button(
+                            label: "➕ 增加",
+                            onClick: () -> { counter <- counter + 1; }
+                        ).SetMargin(20.0, 0.0, 0.0, 0.0)
+                    }
+                ).SetSpacing(20),
+                ui.Basic.Text("点击按钮改变计数值")
+                    .SetFontSize(14.0)
+                    .SetColor("#8E8E93")
+                    .SetMargin(40.0, 0.0, 0.0, 0.0)
+            ]).SetPadding(40);
 }
 
 // 运行应用
-app.Run(() -> CounterView())
+app.Run(CounterView(), "asdf")
