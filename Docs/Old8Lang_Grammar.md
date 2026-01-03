@@ -781,13 +781,15 @@ select 语句实现 Go 风格的 Channel 多路选择：
 ```old8
 ch1 <- ChannelCreateBounded(1)
 ch2 <- ChannelCreateBounded(1)
+ch3 <- ChannelCreate()
+ChannelSend(ch3, 999)
 
 select {
     case ch1 <- 100 -> {
         PrintLine("成功发送 100 到 ch1")
     }
-    case ch2 <- 200 -> {
-        PrintLine("成功发送 200 到 ch2")
+    case value from ch3 -> {
+        PrintLine("从 ch3 接收到: " + value.ToStr())
     }
     default -> {
         PrintLine("所有 channel 都不可用")
@@ -795,14 +797,19 @@ select {
 }
 ```
 
+**语法**：
+- **发送操作**：`case channel <- value -> { ... }`
+- **接收操作**：`case variable from channel -> { ... }`
+- **默认分支**：`default -> { ... }`
+
 **特性**：
 - 使用轮询策略检查多个 Channel
 - 执行第一个可用的 case（发送或接收）
 - 如果没有 case 可用且存在 default 分支，立即执行 default
 - 如果没有 case 可用且没有 default，阻塞直到某个 case 变为可用
+- 接收操作使用 `from` 关键字，清晰区分发送和接收，避免语法歧义
 
 **限制**：
-- 接收 case（`val <- ch`）在 channel 为简单标识符时存在语法歧义
 - 编译模式（`-c`）不支持，会抛出 NotImplementedException
 - 需使用解释模式（`-f`）运行包含 select 语句的代码
 

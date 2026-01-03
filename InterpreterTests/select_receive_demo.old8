@@ -1,0 +1,66 @@
+// Select 语句接收操作演示
+// 本文件展示修复后的 select 语句接收语法
+
+PrintLine("=== Select 语句接收操作演示 ===")
+
+// 1. 基本接收操作
+PrintLine("\n1. 基本接收操作")
+ch1 <- ChannelCreate()
+ChannelSend(ch1, 42)
+
+select {
+    case value from ch1 -> {
+        PrintLine("从 ch1 接收到: " + value.ToStr())
+    }
+    default -> {
+        PrintLine("没有可用的 channel")
+    }
+}
+
+// 2. 混合发送和接收操作
+PrintLine("\n2. 混合发送和接收操作")
+sendCh <- ChannelCreate()
+receiveCh <- ChannelCreate()
+ChannelSend(receiveCh, "Hello from channel")
+
+select {
+    case sendCh <- "发送的消息" -> {
+        PrintLine("成功发送消息")
+    }
+    case msg from receiveCh -> {
+        PrintLine("接收到消息: " + msg)
+    }
+}
+
+// 3. 多个接收操作
+PrintLine("\n3. 多个接收操作")
+ch2 <- ChannelCreate()
+ch3 <- ChannelCreate()
+ChannelSend(ch2, 100)
+ChannelSend(ch3, 200)
+
+select {
+    case val from ch2 -> {
+        PrintLine("从 ch2 接收到: " + val.ToStr())
+    }
+    case val from ch3 -> {
+        PrintLine("从 ch3 接收到: " + val.ToStr())
+    }
+}
+
+// 4. 接收复杂对象
+PrintLine("\n4. 接收复杂对象")
+dataCh <- ChannelCreate()
+data <- {"name": "Old8Lang", "version": 1, "features": {1, 2, 3}}
+ChannelSend(dataCh, data)
+
+select {
+    case obj from dataCh -> {
+        PrintLine("接收到对象: " + obj.ToStr())
+    }
+    default -> {
+        PrintLine("Channel 为空")
+    }
+}
+
+PrintLine("\n=== 演示完成 ===")

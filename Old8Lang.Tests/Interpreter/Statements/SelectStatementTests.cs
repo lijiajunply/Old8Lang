@@ -79,9 +79,115 @@ select {
 
     #region 基本接收测试
 
-    // 注意：根据 CLAUDE.md，接收 case (`val <- ch`) 有语法歧义当 channel 是简单标识符时
-    // 因此暂时跳过接收操作的测试，仅测试发送操作
-    // TODO: 当接收语法歧义问题解决后，可以恢复这些测试
+    /// <summary>
+    /// 测试简单的 select 接收操作
+    /// 语法：case value from channel
+    /// </summary>
+    [Fact]
+    public void SelectStatement_SimpleReceive_ExecutesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+receivedValue <- 0
+ch <- ChannelCreate()
+ChannelSend(ch, 42)
+select {
+    case val from ch -> {
+        receivedValue <- val
+        result <- 1
+    }
+    default -> {
+        result <- 2
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(1, ((IntLangValue)result).Value);
+
+        var receivedValue = interpreter.Manager.GetValue(new LangId("receivedValue"));
+        Assert.NotNull(receivedValue);
+        Assert.IsType<IntLangValue>(receivedValue);
+        Assert.Equal(42, ((IntLangValue)receivedValue).Value);
+    }
+
+    /// <summary>
+    /// 测试 select 接收操作，channel 为空时执行 default
+    /// </summary>
+    [Fact]
+    public void SelectStatement_ReceiveFromEmptyChannel_ExecutesDefault()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+ch <- ChannelCreate()
+select {
+    case val from ch -> {
+        result <- 1
+    }
+    default -> {
+        result <- 2
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(2, ((IntLangValue)result).Value);
+    }
+
+    /// <summary>
+    /// 测试 select 接收复杂对象
+    /// </summary>
+    [Fact]
+    public void SelectStatement_ReceiveComplexObject_ExecutesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+receivedData <- null
+ch <- ChannelCreate()
+data <- {""key"": ""value"", ""number"": 123}
+ChannelSend(ch, data)
+select {
+    case obj from ch -> {
+        receivedData <- obj
+        result <- 1
+    }
+    default -> {
+        result <- 0
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(1, ((IntLangValue)result).Value);
+
+        var receivedData = interpreter.Manager.GetValue(new LangId("receivedData"));
+        Assert.NotNull(receivedData);
+        Assert.IsType<DictionaryLangValue>(receivedData);
+    }
 
     #endregion
 
@@ -454,7 +560,85 @@ select {
 
     #region 多个 channel 交互测试
 
-    // 注意：多 channel 接收测试因语法歧义问题已移除
+    /// <summary>
+    /// 测试多个 channel 的混合接收操作
+    /// </summary>
+    [Fact]
+    public void SelectStatement_MultipleReceive_ExecutesFirstReady()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+receivedValue <- 0
+ch1 <- ChannelCreate()
+ch2 <- ChannelCreate()
+ChannelSend(ch1, 100)
+select {
+    case val from ch1 -> {
+        receivedValue <- val
+        result <- 1
+    }
+    case val from ch2 -> {
+        receivedValue <- val
+        result <- 2
+    }
+    default -> {
+        result <- 3
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(1, ((IntLangValue)result).Value);
+
+        var receivedValue = interpreter.Manager.GetValue(new LangId("receivedValue"));
+        Assert.NotNull(receivedValue);
+        Assert.IsType<IntLangValue>(receivedValue);
+        Assert.Equal(100, ((IntLangValue)receivedValue).Value);
+    }
+
+    /// <summary>
+    /// 测试混合发送和接收操作
+    /// </summary>
+    [Fact]
+    public void SelectStatement_MixedSendAndReceive_ExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+receivedValue <- 0
+sendCh <- ChannelCreate()
+receiveCh <- ChannelCreate()
+ChannelSend(receiveCh, 999)
+select {
+    case sendCh <- 100 -> {
+        result <- 1
+    }
+    case val from receiveCh -> {
+        receivedValue <- val
+        result <- 2
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        // 应该执行接收操作或发送操作之一
+        Assert.True(((IntLangValue)result).Value == 1 || ((IntLangValue)result).Value == 2);
+    }
 
     #endregion
 

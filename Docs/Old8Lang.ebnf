@@ -83,7 +83,11 @@ usingStatement = "using" ( identifier "<-" )? expression blockStatement ;
 
 selectStatement = "select" "{" selectCase* selectDefault? "}" ;
 
-selectCase = "case" expression "<-" expression "->" blockStatement ;
+selectCase = "case" ( selectSendCase | selectReceiveCase ) ;
+
+selectSendCase = expression "<-" expression "->" blockStatement ;
+
+selectReceiveCase = expression "from" expression "->" blockStatement ;
 
 selectDefault = "default" "->" blockStatement ;
 

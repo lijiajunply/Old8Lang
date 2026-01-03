@@ -454,14 +454,19 @@ select {
     case ch1 <- 100 -> {
         PrintLine("Sent 100 to ch1")
     }
-    case ch2 <- 200 -> {
-        PrintLine("Sent 200 to ch2")
+    case val from ch2 -> {
+        PrintLine("Received from ch2: " + val.ToStr())
     }
     default -> {
         PrintLine("No channel ready")
     }
 }
 ```
+
+**Syntax**:
+- **Send operation**: `case channel <- value -> { ... }`
+- **Receive operation**: `case variable from channel -> { ... }`
+- **Default case**: `default -> { ... }`
 
 **How it works**:
 - Uses polling strategy to check multiple channels
@@ -470,7 +475,6 @@ select {
 - If no case is ready and no default, blocks until a case becomes available
 
 **Limitations**:
-- Receive cases (`val <- ch`) have syntax ambiguity when channel is a simple identifier
 - Compiler mode (`-c`) not supported; throws NotImplementedException
 - Use interpreter mode (`-f`) for code with select statements
 

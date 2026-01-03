@@ -1853,10 +1853,15 @@ public class StatementParser(
     /// 解析 select 语句（Channel 多路选择）
     /// 语法：
     ///   select {
-    ///     case value <- channel -> { ... }
-    ///     case channel <- value -> { ... }
+    ///     case value from channel -> { ... }    // 接收操作
+    ///     case channel <- value -> { ... }      // 发送操作
     ///     default -> { ... }
     ///   }
+    ///
+    /// 注意：
+    /// - 接收操作使用 "from" 关键字：case value from ch -> { }
+    /// - 发送操作使用 "<-" 运算符：case ch <- value -> { }
+    /// - 这样可以明确区分两种操作，避免语法歧义
     /// </summary>
     private SelectStatement ParseSelectStatement()
     {
@@ -1873,30 +1878,24 @@ public class StatementParser(
             {
                 Expect(LangTokenType.Case);
 
-                // 解析 case: value <- ch 或 ch <- value
-                // 需要先解析第一个表达式，然后根据是否有第二个 <- 判断
+                // 解析第一个表达式
                 var firstExpr = expressionParser.ParseExpression();
 
-                // 必须有 <- token
-                Expect(LangTokenType.Assignment);
-
-                // 解析第二个表达式
-                var secondExpr = expressionParser.ParseExpression();
-
-                Expect(LangTokenType.Arrow);
-
-                // 解析块
-                var block = ParseBlock();
-
-                // 判断是接收还是发送：
-                // 启发式：如果 secondExpr 是函数调用（Instance），则可能是接收（value <- ChannelCreate()）
-                // 否则假设是发送（ch <- 123）
-                // 这不是完美的，但在大多数情况下能工作
-                bool isReceive = secondExpr is Instance || secondExpr is Operation { Opera: LangTokenType.Dot };
-
-                if (isReceive)
+                // 判断是接收还是发送操作
+                if (CurrentToken.Type == LangTokenType.From)
                 {
-                    // value <- ch (接收)
+                    // 接收操作：case value from channel -> { ... }
+                    Expect(LangTokenType.From);
+
+                    // 解析 channel 表达式
+                    var channelExpr = expressionParser.ParseExpression();
+
+                    Expect(LangTokenType.Arrow);
+
+                    // 解析块
+                    var block = ParseBlock();
+
+                    // 提取变量名（如果第一个表达式是标识符）
                     string? variableName = null;
                     if (firstExpr is LangId id)
                     {
@@ -1904,21 +1903,36 @@ public class StatementParser(
                     }
 
                     cases.Add(new SelectCase(
-                        channelExpression: secondExpr,
+                        channelExpression: channelExpr,
                         variableName: variableName,
+                        blockStatement: block,
+                        position: startPos
+                    ));
+                }
+                else if (CurrentToken.Type == LangTokenType.Assignment)
+                {
+                    // 发送操作：case channel <- value -> { ... }
+                    Expect(LangTokenType.Assignment);
+
+                    // 解析发送值表达式
+                    var sendValueExpr = expressionParser.ParseExpression();
+
+                    Expect(LangTokenType.Arrow);
+
+                    // 解析块
+                    var block = ParseBlock();
+
+                    cases.Add(new SelectCase(
+                        channelExpression: firstExpr,
+                        sendValueExpression: sendValueExpr,
                         blockStatement: block,
                         position: startPos
                     ));
                 }
                 else
                 {
-                    // ch <- value (发送)
-                    cases.Add(new SelectCase(
-                        channelExpression: firstExpr,
-                        sendValueExpression: secondExpr,
-                        blockStatement: block,
-                        position: startPos
-                    ));
+                    throw CreateSyntaxError(
+                        $"select case 中期望 'from'（接收操作）或 '<-'（发送操作），但得到 {CurrentToken.Type}");
                 }
             }
             else if (CurrentToken.Type == LangTokenType.Default)
