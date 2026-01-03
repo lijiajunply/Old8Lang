@@ -1,4 +1,5 @@
 using Old8Lang.GlobalFunctions.Implementations;
+using Old8Lang.GlobalFunctions.Implementations.Concurrency;
 
 namespace Old8Lang.GlobalFunctions.Core;
 
@@ -45,6 +46,77 @@ public static class GlobalFunctionInitializer
             registry.Register(new SpawnFunction());
             registry.Register(new DictFunction());
             registry.Register(new TupleFunction());
+
+            // 注册并发函数 - Mutex
+            registry.Register(new MutexCreateFunction());
+            registry.Register(new MutexLockFunction());
+            registry.Register(new MutexTryLockFunction());
+            registry.Register(new MutexUnlockFunction());
+            registry.Register(new MutexDisposeFunction());
+
+            // 注册并发函数 - Semaphore
+            registry.Register(new SemaphoreCreateFunction());
+            registry.Register(new SemaphoreAcquireFunction());
+            registry.Register(new SemaphoreTryAcquireFunction());
+            registry.Register(new SemaphoreReleaseFunction());
+            registry.Register(new SemaphoreDisposeFunction());
+
+            // 注册并发函数 - AtomicInt
+            registry.Register(new AtomicIntCreateFunction());
+            registry.Register(new AtomicIntGetFunction());
+            registry.Register(new AtomicIntSetFunction());
+            registry.Register(new AtomicIntIncrementFunction());
+            registry.Register(new AtomicIntDecrementFunction());
+            registry.Register(new AtomicIntAddFunction());
+            registry.Register(new AtomicIntCompareAndSetFunction());
+            registry.Register(new AtomicIntDisposeFunction());
+
+            // 注册并发函数 - Channel
+            registry.Register(new ChannelCreateFunction());
+            registry.Register(new ChannelCreateBoundedFunction());
+            registry.Register(new ChannelSendFunction());
+            registry.Register(new ChannelTrySendFunction());
+            registry.Register(new ChannelReceiveFunction());
+            registry.Register(new ChannelTryReceiveFunction());
+            registry.Register(new ChannelCloseFunction());
+            registry.Register(new ChannelDisposeFunction());
+
+            // 注册并发函数 - ReadWriteLock
+            registry.Register(new ReadWriteLockCreateFunction());
+            registry.Register(new ReadLockAcquireFunction());
+            registry.Register(new ReadLockReleaseFunction());
+            registry.Register(new WriteLockAcquireFunction());
+            registry.Register(new WriteLockReleaseFunction());
+            registry.Register(new ReadLockTryAcquireFunction());
+            registry.Register(new WriteLockTryAcquireFunction());
+            registry.Register(new ReadWriteLockDisposeFunction());
+
+            // 注册并发函数 - CountDownLatch
+            registry.Register(new CountDownLatchCreateFunction());
+            registry.Register(new CountDownLatchCountDownFunction());
+            registry.Register(new CountDownLatchWaitFunction());
+            registry.Register(new CountDownLatchWaitTimeoutFunction());
+            registry.Register(new CountDownLatchGetCountFunction());
+            registry.Register(new CountDownLatchDisposeFunction());
+
+            // 注册并发函数 - CyclicBarrier
+            registry.Register(new CyclicBarrierCreateFunction());
+            registry.Register(new CyclicBarrierAwaitFunction());
+            registry.Register(new CyclicBarrierAwaitTimeoutFunction());
+            registry.Register(new CyclicBarrierGetParticipantCountFunction());
+            registry.Register(new CyclicBarrierGetWaitingCountFunction());
+            registry.Register(new CyclicBarrierDisposeFunction());
+
+            // 注册并发函数 - CancellationTokenSource
+            registry.Register(new CreateCancellationTokenSourceFunction());
+            registry.Register(new CancelFunction());
+            registry.Register(new CancelAfterFunction());
+            registry.Register(new DisposeCancellationTokenSourceFunction());
+
+            // 注册并发工具函数
+            registry.Register(new SleepFunction());
+            registry.Register(new GetCurrentThreadIdFunction());
+            registry.Register(new GetProcessorCountFunction());
 
             _initialized = true;
         }

@@ -220,6 +220,12 @@ public enum LangTokenType
     Try,
     Catch,
     Finally,
+
+    /// <summary>
+    /// using
+    /// </summary>
+    Using,
+
     PlusPlus,
     MinusMinus,
     EndOfFile,
@@ -425,6 +431,7 @@ public enum KeywordType
     Try,
     Catch,
     Finally,
+    Using,
     And,
     Or,
     Xor,

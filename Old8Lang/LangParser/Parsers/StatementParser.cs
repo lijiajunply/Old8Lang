@@ -83,6 +83,12 @@ public class StatementParser(
             return ParseTryStatement();
         }
 
+        // 处理 using 语句（资源管理）
+        if (CurrentToken.Type == LangTokenType.Using)
+        {
+            return ParseUsingStatement();
+        }
+
         // 处理循环语句 For 和 For in
         if (CurrentToken.Type == LangTokenType.For)
         {
@@ -1748,6 +1754,54 @@ public class StatementParser(
         Expect(LangTokenType.RightBrace);
 
         return new EnumInit(enumName, members, startPos);
+    }
+
+    #endregion
+
+    #region Using Statement
+
+    /// <summary>
+    /// 解析 using 语句（资源管理）
+    /// 语法：
+    ///   using varName <- expr { statements }
+    ///   using expr { statements }
+    /// </summary>
+    private UsingStatement ParseUsingStatement()
+    {
+        var startPos = new SourcePosition(CurrentToken.Line, CurrentToken.Column);
+        Expect(LangTokenType.Using);
+
+        string? variableName = null;
+        LangExpression resourceExpression;
+
+        // 检查是否是变量声明形式: using varName <- expr
+        if (CurrentToken.Type == LangTokenType.Identifier)
+        {
+            var nextToken = Peek();
+            if (nextToken.Type == LangTokenType.Assignment)
+            {
+                // using varName <- expr { ... }
+                variableName = CurrentToken.Value;
+                CurrentIndex++; // 消费标识符
+                Expect(LangTokenType.Assignment); // 消费 <-
+                resourceExpression = expressionParser.ParseExpression();
+            }
+            else
+            {
+                // using expr { ... }
+                resourceExpression = expressionParser.ParseExpression();
+            }
+        }
+        else
+        {
+            // using expr { ... }
+            resourceExpression = expressionParser.ParseExpression();
+        }
+
+        // 解析 using 块（ParseBlock 会自己处理花括号）
+        var blockStatement = ParseBlock();
+
+        return new UsingStatement(variableName, resourceExpression, blockStatement, startPos);
     }
 
     #endregion

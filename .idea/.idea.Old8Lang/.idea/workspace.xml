@@ -22,7 +22,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Changes">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/UsingStatement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_using.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/GlobalFunctions/Core/GlobalFunctionInitializer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -59,53 +66,15 @@
     <setting file="file://$PROJECT_DIR$/FirstUI.TestApp/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/CompilerBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Benchmarks/InterpreterBenchmarkTests.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Handlers/DefinitionHandler.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Handlers/DefinitionHandler.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Handlers/DefinitionHandler.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Handlers/DefinitionHandler.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Handlers/DefinitionHandler.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Handlers/HoverHandler.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Models/SymbolInfo.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Models/SymbolInfo.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Services/DocumentManager.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Services/SymbolFinder.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Services/SymbolFinder.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/MqttClientWrapper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/SocketClient.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.NetLib/WebSocketClient.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/LanguageServer/SemanticAnalyzerTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/LanguageServer/SymbolFinderTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang.Tests/Library/RegexLibTest.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Parser/StructuredDocCommentTests.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests/Parser/StructuredDocCommentTests.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/ImportInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/ThreadClassLangValue.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/AsyncFuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Expression/Value/FuncLangValue.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/CharValueFuncStatic.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/BlockStatement.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/AST/Statement/FuncInit.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Compiler/TypeConversion.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8Lang/Error/CustomError.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/LangToken.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/LangToken.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/LangTokenType.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/Parsers/ExpressionParser.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang/LangParser/Parsers/PrimaryParser.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/CryptoLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/RegexLib.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" root0="FORCE_HIGHLIGHTING" />
@@ -132,16 +101,13 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/1c28eab5c675457986910a93422c074b108000/13/c04ed676/ClassicDesktopStyleApplicationLifetimeExtensions.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a840692e98b74557bc005b38213a22c72dad0/c8/58c2e0c9/Assert.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3b92f859131bde25d0f7a63de08963e995d1e1426e584dfd4b8e833d2d3dba/ExecutionTimer.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://diff.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
@@ -173,6 +139,7 @@
     "34038497-caa6-4590-9735-a11ac1a57cd0.executor": "Debug",
     "58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor": "Debug",
     "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -584,7 +551,11 @@
       <workItem from="1766997021901" duration="12927000" />
       <workItem from="1767123773418" duration="15798000" />
       <workItem from="1767204141752" duration="12710000" />
-      <workItem from="1767284902325" duration="23276000" />
+      <workItem from="1767284902325" duration="24555000" />
+      <workItem from="1767388259128" duration="2927000" />
+      <workItem from="1767429825540" duration="633000" />
+      <workItem from="1767433937853" duration="26000" />
+      <workItem from="1767434122437" duration="1113000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -929,7 +900,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="510" />
+    <option name="localTasksCounter" value="511" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -956,7 +927,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(theme): 实现主题系统和样式管理功能&#10;&#10;- 添加 ColorScheme 类用于定义颜色主题，包含浅色、深色、Material Design 和 Fluent Design 颜色方案&#10;- 添加 SpacingScheme 类用于定义间距系统，支持不同倍数的间距单位&#10;- 添加 StyleSheet、Style 和 StyleBuilder 类用于管理样式定义和构建&#10;- 添加 ThemeData 类用于存储完整的主题配置，包含颜色、字体、间距、阴影和圆角方案&#10;- 添加 Theme 类提供预定义主题创建方法，支持 light、dark、material、fluent 等主题&#10;- 在 FirstUIBinding 中实现主题切换功能，支持 SetTheme、GetCurrentTheme、ToggleTheme 等 API&#10;- 添加主题变化监听器支持，允许注册回调函数监听主题变化&#10;- 添加主题系统使用示例文档，展示基础主题切换和主题监听功能" />
     <MESSAGE value="fix(ast): 修复类型加载和范围语法问题&#10;&#10;- 修复 NativeAnyLangValue 中类型加载逻辑，支持简单类名和完整类型名&#10;- 修正标准库加载器使用完整类型名而非仅类名&#10;- 修复字符范围语法从 '..' 改为 '~' 的测试用例&#10;- 更新 IDE 配置文件中的任务计数和提交历史记录" />
     <MESSAGE value="refactor(FirstUI): 重构Avalonia应用初始化逻辑&#10;&#10;- 使用AppBuilder正确初始化Avalonia应用生命周期&#10;- 添加ClassicDesktopStyleApplicationLifetime支持桌面应用启动&#10;- 实现图形界面环境检测和平台不支持异常处理&#10;- 重构UI构建逻辑并保持错误处理机制&#10;- 更新应用上下文初始化流程&#10;- 移除旧的初始化检查逻辑并优化窗口创建过程" />
     <MESSAGE value="refactor(FirstUI): 重构Avalonia应用初始化逻辑&#10;&#10;- 使用AppBuilder正确初始化Avalonia应用生命周期&#10;- 添加ClassicDesktopStyleApplicationLifetime支持桌面应用启动&#10;- 实现图形界面环境检测和平台不支持异常处理&#10;- 重构UI构建逻辑并保持错误处理机制&#10;- 更新应用上下文初始化流程&#10;- 移除旧的初始化检查逻辑并优化窗口创建过程&#10;- 添加nullable注解支持并优化Invoke方法调用&#10;- 创建FirstUIAvaloniaApp应用类处理框架初始化&#10;- 重构Program.cs主入口点实现GUI支持的同步包装器" />
@@ -981,7 +951,8 @@
     <MESSAGE value="test(language-server): 添加语言服务器相关单元测试&#10;&#10;- 添加 DebugProfilerServiceTests 测试调试和性能分析服务功能&#10;- 添加 DefinitionHandlerTests 和 ReferencesHandlerTests 测试定义跳转和引用查找功能&#10;- 添加 DocumentManagerTests 测试文档管理器的增删改查操作&#10;- 添加 DocumentParseResultTests 测试文档解析结果的数据结构和诊断信息处理&#10;- 验证多文档管理和符号表构建的正确性&#10;- 测试语法错误和语义分析的诊断报告功能" />
     <MESSAGE value="fix(language-server): 修复符号查找器中的位置计算错误&#10;&#10;- 修正了LSP行列号与LangToken行列号转换的注释说明&#10;- 修复了token结束列计算逻辑，减去1以正确计算基于1的位置&#10;- 修正了EndColumn计算公式，减去2以正确转换为0-based坐标&#10;- 更新了所有测试用例中的行列号参数以匹配修正后的计算逻辑&#10;- 添加了调试测试方法用于分析token位置信息&#10;- 移除了旧的测试文件并更新了工作区配置文件的变更列表" />
     <MESSAGE value="fix(language-server): 修复悬停提示和符号查找功能&#10;&#10;- 修复悬停处理器中的符号类型显示逻辑，正确构建显示类型信息&#10;- 添加调试输出用于跟踪悬停请求和符号查找过程&#10;- 修复符号查找器中的成员访问查找逻辑，支持变量类型推断查找&#10;- 更新符号表构建器中的类型推断功能，支持多种表达式类型推断&#10;- 修正测试用例中的位置参数以匹配正确的行列号计算&#10;- 调整悬停提示测试断言，适应类型信息显示格式变化" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(language-server): 修复悬停提示和符号查找功能&#10;&#10;- 修复悬停处理器中的符号类型显示逻辑，正确构建显示类型信息&#10;- 添加调试输出用于跟踪悬停请求和符号查找过程&#10;- 修复符号查找器中的成员访问查找逻辑，支持变量类型推断查找&#10;- 更新符号表构建器中的类型推断功能，支持多种表达式类型推断&#10;- 修正测试用例中的位置参数以匹配正确的行列号计算&#10;- 调整悬停提示测试断言，适应类型信息显示格式变化" />
+    <MESSAGE value="fix(tests): 修正重命名处理器测试中的位置参数&#10;&#10;- 修正了testFunction定义位置从(1, 5)到(1, 17)的行列号&#10;- 修正了变量调用位置从(5, 10)和(6, 10)调整为(5, 23)和(6, 23)&#10;- 修正了myVariable定义位置从(1, 0)调整为(2, 11)&#10;- 清理了IDE工作区配置文件中的变更列表记录&#10;- 更新了悬停处理器的符号类型显示调试配置&#10;- 调整了工作项时长和本地任务计数统计信息" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(tests): 修正重命名处理器测试中的位置参数&#10;&#10;- 修正了testFunction定义位置从(1, 5)到(1, 17)的行列号&#10;- 修正了变量调用位置从(5, 10)和(6, 10)调整为(5, 23)和(6, 23)&#10;- 修正了myVariable定义位置从(1, 0)调整为(2, 11)&#10;- 清理了IDE工作区配置文件中的变更列表记录&#10;- 更新了悬停处理器的符号类型显示调试配置&#10;- 调整了工作项时长和本地任务计数统计信息" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
