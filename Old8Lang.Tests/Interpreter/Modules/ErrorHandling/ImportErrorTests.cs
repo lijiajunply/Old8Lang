@@ -35,7 +35,7 @@ result <- 42
     {
         // Arrange
         var testContent = """
-                          import "MathLib"
+                          import "Math"
                           result <- Abs(-5)
                           """;
         CreateTempModuleFile("circular_dependency_test.old8", testContent);

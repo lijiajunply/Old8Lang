@@ -14,7 +14,7 @@ public class ConditionalImportTests(ITestOutputHelper output) : ModuleImportTest
     {
         // Arrange
         var testContent = """
-            import "MathLib"
+            import "Math"
             useDebug <- true
             result <- "logging imported"
             """;

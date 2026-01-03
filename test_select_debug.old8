@@ -1,0 +1,9 @@
+result <- 0
+ch <- ChannelCreate()
+ChannelSend(ch, 42)
+select {
+    case val <- ChannelReceive(ch) -> {
+        result <- val
+    }
+}
+PrintLine(result)

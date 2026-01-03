@@ -14,7 +14,7 @@ public class CircularDependencyTests(ITestOutputHelper output) : ModuleImportTes
     {
         // Arrange
         var testContent = """
-            import "MathLib"
+            import "Math"
             result <- Abs(-5)
             """;
         CreateTempModuleFile("circular_dependency_basic_test.old8", testContent);

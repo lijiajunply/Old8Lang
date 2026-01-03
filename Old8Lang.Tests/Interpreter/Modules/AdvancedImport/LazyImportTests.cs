@@ -15,7 +15,7 @@ public class LazyImportTests(ITestOutputHelper output) : ModuleImportTestBase(ou
     {
         // Arrange
         var testContent = """
-            import "MathLib"
+            import "Math"
             result1 <- "Not loaded"
             result2 <- 123
             """;

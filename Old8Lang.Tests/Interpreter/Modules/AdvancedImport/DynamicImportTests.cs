@@ -15,7 +15,7 @@ public class DynamicImportTests(ITestOutputHelper output) : ModuleImportTestBase
     {
         // Arrange
         var testContent = """
-            import "MathLib"
+            import "Math"
             result <- Ceil(3.14)
             """;
         CreateTempModuleFile("dynamic_import_test.old8", testContent);

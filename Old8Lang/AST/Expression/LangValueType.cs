@@ -427,7 +427,21 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
                 pairs.Add(new KeyValuePair<LangExpression, LangExpression>(key, value));
             }
 
-            return new DictionaryLangValue(pairs);
+            var dictValue = new DictionaryLangValue(pairs);
+
+            // 手动填充 Value 字段，避免需要调用 Run(manager)
+            // 这对于从 channel 或其他来源反序列化的字典很重要
+            foreach (var kvp in pairs)
+            {
+                // 键和值已经是 LangValueType（因为 ObjToValue 返回 LangValueType）
+                // 将 LangExpression 转换为 LangValueType
+                if (kvp.Key is LangValueType keyValue && kvp.Value is LangValueType valueValue)
+                {
+                    dictValue.Value.Add((keyValue, valueValue));
+                }
+            }
+
+            return dictValue;
         }
         catch (Exception ex)
         {

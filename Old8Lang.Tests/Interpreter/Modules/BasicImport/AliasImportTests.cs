@@ -15,7 +15,7 @@ public class AliasImportTests(ITestOutputHelper output) : ModuleImportTestBase(o
     {
         // Arrange
         var testContent = """
-            import "MathLib" as m
+            import "Math" as m
             result <- m.sqrt(25)
             """;
         CreateTempModuleFile("with_alias_test.old8", testContent);
@@ -105,7 +105,7 @@ string_result <- s.repeat(""Hello"", 3)
     {
         // Arrange
         var testContent = """
-            import "MathLib"
+            import "Math"
             angle <- GetPi() / 4
             result <- Sin(angle) / Cos(angle)
             """;

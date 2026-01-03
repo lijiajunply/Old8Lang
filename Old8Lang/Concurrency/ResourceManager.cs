@@ -4,6 +4,32 @@ using System.Threading.Channels;
 namespace Old8Lang.Concurrency;
 
 /// <summary>
+/// Channel 接收结果
+/// </summary>
+public class ChannelReceiveResult
+{
+    /// <summary>
+    /// 是否成功接收
+    /// </summary>
+    public bool Success { get; set; }
+
+    /// <summary>
+    /// 接收到的值（可能为 null）
+    /// </summary>
+    public object? Value { get; set; }
+
+    /// <summary>
+    /// 表示接收失败的结果
+    /// </summary>
+    public static ChannelReceiveResult Failed => new() { Success = false, Value = null };
+
+    /// <summary>
+    /// 表示接收成功的结果
+    /// </summary>
+    public static ChannelReceiveResult FromValue(object? value) => new() { Success = true, Value = value };
+}
+
+/// <summary>
 /// 资源管理器 - 统一管理所有并发资源
 /// </summary>
 public static class ResourceManager
@@ -305,8 +331,21 @@ public static class ResourceManager
         }
 
         wrapper.UpdateLastAccessTime();
-        var task = wrapper.Resource.Writer.WriteAsync(value).AsTask();
-        return task.Wait(timeoutMs);
+        try
+        {
+            var task = wrapper.Resource.Writer.WriteAsync(value).AsTask();
+            return task.Wait(timeoutMs);
+        }
+        catch (AggregateException ex) when (ex.InnerException is System.Threading.Channels.ChannelClosedException)
+        {
+            // Channel 已关闭，返回 false 表示发送失败
+            return false;
+        }
+        catch (System.Threading.Channels.ChannelClosedException)
+        {
+            // Channel 已关闭，返回 false 表示发送失败
+            return false;
+        }
     }
 
     public static object ReceiveChannel(int channelId)
@@ -320,7 +359,7 @@ public static class ResourceManager
         return wrapper.Resource.Reader.ReadAsync().GetAwaiter().GetResult();
     }
 
-    public static object? TryReceiveChannel(int channelId, int timeoutMs)
+    public static ChannelReceiveResult TryReceiveChannel(int channelId, int timeoutMs)
     {
         if (!Channels.TryGetValue(channelId, out var wrapper))
         {
@@ -331,10 +370,19 @@ public static class ResourceManager
         var task = wrapper.Resource.Reader.ReadAsync().AsTask();
         if (task.Wait(timeoutMs))
         {
-            return task.GetAwaiter().GetResult();
+            try
+            {
+                var result = task.GetAwaiter().GetResult();
+                return ChannelReceiveResult.FromValue(result);
+            }
+            catch (InvalidOperationException)
+            {
+                // 任务未完成或被取消
+                return ChannelReceiveResult.Failed;
+            }
         }
 
-        return null;
+        return ChannelReceiveResult.Failed;
     }
 
     public static void CloseChannel(int channelId)

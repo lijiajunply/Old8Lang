@@ -23,9 +23,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/SimpleImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/SimpleImportTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/TimeTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/StandardLibrary/TimeTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_dict_channel.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_select_debug.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/DynamicImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/LazyImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/AliasImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/AliasImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/WildcardImportTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/BasicImport/WildcardImportTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/ErrorHandling/CircularDependencyTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/ErrorHandling/CircularDependencyTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/ErrorHandling/ImportErrorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/ErrorHandling/ImportErrorTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangValueType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SelectStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SelectStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Concurrency/ResourceManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/ResourceManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -897,7 +907,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="514" />
+    <option name="localTasksCounter" value="516" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -924,8 +934,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(firstui): 重构FirstUI应用初始化和依赖配置&#10;&#10;- 移除未使用的_mainWindow字段&#10;- 使用数组字面量语法替换Array.Empty&lt;string&gt;()&#10;- 添加Inter字体支持并更新Avalonia配置&#10;- 移除不必要的上下文空值检查&#10;- 移除Colorful.Console包依赖&#10;- 升级Avalonia框架到1.3.10版本&#10;- 添加Avalonia.Fonts.Inter字体包依赖&#10;- 更新IDE工作区配置和调试设置" />
-    <MESSAGE value="refactor(app): 移除修改导入路径命令并优化程序入口点&#10;&#10;- 移除 ChangeImportCommand 命令类文件&#10;- 从命令注册表中移除修改导入路径命令&#10;- 重构 Program.cs 主入口点，移除同步包装器方法&#10;- 调整命令注册顺序，保持性能分析命令注册&#10;- 更新 IDE 配置文件中的 JSON 格式转义字符" />
     <MESSAGE value="feat(components): 添加新组件并完善绑定API&#10;&#10;- 新增 Wrap 布局组件支持自动换行/换列&#10;- 新增 Icon 图标组件，支持 Material Icons、Font Awesome、Unicode 等多种图标库&#10;- 新增 Switch 开关组件提供布尔值选择功能&#10;- 新增 Slider 滑块组件支持范围选择&#10;- 新增 ProgressBar 进度条组件，支持线性和圆形样式&#10;- 新增 TextArea 多行文本输入组件&#10;- 新增 Select 下拉选择组件&#10;- 新增 NavigationView 导航视图组件，支持侧边栏导航&#10;- 新增 Panel 面板组件，支持标题栏和边框&#10;- 完善 FirstUIBinding 绑定层，添加新组件的创建API&#10;- 更新 Button 组件构造函数支持参数注入&#10;- 添加 Svg.Controls.Avalonia 包支持SVG图标渲染" />
     <MESSAGE value="feat(components): 添加 DatePicker、FilePicker 和 Table 组件&#10;&#10;- 实现 DatePicker 日期选择器，支持多种显示模式和日期范围限制&#10;- 添加 FilePicker 文件选择器，提供文件和文件夹选择功能&#10;- 创建 Table 表格组件，支持排序、筛选、分页和行选择功能&#10;- 为新组件提供完整的链式调用 API&#10;- 实现表格的斑马纹、悬停效果和选中行样式&#10;- 添加日期选择器的文化信息和格式化支持&#10;- 实现文件选择器的路径显示和文件信息获取功能" />
     <MESSAGE value="refactor(cli): 将命令执行方法从异步改为同步&#10;&#10;- 将 CertCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 CompilerCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 DebugCommands 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 FromFileCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 HelpCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 ICommand 接口中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 InitCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 InstallCommand 中的所有异步方法改为同步方法&#10;- 将 ListCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 PackCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 ProfileCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 Program.cs 中的 Main 方法改为同步方法&#10;- 将 PublishCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 RemoveCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 RestoreCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 RunCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 SignCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 SyntaxTestCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 UnpackCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 VerifyCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 将 VersionCommand 中的 ExecuteAsync 方法改为 Execute 同步方法&#10;- 在需要的地方使用 GetAwaiter().GetResult() 替代异步等待&#10;- 将 Task.Delay 替换为 Thread.Sleep 以保持延迟功能" />
@@ -949,7 +957,9 @@
     <MESSAGE value="feat(lang): 添加并发原语和using语句支持&#10;&#10;- 注册Mutex、Semaphore、AtomicInt、Channel等57个并发全局函数&#10;- 添加Using语句的词法解析和AST节点实现&#10;- 实现using语句的资源自动管理和try-finally逻辑&#10;- 添加using语句的IL代码生成和解释器执行支持&#10;- 创建并发原语的资源管理器和内部实现类&#10;- 更新语言解析器和类型系统以支持新的并发特性" />
     <MESSAGE value="test(select): 添加 select 语句的解析、解释器和边界测试&#10;&#10;- 实现了 SelectStatementTests 类，包含基本发送、接收、多 case 测试&#10;- 添加了 EdgeCasesTests 类，覆盖嵌套 select、channel 边界、控制流等场景&#10;- 创建了 Parser 测试，验证 select 语句的语法解析功能&#10;- 测试包括空 case 块、异常处理、复杂表达式和并发场景&#10;- 验证了有界 channel、变量作用域和资源清理功能" />
     <MESSAGE value="feat(lang): 添加defer语句支持&#10;&#10;- 实现DeferStatement类，支持延迟执行功能&#10;- 添加defer语句的解析和执行逻辑&#10;- 支持defer语句后进先出(LIFO)执行顺序&#10;- 添加defer语句的编译器IL生成支持&#10;- 实现defer语句与return、异常处理的交互&#10;- 添加大量defer语句的测试用例，包括基本功能、边界条件、异常处理等&#10;- 支持defer代码块和复杂表达式&#10;- 实现defer语句的资源管理功能测试" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加defer语句支持&#10;&#10;- 实现DeferStatement类，支持延迟执行功能&#10;- 添加defer语句的解析和执行逻辑&#10;- 支持defer语句后进先出(LIFO)执行顺序&#10;- 添加defer语句的编译器IL生成支持&#10;- 实现defer语句与return、异常处理的交互&#10;- 添加大量defer语句的测试用例，包括基本功能、边界条件、异常处理等&#10;- 支持defer代码块和复杂表达式&#10;- 实现defer语句的资源管理功能测试" />
+    <MESSAGE value="refactor(standard-library): 更新标准库模块名称和导入语法&#10;&#10;- 将 MathLib 模块重命名为 Math 模块&#10;- 更新所有测试中的模块导入语法&#10;- 修复 Time 模块中的函数调用方式&#10;- 简化异步函数调用的语法结构&#10;- 更新标准库注册表中的模块映射关系" />
+    <MESSAGE value="refactor(tests): 移除嵌套函数defer语句测试&#10;&#10;- 删除了嵌套函数中defer语句执行独立性的测试用例&#10;- 移除了相关的测试代码和断言逻辑" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(tests): 移除嵌套函数defer语句测试&#10;&#10;- 删除了嵌套函数中defer语句执行独立性的测试用例&#10;- 移除了相关的测试代码和断言逻辑" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1184,10 +1194,10 @@
           <line>209</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" containingFunctionPresentation="方法 'Import_ConditionalWithComplexExpression_ShouldEvaluateExpression'">
             <startOffsets>
-              <option value="6604" />
+              <option value="6601" />
             </startOffsets>
             <endOffsets>
-              <option value="6700" />
+              <option value="6697" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="594" />
@@ -1197,10 +1207,10 @@
           <line>208</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/AdvancedImport/ConditionalImportTests.cs" containingFunctionPresentation="方法 'Import_ConditionalWithComplexExpression_ShouldEvaluateExpression'">
             <startOffsets>
-              <option value="6572" />
+              <option value="6569" />
             </startOffsets>
             <endOffsets>
-              <option value="6595" />
+              <option value="6592" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="595" />

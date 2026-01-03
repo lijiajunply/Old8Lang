@@ -123,22 +123,43 @@ public partial class SelectStatement(
                 if (selectCase.IsReceive)
                 {
                     // 接收case：尝试非阻塞接收
-                    var channelIdValue = selectCase.ChannelExpression.Run(manager);
-                    if (channelIdValue is IntLangValue intVal)
-                    {
-                        int channelId = intVal.Value;
-                        var result = ResourceManager.TryReceiveChannel(channelId, 0);
-                        if (result != null)
-                        {
-                            // 接收成功
-                            if (selectCase.VariableName != null)
-                            {
-                                manager.Set(new LangId(selectCase.VariableName), LangValueType.ObjToValue(result));
-                            }
+                    int channelId;
 
-                            selectCase.BlockStatement.Run(manager);
-                            return;
+                    // 检查 ChannelExpression 是否为 ChannelReceive 函数调用
+                    if (selectCase.ChannelExpression is Instance funcCall &&
+                        funcCall.Id.IdName == "ChannelReceive" &&
+                        funcCall.Ids.Count > 0)
+                    {
+                        // 提取实际的 channel ID 参数
+                        var channelIdValue = funcCall.Ids[0].Run(manager);
+                        if (channelIdValue is not IntLangValue intVal)
+                        {
+                            continue;
                         }
+                        channelId = intVal.Value;
+                    }
+                    else
+                    {
+                        // 直接执行 ChannelExpression 获取 channel ID
+                        var channelIdValue = selectCase.ChannelExpression.Run(manager);
+                        if (channelIdValue is not IntLangValue intVal)
+                        {
+                            continue;
+                        }
+                        channelId = intVal.Value;
+                    }
+
+                    var receiveResult = ResourceManager.TryReceiveChannel(channelId, 0);
+                    if (receiveResult.Success)
+                    {
+                        // 接收成功
+                        if (selectCase.VariableName != null)
+                        {
+                            manager.Set(new LangId(selectCase.VariableName), LangValueType.ObjToValue(receiveResult.Value));
+                        }
+
+                        selectCase.BlockStatement.Run(manager);
+                        return;
                     }
                 }
                 else

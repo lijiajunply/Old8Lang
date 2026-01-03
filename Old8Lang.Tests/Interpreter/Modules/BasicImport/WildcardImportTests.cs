@@ -16,7 +16,7 @@ public class WildcardImportTests(ITestOutputHelper output) : ModuleImportTestBas
     {
         // Arrange
         var testContent = """
-            import "MathLib"
+            import "Math"
             result <- Sqrt(100)
             """;
         CreateTempModuleFile("wildcard_test.old8", testContent);

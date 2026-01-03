@@ -1,0 +1,14 @@
+result <- 0
+ch <- ChannelCreate()
+data <- {"a": 1, "b": 2, "c": 3}
+PrintLine("发送前的 data:")
+PrintLine(data)
+ChannelSend(ch, data)
+received <- ChannelReceive(ch)
+PrintLine("接收后的 received:")
+PrintLine(received)
+PrintLine("received[\"a\"] =")
+PrintLine(received["a"])
+result <- received["a"] + received["b"] + received["c"]
+PrintLine("result:")
+PrintLine(result)
