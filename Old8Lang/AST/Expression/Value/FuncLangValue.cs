@@ -621,6 +621,10 @@ public class FuncLangValue : ImportInfo
         // 调用方法体
         // 递归深度检查
         variateManagerFunc.RecursionDepth++;
+
+        // 提前声明executionManager以便在finally中使用
+        VariateManager? executionManager = null;
+
         try
         {
             // 入栈：记录函数调用
@@ -628,7 +632,6 @@ public class FuncLangValue : ImportInfo
 
             // 如果有捕获的作用域（闭包），使用捕获的作用域而不是调用时的作用域
             // 这样函数体就能访问定义时的外部变量
-            VariateManager executionManager;
             if (CapturedScope != null)
             {
                 // 使用捕获的作用域作为基础
@@ -706,6 +709,9 @@ public class FuncLangValue : ImportInfo
             // 重置return标志，确保函数调用不会影响外部上下文
             executionManager.IsReturn = false;
 
+            // 在移除子作用域之前执行所有defer语句（此时变量仍然可见）
+            executionManager.ExecuteDefers();
+
             // 恢复原始的函数返回类型，避免嵌套调用时的类型污染
             executionManager.CurrentFunctionReturnType = originalReturnType;
             executionManager.CurrentFunctionTypeArgumentMapping = originalTypeArgumentMapping;
@@ -718,6 +724,8 @@ public class FuncLangValue : ImportInfo
         }
         finally
         {
+            // finally块不再执行defer（已经在try块中执行了）
+
             // 确保递归深度总是被递减
             variateManagerFunc.RecursionDepth--;
             // 出栈：函数调用结束

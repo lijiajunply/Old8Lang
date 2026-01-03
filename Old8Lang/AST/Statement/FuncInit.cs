@@ -169,6 +169,20 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
             methodIl.Emit(OpCodes.Stloc, localVar);
         }
 
+        // 为支持defer，使用try-finally包装函数体
+        // 声明返回值局部变量（如果需要）
+        if (returnType != typeof(void))
+        {
+            funcLocal.ReturnValueLocal = methodIl.DeclareLocal(returnType);
+        }
+
+        // 创建函数结束标签
+        var endLabel = methodIl.DefineLabel();
+        funcLocal.ReturnLabel = endLabel;
+
+        // 开始 try-finally 块
+        methodIl.BeginExceptionBlock();
+
         // 生成方法体的 IL 代码
         FuncLangValue.BlockStatement.GenerateIl(methodIl, funcLocal);
 
@@ -177,22 +191,14 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
             ? FuncLangValue.BlockStatement[^1]
             : null;
 
-        // 只有当最后一个语句不是 ReturnStatement 时，才添加 Ret 指令
+        // 如果最后一个语句不是 ReturnStatement，提供默认返回值
         if (lastStatement is not ReturnStatement)
         {
-            // 确保栈平衡
-            if (returnType == typeof(void))
+            if (returnType != typeof(void))
             {
-                // 对于 void 方法，直接添加 Ret 指令
-                methodIl.Emit(OpCodes.Ret);
-            }
-            else
-            {
-                // 对于有返回值的方法，如果没有显式 return，需要提供默认返回值
+                // 为有返回值的函数提供默认值并存储到ReturnValueLocal
                 if (returnType.IsValueType)
                 {
-                    // 对于值类型，创建默认值
-                    var defaultValue = Activator.CreateInstance(returnType);
                     if (returnType == typeof(int))
                     {
                         methodIl.Emit(OpCodes.Ldc_I4_0);
@@ -207,7 +213,6 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
                     }
                     else
                     {
-                        // 对于其他值类型，初始化并加载默认值
                         var defaultLocal = methodIl.DeclareLocal(returnType);
                         methodIl.Emit(OpCodes.Initobj, returnType);
                         methodIl.Emit(OpCodes.Ldloc, defaultLocal);
@@ -215,12 +220,28 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
                 }
                 else
                 {
-                    // 对于引用类型，返回 null
                     methodIl.Emit(OpCodes.Ldnull);
                 }
-                methodIl.Emit(OpCodes.Ret);
+                methodIl.Emit(OpCodes.Stloc, funcLocal.ReturnValueLocal!);
             }
         }
+
+        // Finally 块：执行 defer 语句
+        methodIl.BeginFinallyBlock();
+        funcLocal.IsInFinallyBlock = true;
+        funcLocal.GenerateDeferIL(methodIl);
+        funcLocal.IsInFinallyBlock = false;
+        methodIl.EndExceptionBlock();
+
+        // 标记函数结束位置
+        methodIl.MarkLabel(endLabel);
+
+        // 加载返回值并返回
+        if (returnType != typeof(void))
+        {
+            methodIl.Emit(OpCodes.Ldloc, funcLocal.ReturnValueLocal!);
+        }
+        methodIl.Emit(OpCodes.Ret);
 
         // 将方法添加到本地变量管理器
         // 对于用户定义的函数，我们需要保留原始方法名以便调用

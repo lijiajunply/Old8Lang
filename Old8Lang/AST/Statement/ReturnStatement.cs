@@ -49,17 +49,29 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
         // 加载返回表达式的值到栈上
         returnExpression.LoadIlValue(ilGenerator, local);
 
-        // 只有当返回值类型是 Task<object> 时，才进行异步包装
-        // 这表明当前函数是异步函数
-        if (returnType == typeof(Task<object>))
+        // 如果函数使用了defer（ReturnValueLocal不为null），存储返回值并跳转到结束标签
+        if (local.ReturnValueLocal != null)
         {
-            // 返回值已经是 Task<object>，直接返回
-            ilGenerator.Emit(OpCodes.Ret);
+            // 存储返回值到局部变量
+            ilGenerator.Emit(OpCodes.Stloc, local.ReturnValueLocal);
+            // 使用Leave指令退出try块，跳转到函数结束标签
+            ilGenerator.Emit(OpCodes.Leave, local.ReturnLabel!.Value);
         }
         else
         {
-            // 对于同步函数，直接返回值，不进行任何包装
-            ilGenerator.Emit(OpCodes.Ret);
+            // 没有使用defer，直接返回
+            // 只有当返回值类型是 Task<object> 时，才进行异步包装
+            // 这表明当前函数是异步函数
+            if (returnType == typeof(Task<object>))
+            {
+                // 返回值已经是 Task<object>，直接返回
+                ilGenerator.Emit(OpCodes.Ret);
+            }
+            else
+            {
+                // 对于同步函数，直接返回值，不进行任何包装
+                ilGenerator.Emit(OpCodes.Ret);
+            }
         }
     }
 

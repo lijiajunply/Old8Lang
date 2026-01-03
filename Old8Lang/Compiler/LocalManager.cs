@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using Old8Lang.AST;
 using Old8Lang.AST.Expression;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
@@ -96,6 +97,68 @@ public class LocalManager
     /// 标记是否在finally块中生成IL代码
     /// </summary>
     public bool IsInFinallyBlock { get; set; }
+
+    /// <summary>
+    /// 函数返回值的局部变量（用于defer支持）
+    /// </summary>
+    /// <remarks>
+    /// 当函数使用defer时，return语句会将返回值存储到这个局部变量
+    /// 而不是直接返回，以便在finally块中执行defer
+    /// </remarks>
+    public LocalBuilder? ReturnValueLocal { get; set; }
+
+    /// <summary>
+    /// 函数结束标签（用于defer支持）
+    /// </summary>
+    /// <remarks>
+    /// 当函数使用defer时，return语句会跳转到这个标签
+    /// 而不是直接ret，以便在finally块中执行defer
+    /// </remarks>
+    public Label? ReturnLabel { get; set; }
+
+    /// <summary>
+    /// defer语句栈，用于延迟执行（后进先出LIFO）
+    /// </summary>
+    /// <remarks>
+    /// defer语句在函数返回前执行，多个defer按后进先出顺序执行
+    /// 编译器需要在函数结束前生成对应的IL代码
+    /// </remarks>
+    private readonly Stack<OldStatement> DeferStack = new();
+
+    /// <summary>
+    /// 注册一个defer语句
+    /// </summary>
+    /// <param name="statement">要延迟执行的语句</param>
+    public void RegisterDefer(OldStatement statement)
+    {
+        DeferStack.Push(statement);
+    }
+
+    /// <summary>
+    /// 生成所有defer语句的IL代码（按后进先出顺序）
+    /// </summary>
+    /// <param name="ilGenerator">IL指令生成器</param>
+    public void GenerateDeferIL(ILGenerator ilGenerator)
+    {
+        // 将defer语句从栈中取出，按后进先出顺序生成IL
+        var defers = DeferStack.ToList(); // ToList会保持栈的顺序（先进的在后面）
+        foreach (var deferStatement in defers)
+        {
+            // 为每个defer生成try-catch包装，确保异常不会影响其他defer的执行
+            var exceptionLocal = ilGenerator.DeclareLocal(typeof(Exception));
+            ilGenerator.BeginExceptionBlock();
+
+            // 生成defer语句的IL代码
+            deferStatement.GenerateIl(ilGenerator, this);
+
+            // catch块：捕获但不处理异常（符合defer语义）
+            ilGenerator.BeginCatchBlock(typeof(Exception));
+            ilGenerator.Emit(OpCodes.Stloc, exceptionLocal);
+            // 异常被捕获，继续执行后续defer
+
+            ilGenerator.EndExceptionBlock();
+        }
+    }
 
     /// <summary>
     /// 是否启用严格类型检查

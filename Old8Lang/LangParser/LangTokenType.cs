@@ -226,6 +226,11 @@ public enum LangTokenType
     /// </summary>
     Using,
 
+    /// <summary>
+    /// defer
+    /// </summary>
+    Defer,
+
     PlusPlus,
     MinusMinus,
     EndOfFile,
@@ -432,6 +437,7 @@ public enum KeywordType
     Catch,
     Finally,
     Using,
+    Defer,
     And,
     Or,
     Xor,

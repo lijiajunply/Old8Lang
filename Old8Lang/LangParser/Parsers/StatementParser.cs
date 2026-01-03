@@ -89,6 +89,12 @@ public class StatementParser(
             return ParseUsingStatement();
         }
 
+        // 处理 defer 语句（延迟执行）
+        if (CurrentToken.Type == LangTokenType.Defer)
+        {
+            return ParseDeferStatement();
+        }
+
         // 处理循环语句 For 和 For in
         if (CurrentToken.Type == LangTokenType.For)
         {
@@ -1809,6 +1815,34 @@ public class StatementParser(
         var blockStatement = ParseBlock();
 
         return new UsingStatement(variableName, resourceExpression, blockStatement, startPos);
+    }
+
+    /// <summary>
+    /// 解析 defer 语句
+    /// 语法：
+    ///   defer statement
+    ///   defer { ... }
+    /// </summary>
+    private DeferStatement ParseDeferStatement()
+    {
+        var startPos = new SourcePosition(CurrentToken.Line, CurrentToken.Column);
+        Expect(LangTokenType.Defer);
+
+        OldStatement statement;
+
+        // 检查是否是代码块形式
+        if (CurrentToken.Type == LangTokenType.LeftBrace)
+        {
+            // defer { ... }
+            statement = ParseBlock();
+        }
+        else
+        {
+            // defer statement
+            statement = ParseStatement();
+        }
+
+        return new DeferStatement(statement, startPos);
     }
 
     #endregion

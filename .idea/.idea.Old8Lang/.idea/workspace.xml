@@ -23,13 +23,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/SelectStatementEdgeCasesTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/UsingStatementEdgeCasesTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/SelectStatementTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/UsingStatementTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Statement/SelectStatementTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Statement/UsingStatementTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompilerTests/defer_compiler_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/defer_basic_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/DeferStatementEdgeCasesTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Statements/DeferStatementTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Statement/DeferStatementTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/DeferStatement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SyntaxTests/defer_syntax_test.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/Old8Lang.ebnf" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Old8Lang.ebnf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/FuncInit.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -901,7 +911,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="512" />
+    <option name="localTasksCounter" value="513" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -928,7 +938,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(FirstUI): 重构Avalonia应用初始化逻辑&#10;&#10;- 使用AppBuilder正确初始化Avalonia应用生命周期&#10;- 添加ClassicDesktopStyleApplicationLifetime支持桌面应用启动&#10;- 实现图形界面环境检测和平台不支持异常处理&#10;- 重构UI构建逻辑并保持错误处理机制&#10;- 更新应用上下文初始化流程&#10;- 移除旧的初始化检查逻辑并优化窗口创建过程" />
     <MESSAGE value="refactor(FirstUI): 重构Avalonia应用初始化逻辑&#10;&#10;- 使用AppBuilder正确初始化Avalonia应用生命周期&#10;- 添加ClassicDesktopStyleApplicationLifetime支持桌面应用启动&#10;- 实现图形界面环境检测和平台不支持异常处理&#10;- 重构UI构建逻辑并保持错误处理机制&#10;- 更新应用上下文初始化流程&#10;- 移除旧的初始化检查逻辑并优化窗口创建过程&#10;- 添加nullable注解支持并优化Invoke方法调用&#10;- 创建FirstUIAvaloniaApp应用类处理框架初始化&#10;- 重构Program.cs主入口点实现GUI支持的同步包装器" />
     <MESSAGE value="refactor(firstui): 重构FirstUI应用初始化和依赖配置&#10;&#10;- 移除未使用的_mainWindow字段&#10;- 使用数组字面量语法替换Array.Empty&lt;string&gt;()&#10;- 添加Inter字体支持并更新Avalonia配置&#10;- 移除不必要的上下文空值检查&#10;- 移除Colorful.Console包依赖&#10;- 升级Avalonia框架到1.3.10版本&#10;- 添加Avalonia.Fonts.Inter字体包依赖&#10;- 更新IDE工作区配置和调试设置" />
     <MESSAGE value="refactor(app): 移除修改导入路径命令并优化程序入口点&#10;&#10;- 移除 ChangeImportCommand 命令类文件&#10;- 从命令注册表中移除修改导入路径命令&#10;- 重构 Program.cs 主入口点，移除同步包装器方法&#10;- 调整命令注册顺序，保持性能分析命令注册&#10;- 更新 IDE 配置文件中的 JSON 格式转义字符" />
@@ -953,7 +962,8 @@
     <MESSAGE value="fix(language-server): 修复悬停提示和符号查找功能&#10;&#10;- 修复悬停处理器中的符号类型显示逻辑，正确构建显示类型信息&#10;- 添加调试输出用于跟踪悬停请求和符号查找过程&#10;- 修复符号查找器中的成员访问查找逻辑，支持变量类型推断查找&#10;- 更新符号表构建器中的类型推断功能，支持多种表达式类型推断&#10;- 修正测试用例中的位置参数以匹配正确的行列号计算&#10;- 调整悬停提示测试断言，适应类型信息显示格式变化" />
     <MESSAGE value="fix(tests): 修正重命名处理器测试中的位置参数&#10;&#10;- 修正了testFunction定义位置从(1, 5)到(1, 17)的行列号&#10;- 修正了变量调用位置从(5, 10)和(6, 10)调整为(5, 23)和(6, 23)&#10;- 修正了myVariable定义位置从(1, 0)调整为(2, 11)&#10;- 清理了IDE工作区配置文件中的变更列表记录&#10;- 更新了悬停处理器的符号类型显示调试配置&#10;- 调整了工作项时长和本地任务计数统计信息" />
     <MESSAGE value="feat(lang): 添加并发原语和using语句支持&#10;&#10;- 注册Mutex、Semaphore、AtomicInt、Channel等57个并发全局函数&#10;- 添加Using语句的词法解析和AST节点实现&#10;- 实现using语句的资源自动管理和try-finally逻辑&#10;- 添加using语句的IL代码生成和解释器执行支持&#10;- 创建并发原语的资源管理器和内部实现类&#10;- 更新语言解析器和类型系统以支持新的并发特性" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加并发原语和using语句支持&#10;&#10;- 注册Mutex、Semaphore、AtomicInt、Channel等57个并发全局函数&#10;- 添加Using语句的词法解析和AST节点实现&#10;- 实现using语句的资源自动管理和try-finally逻辑&#10;- 添加using语句的IL代码生成和解释器执行支持&#10;- 创建并发原语的资源管理器和内部实现类&#10;- 更新语言解析器和类型系统以支持新的并发特性" />
+    <MESSAGE value="test(select): 添加 select 语句的解析、解释器和边界测试&#10;&#10;- 实现了 SelectStatementTests 类，包含基本发送、接收、多 case 测试&#10;- 添加了 EdgeCasesTests 类，覆盖嵌套 select、channel 边界、控制流等场景&#10;- 创建了 Parser 测试，验证 select 语句的语法解析功能&#10;- 测试包括空 case 块、异常处理、复杂表达式和并发场景&#10;- 验证了有界 channel、变量作用域和资源清理功能" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(select): 添加 select 语句的解析、解释器和边界测试&#10;&#10;- 实现了 SelectStatementTests 类，包含基本发送、接收、多 case 测试&#10;- 添加了 EdgeCasesTests 类，覆盖嵌套 select、channel 边界、控制流等场景&#10;- 创建了 Parser 测试，验证 select 语句的语法解析功能&#10;- 测试包括空 case 块、异常处理、复杂表达式和并发场景&#10;- 验证了有界 channel、变量作用域和资源清理功能" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

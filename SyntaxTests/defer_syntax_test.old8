@@ -1,0 +1,82 @@
+// defer 语法测试
+
+// 基本defer语句
+func testBasicDefer() -> void {
+    defer PrintLine("清理资源")
+    PrintLine("执行函数体")
+}
+
+// defer代码块
+func testDeferBlock() -> void {
+    defer {
+        PrintLine("清理1")
+        PrintLine("清理2")
+    }
+    PrintLine("执行函数体")
+}
+
+// 多个defer语句（后进先出）
+func testMultipleDefer() -> void {
+    defer PrintLine("第一个defer")
+    defer PrintLine("第二个defer")
+    defer PrintLine("第三个defer")
+    PrintLine("执行函数体")
+}
+
+// defer访问局部变量
+func testDeferWithVariables() -> void {
+    x <- 100
+    defer PrintLine(x.ToStr())
+    x <- 200
+}
+
+// defer中的函数调用
+func cleanup(msg:string) -> void {
+    PrintLine(msg)
+}
+
+func testDeferFunctionCall() -> void {
+    defer cleanup("调用cleanup函数")
+    PrintLine("执行函数体")
+}
+
+// defer与return配合
+func testDeferWithReturn() -> int {
+    defer PrintLine("函数返回前执行")
+    return 42
+}
+
+// defer与多个return路径
+func testDeferWithMultipleReturns(flag:bool) -> int {
+    defer PrintLine("无论哪个return都会执行")
+    if flag {
+        return 1
+    } else {
+        return 2
+    }
+}
+
+// defer嵌套（函数调用中的defer）
+func outer() -> void {
+    defer PrintLine("outer defer")
+    inner()
+}
+
+func inner() -> void {
+    defer PrintLine("inner defer")
+    PrintLine("inner body")
+}
+
+// defer代码块中的复杂逻辑
+func testComplexDeferBlock() -> void {
+    x <- 10
+    defer {
+        if x > 5 {
+            PrintLine("x大于5")
+        } else {
+            PrintLine("x小于等于5")
+        }
+        PrintLine("清理完成")
+    }
+    x <- x * 2
+}

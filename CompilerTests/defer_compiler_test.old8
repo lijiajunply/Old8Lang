@@ -1,0 +1,78 @@
+// defer 编译器测试
+
+// 基本defer执行测试
+func testBasicDefer() -> void {
+    PrintLine("开始执行")
+    defer PrintLine("defer: 清理资源")
+    PrintLine("函数主体")
+}
+
+// defer后进先出测试
+func testDeferOrder() -> void {
+    defer PrintLine("defer 1")
+    defer PrintLine("defer 2")
+    defer PrintLine("defer 3")
+    PrintLine("函数体执行")
+}
+
+// defer访问变量
+func testDeferVariable() -> void {
+    x:string <- "初始值"
+    defer PrintLine("defer看到的x: " + x)
+    x <- "修改后的值"
+    PrintLine("函数体中的x: " + x)
+}
+
+// defer与return
+func testDeferWithReturn() -> string {
+    defer PrintLine("函数即将返回")
+    return "返回值"
+}
+
+// defer代码块
+func testDeferBlock() -> void {
+    x:int <- 10
+    defer {
+        PrintLine("defer block: x = " + x.ToStr())
+        PrintLine("defer block: 清理完成")
+    }
+    x <- 20
+    PrintLine("函数体: x = " + x.ToStr())
+}
+
+// defer与多个return路径
+func testDeferMultipleReturns(flag:bool) -> int {
+    defer PrintLine("defer: 无论哪个return都会执行")
+    if flag {
+        PrintLine("返回路径1")
+        return 1
+    } else {
+        PrintLine("返回路径2")
+        return 2
+    }
+}
+
+// 执行测试
+PrintLine("=== 测试1: 基本defer ===")
+testBasicDefer()
+
+PrintLine("\n=== 测试2: defer执行顺序 ===")
+testDeferOrder()
+
+PrintLine("\n=== 测试3: defer访问变量 ===")
+testDeferVariable()
+
+PrintLine("\n=== 测试4: defer与return ===")
+result:string <- testDeferWithReturn()
+PrintLine("收到返回值: " + result)
+
+PrintLine("\n=== 测试5: defer代码块 ===")
+testDeferBlock()
+
+PrintLine("\n=== 测试6: defer与多个return路径 (true) ===")
+ret1:int <- testDeferMultipleReturns(true)
+PrintLine("返回值: " + ret1.ToStr())
+
+PrintLine("\n=== 测试7: defer与多个return路径 (false) ===")
+ret2:int <- testDeferMultipleReturns(false)
+PrintLine("返回值: " + ret2.ToStr())

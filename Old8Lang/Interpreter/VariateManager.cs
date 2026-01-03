@@ -266,7 +266,51 @@ public class VariateManager
     public GeneratorExecutionContext? GeneratorContext { get; set; }
 
     /// <summary>
-    /// 最大递归深度限制，防止栈溢出
+    /// defer语句栈，用于延迟执行（后进先出LIFO）
+    /// </summary>
+    /// <remarks>
+    /// defer语句在函数返回前执行，多个defer按后进先出顺序执行
+    /// 每个函数有独立的defer栈
+    /// </remarks>
+    private readonly Stack<OldStatement> DeferStack = new();
+
+    /// <summary>
+    /// 注册一个defer语句
+    /// </summary>
+    /// <param name="statement">要延迟执行的语句</param>
+    public void RegisterDefer(OldStatement statement)
+    {
+        DeferStack.Push(statement);
+    }
+
+    /// <summary>
+    /// 执行所有注册的defer语句（按后进先出顺序）
+    /// </summary>
+    /// <remarks>
+    /// 在函数返回前调用此方法
+    /// defer中的异常会被捕获，确保所有defer都能执行
+    /// </remarks>
+    public void ExecuteDefers()
+    {
+        while (DeferStack.Count > 0)
+        {
+            var deferStatement = DeferStack.Pop();
+            try
+            {
+                deferStatement.Run(this);
+            }
+            catch (Exception ex)
+            {
+                // defer中的异常被捕获并打印，但继续执行后续defer
+                // 这符合Go语言defer的语义
+                Console.Error.WriteLine($"Defer执行异常: {ex.Message}");
+                Console.Error.WriteLine($"堆栈: {ex.StackTrace}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 最大递归深度限制,防止栈溢出
     /// </summary>
     private const int MaxRecursionDepth = 1000;
 

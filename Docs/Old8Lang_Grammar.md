@@ -806,6 +806,87 @@ select {
 - 编译模式（`-c`）不支持，会抛出 NotImplementedException
 - 需使用解释模式（`-f`）运行包含 select 语句的代码
 
+#### 5.4.8 defer 语句（延迟执行）
+
+defer 语句用于在函数返回前延迟执行语句或代码块，类似 Go 语言的 defer。
+
+```old8
+func example() -> void {
+    PrintLine("开始执行")
+    defer PrintLine("函数即将返回")
+    PrintLine("函数主体")
+}
+// 输出：
+// 开始执行
+// 函数主体
+// 函数即将返回
+```
+
+**defer 代码块**：
+
+```old8
+func cleanup() -> void {
+    file <- OpenFile("data.txt")
+    defer {
+        CloseFile(file)
+        PrintLine("文件已关闭")
+    }
+    // 文件操作...
+}
+```
+
+**defer 执行顺序（后进先出 LIFO）**：
+
+```old8
+func testOrder() -> void {
+    defer PrintLine("defer 1")
+    defer PrintLine("defer 2")
+    defer PrintLine("defer 3")
+    PrintLine("函数体执行")
+}
+// 输出：
+// 函数体执行
+// defer 3
+// defer 2
+// defer 1
+```
+
+**defer 访问局部变量**：
+
+```old8
+func testVariable() -> void {
+    x <- "初始值"
+    defer PrintLine("defer看到的x: " + x)
+    x <- "修改后的值"
+    PrintLine("函数体中的x: " + x)
+}
+// 输出：
+// 函数体中的x: 修改后的值
+// defer看到的x: 修改后的值
+```
+
+**defer 与 return**：
+
+```old8
+func withReturn() -> int {
+    defer PrintLine("即将返回")
+    return 42
+}
+// defer 在 return 前执行，但不影响返回值
+```
+
+**特性**：
+- **函数级作用域**：defer 在函数返回前执行，而非代码块结束时
+- **LIFO 执行顺序**：多个 defer 按后进先出的顺序执行
+- **变量访问**：defer 可以访问函数的局部变量，看到的是 defer 执行时的变量值
+- **异常安全**：defer 使用 try-finally 实现，即使发生异常也会执行
+- **defer 中的异常**：defer 语句中的异常会被捕获并打印，不会阻止其他 defer 的执行
+- **适用场景**：资源清理、日志记录、性能统计等
+
+**与 using 的区别**：
+- `using`：专门用于自动资源管理（Dispose），作用域为代码块
+- `defer`：通用的延迟执行机制，作用域为函数，支持任意语句
+
 ### 5.5 函数声明
 
 #### 5.5.1 基本函数声明

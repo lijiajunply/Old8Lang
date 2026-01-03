@@ -41,6 +41,7 @@ statement = blockStatement
           | tryStatement
           | throwStatement
           | yieldStatement
+          | deferStatement
           | incrementStatement
           | decrementStatement ;
 
@@ -186,6 +187,8 @@ catchBlock = "catch" ( "(" identifier? ")" )? blockStatement ;
 throwStatement = "throw" expression ;
 
 yieldStatement = "yield" expression ;
+
+deferStatement = "defer" ( statement | blockStatement ) ;
 
 incrementStatement = identifier "++" ;
 
@@ -345,7 +348,7 @@ EOF = End of input ;
 
 KEYWORDS = "if" | "elif" | "else" | "for" | "while" | "switch" | "case" | "default"
          | "func" | "class" | "enum" | "mixin" | "interface" | "extends" | "implements"
-         | "return" | "break" | "continue" | "throw" | "yield"
+         | "return" | "break" | "continue" | "throw" | "yield" | "defer"
          | "try" | "catch" | "finally"
          | "import" | "from" | "as" | "native" | "with"
          | "true" | "false" | "null"
