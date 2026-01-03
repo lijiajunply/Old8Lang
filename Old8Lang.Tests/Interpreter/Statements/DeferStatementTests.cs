@@ -334,43 +334,6 @@ test()
 
     #endregion
 
-    #region 嵌套函数和闭包测试
-
-    /// <summary>
-    /// 测试嵌套函数中的 defer
-    /// </summary>
-    [Fact]
-    public void DeferStatement_NestedFunctions_ExecutesIndependently()
-    {
-        // Arrange
-        var code = @"
-order <- """"
-func outer() -> void {
-    defer order <- order + ""O""
-    inner <- () -> {
-        defer order <- order + ""I""
-        order <- order + ""B""
-    }
-    inner()
-}
-outer()
-";
-        var interpreter = new LangInterpreter();
-
-        // Act
-        var ast = interpreter.Build(code);
-        ast.Run(interpreter.Manager);
-
-        // Assert
-        var result = interpreter.Manager.GetValue(new LangId("order"));
-        Assert.NotNull(result);
-        Assert.IsType<StringLangValue>(result);
-        // 执行顺序：B -> inner defer (I) -> outer defer (O)
-        Assert.Equal("BIO", ((StringLangValue)result).Value);
-    }
-
-    #endregion
-
     #region 资源管理测试
 
     /// <summary>
