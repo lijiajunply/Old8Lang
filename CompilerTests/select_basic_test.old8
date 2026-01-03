@@ -1,0 +1,70 @@
+// Select 语句编译器模式基本测试
+// 测试 select 语句在编译器模式（-c）下的执行
+
+PrintLine("=== 测试 1: select 发送到有容量的channel ===")
+ch1 <- ChannelCreateBounded(1)
+
+select {
+    case ch1 <- 100 -> {
+        PrintLine("成功发送 100 到 ch1")
+    }
+    default -> {
+        PrintLine("发送失败")
+    }
+}
+
+// 验证发送的值
+result1 <- ChannelReceive(ch1)
+PrintLine("从 ch1 接收到: " + result1.ToStr())
+ChannelDispose(ch1)
+
+// 测试 2: select 接收操作
+PrintLine("=== 测试 2: select 接收操作 ===")
+ch2 <- ChannelCreate()
+ChannelSend(ch2, 200)
+
+select {
+    case value from ch2 -> {
+        PrintLine("从 ch2 接收到: " + value.ToStr())
+    }
+    default -> {
+        PrintLine("接收失败")
+    }
+}
+ChannelDispose(ch2)
+
+// 测试 3: select 多个case（混合发送和接收）
+PrintLine("=== 测试 3: select 多个case ===")
+sendCh <- ChannelCreateBounded(1)
+receiveCh <- ChannelCreate()
+ChannelSend(receiveCh, "Hello")
+
+select {
+    case sendCh <- 300 -> {
+        PrintLine("成功发送到 sendCh")
+    }
+    case msg from receiveCh -> {
+        PrintLine("从 receiveCh 接收到: " + msg)
+    }
+}
+
+ChannelDispose(sendCh)
+ChannelDispose(receiveCh)
+
+// 测试 4: select with default（所有channel已满）
+PrintLine("=== 测试 4: select with default ===")
+fullCh <- ChannelCreateBounded(1)
+ChannelSend(fullCh, 999)
+
+select {
+    case fullCh <- 400 -> {
+        PrintLine("成功发送到 fullCh")
+    }
+    default -> {
+        PrintLine("Channel 已满，执行 default")
+    }
+}
+
+ChannelDispose(fullCh)
+
+PrintLine("=== 所有测试完成 ===")

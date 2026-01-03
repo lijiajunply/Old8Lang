@@ -1,0 +1,26 @@
+// Select 语句编译器模式 - 多个 case 竞争测试
+
+PrintLine("=== 测试：select 多个 case 竞争 ===")
+
+// 创建两个 channel，提前向第一个发送数据
+ch1 <- ChannelCreate()
+ch2 <- ChannelCreate()
+
+ChannelSend(ch1, "来自 ch1 的消息")
+
+PrintLine("等待从任意 channel 接收数据...")
+
+// 这个 select 会从已经有数据的 ch1 接收
+select {
+    case msg from ch1 -> {
+        PrintLine("从 ch1 接收到: " + msg)
+    }
+    case msg from ch2 -> {
+        PrintLine("从 ch2 接收到: " + msg)
+    }
+}
+
+ChannelDispose(ch1)
+ChannelDispose(ch2)
+
+PrintLine("=== 测试完成 ===")
