@@ -632,4 +632,305 @@ using counter <- AtomicIntCreate(0) {
     }
 
     #endregion
+
+    #region 自定义类 Dispose 方法测试
+
+    /// <summary>
+    /// 测试带有 dispose 方法的自定义类
+    /// </summary>
+    [Fact]
+    public void UsingStatement_WithDisposableClass_CallsDisposeMethod()
+    {
+        // Arrange
+        var code = @"
+disposed <- false
+
+class Resource {
+    func dispose() {
+        disposed <- true
+    }
+}
+
+using res <- Resource() {
+    // Do nothing
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var disposed = interpreter.Manager.GetValue(new LangId("disposed"));
+        Assert.NotNull(disposed);
+        Assert.IsType<BoolLangValue>(disposed);
+        Assert.True(((BoolLangValue)disposed).Value);
+    }
+
+    /// <summary>
+    /// 测试 dispose 方法修改实例字段
+    /// </summary>
+    [Fact]
+    public void UsingStatement_DisposeModifiesFields_FieldsUpdatedCorrectly()
+    {
+        // Arrange
+        var code = @"
+class FileHandle {
+    path <- """"
+    isOpen <- true
+
+    func init(path) {
+        this.path <- path
+    }
+
+    func dispose() {
+        if this.isOpen {
+            this.isOpen <- false
+        }
+    }
+}
+
+using handle <- FileHandle(""/tmp/test.txt"") {
+    // isOpen should be true
+}
+
+result <- handle.isOpen";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<BoolLangValue>(result);
+        Assert.False(((BoolLangValue)result).Value);
+    }
+
+    /// <summary>
+    /// 测试异常情况下 dispose 仍然被调用
+    /// </summary>
+    [Fact]
+    public void UsingStatement_ExceptionInBlock_DisposeStillCalled()
+    {
+        // Arrange
+        var code = @"
+disposeCount <- 0
+
+class Resource {
+    func dispose() {
+        disposeCount <- disposeCount + 1
+    }
+}
+
+try {
+    using res <- Resource() {
+        throw ""Test exception""
+    }
+} catch (e) {
+    // Exception caught
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var disposeCount = interpreter.Manager.GetValue(new LangId("disposeCount"));
+        Assert.NotNull(disposeCount);
+        Assert.IsType<IntLangValue>(disposeCount);
+        Assert.Equal(1, ((IntLangValue)disposeCount).Value);
+    }
+
+    /// <summary>
+    /// 测试嵌套自定义 dispose 类
+    /// </summary>
+    [Fact]
+    public void UsingStatement_NestedDisposableClasses_DisposedInReverseOrder()
+    {
+        // Arrange
+        var code = @"
+disposeOrder <- {""""}
+
+class Resource {
+    name <- """"
+
+    func init(name) {
+        this.name <- name
+    }
+
+    func dispose() {
+        disposeOrder <- disposeOrder.Append(this.name)
+    }
+}
+
+using outer <- Resource(""outer"") {
+    using inner <- Resource(""inner"") {
+        // Both resources active
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var disposeOrder = interpreter.Manager.GetValue(new LangId("disposeOrder"));
+        Assert.NotNull(disposeOrder);
+        Assert.IsType<ListLangValue>(disposeOrder);
+
+        var list = (ListLangValue)disposeOrder;
+        Assert.Equal(2, list.Value.Count);
+        Assert.Equal("inner", ((StringLangValue)list.Value[0]).Value);
+        Assert.Equal("outer", ((StringLangValue)list.Value[1]).Value);
+    }
+
+    /// <summary>
+    /// 测试没有 dispose 方法的类（不应报错）
+    /// </summary>
+    [Fact]
+    public void UsingStatement_ClassWithoutDispose_NoError()
+    {
+        // Arrange
+        var code = @"
+class SimpleClass {
+    value <- 123
+}
+
+result <- 0
+using obj <- SimpleClass() {
+    result <- obj.value
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(123, ((IntLangValue)result).Value);
+    }
+
+    /// <summary>
+    /// 测试 dispose 方法多次调用只执行一次
+    /// </summary>
+    [Fact]
+    public void UsingStatement_DisposeCalledMultipleTimes_ExecutesOnlyOnce()
+    {
+        // Arrange
+        var code = @"
+disposeCount <- 0
+
+class Counter {
+    func dispose() {
+        disposeCount <- disposeCount + 1
+    }
+}
+
+counter <- Counter()
+using counter {
+    // First using
+}
+
+// Second using with same instance - should not call dispose again";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var disposeCount = interpreter.Manager.GetValue(new LangId("disposeCount"));
+        Assert.NotNull(disposeCount);
+        Assert.IsType<IntLangValue>(disposeCount);
+        Assert.Equal(1, ((IntLangValue)disposeCount).Value);
+    }
+
+    /// <summary>
+    /// 测试 dispose 方法访问实例成员
+    /// </summary>
+    [Fact]
+    public void UsingStatement_DisposeAccessesInstanceMembers_ExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+lastMessage <- """"
+
+class Logger {
+    prefix <- ""[LOG]""
+    message <- """"
+
+    func init(msg) {
+        this.message <- msg
+    }
+
+    func dispose() {
+        lastMessage <- this.prefix + "" "" + this.message
+    }
+}
+
+using logger <- Logger(""Shutting down"") {
+    // Do nothing
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var lastMessage = interpreter.Manager.GetValue(new LangId("lastMessage"));
+        Assert.NotNull(lastMessage);
+        Assert.IsType<StringLangValue>(lastMessage);
+        Assert.Equal("[LOG] Shutting down", ((StringLangValue)lastMessage).Value);
+    }
+
+    /// <summary>
+    /// 测试混合使用内置资源和自定义 dispose 类
+    /// </summary>
+    [Fact]
+    public void UsingStatement_MixedResourceTypes_DisposesAllCorrectly()
+    {
+        // Arrange
+        var code = @"
+customDisposed <- false
+
+class CustomResource {
+    func dispose() {
+        customDisposed <- true
+    }
+}
+
+result <- 0
+using ch <- ChannelCreate() {
+    using custom <- CustomResource() {
+        ChannelSend(ch, 42)
+        result <- ChannelReceive(ch)
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(42, ((IntLangValue)result).Value);
+
+        var customDisposed = interpreter.Manager.GetValue(new LangId("customDisposed"));
+        Assert.NotNull(customDisposed);
+        Assert.IsType<BoolLangValue>(customDisposed);
+        Assert.True(((BoolLangValue)customDisposed).Value);
+    }
+
+    #endregion
 }
