@@ -1,0 +1,50 @@
+// 测试嵌套切片访问在编译模式下的实现
+
+func testArrayNestedSlice() -> void {
+    // 创建二维数组
+    matrix <- [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]
+
+    // 测试 matrix[0][1:3] - 第一行的切片
+    row0 <- matrix[0]
+    slice1 <- row0[1:3]
+    PrintLine("slice1[0] = " + slice1[0].ToStr())  // 应该输出 2
+    PrintLine("slice1[1] = " + slice1[1].ToStr())  // 应该输出 3
+
+    // 测试 matrix[1][0:2] - 第二行的切片
+    row1 <- matrix[1]
+    slice2 <- row1[0:2]
+    PrintLine("slice2[0] = " + slice2[0].ToStr())  // 应该输出 5
+    PrintLine("slice2[1] = " + slice2[1].ToStr())  // 应该输出 6
+}
+
+func testListNestedSlice() -> void {
+    // 创建二维列表
+    matrix <- {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}}
+
+    // 测试 matrix[0][1:3] - 第一行的切片
+    row0 <- matrix[0]
+    slice1 <- row0[1:3]
+    PrintLine("list slice1[0] = " + slice1[0].ToStr())  // 应该输出 2
+    PrintLine("list slice1[1] = " + slice1[1].ToStr())  // 应该输出 3
+
+    // 测试 matrix[2][1:4] - 第三行的切片
+    row2 <- matrix[2]
+    slice2 <- row2[1:4]
+    PrintLine("list slice2[0] = " + slice2[0].ToStr())  // 应该输出 10
+    PrintLine("list slice2[1] = " + slice2[1].ToStr())  // 应该输出 11
+    PrintLine("list slice2[2] = " + slice2[2].ToStr())  // 应该输出 12
+}
+
+func main() -> void {
+    PrintLine("=== 测试数组嵌套切片 ===")
+    testArrayNestedSlice()
+
+    PrintLine("")
+    PrintLine("=== 测试列表嵌套切片 ===")
+    testListNestedSlice()
+
+    PrintLine("")
+    PrintLine("测试完成!")
+}
+
+main()

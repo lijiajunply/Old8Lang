@@ -1,0 +1,14 @@
+// 简单的嵌套切片测试
+
+func main() -> void {
+    // 创建一个简单的数组
+    arr <- [1, 2, 3, 4, 5]
+
+    // 测试切片
+    slice <- arr[1:4]
+    PrintLine("slice[0] = " + slice[0].ToStr())
+    PrintLine("slice[1] = " + slice[1].ToStr())
+    PrintLine("slice[2] = " + slice[2].ToStr())
+}
+
+main()

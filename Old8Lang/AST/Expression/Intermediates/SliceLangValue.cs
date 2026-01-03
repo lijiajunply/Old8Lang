@@ -1,3 +1,5 @@
+using System.Reflection.Emit;
+using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
@@ -64,6 +66,87 @@ public partial class SliceLangValue(LangId id, LangExpression? start = null, Lan
         }
 
         return list.Slice(startValue, endValue, stepValue);
+    }
+
+    public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
+    {
+        // 加载集合（id）
+        Id.LoadIlValue(ilGenerator, local);
+
+        // 加载起始索引
+        if (Start != null)
+        {
+            Start.LoadIlValue(ilGenerator, local);
+            var startType = Start.OutputType(local);
+            if (startType != null && startType != typeof(int))
+            {
+                Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, startType, typeof(int), Start);
+            }
+        }
+        else
+        {
+            // 默认起始索引为 0
+            ilGenerator.Emit(OpCodes.Ldc_I4_0);
+        }
+
+        // 加载结束索引
+        if (End != null)
+        {
+            End.LoadIlValue(ilGenerator, local);
+            var endType = End.OutputType(local);
+            if (endType != null && endType != typeof(int))
+            {
+                Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, endType, typeof(int), End);
+            }
+        }
+        else
+        {
+            // 默认结束索引为 int.MaxValue (表示到末尾)
+            ilGenerator.Emit(OpCodes.Ldc_I4, int.MaxValue);
+        }
+
+        // 加载步长
+        if (Step != null)
+        {
+            Step.LoadIlValue(ilGenerator, local);
+            var stepType = Step.OutputType(local);
+            if (stepType != null && stepType != typeof(int))
+            {
+                Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, stepType, typeof(int), Step);
+            }
+        }
+        else
+        {
+            // 默认步长为 1
+            ilGenerator.Emit(OpCodes.Ldc_I4_1);
+        }
+
+        // 调用 CollectionHelper.Slice 方法
+        var sliceMethod = typeof(Old8Lang.Compiler.CollectionHelper).GetMethod(
+            nameof(Old8Lang.Compiler.CollectionHelper.Slice),
+            [typeof(object), typeof(int), typeof(int), typeof(int)]);
+
+        if (sliceMethod == null)
+        {
+            throw new InvalidOperationError(this, "无法找到CollectionHelper.Slice方法");
+        }
+
+        ilGenerator.Emit(OpCodes.Call, sliceMethod);
+    }
+
+    public override Type OutputType(LocalManager local)
+    {
+        // 获取 Id 的类型
+        var idType = Id.OutputType(local);
+
+        // 如果类型为 null，返回 object 类型
+        if (idType == null)
+        {
+            return typeof(object);
+        }
+
+        // 切片操作返回与原类型相同的类型
+        return idType;
     }
 
     public override string ToString()

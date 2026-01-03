@@ -63,25 +63,81 @@ public partial class NestedSliceAccess(
         // 首先加载基础表达式的结果
         BaseExpression.LoadIlValue(ilGenerator, local);
 
-        // 加载切片参数
-        SliceStart.LoadIlValue(ilGenerator, local);
-        SliceEnd?.LoadIlValue(ilGenerator, local);
-        SliceStep?.LoadIlValue(ilGenerator, local);
-
-        // 这里需要根据基础结果的类型调用相应的切片方法
-        // 具体实现取决于各种类型的 GetSlice 方法签名
+        // 如果基础表达式不是object类型，需要装箱
         var baseType = BaseExpression.OutputType(local);
+        if (baseType != null && baseType.IsValueType)
+        {
+            ilGenerator.Emit(OpCodes.Box, baseType);
+        }
 
-        // 调用适当的切片方法
-        // 注意：这里需要根据实际的 IL 实现进行调整
-        throw new NotImplementedException("NestedSliceAccess 的 IL 生成尚未实现");
+        // 加载切片参数 - start
+        SliceStart.LoadIlValue(ilGenerator, local);
+        var startType = SliceStart.OutputType(local);
+        // 转换为int
+        if (startType != null && startType != typeof(int))
+        {
+            Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, startType, typeof(int), SliceStart);
+        }
+
+        // 处理结束索引（可能为null）
+        if (SliceEnd != null)
+        {
+            SliceEnd.LoadIlValue(ilGenerator, local);
+            var endType = SliceEnd.OutputType(local);
+            // 转换为int
+            if (endType != null && endType != typeof(int))
+            {
+                Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, endType, typeof(int), SliceEnd);
+            }
+        }
+        else
+        {
+            // 如果没有指定结束索引，使用int.MaxValue表示到末尾
+            ilGenerator.Emit(OpCodes.Ldc_I4, int.MaxValue);
+        }
+
+        // 处理步长（可能为null）
+        if (SliceStep != null)
+        {
+            SliceStep.LoadIlValue(ilGenerator, local);
+            var stepType = SliceStep.OutputType(local);
+            // 转换为int
+            if (stepType != null && stepType != typeof(int))
+            {
+                Old8Lang.Compiler.TypeConversion.GenerateTypeConversionIl(ilGenerator, stepType, typeof(int), SliceStep);
+            }
+        }
+        else
+        {
+            // 如果没有指定步长，默认为1
+            ilGenerator.Emit(OpCodes.Ldc_I4_1);
+        }
+
+        // 调用CollectionHelper.Slice方法
+        var sliceMethod = typeof(Old8Lang.Compiler.CollectionHelper).GetMethod(
+            nameof(Old8Lang.Compiler.CollectionHelper.Slice),
+            [typeof(object), typeof(int), typeof(int), typeof(int)]);
+
+        if (sliceMethod == null)
+        {
+            throw new InvalidOperationError(this, "无法找到CollectionHelper.Slice方法");
+        }
+
+        ilGenerator.Emit(OpCodes.Call, sliceMethod);
     }
 
     public override Type OutputType(LocalManager local)
     {
         var baseType = BaseExpression.OutputType(local);
 
-        // 切片操作通常返回与基础类型相同的类型
+        // 如果基础类型为null，返回object类型
+        if (baseType == null)
+        {
+            return typeof(object);
+        }
+
+        // 切片操作返回与基础类型相同的类型
+        // 例如：object[] 切片后仍然是 object[]，List<object> 切片后仍然是 List<object>
         return baseType;
     }
 }

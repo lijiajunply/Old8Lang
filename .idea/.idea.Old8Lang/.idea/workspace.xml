@@ -23,8 +23,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Compiler/CollectionHelper.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/CompilerTests/nested_slice_access_test.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NestedSliceAccess.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Intermediates/NestedSliceAccess.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -166,7 +168,7 @@
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
-  <component name="RunManager" selected=".NET 项目.Old8Lang.App">
+  <component name="RunManager" selected=".NET 项目.FirstUI.TestApp">
     <configuration name="FirstUI.TestApp" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -898,7 +900,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="524" />
+    <option name="localTasksCounter" value="525" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -925,7 +927,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 添加可变参数(params)功能支持&#10;&#10;- 实现 params 关键字支持函数接受任意数量的参数&#10;- 添加编译器模式下可变参数的 IL 代码生成和运行时处理&#10;- 实现解释器模式下参数列表到数组的转换机制&#10;- 添加完整的编译器和解释器模式测试套件&#10;- 更新语法文档和语法规则定义&#10;- 修复编译器中指令解析的默认值处理问题" />
     <MESSAGE value="feat(interpreter): 实现命名参数功能&#10;&#10;- 在FunctionCallExpression中添加NamedArguments属性支持命名参数&#10;- 修改FuncLangValue.Run方法以处理位置参数和命名参数的混合调用&#10;- 更新方法重载解析逻辑以支持命名参数的数量和类型匹配&#10;- 实现参数重排序机制将命名参数转换为正确的位置参数顺序&#10;- 添加NamedArgument类用于表示命名参数的名称和值&#10;- 修改解析器以支持函数调用中的命名参数语法解析&#10;- 增加对位置参数和命名参数混合使用的语法支持&#10;- 实现命名参数的验证机制包括重复参数和无效参数检查&#10;- 添加对默认参数与命名参数结合使用的支持&#10;- 为Instance类添加命名参数支持以处理对象方法调用" />
     <MESSAGE value="feat(parser): 添加结构化文档注释解析功能&#10;&#10;- 新增 DocCommentInfo 类用于存储结构化文档注释信息&#10;- 实现多种文档注释风格解析（Google, Sphinx, JavaDoc, 中文等）&#10;- 在函数、异步函数和类中添加文档注释存储属性&#10;- 实现文档注释收集和解析机制&#10;- 支持参数、返回值、异常等结构化信息提取&#10;- 添加文档注释测试用例和示例代码" />
     <MESSAGE value="feat(languageserver): 实现符号表构建和悬停提示功能&#10;&#10;- 将 BlockStatement 中的 ImportStatements 和 OtherStatements 改为公共只读列表&#10;- 修改 DocumentManager 中的 BuildSymbolTable 方法以支持 URI 参数并使用 SymbolTableBuilder&#10;- 实现 SymbolTableBuilder 类用于遍历 AST 构建符号表，支持函数、异步函数、类和变量&#10;- 创建 SymbolFinder 服务用于根据位置查找符号和引用位置&#10;- 完善 HoverHandler 实现符号悬停提示，包括类型签名和文档注释显示&#10;- 添加符号表构建和查找功能的完整实现，支持文档注释格式化为 Markdown" />
@@ -950,7 +951,8 @@
     <MESSAGE value="refactor(ui): 更新UI组件语法并优化计数器示例&#10;&#10;- 将UI组件创建语法从函数调用改为链式调用方式&#10;- 修改计数器示例应用的布局和样式实现&#10;- 重构FirstUIBinding中应用运行方法的参数类型&#10;- 更新测试应用中的计数器实现逻辑&#10;- 修改默认运行的示例文件为计数器应用&#10;- 调整工作区配置和运行管理器设置" />
     <MESSAGE value="feat(type): 实现泛型类型推断中的嵌套类型参数匹配&#10;&#10;- 实现从实际类型中提取泛型参数进行匹配的逻辑&#10;- 添加 ExtractGenericArgumentsFromType 方法支持泛型参数列表提取&#10;- 实现递归匹配每个泛型参数的类型推断机制&#10;- 支持 GenericTypeInfo 实例的 TypeArguments 直接提取&#10;- 添加从类型名称中解析泛型参数的备用方案&#10;- 创建单元测试验证嵌套泛型类型的类型推断功能&#10;- 实现 List&lt;T&gt;、Dictionary&lt;K,V&gt; 和深度嵌套泛型的支持" />
     <MESSAGE value="feat(lang): 实现 select 语句接收操作语法&#10;&#10;- 将接收操作语法从 `case value &lt;- channel` 改为 `case value from channel`&#10;- 在语法文档中更新 select 语句的发送和接收操作语法规则&#10;- 添加完整的 select 接收操作功能测试用例&#10;- 实现解析器中接收和发送操作的明确区分逻辑&#10;- 创建 select 接收操作演示文件和相关测试&#10;- 修复因语法歧义导致的接收操作解析问题" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 实现 select 语句接收操作语法&#10;&#10;- 将接收操作语法从 `case value &lt;- channel` 改为 `case value from channel`&#10;- 在语法文档中更新 select 语句的发送和接收操作语法规则&#10;- 添加完整的 select 接收操作功能测试用例&#10;- 实现解析器中接收和发送操作的明确区分逻辑&#10;- 创建 select 接收操作演示文件和相关测试&#10;- 修复因语法歧义导致的接收操作解析问题" />
+    <MESSAGE value="feat(ui): 实现拖拽阴影效果和Toast消息功能&#10;&#10;- 在Draggable组件中实现阴影反馈效果，拖动时显示阴影样式&#10;- 添加BoxShadows和Color引用支持阴影渲染&#10;- 实现FirstUIAvaloniaApp单例模式用于全局UI控制&#10;- 创建Toast消息显示功能，支持顶部居中显示&#10;- 实现UI重建机制支持主题切换时重新渲染&#10;- 优化TextArea组件引用清理Avalonia命名空间前缀&#10;- 修复WidgetBase组件ID和边距的默认值初始化问题&#10;- 更新Rider配置文件添加Grid组件反编译缓存设置" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(ui): 实现拖拽阴影效果和Toast消息功能&#10;&#10;- 在Draggable组件中实现阴影反馈效果，拖动时显示阴影样式&#10;- 添加BoxShadows和Color引用支持阴影渲染&#10;- 实现FirstUIAvaloniaApp单例模式用于全局UI控制&#10;- 创建Toast消息显示功能，支持顶部居中显示&#10;- 实现UI重建机制支持主题切换时重新渲染&#10;- 优化TextArea组件引用清理Avalonia命名空间前缀&#10;- 修复WidgetBase组件ID和边距的默认值初始化问题&#10;- 更新Rider配置文件添加Grid组件反编译缓存设置" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
