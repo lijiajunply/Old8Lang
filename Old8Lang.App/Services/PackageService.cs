@@ -73,7 +73,7 @@ public class PackageService
     /// <summary>
     /// 安装包
     /// </summary>
-    private async Task<InstallPackageResult> InstallPackageAsync(
+    public async Task<InstallPackageResult> InstallPackageAsync(
         string packageId,
         string versionRange,
         bool isDevelopmentDependency = false)

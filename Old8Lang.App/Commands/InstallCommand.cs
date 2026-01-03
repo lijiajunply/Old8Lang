@@ -1,5 +1,6 @@
 using Old8Lang.PackageManager.Core.Models;
 using Old8Lang.ProjectManagement;
+using Old8Lang.App.Services;
 
 namespace Old8Lang.App.Commands;
 
@@ -144,7 +145,7 @@ public class InstallCommand : ICommand
         var prodDeps = config.References.Where(r => !r.IsDevDependency).ToList();
         foreach (var dep in prodDeps)
         {
-            var result = InstallPackage(packagesDir, dep.PackageId, dep.Version);
+            var result = InstallPackage(packagesDir, dep.PackageId, dep.Version, config, projectRoot);
             switch (result)
             {
                 case InstallResult.Success:
@@ -168,7 +169,7 @@ public class InstallCommand : ICommand
 
             foreach (var dep in devDeps)
             {
-                var result = InstallPackage(packagesDir, dep.PackageId, dep.Version);
+                var result = InstallPackage(packagesDir, dep.PackageId, dep.Version, config, projectRoot);
                 switch (result)
                 {
                     case InstallResult.Success:
@@ -221,51 +222,29 @@ public class InstallCommand : ICommand
     {
         try
         {
-            var packagesDir = GetPackagesDirectory();
+            // 使用 PackageService 安装包
+            var packageService = new PackageService(projectRoot, config);
 
-            // 确定版本号
-            var resolvedVersion = version == "*" ? "1.0.0" : version.TrimStart('^', '~', '>');
+            Console.WriteLine($"  正在从包源下载 {packageName}@{version}...");
 
-            // 包目录
-            var packageDir = Path.Combine(packagesDir, $"{packageName}@{resolvedVersion}");
+            var installTask = packageService.InstallPackageAsync(packageName, version);
+            installTask.Wait();
 
-            // 检查是否已存在
-            if (Directory.Exists(packageDir))
+            var result = installTask.Result;
+
+            if (!result.Success)
             {
-                CommandHelper.PrintInfo($"包 '{packageName}@{resolvedVersion}' 已存在，跳过安装");
-                return true;
+                if (result.Skipped)
+                {
+                    CommandHelper.PrintInfo(result.Message);
+                    return true;
+                }
+
+                CommandHelper.PrintError(result.Message);
+                return false;
             }
 
-            // 模拟下载过程
-            Console.WriteLine($"  下载 {packageName}@{resolvedVersion}...");
-            Thread.Sleep(500); // 模拟网络延迟
-
-            // TODO: 实现实际的包下载逻辑
-            // 1. 从包注册表获取包信息
-            // 2. 下载包文件
-            // 3. 解压到包目录
-            // 4. 处理依赖
-
-            // 目前只是创建占位目录
-            Directory.CreateDirectory(packageDir);
-
-            // 创建占位包文件
-            var packageJsonPath = Path.Combine(packageDir, "package.json");
-            var packageJson = $$"""
-                                {
-                                  "name": "{{packageName}}",
-                                  "version": "{{resolvedVersion}}",
-                                  "description": "{{packageName}} package"
-                                }
-                                """;
-            File.WriteAllText(packageJsonPath, packageJson);
-
-            var packageFilePath = Path.Combine(packageDir, $"{packageName}.old8");
-            var packageContent = $"// {packageName} v{resolvedVersion}\nPrintLine(\"{packageName} loaded\")";
-            File.WriteAllText(packageFilePath, packageContent);
-
             Console.WriteLine("  安装完成");
-
             return true;
         }
         catch (Exception ex)
@@ -273,6 +252,19 @@ public class InstallCommand : ICommand
             CommandHelper.PrintError($"安装失败: {ex.Message}");
             return false;
         }
+    }
+
+    /// <summary>
+    /// 安装包（异步）- 被 PackageService 调用
+    /// </summary>
+    private async Task<Old8Lang.App.Services.InstallPackageResult> InstallPackageAsync(
+        string packageName,
+        string version,
+        ProjectConfig config,
+        string projectRoot)
+    {
+        var packageService = new PackageService(projectRoot, config);
+        return await packageService.InstallPackageAsync(packageName, version);
     }
 
     private enum InstallResult
@@ -285,50 +277,34 @@ public class InstallCommand : ICommand
     private InstallResult InstallPackage(
         string packagesDir,
         string packageName,
-        string versionRange)
+        string versionRange,
+        ProjectConfig config,
+        string projectRoot)
     {
         try
         {
-            // 解析版本范围，取具体版本
-            var version = versionRange.TrimStart('^', '~', '>').Trim();
-            if (version == "*" || version == versionRange.TrimStart('^', '~', '>').Trim())
+            Console.Write($"  安装 {packageName}@{versionRange}...");
+
+            // 使用 PackageService 安装包
+            var packageService = new PackageService(projectRoot, config);
+            var installTask = packageService.InstallPackageAsync(packageName, versionRange);
+            installTask.Wait();
+
+            var result = installTask.Result;
+
+            if (!result.Success)
             {
-                version = "1.0.0"; // 默认版本
-            }
-
-            var packageDir = Path.Combine(packagesDir, $"{packageName}@{version}");
-
-            // 检查是否已存在
-            if (Directory.Exists(packageDir))
-            {
-                Console.WriteLine($"  {packageName}@{version} - 已存在");
-                return InstallResult.Skipped;
-            }
-
-            Console.Write($"  安装 {packageName}@{version}...");
-
-            // TODO: 实现实际的包下载逻辑
-            Thread.Sleep(200); // 模拟下载
-
-            Directory.CreateDirectory(packageDir);
-
-            // 创建包文件
-            var packageJsonPath = Path.Combine(packageDir, "package.json");
-            var packageJson = $$"""
+                if (result.Skipped)
                 {
-                  "name": "{{packageName}}",
-                  "version": "{{version}}",
-                  "description": "{{packageName}} package"
+                    Console.WriteLine(" 已存在");
+                    return InstallResult.Skipped;
                 }
-                """;
-            File.WriteAllText(packageJsonPath, packageJson);
 
-            var packageFilePath = Path.Combine(packageDir, $"{packageName}.old8");
-            var packageContent = $"// {packageName} v{version}\nPrintLine(\"{packageName} loaded\")";
-            File.WriteAllText(packageFilePath, packageContent);
+                Console.WriteLine($" 失败: {result.Message}");
+                return InstallResult.Failed;
+            }
 
             Console.WriteLine(" 完成");
-
             return InstallResult.Success;
         }
         catch (Exception ex)
