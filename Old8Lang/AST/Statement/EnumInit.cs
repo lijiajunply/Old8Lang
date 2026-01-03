@@ -89,15 +89,15 @@ public partial class EnumInit(
         var enumTemplate = new EnumTemplate(enumName, enumValues, Position);
         manager.AddClassAndFunc(enumTemplate);
 
-        // TODO: 注册枚举类型到类型系统（需要在TypeChecker中添加RegisterEnumType方法）
-        // try
-        // {
-        //     TypeChecker.RegisterEnumType(enumName, enumValues.Keys.ToList());
-        // }
-        // catch
-        // {
-        //     // 类型注册失败不影响枚举定义的正常执行
-        // }
+        // 注册枚举类型到类型系统
+        try
+        {
+            TypeChecker.RegisterEnumType(enumName, enumValues.Keys.ToList());
+        }
+        catch
+        {
+            // 类型注册失败不影响枚举定义的正常执行
+        }
     }
 
     /// <summary>

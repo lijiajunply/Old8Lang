@@ -544,6 +544,19 @@ public static class TypeChecker
     }
 
     /// <summary>
+    /// 注册枚举类型到类型假注系统
+    /// </summary>
+    /// <param name="enumName">枚举名称</param>
+    /// <param name="members">枚举成员名称列表</param>
+    public static void RegisterEnumType(string enumName, List<string> members)
+    {
+        if (_annotationManager == null)
+            throw new InvalidOperationException("TypeChecker not initialized. Call Initialize() first.");
+
+        _annotationManager.RegisterEnumType(enumName, members);
+    }
+
+    /// <summary>
     /// 检查类型是否兼容（支持多态）
     /// </summary>
     /// <param name="sourceTypeName">源类型名称</param>

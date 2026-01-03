@@ -105,6 +105,17 @@ public class TypeAnnotationManager
     }
 
     /// <summary>
+    /// 注册枚举类型
+    /// </summary>
+    /// <param name="enumName">枚举名称</param>
+    /// <param name="members">枚举成员列表</param>
+    public void RegisterEnumType(string enumName, List<string> members)
+    {
+        var enumType = new EnumTypeInfo(enumName, members);
+        TypeFamily.RegisterType(enumType);
+    }
+
+    /// <summary>
     /// 解析类型假注表达式（递归支持嵌套泛型）
     /// 支持复杂类型表达式如 "List&lt;int&gt;", "Map&lt;string, List&lt;Person&gt;&gt;", "Shape|Circle", "int?"
     /// </summary>

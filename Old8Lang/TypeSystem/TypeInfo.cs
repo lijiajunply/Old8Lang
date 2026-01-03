@@ -89,6 +89,31 @@ public class InterfaceTypeInfo(string name, List<string>? parentInterfaceNames =
 }
 
 /// <summary>
+/// 枚举类型信息
+/// </summary>
+public class EnumTypeInfo(string name, List<string> members) : ITypeInfo
+{
+    public string Name { get; } = name;
+    public bool IsClassType => false;
+    public ITypeInfo? BaseType => null;
+    public List<string> Members { get; } = members;
+
+    public bool IsCompatibleWith(ITypeInfo other)
+    {
+        // 枚举类型的兼容性规则
+        if (Name == other.Name) return true;
+        if (other.Name == "any") return true;
+
+        // 枚举值可以兼容 int 类型（因为底层是 int）
+        if (other.Name == "int") return true;
+
+        return false;
+    }
+
+    public ConcurrentDictionary<string, LangValueType> GetMembers(VariateManager manager) => [];
+}
+
+/// <summary>
 /// 类类型信息，支持继承和多态
 /// </summary>
 public class ClassTypeInfo(string name, ITypeInfo? baseType = null, List<string>? interfaceNames = null) : ITypeInfo
