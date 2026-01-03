@@ -322,10 +322,26 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
 
             var patternArgs = SplitGenericArguments(patternGenericArgs);
 
-            // TODO: 从实际类型中提取泛型参数进行匹配
-            // 这需要更复杂的类型系统支持
+            // 从实际类型中提取泛型参数进行匹配
+            var actualGenericArgs = ExtractGenericArgumentsFromType(actualType);
+            if (actualGenericArgs == null || actualGenericArgs.Count != patternArgs.Count)
+            {
+                return false; // 泛型参数数量不匹配
+            }
 
-            return true; // 暂时返回 true，需要进一步实现
+            // 递归匹配每个泛型参数
+            for (int i = 0; i < patternArgs.Count; i++)
+            {
+                var patternArg = patternArgs[i].Trim();
+                var actualArg = actualGenericArgs[i];
+
+                if (!MatchTypePattern(patternArg, actualArg, typeArgMapping))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         // 简单类型匹配
@@ -351,6 +367,76 @@ public class GenericTypeInference(TypeAnnotationManager typeAnnotationManager)
         // 因此这里的实现比较简单，主要留作未来扩展
 
         // 暂时不支持类的自动类型推断
+        return null;
+    }
+
+    /// <summary>
+    /// 从 ITypeInfo 中提取泛型参数列表
+    /// 例如: GenericTypeInfo(List&lt;int>) -> [int的TypeInfo]
+    /// </summary>
+    /// <param name="typeInfo">要提取的类型</param>
+    /// <returns>泛型参数列表，如果不是泛型类型或提取失败则返回 null</returns>
+    private List<ITypeInfo>? ExtractGenericArgumentsFromType(ITypeInfo typeInfo)
+    {
+        // 如果是 GenericTypeInfo 实例，直接从 TypeArguments 中提取
+        if (typeInfo is GenericTypeInfo genericTypeInfo)
+        {
+            if (genericTypeInfo.IsGenericInstance && genericTypeInfo.TypeArguments != null)
+            {
+                // 返回泛型参数列表（按照 TypeParameters 的顺序）
+                var result = new List<ITypeInfo>();
+                foreach (var paramName in genericTypeInfo.TypeParameters)
+                {
+                    if (genericTypeInfo.TypeArguments.TryGetValue(paramName, out var argType))
+                    {
+                        result.Add(argType);
+                    }
+                    else
+                    {
+                        // 参数缺失，返回 null
+                        return null;
+                    }
+                }
+                return result;
+            }
+        }
+
+        // 如果类型名称包含泛型信息（例如 "List<int>"），尝试从名称中解析
+        var typeName = typeInfo.Name;
+        var genericStart = typeName.IndexOf('<');
+        if (genericStart != -1)
+        {
+            var genericEnd = typeName.LastIndexOf('>');
+            if (genericEnd > genericStart)
+            {
+                var genericPart = typeName.Substring(genericStart + 1, genericEnd - genericStart - 1);
+                var argNames = SplitGenericArguments(genericPart);
+
+                var result = new List<ITypeInfo>();
+                foreach (var argName in argNames)
+                {
+                    var trimmedName = argName.Trim();
+                    // 尝试从 TypeFamily 获取类型
+                    var argType = typeAnnotationManager.GetTypeFamily().GetType(trimmedName);
+                    if (argType != null)
+                    {
+                        result.Add(argType);
+                    }
+                    else
+                    {
+                        // 如果找不到类型，创建一个基本类型
+                        result.Add(new PrimitiveTypeInfo(trimmedName));
+                    }
+                }
+
+                if (result.Count > 0)
+                {
+                    return result;
+                }
+            }
+        }
+
+        // 不是泛型类型或无法提取
         return null;
     }
 }
