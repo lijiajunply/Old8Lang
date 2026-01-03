@@ -191,12 +191,12 @@ public static class FirstUIBinding
     /// <summary>
     /// 运行应用程序
     /// </summary>
-    public static void RunApp(object buildFunction)
+    public static void RunApp(object buildFunction, string? s = null)
     {
         try
         {
             // 使用 AppBuilder 启动应用
-            var builder = BuildAvaloniaApp(buildFunction);
+            var builder = BuildAvaloniaApp(buildFunction, s);
             builder.StartWithClassicDesktopLifetime([]);
         }
         catch (PlatformNotSupportedException ex)
@@ -234,9 +234,9 @@ public static class FirstUIBinding
     /// <summary>
     /// 构建 Avalonia 应用
     /// </summary>
-    private static AppBuilder BuildAvaloniaApp(object buildFunction)
+    private static AppBuilder BuildAvaloniaApp(object buildFunction, string? s = null)
     {
-         return AppBuilder.Configure(() => new FirstUIAvaloniaApp(buildFunction))
+        return AppBuilder.Configure(() => new FirstUIAvaloniaApp(buildFunction, s))
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();
@@ -312,8 +312,8 @@ public class FirstUIApplication
     /// <summary>
     /// 运行应用程序
     /// </summary>
-    public void Run(object buildFunction)
+    public void Run(object buildFunction, string? s = null)
     {
-        FirstUIBinding.RunApp(buildFunction);
+        FirstUIBinding.RunApp(buildFunction, s);
     }
 }

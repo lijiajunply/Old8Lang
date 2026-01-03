@@ -1,9 +1,7 @@
-using Xunit;
 using Old8Lang.Interpreter;
-using Old8Lang.AST;
 using Xunit.Abstractions;
 
-namespace Old8Lang.Tests.Compiler.Collections;
+namespace Old8Lang.Tests.Compiler.Collections.Advanced;
 
 /// <summary>
 /// 编译器模式下的高级集合功能测试 - 扩展范围

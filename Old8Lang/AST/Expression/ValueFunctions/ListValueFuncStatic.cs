@@ -593,6 +593,73 @@ public static class ListValueFuncStatic
 
             return new StringLangValue(string.Join(separator.Value, langValue.Values.Select(v => v.ToDisplayString())));
         }
+
+        /// <summary>
+        /// 移除列表中的重复元素
+        /// </summary>
+        /// <returns>包含去重后元素的新列表</returns>
+        public ListLangValue Distinct()
+        {
+            var distinct = new List<LangValueType>();
+            var seen = new HashSet<string>();
+
+            foreach (var item in langValue.Values)
+            {
+                var key = item.ToDisplayString();
+                if (seen.Add(key))
+                {
+                    distinct.Add(item);
+                }
+            }
+
+            return new ListLangValue(distinct);
+        }
+
+        /// <summary>
+        /// 使用键选择器对列表进行排序
+        /// </summary>
+        /// <param name="keySelector">键选择函数</param>
+        /// <param name="ascending">是否升序排序，默认为true</param>
+        /// <returns>排序后的新列表</returns>
+        public ListLangValue SortBy(FuncLangValue keySelector, BoolLangValue? ascending = null)
+        {
+            var isAscending = ascending?.Value ?? true;
+            var manager = new VariateManager();
+
+            // 创建索引-元素-键的映射列表
+            var indexedItems = new List<(int index, LangValueType item, LangValueType key)>();
+            for (int i = 0; i < langValue.Values.Count; i++)
+            {
+                var item = langValue.Values[i];
+                var key = keySelector.Run(manager, [item]);
+                indexedItems.Add((i, item, key));
+            }
+
+            // 排序
+            indexedItems.Sort((a, b) =>
+            {
+                var comparison = CompareKeys(a.key, b.key);
+                // 如果键相同，保持原始顺序(稳定排序)
+                if (comparison == 0)
+                {
+                    comparison = a.index.CompareTo(b.index);
+                }
+                return isAscending ? comparison : -comparison;
+            });
+
+            // 提取排序后的元素
+            var sortedValues = indexedItems.Select(x => x.item).ToList();
+            return new ListLangValue(sortedValues);
+        }
+
+        /// <summary>
+        /// 检查列表是否为空
+        /// </summary>
+        /// <returns>如果列表为空返回true，否则返回false</returns>
+        public BoolLangValue IsEmpty()
+        {
+            return new BoolLangValue(langValue.Values.Count == 0);
+        }
     }
 
     /// <summary>
@@ -894,5 +961,24 @@ public static class ListValueFuncStatic
     private static void Swap(List<LangValueType> nums, int i, int j)
     {
         (nums[i], nums[j]) = (nums[j], nums[i]);
+    }
+
+    /// <summary>
+    /// 比较两个键的大小
+    /// </summary>
+    /// <param name="a">第一个键</param>
+    /// <param name="b">第二个键</param>
+    /// <returns>比较结果：负数表示a<b，0表示a==b，正数表示a>b</returns>
+    private static int CompareKeys(LangValueType a, LangValueType b)
+    {
+        return (a, b) switch
+        {
+            (IntLangValue ia, IntLangValue ib) => ia.Value.CompareTo(ib.Value),
+            (DoubleLangValue da, DoubleLangValue db) => da.Value.CompareTo(db.Value),
+            (StringLangValue sa, StringLangValue sb) => string.Compare(sa.Value, sb.Value, StringComparison.Ordinal),
+            (BoolLangValue ba, BoolLangValue bb) => ba.Value.CompareTo(bb.Value),
+            (CharLangValue ca, CharLangValue cb) => ca.Value.CompareTo(cb.Value),
+            _ => string.Compare(a.ToDisplayString(), b.ToDisplayString(), StringComparison.Ordinal)
+        };
     }
 }

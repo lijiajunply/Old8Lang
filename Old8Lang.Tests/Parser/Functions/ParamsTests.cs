@@ -1,9 +1,7 @@
 using Old8Lang.AST.Statement;
 using Old8Lang.Interpreter;
-using Old8Lang.LangParser;
-using Xunit;
 
-namespace Old8Lang.Tests.Parser;
+namespace Old8Lang.Tests.Parser.Functions;
 
 /// <summary>
 /// 测试 params 可变参数语法解析

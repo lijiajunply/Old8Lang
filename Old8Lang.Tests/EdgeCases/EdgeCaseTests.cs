@@ -3,7 +3,7 @@ using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.Tests.Language;
+namespace Old8Lang.Tests.EdgeCases;
 
 /// <summary>
 /// 边界情况测试，测试各种极端值和边界条件

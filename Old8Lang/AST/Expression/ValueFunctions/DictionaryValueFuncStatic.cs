@@ -421,5 +421,37 @@ public static class DictionaryValueFuncStatic
 
             return new VoidLangValue();
         }
+
+        /// <summary>
+        /// 将字典转换为列表，每个元素是包含键值对的元组
+        /// </summary>
+        /// <returns>包含所有键值对元组的列表</returns>
+        public ListLangValue ToList()
+        {
+            var list = new List<LangValueType>();
+            foreach (var (key, value) in langValue.Value)
+            {
+                list.Add(new TupleLangValue(key, value));
+            }
+            return new ListLangValue(list);
+        }
+
+        /// <summary>
+        /// 检查字典是否为空
+        /// </summary>
+        /// <returns>如果字典为空返回true，否则返回false</returns>
+        public BoolLangValue IsEmpty()
+        {
+            return new BoolLangValue(langValue.Value.Count == 0);
+        }
+
+        /// <summary>
+        /// 获取字典中键值对的数量
+        /// </summary>
+        /// <returns>键值对数量</returns>
+        public IntLangValue Count()
+        {
+            return new IntLangValue(langValue.Value.Count);
+        }
     }
 }

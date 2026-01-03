@@ -1,0 +1,87 @@
+// 测试列表的新增扩展方法
+// 测试 Distinct, SortBy, IsEmpty 和字典的 ToList, IsEmpty, Count
+
+// ========== 测试 List.Distinct() ==========
+PrintLine("===== 测试 List.Distinct() =====")
+list1 <- {1, 2, 2, 3, 3, 3, 4, 5, 5}
+distinctList <- list1.Distinct()
+PrintLine($"原列表: {list1.ToStr()}")
+PrintLine($"去重后: {distinctList.ToStr()}")
+PrintLine($"去重后元素数量: {distinctList.Count()}")
+
+list2 <- {"apple", "banana", "apple", "cherry", "banana"}
+distinctList2 <- list2.Distinct()
+PrintLine($"原列表: {list2.ToStr()}")
+PrintLine($"去重后: {distinctList2.ToStr()}")
+PrintLine($"去重后元素数量: {distinctList2.Count()}")
+
+// ========== 测试 List.SortBy() ==========
+PrintLine("\n===== 测试 List.SortBy() =====")
+
+// 使用简单的元组来测试 SortBy
+numbers <- {5, 2, 8, 1, 9, 3}
+PrintLine($"原数字列表: {numbers.ToStr()}")
+
+// 按值本身排序(升序)
+getId <- (n) -> n
+sortedAsc <- numbers.SortBy(getId)
+PrintLine($"升序排序: {sortedAsc.ToStr()}")
+
+// 按值本身排序(降序)
+sortedDesc <- numbers.SortBy(getId, false)
+PrintLine($"降序排序: {sortedDesc.ToStr()}")
+
+// ========== 测试 List.IsEmpty() ==========
+PrintLine("\n===== 测试 List.IsEmpty() =====")
+emptyList <- {}
+nonEmptyList <- {1, 2, 3}
+
+PrintLine($"空列表是否为空: {emptyList.IsEmpty().ToStr()}")
+PrintLine($"非空列表是否为空: {nonEmptyList.IsEmpty().ToStr()}")
+
+// ========== 测试 Dictionary.ToList() ==========
+PrintLine("\n===== 测试 Dictionary.ToList() =====")
+dict <- {"name": "Alice", "age": 30, "city": "Beijing"}
+PrintLine($"原字典: {dict.ToStr()}")
+
+dictList <- dict.ToList()
+PrintLine($"转换为列表: {dictList.ToStr()}")
+
+// 遍历列表中的元组
+dictList.ForEach((tuple) -> {
+    PrintLine($"  键值对: {tuple.ToStr()}")
+})
+
+// ========== 测试 Dictionary.IsEmpty() ==========
+PrintLine("\n===== 测试 Dictionary.IsEmpty() =====")
+emptyDict <- {}
+nonEmptyDict <- {"key": "value"}
+
+PrintLine($"空字典是否为空: {emptyDict.IsEmpty().ToStr()}")
+
+PrintLine($"非空字典是否为空: {nonEmptyDict.IsEmpty().ToStr()}")
+
+// ========== 测试 Dictionary.Count() ==========
+PrintLine("\n===== 测试 Dictionary.Count() =====")
+dict2 <- {"a": 1, "b": 2, "c": 3, "d": 4}
+PrintLine($"字典: {dict2.ToStr()}")
+PrintLine($"字典大小: {dict2.Count()}")
+
+// ========== 综合测试 ==========
+PrintLine("\n===== 综合测试 =====")
+
+// 创建一个数字列表，去重，排序，取前3个
+numbers2 <- {5, 2, 8, 2, 1, 5, 3, 8, 9, 1}
+result <- numbers2.Distinct().Sort().Take(3)
+PrintLine($"原列表: {numbers2.ToStr()}")
+PrintLine($"去重->排序->取前3个: {result.ToStr()}")
+PrintLine($"结果元素数量: {result.Count()}")
+
+// 使用SortBy对字符串按长度排序
+words <- {"apple", "pie", "banana", "cat", "elephant"}
+getLength <- (w) -> Len(w)
+sortedByLength <- words.SortBy(getLength)
+PrintLine($"原列表: {words.ToStr()}")
+PrintLine($"按长度排序: {sortedByLength.ToStr()}")
+
+PrintLine("\n===== 所有测试通过! =====")

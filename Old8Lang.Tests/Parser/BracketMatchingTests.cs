@@ -1,7 +1,7 @@
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.Tests.Language;
+namespace Old8Lang.Tests.Parser;
 
 /// <summary>
 /// 括号匹配测试，测试各种括号（圆括号、方括号、大括号）的匹配错误

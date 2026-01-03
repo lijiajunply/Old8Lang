@@ -52,11 +52,6 @@ public static class StandardLibraryRegistry
             TypeImportConfig.StaticClass(typeof(CryptoLib))
         ),
 
-        ["CollectionLib"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(CollectionLib))
-        ),
-
         ["Json"] = StandardLibraryInfo.FromTypes(
             "Old8LangLib",
             TypeImportConfig.StaticClass(typeof(JsonLib))

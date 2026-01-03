@@ -1,6 +1,6 @@
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.Tests.Language;
+namespace Old8Lang.Tests.Parser.Statement;
 
 /// <summary>
 /// 分号语句分隔符测试

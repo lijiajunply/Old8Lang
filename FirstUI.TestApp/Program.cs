@@ -2,6 +2,7 @@
 
 using Old8Lang.FirstUI;
 using Old8Lang.FirstUI.Basic;
+using Old8Lang.FirstUI.Core;
 using Old8Lang.FirstUI.Layout;
 
 namespace FirstUI.TestApp;
@@ -13,6 +14,13 @@ public class Program
     {
         var app = FirstUIBinding.CreateApp();
 
-        app.Run(() => new Column(children: [new Text("asdf")]));
+        app.Run(RunSimpleTest, "asdf");
+    }
+
+    public static WidgetBase RunSimpleTest()
+    {
+        return new Column([
+            new Text("计数器应用")
+        ]);
     }
 }

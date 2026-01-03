@@ -1,7 +1,6 @@
 using Old8Lang.Interpreter;
-using Xunit;
 
-namespace Old8Lang.Tests.Compiler;
+namespace Old8Lang.Tests.Compiler.Functions;
 
 /// <summary>
 /// 测试 params 可变参数在编译器模式下的行为

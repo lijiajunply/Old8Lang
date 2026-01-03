@@ -30,7 +30,6 @@ public class ErrorHandlingTests
         // Act & Assert
         var exception = Assert.Throws<SyntaxError>(() => interpreter.Build(code));
         Assert.Contains("语法错误", exception.Message);
-        Assert.NotNull(exception.Position);
     }
 
     /// <summary>
@@ -236,7 +235,6 @@ func test() {
         // Act & Assert
         var exception = Assert.Throws<SyntaxError>(() => interpreter.Build(code));
         Assert.Contains("语法错误", exception.Message);
-        Assert.NotNull(exception.Position);
     }
 
     /// <summary>

@@ -1,7 +1,7 @@
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.Tests.Language;
+namespace Old8Lang.Tests.Parser;
 
 /// <summary>
 /// 表达式语句测试 - 验证单独表达式被正确禁止

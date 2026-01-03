@@ -1,6 +1,6 @@
 using Old8Lang.Interpreter;
 
-namespace Old8Lang.Tests.Compiler.Collections.Advanced;
+namespace Old8Lang.Tests.Compiler.Collections.InExpression;
 
 /// <summary>
 /// In 表达式高级功能测试

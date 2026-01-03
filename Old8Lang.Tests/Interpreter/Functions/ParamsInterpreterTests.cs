@@ -1,10 +1,8 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Interpreter;
-using Old8Lang.LangParser;
-using Xunit;
 
-namespace Old8Lang.Tests.Interpreter;
+namespace Old8Lang.Tests.Interpreter.Functions;
 
 /// <summary>
 /// 测试 params 可变参数在解释器模式下的行为

@@ -23,14 +23,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/FirstUI.TestApp/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FirstUI.TestApp/app.manifest" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/run-firstui.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_collection_extensions.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FirstUI.TestApp/FirstUI.TestApp.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/FirstUI.TestApp/FirstUI.TestApp.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Examples/HelloWorld.old8" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Examples/HelloWorld.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FirstUI.TestApp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FirstUI.TestApp/Program.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.FirstUI/Utils/CallbackBridge.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.FirstUI/Utils/CallbackBridge.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/Advanced/CollectionMethodsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/Advanced/CollectionMethodsTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/Advanced/ExtendedRangeTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/Advanced/ExtendedRangeTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/InExpression/InExpressionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Collections/InExpression/InExpressionTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Functions/ParamsCompilerTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Functions/ParamsCompilerTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/ParamsInterpreterTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Functions/ParamsInterpreterTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Language/AsyncNativeTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Language/BracketMatchingTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/BracketMatchingTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Language/EdgeCaseTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/EdgeCaseTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Language/ExpressionStatementTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/ExpressionStatementTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/CollectionLibTests.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Library/VectorLibTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Library/VectorLibTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Functions/ParamsTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Functions/ParamsTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Statement/SemicolonTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Statement/SemicolonTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/ErrorHandlingTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/ErrorHandlingTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/DictionaryValueFuncStatic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/ListValueFuncStatic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/StandardLibrary/StandardLibraryRegistry.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8LangLib/TemplateEngine.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -134,7 +148,7 @@
     ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
     ".NET 项目.FirstUI.TestApp.executor": "Run",
     ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Debug",
+    ".NET 项目.Old8Lang.App.executor": "Run",
     ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
     ".NET 项目.Old8Lang.LanguageServer.executor": "Run",
     "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
@@ -171,7 +185,7 @@
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
-  <component name="RunManager" selected=".NET 项目.Old8Lang.App">
+  <component name="RunManager" selected=".NET 项目.FirstUI.TestApp">
     <configuration name="FirstUI.TestApp" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -1013,13 +1027,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang.Tests/Unit/ErrorHandlingTests.cs</url>
-          <line>264</line>
+          <line>262</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/ErrorHandlingTests.cs" containingFunctionPresentation="方法 'ErrorPosition_Accurate'">
             <startOffsets>
-              <option value="5771" />
+              <option value="5683" />
             </startOffsets>
             <endOffsets>
-              <option value="5812" />
+              <option value="5724" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="564" />
@@ -1450,10 +1464,10 @@
           <line>264</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang.FirstUI/FirstUIBinding.cs" containingFunctionPresentation="方法 'OnFrameworkInitializationCompleted'">
             <startOffsets>
-              <option value="7250" />
+              <option value="7291" />
             </startOffsets>
             <endOffsets>
-              <option value="7502" />
+              <option value="7543" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="639" />
