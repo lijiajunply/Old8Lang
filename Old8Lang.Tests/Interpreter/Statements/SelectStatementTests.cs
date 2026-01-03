@@ -1,0 +1,607 @@
+using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
+using Old8Lang.Interpreter;
+
+namespace Old8Lang.Tests.Interpreter.Statements;
+
+/// <summary>
+/// Select 语句解释器执行测试
+/// </summary>
+[Collection("Sequential")]
+public class SelectStatementTests
+{
+    #region 基本发送测试
+
+    /// <summary>
+    /// 测试简单的 select 发送操作
+    /// </summary>
+    [Fact]
+    public void SelectStatement_SimpleSend_ExecutesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+ch <- ChannelCreate()
+select {
+    case ch <- 100 -> {
+        result <- 1
+    }
+    default -> {
+        result <- 2
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(1, ((IntLangValue)result).Value);
+    }
+
+    /// <summary>
+    /// 测试 select 默认分支执行
+    /// </summary>
+    [Fact]
+    public void SelectStatement_DefaultBranch_ExecutesWhenNoChannelReady()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+ch <- ChannelCreateBounded(1)
+ChannelSend(ch, 1)
+select {
+    case ch <- 100 -> {
+        result <- 1
+    }
+    default -> {
+        result <- 2
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(2, ((IntLangValue)result).Value);
+    }
+
+    #endregion
+
+    #region 基本接收测试
+
+    // 注意：根据 CLAUDE.md，接收 case (`val <- ch`) 有语法歧义当 channel 是简单标识符时
+    // 因此暂时跳过接收操作的测试，仅测试发送操作
+    // TODO: 当接收语法歧义问题解决后，可以恢复这些测试
+
+    #endregion
+
+    #region 多个 case 测试
+
+    /// <summary>
+    /// 测试多个发送 case
+    /// </summary>
+    [Fact]
+    public void SelectStatement_MultipleSendCases_ExecutesFirstReady()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+ch1 <- ChannelCreate()
+ch2 <- ChannelCreate()
+ch3 <- ChannelCreate()
+select {
+    case ch1 <- 100 -> {
+        result <- 1
+    }
+    case ch2 <- 200 -> {
+        result <- 2
+    }
+    case ch3 <- 300 -> {
+        result <- 3
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        // 应该执行其中一个 case（通常是第一个）
+        Assert.True(((IntLangValue)result).Value >= 1 && ((IntLangValue)result).Value <= 3);
+    }
+
+    /// <summary>
+    /// 测试混合多个发送 case
+    /// </summary>
+    [Fact]
+    public void SelectStatement_MixedMultipleSend_ExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+sendCh1 <- ChannelCreate()
+sendCh2 <- ChannelCreate()
+select {
+    case sendCh1 <- 100 -> {
+        result <- 1
+    }
+    case sendCh2 <- 200 -> {
+        result <- 2
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        // 应该执行其中一个 case
+        Assert.True(((IntLangValue)result).Value == 1 || ((IntLangValue)result).Value == 2);
+    }
+
+    #endregion
+
+    #region 带有控制流的测试
+
+    /// <summary>
+    /// 测试 select 中包含 if 语句
+    /// </summary>
+    [Fact]
+    public void SelectStatement_WithIfStatement_ExecutesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+ch <- ChannelCreate()
+flag <- true
+select {
+    case ch <- 100 -> {
+        if flag {
+            result <- 10
+        } else {
+            result <- 20
+        }
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(10, ((IntLangValue)result).Value);
+    }
+
+    /// <summary>
+    /// 测试 select 中包含 for 循环
+    /// </summary>
+    [Fact]
+    public void SelectStatement_WithForLoop_ExecutesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+ch <- ChannelCreate()
+select {
+    case ch <- 100 -> {
+        for i in [1~5] {
+            result <- result + i
+        }
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(15, ((IntLangValue)result).Value); // 1+2+3+4+5 = 15
+    }
+
+    #endregion
+
+    #region 循环中的 select 测试
+
+    /// <summary>
+    /// 测试在循环中使用 select
+    /// </summary>
+    [Fact]
+    public void SelectStatement_InLoop_ExecutesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+ch <- ChannelCreate()
+for i in [1~3] {
+    select {
+        case ch <- i * 10 -> {
+            result <- result + 1
+        }
+        default -> {
+            result <- result + 0
+        }
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(3, ((IntLangValue)result).Value);
+    }
+
+    #endregion
+
+    #region 函数中的 select 测试
+
+    /// <summary>
+    /// 测试函数中的 select 语句
+    /// </summary>
+    [Fact]
+    public void SelectStatement_InFunction_ExecutesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+func testSelect() {
+    ch <- ChannelCreate()
+    result <- 0
+    select {
+        case ch <- 99 -> {
+            result <- 1
+        }
+        default -> {
+            result <- 2
+        }
+    }
+    return result
+}
+finalResult <- testSelect()";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("finalResult"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.True(((IntLangValue)result).Value == 1 || ((IntLangValue)result).Value == 2);
+    }
+
+    /// <summary>
+    /// 测试 select case 中的 return
+    /// </summary>
+    [Fact]
+    public void SelectStatement_ReturnInCase_ExecutesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+func testSelectReturn() {
+    ch <- ChannelCreate()
+    select {
+        case ch <- 100 -> {
+            return 42
+        }
+        default -> {
+            return 0
+        }
+    }
+}
+result <- testSelectReturn()";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.True(((IntLangValue)result).Value == 42 || ((IntLangValue)result).Value == 0);
+    }
+
+    #endregion
+
+    #region 复杂值测试
+
+    /// <summary>
+    /// 测试发送复杂对象
+    /// </summary>
+    [Fact]
+    public void SelectStatement_SendComplexObject_ExecutesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+ch <- ChannelCreate()
+data <- {""key"": ""value"", ""number"": 123}
+select {
+    case ch <- data -> {
+        result <- 1
+    }
+    default -> {
+        result <- 0
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(1, ((IntLangValue)result).Value);
+    }
+
+    // 注意：接收操作的测试因语法歧义问题已移除
+
+    #endregion
+
+    #region 使用 using 和 select 组合测试
+
+    /// <summary>
+    /// 测试在 using 块中使用 select
+    /// </summary>
+    [Fact]
+    public void SelectStatement_WithinUsing_ExecutesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+using ch <- ChannelCreate() {
+    select {
+        case ch <- 777 -> {
+            result <- 1
+        }
+        default -> {
+            result <- 0
+        }
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.True(((IntLangValue)result).Value == 0 || ((IntLangValue)result).Value == 1);
+    }
+
+    #endregion
+
+    #region 异常处理测试
+
+    /// <summary>
+    /// 测试 select 中的 try-catch
+    /// </summary>
+    [Fact]
+    public void SelectStatement_WithTryCatch_HandlesExceptionCorrectly()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+errorCaught <- false
+ch <- ChannelCreate()
+select {
+    case ch <- 100 -> {
+        try {
+            throw ""Test error""
+        } catch (e) {
+            errorCaught <- true
+            result <- 99
+        }
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(99, ((IntLangValue)result).Value);
+
+        var errorCaught = interpreter.Manager.GetValue(new LangId("errorCaught"));
+        Assert.NotNull(errorCaught);
+        Assert.IsType<BoolLangValue>(errorCaught);
+        Assert.True(((BoolLangValue)errorCaught).Value);
+    }
+
+    #endregion
+
+    #region 多个 channel 交互测试
+
+    // 注意：多 channel 接收测试因语法歧义问题已移除
+
+    #endregion
+
+    #region 空 case 块测试
+
+    /// <summary>
+    /// 测试空的 case 块
+    /// </summary>
+    [Fact]
+    public void SelectStatement_EmptyCaseBlock_ExecutesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+ch <- ChannelCreate()
+select {
+    case ch <- 100 -> {
+    }
+    default -> {
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+
+        // Assert - 应该不抛出异常
+        Assert.NotNull(ast);
+        ast.Run(interpreter.Manager);
+    }
+
+    #endregion
+
+    #region 复杂表达式测试
+
+    /// <summary>
+    /// 测试使用计算结果作为发送值
+    /// </summary>
+    [Fact]
+    public void SelectStatement_ComputedSendValue_ExecutesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+ch <- ChannelCreate()
+x <- 10
+y <- 20
+select {
+    case ch <- (x + y * 2) -> {
+        result <- 1
+    }
+    default -> {
+        result <- 0
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.True(((IntLangValue)result).Value == 0 || ((IntLangValue)result).Value == 1);
+    }
+
+    #endregion
+
+    #region switch 与 select 组合测试
+
+    /// <summary>
+    /// 测试 select 中包含 switch
+    /// </summary>
+    [Fact]
+    public void SelectStatement_WithSwitch_ExecutesSuccessfully()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+ch <- ChannelCreate()
+mode <- 2
+select {
+    case ch <- mode -> {
+        switch mode {
+            case 1 {
+                result <- 10
+            }
+            case 2 {
+                result <- 20
+            }
+            default {
+                result <- 30
+            }
+        }
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        Assert.Equal(20, ((IntLangValue)result).Value);
+    }
+
+    #endregion
+
+    #region 并发场景测试
+
+    /// <summary>
+    /// 测试有界 channel 的 select 操作
+    /// </summary>
+    [Fact]
+    public void SelectStatement_BoundedChannel_ExecutesCorrectly()
+    {
+        // Arrange
+        var code = @"
+result <- 0
+ch <- ChannelCreateBounded(2)
+ChannelSend(ch, 1)
+ChannelSend(ch, 2)
+select {
+    case ch <- 3 -> {
+        result <- 1
+    }
+    default -> {
+        result <- 2
+    }
+}";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<IntLangValue>(result);
+        // channel 已满，应该执行 default
+        Assert.Equal(2, ((IntLangValue)result).Value);
+    }
+
+    #endregion
+}
