@@ -17,22 +17,19 @@ namespace Old8Lang.FirstUI;
 /// </summary>
 public static class FirstUIBinding
 {
-    private static Application? _app;
     private static BuildContext? _context;
 
     /// <summary>
-    /// 初始化 FirstUI 库
+    /// 确保上下文已初始化
     /// </summary>
-    public static void Initialize()
+    private static void EnsureContextInitialized()
     {
-        if (_app == null)
+        if (_context == null)
         {
-            _app = new Application();
             _context = new BuildContext
             {
                 Theme = ThemeManager.Instance.CurrentTheme
             };
-            Console.WriteLine("[FirstUI] Initialized");
         }
     }
 
@@ -41,7 +38,7 @@ public static class FirstUIBinding
     /// </summary>
     public static FirstUIApplication CreateApp()
     {
-        Initialize();
+        EnsureContextInitialized();
         return new FirstUIApplication();
     }
 
@@ -205,16 +202,30 @@ public static class FirstUIBinding
         catch (PlatformNotSupportedException ex)
         {
             throw new InvalidOperationException(
-                "无法在当前环境中启动 GUI 应用。FirstUI 需要图形界面支持。\n" +
-                "请确保您在支持 GUI 的环境中运行（例如：macOS 的桌面环境、Windows 或 Linux 的 X11/Wayland）。\n" +
+                "无法在当前环境中启动 GUI 应用。FirstUI 需要图形界面支持。\n\n" +
+                "可能的原因:\n" +
+                "1. 您正在通过 SSH 连接运行此应用（SSH 会话无法显示 GUI）\n" +
+                "2. 当前环境没有活动的图形会话\n" +
+                "3. macOS 可能阻止了应用访问图形界面\n\n" +
+                "解决方案:\n" +
+                "- 如果通过 SSH 连接: 请在本地终端（Terminal.app）中直接运行\n" +
+                "- 如果在本地运行: 请确保已登录桌面环境\n" +
+                "- macOS: 检查系统偏好设置 -> 安全性与隐私 -> 辅助功能\n\n" +
                 $"详细错误: {ex.Message}",
                 ex);
         }
         catch (Exception ex) when (ex.Message.Contains("not supported on this platform"))
         {
             throw new InvalidOperationException(
-                "无法在当前环境中启动 GUI 应用。FirstUI 需要图形界面支持。\n" +
-                "请确保您在支持 GUI 的环境中运行（例如：macOS 的桌面环境、Windows 或 Linux 的 X11/Wayland）。\n" +
+                "无法在当前环境中启动 GUI 应用。FirstUI 需要图形界面支持。\n\n" +
+                "可能的原因:\n" +
+                "1. 您正在通过 SSH 连接运行此应用（SSH 会话无法显示 GUI）\n" +
+                "2. 当前环境没有活动的图形会话\n" +
+                "3. macOS 可能阻止了应用访问图形界面\n\n" +
+                "解决方案:\n" +
+                "- 如果通过 SSH 连接: 请在本地终端（Terminal.app）中直接运行\n" +
+                "- 如果在本地运行: 请确保已登录桌面环境\n" +
+                "- macOS: 检查系统偏好设置 -> 安全性与隐私 -> 辅助功能\n\n" +
                 $"详细错误: {ex.Message}",
                 ex);
         }
@@ -235,10 +246,10 @@ public static class FirstUIBinding
 /// <summary>
 /// FirstUI Avalonia 应用类
 /// </summary>
-internal class FirstUIAvaloniaApp(object buildFunction) : Application
+internal class FirstUIAvaloniaApp(object buildFunction, string? title = null) : Application
 {
-    private static Window? _mainWindow;
-    private static BuildContext? _context;
+    private Window? _mainWindow;
+    private BuildContext? _context;
 
     public override void OnFrameworkInitializationCompleted()
     {
@@ -249,12 +260,11 @@ internal class FirstUIAvaloniaApp(object buildFunction) : Application
             {
                 Theme = ThemeManager.Instance.CurrentTheme
             };
-            Console.WriteLine("[FirstUI] Initialized Avalonia Application");
 
             // 创建主窗口
             _mainWindow = new Window
             {
-                Title = "Old8Lang FirstUI Application",
+                Title = title ?? "Old8Lang FirstUI Application",
                 Width = 800,
                 Height = 600,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen
@@ -268,20 +278,22 @@ internal class FirstUIAvaloniaApp(object buildFunction) : Application
 
                 if (rootWidget is WidgetBase widget)
                 {
-                    if (widget.Build(_context) is Control control)
+                    var control = widget.Build(_context);
+
+                    if (control is Control c)
                     {
-                        _mainWindow.Content = control;
+                        _mainWindow.Content = c;
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"[FirstUI] Error building UI: {ex.Message}");
-                Console.Error.WriteLine($"[FirstUI] Stack trace: {ex.StackTrace}");
+                // 创建错误显示窗口
                 _mainWindow.Content = new TextBlock
                 {
-                    Text = $"Error: {ex.Message}\n\nStack trace:\n{ex.StackTrace}",
-                    TextWrapping = Avalonia.Media.TextWrapping.Wrap
+                    Text = $"UI 构建错误:\n{ex.Message}\n\n堆栈跟踪:\n{ex.StackTrace}",
+                    TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+                    Margin = new Avalonia.Thickness(20)
                 };
             }
 

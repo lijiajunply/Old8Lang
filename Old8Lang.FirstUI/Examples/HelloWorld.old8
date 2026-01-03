@@ -7,8 +7,8 @@ app <- ui.CreateApp()
 
 // 定义主视图
 HelloWorldView() -> {
-    return Column()
+    return Column([Text("asdf")])
 }
 
 // 运行应用程序
-app.Run(() -> HelloWorldView())
+app.Run(() -> HelloWorldView(), "Hello World")

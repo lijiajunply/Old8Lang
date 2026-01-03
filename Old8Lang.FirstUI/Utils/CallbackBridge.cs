@@ -23,7 +23,9 @@ public class CallbackBridge
     /// </summary>
     private int _callbackIdCounter = 0;
 
-    private CallbackBridge() { }
+    private CallbackBridge()
+    {
+    }
 
     /// <summary>
     /// 注册回调函数并返回唯一标识符
@@ -105,16 +107,10 @@ public class CallbackBridge
 /// 提供类型安全的回调函数包装
 /// </summary>
 /// <typeparam name="T">回调参数类型</typeparam>
-public class CallbackWrapper<T>
+public class CallbackWrapper<T>(object old8Callback)
 {
-    private readonly string _callbackId;
-    private readonly Action<T> _wrappedCallback;
-
-    public CallbackWrapper(object old8Callback)
-    {
-        _callbackId = CallbackBridge.Instance.RegisterCallback(old8Callback);
-        _wrappedCallback = TypeConverter.WrapAction<T>(old8Callback);
-    }
+    private readonly string _callbackId = CallbackBridge.Instance.RegisterCallback(old8Callback);
+    private readonly Action<T> _wrappedCallback = TypeConverter.WrapAction<T>(old8Callback);
 
     /// <summary>
     /// 调用回调函数
@@ -140,16 +136,10 @@ public class CallbackWrapper<T>
 /// <summary>
 /// 无参回调函数包装器
 /// </summary>
-public class CallbackWrapper
+public class CallbackWrapper(object old8Callback)
 {
-    private readonly string _callbackId;
-    private readonly Action _wrappedCallback;
-
-    public CallbackWrapper(object old8Callback)
-    {
-        _callbackId = CallbackBridge.Instance.RegisterCallback(old8Callback);
-        _wrappedCallback = TypeConverter.WrapAction(old8Callback);
-    }
+    private readonly string _callbackId = CallbackBridge.Instance.RegisterCallback(old8Callback);
+    private readonly Action _wrappedCallback = TypeConverter.WrapAction(old8Callback);
 
     /// <summary>
     /// 调用回调函数
