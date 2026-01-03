@@ -711,21 +711,49 @@ public class PrimaryParser(
         // 检查第一个元素是否是标识符
         if (CurrentToken.Type == LangTokenType.Identifier)
         {
-            // 解析第一个参数，允许类型注解
-            ids.Add(ParseLambdaParameter());
-
-            // 解析更多参数，允许类型注解
-            while (CurrentToken.Type == LangTokenType.Comma)
+            // 预读检查：如果是 identifier: number/string/... 则不是Lambda，而是命名元组
+            if (Peek(1).Type == LangTokenType.Colon)
             {
-                Expect(LangTokenType.Comma);
-                if (CurrentToken.Type != LangTokenType.Identifier)
+                var tokenAfterColon = Peek(2);
+                // 如果冒号后不是类型名称（identifier），则是命名元组
+                if (tokenAfterColon.Type != LangTokenType.Identifier)
                 {
-                    // 不是标识符，不是Lambda表达式
                     isLambda = false;
-                    break;
                 }
+                else
+                {
+                    // 冒号后是标识符，但需要检查是否为支持的类型名称
+                    var potentialType = tokenAfterColon.Value;
+                    var supportedTypes = new[] { "int", "double", "string", "bool", "char", "void", "list", "dict", "any", "tuple", "array" };
+                    var isGenericTypeParameter = potentialType.Length == 1 && char.IsUpper(potentialType[0]);
 
+                    if (!supportedTypes.Contains(potentialType) && !isGenericTypeParameter)
+                    {
+                        // 不是支持的类型，说明是命名元组
+                        isLambda = false;
+                    }
+                }
+            }
+
+            // 如果还认为是Lambda，继续解析Lambda参数
+            if (isLambda)
+            {
+                // 解析第一个参数，允许类型注解
                 ids.Add(ParseLambdaParameter());
+
+                // 解析更多参数，允许类型注解
+                while (CurrentToken.Type == LangTokenType.Comma)
+                {
+                    Expect(LangTokenType.Comma);
+                    if (CurrentToken.Type != LangTokenType.Identifier)
+                    {
+                        // 不是标识符，不是Lambda表达式
+                        isLambda = false;
+                        break;
+                    }
+
+                    ids.Add(ParseLambdaParameter());
+                }
             }
 
             // 检查是否有箭头符号或返回类型注解
@@ -824,11 +852,13 @@ public class PrimaryParser(
             // isLambda = false;
         }
 
-        // 元组：(expr1, expr2, ...)
+        // 元组：(expr1, expr2, ...) 或命名元组：(x: expr1, y: expr2, ...)
         // 回滚到左括号后，重新解析为表达式列表
         CurrentIndex = savedIndex;
 
         var elements = new List<LangExpression>();
+        var fieldNames = new List<string?>(); // 字段名列表，null表示未命名
+        bool hasAnyFieldName = false; // 标记是否有任何命名字段
 
         // 空括号情况：()
         if (CurrentToken.Type == LangTokenType.RightParen)
@@ -839,8 +869,11 @@ public class PrimaryParser(
                 "语法错误：空括号 '()' 不能作为表达式。建议：如果要定义无参Lambda，请使用 '() -> expression' 或 '() -> { ... }' 格式。");
         }
 
-        // 解析第一个元素
-        elements.Add(expressionParserFactory().ParseExpression());
+        // 解析第一个元素（可能是命名字段）
+        var firstElement = ParseTupleElementWithOptionalName(out string? firstName);
+        elements.Add(firstElement);
+        fieldNames.Add(firstName);
+        if (firstName != null) hasAnyFieldName = true;
 
         // 检查是否有逗号
         bool hasComma = CurrentToken.Type == LangTokenType.Comma;
@@ -857,7 +890,10 @@ public class PrimaryParser(
                 break;
             }
 
-            elements.Add(expressionParserFactory().ParseExpression());
+            var element = ParseTupleElementWithOptionalName(out string? fieldName);
+            elements.Add(element);
+            fieldNames.Add(fieldName);
+            if (fieldName != null) hasAnyFieldName = true;
         }
 
         // 必须是右括号，否则抛出语法错误
@@ -875,24 +911,68 @@ public class PrimaryParser(
                 return elements[0];
             }
 
-            // 单元素元组：(expr,)
+            // 单元素元组：(expr,) 或 (x: expr,)
+            // 注意：单元素元组不支持命名字段，因为命名字段需要多个元素才有意义
             return new TupleLangValue(elements[0], new NullLangValue(), position);
         }
 
-        if (elements.Count == 2)
+        // 多元素元组：使用支持命名字段的构造函数
+        if (hasAnyFieldName)
         {
-            // 双元素元组：(expr1, expr2)
-            return new TupleLangValue(elements[0], elements[1], position);
+            // 有命名字段，使用命名元组构造函数
+            return new TupleLangValue(elements, fieldNames, position);
+        }
+        else
+        {
+            // 无命名字段，使用普通构造函数（向后兼容）
+            if (elements.Count == 2)
+            {
+                // 双元素元组：(expr1, expr2)
+                return new TupleLangValue(elements[0], elements[1], position);
+            }
+
+            // 多元素元组：(expr1, expr2, expr3, ...) - 使用列表构造函数
+            return new TupleLangValue(elements, position);
+        }
+    }
+
+    /// <summary>
+    /// 解析元组元素，支持可选的命名语法：name: expression 或 expression
+    /// </summary>
+    /// <param name="fieldName">输出参数，字段名（如果有）</param>
+    /// <returns>元组元素表达式</returns>
+    private LangExpression ParseTupleElementWithOptionalName(out string? fieldName)
+    {
+        fieldName = null;
+
+        // 尝试预读：检查模式是否为 identifier: expression
+        int savedIndex = CurrentIndex;
+
+        // 检查当前token是否是标识符
+        if (CurrentToken.Type == LangTokenType.Identifier)
+        {
+            string potentialFieldName = CurrentToken.Value;
+            CurrentIndex++; // 移动到下一个token
+
+            // 检查是否紧跟冒号
+            if (CurrentToken.Type == LangTokenType.Colon)
+            {
+                // 确认是命名元组语法：name: expression
+                Expect(LangTokenType.Colon);
+                fieldName = potentialFieldName;
+
+                // 解析冒号后的表达式
+                return expressionParserFactory().ParseExpression();
+            }
+            else
+            {
+                // 不是命名元组语法，回滚并正常解析表达式
+                CurrentIndex = savedIndex;
+            }
         }
 
-        // 多元素元组：(expr1, expr2, expr3, ...) - 递归构建嵌套元组
-        var tuple = new TupleLangValue(elements[0], elements[1], position);
-        for (int i = 2; i < elements.Count; i++)
-        {
-            tuple = new TupleLangValue(tuple, elements[i], position);
-        }
-
-        return tuple;
+        // 普通元组元素，没有命名
+        return expressionParserFactory().ParseExpression();
     }
 
     /// <summary>

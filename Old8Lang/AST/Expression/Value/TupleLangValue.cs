@@ -7,7 +7,7 @@ using Old8Lang.Interpreter;
 namespace Old8Lang.AST.Expression.Value;
 
 /// <summary>
-/// 元组
+/// 元组 - 支持命名和未命名元组
 /// </summary>
 /// <param name="v1"></param>
 /// <param name="v2"></param>
@@ -19,6 +19,13 @@ public partial class TupleLangValue(LangExpression v1, LangExpression v2, Source
     public readonly LangExpression V2 = v2;
 
     public ValueTuple<LangValueType, LangValueType> Value { get; private set; }
+
+    // 命名字段支持 - 存储字段名称
+    // 对于嵌套元组，只有最外层存储所有字段名
+    private readonly Dictionary<string, int>? _fieldNames = null;
+
+    // 标记是否有命名字段
+    public bool HasNamedFields => _fieldNames != null && _fieldNames.Count > 0;
 
     public override LangValueType Run(VariateManager manager)
     {
@@ -42,7 +49,34 @@ public partial class TupleLangValue(LangExpression v1, LangExpression v2, Source
         return this;
     }
 
-    public override string ToString() => $"({V1},{V2})";
+    public override string ToString()
+    {
+        // 如果有命名字段，显示命名格式
+        if (HasNamedFields)
+        {
+            var allElements = new List<LangValueType>();
+            CollectElements(this, allElements);
+
+            var parts = new List<string>();
+            for (int i = 0; i < allElements.Count; i++)
+            {
+                // 查找该索引对应的字段名
+                string? fieldName = _fieldNames?.FirstOrDefault(kvp => kvp.Value == i).Key;
+                if (!string.IsNullOrEmpty(fieldName))
+                {
+                    parts.Add($"{fieldName}: {allElements[i]}");
+                }
+                else
+                {
+                    parts.Add(allElements[i].ToString() ?? "null");
+                }
+            }
+            return $"({string.Join(", ", parts)})";
+        }
+
+        // 未命名元组，使用原有格式
+        return $"({V1},{V2})";
+    }
 
     /// <summary>
     /// 明确标识元组类型，防止与列表混淆
@@ -69,6 +103,35 @@ public partial class TupleLangValue(LangExpression v1, LangExpression v2, Source
         for (int i = 2; i < elements.Count; i++)
         {
             V2 = new TupleLangValue(V2, elements[i], position);
+        }
+    }
+
+    /// <summary>
+    /// 支持命名字段的多元元组构造函数
+    /// </summary>
+    /// <param name="elements">元组元素表达式列表</param>
+    /// <param name="fieldNames">字段名称列表（null或空字符串表示未命名）</param>
+    /// <param name="position">源代码位置</param>
+    public TupleLangValue(List<LangExpression> elements, List<string?>? fieldNames, SourcePosition position = default)
+        : this(elements[0], elements[1], position)
+    {
+        // 如果是多元元组，递归构建嵌套结构
+        for (int i = 2; i < elements.Count; i++)
+        {
+            V2 = new TupleLangValue(V2, elements[i], position);
+        }
+
+        // 设置字段名称映射
+        if (fieldNames != null && fieldNames.Count > 0)
+        {
+            _fieldNames = new Dictionary<string, int>();
+            for (int i = 0; i < fieldNames.Count && i < elements.Count; i++)
+            {
+                if (!string.IsNullOrEmpty(fieldNames[i]))
+                {
+                    _fieldNames[fieldNames[i]!] = i;
+                }
+            }
         }
     }
 
@@ -155,28 +218,47 @@ public partial class TupleLangValue(LangExpression v1, LangExpression v2, Source
     }
 
     /// <summary>
-    /// 支持元组的点操作访问，包括索引访问
+    /// 支持元组的点操作访问，包括索引访问、ItemN访问、命名字段访问
     /// </summary>
     /// <param name="dotExpression">点操作表达式</param>
     /// <param name="manager">变量管理器</param>
     /// <returns>访问结果</returns>
     public override LangValueType Dot(LangExpression dotExpression, VariateManager manager)
     {
-        // 支持数字索引访问：tuple.0, tuple.1, tuple.2 等
+        // 支持数字索引访问、ItemN访问、命名字段访问
         if (dotExpression is LangId id)
         {
+            // 1. 支持 ItemN 访问：tuple.Item1, tuple.Item2 等 (C# 风格)
+            if (id.IdName.StartsWith("Item") && id.IdName.Length > 4)
+            {
+                var itemNumStr = id.IdName.Substring(4);
+                if (int.TryParse(itemNumStr, out int itemNum) && itemNum >= 1)
+                {
+                    // Item1 对应索引0，Item2对应索引1，以此类推
+                    return Get(itemNum - 1);
+                }
+            }
+
+            // 2. 支持命名字段访问：tuple.x, tuple.name 等
+            if (_fieldNames != null && _fieldNames.ContainsKey(id.IdName))
+            {
+                int fieldIndex = _fieldNames[id.IdName];
+                return Get(fieldIndex);
+            }
+
+            // 3. 支持数字索引访问：tuple.0, tuple.1, tuple.2 等 (向后兼容)
             if (int.TryParse(id.IdName, out int index))
             {
                 return Get(index);
             }
 
-            // 支持 ToStr() 方法
+            // 4. 支持 ToStr() 方法
             if (id.IdName == "ToStr")
             {
                 return new StringLangValue(ToString());
             }
 
-            // 支持 Length 属性
+            // 5. 支持 Length 属性
             if (id.IdName == "Length")
             {
                 // 计算元组的长度（对于嵌套元组，需要计算所有元素的总数）

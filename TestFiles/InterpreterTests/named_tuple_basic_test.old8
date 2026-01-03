@@ -1,0 +1,23 @@
+// 测试命名元组基本功能
+// 1. 创建命名元组
+point <- (x: 3, y: 4)
+PrintLine("Point: " + point.ToStr())
+
+// 2. 使用 ItemN 访问
+PrintLine("Item1: " + point.Item1.ToStr())
+PrintLine("Item2: " + point.Item2.ToStr())
+
+// 3. 使用命名字段访问
+PrintLine("X: " + point.x.ToStr())
+PrintLine("Y: " + point.y.ToStr())
+
+// 4. 索引访问(向后兼容)
+PrintLine("Index 0: " + point[0].ToStr())
+PrintLine("Index 1: " + point[1].ToStr())
+
+// 5. 混合命名和未命名
+result <- (success: true, 200, message: "OK")
+PrintLine("Result: " + result.ToStr())
+PrintLine("Success: " + result.success.ToStr())
+PrintLine("Status Code: " + result.Item2.ToStr())
+PrintLine("Message: " + result.message.ToStr())
