@@ -120,7 +120,7 @@ public class TextArea(string? value = null) : WidgetBase
     /// <summary>
     /// 字体样式
     /// </summary>
-    public Avalonia.Media.FontStyle FontStyle { get; set; } = Avalonia.Media.FontStyle.Normal;
+    public FontStyle FontStyle { get; set; } = FontStyle.Normal;
 
     /// <summary>
     /// 最大字符长度
@@ -129,13 +129,13 @@ public class TextArea(string? value = null) : WidgetBase
 
     public override object Build(BuildContext context)
     {
-        var textBlock = new Avalonia.Controls.TextBox
+        var textBlock = new TextBox
         {
             Text = Value,
             Watermark = Placeholder,
             IsReadOnly = IsReadOnly,
             IsEnabled = !IsDisabled,
-            TextWrapping = AutoWrap ? Avalonia.Media.TextWrapping.Wrap : Avalonia.Media.TextWrapping.NoWrap,
+            TextWrapping = AutoWrap ? TextWrapping.Wrap : TextWrapping.NoWrap,
             FontSize = FontSize,
             MinLines = MinLines,
             MaxLines = MaxLines,
@@ -145,7 +145,7 @@ public class TextArea(string? value = null) : WidgetBase
         };
 
         // 应用基础样式
-        Utils.LayoutHelper.ApplyBaseStyles(textBlock, this);
+        LayoutHelper.ApplyBaseStyles(textBlock, this);
 
         // 设置字体粗细
         textBlock.FontWeight = ParseFontWeight(FontWeight);
@@ -179,7 +179,7 @@ public class TextArea(string? value = null) : WidgetBase
     /// <summary>
     /// 应用文本区域样式
     /// </summary>
-    private void ApplyTextAreaStyles(Avalonia.Controls.TextBox textBox)
+    private void ApplyTextAreaStyles(TextBox textBox)
     {
         // 设置文本颜色
         if (!string.IsNullOrEmpty(TextColor))
@@ -222,7 +222,7 @@ public class TextArea(string? value = null) : WidgetBase
     /// <summary>
     /// 注册事件处理器
     /// </summary>
-    private void RegisterEvents(Avalonia.Controls.TextBox textBox)
+    private void RegisterEvents(TextBox textBox)
     {
         // 文本变化事件
         if (OnChanged != null)

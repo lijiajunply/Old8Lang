@@ -9,7 +9,7 @@ public abstract class WidgetBase
     /// <summary>
     /// 组件唯一标识符
     /// </summary>
-    public string Id { get; protected set; }
+    public string Id { get; protected set; } = Guid.NewGuid().ToString();
 
     /// <summary>
     /// 组件宽度
@@ -24,12 +24,12 @@ public abstract class WidgetBase
     /// <summary>
     /// 内边距
     /// </summary>
-    public Thickness Padding { get; set; }
+    public Thickness Padding { get; set; } = new(0);
 
     /// <summary>
     /// 外边距
     /// </summary>
-    public Thickness Margin { get; set; }
+    public Thickness Margin { get; set; } = new(0);
 
     /// <summary>
     /// 背景色
@@ -45,13 +45,6 @@ public abstract class WidgetBase
     /// 不透明度 (0.0 - 1.0)
     /// </summary>
     public double Opacity { get; set; } = 1.0;
-
-    protected WidgetBase()
-    {
-        Id = Guid.NewGuid().ToString();
-        Padding = new Thickness(0);
-        Margin = new Thickness(0);
-    }
 
     /// <summary>
     /// 构建组件对应的 Avalonia 控件

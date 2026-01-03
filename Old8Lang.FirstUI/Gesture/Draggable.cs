@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Media;
 using Old8Lang.FirstUI.Core;
 using System;
 
@@ -229,7 +230,42 @@ public class Draggable : WidgetBase
                 control.Opacity = isDragging ? DragOpacity : 1.0;
                 break;
             case DragFeedback.Shadow:
-                // TODO: 实现阴影效果
+                // 应用阴影效果
+                if (isDragging)
+                {
+                    // 拖动时添加阴影
+                    var shadow = new BoxShadows(new BoxShadow
+                    {
+                        Blur = 16,
+                        Spread = 0,
+                        OffsetX = 0,
+                        OffsetY = 4,
+                        Color = Color.FromArgb(100, 0, 0, 0)
+                    });
+
+                    if (control is Border border)
+                    {
+                        border.BoxShadow = shadow;
+                    }
+                    else
+                    {
+                        // 如果不是 Border，尝试包装一个 Border
+                        // 注意：这种情况下效果可能不理想，建议用户直接使用 Border 作为子组件
+                        control.RenderTransform = new TranslateTransform(0, 2);
+                    }
+                }
+                else
+                {
+                    // 恢复时移除阴影
+                    if (control is Border border)
+                    {
+                        border.BoxShadow = new BoxShadows();
+                    }
+                    else
+                    {
+                        control.RenderTransform = null;
+                    }
+                }
                 break;
             case DragFeedback.Default:
             default:

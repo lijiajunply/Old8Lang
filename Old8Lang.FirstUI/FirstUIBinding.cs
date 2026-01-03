@@ -1,13 +1,12 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Layout;
 using Avalonia.Threading;
+using System.Collections.Generic;
 using Old8Lang.FirstUI.Core;
 using Old8Lang.FirstUI.Theme;
 using Old8Lang.FirstUI.Gesture;
-using Old8Lang.FirstUI.Layout;
-using Old8Lang.FirstUI.Basic;
-using Old8Lang.FirstUI.Advanced;
 
 namespace Old8Lang.FirstUI;
 
@@ -47,11 +46,15 @@ public static class FirstUIBinding
     /// </summary>
     public static void ShowToast(string message, int duration = 3000)
     {
-        Dispatcher.UIThread.Post(() =>
+        if (FirstUIAvaloniaApp.Instance != null)
         {
+            FirstUIAvaloniaApp.Instance.ShowToast(message, duration);
+        }
+        else
+        {
+            // 如果应用还未初始化，输出到控制台
             Console.WriteLine($"[FirstUI Toast] {message}");
-            // TODO: 实现真正的 Toast UI
-        });
+        }
     }
 
     /// <summary>
@@ -70,7 +73,11 @@ public static class FirstUIBinding
                 _context.Theme = ThemeManager.Instance.CurrentTheme;
             }
 
-            // TODO: 触发 UI 重建
+            // 触发 UI 重建
+            if (FirstUIAvaloniaApp.Instance != null)
+            {
+                FirstUIAvaloniaApp.Instance.RebuildUI();
+            }
         });
     }
 
@@ -103,6 +110,12 @@ public static class FirstUIBinding
             if (_context != null)
             {
                 _context.Theme = ThemeManager.Instance.CurrentTheme;
+            }
+
+            // 触发 UI 重建
+            if (FirstUIAvaloniaApp.Instance != null)
+            {
+                FirstUIAvaloniaApp.Instance.RebuildUI();
             }
 
             Console.WriteLine($"[FirstUI] Theme toggled to: {ThemeManager.Instance.CurrentTheme.Name}");
@@ -250,9 +263,17 @@ internal class FirstUIAvaloniaApp(WidgetBase buildFunction, string? title = null
 {
     private Window? _mainWindow;
     private BuildContext? _context;
+    private Panel? _toastContainer;
+
+    // 静态实例用于从其他地方访问
+    private static FirstUIAvaloniaApp? _instance;
+
+    public static FirstUIAvaloniaApp? Instance => _instance;
 
     public override void OnFrameworkInitializationCompleted()
     {
+        _instance = this;
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // 初始化上下文
@@ -277,7 +298,20 @@ internal class FirstUIAvaloniaApp(WidgetBase buildFunction, string? title = null
 
                 if (control is Control c)
                 {
-                    _mainWindow.Content = c;
+                    // 创建覆盖层用于显示 Toast
+                    var overlayGrid = new Grid();
+                    overlayGrid.Children.Add(c);
+
+                    // 创建 Toast 容器
+                    _toastContainer = new Panel
+                    {
+                        VerticalAlignment = VerticalAlignment.Top,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        Margin = new Avalonia.Thickness(0, 20, 0, 0)
+                    };
+                    overlayGrid.Children.Add(_toastContainer);
+
+                    _mainWindow.Content = overlayGrid;
                 }
             }
             catch (Exception ex)
@@ -295,6 +329,104 @@ internal class FirstUIAvaloniaApp(WidgetBase buildFunction, string? title = null
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    /// <summary>
+    /// 显示 Toast 消息
+    /// </summary>
+    public void ShowToast(string message, int duration = 3000)
+    {
+        if (_toastContainer == null || _context == null) return;
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            try
+            {
+                // 创建 Toast 组件
+                var toast = new Advanced.Toast
+                {
+                    Message = message,
+                    Duration = duration,
+                    Position = Advanced.ToastPosition.Top
+                };
+
+                var toastControl = toast.Build(_context) as Control;
+                if (toastControl == null) return;
+
+                // 添加到容器
+                _toastContainer.Children.Add(toastControl);
+
+                // 设置关闭回调
+                toast.OnClose = () =>
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        _toastContainer.Children.Remove(toastControl);
+                    });
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[FirstUI] Error showing toast: {ex.Message}");
+            }
+        });
+    }
+
+    /// <summary>
+    /// 重建 UI（用于主题切换等场景）
+    /// </summary>
+    public void RebuildUI()
+    {
+        if (_mainWindow == null || _context == null) return;
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            try
+            {
+                // 保存旧的 Toast 容器内容
+                var toastChildren = new List<Control>();
+                if (_toastContainer != null)
+                {
+                    foreach (var child in _toastContainer.Children)
+                    {
+                        if (child is Control toastControl)
+                            toastChildren.Add(toastControl);
+                    }
+                }
+
+                // 重新构建 UI
+                var control = buildFunction.Build(_context);
+
+                if (control is Control mainControl)
+                {
+                    // 创建覆盖层用于显示 Toast
+                    var overlayGrid = new Grid();
+                    overlayGrid.Children.Add(mainControl);
+
+                    // 创建新的 Toast 容器
+                    _toastContainer = new Panel
+                    {
+                        VerticalAlignment = VerticalAlignment.Top,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        Margin = new Avalonia.Thickness(0, 20, 0, 0)
+                    };
+
+                    // 恢复 Toast 容器内容
+                    foreach (var toastChild in toastChildren)
+                    {
+                        _toastContainer.Children.Add(toastChild);
+                    }
+
+                    overlayGrid.Children.Add(_toastContainer);
+
+                    _mainWindow.Content = overlayGrid;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[FirstUI] Error rebuilding UI: {ex.Message}");
+            }
+        });
     }
 }
 
