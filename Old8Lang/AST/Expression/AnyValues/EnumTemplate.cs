@@ -31,11 +31,11 @@ public class EnumTemplate(
     /// <param name="memberName">成员名</param>
     /// <returns>枚举成员值</returns>
     /// <exception cref="NameError">当成员不存在时抛出</exception>
-    public IntLangValue GetMemberValue(string memberName)
+    public EnumLangValue GetMemberValue(string memberName)
     {
         if (Members.TryGetValue(memberName, out var value))
         {
-            return new IntLangValue(value, Position);
+            return EnumLangValue.Create(EnumName, memberName, value, Position);
         }
         throw new NameError(this, $"{EnumName}.{memberName}");
     }

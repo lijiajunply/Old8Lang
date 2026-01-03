@@ -102,6 +102,7 @@ public static class TypeChecker
     {
         return value switch
         {
+            EnumLangValue enumValue => enumValue.EnumTypeName,
             IntLangValue => "int",
             DoubleLangValue => "double",
             StringLangValue => "string",

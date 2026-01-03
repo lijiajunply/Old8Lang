@@ -35,7 +35,7 @@ public class TypeTemplate(
 
     /// <summary>
     /// 泛型参数列表
-    /// 例如: class Box<T, U> 中的 [T, U]
+    /// 例如: class Box&lt;T, U> 中的 [T, U]
     /// </summary>
     public readonly List<GenericParameter>? GenericParameters = genericParameters;
 
@@ -46,9 +46,9 @@ public class TypeTemplate(
 
     /// <summary>
     /// 当前实例的类型参数映射（用于泛型实例化）
-    /// 例如: Box<int, string> 时为 {"T": int, "U": string}
+    /// 例如: Box&lt;int, string> 时为 {"T": int, "U": string}
     /// </summary>
-    public Dictionary<string, TypeSystem.ITypeInfo>? TypeArgumentMapping { get; private set; }
+    public Dictionary<string, ITypeInfo>? TypeArgumentMapping { get; private set; }
 
     /// <summary>
     /// 文档注释内容
@@ -676,10 +676,11 @@ public class TypeTemplate(
             isAbstract: IsAbstract,
             genericParameters: GenericParameters,
             position: Position
-        );
-
-        // 设置类型参数映射
-        instantiated.TypeArgumentMapping = typeArguments;
+        )
+        {
+            // 设置类型参数映射
+            TypeArgumentMapping = typeArguments
+        };
 
         return instantiated;
     }

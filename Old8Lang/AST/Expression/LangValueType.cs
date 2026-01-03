@@ -435,7 +435,7 @@ public abstract class LangValueType(SourcePosition position = default) : LangExp
             {
                 // 键和值已经是 LangValueType（因为 ObjToValue 返回 LangValueType）
                 // 将 LangExpression 转换为 LangValueType
-                if (kvp.Key is LangValueType keyValue && kvp.Value is LangValueType valueValue)
+                if (kvp is { Key: LangValueType keyValue, Value: LangValueType valueValue })
                 {
                     dictValue.Value.Add((keyValue, valueValue));
                 }
