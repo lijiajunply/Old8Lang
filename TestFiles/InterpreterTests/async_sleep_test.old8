@@ -1,5 +1,4 @@
 // 测试异步函数返回值（带Sleep）
-import Async
 
 // 带Sleep的异步函数
 async func returnStringWithSleep() {

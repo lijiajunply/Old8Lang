@@ -1,5 +1,4 @@
 // 异步原子操作测试
-import Async
 
 // 创建原子整数
 atomic <- AtomicIntCreate(0)

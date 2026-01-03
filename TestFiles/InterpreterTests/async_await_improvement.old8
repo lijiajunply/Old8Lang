@@ -1,5 +1,4 @@
 // 异步等待机制改进测试
-import Async
 
 // 测试1：基本异步等待功能
 async func basicAsync() {

@@ -95,6 +95,8 @@ The AST is organized in `Old8Lang/AST/`:
   - `ReturnStatement.cs`, `BreakStatement.cs`, `ContinueStatement.cs`: Control flow
   - `TryStatement.cs`, `ThrowStatement.cs`: Exception handling
   - `YieldStatement.cs`: Generator support
+  - `UsingStatement.cs`: Resource management with automatic disposal
+  - `SelectStatement.cs`: Channel multiplexing (Go-style select)
 
 - **Visitor/**: Visitor pattern implementation for AST traversal
 
@@ -193,6 +195,8 @@ Key syntax elements:
 - Functions: `func name(params) { }` or `name(params) -> { }`
 - Classes: `class Name { }` with `public`/`private`/`static` modifiers
 - Control flow: `if/elif/else`, `for/while/for-in`, `switch/case/default`
+- Resource management: `using` statement for automatic disposal
+- Channel multiplexing: `select` statement (Go-style)
 - Lists: `{1, 2, 3}` (braces for list literals)
 - Dictionaries: `{"key": value}` (braces with colons for dictionary literals)
 - Arrays: `[1, 2, 3]` (square brackets for array literals)
@@ -341,6 +345,135 @@ func example(
 
 **Note**: Interpreter mode remains flexible and allows type inference for all cases.
 
+### Concurrency Primitives
+
+Old8Lang provides built-in global functions for concurrency primitives. These are NOT imported from a library but are natively available:
+
+**Mutex (5 functions)**:
+- `MutexCreate()` → int
+- `MutexLock(mutexId:int)` → void
+- `MutexTryLock(mutexId:int, timeoutMs:int)` → bool
+- `MutexUnlock(mutexId:int)` → void
+- `MutexDispose(mutexId:int)` → void
+
+**Semaphore (5 functions)**:
+- `SemaphoreCreate(initialCount:int, maxCount:int)` → int
+- `SemaphoreAcquire(semaphoreId:int)` → void
+- `SemaphoreTryAcquire(semaphoreId:int, timeoutMs:int)` → bool
+- `SemaphoreRelease(semaphoreId:int)` → void
+- `SemaphoreDispose(semaphoreId:int)` → void
+
+**AtomicInt (8 functions)**:
+- `AtomicIntCreate(initialValue:int)` → int
+- `AtomicIntGet(atomicId:int)` → int
+- `AtomicIntSet(atomicId:int, newValue:int)` → void
+- `AtomicIntIncrement(atomicId:int)` → int
+- `AtomicIntDecrement(atomicId:int)` → int
+- `AtomicIntAdd(atomicId:int, delta:int)` → int
+- `AtomicIntCompareAndSet(atomicId:int, expectedValue:int, newValue:int)` → bool
+- `AtomicIntDispose(atomicId:int)` → void
+
+**Channel (8 functions)**:
+- `ChannelCreate()` → int
+- `ChannelCreateBounded(capacity:int)` → int
+- `ChannelSend(channelId:int, value:object)` → void
+- `ChannelTrySend(channelId:int, value:object, timeoutMs:int)` → bool
+- `ChannelReceive(channelId:int)` → object
+- `ChannelTryReceive(channelId:int, timeoutMs:int)` → object?
+- `ChannelClose(channelId:int)` → void
+- `ChannelDispose(channelId:int)` → void
+
+**ReadWriteLock (8 functions)**:
+- `ReadWriteLockCreate()` → int
+- `ReadLockAcquire(lockId:int)` → void
+- `ReadLockRelease(lockId:int)` → void
+- `WriteLockAcquire(lockId:int)` → void
+- `WriteLockRelease(lockId:int)` → void
+- `ReadLockTryAcquire(lockId:int, timeoutMs:int)` → bool
+- `WriteLockTryAcquire(lockId:int, timeoutMs:int)` → bool
+- `ReadWriteLockDispose(lockId:int)` → void
+
+**CountDownLatch (6 functions)**:
+- `CountDownLatchCreate(count:int)` → int
+- `CountDownLatchCountDown(latchId:int)` → void
+- `CountDownLatchWait(latchId:int)` → void
+- `CountDownLatchWaitTimeout(latchId:int, timeoutMs:int)` → bool
+- `CountDownLatchGetCount(latchId:int)` → int
+- `CountDownLatchDispose(latchId:int)` → void
+
+**CyclicBarrier (6 functions)**:
+- `CyclicBarrierCreate(participantCount:int)` → int
+- `CyclicBarrierAwait(barrierId:int)` → void
+- `CyclicBarrierAwaitTimeout(barrierId:int, timeoutMs:int)` → bool
+- `CyclicBarrierGetParticipantCount(barrierId:int)` → int
+- `CyclicBarrierGetWaitingCount(barrierId:int)` → int
+- `CyclicBarrierDispose(barrierId:int)` → void
+
+**CancellationTokenSource (4 functions)**:
+- `CreateCancellationTokenSource()` → int
+- `Cancel(ctsId:int)` → void
+- `CancelAfter(ctsId:int, delayMs:int)` → void
+- `DisposeCancellationTokenSource(ctsId:int)` → void
+
+**Utility Functions (3 functions)**:
+- `Sleep(milliseconds:int)` → void
+- `GetCurrentThreadId()` → int
+- `GetProcessorCount()` → int
+
+### Using Statement
+
+The `using` statement provides automatic resource management with disposal:
+
+```old8
+// Form 1: With variable declaration
+using mutex <- MutexCreate() {
+    MutexLock(mutex)
+    // ... critical section
+    MutexUnlock(mutex)
+}  // MutexDispose(mutex) called automatically
+
+// Form 2: With existing variable
+ch <- ChannelCreate()
+using ch {
+    ChannelSend(ch, data)
+}  // ChannelDispose(ch) called automatically
+```
+
+**How it works**:
+- Resources are automatically disposed when exiting the `using` block
+- Works with any resource returning an ID (int) that has a corresponding Dispose function
+- Uses try-finally internally to ensure disposal even on exceptions
+- Supported in both interpreter and compiler modes
+
+### Select Statement
+
+The `select` statement enables Go-style channel multiplexing:
+
+```old8
+select {
+    case ch1 <- 100 -> {
+        PrintLine("Sent 100 to ch1")
+    }
+    case ch2 <- 200 -> {
+        PrintLine("Sent 200 to ch2")
+    }
+    default -> {
+        PrintLine("No channel ready")
+    }
+}
+```
+
+**How it works**:
+- Uses polling strategy to check multiple channels
+- Executes the first available case (send or receive)
+- If no case is ready and `default` exists, executes default immediately
+- If no case is ready and no default, blocks until a case becomes available
+
+**Limitations**:
+- Receive cases (`val <- ch`) have syntax ambiguity when channel is a simple identifier
+- Compiler mode (`-c`) not supported; throws NotImplementedException
+- Use interpreter mode (`-f`) for code with select statements
+
 ### Visitor Pattern Implementation
 
 **Note**: The codebase is in the process of transitioning to visitor pattern:
@@ -350,6 +483,9 @@ func example(
 ### Recent Refactoring
 
 Recent changes include:
+- **Native Concurrency Primitives**: Migrated from AsyncLib to global functions (Mutex, Semaphore, AtomicInt, Channel, ReadWriteLock, CountDownLatch, CyclicBarrier, CancellationTokenSource)
+- **Using Statement**: Added automatic resource management with disposal
+- **Select Statement**: Added channel multiplexing (Go-style select)
 - Visitor pattern implementation for AST nodes
 - AST expression type system refactoring
 - Renamed `OldIf` to `IfChild`

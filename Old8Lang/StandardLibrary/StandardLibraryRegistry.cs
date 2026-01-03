@@ -47,16 +47,6 @@ public static class StandardLibraryRegistry
             TypeImportConfig.StaticClass(typeof(MathLib))
         ),
 
-        ["Math"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(MathLib))
-        ),
-
-        ["Async"] = StandardLibraryInfo.FromTypes(
-            "Old8LangLib",
-            TypeImportConfig.StaticClass(typeof(AsyncLib))
-        ),
-
         ["Crypto"] = StandardLibraryInfo.FromTypes(
             "Old8LangLib",
             TypeImportConfig.StaticClass(typeof(CryptoLib))

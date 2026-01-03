@@ -1,5 +1,4 @@
 // 异步并发执行测试
-import Async
 
 // 测试1：多个任务并发执行
 async func task1() {

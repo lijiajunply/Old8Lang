@@ -748,6 +748,64 @@ switch x {
 }
 ```
 
+#### 5.4.6 using 语句（资源管理）
+
+using 语句提供自动资源管理，确保资源在使用完毕后自动释放：
+
+```old8
+// 形式1：带变量声明
+using mutex <- MutexCreate() {
+    MutexLock(mutex)
+    PrintLine("持有互斥锁")
+    MutexUnlock(mutex)
+}  // 自动调用 MutexDispose(mutex)
+
+// 形式2：使用已有变量
+ch <- ChannelCreate()
+using ch {
+    ChannelSend(ch, 123)
+    value <- ChannelReceive(ch)
+    PrintLine(value)
+}  // 自动调用 ChannelDispose(ch)
+```
+
+**特性**：
+- 使用 try-finally 实现，即使发生异常也会正确释放资源
+- 支持所有返回资源 ID（int）并具有对应 Dispose 函数的资源
+- 解释模式和编译模式均支持
+
+#### 5.4.7 select 语句（Channel 多路选择）
+
+select 语句实现 Go 风格的 Channel 多路选择：
+
+```old8
+ch1 <- ChannelCreateBounded(1)
+ch2 <- ChannelCreateBounded(1)
+
+select {
+    case ch1 <- 100 -> {
+        PrintLine("成功发送 100 到 ch1")
+    }
+    case ch2 <- 200 -> {
+        PrintLine("成功发送 200 到 ch2")
+    }
+    default -> {
+        PrintLine("所有 channel 都不可用")
+    }
+}
+```
+
+**特性**：
+- 使用轮询策略检查多个 Channel
+- 执行第一个可用的 case（发送或接收）
+- 如果没有 case 可用且存在 default 分支，立即执行 default
+- 如果没有 case 可用且没有 default，阻塞直到某个 case 变为可用
+
+**限制**：
+- 接收 case（`val <- ch`）在 channel 为简单标识符时存在语法歧义
+- 编译模式（`-c`）不支持，会抛出 NotImplementedException
+- 需使用解释模式（`-f`）运行包含 select 语句的代码
+
 ### 5.5 函数声明
 
 #### 5.5.1 基本函数声明
@@ -2232,6 +2290,201 @@ result <- Sin(1.57)         // 正弦
 result <- Abs(-42)          // 绝对值
 result <- Floor(3.7)        // 向下取整
 result <- Ceil(3.2)         // 向上取整
+```
+
+### 8.4 并发原语函数（内置全局函数）
+
+Old8Lang 提供了一套完整的并发原语全局函数，无需导入即可使用：
+
+#### 8.4.1 Mutex（互斥锁）
+
+```old8
+// 创建互斥锁
+mutex <- MutexCreate()
+
+// 加锁
+MutexLock(mutex)
+
+// 尝试加锁（带超时）
+success <- MutexTryLock(mutex, 1000)  // 超时时间：毫秒
+
+// 解锁
+MutexUnlock(mutex)
+
+// 释放资源
+MutexDispose(mutex)
+```
+
+#### 8.4.2 Semaphore（信号量）
+
+```old8
+// 创建信号量（初始计数，最大计数）
+sem <- SemaphoreCreate(1, 3)
+
+// 获取信号
+SemaphoreAcquire(sem)
+
+// 尝试获取信号（带超时）
+success <- SemaphoreTryAcquire(sem, 1000)
+
+// 释放信号
+SemaphoreRelease(sem)
+
+// 释放资源
+SemaphoreDispose(sem)
+```
+
+#### 8.4.3 AtomicInt（原子整数）
+
+```old8
+// 创建原子整数
+atomic <- AtomicIntCreate(0)
+
+// 获取值
+value <- AtomicIntGet(atomic)
+
+// 设置值
+AtomicIntSet(atomic, 10)
+
+// 原子递增/递减
+newValue <- AtomicIntIncrement(atomic)
+newValue <- AtomicIntDecrement(atomic)
+
+// 原子加法
+newValue <- AtomicIntAdd(atomic, 5)
+
+// 比较并交换（CAS）
+success <- AtomicIntCompareAndSet(atomic, 10, 20)
+
+// 释放资源
+AtomicIntDispose(atomic)
+```
+
+#### 8.4.4 Channel（通道）
+
+```old8
+// 创建无界通道
+ch <- ChannelCreate()
+
+// 创建有界通道
+boundedCh <- ChannelCreateBounded(10)
+
+// 发送数据
+ChannelSend(ch, "Hello")
+
+// 尝试发送（带超时）
+success <- ChannelTrySend(ch, "World", 1000)
+
+// 接收数据
+data <- ChannelReceive(ch)
+
+// 尝试接收（带超时）
+data <- ChannelTryReceive(ch, 1000)  // 超时返回 null
+
+// 关闭通道
+ChannelClose(ch)
+
+// 释放资源
+ChannelDispose(ch)
+```
+
+#### 8.4.5 ReadWriteLock（读写锁）
+
+```old8
+// 创建读写锁
+rwLock <- ReadWriteLockCreate()
+
+// 读锁
+ReadLockAcquire(rwLock)
+// ... 读操作
+ReadLockRelease(rwLock)
+
+// 写锁
+WriteLockAcquire(rwLock)
+// ... 写操作
+WriteLockRelease(rwLock)
+
+// 尝试获取读锁（带超时）
+success <- ReadLockTryAcquire(rwLock, 1000)
+
+// 尝试获取写锁（带超时）
+success <- WriteLockTryAcquire(rwLock, 1000)
+
+// 释放资源
+ReadWriteLockDispose(rwLock)
+```
+
+#### 8.4.6 CountDownLatch（倒计时锁）
+
+```old8
+// 创建倒计时锁（初始计数）
+latch <- CountDownLatchCreate(3)
+
+// 减少计数
+CountDownLatchCountDown(latch)
+
+// 等待计数归零
+CountDownLatchWait(latch)
+
+// 带超时的等待
+success <- CountDownLatchWaitTimeout(latch, 5000)
+
+// 获取当前计数
+count <- CountDownLatchGetCount(latch)
+
+// 释放资源
+CountDownLatchDispose(latch)
+```
+
+#### 8.4.7 CyclicBarrier（循环栅栏）
+
+```old8
+// 创建循环栅栏（参与者数量）
+barrier <- CyclicBarrierCreate(3)
+
+// 等待所有参与者到达
+CyclicBarrierAwait(barrier)
+
+// 带超时的等待
+success <- CyclicBarrierAwaitTimeout(barrier, 5000)
+
+// 获取参与者数量
+count <- CyclicBarrierGetParticipantCount(barrier)
+
+// 获取当前等待数量
+waiting <- CyclicBarrierGetWaitingCount(barrier)
+
+// 释放资源
+CyclicBarrierDispose(barrier)
+```
+
+#### 8.4.8 CancellationTokenSource（取消令牌源）
+
+```old8
+// 创建取消令牌源
+cts <- CreateCancellationTokenSource()
+
+// 请求取消
+Cancel(cts)
+
+// 延时取消
+CancelAfter(cts, 5000)  // 5秒后取消
+
+// 释放资源
+DisposeCancellationTokenSource(cts)
+```
+
+#### 8.4.9 并发工具函数
+
+```old8
+// 休眠（毫秒）
+Sleep(1000)
+
+// 获取当前线程 ID
+threadId <- GetCurrentThreadId()
+
+// 获取处理器数量
+processors <- GetProcessorCount()
 ```
 
 ## 9. 执行模式对比

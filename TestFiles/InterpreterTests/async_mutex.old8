@@ -1,5 +1,4 @@
 // 异步 Mutex 互斥锁测试
-import Async
 
 // 创建互斥锁
 mutex <- MutexCreate()

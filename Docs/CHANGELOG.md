@@ -48,11 +48,59 @@
 - 支持普通函数和异步函数的文档注释
 - 为 IDE 集成和自动文档生成提供基础支持
 
+#### 4. 并发原语原生化
+- 将并发原语从 AsyncLib 标准库迁移为语言核心的全局函数
+  - 无需 `import Async` 即可直接使用所有并发功能
+  - 总计 57 个全局函数，覆盖 8 大并发原语类别：
+    - **Mutex（互斥锁）**: 5 个函数 - `MutexCreate()`, `MutexLock()`, `MutexUnlock()`, `MutexTryLock()`, `MutexDispose()`
+    - **Semaphore（信号量）**: 5 个函数 - `SemaphoreCreate()`, `SemaphoreAcquire()`, `SemaphoreRelease()`, `SemaphoreTryAcquire()`, `SemaphoreDispose()`
+    - **AtomicInt（原子整数）**: 8 个函数 - `AtomicIntCreate()`, `AtomicIntGet()`, `AtomicIntSet()`, `AtomicIntIncrement()`, `AtomicIntDecrement()`, `AtomicIntAdd()`, `AtomicIntCompareAndSet()`, `AtomicIntDispose()`
+    - **Channel（通道）**: 8 个函数 - `ChannelCreate()`, `ChannelCreateBounded()`, `ChannelSend()`, `ChannelReceive()`, `ChannelTrySend()`, `ChannelTryReceive()`, `ChannelClose()`, `ChannelDispose()`
+    - **ReadWriteLock（读写锁）**: 8 个函数 - `ReadWriteLockCreate()`, `ReadLockAcquire()`, `ReadLockRelease()`, `WriteLockAcquire()`, `WriteLockRelease()`, `ReadLockTryAcquire()`, `WriteLockTryAcquire()`, `ReadWriteLockDispose()`
+    - **CountDownLatch（倒计时锁）**: 6 个函数 - `CountDownLatchCreate()`, `CountDownLatchCountDown()`, `CountDownLatchWait()`, `CountDownLatchWaitTimeout()`, `CountDownLatchGetCount()`, `CountDownLatchDispose()`
+    - **CyclicBarrier（循环栅栏）**: 6 个函数 - `CyclicBarrierCreate()`, `CyclicBarrierAwait()`, `CyclicBarrierAwaitTimeout()`, `CyclicBarrierGetParticipantCount()`, `CyclicBarrierGetWaitingCount()`, `CyclicBarrierDispose()`
+    - **CancellationTokenSource（取消令牌源）**: 4 个函数 - `CreateCancellationTokenSource()`, `Cancel()`, `CancelAfter()`, `DisposeCancellationTokenSource()`
+  - 并发工具函数: 3 个 - `Sleep()`, `GetCurrentThreadId()`, `GetProcessorCount()`
+- 使用 ResourceManager 集中管理所有并发资源
+  - 自动资源清理和生命周期管理
+  - 线程安全的资源访问
+  - 支持资源跟踪和错误处理
+
+#### 5. using 语句（资源管理）
+- 添加 `using` 语句，实现自动资源管理
+  - 语法形式 1: `using varName <- resource { ... }` - 创建资源并自动管理
+  - 语法形式 2: `using resource { ... }` - 管理已有资源
+- 使用 try-finally 模式确保资源释放
+  - 即使发生异常也能正确调用 Dispose
+  - 块结束时自动释放资源
+- 支持所有返回资源 ID 的并发原语
+- 编译器模式和解释器模式均完全支持
+
+#### 6. select 语句（Channel 多路选择）
+- 添加 `select` 语句，实现 Go 风格的 Channel 多路选择
+  - 语法格式: `select { case ch <- value -> { ... } default -> { ... } }`
+  - 支持发送操作: `case ch <- value ->`
+  - 支持接收操作: `case value <- ch ->`（存在语法歧义限制）
+  - 支持 default 分支: `default ->`
+- 使用轮询策略检查多个 Channel
+  - 执行第一个可用的 case
+  - 无可用 case 且有 default 时立即执行 default
+  - 无可用 case 且无 default 时阻塞等待
+- **限制**: 仅解释器模式支持，编译器模式会抛出 NotImplementedException
+
 ### 系统优化
 
 #### 2. 解释器模式增强
 - 为数组类型添加 `Length()` 方法，与 `Count()` 方法等效
 - 提升解释器模式与编译器模式的 API 一致性
+
+#### 3. 并发原语内部实现重构
+- 创建专用的 `Old8Lang/Concurrency/` 目录
+  - 提取并独立管理并发原语内部实现（AtomicInt, CountDownLatch, CyclicBarrier, ResourceWrapper）
+  - ResourceManager 统一管理资源生命周期和清理
+- 创建 `GlobalFunctions/Implementations/Concurrency/` 目录
+  - 9 个专门的函数实现文件，每个负责一组并发原语
+  - 清晰的职责分离和代码组织
 
 ### 测试与质量
 
@@ -69,6 +117,13 @@
   - Google Style、Sphinx Style、JavaDoc Style、中文风格测试
   - 默认风格和无文档注释函数测试
   - 类文档注释和异步函数文档注释测试
+- 新增并发原语测试套件
+  - 迁移并更新 16 个测试文件，移除 `import Async` 依赖
+  - 验证所有 57 个并发全局函数的功能
+  - 测试覆盖所有 8 大并发原语类别（Mutex、Semaphore、AtomicInt、Channel、ReadWriteLock、CountDownLatch、CyclicBarrier、CancellationTokenSource）
+- 新增 using 和 select 语句测试
+  - 验证 using 语句的自动资源管理
+  - 验证 select 语句的 Channel 多路选择
 - 所有测试在编译器模式和解释器模式下均通过
 
 ## Old8Lang 1.0.0 rc3

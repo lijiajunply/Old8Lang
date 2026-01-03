@@ -1,6 +1,5 @@
 // 测试高级异步功能
 
-import Async
 import Time
 
 // 测试1: 任务组合方法 - WhenAll

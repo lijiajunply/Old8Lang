@@ -1,5 +1,4 @@
 // 异步任务状态管理测试
-import Async
 import Time
 
 // 测试1：基本任务状态转换测试

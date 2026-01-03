@@ -1,5 +1,4 @@
 // 异步流（Async Stream）解释器测试
-import Async
 
 // 测试1：简单的异步生成器
 async func simpleAsyncStream() {

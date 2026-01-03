@@ -1,5 +1,4 @@
 // 异步函数基本执行测试
-import Async
 
 // 测试1：简单异步函数调用
 async func hello() {

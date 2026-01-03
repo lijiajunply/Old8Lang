@@ -1,6 +1,5 @@
 // 简单的异步功能测试
 
-import Async
 import Time
 
 // 测试任务组合方法 - Then

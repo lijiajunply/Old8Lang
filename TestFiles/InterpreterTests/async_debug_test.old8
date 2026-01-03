@@ -1,5 +1,4 @@
 // 测试异步函数执行流程
-import Async
 
 // 带调试输出的异步函数
 async func testFunc() {

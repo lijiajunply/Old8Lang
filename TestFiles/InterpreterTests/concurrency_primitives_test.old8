@@ -1,6 +1,5 @@
 // 高级并发原语测试 - 简化版
 // 测试 ReadWriteLock、CountDownLatch 和 CyclicBarrier
-import Async
 
 PrintLine("=== 并发原语测试开始 ===")
 

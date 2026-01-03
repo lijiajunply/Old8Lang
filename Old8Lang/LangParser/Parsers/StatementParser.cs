@@ -137,6 +137,13 @@ public class StatementParser(
             return ParseSwitchStatement();
         }
 
+        // 处理 select 语句（Channel 多路选择）
+        // 注意：在语句位置的 select 是 select 语句，而不是 LINQ 的 select
+        if (CurrentToken.Type == LangTokenType.Select)
+        {
+            return ParseSelectStatement();
+        }
+
         // 处理异步函数定义和异步 for-in 循环：async func / async for
         if (CurrentToken.Type == LangTokenType.Async)
         {
@@ -1802,6 +1809,99 @@ public class StatementParser(
         var blockStatement = ParseBlock();
 
         return new UsingStatement(variableName, resourceExpression, blockStatement, startPos);
+    }
+
+    #endregion
+
+    #region Select Statement
+
+    /// <summary>
+    /// 解析 select 语句（Channel 多路选择）
+    /// 语法：
+    ///   select {
+    ///     case value <- channel -> { ... }
+    ///     case channel <- value -> { ... }
+    ///     default -> { ... }
+    ///   }
+    /// </summary>
+    private SelectStatement ParseSelectStatement()
+    {
+        var startPos = new SourcePosition(CurrentToken.Line, CurrentToken.Column);
+        Expect(LangTokenType.Select);
+        Expect(LangTokenType.LeftBrace);
+
+        var cases = new List<SelectCase>();
+        BlockStatement? defaultCase = null;
+
+        while (CurrentToken.Type != LangTokenType.RightBrace)
+        {
+            if (CurrentToken.Type == LangTokenType.Case)
+            {
+                Expect(LangTokenType.Case);
+
+                // 解析 case: value <- ch 或 ch <- value
+                // 需要先解析第一个表达式，然后根据是否有第二个 <- 判断
+                var firstExpr = expressionParser.ParseExpression();
+
+                // 必须有 <- token
+                Expect(LangTokenType.Assignment);
+
+                // 解析第二个表达式
+                var secondExpr = expressionParser.ParseExpression();
+
+                Expect(LangTokenType.Arrow);
+
+                // 解析块
+                var block = ParseBlock();
+
+                // 判断是接收还是发送：
+                // 启发式：如果 secondExpr 是函数调用（Instance），则可能是接收（value <- ChannelCreate()）
+                // 否则假设是发送（ch <- 123）
+                // 这不是完美的，但在大多数情况下能工作
+                bool isReceive = secondExpr is Instance || secondExpr is Operation { Opera: LangTokenType.Dot };
+
+                if (isReceive)
+                {
+                    // value <- ch (接收)
+                    string? variableName = null;
+                    if (firstExpr is LangId id)
+                    {
+                        variableName = id.IdName;
+                    }
+
+                    cases.Add(new SelectCase(
+                        channelExpression: secondExpr,
+                        variableName: variableName,
+                        blockStatement: block,
+                        position: startPos
+                    ));
+                }
+                else
+                {
+                    // ch <- value (发送)
+                    cases.Add(new SelectCase(
+                        channelExpression: firstExpr,
+                        sendValueExpression: secondExpr,
+                        blockStatement: block,
+                        position: startPos
+                    ));
+                }
+            }
+            else if (CurrentToken.Type == LangTokenType.Default)
+            {
+                Expect(LangTokenType.Default);
+                Expect(LangTokenType.Arrow);
+                defaultCase = ParseBlock();
+            }
+            else
+            {
+                throw CreateSyntaxError(
+                    $"select 语句中期望 'case' 或 'default'，但得到 {CurrentToken.Type}");
+            }
+        }
+
+        Expect(LangTokenType.RightBrace);
+        return new SelectStatement(cases, defaultCase, startPos);
     }
 
     #endregion

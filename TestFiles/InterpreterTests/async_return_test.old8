@@ -1,5 +1,4 @@
 // 测试异步函数返回值
-import Async
 
 // 简单返回字符串
 async func returnString() {

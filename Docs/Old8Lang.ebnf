@@ -23,6 +23,8 @@ statement = blockStatement
           | forInStatement
           | asyncForInStatement
           | switchStatement
+          | usingStatement
+          | selectStatement
           | functionDeclaration
           | asyncFunctionDeclaration
           | classDeclaration
@@ -75,6 +77,14 @@ switchStatement = "switch" expression "{" switchCase* switchDefault? "}" ;
 switchCase = "case" expression blockStatement ;
 
 switchDefault = "default" blockStatement ;
+
+usingStatement = "using" ( identifier "<-" )? expression blockStatement ;
+
+selectStatement = "select" "{" selectCase* selectDefault? "}" ;
+
+selectCase = "case" expression "<-" expression "->" blockStatement ;
+
+selectDefault = "default" "->" blockStatement ;
 
 (* Function Declarations *)
 

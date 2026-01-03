@@ -1,5 +1,4 @@
 // AwaitAsync 方法综合测试
-import Async
 import Time
 
 // 测试1：基本AwaitAsync测试
