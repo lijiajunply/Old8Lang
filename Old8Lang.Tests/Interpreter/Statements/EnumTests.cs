@@ -28,9 +28,9 @@ enum Color {
     Blue
 }
 
-red <- Color.Red
-green <- Color.Green
-blue <- Color.Blue
+red <- Color.Red as int
+green <- Color.Green as int
+blue <- Color.Blue as int
 ";
         var interpreter = new LangInterpreter();
 
@@ -70,9 +70,9 @@ enum HttpStatus {
     InternalServerError <- 500
 }
 
-ok <- HttpStatus.OK
-notFound <- HttpStatus.NotFound
-serverError <- HttpStatus.InternalServerError
+ok <- HttpStatus.OK as int
+notFound <- HttpStatus.NotFound as int
+serverError <- HttpStatus.InternalServerError as int
 ";
         var interpreter = new LangInterpreter();
 
@@ -108,10 +108,10 @@ enum Priority {
     Critical <- 10
 }
 
-low <- Priority.Low
-medium <- Priority.Medium
-high <- Priority.High
-critical <- Priority.Critical
+low <- Priority.Low as int
+medium <- Priority.Medium as int
+high <- Priority.High as int
+critical <- Priority.Critical as int
 ";
         var interpreter = new LangInterpreter();
 
@@ -183,8 +183,8 @@ enum Numbers {
     Three <- 3
 }
 
-sum <- Numbers.One + Numbers.Two
-product <- Numbers.Two * Numbers.Three
+sum <- (Numbers.One as int) + (Numbers.Two as int)
+product <- (Numbers.Two as int) * (Numbers.Three as int)
 ";
         var interpreter = new LangInterpreter();
 
@@ -236,7 +236,7 @@ enum SingleValue {
     OnlyOne
 }
 
-value <- SingleValue.OnlyOne
+value <- SingleValue.OnlyOne as int
 ";
         var interpreter = new LangInterpreter();
 
@@ -265,10 +265,10 @@ enum Temperature {
     Hot <- 25
 }
 
-cold <- Temperature.Cold
-freezing <- Temperature.Freezing
-normal <- Temperature.Normal
-hot <- Temperature.Hot
+cold <- Temperature.Cold as int
+freezing <- Temperature.Freezing as int
+normal <- Temperature.Normal as int
+hot <- Temperature.Hot as int
 ";
         var interpreter = new LangInterpreter();
 
@@ -301,8 +301,8 @@ enum LargeNumbers {
     Billion <- 1000000000
 }
 
-million <- LargeNumbers.Million
-billion <- LargeNumbers.Billion
+million <- LargeNumbers.Million as int
+billion <- LargeNumbers.Billion as int
 ";
         var interpreter = new LangInterpreter();
 
@@ -604,8 +604,8 @@ enum Size {
     Large
 }
 
-color <- Color.Red
-size <- Size.Medium
+color <- Color.Red as int
+size <- Size.Medium as int
 ";
         var interpreter = new LangInterpreter();
 

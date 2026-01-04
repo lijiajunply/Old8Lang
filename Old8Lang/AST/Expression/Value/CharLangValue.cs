@@ -10,7 +10,8 @@ namespace Old8Lang.AST.Expression.Value;
 /// </summary>
 /// <param name="value"></param>
 /// <param name="position"></param>
-public partial class CharLangValue(char value = default, SourcePosition position = default) : LangValueType(position), IPoolable
+public partial class CharLangValue(char value = '\0', SourcePosition position = default)
+    : LangValueType(position), IPoolable
 {
     public char Value = value;
 

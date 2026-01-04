@@ -213,6 +213,22 @@ public partial class EnumLangValue(
     }
 
     #endregion
+    
+    public override LangValueType Converse(LangValueType otherLangValueType, VariateManager manager)
+    {
+        if (otherLangValueType is not TypeLangValue value)
+            throw new TypeError(this, "TypeValue", otherLangValueType.GetType().Name);
+
+        return value.Value switch
+        {
+            "Int" or "int" => IntLangValue.Create(Value),
+            "Bool" or "bool" => throw new TypeError(this, "bool", "无法将字符转换为布尔值"),
+            "String" or "string" => StringLangValue.Create(MemberName),
+            "enum" or "Enum" => this,
+            "double" or "Double" => DoubleLangValue.Create(Value),
+            _ => throw new TypeError(this, $"不支持的类型转换: {GetType().Name} 到 {value.Value}")
+        };
+    }
 
     #region Visitor 模式
 
