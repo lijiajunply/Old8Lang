@@ -338,12 +338,10 @@ func example(
 }
 ```
 
-**Known Limitations**:
-- Default parameter inference works for **validation** (passes type checking)
-- Due to known IL generation issues, functions with default parameters may encounter runtime issues in compiler mode
-- Interpreter mode handles default parameters correctly
-
-**Note**: Interpreter mode remains flexible and allows type inference for all cases.
+**Note**:
+- Both interpreter mode and compiler mode fully support default parameters
+- Default parameter type inference works correctly in both modes
+- Interpreter mode remains flexible and allows type inference for all cases
 
 ### Concurrency Primitives
 
