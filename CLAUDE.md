@@ -474,9 +474,9 @@ select {
 - If no case is ready and `default` exists, executes default immediately
 - If no case is ready and no default, blocks until a case becomes available
 
-**Limitations**:
-- Compiler mode (`-c`) not supported; throws NotImplementedException
-- Use interpreter mode (`-f`) for code with select statements
+**Implementation**:
+- ✅ Fully supported in both interpreter mode (`-f`) and compiler mode (`-c`)
+- IL code generation implemented with proper channel polling logic
 
 ### Visitor Pattern Implementation
 
