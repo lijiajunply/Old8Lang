@@ -3,6 +3,7 @@ using System.Reflection.Emit;
 using System.Text;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression;
+using Old8Lang.AST.Expression.Value;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
 using Old8Lang.TypeSystem;
@@ -52,6 +53,23 @@ public class LocalManager
     /// 存储函数的参数列表信息（用于支持默认参数）
     /// </summary>
     public readonly Dictionary<string, List<LangId>> FuncParameters = [];
+
+    /// <summary>
+    /// 泛型函数特化方法缓存
+    /// 键为 "函数名$类型参数1_类型参数2"，值为特化后的MethodInfo
+    /// </summary>
+    public readonly Dictionary<string, MethodInfo> GenericSpecializations = [];
+
+    /// <summary>
+    /// 泛型函数定义缓存，键为函数名，值为FuncLangValue
+    /// 用于在运行时创建特化版本
+    /// </summary>
+    public readonly Dictionary<string, FuncLangValue> GenericFunctions = [];
+
+    /// <summary>
+    /// 当前泛型类型解析器，用于在特化方法生成时解析泛型参数
+    /// </summary>
+    public GenericTypeResolver? CurrentGenericTypeResolver { get; set; }
 
     /// <summary>
     /// 全局静态类实例字典，键为类名，值为静态类实例

@@ -104,7 +104,7 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         // 但需要保留DelegateVar、ClassVar等全局信息，以便函数内部可以调用其他函数
         var funcLocal = new LocalManager() { FilePath = local.FilePath, Interpreter = local.Interpreter };
 
-        // 复制全局信息：委托、类、全局静态类
+        // 复制全局信息：委托、类、全局静态类、泛型函数
         foreach (var (key, value) in local.DelegateVar)
         {
             funcLocal.DelegateVar[key] = value;
@@ -120,6 +120,10 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
         foreach (var (key, value) in local.FuncParameters)
         {
             funcLocal.FuncParameters[key] = value;
+        }
+        foreach (var (key, value) in local.GenericFunctions)
+        {
+            funcLocal.GenericFunctions[key] = value;
         }
 
         // 先处理参数，将它们添加到funcLocal中，这样GetItemType才能正确推断返回类型
@@ -253,12 +257,29 @@ public partial class FuncInit(FuncLangValue a, SourcePosition position = default
             var paramTypeNames = string.Join("_", parameterTypes.Select(t => t.Name));
             delegateKey = $"{methodName}${paramTypeNames}";
         }
+        
+        // 对于泛型函数，需要额外注册基础版本（不带类型签名）
+        if (FuncLangValue.IsGeneric)
+        {
+            // 注册泛型函数的基础版本
+            local.DelegateVar.TryAdd(methodName, dynamicMethod);
+            
+            // 存储泛型函数定义，用于后续特化
+            local.GenericFunctions[methodName] = FuncLangValue;
+        }
+        
         local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
 
         // 同时存储函数的参数列表信息，用于支持默认参数
         if (FuncLangValue.Ids != null)
         {
             local.FuncParameters.TryAdd(delegateKey, FuncLangValue.Ids);
+            
+            // 对于泛型函数，也存储基础版本的参数信息
+            if (FuncLangValue.IsGeneric)
+            {
+                local.FuncParameters.TryAdd(methodName, FuncLangValue.Ids);
+            }
         }
     }
 

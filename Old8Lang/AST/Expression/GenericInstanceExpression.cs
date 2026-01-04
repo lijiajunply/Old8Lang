@@ -1,3 +1,4 @@
+using System.Reflection;
 using Old8Lang.AST;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
@@ -202,13 +203,113 @@ public class GenericInstanceExpression : LangExpression
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 编译器模式下的IL生成
-        // 这是一个复杂的过程，需要：
-        // 1. 处理泛型类型的实例化
-        // 2. 处理泛型函数的调用
-        // 3. 处理类型参数的传递
+        // 处理泛型函数调用：func<T>(args)
         
-        // 暂时抛出异常，提示需要实现
-        throw new InvalidOperationError(this, "编译器模式下暂时不支持泛型实例化表达式，请使用解释器模式");
+        if (!IsFunctionCall)
+        {
+            throw new InvalidOperationError(this, "编译器模式下暂时不支持泛型类实例化，仅支持泛型函数调用");
+        }
+        
+        // 获取基础函数名称
+        if (BaseExpression is not LangId functionId)
+        {
+            throw new InvalidOperationError(this, "编译器模式下泛型函数调用必须使用简单的函数标识符");
+        }
+        
+        var funcName = functionId.IdName;
+        
+        // 首先尝试从泛型函数定义中查找
+        if (!local.GenericFunctions.TryGetValue(funcName, out var genericFunc))
+        {
+            // 如果找不到，尝试从普通函数定义中查找（可能是基础版本）
+            if (local.DelegateVar.TryGetValue(funcName, out var baseMethod))
+            {
+                // 创建一个临时的泛型函数定义用于特化
+                // 这里需要根据实际情况来创建
+                // 暂时跳过泛型特化，使用基础方法
+                var baseMethodInfo = baseMethod;
+                
+                // 生成所有调用参数的IL代码
+                foreach (var arg in CallArguments!)
+                {
+                    arg.LoadIlValue(ilGenerator, local);
+                }
+                
+                // 调用基础方法
+                ilGenerator.Emit(OpCodes.Call, baseMethodInfo);
+                return;
+            }
+            
+            throw new InvalidOperationError(this, $"找不到泛型函数定义：{funcName}");
+        }
+        
+        // 创建类型参数映射
+        var typeMapping = new Dictionary<string, Type>();
+        
+        // 解析类型参数并映射到泛型参数名
+        if (genericFunc.GenericParameters != null)
+        {
+            for (int i = 0; i < Math.Min(TypeArguments.Count, genericFunc.GenericParameters.Count); i++)
+            {
+                var genericParamName = genericFunc.GenericParameters[i].Name;
+                var typeArgumentName = TypeArguments[i];
+                var type = ResolveSimpleType(typeArgumentName);
+                typeMapping[genericParamName] = type;
+            }
+        }
+        else
+        {
+            // 如果没有泛型参数信息，使用默认映射
+            for (int i = 0; i < TypeArguments.Count; i++)
+            {
+                var typeArgumentName = TypeArguments[i];
+                var type = ResolveSimpleType(typeArgumentName);
+                var genericParamName = $"T{i + 1}";
+                typeMapping[genericParamName] = type;
+            }
+        }
+        
+        // 构建特化键
+        var typeArgNames = TypeArguments.Select(t => ResolveSimpleType(t).Name).ToArray();
+        var specializationKey = $"{funcName}${string.Join("_", typeArgNames)}";
+        
+        // 检查是否已经存在特化方法
+        if (local.GenericSpecializations.TryGetValue(specializationKey, out var specializedMethod))
+        {
+            // 使用现有的特化方法
+        }
+        else
+        {
+            // 创建新的特化方法
+            specializedMethod = GenericMethodSpecializer.CreateSpecialization(genericFunc, typeMapping, local);
+        }
+        
+        // 生成所有调用参数的IL代码
+        foreach (var arg in CallArguments!)
+        {
+            arg.LoadIlValue(ilGenerator, local);
+        }
+        
+        // 调用特化方法
+        ilGenerator.Emit(OpCodes.Call, specializedMethod);
+    }
+    
+    /// <summary>
+    /// 解析简单类型名称为System.Type
+    /// </summary>
+    private static Type ResolveSimpleType(string typeName)
+    {
+        return typeName.ToLower() switch
+        {
+            "int" => typeof(int),
+            "string" => typeof(string),
+            "double" => typeof(double),
+            "bool" => typeof(bool),
+            "char" => typeof(char),
+            "void" => typeof(void),
+            "object" => typeof(object),
+            _ => typeof(object)
+        };
     }
 
     public override TResult Accept<TResult>(Visitor.IVisitor<TResult> visitor)

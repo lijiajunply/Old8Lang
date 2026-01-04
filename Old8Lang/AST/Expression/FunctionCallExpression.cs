@@ -123,18 +123,49 @@ public partial class FunctionCallExpression : LangExpression
     public override void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
         // 编译器模式下的IL生成
-        // 这是一个简化实现，实际需要更复杂的处理逻辑
-
-        // 1. 生成函数表达式的IL代码
-        FunctionExpression.LoadIlValue(ilGenerator, local);
-
-        // 2. 生成参数的IL代码
-        foreach (var arg in Arguments)
+        
+        // 处理函数调用
+        if (FunctionExpression is LangId functionId)
         {
-            arg.LoadIlValue(ilGenerator, local);
+            // 获取函数名称
+            var funcName = functionId.IdName;
+            
+            // 构建委托键：函数名 + 参数类型签名
+            var paramTypes = Arguments.Select(arg => arg.OutputType(local) ?? typeof(object)).ToArray();
+            var paramTypeNames = string.Join("_", paramTypes.Select(t => t.Name));
+            var delegateKey = $"{funcName}${paramTypeNames}";
+            
+            // 检查是否有对应的编译好的方法
+            if (local.DelegateVar.TryGetValue(delegateKey, out var method))
+            {
+                // 加载所有参数到堆栈
+                foreach (var arg in Arguments)
+                {
+                    arg.LoadIlValue(ilGenerator, local);
+                }
+                
+                // 调用方法
+                ilGenerator.Emit(OpCodes.Call, method);
+                return;
+            }
+            
+            // 尝试查找泛型函数实例
+            var genericDelegateKey = $"{funcName}";
+            if (local.DelegateVar.TryGetValue(genericDelegateKey, out var genericMethod))
+            {
+                // 对于泛型函数，需要特殊处理
+                // 这里简化处理，直接调用
+                foreach (var arg in Arguments)
+                {
+                    arg.LoadIlValue(ilGenerator, local);
+                }
+                
+                ilGenerator.Emit(OpCodes.Call, genericMethod);
+                return;
+            }
         }
 
-        // 3. 由于函数调用的复杂性，暂时抛出异常提示不支持
-        throw new InvalidOperationError(this, "编译器模式下暂时不支持表达式函数调用，请使用解释器模式");
+        // 如果是复杂的表达式函数调用，抛出异常
+        throw new InvalidOperationError(this, "编译器模式下暂时不支持复杂的表达式函数调用，请使用简单的函数标识符调用");
     }
 }

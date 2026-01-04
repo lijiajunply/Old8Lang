@@ -1002,13 +1002,29 @@ public class FuncLangValue : ImportInfo
             }
 
             // 将方法注册到本地变量管理器的DelegateVar中
+            // 对于泛型函数，需要同时注册泛型版本和特化版本
             var paramTypeNames = string.Join("_", parameterTypes.Select(t => t.Name));
-            var delegateKey = $"{methodName}${paramTypeNames}";
-            local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
+            
+            if (IsGeneric)
+            {
+                // 注册泛型函数的基础版本（不带类型签名）
+                local.DelegateVar.TryAdd(methodName, dynamicMethod);
+                
+                // 也注册带类型签名的版本，确保兼容性
+                var delegateKey = $"{methodName}${paramTypeNames}";
+                local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
+            }
+            else
+            {
+                // 普通函数只注册带类型签名的版本
+                var delegateKey = $"{methodName}${paramTypeNames}";
+                local.DelegateVar.TryAdd(delegateKey, dynamicMethod);
+            }
 
             // 同时存储函数的参数列表信息，用于支持默认参数
             if (Ids != null)
             {
+                var delegateKey = $"{methodName}${paramTypeNames}";
                 local.FuncParameters.TryAdd(delegateKey, Ids);
             }
         }

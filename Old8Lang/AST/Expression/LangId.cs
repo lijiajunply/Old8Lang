@@ -203,17 +203,44 @@ public partial class LangId(
                 var baseTypeName = typeName[..genericIndex].Trim();
                 var genericArg = typeName[(genericIndex + 1)..^1].Trim();
 
-                // 解析泛型参数类型
-                var argType = genericArg switch
+                // 首先尝试使用泛型类型解析器解析泛型参数
+                Type argType;
+                if (local.CurrentGenericTypeResolver != null)
                 {
-                    "int" => typeof(int),
-                    "double" => typeof(double),
-                    "string" => typeof(string),
-                    "bool" => typeof(bool),
-                    "char" => typeof(char),
-                    "object" => typeof(object),
-                    _ => typeof(object) // 默认为object
-                };
+                    var resolvedType = local.CurrentGenericTypeResolver.ResolveType(genericArg);
+                    if (resolvedType != null)
+                    {
+                        argType = resolvedType;
+                    }
+                    else
+                    {
+                        // 回退到基本类型映射
+                        argType = genericArg switch
+                        {
+                            "int" => typeof(int),
+                            "double" => typeof(double),
+                            "string" => typeof(string),
+                            "bool" => typeof(bool),
+                            "char" => typeof(char),
+                            "object" => typeof(object),
+                            _ => typeof(object) // 默认为object
+                        };
+                    }
+                }
+                else
+                {
+                    // 没有泛型解析器时使用基本类型映射
+                    argType = genericArg switch
+                    {
+                        "int" => typeof(int),
+                        "double" => typeof(double),
+                        "string" => typeof(string),
+                        "bool" => typeof(bool),
+                        "char" => typeof(char),
+                        "object" => typeof(object),
+                        _ => typeof(object) // 默认为object
+                    };
+                }
 
                 // 返回泛型类型
                 return baseTypeName switch
@@ -225,7 +252,17 @@ public partial class LangId(
                 };
             }
 
-            // 非泛型类型
+            // 首先尝试使用泛型类型解析器
+            if (local.CurrentGenericTypeResolver != null)
+            {
+                var resolvedType = local.CurrentGenericTypeResolver.ResolveType(typeName);
+                if (resolvedType != null)
+                {
+                    return resolvedType;
+                }
+            }
+
+            // 非泛型类型或解析失败时的默认映射
             return typeName switch
             {
                 "int" => typeof(int),
