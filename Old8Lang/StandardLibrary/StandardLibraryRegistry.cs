@@ -1,8 +1,5 @@
 using Old8Lang.DatabaseLib;
 using Old8Lang.FirstUI;
-using Old8Lang.FirstUI.Basic;
-using Old8Lang.FirstUI.Core;
-using Old8Lang.FirstUI.Layout;
 using Old8Lang.MachineLearningLib;
 using Old8Lang.NetLib;
 using Old8Lang.SerializationLib;

@@ -1,6 +1,5 @@
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
-using Old8Lang.Concurrency;
 using Old8Lang.Interpreter;
 
 namespace Old8Lang.Tests.Interpreter.Statements;

@@ -2,8 +2,6 @@ using Old8Lang.LangParser;
 using Old8Lang.AST.Statement;
 using Old8Lang.Error;
 using Old8Lang.LanguageServer.Models;
-using Old8Lang.Debugger;
-using Old8Lang.Profiler;
 using System.Collections.Concurrent;
 
 namespace Old8Lang.LanguageServer.Services;

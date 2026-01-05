@@ -1,5 +1,4 @@
 using Old8Lang.AST;
-using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Value;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
@@ -29,6 +28,7 @@ public static class CollectionTypeValidator
         SourcePosition position)
     {
         // 解析类型注解
+        if (local.Interpreter?.Manager is null) return;
         var typeAnnotationManager = new TypeAnnotationManager(local.Interpreter.Manager);
         var parsedAnnotation = typeAnnotationManager.ParseTypeAnnotation(typeAnnotation);
 
@@ -111,8 +111,8 @@ public static class CollectionTypeValidator
             var actualElementType = typeAnnotationManager.ParseTypeAnnotation(actualElementTypeName);
 
             if (!typeAnnotationManager.ValidateTypeCompatibility(
-                expectedElementType.GetFullName(),
-                actualElementType.GetFullName()))
+                    expectedElementType.GetFullName(),
+                    actualElementType.GetFullName()))
             {
                 throw new CompilerException(
                     $"变量 '{variableName}' 列表元素类型不匹配: 第 {i} 个元素期望类型 {expectedElementType.GetFullName()},实际类型 {actualElementTypeName}",
@@ -161,8 +161,8 @@ public static class CollectionTypeValidator
             var actualElementType = typeAnnotationManager.ParseTypeAnnotation(actualElementTypeName);
 
             if (!typeAnnotationManager.ValidateTypeCompatibility(
-                expectedElementType.GetFullName(),
-                actualElementType.GetFullName()))
+                    expectedElementType.GetFullName(),
+                    actualElementType.GetFullName()))
             {
                 throw new CompilerException(
                     $"变量 '{variableName}' 数组元素类型不匹配: 第 {i} 个元素期望类型 {expectedElementType.GetFullName()},实际类型 {actualElementTypeName}",
@@ -214,8 +214,8 @@ public static class CollectionTypeValidator
             var actualKeyType = typeAnnotationManager.ParseTypeAnnotation(actualKeyTypeName);
 
             if (!typeAnnotationManager.ValidateTypeCompatibility(
-                expectedKeyType.GetFullName(),
-                actualKeyType.GetFullName()))
+                    expectedKeyType.GetFullName(),
+                    actualKeyType.GetFullName()))
             {
                 throw new CompilerException(
                     $"变量 '{variableName}' 字典键类型不匹配: 第 {i} 个键期望类型 {expectedKeyType.GetFullName()},实际类型 {actualKeyTypeName}",
@@ -228,8 +228,8 @@ public static class CollectionTypeValidator
             var actualValueType = typeAnnotationManager.ParseTypeAnnotation(actualValueTypeName);
 
             if (!typeAnnotationManager.ValidateTypeCompatibility(
-                expectedValueType.GetFullName(),
-                actualValueType.GetFullName()))
+                    expectedValueType.GetFullName(),
+                    actualValueType.GetFullName()))
             {
                 throw new CompilerException(
                     $"变量 '{variableName}' 字典值类型不匹配: 第 {i} 个值期望类型 {expectedValueType.GetFullName()},实际类型 {actualValueTypeName}",

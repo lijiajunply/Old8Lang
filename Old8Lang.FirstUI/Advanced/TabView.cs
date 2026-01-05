@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Old8Lang.FirstUI.Core;
-using Old8Lang.FirstUI.Utils;
 
 namespace Old8Lang.FirstUI.Advanced;
 

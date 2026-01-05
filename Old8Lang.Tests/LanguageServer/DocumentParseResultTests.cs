@@ -1,5 +1,4 @@
 using Old8Lang.LangParser;
-using Xunit;
 using Old8Lang.LanguageServer.Models;
 using Xunit.Abstractions;
 

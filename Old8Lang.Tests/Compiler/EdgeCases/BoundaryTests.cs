@@ -1,6 +1,4 @@
-using Xunit;
 using Old8Lang.Interpreter;
-using Old8Lang.AST;
 using Xunit.Abstractions;
 
 namespace Old8Lang.Tests.Compiler.EdgeCases;

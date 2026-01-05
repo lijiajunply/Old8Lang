@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Old8Lang.FirstUI.Core;
-using System;
 
 namespace Old8Lang.FirstUI.Gesture;
 

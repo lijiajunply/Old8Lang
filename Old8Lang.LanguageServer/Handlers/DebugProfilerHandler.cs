@@ -1,4 +1,3 @@
-using MediatR;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.JsonRpc;
 using Old8Lang.LanguageServer.Models;

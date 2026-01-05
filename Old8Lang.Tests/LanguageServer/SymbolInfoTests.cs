@@ -1,7 +1,4 @@
-using Xunit;
 using Old8Lang.LanguageServer.Models;
-using Old8Lang.AST;
-using Old8Lang.LangParser;
 using Xunit.Abstractions;
 
 namespace Old8Lang.Tests.LanguageServer;

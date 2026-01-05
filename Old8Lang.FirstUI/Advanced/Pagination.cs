@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Layout;
-using Avalonia.Media;
 using Old8Lang.FirstUI.Core;
 using LayoutHelper = Old8Lang.FirstUI.Utils.LayoutHelper;
 

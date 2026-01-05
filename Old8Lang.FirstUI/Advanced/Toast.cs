@@ -1,12 +1,8 @@
-using Avalonia;
-using Avalonia.Animation;
-using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Old8Lang.FirstUI.Core;
-using Old8Lang.FirstUI.Utils;
 
 namespace Old8Lang.FirstUI.Advanced;
 

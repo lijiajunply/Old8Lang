@@ -1,9 +1,6 @@
-using Xunit;
 using Old8Lang.LanguageServer.Services;
-using Old8Lang.LanguageServer.Models;
 using Old8Lang.LanguageServer.Handlers;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using System.Threading;
 using Xunit.Abstractions;
 
 namespace Old8Lang.Tests.LanguageServer;

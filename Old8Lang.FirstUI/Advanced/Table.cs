@@ -1,6 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Data;
-using Avalonia.Interactivity;
 using Avalonia.Media;
 using Old8Lang.FirstUI.Core;
 using Old8Lang.FirstUI.Utils;

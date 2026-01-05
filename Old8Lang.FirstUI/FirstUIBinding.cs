@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Layout;
 using Avalonia.Threading;
-using System.Collections.Generic;
 using Old8Lang.FirstUI.Core;
 using Old8Lang.FirstUI.Theme;
 using Old8Lang.FirstUI.Gesture;

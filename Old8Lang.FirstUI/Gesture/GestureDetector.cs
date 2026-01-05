@@ -1,10 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Old8Lang.FirstUI.Core;
-using System;
-using System.Diagnostics;
 
 namespace Old8Lang.FirstUI.Gesture;
 

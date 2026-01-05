@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Old8Lang.FirstUI.Theme;
 
 /// <summary>

@@ -1,7 +1,5 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Old8Lang.FirstUI.Core;
-using Old8Lang.FirstUI.Utils;
 
 namespace Old8Lang.FirstUI.Basic;
 
