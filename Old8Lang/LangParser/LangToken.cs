@@ -652,6 +652,35 @@ public static class LangTokenizer
 
             if (!string.IsNullOrEmpty(matchedKeyword))
             {
+                // 特殊处理 "is not" 关键字组合
+                if (matchedKeyword == "is")
+                {
+                    var nextKeywordStart = i + matchedKeyword.Length;
+
+                    // 跳过空格和制表符
+                    while (nextKeywordStart < code.Length &&
+                           (code[nextKeywordStart] == ' ' || code[nextKeywordStart] == '\t'))
+                    {
+                        nextKeywordStart++;
+                    }
+
+                    // 检查是否紧跟 "not"
+                    var codeSpanAfterIs = code.AsSpan(nextKeywordStart);
+                    if (codeSpanAfterIs.Length >= 3 &&
+                        codeSpanAfterIs.Slice(0, 3).Equals("not".AsSpan(), StringComparison.Ordinal) &&
+                        (nextKeywordStart + 3 == code.Length ||
+                         !char.IsLetterOrDigit(code[nextKeywordStart + 3]) &&
+                         code[nextKeywordStart + 3] != '_'))
+                    {
+                        // 识别为 "is not"
+                        tokens.Add(new LangToken("is not",
+                            LangTokenType.IsNot,
+                            line, i - column));
+                        i = nextKeywordStart + 2; // 跳过 "not"
+                        continue;
+                    }
+                }
+
                 // 添加关键字标记
                 tokens.Add(new LangToken(matchedKeyword,
                     KeywordToTokenType[matchedKeyword],

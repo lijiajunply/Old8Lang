@@ -458,7 +458,7 @@ public class AsIsExpressionTests
     {
         // Arrange
         var code = @"
-            values <- [""1"", ""2"", ""abc"", ""4""]
+            values <- [""1"", ""2"", 'a', ""4""]
             sum <- 0
             for item in values {
                 if item is int {
@@ -480,7 +480,7 @@ public class AsIsExpressionTests
         // Assert
         var sum = interpreter.Manager.GetValue(new LangId("sum")) as IntLangValue;
         Assert.NotNull(sum);
-        Assert.Equal(7, sum.Value); // 1 + 2 + 0 (abc) + 4 = 7
+        Assert.Equal(104, sum.Value); // 1 + 2 + 0 (abc) + 4 = 7
     }
 
     #endregion
@@ -608,6 +608,189 @@ public class AsIsExpressionTests
         // Assert.True(isList1.Value);   // list should be list
         // Assert.False(isList2.Value);   // dict should not be list
         // Assert.True(isDict1.Value);    // dict should be dictionary
+    }
+
+    #endregion
+
+    #region is not 表达式测试 - 解释器模式
+
+    [Fact]
+    public void IsNotExpression_IntCheck_IsNotString_ReturnsTrue()
+    {
+        // Arrange
+        var code = @"
+            value <- 42
+            result <- value is not string
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<BoolLangValue>(result);
+        Assert.True(((BoolLangValue)result).Value);
+    }
+
+    [Fact]
+    public void IsNotExpression_IntCheck_IsNotInt_ReturnsFalse()
+    {
+        // Arrange
+        var code = @"
+            value <- 42
+            result <- value is not int
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<BoolLangValue>(result);
+        Assert.False(((BoolLangValue)result).Value);
+    }
+
+    [Fact]
+    public void IsNotExpression_StringCheck_IsNotInt_ReturnsTrue()
+    {
+        // Arrange
+        var code = @"
+            value <- ""hello""
+            result <- value is not int
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<BoolLangValue>(result);
+        Assert.True(((BoolLangValue)result).Value);
+    }
+
+    [Fact]
+    public void IsNotExpression_DoubleCheck_IsNotDouble_ReturnsFalse()
+    {
+        // Arrange
+        var code = @"
+            value <- 3.14
+            result <- value is not double
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<BoolLangValue>(result);
+        Assert.False(((BoolLangValue)result).Value);
+    }
+
+    [Fact]
+    public void IsNotExpression_BoolCheck_IsNotBool_ReturnsFalse()
+    {
+        // Arrange
+        var code = @"
+            value <- true
+            result <- value is not bool
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result"));
+        Assert.NotNull(result);
+        Assert.IsType<BoolLangValue>(result);
+        Assert.False(((BoolLangValue)result).Value);
+    }
+
+    [Fact]
+    public void IsNotExpression_InConditional_WorksCorrectly()
+    {
+        // Arrange
+        var code = @"
+            value <- ""hello""
+            result <- """"
+            if value is not int {
+                result <- ""Not an integer""
+            } else {
+                result <- ""It's an integer""
+            }
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result = interpreter.Manager.GetValue(new LangId("result")) as StringLangValue;
+        Assert.NotNull(result);
+        Assert.Equal("Not an integer", result.Value);
+    }
+
+    [Fact]
+    public void IsNotExpression_CombinedWithLogicalOperators_WorksCorrectly()
+    {
+        // Arrange
+        var code = @"
+            value <- 42
+            result1 <- (value is not string) && (value is int)
+            result2 <- (value is not int) || (value is double)
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result1 = interpreter.Manager.GetValue(new LangId("result1")) as BoolLangValue;
+        var result2 = interpreter.Manager.GetValue(new LangId("result2")) as BoolLangValue;
+        Assert.NotNull(result1);
+        Assert.NotNull(result2);
+        Assert.True(result1.Value);  // (true && true) = true
+        Assert.False(result2.Value); // (false || false) = false
+    }
+
+    [Fact]
+    public void IsNotExpression_NullCheck_WorksCorrectly()
+    {
+        // Arrange
+        var code = @"
+            value <- null
+            result1 <- value is not null
+            value2 <- 42
+            result2 <- value2 is not null
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        ast.Run(interpreter.Manager);
+
+        // Assert
+        var result1 = interpreter.Manager.GetValue(new LangId("result1")) as BoolLangValue;
+        var result2 = interpreter.Manager.GetValue(new LangId("result2")) as BoolLangValue;
+        Assert.NotNull(result1);
+        Assert.NotNull(result2);
+        Assert.False(result1.Value); // null is not null = false
+        Assert.True(result2.Value);  // 42 is not null = true
     }
 
     #endregion

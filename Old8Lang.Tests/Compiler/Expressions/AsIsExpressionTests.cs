@@ -430,4 +430,176 @@ public class AsIsExpressionTests
     }
 
     #endregion
+
+    #region is not 表达式测试 - 编译模式
+
+    [Fact]
+    public void IsNotExpression_IntCheck_IsNotString_CompilesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            value:int <- 42
+            result:bool <- value is not string
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        Assert.NotNull(compiledAction);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void IsNotExpression_IntCheck_IsNotInt_CompilesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            value:int <- 42
+            result:bool <- value is not int
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        Assert.NotNull(compiledAction);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void IsNotExpression_StringCheck_IsNotInt_CompilesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            value:string <- ""hello""
+            result:bool <- value is not int
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        Assert.NotNull(compiledAction);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void IsNotExpression_DoubleCheck_IsNotDouble_CompilesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            value:double <- 3.14
+            result:bool <- value is not double
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        Assert.NotNull(compiledAction);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void IsNotExpression_BoolCheck_IsNotBool_CompilesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            value:bool <- true
+            result:bool <- value is not bool
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        Assert.NotNull(compiledAction);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void IsNotExpression_InConditional_CompilesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            value:string <- ""hello""
+            result:string <- """"
+            if value is not int {
+                result <- ""Not an integer""
+            } else {
+                result <- ""It's an integer""
+            }
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        Assert.NotNull(compiledAction);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void IsNotExpression_CombinedWithLogicalOperators_CompilesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            value:int <- 42
+            result1:bool <- (value is not string) && (value is int)
+            result2:bool <- (value is not int) || (value is double)
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        Assert.NotNull(compiledAction);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void IsNotExpression_NullCheck_CompilesCorrectly()
+    {
+        // Arrange
+        var code = @"
+            value <- null
+            result1:bool <- value is not null
+            value2:int <- 42
+            result2:bool <- value2 is not null
+        ";
+        var interpreter = new LangInterpreter();
+
+        // Act
+        var ast = interpreter.Build(code);
+        var compiledAction = Old8Lang.Compiler.Compiler.Compile(ast, "test", interpreter);
+
+        // Assert
+        Assert.NotNull(compiledAction);
+        var exception = Record.Exception(() => compiledAction());
+        Assert.Null(exception);
+    }
+
+    #endregion
 }

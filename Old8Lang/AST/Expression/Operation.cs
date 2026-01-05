@@ -78,6 +78,8 @@ public partial class Operation(
             return "as";
         if (Opera == LangTokenType.Is)
             return "is";
+        if (Opera == LangTokenType.IsNot)
+            return "is not";
         if (Opera == LangTokenType.In)
             return "in";
         return "";
@@ -522,6 +524,41 @@ public partial class Operation(
 
             // 检查左侧值是否是指定类型的实例
             return new BoolLangValue(CheckIsInstance(leftResult, typeName, manager));
+        }
+
+        if (Opera == LangTokenType.IsNot)
+        {
+            // 处理否定类型检查操作：left is not right
+            // 右侧应该是一个类型标识符或类名
+            string typeName;
+            switch (Right)
+            {
+                case LangId rightLangId:
+                    typeName = rightLangId.IdName;
+                    break;
+                case TypeLangValue rightTypeLangValue:
+                    typeName = rightTypeLangValue.ToString();
+                    break;
+                default:
+                {
+                    // 如果是其他表达式，尝试获取其值作为类型
+                    var rightIsNotResult = Right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
+
+                    if (rightIsNotResult is TypeLangValue typeLangValue)
+                    {
+                        typeName = typeLangValue.Value ?? typeLangValue.ToString();
+                    }
+                    else
+                    {
+                        typeName = rightIsNotResult.ToString();
+                    }
+
+                    break;
+                }
+            }
+
+            // 检查左侧值是否不是指定类型的实例（取反）
+            return new BoolLangValue(!CheckIsInstance(leftResult, typeName, manager));
         }
 
         var rightResult = Right?.Run(manager) ?? throw new InvalidOperationError(this, "右操作数不能为空");
@@ -1419,6 +1456,192 @@ public partial class Operation(
                 // 非LangId类型，返回object类型
                 Left!.LoadIlValue(ilGenerator, local);
                 return typeof(object);
+            }
+            case LangTokenType.Is:
+            {
+                // 处理类型检查操作：left is right
+                // 右侧应该是一个类型标识符，如 int, double, string 等
+                if (Right is LangId rightLangId)
+                {
+                    var typeName = rightLangId.IdName;
+                    var targetType = typeName switch
+                    {
+                        "int" => typeof(int),
+                        "double" => typeof(double),
+                        "string" => typeof(string),
+                        "bool" => typeof(bool),
+                        "char" => typeof(char),
+                        "list" => typeof(List<object>),
+                        "array" => typeof(object[]),
+                        "dictionary" => typeof(Dictionary<object, object>),
+                        "null" => null,
+                        _ => null // 对于自定义类型，暂不支持编译模式
+                    };
+
+                    // 加载左侧值
+                    Left!.LoadIlValue(ilGenerator, local);
+
+                    if (targetType == null && typeName == "null")
+                    {
+                        // 检查是否为 null
+                        ilGenerator.Emit(OpCodes.Ldnull);
+                        ilGenerator.Emit(OpCodes.Ceq);
+                    }
+                    else if (targetType != null)
+                    {
+                        // 确保左侧值是 object 类型以便进行类型检查
+                        if (leftType != null && leftType.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Box, leftType);
+                        }
+
+                        if (targetType.IsValueType)
+                        {
+                            // 对于值类型，检查是否是装箱后的该类型
+                            ilGenerator.Emit(OpCodes.Isinst, typeof(object));
+                            ilGenerator.Emit(OpCodes.Dup);
+                            var isValueTypeLabel = ilGenerator.DefineLabel();
+                            var endLabel = ilGenerator.DefineLabel();
+
+                            ilGenerator.Emit(OpCodes.Brfalse, isValueTypeLabel); // 如果是 null，跳转
+
+                            // 不是 null，检查具体类型
+                            ilGenerator.Emit(OpCodes.Pop); // 弹出栈顶
+                            Left!.LoadIlValue(ilGenerator, local);
+                            if (leftType != null && leftType.IsValueType)
+                            {
+                                ilGenerator.Emit(OpCodes.Box, leftType);
+                            }
+                            ilGenerator.Emit(OpCodes.Isinst, targetType);
+                            ilGenerator.Emit(OpCodes.Ldnull);
+                            ilGenerator.Emit(OpCodes.Cgt_Un); // 不等于 null 则为 true
+                            ilGenerator.Emit(OpCodes.Br, endLabel);
+
+                            ilGenerator.MarkLabel(isValueTypeLabel);
+                            ilGenerator.Emit(OpCodes.Pop);
+                            ilGenerator.Emit(OpCodes.Ldc_I4_0); // false
+
+                            ilGenerator.MarkLabel(endLabel);
+                        }
+                        else
+                        {
+                            // 对于引用类型，使用 isinst 指令
+                            ilGenerator.Emit(OpCodes.Isinst, targetType);
+                            ilGenerator.Emit(OpCodes.Ldnull);
+                            ilGenerator.Emit(OpCodes.Cgt_Un); // 不等于 null 则为 true
+                        }
+                    }
+                    else
+                    {
+                        // 对于自定义类型，暂不支持，返回 false
+                        ilGenerator.Emit(OpCodes.Pop); // 弹出左侧值
+                        ilGenerator.Emit(OpCodes.Ldc_I4_0); // false
+                    }
+
+                    return typeof(bool);
+                }
+
+                // 非LangId类型，返回false
+                Left!.LoadIlValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Pop);
+                ilGenerator.Emit(OpCodes.Ldc_I4_0);
+                return typeof(bool);
+            }
+            case LangTokenType.IsNot:
+            {
+                // 处理否定类型检查操作：left is not right
+                // 右侧应该是一个类型标识符，如 int, double, string 等
+                if (Right is LangId rightLangId)
+                {
+                    var typeName = rightLangId.IdName;
+                    var targetType = typeName switch
+                    {
+                        "int" => typeof(int),
+                        "double" => typeof(double),
+                        "string" => typeof(string),
+                        "bool" => typeof(bool),
+                        "char" => typeof(char),
+                        "list" => typeof(List<object>),
+                        "array" => typeof(object[]),
+                        "dictionary" => typeof(Dictionary<object, object>),
+                        "null" => null,
+                        _ => null // 对于自定义类型，暂不支持编译模式
+                    };
+
+                    // 加载左侧值
+                    Left!.LoadIlValue(ilGenerator, local);
+
+                    if (targetType == null && typeName == "null")
+                    {
+                        // 检查是否不为 null
+                        ilGenerator.Emit(OpCodes.Ldnull);
+                        ilGenerator.Emit(OpCodes.Ceq);
+                        ilGenerator.Emit(OpCodes.Ldc_I4_1);
+                        ilGenerator.Emit(OpCodes.Xor); // 取反
+                    }
+                    else if (targetType != null)
+                    {
+                        // 确保左侧值是 object 类型以便进行类型检查
+                        if (leftType != null && leftType.IsValueType)
+                        {
+                            ilGenerator.Emit(OpCodes.Box, leftType);
+                        }
+
+                        if (targetType.IsValueType)
+                        {
+                            // 对于值类型，检查是否不是装箱后的该类型
+                            ilGenerator.Emit(OpCodes.Isinst, typeof(object));
+                            ilGenerator.Emit(OpCodes.Dup);
+                            var isValueTypeLabel = ilGenerator.DefineLabel();
+                            var endLabel = ilGenerator.DefineLabel();
+
+                            ilGenerator.Emit(OpCodes.Brfalse, isValueTypeLabel); // 如果是 null，跳转
+
+                            // 不是 null，检查具体类型
+                            ilGenerator.Emit(OpCodes.Pop); // 弹出栈顶
+                            Left!.LoadIlValue(ilGenerator, local);
+                            if (leftType != null && leftType.IsValueType)
+                            {
+                                ilGenerator.Emit(OpCodes.Box, leftType);
+                            }
+                            ilGenerator.Emit(OpCodes.Isinst, targetType);
+                            ilGenerator.Emit(OpCodes.Ldnull);
+                            ilGenerator.Emit(OpCodes.Cgt_Un); // 不等于 null 则为 true
+                            ilGenerator.Emit(OpCodes.Ldc_I4_1);
+                            ilGenerator.Emit(OpCodes.Xor); // 取反
+                            ilGenerator.Emit(OpCodes.Br, endLabel);
+
+                            ilGenerator.MarkLabel(isValueTypeLabel);
+                            ilGenerator.Emit(OpCodes.Pop);
+                            ilGenerator.Emit(OpCodes.Ldc_I4_1); // true (不是该类型)
+
+                            ilGenerator.MarkLabel(endLabel);
+                        }
+                        else
+                        {
+                            // 对于引用类型，使用 isinst 指令
+                            ilGenerator.Emit(OpCodes.Isinst, targetType);
+                            ilGenerator.Emit(OpCodes.Ldnull);
+                            ilGenerator.Emit(OpCodes.Cgt_Un); // 不等于 null 则为 true
+                            ilGenerator.Emit(OpCodes.Ldc_I4_1);
+                            ilGenerator.Emit(OpCodes.Xor); // 取反
+                        }
+                    }
+                    else
+                    {
+                        // 对于自定义类型，暂不支持，返回 true (不是该类型)
+                        ilGenerator.Emit(OpCodes.Pop); // 弹出左侧值
+                        ilGenerator.Emit(OpCodes.Ldc_I4_1); // true
+                    }
+
+                    return typeof(bool);
+                }
+
+                // 非LangId类型，返回true
+                Left!.LoadIlValue(ilGenerator, local);
+                ilGenerator.Emit(OpCodes.Pop);
+                ilGenerator.Emit(OpCodes.Ldc_I4_1);
+                return typeof(bool);
             }
             case LangTokenType.NullishCoalescing:
             {

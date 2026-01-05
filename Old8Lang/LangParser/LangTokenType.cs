@@ -243,6 +243,11 @@ public enum LangTokenType
     Return,
     As,
     Is,
+
+    /// <summary>
+    /// is not
+    /// </summary>
+    IsNot,
     Break,
     Continue,
     This,
@@ -431,6 +436,7 @@ public enum KeywordType
     Return,
     As,
     Is,
+    IsNot,
     Break,
     Continue,
     Try,
