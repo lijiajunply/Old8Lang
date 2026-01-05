@@ -683,7 +683,7 @@ public partial class ForInStatement(
         var getCurrentMethod = currentProperty.GetGetMethod()!;
         ilGenerator.Emit(OpCodes.Ldloc, enumerator);
         ilGenerator.Emit(OpCodes.Callvirt, getCurrentMethod);
-        
+
         // 尝试确定元素类型并进行类型转换
         var exprType = expression.OutputType(local);
         if (exprType != null)
@@ -695,14 +695,14 @@ public partial class ForInStatement(
                 ilGenerator.Emit(OpCodes.Box, typeof(int)); // 重新装箱以保持统一性
             }
             // 如果是泛型集合且元素类型是 int
-            else if (exprType.IsGenericType && exprType.GetGenericArguments().Length > 0 
+            else if (exprType.IsGenericType && exprType.GetGenericArguments().Length > 0
                      && exprType.GetGenericArguments()[0] == typeof(int))
             {
                 ilGenerator.Emit(OpCodes.Unbox_Any, typeof(int));
                 ilGenerator.Emit(OpCodes.Box, typeof(int)); // 重新装箱以保持统一性
             }
         }
-        
+
         ilGenerator.Emit(OpCodes.Stloc, current);
 
         // 处理标识符赋值
@@ -759,6 +759,14 @@ public partial class ForInStatement(
         ilGenerator.Emit(OpCodes.Callvirt, keysGetEnumeratorMethod);
         ilGenerator.Emit(OpCodes.Stloc, keysEnumerator);
 
+        // 在循环外部声明键和值的局部变量
+        var keyLocal = ilGenerator.DeclareLocal(typeof(object));
+        LocalBuilder? valueLocal = null;
+        if (AllIds.Count > 1)
+        {
+            valueLocal = ilGenerator.DeclareLocal(typeof(object));
+        }
+
         // 定义循环标签
         var loopStart = ilGenerator.DefineLabel();
         var loopEnd = ilGenerator.DefineLabel();
@@ -786,7 +794,6 @@ public partial class ForInStatement(
         var getCurrentMethod = currentProperty.GetGetMethod()!;
         ilGenerator.Emit(OpCodes.Ldloc, keysEnumerator);
         ilGenerator.Emit(OpCodes.Callvirt, getCurrentMethod);
-        var keyLocal = ilGenerator.DeclareLocal(typeof(object));
         ilGenerator.Emit(OpCodes.Stloc, keyLocal);
 
         // 将键添加到局部变量管理器
@@ -805,11 +812,10 @@ public partial class ForInStatement(
             ilGenerator.Emit(OpCodes.Callvirt, getItemMethod);
 
             // 保存值到局部变量
-            var valueLocal = ilGenerator.DeclareLocal(typeof(object));
-            ilGenerator.Emit(OpCodes.Stloc, valueLocal);
+            ilGenerator.Emit(OpCodes.Stloc, valueLocal!);
 
             // 将值添加到局部变量管理器
-            local.AddLocalVar(AllIds[1].IdName, valueLocal);
+            local.AddLocalVar(AllIds[1].IdName, valueLocal!);
         }
 
         // 生成循环体

@@ -6,14 +6,9 @@ namespace Old8Lang.Tests.Compiler.Types;
 /// <summary>
 /// 编译器模式下的类型系统测试 - 枚举
 /// </summary>
-    public class EnumTests
-    {
-        private readonly ITestOutputHelper _output;
-
-        public EnumTests(ITestOutputHelper output)
-        {
-            _output = output;
-        }
+public class EnumTests(ITestOutputHelper output)
+{
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void BasicEnum_CompilesAndExecutesCorrectly()
@@ -30,9 +25,9 @@ namespace Old8Lang.Tests.Compiler.Types;
             greenValue <- Color.Green
             blueValue <- Color.Blue
             
-            Assert.Equal(0, redValue)
-            Assert.Equal(1, greenValue)
-            Assert.Equal(2, blueValue)
+            Assert.Equal(0, redValue as int)
+            Assert.Equal(1, greenValue as int)
+            Assert.Equal(2, blueValue as int)
         ";
         var interpreter = new LangInterpreter();
 
@@ -62,9 +57,9 @@ namespace Old8Lang.Tests.Compiler.Types;
             createdCode <- HttpStatus.Created
             notFoundCode <- HttpStatus.NotFound
             
-            Assert.Equal(200, okCode)
-            Assert.Equal(201, createdCode)
-            Assert.Equal(404, notFoundCode)
+            Assert.Equal(200, okCode as int)
+            Assert.Equal(201, createdCode as int)
+            Assert.Equal(404, notFoundCode as int)
         ";
         var interpreter = new LangInterpreter();
 
@@ -94,10 +89,10 @@ namespace Old8Lang.Tests.Compiler.Types;
             highValue <- Priority.High
             criticalValue <- Priority.Critical
             
-            Assert.Equal(0, lowValue)
-            Assert.Equal(5, mediumValue)
-            Assert.Equal(6, highValue)
-            Assert.Equal(10, criticalValue)
+            Assert.Equal(0, lowValue as int)
+            Assert.Equal(5, mediumValue as int)
+            Assert.Equal(6, highValue as int)
+            Assert.Equal(10, criticalValue as int)
         ";
         var interpreter = new LangInterpreter();
 
@@ -141,7 +136,7 @@ namespace Old8Lang.Tests.Compiler.Types;
             }
             
             singleValue <- SingleValue.OnlyOne
-            Assert.Equal(0, singleValue)
+            Assert.Equal(0, singleValue as int)
         ";
         var interpreter = new LangInterpreter();
 
@@ -173,8 +168,8 @@ namespace Old8Lang.Tests.Compiler.Types;
             publicValue2 <- PublicEnum.Value2
             
             // 私有枚举可能需要在类内部访问
-            Assert.Equal(0, publicValue1)
-            Assert.Equal(1, publicValue2)
+            Assert.Equal(0, publicValue1 as int)
+            Assert.Equal(1, publicValue2 as int)
         ";
         var interpreter = new LangInterpreter();
 
@@ -279,18 +274,18 @@ namespace Old8Lang.Tests.Compiler.Types;
             
             func logMessage(level:LogLevel, message:string) -> void {
                 levelValue <- level
-                if levelValue == 0 {
+                if levelValue as int == 0 {
                     // Debug 级别
-                    Assert.Equal(""Debug: "" + message)
-                } else if levelValue == 1 {
+                    Assert.Equal(""Debug: "" , message)
+                } elif levelValue as int == 1 {
                     // Info 级别
-                    Assert.Equal(""Info: "" + message)
-                } else if levelValue == 2 {
+                    Assert.Equal(""Info: "" , message)
+                } elif levelValue as int == 2 {
                     // Warning 级别
-                    Assert.Equal(""Warning: "" + message)
-                } else if levelValue == 3 {
+                    Assert.Equal(""Warning: "" , message)
+                } elif levelValue as int == 3 {
                     // Error 级别
-                    Assert.Equal(""Error: "" + message)
+                    Assert.Equal(""Error: "" , message)
                 }
             }
             
@@ -364,19 +359,19 @@ namespace Old8Lang.Tests.Compiler.Types;
             
             func getDayName(day:DayOfWeek) -> string {
                 dayValue <- day
-                if dayValue == 0 {
+                if dayValue as int == 0 {
                     return ""Monday""
-                } else if dayValue == 1 {
+                } elif dayValue as int == 1 {
                     return ""Tuesday""
-                } else if dayValue == 2 {
+                } elif dayValue as int == 2 {
                     return ""Wednesday""
-                } else if dayValue == 3 {
+                } elif dayValue as int == 3 {
                     return ""Thursday""
-                } else if dayValue == 4 {
+                } elif dayValue as int == 4 {
                     return ""Friday""
-                } else if dayValue == 5 {
+                } elif dayValue as int == 5 {
                     return ""Saturday""
-                } else if dayValue == 6 {
+                } elif dayValue as int == 6 {
                     return ""Sunday""
                 } else {
                     return ""Unknown""
@@ -430,13 +425,13 @@ namespace Old8Lang.Tests.Compiler.Types;
             largeMiddle <- LargeRange.Middle
             largeEnd <- LargeRange.End
             
-            Assert.Equal(0, smallMin)
-            Assert.Equal(1, smallMiddle)
-            Assert.Equal(2, smallMax)
+            Assert.Equal(0, smallMin as int)
+            Assert.Equal(1, smallMiddle as int)
+            Assert.Equal(2, smallMax as int)
             
-            Assert.Equal(1000, largeStart)
-            Assert.Equal(5000, largeMiddle)
-            Assert.Equal(10000, largeEnd)
+            Assert.Equal(1000, largeStart as int)
+            Assert.Equal(5000, largeMiddle as int)
+            Assert.Equal(10000, largeEnd as int)
             
             // 验证范围关系
             Assert.True(smallMin <= smallMiddle && smallMiddle <= smallMax)
@@ -473,8 +468,8 @@ namespace Old8Lang.Tests.Compiler.Types;
             }
             
             func getSeasonWeather(season:Season, weather:Weather) -> string {
-                seasonValue <- season
-                weatherValue <- weather
+                seasonValue <- season as int
+                weatherValue <- weather as int
                 
                 // 春天和晴天
                 if seasonValue == 0 && weatherValue == 0 {

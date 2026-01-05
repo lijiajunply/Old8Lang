@@ -46,16 +46,20 @@ public partial class ReturnStatement(LangExpression returnExpression, SourcePosi
         // 获取返回值表达式的类型
         var returnType = returnExpression.OutputType(local);
 
-        // 加载返回表达式的值到栈上
+        // 加载返回表达式的值到栈上（对于void类型，LoadIlValue不会加载任何值）
         returnExpression.LoadIlValue(ilGenerator, local);
 
-        // 如果函数使用了defer（ReturnValueLocal不为null），存储返回值并跳转到结束标签
-        if (local.ReturnValueLocal != null)
+        // 如果函数使用了try-finally结构（ReturnLabel不为null），必须使用Leave指令
+        if (local.ReturnLabel != null)
         {
-            // 存储返回值到局部变量
-            ilGenerator.Emit(OpCodes.Stloc, local.ReturnValueLocal);
+            // 如果有返回值局部变量（非void函数），存储返回值
+            if (local.ReturnValueLocal != null)
+            {
+                // 存储返回值到局部变量
+                ilGenerator.Emit(OpCodes.Stloc, local.ReturnValueLocal);
+            }
             // 使用Leave指令退出try块，跳转到函数结束标签
-            ilGenerator.Emit(OpCodes.Leave, local.ReturnLabel!.Value);
+            ilGenerator.Emit(OpCodes.Leave, local.ReturnLabel.Value);
         }
         else
         {

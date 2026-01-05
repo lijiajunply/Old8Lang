@@ -316,6 +316,12 @@ public partial class LangId(
             };
         }
 
+        // 检查是否是类或枚举类型（在编译模式下，枚举和类都存储在 ClassVar 中）
+        if (local.ClassVar.TryGetValue(IdName, out var classType))
+        {
+            return classType;
+        }
+
         return typeof(object);
     }
 }

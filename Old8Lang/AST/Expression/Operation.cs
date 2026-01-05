@@ -2092,9 +2092,35 @@ public partial class Operation(
 
                 if (Right is LangId id)
                 {
+                    // 检查是否是枚举类型的静态成员访问
+                    if (leftType != null && leftType.IsEnum)
+                    {
+                        // 枚举成员访问：直接加载枚举值（整数）
+                        var field = leftType.GetField(id.IdName);
+                        if (field == null)
+                        {
+                            throw new InvalidOperationError(this, $"枚举 {leftType.Name} 没有成员 {id.IdName}");
+                        }
+
+                        // 获取枚举成员的值（整数）
+                        var enumValue = field.GetRawConstantValue();
+                        if (enumValue is int intValue)
+                        {
+                            // 直接加载整数常量
+                            ilGenerator.Emit(OpCodes.Ldc_I4, intValue);
+                        }
+                        else
+                        {
+                            throw new InvalidOperationError(this, $"无法获取枚举成员 {id.IdName} 的值");
+                        }
+
+                        return leftType; // 返回枚举类型
+                    }
+
+                    // 普通实例成员访问
                     Left!.LoadIlValue(ilGenerator, local);
-                    var field = leftType!.GetField(id.IdName);
-                    if (field == null)
+                    var instanceField = leftType!.GetField(id.IdName);
+                    if (instanceField == null)
                     {
                         var p = leftType.GetProperty(id.IdName);
                         if (p == null)
@@ -2112,8 +2138,8 @@ public partial class Operation(
                         return p.PropertyType;
                     }
 
-                    ilGenerator.Emit(OpCodes.Ldfld, field);
-                    return field.FieldType;
+                    ilGenerator.Emit(OpCodes.Ldfld, instanceField);
+                    return instanceField.FieldType;
                 }
 
                 // 处理索引访问: left[right]，例如 array[0], list[1], dict["key"]
