@@ -723,6 +723,17 @@ public partial class Operation(
         {
             if (leftType != null)
             {
+                // 检查是否是枚举类型的成员访问
+                if (leftType.IsEnum)
+                {
+                    // 枚举成员访问返回枚举类型本身
+                    var enumField = leftType.GetField(rightId.IdName);
+                    if (enumField != null)
+                    {
+                        return leftType; // 返回枚举类型
+                    }
+                }
+
                 // 尝试获取字段类型
                 var field = leftType.GetField(rightId.IdName);
                 if (field != null)

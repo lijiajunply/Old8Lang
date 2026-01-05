@@ -194,7 +194,7 @@ public class EnumTests(ITestOutputHelper output)
                 West    // 3
             }
             
-            direction <- Direction.East
+            direction <- Direction.East as int
             result <- """"
             
             switch direction {
@@ -328,8 +328,8 @@ public class EnumTests(ITestOutputHelper output)
             result1 <- processOperation(10)  // Success = 1
             result2 <- processOperation(-5)  // Error = 2
             
-            Assert.Equal(1, result1)
-            Assert.Equal(2, result2)
+            Assert.Equal(1, result1 as int)
+            Assert.Equal(2, result2 as int)
         ";
         var interpreter = new LangInterpreter();
 

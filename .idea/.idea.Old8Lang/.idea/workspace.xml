@@ -23,12 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Types/EnumTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Types/EnumTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/LangId.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Types/TypeConversionTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Types/TypeConversionTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Operation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ForInStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ReturnStatement.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -558,7 +554,7 @@
       <workItem from="1767429825540" duration="633000" />
       <workItem from="1767433937853" duration="26000" />
       <workItem from="1767434122437" duration="2457000" />
-      <workItem from="1767519232104" duration="15134000" />
+      <workItem from="1767519232104" duration="15478000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -903,7 +899,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="535" />
+    <option name="localTasksCounter" value="536" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -930,7 +926,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(tests): 修正重命名处理器测试中的位置参数&#10;&#10;- 修正了testFunction定义位置从(1, 5)到(1, 17)的行列号&#10;- 修正了变量调用位置从(5, 10)和(6, 10)调整为(5, 23)和(6, 23)&#10;- 修正了myVariable定义位置从(1, 0)调整为(2, 11)&#10;- 清理了IDE工作区配置文件中的变更列表记录&#10;- 更新了悬停处理器的符号类型显示调试配置&#10;- 调整了工作项时长和本地任务计数统计信息" />
     <MESSAGE value="feat(lang): 添加并发原语和using语句支持&#10;&#10;- 注册Mutex、Semaphore、AtomicInt、Channel等57个并发全局函数&#10;- 添加Using语句的词法解析和AST节点实现&#10;- 实现using语句的资源自动管理和try-finally逻辑&#10;- 添加using语句的IL代码生成和解释器执行支持&#10;- 创建并发原语的资源管理器和内部实现类&#10;- 更新语言解析器和类型系统以支持新的并发特性" />
     <MESSAGE value="test(select): 添加 select 语句的解析、解释器和边界测试&#10;&#10;- 实现了 SelectStatementTests 类，包含基本发送、接收、多 case 测试&#10;- 添加了 EdgeCasesTests 类，覆盖嵌套 select、channel 边界、控制流等场景&#10;- 创建了 Parser 测试，验证 select 语句的语法解析功能&#10;- 测试包括空 case 块、异常处理、复杂表达式和并发场景&#10;- 验证了有界 channel、变量作用域和资源清理功能" />
     <MESSAGE value="feat(lang): 添加defer语句支持&#10;&#10;- 实现DeferStatement类，支持延迟执行功能&#10;- 添加defer语句的解析和执行逻辑&#10;- 支持defer语句后进先出(LIFO)执行顺序&#10;- 添加defer语句的编译器IL生成支持&#10;- 实现defer语句与return、异常处理的交互&#10;- 添加大量defer语句的测试用例，包括基本功能、边界条件、异常处理等&#10;- 支持defer代码块和复杂表达式&#10;- 实现defer语句的资源管理功能测试" />
@@ -955,7 +950,8 @@
     <MESSAGE value="test(using): 移除自定义类dispose方法相关测试用例&#10;&#10;- 移除了UsingStatement_WithDisposableClass_CallsDisposeMethod测试&#10;- 移除了UsingStatement_ExceptionInBlock_DisposeStillCalled测试&#10;- 移除了UsingStatement_NestedDisposableClasses_DisposedInReverseOrder测试&#10;- 移除了UsingStatement_DisposeCalledMultipleTimes_ExecutesOnlyOnce测试&#10;- 移除了UsingStatement_DisposeAccessesInstanceMembers_ExecutesCorrectly测试&#10;- 移除了UsingStatement_MixedResourceTypes_DisposesAllCorrectly测试&#10;- 更新了workspace.xml中的变更列表和任务计数器&#10;- 修改了最后一次提交消息记录" />
     <MESSAGE value="feat(lang): 添加 is not 表达式支持&#10;&#10;- 在词法分析器中添加 IsNot 关键字类型支持&#10;- 实现 &quot;is not&quot; 关键字组合的特殊处理逻辑&#10;- 在表达式解析器中添加 IsNot 操作符优先级处理&#10;- 实现解释器模式下的 IsNot 类型检查功能&#10;- 实现编译模式下的 IsNot 类型检查 IL 生成&#10;- 添加编译和解释器模式的 IsNot 表达式测试用例&#10;- 修复现有 is 表达式测试中的数据类型问题" />
     <MESSAGE value="refactor(core): 优化代码结构并修复类型验证问题&#10;&#10;- 移除多个文件中的冗余 using 指令&#10;- 在 CollectionTypeValidator 中添加空值检查以防止运行时异常&#10;- 修复多处代码格式问题，包括缩进和括号位置&#10;- 简化多个测试文件中的导入声明&#10;- 优化 AST 表达式和值处理的代码结构&#10;- 调整 UI 组件中的布局和手势处理代码&#10;- 改进语言服务器相关组件的依赖管理" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(core): 优化代码结构并修复类型验证问题&#10;&#10;- 移除多个文件中的冗余 using 指令&#10;- 在 CollectionTypeValidator 中添加空值检查以防止运行时异常&#10;- 修复多处代码格式问题，包括缩进和括号位置&#10;- 简化多个测试文件中的导入声明&#10;- 优化 AST 表达式和值处理的代码结构&#10;- 调整 UI 组件中的布局和手势处理代码&#10;- 改进语言服务器相关组件的依赖管理" />
+    <MESSAGE value="fix(compiler): 修复枚举类型访问和代码生成问题&#10;&#10;- 修正枚举值比较时的类型转换，使用 as int 进行安全转换&#10;- 添加枚举类型在 ClassVar 中的类型查找支持&#10;- 实现枚举成员访问的直接整数值加载逻辑&#10;- 修复 ForInStatement 中的局部变量声明和类型转换处理&#10;- 更新 ReturnStatement 中的返回值处理逻辑，支持 try-finally 结构&#10;- 调整 IDE 工作区配置中的变更列表记录和任务计数器" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(compiler): 修复枚举类型访问和代码生成问题&#10;&#10;- 修正枚举值比较时的类型转换，使用 as int 进行安全转换&#10;- 添加枚举类型在 ClassVar 中的类型查找支持&#10;- 实现枚举成员访问的直接整数值加载逻辑&#10;- 修复 ForInStatement 中的局部变量声明和类型转换处理&#10;- 更新 ReturnStatement 中的返回值处理逻辑，支持 try-finally 结构&#10;- 调整 IDE 工作区配置中的变更列表记录和任务计数器" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
