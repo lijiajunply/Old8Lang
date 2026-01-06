@@ -32,7 +32,7 @@ public class PythonFunctionLangValue : FuncLangValue
     /// <summary>
     /// 重写基类的Run方法 - 处理位置参数和命名参数
     /// </summary>
-    public new LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> positionalArgs,
+    public override LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> positionalArgs,
         List<NamedArgument> namedArgs, SourcePosition callPosition, object? obj = null)
     {
         return ExecutePythonFunction(variateManagerFunc, positionalArgs);
@@ -41,7 +41,7 @@ public class PythonFunctionLangValue : FuncLangValue
     /// <summary>
     /// 重写基类的Run方法 - 处理位置参数
     /// </summary>
-    public new LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> positionalArgs, object? obj = null)
+    public override LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> positionalArgs, object? obj = null)
     {
         return ExecutePythonFunction(variateManagerFunc, positionalArgs);
     }
@@ -91,7 +91,7 @@ public class PythonFunctionLangValue : FuncLangValue
             IntLangValue intVal => new PyInt(intVal.Value).ToPython(),
             DoubleLangValue doubleVal => new PyFloat(doubleVal.Value).ToPython(),
             StringLangValue stringVal => new PyString(stringVal.Value).ToPython(),
-            BoolLangValue boolVal => (boolVal.Value ? new PyInt(1) : new PyInt(0)).ToPython(),
+            BoolLangValue boolVal => boolVal.Value.ToPython(),
             NullLangValue => PyObject.None,
             DictionaryLangValue dictVal => ConvertDictToPython(dictVal),
             ILangList listVal => ConvertListToPython(listVal),
@@ -140,35 +140,92 @@ public class PythonFunctionLangValue : FuncLangValue
             return new NullLangValue();
         }
 
-        // 检查是否是 PyObject 类型的 None
-        if (pyObj is PyObject po && po.IsNone())
+        // 转换为 PyObject 以便使用 Python.NET API
+        PyObject pyObject;
+        if (pyObj is PyObject po)
+        {
+            pyObject = po;
+        }
+        else
+        {
+            // 如果已经是 .NET 类型，直接转换
+            return pyObj switch
+            {
+                int i => new IntLangValue(i),
+                long l => new IntLangValue((int)l),
+                double d => new DoubleLangValue(d),
+                float f => new DoubleLangValue(f),
+                string s => new StringLangValue(s),
+                bool b => new BoolLangValue(b),
+                _ => new StringLangValue(pyObj.ToString())
+            };
+        }
+
+        // 检查是否是 Python None
+        if (pyObject.IsNone())
         {
             return new NullLangValue();
         }
 
-        // 尝试获取 Python 对象的类型
-        string objType = "";
+        // 获取 Python 对象的实际类型名称
+        string typeName;
         try
         {
-            objType = pyObj.__class__.__name__ as string ?? "";
+            typeName = pyObject.GetPythonType().Name;
         }
         catch
         {
-            // 无法获取类型，返回字符串表示
-            return new StringLangValue(pyObj.ToString());
+            // 无法获取类型名称，使用默认转换
+            typeName = "";
         }
 
-        return objType switch
+        // 根据类型名称进行转换
+        try
         {
-            "int" => new IntLangValue((int)pyObj),
-            "float" => new DoubleLangValue((double)pyObj),
-            "str" => new StringLangValue((string)pyObj),
-            "bool" => new BoolLangValue((bool)pyObj),
-            "list" => ConvertListFromPython(pyObj),
-            "dict" => ConvertDictFromPython(pyObj),
-            "tuple" => ConvertTupleFromPython(pyObj),
-            _ => new StringLangValue(pyObj.ToString())
-        };
+            switch (typeName)
+            {
+                case "bool":
+                    return new BoolLangValue(pyObject.As<bool>());
+
+                case "int":
+                    return new IntLangValue((int)pyObject.As<long>());
+
+                case "float":
+                    return new DoubleLangValue(pyObject.As<double>());
+
+                case "str":
+                    return new StringLangValue(pyObject.As<string>());
+
+                case "list":
+                    return ConvertListFromPython(pyObject);
+
+                case "dict":
+                    return ConvertDictFromPython(pyObject);
+
+                case "tuple":
+                    return ConvertTupleFromPython(pyObject);
+
+                default:
+                    // 对于其他类型，尝试检查是否是列表或字典
+                    if (pyObject.HasAttr("__iter__") && pyObject.HasAttr("__getitem__") && !pyObject.HasAttr("keys"))
+                    {
+                        return ConvertListFromPython(pyObject);
+                    }
+
+                    if (pyObject.HasAttr("keys") && pyObject.HasAttr("__getitem__"))
+                    {
+                        return ConvertDictFromPython(pyObject);
+                    }
+
+                    // 默认转换为字符串
+                    return new StringLangValue(pyObject.ToString() ?? "");
+            }
+        }
+        catch
+        {
+            // 转换失败，返回字符串表示
+            return new StringLangValue(pyObject.ToString() ?? "");
+        }
     }
 
     /// <summary>

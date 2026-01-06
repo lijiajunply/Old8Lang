@@ -43,10 +43,10 @@ public class JavaScriptFunctionLangValue : FuncLangValue
     /// <summary>
     /// 执行 JavaScript 函数
     /// </summary>
-    public new LangValueType Run(
+    public override LangValueType Run(
         VariateManager variateManagerFunc,
         List<LangExpression> positionalArgs,
-        List<NamedArgument> namedArgs,
+        List<NamedArgument>? namedArgs,
         SourcePosition callPosition,
         object? obj = null)
     {
@@ -56,7 +56,7 @@ public class JavaScriptFunctionLangValue : FuncLangValue
     /// <summary>
     /// 执行 JavaScript 函数（无命名参数版本）
     /// </summary>
-    public new LangValueType Run(
+    public override LangValueType Run(
         VariateManager variateManagerFunc,
         List<LangExpression> positionalArgs,
         object? obj = null)

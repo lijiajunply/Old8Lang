@@ -66,7 +66,8 @@ public class JavaScriptProvider : IExternProvider
 
         if (!File.Exists(fullPath))
         {
-            throw new ImportError(null, $"JavaScript 脚本文件不存在：{fullPath}");
+            throw new InvalidOperationError(default(SourcePosition),
+                $"JavaScript 脚本文件不存在：{fullPath}");
         }
 
         // 创建 Jint 引擎并执行脚本
@@ -79,7 +80,8 @@ public class JavaScriptProvider : IExternProvider
         }
         catch (Exception ex)
         {
-            throw new ImportError(null, $"JavaScript 脚本执行失败：{ex.Message}");
+            throw new InvalidOperationError(default(SourcePosition),
+                $"JavaScript 脚本执行失败：{ex.Message}");
         }
 
         // 导入函数
@@ -91,14 +93,14 @@ public class JavaScriptProvider : IExternProvider
             var jsFunction = engine.GetValue(funcDecl.FunctionName);
             if (jsFunction.IsUndefined())
             {
-                throw new InvalidOperationError(null,
+                throw new InvalidOperationError(default(SourcePosition),
                     $"JavaScript 模块中找不到函数：{funcDecl.FunctionName}");
             }
 
             // 检查是否为函数（Jint 中函数也是对象）
             if (!jsFunction.IsObject())
             {
-                throw new InvalidOperationError(null,
+                throw new InvalidOperationError(default(SourcePosition),
                     $"JavaScript 对象 {funcDecl.FunctionName} 不是函数");
             }
 

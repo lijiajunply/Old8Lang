@@ -61,7 +61,7 @@ public class PythonProvider : IExternProvider
             }
             else
             {
-                throw new ImportError(null,
+                throw new ImportError(default(SourcePosition), "Python",
                     "无法找到 Python 运行时。请确保系统已安装 Python 3.7 或更高版本。\n" +
                     "或者手动设置环境变量 PYTHONNET_PYDLL 指向 Python 动态库路径。");
             }
@@ -72,7 +72,7 @@ public class PythonProvider : IExternProvider
             }
             catch (Exception ex)
             {
-                throw new ImportError(null,
+                throw new ImportError(default(SourcePosition), "Python",
                     $"Python 运行时初始化失败：{ex.Message}\n" +
                     $"Python DLL 路径：{Runtime.PythonDLL}");
             }
@@ -124,7 +124,8 @@ public class PythonProvider : IExternProvider
 
                 if (!File.Exists(fullPath))
                 {
-                    throw new ImportError(null, $"Python 脚本文件不存在：{fullPath}");
+                    throw new ImportError(default(SourcePosition), scriptPath,
+                        $"Python 脚本文件不存在：{fullPath}");
                 }
 
                 // 执行脚本并获取模块
@@ -142,7 +143,7 @@ public class PythonProvider : IExternProvider
                 // 获取 Python 函数对象
                 if (!module.HasAttr(funcDecl.FunctionName))
                 {
-                    throw new InvalidOperationError(null,
+                    throw new InvalidOperationError(default(SourcePosition),
                         $"Python 模块中找不到函数：{funcDecl.FunctionName}");
                 }
 

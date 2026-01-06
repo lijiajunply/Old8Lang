@@ -23,13 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/NativeDelegateFuncLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/NativeDllProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/NativeDllProvider.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/JavaScriptFunctionLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/JavaScriptFunctionLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/PythonFunctionLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/PythonFunctionLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/JavaScriptProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/JavaScriptProvider.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/PythonProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/PythonProvider.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -561,7 +560,7 @@
       <workItem from="1767429825540" duration="633000" />
       <workItem from="1767433937853" duration="26000" />
       <workItem from="1767434122437" duration="2457000" />
-      <workItem from="1767519232104" duration="29460000" />
+      <workItem from="1767519232104" duration="30429000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -906,7 +905,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="543" />
+    <option name="localTasksCounter" value="544" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -933,7 +932,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(interpreter): 添加 using 语句自定义类 dispose 方法测试&#10;&#10;- 测试带有 dispose 方法的自定义类在 using 语句中的行为&#10;- 验证 dispose 方法修改实例字段的功能&#10;- 测试异常情况下 dispose 方法仍能正确调用&#10;- 验证嵌套自定义 dispose 类按逆序释放资源&#10;- 测试没有 dispose 方法的类不会报错&#10;- 验证 dispose 方法多次调用只执行一次&#10;- 测试 dispose 方法访问实例成员的功能&#10;- 验证混合使用内置资源和自定义 dispose 类的场景" />
     <MESSAGE value="feat(type): 实现枚举类型注册功能&#10;&#10;- 在EnumInit中移除TODO注释并激活枚举类型注册逻辑&#10;- 向TypeAnnotationManager添加RegisterEnumType方法&#10;- 在TypeChecker中实现静态RegisterEnumType方法用于枚举注册&#10;- 创建EnumTypeInfo类定义枚举类型信息及其兼容性规则&#10;- 更新workspace.xml中的文件变更记录&#10;- 修复IDEA配置文件中的JSON格式问题" />
     <MESSAGE value="feat(ast): 添加枚举值类型支持&#10;&#10;- 实现 EnumLangValue 类型，支持枚举成员的值表示和类型信息&#10;- 添加枚举值的算术运算和比较运算逻辑&#10;- 实现枚举值与整数的类型转换和比较操作&#10;- 更新 EnumTemplate 中的 GetMemberValue 方法返回 EnumLangValue&#10;- 优化 LangValueType 中的模式匹配语法&#10;- 在类型检查器中添加对 EnumLangValue 的类型识别&#10;- 修复 TypeTemplate 中的泛型参数映射设置逻辑" />
     <MESSAGE value="refactor(tests): 重构测试文件结构并移除集合库测试&#10;&#10;- 将 BracketMatchingTests.cs 从 Language 目录移动到 Parser 目录&#10;- 将 EdgeCaseTests.cs 从 Language 目录移动到 EdgeCases 目录&#10;- 将 ExpressionStatementTests.cs 从 Language 目录移动到 Parser 目录&#10;- 将 SemicolonTests.cs 从 Language 目录移动到 Parser/Statement 目录&#10;- 将 CollectionMethodsTests.cs 从 Compiler/Collections 移动到 Compiler/Collections/Advanced&#10;- 将 ExtendedRangeTests.cs 从 Compiler/Collections 移动到 Compiler/Collections/Advanced&#10;- 将 InExpressionTests.cs 从 Compiler/Collections.Advanced 移动到 Compiler/Collections/InExpression&#10;- 将 ParamsCompilerTests.cs 从 Compiler 目录移动到 Compiler/Functions 目录&#10;- 将 ParamsInterpreterTests.cs 从 Interpreter 目录移动到 Interpreter/Functions 目录&#10;- 将 ParamsTests.cs 从 Parser 目录移动到 Parser/Functions 目录&#10;- 移除 AsyncNativeTests.cs 文件&#10;- 移除 CollectionLibTests.cs 文件&#10;- 从 StandardLibraryRegistry.cs 中移除 CollectionLib 的注册&#10;- 更新 ErrorHandlingTests.cs 中的断言检查&#10;- 在 FirstUIBinding.cs 中添加可选参数支持&#10;- 在 TemplateEngine.cs 中改进代码格式和文档注释&#10;- 添加新的集合扩展方法测试文件 test_collection_extensions.old8" />
@@ -958,7 +956,8 @@
     <MESSAGE value="refactor(extern): 重构 extern 功能为工厂模式架构&#10;&#10;- 实现 ExternProviderFactory 工厂类统一管理不同语言提供者&#10;- 创建 IExternProvider 接口规范所有外部语言提供者行为&#10;- 实现 NativeDllProvider 支持 C/C++ P/Invoke 功能&#10;- 实现 PythonProvider 支持 Python 脚本和模块导入&#10;- 重构 ExternStatement 使用工厂模式替代硬编码分支逻辑&#10;- 添加编译模式支持检查机制区分解释和编译执行&#10;- 实现动态注册新语言提供者的扩展能力&#10;- 保持向后兼容性所有现有语法无需修改" />
     <MESSAGE value="feat(interpreter): 添加 JavaScript extern 函数导入功能&#10;&#10;- 实现 JavaScriptProvider 使用 Jint 引擎执行 JavaScript 代码&#10;- 添加 JavaScript 函数包装器支持 Old8Lang 与 JavaScript 类型转换&#10;- 实现 .js 文件和 js: 前缀的 JavaScript 脚本导入方式&#10;- 添加 JavaScript 数组和对象与 Old8Lang 集合类型的自动转换&#10;- 支持 ES5.1 标准和跨平台执行（Windows/macOS/Linux）&#10;- 仅支持解释模式执行，不支持编译模式" />
     <MESSAGE value="feat(ast): 添加 extern 语句支持并完善外部函数导入功能&#10;&#10;- 在 BlockStatement 中添加 ExternStatement 类型处理&#10;- 实现 ExternStatement 的 AST 结构和解析功能&#10;- 添加 JavaScript、Python 和 Native DLL 外部函数导入支持&#10;- 实现 extern 语句的编译模式支持和调用约定处理&#10;- 添加 extern 功能的边界测试和错误处理测试&#10;- 实现 extern 语句的解析测试和类型检测功能&#10;- 修复 ExternProviderFactory 中的字段命名规范问题&#10;- 更新 ExternStatement 的 Count 属性返回函数数量" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(ast): 添加 extern 语句支持并完善外部函数导入功能&#10;&#10;- 在 BlockStatement 中添加 ExternStatement 类型处理&#10;- 实现 ExternStatement 的 AST 结构和解析功能&#10;- 添加 JavaScript、Python 和 Native DLL 外部函数导入支持&#10;- 实现 extern 语句的编译模式支持和调用约定处理&#10;- 添加 extern 功能的边界测试和错误处理测试&#10;- 实现 extern 语句的解析测试和类型检测功能&#10;- 修复 ExternProviderFactory 中的字段命名规范问题&#10;- 更新 ExternStatement 的 Count 属性返回函数数量" />
+    <MESSAGE value="feat(interpreter): 添加对原生委托函数的支持&#10;&#10;- 实现 NativeDelegateFuncLangValue 类处理 P/Invoke 委托实例&#10;- 在 Instance.cs 中添加对 NativeDelegateFuncLangValue 的调用支持&#10;- 优化 NativeDllProvider 中的 DLL 加载和函数导出错误处理&#10;- 更新 VariateManager 支持 NativeDelegateFuncLangValue 类型匹配&#10;- 升级 Jint 依赖版本至 4.4.2&#10;- 修复代码注释中的标点符号问题" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(interpreter): 添加对原生委托函数的支持&#10;&#10;- 实现 NativeDelegateFuncLangValue 类处理 P/Invoke 委托实例&#10;- 在 Instance.cs 中添加对 NativeDelegateFuncLangValue 的调用支持&#10;- 优化 NativeDllProvider 中的 DLL 加载和函数导出错误处理&#10;- 更新 VariateManager 支持 NativeDelegateFuncLangValue 类型匹配&#10;- 升级 Jint 依赖版本至 4.4.2&#10;- 修复代码注释中的标点符号问题" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

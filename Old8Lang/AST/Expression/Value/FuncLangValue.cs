@@ -242,7 +242,7 @@ public class FuncLangValue : ImportInfo
     /// <param name="callPosition">调用位置信息</param>
     /// <param name="obj">对象实例（方法调用时使用）</param>
     /// <returns>函数执行结果</returns>
-    public LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> positionalArgs,
+    public virtual LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> positionalArgs,
         List<NamedArgument>? namedArgs, SourcePosition callPosition, object? obj = null)
     {
         // 如果没有命名参数，使用原有的逻辑
@@ -408,7 +408,7 @@ public class FuncLangValue : ImportInfo
         }
     }
 
-    public LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> ids, object? obj = null)
+    public virtual LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> ids, object? obj = null)
     {
         if (Method != null)
         {
