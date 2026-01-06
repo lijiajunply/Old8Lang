@@ -8,10 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Jint" Version="4.1.1" />
         <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="5.0.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
         <PackageReference Include="dnlib" Version="4.5.0" />
-        <PackageReference Include="pythonnet" Version="3.0.*" />
+        <PackageReference Include="pythonnet" Version="3.0.5" />
         <!-- 使用 NuGet 包替代项目引用 -->
         <PackageReference Include="Old8Lang.PackageManager.Core" Version="1.1.2" />
     </ItemGroup>

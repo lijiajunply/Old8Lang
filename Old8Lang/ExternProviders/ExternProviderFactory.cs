@@ -17,7 +17,8 @@ public static class ExternProviderFactory
     {
         { ExternType.NativeDll, () => new NativeDllProvider() },
         { ExternType.PythonScript, () => new PythonProvider(ExternType.PythonScript) },
-        { ExternType.PythonModule, () => new PythonProvider(ExternType.PythonModule) }
+        { ExternType.PythonModule, () => new PythonProvider(ExternType.PythonModule) },
+        { ExternType.JavaScript, () => new JavaScriptProvider() }
     };
 
     /// <summary>

@@ -30,7 +30,12 @@ public enum ExternType
     /// <summary>
     /// Python 全局模块
     /// </summary>
-    PythonModule
+    PythonModule,
+
+    /// <summary>
+    /// JavaScript 脚本文件
+    /// </summary>
+    JavaScript
 }
 
 /// <summary>
@@ -142,6 +147,13 @@ public partial class ExternStatement : OldStatement
     /// </summary>
     public static ExternType DetectExternType(string dllName)
     {
+        // JavaScript 脚本文件：以 .js 结尾或 js: 前缀
+        if (dllName.EndsWith(".js", StringComparison.OrdinalIgnoreCase) ||
+            dllName.StartsWith("js:", StringComparison.OrdinalIgnoreCase))
+        {
+            return ExternType.JavaScript;
+        }
+
         // Python 脚本文件：以 .py 结尾或 py: 前缀
         if (dllName.EndsWith(".py", StringComparison.OrdinalIgnoreCase) ||
             dllName.StartsWith("py:", StringComparison.OrdinalIgnoreCase))

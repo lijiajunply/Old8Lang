@@ -1,0 +1,31 @@
+// 测试 JavaScript extern 功能
+
+// 导入 JavaScript 函数
+native extern "TestFiles/test_js_functions.js" {
+    func add(a:int, b:int) -> int,
+    func multiply(a:int, b:int) -> int,
+    func greet(name:string) -> string,
+    func getArray() -> object,
+    func getObject() -> object
+}
+
+// 测试基本函数调用
+result1 <- add(10, 20)
+PrintLine("add(10, 20) = " + result1.ToStr())
+
+result2 <- multiply(6, 7)
+PrintLine("multiply(6, 7) = " + result2.ToStr())
+
+// 测试字符串函数
+greeting <- greet("Old8Lang")
+PrintLine(greeting)
+
+// 测试数组返回
+arr <- getArray()
+PrintLine("数组: " + arr.ToStr())
+
+// 测试对象返回
+obj <- getObject()
+PrintLine("对象: " + obj.ToStr())
+
+PrintLine("所有 JavaScript extern 测试通过!")

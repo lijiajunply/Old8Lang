@@ -47,8 +47,13 @@ Old8Lang/
 │   ├── IExternProvider.cs              # 提供者接口
 │   ├── ExternProviderFactory.cs        # 工厂类
 │   ├── NativeDllProvider.cs            # C/C++ P/Invoke 提供者
-│   └── PythonProvider.cs               # Python 提供者
+│   ├── PythonProvider.cs               # Python 提供者
+│   └── JavaScriptProvider.cs           # JavaScript 提供者（新增）
 └── AST/
+    ├── Expression/
+    │   └── Value/
+    │       ├── PythonFunctionLangValue.cs      # Python 函数包装器
+    │       └── JavaScriptFunctionLangValue.cs  # JavaScript 函数包装器（新增）
     └── Statement/
         └── ExternStatement.cs          # 重构后：使用工厂模式
 ```
@@ -131,6 +136,34 @@ native extern "math_utils.py" {
 native extern "pymodule:math" {
     func sqrt(x:double) -> double,
     func pow(base:double, exp:double) -> double
+}
+```
+
+### 3. JavaScriptProvider
+
+**功能：**
+- 导入 JavaScript 脚本文件（`.js` 或 `js:` 前缀）
+- 使用 Jint 引擎执行 JavaScript 代码
+- 支持跨平台（Windows/macOS/Linux）
+
+**实现特点：**
+- 使用 Jint 4.2.0（纯 C# 实现的 JavaScript 解释器）
+- 自动 JavaScript/Old8Lang 类型转换
+- 仅支持解释模式（`SupportsCompilation = false`）
+- 支持 ES5.1 标准
+
+**示例：**
+```old8
+// JavaScript 脚本文件
+native extern "math_utils.js" {
+    func add(a:int, b:int) -> int,
+    func multiply(a:int, b:int) -> int
+}
+
+// 使用 js: 前缀
+native extern "js:utils.js" {
+    func greet(name:string) -> string,
+    func getArray() -> object
 }
 ```
 
@@ -342,6 +375,7 @@ dotnet run --project Old8Lang.App -- -f test_extern_factory.old8
 |----------|--------------|--------------|
 | NativeDllProvider | ✅ 支持 | ✅ 支持 |
 | PythonProvider | ✅ 支持 | ❌ 不支持 |
+| JavaScriptProvider | ✅ 支持 | ❌ 不支持 |
 
 ## 技术细节
 
@@ -388,4 +422,9 @@ Extern 功能的工厂架构重构成功实现了：
 ✅ **向后兼容**：不破坏现有代码
 ✅ **类型安全**：编译时和运行时检查
 
-这为 Old8Lang 未来支持更多外部语言（JavaScript、Ruby、Lua、Go 等）奠定了坚实的基础。
+这为 Old8Lang 未来支持更多外部语言（Ruby、Lua、Go 等）奠定了坚实的基础。
+
+**目前已支持的语言：**
+1. **C/C++**（通过 P/Invoke）- 编译模式 ✅
+2. **Python**（通过 Python.NET）- 仅解释模式
+3. **JavaScript**（通过 Jint）- 仅解释模式
