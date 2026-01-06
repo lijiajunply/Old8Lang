@@ -709,22 +709,24 @@ public class FuncLangValue : ImportInfo
             // 重置return标志，确保函数调用不会影响外部上下文
             executionManager.IsReturn = false;
 
-            // 在移除子作用域之前执行所有defer语句（此时变量仍然可见）
-            executionManager.ExecuteDefers();
-
             // 恢复原始的函数返回类型，避免嵌套调用时的类型污染
             executionManager.CurrentFunctionReturnType = originalReturnType;
             executionManager.CurrentFunctionTypeArgumentMapping = originalTypeArgumentMapping;
-
-            // 移除子作用域，但是要注意，在init方法中使用this关键字设置的值已经被保存到实例中了
-            // 所以这里移除子作用域不会影响实例的状态
-            executionManager.RemoveChildren();
 
             return result;
         }
         finally
         {
-            // finally块不再执行defer（已经在try块中执行了）
+            // 在移除子作用域之前执行所有defer语句（此时变量仍然可见）
+            // 必须在finally块中执行，以确保即使函数抛出异常，defer也能执行
+            if (executionManager != null)
+            {
+                executionManager.ExecuteDefers();
+
+                // 移除子作用域，但是要注意，在init方法中使用this关键字设置的值已经被保存到实例中了
+                // 所以这里移除子作用域不会影响实例的状态
+                executionManager.RemoveChildren();
+            }
 
             // 确保递归深度总是被递减
             variateManagerFunc.RecursionDepth--;
