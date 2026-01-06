@@ -191,8 +191,8 @@ result4 <- is_odd(8)
 native extern ""pymodule:math"" {
     func sqrt(x:double) -> double,
     func pow(base:double, exp:double) -> double,
-    func floor(x:double) -> double,
-    func ceil(x:double) -> double
+    func floor(x:double) -> int,
+    func ceil(x:double) -> int
 }
 
 result1 <- sqrt(16.0)
@@ -210,8 +210,8 @@ result4 <- ceil(3.2)
         Assert.Null(exception);
         AssertVariableValue(interpreter, "result1", 4.0);
         AssertVariableValue(interpreter, "result2", 8.0);
-        AssertVariableValue(interpreter, "result3", 3.0);
-        AssertVariableValue(interpreter, "result4", 4.0);
+        AssertVariableValue(interpreter, "result3", 3);
+        AssertVariableValue(interpreter, "result4", 4);
     }
 
     #endregion
@@ -266,7 +266,7 @@ native extern ""nonexistent.py"" func test() -> void
         CreateTempModuleFile("test_py_error_notfound.old8", old8Content);
 
         // Act & Assert
-        AssertExecutionThrows("test_py_error_notfound.old8", typeof(InvalidOperationError));
+        AssertExecutionThrows("test_py_error_notfound.old8", typeof(ImportError));
     }
 
     /// <summary>
@@ -309,7 +309,7 @@ result <- test()
         CreateTempModuleFile("test_py_error_module.old8", old8Content);
 
         // Act & Assert
-        AssertExecutionThrows("test_py_error_module.old8", typeof(InvalidOperationError));
+        AssertExecutionThrows("test_py_error_module.old8", typeof(ImportError));
     }
 
     #endregion

@@ -83,7 +83,16 @@ public class PythonProvider : IExternProvider
                 var moduleName = source.StartsWith("pymodule:")
                     ? source.Substring("pymodule:".Length)
                     : source;
-                module = Py.Import(moduleName);
+
+                try
+                {
+                    module = Py.Import(moduleName);
+                }
+                catch (Exception ex)
+                {
+                    throw new ImportError(default(SourcePosition), moduleName,
+                        $"无法导入 Python 模块：{moduleName}\n错误信息：{ex.Message}");
+                }
             }
             else
             {
