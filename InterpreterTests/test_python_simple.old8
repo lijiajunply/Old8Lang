@@ -1,0 +1,9 @@
+// 简单的 Python extern 测试
+
+native extern "TestFiles/test_math.py" {
+    func add(a:int, b:int) -> int
+}
+
+result <- add(10, 20)
+PrintLine("Result: " + result.ToStr())
+PrintLine("Done!")

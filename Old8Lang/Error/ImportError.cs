@@ -16,12 +16,12 @@ public class ImportError : RuntimeError
     /// <summary>
     /// 无法导入的模块名称
     /// </summary>
-    public string ModuleName { get; } 
-    
+    public string ModuleName { get; }
+
     /// <summary>
     /// 尝试的文件路径列表
     /// </summary>
-    public List<string> AttemptedPaths { get; } 
+    public List<string> AttemptedPaths { get; }
 
     /// <summary>
     /// 构造函数
@@ -29,9 +29,9 @@ public class ImportError : RuntimeError
     /// <param name="node">AST节点</param>
     /// <param name="moduleName">无法导入的模块名称</param>
     /// <param name="attemptedPaths">尝试的文件路径列表</param>
-    public ImportError(IOldLangTree node, string moduleName, List<string>? attemptedPaths = null) 
+    public ImportError(IOldLangTree node, string moduleName, List<string>? attemptedPaths = null)
         : base(
-            node, 
+            node,
             ErrorCode,
             BuildErrorMessage(moduleName, attemptedPaths ?? []),
             "请检查模块名称是否正确，或者模块是否存在")
@@ -39,7 +39,7 @@ public class ImportError : RuntimeError
         ModuleName = moduleName;
         AttemptedPaths = attemptedPaths ?? [];
     }
-    
+
     /// <summary>
     /// 构造函数，带详细错误信息
     /// </summary>
@@ -47,9 +47,9 @@ public class ImportError : RuntimeError
     /// <param name="moduleName">无法导入的模块名称</param>
     /// <param name="message">详细错误信息</param>
     /// <param name="attemptedPaths">尝试的文件路径列表</param>
-    public ImportError(IOldLangTree node, string moduleName, string message, List<string>? attemptedPaths = null) 
+    public ImportError(IOldLangTree node, string moduleName, string message, List<string>? attemptedPaths = null)
         : base(
-            node, 
+            node,
             ErrorCode,
             BuildErrorMessage(moduleName, attemptedPaths ?? [], message),
             "请检查模块名称是否正确，或者模块是否存在")
@@ -57,7 +57,7 @@ public class ImportError : RuntimeError
         ModuleName = moduleName;
         AttemptedPaths = attemptedPaths ?? [];
     }
-    
+
     /// <summary>
     /// 构造函数，使用位置信息
     /// </summary>
@@ -125,16 +125,16 @@ public class ImportError : RuntimeError
         ModuleName = moduleName;
         AttemptedPaths = resolutionResult.AttemptedPaths;
     }
-    
+
     /// <summary>
     /// 构造函数，用于循环依赖检测
     /// </summary>
     /// <param name="position">源代码位置信息</param>
     /// <param name="moduleName">无法导入的模块名称</param>
     /// <param name="importStack">当前导入栈</param>
-    public ImportError(SourcePosition position, string moduleName, Stack<string> importStack) 
+    public ImportError(SourcePosition position, string moduleName, Stack<string> importStack)
         : base(
-            position, 
+            position,
             ErrorCode,
             BuildCircularDependencyMessage(moduleName, importStack),
             "请检查模块导入关系，避免循环依赖")
@@ -142,7 +142,7 @@ public class ImportError : RuntimeError
         ModuleName = moduleName;
         AttemptedPaths = new List<string>();
     }
-    
+
     /// <summary>
     /// 构建错误信息
     /// </summary>
@@ -152,27 +152,25 @@ public class ImportError : RuntimeError
     /// <returns>格式化的错误信息</returns>
     private static string BuildErrorMessage(string moduleName, List<string> attemptedPaths, string? message = null)
     {
-        var errorMsg = new List<string> {
-            $"无法导入模块 '{moduleName}'" 
+        var errorMsg = new List<string>
+        {
+            $"无法导入模块 '{moduleName}'"
         };
-        
+
         if (!string.IsNullOrEmpty(message))
         {
             errorMsg.Add($"  原因: {message}");
         }
-        
-        if (attemptedPaths != null && attemptedPaths.Count > 0)
+
+        if (attemptedPaths is { Count: > 0 })
         {
             errorMsg.Add("  尝试的路径:");
-            foreach (var path in attemptedPaths)
-            {
-                errorMsg.Add($"    - {path}");
-            }
+            errorMsg.AddRange(attemptedPaths.Select(path => $"    - {path}"));
         }
-        
+
         return string.Join(Environment.NewLine, errorMsg);
     }
-    
+
     /// <summary>
     /// 构建循环依赖错误信息
     /// </summary>
@@ -183,16 +181,16 @@ public class ImportError : RuntimeError
     {
         var stack = new Stack<string>(importStack);
         var dependencyChain = new List<string> { moduleName };
-        
+
         while (stack.Count > 0)
         {
             var current = stack.Pop();
             dependencyChain.Add(current);
             if (current == moduleName) break;
         }
-        
+
         dependencyChain.Reverse();
-        
+
         return $"循环依赖检测到: {string.Join(" -> ", dependencyChain)}";
     }
 }
@@ -213,25 +211,27 @@ public class DuplicateNameError : RuntimeError
     /// <param name="node">AST节点</param>
     /// <param name="name">重复定义的名称</param>
     /// <param name="type">名称类型（如"变量"、"函数"、"类"等）</param>
-    public DuplicateNameError(IOldLangTree node, string name, string type) 
+    public DuplicateNameError(IOldLangTree node, string name, string type)
         : base(
-            node, 
+            node,
             ErrorCode,
             $"{type} '{name}' 已被定义",
             "请使用不同的名称，或者删除重复的定义")
-    {}
-    
+    {
+    }
+
     /// <summary>
     /// 构造函数，使用位置信息
     /// </summary>
     /// <param name="position">源代码位置信息</param>
     /// <param name="name">重复定义的名称</param>
     /// <param name="type">名称类型（如"变量"、"函数"、"类"等）</param>
-    public DuplicateNameError(SourcePosition position, string name, string type) 
+    public DuplicateNameError(SourcePosition position, string name, string type)
         : base(
-            position, 
+            position,
             ErrorCode,
             $"{type} '{name}' 已被定义",
             "请使用不同的名称，或者删除重复的定义")
-    {}
+    {
+    }
 }

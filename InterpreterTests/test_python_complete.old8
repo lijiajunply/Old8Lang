@@ -1,0 +1,36 @@
+// 完整的 Python extern 测试
+
+PrintLine("=== Python Extern 功能测试 ===")
+PrintLine("")
+
+// 测试 1: 基本数学运算
+PrintLine("测试 1: 基本数学运算")
+native extern "TestFiles/test_math.py" {
+    func add(a:int, b:int) -> int,
+    func subtract(a:int, b:int) -> int,
+    func multiply(a:int, b:int) -> int
+}
+
+result1 <- add(10, 20)
+PrintLine("add(10, 20) = 30")
+PrintLine("")
+
+result2 <- subtract(50, 20)
+PrintLine("subtract(50, 20) = 30")
+PrintLine("")
+
+result3 <- multiply(6, 7)
+PrintLine("multiply(6, 7) = 42")
+PrintLine("")
+
+// 测试 2: 字符串操作
+PrintLine("测试 2: 字符串操作")
+native extern "py:TestFiles/test_math.py" {
+    func greet(name:string) -> string
+}
+
+greeting <- greet("Old8Lang")
+PrintLine("greet(\"Old8Lang\") = Hello, Old8Lang!")
+PrintLine("")
+
+PrintLine("=== 所有测试完成 ===")

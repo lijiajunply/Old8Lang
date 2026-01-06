@@ -2028,7 +2028,10 @@ public class StatementParser(
             functions.Add(funcDecl);
         }
 
-        return new ExternStatement(dllName, functions, defaultCallingConvention);
+        // 自动检测 extern 类型
+        var externType = ExternStatement.DetectExternType(dllName);
+
+        return new ExternStatement(dllName, functions, defaultCallingConvention, externType);
     }
 
     /// <summary>

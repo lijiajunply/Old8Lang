@@ -243,7 +243,7 @@ public class FuncLangValue : ImportInfo
     /// <param name="obj">对象实例（方法调用时使用）</param>
     /// <returns>函数执行结果</returns>
     public LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> positionalArgs,
-        List<NamedArgument> namedArgs, SourcePosition callPosition, object? obj = null)
+        List<NamedArgument>? namedArgs, SourcePosition callPosition, object? obj = null)
     {
         // 如果没有命名参数，使用原有的逻辑
         if (namedArgs == null || namedArgs.Count == 0)

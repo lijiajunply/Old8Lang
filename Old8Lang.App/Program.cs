@@ -30,7 +30,7 @@ public abstract class Program
             args =
             [
                 "-f",
-                "/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.FirstUI/Examples/Counter.old8"
+                "/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/InterpreterTests/test_python_extern_basic.old8"
             ];
         }
 #endif

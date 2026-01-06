@@ -126,7 +126,7 @@ if elif else for while switch case default
 func async class enum mixin interface extends implements with
 return break continue throw yield
 try catch finally
-import from as native
+import from as native extern
 true false null
 and or xor not in
 public private static
@@ -2136,6 +2136,235 @@ threadId <- GetCurrentThreadId()
 PrintLine("Current Thread ID: " + threadId.ToStr())
 
 Sleep(1000)  // 暂停 1 秒
+```
+
+### 5.15 Extern Python 函数导入
+
+Old8Lang 支持使用 `extern` 语句导入 Python 函数，通过 Python.NET (pythonnet) 实现与 Python 代码的无缝集成。
+
+#### 5.15.1 支持的导入格式
+
+**1. Python 脚本文件（.py 扩展名）**：
+```old8
+native extern "path/to/script.py" {
+    func add(a:int, b:int) -> int,
+    func greet(name:string) -> string
+}
+```
+
+**2. Python 脚本文件（py: 前缀）**：
+```old8
+native extern "py:path/to/script.py" {
+    func multiply(a:int, b:int) -> int
+}
+```
+
+**3. Python 全局模块（pymodule: 前缀）**：
+```old8
+native extern "pymodule:math" {
+    func sqrt(x:double) -> double,
+    func pow(base:double, exp:double) -> double
+}
+
+native extern "pymodule:numpy" {
+    func array(data:object) -> object
+}
+```
+
+#### 5.15.2 语法规则
+
+**基本语法**：
+```old8
+native extern "Python路径或模块名" {
+    func 函数名(参数列表) -> 返回类型,
+    func 函数名(参数列表) -> 返回类型 as 别名
+}
+```
+
+**别名支持**：
+```old8
+native extern "math_utils.py" {
+    func add(a:int, b:int) -> int,
+    func multiply(a:int, b:int) -> int as mul
+}
+
+// 调用
+result1 <- add(10, 20)      // 使用原名
+result2 <- mul(5, 6)        // 使用别名
+```
+
+#### 5.15.3 类型转换
+
+Old8Lang 类型与 Python 类型自动转换：
+
+| Old8Lang 类型 | Python 类型 | 转换说明 |
+|---------------|-------------|---------|
+| `int` | `int` | 直接转换 |
+| `double` | `float` | 直接转换 |
+| `string` | `str` | 直接转换 |
+| `bool` | `int` (0/1) | bool → int |
+| `null` | `None` | 空值映射 |
+| `list` / `array` | `list` | 集合转换 |
+| `dict` | `dict` | 字典转换 |
+
+**复杂类型转换**：
+- Old8Lang 的 `list` 和 `array` 都转换为 Python 的 `list`
+- Python 的 `tuple` 转换为 Old8Lang 的 `list`
+- 不支持直接映射的复杂 Python 对象会转换为字符串
+
+#### 5.15.4 使用示例
+
+**示例 1：导入 Python 脚本**
+
+Python 脚本 (`math_utils.py`):
+```python
+def add(a, b):
+    return a + b
+
+def subtract(a, b):
+    return a - b
+
+def multiply(a, b):
+    return a * b
+
+def greet(name):
+    return f"Hello, {name}!"
+```
+
+Old8Lang 代码:
+```old8
+// 导入 Python 函数
+native extern "math_utils.py" {
+    func add(a:int, b:int) -> int,
+    func subtract(a:int, b:int) -> int as sub,
+    func greet(name:string) -> string
+}
+
+// 调用 Python 函数
+result1 <- add(10, 20)           // 返回 30
+result2 <- sub(50, 20)           // 返回 30
+greeting <- greet("Old8Lang")    // 返回 "Hello, Old8Lang!"
+
+PrintLine(result1.ToStr())       // 输出: 30
+PrintLine(greeting)              // 输出: Hello, Old8Lang!
+```
+
+**示例 2：导入 Python 标准库模块**
+
+```old8
+// 导入 Python math 模块
+native extern "pymodule:math" {
+    func sqrt(x:double) -> double,
+    func pow(base:double, exp:double) -> double,
+    func sin(x:double) -> double,
+    func cos(x:double) -> double
+}
+
+// 使用 Python math 函数
+root <- sqrt(16.0)               // 返回 4.0
+power <- pow(2.0, 3.0)           // 返回 8.0
+sine <- sin(1.5707963267948966)  // 返回 1.0 (π/2)
+
+PrintLine("sqrt(16) = " + root.ToStr())
+PrintLine("pow(2, 3) = " + power.ToStr())
+```
+
+**示例 3：处理列表和字典**
+
+Python 脚本 (`data_utils.py`):
+```python
+def sum_list(numbers):
+    return sum(numbers)
+
+def create_dict():
+    return {"name": "Python", "version": 3.10, "active": True}
+
+def process_dict(data):
+    return data.get("name", "Unknown")
+```
+
+Old8Lang 代码:
+```old8
+native extern "data_utils.py" {
+    func sum_list(numbers:object) -> int,
+    func create_dict() -> object,
+    func process_dict(data:object) -> string
+}
+
+// 调用带列表参数的函数
+numbers <- {1, 2, 3, 4, 5}
+total <- sum_list(numbers)       // 返回 15
+PrintLine("Sum: " + total.ToStr())
+
+// 调用返回字典的函数
+pythonData <- create_dict()      // 返回字典
+name <- process_dict(pythonData) // 返回 "Python"
+PrintLine("Language: " + name)
+```
+
+#### 5.15.5 限制和注意事项
+
+**支持的执行模式**：
+- ✅ **解释器模式** (`-f`): 完全支持
+- ❌ **编译器模式** (`-c`): 不支持，会抛出 `NotSupportedException`
+
+**类型注解要求**：
+- Python 函数参数必须指定类型注解
+- Python 函数返回类型必须指定
+- 解释器模式下参数类型用于转换，不做严格检查
+
+**异常处理**：
+- Python 异常会被包装为 Old8Lang 的 `ImportError`
+- 错误信息包含原始 Python 异常信息
+
+**路径解析**：
+- 相对路径相对于当前执行目录
+- 支持绝对路径
+- `pymodule:` 前缀用于 Python 标准库和已安装的第三方包
+
+**依赖要求**：
+- 需要系统安装 Python 运行时
+- Old8Lang 使用 pythonnet 3.0.4 进行 Python 互操作
+- Python 版本建议 3.7 或更高
+
+#### 5.15.6 与 C/C++ Extern 的区别
+
+| 特性 | C/C++ Extern (P/Invoke) | Python Extern |
+|------|------------------------|---------------|
+| 前缀 | 无（DLL 路径） | `.py` 或 `py:` 或 `pymodule:` |
+| 调用约定 | cdecl / stdcall / winapi | 无（Python 调用） |
+| 类型映射 | 严格的 C# ↔ C 类型映射 | 灵活的动态类型转换 |
+| 编译模式 | ✅ 支持 | ❌ 不支持 |
+| 解释模式 | ✅ 支持 | ✅ 支持 |
+| 性能 | 高（直接调用） | 较低（需要类型转换） |
+
+#### 5.15.7 错误示例
+
+```old8
+// ❌ 错误：参数缺少类型注解
+native extern "script.py" {
+    func calculate(x, y) -> int  // 编译错误
+}
+
+// ❌ 错误：返回类型缺失
+native extern "script.py" {
+    func getValue(x:int)  // 编译错误
+}
+
+// ❌ 错误：在编译模式下使用
+// 运行时会抛出 NotSupportedException
+```
+
+**正确做法**：
+```old8
+// ✅ 正确：完整的类型注解
+native extern "script.py" {
+    func calculate(x:int, y:int) -> int,
+    func getValue(x:int) -> string
+}
+
+// ✅ 使用解释器模式运行
+// dotnet run --project Old8Lang.App -- -f program.old8
 ```
 
 ## 6. 集合操作

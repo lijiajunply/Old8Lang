@@ -1,0 +1,15 @@
+// 详细调试测试
+
+PrintLine("Step 1: Import Python function")
+native extern "TestFiles/test_math.py" {
+    func add(a:int, b:int) -> int
+}
+PrintLine("Step 2: Import successful")
+
+PrintLine("Step 3: Call Python function")
+result <- add(10, 20)
+PrintLine("Step 4: Function returned")
+
+PrintLine("Step 5: Result type: " + result.GetType().Name)
+PrintLine("Step 6: Result value: " + result.ToStr())
+PrintLine("Done!")

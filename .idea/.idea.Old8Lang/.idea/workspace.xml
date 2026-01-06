@@ -23,14 +23,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/SyntaxTests/extern_syntax_test.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Docs/Python_Extern_Implementation.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_python_complete.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_python_debug.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_python_extern_basic.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_python_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/PythonFunctionLangValue.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/test_math.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/Old8Lang.ebnf" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Old8Lang.ebnf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ImportError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/ImportError.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -172,7 +178,7 @@
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
-  <component name="RunManager" selected=".NET 项目.FirstUI.TestApp">
+  <component name="RunManager" selected=".NET 项目.Old8Lang.App">
     <configuration name="FirstUI.TestApp" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -560,7 +566,7 @@
       <workItem from="1767429825540" duration="633000" />
       <workItem from="1767433937853" duration="26000" />
       <workItem from="1767434122437" duration="2457000" />
-      <workItem from="1767519232104" duration="18848000" />
+      <workItem from="1767519232104" duration="24700000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -905,7 +911,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="538" />
+    <option name="localTasksCounter" value="539" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -932,7 +938,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(select): 添加 select 语句的解析、解释器和边界测试&#10;&#10;- 实现了 SelectStatementTests 类，包含基本发送、接收、多 case 测试&#10;- 添加了 EdgeCasesTests 类，覆盖嵌套 select、channel 边界、控制流等场景&#10;- 创建了 Parser 测试，验证 select 语句的语法解析功能&#10;- 测试包括空 case 块、异常处理、复杂表达式和并发场景&#10;- 验证了有界 channel、变量作用域和资源清理功能" />
     <MESSAGE value="feat(lang): 添加defer语句支持&#10;&#10;- 实现DeferStatement类，支持延迟执行功能&#10;- 添加defer语句的解析和执行逻辑&#10;- 支持defer语句后进先出(LIFO)执行顺序&#10;- 添加defer语句的编译器IL生成支持&#10;- 实现defer语句与return、异常处理的交互&#10;- 添加大量defer语句的测试用例，包括基本功能、边界条件、异常处理等&#10;- 支持defer代码块和复杂表达式&#10;- 实现defer语句的资源管理功能测试" />
     <MESSAGE value="refactor(standard-library): 更新标准库模块名称和导入语法&#10;&#10;- 将 MathLib 模块重命名为 Math 模块&#10;- 更新所有测试中的模块导入语法&#10;- 修复 Time 模块中的函数调用方式&#10;- 简化异步函数调用的语法结构&#10;- 更新标准库注册表中的模块映射关系" />
     <MESSAGE value="refactor(tests): 移除嵌套函数defer语句测试&#10;&#10;- 删除了嵌套函数中defer语句执行独立性的测试用例&#10;- 移除了相关的测试代码和断言逻辑" />
@@ -957,7 +962,8 @@
     <MESSAGE value="refactor(core): 优化代码结构并修复类型验证问题&#10;&#10;- 移除多个文件中的冗余 using 指令&#10;- 在 CollectionTypeValidator 中添加空值检查以防止运行时异常&#10;- 修复多处代码格式问题，包括缩进和括号位置&#10;- 简化多个测试文件中的导入声明&#10;- 优化 AST 表达式和值处理的代码结构&#10;- 调整 UI 组件中的布局和手势处理代码&#10;- 改进语言服务器相关组件的依赖管理" />
     <MESSAGE value="fix(compiler): 修复枚举类型访问和代码生成问题&#10;&#10;- 修正枚举值比较时的类型转换，使用 as int 进行安全转换&#10;- 添加枚举类型在 ClassVar 中的类型查找支持&#10;- 实现枚举成员访问的直接整数值加载逻辑&#10;- 修复 ForInStatement 中的局部变量声明和类型转换处理&#10;- 更新 ReturnStatement 中的返回值处理逻辑，支持 try-finally 结构&#10;- 调整 IDE 工作区配置中的变更列表记录和任务计数器" />
     <MESSAGE value="feat(parser): 支持可空泛型类型参数解析&#10;&#10;- 在ClassParser中添加对LangTokenType.Question的支持以处理可空泛型类型参数&#10;- 在FunctionParser中添加对换行符后标识符+冒号的检查逻辑&#10;- 在StatementParser中添加对可空类型注解但无赋值的情况的处理&#10;- 修复类型注解解析的边界条件问题" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 支持可空泛型类型参数解析&#10;&#10;- 在ClassParser中添加对LangTokenType.Question的支持以处理可空泛型类型参数&#10;- 在FunctionParser中添加对换行符后标识符+冒号的检查逻辑&#10;- 在StatementParser中添加对可空类型注解但无赋值的情况的处理&#10;- 修复类型注解解析的边界条件问题" />
+    <MESSAGE value="feat(lang): 添加 extern 原生函数导入功能支持 P/Invoke&#10;&#10;- 实现 extern 语句的词法和语法解析，支持 native extern 语法&#10;- 添加 P/Invoke 调用约定支持，包括 cdecl、stdcall、winapi 三种类型&#10;- 实现函数别名和批量导入功能，支持块语法一次导入多个函数&#10;- 完成类型映射支持，涵盖 int、long、double、string 等基本类型及无符号类型&#10;- 实现编译器和解释器模式下的 P/Invoke 动态委托创建和方法绑定&#10;- 添加完整的 extern 语法测试文件和更新文档说明" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加 extern 原生函数导入功能支持 P/Invoke&#10;&#10;- 实现 extern 语句的词法和语法解析，支持 native extern 语法&#10;- 添加 P/Invoke 调用约定支持，包括 cdecl、stdcall、winapi 三种类型&#10;- 实现函数别名和批量导入功能，支持块语法一次导入多个函数&#10;- 完成类型映射支持，涵盖 int、long、double、string 等基本类型及无符号类型&#10;- 实现编译器和解释器模式下的 P/Invoke 动态委托创建和方法绑定&#10;- 添加完整的 extern 语法测试文件和更新文档说明" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
