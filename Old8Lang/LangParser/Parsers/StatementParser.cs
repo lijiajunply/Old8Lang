@@ -195,6 +195,12 @@ public class StatementParser(
             var peek3 = Peek(3);
             var peek4 = Peek(4);
 
+            // 检查是否是 extern 语句：native extern "dll" ...
+            if (peek1.Type == LangTokenType.Extern)
+            {
+                return ParseExternStatement();
+            }
+
             // 先处理更具体的语法模式，再处理更通用的
             // 1. nativeStatic: native "dll" class -> "alias"
             if (peek1.Type == LangTokenType.String &&
@@ -1956,6 +1962,134 @@ public class StatementParser(
 
         Expect(LangTokenType.RightBrace);
         return new SelectStatement(cases, defaultCase, startPos);
+    }
+
+    /// <summary>
+    /// externStatement = "native" "extern" STRING (callingConvention)? externBody
+    /// callingConvention = "cdecl" | "stdcall" | "winapi"
+    /// externBody = "func" funcDeclaration ("as" identifier)?
+    ///            | "{" funcDeclaration ("," funcDeclaration)* "}"
+    /// funcDeclaration = identifier "(" parameters ")" "->" type
+    /// </summary>
+    /// <returns>Extern 语句</returns>
+    public ExternStatement ParseExternStatement()
+    {
+        Expect(LangTokenType.Native);
+        Expect(LangTokenType.Extern);
+
+        // 解析 DLL 名称
+        var dllName = CurrentToken.Value;
+        Expect(LangTokenType.String);
+
+        // 解析可选的调用约定（默认为 Cdecl）
+        var defaultCallingConvention = CallingConventionType.Cdecl;
+        if (CurrentToken.Type == LangTokenType.Identifier)
+        {
+            var conventionStr = CurrentToken.Value.ToLower();
+            if (conventionStr is "cdecl" or "stdcall" or "winapi")
+            {
+                defaultCallingConvention = conventionStr switch
+                {
+                    "cdecl" => CallingConventionType.Cdecl,
+                    "stdcall" => CallingConventionType.StdCall,
+                    "winapi" => CallingConventionType.WinApi,
+                    _ => CallingConventionType.Cdecl
+                };
+                Expect(LangTokenType.Identifier);
+            }
+        }
+
+        var functions = new List<ExternFunctionDeclaration>();
+
+        // 检查是否是函数块：{ func1, func2, ... }
+        if (CurrentToken.Type == LangTokenType.LeftBrace)
+        {
+            Expect(LangTokenType.LeftBrace);
+
+            while (CurrentToken.Type != LangTokenType.RightBrace)
+            {
+                // 解析单个函数声明
+                var funcDecl = ParseExternFunctionDeclaration(defaultCallingConvention);
+                functions.Add(funcDecl);
+
+                // 跳过可选的逗号
+                if (CurrentToken.Type == LangTokenType.Comma)
+                {
+                    Expect(LangTokenType.Comma);
+                }
+            }
+
+            Expect(LangTokenType.RightBrace);
+        }
+        else
+        {
+            // 单个函数声明
+            var funcDecl = ParseExternFunctionDeclaration(defaultCallingConvention);
+            functions.Add(funcDecl);
+        }
+
+        return new ExternStatement(dllName, functions, defaultCallingConvention);
+    }
+
+    /// <summary>
+    /// 解析外部函数声明
+    /// funcDeclaration = (callingConvention)? "func" identifier "(" parameters ")" "->" type ("as" identifier)?
+    /// </summary>
+    private ExternFunctionDeclaration ParseExternFunctionDeclaration(CallingConventionType defaultConvention)
+    {
+        // 解析可选的调用约定
+        var callingConvention = defaultConvention;
+        if (CurrentToken.Type == LangTokenType.Identifier)
+        {
+            var conventionStr = CurrentToken.Value.ToLower();
+            if (conventionStr is "cdecl" or "stdcall" or "winapi")
+            {
+                callingConvention = conventionStr switch
+                {
+                    "cdecl" => CallingConventionType.Cdecl,
+                    "stdcall" => CallingConventionType.StdCall,
+                    "winapi" => CallingConventionType.WinApi,
+                    _ => defaultConvention
+                };
+                Expect(LangTokenType.Identifier);
+            }
+        }
+
+        // 期望 func 关键字
+        Expect(LangTokenType.Func);
+
+        // 解析函数名
+        var functionName = CurrentToken.Value;
+        Expect(LangTokenType.Identifier);
+
+        // 解析参数列表
+        Expect(LangTokenType.LeftParen);
+        var parameters = functionParser.ParseIdList();
+        Expect(LangTokenType.RightParen);
+
+        // 解析返回类型（必须有 -> returnType）
+        Expect(LangTokenType.Arrow);
+        var returnType = string.Empty;
+        if (CurrentToken.Type == LangTokenType.Identifier)
+        {
+            returnType = functionParser.ParseComplexTypeAnnotation();
+        }
+
+        // 创建函数签名（使用 FuncInit 来存储签名信息）
+        var funcName = new LangId(functionName, returnType);
+        var funcValue = new FuncLangValue(funcName, parameters, new BlockStatement(new List<IOldLangTree>()), null, default, false);
+        var funcSignature = new FuncInit(funcValue);
+
+        // 解析可选的别名
+        string? alias = null;
+        if (CurrentToken.Type == LangTokenType.As)
+        {
+            Expect(LangTokenType.As);
+            alias = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
+        }
+
+        return new ExternFunctionDeclaration(functionName, funcSignature, alias, callingConvention);
     }
 
     #endregion

@@ -23,9 +23,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/SyntaxTests/extern_syntax_test.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/Old8Lang.ebnf" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Old8Lang.ebnf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -556,7 +560,7 @@
       <workItem from="1767429825540" duration="633000" />
       <workItem from="1767433937853" duration="26000" />
       <workItem from="1767434122437" duration="2457000" />
-      <workItem from="1767519232104" duration="16423000" />
+      <workItem from="1767519232104" duration="18848000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -901,7 +905,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="537" />
+    <option name="localTasksCounter" value="538" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -928,7 +932,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 添加并发原语和using语句支持&#10;&#10;- 注册Mutex、Semaphore、AtomicInt、Channel等57个并发全局函数&#10;- 添加Using语句的词法解析和AST节点实现&#10;- 实现using语句的资源自动管理和try-finally逻辑&#10;- 添加using语句的IL代码生成和解释器执行支持&#10;- 创建并发原语的资源管理器和内部实现类&#10;- 更新语言解析器和类型系统以支持新的并发特性" />
     <MESSAGE value="test(select): 添加 select 语句的解析、解释器和边界测试&#10;&#10;- 实现了 SelectStatementTests 类，包含基本发送、接收、多 case 测试&#10;- 添加了 EdgeCasesTests 类，覆盖嵌套 select、channel 边界、控制流等场景&#10;- 创建了 Parser 测试，验证 select 语句的语法解析功能&#10;- 测试包括空 case 块、异常处理、复杂表达式和并发场景&#10;- 验证了有界 channel、变量作用域和资源清理功能" />
     <MESSAGE value="feat(lang): 添加defer语句支持&#10;&#10;- 实现DeferStatement类，支持延迟执行功能&#10;- 添加defer语句的解析和执行逻辑&#10;- 支持defer语句后进先出(LIFO)执行顺序&#10;- 添加defer语句的编译器IL生成支持&#10;- 实现defer语句与return、异常处理的交互&#10;- 添加大量defer语句的测试用例，包括基本功能、边界条件、异常处理等&#10;- 支持defer代码块和复杂表达式&#10;- 实现defer语句的资源管理功能测试" />
     <MESSAGE value="refactor(standard-library): 更新标准库模块名称和导入语法&#10;&#10;- 将 MathLib 模块重命名为 Math 模块&#10;- 更新所有测试中的模块导入语法&#10;- 修复 Time 模块中的函数调用方式&#10;- 简化异步函数调用的语法结构&#10;- 更新标准库注册表中的模块映射关系" />
@@ -953,7 +956,8 @@
     <MESSAGE value="feat(lang): 添加 is not 表达式支持&#10;&#10;- 在词法分析器中添加 IsNot 关键字类型支持&#10;- 实现 &quot;is not&quot; 关键字组合的特殊处理逻辑&#10;- 在表达式解析器中添加 IsNot 操作符优先级处理&#10;- 实现解释器模式下的 IsNot 类型检查功能&#10;- 实现编译模式下的 IsNot 类型检查 IL 生成&#10;- 添加编译和解释器模式的 IsNot 表达式测试用例&#10;- 修复现有 is 表达式测试中的数据类型问题" />
     <MESSAGE value="refactor(core): 优化代码结构并修复类型验证问题&#10;&#10;- 移除多个文件中的冗余 using 指令&#10;- 在 CollectionTypeValidator 中添加空值检查以防止运行时异常&#10;- 修复多处代码格式问题，包括缩进和括号位置&#10;- 简化多个测试文件中的导入声明&#10;- 优化 AST 表达式和值处理的代码结构&#10;- 调整 UI 组件中的布局和手势处理代码&#10;- 改进语言服务器相关组件的依赖管理" />
     <MESSAGE value="fix(compiler): 修复枚举类型访问和代码生成问题&#10;&#10;- 修正枚举值比较时的类型转换，使用 as int 进行安全转换&#10;- 添加枚举类型在 ClassVar 中的类型查找支持&#10;- 实现枚举成员访问的直接整数值加载逻辑&#10;- 修复 ForInStatement 中的局部变量声明和类型转换处理&#10;- 更新 ReturnStatement 中的返回值处理逻辑，支持 try-finally 结构&#10;- 调整 IDE 工作区配置中的变更列表记录和任务计数器" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(compiler): 修复枚举类型访问和代码生成问题&#10;&#10;- 修正枚举值比较时的类型转换，使用 as int 进行安全转换&#10;- 添加枚举类型在 ClassVar 中的类型查找支持&#10;- 实现枚举成员访问的直接整数值加载逻辑&#10;- 修复 ForInStatement 中的局部变量声明和类型转换处理&#10;- 更新 ReturnStatement 中的返回值处理逻辑，支持 try-finally 结构&#10;- 调整 IDE 工作区配置中的变更列表记录和任务计数器" />
+    <MESSAGE value="feat(parser): 支持可空泛型类型参数解析&#10;&#10;- 在ClassParser中添加对LangTokenType.Question的支持以处理可空泛型类型参数&#10;- 在FunctionParser中添加对换行符后标识符+冒号的检查逻辑&#10;- 在StatementParser中添加对可空类型注解但无赋值的情况的处理&#10;- 修复类型注解解析的边界条件问题" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 支持可空泛型类型参数解析&#10;&#10;- 在ClassParser中添加对LangTokenType.Question的支持以处理可空泛型类型参数&#10;- 在FunctionParser中添加对换行符后标识符+冒号的检查逻辑&#10;- 在StatementParser中添加对可空类型注解但无赋值的情况的处理&#10;- 修复类型注解解析的边界条件问题" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

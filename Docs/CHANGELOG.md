@@ -1,5 +1,38 @@
 # 更新记录
 
+## Old8Lang 1.0.0 rc5
+
+### 语言特性增强
+
+#### 1. Extern 原生函数导入（P/Invoke FFI 支持）
+- 添加 `extern` 关键字，支持通过 P/Invoke 调用 C/C++ 原生库函数
+  - 使用语法：`native extern "dll_name" func FunctionName(params) -> returnType`
+  - 支持三种调用约定：`cdecl`（默认）、`stdcall`（Windows API）、`winapi`
+  - 支持函数别名：`native extern "kernel32.dll" func GetCurrentProcessId() -> int as GetProcId`
+  - 支持批量导入：使用块语法 `{ func1, func2, ... }` 一次导入多个函数
+  - 支持为单个函数指定不同的调用约定
+- 完整的类型映射支持
+  - 支持基本类型：int、long、double、float、bool、string、void、char、byte、short
+  - 支持无符号类型：uint、ulong、ushort
+  - 自动处理 Old8Lang 类型到 C# 类型的转换
+- 编译器模式和解释器模式完全支持
+  - 编译器模式：动态生成 P/Invoke 方法定义和委托类型
+  - 解释器模式：运行时创建委托并绑定原生函数指针
+- 语法示例：
+  ```old8
+  // 单个函数导入
+  native extern "msvcrt.dll" func abs(x:int) -> int
+
+  // 指定调用约定
+  native extern "kernel32.dll" stdcall func GetCurrentThreadId() -> int
+
+  // 批量导入
+  native extern "user32.dll" {
+      func MessageBoxA(hWnd:int, text:string, caption:string, type:int) -> int,
+      func MessageBoxW(hWnd:int, text:string, caption:string, type:int) -> int
+  }
+  ```
+
 ## Old8Lang 1.0.0 rc4
 
 ### 语言特性增强

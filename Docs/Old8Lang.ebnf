@@ -35,6 +35,7 @@ statement = blockStatement
           | classMemberAccessStatement
           | importStatement
           | nativeStatement
+          | externStatement
           | returnStatement
           | breakStatement
           | continueStatement
@@ -175,6 +176,16 @@ nativeStatement = "native" STRING identifier identifier identifier?
                 | "native" STRING identifier "{" identifierList "}"
                 | "native" STRING identifier "->" identifier
                 | "native" STRING identifier ( "as" identifier )? ;
+
+(* Extern Statement - P/Invoke Native Function Import *)
+externStatement = "native" "extern" STRING callingConvention? externBody ;
+
+callingConvention = "cdecl" | "stdcall" | "winapi" ;
+
+externBody = callingConvention? "func" externFuncDecl ( "as" identifier )?
+           | "{" externFuncDecl ( "," externFuncDecl )* "}" ;
+
+externFuncDecl = callingConvention? "func" identifier "(" paramList? ")" "->" typeAnnotation ( "as" identifier )? ;
 
 (* Control Flow & Exception Handling *)
 

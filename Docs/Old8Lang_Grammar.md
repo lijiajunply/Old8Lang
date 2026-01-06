@@ -2055,6 +2055,89 @@ native "Math.dll" MathLib -> MathLib
 native "Data.dll" DataClass as DC
 ```
 
+### 5.14 Extern 原生函数导入（P/Invoke）
+
+导入 C/C++ 原生库中的函数（使用 P/Invoke）：
+
+#### 5.14.1 单个函数导入
+
+```old8
+// 默认使用 cdecl 调用约定
+native extern "msvcrt.dll" func abs(x:int) -> int
+
+// 指定 cdecl 调用约定
+native extern "msvcrt.dll" cdecl func printf(format:string) -> int
+
+// 指定 stdcall 调用约定（Windows API 常用）
+native extern "kernel32.dll" stdcall func GetCurrentThreadId() -> int
+
+// 指定 winapi 调用约定（等同于 stdcall）
+native extern "user32.dll" winapi func MessageBoxA(hWnd:int, text:string, caption:string, type:int) -> int
+```
+
+#### 5.14.2 带别名的函数导入
+
+```old8
+native extern "kernel32.dll" func GetCurrentProcessId() -> int as GetProcId
+```
+
+#### 5.14.3 批量函数导入（块语法）
+
+```old8
+// 多个函数共享相同的 DLL 和默认调用约定
+native extern "user32.dll" {
+    func MessageBoxA(hWnd:int, text:string, caption:string, type:int) -> int,
+    func MessageBoxW(hWnd:int, text:string, caption:string, type:int) -> int
+}
+
+// 可以为单个函数指定不同的调用约定
+native extern "kernel32.dll" stdcall {
+    func Sleep(milliseconds:int) -> void as SleepMs,
+    cdecl func GetCurrentThreadId() -> int as GetTid
+}
+```
+
+#### 5.14.4 支持的调用约定
+
+- `cdecl`：C 标准调用约定（默认）
+- `stdcall`：Windows API 标准调用约定
+- `winapi`：等同于 stdcall
+
+#### 5.14.5 支持的类型映射
+
+| Old8Lang 类型 | C# 类型 | C/C++ 类型 |
+|---------------|---------|-----------|
+| int           | int     | int       |
+| long          | long    | long long |
+| double        | double  | double    |
+| float         | float   | float     |
+| bool          | bool    | bool      |
+| string        | string  | char*     |
+| void          | void    | void      |
+| char          | char    | char      |
+| byte          | byte    | unsigned char |
+| short         | short   | short     |
+| uint          | uint    | unsigned int |
+| ulong         | ulong   | unsigned long long |
+| ushort        | ushort  | unsigned short |
+
+#### 5.14.6 使用示例
+
+```old8
+// 导入 Windows API 函数
+native extern "kernel32.dll" stdcall {
+    func GetCurrentThreadId() -> int,
+    func GetCurrentProcessId() -> int,
+    func Sleep(milliseconds:int) -> void
+}
+
+// 调用导入的函数
+threadId <- GetCurrentThreadId()
+PrintLine("Current Thread ID: " + threadId.ToStr())
+
+Sleep(1000)  // 暂停 1 秒
+```
+
 ## 6. 集合操作
 
 ### 6.1 列表方法
