@@ -40,17 +40,28 @@ public class NativeDllProvider : IExternProvider
 
             var targetName = funcDecl.Alias ?? funcDecl.FunctionName;
 
-            // 创建 P/Invoke 委托
-            var delegateType = CreateDelegateType(funcDecl, callingConv);
-            var funcPtr = NativeLibrary.GetExport(
-                NativeLibrary.Load(source),
-                funcDecl.FunctionName);
+            try
+            {
+                // 创建 P/Invoke 委托
+                var delegateType = CreateDelegateType(funcDecl, callingConv);
+                var libHandle = NativeLibrary.Load(source);
+                var funcPtr = NativeLibrary.GetExport(libHandle, funcDecl.FunctionName);
 
-            var del = Marshal.GetDelegateForFunctionPointer(funcPtr, delegateType);
+                var del = Marshal.GetDelegateForFunctionPointer(funcPtr, delegateType);
 
-            // 将委托包装为 Old8Lang 函数
-            var funcValue = new FuncLangValue(targetName, del.Method, funcDecl.FunctionSignature?.FuncLangValue);
-            manager.AddClassAndFunc(funcValue);
+                // 将委托包装为 Old8Lang 函数
+                // 注意: 需要使用 NativeDelegateFuncLangValue 来保存委托实例
+                var funcValue = new NativeDelegateFuncLangValue(targetName, del, funcDecl.FunctionSignature?.FuncLangValue);
+                manager.AddClassAndFunc(funcValue);
+            }
+            catch (DllNotFoundException ex)
+            {
+                throw new InvalidOperationError(new SourcePosition(0, 0), $"无法加载 DLL '{source}': {ex.Message}");
+            }
+            catch (EntryPointNotFoundException ex)
+            {
+                throw new InvalidOperationError(new SourcePosition(0, 0), $"在 DLL '{source}' 中找不到函数 '{funcDecl.FunctionName}': {ex.Message}");
+            }
         }
     }
 

@@ -331,7 +331,7 @@ public partial class Instance : LangValueType
             // 如果idResult是FuncLangValue，则调用它
             else if (idResult is FuncLangValue funcValue)
             {
-                // 如果是泛型函数且未实例化，尝试自动推断类型参数
+                // 如果是泛型函数且未实例化,尝试自动推断类型参数
                 if (funcValue.IsGeneric && funcValue.TypeArgumentMapping == null)
                 {
                     if (manager.Interpreter == null)
@@ -361,6 +361,11 @@ public partial class Instance : LangValueType
                     // 直接调用函数，参数表达式会在函数体内执行
                     result = funcValue.Run(manager, Ids, NamedArgs, Position);
                 }
+            }
+            // 如果idResult是NativeDelegateFuncLangValue，则调用它
+            else if (idResult is NativeDelegateFuncLangValue nativeDelegate)
+            {
+                result = nativeDelegate.Run(manager, Ids);
             }
             // 如果idResult是AsyncFuncLangValue，则调用它
             else if (idResult is AsyncFuncLangValue asyncFuncValue)

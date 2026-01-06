@@ -45,6 +45,7 @@
   &lt;Assembly Path="/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/publish/Npgsql.dll" /&gt;
 &lt;/AssemblyExplorer&gt;</s:String>
 	
+	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=58c56b00_002Df81e_002D48fd_002Da74f_002Dc8e84271fcf4/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Continuous Testing" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Or&gt;
     &lt;Project Location="/Users/luckyfish/Documents/Project/Old8LangProjects/Old8Lang/Old8Lang.Tests" Presentation="&amp;lt;Old8Lang.Tests&amp;gt;" /&gt;

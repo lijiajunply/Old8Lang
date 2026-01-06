@@ -1,0 +1,100 @@
+using System.Reflection;
+using Old8Lang.AST.Expression.Intermediates;
+using Old8Lang.AST.Visitor;
+using Old8Lang.Error;
+using Old8Lang.Interpreter;
+using Old8Lang.Utilities;
+
+namespace Old8Lang.AST.Expression.Value;
+
+/// <summary>
+/// 原生委托函数值类
+/// 用于保存 P/Invoke 委托实例和方法信息
+/// </summary>
+public class NativeDelegateFuncLangValue(
+    string idName,
+    Delegate delegateInstance,
+    FuncLangValue? funcSignature = null,
+    SourcePosition position = default)
+    : ImportInfo(position)
+{
+    public readonly LangId Id = new(idName);
+    private readonly Delegate DelegateInstance = delegateInstance;
+    private readonly FuncLangValue? FuncSignature = funcSignature;
+
+    /// <summary>
+    /// 执行原生委托函数
+    /// </summary>
+    public LangValueType Run(VariateManager variateManagerFunc, List<LangExpression> ids, object? obj = null)
+    {
+        // 计算所有参数的值
+        var values = ids.Select(expr => expr.Run(variateManagerFunc)).ToList();
+        var convertedValues = Apis.ListToObjects(values).ToArray();
+
+        object? result;
+        try
+        {
+            // 入栈：记录函数调用
+            Old8Exception.PushCallStack(DelegateInstance.Method.Name, Position);
+
+            // 使用委托缓存优化反射调用性能
+            // 重要: 传递委托实例作为 instance 参数
+            result = MethodInvokerCache.Invoke(DelegateInstance.Method, DelegateInstance, convertedValues);
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException != null)
+        {
+            // 转换 .NET 异常为 Old8Lang 异常
+            var innerException = ex.InnerException;
+
+            // 基础异常信息
+            string errorMessage = innerException.Message;
+            string errorCode = "RUNTIME_ERROR";
+
+            // 直接创建 Old8Exception，保留原始异常作为 innerException
+            throw new Old8Exception(
+                errorCode,
+                errorMessage,
+                Position,
+                null,
+                null,
+                null,
+                null,
+                innerException);
+        }
+        finally
+        {
+            // 出栈：函数调用结束
+            Old8Exception.PopCallStack();
+        }
+
+        // 转换返回值
+        if (result is null)
+            return new VoidLangValue();
+
+        return FuncLangValue.ObjToValue(result);
+    }
+
+    public override string ToString()
+    {
+        return $"native delegate function: {Id.IdName}";
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is NativeDelegateFuncLangValue other)
+        {
+            return Id.IdName == other.Id.IdName && DelegateInstance == other.DelegateInstance;
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Id.IdName, DelegateInstance);
+    }
+
+    public override TResult Accept<TResult>(IVisitor<TResult> visitor)
+    {
+        throw new NotImplementedException("NativeDelegateFuncLangValue 不支持 Visitor 模式访问");
+    }
+}

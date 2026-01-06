@@ -23,16 +23,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Extern/ExternCompilerTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/ExternBoundaryAndErrorTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/JavaScriptExternTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/NativeDllExternTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/PythonExternTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Statement/ExternStatementTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/NativeDelegateFuncLangValue.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/ExternProviderFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/ExternProviderFactory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/NativeDllProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/NativeDllProvider.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,6 +93,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/05/191a139c/IndexOutOfRangeException.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/0f/47447396/MethodBaseInvoker.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/1f/4c54500e/List`1.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/25/ea5de0f5/NullReferenceException.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/35/58ca714a/RuntimeType.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/49/7dcb0981/ThrowHelper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/19674998a88c4c42be3692b32f3379d21046510/4f/81203e97/CastHelpers.cs" root0="FORCE_HIGHLIGHTING" />
@@ -130,47 +128,48 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.FirstUI.TestApp.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.Old8Lang.Benchmarks.executor&quot;: &quot;Run&quot;,
-    &quot;.NET 项目.Old8Lang.LanguageServer.executor&quot;: &quot;Run&quot;,
-    &quot;07d79105-db56-470d-b872-543f396b1133.executor&quot;: &quot;Debug&quot;,
-    &quot;34038497-caa6-4590-9735-a11ac1a57cd0.executor&quot;: &quot;Debug&quot;,
-    &quot;58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor&quot;: &quot;Debug&quot;,
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;e9de5ea7-95aa-45c5-91d2-c46acccab710.executor&quot;: &quot;Debug&quot;,
-    &quot;fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize.executor": "Run",
+    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
+    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
+    ".NET 项目.FirstUI.TestApp.executor": "Run",
+    ".NET 项目.LibTest.executor": "Run",
+    ".NET 项目.Old8Lang.App.executor": "Run",
+    ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
+    ".NET 项目.Old8Lang.LanguageServer.executor": "Run",
+    "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
+    "34038497-caa6-4590-9735-a11ac1a57cd0.executor": "Debug",
+    "3af05a97-c6e2-49ab-b044-50109a642364.executor": "Debug",
+    "58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor": "Debug",
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "SHELLCHECK.PATH": "/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck",
+    "WebServerToolWindowFactoryState": "false",
+    "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
+    "fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor": "Debug",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;PLAIN_TEXT&quot;,
-      &quot;Markdown&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "PLAIN_TEXT",
+      "Markdown"
     ]
   }
-}</component>
+}]]></component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
@@ -562,7 +561,7 @@
       <workItem from="1767429825540" duration="633000" />
       <workItem from="1767433937853" duration="26000" />
       <workItem from="1767434122437" duration="2457000" />
-      <workItem from="1767519232104" duration="28507000" />
+      <workItem from="1767519232104" duration="29460000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -907,7 +906,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="542" />
+    <option name="localTasksCounter" value="543" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -934,7 +933,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(using): 添加对自定义类dispose方法的支持&#10;&#10;- 在AnyLangValue中实现TryDispose方法，支持自定义类的资源释放&#10;- 修改UsingStatement以支持AnyLangValue类型的资源清理&#10;- 更新ValueTypeFuncStatic中的类型转换逻辑，修复默认值问题&#10;- 优化DictionaryValueFuncStatic中的VariateManager获取方式&#10;- 修复TupleValueFuncStatic中的元素遍历逻辑，避免递归栈溢出&#10;- 添加test_disposable.old8测试文件验证using语句的dispose功能" />
     <MESSAGE value="test(interpreter): 添加 using 语句自定义类 dispose 方法测试&#10;&#10;- 测试带有 dispose 方法的自定义类在 using 语句中的行为&#10;- 验证 dispose 方法修改实例字段的功能&#10;- 测试异常情况下 dispose 方法仍能正确调用&#10;- 验证嵌套自定义 dispose 类按逆序释放资源&#10;- 测试没有 dispose 方法的类不会报错&#10;- 验证 dispose 方法多次调用只执行一次&#10;- 测试 dispose 方法访问实例成员的功能&#10;- 验证混合使用内置资源和自定义 dispose 类的场景" />
     <MESSAGE value="feat(type): 实现枚举类型注册功能&#10;&#10;- 在EnumInit中移除TODO注释并激活枚举类型注册逻辑&#10;- 向TypeAnnotationManager添加RegisterEnumType方法&#10;- 在TypeChecker中实现静态RegisterEnumType方法用于枚举注册&#10;- 创建EnumTypeInfo类定义枚举类型信息及其兼容性规则&#10;- 更新workspace.xml中的文件变更记录&#10;- 修复IDEA配置文件中的JSON格式问题" />
     <MESSAGE value="feat(ast): 添加枚举值类型支持&#10;&#10;- 实现 EnumLangValue 类型，支持枚举成员的值表示和类型信息&#10;- 添加枚举值的算术运算和比较运算逻辑&#10;- 实现枚举值与整数的类型转换和比较操作&#10;- 更新 EnumTemplate 中的 GetMemberValue 方法返回 EnumLangValue&#10;- 优化 LangValueType 中的模式匹配语法&#10;- 在类型检查器中添加对 EnumLangValue 的类型识别&#10;- 修复 TypeTemplate 中的泛型参数映射设置逻辑" />
@@ -959,7 +957,8 @@
     <MESSAGE value="feat(interpreter): 添加 Python extern 函数导入功能&#10;&#10;- 实现 Python 函数导入，支持 .py 脚本和 pymodule: 前缀模块&#10;- 添加 ExternType 枚举区分 C/C++ DLL 和 Python 导入类型&#10;- 实现 Python 运行时检测和初始化机制&#10;- 添加跨平台 Python DLL 自动检测（Windows/macOS/Linux）&#10;- 实现 Old8Lang 与 Python 类型自动转换&#10;- 创建 PythonFunctionLangValue 包装 Python 函数对象&#10;- 更新语法文档说明 Python extern 用法和限制&#10;- 添加 Python 异常处理和错误信息包装&#10;- 实现 Python 列表/字典与 Old8Lang 集合类型转换" />
     <MESSAGE value="refactor(extern): 重构 extern 功能为工厂模式架构&#10;&#10;- 实现 ExternProviderFactory 工厂类统一管理不同语言提供者&#10;- 创建 IExternProvider 接口规范所有外部语言提供者行为&#10;- 实现 NativeDllProvider 支持 C/C++ P/Invoke 功能&#10;- 实现 PythonProvider 支持 Python 脚本和模块导入&#10;- 重构 ExternStatement 使用工厂模式替代硬编码分支逻辑&#10;- 添加编译模式支持检查机制区分解释和编译执行&#10;- 实现动态注册新语言提供者的扩展能力&#10;- 保持向后兼容性所有现有语法无需修改" />
     <MESSAGE value="feat(interpreter): 添加 JavaScript extern 函数导入功能&#10;&#10;- 实现 JavaScriptProvider 使用 Jint 引擎执行 JavaScript 代码&#10;- 添加 JavaScript 函数包装器支持 Old8Lang 与 JavaScript 类型转换&#10;- 实现 .js 文件和 js: 前缀的 JavaScript 脚本导入方式&#10;- 添加 JavaScript 数组和对象与 Old8Lang 集合类型的自动转换&#10;- 支持 ES5.1 标准和跨平台执行（Windows/macOS/Linux）&#10;- 仅支持解释模式执行，不支持编译模式" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(interpreter): 添加 JavaScript extern 函数导入功能&#10;&#10;- 实现 JavaScriptProvider 使用 Jint 引擎执行 JavaScript 代码&#10;- 添加 JavaScript 函数包装器支持 Old8Lang 与 JavaScript 类型转换&#10;- 实现 .js 文件和 js: 前缀的 JavaScript 脚本导入方式&#10;- 添加 JavaScript 数组和对象与 Old8Lang 集合类型的自动转换&#10;- 支持 ES5.1 标准和跨平台执行（Windows/macOS/Linux）&#10;- 仅支持解释模式执行，不支持编译模式" />
+    <MESSAGE value="feat(ast): 添加 extern 语句支持并完善外部函数导入功能&#10;&#10;- 在 BlockStatement 中添加 ExternStatement 类型处理&#10;- 实现 ExternStatement 的 AST 结构和解析功能&#10;- 添加 JavaScript、Python 和 Native DLL 外部函数导入支持&#10;- 实现 extern 语句的编译模式支持和调用约定处理&#10;- 添加 extern 功能的边界测试和错误处理测试&#10;- 实现 extern 语句的解析测试和类型检测功能&#10;- 修复 ExternProviderFactory 中的字段命名规范问题&#10;- 更新 ExternStatement 的 Count 属性返回函数数量" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(ast): 添加 extern 语句支持并完善外部函数导入功能&#10;&#10;- 在 BlockStatement 中添加 ExternStatement 类型处理&#10;- 实现 ExternStatement 的 AST 结构和解析功能&#10;- 添加 JavaScript、Python 和 Native DLL 外部函数导入支持&#10;- 实现 extern 语句的编译模式支持和调用约定处理&#10;- 添加 extern 功能的边界测试和错误处理测试&#10;- 实现 extern 语句的解析测试和类型检测功能&#10;- 修复 ExternProviderFactory 中的字段命名规范问题&#10;- 更新 ExternStatement 的 Count 属性返回函数数量" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1230,143 +1229,143 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>414</line>
+          <line>419</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="16389" />
+              <option value="16612" />
             </startOffsets>
             <endOffsets>
-              <option value="16567" />
+              <option value="16790" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="618" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>407</line>
+          <line>412</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="16177" />
+              <option value="16400" />
             </startOffsets>
             <endOffsets>
-              <option value="16197" />
+              <option value="16420" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="619" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>431</line>
+          <line>436</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="17235" />
+              <option value="17458" />
             </startOffsets>
             <endOffsets>
-              <option value="17313" />
+              <option value="17536" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="620" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>432</line>
+          <line>437</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="17326" />
+              <option value="17549" />
             </startOffsets>
             <endOffsets>
-              <option value="17360" />
+              <option value="17583" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="621" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>465</line>
+          <line>470</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="18499" />
+              <option value="18722" />
             </startOffsets>
             <endOffsets>
-              <option value="18513" />
+              <option value="18736" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="622" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>469</line>
+          <line>474</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="18609" />
+              <option value="18832" />
             </startOffsets>
             <endOffsets>
-              <option value="18694" />
+              <option value="18917" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="623" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>470</line>
+          <line>475</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="18707" />
+              <option value="18930" />
             </startOffsets>
             <endOffsets>
-              <option value="18749" />
+              <option value="18972" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="624" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>474</line>
+          <line>479</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="18874" />
+              <option value="19097" />
             </startOffsets>
             <endOffsets>
-              <option value="19010" />
+              <option value="19233" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="625" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>495</line>
+          <line>500</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="19491" />
+              <option value="19714" />
             </startOffsets>
             <endOffsets>
-              <option value="19559" />
+              <option value="19782" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="626" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>504</line>
+          <line>509</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="19755" />
+              <option value="19978" />
             </startOffsets>
             <endOffsets>
-              <option value="19822" />
+              <option value="20045" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="627" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>507</line>
+          <line>512</line>
           <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
             <startOffsets>
-              <option value="19885" />
+              <option value="20108" />
             </startOffsets>
             <endOffsets>
-              <option value="19945" />
+              <option value="20168" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="628" />
@@ -1474,6 +1473,19 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="641" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/JavaScriptExternTests.cs</url>
+          <line>56</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/JavaScriptExternTests.cs" containingFunctionPresentation="方法 'ExecuteJavaScript_BasicArithmeticFunctions_ReturnsCorrectResults'">
+            <startOffsets>
+              <option value="1307" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1355" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="642" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
