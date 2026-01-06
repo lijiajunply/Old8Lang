@@ -24,15 +24,15 @@
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/JavaScriptExternTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/JavaScriptExternTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/JavaScriptFunctionLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/JavaScriptFunctionLangValue.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/ExternProviderFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/ExternProviderFactory.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/IExternProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/IExternProvider.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/JavaScriptProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/JavaScriptProvider.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/NativeDllProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/NativeDllProvider.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/PythonProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/PythonProvider.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/FunctionParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/ExternBoundaryAndErrorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/ExternBoundaryAndErrorTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/PythonFunctionLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/PythonFunctionLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_defer_parse.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_dict_channel.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_disposable.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_select.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_select_debug.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_using.old8" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -564,7 +564,7 @@
       <workItem from="1767429825540" duration="633000" />
       <workItem from="1767433937853" duration="26000" />
       <workItem from="1767434122437" duration="2457000" />
-      <workItem from="1767519232104" duration="32180000" />
+      <workItem from="1767519232104" duration="33414000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -909,7 +909,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="545" />
+    <option name="localTasksCounter" value="547" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -936,8 +936,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(ast): 添加枚举值类型支持&#10;&#10;- 实现 EnumLangValue 类型，支持枚举成员的值表示和类型信息&#10;- 添加枚举值的算术运算和比较运算逻辑&#10;- 实现枚举值与整数的类型转换和比较操作&#10;- 更新 EnumTemplate 中的 GetMemberValue 方法返回 EnumLangValue&#10;- 优化 LangValueType 中的模式匹配语法&#10;- 在类型检查器中添加对 EnumLangValue 的类型识别&#10;- 修复 TypeTemplate 中的泛型参数映射设置逻辑" />
-    <MESSAGE value="refactor(tests): 重构测试文件结构并移除集合库测试&#10;&#10;- 将 BracketMatchingTests.cs 从 Language 目录移动到 Parser 目录&#10;- 将 EdgeCaseTests.cs 从 Language 目录移动到 EdgeCases 目录&#10;- 将 ExpressionStatementTests.cs 从 Language 目录移动到 Parser 目录&#10;- 将 SemicolonTests.cs 从 Language 目录移动到 Parser/Statement 目录&#10;- 将 CollectionMethodsTests.cs 从 Compiler/Collections 移动到 Compiler/Collections/Advanced&#10;- 将 ExtendedRangeTests.cs 从 Compiler/Collections 移动到 Compiler/Collections/Advanced&#10;- 将 InExpressionTests.cs 从 Compiler/Collections.Advanced 移动到 Compiler/Collections/InExpression&#10;- 将 ParamsCompilerTests.cs 从 Compiler 目录移动到 Compiler/Functions 目录&#10;- 将 ParamsInterpreterTests.cs 从 Interpreter 目录移动到 Interpreter/Functions 目录&#10;- 将 ParamsTests.cs 从 Parser 目录移动到 Parser/Functions 目录&#10;- 移除 AsyncNativeTests.cs 文件&#10;- 移除 CollectionLibTests.cs 文件&#10;- 从 StandardLibraryRegistry.cs 中移除 CollectionLib 的注册&#10;- 更新 ErrorHandlingTests.cs 中的断言检查&#10;- 在 FirstUIBinding.cs 中添加可选参数支持&#10;- 在 TemplateEngine.cs 中改进代码格式和文档注释&#10;- 添加新的集合扩展方法测试文件 test_collection_extensions.old8" />
     <MESSAGE value="refactor(ui): 更新UI组件语法并优化计数器示例&#10;&#10;- 将UI组件创建语法从函数调用改为链式调用方式&#10;- 修改计数器示例应用的布局和样式实现&#10;- 重构FirstUIBinding中应用运行方法的参数类型&#10;- 更新测试应用中的计数器实现逻辑&#10;- 修改默认运行的示例文件为计数器应用&#10;- 调整工作区配置和运行管理器设置" />
     <MESSAGE value="feat(type): 实现泛型类型推断中的嵌套类型参数匹配&#10;&#10;- 实现从实际类型中提取泛型参数进行匹配的逻辑&#10;- 添加 ExtractGenericArgumentsFromType 方法支持泛型参数列表提取&#10;- 实现递归匹配每个泛型参数的类型推断机制&#10;- 支持 GenericTypeInfo 实例的 TypeArguments 直接提取&#10;- 添加从类型名称中解析泛型参数的备用方案&#10;- 创建单元测试验证嵌套泛型类型的类型推断功能&#10;- 实现 List&lt;T&gt;、Dictionary&lt;K,V&gt; 和深度嵌套泛型的支持" />
     <MESSAGE value="feat(lang): 实现 select 语句接收操作语法&#10;&#10;- 将接收操作语法从 `case value &lt;- channel` 改为 `case value from channel`&#10;- 在语法文档中更新 select 语句的发送和接收操作语法规则&#10;- 添加完整的 select 接收操作功能测试用例&#10;- 实现解析器中接收和发送操作的明确区分逻辑&#10;- 创建 select 接收操作演示文件和相关测试&#10;- 修复因语法歧义导致的接收操作解析问题" />
@@ -961,7 +959,9 @@
     <MESSAGE value="feat(ast): 添加 extern 语句支持并完善外部函数导入功能&#10;&#10;- 在 BlockStatement 中添加 ExternStatement 类型处理&#10;- 实现 ExternStatement 的 AST 结构和解析功能&#10;- 添加 JavaScript、Python 和 Native DLL 外部函数导入支持&#10;- 实现 extern 语句的编译模式支持和调用约定处理&#10;- 添加 extern 功能的边界测试和错误处理测试&#10;- 实现 extern 语句的解析测试和类型检测功能&#10;- 修复 ExternProviderFactory 中的字段命名规范问题&#10;- 更新 ExternStatement 的 Count 属性返回函数数量" />
     <MESSAGE value="feat(interpreter): 添加对原生委托函数的支持&#10;&#10;- 实现 NativeDelegateFuncLangValue 类处理 P/Invoke 委托实例&#10;- 在 Instance.cs 中添加对 NativeDelegateFuncLangValue 的调用支持&#10;- 优化 NativeDllProvider 中的 DLL 加载和函数导出错误处理&#10;- 更新 VariateManager 支持 NativeDelegateFuncLangValue 类型匹配&#10;- 升级 Jint 依赖版本至 4.4.2&#10;- 修复代码注释中的标点符号问题" />
     <MESSAGE value="refactor(interpreter): 优化外部函数执行和类型转换机制&#10;&#10;- 将 FuncLangValue 的 Run 方法改为 virtual 以支持重写&#10;- 为 JavaScriptFunctionLangValue 实现 override 的 Run 方法并修复命名参数类型&#10;- 为 PythonFunctionLangValue 实现 override 的 Run 方法并优化类型转换逻辑&#10;- 修复 Python 类型转换中的布尔值处理和对象类型检测&#10;- 更新 JavaScriptProvider 和 PythonProvider 中的错误抛出机制&#10;- 优化 PythonProvider 中的异常处理和类型转换流程" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(interpreter): 优化外部函数执行和类型转换机制&#10;&#10;- 将 FuncLangValue 的 Run 方法改为 virtual 以支持重写&#10;- 为 JavaScriptFunctionLangValue 实现 override 的 Run 方法并修复命名参数类型&#10;- 为 PythonFunctionLangValue 实现 override 的 Run 方法并优化类型转换逻辑&#10;- 修复 Python 类型转换中的布尔值处理和对象类型检测&#10;- 更新 JavaScriptProvider 和 PythonProvider 中的错误抛出机制&#10;- 优化 PythonProvider 中的异常处理和类型转换流程" />
+    <MESSAGE value="feat(interpreter): 添加 JavaScript 函数返回类型注解支持&#10;&#10;- 实现 JavaScriptFunctionLangValue 支持返回类型注解&#10;- 在 JavaScriptProvider 中解析函数声明的返回类型&#10;- 修复函数返回值类型转换逻辑，支持 double 类型&#10;- 优化 extern 语句解析时的类型注解处理&#10;- 添加多个测试文件用于验证 extern 功能&#10;- 更新 workspace.xml 配置文件中的变更记录" />
+    <MESSAGE value="fix(python): 修复Python模块导入错误处理和函数返回类型问题&#10;&#10;- 修正了floor和ceil函数的返回类型从double改为int&#10;- 更新了相关测试用例以匹配新的返回类型&#10;- 将Python模块导入错误从InvalidOperationError改为ImportError&#10;- 添加了Python模块导入的异常处理机制&#10;- 实现了更详细的Python模块导入错误信息提示" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(python): 修复Python模块导入错误处理和函数返回类型问题&#10;&#10;- 修正了floor和ceil函数的返回类型从double改为int&#10;- 更新了相关测试用例以匹配新的返回类型&#10;- 将Python模块导入错误从InvalidOperationError改为ImportError&#10;- 添加了Python模块导入的异常处理机制&#10;- 实现了更详细的Python模块导入错误信息提示" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -2075,7 +2075,10 @@ public class StatementParser(
         var returnType = string.Empty;
         if (CurrentToken.Type == LangTokenType.Identifier)
         {
-            returnType = functionParser.ParseComplexTypeAnnotation();
+            // Extern 函数的返回类型应该是简单标识符，不支持复杂类型注解
+            // 使用简单的 token 读取，避免 ParseComplexTypeAnnotation 跨行读取导致的解析问题
+            returnType = CurrentToken.Value;
+            Expect(LangTokenType.Identifier);
         }
 
         // 创建函数签名（使用 FuncInit 来存储签名信息）

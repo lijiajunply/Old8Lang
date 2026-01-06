@@ -75,7 +75,7 @@ public class PythonFunctionLangValue : FuncLangValue
             }
             catch (PythonException ex)
             {
-                throw new ImportError(default(SourcePosition), $"Python 函数 {_functionName} 调用失败：\n{ex.Message}");
+                throw new InvalidOperationError(default(SourcePosition), $"Python 函数 {_functionName} 调用失败：\n{ex.Message}");
             }
         }
     }

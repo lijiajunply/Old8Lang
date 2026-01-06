@@ -1,3 +1,0 @@
-func test() {
-    defer PrintLine("cleanup")
-}

@@ -198,6 +198,7 @@ result <- getLargeNumber()
 
     /// <summary>
     /// 测试类型不匹配的参数
+    /// JavaScript 会进行隐式类型转换,字符串 * 2 = NaN
     /// </summary>
     [Fact]
     public void Extern_TypeMismatch_HandlesGracefully()
@@ -211,7 +212,7 @@ function expectsNumber(x) {
         var old8Content = @"
 native extern ""type_test.js"" func expectsNumber(x:int) -> int
 
-// 传递字符串而不是数字 - 这会导致类型错误
+// 传递字符串而不是数字 - JavaScript 会将其转换为 NaN
 str <- ""not a number""
 result <- expectsNumber(str)
 ";
@@ -219,9 +220,18 @@ result <- expectsNumber(str)
         CreateTempModuleFile("type_test.js", jsContent);
         CreateTempModuleFile("test_type_mismatch.old8", old8Content);
 
-        // Act & Assert
-        // 应该在运行时检测到类型错误
-        AssertExecutionThrows("test_type_mismatch.old8", typeof(TypeError));
+        // Act
+        var (interpreter, exception) = ExecuteCodeFile("test_type_mismatch.old8");
+
+        // Assert
+        // JavaScript 不会为类型不匹配抛出错误,而是返回 NaN
+        Assert.Null(exception);
+        var result = interpreter.Manager.GetValue(new Old8Lang.AST.Expression.LangId("result"));
+        Assert.NotNull(result);
+        // JavaScript NaN 会被转换为 Old8Lang 的 double NaN
+        Assert.IsType<Old8Lang.AST.Expression.Value.DoubleLangValue>(result);
+        var doubleResult = (Old8Lang.AST.Expression.Value.DoubleLangValue)result;
+        Assert.True(double.IsNaN(doubleResult.Value), "Expected JavaScript to return NaN for string * 2");
     }
 
     #endregion
