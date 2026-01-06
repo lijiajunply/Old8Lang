@@ -23,15 +23,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_js_extern_basic.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/JavaScriptFunctionLangValue.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/JavaScriptProvider.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/test_js_functions.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Extern/ExternCompilerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/ExternBoundaryAndErrorTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/JavaScriptExternTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/NativeDllExternTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Modules/Extern/PythonExternTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Statement/ExternStatementTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/ExternFactoryArchitecture.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/ExternFactoryArchitecture.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/ExternProviders/ExternProviderFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/ExternProviderFactory.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -561,7 +562,7 @@
       <workItem from="1767429825540" duration="633000" />
       <workItem from="1767433937853" duration="26000" />
       <workItem from="1767434122437" duration="2457000" />
-      <workItem from="1767519232104" duration="27180000" />
+      <workItem from="1767519232104" duration="28507000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -906,7 +907,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="541" />
+    <option name="localTasksCounter" value="542" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -933,7 +934,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(tests): 移除嵌套函数defer语句测试&#10;&#10;- 删除了嵌套函数中defer语句执行独立性的测试用例&#10;- 移除了相关的测试代码和断言逻辑" />
     <MESSAGE value="feat(using): 添加对自定义类dispose方法的支持&#10;&#10;- 在AnyLangValue中实现TryDispose方法，支持自定义类的资源释放&#10;- 修改UsingStatement以支持AnyLangValue类型的资源清理&#10;- 更新ValueTypeFuncStatic中的类型转换逻辑，修复默认值问题&#10;- 优化DictionaryValueFuncStatic中的VariateManager获取方式&#10;- 修复TupleValueFuncStatic中的元素遍历逻辑，避免递归栈溢出&#10;- 添加test_disposable.old8测试文件验证using语句的dispose功能" />
     <MESSAGE value="test(interpreter): 添加 using 语句自定义类 dispose 方法测试&#10;&#10;- 测试带有 dispose 方法的自定义类在 using 语句中的行为&#10;- 验证 dispose 方法修改实例字段的功能&#10;- 测试异常情况下 dispose 方法仍能正确调用&#10;- 验证嵌套自定义 dispose 类按逆序释放资源&#10;- 测试没有 dispose 方法的类不会报错&#10;- 验证 dispose 方法多次调用只执行一次&#10;- 测试 dispose 方法访问实例成员的功能&#10;- 验证混合使用内置资源和自定义 dispose 类的场景" />
     <MESSAGE value="feat(type): 实现枚举类型注册功能&#10;&#10;- 在EnumInit中移除TODO注释并激活枚举类型注册逻辑&#10;- 向TypeAnnotationManager添加RegisterEnumType方法&#10;- 在TypeChecker中实现静态RegisterEnumType方法用于枚举注册&#10;- 创建EnumTypeInfo类定义枚举类型信息及其兼容性规则&#10;- 更新workspace.xml中的文件变更记录&#10;- 修复IDEA配置文件中的JSON格式问题" />
@@ -958,7 +958,8 @@
     <MESSAGE value="feat(lang): 添加 extern 原生函数导入功能支持 P/Invoke&#10;&#10;- 实现 extern 语句的词法和语法解析，支持 native extern 语法&#10;- 添加 P/Invoke 调用约定支持，包括 cdecl、stdcall、winapi 三种类型&#10;- 实现函数别名和批量导入功能，支持块语法一次导入多个函数&#10;- 完成类型映射支持，涵盖 int、long、double、string 等基本类型及无符号类型&#10;- 实现编译器和解释器模式下的 P/Invoke 动态委托创建和方法绑定&#10;- 添加完整的 extern 语法测试文件和更新文档说明" />
     <MESSAGE value="feat(interpreter): 添加 Python extern 函数导入功能&#10;&#10;- 实现 Python 函数导入，支持 .py 脚本和 pymodule: 前缀模块&#10;- 添加 ExternType 枚举区分 C/C++ DLL 和 Python 导入类型&#10;- 实现 Python 运行时检测和初始化机制&#10;- 添加跨平台 Python DLL 自动检测（Windows/macOS/Linux）&#10;- 实现 Old8Lang 与 Python 类型自动转换&#10;- 创建 PythonFunctionLangValue 包装 Python 函数对象&#10;- 更新语法文档说明 Python extern 用法和限制&#10;- 添加 Python 异常处理和错误信息包装&#10;- 实现 Python 列表/字典与 Old8Lang 集合类型转换" />
     <MESSAGE value="refactor(extern): 重构 extern 功能为工厂模式架构&#10;&#10;- 实现 ExternProviderFactory 工厂类统一管理不同语言提供者&#10;- 创建 IExternProvider 接口规范所有外部语言提供者行为&#10;- 实现 NativeDllProvider 支持 C/C++ P/Invoke 功能&#10;- 实现 PythonProvider 支持 Python 脚本和模块导入&#10;- 重构 ExternStatement 使用工厂模式替代硬编码分支逻辑&#10;- 添加编译模式支持检查机制区分解释和编译执行&#10;- 实现动态注册新语言提供者的扩展能力&#10;- 保持向后兼容性所有现有语法无需修改" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(extern): 重构 extern 功能为工厂模式架构&#10;&#10;- 实现 ExternProviderFactory 工厂类统一管理不同语言提供者&#10;- 创建 IExternProvider 接口规范所有外部语言提供者行为&#10;- 实现 NativeDllProvider 支持 C/C++ P/Invoke 功能&#10;- 实现 PythonProvider 支持 Python 脚本和模块导入&#10;- 重构 ExternStatement 使用工厂模式替代硬编码分支逻辑&#10;- 添加编译模式支持检查机制区分解释和编译执行&#10;- 实现动态注册新语言提供者的扩展能力&#10;- 保持向后兼容性所有现有语法无需修改" />
+    <MESSAGE value="feat(interpreter): 添加 JavaScript extern 函数导入功能&#10;&#10;- 实现 JavaScriptProvider 使用 Jint 引擎执行 JavaScript 代码&#10;- 添加 JavaScript 函数包装器支持 Old8Lang 与 JavaScript 类型转换&#10;- 实现 .js 文件和 js: 前缀的 JavaScript 脚本导入方式&#10;- 添加 JavaScript 数组和对象与 Old8Lang 集合类型的自动转换&#10;- 支持 ES5.1 标准和跨平台执行（Windows/macOS/Linux）&#10;- 仅支持解释模式执行，不支持编译模式" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(interpreter): 添加 JavaScript extern 函数导入功能&#10;&#10;- 实现 JavaScriptProvider 使用 Jint 引擎执行 JavaScript 代码&#10;- 添加 JavaScript 函数包装器支持 Old8Lang 与 JavaScript 类型转换&#10;- 实现 .js 文件和 js: 前缀的 JavaScript 脚本导入方式&#10;- 添加 JavaScript 数组和对象与 Old8Lang 集合类型的自动转换&#10;- 支持 ES5.1 标准和跨平台执行（Windows/macOS/Linux）&#10;- 仅支持解释模式执行，不支持编译模式" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1447,6 +1448,32 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="638" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Parser/Statement/ExternStatementTests.cs</url>
+          <line>251</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Statement/ExternStatementTests.cs" containingFunctionPresentation="方法 'ParseExternStatement_MultipleExterns_ParsesSuccessfully'">
+            <startOffsets>
+              <option value="7461" />
+            </startOffsets>
+            <endOffsets>
+              <option value="7543" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="640" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/Parser/Statement/ExternStatementTests.cs</url>
+          <line>34</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Statement/ExternStatementTests.cs" containingFunctionPresentation="方法 'ParseExternStatement_NativeDll_SingleFunction_ParsesSuccessfully'">
+            <startOffsets>
+              <option value="1027" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1061" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="641" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />

@@ -13,7 +13,7 @@ public static class ExternProviderFactory
     /// <summary>
     /// 提供者注册表（支持运行时注册新的语言提供者）
     /// </summary>
-    private static readonly Dictionary<ExternType, Func<IExternProvider>> _providerRegistry = new()
+    private static readonly Dictionary<ExternType, Func<IExternProvider>> ProviderRegistry = new()
     {
         { ExternType.NativeDll, () => new NativeDllProvider() },
         { ExternType.PythonScript, () => new PythonProvider(ExternType.PythonScript) },
@@ -29,7 +29,7 @@ public static class ExternProviderFactory
     /// <exception cref="NotSupportedException">不支持的 Extern 类型</exception>
     public static IExternProvider CreateProvider(ExternType externType)
     {
-        if (_providerRegistry.TryGetValue(externType, out var factory))
+        if (ProviderRegistry.TryGetValue(externType, out var factory))
         {
             return factory();
         }
@@ -48,7 +48,7 @@ public static class ExternProviderFactory
     /// </remarks>
     public static void RegisterProvider(ExternType externType, Func<IExternProvider> factory)
     {
-        _providerRegistry[externType] = factory;
+        ProviderRegistry[externType] = factory;
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public static class ExternProviderFactory
     /// <returns>是否支持</returns>
     public static bool IsSupported(ExternType externType)
     {
-        return _providerRegistry.ContainsKey(externType);
+        return ProviderRegistry.ContainsKey(externType);
     }
 
     /// <summary>
@@ -67,6 +67,6 @@ public static class ExternProviderFactory
     /// <returns>已注册的类型列表</returns>
     public static IEnumerable<ExternType> GetSupportedTypes()
     {
-        return _providerRegistry.Keys;
+        return ProviderRegistry.Keys;
     }
 }

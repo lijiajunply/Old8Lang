@@ -212,7 +212,7 @@ public partial class ExternStatement : OldStatement
     /// <summary>
     /// 获取语句数量
     /// </summary>
-    public override int Count => 0;
+    public override int Count => Functions.Count;
 
     public override TResult Accept<TResult>(IVisitor<TResult> visitor)
     {
@@ -236,7 +236,8 @@ public partial class ExternStatement : OldStatement
                 : "";
             var aliasStr = func.Alias != null ? $" as {func.Alias}" : "";
             var signature = FormatFunctionSignature(func);
-            return $"native extern \"{DllName}\"{convStr} {convOverrideStr}func {func.FunctionName}{signature}{aliasStr}";
+            return
+                $"native extern \"{DllName}\"{convStr} {convOverrideStr}func {func.FunctionName}{signature}{aliasStr}";
         }
 
         var funcs = string.Join("\n    ", Functions.Select(f =>

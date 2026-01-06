@@ -38,7 +38,7 @@ public partial class BlockStatement : OldStatement
                     }
 
                     break;
-                case NativeStatement or FuncInit or ClassInit or AsyncFuncInit:
+                case NativeStatement or FuncInit or ClassInit or AsyncFuncInit or ExternStatement:
                     ImportStatements.Add(statement);
                     break;
                 case ReturnStatement:
@@ -409,7 +409,7 @@ public partial class BlockStatement : OldStatement
     }
 
     public override OldStatement this[int index] => OtherStatements[index];
-    
+
     public IOldLangTree GetImportStatement(int index) => ImportStatements[index];
 
     /// <summary>
