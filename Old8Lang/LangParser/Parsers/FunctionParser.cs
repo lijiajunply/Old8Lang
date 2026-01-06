@@ -549,14 +549,16 @@ public class FunctionParser(
                 break;
             }
 
-            // 检查是否是换行符后的标识符+冒号（下一个字段声明的开始）
+            // 检查是否是下一个语句的开始（标识符 + 赋值符号或冒号）
             // 这种情况表示当前类型注解已经结束
-            if (CurrentToken.Type == LangTokenType.Identifier)
+            // 注意：只有在已经读取了一些类型内容后才进行此检查，避免在类型注解刚开始时就误判
+            if (result.Length > 0 && CurrentToken.Type == LangTokenType.Identifier)
             {
                 var nextToken = Peek();
-                if (nextToken.Type == LangTokenType.Colon)
+                if (nextToken.Type == LangTokenType.Colon ||
+                    nextToken.Type == LangTokenType.Assignment)
                 {
-                    // 这是下一个字段声明的开始，停止当前类型注解的解析
+                    // 这是下一个字段声明或赋值语句的开始，停止当前类型注解的解析
                     break;
                 }
             }

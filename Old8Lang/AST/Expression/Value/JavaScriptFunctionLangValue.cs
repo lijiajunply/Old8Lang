@@ -1,15 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Jint;
 using Jint.Native;
-using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.Intermediates;
-using Old8Lang.AST.Expression.Value;
 using Old8Lang.AST.Statement;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
-using Old8Lang.LangParser;
 
 namespace Old8Lang.AST.Expression.Value;
 
@@ -21,6 +15,7 @@ public class JavaScriptFunctionLangValue : FuncLangValue
 {
     private readonly Engine _engine;
     private readonly string _functionName;
+    private readonly string? _returnType;
 
     /// <summary>
     /// 构造函数
@@ -29,15 +24,18 @@ public class JavaScriptFunctionLangValue : FuncLangValue
     /// <param name="engine">Jint JavaScript 引擎实例</param>
     /// <param name="functionName">JavaScript 函数名</param>
     /// <param name="parameters">参数列表</param>
+    /// <param name="returnType">返回类型注解（可选）</param>
     public JavaScriptFunctionLangValue(
         string name,
         Engine engine,
         string functionName,
-        List<LangId> parameters)
+        List<LangId> parameters,
+        string? returnType = null)
         : base(new LangId(name), parameters, new BlockStatement(new List<IOldLangTree>()), null, default, false)
     {
         _engine = engine;
         _functionName = functionName;
+        _returnType = returnType;
     }
 
     /// <summary>
@@ -156,7 +154,14 @@ public class JavaScriptFunctionLangValue : FuncLangValue
         if (jsValue.IsNumber())
         {
             var num = jsValue.AsNumber();
-            // 判断是否为整数
+
+            // 如果函数声明了 double 返回类型,始终返回 DoubleLangValue
+            if (_returnType != null && _returnType.Equals("double", StringComparison.OrdinalIgnoreCase))
+            {
+                return new DoubleLangValue(num);
+            }
+
+            // 否则根据数值判断是否为整数
             if (Math.Abs(num - Math.Floor(num)) < double.Epsilon)
             {
                 return new IntLangValue((int)num);

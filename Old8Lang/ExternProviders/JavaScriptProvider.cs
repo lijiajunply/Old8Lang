@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection.Emit;
 using Jint;
 using Old8Lang.AST.Expression;
@@ -10,7 +6,6 @@ using Old8Lang.AST.Statement;
 using Old8Lang.Compiler;
 using Old8Lang.Error;
 using Old8Lang.Interpreter;
-using Old8Lang.LangParser;
 
 namespace Old8Lang.ExternProviders;
 
@@ -133,9 +128,10 @@ public class JavaScriptProvider : IExternProvider
     {
         var signature = funcDecl.FunctionSignature?.FuncLangValue;
         var parameters = signature?.Ids ?? new List<LangId>();
+        var returnType = signature?.Id?.AssumptionType;
 
         // 创建包装函数
-        var funcValue = new JavaScriptFunctionLangValue(targetName, engine, funcDecl.FunctionName, parameters);
+        var funcValue = new JavaScriptFunctionLangValue(targetName, engine, funcDecl.FunctionName, parameters, returnType);
 
         return funcValue;
     }
