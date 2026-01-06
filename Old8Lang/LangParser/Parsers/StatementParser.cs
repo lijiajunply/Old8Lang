@@ -355,6 +355,12 @@ public class StatementParser(
                                 CurrentIndex = savedIndex;
                                 return functionParser.ParseFuncDeclaration();
                             }
+                            else
+                            {
+                                // 只有可空类型注解，没有赋值（例如类字段声明 "key: K?"）
+                                CurrentIndex = savedIndex;
+                                return ParseSet();
+                            }
                         }
                         else if (thirdToken.Type == LangTokenType.Assignment)
                         {

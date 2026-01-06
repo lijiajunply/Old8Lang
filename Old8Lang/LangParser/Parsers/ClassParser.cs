@@ -304,7 +304,8 @@ public class ClassParser(
                         var tokenAfterColon = Peek(2);
                         if (tokenAfterColon.Type == LangTokenType.Identifier ||
                             tokenAfterColon.Type == LangTokenType.LeftBracket ||
-                            tokenAfterColon.Type == LangTokenType.LeftBrace)
+                            tokenAfterColon.Type == LangTokenType.LeftBrace ||
+                            tokenAfterColon.Type == LangTokenType.Question)  // 支持可空泛型类型参数（如 K?）
                         {
                             // 这是类型假注，解析字段声明列表
                             var fieldDeclarations = ParseFieldDeclarationList(modifiers);
