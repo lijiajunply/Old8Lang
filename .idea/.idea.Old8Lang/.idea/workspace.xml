@@ -23,20 +23,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Docs/Python_Extern_Implementation.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_python_complete.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_python_debug.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_python_extern_basic.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test_python_simple.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/PythonFunctionLangValue.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestFiles/test_math.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/ExternProviderFactory.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/IExternProvider.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/NativeDllProvider.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/ExternProviders/PythonProvider.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/ExternStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Error/ImportError.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Error/ImportError.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/StatementParser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Old8Lang.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -566,7 +557,7 @@
       <workItem from="1767429825540" duration="633000" />
       <workItem from="1767433937853" duration="26000" />
       <workItem from="1767434122437" duration="2457000" />
-      <workItem from="1767519232104" duration="24700000" />
+      <workItem from="1767519232104" duration="25600000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -911,7 +902,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="539" />
+    <option name="localTasksCounter" value="540" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -938,7 +929,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(lang): 添加defer语句支持&#10;&#10;- 实现DeferStatement类，支持延迟执行功能&#10;- 添加defer语句的解析和执行逻辑&#10;- 支持defer语句后进先出(LIFO)执行顺序&#10;- 添加defer语句的编译器IL生成支持&#10;- 实现defer语句与return、异常处理的交互&#10;- 添加大量defer语句的测试用例，包括基本功能、边界条件、异常处理等&#10;- 支持defer代码块和复杂表达式&#10;- 实现defer语句的资源管理功能测试" />
     <MESSAGE value="refactor(standard-library): 更新标准库模块名称和导入语法&#10;&#10;- 将 MathLib 模块重命名为 Math 模块&#10;- 更新所有测试中的模块导入语法&#10;- 修复 Time 模块中的函数调用方式&#10;- 简化异步函数调用的语法结构&#10;- 更新标准库注册表中的模块映射关系" />
     <MESSAGE value="refactor(tests): 移除嵌套函数defer语句测试&#10;&#10;- 删除了嵌套函数中defer语句执行独立性的测试用例&#10;- 移除了相关的测试代码和断言逻辑" />
     <MESSAGE value="feat(using): 添加对自定义类dispose方法的支持&#10;&#10;- 在AnyLangValue中实现TryDispose方法，支持自定义类的资源释放&#10;- 修改UsingStatement以支持AnyLangValue类型的资源清理&#10;- 更新ValueTypeFuncStatic中的类型转换逻辑，修复默认值问题&#10;- 优化DictionaryValueFuncStatic中的VariateManager获取方式&#10;- 修复TupleValueFuncStatic中的元素遍历逻辑，避免递归栈溢出&#10;- 添加test_disposable.old8测试文件验证using语句的dispose功能" />
@@ -963,7 +953,8 @@
     <MESSAGE value="fix(compiler): 修复枚举类型访问和代码生成问题&#10;&#10;- 修正枚举值比较时的类型转换，使用 as int 进行安全转换&#10;- 添加枚举类型在 ClassVar 中的类型查找支持&#10;- 实现枚举成员访问的直接整数值加载逻辑&#10;- 修复 ForInStatement 中的局部变量声明和类型转换处理&#10;- 更新 ReturnStatement 中的返回值处理逻辑，支持 try-finally 结构&#10;- 调整 IDE 工作区配置中的变更列表记录和任务计数器" />
     <MESSAGE value="feat(parser): 支持可空泛型类型参数解析&#10;&#10;- 在ClassParser中添加对LangTokenType.Question的支持以处理可空泛型类型参数&#10;- 在FunctionParser中添加对换行符后标识符+冒号的检查逻辑&#10;- 在StatementParser中添加对可空类型注解但无赋值的情况的处理&#10;- 修复类型注解解析的边界条件问题" />
     <MESSAGE value="feat(lang): 添加 extern 原生函数导入功能支持 P/Invoke&#10;&#10;- 实现 extern 语句的词法和语法解析，支持 native extern 语法&#10;- 添加 P/Invoke 调用约定支持，包括 cdecl、stdcall、winapi 三种类型&#10;- 实现函数别名和批量导入功能，支持块语法一次导入多个函数&#10;- 完成类型映射支持，涵盖 int、long、double、string 等基本类型及无符号类型&#10;- 实现编译器和解释器模式下的 P/Invoke 动态委托创建和方法绑定&#10;- 添加完整的 extern 语法测试文件和更新文档说明" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lang): 添加 extern 原生函数导入功能支持 P/Invoke&#10;&#10;- 实现 extern 语句的词法和语法解析，支持 native extern 语法&#10;- 添加 P/Invoke 调用约定支持，包括 cdecl、stdcall、winapi 三种类型&#10;- 实现函数别名和批量导入功能，支持块语法一次导入多个函数&#10;- 完成类型映射支持，涵盖 int、long、double、string 等基本类型及无符号类型&#10;- 实现编译器和解释器模式下的 P/Invoke 动态委托创建和方法绑定&#10;- 添加完整的 extern 语法测试文件和更新文档说明" />
+    <MESSAGE value="feat(interpreter): 添加 Python extern 函数导入功能&#10;&#10;- 实现 Python 函数导入，支持 .py 脚本和 pymodule: 前缀模块&#10;- 添加 ExternType 枚举区分 C/C++ DLL 和 Python 导入类型&#10;- 实现 Python 运行时检测和初始化机制&#10;- 添加跨平台 Python DLL 自动检测（Windows/macOS/Linux）&#10;- 实现 Old8Lang 与 Python 类型自动转换&#10;- 创建 PythonFunctionLangValue 包装 Python 函数对象&#10;- 更新语法文档说明 Python extern 用法和限制&#10;- 添加 Python 异常处理和错误信息包装&#10;- 实现 Python 列表/字典与 Old8Lang 集合类型转换" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(interpreter): 添加 Python extern 函数导入功能&#10;&#10;- 实现 Python 函数导入，支持 .py 脚本和 pymodule: 前缀模块&#10;- 添加 ExternType 枚举区分 C/C++ DLL 和 Python 导入类型&#10;- 实现 Python 运行时检测和初始化机制&#10;- 添加跨平台 Python DLL 自动检测（Windows/macOS/Linux）&#10;- 实现 Old8Lang 与 Python 类型自动转换&#10;- 创建 PythonFunctionLangValue 包装 Python 函数对象&#10;- 更新语法文档说明 Python extern 用法和限制&#10;- 添加 Python 异常处理和错误信息包装&#10;- 实现 Python 列表/字典与 Old8Lang 集合类型转换" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
