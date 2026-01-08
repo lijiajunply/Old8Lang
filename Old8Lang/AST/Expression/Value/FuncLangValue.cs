@@ -651,6 +651,14 @@ public class FuncLangValue : ImportInfo
             var originalReturnType = executionManager.CurrentFunctionReturnType;
             var originalTypeArgumentMapping = executionManager.CurrentFunctionTypeArgumentMapping;
 
+            // 保存当前的IsReturn标志，防止函数调用影响生成器上下文
+            var originalIsReturn = executionManager.IsReturn;
+
+            // 保存并清除生成器上下文，防止函数内部错误地操作生成器状态
+            // 函数应该以标准模式执行，即使它是在生成器中被调用的
+            var originalGeneratorContext = executionManager.GeneratorContext;
+            executionManager.GeneratorContext = null;
+
             executionManager.IsFunc = true; // 设置为函数上下文
             executionManager.CurrentFunctionReturnType = Id?.AssumptionType; // 设置当前函数的返回类型注解（Id.AssumptionType包含了返回类型）
 
@@ -706,8 +714,12 @@ public class FuncLangValue : ImportInfo
             // 保存返回值
             var result = executionManager.Result;
 
-            // 重置return标志，确保函数调用不会影响外部上下文
-            executionManager.IsReturn = false;
+            // 重置return标志为原始值，确保函数调用不会影响外部上下文
+            // 特别重要：在生成器上下文中，函数的return不应该导致生成器退出
+            executionManager.IsReturn = originalIsReturn;
+
+            // 恢复生成器上下文
+            executionManager.GeneratorContext = originalGeneratorContext;
 
             // 恢复原始的函数返回类型，避免嵌套调用时的类型污染
             executionManager.CurrentFunctionReturnType = originalReturnType;

@@ -22,13 +22,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/test_defer_func.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_defer_lambda.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_defer_lambda_debug.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_lambda_closure.old8" afterDir="false" />
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="Changes">
+      <change afterPath="$PROJECT_DIR$/test_even_generator.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_func_in_generator.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_generator_bool_func.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_generator_simple_debug.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_if_with_func_call.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_prime_debug.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_prime_detailed.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_prime_generator.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_prime_simple.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_simple_func_call.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_simple_generator.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_yield_in_if.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_yield_with_func_call.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_yield_with_func_debug.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncGeneratorTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Async/AsyncGeneratorTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Unit/Compiler/ILVerificationTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/FuncLangValue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/BlockStatement.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -127,48 +140,48 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize.executor": "Run",
-    ".NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor": "Run",
-    ".NET 启动设置配置文件.Lang.Demo: http.executor": "Run",
-    ".NET 项目.FirstUI.TestApp.executor": "Run",
-    ".NET 项目.LibTest.executor": "Run",
-    ".NET 项目.Old8Lang.App.executor": "Run",
-    ".NET 项目.Old8Lang.Benchmarks.executor": "Run",
-    ".NET 项目.Old8Lang.LanguageServer.executor": "Run",
-    "07d79105-db56-470d-b872-543f396b1133.executor": "Debug",
-    "34038497-caa6-4590-9735-a11ac1a57cd0.executor": "Debug",
-    "3af05a97-c6e2-49ab-b044-50109a642364.executor": "Debug",
-    "58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor": "Debug",
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "SHELLCHECK.PATH": "/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck",
-    "WebServerToolWindowFactoryState": "false",
-    "e9de5ea7-95aa-45c5-91d2-c46acccab710.executor": "Debug",
-    "fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor": "Debug",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET static 方法.Old8Lang.FirstUI.FirstUIBinding.Initialize.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 启动设置配置文件.Lang.Demo.Client: Lang.Demo.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 启动设置配置文件.Lang.Demo: http.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.FirstUI.TestApp.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.LibTest.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.App.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.Benchmarks.executor&quot;: &quot;Run&quot;,
+    &quot;.NET 项目.Old8Lang.LanguageServer.executor&quot;: &quot;Run&quot;,
+    &quot;07d79105-db56-470d-b872-543f396b1133.executor&quot;: &quot;Debug&quot;,
+    &quot;34038497-caa6-4590-9735-a11ac1a57cd0.executor&quot;: &quot;Debug&quot;,
+    &quot;3af05a97-c6e2-49ab-b044-50109a642364.executor&quot;: &quot;Debug&quot;,
+    &quot;58c56b00-f81e-48fd-a74f-c8e84271fcf4.executor&quot;: &quot;Debug&quot;,
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;/Users/luckyfish/Library/Application Support/JetBrains/Rider2025.3/plugins/Shell Script/shellcheck&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;e9de5ea7-95aa-45c5-91d2-c46acccab710.executor&quot;: &quot;Debug&quot;,
+    &quot;fcae5552-40ef-409a-8c5b-b548ebb4a1d6.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Projects/RiderProjects/Old8Lang/Old8Lang.sln&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "PLAIN_TEXT",
-      "Markdown"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;PLAIN_TEXT&quot;,
+      &quot;Markdown&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RiderProblemsViewState">
     <option name="autoscrollToSource" value="true" />
   </component>
@@ -560,7 +573,8 @@
       <workItem from="1767429825540" duration="633000" />
       <workItem from="1767433937853" duration="26000" />
       <workItem from="1767434122437" duration="2457000" />
-      <workItem from="1767519232104" duration="34956000" />
+      <workItem from="1767519232104" duration="38266000" />
+      <workItem from="1767815939091" duration="4003000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -905,7 +919,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="548" />
+    <option name="localTasksCounter" value="549" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -932,7 +946,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(type): 实现泛型类型推断中的嵌套类型参数匹配&#10;&#10;- 实现从实际类型中提取泛型参数进行匹配的逻辑&#10;- 添加 ExtractGenericArgumentsFromType 方法支持泛型参数列表提取&#10;- 实现递归匹配每个泛型参数的类型推断机制&#10;- 支持 GenericTypeInfo 实例的 TypeArguments 直接提取&#10;- 添加从类型名称中解析泛型参数的备用方案&#10;- 创建单元测试验证嵌套泛型类型的类型推断功能&#10;- 实现 List&lt;T&gt;、Dictionary&lt;K,V&gt; 和深度嵌套泛型的支持" />
     <MESSAGE value="feat(lang): 实现 select 语句接收操作语法&#10;&#10;- 将接收操作语法从 `case value &lt;- channel` 改为 `case value from channel`&#10;- 在语法文档中更新 select 语句的发送和接收操作语法规则&#10;- 添加完整的 select 接收操作功能测试用例&#10;- 实现解析器中接收和发送操作的明确区分逻辑&#10;- 创建 select 接收操作演示文件和相关测试&#10;- 修复因语法歧义导致的接收操作解析问题" />
     <MESSAGE value="feat(ui): 实现拖拽阴影效果和Toast消息功能&#10;&#10;- 在Draggable组件中实现阴影反馈效果，拖动时显示阴影样式&#10;- 添加BoxShadows和Color引用支持阴影渲染&#10;- 实现FirstUIAvaloniaApp单例模式用于全局UI控制&#10;- 创建Toast消息显示功能，支持顶部居中显示&#10;- 实现UI重建机制支持主题切换时重新渲染&#10;- 优化TextArea组件引用清理Avalonia命名空间前缀&#10;- 修复WidgetBase组件ID和边距的默认值初始化问题&#10;- 更新Rider配置文件添加Grid组件反编译缓存设置" />
     <MESSAGE value="feat(compiler): 添加集合切片操作的编译模式支持&#10;&#10;- 实现 CollectionHelper 类提供数组和列表的切片操作功能&#10;- 添加 SliceArray、SliceList 和通用 Slice 方法支持正向和反向切片&#10;- 在 NestedSliceAccess 中实现 IL 代码生成调用 CollectionHelper 切片方法&#10;- 添加类型转换逻辑支持不同数值类型的切片参数&#10;- 实现嵌套切片访问的编译模式处理机制&#10;- 添加简单切片和嵌套切片的测试用例验证功能正确性" />
@@ -957,7 +970,8 @@
     <MESSAGE value="feat(interpreter): 添加 JavaScript 函数返回类型注解支持&#10;&#10;- 实现 JavaScriptFunctionLangValue 支持返回类型注解&#10;- 在 JavaScriptProvider 中解析函数声明的返回类型&#10;- 修复函数返回值类型转换逻辑，支持 double 类型&#10;- 优化 extern 语句解析时的类型注解处理&#10;- 添加多个测试文件用于验证 extern 功能&#10;- 更新 workspace.xml 配置文件中的变更记录" />
     <MESSAGE value="fix(python): 修复Python模块导入错误处理和函数返回类型问题&#10;&#10;- 修正了floor和ceil函数的返回类型从double改为int&#10;- 更新了相关测试用例以匹配新的返回类型&#10;- 将Python模块导入错误从InvalidOperationError改为ImportError&#10;- 添加了Python模块导入的异常处理机制&#10;- 实现了更详细的Python模块导入错误信息提示" />
     <MESSAGE value="fix(interpreter): 修复外部函数类型错误处理和返回值转换问题&#10;&#10;- 修复 JavaScript 类型不匹配时的处理逻辑，支持 NaN 返回值转换&#10;- 将 Python 函数调用错误从 ImportError 改为 InvalidOperationError&#10;- 修复 extern 函数返回类型解析，支持简单标识符类型注解&#10;- 更新类型不匹配测试用例，验证 JavaScript 隐式类型转换行为&#10;- 优化 extern 函数解析器，避免复杂类型注解跨行读取问题" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(interpreter): 修复外部函数类型错误处理和返回值转换问题&#10;&#10;- 修复 JavaScript 类型不匹配时的处理逻辑，支持 NaN 返回值转换&#10;- 将 Python 函数调用错误从 ImportError 改为 InvalidOperationError&#10;- 修复 extern 函数返回类型解析，支持简单标识符类型注解&#10;- 更新类型不匹配测试用例，验证 JavaScript 隐式类型转换行为&#10;- 优化 extern 函数解析器，避免复杂类型注解跨行读取问题" />
+    <MESSAGE value="fix(interpreter): 修复函数调用中defer语句执行时机问题&#10;&#10;- 调整defer语句执行位置，移至finally块中确保异常时也能执行&#10;- 添加executionManager空值检查避免空引用异常&#10;- 保持子作用域移除逻辑在defer执行之后&#10;- 更新workspace.xml中的变更记录和测试文件追踪" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(interpreter): 修复函数调用中defer语句执行时机问题&#10;&#10;- 调整defer语句执行位置，移至finally块中确保异常时也能执行&#10;- 添加executionManager空值检查避免空引用异常&#10;- 保持子作用域移除逻辑在defer执行之后&#10;- 更新workspace.xml中的变更记录和测试文件追踪" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

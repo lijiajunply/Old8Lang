@@ -141,8 +141,18 @@ public partial class BlockStatement : OldStatement
                     }
                 }
 
+                // 保存当前的 IsReturn 标志，以防止嵌套函数调用影响生成器的控制流
+                var savedIsReturn = manager.IsReturn;
+
                 // 执行语句
                 statement.Run(manager);
+
+                // 恢复 IsReturn 标志（如果语句是普通函数调用，它会设置并重置 IsReturn，但我们需要确保生成器的 IsReturn 不受影响）
+                // 注意：如果语句本身是 return 语句，我们需要保留它设置的 IsReturn
+                if (statement is not ReturnStatement)
+                {
+                    manager.IsReturn = savedIsReturn;
+                }
 
                 // 检查是否遇到yield
                 if (context.HasYielded)
