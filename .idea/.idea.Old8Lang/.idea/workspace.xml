@@ -23,9 +23,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.ParserBenchmarkTests-20260108-182422.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.ParserBenchmarkTests-20260108-182740.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report-github.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/ParserBenchmarkTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FirstUI.TestApp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FirstUI.TestApp/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FirstUI.TestApp/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.CompilerBenchmarkTests-20251218-010407.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.CompilerBenchmarkTests-20251218-010847.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.InterpreterBenchmarkTests-20251218-010206.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.InterpreterBenchmarkTests-20251218-010602.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.CompilerBenchmarkTests-report-github.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.CompilerBenchmarkTests-report.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.CompilerBenchmarkTests-report.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.InterpreterBenchmarkTests-report-github.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.InterpreterBenchmarkTests-report.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.InterpreterBenchmarkTests-report.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/test_simple.old8" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -559,7 +575,7 @@
       <workItem from="1767434122437" duration="2457000" />
       <workItem from="1767519232104" duration="38266000" />
       <workItem from="1767815939091" duration="4003000" />
-      <workItem from="1767865400494" duration="1264000" />
+      <workItem from="1767865400494" duration="3097000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -904,7 +920,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="550" />
+    <option name="localTasksCounter" value="551" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -931,7 +947,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(ui): 实现拖拽阴影效果和Toast消息功能&#10;&#10;- 在Draggable组件中实现阴影反馈效果，拖动时显示阴影样式&#10;- 添加BoxShadows和Color引用支持阴影渲染&#10;- 实现FirstUIAvaloniaApp单例模式用于全局UI控制&#10;- 创建Toast消息显示功能，支持顶部居中显示&#10;- 实现UI重建机制支持主题切换时重新渲染&#10;- 优化TextArea组件引用清理Avalonia命名空间前缀&#10;- 修复WidgetBase组件ID和边距的默认值初始化问题&#10;- 更新Rider配置文件添加Grid组件反编译缓存设置" />
     <MESSAGE value="feat(compiler): 添加集合切片操作的编译模式支持&#10;&#10;- 实现 CollectionHelper 类提供数组和列表的切片操作功能&#10;- 添加 SliceArray、SliceList 和通用 Slice 方法支持正向和反向切片&#10;- 在 NestedSliceAccess 中实现 IL 代码生成调用 CollectionHelper 切片方法&#10;- 添加类型转换逻辑支持不同数值类型的切片参数&#10;- 实现嵌套切片访问的编译模式处理机制&#10;- 添加简单切片和嵌套切片的测试用例验证功能正确性" />
     <MESSAGE value="refactor(install): 重构包安装功能使用 PackageService&#10;&#10;- 将 InstallPackage 方法参数增加 config 和 projectRoot&#10;- 使用 PackageService 替代原有的模拟包下载逻辑&#10;- 添加 InstallPackageAsync 异步方法支持&#10;- 修改 PackageService 中 InstallPackageAsync 为公共方法&#10;- 更新 IDE 配置文件中的 XML 实体编码格式" />
     <MESSAGE value="feat(compiler): 实现 select 语句的编译模式支持&#10;&#10;- ✅ 完全支持解释器模式（-f）和编译器模式（-c）&#10;- IL 代码生成实现正确的通道轮询逻辑&#10;- 移除编译器模式下 select 语句不支持的限制说明" />
@@ -956,7 +971,8 @@
     <MESSAGE value="fix(interpreter): 修复外部函数类型错误处理和返回值转换问题&#10;&#10;- 修复 JavaScript 类型不匹配时的处理逻辑，支持 NaN 返回值转换&#10;- 将 Python 函数调用错误从 ImportError 改为 InvalidOperationError&#10;- 修复 extern 函数返回类型解析，支持简单标识符类型注解&#10;- 更新类型不匹配测试用例，验证 JavaScript 隐式类型转换行为&#10;- 优化 extern 函数解析器，避免复杂类型注解跨行读取问题" />
     <MESSAGE value="fix(interpreter): 修复函数调用中defer语句执行时机问题&#10;&#10;- 调整defer语句执行位置，移至finally块中确保异常时也能执行&#10;- 添加executionManager空值检查避免空引用异常&#10;- 保持子作用域移除逻辑在defer执行之后&#10;- 更新workspace.xml中的变更记录和测试文件追踪" />
     <MESSAGE value="fix(interpreter): 修复生成器中函数调用的控制流状态管理问题&#10;&#10;- 在BlockStatement中保存和恢复IsReturn标志，防止普通函数调用影响生成器控制流&#10;- 在FuncLangValue中保存和恢复IsReturn标志，确保函数调用不影响外部生成器上下文&#10;- 在FuncLangValue中保存和清除生成器上下文，防止函数内部错误操作生成器状态&#10;- 恢复函数调用前的原始生成器上下文，避免嵌套调用时的状态污染&#10;- 移除IL验证测试中的跳过标记，启用相关功能测试&#10;- 更新工作空间配置文件中的变更记录和任务计数" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(interpreter): 修复生成器中函数调用的控制流状态管理问题&#10;&#10;- 在BlockStatement中保存和恢复IsReturn标志，防止普通函数调用影响生成器控制流&#10;- 在FuncLangValue中保存和恢复IsReturn标志，确保函数调用不影响外部生成器上下文&#10;- 在FuncLangValue中保存和清除生成器上下文，防止函数内部错误操作生成器状态&#10;- 恢复函数调用前的原始生成器上下文，避免嵌套调用时的状态污染&#10;- 移除IL验证测试中的跳过标记，启用相关功能测试&#10;- 更新工作空间配置文件中的变更记录和任务计数" />
+    <MESSAGE value="refactor(testapp): 简化计数器应用的程序结构&#10;&#10;- 移除 Program 类和 Main 方法的包装结构&#10;- 将应用初始化和运行逻辑直接放在全局作用域&#10;- 删除多余的 RunSimpleTest 方法封装&#10;- 移除测试应用的 README.md 说明文件&#10;- 更新 IDE 配置文件中的启动项目设置&#10;- 调整工作空间配置文件的任务计数和变更记录" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(testapp): 简化计数器应用的程序结构&#10;&#10;- 移除 Program 类和 Main 方法的包装结构&#10;- 将应用初始化和运行逻辑直接放在全局作用域&#10;- 删除多余的 RunSimpleTest 方法封装&#10;- 移除测试应用的 README.md 说明文件&#10;- 更新 IDE 配置文件中的启动项目设置&#10;- 调整工作空间配置文件的任务计数和变更记录" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

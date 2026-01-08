@@ -12,20 +12,23 @@ if (args.Length > 0 && args[0] == "--quick")
     return;
 }
 
-// 运行反射性能基准测试（新增）
-Console.WriteLine("正在运行反射性能基准测试...");
-Console.WriteLine("对比优化前后的性能差异\n");
-BenchmarkRunner.Run<ReflectionPerformanceBenchmark>();
+// // 运行反射性能基准测试（新增）
+// Console.WriteLine("正在运行反射性能基准测试...");
+// Console.WriteLine("对比优化前后的性能差异\n");
+// BenchmarkRunner.Run<ReflectionPerformanceBenchmark>();
+//
+// Console.WriteLine("正在运行高级性能测试...");
+// BenchmarkRunner.Run<AdvancedPerformanceTests>();
+//
+// // 运行解释器性能测试
+// Console.WriteLine("正在运行解释器性能测试...");
+// BenchmarkRunner.Run<InterpreterBenchmarkTests>();
 
-Console.WriteLine("正在运行高级性能测试...");
-BenchmarkRunner.Run<AdvancedPerformanceTests>();
+// Console.WriteLine("\n正在运行编译器性能测试...");
+// BenchmarkRunner.Run<CompilerBenchmarkTests>();
 
-// 运行解释器性能测试
-Console.WriteLine("正在运行解释器性能测试...");
-BenchmarkRunner.Run<InterpreterBenchmarkTests>();
-
-Console.WriteLine("\n正在运行编译器性能测试...");
-BenchmarkRunner.Run<CompilerBenchmarkTests>();
+Console.WriteLine("测试词法分析和语法分析的性能\n");
+BenchmarkRunner.Run<ParserBenchmarkTests>();
 
 Console.WriteLine("\n✅ 所有性能测试已完成！");
 Console.WriteLine($"结果已保存到: BenchmarkDotNet.Artifacts/results/");

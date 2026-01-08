@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Old8Lang.Benchmarks.ParserBenchmarkTests-20260108-182747</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.15.8, macOS Tahoe 26.2 (25C56) [Darwin 25.2.0]
+Apple M4, 1 CPU, 10 logical and 10 physical cores
+.NET SDK 10.0.100
+  [Host]     : .NET 10.0.0 (10.0.0, 10.0.25.52411), Arm64 RyuJIT armv8.0-a
+  DefaultJob : .NET 10.0.0 (10.0.0, 10.0.25.52411), Arm64 RyuJIT armv8.0-a
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>Method                       </th><th>Mean </th><th>Error</th><th>StdDev</th><th>Gen0</th><th>Gen1</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>&#39;Tokenize Simple Code&#39;</td><td>632.5 ns</td><td>10.97 ns</td><td>9.16 ns</td><td>0.4892</td><td>0.0029</td><td>4 KB</td>
+</tr><tr><td>&#39;Tokenize Medium Code&#39;</td><td>1,293.1 ns</td><td>6.30 ns</td><td>5.26 ns</td><td>0.8850</td><td>0.0076</td><td>7.23 KB</td>
+</tr><tr><td>&#39;Tokenize Complex Code&#39;</td><td>3,010.4 ns</td><td>9.36 ns</td><td>8.30 ns</td><td>1.8044</td><td>0.0420</td><td>14.76 KB</td>
+</tr><tr><td>&#39;Tokenize Large File&#39;</td><td>22,253.3 ns</td><td>373.20 ns</td><td>547.03 ns</td><td>13.6719</td><td>1.7090</td><td>112.18 KB</td>
+</tr><tr><td>&#39;Parse Simple Code&#39;</td><td>1,611.1 ns</td><td>31.43 ns</td><td>47.05 ns</td><td>0.9384</td><td>0.0076</td><td>7.68 KB</td>
+</tr><tr><td>&#39;Parse Medium Code&#39;</td><td>2,751.1 ns</td><td>11.71 ns</td><td>10.96 ns</td><td>1.6327</td><td>0.0267</td><td>13.35 KB</td>
+</tr><tr><td>&#39;Parse Complex Code&#39;</td><td>7,562.6 ns</td><td>78.27 ns</td><td>65.36 ns</td><td>4.0665</td><td>0.1297</td><td>33.26 KB</td>
+</tr><tr><td>&#39;Parse Large File&#39;</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td>
+</tr><tr><td>&#39;Full Pipeline - Simple Code&#39;</td><td>1,583.0 ns</td><td>18.43 ns</td><td>20.49 ns</td><td>0.9384</td><td>0.0076</td><td>7.68 KB</td>
+</tr><tr><td>&#39;Full Pipeline - Medium Code&#39;</td><td>2,717.5 ns</td><td>9.21 ns</td><td>8.16 ns</td><td>1.6327</td><td>0.0267</td><td>13.35 KB</td>
+</tr><tr><td>&#39;Full Pipeline - Complex Code&#39;</td><td>7,531.4 ns</td><td>26.50 ns</td><td>22.13 ns</td><td>4.0665</td><td>0.1297</td><td>33.26 KB</td>
+</tr><tr><td>&#39;Parse Loop Intensive Code&#39;</td><td>5,366.4 ns</td><td>30.22 ns</td><td>25.24 ns</td><td>2.7924</td><td>0.0763</td><td>22.81 KB</td>
+</tr><tr><td>&#39;Parse Function Intensive Code&#39;</td><td>7,851.6 ns</td><td>33.64 ns</td><td>31.46 ns</td><td>4.6234</td><td>0.1831</td><td>37.85 KB</td>
+</tr><tr><td>&#39;Parse Expression Intensive Code&#39;</td><td>9,675.6 ns</td><td>29.94 ns</td><td>26.54 ns</td><td>5.0201</td><td>0.2594</td><td>41.09 KB</td>
+</tr><tr><td>&#39;Parse Class Intensive Code&#39;</td><td>18,644.9 ns</td><td>78.86 ns</td><td>65.85 ns</td><td>10.6506</td><td>0.8545</td><td>87.02 KB</td>
+</tr><tr><td>&#39;Multiple Parses - Simple Code&#39;</td><td>15,511.2 ns</td><td>51.73 ns</td><td>48.39 ns</td><td>9.3994</td><td>0.0916</td><td>76.8 KB</td>
+</tr><tr><td>&#39;Multiple Parses - Different Codes&#39;</td><td>12,120.7 ns</td><td>85.06 ns</td><td>75.40 ns</td><td>6.6376</td><td>0.1984</td><td>54.29 KB</td>
+</tr><tr><td>&#39;Parse Generic Syntax&#39;</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td>
+</tr><tr><td>&#39;Parse Lambda Expressions&#39;</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td>
+</tr><tr><td>&#39;Parse LINQ Syntax&#39;</td><td>4,286.3 ns</td><td>12.68 ns</td><td>11.24 ns</td><td>2.3956</td><td>0.0610</td><td>19.58 KB</td>
+</tr><tr><td>&#39;Parse Match Expressions&#39;</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td>
+</tr></tbody></table>
+</body>
+</html>
