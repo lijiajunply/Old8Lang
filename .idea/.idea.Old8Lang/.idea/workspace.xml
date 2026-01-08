@@ -23,14 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/DebugSymbolTableTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_hover.csx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/HoverHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/HoverHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/DocumentManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/DocumentManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolFinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolFinder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/DefinitionHandlerTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/DefinitionHandlerTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/HoverHandlerTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/HoverHandlerTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -564,7 +559,7 @@
       <workItem from="1767434122437" duration="2457000" />
       <workItem from="1767519232104" duration="38266000" />
       <workItem from="1767815939091" duration="4003000" />
-      <workItem from="1767865400494" duration="11106000" />
+      <workItem from="1767865400494" duration="11743000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -909,7 +904,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="554" />
+    <option name="localTasksCounter" value="555" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -936,7 +931,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(compiler): 实现默认参数的编译模式支持&#10;&#10;- 移除默认参数在编译器模式下的已知限制说明&#10;- 添加完整的默认参数编译模式测试套件&#10;- 验证基本默认参数、多参数、类型推断等功能&#10;- 确保解释器和编译器模式下行为一致&#10;- 更新项目配置文件和工作区设置" />
     <MESSAGE value="feat(compiler): 实现泛型函数的编译模式支持&#10;&#10;- 添加泛型函数特化机制，支持泛型函数的运行时特化&#10;- 实现 GenericMethodSpecializer 类用于创建泛型函数的具体类型版本&#10;- 添加 GenericTypeResolver 用于在编译时解析泛型参数类型&#10;- 修改 FuncInit.cs 支持泛型函数的注册和参数信息存储&#10;- 更新 FunctionCallExpression 支持泛型函数的编译模式调用&#10;- 实现 GenericInstanceExpression 中的泛型函数调用逻辑&#10;- 扩展 LocalManager 添加泛型函数缓存和类型解析器支持&#10;- 修改 LangId 类型解析逻辑以支持泛型上下文中的类型解析" />
     <MESSAGE value="test(compiler): 添加 as 和 is 表达式编译模式测试&#10;&#10;- 添加了 as 表达式的各种转换测试，包括数值类型转换和字符串转换&#10;- 添加了 is 表达式的类型检查测试，涵盖基本类型和条件判断&#10;- 添加了 as 和 is 表达式的混合使用测试&#10;- 添加了边界情况测试，包括 null 值和未知类型转换&#10;- 添加了解释器模式下的相应功能测试，验证实际执行结果&#10;- 修复了 CharLangValue 的默认值问题&#10;- 实现了 EnumLangValue 的类型转换功能&#10;- 更新了对象池的字段命名规范&#10;- 修改了枚举测试中的类型转换验证方式" />
     <MESSAGE value="test(interpreter): 更新 as-is 表达式测试用例&#10;&#10;- 修改字符串到整数转换测试的输入值从 &quot;abc&quot; 到 &quot;123&quot;&#10;- 调整类型断言从 NullLangValue 到 IntLangValue&#10;- 移除复杂的条件逻辑测试用例&#10;- 修正边界情况测试中的类型断言&#10;- 更新空字符串测试用例为 null 字符&#10;- 添加注释说明未知类型转换结果" />
@@ -961,7 +955,8 @@
     <MESSAGE value="chore(benchmark): 移除编译器性能测试日志文件&#10;&#10;- 删除了旧的编译器基准测试日志文件&#10;- 清理了相关的性能测试输出记录&#10;- 移除了包含错误信息的基准测试结果文件&#10;- 更新了测试环境的配置状态" />
     <MESSAGE value="feat(benchmark): 更新解析器基准测试代码和结果&#10;&#10;- 修改 ParseLargeFile 测试中的循环结构为条件判断语句&#10;- 更新泛型语法解析测试中的函数声明语法格式&#10;- 调整 Lambda 表达式解析测试中的参数类型声明方式&#10;- 优化 Match 表达式解析测试中的模式匹配语法&#10;- 修正基准测试报告中的格式错误和清理日志文件&#10;- 更新 IDE 工作区配置中的变更记录和任务计数" />
     <MESSAGE value="feat(parser): 添加预编译指令支持&#10;&#10;- 实现 #define、#undef、#if、#elif、#else、#endif 预编译指令&#10;- 支持命令行 -D 参数定义预编译符号&#10;- 添加预编译指令的词法分析和语法解析&#10;- 实现条件编译功能，支持逻辑运算符 &amp;&amp;、||、!&#10;- 添加预编译指令相关的文档和测试用例&#10;- 支持嵌套预编译指令和复杂条件表达式&#10;- 实现预编译指令错误处理和边界情况处理" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(parser): 添加预编译指令支持&#10;&#10;- 实现 #define、#undef、#if、#elif、#else、#endif 预编译指令&#10;- 支持命令行 -D 参数定义预编译符号&#10;- 添加预编译指令的词法分析和语法解析&#10;- 实现条件编译功能，支持逻辑运算符 &amp;&amp;、||、!&#10;- 添加预编译指令相关的文档和测试用例&#10;- 支持嵌套预编译指令和复杂条件表达式&#10;- 实现预编译指令错误处理和边界情况处理" />
+    <MESSAGE value="fix(language-server): 修复符号查找和定义跳转功能&#10;&#10;- 修复 SymbolFinder 中的 FindTokenAtPosition 方法，使用源代码精确查找token位置&#10;- 修正 DefinitionHandlerTests 中的测试位置参数，确保测试准确性&#10;- 在 SymbolTableBuilder 中添加源代码参数以支持位置精确定位&#10;- 实现变量定义位置从token列表中精确查找的功能&#10;- 优化符号位置查找算法，解决光标位置与token匹配的准确性问题&#10;- 更新 DocumentManager 传递源代码到符号表构建器中" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(language-server): 修复符号查找和定义跳转功能&#10;&#10;- 修复 SymbolFinder 中的 FindTokenAtPosition 方法，使用源代码精确查找token位置&#10;- 修正 DefinitionHandlerTests 中的测试位置参数，确保测试准确性&#10;- 在 SymbolTableBuilder 中添加源代码参数以支持位置精确定位&#10;- 实现变量定义位置从token列表中精确查找的功能&#10;- 优化符号位置查找算法，解决光标位置与token匹配的准确性问题&#10;- 更新 DocumentManager 传递源代码到符号表构建器中" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

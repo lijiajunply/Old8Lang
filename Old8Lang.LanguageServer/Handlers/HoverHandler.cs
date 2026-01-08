@@ -80,11 +80,24 @@ public class HoverHandler(DocumentManager documentManager) : IHoverHandler
             modifiers.Add("static");
         }
 
-        // 构建显示类型 - 优先使用符号名称和类型信息
+        // 构建显示类型 - 优先使用符号类型信息
         string displayType;
         if (!string.IsNullOrEmpty(symbol.Type))
         {
-            // 如果没有类型信息，使用符号名称和类型
+            // 对于变量，显示 "变量名: 类型" 的格式
+            if (symbol.Kind == Models.SymbolKind.Variable)
+            {
+                displayType = $"{symbol.Name}: {symbol.Type}";
+            }
+            else
+            {
+                // 对于函数、类、方法等，Type字段已经包含完整签名，直接使用
+                displayType = symbol.Type;
+            }
+        }
+        else
+        {
+            // 如果没有类型信息，使用符号名称和类型构建
             displayType = symbol.Kind switch
             {
                 Models.SymbolKind.Variable => $"var {symbol.Name}",
@@ -94,10 +107,6 @@ public class HoverHandler(DocumentManager documentManager) : IHoverHandler
                 Models.SymbolKind.Property => $"{symbol.Name}",
                 _ => symbol.Name
             };
-        }
-        else
-        {
-            displayType = symbol.Type;
         }
 
         // 添加类型签名

@@ -90,6 +90,22 @@ public class SymbolFinder
                             }
                         }
                     }
+
+                    // Fallback: 如果对象是变量但类型无法推断（如 "var"），
+                    // 遍历所有类，查找包含该成员的类
+                    if (objectSymbol.Kind == SymbolKind.Variable)
+                    {
+                        foreach (var kvp in document.SymbolTable)
+                        {
+                            if (kvp.Value.Kind == SymbolKind.Class)
+                            {
+                                if (kvp.Value.Members.TryGetValue(symbolName, out var memberSymbol))
+                                {
+                                    return memberSymbol;
+                                }
+                            }
+                        }
+                    }
                 }
                 
                 // 也可能是静态方法调用 MathUtil.add
@@ -111,6 +127,19 @@ public class SymbolFinder
         if (document.SymbolTable.TryGetValue(symbolName, out var symbol))
         {
             return symbol;
+        }
+
+        // 4. Fallback: 在所有类的成员中查找
+        // 用于处理在类成员定义位置悬停的情况
+        foreach (var kvp in document.SymbolTable)
+        {
+            if (kvp.Value.Kind == SymbolKind.Class)
+            {
+                if (kvp.Value.Members.TryGetValue(symbolName, out var memberSymbol))
+                {
+                    return memberSymbol;
+                }
+            }
         }
 
         return null;

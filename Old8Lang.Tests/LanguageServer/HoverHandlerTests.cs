@@ -27,7 +27,7 @@ result <- add(1, 2) // 光标在 add 上
         var request = new HoverParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(4, 9) // add 函数调用位置
+            Position = new Position(5, 10) // add 函数调用位置
         };
 
         // Act
@@ -69,7 +69,7 @@ user <- User() // 光标在 User 上
         var request = new HoverParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(8, 7) // User 类实例化位置
+            Position = new Position(9, 8) // User 类实例化位置
         };
 
         // Act
@@ -102,7 +102,7 @@ result <- myVariable + 10 // 光标在 myVariable 上
         var request = new HoverParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(1, 0) // myVariable 使用位置
+            Position = new Position(2, 10) // myVariable 使用位置
         };
 
         // Act
@@ -154,7 +154,7 @@ result <- user.getName() // 光标在 getName 上
         var request = new HoverParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(12, 17) // getName 方法调用位置
+            Position = new Position(10, 15) // getName 方法调用位置
         };
 
         // Act
@@ -193,7 +193,7 @@ result <- calculate(1, 2) // 光标在 calculate 上
         var request = new HoverParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(9, 9) // calculate 函数调用位置
+            Position = new Position(7, 10) // calculate 函数调用位置
         };
 
         // Act
@@ -235,7 +235,7 @@ result <- MathUtil.add(1, 2) // 光标在 add 上
         var request = new HoverParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(8, 18) // add 方法调用位置
+            Position = new Position(7, 19) // add 方法调用位置
         };
 
         // Act
@@ -275,7 +275,7 @@ class User {
         var request = new HoverParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(4, 12) // getName 定义位置
+            Position = new Position(4, 17) // getName 定义位置
         };
 
         // Act
