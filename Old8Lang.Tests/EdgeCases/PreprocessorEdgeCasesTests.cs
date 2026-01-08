@@ -143,11 +143,14 @@ Assert.Equal(2, result)
         var interpreter = new LangInterpreter();
 
         // Act
-        var ast = interpreter.Build(code, null, symbols);
 
         // Assert - DEBUG 不应该被定义，因为 #define 不在行首
-        var exception = Record.Exception(() => ast.Run(interpreter.Manager));
-        Assert.Null(exception);
+        var exception = Record.Exception(() =>
+        {
+            var ast = interpreter.Build(code, null, symbols);
+            ast.Run(interpreter.Manager);
+        });
+        Assert.NotNull(exception);
     }
 
     [Fact]

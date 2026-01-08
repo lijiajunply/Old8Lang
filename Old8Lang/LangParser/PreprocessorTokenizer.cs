@@ -48,7 +48,8 @@ public class PreprocessorTokenizer
     public string Process()
     {
         var result = new StringBuilder();
-        var conditionStack = new Stack<bool>(); // true = 当前块激活, false = 当前块未激活
+        // (isActive: 当前块是否激活, anyBranchTaken: 在当前 if/elif/else 块中是否已有分支被激活)
+        var conditionStack = new Stack<(bool isActive, bool anyBranchTaken)>();
 
         bool inString = false;
         bool inChar = false;
@@ -63,7 +64,7 @@ public class PreprocessorTokenizer
             // 处理转义字符
             if (escapeNext)
             {
-                bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x);
+                bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x.isActive);
                 if (isActive)
                 {
                     result.Append(ch);
@@ -80,7 +81,7 @@ public class PreprocessorTokenizer
             // 检查转义开始
             if ((inString || inChar) && ch == '\\')
             {
-                bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x);
+                bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x.isActive);
                 if (isActive)
                 {
                     result.Append(ch);
@@ -94,7 +95,7 @@ public class PreprocessorTokenizer
             if (ch == '"' && !inChar && !inComment && !inMultiLineComment)
             {
                 inString = !inString;
-                bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x);
+                bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x.isActive);
                 if (isActive)
                 {
                     result.Append(ch);
@@ -107,7 +108,7 @@ public class PreprocessorTokenizer
             if (ch == '\'' && !inString && !inComment && !inMultiLineComment)
             {
                 inChar = !inChar;
-                bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x);
+                bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x.isActive);
                 if (isActive)
                 {
                     result.Append(ch);
@@ -120,7 +121,7 @@ public class PreprocessorTokenizer
             if (inMultiLineComment && ch == '*' && _currentIndex + 1 < _input.Length && _input[_currentIndex + 1] == '/')
             {
                 inMultiLineComment = false;
-                bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x);
+                bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x.isActive);
                 if (isActive)
                 {
                     result.Append("*/");
@@ -138,7 +139,7 @@ public class PreprocessorTokenizer
                     {
                         // 单行注释
                         inComment = true;
-                        bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x);
+                        bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x.isActive);
                         if (isActive)
                         {
                             result.Append("//");
@@ -150,7 +151,7 @@ public class PreprocessorTokenizer
                     {
                         // 多行注释
                         inMultiLineComment = true;
-                        bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x);
+                        bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x.isActive);
                         if (isActive)
                         {
                             result.Append("/*");
@@ -175,7 +176,7 @@ public class PreprocessorTokenizer
             else
             {
                 // 检查当前是否在激活的代码块中
-                bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x);
+                bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x.isActive);
 
                 if (isActive)
                 {
@@ -235,7 +236,7 @@ public class PreprocessorTokenizer
     /// <summary>
     /// 处理预编译指令
     /// </summary>
-    private void ProcessDirective(StringBuilder result, Stack<bool> conditionStack)
+    private void ProcessDirective(StringBuilder result, Stack<(bool isActive, bool anyBranchTaken)> conditionStack)
     {
         _currentIndex++; // 跳过 #
 
@@ -342,10 +343,10 @@ public class PreprocessorTokenizer
     /// <summary>
     /// 处理 #define 指令
     /// </summary>
-    private void ProcessDefine(Stack<bool> conditionStack)
+    private void ProcessDefine(Stack<(bool isActive, bool anyBranchTaken)> conditionStack)
     {
         // 只有在激活的代码块中才执行 #define
-        bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x);
+        bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x.isActive);
 
         var symbolName = ReadDirectiveArgument();
 
@@ -367,10 +368,10 @@ public class PreprocessorTokenizer
     /// <summary>
     /// 处理 #undef 指令
     /// </summary>
-    private void ProcessUndef(Stack<bool> conditionStack)
+    private void ProcessUndef(Stack<(bool isActive, bool anyBranchTaken)> conditionStack)
     {
         // 只有在激活的代码块中才执行 #undef
-        bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x);
+        bool isActive = conditionStack.Count == 0 || conditionStack.All(x => x.isActive);
 
         var symbolName = ReadDirectiveArgument();
 
@@ -392,7 +393,7 @@ public class PreprocessorTokenizer
     /// <summary>
     /// 处理 #if 指令
     /// </summary>
-    private void ProcessIf(Stack<bool> conditionStack)
+    private void ProcessIf(Stack<(bool isActive, bool anyBranchTaken)> conditionStack)
     {
         var condition = ReadDirectiveArgument();
 
@@ -406,16 +407,17 @@ public class PreprocessorTokenizer
         }
 
         // 只有在父级激活时才计算条件
-        bool parentActive = conditionStack.Count == 0 || conditionStack.All(x => x);
+        bool parentActive = conditionStack.Count == 0 || conditionStack.All(x => x.isActive);
         bool conditionResult = parentActive && _symbols.EvaluateCondition(condition);
 
-        conditionStack.Push(conditionResult);
+        // 如果条件为真，则当前分支激活，且已有分支被激活
+        conditionStack.Push((conditionResult, conditionResult));
     }
 
     /// <summary>
     /// 处理 #elif 指令
     /// </summary>
-    private void ProcessElif(Stack<bool> conditionStack)
+    private void ProcessElif(Stack<(bool isActive, bool anyBranchTaken)> conditionStack)
     {
         if (conditionStack.Count == 0)
         {
@@ -437,20 +439,21 @@ public class PreprocessorTokenizer
                 "预编译指令错误：#elif 指令缺少条件表达式");
         }
 
-        // 弹出当前 #if 的状态
-        conditionStack.Pop();
+        // 弹出当前 #if/#elif 的状态
+        var (_, anyBranchTaken) = conditionStack.Pop();
 
-        // 计算新条件
-        bool parentActive = conditionStack.Count == 0 || conditionStack.All(x => x);
-        bool conditionResult = parentActive && _symbols.EvaluateCondition(condition);
+        // 只有在父级激活且前面的分支都未激活时，才计算当前条件
+        bool parentActive = conditionStack.Count == 0 || conditionStack.All(x => x.isActive);
+        bool conditionResult = parentActive && !anyBranchTaken && _symbols.EvaluateCondition(condition);
 
-        conditionStack.Push(conditionResult);
+        // 如果当前条件为真，或者之前有分支已经被激活，则 anyBranchTaken 应该为 true
+        conditionStack.Push((conditionResult, anyBranchTaken || conditionResult));
     }
 
     /// <summary>
     /// 处理 #else 指令
     /// </summary>
-    private void ProcessElse(Stack<bool> conditionStack)
+    private void ProcessElse(Stack<(bool isActive, bool anyBranchTaken)> conditionStack)
     {
         if (conditionStack.Count == 0)
         {
@@ -462,19 +465,20 @@ public class PreprocessorTokenizer
         }
 
         // 弹出当前 #if/#elif 的状态
-        bool previousCondition = conditionStack.Pop();
+        var (_, anyBranchTaken) = conditionStack.Pop();
 
-        // #else 块只有在前面的条件都为 false 且父级激活时才激活
-        bool parentActive = conditionStack.Count == 0 || conditionStack.All(x => x);
-        bool elseActive = parentActive && !previousCondition;
+        // #else 块只有在父级激活且前面的分支都未激活时才激活
+        bool parentActive = conditionStack.Count == 0 || conditionStack.All(x => x.isActive);
+        bool elseActive = parentActive && !anyBranchTaken;
 
-        conditionStack.Push(elseActive);
+        // 如果 #else 激活，或者之前有分支已经被激活，则 anyBranchTaken 应该为 true
+        conditionStack.Push((elseActive, anyBranchTaken || elseActive));
     }
 
     /// <summary>
     /// 处理 #endif 指令
     /// </summary>
-    private void ProcessEndif(Stack<bool> conditionStack)
+    private void ProcessEndif(Stack<(bool isActive, bool anyBranchTaken)> conditionStack)
     {
         if (conditionStack.Count == 0)
         {

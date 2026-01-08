@@ -24,9 +24,8 @@
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Types/UnionTypesInterpreterTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Types/UnionTypesInterpreterTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Statement/SetStatement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/PreprocessorEdgeCasesTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/PreprocessorEdgeCasesTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/PreprocessorTokenizer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/PreprocessorTokenizer.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -561,7 +560,7 @@
       <workItem from="1767434122437" duration="2457000" />
       <workItem from="1767519232104" duration="38266000" />
       <workItem from="1767815939091" duration="4003000" />
-      <workItem from="1767865400494" duration="12237000" />
+      <workItem from="1767865400494" duration="13252000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -906,7 +905,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="556" />
+    <option name="localTasksCounter" value="557" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -933,7 +932,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(compiler): 添加 as 和 is 表达式编译模式测试&#10;&#10;- 添加了 as 表达式的各种转换测试，包括数值类型转换和字符串转换&#10;- 添加了 is 表达式的类型检查测试，涵盖基本类型和条件判断&#10;- 添加了 as 和 is 表达式的混合使用测试&#10;- 添加了边界情况测试，包括 null 值和未知类型转换&#10;- 添加了解释器模式下的相应功能测试，验证实际执行结果&#10;- 修复了 CharLangValue 的默认值问题&#10;- 实现了 EnumLangValue 的类型转换功能&#10;- 更新了对象池的字段命名规范&#10;- 修改了枚举测试中的类型转换验证方式" />
     <MESSAGE value="test(interpreter): 更新 as-is 表达式测试用例&#10;&#10;- 修改字符串到整数转换测试的输入值从 &quot;abc&quot; 到 &quot;123&quot;&#10;- 调整类型断言从 NullLangValue 到 IntLangValue&#10;- 移除复杂的条件逻辑测试用例&#10;- 修正边界情况测试中的类型断言&#10;- 更新空字符串测试用例为 null 字符&#10;- 添加注释说明未知类型转换结果" />
     <MESSAGE value="test(using): 移除自定义类dispose方法相关测试用例&#10;&#10;- 移除了UsingStatement_WithDisposableClass_CallsDisposeMethod测试&#10;- 移除了UsingStatement_ExceptionInBlock_DisposeStillCalled测试&#10;- 移除了UsingStatement_NestedDisposableClasses_DisposedInReverseOrder测试&#10;- 移除了UsingStatement_DisposeCalledMultipleTimes_ExecutesOnlyOnce测试&#10;- 移除了UsingStatement_DisposeAccessesInstanceMembers_ExecutesCorrectly测试&#10;- 移除了UsingStatement_MixedResourceTypes_DisposesAllCorrectly测试&#10;- 更新了workspace.xml中的变更列表和任务计数器&#10;- 修改了最后一次提交消息记录" />
     <MESSAGE value="feat(lang): 添加 is not 表达式支持&#10;&#10;- 在词法分析器中添加 IsNot 关键字类型支持&#10;- 实现 &quot;is not&quot; 关键字组合的特殊处理逻辑&#10;- 在表达式解析器中添加 IsNot 操作符优先级处理&#10;- 实现解释器模式下的 IsNot 类型检查功能&#10;- 实现编译模式下的 IsNot 类型检查 IL 生成&#10;- 添加编译和解释器模式的 IsNot 表达式测试用例&#10;- 修复现有 is 表达式测试中的数据类型问题" />
@@ -958,7 +956,8 @@
     <MESSAGE value="feat(parser): 添加预编译指令支持&#10;&#10;- 实现 #define、#undef、#if、#elif、#else、#endif 预编译指令&#10;- 支持命令行 -D 参数定义预编译符号&#10;- 添加预编译指令的词法分析和语法解析&#10;- 实现条件编译功能，支持逻辑运算符 &amp;&amp;、||、!&#10;- 添加预编译指令相关的文档和测试用例&#10;- 支持嵌套预编译指令和复杂条件表达式&#10;- 实现预编译指令错误处理和边界情况处理" />
     <MESSAGE value="fix(language-server): 修复符号查找和定义跳转功能&#10;&#10;- 修复 SymbolFinder 中的 FindTokenAtPosition 方法，使用源代码精确查找token位置&#10;- 修正 DefinitionHandlerTests 中的测试位置参数，确保测试准确性&#10;- 在 SymbolTableBuilder 中添加源代码参数以支持位置精确定位&#10;- 实现变量定义位置从token列表中精确查找的功能&#10;- 优化符号位置查找算法，解决光标位置与token匹配的准确性问题&#10;- 更新 DocumentManager 传递源代码到符号表构建器中" />
     <MESSAGE value="fix(language-server): 修复悬停功能中的符号类型显示和符号查找问题&#10;&#10;- 修复变量类型显示格式，对于变量显示&quot;变量名: 类型&quot;格式&#10;- 修正函数、类等符号类型信息的显示逻辑&#10;- 增强SymbolFinder中的符号查找机制，支持变量成员的类型推断回退&#10;- 添加在所有类成员中查找符号的回退机制&#10;- 修正HoverHandlerTests中的测试位置参数以确保测试准确性&#10;- 清理IDE工作区配置中的变更记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(language-server): 修复悬停功能中的符号类型显示和符号查找问题&#10;&#10;- 修复变量类型显示格式，对于变量显示&quot;变量名: 类型&quot;格式&#10;- 修正函数、类等符号类型信息的显示逻辑&#10;- 增强SymbolFinder中的符号查找机制，支持变量成员的类型推断回退&#10;- 添加在所有类成员中查找符号的回退机制&#10;- 修正HoverHandlerTests中的测试位置参数以确保测试准确性&#10;- 清理IDE工作区配置中的变更记录" />
+    <MESSAGE value="fix(parser): 修复联合类型和交叉类型解析问题&#10;&#10;- 添加 justProcessedOperator 标记跟踪联合类型和交叉类型操作符处理状态&#10;- 修正类型注解解析逻辑，避免在操作符后误判类型注解结束&#10;- 在标识符读取后重置操作符标记状态&#10;- 标记联合类型操作符 | 和交叉类型操作符 &amp; 处理状态&#10;- 修复 SetStatement 中变量获取方法从 GetAny 改为 GetValue&#10;- 更新单元测试中的空值检查语法&#10;- 清理 IDE 配置文件中的变更记录" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(parser): 修复联合类型和交叉类型解析问题&#10;&#10;- 添加 justProcessedOperator 标记跟踪联合类型和交叉类型操作符处理状态&#10;- 修正类型注解解析逻辑，避免在操作符后误判类型注解结束&#10;- 在标识符读取后重置操作符标记状态&#10;- 标记联合类型操作符 | 和交叉类型操作符 &amp; 处理状态&#10;- 修复 SetStatement 中变量获取方法从 GetAny 改为 GetValue&#10;- 更新单元测试中的空值检查语法&#10;- 清理 IDE 配置文件中的变更记录" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1486,6 +1485,32 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="642" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/PreprocessorEdgeCasesTests.cs</url>
+          <line>298</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/PreprocessorEdgeCasesTests.cs" containingFunctionPresentation="方法 'Preprocessor_ComplexNestedConditions_WorkCorrectly'">
+            <startOffsets>
+              <option value="7055" />
+            </startOffsets>
+            <endOffsets>
+              <option value="7104" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="643" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/PreprocessorEdgeCasesTests.cs</url>
+          <line>301</line>
+          <properties documentPath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/PreprocessorEdgeCasesTests.cs" containingFunctionPresentation="方法 'Preprocessor_ComplexNestedConditions_WorkCorrectly'">
+            <startOffsets>
+              <option value="7132" />
+            </startOffsets>
+            <endOffsets>
+              <option value="7201" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="644" />
         </line-breakpoint>
         <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
           <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
