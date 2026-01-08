@@ -204,7 +204,7 @@ public class SymbolFinder
                     Line = token.Line - 1, // 转换为从0开始
                     Column = token.Column - 1, // 转换为从0开始
                     EndLine = token.Line - 1,
-                    EndColumn = token.Column + token.Value.Length - 2 // 修正结束列计算
+                    EndColumn = token.Column + token.Value.Length - 1 // 修正结束列计算 (token.Column是1-based,所以 -1 后变成0-based的结束位置)
                 });
             }
         }

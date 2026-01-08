@@ -29,7 +29,7 @@ result2 <- testFunction()
         var request = new RenameParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(1, 17), // testFunction 定义位置 (based on symbol table)
+            Position = new Position(1, 5), // testFunction 定义位置的第一个字符
             NewName = "newFunctionName"
         };
 
@@ -51,10 +51,10 @@ result2 <- testFunction()
         }
 
         // 验证编辑位置覆盖了所有的 testFunction
-        var positions = textEdits.Select(e => (e.Range.Start.Line, e.Range.Start.Character)).ToList();
-        Assert.Contains((1, 17), positions); // 定义位置
-        Assert.Contains((5, 23), positions); // 第一个调用
-        Assert.Contains((6, 23), positions); // 第二个调用
+        var positions = textEdits.Select(e => (e.Range.Start.Line, e.Range.Start.Character)).OrderBy(p => p.Line).ThenBy(p => p.Character).ToList();
+        Assert.Contains((1, 5), positions); // 定义位置
+        Assert.Contains((5, 11), positions); // 第一个调用
+        Assert.Contains((6, 11), positions); // 第二个调用
     }
 
     [Fact]
@@ -172,7 +172,7 @@ result2 <- user.getName()
         var request = new RenameParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(12, 16), // user.name 中的 name
+            Position = new Position(10, 16), // user.name 中的 name  (Line 10, 'name' starts at column 16)
             NewName = "fullName"
         };
 
@@ -185,7 +185,7 @@ result2 <- user.getName()
         Assert.True(result.Changes.ContainsKey(new Uri(uri)));
         
         var textEdits = result.Changes[new Uri(uri)].ToList();
-        Assert.Equal(2, textEdits.Count); // 1个定义 + 1个引用
+        Assert.Equal(3, textEdits.Count); // 1个定义 + 2个引用 (this.name 和 user.name)
 
         // 验证所有编辑都将 name 替换为 fullName
         foreach (var edit in textEdits)
@@ -220,7 +220,7 @@ result <- user.getName()
         var request = new RenameParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(12, 15), // user.getName() 中的 getName
+            Position = new Position(10, 15), // user.getName() 中的 getName (Line 10, 'getName' starts at column 15)
             NewName = "getFullName"
         };
 
@@ -357,7 +357,7 @@ func testFunction() -> int {
         var request = new RenameParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(1, 15), // func 后面的空格位置
+            Position = new Position(1, 4), // func 后面的空格位置
             NewName = "newName"
         };
 
