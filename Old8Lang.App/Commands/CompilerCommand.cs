@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Old8Lang.Interpreter;
+using Old8Lang.LangParser;
 
 namespace Old8Lang.App.Commands;
 
@@ -10,7 +11,7 @@ public class CompilerCommand : ICommand
 {
     public string Name => "-c";
     public string Description => "编译并执行指定的 .old8 或 .ol 文件";
-    public string Help => "使用: Old8Lang.App -c <文件名>";
+    public string Help => "使用: Old8Lang.App -c <文件名> [-D SYMBOL1] [-D SYMBOL2] ...";
 
     public int Execute(string[] args)
     {
@@ -21,8 +22,25 @@ public class CompilerCommand : ICommand
             return 1;
         }
 
+        // 解析命令行参数
+        var fileName = args[0];
+        var symbols = new List<string>();
+
+        // 解析 -D 参数
+        for (int i = 1; i < args.Length; i++)
+        {
+            if (args[i] == "-D" && i + 1 < args.Length)
+            {
+                symbols.Add(args[i + 1]);
+                i++; // 跳过符号名
+            }
+        }
+
+        // 总是创建预编译符号管理器（即使没有符号也可以处理#define等指令）
+        PreprocessorSymbols preprocessorSymbols = new PreprocessorSymbols(symbols);
+
         // 验证文件扩展名
-        var ext = Path.GetExtension(args[0]).ToLower();
+        var ext = Path.GetExtension(fileName).ToLower();
         if (ext != ".old8" && ext != ".ol")
         {
             Console.WriteLine($"不支持的文件扩展名: {ext}，仅支持 .old8 和 .ol 文件");
@@ -36,14 +54,14 @@ public class CompilerCommand : ICommand
         {
             // 测量解析时间
             stopwatch.Start();
-            var ast = interpreter.Build(Apis.FromFile(args[0]), args[0]);
+            var ast = interpreter.Build(Apis.FromFile(fileName), fileName, preprocessorSymbols);
             stopwatch.Stop();
             var parseTime = stopwatch.Elapsed.TotalMilliseconds;
             var timeInfo = $"------------------\nParser Build Time : {parseTime}ms\n";
             var totalTime = parseTime;
 
             // 编译代码
-            var compiledAction = Compiler.Compiler.Compile(ast, args[0], interpreter);
+            var compiledAction = Compiler.Compiler.Compile(ast, fileName, interpreter);
 
             // 测量执行时间
             stopwatch.Restart();

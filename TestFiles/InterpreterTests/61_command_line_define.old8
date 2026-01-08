@@ -1,0 +1,22 @@
+// 测试命令行 -D 参数
+// 运行方式: dotnet run --project Old8Lang.App -- -f 61_command_line_define.old8 -D PRODUCTION -D FAST_MODE
+
+PrintLine("=== 测试命令行 -D 参数 ===")
+
+#if PRODUCTION
+    PrintLine("PRODUCTION 模式（通过 -D 定义）")
+#else
+    PrintLine("开发模式")
+#endif
+
+#if FAST_MODE
+    PrintLine("FAST_MODE 已启用（通过 -D 定义）")
+#else
+    PrintLine("FAST_MODE 未启用")
+#endif
+
+#if PRODUCTION && FAST_MODE
+    PrintLine("生产环境 + 快速模式")
+#endif
+
+PrintLine("测试完成")

@@ -1,0 +1,27 @@
+// 测试编译器模式下的预编译指令
+
+#define DEBUG
+#define FEATURE_A
+
+func testPreprocessor() -> void {
+    PrintLine("=== 编译器模式预编译测试 ===")
+
+    #if DEBUG
+        PrintLine("DEBUG 模式已启用")
+    #else
+        PrintLine("DEBUG 模式未启用")
+    #endif
+
+    #if FEATURE_A
+        PrintLine("FEATURE_A 已启用")
+    #else
+        PrintLine("FEATURE_A 未启用")
+    #endif
+
+    #if DEBUG && FEATURE_A
+        PrintLine("DEBUG 和 FEATURE_A 都已启用")
+    #endif
+}
+
+testPreprocessor()
+PrintLine("测试完成")

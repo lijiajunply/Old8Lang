@@ -1,4 +1,5 @@
 using Old8Lang.Interpreter;
+using Old8Lang.LangParser;
 
 namespace Old8Lang.App.Commands;
 
@@ -9,7 +10,7 @@ public class FromFileCommand : ICommand
 {
     public string Name => "-f";
     public string Description => "解释执行指定的 .old8 或 .ol 文件";
-    public string Help => "使用: Old8Lang.App -f <文件名>";
+    public string Help => "使用: Old8Lang.App -f <文件名> [-D SYMBOL1] [-D SYMBOL2] ...";
 
     public int Execute(string[] args)
     {
@@ -20,12 +21,29 @@ public class FromFileCommand : ICommand
             return 1;
         }
 
+        // 解析命令行参数
+        var fileName = args[0];
+        var symbols = new List<string>();
+
+        // 解析 -D 参数
+        for (int i = 1; i < args.Length; i++)
+        {
+            if (args[i] == "-D" && i + 1 < args.Length)
+            {
+                symbols.Add(args[i + 1]);
+                i++; // 跳过符号名
+            }
+        }
+
+        // 总是创建预编译符号管理器（即使没有符号也可以处理#define等指令）
+        PreprocessorSymbols preprocessorSymbols = new PreprocessorSymbols(symbols);
+
         var langInterpreter = new LangInterpreter();
 
         try
         {
-            var code = Apis.FromFile(args[0]);
-            var ast = langInterpreter.Build(code, args[0]);
+            var code = Apis.FromFile(fileName);
+            var ast = langInterpreter.Build(code, fileName, preprocessorSymbols);
             ast.Run(langInterpreter.Manager);
             return 0;
         }

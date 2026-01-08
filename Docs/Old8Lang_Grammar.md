@@ -3034,3 +3034,111 @@ Old8Lang 是一个功能完整的动态类型语言，结合了脚本语言的�
 - ✅ 异常处理
 - ✅ 函数式编程（Lambda、高阶函数）
 - ✅ 丰富的集合操作
+
+## 预编译指令
+
+Old8Lang 支持类似于 C# 的预编译指令，用于条件编译。
+
+### 支持的指令
+
+#### #define
+定义一个预编译符号。
+
+```old8
+#define DEBUG
+#define FEATURE_A
+```
+
+#### #undef
+取消定义一个预编译符号。
+
+```old8
+#undef DEBUG
+```
+
+#### #if
+开始一个条件编译块。
+
+```old8
+#if DEBUG
+    PrintLine("调试模式")
+#endif
+```
+
+#### #elif
+否则如果条件。
+
+```old8
+#if DEBUG
+    PrintLine("调试模式")
+#elif RELEASE
+    PrintLine("发布模式")
+#endif
+```
+
+#### #else
+否则分支。
+
+```old8
+#if DEBUG
+    PrintLine("调试模式")
+#else
+    PrintLine("发布模式")
+#endif
+```
+
+#### #endif
+结束条件编译块。必须与 `#if` 配对使用。
+
+### 条件表达式
+
+预编译指令支持以下逻辑运算符：
+
+- `!` - 逻辑非
+- `&&` - 逻辑与
+- `||` - 逻辑或
+- `()` - 括号分组
+
+示例：
+
+```old8
+#define DEBUG
+#define FEATURE_A
+
+#if DEBUG && FEATURE_A
+    PrintLine("DEBUG 和 FEATURE_A 都已启用")
+#endif
+
+#if DEBUG || RELEASE
+    PrintLine("DEBUG 或 RELEASE 至少一个启用")
+#endif
+
+#if !PRODUCTION
+    PrintLine("非生产环境")
+#endif
+
+#if DEBUG && (FEATURE_A || FEATURE_B)
+    PrintLine("复杂条件")
+#endif
+```
+
+### 命令行参数
+
+可以通过命令行 `-D` 参数预定义符号：
+
+```bash
+# 解释器模式
+dotnet run --project Old8Lang.App -- -f test.old8 -D DEBUG -D FEATURE_A
+
+# 编译器模式
+dotnet run --project Old8Lang.App -- -c test.old8 -D PRODUCTION -D FAST_MODE
+```
+
+### 注意事项
+
+1. 预编译指令必须在行首（忽略前导空格）
+2. 预编译指令不能出现在字符串或注释中
+3. `#if` 必须有对应的 `#endif`
+4. 未激活的代码块会被完全移除，不参与后续解析
+5. 预编译指令在词法分析之前处理
+

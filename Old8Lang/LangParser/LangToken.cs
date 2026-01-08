@@ -101,6 +101,35 @@ public static class LangTokenizer
     public static (List<LangToken> tokens, List<LangToken> headerDirectives, List<LangToken> docComments)
         TokenizeWithDirectivesAndDocs(string code)
     {
+        return TokenizeWithDirectivesAndDocs(code, null);
+    }
+
+    /// <summary>
+    /// 将Old8Lang源代码转换为标记流（支持预编译符号）
+    /// </summary>
+    /// <param name="code">要分析的Old8Lang源代码</param>
+    /// <param name="preprocessorSymbols">预编译符号管理器（可选，如果为null则不处理预编译指令）</param>
+    /// <returns>包含所有标记的列表、文件头指令和文档注释的元组</returns>
+    /// <exception cref="Error.SyntaxError">当遇到无法识别的字符时抛出</exception>
+    /// <remarks>
+    /// 该方法执行以下步骤：
+    /// 0. 如果提供了预编译符号管理器，先处理预编译指令（#if, #define等）
+    /// 1. 过滤掉源代码中的注释，同时提取文件头指令和文档注释
+    /// 2. 逐字符扫描源代码
+    /// 3. 识别并生成各种类型的标记
+    /// 4. 将文档注释 Token 插入到标记流的合适位置
+    /// 5. 返回完整的标记列表、文件头指令和文档注释
+    /// </remarks>
+    public static (List<LangToken> tokens, List<LangToken> headerDirectives, List<LangToken> docComments)
+        TokenizeWithDirectivesAndDocs(string code, PreprocessorSymbols? preprocessorSymbols)
+    {
+        // 0. 如果提供了预编译符号管理器，先处理预编译指令
+        if (preprocessorSymbols != null)
+        {
+            var preprocessor = new PreprocessorTokenizer(code, preprocessorSymbols);
+            code = preprocessor.Process();
+        }
+
         var tokens = new List<LangToken>();
 
         // 先过滤掉源代码中的注释，同时提取文件头指令和文档注释
@@ -834,7 +863,19 @@ public static class LangTokenizer
     /// <returns>包含所有标记的列表和文件头指令的元组</returns>
     public static (List<LangToken> tokens, List<LangToken> headerDirectives) TokenizeWithDirectives(string code)
     {
-        var (tokens, headerDirectives, _) = TokenizeWithDirectivesAndDocs(code);
+        var (tokens, headerDirectives, _) = TokenizeWithDirectivesAndDocs(code, null);
+        return (tokens, headerDirectives);
+    }
+
+    /// <summary>
+    /// 将Old8Lang源代码转换为标记流（向后兼容版本，支持预编译符号）
+    /// </summary>
+    /// <param name="code">要分析的Old8Lang源代码</param>
+    /// <param name="preprocessorSymbols">预编译符号管理器</param>
+    /// <returns>包含所有标记的列表和文件头指令的元组</returns>
+    public static (List<LangToken> tokens, List<LangToken> headerDirectives) TokenizeWithDirectives(string code, PreprocessorSymbols? preprocessorSymbols)
+    {
+        var (tokens, headerDirectives, _) = TokenizeWithDirectivesAndDocs(code, preprocessorSymbols);
         return (tokens, headerDirectives);
     }
 
@@ -845,7 +886,18 @@ public static class LangTokenizer
     /// <returns>包含所有标记的列表</returns>
     public static List<LangToken> Tokenize(string code)
     {
-        return TokenizeWithDirectives(code).tokens;
+        return TokenizeWithDirectives(code, null).tokens;
+    }
+
+    /// <summary>
+    /// 将Old8Lang源代码转换为标记流（向后兼容版本，支持预编译符号）
+    /// </summary>
+    /// <param name="code">要分析的Old8Lang源代码</param>
+    /// <param name="preprocessorSymbols">预编译符号管理器</param>
+    /// <returns>包含所有标记的列表</returns>
+    public static List<LangToken> Tokenize(string code, PreprocessorSymbols? preprocessorSymbols)
+    {
+        return TokenizeWithDirectives(code, preprocessorSymbols).tokens;
     }
 }
 

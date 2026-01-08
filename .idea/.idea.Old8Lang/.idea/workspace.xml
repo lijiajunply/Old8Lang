@@ -23,13 +23,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/Old8Lang.Benchmarks.ParserBenchmarkTests-20260108-231636.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report-github.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Compiler/Basic/PreprocessorCompilerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/PreprocessorEdgeCasesTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Interpreter/Basic/PreprocessorInterpreterTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/Basic/PreprocessorTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/Parser/ErrorCases/PreprocessorErrorTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/PreprocessorSymbols.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/PreprocessorTokenizer.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/CompilerTests/60_preprocessor_directives.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/InterpreterTests/60_preprocessor_directives.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TestFiles/InterpreterTests/61_command_line_define.old8" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report-github.md" beforeDir="false" afterPath="$PROJECT_DIR$/BenchmarkDotNet.Artifacts/results/Old8Lang.Benchmarks.ParserBenchmarkTests-report-github.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Benchmarks/ParserBenchmarkTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/ParserBenchmarkTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/Old8Lang_Grammar.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/CompilerCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/CompilerCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Commands/FromFileCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Commands/FromFileCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/LangInterpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/LangInterpreter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangTokenType.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -563,7 +573,7 @@
       <workItem from="1767434122437" duration="2457000" />
       <workItem from="1767519232104" duration="38266000" />
       <workItem from="1767815939091" duration="4003000" />
-      <workItem from="1767865400494" duration="4472000" />
+      <workItem from="1767865400494" duration="8670000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -908,7 +918,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="552" />
+    <option name="localTasksCounter" value="553" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -935,7 +945,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(install): 重构包安装功能使用 PackageService&#10;&#10;- 将 InstallPackage 方法参数增加 config 和 projectRoot&#10;- 使用 PackageService 替代原有的模拟包下载逻辑&#10;- 添加 InstallPackageAsync 异步方法支持&#10;- 修改 PackageService 中 InstallPackageAsync 为公共方法&#10;- 更新 IDE 配置文件中的 XML 实体编码格式" />
     <MESSAGE value="feat(compiler): 实现 select 语句的编译模式支持&#10;&#10;- ✅ 完全支持解释器模式（-f）和编译器模式（-c）&#10;- IL 代码生成实现正确的通道轮询逻辑&#10;- 移除编译器模式下 select 语句不支持的限制说明" />
     <MESSAGE value="feat(compiler): 实现默认参数的编译模式支持&#10;&#10;- 移除默认参数在编译器模式下的已知限制说明&#10;- 添加完整的默认参数编译模式测试套件&#10;- 验证基本默认参数、多参数、类型推断等功能&#10;- 确保解释器和编译器模式下行为一致&#10;- 更新项目配置文件和工作区设置" />
     <MESSAGE value="feat(compiler): 实现泛型函数的编译模式支持&#10;&#10;- 添加泛型函数特化机制，支持泛型函数的运行时特化&#10;- 实现 GenericMethodSpecializer 类用于创建泛型函数的具体类型版本&#10;- 添加 GenericTypeResolver 用于在编译时解析泛型参数类型&#10;- 修改 FuncInit.cs 支持泛型函数的注册和参数信息存储&#10;- 更新 FunctionCallExpression 支持泛型函数的编译模式调用&#10;- 实现 GenericInstanceExpression 中的泛型函数调用逻辑&#10;- 扩展 LocalManager 添加泛型函数缓存和类型解析器支持&#10;- 修改 LangId 类型解析逻辑以支持泛型上下文中的类型解析" />
@@ -960,7 +969,8 @@
     <MESSAGE value="fix(interpreter): 修复生成器中函数调用的控制流状态管理问题&#10;&#10;- 在BlockStatement中保存和恢复IsReturn标志，防止普通函数调用影响生成器控制流&#10;- 在FuncLangValue中保存和恢复IsReturn标志，确保函数调用不影响外部生成器上下文&#10;- 在FuncLangValue中保存和清除生成器上下文，防止函数内部错误操作生成器状态&#10;- 恢复函数调用前的原始生成器上下文，避免嵌套调用时的状态污染&#10;- 移除IL验证测试中的跳过标记，启用相关功能测试&#10;- 更新工作空间配置文件中的变更记录和任务计数" />
     <MESSAGE value="refactor(testapp): 简化计数器应用的程序结构&#10;&#10;- 移除 Program 类和 Main 方法的包装结构&#10;- 将应用初始化和运行逻辑直接放在全局作用域&#10;- 删除多余的 RunSimpleTest 方法封装&#10;- 移除测试应用的 README.md 说明文件&#10;- 更新 IDE 配置文件中的启动项目设置&#10;- 调整工作空间配置文件的任务计数和变更记录" />
     <MESSAGE value="chore(benchmark): 移除编译器性能测试日志文件&#10;&#10;- 删除了旧的编译器基准测试日志文件&#10;- 清理了相关的性能测试输出记录&#10;- 移除了包含错误信息的基准测试结果文件&#10;- 更新了测试环境的配置状态" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore(benchmark): 移除编译器性能测试日志文件&#10;&#10;- 删除了旧的编译器基准测试日志文件&#10;- 清理了相关的性能测试输出记录&#10;- 移除了包含错误信息的基准测试结果文件&#10;- 更新了测试环境的配置状态" />
+    <MESSAGE value="feat(benchmark): 更新解析器基准测试代码和结果&#10;&#10;- 修改 ParseLargeFile 测试中的循环结构为条件判断语句&#10;- 更新泛型语法解析测试中的函数声明语法格式&#10;- 调整 Lambda 表达式解析测试中的参数类型声明方式&#10;- 优化 Match 表达式解析测试中的模式匹配语法&#10;- 修正基准测试报告中的格式错误和清理日志文件&#10;- 更新 IDE 工作区配置中的变更记录和任务计数" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(benchmark): 更新解析器基准测试代码和结果&#10;&#10;- 修改 ParseLargeFile 测试中的循环结构为条件判断语句&#10;- 更新泛型语法解析测试中的函数声明语法格式&#10;- 调整 Lambda 表达式解析测试中的参数类型声明方式&#10;- 优化 Match 表达式解析测试中的模式匹配语法&#10;- 修正基准测试报告中的格式错误和清理日志文件&#10;- 更新 IDE 工作区配置中的变更记录和任务计数" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

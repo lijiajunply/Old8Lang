@@ -1,0 +1,61 @@
+// 测试预编译指令功能
+
+#define DEBUG
+#define FEATURE_A
+
+PrintLine("=== 测试 #if DEBUG ===")
+#if DEBUG
+    PrintLine("DEBUG 模式已启用")
+#else
+    PrintLine("DEBUG 模式未启用")
+#endif
+
+PrintLine("=== 测试 #if FEATURE_A ===")
+#if FEATURE_A
+    PrintLine("FEATURE_A 已启用")
+#else
+    PrintLine("FEATURE_A 未启用")
+#endif
+
+PrintLine("=== 测试 #if !FEATURE_B ===")
+#if !FEATURE_B
+    PrintLine("FEATURE_B 未定义")
+#else
+    PrintLine("FEATURE_B 已定义")
+#endif
+
+PrintLine("=== 测试 #if DEBUG && FEATURE_A ===")
+#if DEBUG && FEATURE_A
+    PrintLine("DEBUG 和 FEATURE_A 都已启用")
+#else
+    PrintLine("DEBUG 和 FEATURE_A 没有都启用")
+#endif
+
+PrintLine("=== 测试 #if DEBUG || FEATURE_B ===")
+#if DEBUG || FEATURE_B
+    PrintLine("DEBUG 或 FEATURE_B 至少一个启用")
+#else
+    PrintLine("DEBUG 和 FEATURE_B 都未启用")
+#endif
+
+#define RELEASE
+#undef DEBUG
+
+PrintLine("=== 测试 #undef DEBUG ===")
+#if DEBUG
+    PrintLine("DEBUG 仍然启用")
+#elif RELEASE
+    PrintLine("DEBUG 已取消，RELEASE 已启用")
+#else
+    PrintLine("DEBUG 和 RELEASE 都未启用")
+#endif
+
+PrintLine("=== 测试嵌套 #if ===")
+#if RELEASE
+    PrintLine("RELEASE 模式")
+    #if FEATURE_A
+        PrintLine("  - 包含 FEATURE_A")
+    #endif
+#endif
+
+PrintLine("所有测试完成")

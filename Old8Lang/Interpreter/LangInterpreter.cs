@@ -81,14 +81,27 @@ public class LangInterpreter
     /// <exception cref="SyntaxError">当代码语法错误时抛出</exception>
     public BlockStatement Build(string code, string? fileName = null)
     {
+        return Build(code, fileName, null);
+    }
+
+    /// <summary>
+    /// 支持传递文件名和预编译符号以获取更准确的错误信息
+    /// </summary>
+    /// <param name="code">要编译的Old8Lang代码</param>
+    /// <param name="fileName">源代码文件名（可选）</param>
+    /// <param name="preprocessorSymbols">预编译符号管理器（可选）</param>
+    /// <returns>表示整个程序的块语句</returns>
+    /// <exception cref="SyntaxError">当代码语法错误时抛出</exception>
+    public BlockStatement Build(string code, string? fileName, LangParser.PreprocessorSymbols? preprocessorSymbols)
+    {
         SourceCode = code;
         Manager.Path = fileName ?? "";
 
         // 设置当前解释器，以便在错误处理中使用
         Old8Exception.CurrentInterpreter = this;
 
-        // 词法分析：将代码转换为标记流和文件头指令
-        var (tokens, headerDirectives) = LangTokenizer.TokenizeWithDirectives(code);
+        // 词法分析：将代码转换为标记流和文件头指令（支持预编译指令）
+        var (tokens, headerDirectives) = LangTokenizer.TokenizeWithDirectives(code, preprocessorSymbols);
         if (tokens == null) throw new SyntaxError(new SourcePosition(1, 1), "语法出错");
 
         // 语法分析：将标记流转换为抽象语法树

@@ -415,7 +415,37 @@ public enum LangTokenType
     /// <summary>
     /// 文档注释 (///...)
     /// </summary>
-    DocComment
+    DocComment,
+
+    /// <summary>
+    /// 预编译指令 - #define
+    /// </summary>
+    PreprocessorDefine,
+
+    /// <summary>
+    /// 预编译指令 - #undef
+    /// </summary>
+    PreprocessorUndef,
+
+    /// <summary>
+    /// 预编译指令 - #if
+    /// </summary>
+    PreprocessorIf,
+
+    /// <summary>
+    /// 预编译指令 - #elif
+    /// </summary>
+    PreprocessorElif,
+
+    /// <summary>
+    /// 预编译指令 - #else
+    /// </summary>
+    PreprocessorElse,
+
+    /// <summary>
+    /// 预编译指令 - #endif
+    /// </summary>
+    PreprocessorEndif
 }
 
 public enum KeywordType
