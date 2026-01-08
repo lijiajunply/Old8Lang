@@ -156,50 +156,7 @@ public class SymbolFinder
 
         System.Diagnostics.Debug.WriteLine($"FindTokenAtPosition: LSP({line},{column})");
 
-        // 如果有源代码，直接从源代码中查找
-        if (sourceCode != null)
-        {
-            var lines = sourceCode.Split('\n');
-            if (targetLine < 0 || targetLine >= lines.Length)
-            {
-                System.Diagnostics.Debug.WriteLine($"  -> Line out of range");
-                return null;
-            }
-
-            var lineText = lines[targetLine];
-            if (targetColumn < 0 || targetColumn >= lineText.Length)
-            {
-                System.Diagnostics.Debug.WriteLine($"  -> Column out of range");
-                return null;
-            }
-
-            // 找到该行上的所有 tokens
-            var lineTokens = tokens.Where(t => t.Line == targetLine + 1).ToList(); // token Line 是1-based
-
-            // 在源代码中查找光标位置对应的 token
-            foreach (var token in lineTokens)
-            {
-                // 在行文本中查找token的位置
-                var tokenIndex = lineText.IndexOf(token.Value, StringComparison.Ordinal);
-                while (tokenIndex >= 0)
-                {
-                    var tokenEnd = tokenIndex + token.Value.Length - 1;
-                    if (targetColumn >= tokenIndex && targetColumn <= tokenEnd)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"  -> Found: '{token.Value}' at column {tokenIndex}");
-                        return token;
-                    }
-
-                    // 继续查找下一个出现的位置
-                    tokenIndex = lineText.IndexOf(token.Value, tokenIndex + 1, StringComparison.Ordinal);
-                }
-            }
-
-            System.Diagnostics.Debug.WriteLine($"  -> Not found in source");
-            return null;
-        }
-
-        // 旧逻辑（使用 token.Column，已知有问题）
+        // Token的行列号都是1-based，需要转换
         var targetLineToken = line + 1;
         var targetColumnToken = column + 1;
 
@@ -207,6 +164,7 @@ public class SymbolFinder
         {
             if (token.Line == targetLineToken)
             {
+                // token.Column 是1-based，指向token的第一个字符
                 var tokenEndColumn = token.Column + token.Value.Length - 1;
 
                 System.Diagnostics.Debug.WriteLine($"  Checking token: '{token.Value}' at ({token.Line},{token.Column})-({token.Line},{tokenEndColumn})");

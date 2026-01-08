@@ -157,7 +157,7 @@ public static class LangTokenizer
             if (code[i] == '\n')
             {
                 line++;
-                column = i;
+                column = i + 1;  // 下一行从换行符之后的下一个字符开始
                 continue;
             }
 
@@ -336,7 +336,7 @@ public static class LangTokenizer
                         if (code[i] == '\n')
                         {
                             line++;
-                            column = i;
+                            column = i + 1;
                         }
 
                         sb.Append(code[i]);
@@ -452,7 +452,7 @@ public static class LangTokenizer
                         if (code[i] == '\n')
                         {
                             line++;
-                            column = i;
+                            column = i + 1;
                         }
 
                         sb.Append(code[i]);
@@ -724,6 +724,7 @@ public static class LangTokenizer
 
             if (char.IsDigit(code[i]))
             {
+                var startIndex = i; // 记录数字起始位置
                 var sb = new StringBuilder(code[i].ToString());
                 while (i + 1 < code.Length && (char.IsDigit(code[i + 1]) || code[i + 1] == '.'))
                 {
@@ -752,12 +753,13 @@ public static class LangTokenizer
                     }
                 }
 
-                tokens.Add(new LangToken(sb.ToString(), LangTokenType.Number, line, i - column));
+                tokens.Add(new LangToken(sb.ToString(), LangTokenType.Number, line, startIndex - column));
                 continue;
             }
 
             if (char.IsLetter(code[i]) || code[i] == '_')
             {
+                var startIndex = i; // 记录标识符起始位置
                 var sb = new StringBuilder(code[i].ToString());
                 while (i + 1 < code.Length &&
                        (char.IsLetter(code[i + 1]) || char.IsDigit(code[i + 1]) || code[i + 1] == '_'))
@@ -766,7 +768,7 @@ public static class LangTokenizer
                     i++;
                 }
 
-                tokens.Add(new LangToken(sb.ToString(), LangTokenType.Identifier, line, i - column));
+                tokens.Add(new LangToken(sb.ToString(), LangTokenType.Identifier, line, startIndex - column));
                 continue;
             }
 

@@ -23,9 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/PreprocessorEdgeCasesTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/EdgeCases/PreprocessorEdgeCasesTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/PreprocessorTokenizer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/PreprocessorTokenizer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolFinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolFinder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/SymbolFinderTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/SymbolFinderTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -560,7 +560,7 @@
       <workItem from="1767434122437" duration="2457000" />
       <workItem from="1767519232104" duration="38266000" />
       <workItem from="1767815939091" duration="4003000" />
-      <workItem from="1767865400494" duration="13252000" />
+      <workItem from="1767865400494" duration="14051000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -905,7 +905,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="557" />
+    <option name="localTasksCounter" value="559" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -932,8 +932,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="test(interpreter): 更新 as-is 表达式测试用例&#10;&#10;- 修改字符串到整数转换测试的输入值从 &quot;abc&quot; 到 &quot;123&quot;&#10;- 调整类型断言从 NullLangValue 到 IntLangValue&#10;- 移除复杂的条件逻辑测试用例&#10;- 修正边界情况测试中的类型断言&#10;- 更新空字符串测试用例为 null 字符&#10;- 添加注释说明未知类型转换结果" />
-    <MESSAGE value="test(using): 移除自定义类dispose方法相关测试用例&#10;&#10;- 移除了UsingStatement_WithDisposableClass_CallsDisposeMethod测试&#10;- 移除了UsingStatement_ExceptionInBlock_DisposeStillCalled测试&#10;- 移除了UsingStatement_NestedDisposableClasses_DisposedInReverseOrder测试&#10;- 移除了UsingStatement_DisposeCalledMultipleTimes_ExecutesOnlyOnce测试&#10;- 移除了UsingStatement_DisposeAccessesInstanceMembers_ExecutesCorrectly测试&#10;- 移除了UsingStatement_MixedResourceTypes_DisposesAllCorrectly测试&#10;- 更新了workspace.xml中的变更列表和任务计数器&#10;- 修改了最后一次提交消息记录" />
     <MESSAGE value="feat(lang): 添加 is not 表达式支持&#10;&#10;- 在词法分析器中添加 IsNot 关键字类型支持&#10;- 实现 &quot;is not&quot; 关键字组合的特殊处理逻辑&#10;- 在表达式解析器中添加 IsNot 操作符优先级处理&#10;- 实现解释器模式下的 IsNot 类型检查功能&#10;- 实现编译模式下的 IsNot 类型检查 IL 生成&#10;- 添加编译和解释器模式的 IsNot 表达式测试用例&#10;- 修复现有 is 表达式测试中的数据类型问题" />
     <MESSAGE value="refactor(core): 优化代码结构并修复类型验证问题&#10;&#10;- 移除多个文件中的冗余 using 指令&#10;- 在 CollectionTypeValidator 中添加空值检查以防止运行时异常&#10;- 修复多处代码格式问题，包括缩进和括号位置&#10;- 简化多个测试文件中的导入声明&#10;- 优化 AST 表达式和值处理的代码结构&#10;- 调整 UI 组件中的布局和手势处理代码&#10;- 改进语言服务器相关组件的依赖管理" />
     <MESSAGE value="fix(compiler): 修复枚举类型访问和代码生成问题&#10;&#10;- 修正枚举值比较时的类型转换，使用 as int 进行安全转换&#10;- 添加枚举类型在 ClassVar 中的类型查找支持&#10;- 实现枚举成员访问的直接整数值加载逻辑&#10;- 修复 ForInStatement 中的局部变量声明和类型转换处理&#10;- 更新 ReturnStatement 中的返回值处理逻辑，支持 try-finally 结构&#10;- 调整 IDE 工作区配置中的变更列表记录和任务计数器" />
@@ -957,7 +955,9 @@
     <MESSAGE value="fix(language-server): 修复符号查找和定义跳转功能&#10;&#10;- 修复 SymbolFinder 中的 FindTokenAtPosition 方法，使用源代码精确查找token位置&#10;- 修正 DefinitionHandlerTests 中的测试位置参数，确保测试准确性&#10;- 在 SymbolTableBuilder 中添加源代码参数以支持位置精确定位&#10;- 实现变量定义位置从token列表中精确查找的功能&#10;- 优化符号位置查找算法，解决光标位置与token匹配的准确性问题&#10;- 更新 DocumentManager 传递源代码到符号表构建器中" />
     <MESSAGE value="fix(language-server): 修复悬停功能中的符号类型显示和符号查找问题&#10;&#10;- 修复变量类型显示格式，对于变量显示&quot;变量名: 类型&quot;格式&#10;- 修正函数、类等符号类型信息的显示逻辑&#10;- 增强SymbolFinder中的符号查找机制，支持变量成员的类型推断回退&#10;- 添加在所有类成员中查找符号的回退机制&#10;- 修正HoverHandlerTests中的测试位置参数以确保测试准确性&#10;- 清理IDE工作区配置中的变更记录" />
     <MESSAGE value="fix(parser): 修复联合类型和交叉类型解析问题&#10;&#10;- 添加 justProcessedOperator 标记跟踪联合类型和交叉类型操作符处理状态&#10;- 修正类型注解解析逻辑，避免在操作符后误判类型注解结束&#10;- 在标识符读取后重置操作符标记状态&#10;- 标记联合类型操作符 | 和交叉类型操作符 &amp; 处理状态&#10;- 修复 SetStatement 中变量获取方法从 GetAny 改为 GetValue&#10;- 更新单元测试中的空值检查语法&#10;- 清理 IDE 配置文件中的变更记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(parser): 修复联合类型和交叉类型解析问题&#10;&#10;- 添加 justProcessedOperator 标记跟踪联合类型和交叉类型操作符处理状态&#10;- 修正类型注解解析逻辑，避免在操作符后误判类型注解结束&#10;- 在标识符读取后重置操作符标记状态&#10;- 标记联合类型操作符 | 和交叉类型操作符 &amp; 处理状态&#10;- 修复 SetStatement 中变量获取方法从 GetAny 改为 GetValue&#10;- 更新单元测试中的空值检查语法&#10;- 清理 IDE 配置文件中的变更记录" />
+    <MESSAGE value="fix(parser): 修复预处理器指令中#define的位置敏感性问题&#10;&#10;- 修复PreprocessorTokenizer中conditionStack的数据结构，从Stack&lt;bool&gt;改为Stack&lt;(bool isActive, bool anyBranchTaken)&gt;&#10;- 更新所有条件判断逻辑以使用新的元组结构中的isActive字段&#10;- 修正ProcessIf、ProcessElif、ProcessElse方法中的分支激活逻辑&#10;- 更新预处理器指令处理方法的参数类型签名&#10;- 修改测试用例Preprocessor_DefineNotAtLineStart_DoesNotDefineSymbol以正确验证异常情况&#10;- 添加调试断点配置以支持预处理器边缘情况测试" />
+    <MESSAGE value="test(language-server): 更新文档解析结果测试用例&#10;&#10;- 修改TestClass中value属性的字符串字面量为多行字符串格式&#10;- 将诊断计数断言从2改为1，使用Assert.Single进行验证&#10;- 更新属性相等性测试为不等性测试，并修改URI比较逻辑&#10;- 添加不同的URI值以正确测试属性不等性场景" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(language-server): 更新文档解析结果测试用例&#10;&#10;- 修改TestClass中value属性的字符串字面量为多行字符串格式&#10;- 将诊断计数断言从2改为1，使用Assert.Single进行验证&#10;- 更新属性相等性测试为不等性测试，并修改URI比较逻辑&#10;- 添加不同的URI值以正确测试属性不等性场景" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

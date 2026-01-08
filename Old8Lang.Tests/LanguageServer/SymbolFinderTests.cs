@@ -36,7 +36,7 @@ result <- testFunction(1, 2)
         };
 
         // Act - Find symbol at function definition
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, 1, 17); // Line 2, column 18 (testFunction)
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, 1, 5); // Line 2, column 6 (testFunction)
 
         // Assert
         Assert.NotNull(symbol);
@@ -58,7 +58,7 @@ result <- testFunction(1, 2)
         var tokens = LangTokenizer.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code, "test.old8");
         var ast = parser.ParseProgram();
-        
+
         var symbolTableBuilder = new SymbolTableBuilder("test.old8", tokens);
         var symbolTable = symbolTableBuilder.Build(ast);
 
@@ -73,7 +73,7 @@ result <- testFunction(1, 2)
         };
 
         // Act - Find symbol at function call
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, 5, 22); // Line 6, column 23 (testFunction call)
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, 5, 10); // Line 6, column 11 (testFunction call)
 
         // Assert
         Assert.NotNull(symbol);
@@ -92,7 +92,7 @@ result <- myVariable + 10
         var tokens = LangTokenizer.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code, "test.old8");
         var ast = parser.ParseProgram();
-        
+
         var symbolTableBuilder = new SymbolTableBuilder("test.old8", tokens);
         var symbolTable = symbolTableBuilder.Build(ast);
 
@@ -107,7 +107,7 @@ result <- myVariable + 10
         };
 
         // Act - Find symbol at variable definition
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, 1, 10); // Line 2, column 11 (myVariable)
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, 1, 0); // Line 2, column 1 (myVariable)
 
         // Assert
         Assert.NotNull(symbol);
@@ -126,7 +126,7 @@ result <- myVariable + 10
         var tokens = LangTokenizer.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code, "test.old8");
         var ast = parser.ParseProgram();
-        
+
         var symbolTableBuilder = new SymbolTableBuilder("test.old8", tokens);
         var symbolTable = symbolTableBuilder.Build(ast);
 
@@ -141,7 +141,7 @@ result <- myVariable + 10
         };
 
         // Act - Find symbol at variable usage
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, 2, 20); // Line 3, column 21 (myVariable usage)
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, 2, 10); // Line 3, column 11 (myVariable usage)
 
         // Assert
         Assert.NotNull(symbol);
@@ -163,7 +163,7 @@ instance <- TestClass()
         var tokens = LangTokenizer.Tokenize(code);
         var parser = new LangParser.LangParser(tokens, code, "test.old8");
         var ast = parser.ParseProgram();
-        
+
         var symbolTableBuilder = new SymbolTableBuilder("test.old8", tokens);
         var symbolTable = symbolTableBuilder.Build(ast);
 
@@ -177,8 +177,15 @@ instance <- TestClass()
             Diagnostics = new List<DiagnosticInfo>()
         };
 
-        // Act - Find symbol at class definition
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, 1, 7); // Line 2, column 8 (TestClass)
+        // Debug: Print tokens on line 2
+        testOutputHelper.WriteLine("Tokens on line 2:");
+        foreach (var token in tokens.Where(t => t.Line == 2))
+        {
+            testOutputHelper.WriteLine($"  Token: '{token.Value}', Type: {token.Type}, Line: {token.Line}, Column: {token.Column}");
+        }
+
+        // Act - Find symbol at class definition (TestClass is at column 7 in 1-based, column 6 in 0-based)
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, 1, 7); // LSP position (1, 7) for 'TestClass'
 
         // Assert
         Assert.NotNull(symbol);
@@ -233,14 +240,37 @@ result <- user.getName()
             }
         }
 
+        // Debug: Print code lines
+        var lines = code.Split('\n');
+        testOutputHelper.WriteLine("\nCode lines:");
+        for (int i = 0; i < lines.Length; i++)
+        {
+            testOutputHelper.WriteLine($"Line {i}: '{lines[i]}'");
+        }
+
+        // Debug: Print tokens containing "getName"
+        testOutputHelper.WriteLine("\nTokens containing 'getName':");
+        foreach (var token in tokens.Where(t => t.Value.Contains("getName")))
+        {
+            testOutputHelper.WriteLine($"  Token: '{token.Value}', Line: {token.Line}, Column: {token.Column}");
+        }
+
+        // Debug: Print tokens on line where we expect to find result <- user.getName()
+        var targetLine = tokens.Where(t => t.Value == "result").FirstOrDefault().Line;
+        testOutputHelper.WriteLine($"\nTokens on line {targetLine}:");
+        foreach (var token in tokens.Where(t => t.Line == targetLine))
+        {
+            testOutputHelper.WriteLine($"  Token: '{token.Value}', Line: {token.Line}, Column: {token.Column}");
+        }
+
         // Act - Find symbol at member access
-        var memberSymbol = SymbolFinder.FindSymbolAtPosition(document, 12, 15); // Line 13, column 16 (getName in user.getName())
+        var memberSymbol = SymbolFinder.FindSymbolAtPosition(document, 10, 15); // Line 11 (0-based: 10), column 15 (getName in user.getName())
 
         // Assert
         Assert.NotNull(memberSymbol);
         Assert.Equal("getName", memberSymbol.Name);
         Assert.Equal(SymbolKind.Method, memberSymbol.Kind);
-        
+
         // Should have parent information
         Assert.NotNull(memberSymbol.Parent);
         Assert.Equal("User", memberSymbol.Parent.Name);
@@ -276,13 +306,13 @@ result <- user.name
         };
 
         // Act - Find symbol at property access
-        var symbol = SymbolFinder.FindSymbolAtPosition(document, 7, 11); // Line 8, column 12 (name in user.name)
+        var symbol = SymbolFinder.FindSymbolAtPosition(document, 6, 15); // Line 7 (0-based: 6), column 15 (name in user.name)
 
         // Assert
         Assert.NotNull(symbol);
         Assert.Equal("name", symbol.Name);
         Assert.Equal(SymbolKind.Property, symbol.Kind);
-        
+
         // Should have parent information
         Assert.NotNull(symbol.Parent);
         Assert.Equal("User", symbol.Parent.Name);
