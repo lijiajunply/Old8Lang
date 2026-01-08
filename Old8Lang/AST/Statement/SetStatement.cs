@@ -73,7 +73,7 @@ public partial class SetStatement : OldStatement
         // 检查是否为首次赋值
         if (Id != null)
         {
-            var existingVariable = manager.GetAny(Id);
+            var existingVariable = manager.GetValue(Id);
             var isInitialAssignment = existingVariable == null;
 
             // 如果有类型注解，进行类型检查

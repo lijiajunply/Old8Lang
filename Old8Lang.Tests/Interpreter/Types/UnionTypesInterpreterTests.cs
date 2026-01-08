@@ -70,7 +70,7 @@ v3 <- value";
 
         Assert.IsType<BoolLangValue>(v1);
         Assert.True(((BoolLangValue)v1).Value);
-        Assert.Equal(456, ((IntLangValue)v2).Value);
+        Assert.Equal(456, ((IntLangValue)v2!).Value);
         Assert.IsType<StringLangValue>(v3);
         Assert.Equal("test", ((StringLangValue)v3).Value);
     }

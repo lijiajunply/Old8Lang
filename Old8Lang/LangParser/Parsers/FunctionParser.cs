@@ -532,6 +532,7 @@ public class FunctionParser(
     public string ParseComplexTypeAnnotation()
     {
         var result = "";
+        var justProcessedOperator = false; // 标记是否刚刚处理了 | 或 & 操作符
 
         // 持续读取类型注解，直到遇到终止符
         while (true)
@@ -552,7 +553,8 @@ public class FunctionParser(
             // 检查是否是下一个语句的开始（标识符 + 赋值符号或冒号）
             // 这种情况表示当前类型注解已经结束
             // 注意：只有在已经读取了一些类型内容后才进行此检查，避免在类型注解刚开始时就误判
-            if (result.Length > 0 && CurrentToken.Type == LangTokenType.Identifier)
+            // 同时，如果刚刚处理了联合类型或交叉类型操作符，不进行此检查，因为操作符后面的类型是当前类型注解的一部分
+            if (result.Length > 0 && !justProcessedOperator && CurrentToken.Type == LangTokenType.Identifier)
             {
                 var nextToken = Peek();
                 if (nextToken.Type == LangTokenType.Colon ||
@@ -568,6 +570,7 @@ public class FunctionParser(
             {
                 result += CurrentToken.Value;
                 CurrentIndex++; // 跳过当前 token
+                justProcessedOperator = false; // 读取了标识符，重置操作符标记
 
                 // 处理泛型类型（例如 List<int>）- 仅对标识符有效
                 if (CurrentToken.Type == LangTokenType.LessThan)
@@ -587,6 +590,7 @@ public class FunctionParser(
             {
                 result += "|";
                 Expect(LangTokenType.Pipe);
+                justProcessedOperator = true; // 标记刚刚处理了操作符
 
                 // 验证 | 后面必须有类型标识符或 null 关键字
                 if (CurrentToken.Type != LangTokenType.Identifier && CurrentToken.Type != LangTokenType.Null)
@@ -599,6 +603,7 @@ public class FunctionParser(
             {
                 result += "&";
                 Expect(LangTokenType.Ampersand);
+                justProcessedOperator = true; // 标记刚刚处理了操作符
 
                 // 验证 & 后面必须有类型标识符
                 if (CurrentToken.Type != LangTokenType.Identifier)
