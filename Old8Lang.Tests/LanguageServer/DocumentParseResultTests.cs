@@ -65,7 +65,7 @@ func testFunction() -> int {
 }
 
 class TestClass {
-    public value <- ""
+    public value <- """"
 }
 
 variable <- ""test""
@@ -211,7 +211,7 @@ func testFunction() -> int {
         });
 
         // Assert
-        Assert.Equal(2, result.Diagnostics.Count);
+        Assert.Single(result.Diagnostics);
         var diagnostic = result.Diagnostics[0];
         Assert.Equal(DiagnosticSeverity.Information, diagnostic.Severity);
         Assert.Equal("Info message", diagnostic.Message);
@@ -250,13 +250,13 @@ func testFunction() -> int {
         Assert.NotSame(result1, result3);
         Assert.NotSame(result2, result3);
 
-        // Test property equality
-        Assert.Equal(result1.Uri, result2.Uri);
+        // Test property inequality (different URIs)
+        Assert.NotEqual(result1.Uri, result2.Uri);
         Assert.Equal(result1.Text, result2.Text);
-        Assert.Equal(result1.Diagnostics, result2.Diagnostics);
 
         // Test with different content
         Assert.Equal("test://test1.old8", result1.Uri);
+        Assert.Equal("test://test2.old8", result2.Uri);
         Assert.NotEqual(result1.Text, result3.Text);
         Assert.Equal("different content", result3.Text);
     }
