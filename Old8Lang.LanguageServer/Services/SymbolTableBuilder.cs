@@ -11,10 +11,11 @@ namespace Old8Lang.LanguageServer.Services;
 /// <summary>
 /// 符号表构建器 - 遍历AST构建符号表
 /// </summary>
-public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null)
+public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, string? sourceCode = null)
 {
     private readonly Dictionary<string, SymbolInfo> _symbolTable = new();
     private readonly List<LangToken>? _tokens = tokens;
+    private readonly string? _sourceCode = sourceCode;
 
     /// <summary>
     /// 构建符号表
@@ -348,7 +349,10 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null)
         if (setStatement.Id == null) return;
 
         var varName = setStatement.Id.IdName;
-        var location = new SourceLocation
+
+        // 尝试从 token 列表中查找变量的位置
+        var tokenLocation = FindVariableLocationFromTokens(varName);
+        var location = tokenLocation ?? new SourceLocation
         {
             Uri = uri,
             Line = setStatement.Position.Line,
@@ -545,7 +549,7 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null)
                     // 检查是否是异步函数定义
                     else if (expectedTokenType == LangTokenType.Func && prevToken.Type == LangTokenType.Async)
                     {
-                        // async func 的情况，需要再向前查找
+                        // async func 的情况，定义从 async 关键字开始
                         isDefinition = true;
                     }
                     // 检查是否是类定义
@@ -556,13 +560,18 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null)
 
                     if (isDefinition)
                     {
+                        // 返回标识符的位置
+                        // 从所在行的文本中查找符号名称的列位置
+                        var line = token.Line - 1; // 转换为0-based
+                        var column = FindColumnInLine(line, symbolName, expectedTokenType);
+
                         return new SourceLocation
                         {
                             Uri = uri,
-                            Line = token.Line - 1, // Token 从 1 开始，LSP 从 0 开始
-                            Column = token.Column - 1,
-                            EndLine = token.Line - 1,
-                            EndColumn = token.Column - 1 + symbolName.Length
+                            Line = line,
+                            Column = column,
+                            EndLine = line,
+                            EndColumn = column + symbolName.Length
                         };
                     }
                 }
@@ -570,5 +579,91 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null)
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// 在指定行中查找符号的列位置
+    /// </summary>
+    private int FindColumnInLine(int line, string symbolName, LangTokenType tokenType)
+    {
+        if (_sourceCode == null) return 0;
+
+        // 将源代码按行分割
+        var lines = _sourceCode.Split('\n');
+        if (line < 0 || line >= lines.Length) return 0;
+
+        var lineText = lines[line];
+
+        // 查找符号名称在该行中的位置
+        var index = lineText.IndexOf(symbolName, StringComparison.Ordinal);
+
+        // 确保找到的是标识符，而不是其他地方的子字符串
+        // 简化处理：返回第一次出现的位置
+        return index >= 0 ? index : 0;
+    }
+
+    /// <summary>
+    /// 从 token 列表中查找变量的定义位置
+    /// </summary>
+    private SourceLocation? FindVariableLocationFromTokens(string varName)
+    {
+        if (_tokens == null) return null;
+
+        // 查找变量定义位置
+        // 变量定义的模式是: identifier <- expression
+        for (int i = 0; i < _tokens.Count - 1; i++)
+        {
+            var token = _tokens[i];
+            var nextToken = _tokens[i + 1];
+
+            // 检查是否是变量定义模式 (identifier <- ...)
+            if (token.Type == LangTokenType.Identifier &&
+                token.Value == varName &&
+                nextToken.Type == LangTokenType.Assignment) // <- 运算符
+            {
+                var line = token.Line - 1; // 转换为0-based
+                var column = FindColumnInLineForVariable(line, varName);
+
+                return new SourceLocation
+                {
+                    Uri = uri,
+                    Line = line,
+                    Column = column,
+                    EndLine = line,
+                    EndColumn = column + varName.Length
+                };
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 在指定行中查找变量的列位置
+    /// </summary>
+    private int FindColumnInLineForVariable(int line, string varName)
+    {
+        if (_sourceCode == null) return 0;
+
+        // 将源代码按行分割
+        var lines = _sourceCode.Split('\n');
+        if (line < 0 || line >= lines.Length) return 0;
+
+        var lineText = lines[line];
+
+        // 查找变量名在该行中的位置
+        // 确保找到的是变量定义(后面跟着 <-)
+        var index = lineText.IndexOf(varName, StringComparison.Ordinal);
+        if (index >= 0)
+        {
+            // 简单验证:检查后面是否有 <-
+            var afterVar = index + varName.Length;
+            if (afterVar < lineText.Length && lineText.Substring(afterVar).TrimStart().StartsWith("<-"))
+            {
+                return index;
+            }
+        }
+
+        return 0;
     }
 }

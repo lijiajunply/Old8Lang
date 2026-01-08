@@ -20,7 +20,7 @@ result <- testFunction(1, 2)
 ";
         var uri = "file:///test.old8";
         var documentManager = new DocumentManager();
-        documentManager.UpdateDocument(uri, code);
+        var document = documentManager.UpdateDocument(uri, code);
 
         var handler = new DefinitionHandler(documentManager);
 
@@ -28,7 +28,7 @@ result <- testFunction(1, 2)
         var request = new DefinitionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(5, 9) // testFunction 开始位置
+            Position = new Position(5, 10) // testFunction 开始位置
         };
 
         // Act
@@ -37,7 +37,7 @@ result <- testFunction(1, 2)
         // Assert
         Assert.NotNull(result);
         Assert.NotEmpty(result);
-        
+
         var location = result.First().Location!;
         Assert.Equal(uri, location.Uri.ToString());
         Assert.Equal(1, location.Range.Start.Line); // func 定义在第2行（0-based）
@@ -64,7 +64,7 @@ instance <- TestClass() // 光标在 TestClass 上
         var request = new DefinitionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(5, 11) // TestClass 开始位置
+            Position = new Position(5, 12) // TestClass 开始位置
         };
 
         // Act
@@ -96,7 +96,7 @@ result <- myVariable + 10 // 光标在 myVariable 上
         var request = new DefinitionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(2, 9) // myVariable 开始位置
+            Position = new Position(2, 10) // myVariable 开始位置
         };
 
         // Act
@@ -153,7 +153,7 @@ result <- user.getName() // 光标在 getName 上
         var request = new DefinitionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(12, 15) // getName 开始位置
+            Position = new Position(10, 15) // getName 开始位置
         };
 
         // Act
