@@ -30,7 +30,7 @@ Apple M4, 1 CPU, 10 logical and 10 physical cores
 | &#39;Parse Generic Syntax&#39;              |          NA |        NA |        NA |      NA |     NA |        NA |
 | &#39;Parse Lambda Expressions&#39;          |          NA |        NA |        NA |      NA |     NA |        NA |
 | &#39;Parse LINQ Syntax&#39;                 |  4,286.3 ns |  12.68 ns |  11.24 ns |  2.3956 | 0.0610 |  19.58 KB |
-| &#39;Parse Match Expressions&#39;           |          NA |        NA |        NA |      NA |     NA |        NA |~~_~~_
+| &#39;Parse Match Expressions&#39;           |          NA |        NA |        NA |      NA |     NA |        NA |
 
 Benchmarks with issues:
   ParserBenchmarkTests.'Parse Large File': DefaultJob

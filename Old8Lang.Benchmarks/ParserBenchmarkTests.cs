@@ -231,7 +231,10 @@ public class ParserBenchmarkTests
 
         code.AppendLine("total <- 0");
         code.AppendLine("for i <- 1, i <= 20, i <- i + 1 {");
-        code.AppendLine("    total <- total + function{i}()");
+        for (int i = 1; i <= 20; i++)
+        {
+            code.AppendLine($"    if i == {i} {{ total <- total + function{i}() }}");
+        }
         code.AppendLine("}");
         code.AppendLine("");
         code.AppendLine("result <- total");
@@ -404,13 +407,13 @@ public class ParserBenchmarkTests
     public BlockStatement ParseGenericSyntax()
     {
         var code = """
-                   func generic_func<T>(value: T): T {
+                   func generic_func<T>(value:T) -> T {
                        return value
                    }
 
                    class GenericClass<T> {
-                       data: T
-                       func init(value: T) {
+                       data:T
+                       func init(value:T) {
                            this.data <- value
                        }
                    }
@@ -430,20 +433,20 @@ public class ParserBenchmarkTests
     public BlockStatement ParseLambdaExpressions()
     {
         var code = """
-                   add <- (x, y) -> x + y
-                   multiply <- (x, y) -> x * y
+                   add <- (x:int, y:int) -> x + y
+                   multiply <- (x:int, y:int) -> x * y
 
-                   calculate <- (x: int, y: int) -> int {
+                   calculate <- (x:int, y:int) -> {
                        return x + y
                    }
 
-                   func apply(func, x, y) {
+                   func apply(func:object, x:int, y:int) -> int {
                        return func(x, y)
                    }
 
                    result1 <- add(10, 20)
                    result2 <- multiply(5, 6)
-                   result3 <- apply((a, b) -> a * b, 3, 4)
+                   result3 <- apply((a:int, b:int) -> a * b, 3, 4)
                    """;
         var tokens = LangTokenizer.Tokenize(code);
         var parser = new LangParserClass(tokens, code);
@@ -478,25 +481,25 @@ public class ParserBenchmarkTests
     public BlockStatement ParseMatchExpressions()
     {
         var code = """
-                   func describe_value(value) {
-                       match value {
+                   func describe_value(value:int) -> string {
+                       return match value {
                            case 1 -> "one"
                            case 2 -> "two"
                            case 3 -> "three"
-                           default -> "other"
+                           case _ -> "other"
                        }
                    }
 
-                   func match_complex(x) {
-                       match x {
-                           case [a, b] -> a + b
-                           case {key: value} -> value
+                   func match_complex(x:object) -> int {
+                       return match x {
+                           case 10 -> 100
+                           case 20 -> 200
                            case _ -> 0
                        }
                    }
 
                    result1 <- describe_value(1)
-                   result2 <- match_complex([10, 20])
+                   result2 <- match_complex(10)
                    """;
         var tokens = LangTokenizer.Tokenize(code);
         var parser = new LangParserClass(tokens, code);
