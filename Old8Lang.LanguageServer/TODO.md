@@ -19,6 +19,7 @@
 - **文档管理（DocumentManager）**: 文档解析、缓存、诊断信息管理
 - **调试和性能分析（DebugProfilerHandler）**: 启用/禁用调试模式和性能分析
 - **Token-Based Location Finding**: 通过token列表获取准确的符号位置（解决AST Position不准确问题）
+- **文档链接（DocumentLinkHandler）**: 为 import 语句提供可点击的文件链接
 
 ### 🔧 部分实现功能
 
@@ -37,6 +38,18 @@
 - 内联值（Inline Values）
 - 折叠范围（Folding Range）
 - 选择范围（Selection Range）
+
+### 🚫 无法实现功能（受限于 OmniSharp 版本）
+
+由于当前使用的 OmniSharp.Extensions.LanguageServer 0.19.9 基于较旧的 LSP 规范，以下功能暂时无法实现：
+
+- **内联提示（InlayHint）**: 需要 LSP 3.16+ 支持，用于显示类型推断和参数名称提示
+- **调用层次（CallHierarchy）**: 需要 LSP 3.16+ 支持，用于显示函数调用关系
+- **类型层次（TypeHierarchy）**: 需要 LSP 3.16+ 支持，用于显示类型继承关系
+
+**解决方案**:
+- 升级到支持 LSP 3.16+ 的更新版本的 OmniSharp（如果有）
+- 或切换到其他支持最新 LSP 规范的 C# Language Server 库
 
 ---
 
@@ -542,5 +555,48 @@ func bar() -> void {
 
 ---
 
-**最后更新**: 2026-01-02 (已完成查找引用、重命名、类成员支持和实时诊断功能)
+#### ~~16. 实现文档链接（Document Link）~~ ✅ 已完成
+**文件**: `Old8Lang.LanguageServer/Handlers/DocumentLinkHandler.cs`
+
+**完成状态**:
+- [x] 实现 `IDocumentLinkHandler` 接口
+- [x] 解析 import 语句中的模块路径
+- [x] 支持相对路径导入（`./`、`../`）
+- [x] 自动解析 `.old8` 文件扩展名
+- [x] 支持目录模块（`__init__.old8`、`index.old8`）
+- [x] 为模块路径创建可点击链接
+- [x] 注册到 Language Server
+
+**功能说明**:
+- 鼠标悬停在 import 语句的模块名上时，显示可点击链接
+- 点击链接可以直接跳转到导入的模块文件
+- 支持本地文件路径解析（相对路径和绝对路径）
+
+**已知限制**:
+- 标准库（Old8LangLib）的链接暂未实现
+- 第三方包的路径解析暂未实现
+- 网络模块的链接不支持
+
+**测试结果**: 构建成功，功能已集成到 LSP 服务器
+
+---
+
+#### 17. 符号信息模型扩展（为调用层次预留）
+**文件**: `Old8Lang.LanguageServer/Models/SymbolInfo.cs`
+
+**完成状态**:
+- [x] 扩展 `SymbolInfo` 类，添加调用关系字段
+- [x] 添加 `Calls` 列表 - 存储此函数调用的其他函数
+- [x] 添加 `CalledBy` 列表 - 存储调用此函数的其他函数
+- [x] 创建 `CallSite` 类 - 存储调用点信息（符号名称和位置）
+
+**功能说明**:
+- 为未来实现调用层次（Call Hierarchy）功能预留数据结构
+- 当 OmniSharp 库升级支持 LSP 3.16+ 后，可快速实现调用层次功能
+
+**注意**: 由于 OmniSharp 0.19.9 不支持 CallHierarchy API，调用关系信息的收集暂未实现
+
+---
+
+**最后更新**: 2026-01-09 (新增文档链接功能，扩展符号信息模型)
 **维护者**: Old8Lang Team

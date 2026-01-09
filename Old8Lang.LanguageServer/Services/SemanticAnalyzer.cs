@@ -6,16 +6,10 @@ namespace Old8Lang.LanguageServer.Services;
 /// <summary>
 /// 语义分析器 - 检测语义错误
 /// </summary>
-public class SemanticAnalyzer
+public class SemanticAnalyzer(DocumentParseResult document)
 {
-    private readonly DocumentParseResult _document;
-    private readonly List<DiagnosticInfo> _diagnostics = new();
-    private readonly HashSet<string> _definedSymbols = new();
-
-    public SemanticAnalyzer(DocumentParseResult document)
-    {
-        _document = document;
-    }
+    private readonly List<DiagnosticInfo> _diagnostics = [];
+    private readonly HashSet<string> _definedSymbols = [];
 
     /// <summary>
     /// 执行语义分析
@@ -25,7 +19,7 @@ public class SemanticAnalyzer
         _diagnostics.Clear();
         _definedSymbols.Clear();
 
-        if (_document.Ast == null || _document.Tokens == null)
+        if (document.Ast == null || document.Tokens == null)
         {
             return _diagnostics;
         }
@@ -44,12 +38,12 @@ public class SemanticAnalyzer
     /// </summary>
     private void CollectDefinedSymbols()
     {
-        if (_document.SymbolTable == null)
+        if (document.SymbolTable == null)
         {
             return;
         }
 
-        foreach (var symbol in _document.SymbolTable.Keys)
+        foreach (var symbol in document.SymbolTable.Keys)
         {
             _definedSymbols.Add(symbol);
         }
@@ -60,7 +54,7 @@ public class SemanticAnalyzer
     /// </summary>
     private void CheckUndefinedSymbols()
     {
-        if (_document.Tokens == null)
+        if (document.Tokens == null)
         {
             return;
         }
@@ -80,9 +74,9 @@ public class SemanticAnalyzer
             "List", "Dict", "Tuple", "Array"
         };
 
-        for (int i = 0; i < _document.Tokens.Count; i++)
+        for (int i = 0; i < document.Tokens.Count; i++)
         {
-            var token = _document.Tokens[i];
+            var token = document.Tokens[i];
 
             if (token.Type != LangTokenType.Identifier)
             {
@@ -103,7 +97,7 @@ public class SemanticAnalyzer
                 !builtInTypes.Contains(symbolName))
             {
                 // 检查是否是成员访问（obj.member）
-                if (i > 0 && _document.Tokens[i - 1].Type == LangTokenType.Dot)
+                if (i > 0 && document.Tokens[i - 1].Type == LangTokenType.Dot)
                 {
                     // 成员访问暂时跳过（需要类型信息）
                     continue;
@@ -126,13 +120,13 @@ public class SemanticAnalyzer
     /// </summary>
     private bool IsDefinitionContext(int tokenIndex)
     {
-        if (tokenIndex <= 0 || _document.Tokens == null)
+        if (tokenIndex <= 0 || document.Tokens == null)
         {
             return false;
         }
 
-        var token = _document.Tokens[tokenIndex];
-        var prevToken = _document.Tokens[tokenIndex - 1];
+        var token = document.Tokens[tokenIndex];
+        var prevToken = document.Tokens[tokenIndex - 1];
 
         // func name(...)
         if (prevToken.Type == LangTokenType.Func || prevToken.Type == LangTokenType.Async)
@@ -147,9 +141,9 @@ public class SemanticAnalyzer
         }
 
         // var <- value (赋值左侧)
-        if (tokenIndex + 1 < _document.Tokens.Count)
+        if (tokenIndex + 1 < document.Tokens.Count)
         {
-            var nextToken = _document.Tokens[tokenIndex + 1];
+            var nextToken = document.Tokens[tokenIndex + 1];
             if (nextToken.Type == LangTokenType.Assignment)
             {
                 return true;
@@ -164,7 +158,7 @@ public class SemanticAnalyzer
     /// </summary>
     public void CheckDuplicateDefinitions()
     {
-        if (_document.SymbolTable == null)
+        if (document.SymbolTable == null)
         {
             return;
         }
@@ -172,7 +166,7 @@ public class SemanticAnalyzer
         var symbolLocations = new Dictionary<string, List<SourceLocation>>();
 
         // 收集所有符号的定义位置
-        foreach (var (name, symbol) in _document.SymbolTable)
+        foreach (var (name, symbol) in document.SymbolTable)
         {
             if (!symbolLocations.ContainsKey(name))
             {
@@ -197,7 +191,7 @@ public class SemanticAnalyzer
                         Source = "Old8Lang Semantic"
                     };
                     _diagnostics.Add(diagnostic);
-                    _document.Diagnostics.Add(diagnostic);
+                    document.Diagnostics.Add(diagnostic);
                 }
             }
         }

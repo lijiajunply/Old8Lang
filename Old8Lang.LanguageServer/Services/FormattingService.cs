@@ -17,9 +17,9 @@ public class FormattingService
         int indentLevel = 0;
         bool inMultilineComment = false;
 
-        for (int i = 0; i < lines.Length; i++)
+        foreach (var t in lines)
         {
-            var line = lines[i].TrimEnd('\r');
+            var line = t.TrimEnd('\r');
             var trimmedLine = line.Trim();
 
             // 处理空行
@@ -34,6 +34,7 @@ public class FormattingService
             {
                 inMultilineComment = true;
             }
+
             if (trimmedLine.EndsWith("*/"))
             {
                 inMultilineComment = false;
@@ -115,7 +116,8 @@ public class FormattingService
     /// <summary>
     /// 格式化选定范围
     /// </summary>
-    public List<TextEdit> FormatRange(string content, OmniSharp.Extensions.LanguageServer.Protocol.Models.Range range, FormattingOptions options)
+    public List<TextEdit> FormatRange(string content, OmniSharp.Extensions.LanguageServer.Protocol.Models.Range range,
+        FormattingOptions options)
     {
         var lines = content.Split('\n');
         var startLine = (int)range.Start.Line;

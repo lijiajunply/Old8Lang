@@ -36,12 +36,12 @@ public class Animation : IAnimation
     /// <summary>
     /// 是否反向播放（悠悠球效果）
     /// </summary>
-    public bool AutoReverse { get; set; } = false;
+    public bool AutoReverse { get; set; }
 
     /// <summary>
     /// 动画延迟（毫秒）
     /// </summary>
-    public int Delay { get; set; } = 0;
+    public int Delay { get; set; }
 
     /// <summary>
     /// 动画状态
@@ -51,7 +51,7 @@ public class Animation : IAnimation
     /// <summary>
     /// 当前进度（0.0 - 1.0）
     /// </summary>
-    public double Progress { get; private set; } = 0;
+    public double Progress { get; private set; }
 
     /// <summary>
     /// 帧率（FPS）

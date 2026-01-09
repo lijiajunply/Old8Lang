@@ -9,15 +9,8 @@ namespace Old8Lang.LanguageServer.Handlers;
 /// <summary>
 /// 签名帮助处理器 - 提供函数参数提示
 /// </summary>
-public class SignatureHelpHandler : ISignatureHelpHandler
+public class SignatureHelpHandler(DocumentManager documentManager) : ISignatureHelpHandler
 {
-    private readonly DocumentManager _documentManager;
-
-    public SignatureHelpHandler(DocumentManager documentManager)
-    {
-        _documentManager = documentManager;
-    }
-
     public SignatureHelpRegistrationOptions GetRegistrationOptions(
         SignatureHelpCapability capability,
         ClientCapabilities clientCapabilities)
@@ -33,7 +26,7 @@ public class SignatureHelpHandler : ISignatureHelpHandler
     public Task<SignatureHelp?> Handle(SignatureHelpParams request, CancellationToken cancellationToken)
     {
         var uri = request.TextDocument.Uri.ToString();
-        var document = _documentManager.GetDocument(uri);
+        var document = documentManager.GetDocument(uri);
 
         if (document?.Tokens == null || document.SymbolTable == null)
         {
@@ -216,23 +209,22 @@ public class SignatureHelpHandler : ISignatureHelpHandler
     {
         var builtInFunctions = new Dictionary<string, (string signature, string? doc, List<(string label, string? doc)> parameters)>
         {
-            ["PrintLine"] = ("PrintLine(value)", "打印一行并换行", new() { ("value", "要打印的值") }),
-            ["Print"] = ("Print(value)", "打印不换行", new() { ("value", "要打印的值") }),
-            ["Input"] = ("Input(prompt:string) -> string", "读取用户输入", new() { ("prompt:string", "提示信息") }),
-            ["ReadLine"] = ("ReadLine() -> string", "读取一行输入", new()),
-            ["Sleep"] = ("Sleep(milliseconds:int)", "休眠指定毫秒数", new() { ("milliseconds:int", "休眠时间（毫秒）") }),
-            ["ToInt"] = ("ToInt(value) -> int", "转换为整数", new() { ("value", "要转换的值") }),
-            ["ToDouble"] = ("ToDouble(value) -> double", "转换为浮点数", new() { ("value", "要转换的值") }),
-            ["ToStr"] = ("ToStr(value) -> string", "转换为字符串", new() { ("value", "要转换的值") }),
-            ["ToBool"] = ("ToBool(value) -> bool", "转换为布尔值", new() { ("value", "要转换的值") }),
-            ["Len"] = ("Len(collection) -> int", "获取集合长度", new() { ("collection", "集合对象") }),
-            ["Type"] = ("Type(value) -> string", "获取值的类型", new() { ("value", "要检查的值") }),
-            ["Range"] = ("Range(start:int, end:int, step:int) -> range", "创建范围对象", new()
-            {
+            ["PrintLine"] = ("PrintLine(value)", "打印一行并换行", [("value", "要打印的值")]),
+            ["Print"] = ("Print(value)", "打印不换行", [("value", "要打印的值")]),
+            ["Input"] = ("Input(prompt:string) -> string", "读取用户输入", [("prompt:string", "提示信息")]),
+            ["ReadLine"] = ("ReadLine() -> string", "读取一行输入", []),
+            ["Sleep"] = ("Sleep(milliseconds:int)", "休眠指定毫秒数", [("milliseconds:int", "休眠时间（毫秒）")]),
+            ["ToInt"] = ("ToInt(value) -> int", "转换为整数", [("value", "要转换的值")]),
+            ["ToDouble"] = ("ToDouble(value) -> double", "转换为浮点数", [("value", "要转换的值")]),
+            ["ToStr"] = ("ToStr(value) -> string", "转换为字符串", [("value", "要转换的值")]),
+            ["ToBool"] = ("ToBool(value) -> bool", "转换为布尔值", [("value", "要转换的值")]),
+            ["Len"] = ("Len(collection) -> int", "获取集合长度", [("collection", "集合对象")]),
+            ["Type"] = ("Type(value) -> string", "获取值的类型", [("value", "要检查的值")]),
+            ["Range"] = ("Range(start:int, end:int, step:int) -> range", "创建范围对象", [
                 ("start:int", "起始值"),
                 ("end:int", "结束值"),
                 ("step:int", "步长")
-            })
+            ])
         };
 
         if (builtInFunctions.TryGetValue(functionName, out var info))

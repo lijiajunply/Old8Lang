@@ -13,7 +13,7 @@ public class DebugProfilerService
 {
     private readonly ConcurrentDictionary<string, DebugSession> _debugSessions = new();
     private readonly ConcurrentDictionary<string, ProfilerSession> _profilerSessions = new();
-    private readonly object _lockObject = new();
+    private readonly Lock _lockObject = new();
 
     /// <summary>
     /// 启动调试会话

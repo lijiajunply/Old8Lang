@@ -30,6 +30,13 @@ class Program
                 .WithHandler<SignatureHelpHandler>()
                 .WithHandler<DocumentFormattingHandler>()
                 .WithHandler<CodeActionHandler>()
+                // 新增 LSP 高级功能
+                .WithHandler<WorkspaceSymbolHandler>()
+                .WithHandler<DocumentHighlightHandler>()
+                .WithHandler<FoldingRangeHandler>()
+                .WithHandler<SemanticTokensHandler>()
+                // 新增更多 LSP 功能
+                .WithHandler<DocumentLinkHandler>()
                 // Debug and Profiler Handlers
                 .WithHandler<StartProfilingHandler>()
                 .WithHandler<StopProfilingHandler>()

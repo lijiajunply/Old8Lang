@@ -1,0 +1,133 @@
+using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
+using OmniSharp.Extensions.LanguageServer.Protocol.Document;
+using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using OmniSharp.Extensions.LanguageServer.Protocol.Workspace;
+using Old8Lang.LanguageServer.Services;
+using Old8Lang.LanguageServer.Models;
+using OmniSharp.Extensions.LanguageServer.Protocol;
+using SymbolKind = Old8Lang.LanguageServer.Models.SymbolKind;
+
+namespace Old8Lang.LanguageServer.Handlers;
+
+/// <summary>
+/// 工作区符号搜索处理器 - 支持跨文件符号搜索
+/// </summary>
+public class WorkspaceSymbolHandler : WorkspaceSymbolsHandlerBase
+{
+    private readonly DocumentManager _documentManager;
+
+    public WorkspaceSymbolHandler(DocumentManager documentManager)
+    {
+        _documentManager = documentManager;
+    }
+
+    public override Task<Container<WorkspaceSymbol>?> Handle(WorkspaceSymbolParams request, CancellationToken cancellationToken)
+    {
+        var query = request.Query?.ToLower() ?? "";
+        var symbols = new List<WorkspaceSymbol>();
+
+        // 遍历所有已打开的文档
+        foreach (var (uri, parseResult) in _documentManager.GetAllDocuments())
+        {
+            if (parseResult?.SymbolTable == null)
+                continue;
+
+            // 遍历符号表
+            foreach (var (symbolName, symbolInfo) in parseResult.SymbolTable)
+            {
+                // 如果查询为空，返回所有符号
+                // 如果查询不为空，检查符号名是否包含查询字符串
+                if (string.IsNullOrEmpty(query) || symbolName.ToLower().Contains(query))
+                {
+                    // 创建工作区符号
+                    var workspaceSymbol = new WorkspaceSymbol
+                    {
+                        Name = symbolInfo.Name,
+                        Kind = ConvertSymbolKind(symbolInfo.Kind),
+                        Location = new Location
+                        {
+                            Uri = DocumentUri.From(symbolInfo.Location.Uri),
+                            Range = new OmniSharp.Extensions.LanguageServer.Protocol.Models.Range(
+                                new Position(symbolInfo.Location.Line, symbolInfo.Location.Column),
+                                new Position(symbolInfo.Location.EndLine, symbolInfo.Location.EndColumn)
+                            )
+                        },
+                        ContainerName = GetContainerName(symbolInfo)
+                    };
+
+                    symbols.Add(workspaceSymbol);
+
+                    // 如果是类，也添加其成员
+                    if (symbolInfo.Kind == SymbolKind.Class)
+                    {
+                        foreach (var (memberName, memberInfo) in symbolInfo.Members)
+                        {
+                            if (string.IsNullOrEmpty(query) || memberName.ToLower().Contains(query))
+                            {
+                                var memberSymbol = new WorkspaceSymbol
+                                {
+                                    Name = memberInfo.Name,
+                                    Kind = ConvertSymbolKind(memberInfo.Kind),
+                                    Location = new Location
+                                    {
+                                        Uri = DocumentUri.From(memberInfo.Location.Uri),
+                                        Range = new OmniSharp.Extensions.LanguageServer.Protocol.Models.Range(
+                                            new Position(memberInfo.Location.Line, memberInfo.Location.Column),
+                                            new Position(memberInfo.Location.EndLine, memberInfo.Location.EndColumn)
+                                        )
+                                    },
+                                    ContainerName = symbolInfo.Name // 成员的容器是类名
+                                };
+
+                                symbols.Add(memberSymbol);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return Task.FromResult<Container<WorkspaceSymbol>?>(symbols);
+    }
+
+    protected override WorkspaceSymbolRegistrationOptions CreateRegistrationOptions(
+        WorkspaceSymbolCapability capability, ClientCapabilities clientCapabilities)
+    {
+        return new WorkspaceSymbolRegistrationOptions
+        {
+            WorkDoneProgress = false
+        };
+    }
+
+    /// <summary>
+    /// 转换符号类型
+    /// </summary>
+    private static OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind ConvertSymbolKind(SymbolKind kind)
+    {
+        return kind switch
+        {
+            SymbolKind.Variable => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Variable,
+            SymbolKind.Function => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Function,
+            SymbolKind.Class => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Class,
+            SymbolKind.Method => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Method,
+            SymbolKind.Property => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Property,
+            SymbolKind.Parameter => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Variable,
+            SymbolKind.Constant => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Constant,
+            _ => OmniSharp.Extensions.LanguageServer.Protocol.Models.SymbolKind.Variable
+        };
+    }
+
+    /// <summary>
+    /// 获取符号的容器名称
+    /// </summary>
+    private static string? GetContainerName(SymbolInfo symbolInfo)
+    {
+        // 如果有父符号，返回父符号的名称
+        if (symbolInfo.Parent != null)
+        {
+            return symbolInfo.Parent.Name;
+        }
+
+        return null;
+    }
+}

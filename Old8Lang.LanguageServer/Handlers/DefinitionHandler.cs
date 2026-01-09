@@ -62,15 +62,8 @@ public class DefinitionHandler(DocumentManager documentManager) : IDefinitionHan
 /// <summary>
 /// 查找引用处理器
 /// </summary>
-public class ReferencesHandler : IReferencesHandler
+public class ReferencesHandler(DocumentManager documentManager) : IReferencesHandler
 {
-    private readonly DocumentManager _documentManager;
-
-    public ReferencesHandler(DocumentManager documentManager)
-    {
-        _documentManager = documentManager;
-    }
-
     public ReferenceRegistrationOptions GetRegistrationOptions(
         ReferenceCapability capability,
         ClientCapabilities clientCapabilities)
@@ -84,7 +77,7 @@ public class ReferencesHandler : IReferencesHandler
     public Task<LocationContainer?> Handle(ReferenceParams request, CancellationToken cancellationToken)
     {
         var uri = request.TextDocument.Uri.ToString();
-        var document = _documentManager.GetDocument(uri);
+        var document = documentManager.GetDocument(uri);
 
         if (document?.SymbolTable == null || document.Tokens == null)
         {

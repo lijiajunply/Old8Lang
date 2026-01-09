@@ -85,15 +85,9 @@ public class HoverHandler(DocumentManager documentManager) : IHoverHandler
         if (!string.IsNullOrEmpty(symbol.Type))
         {
             // 对于变量，显示 "变量名: 类型" 的格式
-            if (symbol.Kind == Models.SymbolKind.Variable)
-            {
-                displayType = $"{symbol.Name}: {symbol.Type}";
-            }
-            else
-            {
+            displayType = symbol.Kind == Models.SymbolKind.Variable ? $"{symbol.Name}: {symbol.Type}" :
                 // 对于函数、类、方法等，Type字段已经包含完整签名，直接使用
-                displayType = symbol.Type;
-            }
+                symbol.Type;
         }
         else
         {

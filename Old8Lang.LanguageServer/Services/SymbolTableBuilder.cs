@@ -428,7 +428,7 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             // 操作表达式 - 处理成员方法调用：outer.createInner()
             case Operation { Opera: LangTokenType.Dot } dotOp:
                 // 成员方法调用：Operation(Dot, objectId, Instance(methodName()))
-                if (dotOp.Left is LangId objectId && dotOp.Right is Instance methodCall)
+                if (dotOp is { Left: LangId objectId, Right: Instance methodCall })
                 {
                     // 获取对象的类型
                     if (_symbolTable.TryGetValue(objectId.IdName, out var objectSymbol))
@@ -456,9 +456,7 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             case FunctionCallExpression funcCall:
                 // 检查函数表达式是否是成员访问 (outer.createInner())
                 // 成员访问会被解析为 Operation(Dot)，left 是对象，right 是方法名
-                if (funcCall.FunctionExpression is Operation { Opera: LangTokenType.Dot } dotOp2 &&
-                    dotOp2.Left is LangId objectId2 &&
-                    dotOp2.Right is LangId methodId2)
+                if (funcCall.FunctionExpression is Operation { Opera: LangTokenType.Dot, Left: LangId objectId2, Right: LangId methodId2 })
                 {
                     // 获取对象的类型
                     if (_symbolTable.TryGetValue(objectId2.IdName, out var objectSymbol2))

@@ -8,15 +8,8 @@ namespace Old8Lang.LanguageServer.Handlers;
 /// <summary>
 /// 文档符号处理器 - 提供文档大纲视图
 /// </summary>
-public class DocumentSymbolHandler : IDocumentSymbolHandler
+public class DocumentSymbolHandler(DocumentManager documentManager) : IDocumentSymbolHandler
 {
-    private readonly DocumentManager _documentManager;
-
-    public DocumentSymbolHandler(DocumentManager documentManager)
-    {
-        _documentManager = documentManager;
-    }
-
     public DocumentSymbolRegistrationOptions GetRegistrationOptions(
         DocumentSymbolCapability capability,
         ClientCapabilities clientCapabilities)
@@ -32,7 +25,7 @@ public class DocumentSymbolHandler : IDocumentSymbolHandler
         CancellationToken cancellationToken)
     {
         var uri = request.TextDocument.Uri.ToString();
-        var document = _documentManager.GetDocument(uri);
+        var document = documentManager.GetDocument(uri);
 
         if (document?.SymbolTable == null)
         {
@@ -76,7 +69,7 @@ public class DocumentSymbolHandler : IDocumentSymbolHandler
                 new Position(symbolInfo.Location.Line, symbolInfo.Location.Column + symbolInfo.Name.Length)
             ),
             Children = symbolInfo.Members.Count > 0
-                ? new Container<DocumentSymbol>(symbolInfo.Members.Values.Select(m => ConvertToDocumentSymbol(m)).ToList())
+                ? new Container<DocumentSymbol>(symbolInfo.Members.Values.Select(ConvertToDocumentSymbol).ToList())
                 : null
         };
 

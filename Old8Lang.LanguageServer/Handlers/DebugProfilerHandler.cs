@@ -13,28 +13,20 @@ namespace Old8Lang.LanguageServer.Handlers;
 [Method("old8lang/startProfiling")]
 public interface IStartProfilingHandler : IJsonRpcRequestHandler<StartProfilingRequest, ProfilerSessionStatusResponse> { }
 
-public class StartProfilingHandler : IStartProfilingHandler
+public class StartProfilingHandler(DebugProfilerService service, ILogger<StartProfilingHandler> logger)
+    : IStartProfilingHandler
 {
-    private readonly DebugProfilerService _service;
-    private readonly ILogger<StartProfilingHandler> _logger;
-
-    public StartProfilingHandler(DebugProfilerService service, ILogger<StartProfilingHandler> logger)
-    {
-        _service = service;
-        _logger = logger;
-    }
-
     public Task<ProfilerSessionStatusResponse> Handle(StartProfilingRequest request, CancellationToken cancellationToken)
     {
         try
         {
-            var session = _service.StartProfilingSession(
+            var session = service.StartProfilingSession(
                 request.Uri,
                 request.SessionName ?? "",
                 request.ExecutionMode
             );
 
-            _logger.LogInformation("Started profiling session for {Uri}", request.Uri);
+            logger.LogInformation("Started profiling session for {Uri}", request.Uri);
 
             return Task.FromResult(new ProfilerSessionStatusResponse
             {
@@ -50,7 +42,7 @@ public class StartProfilingHandler : IStartProfilingHandler
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to start profiling session");
+            logger.LogError(ex, "Failed to start profiling session");
             throw;
         }
     }
@@ -62,22 +54,14 @@ public class StartProfilingHandler : IStartProfilingHandler
 [Method("old8lang/stopProfiling")]
 public interface IStopProfilingHandler : IJsonRpcRequestHandler<StopProfilingRequest, PerformanceReportResponse> { }
 
-public class StopProfilingHandler : IStopProfilingHandler
+public class StopProfilingHandler(DebugProfilerService service, ILogger<StopProfilingHandler> logger)
+    : IStopProfilingHandler
 {
-    private readonly DebugProfilerService _service;
-    private readonly ILogger<StopProfilingHandler> _logger;
-
-    public StopProfilingHandler(DebugProfilerService service, ILogger<StopProfilingHandler> logger)
-    {
-        _service = service;
-        _logger = logger;
-    }
-
     public Task<PerformanceReportResponse> Handle(StopProfilingRequest request, CancellationToken cancellationToken)
     {
         try
         {
-            var summary = _service.StopProfilingSession(request.Uri);
+            var summary = service.StopProfilingSession(request.Uri);
 
             if (summary == null)
             {
@@ -86,7 +70,7 @@ public class StopProfilingHandler : IStopProfilingHandler
 
             var report = GenerateMarkdownReport(summary);
 
-            _logger.LogInformation("Stopped profiling session for {Uri}", request.Uri);
+            logger.LogInformation("Stopped profiling session for {Uri}", request.Uri);
 
             // 从 Session 中提取信息
             var session = summary.Session;
@@ -126,7 +110,7 @@ public class StopProfilingHandler : IStopProfilingHandler
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to stop profiling session");
+            logger.LogError(ex, "Failed to stop profiling session");
             throw;
         }
     }
@@ -178,20 +162,14 @@ public class StopProfilingHandler : IStopProfilingHandler
 [Method("old8lang/getProfilingStatus")]
 public interface IGetProfilingStatusHandler : IJsonRpcRequestHandler<GetProfilingStatusRequest, ProfilerSessionStatusResponse> { }
 
-public class GetProfilingStatusHandler : IGetProfilingStatusHandler
+public class GetProfilingStatusHandler(DebugProfilerService service, ILogger<GetProfilingStatusHandler> logger)
+    : IGetProfilingStatusHandler
 {
-    private readonly DebugProfilerService _service;
-    private readonly ILogger<GetProfilingStatusHandler> _logger;
-
-    public GetProfilingStatusHandler(DebugProfilerService service, ILogger<GetProfilingStatusHandler> logger)
-    {
-        _service = service;
-        _logger = logger;
-    }
+    private readonly ILogger<GetProfilingStatusHandler> _logger = logger;
 
     public Task<ProfilerSessionStatusResponse> Handle(GetProfilingStatusRequest request, CancellationToken cancellationToken)
     {
-        var session = _service.GetProfilingSession(request.Uri);
+        var session = service.GetProfilingSession(request.Uri);
 
         if (session == null)
         {
@@ -223,27 +201,17 @@ public class GetProfilingStatusHandler : IGetProfilingStatusHandler
 [Method("old8lang/startDebugging")]
 public interface IStartDebuggingHandler : IJsonRpcRequestHandler<StartDebuggingRequest, DebugSessionStatusResponse> { }
 
-public class StartDebuggingHandler : IStartDebuggingHandler
+public class StartDebuggingHandler(
+    DebugProfilerService service,
+    DocumentManager documentManager,
+    ILogger<StartDebuggingHandler> logger)
+    : IStartDebuggingHandler
 {
-    private readonly DebugProfilerService _service;
-    private readonly DocumentManager _documentManager;
-    private readonly ILogger<StartDebuggingHandler> _logger;
-
-    public StartDebuggingHandler(
-        DebugProfilerService service,
-        DocumentManager documentManager,
-        ILogger<StartDebuggingHandler> logger)
-    {
-        _service = service;
-        _documentManager = documentManager;
-        _logger = logger;
-    }
-
     public Task<DebugSessionStatusResponse> Handle(StartDebuggingRequest request, CancellationToken cancellationToken)
     {
         try
         {
-            var document = _documentManager.GetDocument(request.Uri);
+            var document = documentManager.GetDocument(request.Uri);
             if (document?.Ast == null)
             {
                 throw new InvalidOperationException($"Document {request.Uri} not found or has no AST");
@@ -251,9 +219,9 @@ public class StartDebuggingHandler : IStartDebuggingHandler
 
             // 创建解释器(无参数构造函数)
             var interpreter = new Old8Lang.Interpreter.LangInterpreter();
-            var session = _service.StartDebugSession(request.Uri, interpreter, document.Ast);
+            var session = service.StartDebugSession(request.Uri, interpreter, document.Ast);
 
-            _logger.LogInformation("Started debug session for {Uri}", request.Uri);
+            logger.LogInformation("Started debug session for {Uri}", request.Uri);
 
             return Task.FromResult(new DebugSessionStatusResponse
             {
@@ -267,7 +235,7 @@ public class StartDebuggingHandler : IStartDebuggingHandler
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to start debug session");
+            logger.LogError(ex, "Failed to start debug session");
             throw;
         }
     }
@@ -279,24 +247,16 @@ public class StartDebuggingHandler : IStartDebuggingHandler
 [Method("old8lang/stopDebugging")]
 public interface IStopDebuggingHandler : IJsonRpcRequestHandler<StopDebuggingRequest, DebugSessionStatusResponse> { }
 
-public class StopDebuggingHandler : IStopDebuggingHandler
+public class StopDebuggingHandler(DebugProfilerService service, ILogger<StopDebuggingHandler> logger)
+    : IStopDebuggingHandler
 {
-    private readonly DebugProfilerService _service;
-    private readonly ILogger<StopDebuggingHandler> _logger;
-
-    public StopDebuggingHandler(DebugProfilerService service, ILogger<StopDebuggingHandler> logger)
-    {
-        _service = service;
-        _logger = logger;
-    }
-
     public Task<DebugSessionStatusResponse> Handle(StopDebuggingRequest request, CancellationToken cancellationToken)
     {
         try
         {
-            _service.StopDebugSession(request.Uri);
+            service.StopDebugSession(request.Uri);
 
-            _logger.LogInformation("Stopped debug session for {Uri}", request.Uri);
+            logger.LogInformation("Stopped debug session for {Uri}", request.Uri);
 
             return Task.FromResult(new DebugSessionStatusResponse
             {
@@ -306,7 +266,7 @@ public class StopDebuggingHandler : IStopDebuggingHandler
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to stop debug session");
+            logger.LogError(ex, "Failed to stop debug session");
             throw;
         }
     }
@@ -318,22 +278,14 @@ public class StopDebuggingHandler : IStopDebuggingHandler
 [Method("old8lang/addBreakpoint")]
 public interface IAddBreakpointHandler : IJsonRpcRequestHandler<BreakpointRequest, bool> { }
 
-public class AddBreakpointHandler : IAddBreakpointHandler
+public class AddBreakpointHandler(DebugProfilerService service, ILogger<AddBreakpointHandler> logger)
+    : IAddBreakpointHandler
 {
-    private readonly DebugProfilerService _service;
-    private readonly ILogger<AddBreakpointHandler> _logger;
-
-    public AddBreakpointHandler(DebugProfilerService service, ILogger<AddBreakpointHandler> logger)
-    {
-        _service = service;
-        _logger = logger;
-    }
-
     public Task<bool> Handle(BreakpointRequest request, CancellationToken cancellationToken)
     {
         try
         {
-            var session = _service.GetDebugSession(request.Uri);
+            var session = service.GetDebugSession(request.Uri);
             if (session == null)
             {
                 throw new InvalidOperationException($"No debug session found for {request.Uri}");
@@ -346,13 +298,13 @@ public class AddBreakpointHandler : IAddBreakpointHandler
                 request.Condition
             );
 
-            _logger.LogInformation("Added breakpoint {Id} at line {Line} in {Uri}", breakpointId, request.Line, request.Uri);
+            logger.LogInformation("Added breakpoint {Id} at line {Line} in {Uri}", breakpointId, request.Line, request.Uri);
 
             return Task.FromResult(true);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to add breakpoint");
+            logger.LogError(ex, "Failed to add breakpoint");
             return Task.FromResult(false);
         }
     }
@@ -364,22 +316,14 @@ public class AddBreakpointHandler : IAddBreakpointHandler
 [Method("old8lang/removeBreakpoint")]
 public interface IRemoveBreakpointHandler : IJsonRpcRequestHandler<BreakpointRequest, bool> { }
 
-public class RemoveBreakpointHandler : IRemoveBreakpointHandler
+public class RemoveBreakpointHandler(DebugProfilerService service, ILogger<RemoveBreakpointHandler> logger)
+    : IRemoveBreakpointHandler
 {
-    private readonly DebugProfilerService _service;
-    private readonly ILogger<RemoveBreakpointHandler> _logger;
-
-    public RemoveBreakpointHandler(DebugProfilerService service, ILogger<RemoveBreakpointHandler> logger)
-    {
-        _service = service;
-        _logger = logger;
-    }
-
     public Task<bool> Handle(BreakpointRequest request, CancellationToken cancellationToken)
     {
         try
         {
-            var session = _service.GetDebugSession(request.Uri);
+            var session = service.GetDebugSession(request.Uri);
             if (session == null)
             {
                 throw new InvalidOperationException($"No debug session found for {request.Uri}");
@@ -391,20 +335,20 @@ public class RemoveBreakpointHandler : IRemoveBreakpointHandler
 
             if (breakpoint == null)
             {
-                _logger.LogWarning("No breakpoint found at line {Line} in {Uri}", request.Line, request.Uri);
+                logger.LogWarning("No breakpoint found at line {Line} in {Uri}", request.Line, request.Uri);
                 return Task.FromResult(false);
             }
 
             // 使用断点ID移除
             var removed = session.Debugger.BreakpointManager.RemoveBreakpoint(breakpoint.Id);
 
-            _logger.LogInformation("Removed breakpoint {Id} at line {Line} in {Uri}", breakpoint.Id, request.Line, request.Uri);
+            logger.LogInformation("Removed breakpoint {Id} at line {Line} in {Uri}", breakpoint.Id, request.Line, request.Uri);
 
             return Task.FromResult(removed);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to remove breakpoint");
+            logger.LogError(ex, "Failed to remove breakpoint");
             return Task.FromResult(false);
         }
     }
@@ -416,22 +360,14 @@ public class RemoveBreakpointHandler : IRemoveBreakpointHandler
 [Method("old8lang/debugControl")]
 public interface IDebugControlHandler : IJsonRpcRequestHandler<DebugControlRequest, bool> { }
 
-public class DebugControlHandler : IDebugControlHandler
+public class DebugControlHandler(DebugProfilerService service, ILogger<DebugControlHandler> logger)
+    : IDebugControlHandler
 {
-    private readonly DebugProfilerService _service;
-    private readonly ILogger<DebugControlHandler> _logger;
-
-    public DebugControlHandler(DebugProfilerService service, ILogger<DebugControlHandler> logger)
-    {
-        _service = service;
-        _logger = logger;
-    }
-
     public Task<bool> Handle(DebugControlRequest request, CancellationToken cancellationToken)
     {
         try
         {
-            var session = _service.GetDebugSession(request.Uri);
+            var session = service.GetDebugSession(request.Uri);
             if (session == null)
             {
                 throw new InvalidOperationException($"No debug session found for {request.Uri}");
@@ -458,13 +394,13 @@ public class DebugControlHandler : IDebugControlHandler
                     throw new ArgumentException($"Unknown debug command: {request.Command}");
             }
 
-            _logger.LogInformation("Executed debug command {Command} for {Uri}", request.Command, request.Uri);
+            logger.LogInformation("Executed debug command {Command} for {Uri}", request.Command, request.Uri);
 
             return Task.FromResult(true);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to execute debug command");
+            logger.LogError(ex, "Failed to execute debug command");
             return Task.FromResult(false);
         }
     }

@@ -14,8 +14,8 @@ public class AnimatedContainer : WidgetBase
     private double _currentHeight;
     private double _currentOpacity;
     private string? _currentBackgroundColor;
-    private Thickness _currentPadding;
-    private Thickness _currentMargin;
+    private readonly Thickness _currentPadding;
+    private readonly Thickness _currentMargin;
 
     // 动画实例
     private Animation<double>? _widthAnimation;

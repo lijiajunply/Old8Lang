@@ -43,6 +43,14 @@ public class DocumentManager
     }
 
     /// <summary>
+    /// 获取所有文档
+    /// </summary>
+    public IEnumerable<KeyValuePair<string, DocumentParseResult>> GetAllDocuments()
+    {
+        return Documents;
+    }
+
+    /// <summary>
     /// 关闭文档
     /// </summary>
     public void CloseDocument(string uri)

@@ -55,6 +55,34 @@ public class SymbolInfo
     /// 是否为静态成员
     /// </summary>
     public bool IsStatic { get; set; }
+
+    /// <summary>
+    /// 调用的其他函数列表 (用于调用层次)
+    /// 存储此函数/方法调用的其他函数的名称和位置
+    /// </summary>
+    public List<CallSite> Calls { get; set; } = new();
+
+    /// <summary>
+    /// 被哪些函数调用 (用于调用层次)
+    /// 存储调用此函数/方法的其他函数的名称和位置
+    /// </summary>
+    public List<CallSite> CalledBy { get; set; } = new();
+}
+
+/// <summary>
+/// 调用点信息
+/// </summary>
+public class CallSite
+{
+    /// <summary>
+    /// 被调用/调用者的符号名称
+    /// </summary>
+    public required string SymbolName { get; set; }
+
+    /// <summary>
+    /// 调用发生的位置
+    /// </summary>
+    public required SourceLocation Location { get; set; }
 }
 
 /// <summary>
