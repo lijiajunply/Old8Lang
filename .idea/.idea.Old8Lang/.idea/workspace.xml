@@ -23,12 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/DebugSymbolLocationTests.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/TestSymbolLocation.csx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_token_test.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolFinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolFinder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/RenameHandlerTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/RenameHandlerTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/ClassParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -563,7 +560,7 @@
       <workItem from="1767434122437" duration="2457000" />
       <workItem from="1767519232104" duration="38266000" />
       <workItem from="1767815939091" duration="4003000" />
-      <workItem from="1767865400494" duration="14721000" />
+      <workItem from="1767865400494" duration="16254000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -908,7 +905,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="560" />
+    <option name="localTasksCounter" value="561" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -935,7 +932,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(core): 优化代码结构并修复类型验证问题&#10;&#10;- 移除多个文件中的冗余 using 指令&#10;- 在 CollectionTypeValidator 中添加空值检查以防止运行时异常&#10;- 修复多处代码格式问题，包括缩进和括号位置&#10;- 简化多个测试文件中的导入声明&#10;- 优化 AST 表达式和值处理的代码结构&#10;- 调整 UI 组件中的布局和手势处理代码&#10;- 改进语言服务器相关组件的依赖管理" />
     <MESSAGE value="fix(compiler): 修复枚举类型访问和代码生成问题&#10;&#10;- 修正枚举值比较时的类型转换，使用 as int 进行安全转换&#10;- 添加枚举类型在 ClassVar 中的类型查找支持&#10;- 实现枚举成员访问的直接整数值加载逻辑&#10;- 修复 ForInStatement 中的局部变量声明和类型转换处理&#10;- 更新 ReturnStatement 中的返回值处理逻辑，支持 try-finally 结构&#10;- 调整 IDE 工作区配置中的变更列表记录和任务计数器" />
     <MESSAGE value="feat(parser): 支持可空泛型类型参数解析&#10;&#10;- 在ClassParser中添加对LangTokenType.Question的支持以处理可空泛型类型参数&#10;- 在FunctionParser中添加对换行符后标识符+冒号的检查逻辑&#10;- 在StatementParser中添加对可空类型注解但无赋值的情况的处理&#10;- 修复类型注解解析的边界条件问题" />
     <MESSAGE value="feat(lang): 添加 extern 原生函数导入功能支持 P/Invoke&#10;&#10;- 实现 extern 语句的词法和语法解析，支持 native extern 语法&#10;- 添加 P/Invoke 调用约定支持，包括 cdecl、stdcall、winapi 三种类型&#10;- 实现函数别名和批量导入功能，支持块语法一次导入多个函数&#10;- 完成类型映射支持，涵盖 int、long、double、string 等基本类型及无符号类型&#10;- 实现编译器和解释器模式下的 P/Invoke 动态委托创建和方法绑定&#10;- 添加完整的 extern 语法测试文件和更新文档说明" />
@@ -960,7 +956,8 @@
     <MESSAGE value="fix(parser): 修复预处理器指令中#define的位置敏感性问题&#10;&#10;- 修复PreprocessorTokenizer中conditionStack的数据结构，从Stack&lt;bool&gt;改为Stack&lt;(bool isActive, bool anyBranchTaken)&gt;&#10;- 更新所有条件判断逻辑以使用新的元组结构中的isActive字段&#10;- 修正ProcessIf、ProcessElif、ProcessElse方法中的分支激活逻辑&#10;- 更新预处理器指令处理方法的参数类型签名&#10;- 修改测试用例Preprocessor_DefineNotAtLineStart_DoesNotDefineSymbol以正确验证异常情况&#10;- 添加调试断点配置以支持预处理器边缘情况测试" />
     <MESSAGE value="test(language-server): 更新文档解析结果测试用例&#10;&#10;- 修改TestClass中value属性的字符串字面量为多行字符串格式&#10;- 将诊断计数断言从2改为1，使用Assert.Single进行验证&#10;- 更新属性相等性测试为不等性测试，并修改URI比较逻辑&#10;- 添加不同的URI值以正确测试属性不等性场景" />
     <MESSAGE value="fix(parser): 修复列号计算和符号查找问题&#10;&#10;- 修正了换行符后的列号计算，从 column = i 改为 column = i + 1&#10;- 添加了数字和标识符的起始位置记录用于准确的列号计算&#10;- 修复了符号查找器中基于位置的token查找逻辑&#10;- 更新了测试用例中的位置参数以匹配正确的行列计算&#10;- 移除了旧的基于源代码的token查找实现&#10;- 添加了符号查找相关的调试输出功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(parser): 修复列号计算和符号查找问题&#10;&#10;- 修正了换行符后的列号计算，从 column = i 改为 column = i + 1&#10;- 添加了数字和标识符的起始位置记录用于准确的列号计算&#10;- 修复了符号查找器中基于位置的token查找逻辑&#10;- 更新了测试用例中的位置参数以匹配正确的行列计算&#10;- 移除了旧的基于源代码的token查找实现&#10;- 添加了符号查找相关的调试输出功能" />
+    <MESSAGE value="fix(language-server): 修复符号重命名位置计算问题&#10;&#10;- 修正了RenameHandlerTests中位置参数的行列计算&#10;- 更新了符号查找器中基于位置的token查找逻辑&#10;- 修复了列号计算从0开始的转换问题&#10;- 调整了EndColumn计算方式以正确处理token范围&#10;- 更新了相关测试用例以匹配正确的位置参数" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(language-server): 修复符号重命名位置计算问题&#10;&#10;- 修正了RenameHandlerTests中位置参数的行列计算&#10;- 更新了符号查找器中基于位置的token查找逻辑&#10;- 修复了列号计算从0开始的转换问题&#10;- 调整了EndColumn计算方式以正确处理token范围&#10;- 更新了相关测试用例以匹配正确的位置参数" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

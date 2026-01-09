@@ -17,6 +17,10 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
     private readonly List<LangToken>? _tokens = tokens;
     private readonly string? _sourceCode = sourceCode;
 
+    // 当前正在处理的类的 token 范围（用于在类内查找成员文档注释）
+    private int _currentClassStartTokenIndex = -1;
+    private int _currentClassEndTokenIndex = -1;
+
     /// <summary>
     /// 构建符号表
     /// </summary>
@@ -173,7 +177,7 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
         var typeTemplate = classInit.AnyLangValue;
         var className = typeTemplate.ClassName;
 
-        // 尝试从 token 列表中查找位置
+        // 尝试从 token 列表中查找位置和类的 token 范围
         var tokenLocation = FindSymbolLocationFromTokens(className, LangTokenType.Class);
         var location = tokenLocation ?? new SourceLocation
         {
@@ -183,6 +187,9 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             EndLine = classInit.Position.Line,
             EndColumn = classInit.Position.Column + className.Length
         };
+
+        // 设置当前类的 token 范围
+        FindClassTokenRange(className);
 
         // 提取类文档注释
         string? documentation = null;
@@ -204,6 +211,10 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
 
         // 访问类的成员（方法、属性）
         VisitClassMembers(classSymbol, typeTemplate);
+
+        // 重置类的 token 范围
+        _currentClassStartTokenIndex = -1;
+        _currentClassEndTokenIndex = -1;
     }
 
     /// <summary>
@@ -284,6 +295,15 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
         {
             documentation = FormatDocComment(funcValue.DocComment);
         }
+        else
+        {
+            // 如果函数值没有文档注释，尝试从 tokens 中查找
+            var docComment = FindDocCommentForMember(methodName);
+            if (docComment != null)
+            {
+                documentation = FormatDocComment(docComment);
+            }
+        }
 
         // 确定访问修饰符
         var accessModifier = AccessModifier.Public;
@@ -330,12 +350,21 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
         else if (memberId.HasModifier(AccessModifierType.Protected))
             accessModifier = AccessModifier.Protected;
 
+        // 提取属性文档注释
+        string? documentation = null;
+        var docComment = FindDocCommentForMember(propertyName);
+        if (docComment != null)
+        {
+            documentation = FormatDocComment(docComment);
+        }
+
         return new SymbolInfo
         {
             Name = propertyName,
             Kind = SymbolKind.Property,
             Type = $"{staticKeyword}{propertyType}",
             Location = location,
+            Documentation = documentation,
             AccessModifier = accessModifier,
             IsStatic = isStatic
         };
@@ -389,6 +418,12 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
     {
         switch (expr)
         {
+            // 实例化表达式 User()
+            case Instance instance:
+                // Instance 表达式用于类构造函数调用
+                var className = instance.Id.IdName;
+                return className;
+
             // 函数调用表达式 User()
             case FunctionCallExpression funcCall:
                 // 检查函数表达式是否是一个标识符
@@ -665,5 +700,144 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
         }
 
         return 0;
+    }
+
+    /// <summary>
+    /// 从 tokens 中查找成员的文档注释
+    /// </summary>
+    private DocCommentInfo? FindDocCommentForMember(string memberName)
+    {
+        if (_tokens == null) return null;
+
+        // 确定搜索范围
+        int startIndex = _currentClassStartTokenIndex >= 0 ? _currentClassStartTokenIndex : 0;
+        int endIndex = _currentClassEndTokenIndex >= 0 ? _currentClassEndTokenIndex : _tokens.Count;
+
+        // 在指定范围内查找成员名称对应的标识符 token
+        for (int i = startIndex; i < endIndex; i++)
+        {
+            var token = _tokens[i];
+
+            // 找到成员名称
+            if (token.Type == LangTokenType.Identifier && token.Value == memberName)
+            {
+                // 检查是否是成员定义（后面跟着 :、<-、( 或换行）
+                bool isMemberDefinition = false;
+                if (i + 1 < endIndex)
+                {
+                    var nextToken = _tokens[i + 1];
+                    if (nextToken.Type == LangTokenType.Colon || // 类型注解
+                        nextToken.Type == LangTokenType.Assignment || // 赋值
+                        nextToken.Type == LangTokenType.LeftParen) // 函数
+                    {
+                        isMemberDefinition = true;
+                    }
+                }
+
+                if (!isMemberDefinition)
+                {
+                    continue; // 这不是成员定义，跳过
+                }
+
+                // 向前查找文档注释
+                var docCommentTokens = new List<LangToken>();
+                var searchIndex = i - 1;
+
+                // 跳过修饰符 (public, private, static等)
+                while (searchIndex >= startIndex)
+                {
+                    var prevToken = _tokens[searchIndex];
+
+                    // 如果是修饰符，继续向前查找
+                    if (prevToken.Type == LangTokenType.Public ||
+                        prevToken.Type == LangTokenType.Private ||
+                        prevToken.Type == LangTokenType.Protected ||
+                        prevToken.Type == LangTokenType.Static ||
+                        prevToken.Type == LangTokenType.Func) // func 关键字
+                    {
+                        searchIndex--;
+                        continue;
+                    }
+
+                    // 如果是文档注释，收集它
+                    if (prevToken.Type == LangTokenType.DocComment)
+                    {
+                        docCommentTokens.Insert(0, prevToken);
+                        searchIndex--;
+                        continue;
+                    }
+
+                    // 遇到其他 token，停止搜索
+                    break;
+                }
+
+                // 如果找到文档注释，解析并返回
+                if (docCommentTokens.Count > 0)
+                {
+                    var docCommentLines = docCommentTokens.Select(t => t.Value).ToArray();
+                    var rawComment = string.Join("\n", docCommentLines);
+                    return DocCommentParser.Parse(rawComment);
+                }
+
+                // 如果找到成员定义但没有文档注释，返回 null
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 查找类的 token 范围（从 class 关键字到右花括号）
+    /// </summary>
+    private void FindClassTokenRange(string className)
+    {
+        if (_tokens == null)
+        {
+            _currentClassStartTokenIndex = -1;
+            _currentClassEndTokenIndex = -1;
+            return;
+        }
+
+        // 查找 class 关键字后跟类名的位置
+        for (int i = 0; i < _tokens.Count - 1; i++)
+        {
+            if (_tokens[i].Type == LangTokenType.Class &&
+                _tokens[i + 1].Type == LangTokenType.Identifier &&
+                _tokens[i + 1].Value == className)
+            {
+                _currentClassStartTokenIndex = i;
+
+                // 查找对应的右花括号
+                int braceCount = 0;
+                bool foundLeftBrace = false;
+
+                for (int j = i + 2; j < _tokens.Count; j++)
+                {
+                    if (_tokens[j].Type == LangTokenType.LeftBrace)
+                    {
+                        braceCount++;
+                        foundLeftBrace = true;
+                    }
+                    else if (_tokens[j].Type == LangTokenType.RightBrace)
+                    {
+                        braceCount--;
+                        if (foundLeftBrace && braceCount == 0)
+                        {
+                            _currentClassEndTokenIndex = j + 1;
+                            return;
+                        }
+                    }
+                }
+
+                // 如果没找到匹配的右花括号，设置为文件末尾
+                _currentClassEndTokenIndex = _tokens.Count;
+                return;
+            }
+        }
+
+        // 没找到类定义，使用默认值
+        _currentClassStartTokenIndex = -1;
+        _currentClassEndTokenIndex = -1;
     }
 }

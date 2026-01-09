@@ -268,6 +268,13 @@ public class ClassParser(
                 continue;
             }
 
+            // 跳过文档注释（文档注释会在后续解析时通过 CollectPrecedingDocComments 收集）
+            if (CurrentToken.Type == LangTokenType.DocComment)
+            {
+                CurrentIndex++;
+                continue;
+            }
+
             // 尝试解析类成员，先解析修饰符，再解析语句
             try
             {
