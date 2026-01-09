@@ -18,12 +18,18 @@ class Program
                     .AddLanguageProtocolLogging()
                     .SetMinimumLevel(LogLevel.Debug))
                 .WithServices(ConfigureServices)
+                // 核心功能
                 .WithHandler<TextDocumentSyncHandler>()
                 .WithHandler<CompletionHandler>()
                 .WithHandler<DefinitionHandler>()
                 .WithHandler<ReferencesHandler>()
                 .WithHandler<RenameHandler>()
                 .WithHandler<HoverHandler>()
+                // 新增高优先级功能
+                .WithHandler<DocumentSymbolHandler>()
+                .WithHandler<SignatureHelpHandler>()
+                .WithHandler<DocumentFormattingHandler>()
+                .WithHandler<CodeActionHandler>()
                 // Debug and Profiler Handlers
                 .WithHandler<StartProfilingHandler>()
                 .WithHandler<StopProfilingHandler>()
@@ -42,5 +48,6 @@ class Program
     {
         services.AddSingleton<DocumentManager>();
         services.AddSingleton<DebugProfilerService>();
+        services.AddSingleton<FormattingService>();
     }
 }

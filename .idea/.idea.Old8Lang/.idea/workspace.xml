@@ -23,10 +23,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/debug_definition.old8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CodeActionHandler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DocumentFormattingHandler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DocumentSymbolHandler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/SignatureHelpHandler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/FormattingService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/DocumentParseResultTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/DocumentParseResultTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -906,7 +910,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="566" />
+    <option name="localTasksCounter" value="567" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -933,7 +937,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(interpreter): 添加 JavaScript extern 函数导入功能&#10;&#10;- 实现 JavaScriptProvider 使用 Jint 引擎执行 JavaScript 代码&#10;- 添加 JavaScript 函数包装器支持 Old8Lang 与 JavaScript 类型转换&#10;- 实现 .js 文件和 js: 前缀的 JavaScript 脚本导入方式&#10;- 添加 JavaScript 数组和对象与 Old8Lang 集合类型的自动转换&#10;- 支持 ES5.1 标准和跨平台执行（Windows/macOS/Linux）&#10;- 仅支持解释模式执行，不支持编译模式" />
     <MESSAGE value="feat(ast): 添加 extern 语句支持并完善外部函数导入功能&#10;&#10;- 在 BlockStatement 中添加 ExternStatement 类型处理&#10;- 实现 ExternStatement 的 AST 结构和解析功能&#10;- 添加 JavaScript、Python 和 Native DLL 外部函数导入支持&#10;- 实现 extern 语句的编译模式支持和调用约定处理&#10;- 添加 extern 功能的边界测试和错误处理测试&#10;- 实现 extern 语句的解析测试和类型检测功能&#10;- 修复 ExternProviderFactory 中的字段命名规范问题&#10;- 更新 ExternStatement 的 Count 属性返回函数数量" />
     <MESSAGE value="feat(interpreter): 添加对原生委托函数的支持&#10;&#10;- 实现 NativeDelegateFuncLangValue 类处理 P/Invoke 委托实例&#10;- 在 Instance.cs 中添加对 NativeDelegateFuncLangValue 的调用支持&#10;- 优化 NativeDllProvider 中的 DLL 加载和函数导出错误处理&#10;- 更新 VariateManager 支持 NativeDelegateFuncLangValue 类型匹配&#10;- 升级 Jint 依赖版本至 4.4.2&#10;- 修复代码注释中的标点符号问题" />
     <MESSAGE value="refactor(interpreter): 优化外部函数执行和类型转换机制&#10;&#10;- 将 FuncLangValue 的 Run 方法改为 virtual 以支持重写&#10;- 为 JavaScriptFunctionLangValue 实现 override 的 Run 方法并修复命名参数类型&#10;- 为 PythonFunctionLangValue 实现 override 的 Run 方法并优化类型转换逻辑&#10;- 修复 Python 类型转换中的布尔值处理和对象类型检测&#10;- 更新 JavaScriptProvider 和 PythonProvider 中的错误抛出机制&#10;- 优化 PythonProvider 中的异常处理和类型转换流程" />
@@ -958,7 +961,8 @@
     <MESSAGE value="fix(language-server): 修复符号表构建和测试用例中的位置定位问题&#10;&#10;- 修复了符号表构建中类型推断的空值检查逻辑&#10;- 添加了对成员方法调用的类型推断支持，处理 instance.method() 形式的表达式&#10;- 实现了从函数/方法签名中提取返回类型的功能&#10;- 修正了测试用例中代码位置的断言，确保测试准确性&#10;- 增加了对操作表达式中点操作符的处理逻辑" />
     <MESSAGE value="fix(profiler): 修复性能分析会话状态检查逻辑&#10;&#10;- 修正 GenerateReport 方法中的会话状态检查条件&#10;- 修正 SaveReportAsync 方法中的会话状态检查条件&#10;- 更新异常消息内容从&quot;请先停止性能分析会话&quot;改为&quot;当前没有性能分析会话&quot;&#10;- 清理 IDE 工作空间配置文件中的变更列表记录&#10;- 修正工作项持续时间和本地任务计数器统计&#10;- 移除旧的提交消息记录并更新最后提交消息内容" />
     <MESSAGE value="fix(tests): 修复文档管理器测试中的断言逻辑&#10;&#10;- 调整 DocumentManagerTests 中语法错误时 AST 和符号表的断言&#10;- 当解析失败时允许 AST 和符号表为 null 的预期行为&#10;- 更新 workspace.xml 中的工作项持续时间统计&#10;- 修正本地任务计数器从 564 增加到 565&#10;- 清理 VcsManagerConfiguration 中的旧提交消息记录&#10;- 更新最后提交消息为性能分析器会话状态检查修复" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(tests): 修复文档管理器测试中的断言逻辑&#10;&#10;- 调整 DocumentManagerTests 中语法错误时 AST 和符号表的断言&#10;- 当解析失败时允许 AST 和符号表为 null 的预期行为&#10;- 更新 workspace.xml 中的工作项持续时间统计&#10;- 修正本地任务计数器从 564 增加到 565&#10;- 清理 VcsManagerConfiguration 中的旧提交消息记录&#10;- 更新最后提交消息为性能分析器会话状态检查修复" />
+    <MESSAGE value="fix(language-server): 修复定义处理器中的位置计算问题&#10;&#10;- 使用 token 的实际位置替换 FindColumnInLine 方法&#10;- 统一将行号和列号转换为 0-based 索引&#10;- 修正测试用例中的行号断言以匹配新的位置计算逻辑&#10;- 更新诊断信息集合的初始化语法为集合表达式&#10;- 修正集成测试中的位置参数以匹配实际代码行号" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(language-server): 修复定义处理器中的位置计算问题&#10;&#10;- 使用 token 的实际位置替换 FindColumnInLine 方法&#10;- 统一将行号和列号转换为 0-based 索引&#10;- 修正测试用例中的行号断言以匹配新的位置计算逻辑&#10;- 更新诊断信息集合的初始化语法为集合表达式&#10;- 修正集成测试中的位置参数以匹配实际代码行号" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
