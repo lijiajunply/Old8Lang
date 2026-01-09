@@ -23,9 +23,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/ResourceManager.cs.bak" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/StaticClassCompiler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/StaticClassCompiler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/Concurrency/ResourceManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Concurrency/ResourceManager.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_import_links.old8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DocumentLinkHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DocumentLinkHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/StringValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/StringValueFuncStatic.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -906,7 +908,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="572" />
+    <option name="localTasksCounter" value="573" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -933,7 +935,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(interpreter): 修复外部函数类型错误处理和返回值转换问题&#10;&#10;- 修复 JavaScript 类型不匹配时的处理逻辑，支持 NaN 返回值转换&#10;- 将 Python 函数调用错误从 ImportError 改为 InvalidOperationError&#10;- 修复 extern 函数返回类型解析，支持简单标识符类型注解&#10;- 更新类型不匹配测试用例，验证 JavaScript 隐式类型转换行为&#10;- 优化 extern 函数解析器，避免复杂类型注解跨行读取问题" />
     <MESSAGE value="fix(interpreter): 修复函数调用中defer语句执行时机问题&#10;&#10;- 调整defer语句执行位置，移至finally块中确保异常时也能执行&#10;- 添加executionManager空值检查避免空引用异常&#10;- 保持子作用域移除逻辑在defer执行之后&#10;- 更新workspace.xml中的变更记录和测试文件追踪" />
     <MESSAGE value="fix(interpreter): 修复生成器中函数调用的控制流状态管理问题&#10;&#10;- 在BlockStatement中保存和恢复IsReturn标志，防止普通函数调用影响生成器控制流&#10;- 在FuncLangValue中保存和恢复IsReturn标志，确保函数调用不影响外部生成器上下文&#10;- 在FuncLangValue中保存和清除生成器上下文，防止函数内部错误操作生成器状态&#10;- 恢复函数调用前的原始生成器上下文，避免嵌套调用时的状态污染&#10;- 移除IL验证测试中的跳过标记，启用相关功能测试&#10;- 更新工作空间配置文件中的变更记录和任务计数" />
     <MESSAGE value="refactor(testapp): 简化计数器应用的程序结构&#10;&#10;- 移除 Program 类和 Main 方法的包装结构&#10;- 将应用初始化和运行逻辑直接放在全局作用域&#10;- 删除多余的 RunSimpleTest 方法封装&#10;- 移除测试应用的 README.md 说明文件&#10;- 更新 IDE 配置文件中的启动项目设置&#10;- 调整工作空间配置文件的任务计数和变更记录" />
@@ -958,7 +959,8 @@
     <MESSAGE value="refactor(ast): 完成AST节点Visitor模式迁移&#10;&#10;- 在LangExpression中实现Run、LoadIlValue和OutputType方法，使用Visitor模式替代原有逻辑&#10;- 为OldStatement添加详细的解释器和编译器模式XML文档注释&#10;- 更新CLAUDE.md文档，标记Visitor模式迁移已完成，包含InterpreterVisitor、CompilerVisitor和TypeInferenceVisitor&#10;- 移除过时的Visitor_Migration_Plan.md规划文档&#10;- 修改Program.cs中的测试文件路径，更新为union_type_assignment.old8测试用例" />
     <MESSAGE value="refactor(language-server): 重构处理器使用构造函数注入并优化工作区符号搜索性能&#10;&#10;- 将 CodeActionHandler、DocumentHighlightHandler、FoldingRangeHandler、SemanticTokensHandler 和&#10;  WorkspaceSymbolHandler 重构为使用构造函数注入替代手动字段注入&#10;- 修复 DocumentManager 字段注入问题，统一通过构造函数参数获取依赖&#10;- 优化 WorkspaceSymbolHandler 中的符号搜索逻辑，添加查询结果数量限制以提升性能&#10;- 为 WorkspaceSymbolHandler 添加提前终止机制，避免不必要的符号遍历操作&#10;- 简化符号表遍历逻辑，提高无查询条件下的搜索效率" />
     <MESSAGE value="feat(performance): 添加解析器、编译器和符号表缓存优化&#10;&#10;- 实现 TokenIndexCache 用于优化解析器中的 Token 查找性能&#10;- 添加 ILGenerationCache 用于缓存编译器中的反射信息和类型转换&#10;- 创建 SymbolTableCache 用于加速符号表中的变量查找操作&#10;- 在 ParserContext 中集成 Token 索引缓存功能&#10;- 为 LocalManager 添加 IL 生成缓存访问属性&#10;- 在 VariateManager 中实现符号表缓存实例管理&#10;- 添加性能基准测试用于类型推断性能测量&#10;- 生成性能优化报告记录缓存实现细节" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(performance): 添加解析器、编译器和符号表缓存优化&#10;&#10;- 实现 TokenIndexCache 用于优化解析器中的 Token 查找性能&#10;- 添加 ILGenerationCache 用于缓存编译器中的反射信息和类型转换&#10;- 创建 SymbolTableCache 用于加速符号表中的变量查找操作&#10;- 在 ParserContext 中集成 Token 索引缓存功能&#10;- 为 LocalManager 添加 IL 生成缓存访问属性&#10;- 在 VariateManager 中实现符号表缓存实例管理&#10;- 添加性能基准测试用于类型推断性能测量&#10;- 生成性能优化报告记录缓存实现细节" />
+    <MESSAGE value="refactor(core): 将 null 检查从传统语法转换为现代 C# 模式匹配语法&#10;&#10;- 将所有 != null 检查替换为 is not null 模式匹配&#10;- 将所有 == null 检查替换为 is null 模式匹配&#10;- 统一代码库中的空值检查风格以提高可读性&#10;- 修复 Apis.ListToObjects 方法中的空值检查逻辑&#10;- 更新 ArrayLangValue 类中的空值检查实现&#10;- 修改 AssertHelper 类中的断言方法空值检查方式&#10;- 更新 AsyncForInStatement 中的生成器上下文检查&#10;- 调整 BlockStatement 中的语句处理空值检查逻辑&#10;- 优化 BreakpointManager 中的条件评估空值检查&#10;- 改进 ClassInit 中的类存在性检查方式&#10;- 调整 DocCommentInfo 中的返回值空值判断&#10;- 优化 DllPathResolver 中的路径解析空值检查&#10;- 更新 EnumInit 中的枚举成员值检查方式&#10;- 改进 ErrorLangValue 中的建议消息空值检查&#10;- 优化 ExternStatement 中的别名处理空值检查逻辑" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(core): 将 null 检查从传统语法转换为现代 C# 模式匹配语法&#10;&#10;- 将所有 != null 检查替换为 is not null 模式匹配&#10;- 将所有 == null 检查替换为 is null 模式匹配&#10;- 统一代码库中的空值检查风格以提高可读性&#10;- 修复 Apis.ListToObjects 方法中的空值检查逻辑&#10;- 更新 ArrayLangValue 类中的空值检查实现&#10;- 修改 AssertHelper 类中的断言方法空值检查方式&#10;- 更新 AsyncForInStatement 中的生成器上下文检查&#10;- 调整 BlockStatement 中的语句处理空值检查逻辑&#10;- 优化 BreakpointManager 中的条件评估空值检查&#10;- 改进 ClassInit 中的类存在性检查方式&#10;- 调整 DocCommentInfo 中的返回值空值判断&#10;- 优化 DllPathResolver 中的路径解析空值检查&#10;- 更新 EnumInit 中的枚举成员值检查方式&#10;- 改进 ErrorLangValue 中的建议消息空值检查&#10;- 优化 ExternStatement 中的别名处理空值检查逻辑" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1226,162 +1228,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="615" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>419</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
-            <startOffsets>
-              <option value="16612" />
-            </startOffsets>
-            <endOffsets>
-              <option value="16790" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="618" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>412</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
-            <startOffsets>
-              <option value="16400" />
-            </startOffsets>
-            <endOffsets>
-              <option value="16420" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="619" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>436</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
-            <startOffsets>
-              <option value="17458" />
-            </startOffsets>
-            <endOffsets>
-              <option value="17536" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="620" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>437</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
-            <startOffsets>
-              <option value="17549" />
-            </startOffsets>
-            <endOffsets>
-              <option value="17583" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="621" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>470</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
-            <startOffsets>
-              <option value="18722" />
-            </startOffsets>
-            <endOffsets>
-              <option value="18736" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="622" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>474</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
-            <startOffsets>
-              <option value="18832" />
-            </startOffsets>
-            <endOffsets>
-              <option value="18917" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="623" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>475</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
-            <startOffsets>
-              <option value="18930" />
-            </startOffsets>
-            <endOffsets>
-              <option value="18972" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="624" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>479</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
-            <startOffsets>
-              <option value="19097" />
-            </startOffsets>
-            <endOffsets>
-              <option value="19233" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="625" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>500</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
-            <startOffsets>
-              <option value="19714" />
-            </startOffsets>
-            <endOffsets>
-              <option value="19782" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="626" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>509</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
-            <startOffsets>
-              <option value="19978" />
-            </startOffsets>
-            <endOffsets>
-              <option value="20045" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="627" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs</url>
-          <line>512</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Expression/Value/Instance.cs" containingFunctionPresentation="方法 'FromClassToResult'">
-            <startOffsets>
-              <option value="20108" />
-            </startOffsets>
-            <endOffsets>
-              <option value="20168" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="628" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncFuncInit.cs</url>
-          <line>56</line>
-          <properties documentPath="$PROJECT_DIR$/Old8Lang/AST/Statement/AsyncFuncInit.cs" containingFunctionPresentation="方法 'Run'">
-            <startOffsets>
-              <option value="1446" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1486" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="632" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Old8Lang/AST/Expression/StaticValues/TaskClassLangValue.cs</url>

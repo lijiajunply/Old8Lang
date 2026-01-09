@@ -321,6 +321,32 @@ public static class LangTokenizer
                                 case '"':
                                     sb.Append('"');
                                     break;
+                                case 'u':
+                                    // 处理Unicode转义序列 \uXXXX
+                                    if (EscapeSequenceHelper.TryParseUnicodeEscape(code, i - 1, out var unicodeChar, out var unicodeAdvance))
+                                    {
+                                        sb.Append(unicodeChar);
+                                        i += unicodeAdvance; // 跳过已解析的十六进制数字
+                                    }
+                                    else
+                                    {
+                                        // Unicode序列不完整或解析失败，追加原始字符
+                                        sb.Append("\\u");
+                                    }
+                                    break;
+                                case 'x':
+                                    // 处理十六进制转义序列 \xXX
+                                    if (EscapeSequenceHelper.TryParseHexEscape(code, i - 1, out var hexChar, out var hexAdvance))
+                                    {
+                                        sb.Append(hexChar);
+                                        i += hexAdvance; // 跳过已解析的十六进制数字
+                                    }
+                                    else
+                                    {
+                                        // 十六进制序列不完整或解析失败，追加原始字符
+                                        sb.Append("\\x");
+                                    }
+                                    break;
                                 default:
                                     sb.Append(code[i]);
                                     break;
@@ -387,50 +413,28 @@ public static class LangTokenizer
                                     break;
                                 case 'u':
                                     // 处理Unicode转义序列 \uXXXX
-                                    if (i + 4 < code.Length)
+                                    if (EscapeSequenceHelper.TryParseUnicodeEscape(code, i, out var unicodeChar, out var unicodeAdvance))
                                     {
-                                        var hexStr = code.Substring(i + 1, 4);
-                                        if (int.TryParse(hexStr, System.Globalization.NumberStyles.HexNumber, null,
-                                                out var unicodeCode))
-                                        {
-                                            sb.Append((char)unicodeCode);
-                                            i += 4; // 跳过4位十六进制数
-                                        }
-                                        else
-                                        {
-                                            // 如果解析失败，将原始字符追加
-                                            sb.Append("\\u" + hexStr);
-                                            i += 4;
-                                        }
+                                        sb.Append(unicodeChar);
+                                        i += unicodeAdvance; // 跳过已解析的十六进制数字（不包括 \u，因为外层已经在 \ 的位置）
                                     }
                                     else
                                     {
-                                        // Unicode序列不完整，追加原始字符
+                                        // Unicode序列不完整或解析失败，追加原始字符
                                         sb.Append("\\u");
                                     }
 
                                     break;
                                 case 'x':
                                     // 处理十六进制转义序列 \xXX
-                                    if (i + 2 < code.Length)
+                                    if (EscapeSequenceHelper.TryParseHexEscape(code, i, out var hexChar, out var hexAdvance))
                                     {
-                                        var hexStr = code.Substring(i + 1, 2);
-                                        if (int.TryParse(hexStr, System.Globalization.NumberStyles.HexNumber, null,
-                                                out var hexCode))
-                                        {
-                                            sb.Append((char)hexCode);
-                                            i += 2; // 跳过2位十六进制数
-                                        }
-                                        else
-                                        {
-                                            // 如果解析失败，将原始字符追加
-                                            sb.Append("\\x" + hexStr);
-                                            i += 2;
-                                        }
+                                        sb.Append(hexChar);
+                                        i += hexAdvance; // 跳过已解析的十六进制数字（不包括 \x，因为外层已经在 \ 的位置）
                                     }
                                     else
                                     {
-                                        // 十六进制序列不完整，追加原始字符
+                                        // 十六进制序列不完整或解析失败，追加原始字符
                                         sb.Append("\\x");
                                     }
 
@@ -1168,4 +1172,118 @@ public struct FilteringCommentsTokenizer(string input)
     // {
     //     return CurrentIndex + 1 >= input.Length ? '\0' : input[CurrentIndex + 1];
     // }
+}
+
+/// <summary>
+/// 转义序列处理辅助类，提供 Unicode 和十六进制转义序列的解析功能
+/// </summary>
+public static class EscapeSequenceHelper
+{
+    /// <summary>
+    /// 尝试解析 Unicode 转义序列 \uXXXX
+    /// </summary>
+    /// <param name="input">输入字符串</param>
+    /// <param name="startIndex">开始位置（\u 的索引）</param>
+    /// <param name="result">解析结果字符</param>
+    /// <param name="advanceCount">需要跳过的字符数（包括 \u 和 4 位十六进制）</param>
+    /// <returns>是否成功解析</returns>
+    public static bool TryParseUnicodeEscape(string input, int startIndex, out char result, out int advanceCount)
+    {
+        result = '\0';
+        advanceCount = 0;
+
+        // 检查是否有足够的字符（\u + 4位十六进制，索引从 i 开始是 \，i+1 是 u）
+        if (startIndex + 5 > input.Length)
+        {
+            return false;
+        }
+
+        // 提取 4 位十六进制数（从 \u 后面开始）
+        var hexStr = input.Substring(startIndex + 2, 4);
+        if (int.TryParse(hexStr, System.Globalization.NumberStyles.HexNumber, null, out var unicodeCode))
+        {
+            result = (char)unicodeCode;
+            advanceCount = 4; // 只跳过 4 位十六进制，不包括 \u（因为外层 for 循环已经在 \ 的位置）
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 尝试解析十六进制转义序列 \xXX
+    /// </summary>
+    /// <param name="input">输入字符串</param>
+    /// <param name="startIndex">开始位置（\x 的索引）</param>
+    /// <param name="result">解析结果字符</param>
+    /// <param name="advanceCount">需要跳过的字符数（包括 \x 和 2 位十六进制）</param>
+    /// <returns>是否成功解析</returns>
+    public static bool TryParseHexEscape(string input, int startIndex, out char result, out int advanceCount)
+    {
+        result = '\0';
+        advanceCount = 0;
+
+        // 检查是否有足够的字符（\x + 2位十六进制，索引从 i 开始是 \，i+1 是 x）
+        if (startIndex + 3 > input.Length)
+        {
+            return false;
+        }
+
+        // 提取 2 位十六进制数（从 \x 后面开始）
+        var hexStr = input.Substring(startIndex + 2, 2);
+        if (int.TryParse(hexStr, System.Globalization.NumberStyles.HexNumber, null, out var hexCode))
+        {
+            result = (char)hexCode;
+            advanceCount = 2; // 只跳过 2 位十六进制，不包括 \x（因为外层 for 循环已经在 \ 的位置）
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 尝试从已提取的字符串解析 Unicode 转义序列 \uXXXX
+    /// </summary>
+    /// <param name="content">已提取的转义序列内容（如 "\u4E2D"）</param>
+    /// <param name="result">解析结果字符</param>
+    /// <returns>是否成功解析</returns>
+    public static bool TryParseUnicodeEscapeFromContent(string content, out char result)
+    {
+        result = '\0';
+
+        if (content.StartsWith("\\u") && content.Length == 6)
+        {
+            var hexCode = content.Substring(2);
+            if (int.TryParse(hexCode, System.Globalization.NumberStyles.HexNumber, null, out var code))
+            {
+                result = (char)code;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 尝试从已提取的字符串解析十六进制转义序列 \xXX
+    /// </summary>
+    /// <param name="content">已提取的转义序列内容（如 "\x41"）</param>
+    /// <param name="result">解析结果字符</param>
+    /// <returns>是否成功解析</returns>
+    public static bool TryParseHexEscapeFromContent(string content, out char result)
+    {
+        result = '\0';
+
+        if (content.StartsWith("\\x") && content.Length >= 3)
+        {
+            var hexCode = content.Substring(2);
+            if (int.TryParse(hexCode, System.Globalization.NumberStyles.HexNumber, null, out var code))
+            {
+                result = (char)code;
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

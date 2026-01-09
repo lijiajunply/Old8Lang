@@ -4,6 +4,8 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using Old8Lang.LanguageServer.Services;
 using Old8Lang.AST.Statement;
 using OmniSharp.Extensions.LanguageServer.Protocol;
+using Old8Lang.ModuleSystem.Resolution;
+using Old8Lang.StandardLibrary;
 
 namespace Old8Lang.LanguageServer.Handlers;
 
@@ -12,6 +14,7 @@ namespace Old8Lang.LanguageServer.Handlers;
 /// </summary>
 public class DocumentLinkHandler(DocumentManager documentManager) : IDocumentLinkHandler
 {
+    private readonly ModuleResolver _moduleResolver = new();
     public DocumentLinkRegistrationOptions GetRegistrationOptions(
         DocumentLinkCapability capability,
         ClientCapabilities clientCapabilities)
@@ -130,54 +133,155 @@ public class DocumentLinkHandler(DocumentManager documentManager) : IDocumentLin
         {
             // 移除 file:// 前缀
             var currentPath = currentUri.Replace("file://", "");
-            var currentDir = Path.GetDirectoryName(currentPath);
 
-            if (string.IsNullOrEmpty(currentDir))
+            // 使用 ModuleResolver 进行统一解析
+            var result = _moduleResolver.ResolveModule(moduleName, currentPath);
+
+            if (!result.IsSuccess)
             {
                 return null;
             }
 
-            // 处理相对路径
-            if (moduleName.StartsWith("./") || moduleName.StartsWith("../"))
+            // 根据不同的模块类型返回不同的路径
+            switch (result.ModuleType)
             {
-                var fullPath = Path.GetFullPath(Path.Combine(currentDir, moduleName));
+                case ModuleType.StandardLibrary:
+                    // 标准库：尝试定位到源代码文件
+                    return ResolveStandardLibrarySourcePath(moduleName);
 
-                // 尝试 .old8 扩展名
-                if (File.Exists(fullPath + ".old8"))
+                case ModuleType.ThirdPartyPackage:
+                case ModuleType.LocalFile:
+                case ModuleType.Submodule:
+                    // 第三方包和本地文件：直接返回解析后的路径
+                    return result.ResolvedPath;
+
+                case ModuleType.NetworkModule:
+                    // 网络模块：暂不支持链接（可以考虑打开浏览器）
+                    return null;
+
+                default:
+                    return null;
+            }
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// 解析标准库的源代码路径
+    /// </summary>
+    private string? ResolveStandardLibrarySourcePath(string libraryName)
+    {
+        // 获取标准库信息
+        var libInfo = StandardLibraryRegistry.GetLibraryInfo(libraryName);
+        if (libInfo == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            // 尝试定位到标准库项目的源代码文件
+            // 1. 从程序集名称推断项目位置
+            var assemblyName = libInfo.AssemblyName;
+
+            // 2. 获取运行时目录
+            var baseDirectory = AppContext.BaseDirectory;
+
+            // 3. 根据库名称映射到源代码文件
+            // Old8LangLib 中的库映射到对应的 .cs 文件
+            if (assemblyName == "Old8LangLib")
+            {
+                var sourceFileMap = new Dictionary<string, string>
                 {
-                    return fullPath + ".old8";
-                }
+                    ["OS"] = "OS.cs",
+                    ["File"] = "FileLib.cs",
+                    ["Terminal"] = "Terminal.cs",
+                    ["Time"] = "Time.cs",
+                    ["Math"] = "MathLib.cs",
+                    ["Crypto"] = "CryptoLib.cs",
+                    ["Json"] = "JsonLib.cs",
+                    ["Csv"] = "Csv.cs",
+                    ["Vector"] = "VectorLib.cs",
+                    ["Regex"] = "RegexLib.cs",
+                    ["ColorfulTerminal"] = "ColorfulTerminal.cs",
+                    ["TemplateEngine"] = "TemplateEngine.cs",
+                    ["Image"] = "ImageLib.cs",
+                    ["AssertLib"] = "AssertLib.cs",
+                    ["CollectionLib"] = "CollectionLib.cs",
+                    ["MockLib"] = "MockLib.cs",
+                    ["TestRunner"] = "TestRunner.cs"
+                };
 
-                // 尝试作为目录，查找 __init__.old8 或 index.old8
-                if (Directory.Exists(fullPath))
+                if (sourceFileMap.TryGetValue(libraryName, out var sourceFileName))
                 {
-                    var initFile = Path.Combine(fullPath, "__init__.old8");
-                    if (File.Exists(initFile))
+                    // 尝试多种路径策略定位源文件
+                    var searchPaths = new[]
                     {
-                        return initFile;
-                    }
+                        // 策略 1: 从运行时目录向上查找项目结构
+                        // 例如: /path/to/Old8Lang.App/bin/Debug/net10.0/ -> /path/to/Old8LangLib/
+                        Path.Combine(baseDirectory, "..", "..", "..", "..", "Old8LangLib", sourceFileName),
 
-                    var indexFile = Path.Combine(fullPath, "index.old8");
-                    if (File.Exists(indexFile))
+                        // 策略 2: 从当前工作目录查找
+                        Path.Combine(Directory.GetCurrentDirectory(), "..", "Old8LangLib", sourceFileName),
+
+                        // 策略 3: 直接在 Old8LangLib 目录中查找（如果在解决方案根目录运行）
+                        Path.Combine(Directory.GetCurrentDirectory(), "Old8LangLib", sourceFileName)
+                    };
+
+                    foreach (var path in searchPaths)
                     {
-                        return indexFile;
+                        try
+                        {
+                            var fullPath = Path.GetFullPath(path);
+                            if (File.Exists(fullPath))
+                            {
+                                return fullPath;
+                            }
+                        }
+                        catch
+                        {
+                            // 忽略路径解析错误，继续下一个
+                        }
                     }
                 }
+            }
+            else if (assemblyName == "Old8Lang.NetLib")
+            {
+                // Net 库的特殊处理 - 包含多个类
+                // 由于无法准确定位到具体类文件，返回项目目录
+                var netLibPaths = new[]
+                {
+                    Path.Combine(baseDirectory, "..", "..", "..", "..", "Old8Lang.NetLib"),
+                    Path.Combine(Directory.GetCurrentDirectory(), "..", "Old8Lang.NetLib"),
+                    Path.Combine(Directory.GetCurrentDirectory(), "Old8Lang.NetLib")
+                };
 
-                return null;
+                foreach (var path in netLibPaths)
+                {
+                    try
+                    {
+                        var fullPath = Path.GetFullPath(path);
+                        if (Directory.Exists(fullPath))
+                        {
+                            // 返回项目根目录或主入口文件
+                            var mainFile = Path.Combine(fullPath, "SocketClient.cs");
+                            if (File.Exists(mainFile))
+                            {
+                                return mainFile;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // 忽略
+                    }
+                }
             }
 
-            // 处理绝对路径或模块名
-            // 尝试在当前目录查找
-            var localPath = Path.Combine(currentDir, moduleName + ".old8");
-            if (File.Exists(localPath))
-            {
-                return localPath;
-            }
-
-            // TODO: 支持标准库和包查找
-            // 这里可以扩展支持 Old8LangLib 等标准库的路径解析
-
+            // 其他扩展库暂不支持源码链接
             return null;
         }
         catch

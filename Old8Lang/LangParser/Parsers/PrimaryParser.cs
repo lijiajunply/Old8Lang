@@ -1255,23 +1255,15 @@ public class PrimaryParser(
                     case "\\0": return '\0';
                     default:
                         // 处理Unicode转义序列 \uXXXX
-                        if (content.StartsWith("\\u") && content.Length == 6)
+                        if (EscapeSequenceHelper.TryParseUnicodeEscapeFromContent(content, out var unicodeChar))
                         {
-                            var hexCode = content.Substring(2);
-                            if (int.TryParse(hexCode, System.Globalization.NumberStyles.HexNumber, null, out var code))
-                            {
-                                return (char)code;
-                            }
+                            return unicodeChar;
                         }
 
                         // 处理十六进制转义序列 \xXX
-                        if (content.StartsWith("\\x") && content.Length >= 3)
+                        if (EscapeSequenceHelper.TryParseHexEscapeFromContent(content, out var hexChar))
                         {
-                            var hexCode = content.Substring(2);
-                            if (int.TryParse(hexCode, System.Globalization.NumberStyles.HexNumber, null, out var code))
-                            {
-                                return (char)code;
-                            }
+                            return hexChar;
                         }
 
                         break;

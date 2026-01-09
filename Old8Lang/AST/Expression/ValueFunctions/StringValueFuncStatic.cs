@@ -9,6 +9,21 @@ namespace Old8Lang.AST.Expression.ValueFunctions;
 [Serializable]
 public static class StringValueFuncStatic
 {
+    /// <summary>
+    /// 验证字符串不为空，如果为空则抛出异常
+    /// </summary>
+    /// <param name="value">要验证的字符串</param>
+    /// <param name="paramName">参数名称</param>
+    /// <param name="displayName">显示名称（用于错误消息）</param>
+    /// <exception cref="ArgumentNullException">当字符串为空时抛出</exception>
+    private static void ThrowIfNullOrEmpty(string value, string paramName, string displayName)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            throw new ArgumentNullException(paramName, $"{displayName}不能为空");
+        }
+    }
+
     extension(StringLangValue str)
     {
         /// <summary>
@@ -94,15 +109,8 @@ public static class StringValueFuncStatic
             var input = str.Value;
             var prefix = prefixLangValue.Value;
 
-            if (string.IsNullOrEmpty(input))
-            {
-                throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
-            }
-
-            if (string.IsNullOrEmpty(prefix))
-            {
-                throw new ArgumentNullException(nameof(prefix), "前缀不能为空");
-            }
+            ThrowIfNullOrEmpty(input, nameof(input), "输入字符串");
+            ThrowIfNullOrEmpty(prefix, nameof(prefix), "前缀");
 
             return new BoolLangValue(input.StartsWith(prefix));
         }
@@ -115,19 +123,12 @@ public static class StringValueFuncStatic
         public BoolLangValue EndsWith(StringLangValue suffixLangValue)
         {
             var input = str.Value;
-            var prefix = suffixLangValue.Value;
+            var suffix = suffixLangValue.Value;
 
-            if (string.IsNullOrEmpty(input))
-            {
-                throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
-            }
+            ThrowIfNullOrEmpty(input, nameof(input), "输入字符串");
+            ThrowIfNullOrEmpty(suffix, nameof(suffix), "后缀");
 
-            if (string.IsNullOrEmpty(prefix))
-            {
-                throw new ArgumentNullException(nameof(prefix), "前缀不能为空");
-            }
-
-            return new BoolLangValue(input.StartsWith(prefix));
+            return new BoolLangValue(input.EndsWith(suffix));
         }
 
         /// <summary>
@@ -137,15 +138,8 @@ public static class StringValueFuncStatic
         /// <returns>子字符串的位置，如果没有找到则返回-1</returns>
         public IntLangValue IndexOf(StringLangValue substring)
         {
-            if (string.IsNullOrEmpty(str.Value))
-            {
-                throw new ArgumentNullException(nameof(str), "输入字符串不能为空");
-            }
-
-            if (string.IsNullOrEmpty(substring.Value))
-            {
-                throw new ArgumentNullException(nameof(substring), "子字符串不能为空");
-            }
+            ThrowIfNullOrEmpty(str.Value, nameof(str), "输入字符串");
+            ThrowIfNullOrEmpty(substring.Value, nameof(substring), "子字符串");
 
             return new IntLangValue(str.Value.IndexOf(substring.Value, StringComparison.Ordinal));
         }
@@ -162,10 +156,7 @@ public static class StringValueFuncStatic
         /// <returns>重复后的字符串</returns>
         public string Repeat(IntLangValue countValue)
         {
-            if (string.IsNullOrEmpty(input.Value))
-            {
-                throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
-            }
+            ThrowIfNullOrEmpty(input.Value, nameof(input), "输入字符串");
 
             var count = countValue.Value;
 
@@ -195,10 +186,7 @@ public static class StringValueFuncStatic
         public string TrimStart()
         {
             var input1 = input.Value;
-            if (string.IsNullOrEmpty(input1))
-            {
-                throw new ArgumentNullException(nameof(input1), "输入字符串不能为空");
-            }
+            ThrowIfNullOrEmpty(input1, nameof(input1), "输入字符串");
 
             return input1.TrimStart();
         }
@@ -210,10 +198,7 @@ public static class StringValueFuncStatic
         public string TrimEnd()
         {
             var input1 = input.Value;
-            if (string.IsNullOrEmpty(input1))
-            {
-                throw new ArgumentNullException(nameof(input1), "输入字符串不能为空");
-            }
+            ThrowIfNullOrEmpty(input1, nameof(input1), "输入字符串");
 
             return input1.TrimEnd();
         }
@@ -229,10 +214,7 @@ public static class StringValueFuncStatic
         public string ToBase64()
         {
             var input = inputValue.Value;
-            if (string.IsNullOrEmpty(input))
-            {
-                throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
-            }
+            ThrowIfNullOrEmpty(input, nameof(input), "输入字符串");
 
             try
             {
@@ -252,10 +234,7 @@ public static class StringValueFuncStatic
         public string FromBase64()
         {
             var input = inputValue.Value;
-            if (string.IsNullOrEmpty(input))
-            {
-                throw new ArgumentNullException(nameof(input), "输入字符串不能为空");
-            }
+            ThrowIfNullOrEmpty(input, nameof(input), "输入字符串");
 
             try
             {
