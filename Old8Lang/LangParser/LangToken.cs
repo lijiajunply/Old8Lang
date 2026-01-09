@@ -1193,7 +1193,7 @@ public static class EscapeSequenceHelper
         advanceCount = 0;
 
         // 检查是否有足够的字符（\u + 4位十六进制，索引从 i 开始是 \，i+1 是 u）
-        if (startIndex + 5 > input.Length)
+        if (startIndex + 6 > input.Length)
         {
             return false;
         }
@@ -1224,7 +1224,7 @@ public static class EscapeSequenceHelper
         advanceCount = 0;
 
         // 检查是否有足够的字符（\x + 2位十六进制，索引从 i 开始是 \，i+1 是 x）
-        if (startIndex + 3 > input.Length)
+        if (startIndex + 4 > input.Length)
         {
             return false;
         }
