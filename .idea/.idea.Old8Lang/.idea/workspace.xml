@@ -23,8 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/WorkspaceSymbolHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/WorkspaceSymbolHandler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Docs/LANGUAGE_FEATURES.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -562,7 +561,7 @@
       <workItem from="1767815939091" duration="4003000" />
       <workItem from="1767865400494" duration="19888000" />
       <workItem from="1767985358686" duration="156000" />
-      <workItem from="1767985518540" duration="2738000" />
+      <workItem from="1767985518540" duration="3373000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -907,7 +906,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="579" />
+    <option name="localTasksCounter" value="580" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -934,7 +933,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(language-server): 修复符号查找和定义跳转功能&#10;&#10;- 修复 SymbolFinder 中的 FindTokenAtPosition 方法，使用源代码精确查找token位置&#10;- 修正 DefinitionHandlerTests 中的测试位置参数，确保测试准确性&#10;- 在 SymbolTableBuilder 中添加源代码参数以支持位置精确定位&#10;- 实现变量定义位置从token列表中精确查找的功能&#10;- 优化符号位置查找算法，解决光标位置与token匹配的准确性问题&#10;- 更新 DocumentManager 传递源代码到符号表构建器中" />
     <MESSAGE value="fix(language-server): 修复悬停功能中的符号类型显示和符号查找问题&#10;&#10;- 修复变量类型显示格式，对于变量显示&quot;变量名: 类型&quot;格式&#10;- 修正函数、类等符号类型信息的显示逻辑&#10;- 增强SymbolFinder中的符号查找机制，支持变量成员的类型推断回退&#10;- 添加在所有类成员中查找符号的回退机制&#10;- 修正HoverHandlerTests中的测试位置参数以确保测试准确性&#10;- 清理IDE工作区配置中的变更记录" />
     <MESSAGE value="fix(parser): 修复联合类型和交叉类型解析问题&#10;&#10;- 添加 justProcessedOperator 标记跟踪联合类型和交叉类型操作符处理状态&#10;- 修正类型注解解析逻辑，避免在操作符后误判类型注解结束&#10;- 在标识符读取后重置操作符标记状态&#10;- 标记联合类型操作符 | 和交叉类型操作符 &amp; 处理状态&#10;- 修复 SetStatement 中变量获取方法从 GetAny 改为 GetValue&#10;- 更新单元测试中的空值检查语法&#10;- 清理 IDE 配置文件中的变更记录" />
     <MESSAGE value="fix(parser): 修复预处理器指令中#define的位置敏感性问题&#10;&#10;- 修复PreprocessorTokenizer中conditionStack的数据结构，从Stack&lt;bool&gt;改为Stack&lt;(bool isActive, bool anyBranchTaken)&gt;&#10;- 更新所有条件判断逻辑以使用新的元组结构中的isActive字段&#10;- 修正ProcessIf、ProcessElif、ProcessElse方法中的分支激活逻辑&#10;- 更新预处理器指令处理方法的参数类型签名&#10;- 修改测试用例Preprocessor_DefineNotAtLineStart_DoesNotDefineSymbol以正确验证异常情况&#10;- 添加调试断点配置以支持预处理器边缘情况测试" />
@@ -959,7 +957,8 @@
     <MESSAGE value="feat(lsp): 添加函数参数符号查找功能&#10;&#10;- 在 SymbolInfo 模型中新增 Parameters 属性存储函数参数列表&#10;- 扩展 SymbolFinder 实现函数和方法参数的符号查找逻辑&#10;- 修改 SymbolTableBuilder 在构建函数/方法时解析并存储参数信息&#10;- 实现参数符号的位置定位和类型推断功能&#10;- 更新类成员方法的参数查找逻辑&#10;- 完善参数符号的父子关系关联" />
     <MESSAGE value="fix(signature): 修复函数签名帮助中的参数索引和返回类型解析问题&#10;&#10;- 修复了右括号位置的参数索引计算逻辑，确保在函数调用内部正确查找&#10;- 优化了函数参数信息的获取方式，直接从Parameters列表获取而非通过Members过滤&#10;- 实现了返回类型的正确提取逻辑，添加ExtractReturnTypeFromSignature辅助方法&#10;- 更新了测试用例中的函数调用语法以匹配新的解析逻辑&#10;- 修正了内置函数签名帮助的参数索引判断&#10;- 调整了嵌套函数调用场景下的签名帮助支持" />
     <MESSAGE value="fix(semantic-tokens): 解决测试环境中 RegistrationOptions 未初始化问题&#10;&#10;- 添加空值检查避免 RegistrationOptions 为 null 时的异常&#10;- 创建默认的 SemanticTokensLegend 作为后备方案&#10;- 确保 TokenTypes 和 TokenModifiers 的正确初始化&#10;- 保持原有功能完整性的同时提高代码健壮性" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(semantic-tokens): 解决测试环境中 RegistrationOptions 未初始化问题&#10;&#10;- 添加空值检查避免 RegistrationOptions 为 null 时的异常&#10;- 创建默认的 SemanticTokensLegend 作为后备方案&#10;- 确保 TokenTypes 和 TokenModifiers 的正确初始化&#10;- 保持原有功能完整性的同时提高代码健壮性" />
+    <MESSAGE value="docs(guidelines): 添加 Old8Lang API 参考文档和贡献者指南&#10;&#10;- 创建完整的 API 参考文档，涵盖基础函数、数学函数、字符串处理等功能模块&#10;- 添加详细的并发原语文档，包括互斥锁、信号量、原子整数、通道等&#10;- 编写全面的贡献者指南，包含开发环境设置、代码规范、提交规范等内容&#10;- 提供测试要求和文档贡献指导，帮助开发者参与项目&#10;- 包含问题报告和功能请求的模板，规范社区交互流程" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(guidelines): 添加 Old8Lang API 参考文档和贡献者指南&#10;&#10;- 创建完整的 API 参考文档，涵盖基础函数、数学函数、字符串处理等功能模块&#10;- 添加详细的并发原语文档，包括互斥锁、信号量、原子整数、通道等&#10;- 编写全面的贡献者指南，包含开发环境设置、代码规范、提交规范等内容&#10;- 提供测试要求和文档贡献指导，帮助开发者参与项目&#10;- 包含问题报告和功能请求的模板，规范社区交互流程" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
