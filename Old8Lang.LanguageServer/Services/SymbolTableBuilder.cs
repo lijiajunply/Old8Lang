@@ -3,6 +3,7 @@ using Old8Lang.AST.Statement;
 using Old8Lang.AST.Expression;
 using Old8Lang.AST.Expression.AnyValues;
 using Old8Lang.AST.Expression.Value;
+using Old8Lang.AST.Expression.Intermediates;
 using Old8Lang.LanguageServer.Models;
 using Old8Lang.LangParser;
 
@@ -394,7 +395,7 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
         var varType = setStatement.Id.AssumptionType;
 
         // 如果没有显式类型标注，尝试从赋值表达式推断
-        if (string.IsNullOrEmpty(varType))
+        if (string.IsNullOrEmpty(varType) && setStatement.Value != null)
         {
             varType = InferTypeFromExpression(setStatement.Value);
         }
@@ -424,10 +425,63 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
                 var className = instance.Id.IdName;
                 return className;
 
+            // 操作表达式 - 处理成员方法调用：outer.createInner()
+            case Operation { Opera: LangTokenType.Dot } dotOp:
+                // 成员方法调用：Operation(Dot, objectId, Instance(methodName()))
+                if (dotOp.Left is LangId objectId && dotOp.Right is Instance methodCall)
+                {
+                    // 获取对象的类型
+                    if (_symbolTable.TryGetValue(objectId.IdName, out var objectSymbol))
+                    {
+                        // 查找对象类型对应的类
+                        if (!string.IsNullOrEmpty(objectSymbol.Type) &&
+                            _symbolTable.TryGetValue(objectSymbol.Type, out var classSymbol) &&
+                            classSymbol.Kind == SymbolKind.Class)
+                        {
+                            // 查找方法
+                            var memberName = methodCall.Id.IdName;
+                            if (classSymbol.Members.TryGetValue(memberName, out var memberSymbol) &&
+                                memberSymbol.Kind == SymbolKind.Method)
+                            {
+                                // 从方法签名中提取返回类型
+                                var returnType = ExtractReturnTypeFromSignature(memberSymbol.Type);
+                                return returnType;
+                            }
+                        }
+                    }
+                }
+                break;
+
             // 函数调用表达式 User()
             case FunctionCallExpression funcCall:
+                // 检查函数表达式是否是成员访问 (outer.createInner())
+                // 成员访问会被解析为 Operation(Dot)，left 是对象，right 是方法名
+                if (funcCall.FunctionExpression is Operation { Opera: LangTokenType.Dot } dotOp2 &&
+                    dotOp2.Left is LangId objectId2 &&
+                    dotOp2.Right is LangId methodId2)
+                {
+                    // 获取对象的类型
+                    if (_symbolTable.TryGetValue(objectId2.IdName, out var objectSymbol2))
+                    {
+                        // 查找对象类型对应的类
+                        if (!string.IsNullOrEmpty(objectSymbol2.Type) &&
+                            _symbolTable.TryGetValue(objectSymbol2.Type, out var classSymbol2) &&
+                            classSymbol2.Kind == SymbolKind.Class)
+                        {
+                            // 查找方法
+                            var memberName2 = methodId2.IdName;
+                            if (classSymbol2.Members.TryGetValue(memberName2, out var memberSymbol2) &&
+                                memberSymbol2.Kind == SymbolKind.Method)
+                            {
+                                // 从方法签名中提取返回类型
+                                var returnType2 = ExtractReturnTypeFromSignature(memberSymbol2.Type);
+                                return returnType2;
+                            }
+                        }
+                    }
+                }
                 // 检查函数表达式是否是一个标识符
-                if (funcCall.FunctionExpression is LangId funcId)
+                else if (funcCall.FunctionExpression is LangId funcId)
                 {
                     var funcName = funcId.IdName;
                     // 如果函数名首字母大写，很可能是类构造函数调用
@@ -435,25 +489,33 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
                     {
                         return funcName;
                     }
+
+                    // 尝试从符号表查找函数的返回类型
+                    if (_symbolTable.TryGetValue(funcName, out var funcSymbol) &&
+                        funcSymbol.Kind == SymbolKind.Function)
+                    {
+                        var returnType = ExtractReturnTypeFromSignature(funcSymbol.Type);
+                        return returnType;
+                    }
                 }
                 break;
-            
+
             // 字符串字面量
             case StringLangValue:
                 return "string";
-            
+
             // 整数字面量
             case IntLangValue:
                 return "int";
-            
+
             // 浮点数字面量
             case DoubleLangValue:
                 return "double";
-            
+
             // 布尔字面量
             case BoolLangValue:
                 return "bool";
-                
+
             // 标识符 - 从符号表查找
             case LangId langId:
                 if (_symbolTable.TryGetValue(langId.IdName, out var refSymbol))
@@ -461,6 +523,27 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
                     return refSymbol.Type;
                 }
                 break;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 从函数/方法签名中提取返回类型
+    /// </summary>
+    /// <param name="signature">函数签名，格式如 "func name(params) -> returnType"</param>
+    /// <returns>返回类型，如果无法解析则返回 null</returns>
+    private string? ExtractReturnTypeFromSignature(string? signature)
+    {
+        if (string.IsNullOrEmpty(signature))
+            return null;
+
+        // 查找 " -> " 后的返回类型
+        var arrowIndex = signature.IndexOf(" -> ", StringComparison.Ordinal);
+        if (arrowIndex >= 0)
+        {
+            var returnType = signature.Substring(arrowIndex + 4).Trim();
+            return returnType;
         }
 
         return null;

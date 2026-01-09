@@ -38,19 +38,19 @@ pi <- Calculator.PI
         var functionCompletion = await handler.Handle(new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(15, 0) // After 'add' function
+            Position = new Position(13, 0) // Line 14: result1 <- add(1, 2)
         }, CancellationToken.None);
 
         var classCompletion = await handler.Handle(new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(7, 0) // After 'Calculator' class
+            Position = new Position(6, 0) // Line 7: inside Calculator class
         }, CancellationToken.None);
 
         var variableCompletion = await handler.Handle(new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(15, 0) // After 'result1' variable
+            Position = new Position(14, 0) // Line 15: result2 <- Calculator.multiply(3, 4)
         }, CancellationToken.None);
 
         // Assert
@@ -75,7 +75,7 @@ pi <- Calculator.PI
         var staticMemberCompletion = await handler.Handle(new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(12, 9) // After 'Calculator.' (member access)
+            Position = new Position(14, 22) // Line 15: result2 <- Calculator.|multiply(3, 4) - after the dot
         }, CancellationToken.None);
 
         Assert.Contains(staticMemberCompletion.Items, item => item.Label == "multiply");
@@ -109,19 +109,19 @@ reference <- testFunction()
         var functionDefinition = await handler.Handle(new DefinitionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(10, 5) // 'testFunction' reference
+            Position = new Position(11, 14) // Line 12: reference <- |testFunction()
         }, CancellationToken.None);
 
         var classDefinition = await handler.Handle(new DefinitionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(9, 10) // 'TestClass' reference
+            Position = new Position(9, 14) // Line 10: instance <- |TestClass()
         }, CancellationToken.None);
 
         var variableDefinition = await handler.Handle(new DefinitionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(11, 9) // 'instance' reference  
+            Position = new Position(10, 11) // Line 11: result <- |instance.value
         }, CancellationToken.None);
 
         // Assert
@@ -131,15 +131,15 @@ reference <- testFunction()
 
         // Function definition should point to function declaration
         var funcLocation = functionDefinition.First().Location!;
-        Assert.Equal(1, funcLocation.Range.Start.Line); // Line 2 (0-based)
+        Assert.Equal(1, funcLocation.Range.Start.Line); // Line 2 (0-based is 1)
 
         // Class definition should point to class declaration
         var classLocation = classDefinition.First().Location!;
-        Assert.Equal(3, classLocation.Range.Start.Line); // Line 4 (0-based)
+        Assert.Equal(5, classLocation.Range.Start.Line); // Line 6 (0-based is 5)
 
         // Variable definition should point to variable declaration
         var varLocation = variableDefinition.First().Location!;
-        Assert.Equal(10, varLocation.Range.Start.Line); // Line 11 (0-based)
+        Assert.Equal(9, varLocation.Range.Start.Line); // Line 10 (0-based is 9)
     }
 
     [Fact]
@@ -171,13 +171,13 @@ class ValueHolder {
         var functionHover = await handler.Handle(new HoverParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(8, 5) // 'addNumbers' function
+            Position = new Position(5, 5) // Line 6: func |addNumbers(a:int, b:int) -> int
         }, CancellationToken.None);
 
         var classHover = await handler.Handle(new HoverParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(14, 6) // 'ValueHolder' class
+            Position = new Position(10, 6) // Line 11: class |ValueHolder {
         }, CancellationToken.None);
 
         // Assert
@@ -471,13 +471,13 @@ result3 <- InnerClass.getStaticValue()
         var instanceMethodCompletion = await completionHandler.Handle(new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(19, 12) // After 'inner.' (instance method)
+            Position = new Position(23, 18) // Line 24: result1 <- inner.|getValue() - after the dot
         }, CancellationToken.None);
 
         var staticMethodCompletion = await completionHandler.Handle(new CompletionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(20, 14) // After 'inner.' (static method)
+            Position = new Position(24, 18) // Line 25: result2 <- inner.|getStaticValue() - after the dot
         }, CancellationToken.None);
 
         // Assert
