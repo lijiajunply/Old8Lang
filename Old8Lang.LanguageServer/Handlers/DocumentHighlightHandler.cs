@@ -10,18 +10,11 @@ namespace Old8Lang.LanguageServer.Handlers;
 /// <summary>
 /// 文档高亮处理器 - 高亮当前符号的所有出现位置
 /// </summary>
-public class DocumentHighlightHandler : DocumentHighlightHandlerBase
+public class DocumentHighlightHandler(DocumentManager documentManager) : DocumentHighlightHandlerBase
 {
-    private readonly DocumentManager _documentManager;
-
-    public DocumentHighlightHandler(DocumentManager documentManager)
-    {
-        _documentManager = documentManager;
-    }
-
     public override Task<DocumentHighlightContainer?> Handle(DocumentHighlightParams request, CancellationToken cancellationToken)
     {
-        var document = _documentManager.GetDocument(request.TextDocument.Uri.ToString());
+        var document = documentManager.GetDocument(request.TextDocument.Uri.ToString());
         if (document == null)
         {
             return Task.FromResult<DocumentHighlightContainer?>(null);

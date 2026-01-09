@@ -9,18 +9,11 @@ namespace Old8Lang.LanguageServer.Handlers;
 /// <summary>
 /// 代码折叠处理器 - 提供代码块、函数、类的折叠功能
 /// </summary>
-public class FoldingRangeHandler : FoldingRangeHandlerBase
+public class FoldingRangeHandler(DocumentManager documentManager) : FoldingRangeHandlerBase
 {
-    private readonly DocumentManager _documentManager;
-
-    public FoldingRangeHandler(DocumentManager documentManager)
-    {
-        _documentManager = documentManager;
-    }
-
     public override Task<Container<FoldingRange>?> Handle(FoldingRangeRequestParam request, CancellationToken cancellationToken)
     {
-        var document = _documentManager.GetDocument(request.TextDocument.Uri.ToString());
+        var document = documentManager.GetDocument(request.TextDocument.Uri.ToString());
         if (document == null || document.Tokens == null)
         {
             return Task.FromResult<Container<FoldingRange>?>(null);

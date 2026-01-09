@@ -9,15 +9,8 @@ namespace Old8Lang.LanguageServer.Handlers;
 /// <summary>
 /// 代码操作处理器 - 提供快速修复和重构建议
 /// </summary>
-public class CodeActionHandler : ICodeActionHandler
+public class CodeActionHandler(DocumentManager documentManager) : ICodeActionHandler
 {
-    private readonly DocumentManager _documentManager;
-
-    public CodeActionHandler(DocumentManager documentManager)
-    {
-        _documentManager = documentManager;
-    }
-
     public CodeActionRegistrationOptions GetRegistrationOptions(
         CodeActionCapability capability,
         ClientCapabilities clientCapabilities)
@@ -40,7 +33,7 @@ public class CodeActionHandler : ICodeActionHandler
     public Task<CommandOrCodeActionContainer> Handle(CodeActionParams request, CancellationToken cancellationToken)
     {
         var uri = request.TextDocument.Uri.ToString();
-        var document = _documentManager.GetDocument(uri);
+        var document = documentManager.GetDocument(uri);
 
         if (document == null)
         {

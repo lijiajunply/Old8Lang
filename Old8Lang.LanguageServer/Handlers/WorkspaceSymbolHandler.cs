@@ -10,24 +10,22 @@ using SymbolKind = Old8Lang.LanguageServer.Models.SymbolKind;
 namespace Old8Lang.LanguageServer.Handlers;
 
 /// <summary>
-/// 工作区符号搜索处理器 - 支持跨文件符号搜索
+/// 工作区符号搜索处理器 - 支持跨文件符号搜索（已优化性能）
 /// </summary>
-public class WorkspaceSymbolHandler : WorkspaceSymbolsHandlerBase
+public class WorkspaceSymbolHandler(DocumentManager documentManager) : WorkspaceSymbolsHandlerBase
 {
-    private readonly DocumentManager _documentManager;
-
-    public WorkspaceSymbolHandler(DocumentManager documentManager)
-    {
-        _documentManager = documentManager;
-    }
-
-    public override Task<Container<WorkspaceSymbol>?> Handle(WorkspaceSymbolParams request, CancellationToken cancellationToken)
+    public override Task<Container<WorkspaceSymbol>?> Handle(WorkspaceSymbolParams request,
+        CancellationToken cancellationToken)
     {
         var query = request.Query?.ToLower() ?? "";
         var symbols = new List<WorkspaceSymbol>();
 
+        // 优化：提前检查是否有查询，如果没有查询则限制结果数量
+        const int maxSymbolsWithoutQuery = 100;
+        bool hasQuery = !string.IsNullOrEmpty(query);
+
         // 遍历所有已打开的文档
-        foreach (var (uri, parseResult) in _documentManager.GetAllDocuments())
+        foreach (var (uri, parseResult) in documentManager.GetAllDocuments())
         {
             if (parseResult?.SymbolTable == null)
                 continue;
@@ -35,9 +33,15 @@ public class WorkspaceSymbolHandler : WorkspaceSymbolsHandlerBase
             // 遍历符号表
             foreach (var (symbolName, symbolInfo) in parseResult.SymbolTable)
             {
+                // 优化：如果没有查询且已经收集了足够多的符号，则停止
+                if (!hasQuery && symbols.Count >= maxSymbolsWithoutQuery)
+                {
+                    break;
+                }
+
                 // 如果查询为空，返回所有符号
-                // 如果查询不为空，检查符号名是否包含查询字符串
-                if (string.IsNullOrEmpty(query) || symbolName.ToLower().Contains(query))
+                // 如果查询不为空，检查符号名是否包含查询字符串（已优化为不区分大小写）
+                if (!hasQuery || symbolName.ToLower().Contains(query))
                 {
                     // 创建工作区符号
                     var workspaceSymbol = new WorkspaceSymbol
@@ -57,12 +61,18 @@ public class WorkspaceSymbolHandler : WorkspaceSymbolsHandlerBase
 
                     symbols.Add(workspaceSymbol);
 
-                    // 如果是类，也添加其成员
+                    // 如果是类，也添加其成员（仅当查询匹配时）
                     if (symbolInfo.Kind == SymbolKind.Class)
                     {
                         foreach (var (memberName, memberInfo) in symbolInfo.Members)
                         {
-                            if (string.IsNullOrEmpty(query) || memberName.ToLower().Contains(query))
+                            // 优化：如果没有查询且已经收集了足够多的符号，则跳过成员
+                            if (!hasQuery && symbols.Count >= maxSymbolsWithoutQuery)
+                            {
+                                break;
+                            }
+
+                            if (!hasQuery || memberName.ToLower().Contains(query))
                             {
                                 var memberSymbol = new WorkspaceSymbol
                                 {
@@ -84,6 +94,12 @@ public class WorkspaceSymbolHandler : WorkspaceSymbolsHandlerBase
                         }
                     }
                 }
+            }
+
+            // 优化：如果没有查询且已经收集了足够多的符号，则停止遍历文档
+            if (!hasQuery && symbols.Count >= maxSymbolsWithoutQuery)
+            {
+                break;
             }
         }
 
@@ -123,11 +139,6 @@ public class WorkspaceSymbolHandler : WorkspaceSymbolsHandlerBase
     private static string? GetContainerName(SymbolInfo symbolInfo)
     {
         // 如果有父符号，返回父符号的名称
-        if (symbolInfo.Parent != null)
-        {
-            return symbolInfo.Parent.Name;
-        }
-
-        return null;
+        return symbolInfo.Parent?.Name;
     }
 }

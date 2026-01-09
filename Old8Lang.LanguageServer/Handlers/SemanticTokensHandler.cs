@@ -10,10 +10,8 @@ namespace Old8Lang.LanguageServer.Handlers;
 /// <summary>
 /// 语义标记处理器 - 提供基于语义的精确语法高亮
 /// </summary>
-public class SemanticTokensHandler : SemanticTokensHandlerBase
+public class SemanticTokensHandler(DocumentManager documentManager) : SemanticTokensHandlerBase
 {
-    private readonly DocumentManager _documentManager;
-
     // 语义标记类型（按LSP协议标准定义）
     private static readonly string[] TokenTypes =
     [
@@ -57,11 +55,6 @@ public class SemanticTokensHandler : SemanticTokensHandlerBase
         SemanticTokenModifier.DefaultLibrary  // 9
     ];
 
-    public SemanticTokensHandler(DocumentManager documentManager)
-    {
-        _documentManager = documentManager;
-    }
-
     protected override SemanticTokensRegistrationOptions CreateRegistrationOptions(
         SemanticTokensCapability capability, ClientCapabilities clientCapabilities)
     {
@@ -90,7 +83,7 @@ public class SemanticTokensHandler : SemanticTokensHandlerBase
     protected override async Task Tokenize(
         SemanticTokensBuilder builder, ITextDocumentIdentifierParams identifier, CancellationToken cancellationToken)
     {
-        var document = _documentManager.GetDocument(identifier.TextDocument.Uri.ToString());
+        var document = documentManager.GetDocument(identifier.TextDocument.Uri.ToString());
         if (document == null || document.Tokens == null)
         {
             return;

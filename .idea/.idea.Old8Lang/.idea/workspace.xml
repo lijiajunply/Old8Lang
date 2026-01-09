@@ -23,12 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.App/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.App/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/LangExpression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/LangExpression.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/OldStatement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/OldStatement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Visitor_Migration_Plan.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CodeActionHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CodeActionHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DocumentHighlightHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DocumentHighlightHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/FoldingRangeHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/FoldingRangeHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/SemanticTokensHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/SemanticTokensHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/WorkspaceSymbolHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/WorkspaceSymbolHandler.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -908,7 +908,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="569" />
+    <option name="localTasksCounter" value="570" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -935,7 +935,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="refactor(interpreter): 优化外部函数执行和类型转换机制&#10;&#10;- 将 FuncLangValue 的 Run 方法改为 virtual 以支持重写&#10;- 为 JavaScriptFunctionLangValue 实现 override 的 Run 方法并修复命名参数类型&#10;- 为 PythonFunctionLangValue 实现 override 的 Run 方法并优化类型转换逻辑&#10;- 修复 Python 类型转换中的布尔值处理和对象类型检测&#10;- 更新 JavaScriptProvider 和 PythonProvider 中的错误抛出机制&#10;- 优化 PythonProvider 中的异常处理和类型转换流程" />
     <MESSAGE value="feat(interpreter): 添加 JavaScript 函数返回类型注解支持&#10;&#10;- 实现 JavaScriptFunctionLangValue 支持返回类型注解&#10;- 在 JavaScriptProvider 中解析函数声明的返回类型&#10;- 修复函数返回值类型转换逻辑，支持 double 类型&#10;- 优化 extern 语句解析时的类型注解处理&#10;- 添加多个测试文件用于验证 extern 功能&#10;- 更新 workspace.xml 配置文件中的变更记录" />
     <MESSAGE value="fix(python): 修复Python模块导入错误处理和函数返回类型问题&#10;&#10;- 修正了floor和ceil函数的返回类型从double改为int&#10;- 更新了相关测试用例以匹配新的返回类型&#10;- 将Python模块导入错误从InvalidOperationError改为ImportError&#10;- 添加了Python模块导入的异常处理机制&#10;- 实现了更详细的Python模块导入错误信息提示" />
     <MESSAGE value="fix(interpreter): 修复外部函数类型错误处理和返回值转换问题&#10;&#10;- 修复 JavaScript 类型不匹配时的处理逻辑，支持 NaN 返回值转换&#10;- 将 Python 函数调用错误从 ImportError 改为 InvalidOperationError&#10;- 修复 extern 函数返回类型解析，支持简单标识符类型注解&#10;- 更新类型不匹配测试用例，验证 JavaScript 隐式类型转换行为&#10;- 优化 extern 函数解析器，避免复杂类型注解跨行读取问题" />
@@ -960,7 +959,8 @@
     <MESSAGE value="fix(language-server): 修复定义处理器中的位置计算问题&#10;&#10;- 使用 token 的实际位置替换 FindColumnInLine 方法&#10;- 统一将行号和列号转换为 0-based 索引&#10;- 修正测试用例中的行号断言以匹配新的位置计算逻辑&#10;- 更新诊断信息集合的初始化语法为集合表达式&#10;- 修正集成测试中的位置参数以匹配实际代码行号" />
     <MESSAGE value="feat(lsp): 添加高优先级 LSP 功能增强&#10;&#10;- 实现文档符号大纲功能，提供代码结构视图和层级关系导航&#10;- 添加签名帮助功能，支持自定义和内置函数的参数提示和实时高亮&#10;- 集成代码格式化功能，支持文档和选定范围的自动格式化和缩进调整&#10;- 实现代码操作功能，提供快速修复和重构建议如变量定义和函数提取&#10;- 在 Program.cs 中注册新的处理器并添加 FormattingService 依赖注入&#10;- 更新 CHANGELOG.md 记录 Old8Lang 1.0.0 rc6 版本的 LSP 功能增强" />
     <MESSAGE value="feat(lsp): 添加文档链接和代码折叠高亮功能&#10;&#10;- 实现 DocumentLinkHandler 为 import 语句提供可点击的文件链接&#10;- 支持相对路径导入的解析和跳转功能&#10;- 添加 FoldingRangeHandler 提供代码块和注释的折叠功能&#10;- 实现 DocumentHighlightHandler 高亮符号的所有出现位置&#10;- 重构多个 Handler 使用构造函数注入替代手动字段注入&#10;- 更新 CHANGELOG.md 添加文档链接功能说明和架构改进&#10;- 扩展符号信息模型为未来调用层次功能预留数据结构&#10;- 修复动画组件中的字段可变性问题提升代码质量&#10;- 移除过时的调试性能分析功能说明文档" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(lsp): 添加文档链接和代码折叠高亮功能&#10;&#10;- 实现 DocumentLinkHandler 为 import 语句提供可点击的文件链接&#10;- 支持相对路径导入的解析和跳转功能&#10;- 添加 FoldingRangeHandler 提供代码块和注释的折叠功能&#10;- 实现 DocumentHighlightHandler 高亮符号的所有出现位置&#10;- 重构多个 Handler 使用构造函数注入替代手动字段注入&#10;- 更新 CHANGELOG.md 添加文档链接功能说明和架构改进&#10;- 扩展符号信息模型为未来调用层次功能预留数据结构&#10;- 修复动画组件中的字段可变性问题提升代码质量&#10;- 移除过时的调试性能分析功能说明文档" />
+    <MESSAGE value="refactor(ast): 完成AST节点Visitor模式迁移&#10;&#10;- 在LangExpression中实现Run、LoadIlValue和OutputType方法，使用Visitor模式替代原有逻辑&#10;- 为OldStatement添加详细的解释器和编译器模式XML文档注释&#10;- 更新CLAUDE.md文档，标记Visitor模式迁移已完成，包含InterpreterVisitor、CompilerVisitor和TypeInferenceVisitor&#10;- 移除过时的Visitor_Migration_Plan.md规划文档&#10;- 修改Program.cs中的测试文件路径，更新为union_type_assignment.old8测试用例" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 完成AST节点Visitor模式迁移&#10;&#10;- 在LangExpression中实现Run、LoadIlValue和OutputType方法，使用Visitor模式替代原有逻辑&#10;- 为OldStatement添加详细的解释器和编译器模式XML文档注释&#10;- 更新CLAUDE.md文档，标记Visitor模式迁移已完成，包含InterpreterVisitor、CompilerVisitor和TypeInferenceVisitor&#10;- 移除过时的Visitor_Migration_Plan.md规划文档&#10;- 修改Program.cs中的测试文件路径，更新为union_type_assignment.old8测试用例" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
