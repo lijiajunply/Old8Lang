@@ -102,13 +102,22 @@ public class SignatureHelpHandler(DocumentManager documentManager) : ISignatureH
             return null;
         }
 
+        // 如果当前token是右括号,从前一个token开始
+        // 这样可以确保我们在函数调用内部查找
+        int startIndex = currentIndex;
+        if (currentIndex >= 0 && currentIndex < tokens.Count &&
+            tokens[currentIndex].Type == LangTokenType.RightParen)
+        {
+            startIndex = currentIndex - 1;
+        }
+
         // 向前查找最近的左括号和函数名
         int parenDepth = 0;
         string? functionName = null;
         int parameterIndex = 0;
         int commaCount = 0;
 
-        for (int i = currentIndex; i >= 0; i--)
+        for (int i = startIndex; i >= 0; i--)
         {
             var token = tokens[i];
 
@@ -159,11 +168,8 @@ public class SignatureHelpHandler(DocumentManager documentManager) : ISignatureH
         var parameters = new List<ParameterInformation>();
         var signatureLabel = $"{functionSymbol.Name}(";
 
-        // 提取参数信息（从成员中过滤参数）
-        var paramSymbols = functionSymbol.Members.Values
-            .Where(m => m.Kind == Models.SymbolKind.Parameter)
-            .OrderBy(m => m.Location.Column)
-            .ToList();
+        // 从 Parameters 列表中获取参数信息
+        var paramSymbols = functionSymbol.Parameters;
 
         for (int i = 0; i < paramSymbols.Count; i++)
         {
@@ -188,10 +194,11 @@ public class SignatureHelpHandler(DocumentManager documentManager) : ISignatureH
 
         signatureLabel += ")";
 
-        // 添加返回类型
-        if (!string.IsNullOrEmpty(functionSymbol.Type))
+        // 从函数签名中提取返回类型
+        var returnType = ExtractReturnTypeFromSignature(functionSymbol.Type);
+        if (!string.IsNullOrEmpty(returnType))
         {
-            signatureLabel += $" -> {functionSymbol.Type}";
+            signatureLabel += $" -> {returnType}";
         }
 
         return new SignatureInformation
@@ -200,6 +207,24 @@ public class SignatureHelpHandler(DocumentManager documentManager) : ISignatureH
             Documentation = functionSymbol.Documentation,
             Parameters = new Container<ParameterInformation>(parameters)
         };
+    }
+
+    /// <summary>
+    /// 从函数签名中提取返回类型
+    /// </summary>
+    private string? ExtractReturnTypeFromSignature(string? signature)
+    {
+        if (string.IsNullOrEmpty(signature))
+            return null;
+
+        // 查找 " -> " 后的返回类型
+        var arrowIndex = signature.IndexOf(" -> ", StringComparison.Ordinal);
+        if (arrowIndex >= 0)
+        {
+            return signature.Substring(arrowIndex + 4).Trim();
+        }
+
+        return null;
     }
 
     /// <summary>

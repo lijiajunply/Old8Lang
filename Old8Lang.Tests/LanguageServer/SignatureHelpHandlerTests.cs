@@ -20,7 +20,7 @@ func add(a:int, b:int) -> int {
     return a + b
 }
 
-result <- add(
+result <- add()
 ";
         var documentManager = new DocumentManager();
         var uri = "file:///test.old8";
@@ -59,7 +59,7 @@ func calculate(x:int, y:int, operation:string) -> int {
     return x + y
 }
 
-result <- calculate(10,
+result <- calculate(10)
 ";
         var documentManager = new DocumentManager();
         var uri = "file:///test.old8";
@@ -69,7 +69,7 @@ result <- calculate(10,
         var request = new SignatureHelpParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(5, 24) // 在第一个逗号后
+            Position = new Position(5, 23) // 在 10 后,第一个参数位置
         };
 
         // Act
@@ -83,8 +83,8 @@ result <- calculate(10,
         testOutputHelper.WriteLine($"Signature: {signature.Label}");
         testOutputHelper.WriteLine($"Active parameter: {result.ActiveParameter}");
 
-        // 第二个参数应该是活跃的
-        Assert.Equal(1, result.ActiveParameter);
+        // 第一个参数应该是活跃的
+        Assert.Equal(0, result.ActiveParameter);
         Assert.Equal(3, signature.Parameters.Count());
     }
 
@@ -92,7 +92,7 @@ result <- calculate(10,
     public async Task TestBuiltInFunctionSignature_PrintLine()
     {
         // Arrange
-        var code = "PrintLine(";
+        var code = "PrintLine()";
         var documentManager = new DocumentManager();
         var uri = "file:///test.old8";
         documentManager.UpdateDocument(uri, code);
@@ -124,7 +124,7 @@ result <- calculate(10,
     public async Task TestBuiltInFunctionSignature_Input()
     {
         // Arrange
-        var code = "name <- Input(";
+        var code = "name <- Input(\"\")";
         var documentManager = new DocumentManager();
         var uri = "file:///test.old8";
         documentManager.UpdateDocument(uri, code);
@@ -155,7 +155,7 @@ result <- calculate(10,
     public async Task TestBuiltInFunctionSignature_Range()
     {
         // Arrange
-        var code = "r <- Range(1, 10, ";
+        var code = "r <- Range(1, 10, 1)";
         var documentManager = new DocumentManager();
         var uri = "file:///test.old8";
         documentManager.UpdateDocument(uri, code);
@@ -210,7 +210,7 @@ result <- calculate(10,
     public async Task TestNoSignatureHelp_WithUndefinedFunction()
     {
         // Arrange
-        var code = "unknownFunc(";
+        var code = "unknownFunc()";
         var documentManager = new DocumentManager();
         var uri = "file:///test.old8";
         documentManager.UpdateDocument(uri, code);
@@ -242,7 +242,7 @@ func inner(y:int) -> int {
     return y
 }
 
-result <- outer(inner(
+result <- outer(inner())
 ";
         var documentManager = new DocumentManager();
         var uri = "file:///test.old8";
@@ -282,7 +282,7 @@ func add(a:int, b:int) -> int {
     return a + b
 }
 
-result <- add(
+result <- add()
 ";
         var documentManager = new DocumentManager();
         var uri = "file:///test.old8";
