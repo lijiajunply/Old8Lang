@@ -23,12 +23,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Docs/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CodeActionHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CodeActionHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DocumentHighlightHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DocumentHighlightHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/FoldingRangeHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/FoldingRangeHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/SemanticTokensHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/SemanticTokensHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/WorkspaceSymbolHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/WorkspaceSymbolHandler.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Benchmarks/TypeInferenceBenchmarkTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Compiler/ILGenerationCache.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/SymbolTableCache.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Core/TokenIndexCache.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reports/性能优化报告-2026-01-09.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Compiler/LocalManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/Interpreter/VariateManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Core/ParserContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Core/ParserContext.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -908,7 +910,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="570" />
+    <option name="localTasksCounter" value="571" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -935,7 +937,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(interpreter): 添加 JavaScript 函数返回类型注解支持&#10;&#10;- 实现 JavaScriptFunctionLangValue 支持返回类型注解&#10;- 在 JavaScriptProvider 中解析函数声明的返回类型&#10;- 修复函数返回值类型转换逻辑，支持 double 类型&#10;- 优化 extern 语句解析时的类型注解处理&#10;- 添加多个测试文件用于验证 extern 功能&#10;- 更新 workspace.xml 配置文件中的变更记录" />
     <MESSAGE value="fix(python): 修复Python模块导入错误处理和函数返回类型问题&#10;&#10;- 修正了floor和ceil函数的返回类型从double改为int&#10;- 更新了相关测试用例以匹配新的返回类型&#10;- 将Python模块导入错误从InvalidOperationError改为ImportError&#10;- 添加了Python模块导入的异常处理机制&#10;- 实现了更详细的Python模块导入错误信息提示" />
     <MESSAGE value="fix(interpreter): 修复外部函数类型错误处理和返回值转换问题&#10;&#10;- 修复 JavaScript 类型不匹配时的处理逻辑，支持 NaN 返回值转换&#10;- 将 Python 函数调用错误从 ImportError 改为 InvalidOperationError&#10;- 修复 extern 函数返回类型解析，支持简单标识符类型注解&#10;- 更新类型不匹配测试用例，验证 JavaScript 隐式类型转换行为&#10;- 优化 extern 函数解析器，避免复杂类型注解跨行读取问题" />
     <MESSAGE value="fix(interpreter): 修复函数调用中defer语句执行时机问题&#10;&#10;- 调整defer语句执行位置，移至finally块中确保异常时也能执行&#10;- 添加executionManager空值检查避免空引用异常&#10;- 保持子作用域移除逻辑在defer执行之后&#10;- 更新workspace.xml中的变更记录和测试文件追踪" />
@@ -960,7 +961,8 @@
     <MESSAGE value="feat(lsp): 添加高优先级 LSP 功能增强&#10;&#10;- 实现文档符号大纲功能，提供代码结构视图和层级关系导航&#10;- 添加签名帮助功能，支持自定义和内置函数的参数提示和实时高亮&#10;- 集成代码格式化功能，支持文档和选定范围的自动格式化和缩进调整&#10;- 实现代码操作功能，提供快速修复和重构建议如变量定义和函数提取&#10;- 在 Program.cs 中注册新的处理器并添加 FormattingService 依赖注入&#10;- 更新 CHANGELOG.md 记录 Old8Lang 1.0.0 rc6 版本的 LSP 功能增强" />
     <MESSAGE value="feat(lsp): 添加文档链接和代码折叠高亮功能&#10;&#10;- 实现 DocumentLinkHandler 为 import 语句提供可点击的文件链接&#10;- 支持相对路径导入的解析和跳转功能&#10;- 添加 FoldingRangeHandler 提供代码块和注释的折叠功能&#10;- 实现 DocumentHighlightHandler 高亮符号的所有出现位置&#10;- 重构多个 Handler 使用构造函数注入替代手动字段注入&#10;- 更新 CHANGELOG.md 添加文档链接功能说明和架构改进&#10;- 扩展符号信息模型为未来调用层次功能预留数据结构&#10;- 修复动画组件中的字段可变性问题提升代码质量&#10;- 移除过时的调试性能分析功能说明文档" />
     <MESSAGE value="refactor(ast): 完成AST节点Visitor模式迁移&#10;&#10;- 在LangExpression中实现Run、LoadIlValue和OutputType方法，使用Visitor模式替代原有逻辑&#10;- 为OldStatement添加详细的解释器和编译器模式XML文档注释&#10;- 更新CLAUDE.md文档，标记Visitor模式迁移已完成，包含InterpreterVisitor、CompilerVisitor和TypeInferenceVisitor&#10;- 移除过时的Visitor_Migration_Plan.md规划文档&#10;- 修改Program.cs中的测试文件路径，更新为union_type_assignment.old8测试用例" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(ast): 完成AST节点Visitor模式迁移&#10;&#10;- 在LangExpression中实现Run、LoadIlValue和OutputType方法，使用Visitor模式替代原有逻辑&#10;- 为OldStatement添加详细的解释器和编译器模式XML文档注释&#10;- 更新CLAUDE.md文档，标记Visitor模式迁移已完成，包含InterpreterVisitor、CompilerVisitor和TypeInferenceVisitor&#10;- 移除过时的Visitor_Migration_Plan.md规划文档&#10;- 修改Program.cs中的测试文件路径，更新为union_type_assignment.old8测试用例" />
+    <MESSAGE value="refactor(language-server): 重构处理器使用构造函数注入并优化工作区符号搜索性能&#10;&#10;- 将 CodeActionHandler、DocumentHighlightHandler、FoldingRangeHandler、SemanticTokensHandler 和&#10;  WorkspaceSymbolHandler 重构为使用构造函数注入替代手动字段注入&#10;- 修复 DocumentManager 字段注入问题，统一通过构造函数参数获取依赖&#10;- 优化 WorkspaceSymbolHandler 中的符号搜索逻辑，添加查询结果数量限制以提升性能&#10;- 为 WorkspaceSymbolHandler 添加提前终止机制，避免不必要的符号遍历操作&#10;- 简化符号表遍历逻辑，提高无查询条件下的搜索效率" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(language-server): 重构处理器使用构造函数注入并优化工作区符号搜索性能&#10;&#10;- 将 CodeActionHandler、DocumentHighlightHandler、FoldingRangeHandler、SemanticTokensHandler 和&#10;  WorkspaceSymbolHandler 重构为使用构造函数注入替代手动字段注入&#10;- 修复 DocumentManager 字段注入问题，统一通过构造函数参数获取依赖&#10;- 优化 WorkspaceSymbolHandler 中的符号搜索逻辑，添加查询结果数量限制以提升性能&#10;- 为 WorkspaceSymbolHandler 添加提前终止机制，避免不必要的符号遍历操作&#10;- 简化符号表遍历逻辑，提高无查询条件下的搜索效率" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -46,6 +46,20 @@ public class VariateManager
     private ProjectManagement.PackageManager? PackageManager;
 
     /// <summary>
+    /// 符号表缓存实例（延迟初始化）
+    /// </summary>
+    private SymbolTableCache? _symbolTableCache;
+
+    /// <summary>
+    /// 获取符号表缓存实例
+    /// </summary>
+    public SymbolTableCache GetSymbolTableCache()
+    {
+        _symbolTableCache ??= new SymbolTableCache();
+        return _symbolTableCache;
+    }
+
+    /// <summary>
     /// 获取包管理器实例
     /// </summary>
     public ProjectManagement.PackageManager GetPackageManager()

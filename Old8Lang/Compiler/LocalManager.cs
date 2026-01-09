@@ -102,6 +102,23 @@ public class LocalManager
     public ModuleBuilder? DynamicModule { get; set; }
 
     /// <summary>
+    /// IL 代码生成缓存
+    /// </summary>
+    private ILGenerationCache? _ilGenerationCache;
+
+    /// <summary>
+    /// 获取 IL 生成缓存（延迟初始化）
+    /// </summary>
+    public ILGenerationCache ILCache
+    {
+        get
+        {
+            _ilGenerationCache ??= new ILGenerationCache();
+            return _ilGenerationCache;
+        }
+    }
+
+    /// <summary>
     /// break语句的目标标签
     /// </summary>
     public Label? BreakLabel { get; set; }

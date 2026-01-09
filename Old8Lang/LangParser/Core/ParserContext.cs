@@ -9,6 +9,7 @@ public class ParserContext
 {
     private readonly List<LangToken> _tokens;
     private string[]? _cachedSourceLines; // 缓存分割后的源代码行
+    private TokenIndexCache? _tokenIndexCache; // Token 索引缓存
 
     /// <summary>
     /// 源代码（用于错误上下文）
@@ -29,6 +30,11 @@ public class ParserContext
     /// 文件头指令集合
     /// </summary>
     public FileHeaderDirectives HeaderDirectives { get; } = new();
+
+    /// <summary>
+    /// 是否启用 Token 索引缓存（默认启用）
+    /// </summary>
+    public bool EnableTokenIndexCache { get; set; } = true;
 
     /// <summary>
     /// 获取缓存的源代码行（延迟初始化，避免在无错误时分割）
@@ -84,5 +90,52 @@ public class ParserContext
         return CurrentIndex + offset >= _tokens.Count
             ? new LangToken("", LangTokenType.EndOfFile, CurrentIndex + offset)
             : _tokens[CurrentIndex + offset];
+    }
+
+    /// <summary>
+    /// 获取 Token 索引缓存（延迟初始化）
+    /// </summary>
+    /// <returns>Token 索引缓存实例</returns>
+    public TokenIndexCache GetTokenIndexCache()
+    {
+        if (!EnableTokenIndexCache)
+        {
+            // 如果未启用缓存，返回一个新的未构建索引的实例
+            return new TokenIndexCache(_tokens);
+        }
+
+        if (_tokenIndexCache == null)
+        {
+            _tokenIndexCache = new TokenIndexCache(_tokens);
+            _tokenIndexCache.BuildIndex();
+        }
+
+        return _tokenIndexCache;
+    }
+
+    /// <summary>
+    /// 在指定范围内查找下一个指定类型的 Token（使用缓存优化）
+    /// </summary>
+    /// <param name="type">Token 类型</param>
+    /// <param name="startIndex">开始索引（默认从当前位置）</param>
+    /// <param name="endIndex">结束索引（-1 表示到结尾）</param>
+    /// <returns>Token 索引，未找到返回 -1</returns>
+    public int FindNextToken(LangTokenType type, int? startIndex = null, int endIndex = -1)
+    {
+        int actualStartIndex = startIndex ?? CurrentIndex;
+        return GetTokenIndexCache().FindNextToken(type, actualStartIndex, endIndex);
+    }
+
+    /// <summary>
+    /// 统计指定范围内指定类型的 Token 数量（使用缓存优化）
+    /// </summary>
+    /// <param name="type">Token 类型</param>
+    /// <param name="startIndex">开始索引（默认从当前位置）</param>
+    /// <param name="endIndex">结束索引（-1 表示到结尾）</param>
+    /// <returns>Token 数量</returns>
+    public int CountTokens(LangTokenType type, int? startIndex = null, int endIndex = -1)
+    {
+        int actualStartIndex = startIndex ?? CurrentIndex;
+        return GetTokenIndexCache().CountTokens(type, actualStartIndex, endIndex);
     }
 }
