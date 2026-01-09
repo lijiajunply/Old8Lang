@@ -57,6 +57,12 @@ public class SymbolInfo
     public bool IsStatic { get; set; }
 
     /// <summary>
+    /// 函数/方法的参数列表（仅对函数和方法有效）
+    /// 存储参数符号信息，包括参数名称、类型和位置
+    /// </summary>
+    public List<SymbolInfo> Parameters { get; set; } = new();
+
+    /// <summary>
     /// 调用的其他函数列表 (用于调用层次)
     /// 存储此函数/方法调用的其他函数的名称和位置
     /// </summary>

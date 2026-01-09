@@ -109,7 +109,7 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             documentation = FormatDocComment(funcValue.DocComment);
         }
 
-        _symbolTable[funcName] = new SymbolInfo
+        var funcSymbol = new SymbolInfo
         {
             Name = funcName,
             Kind = SymbolKind.Function,
@@ -117,6 +117,39 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             Location = location,
             Documentation = documentation
         };
+
+        // 添加函数参数到符号的参数列表
+        if (funcValue.Ids != null)
+        {
+            foreach (var param in funcValue.Ids)
+            {
+                var paramLocation = FindSymbolLocationFromTokens(param.IdName, LangTokenType.Identifier);
+                if (paramLocation == null)
+                {
+                    paramLocation = new SourceLocation
+                    {
+                        Uri = uri,
+                        Line = param.Position.Line,
+                        Column = param.Position.Column,
+                        EndLine = param.Position.Line,
+                        EndColumn = param.Position.Column + param.IdName.Length
+                    };
+                }
+
+                var paramSymbol = new SymbolInfo
+                {
+                    Name = param.IdName,
+                    Kind = SymbolKind.Parameter,
+                    Type = param.AssumptionType ?? "var",
+                    Location = paramLocation,
+                    Parent = funcSymbol
+                };
+
+                funcSymbol.Parameters.Add(paramSymbol);
+            }
+        }
+
+        _symbolTable[funcName] = funcSymbol;
 
         // 访问函数体中的局部变量
         VisitBlockStatement(funcValue.BlockStatement);
@@ -158,7 +191,7 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             documentation = FormatDocComment(funcValue.DocComment);
         }
 
-        _symbolTable[funcName] = new SymbolInfo
+        var asyncFuncSymbol = new SymbolInfo
         {
             Name = funcName,
             Kind = SymbolKind.Function,
@@ -166,6 +199,39 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             Location = location,
             Documentation = documentation
         };
+
+        // 添加函数参数到符号的参数列表
+        if (funcValue.Ids != null)
+        {
+            foreach (var param in funcValue.Ids)
+            {
+                var paramLocation = FindSymbolLocationFromTokens(param.IdName, LangTokenType.Identifier);
+                if (paramLocation == null)
+                {
+                    paramLocation = new SourceLocation
+                    {
+                        Uri = uri,
+                        Line = param.Position.Line,
+                        Column = param.Position.Column,
+                        EndLine = param.Position.Line,
+                        EndColumn = param.Position.Column + param.IdName.Length
+                    };
+                }
+
+                var paramSymbol = new SymbolInfo
+                {
+                    Name = param.IdName,
+                    Kind = SymbolKind.Parameter,
+                    Type = param.AssumptionType ?? "var",
+                    Location = paramLocation,
+                    Parent = asyncFuncSymbol
+                };
+
+                asyncFuncSymbol.Parameters.Add(paramSymbol);
+            }
+        }
+
+        _symbolTable[funcName] = asyncFuncSymbol;
 
         // 注意：异步函数的 BlockStatement 是 internal 的，且函数体内的局部变量不应该被添加到全局符号表
     }
@@ -313,7 +379,7 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
         else if (memberId.HasModifier(AccessModifierType.Protected))
             accessModifier = AccessModifier.Protected;
 
-        return new SymbolInfo
+        var methodSymbol = new SymbolInfo
         {
             Name = methodName,
             Kind = SymbolKind.Method,
@@ -323,6 +389,39 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
             AccessModifier = accessModifier,
             IsStatic = isStatic
         };
+
+        // 添加方法参数到符号的参数列表
+        if (funcValue.Ids != null)
+        {
+            foreach (var param in funcValue.Ids)
+            {
+                var paramLocation = FindSymbolLocationFromTokens(param.IdName, LangTokenType.Identifier);
+                if (paramLocation == null)
+                {
+                    paramLocation = new SourceLocation
+                    {
+                        Uri = uri,
+                        Line = param.Position.Line,
+                        Column = param.Position.Column,
+                        EndLine = param.Position.Line,
+                        EndColumn = param.Position.Column + param.IdName.Length
+                    };
+                }
+
+                var paramSymbol = new SymbolInfo
+                {
+                    Name = param.IdName,
+                    Kind = SymbolKind.Parameter,
+                    Type = param.AssumptionType ?? "var",
+                    Location = paramLocation,
+                    Parent = methodSymbol
+                };
+
+                methodSymbol.Parameters.Add(paramSymbol);
+            }
+        }
+
+        return methodSymbol;
     }
 
     /// <summary>

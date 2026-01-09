@@ -129,15 +129,46 @@ public class SymbolFinder
             return symbol;
         }
 
-        // 4. Fallback: 在所有类的成员中查找
+        // 4. 在所有函数/方法的参数中查找
+        foreach (var kvp in document.SymbolTable)
+        {
+            if (kvp.Value.Kind == SymbolKind.Function || kvp.Value.Kind == SymbolKind.Method)
+            {
+                foreach (var param in kvp.Value.Parameters)
+                {
+                    if (param.Name == symbolName)
+                    {
+                        return param;
+                    }
+                }
+            }
+        }
+
+        // 5. Fallback: 在所有类的成员中查找
         // 用于处理在类成员定义位置悬停的情况
         foreach (var kvp in document.SymbolTable)
         {
             if (kvp.Value.Kind == SymbolKind.Class)
             {
+                // 查找类成员
                 if (kvp.Value.Members.TryGetValue(symbolName, out var memberSymbol))
                 {
                     return memberSymbol;
+                }
+
+                // 查找类成员方法的参数
+                foreach (var member in kvp.Value.Members.Values)
+                {
+                    if (member.Kind == SymbolKind.Method)
+                    {
+                        foreach (var param in member.Parameters)
+                        {
+                            if (param.Name == symbolName)
+                            {
+                                return param;
+                            }
+                        }
+                    }
                 }
             }
         }

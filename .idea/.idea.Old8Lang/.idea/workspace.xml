@@ -23,18 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/INSTALL_VSCODE_EXTENSION.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InterpreterTests/test.old8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LSP_FIX_SUMMARY.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LSP_FIX_TEST_GUIDE.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/LSP_ISSUE_DIAGNOSIS.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/diagnose_lsp.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/update_language_server.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/CompletionHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SemanticAnalyzer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SemanticAnalyzer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run-firstui.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vscode-old8lang/syntaxes/old8lang.tmLanguage.json" beforeDir="false" afterPath="$PROJECT_DIR$/vscode-old8lang/syntaxes/old8lang.tmLanguage.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Models/SymbolInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Models/SymbolInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolFinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolFinder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Services/SymbolTableBuilder.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,6 +79,7 @@
     <setting file="file://$PROJECT_DIR$/TestFiles/TestProjects/ThirdPartyLibTest/o8packages.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/visitor-codegen-absolute.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/vscode-old8lang/package-lock.json" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/vscode-old8lang/syntaxes/old8lang.tmLanguage.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/378b2b72dcfd47c7a335f353306873123e00/5d/0b33afd1/02000002pdb1.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/84de67dc25fe4a408091bd3270b6d62920200/11/af9ca1aa/0200000Bpdb66.il" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/04eab530f3e74fe4bf9a74715ecc3f0d17e00/6c/4b1e0e94/IPackageConfigurationManager.cs" root0="SKIP_HIGHLIGHTING" />
@@ -571,7 +563,7 @@
       <workItem from="1767815939091" duration="4003000" />
       <workItem from="1767865400494" duration="19888000" />
       <workItem from="1767985358686" duration="156000" />
-      <workItem from="1767985518540" duration="600000" />
+      <workItem from="1767985518540" duration="1591000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
