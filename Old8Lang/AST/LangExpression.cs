@@ -21,11 +21,34 @@ public abstract class LangExpression : IOldLangTree
         Position = position;
     }
 
-    public virtual LangValueType Run(VariateManager manager) => throw new InvalidOperationError(this, "表达式未实现Run方法");
+    /// <summary>
+    /// 解释器模式执行
+    /// </summary>
+    /// <param name="manager">变量管理器</param>
+    /// <returns>表达式的值</returns>
+    /// <remarks>
+    /// 注意：Visitor 模式已实现。推荐使用 Accept 方法配合 InterpreterVisitor。
+    /// </remarks>
+    public virtual LangValueType Run(VariateManager manager)
+    {
+        // 默认实现：使用 Visitor 模式
+        var visitor = new InterpreterVisitor(manager);
+        return Accept(visitor);
+    }
 
+    /// <summary>
+    /// 编译器模式：加载表达式的IL值
+    /// </summary>
+    /// <param name="ilGenerator">IL 生成器</param>
+    /// <param name="local">局部变量管理器</param>
+    /// <remarks>
+    /// 注意：Visitor 模式已实现。推荐使用 Accept 方法配合 CompilerVisitor。
+    /// </remarks>
     public virtual void LoadIlValue(ILGenerator ilGenerator, LocalManager local)
     {
-        throw new InvalidOperationError(this, "表达式未实现LoadIlValue方法", "请在子类中实现LoadIlValue方法");
+        // 默认实现：使用 Visitor 模式
+        var visitor = new CompilerVisitor(ilGenerator, local);
+        Accept(visitor);
     }
 
     public virtual void SetValueToIl(ILGenerator ilGenerator, LocalManager local, string idName)
@@ -78,9 +101,19 @@ public abstract class LangExpression : IOldLangTree
         ilGenerator.Emit(OpCodes.Stloc, localVar.LocalIndex);
     }
 
+    /// <summary>
+    /// 类型推断
+    /// </summary>
+    /// <param name="local">局部变量管理器</param>
+    /// <returns>推断出的类型</returns>
+    /// <remarks>
+    /// 注意：Visitor 模式已实现。推荐使用 Accept 方法配合 TypeInferenceVisitor。
+    /// </remarks>
     public virtual Type? OutputType(LocalManager local)
     {
-        throw new InvalidOperationError(this, "表达式未实现OutputType方法", "请在子类中实现OutputType方法");
+        // 默认实现：使用 Visitor 模式
+        var visitor = new TypeInferenceVisitor(local);
+        return Accept(visitor);
     }
 
     /// <inheritdoc />

@@ -99,6 +99,13 @@ The AST is organized in `Old8Lang/AST/`:
   - `SelectStatement.cs`: Channel multiplexing (Go-style select)
 
 - **Visitor/**: Visitor pattern implementation for AST traversal
+  - `IVisitor.generated.cs`: Visitor interface (auto-generated, 67 methods)
+  - `InterpreterVisitor.cs`: Interpreter Visitor (replaces Run() methods)
+  - `CompilerVisitor.cs`: Compiler Visitor (replaces GenerateIl() methods)
+  - `TypeInferenceVisitor.cs`: Type inference Visitor (replaces OutputType() methods)
+  - `Generated/`: Auto-generated Accept methods for 74 AST nodes
+
+**Note**: Visitor pattern migration is **complete**. All AST nodes support the Visitor pattern via `Accept<TResult>(IVisitor<TResult>)` methods. The legacy `Run()`, `GenerateIl()`, and `OutputType()` methods now delegate to the corresponding Visitor implementations for backward compatibility.
 
 ### Parser and Interpreter
 
@@ -478,17 +485,29 @@ select {
 
 ### Visitor Pattern Implementation
 
-**Note**: The codebase is in the process of transitioning to visitor pattern:
-- AST nodes are being refactored to support visitor pattern
-- When working with AST nodes, be aware that the visitor pattern implementation is ongoing
+**Note**: The codebase has **completed** the migration to Visitor pattern:
+- ✅ All 74 AST nodes support the Visitor pattern via `Accept<TResult>(IVisitor<TResult>)` methods
+- ✅ Three complete Visitor implementations: `InterpreterVisitor`, `CompilerVisitor`, `TypeInferenceVisitor`
+- ✅ Legacy methods (`Run()`, `GenerateIl()`, `OutputType()`) delegate to Visitor implementations for backward compatibility
+- ✅ All generated code uses the `IVisitor.generated.cs` interface with 67 Visit methods
+- 🔄 **Optimization opportunity**: Some Visitor methods still delegate to original implementations for complex operations (e.g., `Operation.Run()` with 900+ lines)
+
+When working with AST nodes:
+- **Preferred approach**: Use `Accept(visitor)` with appropriate Visitor implementation
+- **Legacy approach**: Call `Run()`, `GenerateIl()`, or `OutputType()` (automatically delegates to Visitor)
 
 ### Recent Refactoring
 
 Recent changes include:
+- **✅ Visitor Pattern Migration (Completed 2026-01-09)**: Full Visitor pattern implementation for all AST nodes
+  - `InterpreterVisitor`: Handles interpretation execution (67 Visit methods)
+  - `CompilerVisitor`: Handles IL code generation (67 Visit methods)
+  - `TypeInferenceVisitor`: Handles type inference (67 Visit methods)
+  - Auto-generated `Accept` methods for 74 AST node types
+  - Legacy methods now delegate to Visitor for backward compatibility
 - **Native Concurrency Primitives**: Migrated from AsyncLib to global functions (Mutex, Semaphore, AtomicInt, Channel, ReadWriteLock, CountDownLatch, CyclicBarrier, CancellationTokenSource)
 - **Using Statement**: Added automatic resource management with disposal
 - **Select Statement**: Added channel multiplexing (Go-style select)
-- Visitor pattern implementation for AST nodes
 - AST expression type system refactoring
 - Renamed `OldIf` to `IfChild`
 - Removed `GetChildType()` method from `ILangList` interface
