@@ -100,7 +100,7 @@ public class ReferencesHandler : IReferencesHandler
 
         if (symbol == null)
         {
-            return Task.FromResult<LocationContainer?>(null);
+            return Task.FromResult<LocationContainer?>(new LocationContainer());
         }
 
         // 查找该符号的所有引用
