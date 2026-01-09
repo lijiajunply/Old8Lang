@@ -166,9 +166,9 @@ public class ProfilerManager
     /// <returns>报告文本</returns>
     public string GenerateReport(ReportFormat format = ReportFormat.Text)
     {
-        if (_currentSession == null || _currentSession.IsActive)
+        if (_currentSession == null)
         {
-            throw new InvalidOperationException("请先停止性能分析会话");
+            throw new InvalidOperationException("当前没有性能分析会话");
         }
 
         var summary = Analyzer.GenerateSummary(_currentSession);
@@ -182,9 +182,9 @@ public class ProfilerManager
     /// <param name="format">报告格式</param>
     public async Task SaveReportAsync(string filePath, ReportFormat format = ReportFormat.Text)
     {
-        if (_currentSession == null || _currentSession.IsActive)
+        if (_currentSession == null)
         {
-            throw new InvalidOperationException("请先停止性能分析会话");
+            throw new InvalidOperationException("当前没有性能分析会话");
         }
 
         var summary = Analyzer.GenerateSummary(_currentSession);

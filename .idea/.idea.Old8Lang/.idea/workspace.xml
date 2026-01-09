@@ -22,9 +22,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DefinitionHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DefinitionHandler.cs" afterDir="false" />
-    </list>
+    <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -558,7 +556,7 @@
       <workItem from="1767434122437" duration="2457000" />
       <workItem from="1767519232104" duration="38266000" />
       <workItem from="1767815939091" duration="4003000" />
-      <workItem from="1767865400494" duration="16676000" />
+      <workItem from="1767865400494" duration="17974000" />
     </task>
     <task id="LOCAL-00001" summary="rename">
       <created>1669097867975</created>
@@ -903,7 +901,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="562" />
+    <option name="localTasksCounter" value="564" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -930,8 +928,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat(parser): 支持可空泛型类型参数解析&#10;&#10;- 在ClassParser中添加对LangTokenType.Question的支持以处理可空泛型类型参数&#10;- 在FunctionParser中添加对换行符后标识符+冒号的检查逻辑&#10;- 在StatementParser中添加对可空类型注解但无赋值的情况的处理&#10;- 修复类型注解解析的边界条件问题" />
-    <MESSAGE value="feat(lang): 添加 extern 原生函数导入功能支持 P/Invoke&#10;&#10;- 实现 extern 语句的词法和语法解析，支持 native extern 语法&#10;- 添加 P/Invoke 调用约定支持，包括 cdecl、stdcall、winapi 三种类型&#10;- 实现函数别名和批量导入功能，支持块语法一次导入多个函数&#10;- 完成类型映射支持，涵盖 int、long、double、string 等基本类型及无符号类型&#10;- 实现编译器和解释器模式下的 P/Invoke 动态委托创建和方法绑定&#10;- 添加完整的 extern 语法测试文件和更新文档说明" />
     <MESSAGE value="feat(interpreter): 添加 Python extern 函数导入功能&#10;&#10;- 实现 Python 函数导入，支持 .py 脚本和 pymodule: 前缀模块&#10;- 添加 ExternType 枚举区分 C/C++ DLL 和 Python 导入类型&#10;- 实现 Python 运行时检测和初始化机制&#10;- 添加跨平台 Python DLL 自动检测（Windows/macOS/Linux）&#10;- 实现 Old8Lang 与 Python 类型自动转换&#10;- 创建 PythonFunctionLangValue 包装 Python 函数对象&#10;- 更新语法文档说明 Python extern 用法和限制&#10;- 添加 Python 异常处理和错误信息包装&#10;- 实现 Python 列表/字典与 Old8Lang 集合类型转换" />
     <MESSAGE value="refactor(extern): 重构 extern 功能为工厂模式架构&#10;&#10;- 实现 ExternProviderFactory 工厂类统一管理不同语言提供者&#10;- 创建 IExternProvider 接口规范所有外部语言提供者行为&#10;- 实现 NativeDllProvider 支持 C/C++ P/Invoke 功能&#10;- 实现 PythonProvider 支持 Python 脚本和模块导入&#10;- 重构 ExternStatement 使用工厂模式替代硬编码分支逻辑&#10;- 添加编译模式支持检查机制区分解释和编译执行&#10;- 实现动态注册新语言提供者的扩展能力&#10;- 保持向后兼容性所有现有语法无需修改" />
     <MESSAGE value="feat(interpreter): 添加 JavaScript extern 函数导入功能&#10;&#10;- 实现 JavaScriptProvider 使用 Jint 引擎执行 JavaScript 代码&#10;- 添加 JavaScript 函数包装器支持 Old8Lang 与 JavaScript 类型转换&#10;- 实现 .js 文件和 js: 前缀的 JavaScript 脚本导入方式&#10;- 添加 JavaScript 数组和对象与 Old8Lang 集合类型的自动转换&#10;- 支持 ES5.1 标准和跨平台执行（Windows/macOS/Linux）&#10;- 仅支持解释模式执行，不支持编译模式" />
@@ -955,7 +951,9 @@
     <MESSAGE value="fix(parser): 修复列号计算和符号查找问题&#10;&#10;- 修正了换行符后的列号计算，从 column = i 改为 column = i + 1&#10;- 添加了数字和标识符的起始位置记录用于准确的列号计算&#10;- 修复了符号查找器中基于位置的token查找逻辑&#10;- 更新了测试用例中的位置参数以匹配正确的行列计算&#10;- 移除了旧的基于源代码的token查找实现&#10;- 添加了符号查找相关的调试输出功能" />
     <MESSAGE value="fix(language-server): 修复符号重命名位置计算问题&#10;&#10;- 修正了RenameHandlerTests中位置参数的行列计算&#10;- 更新了符号查找器中基于位置的token查找逻辑&#10;- 修复了列号计算从0开始的转换问题&#10;- 调整了EndColumn计算方式以正确处理token范围&#10;- 更新了相关测试用例以匹配正确的位置参数" />
     <MESSAGE value="feat(language-server): 实现类成员文档注释查找功能&#10;&#10;- 在ClassParser中跳过文档注释以避免重复处理&#10;- 添加_currentClassStartTokenIndex和_currentClassEndTokenIndex字段追踪类范围&#10;- 实现FindClassTokenRange方法查找类的token范围&#10;- 实现FindDocCommentForMember方法在类范围内查找成员文档注释&#10;- 在函数和属性解析中集成文档注释查找逻辑&#10;- 更新符号表构建器在类解析前后设置和重置类范围" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(language-server): 实现类成员文档注释查找功能&#10;&#10;- 在ClassParser中跳过文档注释以避免重复处理&#10;- 添加_currentClassStartTokenIndex和_currentClassEndTokenIndex字段追踪类范围&#10;- 实现FindClassTokenRange方法查找类的token范围&#10;- 实现FindDocCommentForMember方法在类范围内查找成员文档注释&#10;- 在函数和属性解析中集成文档注释查找逻辑&#10;- 更新符号表构建器在类解析前后设置和重置类范围" />
+    <MESSAGE value="fix(language-server): 修复定义处理器返回值问题&#10;&#10;- 修正 DefinitionHandler 中 symbol 为空时的返回值，从返回 null 改为返回新的 LocationContainer()&#10;- 更新 workspace.xml 中的变更列表记录，移除多余条目并添加 DefinitionHandler 的变更&#10;- 修正工作项持续时间计数和本地任务计数器&#10;- 清理 VcsManagerConfiguration 中的旧提交消息记录&#10;- 更新最后提交消息为类成员文档注释查找功能的实现" />
+    <MESSAGE value="fix(language-server): 修复符号表构建和测试用例中的位置定位问题&#10;&#10;- 修复了符号表构建中类型推断的空值检查逻辑&#10;- 添加了对成员方法调用的类型推断支持，处理 instance.method() 形式的表达式&#10;- 实现了从函数/方法签名中提取返回类型的功能&#10;- 修正了测试用例中代码位置的断言，确保测试准确性&#10;- 增加了对操作表达式中点操作符的处理逻辑" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(language-server): 修复符号表构建和测试用例中的位置定位问题&#10;&#10;- 修复了符号表构建中类型推断的空值检查逻辑&#10;- 添加了对成员方法调用的类型推断支持，处理 instance.method() 形式的表达式&#10;- 实现了从函数/方法签名中提取返回类型的功能&#10;- 修正了测试用例中代码位置的断言，确保测试准确性&#10;- 增加了对操作表达式中点操作符的处理逻辑" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
