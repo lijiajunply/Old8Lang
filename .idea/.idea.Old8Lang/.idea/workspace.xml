@@ -23,12 +23,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5d09b3c-440e-4b88-a5ee-265e4f688161" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/test_import_links.old8" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Old8Lang/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DocumentLinkHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.LanguageServer/Handlers/DocumentLinkHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/StringValueFuncStatic.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/AST/Expression/ValueFunctions/StringValueFuncStatic.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/LangToken.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang/LangParser/Parsers/PrimaryParser.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/CodeActionHandlerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/DocumentFormattingHandlerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/DocumentHighlightHandlerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/DocumentLinkHandlerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/DocumentSymbolHandlerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/FoldingRangeHandlerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/FormattingServiceTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/SemanticTokensHandlerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/SignatureHelpHandlerTests.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/WorkspaceSymbolHandlerTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/README_TestCoverage.md" beforeDir="false" afterPath="$PROJECT_DIR$/Old8Lang.Tests/LanguageServer/README_TestCoverage.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -908,7 +913,7 @@
       <option name="project" value="LOCAL" />
       <updated>1676705011972</updated>
     </task>
-    <option name="localTasksCounter" value="573" />
+    <option name="localTasksCounter" value="575" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -935,8 +940,6 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fix(interpreter): 修复函数调用中defer语句执行时机问题&#10;&#10;- 调整defer语句执行位置，移至finally块中确保异常时也能执行&#10;- 添加executionManager空值检查避免空引用异常&#10;- 保持子作用域移除逻辑在defer执行之后&#10;- 更新workspace.xml中的变更记录和测试文件追踪" />
-    <MESSAGE value="fix(interpreter): 修复生成器中函数调用的控制流状态管理问题&#10;&#10;- 在BlockStatement中保存和恢复IsReturn标志，防止普通函数调用影响生成器控制流&#10;- 在FuncLangValue中保存和恢复IsReturn标志，确保函数调用不影响外部生成器上下文&#10;- 在FuncLangValue中保存和清除生成器上下文，防止函数内部错误操作生成器状态&#10;- 恢复函数调用前的原始生成器上下文，避免嵌套调用时的状态污染&#10;- 移除IL验证测试中的跳过标记，启用相关功能测试&#10;- 更新工作空间配置文件中的变更记录和任务计数" />
     <MESSAGE value="refactor(testapp): 简化计数器应用的程序结构&#10;&#10;- 移除 Program 类和 Main 方法的包装结构&#10;- 将应用初始化和运行逻辑直接放在全局作用域&#10;- 删除多余的 RunSimpleTest 方法封装&#10;- 移除测试应用的 README.md 说明文件&#10;- 更新 IDE 配置文件中的启动项目设置&#10;- 调整工作空间配置文件的任务计数和变更记录" />
     <MESSAGE value="chore(benchmark): 移除编译器性能测试日志文件&#10;&#10;- 删除了旧的编译器基准测试日志文件&#10;- 清理了相关的性能测试输出记录&#10;- 移除了包含错误信息的基准测试结果文件&#10;- 更新了测试环境的配置状态" />
     <MESSAGE value="feat(benchmark): 更新解析器基准测试代码和结果&#10;&#10;- 修改 ParseLargeFile 测试中的循环结构为条件判断语句&#10;- 更新泛型语法解析测试中的函数声明语法格式&#10;- 调整 Lambda 表达式解析测试中的参数类型声明方式&#10;- 优化 Match 表达式解析测试中的模式匹配语法&#10;- 修正基准测试报告中的格式错误和清理日志文件&#10;- 更新 IDE 工作区配置中的变更记录和任务计数" />
@@ -960,7 +963,9 @@
     <MESSAGE value="refactor(language-server): 重构处理器使用构造函数注入并优化工作区符号搜索性能&#10;&#10;- 将 CodeActionHandler、DocumentHighlightHandler、FoldingRangeHandler、SemanticTokensHandler 和&#10;  WorkspaceSymbolHandler 重构为使用构造函数注入替代手动字段注入&#10;- 修复 DocumentManager 字段注入问题，统一通过构造函数参数获取依赖&#10;- 优化 WorkspaceSymbolHandler 中的符号搜索逻辑，添加查询结果数量限制以提升性能&#10;- 为 WorkspaceSymbolHandler 添加提前终止机制，避免不必要的符号遍历操作&#10;- 简化符号表遍历逻辑，提高无查询条件下的搜索效率" />
     <MESSAGE value="feat(performance): 添加解析器、编译器和符号表缓存优化&#10;&#10;- 实现 TokenIndexCache 用于优化解析器中的 Token 查找性能&#10;- 添加 ILGenerationCache 用于缓存编译器中的反射信息和类型转换&#10;- 创建 SymbolTableCache 用于加速符号表中的变量查找操作&#10;- 在 ParserContext 中集成 Token 索引缓存功能&#10;- 为 LocalManager 添加 IL 生成缓存访问属性&#10;- 在 VariateManager 中实现符号表缓存实例管理&#10;- 添加性能基准测试用于类型推断性能测量&#10;- 生成性能优化报告记录缓存实现细节" />
     <MESSAGE value="refactor(core): 将 null 检查从传统语法转换为现代 C# 模式匹配语法&#10;&#10;- 将所有 != null 检查替换为 is not null 模式匹配&#10;- 将所有 == null 检查替换为 is null 模式匹配&#10;- 统一代码库中的空值检查风格以提高可读性&#10;- 修复 Apis.ListToObjects 方法中的空值检查逻辑&#10;- 更新 ArrayLangValue 类中的空值检查实现&#10;- 修改 AssertHelper 类中的断言方法空值检查方式&#10;- 更新 AsyncForInStatement 中的生成器上下文检查&#10;- 调整 BlockStatement 中的语句处理空值检查逻辑&#10;- 优化 BreakpointManager 中的条件评估空值检查&#10;- 改进 ClassInit 中的类存在性检查方式&#10;- 调整 DocCommentInfo 中的返回值空值判断&#10;- 优化 DllPathResolver 中的路径解析空值检查&#10;- 更新 EnumInit 中的枚举成员值检查方式&#10;- 改进 ErrorLangValue 中的建议消息空值检查&#10;- 优化 ExternStatement 中的别名处理空值检查逻辑" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(core): 将 null 检查从传统语法转换为现代 C# 模式匹配语法&#10;&#10;- 将所有 != null 检查替换为 is not null 模式匹配&#10;- 将所有 == null 检查替换为 is null 模式匹配&#10;- 统一代码库中的空值检查风格以提高可读性&#10;- 修复 Apis.ListToObjects 方法中的空值检查逻辑&#10;- 更新 ArrayLangValue 类中的空值检查实现&#10;- 修改 AssertHelper 类中的断言方法空值检查方式&#10;- 更新 AsyncForInStatement 中的生成器上下文检查&#10;- 调整 BlockStatement 中的语句处理空值检查逻辑&#10;- 优化 BreakpointManager 中的条件评估空值检查&#10;- 改进 ClassInit 中的类存在性检查方式&#10;- 调整 DocCommentInfo 中的返回值空值判断&#10;- 优化 DllPathResolver 中的路径解析空值检查&#10;- 更新 EnumInit 中的枚举成员值检查方式&#10;- 改进 ErrorLangValue 中的建议消息空值检查&#10;- 优化 ExternStatement 中的别名处理空值检查逻辑" />
+    <MESSAGE value="feat(language-server): 增强模块解析和转义序列处理功能&#10;&#10;- 实现 ModuleResolver 统一解析各种模块类型（标准库、第三方包、本地文件等）&#10;- 添加标准库源代码路径定位功能，支持 Old8LangLib 和 Old8Lang.NetLib&#10;- 引入 EscapeSequenceHelper 辅助类处理 Unicode 和十六进制转义序列&#10;- 重构字符串值函数中的空值检查，使用统一的 ThrowIfNullOrEmpty 方法&#10;- 优化 DocumentLinkHandler 中的模块路径解析逻辑&#10;- 改进 LangToken 中的转义序列解析算法，增强错误处理能力&#10;- 简化 PrimaryParser 中的转义序列处理代码，提高解析效率" />
+    <MESSAGE value="test(parser): 添加转义序列解析器单元测试&#10;&#10;- 实现了Unicode转义序列(\u)的完整测试覆盖&#10;- 添加了十六进制转义序列(\x)的全面测试用例&#10;- 包含边界条件和异常情况的测试验证&#10;- 新增字符串值函数的单元测试确保功能正确性&#10;- 验证了字符串操作方法如StartsWith、EndsWith等的行为&#10;- 补充了Base64编码解码功能的测试用例" />
+    <option name="LAST_COMMIT_MESSAGE" value="test(parser): 添加转义序列解析器单元测试&#10;&#10;- 实现了Unicode转义序列(\u)的完整测试覆盖&#10;- 添加了十六进制转义序列(\x)的全面测试用例&#10;- 包含边界条件和异常情况的测试验证&#10;- 新增字符串值函数的单元测试确保功能正确性&#10;- 验证了字符串操作方法如StartsWith、EndsWith等的行为&#10;- 补充了Base64编码解码功能的测试用例" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
