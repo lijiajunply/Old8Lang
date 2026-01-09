@@ -87,13 +87,12 @@ pi <- Calculator.PI
     {
         // Arrange
         var documentManager = new DocumentManager();
-        var code = @"
-func testFunction() -> int {
+        var code = @"func testFunction() -> int {
     return 42
 }
 
 class TestClass {
-    public value <- ""
+    public value <- """"
 }
 
 instance <- TestClass()
@@ -109,19 +108,19 @@ reference <- testFunction()
         var functionDefinition = await handler.Handle(new DefinitionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(11, 14) // Line 12: reference <- |testFunction()
+            Position = new Position(10, 13) // Line 11: reference <- |testFunction()
         }, CancellationToken.None);
 
         var classDefinition = await handler.Handle(new DefinitionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(9, 14) // Line 10: instance <- |TestClass()
+            Position = new Position(8, 13) // Line 9: instance <- |TestClass()
         }, CancellationToken.None);
 
         var variableDefinition = await handler.Handle(new DefinitionParams
         {
             TextDocument = new TextDocumentIdentifier { Uri = new Uri(uri) },
-            Position = new Position(10, 11) // Line 11: result <- |instance.value
+            Position = new Position(9, 11) // Line 10: result <- |instance.value
         }, CancellationToken.None);
 
         // Assert
@@ -131,15 +130,15 @@ reference <- testFunction()
 
         // Function definition should point to function declaration
         var funcLocation = functionDefinition.First().Location!;
-        Assert.Equal(1, funcLocation.Range.Start.Line); // Line 2 (0-based is 1)
+        Assert.Equal(0, funcLocation.Range.Start.Line); // Line 1 (0-based is 0)
 
         // Class definition should point to class declaration
         var classLocation = classDefinition.First().Location!;
-        Assert.Equal(5, classLocation.Range.Start.Line); // Line 6 (0-based is 5)
+        Assert.Equal(4, classLocation.Range.Start.Line); // Line 5 (0-based is 4)
 
         // Variable definition should point to variable declaration
         var varLocation = variableDefinition.First().Location!;
-        Assert.Equal(9, varLocation.Range.Start.Line); // Line 10 (0-based is 9)
+        Assert.Equal(8, varLocation.Range.Start.Line); // Line 9 (0-based is 8)
     }
 
     [Fact]

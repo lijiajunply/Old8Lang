@@ -678,10 +678,9 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
 
                     if (isDefinition)
                     {
-                        // 返回标识符的位置
-                        // 从所在行的文本中查找符号名称的列位置
+                        // 使用 token 的实际位置（转换为 0-based）
                         var line = token.Line - 1; // 转换为0-based
-                        var column = FindColumnInLine(line, symbolName, expectedTokenType);
+                        var column = token.Column - 1; // 转换为0-based
 
                         return new SourceLocation
                         {
@@ -739,8 +738,9 @@ public class SymbolTableBuilder(string uri, List<LangToken>? tokens = null, stri
                 token.Value == varName &&
                 nextToken.Type == LangTokenType.Assignment) // <- 运算符
             {
+                // 使用 token 的实际位置（转换为 0-based）
                 var line = token.Line - 1; // 转换为0-based
-                var column = FindColumnInLineForVariable(line, varName);
+                var column = token.Column - 1; // 转换为0-based
 
                 return new SourceLocation
                 {

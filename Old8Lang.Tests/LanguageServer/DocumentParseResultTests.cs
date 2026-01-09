@@ -119,8 +119,8 @@ func testFunction() -> int {
             Tokens = tokens,
             Ast = ast,
             SymbolTable = new Dictionary<string, SymbolInfo>(),
-            Diagnostics = new List<DiagnosticInfo>
-            {
+            Diagnostics =
+            [
                 new DiagnosticInfo
                 {
                     Severity = DiagnosticSeverity.Error,
@@ -129,6 +129,7 @@ func testFunction() -> int {
                     Column = 1,
                     Source = "Parser"
                 },
+
                 new DiagnosticInfo
                 {
                     Severity = DiagnosticSeverity.Warning,
@@ -137,7 +138,7 @@ func testFunction() -> int {
                     Column = 9,
                     Source = "Semantic"
                 }
-            }
+            ]
         };
 
         // Assert
@@ -149,7 +150,7 @@ func testFunction() -> int {
         Assert.NotNull(result.SymbolTable);
         Assert.NotEmpty(result.Diagnostics);
         Assert.Equal(2, result.Diagnostics.Count);
-        
+
         // Check error diagnostics
         var errorDiag = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
         var warningDiag = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Warning).ToList();
@@ -197,18 +198,21 @@ func testFunction() -> int {
         {
             Uri = "test://test.old8",
             Text = "test code",
-            Diagnostics = new List<DiagnosticInfo>()
+            Diagnostics =
+            [
+                new DiagnosticInfo
+                {
+                    Severity = DiagnosticSeverity.Information,
+                    Message = "Info message",
+                    Line = 1,
+                    Column = 1,
+                    Source = "Test"
+                }
+                // Assert
+            ]
         };
 
         // Act
-        result.Diagnostics.Add(new DiagnosticInfo
-        {
-            Severity = DiagnosticSeverity.Information,
-            Message = "Info message",
-            Line = 1,
-            Column = 1,
-            Source = "Test"
-        });
 
         // Assert
         Assert.Single(result.Diagnostics);
