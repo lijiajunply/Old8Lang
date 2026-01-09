@@ -77,7 +77,14 @@ public class SemanticTokensHandler(DocumentManager documentManager) : SemanticTo
     protected override Task<SemanticTokensDocument> GetSemanticTokensDocument(
         ITextDocumentIdentifierParams @params, CancellationToken cancellationToken)
     {
-        return Task.FromResult(new SemanticTokensDocument(RegistrationOptions.Legend));
+        // 如果 RegistrationOptions 未初始化（例如在测试环境中），创建默认的 Legend
+        var legend = RegistrationOptions?.Legend ?? new SemanticTokensLegend
+        {
+            TokenTypes = new Container<SemanticTokenType>(TokenTypes.Select(t => new SemanticTokenType(t))),
+            TokenModifiers = new Container<SemanticTokenModifier>(TokenModifiers.Select(m => new SemanticTokenModifier(m)))
+        };
+
+        return Task.FromResult(new SemanticTokensDocument(legend));
     }
 
     protected override async Task Tokenize(
