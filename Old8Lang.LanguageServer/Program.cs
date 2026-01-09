@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Server;
 using Old8Lang.LanguageServer.Services;
 using Old8Lang.LanguageServer.Handlers;
+using Old8Lang.GlobalFunctions.Core;
 
 namespace Old8Lang.LanguageServer;
 
@@ -10,13 +11,16 @@ class Program
 {
     static async Task Main(string[] args)
     {
+        // 在启动时立即初始化全局函数，避免在请求处理时阻塞
+        GlobalFunctionInitializer.EnsureInitialized();
+
         var server = await OmniSharp.Extensions.LanguageServer.Server.LanguageServer.From(options =>
             options
                 .WithInput(Console.OpenStandardInput())
                 .WithOutput(Console.OpenStandardOutput())
                 .ConfigureLogging(x => x
                     .AddLanguageProtocolLogging()
-                    .SetMinimumLevel(LogLevel.Debug))
+                    .SetMinimumLevel(LogLevel.Warning)) // 降低日志级别，减少干扰
                 .WithServices(ConfigureServices)
                 // 核心功能
                 .WithHandler<TextDocumentSyncHandler>()

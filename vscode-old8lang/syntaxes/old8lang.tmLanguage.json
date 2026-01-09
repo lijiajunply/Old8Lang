@@ -25,15 +25,19 @@
       "patterns": [
         {
           "name": "keyword.control.old8lang",
-          "match": "\\b(if|elif|else|for|while|for-in|switch|case|default|return|break|continue|try|catch|finally|throw|yield)\\b"
+          "match": "\\b(if|elif|else|for|while|for-in|in|switch|case|default|return|break|continue|try|catch|finally|throw|yield|using|defer|match)\\b"
         },
         {
           "name": "keyword.other.old8lang",
-          "match": "\\b(func|class|import|native|async|await)\\b"
+          "match": "\\b(func|class|interface|enum|import|from|native|extern|async|await|extends|implements|mixin|with|super|select|where|orderby|ascending|descending|group|by|join|on|into|let|params)\\b"
         },
         {
           "name": "storage.modifier.old8lang",
-          "match": "\\b(public|private|static|const)\\b"
+          "match": "\\b(public|private|protected|static|const|abstract|lazy|dynamic)\\b"
+        },
+        {
+          "name": "keyword.operator.old8lang",
+          "match": "\\b(as|is|not|and|or|xor)\\b"
         }
       ]
     },

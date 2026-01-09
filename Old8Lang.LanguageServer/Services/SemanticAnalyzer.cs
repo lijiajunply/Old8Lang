@@ -1,5 +1,6 @@
 using Old8Lang.LangParser;
 using Old8Lang.LanguageServer.Models;
+using Old8Lang.GlobalFunctions.Core;
 
 namespace Old8Lang.LanguageServer.Services;
 
@@ -59,19 +60,17 @@ public class SemanticAnalyzer(DocumentParseResult document)
             return;
         }
 
-        // 内置函数列表
-        var builtInFunctions = new HashSet<string>
-        {
-            "PrintLine", "Print", "Input", "ReadLine", "Sleep", "Exit",
-            "ToInt", "ToDouble", "ToString", "ToBool", "ToChar",
-            "Len", "Type", "Range", "Assert", "IsNull"
-        };
+        // 全局函数已在 Program.cs 启动时初始化，这里直接获取即可
+        var builtInFunctions = new HashSet<string>(
+            GlobalFunctionRegistry.Instance.GetAllFunctionNames(),
+            StringComparer.OrdinalIgnoreCase
+        );
 
         // 内置类型
         var builtInTypes = new HashSet<string>
         {
-            "int", "double", "string", "bool", "char", "void", "var",
-            "List", "Dict", "Tuple", "Array"
+            "int", "double", "string", "bool", "char", "void",
+            "List", "Dict", "Tuple", "Array", "list", "dict", "tuple"
         };
 
         for (int i = 0; i < document.Tokens.Count; i++)
@@ -172,6 +171,7 @@ public class SemanticAnalyzer(DocumentParseResult document)
             {
                 symbolLocations[name] = new List<SourceLocation>();
             }
+
             symbolLocations[name].Add(symbol.Location);
         }
 

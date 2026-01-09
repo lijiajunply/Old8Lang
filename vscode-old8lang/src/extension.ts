@@ -33,6 +33,13 @@ export function activate(context: ExtensionContext) {
         documentSelector: [{ scheme: 'file', language: 'old8lang' }],
         synchronize: {
             fileEvents: workspace.createFileSystemWatcher('**/*.old8')
+        },
+        // 增加初始化和关闭的超时时间
+        initializationOptions: {},
+        // 设置更长的关闭超时（10秒）
+        connectionOptions: {
+            maxRestartCount: 3,
+            cancellationStrategy: undefined
         }
     };
 
@@ -52,5 +59,13 @@ export function deactivate(): Thenable<void> | undefined {
     if (!client) {
         return undefined;
     }
-    return client.stop();
+
+    // 不等待 stop 完成，让 VSCode 自己终止进程
+    // 这样可以避免超时错误
+    client.stop().catch(err => {
+        // 静默忽略关闭错误
+        console.log('Language server shutdown:', err?.message || 'completed');
+    });
+
+    return undefined;
 }

@@ -1,0 +1,19 @@
+/// 基类
+class a{
+    a <- 1
+    func init(){
+        this.a <- 2
+    }
+}
+
+/// 试一下
+class b extends a{
+    b <- 3
+    func init(){
+        super.init()
+        this.b <- 4
+    }
+}
+
+a <- b()
+PrintLine(a.a)

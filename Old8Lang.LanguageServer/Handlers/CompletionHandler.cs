@@ -3,6 +3,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using Old8Lang.LanguageServer.Services;
 using Old8Lang.LangParser;
+using Old8Lang.GlobalFunctions.Core;
 
 namespace Old8Lang.LanguageServer.Handlers;
 
@@ -65,6 +66,9 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
 
         // 添加代码片段补全
         completionItems.AddRange(GetSnippetCompletions());
+
+        // 添加内置函数补全（所有70+个全局函数）
+        completionItems.AddRange(GetBuiltInFunctionCompletions());
 
         // 添加符号补全
         if (document?.SymbolTable != null)
@@ -232,22 +236,41 @@ public class CompletionHandler(DocumentManager documentManager) : ICompletionHan
         }).ToList();
     }
 
+    /// <summary>
+    /// 获取内置函数补全（从 GlobalFunctionRegistry 动态获取）
+    /// </summary>
+    private static IEnumerable<CompletionItem> GetBuiltInFunctionCompletions()
+    {
+        // 全局函数已在 Program.cs 启动时初始化，这里直接获取即可
+        var functionNames = GlobalFunctionRegistry.Instance.GetAllFunctionNames();
+
+        return functionNames.Select(name => new CompletionItem
+        {
+            Label = name,
+            Kind = CompletionItemKind.Function,
+            Detail = "内置函数",
+            Documentation = $"Old8Lang 内置全局函数：{name}",
+            InsertText = $"{name}($0)",
+            InsertTextFormat = InsertTextFormat.Snippet
+        });
+    }
+
     private static IEnumerable<CompletionItem> GetKeywordCompletions()
     {
-        var keywords = new[]
-        {
-            "func", "class", "if", "elif", "else", "for", "while", "in",
-            "switch", "case", "default", "return", "break", "continue",
-            "try", "catch", "finally", "throw", "import", "async", "await",
-            "yield", "native", "public", "private", "static", "const",
-            "int", "double", "string", "bool", "char", "void", "var"
-        };
+        // 从 KeywordType 枚举动态获取所有关键字
+        var keywords = Enum.GetNames<LangParser.KeywordType>()
+            .Select(name => name.ToLower())
+            .ToList();
 
-        return keywords.Select(keyword => new CompletionItem
+        // 添加类型关键字（不在 KeywordType 中但是语言的关键字）
+        var typeKeywords = new[] { "int", "double", "string", "bool", "char", "void", "var" };
+        keywords.AddRange(typeKeywords);
+
+        return keywords.Distinct().Select(keyword => new CompletionItem
         {
             Label = keyword,
             Kind = CompletionItemKind.Keyword,
-            Detail = $"Old8Lang 关键字",
+            Detail = "Old8Lang 关键字",
             InsertText = keyword
         });
     }
