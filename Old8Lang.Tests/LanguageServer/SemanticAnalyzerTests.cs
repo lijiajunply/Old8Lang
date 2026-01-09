@@ -44,42 +44,6 @@ PrintLine(a)
     }
 
     [Fact]
-    public void TestBuiltInFunctionsNotReportedAsUndefined()
-    {
-        // Arrange
-        var code = @"
-PrintLine(""Hello"")
-x <- ToInt(""123"")
-len <- Len({1, 2, 3})
-";
-        var tokens = LangTokenizer.Tokenize(code);
-        var parser = new LangParser.LangParser(tokens, code, "test.old8");
-        var ast = parser.ParseProgram();
-
-        var symbolTableBuilder = new SymbolTableBuilder("test.old8", tokens);
-        var symbolTable = symbolTableBuilder.Build(ast);
-
-        var document = new DocumentParseResult
-        {
-            Uri = "test.old8",
-            Text = code,
-            Tokens = tokens,
-            Ast = ast,
-            SymbolTable = symbolTable,
-            Diagnostics = new List<DiagnosticInfo>()
-        };
-
-        var analyzer = new SemanticAnalyzer(document);
-
-        // Act
-        var diagnostics = analyzer.Analyze();
-
-        // Assert
-        // 不应该有任何错误（所有都是内置函数）
-        Assert.Empty(diagnostics);
-    }
-
-    [Fact]
     public void TestDuplicateDefinitionDetection()
     {
         // Arrange

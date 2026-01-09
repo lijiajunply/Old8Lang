@@ -39,9 +39,11 @@ public class WorkspaceSymbolHandler(DocumentManager documentManager) : Workspace
                     break;
                 }
 
-                // 如果查询为空，返回所有符号
-                // 如果查询不为空，检查符号名是否包含查询字符串（已优化为不区分大小写）
-                if (!hasQuery || symbolName.ToLower().Contains(query))
+                // 检查当前符号是否匹配查询
+                bool symbolMatches = !hasQuery || MatchesQuery(symbolName, query);
+
+                // 如果符号匹配查询，添加到结果中
+                if (symbolMatches)
                 {
                     // 创建工作区符号
                     var workspaceSymbol = new WorkspaceSymbol
@@ -60,37 +62,38 @@ public class WorkspaceSymbolHandler(DocumentManager documentManager) : Workspace
                     };
 
                     symbols.Add(workspaceSymbol);
+                }
 
-                    // 如果是类，也添加其成员（仅当查询匹配时）
-                    if (symbolInfo.Kind == SymbolKind.Class)
+                // 如果是类，检查其成员（即使类本身不匹配查询，成员仍可能匹配）
+                if (symbolInfo.Kind == SymbolKind.Class)
+                {
+                    foreach (var (memberName, memberInfo) in symbolInfo.Members)
                     {
-                        foreach (var (memberName, memberInfo) in symbolInfo.Members)
+                        // 优化：如果没有查询且已经收集了足够多的符号，则跳过成员
+                        if (!hasQuery && symbols.Count >= maxSymbolsWithoutQuery)
                         {
-                            // 优化：如果没有查询且已经收集了足够多的符号，则跳过成员
-                            if (!hasQuery && symbols.Count >= maxSymbolsWithoutQuery)
-                            {
-                                break;
-                            }
+                            break;
+                        }
 
-                            if (!hasQuery || memberName.ToLower().Contains(query))
+                        // 检查成员是否匹配查询
+                        if (!hasQuery || MatchesQuery(memberName, query))
+                        {
+                            var memberSymbol = new WorkspaceSymbol
                             {
-                                var memberSymbol = new WorkspaceSymbol
+                                Name = memberInfo.Name,
+                                Kind = ConvertSymbolKind(memberInfo.Kind),
+                                Location = new Location
                                 {
-                                    Name = memberInfo.Name,
-                                    Kind = ConvertSymbolKind(memberInfo.Kind),
-                                    Location = new Location
-                                    {
-                                        Uri = DocumentUri.From(memberInfo.Location.Uri),
-                                        Range = new OmniSharp.Extensions.LanguageServer.Protocol.Models.Range(
-                                            new Position(memberInfo.Location.Line, memberInfo.Location.Column),
-                                            new Position(memberInfo.Location.EndLine, memberInfo.Location.EndColumn)
-                                        )
-                                    },
-                                    ContainerName = symbolInfo.Name // 成员的容器是类名
-                                };
+                                    Uri = DocumentUri.From(memberInfo.Location.Uri),
+                                    Range = new OmniSharp.Extensions.LanguageServer.Protocol.Models.Range(
+                                        new Position(memberInfo.Location.Line, memberInfo.Location.Column),
+                                        new Position(memberInfo.Location.EndLine, memberInfo.Location.EndColumn)
+                                    )
+                                },
+                                ContainerName = symbolInfo.Name // 成员的容器是类名
+                            };
 
-                                symbols.Add(memberSymbol);
-                            }
+                            symbols.Add(memberSymbol);
                         }
                     }
                 }
@@ -140,5 +143,177 @@ public class WorkspaceSymbolHandler(DocumentManager documentManager) : Workspace
     {
         // 如果有父符号，返回父符号的名称
         return symbolInfo.Parent?.Name;
+    }
+
+    /// <summary>
+    /// 检查符号名是否匹配查询（支持子字符串匹配、前缀匹配和模糊匹配）
+    /// </summary>
+    /// <param name="symbolName">符号名称</param>
+    /// <param name="query">查询字符串（已转为小写）</param>
+    /// <returns>是否匹配</returns>
+    private static bool MatchesQuery(string symbolName, string query)
+    {
+        var lowerSymbolName = symbolName.ToLower();
+
+        // 1. 子字符串匹配（已有的逻辑）
+        if (lowerSymbolName.Contains(query))
+        {
+            return true;
+        }
+
+        // 2. 前缀匹配：查询是符号名的前缀
+        // 例如：查询 "calc" 匹配 "Calculator"
+        if (lowerSymbolName.StartsWith(query))
+        {
+            return true;
+        }
+
+        // 3. CamelCase 匹配：查询匹配驼峰命名的首字母
+        // 例如：查询 "gur" 匹配 "getUserRole"
+        if (MatchesCamelCase(symbolName, query))
+        {
+            return true;
+        }
+
+        // 4. 模糊匹配：查询的所有字符按顺序出现在符号名中
+        // 例如：查询 "calculate" 匹配 "Calculator"（calc-u-lat-e -> calc-u-lat-or）
+        if (FuzzyMatch(lowerSymbolName, query))
+        {
+            return true;
+        }
+
+        // 5. 相似度匹配：如果符号名和查询非常相似（允许少量字符差异）
+        // 例如：查询 "calculate" 匹配 "Calculator"
+        if (SimilarityMatch(lowerSymbolName, query))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 相似度匹配：检查符号名和查询是否足够相似
+    /// 使用编辑距离阈值进行匹配
+    /// </summary>
+    /// <param name="symbolName">符号名称（小写）</param>
+    /// <param name="query">查询字符串（小写）</param>
+    /// <returns>是否匹配</returns>
+    private static bool SimilarityMatch(string symbolName, string query)
+    {
+        // 如果长度差异太大，不匹配
+        if (Math.Abs(symbolName.Length - query.Length) > 3)
+        {
+            return false;
+        }
+
+        // 计算编辑距离（Levenshtein距离）
+        int distance = LevenshteinDistance(symbolName, query);
+
+        // 如果编辑距离小于等于2，认为足够相似
+        // 例如："calculator" 和 "calculate" 的编辑距离是 2 (删除 'e'，添加 'or')
+        return distance <= 2;
+    }
+
+    /// <summary>
+    /// 计算两个字符串的 Levenshtein 编辑距离
+    /// </summary>
+    private static int LevenshteinDistance(string s1, string s2)
+    {
+        int[,] d = new int[s1.Length + 1, s2.Length + 1];
+
+        for (int i = 0; i <= s1.Length; i++)
+        {
+            d[i, 0] = i;
+        }
+
+        for (int j = 0; j <= s2.Length; j++)
+        {
+            d[0, j] = j;
+        }
+
+        for (int j = 1; j <= s2.Length; j++)
+        {
+            for (int i = 1; i <= s1.Length; i++)
+            {
+                int cost = (s1[i - 1] == s2[j - 1]) ? 0 : 1;
+                d[i, j] = Math.Min(
+                    Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1),
+                    d[i - 1, j - 1] + cost
+                );
+            }
+        }
+
+        return d[s1.Length, s2.Length];
+    }
+
+    /// <summary>
+    /// 模糊匹配：检查查询的所有字符是否按顺序出现在符号名中
+    /// </summary>
+    /// <param name="symbolName">符号名称（小写）</param>
+    /// <param name="query">查询字符串（小写）</param>
+    /// <returns>是否匹配</returns>
+    private static bool FuzzyMatch(string symbolName, string query)
+    {
+        int queryIndex = 0;
+        int symbolIndex = 0;
+
+        while (queryIndex < query.Length && symbolIndex < symbolName.Length)
+        {
+            if (query[queryIndex] == symbolName[symbolIndex])
+            {
+                queryIndex++;
+            }
+            symbolIndex++;
+        }
+
+        // 如果查询的所有字符都找到了，则匹配成功
+        return queryIndex == query.Length;
+    }
+
+    /// <summary>
+    /// 检查查询是否匹配符号的驼峰命名首字母
+    /// </summary>
+    /// <param name="symbolName">符号名称（原始大小写）</param>
+    /// <param name="query">查询字符串（小写）</param>
+    /// <returns>是否匹配</returns>
+    private static bool MatchesCamelCase(string symbolName, string query)
+    {
+        if (string.IsNullOrEmpty(symbolName) || string.IsNullOrEmpty(query))
+        {
+            return false;
+        }
+
+        var camelCaseLetters = new List<char>();
+
+        // 提取驼峰命名的大写字母
+        // 第一个字符总是包含（无论大小写）
+        camelCaseLetters.Add(char.ToLower(symbolName[0]));
+
+        // 遍历剩余字符，提取大写字母
+        for (int i = 1; i < symbolName.Length; i++)
+        {
+            if (char.IsUpper(symbolName[i]))
+            {
+                camelCaseLetters.Add(char.ToLower(symbolName[i]));
+            }
+        }
+
+        // 检查查询是否匹配驼峰首字母序列
+        if (camelCaseLetters.Count < query.Length)
+        {
+            return false;
+        }
+
+        int queryIndex = 0;
+        for (int i = 0; i < camelCaseLetters.Count && queryIndex < query.Length; i++)
+        {
+            if (camelCaseLetters[i] == query[queryIndex])
+            {
+                queryIndex++;
+            }
+        }
+
+        return queryIndex == query.Length;
     }
 }
